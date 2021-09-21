@@ -1,14 +1,14 @@
 ---
-# Per environment values which override defaults in hmpps-template-typescript/values.yaml
+# Per environment values which override defaults in book-a-prison-visit-staff-ui/values.yaml
 
 generic-service:
   replicaCount: 2
 
   ingress:
-    host: hmpps-template-typescript-dev.hmpps.service.justice.gov.uk
+    host: manage-a-prison-visit-dev.hmpps.service.justice.gov.uk
 
   env:
-    INGRESS_URL: "https://hmpps-template-typescript-dev.hmpps.service.justice.gov.uk"
+    INGRESS_URL: "https://manage-a-prison-visit-dev.hmpps.service.justice.gov.uk"
     HMPPS_AUTH_URL: "https://sign-in-dev.hmpps.service.justice.gov.uk/auth"
     TOKEN_VERIFICATION_API_URL: "https://token-verification-api-dev.prison.service.justice.gov.uk"
 
