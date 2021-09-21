@@ -1,0 +1,161 @@
+{
+  "name": "hmpps-template-typescript",
+  "version": "0.0.1",
+  "description": "HMPPS Typescript Template",
+  "repository": "git@github.com:ministryofjustice/hmpps-template-typescript.git",
+  "license": "MIT",
+  "scripts": {
+    "prepare": "husky install",
+    "copy-views": "cp -R server/views dist/server/",
+    "compile-sass": "sass --no-source-map --load-path=node_modules/govuk-frontend --load-path=node_modules/@ministryofjustice/frontend ./assets/sass/application.sass:./assets/stylesheets/application.css ./assets/sass/application-ie8.sass:./assets/stylesheets/application-ie8.css --style compressed",
+    "watch-ts": "tsc -w",
+    "watch-views": "nodemon --watch server/views -e html,njk -x npm run copy-views",
+    "watch-node": "DEBUG=gov-starter-server* nodemon --watch dist/ dist/server.js | bunyan -o short",
+    "watch-sass": "npm run compile-sass -- --watch",
+    "build": "npm run compile-sass && tsc && npm run copy-views",
+    "start": "node $NODE_OPTIONS dist/server.js | bunyan -o short",
+    "start:dev": "npm run build && concurrently -k -p \"[{name}]\" -n \"Views,TypeScript,Node,Sass\" -c \"yellow.bold,cyan.bold,green.bold,blue.bold\" \"npm run watch-views\" \"npm run watch-ts\" \"npm run watch-node\" \"npm run watch-sass\"",
+    "start-feature": "export $(cat feature.env) && node $NODE_DEBUG_OPTION dist/server.js | bunyan -o short",
+    "watch-node-feature": "export $(cat feature.env) && nodemon --watch dist/ $NODE_DEBUG_OPTION dist/server.js | bunyan -o short",
+    "start-feature:dev": "npm run build && concurrently -k -p \"[{name}]\" -n \"Views,TypeScript,Node,Sass\" -c \"yellow.bold,cyan.bold,green.bold,blue.bold\" \"npm run watch-views\" \"npm run watch-ts\" \"npm run watch-node-feature\" \"npm run watch-sass\"",
+    "record-build-info": "node ./bin/record-build-info",
+    "lint": "eslint . --cache --max-warnings 0",
+    "typecheck": "tsc && tsc -p integration_tests",
+    "test": "jest",
+    "security_audit": "npx audit-ci --config audit-ci.json",
+    "int-test": "cypress run --config video=false",
+    "int-test-ui": "cypress open",
+    "clean": "rm -rf dist build node_modules stylesheets"
+  },
+  "engines": {
+    "node": "^14",
+    "npm": "^6.4.1"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "collectCoverageFrom": [
+      "server/**/*.{ts,js,jsx,mjs}"
+    ],
+    "testMatch": [
+      "<rootDir>/(server|job)/**/?(*.)(spec|test).{ts,js,jsx,mjs}"
+    ],
+    "testEnvironment": "node",
+    "reporters": [
+      "default",
+      [
+        "jest-junit",
+        {
+          "outputDirectory": "test_results/jest/"
+        }
+      ],
+      [
+        "./node_modules/jest-html-reporter",
+        {
+          "outputPath": "test_results/unit-test-reports.html"
+        }
+      ]
+    ],
+    "moduleFileExtensions": [
+      "web.js",
+      "js",
+      "json",
+      "node",
+      "ts"
+    ]
+  },
+  "nodemonConfig": {
+    "ignore": [
+      ".circleci/*",
+      "migrations/*",
+      "node_modules/*",
+      "test/*",
+      "integration_tests/*"
+    ],
+    "delay": 2500,
+    "ext": "js,json,html,njk"
+  },
+  "lint-staged": {
+    "*.{ts,js,css}": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "*.json": [
+      "prettier --write"
+    ]
+  },
+  "dependencies": {
+    "@ministryofjustice/frontend": "^0.2.5",
+    "agentkeepalive": "^4.1.4",
+    "applicationinsights": "^2.1.6",
+    "body-parser": "^1.19.0",
+    "bunyan": "^1.8.15",
+    "bunyan-format": "^0.2.1",
+    "compression": "^1.7.4",
+    "connect-flash": "^0.1.1",
+    "connect-redis": "^6.0.0",
+    "cookie-session": "^1.4.0",
+    "csurf": "^1.11.0",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "express-request-id": "^1.4.1",
+    "express-session": "^1.17.2",
+    "govuk-frontend": "^3.13.0",
+    "helmet": "^4.6.0",
+    "http-errors": "^1.8.0",
+    "jquery": "^3.6.0",
+    "jwt-decode": "^3.1.2",
+    "nocache": "^3.0.1",
+    "nunjucks": "^3.2.3",
+    "passport": "^0.4.1",
+    "passport-oauth2": "^1.6.0",
+    "redis": "^3.1.2",
+    "superagent": "^6.1.0"
+  },
+  "devDependencies": {
+    "@types/bunyan": "^1.8.7",
+    "@types/bunyan-format": "^0.2.4",
+    "@types/compression": "^1.7.1",
+    "@types/connect-flash": "0.0.37",
+    "@types/connect-redis": "^0.0.17",
+    "@types/cookie-session": "^2.0.43",
+    "@types/csurf": "^1.11.2",
+    "@types/express-request-id": "^1.4.2",
+    "@types/express-session": "^1.17.4",
+    "@types/http-errors": "^1.8.1",
+    "@types/jest": "^27.0.1",
+    "@types/jsonwebtoken": "^8.5.5",
+    "@types/node": "^14.17.14",
+    "@types/nunjucks": "^3.1.5",
+    "@types/passport": "^1.0.7",
+    "@types/passport-oauth2": "^1.4.11",
+    "@types/redis": "^2.8.31",
+    "@types/superagent": "^4.1.12",
+    "@types/supertest": "^2.0.11",
+    "@typescript-eslint/eslint-plugin": "^4.30.0",
+    "@typescript-eslint/parser": "^4.30.0",
+    "concurrently": "^6.2.1",
+    "cypress": "^8.3.1",
+    "cypress-multi-reporters": "^1.5.0",
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-import-resolver-typescript": "^2.4.0",
+    "eslint-plugin-cypress": "^2.11.3",
+    "eslint-plugin-import": "2.24.2",
+    "eslint-plugin-prettier": "^4.0.0",
+    "husky": "^7.0.2",
+    "jest": "^27.1.0",
+    "jest-html-reporter": "^3.4.1",
+    "jest-junit": "^12.2.0",
+    "jsonwebtoken": "^8.5.1",
+    "lint-staged": "^11.1.2",
+    "mocha-junit-reporter": "^2.0.0",
+    "nock": "^13.1.3",
+    "nodemon": "^2.0.12",
+    "prettier": "^2.3.2",
+    "sass": "^1.39.0",
+    "supertest": "^6.1.6",
+    "ts-jest": "^27.0.5",
+    "typescript": "^4.4.2"
+  }
+}
