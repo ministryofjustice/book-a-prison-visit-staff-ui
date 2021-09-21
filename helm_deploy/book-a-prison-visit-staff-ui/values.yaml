@@ -12,7 +12,7 @@ generic-service:
   ingress:
     enabled: true
     host: app-hostname.local    # override per environment
-    tlsSecretName: book-a-prison-visit-staff-ui-cert
+    tlsSecretName: book-a-prison-visit-staff-cert
     path: /
 
   livenessProbe:
