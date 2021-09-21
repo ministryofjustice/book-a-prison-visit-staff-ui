@@ -1,18 +1,18 @@
 ---
 generic-service:
-  nameOverride: hmpps-template-typescript
+  nameOverride: book-a-prison-visit-staff-ui
 
   replicaCount: 4
 
   image:
-    repository: quay.io/hmpps/hmpps-template-typescript
+    repository: quay.io/hmpps/book-a-prison-visit-staff-ui
     tag: app_version    # override at deployment time
     port: 3000
 
   ingress:
     enabled: true
     host: app-hostname.local    # override per environment
-    tlsSecretName: hmpps-template-typescript-cert
+    tlsSecretName: book-a-prison-visit-staff-ui-cert
     path: /
 
   livenessProbe:
@@ -35,7 +35,7 @@ generic-service:
   #     [name of environment variable as seen by app]: [key of kubernetes secret to load]
 
   namespace_secrets:
-    hmpps-template-typescript:
+    book-a-prison-visit-staff-ui:
       APPINSIGHTS_INSTRUMENTATIONKEY: "APPINSIGHTS_INSTRUMENTATIONKEY"
       API_CLIENT_ID: "API_CLIENT_ID"
       API_CLIENT_SECRET: "API_CLIENT_SECRET"
@@ -55,4 +55,4 @@ generic-service:
     cloudplatform-live1-3: "35.177.252.54/32"
 
 generic-prometheus-alerts:
-  targetApplication: hmpps-template-typescript
+  targetApplication: book-a-prison-visit-staff-ui
