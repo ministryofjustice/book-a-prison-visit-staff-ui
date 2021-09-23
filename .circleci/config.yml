@@ -7,11 +7,11 @@ orbs:
 parameters:
   alerts-slack-channel:
     type: string
-    default: hmpps_typescript_notifications
+    default: prison-visit-booking-alerts
 
   releases-slack-channel:
     type: string
-    default: hmpps_typescript_notifications
+    default: prison-visit-booking-alerts
 
   node-version:
     type: string
