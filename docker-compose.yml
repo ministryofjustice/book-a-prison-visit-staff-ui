@@ -32,7 +32,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - redis-bapv_HOST=redis-bapv
+      - REDIS_HOST=redis-bapv
       - HMPPS_AUTH_EXTERNAL_URL=http://localhost:9090/auth
       - HMPPS_AUTH_URL=http://hmpps-auth:8080/auth
       # These will need to match new creds in the seed auth service auth
