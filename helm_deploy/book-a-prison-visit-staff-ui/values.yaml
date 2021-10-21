@@ -13,7 +13,6 @@ generic-service:
     enabled: true
     host: app-hostname.local    # override per environment
     tlsSecretName: book-a-prison-visit-staff-cert
-    path: /
 
   livenessProbe:
     httpGet:
