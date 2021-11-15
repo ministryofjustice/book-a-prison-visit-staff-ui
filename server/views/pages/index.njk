@@ -1,12 +1,43 @@
 {% extends "../partials/layout.njk" %}
+{% from "../components/card/card.njk" import card %}
+{%- from "moj/components/organisation-switcher/macro.njk" import mojOrganisationSwitcher -%}
 
 {% set pageTitle = applicationName + " - Home" %}
 
 {% block content %}
 
-  <main class="app-container govuk-body">
-    <h1>This site is under construction...</h1>
-    <p>Please check back later when there is content to view.</p>
-  </main>
+  <div class="govuk-body">
+    {{ mojOrganisationSwitcher({
+      text: 'HMP Wayland',
+      link: {
+        text: 'Change prison',
+        href: '#'
+      }
+    }) }}
+    <h1 class="govuk-heading-l govuk-!-margin-top-6">Manage prison visits</h1>
+    <div class="govuk-width-container">
+      <ul class="govuk-grid-row card-group">
+        <li class="govuk-grid-column-one-third card-group__item">
+          {{ card({
+            "href": "http://localhost:3000",
+            "clickable": "true",
+            "heading": "Book a prison visit",
+            "description": "Book a prison visit for a visitor",
+            "id": 1
+          }) }}
+        </li>
+        <li class="govuk-grid-column-one-third card-group__item">
+          {{ card({
+            "href": "http://localhost:3000",
+            "clickable": "true",
+            "heading": "Find a booked visit",
+            "description": "View and cancel an existing visit booking",
+            "id": 2
+          }) }}
+        </li>
+      </ul>
+    </div>
+  </div>
 
+  <script src="/assets/card.js"></script>
 {% endblock %}
