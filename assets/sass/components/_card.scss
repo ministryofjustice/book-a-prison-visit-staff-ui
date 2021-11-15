@@ -1,0 +1,100 @@
+/* ==========================================================================
+   COMPONENTS / #CARD
+   ========================================================================== */
+
+$card-border-width: 1px;
+$card-border-bottom-width: govuk-spacing(1);
+$card-border-hover-color: $govuk-border-colour;
+$card-border-color: lighten($card-border-hover-color, 15%);
+
+.card {
+  margin-bottom: govuk-spacing(7);
+  background: $govuk-body-background-colour;
+  border: $card-border-width solid $card-border-color;
+  position: relative;
+  width: 100%;
+  padding: govuk-spacing(5);
+
+  &__heading {
+    margin-top: 0;
+    margin-bottom: govuk-spacing(3);
+  }
+
+  &__description {
+    margin-bottom: 0;
+  }
+
+  /* Clickable card
+  ========================================================================== */
+  &--clickable {
+    border-bottom-width: $card-border-bottom-width;
+
+    &:hover,
+    &:active {
+      cursor: pointer;
+
+      .card__heading a,
+      .card__link {
+        color: $govuk-link-hover-colour;
+        text-decoration: none;
+
+        &:focus {
+          @include govuk-focused-text;
+        }
+      }
+    }
+
+    &:hover {
+      border-color: $card-border-hover-color;
+    }
+
+    &:active {
+      border-color: $card-border-hover-color;
+      bottom: -$card-border-width;
+    }
+  }
+}
+
+/* Card group
+  ========================================================================== */
+
+/**
+* Card group allows you to have a row of cards.
+*
+* Flexbox is used to make each card in a row the same height.
+*/
+
+.card-group {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: govuk-spacing(3);
+  padding: 0;
+
+  @include govuk-media-query($until: desktop) {
+    margin-bottom: govuk-spacing(6);
+  }
+
+  &__item {
+    display: flex;
+    list-style-type: none;
+    margin-bottom: 0;
+
+    @include govuk-media-query($until: desktop) {
+      flex: 0 0 100%;
+    }
+
+    .card {
+      margin-bottom: govuk-spacing(5);
+    }
+
+    @include govuk-media-query($until: desktop) {
+      .card {
+        margin-bottom: govuk-spacing(3);
+      }
+
+      &:last-child .card {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
