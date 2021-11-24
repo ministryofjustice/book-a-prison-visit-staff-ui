@@ -21,6 +21,7 @@ When deploying to a new namespace, you may wish to use this template typescript 
 
 This template namespace includes an AWS elasticache setup - which is required by this template project.
 
+
 Copy this folder, update all the existing namespace references, and submit a PR to the CloudPlatform team. Further instructions from the CloudPlatform team can be found here: <https://user-guide.cloud-platform.service.justice.gov.uk/#cloud-platform-user-guide>
 
 ## Renaming from HMPPS Template Typescript - github Actions
