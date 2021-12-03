@@ -1,17 +1,18 @@
 {% extends "../partials/layout.njk" %}
 {% from "../components/card/card.njk" import card %}
 
-{% set pageTitle = applicationName + " - Home" %}
+{% set pageHeaderTitle = "Manage prison visits" %}
+{% set pageTitle = applicationName + " - " + pageHeaderTitle %}
 
 {% block content %}
 
   <div class="govuk-body">
-    <h1 class="govuk-heading-l govuk-!-margin-top-6">Manage prison visits</h1>
     <div class="govuk-width-container">
+      <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
       <ul class="govuk-grid-row card-group">
         <li class="govuk-grid-column-one-third card-group__item">
           {{ card({
-            "href": "http://localhost:3000",
+            "href": "/search",
             "clickable": "true",
             "heading": "Book a prison visit",
             "description": "Book a prison visit for a visitor",

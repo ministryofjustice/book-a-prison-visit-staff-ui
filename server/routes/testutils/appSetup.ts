@@ -1,9 +1,10 @@
-import express, { Router, Express } from 'express'
+import express, { Express } from 'express'
 import cookieSession from 'cookie-session'
 import createError from 'http-errors'
 import path from 'path'
 
-import allRoutes from '../index'
+import indexRoutes from '../index'
+import searchRoutes from '../search'
 import nunjucksSetup from '../../utils/nunjucksSetup'
 import errorHandler from '../../errorHandler'
 import standardRouter from '../standardRouter'
@@ -31,7 +32,7 @@ class MockUserService extends UserService {
   }
 }
 
-function appSetup(route: Router, production: boolean): Express {
+function appSetup(production: boolean): Express {
   const app = express()
 
   app.set('view engine', 'njk')
@@ -47,7 +48,8 @@ function appSetup(route: Router, production: boolean): Express {
   app.use(cookieSession({ keys: [''] }))
   app.use(express.json())
   app.use(express.urlencoded({ extended: true }))
-  app.use('/', route)
+  app.use('/', indexRoutes(standardRouter(new MockUserService())))
+  app.use('/search/', searchRoutes(standardRouter(new MockUserService())))
   app.use((req, res, next) => next(createError(404, 'Not found')))
   app.use(errorHandler(production))
 
@@ -56,5 +58,5 @@ function appSetup(route: Router, production: boolean): Express {
 
 export default function appWithAllRoutes({ production = false }: { production?: boolean }): Express {
   auth.default.authenticationMiddleware = () => (req, res, next) => next()
-  return appSetup(allRoutes(standardRouter(new MockUserService())), production)
+  return appSetup(production)
 }
