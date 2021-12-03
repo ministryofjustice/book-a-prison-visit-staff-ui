@@ -1,3 +1,12 @@
+main_branch: &main_branch
+  filters:
+    branches:
+      only: main
+feature_branch: &feature_branch
+  filters:
+    branches:
+      ignore: main
+
 version: 2.1
 
 orbs:
@@ -154,14 +163,26 @@ workflows:
             branches:
               only:
                 - main
+      - request_dev_approval:
+          <<: *feature_branch
+          type: approval
+          requires:
+            - helm_lint
+            - unit_test
+            - integration_test
+            - build_docker
       - hmpps/deploy_env:
+          <<: *feature_branch
+          name: deploy_dev_preview
+          env: "dev"
+          context: hmpps-common-vars
+          requires:
+            - request_dev_approval
+      - hmpps/deploy_env:
+          <<: *main_branch
           name: deploy_dev
           env: "dev"
           context: hmpps-common-vars
-          filters:
-            branches:
-              only:
-                - main
           requires:
             - helm_lint
             - unit_test
@@ -169,6 +190,7 @@ workflows:
             - build_docker
 
       - request-preprod-approval:
+          <<: *main_branch
           type: approval
           requires:
            - deploy_dev
