@@ -22,6 +22,7 @@ describe('Prisoner search service', () => {
           prisonerNumber: 'A1234BC',
           dateOfBirth: '1975-04-02',
           bookingId: '12345',
+          restrictedPatient: false,
         },
       ])
 
