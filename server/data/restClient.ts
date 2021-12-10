@@ -62,9 +62,12 @@ export default class RestClient {
 
       return result.body
     } catch (error) {
-      const sanitisedError = sanitiseError(error)
-      logger.warn({ ...sanitisedError, query }, `Error calling ${this.name}, path: '${path}', verb: 'GET'`)
-      throw sanitisedError
+      const response = error.response && error.response.text
+      logger.warn(
+        `Error calling ${this.name}, path: '${path}', verb: 'GET', query: '${query}', response: '${response}'`,
+        error.stack
+      )
+      throw error
     }
   }
 
@@ -92,9 +95,12 @@ export default class RestClient {
 
       return raw ? result : result.body
     } catch (error) {
-      const sanitisedError = sanitiseError(error)
-      logger.warn({ ...sanitisedError }, `Error calling ${this.name}, path: '${path}', verb: 'POST'`)
-      throw sanitisedError
+      const response = error.response && error.response.text
+      logger.warn(
+        `Error calling ${this.name}, path: '${path}', verb: 'GET', query: 'POST', response: '${response}'`,
+        error.stack
+      )
+      throw error
     }
   }
 
