@@ -15,26 +15,35 @@ describe('Prisoner search service', () => {
       prisonerSearchService = new PrisonerSearchService(prisonerSearchClient)
     })
     it('Retrieves and formats user name', async () => {
-      prisonerSearchClient.getPrisoners.mockResolvedValue([
-        {
-          firstName: 'john',
-          lastName: 'smith',
-          prisonerNumber: 'A1234BC',
-          dateOfBirth: '1975-04-02',
-          bookingId: '12345',
-          restrictedPatient: false,
-        },
-      ])
+      prisonerSearchClient.getPrisoners.mockResolvedValue({
+        matches: [
+          {
+            prisoner: {
+              firstName: 'john',
+              lastName: 'smith',
+              prisonerNumber: 'A1234BC',
+              dateOfBirth: '1975-04-02',
+              bookingId: '12345',
+              restrictedPatient: false,
+            },
+          },
+        ],
+      })
 
       const results = await prisonerSearchService.getPrisoners(search)
 
       expect(results).toEqual([
-        {
-          name: 'Smith, John',
-          prisonerNumber: 'A1234BC',
-          dateOfBirth: '2 April 1975',
-          bookingId: '12345',
-        },
+        [
+          {
+            text: 'Smith, John',
+          },
+          {
+            text: 'A1234BC',
+          },
+          {
+            text: '2 April 1975',
+          },
+        ],
       ])
     })
     it('Propagates error', async () => {

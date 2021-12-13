@@ -5,7 +5,7 @@ import asyncMiddleware from '../middleware/asyncMiddleware'
 import PrisonerSearchClient from '../data/prisonerSearchClient'
 import PrisonerSearchService from '../services/prisonerSearchService'
 import RestClient from '../data/restClient'
-import generateOauthClientToken from '../authentication/clientCredentials'
+import systemToken from '../data/authClient'
 import config from '../config'
 
 export default function routes(router: Router): Router {
@@ -34,11 +34,8 @@ export default function routes(router: Router): Router {
   get('/results', async (req, res, next) => {
     const { search } = req.query
     const error = validateForm(`${search}`)
-    const restClient = new RestClient(
-      'Prisoner Search REST Client',
-      config.apis.prisonerSearch,
-      generateOauthClientToken()
-    )
+    const token = await systemToken()
+    const restClient = new RestClient('Prisoner Search REST Client', config.apis.prisonerSearch, token)
     const prisonerSearchService = new PrisonerSearchService(new PrisonerSearchClient(restClient))
 
     res.render('pages/searchResults', {

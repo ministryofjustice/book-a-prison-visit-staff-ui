@@ -6,15 +6,14 @@ export default class PrisonerSearchClient {
 
   private agencyId = 'HEI'
 
-  getPrisoners(search: string): Promise<Prisoner[]> {
+  getPrisoners(search: string): Promise<{ matches: { prisoner: Prisoner }[] }> {
     return this.restClient.post({
-      path: '/prisoner-search/match-prisoners',
+      path: '/match-prisoners',
       data: {
-        prisonerIdentifier: search,
         firstName: search,
         lastName: search,
-        prisonId: this.agencyId,
-        includeAliases: false,
+        prisonerIdentifier: search,
+        prisonIds: [this.agencyId],
       },
     })
   }
