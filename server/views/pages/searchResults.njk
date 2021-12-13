@@ -12,7 +12,7 @@
     </div>
     {% include "../partials/searchHeader.njk" %}
     <div class="govuk-grid-column-full">
-    {% if true %}
+    {% if results %}
         {{ govukTable({
             captionClasses: "govuk-table__caption--m",
             firstCellIsHeader: true,
