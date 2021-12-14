@@ -1,5 +1,4 @@
 {% extends "../partials/layout.njk" %}
-{% from "moj/components/search/macro.njk" import mojSearch %}
 
 {% set pageHeaderTitle = "Search for a prisoner" %}
 {% set pageTitle = applicationName + " - " + pageHeaderTitle %}
@@ -9,24 +8,6 @@
     <div class="govuk-grid-column-full">
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
     </div>
-    <div class="govuk-grid-column-full">
-      <div class="block-background">
-        {{ mojSearch({
-            action: '#',
-            method: 'post',
-            classes: 'govuk-!-width-one-half',
-            input: {
-                id: 'search',
-                name: 'search'
-            },
-            label: {
-                text: 'Enter name or prison number'
-            },
-            button: {
-                text: 'Search'
-            }
-            }) }}
-      </div>
-    </div>
+    {% include "../partials/searchHeader.njk" %}
   </div>
 {% endblock %}

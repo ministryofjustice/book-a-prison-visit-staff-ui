@@ -1,0 +1,27 @@
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+<div class="govuk-grid-column-full">
+    <div class="block-background">
+        <div class="moj-search govuk-!-width-one-half">
+            <form action="/search/" method="POST">
+                <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+                {{ govukInput({
+                    classes: "moj-search__input",
+                    label: {
+                        text: "Enter name or prison number"
+                    },
+                    id: "search",
+                    name: "search",
+                    value: search
+                }) }}
+
+                {{ govukButton({
+                    classes: "moj-search__button",
+                    text: "Search"
+                }) }}
+
+            </form>
+        </div>
+    </div>
+</div>
