@@ -122,7 +122,8 @@ assets/stylesheets/*.css
 .vscode
 build-info.json
 dist/
-test_results/
+test_results/*
+!test_results/README.md
 integration_tests/videos/
 integration_tests/screenshots/
 */*.iml
