@@ -14,6 +14,10 @@ describe('User service', () => {
       hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
       userService = new UserService(hmppsAuthClient)
     })
+
+    afterEach(() => {
+      jest.resetAllMocks()
+    })
     it('Retrieves and formats user name', async () => {
       hmppsAuthClient.getUser.mockResolvedValue({ name: 'john smith' } as User)
 

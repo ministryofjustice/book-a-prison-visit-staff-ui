@@ -1,6 +1,6 @@
 import validateForm from './searchForPrisonerValidation'
 
-describe.skip('validateForm', () => {
+describe('validateForm', () => {
   describe('search', () => {
     it('valid', () => {
       expect(validateForm('abcd')).toBeNull()

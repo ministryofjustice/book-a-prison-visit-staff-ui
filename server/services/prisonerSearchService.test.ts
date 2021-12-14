@@ -5,7 +5,7 @@ jest.mock('../data/prisonerSearchClient')
 
 const search = 'some search'
 
-describe.skip('Prisoner search service', () => {
+describe('Prisoner search service', () => {
   let prisonerSearchClient: jest.Mocked<PrisonerSearchClient>
   let prisonerSearchService: PrisonerSearchService
 
@@ -13,6 +13,10 @@ describe.skip('Prisoner search service', () => {
     beforeEach(() => {
       prisonerSearchClient = new PrisonerSearchClient(null) as jest.Mocked<PrisonerSearchClient>
       prisonerSearchService = new PrisonerSearchService(prisonerSearchClient)
+    })
+
+    afterEach(() => {
+      jest.resetAllMocks()
     })
     it('Retrieves and formats user name', async () => {
       prisonerSearchClient.getPrisoners.mockResolvedValue({

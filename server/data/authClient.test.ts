@@ -2,7 +2,7 @@ import nock from 'nock'
 import config from '../config'
 import systemToken from './authClient'
 
-describe.skip('authClient', () => {
+describe('authClient', () => {
   let fakeApi: nock.Scope
 
   beforeEach(() => {
