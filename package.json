@@ -22,7 +22,7 @@
     "lint": "eslint . --cache --max-warnings 0",
     "typecheck": "tsc && tsc -p integration_tests",
     "test-debug-nock": "DEBUG=nock.* jest",
-    "test": "jest",
+    "test": "jest -i",
     "security_audit": "npx audit-ci --config audit-ci.json",
     "int-test": "cypress run --config video=false",
     "int-test-ui": "cypress open",
