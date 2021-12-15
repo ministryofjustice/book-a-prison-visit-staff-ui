@@ -20,16 +20,14 @@ describe('Prisoner search service', () => {
     })
     it('Retrieves and formats user name', async () => {
       prisonerSearchClient.getPrisoners.mockResolvedValue({
-        matches: [
+        content: [
           {
-            prisoner: {
-              firstName: 'john',
-              lastName: 'smith',
-              prisonerNumber: 'A1234BC',
-              dateOfBirth: '1975-04-02',
-              bookingId: '12345',
-              restrictedPatient: false,
-            },
+            firstName: 'john',
+            lastName: 'smith',
+            prisonerNumber: 'A1234BC',
+            dateOfBirth: '1975-04-02',
+            bookingId: '12345',
+            restrictedPatient: false,
           },
         ],
       })

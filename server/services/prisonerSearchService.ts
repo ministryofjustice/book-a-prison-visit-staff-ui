@@ -11,20 +11,19 @@ export default class PrisonerSearchService {
 
   async getPrisoners(search: string): Promise<Array<PrisonerDetailsRow[]>> {
     const results = await this.prisonerSearchClient.getPrisoners(search)
-    const { matches } = results
+    const { content } = results
     const prisonerList: Array<PrisonerDetailsRow[]> = []
 
-    matches.forEach((prisoner: { prisoner: Prisoner }) => {
-      const singlePrisoner = prisoner.prisoner
+    content.forEach((prisoner: Prisoner) => {
       const row = [
         {
-          text: properCaseFullName(`${singlePrisoner.lastName}, ${singlePrisoner.firstName}`),
+          text: properCaseFullName(`${prisoner.lastName}, ${prisoner.firstName}`),
         },
         {
-          text: singlePrisoner.prisonerNumber,
+          text: prisoner.prisonerNumber,
         },
         {
-          text: prisonerDobPretty(singlePrisoner.dateOfBirth),
+          text: prisonerDobPretty(prisoner.dateOfBirth),
         },
       ]
 

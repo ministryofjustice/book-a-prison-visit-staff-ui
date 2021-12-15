@@ -22,22 +22,17 @@ describe('prisonSearchClientBuilder', () => {
   describe('getPrisoners', () => {
     it('should return data from api', async () => {
       const results = {
-        matches: [
+        content: [
           {
-            prisoner: {
-              lastName: 'test',
-              firstName: 'test',
-              prisonerNumber: 'test',
-              dateOfBirth: '2000-01-01',
-            },
+            lastName: 'test',
+            firstName: 'test',
+            prisonerNumber: 'test',
+            dateOfBirth: '2000-01-01',
           },
         ],
       }
       fakePrisonerSearchApi
-        .post(
-          `/match-prisoners`,
-          '{"firstName":"test","lastName":"test","prisonerIdentifier":"test","prisonIds":["HEI"]}'
-        )
+        .post(`/keyword`, '{"orWords":"test","fuzzyMatch":true,"prisonIds":["HEI"]}')
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
