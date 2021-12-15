@@ -41,6 +41,7 @@ export default function routes(router: Router): Router {
 
     res.render('pages/searchResults', {
       establishment: 'Hewell (HMP)',
+      search,
       results,
       error,
     })
