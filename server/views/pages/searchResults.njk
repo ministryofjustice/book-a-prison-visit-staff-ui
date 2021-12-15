@@ -12,7 +12,7 @@
     </div>
     {% include "../partials/searchHeader.njk" %}
     <div class="govuk-grid-column-full">
-    {% if results %}
+    {% if results|length %}
         {{ govukTable({
             captionClasses: "govuk-table__caption--m",
             firstCellIsHeader: true,
@@ -30,7 +30,7 @@
             rows: results
         }) }}
     {% else %}
-        <p>There are no results for this name or number at {{ establishment }}.
+        <p class="govuk-!-margin-top-6 govuk-!-margin-bottom-6">There are no results for this name or number at {{ establishment }}.
     {% endif %}
     </div>
   </div>

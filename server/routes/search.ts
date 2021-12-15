@@ -34,12 +34,14 @@ export default function routes(router: Router): Router {
   get('/results', async (req, res, next) => {
     const { search } = req.query
     const error = validateForm(`${search}`)
-    const token = await systemToken()
+    const token = await systemToken(res.locals.user?.username)
     const restClient = new RestClient('Prisoner Search REST Client', config.apis.prisonerSearch, token)
     const prisonerSearchService = new PrisonerSearchService(new PrisonerSearchClient(restClient))
+    const results = error ? [] : await prisonerSearchService.getPrisoners(`${search}`)
 
     res.render('pages/searchResults', {
-      results: error ? [] : await prisonerSearchService.getPrisoners(`${search}`),
+      establishment: 'Hewell (HMP)',
+      results,
       error,
     })
   })
