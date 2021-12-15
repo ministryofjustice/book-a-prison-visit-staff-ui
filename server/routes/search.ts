@@ -12,13 +12,13 @@ export default function routes(router: Router): Router {
   const get = (path: string, handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
   const post = (path: string, handler: RequestHandler) => router.post(path, asyncMiddleware(handler))
 
-  get('/', (req, res, next) => {
+  get('/', (req, res) => {
     const search = req?.body?.search
 
     res.render('pages/search', { search })
   })
 
-  post('/', (req, res, next) => {
+  post('/', (req, res) => {
     const { search } = req.body
 
     return res.redirect(
@@ -31,13 +31,13 @@ export default function routes(router: Router): Router {
     )
   })
 
-  get('/results', async (req, res, next) => {
-    const { search } = req.query
-    const error = validateForm(`${search}`)
+  get('/results', async (req, res) => {
+    const search = (req.query.search || '') as string
+    const error = validateForm(search)
     const token = await systemToken(res.locals.user?.username)
     const restClient = new RestClient('Prisoner Search REST Client', config.apis.prisonerSearch, token)
     const prisonerSearchService = new PrisonerSearchService(new PrisonerSearchClient(restClient))
-    const results = error ? [] : await prisonerSearchService.getPrisoners(`${search}`)
+    const results = error ? [] : await prisonerSearchService.getPrisoners(search)
 
     res.render('pages/searchResults', {
       establishment: 'Hewell (HMP)',
