@@ -9,6 +9,8 @@ import nunjucksSetup from '../../utils/nunjucksSetup'
 import errorHandler from '../../errorHandler'
 import standardRouter from '../standardRouter'
 import UserService from '../../services/userService'
+import { prisonerSearchClientBuilder } from '../../data/prisonerSearchClient'
+import PrisonerSearchService from '../../services/prisonerSearchService'
 import * as auth from '../../authentication/auth'
 
 const user = {
@@ -32,7 +34,7 @@ class MockUserService extends UserService {
   }
 }
 
-function appSetup(production: boolean): Express {
+function appSetup(prisonerSearchServiceOverride: PrisonerSearchService, production = false): Express {
   const app = express()
 
   app.set('view engine', 'njk')
@@ -49,14 +51,19 @@ function appSetup(production: boolean): Express {
   app.use(express.json())
   app.use(express.urlencoded({ extended: true }))
   app.use('/', indexRoutes(standardRouter(new MockUserService())))
-  app.use('/search/', searchRoutes(standardRouter(new MockUserService())))
+
+  const prisonerSearchService = prisonerSearchServiceOverride || new PrisonerSearchService(prisonerSearchClientBuilder)
+  app.use('/search/', searchRoutes(standardRouter(new MockUserService()), prisonerSearchService))
   app.use((req, res, next) => next(createError(404, 'Not found')))
   app.use(errorHandler(production))
 
   return app
 }
 
-export default function appWithAllRoutes({ production = false }: { production?: boolean }): Express {
+export default function appWithAllRoutes(
+  prisonerSearchServiceOverride?: PrisonerSearchService,
+  production?: boolean
+): Express {
   auth.default.authenticationMiddleware = () => (req, res, next) => next()
-  return appSetup(production)
+  return appSetup(prisonerSearchServiceOverride, production)
 }

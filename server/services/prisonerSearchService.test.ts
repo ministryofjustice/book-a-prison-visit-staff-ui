@@ -4,15 +4,16 @@ import PrisonerSearchClient from '../data/prisonerSearchClient'
 jest.mock('../data/prisonerSearchClient')
 
 const search = 'some search'
+const prisonerSearchClient = new PrisonerSearchClient(null) as jest.Mocked<PrisonerSearchClient>
 
 describe('Prisoner search service', () => {
-  let prisonerSearchClient: jest.Mocked<PrisonerSearchClient>
+  let prisonerSearchClientBuilder
   let prisonerSearchService: PrisonerSearchService
 
   describe('getPrisoners', () => {
     beforeEach(() => {
-      prisonerSearchClient = new PrisonerSearchClient(null) as jest.Mocked<PrisonerSearchClient>
-      prisonerSearchService = new PrisonerSearchService(prisonerSearchClient)
+      prisonerSearchClientBuilder = jest.fn().mockReturnValue(prisonerSearchClient)
+      prisonerSearchService = new PrisonerSearchService(prisonerSearchClientBuilder)
     })
 
     afterEach(() => {
@@ -32,7 +33,7 @@ describe('Prisoner search service', () => {
         ],
       })
 
-      const results = await prisonerSearchService.getPrisoners(search)
+      const results = await prisonerSearchService.getPrisoners(search, 'user')
 
       expect(results).toEqual([
         [
@@ -51,7 +52,7 @@ describe('Prisoner search service', () => {
     it('Propagates error', async () => {
       prisonerSearchClient.getPrisoners.mockRejectedValue(new Error('some error'))
 
-      await expect(prisonerSearchService.getPrisoners(search)).rejects.toEqual(new Error('some error'))
+      await expect(prisonerSearchService.getPrisoners(search, 'user')).rejects.toEqual(new Error('some error'))
     })
   })
 })

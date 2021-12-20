@@ -1,7 +1,15 @@
 import RestClient from './restClient'
 import { Prisoner } from './prisonerOffenderSearchTypes'
+import config from '../config'
 
-export default class PrisonerSearchClient {
+export const prisonerSearchClientBuilder = (token: string): PrisonerSearchClient => {
+  const restClient = new RestClient('prisonerSearchApi', config.apis.prisonerSearch, token)
+  const prisonerSearchClient = new PrisonerSearchClient(restClient)
+
+  return prisonerSearchClient
+}
+
+class PrisonerSearchClient {
   constructor(private readonly restClient: RestClient) {}
 
   private agencyId = 'HEI'
@@ -17,3 +25,5 @@ export default class PrisonerSearchClient {
     })
   }
 }
+
+export default PrisonerSearchClient

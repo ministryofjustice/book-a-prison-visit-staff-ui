@@ -1,16 +1,21 @@
-import type PrisonerSearchClient from '../data/prisonerSearchClient'
+import systemToken from '../data/authClient'
 import { properCaseFullName, prisonerDobPretty } from '../utils/utils'
 import { Prisoner } from '../data/prisonerOffenderSearchTypes'
+import PrisonerSearchClient from '../data/prisonerSearchClient'
 
 interface PrisonerDetailsRow {
   text: string
 }
 
-export default class PrisonerSearchService {
-  constructor(private readonly prisonerSearchClient: PrisonerSearchClient) {}
+type PrisonerSearchClientBuilder = (token: string) => PrisonerSearchClient
 
-  async getPrisoners(search: string): Promise<Array<PrisonerDetailsRow[]>> {
-    const results = await this.prisonerSearchClient.getPrisoners(search)
+export default class PrisonerSearchService {
+  constructor(private readonly prisonerSearchClientBuilder: PrisonerSearchClientBuilder) {}
+
+  async getPrisoners(search: string, username: string): Promise<Array<PrisonerDetailsRow[]>> {
+    const token = await systemToken(username)
+    const prisonerSearchClient = this.prisonerSearchClientBuilder(token)
+    const results = await prisonerSearchClient.getPrisoners(search)
     const { content } = results
     const prisonerList: Array<PrisonerDetailsRow[]> = []
 

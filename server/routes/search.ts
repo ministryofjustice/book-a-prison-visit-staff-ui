@@ -2,13 +2,9 @@ import type { RequestHandler, Router } from 'express'
 import url from 'url'
 import validateForm from './searchForPrisonerValidation'
 import asyncMiddleware from '../middleware/asyncMiddleware'
-import PrisonerSearchClient from '../data/prisonerSearchClient'
 import PrisonerSearchService from '../services/prisonerSearchService'
-import RestClient from '../data/restClient'
-import systemToken from '../data/authClient'
-import config from '../config'
 
-export default function routes(router: Router): Router {
+export default function routes(router: Router, prisonerSearchService: PrisonerSearchService): Router {
   const get = (path: string, handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
   const post = (path: string, handler: RequestHandler) => router.post(path, asyncMiddleware(handler))
 
@@ -34,10 +30,7 @@ export default function routes(router: Router): Router {
   get('/results', async (req, res) => {
     const search = (req.query.search || '') as string
     const error = validateForm(search)
-    const token = await systemToken(res.locals.user?.username)
-    const restClient = new RestClient('Prisoner Search REST Client', config.apis.prisonerSearch, token)
-    const prisonerSearchService = new PrisonerSearchService(new PrisonerSearchClient(restClient))
-    const results = error ? [] : await prisonerSearchService.getPrisoners(search)
+    const results = error ? [] : await prisonerSearchService.getPrisoners(search, res.locals.user?.username)
 
     res.render('pages/searchResults', {
       establishment: 'Hewell (HMP)',
