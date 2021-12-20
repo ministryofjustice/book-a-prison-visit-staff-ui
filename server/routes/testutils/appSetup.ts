@@ -12,6 +12,8 @@ import UserService from '../../services/userService'
 import { prisonerSearchClientBuilder } from '../../data/prisonerSearchClient'
 import PrisonerSearchService from '../../services/prisonerSearchService'
 import * as auth from '../../authentication/auth'
+import systemToken from '../../data/authClient'
+import { SystemToken } from '../../@types/auth'
 
 const user = {
   name: 'john smith',
@@ -34,7 +36,11 @@ class MockUserService extends UserService {
   }
 }
 
-function appSetup(prisonerSearchServiceOverride: PrisonerSearchService, production = false): Express {
+function appSetup(
+  prisonerSearchServiceOverride: PrisonerSearchService,
+  systemTokenOverride: SystemToken,
+  production = false
+): Express {
   const app = express()
 
   app.set('view engine', 'njk')
@@ -52,7 +58,9 @@ function appSetup(prisonerSearchServiceOverride: PrisonerSearchService, producti
   app.use(express.urlencoded({ extended: true }))
   app.use('/', indexRoutes(standardRouter(new MockUserService())))
 
-  const prisonerSearchService = prisonerSearchServiceOverride || new PrisonerSearchService(prisonerSearchClientBuilder)
+  const systemTokenTest = systemTokenOverride || systemToken
+  const prisonerSearchService =
+    prisonerSearchServiceOverride || new PrisonerSearchService(prisonerSearchClientBuilder, systemTokenTest)
   app.use('/search/', searchRoutes(standardRouter(new MockUserService()), prisonerSearchService))
   app.use((req, res, next) => next(createError(404, 'Not found')))
   app.use(errorHandler(production))
@@ -62,8 +70,9 @@ function appSetup(prisonerSearchServiceOverride: PrisonerSearchService, producti
 
 export default function appWithAllRoutes(
   prisonerSearchServiceOverride?: PrisonerSearchService,
+  systemTokenOverride?: SystemToken,
   production?: boolean
 ): Express {
   auth.default.authenticationMiddleware = () => (req, res, next) => next()
-  return appSetup(prisonerSearchServiceOverride, production)
+  return appSetup(prisonerSearchServiceOverride, systemTokenOverride, production)
 }

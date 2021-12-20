@@ -9,11 +9,13 @@ const prisonerSearchClient = new PrisonerSearchClient(null) as jest.Mocked<Priso
 describe('Prisoner search service', () => {
   let prisonerSearchClientBuilder
   let prisonerSearchService: PrisonerSearchService
+  let systemToken
 
   describe('getPrisoners', () => {
     beforeEach(() => {
+      systemToken = async (user: string): Promise<string> => `${user}-token-1`
       prisonerSearchClientBuilder = jest.fn().mockReturnValue(prisonerSearchClient)
-      prisonerSearchService = new PrisonerSearchService(prisonerSearchClientBuilder)
+      prisonerSearchService = new PrisonerSearchService(prisonerSearchClientBuilder, systemToken)
     })
 
     afterEach(() => {
