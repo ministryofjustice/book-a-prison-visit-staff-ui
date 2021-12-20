@@ -15,6 +15,9 @@
     {% if results|length %}
         {{ govukTable({
             captionClasses: "govuk-table__caption--m",
+            attributes: {
+              "id": "search-results-true"
+            },
             firstCellIsHeader: true,
             head: [
                 {
@@ -30,7 +33,7 @@
             rows: results
         }) }}
     {% else %}
-        <p class="govuk-!-margin-top-6 govuk-!-margin-bottom-6">There are no results for this name or number at {{ establishment }}.
+        <p class="govuk-!-margin-top-6 govuk-!-margin-bottom-6" id="search-results-none">There are no results for this name or number at {{ establishment }}.
     {% endif %}
     </div>
   </div>
