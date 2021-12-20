@@ -1,0 +1,40 @@
+{% extends "../partials/layout.njk" %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "moj/components/pagination/macro.njk" import mojPagination %}
+
+{% set pageHeaderTitle = "Search for a prisoner" %}
+{% set pageTitle = applicationName + " - " + pageHeaderTitle %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+    </div>
+    {% include "../partials/searchHeader.njk" %}
+    <div class="govuk-grid-column-full">
+    {% if results|length %}
+        {{ govukTable({
+            captionClasses: "govuk-table__caption--m",
+            attributes: {
+              "id": "search-results-true"
+            },
+            firstCellIsHeader: true,
+            head: [
+                {
+                text: "Name"
+                },
+                {
+                text: "Prisoner number"
+                },
+                {
+                text: "Date of birth"
+                }
+            ],
+            rows: results
+        }) }}
+    {% else %}
+        <p class="govuk-!-margin-top-6 govuk-!-margin-bottom-6" id="search-results-none">There are no results for this name or number at {{ establishment }}.
+    {% endif %}
+    </div>
+  </div>
+{% endblock %}
