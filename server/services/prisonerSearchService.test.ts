@@ -46,7 +46,7 @@ describe('Prisoner search service', () => {
       expect(results).toEqual([
         [
           {
-            text: 'Smith, John',
+            html: '<a href="/prisoner/A1234BC">Smith, John</a>',
             classes: 'bapv-table_cell',
           },
           {

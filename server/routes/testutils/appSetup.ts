@@ -13,7 +13,7 @@ import { prisonerSearchClientBuilder } from '../../data/prisonerSearchClient'
 import PrisonerSearchService from '../../services/prisonerSearchService'
 import * as auth from '../../authentication/auth'
 import systemToken from '../../data/authClient'
-import { SystemToken } from '../../@types/auth'
+import { SystemToken } from '../../@types/bapv'
 
 const user = {
   name: 'john smith',

@@ -1,12 +1,7 @@
 import { properCaseFullName, prisonerDobPretty } from '../utils/utils'
 import { Prisoner } from '../data/prisonerOffenderSearchTypes'
 import PrisonerSearchClient from '../data/prisonerSearchClient'
-import { SystemToken } from '../@types/auth'
-
-interface PrisonerDetailsRow {
-  classes: string
-  text: string
-}
+import { PrisonerDetailsItem, SystemToken } from '../@types/bapv'
 
 type PrisonerSearchClientBuilder = (token: string) => PrisonerSearchClient
 
@@ -33,7 +28,7 @@ export default class PrisonerSearchService {
     username: string,
     page: number
   ): Promise<{
-    results: Array<PrisonerDetailsRow[]>
+    results: Array<PrisonerDetailsItem[]>
     numberOfResults: number
     numberOfPages: number
     next: number
@@ -46,12 +41,14 @@ export default class PrisonerSearchService {
     this.numberOfPages = totalPages
     const nextPage = this.getNextPage()
     const previousPage = this.getPreviousPage()
-    const prisonerList: Array<PrisonerDetailsRow[]> = []
+    const prisonerList: Array<PrisonerDetailsItem[]> = []
 
     content.forEach((prisoner: Prisoner) => {
-      const row = [
+      const row: PrisonerDetailsItem[] = [
         {
-          text: properCaseFullName(`${prisoner.lastName}, ${prisoner.firstName}`),
+          html: `<a href="/prisoner/${prisoner.prisonerNumber}">${properCaseFullName(
+            `${prisoner.lastName}, ${prisoner.firstName}`
+          )}</a>`,
           classes: 'bapv-table_cell',
         },
         {
