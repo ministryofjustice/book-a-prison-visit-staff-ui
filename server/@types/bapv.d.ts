@@ -5,6 +5,11 @@ export type PrisonerDetailsItem = { classes: string } & (
   | { html?: never; text: string }
 )
 
-export type PrisonerProfile = { inmateDetail: InmateDetail; visitBalances: VisitBalances }
+export type PrisonerProfile = {
+  displayName: string
+  displayDob: string
+  inmateDetail: InmateDetail
+  visitBalances: VisitBalances
+}
 
 export type SystemToken = (arg0?: string) => Promise<string>

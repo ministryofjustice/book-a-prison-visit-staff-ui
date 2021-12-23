@@ -15,7 +15,7 @@ export default function routes(router: Router, prisonerProfileService: PrisonerP
     }
 
     const prisonerProfile = await prisonerProfileService.getProfile(offenderNo, res.locals.user?.username)
-    res.render('pages/prisoner', { prisonerProfile })
+    res.render('pages/prisoner', { ...prisonerProfile })
   })
 
   return router

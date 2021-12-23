@@ -15,6 +15,16 @@
 {% block bodyStart %}
 {% endblock %}
 
+{% block beforeContent %}
+  {% if backLinkHref %}
+    {{ govukBackLink({
+      text: "Back",
+      href: backLinkHref,
+      classes: 'js-backlink' if not noJsBackLink
+    }) }}
+  {% endif %}
+{% endblock %}
+
 {% block bodyEnd %}
   {# Run JavaScript at end of the
   <body>, to avoid blocking the initial render. #}

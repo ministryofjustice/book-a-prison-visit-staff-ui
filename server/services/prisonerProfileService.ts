@@ -1,5 +1,6 @@
 import PrisonApiClient from '../data/prisonApiClient'
 import { PrisonerProfile, SystemToken } from '../@types/bapv'
+import { prisonerDobPretty, properCaseFullName } from '../utils/utils'
 
 type PrisonApiClientBuilder = (token: string) => PrisonApiClient
 
@@ -18,7 +19,12 @@ export default class PrisonerProfileService {
       prisonerSearchClient.getVisitBalances(offenderNo),
     ])
 
+    const displayName = properCaseFullName(`${inmateDetail.lastName}, ${inmateDetail.firstName}`)
+    const displayDob = prisonerDobPretty(inmateDetail.dateOfBirth)
+
     return {
+      displayName,
+      displayDob,
       inmateDetail,
       visitBalances,
     }

@@ -19,9 +19,8 @@ class PrisonApiClient {
   }
 
   async getVisitBalances(offenderNo: string): Promise<VisitBalances | null> {
-    let balances: VisitBalances
     try {
-      balances = await this.restclient.get({
+      return await this.restclient.get({
         path: `/api/bookings/offenderNo/${offenderNo}/visit/balances`,
       })
     } catch (error) {
@@ -31,7 +30,7 @@ class PrisonApiClient {
         throw error
       }
     }
-    return balances || null
+    return null
   }
 }
 
