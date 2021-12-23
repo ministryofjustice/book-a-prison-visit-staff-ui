@@ -1,0 +1,11 @@
+{% extends "../partials/layout.njk" %}
+
+{% set pageHeaderTitle = "Prisoner profile" %}
+{% set pageTitle = applicationName + " - " + pageHeaderTitle %}
+
+{% block content %}
+  <h1>Prisoner profile</h1>
+  <pre>
+    {{ prisonerProfile | dump(2)}}
+  </pre>
+{% endblock %}
