@@ -12,49 +12,45 @@
     <div class="govuk-grid-column-full">
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
 
-      <div class="prisoner-header">
-        <div class="prisoner-header__details">
-          <ul class="prisoner-header__details__information">
-            <li>
-              <strong>Prison number</strong>
-              {{ inmateDetail.offenderNo }}
-            </li>
-            <li>
-              <strong>Category</strong>
-              {{ inmateDetail.category }}
-            </li>
-            <li>
-              <strong>Visiting orders</strong>
-              {% if visitBalances %}
-              <br>Remaining VOs: {{ visitBalances.remainingVo }}
-              <br>Remaining PVOs: {{ visitBalances.remainingPvo }}
-              {% else %}
-              <br>not applicable
-              {% endif %}
-            </li>
-            <li>
-              <strong>Date of birth</strong>
-              {{ displayDob }}
-            </li>
-            <li>
-              <strong>Incentive level</strong>
-              {{ inmateDetail.privilegeSummary.iepLevel }}
-            </li>
-            <li>
-              <strong>Alerts</strong>
-              <br>{{ inmateDetail.activeAlertCount }} active, {{ inmateDetail.inactiveAlertCount }} inactive
-            </li>
-            <li>
-              <strong>Location</strong>
-              {{ inmateDetail.assignedLivingUnit.description + ", " + inmateDetail.assignedLivingUnit.agencyName if inmateDetail.assignedLivingUnit}}
-            </li>
-            <li>
-              <strong>Conviction status</strong>
-              {{ inmateDetail.legalStatus }}
-            </li>
-          </ul>
-        </div>
-      </div>
+      <ul class="prisoner-profile-summary">
+        <li>
+          <strong>Prison number</strong>
+          {{ inmateDetail.offenderNo }}
+        </li>
+        <li>
+          <strong>Date of birth</strong>
+          {{ displayDob }}
+        </li>
+        <li>
+          <strong>Location</strong>
+          {{ inmateDetail.assignedLivingUnit.description + ", " + inmateDetail.assignedLivingUnit.agencyName if inmateDetail.assignedLivingUnit}}
+        </li>
+        <li>
+          <strong>Category</strong>
+          {{ inmateDetail.category }}
+        </li>
+        <li>
+          <strong>Incentive level</strong>
+          {{ inmateDetail.privilegeSummary.iepLevel }}
+        </li>
+        <li>
+          <strong>Conviction status</strong>
+          {{ inmateDetail.legalStatus }}
+        </li>
+        <li>
+          <strong>Visiting orders</strong>
+          {% if visitBalances %}
+          <span>Remaining VOs: {{ visitBalances.remainingVo }}</span>
+          <span>Remaining PVOs: {{ visitBalances.remainingPvo }}</span>
+          {% else %}
+          <span>not applicable</span>
+          {% endif %}
+        </li>
+        <li>
+          <strong>Alerts</strong>
+          <span>{{ inmateDetail.activeAlertCount }} active, {{ inmateDetail.inactiveAlertCount }} inactive</span>
+        </li>
+      </ul>
 
       {{ govukButton({
         text: "Book a prison visit",

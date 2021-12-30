@@ -1,0 +1,27 @@
+.prisoner-profile-summary {
+  @extend %govuk-list;
+  display: flex;
+  flex-wrap: wrap;
+  gap: govuk-spacing(4) 2%;
+  margin-bottom: govuk-spacing(6);
+
+  > li {
+    @include govuk-media-query($from: mobile, $until: desktop) {
+      flex-basis: 49%;
+    }
+    @include govuk-media-query($from: desktop) {
+      flex-basis: 32%;
+    }
+
+    > strong {
+      margin-right: govuk-spacing(4);
+      @include govuk-media-query($from: mobile, $until: desktop) {
+        display: block;
+      }
+    }
+
+    > span {
+      display: block;
+    }
+  }
+}
