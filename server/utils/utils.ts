@@ -70,5 +70,3 @@ const properCaseName = (name: string): string => (isBlank(name) ? '' : name.spli
 
 export const convertToTitleCase = (sentence: string): string =>
   isBlank(sentence) ? '' : sentence.split(' ').map(properCaseName).join(' ')
-
-export default convertToTitleCase
