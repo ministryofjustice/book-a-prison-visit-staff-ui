@@ -13,6 +13,7 @@
     {% include "../partials/searchHeader.njk" %}
     <div class="govuk-grid-column-full">
     {% if results|length %}
+      {% set pagination %}
         {{ mojPagination({
           results: {
             from: from,
@@ -29,6 +30,9 @@
           },
           items: pageLinks
         }) }}
+      {% endset %}
+
+      {{ pagination | safe }}
 
         {{ govukTable({
             captionClasses: "govuk-table__caption--m",
@@ -52,6 +56,8 @@
             ],
             rows: results
         }) }}
+
+      {{ pagination | safe }}
     {% else %}
         <p class="govuk-!-margin-top-6 govuk-!-margin-bottom-6" id="search-results-none">There are no results for this name or number at {{ establishment }}.
     {% endif %}

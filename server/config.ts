@@ -87,7 +87,7 @@ export default {
         deadline: Number(get('PRISONER_SEARCH_API_TIMEOUT_DEADLINE', 10000)),
       },
       agent: new AgentConfig(),
-      pageSize: 2,
+      pageSize: 10,
       pagesLinksToShow: 3,
     },
   },
