@@ -1,4 +1,5 @@
-import convertToTitleCase from './utils'
+import { convertToTitleCase, getPageLinks } from './utils'
+import getPageLinksTestData from './utils.testData'
 
 describe('Convert to title case', () => {
   it('null string', () => {
@@ -27,5 +28,13 @@ describe('Convert to title case', () => {
   })
   it('Hyphenated', () => {
     expect(convertToTitleCase('Robert-John SmiTH-jONes-WILSON')).toEqual('Robert-John Smith-Jones-Wilson')
+  })
+})
+
+describe('Return pagination pages', () => {
+  getPageLinksTestData.forEach(testData => {
+    it(testData.description, () => {
+      expect(getPageLinks(testData.params)).toEqual(testData.result)
+    })
   })
 })

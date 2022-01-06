@@ -3,6 +3,8 @@ import url from 'url'
 import validateForm from './searchForPrisonerValidation'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import PrisonerSearchService from '../services/prisonerSearchService'
+import config from '../config'
+import { getPageLinks } from '../utils/utils'
 
 export default function routes(router: Router, prisonerSearchService: PrisonerSearchService): Router {
   const get = (path: string, handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
@@ -29,14 +31,36 @@ export default function routes(router: Router, prisonerSearchService: PrisonerSe
 
   get('/results', async (req, res) => {
     const search = (req.query.search || '') as string
+    const currentPage = (req.query.page || '') as string
+    const parsedPage = Number.parseInt(currentPage, 10) || 1
+    const { pageSize } = config.apis.prisonerSearch
     const error = validateForm(search)
-    const results = error ? [] : await prisonerSearchService.getPrisoners(search, res.locals.user?.username)
+    const { results, numberOfResults, numberOfPages, next, previous } = await prisonerSearchService.getPrisoners(
+      search,
+      res.locals.user?.username,
+      parsedPage
+    )
+    const realNumberOfResults = error ? 0 : numberOfResults
+    const currentPageMax = parsedPage * pageSize
+    const to = realNumberOfResults < currentPageMax ? realNumberOfResults : currentPageMax
+    // const pageLinks = getPageLinks({
+    //   pagesToShow: config.apis.prisonerSearch.pagesLinksToShow,
+    //   numberOfPages,
+    //   currentPage: parsedPage,
+    //   searchTerm: search,
+    // })
 
     res.render('pages/searchResults', {
       establishment: 'Hewell (HMP)',
       search,
-      results,
+      results: error ? [] : results,
       error,
+      next,
+      previous,
+      numberOfResults: realNumberOfResults,
+      pageSize,
+      from: (parsedPage - 1) * pageSize + 1,
+      to,
     })
   })
 

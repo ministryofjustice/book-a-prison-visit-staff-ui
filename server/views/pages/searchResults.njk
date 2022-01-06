@@ -13,6 +13,33 @@
     {% include "../partials/searchHeader.njk" %}
     <div class="govuk-grid-column-full">
     {% if results|length %}
+        {{ mojPagination({
+          results: {
+            from: from,
+            to: to,
+            count: numberOfResults
+          },
+          previous: {
+            text: 'Previous',
+            href: '/search/results?search=' + search + '&page=' + previous
+          },
+          next: {
+            text: 'Next',
+            href: '/search/results?search=' + search + '&page=' + next
+          },
+          items: [{
+            text: '1',
+            href: '/page=1'
+          }, {
+            text: '2',
+            href: '/page=2',
+            selected: true
+          }, {
+            text: '3',
+            href: '/page=3'
+          }]
+        }) }}
+
         {{ govukTable({
             captionClasses: "govuk-table__caption--m",
             attributes: {
@@ -21,13 +48,16 @@
             firstCellIsHeader: true,
             head: [
                 {
-                text: "Name"
+                  text: "Name",
+                  classes: "bapv-table_cell"
                 },
                 {
-                text: "Prisoner number"
+                  text: "Prison number",
+                  classes: "bapv-table_cell"
                 },
                 {
-                text: "Date of birth"
+                  text: "Date of birth",
+                  classes: "bapv-table_cell"
                 }
             ],
             rows: results

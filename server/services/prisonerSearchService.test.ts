@@ -23,6 +23,8 @@ describe('Prisoner search service', () => {
     })
     it('Retrieves and formats user name', async () => {
       prisonerSearchClient.getPrisoners.mockResolvedValue({
+        totalPages: 1,
+        totalElements: 1,
         content: [
           {
             firstName: 'john',
@@ -35,18 +37,21 @@ describe('Prisoner search service', () => {
         ],
       })
 
-      const results = await prisonerSearchService.getPrisoners(search, 'user')
+      const { results } = await prisonerSearchService.getPrisoners(search, 'user', 0)
 
       expect(results).toEqual([
         [
           {
             text: 'Smith, John',
+            classes: 'bapv-table_cell',
           },
           {
             text: 'A1234BC',
+            classes: 'bapv-table_cell',
           },
           {
             text: '2 April 1975',
+            classes: 'bapv-table_cell',
           },
         ],
       ])
@@ -54,7 +59,7 @@ describe('Prisoner search service', () => {
     it('Propagates error', async () => {
       prisonerSearchClient.getPrisoners.mockRejectedValue(new Error('some error'))
 
-      await expect(prisonerSearchService.getPrisoners(search, 'user')).rejects.toEqual(new Error('some error'))
+      await expect(prisonerSearchService.getPrisoners(search, 'user', 0)).rejects.toEqual(new Error('some error'))
     })
   })
 })

@@ -87,6 +87,8 @@ export default {
         deadline: Number(get('PRISONER_SEARCH_API_TIMEOUT_DEADLINE', 10000)),
       },
       agent: new AgentConfig(),
+      pageSize: 2,
+      pagesLinksToShow: 3,
     },
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
