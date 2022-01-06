@@ -37,15 +37,13 @@
           <strong>Conviction status</strong>
           {{ inmateDetail.legalStatus }}
         </li>
+        {% if visitBalances %}
         <li>
           <strong>Visiting orders</strong>
-          {% if visitBalances %}
           <span>Remaining VOs: {{ visitBalances.remainingVo }}</span>
           <span>Remaining PVOs: {{ visitBalances.remainingPvo }}</span>
-          {% else %}
-          <span>not applicable</span>
-          {% endif %}
         </li>
+        {% endif %}
         <li>
           <strong>Alerts</strong>
           <span>{{ inmateDetail.activeAlertCount }} active, {{ inmateDetail.inactiveAlertCount }} inactive</span>

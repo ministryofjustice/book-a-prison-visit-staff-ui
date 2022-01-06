@@ -14,10 +14,11 @@ export default class PrisonerProfileService {
     const token = await this.systemToken(username)
     const prisonerSearchClient = this.prisonApiClientBuilder(token)
 
-    const [inmateDetail, visitBalances] = await Promise.all([
-      prisonerSearchClient.getOffender(offenderNo),
-      prisonerSearchClient.getVisitBalances(offenderNo),
-    ])
+    const inmateDetail = await prisonerSearchClient.getOffender(offenderNo)
+    let visitBalances = null
+    if (inmateDetail.legalStatus !== 'REMAND') {
+      visitBalances = await prisonerSearchClient.getVisitBalances(offenderNo)
+    }
 
     const displayName = properCaseFullName(`${inmateDetail.lastName}, ${inmateDetail.firstName}`)
     const displayDob = prisonerDobPretty(inmateDetail.dateOfBirth)

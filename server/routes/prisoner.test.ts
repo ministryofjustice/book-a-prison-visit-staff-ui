@@ -67,6 +67,33 @@ describe('GET /prisoner/A1234BC', () => {
       })
   })
 
+  it('should render prisoner profile page without vitising orders for REMAND', () => {
+    returnData = {
+      displayName: 'James, Fred',
+      displayDob: '11 December 1985',
+      inmateDetail: {
+        offenderNo: 'B2345CD',
+        firstName: 'FRED',
+        lastName: 'JAMES',
+        dateOfBirth: '1985-12-11',
+        activeAlertCount: 2,
+        inactiveAlertCount: 4,
+        legalStatus: 'REMAND',
+      } as InmateDetail,
+      visitBalances: null,
+    }
+
+    return request(app)
+      .get('/prisoner/A1234BC')
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        expect(res.text).toContain('<h1 class="govuk-heading-l">James, Fred</h1>')
+        expect(res.text).toContain('B2345CD')
+        expect(res.text).not.toContain('Visiting orders')
+        expect(res.text).toContain('2 active, 4 inactive')
+      })
+  })
+
   it('should render 400 Bad Request error for invalid prisoner number', () => {
     return request(app)
       .get('/prisoner/A12--34BC')

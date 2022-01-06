@@ -46,11 +46,38 @@ describe('Prisoner profile service', () => {
 
       const results = await prisonerProfileService.getProfile(offenderNo, 'user')
 
+      expect(prisonApiClient.getOffender).toHaveBeenCalledTimes(1)
+      expect(prisonApiClient.getVisitBalances).toHaveBeenCalledTimes(1)
       expect(results).toEqual({
         displayName: 'Smith, John',
         displayDob: '12 October 1980',
         inmateDetail,
         visitBalances,
+      })
+    })
+
+    it('Does not look up visit balances for those on REMAND', async () => {
+      const inmateDetail = <InmateDetail>{
+        offenderNo: 'B2345CD',
+        firstName: 'FRED',
+        lastName: 'JAMES',
+        dateOfBirth: '1985-12-11',
+        activeAlertCount: 2,
+        inactiveAlertCount: 4,
+        legalStatus: 'REMAND',
+      }
+
+      prisonApiClient.getOffender.mockResolvedValue(inmateDetail)
+
+      const results = await prisonerProfileService.getProfile(offenderNo, 'user')
+
+      expect(prisonApiClient.getOffender).toHaveBeenCalledTimes(1)
+      expect(prisonApiClient.getVisitBalances).not.toHaveBeenCalled()
+      expect(results).toEqual({
+        displayName: 'James, Fred',
+        displayDob: '11 December 1985',
+        inmateDetail,
+        visitBalances: null,
       })
     })
   })
