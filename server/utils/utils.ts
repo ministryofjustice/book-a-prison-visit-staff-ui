@@ -53,7 +53,7 @@ export const getPageLinks = ({
   for (let pageIndex = pageStartNumber; pageIndex <= pageEndNumber; pageIndex += 1) {
     pageLinks.push({
       text: pageIndex.toString(),
-      href: `/search/results?result=${searchTerm}&page=${pageIndex}`,
+      href: `/search/results?search=${searchTerm}&page=${pageIndex}`,
       selected: pageIndex === currentPage,
     })
   }

@@ -43,12 +43,12 @@ export default function routes(router: Router, prisonerSearchService: PrisonerSe
     const realNumberOfResults = error ? 0 : numberOfResults
     const currentPageMax = parsedPage * pageSize
     const to = realNumberOfResults < currentPageMax ? realNumberOfResults : currentPageMax
-    // const pageLinks = getPageLinks({
-    //   pagesToShow: config.apis.prisonerSearch.pagesLinksToShow,
-    //   numberOfPages,
-    //   currentPage: parsedPage,
-    //   searchTerm: search,
-    // })
+    const pageLinks = getPageLinks({
+      pagesToShow: config.apis.prisonerSearch.pagesLinksToShow,
+      numberOfPages,
+      currentPage: parsedPage,
+      searchTerm: search,
+    })
 
     res.render('pages/searchResults', {
       establishment: 'Hewell (HMP)',
@@ -61,6 +61,7 @@ export default function routes(router: Router, prisonerSearchService: PrisonerSe
       pageSize,
       from: (parsedPage - 1) * pageSize + 1,
       to,
+      pageLinks,
     })
   })
 

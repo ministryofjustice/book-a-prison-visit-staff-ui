@@ -1,6 +1,6 @@
 const getSingleRow = (selected: boolean, page: number): { href: string; selected: boolean; text: string } => {
   return {
-    href: `/search/results?result=search&page=${page}`,
+    href: `/search/results?search=search&page=${page}`,
     selected,
     text: page.toString(),
   }
