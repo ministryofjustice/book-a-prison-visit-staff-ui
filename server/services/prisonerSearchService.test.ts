@@ -37,7 +37,11 @@ describe('Prisoner search service', () => {
         ],
       })
 
-      const { results } = await prisonerSearchService.getPrisoners(search, 'user', 0)
+      const { results, numberOfResults, numberOfPages, next, previous } = await prisonerSearchService.getPrisoners(
+        search,
+        'user',
+        0
+      )
 
       expect(results).toEqual([
         [
@@ -55,6 +59,10 @@ describe('Prisoner search service', () => {
           },
         ],
       ])
+      expect(numberOfResults).toEqual(1)
+      expect(numberOfPages).toEqual(1)
+      expect(next).toEqual(1)
+      expect(previous).toEqual(1)
     })
     it('Propagates error', async () => {
       prisonerSearchClient.getPrisoners.mockRejectedValue(new Error('some error'))

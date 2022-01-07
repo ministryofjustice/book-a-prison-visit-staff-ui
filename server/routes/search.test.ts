@@ -101,8 +101,8 @@ describe('GET /search/results?search=A1234BC', () => {
       ],
       numberOfPages: 1,
       numberOfResults: 1,
-      next: 0,
-      previous: 0,
+      next: 1,
+      previous: 1,
     }
 
     return request(app)
