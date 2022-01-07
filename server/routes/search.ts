@@ -61,7 +61,7 @@ export default function routes(router: Router, prisonerSearchService: PrisonerSe
       pageSize,
       from: (parsedPage - 1) * pageSize + 1,
       to,
-      pageLinks,
+      pageLinks: numberOfPages <= 1 ? [] : pageLinks,
     })
   })
 
