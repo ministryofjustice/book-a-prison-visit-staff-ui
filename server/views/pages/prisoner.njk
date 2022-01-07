@@ -2,6 +2,7 @@
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/breadcrumbs/macro.njk" import govukBreadcrumbs %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{%- from "govuk/components/tag/macro.njk" import govukTag -%}
 
 {% set pageHeaderTitle = displayName %}
 {% set pageTitle = applicationName + " - " + pageHeaderTitle %}
@@ -11,6 +12,19 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+
+      {% if flaggedAlerts.length %}
+      <ul class="flagged-alerts-list">
+        {% for alert in flaggedAlerts %}
+        <li>
+          {{ govukTag({
+            text: alert.alertCodeDescription,
+            classes: "flagged-alert flagged-alert--" + alert.alertCode
+          }) }}
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
 
       <ul class="prisoner-profile-summary">
         <li>

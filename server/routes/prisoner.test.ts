@@ -37,6 +37,12 @@ describe('GET /prisoner/A1234BC', () => {
     returnData = {
       displayName: 'Smith, John',
       displayDob: '12 October 1980',
+      flaggedAlerts: [
+        {
+          alertCode: 'UPIU',
+          alertCodeDescription: 'Protective Isolation Unit',
+        },
+      ],
       inmateDetail: {
         offenderNo: 'A1234BC',
         firstName: 'JOHN',
@@ -59,6 +65,9 @@ describe('GET /prisoner/A1234BC', () => {
       .expect('Content-Type', /html/)
       .expect(res => {
         expect(res.text).toContain('<h1 class="govuk-heading-l">Smith, John</h1>')
+        expect(res.text).toContain('class="flagged-alerts-list"')
+        expect(res.text).toContain('class="govuk-tag flagged-alert flagged-alert--UPIU"')
+        expect(res.text).toContain('Protective Isolation Unit')
         expect(res.text).toContain('A1234BC')
         expect(res.text).toContain('Remaining VOs: 1')
         expect(res.text).toContain('Remaining PVOs: 2')
@@ -71,6 +80,7 @@ describe('GET /prisoner/A1234BC', () => {
     returnData = {
       displayName: 'James, Fred',
       displayDob: '11 December 1985',
+      flaggedAlerts: [],
       inmateDetail: {
         offenderNo: 'B2345CD',
         firstName: 'FRED',
@@ -88,6 +98,7 @@ describe('GET /prisoner/A1234BC', () => {
       .expect('Content-Type', /html/)
       .expect(res => {
         expect(res.text).toContain('<h1 class="govuk-heading-l">James, Fred</h1>')
+        expect(res.text).not.toContain('class="flagged-alerts-list"')
         expect(res.text).toContain('B2345CD')
         expect(res.text).not.toContain('Visiting orders')
         expect(res.text).toContain('2 active, 4 inactive')

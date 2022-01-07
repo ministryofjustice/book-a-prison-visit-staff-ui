@@ -1,6 +1,7 @@
 import PrisonerProfileService from './prisonerProfileService'
 import PrisonApiClient from '../data/prisonApiClient'
-import { InmateDetail, VisitBalances } from '../data/prisonApiTypes'
+import { Alert, InmateDetail, VisitBalances } from '../data/prisonApiTypes'
+import { FlaggedAlert } from '../@types/bapv'
 
 jest.mock('../data/prisonApiClient')
 
@@ -51,6 +52,7 @@ describe('Prisoner profile service', () => {
       expect(results).toEqual({
         displayName: 'Smith, John',
         displayDob: '12 October 1980',
+        flaggedAlerts: [],
         inmateDetail,
         visitBalances,
       })
@@ -76,6 +78,118 @@ describe('Prisoner profile service', () => {
       expect(results).toEqual({
         displayName: 'James, Fred',
         displayDob: '11 December 1985',
+        flaggedAlerts: [],
+        inmateDetail,
+        visitBalances: null,
+      })
+    })
+
+    it('Filters active alerts that should be flagged', async () => {
+      const inactiveAlert: Alert = {
+        alertId: 1,
+        alertType: 'R',
+        alertTypeDescription: 'Risk',
+        bookingId: 1234,
+        alertCode: 'RCON',
+        alertCodeDescription: 'Conflict with other prisoners',
+        comment: 'Test',
+        dateCreated: '2021-07-27',
+        dateExpires: '2021-08-10',
+        expired: true,
+        active: false,
+        offenderNo: 'B2345CD',
+      }
+
+      const nonRelevantAlert: Alert = {
+        alertId: 2,
+        alertType: 'X',
+        alertTypeDescription: 'Security',
+        bookingId: 1234,
+        alertCode: 'XR',
+        alertCodeDescription: 'Racist',
+        comment: 'Test',
+        dateCreated: '2022-01-01',
+        expired: false,
+        active: true,
+        offenderNo: 'B2345CD',
+      }
+
+      const alertsToFlag: Alert[] = [
+        {
+          alertId: 3,
+          alertType: 'U',
+          alertTypeDescription: 'COVID unit management',
+          bookingId: 1234,
+          alertCode: 'UPIU',
+          alertCodeDescription: 'Protective Isolation Unit',
+          comment: 'Test',
+          dateCreated: '2022-01-02',
+          expired: false,
+          active: true,
+          offenderNo: 'B2345CD',
+        },
+        {
+          alertId: 4,
+          alertType: 'R',
+          alertTypeDescription: 'Risk',
+          bookingId: 1234,
+          alertCode: 'RCDR',
+          alertCodeDescription: 'Quarantined – Communicable Disease Risk',
+          comment: 'Test',
+          dateCreated: '2022-01-03',
+          expired: false,
+          active: true,
+          offenderNo: 'B2345CD',
+        },
+        {
+          alertId: 5,
+          alertType: 'U',
+          alertTypeDescription: 'COVID unit management',
+          bookingId: 1234,
+          alertCode: 'URCU',
+          alertCodeDescription: 'Reverse Cohorting Unit',
+          comment: 'Test',
+          dateCreated: '2022-01-04',
+          expired: false,
+          active: true,
+          offenderNo: 'B2345CD',
+        },
+      ]
+
+      const inmateDetail = <InmateDetail>{
+        offenderNo: 'B2345CD',
+        firstName: 'FRED',
+        lastName: 'JAMES',
+        dateOfBirth: '1985-12-11',
+        activeAlertCount: 4,
+        inactiveAlertCount: 1,
+        legalStatus: 'REMAND',
+        alerts: [inactiveAlert, nonRelevantAlert, ...alertsToFlag],
+      }
+
+      prisonApiClient.getOffender.mockResolvedValue(inmateDetail)
+
+      const results = await prisonerProfileService.getProfile(offenderNo, 'user')
+
+      expect(prisonApiClient.getOffender).toHaveBeenCalledTimes(1)
+      expect(prisonApiClient.getVisitBalances).not.toHaveBeenCalled()
+      expect(results).toEqual({
+        displayName: 'James, Fred',
+        displayDob: '11 December 1985',
+        flaggedAlerts: [
+          {
+            alertCode: 'UPIU',
+            alertCodeDescription: 'Protective Isolation Unit',
+          },
+          {
+            alertCode: 'RCDR',
+            alertCodeDescription: 'Quarantined – Communicable Disease Risk',
+          },
+          {
+            alertCode: 'URCU',
+            alertCodeDescription: 'Reverse Cohorting Unit',
+          },
+        ] as FlaggedAlert[],
         inmateDetail,
         visitBalances: null,
       })
