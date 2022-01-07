@@ -1,9 +1,9 @@
 import { InmateDetail, VisitBalances } from '../data/prisonApiTypes'
 
-export type PrisonerDetailsItem = { classes: string } & (
-  | { html: string; text?: never }
-  | { html?: never; text: string }
-)
+export type PrisonerDetailsItem = {
+  classes: string
+  html: string
+}
 
 export type FlaggedAlert = {
   alertCode: string

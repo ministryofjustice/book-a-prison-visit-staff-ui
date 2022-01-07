@@ -52,11 +52,11 @@ export default class PrisonerSearchService {
           classes: 'bapv-table_cell',
         },
         {
-          text: prisoner.prisonerNumber,
+          html: prisoner.prisonerNumber,
           classes: 'bapv-table_cell',
         },
         {
-          text: prisonerDobPretty(prisoner.dateOfBirth),
+          html: prisonerDobPretty(prisoner.dateOfBirth),
           classes: 'bapv-table_cell',
         },
       ]

@@ -91,8 +91,8 @@ describe('GET /search/results?search=A1234BC', () => {
       results: [
         [
           { html: '<a href="/prisoner/A1234BC">Smith, John</a>', classes: '' },
-          { text: 'A1234BC', classes: '' },
-          { text: '2 April 1975', classes: '' },
+          { html: 'A1234BC', classes: '' },
+          { html: '2 April 1975', classes: '' },
         ],
       ],
       numberOfPages: 1,

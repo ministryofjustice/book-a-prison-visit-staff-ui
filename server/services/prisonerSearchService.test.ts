@@ -50,11 +50,11 @@ describe('Prisoner search service', () => {
             classes: 'bapv-table_cell',
           },
           {
-            text: 'A1234BC',
+            html: 'A1234BC',
             classes: 'bapv-table_cell',
           },
           {
-            text: '2 April 1975',
+            html: '2 April 1975',
             classes: 'bapv-table_cell',
           },
         ],
