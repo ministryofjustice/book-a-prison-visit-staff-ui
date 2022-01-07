@@ -22,6 +22,8 @@ describe('prisonSearchClientBuilder', () => {
   describe('getPrisoners', () => {
     it('should return data from api', async () => {
       const results = {
+        totalPage: 1,
+        totalElements: 1,
         content: [
           {
             lastName: 'test',
@@ -32,7 +34,10 @@ describe('prisonSearchClientBuilder', () => {
         ],
       }
       fakePrisonerSearchApi
-        .post(`/keyword`, '{"orWords":"test","fuzzyMatch":true,"prisonIds":["HEI"]}')
+        .post(
+          `/keyword`,
+          `{"orWords":"test","fuzzyMatch":true,"prisonIds":["HEI"],"pagination":{"page":0,"size":${config.apis.prisonerSearch.pageSize}}}`
+        )
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 

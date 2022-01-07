@@ -11,9 +11,31 @@
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
     </div>
     {% include "../partials/searchHeader.njk" %}
-    <div class="govuk-grid-column-full">
+    <div class="govuk-grid-column-full govuk-!-padding-top-5">
     {% if results|length %}
+      {% set pagination %}
+        {{ mojPagination({
+          results: {
+            from: from,
+            to: to,
+            count: numberOfResults
+          },
+          previous: {
+            text: 'Previous',
+            href: '/search/results?search=' + search + '&page=' + previous
+          },
+          next: {
+            text: 'Next',
+            href: '/search/results?search=' + search + '&page=' + next
+          },
+          items: pageLinks
+        }) }}
+      {% endset %}
+
+      {{ pagination | safe }}
+
         {{ govukTable({
+            classes: " govuk-!-margin-top-3",
             captionClasses: "govuk-table__caption--m",
             attributes: {
               "id": "search-results-true"
@@ -21,17 +43,22 @@
             firstCellIsHeader: true,
             head: [
                 {
-                text: "Name"
+                  text: "Name",
+                  classes: "bapv-table_cell"
                 },
                 {
-                text: "Prisoner number"
+                  text: "Prison number",
+                  classes: "bapv-table_cell"
                 },
                 {
-                text: "Date of birth"
+                  text: "Date of birth",
+                  classes: "bapv-table_cell"
                 }
             ],
             rows: results
         }) }}
+
+      {{ pagination | safe }}
     {% else %}
         <p class="govuk-!-margin-top-6 govuk-!-margin-bottom-6" id="search-results-none">There are no results for this name or number at {{ establishment }}.
     {% endif %}

@@ -14,13 +14,19 @@ class PrisonerSearchClient {
 
   private agencyId = 'HEI'
 
-  getPrisoners(search: string): Promise<{ content: Prisoner[] }> {
+  private pageSize = config.apis.prisonerSearch.pageSize
+
+  getPrisoners(search: string, page = 0): Promise<{ totalPages: number; totalElements: number; content: Prisoner[] }> {
     return this.restClient.post({
       path: '/keyword',
       data: {
         orWords: search,
         fuzzyMatch: true,
         prisonIds: [this.agencyId],
+        pagination: {
+          page,
+          size: this.pageSize,
+        },
       },
     })
   }

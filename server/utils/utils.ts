@@ -18,6 +18,48 @@ export const properCaseFullName = (name: string): string =>
         .map(properCaseName)
         .join(' ')
 
+export const getPageLinks = ({
+  pagesToShow = 1,
+  numberOfPages = 1,
+  currentPage = 1,
+  searchTerm = '',
+}: {
+  pagesToShow: number
+  numberOfPages: number
+  currentPage: number
+  searchTerm: string
+}): Array<{ text: string; href: string; selected: boolean }> => {
+  let pageStartNumber = 1
+  let pageEndNumber = pagesToShow
+  const pageLinks = []
+
+  if (numberOfPages <= pagesToShow) {
+    pageEndNumber = numberOfPages
+  } else {
+    const endPageOffset = currentPage + (pagesToShow - 1)
+
+    if (endPageOffset === numberOfPages) {
+      pageStartNumber = endPageOffset - (pagesToShow - 1)
+      pageEndNumber = endPageOffset
+    } else if (endPageOffset > numberOfPages) {
+      pageStartNumber = numberOfPages - pagesToShow + 1
+      pageEndNumber = numberOfPages
+    } else {
+      pageStartNumber = currentPage
+      pageEndNumber = endPageOffset
+    }
+  }
+
+  for (let pageIndex = pageStartNumber; pageIndex <= pageEndNumber; pageIndex += 1) {
+    pageLinks.push({
+      text: pageIndex.toString(),
+      href: `/search/results?search=${searchTerm}&page=${pageIndex}`,
+      selected: pageIndex === currentPage,
+    })
+  }
+
+  return pageLinks
+}
 /**
  * Converts a name (first name, last name, middle name, etc.) to proper case equivalent, handling double-barreled names
  * correctly (i.e. each part in a double-barreled is converted to proper case).
@@ -26,7 +68,5 @@ export const properCaseFullName = (name: string): string =>
  */
 const properCaseName = (name: string): string => (isBlank(name) ? '' : name.split('-').map(properCase).join('-'))
 
-const convertToTitleCase = (sentence: string): string =>
+export const convertToTitleCase = (sentence: string): string =>
   isBlank(sentence) ? '' : sentence.split(' ').map(properCaseName).join(' ')
-
-export default convertToTitleCase

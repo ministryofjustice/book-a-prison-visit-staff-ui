@@ -8,10 +8,23 @@ let prisonerSearchService: PrisonerSearchService
 let systemToken
 
 interface PrisonerDetailsRow {
+  classes: string
   text: string
 }
 
-let returnData: Array<PrisonerDetailsRow[]> = []
+let returnData: {
+  results: Array<PrisonerDetailsRow[]>
+  numberOfResults: number
+  numberOfPages: number
+  next: number
+  previous: number
+} = {
+  results: [],
+  numberOfResults: 0,
+  numberOfPages: 0,
+  next: 0,
+  previous: 0,
+}
 
 class MockPrisonerSearchService extends PrisonerSearchService {
   constructor() {
@@ -19,7 +32,17 @@ class MockPrisonerSearchService extends PrisonerSearchService {
   }
 
   /* eslint-disable @typescript-eslint/no-unused-vars */
-  getPrisoners = (search: string, username: string): Promise<Array<PrisonerDetailsRow[]>> => {
+  getPrisoners = (
+    search: string,
+    username: string,
+    page: number
+  ): Promise<{
+    results: Array<PrisonerDetailsRow[]>
+    numberOfResults: number
+    numberOfPages: number
+    next: number
+    previous: number
+  }> => {
     /* eslint-enable @typescript-eslint/no-unused-vars */
     return Promise.resolve(returnData)
   }
@@ -48,7 +71,13 @@ describe('GET /search/', () => {
 
 describe('GET /search/results?search=A1234BC', () => {
   it('should render results page with no results', () => {
-    returnData = []
+    returnData = {
+      results: [],
+      numberOfResults: 0,
+      numberOfPages: 0,
+      next: 0,
+      previous: 0,
+    }
 
     return request(app)
       .get('/search/results?search=A1234BC')
@@ -62,7 +91,19 @@ describe('GET /search/results?search=A1234BC', () => {
 
 describe('GET /search/results?search=A1234BC', () => {
   it('should render results page with results', () => {
-    returnData = [[{ text: 'Smith, John' }, { text: 'A1234BC' }, { text: '2 April 1975' }]]
+    returnData = {
+      results: [
+        [
+          { text: 'Smith, John', classes: '' },
+          { text: 'A1234BC', classes: '' },
+          { text: '2 April 1975', classes: '' },
+        ],
+      ],
+      numberOfPages: 1,
+      numberOfResults: 1,
+      next: 1,
+      previous: 1,
+    }
 
     return request(app)
       .get('/search/results?search=A1234BC')
