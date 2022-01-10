@@ -2,18 +2,14 @@ import type { Express } from 'express'
 import request from 'supertest'
 import PrisonerSearchService from '../services/prisonerSearchService'
 import appWithAllRoutes from './testutils/appSetup'
+import { PrisonerDetailsItem } from '../@types/bapv'
 
 let app: Express
 let prisonerSearchService: PrisonerSearchService
 let systemToken
 
-interface PrisonerDetailsRow {
-  classes: string
-  text: string
-}
-
 let returnData: {
-  results: Array<PrisonerDetailsRow[]>
+  results: Array<PrisonerDetailsItem[]>
   numberOfResults: number
   numberOfPages: number
   next: number
@@ -37,7 +33,7 @@ class MockPrisonerSearchService extends PrisonerSearchService {
     username: string,
     page: number
   ): Promise<{
-    results: Array<PrisonerDetailsRow[]>
+    results: Array<PrisonerDetailsItem[]>
     numberOfResults: number
     numberOfPages: number
     next: number
@@ -51,7 +47,7 @@ class MockPrisonerSearchService extends PrisonerSearchService {
 beforeEach(() => {
   systemToken = async (user: string): Promise<string> => `${user}-token-1`
   prisonerSearchService = new MockPrisonerSearchService()
-  app = appWithAllRoutes(prisonerSearchService, systemToken)
+  app = appWithAllRoutes(prisonerSearchService, null, systemToken)
 })
 
 afterEach(() => {
@@ -94,9 +90,9 @@ describe('GET /search/results?search=A1234BC', () => {
     returnData = {
       results: [
         [
-          { text: 'Smith, John', classes: '' },
-          { text: 'A1234BC', classes: '' },
-          { text: '2 April 1975', classes: '' },
+          { html: '<a href="/prisoner/A1234BC">Smith, John</a>', classes: '' },
+          { html: 'A1234BC', classes: '' },
+          { html: '2 April 1975', classes: '' },
         ],
       ],
       numberOfPages: 1,

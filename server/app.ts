@@ -5,12 +5,15 @@ import createError from 'http-errors'
 
 import indexRoutes from './routes'
 import searchRoutes from './routes/search'
+import prisonerRoutes from './routes/prisoner'
 import nunjucksSetup from './utils/nunjucksSetup'
 import errorHandler from './errorHandler'
 import standardRouter from './routes/standardRouter'
 import type UserService from './services/userService'
 import { prisonerSearchClientBuilder } from './data/prisonerSearchClient'
 import PrisonerSearchService from './services/prisonerSearchService'
+import { prisonApiClientBuilder } from './data/prisonApiClient'
+import PrisonerProfileService from './services/prisonerProfileService'
 import systemToken from './data/authClient'
 import setUpWebSession from './middleware/setUpWebSession'
 import setUpStaticResources from './middleware/setUpStaticResources'
@@ -40,6 +43,10 @@ export default function createApp(userService: UserService): express.Application
   app.use(
     '/search/',
     searchRoutes(standardRouter(userService), new PrisonerSearchService(prisonerSearchClientBuilder, systemToken))
+  )
+  app.use(
+    '/prisoner/',
+    prisonerRoutes(standardRouter(userService), new PrisonerProfileService(prisonApiClientBuilder, systemToken))
   )
 
   app.use((req, res, next) => next(createError(404, 'Not found')))

@@ -1,0 +1,74 @@
+{% extends "../partials/layout.njk" %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/breadcrumbs/macro.njk" import govukBreadcrumbs %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{%- from "govuk/components/tag/macro.njk" import govukTag -%}
+
+{% set pageHeaderTitle = displayName %}
+{% set pageTitle = applicationName + " - " + pageHeaderTitle %}
+{% set backLinkHref = "/search" %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+
+      {% if flaggedAlerts.length %}
+      <ul class="flagged-alerts-list">
+        {% for alert in flaggedAlerts %}
+        <li>
+          {{ govukTag({
+            text: alert.alertCodeDescription,
+            classes: "flagged-alert flagged-alert--" + alert.alertCode
+          }) }}
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+
+      <ul class="prisoner-profile-summary">
+        <li>
+          <strong>Prison number</strong>
+          {{ inmateDetail.offenderNo }}
+        </li>
+        <li>
+          <strong>Date of birth</strong>
+          {{ displayDob }}
+        </li>
+        <li>
+          <strong>Location</strong>
+          {{ inmateDetail.assignedLivingUnit.description + ", " + inmateDetail.assignedLivingUnit.agencyName if inmateDetail.assignedLivingUnit}}
+        </li>
+        <li>
+          <strong>Category</strong>
+          {{ inmateDetail.category }}
+        </li>
+        <li>
+          <strong>Incentive level</strong>
+          {{ inmateDetail.privilegeSummary.iepLevel }}
+        </li>
+        <li>
+          <strong>Conviction status</strong>
+          {{ inmateDetail.legalStatus }}
+        </li>
+        {% if visitBalances %}
+        <li>
+          <strong>Visiting orders</strong>
+          <span>Remaining VOs: {{ visitBalances.remainingVo }}</span>
+          <span>Remaining PVOs: {{ visitBalances.remainingPvo }}</span>
+        </li>
+        {% endif %}
+        <li>
+          <strong>Alerts</strong>
+          <span>{{ inmateDetail.activeAlertCount }} active, {{ inmateDetail.inactiveAlertCount }} inactive</span>
+        </li>
+      </ul>
+
+      {{ govukButton({
+        text: "Book a prison visit",
+        href: "#"
+      }) }}
+
+    </div>
+  </div>
+{% endblock %}
