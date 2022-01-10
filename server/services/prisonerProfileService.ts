@@ -15,12 +15,12 @@ export default class PrisonerProfileService {
 
   async getProfile(offenderNo: string, username: string): Promise<PrisonerProfile> {
     const token = await this.systemToken(username)
-    const prisonerSearchClient = this.prisonApiClientBuilder(token)
+    const prisonApiClient = this.prisonApiClientBuilder(token)
 
-    const inmateDetail = await prisonerSearchClient.getOffender(offenderNo)
+    const inmateDetail = await prisonApiClient.getOffender(offenderNo)
     let visitBalances = null
     if (inmateDetail.legalStatus !== 'REMAND') {
-      visitBalances = await prisonerSearchClient.getVisitBalances(offenderNo)
+      visitBalances = await prisonApiClient.getVisitBalances(offenderNo)
     }
 
     const displayName = properCaseFullName(`${inmateDetail.lastName}, ${inmateDetail.firstName}`)
