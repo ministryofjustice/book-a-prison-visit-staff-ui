@@ -6,6 +6,7 @@ generic-service:
 
   ingress:
     host: manage-a-prison-visit.hmpps.service.justice.gov.uk
+    contextColour: green
 
   env:
     INGRESS_URL: "https://manage-a-prison-visit.hmpps.service.justice.gov.uk"
