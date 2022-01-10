@@ -1,5 +1,6 @@
+import querystring from 'querystring'
 import RestClient from './restClient'
-import { InmateDetail, VisitBalances } from './prisonApiTypes'
+import { InmateDetail, PageOfPrisonerBookingSummary, VisitBalances } from './prisonApiTypes'
 import config from '../config'
 
 export const prisonApiClientBuilder = (token: string): PrisonApiClient => {
@@ -11,6 +12,19 @@ export const prisonApiClientBuilder = (token: string): PrisonApiClient => {
 
 class PrisonApiClient {
   constructor(private readonly restclient: RestClient) {}
+
+  private prisonId = 'HEI'
+
+  getBookings(offenderNo: string): Promise<PageOfPrisonerBookingSummary> {
+    return this.restclient.get({
+      path: '/api/bookings/v2',
+      query: querystring.stringify({
+        prisonId: this.prisonId,
+        offenderNo,
+        legalInfo: true,
+      }),
+    })
+  }
 
   getOffender(offenderNo: string): Promise<InmateDetail> {
     return this.restclient.get({

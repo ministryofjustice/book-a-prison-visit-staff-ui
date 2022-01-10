@@ -15,6 +15,7 @@ export type PrisonerProfile = {
   displayDob: string
   flaggedAlerts: FlaggedAlert[]
   inmateDetail: InmateDetail
+  convictedStatus: 'Convicted' | 'Remand'
   visitBalances: VisitBalances
 }
 
