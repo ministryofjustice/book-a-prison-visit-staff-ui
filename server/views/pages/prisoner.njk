@@ -51,6 +51,10 @@
           <strong>Conviction status</strong>
           {{ inmateDetail.legalStatus }}
         </li>
+        <li>
+          <strong>Alerts</strong>
+          <span>{{ inmateDetail.activeAlertCount }} active, {{ inmateDetail.inactiveAlertCount }} inactive</span>
+        </li>
         {% if visitBalances %}
         <li>
           <strong>Visiting orders</strong>
@@ -58,10 +62,6 @@
           <span>Remaining PVOs: {{ visitBalances.remainingPvo }}</span>
         </li>
         {% endif %}
-        <li>
-          <strong>Alerts</strong>
-          <span>{{ inmateDetail.activeAlertCount }} active, {{ inmateDetail.inactiveAlertCount }} inactive</span>
-        </li>
       </ul>
 
       {{ govukButton({
