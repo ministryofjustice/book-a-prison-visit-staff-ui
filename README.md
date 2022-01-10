@@ -1,5 +1,5 @@
-# hmpps-template-typescript
-Template github repo used for new Typescript based projects.
+# book-a-prison-visit-staff-ui
+Staff UI for new Manage a Prison Visit project.
 
 # Instructions
 
