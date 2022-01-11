@@ -25,7 +25,7 @@ describe('Prisoner profile service', () => {
       jest.resetAllMocks()
     })
 
-    it('Retieves and processes data for prisoner profile with visit balances', async () => {
+    it('Retrieves and processes data for prisoner profile with visit balances', async () => {
       const bookings = <PageOfPrisonerBookingSummary>{
         content: [
           {
