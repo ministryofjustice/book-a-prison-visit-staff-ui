@@ -16,6 +16,42 @@ describe('prisonApiClient', () => {
     nock.cleanAll()
   })
 
+  describe('getBookings', () => {
+    it('should return PageOfPrisonerBookingSummary from the Prison API', async () => {
+      const offenderNo = 'A1234BC'
+      const results = {
+        content: [
+          {
+            bookingId: 12345,
+            bookingNo: 'A123445',
+            offenderNo: 'A1234BC',
+            firstName: 'JOHN',
+            lastName: 'SMITH',
+            dateOfBirth: '1980-10-12',
+            agencyId: 'HEI',
+            legalStatus: 'SENTENCED',
+            convictedStatus: 'Convicted',
+          },
+        ],
+        numberOfElements: 1,
+      }
+
+      fakePrisonApi
+        .get('/api/bookings/v2')
+        .query({
+          prisonId: 'HEI',
+          offenderNo,
+          legalInfo: 'true',
+        })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, results)
+
+      const output = await client.getBookings(offenderNo)
+
+      expect(output).toEqual(results)
+    })
+  })
+
   describe('getOffender', () => {
     it('should return inmateDetail from the Prison API', async () => {
       const offenderNo = 'A1234BC'

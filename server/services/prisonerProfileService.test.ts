@@ -1,6 +1,7 @@
+import { NotFound } from 'http-errors'
 import PrisonerProfileService from './prisonerProfileService'
 import PrisonApiClient from '../data/prisonApiClient'
-import { Alert, InmateDetail, VisitBalances } from '../data/prisonApiTypes'
+import { Alert, InmateDetail, PageOfPrisonerBookingSummary, VisitBalances } from '../data/prisonApiTypes'
 import { FlaggedAlert } from '../@types/bapv'
 
 jest.mock('../data/prisonApiClient')
@@ -24,7 +25,24 @@ describe('Prisoner profile service', () => {
       jest.resetAllMocks()
     })
 
-    it('Retieves and processes data for prisoner profile with visit balances', async () => {
+    it('Retrieves and processes data for prisoner profile with visit balances', async () => {
+      const bookings = <PageOfPrisonerBookingSummary>{
+        content: [
+          {
+            bookingId: 12345,
+            bookingNo: 'A123445',
+            offenderNo: 'A1234BC',
+            firstName: 'JOHN',
+            lastName: 'SMITH',
+            dateOfBirth: '1980-10-12',
+            agencyId: 'HEI',
+            legalStatus: 'SENTENCED',
+            convictedStatus: 'Convicted',
+          },
+        ],
+        numberOfElements: 1,
+      }
+
       const inmateDetail = <InmateDetail>{
         offenderNo: 'A1234BC',
         firstName: 'JOHN',
@@ -42,11 +60,13 @@ describe('Prisoner profile service', () => {
         latestPrivIepAdjustDate: '2021-12-01',
       }
 
+      prisonApiClient.getBookings.mockResolvedValue(bookings)
       prisonApiClient.getOffender.mockResolvedValue(inmateDetail)
       prisonApiClient.getVisitBalances.mockResolvedValue(visitBalances)
 
       const results = await prisonerProfileService.getProfile(offenderNo, 'user')
 
+      expect(prisonApiClient.getBookings).toHaveBeenCalledTimes(1)
       expect(prisonApiClient.getOffender).toHaveBeenCalledTimes(1)
       expect(prisonApiClient.getVisitBalances).toHaveBeenCalledTimes(1)
       expect(results).toEqual({
@@ -54,11 +74,29 @@ describe('Prisoner profile service', () => {
         displayDob: '12 October 1980',
         flaggedAlerts: [],
         inmateDetail,
+        convictedStatus: 'Convicted',
         visitBalances,
       })
     })
 
     it('Does not look up visit balances for those on REMAND', async () => {
+      const bookings = <PageOfPrisonerBookingSummary>{
+        content: [
+          {
+            bookingId: 22345,
+            bookingNo: 'B123445',
+            offenderNo: 'B2345CD',
+            firstName: 'FRED',
+            lastName: 'JAMES',
+            dateOfBirth: '1985-12-11',
+            agencyId: 'HEI',
+            legalStatus: 'REMAND',
+            convictedStatus: 'Remand',
+          },
+        ],
+        numberOfElements: 1,
+      }
+
       const inmateDetail = <InmateDetail>{
         offenderNo: 'B2345CD',
         firstName: 'FRED',
@@ -69,10 +107,12 @@ describe('Prisoner profile service', () => {
         legalStatus: 'REMAND',
       }
 
+      prisonApiClient.getBookings.mockResolvedValue(bookings)
       prisonApiClient.getOffender.mockResolvedValue(inmateDetail)
 
       const results = await prisonerProfileService.getProfile(offenderNo, 'user')
 
+      expect(prisonApiClient.getBookings).toHaveBeenCalledTimes(1)
       expect(prisonApiClient.getOffender).toHaveBeenCalledTimes(1)
       expect(prisonApiClient.getVisitBalances).not.toHaveBeenCalled()
       expect(results).toEqual({
@@ -80,6 +120,7 @@ describe('Prisoner profile service', () => {
         displayDob: '11 December 1985',
         flaggedAlerts: [],
         inmateDetail,
+        convictedStatus: 'Remand',
         visitBalances: null,
       })
     })
@@ -156,6 +197,23 @@ describe('Prisoner profile service', () => {
         },
       ]
 
+      const bookings = <PageOfPrisonerBookingSummary>{
+        content: [
+          {
+            bookingId: 22345,
+            bookingNo: 'B123445',
+            offenderNo: 'B2345CD',
+            firstName: 'FRED',
+            lastName: 'JAMES',
+            dateOfBirth: '1985-12-11',
+            agencyId: 'HEI',
+            legalStatus: 'REMAND',
+            convictedStatus: 'Remand',
+          },
+        ],
+        numberOfElements: 1,
+      }
+
       const inmateDetail = <InmateDetail>{
         offenderNo: 'B2345CD',
         firstName: 'FRED',
@@ -167,10 +225,12 @@ describe('Prisoner profile service', () => {
         alerts: [inactiveAlert, nonRelevantAlert, ...alertsToFlag],
       }
 
+      prisonApiClient.getBookings.mockResolvedValue(bookings)
       prisonApiClient.getOffender.mockResolvedValue(inmateDetail)
 
       const results = await prisonerProfileService.getProfile(offenderNo, 'user')
 
+      expect(prisonApiClient.getBookings).toHaveBeenCalledTimes(1)
       expect(prisonApiClient.getOffender).toHaveBeenCalledTimes(1)
       expect(prisonApiClient.getVisitBalances).not.toHaveBeenCalled()
       expect(results).toEqual({
@@ -191,8 +251,23 @@ describe('Prisoner profile service', () => {
           },
         ] as FlaggedAlert[],
         inmateDetail,
+        convictedStatus: 'Remand',
         visitBalances: null,
       })
+    })
+
+    it('Throws 404 if no bookings found for criteria', async () => {
+      // e.g. offenderNo doesn't exist - or not at specified prisonId
+      const bookings = <PageOfPrisonerBookingSummary>{
+        content: [],
+        numberOfElements: 0,
+      }
+
+      prisonApiClient.getBookings.mockResolvedValue(bookings)
+
+      await expect(async () => {
+        await prisonerProfileService.getProfile(offenderNo, 'user')
+      }).rejects.toBeInstanceOf(NotFound)
     })
   })
 })

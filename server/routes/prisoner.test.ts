@@ -52,6 +52,7 @@ describe('GET /prisoner/A1234BC', () => {
         inactiveAlertCount: 3,
         legalStatus: 'SENTENCED',
       } as InmateDetail,
+      convictedStatus: 'Convicted',
       visitBalances: {
         remainingVo: 1,
         remainingPvo: 2,
@@ -69,6 +70,7 @@ describe('GET /prisoner/A1234BC', () => {
         expect(res.text).toContain('class="govuk-tag flagged-alert flagged-alert--UPIU"')
         expect(res.text).toContain('Protective Isolation Unit')
         expect(res.text).toContain('A1234BC')
+        expect(res.text).toMatch(/<strong>Conviction status<\/strong>\s+Convicted/)
         expect(res.text).toContain('Remaining VOs: 1')
         expect(res.text).toContain('Remaining PVOs: 2')
         expect(res.text).toContain('1 active, 3 inactive')
@@ -90,6 +92,7 @@ describe('GET /prisoner/A1234BC', () => {
         inactiveAlertCount: 4,
         legalStatus: 'REMAND',
       } as InmateDetail,
+      convictedStatus: 'Remand',
       visitBalances: null,
     }
 
@@ -100,6 +103,7 @@ describe('GET /prisoner/A1234BC', () => {
         expect(res.text).toContain('<h1 class="govuk-heading-l">James, Fred</h1>')
         expect(res.text).not.toContain('class="flagged-alerts-list"')
         expect(res.text).toContain('B2345CD')
+        expect(res.text).toMatch(/<strong>Conviction status<\/strong>\s+Remand/)
         expect(res.text).not.toContain('Visiting orders')
         expect(res.text).toContain('2 active, 4 inactive')
       })

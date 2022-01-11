@@ -1,3 +1,4 @@
+import { NotFound } from 'http-errors'
 import PrisonApiClient from '../data/prisonApiClient'
 import { FlaggedAlert, PrisonerProfile, SystemToken } from '../@types/bapv'
 import { prisonerDobPretty, properCaseFullName } from '../utils/utils'
@@ -15,12 +16,16 @@ export default class PrisonerProfileService {
 
   async getProfile(offenderNo: string, username: string): Promise<PrisonerProfile> {
     const token = await this.systemToken(username)
-    const prisonerSearchClient = this.prisonApiClientBuilder(token)
+    const prisonApiClient = this.prisonApiClientBuilder(token)
 
-    const inmateDetail = await prisonerSearchClient.getOffender(offenderNo)
+    const bookings = await prisonApiClient.getBookings(offenderNo)
+    if (bookings.numberOfElements !== 1) throw new NotFound()
+    const { convictedStatus } = bookings.content[0]
+
+    const inmateDetail = await prisonApiClient.getOffender(offenderNo)
     let visitBalances = null
-    if (inmateDetail.legalStatus !== 'REMAND') {
-      visitBalances = await prisonerSearchClient.getVisitBalances(offenderNo)
+    if (convictedStatus !== 'Remand') {
+      visitBalances = await prisonApiClient.getVisitBalances(offenderNo)
     }
 
     const displayName = properCaseFullName(`${inmateDetail.lastName}, ${inmateDetail.firstName}`)
@@ -32,6 +37,7 @@ export default class PrisonerProfileService {
       displayDob,
       flaggedAlerts,
       inmateDetail,
+      convictedStatus,
       visitBalances,
     }
   }
