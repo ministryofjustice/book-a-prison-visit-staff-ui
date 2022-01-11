@@ -33,7 +33,7 @@ afterEach(() => {
 })
 
 describe('GET /prisoner/A1234BC', () => {
-  it('should render the prisoner profile page for offender no A1234BC', () => {
+  it('should render the prisoner profile page for offender number A1234BC', () => {
     returnData = {
       displayName: 'Smith, John',
       displayDob: '12 October 1980',
@@ -71,6 +71,7 @@ describe('GET /prisoner/A1234BC', () => {
         expect(res.text).toContain('Protective Isolation Unit')
         expect(res.text).toContain('A1234BC')
         expect(res.text).toMatch(/<strong>Conviction status<\/strong>\s+Convicted/)
+        expect(res.text).toMatch(/id="visiting-orders"/)
         expect(res.text).toContain('Remaining VOs: 1')
         expect(res.text).toContain('Remaining PVOs: 2')
         expect(res.text).toContain('1 active, 3 inactive')
@@ -104,6 +105,7 @@ describe('GET /prisoner/A1234BC', () => {
         expect(res.text).not.toContain('class="flagged-alerts-list"')
         expect(res.text).toContain('B2345CD')
         expect(res.text).toMatch(/<strong>Conviction status<\/strong>\s+Remand/)
+        expect(res.text).not.toMatch(/id="visiting-orders"/)
         expect(res.text).not.toContain('Visiting orders')
         expect(res.text).toContain('2 active, 4 inactive')
       })

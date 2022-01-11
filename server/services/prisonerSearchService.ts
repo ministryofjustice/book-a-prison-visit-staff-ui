@@ -1,4 +1,4 @@
-import { properCaseFullName, prisonerDobPretty } from '../utils/utils'
+import { properCaseFullName, prisonerDatePretty } from '../utils/utils'
 import { Prisoner } from '../data/prisonerOffenderSearchTypes'
 import PrisonerSearchClient from '../data/prisonerSearchClient'
 import { PrisonerDetailsItem, SystemToken } from '../@types/bapv'
@@ -56,7 +56,7 @@ export default class PrisonerSearchService {
           classes: 'bapv-table_cell',
         },
         {
-          html: prisonerDobPretty(prisoner.dateOfBirth),
+          html: prisonerDatePretty(prisoner.dateOfBirth),
           classes: 'bapv-table_cell',
         },
       ]
