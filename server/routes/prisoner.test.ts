@@ -78,7 +78,7 @@ describe('GET /prisoner/A1234BC', () => {
       })
   })
 
-  it('should render prisoner profile page without vitising orders for REMAND', () => {
+  it('should render prisoner profile page without visiting orders for REMAND', () => {
     returnData = {
       displayName: 'James, Fred',
       displayDob: '11 December 1985',
