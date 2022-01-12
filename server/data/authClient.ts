@@ -1,6 +1,6 @@
 import superagent from 'superagent'
 /** @type {any} */
-import querystring from 'querystring'
+import { URLSearchParams } from 'url'
 import logger from '../../logger'
 import config from '../config'
 import generateOauthClientToken from '../authentication/clientCredentials'
@@ -12,8 +12,8 @@ async function getSystemClientToken(username?: string) {
   const clientToken = generateOauthClientToken(config.apis.oauth2.systemClientId, config.apis.oauth2.systemClientSecret)
 
   const oauthRequest = username
-    ? querystring.stringify({ grant_type: 'client_credentials', username })
-    : querystring.stringify({ grant_type: 'client_credentials' })
+    ? new URLSearchParams({ grant_type: 'client_credentials', username }).toString()
+    : new URLSearchParams({ grant_type: 'client_credentials' }).toString()
 
   logger.info(
     `Oauth request '${oauthRequest}' for client id '${config.apis.oauth2.apiClientId}' and user '${username}'`

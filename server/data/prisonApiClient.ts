@@ -1,4 +1,4 @@
-import querystring from 'querystring'
+import { URLSearchParams } from 'url'
 import RestClient from './restClient'
 import { InmateDetail, PageOfPrisonerBookingSummary, VisitBalances } from './prisonApiTypes'
 import config from '../config'
@@ -18,11 +18,11 @@ class PrisonApiClient {
   getBookings(offenderNo: string): Promise<PageOfPrisonerBookingSummary> {
     return this.restclient.get({
       path: '/api/bookings/v2',
-      query: querystring.stringify({
+      query: new URLSearchParams({
         prisonId: this.prisonId,
         offenderNo,
-        legalInfo: true,
-      }),
+        legalInfo: 'true',
+      }).toString(),
     })
   }
 
