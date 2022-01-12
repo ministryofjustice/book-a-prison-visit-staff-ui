@@ -29,12 +29,12 @@ export default class PrisonerProfileService {
     const displayDob = prisonerDatePretty(inmateDetail.dateOfBirth)
     const alerts = inmateDetail.alerts || []
     const activeAlerts: Alert[] = alerts.filter(alert => alert.active)
-    const flaggedAlerts = activeAlerts.filter(alert => this.alertCodesToFlag.includes(alert.alertCode))
+    const flaggedAlerts: Alert[] = activeAlerts.filter(alert => this.alertCodesToFlag.includes(alert.alertCode))
 
     const activeAlertsForDisplay: PrisonerAlertItem[] = activeAlerts.map(alert => {
       return [
-        { text: alert.alertTypeDescription },
-        { text: alert.alertCodeDescription },
+        { text: `${alert.alertTypeDescription} (${alert.alertType})` },
+        { text: `${alert.alertCodeDescription} (${alert.alertCode})` },
         { text: alert.comment },
         { text: alert.dateCreated ? prisonerDatePretty(alert.dateCreated) : 'N/A' },
         { text: alert.dateExpires ? prisonerDatePretty(alert.dateExpires) : 'N/A' },

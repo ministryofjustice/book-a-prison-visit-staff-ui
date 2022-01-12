@@ -202,10 +202,10 @@ describe('Prisoner profile service', () => {
       const alertsForDisplay: PrisonerAlertItem[] = [
         [
           {
-            text: 'Security',
+            text: 'Security (X)',
           },
           {
-            text: 'Racist',
+            text: 'Racist (XR)',
           },
           {
             text: 'Test',
@@ -219,10 +219,10 @@ describe('Prisoner profile service', () => {
         ],
         [
           {
-            text: 'COVID unit management',
+            text: 'COVID unit management (U)',
           },
           {
-            text: 'Protective Isolation Unit',
+            text: 'Protective Isolation Unit (UPIU)',
           },
           {
             text: 'Test',
@@ -236,10 +236,10 @@ describe('Prisoner profile service', () => {
         ],
         [
           {
-            text: 'Risk',
+            text: 'Risk (R)',
           },
           {
-            text: 'Quarantined – Communicable Disease Risk',
+            text: 'Quarantined – Communicable Disease Risk (RCDR)',
           },
           {
             text: 'Test',
@@ -253,10 +253,10 @@ describe('Prisoner profile service', () => {
         ],
         [
           {
-            text: 'COVID unit management',
+            text: 'COVID unit management (U)',
           },
           {
-            text: 'Reverse Cohorting Unit',
+            text: 'Reverse Cohorting Unit (URCU)',
           },
           {
             text: 'Test',
