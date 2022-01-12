@@ -1,6 +1,6 @@
 import { NotFound } from 'http-errors'
 import PrisonApiClient from '../data/prisonApiClient'
-import { FlaggedAlert, PrisonerProfile, SystemToken } from '../@types/bapv'
+import { PrisonerProfile, SystemToken } from '../@types/bapv'
 import { prisonerDobPretty, properCaseFullName } from '../utils/utils'
 import { Alert } from '../data/prisonApiTypes'
 
@@ -23,6 +23,7 @@ export default class PrisonerProfileService {
     const { convictedStatus } = bookings.content[0]
 
     const inmateDetail = await prisonApiClient.getOffender(offenderNo)
+
     let visitBalances = null
     if (convictedStatus !== 'Remand') {
       visitBalances = await prisonApiClient.getVisitBalances(offenderNo)
@@ -42,20 +43,15 @@ export default class PrisonerProfileService {
     }
   }
 
-  private filterAlerts(alerts: Alert[]): FlaggedAlert[] {
-    const flaggedAlerts: FlaggedAlert[] = []
-
+  private filterAlerts(alerts: Alert[]): Alert[] {
     if (Array.isArray(alerts)) {
-      alerts.forEach(alert => {
-        if (alert.active && this.alertCodesToFlag.includes(alert.alertCode)) {
-          flaggedAlerts.push({
-            alertCode: alert.alertCode,
-            alertCodeDescription: alert.alertCodeDescription,
-          })
-        }
+      const flaggedAlerts: Alert[] = alerts.filter(alert => {
+        return alert.active && this.alertCodesToFlag.includes(alert.alertCode)
       })
+
+      return flaggedAlerts
     }
 
-    return flaggedAlerts
+    return []
   }
 }

@@ -5,15 +5,10 @@ export type PrisonerDetailsItem = {
   html: string
 }
 
-export type FlaggedAlert = {
-  alertCode: string
-  alertCodeDescription: string
-}
-
 export type PrisonerProfile = {
   displayName: string
   displayDob: string
-  flaggedAlerts: FlaggedAlert[]
+  flaggedAlerts: Alert[]
   inmateDetail: InmateDetail
   convictedStatus: 'Convicted' | 'Remand'
   visitBalances: VisitBalances

@@ -84,7 +84,7 @@ describe('prisonApiClient', () => {
   })
 
   describe('getVisitBalances', () => {
-    it('should return visitBalances for a SENTANCED prisoner', async () => {
+    it('should return visitBalances for a SENTENCED prisoner', async () => {
       const offenderNo = 'A1234BC'
       const results = {
         remainingVo: 1,

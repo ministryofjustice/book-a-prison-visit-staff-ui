@@ -2,7 +2,6 @@ import { NotFound } from 'http-errors'
 import PrisonerProfileService from './prisonerProfileService'
 import PrisonApiClient from '../data/prisonApiClient'
 import { Alert, InmateDetail, PageOfPrisonerBookingSummary, VisitBalances } from '../data/prisonApiTypes'
-import { FlaggedAlert } from '../@types/bapv'
 
 jest.mock('../data/prisonApiClient')
 
@@ -236,20 +235,7 @@ describe('Prisoner profile service', () => {
       expect(results).toEqual({
         displayName: 'James, Fred',
         displayDob: '11 December 1985',
-        flaggedAlerts: [
-          {
-            alertCode: 'UPIU',
-            alertCodeDescription: 'Protective Isolation Unit',
-          },
-          {
-            alertCode: 'RCDR',
-            alertCodeDescription: 'Quarantined – Communicable Disease Risk',
-          },
-          {
-            alertCode: 'URCU',
-            alertCodeDescription: 'Reverse Cohorting Unit',
-          },
-        ] as FlaggedAlert[],
+        flaggedAlerts: alertsToFlag,
         inmateDetail,
         convictedStatus: 'Remand',
         visitBalances: null,
