@@ -124,6 +124,29 @@
       ]
     }) }}
     {% endset %}
+    {% set alertsTab %}
+    <h2 class="govuk-heading-l">Alerts</h2>
+    {{ govukTable({
+      head: [
+        {
+          text: "Type"
+        },
+        {
+          text: "Alert"
+        },
+        {
+          text: "Comments"
+        },
+        {
+          text: "Date from"
+        },
+        {
+          text: "Date to"
+        }
+      ],
+      rows: activeAlerts
+    }) }}
+    {% endset %}
     {{ govukTabs({
       items: [
         {
@@ -132,7 +155,14 @@
           panel: {
             html: visitingOrdersTab
           }
-        } if visitBalances
+        } if visitBalances,
+        {
+          label: "Alerts",
+          id: "alerts",
+          panel: {
+            html: alertsTab
+          }
+        }
       ]
     }) }}
     </div>

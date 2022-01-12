@@ -37,6 +37,25 @@ describe('GET /prisoner/A1234BC', () => {
     returnData = {
       displayName: 'Smith, John',
       displayDob: '12 October 1980',
+      activeAlerts: [
+        [
+          {
+            text: 'Security',
+          },
+          {
+            text: 'Protective Isolation Unit',
+          },
+          {
+            text: 'Professional lock pick.',
+          },
+          {
+            text: '1 January 2022',
+          },
+          {
+            text: '2 January 2022',
+          },
+        ],
+      ],
       flaggedAlerts: [
         {
           alertCode: 'UPIU',
@@ -89,6 +108,7 @@ describe('GET /prisoner/A1234BC', () => {
     returnData = {
       displayName: 'James, Fred',
       displayDob: '11 December 1985',
+      activeAlerts: [],
       flaggedAlerts: [],
       inmateDetail: {
         offenderNo: 'B2345CD',

@@ -2,6 +2,7 @@ import { NotFound } from 'http-errors'
 import PrisonerProfileService from './prisonerProfileService'
 import PrisonApiClient from '../data/prisonApiClient'
 import { Alert, InmateDetail, PageOfPrisonerBookingSummary, VisitBalances } from '../data/prisonApiTypes'
+import { PrisonerAlertItem } from '../@types/bapv'
 
 jest.mock('../data/prisonApiClient')
 
@@ -71,6 +72,7 @@ describe('Prisoner profile service', () => {
       expect(results).toEqual({
         displayName: 'Smith, John',
         displayDob: '12 October 1980',
+        activeAlerts: [],
         flaggedAlerts: [],
         inmateDetail,
         convictedStatus: 'Convicted',
@@ -117,6 +119,7 @@ describe('Prisoner profile service', () => {
       expect(results).toEqual({
         displayName: 'James, Fred',
         displayDob: '11 December 1985',
+        activeAlerts: [],
         flaggedAlerts: [],
         inmateDetail,
         convictedStatus: 'Remand',
@@ -196,6 +199,77 @@ describe('Prisoner profile service', () => {
         },
       ]
 
+      const alertsForDisplay: PrisonerAlertItem[] = [
+        [
+          {
+            text: 'Security',
+          },
+          {
+            text: 'Racist',
+          },
+          {
+            text: 'Test',
+          },
+          {
+            text: '1 January 2022',
+          },
+          {
+            text: 'N/A',
+          },
+        ],
+        [
+          {
+            text: 'COVID unit management',
+          },
+          {
+            text: 'Protective Isolation Unit',
+          },
+          {
+            text: 'Test',
+          },
+          {
+            text: '2 January 2022',
+          },
+          {
+            text: 'N/A',
+          },
+        ],
+        [
+          {
+            text: 'Risk',
+          },
+          {
+            text: 'Quarantined – Communicable Disease Risk',
+          },
+          {
+            text: 'Test',
+          },
+          {
+            text: '3 January 2022',
+          },
+          {
+            text: 'N/A',
+          },
+        ],
+        [
+          {
+            text: 'COVID unit management',
+          },
+          {
+            text: 'Reverse Cohorting Unit',
+          },
+          {
+            text: 'Test',
+          },
+          {
+            text: '4 January 2022',
+          },
+          {
+            text: 'N/A',
+          },
+        ],
+      ]
+
       const bookings = <PageOfPrisonerBookingSummary>{
         content: [
           {
@@ -235,6 +309,7 @@ describe('Prisoner profile service', () => {
       expect(results).toEqual({
         displayName: 'James, Fred',
         displayDob: '11 December 1985',
+        activeAlerts: alertsForDisplay,
         flaggedAlerts: alertsToFlag,
         inmateDetail,
         convictedStatus: 'Remand',
