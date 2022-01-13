@@ -1,6 +1,6 @@
 import type { Express } from 'express'
 import request from 'supertest'
-import { PrisonerProfile } from '../@types/bapv'
+import { PrisonerProfile, BAPVVisitBalances } from '../@types/bapv'
 import { InmateDetail } from '../data/prisonApiTypes'
 import PrisonerProfileService from '../services/prisonerProfileService'
 import appWithAllRoutes from './testutils/appSetup'
@@ -56,9 +56,11 @@ describe('GET /prisoner/A1234BC', () => {
       visitBalances: {
         remainingVo: 1,
         remainingPvo: 2,
-        latestIepAdjustDate: '2021-04-21',
-        latestPrivIepAdjustDate: '2021-12-01',
-      },
+        latestIepAdjustDate: '21 April 2021',
+        latestPrivIepAdjustDate: '1 December 2021',
+        nextIepAdjustDate: '15 May 2021',
+        nextPrivIepAdjustDate: '1 January 2022',
+      } as BAPVVisitBalances,
     }
 
     return request(app)
@@ -74,6 +76,10 @@ describe('GET /prisoner/A1234BC', () => {
         expect(res.text).toMatch(/id="visiting-orders"/)
         expect(res.text).toContain('Remaining VOs: 1')
         expect(res.text).toContain('Remaining PVOs: 2')
+        expect(res.text).toContain('21 April 2021')
+        expect(res.text).toContain('1 December 2021')
+        expect(res.text).toContain('15 May 2021')
+        expect(res.text).toContain('1 January 2022')
         expect(res.text).toContain('1 active, 3 inactive')
         expect(res.text).toMatch(/<a.*?class="govuk-button".*?>\s+Book a prison visit\s+<\/a>/)
       })

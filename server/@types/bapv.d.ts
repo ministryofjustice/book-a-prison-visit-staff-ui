@@ -15,3 +15,8 @@ export type PrisonerProfile = {
 }
 
 export type SystemToken = (arg0?: string) => Promise<string>
+
+export type BAPVVisitBalances = VisitBalances & {
+  nextIepAdjustDate?: string
+  nextPrivIepAdjustDate?: string
+}

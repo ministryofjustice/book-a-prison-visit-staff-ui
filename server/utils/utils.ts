@@ -5,8 +5,10 @@ const properCase = (word: string): string =>
 
 const isBlank = (str: string): boolean => !str || /^\s*$/.test(str)
 
+export const getDateFromAPI = (dateString: string): Date => parse(dateString, 'yyyy-MM-dd', new Date())
+
 export const prisonerDatePretty = (dateOfBirth: string): string => {
-  return format(parse(dateOfBirth, 'yyyy-MM-dd', new Date()), 'd MMMM yyyy')
+  return format(getDateFromAPI(dateOfBirth), 'd MMMM yyyy')
 }
 
 export const properCaseFullName = (name: string): string =>

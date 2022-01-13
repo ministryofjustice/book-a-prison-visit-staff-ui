@@ -1,7 +1,8 @@
 import { NotFound } from 'http-errors'
+import { addDays, startOfMonth, addMonths, format } from 'date-fns'
 import PrisonApiClient from '../data/prisonApiClient'
-import { PrisonerProfile, SystemToken } from '../@types/bapv'
-import { prisonerDatePretty, properCaseFullName } from '../utils/utils'
+import { PrisonerProfile, SystemToken, BAPVVisitBalances } from '../@types/bapv'
+import { prisonerDatePretty, properCaseFullName, getDateFromAPI } from '../utils/utils'
 import { Alert } from '../data/prisonApiTypes'
 
 type PrisonApiClientBuilder = (token: string) => PrisonApiClient
@@ -27,13 +28,21 @@ export default class PrisonerProfileService {
     let visitBalances = null
 
     if (convictedStatus !== 'Remand') {
-      visitBalances = await prisonApiClient.getVisitBalances(offenderNo)
+      visitBalances = (await prisonApiClient.getVisitBalances(offenderNo)) as BAPVVisitBalances
 
       if (visitBalances.latestIepAdjustDate) {
+        visitBalances.nextIepAdjustDate = format(
+          addDays(getDateFromAPI(visitBalances.latestIepAdjustDate), 14),
+          'd MMMM yyyy'
+        )
         visitBalances.latestIepAdjustDate = prisonerDatePretty(visitBalances.latestIepAdjustDate)
       }
 
       if (visitBalances.latestPrivIepAdjustDate) {
+        visitBalances.nextPrivIepAdjustDate = format(
+          addMonths(startOfMonth(getDateFromAPI(visitBalances.latestPrivIepAdjustDate)), 1),
+          'd MMMM yyyy'
+        )
         visitBalances.latestPrivIepAdjustDate = prisonerDatePretty(visitBalances.latestPrivIepAdjustDate)
       }
     }
