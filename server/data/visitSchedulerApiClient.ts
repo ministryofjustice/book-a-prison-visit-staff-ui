@@ -1,5 +1,4 @@
 import { URLSearchParams } from 'url'
-import { format } from 'date-fns'
 import RestClient from './restClient'
 import { PrisonerVisit } from '../@types/bapv'
 import config from '../config'
@@ -17,14 +16,12 @@ class VisitSchedulerApiClient {
   private prisonId = 'HEI'
 
   getUpcomingVisits(offenderNo: string): Promise<PrisonerVisit[]> {
-    const now = new Date()
-    const dateNow = `${format(now, 'yyyy-MM-dd')}T${format(now, 'HH:mm:ss')}`
     return this.restclient.get({
       path: '/visits',
       query: new URLSearchParams({
         prisonId: this.prisonId,
         prisonerId: offenderNo,
-        startTimestamp: dateNow,
+        startTimestamp: new Date().toISOString(),
       }).toString(),
     })
   }
