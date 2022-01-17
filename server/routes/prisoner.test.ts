@@ -105,6 +105,48 @@ describe('GET /prisoner/A1234BC', () => {
         expect(res.text).toMatch(/<a.*?class="govuk-button".*?>\s+Book a prison visit\s+<\/a>/)
       })
   })
+  it('should render the prisoner profile page for offender number A1234BC without active alerts if there are none', () => {
+    returnData = {
+      displayName: 'Smith, John',
+      displayDob: '12 October 1980',
+      activeAlerts: [],
+      flaggedAlerts: [
+        {
+          alertCode: 'UPIU',
+          alertCodeDescription: 'Protective Isolation Unit',
+        },
+      ],
+      inmateDetail: {
+        offenderNo: 'A1234BC',
+        firstName: 'JOHN',
+        lastName: 'SMITH',
+        dateOfBirth: '1980-10-12',
+        activeAlertCount: 0,
+        inactiveAlertCount: 3,
+        legalStatus: 'SENTENCED',
+      } as InmateDetail,
+      convictedStatus: 'Convicted',
+      visitBalances: {
+        remainingVo: 1,
+        remainingPvo: 2,
+        latestIepAdjustDate: '21 April 2021',
+        latestPrivIepAdjustDate: '1 December 2021',
+        nextIepAdjustDate: '15 May 2021',
+        nextPrivIepAdjustDate: '1 January 2022',
+      } as BAPVVisitBalances,
+    }
+
+    return request(app)
+      .get('/prisoner/A1234BC')
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        expect(res.text).toContain('<h1 class="govuk-heading-l">Smith, John</h1>')
+        expect(res.text).toContain('A1234BC')
+        expect(res.text).toContain('There are no active alerts for this prisoner.')
+        expect(res.text).toMatch(/id="active-alerts"/)
+        expect(res.text).toContain('0 active')
+      })
+  })
 
   it('should render prisoner profile page without visiting orders for REMAND', () => {
     returnData = {

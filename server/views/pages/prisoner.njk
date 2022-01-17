@@ -126,26 +126,30 @@
     {% endset %}
     {% set alertsTab %}
     <h2 class="govuk-heading-m">Active alerts</h2>
-    {{ govukTable({
-      head: [
-        {
-          text: "Type of alert"
-        },
-        {
-          text: "Alert"
-        },
-        {
-          text: "Comments"
-        },
-        {
-          text: "Date from"
-        },
-        {
-          text: "Date to"
-        }
-      ],
-      rows: activeAlerts
-    }) }}
+    {% if activeAlerts | length %}
+      {{ govukTable({
+        head: [
+          {
+            text: "Type of alert"
+          },
+          {
+            text: "Alert"
+          },
+          {
+            text: "Comments"
+          },
+          {
+            text: "Date from"
+          },
+          {
+            text: "Date to"
+          }
+        ],
+        rows: activeAlerts
+      }) }}
+    {% else %}
+    <p>There are no active alerts for this prisoner.</p>
+    {% endif %}
     {% endset %}
     {{ govukTabs({
       items: [
