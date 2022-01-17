@@ -76,7 +76,7 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
     {% set visitingOrdersTab %}
-    <h2 class="govuk-heading-l">Visiting orders</h2>
+    <h2 class="govuk-heading-m">Visiting orders</h2>
     {{ govukTable({
       head: [
         {
@@ -86,7 +86,10 @@
           text: "Balance"
         },
         {
-          text: "Last issue date"
+          text: "Last allocation date"
+        },
+        {
+          text: "Next allocation date"
         }
       ],
       rows: [
@@ -99,6 +102,9 @@
           },
           {
             text: visitBalances.latestIepAdjustDate
+          },
+          {
+            text: visitBalances.nextIepAdjustDate
           }
         ],
         [
@@ -110,6 +116,9 @@
           },
           {
             text: visitBalances.latestPrivIepAdjustDate
+          },
+          {
+            text: visitBalances.nextPrivIepAdjustDate
           }
         ]
       ]
