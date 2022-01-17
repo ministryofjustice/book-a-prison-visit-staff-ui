@@ -214,7 +214,7 @@ describe('Prisoner profile service', () => {
             text: '1 January 2022',
           },
           {
-            text: 'N/A',
+            text: 'Not entered',
           },
         ],
         [
@@ -231,7 +231,7 @@ describe('Prisoner profile service', () => {
             text: '2 January 2022',
           },
           {
-            text: 'N/A',
+            text: 'Not entered',
           },
         ],
         [
@@ -248,7 +248,7 @@ describe('Prisoner profile service', () => {
             text: '3 January 2022',
           },
           {
-            text: 'N/A',
+            text: 'Not entered',
           },
         ],
         [
@@ -265,7 +265,7 @@ describe('Prisoner profile service', () => {
             text: '4 January 2022',
           },
           {
-            text: 'N/A',
+            text: 'Not entered',
           },
         ],
       ]

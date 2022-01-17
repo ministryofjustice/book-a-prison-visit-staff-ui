@@ -55,7 +55,7 @@
         </li>
         <li>
           <strong>Alerts</strong>
-          <span>{{ inmateDetail.activeAlertCount }} active, {{ inmateDetail.inactiveAlertCount }} inactive</span>
+          <span>{{ inmateDetail.activeAlertCount }} active</span>
         </li>
         {% if visitBalances %}
         <li>
@@ -125,7 +125,7 @@
     }) }}
     {% endset %}
     {% set alertsTab %}
-    <h2 class="govuk-heading-m">Alerts</h2>
+    <h2 class="govuk-heading-m">Active alerts</h2>
     {{ govukTable({
       head: [
         {
@@ -157,8 +157,8 @@
           }
         } if visitBalances,
         {
-          label: "Alerts",
-          id: "alerts",
+          label: "Active alerts",
+          id: "active-alerts",
           panel: {
             html: alertsTab
           }

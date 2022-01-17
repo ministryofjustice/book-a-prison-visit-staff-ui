@@ -36,8 +36,8 @@ export default class PrisonerProfileService {
         { text: `${alert.alertTypeDescription} (${alert.alertType})` },
         { text: `${alert.alertCodeDescription} (${alert.alertCode})` },
         { text: alert.comment },
-        { text: alert.dateCreated ? prisonerDatePretty(alert.dateCreated) : 'N/A' },
-        { text: alert.dateExpires ? prisonerDatePretty(alert.dateExpires) : 'N/A' },
+        { text: alert.dateCreated ? prisonerDatePretty(alert.dateCreated) : 'Not entered' },
+        { text: alert.dateExpires ? prisonerDatePretty(alert.dateExpires) : 'Not entered' },
       ]
     })
 
