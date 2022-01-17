@@ -28,6 +28,7 @@ export default class PrisonerProfileService {
   async getProfile(offenderNo: string, username: string): Promise<PrisonerProfile> {
     const token = await this.systemToken(username)
     const prisonApiClient = this.prisonApiClientBuilder(token)
+    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
     const bookings = await prisonApiClient.getBookings(offenderNo)
 
     if (bookings.numberOfElements !== 1) throw new NotFound()
@@ -40,6 +41,7 @@ export default class PrisonerProfileService {
     const alerts = inmateDetail.alerts || []
     const activeAlerts: Alert[] = alerts.filter(alert => alert.active)
     const flaggedAlerts: Alert[] = activeAlerts.filter(alert => this.alertCodesToFlag.includes(alert.alertCode))
+    const upcomingVisits: UpcomingVisitItem[] = await this.getUpcomingVisits(offenderNo, visitSchedulerApiClient)
 
     const activeAlertsForDisplay: PrisonerAlertItem[] = activeAlerts.map(alert => {
       return [
@@ -67,12 +69,14 @@ export default class PrisonerProfileService {
       inmateDetail,
       convictedStatus,
       visitBalances,
+      upcomingVisits,
     }
   }
 
-  async getUpcomingVisits(offenderNo: string, username: string): Promise<UpcomingVisitItem[]> {
-    const token = await this.systemToken(username)
-    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
+  private async getUpcomingVisits(
+    offenderNo: string,
+    visitSchedulerApiClient: VisitSchedulerApiClient
+  ): Promise<UpcomingVisitItem[]> {
     const visits: PrisonerVisit[] = await visitSchedulerApiClient.getUpcomingVisits(offenderNo)
     const socialVisits: PrisonerVisit[] = visits.filter(visit => visit.visitType === 'STANDARD_SOCIAL')
 

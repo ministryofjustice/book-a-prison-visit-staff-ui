@@ -68,6 +68,7 @@ export type PrisonerProfile = {
   inmateDetail: InmateDetail
   convictedStatus: 'Convicted' | 'Remand'
   visitBalances: VisitBalances
+  upcomingVisits: UpcomingVisitItem[]
 }
 
 export type SystemToken = (arg0?: string) => Promise<string>
