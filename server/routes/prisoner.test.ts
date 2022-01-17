@@ -93,6 +93,8 @@ describe('GET /prisoner/A1234BC', () => {
         expect(res.text).toContain('A1234BC')
         expect(res.text).toMatch(/<strong>Conviction status<\/strong>\s+Convicted/)
         expect(res.text).toMatch(/id="visiting-orders"/)
+        expect(res.text).toMatch(/id="alerts"/)
+        expect(res.text).toContain('Professional lock pick.')
         expect(res.text).toContain('Remaining VOs: 1')
         expect(res.text).toContain('Remaining PVOs: 2')
         expect(res.text).toContain('21 April 2021')
