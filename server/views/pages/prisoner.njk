@@ -154,6 +154,26 @@
     <p>There are no active alerts for this prisoner.</p>
     {% endif %}
     {% endset %}
+    {% set upcomingVisitsTab %}
+    <h2 class="govuk-heading-m">Upcoming visits</h2>
+    {{ govukTable({
+      head: [
+        {
+          text: "Visit type"
+        },
+        {
+          text: "Location"
+        },
+        {
+          text: "Date and time"
+        },
+        {
+          text: "Visitors"
+        }
+      ],
+      rows: upcomingVisits
+    }) }}
+    {% endset %}
     {{ govukTabs({
       items: [
         {
@@ -168,6 +188,13 @@
           id: "active-alerts",
           panel: {
             html: alertsTab
+          }
+        },
+        {
+          label: "Upcoming visits",
+          id: "upcoming-visits",
+          panel: {
+            html: upcomingVisitsTab
           }
         }
       ]
