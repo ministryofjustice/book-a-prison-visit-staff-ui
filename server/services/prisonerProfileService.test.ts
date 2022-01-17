@@ -1,6 +1,7 @@
 import { NotFound } from 'http-errors'
 import PrisonerProfileService from './prisonerProfileService'
 import PrisonApiClient from '../data/prisonApiClient'
+import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
 import { Alert, InmateDetail, PageOfPrisonerBookingSummary, VisitBalances } from '../data/prisonApiTypes'
 import { PrisonerAlertItem } from '../@types/bapv'
 
@@ -11,6 +12,7 @@ const prisonApiClient = new PrisonApiClient(null) as jest.Mocked<PrisonApiClient
 
 describe('Prisoner profile service', () => {
   let prisonApiClientBuilder
+  let visitSchedulerApiClientBuilder
   let prisonerProfileService: PrisonerProfileService
   let systemToken
 
@@ -18,7 +20,12 @@ describe('Prisoner profile service', () => {
     beforeEach(() => {
       systemToken = async (user: string): Promise<string> => `${user}-token-1`
       prisonApiClientBuilder = jest.fn().mockReturnValue(prisonApiClient)
-      prisonerProfileService = new PrisonerProfileService(prisonApiClientBuilder, systemToken)
+      visitSchedulerApiClientBuilder = jest.fn().mockReturnValue(VisitSchedulerApiClient)
+      prisonerProfileService = new PrisonerProfileService(
+        prisonApiClientBuilder,
+        visitSchedulerApiClientBuilder,
+        systemToken
+      )
     })
 
     afterEach(() => {

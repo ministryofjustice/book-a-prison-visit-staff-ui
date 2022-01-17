@@ -1,17 +1,27 @@
 import { NotFound } from 'http-errors'
-import { addDays, startOfMonth, addMonths, format } from 'date-fns'
+import { addDays, startOfMonth, addMonths, format, parseISO } from 'date-fns'
 import PrisonApiClient from '../data/prisonApiClient'
-import { PrisonerProfile, SystemToken, BAPVVisitBalances, PrisonerAlertItem } from '../@types/bapv'
-import { prisonerDatePretty, properCaseFullName, getDateFromAPI } from '../utils/utils'
+import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
+import {
+  PrisonerProfile,
+  SystemToken,
+  BAPVVisitBalances,
+  PrisonerAlertItem,
+  UpcomingVisitItem,
+  PrisonerVisit,
+} from '../@types/bapv'
+import { prisonerDatePretty, properCaseFullName, prisonerDateTimePretty } from '../utils/utils'
 import { Alert } from '../data/prisonApiTypes'
 
 type PrisonApiClientBuilder = (token: string) => PrisonApiClient
+type VisitSchedulerApiClientBuilder = (token: string) => VisitSchedulerApiClient
 
 export default class PrisonerProfileService {
   private alertCodesToFlag = ['UPIU', 'RCDR', 'URCU']
 
   constructor(
     private readonly prisonApiClientBuilder: PrisonApiClientBuilder,
+    private readonly visitSchedulerApiClientBuilder: VisitSchedulerApiClientBuilder,
     private readonly systemToken: SystemToken
   ) {}
 
@@ -60,6 +70,28 @@ export default class PrisonerProfileService {
     }
   }
 
+  async getUpcomingVisits(offenderNo: string, username: string): Promise<UpcomingVisitItem[]> {
+    const token = await this.systemToken(username)
+    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
+    const visits: PrisonerVisit[] = await visitSchedulerApiClient.getUpcomingVisits(offenderNo)
+    const socialVisits: PrisonerVisit[] = visits.filter(visit => visit.visitType === 'STANDARD_SOCIAL')
+
+    const visitsForDisplay: UpcomingVisitItem[] = socialVisits.map(visit => {
+      const startTime = format(parseISO(visit.startTimestamp), 'HH:mmb')
+      const endTime = visit.endTimestamp ? ` - ${format(parseISO(visit.endTimestamp), 'HH:mmb')}` : ''
+      return [
+        { text: `${visit.visitTypeDescription}` },
+        { text: 'Hewell (HMP)' },
+        {
+          text: visit.startTimestamp ? `${prisonerDateTimePretty(visit.startTimestamp)} ${startTime}${endTime}` : 'N/A',
+        },
+        { text: 'Visitors here' },
+      ]
+    })
+
+    return visitsForDisplay
+  }
+
   private async getVisitBalances(
     prisonApiClient: PrisonApiClient,
     convictedStatus: string,
@@ -70,16 +102,15 @@ export default class PrisonerProfileService {
     const visitBalances = (await prisonApiClient.getVisitBalances(offenderNo)) as BAPVVisitBalances
 
     if (visitBalances.latestIepAdjustDate) {
-      visitBalances.nextIepAdjustDate = format(
-        addDays(getDateFromAPI(visitBalances.latestIepAdjustDate), 14),
-        'd MMMM yyyy'
-      )
-      visitBalances.latestIepAdjustDate = prisonerDatePretty({ dateToFormat: visitBalances.latestIepAdjustDate })
+      visitBalances.nextIepAdjustDate = format(addDays(parseISO(visitBalances.latestIepAdjustDate), 14), 'd MMMM yyyy')
+      visitBalances.latestIepAdjustDate = prisonerDatePretty({
+        dateToFormat: visitBalances.latestIepAdjustDate,
+      })
     }
 
     if (visitBalances.latestPrivIepAdjustDate) {
       visitBalances.nextPrivIepAdjustDate = format(
-        addMonths(startOfMonth(getDateFromAPI(visitBalances.latestPrivIepAdjustDate)), 1),
+        addMonths(startOfMonth(parseISO(visitBalances.latestPrivIepAdjustDate)), 1),
         'd MMMM yyyy'
       )
       visitBalances.latestPrivIepAdjustDate = prisonerDatePretty({

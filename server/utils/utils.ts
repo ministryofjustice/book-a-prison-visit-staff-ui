@@ -1,11 +1,9 @@
-import { format, parse } from 'date-fns'
+import { format, parseISO } from 'date-fns'
 
 const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
 
 const isBlank = (str: string): boolean => !str || /^\s*$/.test(str)
-
-export const getDateFromAPI = (dateString: string): Date => parse(dateString, 'yyyy-MM-dd', new Date())
 
 export const prisonerDatePretty = ({
   dateToFormat,
@@ -15,13 +13,17 @@ export const prisonerDatePretty = ({
   wrapDate?: boolean
 }): string => {
   if (wrapDate) {
-    return format(getDateFromAPI(dateToFormat), 'd MMMM yyyy')
+    return format(parseISO(dateToFormat), 'd MMMM yyyy')
   }
 
-  return `<span class="bapv-table_cell--nowrap">${format(getDateFromAPI(dateToFormat), 'd MMMM')}</span> ${format(
-    getDateFromAPI(dateToFormat),
+  return `<span class="bapv-table_cell--nowrap">${format(parseISO(dateToFormat), 'd MMMM')}</span> ${format(
+    parseISO(dateToFormat),
     'yyyy'
   )}`
+  }
+
+export const prisonerDateTimePretty = (dateToFormat: string): string => {
+  return format(parseISO(dateToFormat), 'd MMMM yyyy')
 }
 
 export const properCaseFullName = (name: string): string =>

@@ -98,6 +98,14 @@ export default {
       },
       agent: new AgentConfig(),
     },
+    visitScheduler: {
+      url: get('VISIT_SCHEDULER_API_URL', 'http://localhost:8080', requiredInProduction),
+      timeout: {
+        response: Number(get('VISIT_SCHEDULER_API_TIMEOUT_RESPONSE', 10000)),
+        deadline: Number(get('VISIT_SCHEDULER_API_TIMEOUT_DEADLINE', 10000)),
+      },
+      agent: new AgentConfig(),
+    },
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
 }
