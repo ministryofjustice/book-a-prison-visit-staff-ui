@@ -1,7 +1,6 @@
 import { URLSearchParams } from 'url'
 import RestClient from './restClient'
-import { BAPVVisitBalances } from '../@types/bapv'
-import { InmateDetail, PageOfPrisonerBookingSummary } from './prisonApiTypes'
+import { InmateDetail, PageOfPrisonerBookingSummary, VisitBalances } from './prisonApiTypes'
 import config from '../config'
 
 export const prisonApiClientBuilder = (token: string): PrisonApiClient => {
@@ -33,7 +32,7 @@ class PrisonApiClient {
     })
   }
 
-  async getVisitBalances(offenderNo: string): Promise<BAPVVisitBalances | null> {
+  async getVisitBalances(offenderNo: string): Promise<VisitBalances | null> {
     try {
       return await this.restclient.get({
         path: `/api/bookings/offenderNo/${offenderNo}/visit/balances`,
