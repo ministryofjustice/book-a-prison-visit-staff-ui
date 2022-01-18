@@ -55,7 +55,7 @@
         </li>
         <li>
           <strong>Alerts</strong>
-          <span>{{ inmateDetail.activeAlertCount }} active, {{ inmateDetail.inactiveAlertCount }} inactive</span>
+          <span>{{ inmateDetail.activeAlertCount }} active</span>
         </li>
         {% if visitBalances %}
         <li>
@@ -124,6 +124,33 @@
       ]
     }) }}
     {% endset %}
+    {% set alertsTab %}
+    <h2 class="govuk-heading-m">Active alerts</h2>
+    {% if activeAlerts | length %}
+      {{ govukTable({
+        head: [
+          {
+            text: "Type of alert"
+          },
+          {
+            text: "Alert"
+          },
+          {
+            text: "Comments"
+          },
+          {
+            text: "Date from"
+          },
+          {
+            text: "Date to"
+          }
+        ],
+        rows: activeAlerts
+      }) }}
+    {% else %}
+    <p>There are no active alerts for this prisoner.</p>
+    {% endif %}
+    {% endset %}
     {{ govukTabs({
       items: [
         {
@@ -132,7 +159,14 @@
           panel: {
             html: visitingOrdersTab
           }
-        } if visitBalances
+        } if visitBalances,
+        {
+          label: "Active alerts",
+          id: "active-alerts",
+          panel: {
+            html: alertsTab
+          }
+        }
       ]
     }) }}
     </div>

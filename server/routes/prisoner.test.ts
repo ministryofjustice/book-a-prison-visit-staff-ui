@@ -37,6 +37,25 @@ describe('GET /prisoner/A1234BC', () => {
     returnData = {
       displayName: 'Smith, John',
       displayDob: '12 October 1980',
+      activeAlerts: [
+        [
+          {
+            text: 'Security',
+          },
+          {
+            text: 'Protective Isolation Unit',
+          },
+          {
+            text: 'Professional lock pick.',
+          },
+          {
+            text: '1 January 2022',
+          },
+          {
+            text: '2 January 2022',
+          },
+        ],
+      ],
       flaggedAlerts: [
         {
           alertCode: 'UPIU',
@@ -74,14 +93,58 @@ describe('GET /prisoner/A1234BC', () => {
         expect(res.text).toContain('A1234BC')
         expect(res.text).toMatch(/<strong>Conviction status<\/strong>\s+Convicted/)
         expect(res.text).toMatch(/id="visiting-orders"/)
+        expect(res.text).toMatch(/id="active-alerts"/)
+        expect(res.text).toContain('Professional lock pick.')
         expect(res.text).toContain('Remaining VOs: 1')
         expect(res.text).toContain('Remaining PVOs: 2')
         expect(res.text).toContain('21 April 2021')
         expect(res.text).toContain('1 December 2021')
         expect(res.text).toContain('15 May 2021')
         expect(res.text).toContain('1 January 2022')
-        expect(res.text).toContain('1 active, 3 inactive')
+        expect(res.text).toContain('1 active')
         expect(res.text).toMatch(/<a.*?class="govuk-button".*?>\s+Book a prison visit\s+<\/a>/)
+      })
+  })
+  it('should render the prisoner profile page for offender number A1234BC without active alerts if there are none', () => {
+    returnData = {
+      displayName: 'Smith, John',
+      displayDob: '12 October 1980',
+      activeAlerts: [],
+      flaggedAlerts: [
+        {
+          alertCode: 'UPIU',
+          alertCodeDescription: 'Protective Isolation Unit',
+        },
+      ],
+      inmateDetail: {
+        offenderNo: 'A1234BC',
+        firstName: 'JOHN',
+        lastName: 'SMITH',
+        dateOfBirth: '1980-10-12',
+        activeAlertCount: 0,
+        inactiveAlertCount: 3,
+        legalStatus: 'SENTENCED',
+      } as InmateDetail,
+      convictedStatus: 'Convicted',
+      visitBalances: {
+        remainingVo: 1,
+        remainingPvo: 2,
+        latestIepAdjustDate: '21 April 2021',
+        latestPrivIepAdjustDate: '1 December 2021',
+        nextIepAdjustDate: '15 May 2021',
+        nextPrivIepAdjustDate: '1 January 2022',
+      } as BAPVVisitBalances,
+    }
+
+    return request(app)
+      .get('/prisoner/A1234BC')
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        expect(res.text).toContain('<h1 class="govuk-heading-l">Smith, John</h1>')
+        expect(res.text).toContain('A1234BC')
+        expect(res.text).toContain('There are no active alerts for this prisoner.')
+        expect(res.text).toMatch(/id="active-alerts"/)
+        expect(res.text).toContain('0 active')
       })
   })
 
@@ -89,6 +152,7 @@ describe('GET /prisoner/A1234BC', () => {
     returnData = {
       displayName: 'James, Fred',
       displayDob: '11 December 1985',
+      activeAlerts: [],
       flaggedAlerts: [],
       inmateDetail: {
         offenderNo: 'B2345CD',
@@ -113,7 +177,7 @@ describe('GET /prisoner/A1234BC', () => {
         expect(res.text).toMatch(/<strong>Conviction status<\/strong>\s+Remand/)
         expect(res.text).not.toMatch(/id="visiting-orders"/)
         expect(res.text).not.toContain('Visiting orders')
-        expect(res.text).toContain('2 active, 4 inactive')
+        expect(res.text).toContain('2 active')
       })
   })
 

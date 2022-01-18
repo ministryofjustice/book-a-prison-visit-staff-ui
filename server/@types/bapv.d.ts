@@ -5,9 +5,28 @@ export type PrisonerDetailsItem = {
   html: string
 }
 
+export type PrisonerAlertItem = [
+  {
+    text: string
+  },
+  {
+    text: string
+  },
+  {
+    text: string
+  },
+  {
+    text: string
+  },
+  {
+    text: string
+  }
+]
+
 export type PrisonerProfile = {
   displayName: string
   displayDob: string
+  activeAlerts: PrisonerAlertItem[]
   flaggedAlerts: Alert[]
   inmateDetail: InmateDetail
   convictedStatus: 'Convicted' | 'Remand'

@@ -1,7 +1,7 @@
 import { NotFound } from 'http-errors'
 import { addDays, startOfMonth, addMonths, format } from 'date-fns'
 import PrisonApiClient from '../data/prisonApiClient'
-import { PrisonerProfile, SystemToken, BAPVVisitBalances } from '../@types/bapv'
+import { PrisonerProfile, SystemToken, BAPVVisitBalances, PrisonerAlertItem } from '../@types/bapv'
 import { prisonerDatePretty, properCaseFullName, getDateFromAPI } from '../utils/utils'
 import { Alert } from '../data/prisonApiTypes'
 
@@ -24,36 +24,27 @@ export default class PrisonerProfileService {
 
     const { convictedStatus } = bookings.content[0]
     const inmateDetail = await prisonApiClient.getOffender(offenderNo)
-
-    let visitBalances = null
-
-    if (convictedStatus !== 'Remand') {
-      visitBalances = (await prisonApiClient.getVisitBalances(offenderNo)) as BAPVVisitBalances
-
-      if (visitBalances.latestIepAdjustDate) {
-        visitBalances.nextIepAdjustDate = format(
-          addDays(getDateFromAPI(visitBalances.latestIepAdjustDate), 14),
-          'd MMMM yyyy'
-        )
-        visitBalances.latestIepAdjustDate = prisonerDatePretty(visitBalances.latestIepAdjustDate)
-      }
-
-      if (visitBalances.latestPrivIepAdjustDate) {
-        visitBalances.nextPrivIepAdjustDate = format(
-          addMonths(startOfMonth(getDateFromAPI(visitBalances.latestPrivIepAdjustDate)), 1),
-          'd MMMM yyyy'
-        )
-        visitBalances.latestPrivIepAdjustDate = prisonerDatePretty(visitBalances.latestPrivIepAdjustDate)
-      }
-    }
-
+    const visitBalances = await this.getVisitBalances(prisonApiClient, convictedStatus, offenderNo)
     const displayName = properCaseFullName(`${inmateDetail.lastName}, ${inmateDetail.firstName}`)
     const displayDob = prisonerDatePretty(inmateDetail.dateOfBirth)
-    const flaggedAlerts = this.filterAlerts(inmateDetail.alerts)
+    const alerts = inmateDetail.alerts || []
+    const activeAlerts: Alert[] = alerts.filter(alert => alert.active)
+    const flaggedAlerts: Alert[] = activeAlerts.filter(alert => this.alertCodesToFlag.includes(alert.alertCode))
+
+    const activeAlertsForDisplay: PrisonerAlertItem[] = activeAlerts.map(alert => {
+      return [
+        { text: `${alert.alertTypeDescription} (${alert.alertType})` },
+        { text: `${alert.alertCodeDescription} (${alert.alertCode})` },
+        { text: alert.comment },
+        { text: alert.dateCreated ? prisonerDatePretty(alert.dateCreated) : 'Not entered' },
+        { text: alert.dateExpires ? prisonerDatePretty(alert.dateExpires) : 'Not entered' },
+      ]
+    })
 
     return {
       displayName,
       displayDob,
+      activeAlerts: activeAlertsForDisplay,
       flaggedAlerts,
       inmateDetail,
       convictedStatus,
@@ -61,15 +52,31 @@ export default class PrisonerProfileService {
     }
   }
 
-  private filterAlerts(alerts: Alert[]): Alert[] {
-    if (Array.isArray(alerts)) {
-      const flaggedAlerts: Alert[] = alerts.filter(alert => {
-        return alert.active && this.alertCodesToFlag.includes(alert.alertCode)
-      })
+  private async getVisitBalances(
+    prisonApiClient: PrisonApiClient,
+    convictedStatus: string,
+    offenderNo: string
+  ): Promise<BAPVVisitBalances> {
+    if (convictedStatus === 'Remand') return null
 
-      return flaggedAlerts
+    const visitBalances = (await prisonApiClient.getVisitBalances(offenderNo)) as BAPVVisitBalances
+
+    if (visitBalances.latestIepAdjustDate) {
+      visitBalances.nextIepAdjustDate = format(
+        addDays(getDateFromAPI(visitBalances.latestIepAdjustDate), 14),
+        'd MMMM yyyy'
+      )
+      visitBalances.latestIepAdjustDate = prisonerDatePretty(visitBalances.latestIepAdjustDate)
     }
 
-    return []
+    if (visitBalances.latestPrivIepAdjustDate) {
+      visitBalances.nextPrivIepAdjustDate = format(
+        addMonths(startOfMonth(getDateFromAPI(visitBalances.latestPrivIepAdjustDate)), 1),
+        'd MMMM yyyy'
+      )
+      visitBalances.latestPrivIepAdjustDate = prisonerDatePretty(visitBalances.latestPrivIepAdjustDate)
+    }
+
+    return visitBalances
   }
 }
