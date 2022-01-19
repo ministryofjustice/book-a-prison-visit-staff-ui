@@ -56,7 +56,7 @@ export default class PrisonerSearchService {
           classes: 'bapv-table_cell',
         },
         {
-          html: prisonerDatePretty(prisoner.dateOfBirth),
+          html: prisonerDatePretty({ dateToFormat: prisoner.dateOfBirth }),
           classes: 'bapv-table_cell',
         },
       ]

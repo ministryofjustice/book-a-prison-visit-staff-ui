@@ -7,8 +7,21 @@ const isBlank = (str: string): boolean => !str || /^\s*$/.test(str)
 
 export const getDateFromAPI = (dateString: string): Date => parse(dateString, 'yyyy-MM-dd', new Date())
 
-export const prisonerDatePretty = (dateOfBirth: string): string => {
-  return format(getDateFromAPI(dateOfBirth), 'd MMMM yyyy')
+export const prisonerDatePretty = ({
+  dateToFormat,
+  wrapDate = true,
+}: {
+  dateToFormat: string
+  wrapDate?: boolean
+}): string => {
+  if (wrapDate) {
+    return format(getDateFromAPI(dateToFormat), 'd MMMM yyyy')
+  }
+
+  return `<span class="bapv-table_cell--nowrap">${format(getDateFromAPI(dateToFormat), 'd MMMM')}</span> ${format(
+    getDateFromAPI(dateToFormat),
+    'yyyy'
+  )}`
 }
 
 export const properCaseFullName = (name: string): string =>

@@ -211,10 +211,10 @@ describe('Prisoner profile service', () => {
             text: 'Test',
           },
           {
-            text: '1 January 2022',
+            html: '<span class="bapv-table_cell--nowrap">1 January</span> 2022',
           },
           {
-            text: 'Not entered',
+            html: 'Not entered',
           },
         ],
         [
@@ -228,10 +228,10 @@ describe('Prisoner profile service', () => {
             text: 'Test',
           },
           {
-            text: '2 January 2022',
+            html: '<span class="bapv-table_cell--nowrap">2 January</span> 2022',
           },
           {
-            text: 'Not entered',
+            html: 'Not entered',
           },
         ],
         [
@@ -245,10 +245,10 @@ describe('Prisoner profile service', () => {
             text: 'Test',
           },
           {
-            text: '3 January 2022',
+            html: '<span class="bapv-table_cell--nowrap">3 January</span> 2022',
           },
           {
-            text: 'Not entered',
+            html: 'Not entered',
           },
         ],
         [
@@ -262,10 +262,10 @@ describe('Prisoner profile service', () => {
             text: 'Test',
           },
           {
-            text: '4 January 2022',
+            html: '<span class="bapv-table_cell--nowrap">4 January</span> 2022',
           },
           {
-            text: 'Not entered',
+            html: 'Not entered',
           },
         ],
       ]
