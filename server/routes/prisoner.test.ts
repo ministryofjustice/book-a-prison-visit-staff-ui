@@ -135,6 +135,7 @@ describe('GET /prisoner/A1234BC', () => {
         nextIepAdjustDate: '15 May 2021',
         nextPrivIepAdjustDate: '1 January 2022',
       } as BAPVVisitBalances,
+      upcomingVisits: [],
     }
 
     return request(app)
