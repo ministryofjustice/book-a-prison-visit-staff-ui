@@ -15,13 +15,13 @@ class VisitSchedulerApiClient {
 
   private prisonId = 'HEI'
 
-  getUpcomingVisits(offenderNo: string): Promise<PrisonerVisit[]> {
+  getUpcomingVisits(offenderNo: string, startTimestamp?: string): Promise<PrisonerVisit[]> {
     return this.restclient.get({
       path: '/visits',
       query: new URLSearchParams({
         prisonId: this.prisonId,
         prisonerId: offenderNo,
-        startTimestamp: new Date().toISOString(),
+        startTimestamp: startTimestamp || new Date().toISOString(),
       }).toString(),
     })
   }
