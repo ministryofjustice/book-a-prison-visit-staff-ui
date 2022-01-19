@@ -26,7 +26,7 @@ export default class PrisonerProfileService {
     const inmateDetail = await prisonApiClient.getOffender(offenderNo)
     const visitBalances = await this.getVisitBalances(prisonApiClient, convictedStatus, offenderNo)
     const displayName = properCaseFullName(`${inmateDetail.lastName}, ${inmateDetail.firstName}`)
-    const displayDob = prisonerDatePretty(inmateDetail.dateOfBirth)
+    const displayDob = prisonerDatePretty({ dateToFormat: inmateDetail.dateOfBirth })
     const alerts = inmateDetail.alerts || []
     const activeAlerts: Alert[] = alerts.filter(alert => alert.active)
     const flaggedAlerts: Alert[] = activeAlerts.filter(alert => this.alertCodesToFlag.includes(alert.alertCode))
@@ -36,8 +36,16 @@ export default class PrisonerProfileService {
         { text: `${alert.alertTypeDescription} (${alert.alertType})` },
         { text: `${alert.alertCodeDescription} (${alert.alertCode})` },
         { text: alert.comment },
-        { text: alert.dateCreated ? prisonerDatePretty(alert.dateCreated) : 'Not entered' },
-        { text: alert.dateExpires ? prisonerDatePretty(alert.dateExpires) : 'Not entered' },
+        {
+          html: alert.dateCreated
+            ? prisonerDatePretty({ dateToFormat: alert.dateCreated, wrapDate: false })
+            : 'Not entered',
+        },
+        {
+          html: alert.dateExpires
+            ? prisonerDatePretty({ dateToFormat: alert.dateExpires, wrapDate: false })
+            : 'Not entered',
+        },
       ]
     })
 
@@ -66,7 +74,7 @@ export default class PrisonerProfileService {
         addDays(getDateFromAPI(visitBalances.latestIepAdjustDate), 14),
         'd MMMM yyyy'
       )
-      visitBalances.latestIepAdjustDate = prisonerDatePretty(visitBalances.latestIepAdjustDate)
+      visitBalances.latestIepAdjustDate = prisonerDatePretty({ dateToFormat: visitBalances.latestIepAdjustDate })
     }
 
     if (visitBalances.latestPrivIepAdjustDate) {
@@ -74,7 +82,9 @@ export default class PrisonerProfileService {
         addMonths(startOfMonth(getDateFromAPI(visitBalances.latestPrivIepAdjustDate)), 1),
         'd MMMM yyyy'
       )
-      visitBalances.latestPrivIepAdjustDate = prisonerDatePretty(visitBalances.latestPrivIepAdjustDate)
+      visitBalances.latestPrivIepAdjustDate = prisonerDatePretty({
+        dateToFormat: visitBalances.latestPrivIepAdjustDate,
+      })
     }
 
     return visitBalances

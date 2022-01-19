@@ -49,10 +49,10 @@ describe('GET /prisoner/A1234BC', () => {
             text: 'Professional lock pick.',
           },
           {
-            text: '1 January 2022',
+            html: '1 January 2022',
           },
           {
-            text: '2 January 2022',
+            html: '2 January 2022',
           },
         ],
       ],

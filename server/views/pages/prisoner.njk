@@ -130,7 +130,8 @@
       {{ govukTable({
         head: [
           {
-            text: "Type of alert"
+            text: "Type of alert",
+            classes: "bapv-table_cell--nowrap"
           },
           {
             text: "Alert"
@@ -139,10 +140,12 @@
             text: "Comments"
           },
           {
-            text: "Date from"
+            text: "Date from",
+            classes: "bapv-table_cell--nowrap"
           },
           {
-            text: "Date to"
+            text: "Date to",
+            classes: "bapv-table_cell--nowrap"
           }
         ],
         rows: activeAlerts
