@@ -20,7 +20,7 @@ export const prisonerDatePretty = ({
     parseISO(dateToFormat),
     'yyyy'
   )}`
-  }
+}
 
 export const prisonerDateTimePretty = (dateToFormat: string): string => {
   return format(parseISO(dateToFormat), 'd MMMM yyyy')
