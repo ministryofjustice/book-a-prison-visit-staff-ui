@@ -13,7 +13,7 @@ let returnData: PrisonerProfile
 
 class MockPrisonerProfileService extends PrisonerProfileService {
   constructor() {
-    super(undefined, undefined, undefined)
+    super(undefined, undefined, undefined, undefined)
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

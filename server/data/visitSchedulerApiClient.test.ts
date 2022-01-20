@@ -18,7 +18,7 @@ describe('visitSchedulerApiClient', () => {
   })
 
   describe('getUpcomingVisits', () => {
-    it('should return an array of PrisonerVisit from the Visit Scheduler API', async () => {
+    it('should return an array of Visit from the Visit Scheduler API', async () => {
       const offenderNo = 'A1234BC'
       const results = [
         {

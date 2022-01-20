@@ -13,6 +13,7 @@ import type UserService from './services/userService'
 import { prisonerSearchClientBuilder } from './data/prisonerSearchClient'
 import PrisonerSearchService from './services/prisonerSearchService'
 import { visitSchedulerApiClientBuilder } from './data/visitSchedulerApiClient'
+import { prisonerContactRegistryApiClientBuilder } from './data/prisonerContactRegistryApiClient'
 import { prisonApiClientBuilder } from './data/prisonApiClient'
 import PrisonerProfileService from './services/prisonerProfileService'
 import systemToken from './data/authClient'
@@ -49,7 +50,12 @@ export default function createApp(userService: UserService): express.Application
     '/prisoner/',
     prisonerRoutes(
       standardRouter(userService),
-      new PrisonerProfileService(prisonApiClientBuilder, visitSchedulerApiClientBuilder, systemToken)
+      new PrisonerProfileService(
+        prisonApiClientBuilder,
+        visitSchedulerApiClientBuilder,
+        prisonerContactRegistryApiClientBuilder,
+        systemToken
+      )
     )
   )
 

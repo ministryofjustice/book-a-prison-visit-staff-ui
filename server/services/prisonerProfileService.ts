@@ -2,19 +2,22 @@ import { NotFound } from 'http-errors'
 import { addDays, startOfMonth, addMonths, format, parseISO } from 'date-fns'
 import PrisonApiClient from '../data/prisonApiClient'
 import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
+import PrisonerContactRegistryApiClient from '../data/prisonerContactRegistryApiClient'
 import {
   PrisonerProfile,
   SystemToken,
   BAPVVisitBalances,
   PrisonerAlertItem,
   UpcomingVisitItem,
-  PrisonerVisit,
+  Visit,
+  Contact,
 } from '../@types/bapv'
 import { prisonerDatePretty, properCaseFullName, prisonerDateTimePretty } from '../utils/utils'
 import { Alert } from '../data/prisonApiTypes'
 
 type PrisonApiClientBuilder = (token: string) => PrisonApiClient
 type VisitSchedulerApiClientBuilder = (token: string) => VisitSchedulerApiClient
+type PrisonerContactRegistryApiClientBuilder = (token: string) => PrisonerContactRegistryApiClient
 
 export default class PrisonerProfileService {
   private alertCodesToFlag = ['UPIU', 'RCDR', 'URCU']
@@ -22,26 +25,33 @@ export default class PrisonerProfileService {
   constructor(
     private readonly prisonApiClientBuilder: PrisonApiClientBuilder,
     private readonly visitSchedulerApiClientBuilder: VisitSchedulerApiClientBuilder,
+    private readonly prisonerContactRegistryApiClientBuilder: PrisonerContactRegistryApiClientBuilder,
     private readonly systemToken: SystemToken
   ) {}
 
   async getProfile(offenderNo: string, username: string): Promise<PrisonerProfile> {
     const token = await this.systemToken(username)
     const prisonApiClient = this.prisonApiClientBuilder(token)
-    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
     const bookings = await prisonApiClient.getBookings(offenderNo)
 
     if (bookings.numberOfElements !== 1) throw new NotFound()
 
-    const { convictedStatus } = bookings.content[0]
+    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
+    const prisonerContactRegistryApiClient = this.prisonerContactRegistryApiClientBuilder(token)
     const inmateDetail = await prisonApiClient.getOffender(offenderNo)
+    const contacts = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(offenderNo)
+    const { convictedStatus } = bookings.content[0]
     const visitBalances = await this.getVisitBalances(prisonApiClient, convictedStatus, offenderNo)
     const displayName = properCaseFullName(`${inmateDetail.lastName}, ${inmateDetail.firstName}`)
     const displayDob = prisonerDatePretty({ dateToFormat: inmateDetail.dateOfBirth })
     const alerts = inmateDetail.alerts || []
     const activeAlerts: Alert[] = alerts.filter(alert => alert.active)
     const flaggedAlerts: Alert[] = activeAlerts.filter(alert => this.alertCodesToFlag.includes(alert.alertCode))
-    const upcomingVisits: UpcomingVisitItem[] = await this.getUpcomingVisits(offenderNo, visitSchedulerApiClient)
+    const upcomingVisits: UpcomingVisitItem[] = await this.getUpcomingVisits(
+      offenderNo,
+      visitSchedulerApiClient,
+      contacts
+    )
 
     const activeAlertsForDisplay: PrisonerAlertItem[] = activeAlerts.map(alert => {
       return [
@@ -75,25 +85,49 @@ export default class PrisonerProfileService {
 
   private async getUpcomingVisits(
     offenderNo: string,
-    visitSchedulerApiClient: VisitSchedulerApiClient
+    visitSchedulerApiClient: VisitSchedulerApiClient,
+    contacts: Contact[]
   ): Promise<UpcomingVisitItem[]> {
-    const visits: PrisonerVisit[] = await visitSchedulerApiClient.getUpcomingVisits(offenderNo)
-    const socialVisits: PrisonerVisit[] = visits.filter(visit => visit.visitType === 'STANDARD_SOCIAL')
+    const visits: Visit[] = await visitSchedulerApiClient.getUpcomingVisits(offenderNo)
+    const socialVisits: Visit[] = visits.filter(visit => visit.visitType === 'STANDARD_SOCIAL')
 
-    const visitsForDisplay: UpcomingVisitItem[] = socialVisits.map(visit => {
-      const startTime = format(parseISO(visit.startTimestamp), 'HH:mmb')
-      const endTime = visit.endTimestamp ? ` - ${format(parseISO(visit.endTimestamp), 'HH:mmb')}` : ''
-      return [
-        { text: `${visit.visitTypeDescription}` },
-        { text: 'Hewell (HMP)' },
-        {
-          text: visit.startTimestamp ? `${prisonerDateTimePretty(visit.startTimestamp)} ${startTime}${endTime}` : 'N/A',
-        },
-        { text: 'Visitors here' },
-      ]
-    })
+    const visitsForDisplay: UpcomingVisitItem[] = await Promise.all(
+      socialVisits.map(async visit => {
+        const startTime = format(parseISO(visit.startTimestamp), 'HH:mmb')
+        const endTime = visit.endTimestamp ? ` - ${format(parseISO(visit.endTimestamp), 'HH:mmb')}` : ''
+        const visitors: number[] = visit.visitors.reduce((personIds, visitor) => {
+          personIds.push(visitor.nomisPersonId)
+
+          return personIds
+        }, [])
+        const visitContactNames = await this.getPrisonerSocialContacts(contacts, visitors)
+
+        return [
+          { text: `${visit.visitTypeDescription}` },
+          { text: 'Hewell (HMP)' },
+          {
+            text: visit.startTimestamp
+              ? `${prisonerDateTimePretty(visit.startTimestamp)} ${startTime}${endTime}`
+              : 'N/A',
+          },
+          { html: `<p>${visitContactNames.join('<br>')}</p>` },
+        ] as UpcomingVisitItem
+      })
+    )
 
     return visitsForDisplay
+  }
+
+  private async getPrisonerSocialContacts(contacts: Contact[], contactIds: number[]): Promise<string[]> {
+    const contactsForDisplay: string[] = contacts.reduce((contactNames, contact) => {
+      if (contactIds.includes(contact.personId)) {
+        contactNames.push(`${contact.firstName} ${contact.lastName}`)
+      }
+
+      return contactNames
+    }, [])
+
+    return contactsForDisplay
   }
 
   private async getVisitBalances(

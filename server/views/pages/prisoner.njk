@@ -156,23 +156,27 @@
     {% endset %}
     {% set upcomingVisitsTab %}
     <h2 class="govuk-heading-m">Upcoming visits</h2>
-    {{ govukTable({
-      head: [
-        {
-          text: "Visit type"
-        },
-        {
-          text: "Location"
-        },
-        {
-          text: "Date and time"
-        },
-        {
-          text: "Visitors"
-        }
-      ],
-      rows: upcomingVisits
-    }) }}
+    {% if upcomingVisitsTab | length %}
+      {{ govukTable({
+        head: [
+          {
+            text: "Visit type"
+          },
+          {
+            text: "Location"
+          },
+          {
+            text: "Date and time"
+          },
+          {
+            text: "Visitors"
+          }
+        ],
+        rows: upcomingVisits
+      }) }}
+    {% else %}
+    <p>There are no upcoming visits for this prisoner.</p>
+    {% endif %}
     {% endset %}
     {{ govukTabs({
       items: [

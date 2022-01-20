@@ -1,6 +1,6 @@
 import { URLSearchParams } from 'url'
 import RestClient from './restClient'
-import { PrisonerVisit } from '../@types/bapv'
+import { Visit } from '../@types/bapv'
 import config from '../config'
 
 export const visitSchedulerApiClientBuilder = (token: string): VisitSchedulerApiClient => {
@@ -15,7 +15,7 @@ class VisitSchedulerApiClient {
 
   private prisonId = 'HEI'
 
-  getUpcomingVisits(offenderNo: string, startTimestamp?: string): Promise<PrisonerVisit[]> {
+  getUpcomingVisits(offenderNo: string, startTimestamp?: string): Promise<Visit[]> {
     return this.restclient.get({
       path: '/visits',
       query: new URLSearchParams({

@@ -14,6 +14,7 @@ import { prisonerSearchClientBuilder } from '../../data/prisonerSearchClient'
 import PrisonerSearchService from '../../services/prisonerSearchService'
 import { prisonApiClientBuilder } from '../../data/prisonApiClient'
 import { visitSchedulerApiClientBuilder } from '../../data/visitSchedulerApiClient'
+import { prisonerContactRegistryApiClientBuilder } from '../../data/prisonerContactRegistryApiClient'
 import PrisonerProfileService from '../../services/prisonerProfileService'
 import * as auth from '../../authentication/auth'
 import systemToken from '../../data/authClient'
@@ -69,7 +70,12 @@ function appSetup(
   app.use('/search/', searchRoutes(standardRouter(new MockUserService()), prisonerSearchService))
   const prisonerProfileService =
     prisonerProfileServiceOverride ||
-    new PrisonerProfileService(prisonApiClientBuilder, visitSchedulerApiClientBuilder, systemTokenTest)
+    new PrisonerProfileService(
+      prisonApiClientBuilder,
+      visitSchedulerApiClientBuilder,
+      prisonerContactRegistryApiClientBuilder,
+      systemTokenTest
+    )
   app.use('/prisoner/', prisonerRoutes(standardRouter(new MockUserService()), prisonerProfileService))
   app.use((req, res, next) => next(createError(404, 'Not found')))
   app.use(errorHandler(production))
