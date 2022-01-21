@@ -39,7 +39,6 @@ export default class PrisonerProfileService {
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
     const prisonerContactRegistryApiClient = this.prisonerContactRegistryApiClientBuilder(token)
     const inmateDetail = await prisonApiClient.getOffender(offenderNo)
-    const contacts = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(offenderNo)
     const { convictedStatus } = bookings.content[0]
     const visitBalances = await this.getVisitBalances(prisonApiClient, convictedStatus, offenderNo)
     const displayName = properCaseFullName(`${inmateDetail.lastName}, ${inmateDetail.firstName}`)
@@ -50,7 +49,7 @@ export default class PrisonerProfileService {
     const upcomingVisits: UpcomingVisitItem[] = await this.getUpcomingVisits(
       offenderNo,
       visitSchedulerApiClient,
-      contacts
+      prisonerContactRegistryApiClient
     )
 
     const activeAlertsForDisplay: PrisonerAlertItem[] = activeAlerts.map(alert => {
@@ -86,9 +85,10 @@ export default class PrisonerProfileService {
   private async getUpcomingVisits(
     offenderNo: string,
     visitSchedulerApiClient: VisitSchedulerApiClient,
-    contacts: Contact[]
+    prisonerContactRegistryApiClient: PrisonerContactRegistryApiClient
   ): Promise<UpcomingVisitItem[]> {
     const visits: Visit[] = await visitSchedulerApiClient.getUpcomingVisits(offenderNo)
+    const contacts = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(offenderNo)
     const socialVisits: Visit[] = visits.filter(visit => visit.visitType === 'STANDARD_SOCIAL')
 
     const visitsForDisplay: UpcomingVisitItem[] = await Promise.all(
