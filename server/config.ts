@@ -29,6 +29,7 @@ export interface ApiConfig {
     deadline: number
   }
   agent: AgentConfig
+  enabled?: boolean
 }
 
 export default {
@@ -113,6 +114,7 @@ export default {
         deadline: Number(get('PRISONER_CONTACT_REGISTRY_API_TIMEOUT_DEADLINE', 10000)),
       },
       agent: new AgentConfig(),
+      enabled: false,
     },
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
