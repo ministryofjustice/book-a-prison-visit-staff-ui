@@ -1,6 +1,6 @@
 import session from 'express-session'
 import connectRedis, { Client } from 'connect-redis'
-import addRequestId from 'express-request-id'
+import requestID from 'express-request-id'
 import express, { Router } from 'express'
 import { createRedisClient } from '../data/redisClient'
 
@@ -31,7 +31,7 @@ export default function setUpWebSession(): Router {
     next()
   })
 
-  router.use(addRequestId())
+  router.use(requestID())
 
   return router
 }
