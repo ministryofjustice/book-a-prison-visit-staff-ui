@@ -100,8 +100,8 @@ export default class PrisonerProfileService {
 
     const visitsForDisplay: UpcomingVisitItem[] = await Promise.all(
       socialVisits.map(async visit => {
-        const startTime = format(parseISO(visit.startTimestamp), 'HH:mmb')
-        const endTime = visit.endTimestamp ? ` - ${format(parseISO(visit.endTimestamp), 'HH:mmb')}` : ''
+        const startTime = format(parseISO(visit.startTimestamp), 'h:mmb')
+        const endTime = visit.endTimestamp ? ` - ${format(parseISO(visit.endTimestamp), 'h:mmb')}` : ''
         const visitors: number[] = visit.visitors.reduce((personIds, visitor) => {
           personIds.push(visitor.nomisPersonId)
 
@@ -136,8 +136,8 @@ export default class PrisonerProfileService {
 
     const visitsForDisplay: PastVisitItem[] = await Promise.all(
       socialVisits.map(async visit => {
-        const startTime = format(parseISO(visit.startTimestamp), 'HH:mmb')
-        const endTime = visit.endTimestamp ? ` - ${format(parseISO(visit.endTimestamp), 'HH:mmb')}` : ''
+        const startTime = format(parseISO(visit.startTimestamp), 'h:mmb')
+        const endTime = visit.endTimestamp ? ` - ${format(parseISO(visit.endTimestamp), 'h:mmb')}` : ''
         const visitors: number[] = visit.visitors.reduce((personIds, visitor) => {
           personIds.push(visitor.nomisPersonId)
 
