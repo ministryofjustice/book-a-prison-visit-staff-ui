@@ -12,6 +12,8 @@ import standardRouter from './routes/standardRouter'
 import type UserService from './services/userService'
 import { prisonerSearchClientBuilder } from './data/prisonerSearchClient'
 import PrisonerSearchService from './services/prisonerSearchService'
+import { visitSchedulerApiClientBuilder } from './data/visitSchedulerApiClient'
+import { prisonerContactRegistryApiClientBuilder } from './data/prisonerContactRegistryApiClient'
 import { prisonApiClientBuilder } from './data/prisonApiClient'
 import PrisonerProfileService from './services/prisonerProfileService'
 import systemToken from './data/authClient'
@@ -46,7 +48,15 @@ export default function createApp(userService: UserService): express.Application
   )
   app.use(
     '/prisoner/',
-    prisonerRoutes(standardRouter(userService), new PrisonerProfileService(prisonApiClientBuilder, systemToken))
+    prisonerRoutes(
+      standardRouter(userService),
+      new PrisonerProfileService(
+        prisonApiClientBuilder,
+        visitSchedulerApiClientBuilder,
+        prisonerContactRegistryApiClientBuilder,
+        systemToken
+      )
+    )
   )
 
   app.use((req, res, next) => next(createError(404, 'Not found')))

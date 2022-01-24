@@ -1,16 +1,26 @@
 import { NotFound } from 'http-errors'
 import PrisonerProfileService from './prisonerProfileService'
 import PrisonApiClient from '../data/prisonApiClient'
+import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
+import PrisonerContactRegistryApiClient from '../data/prisonerContactRegistryApiClient'
 import { Alert, InmateDetail, PageOfPrisonerBookingSummary, VisitBalances } from '../data/prisonApiTypes'
 import { PrisonerAlertItem } from '../@types/bapv'
 
 jest.mock('../data/prisonApiClient')
+jest.mock('../data/visitSchedulerApiClient')
+jest.mock('../data/prisonerContactRegistryApiClient')
 
 const offenderNo = 'A1234BC'
 const prisonApiClient = new PrisonApiClient(null) as jest.Mocked<PrisonApiClient>
+const visitSchedulerApiClient = new VisitSchedulerApiClient(null) as jest.Mocked<VisitSchedulerApiClient>
+const prisonerContactRegistryApiClient = new PrisonerContactRegistryApiClient(
+  null
+) as jest.Mocked<PrisonerContactRegistryApiClient>
 
 describe('Prisoner profile service', () => {
   let prisonApiClientBuilder
+  let visitSchedulerApiClientBuilder
+  let prisonerContactRegistryApiClientBuilder
   let prisonerProfileService: PrisonerProfileService
   let systemToken
 
@@ -18,7 +28,14 @@ describe('Prisoner profile service', () => {
     beforeEach(() => {
       systemToken = async (user: string): Promise<string> => `${user}-token-1`
       prisonApiClientBuilder = jest.fn().mockReturnValue(prisonApiClient)
-      prisonerProfileService = new PrisonerProfileService(prisonApiClientBuilder, systemToken)
+      visitSchedulerApiClientBuilder = jest.fn().mockReturnValue(visitSchedulerApiClient)
+      prisonerContactRegistryApiClientBuilder = jest.fn().mockReturnValue(prisonerContactRegistryApiClient)
+      prisonerProfileService = new PrisonerProfileService(
+        prisonApiClientBuilder,
+        visitSchedulerApiClientBuilder,
+        prisonerContactRegistryApiClientBuilder,
+        systemToken
+      )
     })
 
     afterEach(() => {
@@ -63,6 +80,7 @@ describe('Prisoner profile service', () => {
       prisonApiClient.getBookings.mockResolvedValue(bookings)
       prisonApiClient.getOffender.mockResolvedValue(inmateDetail)
       prisonApiClient.getVisitBalances.mockResolvedValue(visitBalances)
+      visitSchedulerApiClient.getUpcomingVisits.mockResolvedValue([])
 
       const results = await prisonerProfileService.getProfile(offenderNo, 'user')
 
@@ -77,6 +95,7 @@ describe('Prisoner profile service', () => {
         inmateDetail,
         convictedStatus: 'Convicted',
         visitBalances,
+        upcomingVisits: [],
       })
     })
 
@@ -110,6 +129,7 @@ describe('Prisoner profile service', () => {
 
       prisonApiClient.getBookings.mockResolvedValue(bookings)
       prisonApiClient.getOffender.mockResolvedValue(inmateDetail)
+      visitSchedulerApiClient.getUpcomingVisits.mockResolvedValue([])
 
       const results = await prisonerProfileService.getProfile(offenderNo, 'user')
 
@@ -124,6 +144,7 @@ describe('Prisoner profile service', () => {
         inmateDetail,
         convictedStatus: 'Remand',
         visitBalances: null,
+        upcomingVisits: [],
       })
     })
 
@@ -300,6 +321,7 @@ describe('Prisoner profile service', () => {
 
       prisonApiClient.getBookings.mockResolvedValue(bookings)
       prisonApiClient.getOffender.mockResolvedValue(inmateDetail)
+      visitSchedulerApiClient.getUpcomingVisits.mockResolvedValue([])
 
       const results = await prisonerProfileService.getProfile(offenderNo, 'user')
 
@@ -314,6 +336,7 @@ describe('Prisoner profile service', () => {
         inmateDetail,
         convictedStatus: 'Remand',
         visitBalances: null,
+        upcomingVisits: [],
       })
     })
 

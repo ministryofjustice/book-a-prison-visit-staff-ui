@@ -15,6 +15,8 @@ generic-service:
     TOKEN_VERIFICATION_API_URL: "https://token-verification-api-preprod.prison.service.justice.gov.uk"
     PRISONER_SEARCH_API_URL: "https://prisoner-offender-search-preprod.prison.service.justice.gov.uk"
     PRISON_API_URL: "https://api-preprod.prison.service.justice.gov.uk"
+    VISIT_SCHEDULER_API_URL: "https://visit-scheduler-preprod.hmpps.service.justice.gov.uk"
+    PRISONER_CONTACT_REGISTRY_API_URL: "https://visit-scheduler-dev.hmpps.service.justice.gov.uk"
 
 generic-prometheus-alerts:
   alertSeverity: digital-prison-service-dev

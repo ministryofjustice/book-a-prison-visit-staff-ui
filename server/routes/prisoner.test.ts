@@ -13,7 +13,7 @@ let returnData: PrisonerProfile
 
 class MockPrisonerProfileService extends PrisonerProfileService {
   constructor() {
-    super(undefined, undefined)
+    super(undefined, undefined, undefined, undefined)
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -80,6 +80,7 @@ describe('GET /prisoner/A1234BC', () => {
         nextIepAdjustDate: '15 May 2021',
         nextPrivIepAdjustDate: '1 January 2022',
       } as BAPVVisitBalances,
+      upcomingVisits: [],
     }
 
     return request(app)
@@ -134,6 +135,7 @@ describe('GET /prisoner/A1234BC', () => {
         nextIepAdjustDate: '15 May 2021',
         nextPrivIepAdjustDate: '1 January 2022',
       } as BAPVVisitBalances,
+      upcomingVisits: [],
     }
 
     return request(app)
@@ -165,6 +167,7 @@ describe('GET /prisoner/A1234BC', () => {
       } as InmateDetail,
       convictedStatus: 'Remand',
       visitBalances: null,
+      upcomingVisits: [],
     }
 
     return request(app)
