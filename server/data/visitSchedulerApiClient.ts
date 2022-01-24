@@ -25,6 +25,17 @@ class VisitSchedulerApiClient {
       }).toString(),
     })
   }
+
+  getPastVisits(offenderNo: string, endTimestamp?: string): Promise<Visit[]> {
+    return this.restclient.get({
+      path: '/visits',
+      query: new URLSearchParams({
+        prisonId: this.prisonId,
+        prisonerId: offenderNo,
+        endTimestamp: endTimestamp || new Date().toISOString(),
+      }).toString(),
+    })
+  }
 }
 
 export default VisitSchedulerApiClient

@@ -81,6 +81,7 @@ describe('GET /prisoner/A1234BC', () => {
         nextPrivIepAdjustDate: '1 January 2022',
       } as BAPVVisitBalances,
       upcomingVisits: [],
+      pastVisits: [],
     }
 
     return request(app)
@@ -136,6 +137,7 @@ describe('GET /prisoner/A1234BC', () => {
         nextPrivIepAdjustDate: '1 January 2022',
       } as BAPVVisitBalances,
       upcomingVisits: [],
+      pastVisits: [],
     }
 
     return request(app)
@@ -168,6 +170,7 @@ describe('GET /prisoner/A1234BC', () => {
       convictedStatus: 'Remand',
       visitBalances: null,
       upcomingVisits: [],
+      pastVisits: [],
     }
 
     return request(app)

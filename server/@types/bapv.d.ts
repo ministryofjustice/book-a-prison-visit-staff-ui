@@ -38,6 +38,24 @@ export type UpcomingVisitItem = [
   }
 ]
 
+export type PastVisitItem = [
+  {
+    text: string
+  },
+  {
+    text: string
+  },
+  {
+    text: string
+  },
+  {
+    html: string
+  },
+  {
+    text: string
+  }
+]
+
 type VisitVisitor = {
   visitId: number
   nomisPersonId: number
@@ -69,6 +87,7 @@ export type PrisonerProfile = {
   convictedStatus: 'Convicted' | 'Remand'
   visitBalances: VisitBalances
   upcomingVisits: UpcomingVisitItem[]
+  pastVisits: PastVisitItem[]
 }
 
 export type SystemToken = (arg0?: string) => Promise<string>
