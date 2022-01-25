@@ -156,7 +156,7 @@
     {% endset %}
     {% set upcomingVisitsTab %}
     <h2 class="govuk-heading-m">Upcoming visits</h2>
-    {% if upcomingVisitsTab | length %}
+    {% if upcomingVisits | length %}
       {{ govukTable({
         head: [
           {
@@ -176,6 +176,33 @@
       }) }}
     {% else %}
     <p>There are no upcoming visits for this prisoner.</p>
+    {% endif %}
+    {% endset %}
+    {% set pastVisitsTab %}
+    <h2 class="govuk-heading-m">Visits history</h2>
+    {% if pastVisits | length %}
+      {{ govukTable({
+        head: [
+          {
+            text: "Visit type"
+          },
+          {
+            text: "Location"
+          },
+          {
+            text: "Date and time"
+          },
+          {
+            text: "Visitors"
+          },
+          {
+            text: "Visit status"
+          }
+        ],
+        rows: pastVisits
+      }) }}
+    {% else %}
+    <p>There no visit history for this prisoner.</p>
     {% endif %}
     {% endset %}
     {{ govukTabs({
@@ -199,6 +226,13 @@
           id: "upcoming-visits",
           panel: {
             html: upcomingVisitsTab
+          }
+        },
+        {
+          label: "Visits history",
+          id: "visits-history",
+          panel: {
+            html: pastVisitsTab
           }
         }
       ]

@@ -6,7 +6,7 @@ describe('visitSchedulerApiClient', () => {
   let fakeVisitSchedulerApi: nock.Scope
   let client: VisitSchedulerApiClient
   const token = 'token-1'
-  const startTimestamp = new Date().toISOString()
+  const timestamp = new Date().toISOString()
 
   beforeEach(() => {
     fakeVisitSchedulerApi = nock(config.apis.visitScheduler.url)
@@ -30,7 +30,7 @@ describe('visitSchedulerApiClient', () => {
           visitTypeDescription: 'Standard Social',
           visitStatus: 'RESERVED',
           visitStatusDescription: 'Reserved',
-          startTimestamp,
+          startTimestamp: timestamp,
           endTimestamp: '',
           reasonableAdjustments: 'string',
           visitors: [
@@ -49,12 +49,55 @@ describe('visitSchedulerApiClient', () => {
         .query({
           prisonId: 'HEI',
           prisonerId: offenderNo,
-          startTimestamp,
+          startTimestamp: timestamp,
         })
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
-      const output = await client.getUpcomingVisits(offenderNo, startTimestamp)
+      const output = await client.getUpcomingVisits(offenderNo, timestamp)
+
+      expect(output).toEqual(results)
+    })
+  })
+
+  describe('getPastVisits', () => {
+    it('should return an array of Visit from the Visit Scheduler API', async () => {
+      const offenderNo = 'A1234BC'
+      const results = [
+        {
+          id: 123,
+          prisonerId: offenderNo,
+          prisonId: 'MDI',
+          visitRoom: 'A1 L3',
+          visitType: 'STANDARD_SOCIAL',
+          visitTypeDescription: 'Standard Social',
+          visitStatus: 'RESERVED',
+          visitStatusDescription: 'Reserved',
+          startTimestamp: '',
+          endTimestamp: timestamp,
+          reasonableAdjustments: 'string',
+          visitors: [
+            {
+              visitId: 123,
+              nomisPersonId: 1234,
+              leadVisitor: true,
+            },
+          ],
+          sessionId: 123,
+        },
+      ]
+
+      fakeVisitSchedulerApi
+        .get('/visits')
+        .query({
+          prisonId: 'HEI',
+          prisonerId: offenderNo,
+          endTimestamp: timestamp,
+        })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, results)
+
+      const output = await client.getPastVisits(offenderNo, timestamp)
 
       expect(output).toEqual(results)
     })

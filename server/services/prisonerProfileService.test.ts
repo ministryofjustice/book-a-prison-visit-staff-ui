@@ -81,6 +81,7 @@ describe('Prisoner profile service', () => {
       prisonApiClient.getOffender.mockResolvedValue(inmateDetail)
       prisonApiClient.getVisitBalances.mockResolvedValue(visitBalances)
       visitSchedulerApiClient.getUpcomingVisits.mockResolvedValue([])
+      visitSchedulerApiClient.getPastVisits.mockResolvedValue([])
 
       const results = await prisonerProfileService.getProfile(offenderNo, 'user')
 
@@ -96,6 +97,7 @@ describe('Prisoner profile service', () => {
         convictedStatus: 'Convicted',
         visitBalances,
         upcomingVisits: [],
+        pastVisits: [],
       })
     })
 
@@ -130,6 +132,7 @@ describe('Prisoner profile service', () => {
       prisonApiClient.getBookings.mockResolvedValue(bookings)
       prisonApiClient.getOffender.mockResolvedValue(inmateDetail)
       visitSchedulerApiClient.getUpcomingVisits.mockResolvedValue([])
+      visitSchedulerApiClient.getPastVisits.mockResolvedValue([])
 
       const results = await prisonerProfileService.getProfile(offenderNo, 'user')
 
@@ -145,6 +148,7 @@ describe('Prisoner profile service', () => {
         convictedStatus: 'Remand',
         visitBalances: null,
         upcomingVisits: [],
+        pastVisits: [],
       })
     })
 
@@ -322,6 +326,7 @@ describe('Prisoner profile service', () => {
       prisonApiClient.getBookings.mockResolvedValue(bookings)
       prisonApiClient.getOffender.mockResolvedValue(inmateDetail)
       visitSchedulerApiClient.getUpcomingVisits.mockResolvedValue([])
+      visitSchedulerApiClient.getPastVisits.mockResolvedValue([])
 
       const results = await prisonerProfileService.getProfile(offenderNo, 'user')
 
@@ -337,6 +342,7 @@ describe('Prisoner profile service', () => {
         convictedStatus: 'Remand',
         visitBalances: null,
         upcomingVisits: [],
+        pastVisits: [],
       })
     })
 

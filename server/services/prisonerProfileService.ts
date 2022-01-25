@@ -9,6 +9,7 @@ import {
   BAPVVisitBalances,
   PrisonerAlertItem,
   UpcomingVisitItem,
+  PastVisitItem,
   Visit,
   Contact,
 } from '../@types/bapv'
@@ -51,6 +52,11 @@ export default class PrisonerProfileService {
       visitSchedulerApiClient,
       prisonerContactRegistryApiClient
     )
+    const pastVisits: PastVisitItem[] = await this.getPastVisits(
+      offenderNo,
+      visitSchedulerApiClient,
+      prisonerContactRegistryApiClient
+    )
 
     const activeAlertsForDisplay: PrisonerAlertItem[] = activeAlerts.map(alert => {
       return [
@@ -79,6 +85,7 @@ export default class PrisonerProfileService {
       convictedStatus,
       visitBalances,
       upcomingVisits,
+      pastVisits,
     }
   }
 
@@ -93,8 +100,8 @@ export default class PrisonerProfileService {
 
     const visitsForDisplay: UpcomingVisitItem[] = await Promise.all(
       socialVisits.map(async visit => {
-        const startTime = format(parseISO(visit.startTimestamp), 'HH:mmb')
-        const endTime = visit.endTimestamp ? ` - ${format(parseISO(visit.endTimestamp), 'HH:mmb')}` : ''
+        const startTime = format(parseISO(visit.startTimestamp), 'h:mmaaa')
+        const endTime = visit.endTimestamp ? ` - ${format(parseISO(visit.endTimestamp), 'h:mmaaa')}` : ''
         const visitors: number[] = visit.visitors.reduce((personIds, visitor) => {
           personIds.push(visitor.nomisPersonId)
 
@@ -106,12 +113,49 @@ export default class PrisonerProfileService {
           { text: `${visit.visitTypeDescription}` },
           { text: 'Hewell (HMP)' },
           {
-            text: visit.startTimestamp
-              ? `${prisonerDateTimePretty(visit.startTimestamp)} ${startTime}${endTime}`
-              : 'N/A',
+            html: visit.startTimestamp
+              ? `<p>${prisonerDateTimePretty(visit.startTimestamp)}<br>${startTime}${endTime}</p>`
+              : '<p>N/A</p>',
           },
           { html: `<p>${visitContactNames.join('<br>')}</p>` },
         ] as UpcomingVisitItem
+      })
+    )
+
+    return visitsForDisplay
+  }
+
+  private async getPastVisits(
+    offenderNo: string,
+    visitSchedulerApiClient: VisitSchedulerApiClient,
+    prisonerContactRegistryApiClient: PrisonerContactRegistryApiClient
+  ): Promise<PastVisitItem[]> {
+    const visits: Visit[] = await visitSchedulerApiClient.getPastVisits(offenderNo)
+    const contacts = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(offenderNo)
+    const socialVisits: Visit[] = visits.filter(visit => visit.visitType === 'STANDARD_SOCIAL')
+
+    const visitsForDisplay: PastVisitItem[] = await Promise.all(
+      socialVisits.map(async visit => {
+        const startTime = format(parseISO(visit.startTimestamp), 'h:mmaaa')
+        const endTime = visit.endTimestamp ? ` - ${format(parseISO(visit.endTimestamp), 'h:mmaaa')}` : ''
+        const visitors: number[] = visit.visitors.reduce((personIds, visitor) => {
+          personIds.push(visitor.nomisPersonId)
+
+          return personIds
+        }, [])
+        const visitContactNames = await this.getPrisonerSocialContacts(contacts, visitors)
+
+        return [
+          { text: `${visit.visitTypeDescription}` },
+          { text: 'Hewell (HMP)' },
+          {
+            html: visit.startTimestamp
+              ? `<p>${prisonerDateTimePretty(visit.startTimestamp)}<br>${startTime}${endTime}</p>`
+              : '<p>N/A</p>',
+          },
+          { html: `<p>${visitContactNames.join('<br>')}</p>` },
+          { text: `${visit.visitStatusDescription}` },
+        ] as PastVisitItem
       })
     )
 
