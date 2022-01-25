@@ -1,13 +1,5 @@
 import { InmateDetail, VisitBalances } from '../data/prisonApiTypes'
 
-declare global {
-  namespace Express {
-    interface Request {
-      id: string
-    }
-  }
-}
-
 export type PrisonerDetailsItem = {
   classes: string
   html: string
