@@ -100,8 +100,8 @@ export default class PrisonerProfileService {
 
     const visitsForDisplay: UpcomingVisitItem[] = await Promise.all(
       socialVisits.map(async visit => {
-        const startTime = format(parseISO(visit.startTimestamp), 'h:mmb')
-        const endTime = visit.endTimestamp ? ` - ${format(parseISO(visit.endTimestamp), 'h:mmb')}` : ''
+        const startTime = format(parseISO(visit.startTimestamp), 'h:mmaaa')
+        const endTime = visit.endTimestamp ? ` - ${format(parseISO(visit.endTimestamp), 'h:mmaaa')}` : ''
         const visitors: number[] = visit.visitors.reduce((personIds, visitor) => {
           personIds.push(visitor.nomisPersonId)
 
@@ -113,9 +113,9 @@ export default class PrisonerProfileService {
           { text: `${visit.visitTypeDescription}` },
           { text: 'Hewell (HMP)' },
           {
-            text: visit.startTimestamp
-              ? `${prisonerDateTimePretty(visit.startTimestamp)} ${startTime}${endTime}`
-              : 'N/A',
+            html: visit.startTimestamp
+              ? `<p>${prisonerDateTimePretty(visit.startTimestamp)}<br>${startTime}${endTime}</p>`
+              : '<p>N/A</p>',
           },
           { html: `<p>${visitContactNames.join('<br>')}</p>` },
         ] as UpcomingVisitItem
@@ -136,8 +136,8 @@ export default class PrisonerProfileService {
 
     const visitsForDisplay: PastVisitItem[] = await Promise.all(
       socialVisits.map(async visit => {
-        const startTime = format(parseISO(visit.startTimestamp), 'h:mmb')
-        const endTime = visit.endTimestamp ? ` - ${format(parseISO(visit.endTimestamp), 'h:mmb')}` : ''
+        const startTime = format(parseISO(visit.startTimestamp), 'h:mmaaa')
+        const endTime = visit.endTimestamp ? ` - ${format(parseISO(visit.endTimestamp), 'h:mmaaa')}` : ''
         const visitors: number[] = visit.visitors.reduce((personIds, visitor) => {
           personIds.push(visitor.nomisPersonId)
 
@@ -149,9 +149,9 @@ export default class PrisonerProfileService {
           { text: `${visit.visitTypeDescription}` },
           { text: 'Hewell (HMP)' },
           {
-            text: visit.startTimestamp
-              ? `${prisonerDateTimePretty(visit.startTimestamp)} ${startTime}${endTime}`
-              : 'N/A',
+            html: visit.startTimestamp
+              ? `<p>${prisonerDateTimePretty(visit.startTimestamp)}<br>${startTime}${endTime}</p>`
+              : '<p>N/A</p>',
           },
           { html: `<p>${visitContactNames.join('<br>')}</p>` },
           { text: `${visit.visitStatusDescription}` },

@@ -31,7 +31,7 @@ export type UpcomingVisitItem = [
     text: string
   },
   {
-    text: string
+    html: string
   },
   {
     html: string
@@ -46,7 +46,7 @@ export type PastVisitItem = [
     text: string
   },
   {
-    text: string
+    html: string
   },
   {
     html: string
