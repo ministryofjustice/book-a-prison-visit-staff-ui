@@ -1,4 +1,4 @@
-import { format, parseISO } from 'date-fns'
+import { differenceInYears, format, parseISO } from 'date-fns'
 
 const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
@@ -77,6 +77,18 @@ export const getPageLinks = ({
 
   return pageLinks
 }
+
+/**
+ * Checks if the date of birth represents an adult
+ * @param dateOfBirth date of birth string
+ * @param referenceDate date to check against (defaults to now)
+ * @returns true if an adult
+ */
+export const isAdult = (dateOfBirth: string, referenceDate: Date = new Date()): boolean => {
+  const dobDate = parseISO(dateOfBirth)
+  return differenceInYears(referenceDate, dobDate) >= 18
+}
+
 /**
  * Converts a name (first name, last name, middle name, etc.) to proper case equivalent, handling double-barreled names
  * correctly (i.e. each part in a double-barreled is converted to proper case).

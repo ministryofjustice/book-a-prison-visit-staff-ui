@@ -1,4 +1,4 @@
-import { convertToTitleCase, getPageLinks } from './utils'
+import { convertToTitleCase, getPageLinks, isAdult } from './utils'
 import getPageLinksTestData from './utils.testData'
 
 describe('Convert to title case', () => {
@@ -36,5 +36,17 @@ describe('Return pagination pages', () => {
     it(testData.description, () => {
       expect(getPageLinks(testData.params)).toEqual(testData.result)
     })
+  })
+})
+
+describe('Check if adult', () => {
+  it('Is an adult - now', () => {
+    expect(isAdult('2000-01-01')).toEqual(true)
+  })
+  it('Is an adult - on given date', () => {
+    expect(isAdult('2000-01-02', new Date(2018, 0, 2))).toEqual(true)
+  })
+  it('Is a child - on given date', () => {
+    expect(isAdult('2000-01-02', new Date(2018, 0, 1))).toEqual(false)
   })
 })

@@ -6,6 +6,7 @@ import createError from 'http-errors'
 import indexRoutes from './routes'
 import searchRoutes from './routes/search'
 import prisonerRoutes from './routes/prisoner'
+import visitorsRoutes from './routes/visitors'
 import nunjucksSetup from './utils/nunjucksSetup'
 import errorHandler from './errorHandler'
 import standardRouter from './routes/standardRouter'
@@ -24,6 +25,7 @@ import setUpAuthentication from './middleware/setUpAuthentication'
 import setUpHealthChecks from './middleware/setUpHealthChecks'
 import setUpWebRequestParsing from './middleware/setupRequestParsing'
 import authorisationMiddleware from './middleware/authorisationMiddleware'
+import PrisonerVisitorsService from './services/prisonerVisitorsService'
 
 export default function createApp(userService: UserService): express.Application {
   const app = express()
@@ -56,6 +58,13 @@ export default function createApp(userService: UserService): express.Application
         prisonerContactRegistryApiClientBuilder,
         systemToken
       )
+    )
+  )
+  app.use(
+    '/select-visitors',
+    visitorsRoutes(
+      standardRouter(userService),
+      new PrisonerVisitorsService(prisonApiClientBuilder, prisonerContactRegistryApiClientBuilder, systemToken)
     )
   )
 

@@ -1,0 +1,30 @@
+.visitor-restriction {
+  details {
+    margin-bottom: govuk-spacing(4);
+    margin-top: govuk-spacing(2);
+  }
+}
+
+.visitor-restriction-badge {
+  margin-top: govuk-spacing(-1);
+
+  &--BAN {
+    @extend .moj-badge--red;
+  }
+
+  &--PREINF {
+    @extend .moj-badge--purple;
+  }
+
+  &--RESTRICTED {
+    @extend .moj-badge--bright-purple;
+  }
+
+  &--CLOSED {
+    @extend .moj-badge--black;
+  }
+
+  &--NONCON {
+    @extend .moj-badge--green;
+  }
+}

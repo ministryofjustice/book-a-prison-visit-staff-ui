@@ -78,6 +78,16 @@ export type Visit = {
   sessionId: number
 }
 
+export type VisitorListItem = {
+  personId: number
+  name: string
+  dateOfBirth?: string
+  adult?: boolean
+  relationshipDescription: string
+  address?: string
+  restrictions: Restriction[]
+}
+
 export type PrisonerProfile = {
   displayName: string
   displayDob: string
@@ -142,7 +152,7 @@ export type Contact = {
   firstName: string
   middleName: string
   lastName: string
-  dateOfBirth: string
+  dateOfBirth?: string
   relationshipCode: string
   relationshipDescription: string
   contactType: string
