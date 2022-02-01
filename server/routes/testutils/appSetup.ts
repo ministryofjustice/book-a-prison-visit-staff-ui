@@ -6,6 +6,7 @@ import path from 'path'
 import indexRoutes from '../index'
 import searchRoutes from '../search'
 import prisonerRoutes from '../prisoner'
+import visitorsRoutes from '../visitors'
 import nunjucksSetup from '../../utils/nunjucksSetup'
 import errorHandler from '../../errorHandler'
 import standardRouter from '../standardRouter'
@@ -16,6 +17,7 @@ import { prisonApiClientBuilder } from '../../data/prisonApiClient'
 import { visitSchedulerApiClientBuilder } from '../../data/visitSchedulerApiClient'
 import { prisonerContactRegistryApiClientBuilder } from '../../data/prisonerContactRegistryApiClient'
 import PrisonerProfileService from '../../services/prisonerProfileService'
+import PrisonerVisitorsService from '../../services/prisonerVisitorsService'
 import * as auth from '../../authentication/auth'
 import systemToken from '../../data/authClient'
 import { SystemToken } from '../../@types/bapv'
@@ -44,6 +46,7 @@ class MockUserService extends UserService {
 function appSetup(
   prisonerSearchServiceOverride: PrisonerSearchService,
   prisonerProfileServiceOverride: PrisonerProfileService,
+  prisonerVisitorsServiceOverride: PrisonerVisitorsService,
   systemTokenOverride: SystemToken,
   production = false
 ): Express {
@@ -77,6 +80,10 @@ function appSetup(
       systemTokenTest
     )
   app.use('/prisoner/', prisonerRoutes(standardRouter(new MockUserService()), prisonerProfileService))
+  const prisonerVisitorsService =
+    prisonerVisitorsServiceOverride ||
+    new PrisonerVisitorsService(prisonApiClientBuilder, prisonerContactRegistryApiClientBuilder, systemTokenTest)
+  app.use('/visitors/', visitorsRoutes(standardRouter(new MockUserService()), prisonerVisitorsService))
   app.use((req, res, next) => next(createError(404, 'Not found')))
   app.use(errorHandler(production))
 
@@ -86,9 +93,16 @@ function appSetup(
 export default function appWithAllRoutes(
   prisonerSearchServiceOverride?: PrisonerSearchService,
   prisonerProfileServiceOverride?: PrisonerProfileService,
+  prisonerVisitorsServiceOverride?: PrisonerVisitorsService,
   systemTokenOverride?: SystemToken,
   production?: boolean
 ): Express {
   auth.default.authenticationMiddleware = () => (req, res, next) => next()
-  return appSetup(prisonerSearchServiceOverride, prisonerProfileServiceOverride, systemTokenOverride, production)
+  return appSetup(
+    prisonerSearchServiceOverride,
+    prisonerProfileServiceOverride,
+    prisonerVisitorsServiceOverride,
+    systemTokenOverride,
+    production
+  )
 }
