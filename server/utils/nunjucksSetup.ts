@@ -56,8 +56,18 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
     return Object.keys(errors).map(error => {
       return {
         text: errors[error].msg,
-        href: `#${errors[error].param}`,
+        href: `#${errors[error].param}-error`,
       }
     })
+  })
+
+  // find specifc error and return errorMessage for field validation
+  njkEnv.addFilter('findError', (errors, formFieldId) => {
+    if (!errors || !formFieldId) return null
+    if (!errors[formFieldId]) return null
+
+    return {
+      text: errors[formFieldId].msg,
+    }
   })
 }

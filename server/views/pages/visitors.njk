@@ -75,6 +75,12 @@
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
 
       <p><strong class="govuk-!-margin-right-4">Prisoner name:</strong> {{ prisonerName }}</p>
+
+      {% if errors | length %}
+      <p id="visitors-error" class="govuk-error-message">
+        <span class="govuk-visually-hidden">Error:</span> {{ errors[0].msg }}
+      </p>
+      {% endif %}
       <p>Add up to 3 visitors with a maximum of 2 adults.</p>
 
       <h2 class="govuk-heading-m">Approved visitor list</h2>
@@ -83,6 +89,7 @@
       <form action="{{ url }}" method="POST" novalidate>
         <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
+        <div class="govuk-form-group{% if errors | length %} govuk-form-group--error{% endif %}">
         {{ govukTable({
           head: [
             {
@@ -107,6 +114,7 @@
           ],
           rows: visitors
         }) }}
+        </div>
         {{ govukButton({
           text: "Continue"
         }) }} 

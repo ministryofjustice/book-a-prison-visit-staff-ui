@@ -1,3 +1,5 @@
+import { Contact, VisitorListItem } from '../bapv'
+
 export default {}
 
 declare module 'express-session' {
@@ -5,6 +7,9 @@ declare module 'express-session' {
   interface SessionData {
     returnTo: string
     nowInMinutes: number
+    prisonerName: string
+    contacts: Contact[]
+    visitorList: VisitorListItem[]
   }
 }
 

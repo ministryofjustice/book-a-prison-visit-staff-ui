@@ -17,6 +17,11 @@ export default function routes(router: Router, prisonerVisitorsService: Prisoner
     }
 
     const prisonerVisitors = await prisonerVisitorsService.getVisitors(offenderNo, res.locals.user?.username)
+
+    req.session.prisonerName = prisonerVisitors.prisonerName
+    req.session.contacts = prisonerVisitors.contacts
+    req.session.visitorList = prisonerVisitors.visitorList
+
     res.render('pages/visitors', { ...prisonerVisitors, url: req.originalUrl })
   })
 
@@ -33,11 +38,12 @@ export default function routes(router: Router, prisonerVisitorsService: Prisoner
     (req, res) => {
       const errors = validationResult(req)
 
-      // if (!errors.isEmpty()) {
-      //   return res.status(422).json({ errors: errors.array() })
-      // }
-
-      res.render('pages/visitors', { errors: errors.array() || [], formattedErrors: JSON.stringify(errors) })
+      res.render('pages/visitors', {
+        errors: !errors.isEmpty() ? errors.array() : [],
+        prisonerName: req.session.prisonerName,
+        contacts: req.session.contacts,
+        visitorList: req.session.visitorList,
+      })
     }
   )
 
