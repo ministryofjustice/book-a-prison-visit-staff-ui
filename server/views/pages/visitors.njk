@@ -4,6 +4,7 @@
 {% from "govuk/components/table/macro.njk" import govukTable %}
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 
 {% set pageHeaderTitle = "Select visitors from the prisoner’s approved visitor list" %}
 {% set pageTitle = applicationName + " - " + pageHeaderTitle %}
@@ -69,6 +70,8 @@
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
+      {% include "../partials/errorSummary.njk" %}
+
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
 
       <p><strong class="govuk-!-margin-right-4">Prisoner name:</strong> {{ prisonerName }}</p>
@@ -77,7 +80,7 @@
       <h2 class="govuk-heading-m">Approved visitor list</h2>
 
       {% if visitors | length %}
-      <form action="#" method="POST">
+      <form action="{{ url }}" method="POST" novalidate>
         <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
         {{ govukTable({
@@ -104,14 +107,11 @@
           ],
           rows: visitors
         }) }}
+        {{ govukButton({
+          text: "Continue"
+        }) }} 
       </form>
 
-      {{ govukButton({
-        text: "Continue"
-      }) }}
-      {% else %}
-      <p>The prisoner has no approved visitors.</p>
-      {% endif %}
     </div>
   </div>
 {% endblock %}
