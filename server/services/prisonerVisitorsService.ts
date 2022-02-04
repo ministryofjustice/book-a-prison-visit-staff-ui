@@ -19,7 +19,7 @@ export default class PrisonerVisitorsService {
   async getVisitors(
     offenderNo: string,
     username: string
-  ): Promise<{ prisonerName: string; contacts: Contact[]; visitorList: VisitorListItem[] }> {
+  ): Promise<{ prisonerName: string; visitorList: VisitorListItem[] }> {
     const token = await this.systemToken(username)
     const prisonApiClient = this.prisonApiClientBuilder(token)
 
@@ -46,7 +46,6 @@ export default class PrisonerVisitorsService {
 
     return {
       prisonerName,
-      contacts,
       visitorList,
     }
   }
