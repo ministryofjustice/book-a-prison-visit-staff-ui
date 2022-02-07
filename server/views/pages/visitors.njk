@@ -105,14 +105,13 @@
           rows: visitors
         }) }}
       </form>
+
+      {{ govukButton({
+        text: "Continue"
+      }) }}
       {% else %}
       <p>The prisoner has no approved visitors.</p>
       {% endif %}
-
-      {{ govukButton({
-        text: "Continue",
-        href: "#"
-      }) }}
     </div>
   </div>
 {% endblock %}
