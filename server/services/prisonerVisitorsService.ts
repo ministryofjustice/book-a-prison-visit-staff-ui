@@ -28,10 +28,11 @@ export default class PrisonerVisitorsService {
     const prisonerName = convertToTitleCase(`${bookings.content[0].firstName} ${bookings.content[0].lastName}`)
 
     const prisonerContactRegistryApiClient = this.prisonerContactRegistryApiClientBuilder(token)
-    const contacts: Contact[] = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(offenderNo)
+    const allSocialContacts: Contact[] = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(offenderNo)
+    const approvedContacts = allSocialContacts.filter(contact => contact.approvedVisitor)
 
     const visitorList: VisitorListItem[] = []
-    contacts.forEach(contact => {
+    approvedContacts.forEach(contact => {
       const visitor: VisitorListItem = {
         personId: contact.personId,
         name: `${contact.firstName} ${contact.lastName}`,
