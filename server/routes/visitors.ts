@@ -5,7 +5,6 @@ import { VisitorListItem } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
 import isValidPrisonerNumber from './prisonerProfileValidation'
-import { isAdult } from '../utils/utils'
 // @TODO move validation now it's shared?
 
 export default function routes(router: Router, prisonerVisitorsService: PrisonerVisitorsService): Router {
@@ -42,7 +41,7 @@ export default function routes(router: Router, prisonerVisitorsService: Prisoner
         const adults = req.session.visitorList
           .filter((visitor: VisitorListItem) => selected.includes(visitor.personId.toString()))
           .reduce((count: number, visitor: VisitorListItem) => {
-            return isAdult(visitor.dateOfBirth) ? count + 1 : count
+            return visitor.adult ? count + 1 : count
           }, 0)
 
         if (adults === 0) {
