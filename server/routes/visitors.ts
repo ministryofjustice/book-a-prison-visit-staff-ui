@@ -1,9 +1,11 @@
-import type { RequestHandler, Router } from 'express'
+import type { RequestHandler, Router, Request } from 'express'
 import { BadRequest } from 'http-errors'
 import { body, param, validationResult } from 'express-validator'
+import { Address, Contact, Restriction, SystemToken, VisitorListItem } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
 import isValidPrisonerNumber from './prisonerProfileValidation'
+import { isAdult } from '../utils/utils'
 // @TODO move validation now it's shared?
 
 export default function routes(router: Router, prisonerVisitorsService: PrisonerVisitorsService): Router {
@@ -27,7 +29,32 @@ export default function routes(router: Router, prisonerVisitorsService: Prisoner
 
   router.post(
     '/:offenderNo',
-    body('visitors').notEmpty().withMessage('No visitors selected'),
+    body('visitors')
+      .notEmpty()
+      .withMessage('No visitors selected')
+      .custom((value: string, { req }) => {
+        const selected = [].concat(value)
+
+        if (selected.length > 3) {
+          throw new Error('Select no more than 3 visitors with a maximum of 2 adults')
+        }
+
+        const adults = req.session.contacts
+          .filter((visitor: VisitorListItem) => selected.includes(visitor.personId.toString()))
+          .reduce((count: number, visitor: VisitorListItem) => {
+            return isAdult(visitor.dateOfBirth) ? count + 1 : count
+          }, 0)
+
+        if (adults === 0) {
+          throw new Error('Add an adult to the visit')
+        }
+
+        if (adults > 2) {
+          throw new Error('Select no more than 2 adults')
+        }
+
+        return selected
+      }),
     param('offenderNo').custom((value: string) => {
       if (!isValidPrisonerNumber(value)) {
         throw new Error('Invalid prisoner number supplied')
