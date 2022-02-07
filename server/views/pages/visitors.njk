@@ -15,7 +15,7 @@
 {% for visitor in visitorList %}
   {% set checkbox -%}
   <div class="govuk-checkboxes__item">
-    <input class="govuk-checkboxes__input" id="visitor-{{ visitor.personId }}" name="visitors" type="checkbox" value="{{ visitor.personId }}">
+    <input class="govuk-checkboxes__input" id="visitor-{{ visitor.personId }}" name="visitors" type="checkbox" value="{{ visitor.personId }}"{{ "checked" if visitor.selected }}>
     <label class="govuk-label govuk-checkboxes__label" for="visitor-{{ visitor.personId }}">
       <span class="govuk-visually-hidden">Select {{ visitor.name }}</span>
     </label>

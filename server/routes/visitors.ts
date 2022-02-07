@@ -34,6 +34,13 @@ export default function routes(router: Router, prisonerVisitorsService: Prisoner
       .custom((value: string, { req }) => {
         const selected = [].concat(value)
 
+        req.session.visitorList = req.session.visitorList.map((visitor: VisitorListItem) => {
+          const newVisitor = visitor
+          newVisitor.selected = selected.includes(visitor.personId.toString())
+
+          return newVisitor
+        })
+
         if (selected.length > 3) {
           throw new Error('Select no more than 3 visitors with a maximum of 2 adults')
         }
