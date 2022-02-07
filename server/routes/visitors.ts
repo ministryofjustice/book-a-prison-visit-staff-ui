@@ -31,6 +31,7 @@ export default function routes(router: Router, prisonerVisitorsService: Prisoner
     body('visitors')
       .notEmpty()
       .withMessage('No visitors selected')
+      .bail()
       .custom((value: string, { req }) => {
         const selected = [].concat(value)
 
