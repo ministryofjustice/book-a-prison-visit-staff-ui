@@ -110,6 +110,20 @@ describe('GET /select-visitors/A1234BC', () => {
         expect(res.text).toContain('visitor-restriction-badge--NONCON">Non-Contact Visit</span> End date not entered')
         expect(res.text).toMatch(/Bob Smith.|\s*?Not entered.|\s*?Brother.|\s*?1st listed address.|\s*?None/)
         expect(res.text).toMatch(/Anne Smith.|\s*?2 March 2018<br>(Child).|\s*?Not entered.|\s*?None/)
+        expect(res.text).toMatch(/<button.|\s*?Continue.|\s*?<\/button>/)
+      })
+  })
+
+  it('should show message and no Continue button for prisoner with no approved visitors', () => {
+    returnData = { prisonerName: 'Adam Jones', visitorList: [] }
+
+    return request(app)
+      .get('/select-visitors/A1234BC')
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        expect(res.text).toContain('Prisoner name:</strong> Adam Jones</p>')
+        expect(res.text).toContain('<p>The prisoner has no approved visitors.</p>')
+        expect(res.text).not.toMatch(/<button.|\s*?Continue.|\s*?<\/button>/)
       })
   })
 
