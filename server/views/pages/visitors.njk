@@ -86,7 +86,7 @@
       <h2 class="govuk-heading-m">Approved visitor list</h2>
 
       {% if visitors | length %}
-      <form action="{{ url }}" method="POST" novalidate>
+      <form action="{{ formUrl }}" method="POST" novalidate>
         <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
         <div class="govuk-form-group{% if errors | length %} govuk-form-group--error{% endif %}">
