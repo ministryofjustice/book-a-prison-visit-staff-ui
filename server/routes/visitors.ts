@@ -21,7 +21,6 @@ export default function routes(router: Router, prisonerVisitorsService: Prisoner
     const prisonerVisitors = await prisonerVisitorsService.getVisitors(offenderNo, res.locals.user?.username)
 
     req.session.prisonerName = prisonerVisitors.prisonerName
-    req.session.contacts = prisonerVisitors.contacts
     req.session.visitorList = prisonerVisitors.visitorList
 
     res.render('pages/visitors', { ...prisonerVisitors, formUrl: req.originalUrl })
@@ -39,7 +38,7 @@ export default function routes(router: Router, prisonerVisitorsService: Prisoner
           throw new Error('Select no more than 3 visitors with a maximum of 2 adults')
         }
 
-        const adults = req.session.contacts
+        const adults = req.session.visitorList
           .filter((visitor: VisitorListItem) => selected.includes(visitor.personId.toString()))
           .reduce((count: number, visitor: VisitorListItem) => {
             return isAdult(visitor.dateOfBirth) ? count + 1 : count

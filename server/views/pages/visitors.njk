@@ -76,6 +76,7 @@
 
       <p><strong class="govuk-!-margin-right-4">Prisoner name:</strong> {{ prisonerName }}</p>
 
+      {% if visitors | length %}
       {% if errors | length %}
       <p id="visitors-error" class="govuk-error-message">
         <span class="govuk-visually-hidden">Error:</span> {{ errors[0].msg }}
@@ -85,7 +86,6 @@
 
       <h2 class="govuk-heading-m">Approved visitor list</h2>
 
-      {% if visitors | length %}
       <form action="{{ formUrl }}" method="POST" novalidate>
         <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
@@ -119,7 +119,9 @@
           text: "Continue"
         }) }} 
       </form>
-
+    {% else %}
+    <p>The prisoner has no approved visitors.</p>
+    {% endif %}
     </div>
   </div>
 {% endblock %}
