@@ -7,7 +7,9 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 
 {% set pageHeaderTitle = "Select visitors from the prisoner’s approved visitor list" %}
-{% set pageTitle = applicationName + " - " + pageHeaderTitle %}
+{% set pageTitle %}
+{% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
+{% endset %}
 {% set backLinkHref = "/search" %}
 
 {% set visitors = [] %}
