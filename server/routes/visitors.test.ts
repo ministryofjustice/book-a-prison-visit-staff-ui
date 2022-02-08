@@ -9,6 +9,7 @@ let prisonerVisitorsService: PrisonerVisitorsService
 let systemToken
 
 let returnData: { prisonerName: string; visitorList: VisitorListItem[] }
+let Cookies: string
 
 class MockPrisonerVisitorsService extends PrisonerVisitorsService {
   constructor() {
@@ -133,6 +134,156 @@ describe('GET /select-visitors/A1234BC', () => {
       .expect('Content-Type', /html/)
       .expect(res => {
         expect(res.text).toContain('BadRequestError: Bad Request')
+      })
+  })
+})
+
+describe('POST /select-visitors/A1234BC', () => {
+  beforeEach(() => {
+    returnData = {
+      prisonerName: 'John Smith',
+      visitorList: [
+        {
+          personId: 4321,
+          name: 'Jeanette Smith',
+          dateOfBirth: '1986-07-28',
+          adult: true,
+          relationshipDescription: 'Sister',
+          address:
+            'Premises,<br>Flat 23B,<br>123 The Street,<br>Springfield,<br>Coventry,<br>West Midlands,<br>C1 2AB,<br>England',
+          restrictions: [],
+        },
+        {
+          personId: 4322,
+          name: 'Bob Smith',
+          dateOfBirth: '1986-07-28',
+          adult: true,
+          relationshipDescription: 'Brother',
+          address: '1st listed address',
+          restrictions: [],
+        },
+        {
+          personId: 4323,
+          name: 'Ted Smith',
+          dateOfBirth: '1968-07-28',
+          adult: true,
+          relationshipDescription: 'Father',
+          address: '1st listed address',
+          restrictions: [],
+        },
+        {
+          personId: 4324,
+          name: 'Anne Smith',
+          dateOfBirth: '2018-03-02',
+          adult: false,
+          relationshipDescription: 'Niece',
+          address: 'Not entered',
+          restrictions: [],
+        },
+        {
+          personId: 4325,
+          name: 'Bill Smith',
+          dateOfBirth: '2018-03-02',
+          adult: false,
+          relationshipDescription: 'Nephew',
+          address: 'Not entered',
+          restrictions: [],
+        },
+      ],
+    }
+
+    request(app)
+      .get('/select-visitors/A1234BC')
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        expect(res.text).toContain('Prisoner name:</strong> John Smith</p>')
+        expect(res.text).toContain('id="visitor-4321"')
+        expect(res.text).toContain('28 July 1986<br>(Adult)')
+        expect(res.text).toContain('Sister')
+        expect(res.text).toContain('123 The Street')
+        expect(res.text).toContain('visitor-restriction-badge--BAN">Banned</span> until 31 July 2022')
+        expect(res.text).toContain('Ban details')
+        expect(res.text).toContain('visitor-restriction-badge--RESTRICTED">Restricted</span> End date not entered')
+        expect(res.text).toContain('visitor-restriction-badge--CLOSED">Closed</span> End date not entered')
+        expect(res.text).toContain('visitor-restriction-badge--NONCON">Non-Contact Visit</span> End date not entered')
+        expect(res.text).toMatch(/Bob Smith.|\s*?Not entered.|\s*?Brother.|\s*?1st listed address.|\s*?None/)
+        expect(res.text).toMatch(/Anne Smith.|\s*?2 March 2018<br>(Child).|\s*?Not entered.|\s*?None/)
+        expect(res.text).toMatch(/<button.|\s*?Continue.|\s*?<\/button>/)
+      })
+      .end((err, res) => {
+        Cookies = res.headers['set-cookie'].map((r: string) => r.replace('; path=/; httponly', '')).join('; ')
+      })
+  })
+
+  it('should not show an error if an adult is selected', () => {
+    const req = request(app).post('/select-visitors/A1234BC')
+    req.cookies = Cookies
+
+    return req
+      .send('visitors=4322')
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        expect(res.text).not.toContain('Select no more than 3 visitors with a maximum of 2 adults')
+        expect(res.text).not.toContain('Select no more than 2 adults')
+        expect(res.text).not.toContain('No visitors selected')
+        expect(res.text).not.toContain('Add an adult to the visit')
+      })
+  })
+
+  it('should show an error if no visitors are selected', () => {
+    const req = request(app).post('/select-visitors/A1234BC')
+    req.cookies = Cookies
+
+    return req.expect('Content-Type', /html/).expect(res => {
+      expect(res.text).toContain('No visitors selected')
+      expect(res.text).not.toContain('Select no more than 3 visitors with a maximum of 2 adults')
+      expect(res.text).not.toContain('Select no more than 2 adults')
+      expect(res.text).not.toContain('Add an adult to the visit')
+    })
+  })
+
+  it('should show an error if no adults are selected', () => {
+    const req = request(app).post('/select-visitors/A1234BC')
+    req.cookies = Cookies
+
+    return req
+      .send('visitors=4324')
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        expect(res.text).toContain('Add an adult to the visit')
+        expect(res.text).not.toContain('Select no more than 3 visitors with a maximum of 2 adults')
+        expect(res.text).not.toContain('Select no more than 2 adults')
+        expect(res.text).not.toContain('No visitors selected')
+      })
+  })
+
+  it('should show an error if more than 2 adults are selected', () => {
+    const req = request(app).post('/select-visitors/A1234BC')
+    req.cookies = Cookies
+
+    return req
+      .send('visitors=4321&visitors=4322&visitors=4323')
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        expect(res.text).toContain('Select no more than 2 adults')
+        expect(res.text).not.toContain('Select no more than 3 visitors with a maximum of 2 adults')
+        expect(res.text).not.toContain('No visitors selected')
+        expect(res.text).not.toContain('Add an adult to the visit')
+      })
+  })
+
+  it('should show an error if more than 3 visitors are selected', () => {
+    const req = request(app).post('/select-visitors/A1234BC')
+    req.cookies = Cookies
+
+    return req
+      .send('visitors=4321&visitors=4322&visitors=4323&visitors=4324')
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        expect(res.text).toContain('Select no more than 3 visitors with a maximum of 2 adults')
+        expect(res.text).not.toContain('Select no more than 2 adults')
+        expect(res.text).not.toContain('No visitors selected')
+        expect(res.text).not.toContain('Add an adult to the visit')
       })
   })
 })

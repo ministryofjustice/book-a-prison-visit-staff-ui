@@ -16,7 +16,7 @@ async function getSystemClientToken(username?: string) {
     : new URLSearchParams({ grant_type: 'client_credentials' }).toString()
 
   logger.info(
-    `Oauth request '${oauthRequest}' for client id '${config.apis.oauth2.apiClientId}' and user '${username}'`
+    `Oauth request '${oauthRequest}' for client id '${config.apis.oauth2.systemClientId}' and user '${username}'`
   )
 
   const result = await superagent

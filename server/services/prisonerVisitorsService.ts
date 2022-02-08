@@ -41,6 +41,7 @@ export default class PrisonerVisitorsService {
         relationshipDescription: contact.relationshipDescription,
         address: this.getAddressToDisplay(contact.addresses),
         restrictions: this.getRestrictionsToDisplay(contact.restrictions),
+        selected: false,
       }
       visitorList.push(visitor)
     })

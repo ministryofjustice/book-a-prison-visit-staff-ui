@@ -189,6 +189,7 @@ describe('Prisoner visitor service', () => {
                 startDate: '2022-01-04',
               },
             ],
+            selected: false,
           },
           {
             personId: 4322,
@@ -198,6 +199,7 @@ describe('Prisoner visitor service', () => {
             relationshipDescription: 'Brother',
             address: '1st listed address',
             restrictions: [],
+            selected: false,
           },
           {
             personId: 4324,
@@ -207,6 +209,7 @@ describe('Prisoner visitor service', () => {
             relationshipDescription: 'Niece',
             address: 'Not entered',
             restrictions: [],
+            selected: false,
           },
         ],
       })

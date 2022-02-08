@@ -50,4 +50,24 @@ export default function nunjucksSetup(app: express.Express, path: pathModule.Pla
   njkEnv.addFilter('formatDate', (dateToFormat, dateFormat = 'd MMMM yyyy') => {
     return dateToFormat ? format(parseISO(dateToFormat), dateFormat) : null
   })
+
+  // convert errors to format for GOV.UK error summary component
+  njkEnv.addFilter('errorSummaryList', (errors = []) => {
+    return Object.keys(errors).map(error => {
+      return {
+        text: errors[error].msg,
+        href: `#${errors[error].param}-error`,
+      }
+    })
+  })
+
+  // find specifc error and return errorMessage for field validation
+  njkEnv.addFilter('findError', (errors, formFieldId) => {
+    if (!errors || !formFieldId) return null
+    if (!errors[formFieldId]) return null
+
+    return {
+      text: errors[formFieldId].msg,
+    }
+  })
 }
