@@ -83,7 +83,7 @@ function appSetup(
   const prisonerVisitorsService =
     prisonerVisitorsServiceOverride ||
     new PrisonerVisitorsService(prisonApiClientBuilder, prisonerContactRegistryApiClientBuilder, systemTokenTest)
-  app.use('/select-visitors/', visitorsRoutes(standardRouter(new MockUserService()), prisonerVisitorsService))
+  app.use('/visit/', visitorsRoutes(standardRouter(new MockUserService()), prisonerVisitorsService))
   app.use((req, res, next) => next(createError(404, 'Not found')))
   app.use(errorHandler(production))
 

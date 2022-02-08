@@ -61,7 +61,7 @@ export default function createApp(userService: UserService): express.Application
     )
   )
   app.use(
-    '/select-visitors',
+    '/visit/',
     visitorsRoutes(
       standardRouter(userService),
       new PrisonerVisitorsService(prisonApiClientBuilder, prisonerContactRegistryApiClientBuilder, systemToken)

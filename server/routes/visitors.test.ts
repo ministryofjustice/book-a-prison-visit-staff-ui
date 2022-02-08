@@ -32,7 +32,7 @@ afterEach(() => {
   jest.resetAllMocks()
 })
 
-describe('GET /select-visitors/A1234BC', () => {
+describe('GET /visit/select-visitors/A1234BC', () => {
   it('should render the approved visitor list for offender number A1234BC', () => {
     returnData = {
       prisonerName: 'John Smith',
@@ -96,7 +96,7 @@ describe('GET /select-visitors/A1234BC', () => {
     }
 
     return request(app)
-      .get('/select-visitors/A1234BC')
+      .get('/visit/select-visitors/A1234BC')
       .expect('Content-Type', /html/)
       .expect(res => {
         expect(res.text).toContain('Prisoner name:</strong> John Smith</p>')
@@ -119,7 +119,7 @@ describe('GET /select-visitors/A1234BC', () => {
     returnData = { prisonerName: 'Adam Jones', visitorList: [] }
 
     return request(app)
-      .get('/select-visitors/A1234BC')
+      .get('/visit/select-visitors/A1234BC')
       .expect('Content-Type', /html/)
       .expect(res => {
         expect(res.text).toContain('Prisoner name:</strong> Adam Jones</p>')
@@ -130,7 +130,7 @@ describe('GET /select-visitors/A1234BC', () => {
 
   it('should render 400 Bad Request error for invalid prisoner number', () => {
     return request(app)
-      .get('/select-visitors/A12--34BC')
+      .get('/visit/select-visitors/A12--34BC')
       .expect('Content-Type', /html/)
       .expect(res => {
         expect(res.text).toContain('BadRequestError: Bad Request')
@@ -138,7 +138,7 @@ describe('GET /select-visitors/A1234BC', () => {
   })
 })
 
-describe('POST /select-visitors/A1234BC', () => {
+describe('POST /visit/select-visitors/A1234BC', () => {
   beforeEach(() => {
     returnData = {
       prisonerName: 'John Smith',
@@ -193,7 +193,7 @@ describe('POST /select-visitors/A1234BC', () => {
     }
 
     request(app)
-      .get('/select-visitors/A1234BC')
+      .get('/visit/select-visitors/A1234BC')
       .expect('Content-Type', /html/)
       .expect(res => {
         expect(res.text).toContain('Prisoner name:</strong> John Smith</p>')
@@ -216,7 +216,7 @@ describe('POST /select-visitors/A1234BC', () => {
   })
 
   it('should not show an error if an adult is selected', () => {
-    const req = request(app).post('/select-visitors/A1234BC')
+    const req = request(app).post('/visit/select-visitors/A1234BC')
     req.cookies = Cookies
 
     return req
@@ -231,7 +231,7 @@ describe('POST /select-visitors/A1234BC', () => {
   })
 
   it('should show an error if no visitors are selected', () => {
-    const req = request(app).post('/select-visitors/A1234BC')
+    const req = request(app).post('/visit/select-visitors/A1234BC')
     req.cookies = Cookies
 
     return req.expect('Content-Type', /html/).expect(res => {
@@ -243,7 +243,7 @@ describe('POST /select-visitors/A1234BC', () => {
   })
 
   it('should show an error if no adults are selected', () => {
-    const req = request(app).post('/select-visitors/A1234BC')
+    const req = request(app).post('/visit/select-visitors/A1234BC')
     req.cookies = Cookies
 
     return req
@@ -258,7 +258,7 @@ describe('POST /select-visitors/A1234BC', () => {
   })
 
   it('should show an error if more than 2 adults are selected', () => {
-    const req = request(app).post('/select-visitors/A1234BC')
+    const req = request(app).post('/visit/select-visitors/A1234BC')
     req.cookies = Cookies
 
     return req
@@ -273,7 +273,7 @@ describe('POST /select-visitors/A1234BC', () => {
   })
 
   it('should show an error if more than 3 visitors are selected', () => {
-    const req = request(app).post('/select-visitors/A1234BC')
+    const req = request(app).post('/visit/select-visitors/A1234BC')
     req.cookies = Cookies
 
     return req
