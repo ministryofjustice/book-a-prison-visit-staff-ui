@@ -8,6 +8,8 @@ declare module 'express-session' {
     returnTo: string
     nowInMinutes: number
     prisonerName: string
+    prisonerDob: string
+    offenderNo: string
     contacts: Contact[]
     visitorList: VisitorListItem[]
   }

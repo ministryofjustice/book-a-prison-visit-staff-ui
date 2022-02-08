@@ -22,7 +22,7 @@ export default function routes(router: Router, prisonerVisitorsService: Prisoner
     req.session.prisonerName = prisonerVisitors.prisonerName
     req.session.visitorList = prisonerVisitors.visitorList
 
-    res.render('pages/visitors', { ...prisonerVisitors, formUrl: req.originalUrl })
+    res.render('pages/visitors', { ...prisonerVisitors, offenderNo })
   })
 
   router.post(
