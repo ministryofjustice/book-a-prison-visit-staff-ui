@@ -102,4 +102,37 @@ describe('visitSchedulerApiClient', () => {
       expect(output).toEqual(results)
     })
   })
+
+  describe('getVisitSessions', () => {
+    it('should return an array of Visit Sessions from the Visit Scheduler API', async () => {
+      const results = [
+        {
+          sessionTemplateId: 1,
+          visitRoomName: 'A1',
+          visitType: 'STANDARD_SOCIAL',
+          visitTypeDescription: 'Standard Social',
+          prisonId: 'HEI',
+          restrictions: 'restrictions test',
+          openVisitCapacity: 15,
+          openVisitBookedCount: 0,
+          closedVisitCapacity: 10,
+          closedVisitBookedCount: 0,
+          startTimestamp: '2022-02-14T10:00:00',
+          endTimestamp: '2022-02-14T11:00:00',
+        },
+      ]
+
+      fakeVisitSchedulerApi
+        .get('/visit-sessions')
+        .query({
+          prisonId: 'HEI',
+        })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, results)
+
+      const output = await client.getVisitSessions()
+
+      expect(output).toEqual(results)
+    })
+  })
 })
