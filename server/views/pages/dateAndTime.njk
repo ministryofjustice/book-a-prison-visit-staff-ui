@@ -31,14 +31,15 @@
             {% set accordion = [] %}
 
             {% for day in days %}
-                {% set slotsAvailable = (day.slots | length) %}
+                {% set morningSlotsAvailable = (day.slots.morning | length) %}
+                {% set afternoonSlotsAvailable = (day.slots.afternoon | length) %}
                 {% set accordion = (accordion.push(
                     {
                         heading: {
                             text: day.date
                         },
                         summary: {
-                            text: slotsAvailable + ' time slot(s)'
+                            text: (morningSlotsAvailable + afternoonSlotsAvailable) + ' time slot(s)'
                         },
                         content: {
                             html: ''

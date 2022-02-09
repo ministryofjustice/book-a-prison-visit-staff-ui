@@ -96,60 +96,81 @@ export default function routes(router: Router, prisonerVisitorsService: Prisoner
       'February 2022': [
         {
           date: 'Monday 7 February',
-          slots: [
-            {
-              startTime: 'a',
-              endTime: 'b',
-              availableTables: 3,
-            },
-          ],
+          slots: {
+            morning: [
+              {
+                startTime: 'a',
+                endTime: 'b',
+                availableTables: 3,
+              },
+            ],
+            afternoon: [
+              {
+                startTime: 'a',
+                endTime: 'b',
+                availableTables: 3,
+              },
+            ],
+          },
         },
         {
           date: 'Tuesday 8 February',
-          slots: [
-            {
-              startTime: 'a',
-              endTime: 'b',
-              availableTables: 3,
-            },
-            {
-              startTime: 'c',
-              endTime: 'd',
-              availableTables: 3,
-            },
-          ],
+          slots: {
+            morning: [
+              {
+                startTime: 'a',
+                endTime: 'b',
+                availableTables: 3,
+              },
+            ],
+            afternoon: [
+              {
+                startTime: 'a',
+                endTime: 'b',
+                availableTables: 3,
+              },
+            ],
+          },
         },
       ],
       'March 2022': [
         {
           date: 'Monday 7 March',
-          slots: [
-            {
-              startTime: 'a',
-              endTime: 'b',
-              availableTables: 3,
-            },
-            {
-              startTime: 'c',
-              endTime: 'd',
-              availableTables: 3,
-            },
-          ],
+          slots: {
+            morning: [
+              {
+                startTime: 'a',
+                endTime: 'b',
+                availableTables: 3,
+              },
+            ],
+            afternoon: [
+              {
+                startTime: 'a',
+                endTime: 'b',
+                availableTables: 3,
+              },
+            ],
+          },
         },
         {
           date: 'Tuesday 8 March',
-          slots: [
-            {
-              startTime: 'a',
-              endTime: 'b',
-              availableTables: 3,
-            },
-            {
-              startTime: 'c',
-              endTime: 'd',
-              availableTables: 3,
-            },
-          ],
+          slots: {
+            morning: [
+              {
+                startTime: 'a',
+                endTime: 'b',
+                availableTables: 3,
+              },
+            ],
+            afternoon: [
+              {
+                startTime: 'a',
+                endTime: 'b',
+                availableTables: 3,
+              },
+            ],
+          },
         },
       ],
     }
