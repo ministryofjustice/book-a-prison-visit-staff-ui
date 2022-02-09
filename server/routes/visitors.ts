@@ -48,7 +48,7 @@ export default function routes(router: Router, prisonerVisitorsService: Prisoner
       const adults = req.session.visitorList
         .filter((visitor: VisitorListItem) => selected.includes(visitor.personId.toString()))
         .reduce((count: number, visitor: VisitorListItem) => {
-          return visitor.adult ? count + 1 : count
+          return visitor.adult ?? true ? count + 1 : count
         }, 0)
 
       if (adults === 0) {
