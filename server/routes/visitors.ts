@@ -71,7 +71,11 @@ export default function routes(router: Router, prisonerVisitorsService: Prisoner
     (req, res) => {
       const errors = validationResult(req)
 
-      res.render('pages/visitors', {
+      if (errors.isEmpty()) {
+        return res.redirect(`/visit/select-date-and-time/${req.params.offenderNo}`)
+      }
+
+      return res.render('pages/visitors', {
         errors: !errors.isEmpty() ? errors.array() : [],
         prisonerName: req.session.prisonerName,
         contacts: req.session.contacts,
@@ -79,6 +83,83 @@ export default function routes(router: Router, prisonerVisitorsService: Prisoner
       })
     }
   )
+
+  get('/select-date-and-time/:offenderNo', async (req, res) => {
+    const { offenderNo } = req.params
+
+    if (!isValidPrisonerNumber(offenderNo)) {
+      throw new BadRequest()
+    }
+
+    // const prisonerVisitors = await prisonerVisitorsService.getVisitors(offenderNo, res.locals.user?.username)
+    const slotsList = {
+      'February 2022': [
+        {
+          date: 'Monday 7 February',
+          slots: [
+            {
+              startTime: 'a',
+              endTime: 'b',
+              availableTables: 3,
+            },
+          ],
+        },
+        {
+          date: 'Tuesday 8 February',
+          slots: [
+            {
+              startTime: 'a',
+              endTime: 'b',
+              availableTables: 3,
+            },
+            {
+              startTime: 'c',
+              endTime: 'd',
+              availableTables: 3,
+            },
+          ],
+        },
+      ],
+      'March 2022': [
+        {
+          date: 'Monday 7 March',
+          slots: [
+            {
+              startTime: 'a',
+              endTime: 'b',
+              availableTables: 3,
+            },
+            {
+              startTime: 'c',
+              endTime: 'd',
+              availableTables: 3,
+            },
+          ],
+        },
+        {
+          date: 'Tuesday 8 March',
+          slots: [
+            {
+              startTime: 'a',
+              endTime: 'b',
+              availableTables: 3,
+            },
+            {
+              startTime: 'c',
+              endTime: 'd',
+              availableTables: 3,
+            },
+          ],
+        },
+      ],
+    }
+
+    res.render('pages/dateAndTime', {
+      offenderNo,
+      prisonerName: req.session.prisonerName,
+      slotsList,
+    })
+  })
 
   return router
 }

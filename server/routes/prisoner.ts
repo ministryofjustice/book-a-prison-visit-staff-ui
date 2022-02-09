@@ -15,11 +15,6 @@ export default function routes(router: Router, prisonerProfileService: PrisonerP
     }
 
     const prisonerProfile = await prisonerProfileService.getProfile(offenderNo, res.locals.user?.username)
-
-    req.session.prisonerName = prisonerProfile.displayName
-    req.session.prisonerDob = prisonerProfile.displayDob
-    req.session.offenderNo = offenderNo
-
     res.render('pages/prisoner', { ...prisonerProfile })
   })
 

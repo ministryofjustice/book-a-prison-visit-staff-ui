@@ -1,0 +1,59 @@
+{% extends "../partials/layout.njk" %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/breadcrumbs/macro.njk" import govukBreadcrumbs %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/accordion/macro.njk" import govukAccordion %}
+
+{% set pageHeaderTitle = "Select date and time of visit" %}
+{% set pageTitle %}
+{% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
+{% endset %}
+{% set backLinkHref = "/visit/select-visitors/" + offenderNo %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {% include "../partials/errorSummary.njk" %}
+
+      <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+
+      <p><strong>Prisoner name:</strong> {{ prisonerName }}</p>
+
+      <p><strong>Visit type:</strong> Open</p>
+
+      <p>Showing visit time slots for the next 28 days.</p>
+
+        {% for month, days in slotsList %}
+            <h2 class="govuk-heading-m">{{ month }}</h2>
+
+            {% set accordion = [] %}
+
+            {% for day in days %}
+                {% set slotsAvailable = (day.slots | length) %}
+                {% set accordion = (accordion.push(
+                    {
+                        heading: {
+                            text: day.date
+                        },
+                        summary: {
+                            text: slotsAvailable + ' time slot(s)'
+                        },
+                        content: {
+                            html: ''
+                        }
+                    }
+                ), accordion) %}
+            {% endfor %}
+
+            {{ govukAccordion({
+                id: "slots-",
+                headingLevel: 3,
+                items: accordion
+            }) }}
+        {% endfor %}
+
+    </div>
+  </div>
+{% endblock %}
