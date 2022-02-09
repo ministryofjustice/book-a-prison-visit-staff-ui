@@ -27,41 +27,40 @@ export default function routes(router: Router, prisonerVisitorsService: Prisoner
 
   router.post(
     '/select-visitors/:offenderNo',
-    body('visitors')
-      .custom((value: string, { req }) => {
-        const selected = [].concat(value)
+    body('visitors').custom((value: string, { req }) => {
+      const selected = [].concat(value)
 
-        req.session.visitorList = req.session.visitorList.map((visitor: VisitorListItem) => {
-          const newVisitor = visitor
-          newVisitor.selected = selected.includes(visitor.personId.toString())
+      req.session.visitorList = req.session.visitorList.map((visitor: VisitorListItem) => {
+        const newVisitor = visitor
+        newVisitor.selected = selected.includes(visitor.personId.toString())
 
-          return newVisitor
-        })
+        return newVisitor
+      })
 
-        if (value === undefined) {
-          throw new Error('No visitors selected')
-        }
+      if (value === undefined) {
+        throw new Error('No visitors selected')
+      }
 
-        if (selected.length > 3) {
-          throw new Error('Select no more than 3 visitors with a maximum of 2 adults')
-        }
+      if (selected.length > 3) {
+        throw new Error('Select no more than 3 visitors with a maximum of 2 adults')
+      }
 
-        const adults = req.session.visitorList
-          .filter((visitor: VisitorListItem) => selected.includes(visitor.personId.toString()))
-          .reduce((count: number, visitor: VisitorListItem) => {
-            return visitor.adult ? count + 1 : count
-          }, 0)
+      const adults = req.session.visitorList
+        .filter((visitor: VisitorListItem) => selected.includes(visitor.personId.toString()))
+        .reduce((count: number, visitor: VisitorListItem) => {
+          return visitor.adult ? count + 1 : count
+        }, 0)
 
-        if (adults === 0) {
-          throw new Error('Add an adult to the visit')
-        }
+      if (adults === 0) {
+        throw new Error('Add an adult to the visit')
+      }
 
-        if (adults > 2) {
-          throw new Error('Select no more than 2 adults')
-        }
+      if (adults > 2) {
+        throw new Error('Select no more than 2 adults')
+      }
 
-        return selected
-      }),
+      return selected
+    }),
     param('offenderNo').custom((value: string) => {
       if (!isValidPrisonerNumber(value)) {
         throw new Error('Invalid prisoner number supplied')
