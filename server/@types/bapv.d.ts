@@ -56,28 +56,6 @@ export type PastVisitItem = [
   }
 ]
 
-type VisitVisitor = {
-  visitId: number
-  nomisPersonId: number
-  leadVisitor: boolean
-}
-
-export type Visit = {
-  id: number
-  prisonerId: string
-  prisonId: string
-  visitRoom: string
-  visitType: string
-  visitTypeDescription: string
-  visitStatus: string
-  visitStatusDescription: string
-  startTimestamp: string
-  endTimestamp: string
-  reasonableAdjustments: string
-  visitors: VisitVisitor[]
-  sessionId: number
-}
-
 export type VisitorListItem = {
   personId: number
   name: string

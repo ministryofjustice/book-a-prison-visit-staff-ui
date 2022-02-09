@@ -1,6 +1,6 @@
 import { URLSearchParams } from 'url'
 import RestClient from './restClient'
-import { Visit } from '../@types/bapv'
+import { Visit } from './visitSchedulerApiTypes'
 import config from '../config'
 
 export const visitSchedulerApiClientBuilder = (token: string): VisitSchedulerApiClient => {
