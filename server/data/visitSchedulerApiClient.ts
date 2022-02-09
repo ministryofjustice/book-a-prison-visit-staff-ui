@@ -1,6 +1,6 @@
 import { URLSearchParams } from 'url'
 import RestClient from './restClient'
-import { Visit } from './visitSchedulerApiTypes'
+import { Visit, VisitSession } from './visitSchedulerApiTypes'
 import config from '../config'
 
 export const visitSchedulerApiClientBuilder = (token: string): VisitSchedulerApiClient => {
@@ -33,6 +33,16 @@ class VisitSchedulerApiClient {
         prisonId: this.prisonId,
         prisonerId: offenderNo,
         endTimestamp: endTimestamp || new Date().toISOString(),
+      }).toString(),
+    })
+  }
+
+  getVisitSessions(): Promise<VisitSession[]> {
+    return this.restclient.get({
+      path: '/visit-sessions',
+      query: new URLSearchParams({
+        prisonId: this.prisonId,
+        // 'min' and 'max' params omitted, so using API default between 2 and 28 days from now
       }).toString(),
     })
   }
