@@ -5,6 +5,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/accordion/macro.njk" import govukAccordion %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
 
 {% set pageHeaderTitle = "Select date and time of visit" %}
 {% set pageTitle %}
@@ -31,6 +32,40 @@
             {% set accordion = [] %}
 
             {% for day in days %}
+                {% set morningSlotsList = [] %}
+                {% for slot in day.slots.morning %}
+                    {% set morningSlotsList = (morningSlotsList.push(
+                        {
+                            value: slot.id,
+                            html: "<p><strong>" + slot.startTime + " to " + slot.endTime + "</strong><br>" + slot.availableTables + " tables available</p>"
+                        }
+                    ), morningSlotsList) %}
+                {% endfor %}
+                {% set morningHtml %}
+                    <h3 class="govuk-heading-s">Morning</h3>
+                    {{ govukRadios({
+                        idPrefix: "where-do-you-live",
+                        name: "where-do-you-live",
+                        items: morningSlotsList
+                    }) }}
+                {% endset %}
+                {% set afternoonSlotsList = [] %}
+                {% for slot in day.slots.afternoon %}
+                    {% set afternoonSlotsList = (afternoonSlotsList.push(
+                        {
+                            value: slot.id,
+                            html: "<p><strong>" + slot.startTime + " to " + slot.endTime + "</strong><br>" + slot.availableTables + " tables available</p>"
+                        }
+                    ), afternoonSlotsList) %}
+                {% endfor %}
+                {% set afternoonHtml %}
+                    <h3 class="govuk-heading-s">Afternoon</h3>
+                    {{ govukRadios({
+                        idPrefix: "where-do-you-live",
+                        name: "where-do-you-live",
+                        items: afternoonSlotsList
+                    }) }}
+                {% endset %}
                 {% set morningSlotsAvailable = (day.slots.morning | length) %}
                 {% set afternoonSlotsAvailable = (day.slots.afternoon | length) %}
                 {% set accordion = (accordion.push(
@@ -42,7 +77,7 @@
                             text: (morningSlotsAvailable + afternoonSlotsAvailable) + ' time slot(s)'
                         },
                         content: {
-                            html: ''
+                            html: morningHtml + afternoonHtml
                         }
                     }
                 ), accordion) %}

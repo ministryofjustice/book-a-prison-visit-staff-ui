@@ -99,6 +99,7 @@ export default function routes(router: Router, prisonerVisitorsService: Prisoner
           slots: {
             morning: [
               {
+                id: 'a',
                 startTime: 'a',
                 endTime: 'b',
                 availableTables: 3,
@@ -106,6 +107,7 @@ export default function routes(router: Router, prisonerVisitorsService: Prisoner
             ],
             afternoon: [
               {
+                id: 'b',
                 startTime: 'a',
                 endTime: 'b',
                 availableTables: 3,
@@ -118,6 +120,7 @@ export default function routes(router: Router, prisonerVisitorsService: Prisoner
           slots: {
             morning: [
               {
+                id: 'c',
                 startTime: 'a',
                 endTime: 'b',
                 availableTables: 3,
@@ -125,6 +128,7 @@ export default function routes(router: Router, prisonerVisitorsService: Prisoner
             ],
             afternoon: [
               {
+                id: 'd',
                 startTime: 'a',
                 endTime: 'b',
                 availableTables: 3,
@@ -139,6 +143,7 @@ export default function routes(router: Router, prisonerVisitorsService: Prisoner
           slots: {
             morning: [
               {
+                id: 'e',
                 startTime: 'a',
                 endTime: 'b',
                 availableTables: 3,
@@ -146,6 +151,7 @@ export default function routes(router: Router, prisonerVisitorsService: Prisoner
             ],
             afternoon: [
               {
+                id: 'f',
                 startTime: 'a',
                 endTime: 'b',
                 availableTables: 3,
@@ -158,6 +164,7 @@ export default function routes(router: Router, prisonerVisitorsService: Prisoner
           slots: {
             morning: [
               {
+                id: 'g',
                 startTime: 'a',
                 endTime: 'b',
                 availableTables: 3,
@@ -165,6 +172,7 @@ export default function routes(router: Router, prisonerVisitorsService: Prisoner
             ],
             afternoon: [
               {
+                id: 'h',
                 startTime: 'a',
                 endTime: 'b',
                 availableTables: 3,
