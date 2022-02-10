@@ -34,10 +34,15 @@
             {% for day in days %}
                 {% set morningSlotsList = [] %}
                 {% for slot in day.slots.morning %}
+                    {% set tableText %}
+                        {% if slot.availableTables === 0 %}Fully booked{% endif %}
+                        {% if slot.availableTables === 1 %}1 table available{% endif %}
+                        {% if slot.availableTables > 1 %}{{ slot.availableTables }} tables available{% endif %}
+                    {% endset %}
                     {% set morningSlotsList = (morningSlotsList.push(
                         {
                             value: slot.id,
-                            html: "<p><strong>" + slot.startTime + " to " + slot.endTime + "</strong><br>" + slot.availableTables + " tables available</p>"
+                            html: "<p><strong>" + slot.startTime + " to " + slot.endTime + "</strong><br>" + tableText + "</p>"
                         }
                     ), morningSlotsList) %}
                 {% endfor %}
@@ -51,10 +56,15 @@
                 {% endset %}
                 {% set afternoonSlotsList = [] %}
                 {% for slot in day.slots.afternoon %}
+                    {% set tableText %}
+                        {% if slot.availableTables === 0 %}Fully booked{% endif %}
+                        {% if slot.availableTables === 1 %}1 table available{% endif %}
+                        {% if slot.availableTables > 1 %}{{ slot.availableTables }} tables available{% endif %}
+                    {% endset %}
                     {% set afternoonSlotsList = (afternoonSlotsList.push(
                         {
                             value: slot.id,
-                            html: "<p><strong>" + slot.startTime + " to " + slot.endTime + "</strong><br>" + slot.availableTables + " tables available</p>"
+                            html: "<p><strong>" + slot.startTime + " to " + slot.endTime + "</strong><br>" + tableText + "</p>"
                         }
                     ), afternoonSlotsList) %}
                 {% endfor %}
@@ -66,15 +76,19 @@
                         items: afternoonSlotsList
                     }) }}
                 {% endset %}
-                {% set morningSlotsAvailable = (day.slots.morning | length) %}
-                {% set afternoonSlotsAvailable = (day.slots.afternoon | length) %}
+                {% set slotsAvailable = (day.slots.morning | length) + (day.slots.afternoon | length) %}
+                {% set slotText %}
+                    {% if slotsAvailable === 0 %}Fully booked{% endif %}
+                    {% if slotsAvailable === 1 %}1 time slot{% endif %}
+                    {% if slotsAvailable > 1 %}{{ slotsAvailable }} time slots{% endif %}
+                {% endset %}
                 {% set accordion = (accordion.push(
                     {
                         heading: {
                             text: day.date
                         },
                         summary: {
-                            text: (morningSlotsAvailable + afternoonSlotsAvailable) + ' time slot(s)'
+                            text: slotText
                         },
                         content: {
                             html: morningHtml + afternoonHtml

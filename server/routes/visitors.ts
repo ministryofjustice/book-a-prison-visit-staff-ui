@@ -102,7 +102,7 @@ export default function routes(router: Router, prisonerVisitorsService: Prisoner
                 id: 'a',
                 startTime: 'a',
                 endTime: 'b',
-                availableTables: 3,
+                availableTables: 1,
               },
             ],
             afternoon: [
@@ -132,6 +132,12 @@ export default function routes(router: Router, prisonerVisitorsService: Prisoner
                 startTime: 'a',
                 endTime: 'b',
                 availableTables: 3,
+              },
+              {
+                id: 'd1',
+                startTime: 'a',
+                endTime: 'b',
+                availableTables: 0,
               },
             ],
           },
