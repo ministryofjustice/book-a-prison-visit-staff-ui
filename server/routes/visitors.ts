@@ -4,10 +4,15 @@ import { body, param, validationResult } from 'express-validator'
 import { VisitorListItem } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
+import VisitSessionsService from '../services/visitSessionsService'
 import isValidPrisonerNumber from './prisonerProfileValidation'
 // @TODO move validation now it's shared?
 
-export default function routes(router: Router, prisonerVisitorsService: PrisonerVisitorsService): Router {
+export default function routes(
+  router: Router,
+  prisonerVisitorsService: PrisonerVisitorsService,
+  visitSessionsService: VisitSessionsService
+): Router {
   const get = (path: string, handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
 
   get('/select-visitors/:offenderNo', async (req, res) => {
@@ -91,103 +96,7 @@ export default function routes(router: Router, prisonerVisitorsService: Prisoner
       throw new BadRequest()
     }
 
-    // const prisonerVisitors = await prisonerVisitorsService.getVisitors(offenderNo, res.locals.user?.username)
-    const slotsList = {
-      'February 2022': [
-        {
-          date: 'Monday 7 February',
-          slots: {
-            morning: [
-              {
-                id: 'a',
-                startTime: 'a',
-                endTime: 'b',
-                availableTables: 1,
-              },
-            ],
-            afternoon: [
-              {
-                id: 'b',
-                startTime: 'a',
-                endTime: 'b',
-                availableTables: 3,
-              },
-            ],
-          },
-        },
-        {
-          date: 'Tuesday 8 February',
-          slots: {
-            morning: [
-              {
-                id: 'c',
-                startTime: 'a',
-                endTime: 'b',
-                availableTables: 3,
-              },
-            ],
-            afternoon: [
-              {
-                id: 'd',
-                startTime: 'a',
-                endTime: 'b',
-                availableTables: 3,
-              },
-              {
-                id: 'd1',
-                startTime: 'a',
-                endTime: 'b',
-                availableTables: 0,
-              },
-            ],
-          },
-        },
-      ],
-      'March 2022': [
-        {
-          date: 'Monday 7 March',
-          slots: {
-            morning: [
-              {
-                id: 'e',
-                startTime: 'a',
-                endTime: 'b',
-                availableTables: 3,
-              },
-            ],
-            afternoon: [
-              {
-                id: 'f',
-                startTime: 'a',
-                endTime: 'b',
-                availableTables: 3,
-              },
-            ],
-          },
-        },
-        {
-          date: 'Tuesday 8 March',
-          slots: {
-            morning: [
-              {
-                id: 'g',
-                startTime: 'a',
-                endTime: 'b',
-                availableTables: 3,
-              },
-            ],
-            afternoon: [
-              {
-                id: 'h',
-                startTime: 'a',
-                endTime: 'b',
-                availableTables: 3,
-              },
-            ],
-          },
-        },
-      ],
-    }
+    const slotsList = await visitSessionsService.getVisitSessions(res.locals.user?.username)
 
     res.render('pages/dateAndTime', {
       offenderNo,

@@ -25,7 +25,7 @@ class MockPrisonerVisitorsService extends PrisonerVisitorsService {
 beforeEach(() => {
   systemToken = async (user: string): Promise<string> => `${user}-token-1`
   prisonerVisitorsService = new MockPrisonerVisitorsService()
-  app = appWithAllRoutes(null, null, prisonerVisitorsService, systemToken)
+  app = appWithAllRoutes(null, null, prisonerVisitorsService, null, systemToken)
 })
 
 afterEach(() => {
