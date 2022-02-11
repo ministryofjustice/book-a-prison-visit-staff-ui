@@ -24,7 +24,11 @@
 
         <p><strong>Visit type:</strong> Open</p>
 
+        {% if slotsList | length %}
         <p>Showing visit time slots for the next 28 days.</p>
+        {% else %}
+        <p>There are no visit time slots for the next 28 days.</p>
+        {% endif %}
 
         {% for month, days in slotsList %}
             <h2 class="govuk-heading-m">{{ month }}</h2>
@@ -91,7 +95,7 @@
                         text: slotText
                     },
                     content: {
-                        html: morningHtml + afternoonHtml
+                        html: (morningHtml if morningSlotsList | length) + (afternoonHtml if afternoonSlotsList | length)
                     }
                 }), accordion) %}
             {% endfor %}
