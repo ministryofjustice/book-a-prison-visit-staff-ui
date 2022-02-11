@@ -15,97 +15,97 @@
 
 {% block content %}
 <div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
-        {% include "../partials/errorSummary.njk" %}
+  <div class="govuk-grid-column-full">
+    {% include "../partials/errorSummary.njk" %}
 
-        <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+    <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
 
-        <p><strong>Prisoner name:</strong> {{ prisonerName }}</p>
+    <p><strong>Prisoner name:</strong> {{ prisonerName }}</p>
 
-        <p><strong>Visit type:</strong> Open</p>
+    <p><strong>Visit type:</strong> Open</p>
 
-        {% if slotsList | length %}
-        <p>Showing visit time slots for the next 28 days.</p>
-        {% else %}
-        <p>There are no visit time slots for the next 28 days.</p>
-        {% endif %}
+    {% if slotsList | length %}
+    <p>Showing visit time slots for the next 28 days.</p>
+    {% else %}
+    <p>There are no visit time slots for the next 28 days.</p>
+    {% endif %}
 
-        {% for month, days in slotsList %}
-            <h2 class="govuk-heading-m">{{ month }}</h2>
-            {% set accordion = [] %}
+    {% for month, days in slotsList %}
+      <h2 class="govuk-heading-m">{{ month }}</h2>
+      {% set accordion = [] %}
 
-            {% for day in days %}
-                {% set morningSlotsList = [] %}
-                {% for slot in day.slots.morning %}
-                    {% set tableText %}
-                        {% if slot.availableTables === 0 %}Fully booked{% endif %}
-                        {% if slot.availableTables === 1 %}1 table available{% endif %}
-                        {% if slot.availableTables > 1 %}{{ slot.availableTables }} tables available{% endif %}
-                    {% endset %}
-                    {% set morningSlotsList = (morningSlotsList.push({
-                        value: slot.id,
-                        html: '<p class="bapv-radio-paragraph"><strong>' + slot.startTime + " to " + slot.endTime + "</strong><br>" + tableText + "</p>",
-                        id: slot.id
-                    }), morningSlotsList) %}
-                {% endfor %}
-
-                {% set morningHtml %}
-                    <h3 class="govuk-heading-s">Morning</h3>
-                    {{ govukRadios({
-                        name: "visit-date-and-time",
-                        items: morningSlotsList
-                    }) }}
-                {% endset %}
-
-                {% set afternoonSlotsList = [] %}
-                {% for slot in day.slots.afternoon %}
-                    {% set tableText %}
-                        {% if slot.availableTables === 0 %}Fully booked{% endif %}
-                        {% if slot.availableTables === 1 %}1 table available{% endif %}
-                        {% if slot.availableTables > 1 %}{{ slot.availableTables }} tables available{% endif %}
-                    {% endset %}
-
-                    {% set afternoonSlotsList = (afternoonSlotsList.push({
-                        value: slot.id,
-                        html: '<p class="bapv-radio-paragraph"><strong>' + slot.startTime + " to " + slot.endTime + "</strong><br>" + tableText + "</p>",
-                        id: slot.id
-                    }), afternoonSlotsList) %}
-                {% endfor %}
-
-                {% set afternoonHtml %}
-                    <h3 class="govuk-heading-s">Afternoon</h3>
-                    {{ govukRadios({
-                        name: "visit-date-and-time",
-                        items: afternoonSlotsList
-                    }) }}
-                {% endset %}
-
-                {% set slotsAvailable = (day.slots.morning | length) + (day.slots.afternoon | length) %}
-                {% set slotText %}
-                    {% if slotsAvailable === 0 %}Fully booked{% endif %}
-                    {% if slotsAvailable === 1 %}1 time slot{% endif %}
-                    {% if slotsAvailable > 1 %}{{ slotsAvailable }} time slots{% endif %}
-                {% endset %}
-
-                {% set accordion = (accordion.push({
-                    heading: {
-                        text: day.date
-                    },
-                    summary: {
-                        text: slotText
-                    },
-                    content: {
-                        html: (morningHtml if morningSlotsList | length) + (afternoonHtml if afternoonSlotsList | length)
-                    }
-                }), accordion) %}
-            {% endfor %}
-
-            {{ govukAccordion({
-                id: "slots-month-" + (month | replace(" ", "")),
-                headingLevel: 3,
-                items: accordion
-            }) }}
+      {% for day in days %}
+        {% set morningSlotsList = [] %}
+        {% for slot in day.slots.morning %}
+          {% set tableText %}
+            {% if slot.availableTables === 0 %}Fully booked{% endif %}
+            {% if slot.availableTables === 1 %}1 table available{% endif %}
+            {% if slot.availableTables > 1 %}{{ slot.availableTables }} tables available{% endif %}
+          {% endset %}
+          {% set morningSlotsList = (morningSlotsList.push({
+            value: slot.id,
+            html: '<p class="bapv-radio-paragraph"><strong>' + slot.startTime + " to " + slot.endTime + "</strong><br>" + tableText + "</p>",
+            id: slot.id
+          }), morningSlotsList) %}
         {% endfor %}
-    </div>
+
+        {% set morningHtml %}
+          <h3 class="govuk-heading-s">Morning</h3>
+          {{ govukRadios({
+            name: "visit-date-and-time",
+            items: morningSlotsList
+          }) }}
+        {% endset %}
+
+        {% set afternoonSlotsList = [] %}
+        {% for slot in day.slots.afternoon %}
+          {% set tableText %}
+            {% if slot.availableTables === 0 %}Fully booked{% endif %}
+            {% if slot.availableTables === 1 %}1 table available{% endif %}
+            {% if slot.availableTables > 1 %}{{ slot.availableTables }} tables available{% endif %}
+          {% endset %}
+
+          {% set afternoonSlotsList = (afternoonSlotsList.push({
+            value: slot.id,
+            html: '<p class="bapv-radio-paragraph"><strong>' + slot.startTime + " to " + slot.endTime + "</strong><br>" + tableText + "</p>",
+            id: slot.id
+          }), afternoonSlotsList) %}
+        {% endfor %}
+
+        {% set afternoonHtml %}
+          <h3 class="govuk-heading-s">Afternoon</h3>
+          {{ govukRadios({
+            name: "visit-date-and-time",
+            items: afternoonSlotsList
+          }) }}
+        {% endset %}
+
+        {% set slotsAvailable = (day.slots.morning | length) + (day.slots.afternoon | length) %}
+        {% set slotText %}
+          {% if slotsAvailable === 0 %}Fully booked{% endif %}
+          {% if slotsAvailable === 1 %}1 time slot{% endif %}
+          {% if slotsAvailable > 1 %}{{ slotsAvailable }} time slots{% endif %}
+        {% endset %}
+
+        {% set accordion = (accordion.push({
+          heading: {
+            text: day.date
+          },
+          summary: {
+            text: slotText
+          },
+          content: {
+            html: (morningHtml if morningSlotsList | length) + (afternoonHtml if afternoonSlotsList | length)
+          }
+        }), accordion) %}
+      {% endfor %}
+
+      {{ govukAccordion({
+        id: "slots-month-" + (month | replace(" ", "")),
+        headingLevel: 3,
+        items: accordion
+      }) }}
+    {% endfor %}
+  </div>
 </div>
 {% endblock %}
