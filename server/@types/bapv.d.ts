@@ -143,3 +143,23 @@ export type Contact = {
   addresses: Address[]
   commentText: string
 }
+
+// Visit slots, for representing data derived from VisitSessions
+export type VisitSlot = {
+  id: string
+  startTime: string
+  endTime: string
+  availableTables: number
+}
+
+export type VisitSlotsForDay = {
+  date: string
+  slots: {
+    morning: VisitSlot[]
+    afternoon: VisitSlot[]
+  }
+}
+
+export type VisitSlotList = {
+  [key: string]: VisitSlotsForDay[] // keyed on month value, e.g. 'February 2022'
+}

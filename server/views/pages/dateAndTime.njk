@@ -1,0 +1,111 @@
+{% extends "../partials/layout.njk" %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/breadcrumbs/macro.njk" import govukBreadcrumbs %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/accordion/macro.njk" import govukAccordion %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+
+{% set pageHeaderTitle = "Select date and time of visit" %}
+{% set pageTitle %}
+{% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
+{% endset %}
+{% set backLinkHref = "/visit/select-visitors/" + offenderNo %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+    {% include "../partials/errorSummary.njk" %}
+
+    <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+
+    <p><strong>Prisoner name:</strong> {{ prisonerName }}</p>
+
+    <p><strong>Visit type:</strong> Open</p>
+
+    {% if slotsList | length %}
+    <p>Showing visit time slots for the next 28 days.</p>
+    {% else %}
+    <p>There are no visit time slots for the next 28 days.</p>
+    {% endif %}
+
+    {% for month, days in slotsList %}
+      <h2 class="govuk-heading-m">{{ month }}</h2>
+      {% set accordion = [] %}
+
+      {% for day in days %}
+        {% set morningSlotsList = [] %}
+        {% for slot in day.slots.morning %}
+          {% set tableText %}
+            {% if slot.availableTables === 0 %}Fully booked{% endif %}
+            {% if slot.availableTables === 1 %}1 table available{% endif %}
+            {% if slot.availableTables > 1 %}{{ slot.availableTables }} tables available{% endif %}
+          {% endset %}
+          {% set morningSlotsList = (morningSlotsList.push({
+            value: slot.id,
+            html: '<p class="bapv-radio-paragraph"><strong>' + slot.startTime + " to " + slot.endTime + "</strong><br>" + tableText + "</p>",
+            id: slot.id
+          }), morningSlotsList) %}
+        {% endfor %}
+
+        {% set morningHtml %}
+          <h3 class="govuk-heading-s">Morning</h3>
+          {{ govukRadios({
+            name: "visit-date-and-time",
+            items: morningSlotsList
+          }) }}
+        {% endset %}
+
+        {% set afternoonSlotsList = [] %}
+        {% for slot in day.slots.afternoon %}
+          {% set tableText %}
+            {% if slot.availableTables === 0 %}Fully booked{% endif %}
+            {% if slot.availableTables === 1 %}1 table available{% endif %}
+            {% if slot.availableTables > 1 %}{{ slot.availableTables }} tables available{% endif %}
+          {% endset %}
+
+          {% set afternoonSlotsList = (afternoonSlotsList.push({
+            value: slot.id,
+            html: '<p class="bapv-radio-paragraph"><strong>' + slot.startTime + " to " + slot.endTime + "</strong><br>" + tableText + "</p>",
+            id: slot.id
+          }), afternoonSlotsList) %}
+        {% endfor %}
+
+        {% set afternoonHtml %}
+          <h3 class="govuk-heading-s">Afternoon</h3>
+          {{ govukRadios({
+            name: "visit-date-and-time",
+            items: afternoonSlotsList
+          }) }}
+        {% endset %}
+
+        {% set slotsAvailable = (day.slots.morning | length) + (day.slots.afternoon | length) %}
+        {% set slotText %}
+          {% if slotsAvailable === 0 %}Fully booked{% endif %}
+          {% if slotsAvailable === 1 %}1 time slot{% endif %}
+          {% if slotsAvailable > 1 %}{{ slotsAvailable }} time slots{% endif %}
+        {% endset %}
+
+        {% set accordion = (accordion.push({
+          heading: {
+            text: day.date
+          },
+          summary: {
+            text: slotText
+          },
+          content: {
+            html: (morningHtml if morningSlotsList | length) + (afternoonHtml if afternoonSlotsList | length)
+          }
+        }), accordion) %}
+      {% endfor %}
+
+      {{ govukAccordion({
+        id: "slots-month-" + (month | replace(" ", "")),
+        headingLevel: 3,
+        items: accordion
+      }) }}
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

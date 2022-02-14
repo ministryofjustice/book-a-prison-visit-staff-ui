@@ -18,6 +18,7 @@ import { visitSchedulerApiClientBuilder } from '../../data/visitSchedulerApiClie
 import { prisonerContactRegistryApiClientBuilder } from '../../data/prisonerContactRegistryApiClient'
 import PrisonerProfileService from '../../services/prisonerProfileService'
 import PrisonerVisitorsService from '../../services/prisonerVisitorsService'
+import VisitSessionsService from '../../services/visitSessionsService'
 import * as auth from '../../authentication/auth'
 import systemToken from '../../data/authClient'
 import { SystemToken } from '../../@types/bapv'
@@ -47,6 +48,7 @@ function appSetup(
   prisonerSearchServiceOverride: PrisonerSearchService,
   prisonerProfileServiceOverride: PrisonerProfileService,
   prisonerVisitorsServiceOverride: PrisonerVisitorsService,
+  visitSessionsServiceOverride: VisitSessionsService,
   systemTokenOverride: SystemToken,
   production = false
 ): Express {
@@ -83,7 +85,12 @@ function appSetup(
   const prisonerVisitorsService =
     prisonerVisitorsServiceOverride ||
     new PrisonerVisitorsService(prisonApiClientBuilder, prisonerContactRegistryApiClientBuilder, systemTokenTest)
-  app.use('/select-visitors/', visitorsRoutes(standardRouter(new MockUserService()), prisonerVisitorsService))
+  const visitSessionsService =
+    visitSessionsServiceOverride || new VisitSessionsService(visitSchedulerApiClientBuilder, systemTokenTest)
+  app.use(
+    '/visit/',
+    visitorsRoutes(standardRouter(new MockUserService()), prisonerVisitorsService, visitSessionsService)
+  )
   app.use((req, res, next) => next(createError(404, 'Not found')))
   app.use(errorHandler(production))
 
@@ -94,6 +101,7 @@ export default function appWithAllRoutes(
   prisonerSearchServiceOverride?: PrisonerSearchService,
   prisonerProfileServiceOverride?: PrisonerProfileService,
   prisonerVisitorsServiceOverride?: PrisonerVisitorsService,
+  visitSessionsServiceOverride?: VisitSessionsService,
   systemTokenOverride?: SystemToken,
   production?: boolean
 ): Express {
@@ -102,6 +110,7 @@ export default function appWithAllRoutes(
     prisonerSearchServiceOverride,
     prisonerProfileServiceOverride,
     prisonerVisitorsServiceOverride,
+    visitSessionsServiceOverride,
     systemTokenOverride,
     production
   )

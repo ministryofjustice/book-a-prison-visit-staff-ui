@@ -26,6 +26,7 @@ import setUpHealthChecks from './middleware/setUpHealthChecks'
 import setUpWebRequestParsing from './middleware/setupRequestParsing'
 import authorisationMiddleware from './middleware/authorisationMiddleware'
 import PrisonerVisitorsService from './services/prisonerVisitorsService'
+import VisitSessionsService from './services/visitSessionsService'
 
 export default function createApp(userService: UserService): express.Application {
   const app = express()
@@ -61,10 +62,11 @@ export default function createApp(userService: UserService): express.Application
     )
   )
   app.use(
-    '/select-visitors',
+    '/visit/',
     visitorsRoutes(
       standardRouter(userService),
-      new PrisonerVisitorsService(prisonApiClientBuilder, prisonerContactRegistryApiClientBuilder, systemToken)
+      new PrisonerVisitorsService(prisonApiClientBuilder, prisonerContactRegistryApiClientBuilder, systemToken),
+      new VisitSessionsService(visitSchedulerApiClientBuilder, systemToken)
     )
   )
 

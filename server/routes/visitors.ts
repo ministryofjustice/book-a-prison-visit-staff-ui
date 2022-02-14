@@ -4,13 +4,18 @@ import { body, param, validationResult } from 'express-validator'
 import { VisitorListItem } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
+import VisitSessionsService from '../services/visitSessionsService'
 import isValidPrisonerNumber from './prisonerProfileValidation'
 // @TODO move validation now it's shared?
 
-export default function routes(router: Router, prisonerVisitorsService: PrisonerVisitorsService): Router {
+export default function routes(
+  router: Router,
+  prisonerVisitorsService: PrisonerVisitorsService,
+  visitSessionsService: VisitSessionsService
+): Router {
   const get = (path: string, handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
 
-  get('/:offenderNo', async (req, res) => {
+  get('/select-visitors/:offenderNo', async (req, res) => {
     const { offenderNo } = req.params
 
     if (!isValidPrisonerNumber(offenderNo)) {
@@ -22,11 +27,11 @@ export default function routes(router: Router, prisonerVisitorsService: Prisoner
     req.session.prisonerName = prisonerVisitors.prisonerName
     req.session.visitorList = prisonerVisitors.visitorList
 
-    res.render('pages/visitors', { ...prisonerVisitors, formUrl: req.originalUrl })
+    res.render('pages/visitors', { ...prisonerVisitors, offenderNo })
   })
 
   router.post(
-    '/:offenderNo',
+    '/select-visitors/:offenderNo',
     body('visitors').custom((value: string, { req }) => {
       const selected = [].concat(value)
 
@@ -71,7 +76,11 @@ export default function routes(router: Router, prisonerVisitorsService: Prisoner
     (req, res) => {
       const errors = validationResult(req)
 
-      res.render('pages/visitors', {
+      if (errors.isEmpty()) {
+        return res.redirect(`/visit/select-date-and-time/${req.params.offenderNo}`)
+      }
+
+      return res.render('pages/visitors', {
         errors: !errors.isEmpty() ? errors.array() : [],
         prisonerName: req.session.prisonerName,
         contacts: req.session.contacts,
@@ -79,6 +88,22 @@ export default function routes(router: Router, prisonerVisitorsService: Prisoner
       })
     }
   )
+
+  get('/select-date-and-time/:offenderNo', async (req, res) => {
+    const { offenderNo } = req.params
+
+    if (!isValidPrisonerNumber(offenderNo)) {
+      throw new BadRequest()
+    }
+
+    const slotsList = await visitSessionsService.getVisitSessions(res.locals.user?.username)
+
+    res.render('pages/dateAndTime', {
+      offenderNo,
+      prisonerName: req.session.prisonerName,
+      slotsList,
+    })
+  })
 
   return router
 }
