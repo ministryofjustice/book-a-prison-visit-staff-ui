@@ -116,6 +116,8 @@ export default function routes(
         offenderNo,
         prisonerName: req.session.prisonerName,
         slotsList,
+        timeOfDay,
+        dayOfTheWeek,
       })
     }
   )
