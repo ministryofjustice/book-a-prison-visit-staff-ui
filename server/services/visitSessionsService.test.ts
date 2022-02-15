@@ -207,5 +207,145 @@ describe('Visit sessions service', () => {
         ],
       })
     })
+
+    it('Should return a single result when filtering by time of day when single slot matches filter', async () => {
+      const sessions: VisitSession[] = [
+        {
+          sessionTemplateId: 100,
+          visitRoomName: 'A1',
+          visitType: 'STANDARD_SOCIAL',
+          visitTypeDescription: 'Standard Social',
+          prisonId: 'HEI',
+          openVisitCapacity: 15,
+          openVisitBookedCount: 0,
+          closedVisitCapacity: 10,
+          closedVisitBookedCount: 0,
+          startTimestamp: '2022-02-14T10:00:00',
+          endTimestamp: '2022-02-14T11:00:00',
+        },
+      ]
+
+      visitSchedulerApiClient.getVisitSessions.mockResolvedValue(sessions)
+      const results = await visitSessionsService.getVisitSessions({ username: 'user', timeOfDay: 'morning' })
+
+      expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
+      expect(results).toEqual(<VisitSlotList>{
+        'February 2022': [
+          {
+            date: 'Monday 14 February',
+            slots: {
+              morning: [
+                {
+                  id: '1',
+                  startTime: '10am',
+                  endTime: '11am',
+                  availableTables: 15,
+                },
+              ],
+              afternoon: [],
+            },
+          },
+        ],
+      })
+    })
+
+    it("Should return no results when filtering by time of day when single slot doesn't match filter", async () => {
+      const sessions: VisitSession[] = [
+        {
+          sessionTemplateId: 100,
+          visitRoomName: 'A1',
+          visitType: 'STANDARD_SOCIAL',
+          visitTypeDescription: 'Standard Social',
+          prisonId: 'HEI',
+          openVisitCapacity: 15,
+          openVisitBookedCount: 0,
+          closedVisitCapacity: 10,
+          closedVisitBookedCount: 0,
+          startTimestamp: '2022-02-14T10:00:00',
+          endTimestamp: '2022-02-14T11:00:00',
+        },
+      ]
+
+      visitSchedulerApiClient.getVisitSessions.mockResolvedValue(sessions)
+      const results = await visitSessionsService.getVisitSessions({ username: 'user', timeOfDay: 'afternoon' })
+
+      expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
+      expect(results).toEqual(<VisitSlotList>{
+        'February 2022': [
+          {
+            date: 'Monday 14 February',
+            slots: {
+              morning: [],
+              afternoon: [],
+            },
+          },
+        ],
+      })
+    })
+
+    it('Should return a single result when filtering by day of the week when single slot matches filter', async () => {
+      const sessions: VisitSession[] = [
+        {
+          sessionTemplateId: 100,
+          visitRoomName: 'A1',
+          visitType: 'STANDARD_SOCIAL',
+          visitTypeDescription: 'Standard Social',
+          prisonId: 'HEI',
+          openVisitCapacity: 15,
+          openVisitBookedCount: 0,
+          closedVisitCapacity: 10,
+          closedVisitBookedCount: 0,
+          startTimestamp: '2022-02-14T10:00:00',
+          endTimestamp: '2022-02-14T11:00:00',
+        },
+      ]
+
+      visitSchedulerApiClient.getVisitSessions.mockResolvedValue(sessions)
+      const results = await visitSessionsService.getVisitSessions({ username: 'user', dayOfTheWeek: '1' })
+
+      expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
+      expect(results).toEqual(<VisitSlotList>{
+        'February 2022': [
+          {
+            date: 'Monday 14 February',
+            slots: {
+              morning: [
+                {
+                  id: '1',
+                  startTime: '10am',
+                  endTime: '11am',
+                  availableTables: 15,
+                },
+              ],
+              afternoon: [],
+            },
+          },
+        ],
+      })
+    })
+
+    it("Should return a no results when filtering by day of the week when single slot doesn't match filter", async () => {
+      const sessions: VisitSession[] = [
+        {
+          sessionTemplateId: 100,
+          visitRoomName: 'A1',
+          visitType: 'STANDARD_SOCIAL',
+          visitTypeDescription: 'Standard Social',
+          prisonId: 'HEI',
+          openVisitCapacity: 15,
+          openVisitBookedCount: 0,
+          closedVisitCapacity: 10,
+          closedVisitBookedCount: 0,
+          startTimestamp: '2022-02-14T10:00:00',
+          endTimestamp: '2022-02-14T11:00:00',
+        },
+      ]
+
+      visitSchedulerApiClient.getVisitSessions.mockResolvedValue(sessions)
+      const results = await visitSessionsService.getVisitSessions({ username: 'user', dayOfTheWeek: '2' })
+
+      expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
+      expect(results).toEqual(<VisitSlotList>{})
+    })
   })
 })
