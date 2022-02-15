@@ -25,7 +25,7 @@ describe('Visit sessions service', () => {
 
     it('Should return empty object if no visit sessions', async () => {
       visitSchedulerApiClient.getVisitSessions.mockResolvedValue([])
-      const results = await visitSessionsService.getVisitSessions('user')
+      const results = await visitSessionsService.getVisitSessions({ username: 'user' })
 
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
       expect(results).toEqual({})
@@ -49,7 +49,7 @@ describe('Visit sessions service', () => {
       ]
 
       visitSchedulerApiClient.getVisitSessions.mockResolvedValue(sessions)
-      const results = await visitSessionsService.getVisitSessions('user')
+      const results = await visitSessionsService.getVisitSessions({ username: 'user' })
 
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
       expect(results).toEqual(<VisitSlotList>{
@@ -142,7 +142,7 @@ describe('Visit sessions service', () => {
       ]
 
       visitSchedulerApiClient.getVisitSessions.mockResolvedValue(sessions)
-      const results = await visitSessionsService.getVisitSessions('user')
+      const results = await visitSessionsService.getVisitSessions({ username: 'user' })
 
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
       expect(results).toEqual(<VisitSlotList>{

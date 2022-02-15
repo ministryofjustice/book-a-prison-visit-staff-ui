@@ -1,6 +1,6 @@
 import type { RequestHandler, Router } from 'express'
 import { BadRequest } from 'http-errors'
-import { body, param, validationResult } from 'express-validator'
+import { body, param, validationResult, query } from 'express-validator'
 import { VisitorListItem } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
@@ -89,21 +89,36 @@ export default function routes(
     }
   )
 
-  get('/select-date-and-time/:offenderNo', async (req, res) => {
-    const { offenderNo } = req.params
+  router.get(
+    '/select-date-and-time/:offenderNo',
+    param('offenderNo').custom((value: string) => {
+      if (!isValidPrisonerNumber(value)) {
+        throw new Error('Invalid prisoner number supplied')
+      }
 
-    if (!isValidPrisonerNumber(offenderNo)) {
-      throw new BadRequest()
+      return value
+    }),
+    query('timeOfDay').custom((value: string) => (!['morning', 'afternoon'].includes(value) ? '' : value)),
+    query('dayOfTheWeek').custom((value: string) =>
+      parseInt(value, 10) >= 0 && parseInt(value, 10) <= 6 ? value : ''
+    ),
+    async (req, res) => {
+      const { offenderNo } = req.params
+      const { timeOfDay, dayOfTheWeek } = req.query
+
+      const slotsList = await visitSessionsService.getVisitSessions({
+        username: res.locals.user?.username,
+        timeOfDay,
+        dayOfTheWeek,
+      })
+
+      res.render('pages/dateAndTime', {
+        offenderNo,
+        prisonerName: req.session.prisonerName,
+        slotsList,
+      })
     }
-
-    const slotsList = await visitSessionsService.getVisitSessions(res.locals.user?.username)
-
-    res.render('pages/dateAndTime', {
-      offenderNo,
-      prisonerName: req.session.prisonerName,
-      slotsList,
-    })
-  })
+  )
 
   return router
 }
