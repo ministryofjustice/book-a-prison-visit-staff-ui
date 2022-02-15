@@ -6,6 +6,7 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/accordion/macro.njk" import govukAccordion %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
 
 {% set pageHeaderTitle = "Select date and time of visit" %}
 {% set pageTitle %}
@@ -26,10 +27,95 @@
 
     {% if slotsList | length %}
     <p>Showing visit time slots for the next 28 days.</p>
+    <form action="/visit/select-date-and-time/{{ offenderNo }}" method="GET" novalidate>
+      <div class="bapv-visit-date-time-filter">
+        <h3 class="govuk-heading-s">Filter time slots</h3>
+        <div class="govuk-button-group">
+          {{ govukSelect({
+            id: "timeOfDay",
+            name: "timeOfDay",
+            label: {
+              text: "Time of day"
+            },
+            items: [
+              {
+                value: "",
+                text: "Any"
+              },
+              {
+                value: "morning",
+                text: "Morning",
+                selected: timeOfDay == "morning"
+              },
+              {
+                value: "afternoon",
+                text: "Afternoon",
+                selected: timeOfDay == "afternoon"
+              }
+            ]
+          }) }}
+          {{ govukSelect({
+            id: "dayOfTheWeek",
+            name: "dayOfTheWeek",
+            label: {
+              text: "Day of the week"
+            },
+            items: [
+              {
+                value: "",
+                text: "All"
+              },
+              {
+                value: "1",
+                text: "Monday",
+                selected: dayOfTheWeek == "1"
+              },
+              {
+                value: "2",
+                text: "Tuesday",
+                selected: dayOfTheWeek == "2"
+              },
+              {
+                value: "3",
+                text: "Wednesday",
+                selected: dayOfTheWeek == "3"
+              },
+              {
+                value: "4",
+                text: "Thursday",
+                selected: dayOfTheWeek == "4"
+              },
+              {
+                value: "5",
+                text: "Friday",
+                selected: dayOfTheWeek == "5"
+              },
+              {
+                value: "6",
+                text: "Saturday",
+                selected: dayOfTheWeek == "6"
+              },
+              {
+                value: "0",
+                text: "Sunday",
+                selected: dayOfTheWeek == "0"
+              }
+            ]
+          }) }}
+      
+          {{ govukButton({
+            text: "Apply filters"
+          }) }} 
+        </div>
+      </div>
+    </form>
     {% else %}
     <p>There are no visit time slots for the next 28 days.</p>
     {% endif %}
 
+
+    <form action="/visit/select-date-and-time/{{ offenderNo }}" method="POST" novalidate>
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
     {% for month, days in slotsList %}
       <h2 class="govuk-heading-m">{{ month }}</h2>
       {% set accordion = [] %}
@@ -106,6 +192,11 @@
         items: accordion
       }) }}
     {% endfor %}
+    
+        {{ govukButton({
+          text: "Continue"
+        }) }} 
+    </form>
   </div>
 </div>
 {% endblock %}
