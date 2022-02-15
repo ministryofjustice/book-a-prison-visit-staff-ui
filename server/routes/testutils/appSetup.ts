@@ -1,7 +1,6 @@
 import express, { Express } from 'express'
 import cookieSession from 'cookie-session'
 import createError from 'http-errors'
-import path from 'path'
 
 import indexRoutes from '../index'
 import searchRoutes from '../search'
@@ -56,7 +55,7 @@ function appSetup(
 
   app.set('view engine', 'njk')
 
-  nunjucksSetup(app, path)
+  nunjucksSetup(app)
 
   app.use((req, res, next) => {
     res.locals = {}
