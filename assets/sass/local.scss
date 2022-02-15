@@ -3,7 +3,7 @@
 }
 
 .bapv-table_cell {
-  padding: 20px 20px 20px 0;
+  padding: govuk-spacing(4) govuk-spacing(4) govuk-spacing(4) 0;
 }
 
 .bapv-table_cell--nowrap {
@@ -11,18 +11,18 @@
 }
 
 .bapv-radio-paragraph {
-  margin-top: -10px;
+  margin-top: -govuk-spacing(2);
   margin-bottom: 0;
 }
 
 .govuk-accordion__section-heading-text-focus {
-  font-size: 19px;
+  @include govuk-font($size: 19);
 }
 
 .bapv-visit-date-time-filter {
-  padding: 20px 20px 0;
+  padding: govuk-spacing(4) govuk-spacing(4) 0;
   background-color: govuk-colour("light-grey");
-  margin-bottom: 20px;
+  margin-bottom: govuk-spacing(4);
 
   .govuk-button-group {
     align-items: flex-end;
@@ -34,6 +34,6 @@
   }
 
   .govuk-form-group {
-    margin-right: 30px;
+    margin-right: govuk-spacing(6);
   }
 }
