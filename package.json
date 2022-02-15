@@ -22,11 +22,11 @@
     "lint": "eslint . --cache --max-warnings 0",
     "lint-fix": "eslint . --fix",
     "typecheck": "tsc && tsc -p integration_tests",
-    "test": "jest -i",
+    "test": "jest -i --coverage",
     "security_audit": "npx audit-ci --config audit-ci.json",
     "int-test": "cypress run --config video=false",
     "int-test-ui": "cypress open",
-    "clean": "rm -rf dist build node_modules stylesheets"
+    "clean": "rm -rf dist build node_modules stylesheets coverage"
   },
   "engines": {
     "node": "^16",
