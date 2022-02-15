@@ -20,6 +20,20 @@
 }
 
 .bapv-visit-date-time-filter {
-  padding: 20px;
+  padding: 20px 20px 0;
   background-color: govuk-colour("light-grey");
+  margin-bottom: 20px;
+
+  .govuk-button-group {
+    align-items: flex-end;
+    margin-bottom: 0;
+
+    .govuk-button {
+      margin-bottom: 32px;
+    }
+  }
+
+  .govuk-form-group {
+    margin-right: 30px;
+  }
 }
