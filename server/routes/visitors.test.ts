@@ -139,7 +139,7 @@ describe('GET /visit/select-visitors/A1234BC', () => {
 })
 
 describe('POST /visit/select-visitors/A1234BC', () => {
-  beforeEach(() => {
+  beforeEach(done => {
     returnData = {
       prisonerName: 'John Smith',
       visitorList: [
@@ -201,33 +201,22 @@ describe('POST /visit/select-visitors/A1234BC', () => {
         expect(res.text).toContain('28 July 1986<br>(Adult)')
         expect(res.text).toContain('Sister')
         expect(res.text).toContain('123 The Street')
-        expect(res.text).toContain('visitor-restriction-badge--BAN">Banned</span> until 31 July 2022')
-        expect(res.text).toContain('Ban details')
-        expect(res.text).toContain('visitor-restriction-badge--RESTRICTED">Restricted</span> End date not entered')
-        expect(res.text).toContain('visitor-restriction-badge--CLOSED">Closed</span> End date not entered')
-        expect(res.text).toContain('visitor-restriction-badge--NONCON">Non-Contact Visit</span> End date not entered')
         expect(res.text).toMatch(/Bob Smith.|\s*?Not entered.|\s*?Brother.|\s*?1st listed address.|\s*?None/)
         expect(res.text).toMatch(/Anne Smith.|\s*?2 March 2018<br>(Child).|\s*?Not entered.|\s*?None/)
         expect(res.text).toMatch(/<button.|\s*?Continue.|\s*?<\/button>/)
       })
       .end((err, res) => {
+        if (err) return done(err)
         Cookies = res.headers['set-cookie'].map((r: string) => r.replace('; path=/; httponly', '')).join('; ')
+        return done()
       })
   })
 
-  it('should not show an error if an adult is selected', () => {
+  it('should redirect to the select date and time page if an adult is selected', () => {
     const req = request(app).post('/visit/select-visitors/A1234BC')
     req.cookies = Cookies
 
-    return req
-      .send('visitors=4322')
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        expect(res.text).not.toContain('Select no more than 3 visitors with a maximum of 2 adults')
-        expect(res.text).not.toContain('Select no more than 2 adults')
-        expect(res.text).not.toContain('No visitors selected')
-        expect(res.text).not.toContain('Add an adult to the visit')
-      })
+    return req.send('visitors=4322').expect(302).expect('location', '/visit/select-date-and-time/A1234BC')
   })
 
   it('should show an error if no visitors are selected', () => {

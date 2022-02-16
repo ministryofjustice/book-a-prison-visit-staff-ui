@@ -22,11 +22,11 @@
     "lint": "eslint . --cache --max-warnings 0",
     "lint-fix": "eslint . --fix",
     "typecheck": "tsc && tsc -p integration_tests",
-    "test": "jest -i",
+    "test": "jest -i --coverage",
     "security_audit": "npx audit-ci --config audit-ci.json",
     "int-test": "cypress run --config video=false",
     "int-test-ui": "cypress open",
-    "clean": "rm -rf dist build node_modules stylesheets"
+    "clean": "rm -rf dist build node_modules stylesheets coverage"
   },
   "engines": {
     "node": "^16",
@@ -135,6 +135,7 @@
     "@types/uuid": "^8.3.4",
     "@typescript-eslint/eslint-plugin": "^5.10.2",
     "@typescript-eslint/parser": "^5.10.2",
+    "cheerio": "^1.0.0-rc.10",
     "concurrently": "^7.0.0",
     "cypress": "^9.4.1",
     "cypress-multi-reporters": "^1.5.0",
