@@ -21,7 +21,7 @@
 
     <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
 
-    <p><strong>Prisoner name:</strong> {{ prisonerName }}</p>
+    <p data-test="prisoner-name"><strong>Prisoner name:</strong> {{ prisonerName }}</p>
 
     <p><strong>Visit type:</strong> Open</p>
 
@@ -117,7 +117,7 @@
     <form action="/visit/select-date-and-time/{{ offenderNo }}" method="POST" novalidate>
       <input type="hidden" name="_csrf" value="{{ csrfToken }}">
     {% for month, days in slotsList %}
-      <h2 class="govuk-heading-m">{{ month }}</h2>
+      <h2 class="govuk-heading-m" data-test="month">{{ month }}</h2>
       {% set accordion = [] %}
 
       {% for day in days %}
