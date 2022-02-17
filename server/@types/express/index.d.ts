@@ -1,4 +1,4 @@
-import { Contact, VisitorListItem } from '../bapv'
+import { VisitorListItem } from '../bapv'
 
 export default {}
 
@@ -8,7 +8,7 @@ declare module 'express-session' {
     returnTo: string
     nowInMinutes: number
     prisonerName: string
-    contacts: Contact[]
+    offenderNo: string
     visitorList: VisitorListItem[]
   }
 }
