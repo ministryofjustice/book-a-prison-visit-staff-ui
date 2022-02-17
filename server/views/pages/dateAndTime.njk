@@ -130,7 +130,8 @@
           {% endset %}
           {% set morningSlotsList = (morningSlotsList.push({
             value: slot.id,
-            html: '<p class="bapv-radio-paragraph"><strong>' + slot.startTime + " to " + slot.endTime + "</strong><br>" + tableText + "</p>",
+            html: '<p class="bapv-radio-paragraph"><strong>' + slot.startTimestamp | formatTime +
+              " to " + slot.endTimestamp | formatTime + "</strong><br>" + tableText + "</p>",
             id: slot.id
           }), morningSlotsList) %}
         {% endfor %}
@@ -153,7 +154,7 @@
 
           {% set afternoonSlotsList = (afternoonSlotsList.push({
             value: slot.id,
-            html: '<p class="bapv-radio-paragraph"><strong>' + slot.startTime + " to " + slot.endTime + "</strong><br>" + tableText + "</p>",
+            html: '<p class="bapv-radio-paragraph"><strong>' + slot.startTimestamp | formatTime + " to " + slot.endTimestamp | formatTime + "</strong><br>" + tableText + "</p>",
             id: slot.id
           }), afternoonSlotsList) %}
         {% endfor %}

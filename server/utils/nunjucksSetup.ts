@@ -55,6 +55,12 @@ export function registerNunjucks(app?: express.Express): Environment {
     return dateToFormat ? format(parseISO(dateToFormat), dateFormat) : null
   })
 
+  // format time with minutes only if not on the hour; e.g. 10am / 10:30am
+  njkEnv.addFilter('formatTime', (timeToFormat: string) => {
+    const time = parseISO(timeToFormat)
+    return format(time, 'h:mmaaa').replace(':00', '')
+  })
+
   // convert errors to format for GOV.UK error summary component
   njkEnv.addFilter('errorSummaryList', (errors = []) => {
     return Object.keys(errors).map(error => {

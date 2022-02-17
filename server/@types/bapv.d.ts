@@ -147,8 +147,8 @@ export type Contact = {
 // Visit slots, for representing data derived from VisitSessions
 export type VisitSlot = {
   id: string
-  startTime: string
-  endTime: string
+  startTimestamp: string
+  endTimestamp: string
   availableTables: number
 }
 
