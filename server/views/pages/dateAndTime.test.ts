@@ -111,5 +111,6 @@ describe('Views - Date and time of visit', () => {
     expect($('#slots-month-March2022-content-1 h3').eq(1).length).toBe(0) // no afternoon slots
     expect($('label[for="5"]').text()).toContain('9:30am to 10:30am')
     expect($('label[for="5"]').text()).toContain('Fully booked')
+    expect($('#5').attr('disabled')).toBe('disabled')
   })
 })

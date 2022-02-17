@@ -132,7 +132,8 @@
             value: slot.id,
             html: '<p class="bapv-radio-paragraph"><strong>' + slot.startTimestamp | formatTime +
               " to " + slot.endTimestamp | formatTime + "</strong><br>" + tableText + "</p>",
-            id: slot.id
+            id: slot.id,
+            disabled: slot.availableTables === 0
           }), morningSlotsList) %}
         {% endfor %}
 
@@ -155,7 +156,8 @@
           {% set afternoonSlotsList = (afternoonSlotsList.push({
             value: slot.id,
             html: '<p class="bapv-radio-paragraph"><strong>' + slot.startTimestamp | formatTime + " to " + slot.endTimestamp | formatTime + "</strong><br>" + tableText + "</p>",
-            id: slot.id
+            id: slot.id,
+            disabled: slot.availableTables === 0
           }), afternoonSlotsList) %}
         {% endfor %}
 
