@@ -35,22 +35,22 @@ describe('Views - Date and time of visit', () => {
               morning: [
                 {
                   id: '1',
-                  startTime: '10am',
-                  endTime: '11am',
+                  startTimestamp: '2022-02-14T10:00:00',
+                  endTimestamp: '2022-02-14T11:00:00',
                   availableTables: 15,
                 },
                 {
                   id: '2',
-                  startTime: '11:59am',
-                  endTime: '12:59pm',
+                  startTimestamp: '2022-02-14T11:59:00',
+                  endTimestamp: '2022-02-14T12:59:00',
                   availableTables: 1,
                 },
               ],
               afternoon: [
                 {
                   id: '3',
-                  startTime: '12pm',
-                  endTime: '1:05pm',
+                  startTimestamp: '2022-02-14T12:00:00',
+                  endTimestamp: '2022-02-14T13:05:00',
                   availableTables: 5,
                 },
               ],
@@ -63,8 +63,8 @@ describe('Views - Date and time of visit', () => {
               afternoon: [
                 {
                   id: '4',
-                  startTime: '4pm',
-                  endTime: '5pm',
+                  startTimestamp: '2022-02-15T16:00:00',
+                  endTimestamp: '2022-02-15T17:00:00',
                   availableTables: 12,
                 },
               ],
@@ -78,8 +78,8 @@ describe('Views - Date and time of visit', () => {
               morning: [
                 {
                   id: '5',
-                  startTime: '9:30am',
-                  endTime: '10:30am',
+                  startTimestamp: '2022-03-01T09:30:00',
+                  endTimestamp: '2022-03-01T10:30:00',
                   availableTables: 0,
                 },
               ],

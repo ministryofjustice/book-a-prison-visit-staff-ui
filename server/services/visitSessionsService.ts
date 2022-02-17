@@ -27,7 +27,6 @@ export default class VisitSessionsService {
 
     return visitSessions.reduce((slotList: VisitSlotList, visitSession: VisitSession, slotIdCounter: number) => {
       const startTimestamp = parseISO(visitSession.startTimestamp)
-      const endTimestamp = parseISO(visitSession.endTimestamp)
       const startDayOfTheWeek = getDay(startTimestamp)
 
       if (dayOfTheWeek === '' || parseInt(dayOfTheWeek, 10) === startDayOfTheWeek) {
@@ -45,8 +44,8 @@ export default class VisitSessionsService {
 
         const newSlot: VisitSlot = {
           id: (slotIdCounter + 1).toString(),
-          startTime: this.getFormattedTime(startTimestamp),
-          endTime: this.getFormattedTime(endTimestamp),
+          startTimestamp: visitSession.startTimestamp,
+          endTimestamp: visitSession.endTimestamp,
           // @TODO this will need fixing to handle open/closed visits
           availableTables: visitSession.openVisitCapacity - visitSession.openVisitBookedCount,
         }
@@ -63,10 +62,5 @@ export default class VisitSessionsService {
 
       return slotList
     }, {})
-  }
-
-  // include minutes only if not on the hour; e.g. 10am / 10:30am
-  private getFormattedTime(time: Date): string {
-    return time.getMinutes() ? format(time, 'h:mmaaa') : format(time, 'haaa')
   }
 }

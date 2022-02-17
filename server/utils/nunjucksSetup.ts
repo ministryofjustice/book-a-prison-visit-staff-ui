@@ -51,8 +51,14 @@ export function registerNunjucks(app?: express.Express): Environment {
     return `${array[0][0]}. ${array.reverse()[0]}`
   })
 
-  njkEnv.addFilter('formatDate', (dateToFormat, dateFormat = 'd MMMM yyyy') => {
+  njkEnv.addFilter('formatDate', (dateToFormat: string, dateFormat = 'd MMMM yyyy') => {
+    if (typeof dateFormat !== 'string') return null
     return dateToFormat ? format(parseISO(dateToFormat), dateFormat) : null
+  })
+
+  // format time with minutes only if not on the hour; e.g. 10am / 10:30am
+  njkEnv.addFilter('formatTime', (timeToFormat: string) => {
+    return timeToFormat ? format(parseISO(timeToFormat), 'h:mmaaa').replace(':00', '') : null
   })
 
   // convert errors to format for GOV.UK error summary component
@@ -65,7 +71,7 @@ export function registerNunjucks(app?: express.Express): Environment {
     })
   })
 
-  // find specifc error and return errorMessage for field validation
+  // find specific error and return errorMessage for field validation
   njkEnv.addFilter('findError', (errors, formFieldId) => {
     if (!errors || !formFieldId) return null
     if (!errors[formFieldId]) return null
