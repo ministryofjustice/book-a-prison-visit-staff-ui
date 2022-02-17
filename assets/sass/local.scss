@@ -16,7 +16,7 @@
 }
 
 .govuk-accordion__section-heading-text-focus {
-  @include govuk-font($size: 19);
+  @include govuk-font($size: 19, $weight: "bold");
 }
 
 .bapv-visit-date-time-filter {
