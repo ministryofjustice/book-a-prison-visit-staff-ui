@@ -112,6 +112,7 @@ describe('GET /visit/select-visitors/A1234BC', () => {
         expect(res.text).toMatch(/Bob Smith.|\s*?Not entered.|\s*?Brother.|\s*?1st listed address.|\s*?None/)
         expect(res.text).toMatch(/Anne Smith.|\s*?2 March 2018<br>(Child).|\s*?Not entered.|\s*?None/)
         expect(res.text).toMatch(/<button.|\s*?Continue.|\s*?<\/button>/)
+        expect(res.text).toContain('<form action="/visit/select-visitors/A1234BC"')
       })
   })
 
@@ -204,6 +205,7 @@ describe('POST /visit/select-visitors/A1234BC', () => {
         expect(res.text).toMatch(/Bob Smith.|\s*?Not entered.|\s*?Brother.|\s*?1st listed address.|\s*?None/)
         expect(res.text).toMatch(/Anne Smith.|\s*?2 March 2018<br>(Child).|\s*?Not entered.|\s*?None/)
         expect(res.text).toMatch(/<button.|\s*?Continue.|\s*?<\/button>/)
+        expect(res.text).toContain('<form action="/visit/select-visitors/A1234BC"')
       })
       .end((err, res) => {
         if (err) return done(err)
@@ -228,6 +230,7 @@ describe('POST /visit/select-visitors/A1234BC', () => {
       expect(res.text).not.toContain('Select no more than 3 visitors with a maximum of 2 adults')
       expect(res.text).not.toContain('Select no more than 2 adults')
       expect(res.text).not.toContain('Add an adult to the visit')
+      expect(res.text).toContain('<form action="/visit/select-visitors/A1234BC"')
     })
   })
 

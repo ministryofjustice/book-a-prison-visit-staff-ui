@@ -25,6 +25,7 @@ export default function routes(
     const prisonerVisitors = await prisonerVisitorsService.getVisitors(offenderNo, res.locals.user?.username)
 
     req.session.prisonerName = prisonerVisitors.prisonerName
+    req.session.offenderNo = offenderNo
     req.session.visitorList = prisonerVisitors.visitorList
 
     res.render('pages/visitors', { ...prisonerVisitors, offenderNo })
@@ -83,7 +84,7 @@ export default function routes(
       return res.render('pages/visitors', {
         errors: !errors.isEmpty() ? errors.array() : [],
         prisonerName: req.session.prisonerName,
-        contacts: req.session.contacts,
+        offenderNo: req.session.offenderNo,
         visitorList: req.session.visitorList,
       })
     }
