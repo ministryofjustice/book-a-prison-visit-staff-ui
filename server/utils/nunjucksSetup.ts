@@ -39,6 +39,8 @@ export function registerNunjucks(app?: express.Express): Environment {
     {
       autoescape: true,
       express: app,
+      trimBlocks: true,
+      lstripBlocks: true,
     }
   )
 
