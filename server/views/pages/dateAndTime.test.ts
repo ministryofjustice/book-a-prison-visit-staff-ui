@@ -103,14 +103,6 @@ describe('Views - Date and time of visit', () => {
     expect($('label[for="2"]').text()).toContain('11:59am to 12:59pm')
     expect($('label[for="2"]').text()).toContain('1 table available')
     expect($('#slots-month-February2022-content-1 h3').eq(1).text()).toBe('Afternoon')
-    expect($('#slots-month-February2022-heading-2').text().trim()).toBe('Tuesday 15 February')
-
     expect($('[data-test="month"]').eq(1).text()).toBe('March 2022')
-    expect($('#slots-month-March2022-heading-1').text().trim()).toBe('Tuesday 1 March')
-    expect($('#slots-month-March2022-content-1 h3').eq(0).text()).toBe('Morning')
-    expect($('#slots-month-March2022-content-1 h3').eq(1).length).toBe(0) // no afternoon slots
-    expect($('label[for="5"]').text()).toContain('9:30am to 10:30am')
-    expect($('label[for="5"]').text()).toContain('Fully booked')
-    expect($('#5').attr('disabled')).toBe('disabled')
   })
 })

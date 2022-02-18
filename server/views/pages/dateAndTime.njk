@@ -176,6 +176,7 @@
           {% if slotsAvailable > 1 %}{{ slotsAvailable }} time slots{% endif %}
         {% endset %}
 
+        {% if (slotsAvailable > 1) %}
         {%- set accordion = (accordion.push({
           heading: {
             text: day.date
@@ -186,7 +187,9 @@
           content: {
             html: (morningHtml if morningSlotsList | length) + (afternoonHtml if afternoonSlotsList | length)
           }
-        }), accordion) %}
+        }), accordion)
+        %}
+        {% endif %}
       {% endfor %}
 
       {{- govukAccordion({
