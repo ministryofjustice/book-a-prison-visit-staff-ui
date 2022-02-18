@@ -176,7 +176,7 @@
           {% if slotsAvailable > 1 %}{{ slotsAvailable }} time slots{% endif %}
         {% endset %}
 
-        {% if (slotsAvailable > 1) %}
+        {% if (slotsAvailable > 0) %}
         {%- set accordion = (accordion.push({
           heading: {
             text: day.date
