@@ -120,7 +120,7 @@
       <h2 class="govuk-heading-m" data-test="month">{{ month }}</h2>
       {% set accordion = [] %}
 
-      {% for day in days %}
+      {%- for day in days %}
         {% set morningSlotsList = [] %}
         {% for slot in day.slots.morning %}
           {% set tableText %}
@@ -137,13 +137,13 @@
           }), morningSlotsList) %}
         {% endfor %}
 
-        {% set morningHtml %}
+        {%- set morningHtml %}
           <h3 class="govuk-heading-s">Morning</h3>
           {{ govukRadios({
             name: "visit-date-and-time",
             items: morningSlotsList
           }) }}
-        {% endset %}
+        {% endset -%}
 
         {% set afternoonSlotsList = [] %}
         {% for slot in day.slots.afternoon %}
@@ -153,7 +153,7 @@
             {% if slot.availableTables > 1 %}{{ slot.availableTables }} tables available{% endif %}
           {% endset %}
 
-          {% set afternoonSlotsList = (afternoonSlotsList.push({
+          {%- set afternoonSlotsList = (afternoonSlotsList.push({
             value: slot.id,
             html: '<p class="bapv-radio-paragraph"><strong>' + slot.startTimestamp | formatTime + " to " + slot.endTimestamp | formatTime + "</strong><br>" + tableText + "</p>",
             id: slot.id,
@@ -161,13 +161,13 @@
           }), afternoonSlotsList) %}
         {% endfor %}
 
-        {% set afternoonHtml %}
+        {%- set afternoonHtml %}
           <h3 class="govuk-heading-s">Afternoon</h3>
           {{ govukRadios({
             name: "visit-date-and-time",
             items: afternoonSlotsList
           }) }}
-        {% endset %}
+        {% endset -%}
 
         {% set slotsAvailable = (day.slots.morning | length) + (day.slots.afternoon | length) %}
         {% set slotText %}
@@ -176,7 +176,7 @@
           {% if slotsAvailable > 1 %}{{ slotsAvailable }} time slots{% endif %}
         {% endset %}
 
-        {% set accordion = (accordion.push({
+        {%- set accordion = (accordion.push({
           heading: {
             text: day.date
           },
@@ -189,7 +189,7 @@
         }), accordion) %}
       {% endfor %}
 
-      {{ govukAccordion({
+      {{- govukAccordion({
         id: "slots-month-" + (month | replace(" ", "")),
         headingLevel: 3,
         items: accordion
