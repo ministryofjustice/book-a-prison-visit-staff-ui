@@ -13,14 +13,17 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
         {% include "partials/errorSummary.njk" %}
-        <form action="/visit/confirmation/{{ offenderNo }}" method="POST" novalidate>
+        <form action="/visit/select-main-contact/{{ offenderNo }}" method="POST" novalidate>
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
             {% set visitors = [] %}
 
             {% for visitor in adultVisitors %}
+                {% set itemValue = visitor.name | replace(" ", "_") %}
                 {% set visitors = (visitors.push(
                     {
-                        value: visitor.name | replace(" ", "_"),
-                        text: visitor.name + " (" + (visitor.relationshipDescription | lower) + " to prisoner)"
+                        value: itemValue,
+                        text: visitor.name + " (" + (visitor.relationshipDescription | lower) + " to prisoner)",
+                        checked: itemValue == contact
                     }
                 ), visitors) %}
             {% endfor %}
@@ -33,7 +36,8 @@
                     classes: "govuk-!-width-one-third",
                     label: {
                         text: "Name"
-                    }
+                    },
+                    value: someoneElseName
                 }) }}
             {% endset -%}
             
@@ -41,6 +45,7 @@
                 {
                     value: "someoneElse",
                     text: "Someone else",
+                    checked: contact == "someoneElse",
                     conditional: {
                         html: someoneElseHtml
                     }
@@ -71,7 +76,8 @@
                 },
                 classes: "govuk-!-width-one-third",
                 id: "phone-number",
-                name: "phone-number"
+                name: "phone-number",
+                value: phoneNumber
             }) }}
             {{ govukButton({
                 text: "Continue"

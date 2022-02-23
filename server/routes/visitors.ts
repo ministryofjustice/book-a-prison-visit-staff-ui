@@ -158,5 +158,55 @@ export default function routes(
     }
   )
 
+  router.post(
+    '/select-main-contact/:offenderNo',
+    body('contact').custom((value: string, { req }) => {
+      if (!value) {
+        throw new Error('No main contact selected')
+      }
+
+      if (value === 'someoneElse' && req.body.someoneElseName === '') {
+        throw new Error('Enter the name of the main contact')
+      }
+
+      return value
+    }),
+    body('phone-number').custom((value: string) => {
+      if (!value) {
+        throw new Error('Enter a phone number')
+      }
+
+      if (!/^(?:0|\+?44)(?:\d\s?){9,10}$/.test(value)) {
+        throw new Error('Enter a valid UK phone number, like 01632 960 001, 07700 900 982 or +44 808 157 0192')
+      }
+
+      return value
+    }),
+    param('offenderNo').custom((value: string) => {
+      if (!isValidPrisonerNumber(value)) {
+        throw new Error('Invalid prisoner number supplied')
+      }
+
+      return value
+    }),
+    async (req, res) => {
+      const { offenderNo } = req.params
+      const errors = validationResult(req)
+
+      if (!errors.isEmpty()) {
+        res.render('pages/mainContact', {
+          errors: !errors.isEmpty() ? errors.array() : [],
+          offenderNo,
+          adultVisitors: req.session.adultVisitors,
+          phoneNumber: req.body['phone-number'],
+          contact: req.body.contact,
+          someoneElseName: req.body.someoneElseName,
+        })
+      }
+
+      // return res.redirect(`/visit/confirmation/${req.params.offenderNo}`)
+    }
+  )
+
   return router
 }
