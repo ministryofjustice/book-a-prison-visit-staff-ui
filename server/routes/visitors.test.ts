@@ -195,18 +195,6 @@ describe('POST /visit/select-visitors/A1234BC', () => {
 
     request(app)
       .get('/visit/select-visitors/A1234BC')
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        expect(res.text).toContain('Prisoner name:</strong> John Smith</p>')
-        expect(res.text).toContain('id="visitor-4321"')
-        expect(res.text).toContain('28 July 1986<br>(Adult)')
-        expect(res.text).toContain('Sister')
-        expect(res.text).toContain('123 The Street')
-        expect(res.text).toMatch(/Bob Smith.|\s*?Not entered.|\s*?Brother.|\s*?1st listed address.|\s*?None/)
-        expect(res.text).toMatch(/Anne Smith.|\s*?2 March 2018<br>(Child).|\s*?Not entered.|\s*?None/)
-        expect(res.text).toMatch(/<button.|\s*?Continue.|\s*?<\/button>/)
-        expect(res.text).toContain('<form action="/visit/select-visitors/A1234BC"')
-      })
       .end((err, res) => {
         if (err) return done(err)
         Cookies = res.headers['set-cookie'].map((r: string) => r.replace('; path=/; httponly', '')).join('; ')
