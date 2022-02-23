@@ -4,15 +4,19 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% set pageHeaderTitle = "Who is the main contact for this booking?" %}
-{% set pageTitle = applicationName + " - " + pageHeaderTitle %}
+{% set pageTitle %}
+{% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
+{% endset %}
+{% set backLinkHref = "/visit/select-date-and-time/" + offenderNo %}
 
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
+        {% include "partials/errorSummary.njk" %}
         <form action="/visit/confirmation/{{ offenderNo }}" method="POST" novalidate>
             {% set visitors = [] %}
 
-            {% for visitor in visitorList %}
+            {% for visitor in adultVisitors %}
                 {% set visitors = (visitors.push(
                     {
                         value: visitor.name | replace(" ", "_"),

@@ -278,4 +278,14 @@ describe('POST /visit/select-visitors/A1234BC', () => {
         expect(res.text).not.toContain('Add an adult to the visit')
       })
   })
+
+  describe('GET /visit/select-main-contact/A1234BC', () => {
+    it('should show an error if invalid prisoner number supplied', () => {
+      const req = request(app).get('/visit/select-main-contact/123')
+
+      return req.expect('Content-Type', /html/).expect(res => {
+        expect(res.text).toContain('Invalid prisoner number supplied')
+      })
+    })
+  })
 })

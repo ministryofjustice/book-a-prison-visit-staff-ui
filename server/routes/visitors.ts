@@ -148,10 +148,12 @@ export default function routes(
     }),
     async (req, res) => {
       const { offenderNo } = req.params
+      const errors = validationResult(req)
 
       res.render('pages/mainContact', {
+        errors: !errors.isEmpty() ? errors.array() : [],
         offenderNo,
-        visitorList: req.session.adultVisitors,
+        adultVisitors: req.session.adultVisitors,
       })
     }
   )
