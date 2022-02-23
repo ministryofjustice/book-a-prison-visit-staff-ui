@@ -195,18 +195,6 @@ describe('POST /visit/select-visitors/A1234BC', () => {
 
     request(app)
       .get('/visit/select-visitors/A1234BC')
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        expect(res.text).toContain('Prisoner name:</strong> John Smith</p>')
-        expect(res.text).toContain('id="visitor-4321"')
-        expect(res.text).toContain('28 July 1986<br>(Adult)')
-        expect(res.text).toContain('Sister')
-        expect(res.text).toContain('123 The Street')
-        expect(res.text).toMatch(/Bob Smith.|\s*?Not entered.|\s*?Brother.|\s*?1st listed address.|\s*?None/)
-        expect(res.text).toMatch(/Anne Smith.|\s*?2 March 2018<br>(Child).|\s*?Not entered.|\s*?None/)
-        expect(res.text).toMatch(/<button.|\s*?Continue.|\s*?<\/button>/)
-        expect(res.text).toContain('<form action="/visit/select-visitors/A1234BC"')
-      })
       .end((err, res) => {
         if (err) return done(err)
         Cookies = res.headers['set-cookie'].map((r: string) => r.replace('; path=/; httponly', '')).join('; ')
@@ -277,5 +265,15 @@ describe('POST /visit/select-visitors/A1234BC', () => {
         expect(res.text).not.toContain('No visitors selected')
         expect(res.text).not.toContain('Add an adult to the visit')
       })
+  })
+
+  describe('GET /visit/select-main-contact/A1234BC', () => {
+    it('should show an error if invalid prisoner number supplied', () => {
+      const req = request(app).get('/visit/select-main-contact/123')
+
+      return req.expect('Content-Type', /html/).expect(res => {
+        expect(res.text).toContain('Invalid prisoner number supplied')
+      })
+    })
   })
 })

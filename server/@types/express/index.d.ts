@@ -10,6 +10,7 @@ declare module 'express-session' {
     prisonerName: string
     offenderNo: string
     visitorList: VisitorListItem[]
+    adultVisitors: VisitorListItem[]
   }
 }
 

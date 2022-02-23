@@ -163,3 +163,10 @@ export type VisitSlotsForDay = {
 export type VisitSlotList = {
   [key: string]: VisitSlotsForDay[] // keyed on month value, e.g. 'February 2022'
 }
+
+export type FormError = {
+  value: string
+  msg: string
+  param: string
+  location: string
+}

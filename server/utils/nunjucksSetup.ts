@@ -3,6 +3,7 @@ import nunjucks, { Environment } from 'nunjucks'
 import express from 'express'
 import { format, parseISO } from 'date-fns'
 import path from 'path'
+import { FormError } from '../@types/bapv'
 
 const production = process.env.NODE_ENV === 'production'
 
@@ -76,10 +77,12 @@ export function registerNunjucks(app?: express.Express): Environment {
   // find specific error and return errorMessage for field validation
   njkEnv.addFilter('findError', (errors, formFieldId) => {
     if (!errors || !formFieldId) return null
-    if (!errors[formFieldId]) return null
+    const errorForMessage = errors.find((error: FormError) => error.param === formFieldId)
+
+    if (errorForMessage === undefined) return null
 
     return {
-      text: errors[formFieldId].msg,
+      text: errorForMessage?.msg,
     }
   })
 

@@ -1,4 +1,11 @@
-import { convertToTitleCase, getPageLinks, isAdult } from './utils'
+import {
+  convertToTitleCase,
+  getPageLinks,
+  isAdult,
+  prisonerDateTimePretty,
+  properCaseFullName,
+  properCase,
+} from './utils'
 import getPageLinksTestData from './utils.testData'
 
 describe('Convert to title case', () => {
@@ -48,5 +55,35 @@ describe('Check if adult', () => {
   })
   it('Is a child - on given date', () => {
     expect(isAdult('2000-01-02', new Date(2018, 0, 1))).toEqual(false)
+  })
+})
+
+describe('prisonerDateTimePretty', () => {
+  it('2022-03-17T10:00:00', () => {
+    expect(prisonerDateTimePretty('2022-03-17T10:00:00')).toEqual('17 March 2022')
+  })
+})
+
+describe('properCaseFullName', () => {
+  it('my test data', () => {
+    expect(properCaseFullName('my test data')).toEqual('My Test Data')
+  })
+  it('single character', () => {
+    expect(properCaseFullName('s')).toEqual('S')
+  })
+  it('empty string', () => {
+    expect(properCaseFullName('')).toEqual('')
+  })
+})
+
+describe('properCase', () => {
+  it('my test data', () => {
+    expect(properCase('my test data')).toEqual('My test data')
+  })
+  it('single character', () => {
+    expect(properCase('s')).toEqual('S')
+  })
+  it('empty string', () => {
+    expect(properCase('')).toEqual('')
   })
 })
