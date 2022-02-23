@@ -194,7 +194,7 @@ export default function routes(
       const errors = validationResult(req)
 
       if (!errors.isEmpty()) {
-        res.render('pages/mainContact', {
+        return res.render('pages/mainContact', {
           errors: !errors.isEmpty() ? errors.array() : [],
           offenderNo,
           adultVisitors: req.session.adultVisitors,
@@ -204,7 +204,7 @@ export default function routes(
         })
       }
 
-      // return res.redirect(`/visit/confirmation/${req.params.offenderNo}`)
+      return res.redirect(`/visit/confirmation/${req.params.offenderNo}`)
     }
   )
 
