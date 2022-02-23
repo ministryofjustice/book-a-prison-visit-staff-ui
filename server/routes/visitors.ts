@@ -65,14 +65,14 @@ export default function routes(
         throw new Error('Select no more than 2 adults')
       }
 
-      return selected
+      return true
     }),
     param('offenderNo').custom((value: string) => {
       if (!isValidPrisonerNumber(value)) {
         throw new Error('Invalid prisoner number supplied')
       }
 
-      return value
+      return true
     }),
     (req, res) => {
       const errors = validationResult(req)
@@ -111,7 +111,7 @@ export default function routes(
         throw new Error('Invalid prisoner number supplied')
       }
 
-      return value
+      return true
     }),
     query('timeOfDay').custom((value: string) => (!['morning', 'afternoon'].includes(value) ? '' : value)),
     query('dayOfTheWeek').custom((value: string) =>
@@ -144,7 +144,7 @@ export default function routes(
         throw new Error('Invalid prisoner number supplied')
       }
 
-      return value
+      return true
     }),
     async (req, res) => {
       const { offenderNo } = req.params
@@ -160,18 +160,21 @@ export default function routes(
 
   router.post(
     '/select-main-contact/:offenderNo',
-    body('contact').custom((value: string, { req }) => {
+    body('contact').custom((value: string) => {
       if (!value) {
         throw new Error('No main contact selected')
       }
 
-      if (value === 'someoneElse' && req.body.someoneElseName === '') {
+      return true
+    }),
+    body('someoneElseName').custom((value: string, { req }) => {
+      if (value === '' && req.body.contact === 'someoneElse') {
         throw new Error('Enter the name of the main contact')
       }
 
-      return value
+      return true
     }),
-    body('phone-number').custom((value: string) => {
+    body('phoneNumber').custom((value: string) => {
       if (!value) {
         throw new Error('Enter a phone number')
       }
@@ -180,14 +183,14 @@ export default function routes(
         throw new Error('Enter a valid UK phone number, like 01632 960 001, 07700 900 982 or +44 808 157 0192')
       }
 
-      return value
+      return true
     }),
     param('offenderNo').custom((value: string) => {
       if (!isValidPrisonerNumber(value)) {
         throw new Error('Invalid prisoner number supplied')
       }
 
-      return value
+      return true
     }),
     async (req, res) => {
       const { offenderNo } = req.params
@@ -198,7 +201,7 @@ export default function routes(
           errors: !errors.isEmpty() ? errors.array() : [],
           offenderNo,
           adultVisitors: req.session.adultVisitors,
-          phoneNumber: req.body['phone-number'],
+          phoneNumber: req.body.phoneNumber,
           contact: req.body.contact,
           someoneElseName: req.body.someoneElseName,
         })

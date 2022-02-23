@@ -37,7 +37,8 @@
                     label: {
                         text: "Name"
                     },
-                    value: someoneElseName
+                    value: someoneElseName,
+                    errorMessage: errors | findError('someoneElseName')
                 }) }}
             {% endset -%}
             
@@ -62,7 +63,8 @@
                         classes: "govuk-fieldset__legend--l"
                     }
                 },
-                items: visitors
+                items: visitors,
+                errorMessage: errors | findError('contact')
             }) }}
 
             {{ govukInput({
@@ -75,9 +77,10 @@
                     text: "Phone number"
                 },
                 classes: "govuk-!-width-one-third",
-                id: "phone-number",
-                name: "phone-number",
-                value: phoneNumber
+                id: "phoneNumber",
+                name: "phoneNumber",
+                value: phoneNumber,
+                errorMessage: errors | findError('phoneNumber')
             }) }}
             {{ govukButton({
                 text: "Continue"
