@@ -77,16 +77,30 @@ export default function routes(
     (req, res) => {
       const errors = validationResult(req)
 
-      if (errors.isEmpty()) {
-        return res.redirect(`/visit/select-date-and-time/${req.params.offenderNo}`)
+      if (!errors.isEmpty()) {
+        return res.render('pages/visitors', {
+          errors: !errors.isEmpty() ? errors.array() : [],
+          prisonerName: req.session.prisonerName,
+          offenderNo: req.session.offenderNo,
+          visitorList: req.session.visitorList,
+        })
       }
 
-      return res.render('pages/visitors', {
-        errors: !errors.isEmpty() ? errors.array() : [],
-        prisonerName: req.session.prisonerName,
-        offenderNo: req.session.offenderNo,
-        visitorList: req.session.visitorList,
-      })
+      const selected = [].concat(req.body.visitors)
+
+      const adults = req.session.visitorList
+        .filter((visitor: VisitorListItem) => selected.includes(visitor.personId.toString()))
+        .reduce((adultVisitors: VisitorListItem[], visitor: VisitorListItem) => {
+          if (visitor.adult ?? true) {
+            adultVisitors.push(visitor)
+          }
+
+          return adultVisitors
+        }, [])
+
+      req.session.adultVisitors = adults
+
+      return res.redirect(`/visit/select-date-and-time/${req.params.offenderNo}`)
     }
   )
 
@@ -119,6 +133,25 @@ export default function routes(
         slotsList,
         timeOfDay,
         dayOfTheWeek,
+      })
+    }
+  )
+
+  router.get(
+    '/select-main-contact/:offenderNo',
+    param('offenderNo').custom((value: string) => {
+      if (!isValidPrisonerNumber(value)) {
+        throw new Error('Invalid prisoner number supplied')
+      }
+
+      return value
+    }),
+    async (req, res) => {
+      const { offenderNo } = req.params
+
+      res.render('pages/mainContact', {
+        offenderNo,
+        visitorList: req.session.adultVisitors,
       })
     }
   )

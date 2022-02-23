@@ -1,0 +1,78 @@
+{% extends "layout.njk" %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% set pageHeaderTitle = "Who is the main contact for this booking?" %}
+{% set pageTitle = applicationName + " - " + pageHeaderTitle %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <form action="/visit/confirmation/{{ offenderNo }}" method="POST" novalidate>
+            {% set visitors = [] %}
+
+            {% for visitor in visitorList %}
+                {% set visitors = (visitors.push(
+                    {
+                        value: visitor.name | replace(" ", "_"),
+                        text: visitor.name + " (" + (visitor.relationshipDescription | lower) + " to prisoner)"
+                    }
+                ), visitors) %}
+            {% endfor %}
+
+            {% set someoneElseHtml %}
+                {{ govukInput({
+                    id: "someoneElseName",
+                    name: "someoneElseName",
+                    type: "text",
+                    classes: "govuk-!-width-one-third",
+                    label: {
+                        text: "Name"
+                    }
+                }) }}
+            {% endset -%}
+            
+            {% set visitors = (visitors.push(
+                {
+                    value: "someoneElse",
+                    text: "Someone else",
+                    conditional: {
+                        html: someoneElseHtml
+                    }
+                }
+            ), visitors) %}
+
+            {{ govukRadios({
+                idPrefix: "contact",
+                name: "contact",
+                fieldset: {
+                    legend: {
+                        text: pageHeaderTitle,
+                        isPageHeading: true,
+                        classes: "govuk-fieldset__legend--l"
+                    }
+                },
+                items: visitors
+            }) }}
+
+            {{ govukInput({
+                label: {
+                    text: "What is their phone number?",
+                    classes: "govuk-label--m",
+                    isPageHeading: true
+                },
+                hint: {
+                    text: "Phone number"
+                },
+                classes: "govuk-!-width-one-third",
+                id: "phone-number",
+                name: "phone-number"
+            }) }}
+            {{ govukButton({
+                text: "Continue"
+            }) }} 
+        </form>
+    </div>
+  </div>
+{% endblock %}
