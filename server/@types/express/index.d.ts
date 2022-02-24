@@ -11,6 +11,9 @@ declare module 'express-session' {
     offenderNo: string
     visitorList: VisitorListItem[]
     adultVisitors: VisitorListItem[]
+    contact: string
+    phoneNumber: string
+    someoneElseName: string
   }
 }
 

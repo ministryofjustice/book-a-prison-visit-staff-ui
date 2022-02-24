@@ -207,6 +207,10 @@ export default function routes(
         })
       }
 
+      req.session.phoneNumber = req.body.phoneNumber
+      req.session.contact = req.body.contact
+      req.session.someoneElseName = req.body.someoneElseName
+
       return res.redirect(`/visit/confirmation/${req.params.offenderNo}`)
     }
   )
