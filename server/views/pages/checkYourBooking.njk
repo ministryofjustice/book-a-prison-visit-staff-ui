@@ -1,0 +1,208 @@
+{% extends "layout.njk" %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% set pageHeaderTitle = "Check the visit details before booking" %}
+{% set pageTitle %}
+{% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
+{% endset %}
+
+{% block content %}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        {% include "partials/errorSummary.njk" %}
+        <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+        <p>A reference number will be provided once the booking is confirmed.</p>
+    </div>
+</div>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <h2 class="govuk-heading-m">Prisoner details</h2>
+        {{ govukSummaryList({
+            rows: [
+                {
+                    key: {
+                        text: "Name"
+                    },
+                    value: {
+                        text: "Sarah Philips"
+                    }
+                },
+                {
+                    key: {
+                        text: "Prison number"
+                    },
+                    value: {
+                        text: "G2780GX"
+                    }
+                },
+                {
+                    key: {
+                        text: "Date of birth"
+                    },
+                    value: {
+                        text: "1 January 1970"
+                    }
+                },
+                {
+                    key: {
+                        text: "Location"
+                    },
+                    value: {
+                        text: "1-2-988 Hewell (HMP)"
+                    }
+                }
+            ]
+        }) }}
+    </div>
+</div>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-half">
+        <h2 class="govuk-heading-m">Visit details</h2>
+    </div>
+    <div class="govuk-grid-column-one-half bapv-change-details-link">
+        <a href="#" class="govuk-link">Change</a>
+    </div>
+</div>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        {{ govukSummaryList({
+            rows: [
+                {
+                    key: {
+                        text: "Date"
+                    },
+                    value: {
+                        text: "Thursday 13 November 2021"
+                    }
+                },
+                {
+                    key: {
+                        text: "Time"
+                    },
+                    value: {
+                        text: "9am to 10am"
+                    }
+                },
+                {
+                    key: {
+                        text: "Visit type"
+                    },
+                    value: {
+                        text: "Open"
+                    }
+                }
+            ]
+        }) }}
+    </div>
+</div>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-half">
+        <h2 class="govuk-heading-m">Visitor details</h2>
+    </div>
+    <div class="govuk-grid-column-one-half bapv-change-details-link">
+        <a href="#" class="govuk-link">Change</a>
+    </div>
+</div>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <h3 class="govuk-heading-m">Visitor 1</h3>
+        {{ govukSummaryList({
+            rows: [
+                {
+                    key: {
+                        text: "Name"
+                    },
+                    value: {
+                        text: "Sarah Philips (mother of the prisoner)"
+                    }
+                },
+                {
+                    key: {
+                        text: "Address"
+                    },
+                    value: {
+                        text: "1 Letsbe Avenue, Sheffield, S1 2QZ"
+                    }
+                }
+            ]
+        }) }}
+    </div>
+</div>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-half">
+        <h2 class="govuk-heading-m">Additional support</h2>
+    </div>
+    <div class="govuk-grid-column-one-half bapv-change-details-link">
+        <a href="#" class="govuk-link">Change</a>
+    </div>
+</div>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        {{ govukSummaryList({
+            rows: [
+                {
+                    key: {
+                        text: "Request 1"
+                    },
+                    value: {
+                        text: "Wheelchair access ramp"
+                    }
+                }
+            ]
+        }) }}
+    </div>
+</div>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-half">
+        <h2 class="govuk-heading-m">Contact details</h2>
+    </div>
+    <div class="govuk-grid-column-one-half bapv-change-details-link">
+        <a href="#" class="govuk-link">Change</a>
+    </div>
+</div>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        {{ govukSummaryList({
+            rows: [
+                {
+                    key: {
+                        text: "Main contact"
+                    },
+                    value: {
+                        text: "Sarah Philips (mother of the prisoner)"
+                    }
+                },
+                {
+                    key: {
+                        text: "Phone number"
+                    },
+                    value: {
+                        text: "07654 321321"
+                    }
+                }
+            ]
+        }) }}
+    </div>
+</div>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <form action="/visit/check-your-booking/{{ offenderNo }}" method="POST" novalidate>
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+            {{ govukButton({
+                text: "Submit booking"
+            }) }}
+        </form>
+    </div>
+</div>
+{% endblock %}
