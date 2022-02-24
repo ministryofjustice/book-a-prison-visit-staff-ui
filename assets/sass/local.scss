@@ -37,3 +37,8 @@
     margin-right: govuk-spacing(6);
   }
 }
+
+.bapv-change-details-link {
+  @include govuk-font($size: 19, $weight: 'normal');
+  text-align: right;
+}

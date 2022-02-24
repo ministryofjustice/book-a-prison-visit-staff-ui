@@ -215,5 +215,28 @@ export default function routes(
     }
   )
 
+  router.get(
+    '/check-your-booking/:offenderNo',
+    param('offenderNo').custom((value: string) => {
+      if (!isValidPrisonerNumber(value)) {
+        throw new Error('Invalid prisoner number supplied')
+      }
+
+      return true
+    }),
+    async (req, res) => {
+      const { offenderNo } = req.params
+      const errors = validationResult(req)
+
+      res.render('pages/checkYourBooking', {
+        errors: !errors.isEmpty() ? errors.array() : [],
+        offenderNo,
+        contactDetails: {
+          phoneNumber: req.session.phoneNumber,
+        },
+      })
+    }
+  )
+
   return router
 }
