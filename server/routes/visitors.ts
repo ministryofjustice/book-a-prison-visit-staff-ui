@@ -1,7 +1,7 @@
 import type { RequestHandler, Router } from 'express'
 import { BadRequest } from 'http-errors'
 import { body, param, validationResult, query } from 'express-validator'
-import { VisitorListItem } from '../@types/bapv'
+import { VisitorListItem, VisitSlot, VisitSlotList } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
 import VisitSessionsService from '../services/visitSessionsService'
@@ -113,8 +113,8 @@ export default function routes(
 
       return true
     }),
-    query('timeOfDay').custom((value: string) => (!['morning', 'afternoon'].includes(value) ? '' : value)),
-    query('dayOfTheWeek').custom((value: string) =>
+    query('timeOfDay').customSanitizer((value: string) => (!['morning', 'afternoon'].includes(value) ? '' : value)),
+    query('dayOfTheWeek').customSanitizer((value: string) =>
       parseInt(value, 10) >= 0 && parseInt(value, 10) <= 6 ? value : ''
     ),
     async (req, res) => {
@@ -127,6 +127,10 @@ export default function routes(
         dayOfTheWeek,
       })
 
+      req.session.slotsList = slotsList
+      req.session.timeOfDay = timeOfDay
+      req.session.dayOfTheWeek = dayOfTheWeek
+
       res.render('pages/dateAndTime', {
         offenderNo,
         prisonerName: req.session.prisonerName,
@@ -134,6 +138,50 @@ export default function routes(
         timeOfDay,
         dayOfTheWeek,
       })
+    }
+  )
+
+  router.post(
+    '/select-date-and-time/:offenderNo',
+    body('visit-date-and-time').custom((value: string, { req }) => {
+      const slotsList = req.session.slotsList as VisitSlotList
+
+      // check selected slot is in the list that was shown and has available tables
+      const selectedSlot: VisitSlot = Object.values(slotsList)
+        .flat()
+        .reduce((allSlots, slot) => {
+          return allSlots.concat(slot.slots.morning, slot.slots.afternoon)
+        }, [])
+        .find(slot => slot.id === value)
+
+      if (selectedSlot === undefined || selectedSlot.availableTables === 0) {
+        throw new Error('No time slot selected')
+      }
+
+      return true
+    }),
+    param('offenderNo').custom((value: string) => {
+      if (!isValidPrisonerNumber(value)) {
+        throw new Error('Invalid prisoner number supplied')
+      }
+
+      return true
+    }),
+    async (req, res) => {
+      const { offenderNo } = req.params
+      const errors = validationResult(req)
+
+      if (!errors.isEmpty()) {
+        return res.render('pages/dateAndTime', {
+          errors: !errors.isEmpty() ? errors.array() : [],
+          offenderNo,
+          prisonerName: req.session.prisonerName,
+          slotsList: req.session.slotsList,
+          timeOfDay: req.session.timeOfDay,
+          dayOfTheWeek: req.session.dayOfTheWeek,
+        })
+      }
+      return res.redirect(`/visit/additional-support/${req.params.offenderNo}`)
     }
   )
 
