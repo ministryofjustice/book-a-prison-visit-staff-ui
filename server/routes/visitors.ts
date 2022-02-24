@@ -186,6 +186,26 @@ export default function routes(
   )
 
   router.get(
+    '/additional-support/:offenderNo',
+    param('offenderNo').custom((value: string) => {
+      if (!isValidPrisonerNumber(value)) {
+        throw new Error('Invalid prisoner number supplied')
+      }
+
+      return true
+    }),
+    async (req, res) => {
+      const { offenderNo } = req.params
+      const errors = validationResult(req)
+
+      res.render('pages/additionalSupport', {
+        errors: !errors.isEmpty() ? errors.array() : [],
+        offenderNo,
+      })
+    }
+  )
+
+  router.get(
     '/select-main-contact/:offenderNo',
     param('offenderNo').custom((value: string) => {
       if (!isValidPrisonerNumber(value)) {

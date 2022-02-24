@@ -1,0 +1,108 @@
+{% extends "layout.njk" %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% set pageHeaderTitle = "Is additional support needed for any of the visitors?" %}
+{% set pageTitle %}
+{% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
+{% endset %}
+{% set backLinkHref = "/visit/select-date-and-time/" + offenderNo %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        {% include "partials/errorSummary.njk" %}
+        <form action="/visit/additional-support/{{ offenderNo }}" method="POST" novalidate>
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+            {% set otherSupportHtml %}
+              {{ govukInput({
+                id: "otherSupportDetails",
+                name: "otherSupportDetails",
+                type: "text",
+                classes: "govuk-!-width-one-third",
+                label: {
+                  text: "Provide details"
+                },
+                value: otherSupportName,
+                errorMessage: errors | findError('otherSupportDetails')
+              }) }}
+            {% endset -%}
+
+            {% set supportOptionsHtml %}
+              {{ govukCheckboxes({
+                idPrefix: "additionalSupport",
+                name: "additionalSupport",
+                fieldset: {
+                  legend: {
+                    text: "Select all that apply.",
+                    classes: ""
+                  }
+                },
+                items: [
+                  {
+                    value: "ramp",
+                    text: "Wheelchair ramp"
+                  },
+                  {
+                    value: "inductionLoop",
+                    text: "Portable induction loop for people with hearing aids"
+                  },
+                  {
+                    value: "bslInterpreter",
+                    text: "British Sign Language (BSL) Interpreter"
+                  },
+                  {
+                    value: "faceCoveringExemption",
+                    text: "Face covering exemption"
+                  },
+                  {
+                    value: "other",
+                    text: "Other",
+                    conditional: {
+                      html: otherSupportHtml
+                    }
+                  }
+                ],
+                errorMessage: errors | findError('additionalSupport')
+              }) }}
+            {% endset -%}
+
+            {{ govukRadios({
+              idPrefix: "additionalSupportRequired",
+              name: "additionalSupportRequired",
+              fieldset: {
+                legend: {
+                  text: pageHeaderTitle,
+                  isPageHeading: true,
+                  classes: "govuk-fieldset__legend--l"
+                }
+              },
+              hint: {
+                text: "For example, a wheelchair ramp, an induction loop or an interpreter."
+              },
+              items: [
+                {
+                  value: "yes",
+                  text: "Yes",
+                  conditional: {
+                    html: supportOptionsHtml
+                  }
+                },
+                {
+                  value: "no",
+                  text: "No"
+                }
+              ],
+              errorMessage: errors | findError('additionalSupportRequired')
+            }) }}
+            
+            {{ govukButton({
+              text: "Continue"
+            }) }} 
+        </form>
+    </div>
+  </div>
+{% endblock %}
