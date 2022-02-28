@@ -170,3 +170,24 @@ export type FormError = {
   param: string
   location: string
 }
+
+export type visitSessionData = {
+  prisoner: {
+    name: string
+    offenderNo: string
+    dateOfBirth: string
+    location: string
+  }
+  visit: {
+    id: number
+    dateStart: string
+    dateEnd: string
+    type: string
+  }
+  mainContact: {
+    name: string
+    relationship: string
+    phoneNumber: string
+    newContact: boolean
+  }
+}
