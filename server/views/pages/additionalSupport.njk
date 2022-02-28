@@ -26,11 +26,12 @@
                 label: {
                   text: "Provide details"
                 },
-                value: otherSupportName,
+                value: otherSupportDetails,
                 errorMessage: errors | findError('otherSupportDetails')
               }) }}
             {% endset -%}
 
+            {% set additionalSupport = additionalSupport or [] %}
             {% set supportOptionsHtml %}
               {{ govukCheckboxes({
                 idPrefix: "additionalSupport",
@@ -44,23 +45,28 @@
                 items: [
                   {
                     value: "ramp",
-                    text: "Wheelchair ramp"
+                    text: "Wheelchair ramp",
+                    checked: "ramp" in additionalSupport
                   },
                   {
                     value: "inductionLoop",
-                    text: "Portable induction loop for people with hearing aids"
+                    text: "Portable induction loop for people with hearing aids",
+                    checked: "inductionLoop" in additionalSupport
                   },
                   {
                     value: "bslInterpreter",
-                    text: "British Sign Language (BSL) Interpreter"
+                    text: "British Sign Language (BSL) Interpreter",
+                    checked: "bslInterpreter" in additionalSupport
                   },
                   {
                     value: "faceCoveringExemption",
-                    text: "Face covering exemption"
+                    text: "Face covering exemption",
+                    checked: "faceCoveringExemption" in additionalSupport
                   },
                   {
                     value: "other",
                     text: "Other",
+                    checked: "other" in additionalSupport,
                     conditional: {
                       html: otherSupportHtml
                     }
@@ -87,13 +93,15 @@
                 {
                   value: "yes",
                   text: "Yes",
+                  checked: additionalSupportRequired == "yes",
                   conditional: {
                     html: supportOptionsHtml
                   }
                 },
                 {
                   value: "no",
-                  text: "No"
+                  text: "No",
+                  checked: additionalSupportRequired == "no"
                 }
               ],
               errorMessage: errors | findError('additionalSupportRequired')

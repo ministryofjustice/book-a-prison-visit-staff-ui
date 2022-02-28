@@ -207,6 +207,36 @@ export default function routes(
 
   router.post(
     '/additional-support/:offenderNo',
+    body('additionalSupportRequired').custom((value: string) => {
+      if (!/^yes|no$/.test(value)) {
+        throw new Error('No answer selected')
+      }
+
+      return true
+    }),
+    body('additionalSupport')
+      .toArray()
+      .custom((value: string[], { req }) => {
+        if (req.body.additionalSupportRequired === 'yes') {
+          const validSupportRequest = value.reduce((valid, supportReq) => {
+            return valid
+              ? ['ramp', 'inductionLoop', 'bslInterpreter', 'faceCoveringExemption', 'other'].includes(supportReq)
+              : false
+          }, true)
+          if (!value.length || !validSupportRequest) throw new Error('No request selected')
+        }
+
+        return true
+      }),
+    body('otherSupportDetails')
+      .trim()
+      .custom((value: string, { req }) => {
+        if (<string[]>req.body.additionalSupport.includes('other') && (value ?? '').length === 0) {
+          throw new Error('Enter details of the request')
+        }
+
+        return true
+      }),
     param('offenderNo').custom((value: string) => {
       if (!isValidPrisonerNumber(value)) {
         throw new Error('Invalid prisoner number supplied')
@@ -222,6 +252,9 @@ export default function routes(
         return res.render('pages/additionalSupport', {
           errors: !errors.isEmpty() ? errors.array() : [],
           offenderNo,
+          additionalSupportRequired: req.body.additionalSupportRequired,
+          additionalSupport: req.body.additionalSupport,
+          otherSupportDetails: req.body.otherSupportDetails,
         })
       }
 
@@ -303,7 +336,7 @@ export default function routes(
       req.session.contact = req.body.contact
       req.session.someoneElseName = req.body.someoneElseName
 
-      return res.redirect(`/visit/confirmation/${req.params.offenderNo}`)
+      return res.redirect(`/visit/check-your-booking/${req.params.offenderNo}`)
     }
   )
 
