@@ -277,3 +277,116 @@ describe('POST /visit/select-visitors/A1234BC', () => {
     })
   })
 })
+
+describe('POST /visit/additional-support/:offenderNo', () => {
+  it('should show error if additional support question not answered', () => {
+    const req = request(app).post('/visit/additional-support/A1234BC')
+
+    return req.expect('Content-Type', /html/).expect(res => {
+      expect(res.text).toContain('No answer selected')
+    })
+  })
+
+  it('should show error if invalid data supplied', () => {
+    const req = request(app).post('/visit/additional-support/A1234BC')
+
+    return req
+      .send('additionalSupportRequired=xyz')
+      .send('additionalSupport=ramp')
+      .send('additionalSupport=xyz')
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        expect(res.text).toContain('No answer selected')
+      })
+  })
+
+  it('should redirect to the select main contact page if no additional support selected', () => {
+    const req = request(app).post('/visit/additional-support/A1234BC')
+
+    return req.send('additionalSupportRequired=no').expect(302).expect('location', '/visit/select-main-contact/A1234BC')
+  })
+
+  it('should show error if additional support selected but no request selected', () => {
+    const req = request(app).post('/visit/additional-support/A1234BC')
+
+    return req
+      .send('additionalSupportRequired=yes')
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        expect(res.text).toContain('No request selected')
+      })
+  })
+
+  it('should show error if additional support selected but invalid request selected', () => {
+    const req = request(app).post('/visit/additional-support/A1234BC')
+
+    return req
+      .send('additionalSupportRequired=yes')
+      .send('additionalSupport=xyz')
+      .send('additionalSupport=ramp')
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        expect(res.text).toContain('No request selected')
+      })
+  })
+
+  it('should redirect to the select main contact page when a single request selected', () => {
+    const req = request(app).post('/visit/additional-support/A1234BC')
+
+    return req
+      .send('additionalSupportRequired=yes')
+      .send('additionalSupport=ramp')
+      .expect(302)
+      .expect('location', '/visit/select-main-contact/A1234BC')
+  })
+
+  it('should redirect to the select main contact page when multiple requests selected', () => {
+    const req = request(app).post('/visit/additional-support/A1234BC')
+
+    return req
+      .send('additionalSupportRequired=yes')
+      .send('additionalSupport=ramp')
+      .send('additionalSupport=inductionLoop')
+      .send('additionalSupport=bslInterpreter')
+      .send('additionalSupport=faceCoveringExemption')
+      .expect(302)
+      .expect('location', '/visit/select-main-contact/A1234BC')
+  })
+
+  it('should show error if other support requested but not specified', () => {
+    const req = request(app).post('/visit/additional-support/A1234BC')
+
+    return req
+      .send('additionalSupportRequired=yes')
+      .send('additionalSupport=other')
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        expect(res.text).toContain('Enter details of the request')
+      })
+  })
+
+  it('should show error if multiple support requests but other not specified', () => {
+    const req = request(app).post('/visit/additional-support/A1234BC')
+
+    return req
+      .send('additionalSupportRequired=yes')
+      .send('additionalSupport=ramp')
+      .send('additionalSupport=other')
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        expect(res.text).toContain('Enter details of the request')
+      })
+  })
+
+  it('should redirect to the select main contact page if additional and other support requests made', () => {
+    const req = request(app).post('/visit/additional-support/A1234BC')
+
+    return req
+      .send('additionalSupportRequired=yes')
+      .send('additionalSupport=ramp')
+      .send('additionalSupport=other')
+      .send('otherSupportDetails=additional-request-details')
+      .expect(302)
+      .expect('location', '/visit/select-main-contact/A1234BC')
+  })
+})

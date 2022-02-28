@@ -1,7 +1,7 @@
 import type { RequestHandler, Router } from 'express'
 import { BadRequest } from 'http-errors'
 import { body, param, validationResult, query } from 'express-validator'
-import { VisitorListItem } from '../@types/bapv'
+import { VisitorListItem, VisitSlot, VisitSlotList } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
 import VisitSessionsService from '../services/visitSessionsService'
@@ -113,8 +113,8 @@ export default function routes(
 
       return true
     }),
-    query('timeOfDay').custom((value: string) => (!['morning', 'afternoon'].includes(value) ? '' : value)),
-    query('dayOfTheWeek').custom((value: string) =>
+    query('timeOfDay').customSanitizer((value: string) => (!['morning', 'afternoon'].includes(value) ? '' : value)),
+    query('dayOfTheWeek').customSanitizer((value: string) =>
       parseInt(value, 10) >= 0 && parseInt(value, 10) <= 6 ? value : ''
     ),
     async (req, res) => {
@@ -127,6 +127,10 @@ export default function routes(
         dayOfTheWeek,
       })
 
+      req.session.slotsList = slotsList
+      req.session.timeOfDay = timeOfDay
+      req.session.dayOfTheWeek = dayOfTheWeek
+
       res.render('pages/dateAndTime', {
         offenderNo,
         prisonerName: req.session.prisonerName,
@@ -134,6 +138,127 @@ export default function routes(
         timeOfDay,
         dayOfTheWeek,
       })
+    }
+  )
+
+  router.post(
+    '/select-date-and-time/:offenderNo',
+    body('visit-date-and-time').custom((value: string, { req }) => {
+      const slotsList = req.session.slotsList as VisitSlotList
+
+      // check selected slot is in the list that was shown and has available tables
+      const selectedSlot: VisitSlot = Object.values(slotsList)
+        .flat()
+        .reduce((allSlots, slot) => {
+          return allSlots.concat(slot.slots.morning, slot.slots.afternoon)
+        }, [])
+        .find(slot => slot.id === value)
+
+      if (selectedSlot === undefined || selectedSlot.availableTables === 0) {
+        throw new Error('No time slot selected')
+      }
+
+      return true
+    }),
+    param('offenderNo').custom((value: string) => {
+      if (!isValidPrisonerNumber(value)) {
+        throw new Error('Invalid prisoner number supplied')
+      }
+
+      return true
+    }),
+    async (req, res) => {
+      const { offenderNo } = req.params
+      const errors = validationResult(req)
+
+      if (!errors.isEmpty()) {
+        return res.render('pages/dateAndTime', {
+          errors: !errors.isEmpty() ? errors.array() : [],
+          offenderNo,
+          prisonerName: req.session.prisonerName,
+          slotsList: req.session.slotsList,
+          timeOfDay: req.session.timeOfDay,
+          dayOfTheWeek: req.session.dayOfTheWeek,
+        })
+      }
+      return res.redirect(`/visit/additional-support/${req.params.offenderNo}`)
+    }
+  )
+
+  router.get(
+    '/additional-support/:offenderNo',
+    param('offenderNo').custom((value: string) => {
+      if (!isValidPrisonerNumber(value)) {
+        throw new Error('Invalid prisoner number supplied')
+      }
+
+      return true
+    }),
+    async (req, res) => {
+      const { offenderNo } = req.params
+      const errors = validationResult(req)
+
+      res.render('pages/additionalSupport', {
+        errors: !errors.isEmpty() ? errors.array() : [],
+        offenderNo,
+      })
+    }
+  )
+
+  router.post(
+    '/additional-support/:offenderNo',
+    body('additionalSupportRequired').custom((value: string) => {
+      if (!/^yes|no$/.test(value)) {
+        throw new Error('No answer selected')
+      }
+
+      return true
+    }),
+    body('additionalSupport')
+      .toArray()
+      .custom((value: string[], { req }) => {
+        if (req.body.additionalSupportRequired === 'yes') {
+          const validSupportRequest = value.reduce((valid, supportReq) => {
+            return valid
+              ? ['ramp', 'inductionLoop', 'bslInterpreter', 'faceCoveringExemption', 'other'].includes(supportReq)
+              : false
+          }, true)
+          if (!value.length || !validSupportRequest) throw new Error('No request selected')
+        }
+
+        return true
+      }),
+    body('otherSupportDetails')
+      .trim()
+      .custom((value: string, { req }) => {
+        if (<string[]>req.body.additionalSupport.includes('other') && (value ?? '').length === 0) {
+          throw new Error('Enter details of the request')
+        }
+
+        return true
+      }),
+    param('offenderNo').custom((value: string) => {
+      if (!isValidPrisonerNumber(value)) {
+        throw new Error('Invalid prisoner number supplied')
+      }
+
+      return true
+    }),
+    async (req, res) => {
+      const { offenderNo } = req.params
+      const errors = validationResult(req)
+
+      if (!errors.isEmpty()) {
+        return res.render('pages/additionalSupport', {
+          errors: !errors.isEmpty() ? errors.array() : [],
+          offenderNo,
+          additionalSupportRequired: req.body.additionalSupportRequired,
+          additionalSupport: req.body.additionalSupport,
+          otherSupportDetails: req.body.otherSupportDetails,
+        })
+      }
+
+      return res.redirect(`/visit/select-main-contact/${req.params.offenderNo}`)
     }
   )
 
@@ -211,7 +336,7 @@ export default function routes(
       req.session.contact = req.body.contact
       req.session.someoneElseName = req.body.someoneElseName
 
-      return res.redirect(`/visit/confirmation/${req.params.offenderNo}`)
+      return res.redirect(`/visit/check-your-booking/${req.params.offenderNo}`)
     }
   )
 
