@@ -278,7 +278,7 @@ describe('POST /visit/select-visitors/A1234BC', () => {
   })
 })
 
-describe.only('POST /visit/additional-support/:offenderNo', () => {
+describe('POST /visit/additional-support/:offenderNo', () => {
   it('should show error if additional support question not answered', () => {
     const req = request(app).post('/visit/additional-support/A1234BC')
 
