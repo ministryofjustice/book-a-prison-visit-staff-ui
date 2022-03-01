@@ -172,7 +172,7 @@ export type FormError = {
   location: string
 }
 
-export type visitSessionData = {
+export type VisitSessionData = {
   prisoner: {
     name: string
     offenderNo: string
