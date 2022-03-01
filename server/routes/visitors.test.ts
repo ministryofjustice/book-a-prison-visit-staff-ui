@@ -292,7 +292,7 @@ describe('POST /visit/additional-support/:offenderNo', () => {
 
     return req
       .send('additionalSupportRequired=xyz')
-      .send('additionalSupport=ramp')
+      .send('additionalSupport=wheelchair')
       .send('additionalSupport=xyz')
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -323,7 +323,7 @@ describe('POST /visit/additional-support/:offenderNo', () => {
     return req
       .send('additionalSupportRequired=yes')
       .send('additionalSupport=xyz')
-      .send('additionalSupport=ramp')
+      .send('additionalSupport=wheelchair')
       .expect('Content-Type', /html/)
       .expect(res => {
         expect(res.text).toContain('No request selected')
@@ -335,7 +335,7 @@ describe('POST /visit/additional-support/:offenderNo', () => {
 
     return req
       .send('additionalSupportRequired=yes')
-      .send('additionalSupport=ramp')
+      .send('additionalSupport=wheelchair')
       .expect(302)
       .expect('location', '/visit/select-main-contact/A1234BC')
   })
@@ -345,10 +345,10 @@ describe('POST /visit/additional-support/:offenderNo', () => {
 
     return req
       .send('additionalSupportRequired=yes')
-      .send('additionalSupport=ramp')
+      .send('additionalSupport=wheelchair')
       .send('additionalSupport=inductionLoop')
       .send('additionalSupport=bslInterpreter')
-      .send('additionalSupport=faceCoveringExemption')
+      .send('additionalSupport=maskExempt')
       .expect(302)
       .expect('location', '/visit/select-main-contact/A1234BC')
   })
@@ -370,7 +370,7 @@ describe('POST /visit/additional-support/:offenderNo', () => {
 
     return req
       .send('additionalSupportRequired=yes')
-      .send('additionalSupport=ramp')
+      .send('additionalSupport=wheelchair')
       .send('additionalSupport=other')
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -383,7 +383,7 @@ describe('POST /visit/additional-support/:offenderNo', () => {
 
     return req
       .send('additionalSupportRequired=yes')
-      .send('additionalSupport=ramp')
+      .send('additionalSupport=wheelchair')
       .send('additionalSupport=other')
       .send('otherSupportDetails=additional-request-details')
       .expect(302)

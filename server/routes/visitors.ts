@@ -6,6 +6,7 @@ import asyncMiddleware from '../middleware/asyncMiddleware'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
 import VisitSessionsService from '../services/visitSessionsService'
 import isValidPrisonerNumber from './prisonerProfileValidation'
+import additionalSupportOptions from '../constants/additionalSupportOptions'
 // @TODO move validation now it's shared?
 
 export default function routes(
@@ -219,9 +220,7 @@ export default function routes(
       .custom((value: string[], { req }) => {
         if (req.body.additionalSupportRequired === 'yes') {
           const validSupportRequest = value.reduce((valid, supportReq) => {
-            return valid
-              ? ['ramp', 'inductionLoop', 'bslInterpreter', 'faceCoveringExemption', 'other'].includes(supportReq)
-              : false
+            return valid ? additionalSupportOptions.getKeys().includes(supportReq) : false
           }, true)
           if (!value.length || !validSupportRequest) throw new Error('No request selected')
         }
@@ -256,6 +255,18 @@ export default function routes(
           additionalSupport: req.body.additionalSupport,
           otherSupportDetails: req.body.otherSupportDetails,
         })
+      }
+
+      let selectedSupport
+      if (req.body.additionalSupportRequired === 'yes') {
+        selectedSupport = {
+          keys: req.body.additionalSupport,
+          other: req.body.additionalSupport.includes('other') ? req.body.otherSupportDetails : undefined,
+        }
+      }
+      // @TODO conditional will need removing when session validation looked at
+      if (req.session.visitSessionData) {
+        req.session.visitSessionData.additionalSupport = selectedSupport
       }
 
       return res.redirect(`/visit/select-main-contact/${req.params.offenderNo}`)
@@ -353,12 +364,19 @@ export default function routes(
       const { offenderNo } = req.params
       const errors = validationResult(req)
 
+      const additionalSupport = req.session.visitSessionData.additionalSupport?.keys.map(key => {
+        return key === additionalSupportOptions.items.OTHER.key
+          ? req.session.visitSessionData.additionalSupport.other
+          : additionalSupportOptions.getValue(key)
+      })
+
       res.render('pages/checkYourBooking', {
         errors: !errors.isEmpty() ? errors.array() : [],
         offenderNo,
         contactDetails: {
           phoneNumber: req.session.phoneNumber,
         },
+        additionalSupport,
       })
     }
   )
