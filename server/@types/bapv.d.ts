@@ -150,6 +150,7 @@ export type VisitSlot = {
   startTimestamp: string
   endTimestamp: string
   availableTables: number
+  visitRoomName?: string
 }
 
 export type VisitSlotsForDay = {
@@ -178,12 +179,7 @@ export type visitSessionData = {
     dateOfBirth: string
     location: string
   }
-  visit?: {
-    id: number
-    dateStart: string
-    dateEnd: string
-    type: string
-  }
+  visit?: VisitSlot
   visitors?: Contact[]
   mainContact?: {
     contact?: Contact
