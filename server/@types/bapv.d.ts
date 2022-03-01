@@ -178,16 +178,20 @@ export type visitSessionData = {
     dateOfBirth: string
     location: string
   }
-  visit: {
+  visit?: {
     id: number
     dateStart: string
     dateEnd: string
     type: string
   }
-  mainContact: {
-    name: string
-    relationship: string
+  visitors?: Contact[]
+  mainContact?: {
+    contact?: Contact
     phoneNumber: string
-    newContact: boolean
+    contactName?: string
+  }
+  additionalSupport?: {
+    keys: number[]
+    other?: string
   }
 }
