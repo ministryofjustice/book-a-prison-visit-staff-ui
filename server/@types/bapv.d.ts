@@ -150,6 +150,7 @@ export type VisitSlot = {
   startTimestamp: string
   endTimestamp: string
   availableTables: number
+  visitRoomName?: string
 }
 
 export type VisitSlotsForDay = {
@@ -169,4 +170,24 @@ export type FormError = {
   msg: string
   param: string
   location: string
+}
+
+export type visitSessionData = {
+  prisoner: {
+    name: string
+    offenderNo: string
+    dateOfBirth: string
+    location: string
+  }
+  visit?: VisitSlot
+  visitors?: Contact[]
+  mainContact?: {
+    contact?: Contact
+    phoneNumber: string
+    contactName?: string
+  }
+  additionalSupport?: {
+    keys: string[]
+    other?: string
+  }
 }
