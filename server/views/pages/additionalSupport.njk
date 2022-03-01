@@ -32,6 +32,17 @@
             {% endset -%}
 
             {% set additionalSupport = additionalSupport or [] %}
+            {% set additionalSupportCheckboxes = [] %}
+            {% for optionName, optionDetails in additionalSupportOptions %}
+              {% set additionalSupportCheckboxes = (additionalSupportCheckboxes.push(
+                {
+                  value: optionDetails.key,
+                  text: optionDetails.label,
+                  checked: optionDetails.key in additionalSupport,
+                  conditional: { html: otherSupportHtml } if optionName == "OTHER"
+                }
+              ), additionalSupportCheckboxes) %}
+            {% endfor %}
             {% set supportOptionsHtml %}
               {{ govukCheckboxes({
                 idPrefix: "additionalSupport",
@@ -42,36 +53,7 @@
                     classes: ""
                   }
                 },
-                items: [
-                  {
-                    value: "wheelchair",
-                    text: "Wheelchair ramp",
-                    checked: "ramp" in additionalSupport
-                  },
-                  {
-                    value: "inductionLoop",
-                    text: "Portable induction loop for people with hearing aids",
-                    checked: "inductionLoop" in additionalSupport
-                  },
-                  {
-                    value: "bslInterpreter",
-                    text: "British Sign Language (BSL) Interpreter",
-                    checked: "bslInterpreter" in additionalSupport
-                  },
-                  {
-                    value: "maskExempt",
-                    text: "Face covering exemption",
-                    checked: "faceCoveringExemption" in additionalSupport
-                  },
-                  {
-                    value: "other",
-                    text: "Other",
-                    checked: "other" in additionalSupport,
-                    conditional: {
-                      html: otherSupportHtml
-                    }
-                  }
-                ],
+                items: additionalSupportCheckboxes,
                 errorMessage: errors | findError('additionalSupport')
               }) }}
             {% endset -%}

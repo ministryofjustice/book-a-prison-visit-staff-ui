@@ -202,6 +202,7 @@ export default function routes(
       res.render('pages/additionalSupport', {
         errors: !errors.isEmpty() ? errors.array() : [],
         offenderNo,
+        additionalSupportOptions: additionalSupportOptions.items,
       })
     }
   )
@@ -251,6 +252,7 @@ export default function routes(
         return res.render('pages/additionalSupport', {
           errors: !errors.isEmpty() ? errors.array() : [],
           offenderNo,
+          additionalSupportOptions: additionalSupportOptions.items,
           additionalSupportRequired: req.body.additionalSupportRequired,
           additionalSupport: req.body.additionalSupport,
           otherSupportDetails: req.body.otherSupportDetails,
