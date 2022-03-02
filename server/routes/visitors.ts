@@ -182,6 +182,19 @@ export default function routes(
           dayOfTheWeek: req.session.dayOfTheWeek,
         })
       }
+
+      const slotsList = req.session.slotsList as VisitSlotList
+
+      // check selected slot is in the list that was shown and has available tables
+      const selectedSlot: VisitSlot = Object.values(slotsList)
+        .flat()
+        .reduce((allSlots, slot) => {
+          return allSlots.concat(slot.slots.morning, slot.slots.afternoon)
+        }, [])
+        .find(slot => slot.id === req.body['visit-date-and-time'])
+
+      req.session.visitSessionData.visit = selectedSlot
+
       return res.redirect(`/visit/additional-support/${req.params.offenderNo}`)
     }
   )
@@ -387,6 +400,7 @@ export default function routes(
         },
         mainContact: visitSessionData.mainContact,
         prisoner: visitSessionData.prisoner,
+        visit: visitSessionData.visit,
         additionalSupport,
       })
     }

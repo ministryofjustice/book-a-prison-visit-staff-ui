@@ -76,7 +76,7 @@
                         text: "Date"
                     },
                     value: {
-                        text: "Thursday 13 November 2021"
+                        text: visit.startTimestamp | formatDate("EEEE d MMMM yyyy")
                     }
                 },
                 {
@@ -84,7 +84,7 @@
                         text: "Time"
                     },
                     value: {
-                        text: "9am to 10am"
+                        text: visit.startTimestamp | formatTime + " to " + visit.endTimestamp | formatTime
                     }
                 },
                 {
