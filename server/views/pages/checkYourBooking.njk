@@ -146,17 +146,21 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
+        {% set additionalSupportRows = [] %}
+        {% for item in additionalSupport %}
+          {% set additionalSupportRows = (additionalSupportRows.push(
+            {
+              key: {
+                text: "Request " + loop.index
+              },
+              value: {
+                text: item
+              }
+            }
+          ), additionalSupportRows) %}
+        {% endfor %}
         {{ govukSummaryList({
-            rows: [
-                {
-                    key: {
-                        text: "Request 1"
-                    },
-                    value: {
-                        text: "Wheelchair access ramp"
-                    }
-                }
-            ]
+            rows: additionalSupportRows
         }) }}
     </div>
 </div>
