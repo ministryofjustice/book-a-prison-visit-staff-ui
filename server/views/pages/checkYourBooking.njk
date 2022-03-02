@@ -176,6 +176,13 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
+        {% set contactName %}
+        {% if mainContact.contactName %}
+        {{ mainContact.contactName }}
+        {% else %}
+        {{ mainContact.contact.name + " (" + (mainContact.contact.relationshipDescription | lower) + " to prisoner)" }}
+        {% endif %}
+        {% endset %}
         {{ govukSummaryList({
             rows: [
                 {
@@ -183,7 +190,7 @@
                         text: "Main contact"
                     },
                     value: {
-                        text: "Sarah Philips (mother of the prisoner)"
+                        text: contactName
                     }
                 },
                 {
@@ -191,7 +198,7 @@
                         text: "Phone number"
                     },
                     value: {
-                        text: "07654 321321"
+                        text: mainContact.phoneNumber
                     }
                 }
             ]
