@@ -9,6 +9,15 @@ import isValidPrisonerNumber from './prisonerProfileValidation'
 import additionalSupportOptions from '../constants/additionalSupportOptions'
 // @TODO move validation now it's shared?
 
+const getSelectedSlot = (slotsList: VisitSlotList, selectedSlot: string): VisitSlot => {
+  return Object.values(slotsList)
+    .flat()
+    .reduce((allSlots, slot) => {
+      return allSlots.concat(slot.slots.morning, slot.slots.afternoon)
+    }, [])
+    .find(slot => slot.id === selectedSlot)
+}
+
 export default function routes(
   router: Router,
   prisonerVisitorsService: PrisonerVisitorsService,
@@ -145,15 +154,8 @@ export default function routes(
   router.post(
     '/select-date-and-time/:offenderNo',
     body('visit-date-and-time').custom((value: string, { req }) => {
-      const slotsList = req.session.slotsList as VisitSlotList
-
       // check selected slot is in the list that was shown and has available tables
-      const selectedSlot: VisitSlot = Object.values(slotsList)
-        .flat()
-        .reduce((allSlots, slot) => {
-          return allSlots.concat(slot.slots.morning, slot.slots.afternoon)
-        }, [])
-        .find(slot => slot.id === value)
+      const selectedSlot: VisitSlot = getSelectedSlot(req.session.slotsList, value)
 
       if (selectedSlot === undefined || selectedSlot.availableTables === 0) {
         throw new Error('No time slot selected')
@@ -182,6 +184,9 @@ export default function routes(
           dayOfTheWeek: req.session.dayOfTheWeek,
         })
       }
+
+      req.session.visitSessionData.visit = getSelectedSlot(req.session.slotsList, req.body['visit-date-and-time'])
+
       return res.redirect(`/visit/additional-support/${req.params.offenderNo}`)
     }
   )
@@ -387,6 +392,7 @@ export default function routes(
         },
         mainContact: visitSessionData.mainContact,
         prisoner: visitSessionData.prisoner,
+        visit: visitSessionData.visit,
         additionalSupport,
       })
     }
