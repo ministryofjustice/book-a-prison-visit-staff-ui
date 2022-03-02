@@ -9,8 +9,8 @@ declare module 'express-session' {
     nowInMinutes: number
     prisonerName: string
     offenderNo: string
-    visitorList: VisitorListItem[]
-    adultVisitors: VisitorListItem[]
+    visitorList?: VisitorListItem[]
+    adultVisitors?: VisitorListItem[]
     slotsList: VisitSlotList
     timeOfDay: string
     dayOfTheWeek: string

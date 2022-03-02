@@ -76,7 +76,7 @@ export default function routes(
     }),
     (req, res) => {
       const errors = validationResult(req)
-
+      console.log(req.session)
       if (!errors.isEmpty()) {
         return res.render('pages/visitors', {
           errors: !errors.isEmpty() ? errors.array() : [],
@@ -86,19 +86,24 @@ export default function routes(
         })
       }
 
-      const selected = [].concat(req.body.visitors)
+      if (!req.session.visitSessionData) {
+        return res.redirect(`/prisoner/${req.params.offenderNo}`)
+      }
 
-      const adults = req.session.visitorList
-        .filter((visitor: VisitorListItem) => selected.includes(visitor.personId.toString()))
-        .reduce((adultVisitors: VisitorListItem[], visitor: VisitorListItem) => {
-          if (visitor.adult ?? true) {
-            adultVisitors.push(visitor)
-          }
+      const selectedIds = [].concat(req.body.visitors)
+      const selectedVisitors = req.session.visitorList.filter((visitor: VisitorListItem) =>
+        selectedIds.includes(visitor.personId.toString())
+      )
 
-          return adultVisitors
-        }, [])
+      const adults = selectedVisitors.reduce((adultVisitors: VisitorListItem[], visitor: VisitorListItem) => {
+        if (visitor.adult ?? true) {
+          adultVisitors.push(visitor)
+        }
 
+        return adultVisitors
+      }, [])
       req.session.adultVisitors = adults
+      req.session.visitSessionData.visitors = selectedVisitors
 
       return res.redirect(`/visit/select-date-and-time/${req.params.offenderNo}`)
     }
