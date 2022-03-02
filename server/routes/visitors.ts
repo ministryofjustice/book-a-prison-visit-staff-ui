@@ -365,10 +365,11 @@ export default function routes(
     async (req, res) => {
       const { offenderNo } = req.params
       const errors = validationResult(req)
+      const { visitSessionData } = req.session
 
-      const additionalSupport = req.session.visitSessionData.additionalSupport?.keys.map(key => {
+      const additionalSupport = visitSessionData.additionalSupport?.keys.map(key => {
         return key === additionalSupportOptions.items.OTHER.key
-          ? req.session.visitSessionData.additionalSupport.other
+          ? visitSessionData.additionalSupport.other
           : additionalSupportOptions.getValue(key)
       })
 
@@ -378,6 +379,7 @@ export default function routes(
         contactDetails: {
           phoneNumber: req.session.phoneNumber,
         },
+        prisoner: visitSessionData.prisoner,
         additionalSupport,
       })
     }
