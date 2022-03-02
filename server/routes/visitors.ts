@@ -345,9 +345,15 @@ export default function routes(
         })
       }
 
-      req.session.phoneNumber = req.body.phoneNumber
-      req.session.contact = req.body.contact
-      req.session.someoneElseName = req.body.someoneElseName
+      const selectedContact = req.session.visitorList.find(
+        (visitor: VisitorListItem) => req.body.contact === visitor.name.replace(' ', '_')
+      )
+
+      req.session.visitSessionData.mainContact = {
+        contact: selectedContact,
+        phoneNumber: req.body.phoneNumber,
+        contactName: selectedContact === undefined ? req.body.someoneElseName : undefined,
+      }
 
       return res.redirect(`/visit/check-your-booking/${req.params.offenderNo}`)
     }
@@ -379,6 +385,7 @@ export default function routes(
         contactDetails: {
           phoneNumber: req.session.phoneNumber,
         },
+        mainContact: visitSessionData.mainContact,
         prisoner: visitSessionData.prisoner,
         additionalSupport,
       })
