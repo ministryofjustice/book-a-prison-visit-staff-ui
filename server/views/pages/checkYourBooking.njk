@@ -111,27 +111,29 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-        <h3 class="govuk-heading-m">Visitor 1</h3>
-        {{ govukSummaryList({
-            rows: [
-                {
-                    key: {
-                        text: "Name"
+        {%- for visitor in visitors %}
+            <h3 class="govuk-heading-m">Visitor {{ loop.index }}</h3>
+            {{ govukSummaryList({
+                rows: [
+                    {
+                        key: {
+                            text: "Name"
+                        },
+                        value: {
+                            text: visitor.name + " (" + (visitor.relationshipDescription | lower) + " of the prisoner)"
+                        }
                     },
-                    value: {
-                        text: "Sarah Philips (mother of the prisoner)"
+                    {
+                        key: {
+                            text: "Address"
+                        },
+                        value: {
+                            text: visitor.address | replace("<br>", " ")
+                        }
                     }
-                },
-                {
-                    key: {
-                        text: "Address"
-                    },
-                    value: {
-                        text: "1 Letsbe Avenue, Sheffield, S1 2QZ"
-                    }
-                }
-            ]
-        }) }}
+                ]
+            }) }}
+        {% endfor %}
     </div>
 </div>
 
@@ -180,7 +182,7 @@
         {% if mainContact.contactName %}
         {{ mainContact.contactName }}
         {% else %}
-        {{ mainContact.contact.name + " (" + (mainContact.contact.relationshipDescription | lower) + " to prisoner)" }}
+        {{ mainContact.contact.name + " (" + (mainContact.contact.relationshipDescription | lower) + " of the prisoner)" }}
         {% endif %}
         {% endset %}
         {{ govukSummaryList({

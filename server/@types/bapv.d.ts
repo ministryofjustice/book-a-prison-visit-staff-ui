@@ -180,7 +180,7 @@ export type VisitSessionData = {
     location: string
   }
   visit?: VisitSlot
-  visitors?: Contact[]
+  visitors?: VisitorListItem[]
   mainContact?: {
     contact?: VisitorListItem
     phoneNumber: string
