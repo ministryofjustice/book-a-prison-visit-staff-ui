@@ -289,7 +289,7 @@ describe('GET /visit/select-main-contact/A1234BC', () => {
   })
 })
 
-describe('POST /visit/additional-support/:offenderNo', () => {
+describe.skip('POST /visit/additional-support/:offenderNo', () => {
   it('should show error if additional support question not answered', () => {
     const req = request(app).post('/visit/additional-support/A1234BC')
 

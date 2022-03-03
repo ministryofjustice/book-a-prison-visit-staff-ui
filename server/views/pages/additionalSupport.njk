@@ -26,7 +26,7 @@
                 label: {
                   text: "Provide details"
                 },
-                value: otherSupportDetails,
+                value: formValues.otherSupportDetails,
                 errorMessage: errors | findError('otherSupportDetails')
               }) }}
             {% endset -%}
@@ -38,7 +38,7 @@
                 {
                   value: optionDetails.key,
                   text: optionDetails.label,
-                  checked: optionDetails.key in additionalSupport,
+                  checked: formValues.additionalSupport and optionDetails.key in formValues.additionalSupport,
                   conditional: { html: otherSupportHtml } if optionName == "OTHER"
                 }
               ), additionalSupportCheckboxes) %}
@@ -75,7 +75,7 @@
                 {
                   value: "yes",
                   text: "Yes",
-                  checked: additionalSupportRequired == "yes",
+                  checked: formValues.additionalSupportRequired == "yes",
                   conditional: {
                     html: supportOptionsHtml
                   }
@@ -83,7 +83,7 @@
                 {
                   value: "no",
                   text: "No",
-                  checked: additionalSupportRequired == "no"
+                  checked: formValues.additionalSupportRequired == "no"
                 }
               ],
               errorMessage: errors | findError('additionalSupportRequired')

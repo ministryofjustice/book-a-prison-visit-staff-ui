@@ -187,7 +187,8 @@ export type VisitSessionData = {
     contactName?: string
   }
   additionalSupport?: {
-    keys: string[]
+    required: boolean
+    keys?: string[]
     other?: string
   }
 }
