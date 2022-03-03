@@ -1,7 +1,7 @@
 import type { RequestHandler, Router } from 'express'
 import { BadRequest } from 'http-errors'
 import { body, param, validationResult, query } from 'express-validator'
-import { VisitorListItem, VisitSlot, VisitSlotList } from '../@types/bapv'
+import { VisitorListItem, VisitSessionData, VisitSlot, VisitSlotList } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
 import VisitSessionsService from '../services/visitSessionsService'
@@ -205,7 +205,7 @@ export default function routes(
     async (req, res) => {
       const { offenderNo } = req.params
 
-      const formValues: any = req.flash('formValues')[0] || {}
+      const formValues = (req.flash('formValues')[0] as unknown as Record<string, string | string[]>) || {}
       if (!Object.keys(formValues).length && req.session.visitSessionData.additionalSupport) {
         formValues.additionalSupportRequired = req.session.visitSessionData.additionalSupport.required ? 'yes' : 'no'
         formValues.additionalSupport = req.session.visitSessionData.additionalSupport.keys
@@ -259,7 +259,6 @@ export default function routes(
       return true
     }),
     async (req, res) => {
-      const { offenderNo } = req.params
       const errors = validationResult(req)
 
       if (!errors.isEmpty()) {
@@ -268,16 +267,13 @@ export default function routes(
         return res.redirect(req.originalUrl)
       }
 
-      let selectedSupport
+      const selectedSupport: VisitSessionData['additionalSupport'] = { required: false }
       if (req.body.additionalSupportRequired === 'yes') {
-        selectedSupport = {
-          required: true,
-          keys: req.body.additionalSupport,
-          other: req.body.additionalSupport.includes('other') ? req.body.otherSupportDetails : undefined,
-        }
-      } else {
-        selectedSupport = { required: false }
+        selectedSupport.required = true
+        selectedSupport.keys = req.body.additionalSupport
+        selectedSupport.other = req.body.additionalSupport.includes('other') ? req.body.otherSupportDetails : undefined
       }
+
       // @TODO conditional will need removing when session validation looked at
       if (req.session.visitSessionData) {
         req.session.visitSessionData.additionalSupport = selectedSupport
