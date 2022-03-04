@@ -1,7 +1,7 @@
 import express, { Express } from 'express'
-import cookieSession from 'cookie-session'
+// import cookieSession from 'cookie-session'
 import createError from 'http-errors'
-
+import { Cookie, SessionData } from 'express-session'
 import indexRoutes from '../index'
 import searchRoutes from '../search'
 import prisonerRoutes from '../prisoner'
@@ -20,7 +20,7 @@ import PrisonerVisitorsService from '../../services/prisonerVisitorsService'
 import VisitSessionsService from '../../services/visitSessionsService'
 import * as auth from '../../authentication/auth'
 import systemToken from '../../data/authClient'
-import { SystemToken } from '../../@types/bapv'
+import { SystemToken, VisitorListItem, VisitSlotList, VisitSessionData } from '../../@types/bapv'
 
 const user = {
   name: 'john smith',
@@ -49,7 +49,18 @@ function appSetup(
   prisonerVisitorsServiceOverride: PrisonerVisitorsService,
   visitSessionsServiceOverride: VisitSessionsService,
   systemTokenOverride: SystemToken,
-  production = false
+  production = false,
+  sessionData = {
+    cookie: new Cookie(),
+    returnTo: '',
+    nowInMinutes: 0,
+    visitorList: [] as VisitorListItem[],
+    adultVisitors: [] as VisitorListItem[],
+    slotsList: {} as VisitSlotList,
+    timeOfDay: '',
+    dayOfTheWeek: '',
+    visitSessionData: {} as VisitSessionData,
+  }
 ): Express {
   const app = express()
 
@@ -60,10 +71,20 @@ function appSetup(
   app.use((req, res, next) => {
     res.locals = {}
     res.locals.user = req.user
+    req.session = {
+      ...sessionData,
+      regenerate: jest.fn(),
+      destroy: jest.fn(),
+      reload: jest.fn(),
+      id: 'sessionId',
+      resetMaxAge: jest.fn(),
+      save: jest.fn(),
+      touch: jest.fn(),
+    }
     next()
   })
 
-  app.use(cookieSession({ keys: [''] }))
+  // app.use(cookieSession({ keys: [''] }))
   app.use(express.json())
   app.use(express.urlencoded({ extended: true }))
   app.use('/', indexRoutes(standardRouter(new MockUserService())))
@@ -102,7 +123,8 @@ export default function appWithAllRoutes(
   prisonerVisitorsServiceOverride?: PrisonerVisitorsService,
   visitSessionsServiceOverride?: VisitSessionsService,
   systemTokenOverride?: SystemToken,
-  production?: boolean
+  production?: boolean,
+  sessionData?: SessionData
 ): Express {
   auth.default.authenticationMiddleware = () => (req, res, next) => next()
   return appSetup(
@@ -111,6 +133,7 @@ export default function appWithAllRoutes(
     prisonerVisitorsServiceOverride,
     visitSessionsServiceOverride,
     systemTokenOverride,
-    production
+    production,
+    sessionData
   )
 }
