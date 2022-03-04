@@ -139,7 +139,7 @@ describe('GET /visit/select-visitors/A1234BC', () => {
   })
 })
 
-describe('POST /visit/select-visitors/A1234BC', () => {
+describe.skip('POST /visit/select-visitors/A1234BC', () => {
   beforeEach(done => {
     returnData = {
       prisonerName: 'John Smith',
@@ -202,7 +202,7 @@ describe('POST /visit/select-visitors/A1234BC', () => {
       })
   })
 
-  it.skip('should redirect to the select date and time page if an adult is selected', () => {
+  it('should redirect to the select date and time page if an adult is selected', () => {
     const req = request(app).post('/visit/select-visitors/A1234BC')
     req.cookies = Cookies
 

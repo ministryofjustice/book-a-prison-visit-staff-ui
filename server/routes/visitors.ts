@@ -34,8 +34,6 @@ export default function routes(
 
     const prisonerVisitors = await prisonerVisitorsService.getVisitors(offenderNo, res.locals.user?.username)
 
-    req.session.prisonerName = prisonerVisitors.prisonerName
-    req.session.offenderNo = offenderNo
     req.session.visitorList = prisonerVisitors.visitorList
 
     res.render('pages/visitors', { ...prisonerVisitors, offenderNo })
@@ -90,8 +88,8 @@ export default function routes(
       if (!errors.isEmpty()) {
         return res.render('pages/visitors', {
           errors: !errors.isEmpty() ? errors.array() : [],
-          prisonerName: req.session.prisonerName,
-          offenderNo: req.session.offenderNo,
+          prisonerName: req.session.visitSessionData.prisoner.name,
+          offenderNo: req.session.visitSessionData.prisoner.offenderNo,
           visitorList: req.session.visitorList,
         })
       }
@@ -134,7 +132,6 @@ export default function routes(
       parseInt(value, 10) >= 0 && parseInt(value, 10) <= 6 ? value : ''
     ),
     async (req, res) => {
-      const { offenderNo } = req.params
       const { timeOfDay, dayOfTheWeek } = req.query
 
       const slotsList = await visitSessionsService.getVisitSessions({
@@ -148,8 +145,8 @@ export default function routes(
       req.session.dayOfTheWeek = dayOfTheWeek
 
       res.render('pages/dateAndTime', {
-        offenderNo,
-        prisonerName: req.session.prisonerName,
+        prisonerName: req.session.visitSessionData.prisoner.name,
+        offenderNo: req.session.visitSessionData.prisoner.offenderNo,
         slotsList,
         timeOfDay,
         dayOfTheWeek,
@@ -177,14 +174,13 @@ export default function routes(
       return true
     }),
     async (req, res) => {
-      const { offenderNo } = req.params
       const errors = validationResult(req)
 
       if (!errors.isEmpty()) {
         return res.render('pages/dateAndTime', {
           errors: !errors.isEmpty() ? errors.array() : [],
-          offenderNo,
-          prisonerName: req.session.prisonerName,
+          prisonerName: req.session.visitSessionData.prisoner.name,
+          offenderNo: req.session.visitSessionData.prisoner.offenderNo,
           slotsList: req.session.slotsList,
           timeOfDay: req.session.timeOfDay,
           dayOfTheWeek: req.session.dayOfTheWeek,
@@ -394,7 +390,7 @@ export default function routes(
         errors: !errors.isEmpty() ? errors.array() : [],
         offenderNo,
         contactDetails: {
-          phoneNumber: req.session.phoneNumber,
+          phoneNumber: req.session.visitSessionData.mainContact.phoneNumber,
         },
         mainContact: visitSessionData.mainContact,
         prisoner: visitSessionData.prisoner,
