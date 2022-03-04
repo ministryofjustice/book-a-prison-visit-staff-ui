@@ -7,16 +7,11 @@ declare module 'express-session' {
   interface SessionData {
     returnTo: string
     nowInMinutes: number
-    prisonerName: string
-    offenderNo: string
     visitorList: VisitorListItem[]
     adultVisitors: VisitorListItem[]
     slotsList: VisitSlotList
     timeOfDay: string
     dayOfTheWeek: string
-    contact: string
-    phoneNumber: string
-    someoneElseName: string
     visitSessionData: VisitSessionData
   }
 }
