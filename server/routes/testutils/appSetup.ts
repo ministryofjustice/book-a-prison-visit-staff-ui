@@ -1,5 +1,4 @@
 import express, { Express } from 'express'
-// import cookieSession from 'cookie-session'
 import createError from 'http-errors'
 import { Cookie, SessionData } from 'express-session'
 import indexRoutes from '../index'
