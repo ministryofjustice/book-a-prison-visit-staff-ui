@@ -179,8 +179,8 @@ export type VisitSessionData = {
     dateOfBirth: string
     location: string
   }
-  visit?: VisitSlot
   visitors?: VisitorListItem[]
+  visit?: VisitSlot
   additionalSupport?: {
     keys: string[]
     other?: string

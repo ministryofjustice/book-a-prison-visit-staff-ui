@@ -6,7 +6,14 @@ import PrisonerVisitorsService from '../services/prisonerVisitorsService'
 import VisitSessionsService from '../services/visitSessionsService'
 import isValidPrisonerNumber from './prisonerProfileValidation'
 import additionalSupportOptions from '../constants/additionalSupportOptions'
-// @TODO move validation now it's shared?
+
+const visitJourneyStage = {
+  CHOOSE_PRISONER: 0,
+  CHOOSE_VISITORS: 1,
+  CHOOSE_DATE_TIME: 2,
+  CHOOSE_ADDITIONAL_SUPPORT: 3,
+  CHOOSE_MAIN_CONTACT: 4,
+}
 
 const getSelectedSlot = (slotsList: VisitSlotList, selectedSlot: string): VisitSlot => {
   return Object.values(slotsList)
@@ -41,12 +48,12 @@ const checkSession = ({
     return res.redirect('/search/')
   }
 
-  if (stage > 1 && (!visitData.visitors || visitData.visitors.length === 0)) {
+  if (stage > visitJourneyStage.CHOOSE_VISITORS && (!visitData.visitors || visitData.visitors.length === 0)) {
     return res.redirect(`/prisoner/${visitData.prisoner.offenderNo}`)
   }
 
   if (
-    stage > 2 &&
+    stage > visitJourneyStage.CHOOSE_DATE_TIME &&
     (!visitData.visit ||
       !visitData.visit.id ||
       !visitData.visit.availableTables ||
@@ -57,7 +64,7 @@ const checkSession = ({
   }
 
   if (
-    stage > 4 &&
+    stage > visitJourneyStage.CHOOSE_MAIN_CONTACT &&
     (!visitData.mainContact ||
       !visitData.mainContact.phoneNumber ||
       (!visitData.mainContact.contact && !visitData.mainContact.contactName))
@@ -75,7 +82,7 @@ export default function routes(
 
   get('/select-visitors/:offenderNo', async (req, res) => {
     checkSession({
-      stage: 1,
+      stage: visitJourneyStage.CHOOSE_VISITORS,
       visitData: req.session.visitSessionData,
       res,
     })
@@ -126,7 +133,7 @@ export default function routes(
     }),
     (req, res) => {
       checkSession({
-        stage: 1,
+        stage: visitJourneyStage.CHOOSE_VISITORS,
         visitData: req.session.visitSessionData,
         res,
       })
@@ -170,7 +177,7 @@ export default function routes(
     ),
     async (req, res) => {
       checkSession({
-        stage: 2,
+        stage: visitJourneyStage.CHOOSE_DATE_TIME,
         visitData: req.session.visitSessionData,
         res,
       })
@@ -210,7 +217,7 @@ export default function routes(
     }),
     async (req, res) => {
       checkSession({
-        stage: 2,
+        stage: visitJourneyStage.CHOOSE_DATE_TIME,
         visitData: req.session.visitSessionData,
         res,
       })
@@ -235,7 +242,7 @@ export default function routes(
 
   router.get('/additional-support/:offenderNo', async (req, res) => {
     checkSession({
-      stage: 4,
+      stage: visitJourneyStage.CHOOSE_ADDITIONAL_SUPPORT,
       visitData: req.session.visitSessionData,
       res,
     })
@@ -282,7 +289,7 @@ export default function routes(
       }),
     async (req, res) => {
       checkSession({
-        stage: 4,
+        stage: visitJourneyStage.CHOOSE_ADDITIONAL_SUPPORT,
         visitData: req.session.visitSessionData,
         res,
       })
@@ -328,7 +335,7 @@ export default function routes(
     }),
     async (req, res) => {
       checkSession({
-        stage: 5,
+        stage: visitJourneyStage.CHOOSE_MAIN_CONTACT,
         visitData: req.session.visitSessionData,
         res,
       })
@@ -373,7 +380,7 @@ export default function routes(
     }),
     async (req, res) => {
       checkSession({
-        stage: 5,
+        stage: visitJourneyStage.CHOOSE_MAIN_CONTACT,
         visitData: req.session.visitSessionData,
         res,
       })
