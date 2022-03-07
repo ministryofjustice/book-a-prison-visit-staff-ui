@@ -15,11 +15,11 @@ function get<T>(name: string, fallback: T, options = { requireInProduction: fals
 const requiredInProduction = { requireInProduction: true }
 
 export class AgentConfig {
-  maxSockets: 100
+  timeout: number
 
-  maxFreeSockets: 10
-
-  freeSocketTimeout: 30000
+  constructor(timeout = 8000) {
+    this.timeout = timeout
+  }
 }
 
 export interface ApiConfig {
@@ -53,7 +53,7 @@ export default {
         response: Number(get('AUTH_API_TIMEOUT_RESPONSE', 10000)),
         deadline: Number(get('AUTH_API_TIMEOUT_DEADLINE', 10000)),
       },
-      agent: new AgentConfig(),
+      agent: new AgentConfig(Number(get('AUTH_API_TIMEOUT_RESPONSE', 10000))),
       apiClientId: get('API_CLIENT_ID', 'clientid', requiredInProduction),
       apiClientSecret: get('API_CLIENT_SECRET', 'clientsecret', requiredInProduction),
       systemClientId: get('SYSTEM_CLIENT_ID', get('API_CLIENT_ID', 'clientid'), requiredInProduction),
@@ -66,7 +66,7 @@ export default {
         response: Number(get('HMPPS_AUTH_TIMEOUT_RESPONSE', 10000)),
         deadline: Number(get('HMPPS_AUTH_TIMEOUT_DEADLINE', 10000)),
       },
-      agent: new AgentConfig(),
+      agent: new AgentConfig(Number(get('HMPPS_AUTH_TIMEOUT_RESPONSE', 10000))),
       apiClientId: get('API_CLIENT_ID', 'clientid', requiredInProduction),
       apiClientSecret: get('API_CLIENT_SECRET', 'clientsecret', requiredInProduction),
       systemClientId: get('SYSTEM_CLIENT_ID', 'clientid', requiredInProduction),
@@ -78,7 +78,7 @@ export default {
         response: Number(get('TOKEN_VERIFICATION_API_TIMEOUT_RESPONSE', 5000)),
         deadline: Number(get('TOKEN_VERIFICATION_API_TIMEOUT_DEADLINE', 5000)),
       },
-      agent: new AgentConfig(),
+      agent: new AgentConfig(Number(get('TOKEN_VERIFICATION_API_TIMEOUT_RESPONSE', 5000))),
       enabled: get('TOKEN_VERIFICATION_ENABLED', 'false') === 'true',
     },
     prisonerSearch: {
@@ -87,7 +87,7 @@ export default {
         response: Number(get('PRISONER_SEARCH_API_TIMEOUT_RESPONSE', 10000)),
         deadline: Number(get('PRISONER_SEARCH_API_TIMEOUT_DEADLINE', 10000)),
       },
-      agent: new AgentConfig(),
+      agent: new AgentConfig(Number(get('PRISONER_SEARCH_API_TIMEOUT_RESPONSE', 10000))),
       pageSize: 10,
       pagesLinksToShow: 3,
     },
@@ -97,7 +97,7 @@ export default {
         response: Number(get('PRISONER_DETAILS_API_TIMEOUT_RESPONSE', 10000)),
         deadline: Number(get('PRISONER_DETAILS_API_TIMEOUT_DEADLINE', 10000)),
       },
-      agent: new AgentConfig(),
+      agent: new AgentConfig(Number(get('PRISONER_DETAILS_API_TIMEOUT_RESPONSE', 10000))),
     },
     visitScheduler: {
       url: get('VISIT_SCHEDULER_API_URL', 'http://localhost:8080', requiredInProduction),
@@ -105,7 +105,7 @@ export default {
         response: Number(get('VISIT_SCHEDULER_API_TIMEOUT_RESPONSE', 10000)),
         deadline: Number(get('VISIT_SCHEDULER_API_TIMEOUT_DEADLINE', 10000)),
       },
-      agent: new AgentConfig(),
+      agent: new AgentConfig(Number(get('VISIT_SCHEDULER_API_TIMEOUT_RESPONSE', 10000))),
     },
     prisonerContactRegistry: {
       url: get('PRISONER_CONTACT_REGISTRY_API_URL', 'http://localhost:8080', requiredInProduction),
@@ -113,7 +113,7 @@ export default {
         response: Number(get('PRISONER_CONTACT_REGISTRY_API_TIMEOUT_RESPONSE', 10000)),
         deadline: Number(get('PRISONER_CONTACT_REGISTRY_API_TIMEOUT_DEADLINE', 10000)),
       },
-      agent: new AgentConfig(),
+      agent: new AgentConfig(Number(get('PRISONER_CONTACT_REGISTRY_API_TIMEOUT_RESPONSE', 10000))),
     },
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
