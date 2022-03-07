@@ -204,8 +204,7 @@ export default function routes(
     }),
     async (req, res) => {
       const { offenderNo } = req.params
-
-      const formValues = (req.flash('formValues')[0] as unknown as Record<string, string | string[]>) || {}
+      const formValues = (req.flash('formValues')?.[0] as unknown as Record<string, string | string[]>) || {}
       if (!Object.keys(formValues).length && req.session.visitSessionData.additionalSupport) {
         formValues.additionalSupportRequired = req.session.visitSessionData.additionalSupport.required ? 'yes' : 'no'
         formValues.additionalSupport = req.session.visitSessionData.additionalSupport.keys

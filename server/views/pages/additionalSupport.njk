@@ -38,6 +38,9 @@
                 {
                   value: optionDetails.key,
                   text: optionDetails.label,
+                  attributes: {
+                    'data-test': optionDetails.key
+                  },
                   checked: formValues.additionalSupport and optionDetails.key in formValues.additionalSupport,
                   conditional: { html: otherSupportHtml } if optionName == "OTHER"
                 }
@@ -75,6 +78,9 @@
                 {
                   value: "yes",
                   text: "Yes",
+                  attributes: {
+                    'data-test': 'support-required-yes'
+                  },
                   checked: formValues.additionalSupportRequired == "yes",
                   conditional: {
                     html: supportOptionsHtml
@@ -83,6 +89,9 @@
                 {
                   value: "no",
                   text: "No",
+                  attributes: {
+                    'data-test': 'support-required-no'
+                  },
                   checked: formValues.additionalSupportRequired == "no"
                 }
               ],
