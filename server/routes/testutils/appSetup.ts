@@ -29,6 +29,8 @@ const user = {
   displayName: 'John Smith',
 }
 
+export const flashProvider = jest.fn()
+
 class MockUserService extends UserService {
   constructor() {
     super(undefined)
@@ -70,6 +72,7 @@ function appSetup(
   app.use((req, res, next) => {
     res.locals = {}
     res.locals.user = req.user
+    req.flash = flashProvider
     req.session = {
       ...sessionData,
       regenerate: jest.fn(),
@@ -116,7 +119,7 @@ function appSetup(
   return app
 }
 
-export default function appWithAllRoutes(
+export function appWithAllRoutes(
   prisonerSearchServiceOverride?: PrisonerSearchService,
   prisonerProfileServiceOverride?: PrisonerProfileService,
   prisonerVisitorsServiceOverride?: PrisonerVisitorsService,

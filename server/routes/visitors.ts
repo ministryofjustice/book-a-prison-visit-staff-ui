@@ -1,7 +1,7 @@
 import type { RequestHandler, Router } from 'express'
 import { BadRequest } from 'http-errors'
 import { body, param, validationResult, query } from 'express-validator'
-import { VisitorListItem, VisitSlot, VisitSlotList } from '../@types/bapv'
+import { VisitorListItem, VisitSessionData, VisitSlot, VisitSlotList } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
 import VisitSessionsService from '../services/visitSessionsService'
@@ -204,12 +204,18 @@ export default function routes(
     }),
     async (req, res) => {
       const { offenderNo } = req.params
-      const errors = validationResult(req)
+      const formValues = (req.flash('formValues')?.[0] as unknown as Record<string, string | string[]>) || {}
+      if (!Object.keys(formValues).length && req.session.visitSessionData.additionalSupport) {
+        formValues.additionalSupportRequired = req.session.visitSessionData.additionalSupport.required ? 'yes' : 'no'
+        formValues.additionalSupport = req.session.visitSessionData.additionalSupport.keys
+        formValues.otherSupportDetails = req.session.visitSessionData.additionalSupport.other
+      }
 
       res.render('pages/additionalSupport', {
-        errors: !errors.isEmpty() ? errors.array() : [],
+        errors: req.flash('errors'),
         offenderNo,
         additionalSupportOptions: additionalSupportOptions.items,
+        formValues,
       })
     }
   )
@@ -252,27 +258,21 @@ export default function routes(
       return true
     }),
     async (req, res) => {
-      const { offenderNo } = req.params
       const errors = validationResult(req)
 
       if (!errors.isEmpty()) {
-        return res.render('pages/additionalSupport', {
-          errors: !errors.isEmpty() ? errors.array() : [],
-          offenderNo,
-          additionalSupportOptions: additionalSupportOptions.items,
-          additionalSupportRequired: req.body.additionalSupportRequired,
-          additionalSupport: req.body.additionalSupport,
-          otherSupportDetails: req.body.otherSupportDetails,
-        })
+        req.flash('errors', errors.array() as [])
+        req.flash('formValues', req.body)
+        return res.redirect(req.originalUrl)
       }
 
-      let selectedSupport
+      const selectedSupport: VisitSessionData['additionalSupport'] = { required: false }
       if (req.body.additionalSupportRequired === 'yes') {
-        selectedSupport = {
-          keys: req.body.additionalSupport,
-          other: req.body.additionalSupport.includes('other') ? req.body.otherSupportDetails : undefined,
-        }
+        selectedSupport.required = true
+        selectedSupport.keys = req.body.additionalSupport
+        selectedSupport.other = req.body.additionalSupport.includes('other') ? req.body.otherSupportDetails : undefined
       }
+
       // @TODO conditional will need removing when session validation looked at
       if (req.session.visitSessionData) {
         req.session.visitSessionData.additionalSupport = selectedSupport
@@ -380,7 +380,7 @@ export default function routes(
       const errors = validationResult(req)
       const { visitSessionData } = req.session
 
-      const additionalSupport = visitSessionData.additionalSupport?.keys.map(key => {
+      const additionalSupport = visitSessionData.additionalSupport?.keys?.map(key => {
         return key === additionalSupportOptions.items.OTHER.key
           ? visitSessionData.additionalSupport.other
           : additionalSupportOptions.getValue(key)

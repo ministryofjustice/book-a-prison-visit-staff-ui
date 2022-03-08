@@ -1,7 +1,7 @@
 import type { Express } from 'express'
 import request from 'supertest'
 import PrisonerSearchService from '../services/prisonerSearchService'
-import appWithAllRoutes from './testutils/appSetup'
+import { appWithAllRoutes } from './testutils/appSetup'
 import { PrisonerDetailsItem } from '../@types/bapv'
 
 let app: Express

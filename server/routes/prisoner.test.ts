@@ -3,7 +3,7 @@ import request from 'supertest'
 import { PrisonerProfile, BAPVVisitBalances } from '../@types/bapv'
 import { InmateDetail } from '../data/prisonApiTypes'
 import PrisonerProfileService from '../services/prisonerProfileService'
-import appWithAllRoutes from './testutils/appSetup'
+import { appWithAllRoutes } from './testutils/appSetup'
 
 let app: Express
 let prisonerProfileService: PrisonerProfileService

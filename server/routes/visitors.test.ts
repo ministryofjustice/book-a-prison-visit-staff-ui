@@ -1,15 +1,19 @@
 import type { Express } from 'express'
 import request from 'supertest'
 import { SessionData } from 'express-session'
-import { VisitorListItem } from '../@types/bapv'
+import * as cheerio from 'cheerio'
+import { VisitorListItem, VisitSessionData } from '../@types/bapv'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
-import appWithAllRoutes from './testutils/appSetup'
+import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 
 let app: Express
+let sessionApp: Express
 let prisonerVisitorsService: PrisonerVisitorsService
-let systemToken
+let systemToken: (user: string) => Promise<string>
 
+let flashData: Record<'errors' | 'formValues', Record<string, string | string[]>[]>
 let returnData: { prisonerName: string; visitorList: VisitorListItem[] }
+let visitSessionData: VisitSessionData
 
 class MockPrisonerVisitorsService extends PrisonerVisitorsService {
   constructor() {
@@ -26,6 +30,11 @@ beforeEach(() => {
   systemToken = async (user: string): Promise<string> => `${user}-token-1`
   prisonerVisitorsService = new MockPrisonerVisitorsService()
   app = appWithAllRoutes(null, null, prisonerVisitorsService, null, systemToken)
+
+  flashData = { errors: [], formValues: [] }
+  flashProvider.mockImplementation(key => {
+    return flashData[key]
+  })
 })
 
 afterEach(() => {
@@ -140,9 +149,7 @@ describe('GET /visit/select-visitors/A1234BC', () => {
 })
 
 describe('POST /visit/select-visitors/A1234BC', () => {
-  let sessionApp: Express
   beforeAll(() => {
-    systemToken = async (user: string): Promise<string> => `${user}-token-1`
     prisonerVisitorsService = new MockPrisonerVisitorsService()
     const visitorList: VisitorListItem[] = [
       {
@@ -279,6 +286,312 @@ describe('POST /visit/select-visitors/A1234BC', () => {
   })
 })
 
+describe('GET /visit/additional-support/:offenderNo', () => {
+  beforeEach(() => {
+    visitSessionData = {
+      prisoner: {
+        name: 'prisoner name',
+        offenderNo: 'A1234BC',
+        dateOfBirth: '25 May 1988',
+        location: 'location place',
+      },
+    }
+  })
+
+  it('should render the additional support page with no options selected', () => {
+    sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, { visitSessionData } as SessionData)
+
+    return request(sessionApp)
+      .get('/visit/additional-support/A1234BC')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('h1').text()).toContain('Is additional support needed for any of the visitors?')
+        expect($('[data-test="support-required-yes"]').prop('checked')).toBe(false)
+        expect($('[data-test="support-required-no"]').prop('checked')).toBe(false)
+      })
+  })
+
+  it('should render the additional support page, pre-populated with session data (for no requests)', () => {
+    sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, { visitSessionData } as SessionData)
+
+    visitSessionData.additionalSupport = { required: false }
+
+    return request(sessionApp)
+      .get('/visit/additional-support/A1234BC')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('h1').text()).toContain('Is additional support needed for any of the visitors?')
+        expect($('[data-test="support-required-yes"]').prop('checked')).toBe(false)
+        expect($('[data-test="support-required-no"]').prop('checked')).toBe(true)
+      })
+  })
+
+  it('should render the additional support page, pre-populated with session data (multiple requests)', () => {
+    sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, { visitSessionData } as SessionData)
+
+    visitSessionData.additionalSupport = {
+      required: true,
+      keys: ['wheelchair', 'maskExempt', 'other'],
+      other: 'custom request',
+    }
+
+    return request(sessionApp)
+      .get('/visit/additional-support/A1234BC')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('h1').text()).toContain('Is additional support needed for any of the visitors?')
+        expect($('[data-test="support-required-yes"]').prop('checked')).toBe(true)
+        expect($('[data-test="support-required-no"]').prop('checked')).toBe(false)
+        expect($('[data-test="wheelchair"]').prop('checked')).toBe(true)
+        expect($('[data-test="inductionLoop"]').prop('checked')).toBe(false)
+        expect($('[data-test="bslInterpreter"]').prop('checked')).toBe(false)
+        expect($('[data-test="maskExempt"]').prop('checked')).toBe(true)
+        expect($('[data-test="other"]').prop('checked')).toBe(true)
+        expect($('#otherSupportDetails').val()).toContain('custom request')
+      })
+  })
+
+  it('should render validation errors from flash data for no answer selected', () => {
+    flashData.errors = [
+      {
+        msg: 'No answer selected',
+        param: 'additionalSupportRequired',
+        location: 'body',
+      },
+    ]
+
+    sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, { visitSessionData } as SessionData)
+
+    return request(sessionApp)
+      .get('/visit/additional-support/A1234BC')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('.govuk-error-summary__body').text()).toContain('No answer selected')
+        expect($('#additionalSupportRequired-error').text()).toContain('No answer selected')
+        expect(flashProvider).toHaveBeenCalledWith('errors')
+        expect(flashProvider).toHaveBeenCalledWith('formValues')
+        expect(flashProvider).toHaveBeenCalledTimes(2)
+      })
+  })
+
+  it('should render validation errors from flash data for support requested but none selected', () => {
+    flashData.errors = [
+      {
+        value: [],
+        msg: 'No request selected',
+        param: 'additionalSupport',
+        location: 'body',
+      },
+    ]
+
+    flashData.formValues = [{ additionalSupportRequired: 'yes' }]
+
+    sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, { visitSessionData } as SessionData)
+
+    return request(sessionApp)
+      .get('/visit/additional-support/A1234BC')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('.govuk-error-summary__body').text()).toContain('No request selected')
+        expect($('[data-test="support-required-yes"]').prop('checked')).toBe(true)
+        expect($('#additionalSupport-error').text()).toContain('No request selected')
+        expect(flashProvider).toHaveBeenCalledWith('errors')
+        expect(flashProvider).toHaveBeenCalledWith('formValues')
+        expect(flashProvider).toHaveBeenCalledTimes(2)
+      })
+  })
+
+  it('should render validation errors from flash data when other support details not provided', () => {
+    flashData.errors = [
+      {
+        value: '',
+        msg: 'Enter details of the request',
+        param: 'otherSupportDetails',
+        location: 'body',
+      },
+    ]
+
+    flashData.formValues = [{ additionalSupportRequired: 'yes', additionalSupport: ['wheelchair', 'other'] }]
+
+    sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, { visitSessionData } as SessionData)
+
+    return request(sessionApp)
+      .get('/visit/additional-support/A1234BC')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('.govuk-error-summary__body').text()).toContain('Enter details of the request')
+        expect($('[data-test="support-required-yes"]').prop('checked')).toBe(true)
+        expect($('[data-test="wheelchair"]').prop('checked')).toBe(true)
+        expect($('[data-test="other"]').prop('checked')).toBe(true)
+        expect($('#otherSupportDetails-error').text()).toContain('Enter details of the request')
+        expect(flashProvider).toHaveBeenCalledWith('errors')
+        expect(flashProvider).toHaveBeenCalledWith('formValues')
+        expect(flashProvider).toHaveBeenCalledTimes(2)
+      })
+  })
+})
+
+describe('POST /visit/additional-support/:offenderNo', () => {
+  it('should set validation errors in flash and redirect if additional support question not answered', () => {
+    return request(app)
+      .post('/visit/additional-support/A1234BC')
+      .expect(302)
+      .expect('location', '/visit/additional-support/A1234BC')
+      .expect(() => {
+        expect(flashProvider).toHaveBeenCalledWith('errors', [
+          { location: 'body', msg: 'No answer selected', param: 'additionalSupportRequired', value: undefined },
+        ])
+        expect(flashProvider).toHaveBeenCalledWith('formValues', {
+          additionalSupport: [],
+          otherSupportDetails: '',
+        })
+      })
+  })
+
+  it('should set validation errors in flash and redirect if invalid data supplied', () => {
+    return request(app)
+      .post('/visit/additional-support/A1234BC')
+      .send('additionalSupportRequired=xyz')
+      .expect(302)
+      .expect('location', '/visit/additional-support/A1234BC')
+      .expect(() => {
+        expect(flashProvider).toHaveBeenCalledWith('errors', [
+          { location: 'body', msg: 'No answer selected', param: 'additionalSupportRequired', value: 'xyz' },
+        ])
+        expect(flashProvider).toHaveBeenCalledWith('formValues', {
+          additionalSupportRequired: 'xyz',
+          additionalSupport: [],
+          otherSupportDetails: '',
+        })
+      })
+  })
+
+  it('should set validation errors in flash and redirect if additional support selected but no request selected', () => {
+    return request(app)
+      .post('/visit/additional-support/A1234BC')
+      .send('additionalSupportRequired=yes')
+      .expect(302)
+      .expect('location', '/visit/additional-support/A1234BC')
+      .expect(() => {
+        expect(flashProvider).toHaveBeenCalledWith('errors', [
+          { location: 'body', msg: 'No request selected', param: 'additionalSupport', value: [] },
+        ])
+        expect(flashProvider).toHaveBeenCalledWith('formValues', {
+          additionalSupportRequired: 'yes',
+          additionalSupport: [],
+          otherSupportDetails: '',
+        })
+      })
+  })
+
+  it('should set validation errors in flash and redirect if additional support selected but invalid request selected', () => {
+    return request(app)
+      .post('/visit/additional-support/A1234BC')
+      .send('additionalSupportRequired=yes')
+      .send('additionalSupport=xyz')
+      .send('additionalSupport=wheelchair')
+      .expect(302)
+      .expect('location', '/visit/additional-support/A1234BC')
+      .expect(() => {
+        expect(flashProvider).toHaveBeenCalledWith('errors', [
+          { location: 'body', msg: 'No request selected', param: 'additionalSupport', value: ['xyz', 'wheelchair'] },
+        ])
+        expect(flashProvider).toHaveBeenCalledWith('formValues', {
+          additionalSupportRequired: 'yes',
+          additionalSupport: ['xyz', 'wheelchair'],
+          otherSupportDetails: '',
+        })
+      })
+  })
+
+  it('should set validation errors in flash and redirect if other support requested but not specified', () => {
+    return request(app)
+      .post('/visit/additional-support/A1234BC')
+      .send('additionalSupportRequired=yes')
+      .send('additionalSupport=other')
+      .expect(302)
+      .expect('location', '/visit/additional-support/A1234BC')
+      .expect(() => {
+        expect(flashProvider).toHaveBeenCalledWith('errors', [
+          { location: 'body', msg: 'Enter details of the request', param: 'otherSupportDetails', value: '' },
+        ])
+        expect(flashProvider).toHaveBeenCalledWith('formValues', {
+          additionalSupportRequired: 'yes',
+          additionalSupport: ['other'],
+          otherSupportDetails: '',
+        })
+      })
+  })
+
+  it('should set validation errors in flash and redirect, overriding values set in session', () => {
+    visitSessionData = {
+      prisoner: {
+        name: 'prisoner name',
+        offenderNo: 'A1234BC',
+        dateOfBirth: '25 May 1988',
+        location: 'location place',
+      },
+      additionalSupport: {
+        required: false,
+      },
+    }
+
+    sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, { visitSessionData } as SessionData)
+
+    return request(sessionApp)
+      .post('/visit/additional-support/A1234BC')
+      .send('additionalSupportRequired=yes')
+      .expect(302)
+      .expect('location', '/visit/additional-support/A1234BC')
+      .expect(() => {
+        expect(flashProvider).toHaveBeenCalledWith('errors', [
+          { location: 'body', msg: 'No request selected', param: 'additionalSupport', value: [] },
+        ])
+        expect(flashProvider).toHaveBeenCalledWith('formValues', {
+          additionalSupportRequired: 'yes',
+          additionalSupport: [],
+          otherSupportDetails: '',
+        })
+      })
+  })
+
+  it('should redirect to the select main contact page if "no" additional support radio selected', () => {
+    return request(app)
+      .post('/visit/additional-support/A1234BC')
+      .send('additionalSupportRequired=no')
+      .expect(302)
+      .expect('location', '/visit/select-main-contact/A1234BC')
+    // @TODO check this choice is saved to session
+  })
+
+  it('should redirect to the select main contact page when support requests chosen', () => {
+    return request(app)
+      .post('/visit/additional-support/A1234BC')
+      .send('additionalSupportRequired=yes')
+      .send('additionalSupport=wheelchair')
+      .send('additionalSupport=inductionLoop')
+      .send('additionalSupport=bslInterpreter')
+      .send('additionalSupport=maskExempt')
+      .send('additionalSupport=other')
+      .send('otherSupportDetails=custom-request')
+      .expect(302)
+      .expect('location', '/visit/select-main-contact/A1234BC')
+    // @TODO check this choice is saved to session
+  })
+})
+
 describe('GET /visit/select-main-contact/A1234BC', () => {
   it('should show an error if invalid prisoner number supplied', () => {
     const req = request(app).get('/visit/select-main-contact/123')
@@ -286,118 +599,5 @@ describe('GET /visit/select-main-contact/A1234BC', () => {
     return req.expect('Content-Type', /html/).expect(res => {
       expect(res.text).toContain('Invalid prisoner number supplied')
     })
-  })
-})
-
-describe('POST /visit/additional-support/:offenderNo', () => {
-  it('should show error if additional support question not answered', () => {
-    const req = request(app).post('/visit/additional-support/A1234BC')
-
-    return req.expect('Content-Type', /html/).expect(res => {
-      expect(res.text).toContain('No answer selected')
-    })
-  })
-
-  it('should show error if invalid data supplied', () => {
-    const req = request(app).post('/visit/additional-support/A1234BC')
-
-    return req
-      .send('additionalSupportRequired=xyz')
-      .send('additionalSupport=wheelchair')
-      .send('additionalSupport=xyz')
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        expect(res.text).toContain('No answer selected')
-      })
-  })
-
-  it('should redirect to the select main contact page if no additional support selected', () => {
-    const req = request(app).post('/visit/additional-support/A1234BC')
-
-    return req.send('additionalSupportRequired=no').expect(302).expect('location', '/visit/select-main-contact/A1234BC')
-  })
-
-  it('should show error if additional support selected but no request selected', () => {
-    const req = request(app).post('/visit/additional-support/A1234BC')
-
-    return req
-      .send('additionalSupportRequired=yes')
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        expect(res.text).toContain('No request selected')
-      })
-  })
-
-  it('should show error if additional support selected but invalid request selected', () => {
-    const req = request(app).post('/visit/additional-support/A1234BC')
-
-    return req
-      .send('additionalSupportRequired=yes')
-      .send('additionalSupport=xyz')
-      .send('additionalSupport=wheelchair')
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        expect(res.text).toContain('No request selected')
-      })
-  })
-
-  it('should redirect to the select main contact page when a single request selected', () => {
-    const req = request(app).post('/visit/additional-support/A1234BC')
-
-    return req
-      .send('additionalSupportRequired=yes')
-      .send('additionalSupport=wheelchair')
-      .expect(302)
-      .expect('location', '/visit/select-main-contact/A1234BC')
-  })
-
-  it('should redirect to the select main contact page when multiple requests selected', () => {
-    const req = request(app).post('/visit/additional-support/A1234BC')
-
-    return req
-      .send('additionalSupportRequired=yes')
-      .send('additionalSupport=wheelchair')
-      .send('additionalSupport=inductionLoop')
-      .send('additionalSupport=bslInterpreter')
-      .send('additionalSupport=maskExempt')
-      .expect(302)
-      .expect('location', '/visit/select-main-contact/A1234BC')
-  })
-
-  it('should show error if other support requested but not specified', () => {
-    const req = request(app).post('/visit/additional-support/A1234BC')
-
-    return req
-      .send('additionalSupportRequired=yes')
-      .send('additionalSupport=other')
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        expect(res.text).toContain('Enter details of the request')
-      })
-  })
-
-  it('should show error if multiple support requests but other not specified', () => {
-    const req = request(app).post('/visit/additional-support/A1234BC')
-
-    return req
-      .send('additionalSupportRequired=yes')
-      .send('additionalSupport=wheelchair')
-      .send('additionalSupport=other')
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        expect(res.text).toContain('Enter details of the request')
-      })
-  })
-
-  it('should redirect to the select main contact page if additional and other support requests made', () => {
-    const req = request(app).post('/visit/additional-support/A1234BC')
-
-    return req
-      .send('additionalSupportRequired=yes')
-      .send('additionalSupport=wheelchair')
-      .send('additionalSupport=other')
-      .send('otherSupportDetails=additional-request-details')
-      .expect(302)
-      .expect('location', '/visit/select-main-contact/A1234BC')
   })
 })
