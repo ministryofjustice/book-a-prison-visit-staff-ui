@@ -1,5 +1,4 @@
-import type { RequestHandler, Router } from 'express'
-import { BadRequest } from 'http-errors'
+import type { RequestHandler, Router, Response } from 'express'
 import { body, param, validationResult, query } from 'express-validator'
 import { VisitorListItem, VisitSessionData, VisitSlot, VisitSlotList } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
@@ -18,6 +17,55 @@ const getSelectedSlot = (slotsList: VisitSlotList, selectedSlot: string): VisitS
     .find(slot => slot.id === selectedSlot)
 }
 
+const checkSession = ({
+  stage,
+  visitData,
+  res,
+}: {
+  stage: number
+  visitData: VisitSessionData
+  res: Response
+  // eslint-disable-next-line consistent-return
+}): void => {
+  if (!visitData) {
+    return res.redirect('/search/')
+  }
+
+  if (
+    !visitData.prisoner ||
+    !visitData.prisoner.name ||
+    !isValidPrisonerNumber(visitData.prisoner.offenderNo) ||
+    !visitData.prisoner.dateOfBirth ||
+    !visitData.prisoner.location
+  ) {
+    return res.redirect('/search/')
+  }
+
+  if (stage > 1 && (!visitData.visitors || visitData.visitors.length === 0)) {
+    return res.redirect(`/prisoner/${visitData.prisoner.offenderNo}`)
+  }
+
+  if (
+    stage > 2 &&
+    (!visitData.visit ||
+      !visitData.visit.id ||
+      !visitData.visit.availableTables ||
+      !visitData.visit.startTimestamp ||
+      !visitData.visit.endTimestamp)
+  ) {
+    return res.redirect(`/prisoner/${visitData.prisoner.offenderNo}`)
+  }
+
+  if (
+    stage > 4 &&
+    (!visitData.mainContact ||
+      !visitData.mainContact.phoneNumber ||
+      (!visitData.mainContact.contact && !visitData.mainContact.contactName))
+  ) {
+    return res.redirect(`/prisoner/${visitData.prisoner.offenderNo}`)
+  }
+}
+
 export default function routes(
   router: Router,
   prisonerVisitorsService: PrisonerVisitorsService,
@@ -26,12 +74,13 @@ export default function routes(
   const get = (path: string, handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
 
   get('/select-visitors/:offenderNo', async (req, res) => {
-    const { offenderNo } = req.params
+    checkSession({
+      stage: 1,
+      visitData: req.session.visitSessionData,
+      res,
+    })
 
-    if (!isValidPrisonerNumber(offenderNo)) {
-      throw new BadRequest()
-    }
-
+    const { offenderNo } = req.session.visitSessionData.prisoner
     const prisonerVisitors = await prisonerVisitorsService.getVisitors(offenderNo, res.locals.user?.username)
 
     req.session.visitorList = prisonerVisitors.visitorList
@@ -75,14 +124,13 @@ export default function routes(
 
       return true
     }),
-    param('offenderNo').custom((value: string) => {
-      if (!isValidPrisonerNumber(value)) {
-        throw new Error('Invalid prisoner number supplied')
-      }
-
-      return true
-    }),
     (req, res) => {
+      checkSession({
+        stage: 1,
+        visitData: req.session.visitSessionData,
+        res,
+      })
+
       const errors = validationResult(req)
 
       if (!errors.isEmpty()) {
@@ -92,10 +140,6 @@ export default function routes(
           offenderNo: req.session.visitSessionData.prisoner.offenderNo,
           visitorList: req.session.visitorList,
         })
-      }
-
-      if (!req.session.visitSessionData) {
-        return res.redirect(`/prisoner/${req.params.offenderNo}`)
       }
 
       const selectedIds = [].concat(req.body.visitors)
@@ -120,20 +164,18 @@ export default function routes(
 
   router.get(
     '/select-date-and-time/:offenderNo',
-    param('offenderNo').custom((value: string) => {
-      if (!isValidPrisonerNumber(value)) {
-        throw new Error('Invalid prisoner number supplied')
-      }
-
-      return true
-    }),
     query('timeOfDay').customSanitizer((value: string) => (!['morning', 'afternoon'].includes(value) ? '' : value)),
     query('dayOfTheWeek').customSanitizer((value: string) =>
       parseInt(value, 10) >= 0 && parseInt(value, 10) <= 6 ? value : ''
     ),
     async (req, res) => {
-      const { timeOfDay, dayOfTheWeek } = req.query
+      checkSession({
+        stage: 2,
+        visitData: req.session.visitSessionData,
+        res,
+      })
 
+      const { timeOfDay, dayOfTheWeek } = req.query
       const slotsList = await visitSessionsService.getVisitSessions({
         username: res.locals.user?.username,
         timeOfDay,
@@ -166,14 +208,12 @@ export default function routes(
 
       return true
     }),
-    param('offenderNo').custom((value: string) => {
-      if (!isValidPrisonerNumber(value)) {
-        throw new Error('Invalid prisoner number supplied')
-      }
-
-      return true
-    }),
     async (req, res) => {
+      checkSession({
+        stage: 2,
+        visitData: req.session.visitSessionData,
+        res,
+      })
       const errors = validationResult(req)
 
       if (!errors.isEmpty()) {
@@ -193,32 +233,29 @@ export default function routes(
     }
   )
 
-  router.get(
-    '/additional-support/:offenderNo',
-    param('offenderNo').custom((value: string) => {
-      if (!isValidPrisonerNumber(value)) {
-        throw new Error('Invalid prisoner number supplied')
-      }
+  router.get('/additional-support/:offenderNo', async (req, res) => {
+    checkSession({
+      stage: 4,
+      visitData: req.session.visitSessionData,
+      res,
+    })
 
-      return true
-    }),
-    async (req, res) => {
-      const { offenderNo } = req.params
-      const formValues = (req.flash('formValues')?.[0] as unknown as Record<string, string | string[]>) || {}
-      if (!Object.keys(formValues).length && req.session.visitSessionData.additionalSupport) {
-        formValues.additionalSupportRequired = req.session.visitSessionData.additionalSupport.required ? 'yes' : 'no'
-        formValues.additionalSupport = req.session.visitSessionData.additionalSupport.keys
-        formValues.otherSupportDetails = req.session.visitSessionData.additionalSupport.other
-      }
+    const { offenderNo } = req.session.visitSessionData.prisoner
+    const formValues = (req.flash('formValues')?.[0] as unknown as Record<string, string | string[]>) || {}
 
-      res.render('pages/additionalSupport', {
-        errors: req.flash('errors'),
-        offenderNo,
-        additionalSupportOptions: additionalSupportOptions.items,
-        formValues,
-      })
+    if (!Object.keys(formValues).length && req.session.visitSessionData.additionalSupport) {
+      formValues.additionalSupportRequired = req.session.visitSessionData.additionalSupport.required ? 'yes' : 'no'
+      formValues.additionalSupport = req.session.visitSessionData.additionalSupport.keys
+      formValues.otherSupportDetails = req.session.visitSessionData.additionalSupport.other
     }
-  )
+
+    res.render('pages/additionalSupport', {
+      errors: req.flash('errors'),
+      offenderNo,
+      additionalSupportOptions: additionalSupportOptions.items,
+      formValues,
+    })
+  })
 
   router.post(
     '/additional-support/:offenderNo',
@@ -250,14 +287,14 @@ export default function routes(
 
         return true
       }),
-    param('offenderNo').custom((value: string) => {
-      if (!isValidPrisonerNumber(value)) {
-        throw new Error('Invalid prisoner number supplied')
-      }
-
-      return true
-    }),
     async (req, res) => {
+      checkSession({
+        stage: 4,
+        visitData: req.session.visitSessionData,
+        res,
+      })
+
+      const { offenderNo } = req.session.visitSessionData.prisoner
       const errors = validationResult(req)
 
       if (!errors.isEmpty()) {
@@ -278,7 +315,7 @@ export default function routes(
         req.session.visitSessionData.additionalSupport = selectedSupport
       }
 
-      return res.redirect(`/visit/select-main-contact/${req.params.offenderNo}`)
+      return res.redirect(`/visit/select-main-contact/${offenderNo}`)
     }
   )
 
@@ -292,7 +329,13 @@ export default function routes(
       return true
     }),
     async (req, res) => {
-      const { offenderNo } = req.params
+      checkSession({
+        stage: 5,
+        visitData: req.session.visitSessionData,
+        res,
+      })
+
+      const { offenderNo } = req.session.visitSessionData.prisoner
       const errors = validationResult(req)
 
       res.render('pages/mainContact', {
@@ -330,15 +373,14 @@ export default function routes(
 
       return true
     }),
-    param('offenderNo').custom((value: string) => {
-      if (!isValidPrisonerNumber(value)) {
-        throw new Error('Invalid prisoner number supplied')
-      }
-
-      return true
-    }),
     async (req, res) => {
-      const { offenderNo } = req.params
+      checkSession({
+        stage: 5,
+        visitData: req.session.visitSessionData,
+        res,
+      })
+
+      const { offenderNo } = req.session.visitSessionData.prisoner
       const errors = validationResult(req)
 
       if (!errors.isEmpty()) {

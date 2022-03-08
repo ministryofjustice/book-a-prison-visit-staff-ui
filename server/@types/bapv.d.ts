@@ -181,14 +181,14 @@ export type VisitSessionData = {
   }
   visit?: VisitSlot
   visitors?: VisitorListItem[]
-  mainContact?: {
-    contact?: VisitorListItem
-    phoneNumber: string
-    contactName?: string
-  }
   additionalSupport?: {
     required: boolean
     keys?: string[]
     other?: string
+  }
+  mainContact?: {
+    contact?: VisitorListItem
+    phoneNumber: string
+    contactName?: string
   }
 }
