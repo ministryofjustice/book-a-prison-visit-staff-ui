@@ -28,7 +28,7 @@ export const checkSession = ({
   if (
     !visitData.prisoner ||
     !visitData.prisoner.name ||
-    !isValidPrisonerNumber(visitData.prisoner.offenderNo) ||
+    !isValidPrisonerNumber(visitData.prisoner.offenderNo || '') ||
     !visitData.prisoner.dateOfBirth ||
     !visitData.prisoner.location
   ) {
