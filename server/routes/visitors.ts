@@ -1,70 +1,12 @@
-import type { RequestHandler, Router, Response } from 'express'
+import type { RequestHandler, Router } from 'express'
 import { body, param, validationResult, query } from 'express-validator'
-import { VisitorListItem, VisitSessionData, VisitSlot, VisitSlotList } from '../@types/bapv'
+import { VisitorListItem, VisitSessionData, VisitSlot } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
 import VisitSessionsService from '../services/visitSessionsService'
 import isValidPrisonerNumber from './prisonerProfileValidation'
 import additionalSupportOptions from '../constants/additionalSupportOptions'
-// @TODO move validation now it's shared?
-
-const getSelectedSlot = (slotsList: VisitSlotList, selectedSlot: string): VisitSlot => {
-  return Object.values(slotsList)
-    .flat()
-    .reduce((allSlots, slot) => {
-      return allSlots.concat(slot.slots.morning, slot.slots.afternoon)
-    }, [])
-    .find(slot => slot.id === selectedSlot)
-}
-
-const checkSession = ({
-  stage,
-  visitData,
-  res,
-}: {
-  stage: number
-  visitData: VisitSessionData
-  res: Response
-  // eslint-disable-next-line consistent-return
-}): void => {
-  if (!visitData) {
-    return res.redirect('/search/')
-  }
-
-  if (
-    !visitData.prisoner ||
-    !visitData.prisoner.name ||
-    !isValidPrisonerNumber(visitData.prisoner.offenderNo) ||
-    !visitData.prisoner.dateOfBirth ||
-    !visitData.prisoner.location
-  ) {
-    return res.redirect('/search/')
-  }
-
-  if (stage > 1 && (!visitData.visitors || visitData.visitors.length === 0)) {
-    return res.redirect(`/prisoner/${visitData.prisoner.offenderNo}`)
-  }
-
-  if (
-    stage > 2 &&
-    (!visitData.visit ||
-      !visitData.visit.id ||
-      !visitData.visit.availableTables ||
-      !visitData.visit.startTimestamp ||
-      !visitData.visit.endTimestamp)
-  ) {
-    return res.redirect(`/prisoner/${visitData.prisoner.offenderNo}`)
-  }
-
-  if (
-    stage > 4 &&
-    (!visitData.mainContact ||
-      !visitData.mainContact.phoneNumber ||
-      (!visitData.mainContact.contact && !visitData.mainContact.contactName))
-  ) {
-    return res.redirect(`/prisoner/${visitData.prisoner.offenderNo}`)
-  }
-}
+import { checkSession, getSelectedSlot } from './visitorUtils'
 
 export default function routes(
   router: Router,
