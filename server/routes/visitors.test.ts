@@ -681,16 +681,18 @@ describe('POST /visit/additional-support/:offenderNo', () => {
       })
   })
 
-  it('should redirect to the select main contact page if "no" additional support radio selected', () => {
+  it('should redirect to the select main contact page if "no" additional support radio selected and store in session', () => {
     return request(sessionApp)
       .post('/visit/additional-support/A1234BC')
       .send('additionalSupportRequired=no')
       .expect(302)
       .expect('location', '/visit/select-main-contact/A1234BC')
-    // @TODO check this choice is saved to session
+      .expect(() => {
+        expect(visitSessionData.additionalSupport?.required).toBe(false)
+      })
   })
 
-  it('should redirect to the select main contact page when support requests chosen', () => {
+  it('should redirect to the select main contact page when support requests chosen and store in session', () => {
     return request(sessionApp)
       .post('/visit/additional-support/A1234BC')
       .send('additionalSupportRequired=yes')
@@ -702,7 +704,17 @@ describe('POST /visit/additional-support/:offenderNo', () => {
       .send('otherSupportDetails=custom-request')
       .expect(302)
       .expect('location', '/visit/select-main-contact/A1234BC')
-    // @TODO check this choice is saved to session
+      .expect(() => {
+        expect(visitSessionData.additionalSupport?.required).toBe(true)
+        expect(visitSessionData.additionalSupport?.keys).toEqual([
+          'wheelchair',
+          'inductionLoop',
+          'bslInterpreter',
+          'maskExempt',
+          'other',
+        ])
+        expect(visitSessionData.additionalSupport?.other).toBe('custom-request')
+      })
   })
 })
 
