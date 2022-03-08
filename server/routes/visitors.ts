@@ -13,6 +13,7 @@ const visitJourneyStage = {
   CHOOSE_DATE_TIME: 2,
   CHOOSE_ADDITIONAL_SUPPORT: 3,
   CHOOSE_MAIN_CONTACT: 4,
+  CHECK_YOUR_ANSWERS: 5,
 }
 
 const getSelectedSlot = (slotsList: VisitSlotList, selectedSlot: string): VisitSlot => {
