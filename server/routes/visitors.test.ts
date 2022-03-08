@@ -27,9 +27,6 @@ class MockPrisonerVisitorsService extends PrisonerVisitorsService {
 }
 
 beforeEach(() => {
-  prisonerVisitorsService = new MockPrisonerVisitorsService()
-  app = appWithAllRoutes(null, null, prisonerVisitorsService, null, systemToken)
-
   flashData = { errors: [], formValues: [] }
   flashProvider.mockImplementation(key => {
     return flashData[key]
