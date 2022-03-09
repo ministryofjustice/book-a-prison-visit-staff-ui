@@ -105,7 +105,7 @@ export default function routes(
   )
 
   router.get(
-    '/select-date-and-time/:offenderNo',
+    '/select-date-and-time',
     query('timeOfDay').customSanitizer((value: string) => (!['morning', 'afternoon'].includes(value) ? '' : value)),
     query('dayOfTheWeek').customSanitizer((value: string) =>
       parseInt(value, 10) >= 0 && parseInt(value, 10) <= 6 ? value : ''
@@ -139,7 +139,7 @@ export default function routes(
   )
 
   router.post(
-    '/select-date-and-time/:offenderNo',
+    '/select-date-and-time',
     body('visit-date-and-time').custom((value: string, { req }) => {
       // check selected slot is in the list that was shown and has available tables
       const selectedSlot: VisitSlot = getSelectedSlot(req.session.slotsList, value)
