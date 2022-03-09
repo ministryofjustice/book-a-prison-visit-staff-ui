@@ -161,9 +161,13 @@
             }
           ), additionalSupportRows) %}
         {% endfor %}
-        {{ govukSummaryList({
-            rows: additionalSupportRows
-        }) }}
+        {% if (additionalSupportRows | length) %}
+            {{ govukSummaryList({
+                rows: additionalSupportRows
+            }) }}
+        {% else %}
+        <p>No additional support options were chosen.</p>
+        {% endif %}
     </div>
 </div>
 
