@@ -177,7 +177,7 @@ export default function routes(
 
   router.get('/additional-support/:offenderNo', async (req, res) => {
     checkSession({
-      stage: 4,
+      stage: 3,
       visitData: req.session.visitSessionData,
       res,
     })
@@ -231,7 +231,7 @@ export default function routes(
       }),
     async (req, res) => {
       checkSession({
-        stage: 4,
+        stage: 3,
         visitData: req.session.visitSessionData,
         res,
       })
@@ -261,32 +261,20 @@ export default function routes(
     }
   )
 
-  router.get(
-    '/select-main-contact/:offenderNo',
-    param('offenderNo').custom((value: string) => {
-      if (!isValidPrisonerNumber(value)) {
-        throw new Error('Invalid prisoner number supplied')
-      }
+  router.get('/select-main-contact/:offenderNo', async (req, res) => {
+    checkSession({
+      stage: 4,
+      visitData: req.session.visitSessionData,
+      res,
+    })
 
-      return true
-    }),
-    async (req, res) => {
-      checkSession({
-        stage: 5,
-        visitData: req.session.visitSessionData,
-        res,
-      })
+    const { offenderNo } = req.session.visitSessionData.prisoner
 
-      const { offenderNo } = req.session.visitSessionData.prisoner
-      const errors = validationResult(req)
-
-      res.render('pages/mainContact', {
-        errors: !errors.isEmpty() ? errors.array() : [],
-        offenderNo,
-        adultVisitors: req.session.adultVisitors,
-      })
-    }
-  )
+    res.render('pages/mainContact', {
+      offenderNo,
+      adultVisitors: req.session.adultVisitors,
+    })
+  })
 
   router.post(
     '/select-main-contact/:offenderNo',
@@ -317,7 +305,7 @@ export default function routes(
     }),
     async (req, res) => {
       checkSession({
-        stage: 5,
+        stage: 4,
         visitData: req.session.visitSessionData,
         res,
       })
@@ -360,9 +348,13 @@ export default function routes(
       return true
     }),
     async (req, res) => {
-      const { offenderNo } = req.params
-      const errors = validationResult(req)
       const { visitSessionData } = req.session
+      checkSession({
+        stage: 5,
+        visitData: visitSessionData,
+        res,
+      })
+      const { offenderNo } = req.session.visitSessionData.prisoner
 
       const additionalSupport = visitSessionData.additionalSupport?.keys?.map(key => {
         return key === additionalSupportOptions.items.OTHER.key
@@ -371,7 +363,6 @@ export default function routes(
       })
 
       res.render('pages/checkYourBooking', {
-        errors: !errors.isEmpty() ? errors.array() : [],
         offenderNo,
         contactDetails: {
           phoneNumber: req.session.visitSessionData.mainContact.phoneNumber,
