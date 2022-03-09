@@ -171,11 +171,11 @@ export default function routes(
 
       req.session.visitSessionData.visit = getSelectedSlot(req.session.slotsList, req.body['visit-date-and-time'])
 
-      return res.redirect(`/visit/additional-support/${req.params.offenderNo}`)
+      return res.redirect('/visit/additional-support')
     }
   )
 
-  router.get('/additional-support/:offenderNo', async (req, res) => {
+  router.get('/additional-support', async (req, res) => {
     checkSession({
       stage: 3,
       visitData: req.session.visitSessionData,
@@ -200,7 +200,7 @@ export default function routes(
   })
 
   router.post(
-    '/additional-support/:offenderNo',
+    '/additional-support',
     body('additionalSupportRequired').custom((value: string) => {
       if (!/^yes|no$/.test(value)) {
         throw new Error('No answer selected')

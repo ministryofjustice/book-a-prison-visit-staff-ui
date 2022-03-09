@@ -296,7 +296,7 @@ describe('POST /visit/select-visitors', () => {
   })
 })
 
-describe('GET /visit/additional-support/:offenderNo', () => {
+describe('GET /visit/additional-suppor', () => {
   beforeEach(() => {
     visitSessionData = {
       prisoner: {
@@ -335,7 +335,7 @@ describe('GET /visit/additional-support/:offenderNo', () => {
 
   it('should render the additional support page with no options selected', () => {
     return request(sessionApp)
-      .get('/visit/additional-support/A1234BC')
+      .get('/visit/additional-support')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -350,7 +350,7 @@ describe('GET /visit/additional-support/:offenderNo', () => {
     visitSessionData.additionalSupport = { required: false }
 
     return request(sessionApp)
-      .get('/visit/additional-support/A1234BC')
+      .get('/visit/additional-support')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -369,7 +369,7 @@ describe('GET /visit/additional-support/:offenderNo', () => {
     }
 
     return request(sessionApp)
-      .get('/visit/additional-support/A1234BC')
+      .get('/visit/additional-support')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -396,7 +396,7 @@ describe('GET /visit/additional-support/:offenderNo', () => {
     ]
 
     return request(sessionApp)
-      .get('/visit/additional-support/A1234BC')
+      .get('/visit/additional-support')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -422,7 +422,7 @@ describe('GET /visit/additional-support/:offenderNo', () => {
     flashData.formValues = [{ additionalSupportRequired: 'yes' }]
 
     return request(sessionApp)
-      .get('/visit/additional-support/A1234BC')
+      .get('/visit/additional-support')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -449,7 +449,7 @@ describe('GET /visit/additional-support/:offenderNo', () => {
     flashData.formValues = [{ additionalSupportRequired: 'yes', additionalSupport: ['wheelchair', 'other'] }]
 
     return request(sessionApp)
-      .get('/visit/additional-support/A1234BC')
+      .get('/visit/additional-support')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -466,7 +466,7 @@ describe('GET /visit/additional-support/:offenderNo', () => {
   })
 })
 
-describe('POST /visit/additional-support/:offenderNo', () => {
+describe('POST /visit/additional-support', () => {
   beforeEach(() => {
     visitSessionData = {
       prisoner: {
@@ -504,9 +504,9 @@ describe('POST /visit/additional-support/:offenderNo', () => {
 
   it('should set validation errors in flash and redirect if additional support question not answered', () => {
     return request(sessionApp)
-      .post('/visit/additional-support/A1234BC')
+      .post('/visit/additional-support')
       .expect(302)
-      .expect('location', '/visit/additional-support/A1234BC')
+      .expect('location', '/visit/additional-support')
       .expect(() => {
         expect(flashProvider).toHaveBeenCalledWith('errors', [
           { location: 'body', msg: 'No answer selected', param: 'additionalSupportRequired', value: undefined },
@@ -520,10 +520,10 @@ describe('POST /visit/additional-support/:offenderNo', () => {
 
   it('should set validation errors in flash and redirect if invalid data supplied', () => {
     return request(sessionApp)
-      .post('/visit/additional-support/A1234BC')
+      .post('/visit/additional-support')
       .send('additionalSupportRequired=xyz')
       .expect(302)
-      .expect('location', '/visit/additional-support/A1234BC')
+      .expect('location', '/visit/additional-support')
       .expect(() => {
         expect(flashProvider).toHaveBeenCalledWith('errors', [
           { location: 'body', msg: 'No answer selected', param: 'additionalSupportRequired', value: 'xyz' },
@@ -538,10 +538,10 @@ describe('POST /visit/additional-support/:offenderNo', () => {
 
   it('should set validation errors in flash and redirect if additional support selected but no request selected', () => {
     return request(sessionApp)
-      .post('/visit/additional-support/A1234BC')
+      .post('/visit/additional-support')
       .send('additionalSupportRequired=yes')
       .expect(302)
-      .expect('location', '/visit/additional-support/A1234BC')
+      .expect('location', '/visit/additional-support')
       .expect(() => {
         expect(flashProvider).toHaveBeenCalledWith('errors', [
           { location: 'body', msg: 'No request selected', param: 'additionalSupport', value: [] },
@@ -556,12 +556,12 @@ describe('POST /visit/additional-support/:offenderNo', () => {
 
   it('should set validation errors in flash and redirect if additional support selected but invalid request selected', () => {
     return request(sessionApp)
-      .post('/visit/additional-support/A1234BC')
+      .post('/visit/additional-support')
       .send('additionalSupportRequired=yes')
       .send('additionalSupport=xyz')
       .send('additionalSupport=wheelchair')
       .expect(302)
-      .expect('location', '/visit/additional-support/A1234BC')
+      .expect('location', '/visit/additional-support')
       .expect(() => {
         expect(flashProvider).toHaveBeenCalledWith('errors', [
           { location: 'body', msg: 'No request selected', param: 'additionalSupport', value: ['xyz', 'wheelchair'] },
@@ -576,11 +576,11 @@ describe('POST /visit/additional-support/:offenderNo', () => {
 
   it('should set validation errors in flash and redirect if other support requested but not specified', () => {
     return request(sessionApp)
-      .post('/visit/additional-support/A1234BC')
+      .post('/visit/additional-support')
       .send('additionalSupportRequired=yes')
       .send('additionalSupport=other')
       .expect(302)
-      .expect('location', '/visit/additional-support/A1234BC')
+      .expect('location', '/visit/additional-support')
       .expect(() => {
         expect(flashProvider).toHaveBeenCalledWith('errors', [
           { location: 'body', msg: 'Enter details of the request', param: 'otherSupportDetails', value: '' },
@@ -599,10 +599,10 @@ describe('POST /visit/additional-support/:offenderNo', () => {
     }
 
     return request(sessionApp)
-      .post('/visit/additional-support/A1234BC')
+      .post('/visit/additional-support')
       .send('additionalSupportRequired=yes')
       .expect(302)
-      .expect('location', '/visit/additional-support/A1234BC')
+      .expect('location', '/visit/additional-support')
       .expect(() => {
         expect(flashProvider).toHaveBeenCalledWith('errors', [
           { location: 'body', msg: 'No request selected', param: 'additionalSupport', value: [] },
@@ -617,7 +617,7 @@ describe('POST /visit/additional-support/:offenderNo', () => {
 
   it('should redirect to the select main contact page if "no" additional support radio selected and store in session', () => {
     return request(sessionApp)
-      .post('/visit/additional-support/A1234BC')
+      .post('/visit/additional-support')
       .send('additionalSupportRequired=no')
       .expect(302)
       .expect('location', '/visit/select-main-contact/A1234BC')
@@ -628,7 +628,7 @@ describe('POST /visit/additional-support/:offenderNo', () => {
 
   it('should redirect to the select main contact page when support requests chosen and store in session', () => {
     return request(sessionApp)
-      .post('/visit/additional-support/A1234BC')
+      .post('/visit/additional-support')
       .send('additionalSupportRequired=yes')
       .send('additionalSupport=wheelchair')
       .send('additionalSupport=inductionLoop')
