@@ -86,7 +86,7 @@ describe('GET /search/results?search=A1234BC', () => {
 })
 
 describe('GET /search/results?search=A1234BC', () => {
-  it('should render results page with results', () => {
+  it('should render results page with results and no next/prev when there are less than 11 results', () => {
     returnData = {
       results: [
         [
@@ -107,6 +107,82 @@ describe('GET /search/results?search=A1234BC', () => {
       .expect(res => {
         expect(res.text).toContain('Search for a prisoner')
         expect(res.text).toContain('id="search-results-true"')
+        expect(res.text).not.toContain('<p class="moj-pagination__results">')
+      })
+  })
+
+  it('should render results page with results and prev/next when there are more than 10 results', () => {
+    returnData = {
+      results: [
+        [
+          { html: '<a href="/prisoner/A1234BC">Smith, John</a>', classes: '' },
+          { html: 'A1234BC', classes: '' },
+          { html: '2 April 1975', classes: '' },
+        ],
+        [
+          { html: '<a href="/prisoner/A1234BC">Smith, John</a>', classes: '' },
+          { html: 'A1234BC', classes: '' },
+          { html: '2 April 1975', classes: '' },
+        ],
+        [
+          { html: '<a href="/prisoner/A1234BC">Smith, John</a>', classes: '' },
+          { html: 'A1234BC', classes: '' },
+          { html: '2 April 1975', classes: '' },
+        ],
+        [
+          { html: '<a href="/prisoner/A1234BC">Smith, John</a>', classes: '' },
+          { html: 'A1234BC', classes: '' },
+          { html: '2 April 1975', classes: '' },
+        ],
+        [
+          { html: '<a href="/prisoner/A1234BC">Smith, John</a>', classes: '' },
+          { html: 'A1234BC', classes: '' },
+          { html: '2 April 1975', classes: '' },
+        ],
+        [
+          { html: '<a href="/prisoner/A1234BC">Smith, John</a>', classes: '' },
+          { html: 'A1234BC', classes: '' },
+          { html: '2 April 1975', classes: '' },
+        ],
+        [
+          { html: '<a href="/prisoner/A1234BC">Smith, John</a>', classes: '' },
+          { html: 'A1234BC', classes: '' },
+          { html: '2 April 1975', classes: '' },
+        ],
+        [
+          { html: '<a href="/prisoner/A1234BC">Smith, John</a>', classes: '' },
+          { html: 'A1234BC', classes: '' },
+          { html: '2 April 1975', classes: '' },
+        ],
+        [
+          { html: '<a href="/prisoner/A1234BC">Smith, John</a>', classes: '' },
+          { html: 'A1234BC', classes: '' },
+          { html: '2 April 1975', classes: '' },
+        ],
+        [
+          { html: '<a href="/prisoner/A1234BC">Smith, John</a>', classes: '' },
+          { html: 'A1234BC', classes: '' },
+          { html: '2 April 1975', classes: '' },
+        ],
+        [
+          { html: '<a href="/prisoner/A1234BC">Smith, John</a>', classes: '' },
+          { html: 'A1234BC', classes: '' },
+          { html: '2 April 1975', classes: '' },
+        ],
+      ],
+      numberOfPages: 12,
+      numberOfResults: 11,
+      next: 2,
+      previous: 1,
+    }
+
+    return request(app)
+      .get('/search/results?search=A1234BC')
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        expect(res.text).toContain('Search for a prisoner')
+        expect(res.text).toContain('id="search-results-true"')
+        expect(res.text).toContain('<p class="moj-pagination__results">')
       })
   })
 })
