@@ -22,7 +22,7 @@ export const checkSession = ({
   // eslint-disable-next-line consistent-return
 }): void => {
   if (!visitData) {
-    return res.redirect('/search/')
+    return res.redirect('/search/?error=missing-session')
   }
 
   if (
@@ -32,11 +32,11 @@ export const checkSession = ({
     !visitData.prisoner.dateOfBirth ||
     !visitData.prisoner.location
   ) {
-    return res.redirect('/search/')
+    return res.redirect('/search/?error=missing-prisoner')
   }
 
   if (stage > 1 && (!visitData.visitors || visitData.visitors.length === 0)) {
-    return res.redirect(`/prisoner/${visitData.prisoner.offenderNo}`)
+    return res.redirect(`/prisoner/${visitData.prisoner.offenderNo}?error=missing-visitors`)
   }
 
   if (
@@ -47,7 +47,7 @@ export const checkSession = ({
       !visitData.visit.startTimestamp ||
       !visitData.visit.endTimestamp)
   ) {
-    return res.redirect(`/prisoner/${visitData.prisoner.offenderNo}`)
+    return res.redirect(`/prisoner/${visitData.prisoner.offenderNo}?error=missing-visit`)
   }
 
   if (
@@ -56,6 +56,6 @@ export const checkSession = ({
       !visitData.mainContact.phoneNumber ||
       (!visitData.mainContact.contact && !visitData.mainContact.contactName))
   ) {
-    return res.redirect(`/prisoner/${visitData.prisoner.offenderNo}`)
+    return res.redirect(`/prisoner/${visitData.prisoner.offenderNo}?error=missing-main-contact`)
   }
 }
