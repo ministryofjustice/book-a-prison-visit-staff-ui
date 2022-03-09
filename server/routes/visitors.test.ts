@@ -6,7 +6,6 @@ import { VisitorListItem, VisitSessionData } from '../@types/bapv'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 
-let app: Express
 let sessionApp: Express
 let prisonerVisitorsService: PrisonerVisitorsService
 const systemToken = async (user: string): Promise<string> => `${user}-token-1`
