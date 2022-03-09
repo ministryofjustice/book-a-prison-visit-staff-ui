@@ -329,11 +329,11 @@ describe('GET /visit/additional-support/:offenderNo', () => {
         },
       ],
     }
+
+    sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, { visitSessionData } as SessionData)
   })
 
   it('should render the additional support page with no options selected', () => {
-    sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, { visitSessionData } as SessionData)
-
     return request(sessionApp)
       .get('/visit/additional-support/A1234BC')
       .expect(200)
@@ -347,8 +347,6 @@ describe('GET /visit/additional-support/:offenderNo', () => {
   })
 
   it('should render the additional support page, pre-populated with session data (for no requests)', () => {
-    sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, { visitSessionData } as SessionData)
-
     visitSessionData.additionalSupport = { required: false }
 
     return request(sessionApp)
@@ -364,8 +362,6 @@ describe('GET /visit/additional-support/:offenderNo', () => {
   })
 
   it('should render the additional support page, pre-populated with session data (multiple requests)', () => {
-    sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, { visitSessionData } as SessionData)
-
     visitSessionData.additionalSupport = {
       required: true,
       keys: ['wheelchair', 'maskExempt', 'other'],
@@ -399,8 +395,6 @@ describe('GET /visit/additional-support/:offenderNo', () => {
       },
     ]
 
-    sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, { visitSessionData } as SessionData)
-
     return request(sessionApp)
       .get('/visit/additional-support/A1234BC')
       .expect(200)
@@ -426,8 +420,6 @@ describe('GET /visit/additional-support/:offenderNo', () => {
     ]
 
     flashData.formValues = [{ additionalSupportRequired: 'yes' }]
-
-    sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, { visitSessionData } as SessionData)
 
     return request(sessionApp)
       .get('/visit/additional-support/A1234BC')
@@ -456,8 +448,6 @@ describe('GET /visit/additional-support/:offenderNo', () => {
 
     flashData.formValues = [{ additionalSupportRequired: 'yes', additionalSupport: ['wheelchair', 'other'] }]
 
-    sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, { visitSessionData } as SessionData)
-
     return request(sessionApp)
       .get('/visit/additional-support/A1234BC')
       .expect(200)
@@ -477,56 +467,7 @@ describe('GET /visit/additional-support/:offenderNo', () => {
 })
 
 describe('POST /visit/additional-support/:offenderNo', () => {
-  beforeAll(() => {
-    const visitorList: VisitorListItem[] = [
-      {
-        personId: 4321,
-        name: 'Jeanette Smith',
-        dateOfBirth: '1986-07-28',
-        adult: true,
-        relationshipDescription: 'Sister',
-        address:
-          'Premises,<br>Flat 23B,<br>123 The Street,<br>Springfield,<br>Coventry,<br>West Midlands,<br>C1 2AB,<br>England',
-        restrictions: [],
-      },
-      {
-        personId: 4322,
-        name: 'Bob Smith',
-        dateOfBirth: '1986-07-28',
-        adult: true,
-        relationshipDescription: 'Brother',
-        address: '1st listed address',
-        restrictions: [],
-      },
-      {
-        personId: 4323,
-        name: 'Ted Smith',
-        dateOfBirth: '1968-07-28',
-        adult: true,
-        relationshipDescription: 'Father',
-        address: '1st listed address',
-        restrictions: [],
-      },
-      {
-        personId: 4324,
-        name: 'Anne Smith',
-        dateOfBirth: '2018-03-02',
-        adult: false,
-        relationshipDescription: 'Niece',
-        address: 'Not entered',
-        restrictions: [],
-      },
-      {
-        personId: 4325,
-        name: 'Bill Smith',
-        dateOfBirth: '2018-03-02',
-        adult: false,
-        relationshipDescription: 'Nephew',
-        address: 'Not entered',
-        restrictions: [],
-      },
-    ]
-    prisonerVisitorsService = new MockPrisonerVisitorsService()
+  beforeEach(() => {
     visitSessionData = {
       prisoner: {
         name: 'prisoner name',
@@ -558,10 +499,7 @@ describe('POST /visit/additional-support/:offenderNo', () => {
         },
       ],
     }
-    sessionApp = appWithAllRoutes(null, null, prisonerVisitorsService, null, systemToken, false, {
-      visitorList,
-      visitSessionData,
-    } as SessionData)
+    sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, { visitSessionData } as SessionData)
   })
 
   it('should set validation errors in flash and redirect if additional support question not answered', () => {
@@ -660,11 +598,7 @@ describe('POST /visit/additional-support/:offenderNo', () => {
       required: false,
     }
 
-    const sessionAppLocal = appWithAllRoutes(null, null, null, null, systemToken, false, {
-      visitSessionData,
-    } as SessionData)
-
-    return request(sessionAppLocal)
+    return request(sessionApp)
       .post('/visit/additional-support/A1234BC')
       .send('additionalSupportRequired=yes')
       .expect(302)
@@ -681,16 +615,18 @@ describe('POST /visit/additional-support/:offenderNo', () => {
       })
   })
 
-  it('should redirect to the select main contact page if "no" additional support radio selected', () => {
+  it('should redirect to the select main contact page if "no" additional support radio selected and store in session', () => {
     return request(sessionApp)
       .post('/visit/additional-support/A1234BC')
       .send('additionalSupportRequired=no')
       .expect(302)
       .expect('location', '/visit/select-main-contact/A1234BC')
-    // @TODO check this choice is saved to session
+      .expect(() => {
+        expect(visitSessionData.additionalSupport?.required).toBe(false)
+      })
   })
 
-  it('should redirect to the select main contact page when support requests chosen', () => {
+  it('should redirect to the select main contact page when support requests chosen and store in session', () => {
     return request(sessionApp)
       .post('/visit/additional-support/A1234BC')
       .send('additionalSupportRequired=yes')
@@ -702,7 +638,17 @@ describe('POST /visit/additional-support/:offenderNo', () => {
       .send('otherSupportDetails=custom-request')
       .expect(302)
       .expect('location', '/visit/select-main-contact/A1234BC')
-    // @TODO check this choice is saved to session
+      .expect(() => {
+        expect(visitSessionData.additionalSupport?.required).toBe(true)
+        expect(visitSessionData.additionalSupport?.keys).toEqual([
+          'wheelchair',
+          'inductionLoop',
+          'bslInterpreter',
+          'maskExempt',
+          'other',
+        ])
+        expect(visitSessionData.additionalSupport?.other).toBe('custom-request')
+      })
   })
 })
 
