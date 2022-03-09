@@ -334,12 +334,12 @@ export default function routes(
         contactName: selectedContact === undefined ? req.body.someoneElseName : undefined,
       }
 
-      return res.redirect(`/visit/check-your-booking/${req.params.offenderNo}`)
+      return res.redirect('/visit/check-your-booking')
     }
   )
 
   router.get(
-    '/check-your-booking/:offenderNo',
+    '/check-your-booking',
     param('offenderNo').custom((value: string) => {
       if (!isValidPrisonerNumber(value)) {
         throw new Error('Invalid prisoner number supplied')
