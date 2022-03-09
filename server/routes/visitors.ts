@@ -1,10 +1,9 @@
 import type { RequestHandler, Router } from 'express'
-import { body, param, validationResult, query } from 'express-validator'
+import { body, validationResult, query } from 'express-validator'
 import { VisitorListItem, VisitSessionData, VisitSlot } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
 import VisitSessionsService from '../services/visitSessionsService'
-import isValidPrisonerNumber from './prisonerProfileValidation'
 import additionalSupportOptions from '../constants/additionalSupportOptions'
 import { checkSession, getSelectedSlot } from './visitorUtils'
 
@@ -15,7 +14,7 @@ export default function routes(
 ): Router {
   const get = (path: string, handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
 
-  get('/select-visitors/:offenderNo', async (req, res) => {
+  get('/select-visitors', async (req, res) => {
     checkSession({
       stage: 1,
       visitData: req.session.visitSessionData,
@@ -31,7 +30,7 @@ export default function routes(
   })
 
   router.post(
-    '/select-visitors/:offenderNo',
+    '/select-visitors',
     body('visitors').custom((value: string, { req }) => {
       const selected = [].concat(value)
 
@@ -100,12 +99,12 @@ export default function routes(
       req.session.adultVisitors = adults
       req.session.visitSessionData.visitors = selectedVisitors
 
-      return res.redirect(`/visit/select-date-and-time/${req.params.offenderNo}`)
+      return res.redirect('/visit/select-date-and-time')
     }
   )
 
   router.get(
-    '/select-date-and-time/:offenderNo',
+    '/select-date-and-time',
     query('timeOfDay').customSanitizer((value: string) => (!['morning', 'afternoon'].includes(value) ? '' : value)),
     query('dayOfTheWeek').customSanitizer((value: string) =>
       parseInt(value, 10) >= 0 && parseInt(value, 10) <= 6 ? value : ''
@@ -139,7 +138,7 @@ export default function routes(
   )
 
   router.post(
-    '/select-date-and-time/:offenderNo',
+    '/select-date-and-time',
     body('visit-date-and-time').custom((value: string, { req }) => {
       // check selected slot is in the list that was shown and has available tables
       const selectedSlot: VisitSlot = getSelectedSlot(req.session.slotsList, value)
@@ -171,11 +170,11 @@ export default function routes(
 
       req.session.visitSessionData.visit = getSelectedSlot(req.session.slotsList, req.body['visit-date-and-time'])
 
-      return res.redirect(`/visit/additional-support/${req.params.offenderNo}`)
+      return res.redirect('/visit/additional-support')
     }
   )
 
-  router.get('/additional-support/:offenderNo', async (req, res) => {
+  router.get('/additional-support', async (req, res) => {
     checkSession({
       stage: 3,
       visitData: req.session.visitSessionData,
@@ -200,7 +199,7 @@ export default function routes(
   })
 
   router.post(
-    '/additional-support/:offenderNo',
+    '/additional-support',
     body('additionalSupportRequired').custom((value: string) => {
       if (!/^yes|no$/.test(value)) {
         throw new Error('No answer selected')
@@ -236,7 +235,6 @@ export default function routes(
         res,
       })
 
-      const { offenderNo } = req.session.visitSessionData.prisoner
       const errors = validationResult(req)
 
       if (!errors.isEmpty()) {
@@ -252,16 +250,13 @@ export default function routes(
         selectedSupport.other = req.body.additionalSupport.includes('other') ? req.body.otherSupportDetails : undefined
       }
 
-      // @TODO conditional will need removing when session validation looked at
-      if (req.session.visitSessionData) {
-        req.session.visitSessionData.additionalSupport = selectedSupport
-      }
+      req.session.visitSessionData.additionalSupport = selectedSupport
 
-      return res.redirect(`/visit/select-main-contact/${offenderNo}`)
+      return res.redirect('/visit/select-main-contact')
     }
   )
 
-  router.get('/select-main-contact/:offenderNo', async (req, res) => {
+  router.get('/select-main-contact', async (req, res) => {
     checkSession({
       stage: 4,
       visitData: req.session.visitSessionData,
@@ -277,7 +272,7 @@ export default function routes(
   })
 
   router.post(
-    '/select-main-contact/:offenderNo',
+    '/select-main-contact',
     body('contact').custom((value: string) => {
       if (!value) {
         throw new Error('No main contact selected')
@@ -334,47 +329,37 @@ export default function routes(
         contactName: selectedContact === undefined ? req.body.someoneElseName : undefined,
       }
 
-      return res.redirect(`/visit/check-your-booking/${req.params.offenderNo}`)
+      return res.redirect('/visit/check-your-booking')
     }
   )
 
-  router.get(
-    '/check-your-booking/:offenderNo',
-    param('offenderNo').custom((value: string) => {
-      if (!isValidPrisonerNumber(value)) {
-        throw new Error('Invalid prisoner number supplied')
-      }
+  router.get('/check-your-booking', async (req, res) => {
+    const { visitSessionData } = req.session
+    checkSession({
+      stage: 5,
+      visitData: visitSessionData,
+      res,
+    })
+    const { offenderNo } = req.session.visitSessionData.prisoner
 
-      return true
-    }),
-    async (req, res) => {
-      const { visitSessionData } = req.session
-      checkSession({
-        stage: 5,
-        visitData: visitSessionData,
-        res,
-      })
-      const { offenderNo } = req.session.visitSessionData.prisoner
+    const additionalSupport = visitSessionData.additionalSupport?.keys?.map(key => {
+      return key === additionalSupportOptions.items.OTHER.key
+        ? visitSessionData.additionalSupport.other
+        : additionalSupportOptions.getValue(key)
+    })
 
-      const additionalSupport = visitSessionData.additionalSupport?.keys?.map(key => {
-        return key === additionalSupportOptions.items.OTHER.key
-          ? visitSessionData.additionalSupport.other
-          : additionalSupportOptions.getValue(key)
-      })
-
-      res.render('pages/checkYourBooking', {
-        offenderNo,
-        contactDetails: {
-          phoneNumber: req.session.visitSessionData.mainContact.phoneNumber,
-        },
-        mainContact: visitSessionData.mainContact,
-        prisoner: visitSessionData.prisoner,
-        visit: visitSessionData.visit,
-        visitors: visitSessionData.visitors,
-        additionalSupport,
-      })
-    }
-  )
+    res.render('pages/checkYourBooking', {
+      offenderNo,
+      contactDetails: {
+        phoneNumber: req.session.visitSessionData.mainContact.phoneNumber,
+      },
+      mainContact: visitSessionData.mainContact,
+      prisoner: visitSessionData.prisoner,
+      visit: visitSessionData.visit,
+      visitors: visitSessionData.visitors,
+      additionalSupport,
+    })
+  })
 
   return router
 }
