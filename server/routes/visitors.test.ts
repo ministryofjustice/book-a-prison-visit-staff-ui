@@ -147,15 +147,6 @@ describe('GET /visit/select-visitors', () => {
         expect(res.text).not.toMatch(/<button.|\s*?Continue.|\s*?<\/button>/)
       })
   })
-
-  it.skip('should render 400 Bad Request error for invalid prisoner number', () => {
-    return request(app)
-      .get('/visit/select-visitors')
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        expect(res.text).toContain('BadRequestError: Bad Request')
-      })
-  })
 })
 
 describe('POST /visit/select-visitors', () => {
@@ -652,12 +643,5 @@ describe('POST /visit/additional-support', () => {
   })
 })
 
-describe.skip('GET /visit/select-main-contact', () => {
-  it('should show an error if invalid prisoner number supplied', () => {
-    const req = request(app).get('/visit/select-main-contact')
-
-    return req.expect('Content-Type', /html/).expect(res => {
-      expect(res.text).toContain('Invalid prisoner number supplied')
-    })
-  })
-})
+// describe('GET /visit/select-main-contact', () => {
+// })
