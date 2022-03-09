@@ -257,11 +257,11 @@ export default function routes(
         req.session.visitSessionData.additionalSupport = selectedSupport
       }
 
-      return res.redirect(`/visit/select-main-contact/${offenderNo}`)
+      return res.redirect('/visit/select-main-contact')
     }
   )
 
-  router.get('/select-main-contact/:offenderNo', async (req, res) => {
+  router.get('/select-main-contact', async (req, res) => {
     checkSession({
       stage: 4,
       visitData: req.session.visitSessionData,
@@ -277,7 +277,7 @@ export default function routes(
   })
 
   router.post(
-    '/select-main-contact/:offenderNo',
+    '/select-main-contact',
     body('contact').custom((value: string) => {
       if (!value) {
         throw new Error('No main contact selected')

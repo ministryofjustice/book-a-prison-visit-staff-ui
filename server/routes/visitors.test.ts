@@ -620,7 +620,7 @@ describe('POST /visit/additional-support', () => {
       .post('/visit/additional-support')
       .send('additionalSupportRequired=no')
       .expect(302)
-      .expect('location', '/visit/select-main-contact/A1234BC')
+      .expect('location', '/visit/select-main-contact')
       .expect(() => {
         expect(visitSessionData.additionalSupport?.required).toBe(false)
       })
@@ -637,7 +637,7 @@ describe('POST /visit/additional-support', () => {
       .send('additionalSupport=other')
       .send('otherSupportDetails=custom-request')
       .expect(302)
-      .expect('location', '/visit/select-main-contact/A1234BC')
+      .expect('location', '/visit/select-main-contact')
       .expect(() => {
         expect(visitSessionData.additionalSupport?.required).toBe(true)
         expect(visitSessionData.additionalSupport?.keys).toEqual([
@@ -652,9 +652,9 @@ describe('POST /visit/additional-support', () => {
   })
 })
 
-describe.skip('GET /visit/select-main-contact/A1234BC', () => {
+describe.skip('GET /visit/select-main-contact', () => {
   it('should show an error if invalid prisoner number supplied', () => {
-    const req = request(app).get('/visit/select-main-contact/123')
+    const req = request(app).get('/visit/select-main-contact')
 
     return req.expect('Content-Type', /html/).expect(res => {
       expect(res.text).toContain('Invalid prisoner number supplied')
