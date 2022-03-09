@@ -1,70 +1,12 @@
-import type { RequestHandler, Router, Response } from 'express'
+import type { RequestHandler, Router } from 'express'
 import { body, param, validationResult, query } from 'express-validator'
-import { VisitorListItem, VisitSessionData, VisitSlot, VisitSlotList } from '../@types/bapv'
+import { VisitorListItem, VisitSessionData, VisitSlot } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
 import VisitSessionsService from '../services/visitSessionsService'
 import isValidPrisonerNumber from './prisonerProfileValidation'
 import additionalSupportOptions from '../constants/additionalSupportOptions'
-// @TODO move validation now it's shared?
-
-const getSelectedSlot = (slotsList: VisitSlotList, selectedSlot: string): VisitSlot => {
-  return Object.values(slotsList)
-    .flat()
-    .reduce((allSlots, slot) => {
-      return allSlots.concat(slot.slots.morning, slot.slots.afternoon)
-    }, [])
-    .find(slot => slot.id === selectedSlot)
-}
-
-const checkSession = ({
-  stage,
-  visitData,
-  res,
-}: {
-  stage: number
-  visitData: VisitSessionData
-  res: Response
-  // eslint-disable-next-line consistent-return
-}): void => {
-  if (!visitData) {
-    return res.redirect('/search/')
-  }
-
-  if (
-    !visitData.prisoner ||
-    !visitData.prisoner.name ||
-    !isValidPrisonerNumber(visitData.prisoner.offenderNo) ||
-    !visitData.prisoner.dateOfBirth ||
-    !visitData.prisoner.location
-  ) {
-    return res.redirect('/search/')
-  }
-
-  if (stage > 1 && (!visitData.visitors || visitData.visitors.length === 0)) {
-    return res.redirect(`/prisoner/${visitData.prisoner.offenderNo}`)
-  }
-
-  if (
-    stage > 2 &&
-    (!visitData.visit ||
-      !visitData.visit.id ||
-      !visitData.visit.availableTables ||
-      !visitData.visit.startTimestamp ||
-      !visitData.visit.endTimestamp)
-  ) {
-    return res.redirect(`/prisoner/${visitData.prisoner.offenderNo}`)
-  }
-
-  if (
-    stage > 4 &&
-    (!visitData.mainContact ||
-      !visitData.mainContact.phoneNumber ||
-      (!visitData.mainContact.contact && !visitData.mainContact.contactName))
-  ) {
-    return res.redirect(`/prisoner/${visitData.prisoner.offenderNo}`)
-  }
-}
+import { checkSession, getSelectedSlot } from './visitorUtils'
 
 export default function routes(
   router: Router,
@@ -235,7 +177,7 @@ export default function routes(
 
   router.get('/additional-support/:offenderNo', async (req, res) => {
     checkSession({
-      stage: 4,
+      stage: 3,
       visitData: req.session.visitSessionData,
       res,
     })
@@ -289,7 +231,7 @@ export default function routes(
       }),
     async (req, res) => {
       checkSession({
-        stage: 4,
+        stage: 3,
         visitData: req.session.visitSessionData,
         res,
       })
@@ -319,32 +261,20 @@ export default function routes(
     }
   )
 
-  router.get(
-    '/select-main-contact/:offenderNo',
-    param('offenderNo').custom((value: string) => {
-      if (!isValidPrisonerNumber(value)) {
-        throw new Error('Invalid prisoner number supplied')
-      }
+  router.get('/select-main-contact/:offenderNo', async (req, res) => {
+    checkSession({
+      stage: 4,
+      visitData: req.session.visitSessionData,
+      res,
+    })
 
-      return true
-    }),
-    async (req, res) => {
-      checkSession({
-        stage: 5,
-        visitData: req.session.visitSessionData,
-        res,
-      })
+    const { offenderNo } = req.session.visitSessionData.prisoner
 
-      const { offenderNo } = req.session.visitSessionData.prisoner
-      const errors = validationResult(req)
-
-      res.render('pages/mainContact', {
-        errors: !errors.isEmpty() ? errors.array() : [],
-        offenderNo,
-        adultVisitors: req.session.adultVisitors,
-      })
-    }
-  )
+    res.render('pages/mainContact', {
+      offenderNo,
+      adultVisitors: req.session.adultVisitors,
+    })
+  })
 
   router.post(
     '/select-main-contact/:offenderNo',
@@ -375,7 +305,7 @@ export default function routes(
     }),
     async (req, res) => {
       checkSession({
-        stage: 5,
+        stage: 4,
         visitData: req.session.visitSessionData,
         res,
       })
@@ -418,9 +348,13 @@ export default function routes(
       return true
     }),
     async (req, res) => {
-      const { offenderNo } = req.params
-      const errors = validationResult(req)
       const { visitSessionData } = req.session
+      checkSession({
+        stage: 5,
+        visitData: visitSessionData,
+        res,
+      })
+      const { offenderNo } = req.session.visitSessionData.prisoner
 
       const additionalSupport = visitSessionData.additionalSupport?.keys?.map(key => {
         return key === additionalSupportOptions.items.OTHER.key
@@ -429,7 +363,6 @@ export default function routes(
       })
 
       res.render('pages/checkYourBooking', {
-        errors: !errors.isEmpty() ? errors.array() : [],
         offenderNo,
         contactDetails: {
           phoneNumber: req.session.visitSessionData.mainContact.phoneNumber,
