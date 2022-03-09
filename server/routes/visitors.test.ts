@@ -37,7 +37,7 @@ afterEach(() => {
   jest.resetAllMocks()
 })
 
-describe('GET /visit/select-visitors/A1234BC', () => {
+describe('GET /visit/select-visitors', () => {
   beforeAll(() => {
     prisonerVisitorsService = new MockPrisonerVisitorsService()
     sessionApp = appWithAllRoutes(null, null, prisonerVisitorsService, null, systemToken, false, {
@@ -115,7 +115,7 @@ describe('GET /visit/select-visitors/A1234BC', () => {
     }
 
     return request(sessionApp)
-      .get('/visit/select-visitors/A1234BC')
+      .get('/visit/select-visitors')
       .expect('Content-Type', /html/)
       .expect(res => {
         expect(res.text).toContain('Prisoner name:</strong> John Smith</p>')
@@ -131,7 +131,7 @@ describe('GET /visit/select-visitors/A1234BC', () => {
         expect(res.text).toMatch(/Bob Smith.|\s*?Not entered.|\s*?Brother.|\s*?1st listed address.|\s*?None/)
         expect(res.text).toMatch(/Anne Smith.|\s*?2 March 2018<br>(Child).|\s*?Not entered.|\s*?None/)
         expect(res.text).toMatch(/<button.|\s*?Continue.|\s*?<\/button>/)
-        expect(res.text).toContain('<form action="/visit/select-visitors/A1234BC"')
+        expect(res.text).toContain('<form action="/visit/select-visitors"')
       })
   })
 
@@ -139,7 +139,7 @@ describe('GET /visit/select-visitors/A1234BC', () => {
     returnData = { prisonerName: 'Adam Jones', visitorList: [] }
 
     return request(sessionApp)
-      .get('/visit/select-visitors/A1234BC')
+      .get('/visit/select-visitors')
       .expect('Content-Type', /html/)
       .expect(res => {
         expect(res.text).toContain('Prisoner name:</strong> Adam Jones</p>')
@@ -150,7 +150,7 @@ describe('GET /visit/select-visitors/A1234BC', () => {
 
   it.skip('should render 400 Bad Request error for invalid prisoner number', () => {
     return request(app)
-      .get('/visit/select-visitors/A12--34BC')
+      .get('/visit/select-visitors')
       .expect('Content-Type', /html/)
       .expect(res => {
         expect(res.text).toContain('BadRequestError: Bad Request')
@@ -158,7 +158,7 @@ describe('GET /visit/select-visitors/A1234BC', () => {
   })
 })
 
-describe('POST /visit/select-visitors/A1234BC', () => {
+describe('POST /visit/select-visitors', () => {
   beforeAll(() => {
     const visitorList: VisitorListItem[] = [
       {
@@ -224,41 +224,41 @@ describe('POST /visit/select-visitors/A1234BC', () => {
 
   it('should redirect to the select date and time page if an adult is selected', () => {
     return request(sessionApp)
-      .post('/visit/select-visitors/A1234BC')
+      .post('/visit/select-visitors')
       .send('visitors=4322')
       .expect(302)
-      .expect('location', '/visit/select-date-and-time/A1234BC')
+      .expect('location', '/visit/select-date-and-time')
   })
 
   it('should show an error if no visitors are selected', () => {
     return request(sessionApp)
-      .post('/visit/select-visitors/A1234BC')
+      .post('/visit/select-visitors')
       .expect('Content-Type', /html/)
       .expect(res => {
         expect(res.text).toContain('No visitors selected')
         expect(res.text).not.toContain('Select no more than 3 visitors with a maximum of 2 adults')
         expect(res.text).not.toContain('Select no more than 2 adults')
         expect(res.text).not.toContain('Add an adult to the visit')
-        expect(res.text).toContain('<form action="/visit/select-visitors/A1234BC"')
+        expect(res.text).toContain('<form action="/visit/select-visitors"')
       })
   })
 
   it('should show an error if no visitors are selected', () => {
     return request(sessionApp)
-      .post('/visit/select-visitors/A1234BC')
+      .post('/visit/select-visitors')
       .expect('Content-Type', /html/)
       .expect(res => {
         expect(res.text).toContain('No visitors selected')
         expect(res.text).not.toContain('Select no more than 3 visitors with a maximum of 2 adults')
         expect(res.text).not.toContain('Select no more than 2 adults')
         expect(res.text).not.toContain('Add an adult to the visit')
-        expect(res.text).toContain('<form action="/visit/select-visitors/A1234BC"')
+        expect(res.text).toContain('<form action="/visit/select-visitors"')
       })
   })
 
   it('should show an error if no adults are selected', () => {
     return request(sessionApp)
-      .post('/visit/select-visitors/A1234BC')
+      .post('/visit/select-visitors')
       .send('visitors=4324')
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -271,7 +271,7 @@ describe('POST /visit/select-visitors/A1234BC', () => {
 
   it('should show an error if more than 2 adults are selected', () => {
     return request(sessionApp)
-      .post('/visit/select-visitors/A1234BC')
+      .post('/visit/select-visitors')
       .send('visitors=4321&visitors=4322&visitors=4323')
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -284,7 +284,7 @@ describe('POST /visit/select-visitors/A1234BC', () => {
 
   it('should show an error if more than 3 visitors are selected', () => {
     return request(sessionApp)
-      .post('/visit/select-visitors/A1234BC')
+      .post('/visit/select-visitors')
       .send('visitors=4321&visitors=4322&visitors=4323&visitors=4324')
       .expect('Content-Type', /html/)
       .expect(res => {

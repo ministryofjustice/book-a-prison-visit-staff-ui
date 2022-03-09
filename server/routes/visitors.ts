@@ -15,7 +15,7 @@ export default function routes(
 ): Router {
   const get = (path: string, handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
 
-  get('/select-visitors/:offenderNo', async (req, res) => {
+  get('/select-visitors', async (req, res) => {
     checkSession({
       stage: 1,
       visitData: req.session.visitSessionData,
@@ -31,7 +31,7 @@ export default function routes(
   })
 
   router.post(
-    '/select-visitors/:offenderNo',
+    '/select-visitors',
     body('visitors').custom((value: string, { req }) => {
       const selected = [].concat(value)
 
@@ -100,7 +100,7 @@ export default function routes(
       req.session.adultVisitors = adults
       req.session.visitSessionData.visitors = selectedVisitors
 
-      return res.redirect(`/visit/select-date-and-time/${req.params.offenderNo}`)
+      return res.redirect('/visit/select-date-and-time')
     }
   )
 
