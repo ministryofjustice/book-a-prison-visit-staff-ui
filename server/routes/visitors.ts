@@ -1,10 +1,9 @@
 import type { RequestHandler, Router } from 'express'
-import { body, param, validationResult, query } from 'express-validator'
+import { body, validationResult, query } from 'express-validator'
 import { VisitorListItem, VisitSessionData, VisitSlot } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
 import VisitSessionsService from '../services/visitSessionsService'
-import isValidPrisonerNumber from './prisonerProfileValidation'
 import additionalSupportOptions from '../constants/additionalSupportOptions'
 import { checkSession, getSelectedSlot } from './visitorUtils'
 
@@ -236,7 +235,6 @@ export default function routes(
         res,
       })
 
-      const { offenderNo } = req.session.visitSessionData.prisoner
       const errors = validationResult(req)
 
       if (!errors.isEmpty()) {
@@ -252,10 +250,7 @@ export default function routes(
         selectedSupport.other = req.body.additionalSupport.includes('other') ? req.body.otherSupportDetails : undefined
       }
 
-      // @TODO conditional will need removing when session validation looked at
-      if (req.session.visitSessionData) {
-        req.session.visitSessionData.additionalSupport = selectedSupport
-      }
+      req.session.visitSessionData.additionalSupport = selectedSupport
 
       return res.redirect('/visit/select-main-contact')
     }
@@ -338,43 +333,33 @@ export default function routes(
     }
   )
 
-  router.get(
-    '/check-your-booking',
-    param('offenderNo').custom((value: string) => {
-      if (!isValidPrisonerNumber(value)) {
-        throw new Error('Invalid prisoner number supplied')
-      }
+  router.get('/check-your-booking', async (req, res) => {
+    const { visitSessionData } = req.session
+    checkSession({
+      stage: 5,
+      visitData: visitSessionData,
+      res,
+    })
+    const { offenderNo } = req.session.visitSessionData.prisoner
 
-      return true
-    }),
-    async (req, res) => {
-      const { visitSessionData } = req.session
-      checkSession({
-        stage: 5,
-        visitData: visitSessionData,
-        res,
-      })
-      const { offenderNo } = req.session.visitSessionData.prisoner
+    const additionalSupport = visitSessionData.additionalSupport?.keys?.map(key => {
+      return key === additionalSupportOptions.items.OTHER.key
+        ? visitSessionData.additionalSupport.other
+        : additionalSupportOptions.getValue(key)
+    })
 
-      const additionalSupport = visitSessionData.additionalSupport?.keys?.map(key => {
-        return key === additionalSupportOptions.items.OTHER.key
-          ? visitSessionData.additionalSupport.other
-          : additionalSupportOptions.getValue(key)
-      })
-
-      res.render('pages/checkYourBooking', {
-        offenderNo,
-        contactDetails: {
-          phoneNumber: req.session.visitSessionData.mainContact.phoneNumber,
-        },
-        mainContact: visitSessionData.mainContact,
-        prisoner: visitSessionData.prisoner,
-        visit: visitSessionData.visit,
-        visitors: visitSessionData.visitors,
-        additionalSupport,
-      })
-    }
-  )
+    res.render('pages/checkYourBooking', {
+      offenderNo,
+      contactDetails: {
+        phoneNumber: req.session.visitSessionData.mainContact.phoneNumber,
+      },
+      mainContact: visitSessionData.mainContact,
+      prisoner: visitSessionData.prisoner,
+      visit: visitSessionData.visit,
+      visitors: visitSessionData.visitors,
+      additionalSupport,
+    })
+  })
 
   return router
 }
