@@ -14,7 +14,8 @@
 {% for visitor in visitorList %}
   {% set checkbox -%}
   <div class="govuk-checkboxes__item">
-    <input class="govuk-checkboxes__input" id="visitor-{{ visitor.personId }}" name="visitors" type="checkbox" value="{{ visitor.personId }}"{{ "checked" if visitor.selected }}>
+    <input class="govuk-checkboxes__input" id="visitor-{{ visitor.personId }}" name="visitors" type="checkbox"
+      value="{{ visitor.personId }}"{{ "checked" if formValues.visitors and visitor.personId | string in formValues.visitors }}>
     <label class="govuk-label govuk-checkboxes__label" for="visitor-{{ visitor.personId }}">
       <span class="govuk-visually-hidden">Select {{ visitor.name }}</span>
     </label>
@@ -49,19 +50,24 @@
       html: checkbox
     },
     {
-      text: visitor.name
+      text: visitor.name,
+      attributes: { "data-test": "visitor-name-" + visitor.personId }
     },
     {
-      html: dateOfBirth
+      html: dateOfBirth,
+      attributes: { "data-test": "visitor-dob-" + visitor.personId }
     },
     {
-      text: visitor.relationshipDescription
+      text: visitor.relationshipDescription,
+      attributes: { "data-test": "visitor-relation-" + visitor.personId }
     },
     {
-      html: visitor.address
+      html: visitor.address,
+      attributes: { "data-test": "visitor-address-" + visitor.personId }
     },
     {
-      html: restrictions if restrictions else "None"
+      html: restrictions if restrictions else "None",
+      attributes: { "data-test": "visitor-restrictions-" + visitor.personId }
     }
   ]), visitors) %}
 {% endfor %}
@@ -73,7 +79,7 @@
 
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
 
-      <p><strong class="govuk-!-margin-right-4">Prisoner name:</strong> {{ prisonerName }}</p>
+      <p><strong class="govuk-!-margin-right-4">Prisoner name:</strong> <span data-test="prisoner-name">{{ prisonerName }}</span></p>
 
       {% if visitors | length %}
       {% if errors | length %}
@@ -115,7 +121,8 @@
         }) }}
         </div>
         {{ govukButton({
-          text: "Continue"
+          text: "Continue",
+          attributes: { "data-test": "submit" }
         }) }} 
       </form>
     {% else %}

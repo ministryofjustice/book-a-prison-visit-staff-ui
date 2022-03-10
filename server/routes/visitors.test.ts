@@ -2,7 +2,7 @@ import type { Express } from 'express'
 import request from 'supertest'
 import { SessionData } from 'express-session'
 import * as cheerio from 'cheerio'
-import { VisitorListItem, VisitSessionData } from '../@types/bapv'
+import { Restriction, VisitorListItem, VisitSessionData } from '../@types/bapv'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 
@@ -37,21 +37,16 @@ afterEach(() => {
 })
 
 describe('GET /visit/select-visitors', () => {
-  beforeAll(() => {
-    prisonerVisitorsService = new MockPrisonerVisitorsService()
-    sessionApp = appWithAllRoutes(null, null, prisonerVisitorsService, null, systemToken, false, {
-      visitSessionData: {
-        prisoner: {
-          name: 'prisoner name',
-          offenderNo: 'A1234BC',
-          dateOfBirth: '25 May 1988',
-          location: 'location place',
-        },
+  beforeEach(() => {
+    visitSessionData = {
+      prisoner: {
+        name: 'John Smith',
+        offenderNo: 'A1234BC',
+        dateOfBirth: '25 May 1988',
+        location: 'location place',
       },
-    } as SessionData)
-  })
+    }
 
-  it('should render the approved visitor list for offender number A1234BC', () => {
     returnData = {
       prisonerName: 'John Smith',
       visitorList: [
@@ -64,7 +59,6 @@ describe('GET /visit/select-visitors', () => {
           address:
             'Premises,<br>Flat 23B,<br>123 The Street,<br>Springfield,<br>Coventry,<br>West Midlands,<br>C1 2AB,<br>England',
           restrictions: [
-            // @ts-expect-error missing properties from type Restriction
             {
               restrictionType: 'BAN',
               restrictionTypeDescription: 'Banned',
@@ -72,25 +66,22 @@ describe('GET /visit/select-visitors', () => {
               expiryDate: '2022-07-31',
               comment: 'Ban details',
             },
-            // @ts-expect-error missing properties from type Restriction
             {
               restrictionType: 'RESTRICTED',
               restrictionTypeDescription: 'Restricted',
               startDate: '2022-01-02',
             },
-            // @ts-expect-error missing properties from type Restriction
             {
               restrictionType: 'CLOSED',
               restrictionTypeDescription: 'Closed',
               startDate: '2022-01-03',
             },
-            // @ts-expect-error missing properties from type Restriction
             {
               restrictionType: 'NONCON',
               restrictionTypeDescription: 'Non-Contact Visit',
               startDate: '2022-01-04',
             },
-          ],
+          ] as Restriction[],
         },
         {
           personId: 4322,
@@ -113,43 +104,148 @@ describe('GET /visit/select-visitors', () => {
       ],
     }
 
+    prisonerVisitorsService = new MockPrisonerVisitorsService()
+
+    sessionApp = appWithAllRoutes(null, null, prisonerVisitorsService, null, systemToken, false, {
+      visitSessionData,
+    } as SessionData)
+  })
+
+  it('should render the approved visitor list for offender number A1234BC with none selected', () => {
     return request(sessionApp)
       .get('/visit/select-visitors')
+      .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
-        expect(res.text).toContain('Prisoner name:</strong> John Smith</p>')
-        expect(res.text).toContain('id="visitor-4321"')
-        expect(res.text).toContain('28 July 1986<br>(Adult)')
-        expect(res.text).toContain('Sister')
-        expect(res.text).toContain('123 The Street')
-        expect(res.text).toContain('visitor-restriction-badge--BAN">Banned</span> until 31 July 2022')
-        expect(res.text).toContain('Ban details')
-        expect(res.text).toContain('visitor-restriction-badge--RESTRICTED">Restricted</span> End date not entered')
-        expect(res.text).toContain('visitor-restriction-badge--CLOSED">Closed</span> End date not entered')
-        expect(res.text).toContain('visitor-restriction-badge--NONCON">Non-Contact Visit</span> End date not entered')
-        expect(res.text).toMatch(/Bob Smith.|\s*?Not entered.|\s*?Brother.|\s*?1st listed address.|\s*?None/)
-        expect(res.text).toMatch(/Anne Smith.|\s*?2 March 2018<br>(Child).|\s*?Not entered.|\s*?None/)
-        expect(res.text).toMatch(/<button.|\s*?Continue.|\s*?<\/button>/)
-        expect(res.text).toContain('<form action="/visit/select-visitors"')
+        const $ = cheerio.load(res.text)
+        expect($('[data-test="prisoner-name"]').text()).toEqual('John Smith')
+
+        expect($('#visitor-4321').length).toBe(1)
+        expect($('[data-test="visitor-name-4321"]').text()).toBe('Jeanette Smith')
+        expect($('[data-test="visitor-dob-4321"]').text()).toMatch(/28 July 1986.*Adult/)
+        expect($('[data-test="visitor-relation-4321"]').text()).toContain('Sister')
+        expect($('[data-test="visitor-address-4321"]').text()).toContain('123 The Street')
+        const restrictions = $('[data-test="visitor-restrictions-4321"] .visitor-restriction')
+        expect(restrictions.eq(0).text()).toContain('Banned until 31 July 2022')
+        expect(restrictions.eq(0).text()).toContain('Ban details')
+        expect(restrictions.eq(1).text()).toContain('Restricted End date not entered')
+        expect(restrictions.eq(2).text()).toContain('Closed End date not entered')
+        expect(restrictions.eq(3).text()).toContain('Non-Contact Visit End date not entered')
+
+        expect($('[data-test="visitor-name-4322"]').text()).toBe('Bob Smith')
+        expect($('[data-test="visitor-restrictions-4322"]').text()).toBe('None')
+
+        expect($('[data-test="visitor-name-4324"]').text()).toBe('Anne Smith')
+        expect($('[data-test="visitor-dob-4324"]').text()).toMatch(/2 March 2018.*Child/)
+
+        expect($('input[name="visitors"]:checked').length).toBe(0)
+        expect($('[data-test="submit"]').text()).toContain('Continue')
+      })
+  })
+
+  it('should render the approved visitor list for offender number A1234BC with those in session (single) selected', () => {
+    visitSessionData.visitors = [
+      {
+        address: '1st listed address',
+        adult: undefined,
+        dateOfBirth: undefined,
+        name: 'Bob Smith',
+        personId: 4322,
+        relationshipDescription: 'Brother',
+        restrictions: [],
+        selected: true,
+      },
+    ]
+
+    return request(sessionApp)
+      .get('/visit/select-visitors')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('[data-test="prisoner-name"]').text()).toEqual('John Smith')
+        expect($('input[name="visitors"]').length).toBe(3)
+        expect($('#visitor-4321').prop('checked')).toBe(false)
+        expect($('#visitor-4322').prop('checked')).toBe(true)
+        expect($('#visitor-4324').prop('checked')).toBe(false)
+        expect($('[data-test="submit"]').text()).toContain('Continue')
+      })
+  })
+
+  it('should render the approved visitor list for offender number A1234BC with those in session (multiple) selected', () => {
+    visitSessionData.visitors = [
+      {
+        address: '1st listed address',
+        adult: undefined,
+        dateOfBirth: undefined,
+        name: 'Bob Smith',
+        personId: 4322,
+        relationshipDescription: 'Brother',
+        restrictions: [],
+        selected: true,
+      },
+      {
+        address: 'Not entered',
+        adult: false,
+        dateOfBirth: '2018-03-02',
+        name: 'Anne Smith',
+        personId: 4324,
+        relationshipDescription: 'Niece',
+        restrictions: [],
+        selected: true,
+      },
+    ]
+
+    return request(sessionApp)
+      .get('/visit/select-visitors')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('[data-test="prisoner-name"]').text()).toEqual('John Smith')
+        expect($('input[name="visitors"]').length).toBe(3)
+        expect($('#visitor-4321').prop('checked')).toBe(false)
+        expect($('#visitor-4322').prop('checked')).toBe(true)
+        expect($('#visitor-4324').prop('checked')).toBe(true)
+        expect($('[data-test="submit"]').text()).toContain('Continue')
+      })
+  })
+
+  it('should render validation errors from flash data for invalid input', () => {
+    flashData.errors = [{ location: 'body', msg: 'No visitors selected', param: 'visitors', value: undefined }]
+
+    return request(sessionApp)
+      .get('/visit/select-visitors')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('[data-test="prisoner-name"]').text()).toEqual('John Smith')
+        expect($('.govuk-error-summary__body').text()).toContain('No visitors selected')
+        expect($('#visitors-error').text()).toContain('No visitors selected')
+        expect(flashProvider).toHaveBeenCalledWith('errors')
+        expect(flashProvider).toHaveBeenCalledWith('formValues')
+        expect(flashProvider).toHaveBeenCalledTimes(2)
       })
   })
 
   it('should show message and no Continue button for prisoner with no approved visitors', () => {
-    returnData = { prisonerName: 'Adam Jones', visitorList: [] }
+    returnData = { prisonerName: 'John Smith', visitorList: [] }
 
     return request(sessionApp)
       .get('/visit/select-visitors')
       .expect('Content-Type', /html/)
       .expect(res => {
-        expect(res.text).toContain('Prisoner name:</strong> Adam Jones</p>')
-        expect(res.text).toContain('<p>The prisoner has no approved visitors.</p>')
-        expect(res.text).not.toMatch(/<button.|\s*?Continue.|\s*?<\/button>/)
+        const $ = cheerio.load(res.text)
+        expect($('[data-test="prisoner-name"]').text()).toEqual('John Smith')
+        expect($('#main-content').text()).toContain('The prisoner has no approved visitors.')
+        expect($('[data-test="submit"]').length).toBe(0)
       })
   })
 })
 
 describe('POST /visit/select-visitors', () => {
-  beforeAll(() => {
+  beforeEach(() => {
     const visitorList: VisitorListItem[] = [
       {
         personId: 4321,
@@ -198,95 +294,178 @@ describe('POST /visit/select-visitors', () => {
         restrictions: [],
       },
     ]
-    prisonerVisitorsService = new MockPrisonerVisitorsService()
-    sessionApp = appWithAllRoutes(null, null, prisonerVisitorsService, null, systemToken, false, {
-      visitorList,
-      visitSessionData: {
-        prisoner: {
-          name: 'prisoner name',
-          offenderNo: 'A1234BC',
-          dateOfBirth: '25 May 1988',
-          location: 'location place',
-        },
+
+    visitSessionData = {
+      prisoner: {
+        name: 'prisoner name',
+        offenderNo: 'A1234BC',
+        dateOfBirth: '25 May 1988',
+        location: 'location place',
       },
+    }
+
+    sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, {
+      visitorList,
+      visitSessionData,
     } as SessionData)
   })
 
-  it('should redirect to the select date and time page if an adult is selected', () => {
+  it('should save to session and redirect to the select date and time page if an adult is selected', () => {
     return request(sessionApp)
       .post('/visit/select-visitors')
       .send('visitors=4322')
       .expect(302)
       .expect('location', '/visit/select-date-and-time')
-  })
-
-  it('should show an error if no visitors are selected', () => {
-    return request(sessionApp)
-      .post('/visit/select-visitors')
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        expect(res.text).toContain('No visitors selected')
-        expect(res.text).not.toContain('Select no more than 3 visitors with a maximum of 2 adults')
-        expect(res.text).not.toContain('Select no more than 2 adults')
-        expect(res.text).not.toContain('Add an adult to the visit')
-        expect(res.text).toContain('<form action="/visit/select-visitors"')
+      .expect(() => {
+        expect(visitSessionData.visitors).toEqual([
+          {
+            address: '1st listed address',
+            adult: true,
+            dateOfBirth: '1986-07-28',
+            name: 'Bob Smith',
+            personId: 4322,
+            relationshipDescription: 'Brother',
+            restrictions: [],
+            selected: true,
+          },
+        ])
       })
   })
 
-  it('should show an error if no visitors are selected', () => {
+  it('should save to session and redirect to the select date and time page if an adult and a child are selected', () => {
     return request(sessionApp)
       .post('/visit/select-visitors')
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        expect(res.text).toContain('No visitors selected')
-        expect(res.text).not.toContain('Select no more than 3 visitors with a maximum of 2 adults')
-        expect(res.text).not.toContain('Select no more than 2 adults')
-        expect(res.text).not.toContain('Add an adult to the visit')
-        expect(res.text).toContain('<form action="/visit/select-visitors"')
+      .send('visitors=4322&visitors=4324')
+      .expect(302)
+      .expect('location', '/visit/select-date-and-time')
+      .expect(() => {
+        expect(visitSessionData.visitors).toEqual([
+          {
+            address: '1st listed address',
+            adult: true,
+            dateOfBirth: '1986-07-28',
+            name: 'Bob Smith',
+            personId: 4322,
+            relationshipDescription: 'Brother',
+            restrictions: [],
+            selected: true,
+          },
+          {
+            address: 'Not entered',
+            adult: false,
+            dateOfBirth: '2018-03-02',
+            name: 'Anne Smith',
+            personId: 4324,
+            relationshipDescription: 'Niece',
+            restrictions: [],
+            selected: true,
+          },
+        ])
       })
   })
 
-  it('should show an error if no adults are selected', () => {
+  it('should save new choice to session and redirect to select date and time page if existing session data present', () => {
+    visitSessionData.visitors = [
+      {
+        address: '1st listed address',
+        adult: true,
+        dateOfBirth: '1986-07-28',
+        name: 'Bob Smith',
+        personId: 4322,
+        relationshipDescription: 'Brother',
+        restrictions: [],
+        selected: true,
+      },
+    ]
+
+    return request(sessionApp)
+      .post('/visit/select-visitors')
+      .send('visitors=4323')
+      .expect(302)
+      .expect('location', '/visit/select-date-and-time')
+      .expect(() => {
+        expect(visitSessionData.visitors).toEqual([
+          {
+            personId: 4323,
+            name: 'Ted Smith',
+            dateOfBirth: '1968-07-28',
+            adult: true,
+            relationshipDescription: 'Father',
+            address: '1st listed address',
+            restrictions: [],
+            selected: true,
+          },
+        ])
+      })
+  })
+
+  it('should set validation errors in flash and redirect if no visitors are selected', () => {
+    return request(sessionApp)
+      .post('/visit/select-visitors')
+      .expect(302)
+      .expect('location', '/visit/select-visitors')
+      .expect(() => {
+        expect(flashProvider).toHaveBeenCalledWith('errors', [
+          { location: 'body', msg: 'No visitors selected', param: 'visitors', value: undefined },
+        ])
+        expect(flashProvider).toHaveBeenCalledWith('formValues', {})
+      })
+  })
+
+  it('should set validation errors in flash and redirect if no adults are selected', () => {
     return request(sessionApp)
       .post('/visit/select-visitors')
       .send('visitors=4324')
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        expect(res.text).toContain('Add an adult to the visit')
-        expect(res.text).not.toContain('Select no more than 3 visitors with a maximum of 2 adults')
-        expect(res.text).not.toContain('Select no more than 2 adults')
-        expect(res.text).not.toContain('No visitors selected')
+      .expect(302)
+      .expect('location', '/visit/select-visitors')
+      .expect(() => {
+        expect(flashProvider).toHaveBeenCalledWith('errors', [
+          { location: 'body', msg: 'Add an adult to the visit', param: 'visitors', value: '4324' },
+        ])
+        expect(flashProvider).toHaveBeenCalledWith('formValues', { visitors: '4324' })
       })
   })
 
-  it('should show an error if more than 2 adults are selected', () => {
+  it('should set validation errors in flash and redirect if more than 2 adults are selected', () => {
     return request(sessionApp)
       .post('/visit/select-visitors')
       .send('visitors=4321&visitors=4322&visitors=4323')
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        expect(res.text).toContain('Select no more than 2 adults')
-        expect(res.text).not.toContain('Select no more than 3 visitors with a maximum of 2 adults')
-        expect(res.text).not.toContain('No visitors selected')
-        expect(res.text).not.toContain('Add an adult to the visit')
+      .expect(302)
+      .expect('location', '/visit/select-visitors')
+      .expect(() => {
+        expect(flashProvider).toHaveBeenCalledWith('errors', [
+          {
+            location: 'body',
+            msg: 'Select no more than 2 adults',
+            param: 'visitors',
+            value: ['4321', '4322', '4323'],
+          },
+        ])
+        expect(flashProvider).toHaveBeenCalledWith('formValues', { visitors: ['4321', '4322', '4323'] })
       })
   })
 
-  it('should show an error if more than 3 visitors are selected', () => {
+  it('should set validation errors in flash and redirect if more than 3 visitors are selected', () => {
     return request(sessionApp)
       .post('/visit/select-visitors')
       .send('visitors=4321&visitors=4322&visitors=4323&visitors=4324')
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        expect(res.text).toContain('Select no more than 3 visitors with a maximum of 2 adults')
-        expect(res.text).not.toContain('Select no more than 2 adults')
-        expect(res.text).not.toContain('No visitors selected')
-        expect(res.text).not.toContain('Add an adult to the visit')
+      .expect(302)
+      .expect('location', '/visit/select-visitors')
+      .expect(() => {
+        expect(flashProvider).toHaveBeenCalledWith('errors', [
+          {
+            location: 'body',
+            msg: 'Select no more than 3 visitors with a maximum of 2 adults',
+            param: 'visitors',
+            value: ['4321', '4322', '4323', '4324'],
+          },
+        ])
+        expect(flashProvider).toHaveBeenCalledWith('formValues', { visitors: ['4321', '4322', '4323', '4324'] })
       })
   })
 })
 
-describe('GET /visit/additional-suppor', () => {
+describe('GET /visit/additional-support', () => {
   beforeEach(() => {
     visitSessionData = {
       prisoner: {
