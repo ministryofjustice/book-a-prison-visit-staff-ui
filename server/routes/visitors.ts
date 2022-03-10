@@ -24,9 +24,19 @@ export default function routes(
     const { offenderNo } = req.session.visitSessionData.prisoner
     const prisonerVisitors = await prisonerVisitorsService.getVisitors(offenderNo, res.locals.user?.username)
 
+    const formValues = (req.flash('formValues')?.[0] as unknown as Record<string, string | string[]>) || {}
+    if (!Object.keys(formValues).length && req.session.visitSessionData.visitors) {
+      formValues.visitors = req.session.visitSessionData.visitors.map(visitor => visitor.personId.toString())
+    }
+
     req.session.visitorList = prisonerVisitors.visitorList
 
-    res.render('pages/visitors', { ...prisonerVisitors, offenderNo })
+    res.render('pages/visitors', {
+      errors: req.flash('errors'),
+      prisonerName: req.session.visitSessionData.prisoner.name,
+      visitorList: prisonerVisitors.visitorList,
+      formValues,
+    })
   })
 
   router.post(
@@ -75,12 +85,9 @@ export default function routes(
       const errors = validationResult(req)
 
       if (!errors.isEmpty()) {
-        return res.render('pages/visitors', {
-          errors: !errors.isEmpty() ? errors.array() : [],
-          prisonerName: req.session.visitSessionData.prisoner.name,
-          offenderNo: req.session.visitSessionData.prisoner.offenderNo,
-          visitorList: req.session.visitorList,
-        })
+        req.flash('errors', errors.array() as [])
+        req.flash('formValues', req.body)
+        return res.redirect(req.originalUrl)
       }
 
       const selectedIds = [].concat(req.body.visitors)
