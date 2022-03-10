@@ -642,5 +642,141 @@ describe('POST /visit/additional-support', () => {
   })
 })
 
-// describe('GET /visit/select-main-contact', () => {
-// })
+describe('GET /visit/check-your-booking', () => {
+  beforeEach(() => {
+    visitSessionData = {
+      prisoner: {
+        name: 'prisoner name',
+        offenderNo: 'A1234BC',
+        dateOfBirth: '25 May 1988',
+        location: 'location place',
+      },
+      visit: {
+        id: 'visitId',
+        startTimestamp: '2022-03-12T09:30:00',
+        endTimestamp: '2022-03-12T10:30:00',
+        availableTables: 1,
+      },
+      visitors: [
+        {
+          personId: 123,
+          name: 'name last',
+          relationshipDescription: 'relate',
+          restrictions: [
+            {
+              restrictionType: 'AVS',
+              restrictionTypeDescription: 'AVS desc',
+              startDate: '123',
+              expiryDate: '456',
+              globalRestriction: false,
+              comment: 'comment',
+            },
+          ],
+          address: '123 Street,<br>Test Town,<br>S1 2QZ',
+        },
+      ],
+      additionalSupport: {
+        required: true,
+        keys: ['wheelchair', 'inductionLoop'],
+      },
+      mainContact: {
+        phoneNumber: '123',
+        contactName: 'abc',
+      },
+    }
+    sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, { visitSessionData } as SessionData)
+  })
+
+  it('should render all data from the session', () => {
+    return request(sessionApp)
+      .get('/visit/check-your-booking')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('h1').text()).toContain('Check the visit details before booking')
+        expect($('.test-prisoner-name').text()).toContain('prisoner name')
+        expect($('.test-prisoner-offenderno').text()).toContain('A1234BC')
+        expect($('.test-prisoner-dateofbirth').text()).toContain('25 May 1988')
+        expect($('.test-prisoner-location').text()).toContain('location place')
+        expect($('.test-visit-date').text()).toContain('Saturday 12 March 2022')
+        expect($('.test-visit-time').text()).toContain('9:30am to 10:30am')
+        expect($('.test-visitor-name1').text()).toContain('name last (relate of the prisoner)')
+        expect($('.test-visitor-address1').text()).toContain('123 Street, Test Town, S1 2QZ')
+        expect($('.test-additional-support1').text()).toContain('Wheelchair ramp')
+        expect($('.test-additional-support2').text()).toContain('Portable induction loop for people with hearing aids')
+        expect($('.test-main-contact-name').text()).toContain('abc')
+        expect($('.test-main-contact-number').text()).toContain('123')
+      })
+  })
+
+  describe('when no additional support options are chosen', () => {
+    beforeEach(() => {
+      visitSessionData = {
+        prisoner: {
+          name: 'prisoner name',
+          offenderNo: 'A1234BC',
+          dateOfBirth: '25 May 1988',
+          location: 'location place',
+        },
+        visit: {
+          id: 'visitId',
+          startTimestamp: '2022-03-12T09:30:00',
+          endTimestamp: '2022-03-12T10:30:00',
+          availableTables: 1,
+        },
+        visitors: [
+          {
+            personId: 123,
+            name: 'name last',
+            relationshipDescription: 'relate',
+            restrictions: [
+              {
+                restrictionType: 'AVS',
+                restrictionTypeDescription: 'AVS desc',
+                startDate: '123',
+                expiryDate: '456',
+                globalRestriction: false,
+                comment: 'comment',
+              },
+            ],
+            address: '123 Street,<br>Test Town,<br>S1 2QZ',
+          },
+        ],
+        additionalSupport: {
+          required: false,
+          keys: [],
+        },
+        mainContact: {
+          phoneNumber: '123',
+          contactName: 'abc',
+        },
+      }
+      sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, { visitSessionData } as SessionData)
+    })
+
+    it('should render all data from the session with a message for no selected additional support options', () => {
+      return request(sessionApp)
+        .get('/visit/check-your-booking')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text()).toContain('Check the visit details before booking')
+          expect($('.test-prisoner-name').text()).toContain('prisoner name')
+          expect($('.test-prisoner-offenderno').text()).toContain('A1234BC')
+          expect($('.test-prisoner-dateofbirth').text()).toContain('25 May 1988')
+          expect($('.test-prisoner-location').text()).toContain('location place')
+          expect($('.test-visit-date').text()).toContain('Saturday 12 March 2022')
+          expect($('.test-visit-time').text()).toContain('9:30am to 10:30am')
+          expect($('.test-visitor-name1').text()).toContain('name last (relate of the prisoner)')
+          expect($('.test-visitor-address1').text()).toContain('123 Street, Test Town, S1 2QZ')
+          expect($('[data-test="no-addition-support-chosen"]').text()).toContain(
+            'No additional support options were chosen.'
+          )
+          expect($('.test-main-contact-name').text()).toContain('abc')
+          expect($('.test-main-contact-number').text()).toContain('123')
+        })
+    })
+  })
+})

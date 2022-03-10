@@ -26,7 +26,8 @@
                         text: "Name"
                     },
                     value: {
-                        text: prisoner.name
+                        text: prisoner.name,
+                        classes: "test-prisoner-name"
                     }
                 },
                 {
@@ -34,7 +35,8 @@
                         text: "Prison number"
                     },
                     value: {
-                        text: prisoner.offenderNo
+                        text: prisoner.offenderNo,
+                        classes: "test-prisoner-offenderno"
                     }
                 },
                 {
@@ -42,7 +44,8 @@
                         text: "Date of birth"
                     },
                     value: {
-                        text: prisoner.dateOfBirth
+                        text: prisoner.dateOfBirth,
+                        classes: "test-prisoner-dateofbirth"
                     }
                 },
                 {
@@ -50,7 +53,8 @@
                         text: "Location"
                     },
                     value: {
-                        text: prisoner.location
+                        text: prisoner.location,
+                        classes: "test-prisoner-location"
                     }
                 }
             ]
@@ -76,7 +80,8 @@
                         text: "Date"
                     },
                     value: {
-                        text: visit.startTimestamp | formatDate("EEEE d MMMM yyyy")
+                        text: visit.startTimestamp | formatDate("EEEE d MMMM yyyy"),
+                        classes: "test-visit-date"
                     }
                 },
                 {
@@ -84,7 +89,8 @@
                         text: "Time"
                     },
                     value: {
-                        text: visit.startTimestamp | formatTime + " to " + visit.endTimestamp | formatTime
+                        text: visit.startTimestamp | formatTime + " to " + visit.endTimestamp | formatTime,
+                        classes: "test-visit-time"
                     }
                 },
                 {
@@ -120,7 +126,8 @@
                             text: "Name"
                         },
                         value: {
-                            text: visitor.name + " (" + (visitor.relationshipDescription | lower) + " of the prisoner)"
+                            text: visitor.name + " (" + (visitor.relationshipDescription | lower) + " of the prisoner)",
+                            classes: "test-visitor-name" + loop.index
                         }
                     },
                     {
@@ -128,7 +135,8 @@
                             text: "Address"
                         },
                         value: {
-                            text: visitor.address | replace("<br>", " ")
+                            text: visitor.address | replace("<br>", " "),
+                            classes: "test-visitor-address" + loop.index
                         }
                     }
                 ]
@@ -156,7 +164,8 @@
                 text: "Request " + loop.index
               },
               value: {
-                text: item
+                text: item,
+                classes: "test-additional-support" + loop.index
               }
             }
           ), additionalSupportRows) %}
@@ -166,7 +175,7 @@
                 rows: additionalSupportRows
             }) }}
         {% else %}
-        <p>No additional support options were chosen.</p>
+        <p data-test="no-addition-support-chosen">No additional support options were chosen.</p>
         {% endif %}
     </div>
 </div>
@@ -196,7 +205,8 @@
                         text: "Main contact"
                     },
                     value: {
-                        text: contactName
+                        text: contactName,
+                        classes: "test-main-contact-name"
                     }
                 },
                 {
@@ -204,7 +214,8 @@
                         text: "Phone number"
                     },
                     value: {
-                        text: mainContact.phoneNumber
+                        text: mainContact.phoneNumber,
+                        classes: "test-main-contact-number"
                     }
                 }
             ]
