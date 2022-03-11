@@ -499,12 +499,14 @@ describe('/visit/select-date-and-time', () => {
               startTimestamp: '2022-02-14T10:00:00',
               endTimestamp: '2022-02-14T11:00:00',
               availableTables: 15,
+              visitRoomName: 'room name',
             },
             {
               id: '2',
               startTimestamp: '2022-02-14T11:59:00',
               endTimestamp: '2022-02-14T12:59:00',
               availableTables: 1,
+              visitRoomName: 'room name',
             },
           ],
           afternoon: [
@@ -513,6 +515,7 @@ describe('/visit/select-date-and-time', () => {
               startTimestamp: '2022-02-14T12:00:00',
               endTimestamp: '2022-02-14T13:05:00',
               availableTables: 5,
+              visitRoomName: 'room name',
             },
           ],
         },
@@ -527,6 +530,7 @@ describe('/visit/select-date-and-time', () => {
               startTimestamp: '2022-02-15T16:00:00',
               endTimestamp: '2022-02-15T17:00:00',
               availableTables: 12,
+              visitRoomName: 'room name',
             },
           ],
         },
@@ -542,6 +546,7 @@ describe('/visit/select-date-and-time', () => {
               startTimestamp: '2022-03-01T09:30:00',
               endTimestamp: '2022-03-01T10:30:00',
               availableTables: 0,
+              visitRoomName: 'room name',
             },
           ],
           afternoon: [],
@@ -626,6 +631,7 @@ describe('/visit/select-date-and-time', () => {
         startTimestamp: '2022-02-14T12:00:00',
         endTimestamp: '2022-02-14T13:05:00',
         availableTables: 5,
+        visitRoomName: 'room name',
       }
 
       return request(sessionApp)
@@ -681,6 +687,7 @@ describe('/visit/select-date-and-time', () => {
             startTimestamp: '2022-02-14T11:59:00',
             endTimestamp: '2022-02-14T12:59:00',
             availableTables: 1,
+            visitRoomName: 'room name',
           })
         })
     })
@@ -691,6 +698,7 @@ describe('/visit/select-date-and-time', () => {
         startTimestamp: '2022-02-14T10:00:00',
         endTimestamp: '2022-02-14T11:00:00',
         availableTables: 15,
+        visitRoomName: 'room name',
       }
 
       return request(sessionApp)
@@ -704,6 +712,7 @@ describe('/visit/select-date-and-time', () => {
             startTimestamp: '2022-02-14T12:00:00',
             endTimestamp: '2022-02-14T13:05:00',
             availableTables: 5,
+            visitRoomName: 'room name',
           })
         })
     })
