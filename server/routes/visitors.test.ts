@@ -399,6 +399,20 @@ describe('POST /visit/select-visitors', () => {
       })
   })
 
+  it('should should set validation errors in flash and redirect if invalid visitor selected', () => {
+    return request(sessionApp)
+      .post('/visit/select-visitors')
+      .send('visitors=1234')
+      .expect(302)
+      .expect('location', '/visit/select-visitors')
+      .expect(() => {
+        expect(flashProvider).toHaveBeenCalledWith('errors', [
+          { location: 'body', msg: 'Add an adult to the visit', param: 'visitors', value: '1234' },
+        ])
+        expect(flashProvider).toHaveBeenCalledWith('formValues', { visitors: '1234' })
+      })
+  })
+
   it('should set validation errors in flash and redirect if no visitors are selected', () => {
     return request(sessionApp)
       .post('/visit/select-visitors')
