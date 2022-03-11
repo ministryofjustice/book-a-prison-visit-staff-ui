@@ -21,6 +21,7 @@ describe('Views - Date and time of visit', () => {
     const $ = cheerio.load(compiledTemplate.render(viewContext))
     expect($('main p').text()).toContain('There are no visit time slots for the next 28 days.')
     expect($('.govuk-accordion').length).toBe(0)
+    expect($('[data-test="submit"]').length).toBe(0)
   })
 
   it('should display date and time picker for two months with morning and afternoon slots', () => {
@@ -93,7 +94,7 @@ describe('Views - Date and time of visit', () => {
     }
     const $ = cheerio.load(compiledTemplate.render(viewContext))
 
-    expect($('[data-test="prisoner-name"]').text()).toContain('John Smith')
+    expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
 
     expect($('[data-test="month"]').eq(0).text()).toBe('February 2022')
     expect($('#slots-month-February2022-heading-1').text().trim()).toBe('Monday 14 February')
@@ -112,5 +113,6 @@ describe('Views - Date and time of visit', () => {
     expect($('label[for="5"]').text()).toContain('9:30am to 10:30am')
     expect($('label[for="5"]').text()).toContain('Fully booked')
     expect($('#5').attr('disabled')).toBe('disabled')
+    expect($('[data-test="submit"]').text().trim()).toBe('Continue')
   })
 })

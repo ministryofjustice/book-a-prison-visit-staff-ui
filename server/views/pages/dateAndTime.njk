@@ -17,7 +17,7 @@
 
     <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
 
-    <p data-test="prisoner-name"><strong>Prisoner name:</strong> {{ prisonerName }}</p>
+    <p><strong>Prisoner name:</strong> <span data-test="prisoner-name">{{ prisonerName }}</span></p>
 
     <p><strong>Visit type:</strong> Open</p>
 
@@ -105,10 +105,6 @@
         </div>
       </div>
     </form>
-    {% else %}
-    <p>There are no visit time slots for the next 28 days.</p>
-    {% endif %}
-
 
     <form action="/visit/select-date-and-time" method="POST" novalidate>
       <input type="hidden" name="_csrf" value="{{ csrfToken }}">
@@ -195,10 +191,15 @@
       }) }}
     {% endfor %}
     
-        {{ govukButton({
-          text: "Continue"
-        }) }} 
+    {{ govukButton({
+      text: "Continue",
+      attributes: { "data-test": "submit" }
+    }) }} 
     </form>
+
+    {% else %}
+    <p>There are no visit time slots for the next 28 days.</p>
+    {% endif %}
   </div>
 </div>
 {% endblock %}
