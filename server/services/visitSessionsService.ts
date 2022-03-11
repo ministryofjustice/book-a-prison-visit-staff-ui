@@ -48,6 +48,7 @@ export default class VisitSessionsService {
           endTimestamp: visitSession.endTimestamp,
           // @TODO this will need fixing to handle open/closed visits
           availableTables: visitSession.openVisitCapacity - visitSession.openVisitBookedCount,
+          visitRoomName: visitSession.visitRoomName,
         }
 
         // Add new Slot to morning / afternoon grouping

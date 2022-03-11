@@ -479,6 +479,7 @@ describe('GET /visit/additional-support', () => {
         startTimestamp: '123',
         endTimestamp: '456',
         availableTables: 1,
+        visitRoomName: 'room name',
       },
       visitors: [
         {
@@ -649,6 +650,7 @@ describe('POST /visit/additional-support', () => {
         startTimestamp: '123',
         endTimestamp: '456',
         availableTables: 1,
+        visitRoomName: 'room name',
       },
       visitors: [
         {
@@ -835,6 +837,7 @@ describe('GET /visit/check-your-booking', () => {
         startTimestamp: '2022-03-12T09:30:00',
         endTimestamp: '2022-03-12T10:30:00',
         availableTables: 1,
+        visitRoomName: 'room name',
       },
       visitors: [
         {
@@ -903,6 +906,7 @@ describe('GET /visit/check-your-booking', () => {
           startTimestamp: '2022-03-12T09:30:00',
           endTimestamp: '2022-03-12T10:30:00',
           availableTables: 1,
+          visitRoomName: 'room name',
         },
         visitors: [
           {

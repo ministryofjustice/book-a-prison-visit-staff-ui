@@ -60,7 +60,7 @@ class VisitSchedulerApiClient {
         endTimestamp: visitData.visit.endTimestamp,
         visitType: this.visitType,
         visitStatus: 'RESERVED',
-        visitRoom: visitData.visit.visitRoomName || 'UNASSIGNED',
+        visitRoom: visitData.visit.visitRoomName,
         contactList: visitData.visitors.map(visitor => {
           return {
             nomisPersonId: visitor.personId,

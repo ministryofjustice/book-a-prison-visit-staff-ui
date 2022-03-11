@@ -30,6 +30,7 @@ const visit = {
   startTimestamp: '123',
   endTimestamp: '123',
   availableTables: 1,
+  visitRoomName: 'visitRoom',
 }
 
 describe('checkSession', () => {
