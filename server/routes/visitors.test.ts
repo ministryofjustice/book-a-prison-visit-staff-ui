@@ -6,24 +6,13 @@ import { Restriction, VisitorListItem, VisitSessionData } from '../@types/bapv'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 
+jest.mock('../services/prisonerVisitorsService')
+
 let sessionApp: Express
-let prisonerVisitorsService: PrisonerVisitorsService
 const systemToken = async (user: string): Promise<string> => `${user}-token-1`
 
 let flashData: Record<'errors' | 'formValues', Record<string, string | string[]>[]>
-let returnData: { prisonerName: string; visitorList: VisitorListItem[] }
 let visitSessionData: VisitSessionData
-
-class MockPrisonerVisitorsService extends PrisonerVisitorsService {
-  constructor() {
-    super(undefined, undefined, undefined)
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  getVisitors(offenderNo: string, username: string): Promise<{ prisonerName: string; visitorList: VisitorListItem[] }> {
-    return Promise.resolve(returnData)
-  }
-}
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
@@ -37,16 +26,15 @@ afterEach(() => {
 })
 
 describe('GET /visit/select-visitors', () => {
-  beforeEach(() => {
-    visitSessionData = {
-      prisoner: {
-        name: 'John Smith',
-        offenderNo: 'A1234BC',
-        dateOfBirth: '25 May 1988',
-        location: 'location place',
-      },
-    }
+  const prisonerVisitorsService = new PrisonerVisitorsService(
+    null,
+    null,
+    systemToken
+  ) as jest.Mocked<PrisonerVisitorsService>
 
+  let returnData: { prisonerName: string; visitorList: VisitorListItem[] }
+
+  beforeAll(() => {
     returnData = {
       prisonerName: 'John Smith',
       visitorList: [
@@ -103,8 +91,19 @@ describe('GET /visit/select-visitors', () => {
         },
       ],
     }
+  })
 
-    prisonerVisitorsService = new MockPrisonerVisitorsService()
+  beforeEach(() => {
+    visitSessionData = {
+      prisoner: {
+        name: 'John Smith',
+        offenderNo: 'A1234BC',
+        dateOfBirth: '25 May 1988',
+        location: 'location place',
+      },
+    }
+
+    prisonerVisitorsService.getVisitors.mockResolvedValue(returnData)
 
     sessionApp = appWithAllRoutes(null, null, prisonerVisitorsService, null, systemToken, false, {
       visitSessionData,
@@ -231,6 +230,7 @@ describe('GET /visit/select-visitors', () => {
 
   it('should show message and no Continue button for prisoner with no approved visitors', () => {
     returnData = { prisonerName: 'John Smith', visitorList: [] }
+    prisonerVisitorsService.getVisitors.mockResolvedValue(returnData)
 
     return request(sessionApp)
       .get('/visit/select-visitors')
