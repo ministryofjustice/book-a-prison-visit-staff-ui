@@ -135,4 +135,93 @@ describe('visitSchedulerApiClient', () => {
       expect(output).toEqual(results)
     })
   })
+
+  describe('reserveVisit', () => {
+    it('should return a new Visit from the Visit Scheduler API', async () => {
+      const prisonId = 'HEI'
+      const visitType = 'STANDARD_SOCIAL'
+      const visitStatus = 'RESERVED'
+      const result = {
+        id: 123,
+        prisonerId: 'AF34567G',
+        prisonId,
+        visitRoom: 'A1 L3',
+        visitType,
+        visitTypeDescription: 'Standard Social',
+        visitStatus,
+        visitStatusDescription: 'Reserved',
+        startTimestamp: '2022-02-14T10:00:00',
+        endTimestamp: '2022-02-14T11:00:00',
+        reasonableAdjustments: 'string',
+        visitorConcerns: 'string',
+        mainContact: {
+          visitId: 123,
+          contactName: 'John Smith',
+          contactPhone: '01234 567890',
+        },
+        visitors: [
+          {
+            visitId: 123,
+            nomisPersonId: 1234,
+            leadVisitor: true,
+          },
+        ],
+        sessionId: 123,
+      }
+      const visitSessionData = {
+        prisoner: {
+          offenderNo: result.prisonerId,
+          name: 'pri name',
+          dateOfBirth: '23 May 1988',
+          location: 'somewhere',
+        },
+        visit: {
+          id: 'visitId',
+          startTimestamp: result.startTimestamp,
+          endTimestamp: result.endTimestamp,
+          availableTables: 1,
+          visitRoomName: result.visitRoom,
+        },
+        visitors: [
+          {
+            personId: 123,
+            name: 'visitor name',
+            relationshipDescription: 'rel desc',
+            restrictions: [
+              {
+                restrictionType: 'TEST',
+                restrictionTypeDescription: 'test type',
+                startDate: '10 May 2020',
+                expiryDate: '10 May 2022',
+                globalRestriction: false,
+                comment: 'comments',
+              },
+            ],
+          },
+        ],
+      }
+
+      fakeVisitSchedulerApi
+        .post('/visits', {
+          prisonId,
+          prisonerId: visitSessionData.prisoner.offenderNo,
+          startTimestamp: visitSessionData.visit.startTimestamp,
+          endTimestamp: visitSessionData.visit.endTimestamp,
+          visitType,
+          visitStatus,
+          visitRoom: visitSessionData.visit.visitRoomName,
+          contactList: visitSessionData.visitors.map(visitor => {
+            return {
+              nomisPersonId: visitor.personId,
+            }
+          }),
+        })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, result)
+
+      const output = await client.reserveVisit(visitSessionData)
+
+      expect(output).toEqual(result)
+    })
+  })
 })

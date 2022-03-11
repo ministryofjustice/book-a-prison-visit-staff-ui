@@ -70,6 +70,6 @@ export default class VisitSessionsService {
 
     const reservation = await visitSchedulerApiClient.reserveVisit(visitData)
 
-    return reservation.id
+    return reservation.id ? reservation.id : undefined
   }
 }
