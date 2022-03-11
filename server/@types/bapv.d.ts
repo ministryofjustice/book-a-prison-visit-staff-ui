@@ -191,4 +191,5 @@ export type VisitSessionData = {
     phoneNumber: string
     contactName?: string
   }
+  reservationId?: number
 }

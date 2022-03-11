@@ -1,5 +1,5 @@
 import { format, parseISO, getDay } from 'date-fns'
-import { VisitSlot, VisitSlotList, VisitSlotsForDay, SystemToken } from '../@types/bapv'
+import { VisitSlot, VisitSlotList, VisitSlotsForDay, SystemToken, VisitSessionData } from '../@types/bapv'
 import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
 import { VisitSession } from '../data/visitSchedulerApiTypes'
 
@@ -62,5 +62,14 @@ export default class VisitSessionsService {
 
       return slotList
     }, {})
+  }
+
+  async reserveVisit({ username, visitData }: { username: string; visitData: VisitSessionData }): Promise<number> {
+    const token = await this.systemToken(username)
+    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
+
+    const reservation = await visitSchedulerApiClient.reserveVisit(visitData)
+
+    return reservation.id
   }
 }

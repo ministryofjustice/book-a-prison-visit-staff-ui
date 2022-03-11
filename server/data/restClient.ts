@@ -23,6 +23,14 @@ interface PostRequest {
   raw?: boolean
 }
 
+interface PutRequest {
+  path?: string
+  headers?: Record<string, string>
+  responseType?: string
+  data?: Record<string, unknown>
+  raw?: boolean
+}
+
 interface StreamRequest {
   path?: string
   headers?: Record<string, string>
@@ -76,6 +84,30 @@ export default class RestClient {
     raw = false,
   }: PostRequest = {}): Promise<T> {
     logger.info(`Post using user credentials: calling ${this.name}: ${path}`)
+    try {
+      const result = await superagent
+        .post(`${this.apiUrl()}${path}`)
+        .send(data)
+        .agent(this.agent)
+        .retry(2, (err, res) => {
+          if (err) logger.info(`Retry handler found API error with ${err.code} ${err.message}`)
+          return undefined // retry handler only for logging retries, not to influence retry logic
+        })
+        .auth(this.token, { type: 'bearer' })
+        .set(headers)
+        .responseType(responseType)
+        .timeout(this.timeoutConfig())
+
+      return raw ? result : result.body
+    } catch (error) {
+      const sanitisedError = sanitiseError(error)
+      logger.warn({ ...sanitisedError }, `Error calling ${this.name}, path: '${path}', verb: 'POST'`)
+      throw sanitisedError
+    }
+  }
+
+  async put<T>({ path = null, headers = {}, responseType = '', data = {}, raw = false }: PutRequest = {}): Promise<T> {
+    logger.info(`Put using user credentials: calling ${this.name}: ${path}`)
     try {
       const result = await superagent
         .post(`${this.apiUrl()}${path}`)
