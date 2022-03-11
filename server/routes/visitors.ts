@@ -130,16 +130,22 @@ export default function routes(
         dayOfTheWeek,
       })
 
+      const formValues = (req.flash('formValues')?.[0] as unknown as Record<string, string | string[]>) || {}
+      if (!Object.keys(formValues).length && req.session.visitSessionData.visit?.id) {
+        formValues['visit-date-and-time'] = req.session.visitSessionData.visit?.id
+      }
+
       req.session.slotsList = slotsList
       req.session.timeOfDay = timeOfDay
       req.session.dayOfTheWeek = dayOfTheWeek
 
       res.render('pages/dateAndTime', {
+        errors: req.flash('errors'),
         prisonerName: req.session.visitSessionData.prisoner.name,
-        offenderNo: req.session.visitSessionData.prisoner.offenderNo,
         slotsList,
         timeOfDay,
         dayOfTheWeek,
+        formValues,
       })
     }
   )
@@ -165,14 +171,14 @@ export default function routes(
       const errors = validationResult(req)
 
       if (!errors.isEmpty()) {
-        return res.render('pages/dateAndTime', {
-          errors: !errors.isEmpty() ? errors.array() : [],
-          prisonerName: req.session.visitSessionData.prisoner.name,
-          offenderNo: req.session.visitSessionData.prisoner.offenderNo,
-          slotsList: req.session.slotsList,
-          timeOfDay: req.session.timeOfDay,
-          dayOfTheWeek: req.session.dayOfTheWeek,
-        })
+        req.flash('errors', errors.array() as [])
+        req.flash('formValues', req.body)
+        if (req.session.timeOfDay || req.session.dayOfTheWeek) {
+          return res.redirect(
+            `${req.originalUrl}?timeOfDay=${req.session.timeOfDay}&dayOfTheWeek=${req.session.dayOfTheWeek}`
+          )
+        }
+        return res.redirect(req.originalUrl)
       }
 
       req.session.visitSessionData.visit = getSelectedSlot(req.session.slotsList, req.body['visit-date-and-time'])

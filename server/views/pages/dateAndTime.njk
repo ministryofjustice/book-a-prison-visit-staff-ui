@@ -125,6 +125,7 @@
             html: '<p class="bapv-radio-paragraph"><strong>' + slot.startTimestamp | formatTime +
               " to " + slot.endTimestamp | formatTime + "</strong><br>" + tableText + "</p>",
             id: slot.id,
+            checked: true if formValues['visit-date-and-time'] and formValues['visit-date-and-time'] == slot.id,
             disabled: slot.availableTables === 0
           }), morningSlotsList) %}
         {% endfor %}
@@ -149,6 +150,7 @@
             value: slot.id,
             html: '<p class="bapv-radio-paragraph"><strong>' + slot.startTimestamp | formatTime + " to " + slot.endTimestamp | formatTime + "</strong><br>" + tableText + "</p>",
             id: slot.id,
+            checked: true if formValues['visit-date-and-time'] and formValues['visit-date-and-time'] == slot.id,
             disabled: slot.availableTables === 0
           }), afternoonSlotsList) %}
         {% endfor %}
