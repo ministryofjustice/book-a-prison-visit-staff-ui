@@ -150,7 +150,7 @@ export type VisitSlot = {
   startTimestamp: string
   endTimestamp: string
   availableTables: number
-  visitRoomName?: string
+  visitRoomName: string
 }
 
 export type VisitSlotsForDay = {
@@ -191,4 +191,5 @@ export type VisitSessionData = {
     phoneNumber: string
     contactName?: string
   }
+  reservationId?: number
 }
