@@ -2,28 +2,19 @@ import type { Express } from 'express'
 import request from 'supertest'
 import { SessionData } from 'express-session'
 import * as cheerio from 'cheerio'
-import { Restriction, VisitorListItem, VisitSessionData } from '../@types/bapv'
+import { Restriction, VisitorListItem, VisitSessionData, VisitSlotList } from '../@types/bapv'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
+import VisitSessionsService from '../services/visitSessionsService'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 
+jest.mock('../services/prisonerVisitorsService')
+jest.mock('../services/visitSessionsService')
+
 let sessionApp: Express
-let prisonerVisitorsService: PrisonerVisitorsService
 const systemToken = async (user: string): Promise<string> => `${user}-token-1`
 
 let flashData: Record<'errors' | 'formValues', Record<string, string | string[]>[]>
-let returnData: { prisonerName: string; visitorList: VisitorListItem[] }
 let visitSessionData: VisitSessionData
-
-class MockPrisonerVisitorsService extends PrisonerVisitorsService {
-  constructor() {
-    super(undefined, undefined, undefined)
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  getVisitors(offenderNo: string, username: string): Promise<{ prisonerName: string; visitorList: VisitorListItem[] }> {
-    return Promise.resolve(returnData)
-  }
-}
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
@@ -37,16 +28,15 @@ afterEach(() => {
 })
 
 describe('GET /visit/select-visitors', () => {
-  beforeEach(() => {
-    visitSessionData = {
-      prisoner: {
-        name: 'John Smith',
-        offenderNo: 'A1234BC',
-        dateOfBirth: '25 May 1988',
-        location: 'location place',
-      },
-    }
+  const prisonerVisitorsService = new PrisonerVisitorsService(
+    null,
+    null,
+    systemToken
+  ) as jest.Mocked<PrisonerVisitorsService>
 
+  let returnData: { prisonerName: string; visitorList: VisitorListItem[] }
+
+  beforeAll(() => {
     returnData = {
       prisonerName: 'John Smith',
       visitorList: [
@@ -103,8 +93,19 @@ describe('GET /visit/select-visitors', () => {
         },
       ],
     }
+  })
 
-    prisonerVisitorsService = new MockPrisonerVisitorsService()
+  beforeEach(() => {
+    visitSessionData = {
+      prisoner: {
+        name: 'John Smith',
+        offenderNo: 'A1234BC',
+        dateOfBirth: '25 May 1988',
+        location: 'location place',
+      },
+    }
+
+    prisonerVisitorsService.getVisitors.mockResolvedValue(returnData)
 
     sessionApp = appWithAllRoutes(null, null, prisonerVisitorsService, null, systemToken, false, {
       visitSessionData,
@@ -118,7 +119,8 @@ describe('GET /visit/select-visitors', () => {
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
-        expect($('[data-test="prisoner-name"]').text()).toEqual('John Smith')
+        expect($('h1').text().trim()).toBe('Select visitors from the prisoner’s approved visitor list')
+        expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
 
         expect($('#visitor-4321').length).toBe(1)
         expect($('[data-test="visitor-name-4321"]').text()).toBe('Jeanette Smith')
@@ -139,7 +141,7 @@ describe('GET /visit/select-visitors', () => {
         expect($('[data-test="visitor-dob-4324"]').text()).toMatch(/2 March 2018.*Child/)
 
         expect($('input[name="visitors"]:checked').length).toBe(0)
-        expect($('[data-test="submit"]').text()).toContain('Continue')
+        expect($('[data-test="submit"]').text().trim()).toBe('Continue')
       })
   })
 
@@ -163,12 +165,13 @@ describe('GET /visit/select-visitors', () => {
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
-        expect($('[data-test="prisoner-name"]').text()).toEqual('John Smith')
+        expect($('h1').text().trim()).toBe('Select visitors from the prisoner’s approved visitor list')
+        expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
         expect($('input[name="visitors"]').length).toBe(3)
         expect($('#visitor-4321').prop('checked')).toBe(false)
         expect($('#visitor-4322').prop('checked')).toBe(true)
         expect($('#visitor-4324').prop('checked')).toBe(false)
-        expect($('[data-test="submit"]').text()).toContain('Continue')
+        expect($('[data-test="submit"]').text().trim()).toBe('Continue')
       })
   })
 
@@ -202,12 +205,13 @@ describe('GET /visit/select-visitors', () => {
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
-        expect($('[data-test="prisoner-name"]').text()).toEqual('John Smith')
+        expect($('h1').text().trim()).toBe('Select visitors from the prisoner’s approved visitor list')
+        expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
         expect($('input[name="visitors"]').length).toBe(3)
         expect($('#visitor-4321').prop('checked')).toBe(false)
         expect($('#visitor-4322').prop('checked')).toBe(true)
         expect($('#visitor-4324').prop('checked')).toBe(true)
-        expect($('[data-test="submit"]').text()).toContain('Continue')
+        expect($('[data-test="submit"]').text().trim()).toBe('Continue')
       })
   })
 
@@ -220,7 +224,8 @@ describe('GET /visit/select-visitors', () => {
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
-        expect($('[data-test="prisoner-name"]').text()).toEqual('John Smith')
+        expect($('h1').text().trim()).toBe('Select visitors from the prisoner’s approved visitor list')
+        expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
         expect($('.govuk-error-summary__body').text()).toContain('No visitors selected')
         expect($('#visitors-error').text()).toContain('No visitors selected')
         expect(flashProvider).toHaveBeenCalledWith('errors')
@@ -231,13 +236,16 @@ describe('GET /visit/select-visitors', () => {
 
   it('should show message and no Continue button for prisoner with no approved visitors', () => {
     returnData = { prisonerName: 'John Smith', visitorList: [] }
+    prisonerVisitorsService.getVisitors.mockResolvedValue(returnData)
 
     return request(sessionApp)
       .get('/visit/select-visitors')
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
-        expect($('[data-test="prisoner-name"]').text()).toEqual('John Smith')
+        expect($('h1').text().trim()).toBe('Select visitors from the prisoner’s approved visitor list')
+        expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
+        expect($('input[name="visitors"]').length).toBe(0)
         expect($('#main-content').text()).toContain('The prisoner has no approved visitors.')
         expect($('[data-test="submit"]').length).toBe(0)
       })
@@ -399,6 +407,20 @@ describe('POST /visit/select-visitors', () => {
       })
   })
 
+  it('should should set validation errors in flash and redirect if invalid visitor selected', () => {
+    return request(sessionApp)
+      .post('/visit/select-visitors')
+      .send('visitors=1234')
+      .expect(302)
+      .expect('location', '/visit/select-visitors')
+      .expect(() => {
+        expect(flashProvider).toHaveBeenCalledWith('errors', [
+          { location: 'body', msg: 'Add an adult to the visit', param: 'visitors', value: '1234' },
+        ])
+        expect(flashProvider).toHaveBeenCalledWith('formValues', { visitors: '1234' })
+      })
+  })
+
   it('should set validation errors in flash and redirect if no visitors are selected', () => {
     return request(sessionApp)
       .post('/visit/select-visitors')
@@ -465,6 +487,299 @@ describe('POST /visit/select-visitors', () => {
   })
 })
 
+describe('/visit/select-date-and-time', () => {
+  const slotsList: VisitSlotList = {
+    'February 2022': [
+      {
+        date: 'Monday 14 February',
+        slots: {
+          morning: [
+            {
+              id: '1',
+              startTimestamp: '2022-02-14T10:00:00',
+              endTimestamp: '2022-02-14T11:00:00',
+              availableTables: 15,
+              visitRoomName: 'room name',
+            },
+            {
+              id: '2',
+              startTimestamp: '2022-02-14T11:59:00',
+              endTimestamp: '2022-02-14T12:59:00',
+              availableTables: 1,
+              visitRoomName: 'room name',
+            },
+          ],
+          afternoon: [
+            {
+              id: '3',
+              startTimestamp: '2022-02-14T12:00:00',
+              endTimestamp: '2022-02-14T13:05:00',
+              availableTables: 5,
+              visitRoomName: 'room name',
+            },
+          ],
+        },
+      },
+      {
+        date: 'Tuesday 15 February',
+        slots: {
+          morning: [],
+          afternoon: [
+            {
+              id: '4',
+              startTimestamp: '2022-02-15T16:00:00',
+              endTimestamp: '2022-02-15T17:00:00',
+              availableTables: 12,
+              visitRoomName: 'room name',
+            },
+          ],
+        },
+      },
+    ],
+    'March 2022': [
+      {
+        date: 'Tuesday 1 March',
+        slots: {
+          morning: [
+            {
+              id: '5',
+              startTimestamp: '2022-03-01T09:30:00',
+              endTimestamp: '2022-03-01T10:30:00',
+              availableTables: 0,
+              visitRoomName: 'room name',
+            },
+          ],
+          afternoon: [],
+        },
+      },
+    ],
+  }
+
+  beforeEach(() => {
+    visitSessionData = {
+      prisoner: {
+        name: 'John Smith',
+        offenderNo: 'A1234BC',
+        dateOfBirth: '25 May 1988',
+        location: 'location place',
+      },
+      visitors: [
+        {
+          personId: 4323,
+          name: 'Ted Smith',
+          dateOfBirth: '1968-07-28',
+          adult: true,
+          relationshipDescription: 'Father',
+          address: '1st listed address',
+          restrictions: [],
+          selected: true,
+        },
+      ],
+    }
+  })
+
+  describe('GET /visit/select-date-and-time', () => {
+    const visitSessionsService = new VisitSessionsService(null, systemToken) as jest.Mocked<VisitSessionsService>
+
+    beforeEach(() => {
+      visitSessionsService.getVisitSessions.mockResolvedValue(slotsList)
+
+      sessionApp = appWithAllRoutes(null, null, null, visitSessionsService, systemToken, false, {
+        visitSessionData,
+      } as SessionData)
+    })
+
+    it('should render the available sessions list with none selected', () => {
+      return request(sessionApp)
+        .get('/visit/select-date-and-time')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text().trim()).toBe('Select date and time of visit')
+          expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
+          expect($('input[name="visit-date-and-time"]').length).toBe(5)
+          expect($('input[name="visit-date-and-time"]:checked').length).toBe(0)
+          expect($('[data-test="submit"]').text().trim()).toBe('Continue')
+        })
+    })
+
+    it('should show message if no sessions are available', () => {
+      visitSessionsService.getVisitSessions.mockResolvedValue({})
+
+      sessionApp = appWithAllRoutes(null, null, null, visitSessionsService, systemToken, false, {
+        visitSessionData,
+      } as SessionData)
+
+      return request(sessionApp)
+        .get('/visit/select-date-and-time')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text().trim()).toBe('Select date and time of visit')
+          expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
+          expect($('#main-content').text()).toContain('There are no visit time slots for the next 28 days.')
+          expect($('input[name="visit-date-and-time"]').length).toBe(0)
+          expect($('[data-test="submit"]').length).toBe(0)
+        })
+    })
+
+    it('should render the available sessions list with the slot in the session selected', () => {
+      visitSessionData.visit = {
+        id: '3',
+        startTimestamp: '2022-02-14T12:00:00',
+        endTimestamp: '2022-02-14T13:05:00',
+        availableTables: 5,
+        visitRoomName: 'room name',
+      }
+
+      return request(sessionApp)
+        .get('/visit/select-date-and-time')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text().trim()).toBe('Select date and time of visit')
+          expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
+          expect($('input[name="visit-date-and-time"]').length).toBe(5)
+          expect($('input#3').prop('checked')).toBe(true)
+          expect($('[data-test="submit"]').text().trim()).toBe('Continue')
+        })
+    })
+
+    it('should render validation errors from flash data for invalid input', () => {
+      flashData.errors = [{ location: 'body', msg: 'No time slot selected', param: 'visit-date-and-time' }]
+
+      return request(sessionApp)
+        .get('/visit/select-date-and-time')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text().trim()).toBe('Select date and time of visit')
+          expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
+          expect($('.govuk-error-summary__body').text()).toContain('No time slot selected')
+          expect(flashProvider).toHaveBeenCalledWith('errors')
+          expect(flashProvider).toHaveBeenCalledWith('formValues')
+          expect(flashProvider).toHaveBeenCalledTimes(2)
+        })
+    })
+  })
+
+  describe('POST /visit/select-date-and-time', () => {
+    beforeEach(() => {
+      sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, {
+        slotsList,
+        visitSessionData,
+      } as SessionData)
+    })
+
+    it('should save to session and redirect to additional support page if slot selected', () => {
+      return request(sessionApp)
+        .post('/visit/select-date-and-time')
+        .send('visit-date-and-time=2')
+        .expect(302)
+        .expect('location', '/visit/additional-support')
+        .expect(() => {
+          expect(visitSessionData.visit).toEqual({
+            id: '2',
+            startTimestamp: '2022-02-14T11:59:00',
+            endTimestamp: '2022-02-14T12:59:00',
+            availableTables: 1,
+            visitRoomName: 'room name',
+          })
+        })
+    })
+
+    it('should save new choice to session and redirect to additional support page if existing session data present', () => {
+      visitSessionData.visit = {
+        id: '1',
+        startTimestamp: '2022-02-14T10:00:00',
+        endTimestamp: '2022-02-14T11:00:00',
+        availableTables: 15,
+        visitRoomName: 'room name',
+      }
+
+      return request(sessionApp)
+        .post('/visit/select-date-and-time')
+        .send('visit-date-and-time=3')
+        .expect(302)
+        .expect('location', '/visit/additional-support')
+        .expect(() => {
+          expect(visitSessionData.visit).toEqual({
+            id: '3',
+            startTimestamp: '2022-02-14T12:00:00',
+            endTimestamp: '2022-02-14T13:05:00',
+            availableTables: 5,
+            visitRoomName: 'room name',
+          })
+        })
+    })
+
+    it('should should set validation errors in flash and redirect if no slot selected', () => {
+      return request(sessionApp)
+        .post('/visit/select-date-and-time')
+        .expect(302)
+        .expect('location', '/visit/select-date-and-time')
+        .expect(() => {
+          expect(flashProvider).toHaveBeenCalledWith('errors', [
+            { location: 'body', msg: 'No time slot selected', param: 'visit-date-and-time', value: undefined },
+          ])
+          expect(flashProvider).toHaveBeenCalledWith('formValues', {})
+        })
+    })
+
+    it('should should set validation errors in flash and redirect, preserving filter settings, if no slot selected', () => {
+      sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, {
+        timeOfDay: 'afternoon',
+        dayOfTheWeek: '3',
+        slotsList,
+        visitSessionData,
+      } as SessionData)
+
+      return request(sessionApp)
+        .post('/visit/select-date-and-time')
+        .expect(302)
+        .expect('location', '/visit/select-date-and-time?timeOfDay=afternoon&dayOfTheWeek=3')
+        .expect(() => {
+          expect(flashProvider).toHaveBeenCalledWith('errors', [
+            { location: 'body', msg: 'No time slot selected', param: 'visit-date-and-time', value: undefined },
+          ])
+          expect(flashProvider).toHaveBeenCalledWith('formValues', {})
+        })
+    })
+
+    it('should should set validation errors in flash and redirect if invalid slot selected', () => {
+      return request(sessionApp)
+        .post('/visit/select-date-and-time')
+        .send('visit-date-and-time=100')
+        .expect(302)
+        .expect('location', '/visit/select-date-and-time')
+        .expect(() => {
+          expect(flashProvider).toHaveBeenCalledWith('errors', [
+            { location: 'body', msg: 'No time slot selected', param: 'visit-date-and-time', value: '100' },
+          ])
+          expect(flashProvider).toHaveBeenCalledWith('formValues', { 'visit-date-and-time': '100' })
+        })
+    })
+
+    it('should should set validation errors in flash and redirect if fully booked slot selected', () => {
+      return request(sessionApp)
+        .post('/visit/select-date-and-time')
+        .send('visit-date-and-time=5')
+        .expect(302)
+        .expect('location', '/visit/select-date-and-time')
+        .expect(() => {
+          expect(flashProvider).toHaveBeenCalledWith('errors', [
+            { location: 'body', msg: 'No time slot selected', param: 'visit-date-and-time', value: '5' },
+          ])
+          expect(flashProvider).toHaveBeenCalledWith('formValues', { 'visit-date-and-time': '5' })
+        })
+    })
+  })
+})
+
 describe('GET /visit/additional-support', () => {
   beforeEach(() => {
     visitSessionData = {
@@ -510,7 +825,7 @@ describe('GET /visit/additional-support', () => {
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
-        expect($('h1').text()).toContain('Is additional support needed for any of the visitors?')
+        expect($('h1').text().trim()).toBe('Is additional support needed for any of the visitors?')
         expect($('[data-test="support-required-yes"]').prop('checked')).toBe(false)
         expect($('[data-test="support-required-no"]').prop('checked')).toBe(false)
       })
@@ -525,7 +840,7 @@ describe('GET /visit/additional-support', () => {
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
-        expect($('h1').text()).toContain('Is additional support needed for any of the visitors?')
+        expect($('h1').text().trim()).toBe('Is additional support needed for any of the visitors?')
         expect($('[data-test="support-required-yes"]').prop('checked')).toBe(false)
         expect($('[data-test="support-required-no"]').prop('checked')).toBe(true)
       })
@@ -544,7 +859,7 @@ describe('GET /visit/additional-support', () => {
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
-        expect($('h1').text()).toContain('Is additional support needed for any of the visitors?')
+        expect($('h1').text().trim()).toBe('Is additional support needed for any of the visitors?')
         expect($('[data-test="support-required-yes"]').prop('checked')).toBe(true)
         expect($('[data-test="support-required-no"]').prop('checked')).toBe(false)
         expect($('[data-test="wheelchair"]').prop('checked')).toBe(true)
@@ -552,7 +867,7 @@ describe('GET /visit/additional-support', () => {
         expect($('[data-test="bslInterpreter"]').prop('checked')).toBe(false)
         expect($('[data-test="maskExempt"]').prop('checked')).toBe(true)
         expect($('[data-test="other"]').prop('checked')).toBe(true)
-        expect($('#otherSupportDetails').val()).toContain('custom request')
+        expect($('#otherSupportDetails').val()).toBe('custom request')
       })
   })
 
@@ -571,6 +886,7 @@ describe('GET /visit/additional-support', () => {
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
+        expect($('h1').text().trim()).toBe('Is additional support needed for any of the visitors?')
         expect($('.govuk-error-summary__body').text()).toContain('No answer selected')
         expect($('#additionalSupportRequired-error').text()).toContain('No answer selected')
         expect(flashProvider).toHaveBeenCalledWith('errors')
@@ -597,6 +913,7 @@ describe('GET /visit/additional-support', () => {
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
+        expect($('h1').text().trim()).toBe('Is additional support needed for any of the visitors?')
         expect($('.govuk-error-summary__body').text()).toContain('No request selected')
         expect($('[data-test="support-required-yes"]').prop('checked')).toBe(true)
         expect($('#additionalSupport-error').text()).toContain('No request selected')
@@ -624,6 +941,7 @@ describe('GET /visit/additional-support', () => {
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
+        expect($('h1').text().trim()).toBe('Is additional support needed for any of the visitors?')
         expect($('.govuk-error-summary__body').text()).toContain('Enter details of the request')
         expect($('[data-test="support-required-yes"]').prop('checked')).toBe(true)
         expect($('[data-test="wheelchair"]').prop('checked')).toBe(true)
@@ -876,7 +1194,7 @@ describe('GET /visit/check-your-booking', () => {
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
-        expect($('h1').text()).toContain('Check the visit details before booking')
+        expect($('h1').text().trim()).toBe('Check the visit details before booking')
         expect($('.test-prisoner-name').text()).toContain('prisoner name')
         expect($('.test-prisoner-offenderno').text()).toContain('A1234BC')
         expect($('.test-prisoner-dateofbirth').text()).toContain('25 May 1988')
@@ -945,7 +1263,7 @@ describe('GET /visit/check-your-booking', () => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('h1').text()).toContain('Check the visit details before booking')
+          expect($('h1').text().trim()).toBe('Check the visit details before booking')
           expect($('.test-prisoner-name').text()).toContain('prisoner name')
           expect($('.test-prisoner-offenderno').text()).toContain('A1234BC')
           expect($('.test-prisoner-dateofbirth').text()).toContain('25 May 1988')
