@@ -449,6 +449,9 @@ export default function routes(
         visitData: req.session.visitSessionData,
         visitStatus: 'BOOKED',
       })
+
+      // TODO: Update to the correct value when schema updated
+      req.session.visitSessionData.booking.reference = bookedVisit.id.toString()
     } catch (error) {
       return res.render('pages/checkYourBooking', {
         errors: [
@@ -485,7 +488,7 @@ export default function routes(
     })
 
     res.render('pages/confirmation', {
-      reference: 'test',
+      reference: visitSessionData.booking.reference,
       offenderNo,
       mainContact: visitSessionData.mainContact,
       visit: visitSessionData.visit,
