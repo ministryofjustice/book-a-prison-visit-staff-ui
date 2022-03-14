@@ -198,7 +198,7 @@ export default function routes(
 
       visitSessionData.visit = getSelectedSlot(req.session.slotsList, req.body['visit-date-and-time'])
 
-      if (Number.isInteger(req.session.visitSessionData.visitId)) {
+      if (!req.session.visitSessionData.visitId) {
         await visitSessionsService.updateVisit({
           username: res.locals.user?.username,
           visitData: visitSessionData,
@@ -426,7 +426,7 @@ export default function routes(
         : additionalSupportOptions.getValue(key)
     })
 
-    if (!Number.isInteger(req.session.visitSessionData.visitId)) {
+    if (!req.session.visitSessionData.visitId) {
       return res.render('pages/checkYourBooking', {
         errors: [
           {
@@ -490,6 +490,7 @@ export default function routes(
     res.render('pages/confirmation', {
       visitId: visitSessionData.visitId,
       offenderNo,
+      prisoner: visitSessionData.prisoner,
       mainContact: visitSessionData.mainContact,
       visit: visitSessionData.visit,
       visitors: visitSessionData.visitors,
