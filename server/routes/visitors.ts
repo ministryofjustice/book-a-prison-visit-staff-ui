@@ -183,12 +183,19 @@ export default function routes(
 
       req.session.visitSessionData.visit = getSelectedSlot(req.session.slotsList, req.body['visit-date-and-time'])
 
-      const reservationId = await visitSessionsService.reserveVisit({
-        username: res.locals.user?.username,
-        visitData: req.session.visitSessionData,
-      })
+      if (Number.isInteger(req.session.visitSessionData.reservationId)) {
+        await visitSessionsService.updateVisit({
+          username: res.locals.user?.username,
+          visitData: req.session.visitSessionData,
+        })
+      } else {
+        const reservationId = await visitSessionsService.createVisit({
+          username: res.locals.user?.username,
+          visitData: req.session.visitSessionData,
+        })
 
-      req.session.visitSessionData.reservationId = reservationId
+        req.session.visitSessionData.reservationId = reservationId
+      }
 
       return res.redirect('/visit/additional-support')
     }

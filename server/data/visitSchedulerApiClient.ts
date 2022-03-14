@@ -50,7 +50,7 @@ class VisitSchedulerApiClient {
     })
   }
 
-  reserveVisit(visitData: VisitSessionData): Promise<Visit> {
+  createVisit(visitData: VisitSessionData): Promise<Visit> {
     return this.restclient.post({
       path: '/visits',
       data: {
@@ -61,6 +61,38 @@ class VisitSchedulerApiClient {
         visitType: this.visitType,
         visitStatus: 'RESERVED',
         visitRoom: visitData.visit.visitRoomName,
+        contactList: visitData.visitors.map(visitor => {
+          return {
+            nomisPersonId: visitor.personId,
+          }
+        }),
+      },
+    })
+  }
+
+  updateVisit(visitData: VisitSessionData, visitStatus: string): Promise<Visit> {
+    const mainContact = {
+      contactPhone: visitData.mainContact.phoneNumber,
+      contactName: visitData.mainContact.contactName
+        ? visitData.mainContact.contactName
+        : visitData.mainContact.contact.name,
+    }
+    const additionalSupport = visitData.additionalSupport?.keys
+      ? visitData.additionalSupport.keys.concat([visitData.additionalSupport.other]).join(',')
+      : ''
+
+    return this.restclient.put({
+      path: `/visits/${visitData.reservationId}`,
+      data: {
+        prisonId: this.prisonId,
+        prisonerId: visitData.prisoner.offenderNo,
+        startTimestamp: visitData.visit.startTimestamp,
+        endTimestamp: visitData.visit.endTimestamp,
+        visitType: this.visitType,
+        visitStatus,
+        visitRoom: visitData.visit.visitRoomName,
+        reasonableAdjustments: additionalSupport,
+        mainContact,
         contactList: visitData.visitors.map(visitor => {
           return {
             nomisPersonId: visitor.personId,

@@ -136,7 +136,7 @@ describe('visitSchedulerApiClient', () => {
     })
   })
 
-  describe('reserveVisit', () => {
+  describe('createVisit', () => {
     it('should return a new Visit from the Visit Scheduler API', async () => {
       const prisonId = 'HEI'
       const visitType = 'STANDARD_SOCIAL'
@@ -219,7 +219,115 @@ describe('visitSchedulerApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, result)
 
-      const output = await client.reserveVisit(visitSessionData)
+      const output = await client.createVisit(visitSessionData)
+
+      expect(output).toEqual(result)
+    })
+  })
+
+  describe('updateVisit', () => {
+    it('should return an updated Visit from the Visit Scheduler API', async () => {
+      const prisonId = 'HEI'
+      const visitType = 'STANDARD_SOCIAL'
+      const visitStatus = 'RESERVED'
+      const result = {
+        id: 123,
+        prisonerId: 'AF34567G',
+        prisonId,
+        visitRoom: 'A1 L3',
+        visitType,
+        visitTypeDescription: 'Standard Social',
+        visitStatus,
+        visitStatusDescription: 'Reserved',
+        startTimestamp: '2022-02-14T10:00:00',
+        endTimestamp: '2022-02-14T11:00:00',
+        reasonableAdjustments: 'wheelchair,maskExempt,other,custom request',
+        visitorConcerns: '',
+        mainContact: {
+          visitId: 123,
+          contactName: 'John Smith',
+          contactPhone: '01234 567890',
+        },
+        visitors: [
+          {
+            visitId: 123,
+            nomisPersonId: 1234,
+            leadVisitor: true,
+          },
+        ],
+        sessionId: 123,
+      }
+      const visitSessionData = {
+        prisoner: {
+          offenderNo: result.prisonerId,
+          name: 'pri name',
+          dateOfBirth: '23 May 1988',
+          location: 'somewhere',
+        },
+        visit: {
+          id: 'visitId',
+          startTimestamp: result.startTimestamp,
+          endTimestamp: result.endTimestamp,
+          availableTables: 1,
+          visitRoomName: result.visitRoom,
+        },
+        additionalSupport: {
+          required: true,
+          keys: ['wheelchair', 'maskExempt', 'other'],
+          other: 'custom request',
+        },
+        mainContact: {
+          phoneNumber: result.mainContact.contactPhone,
+          contactName: result.mainContact.contactName,
+        },
+        visitors: [
+          {
+            personId: 123,
+            name: 'visitor name',
+            relationshipDescription: 'rel desc',
+            restrictions: [
+              {
+                restrictionType: 'TEST',
+                restrictionTypeDescription: 'test type',
+                startDate: '10 May 2020',
+                expiryDate: '10 May 2022',
+                globalRestriction: false,
+                comment: 'comments',
+              },
+            ],
+          },
+        ],
+        reservationId: 123,
+      }
+      const mainContact = {
+        contactPhone: visitSessionData.mainContact.phoneNumber,
+        contactName: visitSessionData.mainContact.contactName,
+      }
+      const additionalSupport = visitSessionData.additionalSupport?.keys
+        ? visitSessionData.additionalSupport.keys.concat([visitSessionData.additionalSupport.other]).join(',')
+        : ''
+
+      fakeVisitSchedulerApi
+        .put('/visits/123', {
+          prisonId,
+          prisonerId: visitSessionData.prisoner.offenderNo,
+          startTimestamp: visitSessionData.visit.startTimestamp,
+          endTimestamp: visitSessionData.visit.endTimestamp,
+          visitType,
+          visitStatus,
+          visitRoom: visitSessionData.visit.visitRoomName,
+          reasonableAdjustments: additionalSupport,
+          mainContact,
+          contactList: visitSessionData.visitors.map(visitor => {
+            return {
+              nomisPersonId: visitor.personId,
+            }
+          }),
+        })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, result)
+
+      const output = await client.updateVisit(visitSessionData, visitStatus)
 
       expect(output).toEqual(result)
     })

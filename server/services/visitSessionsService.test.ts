@@ -357,7 +357,7 @@ describe('Visit sessions service', () => {
     })
   })
 
-  describe('reserveVisit', () => {
+  describe('createVisit', () => {
     beforeEach(() => {
       systemToken = async (user: string): Promise<string> => `${user}-token-1`
       visitSchedulerApiClientBuilder = jest.fn().mockReturnValue(visitSchedulerApiClient)
@@ -368,7 +368,7 @@ describe('Visit sessions service', () => {
       jest.resetAllMocks()
     })
 
-    it('should handle a single visit session and return correctly formatted data', async () => {
+    it('should create a new visit and return the visit data', async () => {
       const visitSessionData: VisitSessionData = {
         prisoner: {
           offenderNo: 'A1234BC',
@@ -423,10 +423,99 @@ describe('Visit sessions service', () => {
         sessionId: 123,
       }
 
-      visitSchedulerApiClient.reserveVisit.mockResolvedValue(visit)
-      const result = await visitSessionsService.reserveVisit({ username: 'user', visitData: visitSessionData })
+      visitSchedulerApiClient.createVisit.mockResolvedValue(visit)
+      const result = await visitSessionsService.createVisit({ username: 'user', visitData: visitSessionData })
 
-      expect(visitSchedulerApiClient.reserveVisit).toHaveBeenCalledTimes(1)
+      expect(visitSchedulerApiClient.createVisit).toHaveBeenCalledTimes(1)
+      expect(result).toEqual(123)
+    })
+  })
+
+  describe('updateVisit', () => {
+    beforeEach(() => {
+      systemToken = async (user: string): Promise<string> => `${user}-token-1`
+      visitSchedulerApiClientBuilder = jest.fn().mockReturnValue(visitSchedulerApiClient)
+      visitSessionsService = new VisitSessionsService(visitSchedulerApiClientBuilder, systemToken)
+    })
+
+    afterEach(() => {
+      jest.resetAllMocks()
+    })
+
+    it('should update an existing visit and return the visit data', async () => {
+      const visitSessionData: VisitSessionData = {
+        prisoner: {
+          offenderNo: 'A1234BC',
+          name: 'pri name',
+          dateOfBirth: '23 May 1988',
+          location: 'somewhere',
+        },
+        visit: {
+          id: 'visitId',
+          startTimestamp: '2022-02-14T10:00:00',
+          endTimestamp: '2022-02-14T11:00:00',
+          availableTables: 1,
+          visitRoomName: 'visit room',
+        },
+        visitors: [
+          {
+            personId: 123,
+            name: 'visitor name',
+            relationshipDescription: 'rel desc',
+            restrictions: [
+              {
+                restrictionType: 'TEST',
+                restrictionTypeDescription: 'test type',
+                startDate: '10 May 2020',
+                expiryDate: '10 May 2022',
+                globalRestriction: false,
+                comment: 'comments',
+              },
+            ],
+          },
+        ],
+        additionalSupport: {
+          required: true,
+          keys: ['wheelchair', 'maskExempt', 'other'],
+          other: 'custom request',
+        },
+        mainContact: {
+          phoneNumber: '01234 567890',
+          contactName: 'John Smith',
+        },
+        reservationId: 123,
+      }
+      const visit: Visit = {
+        id: 123,
+        prisonerId: visitSessionData.prisoner.offenderNo,
+        prisonId: 'HEI',
+        visitRoom: visitSessionData.visit.visitRoomName,
+        visitType: 'STANDARD_SOCIAL',
+        visitTypeDescription: 'Standard Social',
+        visitStatus: 'RESERVED',
+        visitStatusDescription: 'Reserved',
+        startTimestamp: '2022-02-14T10:00:00',
+        endTimestamp: '2022-02-14T11:00:00',
+        reasonableAdjustments: 'wheelchair,maskExempt,other,custom request',
+        mainContact: {
+          visitId: 123,
+          contactName: 'John Smith',
+          contactPhone: '01234 567890',
+        },
+        visitors: [
+          {
+            visitId: 123,
+            nomisPersonId: 1234,
+            leadVisitor: true,
+          },
+        ],
+        sessionId: 123,
+      }
+
+      visitSchedulerApiClient.updateVisit.mockResolvedValue(visit)
+      const result = await visitSessionsService.updateVisit({ username: 'user', visitData: visitSessionData })
+
+      expect(visitSchedulerApiClient.updateVisit).toHaveBeenCalledTimes(1)
       expect(result).toEqual(123)
     })
   })

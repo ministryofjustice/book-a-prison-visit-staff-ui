@@ -110,7 +110,7 @@ export default class RestClient {
     logger.info(`Put using user credentials: calling ${this.name}: ${path}`)
     try {
       const result = await superagent
-        .post(`${this.apiUrl()}${path}`)
+        .put(`${this.apiUrl()}${path}`)
         .send(data)
         .agent(this.agent)
         .retry(2, (err, res) => {

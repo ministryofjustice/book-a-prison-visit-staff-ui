@@ -4,6 +4,13 @@
  */
 
 export interface paths {
+  '/visits/{visitId}': {
+    /** Retrieve visit by visit id */
+    get: operations['getVisitById']
+    put: operations['updateVisit']
+    /** Delete a visit by visit id */
+    delete: operations['deleteVisit']
+  }
   '/visits': {
     /** Retrieve visits with optional filters, sorted by startTimestamp ascending */
     get: operations['getVisitsByFilter']
@@ -13,12 +20,6 @@ export interface paths {
     /** Get all session templates */
     get: operations['getSessionTemplates']
     post: operations['createSessionTemplate']
-  }
-  '/visits/{visitId}': {
-    /** Retrieve visit by visit id */
-    get: operations['getVisitById']
-    /** Delete a visit by visit id */
-    delete: operations['deleteVisit']
   }
   '/visit-sessions': {
     /** Retrieve all visits for a specified prisoner */
@@ -34,61 +35,21 @@ export interface paths {
 
 export interface components {
   schemas: {
-    CreateVisitRequest: {
+    /** @description Main Contact associated with the visit */
+    CreateContactOnVisitRequest: {
       /**
-       * @description prisonerId
-       * @example AF34567G
+       * @description Contact Name
+       * @example John Smith
        */
-      prisonerId: string
+      contactName: string
       /**
-       * @description prisonId
-       * @example MDI
+       * @description Contact Phone
+       * @example 01234 567890
        */
-      prisonId: string
-      /**
-       * Format: date-time
-       * @description The date and time of the visit
-       */
-      startTimestamp: string
-      /**
-       * Format: date-time
-       * @description The finishing date and time of the visit
-       */
-      endTimestamp: string
-      /**
-       * @description visit type
-       * @example STANDARD_SOCIAL
-       */
-      visitType: 'STANDARD_SOCIAL' | 'OFFICIAL' | 'FAMILY'
-      /**
-       * @description visit visitStatus
-       * @example RESERVED
-       */
-      visitStatus:
-        | 'RESERVED'
-        | 'BOOKED'
-        | 'CANCELLED_BY_PRISONER'
-        | 'CANCELLED_BY_VISITOR'
-        | 'CANCELLED_BY_PRISON'
-        | 'ATTENDED'
-      /**
-       * @description visit room
-       * @example A1
-       */
-      visitRoom: string
-      /** @description reasonable adjustments */
-      reasonableAdjustments?: string
-      /** @description contact list */
-      contactList?: components['schemas']['CreateVisitorOnVisit'][]
-      /**
-       * Format: int64
-       * @description sessionId identifying the visit session template
-       * @example 123456
-       */
-      sessionId?: number
+      contactPhone: string
     }
-    /** @description contact list */
-    CreateVisitorOnVisit: {
+    /** @description List of visitors associated with the visit */
+    CreateVisitorOnVisitRequest: {
       /**
        * Format: int64
        * @description NOMIS person ID
@@ -96,10 +57,68 @@ export interface components {
        */
       nomisPersonId: number
       /**
-       * @description leadVisitor
+       * @description Lead Visitor
        * @example true
        */
       leadVisitor: boolean
+    }
+    UpdateVisitRequest: {
+      /**
+       * @description Prisoner Id
+       * @example AF34567G
+       */
+      prisonerId?: string
+      /**
+       * @description Prison Id
+       * @example MDI
+       */
+      prisonId?: string
+      /**
+       * Format: date-time
+       * @description The date and time of the visit
+       */
+      startTimestamp?: string
+      /**
+       * Format: date-time
+       * @description The finishing date and time of the visit
+       */
+      endTimestamp?: string
+      /**
+       * @description Visit Type
+       * @example STANDARD_SOCIAL
+       * @enum {string}
+       */
+      visitType?: 'STANDARD_SOCIAL' | 'OFFICIAL' | 'FAMILY'
+      /**
+       * @description Visit Status
+       * @example RESERVED
+       * @enum {string}
+       */
+      visitStatus?:
+        | 'RESERVED'
+        | 'BOOKED'
+        | 'CANCELLED_BY_PRISONER'
+        | 'CANCELLED_BY_VISITOR'
+        | 'CANCELLED_BY_PRISON'
+        | 'ATTENDED'
+      /**
+       * @description Visit Room
+       * @example A1
+       */
+      visitRoom?: string
+      /** @description Reasonable Adjustments */
+      reasonableAdjustments?: string
+      /** @description Visitor Concerns */
+      visitorConcerns?: string
+      mainContact?: components['schemas']['CreateContactOnVisitRequest']
+      /** @description List of visitors associated with the visit */
+      contactList?: components['schemas']['CreateVisitorOnVisitRequest'][]
+      /**
+       * Format: int64
+       * @description Session Id identifying the visit session template
+       * @example 123456
+       */
+      sessionId?: number
     }
     ErrorResponse: {
       /** Format: int32 */
@@ -108,6 +127,25 @@ export interface components {
       errorCode?: number
       userMessage?: string
       developerMessage?: string
+    }
+    /** @description Contact */
+    ContactDto: {
+      /**
+       * Format: int64
+       * @description Visit id
+       * @example 123
+       */
+      visitId: number
+      /**
+       * @description Main Contact Name
+       * @example John Smith
+       */
+      contactName: string
+      /**
+       * @description Main Contact Phone
+       * @example 01234 567890
+       */
+      contactPhone: string
     }
     /** @description Visit */
     VisitDto: {
@@ -118,37 +156,37 @@ export interface components {
        */
       id: number
       /**
-       * @description prisonerId
+       * @description Prisoner Id
        * @example AF34567G
        */
       prisonerId: string
       /**
-       * @description prisonId
+       * @description Prison Id
        * @example MDI
        */
       prisonId: string
       /**
-       * @description visitRoom
+       * @description Visit Room
        * @example A1 L3
        */
       visitRoom: string
       /**
-       * @description visitType
+       * @description Visit Type
        * @example STANDARD_SOCIAL
        */
       visitType: string
       /**
-       * @description visitTypeDescription
+       * @description Visit Type Description
        * @example Standard Social
        */
       visitTypeDescription: string
       /**
-       * @description visitStatus
+       * @description Visit Status
        * @example RESERVED
        */
       visitStatus: string
       /**
-       * @description visitStatusDescription
+       * @description Visit Status Description
        * @example Reserved
        */
       visitStatusDescription: string
@@ -162,18 +200,21 @@ export interface components {
        * @description The finishing date and time of the visit
        */
       endTimestamp: string
-      /** @description reasonable adjustments text */
+      /** @description Reasonable Adjustments */
       reasonableAdjustments?: string
-      /** @description list of visitors associated with the visit */
+      /** @description Visitor Concerns */
+      visitorConcerns?: string
+      mainContact?: components['schemas']['ContactDto']
+      /** @description List of visitors associated with the visit */
       visitors: components['schemas']['VisitorDto'][]
       /**
        * Format: int64
-       * @description The id of the session template associated with this visit
+       * @description Session Id identifying the visit session template
        * @example 123
        */
       sessionId?: number
     }
-    /** @description Visit */
+    /** @description Visitor */
     VisitorDto: {
       /**
        * Format: int64
@@ -192,6 +233,64 @@ export interface components {
        * @example true
        */
       leadVisitor: boolean
+    }
+    CreateVisitRequest: {
+      /**
+       * @description Prisoner Id
+       * @example AF34567G
+       */
+      prisonerId: string
+      /**
+       * @description Prison Id
+       * @example MDI
+       */
+      prisonId: string
+      /**
+       * Format: date-time
+       * @description The date and time of the visit
+       */
+      startTimestamp: string
+      /**
+       * Format: date-time
+       * @description The finishing date and time of the visit
+       */
+      endTimestamp: string
+      /**
+       * @description Visit Type
+       * @example STANDARD_SOCIAL
+       * @enum {string}
+       */
+      visitType: 'STANDARD_SOCIAL' | 'OFFICIAL' | 'FAMILY'
+      /**
+       * @description Visit Status
+       * @example RESERVED
+       * @enum {string}
+       */
+      visitStatus:
+        | 'RESERVED'
+        | 'BOOKED'
+        | 'CANCELLED_BY_PRISONER'
+        | 'CANCELLED_BY_VISITOR'
+        | 'CANCELLED_BY_PRISON'
+        | 'ATTENDED'
+      /**
+       * @description Visit Room
+       * @example A1
+       */
+      visitRoom: string
+      /** @description Reasonable Adjustments */
+      reasonableAdjustments?: string
+      /** @description Visitor Concerns */
+      visitorConcerns?: string
+      mainContact?: components['schemas']['CreateContactOnVisitRequest']
+      /** @description List of visitors associated with the visit */
+      contactList?: components['schemas']['CreateVisitorOnVisitRequest'][]
+      /**
+       * Format: int64
+       * @description Session Id identifying the visit session template
+       * @example 123456
+       */
+      sessionId?: number
     }
     CreateSessionTemplateRequest: {
       /**
@@ -216,6 +315,7 @@ export interface components {
       /**
        * @description visit type
        * @example STANDARD_SOCIAL
+       * @enum {string}
        */
       visitType: 'STANDARD_SOCIAL' | 'OFFICIAL' | 'FAMILY'
       /**
@@ -225,7 +325,10 @@ export interface components {
       visitRoom: string
       /** @description restrictions */
       restrictions?: string
-      /** @description frequency */
+      /**
+       * @description frequency
+       * @enum {string}
+       */
       frequency: 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'SINGLE'
       /**
        * Format: int32
@@ -281,6 +384,7 @@ export interface components {
       /**
        * @description visit type
        * @example STANDARD_SOCIAL
+       * @enum {string}
        */
       visitType: 'STANDARD_SOCIAL' | 'OFFICIAL' | 'FAMILY'
       /**
@@ -293,6 +397,7 @@ export interface components {
       /**
        * @description frequency
        * @example A1
+       * @enum {string}
        */
       frequency: 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'SINGLE'
       /**
@@ -306,6 +411,7 @@ export interface components {
        */
       openCapacity: number
     }
+    /** @description Visit Session */
     VisitSession: {
       /**
        * Format: int64
@@ -377,6 +483,114 @@ export interface components {
 }
 
 export interface operations {
+  /** Retrieve visit by visit id */
+  getVisitById: {
+    parameters: {
+      path: {
+        visitId: number
+      }
+    }
+    responses: {
+      /** Visit Information Returned */
+      200: {
+        content: {
+          'application/json': components['schemas']['VisitDto']
+        }
+      }
+      /** Incorrect request to Get visits for prisoner */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** Unauthorized to access this endpoint */
+      401: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** Incorrect permissions retrieve a visit */
+      403: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** Visit not found */
+      404: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  updateVisit: {
+    parameters: {
+      path: {
+        visitId: number
+      }
+    }
+    responses: {
+      /** Visit updated */
+      200: {
+        content: {
+          'application/json': components['schemas']['VisitDto']
+        }
+      }
+      /** Incorrect request to update a visit */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** Unauthorized to access this endpoint */
+      401: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** Incorrect permissions to update a visit */
+      403: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** Visit not found */
+      404: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateVisitRequest']
+      }
+    }
+  }
+  /** Delete a visit by visit id */
+  deleteVisit: {
+    parameters: {
+      path: {
+        visitId: number
+      }
+    }
+    responses: {
+      /** Visit deleted */
+      200: unknown
+      /** Unauthorized to access this endpoint */
+      401: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** Incorrect permissions to delete a visit */
+      403: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
   /** Retrieve visits with optional filters, sorted by startTimestamp ascending */
   getVisitsByFilter: {
     parameters: {
@@ -509,76 +723,14 @@ export interface operations {
       }
     }
   }
-  /** Retrieve visit by visit id */
-  getVisitById: {
-    parameters: {
-      path: {
-        visitId: number
-      }
-    }
-    responses: {
-      /** Visit Information Returned */
-      200: {
-        content: {
-          'application/json': components['schemas']['VisitDto']
-        }
-      }
-      /** Incorrect request to Get visits for prisoner */
-      400: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** Unauthorized to access this endpoint */
-      401: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** Incorrect permissions retrieve a visit */
-      403: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** Visit not found */
-      404: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  /** Delete a visit by visit id */
-  deleteVisit: {
-    parameters: {
-      path: {
-        visitId: number
-      }
-    }
-    responses: {
-      /** Visit deleted */
-      200: unknown
-      /** Unauthorized to access this endpoint */
-      401: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** Incorrect permissions to delete a visit */
-      403: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
   /** Retrieve all visits for a specified prisoner */
   getVisitSessions: {
     parameters: {
       query: {
         /** Query by NOMIS Prison Identifier */
         prisonId: string
+        /** Filter results by prisoner id */
+        prisonerId?: string
         /** Override the default minimum number of days notice from the current date */
         min?: number
         /** Override the default maximum number of days to book-ahead from the current date */
