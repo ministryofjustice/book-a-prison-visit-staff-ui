@@ -191,5 +191,8 @@ export type VisitSessionData = {
     phoneNumber: string
     contactName?: string
   }
-  reservationId?: string
+  booking?: {
+    reservationId?: string
+    reference?: string
+  }
 }

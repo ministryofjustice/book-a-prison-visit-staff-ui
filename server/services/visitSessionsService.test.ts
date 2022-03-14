@@ -482,7 +482,9 @@ describe('Visit sessions service', () => {
           phoneNumber: '01234 567890',
           contactName: 'John Smith',
         },
-        reservationId: '123',
+        booking: {
+          reservationId: '123',
+        },
       }
       const visit: Visit = {
         id: '123',

@@ -419,7 +419,6 @@ export default function routes(
     })
 
     const { offenderNo } = req.session.visitSessionData.prisoner
-    const errors = validationResult(req)
 
     const additionalSupport = visitSessionData.additionalSupport?.keys?.map(key => {
       return key === additionalSupportOptions.items.OTHER.key
@@ -427,9 +426,14 @@ export default function routes(
         : additionalSupportOptions.getValue(key)
     })
 
-    if (!Number.isInteger(req.session.visitSessionData.reservationId)) {
+    if (!Number.isInteger(req.session.visitSessionData.booking.reservationId)) {
       return res.render('pages/checkYourBooking', {
-        errors: !errors.isEmpty() ? errors.array() : [],
+        errors: [
+          {
+            msg: 'The reservation id is missing',
+            param: 'id',
+          },
+        ],
         offenderNo,
         mainContact: visitSessionData.mainContact,
         prisoner: visitSessionData.prisoner,
@@ -440,14 +444,19 @@ export default function routes(
     }
 
     try {
-      await visitSessionsService.updateVisit({
+      const bookedVisit = await visitSessionsService.updateVisit({
         username: res.locals.user?.username,
         visitData: req.session.visitSessionData,
         visitStatus: 'BOOKED',
       })
     } catch (error) {
       return res.render('pages/checkYourBooking', {
-        errors: !errors.isEmpty() ? errors.array() : [],
+        errors: [
+          {
+            msg: 'Failed to make complete the reservation',
+            param: 'id',
+          },
+        ],
         offenderNo,
         mainContact: visitSessionData.mainContact,
         prisoner: visitSessionData.prisoner,

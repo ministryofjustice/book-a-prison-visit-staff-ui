@@ -297,7 +297,9 @@ describe('visitSchedulerApiClient', () => {
             ],
           },
         ],
-        reservationId: '123',
+        booking: {
+          reservationId: '123',
+        },
       }
       const mainContact = {
         contactPhone: visitSessionData.mainContact.phoneNumber,
