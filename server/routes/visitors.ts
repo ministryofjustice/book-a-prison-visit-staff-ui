@@ -103,7 +103,11 @@ export default function routes(
         return adultVisitors
       }, [])
 
-      req.session.adultVisitors = adults
+      if (!req.session.adultVisitors) {
+        req.session.adultVisitors = { adults: [] }
+      }
+      req.session.adultVisitors.adults = adults
+
       req.session.visitSessionData.visitors = selectedVisitors
 
       return res.redirect('/visit/select-date-and-time')
@@ -294,7 +298,7 @@ export default function routes(
 
     res.render('pages/mainContact', {
       offenderNo,
-      adultVisitors: req.session.adultVisitors,
+      adultVisitors: req.session.adultVisitors?.adults,
     })
   })
 
@@ -339,7 +343,7 @@ export default function routes(
         return res.render('pages/mainContact', {
           errors: !errors.isEmpty() ? errors.array() : [],
           offenderNo,
-          adultVisitors: req.session.adultVisitors,
+          adultVisitors: req.session.adultVisitors?.adults,
           phoneNumber: req.body.phoneNumber,
           contact: req.body.contact,
           someoneElseName: req.body.someoneElseName,

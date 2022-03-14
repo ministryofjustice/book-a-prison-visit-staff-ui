@@ -56,7 +56,7 @@ function appSetup(
     returnTo: '',
     nowInMinutes: 0,
     visitorList: [] as VisitorListItem[],
-    adultVisitors: [] as VisitorListItem[],
+    adultVisitors: { adults: [] as VisitorListItem[] },
     slotsList: {} as VisitSlotList,
     timeOfDay: '',
     dayOfTheWeek: '',

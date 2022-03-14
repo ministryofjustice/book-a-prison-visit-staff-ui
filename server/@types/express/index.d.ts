@@ -8,7 +8,7 @@ declare module 'express-session' {
     returnTo: string
     nowInMinutes: number
     visitorList: VisitorListItem[]
-    adultVisitors: VisitorListItem[]
+    adultVisitors: { adults: VisitorListItem[] }
     slotsList: VisitSlotList
     timeOfDay: string
     dayOfTheWeek: string

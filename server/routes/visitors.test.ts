@@ -253,6 +253,8 @@ describe('GET /visit/select-visitors', () => {
 })
 
 describe('POST /visit/select-visitors', () => {
+  const adultVisitors: { adults: VisitorListItem[] } = { adults: [] }
+
   beforeEach(() => {
     const visitorList: VisitorListItem[] = [
       {
@@ -313,66 +315,85 @@ describe('POST /visit/select-visitors', () => {
     }
 
     sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, {
+      adultVisitors,
       visitorList,
       visitSessionData,
     } as SessionData)
   })
 
   it('should save to session and redirect to the select date and time page if an adult is selected', () => {
+    const returnAdult = [
+      {
+        address: '1st listed address',
+        adult: true,
+        dateOfBirth: '1986-07-28',
+        name: 'Bob Smith',
+        personId: 4322,
+        relationshipDescription: 'Brother',
+        restrictions: [],
+        selected: true,
+      },
+    ] as VisitorListItem[]
+
     return request(sessionApp)
       .post('/visit/select-visitors')
       .send('visitors=4322')
       .expect(302)
       .expect('location', '/visit/select-date-and-time')
       .expect(() => {
-        expect(visitSessionData.visitors).toEqual([
-          {
-            address: '1st listed address',
-            adult: true,
-            dateOfBirth: '1986-07-28',
-            name: 'Bob Smith',
-            personId: 4322,
-            relationshipDescription: 'Brother',
-            restrictions: [],
-            selected: true,
-          },
-        ])
+        expect(adultVisitors.adults).toEqual(returnAdult)
+        expect(visitSessionData.visitors).toEqual(returnAdult)
       })
   })
 
   it('should save to session and redirect to the select date and time page if an adult and a child are selected', () => {
+    const returnAdult = {
+      address: '1st listed address',
+      adult: true,
+      dateOfBirth: '1986-07-28',
+      name: 'Bob Smith',
+      personId: 4322,
+      relationshipDescription: 'Brother',
+      restrictions: [],
+      selected: true,
+    } as VisitorListItem
+
+    const returnChild = {
+      address: 'Not entered',
+      adult: false,
+      dateOfBirth: '2018-03-02',
+      name: 'Anne Smith',
+      personId: 4324,
+      relationshipDescription: 'Niece',
+      restrictions: [],
+      selected: true,
+    } as VisitorListItem
+
     return request(sessionApp)
       .post('/visit/select-visitors')
       .send('visitors=4322&visitors=4324')
       .expect(302)
       .expect('location', '/visit/select-date-and-time')
       .expect(() => {
-        expect(visitSessionData.visitors).toEqual([
-          {
-            address: '1st listed address',
-            adult: true,
-            dateOfBirth: '1986-07-28',
-            name: 'Bob Smith',
-            personId: 4322,
-            relationshipDescription: 'Brother',
-            restrictions: [],
-            selected: true,
-          },
-          {
-            address: 'Not entered',
-            adult: false,
-            dateOfBirth: '2018-03-02',
-            name: 'Anne Smith',
-            personId: 4324,
-            relationshipDescription: 'Niece',
-            restrictions: [],
-            selected: true,
-          },
-        ])
+        expect(adultVisitors.adults).toEqual([returnAdult])
+        expect(visitSessionData.visitors).toEqual([returnAdult, returnChild])
       })
   })
 
   it('should save new choice to session and redirect to select date and time page if existing session data present', () => {
+    adultVisitors.adults = [
+      {
+        address: '1st listed address',
+        adult: true,
+        dateOfBirth: '1986-07-28',
+        name: 'Bob Smith',
+        personId: 4322,
+        relationshipDescription: 'Brother',
+        restrictions: [],
+        selected: true,
+      },
+    ]
+
     visitSessionData.visitors = [
       {
         address: '1st listed address',
@@ -386,24 +407,25 @@ describe('POST /visit/select-visitors', () => {
       },
     ]
 
+    const returnAdult = {
+      personId: 4323,
+      name: 'Ted Smith',
+      dateOfBirth: '1968-07-28',
+      adult: true,
+      relationshipDescription: 'Father',
+      address: '1st listed address',
+      restrictions: [],
+      selected: true,
+    } as VisitorListItem
+
     return request(sessionApp)
       .post('/visit/select-visitors')
       .send('visitors=4323')
       .expect(302)
       .expect('location', '/visit/select-date-and-time')
       .expect(() => {
-        expect(visitSessionData.visitors).toEqual([
-          {
-            personId: 4323,
-            name: 'Ted Smith',
-            dateOfBirth: '1968-07-28',
-            adult: true,
-            relationshipDescription: 'Father',
-            address: '1st listed address',
-            restrictions: [],
-            selected: true,
-          },
-        ])
+        expect(adultVisitors.adults).toEqual([returnAdult])
+        expect(visitSessionData.visitors).toEqual([returnAdult])
       })
   })
 
