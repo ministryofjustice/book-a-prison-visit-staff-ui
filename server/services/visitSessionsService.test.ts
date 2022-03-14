@@ -515,7 +515,22 @@ describe('Visit sessions service', () => {
       const result = await visitSessionsService.updateVisit({ username: 'user', visitData: visitSessionData })
 
       expect(visitSchedulerApiClient.updateVisit).toHaveBeenCalledTimes(1)
-      expect(result).toEqual('123')
+      expect(result).toEqual({
+        endTimestamp: '2022-02-14T11:00:00',
+        id: '123',
+        mainContact: { contactName: 'John Smith', contactPhone: '01234 567890' },
+        prisonId: 'HEI',
+        prisonerId: 'A1234BC',
+        reasonableAdjustments: 'wheelchair,maskExempt,other,custom request',
+        sessionId: 123,
+        startTimestamp: '2022-02-14T10:00:00',
+        visitRoom: 'visit room',
+        visitStatus: 'RESERVED',
+        visitStatusDescription: 'Reserved',
+        visitType: 'STANDARD_SOCIAL',
+        visitTypeDescription: 'Standard Social',
+        visitors: [{ leadVisitor: true, nomisPersonId: 1234 }],
+      })
     })
   })
 })
