@@ -402,11 +402,83 @@ export default function routes(
 
     res.render('pages/checkYourBooking', {
       offenderNo,
-      contactDetails: {
-        phoneNumber: visitSessionData.mainContact.phoneNumber,
-      },
       mainContact: visitSessionData.mainContact,
       prisoner: visitSessionData.prisoner,
+      visit: visitSessionData.visit,
+      visitors: visitSessionData.visitors,
+      additionalSupport,
+    })
+  })
+
+  router.post('/check-your-booking', async (req, res) => {
+    const { visitSessionData } = req.session
+    checkSession({
+      stage: 5,
+      visitData: visitSessionData,
+      res,
+    })
+
+    const { offenderNo } = req.session.visitSessionData.prisoner
+    const errors = validationResult(req)
+
+    const additionalSupport = visitSessionData.additionalSupport?.keys?.map(key => {
+      return key === additionalSupportOptions.items.OTHER.key
+        ? visitSessionData.additionalSupport.other
+        : additionalSupportOptions.getValue(key)
+    })
+
+    if (!Number.isInteger(req.session.visitSessionData.reservationId)) {
+      return res.render('pages/checkYourBooking', {
+        errors: !errors.isEmpty() ? errors.array() : [],
+        offenderNo,
+        mainContact: visitSessionData.mainContact,
+        prisoner: visitSessionData.prisoner,
+        visit: visitSessionData.visit,
+        visitors: visitSessionData.visitors,
+        additionalSupport,
+      })
+    }
+
+    try {
+      await visitSessionsService.updateVisit({
+        username: res.locals.user?.username,
+        visitData: req.session.visitSessionData,
+        visitStatus: 'BOOKED',
+      })
+    } catch (error) {
+      return res.render('pages/checkYourBooking', {
+        errors: !errors.isEmpty() ? errors.array() : [],
+        offenderNo,
+        mainContact: visitSessionData.mainContact,
+        prisoner: visitSessionData.prisoner,
+        visit: visitSessionData.visit,
+        visitors: visitSessionData.visitors,
+        additionalSupport,
+      })
+    }
+
+    return res.redirect('/visit/confirmation')
+  })
+
+  router.get('/confirmation', async (req, res) => {
+    const { visitSessionData } = req.session
+    checkSession({
+      stage: 6,
+      visitData: visitSessionData,
+      res,
+    })
+    const { offenderNo } = req.session.visitSessionData.prisoner
+
+    const additionalSupport = visitSessionData.additionalSupport?.keys?.map(key => {
+      return key === additionalSupportOptions.items.OTHER.key
+        ? visitSessionData.additionalSupport.other
+        : additionalSupportOptions.getValue(key)
+    })
+
+    res.render('pages/confirmation', {
+      reference: 'test',
+      offenderNo,
+      mainContact: visitSessionData.mainContact,
       visit: visitSessionData.visit,
       visitors: visitSessionData.visitors,
       additionalSupport,
