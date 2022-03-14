@@ -65,11 +65,28 @@ export default class VisitSessionsService {
     }, {})
   }
 
-  async reserveVisit({ username, visitData }: { username: string; visitData: VisitSessionData }): Promise<number> {
+  async createVisit({ username, visitData }: { username: string; visitData: VisitSessionData }): Promise<number> {
     const token = await this.systemToken(username)
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
 
-    const reservation = await visitSchedulerApiClient.reserveVisit(visitData)
+    const reservation = await visitSchedulerApiClient.createVisit(visitData)
+
+    return reservation.id ? reservation.id : undefined
+  }
+
+  async updateVisit({
+    username,
+    visitData,
+    visitStatus = 'RESERVED',
+  }: {
+    username: string
+    visitData: VisitSessionData
+    visitStatus?: string
+  }): Promise<number> {
+    const token = await this.systemToken(username)
+    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
+
+    const reservation = await visitSchedulerApiClient.updateVisit(visitData, visitStatus)
 
     return reservation.id ? reservation.id : undefined
   }
