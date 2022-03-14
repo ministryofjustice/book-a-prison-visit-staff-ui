@@ -131,12 +131,6 @@ export interface components {
     /** @description Contact */
     ContactDto: {
       /**
-       * Format: int64
-       * @description Visit id
-       * @example 123
-       */
-      visitId: number
-      /**
        * @description Main Contact Name
        * @example John Smith
        */
@@ -150,11 +144,10 @@ export interface components {
     /** @description Visit */
     VisitDto: {
       /**
-       * Format: int64
        * @description Visit id
-       * @example 123
+       * @example v9-d7-ed-7u
        */
-      id: number
+      id: string
       /**
        * @description Prisoner Id
        * @example AF34567G
@@ -216,12 +209,6 @@ export interface components {
     }
     /** @description Visitor */
     VisitorDto: {
-      /**
-       * Format: int64
-       * @description Visit id
-       * @example 123
-       */
-      visitId: number
       /**
        * Format: int64
        * @description person ID (nomis) of the visitor
@@ -487,7 +474,7 @@ export interface operations {
   getVisitById: {
     parameters: {
       path: {
-        visitId: number
+        visitId: string
       }
     }
     responses: {
@@ -526,7 +513,7 @@ export interface operations {
   updateVisit: {
     parameters: {
       path: {
-        visitId: number
+        visitId: string
       }
     }
     responses: {
@@ -571,7 +558,7 @@ export interface operations {
   deleteVisit: {
     parameters: {
       path: {
-        visitId: number
+        visitId: string
       }
     }
     responses: {

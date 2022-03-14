@@ -65,7 +65,7 @@ export default class VisitSessionsService {
     }, {})
   }
 
-  async createVisit({ username, visitData }: { username: string; visitData: VisitSessionData }): Promise<number> {
+  async createVisit({ username, visitData }: { username: string; visitData: VisitSessionData }): Promise<string> {
     const token = await this.systemToken(username)
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
 
@@ -82,7 +82,7 @@ export default class VisitSessionsService {
     username: string
     visitData: VisitSessionData
     visitStatus?: string
-  }): Promise<number> {
+  }): Promise<string> {
     const token = await this.systemToken(username)
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
 
