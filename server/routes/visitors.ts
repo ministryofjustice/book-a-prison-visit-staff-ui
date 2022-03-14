@@ -198,18 +198,18 @@ export default function routes(
 
       visitSessionData.visit = getSelectedSlot(req.session.slotsList, req.body['visit-date-and-time'])
 
-      if (Number.isInteger(visitSessionData.reservationId)) {
+      if (Number.isInteger(req.session.visitSessionData.visitId)) {
         await visitSessionsService.updateVisit({
           username: res.locals.user?.username,
           visitData: visitSessionData,
         })
       } else {
-        const reservationId = await visitSessionsService.createVisit({
+        const visitId = await visitSessionsService.createVisit({
           username: res.locals.user?.username,
           visitData: visitSessionData,
         })
 
-        visitSessionData.reservationId = reservationId
+        req.session.visitSessionData.visitId = visitId
       }
 
       return res.redirect('/visit/additional-support')
@@ -426,11 +426,11 @@ export default function routes(
         : additionalSupportOptions.getValue(key)
     })
 
-    if (!Number.isInteger(req.session.visitSessionData.booking.reservationId)) {
+    if (!Number.isInteger(req.session.visitSessionData.visitId)) {
       return res.render('pages/checkYourBooking', {
         errors: [
           {
-            msg: 'The reservation id is missing',
+            msg: 'The visit id is missing',
             param: 'id',
           },
         ],
@@ -451,7 +451,7 @@ export default function routes(
       })
 
       // TODO: Update to the correct value when schema updated
-      req.session.visitSessionData.booking.reference = bookedVisit.id.toString()
+      req.session.visitSessionData.visitId = bookedVisit.id
     } catch (error) {
       return res.render('pages/checkYourBooking', {
         errors: [
@@ -488,7 +488,7 @@ export default function routes(
     })
 
     res.render('pages/confirmation', {
-      reference: visitSessionData.booking.reference,
+      visitId: visitSessionData.visitId,
       offenderNo,
       mainContact: visitSessionData.mainContact,
       visit: visitSessionData.visit,

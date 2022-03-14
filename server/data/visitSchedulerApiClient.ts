@@ -82,7 +82,7 @@ class VisitSchedulerApiClient {
       : ''
 
     return this.restclient.put({
-      path: `/visits/${visitData.booking.reservationId}`,
+      path: `/visits/${visitData.visitId}`,
       data: {
         prisonId: this.prisonId,
         prisonerId: visitData.prisoner.offenderNo,
