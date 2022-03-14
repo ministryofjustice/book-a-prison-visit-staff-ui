@@ -215,7 +215,6 @@ export default function routes(
       res,
     })
 
-    const { offenderNo } = req.session.visitSessionData.prisoner
     const formValues = (req.flash('formValues')?.[0] as unknown as Record<string, string | string[]>) || {}
 
     if (!Object.keys(formValues).length && req.session.visitSessionData.additionalSupport) {
@@ -226,7 +225,6 @@ export default function routes(
 
     res.render('pages/additionalSupport', {
       errors: req.flash('errors'),
-      offenderNo,
       additionalSupportOptions: additionalSupportOptions.items,
       formValues,
     })
@@ -297,8 +295,22 @@ export default function routes(
       res,
     })
 
+    const formValues = (req.flash('formValues')?.[0] as unknown as Record<string, string | string[]>) || {}
+
+    if (!Object.keys(formValues).length && req.session.visitSessionData.mainContact) {
+      formValues.contact = req.session.visitSessionData.mainContact.contact
+        ? req.session.visitSessionData.mainContact.contact.name.replace(' ', '_')
+        : 'someoneElse'
+      formValues.phoneNumber = req.session.visitSessionData.mainContact.phoneNumber
+      formValues.someoneElseName = req.session.visitSessionData.mainContact.contact
+        ? undefined
+        : req.session.visitSessionData.mainContact.contactName
+    }
+
     res.render('pages/mainContact', {
+      errors: req.flash('errors'),
       adultVisitors: req.session.adultVisitors?.adults,
+      formValues,
     })
   })
 
@@ -336,18 +348,12 @@ export default function routes(
         res,
       })
 
-      const { offenderNo } = req.session.visitSessionData.prisoner
       const errors = validationResult(req)
 
       if (!errors.isEmpty()) {
-        return res.render('pages/mainContact', {
-          errors: !errors.isEmpty() ? errors.array() : [],
-          offenderNo,
-          adultVisitors: req.session.adultVisitors?.adults,
-          phoneNumber: req.body.phoneNumber,
-          contact: req.body.contact,
-          someoneElseName: req.body.someoneElseName,
-        })
+        req.flash('errors', errors.array() as [])
+        req.flash('formValues', req.body)
+        return res.redirect(req.originalUrl)
       }
 
       const selectedContact = req.session.visitorList.visitors.find(
