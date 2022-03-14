@@ -402,7 +402,7 @@ describe('Visit sessions service', () => {
         ],
       }
       const visit: Visit = {
-        id: 123,
+        id: '123',
         prisonerId: visitSessionData.prisoner.offenderNo,
         prisonId: 'HEI',
         visitRoom: visitSessionData.visit.visitRoomName,
@@ -415,7 +415,6 @@ describe('Visit sessions service', () => {
         reasonableAdjustments: 'string',
         visitors: [
           {
-            visitId: 123,
             nomisPersonId: 1234,
             leadVisitor: true,
           },
@@ -427,7 +426,7 @@ describe('Visit sessions service', () => {
       const result = await visitSessionsService.createVisit({ username: 'user', visitData: visitSessionData })
 
       expect(visitSchedulerApiClient.createVisit).toHaveBeenCalledTimes(1)
-      expect(result).toEqual(123)
+      expect(result).toEqual('123')
     })
   })
 
@@ -483,10 +482,10 @@ describe('Visit sessions service', () => {
           phoneNumber: '01234 567890',
           contactName: 'John Smith',
         },
-        reservationId: 123,
+        reservationId: '123',
       }
       const visit: Visit = {
-        id: 123,
+        id: '123',
         prisonerId: visitSessionData.prisoner.offenderNo,
         prisonId: 'HEI',
         visitRoom: visitSessionData.visit.visitRoomName,
@@ -498,13 +497,11 @@ describe('Visit sessions service', () => {
         endTimestamp: '2022-02-14T11:00:00',
         reasonableAdjustments: 'wheelchair,maskExempt,other,custom request',
         mainContact: {
-          visitId: 123,
           contactName: 'John Smith',
           contactPhone: '01234 567890',
         },
         visitors: [
           {
-            visitId: 123,
             nomisPersonId: 1234,
             leadVisitor: true,
           },
@@ -516,7 +513,7 @@ describe('Visit sessions service', () => {
       const result = await visitSessionsService.updateVisit({ username: 'user', visitData: visitSessionData })
 
       expect(visitSchedulerApiClient.updateVisit).toHaveBeenCalledTimes(1)
-      expect(result).toEqual(123)
+      expect(result).toEqual('123')
     })
   })
 })
