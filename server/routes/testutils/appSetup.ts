@@ -55,7 +55,7 @@ function appSetup(
     cookie: new Cookie(),
     returnTo: '',
     nowInMinutes: 0,
-    visitorList: [] as VisitorListItem[],
+    visitorList: { visitors: [] as VisitorListItem[] },
     adultVisitors: { adults: [] as VisitorListItem[] },
     slotsList: {} as VisitSlotList,
     timeOfDay: '',

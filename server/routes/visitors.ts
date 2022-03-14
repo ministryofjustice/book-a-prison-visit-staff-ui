@@ -29,7 +29,10 @@ export default function routes(
       formValues.visitors = req.session.visitSessionData.visitors.map(visitor => visitor.personId.toString())
     }
 
-    req.session.visitorList = prisonerVisitors.visitorList
+    if (!req.session.visitorList) {
+      req.session.visitorList = { visitors: [] }
+    }
+    req.session.visitorList.visitors = prisonerVisitors.visitorList
 
     res.render('pages/visitors', {
       errors: req.flash('errors'),
@@ -44,7 +47,7 @@ export default function routes(
     body('visitors').custom((value: string, { req }) => {
       const selected = [].concat(value)
 
-      req.session.visitorList = req.session.visitorList.map((visitor: VisitorListItem) => {
+      req.session.visitorList.visitors = req.session.visitorList.visitors.map((visitor: VisitorListItem) => {
         const newVisitor = visitor
         newVisitor.selected = selected.includes(visitor.personId.toString())
 
@@ -59,7 +62,7 @@ export default function routes(
         throw new Error('Select no more than 3 visitors with a maximum of 2 adults')
       }
 
-      const adults = req.session.visitorList
+      const adults = req.session.visitorList.visitors
         .filter((visitor: VisitorListItem) => selected.includes(visitor.personId.toString()))
         .reduce((count: number, visitor: VisitorListItem) => {
           return visitor.adult ?? true ? count + 1 : count
@@ -91,7 +94,7 @@ export default function routes(
       }
 
       const selectedIds = [].concat(req.body.visitors)
-      const selectedVisitors = req.session.visitorList.filter((visitor: VisitorListItem) =>
+      const selectedVisitors = req.session.visitorList.visitors.filter((visitor: VisitorListItem) =>
         selectedIds.includes(visitor.personId.toString())
       )
 
@@ -294,10 +297,7 @@ export default function routes(
       res,
     })
 
-    const { offenderNo } = req.session.visitSessionData.prisoner
-
     res.render('pages/mainContact', {
-      offenderNo,
       adultVisitors: req.session.adultVisitors?.adults,
     })
   })
@@ -350,7 +350,7 @@ export default function routes(
         })
       }
 
-      const selectedContact = req.session.visitorList.find(
+      const selectedContact = req.session.visitorList.visitors.find(
         (visitor: VisitorListItem) => req.body.contact === visitor.name.replace(' ', '_')
       )
 

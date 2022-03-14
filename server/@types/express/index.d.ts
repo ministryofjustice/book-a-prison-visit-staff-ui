@@ -7,7 +7,7 @@ declare module 'express-session' {
   interface SessionData {
     returnTo: string
     nowInMinutes: number
-    visitorList: VisitorListItem[]
+    visitorList: { visitors: VisitorListItem[] }
     adultVisitors: { adults: VisitorListItem[] }
     slotsList: VisitSlotList
     timeOfDay: string

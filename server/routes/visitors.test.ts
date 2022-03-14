@@ -28,6 +28,8 @@ afterEach(() => {
 })
 
 describe('GET /visit/select-visitors', () => {
+  const visitorList: { visitors: VisitorListItem[] } = { visitors: [] }
+
   const prisonerVisitorsService = new PrisonerVisitorsService(
     null,
     null,
@@ -108,11 +110,12 @@ describe('GET /visit/select-visitors', () => {
     prisonerVisitorsService.getVisitors.mockResolvedValue(returnData)
 
     sessionApp = appWithAllRoutes(null, null, prisonerVisitorsService, null, systemToken, false, {
+      visitorList,
       visitSessionData,
     } as SessionData)
   })
 
-  it('should render the approved visitor list for offender number A1234BC with none selected', () => {
+  it('should render the approved visitor list for offender number A1234BC with none selected and store visitorList in session', () => {
     return request(sessionApp)
       .get('/visit/select-visitors')
       .expect(200)
@@ -142,6 +145,8 @@ describe('GET /visit/select-visitors', () => {
 
         expect($('input[name="visitors"]:checked').length).toBe(0)
         expect($('[data-test="submit"]').text().trim()).toBe('Continue')
+
+        expect(visitorList.visitors).toEqual(returnData.visitorList)
       })
   })
 
@@ -256,54 +261,56 @@ describe('POST /visit/select-visitors', () => {
   const adultVisitors: { adults: VisitorListItem[] } = { adults: [] }
 
   beforeEach(() => {
-    const visitorList: VisitorListItem[] = [
-      {
-        personId: 4321,
-        name: 'Jeanette Smith',
-        dateOfBirth: '1986-07-28',
-        adult: true,
-        relationshipDescription: 'Sister',
-        address:
-          'Premises,<br>Flat 23B,<br>123 The Street,<br>Springfield,<br>Coventry,<br>West Midlands,<br>C1 2AB,<br>England',
-        restrictions: [],
-      },
-      {
-        personId: 4322,
-        name: 'Bob Smith',
-        dateOfBirth: '1986-07-28',
-        adult: true,
-        relationshipDescription: 'Brother',
-        address: '1st listed address',
-        restrictions: [],
-      },
-      {
-        personId: 4323,
-        name: 'Ted Smith',
-        dateOfBirth: '1968-07-28',
-        adult: true,
-        relationshipDescription: 'Father',
-        address: '1st listed address',
-        restrictions: [],
-      },
-      {
-        personId: 4324,
-        name: 'Anne Smith',
-        dateOfBirth: '2018-03-02',
-        adult: false,
-        relationshipDescription: 'Niece',
-        address: 'Not entered',
-        restrictions: [],
-      },
-      {
-        personId: 4325,
-        name: 'Bill Smith',
-        dateOfBirth: '2018-03-02',
-        adult: false,
-        relationshipDescription: 'Nephew',
-        address: 'Not entered',
-        restrictions: [],
-      },
-    ]
+    const visitorList: { visitors: VisitorListItem[] } = {
+      visitors: [
+        {
+          personId: 4321,
+          name: 'Jeanette Smith',
+          dateOfBirth: '1986-07-28',
+          adult: true,
+          relationshipDescription: 'Sister',
+          address:
+            'Premises,<br>Flat 23B,<br>123 The Street,<br>Springfield,<br>Coventry,<br>West Midlands,<br>C1 2AB,<br>England',
+          restrictions: [],
+        },
+        {
+          personId: 4322,
+          name: 'Bob Smith',
+          dateOfBirth: '1986-07-28',
+          adult: true,
+          relationshipDescription: 'Brother',
+          address: '1st listed address',
+          restrictions: [],
+        },
+        {
+          personId: 4323,
+          name: 'Ted Smith',
+          dateOfBirth: '1968-07-28',
+          adult: true,
+          relationshipDescription: 'Father',
+          address: '1st listed address',
+          restrictions: [],
+        },
+        {
+          personId: 4324,
+          name: 'Anne Smith',
+          dateOfBirth: '2018-03-02',
+          adult: false,
+          relationshipDescription: 'Niece',
+          address: 'Not entered',
+          restrictions: [],
+        },
+        {
+          personId: 4325,
+          name: 'Bill Smith',
+          dateOfBirth: '2018-03-02',
+          adult: false,
+          relationshipDescription: 'Nephew',
+          address: 'Not entered',
+          restrictions: [],
+        },
+      ],
+    }
 
     visitSessionData = {
       prisoner: {
@@ -823,16 +830,7 @@ describe('GET /visit/additional-support', () => {
           personId: 123,
           name: 'name last',
           relationshipDescription: 'relate',
-          restrictions: [
-            {
-              restrictionType: 'AVS',
-              restrictionTypeDescription: 'AVS desc',
-              startDate: '123',
-              expiryDate: '456',
-              globalRestriction: false,
-              comment: 'comment',
-            },
-          ],
+          restrictions: [],
         },
       ],
     }
