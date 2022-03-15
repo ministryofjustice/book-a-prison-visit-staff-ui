@@ -3,7 +3,13 @@ import PrisonerProfileService from './prisonerProfileService'
 import PrisonApiClient from '../data/prisonApiClient'
 import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
 import PrisonerContactRegistryApiClient from '../data/prisonerContactRegistryApiClient'
-import { Alert, InmateDetail, PageOfPrisonerBookingSummary, VisitBalances } from '../data/prisonApiTypes'
+import {
+  Alert,
+  InmateDetail,
+  PageOfPrisonerBookingSummary,
+  VisitBalances,
+  OffenderRestrictions,
+} from '../data/prisonApiTypes'
 import { PrisonerAlertItem } from '../@types/bapv'
 
 jest.mock('../data/prisonApiClient')
@@ -358,6 +364,59 @@ describe('Prisoner profile service', () => {
       await expect(async () => {
         await prisonerProfileService.getProfile(offenderNo, 'user')
       }).rejects.toBeInstanceOf(NotFound)
+    })
+  })
+
+  describe('getOffenderRestrictions', () => {
+    beforeEach(() => {
+      systemToken = async (user: string): Promise<string> => `${user}-token-1`
+      prisonApiClientBuilder = jest.fn().mockReturnValue(prisonApiClient)
+      visitSchedulerApiClientBuilder = jest.fn().mockReturnValue(visitSchedulerApiClient)
+      prisonerContactRegistryApiClientBuilder = jest.fn().mockReturnValue(prisonerContactRegistryApiClient)
+      prisonerProfileService = new PrisonerProfileService(
+        prisonApiClientBuilder,
+        visitSchedulerApiClientBuilder,
+        prisonerContactRegistryApiClientBuilder,
+        systemToken
+      )
+    })
+
+    afterEach(() => {
+      jest.resetAllMocks()
+    })
+
+    it('Retrieves and passes through the offender restrictions', async () => {
+      const restrictions = <OffenderRestrictions>{
+        bookingId: 12345,
+        offenderRestrictions: [
+          {
+            restrictionId: 0,
+            comment: 'string',
+            restrictionType: 'string',
+            restrictionTypeDescription: 'string',
+            startDate: '2022-03-15',
+            expiryDate: '2022-03-15',
+            active: true,
+          },
+        ],
+      }
+
+      prisonApiClient.getOffenderRestrictions.mockResolvedValue(restrictions)
+
+      const results = await prisonerProfileService.getRestrictions(offenderNo, 'user')
+
+      expect(prisonApiClient.getOffenderRestrictions).toHaveBeenCalledTimes(1)
+      expect(results).toEqual([
+        {
+          restrictionId: 0,
+          comment: 'string',
+          restrictionType: 'string',
+          restrictionTypeDescription: 'string',
+          startDate: '2022-03-15',
+          expiryDate: '2022-03-15',
+          active: true,
+        },
+      ])
     })
   })
 })

@@ -30,7 +30,7 @@
     {%- endif %}
   {%- endset %}
 
-  {% set restrictions %}
+  {% set visitorRestrictions %}
     {%- for restriction in visitor.restrictions -%}
       <div class="visitor-restriction">
         <span class="moj-badge moj-badge--large visitor-restriction-badge visitor-restriction-badge--{{ restriction.restrictionType }}">{{- restriction.restrictionTypeDescription }}</span>
@@ -66,10 +66,28 @@
       attributes: { "data-test": "visitor-address-" + visitor.personId }
     },
     {
-      html: restrictions if restrictions else "None",
+      html: visitorRestrictions if visitorRestrictions else "None",
       attributes: { "data-test": "visitor-restrictions-" + visitor.personId }
     }
   ]), visitors) %}
+{% endfor %}
+
+{% set prisonerRestrictions = [] %}
+{% for restriction in restrictions %}
+  {%- set prisonerRestrictions = (prisonerRestrictions.push([
+    {
+      text: restriction.restrictionTypeDescription
+    },
+    {
+      text: restriction.comment
+    },
+    {
+      text: restriction.startDate
+    },
+    {
+      text: restriction.expiryDate
+    }
+  ]), prisonerRestrictions) %}
 {% endfor %}
 
 {% block content %}
@@ -80,6 +98,26 @@
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
 
       <p><strong class="govuk-!-margin-right-4">Prisoner name:</strong> <span data-test="prisoner-name">{{ prisonerName }}</span></p>
+
+      <h2 class="govuk-heading-m">Prisoner's active restrictions</h2>
+
+      {{ govukTable({
+        head: [
+          {
+            text: "Type of restriction"
+          },
+          {
+            text: "Comments"
+          },
+          {
+            text: "Date from"
+          },
+          {
+            text: "Date to"
+          }
+        ],
+        rows: prisonerRestrictions
+      }) }}
 
       {% if visitors | length %}
       {% if errors | length %}

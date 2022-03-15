@@ -95,6 +95,7 @@ function appSetup(
   const prisonerSearchService =
     prisonerSearchServiceOverride || new PrisonerSearchService(prisonerSearchClientBuilder, systemTokenTest)
   app.use('/search/', searchRoutes(standardRouter(new MockUserService()), prisonerSearchService))
+
   const prisonerProfileService =
     prisonerProfileServiceOverride ||
     new PrisonerProfileService(
@@ -104,6 +105,7 @@ function appSetup(
       systemTokenTest
     )
   app.use('/prisoner/', prisonerRoutes(standardRouter(new MockUserService()), prisonerProfileService))
+
   const prisonerVisitorsService =
     prisonerVisitorsServiceOverride ||
     new PrisonerVisitorsService(prisonApiClientBuilder, prisonerContactRegistryApiClientBuilder, systemTokenTest)
@@ -111,8 +113,14 @@ function appSetup(
     visitSessionsServiceOverride || new VisitSessionsService(visitSchedulerApiClientBuilder, systemTokenTest)
   app.use(
     '/visit/',
-    visitorsRoutes(standardRouter(new MockUserService()), prisonerVisitorsService, visitSessionsService)
+    visitorsRoutes(
+      standardRouter(new MockUserService()),
+      prisonerVisitorsService,
+      visitSessionsService,
+      prisonerProfileService
+    )
   )
+
   app.use((req, res, next) => next(createError(404, 'Not found')))
   app.use(errorHandler(production))
 

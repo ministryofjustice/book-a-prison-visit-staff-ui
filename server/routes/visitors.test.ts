@@ -3,10 +3,13 @@ import request from 'supertest'
 import { SessionData } from 'express-session'
 import * as cheerio from 'cheerio'
 import { Restriction, VisitorListItem, VisitSessionData, VisitSlotList } from '../@types/bapv'
+import { OffenderRestriction } from '../data/prisonApiTypes'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
+import PrisonerProfileService from '../services/prisonerProfileService'
 import VisitSessionsService from '../services/visitSessionsService'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 
+jest.mock('../services/prisonerProfileService')
 jest.mock('../services/prisonerVisitorsService')
 jest.mock('../services/visitSessionsService')
 
@@ -36,7 +39,15 @@ describe('GET /visit/select-visitors', () => {
     systemToken
   ) as jest.Mocked<PrisonerVisitorsService>
 
+  const prisonerProfileService = new PrisonerProfileService(
+    null,
+    null,
+    null,
+    systemToken
+  ) as jest.Mocked<PrisonerProfileService>
+
   let returnData: { prisonerName: string; visitorList: VisitorListItem[] }
+  let restrictions: OffenderRestriction[]
 
   beforeAll(() => {
     returnData = {
@@ -95,6 +106,17 @@ describe('GET /visit/select-visitors', () => {
         },
       ],
     }
+    restrictions = [
+      {
+        restrictionId: 0,
+        comment: 'string',
+        restrictionType: 'string',
+        restrictionTypeDescription: 'string',
+        startDate: '2022-03-15',
+        expiryDate: '2022-03-15',
+        active: true,
+      },
+    ]
   })
 
   beforeEach(() => {
@@ -108,8 +130,9 @@ describe('GET /visit/select-visitors', () => {
     }
 
     prisonerVisitorsService.getVisitors.mockResolvedValue(returnData)
+    prisonerProfileService.getRestrictions.mockResolvedValue(restrictions)
 
-    sessionApp = appWithAllRoutes(null, null, prisonerVisitorsService, null, systemToken, false, {
+    sessionApp = appWithAllRoutes(null, prisonerProfileService, prisonerVisitorsService, null, systemToken, false, {
       visitorList,
       visitSessionData,
     } as SessionData)
@@ -130,12 +153,12 @@ describe('GET /visit/select-visitors', () => {
         expect($('[data-test="visitor-dob-4321"]').text()).toMatch(/28 July 1986.*Adult/)
         expect($('[data-test="visitor-relation-4321"]').text()).toContain('Sister')
         expect($('[data-test="visitor-address-4321"]').text()).toContain('123 The Street')
-        const restrictions = $('[data-test="visitor-restrictions-4321"] .visitor-restriction')
-        expect(restrictions.eq(0).text()).toContain('Banned until 31 July 2022')
-        expect(restrictions.eq(0).text()).toContain('Ban details')
-        expect(restrictions.eq(1).text()).toContain('Restricted End date not entered')
-        expect(restrictions.eq(2).text()).toContain('Closed End date not entered')
-        expect(restrictions.eq(3).text()).toContain('Non-Contact Visit End date not entered')
+        const visitorRestrictions = $('[data-test="visitor-restrictions-4321"] .visitor-restriction')
+        expect(visitorRestrictions.eq(0).text()).toContain('Banned until 31 July 2022')
+        expect(visitorRestrictions.eq(0).text()).toContain('Ban details')
+        expect(visitorRestrictions.eq(1).text()).toContain('Restricted End date not entered')
+        expect(visitorRestrictions.eq(2).text()).toContain('Closed End date not entered')
+        expect(visitorRestrictions.eq(3).text()).toContain('Non-Contact Visit End date not entered')
 
         expect($('[data-test="visitor-name-4322"]').text()).toBe('Bob Smith')
         expect($('[data-test="visitor-restrictions-4322"]').text()).toBe('None')
