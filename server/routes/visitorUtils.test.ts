@@ -26,7 +26,7 @@ const visitorsData = [
   },
 ]
 const visit = {
-  id: '123',
+  id: 'v9-d7-ed-7u',
   startTimestamp: '123',
   endTimestamp: '123',
   availableTables: 1,
@@ -209,14 +209,14 @@ describe('checkSession', () => {
         prisoner: prisonerData,
         visitors: visitorsData,
         visit: {
-          id: '123',
+          id: 'v9-d7-ed-7u',
         } as VisitSlot,
       },
       {
         prisoner: prisonerData,
         visitors: visitorsData,
         visit: {
-          id: '123',
+          id: 'v9-d7-ed-7u',
           startTimestamp: '123',
         } as VisitSlot,
       },
@@ -224,7 +224,7 @@ describe('checkSession', () => {
         prisoner: prisonerData,
         visitors: visitorsData,
         visit: {
-          id: '123',
+          id: 'v9-d7-ed-7u',
           startTimestamp: '123',
           endTimestamp: '123',
         } as VisitSlot,
@@ -233,7 +233,7 @@ describe('checkSession', () => {
         prisoner: prisonerData,
         visitors: visitorsData,
         visit: {
-          id: '123',
+          id: 'v9-d7-ed-7u',
           startTimestamp: '123',
           endTimestamp: '123',
         } as VisitSlot,

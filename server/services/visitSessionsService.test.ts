@@ -402,7 +402,7 @@ describe('Visit sessions service', () => {
         ],
       }
       const visit: Visit = {
-        id: '123',
+        id: 'v9-d7-ed-7u',
         prisonerId: visitSessionData.prisoner.offenderNo,
         prisonId: 'HEI',
         visitRoom: visitSessionData.visit.visitRoomName,
@@ -426,7 +426,7 @@ describe('Visit sessions service', () => {
       const result = await visitSessionsService.createVisit({ username: 'user', visitData: visitSessionData })
 
       expect(visitSchedulerApiClient.createVisit).toHaveBeenCalledTimes(1)
-      expect(result).toEqual('123')
+      expect(result).toEqual('v9-d7-ed-7u')
     })
   })
 
@@ -482,10 +482,10 @@ describe('Visit sessions service', () => {
           phoneNumber: '01234 567890',
           contactName: 'John Smith',
         },
-        reservationId: '123',
+        visitId: 'v9-d7-ed-7u',
       }
       const visit: Visit = {
-        id: '123',
+        id: 'v9-d7-ed-7u',
         prisonerId: visitSessionData.prisoner.offenderNo,
         prisonId: 'HEI',
         visitRoom: visitSessionData.visit.visitRoomName,
@@ -513,7 +513,22 @@ describe('Visit sessions service', () => {
       const result = await visitSessionsService.updateVisit({ username: 'user', visitData: visitSessionData })
 
       expect(visitSchedulerApiClient.updateVisit).toHaveBeenCalledTimes(1)
-      expect(result).toEqual('123')
+      expect(result).toEqual({
+        endTimestamp: '2022-02-14T11:00:00',
+        id: 'v9-d7-ed-7u',
+        mainContact: { contactName: 'John Smith', contactPhone: '01234 567890' },
+        prisonId: 'HEI',
+        prisonerId: 'A1234BC',
+        reasonableAdjustments: 'wheelchair,maskExempt,other,custom request',
+        sessionId: 123,
+        startTimestamp: '2022-02-14T10:00:00',
+        visitRoom: 'visit room',
+        visitStatus: 'RESERVED',
+        visitStatusDescription: 'Reserved',
+        visitType: 'STANDARD_SOCIAL',
+        visitTypeDescription: 'Standard Social',
+        visitors: [{ leadVisitor: true, nomisPersonId: 1234 }],
+      })
     })
   })
 })

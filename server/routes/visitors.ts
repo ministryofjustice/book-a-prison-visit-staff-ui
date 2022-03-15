@@ -198,18 +198,18 @@ export default function routes(
 
       visitSessionData.visit = getSelectedSlot(req.session.slotsList, req.body['visit-date-and-time'])
 
-      if (Number.isInteger(visitSessionData.reservationId)) {
+      if (!req.session.visitSessionData.visitId) {
         await visitSessionsService.updateVisit({
           username: res.locals.user?.username,
           visitData: visitSessionData,
         })
       } else {
-        const reservationId = await visitSessionsService.createVisit({
+        const visitId = await visitSessionsService.createVisit({
           username: res.locals.user?.username,
           visitData: visitSessionData,
         })
 
-        visitSessionData.reservationId = reservationId
+        req.session.visitSessionData.visitId = visitId
       }
 
       return res.redirect('/visit/additional-support')
@@ -402,11 +402,96 @@ export default function routes(
 
     res.render('pages/checkYourBooking', {
       offenderNo,
-      contactDetails: {
-        phoneNumber: visitSessionData.mainContact.phoneNumber,
-      },
       mainContact: visitSessionData.mainContact,
       prisoner: visitSessionData.prisoner,
+      visit: visitSessionData.visit,
+      visitors: visitSessionData.visitors,
+      additionalSupport,
+    })
+  })
+
+  router.post('/check-your-booking', async (req, res) => {
+    const { visitSessionData } = req.session
+    checkSession({
+      stage: 5,
+      visitSessionData,
+      res,
+    })
+
+    const { offenderNo } = req.session.visitSessionData.prisoner
+
+    const additionalSupport = visitSessionData.additionalSupport?.keys?.map(key => {
+      return key === additionalSupportOptions.items.OTHER.key
+        ? visitSessionData.additionalSupport.other
+        : additionalSupportOptions.getValue(key)
+    })
+
+    if (!req.session.visitSessionData.visitId) {
+      return res.render('pages/checkYourBooking', {
+        errors: [
+          {
+            msg: 'The visit id is missing',
+            param: 'id',
+          },
+        ],
+        offenderNo,
+        mainContact: visitSessionData.mainContact,
+        prisoner: visitSessionData.prisoner,
+        visit: visitSessionData.visit,
+        visitors: visitSessionData.visitors,
+        additionalSupport,
+      })
+    }
+
+    try {
+      const bookedVisit = await visitSessionsService.updateVisit({
+        username: res.locals.user?.username,
+        visitData: req.session.visitSessionData,
+        visitStatus: 'BOOKED',
+      })
+
+      // TODO: Update to the correct value when schema updated
+      req.session.visitSessionData.visitId = bookedVisit.id
+    } catch (error) {
+      return res.render('pages/checkYourBooking', {
+        errors: [
+          {
+            msg: 'Failed to make complete the reservation',
+            param: 'id',
+          },
+        ],
+        offenderNo,
+        mainContact: visitSessionData.mainContact,
+        prisoner: visitSessionData.prisoner,
+        visit: visitSessionData.visit,
+        visitors: visitSessionData.visitors,
+        additionalSupport,
+      })
+    }
+
+    return res.redirect('/visit/confirmation')
+  })
+
+  router.get('/confirmation', async (req, res) => {
+    const { visitSessionData } = req.session
+    checkSession({
+      stage: 6,
+      visitSessionData,
+      res,
+    })
+    const { offenderNo } = req.session.visitSessionData.prisoner
+
+    const additionalSupport = visitSessionData.additionalSupport?.keys?.map(key => {
+      return key === additionalSupportOptions.items.OTHER.key
+        ? visitSessionData.additionalSupport.other
+        : additionalSupportOptions.getValue(key)
+    })
+
+    res.render('pages/confirmation', {
+      visitId: visitSessionData.visitId,
+      offenderNo,
+      prisoner: visitSessionData.prisoner,
+      mainContact: visitSessionData.mainContact,
       visit: visitSessionData.visit,
       visitors: visitSessionData.visitors,
       additionalSupport,

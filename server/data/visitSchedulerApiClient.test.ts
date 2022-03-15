@@ -297,7 +297,7 @@ describe('visitSchedulerApiClient', () => {
             ],
           },
         ],
-        reservationId: '123',
+        visitId: 'v9-d7-ed-7u',
       }
       const mainContact = {
         contactPhone: visitSessionData.mainContact.phoneNumber,
@@ -308,7 +308,7 @@ describe('visitSchedulerApiClient', () => {
         : ''
 
       fakeVisitSchedulerApi
-        .put('/visits/123', {
+        .put('/visits/v9-d7-ed-7u', {
           prisonId,
           prisonerId: visitSessionData.prisoner.offenderNo,
           startTimestamp: visitSessionData.visit.startTimestamp,

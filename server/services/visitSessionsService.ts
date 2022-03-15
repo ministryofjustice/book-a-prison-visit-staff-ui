@@ -1,7 +1,7 @@
 import { format, parseISO, getDay } from 'date-fns'
 import { VisitSlot, VisitSlotList, VisitSlotsForDay, SystemToken, VisitSessionData } from '../@types/bapv'
 import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
-import { VisitSession } from '../data/visitSchedulerApiTypes'
+import { VisitSession, Visit } from '../data/visitSchedulerApiTypes'
 
 type VisitSchedulerApiClientBuilder = (token: string) => VisitSchedulerApiClient
 
@@ -82,12 +82,10 @@ export default class VisitSessionsService {
     username: string
     visitData: VisitSessionData
     visitStatus?: string
-  }): Promise<string> {
+  }): Promise<Visit> {
     const token = await this.systemToken(username)
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
 
-    const reservation = await visitSchedulerApiClient.updateVisit(visitData, visitStatus)
-
-    return reservation.id ? reservation.id : undefined
+    return visitSchedulerApiClient.updateVisit(visitData, visitStatus)
   }
 }
