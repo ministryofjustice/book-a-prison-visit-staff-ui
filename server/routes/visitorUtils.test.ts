@@ -1,6 +1,6 @@
-import { Response } from 'express'
+import { Request, Response } from 'express'
 import { VisitSessionData, VisitSlot, VisitSlotList } from '../@types/bapv'
-import { checkSession, getSelectedSlot } from './visitorUtils'
+import { checkSession, getFlashFormValues, getSelectedSlot } from './visitorUtils'
 
 const prisonerData = {
   name: 'abc',
@@ -269,5 +269,29 @@ describe('checkSession', () => {
         expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/A1234BC?error=missing-main-contact')
       })
     })
+  })
+})
+
+describe('getFlashFormValues', () => {
+  let returnValue: Record<string, string | string[]>[]
+
+  const req = {
+    flash: jest.fn(() => {
+      return returnValue
+    }),
+  } as unknown as Request
+
+  it('should return formValues if present in request flash data', () => {
+    returnValue = [{ formField: 'value', anotherField: '123' }]
+
+    expect(getFlashFormValues(req)).toEqual({ formField: 'value', anotherField: '123' })
+    expect(req.flash).toHaveBeenNthCalledWith(1, 'formValues')
+  })
+
+  it('should return empty object if formValues not present in request flash data', () => {
+    returnValue = []
+
+    expect(getFlashFormValues(req)).toEqual({})
+    expect(req.flash).toHaveBeenNthCalledWith(1, 'formValues')
   })
 })

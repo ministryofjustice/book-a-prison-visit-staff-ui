@@ -5,7 +5,7 @@ import asyncMiddleware from '../middleware/asyncMiddleware'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
 import VisitSessionsService from '../services/visitSessionsService'
 import additionalSupportOptions from '../constants/additionalSupportOptions'
-import { checkSession, getSelectedSlot } from './visitorUtils'
+import { checkSession, getFlashFormValues, getSelectedSlot } from './visitorUtils'
 
 export default function routes(
   router: Router,
@@ -26,7 +26,7 @@ export default function routes(
     const { offenderNo } = visitSessionData.prisoner
     const prisonerVisitors = await prisonerVisitorsService.getVisitors(offenderNo, res.locals.user?.username)
 
-    const formValues = (req.flash('formValues')?.[0] as unknown as Record<string, string | string[]>) || {}
+    const formValues = getFlashFormValues(req)
     if (!Object.keys(formValues).length && visitSessionData.visitors) {
       formValues.visitors = visitSessionData.visitors.map(visitor => visitor.personId.toString())
     }
@@ -143,7 +143,7 @@ export default function routes(
         dayOfTheWeek,
       })
 
-      const formValues = (req.flash('formValues')?.[0] as unknown as Record<string, string | string[]>) || {}
+      const formValues = getFlashFormValues(req)
       if (!Object.keys(formValues).length && visitSessionData.visit?.id) {
         formValues['visit-date-and-time'] = visitSessionData.visit?.id
       }
@@ -225,8 +225,7 @@ export default function routes(
       res,
     })
 
-    const formValues = (req.flash('formValues')?.[0] as unknown as Record<string, string | string[]>) || {}
-
+    const formValues = getFlashFormValues(req)
     if (!Object.keys(formValues).length && visitSessionData.additionalSupport) {
       formValues.additionalSupportRequired = visitSessionData.additionalSupport.required ? 'yes' : 'no'
       formValues.additionalSupport = visitSessionData.additionalSupport.keys
@@ -309,8 +308,7 @@ export default function routes(
       res,
     })
 
-    const formValues = (req.flash('formValues')?.[0] as unknown as Record<string, string | string[]>) || {}
-
+    const formValues = getFlashFormValues(req)
     if (!Object.keys(formValues).length && visitSessionData.mainContact) {
       formValues.contact = visitSessionData.mainContact.contact
         ? visitSessionData.mainContact.contact.name.replace(' ', '_')

@@ -1,4 +1,4 @@
-import type { Response } from 'express'
+import type { Request, Response } from 'express'
 import { VisitSessionData, VisitSlot, VisitSlotList } from '../@types/bapv'
 import isValidPrisonerNumber from './prisonerProfileValidation'
 
@@ -58,4 +58,8 @@ export const checkSession = ({
   ) {
     return res.redirect(`/prisoner/${visitSessionData.prisoner.offenderNo}?error=missing-main-contact`)
   }
+}
+
+export const getFlashFormValues = (req: Request): Record<string, string | string[]> => {
+  return (req.flash('formValues')?.[0] as unknown as Record<string, string | string[]>) || {}
 }
