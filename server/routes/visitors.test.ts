@@ -28,6 +28,8 @@ afterEach(() => {
 })
 
 describe('GET /visit/select-visitors', () => {
+  const visitorList: { visitors: VisitorListItem[] } = { visitors: [] }
+
   const prisonerVisitorsService = new PrisonerVisitorsService(
     null,
     null,
@@ -108,11 +110,12 @@ describe('GET /visit/select-visitors', () => {
     prisonerVisitorsService.getVisitors.mockResolvedValue(returnData)
 
     sessionApp = appWithAllRoutes(null, null, prisonerVisitorsService, null, systemToken, false, {
+      visitorList,
       visitSessionData,
     } as SessionData)
   })
 
-  it('should render the approved visitor list for offender number A1234BC with none selected', () => {
+  it('should render the approved visitor list for offender number A1234BC with none selected and store visitorList in session', () => {
     return request(sessionApp)
       .get('/visit/select-visitors')
       .expect(200)
@@ -142,6 +145,8 @@ describe('GET /visit/select-visitors', () => {
 
         expect($('input[name="visitors"]:checked').length).toBe(0)
         expect($('[data-test="submit"]').text().trim()).toBe('Continue')
+
+        expect(visitorList.visitors).toEqual(returnData.visitorList)
       })
   })
 
@@ -253,55 +258,59 @@ describe('GET /visit/select-visitors', () => {
 })
 
 describe('POST /visit/select-visitors', () => {
+  const adultVisitors: { adults: VisitorListItem[] } = { adults: [] }
+
   beforeEach(() => {
-    const visitorList: VisitorListItem[] = [
-      {
-        personId: 4321,
-        name: 'Jeanette Smith',
-        dateOfBirth: '1986-07-28',
-        adult: true,
-        relationshipDescription: 'Sister',
-        address:
-          'Premises,<br>Flat 23B,<br>123 The Street,<br>Springfield,<br>Coventry,<br>West Midlands,<br>C1 2AB,<br>England',
-        restrictions: [],
-      },
-      {
-        personId: 4322,
-        name: 'Bob Smith',
-        dateOfBirth: '1986-07-28',
-        adult: true,
-        relationshipDescription: 'Brother',
-        address: '1st listed address',
-        restrictions: [],
-      },
-      {
-        personId: 4323,
-        name: 'Ted Smith',
-        dateOfBirth: '1968-07-28',
-        adult: true,
-        relationshipDescription: 'Father',
-        address: '1st listed address',
-        restrictions: [],
-      },
-      {
-        personId: 4324,
-        name: 'Anne Smith',
-        dateOfBirth: '2018-03-02',
-        adult: false,
-        relationshipDescription: 'Niece',
-        address: 'Not entered',
-        restrictions: [],
-      },
-      {
-        personId: 4325,
-        name: 'Bill Smith',
-        dateOfBirth: '2018-03-02',
-        adult: false,
-        relationshipDescription: 'Nephew',
-        address: 'Not entered',
-        restrictions: [],
-      },
-    ]
+    const visitorList: { visitors: VisitorListItem[] } = {
+      visitors: [
+        {
+          personId: 4321,
+          name: 'Jeanette Smith',
+          dateOfBirth: '1986-07-28',
+          adult: true,
+          relationshipDescription: 'Sister',
+          address:
+            'Premises,<br>Flat 23B,<br>123 The Street,<br>Springfield,<br>Coventry,<br>West Midlands,<br>C1 2AB,<br>England',
+          restrictions: [],
+        },
+        {
+          personId: 4322,
+          name: 'Bob Smith',
+          dateOfBirth: '1986-07-28',
+          adult: true,
+          relationshipDescription: 'Brother',
+          address: '1st listed address',
+          restrictions: [],
+        },
+        {
+          personId: 4323,
+          name: 'Ted Smith',
+          dateOfBirth: '1968-07-28',
+          adult: true,
+          relationshipDescription: 'Father',
+          address: '1st listed address',
+          restrictions: [],
+        },
+        {
+          personId: 4324,
+          name: 'Anne Smith',
+          dateOfBirth: '2018-03-02',
+          adult: false,
+          relationshipDescription: 'Niece',
+          address: 'Not entered',
+          restrictions: [],
+        },
+        {
+          personId: 4325,
+          name: 'Bill Smith',
+          dateOfBirth: '2018-03-02',
+          adult: false,
+          relationshipDescription: 'Nephew',
+          address: 'Not entered',
+          restrictions: [],
+        },
+      ],
+    }
 
     visitSessionData = {
       prisoner: {
@@ -313,66 +322,85 @@ describe('POST /visit/select-visitors', () => {
     }
 
     sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, {
+      adultVisitors,
       visitorList,
       visitSessionData,
     } as SessionData)
   })
 
   it('should save to session and redirect to the select date and time page if an adult is selected', () => {
+    const returnAdult = [
+      {
+        address: '1st listed address',
+        adult: true,
+        dateOfBirth: '1986-07-28',
+        name: 'Bob Smith',
+        personId: 4322,
+        relationshipDescription: 'Brother',
+        restrictions: [],
+        selected: true,
+      },
+    ] as VisitorListItem[]
+
     return request(sessionApp)
       .post('/visit/select-visitors')
       .send('visitors=4322')
       .expect(302)
       .expect('location', '/visit/select-date-and-time')
       .expect(() => {
-        expect(visitSessionData.visitors).toEqual([
-          {
-            address: '1st listed address',
-            adult: true,
-            dateOfBirth: '1986-07-28',
-            name: 'Bob Smith',
-            personId: 4322,
-            relationshipDescription: 'Brother',
-            restrictions: [],
-            selected: true,
-          },
-        ])
+        expect(adultVisitors.adults).toEqual(returnAdult)
+        expect(visitSessionData.visitors).toEqual(returnAdult)
       })
   })
 
   it('should save to session and redirect to the select date and time page if an adult and a child are selected', () => {
+    const returnAdult = {
+      address: '1st listed address',
+      adult: true,
+      dateOfBirth: '1986-07-28',
+      name: 'Bob Smith',
+      personId: 4322,
+      relationshipDescription: 'Brother',
+      restrictions: [],
+      selected: true,
+    } as VisitorListItem
+
+    const returnChild = {
+      address: 'Not entered',
+      adult: false,
+      dateOfBirth: '2018-03-02',
+      name: 'Anne Smith',
+      personId: 4324,
+      relationshipDescription: 'Niece',
+      restrictions: [],
+      selected: true,
+    } as VisitorListItem
+
     return request(sessionApp)
       .post('/visit/select-visitors')
       .send('visitors=4322&visitors=4324')
       .expect(302)
       .expect('location', '/visit/select-date-and-time')
       .expect(() => {
-        expect(visitSessionData.visitors).toEqual([
-          {
-            address: '1st listed address',
-            adult: true,
-            dateOfBirth: '1986-07-28',
-            name: 'Bob Smith',
-            personId: 4322,
-            relationshipDescription: 'Brother',
-            restrictions: [],
-            selected: true,
-          },
-          {
-            address: 'Not entered',
-            adult: false,
-            dateOfBirth: '2018-03-02',
-            name: 'Anne Smith',
-            personId: 4324,
-            relationshipDescription: 'Niece',
-            restrictions: [],
-            selected: true,
-          },
-        ])
+        expect(adultVisitors.adults).toEqual([returnAdult])
+        expect(visitSessionData.visitors).toEqual([returnAdult, returnChild])
       })
   })
 
   it('should save new choice to session and redirect to select date and time page if existing session data present', () => {
+    adultVisitors.adults = [
+      {
+        address: '1st listed address',
+        adult: true,
+        dateOfBirth: '1986-07-28',
+        name: 'Bob Smith',
+        personId: 4322,
+        relationshipDescription: 'Brother',
+        restrictions: [],
+        selected: true,
+      },
+    ]
+
     visitSessionData.visitors = [
       {
         address: '1st listed address',
@@ -386,24 +414,25 @@ describe('POST /visit/select-visitors', () => {
       },
     ]
 
+    const returnAdult = {
+      personId: 4323,
+      name: 'Ted Smith',
+      dateOfBirth: '1968-07-28',
+      adult: true,
+      relationshipDescription: 'Father',
+      address: '1st listed address',
+      restrictions: [],
+      selected: true,
+    } as VisitorListItem
+
     return request(sessionApp)
       .post('/visit/select-visitors')
       .send('visitors=4323')
       .expect(302)
       .expect('location', '/visit/select-date-and-time')
       .expect(() => {
-        expect(visitSessionData.visitors).toEqual([
-          {
-            personId: 4323,
-            name: 'Ted Smith',
-            dateOfBirth: '1968-07-28',
-            adult: true,
-            relationshipDescription: 'Father',
-            address: '1st listed address',
-            restrictions: [],
-            selected: true,
-          },
-        ])
+        expect(adultVisitors.adults).toEqual([returnAdult])
+        expect(visitSessionData.visitors).toEqual([returnAdult])
       })
   })
 
@@ -801,16 +830,7 @@ describe('GET /visit/additional-support', () => {
           personId: 123,
           name: 'name last',
           relationshipDescription: 'relate',
-          restrictions: [
-            {
-              restrictionType: 'AVS',
-              restrictionTypeDescription: 'AVS desc',
-              startDate: '123',
-              expiryDate: '456',
-              globalRestriction: false,
-              comment: 'comment',
-            },
-          ],
+          restrictions: [],
         },
       ],
     }
@@ -1138,6 +1158,305 @@ describe('POST /visit/additional-support', () => {
         ])
         expect(visitSessionData.additionalSupport?.other).toBe('custom-request')
       })
+  })
+})
+
+describe('/visit/select-main-contact', () => {
+  const adultVisitors: { adults: VisitorListItem[] } = {
+    adults: [
+      {
+        personId: 123,
+        name: 'name last',
+        relationshipDescription: 'relate',
+        restrictions: [],
+      },
+    ],
+  }
+
+  const visitorList: { visitors: VisitorListItem[] } = {
+    visitors: [
+      {
+        personId: 122,
+        name: 'first last',
+        relationshipDescription: 'cousin',
+        restrictions: [],
+      },
+      {
+        personId: 123,
+        name: 'name last',
+        relationshipDescription: 'relate',
+        restrictions: [],
+      },
+    ],
+  }
+
+  beforeEach(() => {
+    visitSessionData = {
+      prisoner: {
+        name: 'prisoner name',
+        offenderNo: 'A1234BC',
+        dateOfBirth: '25 May 1988',
+        location: 'location place',
+      },
+      visit: {
+        id: 'visitId',
+        startTimestamp: '123',
+        endTimestamp: '456',
+        availableTables: 1,
+        visitRoomName: 'room name',
+      },
+      visitors: [
+        {
+          personId: 123,
+          name: 'name last',
+          relationshipDescription: 'relate',
+          restrictions: [],
+        },
+      ],
+      additionalSupport: {
+        required: false,
+      },
+    }
+
+    sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, {
+      adultVisitors,
+      visitorList,
+      visitSessionData,
+    } as SessionData)
+  })
+
+  describe('GET /visit/select-main-contact', () => {
+    it('should render the main contact page with all fields empty', () => {
+      return request(sessionApp)
+        .get('/visit/select-main-contact')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text().trim()).toBe('Who is the main contact for this booking?')
+          expect($('input[name="contact"]').length).toBe(2)
+          expect($('input[name="contact"]:checked').length).toBe(0)
+          expect($('input[name="contact"]').eq(0).prop('value')).toBe('name_last')
+          expect($('input[name="contact"]').eq(1).prop('value')).toBe('someoneElse')
+          expect($('#someoneElseName').prop('value')).toBeFalsy()
+          expect($('#phoneNumber').prop('value')).toBeFalsy()
+        })
+    })
+
+    it('should render the main contact page, pre-populated with session data for contact choice and phone number', () => {
+      visitSessionData.mainContact = {
+        contact: {
+          personId: 123,
+          name: 'name last',
+          relationshipDescription: 'relate',
+          restrictions: [],
+        },
+        phoneNumber: '0114 1234 567',
+      }
+
+      return request(sessionApp)
+        .get('/visit/select-main-contact')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text().trim()).toBe('Who is the main contact for this booking?')
+          expect($('input[name="contact"]').length).toBe(2)
+          expect($('input[name="contact"]:checked').length).toBe(1)
+          expect($('input[value="name_last"]').prop('checked')).toBe(true)
+          expect($('#someoneElseName').prop('value')).toBeFalsy()
+          expect($('#phoneNumber').prop('value')).toBe('0114 1234 567')
+        })
+    })
+
+    it('should render the main contact page, pre-populated with session data for custom contact name and phone number', () => {
+      visitSessionData.mainContact = {
+        contact: undefined,
+        contactName: 'another person',
+        phoneNumber: '0114 1122 333',
+      }
+
+      return request(sessionApp)
+        .get('/visit/select-main-contact')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text().trim()).toBe('Who is the main contact for this booking?')
+          expect($('input[name="contact"]').length).toBe(2)
+          expect($('input[name="contact"]:checked').length).toBe(1)
+          expect($('input[value="someoneElse"]').prop('checked')).toBe(true)
+          expect($('#someoneElseName').prop('value')).toBe('another person')
+          expect($('#phoneNumber').prop('value')).toBe('0114 1122 333')
+        })
+    })
+
+    it('should render validation errors from flash data for when no data entered', () => {
+      flashData.errors = [
+        { location: 'body', msg: 'No main contact selected', param: 'contact', value: undefined },
+        { location: 'body', msg: 'Enter a phone number', param: 'phoneNumber', value: undefined },
+      ]
+
+      return request(sessionApp)
+        .get('/visit/select-main-contact')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text().trim()).toBe('Who is the main contact for this booking?')
+          expect($('.govuk-error-summary__body').text()).toContain('No main contact selected')
+          expect($('.govuk-error-summary__body').text()).toContain('Enter a phone number')
+          expect($('#contact-error').text()).toContain('No main contact selected')
+          expect($('#phoneNumber-error').text()).toContain('Enter a phone number')
+          expect(flashProvider).toHaveBeenCalledWith('errors')
+          expect(flashProvider).toHaveBeenCalledWith('formValues')
+          expect(flashProvider).toHaveBeenCalledTimes(2)
+        })
+    })
+
+    it('should render validation errors from flash data for when no data entered', () => {
+      flashData.errors = [
+        { location: 'body', msg: 'Enter the name of the main contact', param: 'someoneElseName', value: '' },
+        { location: 'body', msg: 'Enter a phone number', param: 'phoneNumber', value: '' },
+      ]
+
+      flashData.formValues = [{ contact: 'someoneElse' }]
+
+      return request(sessionApp)
+        .get('/visit/select-main-contact')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text().trim()).toBe('Who is the main contact for this booking?')
+          expect($('.govuk-error-summary__body').text()).toContain('Enter the name of the main contact')
+          expect($('.govuk-error-summary__body').text()).toContain('Enter a phone number')
+          expect($('#someoneElseName-error').text()).toContain('Enter the name of the main contact')
+          expect($('#phoneNumber-error').text()).toContain('Enter a phone number')
+          expect(flashProvider).toHaveBeenCalledWith('errors')
+          expect(flashProvider).toHaveBeenCalledWith('formValues')
+          expect(flashProvider).toHaveBeenCalledTimes(2)
+        })
+    })
+  })
+
+  describe('POST /visit/select-main-contact', () => {
+    it('should redirect to check answers page and store in session if contact selected and phone number entered', () => {
+      return request(sessionApp)
+        .post('/visit/select-main-contact')
+        .send('contact=name_last')
+        .send('phoneNumber=0114+1234+567')
+        .expect(302)
+        .expect('location', '/visit/check-your-booking')
+        .expect(() => {
+          expect(visitSessionData.mainContact.contact).toEqual({
+            personId: 123,
+            name: 'name last',
+            relationshipDescription: 'relate',
+            restrictions: [],
+          })
+          expect(visitSessionData.mainContact.phoneNumber).toBe('0114 1234 567')
+          expect(visitSessionData.mainContact.contactName).toBe(undefined)
+        })
+    })
+
+    it('should redirect to check answers page and store in session if other contact named and phone number entered', () => {
+      return request(sessionApp)
+        .post('/visit/select-main-contact')
+        .send('contact=someoneElse')
+        .send('someoneElseName=another+person')
+        .send('phoneNumber=0114+7654+321')
+        .expect(302)
+        .expect('location', '/visit/check-your-booking')
+        .expect(() => {
+          expect(visitSessionData.mainContact.contact).toBe(undefined)
+          expect(visitSessionData.mainContact.contactName).toBe('another person')
+          expect(visitSessionData.mainContact.phoneNumber).toBe('0114 7654 321')
+        })
+    })
+
+    it('should save new choice to session and redirect to check answers page if existing session data present', () => {
+      visitSessionData.mainContact = {
+        contact: {
+          personId: 123,
+          name: 'name last',
+          relationshipDescription: 'relate',
+          restrictions: [],
+        },
+        phoneNumber: '0114 1234 567',
+        contactName: undefined,
+      }
+      return request(sessionApp)
+        .post('/visit/select-main-contact')
+        .send('contact=someoneElse')
+        .send('someoneElseName=another+person')
+        .send('phoneNumber=0114+7654+321')
+        .expect(302)
+        .expect('location', '/visit/check-your-booking')
+        .expect(() => {
+          expect(visitSessionData.mainContact.contact).toBe(undefined)
+          expect(visitSessionData.mainContact.contactName).toBe('another person')
+          expect(visitSessionData.mainContact.phoneNumber).toBe('0114 7654 321')
+        })
+    })
+
+    it('should set validation errors in flash and redirect if no main contact selected and no number entered', () => {
+      return request(sessionApp)
+        .post('/visit/select-main-contact')
+        .expect(302)
+        .expect('location', '/visit/select-main-contact')
+        .expect(() => {
+          expect(flashProvider).toHaveBeenCalledWith('errors', [
+            { location: 'body', msg: 'No main contact selected', param: 'contact', value: undefined },
+            { location: 'body', msg: 'Enter a phone number', param: 'phoneNumber', value: undefined },
+          ])
+          expect(flashProvider).toHaveBeenCalledWith('formValues', {})
+        })
+    })
+
+    it('should set validation errors in flash and redirect if someone else selected but no name entered', () => {
+      return request(sessionApp)
+        .post('/visit/select-main-contact')
+        .send('contact=someoneElse')
+        .send('someoneElseName=')
+        .send('phoneNumber=')
+        .expect(302)
+        .expect('location', '/visit/select-main-contact')
+        .expect(() => {
+          expect(flashProvider).toHaveBeenCalledWith('errors', [
+            { location: 'body', msg: 'Enter the name of the main contact', param: 'someoneElseName', value: '' },
+            { location: 'body', msg: 'Enter a phone number', param: 'phoneNumber', value: '' },
+          ])
+          expect(flashProvider).toHaveBeenCalledWith('formValues', {
+            contact: 'someoneElse',
+            someoneElseName: '',
+            phoneNumber: '',
+          })
+        })
+    })
+
+    it('should set validation errors in flash and redirect if invalid data entered', () => {
+      return request(sessionApp)
+        .post('/visit/select-main-contact')
+        .send('contact=non-existant')
+        .send('phoneNumber=abc123')
+        .expect(302)
+        .expect('location', '/visit/select-main-contact')
+        .expect(() => {
+          expect(flashProvider).toHaveBeenCalledWith('errors', [
+            {
+              location: 'body',
+              msg: 'Enter a valid UK phone number, like 01632 960 001, 07700 900 982 or +44 808 157 0192',
+              param: 'phoneNumber',
+              value: 'abc123',
+            },
+          ])
+          expect(flashProvider).toHaveBeenCalledWith('formValues', {
+            contact: 'non-existant',
+            phoneNumber: 'abc123',
+          })
+        })
+    })
   })
 })
 

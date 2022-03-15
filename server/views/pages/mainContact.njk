@@ -23,7 +23,7 @@
                     {
                         value: itemValue,
                         text: visitor.name + " (" + (visitor.relationshipDescription | lower) + " to prisoner)",
-                        checked: itemValue == contact
+                        checked: itemValue == formValues.contact
                     }
                 ), visitors) %}
             {% endfor %}
@@ -37,7 +37,7 @@
                     label: {
                         text: "Name"
                     },
-                    value: someoneElseName,
+                    value: formValues.someoneElseName,
                     errorMessage: errors | findError('someoneElseName')
                 }) }}
             {% endset -%}
@@ -46,7 +46,7 @@
                 {
                     value: "someoneElse",
                     text: "Someone else",
-                    checked: contact == "someoneElse",
+                    checked: formValues.contact == "someoneElse",
                     conditional: {
                         html: someoneElseHtml
                     }
@@ -71,7 +71,7 @@
                 label: {
                     text: "What is their phone number?",
                     classes: "govuk-label--m",
-                    isPageHeading: true
+                    isPageHeading: false
                 },
                 hint: {
                     text: "Phone number"
@@ -79,7 +79,7 @@
                 classes: "govuk-!-width-one-third",
                 id: "phoneNumber",
                 name: "phoneNumber",
-                value: phoneNumber,
+                value: formValues.phoneNumber,
                 errorMessage: errors | findError('phoneNumber')
             }) }}
             {{ govukButton({

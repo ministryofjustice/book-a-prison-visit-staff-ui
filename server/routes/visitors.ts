@@ -5,7 +5,7 @@ import asyncMiddleware from '../middleware/asyncMiddleware'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
 import VisitSessionsService from '../services/visitSessionsService'
 import additionalSupportOptions from '../constants/additionalSupportOptions'
-import { checkSession, getSelectedSlot } from './visitorUtils'
+import { checkSession, getFlashFormValues, getSelectedSlot } from './visitorUtils'
 
 export default function routes(
   router: Router,
@@ -15,25 +15,30 @@ export default function routes(
   const get = (path: string, handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
 
   get('/select-visitors', async (req, res) => {
+    const { visitSessionData } = req.session
+
     checkSession({
       stage: 1,
-      visitData: req.session.visitSessionData,
+      visitSessionData,
       res,
     })
 
-    const { offenderNo } = req.session.visitSessionData.prisoner
+    const { offenderNo } = visitSessionData.prisoner
     const prisonerVisitors = await prisonerVisitorsService.getVisitors(offenderNo, res.locals.user?.username)
 
-    const formValues = (req.flash('formValues')?.[0] as unknown as Record<string, string | string[]>) || {}
-    if (!Object.keys(formValues).length && req.session.visitSessionData.visitors) {
-      formValues.visitors = req.session.visitSessionData.visitors.map(visitor => visitor.personId.toString())
+    const formValues = getFlashFormValues(req)
+    if (!Object.keys(formValues).length && visitSessionData.visitors) {
+      formValues.visitors = visitSessionData.visitors.map(visitor => visitor.personId.toString())
     }
 
-    req.session.visitorList = prisonerVisitors.visitorList
+    if (!req.session.visitorList) {
+      req.session.visitorList = { visitors: [] }
+    }
+    req.session.visitorList.visitors = prisonerVisitors.visitorList
 
     res.render('pages/visitors', {
       errors: req.flash('errors'),
-      prisonerName: req.session.visitSessionData.prisoner.name,
+      prisonerName: visitSessionData.prisoner.name,
       visitorList: prisonerVisitors.visitorList,
       formValues,
     })
@@ -44,7 +49,7 @@ export default function routes(
     body('visitors').custom((value: string, { req }) => {
       const selected = [].concat(value)
 
-      req.session.visitorList = req.session.visitorList.map((visitor: VisitorListItem) => {
+      req.session.visitorList.visitors = req.session.visitorList.visitors.map((visitor: VisitorListItem) => {
         const newVisitor = visitor
         newVisitor.selected = selected.includes(visitor.personId.toString())
 
@@ -59,7 +64,7 @@ export default function routes(
         throw new Error('Select no more than 3 visitors with a maximum of 2 adults')
       }
 
-      const adults = req.session.visitorList
+      const adults = req.session.visitorList.visitors
         .filter((visitor: VisitorListItem) => selected.includes(visitor.personId.toString()))
         .reduce((count: number, visitor: VisitorListItem) => {
           return visitor.adult ?? true ? count + 1 : count
@@ -76,9 +81,11 @@ export default function routes(
       return true
     }),
     (req, res) => {
+      const { visitSessionData } = req.session
+
       checkSession({
         stage: 1,
-        visitData: req.session.visitSessionData,
+        visitSessionData,
         res,
       })
 
@@ -91,7 +98,7 @@ export default function routes(
       }
 
       const selectedIds = [].concat(req.body.visitors)
-      const selectedVisitors = req.session.visitorList.filter((visitor: VisitorListItem) =>
+      const selectedVisitors = req.session.visitorList.visitors.filter((visitor: VisitorListItem) =>
         selectedIds.includes(visitor.personId.toString())
       )
 
@@ -103,8 +110,12 @@ export default function routes(
         return adultVisitors
       }, [])
 
-      req.session.adultVisitors = adults
-      req.session.visitSessionData.visitors = selectedVisitors
+      if (!req.session.adultVisitors) {
+        req.session.adultVisitors = { adults: [] }
+      }
+      req.session.adultVisitors.adults = adults
+
+      visitSessionData.visitors = selectedVisitors
 
       return res.redirect('/visit/select-date-and-time')
     }
@@ -117,9 +128,11 @@ export default function routes(
       parseInt(value, 10) >= 0 && parseInt(value, 10) <= 6 ? value : ''
     ),
     async (req, res) => {
+      const { visitSessionData } = req.session
+
       checkSession({
         stage: 2,
-        visitData: req.session.visitSessionData,
+        visitSessionData,
         res,
       })
 
@@ -130,9 +143,9 @@ export default function routes(
         dayOfTheWeek,
       })
 
-      const formValues = (req.flash('formValues')?.[0] as unknown as Record<string, string | string[]>) || {}
-      if (!Object.keys(formValues).length && req.session.visitSessionData.visit?.id) {
-        formValues['visit-date-and-time'] = req.session.visitSessionData.visit?.id
+      const formValues = getFlashFormValues(req)
+      if (!Object.keys(formValues).length && visitSessionData.visit?.id) {
+        formValues['visit-date-and-time'] = visitSessionData.visit?.id
       }
 
       req.session.slotsList = slotsList
@@ -141,7 +154,7 @@ export default function routes(
 
       res.render('pages/dateAndTime', {
         errors: req.flash('errors'),
-        prisonerName: req.session.visitSessionData.prisoner.name,
+        prisonerName: visitSessionData.prisoner.name,
         slotsList,
         timeOfDay,
         dayOfTheWeek,
@@ -163,9 +176,11 @@ export default function routes(
       return true
     }),
     async (req, res) => {
+      const { visitSessionData } = req.session
+
       checkSession({
         stage: 2,
-        visitData: req.session.visitSessionData,
+        visitSessionData,
         res,
       })
       const errors = validationResult(req)
@@ -181,20 +196,20 @@ export default function routes(
         return res.redirect(req.originalUrl)
       }
 
-      req.session.visitSessionData.visit = getSelectedSlot(req.session.slotsList, req.body['visit-date-and-time'])
+      visitSessionData.visit = getSelectedSlot(req.session.slotsList, req.body['visit-date-and-time'])
 
-      if (Number.isInteger(req.session.visitSessionData.reservationId)) {
+      if (Number.isInteger(visitSessionData.reservationId)) {
         await visitSessionsService.updateVisit({
           username: res.locals.user?.username,
-          visitData: req.session.visitSessionData,
+          visitData: visitSessionData,
         })
       } else {
         const reservationId = await visitSessionsService.createVisit({
           username: res.locals.user?.username,
-          visitData: req.session.visitSessionData,
+          visitData: visitSessionData,
         })
 
-        req.session.visitSessionData.reservationId = reservationId
+        visitSessionData.reservationId = reservationId
       }
 
       return res.redirect('/visit/additional-support')
@@ -202,24 +217,23 @@ export default function routes(
   )
 
   router.get('/additional-support', async (req, res) => {
+    const { visitSessionData } = req.session
+
     checkSession({
       stage: 3,
-      visitData: req.session.visitSessionData,
+      visitSessionData,
       res,
     })
 
-    const { offenderNo } = req.session.visitSessionData.prisoner
-    const formValues = (req.flash('formValues')?.[0] as unknown as Record<string, string | string[]>) || {}
-
-    if (!Object.keys(formValues).length && req.session.visitSessionData.additionalSupport) {
-      formValues.additionalSupportRequired = req.session.visitSessionData.additionalSupport.required ? 'yes' : 'no'
-      formValues.additionalSupport = req.session.visitSessionData.additionalSupport.keys
-      formValues.otherSupportDetails = req.session.visitSessionData.additionalSupport.other
+    const formValues = getFlashFormValues(req)
+    if (!Object.keys(formValues).length && visitSessionData.additionalSupport) {
+      formValues.additionalSupportRequired = visitSessionData.additionalSupport.required ? 'yes' : 'no'
+      formValues.additionalSupport = visitSessionData.additionalSupport.keys
+      formValues.otherSupportDetails = visitSessionData.additionalSupport.other
     }
 
     res.render('pages/additionalSupport', {
       errors: req.flash('errors'),
-      offenderNo,
       additionalSupportOptions: additionalSupportOptions.items,
       formValues,
     })
@@ -256,9 +270,11 @@ export default function routes(
         return true
       }),
     async (req, res) => {
+      const { visitSessionData } = req.session
+
       checkSession({
         stage: 3,
-        visitData: req.session.visitSessionData,
+        visitSessionData,
         res,
       })
 
@@ -277,24 +293,36 @@ export default function routes(
         selectedSupport.other = req.body.additionalSupport.includes('other') ? req.body.otherSupportDetails : undefined
       }
 
-      req.session.visitSessionData.additionalSupport = selectedSupport
+      visitSessionData.additionalSupport = selectedSupport
 
       return res.redirect('/visit/select-main-contact')
     }
   )
 
   router.get('/select-main-contact', async (req, res) => {
+    const { visitSessionData } = req.session
+
     checkSession({
       stage: 4,
-      visitData: req.session.visitSessionData,
+      visitSessionData,
       res,
     })
 
-    const { offenderNo } = req.session.visitSessionData.prisoner
+    const formValues = getFlashFormValues(req)
+    if (!Object.keys(formValues).length && visitSessionData.mainContact) {
+      formValues.contact = visitSessionData.mainContact.contact
+        ? visitSessionData.mainContact.contact.name.replace(' ', '_')
+        : 'someoneElse'
+      formValues.phoneNumber = visitSessionData.mainContact.phoneNumber
+      formValues.someoneElseName = visitSessionData.mainContact.contact
+        ? undefined
+        : visitSessionData.mainContact.contactName
+    }
 
     res.render('pages/mainContact', {
-      offenderNo,
-      adultVisitors: req.session.adultVisitors,
+      errors: req.flash('errors'),
+      adultVisitors: req.session.adultVisitors?.adults,
+      formValues,
     })
   })
 
@@ -326,31 +354,27 @@ export default function routes(
       return true
     }),
     async (req, res) => {
+      const { visitSessionData } = req.session
+
       checkSession({
         stage: 4,
-        visitData: req.session.visitSessionData,
+        visitSessionData,
         res,
       })
 
-      const { offenderNo } = req.session.visitSessionData.prisoner
       const errors = validationResult(req)
 
       if (!errors.isEmpty()) {
-        return res.render('pages/mainContact', {
-          errors: !errors.isEmpty() ? errors.array() : [],
-          offenderNo,
-          adultVisitors: req.session.adultVisitors,
-          phoneNumber: req.body.phoneNumber,
-          contact: req.body.contact,
-          someoneElseName: req.body.someoneElseName,
-        })
+        req.flash('errors', errors.array() as [])
+        req.flash('formValues', req.body)
+        return res.redirect(req.originalUrl)
       }
 
-      const selectedContact = req.session.visitorList.find(
+      const selectedContact = req.session.visitorList.visitors.find(
         (visitor: VisitorListItem) => req.body.contact === visitor.name.replace(' ', '_')
       )
 
-      req.session.visitSessionData.mainContact = {
+      visitSessionData.mainContact = {
         contact: selectedContact,
         phoneNumber: req.body.phoneNumber,
         contactName: selectedContact === undefined ? req.body.someoneElseName : undefined,
@@ -362,12 +386,13 @@ export default function routes(
 
   router.get('/check-your-booking', async (req, res) => {
     const { visitSessionData } = req.session
+
     checkSession({
       stage: 5,
-      visitData: visitSessionData,
+      visitSessionData,
       res,
     })
-    const { offenderNo } = req.session.visitSessionData.prisoner
+    const { offenderNo } = visitSessionData.prisoner
 
     const additionalSupport = visitSessionData.additionalSupport?.keys?.map(key => {
       return key === additionalSupportOptions.items.OTHER.key
@@ -378,7 +403,7 @@ export default function routes(
     res.render('pages/checkYourBooking', {
       offenderNo,
       contactDetails: {
-        phoneNumber: req.session.visitSessionData.mainContact.phoneNumber,
+        phoneNumber: visitSessionData.mainContact.phoneNumber,
       },
       mainContact: visitSessionData.mainContact,
       prisoner: visitSessionData.prisoner,

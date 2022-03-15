@@ -1,6 +1,6 @@
-import { Response } from 'express'
+import { Request, Response } from 'express'
 import { VisitSessionData, VisitSlot, VisitSlotList } from '../@types/bapv'
-import { checkSession, getSelectedSlot } from './visitorUtils'
+import { checkSession, getFlashFormValues, getSelectedSlot } from './visitorUtils'
 
 const prisonerData = {
   name: 'abc',
@@ -127,7 +127,7 @@ describe('checkSession', () => {
   })
 
   it('should redirect to the search page when there is no session', () => {
-    checkSession({ stage: 1, visitData: undefined, res: mockResponse as Response })
+    checkSession({ stage: 1, visitSessionData: undefined, res: mockResponse as Response })
 
     expect(mockResponse.redirect).toHaveBeenCalledWith('/search/?error=missing-session')
   })
@@ -157,7 +157,7 @@ describe('checkSession', () => {
       },
     ].forEach((testData: VisitSessionData) => {
       it('should redirect to the search page when there are missing bits of prisoner data', () => {
-        checkSession({ stage: 1, visitData: testData, res: mockResponse as Response })
+        checkSession({ stage: 1, visitSessionData: testData, res: mockResponse as Response })
 
         expect(mockResponse.redirect).toHaveBeenCalledWith('/search/?error=missing-prisoner')
       })
@@ -166,7 +166,7 @@ describe('checkSession', () => {
     it('should not redirect when there are no bits of missing prisoner data at stage 1', () => {
       checkSession({
         stage: 1,
-        visitData: {
+        visitSessionData: {
           prisoner: {
             name: 'abc',
             offenderNo: 'A1234BC',
@@ -192,7 +192,7 @@ describe('checkSession', () => {
       },
     ].forEach((testData: VisitSessionData) => {
       it('should redirect to the prisoner profile when there is missing visitor data', () => {
-        checkSession({ stage: 2, visitData: testData, res: mockResponse as Response })
+        checkSession({ stage: 2, visitSessionData: testData, res: mockResponse as Response })
 
         expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/A1234BC?error=missing-visitors')
       })
@@ -240,7 +240,7 @@ describe('checkSession', () => {
       },
     ].forEach((testData: VisitSessionData) => {
       it('should redirect to the prisoner profile when there is missing visit data', () => {
-        checkSession({ stage: 3, visitData: testData, res: mockResponse as Response })
+        checkSession({ stage: 3, visitSessionData: testData, res: mockResponse as Response })
 
         expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/A1234BC?error=missing-visit')
       })
@@ -264,10 +264,34 @@ describe('checkSession', () => {
       },
     ].forEach((testData: VisitSessionData) => {
       it('should redirect to the prisoner profile when there is missing main contact data', () => {
-        checkSession({ stage: 5, visitData: testData, res: mockResponse as Response })
+        checkSession({ stage: 5, visitSessionData: testData, res: mockResponse as Response })
 
         expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/A1234BC?error=missing-main-contact')
       })
     })
+  })
+})
+
+describe('getFlashFormValues', () => {
+  let returnValue: Record<string, string | string[]>[]
+
+  const req = {
+    flash: jest.fn(() => {
+      return returnValue
+    }),
+  } as unknown as Request
+
+  it('should return formValues if present in request flash data', () => {
+    returnValue = [{ formField: 'value', anotherField: '123' }]
+
+    expect(getFlashFormValues(req)).toEqual({ formField: 'value', anotherField: '123' })
+    expect(req.flash).toHaveBeenNthCalledWith(1, 'formValues')
+  })
+
+  it('should return empty object if formValues not present in request flash data', () => {
+    returnValue = []
+
+    expect(getFlashFormValues(req)).toEqual({})
+    expect(req.flash).toHaveBeenNthCalledWith(1, 'formValues')
   })
 })
