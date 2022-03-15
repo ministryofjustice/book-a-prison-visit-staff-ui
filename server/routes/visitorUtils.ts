@@ -13,49 +13,49 @@ export const getSelectedSlot = (slotsList: VisitSlotList, selectedSlot: string):
 
 export const checkSession = ({
   stage,
-  visitData,
+  visitSessionData,
   res,
 }: {
   stage: number
-  visitData: VisitSessionData
+  visitSessionData: VisitSessionData
   res: Response
   // eslint-disable-next-line consistent-return
 }): void => {
-  if (!visitData) {
+  if (!visitSessionData) {
     return res.redirect('/search/?error=missing-session')
   }
 
   if (
-    !visitData.prisoner ||
-    !visitData.prisoner.name ||
-    !isValidPrisonerNumber(visitData.prisoner.offenderNo || '') ||
-    !visitData.prisoner.dateOfBirth ||
-    !visitData.prisoner.location
+    !visitSessionData.prisoner ||
+    !visitSessionData.prisoner.name ||
+    !isValidPrisonerNumber(visitSessionData.prisoner.offenderNo || '') ||
+    !visitSessionData.prisoner.dateOfBirth ||
+    !visitSessionData.prisoner.location
   ) {
     return res.redirect('/search/?error=missing-prisoner')
   }
 
-  if (stage > 1 && (!visitData.visitors || visitData.visitors.length === 0)) {
-    return res.redirect(`/prisoner/${visitData.prisoner.offenderNo}?error=missing-visitors`)
+  if (stage > 1 && (!visitSessionData.visitors || visitSessionData.visitors.length === 0)) {
+    return res.redirect(`/prisoner/${visitSessionData.prisoner.offenderNo}?error=missing-visitors`)
   }
 
   if (
     stage > 2 &&
-    (!visitData.visit ||
-      !visitData.visit.id ||
-      !visitData.visit.availableTables ||
-      !visitData.visit.startTimestamp ||
-      !visitData.visit.endTimestamp)
+    (!visitSessionData.visit ||
+      !visitSessionData.visit.id ||
+      !visitSessionData.visit.availableTables ||
+      !visitSessionData.visit.startTimestamp ||
+      !visitSessionData.visit.endTimestamp)
   ) {
-    return res.redirect(`/prisoner/${visitData.prisoner.offenderNo}?error=missing-visit`)
+    return res.redirect(`/prisoner/${visitSessionData.prisoner.offenderNo}?error=missing-visit`)
   }
 
   if (
     stage > 4 &&
-    (!visitData.mainContact ||
-      !visitData.mainContact.phoneNumber ||
-      (!visitData.mainContact.contact && !visitData.mainContact.contactName))
+    (!visitSessionData.mainContact ||
+      !visitSessionData.mainContact.phoneNumber ||
+      (!visitSessionData.mainContact.contact && !visitSessionData.mainContact.contactName))
   ) {
-    return res.redirect(`/prisoner/${visitData.prisoner.offenderNo}?error=missing-main-contact`)
+    return res.redirect(`/prisoner/${visitSessionData.prisoner.offenderNo}?error=missing-main-contact`)
   }
 }

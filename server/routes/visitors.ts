@@ -15,18 +15,20 @@ export default function routes(
   const get = (path: string, handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
 
   get('/select-visitors', async (req, res) => {
+    const { visitSessionData } = req.session
+
     checkSession({
       stage: 1,
-      visitData: req.session.visitSessionData,
+      visitSessionData,
       res,
     })
 
-    const { offenderNo } = req.session.visitSessionData.prisoner
+    const { offenderNo } = visitSessionData.prisoner
     const prisonerVisitors = await prisonerVisitorsService.getVisitors(offenderNo, res.locals.user?.username)
 
     const formValues = (req.flash('formValues')?.[0] as unknown as Record<string, string | string[]>) || {}
-    if (!Object.keys(formValues).length && req.session.visitSessionData.visitors) {
-      formValues.visitors = req.session.visitSessionData.visitors.map(visitor => visitor.personId.toString())
+    if (!Object.keys(formValues).length && visitSessionData.visitors) {
+      formValues.visitors = visitSessionData.visitors.map(visitor => visitor.personId.toString())
     }
 
     if (!req.session.visitorList) {
@@ -36,7 +38,7 @@ export default function routes(
 
     res.render('pages/visitors', {
       errors: req.flash('errors'),
-      prisonerName: req.session.visitSessionData.prisoner.name,
+      prisonerName: visitSessionData.prisoner.name,
       visitorList: prisonerVisitors.visitorList,
       formValues,
     })
@@ -79,9 +81,11 @@ export default function routes(
       return true
     }),
     (req, res) => {
+      const { visitSessionData } = req.session
+
       checkSession({
         stage: 1,
-        visitData: req.session.visitSessionData,
+        visitSessionData,
         res,
       })
 
@@ -111,7 +115,7 @@ export default function routes(
       }
       req.session.adultVisitors.adults = adults
 
-      req.session.visitSessionData.visitors = selectedVisitors
+      visitSessionData.visitors = selectedVisitors
 
       return res.redirect('/visit/select-date-and-time')
     }
@@ -124,9 +128,11 @@ export default function routes(
       parseInt(value, 10) >= 0 && parseInt(value, 10) <= 6 ? value : ''
     ),
     async (req, res) => {
+      const { visitSessionData } = req.session
+
       checkSession({
         stage: 2,
-        visitData: req.session.visitSessionData,
+        visitSessionData,
         res,
       })
 
@@ -138,8 +144,8 @@ export default function routes(
       })
 
       const formValues = (req.flash('formValues')?.[0] as unknown as Record<string, string | string[]>) || {}
-      if (!Object.keys(formValues).length && req.session.visitSessionData.visit?.id) {
-        formValues['visit-date-and-time'] = req.session.visitSessionData.visit?.id
+      if (!Object.keys(formValues).length && visitSessionData.visit?.id) {
+        formValues['visit-date-and-time'] = visitSessionData.visit?.id
       }
 
       req.session.slotsList = slotsList
@@ -148,7 +154,7 @@ export default function routes(
 
       res.render('pages/dateAndTime', {
         errors: req.flash('errors'),
-        prisonerName: req.session.visitSessionData.prisoner.name,
+        prisonerName: visitSessionData.prisoner.name,
         slotsList,
         timeOfDay,
         dayOfTheWeek,
@@ -170,9 +176,11 @@ export default function routes(
       return true
     }),
     async (req, res) => {
+      const { visitSessionData } = req.session
+
       checkSession({
         stage: 2,
-        visitData: req.session.visitSessionData,
+        visitSessionData,
         res,
       })
       const errors = validationResult(req)
@@ -188,20 +196,20 @@ export default function routes(
         return res.redirect(req.originalUrl)
       }
 
-      req.session.visitSessionData.visit = getSelectedSlot(req.session.slotsList, req.body['visit-date-and-time'])
+      visitSessionData.visit = getSelectedSlot(req.session.slotsList, req.body['visit-date-and-time'])
 
-      if (Number.isInteger(req.session.visitSessionData.reservationId)) {
+      if (Number.isInteger(visitSessionData.reservationId)) {
         await visitSessionsService.updateVisit({
           username: res.locals.user?.username,
-          visitData: req.session.visitSessionData,
+          visitData: visitSessionData,
         })
       } else {
         const reservationId = await visitSessionsService.createVisit({
           username: res.locals.user?.username,
-          visitData: req.session.visitSessionData,
+          visitData: visitSessionData,
         })
 
-        req.session.visitSessionData.reservationId = reservationId
+        visitSessionData.reservationId = reservationId
       }
 
       return res.redirect('/visit/additional-support')
@@ -209,18 +217,20 @@ export default function routes(
   )
 
   router.get('/additional-support', async (req, res) => {
+    const { visitSessionData } = req.session
+
     checkSession({
       stage: 3,
-      visitData: req.session.visitSessionData,
+      visitSessionData,
       res,
     })
 
     const formValues = (req.flash('formValues')?.[0] as unknown as Record<string, string | string[]>) || {}
 
-    if (!Object.keys(formValues).length && req.session.visitSessionData.additionalSupport) {
-      formValues.additionalSupportRequired = req.session.visitSessionData.additionalSupport.required ? 'yes' : 'no'
-      formValues.additionalSupport = req.session.visitSessionData.additionalSupport.keys
-      formValues.otherSupportDetails = req.session.visitSessionData.additionalSupport.other
+    if (!Object.keys(formValues).length && visitSessionData.additionalSupport) {
+      formValues.additionalSupportRequired = visitSessionData.additionalSupport.required ? 'yes' : 'no'
+      formValues.additionalSupport = visitSessionData.additionalSupport.keys
+      formValues.otherSupportDetails = visitSessionData.additionalSupport.other
     }
 
     res.render('pages/additionalSupport', {
@@ -261,9 +271,11 @@ export default function routes(
         return true
       }),
     async (req, res) => {
+      const { visitSessionData } = req.session
+
       checkSession({
         stage: 3,
-        visitData: req.session.visitSessionData,
+        visitSessionData,
         res,
       })
 
@@ -282,29 +294,31 @@ export default function routes(
         selectedSupport.other = req.body.additionalSupport.includes('other') ? req.body.otherSupportDetails : undefined
       }
 
-      req.session.visitSessionData.additionalSupport = selectedSupport
+      visitSessionData.additionalSupport = selectedSupport
 
       return res.redirect('/visit/select-main-contact')
     }
   )
 
   router.get('/select-main-contact', async (req, res) => {
+    const { visitSessionData } = req.session
+
     checkSession({
       stage: 4,
-      visitData: req.session.visitSessionData,
+      visitSessionData,
       res,
     })
 
     const formValues = (req.flash('formValues')?.[0] as unknown as Record<string, string | string[]>) || {}
 
-    if (!Object.keys(formValues).length && req.session.visitSessionData.mainContact) {
-      formValues.contact = req.session.visitSessionData.mainContact.contact
-        ? req.session.visitSessionData.mainContact.contact.name.replace(' ', '_')
+    if (!Object.keys(formValues).length && visitSessionData.mainContact) {
+      formValues.contact = visitSessionData.mainContact.contact
+        ? visitSessionData.mainContact.contact.name.replace(' ', '_')
         : 'someoneElse'
-      formValues.phoneNumber = req.session.visitSessionData.mainContact.phoneNumber
-      formValues.someoneElseName = req.session.visitSessionData.mainContact.contact
+      formValues.phoneNumber = visitSessionData.mainContact.phoneNumber
+      formValues.someoneElseName = visitSessionData.mainContact.contact
         ? undefined
-        : req.session.visitSessionData.mainContact.contactName
+        : visitSessionData.mainContact.contactName
     }
 
     res.render('pages/mainContact', {
@@ -342,9 +356,11 @@ export default function routes(
       return true
     }),
     async (req, res) => {
+      const { visitSessionData } = req.session
+
       checkSession({
         stage: 4,
-        visitData: req.session.visitSessionData,
+        visitSessionData,
         res,
       })
 
@@ -360,7 +376,7 @@ export default function routes(
         (visitor: VisitorListItem) => req.body.contact === visitor.name.replace(' ', '_')
       )
 
-      req.session.visitSessionData.mainContact = {
+      visitSessionData.mainContact = {
         contact: selectedContact,
         phoneNumber: req.body.phoneNumber,
         contactName: selectedContact === undefined ? req.body.someoneElseName : undefined,
@@ -372,12 +388,13 @@ export default function routes(
 
   router.get('/check-your-booking', async (req, res) => {
     const { visitSessionData } = req.session
+
     checkSession({
       stage: 5,
-      visitData: visitSessionData,
+      visitSessionData,
       res,
     })
-    const { offenderNo } = req.session.visitSessionData.prisoner
+    const { offenderNo } = visitSessionData.prisoner
 
     const additionalSupport = visitSessionData.additionalSupport?.keys?.map(key => {
       return key === additionalSupportOptions.items.OTHER.key
@@ -388,7 +405,7 @@ export default function routes(
     res.render('pages/checkYourBooking', {
       offenderNo,
       contactDetails: {
-        phoneNumber: req.session.visitSessionData.mainContact.phoneNumber,
+        phoneNumber: visitSessionData.mainContact.phoneNumber,
       },
       mainContact: visitSessionData.mainContact,
       prisoner: visitSessionData.prisoner,
