@@ -1,4 +1,5 @@
 import { format, parseISO, getDay } from 'date-fns'
+import logger from '../../logger'
 import { VisitSlot, VisitSlotList, VisitSlotsForDay, SystemToken, VisitSessionData } from '../@types/bapv'
 import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
 import { VisitSession, Visit } from '../data/visitSchedulerApiTypes'
@@ -70,6 +71,7 @@ export default class VisitSessionsService {
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
 
     const reservation = await visitSchedulerApiClient.createVisit(visitData)
+    logger.info(`Created visit ${reservation?.id} for offender ${visitData.prisoner.offenderNo}`)
 
     return reservation.id ? reservation.id : undefined
   }
@@ -86,6 +88,9 @@ export default class VisitSessionsService {
     const token = await this.systemToken(username)
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
 
-    return visitSchedulerApiClient.updateVisit(visitData, visitStatus)
+    const visit = await visitSchedulerApiClient.updateVisit(visitData, visitStatus)
+    logger.info(`Updated visit ${visit.id} (status = ${visitStatus}) for offender ${visitData.prisoner.offenderNo}`)
+
+    return visit
   }
 }
