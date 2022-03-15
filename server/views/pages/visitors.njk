@@ -72,24 +72,6 @@
   ]), visitors) %}
 {% endfor %}
 
-{% set prisonerRestrictions = [] %}
-{% for restriction in restrictions %}
-  {%- set prisonerRestrictions = (prisonerRestrictions.push([
-    {
-      text: restriction.restrictionTypeDescription
-    },
-    {
-      text: restriction.comment
-    },
-    {
-      text: restriction.startDate
-    },
-    {
-      text: restriction.expiryDate
-    }
-  ]), prisonerRestrictions) %}
-{% endfor %}
-
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
@@ -99,25 +81,49 @@
 
       <p><strong class="govuk-!-margin-right-4">Prisoner name:</strong> <span data-test="prisoner-name">{{ prisonerName }}</span></p>
 
-      <h2 class="govuk-heading-m">Prisoner's active restrictions</h2>
+      <div class="prisoner-restrictions">
 
-      {{ govukTable({
-        head: [
-          {
-            text: "Type of restriction"
-          },
-          {
-            text: "Comments"
-          },
-          {
-            text: "Date from"
-          },
-          {
-            text: "Date to"
-          }
-        ],
-        rows: prisonerRestrictions
-      }) }}
+        <h2 class="govuk-heading-m">Prisoner's active restrictions</h2>
+
+        {% if restrictions | length %}
+          {% set prisonerRestrictions = [] %}
+          {% for restriction in restrictions %}
+            {%- set prisonerRestrictions = (prisonerRestrictions.push([
+              {
+                html: '<span class="moj-badge moj-badge--large visitor-restriction-badge visitor-restriction-badge--{{ restriction.restrictionType }}">{{- restriction.restrictionTypeDescription }}</span>"'
+              },
+              {
+                text: restriction.comment
+              },
+              {
+                text: restriction.startDate | formatDate
+              },
+              {
+                text: restriction.expiryDate | formatDate
+              }
+            ]), prisonerRestrictions) %}
+          {% endfor %}
+          {{ govukTable({
+            head: [
+              {
+                text: "Type of restriction"
+              },
+              {
+                text: "Comments"
+              },
+              {
+                text: "Date from"
+              },
+              {
+                text: "Date to"
+              }
+            ],
+            rows: prisonerRestrictions
+          }) }}
+        {% else %}
+        <p>Prisoner has no restrictions.</p>
+        {% endif %}
+      </div>
 
       {% if visitors | length %}
       {% if errors | length %}

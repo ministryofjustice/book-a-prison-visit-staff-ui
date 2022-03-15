@@ -1,4 +1,4 @@
-.visitor-restriction {
+.visit-restriction {
   margin-bottom: govuk-spacing(4);
 
   details {
@@ -6,7 +6,7 @@
   }
 }
 
-.visitor-restriction-badge {
+.visit-restriction-badge {
   margin-top: govuk-spacing(-1);
 
   &--BAN {
@@ -28,4 +28,10 @@
   &--NONCON {
     @extend .moj-badge--green;
   }
+}
+
+.prisoner-restrictions {
+  border: 1px solid govuk-colour("mid-grey");
+  margin-bottom: govuk-spacing(5);
+  padding: govuk-spacing(5) govuk-spacing(5) 0;
 }
