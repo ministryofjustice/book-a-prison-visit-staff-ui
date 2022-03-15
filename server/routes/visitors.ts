@@ -414,7 +414,7 @@ export default function routes(
     const { visitSessionData } = req.session
     checkSession({
       stage: 5,
-      visitData: visitSessionData,
+      visitSessionData,
       res,
     })
 
@@ -476,7 +476,7 @@ export default function routes(
     const { visitSessionData } = req.session
     checkSession({
       stage: 6,
-      visitData: visitSessionData,
+      visitSessionData,
       res,
     })
     const { offenderNo } = req.session.visitSessionData.prisoner
