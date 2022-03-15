@@ -110,8 +110,8 @@ describe('GET /visit/select-visitors', () => {
       {
         restrictionId: 0,
         comment: 'string',
-        restrictionType: 'string',
-        restrictionTypeDescription: 'string',
+        restrictionType: 'BAN',
+        restrictionTypeDescription: 'Banned',
         startDate: '2022-03-15',
         expiryDate: '2022-03-15',
         active: true,
@@ -136,6 +136,20 @@ describe('GET /visit/select-visitors', () => {
       visitorList,
       visitSessionData,
     } as SessionData)
+  })
+
+  it('should render the prisoner restrictions', () => {
+    return request(sessionApp)
+      .get('/visit/select-visitors')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('.test-restrictions-type1').text().trim()).toBe('Banned')
+        expect($('.test-restrictions-comment1').text().trim()).toBe('string')
+        expect($('.test-restrictions-start-date1').text().trim()).toBe('15 March 2022')
+        expect($('.test-restrictions-end-date1').text().trim()).toBe('15 March 2022')
+      })
   })
 
   it('should render the approved visitor list for offender number A1234BC with none selected and store visitorList in session', () => {
