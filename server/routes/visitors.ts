@@ -198,7 +198,7 @@ export default function routes(
 
       visitSessionData.visit = getSelectedSlot(req.session.slotsList, req.body['visit-date-and-time'])
 
-      if (!req.session.visitSessionData.visitId) {
+      if (req.session.visitSessionData.visitId) {
         await visitSessionsService.updateVisit({
           username: res.locals.user?.username,
           visitData: visitSessionData,
