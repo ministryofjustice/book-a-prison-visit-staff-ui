@@ -697,14 +697,19 @@ describe('/visit/select-date-and-time', () => {
   })
 
   describe('POST /visit/select-date-and-time', () => {
+    const visitSessionsService = new VisitSessionsService(null, systemToken) as jest.Mocked<VisitSessionsService>
+
     beforeEach(() => {
-      sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, {
+      visitSessionsService.createVisit = jest.fn().mockResolvedValue('2a-bc-3d-ef')
+      visitSessionsService.updateVisit = jest.fn()
+
+      sessionApp = appWithAllRoutes(null, null, null, visitSessionsService, systemToken, false, {
         slotsList,
         visitSessionData,
       } as SessionData)
     })
 
-    it('should save to session and redirect to additional support page if slot selected', () => {
+    it('should save to session, create visit and redirect to additional support page if slot selected', () => {
       return request(sessionApp)
         .post('/visit/select-date-and-time')
         .send('visit-date-and-time=2')
@@ -718,10 +723,13 @@ describe('/visit/select-date-and-time', () => {
             availableTables: 1,
             visitRoomName: 'room name',
           })
+          expect(visitSessionsService.createVisit).toHaveBeenCalledTimes(1)
+          expect(visitSessionsService.updateVisit).not.toHaveBeenCalled()
+          expect(visitSessionData.visitId).toEqual('2a-bc-3d-ef')
         })
     })
 
-    it('should save new choice to session and redirect to additional support page if existing session data present', () => {
+    it('should save new choice to session, update visit reservation and redirect to additional support page if existing session data present', () => {
       visitSessionData.visit = {
         id: '1',
         startTimestamp: '2022-02-14T10:00:00',
@@ -729,6 +737,8 @@ describe('/visit/select-date-and-time', () => {
         availableTables: 15,
         visitRoomName: 'room name',
       }
+
+      visitSessionData.visitId = '3b-cd-4f-fg'
 
       return request(sessionApp)
         .post('/visit/select-date-and-time')
@@ -743,6 +753,9 @@ describe('/visit/select-date-and-time', () => {
             availableTables: 5,
             visitRoomName: 'room name',
           })
+          expect(visitSessionsService.createVisit).not.toHaveBeenCalled()
+          expect(visitSessionsService.updateVisit).toHaveBeenCalledTimes(1)
+          expect(visitSessionsService.updateVisit.mock.calls[0][0].visitData.visitId).toBe('3b-cd-4f-fg')
         })
     })
 
