@@ -13,7 +13,7 @@ import {
   Contact,
 } from '../@types/bapv'
 import { prisonerDatePretty, properCaseFullName, prisonerDateTimePretty } from '../utils/utils'
-import { Alert } from '../data/prisonApiTypes'
+import { Alert, OffenderRestriction } from '../data/prisonApiTypes'
 import { Visit } from '../data/visitSchedulerApiTypes'
 
 type PrisonApiClientBuilder = (token: string) => PrisonApiClient
@@ -87,6 +87,18 @@ export default class PrisonerProfileService {
       upcomingVisits,
       pastVisits,
     }
+  }
+
+  async getRestrictions(offenderNo: string, username: string): Promise<OffenderRestriction[]> {
+    const token = await this.systemToken(username)
+    const prisonApiClient = this.prisonApiClientBuilder(token)
+    const restrictions = await prisonApiClient.getOffenderRestrictions(offenderNo)
+
+    if (!restrictions.bookingId) throw new NotFound()
+
+    const { offenderRestrictions } = restrictions
+
+    return offenderRestrictions
   }
 
   private async getUpcomingVisits(

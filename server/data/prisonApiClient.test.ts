@@ -83,6 +83,38 @@ describe('prisonApiClient', () => {
     })
   })
 
+  describe('getOffenderRestrictions', () => {
+    it('should return offender restrictions from the Prison API', async () => {
+      const offenderNo = 'A1234BC'
+      const results = {
+        bookingId: 0,
+        offenderRestrictions: [
+          {
+            restrictionId: 0,
+            comment: 'string',
+            restrictionType: 'string',
+            restrictionTypeDescription: 'string',
+            startDate: '2022-03-15',
+            expiryDate: '2022-03-15',
+            active: true,
+          },
+        ],
+      }
+
+      fakePrisonApi
+        .get(`/api/offenders/${offenderNo}/offender-restrictions`)
+        .query({
+          activeRestrictionsOnly: 'true',
+        })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, results)
+
+      const output = await client.getOffenderRestrictions(offenderNo)
+
+      expect(output).toEqual(results)
+    })
+  })
+
   describe('getVisitBalances', () => {
     it('should return visitBalances for a SENTENCED prisoner', async () => {
       const offenderNo = 'A1234BC'

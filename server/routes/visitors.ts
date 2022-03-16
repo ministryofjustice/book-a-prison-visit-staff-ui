@@ -3,6 +3,7 @@ import { body, validationResult, query } from 'express-validator'
 import { VisitorListItem, VisitSessionData, VisitSlot } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
+import PrisonerProfileService from '../services/prisonerProfileService'
 import VisitSessionsService from '../services/visitSessionsService'
 import additionalSupportOptions from '../constants/additionalSupportOptions'
 import { checkSession, getFlashFormValues, getSelectedSlot } from './visitorUtils'
@@ -10,7 +11,8 @@ import { checkSession, getFlashFormValues, getSelectedSlot } from './visitorUtil
 export default function routes(
   router: Router,
   prisonerVisitorsService: PrisonerVisitorsService,
-  visitSessionsService: VisitSessionsService
+  visitSessionsService: VisitSessionsService,
+  prisonerProfileService: PrisonerProfileService
 ): Router {
   const get = (path: string, handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
 
@@ -25,6 +27,7 @@ export default function routes(
 
     const { offenderNo } = visitSessionData.prisoner
     const prisonerVisitors = await prisonerVisitorsService.getVisitors(offenderNo, res.locals.user?.username)
+    const restrictions = await prisonerProfileService.getRestrictions(offenderNo, res.locals.user?.username)
 
     const formValues = getFlashFormValues(req)
     if (!Object.keys(formValues).length && visitSessionData.visitors) {
@@ -40,6 +43,7 @@ export default function routes(
       errors: req.flash('errors'),
       prisonerName: visitSessionData.prisoner.name,
       visitorList: prisonerVisitors.visitorList,
+      restrictions,
       formValues,
     })
   })

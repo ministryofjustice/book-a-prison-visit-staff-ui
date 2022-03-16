@@ -65,7 +65,13 @@ export default function createApp(userService: UserService): express.Application
     visitorsRoutes(
       standardRouter(userService),
       new PrisonerVisitorsService(prisonApiClientBuilder, prisonerContactRegistryApiClientBuilder, systemToken),
-      new VisitSessionsService(visitSchedulerApiClientBuilder, systemToken)
+      new VisitSessionsService(visitSchedulerApiClientBuilder, systemToken),
+      new PrisonerProfileService(
+        prisonApiClientBuilder,
+        visitSchedulerApiClientBuilder,
+        prisonerContactRegistryApiClientBuilder,
+        systemToken
+      )
     )
   )
 

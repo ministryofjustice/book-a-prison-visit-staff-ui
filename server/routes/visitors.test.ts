@@ -3,10 +3,13 @@ import request from 'supertest'
 import { SessionData } from 'express-session'
 import * as cheerio from 'cheerio'
 import { Restriction, VisitorListItem, VisitSessionData, VisitSlotList } from '../@types/bapv'
+import { OffenderRestriction } from '../data/prisonApiTypes'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
+import PrisonerProfileService from '../services/prisonerProfileService'
 import VisitSessionsService from '../services/visitSessionsService'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 
+jest.mock('../services/prisonerProfileService')
 jest.mock('../services/prisonerVisitorsService')
 jest.mock('../services/visitSessionsService')
 
@@ -36,7 +39,15 @@ describe('GET /visit/select-visitors', () => {
     systemToken
   ) as jest.Mocked<PrisonerVisitorsService>
 
+  const prisonerProfileService = new PrisonerProfileService(
+    null,
+    null,
+    null,
+    systemToken
+  ) as jest.Mocked<PrisonerProfileService>
+
   let returnData: { prisonerName: string; visitorList: VisitorListItem[] }
+  let restrictions: OffenderRestriction[]
 
   beforeAll(() => {
     returnData = {
@@ -95,6 +106,17 @@ describe('GET /visit/select-visitors', () => {
         },
       ],
     }
+    restrictions = [
+      {
+        restrictionId: 0,
+        comment: 'string',
+        restrictionType: 'BAN',
+        restrictionTypeDescription: 'Banned',
+        startDate: '2022-03-15',
+        expiryDate: '2022-03-15',
+        active: true,
+      },
+    ]
   })
 
   beforeEach(() => {
@@ -108,11 +130,80 @@ describe('GET /visit/select-visitors', () => {
     }
 
     prisonerVisitorsService.getVisitors.mockResolvedValue(returnData)
+    prisonerProfileService.getRestrictions.mockResolvedValue(restrictions)
 
-    sessionApp = appWithAllRoutes(null, null, prisonerVisitorsService, null, systemToken, false, {
+    sessionApp = appWithAllRoutes(null, prisonerProfileService, prisonerVisitorsService, null, systemToken, false, {
       visitorList,
       visitSessionData,
     } as SessionData)
+  })
+
+  it('should render the prisoner restrictions when they are present', () => {
+    return request(sessionApp)
+      .get('/visit/select-visitors')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('.test-restrictions-type1').text().trim()).toBe('Banned')
+        expect($('.test-restrictions-comment1').text().trim()).toBe('string')
+        expect($('.test-restrictions-start-date1').text().trim()).toBe('15 March 2022')
+        expect($('.test-restrictions-end-date1').text().trim()).toBe('15 March 2022')
+      })
+  })
+
+  it('should render the prisoner restrictions when they are present, displaying a message if dates are not set', () => {
+    restrictions = [
+      {
+        restrictionId: 0,
+        comment: 'string',
+        restrictionType: 'BAN',
+        restrictionTypeDescription: 'Banned',
+        startDate: '',
+        expiryDate: '',
+        active: true,
+      },
+    ]
+    prisonerProfileService.getRestrictions.mockResolvedValue(restrictions)
+
+    sessionApp = appWithAllRoutes(null, prisonerProfileService, prisonerVisitorsService, null, systemToken, false, {
+      visitorList,
+      visitSessionData,
+    } as SessionData)
+
+    return request(sessionApp)
+      .get('/visit/select-visitors')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('.test-restrictions-type1').text().trim()).toBe('Banned')
+        expect($('.test-restrictions-comment1').text().trim()).toBe('string')
+        expect($('.test-restrictions-start-date1').text().trim()).toBe('Not entered')
+        expect($('.test-restrictions-end-date1').text().trim()).toBe('Not entered')
+      })
+  })
+
+  it('should display a message when there are no prisoner restrictions', () => {
+    prisonerProfileService.getRestrictions.mockResolvedValue([])
+
+    sessionApp = appWithAllRoutes(null, prisonerProfileService, prisonerVisitorsService, null, systemToken, false, {
+      visitorList,
+      visitSessionData,
+    } as SessionData)
+
+    return request(sessionApp)
+      .get('/visit/select-visitors')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('.test-no-prisoner-restrictions').text()).toBe('Prisoner has no restrictions.')
+        expect($('.test-restrictions-type1').text()).toBe('')
+        expect($('.test-restrictions-comment1').text().trim()).toBe('')
+        expect($('.test-restrictions-start-date1').text().trim()).toBe('')
+        expect($('.test-restrictions-end-date1').text().trim()).toBe('')
+      })
   })
 
   it('should render the approved visitor list for offender number A1234BC with none selected and store visitorList in session', () => {
@@ -130,12 +221,12 @@ describe('GET /visit/select-visitors', () => {
         expect($('[data-test="visitor-dob-4321"]').text()).toMatch(/28 July 1986.*Adult/)
         expect($('[data-test="visitor-relation-4321"]').text()).toContain('Sister')
         expect($('[data-test="visitor-address-4321"]').text()).toContain('123 The Street')
-        const restrictions = $('[data-test="visitor-restrictions-4321"] .visitor-restriction')
-        expect(restrictions.eq(0).text()).toContain('Banned until 31 July 2022')
-        expect(restrictions.eq(0).text()).toContain('Ban details')
-        expect(restrictions.eq(1).text()).toContain('Restricted End date not entered')
-        expect(restrictions.eq(2).text()).toContain('Closed End date not entered')
-        expect(restrictions.eq(3).text()).toContain('Non-Contact Visit End date not entered')
+        const visitorRestrictions = $('[data-test="visitor-restrictions-4321"] .visitor-restriction')
+        expect(visitorRestrictions.eq(0).text()).toContain('Banned until 31 July 2022')
+        expect(visitorRestrictions.eq(0).text()).toContain('Ban details')
+        expect(visitorRestrictions.eq(1).text()).toContain('Restricted End date not entered')
+        expect(visitorRestrictions.eq(2).text()).toContain('Closed End date not entered')
+        expect(visitorRestrictions.eq(3).text()).toContain('Non-Contact Visit End date not entered')
 
         expect($('[data-test="visitor-name-4322"]').text()).toBe('Bob Smith')
         expect($('[data-test="visitor-restrictions-4322"]').text()).toBe('None')
