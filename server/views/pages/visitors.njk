@@ -88,6 +88,8 @@
         {% if restrictions | length %}
           {% set prisonerRestrictions = [] %}
           {% for restriction in restrictions %}
+            {% set restrictionStartDate %}{% if restriction.startDate %}{{ restriction.startDate | formatDate }}{% else %}Not entered{% endif %}{% endset %}
+            {% set restrictionExpiryDate %}{% if restriction.expiryDate %}{{ restriction.expiryDate | formatDate }}{% else %}Not entered{% endif %}{% endset %}
             {%- set prisonerRestrictions = (prisonerRestrictions.push([
               {
                 html: '<span class="test-restrictions-type' + loop.index + ' moj-badge moj-badge--large visitor-restriction-badge visitor-restriction-badge--' + restriction.restrictionType + '">' + restriction.restrictionTypeDescription + '</span>'
@@ -97,11 +99,11 @@
                 classes: "test-restrictions-comment" + loop.index
               },
               {
-                text: restriction.startDate | formatDate,
+                text: restrictionStartDate,
                 classes: "test-restrictions-start-date" + loop.index
               },
               {
-                text: restriction.expiryDate | formatDate,
+                text: restrictionExpiryDate,
                 classes: "test-restrictions-end-date" + loop.index
               }
             ]), prisonerRestrictions) %}

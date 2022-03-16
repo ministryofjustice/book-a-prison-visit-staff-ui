@@ -152,6 +152,38 @@ describe('GET /visit/select-visitors', () => {
       })
   })
 
+  it('should render the prisoner restrictions when they are present, displaying a message if dates are not set', () => {
+    restrictions = [
+      {
+        restrictionId: 0,
+        comment: 'string',
+        restrictionType: 'BAN',
+        restrictionTypeDescription: 'Banned',
+        startDate: '',
+        expiryDate: '',
+        active: true,
+      },
+    ]
+    prisonerProfileService.getRestrictions.mockResolvedValue(restrictions)
+
+    sessionApp = appWithAllRoutes(null, prisonerProfileService, prisonerVisitorsService, null, systemToken, false, {
+      visitorList,
+      visitSessionData,
+    } as SessionData)
+
+    return request(sessionApp)
+      .get('/visit/select-visitors')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('.test-restrictions-type1').text().trim()).toBe('Banned')
+        expect($('.test-restrictions-comment1').text().trim()).toBe('string')
+        expect($('.test-restrictions-start-date1').text().trim()).toBe('Not entered')
+        expect($('.test-restrictions-end-date1').text().trim()).toBe('Not entered')
+      })
+  })
+
   it('should display a message when there are no prisoner restrictions', () => {
     prisonerProfileService.getRestrictions.mockResolvedValue([])
 
