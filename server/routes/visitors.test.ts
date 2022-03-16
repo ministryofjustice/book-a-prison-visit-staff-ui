@@ -138,7 +138,7 @@ describe('GET /visit/select-visitors', () => {
     } as SessionData)
   })
 
-  it('should render the prisoner restrictions', () => {
+  it('should render the prisoner restrictions when they are present', () => {
     return request(sessionApp)
       .get('/visit/select-visitors')
       .expect(200)
@@ -149,6 +149,28 @@ describe('GET /visit/select-visitors', () => {
         expect($('.test-restrictions-comment1').text().trim()).toBe('string')
         expect($('.test-restrictions-start-date1').text().trim()).toBe('15 March 2022')
         expect($('.test-restrictions-end-date1').text().trim()).toBe('15 March 2022')
+      })
+  })
+
+  it('should display a message when there are no prisoner restrictions', () => {
+    prisonerProfileService.getRestrictions.mockResolvedValue([])
+
+    sessionApp = appWithAllRoutes(null, prisonerProfileService, prisonerVisitorsService, null, systemToken, false, {
+      visitorList,
+      visitSessionData,
+    } as SessionData)
+
+    return request(sessionApp)
+      .get('/visit/select-visitors')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('.test-no-prisoner-restrictions').text()).toBe('Prisoner has no restrictions.')
+        expect($('.test-restrictions-type1').text()).toBe('')
+        expect($('.test-restrictions-comment1').text().trim()).toBe('')
+        expect($('.test-restrictions-start-date1').text().trim()).toBe('')
+        expect($('.test-restrictions-end-date1').text().trim()).toBe('')
       })
   })
 
