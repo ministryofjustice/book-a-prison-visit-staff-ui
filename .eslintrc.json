@@ -5,7 +5,7 @@
     "jest": true
   },
 
-  "plugins": ["import"],
+  "plugins": ["import", "no-only-tests"],
 
   "settings": {
     "import/parsers": {
@@ -103,6 +103,7 @@
         "semi": false,
         "arrowParens": "avoid"
       }
-    ]
+    ],
+    "no-only-tests/no-only-tests": "error"
   }
 }
