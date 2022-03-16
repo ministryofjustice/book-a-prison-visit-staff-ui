@@ -18,12 +18,11 @@
             {% set visitors = [] %}
 
             {% for visitor in adultVisitors %}
-                {% set itemValue = visitor.name | replace(" ", "_") %}
                 {% set visitors = (visitors.push(
                     {
-                        value: itemValue,
+                        value: visitor.personId,
                         text: visitor.name + " (" + (visitor.relationshipDescription | lower) + " to prisoner)",
-                        checked: itemValue == formValues.contact
+                        checked: visitor.personId == formValues.contact
                     }
                 ), visitors) %}
             {% endfor %}

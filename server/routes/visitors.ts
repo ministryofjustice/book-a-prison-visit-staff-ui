@@ -315,7 +315,7 @@ export default function routes(
     const formValues = getFlashFormValues(req)
     if (!Object.keys(formValues).length && visitSessionData.mainContact) {
       formValues.contact = visitSessionData.mainContact.contact
-        ? visitSessionData.mainContact.contact.name.replace(' ', '_')
+        ? visitSessionData.mainContact.contact.personId.toString()
         : 'someoneElse'
       formValues.phoneNumber = visitSessionData.mainContact.phoneNumber
       formValues.someoneElseName = visitSessionData.mainContact.contact
@@ -375,7 +375,7 @@ export default function routes(
       }
 
       const selectedContact = req.session.visitorList.visitors.find(
-        (visitor: VisitorListItem) => req.body.contact === visitor.name.replace(' ', '_')
+        (visitor: VisitorListItem) => req.body.contact === visitor.personId.toString()
       )
 
       visitSessionData.mainContact = {
