@@ -9,16 +9,8 @@
 .visitor-restriction-badge {
   margin-top: govuk-spacing(-1);
 
-  &--BAN {
-    @extend .moj-badge--red;
-  }
-
-  &--PREINF {
+  &--CHILD {
     @extend .moj-badge--purple;
-  }
-
-  &--RESTRICTED {
-    @extend .moj-badge--bright-purple;
   }
 
   &--CLOSED {
@@ -27,6 +19,30 @@
 
   &--NONCON {
     @extend .moj-badge--green;
+  }
+
+  &--RESTRICTED {
+    @extend .moj-badge--bright-purple;
+  }
+
+  &--PREINF {
+    @extend .moj-badge--purple;
+  }
+
+  &--DIHCON {
+    @extend .moj-badge--grey;
+  }
+
+  &--ACC {
+    @extend .moj-badge--blue;
+  }
+
+  &--CCTV {
+    @extend .moj-badge--grey;
+  }
+
+  &--BAN {
+    @extend .moj-badge--red;
   }
 }
 
