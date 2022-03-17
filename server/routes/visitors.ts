@@ -32,6 +32,7 @@ export default function routes(
 
     res.render('pages/visitors', {
       errors: req.flash('errors'),
+      offenderNo: visitSessionData.prisoner.offenderNo,
       prisonerName: visitSessionData.prisoner.name,
       visitorList: prisonerVisitors.visitorList,
       restrictions,

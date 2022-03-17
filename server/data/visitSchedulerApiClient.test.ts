@@ -1,6 +1,8 @@
 import nock from 'nock'
+import { VisitSessionData } from '../@types/bapv'
 import config from '../config'
 import VisitSchedulerApiClient, { visitSchedulerApiClientBuilder } from './visitSchedulerApiClient'
+import { Visit, VisitSession } from './visitSchedulerApiTypes'
 
 describe('visitSchedulerApiClient', () => {
   let fakeVisitSchedulerApi: nock.Scope
@@ -20,11 +22,11 @@ describe('visitSchedulerApiClient', () => {
   describe('getUpcomingVisits', () => {
     it('should return an array of Visit from the Visit Scheduler API', async () => {
       const offenderNo = 'A1234BC'
-      const results = [
+      const results: Visit[] = [
         {
-          id: 123,
+          id: 'v9-d7-ed-7u',
           prisonerId: offenderNo,
-          prisonId: 'MDI',
+          prisonId: 'HEI',
           visitRoom: 'A1 L3',
           visitType: 'STANDARD_SOCIAL',
           visitTypeDescription: 'Standard Social',
@@ -35,7 +37,6 @@ describe('visitSchedulerApiClient', () => {
           reasonableAdjustments: 'string',
           visitors: [
             {
-              visitId: 123,
               nomisPersonId: 1234,
               leadVisitor: true,
             },
@@ -63,11 +64,11 @@ describe('visitSchedulerApiClient', () => {
   describe('getPastVisits', () => {
     it('should return an array of Visit from the Visit Scheduler API', async () => {
       const offenderNo = 'A1234BC'
-      const results = [
+      const results: Visit[] = [
         {
-          id: 123,
+          id: 'v9-d7-ed-7u',
           prisonerId: offenderNo,
-          prisonId: 'MDI',
+          prisonId: 'HEI',
           visitRoom: 'A1 L3',
           visitType: 'STANDARD_SOCIAL',
           visitTypeDescription: 'Standard Social',
@@ -78,7 +79,6 @@ describe('visitSchedulerApiClient', () => {
           reasonableAdjustments: 'string',
           visitors: [
             {
-              visitId: 123,
               nomisPersonId: 1234,
               leadVisitor: true,
             },
@@ -105,7 +105,7 @@ describe('visitSchedulerApiClient', () => {
 
   describe('getVisitSessions', () => {
     it('should return an array of Visit Sessions from the Visit Scheduler API', async () => {
-      const results = [
+      const results: VisitSession[] = [
         {
           sessionTemplateId: 1,
           visitRoomName: 'A1',
@@ -141,8 +141,8 @@ describe('visitSchedulerApiClient', () => {
       const prisonId = 'HEI'
       const visitType = 'STANDARD_SOCIAL'
       const visitStatus = 'RESERVED'
-      const result = {
-        id: 123,
+      const result: Visit = {
+        id: 'v9-d7-ed-7u',
         prisonerId: 'AF34567G',
         prisonId,
         visitRoom: 'A1 L3',
@@ -155,13 +155,11 @@ describe('visitSchedulerApiClient', () => {
         reasonableAdjustments: 'string',
         visitorConcerns: 'string',
         mainContact: {
-          visitId: 123,
           contactName: 'John Smith',
           contactPhone: '01234 567890',
         },
         visitors: [
           {
-            visitId: 123,
             nomisPersonId: 1234,
             leadVisitor: true,
           },
@@ -226,12 +224,13 @@ describe('visitSchedulerApiClient', () => {
   })
 
   describe('updateVisit', () => {
-    it('should return an updated Visit from the Visit Scheduler API', async () => {
-      const prisonId = 'HEI'
-      const visitType = 'STANDARD_SOCIAL'
-      const visitStatus = 'RESERVED'
-      const result = {
-        id: 123,
+    const prisonId = 'HEI'
+    const visitType = 'STANDARD_SOCIAL'
+    const visitStatus = 'RESERVED'
+
+    it('should return an updated Visit from the Visit Scheduler API, given full visitSessionData', async () => {
+      const result: Visit = {
+        id: 'v9-d7-ed-7u',
         prisonerId: 'AF34567G',
         prisonId,
         visitRoom: 'A1 L3',
@@ -244,20 +243,18 @@ describe('visitSchedulerApiClient', () => {
         reasonableAdjustments: 'wheelchair,maskExempt,other,custom request',
         visitorConcerns: '',
         mainContact: {
-          visitId: 123,
           contactName: 'John Smith',
           contactPhone: '01234 567890',
         },
         visitors: [
           {
-            visitId: 123,
             nomisPersonId: 1234,
             leadVisitor: true,
           },
         ],
         sessionId: 123,
       }
-      const visitSessionData = {
+      const visitSessionData: VisitSessionData = {
         prisoner: {
           offenderNo: result.prisonerId,
           name: 'pri name',
@@ -306,6 +303,88 @@ describe('visitSchedulerApiClient', () => {
       const additionalSupport = visitSessionData.additionalSupport?.keys
         ? visitSessionData.additionalSupport.keys.concat([visitSessionData.additionalSupport.other]).join(',')
         : ''
+
+      fakeVisitSchedulerApi
+        .put('/visits/v9-d7-ed-7u', {
+          prisonId,
+          prisonerId: visitSessionData.prisoner.offenderNo,
+          startTimestamp: visitSessionData.visit.startTimestamp,
+          endTimestamp: visitSessionData.visit.endTimestamp,
+          visitType,
+          visitStatus,
+          visitRoom: visitSessionData.visit.visitRoomName,
+          reasonableAdjustments: additionalSupport,
+          mainContact,
+          contactList: visitSessionData.visitors.map(visitor => {
+            return {
+              nomisPersonId: visitor.personId,
+            }
+          }),
+        })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, result)
+
+      const output = await client.updateVisit(visitSessionData, visitStatus)
+
+      expect(output).toEqual(result)
+    })
+
+    it('should return an updated Visit from the Visit Scheduler API, given minimal visitSessionData', async () => {
+      const result: Visit = {
+        id: 'v9-d7-ed-7u',
+        prisonerId: 'AF34567G',
+        prisonId,
+        visitRoom: 'A1 L3',
+        visitType,
+        visitTypeDescription: 'Standard Social',
+        visitStatus,
+        visitStatusDescription: 'Reserved',
+        startTimestamp: '2022-02-14T10:00:00',
+        endTimestamp: '2022-02-14T11:00:00',
+        reasonableAdjustments: '',
+        visitors: [
+          {
+            nomisPersonId: 1234,
+            leadVisitor: true,
+          },
+        ],
+        sessionId: 123,
+      }
+      const visitSessionData: VisitSessionData = {
+        prisoner: {
+          offenderNo: result.prisonerId,
+          name: 'pri name',
+          dateOfBirth: '23 May 1988',
+          location: 'somewhere',
+        },
+        visit: {
+          id: 'visitId',
+          startTimestamp: result.startTimestamp,
+          endTimestamp: result.endTimestamp,
+          availableTables: 1,
+          visitRoomName: result.visitRoom,
+        },
+        visitors: [
+          {
+            personId: 123,
+            name: 'visitor name',
+            relationshipDescription: 'rel desc',
+            restrictions: [
+              {
+                restrictionType: 'TEST',
+                restrictionTypeDescription: 'test type',
+                startDate: '10 May 2020',
+                expiryDate: '10 May 2022',
+                globalRestriction: false,
+                comment: 'comments',
+              },
+            ],
+          },
+        ],
+        visitId: 'v9-d7-ed-7u',
+      }
+      const mainContact: VisitSessionData['mainContact'] = undefined
+      const additionalSupport = ''
 
       fakeVisitSchedulerApi
         .put('/visits/v9-d7-ed-7u', {
