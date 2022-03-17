@@ -108,7 +108,7 @@ function appSetup(
 
   const prisonerVisitorsService =
     prisonerVisitorsServiceOverride ||
-    new PrisonerVisitorsService(prisonApiClientBuilder, prisonerContactRegistryApiClientBuilder, systemTokenTest)
+    new PrisonerVisitorsService(prisonerContactRegistryApiClientBuilder, systemTokenTest)
   const visitSessionsService =
     visitSessionsServiceOverride || new VisitSessionsService(visitSchedulerApiClientBuilder, systemTokenTest)
   app.use(

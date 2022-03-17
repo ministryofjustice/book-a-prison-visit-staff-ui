@@ -17,7 +17,7 @@ export default function routes(
   router.get('/select-visitors', sessionCheckMiddleware({ stage: 1 }), async (req, res) => {
     const { visitSessionData } = req.session
     const { offenderNo } = visitSessionData.prisoner
-    const prisonerVisitors = await prisonerVisitorsService.getVisitors(offenderNo, res.locals.user?.username)
+    const visitorList = await prisonerVisitorsService.getVisitors(offenderNo, res.locals.user?.username)
     const restrictions = await prisonerProfileService.getRestrictions(offenderNo, res.locals.user?.username)
 
     const formValues = getFlashFormValues(req)
@@ -28,13 +28,13 @@ export default function routes(
     if (!req.session.visitorList) {
       req.session.visitorList = { visitors: [] }
     }
-    req.session.visitorList.visitors = prisonerVisitors.visitorList
+    req.session.visitorList.visitors = visitorList
 
     res.render('pages/visitors', {
       errors: req.flash('errors'),
       offenderNo: visitSessionData.prisoner.offenderNo,
       prisonerName: visitSessionData.prisoner.name,
-      visitorList: prisonerVisitors.visitorList,
+      visitorList,
       restrictions,
       formValues,
     })
