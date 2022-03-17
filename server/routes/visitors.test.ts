@@ -33,11 +33,7 @@ afterEach(() => {
 describe('GET /visit/select-visitors', () => {
   const visitorList: { visitors: VisitorListItem[] } = { visitors: [] }
 
-  const prisonerVisitorsService = new PrisonerVisitorsService(
-    null,
-    null,
-    systemToken
-  ) as jest.Mocked<PrisonerVisitorsService>
+  const prisonerVisitorsService = new PrisonerVisitorsService(null, systemToken) as jest.Mocked<PrisonerVisitorsService>
 
   const prisonerProfileService = new PrisonerProfileService(
     null,
@@ -46,66 +42,64 @@ describe('GET /visit/select-visitors', () => {
     systemToken
   ) as jest.Mocked<PrisonerProfileService>
 
-  let returnData: { prisonerName: string; visitorList: VisitorListItem[] }
+  let returnData: VisitorListItem[]
   let restrictions: OffenderRestriction[]
 
   beforeAll(() => {
-    returnData = {
-      prisonerName: 'John Smith',
-      visitorList: [
-        {
-          personId: 4321,
-          name: 'Jeanette Smith',
-          dateOfBirth: '1986-07-28',
-          adult: true,
-          relationshipDescription: 'Sister',
-          address:
-            'Premises,<br>Flat 23B,<br>123 The Street,<br>Springfield,<br>Coventry,<br>West Midlands,<br>C1 2AB,<br>England',
-          restrictions: [
-            {
-              restrictionType: 'BAN',
-              restrictionTypeDescription: 'Banned',
-              startDate: '2022-01-01',
-              expiryDate: '2022-07-31',
-              comment: 'Ban details',
-            },
-            {
-              restrictionType: 'RESTRICTED',
-              restrictionTypeDescription: 'Restricted',
-              startDate: '2022-01-02',
-            },
-            {
-              restrictionType: 'CLOSED',
-              restrictionTypeDescription: 'Closed',
-              startDate: '2022-01-03',
-            },
-            {
-              restrictionType: 'NONCON',
-              restrictionTypeDescription: 'Non-Contact Visit',
-              startDate: '2022-01-04',
-            },
-          ] as Restriction[],
-        },
-        {
-          personId: 4322,
-          name: 'Bob Smith',
-          dateOfBirth: undefined,
-          adult: undefined,
-          relationshipDescription: 'Brother',
-          address: '1st listed address',
-          restrictions: [],
-        },
-        {
-          personId: 4324,
-          name: 'Anne Smith',
-          dateOfBirth: '2018-03-02',
-          adult: false,
-          relationshipDescription: 'Niece',
-          address: 'Not entered',
-          restrictions: [],
-        },
-      ],
-    }
+    returnData = [
+      {
+        personId: 4321,
+        name: 'Jeanette Smith',
+        dateOfBirth: '1986-07-28',
+        adult: true,
+        relationshipDescription: 'Sister',
+        address:
+          'Premises,<br>Flat 23B,<br>123 The Street,<br>Springfield,<br>Coventry,<br>West Midlands,<br>C1 2AB,<br>England',
+        restrictions: [
+          {
+            restrictionType: 'BAN',
+            restrictionTypeDescription: 'Banned',
+            startDate: '2022-01-01',
+            expiryDate: '2022-07-31',
+            comment: 'Ban details',
+          },
+          {
+            restrictionType: 'RESTRICTED',
+            restrictionTypeDescription: 'Restricted',
+            startDate: '2022-01-02',
+          },
+          {
+            restrictionType: 'CLOSED',
+            restrictionTypeDescription: 'Closed',
+            startDate: '2022-01-03',
+          },
+          {
+            restrictionType: 'NONCON',
+            restrictionTypeDescription: 'Non-Contact Visit',
+            startDate: '2022-01-04',
+          },
+        ] as Restriction[],
+      },
+      {
+        personId: 4322,
+        name: 'Bob Smith',
+        dateOfBirth: undefined,
+        adult: undefined,
+        relationshipDescription: 'Brother',
+        address: '1st listed address',
+        restrictions: [],
+      },
+      {
+        personId: 4324,
+        name: 'Anne Smith',
+        dateOfBirth: '2018-03-02',
+        adult: false,
+        relationshipDescription: 'Niece',
+        address: 'Not entered',
+        restrictions: [],
+      },
+    ]
+
     restrictions = [
       {
         restrictionId: 0,
@@ -237,7 +231,7 @@ describe('GET /visit/select-visitors', () => {
         expect($('input[name="visitors"]:checked').length).toBe(0)
         expect($('[data-test="submit"]').text().trim()).toBe('Continue')
 
-        expect(visitorList.visitors).toEqual(returnData.visitorList)
+        expect(visitorList.visitors).toEqual(returnData)
       })
   })
 
@@ -331,7 +325,7 @@ describe('GET /visit/select-visitors', () => {
   })
 
   it('should show message and no Continue button for prisoner with no approved visitors', () => {
-    returnData = { prisonerName: 'John Smith', visitorList: [] }
+    returnData = []
     prisonerVisitorsService.getVisitors.mockResolvedValue(returnData)
 
     return request(sessionApp)

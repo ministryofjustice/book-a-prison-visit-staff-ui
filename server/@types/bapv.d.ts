@@ -90,9 +90,9 @@ export type Restriction = {
   restrictionType: string
   restrictionTypeDescription: string
   startDate: string
-  expiryDate: string
+  expiryDate?: string
   globalRestriction: boolean
-  comment: string
+  comment?: string
 }
 
 export type Address = {
