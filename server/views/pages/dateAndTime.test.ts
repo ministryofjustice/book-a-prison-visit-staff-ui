@@ -26,7 +26,6 @@ describe('Views - Date and time of visit', () => {
 
   it('should display date and time picker for two months with morning and afternoon slots', () => {
     viewContext = {
-      offenderNo: 'A1234BC',
       prisonerName: 'John Smith',
       slotsList: {
         'February 2022': [
@@ -91,6 +90,7 @@ describe('Views - Date and time of visit', () => {
       },
       timeOfDay: '',
       dayOfTheWeek: '',
+      formValues: { 'visit-date-and-time': '4' },
     }
     const $ = cheerio.load(compiledTemplate.render(viewContext))
 
@@ -105,6 +105,9 @@ describe('Views - Date and time of visit', () => {
     expect($('label[for="2"]').text()).toContain('1 table available')
     expect($('#slots-month-February2022-content-1 h3').eq(1).text()).toBe('Afternoon')
     expect($('#slots-month-February2022-heading-2').text().trim()).toBe('Tuesday 15 February')
+    expect($('#4').prop('checked')).toBe(true)
+    expect($('.govuk-accordion__section--expanded').length).toBe(1)
+    expect($('.govuk-accordion__section--expanded #4').length).toBe(1)
 
     expect($('[data-test="month"]').eq(1).text()).toBe('March 2022')
     expect($('#slots-month-March2022-heading-1').text().trim()).toBe('Tuesday 1 March')
