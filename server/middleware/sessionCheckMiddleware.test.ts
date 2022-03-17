@@ -34,7 +34,7 @@ const visit = {
   visitRoomName: 'visitRoom',
 }
 
-describe('checkSession', () => {
+describe('sessionCheckMiddleware', () => {
   let mockResponse: Partial<Response>
   let req: Partial<Request>
   const next = jest.fn()
