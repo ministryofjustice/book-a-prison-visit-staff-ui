@@ -1,12 +1,12 @@
-import type { RequestHandler, Router } from 'express'
+import type { Router } from 'express'
 import { body, validationResult, query } from 'express-validator'
 import { VisitorListItem, VisitSessionData, VisitSlot } from '../@types/bapv'
-import asyncMiddleware from '../middleware/asyncMiddleware'
+import sessionCheckMiddleware from '../middleware/sessionCheckMiddleware'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
 import PrisonerProfileService from '../services/prisonerProfileService'
 import VisitSessionsService from '../services/visitSessionsService'
 import additionalSupportOptions from '../constants/additionalSupportOptions'
-import { checkSession, getFlashFormValues, getSelectedSlot } from './visitorUtils'
+import { getFlashFormValues, getSelectedSlot } from './visitorUtils'
 
 export default function routes(
   router: Router,
@@ -14,17 +14,8 @@ export default function routes(
   visitSessionsService: VisitSessionsService,
   prisonerProfileService: PrisonerProfileService
 ): Router {
-  const get = (path: string, handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
-
-  get('/select-visitors', async (req, res) => {
+  router.get('/select-visitors', sessionCheckMiddleware({ stage: 1 }), async (req, res) => {
     const { visitSessionData } = req.session
-
-    checkSession({
-      stage: 1,
-      visitSessionData,
-      res,
-    })
-
     const { offenderNo } = visitSessionData.prisoner
     const prisonerVisitors = await prisonerVisitorsService.getVisitors(offenderNo, res.locals.user?.username)
     const restrictions = await prisonerProfileService.getRestrictions(offenderNo, res.locals.user?.username)
@@ -50,6 +41,7 @@ export default function routes(
 
   router.post(
     '/select-visitors',
+    sessionCheckMiddleware({ stage: 1 }),
     body('visitors').custom((value: string, { req }) => {
       const selected = [].concat(value)
 
@@ -86,13 +78,6 @@ export default function routes(
     }),
     (req, res) => {
       const { visitSessionData } = req.session
-
-      checkSession({
-        stage: 1,
-        visitSessionData,
-        res,
-      })
-
       const errors = validationResult(req)
 
       if (!errors.isEmpty()) {
@@ -127,19 +112,13 @@ export default function routes(
 
   router.get(
     '/select-date-and-time',
+    sessionCheckMiddleware({ stage: 2 }),
     query('timeOfDay').customSanitizer((value: string) => (!['morning', 'afternoon'].includes(value) ? '' : value)),
     query('dayOfTheWeek').customSanitizer((value: string) =>
       parseInt(value, 10) >= 0 && parseInt(value, 10) <= 6 ? value : ''
     ),
     async (req, res) => {
       const { visitSessionData } = req.session
-
-      checkSession({
-        stage: 2,
-        visitSessionData,
-        res,
-      })
-
       const { timeOfDay, dayOfTheWeek } = req.query
       const slotsList = await visitSessionsService.getVisitSessions({
         username: res.locals.user?.username,
@@ -169,6 +148,7 @@ export default function routes(
 
   router.post(
     '/select-date-and-time',
+    sessionCheckMiddleware({ stage: 2 }),
     body('visit-date-and-time').custom((value: string, { req }) => {
       // check selected slot is in the list that was shown and has available tables
       const selectedSlot: VisitSlot = getSelectedSlot(req.session.slotsList, value)
@@ -181,12 +161,6 @@ export default function routes(
     }),
     async (req, res) => {
       const { visitSessionData } = req.session
-
-      checkSession({
-        stage: 2,
-        visitSessionData,
-        res,
-      })
       const errors = validationResult(req)
 
       if (!errors.isEmpty()) {
@@ -220,16 +194,10 @@ export default function routes(
     }
   )
 
-  router.get('/additional-support', async (req, res) => {
+  router.get('/additional-support', sessionCheckMiddleware({ stage: 3 }), async (req, res) => {
     const { visitSessionData } = req.session
-
-    checkSession({
-      stage: 3,
-      visitSessionData,
-      res,
-    })
-
     const formValues = getFlashFormValues(req)
+
     if (!Object.keys(formValues).length && visitSessionData.additionalSupport) {
       formValues.additionalSupportRequired = visitSessionData.additionalSupport.required ? 'yes' : 'no'
       formValues.additionalSupport = visitSessionData.additionalSupport.keys
@@ -245,6 +213,7 @@ export default function routes(
 
   router.post(
     '/additional-support',
+    sessionCheckMiddleware({ stage: 3 }),
     body('additionalSupportRequired').custom((value: string) => {
       if (!/^yes|no$/.test(value)) {
         throw new Error('No answer selected')
@@ -275,13 +244,6 @@ export default function routes(
       }),
     async (req, res) => {
       const { visitSessionData } = req.session
-
-      checkSession({
-        stage: 3,
-        visitSessionData,
-        res,
-      })
-
       const errors = validationResult(req)
 
       if (!errors.isEmpty()) {
@@ -303,16 +265,10 @@ export default function routes(
     }
   )
 
-  router.get('/select-main-contact', async (req, res) => {
+  router.get('/select-main-contact', sessionCheckMiddleware({ stage: 4 }), async (req, res) => {
     const { visitSessionData } = req.session
-
-    checkSession({
-      stage: 4,
-      visitSessionData,
-      res,
-    })
-
     const formValues = getFlashFormValues(req)
+
     if (!Object.keys(formValues).length && visitSessionData.mainContact) {
       formValues.contact = visitSessionData.mainContact.contact
         ? visitSessionData.mainContact.contact.personId.toString()
@@ -332,6 +288,7 @@ export default function routes(
 
   router.post(
     '/select-main-contact',
+    sessionCheckMiddleware({ stage: 4 }),
     body('contact').custom((value: string) => {
       if (!value) {
         throw new Error('No main contact selected')
@@ -359,13 +316,6 @@ export default function routes(
     }),
     async (req, res) => {
       const { visitSessionData } = req.session
-
-      checkSession({
-        stage: 4,
-        visitSessionData,
-        res,
-      })
-
       const errors = validationResult(req)
 
       if (!errors.isEmpty()) {
@@ -388,14 +338,8 @@ export default function routes(
     }
   )
 
-  router.get('/check-your-booking', async (req, res) => {
+  router.get('/check-your-booking', sessionCheckMiddleware({ stage: 5 }), async (req, res) => {
     const { visitSessionData } = req.session
-
-    checkSession({
-      stage: 5,
-      visitSessionData,
-      res,
-    })
     const { offenderNo } = visitSessionData.prisoner
 
     const additionalSupport = visitSessionData.additionalSupport?.keys?.map(key => {
@@ -414,14 +358,8 @@ export default function routes(
     })
   })
 
-  router.post('/check-your-booking', async (req, res) => {
+  router.post('/check-your-booking', sessionCheckMiddleware({ stage: 5 }), async (req, res) => {
     const { visitSessionData } = req.session
-    checkSession({
-      stage: 5,
-      visitSessionData,
-      res,
-    })
-
     const { offenderNo } = req.session.visitSessionData.prisoner
 
     const additionalSupport = visitSessionData.additionalSupport?.keys?.map(key => {
@@ -476,13 +414,8 @@ export default function routes(
     return res.redirect('/visit/confirmation')
   })
 
-  router.get('/confirmation', async (req, res) => {
+  router.get('/confirmation', sessionCheckMiddleware({ stage: 6 }), async (req, res) => {
     const { visitSessionData } = req.session
-    checkSession({
-      stage: 6,
-      visitSessionData,
-      res,
-    })
     const { offenderNo } = req.session.visitSessionData.prisoner
 
     const additionalSupport = visitSessionData.additionalSupport?.keys?.map(key => {
