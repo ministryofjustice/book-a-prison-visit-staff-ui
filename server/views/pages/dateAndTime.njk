@@ -10,6 +10,27 @@
 {% endset %}
 {% set backLinkHref = "/visit/select-visitors" %}
 
+{% macro buildSlotsRadioItems(slotsList, radios) %}
+  {% for slot in slotsList %}
+    {% set tableText %}
+      {% if slot.availableTables === 0 %}Fully booked{% endif %}
+      {% if slot.availableTables === 1 %}1 table available{% endif %}
+      {% if slot.availableTables > 1 %}{{ slot.availableTables }} tables available{% endif %}
+    {% endset %}
+
+    {%- set checked = true if formValues['visit-date-and-time'] and formValues['visit-date-and-time'] == slot.id else false %}
+
+    {%- set radios = (radios.push({
+      value: slot.id,
+      html: '<p class="bapv-radio-paragraph"><strong>' + slot.startTimestamp | formatTime +
+        " to " + slot.endTimestamp | formatTime + "</strong><br>" + tableText + "</p>",
+      id: slot.id,
+      checked: checked,
+      disabled: slot.availableTables === 0
+    }), radios) %}
+  {% endfor %}
+{% endmacro %}
+
 {% block content %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
@@ -111,73 +132,37 @@
     {% for month, days in slotsList %}
       <h2 class="govuk-heading-m" data-test="month">{{ month }}</h2>
       {% set accordion = [] %}
+      {% for day in days %}
 
-      {%- for day in days %}
-        {% set expanded = false %}
-        {% set morningSlotsList = [] %}
-        {% for slot in day.slots.morning %}
-          {% set tableText %}
-            {% if slot.availableTables === 0 %}Fully booked{% endif %}
-            {% if slot.availableTables === 1 %}1 table available{% endif %}
-            {% if slot.availableTables > 1 %}{{ slot.availableTables }} tables available{% endif %}
-          {% endset %}
-
-          {% set checked = true if formValues['visit-date-and-time'] and formValues['visit-date-and-time'] == slot.id else false %}
-          {% set expanded = expanded or checked %}
-          {% set morningSlotsList = (morningSlotsList.push({
-            value: slot.id,
-            html: '<p class="bapv-radio-paragraph"><strong>' + slot.startTimestamp | formatTime +
-              " to " + slot.endTimestamp | formatTime + "</strong><br>" + tableText + "</p>",
-            id: slot.id,
-            checked: checked,
-            disabled: slot.availableTables === 0
-          }), morningSlotsList) %}
-        {% endfor %}
-
+        {%- set morningSlotsList = [] %}
+        {{ buildSlotsRadioItems(day.slots.morning, morningSlotsList) }}
         {%- set morningHtml %}
           <h3 class="govuk-heading-s">Morning</h3>
           {{ govukRadios({
             name: "visit-date-and-time",
             items: morningSlotsList
           }) }}
-        {% endset -%}
+        {% endset %}
 
-        {% set afternoonSlotsList = [] %}
-        {% for slot in day.slots.afternoon %}
-          {% set tableText %}
-            {% if slot.availableTables === 0 %}Fully booked{% endif %}
-            {% if slot.availableTables === 1 %}1 table available{% endif %}
-            {% if slot.availableTables > 1 %}{{ slot.availableTables }} tables available{% endif %}
-          {% endset %}
-
-          {% set checked = true if formValues['visit-date-and-time'] and formValues['visit-date-and-time'] == slot.id else false %}
-          {% set expanded = expanded or checked %}
-          {%- set afternoonSlotsList = (afternoonSlotsList.push({
-            value: slot.id,
-            html: '<p class="bapv-radio-paragraph"><strong>' + slot.startTimestamp | formatTime + " to " + slot.endTimestamp | formatTime + "</strong><br>" + tableText + "</p>",
-            id: slot.id,
-            checked: checked,
-            disabled: slot.availableTables === 0
-          }), afternoonSlotsList) %}
-        {% endfor %}
-
+        {%- set afternoonSlotsList = [] %}
+        {{ buildSlotsRadioItems(day.slots.afternoon, afternoonSlotsList) }}
         {%- set afternoonHtml %}
           <h3 class="govuk-heading-s">Afternoon</h3>
           {{ govukRadios({
             name: "visit-date-and-time",
             items: afternoonSlotsList
           }) }}
-        {% endset -%}
+        {% endset %}
 
-        {% set slotsAvailable = (day.slots.morning | length) + (day.slots.afternoon | length) %}
+        {%- set slotsAvailable = (day.slots.morning | length) + (day.slots.afternoon | length) %}
         {% set slotText %}
           {% if slotsAvailable === 0 %}Fully booked{% endif %}
           {% if slotsAvailable === 1 %}1 time slot{% endif %}
           {% if slotsAvailable > 1 %}{{ slotsAvailable }} time slots{% endif %}
         {% endset %}
 
-        {% if (slotsAvailable > 0) %}
-        {%- set accordion = (accordion.push({
+        {%- if (slotsAvailable > 0) %}
+        {% set accordion = (accordion.push({
           heading: {
             text: day.date
           },
@@ -187,11 +172,10 @@
           content: {
             html: (morningHtml if morningSlotsList | length) + (afternoonHtml if afternoonSlotsList | length)
           },
-          expanded: expanded
-        }), accordion)
-        %}
+          expanded: (morningSlotsList | selectattr("checked") | length) or (afternoonSlotsList | selectattr("checked") | length)
+        }), accordion) %}
         {% endif %}
-      {% endfor %}
+      {% endfor -%}
 
       {{- govukAccordion({
         id: "slots-month-" + (month | replace(" ", "")),
