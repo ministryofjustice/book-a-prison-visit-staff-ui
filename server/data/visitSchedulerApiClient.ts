@@ -71,12 +71,15 @@ class VisitSchedulerApiClient {
   }
 
   updateVisit(visitData: VisitSessionData, visitStatus: string): Promise<Visit> {
-    const mainContact = {
-      contactPhone: visitData.mainContact.phoneNumber,
-      contactName: visitData.mainContact.contactName
-        ? visitData.mainContact.contactName
-        : visitData.mainContact.contact.name,
-    }
+    const mainContact = visitData.mainContact
+      ? {
+          contactPhone: visitData.mainContact.phoneNumber,
+          contactName: visitData.mainContact.contactName
+            ? visitData.mainContact.contactName
+            : visitData.mainContact.contact.name,
+        }
+      : undefined
+
     const additionalSupport = visitData.additionalSupport?.keys
       ? visitData.additionalSupport.keys.concat([visitData.additionalSupport.other]).join(',')
       : ''
