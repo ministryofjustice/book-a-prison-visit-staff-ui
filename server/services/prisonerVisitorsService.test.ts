@@ -1,6 +1,6 @@
 import PrisonerVisitorsService from './prisonerVisitorsService'
 import PrisonerContactRegistryApiClient from '../data/prisonerContactRegistryApiClient'
-import { Contact } from '../@types/bapv'
+import { Contact } from '../data/prisonerContactRegistryApiTypes'
 
 jest.mock('../data/prisonerContactRegistryApiClient')
 

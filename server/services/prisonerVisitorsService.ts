@@ -1,4 +1,5 @@
-import { Address, Contact, Restriction, SystemToken, VisitorListItem } from '../@types/bapv'
+import { SystemToken, VisitorListItem } from '../@types/bapv'
+import { Address, Contact, Restriction } from '../data/prisonerContactRegistryApiTypes'
 import PrisonerContactRegistryApiClient from '../data/prisonerContactRegistryApiClient'
 import { isAdult } from '../utils/utils'
 

@@ -10,11 +10,11 @@ import {
   PrisonerAlertItem,
   UpcomingVisitItem,
   PastVisitItem,
-  Contact,
 } from '../@types/bapv'
 import { prisonerDatePretty, properCaseFullName, prisonerDateTimePretty } from '../utils/utils'
 import { Alert, OffenderRestriction } from '../data/prisonApiTypes'
 import { Visit } from '../data/visitSchedulerApiTypes'
+import { Contact } from '../data/prisonerContactRegistryApiTypes'
 
 type PrisonApiClientBuilder = (token: string) => PrisonApiClient
 type VisitSchedulerApiClientBuilder = (token: string) => VisitSchedulerApiClient

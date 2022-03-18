@@ -2,12 +2,13 @@ import type { Express } from 'express'
 import request from 'supertest'
 import { SessionData } from 'express-session'
 import * as cheerio from 'cheerio'
-import { Restriction, VisitorListItem, VisitSessionData, VisitSlotList } from '../@types/bapv'
+import { VisitorListItem, VisitSessionData, VisitSlotList } from '../@types/bapv'
 import { OffenderRestriction } from '../data/prisonApiTypes'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
 import PrisonerProfileService from '../services/prisonerProfileService'
 import VisitSessionsService from '../services/visitSessionsService'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
+import { Restriction } from '../data/prisonerContactRegistryApiTypes'
 
 jest.mock('../services/prisonerProfileService')
 jest.mock('../services/prisonerVisitorsService')
