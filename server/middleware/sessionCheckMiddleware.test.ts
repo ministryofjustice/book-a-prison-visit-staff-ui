@@ -24,6 +24,7 @@ const visitorsData = [
         comment: 'abc',
       },
     ],
+    banned: false,
   },
 ]
 const visit = {

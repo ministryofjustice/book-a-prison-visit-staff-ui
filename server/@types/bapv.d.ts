@@ -65,6 +65,7 @@ export type VisitorListItem = {
   address?: string
   restrictions: Restriction[]
   selected?: boolean
+  banned: boolean
 }
 
 export type PrisonerProfile = {

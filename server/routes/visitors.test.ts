@@ -80,6 +80,7 @@ describe('GET /visit/select-visitors', () => {
             startDate: '2022-01-04',
           },
         ] as Restriction[],
+        banned: true,
       },
       {
         personId: 4322,
@@ -89,6 +90,7 @@ describe('GET /visit/select-visitors', () => {
         relationshipDescription: 'Brother',
         address: '1st listed address',
         restrictions: [],
+        banned: false,
       },
       {
         personId: 4324,
@@ -98,6 +100,7 @@ describe('GET /visit/select-visitors', () => {
         relationshipDescription: 'Niece',
         address: 'Not entered',
         restrictions: [],
+        banned: false,
       },
     ]
 
@@ -247,6 +250,7 @@ describe('GET /visit/select-visitors', () => {
         relationshipDescription: 'Brother',
         restrictions: [],
         selected: true,
+        banned: false,
       },
     ]
 
@@ -277,6 +281,7 @@ describe('GET /visit/select-visitors', () => {
         relationshipDescription: 'Brother',
         restrictions: [],
         selected: true,
+        banned: false,
       },
       {
         address: 'Not entered',
@@ -287,6 +292,7 @@ describe('GET /visit/select-visitors', () => {
         relationshipDescription: 'Niece',
         restrictions: [],
         selected: true,
+        banned: false,
       },
     ]
 
@@ -357,7 +363,16 @@ describe('POST /visit/select-visitors', () => {
           relationshipDescription: 'Sister',
           address:
             'Premises,<br>Flat 23B,<br>123 The Street,<br>Springfield,<br>Coventry,<br>West Midlands,<br>C1 2AB,<br>England',
-          restrictions: [],
+          restrictions: [
+            {
+              restrictionType: 'BAN',
+              restrictionTypeDescription: 'Banned',
+              startDate: '2022-01-01',
+              expiryDate: '2022-07-31',
+              comment: 'Ban details',
+            },
+          ],
+          banned: true,
         },
         {
           personId: 4322,
@@ -367,6 +382,7 @@ describe('POST /visit/select-visitors', () => {
           relationshipDescription: 'Brother',
           address: '1st listed address',
           restrictions: [],
+          banned: false,
         },
         {
           personId: 4323,
@@ -376,6 +392,7 @@ describe('POST /visit/select-visitors', () => {
           relationshipDescription: 'Father',
           address: '1st listed address',
           restrictions: [],
+          banned: false,
         },
         {
           personId: 4324,
@@ -385,6 +402,7 @@ describe('POST /visit/select-visitors', () => {
           relationshipDescription: 'Niece',
           address: 'Not entered',
           restrictions: [],
+          banned: false,
         },
         {
           personId: 4325,
@@ -394,6 +412,7 @@ describe('POST /visit/select-visitors', () => {
           relationshipDescription: 'Nephew',
           address: 'Not entered',
           restrictions: [],
+          banned: false,
         },
       ],
     }
@@ -425,6 +444,7 @@ describe('POST /visit/select-visitors', () => {
         relationshipDescription: 'Brother',
         restrictions: [],
         selected: true,
+        banned: false,
       },
     ] as VisitorListItem[]
 
@@ -449,6 +469,7 @@ describe('POST /visit/select-visitors', () => {
       relationshipDescription: 'Brother',
       restrictions: [],
       selected: true,
+      banned: false,
     } as VisitorListItem
 
     const returnChild = {
@@ -460,6 +481,7 @@ describe('POST /visit/select-visitors', () => {
       relationshipDescription: 'Niece',
       restrictions: [],
       selected: true,
+      banned: false,
     } as VisitorListItem
 
     return request(sessionApp)
@@ -484,6 +506,7 @@ describe('POST /visit/select-visitors', () => {
         relationshipDescription: 'Brother',
         restrictions: [],
         selected: true,
+        banned: false,
       },
     ]
 
@@ -497,6 +520,7 @@ describe('POST /visit/select-visitors', () => {
         relationshipDescription: 'Brother',
         restrictions: [],
         selected: true,
+        banned: false,
       },
     ]
 
@@ -509,6 +533,7 @@ describe('POST /visit/select-visitors', () => {
       address: '1st listed address',
       restrictions: [],
       selected: true,
+      banned: false,
     } as VisitorListItem
 
     return request(sessionApp)
@@ -688,6 +713,7 @@ describe('/visit/select-date-and-time', () => {
           address: '1st listed address',
           restrictions: [],
           selected: true,
+          banned: false,
         },
       ],
     }
@@ -933,6 +959,7 @@ describe('GET /visit/additional-support', () => {
           name: 'name last',
           relationshipDescription: 'relate',
           restrictions: [],
+          banned: false,
         },
       ],
     }
@@ -1107,6 +1134,7 @@ describe('POST /visit/additional-support', () => {
               comment: 'comment',
             },
           ],
+          banned: false,
         },
       ],
     }
@@ -1271,6 +1299,7 @@ describe('/visit/select-main-contact', () => {
         name: 'name last',
         relationshipDescription: 'relate',
         restrictions: [],
+        banned: false,
       },
     ],
   }
@@ -1282,12 +1311,14 @@ describe('/visit/select-main-contact', () => {
         name: 'first last',
         relationshipDescription: 'cousin',
         restrictions: [],
+        banned: false,
       },
       {
         personId: 123,
         name: 'name last',
         relationshipDescription: 'relate',
         restrictions: [],
+        banned: false,
       },
     ],
   }
@@ -1313,6 +1344,7 @@ describe('/visit/select-main-contact', () => {
           name: 'name last',
           relationshipDescription: 'relate',
           restrictions: [],
+          banned: false,
         },
       ],
       additionalSupport: {
@@ -1352,6 +1384,7 @@ describe('/visit/select-main-contact', () => {
           name: 'name last',
           relationshipDescription: 'relate',
           restrictions: [],
+          banned: false,
         },
         phoneNumber: '0114 1234 567',
       }
@@ -1456,6 +1489,7 @@ describe('/visit/select-main-contact', () => {
             name: 'name last',
             relationshipDescription: 'relate',
             restrictions: [],
+            banned: false,
           })
           expect(visitSessionData.mainContact.phoneNumber).toBe('0114 1234 567')
           expect(visitSessionData.mainContact.contactName).toBe(undefined)
@@ -1484,6 +1518,7 @@ describe('/visit/select-main-contact', () => {
           name: 'name last',
           relationshipDescription: 'relate',
           restrictions: [],
+          banned: false,
         },
         phoneNumber: '0114 1234 567',
         contactName: undefined,
@@ -1594,6 +1629,7 @@ describe('GET /visit/check-your-booking', () => {
             },
           ],
           address: '123 Street,<br>Test Town,<br>S1 2QZ',
+          banned: false,
         },
       ],
       additionalSupport: {
@@ -1663,6 +1699,7 @@ describe('GET /visit/check-your-booking', () => {
               },
             ],
             address: '123 Street,<br>Test Town,<br>S1 2QZ',
+            banned: false,
           },
         ],
         additionalSupport: {
@@ -1735,6 +1772,7 @@ describe('GET /visit/confirmation', () => {
             },
           ],
           address: '123 Street,<br>Test Town,<br>S1 2QZ',
+          banned: false,
         },
       ],
       additionalSupport: {
@@ -1803,6 +1841,7 @@ describe('GET /visit/confirmation', () => {
               },
             ],
             address: '123 Street,<br>Test Town,<br>S1 2QZ',
+            banned: false,
           },
         ],
         additionalSupport: {

@@ -195,6 +195,7 @@ describe('visitSchedulerApiClient', () => {
                 comment: 'comments',
               },
             ],
+            banned: false,
           },
         ],
       }
@@ -292,6 +293,7 @@ describe('visitSchedulerApiClient', () => {
                 comment: 'comments',
               },
             ],
+            banned: false,
           },
         ],
         visitId: 'v9-d7-ed-7u',
@@ -379,6 +381,7 @@ describe('visitSchedulerApiClient', () => {
                 comment: 'comments',
               },
             ],
+            banned: false,
           },
         ],
         visitId: 'v9-d7-ed-7u',

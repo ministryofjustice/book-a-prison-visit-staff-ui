@@ -1,6 +1,7 @@
 import PrisonerVisitorsService from './prisonerVisitorsService'
 import PrisonerContactRegistryApiClient from '../data/prisonerContactRegistryApiClient'
 import { Contact } from '../data/prisonerContactRegistryApiTypes'
+import { VisitorListItem } from '../@types/bapv'
 
 jest.mock('../data/prisonerContactRegistryApiClient')
 
@@ -162,6 +163,7 @@ describe('Prisoner visitor service', () => {
             },
           ],
           selected: false,
+          banned: true,
         },
         {
           personId: 4322,
@@ -172,6 +174,7 @@ describe('Prisoner visitor service', () => {
           address: '1st listed address',
           restrictions: [],
           selected: false,
+          banned: false,
         },
         {
           personId: 4324,
@@ -182,8 +185,9 @@ describe('Prisoner visitor service', () => {
           address: 'Not entered',
           restrictions: [],
           selected: false,
+          banned: false,
         },
-      ])
+      ] as VisitorListItem[])
     })
 
     it('should handle prisoner having no contacts', async () => {
