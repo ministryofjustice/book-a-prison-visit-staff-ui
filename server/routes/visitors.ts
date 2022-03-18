@@ -57,6 +57,13 @@ export default function routes(
         throw new Error('No visitors selected')
       }
 
+      const selectedAndBanned = req.session.visitorList.visitors.filter((visitor: VisitorListItem) => {
+        return selected.includes(visitor.personId.toString()) && visitor.banned
+      })
+      if (selectedAndBanned.length) {
+        throw new Error('Invalid selection')
+      }
+
       if (selected.length > 3) {
         throw new Error('Select no more than 3 visitors with a maximum of 2 adults')
       }
