@@ -1,4 +1,5 @@
-import { Address, Contact, Restriction, SystemToken, VisitorListItem } from '../@types/bapv'
+import { SystemToken, VisitorListItem } from '../@types/bapv'
+import { Address, Contact, Restriction } from '../data/prisonerContactRegistryApiTypes'
 import PrisonerContactRegistryApiClient from '../data/prisonerContactRegistryApiClient'
 import { isAdult } from '../utils/utils'
 
@@ -30,6 +31,7 @@ export default class PrisonerVisitorsService {
         address: this.getAddressToDisplay(contact.addresses),
         restrictions: this.getRestrictionsToDisplay(contact.restrictions),
         selected: false,
+        banned: this.isBanned(contact.restrictions),
       }
       visitorList.push(visitor)
     })
@@ -64,5 +66,9 @@ export default class PrisonerVisitorsService {
 
   private getRestrictionsToDisplay(restrictions: Restriction[]): Restriction[] {
     return restrictions.filter(restriction => this.visitorRestrictionsToShow.includes(restriction.restrictionType))
+  }
+
+  private isBanned(restrictions: Restriction[]): boolean {
+    return !!restrictions.find(restriction => restriction.restrictionType === 'BAN')
   }
 }

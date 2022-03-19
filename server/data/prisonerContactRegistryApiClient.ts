@@ -1,6 +1,6 @@
 import { URLSearchParams } from 'url'
 import RestClient from './restClient'
-import { Contact } from '../@types/bapv'
+import { Contact } from './prisonerContactRegistryApiTypes'
 import config from '../config'
 
 export const prisonerContactRegistryApiClientBuilder = (token: string): PrisonerContactRegistryApiClient => {

@@ -398,6 +398,7 @@ describe('Visit sessions service', () => {
                 comment: 'comments',
               },
             ],
+            banned: false,
           },
         ],
       }
@@ -471,6 +472,7 @@ describe('Visit sessions service', () => {
                 comment: 'comments',
               },
             ],
+            banned: false,
           },
         ],
         additionalSupport: {

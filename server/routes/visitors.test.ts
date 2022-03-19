@@ -2,12 +2,13 @@ import type { Express } from 'express'
 import request from 'supertest'
 import { SessionData } from 'express-session'
 import * as cheerio from 'cheerio'
-import { Restriction, VisitorListItem, VisitSessionData, VisitSlotList } from '../@types/bapv'
+import { VisitorListItem, VisitSessionData, VisitSlotList } from '../@types/bapv'
 import { OffenderRestriction } from '../data/prisonApiTypes'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
 import PrisonerProfileService from '../services/prisonerProfileService'
 import VisitSessionsService from '../services/visitSessionsService'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
+import { Restriction } from '../data/prisonerContactRegistryApiTypes'
 
 jest.mock('../services/prisonerProfileService')
 jest.mock('../services/prisonerVisitorsService')
@@ -79,6 +80,7 @@ describe('GET /visit/select-visitors', () => {
             startDate: '2022-01-04',
           },
         ] as Restriction[],
+        banned: true,
       },
       {
         personId: 4322,
@@ -88,6 +90,7 @@ describe('GET /visit/select-visitors', () => {
         relationshipDescription: 'Brother',
         address: '1st listed address',
         restrictions: [],
+        banned: false,
       },
       {
         personId: 4324,
@@ -97,6 +100,7 @@ describe('GET /visit/select-visitors', () => {
         relationshipDescription: 'Niece',
         address: 'Not entered',
         restrictions: [],
+        banned: false,
       },
     ]
 
@@ -211,6 +215,7 @@ describe('GET /visit/select-visitors', () => {
         expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
 
         expect($('#visitor-4321').length).toBe(1)
+        expect($('#visitor-4321').prop('disabled')).toBe(true)
         expect($('[data-test="visitor-name-4321"]').text()).toBe('Jeanette Smith')
         expect($('[data-test="visitor-dob-4321"]').text()).toMatch(/28 July 1986.*Adult/)
         expect($('[data-test="visitor-relation-4321"]').text()).toContain('Sister')
@@ -222,9 +227,11 @@ describe('GET /visit/select-visitors', () => {
         expect(visitorRestrictions.eq(2).text()).toContain('Closed End date not entered')
         expect(visitorRestrictions.eq(3).text()).toContain('Non-Contact Visit End date not entered')
 
+        expect($('#visitor-4322').prop('disabled')).toBe(false)
         expect($('[data-test="visitor-name-4322"]').text()).toBe('Bob Smith')
         expect($('[data-test="visitor-restrictions-4322"]').text()).toBe('None')
 
+        expect($('#visitor-4324').prop('disabled')).toBe(false)
         expect($('[data-test="visitor-name-4324"]').text()).toBe('Anne Smith')
         expect($('[data-test="visitor-dob-4324"]').text()).toMatch(/2 March 2018.*Child/)
 
@@ -246,6 +253,7 @@ describe('GET /visit/select-visitors', () => {
         relationshipDescription: 'Brother',
         restrictions: [],
         selected: true,
+        banned: false,
       },
     ]
 
@@ -276,6 +284,7 @@ describe('GET /visit/select-visitors', () => {
         relationshipDescription: 'Brother',
         restrictions: [],
         selected: true,
+        banned: false,
       },
       {
         address: 'Not entered',
@@ -286,6 +295,7 @@ describe('GET /visit/select-visitors', () => {
         relationshipDescription: 'Niece',
         restrictions: [],
         selected: true,
+        banned: false,
       },
     ]
 
@@ -356,7 +366,16 @@ describe('POST /visit/select-visitors', () => {
           relationshipDescription: 'Sister',
           address:
             'Premises,<br>Flat 23B,<br>123 The Street,<br>Springfield,<br>Coventry,<br>West Midlands,<br>C1 2AB,<br>England',
-          restrictions: [],
+          restrictions: [
+            {
+              restrictionType: 'BAN',
+              restrictionTypeDescription: 'Banned',
+              startDate: '2022-01-01',
+              expiryDate: '2022-07-31',
+              comment: 'Ban details',
+            },
+          ],
+          banned: true,
         },
         {
           personId: 4322,
@@ -366,6 +385,7 @@ describe('POST /visit/select-visitors', () => {
           relationshipDescription: 'Brother',
           address: '1st listed address',
           restrictions: [],
+          banned: false,
         },
         {
           personId: 4323,
@@ -375,6 +395,7 @@ describe('POST /visit/select-visitors', () => {
           relationshipDescription: 'Father',
           address: '1st listed address',
           restrictions: [],
+          banned: false,
         },
         {
           personId: 4324,
@@ -384,6 +405,7 @@ describe('POST /visit/select-visitors', () => {
           relationshipDescription: 'Niece',
           address: 'Not entered',
           restrictions: [],
+          banned: false,
         },
         {
           personId: 4325,
@@ -393,6 +415,17 @@ describe('POST /visit/select-visitors', () => {
           relationshipDescription: 'Nephew',
           address: 'Not entered',
           restrictions: [],
+          banned: false,
+        },
+        {
+          personId: 4326,
+          name: 'John Jones',
+          dateOfBirth: '1978-05-25',
+          adult: true,
+          relationshipDescription: 'Friend',
+          address: 'Not entered',
+          restrictions: [],
+          banned: false,
         },
       ],
     }
@@ -424,6 +457,7 @@ describe('POST /visit/select-visitors', () => {
         relationshipDescription: 'Brother',
         restrictions: [],
         selected: true,
+        banned: false,
       },
     ] as VisitorListItem[]
 
@@ -448,6 +482,7 @@ describe('POST /visit/select-visitors', () => {
       relationshipDescription: 'Brother',
       restrictions: [],
       selected: true,
+      banned: false,
     } as VisitorListItem
 
     const returnChild = {
@@ -459,6 +494,7 @@ describe('POST /visit/select-visitors', () => {
       relationshipDescription: 'Niece',
       restrictions: [],
       selected: true,
+      banned: false,
     } as VisitorListItem
 
     return request(sessionApp)
@@ -483,6 +519,7 @@ describe('POST /visit/select-visitors', () => {
         relationshipDescription: 'Brother',
         restrictions: [],
         selected: true,
+        banned: false,
       },
     ]
 
@@ -496,6 +533,7 @@ describe('POST /visit/select-visitors', () => {
         relationshipDescription: 'Brother',
         restrictions: [],
         selected: true,
+        banned: false,
       },
     ]
 
@@ -508,6 +546,7 @@ describe('POST /visit/select-visitors', () => {
       address: '1st listed address',
       restrictions: [],
       selected: true,
+      banned: false,
     } as VisitorListItem
 
     return request(sessionApp)
@@ -532,6 +571,20 @@ describe('POST /visit/select-visitors', () => {
           { location: 'body', msg: 'Add an adult to the visit', param: 'visitors', value: '1234' },
         ])
         expect(flashProvider).toHaveBeenCalledWith('formValues', { visitors: '1234' })
+      })
+  })
+
+  it('should should set validation errors in flash and redirect if banned is visitor selected', () => {
+    return request(sessionApp)
+      .post('/visit/select-visitors')
+      .send('visitors=4321')
+      .expect(302)
+      .expect('location', '/visit/select-visitors')
+      .expect(() => {
+        expect(flashProvider).toHaveBeenCalledWith('errors', [
+          { location: 'body', msg: 'Invalid selection', param: 'visitors', value: '4321' },
+        ])
+        expect(flashProvider).toHaveBeenCalledWith('formValues', { visitors: '4321' })
       })
   })
 
@@ -565,7 +618,7 @@ describe('POST /visit/select-visitors', () => {
   it('should set validation errors in flash and redirect if more than 2 adults are selected', () => {
     return request(sessionApp)
       .post('/visit/select-visitors')
-      .send('visitors=4321&visitors=4322&visitors=4323')
+      .send('visitors=4322&visitors=4323&visitors=4326')
       .expect(302)
       .expect('location', '/visit/select-visitors')
       .expect(() => {
@@ -574,17 +627,17 @@ describe('POST /visit/select-visitors', () => {
             location: 'body',
             msg: 'Select no more than 2 adults',
             param: 'visitors',
-            value: ['4321', '4322', '4323'],
+            value: ['4322', '4323', '4326'],
           },
         ])
-        expect(flashProvider).toHaveBeenCalledWith('formValues', { visitors: ['4321', '4322', '4323'] })
+        expect(flashProvider).toHaveBeenCalledWith('formValues', { visitors: ['4322', '4323', '4326'] })
       })
   })
 
   it('should set validation errors in flash and redirect if more than 3 visitors are selected', () => {
     return request(sessionApp)
       .post('/visit/select-visitors')
-      .send('visitors=4321&visitors=4322&visitors=4323&visitors=4324')
+      .send('visitors=4322&visitors=4323&visitors=4324&visitors=4325')
       .expect(302)
       .expect('location', '/visit/select-visitors')
       .expect(() => {
@@ -593,10 +646,10 @@ describe('POST /visit/select-visitors', () => {
             location: 'body',
             msg: 'Select no more than 3 visitors with a maximum of 2 adults',
             param: 'visitors',
-            value: ['4321', '4322', '4323', '4324'],
+            value: ['4322', '4323', '4324', '4325'],
           },
         ])
-        expect(flashProvider).toHaveBeenCalledWith('formValues', { visitors: ['4321', '4322', '4323', '4324'] })
+        expect(flashProvider).toHaveBeenCalledWith('formValues', { visitors: ['4322', '4323', '4324', '4325'] })
       })
   })
 })
@@ -687,6 +740,7 @@ describe('/visit/select-date-and-time', () => {
           address: '1st listed address',
           restrictions: [],
           selected: true,
+          banned: false,
         },
       ],
     }
@@ -932,6 +986,7 @@ describe('GET /visit/additional-support', () => {
           name: 'name last',
           relationshipDescription: 'relate',
           restrictions: [],
+          banned: false,
         },
       ],
     }
@@ -1106,6 +1161,7 @@ describe('POST /visit/additional-support', () => {
               comment: 'comment',
             },
           ],
+          banned: false,
         },
       ],
     }
@@ -1270,6 +1326,7 @@ describe('/visit/select-main-contact', () => {
         name: 'name last',
         relationshipDescription: 'relate',
         restrictions: [],
+        banned: false,
       },
     ],
   }
@@ -1281,12 +1338,14 @@ describe('/visit/select-main-contact', () => {
         name: 'first last',
         relationshipDescription: 'cousin',
         restrictions: [],
+        banned: false,
       },
       {
         personId: 123,
         name: 'name last',
         relationshipDescription: 'relate',
         restrictions: [],
+        banned: false,
       },
     ],
   }
@@ -1312,6 +1371,7 @@ describe('/visit/select-main-contact', () => {
           name: 'name last',
           relationshipDescription: 'relate',
           restrictions: [],
+          banned: false,
         },
       ],
       additionalSupport: {
@@ -1351,6 +1411,7 @@ describe('/visit/select-main-contact', () => {
           name: 'name last',
           relationshipDescription: 'relate',
           restrictions: [],
+          banned: false,
         },
         phoneNumber: '0114 1234 567',
       }
@@ -1455,6 +1516,7 @@ describe('/visit/select-main-contact', () => {
             name: 'name last',
             relationshipDescription: 'relate',
             restrictions: [],
+            banned: false,
           })
           expect(visitSessionData.mainContact.phoneNumber).toBe('0114 1234 567')
           expect(visitSessionData.mainContact.contactName).toBe(undefined)
@@ -1483,6 +1545,7 @@ describe('/visit/select-main-contact', () => {
           name: 'name last',
           relationshipDescription: 'relate',
           restrictions: [],
+          banned: false,
         },
         phoneNumber: '0114 1234 567',
         contactName: undefined,
@@ -1593,6 +1656,7 @@ describe('GET /visit/check-your-booking', () => {
             },
           ],
           address: '123 Street,<br>Test Town,<br>S1 2QZ',
+          banned: false,
         },
       ],
       additionalSupport: {
@@ -1662,6 +1726,7 @@ describe('GET /visit/check-your-booking', () => {
               },
             ],
             address: '123 Street,<br>Test Town,<br>S1 2QZ',
+            banned: false,
           },
         ],
         additionalSupport: {
@@ -1734,6 +1799,7 @@ describe('GET /visit/confirmation', () => {
             },
           ],
           address: '123 Street,<br>Test Town,<br>S1 2QZ',
+          banned: false,
         },
       ],
       additionalSupport: {
@@ -1802,6 +1868,7 @@ describe('GET /visit/confirmation', () => {
               },
             ],
             address: '123 Street,<br>Test Town,<br>S1 2QZ',
+            banned: false,
           },
         ],
         additionalSupport: {
