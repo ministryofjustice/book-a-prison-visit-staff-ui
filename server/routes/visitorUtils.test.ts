@@ -6,6 +6,10 @@ const slotsList: VisitSlotList = {
   'February 2022': [
     {
       date: 'Monday 14 February',
+      prisonerEvents: {
+        morning: [],
+        afternoon: [],
+      },
       slots: {
         morning: [
           {
@@ -36,6 +40,10 @@ const slotsList: VisitSlotList = {
     },
     {
       date: 'Tuesday 15 February',
+      prisonerEvents: {
+        morning: [],
+        afternoon: [],
+      },
       slots: {
         morning: [],
         afternoon: [
@@ -53,6 +61,10 @@ const slotsList: VisitSlotList = {
   'March 2022': [
     {
       date: 'Tuesday 1 March',
+      prisonerEvents: {
+        morning: [],
+        afternoon: [],
+      },
       slots: {
         morning: [
           {

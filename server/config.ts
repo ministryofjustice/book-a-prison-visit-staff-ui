@@ -115,6 +115,14 @@ export default {
       },
       agent: new AgentConfig(Number(get('PRISONER_CONTACT_REGISTRY_API_TIMEOUT_RESPONSE', 10000))),
     },
+    whereabouts: {
+      url: get('WHEREABOUTS_API_URL', 'http://localhost:8080', requiredInProduction),
+      timeout: {
+        response: Number(get('WHEREABOUTS_API_TIMEOUT_RESPONSE', 10000)),
+        deadline: Number(get('WHEREABOUTS_API_TIMEOUT_DEADLINE', 10000)),
+      },
+      agent: new AgentConfig(Number(get('WHEREABOUTS_API_TIMEOUT_RESPONSE', 10000))),
+    },
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
 }

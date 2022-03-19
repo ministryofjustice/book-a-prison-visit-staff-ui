@@ -96,11 +96,21 @@ export type VisitSlot = {
   visitRoomName: string
 }
 
+export type PrisonerEvent = {
+  startTimestamp: string
+  endTimestamp: string
+  description: string
+}
+
 export type VisitSlotsForDay = {
   date: string
   slots: {
     morning: VisitSlot[]
     afternoon: VisitSlot[]
+  }
+  prisonerEvents: {
+    morning: PrisonerEvent[]
+    afternoon: PrisonerEvent[]
   }
 }
 

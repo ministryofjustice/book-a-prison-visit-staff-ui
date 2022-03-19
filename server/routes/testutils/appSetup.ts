@@ -13,6 +13,7 @@ import { prisonerSearchClientBuilder } from '../../data/prisonerSearchClient'
 import PrisonerSearchService from '../../services/prisonerSearchService'
 import { prisonApiClientBuilder } from '../../data/prisonApiClient'
 import { visitSchedulerApiClientBuilder } from '../../data/visitSchedulerApiClient'
+import { whereaboutsApiClientBuilder } from '../../data/whereaboutsApiClient'
 import { prisonerContactRegistryApiClientBuilder } from '../../data/prisonerContactRegistryApiClient'
 import PrisonerProfileService from '../../services/prisonerProfileService'
 import PrisonerVisitorsService from '../../services/prisonerVisitorsService'
@@ -110,7 +111,8 @@ function appSetup(
     prisonerVisitorsServiceOverride ||
     new PrisonerVisitorsService(prisonerContactRegistryApiClientBuilder, systemTokenTest)
   const visitSessionsService =
-    visitSessionsServiceOverride || new VisitSessionsService(visitSchedulerApiClientBuilder, systemTokenTest)
+    visitSessionsServiceOverride ||
+    new VisitSessionsService(visitSchedulerApiClientBuilder, whereaboutsApiClientBuilder, systemTokenTest)
   app.use(
     '/visit/',
     visitorsRoutes(

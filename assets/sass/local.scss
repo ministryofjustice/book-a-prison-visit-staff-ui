@@ -42,3 +42,13 @@
   @include govuk-font($size: 19, $weight: 'normal');
   text-align: right;
 }
+
+.bapv-prisoner-event {
+  padding: govuk-spacing(2);
+  background-color: rgba(86, 148, 202, 0.25);
+  @include govuk-font($size: 16, $weight: "normal");
+}
+
+.bapv-prisoner-event--top-margin {
+  margin-top: 45px;
+}

@@ -1,14 +1,18 @@
 import VisitSessionsService from './visitSessionsService'
 import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
+import WhereaboutsApiClient from '../data/whereaboutsApiClient'
 import { VisitSession, Visit } from '../data/visitSchedulerApiTypes'
 import { VisitSlotList, VisitSessionData } from '../@types/bapv'
 
 jest.mock('../data/visitSchedulerApiClient')
+jest.mock('../data/whereaboutsApiClient')
 
 const visitSchedulerApiClient = new VisitSchedulerApiClient(null) as jest.Mocked<VisitSchedulerApiClient>
+const whereaboutsApiClient = new WhereaboutsApiClient(null) as jest.Mocked<WhereaboutsApiClient>
 
 describe('Visit sessions service', () => {
   let visitSchedulerApiClientBuilder
+  let whereaboutsApiClientBuilder
   let visitSessionsService: VisitSessionsService
   let systemToken
 
@@ -16,7 +20,12 @@ describe('Visit sessions service', () => {
     beforeEach(() => {
       systemToken = async (user: string): Promise<string> => `${user}-token-1`
       visitSchedulerApiClientBuilder = jest.fn().mockReturnValue(visitSchedulerApiClient)
-      visitSessionsService = new VisitSessionsService(visitSchedulerApiClientBuilder, systemToken)
+      whereaboutsApiClientBuilder = jest.fn().mockReturnValue(whereaboutsApiClient)
+      visitSessionsService = new VisitSessionsService(
+        visitSchedulerApiClientBuilder,
+        whereaboutsApiClientBuilder,
+        systemToken
+      )
     })
 
     afterEach(() => {
@@ -25,7 +34,7 @@ describe('Visit sessions service', () => {
 
     it('Should return empty object if no visit sessions', async () => {
       visitSchedulerApiClient.getVisitSessions.mockResolvedValue([])
-      const results = await visitSessionsService.getVisitSessions({ username: 'user' })
+      const results = await visitSessionsService.getVisitSessions({ username: 'user', offenderNo: 'A1234BC' })
 
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
       expect(results).toEqual({})
@@ -49,13 +58,17 @@ describe('Visit sessions service', () => {
       ]
 
       visitSchedulerApiClient.getVisitSessions.mockResolvedValue(sessions)
-      const results = await visitSessionsService.getVisitSessions({ username: 'user' })
+      const results = await visitSessionsService.getVisitSessions({ username: 'user', offenderNo: 'A1234BC' })
 
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
       expect(results).toEqual(<VisitSlotList>{
         'February 2022': [
           {
             date: 'Monday 14 February',
+            prisonerEvents: {
+              morning: [],
+              afternoon: [],
+            },
             slots: {
               morning: [
                 {
@@ -143,13 +156,17 @@ describe('Visit sessions service', () => {
       ]
 
       visitSchedulerApiClient.getVisitSessions.mockResolvedValue(sessions)
-      const results = await visitSessionsService.getVisitSessions({ username: 'user' })
+      const results = await visitSessionsService.getVisitSessions({ username: 'user', offenderNo: 'A1234BC' })
 
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
       expect(results).toEqual(<VisitSlotList>{
         'February 2022': [
           {
             date: 'Monday 14 February',
+            prisonerEvents: {
+              morning: [],
+              afternoon: [],
+            },
             slots: {
               morning: [
                 {
@@ -180,6 +197,10 @@ describe('Visit sessions service', () => {
           },
           {
             date: 'Tuesday 15 February',
+            prisonerEvents: {
+              morning: [],
+              afternoon: [],
+            },
             slots: {
               morning: [],
               afternoon: [
@@ -197,6 +218,10 @@ describe('Visit sessions service', () => {
         'March 2022': [
           {
             date: 'Tuesday 1 March',
+            prisonerEvents: {
+              morning: [],
+              afternoon: [],
+            },
             slots: {
               morning: [
                 {
@@ -232,13 +257,21 @@ describe('Visit sessions service', () => {
       ]
 
       visitSchedulerApiClient.getVisitSessions.mockResolvedValue(sessions)
-      const results = await visitSessionsService.getVisitSessions({ username: 'user', timeOfDay: 'morning' })
+      const results = await visitSessionsService.getVisitSessions({
+        username: 'user',
+        offenderNo: 'A1234BC',
+        timeOfDay: 'morning',
+      })
 
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
       expect(results).toEqual(<VisitSlotList>{
         'February 2022': [
           {
             date: 'Monday 14 February',
+            prisonerEvents: {
+              morning: [],
+              afternoon: [],
+            },
             slots: {
               morning: [
                 {
@@ -274,13 +307,21 @@ describe('Visit sessions service', () => {
       ]
 
       visitSchedulerApiClient.getVisitSessions.mockResolvedValue(sessions)
-      const results = await visitSessionsService.getVisitSessions({ username: 'user', timeOfDay: 'afternoon' })
+      const results = await visitSessionsService.getVisitSessions({
+        username: 'user',
+        offenderNo: 'A1234BC',
+        timeOfDay: 'afternoon',
+      })
 
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
       expect(results).toEqual(<VisitSlotList>{
         'February 2022': [
           {
             date: 'Monday 14 February',
+            prisonerEvents: {
+              morning: [],
+              afternoon: [],
+            },
             slots: {
               morning: [],
               afternoon: [],
@@ -308,13 +349,21 @@ describe('Visit sessions service', () => {
       ]
 
       visitSchedulerApiClient.getVisitSessions.mockResolvedValue(sessions)
-      const results = await visitSessionsService.getVisitSessions({ username: 'user', dayOfTheWeek: '1' })
+      const results = await visitSessionsService.getVisitSessions({
+        username: 'user',
+        offenderNo: 'A1234BC',
+        dayOfTheWeek: '1',
+      })
 
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
       expect(results).toEqual(<VisitSlotList>{
         'February 2022': [
           {
             date: 'Monday 14 February',
+            prisonerEvents: {
+              morning: [],
+              afternoon: [],
+            },
             slots: {
               morning: [
                 {
@@ -350,7 +399,11 @@ describe('Visit sessions service', () => {
       ]
 
       visitSchedulerApiClient.getVisitSessions.mockResolvedValue(sessions)
-      const results = await visitSessionsService.getVisitSessions({ username: 'user', dayOfTheWeek: '2' })
+      const results = await visitSessionsService.getVisitSessions({
+        username: 'user',
+        offenderNo: 'A1234BC',
+        dayOfTheWeek: '2',
+      })
 
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
       expect(results).toEqual(<VisitSlotList>{})
@@ -361,7 +414,12 @@ describe('Visit sessions service', () => {
     beforeEach(() => {
       systemToken = async (user: string): Promise<string> => `${user}-token-1`
       visitSchedulerApiClientBuilder = jest.fn().mockReturnValue(visitSchedulerApiClient)
-      visitSessionsService = new VisitSessionsService(visitSchedulerApiClientBuilder, systemToken)
+      whereaboutsApiClientBuilder = jest.fn().mockReturnValue(whereaboutsApiClient)
+      visitSessionsService = new VisitSessionsService(
+        visitSchedulerApiClientBuilder,
+        whereaboutsApiClientBuilder,
+        systemToken
+      )
     })
 
     afterEach(() => {
@@ -435,7 +493,12 @@ describe('Visit sessions service', () => {
     beforeEach(() => {
       systemToken = async (user: string): Promise<string> => `${user}-token-1`
       visitSchedulerApiClientBuilder = jest.fn().mockReturnValue(visitSchedulerApiClient)
-      visitSessionsService = new VisitSessionsService(visitSchedulerApiClientBuilder, systemToken)
+      whereaboutsApiClientBuilder = jest.fn().mockReturnValue(whereaboutsApiClient)
+      visitSessionsService = new VisitSessionsService(
+        visitSchedulerApiClientBuilder,
+        whereaboutsApiClientBuilder,
+        systemToken
+      )
     })
 
     afterEach(() => {
