@@ -34,6 +34,7 @@ describe('Visit sessions service', () => {
 
     it('Should return empty object if no visit sessions', async () => {
       visitSchedulerApiClient.getVisitSessions.mockResolvedValue([])
+      whereaboutsApiClient.getEvents.mockResolvedValue([])
       const results = await visitSessionsService.getVisitSessions({ username: 'user', offenderNo: 'A1234BC' })
 
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
@@ -58,6 +59,7 @@ describe('Visit sessions service', () => {
       ]
 
       visitSchedulerApiClient.getVisitSessions.mockResolvedValue(sessions)
+      whereaboutsApiClient.getEvents.mockResolvedValue([])
       const results = await visitSessionsService.getVisitSessions({ username: 'user', offenderNo: 'A1234BC' })
 
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
@@ -156,6 +158,7 @@ describe('Visit sessions service', () => {
       ]
 
       visitSchedulerApiClient.getVisitSessions.mockResolvedValue(sessions)
+      whereaboutsApiClient.getEvents.mockResolvedValue([])
       const results = await visitSessionsService.getVisitSessions({ username: 'user', offenderNo: 'A1234BC' })
 
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
@@ -257,6 +260,7 @@ describe('Visit sessions service', () => {
       ]
 
       visitSchedulerApiClient.getVisitSessions.mockResolvedValue(sessions)
+      whereaboutsApiClient.getEvents.mockResolvedValue([])
       const results = await visitSessionsService.getVisitSessions({
         username: 'user',
         offenderNo: 'A1234BC',
@@ -307,6 +311,7 @@ describe('Visit sessions service', () => {
       ]
 
       visitSchedulerApiClient.getVisitSessions.mockResolvedValue(sessions)
+      whereaboutsApiClient.getEvents.mockResolvedValue([])
       const results = await visitSessionsService.getVisitSessions({
         username: 'user',
         offenderNo: 'A1234BC',
@@ -349,6 +354,7 @@ describe('Visit sessions service', () => {
       ]
 
       visitSchedulerApiClient.getVisitSessions.mockResolvedValue(sessions)
+      whereaboutsApiClient.getEvents.mockResolvedValue([])
       const results = await visitSessionsService.getVisitSessions({
         username: 'user',
         offenderNo: 'A1234BC',
@@ -399,6 +405,7 @@ describe('Visit sessions service', () => {
       ]
 
       visitSchedulerApiClient.getVisitSessions.mockResolvedValue(sessions)
+      whereaboutsApiClient.getEvents.mockResolvedValue([])
       const results = await visitSessionsService.getVisitSessions({
         username: 'user',
         offenderNo: 'A1234BC',
@@ -482,6 +489,7 @@ describe('Visit sessions service', () => {
       }
 
       visitSchedulerApiClient.createVisit.mockResolvedValue(visit)
+      whereaboutsApiClient.getEvents.mockResolvedValue([])
       const result = await visitSessionsService.createVisit({ username: 'user', visitData: visitSessionData })
 
       expect(visitSchedulerApiClient.createVisit).toHaveBeenCalledTimes(1)
@@ -575,6 +583,7 @@ describe('Visit sessions service', () => {
       }
 
       visitSchedulerApiClient.updateVisit.mockResolvedValue(visit)
+      whereaboutsApiClient.getEvents.mockResolvedValue([])
       const result = await visitSessionsService.updateVisit({ username: 'user', visitData: visitSessionData })
 
       expect(visitSchedulerApiClient.updateVisit).toHaveBeenCalledTimes(1)
