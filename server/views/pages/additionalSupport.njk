@@ -33,16 +33,16 @@
 
             {% set additionalSupport = additionalSupport or [] %}
             {% set additionalSupportCheckboxes = [] %}
-            {% for optionName, optionDetails in additionalSupportOptions %}
+            {% for option in availableSupportTypes %}
               {% set additionalSupportCheckboxes = (additionalSupportCheckboxes.push(
                 {
-                  value: optionDetails.key,
-                  text: optionDetails.label,
+                  value: option.name,
+                  text: option.description,
                   attributes: {
-                    'data-test': optionDetails.key
+                    'data-test': option.name
                   },
-                  checked: formValues.additionalSupport and optionDetails.key in formValues.additionalSupport,
-                  conditional: { html: otherSupportHtml } if optionName == "OTHER"
+                  checked: formValues.additionalSupport and option.name in formValues.additionalSupport,
+                  conditional: { html: otherSupportHtml } if option.name == "OTHER"
                 }
               ), additionalSupportCheckboxes) %}
             {% endfor %}

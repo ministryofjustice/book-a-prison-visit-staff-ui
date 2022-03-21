@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express'
 import { VisitSessionData, VisitSlot, VisitSlotList } from '../@types/bapv'
+import { SupportType, VisitorSupport } from '../data/visitSchedulerApiTypes'
 import isValidPrisonerNumber from './prisonerProfileValidation'
 
 export const getSelectedSlot = (slotsList: VisitSlotList, selectedSlot: string): VisitSlot => {
@@ -62,4 +63,15 @@ export const checkSession = ({
 
 export const getFlashFormValues = (req: Request): Record<string, string | string[]> => {
   return (req.flash('formValues')?.[0] as unknown as Record<string, string | string[]>) || {}
+}
+
+export const getSupportTypeDescriptions = (
+  availableSupportTypes: SupportType[],
+  visitorSupport: VisitorSupport[]
+): string[] => {
+  return visitorSupport.map(support => {
+    return support.supportName === 'OTHER'
+      ? support.supportDetails
+      : availableSupportTypes.find(type => type.name === support.supportName).description
+  })
 }

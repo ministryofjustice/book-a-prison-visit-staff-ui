@@ -1,4 +1,5 @@
 import { InmateDetail, VisitBalances } from '../data/prisonApiTypes'
+import { VisitorSupport } from '../data/visitSchedulerApiTypes'
 
 export type PrisonerDetailsItem = {
   classes: string
@@ -134,11 +135,7 @@ export type VisitSessionData = {
   }
   visit?: VisitSlot
   visitors?: VisitorListItem[]
-  additionalSupport?: {
-    required: boolean
-    keys?: string[]
-    other?: string
-  }
+  visitorSupport?: VisitorSupport[]
   mainContact?: {
     contact?: VisitorListItem
     phoneNumber: string

@@ -1,12 +1,12 @@
 import type { Router } from 'express'
 import { body, validationResult, query } from 'express-validator'
-import { VisitorListItem, VisitSessionData, VisitSlot } from '../@types/bapv'
+import { VisitorListItem, VisitSlot } from '../@types/bapv'
 import sessionCheckMiddleware from '../middleware/sessionCheckMiddleware'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
 import PrisonerProfileService from '../services/prisonerProfileService'
 import VisitSessionsService from '../services/visitSessionsService'
-import additionalSupportOptions from '../constants/additionalSupportOptions'
-import { getFlashFormValues, getSelectedSlot } from './visitorUtils'
+import { getFlashFormValues, getSelectedSlot, getSupportTypeDescriptions } from './visitorUtils'
+import { SupportType, VisitorSupport } from '../data/visitSchedulerApiTypes'
 
 export default function routes(
   router: Router,
@@ -207,15 +207,24 @@ export default function routes(
     const { visitSessionData } = req.session
     const formValues = getFlashFormValues(req)
 
-    if (!Object.keys(formValues).length && visitSessionData.additionalSupport) {
-      formValues.additionalSupportRequired = visitSessionData.additionalSupport.required ? 'yes' : 'no'
-      formValues.additionalSupport = visitSessionData.additionalSupport.keys
-      formValues.otherSupportDetails = visitSessionData.additionalSupport.other
+    if (!req.session.availableSupportTypes) {
+      req.session.availableSupportTypes = await visitSessionsService.getAvailableSupportOptions(
+        res.locals.user?.username
+      )
+    }
+    const { availableSupportTypes } = req.session
+
+    if (!Object.keys(formValues).length && visitSessionData.visitorSupport) {
+      formValues.additionalSupportRequired = visitSessionData.visitorSupport.length ? 'yes' : 'no'
+      formValues.additionalSupport = visitSessionData.visitorSupport.map(support => support.supportName)
+      formValues.otherSupportDetails = visitSessionData.visitorSupport.find(
+        support => support.supportName === 'OTHER'
+      )?.supportDetails
     }
 
     res.render('pages/additionalSupport', {
       errors: req.flash('errors'),
-      additionalSupportOptions: additionalSupportOptions.items,
+      availableSupportTypes,
       formValues,
     })
   })
@@ -235,7 +244,9 @@ export default function routes(
       .custom((value: string[], { req }) => {
         if (req.body.additionalSupportRequired === 'yes') {
           const validSupportRequest = value.reduce((valid, supportReq) => {
-            return valid ? additionalSupportOptions.getKeys().includes(supportReq) : false
+            return valid
+              ? req.session.availableSupportTypes.find((option: SupportType) => option.name === supportReq)
+              : false
           }, true)
           if (!value.length || !validSupportRequest) throw new Error('No request selected')
         }
@@ -245,7 +256,7 @@ export default function routes(
     body('otherSupportDetails')
       .trim()
       .custom((value: string, { req }) => {
-        if (<string[]>req.body.additionalSupport.includes('other') && (value ?? '').length === 0) {
+        if (<string[]>req.body.additionalSupport.includes('OTHER') && (value ?? '').length === 0) {
           throw new Error('Enter details of the request')
         }
 
@@ -261,14 +272,13 @@ export default function routes(
         return res.redirect(req.originalUrl)
       }
 
-      const selectedSupport: VisitSessionData['additionalSupport'] = { required: false }
-      if (req.body.additionalSupportRequired === 'yes') {
-        selectedSupport.required = true
-        selectedSupport.keys = req.body.additionalSupport
-        selectedSupport.other = req.body.additionalSupport.includes('other') ? req.body.otherSupportDetails : undefined
-      }
-
-      visitSessionData.additionalSupport = selectedSupport
+      visitSessionData.visitorSupport = req.body.additionalSupport.map((support: string): VisitorSupport => {
+        const supportItem: VisitorSupport = { supportName: support }
+        if (support === 'OTHER') {
+          supportItem.supportDetails = req.body.otherSupportDetails
+        }
+        return supportItem
+      })
 
       return res.redirect('/visit/select-main-contact')
     }
@@ -351,11 +361,10 @@ export default function routes(
     const { visitSessionData } = req.session
     const { offenderNo } = visitSessionData.prisoner
 
-    const additionalSupport = visitSessionData.additionalSupport?.keys?.map(key => {
-      return key === additionalSupportOptions.items.OTHER.key
-        ? visitSessionData.additionalSupport.other
-        : additionalSupportOptions.getValue(key)
-    })
+    const additionalSupport = getSupportTypeDescriptions(
+      req.session.availableSupportTypes,
+      visitSessionData.visitorSupport
+    )
 
     res.render('pages/checkYourBooking', {
       offenderNo,
@@ -371,11 +380,10 @@ export default function routes(
     const { visitSessionData } = req.session
     const { offenderNo } = req.session.visitSessionData.prisoner
 
-    const additionalSupport = visitSessionData.additionalSupport?.keys?.map(key => {
-      return key === additionalSupportOptions.items.OTHER.key
-        ? visitSessionData.additionalSupport.other
-        : additionalSupportOptions.getValue(key)
-    })
+    const additionalSupport = getSupportTypeDescriptions(
+      req.session.availableSupportTypes,
+      visitSessionData.visitorSupport
+    )
 
     if (!req.session.visitSessionData.visitId) {
       return res.render('pages/checkYourBooking', {
@@ -427,11 +435,10 @@ export default function routes(
     const { visitSessionData } = req.session
     const { offenderNo } = req.session.visitSessionData.prisoner
 
-    const additionalSupport = visitSessionData.additionalSupport?.keys?.map(key => {
-      return key === additionalSupportOptions.items.OTHER.key
-        ? visitSessionData.additionalSupport.other
-        : additionalSupportOptions.getValue(key)
-    })
+    const additionalSupport = getSupportTypeDescriptions(
+      req.session.availableSupportTypes,
+      visitSessionData.visitorSupport
+    )
 
     res.render('pages/confirmation', {
       visitId: visitSessionData.visitId,

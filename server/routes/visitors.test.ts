@@ -9,6 +9,7 @@ import PrisonerProfileService from '../services/prisonerProfileService'
 import VisitSessionsService from '../services/visitSessionsService'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import { Restriction } from '../data/prisonerContactRegistryApiTypes'
+import { SupportType, VisitorSupport } from '../data/visitSchedulerApiTypes'
 
 jest.mock('../services/prisonerProfileService')
 jest.mock('../services/prisonerVisitorsService')
@@ -19,6 +20,34 @@ const systemToken = async (user: string): Promise<string> => `${user}-token-1`
 
 let flashData: Record<'errors' | 'formValues', Record<string, string | string[]>[]>
 let visitSessionData: VisitSessionData
+
+const availableSupportTypes: SupportType[] = [
+  {
+    code: 1010,
+    name: 'WHEELCHAIR',
+    description: 'Wheelchair ramp',
+  },
+  {
+    code: 1020,
+    name: 'INDUCTION_LOOP',
+    description: 'Portable induction loop for people with hearing aids',
+  },
+  {
+    code: 1030,
+    name: 'BSL_INTERPRETER',
+    description: 'British Sign Language (BSL) Interpreter',
+  },
+  {
+    code: 1040,
+    name: 'MASK_EXEMPT',
+    description: 'Face covering exemption',
+  },
+  {
+    code: 1050,
+    name: 'OTHER',
+    description: 'Other',
+  },
+]
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
@@ -1003,7 +1032,10 @@ describe('GET /visit/additional-support', () => {
       ],
     }
 
-    sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, { visitSessionData } as SessionData)
+    sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, {
+      availableSupportTypes,
+      visitSessionData,
+    } as SessionData)
   })
 
   it('should render the additional support page with no options selected', () => {
@@ -1020,7 +1052,7 @@ describe('GET /visit/additional-support', () => {
   })
 
   it('should render the additional support page, pre-populated with session data (for no requests)', () => {
-    visitSessionData.additionalSupport = { required: false }
+    visitSessionData.visitorSupport = []
 
     return request(sessionApp)
       .get('/visit/additional-support')
@@ -1035,11 +1067,11 @@ describe('GET /visit/additional-support', () => {
   })
 
   it('should render the additional support page, pre-populated with session data (multiple requests)', () => {
-    visitSessionData.additionalSupport = {
-      required: true,
-      keys: ['wheelchair', 'maskExempt', 'other'],
-      other: 'custom request',
-    }
+    visitSessionData.visitorSupport = [
+      { supportName: 'WHEELCHAIR' },
+      { supportName: 'MASK_EXEMPT' },
+      { supportName: 'OTHER', supportDetails: 'custom request' },
+    ]
 
     return request(sessionApp)
       .get('/visit/additional-support')
@@ -1050,11 +1082,11 @@ describe('GET /visit/additional-support', () => {
         expect($('h1').text().trim()).toBe('Is additional support needed for any of the visitors?')
         expect($('[data-test="support-required-yes"]').prop('checked')).toBe(true)
         expect($('[data-test="support-required-no"]').prop('checked')).toBe(false)
-        expect($('[data-test="wheelchair"]').prop('checked')).toBe(true)
-        expect($('[data-test="inductionLoop"]').prop('checked')).toBe(false)
-        expect($('[data-test="bslInterpreter"]').prop('checked')).toBe(false)
-        expect($('[data-test="maskExempt"]').prop('checked')).toBe(true)
-        expect($('[data-test="other"]').prop('checked')).toBe(true)
+        expect($('[data-test="WHEELCHAIR"]').prop('checked')).toBe(true)
+        expect($('[data-test="INDUCTION_LOOP"]').prop('checked')).toBe(false)
+        expect($('[data-test="BSL_INTERPRETER"]').prop('checked')).toBe(false)
+        expect($('[data-test="MASK_EXEMPT"]').prop('checked')).toBe(true)
+        expect($('[data-test="OTHER"]').prop('checked')).toBe(true)
         expect($('#otherSupportDetails').val()).toBe('custom request')
       })
   })
@@ -1121,7 +1153,7 @@ describe('GET /visit/additional-support', () => {
       },
     ]
 
-    flashData.formValues = [{ additionalSupportRequired: 'yes', additionalSupport: ['wheelchair', 'other'] }]
+    flashData.formValues = [{ additionalSupportRequired: 'yes', additionalSupport: ['WHEELCHAIR', 'OTHER'] }]
 
     return request(sessionApp)
       .get('/visit/additional-support')
@@ -1132,8 +1164,8 @@ describe('GET /visit/additional-support', () => {
         expect($('h1').text().trim()).toBe('Is additional support needed for any of the visitors?')
         expect($('.govuk-error-summary__body').text()).toContain('Enter details of the request')
         expect($('[data-test="support-required-yes"]').prop('checked')).toBe(true)
-        expect($('[data-test="wheelchair"]').prop('checked')).toBe(true)
-        expect($('[data-test="other"]').prop('checked')).toBe(true)
+        expect($('[data-test="WHEELCHAIR"]').prop('checked')).toBe(true)
+        expect($('[data-test="OTHER"]').prop('checked')).toBe(true)
         expect($('#otherSupportDetails-error').text()).toContain('Enter details of the request')
         expect(flashProvider).toHaveBeenCalledWith('errors')
         expect(flashProvider).toHaveBeenCalledWith('formValues')
@@ -1177,7 +1209,10 @@ describe('POST /visit/additional-support', () => {
         },
       ],
     }
-    sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, { visitSessionData } as SessionData)
+    sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, {
+      availableSupportTypes,
+      visitSessionData,
+    } as SessionData)
   })
 
   it('should set validation errors in flash and redirect if additional support question not answered', () => {
@@ -1237,16 +1272,16 @@ describe('POST /visit/additional-support', () => {
       .post('/visit/additional-support')
       .send('additionalSupportRequired=yes')
       .send('additionalSupport=xyz')
-      .send('additionalSupport=wheelchair')
+      .send('additionalSupport=WHEELCHAIR')
       .expect(302)
       .expect('location', '/visit/additional-support')
       .expect(() => {
         expect(flashProvider).toHaveBeenCalledWith('errors', [
-          { location: 'body', msg: 'No request selected', param: 'additionalSupport', value: ['xyz', 'wheelchair'] },
+          { location: 'body', msg: 'No request selected', param: 'additionalSupport', value: ['xyz', 'WHEELCHAIR'] },
         ])
         expect(flashProvider).toHaveBeenCalledWith('formValues', {
           additionalSupportRequired: 'yes',
-          additionalSupport: ['xyz', 'wheelchair'],
+          additionalSupport: ['xyz', 'WHEELCHAIR'],
           otherSupportDetails: '',
         })
       })
@@ -1256,7 +1291,7 @@ describe('POST /visit/additional-support', () => {
     return request(sessionApp)
       .post('/visit/additional-support')
       .send('additionalSupportRequired=yes')
-      .send('additionalSupport=other')
+      .send('additionalSupport=OTHER')
       .expect(302)
       .expect('location', '/visit/additional-support')
       .expect(() => {
@@ -1265,16 +1300,14 @@ describe('POST /visit/additional-support', () => {
         ])
         expect(flashProvider).toHaveBeenCalledWith('formValues', {
           additionalSupportRequired: 'yes',
-          additionalSupport: ['other'],
+          additionalSupport: ['OTHER'],
           otherSupportDetails: '',
         })
       })
   })
 
   it('should set validation errors in flash and redirect, overriding values set in session', () => {
-    visitSessionData.additionalSupport = {
-      required: false,
-    }
+    visitSessionData.visitorSupport = []
 
     return request(sessionApp)
       .post('/visit/additional-support')
@@ -1300,7 +1333,7 @@ describe('POST /visit/additional-support', () => {
       .expect(302)
       .expect('location', '/visit/select-main-contact')
       .expect(() => {
-        expect(visitSessionData.additionalSupport?.required).toBe(false)
+        expect(visitSessionData.visitorSupport.length).toBe(0)
       })
   })
 
@@ -1308,24 +1341,25 @@ describe('POST /visit/additional-support', () => {
     return request(sessionApp)
       .post('/visit/additional-support')
       .send('additionalSupportRequired=yes')
-      .send('additionalSupport=wheelchair')
-      .send('additionalSupport=inductionLoop')
-      .send('additionalSupport=bslInterpreter')
-      .send('additionalSupport=maskExempt')
-      .send('additionalSupport=other')
+      .send('additionalSupport=WHEELCHAIR')
+      .send('additionalSupport=INDUCTION_LOOP')
+      .send('additionalSupport=BSL_INTERPRETER')
+      .send('additionalSupport=MASK_EXEMPT')
+      .send('additionalSupport=OTHER')
       .send('otherSupportDetails=custom-request')
       .expect(302)
       .expect('location', '/visit/select-main-contact')
       .expect(() => {
-        expect(visitSessionData.additionalSupport?.required).toBe(true)
-        expect(visitSessionData.additionalSupport?.keys).toEqual([
-          'wheelchair',
-          'inductionLoop',
-          'bslInterpreter',
-          'maskExempt',
-          'other',
+        expect(visitSessionData.visitorSupport).toEqual(<VisitorSupport[]>[
+          { supportName: 'WHEELCHAIR' },
+          { supportName: 'INDUCTION_LOOP' },
+          { supportName: 'BSL_INTERPRETER' },
+          { supportName: 'MASK_EXEMPT' },
+          {
+            supportName: 'OTHER',
+            supportDetails: 'custom-request',
+          },
         ])
-        expect(visitSessionData.additionalSupport?.other).toBe('custom-request')
       })
   })
 })
@@ -1386,9 +1420,7 @@ describe('/visit/select-main-contact', () => {
           banned: false,
         },
       ],
-      additionalSupport: {
-        required: false,
-      },
+      visitorSupport: [],
     }
 
     sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, {
@@ -1671,16 +1703,16 @@ describe('GET /visit/check-your-booking', () => {
           banned: false,
         },
       ],
-      additionalSupport: {
-        required: true,
-        keys: ['wheelchair', 'inductionLoop'],
-      },
+      visitorSupport: [{ supportName: 'WHEELCHAIR' }, { supportName: 'INDUCTION_LOOP' }],
       mainContact: {
         phoneNumber: '123',
         contactName: 'abc',
       },
     }
-    sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, { visitSessionData } as SessionData)
+    sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, {
+      availableSupportTypes,
+      visitSessionData,
+    } as SessionData)
   })
 
   it('should render all data from the session', () => {
@@ -1741,10 +1773,7 @@ describe('GET /visit/check-your-booking', () => {
             banned: false,
           },
         ],
-        additionalSupport: {
-          required: false,
-          keys: [],
-        },
+        visitorSupport: [],
         mainContact: {
           phoneNumber: '123',
           contactName: 'abc',
@@ -1814,17 +1843,17 @@ describe('GET /visit/confirmation', () => {
           banned: false,
         },
       ],
-      additionalSupport: {
-        required: true,
-        keys: ['wheelchair', 'inductionLoop'],
-      },
+      visitorSupport: [{ supportName: 'WHEELCHAIR' }, { supportName: 'INDUCTION_LOOP' }],
       mainContact: {
         phoneNumber: '123',
         contactName: 'abc',
       },
       visitId: 'k2-00-lg-du',
     }
-    sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, { visitSessionData } as SessionData)
+    sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, {
+      availableSupportTypes,
+      visitSessionData,
+    } as SessionData)
   })
 
   it('should render all data from the session', () => {
@@ -1883,17 +1912,17 @@ describe('GET /visit/confirmation', () => {
             banned: false,
           },
         ],
-        additionalSupport: {
-          required: false,
-          keys: [],
-        },
+        visitorSupport: [],
         mainContact: {
           phoneNumber: '123',
           contactName: 'abc',
         },
         visitId: 'k2-00-lg-du',
       }
-      sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, { visitSessionData } as SessionData)
+      sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, {
+        availableSupportTypes,
+        visitSessionData,
+      } as SessionData)
     })
 
     it('should render all data from the session with a message for no selected additional support options', () => {

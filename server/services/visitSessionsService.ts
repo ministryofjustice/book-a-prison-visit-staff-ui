@@ -10,7 +10,7 @@ import {
 } from '../@types/bapv'
 import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
 import WhereaboutsApiClient from '../data/whereaboutsApiClient'
-import { VisitSession, Visit } from '../data/visitSchedulerApiTypes'
+import { VisitSession, Visit, SupportType } from '../data/visitSchedulerApiTypes'
 import { ScheduledEvent } from '../data/whereaboutsApiTypes'
 
 type VisitSchedulerApiClientBuilder = (token: string) => VisitSchedulerApiClient
@@ -24,6 +24,12 @@ export default class VisitSessionsService {
     private readonly whereaboutsApiClientBuilder: WhereaboutsApiClientBuilder,
     private readonly systemToken: SystemToken
   ) {}
+
+  async getAvailableSupportOptions(username: string): Promise<SupportType[]> {
+    const token = await this.systemToken(username)
+    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
+    return visitSchedulerApiClient.getAvailableSupportOptions()
+  }
 
   async getVisitSessions({
     username,
