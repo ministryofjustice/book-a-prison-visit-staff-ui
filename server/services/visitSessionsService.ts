@@ -1,69 +1,150 @@
-import { format, parseISO, getDay } from 'date-fns'
+import { format, parseISO, getDay, isAfter, isBefore, parse } from 'date-fns'
 import logger from '../../logger'
-import { VisitSlot, VisitSlotList, VisitSlotsForDay, SystemToken, VisitSessionData } from '../@types/bapv'
+import {
+  VisitSlot,
+  VisitSlotList,
+  VisitSlotsForDay,
+  SystemToken,
+  VisitSessionData,
+  PrisonerEvent,
+} from '../@types/bapv'
 import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
+import WhereaboutsApiClient from '../data/whereaboutsApiClient'
 import { VisitSession, Visit } from '../data/visitSchedulerApiTypes'
+import { ScheduledEvent } from '../data/whereaboutsApiTypes'
 
 type VisitSchedulerApiClientBuilder = (token: string) => VisitSchedulerApiClient
+type WhereaboutsApiClientBuilder = (token: string) => WhereaboutsApiClient
 
 export default class VisitSessionsService {
+  private morningCutoff = 12
+
   constructor(
     private readonly visitSchedulerApiClientBuilder: VisitSchedulerApiClientBuilder,
+    private readonly whereaboutsApiClientBuilder: WhereaboutsApiClientBuilder,
     private readonly systemToken: SystemToken
   ) {}
 
   async getVisitSessions({
     username,
+    offenderNo,
     dayOfTheWeek = '',
     timeOfDay = '',
   }: {
     username: string
+    offenderNo: string
     dayOfTheWeek?: string
     timeOfDay?: string
   }): Promise<VisitSlotList> {
     const token = await this.systemToken(username)
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
-
+    const whereaboutsApiClient = this.whereaboutsApiClientBuilder(token)
     const visitSessions = await visitSchedulerApiClient.getVisitSessions()
 
-    return visitSessions.reduce((slotList: VisitSlotList, visitSession: VisitSession, slotIdCounter: number) => {
-      const startTimestamp = parseISO(visitSession.startTimestamp)
-      const startDayOfTheWeek = getDay(startTimestamp)
+    let earliestStartTime: Date = new Date()
+    let latestEndTime: Date = new Date()
 
-      if (dayOfTheWeek === '' || parseInt(dayOfTheWeek, 10) === startDayOfTheWeek) {
-        // Month grouping for slots, e.g. 'February 2022'
-        const slotMonth = format(startTimestamp, 'MMMM yyyy')
-        if (!slotList[slotMonth]) slotList[slotMonth] = [] // eslint-disable-line no-param-reassign
+    const availableSessions = visitSessions.reduce(
+      (slotList: VisitSlotList, visitSession: VisitSession, slotIdCounter: number) => {
+        const parsedStartTimestamp = parseISO(visitSession.startTimestamp)
+        const parsedEndTimestamp = parseISO(visitSession.endTimestamp)
+        const startDayOfTheWeek = getDay(parsedStartTimestamp)
 
-        // Slots for the day, e.g. 'Monday 14 February'
-        const slotDate = format(startTimestamp, 'EEEE d MMMM')
-        let slotsForDay: VisitSlotsForDay = slotList[slotMonth].find(slot => slot.date === slotDate)
-        if (slotsForDay === undefined) {
-          slotsForDay = { date: slotDate, slots: { morning: [], afternoon: [] } }
-          slotList[slotMonth].push(slotsForDay)
-        }
+        if (dayOfTheWeek === '' || parseInt(dayOfTheWeek, 10) === startDayOfTheWeek) {
+          // Month grouping for slots, e.g. 'February 2022'
+          const slotMonth = format(parsedStartTimestamp, 'MMMM yyyy')
+          if (!slotList[slotMonth]) slotList[slotMonth] = [] // eslint-disable-line no-param-reassign
 
-        const newSlot: VisitSlot = {
-          id: (slotIdCounter + 1).toString(),
-          startTimestamp: visitSession.startTimestamp,
-          endTimestamp: visitSession.endTimestamp,
-          // @TODO this will need fixing to handle open/closed visits
-          availableTables: visitSession.openVisitCapacity - visitSession.openVisitBookedCount,
-          visitRoomName: visitSession.visitRoomName,
-        }
-
-        // Add new Slot to morning / afternoon grouping
-        if (startTimestamp.getHours() < 12) {
-          if (timeOfDay === '' || timeOfDay === 'morning') {
-            slotsForDay.slots.morning.push(newSlot)
+          // Slots for the day, e.g. 'Monday 14 February'
+          const slotDate = format(parsedStartTimestamp, 'EEEE d MMMM')
+          let slotsForDay: VisitSlotsForDay = slotList[slotMonth].find(slot => slot.date === slotDate)
+          if (slotsForDay === undefined) {
+            slotsForDay = {
+              date: slotDate,
+              slots: { morning: [], afternoon: [] },
+              prisonerEvents: { morning: [], afternoon: [] },
+            }
+            slotList[slotMonth].push(slotsForDay)
           }
-        } else if (timeOfDay === '' || timeOfDay === 'afternoon') {
-          slotsForDay.slots.afternoon.push(newSlot)
-        }
-      }
 
-      return slotList
-    }, {})
+          const newSlot: VisitSlot = {
+            id: (slotIdCounter + 1).toString(),
+            startTimestamp: visitSession.startTimestamp,
+            endTimestamp: visitSession.endTimestamp,
+            // @TODO this will need fixing to handle open/closed visits
+            availableTables: visitSession.openVisitCapacity - visitSession.openVisitBookedCount,
+            visitRoomName: visitSession.visitRoomName,
+          }
+
+          // Maybe this needs doing below, twice since technically this may not be pushed
+          if (isAfter(parsedEndTimestamp, latestEndTime)) {
+            latestEndTime = parsedEndTimestamp
+          }
+          if (isBefore(parsedStartTimestamp, earliestStartTime)) {
+            earliestStartTime = parsedStartTimestamp
+          }
+
+          // Add new Slot to morning / afternoon grouping
+          if (parsedStartTimestamp.getHours() < this.morningCutoff) {
+            if (timeOfDay === '' || timeOfDay === 'morning') {
+              slotsForDay.slots.morning.push(newSlot)
+            }
+          } else if (timeOfDay === '' || timeOfDay === 'afternoon') {
+            slotsForDay.slots.afternoon.push(newSlot)
+          }
+        }
+
+        return slotList
+      },
+      {}
+    )
+
+    const prisonerEvents = await whereaboutsApiClient.getEvents(
+      offenderNo,
+      format(earliestStartTime, 'yyyy-MM-dd'),
+      format(latestEndTime, 'yyyy-MM-dd')
+    )
+
+    const getPrisonerEvents = (events: ScheduledEvent[], start: Date, end: Date): PrisonerEvent[] => {
+      return events
+        .filter(event => {
+          const eventStart = parseISO(event.startTime)
+
+          return isAfter(eventStart, start) && isBefore(eventStart, end)
+        })
+        .map(event => {
+          return {
+            startTimestamp: event.startTime,
+            endTimestamp: event.endTime,
+            description: event.eventSourceDesc,
+          }
+        })
+    }
+
+    Object.keys(availableSessions).forEach(month => {
+      /* eslint no-param-reassign: ["error", { "props": false }] */
+      const year = month.split(' ')[1]
+      const allVisitSlots: VisitSlotsForDay[] = []
+
+      availableSessions[month].forEach((visitSlotsforDay: VisitSlotsForDay) => {
+        if (visitSlotsforDay.slots.morning.length > 0) {
+          const timeStart = parse(`${visitSlotsforDay.date} ${year} 00:00`, 'EEEE d MMMM yyyy H:mm', new Date())
+          const timeEnd = parse(`${visitSlotsforDay.date} ${year} 12:00`, 'EEEE d MMMM yyyy H:mm', new Date())
+          visitSlotsforDay.prisonerEvents.morning = getPrisonerEvents(prisonerEvents, timeStart, timeEnd)
+        }
+        if (visitSlotsforDay.slots.afternoon.length > 0) {
+          const timeStart = parse(`${visitSlotsforDay.date} ${year} 11:59`, 'EEEE d MMMM yyyy H:mm', new Date())
+          const timeEnd = parse(`${visitSlotsforDay.date} ${year} 23:59`, 'EEEE d MMMM yyyy H:mm', new Date())
+          visitSlotsforDay.prisonerEvents.afternoon = getPrisonerEvents(prisonerEvents, timeStart, timeEnd)
+        }
+
+        allVisitSlots.push(visitSlotsforDay)
+      })
+
+      availableSessions[month] = allVisitSlots
+    })
+
+    return availableSessions
   }
 
   async createVisit({ username, visitData }: { username: string; visitData: VisitSessionData }): Promise<string> {

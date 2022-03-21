@@ -130,6 +130,7 @@ export default function routes(
       const { timeOfDay, dayOfTheWeek } = req.query
       const slotsList = await visitSessionsService.getVisitSessions({
         username: res.locals.user?.username,
+        offenderNo: visitSessionData.prisoner.offenderNo,
         timeOfDay,
         dayOfTheWeek,
       })

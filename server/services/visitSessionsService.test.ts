@@ -1,14 +1,18 @@
 import VisitSessionsService from './visitSessionsService'
 import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
+import WhereaboutsApiClient from '../data/whereaboutsApiClient'
 import { VisitSession, Visit } from '../data/visitSchedulerApiTypes'
 import { VisitSlotList, VisitSessionData } from '../@types/bapv'
 
 jest.mock('../data/visitSchedulerApiClient')
+jest.mock('../data/whereaboutsApiClient')
 
 const visitSchedulerApiClient = new VisitSchedulerApiClient(null) as jest.Mocked<VisitSchedulerApiClient>
+const whereaboutsApiClient = new WhereaboutsApiClient(null) as jest.Mocked<WhereaboutsApiClient>
 
 describe('Visit sessions service', () => {
   let visitSchedulerApiClientBuilder
+  let whereaboutsApiClientBuilder
   let visitSessionsService: VisitSessionsService
   let systemToken
 
@@ -16,7 +20,12 @@ describe('Visit sessions service', () => {
     beforeEach(() => {
       systemToken = async (user: string): Promise<string> => `${user}-token-1`
       visitSchedulerApiClientBuilder = jest.fn().mockReturnValue(visitSchedulerApiClient)
-      visitSessionsService = new VisitSessionsService(visitSchedulerApiClientBuilder, systemToken)
+      whereaboutsApiClientBuilder = jest.fn().mockReturnValue(whereaboutsApiClient)
+      visitSessionsService = new VisitSessionsService(
+        visitSchedulerApiClientBuilder,
+        whereaboutsApiClientBuilder,
+        systemToken
+      )
     })
 
     afterEach(() => {
@@ -25,51 +34,165 @@ describe('Visit sessions service', () => {
 
     it('Should return empty object if no visit sessions', async () => {
       visitSchedulerApiClient.getVisitSessions.mockResolvedValue([])
-      const results = await visitSessionsService.getVisitSessions({ username: 'user' })
+      whereaboutsApiClient.getEvents.mockResolvedValue([])
+      const results = await visitSessionsService.getVisitSessions({ username: 'user', offenderNo: 'A1234BC' })
 
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
       expect(results).toEqual({})
     })
 
-    it('Should handle a single visit session and return correctly formatted data', async () => {
-      const sessions: VisitSession[] = [
-        {
-          sessionTemplateId: 100,
-          visitRoomName: 'A1',
-          visitType: 'STANDARD_SOCIAL',
-          visitTypeDescription: 'Standard Social',
-          prisonId: 'HEI',
-          openVisitCapacity: 15,
-          openVisitBookedCount: 0,
-          closedVisitCapacity: 10,
-          closedVisitBookedCount: 0,
-          startTimestamp: '2022-02-14T10:00:00',
-          endTimestamp: '2022-02-14T11:00:00',
-        },
-      ]
+    describe('single visit session should return correctly formatted data', () => {
+      let sessions: VisitSession[]
 
-      visitSchedulerApiClient.getVisitSessions.mockResolvedValue(sessions)
-      const results = await visitSessionsService.getVisitSessions({ username: 'user' })
-
-      expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
-      expect(results).toEqual(<VisitSlotList>{
-        'February 2022': [
+      beforeEach(() => {
+        sessions = [
           {
-            date: 'Monday 14 February',
-            slots: {
-              morning: [
-                {
-                  id: '1',
-                  startTimestamp: '2022-02-14T10:00:00',
-                  endTimestamp: '2022-02-14T11:00:00',
-                  availableTables: 15,
-                  visitRoomName: 'A1',
-                },
-              ],
-              afternoon: [],
-            },
+            sessionTemplateId: 100,
+            visitRoomName: 'A1',
+            visitType: 'STANDARD_SOCIAL',
+            visitTypeDescription: 'Standard Social',
+            prisonId: 'HEI',
+            openVisitCapacity: 15,
+            openVisitBookedCount: 0,
+            closedVisitCapacity: 10,
+            closedVisitBookedCount: 0,
+            startTimestamp: '2022-02-14T10:00:00',
+            endTimestamp: '2022-02-14T11:00:00',
           },
-        ],
+        ]
+
+        visitSchedulerApiClient.getVisitSessions.mockResolvedValue(sessions)
+      })
+
+      it('with a prisoner event', async () => {
+        const events = [
+          {
+            bookingId: 123,
+            eventClass: 'eventClass',
+            eventDate: '2022-02-14T',
+            startTime: '2022-02-14T10:00:00',
+            endTime: '2022-02-14T11:00:00',
+            eventSource: 'eventSource',
+            eventSourceDesc: 'eventSourceDesc',
+            eventStatus: 'eventStatus',
+            eventSubType: 'eventSubType',
+            eventSubTypeDesc: 'eventSubTypeDesc',
+            eventType: 'eventType',
+            eventTypeDesc: 'eventTypeDesc',
+          },
+        ]
+        whereaboutsApiClient.getEvents.mockResolvedValue(events)
+        const results = await visitSessionsService.getVisitSessions({ username: 'user', offenderNo: 'A1234BC' })
+
+        expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
+        expect(whereaboutsApiClient.getEvents).toHaveBeenCalledTimes(1)
+        expect(results).toEqual(<VisitSlotList>{
+          'February 2022': [
+            {
+              date: 'Monday 14 February',
+              prisonerEvents: {
+                morning: [
+                  {
+                    description: 'eventSourceDesc',
+                    endTimestamp: '2022-02-14T11:00:00',
+                    startTimestamp: '2022-02-14T10:00:00',
+                  },
+                ],
+                afternoon: [],
+              },
+              slots: {
+                morning: [
+                  {
+                    id: '1',
+                    startTimestamp: '2022-02-14T10:00:00',
+                    endTimestamp: '2022-02-14T11:00:00',
+                    availableTables: 15,
+                    visitRoomName: 'A1',
+                  },
+                ],
+                afternoon: [],
+              },
+            },
+          ],
+        })
+      })
+
+      it('with a non-relevant prisoner event', async () => {
+        const events = [
+          {
+            bookingId: 123,
+            eventClass: 'eventClass',
+            eventDate: '2022-03-14T',
+            startTime: '2022-03-14T10:00:00',
+            endTime: '2022-03-14T11:00:00',
+            eventSource: 'eventSource',
+            eventSourceDesc: 'eventSourceDesc',
+            eventStatus: 'eventStatus',
+            eventSubType: 'eventSubType',
+            eventSubTypeDesc: 'eventSubTypeDesc',
+            eventType: 'eventType',
+            eventTypeDesc: 'eventTypeDesc',
+          },
+        ]
+        whereaboutsApiClient.getEvents.mockResolvedValue(events)
+        const results = await visitSessionsService.getVisitSessions({ username: 'user', offenderNo: 'A1234BC' })
+
+        expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
+        expect(whereaboutsApiClient.getEvents).toHaveBeenCalledTimes(1)
+        expect(results).toEqual(<VisitSlotList>{
+          'February 2022': [
+            {
+              date: 'Monday 14 February',
+              prisonerEvents: {
+                morning: [],
+                afternoon: [],
+              },
+              slots: {
+                morning: [
+                  {
+                    id: '1',
+                    startTimestamp: '2022-02-14T10:00:00',
+                    endTimestamp: '2022-02-14T11:00:00',
+                    availableTables: 15,
+                    visitRoomName: 'A1',
+                  },
+                ],
+                afternoon: [],
+              },
+            },
+          ],
+        })
+      })
+
+      it('with no prisoner events', async () => {
+        whereaboutsApiClient.getEvents.mockResolvedValue([])
+        const results = await visitSessionsService.getVisitSessions({ username: 'user', offenderNo: 'A1234BC' })
+
+        expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
+        expect(whereaboutsApiClient.getEvents).toHaveBeenCalledTimes(1)
+        expect(results).toEqual(<VisitSlotList>{
+          'February 2022': [
+            {
+              date: 'Monday 14 February',
+              prisonerEvents: {
+                morning: [],
+                afternoon: [],
+              },
+              slots: {
+                morning: [
+                  {
+                    id: '1',
+                    startTimestamp: '2022-02-14T10:00:00',
+                    endTimestamp: '2022-02-14T11:00:00',
+                    availableTables: 15,
+                    visitRoomName: 'A1',
+                  },
+                ],
+                afternoon: [],
+              },
+            },
+          ],
+        })
       })
     })
 
@@ -143,13 +266,18 @@ describe('Visit sessions service', () => {
       ]
 
       visitSchedulerApiClient.getVisitSessions.mockResolvedValue(sessions)
-      const results = await visitSessionsService.getVisitSessions({ username: 'user' })
+      whereaboutsApiClient.getEvents.mockResolvedValue([])
+      const results = await visitSessionsService.getVisitSessions({ username: 'user', offenderNo: 'A1234BC' })
 
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
       expect(results).toEqual(<VisitSlotList>{
         'February 2022': [
           {
             date: 'Monday 14 February',
+            prisonerEvents: {
+              morning: [],
+              afternoon: [],
+            },
             slots: {
               morning: [
                 {
@@ -180,6 +308,10 @@ describe('Visit sessions service', () => {
           },
           {
             date: 'Tuesday 15 February',
+            prisonerEvents: {
+              morning: [],
+              afternoon: [],
+            },
             slots: {
               morning: [],
               afternoon: [
@@ -197,6 +329,10 @@ describe('Visit sessions service', () => {
         'March 2022': [
           {
             date: 'Tuesday 1 March',
+            prisonerEvents: {
+              morning: [],
+              afternoon: [],
+            },
             slots: {
               morning: [
                 {
@@ -232,13 +368,22 @@ describe('Visit sessions service', () => {
       ]
 
       visitSchedulerApiClient.getVisitSessions.mockResolvedValue(sessions)
-      const results = await visitSessionsService.getVisitSessions({ username: 'user', timeOfDay: 'morning' })
+      whereaboutsApiClient.getEvents.mockResolvedValue([])
+      const results = await visitSessionsService.getVisitSessions({
+        username: 'user',
+        offenderNo: 'A1234BC',
+        timeOfDay: 'morning',
+      })
 
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
       expect(results).toEqual(<VisitSlotList>{
         'February 2022': [
           {
             date: 'Monday 14 February',
+            prisonerEvents: {
+              morning: [],
+              afternoon: [],
+            },
             slots: {
               morning: [
                 {
@@ -274,13 +419,22 @@ describe('Visit sessions service', () => {
       ]
 
       visitSchedulerApiClient.getVisitSessions.mockResolvedValue(sessions)
-      const results = await visitSessionsService.getVisitSessions({ username: 'user', timeOfDay: 'afternoon' })
+      whereaboutsApiClient.getEvents.mockResolvedValue([])
+      const results = await visitSessionsService.getVisitSessions({
+        username: 'user',
+        offenderNo: 'A1234BC',
+        timeOfDay: 'afternoon',
+      })
 
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
       expect(results).toEqual(<VisitSlotList>{
         'February 2022': [
           {
             date: 'Monday 14 February',
+            prisonerEvents: {
+              morning: [],
+              afternoon: [],
+            },
             slots: {
               morning: [],
               afternoon: [],
@@ -308,13 +462,22 @@ describe('Visit sessions service', () => {
       ]
 
       visitSchedulerApiClient.getVisitSessions.mockResolvedValue(sessions)
-      const results = await visitSessionsService.getVisitSessions({ username: 'user', dayOfTheWeek: '1' })
+      whereaboutsApiClient.getEvents.mockResolvedValue([])
+      const results = await visitSessionsService.getVisitSessions({
+        username: 'user',
+        offenderNo: 'A1234BC',
+        dayOfTheWeek: '1',
+      })
 
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
       expect(results).toEqual(<VisitSlotList>{
         'February 2022': [
           {
             date: 'Monday 14 February',
+            prisonerEvents: {
+              morning: [],
+              afternoon: [],
+            },
             slots: {
               morning: [
                 {
@@ -350,7 +513,12 @@ describe('Visit sessions service', () => {
       ]
 
       visitSchedulerApiClient.getVisitSessions.mockResolvedValue(sessions)
-      const results = await visitSessionsService.getVisitSessions({ username: 'user', dayOfTheWeek: '2' })
+      whereaboutsApiClient.getEvents.mockResolvedValue([])
+      const results = await visitSessionsService.getVisitSessions({
+        username: 'user',
+        offenderNo: 'A1234BC',
+        dayOfTheWeek: '2',
+      })
 
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
       expect(results).toEqual(<VisitSlotList>{})
@@ -361,7 +529,12 @@ describe('Visit sessions service', () => {
     beforeEach(() => {
       systemToken = async (user: string): Promise<string> => `${user}-token-1`
       visitSchedulerApiClientBuilder = jest.fn().mockReturnValue(visitSchedulerApiClient)
-      visitSessionsService = new VisitSessionsService(visitSchedulerApiClientBuilder, systemToken)
+      whereaboutsApiClientBuilder = jest.fn().mockReturnValue(whereaboutsApiClient)
+      visitSessionsService = new VisitSessionsService(
+        visitSchedulerApiClientBuilder,
+        whereaboutsApiClientBuilder,
+        systemToken
+      )
     })
 
     afterEach(() => {
@@ -424,6 +597,7 @@ describe('Visit sessions service', () => {
       }
 
       visitSchedulerApiClient.createVisit.mockResolvedValue(visit)
+      whereaboutsApiClient.getEvents.mockResolvedValue([])
       const result = await visitSessionsService.createVisit({ username: 'user', visitData: visitSessionData })
 
       expect(visitSchedulerApiClient.createVisit).toHaveBeenCalledTimes(1)
@@ -435,7 +609,12 @@ describe('Visit sessions service', () => {
     beforeEach(() => {
       systemToken = async (user: string): Promise<string> => `${user}-token-1`
       visitSchedulerApiClientBuilder = jest.fn().mockReturnValue(visitSchedulerApiClient)
-      visitSessionsService = new VisitSessionsService(visitSchedulerApiClientBuilder, systemToken)
+      whereaboutsApiClientBuilder = jest.fn().mockReturnValue(whereaboutsApiClient)
+      visitSessionsService = new VisitSessionsService(
+        visitSchedulerApiClientBuilder,
+        whereaboutsApiClientBuilder,
+        systemToken
+      )
     })
 
     afterEach(() => {
@@ -512,6 +691,7 @@ describe('Visit sessions service', () => {
       }
 
       visitSchedulerApiClient.updateVisit.mockResolvedValue(visit)
+      whereaboutsApiClient.getEvents.mockResolvedValue([])
       const result = await visitSessionsService.updateVisit({ username: 'user', visitData: visitSessionData })
 
       expect(visitSchedulerApiClient.updateVisit).toHaveBeenCalledTimes(1)

@@ -659,6 +659,10 @@ describe('/visit/select-date-and-time', () => {
     'February 2022': [
       {
         date: 'Monday 14 February',
+        prisonerEvents: {
+          morning: [],
+          afternoon: [],
+        },
         slots: {
           morning: [
             {
@@ -689,6 +693,10 @@ describe('/visit/select-date-and-time', () => {
       },
       {
         date: 'Tuesday 15 February',
+        prisonerEvents: {
+          morning: [],
+          afternoon: [],
+        },
         slots: {
           morning: [],
           afternoon: [
@@ -706,6 +714,10 @@ describe('/visit/select-date-and-time', () => {
     'March 2022': [
       {
         date: 'Tuesday 1 March',
+        prisonerEvents: {
+          morning: [],
+          afternoon: [],
+        },
         slots: {
           morning: [
             {
@@ -747,7 +759,7 @@ describe('/visit/select-date-and-time', () => {
   })
 
   describe('GET /visit/select-date-and-time', () => {
-    const visitSessionsService = new VisitSessionsService(null, systemToken) as jest.Mocked<VisitSessionsService>
+    const visitSessionsService = new VisitSessionsService(null, null, systemToken) as jest.Mocked<VisitSessionsService>
 
     beforeEach(() => {
       visitSessionsService.getVisitSessions.mockResolvedValue(slotsList)
@@ -839,7 +851,7 @@ describe('/visit/select-date-and-time', () => {
   })
 
   describe('POST /visit/select-date-and-time', () => {
-    const visitSessionsService = new VisitSessionsService(null, systemToken) as jest.Mocked<VisitSessionsService>
+    const visitSessionsService = new VisitSessionsService(null, null, systemToken) as jest.Mocked<VisitSessionsService>
 
     beforeEach(() => {
       visitSessionsService.createVisit = jest.fn().mockResolvedValue('2a-bc-3d-ef')
