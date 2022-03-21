@@ -41,50 +41,158 @@ describe('Visit sessions service', () => {
       expect(results).toEqual({})
     })
 
-    it('Should handle a single visit session and return correctly formatted data', async () => {
-      const sessions: VisitSession[] = [
-        {
-          sessionTemplateId: 100,
-          visitRoomName: 'A1',
-          visitType: 'STANDARD_SOCIAL',
-          visitTypeDescription: 'Standard Social',
-          prisonId: 'HEI',
-          openVisitCapacity: 15,
-          openVisitBookedCount: 0,
-          closedVisitCapacity: 10,
-          closedVisitBookedCount: 0,
-          startTimestamp: '2022-02-14T10:00:00',
-          endTimestamp: '2022-02-14T11:00:00',
-        },
-      ]
+    describe('single visit session should return correctly formatted data', () => {
+      let sessions: VisitSession[]
 
-      visitSchedulerApiClient.getVisitSessions.mockResolvedValue(sessions)
-      whereaboutsApiClient.getEvents.mockResolvedValue([])
-      const results = await visitSessionsService.getVisitSessions({ username: 'user', offenderNo: 'A1234BC' })
-
-      expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
-      expect(results).toEqual(<VisitSlotList>{
-        'February 2022': [
+      beforeEach(() => {
+        sessions = [
           {
-            date: 'Monday 14 February',
-            prisonerEvents: {
-              morning: [],
-              afternoon: [],
-            },
-            slots: {
-              morning: [
-                {
-                  id: '1',
-                  startTimestamp: '2022-02-14T10:00:00',
-                  endTimestamp: '2022-02-14T11:00:00',
-                  availableTables: 15,
-                  visitRoomName: 'A1',
-                },
-              ],
-              afternoon: [],
-            },
+            sessionTemplateId: 100,
+            visitRoomName: 'A1',
+            visitType: 'STANDARD_SOCIAL',
+            visitTypeDescription: 'Standard Social',
+            prisonId: 'HEI',
+            openVisitCapacity: 15,
+            openVisitBookedCount: 0,
+            closedVisitCapacity: 10,
+            closedVisitBookedCount: 0,
+            startTimestamp: '2022-02-14T10:00:00',
+            endTimestamp: '2022-02-14T11:00:00',
           },
-        ],
+        ]
+
+        visitSchedulerApiClient.getVisitSessions.mockResolvedValue(sessions)
+      })
+
+      it('with a prisoner event', async () => {
+        const events = [
+          {
+            bookingId: 123,
+            eventClass: 'eventClass',
+            eventDate: '2022-02-14T',
+            startTime: '2022-02-14T10:00:00',
+            endTime: '2022-02-14T11:00:00',
+            eventSource: 'eventSource',
+            eventSourceDesc: 'eventSourceDesc',
+            eventStatus: 'eventStatus',
+            eventSubType: 'eventSubType',
+            eventSubTypeDesc: 'eventSubTypeDesc',
+            eventType: 'eventType',
+            eventTypeDesc: 'eventTypeDesc',
+          },
+        ]
+        whereaboutsApiClient.getEvents.mockResolvedValue(events)
+        const results = await visitSessionsService.getVisitSessions({ username: 'user', offenderNo: 'A1234BC' })
+
+        expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
+        expect(whereaboutsApiClient.getEvents).toHaveBeenCalledTimes(1)
+        expect(results).toEqual(<VisitSlotList>{
+          'February 2022': [
+            {
+              date: 'Monday 14 February',
+              prisonerEvents: {
+                morning: [
+                  {
+                    description: 'eventSourceDesc',
+                    endTimestamp: '2022-02-14T11:00:00',
+                    startTimestamp: '2022-02-14T10:00:00',
+                  },
+                ],
+                afternoon: [],
+              },
+              slots: {
+                morning: [
+                  {
+                    id: '1',
+                    startTimestamp: '2022-02-14T10:00:00',
+                    endTimestamp: '2022-02-14T11:00:00',
+                    availableTables: 15,
+                    visitRoomName: 'A1',
+                  },
+                ],
+                afternoon: [],
+              },
+            },
+          ],
+        })
+      })
+
+      it('with a non-relevant prisoner event', async () => {
+        const events = [
+          {
+            bookingId: 123,
+            eventClass: 'eventClass',
+            eventDate: '2022-03-14T',
+            startTime: '2022-03-14T10:00:00',
+            endTime: '2022-03-14T11:00:00',
+            eventSource: 'eventSource',
+            eventSourceDesc: 'eventSourceDesc',
+            eventStatus: 'eventStatus',
+            eventSubType: 'eventSubType',
+            eventSubTypeDesc: 'eventSubTypeDesc',
+            eventType: 'eventType',
+            eventTypeDesc: 'eventTypeDesc',
+          },
+        ]
+        whereaboutsApiClient.getEvents.mockResolvedValue(events)
+        const results = await visitSessionsService.getVisitSessions({ username: 'user', offenderNo: 'A1234BC' })
+
+        expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
+        expect(whereaboutsApiClient.getEvents).toHaveBeenCalledTimes(1)
+        expect(results).toEqual(<VisitSlotList>{
+          'February 2022': [
+            {
+              date: 'Monday 14 February',
+              prisonerEvents: {
+                morning: [],
+                afternoon: [],
+              },
+              slots: {
+                morning: [
+                  {
+                    id: '1',
+                    startTimestamp: '2022-02-14T10:00:00',
+                    endTimestamp: '2022-02-14T11:00:00',
+                    availableTables: 15,
+                    visitRoomName: 'A1',
+                  },
+                ],
+                afternoon: [],
+              },
+            },
+          ],
+        })
+      })
+
+      it('with no prisoner events', async () => {
+        whereaboutsApiClient.getEvents.mockResolvedValue([])
+        const results = await visitSessionsService.getVisitSessions({ username: 'user', offenderNo: 'A1234BC' })
+
+        expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
+        expect(whereaboutsApiClient.getEvents).toHaveBeenCalledTimes(1)
+        expect(results).toEqual(<VisitSlotList>{
+          'February 2022': [
+            {
+              date: 'Monday 14 February',
+              prisonerEvents: {
+                morning: [],
+                afternoon: [],
+              },
+              slots: {
+                morning: [
+                  {
+                    id: '1',
+                    startTimestamp: '2022-02-14T10:00:00',
+                    endTimestamp: '2022-02-14T11:00:00',
+                    availableTables: 15,
+                    visitRoomName: 'A1',
+                  },
+                ],
+                afternoon: [],
+              },
+            },
+          ],
+        })
       })
     })
 

@@ -146,12 +146,14 @@
               }) }}
             </div>
             <div class="govuk-grid-column-three-quarters">
-              <h3 class="govuk-heading-s">Prisoner schedule</h3>
-              {% for event in day.prisonerEvents.morning %}
-                <div class="bapv-prisoner-event govuk-grid-column-one-third">{{ event.startTimestamp | formatTime }} to {{ event.endTimestamp | formatTime }}
-                <br>{{ event.description }}
-                </div>
-              {% endfor %}
+              {% if day.prisonerEvents.morning | length %}
+                <h3 class="govuk-heading-s">Prisoner schedule</h3>
+                {% for event in day.prisonerEvents.morning %}
+                  <div class="bapv-prisoner-event govuk-grid-column-one-third">{{ event.startTimestamp | formatTime }} to {{ event.endTimestamp | formatTime }}
+                  <br>{{ event.description }}
+                  </div>
+                {% endfor %}
+              {% endif %}
             </div>
           </div>
         {% endset %}
@@ -168,12 +170,14 @@
               }) }}
             </div>
             <div class="govuk-grid-column-three-quarters">
-              {% if not morningSlotsList | length %}<h3 class="govuk-heading-s">Prisoner schedule</h3>{% endif %} 
-              {% for event in day.prisonerEvents.afternoon %}
-                <div class="bapv-prisoner-event govuk-grid-column-one-third{% if morningSlotsList | length %} bapv-prisoner-event--top-margin{% endif %}">{{ event.startTimestamp | formatTime }} to {{ event.endTimestamp | formatTime }}
-                <br>{{ event.description }}
-                </div>
-              {% endfor %}
+              {% if day.prisonerEvents.afternoon | length %}
+                {% if not morningSlotsList | length %}<h3 class="govuk-heading-s">Prisoner schedule</h3>{% endif %} 
+                {% for event in day.prisonerEvents.afternoon %}
+                  <div class="bapv-prisoner-event govuk-grid-column-one-third{% if morningSlotsList | length %} bapv-prisoner-event--top-margin{% endif %}">{{ event.startTimestamp | formatTime }} to {{ event.endTimestamp | formatTime }}
+                  <br>{{ event.description }}
+                  </div>
+                {% endfor %}
+              {% endif %}
             </div>
           </div>
         {% endset %}
