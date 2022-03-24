@@ -1,7 +1,7 @@
 import VisitSessionsService from './visitSessionsService'
 import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
 import WhereaboutsApiClient from '../data/whereaboutsApiClient'
-import { VisitSession, Visit } from '../data/visitSchedulerApiTypes'
+import { VisitSession, Visit, SupportType } from '../data/visitSchedulerApiTypes'
 import { VisitSlotList, VisitSessionData } from '../@types/bapv'
 
 jest.mock('../data/visitSchedulerApiClient')
@@ -16,22 +16,46 @@ describe('Visit sessions service', () => {
   let visitSessionsService: VisitSessionsService
   let systemToken
 
+  beforeEach(() => {
+    systemToken = async (user: string): Promise<string> => `${user}-token-1`
+    visitSchedulerApiClientBuilder = jest.fn().mockReturnValue(visitSchedulerApiClient)
+    whereaboutsApiClientBuilder = jest.fn().mockReturnValue(whereaboutsApiClient)
+    visitSessionsService = new VisitSessionsService(
+      visitSchedulerApiClientBuilder,
+      whereaboutsApiClientBuilder,
+      systemToken
+    )
+  })
+
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
+
+  describe('getAdditionalSupportOptions', () => {
+    it('should return an array of available support options', async () => {
+      const availableSupportTypes: SupportType[] = [
+        {
+          code: 1010,
+          name: 'WHEELCHAIR',
+          description: 'Wheelchair ramp',
+        },
+        {
+          code: 1050,
+          name: 'OTHER',
+          description: 'Other',
+        },
+      ]
+
+      visitSchedulerApiClient.getAvailableSupportOptions.mockResolvedValue(availableSupportTypes)
+
+      const results = await visitSessionsService.getAvailableSupportOptions('user')
+
+      expect(visitSchedulerApiClient.getAvailableSupportOptions).toHaveBeenCalledTimes(1)
+      expect(results).toEqual(availableSupportTypes)
+    })
+  })
+
   describe('getVisitSessions', () => {
-    beforeEach(() => {
-      systemToken = async (user: string): Promise<string> => `${user}-token-1`
-      visitSchedulerApiClientBuilder = jest.fn().mockReturnValue(visitSchedulerApiClient)
-      whereaboutsApiClientBuilder = jest.fn().mockReturnValue(whereaboutsApiClient)
-      visitSessionsService = new VisitSessionsService(
-        visitSchedulerApiClientBuilder,
-        whereaboutsApiClientBuilder,
-        systemToken
-      )
-    })
-
-    afterEach(() => {
-      jest.resetAllMocks()
-    })
-
     it('Should return empty object if no visit sessions', async () => {
       visitSchedulerApiClient.getVisitSessions.mockResolvedValue([])
       whereaboutsApiClient.getEvents.mockResolvedValue([])
@@ -526,21 +550,6 @@ describe('Visit sessions service', () => {
   })
 
   describe('createVisit', () => {
-    beforeEach(() => {
-      systemToken = async (user: string): Promise<string> => `${user}-token-1`
-      visitSchedulerApiClientBuilder = jest.fn().mockReturnValue(visitSchedulerApiClient)
-      whereaboutsApiClientBuilder = jest.fn().mockReturnValue(whereaboutsApiClient)
-      visitSessionsService = new VisitSessionsService(
-        visitSchedulerApiClientBuilder,
-        whereaboutsApiClientBuilder,
-        systemToken
-      )
-    })
-
-    afterEach(() => {
-      jest.resetAllMocks()
-    })
-
     it('should create a new visit and return the visit data', async () => {
       const visitSessionData: VisitSessionData = {
         prisoner: {
@@ -586,7 +595,7 @@ describe('Visit sessions service', () => {
         visitStatusDescription: 'Reserved',
         startTimestamp: '2022-02-14T10:00:00',
         endTimestamp: '2022-02-14T11:00:00',
-        reasonableAdjustments: 'string',
+        visitorSupport: [],
         visitors: [
           {
             nomisPersonId: 1234,
@@ -606,21 +615,6 @@ describe('Visit sessions service', () => {
   })
 
   describe('updateVisit', () => {
-    beforeEach(() => {
-      systemToken = async (user: string): Promise<string> => `${user}-token-1`
-      visitSchedulerApiClientBuilder = jest.fn().mockReturnValue(visitSchedulerApiClient)
-      whereaboutsApiClientBuilder = jest.fn().mockReturnValue(whereaboutsApiClient)
-      visitSessionsService = new VisitSessionsService(
-        visitSchedulerApiClientBuilder,
-        whereaboutsApiClientBuilder,
-        systemToken
-      )
-    })
-
-    afterEach(() => {
-      jest.resetAllMocks()
-    })
-
     it('should update an existing visit and return the visit data', async () => {
       const visitSessionData: VisitSessionData = {
         prisoner: {
@@ -654,11 +648,7 @@ describe('Visit sessions service', () => {
             banned: false,
           },
         ],
-        additionalSupport: {
-          required: true,
-          keys: ['wheelchair', 'maskExempt', 'other'],
-          other: 'custom request',
-        },
+        visitorSupport: [{ supportName: 'WHEELCHAIR' }, { supportName: 'MASK_EXEMPT' }, { supportName: 'OTHER' }],
         mainContact: {
           phoneNumber: '01234 567890',
           contactName: 'John Smith',
@@ -676,7 +666,11 @@ describe('Visit sessions service', () => {
         visitStatusDescription: 'Reserved',
         startTimestamp: '2022-02-14T10:00:00',
         endTimestamp: '2022-02-14T11:00:00',
-        reasonableAdjustments: 'wheelchair,maskExempt,other,custom request',
+        visitorSupport: [
+          { supportName: 'WHEELCHAIR' },
+          { supportName: 'MASK_EXEMPT' },
+          { supportName: 'OTHER', supportDetails: 'custom request' },
+        ],
         mainContact: {
           contactName: 'John Smith',
           contactPhone: '01234 567890',
@@ -695,13 +689,17 @@ describe('Visit sessions service', () => {
       const result = await visitSessionsService.updateVisit({ username: 'user', visitData: visitSessionData })
 
       expect(visitSchedulerApiClient.updateVisit).toHaveBeenCalledTimes(1)
-      expect(result).toEqual({
+      expect(result).toEqual(<Visit>{
         endTimestamp: '2022-02-14T11:00:00',
         id: 'v9-d7-ed-7u',
         mainContact: { contactName: 'John Smith', contactPhone: '01234 567890' },
         prisonId: 'HEI',
         prisonerId: 'A1234BC',
-        reasonableAdjustments: 'wheelchair,maskExempt,other,custom request',
+        visitorSupport: [
+          { supportName: 'WHEELCHAIR' },
+          { supportName: 'MASK_EXEMPT' },
+          { supportName: 'OTHER', supportDetails: 'custom request' },
+        ],
         sessionId: 123,
         startTimestamp: '2022-02-14T10:00:00',
         visitRoom: 'visit room',

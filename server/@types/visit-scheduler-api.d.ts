@@ -21,6 +21,10 @@ export interface paths {
     get: operations['getSessionTemplates']
     post: operations['createSessionTemplate']
   }
+  '/visit-support': {
+    /** Retrieve all available support types */
+    get: operations['getSupportTypes']
+  }
   '/visit-sessions': {
     /** Retrieve all visits for a specified prisoner */
     get: operations['getVisitSessions']
@@ -47,6 +51,19 @@ export interface components {
        * @example 01234 567890
        */
       contactPhone: string
+    }
+    /** @description List of additional support associated with the visit */
+    CreateSupportOnVisitRequest: {
+      /**
+       * @description Support name
+       * @example OTHER
+       */
+      supportName: string
+      /**
+       * @description Support details
+       * @example visually impaired assistance
+       */
+      supportDetails?: string
     }
     /** @description List of visitors associated with the visit */
     CreateVisitorOnVisitRequest: {
@@ -86,13 +103,11 @@ export interface components {
       /**
        * @description Visit Type
        * @example STANDARD_SOCIAL
-       * @enum {string}
        */
       visitType?: 'STANDARD_SOCIAL' | 'OFFICIAL' | 'FAMILY'
       /**
        * @description Visit Status
        * @example RESERVED
-       * @enum {string}
        */
       visitStatus?:
         | 'RESERVED'
@@ -106,13 +121,13 @@ export interface components {
        * @example A1
        */
       visitRoom?: string
-      /** @description Reasonable Adjustments */
-      reasonableAdjustments?: string
       /** @description Visitor Concerns */
       visitorConcerns?: string
       mainContact?: components['schemas']['CreateContactOnVisitRequest']
       /** @description List of visitors associated with the visit */
       contactList?: components['schemas']['CreateVisitorOnVisitRequest'][]
+      /** @description List of additional support associated with the visit */
+      supportList?: components['schemas']['CreateSupportOnVisitRequest'][]
       /**
        * Format: int64
        * @description Session Id identifying the visit session template
@@ -193,13 +208,13 @@ export interface components {
        * @description The finishing date and time of the visit
        */
       endTimestamp: string
-      /** @description Reasonable Adjustments */
-      reasonableAdjustments?: string
       /** @description Visitor Concerns */
       visitorConcerns?: string
       mainContact?: components['schemas']['ContactDto']
       /** @description List of visitors associated with the visit */
       visitors: components['schemas']['VisitorDto'][]
+      /** @description List of additional support associated with the visit */
+      visitorSupport: components['schemas']['VisitorSupportDto'][]
       /**
        * Format: int64
        * @description Session Id identifying the visit session template
@@ -220,6 +235,19 @@ export interface components {
        * @example true
        */
       leadVisitor: boolean
+    }
+    /** @description Visitor support */
+    VisitorSupportDto: {
+      /**
+       * @description Support name
+       * @example OTHER
+       */
+      supportName: string
+      /**
+       * @description Support details
+       * @example visually impaired assistance
+       */
+      supportDetails?: string
     }
     CreateVisitRequest: {
       /**
@@ -245,13 +273,11 @@ export interface components {
       /**
        * @description Visit Type
        * @example STANDARD_SOCIAL
-       * @enum {string}
        */
       visitType: 'STANDARD_SOCIAL' | 'OFFICIAL' | 'FAMILY'
       /**
        * @description Visit Status
        * @example RESERVED
-       * @enum {string}
        */
       visitStatus:
         | 'RESERVED'
@@ -265,13 +291,13 @@ export interface components {
        * @example A1
        */
       visitRoom: string
-      /** @description Reasonable Adjustments */
-      reasonableAdjustments?: string
       /** @description Visitor Concerns */
       visitorConcerns?: string
       mainContact?: components['schemas']['CreateContactOnVisitRequest']
       /** @description List of visitors associated with the visit */
       contactList?: components['schemas']['CreateVisitorOnVisitRequest'][]
+      /** @description List of additional support associated with the visit */
+      supportList?: components['schemas']['CreateSupportOnVisitRequest'][]
       /**
        * Format: int64
        * @description Session Id identifying the visit session template
@@ -302,7 +328,6 @@ export interface components {
       /**
        * @description visit type
        * @example STANDARD_SOCIAL
-       * @enum {string}
        */
       visitType: 'STANDARD_SOCIAL' | 'OFFICIAL' | 'FAMILY'
       /**
@@ -312,10 +337,7 @@ export interface components {
       visitRoom: string
       /** @description restrictions */
       restrictions?: string
-      /**
-       * @description frequency
-       * @enum {string}
-       */
+      /** @description frequency */
       frequency: 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'SINGLE'
       /**
        * Format: int32
@@ -371,7 +393,6 @@ export interface components {
       /**
        * @description visit type
        * @example STANDARD_SOCIAL
-       * @enum {string}
        */
       visitType: 'STANDARD_SOCIAL' | 'OFFICIAL' | 'FAMILY'
       /**
@@ -384,7 +405,6 @@ export interface components {
       /**
        * @description frequency
        * @example A1
-       * @enum {string}
        */
       frequency: 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'SINGLE'
       /**
@@ -397,6 +417,25 @@ export interface components {
        * @description open capacity
        */
       openCapacity: number
+    }
+    /** @description Support Type */
+    SupportTypeDto: {
+      /**
+       * Format: int32
+       * @description Support code
+       * @example 1040
+       */
+      code: number
+      /**
+       * @description Support name
+       * @example MASK_EXEMPT
+       */
+      name: string
+      /**
+       * @description Support description
+       * @example Face covering exemption
+       */
+      description: string
     }
     /** @description Visit Session */
     VisitSession: {
@@ -707,6 +746,29 @@ export interface operations {
     requestBody: {
       content: {
         'application/json': components['schemas']['CreateSessionTemplateRequest']
+      }
+    }
+  }
+  /** Retrieve all available support types */
+  getSupportTypes: {
+    responses: {
+      /** Available Support information returned */
+      200: {
+        content: {
+          'application/json': components['schemas']['SupportTypeDto'][]
+        }
+      }
+      /** Incorrect request to Get Available Support */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** Unauthorized to access this endpoint */
+      401: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
       }
     }
   }

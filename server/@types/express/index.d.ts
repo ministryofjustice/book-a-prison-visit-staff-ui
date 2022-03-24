@@ -1,3 +1,4 @@
+import { SupportType } from '../../data/visitSchedulerApiTypes'
 import { VisitorListItem, VisitSessionData } from '../bapv'
 
 export default {}
@@ -7,6 +8,7 @@ declare module 'express-session' {
   interface SessionData {
     returnTo: string
     nowInMinutes: number
+    availableSupportTypes: SupportType[]
     visitorList: { visitors: VisitorListItem[] }
     adultVisitors: { adults: VisitorListItem[] }
     slotsList: VisitSlotList

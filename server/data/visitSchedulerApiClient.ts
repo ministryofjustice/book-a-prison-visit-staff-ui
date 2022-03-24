@@ -1,6 +1,6 @@
 import { URLSearchParams } from 'url'
 import RestClient from './restClient'
-import { Visit, VisitSession } from './visitSchedulerApiTypes'
+import { SupportType, Visit, VisitSession } from './visitSchedulerApiTypes'
 import { VisitSessionData } from '../@types/bapv'
 import config from '../config'
 
@@ -17,6 +17,12 @@ class VisitSchedulerApiClient {
   private prisonId = 'HEI'
 
   private visitType = 'STANDARD_SOCIAL'
+
+  getAvailableSupportOptions(): Promise<SupportType[]> {
+    return this.restclient.get({
+      path: '/visit-support',
+    })
+  }
 
   getUpcomingVisits(offenderNo: string, startTimestamp?: string): Promise<Visit[]> {
     return this.restclient.get({
@@ -80,10 +86,6 @@ class VisitSchedulerApiClient {
         }
       : undefined
 
-    const additionalSupport = visitData.additionalSupport?.keys
-      ? visitData.additionalSupport.keys.concat([visitData.additionalSupport.other]).join(',')
-      : ''
-
     return this.restclient.put({
       path: `/visits/${visitData.visitId}`,
       data: {
@@ -94,7 +96,7 @@ class VisitSchedulerApiClient {
         visitType: this.visitType,
         visitStatus,
         visitRoom: visitData.visit.visitRoomName,
-        reasonableAdjustments: additionalSupport,
+        supportList: visitData.visitorSupport,
         mainContact,
         contactList: visitData.visitors.map(visitor => {
           return {

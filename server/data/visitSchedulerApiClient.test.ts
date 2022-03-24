@@ -2,7 +2,7 @@ import nock from 'nock'
 import { VisitSessionData } from '../@types/bapv'
 import config from '../config'
 import VisitSchedulerApiClient, { visitSchedulerApiClientBuilder } from './visitSchedulerApiClient'
-import { Visit, VisitSession } from './visitSchedulerApiTypes'
+import { SupportType, Visit, VisitSession } from './visitSchedulerApiTypes'
 
 describe('visitSchedulerApiClient', () => {
   let fakeVisitSchedulerApi: nock.Scope
@@ -17,6 +17,29 @@ describe('visitSchedulerApiClient', () => {
 
   afterEach(() => {
     nock.cleanAll()
+  })
+
+  describe('getAvailableSupportOptions', () => {
+    it('should return an array of available support types', async () => {
+      const results: SupportType[] = [
+        {
+          code: 1010,
+          name: 'WHEELCHAIR',
+          description: 'Wheelchair ramp',
+        },
+        {
+          code: 1050,
+          name: 'OTHER',
+          description: 'Other',
+        },
+      ]
+
+      fakeVisitSchedulerApi.get('/visit-support').matchHeader('authorization', `Bearer ${token}`).reply(200, results)
+
+      const output = await client.getAvailableSupportOptions()
+
+      expect(output).toEqual(results)
+    })
   })
 
   describe('getUpcomingVisits', () => {
@@ -34,7 +57,7 @@ describe('visitSchedulerApiClient', () => {
           visitStatusDescription: 'Reserved',
           startTimestamp: timestamp,
           endTimestamp: '',
-          reasonableAdjustments: 'string',
+          visitorSupport: [{ supportName: 'OTHER', supportDetails: 'custom support details' }],
           visitors: [
             {
               nomisPersonId: 1234,
@@ -76,7 +99,7 @@ describe('visitSchedulerApiClient', () => {
           visitStatusDescription: 'Reserved',
           startTimestamp: '',
           endTimestamp: timestamp,
-          reasonableAdjustments: 'string',
+          visitorSupport: [{ supportName: 'OTHER', supportDetails: 'custom support details' }],
           visitors: [
             {
               nomisPersonId: 1234,
@@ -152,7 +175,6 @@ describe('visitSchedulerApiClient', () => {
         visitStatusDescription: 'Reserved',
         startTimestamp: '2022-02-14T10:00:00',
         endTimestamp: '2022-02-14T11:00:00',
-        reasonableAdjustments: 'string',
         visitorConcerns: 'string',
         mainContact: {
           contactName: 'John Smith',
@@ -164,6 +186,7 @@ describe('visitSchedulerApiClient', () => {
             leadVisitor: true,
           },
         ],
+        visitorSupport: [{ supportName: 'OTHER', supportDetails: 'custom support details' }],
         sessionId: 123,
       }
       const visitSessionData = {
@@ -241,7 +264,6 @@ describe('visitSchedulerApiClient', () => {
         visitStatusDescription: 'Reserved',
         startTimestamp: '2022-02-14T10:00:00',
         endTimestamp: '2022-02-14T11:00:00',
-        reasonableAdjustments: 'wheelchair,maskExempt,other,custom request',
         visitorConcerns: '',
         mainContact: {
           contactName: 'John Smith',
@@ -251,6 +273,14 @@ describe('visitSchedulerApiClient', () => {
           {
             nomisPersonId: 1234,
             leadVisitor: true,
+          },
+        ],
+        visitorSupport: [
+          { supportName: 'WHEELCHAIR' },
+          { supportName: 'MASK_EXEMPT' },
+          {
+            supportName: 'OTHER',
+            supportDetails: 'custom request',
           },
         ],
         sessionId: 123,
@@ -268,15 +298,6 @@ describe('visitSchedulerApiClient', () => {
           endTimestamp: result.endTimestamp,
           availableTables: 1,
           visitRoomName: result.visitRoom,
-        },
-        additionalSupport: {
-          required: true,
-          keys: ['wheelchair', 'maskExempt', 'other'],
-          other: 'custom request',
-        },
-        mainContact: {
-          phoneNumber: result.mainContact.contactPhone,
-          contactName: result.mainContact.contactName,
         },
         visitors: [
           {
@@ -296,15 +317,21 @@ describe('visitSchedulerApiClient', () => {
             banned: false,
           },
         ],
+        visitorSupport: [
+          { supportName: 'WHEELCHAIR' },
+          { supportName: 'MASK_EXEMPT' },
+          { supportName: 'OTHER', supportDetails: 'custom request' },
+        ],
+        mainContact: {
+          phoneNumber: result.mainContact.contactPhone,
+          contactName: result.mainContact.contactName,
+        },
         visitId: 'v9-d7-ed-7u',
       }
       const mainContact = {
         contactPhone: visitSessionData.mainContact.phoneNumber,
         contactName: visitSessionData.mainContact.contactName,
       }
-      const additionalSupport = visitSessionData.additionalSupport?.keys
-        ? visitSessionData.additionalSupport.keys.concat([visitSessionData.additionalSupport.other]).join(',')
-        : ''
 
       fakeVisitSchedulerApi
         .put('/visits/v9-d7-ed-7u', {
@@ -315,7 +342,7 @@ describe('visitSchedulerApiClient', () => {
           visitType,
           visitStatus,
           visitRoom: visitSessionData.visit.visitRoomName,
-          reasonableAdjustments: additionalSupport,
+          supportList: visitSessionData.visitorSupport,
           mainContact,
           contactList: visitSessionData.visitors.map(visitor => {
             return {
@@ -343,13 +370,13 @@ describe('visitSchedulerApiClient', () => {
         visitStatusDescription: 'Reserved',
         startTimestamp: '2022-02-14T10:00:00',
         endTimestamp: '2022-02-14T11:00:00',
-        reasonableAdjustments: '',
         visitors: [
           {
             nomisPersonId: 1234,
             leadVisitor: true,
           },
         ],
+        visitorSupport: [],
         sessionId: 123,
       }
       const visitSessionData: VisitSessionData = {
@@ -386,8 +413,6 @@ describe('visitSchedulerApiClient', () => {
         ],
         visitId: 'v9-d7-ed-7u',
       }
-      const mainContact: VisitSessionData['mainContact'] = undefined
-      const additionalSupport = ''
 
       fakeVisitSchedulerApi
         .put('/visits/v9-d7-ed-7u', {
@@ -398,8 +423,8 @@ describe('visitSchedulerApiClient', () => {
           visitType,
           visitStatus,
           visitRoom: visitSessionData.visit.visitRoomName,
-          reasonableAdjustments: additionalSupport,
-          mainContact,
+          supportList: visitSessionData.visitorSupport,
+          mainContact: visitSessionData.mainContact,
           contactList: visitSessionData.visitors.map(visitor => {
             return {
               nomisPersonId: visitor.personId,
