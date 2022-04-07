@@ -44,6 +44,7 @@
 
     {% if slotsList | length %}
     <p>Showing visit time slots for the next 28 days.</p>
+    <p>Time slots with prisoner non-associations are not shown.</p>
     <form action="/visit/select-date-and-time" method="GET" novalidate>
       <div class="bapv-visit-date-time-filter">
         <h3 class="govuk-heading-s">Filter time slots</h3>
