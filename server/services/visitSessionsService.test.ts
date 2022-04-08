@@ -35,13 +35,11 @@ describe('Visit sessions service', () => {
     it('should return an array of available support options', async () => {
       const availableSupportTypes: SupportType[] = [
         {
-          code: 1010,
-          name: 'WHEELCHAIR',
+          type: 'WHEELCHAIR',
           description: 'Wheelchair ramp',
         },
         {
-          code: 1050,
-          name: 'OTHER',
+          type: 'OTHER',
           description: 'Other',
         },
       ]
@@ -73,8 +71,7 @@ describe('Visit sessions service', () => {
           {
             sessionTemplateId: 100,
             visitRoomName: 'A1',
-            visitType: 'STANDARD_SOCIAL',
-            visitTypeDescription: 'Standard Social',
+            visitType: 'SOCIAL',
             prisonId: 'HEI',
             openVisitCapacity: 15,
             openVisitBookedCount: 0,
@@ -225,8 +222,7 @@ describe('Visit sessions service', () => {
         {
           sessionTemplateId: 10,
           visitRoomName: 'A1',
-          visitType: 'STANDARD_SOCIAL',
-          visitTypeDescription: 'Standard Social',
+          visitType: 'SOCIAL',
           prisonId: 'HEI',
           openVisitCapacity: 15,
           openVisitBookedCount: 0,
@@ -238,8 +234,7 @@ describe('Visit sessions service', () => {
         {
           sessionTemplateId: 11,
           visitRoomName: 'A1',
-          visitType: 'STANDARD_SOCIAL',
-          visitTypeDescription: 'Standard Social',
+          visitType: 'SOCIAL',
           prisonId: 'HEI',
           openVisitCapacity: 15,
           openVisitBookedCount: 5,
@@ -251,8 +246,7 @@ describe('Visit sessions service', () => {
         {
           sessionTemplateId: 12,
           visitRoomName: 'A1',
-          visitType: 'STANDARD_SOCIAL',
-          visitTypeDescription: 'Standard Social',
+          visitType: 'SOCIAL',
           prisonId: 'HEI',
           openVisitCapacity: 15,
           openVisitBookedCount: 10,
@@ -264,8 +258,7 @@ describe('Visit sessions service', () => {
         {
           sessionTemplateId: 13,
           visitRoomName: 'A1',
-          visitType: 'STANDARD_SOCIAL',
-          visitTypeDescription: 'Standard Social',
+          visitType: 'SOCIAL',
           prisonId: 'HEI',
           openVisitCapacity: 15,
           openVisitBookedCount: 3,
@@ -277,8 +270,7 @@ describe('Visit sessions service', () => {
         {
           sessionTemplateId: 14,
           visitRoomName: 'A1',
-          visitType: 'STANDARD_SOCIAL',
-          visitTypeDescription: 'Standard Social',
+          visitType: 'SOCIAL',
           prisonId: 'HEI',
           openVisitCapacity: 15,
           openVisitBookedCount: 15,
@@ -379,8 +371,7 @@ describe('Visit sessions service', () => {
         {
           sessionTemplateId: 100,
           visitRoomName: 'A1',
-          visitType: 'STANDARD_SOCIAL',
-          visitTypeDescription: 'Standard Social',
+          visitType: 'SOCIAL',
           prisonId: 'HEI',
           openVisitCapacity: 15,
           openVisitBookedCount: 0,
@@ -430,8 +421,7 @@ describe('Visit sessions service', () => {
         {
           sessionTemplateId: 100,
           visitRoomName: 'A1',
-          visitType: 'STANDARD_SOCIAL',
-          visitTypeDescription: 'Standard Social',
+          visitType: 'SOCIAL',
           prisonId: 'HEI',
           openVisitCapacity: 15,
           openVisitBookedCount: 0,
@@ -473,8 +463,7 @@ describe('Visit sessions service', () => {
         {
           sessionTemplateId: 100,
           visitRoomName: 'A1',
-          visitType: 'STANDARD_SOCIAL',
-          visitTypeDescription: 'Standard Social',
+          visitType: 'SOCIAL',
           prisonId: 'HEI',
           openVisitCapacity: 15,
           openVisitBookedCount: 0,
@@ -524,8 +513,7 @@ describe('Visit sessions service', () => {
         {
           sessionTemplateId: 100,
           visitRoomName: 'A1',
-          visitType: 'STANDARD_SOCIAL',
-          visitTypeDescription: 'Standard Social',
+          visitType: 'SOCIAL',
           prisonId: 'HEI',
           openVisitCapacity: 15,
           openVisitBookedCount: 0,
@@ -565,6 +553,7 @@ describe('Visit sessions service', () => {
           availableTables: 1,
           visitRoomName: 'visit room',
         },
+        visitRestriction: 'OPEN',
         visitors: [
           {
             personId: 123,
@@ -585,24 +574,21 @@ describe('Visit sessions service', () => {
         ],
       }
       const visit: Visit = {
-        id: 'v9-d7-ed-7u',
+        reference: 'v9-d7-ed-7u',
         prisonerId: visitSessionData.prisoner.offenderNo,
         prisonId: 'HEI',
         visitRoom: visitSessionData.visit.visitRoomName,
-        visitType: 'STANDARD_SOCIAL',
-        visitTypeDescription: 'Standard Social',
+        visitType: 'SOCIAL',
         visitStatus: 'RESERVED',
-        visitStatusDescription: 'Reserved',
+        visitRestriction: 'OPEN',
         startTimestamp: '2022-02-14T10:00:00',
         endTimestamp: '2022-02-14T11:00:00',
-        visitorSupport: [],
         visitors: [
           {
             nomisPersonId: 1234,
-            leadVisitor: true,
           },
         ],
-        sessionId: 123,
+        visitorSupport: [],
       }
 
       visitSchedulerApiClient.createVisit.mockResolvedValue(visit)
@@ -630,6 +616,7 @@ describe('Visit sessions service', () => {
           availableTables: 1,
           visitRoomName: 'visit room',
         },
+        visitRestriction: 'OPEN',
         visitors: [
           {
             personId: 123,
@@ -648,7 +635,7 @@ describe('Visit sessions service', () => {
             banned: false,
           },
         ],
-        visitorSupport: [{ supportName: 'WHEELCHAIR' }, { supportName: 'MASK_EXEMPT' }, { supportName: 'OTHER' }],
+        visitorSupport: [{ type: 'WHEELCHAIR' }, { type: 'MASK_EXEMPT' }, { type: 'OTHER' }],
         mainContact: {
           phoneNumber: '01234 567890',
           contactName: 'John Smith',
@@ -656,32 +643,25 @@ describe('Visit sessions service', () => {
         visitId: 'v9-d7-ed-7u',
       }
       const visit: Visit = {
-        id: 'v9-d7-ed-7u',
+        reference: 'v9-d7-ed-7u',
         prisonerId: visitSessionData.prisoner.offenderNo,
         prisonId: 'HEI',
         visitRoom: visitSessionData.visit.visitRoomName,
-        visitType: 'STANDARD_SOCIAL',
-        visitTypeDescription: 'Standard Social',
+        visitType: 'SOCIAL',
         visitStatus: 'RESERVED',
-        visitStatusDescription: 'Reserved',
+        visitRestriction: 'OPEN',
         startTimestamp: '2022-02-14T10:00:00',
         endTimestamp: '2022-02-14T11:00:00',
-        visitorSupport: [
-          { supportName: 'WHEELCHAIR' },
-          { supportName: 'MASK_EXEMPT' },
-          { supportName: 'OTHER', supportDetails: 'custom request' },
-        ],
-        mainContact: {
-          contactName: 'John Smith',
-          contactPhone: '01234 567890',
+        visitContact: {
+          name: 'John Smith',
+          telephone: '01234 567890',
         },
         visitors: [
           {
             nomisPersonId: 1234,
-            leadVisitor: true,
           },
         ],
-        sessionId: 123,
+        visitorSupport: [{ type: 'WHEELCHAIR' }, { type: 'MASK_EXEMPT' }, { type: 'OTHER', text: 'custom request' }],
       }
 
       visitSchedulerApiClient.updateVisit.mockResolvedValue(visit)
@@ -690,24 +670,18 @@ describe('Visit sessions service', () => {
 
       expect(visitSchedulerApiClient.updateVisit).toHaveBeenCalledTimes(1)
       expect(result).toEqual(<Visit>{
-        endTimestamp: '2022-02-14T11:00:00',
-        id: 'v9-d7-ed-7u',
-        mainContact: { contactName: 'John Smith', contactPhone: '01234 567890' },
-        prisonId: 'HEI',
+        reference: 'v9-d7-ed-7u',
         prisonerId: 'A1234BC',
-        visitorSupport: [
-          { supportName: 'WHEELCHAIR' },
-          { supportName: 'MASK_EXEMPT' },
-          { supportName: 'OTHER', supportDetails: 'custom request' },
-        ],
-        sessionId: 123,
-        startTimestamp: '2022-02-14T10:00:00',
+        prisonId: 'HEI',
         visitRoom: 'visit room',
+        visitType: 'SOCIAL',
         visitStatus: 'RESERVED',
-        visitStatusDescription: 'Reserved',
-        visitType: 'STANDARD_SOCIAL',
-        visitTypeDescription: 'Standard Social',
-        visitors: [{ leadVisitor: true, nomisPersonId: 1234 }],
+        visitRestriction: 'OPEN',
+        startTimestamp: '2022-02-14T10:00:00',
+        endTimestamp: '2022-02-14T11:00:00',
+        visitContact: { name: 'John Smith', telephone: '01234 567890' },
+        visitors: [{ nomisPersonId: 1234 }],
+        visitorSupport: [{ type: 'WHEELCHAIR' }, { type: 'MASK_EXEMPT' }, { type: 'OTHER', text: 'custom request' }],
       })
     })
   })
