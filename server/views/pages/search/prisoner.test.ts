@@ -1,9 +1,9 @@
 import fs from 'fs'
 import * as cheerio from 'cheerio'
 import nunjucks, { Template } from 'nunjucks'
-import { registerNunjucks } from '../../utils/nunjucksSetup'
+import { registerNunjucks } from '../../../utils/nunjucksSetup'
 
-const template = fs.readFileSync('server/views/pages/search.njk')
+const template = fs.readFileSync('server/views/pages/search/prisoner.njk')
 
 describe('Views - Search', () => {
   let compiledTemplate: Template

@@ -10,18 +10,18 @@ export default function routes(router: Router, prisonerSearchService: PrisonerSe
   const get = (path: string, handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
   const post = (path: string, handler: RequestHandler) => router.post(path, asyncMiddleware(handler))
 
-  get('/', (req, res) => {
+  get('/prisoner', (req, res) => {
     const search = req?.body?.search
 
-    res.render('pages/search', { search })
+    res.render('pages/search/prisoner', { search })
   })
 
-  post('/', (req, res) => {
+  post('/prisoner', (req, res) => {
     const { search } = req.body
 
     return res.redirect(
       url.format({
-        pathname: '/search/results',
+        pathname: '/search/prisoner/results',
         query: {
           ...(search && { search }),
         },
@@ -29,7 +29,7 @@ export default function routes(router: Router, prisonerSearchService: PrisonerSe
     )
   })
 
-  get('/results', async (req, res) => {
+  get('/prisoner/results', async (req, res) => {
     const search = (req.query.search || '') as string
     const currentPage = (req.query.page || '') as string
     const parsedPage = Number.parseInt(currentPage, 10) || 1
@@ -50,7 +50,7 @@ export default function routes(router: Router, prisonerSearchService: PrisonerSe
       searchTerm: search,
     })
 
-    res.render('pages/searchResults', {
+    res.render('pages/search/prisonerResults', {
       establishment: 'Hewell (HMP)',
       search,
       results: error ? [] : results,
