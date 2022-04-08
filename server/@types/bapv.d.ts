@@ -142,5 +142,5 @@ export type VisitSessionData = {
     phoneNumber: string
     contactName?: string
   }
-  visitId?: string
+  visitReference?: string
 }

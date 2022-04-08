@@ -332,7 +332,7 @@ describe('visitSchedulerApiClient', () => {
           phoneNumber: result.visitContact.telephone,
           contactName: result.visitContact.name,
         },
-        visitId: 'v9-d7-ed-7u',
+        visitReference: 'v9-d7-ed-7u',
       }
       const visitContact = {
         telephone: visitSessionData.mainContact.phoneNumber,
@@ -416,7 +416,7 @@ describe('visitSchedulerApiClient', () => {
             banned: false,
           },
         ],
-        visitId: 'v9-d7-ed-7u',
+        visitReference: 'v9-d7-ed-7u',
       }
 
       fakeVisitSchedulerApi

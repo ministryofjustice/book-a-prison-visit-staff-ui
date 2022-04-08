@@ -640,7 +640,7 @@ describe('Visit sessions service', () => {
           phoneNumber: '01234 567890',
           contactName: 'John Smith',
         },
-        visitId: 'v9-d7-ed-7u',
+        visitReference: 'v9-d7-ed-7u',
       }
       const visit: Visit = {
         reference: 'v9-d7-ed-7u',

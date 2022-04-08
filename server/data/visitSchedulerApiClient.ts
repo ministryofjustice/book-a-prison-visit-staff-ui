@@ -94,7 +94,7 @@ class VisitSchedulerApiClient {
       : undefined
 
     return this.restclient.put({
-      path: `/visits/${visitData.visitId}`,
+      path: `/visits/${visitData.visitReference}`,
       data: <UpdateVisitRequestDto>{
         prisonerId: visitData.prisoner.offenderNo,
         prisonId: this.prisonId,

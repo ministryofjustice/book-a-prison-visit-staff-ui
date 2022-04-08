@@ -188,18 +188,18 @@ export default function routes(
       // @TODO placeholder until open/closed visits handled properly
       visitSessionData.visitRestriction = 'OPEN'
 
-      if (req.session.visitSessionData.visitId) {
+      if (req.session.visitSessionData.visitReference) {
         await visitSessionsService.updateVisit({
           username: res.locals.user?.username,
           visitData: visitSessionData,
         })
       } else {
-        const visitId = await visitSessionsService.createVisit({
+        const visitReference = await visitSessionsService.createVisit({
           username: res.locals.user?.username,
           visitData: visitSessionData,
         })
 
-        req.session.visitSessionData.visitId = visitId
+        req.session.visitSessionData.visitReference = visitReference
       }
 
       return res.redirect('/visit/additional-support')
@@ -386,7 +386,7 @@ export default function routes(
       visitSessionData.visitorSupport
     )
 
-    if (!req.session.visitSessionData.visitId) {
+    if (!req.session.visitSessionData.visitReference) {
       return res.render('pages/checkYourBooking', {
         errors: [
           {
@@ -411,7 +411,7 @@ export default function routes(
       })
 
       // TODO: Update to the correct value when schema updated
-      req.session.visitSessionData.visitId = bookedVisit.reference
+      req.session.visitSessionData.visitReference = bookedVisit.reference
     } catch (error) {
       return res.render('pages/checkYourBooking', {
         errors: [
@@ -442,7 +442,7 @@ export default function routes(
     )
 
     res.render('pages/confirmation', {
-      visitId: visitSessionData.visitId,
+      visitReference: visitSessionData.visitReference,
       offenderNo,
       prisoner: visitSessionData.prisoner,
       mainContact: visitSessionData.mainContact,

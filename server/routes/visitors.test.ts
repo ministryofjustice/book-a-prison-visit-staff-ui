@@ -903,7 +903,7 @@ describe('/visit/select-date-and-time', () => {
           })
           expect(visitSessionsService.createVisit).toHaveBeenCalledTimes(1)
           expect(visitSessionsService.updateVisit).not.toHaveBeenCalled()
-          expect(visitSessionData.visitId).toEqual('2a-bc-3d-ef')
+          expect(visitSessionData.visitReference).toEqual('2a-bc-3d-ef')
         })
     })
 
@@ -916,7 +916,7 @@ describe('/visit/select-date-and-time', () => {
         visitRoomName: 'room name',
       }
 
-      visitSessionData.visitId = '3b-cd-4f-fg'
+      visitSessionData.visitReference = '3b-cd-4f-fg'
 
       return request(sessionApp)
         .post('/visit/select-date-and-time')
@@ -933,7 +933,7 @@ describe('/visit/select-date-and-time', () => {
           })
           expect(visitSessionsService.createVisit).not.toHaveBeenCalled()
           expect(visitSessionsService.updateVisit).toHaveBeenCalledTimes(1)
-          expect(visitSessionsService.updateVisit.mock.calls[0][0].visitData.visitId).toBe('3b-cd-4f-fg')
+          expect(visitSessionsService.updateVisit.mock.calls[0][0].visitData.visitReference).toBe('3b-cd-4f-fg')
         })
     })
 
@@ -1844,7 +1844,7 @@ describe('GET /visit/confirmation', () => {
         phoneNumber: '123',
         contactName: 'abc',
       },
-      visitId: 'k2-00-lg-du',
+      visitReference: 'k2-00-lg-du',
     }
     sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, {
       availableSupportTypes,
@@ -1913,7 +1913,7 @@ describe('GET /visit/confirmation', () => {
           phoneNumber: '123',
           contactName: 'abc',
         },
-        visitId: 'k2-00-lg-du',
+        visitReference: 'k2-00-lg-du',
       }
       sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, {
         availableSupportTypes,
