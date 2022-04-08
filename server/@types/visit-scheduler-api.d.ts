@@ -4,11 +4,11 @@
  */
 
 export interface paths {
-  '/visits/{visitId}': {
-    /** Retrieve visit by visit id */
-    get: operations['getVisitById']
+  '/visits/{reference}': {
+    /** Retrieve visit by visit reference */
+    get: operations['getVisitByReference']
     put: operations['updateVisit']
-    /** Delete a visit by visit id */
+    /** Delete a visit by visit reference */
     delete: operations['deleteVisit']
   }
   '/visits': {
@@ -39,47 +39,42 @@ export interface paths {
 
 export interface components {
   schemas: {
-    /** @description Main Contact associated with the visit */
-    CreateContactOnVisitRequest: {
+    /** @description Contact associated with the visit */
+    CreateContactOnVisitRequestDto: {
       /**
        * @description Contact Name
        * @example John Smith
        */
-      contactName: string
+      name: string
       /**
-       * @description Contact Phone
+       * @description Contact Phone Number
        * @example 01234 567890
        */
-      contactPhone: string
+      telephone: string
     }
     /** @description List of additional support associated with the visit */
-    CreateSupportOnVisitRequest: {
+    CreateSupportOnVisitRequestDto: {
       /**
-       * @description Support name
+       * @description Support type
        * @example OTHER
        */
-      supportName: string
+      type: string
       /**
-       * @description Support details
+       * @description Support text description
        * @example visually impaired assistance
        */
-      supportDetails?: string
+      text?: string
     }
     /** @description List of visitors associated with the visit */
-    CreateVisitorOnVisitRequest: {
+    CreateVisitorOnVisitRequestDto: {
       /**
        * Format: int64
        * @description NOMIS person ID
        * @example 1234556
        */
       nomisPersonId: number
-      /**
-       * @description Lead Visitor
-       * @example true
-       */
-      leadVisitor: boolean
     }
-    UpdateVisitRequest: {
+    UpdateVisitRequestDto: {
       /**
        * @description Prisoner Id
        * @example AF34567G
@@ -91,6 +86,26 @@ export interface components {
        */
       prisonId?: string
       /**
+       * @description Visit Room
+       * @example A1
+       */
+      visitRoom?: string
+      /**
+       * @description Visit Type
+       * @example SOCIAL
+       */
+      visitType?: 'SOCIAL' | 'OFFICIAL' | 'FAMILY'
+      /**
+       * @description Visit Status
+       * @example RESERVED
+       */
+      visitStatus?: 'RESERVED' | 'BOOKED' | 'CANCELLED'
+      /**
+       * @description Visit Restriction
+       * @example OPEN
+       */
+      visitRestriction?: 'OPEN' | 'CLOSED'
+      /**
        * Format: date-time
        * @description The date and time of the visit
        */
@@ -100,40 +115,11 @@ export interface components {
        * @description The finishing date and time of the visit
        */
       endTimestamp?: string
-      /**
-       * @description Visit Type
-       * @example STANDARD_SOCIAL
-       */
-      visitType?: 'STANDARD_SOCIAL' | 'OFFICIAL' | 'FAMILY'
-      /**
-       * @description Visit Status
-       * @example RESERVED
-       */
-      visitStatus?:
-        | 'RESERVED'
-        | 'BOOKED'
-        | 'CANCELLED_BY_PRISONER'
-        | 'CANCELLED_BY_VISITOR'
-        | 'CANCELLED_BY_PRISON'
-        | 'ATTENDED'
-      /**
-       * @description Visit Room
-       * @example A1
-       */
-      visitRoom?: string
-      /** @description Visitor Concerns */
-      visitorConcerns?: string
-      mainContact?: components['schemas']['CreateContactOnVisitRequest']
+      visitContact?: components['schemas']['CreateContactOnVisitRequestDto']
       /** @description List of visitors associated with the visit */
-      contactList?: components['schemas']['CreateVisitorOnVisitRequest'][]
+      visitors?: components['schemas']['CreateVisitorOnVisitRequestDto'][]
       /** @description List of additional support associated with the visit */
-      supportList?: components['schemas']['CreateSupportOnVisitRequest'][]
-      /**
-       * Format: int64
-       * @description Session Id identifying the visit session template
-       * @example 123456
-       */
-      sessionId?: number
+      visitorSupport?: components['schemas']['CreateSupportOnVisitRequestDto'][]
     }
     ErrorResponse: {
       /** Format: int32 */
@@ -146,23 +132,23 @@ export interface components {
     /** @description Contact */
     ContactDto: {
       /**
-       * @description Main Contact Name
+       * @description Contact Name
        * @example John Smith
        */
-      contactName: string
+      name: string
       /**
-       * @description Main Contact Phone
+       * @description Contact Phone Number
        * @example 01234 567890
        */
-      contactPhone: string
+      telephone: string
     }
     /** @description Visit */
     VisitDto: {
       /**
-       * @description Visit id
+       * @description Visit Reference
        * @example v9-d7-ed-7u
        */
-      id: string
+      reference: string
       /**
        * @description Prisoner Id
        * @example AF34567G
@@ -180,24 +166,19 @@ export interface components {
       visitRoom: string
       /**
        * @description Visit Type
-       * @example STANDARD_SOCIAL
+       * @example SOCIAL
        */
-      visitType: string
-      /**
-       * @description Visit Type Description
-       * @example Standard Social
-       */
-      visitTypeDescription: string
+      visitType: 'SOCIAL' | 'OFFICIAL' | 'FAMILY'
       /**
        * @description Visit Status
        * @example RESERVED
        */
-      visitStatus: string
+      visitStatus: 'RESERVED' | 'BOOKED' | 'CANCELLED'
       /**
-       * @description Visit Status Description
-       * @example Reserved
+       * @description Visit Restriction
+       * @example OPEN
        */
-      visitStatusDescription: string
+      visitRestriction: 'OPEN' | 'CLOSED'
       /**
        * Format: date-time
        * @description The date and time of the visit
@@ -208,48 +189,44 @@ export interface components {
        * @description The finishing date and time of the visit
        */
       endTimestamp: string
-      /** @description Visitor Concerns */
-      visitorConcerns?: string
-      mainContact?: components['schemas']['ContactDto']
+      visitContact?: components['schemas']['ContactDto']
       /** @description List of visitors associated with the visit */
       visitors: components['schemas']['VisitorDto'][]
       /** @description List of additional support associated with the visit */
       visitorSupport: components['schemas']['VisitorSupportDto'][]
-      /**
-       * Format: int64
-       * @description Session Id identifying the visit session template
-       * @example 123
-       */
-      sessionId?: number
     }
     /** @description Visitor */
     VisitorDto: {
       /**
        * Format: int64
-       * @description person ID (nomis) of the visitor
+       * @description Person ID (nomis) of the visitor
        * @example 1234
        */
       nomisPersonId: number
-      /**
-       * @description indicates lead visitor for this visit
-       * @example true
-       */
-      leadVisitor: boolean
     }
     /** @description Visitor support */
     VisitorSupportDto: {
       /**
-       * @description Support name
+       * @description Support type
        * @example OTHER
        */
-      supportName: string
+      type: string
       /**
-       * @description Support details
+       * @description Support text description
        * @example visually impaired assistance
        */
-      supportDetails?: string
+      text?: string
     }
-    CreateVisitRequest: {
+    /** @description Create legacy data */
+    CreateLegacyDataRequestDto: {
+      /**
+       * Format: int64
+       * @description NOMIS lead visitor ID
+       * @example 1234556
+       */
+      leadVisitorId: number
+    }
+    CreateVisitRequestDto: {
       /**
        * @description Prisoner Id
        * @example AF34567G
@@ -261,6 +238,26 @@ export interface components {
        */
       prisonId: string
       /**
+       * @description Visit Room
+       * @example A1
+       */
+      visitRoom: string
+      /**
+       * @description Visit Type
+       * @example SOCIAL
+       */
+      visitType: 'SOCIAL' | 'OFFICIAL' | 'FAMILY'
+      /**
+       * @description Visit Status
+       * @example RESERVED
+       */
+      visitStatus: 'RESERVED' | 'BOOKED' | 'CANCELLED'
+      /**
+       * @description Visit Restriction
+       * @example OPEN
+       */
+      visitRestriction: 'OPEN' | 'CLOSED'
+      /**
        * Format: date-time
        * @description The date and time of the visit
        */
@@ -270,42 +267,29 @@ export interface components {
        * @description The finishing date and time of the visit
        */
       endTimestamp: string
-      /**
-       * @description Visit Type
-       * @example STANDARD_SOCIAL
-       */
-      visitType: 'STANDARD_SOCIAL' | 'OFFICIAL' | 'FAMILY'
-      /**
-       * @description Visit Status
-       * @example RESERVED
-       */
-      visitStatus:
-        | 'RESERVED'
-        | 'BOOKED'
-        | 'CANCELLED_BY_PRISONER'
-        | 'CANCELLED_BY_VISITOR'
-        | 'CANCELLED_BY_PRISON'
-        | 'ATTENDED'
-      /**
-       * @description Visit Room
-       * @example A1
-       */
-      visitRoom: string
-      /** @description Visitor Concerns */
-      visitorConcerns?: string
-      mainContact?: components['schemas']['CreateContactOnVisitRequest']
+      legacyData?: components['schemas']['CreateLegacyDataRequestDto']
+      visitContact?: components['schemas']['CreateContactOnVisitRequestDto']
       /** @description List of visitors associated with the visit */
-      contactList?: components['schemas']['CreateVisitorOnVisitRequest'][]
+      visitors?: components['schemas']['CreateVisitorOnVisitRequestDto'][]
       /** @description List of additional support associated with the visit */
-      supportList?: components['schemas']['CreateSupportOnVisitRequest'][]
-      /**
-       * Format: int64
-       * @description Session Id identifying the visit session template
-       * @example 123456
-       */
-      sessionId?: number
+      visitorSupport?: components['schemas']['CreateSupportOnVisitRequestDto'][]
+      /** @description Visit notes */
+      visitNotes?: components['schemas']['VisitNoteDto'][]
     }
-    CreateSessionTemplateRequest: {
+    /** @description VisitNote */
+    VisitNoteDto: {
+      /**
+       * @description Note type
+       * @example VISITOR_CONCERN
+       */
+      type: 'VISITOR_CONCERN' | 'VISIT_OUTCOMES' | 'VISIT_COMMENT' | 'STATUS_CHANGED_REASON'
+      /**
+       * @description Note text
+       * @example Visitor is concerned that his mother in-law is coming!
+       */
+      text: string
+    }
+    CreateSessionTemplateRequestDto: {
       /**
        * @description prisonId
        * @example MDI
@@ -327,9 +311,9 @@ export interface components {
       expiryDate?: string
       /**
        * @description visit type
-       * @example STANDARD_SOCIAL
+       * @example SOCIAL
        */
-      visitType: 'STANDARD_SOCIAL' | 'OFFICIAL' | 'FAMILY'
+      visitType: 'SOCIAL' | 'OFFICIAL' | 'FAMILY'
       /**
        * @description visit room
        * @example A1
@@ -342,11 +326,13 @@ export interface components {
       /**
        * Format: int32
        * @description closed capacity
+       * @example 10
        */
       closedCapacity: number
       /**
        * Format: int32
        * @description open capacity
+       * @example 50
        */
       openCapacity: number
     }
@@ -392,9 +378,9 @@ export interface components {
       expiryDate?: string
       /**
        * @description visit type
-       * @example STANDARD_SOCIAL
+       * @example SOCIAL
        */
-      visitType: 'STANDARD_SOCIAL' | 'OFFICIAL' | 'FAMILY'
+      visitType: 'SOCIAL' | 'OFFICIAL' | 'FAMILY'
       /**
        * @description visit room
        * @example A1
@@ -410,27 +396,23 @@ export interface components {
       /**
        * Format: int32
        * @description closed capacity
+       * @example 10
        */
       closedCapacity: number
       /**
        * Format: int32
        * @description open capacity
+       * @example 50
        */
       openCapacity: number
     }
     /** @description Support Type */
     SupportTypeDto: {
       /**
-       * Format: int32
-       * @description Support code
-       * @example 1040
-       */
-      code: number
-      /**
-       * @description Support name
+       * @description Support type name
        * @example MASK_EXEMPT
        */
-      name: string
+      type: string
       /**
        * @description Support description
        * @example Face covering exemption
@@ -438,7 +420,7 @@ export interface components {
       description: string
     }
     /** @description Visit Session */
-    VisitSession: {
+    VisitSessionDto: {
       /**
        * Format: int64
        * @description session id
@@ -451,15 +433,10 @@ export interface components {
        */
       visitRoomName: string
       /**
-       * @description The type of visits taking place within this session - code
-       * @example STANDARD_SOCIAL
+       * @description The type of visits taking place within this session
+       * @example SOCIAL
        */
-      visitType: string
-      /**
-       * @description The type of visits taking place within this session - description
-       * @example Standard social
-       */
-      visitTypeDescription: string
+      visitType: 'SOCIAL' | 'OFFICIAL' | 'FAMILY'
       /**
        * @description The prison id
        * @example LEI
@@ -481,7 +458,7 @@ export interface components {
        * @description The count of open visit bookings already reserved or booked for this session
        * @example 1
        */
-      openVisitBookedCount: number
+      openVisitBookedCount?: number
       /**
        * Format: int32
        * @description The number of closed visits which may take place within this session
@@ -493,7 +470,7 @@ export interface components {
        * @description The count of closed visit bookings already reserved or booked for this session
        * @example 1
        */
-      closedVisitBookedCount: number
+      closedVisitBookedCount?: number
       /**
        * Format: date-time
        * @description The start timestamp for this visit session
@@ -509,11 +486,11 @@ export interface components {
 }
 
 export interface operations {
-  /** Retrieve visit by visit id */
-  getVisitById: {
+  /** Retrieve visit by visit reference */
+  getVisitByReference: {
     parameters: {
       path: {
-        visitId: string
+        reference: string
       }
     }
     responses: {
@@ -552,7 +529,7 @@ export interface operations {
   updateVisit: {
     parameters: {
       path: {
-        visitId: string
+        reference: string
       }
     }
     responses: {
@@ -589,15 +566,15 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdateVisitRequest']
+        'application/json': components['schemas']['UpdateVisitRequestDto']
       }
     }
   }
-  /** Delete a visit by visit id */
+  /** Delete a visit by visit reference */
   deleteVisit: {
     parameters: {
       path: {
-        visitId: string
+        reference: string
       }
     }
     responses: {
@@ -689,7 +666,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['CreateVisitRequest']
+        'application/json': components['schemas']['CreateVisitRequestDto']
       }
     }
   }
@@ -745,7 +722,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['CreateSessionTemplateRequest']
+        'application/json': components['schemas']['CreateSessionTemplateRequestDto']
       }
     }
   }
@@ -790,7 +767,7 @@ export interface operations {
       /** Visit session information returned */
       200: {
         content: {
-          'application/json': components['schemas']['VisitSession'][]
+          'application/json': components['schemas']['VisitSessionDto'][]
         }
       }
       /** Incorrect request to Get visit sessions */
