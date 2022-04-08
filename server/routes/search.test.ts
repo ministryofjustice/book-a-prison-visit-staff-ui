@@ -188,3 +188,16 @@ describe('Prisoner search page', () => {
     })
   })
 })
+
+describe('Booking search page', () => {
+  describe('GET /search/booking', () => {
+    it('should render booking search page', () => {
+      return request(app)
+        .get('/search/booking')
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          expect(res.text).toContain('Search for a booking')
+        })
+    })
+  })
+})
