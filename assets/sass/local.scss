@@ -52,3 +52,26 @@
 .bapv-prisoner-event--top-margin {
   margin-top: 45px;
 }
+
+.bapv-booking-search {
+  display: flex;
+  align-items: center;
+
+  & > span {
+    margin-right: govuk-spacing(2);
+  }
+
+  .govuk-form-group {
+    margin-right: govuk-spacing(2);
+    margin-bottom: 0;
+  }
+
+  .govuk-button {
+    margin-left: govuk-spacing(4);
+    margin-bottom: 0;
+  }
+}
+
+.bapv-booking-search-label {
+  margin-bottom: govuk-spacing(3);
+}

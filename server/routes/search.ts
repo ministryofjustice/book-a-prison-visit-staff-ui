@@ -65,5 +65,24 @@ export default function routes(router: Router, prisonerSearchService: PrisonerSe
     })
   })
 
+  get('/booking', (req, res) => {
+    const search = req?.body?.search
+
+    res.render('pages/search/booking', { search })
+  })
+
+  post('/booking', (req, res) => {
+    const { search } = req.body
+
+    return res.redirect(
+      url.format({
+        pathname: '/search/booking/results',
+        query: {
+          ...(search && { search }),
+        },
+      })
+    )
+  })
+
   return router
 }
