@@ -185,6 +185,9 @@ export default function routes(
 
       visitSessionData.visit = getSelectedSlot(req.session.slotsList, req.body['visit-date-and-time'])
 
+      // @TODO placeholder until open/closed visits handled properly
+      visitSessionData.visitRestriction = 'OPEN'
+
       if (req.session.visitSessionData.visitId) {
         await visitSessionsService.updateVisit({
           username: res.locals.user?.username,
@@ -216,10 +219,8 @@ export default function routes(
 
     if (!Object.keys(formValues).length && visitSessionData.visitorSupport) {
       formValues.additionalSupportRequired = visitSessionData.visitorSupport.length ? 'yes' : 'no'
-      formValues.additionalSupport = visitSessionData.visitorSupport.map(support => support.supportName)
-      formValues.otherSupportDetails = visitSessionData.visitorSupport.find(
-        support => support.supportName === 'OTHER'
-      )?.supportDetails
+      formValues.additionalSupport = visitSessionData.visitorSupport.map(support => support.type)
+      formValues.otherSupportDetails = visitSessionData.visitorSupport.find(support => support.type === 'OTHER')?.text
     }
 
     res.render('pages/additionalSupport', {
@@ -245,7 +246,7 @@ export default function routes(
         if (req.body.additionalSupportRequired === 'yes') {
           const validSupportRequest = value.reduce((valid, supportReq) => {
             return valid
-              ? req.session.availableSupportTypes.find((option: SupportType) => option.name === supportReq)
+              ? req.session.availableSupportTypes.find((option: SupportType) => option.type === supportReq)
               : false
           }, true)
           if (!value.length || !validSupportRequest) throw new Error('No request selected')
@@ -273,9 +274,9 @@ export default function routes(
       }
 
       visitSessionData.visitorSupport = req.body.additionalSupport.map((support: string): VisitorSupport => {
-        const supportItem: VisitorSupport = { supportName: support }
+        const supportItem: VisitorSupport = { type: support }
         if (support === 'OTHER') {
-          supportItem.supportDetails = req.body.otherSupportDetails
+          supportItem.text = req.body.otherSupportDetails
         }
         return supportItem
       })
@@ -410,7 +411,7 @@ export default function routes(
       })
 
       // TODO: Update to the correct value when schema updated
-      req.session.visitSessionData.visitId = bookedVisit.id
+      req.session.visitSessionData.visitId = bookedVisit.reference
     } catch (error) {
       return res.render('pages/checkYourBooking', {
         errors: [

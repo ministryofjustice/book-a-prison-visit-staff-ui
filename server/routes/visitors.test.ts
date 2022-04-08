@@ -23,28 +23,23 @@ let visitSessionData: VisitSessionData
 
 const availableSupportTypes: SupportType[] = [
   {
-    code: 1010,
-    name: 'WHEELCHAIR',
+    type: 'WHEELCHAIR',
     description: 'Wheelchair ramp',
   },
   {
-    code: 1020,
-    name: 'INDUCTION_LOOP',
+    type: 'INDUCTION_LOOP',
     description: 'Portable induction loop for people with hearing aids',
   },
   {
-    code: 1030,
-    name: 'BSL_INTERPRETER',
+    type: 'BSL_INTERPRETER',
     description: 'British Sign Language (BSL) Interpreter',
   },
   {
-    code: 1040,
-    name: 'MASK_EXEMPT',
+    type: 'MASK_EXEMPT',
     description: 'Face covering exemption',
   },
   {
-    code: 1050,
-    name: 'OTHER',
+    type: 'OTHER',
     description: 'Other',
   },
 ]
@@ -1068,9 +1063,9 @@ describe('GET /visit/additional-support', () => {
 
   it('should render the additional support page, pre-populated with session data (multiple requests)', () => {
     visitSessionData.visitorSupport = [
-      { supportName: 'WHEELCHAIR' },
-      { supportName: 'MASK_EXEMPT' },
-      { supportName: 'OTHER', supportDetails: 'custom request' },
+      { type: 'WHEELCHAIR' },
+      { type: 'MASK_EXEMPT' },
+      { type: 'OTHER', text: 'custom request' },
     ]
 
     return request(sessionApp)
@@ -1351,13 +1346,13 @@ describe('POST /visit/additional-support', () => {
       .expect('location', '/visit/select-main-contact')
       .expect(() => {
         expect(visitSessionData.visitorSupport).toEqual(<VisitorSupport[]>[
-          { supportName: 'WHEELCHAIR' },
-          { supportName: 'INDUCTION_LOOP' },
-          { supportName: 'BSL_INTERPRETER' },
-          { supportName: 'MASK_EXEMPT' },
+          { type: 'WHEELCHAIR' },
+          { type: 'INDUCTION_LOOP' },
+          { type: 'BSL_INTERPRETER' },
+          { type: 'MASK_EXEMPT' },
           {
-            supportName: 'OTHER',
-            supportDetails: 'custom-request',
+            type: 'OTHER',
+            text: 'custom-request',
           },
         ])
       })
@@ -1684,6 +1679,7 @@ describe('GET /visit/check-your-booking', () => {
         availableTables: 1,
         visitRoomName: 'room name',
       },
+      visitRestriction: 'OPEN',
       visitors: [
         {
           personId: 123,
@@ -1703,7 +1699,7 @@ describe('GET /visit/check-your-booking', () => {
           banned: false,
         },
       ],
-      visitorSupport: [{ supportName: 'WHEELCHAIR' }, { supportName: 'INDUCTION_LOOP' }],
+      visitorSupport: [{ type: 'WHEELCHAIR' }, { type: 'INDUCTION_LOOP' }],
       mainContact: {
         phoneNumber: '123',
         contactName: 'abc',
@@ -1843,7 +1839,7 @@ describe('GET /visit/confirmation', () => {
           banned: false,
         },
       ],
-      visitorSupport: [{ supportName: 'WHEELCHAIR' }, { supportName: 'INDUCTION_LOOP' }],
+      visitorSupport: [{ type: 'WHEELCHAIR' }, { type: 'INDUCTION_LOOP' }],
       mainContact: {
         phoneNumber: '123',
         contactName: 'abc',
