@@ -26,7 +26,7 @@ export type PrisonerAlertItem = [
 
 export type UpcomingVisitItem = [
   {
-    text: string
+    html: string
   },
   {
     text: string
@@ -41,7 +41,7 @@ export type UpcomingVisitItem = [
 
 export type PastVisitItem = [
   {
-    text: string
+    html: string
   },
   {
     text: string
@@ -134,6 +134,7 @@ export type VisitSessionData = {
     location: string
   }
   visit?: VisitSlot
+  visitRestriction?: 'OPEN' | 'CLOSED'
   visitors?: VisitorListItem[]
   visitorSupport?: VisitorSupport[]
   mainContact?: {
@@ -141,5 +142,5 @@ export type VisitSessionData = {
     phoneNumber: string
     contactName?: string
   }
-  visitId?: string
+  visitReference?: string
 }

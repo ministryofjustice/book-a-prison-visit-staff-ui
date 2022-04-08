@@ -11,7 +11,7 @@ import {
   UpcomingVisitItem,
   PastVisitItem,
 } from '../@types/bapv'
-import { prisonerDatePretty, properCaseFullName, prisonerDateTimePretty } from '../utils/utils'
+import { prisonerDatePretty, properCaseFullName, prisonerDateTimePretty, properCase } from '../utils/utils'
 import { Alert, OffenderRestriction } from '../data/prisonApiTypes'
 import { Visit } from '../data/visitSchedulerApiTypes'
 import { Contact } from '../data/prisonerContactRegistryApiTypes'
@@ -108,7 +108,7 @@ export default class PrisonerProfileService {
   ): Promise<UpcomingVisitItem[]> {
     const visits: Visit[] = await visitSchedulerApiClient.getUpcomingVisits(offenderNo)
     const contacts = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(offenderNo)
-    const socialVisits: Visit[] = visits.filter(visit => visit.visitType === 'STANDARD_SOCIAL')
+    const socialVisits: Visit[] = visits.filter(visit => visit.visitType === 'SOCIAL')
 
     const visitsForDisplay: UpcomingVisitItem[] = await Promise.all(
       socialVisits.map(async visit => {
@@ -122,7 +122,7 @@ export default class PrisonerProfileService {
         const visitContactNames = await this.getPrisonerSocialContacts(contacts, visitors)
 
         return [
-          { text: `${visit.visitTypeDescription}` },
+          { html: `${properCase(visit.visitType)}<br>(${properCase(visit.visitRestriction)})` },
           { text: 'Hewell (HMP)' },
           {
             html: visit.startTimestamp
@@ -144,7 +144,7 @@ export default class PrisonerProfileService {
   ): Promise<PastVisitItem[]> {
     const visits: Visit[] = await visitSchedulerApiClient.getPastVisits(offenderNo)
     const contacts = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(offenderNo)
-    const socialVisits: Visit[] = visits.filter(visit => visit.visitType === 'STANDARD_SOCIAL')
+    const socialVisits: Visit[] = visits.filter(visit => visit.visitType === 'SOCIAL')
 
     const visitsForDisplay: PastVisitItem[] = await Promise.all(
       socialVisits.map(async visit => {
@@ -158,7 +158,7 @@ export default class PrisonerProfileService {
         const visitContactNames = await this.getPrisonerSocialContacts(contacts, visitors)
 
         return [
-          { text: `${visit.visitTypeDescription}` },
+          { html: `${properCase(visit.visitType)}<br>(${properCase(visit.visitRestriction)})` },
           { text: 'Hewell (HMP)' },
           {
             html: visit.startTimestamp
@@ -166,7 +166,7 @@ export default class PrisonerProfileService {
               : '<p>N/A</p>',
           },
           { html: `<p>${visitContactNames.join('<br>')}</p>` },
-          { text: `${visit.visitStatusDescription}` },
+          { text: `${properCase(visit.visitStatus)}` },
         ] as PastVisitItem
       })
     )

@@ -158,9 +158,9 @@ export default class VisitSessionsService {
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
 
     const reservation = await visitSchedulerApiClient.createVisit(visitData)
-    logger.info(`Created visit ${reservation?.id} for offender ${visitData.prisoner.offenderNo}`)
+    logger.info(`Created visit ${reservation?.reference} for offender ${visitData.prisoner.offenderNo}`)
 
-    return reservation.id ? reservation.id : undefined
+    return reservation.reference ? reservation.reference : undefined
   }
 
   async updateVisit({
@@ -176,7 +176,9 @@ export default class VisitSessionsService {
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
 
     const visit = await visitSchedulerApiClient.updateVisit(visitData, visitStatus)
-    logger.info(`Updated visit ${visit.id} (status = ${visitStatus}) for offender ${visitData.prisoner.offenderNo}`)
+    logger.info(
+      `Updated visit ${visit.reference} (status = ${visitStatus}) for offender ${visitData.prisoner.offenderNo}`
+    )
 
     return visit
   }

@@ -1,6 +1,12 @@
 import { URLSearchParams } from 'url'
 import RestClient from './restClient'
-import { SupportType, Visit, VisitSession } from './visitSchedulerApiTypes'
+import {
+  CreateVisitRequestDto,
+  SupportType,
+  UpdateVisitRequestDto,
+  Visit,
+  VisitSession,
+} from './visitSchedulerApiTypes'
 import { VisitSessionData } from '../@types/bapv'
 import config from '../config'
 
@@ -16,7 +22,7 @@ class VisitSchedulerApiClient {
 
   private prisonId = 'HEI'
 
-  private visitType = 'STANDARD_SOCIAL'
+  private visitType = 'SOCIAL'
 
   getAvailableSupportOptions(): Promise<SupportType[]> {
     return this.restclient.get({
@@ -28,8 +34,8 @@ class VisitSchedulerApiClient {
     return this.restclient.get({
       path: '/visits',
       query: new URLSearchParams({
-        prisonId: this.prisonId,
         prisonerId: offenderNo,
+        prisonId: this.prisonId,
         startTimestamp: startTimestamp || new Date().toISOString(),
       }).toString(),
     })
@@ -39,8 +45,8 @@ class VisitSchedulerApiClient {
     return this.restclient.get({
       path: '/visits',
       query: new URLSearchParams({
-        prisonId: this.prisonId,
         prisonerId: offenderNo,
+        prisonId: this.prisonId,
         endTimestamp: endTimestamp || new Date().toISOString(),
       }).toString(),
     })
@@ -59,15 +65,16 @@ class VisitSchedulerApiClient {
   createVisit(visitData: VisitSessionData): Promise<Visit> {
     return this.restclient.post({
       path: '/visits',
-      data: {
-        prisonId: this.prisonId,
+      data: <CreateVisitRequestDto>{
         prisonerId: visitData.prisoner.offenderNo,
-        startTimestamp: visitData.visit.startTimestamp,
-        endTimestamp: visitData.visit.endTimestamp,
+        prisonId: this.prisonId,
+        visitRoom: visitData.visit.visitRoomName,
         visitType: this.visitType,
         visitStatus: 'RESERVED',
-        visitRoom: visitData.visit.visitRoomName,
-        contactList: visitData.visitors.map(visitor => {
+        visitRestriction: visitData.visitRestriction,
+        startTimestamp: visitData.visit.startTimestamp,
+        endTimestamp: visitData.visit.endTimestamp,
+        visitors: visitData.visitors.map(visitor => {
           return {
             nomisPersonId: visitor.personId,
           }
@@ -77,32 +84,33 @@ class VisitSchedulerApiClient {
   }
 
   updateVisit(visitData: VisitSessionData, visitStatus: string): Promise<Visit> {
-    const mainContact = visitData.mainContact
+    const visitContact = visitData.mainContact
       ? {
-          contactPhone: visitData.mainContact.phoneNumber,
-          contactName: visitData.mainContact.contactName
+          telephone: visitData.mainContact.phoneNumber,
+          name: visitData.mainContact.contactName
             ? visitData.mainContact.contactName
             : visitData.mainContact.contact.name,
         }
       : undefined
 
     return this.restclient.put({
-      path: `/visits/${visitData.visitId}`,
-      data: {
-        prisonId: this.prisonId,
+      path: `/visits/${visitData.visitReference}`,
+      data: <UpdateVisitRequestDto>{
         prisonerId: visitData.prisoner.offenderNo,
-        startTimestamp: visitData.visit.startTimestamp,
-        endTimestamp: visitData.visit.endTimestamp,
+        prisonId: this.prisonId,
+        visitRoom: visitData.visit.visitRoomName,
         visitType: this.visitType,
         visitStatus,
-        visitRoom: visitData.visit.visitRoomName,
-        supportList: visitData.visitorSupport,
-        mainContact,
-        contactList: visitData.visitors.map(visitor => {
+        visitRestriction: visitData.visitRestriction,
+        startTimestamp: visitData.visit.startTimestamp,
+        endTimestamp: visitData.visit.endTimestamp,
+        visitContact,
+        visitors: visitData.visitors.map(visitor => {
           return {
             nomisPersonId: visitor.personId,
           }
         }),
+        visitorSupport: visitData.visitorSupport,
       },
     })
   }

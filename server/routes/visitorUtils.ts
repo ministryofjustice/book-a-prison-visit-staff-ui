@@ -70,8 +70,8 @@ export const getSupportTypeDescriptions = (
   visitorSupport: VisitorSupport[]
 ): string[] => {
   return visitorSupport.map(support => {
-    return support.supportName === 'OTHER'
-      ? support.supportDetails
-      : availableSupportTypes.find(type => type.name === support.supportName).description
+    return support.type === 'OTHER'
+      ? support.text
+      : availableSupportTypes.find(type => type.type === support.type).description
   })
 }
