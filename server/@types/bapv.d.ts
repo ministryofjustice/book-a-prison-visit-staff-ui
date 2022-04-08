@@ -26,7 +26,7 @@ export type PrisonerAlertItem = [
 
 export type UpcomingVisitItem = [
   {
-    text: string
+    html: string
   },
   {
     text: string
@@ -41,7 +41,7 @@ export type UpcomingVisitItem = [
 
 export type PastVisitItem = [
   {
-    text: string
+    html: string
   },
   {
     text: string
