@@ -4,7 +4,7 @@ import { Cookie, SessionData } from 'express-session'
 import indexRoutes from '../index'
 import searchRoutes from '../search'
 import prisonerRoutes from '../prisoner'
-import visitorsRoutes from '../visitors'
+import bookAVisitRoutes from '../bookAVisit'
 import nunjucksSetup from '../../utils/nunjucksSetup'
 import errorHandler from '../../errorHandler'
 import standardRouter from '../standardRouter'
@@ -115,7 +115,7 @@ function appSetup(
     new VisitSessionsService(visitSchedulerApiClientBuilder, whereaboutsApiClientBuilder, systemTokenTest)
   app.use(
     '/book-a-visit/',
-    visitorsRoutes(
+    bookAVisitRoutes(
       standardRouter(new MockUserService()),
       prisonerVisitorsService,
       visitSessionsService,

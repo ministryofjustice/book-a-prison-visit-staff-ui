@@ -5,7 +5,7 @@ import createError from 'http-errors'
 import indexRoutes from './routes'
 import searchRoutes from './routes/search'
 import prisonerRoutes from './routes/prisoner'
-import visitorsRoutes from './routes/visitors'
+import bookAVisitRoutes from './routes/bookAVisit'
 import nunjucksSetup from './utils/nunjucksSetup'
 import errorHandler from './errorHandler'
 import standardRouter from './routes/standardRouter'
@@ -63,7 +63,7 @@ export default function createApp(userService: UserService): express.Application
   )
   app.use(
     '/book-a-visit/',
-    visitorsRoutes(
+    bookAVisitRoutes(
       standardRouter(userService),
       new PrisonerVisitorsService(prisonerContactRegistryApiClientBuilder, systemToken),
       new VisitSessionsService(visitSchedulerApiClientBuilder, whereaboutsApiClientBuilder, systemToken),
