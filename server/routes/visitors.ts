@@ -114,7 +114,7 @@ export default function routes(
 
       visitSessionData.visitors = selectedVisitors
 
-      return res.redirect('/visit/select-date-and-time')
+      return res.redirect('/book-a-visit/select-date-and-time')
     }
   )
 
@@ -202,7 +202,7 @@ export default function routes(
         req.session.visitSessionData.visitReference = visitReference
       }
 
-      return res.redirect('/visit/additional-support')
+      return res.redirect('/book-a-visit/additional-support')
     }
   )
 
@@ -281,7 +281,7 @@ export default function routes(
         return supportItem
       })
 
-      return res.redirect('/visit/select-main-contact')
+      return res.redirect('/book-a-visit/select-main-contact')
     }
   )
 
@@ -354,7 +354,7 @@ export default function routes(
         contactName: selectedContact === undefined ? req.body.someoneElseName : undefined,
       }
 
-      return res.redirect('/visit/check-your-booking')
+      return res.redirect('/book-a-visit/check-your-booking')
     }
   )
 
@@ -429,7 +429,7 @@ export default function routes(
       })
     }
 
-    return res.redirect('/visit/confirmation')
+    return res.redirect('/book-a-visit/confirmation')
   })
 
   router.get('/confirmation', sessionCheckMiddleware({ stage: 6 }), async (req, res) => {

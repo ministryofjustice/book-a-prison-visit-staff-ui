@@ -55,7 +55,7 @@ afterEach(() => {
   jest.resetAllMocks()
 })
 
-describe('GET /visit/select-visitors', () => {
+describe('GET /book-a-visit/select-visitors', () => {
   const visitorList: { visitors: VisitorListItem[] } = { visitors: [] }
 
   const prisonerVisitorsService = new PrisonerVisitorsService(null, systemToken) as jest.Mocked<PrisonerVisitorsService>
@@ -162,7 +162,7 @@ describe('GET /visit/select-visitors', () => {
 
   it('should render the prisoner restrictions when they are present', () => {
     return request(sessionApp)
-      .get('/visit/select-visitors')
+      .get('/book-a-visit/select-visitors')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -194,7 +194,7 @@ describe('GET /visit/select-visitors', () => {
     } as SessionData)
 
     return request(sessionApp)
-      .get('/visit/select-visitors')
+      .get('/book-a-visit/select-visitors')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -215,7 +215,7 @@ describe('GET /visit/select-visitors', () => {
     } as SessionData)
 
     return request(sessionApp)
-      .get('/visit/select-visitors')
+      .get('/book-a-visit/select-visitors')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -230,7 +230,7 @@ describe('GET /visit/select-visitors', () => {
 
   it('should render the approved visitor list for offender number A1234BC with none selected and store visitorList in session', () => {
     return request(sessionApp)
-      .get('/visit/select-visitors')
+      .get('/book-a-visit/select-visitors')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -282,7 +282,7 @@ describe('GET /visit/select-visitors', () => {
     ]
 
     return request(sessionApp)
-      .get('/visit/select-visitors')
+      .get('/book-a-visit/select-visitors')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -324,7 +324,7 @@ describe('GET /visit/select-visitors', () => {
     ]
 
     return request(sessionApp)
-      .get('/visit/select-visitors')
+      .get('/book-a-visit/select-visitors')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -343,7 +343,7 @@ describe('GET /visit/select-visitors', () => {
     flashData.errors = [{ location: 'body', msg: 'No visitors selected', param: 'visitors', value: undefined }]
 
     return request(sessionApp)
-      .get('/visit/select-visitors')
+      .get('/book-a-visit/select-visitors')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -363,7 +363,7 @@ describe('GET /visit/select-visitors', () => {
     prisonerVisitorsService.getVisitors.mockResolvedValue(returnData)
 
     return request(sessionApp)
-      .get('/visit/select-visitors')
+      .get('/book-a-visit/select-visitors')
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
@@ -376,7 +376,7 @@ describe('GET /visit/select-visitors', () => {
   })
 })
 
-describe('POST /visit/select-visitors', () => {
+describe('POST /book-a-visit/select-visitors', () => {
   const adultVisitors: { adults: VisitorListItem[] } = { adults: [] }
 
   beforeEach(() => {
@@ -486,10 +486,10 @@ describe('POST /visit/select-visitors', () => {
     ] as VisitorListItem[]
 
     return request(sessionApp)
-      .post('/visit/select-visitors')
+      .post('/book-a-visit/select-visitors')
       .send('visitors=4322')
       .expect(302)
-      .expect('location', '/visit/select-date-and-time')
+      .expect('location', '/book-a-visit/select-date-and-time')
       .expect(() => {
         expect(adultVisitors.adults).toEqual(returnAdult)
         expect(visitSessionData.visitors).toEqual(returnAdult)
@@ -522,10 +522,10 @@ describe('POST /visit/select-visitors', () => {
     } as VisitorListItem
 
     return request(sessionApp)
-      .post('/visit/select-visitors')
+      .post('/book-a-visit/select-visitors')
       .send('visitors=4322&visitors=4324')
       .expect(302)
-      .expect('location', '/visit/select-date-and-time')
+      .expect('location', '/book-a-visit/select-date-and-time')
       .expect(() => {
         expect(adultVisitors.adults).toEqual([returnAdult])
         expect(visitSessionData.visitors).toEqual([returnAdult, returnChild])
@@ -574,10 +574,10 @@ describe('POST /visit/select-visitors', () => {
     } as VisitorListItem
 
     return request(sessionApp)
-      .post('/visit/select-visitors')
+      .post('/book-a-visit/select-visitors')
       .send('visitors=4323')
       .expect(302)
-      .expect('location', '/visit/select-date-and-time')
+      .expect('location', '/book-a-visit/select-date-and-time')
       .expect(() => {
         expect(adultVisitors.adults).toEqual([returnAdult])
         expect(visitSessionData.visitors).toEqual([returnAdult])
@@ -586,10 +586,10 @@ describe('POST /visit/select-visitors', () => {
 
   it('should should set validation errors in flash and redirect if invalid visitor selected', () => {
     return request(sessionApp)
-      .post('/visit/select-visitors')
+      .post('/book-a-visit/select-visitors')
       .send('visitors=1234')
       .expect(302)
-      .expect('location', '/visit/select-visitors')
+      .expect('location', '/book-a-visit/select-visitors')
       .expect(() => {
         expect(flashProvider).toHaveBeenCalledWith('errors', [
           { location: 'body', msg: 'Add an adult to the visit', param: 'visitors', value: '1234' },
@@ -600,10 +600,10 @@ describe('POST /visit/select-visitors', () => {
 
   it('should should set validation errors in flash and redirect if banned is visitor selected', () => {
     return request(sessionApp)
-      .post('/visit/select-visitors')
+      .post('/book-a-visit/select-visitors')
       .send('visitors=4321')
       .expect(302)
-      .expect('location', '/visit/select-visitors')
+      .expect('location', '/book-a-visit/select-visitors')
       .expect(() => {
         expect(flashProvider).toHaveBeenCalledWith('errors', [
           { location: 'body', msg: 'Invalid selection', param: 'visitors', value: '4321' },
@@ -614,9 +614,9 @@ describe('POST /visit/select-visitors', () => {
 
   it('should set validation errors in flash and redirect if no visitors are selected', () => {
     return request(sessionApp)
-      .post('/visit/select-visitors')
+      .post('/book-a-visit/select-visitors')
       .expect(302)
-      .expect('location', '/visit/select-visitors')
+      .expect('location', '/book-a-visit/select-visitors')
       .expect(() => {
         expect(flashProvider).toHaveBeenCalledWith('errors', [
           { location: 'body', msg: 'No visitors selected', param: 'visitors', value: undefined },
@@ -627,10 +627,10 @@ describe('POST /visit/select-visitors', () => {
 
   it('should set validation errors in flash and redirect if no adults are selected', () => {
     return request(sessionApp)
-      .post('/visit/select-visitors')
+      .post('/book-a-visit/select-visitors')
       .send('visitors=4324')
       .expect(302)
-      .expect('location', '/visit/select-visitors')
+      .expect('location', '/book-a-visit/select-visitors')
       .expect(() => {
         expect(flashProvider).toHaveBeenCalledWith('errors', [
           { location: 'body', msg: 'Add an adult to the visit', param: 'visitors', value: '4324' },
@@ -641,10 +641,10 @@ describe('POST /visit/select-visitors', () => {
 
   it('should set validation errors in flash and redirect if more than 2 adults are selected', () => {
     return request(sessionApp)
-      .post('/visit/select-visitors')
+      .post('/book-a-visit/select-visitors')
       .send('visitors=4322&visitors=4323&visitors=4326')
       .expect(302)
-      .expect('location', '/visit/select-visitors')
+      .expect('location', '/book-a-visit/select-visitors')
       .expect(() => {
         expect(flashProvider).toHaveBeenCalledWith('errors', [
           {
@@ -660,10 +660,10 @@ describe('POST /visit/select-visitors', () => {
 
   it('should set validation errors in flash and redirect if more than 3 visitors are selected', () => {
     return request(sessionApp)
-      .post('/visit/select-visitors')
+      .post('/book-a-visit/select-visitors')
       .send('visitors=4322&visitors=4323&visitors=4324&visitors=4325')
       .expect(302)
-      .expect('location', '/visit/select-visitors')
+      .expect('location', '/book-a-visit/select-visitors')
       .expect(() => {
         expect(flashProvider).toHaveBeenCalledWith('errors', [
           {
@@ -678,7 +678,7 @@ describe('POST /visit/select-visitors', () => {
   })
 })
 
-describe('/visit/select-date-and-time', () => {
+describe('/book-a-visit/select-date-and-time', () => {
   const slotsList: VisitSlotList = {
     'February 2022': [
       {
@@ -782,7 +782,7 @@ describe('/visit/select-date-and-time', () => {
     }
   })
 
-  describe('GET /visit/select-date-and-time', () => {
+  describe('GET /book-a-visit/select-date-and-time', () => {
     const visitSessionsService = new VisitSessionsService(null, null, systemToken) as jest.Mocked<VisitSessionsService>
 
     beforeEach(() => {
@@ -795,7 +795,7 @@ describe('/visit/select-date-and-time', () => {
 
     it('should render the available sessions list with none selected', () => {
       return request(sessionApp)
-        .get('/visit/select-date-and-time')
+        .get('/book-a-visit/select-date-and-time')
         .expect(200)
         .expect('Content-Type', /html/)
         .expect(res => {
@@ -817,7 +817,7 @@ describe('/visit/select-date-and-time', () => {
       } as SessionData)
 
       return request(sessionApp)
-        .get('/visit/select-date-and-time')
+        .get('/book-a-visit/select-date-and-time')
         .expect(200)
         .expect('Content-Type', /html/)
         .expect(res => {
@@ -840,7 +840,7 @@ describe('/visit/select-date-and-time', () => {
       }
 
       return request(sessionApp)
-        .get('/visit/select-date-and-time')
+        .get('/book-a-visit/select-date-and-time')
         .expect(200)
         .expect('Content-Type', /html/)
         .expect(res => {
@@ -859,7 +859,7 @@ describe('/visit/select-date-and-time', () => {
       flashData.errors = [{ location: 'body', msg: 'No time slot selected', param: 'visit-date-and-time' }]
 
       return request(sessionApp)
-        .get('/visit/select-date-and-time')
+        .get('/book-a-visit/select-date-and-time')
         .expect(200)
         .expect('Content-Type', /html/)
         .expect(res => {
@@ -874,7 +874,7 @@ describe('/visit/select-date-and-time', () => {
     })
   })
 
-  describe('POST /visit/select-date-and-time', () => {
+  describe('POST /book-a-visit/select-date-and-time', () => {
     const visitSessionsService = new VisitSessionsService(null, null, systemToken) as jest.Mocked<VisitSessionsService>
 
     beforeEach(() => {
@@ -889,10 +889,10 @@ describe('/visit/select-date-and-time', () => {
 
     it('should save to session, create visit and redirect to additional support page if slot selected', () => {
       return request(sessionApp)
-        .post('/visit/select-date-and-time')
+        .post('/book-a-visit/select-date-and-time')
         .send('visit-date-and-time=2')
         .expect(302)
-        .expect('location', '/visit/additional-support')
+        .expect('location', '/book-a-visit/additional-support')
         .expect(() => {
           expect(visitSessionData.visit).toEqual({
             id: '2',
@@ -919,10 +919,10 @@ describe('/visit/select-date-and-time', () => {
       visitSessionData.visitReference = '3b-cd-4f-fg'
 
       return request(sessionApp)
-        .post('/visit/select-date-and-time')
+        .post('/book-a-visit/select-date-and-time')
         .send('visit-date-and-time=3')
         .expect(302)
-        .expect('location', '/visit/additional-support')
+        .expect('location', '/book-a-visit/additional-support')
         .expect(() => {
           expect(visitSessionData.visit).toEqual({
             id: '3',
@@ -939,9 +939,9 @@ describe('/visit/select-date-and-time', () => {
 
     it('should should set validation errors in flash and redirect if no slot selected', () => {
       return request(sessionApp)
-        .post('/visit/select-date-and-time')
+        .post('/book-a-visit/select-date-and-time')
         .expect(302)
-        .expect('location', '/visit/select-date-and-time')
+        .expect('location', '/book-a-visit/select-date-and-time')
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledWith('errors', [
             { location: 'body', msg: 'No time slot selected', param: 'visit-date-and-time', value: undefined },
@@ -959,9 +959,9 @@ describe('/visit/select-date-and-time', () => {
       } as SessionData)
 
       return request(sessionApp)
-        .post('/visit/select-date-and-time')
+        .post('/book-a-visit/select-date-and-time')
         .expect(302)
-        .expect('location', '/visit/select-date-and-time?timeOfDay=afternoon&dayOfTheWeek=3')
+        .expect('location', '/book-a-visit/select-date-and-time?timeOfDay=afternoon&dayOfTheWeek=3')
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledWith('errors', [
             { location: 'body', msg: 'No time slot selected', param: 'visit-date-and-time', value: undefined },
@@ -972,10 +972,10 @@ describe('/visit/select-date-and-time', () => {
 
     it('should should set validation errors in flash and redirect if invalid slot selected', () => {
       return request(sessionApp)
-        .post('/visit/select-date-and-time')
+        .post('/book-a-visit/select-date-and-time')
         .send('visit-date-and-time=100')
         .expect(302)
-        .expect('location', '/visit/select-date-and-time')
+        .expect('location', '/book-a-visit/select-date-and-time')
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledWith('errors', [
             { location: 'body', msg: 'No time slot selected', param: 'visit-date-and-time', value: '100' },
@@ -986,10 +986,10 @@ describe('/visit/select-date-and-time', () => {
 
     it('should should set validation errors in flash and redirect if fully booked slot selected', () => {
       return request(sessionApp)
-        .post('/visit/select-date-and-time')
+        .post('/book-a-visit/select-date-and-time')
         .send('visit-date-and-time=5')
         .expect(302)
-        .expect('location', '/visit/select-date-and-time')
+        .expect('location', '/book-a-visit/select-date-and-time')
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledWith('errors', [
             { location: 'body', msg: 'No time slot selected', param: 'visit-date-and-time', value: '5' },
@@ -1000,7 +1000,7 @@ describe('/visit/select-date-and-time', () => {
   })
 })
 
-describe('GET /visit/additional-support', () => {
+describe('GET /book-a-visit/additional-support', () => {
   beforeEach(() => {
     visitSessionData = {
       prisoner: {
@@ -1035,7 +1035,7 @@ describe('GET /visit/additional-support', () => {
 
   it('should render the additional support page with no options selected', () => {
     return request(sessionApp)
-      .get('/visit/additional-support')
+      .get('/book-a-visit/additional-support')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -1050,7 +1050,7 @@ describe('GET /visit/additional-support', () => {
     visitSessionData.visitorSupport = []
 
     return request(sessionApp)
-      .get('/visit/additional-support')
+      .get('/book-a-visit/additional-support')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -1069,7 +1069,7 @@ describe('GET /visit/additional-support', () => {
     ]
 
     return request(sessionApp)
-      .get('/visit/additional-support')
+      .get('/book-a-visit/additional-support')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -1096,7 +1096,7 @@ describe('GET /visit/additional-support', () => {
     ]
 
     return request(sessionApp)
-      .get('/visit/additional-support')
+      .get('/book-a-visit/additional-support')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -1123,7 +1123,7 @@ describe('GET /visit/additional-support', () => {
     flashData.formValues = [{ additionalSupportRequired: 'yes' }]
 
     return request(sessionApp)
-      .get('/visit/additional-support')
+      .get('/book-a-visit/additional-support')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -1151,7 +1151,7 @@ describe('GET /visit/additional-support', () => {
     flashData.formValues = [{ additionalSupportRequired: 'yes', additionalSupport: ['WHEELCHAIR', 'OTHER'] }]
 
     return request(sessionApp)
-      .get('/visit/additional-support')
+      .get('/book-a-visit/additional-support')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -1169,7 +1169,7 @@ describe('GET /visit/additional-support', () => {
   })
 })
 
-describe('POST /visit/additional-support', () => {
+describe('POST /book-a-visit/additional-support', () => {
   beforeEach(() => {
     visitSessionData = {
       prisoner: {
@@ -1212,9 +1212,9 @@ describe('POST /visit/additional-support', () => {
 
   it('should set validation errors in flash and redirect if additional support question not answered', () => {
     return request(sessionApp)
-      .post('/visit/additional-support')
+      .post('/book-a-visit/additional-support')
       .expect(302)
-      .expect('location', '/visit/additional-support')
+      .expect('location', '/book-a-visit/additional-support')
       .expect(() => {
         expect(flashProvider).toHaveBeenCalledWith('errors', [
           { location: 'body', msg: 'No answer selected', param: 'additionalSupportRequired', value: undefined },
@@ -1228,10 +1228,10 @@ describe('POST /visit/additional-support', () => {
 
   it('should set validation errors in flash and redirect if invalid data supplied', () => {
     return request(sessionApp)
-      .post('/visit/additional-support')
+      .post('/book-a-visit/additional-support')
       .send('additionalSupportRequired=xyz')
       .expect(302)
-      .expect('location', '/visit/additional-support')
+      .expect('location', '/book-a-visit/additional-support')
       .expect(() => {
         expect(flashProvider).toHaveBeenCalledWith('errors', [
           { location: 'body', msg: 'No answer selected', param: 'additionalSupportRequired', value: 'xyz' },
@@ -1246,10 +1246,10 @@ describe('POST /visit/additional-support', () => {
 
   it('should set validation errors in flash and redirect if additional support selected but no request selected', () => {
     return request(sessionApp)
-      .post('/visit/additional-support')
+      .post('/book-a-visit/additional-support')
       .send('additionalSupportRequired=yes')
       .expect(302)
-      .expect('location', '/visit/additional-support')
+      .expect('location', '/book-a-visit/additional-support')
       .expect(() => {
         expect(flashProvider).toHaveBeenCalledWith('errors', [
           { location: 'body', msg: 'No request selected', param: 'additionalSupport', value: [] },
@@ -1264,12 +1264,12 @@ describe('POST /visit/additional-support', () => {
 
   it('should set validation errors in flash and redirect if additional support selected but invalid request selected', () => {
     return request(sessionApp)
-      .post('/visit/additional-support')
+      .post('/book-a-visit/additional-support')
       .send('additionalSupportRequired=yes')
       .send('additionalSupport=xyz')
       .send('additionalSupport=WHEELCHAIR')
       .expect(302)
-      .expect('location', '/visit/additional-support')
+      .expect('location', '/book-a-visit/additional-support')
       .expect(() => {
         expect(flashProvider).toHaveBeenCalledWith('errors', [
           { location: 'body', msg: 'No request selected', param: 'additionalSupport', value: ['xyz', 'WHEELCHAIR'] },
@@ -1284,11 +1284,11 @@ describe('POST /visit/additional-support', () => {
 
   it('should set validation errors in flash and redirect if other support requested but not specified', () => {
     return request(sessionApp)
-      .post('/visit/additional-support')
+      .post('/book-a-visit/additional-support')
       .send('additionalSupportRequired=yes')
       .send('additionalSupport=OTHER')
       .expect(302)
-      .expect('location', '/visit/additional-support')
+      .expect('location', '/book-a-visit/additional-support')
       .expect(() => {
         expect(flashProvider).toHaveBeenCalledWith('errors', [
           { location: 'body', msg: 'Enter details of the request', param: 'otherSupportDetails', value: '' },
@@ -1305,10 +1305,10 @@ describe('POST /visit/additional-support', () => {
     visitSessionData.visitorSupport = []
 
     return request(sessionApp)
-      .post('/visit/additional-support')
+      .post('/book-a-visit/additional-support')
       .send('additionalSupportRequired=yes')
       .expect(302)
-      .expect('location', '/visit/additional-support')
+      .expect('location', '/book-a-visit/additional-support')
       .expect(() => {
         expect(flashProvider).toHaveBeenCalledWith('errors', [
           { location: 'body', msg: 'No request selected', param: 'additionalSupport', value: [] },
@@ -1323,10 +1323,10 @@ describe('POST /visit/additional-support', () => {
 
   it('should redirect to the select main contact page if "no" additional support radio selected and store in session', () => {
     return request(sessionApp)
-      .post('/visit/additional-support')
+      .post('/book-a-visit/additional-support')
       .send('additionalSupportRequired=no')
       .expect(302)
-      .expect('location', '/visit/select-main-contact')
+      .expect('location', '/book-a-visit/select-main-contact')
       .expect(() => {
         expect(visitSessionData.visitorSupport.length).toBe(0)
       })
@@ -1334,7 +1334,7 @@ describe('POST /visit/additional-support', () => {
 
   it('should redirect to the select main contact page when support requests chosen and store in session', () => {
     return request(sessionApp)
-      .post('/visit/additional-support')
+      .post('/book-a-visit/additional-support')
       .send('additionalSupportRequired=yes')
       .send('additionalSupport=WHEELCHAIR')
       .send('additionalSupport=INDUCTION_LOOP')
@@ -1343,7 +1343,7 @@ describe('POST /visit/additional-support', () => {
       .send('additionalSupport=OTHER')
       .send('otherSupportDetails=custom-request')
       .expect(302)
-      .expect('location', '/visit/select-main-contact')
+      .expect('location', '/book-a-visit/select-main-contact')
       .expect(() => {
         expect(visitSessionData.visitorSupport).toEqual(<VisitorSupport[]>[
           { type: 'WHEELCHAIR' },
@@ -1359,7 +1359,7 @@ describe('POST /visit/additional-support', () => {
   })
 })
 
-describe('/visit/select-main-contact', () => {
+describe('/book-a-visit/select-main-contact', () => {
   const adultVisitors: { adults: VisitorListItem[] } = {
     adults: [
       {
@@ -1425,10 +1425,10 @@ describe('/visit/select-main-contact', () => {
     } as SessionData)
   })
 
-  describe('GET /visit/select-main-contact', () => {
+  describe('GET /book-a-visit/select-main-contact', () => {
     it('should render the main contact page with all fields empty', () => {
       return request(sessionApp)
-        .get('/visit/select-main-contact')
+        .get('/book-a-visit/select-main-contact')
         .expect(200)
         .expect('Content-Type', /html/)
         .expect(res => {
@@ -1456,7 +1456,7 @@ describe('/visit/select-main-contact', () => {
       }
 
       return request(sessionApp)
-        .get('/visit/select-main-contact')
+        .get('/book-a-visit/select-main-contact')
         .expect(200)
         .expect('Content-Type', /html/)
         .expect(res => {
@@ -1478,7 +1478,7 @@ describe('/visit/select-main-contact', () => {
       }
 
       return request(sessionApp)
-        .get('/visit/select-main-contact')
+        .get('/book-a-visit/select-main-contact')
         .expect(200)
         .expect('Content-Type', /html/)
         .expect(res => {
@@ -1499,7 +1499,7 @@ describe('/visit/select-main-contact', () => {
       ]
 
       return request(sessionApp)
-        .get('/visit/select-main-contact')
+        .get('/book-a-visit/select-main-contact')
         .expect(200)
         .expect('Content-Type', /html/)
         .expect(res => {
@@ -1524,7 +1524,7 @@ describe('/visit/select-main-contact', () => {
       flashData.formValues = [{ contact: 'someoneElse' }]
 
       return request(sessionApp)
-        .get('/visit/select-main-contact')
+        .get('/book-a-visit/select-main-contact')
         .expect(200)
         .expect('Content-Type', /html/)
         .expect(res => {
@@ -1541,14 +1541,14 @@ describe('/visit/select-main-contact', () => {
     })
   })
 
-  describe('POST /visit/select-main-contact', () => {
+  describe('POST /book-a-visit/select-main-contact', () => {
     it('should redirect to check answers page and store in session if contact selected and phone number entered', () => {
       return request(sessionApp)
-        .post('/visit/select-main-contact')
+        .post('/book-a-visit/select-main-contact')
         .send('contact=123')
         .send('phoneNumber=0114+1234+567')
         .expect(302)
-        .expect('location', '/visit/check-your-booking')
+        .expect('location', '/book-a-visit/check-your-booking')
         .expect(() => {
           expect(visitSessionData.mainContact.contact).toEqual({
             personId: 123,
@@ -1564,12 +1564,12 @@ describe('/visit/select-main-contact', () => {
 
     it('should redirect to check answers page and store in session if other contact named and phone number entered', () => {
       return request(sessionApp)
-        .post('/visit/select-main-contact')
+        .post('/book-a-visit/select-main-contact')
         .send('contact=someoneElse')
         .send('someoneElseName=another+person')
         .send('phoneNumber=0114+7654+321')
         .expect(302)
-        .expect('location', '/visit/check-your-booking')
+        .expect('location', '/book-a-visit/check-your-booking')
         .expect(() => {
           expect(visitSessionData.mainContact.contact).toBe(undefined)
           expect(visitSessionData.mainContact.contactName).toBe('another person')
@@ -1590,12 +1590,12 @@ describe('/visit/select-main-contact', () => {
         contactName: undefined,
       }
       return request(sessionApp)
-        .post('/visit/select-main-contact')
+        .post('/book-a-visit/select-main-contact')
         .send('contact=someoneElse')
         .send('someoneElseName=another+person')
         .send('phoneNumber=0114+7654+321')
         .expect(302)
-        .expect('location', '/visit/check-your-booking')
+        .expect('location', '/book-a-visit/check-your-booking')
         .expect(() => {
           expect(visitSessionData.mainContact.contact).toBe(undefined)
           expect(visitSessionData.mainContact.contactName).toBe('another person')
@@ -1605,9 +1605,9 @@ describe('/visit/select-main-contact', () => {
 
     it('should set validation errors in flash and redirect if no main contact selected and no number entered', () => {
       return request(sessionApp)
-        .post('/visit/select-main-contact')
+        .post('/book-a-visit/select-main-contact')
         .expect(302)
-        .expect('location', '/visit/select-main-contact')
+        .expect('location', '/book-a-visit/select-main-contact')
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledWith('errors', [
             { location: 'body', msg: 'No main contact selected', param: 'contact', value: undefined },
@@ -1619,12 +1619,12 @@ describe('/visit/select-main-contact', () => {
 
     it('should set validation errors in flash and redirect if someone else selected but no name entered', () => {
       return request(sessionApp)
-        .post('/visit/select-main-contact')
+        .post('/book-a-visit/select-main-contact')
         .send('contact=someoneElse')
         .send('someoneElseName=')
         .send('phoneNumber=')
         .expect(302)
-        .expect('location', '/visit/select-main-contact')
+        .expect('location', '/book-a-visit/select-main-contact')
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledWith('errors', [
             { location: 'body', msg: 'Enter the name of the main contact', param: 'someoneElseName', value: '' },
@@ -1640,11 +1640,11 @@ describe('/visit/select-main-contact', () => {
 
     it('should set validation errors in flash and redirect if invalid data entered', () => {
       return request(sessionApp)
-        .post('/visit/select-main-contact')
+        .post('/book-a-visit/select-main-contact')
         .send('contact=non-existant')
         .send('phoneNumber=abc123')
         .expect(302)
-        .expect('location', '/visit/select-main-contact')
+        .expect('location', '/book-a-visit/select-main-contact')
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledWith('errors', [
             {
@@ -1663,7 +1663,7 @@ describe('/visit/select-main-contact', () => {
   })
 })
 
-describe('GET /visit/check-your-booking', () => {
+describe('GET /book-a-visit/check-your-booking', () => {
   beforeEach(() => {
     visitSessionData = {
       prisoner: {
@@ -1713,7 +1713,7 @@ describe('GET /visit/check-your-booking', () => {
 
   it('should render all data from the session', () => {
     return request(sessionApp)
-      .get('/visit/check-your-booking')
+      .get('/book-a-visit/check-your-booking')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -1780,7 +1780,7 @@ describe('GET /visit/check-your-booking', () => {
 
     it('should render all data from the session with a message for no selected additional support options', () => {
       return request(sessionApp)
-        .get('/visit/check-your-booking')
+        .get('/book-a-visit/check-your-booking')
         .expect(200)
         .expect('Content-Type', /html/)
         .expect(res => {
@@ -1804,7 +1804,7 @@ describe('GET /visit/check-your-booking', () => {
   })
 })
 
-describe('GET /visit/confirmation', () => {
+describe('GET /book-a-visit/confirmation', () => {
   beforeEach(() => {
     visitSessionData = {
       prisoner: {
@@ -1854,7 +1854,7 @@ describe('GET /visit/confirmation', () => {
 
   it('should render all data from the session', () => {
     return request(sessionApp)
-      .get('/visit/confirmation')
+      .get('/book-a-visit/confirmation')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -1923,7 +1923,7 @@ describe('GET /visit/confirmation', () => {
 
     it('should render all data from the session with a message for no selected additional support options', () => {
       return request(sessionApp)
-        .get('/visit/confirmation')
+        .get('/book-a-visit/confirmation')
         .expect(200)
         .expect('Content-Type', /html/)
         .expect(res => {

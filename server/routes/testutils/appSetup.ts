@@ -114,7 +114,7 @@ function appSetup(
     visitSessionsServiceOverride ||
     new VisitSessionsService(visitSchedulerApiClientBuilder, whereaboutsApiClientBuilder, systemTokenTest)
   app.use(
-    '/visit/',
+    '/book-a-visit/',
     visitorsRoutes(
       standardRouter(new MockUserService()),
       prisonerVisitorsService,
