@@ -144,3 +144,10 @@ export type VisitSessionData = {
   }
   visitReference?: string
 }
+
+export type VisitInformation = {
+  reference: string
+  prisonNumber: string
+  mainContact: string
+  visitDate: string
+}

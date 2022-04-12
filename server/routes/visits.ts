@@ -1,9 +1,9 @@
 import type { RequestHandler, Router } from 'express'
 import { BadRequest } from 'http-errors'
-import { Visit } from '../data/visitSchedulerApiTypes'
+import { VisitInformation } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import VisitSessionsService from '../services/visitSessionsService'
-import isValidVisitReference from './visitSchedulerValidation'
+import { validateVisitSearch } from './searchValidation'
 
 export default function routes(router: Router, visitSessionsService: VisitSessionsService): Router {
   const get = (path: string, handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
@@ -11,11 +11,14 @@ export default function routes(router: Router, visitSessionsService: VisitSessio
   get('/:reference', async (req, res) => {
     const { reference } = req.params
 
-    if (!isValidVisitReference(reference)) {
+    if (!validateVisitSearch(reference)) {
       throw new BadRequest()
     }
 
-    const visit: Visit = await visitSessionsService.getVisit({ reference, username: res.locals.user?.username })
+    const visit: VisitInformation = await visitSessionsService.getVisit({
+      reference,
+      username: res.locals.user?.username,
+    })
 
     return res.render('pages/visit', { visit })
   })

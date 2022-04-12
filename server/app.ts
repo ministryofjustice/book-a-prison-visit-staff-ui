@@ -6,6 +6,7 @@ import indexRoutes from './routes'
 import searchRoutes from './routes/search'
 import prisonerRoutes from './routes/prisoner'
 import bookAVisitRoutes from './routes/bookAVisit'
+import visitRoutes from './routes/visits'
 import nunjucksSetup from './utils/nunjucksSetup'
 import errorHandler from './errorHandler'
 import standardRouter from './routes/standardRouter'
@@ -47,7 +48,11 @@ export default function createApp(userService: UserService): express.Application
   app.use('/', indexRoutes(standardRouter(userService)))
   app.use(
     '/search/',
-    searchRoutes(standardRouter(userService), new PrisonerSearchService(prisonerSearchClientBuilder, systemToken))
+    searchRoutes(
+      standardRouter(userService),
+      new PrisonerSearchService(prisonerSearchClientBuilder, systemToken),
+      new VisitSessionsService(visitSchedulerApiClientBuilder, whereaboutsApiClientBuilder, systemToken)
+    )
   )
   app.use(
     '/prisoner/',
@@ -73,6 +78,13 @@ export default function createApp(userService: UserService): express.Application
         prisonerContactRegistryApiClientBuilder,
         systemToken
       )
+    )
+  )
+  app.use(
+    '/visit/',
+    visitRoutes(
+      standardRouter(userService),
+      new VisitSessionsService(visitSchedulerApiClientBuilder, whereaboutsApiClientBuilder, systemToken)
     )
   )
 

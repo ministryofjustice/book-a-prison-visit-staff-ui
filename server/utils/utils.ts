@@ -26,6 +26,10 @@ export const prisonerDateTimePretty = (dateToFormat: string): string => {
   return format(parseISO(dateToFormat), 'd MMMM yyyy')
 }
 
+export const prisonerTimePretty = (dateToFormat: string): string => {
+  return dateToFormat ? format(parseISO(dateToFormat), 'h:mmaaa').replace(':00', '') : null
+}
+
 export const properCaseFullName = (name: string): string =>
   isBlank(name)
     ? ''

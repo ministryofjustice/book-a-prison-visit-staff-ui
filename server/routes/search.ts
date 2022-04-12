@@ -1,13 +1,17 @@
 import type { Router } from 'express'
 import url from 'url'
-import { body, validationResult } from 'express-validator'
-import validateForm from './searchForPrisonerValidation'
+import { validatePrisonerSearch, validateVisitSearch } from './searchValidation'
 import PrisonerSearchService from '../services/prisonerSearchService'
+import VisitSessionsService from '../services/visitSessionsService'
 import config from '../config'
 import { getPageLinks } from '../utils/utils'
-import isValidVisitReference from './visitSchedulerValidation'
+import { VisitInformation } from '../@types/bapv'
 
-export default function routes(router: Router, prisonerSearchService: PrisonerSearchService): Router {
+export default function routes(
+  router: Router,
+  prisonerSearchService: PrisonerSearchService,
+  visitSessionsService: VisitSessionsService
+): Router {
   router.get('/prisoner', (req, res) => {
     const search = req?.body?.search
 
@@ -32,7 +36,7 @@ export default function routes(router: Router, prisonerSearchService: PrisonerSe
     const currentPage = (req.query.page || '') as string
     const parsedPage = Number.parseInt(currentPage, 10) || 1
     const { pageSize } = config.apis.prisonerSearch
-    const error = validateForm(search)
+    const error = validatePrisonerSearch(search)
     const { results, numberOfResults, numberOfPages, next, previous } = await prisonerSearchService.getPrisoners(
       search,
       res.locals.user?.username,
@@ -72,42 +76,65 @@ export default function routes(router: Router, prisonerSearchService: PrisonerSe
     res.render('pages/search/visit', { searchBlock1, searchBlock2, searchBlock3, searchBlock4 })
   })
 
-  router.post(
-    '/visit',
-    body('searchBlock1').custom((value: string, { req }) => {
-      const searchBlock1 = req?.body?.searchBlock1
-      const searchBlock2 = req?.body?.searchBlock2
-      const searchBlock3 = req?.body?.searchBlock3
-      const searchBlock4 = req?.body?.searchBlock4
-      const reference = `${searchBlock1}-${searchBlock2}-${searchBlock3}-${searchBlock4}`
+  router.post('/visit', (req, res) => {
+    const { searchBlock1, searchBlock2, searchBlock3, searchBlock4 } = req.body
 
-      if (!isValidVisitReference(reference)) {
-        throw new Error('Invalid visit reference provided')
-      }
+    return res.redirect(
+      url.format({
+        pathname: '/search/visit/results',
+        query: {
+          ...(searchBlock1 && { searchBlock1, searchBlock2, searchBlock3, searchBlock4 }),
+        },
+      })
+    )
+  })
 
-      return true
-    }),
-    (req, res) => {
-      const errors = validationResult(req)
-      const searchBlock1 = req?.body?.searchBlock1
-      const searchBlock2 = req?.body?.searchBlock2
-      const searchBlock3 = req?.body?.searchBlock3
-      const searchBlock4 = req?.body?.searchBlock4
-      const reference = `${searchBlock1}-${searchBlock2}-${searchBlock3}-${searchBlock4}`
+  router.get('/visit/results', async (req, res) => {
+    const { searchBlock1, searchBlock2, searchBlock3, searchBlock4 } = req.query
+    const search = `${searchBlock1}-${searchBlock2}-${searchBlock3}-${searchBlock4}`
 
-      if (!errors.isEmpty()) {
-        return res.render('pages/search/visit', {
-          errors: errors.array(),
-          searchBlock1,
-          searchBlock2,
-          searchBlock3,
-          searchBlock4,
-        })
-      }
+    const currentPage = '1'
+    const numberOfPages = 1
+    const parsedPage = Number.parseInt(currentPage, 10) || 1
+    const { pageSize, pagesLinksToShow } = config.apis.prisonerSearch
+    const errors = [validateVisitSearch(search)]
+    let visit: VisitInformation
 
-      return res.redirect(`/visit/${reference}`)
+    try {
+      visit = await visitSessionsService.getVisit({ reference: search, username: res.locals.user?.username })
+    } catch (e) {
+      errors.push({
+        text: e.message,
+        href: '#searchBlock1',
+      })
     }
-  )
+    const realNumberOfResults = errors ? 0 : 1
+    const currentPageMax = parsedPage * pageSize
+    const to = realNumberOfResults < currentPageMax ? realNumberOfResults : currentPageMax
+    const pageLinks = getPageLinks({
+      pagesToShow: pagesLinksToShow,
+      numberOfPages: 1,
+      currentPage: parsedPage,
+      searchTerm: search,
+    })
+
+    res.render('pages/search/visitResults', {
+      establishment: 'Hewell (HMP)',
+      searchBlock1,
+      searchBlock2,
+      searchBlock3,
+      searchBlock4,
+      results: errors ? [] : [visit],
+      errors,
+      next: 1,
+      previous: 1,
+      numberOfResults: realNumberOfResults,
+      pageSize,
+      from: (parsedPage - 1) * pageSize + 1,
+      to,
+      pageLinks: numberOfPages <= 1 ? [] : pageLinks,
+    })
+  })
 
   return router
 }
