@@ -1,22 +1,20 @@
-import type { RequestHandler, Router } from 'express'
+import type { Router } from 'express'
 import url from 'url'
+import { body, validationResult } from 'express-validator'
 import validateForm from './searchForPrisonerValidation'
-import asyncMiddleware from '../middleware/asyncMiddleware'
 import PrisonerSearchService from '../services/prisonerSearchService'
 import config from '../config'
 import { getPageLinks } from '../utils/utils'
+import isValidVisitReference from './visitSchedulerValidation'
 
 export default function routes(router: Router, prisonerSearchService: PrisonerSearchService): Router {
-  const get = (path: string, handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
-  const post = (path: string, handler: RequestHandler) => router.post(path, asyncMiddleware(handler))
-
-  get('/prisoner', (req, res) => {
+  router.get('/prisoner', (req, res) => {
     const search = req?.body?.search
 
     res.render('pages/search/prisoner', { search })
   })
 
-  post('/prisoner', (req, res) => {
+  router.post('/prisoner', (req, res) => {
     const { search } = req.body
 
     return res.redirect(
@@ -29,7 +27,7 @@ export default function routes(router: Router, prisonerSearchService: PrisonerSe
     )
   })
 
-  get('/prisoner/results', async (req, res) => {
+  router.get('/prisoner/results', async (req, res) => {
     const search = (req.query.search || '') as string
     const currentPage = (req.query.page || '') as string
     const parsedPage = Number.parseInt(currentPage, 10) || 1
@@ -65,24 +63,51 @@ export default function routes(router: Router, prisonerSearchService: PrisonerSe
     })
   })
 
-  get('/booking', (req, res) => {
-    const search = req?.body?.search
+  router.get('/visit', (req, res) => {
+    const searchBlock1 = req?.body?.searchBlock1
+    const searchBlock2 = req?.body?.searchBlock2
+    const searchBlock3 = req?.body?.searchBlock3
+    const searchBlock4 = req?.body?.searchBlock4
 
-    res.render('pages/search/booking', { search })
+    res.render('pages/search/visit', { searchBlock1, searchBlock2, searchBlock3, searchBlock4 })
   })
 
-  post('/booking', (req, res) => {
-    const { search } = req.body
+  router.post(
+    '/visit',
+    body('searchBlock1').custom((value: string, { req }) => {
+      const searchBlock1 = req?.body?.searchBlock1
+      const searchBlock2 = req?.body?.searchBlock2
+      const searchBlock3 = req?.body?.searchBlock3
+      const searchBlock4 = req?.body?.searchBlock4
+      const reference = `${searchBlock1}-${searchBlock2}-${searchBlock3}-${searchBlock4}`
 
-    return res.redirect(
-      url.format({
-        pathname: '/search/booking/results',
-        query: {
-          ...(search && { search }),
-        },
-      })
-    )
-  })
+      if (!isValidVisitReference(reference)) {
+        throw new Error('Invalid visit reference provided')
+      }
+
+      return true
+    }),
+    (req, res) => {
+      const errors = validationResult(req)
+      const searchBlock1 = req?.body?.searchBlock1
+      const searchBlock2 = req?.body?.searchBlock2
+      const searchBlock3 = req?.body?.searchBlock3
+      const searchBlock4 = req?.body?.searchBlock4
+      const reference = `${searchBlock1}-${searchBlock2}-${searchBlock3}-${searchBlock4}`
+
+      if (!errors.isEmpty()) {
+        return res.render('pages/search/visit', {
+          errors: errors.array(),
+          searchBlock1,
+          searchBlock2,
+          searchBlock3,
+          searchBlock4,
+        })
+      }
+
+      return res.redirect(`/visit/${reference}`)
+    }
+  )
 
   return router
 }

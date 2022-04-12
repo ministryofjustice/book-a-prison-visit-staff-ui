@@ -190,10 +190,10 @@ describe('Prisoner search page', () => {
 })
 
 describe('Booking search page', () => {
-  describe('GET /search/booking', () => {
+  describe('GET /search/visit', () => {
     it('should render booking search page', () => {
       return request(app)
-        .get('/search/booking')
+        .get('/search/visit')
         .expect('Content-Type', /html/)
         .expect(res => {
           expect(res.text).toContain('Search for a booking')

@@ -30,6 +30,10 @@ class VisitSchedulerApiClient {
     })
   }
 
+  getVisit(reference: string): Promise<Visit> {
+    return this.restclient.get({ path: `/visits/${reference}` })
+  }
+
   getUpcomingVisits(offenderNo: string, startTimestamp?: string): Promise<Visit[]> {
     return this.restclient.get({
       path: '/visits',
