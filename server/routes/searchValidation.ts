@@ -5,18 +5,18 @@ type Error = {
 
 const errors: { [key: string]: Error } = {
   INVALID_PRISONER_QUERY: {
-    text: 'You must enter at least 3 characters',
     href: '#search',
+    text: 'You must enter at least 3 characters',
   },
   INVALID_VISIT_QUERY: {
-    text: 'Please enter only alphanumeric characters in each search box',
     href: '#searchBlock1',
+    text: 'Please enter only alphanumeric characters in each search box',
   },
 }
 
 export const validatePrisonerSearch = (search: string): Error | null => {
   if (search.length < 3) {
-    return errors.INVALID_QUERY
+    return errors.INVALID_PRISONER_QUERY
   }
 
   return null

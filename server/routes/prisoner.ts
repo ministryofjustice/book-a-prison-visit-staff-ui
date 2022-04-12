@@ -3,7 +3,7 @@ import { BadRequest } from 'http-errors'
 import { VisitSessionData } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import PrisonerProfileService from '../services/prisonerProfileService'
-import { validatePrisonerSearch } from './searchValidation'
+import { isValidPrisonerNumber } from './validationChecks'
 
 export default function routes(router: Router, prisonerProfileService: PrisonerProfileService): Router {
   const get = (path: string, handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
@@ -11,7 +11,7 @@ export default function routes(router: Router, prisonerProfileService: PrisonerP
   get('/:offenderNo', async (req, res) => {
     const { offenderNo } = req.params
 
-    if (!validatePrisonerSearch(offenderNo)) {
+    if (!isValidPrisonerNumber(offenderNo)) {
       throw new BadRequest()
     }
 

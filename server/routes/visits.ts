@@ -3,7 +3,7 @@ import { BadRequest } from 'http-errors'
 import { VisitInformation } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import VisitSessionsService from '../services/visitSessionsService'
-import { validateVisitSearch } from './searchValidation'
+import { isValidVisitReference } from './validationChecks'
 
 export default function routes(router: Router, visitSessionsService: VisitSessionsService): Router {
   const get = (path: string, handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
@@ -11,7 +11,7 @@ export default function routes(router: Router, visitSessionsService: VisitSessio
   get('/:reference', async (req, res) => {
     const { reference } = req.params
 
-    if (!validateVisitSearch(reference)) {
+    if (!isValidVisitReference(reference)) {
       throw new BadRequest()
     }
 

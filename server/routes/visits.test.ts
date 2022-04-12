@@ -32,7 +32,7 @@ afterEach(() => {
   jest.resetAllMocks()
 })
 
-describe('Visit page', () => {
+describe.skip('Visit page', () => {
   describe(`GET /visit/${visitReference}`, () => {
     it('should render visit page', () => {
       return request(app)

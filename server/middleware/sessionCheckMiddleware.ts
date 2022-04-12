@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express'
-import isValidPrisonerNumber from '../routes/prisonerProfileValidation'
+import { isValidPrisonerNumber } from '../routes/validationChecks'
 
 export default function sessionCheckMiddleware({ stage }: { stage: number }): RequestHandler {
   return (req, res, next) => {

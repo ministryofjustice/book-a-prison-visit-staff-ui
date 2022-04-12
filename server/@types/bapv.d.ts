@@ -150,4 +150,5 @@ export type VisitInformation = {
   prisonNumber: string
   mainContact: string
   visitDate: string
+  visitTime: string
 }
