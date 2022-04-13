@@ -104,6 +104,8 @@ export default function routes(
 
     try {
       visit = await visitSessionsService.getVisit({ reference: search, username: res.locals.user?.username })
+      const prisonerDetails = await prisonerSearchService.getPrisoner(search, res.locals.user?.username)
+      visit.prisonerName = `${prisonerDetails.lastName}, ${prisonerDetails.firstName}`
     } catch (e) {
       errors.push({
         msg: e.message,

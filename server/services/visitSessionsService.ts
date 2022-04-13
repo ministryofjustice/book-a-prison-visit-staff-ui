@@ -195,6 +195,7 @@ export default class VisitSessionsService {
     const visitInformation = {
       reference: visit.reference,
       prisonNumber: visit.prisonerId,
+      prisonerName: '',
       mainContact: visit.visitContact?.name,
       visitDate: prisonerDateTimePretty(visit.startTimestamp),
       visitTime: prisonerTimePretty(visit.startTimestamp),

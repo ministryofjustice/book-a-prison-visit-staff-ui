@@ -30,6 +30,16 @@ class PrisonerSearchClient {
       },
     })
   }
+
+  getPrisoner(search: string): Promise<{ content: Prisoner[] }> {
+    return this.restClient.post({
+      path: '/prisoner-detail-resource',
+      data: {
+        nomsNumber: search,
+        prisonIds: [this.agencyId],
+      },
+    })
+  }
 }
 
 export default PrisonerSearchClient
