@@ -71,7 +71,34 @@
                   classes: "bapv-table_cell"
                 }
             ],
-            rows: results
+            rows: [
+              [
+                {
+                  html: '<a href="/visit/' + results[0].reference + '">' + results[0].reference + '</a>',
+                  classes: 'bapv-table_cell'
+                },
+                {
+                  text: results[0].prisonerName | properCaseFullName,
+                  classes: 'bapv-table_cell'
+                },
+                {
+                  text: results[0].prisonNumber,
+                  classes: 'bapv-table_cell'
+                },
+                {
+                  text: results[0].mainContact,
+                  classes: 'bapv-table_cell'
+                },
+                {
+                  text: results[0].visitDate,
+                  classes: 'bapv-table_cell'
+                },
+                {
+                  text: results[0].visitTime,
+                  classes: 'bapv-table_cell'
+                }
+              ]
+            ]
         }) }}
 
       {{ pagination | safe if numberOfResults > 10 }}

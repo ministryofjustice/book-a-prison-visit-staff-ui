@@ -102,16 +102,19 @@ export default function routes(
     const errors = validationErrors ? [validationErrors] : []
     let visit: VisitInformation
 
-    try {
-      visit = await visitSessionsService.getVisit({ reference: search, username: res.locals.user?.username })
-      const prisonerDetails = await prisonerSearchService.getPrisoner(search, res.locals.user?.username)
-      visit.prisonerName = `${prisonerDetails.lastName}, ${prisonerDetails.firstName}`
-    } catch (e) {
-      errors.push({
-        msg: e.message,
-        param: '#searchBlock1',
-      })
+    if (errors.length === 0) {
+      try {
+        visit = await visitSessionsService.getVisit({ reference: search, username: res.locals.user?.username })
+        const prisonerDetails = await prisonerSearchService.getPrisoner(visit.prisonNumber, res.locals.user?.username)
+        visit.prisonerName = `${prisonerDetails.lastName}, ${prisonerDetails.firstName}`
+      } catch (e) {
+        errors.push({
+          msg: e.message,
+          param: '#searchBlock1',
+        })
+      }
     }
+
     const realNumberOfResults = errors.length > 0 ? 0 : 1
     const currentPageMax = parsedPage * pageSize
     const to = realNumberOfResults < currentPageMax ? realNumberOfResults : currentPageMax

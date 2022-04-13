@@ -62,7 +62,7 @@ describe('prisonSearchClientBuilder', () => {
         ],
       }
       fakePrisonerSearchApi
-        .post(`/prisoner-detail-resource`, `{"nomsNumber":"test","prisonIds":["HEI"]}`)
+        .post(`/keyword`, `{"andWords":"test","prisonIds":["HEI"]}`)
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 

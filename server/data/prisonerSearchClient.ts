@@ -33,9 +33,9 @@ class PrisonerSearchClient {
 
   getPrisoner(search: string): Promise<{ content: Prisoner[] }> {
     return this.restClient.post({
-      path: '/prisoner-detail-resource',
+      path: '/keyword',
       data: {
-        nomsNumber: search,
+        andWords: search,
         prisonIds: [this.agencyId],
       },
     })

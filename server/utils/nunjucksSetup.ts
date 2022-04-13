@@ -4,6 +4,7 @@ import express from 'express'
 import { format, parseISO } from 'date-fns'
 import path from 'path'
 import { FormError } from '../@types/bapv'
+import { properCaseFullName } from './utils'
 
 const production = process.env.NODE_ENV === 'production'
 
@@ -52,6 +53,11 @@ export function registerNunjucks(app?: express.Express): Environment {
     }
     const array = fullName.split(' ')
     return `${array[0][0]}. ${array.reverse()[0]}`
+  })
+
+  njkEnv.addFilter('properCaseFullName', (name: string) => {
+    if (!name) return null
+    return properCaseFullName(name)
   })
 
   njkEnv.addFilter('formatDate', (dateToFormat: string, dateFormat = 'd MMMM yyyy') => {
