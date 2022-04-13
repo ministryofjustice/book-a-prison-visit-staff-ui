@@ -190,6 +190,9 @@ export default class VisitSessionsService {
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
 
     const visit = await visitSchedulerApiClient.getVisit(reference)
+    const visitTime = visit.endTimestamp
+      ? `${prisonerTimePretty(visit.startTimestamp)} to ${prisonerTimePretty(visit.endTimestamp)}`
+      : prisonerTimePretty(visit.startTimestamp)
     logger.info(`Get visit ${visit.reference}`)
 
     const visitInformation = {
@@ -198,7 +201,7 @@ export default class VisitSessionsService {
       prisonerName: '',
       mainContact: visit.visitContact?.name,
       visitDate: prisonerDateTimePretty(visit.startTimestamp),
-      visitTime: prisonerTimePretty(visit.startTimestamp),
+      visitTime,
     }
 
     return visitInformation

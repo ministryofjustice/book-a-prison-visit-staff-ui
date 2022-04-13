@@ -55,6 +55,15 @@ export function registerNunjucks(app?: express.Express): Environment {
     return `${array[0][0]}. ${array.reverse()[0]}`
   })
 
+  njkEnv.addFilter('formatMainContact', (fullName: string) => {
+    // this check is for the authError page
+    if (!fullName) {
+      return null
+    }
+    const array = fullName.split(' ')
+    return `${properCaseFullName(array[1])}, ${properCaseFullName(array[0])}`
+  })
+
   njkEnv.addFilter('properCaseFullName', (name: string) => {
     if (!name) return null
     return properCaseFullName(name)
