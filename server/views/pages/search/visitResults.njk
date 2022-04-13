@@ -3,7 +3,10 @@
 {% from "moj/components/pagination/macro.njk" import mojPagination %}
 
 {% set pageHeaderTitle = "Search for a visit" %}
-{% set pageTitle = applicationName + " - " + pageHeaderTitle %}
+{% set pageHeaderTitle = "Search for a prisoner" %}
+{% set pageTitle %}
+{% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
+{% endset %}
 {% set backLinkHref = "/search/visit" %}
 
 {% block content %}
@@ -11,7 +14,6 @@
     <div class="govuk-grid-column-full">
       {% include "partials/errorSummary.njk" %}
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
-      {{ aaa }}
     </div>
     {% include "partials/searchForVisitHeader.njk" %}
     <div class="govuk-grid-column-full govuk-!-padding-top-5">

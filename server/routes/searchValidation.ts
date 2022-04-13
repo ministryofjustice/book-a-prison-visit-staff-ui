@@ -1,16 +1,16 @@
 type Error = {
-  href: string
-  text: string
+  param: string
+  msg: string
 }
 
 const errors: { [key: string]: Error } = {
   INVALID_PRISONER_QUERY: {
-    href: '#search',
-    text: 'You must enter at least 3 characters',
+    param: '#search',
+    msg: 'You must enter at least 3 characters',
   },
   INVALID_VISIT_QUERY: {
-    href: '#searchBlock1',
-    text: 'Please enter only alphanumeric characters in each search box',
+    param: '#searchBlock1',
+    msg: 'Please enter only alphanumeric characters in each search box',
   },
 }
 

@@ -36,13 +36,14 @@ export default function routes(
     const currentPage = (req.query.page || '') as string
     const parsedPage = Number.parseInt(currentPage, 10) || 1
     const { pageSize } = config.apis.prisonerSearch
-    const error = validatePrisonerSearch(search)
+    const validationErrors = validatePrisonerSearch(search)
+    const errors = validationErrors ? [validationErrors] : []
     const { results, numberOfResults, numberOfPages, next, previous } = await prisonerSearchService.getPrisoners(
       search,
       res.locals.user?.username,
       parsedPage
     )
-    const realNumberOfResults = error ? 0 : numberOfResults
+    const realNumberOfResults = errors.length > 0 ? 0 : numberOfResults
     const currentPageMax = parsedPage * pageSize
     const to = realNumberOfResults < currentPageMax ? realNumberOfResults : currentPageMax
     const pageLinks = getPageLinks({
@@ -55,8 +56,8 @@ export default function routes(
     res.render('pages/search/prisonerResults', {
       establishment: 'Hewell (HMP)',
       search,
-      results: error ? [] : results,
-      error,
+      results: errors.length > 0 ? [] : results,
+      errors,
       next,
       previous,
       numberOfResults: realNumberOfResults,
@@ -97,18 +98,19 @@ export default function routes(
     const numberOfPages = 1
     const parsedPage = Number.parseInt(currentPage, 10) || 1
     const { pageSize, pagesLinksToShow } = config.apis.prisonerSearch
-    const errors = [validateVisitSearch(search)]
+    const validationErrors = validateVisitSearch(search)
+    const errors = validationErrors ? [validationErrors] : []
     let visit: VisitInformation
 
     try {
       visit = await visitSessionsService.getVisit({ reference: search, username: res.locals.user?.username })
     } catch (e) {
       errors.push({
-        text: e.message,
-        href: '#searchBlock1',
+        msg: e.message,
+        param: '#searchBlock1',
       })
     }
-    const realNumberOfResults = errors ? 0 : 1
+    const realNumberOfResults = errors.length > 0 ? 0 : 1
     const currentPageMax = parsedPage * pageSize
     const to = realNumberOfResults < currentPageMax ? realNumberOfResults : currentPageMax
     const pageLinks = getPageLinks({
@@ -124,7 +126,7 @@ export default function routes(
       searchBlock2,
       searchBlock3,
       searchBlock4,
-      results: errors ? [] : [visit],
+      results: errors.length > 0 ? [] : [visit],
       errors,
       next: 1,
       previous: 1,
