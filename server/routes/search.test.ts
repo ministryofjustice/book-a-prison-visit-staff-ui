@@ -1,14 +1,20 @@
 import type { Express } from 'express'
 import request from 'supertest'
 import PrisonerSearchService from '../services/prisonerSearchService'
+import VisitSessionsService from '../services/visitSessionsService'
 import { appWithAllRoutes } from './testutils/appSetup'
-import { PrisonerDetailsItem } from '../@types/bapv'
+import { PrisonerDetailsItem, VisitInformation } from '../@types/bapv'
+import { Prisoner } from '../data/prisonerOffenderSearchTypes'
+
+jest.mock('../services/prisonerSearchService')
+jest.mock('../services/visitSessionsService')
 
 let app: Express
-let prisonerSearchService: PrisonerSearchService
-let systemToken
+const systemToken = async (user: string): Promise<string> => `${user}-token-1`
+const prisonerSearchService = new PrisonerSearchService(null, systemToken) as jest.Mocked<PrisonerSearchService>
+const visitSessionsService = new VisitSessionsService(null, null, systemToken) as jest.Mocked<VisitSessionsService>
 
-let returnData: {
+let getPrisonersReturnData: {
   results: Array<PrisonerDetailsItem[]>
   numberOfResults: number
   numberOfPages: number
@@ -22,39 +28,18 @@ let returnData: {
   previous: 0,
 }
 
-class MockPrisonerSearchService extends PrisonerSearchService {
-  constructor() {
-    super(undefined, undefined)
-  }
-
-  /* eslint-disable @typescript-eslint/no-unused-vars */
-  getPrisoners = (
-    search: string,
-    username: string,
-    page: number
-  ): Promise<{
-    results: Array<PrisonerDetailsItem[]>
-    numberOfResults: number
-    numberOfPages: number
-    next: number
-    previous: number
-  }> => {
-    /* eslint-enable @typescript-eslint/no-unused-vars */
-    return Promise.resolve(returnData)
-  }
-}
-
-beforeEach(() => {
-  systemToken = async (user: string): Promise<string> => `${user}-token-1`
-  prisonerSearchService = new MockPrisonerSearchService()
-  app = appWithAllRoutes(prisonerSearchService, null, null, null, systemToken)
-})
-
-afterEach(() => {
-  jest.resetAllMocks()
-})
+let getPrisonerReturnData: Prisoner
+let getVisit: VisitInformation
 
 describe('Prisoner search page', () => {
+  beforeEach(() => {
+    app = appWithAllRoutes(prisonerSearchService, null, null, visitSessionsService, systemToken)
+  })
+
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
+
   describe('GET /search/prisoner', () => {
     it('should render prisoner search page', () => {
       return request(app)
@@ -68,13 +53,15 @@ describe('Prisoner search page', () => {
 
   describe('GET /search/prisoner/results?search=A1234BC', () => {
     it('should render prisoner results page with no results', () => {
-      returnData = {
+      getPrisonersReturnData = {
         results: [],
         numberOfResults: 0,
         numberOfPages: 0,
         next: 0,
         previous: 0,
       }
+
+      prisonerSearchService.getPrisoners.mockResolvedValue(getPrisonersReturnData)
 
       return request(app)
         .get('/search/prisoner/results?search=A1234BC')
@@ -88,7 +75,7 @@ describe('Prisoner search page', () => {
 
   describe('GET /search/prisoner/results?search=A1234BC', () => {
     it('should render prisoner results page with results and no next/prev when there are less than 11 results', () => {
-      returnData = {
+      getPrisonersReturnData = {
         results: [
           [
             { html: '<a href="/prisoner/A1234BC">Smith, John</a>', classes: '' },
@@ -102,6 +89,8 @@ describe('Prisoner search page', () => {
         previous: 1,
       }
 
+      prisonerSearchService.getPrisoners.mockResolvedValue(getPrisonersReturnData)
+
       return request(app)
         .get('/search/prisoner/results?search=A1234BC')
         .expect('Content-Type', /html/)
@@ -113,7 +102,7 @@ describe('Prisoner search page', () => {
     })
 
     it('should render prisoner results page with results and prev/next when there are more than 10 results', () => {
-      returnData = {
+      getPrisonersReturnData = {
         results: [
           [
             { html: '<a href="/prisoner/A1234BC">Smith, John</a>', classes: '' },
@@ -177,6 +166,8 @@ describe('Prisoner search page', () => {
         previous: 1,
       }
 
+      prisonerSearchService.getPrisoners.mockResolvedValue(getPrisonersReturnData)
+
       return request(app)
         .get('/search/prisoner/results?search=A1234BC')
         .expect('Content-Type', /html/)
@@ -197,6 +188,57 @@ describe('Booking search page', () => {
         .expect('Content-Type', /html/)
         .expect(res => {
           expect(res.text).toContain('Search for a booking')
+        })
+    })
+  })
+
+  describe('GET /search/visit/results?searchBlock1=ab&searchBlock2=bc&searchBlock3=cd&searchBlock4=de', () => {
+    it('should not render visit results page when no result', () => {
+      getPrisonerReturnData = {
+        firstName: 'Geoff',
+        lastName: 'Smith',
+        restrictedPatient: false,
+      }
+      getVisit = null
+
+      prisonerSearchService.getPrisoner.mockResolvedValue(getPrisonerReturnData)
+      visitSessionsService.getVisit.mockResolvedValue(getVisit)
+
+      return request(app)
+        .get('/search/visit/results?searchBlock1=ab&searchBlock2=bc&searchBlock3=cd&searchBlock4=de')
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          expect(res.text).toContain('Search for a prisoner')
+          expect(res.text).toContain('id="search-results-none"')
+        })
+    })
+  })
+
+  describe('GET /search/visit/results?searchBlock1=ab&searchBlock2=bc&searchBlock3=cd&searchBlock4=de', () => {
+    it('should render visit results page with a single visit', () => {
+      getPrisonerReturnData = {
+        firstName: 'Geoff',
+        lastName: 'Smith',
+        restrictedPatient: false,
+      }
+      getVisit = {
+        reference: 'as-sd-df-fg',
+        prisonNumber: 'A1234BC',
+        prisonerName: 'Smith, Ted',
+        mainContact: 'Jon Smith',
+        visitDate: '12 Nov 2021',
+        visitTime: '1pm -2pm',
+      }
+
+      prisonerSearchService.getPrisoner.mockResolvedValue(getPrisonerReturnData)
+      visitSessionsService.getVisit.mockResolvedValue(getVisit)
+
+      return request(app)
+        .get('/search/visit/results?searchBlock1=ab&searchBlock2=bc&searchBlock3=cd&searchBlock4=de')
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          expect(res.text).toContain('Search for a prisoner')
+          expect(res.text).toContain('id="search-results-true"')
         })
     })
   })
