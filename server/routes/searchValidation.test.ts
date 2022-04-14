@@ -1,4 +1,5 @@
 import { validatePrisonerSearch, validateVisitSearch } from './searchValidation'
+import { validVisitReferenceCharacters } from './validationChecks'
 
 describe('validatePrisonerSearch', () => {
   it('valid', () => {
@@ -29,9 +30,9 @@ describe('validateVisitSearch', () => {
     })
   })
   it('invalid', () => {
-    expect(validateVisitSearch('sdlfsdff')).toStrictEqual({
+    expect(validateVisitSearch('sd-lf-s1-ff')).toStrictEqual({
       param: '#searchBlock1',
-      msg: 'Please enter only alphanumeric characters in each search box',
+      msg: `Reference must contain only the following characters: ${validVisitReferenceCharacters}`,
     })
   })
 })

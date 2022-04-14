@@ -1,3 +1,5 @@
+import { validVisitReferenceCharacters, isValidVisitReference } from './validationChecks'
+
 type Error = {
   param: string
   msg: string
@@ -10,7 +12,7 @@ const errors: { [key: string]: Error } = {
   },
   INVALID_VISIT_QUERY: {
     param: '#searchBlock1',
-    msg: 'Please enter only alphanumeric characters in each search box',
+    msg: `Reference must contain only the following characters: ${validVisitReferenceCharacters}`,
   },
   SHORT_VISIT_QUERY: {
     param: '#searchBlock1',
@@ -31,10 +33,7 @@ export const validateVisitSearch = (reference: string): Error | null => {
     return errors.SHORT_VISIT_QUERY
   }
 
-  const visitReferenceRegExp = /^[a-z0-9]{2}-[a-z0-9]{2}-[a-z0-9]{2}-[a-z0-9]{2}$/
-  const matches = reference.match(visitReferenceRegExp)
-
-  if (matches === null) {
+  if (!isValidVisitReference(reference)) {
     return errors.INVALID_VISIT_QUERY
   }
 
