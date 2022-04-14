@@ -12,6 +12,10 @@ const errors: { [key: string]: Error } = {
     param: '#searchBlock1',
     msg: 'Please enter only alphanumeric characters in each search box',
   },
+  SHORT_VISIT_QUERY: {
+    param: '#searchBlock1',
+    msg: 'Booking reference must be 8 characters',
+  },
 }
 
 export const validatePrisonerSearch = (search: string): Error | null => {
@@ -23,6 +27,10 @@ export const validatePrisonerSearch = (search: string): Error | null => {
 }
 
 export const validateVisitSearch = (reference: string): Error | null => {
+  if (reference.split('-').join('').length < 8) {
+    return errors.SHORT_VISIT_QUERY
+  }
+
   const visitReferenceRegExp = /^[a-z0-9]{2}-[a-z0-9]{2}-[a-z0-9]{2}-[a-z0-9]{2}$/
   const matches = reference.match(visitReferenceRegExp)
 

@@ -19,11 +19,17 @@ describe('validateVisitSearch', () => {
   it('empty', () => {
     expect(validateVisitSearch('')).toStrictEqual({
       param: '#searchBlock1',
-      msg: 'Please enter only alphanumeric characters in each search box',
+      msg: 'Booking reference must be 8 characters',
+    })
+  })
+  it('short', () => {
+    expect(validateVisitSearch('sd-fs-df-f')).toStrictEqual({
+      param: '#searchBlock1',
+      msg: 'Booking reference must be 8 characters',
     })
   })
   it('invalid', () => {
-    expect(validateVisitSearch('sdfsdff')).toStrictEqual({
+    expect(validateVisitSearch('sdlfsdff')).toStrictEqual({
       param: '#searchBlock1',
       msg: 'Please enter only alphanumeric characters in each search box',
     })
