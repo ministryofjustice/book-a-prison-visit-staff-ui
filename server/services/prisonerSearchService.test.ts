@@ -21,53 +21,108 @@ describe('Prisoner search service', () => {
     afterEach(() => {
       jest.resetAllMocks()
     })
-    it('Retrieves and formats user name', async () => {
-      prisonerSearchClient.getPrisoners.mockResolvedValue({
-        totalPages: 1,
-        totalElements: 1,
-        content: [
-          {
-            firstName: 'john',
-            lastName: 'smith',
-            prisonerNumber: 'A1234BC',
-            dateOfBirth: '1975-04-02',
-            bookingId: '12345',
-            restrictedPatient: false,
-          },
-        ],
+
+    describe('prisoner search', () => {
+      it('Retrieves and formats user name', async () => {
+        prisonerSearchClient.getPrisoners.mockResolvedValue({
+          totalPages: 1,
+          totalElements: 1,
+          content: [
+            {
+              firstName: 'john',
+              lastName: 'smith',
+              prisonerNumber: 'A1234BC',
+              dateOfBirth: '1975-04-02',
+              bookingId: '12345',
+              restrictedPatient: false,
+            },
+          ],
+        })
+
+        const { results, numberOfResults, numberOfPages, next, previous } = await prisonerSearchService.getPrisoners(
+          search,
+          'user',
+          0
+        )
+
+        expect(results).toEqual([
+          [
+            {
+              html: '<a href="/prisoner/A1234BC">Smith, John</a>',
+              classes: 'bapv-table_cell',
+            },
+            {
+              html: 'A1234BC',
+              classes: 'bapv-table_cell',
+            },
+            {
+              html: '2 April 1975',
+              classes: 'bapv-table_cell',
+            },
+          ],
+        ])
+        expect(numberOfResults).toEqual(1)
+        expect(numberOfPages).toEqual(1)
+        expect(next).toEqual(1)
+        expect(previous).toEqual(1)
       })
+      it('Propagates error', async () => {
+        prisonerSearchClient.getPrisoners.mockRejectedValue(new Error('some error'))
 
-      const { results, numberOfResults, numberOfPages, next, previous } = await prisonerSearchService.getPrisoners(
-        search,
-        'user',
-        0
-      )
-
-      expect(results).toEqual([
-        [
-          {
-            html: '<a href="/prisoner/A1234BC">Smith, John</a>',
-            classes: 'bapv-table_cell',
-          },
-          {
-            html: 'A1234BC',
-            classes: 'bapv-table_cell',
-          },
-          {
-            html: '2 April 1975',
-            classes: 'bapv-table_cell',
-          },
-        ],
-      ])
-      expect(numberOfResults).toEqual(1)
-      expect(numberOfPages).toEqual(1)
-      expect(next).toEqual(1)
-      expect(previous).toEqual(1)
+        await expect(prisonerSearchService.getPrisoners(search, 'user', 0)).rejects.toEqual(new Error('some error'))
+      })
     })
-    it('Propagates error', async () => {
-      prisonerSearchClient.getPrisoners.mockRejectedValue(new Error('some error'))
 
-      await expect(prisonerSearchService.getPrisoners(search, 'user', 0)).rejects.toEqual(new Error('some error'))
+    describe('visit search', () => {
+      it('Retrieves and formats user name', async () => {
+        prisonerSearchClient.getPrisoners.mockResolvedValue({
+          totalPages: 1,
+          totalElements: 1,
+          content: [
+            {
+              firstName: 'john',
+              lastName: 'smith',
+              prisonerNumber: 'A1234BC',
+              dateOfBirth: '1975-04-02',
+              bookingId: '12345',
+              restrictedPatient: false,
+            },
+          ],
+        })
+
+        const { results, numberOfResults, numberOfPages, next, previous } = await prisonerSearchService.getPrisoners(
+          search,
+          'user',
+          0,
+          true
+        )
+
+        expect(results).toEqual([
+          [
+            {
+              html: '<a href="/prisoner/visits/A1234BC">Smith, John</a>',
+              classes: 'bapv-table_cell',
+            },
+            {
+              html: 'A1234BC',
+              classes: 'bapv-table_cell',
+            },
+            {
+              html: '2 April 1975',
+              classes: 'bapv-table_cell',
+            },
+          ],
+        ])
+        expect(numberOfResults).toEqual(1)
+        expect(numberOfPages).toEqual(1)
+        expect(next).toEqual(1)
+        expect(previous).toEqual(1)
+      })
+      it('Propagates error', async () => {
+        prisonerSearchClient.getPrisoners.mockRejectedValue(new Error('some error'))
+
+        await expect(prisonerSearchService.getPrisoners(search, 'user', 0)).rejects.toEqual(new Error('some error'))
+      })
     })
   })
 })

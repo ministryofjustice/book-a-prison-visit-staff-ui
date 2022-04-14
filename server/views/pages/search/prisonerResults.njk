@@ -6,7 +6,7 @@
 {% set pageTitle %}
 {% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
 {% endset %}
-{% set backLinkHref = "/search/prisoner" %}
+{% set backLinkHref %}/search/prisoner{% if visit %}-visit{% endif %}{% endset %}
 
 {% block content %}
   <div class="govuk-grid-row">
@@ -26,11 +26,11 @@
           },
           previous: {
             text: 'Previous',
-            href: '/search/prisoner/results?search=' + search + '&page=' + previous
+            href: backLinkHref + '?search=' + search + '&page=' + previous
           },
           next: {
             text: 'Next',
-            href: '/search/prisoner/results?search=' + search + '&page=' + next
+            href: backLinkHref + '?search=' + search + '&page=' + next
           },
           items: pageLinks
         }) }}
