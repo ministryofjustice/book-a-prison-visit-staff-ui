@@ -1,15 +1,18 @@
 {% extends "layout.njk" %}
 
 {% set pageHeaderTitle = "Search for a booking" %}
-{% set pageTitle = applicationName + " - " + pageHeaderTitle %}
+{% set pageTitle %}
+{% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
+{% endset %}
 {% set backLinkHref = "/" %}
 
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
+      {% include "partials/errorSummary.njk" %}
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
     </div>
-    {% include "partials/searchForBookingHeader.njk" %}
+    {% include "partials/searchForVisitHeader.njk" %}
     <div class="govuk-grid-column-full">
         <h2 class="govuk-heading-m govuk-!-margin-top-5">Search by prisoner</h2>
         <p><a href="/search/prisoner">You can also search by prisoner name or number</a></p>

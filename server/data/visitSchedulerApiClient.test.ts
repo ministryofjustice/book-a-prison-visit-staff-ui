@@ -46,6 +46,43 @@ describe('visitSchedulerApiClient', () => {
     })
   })
 
+  describe('getVisit', () => {
+    it('should return a single matching Visit from the Visit Scheduler API for a valid reference', async () => {
+      const reference = 'v9-d7-ed-7u'
+      const result: Visit = {
+        reference: 'v9-d7-ed-7u',
+        prisonerId: 'A1234BC',
+        prisonId: 'HEI',
+        visitRoom: 'A1 L3',
+        visitType: 'SOCIAL',
+        visitStatus: 'RESERVED',
+        visitRestriction: 'OPEN',
+        startTimestamp: timestamp,
+        endTimestamp: '',
+        visitors: [
+          {
+            nomisPersonId: 1234,
+          },
+        ],
+        visitorSupport: [
+          {
+            type: 'OTHER',
+            text: 'custom support details',
+          },
+        ],
+      }
+
+      fakeVisitSchedulerApi
+        .get(`/visits/${reference}`)
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, result)
+
+      const output = await client.getVisit(reference)
+
+      expect(output).toEqual(result)
+    })
+  })
+
   describe('getUpcomingVisits', () => {
     it('should return an array of Visit from the Visit Scheduler API', async () => {
       const offenderNo = 'A1234BC'

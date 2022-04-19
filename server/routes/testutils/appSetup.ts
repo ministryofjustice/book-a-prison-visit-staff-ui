@@ -4,7 +4,8 @@ import { Cookie, SessionData } from 'express-session'
 import indexRoutes from '../index'
 import searchRoutes from '../search'
 import prisonerRoutes from '../prisoner'
-import visitorsRoutes from '../visitors'
+import bookAVisitRoutes from '../bookAVisit'
+import visitRoutes from '../visits'
 import nunjucksSetup from '../../utils/nunjucksSetup'
 import errorHandler from '../../errorHandler'
 import standardRouter from '../standardRouter'
@@ -95,7 +96,10 @@ function appSetup(
   const systemTokenTest = systemTokenOverride || systemToken
   const prisonerSearchService =
     prisonerSearchServiceOverride || new PrisonerSearchService(prisonerSearchClientBuilder, systemTokenTest)
-  app.use('/search/', searchRoutes(standardRouter(new MockUserService()), prisonerSearchService))
+  const visitSessionsService =
+    visitSessionsServiceOverride ||
+    new VisitSessionsService(visitSchedulerApiClientBuilder, whereaboutsApiClientBuilder, systemTokenTest)
+  app.use('/search/', searchRoutes(standardRouter(new MockUserService()), prisonerSearchService, visitSessionsService))
 
   const prisonerProfileService =
     prisonerProfileServiceOverride ||
@@ -110,18 +114,16 @@ function appSetup(
   const prisonerVisitorsService =
     prisonerVisitorsServiceOverride ||
     new PrisonerVisitorsService(prisonerContactRegistryApiClientBuilder, systemTokenTest)
-  const visitSessionsService =
-    visitSessionsServiceOverride ||
-    new VisitSessionsService(visitSchedulerApiClientBuilder, whereaboutsApiClientBuilder, systemTokenTest)
   app.use(
-    '/visit/',
-    visitorsRoutes(
+    '/book-a-visit/',
+    bookAVisitRoutes(
       standardRouter(new MockUserService()),
       prisonerVisitorsService,
       visitSessionsService,
       prisonerProfileService
     )
   )
+  app.use('/visit/', visitRoutes(standardRouter(new MockUserService()), visitSessionsService))
 
   app.use((req, res, next) => next(createError(404, 'Not found')))
   app.use(errorHandler(production))

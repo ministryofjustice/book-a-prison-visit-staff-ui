@@ -1,0 +1,110 @@
+{% extends "layout.njk" %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "moj/components/pagination/macro.njk" import mojPagination %}
+
+{% set pageHeaderTitle = "Search for a visit" %}
+{% set pageHeaderTitle = "Search for a prisoner" %}
+{% set pageTitle %}
+{% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
+{% endset %}
+{% set backLinkHref = "/search/visit" %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {% include "partials/errorSummary.njk" %}
+      <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+    </div>
+    {% include "partials/searchForVisitHeader.njk" %}
+    <div class="govuk-grid-column-full govuk-!-padding-top-5">
+    {% if results | length %}
+      {% set pagination %}
+        {{ mojPagination({
+          results: {
+            from: from,
+            to: to,
+            count: numberOfResults
+          },
+          previous: {
+            text: 'Previous',
+            href: '/search/visit/results?searchBlock1=' + searchBlock1 + '&searchBlock2=' + searchBlock2 + '&searchBlock3=' + searchBlock3 + '&searchBlock4=' + searchBlock4 + '&page=' + previous
+          },
+          next: {
+            text: 'Next',
+            href: '/search/visit/results?searchBlock1=' + searchBlock1 + '&searchBlock2=' + searchBlock2 + '&searchBlock3=' + searchBlock3 + '&searchBlock4=' + searchBlock4 + '&page=' + next
+          },
+          items: pageLinks
+        }) }}
+      {% endset %}
+
+      {{ pagination | safe if numberOfResults > 10 }}
+
+        {{ govukTable({
+            classes: " govuk-!-margin-top-3",
+            captionClasses: "govuk-table__caption--m",
+            attributes: {
+              "id": "search-results-true"
+            },
+            head: [
+                {
+                  text: "Booking reference",
+                  classes: "bapv-table_cell"
+                },
+                {
+                  text: "Prisoner name",
+                  classes: "bapv-table_cell"
+                },
+                {
+                  text: "Prison number",
+                  classes: "bapv-table_cell"
+                },
+                {
+                  text: "Main contact",
+                  classes: "bapv-table_cell"
+                },
+                {
+                  text: "Visit date",
+                  classes: "bapv-table_cell"
+                },
+                {
+                  text: "Visit time",
+                  classes: "bapv-table_cell"
+                }
+            ],
+            rows: [
+              [
+                {
+                  html: '<a href="/visit/' + results[0].reference + '">' + results[0].reference + '</a>',
+                  classes: 'bapv-table_cell'
+                },
+                {
+                  text: results[0].prisonerName | properCaseFullName,
+                  classes: 'bapv-table_cell'
+                },
+                {
+                  text: results[0].prisonNumber,
+                  classes: 'bapv-table_cell'
+                },
+                {
+                  text: results[0].mainContact | formatMainContact,
+                  classes: 'bapv-table_cell'
+                },
+                {
+                  text: results[0].visitDate,
+                  classes: 'bapv-table_cell'
+                },
+                {
+                  text: results[0].visitTime,
+                  classes: 'bapv-table_cell'
+                }
+              ]
+            ]
+        }) }}
+
+      {{ pagination | safe if numberOfResults > 10 }}
+    {% else %}
+        <p class="govuk-!-margin-top-6 govuk-!-margin-bottom-6" id="search-results-none">There are no results for this reference at {{ establishment }}.
+    {% endif %}
+    </div>
+  </div>
+{% endblock %}

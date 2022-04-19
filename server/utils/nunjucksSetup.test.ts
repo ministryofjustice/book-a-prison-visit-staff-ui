@@ -8,6 +8,46 @@ describe('Nunjucks Filters', () => {
 
   const njkEnv = registerNunjucks()
 
+  describe('formatMainContact', () => {
+    it('should return null if full name is not provided', () => {
+      viewContext = {}
+      const nunjucksString = '{{ fullName | formatMainContact }}'
+      compiledTemplate = nunjucks.compile(nunjucksString, njkEnv)
+      const $ = cheerio.load(compiledTemplate.render(viewContext))
+      expect($('body').text()).toBe('')
+    })
+
+    it('should return formatted contact', () => {
+      viewContext = {
+        fullName: 'Joe Bloggs',
+      }
+      const nunjucksString = '{{ fullName | formatMainContact }}'
+      compiledTemplate = nunjucks.compile(nunjucksString, njkEnv)
+      const $ = cheerio.load(compiledTemplate.render(viewContext))
+      expect($('body').text()).toBe('Bloggs, Joe')
+    })
+  })
+
+  describe('properCaseFullName', () => {
+    it('should return null if name is not provided', () => {
+      viewContext = {}
+      const nunjucksString = '{{ fullName | properCaseFullName }}'
+      compiledTemplate = nunjucks.compile(nunjucksString, njkEnv)
+      const $ = cheerio.load(compiledTemplate.render(viewContext))
+      expect($('body').text()).toBe('')
+    })
+
+    it('should return formatted contact', () => {
+      viewContext = {
+        fullName: 'JOE BLOGGS',
+      }
+      const nunjucksString = '{{ fullName | properCaseFullName }}'
+      compiledTemplate = nunjucks.compile(nunjucksString, njkEnv)
+      const $ = cheerio.load(compiledTemplate.render(viewContext))
+      expect($('body').text()).toBe('Joe Bloggs')
+    })
+  })
+
   describe('initialiseName', () => {
     it('should return null if full name is not provided', () => {
       viewContext = {}

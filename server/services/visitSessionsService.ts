@@ -1,6 +1,7 @@
 import { format, parseISO, getDay, isAfter, isBefore, parse } from 'date-fns'
 import logger from '../../logger'
 import {
+  VisitInformation,
   VisitSlot,
   VisitSlotList,
   VisitSlotsForDay,
@@ -12,6 +13,7 @@ import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
 import WhereaboutsApiClient from '../data/whereaboutsApiClient'
 import { VisitSession, Visit, SupportType } from '../data/visitSchedulerApiTypes'
 import { ScheduledEvent } from '../data/whereaboutsApiTypes'
+import { prisonerDateTimePretty, prisonerTimePretty } from '../utils/utils'
 
 type VisitSchedulerApiClientBuilder = (token: string) => VisitSchedulerApiClient
 type WhereaboutsApiClientBuilder = (token: string) => WhereaboutsApiClient
@@ -181,5 +183,27 @@ export default class VisitSessionsService {
     )
 
     return visit
+  }
+
+  async getVisit({ username, reference }: { username: string; reference: string }): Promise<VisitInformation> {
+    const token = await this.systemToken(username)
+    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
+
+    const visit = await visitSchedulerApiClient.getVisit(reference)
+    const visitTime = visit.endTimestamp
+      ? `${prisonerTimePretty(visit.startTimestamp)} to ${prisonerTimePretty(visit.endTimestamp)}`
+      : prisonerTimePretty(visit.startTimestamp)
+    logger.info(`Get visit ${visit.reference}`)
+
+    const visitInformation = {
+      reference: visit.reference,
+      prisonNumber: visit.prisonerId,
+      prisonerName: '',
+      mainContact: visit.visitContact?.name,
+      visitDate: prisonerDateTimePretty(visit.startTimestamp),
+      visitTime,
+    }
+
+    return visitInformation
   }
 }

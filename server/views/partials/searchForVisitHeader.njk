@@ -3,7 +3,7 @@
 <div class="govuk-grid-column-full">
     <div class="block-background">
         <div class="govuk-!-width-one-half">
-            <form action="/search/booking" method="POST" novalidate>
+            <form action="/search/visit" method="POST" novalidate>
                 <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
                 <label class="govuk-label bapv-booking-search-label" for="searchBlock1">
@@ -16,8 +16,7 @@
                     id: "searchBlock1",
                     name: "searchBlock1",
                     spellcheck: false,
-                    value: searchBlock1,
-                    errorMessage: error
+                    value: searchBlock1
                 }) }}
 
                 <span>-</span>
@@ -27,8 +26,7 @@
                     id: "searchBlock2",
                     name: "searchBlock2",
                     spellcheck: false,
-                    value: searchBlock2,
-                    errorMessage: error
+                    value: searchBlock2
                 }) }}
 
                 <span>-</span>
@@ -38,8 +36,7 @@
                     id: "searchBlock3",
                     name: "searchBlock3",
                     spellcheck: false,
-                    value: searchBlock3,
-                    errorMessage: error
+                    value: searchBlock3
                 }) }}
 
                 <span>-</span>
@@ -49,12 +46,12 @@
                     id: "searchBlock4",
                     name: "searchBlock4",
                     spellcheck: false,
-                    value: searchBlock4,
-                    errorMessage: error
+                    value: searchBlock4
                 }) }}
 
                 {{ govukButton({
-                    text: "Search"
+                    text: "Search",
+                    classes: "bapv-visit-search__button"
                 }) }}
                 </div>
 

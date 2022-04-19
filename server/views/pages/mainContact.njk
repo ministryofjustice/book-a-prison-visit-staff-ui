@@ -7,13 +7,13 @@
 {% set pageTitle %}
 {% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
 {% endset %}
-{% set backLinkHref = "/visit/additional-support" %}
+{% set backLinkHref = "/book-a-visit/additional-support" %}
 
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
         {% include "partials/errorSummary.njk" %}
-        <form action="/visit/select-main-contact" method="POST" novalidate>
+        <form action="/book-a-visit/select-main-contact" method="POST" novalidate>
             <input type="hidden" name="_csrf" value="{{ csrfToken }}">
             {% set visitors = [] %}
 

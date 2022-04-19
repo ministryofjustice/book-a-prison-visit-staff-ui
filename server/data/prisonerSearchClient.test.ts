@@ -46,4 +46,29 @@ describe('prisonSearchClientBuilder', () => {
       expect(output).toEqual(results)
     })
   })
+
+  describe('getPrisoner', () => {
+    it('should return data from api', async () => {
+      const results = {
+        totalPage: 1,
+        totalElements: 1,
+        content: [
+          {
+            lastName: 'test',
+            firstName: 'test',
+            prisonerNumber: 'test',
+            dateOfBirth: '2000-01-01',
+          },
+        ],
+      }
+      fakePrisonerSearchApi
+        .post(`/keyword`, `{"andWords":"test","prisonIds":["HEI"]}`)
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, results)
+
+      const output = await client.getPrisoner('test')
+
+      expect(output).toEqual(results)
+    })
+  })
 })

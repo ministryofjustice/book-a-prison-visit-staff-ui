@@ -72,4 +72,11 @@ export default class PrisonerSearchService {
       previous: previousPage + 1,
     }
   }
+
+  async getPrisoner(search: string, username: string): Promise<Prisoner> {
+    const token = await this.systemToken(username)
+    const prisonerSearchClient = this.prisonerSearchClientBuilder(token)
+    const { content } = await prisonerSearchClient.getPrisoner(search)
+    return content.length === 1 ? content[0] : null
+  }
 }

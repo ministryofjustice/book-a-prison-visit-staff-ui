@@ -67,7 +67,7 @@
         <h2 class="govuk-heading-m">Visit details</h2>
     </div>
     <div class="govuk-grid-column-one-half bapv-change-details-link">
-        <a href="/visit/select-date-and-time" class="govuk-link">Change</a>
+        <a href="/book-a-visit/select-date-and-time" class="govuk-link">Change</a>
     </div>
 </div>
 
@@ -111,7 +111,7 @@
         <h2 class="govuk-heading-m">Visitor details</h2>
     </div>
     <div class="govuk-grid-column-one-half bapv-change-details-link">
-        <a href="/visit/select-visitors" class="govuk-link">Change</a>
+        <a href="/book-a-visit/select-visitors" class="govuk-link">Change</a>
     </div>
 </div>
 
@@ -150,7 +150,7 @@
         <h2 class="govuk-heading-m">Additional support</h2>
     </div>
     <div class="govuk-grid-column-one-half bapv-change-details-link">
-        <a href="/visit/additional-support" class="govuk-link">Change</a>
+        <a href="/book-a-visit/additional-support" class="govuk-link">Change</a>
     </div>
 </div>
 
@@ -185,7 +185,7 @@
         <h2 class="govuk-heading-m">Contact details</h2>
     </div>
     <div class="govuk-grid-column-one-half bapv-change-details-link">
-        <a href="/visit/select-main-contact" class="govuk-link">Change</a>
+        <a href="/book-a-visit/select-main-contact" class="govuk-link">Change</a>
     </div>
 </div>
 
@@ -225,7 +225,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-        <form action="/visit/check-your-booking" method="POST" novalidate>
+        <form action="/book-a-visit/check-your-booking" method="POST" novalidate>
             <input type="hidden" name="_csrf" value="{{ csrfToken }}">
             {{ govukButton({
                 text: "Submit booking"

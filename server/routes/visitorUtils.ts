@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express'
 import { VisitSessionData, VisitSlot, VisitSlotList } from '../@types/bapv'
 import { SupportType, VisitorSupport } from '../data/visitSchedulerApiTypes'
-import isValidPrisonerNumber from './prisonerProfileValidation'
+import { isValidPrisonerNumber } from './validationChecks'
 
 export const getSelectedSlot = (slotsList: VisitSlotList, selectedSlot: string): VisitSlot => {
   return Object.values(slotsList)
