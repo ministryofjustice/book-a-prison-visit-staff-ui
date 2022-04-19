@@ -12,18 +12,19 @@ export default function routes(
   prisonerSearchService: PrisonerSearchService,
   visitSessionsService: VisitSessionsService
 ): Router {
-  router.get('/prisoner', (req, res) => {
+  router.get(['/prisoner', '/prisoner-visit'], (req, res) => {
     const search = req?.body?.search
 
-    res.render('pages/search/prisoner', { search })
+    res.render('pages/search/prisoner', { search, visit: req.originalUrl.includes('-visit') })
   })
 
-  router.post('/prisoner', (req, res) => {
+  router.post(['/prisoner', '/prisoner-visit'], (req, res) => {
+    const isVisit = req.originalUrl.includes('-visit')
     const { search } = req.body
 
     return res.redirect(
       url.format({
-        pathname: '/search/prisoner/results',
+        pathname: `/search/prisoner${isVisit ? '-visit' : ''}/results`,
         query: {
           ...(search && { search }),
         },
@@ -31,7 +32,8 @@ export default function routes(
     )
   })
 
-  router.get('/prisoner/results', async (req, res) => {
+  router.get(['/prisoner/results', '/prisoner-visit/results'], async (req, res) => {
+    const isVisit = req.originalUrl.includes('-visit')
     const search = (req.query.search || '') as string
     const currentPage = (req.query.page || '') as string
     const parsedPage = Number.parseInt(currentPage, 10) || 1
@@ -41,7 +43,8 @@ export default function routes(
     const { results, numberOfResults, numberOfPages, next, previous } = await prisonerSearchService.getPrisoners(
       search,
       res.locals.user?.username,
-      parsedPage
+      parsedPage,
+      isVisit
     )
     const realNumberOfResults = errors.length > 0 ? 0 : numberOfResults
     const currentPageMax = parsedPage * pageSize
@@ -65,6 +68,7 @@ export default function routes(
       from: (parsedPage - 1) * pageSize + 1,
       to,
       pageLinks: numberOfPages <= 1 ? [] : pageLinks,
+      visit: isVisit,
     })
   })
 

@@ -26,7 +26,8 @@ export default class PrisonerSearchService {
   async getPrisoners(
     search: string,
     username: string,
-    page: number
+    page: number,
+    visit?: boolean
   ): Promise<{
     results: Array<PrisonerDetailsItem[]>
     numberOfResults: number
@@ -44,11 +45,16 @@ export default class PrisonerSearchService {
     const prisonerList: Array<PrisonerDetailsItem[]> = []
 
     content.forEach((prisoner: Prisoner) => {
+      const url = visit
+        ? `<a href="/prisoner/visits/${prisoner.prisonerNumber}">${properCaseFullName(
+            `${prisoner.lastName}, ${prisoner.firstName}`
+          )}</a>`
+        : `<a href="/prisoner/${prisoner.prisonerNumber}">${properCaseFullName(
+            `${prisoner.lastName}, ${prisoner.firstName}`
+          )}</a>`
       const row: PrisonerDetailsItem[] = [
         {
-          html: `<a href="/prisoner/${prisoner.prisonerNumber}">${properCaseFullName(
-            `${prisoner.lastName}, ${prisoner.firstName}`
-          )}</a>`,
+          html: url,
           classes: 'bapv-table_cell',
         },
         {

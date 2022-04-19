@@ -11,4 +11,12 @@
     </div>
     {% include "partials/searchForPrisonerHeader.njk" %}
   </div>
+{% if visit %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <h2 class="govuk-heading-m govuk-!-margin-top-5">Search by booking reference</h2>
+        <p><a href="/search/visit">You can also search by booking reference</a></p>
+    </div>
+  </div>
+{% endif %}
 {% endblock %}
