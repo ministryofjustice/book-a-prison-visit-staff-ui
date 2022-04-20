@@ -711,7 +711,6 @@ describe('Visit sessions service', () => {
       }
 
       visitSchedulerApiClient.getVisit.mockResolvedValue(visit)
-
       const result = await visitSessionsService.getVisit({ username: 'user', reference: 'v9-d7-ed-7u' })
 
       expect(visitSchedulerApiClient.getVisit).toHaveBeenCalledTimes(1)
@@ -723,6 +722,61 @@ describe('Visit sessions service', () => {
         visitDate: '14 February 2022',
         visitTime: '10am to 11:15am',
       })
+    })
+  })
+
+  describe('getUpcomingVisits', () => {
+    it('should return an array of upcoming VisitInformation for an offender', async () => {
+      const visits: Visit[] = [
+        {
+          reference: 'v9-d7-ed-7u',
+          prisonerId: 'A1234BC',
+          prisonId: 'HEI',
+          visitRoom: 'visit room',
+          visitType: 'SOCIAL',
+          visitStatus: 'BOOKED',
+          visitRestriction: 'OPEN',
+          startTimestamp: '2022-02-14T10:00:00',
+          endTimestamp: '2022-02-14T11:15:00',
+          visitContact: {
+            name: 'John Smith',
+            telephone: '01234 567890',
+          },
+          visitors: [
+            {
+              nomisPersonId: 1234,
+            },
+          ],
+          visitorSupport: [],
+        },
+      ]
+
+      visitSchedulerApiClient.getUpcomingVisits.mockResolvedValue(visits)
+      const result = await visitSessionsService.getUpcomingVisits({ username: 'user', offenderNo: 'A1234BC' })
+
+      expect(visitSchedulerApiClient.getUpcomingVisits).toHaveBeenCalledTimes(1)
+      expect(visitSchedulerApiClient.getUpcomingVisits).toHaveBeenCalledWith('A1234BC')
+      expect(result).toEqual(<VisitInformation[]>[
+        {
+          reference: 'v9-d7-ed-7u',
+          prisonNumber: 'A1234BC',
+          prisonerName: '',
+          mainContact: 'John Smith',
+          visitDate: '14 February 2022',
+          visitTime: '10am to 11:15am',
+        },
+      ])
+    })
+
+    it('should return an empty array for an offender with no upcoming visits', async () => {
+      const visits: Visit[] = []
+
+      visitSchedulerApiClient.getUpcomingVisits.mockResolvedValue(visits)
+      const result = await visitSessionsService.getUpcomingVisits({ username: 'user', offenderNo: 'A1234BC' })
+
+      expect(visitSchedulerApiClient.getUpcomingVisits).toHaveBeenCalledTimes(1)
+      expect(visitSchedulerApiClient.getUpcomingVisits).toHaveBeenCalledWith('A1234BC')
+      expect(result).toEqual([])
     })
   })
 })

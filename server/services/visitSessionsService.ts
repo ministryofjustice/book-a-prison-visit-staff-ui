@@ -190,12 +190,33 @@ export default class VisitSessionsService {
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
 
     const visit = await visitSchedulerApiClient.getVisit(reference)
-    const visitTime = visit.endTimestamp
-      ? `${prisonerTimePretty(visit.startTimestamp)} to ${prisonerTimePretty(visit.endTimestamp)}`
-      : prisonerTimePretty(visit.startTimestamp)
     logger.info(`Get visit ${visit.reference}`)
 
-    const visitInformation = {
+    return this.buildVisitInformation(visit)
+  }
+
+  async getUpcomingVisits({
+    username,
+    offenderNo,
+  }: {
+    username: string
+    offenderNo: string
+  }): Promise<VisitInformation[]> {
+    const token = await this.systemToken(username)
+    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
+
+    const visits = await visitSchedulerApiClient.getUpcomingVisits(offenderNo)
+    logger.info(`Get upcoming visits for ${offenderNo}`)
+
+    return visits.map(visit => {
+      return this.buildVisitInformation(visit)
+    })
+  }
+
+  private buildVisitInformation(visit: Visit): VisitInformation {
+    const visitTime = `${prisonerTimePretty(visit.startTimestamp)} to ${prisonerTimePretty(visit.endTimestamp)}`
+
+    return {
       reference: visit.reference,
       prisonNumber: visit.prisonerId,
       prisonerName: '',
@@ -203,7 +224,5 @@ export default class VisitSessionsService {
       visitDate: prisonerDateTimePretty(visit.startTimestamp),
       visitTime,
     }
-
-    return visitInformation
   }
 }
