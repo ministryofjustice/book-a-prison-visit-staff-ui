@@ -2,7 +2,7 @@ import VisitSessionsService from './visitSessionsService'
 import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
 import WhereaboutsApiClient from '../data/whereaboutsApiClient'
 import { VisitSession, Visit, SupportType } from '../data/visitSchedulerApiTypes'
-import { VisitSlotList, VisitSessionData } from '../@types/bapv'
+import { VisitSlotList, VisitSessionData, VisitInformation } from '../@types/bapv'
 
 jest.mock('../data/visitSchedulerApiClient')
 jest.mock('../data/whereaboutsApiClient')
@@ -682,6 +682,46 @@ describe('Visit sessions service', () => {
         visitContact: { name: 'John Smith', telephone: '01234 567890' },
         visitors: [{ nomisPersonId: 1234 }],
         visitorSupport: [{ type: 'WHEELCHAIR' }, { type: 'MASK_EXEMPT' }, { type: 'OTHER', text: 'custom request' }],
+      })
+    })
+  })
+
+  describe('getVisit', () => {
+    it('should return VisitInformation given a visit reference', async () => {
+      const visit: Visit = {
+        reference: 'v9-d7-ed-7u',
+        prisonerId: 'A1234BC',
+        prisonId: 'HEI',
+        visitRoom: 'visit room',
+        visitType: 'SOCIAL',
+        visitStatus: 'BOOKED',
+        visitRestriction: 'OPEN',
+        startTimestamp: '2022-02-14T10:00:00',
+        endTimestamp: '2022-02-14T11:15:00',
+        visitContact: {
+          name: 'John Smith',
+          telephone: '01234 567890',
+        },
+        visitors: [
+          {
+            nomisPersonId: 1234,
+          },
+        ],
+        visitorSupport: [],
+      }
+
+      visitSchedulerApiClient.getVisit.mockResolvedValue(visit)
+
+      const result = await visitSessionsService.getVisit({ username: 'user', reference: 'v9-d7-ed-7u' })
+
+      expect(visitSchedulerApiClient.getVisit).toHaveBeenCalledTimes(1)
+      expect(result).toEqual(<VisitInformation>{
+        reference: 'v9-d7-ed-7u',
+        prisonNumber: 'A1234BC',
+        prisonerName: '',
+        mainContact: 'John Smith',
+        visitDate: '14 February 2022',
+        visitTime: '10am to 11:15am',
       })
     })
   })
