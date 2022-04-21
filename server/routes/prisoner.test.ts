@@ -1,31 +1,32 @@
 import type { Express } from 'express'
 import request from 'supertest'
-import { PrisonerProfile, BAPVVisitBalances } from '../@types/bapv'
+import * as cheerio from 'cheerio'
+import { PrisonerProfile, BAPVVisitBalances, VisitInformation } from '../@types/bapv'
 import { InmateDetail } from '../data/prisonApiTypes'
 import PrisonerProfileService from '../services/prisonerProfileService'
+import PrisonerSearchService from '../services/prisonerSearchService'
+import VisitSessionsService from '../services/visitSessionsService'
 import { appWithAllRoutes } from './testutils/appSetup'
+import { Prisoner } from '../data/prisonerOffenderSearchTypes'
+
+jest.mock('../services/prisonerProfileService')
+jest.mock('../services/prisonerSearchService')
+jest.mock('../services/visitSessionsService')
 
 let app: Express
-let prisonerProfileService: PrisonerProfileService
-let systemToken
+const systemToken = async (user: string): Promise<string> => `${user}-token-1`
 
-let returnData: PrisonerProfile
-
-class MockPrisonerProfileService extends PrisonerProfileService {
-  constructor() {
-    super(undefined, undefined, undefined, undefined)
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  getProfile(offenderNo: string, username: string): Promise<PrisonerProfile> {
-    return Promise.resolve(returnData)
-  }
-}
+const prisonerProfileService = new PrisonerProfileService(
+  null,
+  null,
+  null,
+  systemToken
+) as jest.Mocked<PrisonerProfileService>
+const prisonerSearchService = new PrisonerSearchService(null, systemToken) as jest.Mocked<PrisonerSearchService>
+const visitSessionsService = new VisitSessionsService(null, null, systemToken) as jest.Mocked<VisitSessionsService>
 
 beforeEach(() => {
-  systemToken = async (user: string): Promise<string> => `${user}-token-1`
-  prisonerProfileService = new MockPrisonerProfileService()
-  app = appWithAllRoutes(null, prisonerProfileService, null, null, systemToken)
+  app = appWithAllRoutes(prisonerSearchService, prisonerProfileService, null, visitSessionsService, systemToken)
 })
 
 afterEach(() => {
@@ -34,7 +35,7 @@ afterEach(() => {
 
 describe('GET /prisoner/A1234BC', () => {
   it('should render the prisoner profile page for offender number A1234BC', () => {
-    returnData = {
+    const returnData: PrisonerProfile = {
       displayName: 'Smith, John',
       displayDob: '12 October 1980',
       activeAlerts: [
@@ -84,6 +85,8 @@ describe('GET /prisoner/A1234BC', () => {
       pastVisits: [],
     }
 
+    prisonerProfileService.getProfile.mockResolvedValue(returnData)
+
     return request(app)
       .get('/prisoner/A1234BC')
       .expect('Content-Type', /html/)
@@ -107,8 +110,9 @@ describe('GET /prisoner/A1234BC', () => {
         expect(res.text).toMatch(/<a.*?class="govuk-button".*?>\s+Book a prison visit\s+<\/a>/)
       })
   })
+
   it('should render the prisoner profile page for offender number A1234BC without active alerts if there are none', () => {
-    returnData = {
+    const returnData: PrisonerProfile = {
       displayName: 'Smith, John',
       displayDob: '12 October 1980',
       activeAlerts: [],
@@ -140,6 +144,8 @@ describe('GET /prisoner/A1234BC', () => {
       pastVisits: [],
     }
 
+    prisonerProfileService.getProfile.mockResolvedValue(returnData)
+
     return request(app)
       .get('/prisoner/A1234BC')
       .expect('Content-Type', /html/)
@@ -153,7 +159,7 @@ describe('GET /prisoner/A1234BC', () => {
   })
 
   it('should render prisoner profile page without visiting orders for REMAND', () => {
-    returnData = {
+    const returnData: PrisonerProfile = {
       displayName: 'James, Fred',
       displayDob: '11 December 1985',
       activeAlerts: [],
@@ -173,6 +179,8 @@ describe('GET /prisoner/A1234BC', () => {
       pastVisits: [],
     }
 
+    prisonerProfileService.getProfile.mockResolvedValue(returnData)
+
     return request(app)
       .get('/prisoner/A1234BC')
       .expect('Content-Type', /html/)
@@ -190,9 +198,100 @@ describe('GET /prisoner/A1234BC', () => {
   it('should render 400 Bad Request error for invalid prisoner number', () => {
     return request(app)
       .get('/prisoner/A12--34BC')
+      .expect(400)
       .expect('Content-Type', /html/)
       .expect(res => {
         expect(res.text).toContain('BadRequestError: Bad Request')
+      })
+  })
+})
+
+describe('GET /prisoner/visits/A1234BC', () => {
+  const prisoner: Prisoner = {
+    prisonerNumber: 'A1234BC',
+    firstName: 'JOHN',
+    lastName: 'SMITH',
+    restrictedPatient: false,
+  }
+  it('should list upcoming visits for the prisoner', () => {
+    const visitInfo: VisitInformation[] = [
+      {
+        reference: 'v9-d7-ed-7u',
+        prisonNumber: 'A1234BC',
+        prisonerName: '',
+        mainContact: 'John Smith',
+        visitDate: '14 February 2022',
+        visitTime: '10am to 11:15am',
+      },
+      {
+        reference: 'gm-in-az-ma',
+        prisonNumber: 'A1234BC',
+        prisonerName: '',
+        mainContact: 'Fred Smith',
+        visitDate: '24 February 2022',
+        visitTime: '2pm to 3pm',
+      },
+    ]
+
+    prisonerSearchService.getPrisoner.mockResolvedValue(prisoner)
+    visitSessionsService.getUpcomingVisits.mockResolvedValue(visitInfo)
+
+    return request(app)
+      .get('/prisoner/visits/A1234BC')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('h1').text()).toBe('Smith, John')
+        expect($('[data-test="prisoner-number"]').text()).toBe('A1234BC')
+        expect($('[data-test="visit-reference-1"]').text()).toBe('v9-d7-ed-7u')
+        expect($('[data-test="visit-mainContact-1"]').text()).toBe('Smith, John')
+        expect($('[data-test="visit-date-1"]').text()).toBe('14 February 2022')
+        expect($('[data-test="visit-time-1"]').text()).toBe('10am to 11:15am')
+
+        expect($('[data-test="visit-reference-2"]').text()).toBe('gm-in-az-ma')
+        expect($('[data-test="visit-mainContact-2"]').text()).toBe('Smith, Fred')
+        expect($('[data-test="visit-date-2"]').text()).toBe('24 February 2022')
+        expect($('[data-test="visit-time-2"]').text()).toBe('2pm to 3pm')
+      })
+  })
+
+  it('should show message and back-to-start button if prisoner has no upcoming visits', () => {
+    prisonerSearchService.getPrisoner.mockResolvedValue(prisoner)
+    visitSessionsService.getUpcomingVisits.mockResolvedValue([])
+
+    return request(app)
+      .get('/prisoner/visits/A1234BC')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('h1').text()).toBe('Smith, John')
+        expect($('[data-test="prisoner-number"]').text()).toBe('A1234BC')
+        expect($('main').text()).toContain('There are no upcoming visits for this prisoner.')
+        expect($('[data-test="go-to-start"]').length).toBe(1)
+      })
+  })
+
+  it('should render 400 Bad Request error for invalid prisoner number', () => {
+    return request(app)
+      .get('/prisoner/visits/A12--34BC')
+      .expect(400)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        expect(res.text).toContain('BadRequestError: Bad Request')
+      })
+  })
+
+  it('should render 404 Not Found error if prisoner not found', () => {
+    prisonerSearchService.getPrisoner.mockResolvedValue(null)
+
+    return request(app)
+      .get('/prisoner/visits/A1234BC')
+      .expect(404)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        expect(res.text).toContain('NotFoundError: Not Found')
       })
   })
 })
