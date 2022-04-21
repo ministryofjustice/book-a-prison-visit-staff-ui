@@ -63,7 +63,9 @@ export default function createApp(userService: UserService): express.Application
         visitSchedulerApiClientBuilder,
         prisonerContactRegistryApiClientBuilder,
         systemToken
-      )
+      ),
+      new PrisonerSearchService(prisonerSearchClientBuilder, systemToken),
+      new VisitSessionsService(visitSchedulerApiClientBuilder, whereaboutsApiClientBuilder, systemToken)
     )
   )
   app.use(

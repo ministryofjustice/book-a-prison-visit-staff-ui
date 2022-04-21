@@ -109,7 +109,15 @@ function appSetup(
       prisonerContactRegistryApiClientBuilder,
       systemTokenTest
     )
-  app.use('/prisoner/', prisonerRoutes(standardRouter(new MockUserService()), prisonerProfileService))
+  app.use(
+    '/prisoner/',
+    prisonerRoutes(
+      standardRouter(new MockUserService()),
+      prisonerProfileService,
+      prisonerSearchService,
+      visitSessionsService
+    )
+  )
 
   const prisonerVisitorsService =
     prisonerVisitorsServiceOverride ||
