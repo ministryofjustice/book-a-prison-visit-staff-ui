@@ -6,7 +6,7 @@ import indexRoutes from './routes'
 import searchRoutes from './routes/search'
 import prisonerRoutes from './routes/prisoner'
 import bookAVisitRoutes from './routes/bookAVisit'
-import visitRoutes from './routes/visits'
+import visitRoutes from './routes/visit'
 import nunjucksSetup from './utils/nunjucksSetup'
 import errorHandler from './errorHandler'
 import standardRouter from './routes/standardRouter'
@@ -51,7 +51,12 @@ export default function createApp(userService: UserService): express.Application
     searchRoutes(
       standardRouter(userService),
       new PrisonerSearchService(prisonerSearchClientBuilder, systemToken),
-      new VisitSessionsService(visitSchedulerApiClientBuilder, whereaboutsApiClientBuilder, systemToken)
+      new VisitSessionsService(
+        prisonerContactRegistryApiClientBuilder,
+        visitSchedulerApiClientBuilder,
+        whereaboutsApiClientBuilder,
+        systemToken
+      )
     )
   )
   app.use(
@@ -65,7 +70,12 @@ export default function createApp(userService: UserService): express.Application
         systemToken
       ),
       new PrisonerSearchService(prisonerSearchClientBuilder, systemToken),
-      new VisitSessionsService(visitSchedulerApiClientBuilder, whereaboutsApiClientBuilder, systemToken)
+      new VisitSessionsService(
+        prisonerContactRegistryApiClientBuilder,
+        visitSchedulerApiClientBuilder,
+        whereaboutsApiClientBuilder,
+        systemToken
+      )
     )
   )
   app.use(
@@ -73,7 +83,12 @@ export default function createApp(userService: UserService): express.Application
     bookAVisitRoutes(
       standardRouter(userService),
       new PrisonerVisitorsService(prisonerContactRegistryApiClientBuilder, systemToken),
-      new VisitSessionsService(visitSchedulerApiClientBuilder, whereaboutsApiClientBuilder, systemToken),
+      new VisitSessionsService(
+        prisonerContactRegistryApiClientBuilder,
+        visitSchedulerApiClientBuilder,
+        whereaboutsApiClientBuilder,
+        systemToken
+      ),
       new PrisonerProfileService(
         prisonApiClientBuilder,
         visitSchedulerApiClientBuilder,
@@ -86,7 +101,14 @@ export default function createApp(userService: UserService): express.Application
     '/visit/',
     visitRoutes(
       standardRouter(userService),
-      new VisitSessionsService(visitSchedulerApiClientBuilder, whereaboutsApiClientBuilder, systemToken)
+      new PrisonerSearchService(prisonerSearchClientBuilder, systemToken),
+      new PrisonerVisitorsService(prisonerContactRegistryApiClientBuilder, systemToken),
+      new VisitSessionsService(
+        prisonerContactRegistryApiClientBuilder,
+        visitSchedulerApiClientBuilder,
+        whereaboutsApiClientBuilder,
+        systemToken
+      )
     )
   )
 

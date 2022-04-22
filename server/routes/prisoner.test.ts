@@ -23,7 +23,12 @@ const prisonerProfileService = new PrisonerProfileService(
   systemToken
 ) as jest.Mocked<PrisonerProfileService>
 const prisonerSearchService = new PrisonerSearchService(null, systemToken) as jest.Mocked<PrisonerSearchService>
-const visitSessionsService = new VisitSessionsService(null, null, systemToken) as jest.Mocked<VisitSessionsService>
+const visitSessionsService = new VisitSessionsService(
+  null,
+  null,
+  null,
+  systemToken
+) as jest.Mocked<VisitSessionsService>
 
 beforeEach(() => {
   app = appWithAllRoutes(prisonerSearchService, prisonerProfileService, null, visitSessionsService, systemToken)

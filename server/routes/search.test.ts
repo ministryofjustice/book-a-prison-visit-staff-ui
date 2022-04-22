@@ -12,7 +12,12 @@ jest.mock('../services/visitSessionsService')
 let app: Express
 const systemToken = async (user: string): Promise<string> => `${user}-token-1`
 const prisonerSearchService = new PrisonerSearchService(null, systemToken) as jest.Mocked<PrisonerSearchService>
-const visitSessionsService = new VisitSessionsService(null, null, systemToken) as jest.Mocked<VisitSessionsService>
+const visitSessionsService = new VisitSessionsService(
+  null,
+  null,
+  null,
+  systemToken
+) as jest.Mocked<VisitSessionsService>
 
 let getPrisonersReturnData: {
   results: Array<PrisonerDetailsItem[]>

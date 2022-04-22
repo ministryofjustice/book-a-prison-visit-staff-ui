@@ -783,7 +783,12 @@ describe('/book-a-visit/select-date-and-time', () => {
   })
 
   describe('GET /book-a-visit/select-date-and-time', () => {
-    const visitSessionsService = new VisitSessionsService(null, null, systemToken) as jest.Mocked<VisitSessionsService>
+    const visitSessionsService = new VisitSessionsService(
+      null,
+      null,
+      null,
+      systemToken
+    ) as jest.Mocked<VisitSessionsService>
 
     beforeEach(() => {
       visitSessionsService.getVisitSessions.mockResolvedValue(slotsList)
@@ -875,7 +880,12 @@ describe('/book-a-visit/select-date-and-time', () => {
   })
 
   describe('POST /book-a-visit/select-date-and-time', () => {
-    const visitSessionsService = new VisitSessionsService(null, null, systemToken) as jest.Mocked<VisitSessionsService>
+    const visitSessionsService = new VisitSessionsService(
+      null,
+      null,
+      null,
+      systemToken
+    ) as jest.Mocked<VisitSessionsService>
 
     beforeEach(() => {
       visitSessionsService.createVisit = jest.fn().mockResolvedValue('2a-bc-3d-ef')
