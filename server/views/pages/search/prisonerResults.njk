@@ -39,23 +39,20 @@
       {{ pagination | safe if numberOfResults > 10 }}
 
         {{ govukTable({
-            classes: " govuk-!-margin-top-3",
+            classes: "bapv-table govuk-!-margin-top-3",
             captionClasses: "govuk-table__caption--m",
             attributes: {
               "id": "search-results-true"
             },
             head: [
                 {
-                  text: "Name",
-                  classes: "bapv-table_cell"
+                  text: "Name"
                 },
                 {
-                  text: "Prison number",
-                  classes: "bapv-table_cell"
+                  text: "Prison number"
                 },
                 {
-                  text: "Date of birth",
-                  classes: "bapv-table_cell"
+                  text: "Date of birth"
                 }
             ],
             rows: results

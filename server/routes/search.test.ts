@@ -78,11 +78,7 @@ describe('Prisoner search page', () => {
       it('should render prisoner results page with results and no next/prev when there are less than 11 results', () => {
         getPrisonersReturnData = {
           results: [
-            [
-              { html: '<a href="/prisoner/A1234BC">Smith, John</a>', classes: '' },
-              { html: 'A1234BC', classes: '' },
-              { html: '2 April 1975', classes: '' },
-            ],
+            [{ html: '<a href="/prisoner/A1234BC">Smith, John</a>' }, { html: 'A1234BC' }, { html: '2 April 1975' }],
           ],
           numberOfPages: 1,
           numberOfResults: 1,
@@ -105,61 +101,17 @@ describe('Prisoner search page', () => {
       it('should render prisoner results page with results and prev/next when there are more than 10 results', () => {
         getPrisonersReturnData = {
           results: [
-            [
-              { html: '<a href="/prisoner/A1234BC">Smith, John</a>', classes: '' },
-              { html: 'A1234BC', classes: '' },
-              { html: '2 April 1975', classes: '' },
-            ],
-            [
-              { html: '<a href="/prisoner/A1234BC">Smith, John</a>', classes: '' },
-              { html: 'A1234BC', classes: '' },
-              { html: '2 April 1975', classes: '' },
-            ],
-            [
-              { html: '<a href="/prisoner/A1234BC">Smith, John</a>', classes: '' },
-              { html: 'A1234BC', classes: '' },
-              { html: '2 April 1975', classes: '' },
-            ],
-            [
-              { html: '<a href="/prisoner/A1234BC">Smith, John</a>', classes: '' },
-              { html: 'A1234BC', classes: '' },
-              { html: '2 April 1975', classes: '' },
-            ],
-            [
-              { html: '<a href="/prisoner/A1234BC">Smith, John</a>', classes: '' },
-              { html: 'A1234BC', classes: '' },
-              { html: '2 April 1975', classes: '' },
-            ],
-            [
-              { html: '<a href="/prisoner/A1234BC">Smith, John</a>', classes: '' },
-              { html: 'A1234BC', classes: '' },
-              { html: '2 April 1975', classes: '' },
-            ],
-            [
-              { html: '<a href="/prisoner/A1234BC">Smith, John</a>', classes: '' },
-              { html: 'A1234BC', classes: '' },
-              { html: '2 April 1975', classes: '' },
-            ],
-            [
-              { html: '<a href="/prisoner/A1234BC">Smith, John</a>', classes: '' },
-              { html: 'A1234BC', classes: '' },
-              { html: '2 April 1975', classes: '' },
-            ],
-            [
-              { html: '<a href="/prisoner/A1234BC">Smith, John</a>', classes: '' },
-              { html: 'A1234BC', classes: '' },
-              { html: '2 April 1975', classes: '' },
-            ],
-            [
-              { html: '<a href="/prisoner/A1234BC">Smith, John</a>', classes: '' },
-              { html: 'A1234BC', classes: '' },
-              { html: '2 April 1975', classes: '' },
-            ],
-            [
-              { html: '<a href="/prisoner/A1234BC">Smith, John</a>', classes: '' },
-              { html: 'A1234BC', classes: '' },
-              { html: '2 April 1975', classes: '' },
-            ],
+            [{ html: '<a href="/prisoner/A1234BC">Smith, John</a>' }, { html: 'A1234BC' }, { html: '2 April 1975' }],
+            [{ html: '<a href="/prisoner/A1234BC">Smith, John</a>' }, { html: 'A1234BC' }, { html: '2 April 1975' }],
+            [{ html: '<a href="/prisoner/A1234BC">Smith, John</a>' }, { html: 'A1234BC' }, { html: '2 April 1975' }],
+            [{ html: '<a href="/prisoner/A1234BC">Smith, John</a>' }, { html: 'A1234BC' }, { html: '2 April 1975' }],
+            [{ html: '<a href="/prisoner/A1234BC">Smith, John</a>' }, { html: 'A1234BC' }, { html: '2 April 1975' }],
+            [{ html: '<a href="/prisoner/A1234BC">Smith, John</a>' }, { html: 'A1234BC' }, { html: '2 April 1975' }],
+            [{ html: '<a href="/prisoner/A1234BC">Smith, John</a>' }, { html: 'A1234BC' }, { html: '2 April 1975' }],
+            [{ html: '<a href="/prisoner/A1234BC">Smith, John</a>' }, { html: 'A1234BC' }, { html: '2 April 1975' }],
+            [{ html: '<a href="/prisoner/A1234BC">Smith, John</a>' }, { html: 'A1234BC' }, { html: '2 April 1975' }],
+            [{ html: '<a href="/prisoner/A1234BC">Smith, John</a>' }, { html: 'A1234BC' }, { html: '2 April 1975' }],
+            [{ html: '<a href="/prisoner/A1234BC">Smith, John</a>' }, { html: 'A1234BC' }, { html: '2 April 1975' }],
           ],
           numberOfPages: 12,
           numberOfResults: 11,
@@ -219,11 +171,7 @@ describe('Prisoner search page', () => {
       it('should render prisoner results page with results and no next/prev when there are less than 11 results', () => {
         getPrisonersReturnData = {
           results: [
-            [
-              { html: '<a href="/prisoner/A1234BC">Smith, John</a>', classes: '' },
-              { html: 'A1234BC', classes: '' },
-              { html: '2 April 1975', classes: '' },
-            ],
+            [{ html: '<a href="/prisoner/A1234BC">Smith, John</a>' }, { html: 'A1234BC' }, { html: '2 April 1975' }],
           ],
           numberOfPages: 1,
           numberOfResults: 1,
@@ -246,61 +194,17 @@ describe('Prisoner search page', () => {
       it('should render prisoner results page with results and prev/next when there are more than 10 results', () => {
         getPrisonersReturnData = {
           results: [
-            [
-              { html: '<a href="/prisoner/A1234BC">Smith, John</a>', classes: '' },
-              { html: 'A1234BC', classes: '' },
-              { html: '2 April 1975', classes: '' },
-            ],
-            [
-              { html: '<a href="/prisoner/A1234BC">Smith, John</a>', classes: '' },
-              { html: 'A1234BC', classes: '' },
-              { html: '2 April 1975', classes: '' },
-            ],
-            [
-              { html: '<a href="/prisoner/A1234BC">Smith, John</a>', classes: '' },
-              { html: 'A1234BC', classes: '' },
-              { html: '2 April 1975', classes: '' },
-            ],
-            [
-              { html: '<a href="/prisoner/A1234BC">Smith, John</a>', classes: '' },
-              { html: 'A1234BC', classes: '' },
-              { html: '2 April 1975', classes: '' },
-            ],
-            [
-              { html: '<a href="/prisoner/A1234BC">Smith, John</a>', classes: '' },
-              { html: 'A1234BC', classes: '' },
-              { html: '2 April 1975', classes: '' },
-            ],
-            [
-              { html: '<a href="/prisoner/A1234BC">Smith, John</a>', classes: '' },
-              { html: 'A1234BC', classes: '' },
-              { html: '2 April 1975', classes: '' },
-            ],
-            [
-              { html: '<a href="/prisoner/A1234BC">Smith, John</a>', classes: '' },
-              { html: 'A1234BC', classes: '' },
-              { html: '2 April 1975', classes: '' },
-            ],
-            [
-              { html: '<a href="/prisoner/A1234BC">Smith, John</a>', classes: '' },
-              { html: 'A1234BC', classes: '' },
-              { html: '2 April 1975', classes: '' },
-            ],
-            [
-              { html: '<a href="/prisoner/A1234BC">Smith, John</a>', classes: '' },
-              { html: 'A1234BC', classes: '' },
-              { html: '2 April 1975', classes: '' },
-            ],
-            [
-              { html: '<a href="/prisoner/A1234BC">Smith, John</a>', classes: '' },
-              { html: 'A1234BC', classes: '' },
-              { html: '2 April 1975', classes: '' },
-            ],
-            [
-              { html: '<a href="/prisoner/A1234BC">Smith, John</a>', classes: '' },
-              { html: 'A1234BC', classes: '' },
-              { html: '2 April 1975', classes: '' },
-            ],
+            [{ html: '<a href="/prisoner/A1234BC">Smith, John</a>' }, { html: 'A1234BC' }, { html: '2 April 1975' }],
+            [{ html: '<a href="/prisoner/A1234BC">Smith, John</a>' }, { html: 'A1234BC' }, { html: '2 April 1975' }],
+            [{ html: '<a href="/prisoner/A1234BC">Smith, John</a>' }, { html: 'A1234BC' }, { html: '2 April 1975' }],
+            [{ html: '<a href="/prisoner/A1234BC">Smith, John</a>' }, { html: 'A1234BC' }, { html: '2 April 1975' }],
+            [{ html: '<a href="/prisoner/A1234BC">Smith, John</a>' }, { html: 'A1234BC' }, { html: '2 April 1975' }],
+            [{ html: '<a href="/prisoner/A1234BC">Smith, John</a>' }, { html: 'A1234BC' }, { html: '2 April 1975' }],
+            [{ html: '<a href="/prisoner/A1234BC">Smith, John</a>' }, { html: 'A1234BC' }, { html: '2 April 1975' }],
+            [{ html: '<a href="/prisoner/A1234BC">Smith, John</a>' }, { html: 'A1234BC' }, { html: '2 April 1975' }],
+            [{ html: '<a href="/prisoner/A1234BC">Smith, John</a>' }, { html: 'A1234BC' }, { html: '2 April 1975' }],
+            [{ html: '<a href="/prisoner/A1234BC">Smith, John</a>' }, { html: 'A1234BC' }, { html: '2 April 1975' }],
+            [{ html: '<a href="/prisoner/A1234BC">Smith, John</a>' }, { html: 'A1234BC' }, { html: '2 April 1975' }],
           ],
           numberOfPages: 12,
           numberOfResults: 11,

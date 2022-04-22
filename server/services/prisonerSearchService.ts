@@ -55,15 +55,12 @@ export default class PrisonerSearchService {
       const row: PrisonerDetailsItem[] = [
         {
           html: url,
-          classes: 'bapv-table_cell',
         },
         {
           html: prisoner.prisonerNumber,
-          classes: 'bapv-table_cell',
         },
         {
           html: prisonerDatePretty({ dateToFormat: prisoner.dateOfBirth }),
-          classes: 'bapv-table_cell',
         },
       ]
 
