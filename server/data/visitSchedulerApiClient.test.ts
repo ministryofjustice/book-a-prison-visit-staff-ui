@@ -59,6 +59,7 @@ describe('visitSchedulerApiClient', () => {
         visitRestriction: 'OPEN',
         startTimestamp: timestamp,
         endTimestamp: '',
+        visitNotes: [],
         visitors: [
           {
             nomisPersonId: 1234,
@@ -70,6 +71,7 @@ describe('visitSchedulerApiClient', () => {
             text: 'custom support details',
           },
         ],
+        createdTimestamp: '2022-02-14T10:00:00',
       }
 
       fakeVisitSchedulerApi
@@ -97,6 +99,7 @@ describe('visitSchedulerApiClient', () => {
           visitRestriction: 'OPEN',
           startTimestamp: timestamp,
           endTimestamp: '',
+          visitNotes: [],
           visitors: [
             {
               nomisPersonId: 1234,
@@ -108,6 +111,7 @@ describe('visitSchedulerApiClient', () => {
               text: 'custom support details',
             },
           ],
+          createdTimestamp: '2022-02-14T10:00:00',
         },
       ]
 
@@ -117,6 +121,7 @@ describe('visitSchedulerApiClient', () => {
           prisonerId: offenderNo,
           prisonId: 'HEI',
           startTimestamp: timestamp,
+          visitStatus: 'BOOKED',
         })
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
@@ -141,6 +146,7 @@ describe('visitSchedulerApiClient', () => {
           visitRestriction: 'OPEN',
           startTimestamp: '',
           endTimestamp: timestamp,
+          visitNotes: [],
           visitors: [
             {
               nomisPersonId: 1234,
@@ -152,6 +158,7 @@ describe('visitSchedulerApiClient', () => {
               text: 'custom support details',
             },
           ],
+          createdTimestamp: '2022-02-14T10:00:00',
         },
       ]
 
@@ -161,6 +168,7 @@ describe('visitSchedulerApiClient', () => {
           prisonerId: offenderNo,
           prisonId: 'HEI',
           endTimestamp: timestamp,
+          visitStatus: 'BOOKED',
         })
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
@@ -220,6 +228,7 @@ describe('visitSchedulerApiClient', () => {
         visitRestriction,
         startTimestamp: '2022-02-14T10:00:00',
         endTimestamp: '2022-02-14T11:00:00',
+        visitNotes: [],
         visitContact: {
           name: 'John Smith',
           telephone: '01234 567890',
@@ -235,6 +244,7 @@ describe('visitSchedulerApiClient', () => {
             text: 'custom support details',
           },
         ],
+        createdTimestamp: '2022-02-14T10:00:00',
       }
       const visitSessionData = <VisitSessionData>{
         prisoner: {
@@ -288,7 +298,7 @@ describe('visitSchedulerApiClient', () => {
           }),
         })
         .matchHeader('authorization', `Bearer ${token}`)
-        .reply(200, result)
+        .reply(201, result)
 
       const output = await client.createVisit(visitSessionData)
 
@@ -312,6 +322,7 @@ describe('visitSchedulerApiClient', () => {
         visitRestriction: 'OPEN',
         startTimestamp: '2022-02-14T10:00:00',
         endTimestamp: '2022-02-14T11:00:00',
+        visitNotes: [],
         visitContact: {
           name: 'John Smith',
           telephone: '01234 567890',
@@ -329,6 +340,7 @@ describe('visitSchedulerApiClient', () => {
             text: 'custom request',
           },
         ],
+        createdTimestamp: '2022-02-14T10:00:00',
       }
 
       const visitSessionData: VisitSessionData = {
@@ -413,12 +425,14 @@ describe('visitSchedulerApiClient', () => {
         visitRestriction: 'OPEN',
         startTimestamp: '2022-02-14T10:00:00',
         endTimestamp: '2022-02-14T11:00:00',
+        visitNotes: [],
         visitors: [
           {
             nomisPersonId: 1234,
           },
         ],
         visitorSupport: [],
+        createdTimestamp: '2022-02-14T10:00:00',
       }
       const visitSessionData: VisitSessionData = {
         prisoner: {

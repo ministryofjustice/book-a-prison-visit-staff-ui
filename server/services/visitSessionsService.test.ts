@@ -583,12 +583,14 @@ describe('Visit sessions service', () => {
         visitRestriction: 'OPEN',
         startTimestamp: '2022-02-14T10:00:00',
         endTimestamp: '2022-02-14T11:00:00',
+        visitNotes: [],
         visitors: [
           {
             nomisPersonId: 1234,
           },
         ],
         visitorSupport: [],
+        createdTimestamp: '2022-02-14T10:00:00',
       }
 
       visitSchedulerApiClient.createVisit.mockResolvedValue(visit)
@@ -635,7 +637,7 @@ describe('Visit sessions service', () => {
             banned: false,
           },
         ],
-        visitorSupport: [{ type: 'WHEELCHAIR' }, { type: 'MASK_EXEMPT' }, { type: 'OTHER' }],
+        visitorSupport: [{ type: 'WHEELCHAIR' }, { type: 'MASK_EXEMPT' }, { type: 'OTHER', text: 'custom request' }],
         mainContact: {
           phoneNumber: '01234 567890',
           contactName: 'John Smith',
@@ -652,6 +654,7 @@ describe('Visit sessions service', () => {
         visitRestriction: 'OPEN',
         startTimestamp: '2022-02-14T10:00:00',
         endTimestamp: '2022-02-14T11:00:00',
+        visitNotes: [],
         visitContact: {
           name: 'John Smith',
           telephone: '01234 567890',
@@ -662,6 +665,7 @@ describe('Visit sessions service', () => {
           },
         ],
         visitorSupport: [{ type: 'WHEELCHAIR' }, { type: 'MASK_EXEMPT' }, { type: 'OTHER', text: 'custom request' }],
+        createdTimestamp: '2022-02-14T10:00:00',
       }
 
       visitSchedulerApiClient.updateVisit.mockResolvedValue(visit)
@@ -679,9 +683,11 @@ describe('Visit sessions service', () => {
         visitRestriction: 'OPEN',
         startTimestamp: '2022-02-14T10:00:00',
         endTimestamp: '2022-02-14T11:00:00',
+        visitNotes: [],
         visitContact: { name: 'John Smith', telephone: '01234 567890' },
         visitors: [{ nomisPersonId: 1234 }],
         visitorSupport: [{ type: 'WHEELCHAIR' }, { type: 'MASK_EXEMPT' }, { type: 'OTHER', text: 'custom request' }],
+        createdTimestamp: '2022-02-14T10:00:00',
       })
     })
   })
@@ -698,6 +704,7 @@ describe('Visit sessions service', () => {
         visitRestriction: 'OPEN',
         startTimestamp: '2022-02-14T10:00:00',
         endTimestamp: '2022-02-14T11:15:00',
+        visitNotes: [],
         visitContact: {
           name: 'John Smith',
           telephone: '01234 567890',
@@ -708,6 +715,7 @@ describe('Visit sessions service', () => {
           },
         ],
         visitorSupport: [],
+        createdTimestamp: '2022-02-14T10:00:00',
       }
 
       visitSchedulerApiClient.getVisit.mockResolvedValue(visit)
@@ -738,6 +746,7 @@ describe('Visit sessions service', () => {
           visitRestriction: 'OPEN',
           startTimestamp: '2022-02-14T10:00:00',
           endTimestamp: '2022-02-14T11:15:00',
+          visitNotes: [],
           visitContact: {
             name: 'John Smith',
             telephone: '01234 567890',
@@ -748,6 +757,7 @@ describe('Visit sessions service', () => {
             },
           ],
           visitorSupport: [],
+          createdTimestamp: '2022-02-14T10:00:00',
         },
       ]
 

@@ -11,6 +11,9 @@ export interface paths {
     /** Delete a visit by visit reference */
     delete: operations['deleteVisit']
   }
+  '/visits/{reference}/cancel': {
+    put: operations['cancelVisit']
+  }
   '/visits': {
     /** Retrieve visits with optional filters, sorted by startTimestamp ascending */
     get: operations['getVisitsByFilter']
@@ -189,11 +192,31 @@ export interface components {
        * @description The finishing date and time of the visit
        */
       endTimestamp: string
+      /** @description Visit Notes */
+      visitNotes: components['schemas']['VisitNoteDto'][]
       visitContact?: components['schemas']['ContactDto']
       /** @description List of visitors associated with the visit */
       visitors: components['schemas']['VisitorDto'][]
       /** @description List of additional support associated with the visit */
       visitorSupport: components['schemas']['VisitorSupportDto'][]
+      /**
+       * Format: date-time
+       * @description The visit created date and time
+       */
+      createdTimestamp: string
+    }
+    /** @description VisitNote */
+    VisitNoteDto: {
+      /**
+       * @description Note type
+       * @example VISITOR_CONCERN
+       */
+      type: 'VISITOR_CONCERN' | 'VISIT_OUTCOMES' | 'VISIT_COMMENT' | 'STATUS_CHANGED_REASON'
+      /**
+       * @description Note text
+       * @example Visitor is concerned that his mother in-law is coming!
+       */
+      text: string
     }
     /** @description Visitor */
     VisitorDto: {
@@ -275,19 +298,6 @@ export interface components {
       visitorSupport?: components['schemas']['CreateSupportOnVisitRequestDto'][]
       /** @description Visit notes */
       visitNotes?: components['schemas']['VisitNoteDto'][]
-    }
-    /** @description VisitNote */
-    VisitNoteDto: {
-      /**
-       * @description Note type
-       * @example VISITOR_CONCERN
-       */
-      type: 'VISITOR_CONCERN' | 'VISIT_OUTCOMES' | 'VISIT_COMMENT' | 'STATUS_CHANGED_REASON'
-      /**
-       * @description Note text
-       * @example Visitor is concerned that his mother in-law is coming!
-       */
-      text: string
     }
     CreateSessionTemplateRequestDto: {
       /**
@@ -594,6 +604,50 @@ export interface operations {
       }
     }
   }
+  cancelVisit: {
+    parameters: {
+      path: {
+        reference: string
+      }
+    }
+    responses: {
+      /** Visit cancelled */
+      200: {
+        content: {
+          'application/json': components['schemas']['VisitDto']
+        }
+      }
+      /** Incorrect request to cancel a visit */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** Unauthorized to access this endpoint */
+      401: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** Incorrect permissions to cancel a visit */
+      403: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** Visit not found */
+      404: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateVisitRequestDto']
+      }
+    }
+  }
   /** Retrieve visits with optional filters, sorted by startTimestamp ascending */
   getVisitsByFilter: {
     parameters: {
@@ -608,6 +662,8 @@ export interface operations {
         endTimestamp?: string
         /** Filter results by visitor (contact id) */
         nomisPersonId?: number
+        /** Filter results by visit status */
+        visitStatus?: 'RESERVED' | 'BOOKED' | 'CANCELLED'
       }
     }
     responses: {
