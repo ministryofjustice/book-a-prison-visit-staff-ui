@@ -7,5 +7,7 @@ export default class IndexPage extends Page {
 
   headerUserName = (): PageElement => cy.get('[data-qa=header-user-name]')
 
-  courtRegisterLink = (): PageElement => cy.get('[href="/court-register"]')
+  bookAVisitLink = (): PageElement => cy.get('[href="/search/prisoner"]')
+
+  cancelAVisitLink = (): PageElement => cy.get('[href="/search/visit"]')
 }
