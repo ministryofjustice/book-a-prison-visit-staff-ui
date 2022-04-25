@@ -4,6 +4,7 @@ import auth from '../mockApis/auth'
 import tokenVerification from '../mockApis/tokenVerification'
 import prisonerContactRegistry from '../mockApis/prisonerContactRegistry'
 import whereaboutsOffenderEvents from '../mockApis/whereabouts'
+import prisonApi from '../mockApis/prison'
 
 export default (on: (string, Record) => void): void => {
   on('task', {
@@ -20,5 +21,10 @@ export default (on: (string, Record) => void): void => {
     stubGetPrisonerContacts: prisonerContactRegistry.stubGetPrisonerContacts,
 
     stubGetOffenderEvents: whereaboutsOffenderEvents.stubGetOffenderEvents,
+
+    stubGetBookings: prisonApi.stubGetBookings,
+    stubGetPrisonerDetail: prisonApi.stubGetPrisonerDetail,
+    stubGetPrisonerRestrictions: prisonApi.stubGetPrisonerRestrictions,
+    stubGetVisitBalances: prisonApi.stubGetVisitBalances,
   })
 }
