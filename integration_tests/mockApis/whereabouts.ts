@@ -2,7 +2,15 @@ import { SuperAgentRequest } from 'superagent'
 import { stubFor } from './wiremock'
 
 export default {
-  stubGetOffenderEvents: (): SuperAgentRequest => {
+  stubGetOffenderEvents: ({
+    offenderNo,
+    fromDate,
+    toDate,
+  }: {
+    offenderNo: string
+    fromDate: string
+    toDate: string
+  }): SuperAgentRequest => {
     const results = {
       bookingId: 123456,
       eventClass: 'ABC',
@@ -20,7 +28,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: '/events/*?fromDate=*&toDate=*',
+        urlPattern: `/events/${offenderNo}?fromDate=${fromDate}&toDate=${toDate}`,
       },
       response: {
         status: 200,

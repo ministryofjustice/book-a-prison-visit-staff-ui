@@ -22,20 +22,41 @@ export default (on: (string, Record) => void): void => {
 
     stubGetPrisonerContacts: prisonerContactRegistry.stubGetPrisonerContacts,
 
-    stubGetOffenderEvents: whereaboutsOffenderEvents.stubGetOffenderEvents,
+    stubGetOffenderEvents: ({
+      offenderNo,
+      fromDate,
+      toDate,
+    }: {
+      offenderNo: string
+      fromDate: string
+      toDate: string
+    }) =>
+      whereaboutsOffenderEvents.stubGetOffenderEvents({
+        offenderNo,
+        fromDate,
+        toDate,
+      }),
 
-    stubGetBookings: prisonApi.stubGetBookings,
-    stubGetPrisonerDetail: prisonApi.stubGetPrisonerDetail,
-    stubGetPrisonerRestrictions: prisonApi.stubGetPrisonerRestrictions,
-    stubGetVisitBalances: prisonApi.stubGetVisitBalances,
+    stubGetBookings: (offenderNo: string) => prisonApi.stubGetBookings(offenderNo),
+    stubGetPrisonerDetail: (offenderNo: string) => prisonApi.stubGetPrisonerDetail(offenderNo),
+    stubGetPrisonerRestrictions: (offenderNo: string) => prisonApi.stubGetPrisonerRestrictions(offenderNo),
+    stubGetVisitBalances: (offenderNo: string) => prisonApi.stubGetVisitBalances(offenderNo),
 
     stubGetPrisoners: offenderSearch.stubGetPrisoners,
     stubGetPrisoner: offenderSearch.stubGetPrisoner,
 
     stubGetAvailableSupportOptions: visitScheduler.stubGetAvailableSupportOptions,
-    stubGetVisit: visitScheduler.stubGetVisit,
-    stubGetUpcomingVisits: visitScheduler.stubGetUpcomingVisits,
-    stubGetPastVisits: visitScheduler.stubGetPastVisits,
+    stubGetVisit: (reference: string) => visitScheduler.stubGetVisit(reference),
+    stubGetUpcomingVisits: ({ offenderNo, startTimestamp }: { offenderNo: string; startTimestamp: string }) =>
+      visitScheduler.stubGetUpcomingVisits({
+        offenderNo,
+        startTimestamp,
+      }),
+    stubGetPastVisits: ({ offenderNo, endTimestamp }: { offenderNo: string; endTimestamp: string }) =>
+      visitScheduler.stubGetPastVisits({
+        offenderNo,
+        endTimestamp,
+      }),
     stubGetVisitSessions: visitScheduler.stubGetVisitSessions,
     stubCreateVisit: visitScheduler.stubCreateVisit,
     stubUpdateVisit: visitScheduler.stubUpdateVisit,

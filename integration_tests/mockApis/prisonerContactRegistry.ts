@@ -2,10 +2,10 @@ import { SuperAgentRequest } from 'superagent'
 import { stubFor } from './wiremock'
 
 export default {
-  stubGetPrisonerContacts: (): SuperAgentRequest => {
+  stubGetPrisonerContacts: (offenderNo: string): SuperAgentRequest => {
     const results = [
       {
-        personId: 5871791,
+        personId: 1234,
         firstName: 'John',
         middleName: 'Mark',
         lastName: 'Smith',
@@ -66,7 +66,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: '/prisoners/*/contacts?type=S',
+        urlPattern: `/prisoners/${offenderNo}/contacts?type=S`,
       },
       response: {
         status: 200,

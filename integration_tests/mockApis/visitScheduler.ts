@@ -26,9 +26,9 @@ export default {
       },
     })
   },
-  stubGetVisit: (): SuperAgentRequest => {
+  stubGetVisit: (reference: string): SuperAgentRequest => {
     const results = {
-      reference: 'ab-cd-ef-gh',
+      reference,
       prisonerId: 'A1234BC',
       prisonId: 'HEI',
       visitRoom: 'A1 L3',
@@ -53,7 +53,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: '/visits/ab-cd-ef-gh',
+        urlPattern: `/visits/${reference}`,
       },
       response: {
         status: 200,
@@ -62,7 +62,13 @@ export default {
       },
     })
   },
-  stubGetUpcomingVisits: (): SuperAgentRequest => {
+  stubGetUpcomingVisits: ({
+    offenderNo,
+    startTimestamp,
+  }: {
+    offenderNo: string
+    startTimestamp: string
+  }): SuperAgentRequest => {
     const results = [
       {
         reference: 'ab-cd-ef-gh',
@@ -113,7 +119,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: '/visits?prisonerId=*&prisonId=HEI&startTimestamp=*',
+        urlPattern: `/visits?prisonerId=${offenderNo}&prisonId=HEI&startTimestamp=${startTimestamp}`,
       },
       response: {
         status: 200,
@@ -122,7 +128,13 @@ export default {
       },
     })
   },
-  stubGetPastVisits: (): SuperAgentRequest => {
+  stubGetPastVisits: ({
+    offenderNo,
+    endTimestamp,
+  }: {
+    offenderNo: string
+    endTimestamp: string
+  }): SuperAgentRequest => {
     const results = [
       {
         reference: 'ab-cd-ef-gh',
@@ -173,7 +185,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: '/visits?prisonerId=*&prisonId=HEI&endTimestamp=*',
+        urlPattern: `/visits?prisonerId=${offenderNo}&prisonId=HEI&endTimestamp=${endTimestamp}`,
       },
       response: {
         status: 200,

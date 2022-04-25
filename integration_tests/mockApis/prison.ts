@@ -2,11 +2,11 @@ import { SuperAgentRequest } from 'superagent'
 import { stubFor } from './wiremock'
 
 export default {
-  stubGetBookings: (): SuperAgentRequest => {
+  stubGetBookings: (offenderNo: string): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: '/api/bookings/v2/?prisonId=HEI&offenderNo=*&legalInfo=true',
+        urlPattern: `/api/bookings/v2/?prisonId=HEI&offenderNo=${offenderNo}&legalInfo=true`,
       },
       response: {
         status: 200,
@@ -22,18 +22,18 @@ export default {
               dateOfBirth: '1999-01-01',
               firstName: 'FirstName',
               lastName: 'LastName',
-              offenderNo: 'AB1234C',
+              offenderNo,
             },
           ],
         },
       },
     })
   },
-  stubGetPrisonerDetail: (): SuperAgentRequest => {
+  stubGetPrisonerDetail: (offenderNo: string): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: '/api/offenders/*',
+        urlPattern: `/api/offenders/${offenderNo}`,
       },
       response: {
         status: 200,
@@ -50,11 +50,11 @@ export default {
       },
     })
   },
-  stubGetPrisonerRestrictions: (): SuperAgentRequest => {
+  stubGetPrisonerRestrictions: (offenderNo: string): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: '/api/offenders/*/offender-restrictions?activeRestrictionsOnly=true',
+        urlPattern: `/api/offenders/${offenderNo}/offender-restrictions?activeRestrictionsOnly=true`,
       },
       response: {
         status: 200,
@@ -76,11 +76,11 @@ export default {
       },
     })
   },
-  stubGetVisitBalances: (): SuperAgentRequest => {
+  stubGetVisitBalances: (offenderNo: string): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: '/api/bookings/offenderNo/*/visit/balances',
+        urlPattern: `/api/bookings/offenderNo/${offenderNo}/visit/balances`,
       },
       response: {
         status: 200,
