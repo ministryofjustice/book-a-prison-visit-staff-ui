@@ -121,6 +121,7 @@ describe('visitSchedulerApiClient', () => {
           prisonerId: offenderNo,
           prisonId: 'HEI',
           startTimestamp: timestamp,
+          visitStatus: 'BOOKED',
         })
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
@@ -167,6 +168,7 @@ describe('visitSchedulerApiClient', () => {
           prisonerId: offenderNo,
           prisonId: 'HEI',
           endTimestamp: timestamp,
+          visitStatus: 'BOOKED',
         })
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)

@@ -24,6 +24,8 @@ class VisitSchedulerApiClient {
 
   private visitType = 'SOCIAL'
 
+  private visitStatus = 'BOOKED'
+
   getAvailableSupportOptions(): Promise<SupportType[]> {
     return this.restclient.get({
       path: '/visit-support',
@@ -41,6 +43,7 @@ class VisitSchedulerApiClient {
         prisonerId: offenderNo,
         prisonId: this.prisonId,
         startTimestamp: startTimestamp || new Date().toISOString(),
+        visitStatus: this.visitStatus,
       }).toString(),
     })
   }
@@ -52,6 +55,7 @@ class VisitSchedulerApiClient {
         prisonerId: offenderNo,
         prisonId: this.prisonId,
         endTimestamp: endTimestamp || new Date().toISOString(),
+        visitStatus: this.visitStatus,
       }).toString(),
     })
   }
