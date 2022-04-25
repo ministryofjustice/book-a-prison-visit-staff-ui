@@ -5,6 +5,8 @@ import tokenVerification from '../mockApis/tokenVerification'
 import prisonerContactRegistry from '../mockApis/prisonerContactRegistry'
 import whereaboutsOffenderEvents from '../mockApis/whereabouts'
 import prisonApi from '../mockApis/prison'
+import offenderSearch from '../mockApis/offenderSearch'
+import visitScheduler from '../mockApis/visitScheduler'
 
 export default (on: (string, Record) => void): void => {
   on('task', {
@@ -26,5 +28,16 @@ export default (on: (string, Record) => void): void => {
     stubGetPrisonerDetail: prisonApi.stubGetPrisonerDetail,
     stubGetPrisonerRestrictions: prisonApi.stubGetPrisonerRestrictions,
     stubGetVisitBalances: prisonApi.stubGetVisitBalances,
+
+    stubGetPrisoners: offenderSearch.stubGetPrisoners,
+    stubGetPrisoner: offenderSearch.stubGetPrisoner,
+
+    stubGetAvailableSupportOptions: visitScheduler.stubGetAvailableSupportOptions,
+    stubGetVisit: visitScheduler.stubGetVisit,
+    stubGetUpcomingVisits: visitScheduler.stubGetUpcomingVisits,
+    stubGetPastVisits: visitScheduler.stubGetPastVisits,
+    stubGetVisitSessions: visitScheduler.stubGetVisitSessions,
+    stubCreateVisit: visitScheduler.stubCreateVisit,
+    stubUpdateVisit: visitScheduler.stubUpdateVisit,
   })
 }

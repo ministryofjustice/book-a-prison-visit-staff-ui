@@ -10,4 +10,20 @@ const getRequests = (): SuperAgentRequest => superagent.get(`${url}/requests`)
 const resetStubs = (): Promise<Array<Response>> =>
   Promise.all([superagent.delete(`${url}/mappings`), superagent.delete(`${url}/requests`)])
 
-export { stubFor, getRequests, resetStubs }
+const postFor = ({ body, urlPattern, urlPath }) =>
+  stubFor({
+    request: {
+      method: 'POST',
+      urlPattern,
+      urlPath,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: body,
+    },
+  })
+
+export { stubFor, getRequests, resetStubs, postFor }
