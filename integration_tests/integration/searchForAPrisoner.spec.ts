@@ -2,7 +2,7 @@ import IndexPage from '../pages/index'
 import Page from '../pages/page'
 import SearchForAPrisonerPage from '../pages/searchForAPrisoner'
 
-context('Book A Visit page', () => {
+context('Search for a prisoner', () => {
   beforeEach(() => {
     cy.task('reset')
     cy.task('stubSignIn')
