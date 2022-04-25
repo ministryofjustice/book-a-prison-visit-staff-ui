@@ -49,15 +49,12 @@ describe('Prisoner search service', () => {
           [
             {
               html: '<a href="/prisoner/A1234BC">Smith, John</a>',
-              classes: 'bapv-table_cell',
             },
             {
               html: 'A1234BC',
-              classes: 'bapv-table_cell',
             },
             {
               html: '2 April 1975',
-              classes: 'bapv-table_cell',
             },
           ],
         ])
@@ -101,15 +98,12 @@ describe('Prisoner search service', () => {
           [
             {
               html: '<a href="/prisoner/visits/A1234BC">Smith, John</a>',
-              classes: 'bapv-table_cell',
             },
             {
               html: 'A1234BC',
-              classes: 'bapv-table_cell',
             },
             {
               html: '2 April 1975',
-              classes: 'bapv-table_cell',
             },
           ],
         ])

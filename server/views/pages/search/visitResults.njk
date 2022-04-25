@@ -40,62 +40,50 @@
       {{ pagination | safe if numberOfResults > 10 }}
 
         {{ govukTable({
-            classes: " govuk-!-margin-top-3",
+            classes: "bapv-table govuk-!-margin-top-3",
             captionClasses: "govuk-table__caption--m",
             attributes: {
               "id": "search-results-true"
             },
             head: [
                 {
-                  text: "Booking reference",
-                  classes: "bapv-table_cell"
+                  text: "Booking reference"
                 },
                 {
-                  text: "Prisoner name",
-                  classes: "bapv-table_cell"
+                  text: "Prisoner name"
                 },
                 {
-                  text: "Prison number",
-                  classes: "bapv-table_cell"
+                  text: "Prison number"
                 },
                 {
-                  text: "Main contact",
-                  classes: "bapv-table_cell"
+                  text: "Main contact"
                 },
                 {
-                  text: "Visit date",
-                  classes: "bapv-table_cell"
+                  text: "Visit date"
                 },
                 {
-                  text: "Visit time",
-                  classes: "bapv-table_cell"
+                  text: "Visit time"
                 }
             ],
             rows: [
               [
                 {
-                  html: '<a href="/visit/' + results[0].reference + '">' + results[0].reference + '</a>',
-                  classes: 'bapv-table_cell'
+                  html: '<a href="/visit/' + results[0].reference + '">' + results[0].reference + '</a>'
                 },
                 {
-                  text: results[0].prisonerName | properCaseFullName,
-                  classes: 'bapv-table_cell'
+                  text: results[0].prisonerName | properCaseFullName
                 },
                 {
-                  text: results[0].prisonNumber,
-                  classes: 'bapv-table_cell'
+                  text: results[0].prisonNumber
                 },
                 {
-                  text: results[0].mainContact | formatMainContact,
-                  classes: 'bapv-table_cell'
+                  text: results[0].mainContact | formatMainContact
                 },
                 {
-                  text: results[0].visitDate,
-                  classes: 'bapv-table_cell'
+                  text: results[0].visitDate
                 },
                 {
-                  text: results[0].visitTime,
-                  classes: 'bapv-table_cell'
+                  text: results[0].visitTime
                 }
               ]
             ]
