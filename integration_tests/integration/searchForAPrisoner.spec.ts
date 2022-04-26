@@ -59,15 +59,15 @@ context('Search for a prisoner', () => {
         totalElements: 2,
         content: [
           {
-            lastName: 'test',
-            firstName: 'test',
-            prisonerNumber: 'test',
+            lastName: 'Last Name 1',
+            firstName: 'First Name 1',
+            prisonerNumber: 'AB1234C',
             dateOfBirth: '2000-01-01',
           },
           {
-            lastName: 'test2',
-            firstName: 'test2',
-            prisonerNumber: 'test2',
+            lastName: 'Last Name 2',
+            firstName: 'First Name 2',
+            prisonerNumber: 'DE5678F',
             dateOfBirth: '2000-01-02',
           },
         ],
