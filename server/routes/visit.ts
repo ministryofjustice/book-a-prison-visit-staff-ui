@@ -3,14 +3,12 @@ import { BadRequest } from 'http-errors'
 import { Prisoner } from '../data/prisonerOffenderSearchTypes'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import PrisonerSearchService from '../services/prisonerSearchService'
-import PrisonerVisitorsService from '../services/prisonerVisitorsService'
 import VisitSessionsService from '../services/visitSessionsService'
 import { isValidVisitReference } from './validationChecks'
 
 export default function routes(
   router: Router,
   prisonerSearchService: PrisonerSearchService,
-  prisonerVisitorsService: PrisonerVisitorsService,
   visitSessionsService: VisitSessionsService
 ): Router {
   const get = (path: string, handler: RequestHandler) => router.get(path, asyncMiddleware(handler))

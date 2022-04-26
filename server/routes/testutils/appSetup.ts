@@ -136,15 +136,7 @@ function appSetup(
       prisonerProfileService
     )
   )
-  app.use(
-    '/visit/',
-    visitRoutes(
-      standardRouter(new MockUserService()),
-      prisonerSearchService,
-      prisonerVisitorsService,
-      visitSessionsService
-    )
-  )
+  app.use('/visit/', visitRoutes(standardRouter(new MockUserService()), prisonerSearchService, visitSessionsService))
 
   app.use((req, res, next) => next(createError(404, 'Not found')))
   app.use(errorHandler(production))
