@@ -2,7 +2,7 @@ import { SuperAgentRequest } from 'superagent'
 import { stubFor } from './wiremock'
 
 export default {
-  stubGetPrisoners: (): SuperAgentRequest => {
+  getPrisoners: (): SuperAgentRequest => {
     const results = {
       totalPages: 1,
       totalElements: 2,
@@ -25,7 +25,7 @@ export default {
     return stubFor({
       request: {
         method: 'POST',
-        urlPattern: '/keyword',
+        url: '/offenderSearch/keyword',
       },
       response: {
         status: 200,
@@ -34,7 +34,7 @@ export default {
       },
     })
   },
-  stubGetPrisoner: (): SuperAgentRequest => {
+  getPrisoner: (): SuperAgentRequest => {
     const results = {
       totalPages: 1,
       totalElements: 1,
@@ -51,7 +51,7 @@ export default {
     return stubFor({
       request: {
         method: 'POST',
-        urlPattern: '/keyword',
+        urlPattern: '/offenderSearch/keyword',
       },
       response: {
         status: 200,

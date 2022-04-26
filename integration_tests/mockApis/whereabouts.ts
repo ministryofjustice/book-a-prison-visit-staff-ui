@@ -28,7 +28,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/events/${offenderNo}?fromDate=${fromDate}&toDate=${toDate}`,
+        urlPattern: `/whereabouts/events/${offenderNo}?fromDate=${fromDate}&toDate=${toDate}`,
       },
       response: {
         status: 200,

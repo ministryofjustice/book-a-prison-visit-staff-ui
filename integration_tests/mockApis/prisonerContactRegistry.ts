@@ -66,7 +66,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prisoners/${offenderNo}/contacts?type=S`,
+        urlPattern: `/contactRegistry/prisoners/${offenderNo}/contacts?type=S`,
       },
       response: {
         status: 200,

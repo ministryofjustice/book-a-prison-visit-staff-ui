@@ -1,15 +1,15 @@
 import jwt from 'jsonwebtoken'
 import { Response } from 'superagent'
 
-import { stubFor, getRequests } from './wiremock'
+import { stubFor, getMatchingRequests } from './wiremock'
 import tokenVerification from './tokenVerification'
 
 const createToken = () => {
   const payload = {
     user_name: 'USER1',
-    scope: ['read'],
+    scope: ['read', 'write'],
     auth_source: 'nomis',
-    authorities: [],
+    authorities: ['ROLE_GLOBAL_SEARCH'],
     jti: '83b50a10-cca6-41db-985f-e87efb303ddb',
     client_id: 'clientid',
   }
@@ -17,11 +17,13 @@ const createToken = () => {
   return jwt.sign(payload, 'secret', { expiresIn: '1h' })
 }
 
-const getSignInUrl = (): Promise<string> =>
-  getRequests().then(data => {
+const getSignInUrl = () =>
+  getMatchingRequests({
+    method: 'GET',
+    urlPath: '/auth/oauth/authorize',
+  }).then(data => {
     const { requests } = data.body
-    const stateParam = requests[0].request.queryParams.state
-    const stateValue = stateParam ? stateParam.values[0] : requests[1].request.queryParams.state.values[0]
+    const stateValue = requests[requests.length - 1].queryParams.state.values[0]
     return `/sign-in/callback?code=codexxxx&state=${stateValue}`
   })
 
@@ -108,9 +110,10 @@ const token = () =>
       jsonBody: {
         access_token: createToken(),
         token_type: 'bearer',
+        refresh_token: 'refresh',
         user_name: 'USER1',
-        expires_in: 599,
-        scope: 'read',
+        expires_in: 600,
+        scope: 'read write',
         internalUser: true,
       },
     },
@@ -128,10 +131,13 @@ const stubUser = () =>
         'Content-Type': 'application/json;charset=UTF-8',
       },
       jsonBody: {
+        user_name: 'USER1',
         staffId: 231232,
         username: 'USER1',
         active: true,
         name: 'john smith',
+        authSource: 'nomis',
+        activeCaseLoadId: 'HEI',
       },
     },
   })
@@ -147,7 +153,7 @@ const stubUserRoles = () =>
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
       },
-      jsonBody: [{ roleId: 'SOME_USER_ROLE' }],
+      jsonBody: [{ roleCode: 'GLOBAL_SEARCH' }, { roleId: 'PVB_STAFF' }],
     },
   })
 
