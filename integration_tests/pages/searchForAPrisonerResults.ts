@@ -16,4 +16,8 @@ export default class SearchForAPrisonerResultsPage extends Page {
   noResults = (): PageElement => cy.get('#search-results-none')
 
   hasResults = (): PageElement => cy.get('#search-results-true')
+
+  pagingLinks = (): PageElement => cy.get('.moj-pagination__list')
+
+  resultRows = (): PageElement => cy.get('#search-results-true>tbody>tr')
 }

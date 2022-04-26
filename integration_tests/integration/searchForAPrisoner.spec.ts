@@ -3,6 +3,7 @@ import Page from '../pages/page'
 import SearchForAPrisonerPage from '../pages/searchForAPrisoner'
 import SearchForAPrisonerResultsPage from '../pages/searchForAPrisonerResults'
 import { Prisoner } from '../../server/data/prisonerOffenderSearchTypes'
+import { prisonerDatePretty } from '../../server/utils/utils'
 
 context('Search for a prisoner', () => {
   beforeEach(() => {
@@ -43,7 +44,7 @@ context('Search for a prisoner', () => {
           cy.visit(href)
 
           const searchForAPrisonerPage = Page.verifyOnPage(SearchForAPrisonerPage)
-          searchForAPrisonerPage.searchInput().type('AB1234C')
+          searchForAPrisonerPage.searchInput().clear().type('AB1234C')
           searchForAPrisonerPage.searchButton().click()
 
           const searchForAPrisonerResultsPage = Page.verifyOnPage(SearchForAPrisonerResultsPage)
@@ -52,8 +53,8 @@ context('Search for a prisoner', () => {
     })
   })
 
-  context('when there are results', () => {
-    it('should list the results', () => {
+  context('when there is one page of results', () => {
+    it('should list the results with no paging', () => {
       const results: { totalPages: number; totalElements: number; content: Partial<Prisoner>[] } = {
         totalPages: 1,
         totalElements: 2,
@@ -82,11 +83,26 @@ context('Search for a prisoner', () => {
           cy.visit(href)
 
           const searchForAPrisonerPage = Page.verifyOnPage(SearchForAPrisonerPage)
-          searchForAPrisonerPage.searchInput().type('AB1234C')
+          searchForAPrisonerPage.searchInput().clear().type('AB1234C')
           searchForAPrisonerPage.searchButton().click()
 
           const searchForAPrisonerResultsPage = Page.verifyOnPage(SearchForAPrisonerResultsPage)
           searchForAPrisonerResultsPage.hasResults()
+          searchForAPrisonerResultsPage.pagingLinks().should('not.exist')
+          searchForAPrisonerResultsPage.resultRows().should('have.length', results.content.length)
+
+          results.content.forEach((prisoner, index) => {
+            searchForAPrisonerResultsPage
+              .resultRows()
+              .eq(index)
+              .within(() => {
+                cy.get('td').eq(0).contains(`${prisoner.lastName}, ${prisoner.firstName}`)
+                cy.get('td').eq(1).contains(prisoner.prisonerNumber)
+                cy.get('td')
+                  .eq(2)
+                  .contains(prisonerDatePretty({ dateToFormat: prisoner.dateOfBirth }))
+              })
+          })
         })
     })
   })
