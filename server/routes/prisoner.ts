@@ -38,7 +38,7 @@ export default function routes(
     return res.render('pages/prisoner/profile', { ...prisonerProfile })
   })
 
-  get('/visits/:offenderNo', async (req, res) => {
+  get('/:offenderNo/visits', async (req, res) => {
     const { offenderNo } = req.params
 
     if (!isValidPrisonerNumber(offenderNo)) {

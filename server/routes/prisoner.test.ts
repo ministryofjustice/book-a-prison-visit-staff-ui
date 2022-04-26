@@ -206,7 +206,7 @@ describe('GET /prisoner/A1234BC', () => {
   })
 })
 
-describe('GET /prisoner/visits/A1234BC', () => {
+describe('GET /prisoner/A1234BC/visits', () => {
   const prisoner: Prisoner = {
     prisonerNumber: 'A1234BC',
     firstName: 'JOHN',
@@ -237,7 +237,7 @@ describe('GET /prisoner/visits/A1234BC', () => {
     visitSessionsService.getUpcomingVisits.mockResolvedValue(visitInfo)
 
     return request(app)
-      .get('/prisoner/visits/A1234BC')
+      .get('/prisoner/A1234BC/visits')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -261,7 +261,7 @@ describe('GET /prisoner/visits/A1234BC', () => {
     visitSessionsService.getUpcomingVisits.mockResolvedValue([])
 
     return request(app)
-      .get('/prisoner/visits/A1234BC')
+      .get('/prisoner/A1234BC/visits')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -275,7 +275,7 @@ describe('GET /prisoner/visits/A1234BC', () => {
 
   it('should render 400 Bad Request error for invalid prisoner number', () => {
     return request(app)
-      .get('/prisoner/visits/A12--34BC')
+      .get('/prisoner/A12--34BC/visits')
       .expect(400)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -287,7 +287,7 @@ describe('GET /prisoner/visits/A1234BC', () => {
     prisonerSearchService.getPrisoner.mockResolvedValue(null)
 
     return request(app)
-      .get('/prisoner/visits/A1234BC')
+      .get('/prisoner/A1234BC/visits')
       .expect(404)
       .expect('Content-Type', /html/)
       .expect(res => {
