@@ -233,9 +233,10 @@ export default class VisitSessionsService {
     const contacts = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(visit.prisonerId)
 
     const visitorIds = visit.visitors.map(visitor => visitor.nomisPersonId)
-    const visitContacts = contacts.filter(contact => visitorIds.includes(contact.personId))
 
-    const visitors = visitContacts.map(contact => buildVisitorListItem(contact))
+    const visitors = contacts
+      .filter(contact => visitorIds.includes(contact.personId))
+      .map(contact => buildVisitorListItem(contact))
 
     return { visit, visitors }
   }
