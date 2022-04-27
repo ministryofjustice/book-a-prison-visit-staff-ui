@@ -22,7 +22,7 @@ export interface components {
       moreInfo?: string
     }
     /** @description An address */
-    Address: {
+    AddressDto: {
       /**
        * @description Address Type
        * @example BUS
@@ -90,12 +90,12 @@ export interface components {
        */
       endDate?: string
       /** @description The phone number associated with the address */
-      phones: components['schemas']['Telephone'][]
+      phones: components['schemas']['TelephoneDto'][]
       /** @description The address usages/types */
-      addressUsages: components['schemas']['AddressUsage'][]
+      addressUsages: components['schemas']['AddressUsageDto'][]
     }
     /** @description An Offender's address usage */
-    AddressUsage: {
+    AddressUsageDto: {
       /**
        * @description The address usages
        * @example HDC
@@ -113,7 +113,7 @@ export interface components {
       activeFlag?: boolean
     }
     /** @description A contact for a prisoner */
-    Contact: {
+    ContactDto: {
       /**
        * Format: int64
        * @description Identifier for this contact (Person in NOMIS)
@@ -168,9 +168,9 @@ export interface components {
       /** @description Next of Kin Flag */
       nextOfKin: boolean
       /** @description List of restrictions associated with the contact */
-      restrictions: components['schemas']['Restriction'][]
+      restrictions: components['schemas']['RestrictionDto'][]
       /** @description List of addresses associated with the contact */
-      addresses: components['schemas']['Address'][]
+      addresses: components['schemas']['AddressDto'][]
       /**
        * @description Additional Information
        * @example This is a comment text
@@ -178,7 +178,7 @@ export interface components {
       commentText?: string
     }
     /** @description A contact for a prisoner */
-    Restriction: {
+    RestrictionDto: {
       /**
        * @description Restriction Type Code
        * @example 123
@@ -210,7 +210,7 @@ export interface components {
       comment?: string
     }
     /** @description Telephone Details */
-    Telephone: {
+    TelephoneDto: {
       /**
        * @description Telephone number
        * @example 0114 2345678
@@ -248,7 +248,7 @@ export interface operations {
       /** Prisoner Contacts Information Returned */
       200: {
         content: {
-          'application/json': components['schemas']['Contact'][]
+          'application/json': components['schemas']['ContactDto'][]
         }
       }
       /** Incorrect request to Get Prisoner Contacts for Prisoner Identifier */
