@@ -48,7 +48,7 @@ describe('Prisoner search service', () => {
         expect(results).toEqual([
           [
             {
-              html: '<a href="/prisoner/A1234BC">Smith, John</a>',
+              html: '<a href="/prisoner/A1234BC" class="bapv-result-row">Smith, John</a>',
             },
             {
               html: 'A1234BC',
@@ -97,7 +97,7 @@ describe('Prisoner search service', () => {
         expect(results).toEqual([
           [
             {
-              html: '<a href="/prisoner/A1234BC/visits">Smith, John</a>',
+              html: '<a href="/prisoner/A1234BC/visits" class="bapv-result-row">Smith, John</a>',
             },
             {
               html: 'A1234BC',

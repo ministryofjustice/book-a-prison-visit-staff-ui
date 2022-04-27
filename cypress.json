@@ -13,5 +13,7 @@
       "configFile": "reporter-config.json"
     },
     "videoUploadOnPasses": false,
-    "taskTimeout": 60000
+    "taskTimeout": 60000,
+    "viewportWidth": 2000,
+    "viewportHeight": 2000
 }
