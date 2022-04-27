@@ -1,4 +1,4 @@
-import { validVisitReferenceCharacters, isValidVisitReference } from './validationChecks'
+import { isValidVisitReference } from './validationChecks'
 
 type Error = {
   param: string
@@ -12,7 +12,7 @@ const errors: { [key: string]: Error } = {
   },
   INVALID_VISIT_QUERY: {
     param: '#searchBlock1',
-    msg: `Reference must contain only the following characters: ${validVisitReferenceCharacters}`,
+    msg: 'Booking reference must only include lower case letters',
   },
   SHORT_VISIT_QUERY: {
     param: '#searchBlock1',
