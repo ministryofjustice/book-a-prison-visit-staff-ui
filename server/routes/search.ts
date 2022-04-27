@@ -54,6 +54,7 @@ export default function routes(
       numberOfPages,
       currentPage: parsedPage,
       searchTerm: search,
+      searchType: isVisit ? 'prisoner-visit' : 'prisoner',
     })
 
     res.render('pages/search/prisonerResults', {
@@ -127,6 +128,7 @@ export default function routes(
       numberOfPages: 1,
       currentPage: parsedPage,
       searchTerm: search,
+      searchType: 'visit',
     })
 
     res.render('pages/search/visitResults', {
