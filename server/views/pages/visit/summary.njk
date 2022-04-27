@@ -1,10 +1,11 @@
 {% extends "layout.njk" %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "components/visitors.njk" import visitorDateOfBirth, visitorRestrictions %}
 
 {% set pageHeaderTitle = "Booking details" %}
-{% set pageTitle = applicationName + pageHeaderTitle + " - " + visit.reference %}
-{% set backLinkHref = "/prisoner/visits/" + visit.prisonNumber %}
+{% set pageTitle = applicationName + " - " + pageHeaderTitle + " - " + visit.reference %}
+{% set backLinkHref = "/prisoner/" + visit.prisonerId + "/visits" %}
 
 {% block content %}
   <div class="govuk-grid-row">
@@ -69,11 +70,11 @@
       {% for visitor in visitors %}
         {% set visitorRows = (visitorRows.push([
           {
-            text: (visitor.firstName + ' ' + visitor.lastName) | formatMainContact,
+            text: visitor.name | formatMainContact,
             attributes: { "data-test": "visitor-name-" + loop.index }
           },
           {
-            text: visitor.dateOfBirth | formatDate,
+            html: visitorDateOfBirth(visitor),
             attributes: { "data-test": "visitor-dob-" + loop.index }
           },
           {
@@ -81,11 +82,11 @@
             attributes: { "data-test": "visitor-relationship-" + loop.index }
           },
           {
-            text: "ADDRESS...",
+            html: visitor.address,
             attributes: { "data-test": "visitor-address-" + loop.index }
           },
           {
-            text: "RESTRICTIONS...",
+            html: visitorRestrictions(visitor),
             attributes: { "data-test": "visitor-restrictions-" + loop.index }
           }
         ]), visitorRows) %}
@@ -109,12 +110,12 @@
               text: "Address"
             },
             {
-              text: "Restrictions"
+              text: "Restrictions",
+              classes: "govuk-!-width-one-quarter"
             }
         ],
         rows: visitorRows
       }) }}
-
     </div>
   </div>
 {% endblock %}
