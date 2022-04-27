@@ -14,7 +14,10 @@ import WhereaboutsApiClient from '../data/whereaboutsApiClient'
 import { VisitSession, Visit, SupportType } from '../data/visitSchedulerApiTypes'
 import { ScheduledEvent } from '../data/whereaboutsApiTypes'
 import { prisonerDateTimePretty, prisonerTimePretty } from '../utils/utils'
+import { Contact } from '../data/prisonerContactRegistryApiTypes'
+import PrisonerContactRegistryApiClient from '../data/prisonerContactRegistryApiClient'
 
+type PrisonerContactRegistryApiClientBuilder = (token: string) => PrisonerContactRegistryApiClient
 type VisitSchedulerApiClientBuilder = (token: string) => VisitSchedulerApiClient
 type WhereaboutsApiClientBuilder = (token: string) => WhereaboutsApiClient
 
@@ -22,6 +25,7 @@ export default class VisitSessionsService {
   private morningCutoff = 12
 
   constructor(
+    private readonly prisonerContactRegistryApiClientBuilder: PrisonerContactRegistryApiClientBuilder,
     private readonly visitSchedulerApiClientBuilder: VisitSchedulerApiClientBuilder,
     private readonly whereaboutsApiClientBuilder: WhereaboutsApiClientBuilder,
     private readonly systemToken: SystemToken
@@ -189,8 +193,8 @@ export default class VisitSessionsService {
     const token = await this.systemToken(username)
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
 
+    logger.info(`Get visit ${reference}`)
     const visit = await visitSchedulerApiClient.getVisit(reference)
-    logger.info(`Get visit ${visit.reference}`)
 
     return this.buildVisitInformation(visit)
   }
@@ -205,12 +209,44 @@ export default class VisitSessionsService {
     const token = await this.systemToken(username)
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
 
-    const visits = await visitSchedulerApiClient.getUpcomingVisits(offenderNo)
     logger.info(`Get upcoming visits for ${offenderNo}`)
+    const visits = await visitSchedulerApiClient.getUpcomingVisits(offenderNo)
 
     return visits.map(visit => {
       return this.buildVisitInformation(visit)
     })
+  }
+
+  async getFullVisitDetails({
+    username,
+    reference,
+  }: {
+    username: string
+    reference: string
+  }): Promise<{ visit: Visit; visitors: Contact[] }> {
+    const token = await this.systemToken(username)
+    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
+    const prisonerContactRegistryApiClient = this.prisonerContactRegistryApiClientBuilder(token)
+
+    logger.info(`Get visit ${reference}`)
+    const visit = await visitSchedulerApiClient.getVisit(reference)
+
+    logger.info(`Get contacts for ${visit.prisonerId}`)
+    const contacts = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(visit.prisonerId)
+
+    const visitorIds: number[] = visit.visitors.reduce((acc, visitor) => {
+      acc.push(visitor.nomisPersonId)
+      return acc
+    }, [])
+
+    const visitors: Contact[] = contacts.reduce((acc, contact) => {
+      if (visitorIds.includes(contact.personId)) {
+        acc.push(contact)
+      }
+      return acc
+    }, [])
+
+    return { visit, visitors }
   }
 
   private buildVisitInformation(visit: Visit): VisitInformation {

@@ -46,7 +46,7 @@ export default class PrisonerSearchService {
 
     content.forEach((prisoner: Prisoner) => {
       const url = visit
-        ? `<a href="/prisoner/visits/${prisoner.prisonerNumber}">${properCaseFullName(
+        ? `<a href="/prisoner/${prisoner.prisonerNumber}/visits">${properCaseFullName(
             `${prisoner.lastName}, ${prisoner.firstName}`
           )}</a>`
         : `<a href="/prisoner/${prisoner.prisonerNumber}">${properCaseFullName(

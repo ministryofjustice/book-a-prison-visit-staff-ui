@@ -11,9 +11,6 @@ export interface paths {
     /** Delete a visit by visit reference */
     delete: operations['deleteVisit']
   }
-  '/visits/{reference}/cancel': {
-    put: operations['cancelVisit']
-  }
   '/visits': {
     /** Retrieve visits with optional filters, sorted by startTimestamp ascending */
     get: operations['getVisitsByFilter']
@@ -23,6 +20,9 @@ export interface paths {
     /** Get all session templates */
     get: operations['getSessionTemplates']
     post: operations['createSessionTemplate']
+  }
+  '/visits/{reference}/cancel': {
+    patch: operations['cancelVisit']
   }
   '/visit-support': {
     /** Retrieve all available support types */
@@ -416,6 +416,19 @@ export interface components {
        */
       openCapacity: number
     }
+    /** @description Visit Outcome */
+    OutcomeDto: {
+      /**
+       * @description Outcome type
+       * @example VISITOR_CANCELLED
+       */
+      outcome: 'VISITOR_CANCELLED' | 'ESTABLISHMENT_CANCELLED' | 'PRISONER_CANCELLED' | 'ADMINISTRATIVE_ERROR'
+      /**
+       * @description Outcome text
+       * @example Because he got covid
+       */
+      text?: string
+    }
     /** @description Support Type */
     SupportTypeDto: {
       /**
@@ -604,50 +617,6 @@ export interface operations {
       }
     }
   }
-  cancelVisit: {
-    parameters: {
-      path: {
-        reference: string
-      }
-    }
-    responses: {
-      /** Visit cancelled */
-      200: {
-        content: {
-          'application/json': components['schemas']['VisitDto']
-        }
-      }
-      /** Incorrect request to cancel a visit */
-      400: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** Unauthorized to access this endpoint */
-      401: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** Incorrect permissions to cancel a visit */
-      403: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** Visit not found */
-      404: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateVisitRequestDto']
-      }
-    }
-  }
   /** Retrieve visits with optional filters, sorted by startTimestamp ascending */
   getVisitsByFilter: {
     parameters: {
@@ -779,6 +748,50 @@ export interface operations {
     requestBody: {
       content: {
         'application/json': components['schemas']['CreateSessionTemplateRequestDto']
+      }
+    }
+  }
+  cancelVisit: {
+    parameters: {
+      path: {
+        reference: string
+      }
+    }
+    responses: {
+      /** Visit cancelled */
+      200: {
+        content: {
+          'application/json': components['schemas']['VisitDto']
+        }
+      }
+      /** Incorrect request to cancel a visit */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** Unauthorized to access this endpoint */
+      401: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** Incorrect permissions to cancel a visit */
+      403: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** Visit not found */
+      404: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['OutcomeDto']
       }
     }
   }

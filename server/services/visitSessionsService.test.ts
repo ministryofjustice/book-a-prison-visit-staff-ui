@@ -21,6 +21,7 @@ describe('Visit sessions service', () => {
     visitSchedulerApiClientBuilder = jest.fn().mockReturnValue(visitSchedulerApiClient)
     whereaboutsApiClientBuilder = jest.fn().mockReturnValue(whereaboutsApiClient)
     visitSessionsService = new VisitSessionsService(
+      null,
       visitSchedulerApiClientBuilder,
       whereaboutsApiClientBuilder,
       systemToken

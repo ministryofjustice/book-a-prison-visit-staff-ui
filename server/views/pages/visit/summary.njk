@@ -1,0 +1,120 @@
+{% extends "layout.njk" %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% set pageHeaderTitle = "Booking details" %}
+{% set pageTitle = applicationName + pageHeaderTitle + " - " + visit.reference %}
+{% set backLinkHref = "/prisoner/visits/" + visit.prisonNumber %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+
+      <p class="bapv-secondary-text govuk-!-margin-bottom-0">Booking reference: <span data-test="reference">{{ visit.reference }}</span></p>
+
+      <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+
+      <h2 class="govuk-heading-m">Prisoner details</h2>
+      <ul class="bapv-details-list">
+        <li>
+          <strong>Name</strong>
+          <span data-test="prisoner-name">{{ (prisoner.firstName + ' ' + prisoner.lastName) | formatMainContact }}</span>
+        </li>
+        <li>
+          <strong>Prison number</strong>
+          <span data-test="prisoner-number">{{ prisoner.prisonerNumber }}</span>
+        </li>
+        <li>
+          <strong>Date of birth</strong>
+          <span data-test="prisoner-dob">{{ prisoner.dateOfBirth | formatDate }}</span>
+        </li>
+        <li>
+          <strong>Location</strong>
+          <span data-test="prisoner-location">{{ prisoner.cellLocation + ", " + prisoner.prisonName }}</span>
+        </li>
+      </ul>
+
+      <h2 class="govuk-heading-m">Visit details</h2>
+            <ul class="bapv-details-list">
+        <li>
+          <strong>Date</strong>
+          <span data-test="visit-date">{{ visit.startTimestamp | formatDate }}</span>
+        </li>
+        <li>
+          <strong>Time</strong>
+          <span data-test="visit-time">{{ visit.startTimestamp | formatTime + " to " + visit.endTimestamp | formatTime }}</span>
+        </li>
+        <li>
+          <strong>Visit type</strong>
+          <span data-test="visit-type">{{ visit.visitRestriction | capitalize }}</span>
+        </li>
+        <li>
+          <strong>Main contact</strong>
+          <span data-test="visit-contact">{{ visit.visitContact.name | formatMainContact }}</span>
+        </li>
+        <li>
+          <strong>Phone number</strong>
+          <span data-test="visit-phone">{{ visit.visitContact.telephone }}</span>
+        </li>
+      </ul>
+
+      {{ govukButton({
+        text: "Cancel booking",
+        classes: "govuk-!-margin-top-5",
+        href: "/visit/" + visit.reference + "/cancel",
+        attributes: { "data-test": "cancel-visit" }
+      }) }}
+
+      {% set visitorRows = [] %}
+      {% for visitor in visitors %}
+        {% set visitorRows = (visitorRows.push([
+          {
+            text: (visitor.firstName + ' ' + visitor.lastName) | formatMainContact,
+            attributes: { "data-test": "visitor-name-" + loop.index }
+          },
+          {
+            text: visitor.dateOfBirth | formatDate,
+            attributes: { "data-test": "visitor-dob-" + loop.index }
+          },
+          {
+            text: visitor.relationshipDescription,
+            attributes: { "data-test": "visitor-relationship-" + loop.index }
+          },
+          {
+            text: "ADDRESS...",
+            attributes: { "data-test": "visitor-address-" + loop.index }
+          },
+          {
+            text: "RESTRICTIONS...",
+            attributes: { "data-test": "visitor-restrictions-" + loop.index }
+          }
+        ]), visitorRows) %}
+      {% endfor %}
+
+      {{ govukTable({
+        caption: "Visitor details",
+        captionClasses: "govuk-table__caption--m",
+        classes: "bapv-table govuk-!-margin-top-3",
+        head: [
+            {
+              text: "Name"
+            },
+            {
+              text: "Date of birth"
+            },
+            {
+              text: "Relationship to prisoner"
+            },
+            {
+              text: "Address"
+            },
+            {
+              text: "Restrictions"
+            }
+        ],
+        rows: visitorRows
+      }) }}
+
+    </div>
+  </div>
+{% endblock %}

@@ -75,3 +75,23 @@
 .bapv-booking-search-label {
   margin-bottom: govuk-spacing(3);
 }
+
+.bapv-secondary-text {
+  color: $govuk-secondary-text-colour;
+}
+
+.bapv-details-list {
+  @extend %govuk-list;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: govuk-spacing(4) 2%;
+
+  li {
+    flex-grow: 1;
+  }
+
+  strong {
+    display: block;
+    margin-bottom: govuk-spacing(3);
+  }
+}
