@@ -9,7 +9,7 @@ const createToken = () => {
     user_name: 'USER1',
     scope: ['read'],
     auth_source: 'nomis',
-    authorities: [],
+    authorities: ['ROLE_GLOBAL_SEARCH'],
     jti: '83b50a10-cca6-41db-985f-e87efb303ddb',
     client_id: 'clientid',
   }
@@ -108,9 +108,10 @@ const token = () =>
       jsonBody: {
         access_token: createToken(),
         token_type: 'bearer',
+        refresh_token: 'refresh',
         user_name: 'USER1',
-        expires_in: 599,
-        scope: 'read',
+        expires_in: 600,
+        scope: 'read write',
         internalUser: true,
       },
     },
@@ -128,10 +129,13 @@ const stubUser = () =>
         'Content-Type': 'application/json;charset=UTF-8',
       },
       jsonBody: {
+        user_name: 'USER1',
         staffId: 231232,
         username: 'USER1',
         active: true,
         name: 'john smith',
+        authSource: 'nomis',
+        activeCaseLoadId: 'HEI',
       },
     },
   })
@@ -147,7 +151,7 @@ const stubUserRoles = () =>
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
       },
-      jsonBody: [{ roleId: 'SOME_USER_ROLE' }],
+      jsonBody: [{ roleCode: 'GLOBAL_SEARCH' }, { roleId: 'PVB_STAFF' }],
     },
   })
 

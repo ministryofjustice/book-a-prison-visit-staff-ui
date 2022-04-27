@@ -7,6 +7,7 @@ import whereaboutsOffenderEvents from '../mockApis/whereabouts'
 import prisonApi from '../mockApis/prison'
 import offenderSearch from '../mockApis/offenderSearch'
 import visitScheduler from '../mockApis/visitScheduler'
+import { Prisoner } from '../../server/data/prisonerOffenderSearchTypes'
 
 export default (on: (string, Record) => void): void => {
   on('task', {
@@ -42,8 +43,10 @@ export default (on: (string, Record) => void): void => {
     stubGetPrisonerRestrictions: (offenderNo: string) => prisonApi.stubGetPrisonerRestrictions(offenderNo),
     stubGetVisitBalances: (offenderNo: string) => prisonApi.stubGetVisitBalances(offenderNo),
 
-    stubGetPrisoners: offenderSearch.stubGetPrisoners,
-    stubGetPrisoner: offenderSearch.stubGetPrisoner,
+    stubGetPrisoners: (results: { totalPages: number; totalElements: number; content: Partial<Prisoner>[] }) =>
+      offenderSearch.getPrisoners(results),
+    stubGetPrisoner: (results: { totalPages: number; totalElements: number; content: Partial<Prisoner>[] }) =>
+      offenderSearch.getPrisoner(results),
 
     stubGetAvailableSupportOptions: visitScheduler.stubGetAvailableSupportOptions,
     stubGetVisit: (reference: string) => visitScheduler.stubGetVisit(reference),

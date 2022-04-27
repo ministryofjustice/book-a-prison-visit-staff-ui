@@ -1,31 +1,17 @@
 import { SuperAgentRequest } from 'superagent'
 import { stubFor } from './wiremock'
+import { Prisoner } from '../../server/data/prisonerOffenderSearchTypes'
 
 export default {
-  stubGetPrisoners: (): SuperAgentRequest => {
-    const results = {
-      totalPages: 1,
-      totalElements: 2,
-      content: [
-        {
-          lastName: 'test',
-          firstName: 'test',
-          prisonerNumber: 'test',
-          dateOfBirth: '2000-01-01',
-        },
-        {
-          lastName: 'test2',
-          firstName: 'test2',
-          prisonerNumber: 'test2',
-          dateOfBirth: '2000-01-02',
-        },
-      ],
-    }
-
+  getPrisoners: (results: {
+    totalPages: number
+    totalElements: number
+    content: Partial<Prisoner>[]
+  }): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'POST',
-        urlPattern: '/keyword',
+        url: '/offenderSearch/keyword',
       },
       response: {
         status: 200,
@@ -34,24 +20,15 @@ export default {
       },
     })
   },
-  stubGetPrisoner: (): SuperAgentRequest => {
-    const results = {
-      totalPages: 1,
-      totalElements: 1,
-      content: [
-        {
-          lastName: 'test',
-          firstName: 'test',
-          prisonerNumber: 'test',
-          dateOfBirth: '2000-01-01',
-        },
-      ],
-    }
-
+  getPrisoner: (results: {
+    totalPages: number
+    totalElements: number
+    content: Partial<Prisoner>[]
+  }): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'POST',
-        urlPattern: '/keyword',
+        urlPattern: '/offenderSearch/keyword',
       },
       response: {
         status: 200,

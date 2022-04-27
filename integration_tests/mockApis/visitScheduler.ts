@@ -17,7 +17,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: '/visit-support',
+        urlPattern: '/visitScheduler/visit-support',
       },
       response: {
         status: 200,
@@ -53,7 +53,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/visits/${reference}`,
+        urlPattern: `/visitScheduler/visits/${reference}`,
       },
       response: {
         status: 200,
@@ -119,7 +119,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/visits?prisonerId=${offenderNo}&prisonId=HEI&startTimestamp=${startTimestamp}`,
+        urlPattern: `/visitScheduler/visits?prisonerId=${offenderNo}&prisonId=HEI&startTimestamp=${startTimestamp}`,
       },
       response: {
         status: 200,
@@ -185,7 +185,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/visits?prisonerId=${offenderNo}&prisonId=HEI&endTimestamp=${endTimestamp}`,
+        urlPattern: `/visitScheduler/visits?prisonerId=${offenderNo}&prisonId=HEI&endTimestamp=${endTimestamp}`,
       },
       response: {
         status: 200,
@@ -214,7 +214,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: '/visit-sessions?prisonId=HEI',
+        urlPattern: '/visitScheduler/visit-sessions?prisonId=HEI',
       },
       response: {
         status: 200,
@@ -254,7 +254,7 @@ export default {
     return stubFor({
       request: {
         method: 'POST',
-        urlPattern: '/visits',
+        urlPattern: '/visitScheduler/visits',
       },
       response: {
         status: 200,
@@ -294,7 +294,7 @@ export default {
     return stubFor({
       request: {
         method: 'PUT',
-        urlPattern: '/visits',
+        urlPattern: '/visitScheduler/visits',
       },
       response: {
         status: 200,
