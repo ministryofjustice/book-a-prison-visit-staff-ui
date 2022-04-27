@@ -80,7 +80,22 @@
   color: $govuk-secondary-text-colour;
 }
 
-.bapv-details-list {
+.bapv-item-list {
+  @extend %govuk-list;
+
+  li {
+    display: flex;
+    gap: govuk-spacing(4);
+    margin-bottom: govuk-spacing(5);
+  }
+  
+  strong {
+    flex-basis: 20%;
+    flex-shrink: 0;
+  }
+}
+
+.bapv-item-list--horizontal {
   @extend %govuk-list;
   display: flex;
   flex-wrap: nowrap;

@@ -20,14 +20,14 @@ export default function routes(
       throw new BadRequest()
     }
 
-    const { visit, visitors } = await visitSessionsService.getFullVisitDetails({
+    const { visit, visitors, additionalSupport } = await visitSessionsService.getFullVisitDetails({
       reference,
       username: res.locals.user?.username,
     })
 
     const prisoner: Prisoner = await prisonerSearchService.getPrisoner(visit.prisonerId, res.locals.user?.username)
 
-    return res.render('pages/visit/summary', { prisoner, visit, visitors })
+    return res.render('pages/visit/summary', { prisoner, visit, visitors, additionalSupport })
   })
 
   return router
