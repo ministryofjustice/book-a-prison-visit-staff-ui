@@ -108,7 +108,7 @@ context('Search for a prisoner', () => {
   })
 
   context('when there is more than one page of results', () => {
-    it.only('should list the results with paging', () => {
+    it('should list the results with paging', () => {
       const pageSize = 10
       const resultsPage1: { totalPages: number; totalElements: number; content: Partial<Prisoner>[] } = {
         totalPages: 2,
@@ -221,8 +221,20 @@ context('Search for a prisoner', () => {
 
           cy.task('stubGetPrisoners', resultsPage2)
           searchForAPrisonerResultsPage.nextPageLink().click()
+          searchForAPrisonerResultsPage.hasResults()
           searchForAPrisonerResultsPage.pagingLinks().should('exist')
           searchForAPrisonerResultsPage.resultRows().should('have.length', 1)
+
+          searchForAPrisonerResultsPage
+            .resultRows()
+            .eq(0)
+            .within(() => {
+              cy.get('td').eq(0).contains(`${resultsPage2.content[0].lastName}, ${resultsPage2.content[0].firstName}`)
+              cy.get('td').eq(1).contains(resultsPage2.content[0].prisonerNumber)
+              cy.get('td')
+                .eq(2)
+                .contains(prisonerDatePretty({ dateToFormat: resultsPage2.content[0].dateOfBirth }))
+            })
         })
     })
   })
