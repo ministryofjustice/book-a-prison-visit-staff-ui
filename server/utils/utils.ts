@@ -44,11 +44,13 @@ export const getPageLinks = ({
   numberOfPages = 1,
   currentPage = 1,
   searchTerm = '',
+  searchType,
 }: {
   pagesToShow: number
   numberOfPages: number
   currentPage: number
   searchTerm: string
+  searchType: string
 }): Array<{ text: string; href: string; selected: boolean }> => {
   let pageStartNumber = 1
   let pageEndNumber = pagesToShow
@@ -74,7 +76,7 @@ export const getPageLinks = ({
   for (let pageIndex = pageStartNumber; pageIndex <= pageEndNumber; pageIndex += 1) {
     pageLinks.push({
       text: pageIndex.toString(),
-      href: `/search/results?search=${searchTerm}&page=${pageIndex}`,
+      href: `/search/${searchType}/results?search=${searchTerm}&page=${pageIndex}`,
       selected: pageIndex === currentPage,
     })
   }
