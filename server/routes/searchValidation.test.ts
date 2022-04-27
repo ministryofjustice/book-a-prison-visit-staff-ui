@@ -1,5 +1,4 @@
 import { validatePrisonerSearch, validateVisitSearch } from './searchValidation'
-import { validVisitReferenceCharacters } from './validationChecks'
 
 describe('validatePrisonerSearch', () => {
   it('valid', () => {
@@ -32,7 +31,7 @@ describe('validateVisitSearch', () => {
   it('invalid', () => {
     expect(validateVisitSearch('sd-lf-s1-ff')).toStrictEqual({
       param: '#searchBlock1',
-      msg: `Reference must contain only the following characters: ${validVisitReferenceCharacters}`,
+      msg: 'Booking reference must only include lower case letters',
     })
   })
 })
