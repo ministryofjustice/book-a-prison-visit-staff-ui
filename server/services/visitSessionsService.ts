@@ -228,10 +228,7 @@ export default class VisitSessionsService {
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
     const prisonerContactRegistryApiClient = this.prisonerContactRegistryApiClientBuilder(token)
 
-    logger.info(`Get visit ${reference}`)
     const visit = await visitSchedulerApiClient.getVisit(reference)
-
-    logger.info(`Get contacts for ${visit.prisonerId}`)
     const contacts = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(visit.prisonerId)
 
     const visitorIds: number[] = visit.visitors.reduce((acc, visitor) => {
@@ -239,12 +236,7 @@ export default class VisitSessionsService {
       return acc
     }, [])
 
-    const visitors: Contact[] = contacts.reduce((acc, contact) => {
-      if (visitorIds.includes(contact.personId)) {
-        acc.push(contact)
-      }
-      return acc
-    }, [])
+    const visitors = contacts.filter(contact => visitorIds.includes(contact.personId))
 
     return { visit, visitors }
   }
