@@ -1,0 +1,28 @@
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+
+{% macro visitorDateOfBirth(visitor) %}
+  {%- if visitor.dateOfBirth %}
+    {{- visitor.dateOfBirth | formatDate }}<br>({{ "Adult" if visitor.adult else "Child" }})
+  {%- else -%}
+    Not entered
+  {%- endif %}
+{% endmacro %}
+
+{% macro visitorRestrictions(visitor) %}
+  {%- if visitor.restrictions | length %}
+    {%- for restriction in visitor.restrictions -%}
+      <div class="visitor-restriction">
+        <span class="moj-badge moj-badge--large visitor-restriction-badge visitor-restriction-badge--{{ restriction.restrictionType }}">{{- restriction.restrictionTypeDescription }}</span>
+      {%- if restriction.expiryDate %} until {{ restriction.expiryDate | formatDate }}{% else %} End date not entered{% endif %}
+      {% if restriction.comment %}
+        {{- govukDetails({
+          summaryText: "See comment",
+          text: restriction.comment
+        }) }}
+      {% endif %}
+      </div>
+    {%- endfor %}
+  {%- else -%}
+    None
+  {%- endif %}
+{% endmacro %}

@@ -29,41 +29,50 @@ describe('Prisoner visitor service', () => {
 
     it('Retrieves and processes prisoner and visitor details', async () => {
       const childDateOfBirth = `${new Date().getFullYear() - 4}-03-02`
-      const contacts = [
+      const contacts: Contact[] = [
         {
           personId: 4321,
           firstName: 'Jeanette',
           lastName: 'Smith',
           dateOfBirth: '1986-07-28',
+          relationshipCode: 'SIS',
           relationshipDescription: 'Sister',
+          contactType: 'S',
           approvedVisitor: true,
+          emergencyContact: false,
+          nextOfKin: false,
           restrictions: [
             {
               restrictionType: 'BAN',
               restrictionTypeDescription: 'Banned',
               startDate: '2022-01-01',
               expiryDate: '2022-07-31',
+              globalRestriction: false,
               comment: 'Ban details',
             },
             {
               restrictionType: 'RESTRICTED',
               restrictionTypeDescription: 'Restricted',
               startDate: '2022-01-02',
+              globalRestriction: false,
             },
             {
               restrictionType: 'CLOSED',
               restrictionTypeDescription: 'Closed',
               startDate: '2022-01-03',
+              globalRestriction: false,
             },
             {
               restrictionType: 'NONCON',
               restrictionTypeDescription: 'Non-Contact Visit',
               startDate: '2022-01-04',
+              globalRestriction: false,
             },
             {
               restrictionType: 'DIHCON',
               restrictionTypeDescription: 'Disability Health Concerns',
               startDate: '2022-01-05',
+              globalRestriction: false,
               comment: 'This restriction should not display',
             },
           ],
@@ -71,6 +80,9 @@ describe('Prisoner visitor service', () => {
             {
               street: 'non primary addr',
               primary: false,
+              noFixedAddress: false,
+              phones: [],
+              addressUsages: [],
             },
             {
               flat: '23B',
@@ -82,6 +94,9 @@ describe('Prisoner visitor service', () => {
               county: 'West Midlands',
               country: 'England',
               primary: true,
+              noFixedAddress: false,
+              phones: [],
+              addressUsages: [],
             },
           ],
         },
@@ -89,17 +104,27 @@ describe('Prisoner visitor service', () => {
           personId: 4322,
           firstName: 'Bob',
           lastName: 'Smith',
+          relationshipCode: 'BRO',
           relationshipDescription: 'Brother',
+          contactType: 'S',
           approvedVisitor: true,
+          emergencyContact: false,
+          nextOfKin: false,
           restrictions: [],
           addresses: [
             {
               street: '1st listed address', // no primary; should show first
               primary: false,
+              noFixedAddress: false,
+              phones: [],
+              addressUsages: [],
             },
             {
               street: '2nd listed address',
               primary: false,
+              noFixedAddress: false,
+              phones: [],
+              addressUsages: [],
             },
           ],
         },
@@ -107,8 +132,12 @@ describe('Prisoner visitor service', () => {
           personId: 4323,
           firstName: 'John',
           lastName: 'Jones',
+          relationshipCode: 'FRI',
           relationshipDescription: 'Friend',
+          contactType: 'S',
           approvedVisitor: false, // should not show in visitor list
+          emergencyContact: false,
+          nextOfKin: false,
           restrictions: [],
           addresses: [],
         },
@@ -116,13 +145,17 @@ describe('Prisoner visitor service', () => {
           personId: 4324,
           firstName: 'Anne',
           lastName: 'Smith',
+          relationshipCode: 'NIE',
           dateOfBirth: childDateOfBirth,
           relationshipDescription: 'Niece',
+          contactType: 'S',
           approvedVisitor: true,
+          emergencyContact: false,
+          nextOfKin: false,
           restrictions: [],
           addresses: [],
         },
-      ] as Contact[]
+      ]
 
       prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue(contacts)
 
@@ -144,22 +177,26 @@ describe('Prisoner visitor service', () => {
               restrictionTypeDescription: 'Banned',
               startDate: '2022-01-01',
               expiryDate: '2022-07-31',
+              globalRestriction: false,
               comment: 'Ban details',
             },
             {
               restrictionType: 'RESTRICTED',
               restrictionTypeDescription: 'Restricted',
               startDate: '2022-01-02',
+              globalRestriction: false,
             },
             {
               restrictionType: 'CLOSED',
               restrictionTypeDescription: 'Closed',
               startDate: '2022-01-03',
+              globalRestriction: false,
             },
             {
               restrictionType: 'NONCON',
               restrictionTypeDescription: 'Non-Contact Visit',
               startDate: '2022-01-04',
+              globalRestriction: false,
             },
           ],
           selected: false,

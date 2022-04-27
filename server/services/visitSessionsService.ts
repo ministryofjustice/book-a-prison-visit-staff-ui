@@ -8,14 +8,15 @@ import {
   SystemToken,
   VisitSessionData,
   PrisonerEvent,
+  VisitorListItem,
 } from '../@types/bapv'
 import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
 import WhereaboutsApiClient from '../data/whereaboutsApiClient'
 import { VisitSession, Visit, SupportType } from '../data/visitSchedulerApiTypes'
 import { ScheduledEvent } from '../data/whereaboutsApiTypes'
 import { prisonerDateTimePretty, prisonerTimePretty } from '../utils/utils'
-import { Contact } from '../data/prisonerContactRegistryApiTypes'
 import PrisonerContactRegistryApiClient from '../data/prisonerContactRegistryApiClient'
+import buildVisitorListItem from '../utils/visitorUtils'
 
 type PrisonerContactRegistryApiClientBuilder = (token: string) => PrisonerContactRegistryApiClient
 type VisitSchedulerApiClientBuilder = (token: string) => VisitSchedulerApiClient
@@ -223,28 +224,18 @@ export default class VisitSessionsService {
   }: {
     username: string
     reference: string
-  }): Promise<{ visit: Visit; visitors: Contact[] }> {
+  }): Promise<{ visit: Visit; visitors: VisitorListItem[] }> {
     const token = await this.systemToken(username)
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
     const prisonerContactRegistryApiClient = this.prisonerContactRegistryApiClientBuilder(token)
 
-    logger.info(`Get visit ${reference}`)
     const visit = await visitSchedulerApiClient.getVisit(reference)
-
-    logger.info(`Get contacts for ${visit.prisonerId}`)
     const contacts = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(visit.prisonerId)
 
-    const visitorIds: number[] = visit.visitors.reduce((acc, visitor) => {
-      acc.push(visitor.nomisPersonId)
-      return acc
-    }, [])
+    const visitorIds = visit.visitors.map(visitor => visitor.nomisPersonId)
+    const visitContacts = contacts.filter(contact => visitorIds.includes(contact.personId))
 
-    const visitors: Contact[] = contacts.reduce((acc, contact) => {
-      if (visitorIds.includes(contact.personId)) {
-        acc.push(contact)
-      }
-      return acc
-    }, [])
+    const visitors = visitContacts.map(contact => buildVisitorListItem(contact))
 
     return { visit, visitors }
   }

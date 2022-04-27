@@ -1,7 +1,7 @@
 {% extends "layout.njk" %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
-{% from "govuk/components/details/macro.njk" import govukDetails %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "components/visitors.njk" import visitorDateOfBirth, visitorRestrictions %}
 
 {% set pageHeaderTitle = "Select visitors from the prisoner’s approved visitor list" %}
 {% set pageTitle %}
@@ -22,29 +22,6 @@
   </div>
   {%- endset %}
 
-  {% set dateOfBirth %}
-    {%- if visitor.dateOfBirth %}
-      {{- visitor.dateOfBirth | formatDate }}<br>({{ "Adult" if visitor.adult else "Child" }})
-    {%- else -%}
-      Not entered
-    {%- endif %}
-  {%- endset %}
-
-  {% set visitorRestrictions %}
-    {%- for restriction in visitor.restrictions -%}
-      <div class="visitor-restriction">
-        <span class="moj-badge moj-badge--large visitor-restriction-badge visitor-restriction-badge--{{ restriction.restrictionType }}">{{- restriction.restrictionTypeDescription }}</span>
-      {%- if restriction.expiryDate %} until {{ restriction.expiryDate | formatDate }}{% else %} End date not entered{% endif %}
-      {% if restriction.comment %}
-        {{- govukDetails({
-          summaryText: "See comment",
-          text: restriction.comment
-        }) }}
-      {% endif %}
-      </div>
-    {%- endfor %}
-  {%- endset %}
-
   {% set visitors = (visitors.push([
     {
       html: checkbox
@@ -54,7 +31,7 @@
       attributes: { "data-test": "visitor-name-" + visitor.personId }
     },
     {
-      html: dateOfBirth,
+      html: visitorDateOfBirth(visitor),
       attributes: { "data-test": "visitor-dob-" + visitor.personId }
     },
     {
@@ -66,7 +43,7 @@
       attributes: { "data-test": "visitor-address-" + visitor.personId }
     },
     {
-      html: visitorRestrictions if visitorRestrictions else "None",
+      html: visitorRestrictions(visitor),
       attributes: { "data-test": "visitor-restrictions-" + visitor.personId }
     }
   ]), visitors) %}
