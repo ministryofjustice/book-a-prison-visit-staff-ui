@@ -3,6 +3,7 @@ import { VisitorSupport } from '../data/visitSchedulerApiTypes'
 
 export type PrisonerDetailsItem = {
   html: string
+  classes?: string
 }
 
 export type PrisonerAlertItem = [

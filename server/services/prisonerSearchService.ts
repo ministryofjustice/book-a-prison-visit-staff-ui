@@ -46,10 +46,10 @@ export default class PrisonerSearchService {
 
     content.forEach((prisoner: Prisoner) => {
       const url = visit
-        ? `<a href="/prisoner/${prisoner.prisonerNumber}/visits">${properCaseFullName(
+        ? `<a href="/prisoner/${prisoner.prisonerNumber}/visits" class="bapv-result-row">${properCaseFullName(
             `${prisoner.lastName}, ${prisoner.firstName}`
           )}</a>`
-        : `<a href="/prisoner/${prisoner.prisonerNumber}">${properCaseFullName(
+        : `<a href="/prisoner/${prisoner.prisonerNumber}" class="bapv-result-row">${properCaseFullName(
             `${prisoner.lastName}, ${prisoner.firstName}`
           )}</a>`
       const row: PrisonerDetailsItem[] = [

@@ -25,6 +25,7 @@
     "test": "jest -i --coverage",
     "security_audit": "npx audit-ci --config audit-ci.json",
     "int-test": "cypress run --config video=false",
+    "int-test-single": "cypress run --config video=false --spec ",
     "int-test-ui": "cypress open",
     "clean": "rm -rf dist build node_modules stylesheets coverage"
   },
