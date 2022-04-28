@@ -8,10 +8,10 @@ describe('Nunjucks Filters', () => {
 
   const njkEnv = registerNunjucks()
 
-  describe('formatMainContact', () => {
+  describe('formatLastNameFirst', () => {
     it('should return null if full name is not provided', () => {
       viewContext = {}
-      const nunjucksString = '{{ fullName | formatMainContact }}'
+      const nunjucksString = '{{ fullName | formatLastNameFirst }}'
       compiledTemplate = nunjucks.compile(nunjucksString, njkEnv)
       const $ = cheerio.load(compiledTemplate.render(viewContext))
       expect($('body').text()).toBe('')
@@ -19,9 +19,9 @@ describe('Nunjucks Filters', () => {
 
     it('should return formatted contact', () => {
       viewContext = {
-        fullName: 'Joe Bloggs',
+        fullName: 'JOE BLOGGS',
       }
-      const nunjucksString = '{{ fullName | formatMainContact }}'
+      const nunjucksString = '{{ fullName | formatLastNameFirst }}'
       compiledTemplate = nunjucks.compile(nunjucksString, njkEnv)
       const $ = cheerio.load(compiledTemplate.render(viewContext))
       expect($('body').text()).toBe('Bloggs, Joe')
