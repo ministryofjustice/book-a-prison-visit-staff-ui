@@ -17,6 +17,7 @@ import { ScheduledEvent } from '../data/whereaboutsApiTypes'
 import { prisonerDateTimePretty, prisonerTimePretty } from '../utils/utils'
 import PrisonerContactRegistryApiClient from '../data/prisonerContactRegistryApiClient'
 import buildVisitorListItem from '../utils/visitorUtils'
+import { getSupportTypeDescriptions } from '../routes/visitorUtils'
 
 type PrisonerContactRegistryApiClientBuilder = (token: string) => PrisonerContactRegistryApiClient
 type VisitSchedulerApiClientBuilder = (token: string) => VisitSchedulerApiClient
@@ -224,7 +225,7 @@ export default class VisitSessionsService {
   }: {
     username: string
     reference: string
-  }): Promise<{ visit: Visit; visitors: VisitorListItem[] }> {
+  }): Promise<{ visit: Visit; visitors: VisitorListItem[]; additionalSupport: string[] }> {
     const token = await this.systemToken(username)
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
     const prisonerContactRegistryApiClient = this.prisonerContactRegistryApiClientBuilder(token)
@@ -233,11 +234,17 @@ export default class VisitSessionsService {
     const contacts = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(visit.prisonerId)
 
     const visitorIds = visit.visitors.map(visitor => visitor.nomisPersonId)
-    const visitContacts = contacts.filter(contact => visitorIds.includes(contact.personId))
 
-    const visitors = visitContacts.map(contact => buildVisitorListItem(contact))
+    const visitors = contacts
+      .filter(contact => visitorIds.includes(contact.personId))
+      .map(contact => buildVisitorListItem(contact))
 
-    return { visit, visitors }
+    const additionalSupport = getSupportTypeDescriptions(
+      await this.getAvailableSupportOptions(username),
+      visit.visitorSupport
+    )
+
+    return { visit, visitors, additionalSupport }
   }
 
   private buildVisitInformation(visit: Visit): VisitInformation {

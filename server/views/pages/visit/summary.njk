@@ -16,7 +16,7 @@
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
 
       <h2 class="govuk-heading-m">Prisoner details</h2>
-      <ul class="bapv-details-list">
+      <ul class="bapv-item-list--horizontal">
         <li>
           <strong>Name</strong>
           <span data-test="prisoner-name">{{ (prisoner.firstName + ' ' + prisoner.lastName) | formatMainContact }}</span>
@@ -36,7 +36,7 @@
       </ul>
 
       <h2 class="govuk-heading-m">Visit details</h2>
-            <ul class="bapv-details-list">
+      <ul class="bapv-item-list--horizontal">
         <li>
           <strong>Date</strong>
           <span data-test="visit-date">{{ visit.startTimestamp | formatDate }}</span>
@@ -116,6 +116,32 @@
         ],
         rows: visitorRows
       }) }}
+
+      <ul class="bapv-item-list">
+      {%- for visitNote in visit.visitNotes %}
+        {% if visitNote.type == "VISIT_COMMENT" %}
+          <li>
+            <strong>Comments</strong>
+            <span data-test="visit-comment">{{ visitNote.text }}</span>
+          </li>
+        {% elseif visitNote.type == "VISITOR_CONCERN" %}
+          <li>
+            <strong>Visitor concerns</strong>
+            <span data-test="visitor-concern">{{ visitNote.text }}</span>
+          </li>
+        {% endif %}
+      {% endfor %}
+
+        <li>
+          <strong>Additional support</strong>
+          <span data-test="additional-support">{{ additionalSupport | join(", ") if additionalSupport | length else "No additional support options were chosen"}}</span>
+        </li>
+
+        <li>
+          <strong>Visit booked</strong>
+          <span data-test="visit-booked">{{ visit.createdTimestamp | formatDate('EEEE dd MMMM yyyy') }} at {{ visit.createdTimestamp | formatTime }}</span>
+        </li>
+      </ul>
     </div>
   </div>
 {% endblock %}
