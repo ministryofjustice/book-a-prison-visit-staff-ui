@@ -6,6 +6,7 @@ import SearchForAPrisonerResultsPage from '../pages/searchForAPrisonerResults'
 import { Prisoner } from '../../server/data/prisonerOffenderSearchTypes'
 import { prisonerDatePretty } from '../../server/utils/utils'
 import { InmateDetail, VisitBalances } from '../../server/data/prisonApiTypes'
+import { Visit } from '../../server/data/visitSchedulerApiTypes'
 
 context('Search for a prisoner', () => {
   const prisonerNumber = 'A1234BC'
@@ -315,10 +316,56 @@ context('Search for a prisoner', () => {
                 remainingPvo: 1,
                 remainingVo: 2,
               }
+              const upcomingVisits = [
+                {
+                  reference: 'ab-cd-ef-gh',
+                  prisonerId: 'A1234BC',
+                  prisonId: 'HEI',
+                  visitRoom: 'A1 L3',
+                  visitType: 'SOCIAL',
+                  visitStatus: 'RESERVED',
+                  visitRestriction: 'OPEN',
+                  startTimestamp: '2022-04-25T09:35:34.489Z',
+                  endTimestamp: '',
+                  visitors: [
+                    {
+                      nomisPersonId: 1234,
+                    },
+                  ],
+                  visitorSupport: [
+                    {
+                      type: 'OTHER',
+                      text: 'custom support details',
+                    },
+                  ],
+                },
+                {
+                  reference: 'ab-cd-ef-gh',
+                  prisonerId: 'A1234BC',
+                  prisonId: 'HEI',
+                  visitRoom: 'A1 L3',
+                  visitType: 'SOCIAL',
+                  visitStatus: 'RESERVED',
+                  visitRestriction: 'OPEN',
+                  startTimestamp: '2022-04-25T09:35:34.489Z',
+                  endTimestamp: '',
+                  visitors: [
+                    {
+                      nomisPersonId: 1234,
+                    },
+                  ],
+                  visitorSupport: [
+                    {
+                      type: 'OTHER',
+                      text: 'custom support details',
+                    },
+                  ],
+                },
+              ]
               cy.task('stubGetBookings', prisonerNumber)
               cy.task('stubGetOffender', offender)
               cy.task('stubGetVisitBalances', { offenderNo: prisonerNumber, visitBalances })
-              cy.task('stubGetUpcomingVisits', prisonerNumber)
+              cy.task('stubGetUpcomingVisits', { offenderNo: prisonerNumber, upcomingVisits })
               cy.task('stubGetPastVisits', prisonerNumber)
               cy.task('stubGetPrisonerSocialContacts', prisonerNumber)
               searchForAPrisonerResultsPage.firstResultLink().click()
@@ -326,7 +373,7 @@ context('Search for a prisoner', () => {
               const prisonerProfilePage = new PrisonerProfilePage(text)
 
               prisonerProfilePage.prisonNumber().contains(prisonerNumber)
-              prisonerProfilePage.dateOfBirth().contains('1 January 2000')
+              prisonerProfilePage.dateOfBirth().contains(prisonerDatePretty({ dateToFormat: offender.dateOfBirth }))
               prisonerProfilePage
                 .location()
                 .contains(`${offender.assignedLivingUnit.description}, ${offender.assignedLivingUnit.agencyName}`)
@@ -337,6 +384,30 @@ context('Search for a prisoner', () => {
               prisonerProfilePage.remainingVOs().contains(visitBalances.remainingVo)
               prisonerProfilePage.remainingPVOs().contains(visitBalances.remainingPvo)
               prisonerProfilePage.flaggedAlerts().eq(0).contains(offender.alerts[0].alertCodeDescription)
+
+              prisonerProfilePage.visitTabVORemaining().contains(visitBalances.remainingVo)
+              prisonerProfilePage
+                .visitTabVOLastAdjustment()
+                .contains(prisonerDatePretty({ dateToFormat: visitBalances.latestIepAdjustDate }))
+              prisonerProfilePage.visitTabPVORemaining().contains(visitBalances.remainingPvo)
+              prisonerProfilePage
+                .visitTabPVOLastAdjustment()
+                .contains(prisonerDatePretty({ dateToFormat: visitBalances.latestPrivIepAdjustDate }))
+
+              // NOTE: Need to test next dates, move next calc into function in separate PR to use in here
+
+              prisonerProfilePage.selectActiveAlertsTab()
+
+              prisonerProfilePage.alertsTabType().eq(0).contains(offender.alerts[0].alertTypeDescription)
+              prisonerProfilePage.alertsTabCode().eq(0).contains(offender.alerts[0].alertCodeDescription)
+              prisonerProfilePage.alertsTabComment().eq(0).contains(offender.alerts[0].comment)
+              prisonerProfilePage
+                .alertsTabCreated()
+                .eq(0)
+                .contains(prisonerDatePretty({ dateToFormat: offender.alerts[0].dateCreated }))
+              prisonerProfilePage.alertsTabExpires().eq(0).contains('Not entered')
+
+              prisonerProfilePage.selectUpcomingVisitsTab()
             })
         })
     })

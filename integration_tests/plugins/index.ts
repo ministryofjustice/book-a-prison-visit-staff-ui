@@ -9,6 +9,7 @@ import offenderSearch from '../mockApis/offenderSearch'
 import visitScheduler from '../mockApis/visitScheduler'
 import { Prisoner } from '../../server/data/prisonerOffenderSearchTypes'
 import { InmateDetail, VisitBalances } from '../../server/data/prisonApiTypes'
+import { Visit } from '../../server/data/visitSchedulerApiTypes'
 
 export default (on: (string, Record) => void): void => {
   on('task', {
@@ -53,7 +54,8 @@ export default (on: (string, Record) => void): void => {
 
     stubGetAvailableSupportOptions: visitScheduler.stubGetAvailableSupportOptions,
     stubGetVisit: (reference: string) => visitScheduler.stubGetVisit(reference),
-    stubGetUpcomingVisits: (offenderNo: string) => visitScheduler.getUpcomingVisits(offenderNo),
+    stubGetUpcomingVisits: ({ offenderNo, upcomingVisits }: { offenderNo: string; upcomingVisits: Visit[] }) =>
+      visitScheduler.getUpcomingVisits({ offenderNo, upcomingVisits }),
     stubGetPastVisits: (offenderNo: string) => visitScheduler.getPastVisits(offenderNo),
     stubGetVisitSessions: visitScheduler.stubGetVisitSessions,
     stubCreateVisit: visitScheduler.stubCreateVisit,

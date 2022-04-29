@@ -26,4 +26,34 @@ export default class PrisonerProfilePage extends Page {
   remainingVOs = (): PageElement => cy.get('[data-test="remaining-vos"]')
 
   remainingPVOs = (): PageElement => cy.get('[data-test="remaining-pvos"]')
+
+  selectVisitingOrdersTab = (): PageElement => cy.get('#tab_visiting-orders').click()
+
+  selectActiveAlertsTab = (): PageElement => cy.get('#tab_active-alerts').click()
+
+  selectUpcomingVisitsTab = (): PageElement => cy.get('#tab_upcoming-visits').click()
+
+  selectVisitsHistoryTab = (): PageElement => cy.get('#tab_visits-history').click()
+
+  visitTabVORemaining = (): PageElement => cy.get('[data-test="tab-vo-remaining"]')
+
+  visitTabVOLastAdjustment = (): PageElement => cy.get('[data-test="tab-vo-last-date"]')
+
+  visitTabVONextAdjustment = (): PageElement => cy.get('[data-test="tab-vo-next-date"]')
+
+  visitTabPVORemaining = (): PageElement => cy.get('[data-test="tab-pvo-remaining"]')
+
+  visitTabPVOLastAdjustment = (): PageElement => cy.get('[data-test="tab-pvo-last-date"]')
+
+  visitTabPVONextAdjustment = (): PageElement => cy.get('[data-test="tab-pvo-next-date"]')
+
+  alertsTabType = (): PageElement => cy.get('[data-test="tab-alerts-type-desc"]')
+
+  alertsTabCode = (): PageElement => cy.get('[data-test="tab-alerts-code-desc"]')
+
+  alertsTabComment = (): PageElement => cy.get('[data-test="tab-alerts-comment"]')
+
+  alertsTabCreated = (): PageElement => cy.get('[data-test="tab-alerts-created"]')
+
+  alertsTabExpires = (): PageElement => cy.get('[data-test="tab-alerts-expires"]')
 }

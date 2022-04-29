@@ -234,69 +234,129 @@ describe('Prisoner profile service', () => {
         [
           {
             text: 'Security (X)',
+            attributes: {
+              'data-test': 'tab-alerts-type-desc',
+            },
           },
           {
             text: 'Racist (XR)',
+            attributes: {
+              'data-test': 'tab-alerts-code-desc',
+            },
           },
           {
             text: 'Test',
+            attributes: {
+              'data-test': 'tab-alerts-comment',
+            },
           },
           {
             html: '<span class="bapv-table_cell--nowrap">1 January</span> 2022',
+            attributes: {
+              'data-test': 'tab-alerts-created',
+            },
           },
           {
             html: 'Not entered',
+            attributes: {
+              'data-test': 'tab-alerts-expires',
+            },
           },
         ],
         [
           {
             text: 'COVID unit management (U)',
+            attributes: {
+              'data-test': 'tab-alerts-type-desc',
+            },
           },
           {
             text: 'Protective Isolation Unit (UPIU)',
+            attributes: {
+              'data-test': 'tab-alerts-code-desc',
+            },
           },
           {
             text: 'Test',
+            attributes: {
+              'data-test': 'tab-alerts-comment',
+            },
           },
           {
             html: '<span class="bapv-table_cell--nowrap">2 January</span> 2022',
+            attributes: {
+              'data-test': 'tab-alerts-created',
+            },
           },
           {
             html: 'Not entered',
+            attributes: {
+              'data-test': 'tab-alerts-expires',
+            },
           },
         ],
         [
           {
             text: 'Risk (R)',
+            attributes: {
+              'data-test': 'tab-alerts-type-desc',
+            },
           },
           {
             text: 'Quarantined – Communicable Disease Risk (RCDR)',
+            attributes: {
+              'data-test': 'tab-alerts-code-desc',
+            },
           },
           {
             text: 'Test',
+            attributes: {
+              'data-test': 'tab-alerts-comment',
+            },
           },
           {
             html: '<span class="bapv-table_cell--nowrap">3 January</span> 2022',
+            attributes: {
+              'data-test': 'tab-alerts-created',
+            },
           },
           {
             html: 'Not entered',
+            attributes: {
+              'data-test': 'tab-alerts-expires',
+            },
           },
         ],
         [
           {
             text: 'COVID unit management (U)',
+            attributes: {
+              'data-test': 'tab-alerts-type-desc',
+            },
           },
           {
             text: 'Reverse Cohorting Unit (URCU)',
+            attributes: {
+              'data-test': 'tab-alerts-code-desc',
+            },
           },
           {
             text: 'Test',
+            attributes: {
+              'data-test': 'tab-alerts-comment',
+            },
           },
           {
             html: '<span class="bapv-table_cell--nowrap">4 January</span> 2022',
+            attributes: {
+              'data-test': 'tab-alerts-created',
+            },
           },
           {
             html: 'Not entered',
+            attributes: {
+              'data-test': 'tab-alerts-expires',
+            },
           },
         ],
       ]

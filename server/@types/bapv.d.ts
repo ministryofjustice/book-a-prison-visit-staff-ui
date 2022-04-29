@@ -8,33 +8,60 @@ export type PrisonerDetailsItem = {
 export type PrisonerAlertItem = [
   {
     text: string
+    attributes?: {
+      'data-test': string
+    }
   },
   {
     text: string
+    attributes?: {
+      'data-test': string
+    }
   },
   {
     text: string
+    attributes?: {
+      'data-test': string
+    }
   },
   {
     html: string
+    attributes?: {
+      'data-test': string
+    }
   },
   {
     html: string
+    attributes?: {
+      'data-test': string
+    }
   }
 ]
 
 export type UpcomingVisitItem = [
   {
     html: string
+    attributes?: {
+      'data-test': string
+    }
   },
   {
     text: string
+    attributes?: {
+      'data-test': string
+    }
   },
   {
     html: string
+    attributes?: {
+      'data-test': string
+    }
   },
   {
     html: string
+    attributes?: {
+      'data-test': string
+    }
   }
 ]
 

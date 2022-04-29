@@ -66,18 +66,39 @@ export default class PrisonerProfileService {
 
     const activeAlertsForDisplay: PrisonerAlertItem[] = activeAlerts.map(alert => {
       return [
-        { text: `${alert.alertTypeDescription} (${alert.alertType})` },
-        { text: `${alert.alertCodeDescription} (${alert.alertCode})` },
-        { text: alert.comment },
+        {
+          text: `${alert.alertTypeDescription} (${alert.alertType})`,
+          attributes: {
+            'data-test': 'tab-alerts-type-desc',
+          },
+        },
+        {
+          text: `${alert.alertCodeDescription} (${alert.alertCode})`,
+          attributes: {
+            'data-test': 'tab-alerts-code-desc',
+          },
+        },
+        {
+          text: alert.comment,
+          attributes: {
+            'data-test': 'tab-alerts-comment',
+          },
+        },
         {
           html: alert.dateCreated
             ? prisonerDatePretty({ dateToFormat: alert.dateCreated, wrapDate: false })
             : 'Not entered',
+          attributes: {
+            'data-test': 'tab-alerts-created',
+          },
         },
         {
           html: alert.dateExpires
             ? prisonerDatePretty({ dateToFormat: alert.dateExpires, wrapDate: false })
             : 'Not entered',
+          attributes: {
+            'data-test': 'tab-alerts-expires',
+          },
         },
       ]
     })

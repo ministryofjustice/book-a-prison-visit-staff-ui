@@ -96,13 +96,22 @@
             html: "<strong>VO</strong>"
           },
           {
-            text: visitBalances.remainingVo
+            text: visitBalances.remainingVo,
+            attributes: {
+              "data-test": "tab-vo-remaining"
+            }
           },
           {
-            text: visitBalances.latestIepAdjustDate
+            text: visitBalances.latestIepAdjustDate,
+            attributes: {
+              "data-test": "tab-vo-last-date"
+            }
           },
           {
-            text: visitBalances.nextIepAdjustDate
+            text: visitBalances.nextIepAdjustDate,
+            attributes: {
+              "data-test": "tab-vo-next-date"
+            }
           }
         ],
         [
@@ -110,13 +119,22 @@
             html: "<strong>PVO</strong>"
           },
           {
-            text: visitBalances.remainingPvo
+            text: visitBalances.remainingPvo,
+            attributes: {
+              "data-test": "tab-pvo-remaining"
+            }
           },
           {
-            text: visitBalances.latestPrivIepAdjustDate
+            text: visitBalances.latestPrivIepAdjustDate,
+            attributes: {
+              "data-test": "tab-pvo-last-date"
+            }
           },
           {
-            text: visitBalances.nextPrivIepAdjustDate
+            text: visitBalances.nextPrivIepAdjustDate,
+            attributes: {
+              "data-test": "tab-pvo-next-date"
+            }
           }
         ]
       ]
