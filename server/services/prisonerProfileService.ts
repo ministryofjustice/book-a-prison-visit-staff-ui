@@ -1,5 +1,4 @@
 import { NotFound } from 'http-errors'
-import { addDays, startOfMonth, addMonths, format, parseISO } from 'date-fns'
 import PrisonApiClient from '../data/prisonApiClient'
 import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
 import PrisonerContactRegistryApiClient from '../data/prisonerContactRegistryApiClient'
@@ -11,7 +10,14 @@ import {
   UpcomingVisitItem,
   PastVisitItem,
 } from '../@types/bapv'
-import { prisonerDatePretty, properCaseFullName, prisonerDateTimePretty, properCase } from '../utils/utils'
+import {
+  prisonerDatePretty,
+  properCaseFullName,
+  properCase,
+  visitDateAndTime,
+  nextIepAdjustDate,
+  nextPrivIepAdjustDate,
+} from '../utils/utils'
 import { Alert, OffenderRestriction } from '../data/prisonApiTypes'
 import { Visit } from '../data/visitSchedulerApiTypes'
 import { Contact } from '../data/prisonerContactRegistryApiTypes'
@@ -112,8 +118,6 @@ export default class PrisonerProfileService {
 
     const visitsForDisplay: UpcomingVisitItem[] = await Promise.all(
       socialVisits.map(async visit => {
-        const startTime = format(parseISO(visit.startTimestamp), 'h:mmaaa')
-        const endTime = visit.endTimestamp ? ` - ${format(parseISO(visit.endTimestamp), 'h:mmaaa')}` : ''
         const visitors: number[] = visit.visitors.reduce((personIds, visitor) => {
           personIds.push(visitor.nomisPersonId)
 
@@ -126,7 +130,7 @@ export default class PrisonerProfileService {
           { text: 'Hewell (HMP)' },
           {
             html: visit.startTimestamp
-              ? `<p>${prisonerDateTimePretty(visit.startTimestamp)}<br>${startTime}${endTime}</p>`
+              ? `<p>${visitDateAndTime({ startTimestamp: visit.startTimestamp, endTimestamp: visit.endTimestamp })}</p>`
               : '<p>N/A</p>',
           },
           { html: `<p>${visitContactNames.join('<br>')}</p>` },
@@ -148,8 +152,6 @@ export default class PrisonerProfileService {
 
     const visitsForDisplay: PastVisitItem[] = await Promise.all(
       socialVisits.map(async visit => {
-        const startTime = format(parseISO(visit.startTimestamp), 'h:mmaaa')
-        const endTime = visit.endTimestamp ? ` - ${format(parseISO(visit.endTimestamp), 'h:mmaaa')}` : ''
         const visitors: number[] = visit.visitors.reduce((personIds, visitor) => {
           personIds.push(visitor.nomisPersonId)
 
@@ -162,7 +164,7 @@ export default class PrisonerProfileService {
           { text: 'Hewell (HMP)' },
           {
             html: visit.startTimestamp
-              ? `<p>${prisonerDateTimePretty(visit.startTimestamp)}<br>${startTime}${endTime}</p>`
+              ? `<p>${visitDateAndTime({ startTimestamp: visit.startTimestamp, endTimestamp: visit.endTimestamp })}</p>`
               : '<p>N/A</p>',
           },
           { html: `<p>${visitContactNames.join('<br>')}</p>` },
@@ -196,17 +198,14 @@ export default class PrisonerProfileService {
     const visitBalances = (await prisonApiClient.getVisitBalances(offenderNo)) as BAPVVisitBalances
 
     if (visitBalances.latestIepAdjustDate) {
-      visitBalances.nextIepAdjustDate = format(addDays(parseISO(visitBalances.latestIepAdjustDate), 14), 'd MMMM yyyy')
+      visitBalances.nextIepAdjustDate = nextIepAdjustDate(visitBalances.latestIepAdjustDate)
       visitBalances.latestIepAdjustDate = prisonerDatePretty({
         dateToFormat: visitBalances.latestIepAdjustDate,
       })
     }
 
     if (visitBalances.latestPrivIepAdjustDate) {
-      visitBalances.nextPrivIepAdjustDate = format(
-        addMonths(startOfMonth(parseISO(visitBalances.latestPrivIepAdjustDate)), 1),
-        'd MMMM yyyy'
-      )
+      visitBalances.nextPrivIepAdjustDate = nextPrivIepAdjustDate(visitBalances.latestPrivIepAdjustDate)
       visitBalances.latestPrivIepAdjustDate = prisonerDatePretty({
         dateToFormat: visitBalances.latestPrivIepAdjustDate,
       })

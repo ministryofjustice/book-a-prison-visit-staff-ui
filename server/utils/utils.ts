@@ -1,4 +1,4 @@
-import { differenceInYears, format, parseISO } from 'date-fns'
+import { differenceInYears, format, parseISO, addDays, startOfMonth, addMonths } from 'date-fns'
 
 export const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
@@ -105,3 +105,24 @@ const properCaseName = (name: string): string => (isBlank(name) ? '' : name.spli
 
 export const convertToTitleCase = (sentence: string): string =>
   isBlank(sentence) ? '' : sentence.split(' ').map(properCaseName).join(' ')
+
+export const visitDateAndTime = ({
+  startTimestamp,
+  endTimestamp,
+}: {
+  startTimestamp: string
+  endTimestamp: string
+}): string => {
+  const startTime = format(parseISO(startTimestamp), 'h:mmaaa')
+  const endTime = endTimestamp ? ` - ${format(parseISO(endTimestamp), 'h:mmaaa')}` : ''
+
+  return `${prisonerDateTimePretty(startTimestamp)}<br>${startTime}${endTime}`
+}
+
+export const nextIepAdjustDate = (latestIepAdjustDate: string): string => {
+  return format(addDays(parseISO(latestIepAdjustDate), 14), 'd MMMM yyyy')
+}
+
+export const nextPrivIepAdjustDate = (latestPrivIepAdjustDate: string): string => {
+  return format(addMonths(startOfMonth(parseISO(latestPrivIepAdjustDate)), 1), 'd MMMM yyyy')
+}
