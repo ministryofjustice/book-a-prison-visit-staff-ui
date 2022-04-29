@@ -194,6 +194,7 @@ export default class PrisonerProfileService {
     offenderNo: string
   ): Promise<BAPVVisitBalances> {
     if (convictedStatus === 'Remand') return null
+
     const visitBalances = (await prisonApiClient.getVisitBalances(offenderNo)) as BAPVVisitBalances
 
     if (visitBalances.latestIepAdjustDate) {

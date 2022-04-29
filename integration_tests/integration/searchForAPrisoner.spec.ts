@@ -8,6 +8,7 @@ import { prisonerDatePretty } from '../../server/utils/utils'
 import { InmateDetail, VisitBalances } from '../../server/data/prisonApiTypes'
 
 context('Search for a prisoner', () => {
+  const prisonerNumber = 'A1234BC'
   beforeEach(() => {
     cy.task('reset')
     cy.task('stubSignIn')
@@ -46,7 +47,7 @@ context('Search for a prisoner', () => {
           cy.visit(href)
 
           const searchForAPrisonerPage = Page.verifyOnPage(SearchForAPrisonerPage)
-          searchForAPrisonerPage.searchInput().clear().type('A1234BC')
+          searchForAPrisonerPage.searchInput().clear().type(prisonerNumber)
           searchForAPrisonerPage.searchButton().click()
 
           const searchForAPrisonerResultsPage = Page.verifyOnPage(SearchForAPrisonerResultsPage)
@@ -64,7 +65,7 @@ context('Search for a prisoner', () => {
           {
             lastName: 'Last Name 1',
             firstName: 'First Name 1',
-            prisonerNumber: 'A1234BC',
+            prisonerNumber,
             dateOfBirth: '2000-01-01',
           },
           {
@@ -85,7 +86,7 @@ context('Search for a prisoner', () => {
           cy.visit(href)
 
           const searchForAPrisonerPage = Page.verifyOnPage(SearchForAPrisonerPage)
-          searchForAPrisonerPage.searchInput().clear().type('A1234BC')
+          searchForAPrisonerPage.searchInput().clear().type(prisonerNumber)
           searchForAPrisonerPage.searchButton().click()
 
           const searchForAPrisonerResultsPage = Page.verifyOnPage(SearchForAPrisonerResultsPage)
@@ -119,7 +120,7 @@ context('Search for a prisoner', () => {
           {
             lastName: 'Last Name 1',
             firstName: 'First Name 1',
-            prisonerNumber: 'A1234BC',
+            prisonerNumber,
             dateOfBirth: '2000-01-01',
           },
           {
@@ -200,7 +201,7 @@ context('Search for a prisoner', () => {
           cy.visit(href)
 
           const searchForAPrisonerPage = Page.verifyOnPage(SearchForAPrisonerPage)
-          searchForAPrisonerPage.searchInput().clear().type('A1234BC')
+          searchForAPrisonerPage.searchInput().clear().type(prisonerNumber)
           searchForAPrisonerPage.searchButton().click()
 
           const searchForAPrisonerResultsPage = Page.verifyOnPage(SearchForAPrisonerResultsPage)
@@ -243,7 +244,6 @@ context('Search for a prisoner', () => {
 
   context('view single prisoner', () => {
     it('should show the prisoner profile page', () => {
-      const prisonerNumber = 'A1234BC'
       const prisoner: Partial<Prisoner> = {
         lastName: 'Last Name 1',
         firstName: 'First Name 1',
@@ -336,7 +336,6 @@ context('Search for a prisoner', () => {
               prisonerProfilePage.alertCount().contains(offender.activeAlertCount)
               prisonerProfilePage.remainingVOs().contains(visitBalances.remainingVo)
               prisonerProfilePage.remainingPVOs().contains(visitBalances.remainingPvo)
-              prisonerProfilePage.flaggedAlerts().eq(0).contains(offender.alerts[0].alertCode)
               prisonerProfilePage.flaggedAlerts().eq(0).contains(offender.alerts[0].alertCodeDescription)
             })
         })
