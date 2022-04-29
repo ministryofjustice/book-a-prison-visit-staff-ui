@@ -583,7 +583,7 @@ describe('Visit sessions service', () => {
         ],
       }
       const visit: Visit = {
-        reference: 'v9-d7-ed-7u',
+        reference: 'ab-cd-ef-gh',
         prisonerId: visitSessionData.prisoner.offenderNo,
         prisonId: 'HEI',
         visitRoom: visitSessionData.visit.visitRoomName,
@@ -607,7 +607,7 @@ describe('Visit sessions service', () => {
       const result = await visitSessionsService.createVisit({ username: 'user', visitData: visitSessionData })
 
       expect(visitSchedulerApiClient.createVisit).toHaveBeenCalledTimes(1)
-      expect(result).toEqual('v9-d7-ed-7u')
+      expect(result).toEqual('ab-cd-ef-gh')
     })
   })
 
@@ -651,10 +651,10 @@ describe('Visit sessions service', () => {
           phoneNumber: '01234 567890',
           contactName: 'John Smith',
         },
-        visitReference: 'v9-d7-ed-7u',
+        visitReference: 'ab-cd-ef-gh',
       }
       const visit: Visit = {
-        reference: 'v9-d7-ed-7u',
+        reference: 'ab-cd-ef-gh',
         prisonerId: visitSessionData.prisoner.offenderNo,
         prisonId: 'HEI',
         visitRoom: visitSessionData.visit.visitRoomName,
@@ -683,7 +683,7 @@ describe('Visit sessions service', () => {
 
       expect(visitSchedulerApiClient.updateVisit).toHaveBeenCalledTimes(1)
       expect(result).toEqual(<Visit>{
-        reference: 'v9-d7-ed-7u',
+        reference: 'ab-cd-ef-gh',
         prisonerId: 'A1234BC',
         prisonId: 'HEI',
         visitRoom: 'visit room',
@@ -703,7 +703,7 @@ describe('Visit sessions service', () => {
 
   describe('Get visit data', () => {
     const visit: Visit = {
-      reference: 'v9-d7-ed-7u',
+      reference: 'ab-cd-ef-gh',
       prisonerId: 'A1234BC',
       prisonId: 'HEI',
       visitRoom: 'visit room',
@@ -740,11 +740,11 @@ describe('Visit sessions service', () => {
     describe('getVisit', () => {
       it('should return VisitInformation given a visit reference', async () => {
         visitSchedulerApiClient.getVisit.mockResolvedValue(visit)
-        const result = await visitSessionsService.getVisit({ username: 'user', reference: 'v9-d7-ed-7u' })
+        const result = await visitSessionsService.getVisit({ username: 'user', reference: 'ab-cd-ef-gh' })
 
         expect(visitSchedulerApiClient.getVisit).toHaveBeenCalledTimes(1)
         expect(result).toEqual(<VisitInformation>{
-          reference: 'v9-d7-ed-7u',
+          reference: 'ab-cd-ef-gh',
           prisonNumber: 'A1234BC',
           prisonerName: '',
           mainContact: 'John Smith',
@@ -765,7 +765,7 @@ describe('Visit sessions service', () => {
         expect(visitSchedulerApiClient.getUpcomingVisits).toHaveBeenCalledWith('A1234BC')
         expect(result).toEqual(<VisitInformation[]>[
           {
-            reference: 'v9-d7-ed-7u',
+            reference: 'ab-cd-ef-gh',
             prisonNumber: 'A1234BC',
             prisonerName: '',
             mainContact: 'John Smith',
@@ -883,7 +883,7 @@ describe('Visit sessions service', () => {
         visitSchedulerApiClient.getAvailableSupportOptions.mockResolvedValue(availableSupportTypes)
         visitSchedulerApiClient.getVisit.mockResolvedValue(visit)
 
-        const result = await visitSessionsService.getFullVisitDetails({ username: 'user', reference: 'v9-d7-ed-7u' })
+        const result = await visitSessionsService.getFullVisitDetails({ username: 'user', reference: 'ab-cd-ef-gh' })
 
         expect(prisonerContactRegistryApiClient.getPrisonerSocialContacts).toHaveBeenCalledTimes(1)
         expect(visitSchedulerApiClient.getAvailableSupportOptions).toHaveBeenCalledTimes(1)

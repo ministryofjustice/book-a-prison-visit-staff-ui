@@ -48,9 +48,9 @@ describe('visitSchedulerApiClient', () => {
 
   describe('getVisit', () => {
     it('should return a single matching Visit from the Visit Scheduler API for a valid reference', async () => {
-      const reference = 'v9-d7-ed-7u'
+      const reference = 'ab-cd-ef-gh'
       const result: Visit = {
-        reference: 'v9-d7-ed-7u',
+        reference: 'ab-cd-ef-gh',
         prisonerId: 'A1234BC',
         prisonId: 'HEI',
         visitRoom: 'A1 L3',
@@ -90,7 +90,7 @@ describe('visitSchedulerApiClient', () => {
       const offenderNo = 'A1234BC'
       const results: Visit[] = [
         {
-          reference: 'v9-d7-ed-7u',
+          reference: 'ab-cd-ef-gh',
           prisonerId: offenderNo,
           prisonId: 'HEI',
           visitRoom: 'A1 L3',
@@ -137,7 +137,7 @@ describe('visitSchedulerApiClient', () => {
       const offenderNo = 'A1234BC'
       const results: Visit[] = [
         {
-          reference: 'v9-d7-ed-7u',
+          reference: 'ab-cd-ef-gh',
           prisonerId: offenderNo,
           prisonId: 'HEI',
           visitRoom: 'A1 L3',
@@ -219,7 +219,7 @@ describe('visitSchedulerApiClient', () => {
       const visitRestriction = 'OPEN'
 
       const result: Visit = {
-        reference: 'v9-d7-ed-7u',
+        reference: 'ab-cd-ef-gh',
         prisonerId: 'AF34567G',
         prisonId,
         visitRoom: 'A1 L3',
@@ -313,7 +313,7 @@ describe('visitSchedulerApiClient', () => {
 
     it('should return an updated Visit from the Visit Scheduler API, given full visitSessionData', async () => {
       const result: Visit = {
-        reference: 'v9-d7-ed-7u',
+        reference: 'ab-cd-ef-gh',
         prisonerId: 'AF34567G',
         prisonId,
         visitRoom: 'A1 L3',
@@ -381,7 +381,7 @@ describe('visitSchedulerApiClient', () => {
           phoneNumber: result.visitContact.telephone,
           contactName: result.visitContact.name,
         },
-        visitReference: 'v9-d7-ed-7u',
+        visitReference: 'ab-cd-ef-gh',
       }
       const visitContact = {
         telephone: visitSessionData.mainContact.phoneNumber,
@@ -389,7 +389,7 @@ describe('visitSchedulerApiClient', () => {
       }
 
       fakeVisitSchedulerApi
-        .put('/visits/v9-d7-ed-7u', <UpdateVisitRequestDto>{
+        .put('/visits/ab-cd-ef-gh', <UpdateVisitRequestDto>{
           prisonerId: visitSessionData.prisoner.offenderNo,
           prisonId,
           visitRoom: visitSessionData.visit.visitRoomName,
@@ -416,7 +416,7 @@ describe('visitSchedulerApiClient', () => {
 
     it('should return an updated Visit from the Visit Scheduler API, given minimal visitSessionData', async () => {
       const result: Visit = {
-        reference: 'v9-d7-ed-7u',
+        reference: 'ab-cd-ef-gh',
         prisonerId: 'AF34567G',
         prisonId,
         visitRoom: 'A1 L3',
@@ -467,11 +467,11 @@ describe('visitSchedulerApiClient', () => {
             banned: false,
           },
         ],
-        visitReference: 'v9-d7-ed-7u',
+        visitReference: 'ab-cd-ef-gh',
       }
 
       fakeVisitSchedulerApi
-        .put('/visits/v9-d7-ed-7u', <UpdateVisitRequestDto>{
+        .put('/visits/ab-cd-ef-gh', <UpdateVisitRequestDto>{
           prisonerId: visitSessionData.prisoner.offenderNo,
           prisonId,
           visitRoom: visitSessionData.visit.visitRoomName,

@@ -1854,7 +1854,7 @@ describe('GET /book-a-visit/confirmation', () => {
         phoneNumber: '123',
         contactName: 'abc',
       },
-      visitReference: 'k2-00-lg-du',
+      visitReference: 'ab-cd-ef-gh',
     }
     sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, {
       availableSupportTypes,
@@ -1879,7 +1879,7 @@ describe('GET /book-a-visit/confirmation', () => {
         expect($('.test-additional-support2').text()).toContain('Portable induction loop for people with hearing aids')
         expect($('.test-main-contact-name').text()).toContain('abc')
         expect($('.test-main-contact-number').text()).toContain('123')
-        expect($('.test-booking-reference').text()).toContain('k2-00-lg-du')
+        expect($('.test-booking-reference').text()).toContain('ab-cd-ef-gh')
       })
   })
 
@@ -1923,7 +1923,7 @@ describe('GET /book-a-visit/confirmation', () => {
           phoneNumber: '123',
           contactName: 'abc',
         },
-        visitReference: 'k2-00-lg-du',
+        visitReference: 'ab-cd-ef-gh',
       }
       sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, {
         availableSupportTypes,
@@ -1949,7 +1949,7 @@ describe('GET /book-a-visit/confirmation', () => {
           )
           expect($('.test-main-contact-name').text()).toContain('abc')
           expect($('.test-main-contact-number').text()).toContain('123')
-          expect($('.test-booking-reference').text()).toContain('k2-00-lg-du')
+          expect($('.test-booking-reference').text()).toContain('ab-cd-ef-gh')
         })
     })
   })

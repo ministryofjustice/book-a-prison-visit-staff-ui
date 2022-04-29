@@ -221,7 +221,7 @@ describe('GET /prisoner/A1234BC/visits', () => {
   it('should list upcoming visits for the prisoner', () => {
     const visitInfo: VisitInformation[] = [
       {
-        reference: 'v9-d7-ed-7u',
+        reference: 'ab-cd-ef-gh',
         prisonNumber: 'A1234BC',
         prisonerName: '',
         mainContact: 'John Smith',
@@ -249,7 +249,7 @@ describe('GET /prisoner/A1234BC/visits', () => {
         const $ = cheerio.load(res.text)
         expect($('h1').text()).toBe('Smith, John')
         expect($('[data-test="prisoner-number"]').text()).toBe('A1234BC')
-        expect($('[data-test="visit-reference-1"]').text()).toBe('v9-d7-ed-7u')
+        expect($('[data-test="visit-reference-1"]').text()).toBe('ab-cd-ef-gh')
         expect($('[data-test="visit-mainContact-1"]').text()).toBe('Smith, John')
         expect($('[data-test="visit-date-1"]').text()).toBe('14 February 2022')
         expect($('[data-test="visit-time-1"]').text()).toBe('10am to 11:15am')

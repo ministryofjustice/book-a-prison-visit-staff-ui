@@ -28,7 +28,7 @@ const visitorsData = [
   },
 ]
 const visit = {
-  id: 'v9-d7-ed-7u',
+  id: 'ab-cd-ef-gh',
   startTimestamp: '123',
   endTimestamp: '123',
   availableTables: 1,
@@ -143,14 +143,14 @@ describe('sessionCheckMiddleware', () => {
         prisoner: prisonerData,
         visitors: visitorsData,
         visit: {
-          id: 'v9-d7-ed-7u',
+          id: 'ab-cd-ef-gh',
         } as VisitSlot,
       },
       {
         prisoner: prisonerData,
         visitors: visitorsData,
         visit: {
-          id: 'v9-d7-ed-7u',
+          id: 'ab-cd-ef-gh',
           startTimestamp: '123',
         } as VisitSlot,
       },
@@ -158,7 +158,7 @@ describe('sessionCheckMiddleware', () => {
         prisoner: prisonerData,
         visitors: visitorsData,
         visit: {
-          id: 'v9-d7-ed-7u',
+          id: 'ab-cd-ef-gh',
           startTimestamp: '123',
           endTimestamp: '123',
         } as VisitSlot,
@@ -167,7 +167,7 @@ describe('sessionCheckMiddleware', () => {
         prisoner: prisonerData,
         visitors: visitorsData,
         visit: {
-          id: 'v9-d7-ed-7u',
+          id: 'ab-cd-ef-gh',
           startTimestamp: '123',
           endTimestamp: '123',
         } as VisitSlot,

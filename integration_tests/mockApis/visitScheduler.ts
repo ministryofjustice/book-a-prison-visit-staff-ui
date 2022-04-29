@@ -225,7 +225,7 @@ export default {
   },
   stubCreateVisit: (): SuperAgentRequest => {
     const results = {
-      reference: 'v9-d7-ed-7u',
+      reference: 'ab-cd-ef-gh',
       prisonerId: 'AF34567G',
       prisonId: 'HEI',
       visitRoom: 'A1 L3',
@@ -265,7 +265,7 @@ export default {
   },
   stubUpdateVisit: (): SuperAgentRequest => {
     const results = {
-      reference: 'v9-d7-ed-7u',
+      reference: 'ab-cd-ef-gh',
       prisonerId: 'AF34567G',
       prisonId: 'HEI',
       visitRoom: 'A1 L3',
