@@ -29,37 +29,37 @@
       <ul class="prisoner-profile-summary">
         <li>
           <strong>Prison number</strong>
-          {{ inmateDetail.offenderNo }}
+          <span data-test="prison-number">{{ inmateDetail.offenderNo }}</span>
         </li>
         <li>
           <strong>Date of birth</strong>
-          {{ displayDob }}
+          <span data-test="dob">{{ displayDob }}</span>
         </li>
         <li>
           <strong>Location</strong>
-          {{ inmateDetail.assignedLivingUnit.description + ", " + inmateDetail.assignedLivingUnit.agencyName if inmateDetail.assignedLivingUnit}}
+          <span data-test="location">{{ inmateDetail.assignedLivingUnit.description + ", " + inmateDetail.assignedLivingUnit.agencyName if inmateDetail.assignedLivingUnit}}</span>
         </li>
         <li>
           <strong>Category</strong>
-          {{ inmateDetail.category }}
+          <span data-test="category">{{ inmateDetail.category }}</span>
         </li>
         <li>
           <strong>Incentive level</strong>
-          {{ inmateDetail.privilegeSummary.iepLevel }}
+          <span data-test="iep-level">{{ inmateDetail.privilegeSummary.iepLevel }}</span>
         </li>
         <li>
           <strong>Conviction status</strong>
-          {{ convictedStatus }}
+          <span data-test="convicted-status">{{ convictedStatus }}</span>
         </li>
         <li>
           <strong>Alerts</strong>
-          <span>{{ inmateDetail.activeAlertCount }} active</span>
+          <span data-test="active-alert-count">{{ inmateDetail.activeAlertCount }} active</span>
         </li>
         {% if visitBalances %}
         <li>
           <strong>Visiting orders</strong>
-          <span>Remaining VOs: {{ visitBalances.remainingVo }}</span>
-          <span>Remaining PVOs: {{ visitBalances.remainingPvo }}</span>
+          <span data-test="remaining-vos">Remaining VOs: {{ visitBalances.remainingVo }}</span>
+          <span data-test="remaining-pvos">Remaining PVOs: {{ visitBalances.remainingPvo }}</span>
         </li>
         {% endif %}
       </ul>

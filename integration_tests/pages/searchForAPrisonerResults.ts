@@ -22,4 +22,6 @@ export default class SearchForAPrisonerResultsPage extends Page {
   pagingLinks = (): PageElement => cy.get('.moj-pagination__list')
 
   nextPageLink = (): PageElement => cy.get('.moj-pagination__item--next a').first()
+
+  firstResultLink = (): PageElement => cy.get('.bapv-result-row').first()
 }

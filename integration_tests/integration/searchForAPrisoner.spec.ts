@@ -1,9 +1,11 @@
 import IndexPage from '../pages/index'
 import Page from '../pages/page'
+import PrisonerProfilePage from '../pages/prisonerProfile'
 import SearchForAPrisonerPage from '../pages/searchForAPrisoner'
 import SearchForAPrisonerResultsPage from '../pages/searchForAPrisonerResults'
 import { Prisoner } from '../../server/data/prisonerOffenderSearchTypes'
 import { prisonerDatePretty } from '../../server/utils/utils'
+import { InmateDetail, VisitBalances } from '../../server/data/prisonApiTypes'
 
 context('Search for a prisoner', () => {
   beforeEach(() => {
@@ -44,7 +46,7 @@ context('Search for a prisoner', () => {
           cy.visit(href)
 
           const searchForAPrisonerPage = Page.verifyOnPage(SearchForAPrisonerPage)
-          searchForAPrisonerPage.searchInput().clear().type('AB1234C')
+          searchForAPrisonerPage.searchInput().clear().type('A1234BC')
           searchForAPrisonerPage.searchButton().click()
 
           const searchForAPrisonerResultsPage = Page.verifyOnPage(SearchForAPrisonerResultsPage)
@@ -62,7 +64,7 @@ context('Search for a prisoner', () => {
           {
             lastName: 'Last Name 1',
             firstName: 'First Name 1',
-            prisonerNumber: 'AB1234C',
+            prisonerNumber: 'A1234BC',
             dateOfBirth: '2000-01-01',
           },
           {
@@ -83,7 +85,7 @@ context('Search for a prisoner', () => {
           cy.visit(href)
 
           const searchForAPrisonerPage = Page.verifyOnPage(SearchForAPrisonerPage)
-          searchForAPrisonerPage.searchInput().clear().type('AB1234C')
+          searchForAPrisonerPage.searchInput().clear().type('A1234BC')
           searchForAPrisonerPage.searchButton().click()
 
           const searchForAPrisonerResultsPage = Page.verifyOnPage(SearchForAPrisonerResultsPage)
@@ -117,61 +119,61 @@ context('Search for a prisoner', () => {
           {
             lastName: 'Last Name 1',
             firstName: 'First Name 1',
-            prisonerNumber: 'AB1234C',
+            prisonerNumber: 'A1234BC',
             dateOfBirth: '2000-01-01',
           },
           {
             lastName: 'Last Name 2',
             firstName: 'First Name 2',
-            prisonerNumber: 'DE5678F',
+            prisonerNumber: 'D5678EF',
             dateOfBirth: '2000-01-02',
           },
           {
             lastName: 'Last Name 3',
             firstName: 'First Name 3',
-            prisonerNumber: 'DE1678F',
+            prisonerNumber: 'D1678EF',
             dateOfBirth: '2000-01-03',
           },
           {
             lastName: 'Last Name 4',
             firstName: 'First Name 4',
-            prisonerNumber: 'DE2678F',
+            prisonerNumber: 'D2678EF',
             dateOfBirth: '2000-01-04',
           },
           {
             lastName: 'Last Name 5',
             firstName: 'First Name 5',
-            prisonerNumber: 'DE3678F',
+            prisonerNumber: 'D3678EF',
             dateOfBirth: '2000-01-05',
           },
           {
             lastName: 'Last Name 6',
             firstName: 'First Name 6',
-            prisonerNumber: 'DE4678F',
+            prisonerNumber: 'D4678EF',
             dateOfBirth: '2000-01-06',
           },
           {
             lastName: 'Last Name 7',
             firstName: 'First Name 7',
-            prisonerNumber: 'DE6678F',
+            prisonerNumber: 'D6678EF',
             dateOfBirth: '2000-01-07',
           },
           {
             lastName: 'Last Name 8',
             firstName: 'First Name 8',
-            prisonerNumber: 'DE7678F',
+            prisonerNumber: 'D7678EF',
             dateOfBirth: '2000-01-08',
           },
           {
             lastName: 'Last Name 9',
             firstName: 'First Name 9',
-            prisonerNumber: 'DE8678F',
+            prisonerNumber: 'D8678EF',
             dateOfBirth: '2000-01-09',
           },
           {
             lastName: 'Last Name 10',
             firstName: 'First Name 10',
-            prisonerNumber: 'DE9678F',
+            prisonerNumber: 'D9678EF',
             dateOfBirth: '2000-01-10',
           },
         ],
@@ -183,7 +185,7 @@ context('Search for a prisoner', () => {
           {
             lastName: 'Last Name 11',
             firstName: 'First Name 11',
-            prisonerNumber: 'DE9678G',
+            prisonerNumber: 'D9678EG',
             dateOfBirth: '2000-01-11',
           },
         ],
@@ -198,7 +200,7 @@ context('Search for a prisoner', () => {
           cy.visit(href)
 
           const searchForAPrisonerPage = Page.verifyOnPage(SearchForAPrisonerPage)
-          searchForAPrisonerPage.searchInput().clear().type('AB1234C')
+          searchForAPrisonerPage.searchInput().clear().type('A1234BC')
           searchForAPrisonerPage.searchButton().click()
 
           const searchForAPrisonerResultsPage = Page.verifyOnPage(SearchForAPrisonerResultsPage)
@@ -234,6 +236,108 @@ context('Search for a prisoner', () => {
               cy.get('td')
                 .eq(2)
                 .contains(prisonerDatePretty({ dateToFormat: resultsPage2.content[0].dateOfBirth }))
+            })
+        })
+    })
+  })
+
+  context('view single prisoner', () => {
+    it('should show the prisoner profile page', () => {
+      const prisonerNumber = 'A1234BC'
+      const prisoner: Partial<Prisoner> = {
+        lastName: 'Last Name 1',
+        firstName: 'First Name 1',
+        prisonerNumber,
+        dateOfBirth: '2000-01-01',
+      }
+      const offender: Partial<InmateDetail> = {
+        lastName: 'Last Name 1',
+        firstName: 'First Name 1',
+        offenderNo: prisonerNumber,
+        dateOfBirth: '2000-01-01',
+        assignedLivingUnit: {
+          description: 'ALU Description',
+          agencyName: 'ALU Description',
+          agencyId: 'HEI',
+          locationId: 123,
+        },
+        category: 'SomeCategory',
+        privilegeSummary: {
+          iepLevel: 'Basic',
+          iepDate: '2022-01-01',
+          bookingId: 1234,
+          daysSinceReview: 3,
+        },
+        activeAlertCount: 2,
+        alerts: [
+          {
+            active: true,
+            alertCode: 'UPIU',
+            alertCodeDescription: 'Protective Isolation Unit',
+            alertId: 1234,
+            alertType: 'U',
+            alertTypeDescription: 'COVID unit management',
+            bookingId: 1234,
+            comment: 'Alert comment',
+            dateCreated: '2022-04-25T09:35:34.489Z',
+            expired: false,
+            offenderNo: prisonerNumber,
+          },
+        ],
+      }
+      const results: { totalPages: number; totalElements: number; content: Partial<Prisoner>[] } = {
+        totalPages: 1,
+        totalElements: 1,
+        content: [prisoner],
+      }
+      cy.task('stubGetPrisoners', results)
+      cy.signIn()
+      const indexPage = Page.verifyOnPage(IndexPage)
+      indexPage
+        .bookAVisitLink()
+        .invoke('attr', 'href')
+        .then(href => {
+          cy.visit(href)
+
+          const searchForAPrisonerPage = Page.verifyOnPage(SearchForAPrisonerPage)
+          searchForAPrisonerPage.searchInput().clear().type(prisonerNumber)
+          searchForAPrisonerPage.searchButton().click()
+
+          const searchForAPrisonerResultsPage = Page.verifyOnPage(SearchForAPrisonerResultsPage)
+          searchForAPrisonerResultsPage.resultRows().should('have.length', results.content.length)
+          searchForAPrisonerResultsPage
+            .firstResultLink()
+            .invoke('text')
+            .then(text => {
+              const visitBalances: VisitBalances = {
+                latestIepAdjustDate: '2022-04-25T09:35:34.489Z',
+                latestPrivIepAdjustDate: '2022-04-25T09:35:34.489Z',
+                remainingPvo: 1,
+                remainingVo: 2,
+              }
+              cy.task('stubGetBookings', prisonerNumber)
+              cy.task('stubGetOffender', offender)
+              cy.task('stubGetVisitBalances', { offenderNo: prisonerNumber, visitBalances })
+              cy.task('stubGetUpcomingVisits', prisonerNumber)
+              cy.task('stubGetPastVisits', prisonerNumber)
+              cy.task('stubGetPrisonerSocialContacts', prisonerNumber)
+              searchForAPrisonerResultsPage.firstResultLink().click()
+
+              const prisonerProfilePage = new PrisonerProfilePage(text)
+
+              prisonerProfilePage.prisonNumber().contains(prisonerNumber)
+              prisonerProfilePage.dateOfBirth().contains('1 January 2000')
+              prisonerProfilePage
+                .location()
+                .contains(`${offender.assignedLivingUnit.description}, ${offender.assignedLivingUnit.agencyName}`)
+              prisonerProfilePage.category().contains(offender.category)
+              prisonerProfilePage.incentiveLevel().contains(offender.privilegeSummary.iepLevel)
+              prisonerProfilePage.convictionStatus().contains('Convicted')
+              prisonerProfilePage.alertCount().contains(offender.activeAlertCount)
+              prisonerProfilePage.remainingVOs().contains(visitBalances.remainingVo)
+              prisonerProfilePage.remainingPVOs().contains(visitBalances.remainingPvo)
+              prisonerProfilePage.flaggedAlerts().eq(0).contains(offender.alerts[0].alertCode)
+              prisonerProfilePage.flaggedAlerts().eq(0).contains(offender.alerts[0].alertCodeDescription)
             })
         })
     })
