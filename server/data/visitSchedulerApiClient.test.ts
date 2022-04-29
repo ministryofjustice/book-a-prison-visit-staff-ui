@@ -7,6 +7,7 @@ import {
   SupportType,
   UpdateVisitRequestDto,
   Visit,
+  OutcomeDto,
   VisitSession,
 } from './visitSchedulerApiTypes'
 
@@ -492,6 +493,54 @@ describe('visitSchedulerApiClient', () => {
         .reply(200, result)
 
       const output = await client.updateVisit(visitSessionData, visitStatus)
+
+      expect(output).toEqual(result)
+    })
+  })
+
+  describe('cancelVisit', () => {
+    it('should cancel visit with the specified outcome', async () => {
+      const reference = 'ab-cd-ef-gh'
+
+      const outcome: OutcomeDto = {
+        outcome: 'VISITOR_CANCELLED',
+        text: 'cancellation reason',
+      }
+
+      const result: Visit = {
+        reference: 'ab-cd-ef-gh',
+        prisonerId: 'AF34567G',
+        prisonId: 'HEI',
+        visitRoom: 'A1 L3',
+        visitType: 'SOCIAL',
+        visitStatus: 'CANCELLED',
+        visitRestriction: 'OPEN',
+        startTimestamp: '2022-02-14T10:00:00',
+        endTimestamp: '2022-02-14T11:00:00',
+        visitNotes: [
+          {
+            type: 'VISIT_OUTCOMES',
+            text: 'VISITOR_CANCELLED',
+          },
+          {
+            type: 'STATUS_CHANGED_REASON',
+            text: 'cancellation reason',
+          },
+        ],
+        visitors: [
+          {
+            nomisPersonId: 1234,
+          },
+        ],
+        visitorSupport: [],
+        createdTimestamp: '2022-02-14T10:00:00',
+      }
+      fakeVisitSchedulerApi
+        .patch(`/visits/ab-cd-ef-gh/cancel`, outcome)
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, result)
+
+      const output = await client.cancelVisit(reference, outcome)
 
       expect(output).toEqual(result)
     })

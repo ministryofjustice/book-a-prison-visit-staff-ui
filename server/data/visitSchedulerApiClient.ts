@@ -6,6 +6,7 @@ import {
   UpdateVisitRequestDto,
   Visit,
   VisitSession,
+  OutcomeDto,
 } from './visitSchedulerApiTypes'
 import { VisitSessionData } from '../@types/bapv'
 import config from '../config'
@@ -120,6 +121,13 @@ class VisitSchedulerApiClient {
         }),
         visitorSupport: visitData.visitorSupport,
       },
+    })
+  }
+
+  cancelVisit(reference: string, outcome: OutcomeDto): Promise<Visit> {
+    return this.restclient.patch({
+      path: `/visits/${reference}/cancel`,
+      data: outcome,
     })
   }
 }
