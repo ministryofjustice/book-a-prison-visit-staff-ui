@@ -1,27 +1,46 @@
+import PrisonerContactRegistryApiClient from '../data/prisonerContactRegistryApiClient'
 import VisitSessionsService from './visitSessionsService'
 import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
 import WhereaboutsApiClient from '../data/whereaboutsApiClient'
 import { VisitSession, Visit, SupportType } from '../data/visitSchedulerApiTypes'
-import { VisitSlotList, VisitSessionData, VisitInformation } from '../@types/bapv'
+import { VisitSlotList, VisitSessionData, VisitInformation, VisitorListItem } from '../@types/bapv'
+import { Contact } from '../data/prisonerContactRegistryApiTypes'
 
+jest.mock('../data/prisonerContactRegistryApiClient')
 jest.mock('../data/visitSchedulerApiClient')
 jest.mock('../data/whereaboutsApiClient')
 
+const prisonerContactRegistryApiClient = new PrisonerContactRegistryApiClient(
+  null
+) as jest.Mocked<PrisonerContactRegistryApiClient>
 const visitSchedulerApiClient = new VisitSchedulerApiClient(null) as jest.Mocked<VisitSchedulerApiClient>
 const whereaboutsApiClient = new WhereaboutsApiClient(null) as jest.Mocked<WhereaboutsApiClient>
 
 describe('Visit sessions service', () => {
+  let prisonerContactRegistryApiClientBuilder
   let visitSchedulerApiClientBuilder
   let whereaboutsApiClientBuilder
   let visitSessionsService: VisitSessionsService
   let systemToken
 
+  const availableSupportTypes: SupportType[] = [
+    {
+      type: 'WHEELCHAIR',
+      description: 'Wheelchair ramp',
+    },
+    {
+      type: 'OTHER',
+      description: 'Other',
+    },
+  ]
+
   beforeEach(() => {
     systemToken = async (user: string): Promise<string> => `${user}-token-1`
+    prisonerContactRegistryApiClientBuilder = jest.fn().mockReturnValue(prisonerContactRegistryApiClient)
     visitSchedulerApiClientBuilder = jest.fn().mockReturnValue(visitSchedulerApiClient)
     whereaboutsApiClientBuilder = jest.fn().mockReturnValue(whereaboutsApiClient)
     visitSessionsService = new VisitSessionsService(
-      null,
+      prisonerContactRegistryApiClientBuilder,
       visitSchedulerApiClientBuilder,
       whereaboutsApiClientBuilder,
       systemToken
@@ -34,17 +53,6 @@ describe('Visit sessions service', () => {
 
   describe('getAdditionalSupportOptions', () => {
     it('should return an array of available support options', async () => {
-      const availableSupportTypes: SupportType[] = [
-        {
-          type: 'WHEELCHAIR',
-          description: 'Wheelchair ramp',
-        },
-        {
-          type: 'OTHER',
-          description: 'Other',
-        },
-      ]
-
       visitSchedulerApiClient.getAvailableSupportOptions.mockResolvedValue(availableSupportTypes)
 
       const results = await visitSessionsService.getAvailableSupportOptions('user')
@@ -575,7 +583,7 @@ describe('Visit sessions service', () => {
         ],
       }
       const visit: Visit = {
-        reference: 'v9-d7-ed-7u',
+        reference: 'ab-cd-ef-gh',
         prisonerId: visitSessionData.prisoner.offenderNo,
         prisonId: 'HEI',
         visitRoom: visitSessionData.visit.visitRoomName,
@@ -599,7 +607,7 @@ describe('Visit sessions service', () => {
       const result = await visitSessionsService.createVisit({ username: 'user', visitData: visitSessionData })
 
       expect(visitSchedulerApiClient.createVisit).toHaveBeenCalledTimes(1)
-      expect(result).toEqual('v9-d7-ed-7u')
+      expect(result).toEqual('ab-cd-ef-gh')
     })
   })
 
@@ -643,10 +651,10 @@ describe('Visit sessions service', () => {
           phoneNumber: '01234 567890',
           contactName: 'John Smith',
         },
-        visitReference: 'v9-d7-ed-7u',
+        visitReference: 'ab-cd-ef-gh',
       }
       const visit: Visit = {
-        reference: 'v9-d7-ed-7u',
+        reference: 'ab-cd-ef-gh',
         prisonerId: visitSessionData.prisoner.offenderNo,
         prisonId: 'HEI',
         visitRoom: visitSessionData.visit.visitRoomName,
@@ -675,7 +683,7 @@ describe('Visit sessions service', () => {
 
       expect(visitSchedulerApiClient.updateVisit).toHaveBeenCalledTimes(1)
       expect(result).toEqual(<Visit>{
-        reference: 'v9-d7-ed-7u',
+        reference: 'ab-cd-ef-gh',
         prisonerId: 'A1234BC',
         prisonId: 'HEI',
         visitRoom: 'visit room',
@@ -693,101 +701,195 @@ describe('Visit sessions service', () => {
     })
   })
 
-  describe('getVisit', () => {
-    it('should return VisitInformation given a visit reference', async () => {
-      const visit: Visit = {
-        reference: 'v9-d7-ed-7u',
-        prisonerId: 'A1234BC',
-        prisonId: 'HEI',
-        visitRoom: 'visit room',
-        visitType: 'SOCIAL',
-        visitStatus: 'BOOKED',
-        visitRestriction: 'OPEN',
-        startTimestamp: '2022-02-14T10:00:00',
-        endTimestamp: '2022-02-14T11:15:00',
-        visitNotes: [],
-        visitContact: {
-          name: 'John Smith',
-          telephone: '01234 567890',
-        },
-        visitors: [
-          {
-            nomisPersonId: 1234,
-          },
-        ],
-        visitorSupport: [],
-        createdTimestamp: '2022-02-14T10:00:00',
-      }
-
-      visitSchedulerApiClient.getVisit.mockResolvedValue(visit)
-      const result = await visitSessionsService.getVisit({ username: 'user', reference: 'v9-d7-ed-7u' })
-
-      expect(visitSchedulerApiClient.getVisit).toHaveBeenCalledTimes(1)
-      expect(result).toEqual(<VisitInformation>{
-        reference: 'v9-d7-ed-7u',
-        prisonNumber: 'A1234BC',
-        prisonerName: '',
-        mainContact: 'John Smith',
-        visitDate: '14 February 2022',
-        visitTime: '10am to 11:15am',
-      })
-    })
-  })
-
-  describe('getUpcomingVisits', () => {
-    it('should return an array of upcoming VisitInformation for an offender', async () => {
-      const visits: Visit[] = [
+  describe('Get visit data', () => {
+    const visit: Visit = {
+      reference: 'ab-cd-ef-gh',
+      prisonerId: 'A1234BC',
+      prisonId: 'HEI',
+      visitRoom: 'visit room',
+      visitType: 'SOCIAL',
+      visitStatus: 'BOOKED',
+      visitRestriction: 'OPEN',
+      startTimestamp: '2022-02-14T10:00:00',
+      endTimestamp: '2022-02-14T11:15:00',
+      visitNotes: [],
+      visitContact: {
+        name: 'John Smith',
+        telephone: '01234 567890',
+      },
+      visitors: [
         {
-          reference: 'v9-d7-ed-7u',
-          prisonerId: 'A1234BC',
-          prisonId: 'HEI',
-          visitRoom: 'visit room',
-          visitType: 'SOCIAL',
-          visitStatus: 'BOOKED',
-          visitRestriction: 'OPEN',
-          startTimestamp: '2022-02-14T10:00:00',
-          endTimestamp: '2022-02-14T11:15:00',
-          visitNotes: [],
-          visitContact: {
-            name: 'John Smith',
-            telephone: '01234 567890',
-          },
-          visitors: [
-            {
-              nomisPersonId: 1234,
-            },
-          ],
-          visitorSupport: [],
-          createdTimestamp: '2022-02-14T10:00:00',
+          nomisPersonId: 4321,
         },
-      ]
-
-      visitSchedulerApiClient.getUpcomingVisits.mockResolvedValue(visits)
-      const result = await visitSessionsService.getUpcomingVisits({ username: 'user', offenderNo: 'A1234BC' })
-
-      expect(visitSchedulerApiClient.getUpcomingVisits).toHaveBeenCalledTimes(1)
-      expect(visitSchedulerApiClient.getUpcomingVisits).toHaveBeenCalledWith('A1234BC')
-      expect(result).toEqual(<VisitInformation[]>[
         {
-          reference: 'v9-d7-ed-7u',
+          nomisPersonId: 4324,
+        },
+      ],
+      visitorSupport: [
+        {
+          type: 'WHEELCHAIR',
+        },
+        {
+          type: 'OTHER',
+          text: 'custom request',
+        },
+      ],
+      createdTimestamp: '2022-02-14T10:00:00',
+    }
+
+    describe('getVisit', () => {
+      it('should return VisitInformation given a visit reference', async () => {
+        visitSchedulerApiClient.getVisit.mockResolvedValue(visit)
+        const result = await visitSessionsService.getVisit({ username: 'user', reference: 'ab-cd-ef-gh' })
+
+        expect(visitSchedulerApiClient.getVisit).toHaveBeenCalledTimes(1)
+        expect(result).toEqual(<VisitInformation>{
+          reference: 'ab-cd-ef-gh',
           prisonNumber: 'A1234BC',
           prisonerName: '',
           mainContact: 'John Smith',
           visitDate: '14 February 2022',
           visitTime: '10am to 11:15am',
-        },
-      ])
+        })
+      })
     })
 
-    it('should return an empty array for an offender with no upcoming visits', async () => {
-      const visits: Visit[] = []
+    describe('getUpcomingVisits', () => {
+      it('should return an array of upcoming VisitInformation for an offender', async () => {
+        const visits: Visit[] = [visit]
 
-      visitSchedulerApiClient.getUpcomingVisits.mockResolvedValue(visits)
-      const result = await visitSessionsService.getUpcomingVisits({ username: 'user', offenderNo: 'A1234BC' })
+        visitSchedulerApiClient.getUpcomingVisits.mockResolvedValue(visits)
+        const result = await visitSessionsService.getUpcomingVisits({ username: 'user', offenderNo: 'A1234BC' })
 
-      expect(visitSchedulerApiClient.getUpcomingVisits).toHaveBeenCalledTimes(1)
-      expect(visitSchedulerApiClient.getUpcomingVisits).toHaveBeenCalledWith('A1234BC')
-      expect(result).toEqual([])
+        expect(visitSchedulerApiClient.getUpcomingVisits).toHaveBeenCalledTimes(1)
+        expect(visitSchedulerApiClient.getUpcomingVisits).toHaveBeenCalledWith('A1234BC')
+        expect(result).toEqual(<VisitInformation[]>[
+          {
+            reference: 'ab-cd-ef-gh',
+            prisonNumber: 'A1234BC',
+            prisonerName: '',
+            mainContact: 'John Smith',
+            visitDate: '14 February 2022',
+            visitTime: '10am to 11:15am',
+          },
+        ])
+      })
+
+      it('should return an empty array for an offender with no upcoming visits', async () => {
+        const visits: Visit[] = []
+
+        visitSchedulerApiClient.getUpcomingVisits.mockResolvedValue(visits)
+        const result = await visitSessionsService.getUpcomingVisits({ username: 'user', offenderNo: 'A1234BC' })
+
+        expect(visitSchedulerApiClient.getUpcomingVisits).toHaveBeenCalledTimes(1)
+        expect(visitSchedulerApiClient.getUpcomingVisits).toHaveBeenCalledWith('A1234BC')
+        expect(result).toEqual([])
+      })
+    })
+
+    describe('getFullVisitDetails', () => {
+      it('should return full details of visit, visitors and additional support options', async () => {
+        const childDateOfBirth = `${new Date().getFullYear() - 4}-03-02`
+        const contacts: Contact[] = [
+          {
+            personId: 4321,
+            firstName: 'Jeanette',
+            lastName: 'Smith',
+            dateOfBirth: '1986-07-28',
+            relationshipCode: 'SIS',
+            relationshipDescription: 'Sister',
+            contactType: 'S',
+            approvedVisitor: true,
+            emergencyContact: false,
+            nextOfKin: false,
+            restrictions: [
+              {
+                restrictionType: 'CLOSED',
+                restrictionTypeDescription: 'Closed',
+                startDate: '2022-01-03',
+                globalRestriction: false,
+              },
+            ],
+            addresses: [
+              {
+                street: '123 The Street',
+                town: 'Coventry',
+                primary: true,
+                noFixedAddress: false,
+                phones: [],
+                addressUsages: [],
+              },
+            ],
+          },
+          {
+            personId: 4322,
+            firstName: 'Bob',
+            lastName: 'Smith',
+            relationshipCode: 'BRO',
+            relationshipDescription: 'Brother',
+            contactType: 'S',
+            approvedVisitor: true,
+            emergencyContact: false,
+            nextOfKin: false,
+            restrictions: [],
+            addresses: [],
+          },
+          {
+            personId: 4324,
+            firstName: 'Anne',
+            lastName: 'Smith',
+            relationshipCode: 'NIE',
+            dateOfBirth: childDateOfBirth,
+            relationshipDescription: 'Niece',
+            contactType: 'S',
+            approvedVisitor: true,
+            emergencyContact: false,
+            nextOfKin: false,
+            restrictions: [],
+            addresses: [],
+          },
+        ]
+
+        const expectedResult: { visit: Visit; visitors: VisitorListItem[]; additionalSupport: string[] } = {
+          visit,
+          visitors: [
+            {
+              personId: 4321,
+              name: 'Jeanette Smith',
+              dateOfBirth: '1986-07-28',
+              adult: true,
+              relationshipDescription: 'Sister',
+              address: '123 The Street,<br>Coventry',
+              restrictions: contacts[0].restrictions,
+              selected: false,
+              banned: false,
+            },
+            {
+              personId: 4324,
+              name: 'Anne Smith',
+              dateOfBirth: childDateOfBirth,
+              adult: false,
+              relationshipDescription: 'Niece',
+              address: 'Not entered',
+              restrictions: [],
+              selected: false,
+              banned: false,
+            },
+          ],
+          additionalSupport: ['Wheelchair ramp', 'custom request'],
+        }
+
+        prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue(contacts)
+        visitSchedulerApiClient.getAvailableSupportOptions.mockResolvedValue(availableSupportTypes)
+        visitSchedulerApiClient.getVisit.mockResolvedValue(visit)
+
+        const result = await visitSessionsService.getFullVisitDetails({ username: 'user', reference: 'ab-cd-ef-gh' })
+
+        expect(prisonerContactRegistryApiClient.getPrisonerSocialContacts).toHaveBeenCalledTimes(1)
+        expect(visitSchedulerApiClient.getAvailableSupportOptions).toHaveBeenCalledTimes(1)
+        expect(visitSchedulerApiClient.getVisit).toHaveBeenCalledTimes(1)
+        expect(result).toEqual(expectedResult)
+      })
     })
   })
 })

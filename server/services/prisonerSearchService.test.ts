@@ -1,5 +1,6 @@
 import PrisonerSearchService from './prisonerSearchService'
 import PrisonerSearchClient from '../data/prisonerSearchClient'
+import { Prisoner } from '../data/prisonerOffenderSearchTypes'
 
 jest.mock('../data/prisonerSearchClient')
 
@@ -11,13 +12,13 @@ describe('Prisoner search service', () => {
   let prisonerSearchService: PrisonerSearchService
   let systemToken
 
-  describe('getPrisoners', () => {
-    beforeEach(() => {
-      systemToken = async (user: string): Promise<string> => `${user}-token-1`
-      prisonerSearchClientBuilder = jest.fn().mockReturnValue(prisonerSearchClient)
-      prisonerSearchService = new PrisonerSearchService(prisonerSearchClientBuilder, systemToken)
-    })
+  beforeEach(() => {
+    systemToken = async (user: string): Promise<string> => `${user}-token-1`
+    prisonerSearchClientBuilder = jest.fn().mockReturnValue(prisonerSearchClient)
+    prisonerSearchService = new PrisonerSearchService(prisonerSearchClientBuilder, systemToken)
+  })
 
+  describe('getPrisoners', () => {
     afterEach(() => {
       jest.resetAllMocks()
     })
@@ -117,6 +118,34 @@ describe('Prisoner search service', () => {
 
         await expect(prisonerSearchService.getPrisoners(search, 'user', 0)).rejects.toEqual(new Error('some error'))
       })
+    })
+  })
+
+  describe('getPrisoner', () => {
+    it('should return null if no matching prisoner', async () => {
+      prisonerSearchClient.getPrisoner.mockResolvedValue({ content: [] })
+      const result = await prisonerSearchService.getPrisoner('test', 'user')
+      expect(result).toBe(null)
+    })
+
+    it('should matching prisoner', async () => {
+      const prisoner: { content: Prisoner[] } = {
+        content: [
+          {
+            firstName: 'john',
+            lastName: 'smith',
+            prisonerNumber: 'A1234BC',
+            dateOfBirth: '1975-04-02',
+            bookingId: '12345',
+            restrictedPatient: false,
+          },
+        ],
+      }
+
+      prisonerSearchClient.getPrisoner.mockResolvedValue(prisoner)
+      const result = await prisonerSearchService.getPrisoner('A1234BC', 'user')
+
+      expect(result).toBe(prisoner.content[0])
     })
   })
 })

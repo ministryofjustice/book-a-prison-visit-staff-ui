@@ -19,7 +19,7 @@
       <ul class="bapv-item-list--horizontal">
         <li>
           <strong>Name</strong>
-          <span data-test="prisoner-name">{{ (prisoner.firstName + ' ' + prisoner.lastName) | formatMainContact }}</span>
+          <span data-test="prisoner-name">{{ (prisoner.firstName + ' ' + prisoner.lastName) | formatLastNameFirst }}</span>
         </li>
         <li>
           <strong>Prison number</strong>
@@ -51,7 +51,7 @@
         </li>
         <li>
           <strong>Main contact</strong>
-          <span data-test="visit-contact">{{ visit.visitContact.name | formatMainContact }}</span>
+          <span data-test="visit-contact">{{ visit.visitContact.name | formatLastNameFirst }}</span>
         </li>
         <li>
           <strong>Phone number</strong>
@@ -70,7 +70,7 @@
       {% for visitor in visitors %}
         {% set visitorRows = (visitorRows.push([
           {
-            text: visitor.name | formatMainContact,
+            text: visitor.name | formatLastNameFirst,
             attributes: { "data-test": "visitor-name-" + loop.index }
           },
           {
