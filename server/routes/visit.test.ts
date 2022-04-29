@@ -102,7 +102,6 @@ describe('GET /visit/:reference', () => {
             globalRestriction: false,
           },
         ],
-        selected: false,
         banned: false,
       },
       {
@@ -113,7 +112,6 @@ describe('GET /visit/:reference', () => {
         relationshipDescription: 'Niece',
         address: 'Not entered',
         restrictions: [],
-        selected: false,
         banned: false,
       },
     ]

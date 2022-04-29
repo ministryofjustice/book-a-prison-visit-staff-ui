@@ -199,7 +199,6 @@ describe('Prisoner visitor service', () => {
               globalRestriction: false,
             },
           ],
-          selected: false,
           banned: true,
         },
         {
@@ -210,7 +209,6 @@ describe('Prisoner visitor service', () => {
           relationshipDescription: 'Brother',
           address: '1st listed address',
           restrictions: [],
-          selected: false,
           banned: false,
         },
         {
@@ -221,7 +219,6 @@ describe('Prisoner visitor service', () => {
           relationshipDescription: 'Niece',
           address: 'Not entered',
           restrictions: [],
-          selected: false,
           banned: false,
         },
       ] as VisitorListItem[])

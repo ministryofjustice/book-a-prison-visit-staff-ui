@@ -106,7 +106,6 @@ export type VisitorListItem = {
   relationshipDescription: string
   address?: string
   restrictions: Restriction[]
-  selected?: boolean
   banned: boolean
 }
 

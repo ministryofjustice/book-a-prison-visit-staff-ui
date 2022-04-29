@@ -276,7 +276,6 @@ describe('GET /book-a-visit/select-visitors', () => {
         personId: 4322,
         relationshipDescription: 'Brother',
         restrictions: [],
-        selected: true,
         banned: false,
       },
     ]
@@ -307,7 +306,6 @@ describe('GET /book-a-visit/select-visitors', () => {
         personId: 4322,
         relationshipDescription: 'Brother',
         restrictions: [],
-        selected: true,
         banned: false,
       },
       {
@@ -318,7 +316,6 @@ describe('GET /book-a-visit/select-visitors', () => {
         personId: 4324,
         relationshipDescription: 'Niece',
         restrictions: [],
-        selected: true,
         banned: false,
       },
     ]
@@ -471,7 +468,7 @@ describe('POST /book-a-visit/select-visitors', () => {
   })
 
   it('should save to session and redirect to the select date and time page if an adult is selected', () => {
-    const returnAdult = [
+    const returnAdult: VisitorListItem[] = [
       {
         address: '1st listed address',
         adult: true,
@@ -480,10 +477,9 @@ describe('POST /book-a-visit/select-visitors', () => {
         personId: 4322,
         relationshipDescription: 'Brother',
         restrictions: [],
-        selected: true,
         banned: false,
       },
-    ] as VisitorListItem[]
+    ]
 
     return request(sessionApp)
       .post('/book-a-visit/select-visitors')
@@ -497,7 +493,7 @@ describe('POST /book-a-visit/select-visitors', () => {
   })
 
   it('should save to session and redirect to the select date and time page if an adult and a child are selected', () => {
-    const returnAdult = {
+    const returnAdult: VisitorListItem = {
       address: '1st listed address',
       adult: true,
       dateOfBirth: '1986-07-28',
@@ -505,11 +501,10 @@ describe('POST /book-a-visit/select-visitors', () => {
       personId: 4322,
       relationshipDescription: 'Brother',
       restrictions: [],
-      selected: true,
       banned: false,
-    } as VisitorListItem
+    }
 
-    const returnChild = {
+    const returnChild: VisitorListItem = {
       address: 'Not entered',
       adult: false,
       dateOfBirth: '2018-03-02',
@@ -517,9 +512,8 @@ describe('POST /book-a-visit/select-visitors', () => {
       personId: 4324,
       relationshipDescription: 'Niece',
       restrictions: [],
-      selected: true,
       banned: false,
-    } as VisitorListItem
+    }
 
     return request(sessionApp)
       .post('/book-a-visit/select-visitors')
@@ -542,7 +536,6 @@ describe('POST /book-a-visit/select-visitors', () => {
         personId: 4322,
         relationshipDescription: 'Brother',
         restrictions: [],
-        selected: true,
         banned: false,
       },
     ]
@@ -556,12 +549,11 @@ describe('POST /book-a-visit/select-visitors', () => {
         personId: 4322,
         relationshipDescription: 'Brother',
         restrictions: [],
-        selected: true,
         banned: false,
       },
     ]
 
-    const returnAdult = {
+    const returnAdult: VisitorListItem = {
       personId: 4323,
       name: 'Ted Smith',
       dateOfBirth: '1968-07-28',
@@ -569,9 +561,8 @@ describe('POST /book-a-visit/select-visitors', () => {
       relationshipDescription: 'Father',
       address: '1st listed address',
       restrictions: [],
-      selected: true,
       banned: false,
-    } as VisitorListItem
+    }
 
     return request(sessionApp)
       .post('/book-a-visit/select-visitors')
@@ -775,7 +766,6 @@ describe('/book-a-visit/select-date-and-time', () => {
           relationshipDescription: 'Father',
           address: '1st listed address',
           restrictions: [],
-          selected: true,
           banned: false,
         },
       ],
