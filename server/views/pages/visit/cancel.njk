@@ -1,0 +1,76 @@
+{% extends "layout.njk" %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% set pageHeaderTitle = "Why is this booking being cancelled?" %}
+{% set pageTitle %}
+{% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
+{% endset %}
+{% set backLinkHref = "/visit/" + reference %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+
+      {% include "partials/errorSummary.njk" %}
+
+      <form action="/visit/{{ reference }}/cancel" method="POST" novalidate>
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+        {% set reasonsRadioItems = [] %}
+        {% for key, text in visitCancellationReasons %}
+        {% set reasonFieldName = "reason_" + (key | lower) %}
+        {% set reasonHtml %}
+          {{ govukInput({
+            id: reasonFieldName,
+            name: reasonFieldName,
+            type: "text",
+            classes: "govuk-!-width-one-third",
+            label: {
+              text: "Reason"
+            },
+            value: formValues[reasonFieldName],
+            errorMessage: errors | findError(reasonFieldName)
+          }) -}}
+        {% endset -%}
+
+        {% set reasonsRadioItems = (reasonsRadioItems.push(
+          {
+            value: key,
+            text: text,
+            checked: formValues.cancel == key,
+            conditional: {
+              html: reasonHtml
+            },
+            attributes: {
+              "data-test": key | lower
+            }
+          }
+        ), reasonsRadioItems) %}
+        {% endfor %}
+
+        {{ govukRadios({
+          idPrefix: "cancel",
+          name: "cancel",
+          fieldset: {
+            legend: {
+              text: pageHeaderTitle,
+              isPageHeading: true,
+              classes: "govuk-fieldset__legend--l"
+            }
+          },
+          items: reasonsRadioItems,
+          errorMessage: errors | findError('cancel')
+        }) }}
+        
+        {{ govukButton({
+          text: "Cancel booking",
+          attributes: {
+            "data-test": "cancel-booking"
+          }
+        }) }} 
+      </form>
+    </div>
+  </div>
+{% endblock %}
