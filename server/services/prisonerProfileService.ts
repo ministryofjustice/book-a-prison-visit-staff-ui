@@ -138,40 +138,38 @@ export default class PrisonerProfileService {
     const contacts = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(offenderNo)
     const socialVisits: Visit[] = visits.filter(visit => visit.visitType === 'SOCIAL')
 
-    const visitsForDisplay: UpcomingVisitItem[] = await Promise.all(
-      socialVisits.map(async visit => {
-        const visitContactNames = this.getPrisonerSocialContacts(contacts, visit.visitors)
+    const visitsForDisplay: UpcomingVisitItem[] = socialVisits.map(visit => {
+      const visitContactNames = this.getPrisonerSocialContacts(contacts, visit.visitors)
 
-        return [
-          {
-            html: formatVisitType({ visitType: visit.visitType, visitRestriction: visit.visitRestriction }),
-            attributes: {
-              'data-test': 'tab-upcoming-type',
-            },
+      return [
+        {
+          html: formatVisitType({ visitType: visit.visitType, visitRestriction: visit.visitRestriction }),
+          attributes: {
+            'data-test': 'tab-upcoming-type',
           },
-          {
-            text: 'Hewell (HMP)',
-            attributes: {
-              'data-test': 'tab-upcoming-location',
-            },
+        },
+        {
+          text: 'Hewell (HMP)',
+          attributes: {
+            'data-test': 'tab-upcoming-location',
           },
-          {
-            html: visit.startTimestamp
-              ? `<p>${visitDateAndTime({ startTimestamp: visit.startTimestamp, endTimestamp: visit.endTimestamp })}</p>`
-              : '<p>N/A</p>',
-            attributes: {
-              'data-test': 'tab-upcoming-date-and-time',
-            },
+        },
+        {
+          html: visit.startTimestamp
+            ? `<p>${visitDateAndTime({ startTimestamp: visit.startTimestamp, endTimestamp: visit.endTimestamp })}</p>`
+            : '<p>N/A</p>',
+          attributes: {
+            'data-test': 'tab-upcoming-date-and-time',
           },
-          {
-            html: `<p>${visitContactNames.join('<br>')}</p>`,
-            attributes: {
-              'data-test': 'tab-upcoming-visitors',
-            },
+        },
+        {
+          html: `<p>${visitContactNames.join('<br>')}</p>`,
+          attributes: {
+            'data-test': 'tab-upcoming-visitors',
           },
-        ] as UpcomingVisitItem
-      })
-    )
+        },
+      ] as UpcomingVisitItem
+    })
 
     return visitsForDisplay
   }
@@ -185,46 +183,44 @@ export default class PrisonerProfileService {
     const contacts = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(offenderNo)
     const socialVisits: Visit[] = visits.filter(visit => visit.visitType === 'SOCIAL')
 
-    const visitsForDisplay: PastVisitItem[] = await Promise.all(
-      socialVisits.map(async visit => {
-        const visitContactNames = this.getPrisonerSocialContacts(contacts, visit.visitors)
+    const visitsForDisplay: PastVisitItem[] = socialVisits.map(visit => {
+      const visitContactNames = this.getPrisonerSocialContacts(contacts, visit.visitors)
 
-        return [
-          {
-            html: formatVisitType({ visitType: visit.visitType, visitRestriction: visit.visitRestriction }),
-            attributes: {
-              'data-test': 'tab-past-type',
-            },
+      return [
+        {
+          html: formatVisitType({ visitType: visit.visitType, visitRestriction: visit.visitRestriction }),
+          attributes: {
+            'data-test': 'tab-past-type',
           },
-          {
-            text: 'Hewell (HMP)',
-            attributes: {
-              'data-test': 'tab-past-location',
-            },
+        },
+        {
+          text: 'Hewell (HMP)',
+          attributes: {
+            'data-test': 'tab-past-location',
           },
-          {
-            html: visit.startTimestamp
-              ? `<p>${visitDateAndTime({ startTimestamp: visit.startTimestamp, endTimestamp: visit.endTimestamp })}</p>`
-              : '<p>N/A</p>',
-            attributes: {
-              'data-test': 'tab-past-date-and-time',
-            },
+        },
+        {
+          html: visit.startTimestamp
+            ? `<p>${visitDateAndTime({ startTimestamp: visit.startTimestamp, endTimestamp: visit.endTimestamp })}</p>`
+            : '<p>N/A</p>',
+          attributes: {
+            'data-test': 'tab-past-date-and-time',
           },
-          {
-            html: `<p>${visitContactNames.join('<br>')}</p>`,
-            attributes: {
-              'data-test': 'tab-past-visitors',
-            },
+        },
+        {
+          html: `<p>${visitContactNames.join('<br>')}</p>`,
+          attributes: {
+            'data-test': 'tab-past-visitors',
           },
-          {
-            text: `${properCase(visit.visitStatus)}`,
-            attributes: {
-              'data-test': 'tab-past-status',
-            },
+        },
+        {
+          text: `${properCase(visit.visitStatus)}`,
+          attributes: {
+            'data-test': 'tab-past-status',
           },
-        ] as PastVisitItem
-      })
-    )
+        },
+      ] as PastVisitItem
+    })
 
     return visitsForDisplay
   }
