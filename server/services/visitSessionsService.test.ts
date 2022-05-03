@@ -861,7 +861,6 @@ describe('Visit sessions service', () => {
               relationshipDescription: 'Sister',
               address: '123 The Street,<br>Coventry',
               restrictions: contacts[0].restrictions,
-              selected: false,
               banned: false,
             },
             {
@@ -872,7 +871,6 @@ describe('Visit sessions service', () => {
               relationshipDescription: 'Niece',
               address: 'Not entered',
               restrictions: [],
-              selected: false,
               banned: false,
             },
           ],

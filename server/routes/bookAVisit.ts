@@ -46,13 +46,6 @@ export default function routes(
     body('visitors').custom((value: string, { req }) => {
       const selected = [].concat(value)
 
-      req.session.visitorList.visitors = req.session.visitorList.visitors.map((visitor: VisitorListItem) => {
-        const newVisitor = visitor
-        newVisitor.selected = selected.includes(visitor.personId.toString())
-
-        return newVisitor
-      })
-
       if (value === undefined) {
         throw new Error('No visitors selected')
       }

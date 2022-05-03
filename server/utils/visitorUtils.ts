@@ -13,7 +13,6 @@ const buildVisitorListItem = (visitor: Contact): VisitorListItem => {
     relationshipDescription: visitor.relationshipDescription,
     address: getAddressToDisplay(visitor.addresses),
     restrictions: getRestrictionsToDisplay(visitor.restrictions),
-    selected: false,
     banned: isBanned(visitor.restrictions),
   }
 }
