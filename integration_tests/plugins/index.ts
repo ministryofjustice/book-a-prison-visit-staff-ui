@@ -8,6 +8,8 @@ import prisonApi from '../mockApis/prison'
 import offenderSearch from '../mockApis/offenderSearch'
 import visitScheduler from '../mockApis/visitScheduler'
 import { Prisoner } from '../../server/data/prisonerOffenderSearchTypes'
+import { InmateDetail, VisitBalances } from '../../server/data/prisonApiTypes'
+import { Visit } from '../../server/data/visitSchedulerApiTypes'
 
 export default (on: (string, Record) => void): void => {
   on('task', {
@@ -21,7 +23,8 @@ export default (on: (string, Record) => void): void => {
 
     stubTokenVerificationPing: tokenVerification.stubPing,
 
-    stubGetPrisonerContacts: prisonerContactRegistry.stubGetPrisonerContacts,
+    stubGetPrisonerSocialContacts: (offenderNo: string) =>
+      prisonerContactRegistry.getPrisonerSocialContacts(offenderNo),
 
     stubGetOffenderEvents: ({
       offenderNo,
@@ -38,10 +41,11 @@ export default (on: (string, Record) => void): void => {
         toDate,
       }),
 
-    stubGetBookings: (offenderNo: string) => prisonApi.stubGetBookings(offenderNo),
-    stubGetPrisonerDetail: (offenderNo: string) => prisonApi.stubGetPrisonerDetail(offenderNo),
-    stubGetPrisonerRestrictions: (offenderNo: string) => prisonApi.stubGetPrisonerRestrictions(offenderNo),
-    stubGetVisitBalances: (offenderNo: string) => prisonApi.stubGetVisitBalances(offenderNo),
+    stubGetBookings: (offenderNo: string) => prisonApi.getBookings(offenderNo),
+    stubGetOffender: (prisoner: Partial<InmateDetail>) => prisonApi.getOffender(prisoner),
+    stubGetOffenderRestrictions: (offenderNo: string) => prisonApi.getOffenderRestrictions(offenderNo),
+    stubGetVisitBalances: ({ offenderNo, visitBalances }: { offenderNo: string; visitBalances: VisitBalances }) =>
+      prisonApi.getVisitBalances({ offenderNo, visitBalances }),
 
     stubGetPrisoners: (results: { totalPages: number; totalElements: number; content: Partial<Prisoner>[] }) =>
       offenderSearch.getPrisoners(results),
@@ -50,16 +54,10 @@ export default (on: (string, Record) => void): void => {
 
     stubGetAvailableSupportOptions: visitScheduler.stubGetAvailableSupportOptions,
     stubGetVisit: (reference: string) => visitScheduler.stubGetVisit(reference),
-    stubGetUpcomingVisits: ({ offenderNo, startTimestamp }: { offenderNo: string; startTimestamp: string }) =>
-      visitScheduler.stubGetUpcomingVisits({
-        offenderNo,
-        startTimestamp,
-      }),
-    stubGetPastVisits: ({ offenderNo, endTimestamp }: { offenderNo: string; endTimestamp: string }) =>
-      visitScheduler.stubGetPastVisits({
-        offenderNo,
-        endTimestamp,
-      }),
+    stubGetUpcomingVisits: ({ offenderNo, upcomingVisits }: { offenderNo: string; upcomingVisits: Visit[] }) =>
+      visitScheduler.getUpcomingVisits({ offenderNo, upcomingVisits }),
+    stubGetPastVisits: ({ offenderNo, pastVisits }: { offenderNo: string; pastVisits: Visit[] }) =>
+      visitScheduler.getPastVisits({ offenderNo, pastVisits }),
     stubGetVisitSessions: visitScheduler.stubGetVisitSessions,
     stubCreateVisit: visitScheduler.stubCreateVisit,
     stubUpdateVisit: visitScheduler.stubUpdateVisit,

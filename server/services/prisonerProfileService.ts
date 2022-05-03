@@ -17,9 +17,10 @@ import {
   visitDateAndTime,
   nextIepAdjustDate,
   nextPrivIepAdjustDate,
+  formatVisitType,
 } from '../utils/utils'
 import { Alert, OffenderRestriction } from '../data/prisonApiTypes'
-import { Visit } from '../data/visitSchedulerApiTypes'
+import { Visit, Visitor } from '../data/visitSchedulerApiTypes'
 import { Contact } from '../data/prisonerContactRegistryApiTypes'
 
 type PrisonApiClientBuilder = (token: string) => PrisonApiClient
@@ -66,18 +67,39 @@ export default class PrisonerProfileService {
 
     const activeAlertsForDisplay: PrisonerAlertItem[] = activeAlerts.map(alert => {
       return [
-        { text: `${alert.alertTypeDescription} (${alert.alertType})` },
-        { text: `${alert.alertCodeDescription} (${alert.alertCode})` },
-        { text: alert.comment },
+        {
+          text: `${alert.alertTypeDescription} (${alert.alertType})`,
+          attributes: {
+            'data-test': 'tab-alerts-type-desc',
+          },
+        },
+        {
+          text: `${alert.alertCodeDescription} (${alert.alertCode})`,
+          attributes: {
+            'data-test': 'tab-alerts-code-desc',
+          },
+        },
+        {
+          text: alert.comment,
+          attributes: {
+            'data-test': 'tab-alerts-comment',
+          },
+        },
         {
           html: alert.dateCreated
             ? prisonerDatePretty({ dateToFormat: alert.dateCreated, wrapDate: false })
             : 'Not entered',
+          attributes: {
+            'data-test': 'tab-alerts-created',
+          },
         },
         {
           html: alert.dateExpires
             ? prisonerDatePretty({ dateToFormat: alert.dateExpires, wrapDate: false })
             : 'Not entered',
+          attributes: {
+            'data-test': 'tab-alerts-expires',
+          },
         },
       ]
     })
@@ -116,27 +138,38 @@ export default class PrisonerProfileService {
     const contacts = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(offenderNo)
     const socialVisits: Visit[] = visits.filter(visit => visit.visitType === 'SOCIAL')
 
-    const visitsForDisplay: UpcomingVisitItem[] = await Promise.all(
-      socialVisits.map(async visit => {
-        const visitors: number[] = visit.visitors.reduce((personIds, visitor) => {
-          personIds.push(visitor.nomisPersonId)
+    const visitsForDisplay: UpcomingVisitItem[] = socialVisits.map(visit => {
+      const visitContactNames = this.getPrisonerSocialContacts(contacts, visit.visitors)
 
-          return personIds
-        }, [])
-        const visitContactNames = await this.getPrisonerSocialContacts(contacts, visitors)
-
-        return [
-          { html: `${properCase(visit.visitType)}<br>(${properCase(visit.visitRestriction)})` },
-          { text: 'Hewell (HMP)' },
-          {
-            html: visit.startTimestamp
-              ? `<p>${visitDateAndTime({ startTimestamp: visit.startTimestamp, endTimestamp: visit.endTimestamp })}</p>`
-              : '<p>N/A</p>',
+      return [
+        {
+          html: formatVisitType({ visitType: visit.visitType, visitRestriction: visit.visitRestriction }),
+          attributes: {
+            'data-test': 'tab-upcoming-type',
           },
-          { html: `<p>${visitContactNames.join('<br>')}</p>` },
-        ] as UpcomingVisitItem
-      })
-    )
+        },
+        {
+          text: 'Hewell (HMP)',
+          attributes: {
+            'data-test': 'tab-upcoming-location',
+          },
+        },
+        {
+          html: visit.startTimestamp
+            ? `<p>${visitDateAndTime({ startTimestamp: visit.startTimestamp, endTimestamp: visit.endTimestamp })}</p>`
+            : '<p>N/A</p>',
+          attributes: {
+            'data-test': 'tab-upcoming-date-and-time',
+          },
+        },
+        {
+          html: `<p>${visitContactNames.join('<br>')}</p>`,
+          attributes: {
+            'data-test': 'tab-upcoming-visitors',
+          },
+        },
+      ] as UpcomingVisitItem
+    })
 
     return visitsForDisplay
   }
@@ -150,33 +183,55 @@ export default class PrisonerProfileService {
     const contacts = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(offenderNo)
     const socialVisits: Visit[] = visits.filter(visit => visit.visitType === 'SOCIAL')
 
-    const visitsForDisplay: PastVisitItem[] = await Promise.all(
-      socialVisits.map(async visit => {
-        const visitors: number[] = visit.visitors.reduce((personIds, visitor) => {
-          personIds.push(visitor.nomisPersonId)
+    const visitsForDisplay: PastVisitItem[] = socialVisits.map(visit => {
+      const visitContactNames = this.getPrisonerSocialContacts(contacts, visit.visitors)
 
-          return personIds
-        }, [])
-        const visitContactNames = await this.getPrisonerSocialContacts(contacts, visitors)
-
-        return [
-          { html: `${properCase(visit.visitType)}<br>(${properCase(visit.visitRestriction)})` },
-          { text: 'Hewell (HMP)' },
-          {
-            html: visit.startTimestamp
-              ? `<p>${visitDateAndTime({ startTimestamp: visit.startTimestamp, endTimestamp: visit.endTimestamp })}</p>`
-              : '<p>N/A</p>',
+      return [
+        {
+          html: formatVisitType({ visitType: visit.visitType, visitRestriction: visit.visitRestriction }),
+          attributes: {
+            'data-test': 'tab-past-type',
           },
-          { html: `<p>${visitContactNames.join('<br>')}</p>` },
-          { text: `${properCase(visit.visitStatus)}` },
-        ] as PastVisitItem
-      })
-    )
+        },
+        {
+          text: 'Hewell (HMP)',
+          attributes: {
+            'data-test': 'tab-past-location',
+          },
+        },
+        {
+          html: visit.startTimestamp
+            ? `<p>${visitDateAndTime({ startTimestamp: visit.startTimestamp, endTimestamp: visit.endTimestamp })}</p>`
+            : '<p>N/A</p>',
+          attributes: {
+            'data-test': 'tab-past-date-and-time',
+          },
+        },
+        {
+          html: `<p>${visitContactNames.join('<br>')}</p>`,
+          attributes: {
+            'data-test': 'tab-past-visitors',
+          },
+        },
+        {
+          text: `${properCase(visit.visitStatus)}`,
+          attributes: {
+            'data-test': 'tab-past-status',
+          },
+        },
+      ] as PastVisitItem
+    })
 
     return visitsForDisplay
   }
 
-  private async getPrisonerSocialContacts(contacts: Contact[], contactIds: number[]): Promise<string[]> {
+  private getPrisonerSocialContacts(contacts: Contact[], visitors: Visitor[]): string[] {
+    const contactIds: number[] = visitors.reduce((personIds, visitor) => {
+      personIds.push(visitor.nomisPersonId)
+
+      return personIds
+    }, [])
+
     const contactsForDisplay: string[] = contacts.reduce((contactNames, contact) => {
       if (contactIds.includes(contact.personId)) {
         contactNames.push(`${contact.firstName} ${contact.lastName}`)

@@ -1,17 +1,19 @@
 import { SuperAgentRequest } from 'superagent'
 import { stubFor } from './wiremock'
+import { InmateDetail, VisitBalances } from '../../server/data/prisonApiTypes'
 
 export default {
-  stubGetBookings: (offenderNo: string): SuperAgentRequest => {
+  getBookings: (offenderNo: string): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/api/bookings/v2/?prisonId=HEI&offenderNo=${offenderNo}&legalInfo=true`,
+        url: `/api/bookings/v2?prisonId=HEI&offenderNo=${offenderNo}&legalInfo=true`,
       },
       response: {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
         jsonBody: {
+          numberOfElements: 1,
           content: [
             {
               age: 20,
@@ -29,28 +31,20 @@ export default {
       },
     })
   },
-  stubGetPrisonerDetail: (offenderNo: string): SuperAgentRequest => {
+  getOffender: (prisoner: Partial<InmateDetail>): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/api/offenders/${offenderNo}`,
+        urlPattern: `/api/offenders/${prisoner.offenderNo}`,
       },
       response: {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: {
-          bookingNo: '1234',
-          bookingId: '1234',
-          agencyId: 'BMI',
-          firstName: 'DOUGAL',
-          middleName: 'JP',
-          lastName: 'MCGUIRE',
-          dateOfBirth: '1950-05-28',
-        },
+        jsonBody: prisoner,
       },
     })
   },
-  stubGetPrisonerRestrictions: (offenderNo: string): SuperAgentRequest => {
+  getOffenderRestrictions: (offenderNo: string): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',
@@ -76,7 +70,13 @@ export default {
       },
     })
   },
-  stubGetVisitBalances: (offenderNo: string): SuperAgentRequest => {
+  getVisitBalances: ({
+    offenderNo,
+    visitBalances,
+  }: {
+    offenderNo: string
+    visitBalances: VisitBalances
+  }): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',
@@ -85,12 +85,7 @@ export default {
       response: {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: {
-          latestIepAdjustDate: '2022-04-25T09:35:34.489Z',
-          latestPrivIepAdjustDate: '2022-04-25T09:35:34.489Z',
-          remainingPvo: 1,
-          remainingVo: 2,
-        },
+        jsonBody: visitBalances,
       },
     })
   },
