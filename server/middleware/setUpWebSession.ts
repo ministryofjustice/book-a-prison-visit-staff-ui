@@ -3,14 +3,14 @@ import session from 'express-session'
 import connectRedis, { Client } from 'connect-redis'
 import express, { Router } from 'express'
 import { createRedisClient } from '../data/redisClient'
-
 import config from '../config'
+import logger from '../../logger'
 
 const RedisStore = connectRedis(session)
 
 export default function setUpWebSession(): Router {
-  const client = createRedisClient(true)
-  client.connect()
+  const client = createRedisClient({ legacyMode: true })
+  client.connect().catch((err: Error) => logger.error(`Error connecting to Redis`, err))
 
   const router = express.Router()
   router.use(
