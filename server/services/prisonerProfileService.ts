@@ -17,9 +17,10 @@ import {
   visitDateAndTime,
   nextIepAdjustDate,
   nextPrivIepAdjustDate,
+  formatVisitType,
 } from '../utils/utils'
 import { Alert, OffenderRestriction } from '../data/prisonApiTypes'
-import { Visit } from '../data/visitSchedulerApiTypes'
+import { Visit, Visitor } from '../data/visitSchedulerApiTypes'
 import { Contact } from '../data/prisonerContactRegistryApiTypes'
 
 type PrisonApiClientBuilder = (token: string) => PrisonApiClient
@@ -139,22 +140,35 @@ export default class PrisonerProfileService {
 
     const visitsForDisplay: UpcomingVisitItem[] = await Promise.all(
       socialVisits.map(async visit => {
-        const visitors: number[] = visit.visitors.reduce((personIds, visitor) => {
-          personIds.push(visitor.nomisPersonId)
-
-          return personIds
-        }, [])
-        const visitContactNames = await this.getPrisonerSocialContacts(contacts, visitors)
+        const visitContactNames = this.getPrisonerSocialContacts(contacts, visit.visitors)
 
         return [
-          { html: `${properCase(visit.visitType)}<br>(${properCase(visit.visitRestriction)})` },
-          { text: 'Hewell (HMP)' },
+          {
+            html: formatVisitType({ visitType: visit.visitType, visitRestriction: visit.visitRestriction }),
+            attributes: {
+              'data-test': 'tab-upcoming-type',
+            },
+          },
+          {
+            text: 'Hewell (HMP)',
+            attributes: {
+              'data-test': 'tab-upcoming-location',
+            },
+          },
           {
             html: visit.startTimestamp
               ? `<p>${visitDateAndTime({ startTimestamp: visit.startTimestamp, endTimestamp: visit.endTimestamp })}</p>`
               : '<p>N/A</p>',
+            attributes: {
+              'data-test': 'tab-upcoming-date-and-time',
+            },
           },
-          { html: `<p>${visitContactNames.join('<br>')}</p>` },
+          {
+            html: `<p>${visitContactNames.join('<br>')}</p>`,
+            attributes: {
+              'data-test': 'tab-upcoming-visitors',
+            },
+          },
         ] as UpcomingVisitItem
       })
     )
@@ -173,23 +187,41 @@ export default class PrisonerProfileService {
 
     const visitsForDisplay: PastVisitItem[] = await Promise.all(
       socialVisits.map(async visit => {
-        const visitors: number[] = visit.visitors.reduce((personIds, visitor) => {
-          personIds.push(visitor.nomisPersonId)
-
-          return personIds
-        }, [])
-        const visitContactNames = await this.getPrisonerSocialContacts(contacts, visitors)
+        const visitContactNames = this.getPrisonerSocialContacts(contacts, visit.visitors)
 
         return [
-          { html: `${properCase(visit.visitType)}<br>(${properCase(visit.visitRestriction)})` },
-          { text: 'Hewell (HMP)' },
+          {
+            html: formatVisitType({ visitType: visit.visitType, visitRestriction: visit.visitRestriction }),
+            attributes: {
+              'data-test': 'tab-past-type',
+            },
+          },
+          {
+            text: 'Hewell (HMP)',
+            attributes: {
+              'data-test': 'tab-past-location',
+            },
+          },
           {
             html: visit.startTimestamp
               ? `<p>${visitDateAndTime({ startTimestamp: visit.startTimestamp, endTimestamp: visit.endTimestamp })}</p>`
               : '<p>N/A</p>',
+            attributes: {
+              'data-test': 'tab-past-date-and-time',
+            },
           },
-          { html: `<p>${visitContactNames.join('<br>')}</p>` },
-          { text: `${properCase(visit.visitStatus)}` },
+          {
+            html: `<p>${visitContactNames.join('<br>')}</p>`,
+            attributes: {
+              'data-test': 'tab-past-visitors',
+            },
+          },
+          {
+            text: `${properCase(visit.visitStatus)}`,
+            attributes: {
+              'data-test': 'tab-past-status',
+            },
+          },
         ] as PastVisitItem
       })
     )
@@ -197,7 +229,13 @@ export default class PrisonerProfileService {
     return visitsForDisplay
   }
 
-  private async getPrisonerSocialContacts(contacts: Contact[], contactIds: number[]): Promise<string[]> {
+  private getPrisonerSocialContacts(contacts: Contact[], visitors: Visitor[]): string[] {
+    const contactIds: number[] = visitors.reduce((personIds, visitor) => {
+      personIds.push(visitor.nomisPersonId)
+
+      return personIds
+    }, [])
+
     const contactsForDisplay: string[] = contacts.reduce((contactNames, contact) => {
       if (contactIds.includes(contact.personId)) {
         contactNames.push(`${contact.firstName} ${contact.lastName}`)

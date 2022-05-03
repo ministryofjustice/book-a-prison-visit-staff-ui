@@ -109,14 +109,18 @@ export const convertToTitleCase = (sentence: string): string =>
 export const visitDateAndTime = ({
   startTimestamp,
   endTimestamp,
+  isIntTest = false,
 }: {
   startTimestamp: string
   endTimestamp: string
+  isIntTest?: boolean
 }): string => {
   const startTime = format(parseISO(startTimestamp), 'h:mmaaa')
   const endTime = endTimestamp ? ` - ${format(parseISO(endTimestamp), 'h:mmaaa')}` : ''
 
-  return `${prisonerDateTimePretty(startTimestamp)}<br>${startTime}${endTime}`
+  return isIntTest
+    ? `${prisonerDateTimePretty(startTimestamp)}${startTime}${endTime}`
+    : `${prisonerDateTimePretty(startTimestamp)}<br>${startTime}${endTime}`
 }
 
 export const nextIepAdjustDate = (latestIepAdjustDate: string): string => {
@@ -125,4 +129,18 @@ export const nextIepAdjustDate = (latestIepAdjustDate: string): string => {
 
 export const nextPrivIepAdjustDate = (latestPrivIepAdjustDate: string): string => {
   return format(addMonths(startOfMonth(parseISO(latestPrivIepAdjustDate)), 1), 'd MMMM yyyy')
+}
+
+export const formatVisitType = ({
+  visitType,
+  visitRestriction,
+  isIntTest = false,
+}: {
+  visitType: string
+  visitRestriction: string
+  isIntTest?: boolean
+}): string => {
+  return isIntTest
+    ? `${properCase(visitType)}(${properCase(visitRestriction)})`
+    : `${properCase(visitType)}<br>(${properCase(visitRestriction)})`
 }

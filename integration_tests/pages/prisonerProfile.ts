@@ -56,4 +56,22 @@ export default class PrisonerProfilePage extends Page {
   alertsTabCreated = (): PageElement => cy.get('[data-test="tab-alerts-created"]')
 
   alertsTabExpires = (): PageElement => cy.get('[data-test="tab-alerts-expires"]')
+
+  upcomingTabType = (): PageElement => cy.get('[data-test="tab-upcoming-type"]')
+
+  upcomingTabLocation = (): PageElement => cy.get('[data-test="tab-upcoming-location"]')
+
+  upcomingTabDateAndTime = (): PageElement => cy.get('[data-test="tab-upcoming-date-and-time"]')
+
+  upcomingTabVisitors = (): PageElement => cy.get('[data-test="tab-upcoming-visitors"]')
+
+  pastTabType = (): PageElement => cy.get('[data-test="tab-past-type"]')
+
+  pastTabLocation = (): PageElement => cy.get('[data-test="tab-past-location"]')
+
+  pastTabDateAndTime = (): PageElement => cy.get('[data-test="tab-past-date-and-time"]')
+
+  pastTabVisitors = (): PageElement => cy.get('[data-test="tab-past-visitors"]')
+
+  pastTabStatus = (): PageElement => cy.get('[data-test="tab-past-status"]')
 }

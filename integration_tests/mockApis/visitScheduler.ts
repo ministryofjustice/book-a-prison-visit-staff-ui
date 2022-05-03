@@ -82,54 +82,7 @@ export default {
       },
     })
   },
-  getPastVisits: (offenderNo: string): SuperAgentRequest => {
-    const results = [
-      {
-        reference: 'ab-cd-ef-gh',
-        prisonerId: 'A1234BC',
-        prisonId: 'HEI',
-        visitRoom: 'A1 L3',
-        visitType: 'SOCIAL',
-        visitStatus: 'RESERVED',
-        visitRestriction: 'OPEN',
-        startTimestamp: '2022-04-25T09:35:34.489Z',
-        endTimestamp: '',
-        visitors: [
-          {
-            nomisPersonId: 1234,
-          },
-        ],
-        visitorSupport: [
-          {
-            type: 'OTHER',
-            text: 'custom support details',
-          },
-        ],
-      },
-      {
-        reference: 'ab-cd-ef-gh',
-        prisonerId: 'A1234BC',
-        prisonId: 'HEI',
-        visitRoom: 'A1 L3',
-        visitType: 'SOCIAL',
-        visitStatus: 'RESERVED',
-        visitRestriction: 'OPEN',
-        startTimestamp: '2022-04-25T09:35:34.489Z',
-        endTimestamp: '',
-        visitors: [
-          {
-            nomisPersonId: 1234,
-          },
-        ],
-        visitorSupport: [
-          {
-            type: 'OTHER',
-            text: 'custom support details',
-          },
-        ],
-      },
-    ]
-
+  getPastVisits: ({ offenderNo, pastVisits }: { offenderNo: string; pastVisits: Visit[] }): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',
@@ -138,7 +91,7 @@ export default {
       response: {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: results,
+        jsonBody: pastVisits,
       },
     })
   },

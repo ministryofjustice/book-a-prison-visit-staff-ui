@@ -68,18 +68,33 @@ export type UpcomingVisitItem = [
 export type PastVisitItem = [
   {
     html: string
+    attributes?: {
+      'data-test': string
+    }
   },
   {
     text: string
+    attributes?: {
+      'data-test': string
+    }
   },
   {
     html: string
+    attributes?: {
+      'data-test': string
+    }
   },
   {
     html: string
+    attributes?: {
+      'data-test': string
+    }
   },
   {
     text: string
+    attributes?: {
+      'data-test': string
+    }
   }
 ]
 

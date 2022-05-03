@@ -56,7 +56,8 @@ export default (on: (string, Record) => void): void => {
     stubGetVisit: (reference: string) => visitScheduler.stubGetVisit(reference),
     stubGetUpcomingVisits: ({ offenderNo, upcomingVisits }: { offenderNo: string; upcomingVisits: Visit[] }) =>
       visitScheduler.getUpcomingVisits({ offenderNo, upcomingVisits }),
-    stubGetPastVisits: (offenderNo: string) => visitScheduler.getPastVisits(offenderNo),
+    stubGetPastVisits: ({ offenderNo, pastVisits }: { offenderNo: string; pastVisits: Visit[] }) =>
+      visitScheduler.getPastVisits({ offenderNo, pastVisits }),
     stubGetVisitSessions: visitScheduler.stubGetVisitSessions,
     stubCreateVisit: visitScheduler.stubCreateVisit,
     stubUpdateVisit: visitScheduler.stubUpdateVisit,
