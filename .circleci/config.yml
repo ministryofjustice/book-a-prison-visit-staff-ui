@@ -195,7 +195,7 @@ workflows:
           env: "preprod"
           context:
             - hmpps-common-vars
-            - visit-someone-in-prison-frontend-svc-preprod
+            - book-a-prison-visit-staff-ui-preprod
           requires:
             - request-preprod-approval
       - request-prod-approval:
@@ -209,7 +209,7 @@ workflows:
           slack_channel_name: << pipeline.parameters.releases-slack-channel >>
           context:
             - hmpps-common-vars
-            - visit-someone-in-prison-frontend-svc-prod
+            - book-a-prison-visit-staff-ui-prod
           requires:
             - request-prod-approval
 
