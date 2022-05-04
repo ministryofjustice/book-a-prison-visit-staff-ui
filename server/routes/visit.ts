@@ -3,6 +3,7 @@ import { body, validationResult } from 'express-validator'
 import { BadRequest } from 'http-errors'
 import visitCancellationReasons from '../constants/visitCancellationReasons'
 import { Prisoner } from '../data/prisonerOffenderSearchTypes'
+import { OutcomeDto } from '../data/visitSchedulerApiTypes'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import PrisonerSearchService from '../services/prisonerSearchService'
 import VisitSessionsService from '../services/visitSessionsService'
@@ -67,8 +68,12 @@ export default function routes(
       }
 
       const reference = getVisitReference(req)
-      const reason = req.body[reasonFieldName]
-      // TODO - cancel visit
+      const outcome: OutcomeDto = {
+        outcome: req.body.cancel,
+        text: req.body[reasonFieldName],
+      }
+
+      await visitSessionsService.cancelVisit({ username: res.locals.user?.username, reference, outcome })
 
       return res.redirect('/visit/cancelled')
     }
