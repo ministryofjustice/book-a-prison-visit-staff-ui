@@ -1,6 +1,6 @@
 ---
 generic-service:
-  nameOverride: visit-someone-in-prison-frontend-svc
+  nameOverride: book-a-prison-visit-staff-ui
 
   replicaCount: 4
 
