@@ -73,6 +73,7 @@ describe('visitSchedulerApiClient', () => {
           },
         ],
         createdTimestamp: '2022-02-14T10:00:00',
+        modifiedTimestamp: '2022-02-14T10:05:00',
       }
 
       fakeVisitSchedulerApi
@@ -113,6 +114,7 @@ describe('visitSchedulerApiClient', () => {
             },
           ],
           createdTimestamp: '2022-02-14T10:00:00',
+          modifiedTimestamp: '2022-02-14T10:05:00',
         },
       ]
 
@@ -160,6 +162,7 @@ describe('visitSchedulerApiClient', () => {
             },
           ],
           createdTimestamp: '2022-02-14T10:00:00',
+          modifiedTimestamp: '2022-02-14T10:05:00',
         },
       ]
 
@@ -246,6 +249,7 @@ describe('visitSchedulerApiClient', () => {
           },
         ],
         createdTimestamp: '2022-02-14T10:00:00',
+        modifiedTimestamp: '2022-02-14T10:05:00',
       }
       const visitSessionData = <VisitSessionData>{
         prisoner: {
@@ -342,6 +346,7 @@ describe('visitSchedulerApiClient', () => {
           },
         ],
         createdTimestamp: '2022-02-14T10:00:00',
+        modifiedTimestamp: '2022-02-14T10:05:00',
       }
 
       const visitSessionData: VisitSessionData = {
@@ -434,6 +439,7 @@ describe('visitSchedulerApiClient', () => {
         ],
         visitorSupport: [],
         createdTimestamp: '2022-02-14T10:00:00',
+        modifiedTimestamp: '2022-02-14T10:05:00',
       }
       const visitSessionData: VisitSessionData = {
         prisoner: {
@@ -534,6 +540,7 @@ describe('visitSchedulerApiClient', () => {
         ],
         visitorSupport: [],
         createdTimestamp: '2022-02-14T10:00:00',
+        modifiedTimestamp: '2022-02-14T10:05:00',
       }
       fakeVisitSchedulerApi
         .patch(`/visits/ab-cd-ef-gh/cancel`, outcome)

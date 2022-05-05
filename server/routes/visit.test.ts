@@ -91,6 +91,7 @@ describe('GET /visit/:reference', () => {
         },
       ],
       createdTimestamp: '2022-02-14T10:00:00',
+      modifiedTimestamp: '2022-02-14T10:05:00',
     }
     const visitors: VisitorListItem[] = [
       {

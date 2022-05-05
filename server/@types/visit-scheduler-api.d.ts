@@ -11,6 +11,15 @@ export interface paths {
     /** Delete a visit by visit reference */
     delete: operations['deleteVisit']
   }
+  '/queue-admin/retry-dlq/{dlqName}': {
+    put: operations['retryDlq']
+  }
+  '/queue-admin/retry-all-dlqs': {
+    put: operations['retryAllDlqs']
+  }
+  '/queue-admin/purge-queue/{queueName}': {
+    put: operations['purgeQueue']
+  }
   '/visits': {
     /** Retrieve visits with optional filters, sorted by startTimestamp ascending */
     get: operations['getVisitsByFilter']
@@ -37,6 +46,9 @@ export interface paths {
     get: operations['getSessionTemplate']
     /** Delete a session template by id */
     delete: operations['deleteSessionTemplate']
+  }
+  '/queue-admin/get-dlq-messages/{dlqName}': {
+    get: operations['getDlqMessages']
   }
 }
 
@@ -204,6 +216,11 @@ export interface components {
        * @description The visit created date and time
        */
       createdTimestamp: string
+      /**
+       * Format: date-time
+       * @description The visit modified date and time
+       */
+      modifiedTimestamp: string
     }
     /** @description VisitNote */
     VisitNoteDto: {
@@ -239,6 +256,61 @@ export interface components {
        * @example visually impaired assistance
        */
       text?: string
+    }
+    Message: {
+      messageId?: string
+      receiptHandle?: string
+      body?: string
+      attributes?: { [key: string]: string }
+      messageAttributes?: {
+        [key: string]: components['schemas']['MessageAttributeValue']
+      }
+      md5OfMessageAttributes?: string
+      md5OfBody?: string
+    }
+    MessageAttributeValue: {
+      stringValue?: string
+      binaryValue?: {
+        /** Format: int32 */
+        short?: number
+        char?: string
+        /** Format: int32 */
+        int?: number
+        /** Format: int64 */
+        long?: number
+        /** Format: float */
+        float?: number
+        /** Format: double */
+        double?: number
+        direct?: boolean
+        readOnly?: boolean
+      }
+      stringListValues?: string[]
+      binaryListValues?: {
+        /** Format: int32 */
+        short?: number
+        char?: string
+        /** Format: int32 */
+        int?: number
+        /** Format: int64 */
+        long?: number
+        /** Format: float */
+        float?: number
+        /** Format: double */
+        double?: number
+        direct?: boolean
+        readOnly?: boolean
+      }[]
+      dataType?: string
+    }
+    RetryDlqResult: {
+      /** Format: int32 */
+      messagesFoundCount: number
+      messages: components['schemas']['Message'][]
+    }
+    PurgeQueueResult: {
+      /** Format: int32 */
+      messagesFoundCount: number
     }
     /** @description Create legacy data */
     CreateLegacyDataRequestDto: {
@@ -505,6 +577,17 @@ export interface components {
        */
       endTimestamp: string
     }
+    DlqMessage: {
+      body: { [key: string]: { [key: string]: unknown } }
+      messageId: string
+    }
+    GetDlqResult: {
+      /** Format: int32 */
+      messagesFoundCount: number
+      /** Format: int32 */
+      messagesReturnedCount: number
+      messages: components['schemas']['DlqMessage'][]
+    }
   }
 }
 
@@ -613,6 +696,46 @@ export interface operations {
       403: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  retryDlq: {
+    parameters: {
+      path: {
+        dlqName: string
+      }
+    }
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['RetryDlqResult']
+        }
+      }
+    }
+  }
+  retryAllDlqs: {
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['RetryDlqResult'][]
+        }
+      }
+    }
+  }
+  purgeQueue: {
+    parameters: {
+      path: {
+        queueName: string
+      }
+    }
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['PurgeQueueResult']
         }
       }
     }
@@ -901,6 +1024,24 @@ export interface operations {
       403: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  getDlqMessages: {
+    parameters: {
+      path: {
+        dlqName: string
+      }
+      query: {
+        maxMessages?: number
+      }
+    }
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['GetDlqResult']
         }
       }
     }
