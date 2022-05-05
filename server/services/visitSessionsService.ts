@@ -203,9 +203,7 @@ export default class VisitSessionsService {
     const token = await this.systemToken(username)
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
 
-    const visit = await visitSchedulerApiClient.cancelVisit(reference, outcome)
-
-    return visit
+    return visitSchedulerApiClient.cancelVisit(reference, outcome)
   }
 
   async getVisit({ username, reference }: { username: string; reference: string }): Promise<VisitInformation> {
