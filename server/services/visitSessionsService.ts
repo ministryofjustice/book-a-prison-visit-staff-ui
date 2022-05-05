@@ -12,7 +12,7 @@ import {
 } from '../@types/bapv'
 import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
 import WhereaboutsApiClient from '../data/whereaboutsApiClient'
-import { VisitSession, Visit, SupportType } from '../data/visitSchedulerApiTypes'
+import { VisitSession, Visit, SupportType, OutcomeDto } from '../data/visitSchedulerApiTypes'
 import { ScheduledEvent } from '../data/whereaboutsApiTypes'
 import { prisonerDateTimePretty, prisonerTimePretty } from '../utils/utils'
 import PrisonerContactRegistryApiClient from '../data/prisonerContactRegistryApiClient'
@@ -189,6 +189,21 @@ export default class VisitSessionsService {
     )
 
     return visit
+  }
+
+  async cancelVisit({
+    username,
+    reference,
+    outcome,
+  }: {
+    username: string
+    reference: string
+    outcome: OutcomeDto
+  }): Promise<Visit> {
+    const token = await this.systemToken(username)
+    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
+
+    return visitSchedulerApiClient.cancelVisit(reference, outcome)
   }
 
   async getVisit({ username, reference }: { username: string; reference: string }): Promise<VisitInformation> {

@@ -2,7 +2,7 @@ import PrisonerContactRegistryApiClient from '../data/prisonerContactRegistryApi
 import VisitSessionsService from './visitSessionsService'
 import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
 import WhereaboutsApiClient from '../data/whereaboutsApiClient'
-import { VisitSession, Visit, SupportType } from '../data/visitSchedulerApiTypes'
+import { VisitSession, Visit, SupportType, OutcomeDto } from '../data/visitSchedulerApiTypes'
 import { VisitSlotList, VisitSessionData, VisitInformation, VisitorListItem } from '../@types/bapv'
 import { Contact } from '../data/prisonerContactRegistryApiTypes'
 
@@ -698,6 +698,55 @@ describe('Visit sessions service', () => {
         visitorSupport: [{ type: 'WHEELCHAIR' }, { type: 'MASK_EXEMPT' }, { type: 'OTHER', text: 'custom request' }],
         createdTimestamp: '2022-02-14T10:00:00',
       })
+    })
+  })
+
+  describe('Cancel a visit', () => {
+    it('should cancel a visit, giving the status code and reason', async () => {
+      const expectedResult: Visit = {
+        reference: 'ab-cd-ef-gh',
+        prisonerId: 'AF34567G',
+        prisonId: 'HEI',
+        visitRoom: 'A1 L3',
+        visitType: 'SOCIAL',
+        visitStatus: 'CANCELLED',
+        visitRestriction: 'OPEN',
+        startTimestamp: '2022-02-14T10:00:00',
+        endTimestamp: '2022-02-14T11:00:00',
+        visitNotes: [
+          {
+            type: 'VISIT_OUTCOMES',
+            text: 'VISITOR_CANCELLED',
+          },
+          {
+            type: 'STATUS_CHANGED_REASON',
+            text: 'cancellation reason',
+          },
+        ],
+        visitors: [
+          {
+            nomisPersonId: 1234,
+          },
+        ],
+        visitorSupport: [],
+        createdTimestamp: '2022-02-14T10:00:00',
+      }
+
+      const outcome: OutcomeDto = {
+        outcome: 'VISITOR_CANCELLED',
+        text: 'cancellation reason',
+      }
+
+      visitSchedulerApiClient.cancelVisit.mockResolvedValue(expectedResult)
+      const result = await visitSessionsService.cancelVisit({
+        username: 'user',
+        reference: expectedResult.reference,
+        outcome,
+      })
+
+      expect(visitSchedulerApiClient.cancelVisit).toHaveBeenCalledTimes(1)
+      expect(visitSchedulerApiClient.cancelVisit).toHaveBeenCalledWith(expectedResult.reference, outcome)
+      expect(result).toEqual(expectedResult)
     })
   })
 
