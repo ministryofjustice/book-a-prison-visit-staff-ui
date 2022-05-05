@@ -5,11 +5,11 @@ generic-service:
   replicaCount: 2
 
   ingress:
-    host: visit-someone-in-prison-staff.hmpps.service.justice.gov.uk
+    host: vsip-staff.hmpps.service.justice.gov.uk
     contextColour: green
 
   env:
-    INGRESS_URL: "https://visit-someone-in-prison-staff.hmpps.service.justice.gov.uk"
+    INGRESS_URL: "https://vsip-staff.hmpps.service.justice.gov.uk"
     HMPPS_AUTH_URL: "https://sign-in.hmpps.service.justice.gov.uk/auth"
     NOMIS_AUTH_URL: "https://sign-in.hmpps.service.justice.gov.uk/auth"
     TOKEN_VERIFICATION_API_URL: "https://token-verification-api.prison.service.justice.gov.uk"
