@@ -600,6 +600,7 @@ describe('Visit sessions service', () => {
         ],
         visitorSupport: [],
         createdTimestamp: '2022-02-14T10:00:00',
+        modifiedTimestamp: '2022-02-14T10:05:00',
       }
 
       visitSchedulerApiClient.createVisit.mockResolvedValue(visit)
@@ -675,6 +676,7 @@ describe('Visit sessions service', () => {
         ],
         visitorSupport: [{ type: 'WHEELCHAIR' }, { type: 'MASK_EXEMPT' }, { type: 'OTHER', text: 'custom request' }],
         createdTimestamp: '2022-02-14T10:00:00',
+        modifiedTimestamp: '2022-02-14T10:05:00',
       }
 
       visitSchedulerApiClient.updateVisit.mockResolvedValue(visit)
@@ -697,6 +699,7 @@ describe('Visit sessions service', () => {
         visitors: [{ nomisPersonId: 1234 }],
         visitorSupport: [{ type: 'WHEELCHAIR' }, { type: 'MASK_EXEMPT' }, { type: 'OTHER', text: 'custom request' }],
         createdTimestamp: '2022-02-14T10:00:00',
+        modifiedTimestamp: '2022-02-14T10:05:00',
       })
     })
   })
@@ -730,6 +733,7 @@ describe('Visit sessions service', () => {
         ],
         visitorSupport: [],
         createdTimestamp: '2022-02-14T10:00:00',
+        modifiedTimestamp: '2022-02-14T10:05:00',
       }
 
       const outcome: OutcomeDto = {
@@ -784,6 +788,7 @@ describe('Visit sessions service', () => {
         },
       ],
       createdTimestamp: '2022-02-14T10:00:00',
+      modifiedTimestamp: '2022-02-14T10:05:00',
     }
 
     describe('getVisit', () => {
