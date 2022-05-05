@@ -13,7 +13,7 @@ jest.mock('../services/visitSessionsService')
 
 let app: Express
 const systemToken = async (user: string): Promise<string> => `${user}-token-1`
-let flashData: Record<'errors' | 'formValues', Record<string, string | string[]>[]>
+let flashData: Record<string, string[] | Record<string, string>[]>
 
 const prisonerSearchService = new PrisonerSearchService(null, systemToken) as jest.Mocked<PrisonerSearchService>
 const visitSessionsService = new VisitSessionsService(
@@ -180,7 +180,7 @@ describe('GET /visit/:reference', () => {
   })
 })
 
-describe('GET /:reference/cancel', () => {
+describe('GET /visit/:reference/cancel', () => {
   it('should render the cancellation reasons page with all the reasons and none selected', () => {
     return request(app)
       .get('/visit/ab-cd-ef-gh/cancel')
@@ -253,9 +253,39 @@ describe('GET /:reference/cancel', () => {
   })
 })
 
-describe('POST /:reference/cancel', () => {
-  it('should cancel visit and redirect to confirmation page if reason and text entered', () => {
-    visitSessionsService.cancelVisit = jest.fn()
+describe('POST /visit/:reference/cancel', () => {
+  it('should cancel visit, set flash values and redirect to confirmation page if reason and text entered', () => {
+    const cancelledVisit: Visit = {
+      reference: 'ab-cd-ef-gh',
+      prisonerId: 'AF34567G',
+      prisonId: 'HEI',
+      visitRoom: 'A1 L3',
+      visitType: 'SOCIAL',
+      visitStatus: 'CANCELLED',
+      visitRestriction: 'OPEN',
+      startTimestamp: '2022-02-14T10:00:00',
+      endTimestamp: '2022-02-14T11:00:00',
+      visitNotes: [
+        {
+          type: 'VISIT_OUTCOMES',
+          text: 'VISITOR_CANCELLED',
+        },
+        {
+          type: 'STATUS_CHANGED_REASON',
+          text: 'cancellation reason',
+        },
+      ],
+      visitors: [
+        {
+          nomisPersonId: 1234,
+        },
+      ],
+      visitorSupport: [],
+      createdTimestamp: '2022-02-14T10:00:00',
+      modifiedTimestamp: '2022-02-14T10:05:00',
+    }
+
+    visitSessionsService.cancelVisit.mockResolvedValue(cancelledVisit)
 
     return request(app)
       .post('/visit/ab-cd-ef-gh/cancel')
@@ -273,6 +303,8 @@ describe('POST /:reference/cancel', () => {
             text: 'illness',
           },
         })
+        expect(flashProvider).toHaveBeenCalledWith('startTimestamp', cancelledVisit.startTimestamp)
+        expect(flashProvider).toHaveBeenCalledWith('endTimestamp', cancelledVisit.endTimestamp)
       })
   })
 
@@ -323,6 +355,24 @@ describe('POST /:reference/cancel', () => {
           cancel: 'INVALID_VALUE',
           reason_prisoner_cancelled: 'illness',
         })
+      })
+  })
+})
+
+describe('GET /visit/cancelled', () => {
+  it('should render the booking cancelled page with details of the visit', () => {
+    flashData.startTimestamp = ['2022-02-14T10:15:00']
+    flashData.endTimestamp = ['2022-02-14T11:00:00']
+
+    return request(app)
+      .get('/visit/cancelled')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('h1').text().trim()).toBe('Booking cancelled')
+        expect($('[data-test="visit-details"]').text().trim()).toBe('10:15am to 11am on Monday 14 February 2022')
+        expect($('[data-test="go-to-start"]').length).toBe(1)
       })
   })
 })

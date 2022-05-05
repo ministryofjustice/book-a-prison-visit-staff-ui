@@ -23,7 +23,10 @@ export default function routes(
     )
 
   get('/cancelled', async (req, res) => {
-    return res.render('pages/visit/cancelConfirmation')
+    return res.render('pages/visit/cancelConfirmation', {
+      startTimestamp: req.flash('startTimestamp')?.[0],
+      endTimestamp: req.flash('endTimestamp')?.[0],
+    })
   })
 
   get('/:reference', async (req, res) => {
@@ -73,7 +76,10 @@ export default function routes(
         text: req.body[reasonFieldName],
       }
 
-      await visitSessionsService.cancelVisit({ username: res.locals.user?.username, reference, outcome })
+      const visit = await visitSessionsService.cancelVisit({ username: res.locals.user?.username, reference, outcome })
+
+      req.flash('startTimestamp', visit.startTimestamp)
+      req.flash('endTimestamp', visit.endTimestamp)
 
       return res.redirect('/visit/cancelled')
     }
