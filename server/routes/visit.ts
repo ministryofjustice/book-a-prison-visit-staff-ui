@@ -55,7 +55,7 @@ export default function routes(
     body('cancel').isIn(Object.keys(visitCancellationReasons)).withMessage('No answer selected'),
     async (req, res) => {
       const reasonFieldName = `reason_${req.body.cancel}`.toLowerCase()
-      if (req.body.cancel?.length) {
+      if (validationResult(req).isEmpty()) {
         await body(reasonFieldName).notEmpty().withMessage('Enter a reason for the cancellation').run(req)
       }
 

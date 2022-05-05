@@ -3,15 +3,17 @@ import request from 'supertest'
 import * as cheerio from 'cheerio'
 import PrisonerSearchService from '../services/prisonerSearchService'
 import VisitSessionsService from '../services/visitSessionsService'
-import { appWithAllRoutes } from './testutils/appSetup'
-import { Visit } from '../data/visitSchedulerApiTypes'
+import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
+import { OutcomeDto, Visit } from '../data/visitSchedulerApiTypes'
 import { VisitorListItem } from '../@types/bapv'
 import { Prisoner } from '../data/prisonerOffenderSearchTypes'
 
 jest.mock('../services/prisonerSearchService')
 jest.mock('../services/visitSessionsService')
+
 let app: Express
 const systemToken = async (user: string): Promise<string> => `${user}-token-1`
+let flashData: Record<'errors' | 'formValues', Record<string, string | string[]>[]>
 
 const prisonerSearchService = new PrisonerSearchService(null, systemToken) as jest.Mocked<PrisonerSearchService>
 const visitSessionsService = new VisitSessionsService(
@@ -22,6 +24,10 @@ const visitSessionsService = new VisitSessionsService(
 ) as jest.Mocked<VisitSessionsService>
 
 beforeEach(() => {
+  flashData = { errors: [], formValues: [] }
+  flashProvider.mockImplementation(key => {
+    return flashData[key]
+  })
   app = appWithAllRoutes(prisonerSearchService, null, null, visitSessionsService, systemToken)
 })
 
@@ -169,6 +175,153 @@ describe('GET /visit/:reference', () => {
       .expect('Content-Type', /html/)
       .expect(res => {
         expect(res.text).toContain('BadRequestError: Bad Request')
+      })
+  })
+})
+
+describe('GET /:reference/cancel', () => {
+  it('should render the cancellation reasons page with all the reasons and none selected', () => {
+    return request(app)
+      .get('/visit/ab-cd-ef-gh/cancel')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('h1').text().trim()).toBe('Why is this booking being cancelled?')
+        expect($('input[name="cancel"]').length).toBe(4)
+        expect($('input[name="cancel"]:checked').length).toBe(0)
+        expect($('[data-test="visitor_cancelled"]').attr('value')).toBe('VISITOR_CANCELLED')
+        expect($('label[for="cancel"]').text().trim()).toBe('Visitor cancelled')
+        expect($('[data-test="administrative_error"]').attr('value')).toBe('ADMINISTRATIVE_ERROR')
+        expect($('label[for="cancel-4"]').text().trim()).toBe('Administrative error')
+        expect($('[data-test="cancel-booking"]').length).toBe(1)
+      })
+  })
+
+  it('should render the cancellation reasons page with no selection validation error', () => {
+    flashData.errors = [
+      {
+        msg: 'No answer selected',
+        param: 'cancel',
+        location: 'body',
+      },
+    ]
+
+    return request(app)
+      .get('/visit/ab-cd-ef-gh/cancel')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('h1').text().trim()).toBe('Why is this booking being cancelled?')
+        expect($('input[name="cancel"]').length).toBe(4)
+        expect($('input[name="cancel"]:checked').length).toBe(0)
+        expect($('.govuk-error-summary__body').text()).toContain('No answer selected')
+        expect(flashProvider).toHaveBeenCalledWith('errors')
+        expect(flashProvider).toHaveBeenCalledWith('formValues')
+        expect(flashProvider).toHaveBeenCalledTimes(2)
+      })
+  })
+
+  it('should render the cancellation reasons page with no reason text validation error', () => {
+    flashData.errors = [
+      {
+        value: '',
+        msg: 'Enter a reason for the cancellation',
+        param: 'reason_establishment_cancelled',
+        location: 'body',
+      },
+    ]
+
+    flashData.formValues = [{ cancel: 'ESTABLISHMENT_CANCELLED' }]
+
+    return request(app)
+      .get('/visit/ab-cd-ef-gh/cancel')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('h1').text().trim()).toBe('Why is this booking being cancelled?')
+        expect($('input[name="cancel"]').length).toBe(4)
+        expect($('[data-test="establishment_cancelled"]').prop('checked')).toBe(true)
+        expect($('.govuk-error-summary__body').text()).toContain('Enter a reason for the cancellation')
+        expect(flashProvider).toHaveBeenCalledWith('errors')
+        expect(flashProvider).toHaveBeenCalledWith('formValues')
+        expect(flashProvider).toHaveBeenCalledTimes(2)
+      })
+  })
+})
+
+describe('POST /:reference/cancel', () => {
+  it('should cancel visit and redirect to confirmation page if reason and text entered', () => {
+    visitSessionsService.cancelVisit = jest.fn()
+
+    return request(app)
+      .post('/visit/ab-cd-ef-gh/cancel')
+      .send('cancel=PRISONER_CANCELLED')
+      .send('reason_prisoner_cancelled=illness')
+      .expect(302)
+      .expect('location', '/visit/cancelled')
+      .expect(() => {
+        expect(visitSessionsService.cancelVisit).toHaveBeenCalledTimes(1)
+        expect(visitSessionsService.cancelVisit).toHaveBeenCalledWith({
+          username: undefined,
+          reference: 'ab-cd-ef-gh',
+          outcome: <OutcomeDto>{
+            outcome: 'PRISONER_CANCELLED',
+            text: 'illness',
+          },
+        })
+      })
+  })
+
+  it('should set validation errors in flash and redirect if no reason selected', () => {
+    return request(app)
+      .post('/visit/ab-cd-ef-gh/cancel')
+      .expect(302)
+      .expect('location', '/visit/ab-cd-ef-gh/cancel')
+      .expect(() => {
+        expect(flashProvider).toHaveBeenCalledWith('errors', [
+          { location: 'body', msg: 'No answer selected', param: 'cancel', value: undefined },
+        ])
+        expect(flashProvider).toHaveBeenCalledWith('formValues', {})
+      })
+  })
+
+  it('should set validation errors in flash and redirect if no reason text entered', () => {
+    return request(app)
+      .post('/visit/ab-cd-ef-gh/cancel')
+      .send('cancel=PRISONER_CANCELLED')
+      .expect(302)
+      .expect('location', '/visit/ab-cd-ef-gh/cancel')
+      .expect(() => {
+        expect(flashProvider).toHaveBeenCalledWith('errors', [
+          {
+            location: 'body',
+            msg: 'Enter a reason for the cancellation',
+            param: 'reason_prisoner_cancelled',
+            value: undefined,
+          },
+        ])
+        expect(flashProvider).toHaveBeenCalledWith('formValues', { cancel: 'PRISONER_CANCELLED' })
+      })
+  })
+
+  it('should set validation errors in flash and redirect if invalid data entered', () => {
+    return request(app)
+      .post('/visit/ab-cd-ef-gh/cancel')
+      .send('cancel=INVALID_VALUE')
+      .send('reason_prisoner_cancelled=illness')
+      .expect(302)
+      .expect('location', '/visit/ab-cd-ef-gh/cancel')
+      .expect(() => {
+        expect(flashProvider).toHaveBeenCalledWith('errors', [
+          { location: 'body', msg: 'No answer selected', param: 'cancel', value: 'INVALID_VALUE' },
+        ])
+        expect(flashProvider).toHaveBeenCalledWith('formValues', {
+          cancel: 'INVALID_VALUE',
+          reason_prisoner_cancelled: 'illness',
+        })
       })
   })
 })
