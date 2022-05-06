@@ -26,5 +26,8 @@ describe('Views - Home', () => {
 
     expect($('[data-test="cancel-visit"] .card__link').text()).toEqual('Cancel a visit')
     expect($('[data-test="cancel-visit"] .card__link').attr('href')).toEqual('/search/visit')
+
+    expect($('[data-test="view-visits-by-date"] .card__link').text()).toEqual('View visits by date')
+    expect($('[data-test="view-visits-by-date"] .card__link').attr('href')).toEqual('/visits')
   })
 })
