@@ -40,6 +40,15 @@ class PrisonerSearchClient {
       },
     })
   }
+
+  getPrisonersByNumbers(prisonerNumbers: string[]): Promise<Prisoner[]> {
+    return this.restClient.post({
+      path: '/prisoner-search/prisoner-numbers',
+      data: {
+        prisonerNumbers,
+      },
+    })
+  }
 }
 
 export default PrisonerSearchClient
