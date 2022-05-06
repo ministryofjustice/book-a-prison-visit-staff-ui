@@ -8,7 +8,7 @@ type Error = {
 const errors: { [key: string]: Error } = {
   INVALID_PRISONER_QUERY: {
     param: '#search',
-    msg: 'You must enter at least 3 characters',
+    msg: 'You must enter at least 2 characters',
   },
   INVALID_VISIT_QUERY: {
     param: '#searchBlock1',
@@ -21,7 +21,7 @@ const errors: { [key: string]: Error } = {
 }
 
 export const validatePrisonerSearch = (search: string): Error | null => {
-  if (search.length < 3) {
+  if (search.length < 2) {
     return errors.INVALID_PRISONER_QUERY
   }
 

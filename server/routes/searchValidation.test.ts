@@ -5,9 +5,9 @@ describe('validatePrisonerSearch', () => {
     expect(validatePrisonerSearch('abcd')).toBeNull()
   })
   it('tooShort', () => {
-    expect(validatePrisonerSearch('ab')).toStrictEqual({
+    expect(validatePrisonerSearch('b')).toStrictEqual({
       param: '#search',
-      msg: 'You must enter at least 3 characters',
+      msg: 'You must enter at least 2 characters',
     })
   })
 })
