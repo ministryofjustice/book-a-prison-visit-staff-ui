@@ -29,7 +29,19 @@ export const validatePrisonerSearch = (search: string): Error | null => {
 }
 
 export const validateVisitSearch = (reference: string): Error | null => {
-  if (reference.split('-').join('').length < 8) {
+  const referenceParts = reference.split('-')
+
+  if (
+    referenceParts.length === 4 &&
+    referenceParts[0] === 'undefined' &&
+    referenceParts[1] === 'undefined' &&
+    referenceParts[2] === 'undefined' &&
+    referenceParts[3] === 'undefined'
+  ) {
+    return errors.SHORT_VISIT_QUERY
+  }
+
+  if (referenceParts.join('').length < 8) {
     return errors.SHORT_VISIT_QUERY
   }
 

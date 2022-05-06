@@ -1,5 +1,6 @@
 import type { Express } from 'express'
 import request from 'supertest'
+import createError from 'http-errors'
 import PrisonerSearchService from '../services/prisonerSearchService'
 import VisitSessionsService from '../services/visitSessionsService'
 import { appWithAllRoutes } from './testutils/appSetup'
@@ -251,10 +252,11 @@ describe('Booking search page', () => {
         lastName: 'Smith',
         restrictedPatient: false,
       }
-      getVisit = null
 
       prisonerSearchService.getPrisoner.mockResolvedValue(getPrisonerReturnData)
-      visitSessionsService.getVisit.mockResolvedValue(getVisit)
+      visitSessionsService.getVisit.mockImplementation(() => {
+        throw createError(404, 'Not found')
+      })
 
       return request(app)
         .get('/search/visit/results?searchBlock1=ab&searchBlock2=bc&searchBlock3=cd&searchBlock4=de')
