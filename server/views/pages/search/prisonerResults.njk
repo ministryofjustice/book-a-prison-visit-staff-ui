@@ -59,8 +59,9 @@
         }) }}
 
       {{ pagination | safe if numberOfResults > 10 }}
+    {% elif errors | length %}
     {% else %}
-        <p class="govuk-!-margin-top-6 govuk-!-margin-bottom-6" id="search-results-none">There are no results for this name or number at {{ establishment }}.
+        <p class="govuk-!-margin-top-6 govuk-!-margin-bottom-6" id="search-results-none">There are no results for this name or number at {{ establishment }}.</p>
     {% endif %}
     </div>
   </div>
