@@ -16,7 +16,6 @@ describe('prisonSearchClientBuilder', () => {
   })
 
   afterEach(() => {
-    console.log(nock.pendingMocks())
     nock.cleanAll()
   })
 
@@ -78,10 +77,16 @@ describe('prisonSearchClientBuilder', () => {
       const prisonerNumbers = ['A1234BC', 'B1234CD']
       const results = [
         {
-          lastName: 'test',
-          firstName: 'test',
-          prisonerNumber: 'test',
+          lastName: 'lastName1',
+          firstName: 'firstName1',
+          prisonerNumber: 'A1234BC',
           dateOfBirth: '2000-01-01',
+        },
+        {
+          lastName: 'lastName2',
+          firstName: 'firstName2',
+          prisonerNumber: 'B1234CD',
+          dateOfBirth: '2000-01-02',
         },
       ]
       fakePrisonerSearchApi
