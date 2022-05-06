@@ -35,7 +35,7 @@ describe('prisonSearchClientBuilder', () => {
       }
       fakePrisonerSearchApi
         .post(
-          `/keyword`,
+          '/keyword',
           `{"orWords":"test","fuzzyMatch":true,"prisonIds":["HEI"],"pagination":{"page":0,"size":${config.apis.prisonerSearch.pageSize}}}`
         )
         .matchHeader('authorization', `Bearer ${token}`)
@@ -62,11 +62,39 @@ describe('prisonSearchClientBuilder', () => {
         ],
       }
       fakePrisonerSearchApi
-        .post(`/keyword`, `{"andWords":"test","prisonIds":["HEI"]}`)
+        .post('/keyword', `{"andWords":"test","prisonIds":["HEI"]}`)
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
       const output = await client.getPrisoner('test')
+
+      expect(output).toEqual(results)
+    })
+  })
+
+  describe('getPrisonersByNumbers', () => {
+    it('should return data from api', async () => {
+      const prisonerNumbers = ['A1234BC', 'B1234CD']
+      const results = [
+        {
+          lastName: 'lastName1',
+          firstName: 'firstName1',
+          prisonerNumber: 'A1234BC',
+          dateOfBirth: '2000-01-01',
+        },
+        {
+          lastName: 'lastName2',
+          firstName: 'firstName2',
+          prisonerNumber: 'B1234CD',
+          dateOfBirth: '2000-01-02',
+        },
+      ]
+      fakePrisonerSearchApi
+        .post('/prisoner-search/prisoner-numbers', `{"prisonerNumbers":${JSON.stringify(prisonerNumbers)}}`)
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, results)
+
+      const output = await client.getPrisonersByNumbers(prisonerNumbers)
 
       expect(output).toEqual(results)
     })
