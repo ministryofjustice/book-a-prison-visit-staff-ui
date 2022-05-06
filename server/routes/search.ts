@@ -106,6 +106,7 @@ export default function routes(
     const validationErrors = validateVisitSearch(search)
     const errors = validationErrors ? [validationErrors] : []
     let visit: VisitInformation
+    let noResults = false
 
     if (errors.length === 0) {
       try {
@@ -113,14 +114,20 @@ export default function routes(
         const prisonerDetails = await prisonerSearchService.getPrisoner(visit.prisonNumber, res.locals.user?.username)
         visit.prisonerName = `${prisonerDetails.lastName}, ${prisonerDetails.firstName}`
       } catch (e) {
-        errors.push({
-          msg: e.message,
-          param: '#searchBlock1',
-        })
+        if (e?.status === 404) {
+          noResults = true
+        }
+
+        if (e?.status !== 404) {
+          errors.push({
+            msg: e.message,
+            param: '#searchBlock1',
+          })
+        }
       }
     }
 
-    const realNumberOfResults = errors.length > 0 ? 0 : 1
+    const realNumberOfResults = errors.length > 0 || noResults ? 0 : 1
     const currentPageMax = parsedPage * pageSize
     const to = realNumberOfResults < currentPageMax ? realNumberOfResults : currentPageMax
     const pageLinks = getPageLinks({
@@ -137,7 +144,7 @@ export default function routes(
       searchBlock2,
       searchBlock3,
       searchBlock4,
-      results: errors.length > 0 ? [] : [visit],
+      results: errors.length > 0 || noResults ? [] : [visit],
       errors,
       next: 1,
       previous: 1,
