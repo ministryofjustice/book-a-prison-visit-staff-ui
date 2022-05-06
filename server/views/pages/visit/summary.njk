@@ -134,12 +134,12 @@
 
         <li>
           <strong>Additional support</strong>
-          <span data-test="additional-support">{{ additionalSupport | join(", ") if additionalSupport | length else "No additional support options were chosen"}}</span>
+          <span data-test="additional-support">{{ additionalSupport | join(", ") if additionalSupport | length else "None"}}</span>
         </li>
 
         <li>
           <strong>Visit booked</strong>
-          <span data-test="visit-booked">{{ visit.createdTimestamp | formatDate('EEEE dd MMMM yyyy') }} at {{ visit.createdTimestamp | formatTime }}</span>
+          <span data-test="visit-booked">{{ visit.createdTimestamp | formatDate('EEEE d MMMM yyyy') }} at {{ visit.createdTimestamp | formatTime }}</span>
         </li>
       </ul>
     </div>
