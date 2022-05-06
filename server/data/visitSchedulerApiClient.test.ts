@@ -183,6 +183,54 @@ describe('visitSchedulerApiClient', () => {
     })
   })
 
+  describe('getVisitsByDate', () => {
+    it('should return an array of Visit from the Visit Scheduler API', async () => {
+      const dateString = '2022-05-06'
+      const results: Visit[] = [
+        {
+          reference: 'ab-cd-ef-gh',
+          prisonerId: 'A1234BC',
+          prisonId: 'HEI',
+          visitRoom: 'A1 L3',
+          visitType: 'SOCIAL',
+          visitStatus: 'RESERVED',
+          visitRestriction: 'OPEN',
+          startTimestamp: `${dateString}T10:00:00`,
+          endTimestamp: '',
+          visitNotes: [],
+          visitors: [
+            {
+              nomisPersonId: 1234,
+            },
+          ],
+          visitorSupport: [
+            {
+              type: 'OTHER',
+              text: 'custom support details',
+            },
+          ],
+          createdTimestamp: '2022-02-14T10:00:00',
+          modifiedTimestamp: '2022-02-14T10:05:00',
+        },
+      ]
+
+      fakeVisitSchedulerApi
+        .get('/visits')
+        .query({
+          prisonId: 'HEI',
+          startTimestamp: `${dateString}T00:00:00`,
+          endTimestamp: `${dateString}T23:59:59`,
+          visitStatus: 'BOOKED',
+        })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, results)
+
+      const output = await client.getVisitsByDate(dateString)
+
+      expect(output).toEqual(results)
+    })
+  })
+
   describe('getVisitSessions', () => {
     it('should return an array of Visit Sessions from the Visit Scheduler API', async () => {
       const results: VisitSession[] = [
