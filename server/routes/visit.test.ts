@@ -57,8 +57,8 @@ describe('GET /visit/:reference', () => {
       visitType: 'SOCIAL',
       visitStatus: 'BOOKED',
       visitRestriction: 'OPEN',
-      startTimestamp: '2022-02-14T10:00:00',
-      endTimestamp: '2022-02-14T11:15:00',
+      startTimestamp: '2022-02-09T10:00:00',
+      endTimestamp: '2022-02-09T11:15:00',
       visitNotes: [
         {
           type: 'VISIT_COMMENT',
@@ -143,7 +143,7 @@ describe('GET /visit/:reference', () => {
         expect($('[data-test="prisoner-dob"]').text()).toBe('2 April 1975')
         expect($('[data-test="prisoner-location"]').text()).toBe('1-1-C-028, HMP Hewell')
         // visit details
-        expect($('[data-test="visit-date"]').text()).toBe('14 February 2022')
+        expect($('[data-test="visit-date"]').text()).toBe('9 February 2022')
         expect($('[data-test="visit-time"]').text()).toBe('10am to 11:15am')
         expect($('[data-test="visit-type"]').text()).toBe('Open')
         expect($('[data-test="visit-contact"]').text()).toBe('Smith, Jeanette')
@@ -361,8 +361,8 @@ describe('POST /visit/:reference/cancel', () => {
 
 describe('GET /visit/cancelled', () => {
   it('should render the booking cancelled page with details of the visit', () => {
-    flashData.startTimestamp = ['2022-02-14T10:15:00']
-    flashData.endTimestamp = ['2022-02-14T11:00:00']
+    flashData.startTimestamp = ['2022-02-09T10:15:00']
+    flashData.endTimestamp = ['2022-02-09T11:00:00']
 
     return request(app)
       .get('/visit/cancelled')
@@ -371,7 +371,7 @@ describe('GET /visit/cancelled', () => {
       .expect(res => {
         const $ = cheerio.load(res.text)
         expect($('h1').text().trim()).toBe('Booking cancelled')
-        expect($('[data-test="visit-details"]').text().trim()).toBe('10:15am to 11am on Monday 14 February 2022')
+        expect($('[data-test="visit-details"]').text().trim()).toBe('10:15am to 11am on Wednesday 9 February 2022')
         expect($('[data-test="go-to-start"]').length).toBe(1)
       })
   })
