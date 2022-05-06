@@ -1,1 +1,34 @@
-CANCELLATION CONFIRMATION!
+{% extends "layout.njk" %}
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% set pageHeaderTitle = "Booking cancelled" %}
+{% set pageTitle %}
+{{ applicationName }} - {{ pageHeaderTitle }}
+{% endset %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+    {{ govukPanel({
+      titleText: pageHeaderTitle,
+      classes: "bapv-info-panel govuk-!-padding-top-9 govuk-!-padding-bottom-9"
+    }) }}
+
+    <h2 class="govuk-heading-m govuk-!-margin-top-6">What happens next</h2>
+    {% if startTimestamp and endTimestamp %}
+      <p>The visit booking for
+        <span data-test="visit-details">{{ startTimestamp | formatTime }} to {{ endTimestamp | formatTime }} on {{ startTimestamp | formatDate('EEEE dd MMMM yyyy') }}</span>
+        has been cancelled.</p>
+    {% endif %}
+    <p>The main contact for this visit will get a text message to confirm it has been cancelled.</p>
+
+    {{ govukButton({
+      text: "Go to manage prison visits",
+      classes: "govuk-!-margin-top-3",
+      href: "/",
+      attributes: { "data-test": "go-to-start" }
+    }) }}
+  </div>
+</div>
+{% endblock %}
