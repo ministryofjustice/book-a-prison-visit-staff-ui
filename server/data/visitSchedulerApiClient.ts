@@ -61,6 +61,18 @@ class VisitSchedulerApiClient {
     })
   }
 
+  getVisitsByDate(dateString?: string): Promise<Visit[]> {
+    return this.restclient.get({
+      path: '/visits',
+      query: new URLSearchParams({
+        prisonId: this.prisonId,
+        startTimestamp: `${dateString}T00:00:00`,
+        endTimestamp: `${dateString}T23:59:59`,
+        visitStatus: this.visitStatus,
+      }).toString(),
+    })
+  }
+
   getVisitSessions(): Promise<VisitSession[]> {
     return this.restclient.get({
       path: '/visit-sessions',
