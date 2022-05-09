@@ -64,10 +64,13 @@
         {% endif %}
       </ul>
 
-      {{ govukButton({
-        text: "Book a prison visit",
-        href: "/book-a-visit/select-visitors"
-      }) }}
+      <form action="/prisoner/{{ inmateDetail.offenderNo }}" method="POST" novalidate>
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+        {{ govukButton({
+          text: "Book a prison visit",
+          attributes: { "data-test": "book-a-visit" }
+        }) }}
+      </form>
 
     </div>
   </div>
