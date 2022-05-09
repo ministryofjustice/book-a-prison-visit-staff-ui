@@ -1,7 +1,8 @@
 import type { Express } from 'express'
 import request from 'supertest'
 import * as cheerio from 'cheerio'
-import { PrisonerProfile, BAPVVisitBalances, VisitInformation } from '../@types/bapv'
+import { SessionData } from 'express-session'
+import { PrisonerProfile, BAPVVisitBalances, VisitInformation, VisitSessionData } from '../@types/bapv'
 import { InmateDetail } from '../data/prisonApiTypes'
 import PrisonerProfileService from '../services/prisonerProfileService'
 import PrisonerSearchService from '../services/prisonerSearchService'
@@ -15,6 +16,7 @@ jest.mock('../services/visitSessionsService')
 
 let app: Express
 const systemToken = async (user: string): Promise<string> => `${user}-token-1`
+let visitSessionData: Partial<VisitSessionData>
 
 const prisonerProfileService = new PrisonerProfileService(
   null,
@@ -31,7 +33,19 @@ const visitSessionsService = new VisitSessionsService(
 ) as jest.Mocked<VisitSessionsService>
 
 beforeEach(() => {
-  app = appWithAllRoutes(prisonerSearchService, prisonerProfileService, null, visitSessionsService, systemToken)
+  visitSessionData = {}
+
+  app = appWithAllRoutes(
+    prisonerSearchService,
+    prisonerProfileService,
+    null,
+    visitSessionsService,
+    systemToken,
+    false,
+    {
+      visitSessionData,
+    } as SessionData
+  )
 })
 
 afterEach(() => {
@@ -112,7 +126,7 @@ describe('GET /prisoner/A1234BC', () => {
         expect(res.text).toContain('15 May 2021')
         expect(res.text).toContain('1 January 2022')
         expect(res.text).toContain('1 active')
-        expect(res.text).toMatch(/<a.*?class="govuk-button".*?>\s+Book a prison visit\s+<\/a>/)
+        expect(res.text).toMatch(/<button.*?class="govuk-button".*?>\s+Book a prison visit\s+<\/button>/)
       })
   })
 
@@ -203,6 +217,77 @@ describe('GET /prisoner/A1234BC', () => {
   it('should render 400 Bad Request error for invalid prisoner number', () => {
     return request(app)
       .get('/prisoner/A12--34BC')
+      .expect(400)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        expect(res.text).toContain('BadRequestError: Bad Request')
+      })
+  })
+})
+
+describe('POST /prisoner/A1234BC', () => {
+  const prisoner: Prisoner = {
+    firstName: 'JOHN',
+    lastName: 'SMITH',
+    prisonerNumber: 'A1234BC',
+    dateOfBirth: '1975-04-02',
+    prisonName: 'HMP Hewell',
+    cellLocation: '1-1-C-028',
+    restrictedPatient: false,
+  }
+
+  it('should set up visitSessionData and redirect to select visitors page', () => {
+    prisonerSearchService.getPrisoner.mockResolvedValue(prisoner)
+
+    return request(app)
+      .post('/prisoner/A1234BC')
+      .expect(302)
+      .expect('location', '/book-a-visit/select-visitors')
+      .expect(res => {
+        expect(prisonerSearchService.getPrisoner).toHaveBeenCalledTimes(1)
+        expect(prisonerSearchService.getPrisoner).toHaveBeenCalledWith('A1234BC', undefined)
+        expect(visitSessionData).toEqual(<VisitSessionData>{
+          prisoner: {
+            name: 'Smith, John',
+            offenderNo: 'A1234BC',
+            dateOfBirth: '2 April 1975',
+            location: '1-1-C-028, HMP Hewell',
+          },
+        })
+      })
+  })
+
+  it('should replace existing visitSessionData and redirect to select visitors page', () => {
+    visitSessionData.prisoner = {
+      name: 'Someone, Else',
+      offenderNo: 'C4321BA',
+      dateOfBirth: '5 May 1980',
+      location: 'a cell, HMP Prison',
+    }
+
+    prisonerSearchService.getPrisoner.mockResolvedValue(prisoner)
+
+    return request(app)
+      .post('/prisoner/A1234BC')
+      .expect(302)
+      .expect('location', '/book-a-visit/select-visitors')
+      .expect(res => {
+        expect(prisonerSearchService.getPrisoner).toHaveBeenCalledTimes(1)
+        expect(prisonerSearchService.getPrisoner).toHaveBeenCalledWith('A1234BC', undefined)
+        expect(visitSessionData).toEqual(<VisitSessionData>{
+          prisoner: {
+            name: 'Smith, John',
+            offenderNo: 'A1234BC',
+            dateOfBirth: '2 April 1975',
+            location: '1-1-C-028, HMP Hewell',
+          },
+        })
+      })
+  })
+
+  it('should render 400 Bad Request error for invalid prisoner number', () => {
+    return request(app)
+      .post('/prisoner/A12--34BC')
       .expect(400)
       .expect('Content-Type', /html/)
       .expect(res => {
