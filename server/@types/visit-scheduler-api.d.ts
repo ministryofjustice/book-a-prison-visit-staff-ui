@@ -30,6 +30,9 @@ export interface paths {
     get: operations['getSessionTemplates']
     post: operations['createSessionTemplate']
   }
+  '/migrate-visits': {
+    post: operations['migrateVisit']
+  }
   '/visits/{reference}/cancel': {
     patch: operations['cancelVisit']
   }
@@ -312,15 +315,6 @@ export interface components {
       /** Format: int32 */
       messagesFoundCount: number
     }
-    /** @description Create legacy data */
-    CreateLegacyDataRequestDto: {
-      /**
-       * Format: int64
-       * @description NOMIS lead visitor ID
-       * @example 1234556
-       */
-      leadVisitorId: number
-    }
     CreateVisitRequestDto: {
       /**
        * @description Prisoner Id
@@ -362,14 +356,11 @@ export interface components {
        * @description The finishing date and time of the visit
        */
       endTimestamp: string
-      legacyData?: components['schemas']['CreateLegacyDataRequestDto']
       visitContact?: components['schemas']['CreateContactOnVisitRequestDto']
       /** @description List of visitors associated with the visit */
-      visitors?: components['schemas']['CreateVisitorOnVisitRequestDto'][]
+      visitors: components['schemas']['CreateVisitorOnVisitRequestDto'][]
       /** @description List of additional support associated with the visit */
       visitorSupport?: components['schemas']['CreateSupportOnVisitRequestDto'][]
-      /** @description Visit notes */
-      visitNotes?: components['schemas']['VisitNoteDto'][]
     }
     CreateSessionTemplateRequestDto: {
       /**
@@ -487,6 +478,77 @@ export interface components {
        * @example 50
        */
       openCapacity: number
+    }
+    /** @description Contact associated with the visit */
+    CreateLegacyContactOnVisitRequestDto: {
+      /**
+       * @description Contact Name
+       * @example John Smith
+       */
+      name: string
+      /**
+       * @description Contact Phone Number
+       * @example 01234 567890
+       */
+      telephone?: string
+    }
+    /** @description Create legacy data */
+    CreateLegacyDataRequestDto: {
+      /**
+       * Format: int64
+       * @description NOMIS lead visitor ID
+       * @example 1234556
+       */
+      leadVisitorId: number
+    }
+    /** @description Migrate visit request */
+    MigrateVisitRequestDto: {
+      /**
+       * @description Prisoner Id
+       * @example AF34567G
+       */
+      prisonerId: string
+      /**
+       * @description Prison Id
+       * @example MDI
+       */
+      prisonId: string
+      /**
+       * @description Visit Room
+       * @example A1
+       */
+      visitRoom: string
+      /**
+       * @description Visit Type
+       * @example SOCIAL
+       */
+      visitType: 'SOCIAL' | 'OFFICIAL' | 'FAMILY'
+      /**
+       * @description Visit Status
+       * @example RESERVED
+       */
+      visitStatus: 'RESERVED' | 'BOOKED' | 'CANCELLED'
+      /**
+       * @description Visit Restriction
+       * @example OPEN
+       */
+      visitRestriction: 'OPEN' | 'CLOSED'
+      /**
+       * Format: date-time
+       * @description The date and time of the visit
+       */
+      startTimestamp: string
+      /**
+       * Format: date-time
+       * @description The finishing date and time of the visit
+       */
+      endTimestamp: string
+      legacyData: components['schemas']['CreateLegacyDataRequestDto']
+      visitContact?: components['schemas']['CreateLegacyContactOnVisitRequestDto']
+      /** @description List of visitors associated with the visit */
+      visitors?: components['schemas']['CreateVisitorOnVisitRequestDto'][]
+      /** @description Visit notes */
+      visitNotes?: components['schemas']['VisitNoteDto'][]
     }
     /** @description Visit Outcome */
     OutcomeDto: {
@@ -871,6 +933,39 @@ export interface operations {
     requestBody: {
       content: {
         'application/json': components['schemas']['CreateSessionTemplateRequestDto']
+      }
+    }
+  }
+  migrateVisit: {
+    responses: {
+      /** Visit migrated */
+      201: {
+        content: {
+          'application/json': string
+        }
+      }
+      /** Incorrect request to migrate a visit */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** Unauthorized to access this endpoint */
+      401: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** Incorrect permissions to migrate a visit */
+      403: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['MigrateVisitRequestDto']
       }
     }
   }
