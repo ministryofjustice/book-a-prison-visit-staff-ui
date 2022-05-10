@@ -9,14 +9,14 @@ generic-service:
     contextColour: green
 
   env:
-    INGRESS_URL: "https://vsip-staff-preprod.hmpps.service.justice.gov.uk"
+    INGRESS_URL: "https://manage-prison-visits-preprod.prison.service.justice.gov.uk"
     HMPPS_AUTH_URL: "https://sign-in-preprod.hmpps.service.justice.gov.uk/auth"
     NOMIS_AUTH_URL: "https://sign-in-preprod.hmpps.service.justice.gov.uk/auth"
     TOKEN_VERIFICATION_API_URL: "https://token-verification-api-preprod.prison.service.justice.gov.uk"
     PRISONER_SEARCH_API_URL: "https://prisoner-offender-search-preprod.prison.service.justice.gov.uk"
     PRISON_API_URL: "https://api-preprod.prison.service.justice.gov.uk"
-    VISIT_SCHEDULER_API_URL: "https://visit-scheduler-preprod.hmpps.service.justice.gov.uk"
-    PRISONER_CONTACT_REGISTRY_API_URL: "https://prisoner-contact-registry-preprod.hmpps.service.justice.gov.uk"
+    VISIT_SCHEDULER_API_URL: "https://visit-scheduler-preprod.prison.service.justice.gov.uk"
+    PRISONER_CONTACT_REGISTRY_API_URL: "https://prisoner-contact-registry-preprod.prison.service.justice.gov.uk"
     WHEREABOUTS_API_URL: "https://whereabouts-api-preprod.service.justice.gov.uk"
 
 generic-prometheus-alerts:
