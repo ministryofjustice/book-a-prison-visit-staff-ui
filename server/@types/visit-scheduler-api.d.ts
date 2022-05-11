@@ -147,119 +147,6 @@ export interface components {
       userMessage?: string
       developerMessage?: string
     }
-    /** @description Contact */
-    ContactDto: {
-      /**
-       * @description Contact Name
-       * @example John Smith
-       */
-      name: string
-      /**
-       * @description Contact Phone Number
-       * @example 01234 567890
-       */
-      telephone: string
-    }
-    /** @description Visit */
-    VisitDto: {
-      /**
-       * @description Visit Reference
-       * @example v9-d7-ed-7u
-       */
-      reference: string
-      /**
-       * @description Prisoner Id
-       * @example AF34567G
-       */
-      prisonerId: string
-      /**
-       * @description Prison Id
-       * @example MDI
-       */
-      prisonId: string
-      /**
-       * @description Visit Room
-       * @example A1 L3
-       */
-      visitRoom: string
-      /**
-       * @description Visit Type
-       * @example SOCIAL
-       */
-      visitType: 'SOCIAL' | 'OFFICIAL' | 'FAMILY'
-      /**
-       * @description Visit Status
-       * @example RESERVED
-       */
-      visitStatus: 'RESERVED' | 'BOOKED' | 'CANCELLED'
-      /**
-       * @description Visit Restriction
-       * @example OPEN
-       */
-      visitRestriction: 'OPEN' | 'CLOSED'
-      /**
-       * Format: date-time
-       * @description The date and time of the visit
-       */
-      startTimestamp: string
-      /**
-       * Format: date-time
-       * @description The finishing date and time of the visit
-       */
-      endTimestamp: string
-      /** @description Visit Notes */
-      visitNotes: components['schemas']['VisitNoteDto'][]
-      visitContact?: components['schemas']['ContactDto']
-      /** @description List of visitors associated with the visit */
-      visitors: components['schemas']['VisitorDto'][]
-      /** @description List of additional support associated with the visit */
-      visitorSupport: components['schemas']['VisitorSupportDto'][]
-      /**
-       * Format: date-time
-       * @description The visit created date and time
-       */
-      createdTimestamp: string
-      /**
-       * Format: date-time
-       * @description The visit modified date and time
-       */
-      modifiedTimestamp: string
-    }
-    /** @description VisitNote */
-    VisitNoteDto: {
-      /**
-       * @description Note type
-       * @example VISITOR_CONCERN
-       */
-      type: 'VISITOR_CONCERN' | 'VISIT_OUTCOMES' | 'VISIT_COMMENT' | 'STATUS_CHANGED_REASON'
-      /**
-       * @description Note text
-       * @example Visitor is concerned that his mother in-law is coming!
-       */
-      text: string
-    }
-    /** @description Visitor */
-    VisitorDto: {
-      /**
-       * Format: int64
-       * @description Person ID (nomis) of the visitor
-       * @example 1234
-       */
-      nomisPersonId: number
-    }
-    /** @description Visitor support */
-    VisitorSupportDto: {
-      /**
-       * @description Support type
-       * @example OTHER
-       */
-      type: string
-      /**
-       * @description Support text description
-       * @example visually impaired assistance
-       */
-      text?: string
-    }
     Message: {
       messageId?: string
       receiptHandle?: string
@@ -268,8 +155,8 @@ export interface components {
       messageAttributes?: {
         [key: string]: components['schemas']['MessageAttributeValue']
       }
-      md5OfMessageAttributes?: string
       md5OfBody?: string
+      md5OfMessageAttributes?: string
     }
     MessageAttributeValue: {
       stringValue?: string
@@ -550,6 +437,19 @@ export interface components {
       /** @description Visit notes */
       visitNotes?: components['schemas']['VisitNoteDto'][]
     }
+    /** @description VisitNote */
+    VisitNoteDto: {
+      /**
+       * @description Note type
+       * @example VISITOR_CONCERN
+       */
+      type: 'VISITOR_CONCERN' | 'VISIT_OUTCOMES' | 'VISIT_COMMENT' | 'STATUS_CHANGED_REASON'
+      /**
+       * @description Note text
+       * @example Visitor is concerned that his mother in-law is coming!
+       */
+      text: string
+    }
     /** @description Visit Outcome */
     OutcomeDto: {
       /**
@@ -560,6 +460,106 @@ export interface components {
       /**
        * @description Outcome text
        * @example Because he got covid
+       */
+      text?: string
+    }
+    /** @description Contact */
+    ContactDto: {
+      /**
+       * @description Contact Name
+       * @example John Smith
+       */
+      name: string
+      /**
+       * @description Contact Phone Number
+       * @example 01234 567890
+       */
+      telephone: string
+    }
+    /** @description Visit */
+    VisitDto: {
+      /**
+       * @description Visit Reference
+       * @example v9-d7-ed-7u
+       */
+      reference: string
+      /**
+       * @description Prisoner Id
+       * @example AF34567G
+       */
+      prisonerId: string
+      /**
+       * @description Prison Id
+       * @example MDI
+       */
+      prisonId: string
+      /**
+       * @description Visit Room
+       * @example A1 L3
+       */
+      visitRoom: string
+      /**
+       * @description Visit Type
+       * @example SOCIAL
+       */
+      visitType: 'SOCIAL' | 'OFFICIAL' | 'FAMILY'
+      /**
+       * @description Visit Status
+       * @example RESERVED
+       */
+      visitStatus: 'RESERVED' | 'BOOKED' | 'CANCELLED'
+      /**
+       * @description Visit Restriction
+       * @example OPEN
+       */
+      visitRestriction: 'OPEN' | 'CLOSED'
+      /**
+       * Format: date-time
+       * @description The date and time of the visit
+       */
+      startTimestamp: string
+      /**
+       * Format: date-time
+       * @description The finishing date and time of the visit
+       */
+      endTimestamp: string
+      /** @description Visit Notes */
+      visitNotes: components['schemas']['VisitNoteDto'][]
+      visitContact?: components['schemas']['ContactDto']
+      /** @description List of visitors associated with the visit */
+      visitors: components['schemas']['VisitorDto'][]
+      /** @description List of additional support associated with the visit */
+      visitorSupport: components['schemas']['VisitorSupportDto'][]
+      /**
+       * Format: date-time
+       * @description The visit created date and time
+       */
+      createdTimestamp: string
+      /**
+       * Format: date-time
+       * @description The visit modified date and time
+       */
+      modifiedTimestamp: string
+    }
+    /** @description Visitor */
+    VisitorDto: {
+      /**
+       * Format: int64
+       * @description Person ID (nomis) of the visitor
+       * @example 1234
+       */
+      nomisPersonId: number
+    }
+    /** @description Visitor support */
+    VisitorSupportDto: {
+      /**
+       * @description Support type
+       * @example OTHER
+       */
+      type: string
+      /**
+       * @description Support text description
+       * @example visually impaired assistance
        */
       text?: string
     }
@@ -704,7 +704,7 @@ export interface operations {
       /** Visit updated */
       200: {
         content: {
-          'application/json': components['schemas']['VisitDto']
+          'application/json': string
         }
       }
       /** Incorrect request to update a visit */
@@ -852,7 +852,7 @@ export interface operations {
       /** Visit created */
       201: {
         content: {
-          'application/json': components['schemas']['VisitDto']
+          'application/json': string
         }
       }
       /** Incorrect request to create a visit */

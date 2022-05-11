@@ -1,4 +1,5 @@
 import { URLSearchParams } from 'url'
+import { Response } from 'superagent'
 import RestClient from './restClient'
 import {
   CreateVisitRequestDto,
@@ -83,28 +84,31 @@ class VisitSchedulerApiClient {
     })
   }
 
-  createVisit(visitData: VisitSessionData): Promise<Visit> {
-    return this.restclient.post({
-      path: '/visits',
-      data: <CreateVisitRequestDto>{
-        prisonerId: visitData.prisoner.offenderNo,
-        prisonId: this.prisonId,
-        visitRoom: visitData.visit.visitRoomName,
-        visitType: this.visitType,
-        visitStatus: 'RESERVED',
-        visitRestriction: visitData.visitRestriction,
-        startTimestamp: visitData.visit.startTimestamp,
-        endTimestamp: visitData.visit.endTimestamp,
-        visitors: visitData.visitors.map(visitor => {
-          return {
-            nomisPersonId: visitor.personId,
-          }
-        }),
-      },
-    })
+  createVisit(visitData: VisitSessionData): Promise<string> {
+    return this.restclient
+      .post({
+        path: '/visits',
+        data: <CreateVisitRequestDto>{
+          prisonerId: visitData.prisoner.offenderNo,
+          prisonId: this.prisonId,
+          visitRoom: visitData.visit.visitRoomName,
+          visitType: this.visitType,
+          visitStatus: 'RESERVED',
+          visitRestriction: visitData.visitRestriction,
+          startTimestamp: visitData.visit.startTimestamp,
+          endTimestamp: visitData.visit.endTimestamp,
+          visitors: visitData.visitors.map(visitor => {
+            return {
+              nomisPersonId: visitor.personId,
+            }
+          }),
+        },
+        raw: true,
+      })
+      .then((result: Response) => result.text)
   }
 
-  updateVisit(visitData: VisitSessionData, visitStatus: string): Promise<Visit> {
+  updateVisit(visitData: VisitSessionData, visitStatus: string): Promise<string> {
     const visitContact = visitData.mainContact
       ? {
           telephone: visitData.mainContact.phoneNumber,
@@ -114,26 +118,29 @@ class VisitSchedulerApiClient {
         }
       : undefined
 
-    return this.restclient.put({
-      path: `/visits/${visitData.visitReference}`,
-      data: <UpdateVisitRequestDto>{
-        prisonerId: visitData.prisoner.offenderNo,
-        prisonId: this.prisonId,
-        visitRoom: visitData.visit.visitRoomName,
-        visitType: this.visitType,
-        visitStatus,
-        visitRestriction: visitData.visitRestriction,
-        startTimestamp: visitData.visit.startTimestamp,
-        endTimestamp: visitData.visit.endTimestamp,
-        visitContact,
-        visitors: visitData.visitors.map(visitor => {
-          return {
-            nomisPersonId: visitor.personId,
-          }
-        }),
-        visitorSupport: visitData.visitorSupport,
-      },
-    })
+    return this.restclient
+      .put({
+        path: `/visits/${visitData.visitReference}`,
+        data: <UpdateVisitRequestDto>{
+          prisonerId: visitData.prisoner.offenderNo,
+          prisonId: this.prisonId,
+          visitRoom: visitData.visit.visitRoomName,
+          visitType: this.visitType,
+          visitStatus,
+          visitRestriction: visitData.visitRestriction,
+          startTimestamp: visitData.visit.startTimestamp,
+          endTimestamp: visitData.visit.endTimestamp,
+          visitContact,
+          visitors: visitData.visitors.map(visitor => {
+            return {
+              nomisPersonId: visitor.personId,
+            }
+          }),
+          visitorSupport: visitData.visitorSupport,
+        },
+        raw: true,
+      })
+      .then((result: Response) => result.text)
   }
 
   cancelVisit(reference: string, outcome: OutcomeDto): Promise<Visit> {

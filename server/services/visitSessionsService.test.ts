@@ -582,33 +582,15 @@ describe('Visit sessions service', () => {
           },
         ],
       }
-      const visit: Visit = {
-        reference: 'ab-cd-ef-gh',
-        prisonerId: visitSessionData.prisoner.offenderNo,
-        prisonId: 'HEI',
-        visitRoom: visitSessionData.visit.visitRoomName,
-        visitType: 'SOCIAL',
-        visitStatus: 'RESERVED',
-        visitRestriction: 'OPEN',
-        startTimestamp: '2022-02-14T10:00:00',
-        endTimestamp: '2022-02-14T11:00:00',
-        visitNotes: [],
-        visitors: [
-          {
-            nomisPersonId: 1234,
-          },
-        ],
-        visitorSupport: [],
-        createdTimestamp: '2022-02-14T10:00:00',
-        modifiedTimestamp: '2022-02-14T10:05:00',
-      }
 
-      visitSchedulerApiClient.createVisit.mockResolvedValue(visit)
+      const reference = 'ab-cd-ef-gh'
+
+      visitSchedulerApiClient.createVisit.mockResolvedValue(reference)
       whereaboutsApiClient.getEvents.mockResolvedValue([])
       const result = await visitSessionsService.createVisit({ username: 'user', visitData: visitSessionData })
 
       expect(visitSchedulerApiClient.createVisit).toHaveBeenCalledTimes(1)
-      expect(result).toEqual('ab-cd-ef-gh')
+      expect(result).toEqual(reference)
     })
   })
 
@@ -654,53 +636,15 @@ describe('Visit sessions service', () => {
         },
         visitReference: 'ab-cd-ef-gh',
       }
-      const visit: Visit = {
-        reference: 'ab-cd-ef-gh',
-        prisonerId: visitSessionData.prisoner.offenderNo,
-        prisonId: 'HEI',
-        visitRoom: visitSessionData.visit.visitRoomName,
-        visitType: 'SOCIAL',
-        visitStatus: 'RESERVED',
-        visitRestriction: 'OPEN',
-        startTimestamp: '2022-02-14T10:00:00',
-        endTimestamp: '2022-02-14T11:00:00',
-        visitNotes: [],
-        visitContact: {
-          name: 'John Smith',
-          telephone: '01234 567890',
-        },
-        visitors: [
-          {
-            nomisPersonId: 1234,
-          },
-        ],
-        visitorSupport: [{ type: 'WHEELCHAIR' }, { type: 'MASK_EXEMPT' }, { type: 'OTHER', text: 'custom request' }],
-        createdTimestamp: '2022-02-14T10:00:00',
-        modifiedTimestamp: '2022-02-14T10:05:00',
-      }
 
-      visitSchedulerApiClient.updateVisit.mockResolvedValue(visit)
+      const reference = 'ab-cd-ef-gh'
+
+      visitSchedulerApiClient.updateVisit.mockResolvedValue(reference)
       whereaboutsApiClient.getEvents.mockResolvedValue([])
       const result = await visitSessionsService.updateVisit({ username: 'user', visitData: visitSessionData })
 
       expect(visitSchedulerApiClient.updateVisit).toHaveBeenCalledTimes(1)
-      expect(result).toEqual(<Visit>{
-        reference: 'ab-cd-ef-gh',
-        prisonerId: 'A1234BC',
-        prisonId: 'HEI',
-        visitRoom: 'visit room',
-        visitType: 'SOCIAL',
-        visitStatus: 'RESERVED',
-        visitRestriction: 'OPEN',
-        startTimestamp: '2022-02-14T10:00:00',
-        endTimestamp: '2022-02-14T11:00:00',
-        visitNotes: [],
-        visitContact: { name: 'John Smith', telephone: '01234 567890' },
-        visitors: [{ nomisPersonId: 1234 }],
-        visitorSupport: [{ type: 'WHEELCHAIR' }, { type: 'MASK_EXEMPT' }, { type: 'OTHER', text: 'custom request' }],
-        createdTimestamp: '2022-02-14T10:00:00',
-        modifiedTimestamp: '2022-02-14T10:05:00',
-      })
+      expect(result).toEqual(reference)
     })
   })
 

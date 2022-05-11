@@ -165,10 +165,10 @@ export default class VisitSessionsService {
     const token = await this.systemToken(username)
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
 
-    const reservation = await visitSchedulerApiClient.createVisit(visitData)
-    logger.info(`Created visit ${reservation?.reference} for offender ${visitData.prisoner.offenderNo}`)
+    const reference = await visitSchedulerApiClient.createVisit(visitData)
+    logger.info(`Created visit ${reference} for offender ${visitData.prisoner.offenderNo}`)
 
-    return reservation.reference ? reservation.reference : undefined
+    return reference
   }
 
   async updateVisit({
@@ -179,16 +179,14 @@ export default class VisitSessionsService {
     username: string
     visitData: VisitSessionData
     visitStatus?: string
-  }): Promise<Visit> {
+  }): Promise<string> {
     const token = await this.systemToken(username)
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
 
-    const visit = await visitSchedulerApiClient.updateVisit(visitData, visitStatus)
-    logger.info(
-      `Updated visit ${visit.reference} (status = ${visitStatus}) for offender ${visitData.prisoner.offenderNo}`
-    )
+    const reference = await visitSchedulerApiClient.updateVisit(visitData, visitStatus)
+    logger.info(`Updated visit ${reference} (status = ${visitStatus}) for offender ${visitData.prisoner.offenderNo}`)
 
-    return visit
+    return reference
   }
 
   async cancelVisit({

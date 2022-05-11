@@ -397,14 +397,12 @@ export default function routes(
     }
 
     try {
-      const bookedVisit = await visitSessionsService.updateVisit({
+      const reference = await visitSessionsService.updateVisit({
         username: res.locals.user?.username,
         visitData: req.session.visitSessionData,
         visitStatus: 'BOOKED',
       })
-
-      // TODO: Update to the correct value when schema updated
-      req.session.visitSessionData.visitReference = bookedVisit.reference
+      req.session.visitSessionData.visitReference = reference
     } catch (error) {
       return res.render('pages/checkYourBooking', {
         errors: [

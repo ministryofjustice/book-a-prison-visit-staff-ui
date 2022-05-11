@@ -264,54 +264,27 @@ describe('visitSchedulerApiClient', () => {
   })
 
   describe('createVisit', () => {
-    it('should return a new Visit from the Visit Scheduler API', async () => {
+    it('should return a new Visit reference from the Visit Scheduler API', async () => {
       const prisonId = 'HEI'
       const visitType = 'SOCIAL'
       const visitStatus = 'RESERVED'
       const visitRestriction = 'OPEN'
 
-      const result: Visit = {
-        reference: 'ab-cd-ef-gh',
-        prisonerId: 'AF34567G',
-        prisonId,
-        visitRoom: 'A1 L3',
-        visitType,
-        visitStatus,
-        visitRestriction,
-        startTimestamp: '2022-02-14T10:00:00',
-        endTimestamp: '2022-02-14T11:00:00',
-        visitNotes: [],
-        visitContact: {
-          name: 'John Smith',
-          telephone: '01234 567890',
-        },
-        visitors: [
-          {
-            nomisPersonId: 1234,
-          },
-        ],
-        visitorSupport: [
-          {
-            type: 'OTHER',
-            text: 'custom support details',
-          },
-        ],
-        createdTimestamp: '2022-02-14T10:00:00',
-        modifiedTimestamp: '2022-02-14T10:05:00',
-      }
+      const reference = 'ab-cd-ef-gh'
+
       const visitSessionData = <VisitSessionData>{
         prisoner: {
-          offenderNo: result.prisonerId,
+          offenderNo: 'AF34567G',
           name: 'pri name',
           dateOfBirth: '23 May 1988',
           location: 'somewhere',
         },
         visit: {
           id: 'visitId',
-          startTimestamp: result.startTimestamp,
-          endTimestamp: result.endTimestamp,
+          startTimestamp: '2022-02-14T10:00:00',
+          endTimestamp: '2022-02-14T11:00:00',
           availableTables: 1,
-          visitRoomName: result.visitRoom,
+          visitRoomName: 'A1 L3',
         },
         visitRestriction: 'OPEN',
         visitors: [
@@ -351,11 +324,11 @@ describe('visitSchedulerApiClient', () => {
           }),
         })
         .matchHeader('authorization', `Bearer ${token}`)
-        .reply(201, result)
+        .reply(201, reference)
 
       const output = await client.createVisit(visitSessionData)
 
-      expect(output).toEqual(result)
+      expect(output).toEqual(reference)
     })
   })
 
@@ -364,52 +337,22 @@ describe('visitSchedulerApiClient', () => {
     const visitType = 'SOCIAL'
     const visitStatus = 'RESERVED'
 
-    it('should return an updated Visit from the Visit Scheduler API, given full visitSessionData', async () => {
-      const result: Visit = {
-        reference: 'ab-cd-ef-gh',
-        prisonerId: 'AF34567G',
-        prisonId,
-        visitRoom: 'A1 L3',
-        visitType,
-        visitStatus,
-        visitRestriction: 'OPEN',
-        startTimestamp: '2022-02-14T10:00:00',
-        endTimestamp: '2022-02-14T11:00:00',
-        visitNotes: [],
-        visitContact: {
-          name: 'John Smith',
-          telephone: '01234 567890',
-        },
-        visitors: [
-          {
-            nomisPersonId: 1234,
-          },
-        ],
-        visitorSupport: [
-          { type: 'WHEELCHAIR' },
-          { type: 'MASK_EXEMPT' },
-          {
-            type: 'OTHER',
-            text: 'custom request',
-          },
-        ],
-        createdTimestamp: '2022-02-14T10:00:00',
-        modifiedTimestamp: '2022-02-14T10:05:00',
-      }
+    it('should return reference when updating a Visit from the Visit Scheduler API, given full visitSessionData', async () => {
+      const reference = 'ab-cd-ef-gh'
 
       const visitSessionData: VisitSessionData = {
         prisoner: {
-          offenderNo: result.prisonerId,
+          offenderNo: 'AF34567G',
           name: 'pri name',
           dateOfBirth: '23 May 1988',
           location: 'somewhere',
         },
         visit: {
           id: 'visitId',
-          startTimestamp: result.startTimestamp,
-          endTimestamp: result.endTimestamp,
+          startTimestamp: '2022-02-14T10:00:00',
+          endTimestamp: '2022-02-14T11:00:00',
           availableTables: 1,
-          visitRoomName: result.visitRoom,
+          visitRoomName: 'A1 L3',
         },
         visitRestriction: 'OPEN',
         visitors: [
@@ -432,8 +375,8 @@ describe('visitSchedulerApiClient', () => {
         ],
         visitorSupport: [{ type: 'WHEELCHAIR' }, { type: 'MASK_EXEMPT' }, { type: 'OTHER', text: 'custom request' }],
         mainContact: {
-          phoneNumber: result.visitContact.telephone,
-          contactName: result.visitContact.name,
+          phoneNumber: '01234 567890',
+          contactName: 'John Smith',
         },
         visitReference: 'ab-cd-ef-gh',
       }
@@ -461,47 +404,29 @@ describe('visitSchedulerApiClient', () => {
           visitorSupport: visitSessionData.visitorSupport,
         })
         .matchHeader('authorization', `Bearer ${token}`)
-        .reply(200, result)
+        .reply(200, reference)
 
       const output = await client.updateVisit(visitSessionData, visitStatus)
 
-      expect(output).toEqual(result)
+      expect(output).toEqual(reference)
     })
 
     it('should return an updated Visit from the Visit Scheduler API, given minimal visitSessionData', async () => {
-      const result: Visit = {
-        reference: 'ab-cd-ef-gh',
-        prisonerId: 'AF34567G',
-        prisonId,
-        visitRoom: 'A1 L3',
-        visitType,
-        visitStatus,
-        visitRestriction: 'OPEN',
-        startTimestamp: '2022-02-14T10:00:00',
-        endTimestamp: '2022-02-14T11:00:00',
-        visitNotes: [],
-        visitors: [
-          {
-            nomisPersonId: 1234,
-          },
-        ],
-        visitorSupport: [],
-        createdTimestamp: '2022-02-14T10:00:00',
-        modifiedTimestamp: '2022-02-14T10:05:00',
-      }
+      const reference = 'ab-cd-ef-gh'
+
       const visitSessionData: VisitSessionData = {
         prisoner: {
-          offenderNo: result.prisonerId,
+          offenderNo: 'AF34567G',
           name: 'pri name',
           dateOfBirth: '23 May 1988',
           location: 'somewhere',
         },
         visit: {
           id: 'visitId',
-          startTimestamp: result.startTimestamp,
-          endTimestamp: result.endTimestamp,
+          startTimestamp: '2022-02-14T10:00:00',
+          endTimestamp: '2022-02-14T11:00:00',
           availableTables: 1,
-          visitRoomName: result.visitRoom,
+          visitRoomName: 'A1 L3',
         },
         visitRestriction: 'OPEN',
         visitors: [
@@ -544,11 +469,11 @@ describe('visitSchedulerApiClient', () => {
           visitorSupport: visitSessionData.visitorSupport,
         })
         .matchHeader('authorization', `Bearer ${token}`)
-        .reply(200, result)
+        .reply(200, reference)
 
       const output = await client.updateVisit(visitSessionData, visitStatus)
 
-      expect(output).toEqual(result)
+      expect(output).toEqual(reference)
     })
   })
 
