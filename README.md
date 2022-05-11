@@ -57,7 +57,7 @@ The easiest way to run the app is to use docker compose to create the service an
 The app requires: 
 * hmpps-auth - for authentication
 * redis - session store and token caching
-npm i
+
 ### Running the app for development
 
 To start the main services excluding the example typescript template app: 
