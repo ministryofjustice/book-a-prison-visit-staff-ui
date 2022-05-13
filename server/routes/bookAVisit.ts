@@ -1,4 +1,4 @@
-import type { Router } from 'express'
+import type { RequestHandler, Router } from 'express'
 import { body, validationResult, query } from 'express-validator'
 import { VisitorListItem, VisitSlot } from '../@types/bapv'
 import sessionCheckMiddleware from '../middleware/sessionCheckMiddleware'
@@ -7,6 +7,7 @@ import PrisonerProfileService from '../services/prisonerProfileService'
 import VisitSessionsService from '../services/visitSessionsService'
 import { getFlashFormValues, getSelectedSlot, getSupportTypeDescriptions } from './visitorUtils'
 import { SupportType, VisitorSupport } from '../data/visitSchedulerApiTypes'
+import asyncMiddleware from '../middleware/asyncMiddleware'
 
 export default function routes(
   router: Router,
@@ -14,7 +15,19 @@ export default function routes(
   visitSessionsService: VisitSessionsService,
   prisonerProfileService: PrisonerProfileService
 ): Router {
-  router.get('/select-visitors', sessionCheckMiddleware({ stage: 1 }), async (req, res) => {
+  const get = (path: string, ...handlers: RequestHandler[]) =>
+    router.get(
+      path,
+      handlers.map(handler => asyncMiddleware(handler))
+    )
+
+  const post = (path: string, ...handlers: RequestHandler[]) =>
+    router.post(
+      path,
+      handlers.map(handler => asyncMiddleware(handler))
+    )
+
+  get('/select-visitors', sessionCheckMiddleware({ stage: 1 }), async (req, res) => {
     const { visitSessionData } = req.session
     const { offenderNo } = visitSessionData.prisoner
     const visitorList = await prisonerVisitorsService.getVisitors(offenderNo, res.locals.user?.username)
@@ -40,7 +53,7 @@ export default function routes(
     })
   })
 
-  router.post(
+  post(
     '/select-visitors',
     sessionCheckMiddleware({ stage: 1 }),
     body('visitors').custom((value: string, { req }) => {
@@ -111,7 +124,7 @@ export default function routes(
     }
   )
 
-  router.get(
+  get(
     '/select-date-and-time',
     sessionCheckMiddleware({ stage: 2 }),
     query('timeOfDay').customSanitizer((value: string) => (!['morning', 'afternoon'].includes(value) ? '' : value)),
@@ -120,7 +133,7 @@ export default function routes(
     ),
     async (req, res) => {
       const { visitSessionData } = req.session
-      const { timeOfDay, dayOfTheWeek } = req.query
+      const { timeOfDay, dayOfTheWeek } = req.query as Record<string, string>
       const slotsList = await visitSessionsService.getVisitSessions({
         username: res.locals.user?.username,
         offenderNo: visitSessionData.prisoner.offenderNo,
@@ -148,7 +161,7 @@ export default function routes(
     }
   )
 
-  router.post(
+  post(
     '/select-date-and-time',
     sessionCheckMiddleware({ stage: 2 }),
     body('visit-date-and-time').custom((value: string, { req }) => {
@@ -199,7 +212,7 @@ export default function routes(
     }
   )
 
-  router.get('/additional-support', sessionCheckMiddleware({ stage: 3 }), async (req, res) => {
+  get('/additional-support', sessionCheckMiddleware({ stage: 3 }), async (req, res) => {
     const { visitSessionData } = req.session
     const formValues = getFlashFormValues(req)
 
@@ -223,7 +236,7 @@ export default function routes(
     })
   })
 
-  router.post(
+  post(
     '/additional-support',
     sessionCheckMiddleware({ stage: 3 }),
     body('additionalSupportRequired').custom((value: string) => {
@@ -278,7 +291,7 @@ export default function routes(
     }
   )
 
-  router.get('/select-main-contact', sessionCheckMiddleware({ stage: 4 }), async (req, res) => {
+  get('/select-main-contact', sessionCheckMiddleware({ stage: 4 }), async (req, res) => {
     const { visitSessionData } = req.session
     const formValues = getFlashFormValues(req)
 
@@ -299,7 +312,7 @@ export default function routes(
     })
   })
 
-  router.post(
+  post(
     '/select-main-contact',
     sessionCheckMiddleware({ stage: 4 }),
     body('contact').custom((value: string) => {
@@ -351,7 +364,7 @@ export default function routes(
     }
   )
 
-  router.get('/check-your-booking', sessionCheckMiddleware({ stage: 5 }), async (req, res) => {
+  get('/check-your-booking', sessionCheckMiddleware({ stage: 5 }), async (req, res) => {
     const { visitSessionData } = req.session
     const { offenderNo } = visitSessionData.prisoner
 
@@ -370,7 +383,7 @@ export default function routes(
     })
   })
 
-  router.post('/check-your-booking', sessionCheckMiddleware({ stage: 5 }), async (req, res) => {
+  post('/check-your-booking', sessionCheckMiddleware({ stage: 5 }), async (req, res) => {
     const { visitSessionData } = req.session
     const { offenderNo } = req.session.visitSessionData.prisoner
 
@@ -425,7 +438,7 @@ export default function routes(
     return res.redirect('/book-a-visit/confirmation')
   })
 
-  router.get('/confirmation', sessionCheckMiddleware({ stage: 6 }), async (req, res) => {
+  get('/confirmation', sessionCheckMiddleware({ stage: 6 }), async (req, res) => {
     const { visitSessionData } = req.session
     const { offenderNo } = req.session.visitSessionData.prisoner
 
