@@ -1,4 +1,4 @@
-import type { RequestHandler, Router } from 'express'
+import type { RequestHandler, Request, Router } from 'express'
 import { body, validationResult } from 'express-validator'
 import { BadRequest, NotFound } from 'http-errors'
 import { VisitSessionData } from '../@types/bapv'
@@ -19,11 +19,7 @@ export default function routes(
   const post = (path: string, handler: RequestHandler) => router.post(path, asyncMiddleware(handler))
 
   get('/:offenderNo', async (req, res) => {
-    const { offenderNo } = req.params
-
-    if (!isValidPrisonerNumber(offenderNo)) {
-      throw new BadRequest()
-    }
+    const offenderNo = getOffenderNo(req)
 
     const prisonerProfile = await prisonerProfileService.getProfile(offenderNo, res.locals.user?.username)
 
@@ -34,10 +30,7 @@ export default function routes(
   })
 
   post('/:offenderNo', async (req, res) => {
-    const { offenderNo } = req.params
-    if (!isValidPrisonerNumber(offenderNo)) {
-      throw new BadRequest()
-    }
+    const offenderNo = getOffenderNo(req)
 
     const { inmateDetail, visitBalances } = await prisonerProfileService.getPrisonerAndVisitBalances(
       offenderNo,
@@ -72,11 +65,7 @@ export default function routes(
   })
 
   get('/:offenderNo/visits', async (req, res) => {
-    const { offenderNo } = req.params
-
-    if (!isValidPrisonerNumber(offenderNo)) {
-      throw new BadRequest()
-    }
+    const offenderNo = getOffenderNo(req)
 
     const prisonerDetails = await prisonerSearchService.getPrisoner(offenderNo, res.locals.user?.username)
     if (prisonerDetails === null) {
@@ -90,4 +79,13 @@ export default function routes(
   })
 
   return router
+}
+
+function getOffenderNo(req: Request): string {
+  const { offenderNo } = req.params
+
+  if (!isValidPrisonerNumber(offenderNo)) {
+    throw new BadRequest()
+  }
+  return offenderNo
 }
