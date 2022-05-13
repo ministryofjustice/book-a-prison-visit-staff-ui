@@ -3,11 +3,11 @@ import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
 import { PrisonerProfile, BAPVVisitBalances, VisitInformation, VisitSessionData } from '../@types/bapv'
-import { InmateDetail } from '../data/prisonApiTypes'
+import { InmateDetail, VisitBalances } from '../data/prisonApiTypes'
 import PrisonerProfileService from '../services/prisonerProfileService'
 import PrisonerSearchService from '../services/prisonerSearchService'
 import VisitSessionsService from '../services/visitSessionsService'
-import { appWithAllRoutes } from './testutils/appSetup'
+import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import { Prisoner } from '../data/prisonerOffenderSearchTypes'
 
 jest.mock('../services/prisonerProfileService')
@@ -16,6 +16,7 @@ jest.mock('../services/visitSessionsService')
 
 let app: Express
 const systemToken = async (user: string): Promise<string> => `${user}-token-1`
+let flashData: Record<string, string[] | Record<string, string>[]>
 let visitSessionData: Partial<VisitSessionData>
 
 const prisonerProfileService = new PrisonerProfileService(
@@ -33,6 +34,11 @@ const visitSessionsService = new VisitSessionsService(
 ) as jest.Mocked<VisitSessionsService>
 
 beforeEach(() => {
+  flashData = { errors: [], formValues: [] }
+  flashProvider.mockImplementation(key => {
+    return flashData[key]
+  })
+
   visitSessionData = {}
 
   app = appWithAllRoutes(
@@ -53,8 +59,10 @@ afterEach(() => {
 })
 
 describe('GET /prisoner/A1234BC', () => {
-  it('should render the prisoner profile page for offender number A1234BC', () => {
-    const returnData: PrisonerProfile = {
+  let prisonerProfile: PrisonerProfile
+
+  beforeEach(() => {
+    prisonerProfile = {
       displayName: 'Smith, John',
       displayDob: '12 October 1980',
       activeAlerts: [
@@ -66,7 +74,7 @@ describe('GET /prisoner/A1234BC', () => {
             text: 'Protective Isolation Unit',
           },
           {
-            text: 'Professional lock pick.',
+            text: 'Professional lock pick',
           },
           {
             html: '1 January 2022',
@@ -90,11 +98,19 @@ describe('GET /prisoner/A1234BC', () => {
         activeAlertCount: 1,
         inactiveAlertCount: 3,
         legalStatus: 'SENTENCED',
+        assignedLivingUnit: {
+          description: '1-1-C-028',
+          agencyName: 'HMP Hewell',
+        },
+        category: 'Cat C',
+        privilegeSummary: {
+          iepLevel: 'Standard',
+        },
       } as InmateDetail,
       convictedStatus: 'Convicted',
       visitBalances: {
         remainingVo: 1,
-        remainingPvo: 2,
+        remainingPvo: 0,
         latestIepAdjustDate: '21 April 2021',
         latestPrivIepAdjustDate: '1 December 2021',
         nextIepAdjustDate: '15 May 2021',
@@ -104,113 +120,127 @@ describe('GET /prisoner/A1234BC', () => {
       pastVisits: [],
     }
 
-    prisonerProfileService.getProfile.mockResolvedValue(returnData)
+    prisonerProfileService.getProfile.mockResolvedValue(prisonerProfile)
+  })
 
+  it('should render the prisoner profile page for offender number A1234BC', () => {
     return request(app)
       .get('/prisoner/A1234BC')
+      .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
-        expect(res.text).toContain('<h1 class="govuk-heading-l">Smith, John</h1>')
-        expect(res.text).toContain('class="flagged-alerts-list"')
-        expect(res.text).toContain('class="govuk-tag flagged-alert flagged-alert--UPIU"')
-        expect(res.text).toContain('Protective Isolation Unit')
-        expect(res.text).toContain('A1234BC')
-        expect(res.text).toMatch(/<strong>Conviction status<\/strong>\s+<span data-test="convicted-status">Convicted/)
-        expect(res.text).toMatch(/id="visiting-orders"/)
-        expect(res.text).toMatch(/id="active-alerts"/)
-        expect(res.text).toContain('Professional lock pick.')
-        expect(res.text).toContain('Remaining VOs: 1')
-        expect(res.text).toContain('Remaining PVOs: 2')
-        expect(res.text).toContain('21 April 2021')
-        expect(res.text).toContain('1 December 2021')
-        expect(res.text).toContain('15 May 2021')
-        expect(res.text).toContain('1 January 2022')
-        expect(res.text).toContain('1 active')
-        expect(res.text).toMatch(/<button.*?class="govuk-button".*?>\s+Book a prison visit\s+<\/button>/)
+        const $ = cheerio.load(res.text)
+        expect($('.govuk-error-summary__body').length).toBe(0)
+        expect($('h1').text().trim()).toBe('Smith, John')
+        expect($('.flagged-alerts-list .flagged-alert.flagged-alert--UPIU').text().trim()).toBe(
+          'Protective Isolation Unit'
+        )
+        expect($('[data-test="prison-number"]').text()).toBe('A1234BC')
+        expect($('[data-test="dob"]').text()).toBe('12 October 1980')
+        expect($('[data-test="location"]').text()).toBe('1-1-C-028, HMP Hewell')
+        expect($('[data-test="category"]').text()).toBe('Cat C')
+        expect($('[data-test="iep-level"]').text()).toBe('Standard')
+        expect($('[data-test="convicted-status"]').text()).toBe('Convicted')
+        expect($('[data-test="active-alert-count"]').text()).toBe('1 active')
+        expect($('[data-test="remaining-vos"]').text()).toBe('Remaining VOs: 1')
+        expect($('[data-test="remaining-pvos"]').text()).toBe('Remaining PVOs: 0')
+
+        expect($('[data-test="tab-vo-remaining"]').text()).toBe('1')
+        expect($('[data-test="tab-vo-last-date"]').text()).toBe('21 April 2021')
+        expect($('[data-test="tab-vo-next-date"]').text()).toBe('15 May 2021')
+        expect($('[data-test="tab-pvo-remaining"]').text()).toBe('0')
+        expect($('[data-test="tab-pvo-last-date"]').text()).toBe('1 December 2021')
+        expect($('[data-test="tab-pvo-next-date"]').text()).toBe('1 January 2022')
+
+        expect($('#active-alerts').text()).toContain('Professional lock pick')
+
+        expect($('#vo-override').length).toBe(0)
+        expect($('[data-test="book-a-visit"]').length).toBe(1)
       })
   })
 
   it('should render the prisoner profile page for offender number A1234BC without active alerts if there are none', () => {
-    const returnData: PrisonerProfile = {
-      displayName: 'Smith, John',
-      displayDob: '12 October 1980',
-      activeAlerts: [],
-      flaggedAlerts: [
-        {
-          alertCode: 'UPIU',
-          alertCodeDescription: 'Protective Isolation Unit',
-        },
-      ],
-      inmateDetail: {
-        offenderNo: 'A1234BC',
-        firstName: 'JOHN',
-        lastName: 'SMITH',
-        dateOfBirth: '1980-10-12',
-        activeAlertCount: 0,
-        inactiveAlertCount: 3,
-        legalStatus: 'SENTENCED',
-      } as InmateDetail,
-      convictedStatus: 'Convicted',
-      visitBalances: {
-        remainingVo: 1,
-        remainingPvo: 2,
-        latestIepAdjustDate: '21 April 2021',
-        latestPrivIepAdjustDate: '1 December 2021',
-        nextIepAdjustDate: '15 May 2021',
-        nextPrivIepAdjustDate: '1 January 2022',
-      } as BAPVVisitBalances,
-      upcomingVisits: [],
-      pastVisits: [],
-    }
-
-    prisonerProfileService.getProfile.mockResolvedValue(returnData)
+    prisonerProfile.flaggedAlerts = []
+    prisonerProfile.activeAlerts = []
+    prisonerProfile.inmateDetail.activeAlertCount = 0
 
     return request(app)
       .get('/prisoner/A1234BC')
+      .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
-        expect(res.text).toContain('<h1 class="govuk-heading-l">Smith, John</h1>')
-        expect(res.text).toContain('A1234BC')
-        expect(res.text).toContain('There are no active alerts for this prisoner.')
-        expect(res.text).toMatch(/id="active-alerts"/)
-        expect(res.text).toContain('0 active')
+        const $ = cheerio.load(res.text)
+        expect($('h1').text().trim()).toBe('Smith, John')
+        expect($('.flagged-alerts-list').length).toBe(0)
+        expect($('[data-test="active-alert-count"]').text()).toBe('0 active')
+        expect($('#active-alerts').text()).toContain('There are no active alerts for this prisoner.')
       })
   })
 
   it('should render prisoner profile page without visiting orders for REMAND', () => {
-    const returnData: PrisonerProfile = {
-      displayName: 'James, Fred',
-      displayDob: '11 December 1985',
-      activeAlerts: [],
-      flaggedAlerts: [],
-      inmateDetail: {
-        offenderNo: 'B2345CD',
-        firstName: 'FRED',
-        lastName: 'JAMES',
-        dateOfBirth: '1985-12-11',
-        activeAlertCount: 2,
-        inactiveAlertCount: 4,
-        legalStatus: 'REMAND',
-      } as InmateDetail,
-      convictedStatus: 'Remand',
-      visitBalances: null,
-      upcomingVisits: [],
-      pastVisits: [],
-    }
-
-    prisonerProfileService.getProfile.mockResolvedValue(returnData)
+    prisonerProfile.convictedStatus = 'Remand'
+    prisonerProfile.visitBalances = undefined
 
     return request(app)
       .get('/prisoner/A1234BC')
+      .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
-        expect(res.text).toContain('<h1 class="govuk-heading-l">James, Fred</h1>')
-        expect(res.text).not.toContain('class="flagged-alerts-list"')
-        expect(res.text).toContain('B2345CD')
-        expect(res.text).toMatch(/<strong>Conviction status<\/strong>\s+<span data-test="convicted-status">Remand/)
-        expect(res.text).not.toMatch(/id="visiting-orders"/)
-        expect(res.text).not.toContain('Visiting orders')
-        expect(res.text).toContain('2 active')
+        const $ = cheerio.load(res.text)
+        expect($('h1').text().trim()).toBe('Smith, John')
+        expect($('[data-test="convicted-status"]').text()).toBe('Remand')
+        expect($('[data-test="remaining-vos"]').length).toBe(0)
+        expect($('[data-test="remaining-pvos"]').length).toBe(0)
+        expect($('#vo-override').length).toBe(0)
+        expect($('[data-test="book-a-visit"]').length).toBe(1)
+      })
+  })
+
+  it('should render prisoner profile page with VO Override checkbox if VO balances zero', () => {
+    prisonerProfile.visitBalances.remainingVo = 0
+
+    return request(app)
+      .get('/prisoner/A1234BC')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('h1').text().trim()).toBe('Smith, John')
+        expect($('[data-test="remaining-vos"]').text()).toBe('Remaining VOs: 0')
+        expect($('[data-test="remaining-pvos"]').text()).toBe('Remaining PVOs: 0')
+        expect($('#vo-override').length).toBe(1)
+        expect($('label[for="vo-override"]').text()).toContain('The prisoner has no available visiting orders')
+        expect($('[data-test="book-a-visit"]').length).toBe(1)
+      })
+  })
+
+  it('should render prisoner profile page with VO Override validation errors', () => {
+    prisonerProfile.visitBalances.remainingVo = 0
+
+    flashData.errors = [
+      {
+        msg: 'Select the box to book a prison visit',
+        param: 'vo-override',
+        location: 'body',
+      },
+    ]
+
+    return request(app)
+      .get('/prisoner/A1234BC')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('.govuk-error-summary__body').text()).toContain('Select the box to book a prison visit')
+        expect($('h1').text().trim()).toBe('Smith, John')
+        expect($('[data-test="remaining-vos"]').text()).toBe('Remaining VOs: 0')
+        expect($('[data-test="remaining-pvos"]').text()).toBe('Remaining PVOs: 0')
+        expect($('#vo-override').length).toBe(1)
+        expect($('#vo-override-error').text()).toContain('Select the box to book a prison visit')
+        expect($('label[for="vo-override"]').text()).toContain('The prisoner has no available visiting orders')
+        expect($('[data-test="book-a-visit"]').length).toBe(1)
+        expect(flashProvider).toHaveBeenCalledWith('errors')
+        expect(flashProvider).toHaveBeenCalledTimes(1)
       })
   })
 
@@ -226,26 +256,37 @@ describe('GET /prisoner/A1234BC', () => {
 })
 
 describe('POST /prisoner/A1234BC', () => {
-  const prisoner: Prisoner = {
+  const inmateDetail = {
+    offenderNo: 'A1234BC',
     firstName: 'JOHN',
     lastName: 'SMITH',
-    prisonerNumber: 'A1234BC',
     dateOfBirth: '1975-04-02',
-    prisonName: 'HMP Hewell',
-    cellLocation: '1-1-C-028',
-    restrictedPatient: false,
+    activeAlertCount: 0,
+    inactiveAlertCount: 3,
+    legalStatus: 'SENTENCED',
+    assignedLivingUnit: {
+      description: '1-1-C-028',
+      agencyName: 'HMP Hewell',
+    },
+  } as InmateDetail
+
+  const visitBalances: VisitBalances = {
+    remainingVo: 1,
+    remainingPvo: 0,
   }
 
-  it('should set up visitSessionData and redirect to select visitors page', () => {
-    prisonerSearchService.getPrisoner.mockResolvedValue(prisoner)
+  beforeEach(() => {
+    prisonerProfileService.getPrisonerAndVisitBalances.mockResolvedValue({ inmateDetail, visitBalances })
+  })
 
+  it('should set up visitSessionData and redirect to select visitors page', () => {
     return request(app)
       .post('/prisoner/A1234BC')
       .expect(302)
       .expect('location', '/book-a-visit/select-visitors')
       .expect(res => {
-        expect(prisonerSearchService.getPrisoner).toHaveBeenCalledTimes(1)
-        expect(prisonerSearchService.getPrisoner).toHaveBeenCalledWith('A1234BC', undefined)
+        expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledTimes(1)
+        expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledWith('A1234BC', undefined)
         expect(visitSessionData).toEqual(<VisitSessionData>{
           prisoner: {
             name: 'Smith, John',
@@ -265,15 +306,13 @@ describe('POST /prisoner/A1234BC', () => {
       location: 'a cell, HMP Prison',
     }
 
-    prisonerSearchService.getPrisoner.mockResolvedValue(prisoner)
-
     return request(app)
       .post('/prisoner/A1234BC')
       .expect(302)
       .expect('location', '/book-a-visit/select-visitors')
       .expect(res => {
-        expect(prisonerSearchService.getPrisoner).toHaveBeenCalledTimes(1)
-        expect(prisonerSearchService.getPrisoner).toHaveBeenCalledWith('A1234BC', undefined)
+        expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledTimes(1)
+        expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledWith('A1234BC', undefined)
         expect(visitSessionData).toEqual(<VisitSessionData>{
           prisoner: {
             name: 'Smith, John',
@@ -282,6 +321,28 @@ describe('POST /prisoner/A1234BC', () => {
             location: '1-1-C-028, HMP Hewell',
           },
         })
+      })
+  })
+
+  it('should set error in flash and redirect back to profile page if VO balances zero', () => {
+    visitBalances.remainingVo = 0
+
+    return request(app)
+      .post('/prisoner/A1234BC')
+      .expect(302)
+      .expect('location', '/prisoner/A1234BC')
+      .expect(res => {
+        expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledTimes(1)
+        expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledWith('A1234BC', undefined)
+        expect(visitSessionData).toEqual({})
+        expect(flashProvider).toHaveBeenCalledWith('errors', [
+          {
+            location: 'body',
+            msg: 'Select the box to book a prison visit',
+            param: 'vo-override',
+            value: undefined,
+          },
+        ])
       })
   })
 

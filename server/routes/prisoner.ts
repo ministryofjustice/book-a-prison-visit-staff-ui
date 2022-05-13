@@ -1,4 +1,5 @@
 import type { RequestHandler, Router } from 'express'
+import { body, validationResult } from 'express-validator'
 import { BadRequest, NotFound } from 'http-errors'
 import { VisitSessionData } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
@@ -26,28 +27,43 @@ export default function routes(
 
     const prisonerProfile = await prisonerProfileService.getProfile(offenderNo, res.locals.user?.username)
 
-    return res.render('pages/prisoner/profile', { ...prisonerProfile })
+    return res.render('pages/prisoner/profile', {
+      errors: req.flash('errors'),
+      ...prisonerProfile,
+    })
   })
 
   post('/:offenderNo', async (req, res) => {
     const { offenderNo } = req.params
-
     if (!isValidPrisonerNumber(offenderNo)) {
       throw new BadRequest()
     }
 
-    const prisonerDetails = await prisonerSearchService.getPrisoner(offenderNo, res.locals.user?.username)
-    if (prisonerDetails === null) {
-      throw new NotFound()
+    const { inmateDetail, visitBalances } = await prisonerProfileService.getPrisonerAndVisitBalances(
+      offenderNo,
+      res.locals.user?.username
+    )
+
+    if (visitBalances?.remainingVo <= 0 && visitBalances?.remainingPvo <= 0) {
+      await body('vo-override').equals('override').withMessage('Select the box to book a prison visit').run(req)
+
+      const errors = validationResult(req)
+
+      if (!errors.isEmpty()) {
+        req.flash('errors', errors.array() as [])
+        return res.redirect(req.originalUrl)
+      }
     }
 
     const visitSessionData: VisitSessionData = req.session.visitSessionData || { prisoner: undefined }
 
     visitSessionData.prisoner = {
-      name: properCaseFullName(`${prisonerDetails.lastName}, ${prisonerDetails.firstName}`),
+      name: properCaseFullName(`${inmateDetail.lastName}, ${inmateDetail.firstName}`),
       offenderNo,
-      dateOfBirth: prisonerDateTimePretty(prisonerDetails.dateOfBirth),
-      location: `${prisonerDetails.cellLocation}, ${prisonerDetails.prisonName}`,
+      dateOfBirth: prisonerDateTimePretty(inmateDetail.dateOfBirth),
+      location: inmateDetail.assignedLivingUnit
+        ? `${inmateDetail.assignedLivingUnit.description}, ${inmateDetail.assignedLivingUnit.agencyName}`
+        : '',
     }
 
     req.session.visitSessionData = visitSessionData

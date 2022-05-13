@@ -30,24 +30,24 @@ describe('Prisoner profile service', () => {
   let prisonerProfileService: PrisonerProfileService
   let systemToken
 
+  beforeEach(() => {
+    systemToken = async (user: string): Promise<string> => `${user}-token-1`
+    prisonApiClientBuilder = jest.fn().mockReturnValue(prisonApiClient)
+    visitSchedulerApiClientBuilder = jest.fn().mockReturnValue(visitSchedulerApiClient)
+    prisonerContactRegistryApiClientBuilder = jest.fn().mockReturnValue(prisonerContactRegistryApiClient)
+    prisonerProfileService = new PrisonerProfileService(
+      prisonApiClientBuilder,
+      visitSchedulerApiClientBuilder,
+      prisonerContactRegistryApiClientBuilder,
+      systemToken
+    )
+  })
+
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
+
   describe('getProfile', () => {
-    beforeEach(() => {
-      systemToken = async (user: string): Promise<string> => `${user}-token-1`
-      prisonApiClientBuilder = jest.fn().mockReturnValue(prisonApiClient)
-      visitSchedulerApiClientBuilder = jest.fn().mockReturnValue(visitSchedulerApiClient)
-      prisonerContactRegistryApiClientBuilder = jest.fn().mockReturnValue(prisonerContactRegistryApiClient)
-      prisonerProfileService = new PrisonerProfileService(
-        prisonApiClientBuilder,
-        visitSchedulerApiClientBuilder,
-        prisonerContactRegistryApiClientBuilder,
-        systemToken
-      )
-    })
-
-    afterEach(() => {
-      jest.resetAllMocks()
-    })
-
     it('Retrieves and processes data for prisoner profile with visit balances', async () => {
       const bookings = <PageOfPrisonerBookingSummary>{
         content: [
@@ -427,24 +427,69 @@ describe('Prisoner profile service', () => {
     })
   })
 
-  describe('getOffenderRestrictions', () => {
+  describe('getPrisonerAndVisitBalances', () => {
+    const bookings = <PageOfPrisonerBookingSummary>{
+      content: [
+        {
+          bookingId: 12345,
+          bookingNo: 'A123445',
+          offenderNo: 'A1234BC',
+          firstName: 'JOHN',
+          lastName: 'SMITH',
+          dateOfBirth: '1980-10-12',
+          agencyId: 'HEI',
+          legalStatus: 'SENTENCED',
+          convictedStatus: 'Convicted',
+        },
+      ],
+      numberOfElements: 1,
+    }
+
+    const inmateDetail = <InmateDetail>{
+      offenderNo: 'A1234BC',
+      firstName: 'JOHN',
+      lastName: 'SMITH',
+      dateOfBirth: '1980-10-12',
+      activeAlertCount: 1,
+      inactiveAlertCount: 3,
+      legalStatus: 'SENTENCED',
+    }
+
+    const visitBalances: VisitBalances = {
+      remainingVo: 1,
+      remainingPvo: 2,
+      latestIepAdjustDate: '2021-04-21',
+      latestPrivIepAdjustDate: '2021-12-01',
+    }
+
     beforeEach(() => {
-      systemToken = async (user: string): Promise<string> => `${user}-token-1`
-      prisonApiClientBuilder = jest.fn().mockReturnValue(prisonApiClient)
-      visitSchedulerApiClientBuilder = jest.fn().mockReturnValue(visitSchedulerApiClient)
-      prisonerContactRegistryApiClientBuilder = jest.fn().mockReturnValue(prisonerContactRegistryApiClient)
-      prisonerProfileService = new PrisonerProfileService(
-        prisonApiClientBuilder,
-        visitSchedulerApiClientBuilder,
-        prisonerContactRegistryApiClientBuilder,
-        systemToken
-      )
+      prisonApiClient.getBookings.mockResolvedValue(bookings)
+      prisonApiClient.getOffender.mockResolvedValue(inmateDetail)
+      prisonApiClient.getVisitBalances.mockResolvedValue(visitBalances)
     })
 
-    afterEach(() => {
-      jest.resetAllMocks()
+    it('Retrieves prisoner details and visit balances for a Convicted prisoner', async () => {
+      const results = await prisonerProfileService.getPrisonerAndVisitBalances(offenderNo, 'user')
+
+      expect(prisonApiClient.getBookings).toHaveBeenCalledTimes(1)
+      expect(prisonApiClient.getOffender).toHaveBeenCalledTimes(1)
+      expect(prisonApiClient.getVisitBalances).toHaveBeenCalledTimes(1)
+      expect(results).toEqual({ inmateDetail, visitBalances })
     })
 
+    it('Retrieves prisoner details and no visit balances for prisoner on Remand', async () => {
+      bookings.content[0].convictedStatus = 'Remand'
+
+      const results = await prisonerProfileService.getPrisonerAndVisitBalances(offenderNo, 'user')
+
+      expect(prisonApiClient.getBookings).toHaveBeenCalledTimes(1)
+      expect(prisonApiClient.getOffender).toHaveBeenCalledTimes(1)
+      expect(prisonApiClient.getVisitBalances).toHaveBeenCalledTimes(0)
+      expect(results).toEqual({ inmateDetail, visitBalances: undefined })
+    })
+  })
+
+  describe('getRestrictions', () => {
     it('Retrieves and passes through the offender restrictions', async () => {
       const restrictions = <OffenderRestrictions>{
         bookingId: 12345,

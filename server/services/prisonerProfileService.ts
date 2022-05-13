@@ -19,7 +19,7 @@ import {
   nextPrivIepAdjustDate,
   formatVisitType,
 } from '../utils/utils'
-import { Alert, OffenderRestriction } from '../data/prisonApiTypes'
+import { Alert, InmateDetail, OffenderRestriction, VisitBalances } from '../data/prisonApiTypes'
 import { Visit, Visitor } from '../data/visitSchedulerApiTypes'
 import { Contact } from '../data/prisonerContactRegistryApiTypes'
 
@@ -115,6 +115,26 @@ export default class PrisonerProfileService {
       upcomingVisits,
       pastVisits,
     }
+  }
+
+  async getPrisonerAndVisitBalances(
+    offenderNo: string,
+    username: string
+  ): Promise<{ inmateDetail: InmateDetail; visitBalances: VisitBalances }> {
+    const token = await this.systemToken(username)
+    const prisonApiClient = this.prisonApiClientBuilder(token)
+
+    const bookings = await prisonApiClient.getBookings(offenderNo)
+    if (bookings.numberOfElements !== 1) throw new NotFound()
+    const { convictedStatus } = bookings.content[0]
+
+    const inmateDetail = await prisonApiClient.getOffender(offenderNo)
+
+    if (convictedStatus === 'Remand') {
+      return { inmateDetail, visitBalances: undefined }
+    }
+
+    return { inmateDetail, visitBalances: await prisonApiClient.getVisitBalances(offenderNo) }
   }
 
   async getRestrictions(offenderNo: string, username: string): Promise<OffenderRestriction[]> {
