@@ -72,7 +72,7 @@ export default function routes(
 
       const reference = getVisitReference(req)
       const outcome: OutcomeDto = {
-        outcome: req.body.cancel,
+        outcomeStatus: req.body.cancel,
         text: req.body[reasonFieldName],
       }
 

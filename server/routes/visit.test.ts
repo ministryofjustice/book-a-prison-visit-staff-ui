@@ -299,7 +299,7 @@ describe('POST /visit/:reference/cancel', () => {
           username: undefined,
           reference: 'ab-cd-ef-gh',
           outcome: <OutcomeDto>{
-            outcome: 'PRISONER_CANCELLED',
+            outcomeStatus: 'PRISONER_CANCELLED',
             text: 'illness',
           },
         })

@@ -557,7 +557,7 @@ describe('visitSchedulerApiClient', () => {
       const reference = 'ab-cd-ef-gh'
 
       const outcome: OutcomeDto = {
-        outcome: 'VISITOR_CANCELLED',
+        outcomeStatus: 'VISITOR_CANCELLED',
         text: 'cancellation reason',
       }
 
