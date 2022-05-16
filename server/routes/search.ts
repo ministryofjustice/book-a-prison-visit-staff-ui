@@ -1,4 +1,4 @@
-import type { Router } from 'express'
+import type { RequestHandler, Router } from 'express'
 import url from 'url'
 import { validatePrisonerSearch, validateVisitSearch } from './searchValidation'
 import PrisonerSearchService from '../services/prisonerSearchService'
@@ -6,19 +6,23 @@ import VisitSessionsService from '../services/visitSessionsService'
 import config from '../config'
 import { getPageLinks } from '../utils/utils'
 import { VisitInformation } from '../@types/bapv'
+import asyncMiddleware from '../middleware/asyncMiddleware'
 
 export default function routes(
   router: Router,
   prisonerSearchService: PrisonerSearchService,
   visitSessionsService: VisitSessionsService
 ): Router {
-  router.get(['/prisoner', '/prisoner-visit'], (req, res) => {
+  const get = (path: string | string[], handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
+  const post = (path: string | string[], handler: RequestHandler) => router.post(path, asyncMiddleware(handler))
+
+  get(['/prisoner', '/prisoner-visit'], (req, res) => {
     const search = req?.body?.search
 
     res.render('pages/search/prisoner', { search, visit: req.originalUrl.includes('-visit') })
   })
 
-  router.post(['/prisoner', '/prisoner-visit'], (req, res) => {
+  post(['/prisoner', '/prisoner-visit'], (req, res) => {
     const isVisit = req.originalUrl.includes('-visit')
     const { search } = req.body
 
@@ -32,7 +36,7 @@ export default function routes(
     )
   })
 
-  router.get(['/prisoner/results', '/prisoner-visit/results'], async (req, res) => {
+  get(['/prisoner/results', '/prisoner-visit/results'], async (req, res) => {
     const isVisit = req.originalUrl.includes('-visit')
     const search = (req.query.search || '') as string
     const currentPage = (req.query.page || '') as string
@@ -73,7 +77,7 @@ export default function routes(
     })
   })
 
-  router.get('/visit', (req, res) => {
+  get('/visit', (req, res) => {
     const searchBlock1 = req?.body?.searchBlock1
     const searchBlock2 = req?.body?.searchBlock2
     const searchBlock3 = req?.body?.searchBlock3
@@ -82,7 +86,7 @@ export default function routes(
     res.render('pages/search/visit', { searchBlock1, searchBlock2, searchBlock3, searchBlock4 })
   })
 
-  router.post('/visit', (req, res) => {
+  post('/visit', (req, res) => {
     const { searchBlock1, searchBlock2, searchBlock3, searchBlock4 } = req.body
 
     return res.redirect(
@@ -95,7 +99,7 @@ export default function routes(
     )
   })
 
-  router.get('/visit/results', async (req, res) => {
+  get('/visit/results', async (req, res) => {
     const { searchBlock1, searchBlock2, searchBlock3, searchBlock4 } = req.query
     const search = `${searchBlock1}-${searchBlock2}-${searchBlock3}-${searchBlock4}`
 
