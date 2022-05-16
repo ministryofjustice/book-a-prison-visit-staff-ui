@@ -1,0 +1,104 @@
+{% extends "layout.njk" %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{%- from "moj/components/side-navigation/macro.njk" import mojSideNavigation -%}
+
+{% set pageHeaderTitle = "View visits by date" %}
+{% set pageTitle = applicationName + " - " + pageHeaderTitle + " - " + visit.reference %}
+{% set backLinkHref = "/prisoner/" + visit.prisonerId + "/visits" %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+    </div>
+
+    <div class="govuk-grid-column-one-quarter">
+        {{ mojSideNavigation({
+        label: 'Slots navigation',
+        sections: [
+            {
+                heading: {
+                    text: 'Main visits room'
+                },
+                items: [{
+                    text: '11am to 12pm',
+                    href: '/visits/',
+                    active: true
+                }, {
+                    text: '3pm to 4pm',
+                    href: '/visits'
+                }]
+            },
+            {
+                heading: {
+                    text: 'Closed visits room'
+                },
+                items: [{{
+                    text: '3pm to 4pm',
+                    href: '/visits'
+                }]
+            }
+        ]
+        }) }}
+
+      <h3 class="govuk-heading-s">Visitor list</h3>
+      <div class="govuk-button-group">
+        {{ govukButton({
+            text: "Download CSV"
+        }) }}
+        {{ govukButton({
+            text: "Print",
+            classes: "govuk-button--secondary"
+        }) }}
+      </div>
+
+      <h3 class="govuk-heading-s">Prisoner list</h3>
+      <div class="govuk-button-group">
+        {{ govukButton({
+            text: "Download CSV"
+        }) }}
+        {{ govukButton({
+            text: "Print",
+            classes: "govuk-button--secondary"
+        }) }}
+      </div>
+    </div>
+
+    <div class="govuk-grid-column-three-quarters">
+      <h2 class="govuk-heading-m">X visits room, Y to Z</h2>
+      <p>X of Y tables booked</p>
+      <p>X visits in total (Y adults and Z children)
+    </div>
+
+      {{ govukTable({
+        caption: "Prisoner details",
+        captionClasses: "govuk-table__caption--m",
+        classes: "bapv-table govuk-!-margin-top-3",
+        head: [
+            {
+              text: "Prisoner name"
+            },
+            {
+              text: "Prison number"
+            },
+            {
+              text: "Action"
+            }
+        ],
+        rows: [
+            {
+                text: 'Surname, First Name'
+            },
+            {
+                text: 'A1234BC'
+            },
+            {
+                html: '<a href="#">View</a>'
+            }
+        ]
+      }) }}
+
+    </div>
+  </div>
+{% endblock %}
