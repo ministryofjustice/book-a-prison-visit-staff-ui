@@ -61,7 +61,7 @@ export function registerNunjucks(app?: express.Express): Environment {
       return null
     }
     const array = fullName.split(' ')
-    return `${properCaseFullName(array[1])}, ${properCaseFullName(array[0])}`
+    return `${properCaseFullName(array.at(-1))}, ${properCaseFullName(array[0])}`
   })
 
   njkEnv.addFilter('properCaseFullName', (name: string) => {
