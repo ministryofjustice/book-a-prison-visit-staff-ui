@@ -26,6 +26,16 @@ describe('Nunjucks Filters', () => {
       const $ = cheerio.load(compiledTemplate.render(viewContext))
       expect($('body').text()).toBe('Bloggs, Joe')
     })
+
+    it('should handle contact with middle name', () => {
+      viewContext = {
+        fullName: 'ONE TWO THREE',
+      }
+      const nunjucksString = '{{ fullName | formatLastNameFirst }}'
+      compiledTemplate = nunjucks.compile(nunjucksString, njkEnv)
+      const $ = cheerio.load(compiledTemplate.render(viewContext))
+      expect($('body').text()).toBe('Three, One')
+    })
   })
 
   describe('properCaseFullName', () => {
