@@ -41,7 +41,7 @@ class PrisonerSearchClient {
     })
   }
 
-  getPrisonersByNumbers(prisonerNumbers: string[]): Promise<Prisoner[]> {
+  getPrisonersByPrisonerNumbers(prisonerNumbers: string[]): Promise<Prisoner[]> {
     return this.restClient.post({
       path: '/prisoner-search/prisoner-numbers',
       data: {

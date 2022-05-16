@@ -4,8 +4,8 @@
 {%- from "moj/components/side-navigation/macro.njk" import mojSideNavigation -%}
 
 {% set pageHeaderTitle = "View visits by date" %}
-{% set pageTitle = applicationName + " - " + pageHeaderTitle + " - " + visit.reference %}
-{% set backLinkHref = "/prisoner/" + visit.prisonerId + "/visits" %}
+{% set pageTitle = applicationName + " - " + pageHeaderTitle %}
+{% set backLinkHref = "/" %}
 
 {% block content %}
   <div class="govuk-grid-row">
