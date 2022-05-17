@@ -96,7 +96,11 @@ describe('prisonSearchClientBuilder', () => {
 
       const output = await client.getPrisonersByPrisonerNumbers(prisonerNumbers)
 
-      expect(output).toEqual(results)
+      expect(output).toEqual({
+        totalPages: 1,
+        totalElements: 2,
+        content: results,
+      })
     })
   })
 })

@@ -2,7 +2,8 @@ import { InmateDetail, VisitBalances } from '../data/prisonApiTypes'
 import { VisitorSupport } from '../data/visitSchedulerApiTypes'
 
 export type PrisonerDetailsItem = {
-  html: string
+  html?: string
+  text?: string
 }
 
 export type PrisonerAlertItem = [
