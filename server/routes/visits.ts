@@ -51,8 +51,8 @@ export default function routes(
     //   pagesToShow: config.apis.prisonerSearch.pagesLinksToShow,
     //   numberOfPages,
     //   currentPage: parsedPage,
-    //   searchTerm: search,
-    //   searchType: isVisit ? 'prisoner-visit' : 'prisoner',
+    //   searchParam: `search=${search}`,
+    //   searchUrl: '/',
     // })
 
     return res.render('pages/visits/summary', {

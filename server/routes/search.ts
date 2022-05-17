@@ -57,8 +57,8 @@ export default function routes(
       pagesToShow: config.apis.prisonerSearch.pagesLinksToShow,
       numberOfPages,
       currentPage: parsedPage,
-      searchTerm: search,
-      searchType: isVisit ? 'prisoner-visit' : 'prisoner',
+      searchParam: `search=${search}`,
+      searchUrl: `/search/${isVisit ? 'prisoner-visit' : 'prisoner'}/results`,
     })
 
     res.render('pages/search/prisonerResults', {
@@ -138,8 +138,8 @@ export default function routes(
       pagesToShow: pagesLinksToShow,
       numberOfPages: 1,
       currentPage: parsedPage,
-      searchTerm: search,
-      searchType: 'visit',
+      searchParam: `search=${search}`,
+      searchUrl: '/search/visit/results',
     })
 
     res.render('pages/search/visitResults', {
