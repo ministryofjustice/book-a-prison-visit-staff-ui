@@ -6,7 +6,7 @@
 
 {% set pageHeaderTitle = "View visits by date" %}
 {% set pageTitle = applicationName + " - " + pageHeaderTitle %}
-{% set backLinkHref = "/" %}
+{% set backLinkHref = "/visits" %}
 
 {% block content %}
   <div class="govuk-grid-row">
@@ -81,11 +81,11 @@
             },
             previous: {
               text: 'Previous',
-              href: backLinkHref + '/results?search=' + search + '&page=' + previous
+              href: backLinkHref + '?startDate=' + startDate + '&page=' + previous
             },
             next: {
               text: 'Next',
-              href: backLinkHref + '/results?search=' + search + '&page=' + next
+              href: backLinkHref + '?startDate=' + startDate + '&page=' + next
             },
             items: pageLinks
           }) }}

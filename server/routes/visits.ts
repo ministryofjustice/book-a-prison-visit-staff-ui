@@ -18,53 +18,50 @@ export default function routes(
       handlers.map(handler => asyncMiddleware(handler))
     )
 
-  get('/', async (req, res) => {
-    const startDate =
-      new Date(req.query?.startDate as string).toString() === 'Invalid Date'
-        ? new Date()
-        : new Date(req.query?.startDate as string)
-    const formattedStartDate = format(startDate, 'yyyy-MM-dd')
+  const getStartDate = (startDate: string): string => {
+    const startDateObject = new Date(startDate).toString() === 'Invalid Date' ? new Date() : new Date(startDate)
+    return format(startDateObject, 'yyyy-MM-dd')
+  }
 
+  get('/', async (req, res) => {
+    const startDate = getStartDate(req.query?.startDate as string)
     const visits: VisitInformation[] = await visitSessionsService.getVisitsByDate({
-      dateString: formattedStartDate,
+      dateString: startDate,
       username: res.locals.user?.username,
     })
-    const everyVisitPrisoner = visits.map(visit => visit.prisonNumber)
-    const prisoners = [...new Set(everyVisitPrisoner)]
-    const search = formattedStartDate
-    const currentPage = (req.query.page || '1') as string
-    const parsedPage = Number.parseInt(currentPage, 10) || 1
+    const prisoners = [...new Set(visits.map(visit => visit.prisonNumber))]
+    const currentPage = Number.parseInt((req.query.page || '1') as string, 10)
     const { pageSize } = config.apis.prisonerSearch
 
     let results: PrisonerDetailsItem[][] = []
     let numberOfResults = 0
     let numberOfPages = 1
-    let next
-    let previous
+    let next = 1
+    let previous = 1
 
     if (prisoners.length > 0) {
       ;({ results, numberOfResults, numberOfPages, next, previous } =
-        await prisonerSearchService.getPrisonersByPrisonerNumbers(prisoners, res.locals.user?.username, parsedPage))
+        await prisonerSearchService.getPrisonersByPrisonerNumbers(prisoners, res.locals.user?.username, currentPage))
     }
-    const realNumberOfResults = numberOfResults
-    const currentPageMax = parsedPage * pageSize
-    const to = realNumberOfResults < currentPageMax ? realNumberOfResults : currentPageMax
+
+    const currentPageMax = currentPage * pageSize
+    const to = numberOfResults < currentPageMax ? numberOfResults : currentPageMax
     const pageLinks = getResultsPagingLinks({
       pagesToShow: config.apis.prisonerSearch.pagesLinksToShow,
       numberOfPages,
-      currentPage: parsedPage,
-      searchParam: `startDate=${search}`,
+      currentPage,
+      searchParam: `startDate=${startDate}`,
       searchUrl: '/visits/',
     })
 
     return res.render('pages/visits/summary', {
-      search,
+      startDate,
       results,
       next,
       previous,
-      numberOfResults: realNumberOfResults,
+      numberOfResults,
       pageSize,
-      from: (parsedPage - 1) * pageSize + 1,
+      from: (currentPage - 1) * pageSize + 1,
       to,
       pageLinks: numberOfPages <= 1 ? [] : pageLinks,
     })
