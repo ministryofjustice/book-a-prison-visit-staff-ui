@@ -199,9 +199,12 @@ export interface components {
       outcomeStatus?:
         | 'ADMINISTRATIVE_CANCELLATION'
         | 'ADMINISTRATIVE_ERROR'
+        | 'BATCH_CANCELLATION'
+        | 'CANCELLATION'
         | 'COMPLETED_NORMALLY'
         | 'ESTABLISHMENT_CANCELLED'
         | 'NOT_RECORDED'
+        | 'NO_VISITING_ORDER'
         | 'PRISONER_CANCELLED'
         | 'PRISONER_COMPLETED_EARLY'
         | 'PRISONER_REFUSED_TO_ATTEND'
@@ -211,6 +214,7 @@ export interface components {
         | 'VISITOR_DECLINED_ENTRY'
         | 'VISITOR_DID_NOT_ARRIVE'
         | 'VISITOR_FAILED_SECURITY_CHECKS'
+        | 'VISIT_ORDER_CANCELLED'
       /**
        * @description Visit Restriction
        * @example OPEN
@@ -556,9 +560,12 @@ export interface components {
       outcomeStatus?:
         | 'ADMINISTRATIVE_CANCELLATION'
         | 'ADMINISTRATIVE_ERROR'
+        | 'BATCH_CANCELLATION'
+        | 'CANCELLATION'
         | 'COMPLETED_NORMALLY'
         | 'ESTABLISHMENT_CANCELLED'
         | 'NOT_RECORDED'
+        | 'NO_VISITING_ORDER'
         | 'PRISONER_CANCELLED'
         | 'PRISONER_COMPLETED_EARLY'
         | 'PRISONER_REFUSED_TO_ATTEND'
@@ -568,6 +575,7 @@ export interface components {
         | 'VISITOR_DECLINED_ENTRY'
         | 'VISITOR_DID_NOT_ARRIVE'
         | 'VISITOR_FAILED_SECURITY_CHECKS'
+        | 'VISIT_ORDER_CANCELLED'
       /**
        * @description Visit Restriction
        * @example OPEN
@@ -599,9 +607,12 @@ export interface components {
       outcomeStatus:
         | 'ADMINISTRATIVE_CANCELLATION'
         | 'ADMINISTRATIVE_ERROR'
+        | 'BATCH_CANCELLATION'
+        | 'CANCELLATION'
         | 'COMPLETED_NORMALLY'
         | 'ESTABLISHMENT_CANCELLED'
         | 'NOT_RECORDED'
+        | 'NO_VISITING_ORDER'
         | 'PRISONER_CANCELLED'
         | 'PRISONER_COMPLETED_EARLY'
         | 'PRISONER_REFUSED_TO_ATTEND'
@@ -611,6 +622,7 @@ export interface components {
         | 'VISITOR_DECLINED_ENTRY'
         | 'VISITOR_DID_NOT_ARRIVE'
         | 'VISITOR_FAILED_SECURITY_CHECKS'
+        | 'VISIT_ORDER_CANCELLED'
       /**
        * @description Outcome text
        * @example Because he got covid
