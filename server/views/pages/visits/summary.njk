@@ -2,6 +2,7 @@
 {% from "govuk/components/table/macro.njk" import govukTable %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {%- from "moj/components/side-navigation/macro.njk" import mojSideNavigation -%}
+{% from "moj/components/pagination/macro.njk" import mojPagination %}
 
 {% set pageHeaderTitle = "View visits by date" %}
 {% set pageTitle = applicationName + " - " + pageHeaderTitle %}
@@ -12,8 +13,8 @@
     <div class="govuk-grid-column-full">
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
     </div>
-
-    <div class="govuk-grid-column-one-quarter">
+    {% if results | length %}
+      <div class="govuk-grid-column-one-quarter">
         {{ mojSideNavigation({
         label: 'Slots navigation',
         classes: 'govuk-!-padding-top-0',
@@ -71,22 +72,47 @@
       <h2 class="govuk-heading-m">X visits room, Y to Z</h2>
       <p>X of Y tables booked</p>
       <p>X visits in total (Y adults and Z children)</p>
-      {{ govukTable({
-        classes: "bapv-table govuk-!-margin-top-3",
-        head: [
-            {
-              text: "Prisoner name"
+        {% set pagination %}
+          {{ mojPagination({
+            results: {
+              from: from,
+              to: to,
+              count: numberOfResults
             },
-            {
-              text: "Prison number"
+            previous: {
+              text: 'Previous',
+              href: backLinkHref + '/results?search=' + search + '&page=' + previous
             },
-            {
-              text: "Action",
-              classes: "govuk-!-text-align-right"
-            }
-        ],
-        rows: results
-      }) }}
-    </div>
+            next: {
+              text: 'Next',
+              href: backLinkHref + '/results?search=' + search + '&page=' + next
+            },
+            items: pageLinks
+          }) }}
+        {% endset %}
+        {{ pagination | safe if numberOfResults > 10 }}
+        {{ govukTable({
+          classes: "bapv-table govuk-!-margin-top-3",
+          head: [
+              {
+                text: "Prisoner name"
+              },
+              {
+                text: "Prison number"
+              },
+              {
+                text: "Action",
+                classes: "govuk-!-text-align-right"
+              }
+          ],
+          rows: results
+        }) }}
+        {{ pagination | safe if numberOfResults > 10 }}
+      </div>
+    {% else %}
+      <div class="govuk-grid-column-full">
+        <p class="govuk-!-margin-top-6 govuk-!-margin-bottom-6" id="search-results-none">No visit sessions on this day.</p>
+      </div>
+    {% endif %}
   </div>
 {% endblock %}

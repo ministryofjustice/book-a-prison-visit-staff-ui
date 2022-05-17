@@ -1,7 +1,7 @@
 import type { RequestHandler, Router } from 'express'
 import { format } from 'date-fns'
 import config from '../config'
-import { VisitInformation } from '../@types/bapv'
+import { VisitInformation, PrisonerDetailsItem } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import PrisonerSearchService from '../services/prisonerSearchService'
 import VisitSessionsService from '../services/visitSessionsService'
@@ -31,11 +31,19 @@ export default function routes(
     const currentPage = (req.query.page || '') as string
     const parsedPage = Number.parseInt(currentPage, 10) || 1
     const { pageSize } = config.apis.prisonerSearch
-    const { results, numberOfResults, next, previous } = await prisonerSearchService.getPrisonersByPrisonerNumbers(
-      prisoners,
-      res.locals.user?.username,
-      parsedPage
-    )
+
+    let results: PrisonerDetailsItem[][] = []
+    let numberOfResults = 0
+    let next
+    let previous
+
+    if (prisoners.length > 0) {
+      ;({ results, numberOfResults, next, previous } = await prisonerSearchService.getPrisonersByPrisonerNumbers(
+        prisoners,
+        res.locals.user?.username,
+        parsedPage
+      ))
+    }
     const realNumberOfResults = numberOfResults
     const currentPageMax = parsedPage * pageSize
     const to = realNumberOfResults < currentPageMax ? realNumberOfResults : currentPageMax
