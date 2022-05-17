@@ -1,6 +1,6 @@
 import { OutcomeDto } from '../data/visitSchedulerApiTypes'
 
-const visitCancellationReasons: Record<OutcomeDto['outcome'], string> = {
+const visitCancellationReasons: Partial<Record<OutcomeDto['outcomeStatus'], string>> = {
   VISITOR_CANCELLED: 'Visitor cancelled',
   ESTABLISHMENT_CANCELLED: 'Establishment cancelled',
   PRISONER_CANCELLED: 'Prisoner cancelled',

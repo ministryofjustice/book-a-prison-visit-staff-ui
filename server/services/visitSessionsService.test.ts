@@ -737,7 +737,7 @@ describe('Visit sessions service', () => {
       }
 
       const outcome: OutcomeDto = {
-        outcome: 'VISITOR_CANCELLED',
+        outcomeStatus: 'VISITOR_CANCELLED',
         text: 'cancellation reason',
       }
 

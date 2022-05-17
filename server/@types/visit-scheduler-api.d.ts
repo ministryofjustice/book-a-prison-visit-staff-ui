@@ -122,7 +122,7 @@ export interface components {
        * @description Visit Restriction
        * @example OPEN
        */
-      visitRestriction?: 'OPEN' | 'CLOSED'
+      visitRestriction?: 'OPEN' | 'CLOSED' | 'UNKNOWN'
       /**
        * Format: date-time
        * @description The date and time of the visit
@@ -193,10 +193,29 @@ export interface components {
        */
       visitStatus: 'RESERVED' | 'BOOKED' | 'CANCELLED'
       /**
+       * @description Outcome Status
+       * @example VISITOR_CANCELLED
+       */
+      outcomeStatus?:
+        | 'ADMINISTRATIVE_CANCELLATION'
+        | 'ADMINISTRATIVE_ERROR'
+        | 'COMPLETED_NORMALLY'
+        | 'ESTABLISHMENT_CANCELLED'
+        | 'NOT_RECORDED'
+        | 'PRISONER_CANCELLED'
+        | 'PRISONER_COMPLETED_EARLY'
+        | 'PRISONER_REFUSED_TO_ATTEND'
+        | 'TERMINATED_BY_STAFF'
+        | 'VISITOR_CANCELLED'
+        | 'VISITOR_COMPLETED_EARLY'
+        | 'VISITOR_DECLINED_ENTRY'
+        | 'VISITOR_DID_NOT_ARRIVE'
+        | 'VISITOR_FAILED_SECURITY_CHECKS'
+      /**
        * @description Visit Restriction
        * @example OPEN
        */
-      visitRestriction: 'OPEN' | 'CLOSED'
+      visitRestriction: 'OPEN' | 'CLOSED' | 'UNKNOWN'
       /**
        * Format: date-time
        * @description The date and time of the visit
@@ -268,8 +287,8 @@ export interface components {
       messageAttributes?: {
         [key: string]: components['schemas']['MessageAttributeValue']
       }
-      md5OfMessageAttributes?: string
       md5OfBody?: string
+      md5OfMessageAttributes?: string
     }
     MessageAttributeValue: {
       stringValue?: string
@@ -345,7 +364,7 @@ export interface components {
        * @description Visit Restriction
        * @example OPEN
        */
-      visitRestriction: 'OPEN' | 'CLOSED'
+      visitRestriction: 'OPEN' | 'CLOSED' | 'UNKNOWN'
       /**
        * Format: date-time
        * @description The date and time of the visit
@@ -483,11 +502,13 @@ export interface components {
     CreateLegacyContactOnVisitRequestDto: {
       /**
        * @description Contact Name
+       * @default UNKNOWN
        * @example John Smith
        */
       name: string
       /**
        * @description Contact Phone Number
+       * @default UNKNOWN
        * @example 01234 567890
        */
       telephone?: string
@@ -529,10 +550,29 @@ export interface components {
        */
       visitStatus: 'RESERVED' | 'BOOKED' | 'CANCELLED'
       /**
+       * @description Outcome Status
+       * @default NOT_RECORDED
+       */
+      outcomeStatus?:
+        | 'ADMINISTRATIVE_CANCELLATION'
+        | 'ADMINISTRATIVE_ERROR'
+        | 'COMPLETED_NORMALLY'
+        | 'ESTABLISHMENT_CANCELLED'
+        | 'NOT_RECORDED'
+        | 'PRISONER_CANCELLED'
+        | 'PRISONER_COMPLETED_EARLY'
+        | 'PRISONER_REFUSED_TO_ATTEND'
+        | 'TERMINATED_BY_STAFF'
+        | 'VISITOR_CANCELLED'
+        | 'VISITOR_COMPLETED_EARLY'
+        | 'VISITOR_DECLINED_ENTRY'
+        | 'VISITOR_DID_NOT_ARRIVE'
+        | 'VISITOR_FAILED_SECURITY_CHECKS'
+      /**
        * @description Visit Restriction
        * @example OPEN
        */
-      visitRestriction: 'OPEN' | 'CLOSED'
+      visitRestriction: 'OPEN' | 'CLOSED' | 'UNKNOWN'
       /**
        * Format: date-time
        * @description The date and time of the visit
@@ -543,7 +583,7 @@ export interface components {
        * @description The finishing date and time of the visit
        */
       endTimestamp: string
-      legacyData: components['schemas']['CreateLegacyDataRequestDto']
+      legacyData?: components['schemas']['CreateLegacyDataRequestDto']
       visitContact?: components['schemas']['CreateLegacyContactOnVisitRequestDto']
       /** @description List of visitors associated with the visit */
       visitors?: components['schemas']['CreateVisitorOnVisitRequestDto'][]
@@ -553,10 +593,24 @@ export interface components {
     /** @description Visit Outcome */
     OutcomeDto: {
       /**
-       * @description Outcome type
+       * @description Outcome Status
        * @example VISITOR_CANCELLED
        */
-      outcome: 'VISITOR_CANCELLED' | 'ESTABLISHMENT_CANCELLED' | 'PRISONER_CANCELLED' | 'ADMINISTRATIVE_ERROR'
+      outcomeStatus:
+        | 'ADMINISTRATIVE_CANCELLATION'
+        | 'ADMINISTRATIVE_ERROR'
+        | 'COMPLETED_NORMALLY'
+        | 'ESTABLISHMENT_CANCELLED'
+        | 'NOT_RECORDED'
+        | 'PRISONER_CANCELLED'
+        | 'PRISONER_COMPLETED_EARLY'
+        | 'PRISONER_REFUSED_TO_ATTEND'
+        | 'TERMINATED_BY_STAFF'
+        | 'VISITOR_CANCELLED'
+        | 'VISITOR_COMPLETED_EARLY'
+        | 'VISITOR_DECLINED_ENTRY'
+        | 'VISITOR_DID_NOT_ARRIVE'
+        | 'VISITOR_FAILED_SECURITY_CHECKS'
       /**
        * @description Outcome text
        * @example Because he got covid
