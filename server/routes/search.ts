@@ -58,7 +58,7 @@ export default function routes(
       numberOfPages,
       currentPage: parsedPage,
       searchParam: `search=${search}`,
-      searchUrl: `/search/${isVisit ? 'prisoner-visit' : 'prisoner'}/results`,
+      searchUrl: `/search/prisoner${isVisit ? '-visit' : ''}/results`,
     })
 
     res.render('pages/search/prisonerResults', {
