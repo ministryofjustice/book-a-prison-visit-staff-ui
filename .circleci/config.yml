@@ -10,7 +10,7 @@ feature_branch: &feature_branch
 version: 2.1
 
 orbs:
-  hmpps: ministryofjustice/hmpps@3.14
+  hmpps: ministryofjustice/hmpps@5.1
   slack: circleci/slack@4.4.2
 
 parameters:
@@ -105,7 +105,7 @@ jobs:
 
   integration_test:
     executor:
-      name: hmpps/node_redis_cimg
+      name: hmpps/node_redis
       node_tag: << pipeline.parameters.node-version >>
       redis_tag: "6.2"
     steps:
@@ -157,7 +157,7 @@ workflows:
             - build
       - hmpps/helm_lint:
           name: helm_lint
-      - hmpps/build_docker:
+      - hmpps/build_multiplatform_docker:
           name: build_docker
       - request_dev_approval:
           <<: *feature_branch
