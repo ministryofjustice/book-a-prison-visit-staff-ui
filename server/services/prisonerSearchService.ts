@@ -115,7 +115,8 @@ export default class PrisonerSearchService {
           text: prisoner.prisonerNumber,
         },
         {
-          html: `< href="" class="bapv-result-row">View</a>`,
+          html: `<a href="" class="bapv-result-row">View</a>`,
+          classes: 'govuk-!-text-align-right',
         },
       ]
 

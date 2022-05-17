@@ -22,11 +22,11 @@ export default function routes(
       new Date(req.params?.startDate).toString() === 'Invalid Date' ? new Date() : new Date(req.params?.startDate)
 
     const visits: VisitInformation[] = await visitSessionsService.getVisitsByDate({
-      dateString: format(startDate, 'YYYY-MM-dd'),
+      dateString: format(startDate, 'yyyy-MM-dd'),
       username: res.locals.user?.username,
     })
-
-    const prisoners = visits.map(visit => visit.prisonNumber)
+    const everyVisitPrisoner = visits.map(visit => visit.prisonNumber)
+    const prisoners = [...new Set(everyVisitPrisoner)]
     const search = (req.query.search || '') as string
     const currentPage = (req.query.page || '') as string
     const parsedPage = Number.parseInt(currentPage, 10) || 1

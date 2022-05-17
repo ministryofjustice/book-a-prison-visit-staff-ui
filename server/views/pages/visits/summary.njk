@@ -16,10 +16,12 @@
     <div class="govuk-grid-column-one-quarter">
         {{ mojSideNavigation({
         label: 'Slots navigation',
+        classes: 'govuk-!-padding-top-0',
         sections: [
             {
                 heading: {
-                    text: 'Main visits room'
+                    text: 'Main visits room',
+                    classes: 'govuk-!-padding-top-0'
                 },
                 items: [{
                     text: '11am to 12pm',
@@ -34,7 +36,7 @@
                 heading: {
                     text: 'Closed visits room'
                 },
-                items: [{{
+                items: [{
                     text: '3pm to 4pm',
                     href: '/visits'
                 }]
@@ -68,12 +70,8 @@
     <div class="govuk-grid-column-three-quarters">
       <h2 class="govuk-heading-m">X visits room, Y to Z</h2>
       <p>X of Y tables booked</p>
-      <p>X visits in total (Y adults and Z children)
-    </div>
-
+      <p>X visits in total (Y adults and Z children)</p>
       {{ govukTable({
-        caption: "Prisoner details",
-        captionClasses: "govuk-table__caption--m",
         classes: "bapv-table govuk-!-margin-top-3",
         head: [
             {
@@ -83,22 +81,12 @@
               text: "Prison number"
             },
             {
-              text: "Action"
+              text: "Action",
+              classes: "govuk-!-text-align-right"
             }
         ],
-        rows: [
-            {
-                text: 'Surname, First Name'
-            },
-            {
-                text: 'A1234BC'
-            },
-            {
-                html: '<a href="#">View</a>'
-            }
-        ]
+        rows: results
       }) }}
-
     </div>
   </div>
 {% endblock %}
