@@ -39,7 +39,7 @@ export const properCaseFullName = (name: string): string =>
         .map(properCaseName)
         .join(' ')
 
-export const getPageLinks = ({
+export const getResultsPagingLinks = ({
   pagesToShow = 1,
   numberOfPages = 1,
   currentPage = 1,

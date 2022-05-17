@@ -1,12 +1,12 @@
 import {
   convertToTitleCase,
-  getPageLinks,
+  getResultsPagingLinks,
   isAdult,
   prisonerDateTimePretty,
   properCaseFullName,
   properCase,
 } from './utils'
-import getPageLinksTestData from './utils.testData'
+import getResultsPagingLinksTestData from './utils.testData'
 
 describe('Convert to title case', () => {
   it('null string', () => {
@@ -39,9 +39,9 @@ describe('Convert to title case', () => {
 })
 
 describe('Return pagination pages', () => {
-  getPageLinksTestData.forEach(testData => {
+  getResultsPagingLinksTestData.forEach(testData => {
     it(testData.description, () => {
-      expect(getPageLinks(testData.params)).toEqual(testData.result)
+      expect(getResultsPagingLinks(testData.params)).toEqual(testData.result)
     })
   })
 })

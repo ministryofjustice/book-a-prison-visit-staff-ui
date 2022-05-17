@@ -47,7 +47,7 @@ export default function routes(
     const realNumberOfResults = numberOfResults
     const currentPageMax = parsedPage * pageSize
     const to = realNumberOfResults < currentPageMax ? realNumberOfResults : currentPageMax
-    // const pageLinks = getPageLinks({
+    // const pageLinks = getResultsPagingLinks({
     //   pagesToShow: config.apis.prisonerSearch.pagesLinksToShow,
     //   numberOfPages,
     //   currentPage: parsedPage,
