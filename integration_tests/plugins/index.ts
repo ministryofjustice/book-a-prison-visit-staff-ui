@@ -14,14 +14,8 @@ import { Visit } from '../../server/data/visitSchedulerApiTypes'
 export default (on: (string, Record) => void): void => {
   on('task', {
     reset: resetStubs,
-
-    getSignInUrl: auth.getSignInUrl,
-    stubSignIn: auth.stubSignIn,
-
-    stubAuthUser: auth.stubUser,
-    stubAuthPing: auth.stubPing,
-
-    stubTokenVerificationPing: tokenVerification.stubPing,
+    ...auth,
+    ...tokenVerification,
 
     stubGetPrisonerSocialContacts: (offenderNo: string) =>
       prisonerContactRegistry.getPrisonerSocialContacts(offenderNo),

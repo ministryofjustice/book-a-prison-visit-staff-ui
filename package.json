@@ -120,7 +120,6 @@
     "@types/compression": "^1.7.2",
     "@types/connect-flash": "0.0.37",
     "@types/connect-redis": "^0.0.18",
-    "@types/cookie-session": "^2.0.44",
     "@types/csurf": "^1.11.2",
     "@types/express-session": "^1.17.4",
     "@types/http-errors": "^1.8.2",
