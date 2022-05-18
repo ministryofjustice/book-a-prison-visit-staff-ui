@@ -82,4 +82,53 @@ export default class PrisonerSearchService {
     const { content } = await prisonerSearchClient.getPrisoner(search)
     return content.length === 1 ? content[0] : null
   }
+
+  async getPrisonersByPrisonerNumbers(
+    prisonerNumbers: string[],
+    username: string,
+    page: number
+  ): Promise<{
+    results: Array<PrisonerDetailsItem[]>
+    numberOfResults: number
+    numberOfPages: number
+    next: number
+    previous: number
+  }> {
+    const token = await this.systemToken(username)
+    const prisonerSearchClient = this.prisonerSearchClientBuilder(token)
+    this.currentPage = page - 1
+    const { totalPages, totalElements, content } = await prisonerSearchClient.getPrisonersByPrisonerNumbers(
+      prisonerNumbers,
+      this.currentPage
+    )
+    this.numberOfPages = totalPages
+    const nextPage = this.getNextPage()
+    const previousPage = this.getPreviousPage()
+    const prisonerList: Array<PrisonerDetailsItem[]> = []
+
+    content.forEach((prisoner: Prisoner) => {
+      const row: PrisonerDetailsItem[] = [
+        {
+          text: properCaseFullName(`${prisoner.lastName}, ${prisoner.firstName}`),
+        },
+        {
+          text: prisoner.prisonerNumber,
+        },
+        {
+          html: `<a href="" class="bapv-result-row">View</a>`,
+          classes: 'govuk-!-text-align-right',
+        },
+      ]
+
+      prisonerList.push(row)
+    })
+
+    return {
+      results: prisonerList,
+      numberOfResults: totalElements,
+      numberOfPages: this.numberOfPages,
+      next: nextPage + 1,
+      previous: previousPage + 1,
+    }
+  }
 }

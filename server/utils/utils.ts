@@ -39,18 +39,18 @@ export const properCaseFullName = (name: string): string =>
         .map(properCaseName)
         .join(' ')
 
-export const getPageLinks = ({
+export const getResultsPagingLinks = ({
   pagesToShow = 1,
   numberOfPages = 1,
   currentPage = 1,
-  searchTerm = '',
-  searchType,
+  searchParam = '',
+  searchUrl,
 }: {
   pagesToShow: number
   numberOfPages: number
   currentPage: number
-  searchTerm: string
-  searchType: string
+  searchParam: string
+  searchUrl: string
 }): Array<{ text: string; href: string; selected: boolean }> => {
   let pageStartNumber = 1
   let pageEndNumber = pagesToShow
@@ -76,7 +76,7 @@ export const getPageLinks = ({
   for (let pageIndex = pageStartNumber; pageIndex <= pageEndNumber; pageIndex += 1) {
     pageLinks.push({
       text: pageIndex.toString(),
-      href: `/search/${searchType}/results?search=${searchTerm}&page=${pageIndex}`,
+      href: `${searchUrl}?${searchParam}&page=${pageIndex}`,
       selected: pageIndex === currentPage,
     })
   }

@@ -1,0 +1,118 @@
+{% extends "layout.njk" %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{%- from "moj/components/side-navigation/macro.njk" import mojSideNavigation -%}
+{% from "moj/components/pagination/macro.njk" import mojPagination %}
+
+{% set pageHeaderTitle = "View visits by date" %}
+{% set pageTitle = applicationName + " - " + pageHeaderTitle %}
+{% set backLinkHref = "/visits" %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+    </div>
+    {% if results | length %}
+      <div class="govuk-grid-column-one-quarter">
+        {{ mojSideNavigation({
+        label: 'Slots navigation',
+        classes: 'govuk-!-padding-top-0',
+        sections: [
+            {
+                heading: {
+                    text: 'Main visits room',
+                    classes: 'govuk-!-padding-top-0'
+                },
+                items: [{
+                    text: '11am to 12pm',
+                    href: '/visits/',
+                    active: true
+                }, {
+                    text: '3pm to 4pm',
+                    href: '/visits'
+                }]
+            },
+            {
+                heading: {
+                    text: 'Closed visits room'
+                },
+                items: [{
+                    text: '3pm to 4pm',
+                    href: '/visits'
+                }]
+            }
+        ]
+        }) }}
+
+      <h3 class="govuk-heading-s">Visitor list</h3>
+      <div class="govuk-button-group">
+        {{ govukButton({
+            text: "Download CSV"
+        }) }}
+        {{ govukButton({
+            text: "Print",
+            classes: "govuk-button--secondary"
+        }) }}
+      </div>
+
+      <h3 class="govuk-heading-s">Prisoner list</h3>
+      <div class="govuk-button-group">
+        {{ govukButton({
+            text: "Download CSV"
+        }) }}
+        {{ govukButton({
+            text: "Print",
+            classes: "govuk-button--secondary"
+        }) }}
+      </div>
+    </div>
+
+    <div class="govuk-grid-column-three-quarters">
+      <h2 class="govuk-heading-m">X visits room, Y to Z</h2>
+      <p>X of Y tables booked</p>
+      <p>X visits in total (Y adults and Z children)</p>
+        {% set pagination %}
+          {{ mojPagination({
+            results: {
+              from: from,
+              to: to,
+              count: numberOfResults
+            },
+            previous: {
+              text: 'Previous',
+              href: backLinkHref + '?startDate=' + startDate + '&page=' + previous
+            },
+            next: {
+              text: 'Next',
+              href: backLinkHref + '?startDate=' + startDate + '&page=' + next
+            },
+            items: pageLinks
+          }) }}
+        {% endset %}
+        {{ pagination | safe if numberOfResults > 10 }}
+        {{ govukTable({
+          classes: "bapv-table govuk-!-margin-top-3",
+          head: [
+              {
+                text: "Prisoner name"
+              },
+              {
+                text: "Prison number"
+              },
+              {
+                text: "Action",
+                classes: "govuk-!-text-align-right"
+              }
+          ],
+          rows: results
+        }) }}
+        {{ pagination | safe if numberOfResults > 10 }}
+      </div>
+    {% else %}
+      <div class="govuk-grid-column-full">
+        <p class="govuk-!-margin-top-6 govuk-!-margin-bottom-6" id="search-results-none">No visit sessions on this day.</p>
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}

@@ -234,6 +234,24 @@ export default class VisitSessionsService {
     })
   }
 
+  async getVisitsByDate({
+    username,
+    dateString,
+  }: {
+    username: string
+    dateString: string
+  }): Promise<VisitInformation[]> {
+    const token = await this.systemToken(username)
+    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
+
+    logger.info(`Get visits for ${dateString}`)
+    const visits = await visitSchedulerApiClient.getVisitsByDate(dateString)
+
+    return visits.map(visit => {
+      return this.buildVisitInformation(visit)
+    })
+  }
+
   async getFullVisitDetails({
     username,
     reference,

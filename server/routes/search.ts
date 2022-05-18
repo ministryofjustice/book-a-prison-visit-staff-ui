@@ -4,7 +4,7 @@ import { validatePrisonerSearch, validateVisitSearch } from './searchValidation'
 import PrisonerSearchService from '../services/prisonerSearchService'
 import VisitSessionsService from '../services/visitSessionsService'
 import config from '../config'
-import { getPageLinks } from '../utils/utils'
+import { getResultsPagingLinks } from '../utils/utils'
 import { VisitInformation } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 
@@ -53,12 +53,12 @@ export default function routes(
     const realNumberOfResults = errors.length > 0 ? 0 : numberOfResults
     const currentPageMax = parsedPage * pageSize
     const to = realNumberOfResults < currentPageMax ? realNumberOfResults : currentPageMax
-    const pageLinks = getPageLinks({
+    const pageLinks = getResultsPagingLinks({
       pagesToShow: config.apis.prisonerSearch.pagesLinksToShow,
       numberOfPages,
       currentPage: parsedPage,
-      searchTerm: search,
-      searchType: isVisit ? 'prisoner-visit' : 'prisoner',
+      searchParam: `search=${search}`,
+      searchUrl: `/search/prisoner${isVisit ? '-visit' : ''}/results`,
     })
 
     res.render('pages/search/prisonerResults', {
@@ -134,12 +134,12 @@ export default function routes(
     const realNumberOfResults = errors.length > 0 || noResults ? 0 : 1
     const currentPageMax = parsedPage * pageSize
     const to = realNumberOfResults < currentPageMax ? realNumberOfResults : currentPageMax
-    const pageLinks = getPageLinks({
+    const pageLinks = getResultsPagingLinks({
       pagesToShow: pagesLinksToShow,
       numberOfPages: 1,
       currentPage: parsedPage,
-      searchTerm: search,
-      searchType: 'visit',
+      searchParam: `search=${search}`,
+      searchUrl: '/search/visit/results',
     })
 
     res.render('pages/search/visitResults', {

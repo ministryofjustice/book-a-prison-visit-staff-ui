@@ -72,7 +72,7 @@ describe('prisonSearchClientBuilder', () => {
     })
   })
 
-  describe('getPrisonersByNumbers', () => {
+  describe('getPrisonersByPrisonerNumbers', () => {
     it('should return data from api', async () => {
       const prisonerNumbers = ['A1234BC', 'B1234CD']
       const results = [
@@ -94,9 +94,13 @@ describe('prisonSearchClientBuilder', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
-      const output = await client.getPrisonersByNumbers(prisonerNumbers)
+      const output = await client.getPrisonersByPrisonerNumbers(prisonerNumbers)
 
-      expect(output).toEqual(results)
+      expect(output).toEqual({
+        totalPages: 1,
+        totalElements: 2,
+        content: results,
+      })
     })
   })
 })

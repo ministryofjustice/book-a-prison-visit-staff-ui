@@ -41,13 +41,30 @@ class PrisonerSearchClient {
     })
   }
 
-  getPrisonersByNumbers(prisonerNumbers: string[]): Promise<Prisoner[]> {
-    return this.restClient.post({
+  async getPrisonersByPrisonerNumbers(
+    prisonerNumbers: string[],
+    page = 1
+  ): Promise<{ totalPages: number; totalElements: number; content: Prisoner[] }> {
+    const allResults: Prisoner[] = await this.restClient.post({
       path: '/prisoner-search/prisoner-numbers',
       data: {
         prisonerNumbers,
       },
     })
+
+    const totalElements = allResults.length
+    const totalPages = Math.ceil(totalElements / this.pageSize)
+    let actualPage = 1
+
+    if (page > 0 || page <= totalPages) {
+      actualPage = page
+    }
+
+    return {
+      totalPages,
+      totalElements,
+      content: allResults.slice((actualPage - 1) * this.pageSize, this.pageSize),
+    }
   }
 }
 
