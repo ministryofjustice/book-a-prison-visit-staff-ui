@@ -121,8 +121,7 @@ export default function createApp(userService: UserService): express.Application
         visitSchedulerApiClientBuilder,
         whereaboutsApiClientBuilder,
         systemToken
-      ),
-      new PrisonerVisitorsService(prisonerContactRegistryApiClientBuilder, systemToken)
+      )
     )
   )
 

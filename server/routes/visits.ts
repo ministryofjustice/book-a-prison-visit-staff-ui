@@ -5,14 +5,12 @@ import { ExtendedVisitInformation, PrisonerDetailsItem } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import PrisonerSearchService from '../services/prisonerSearchService'
 import VisitSessionsService from '../services/visitSessionsService'
-import PrisonerVisitorsService from '../services/prisonerVisitorsService'
 import { getResultsPagingLinks } from '../utils/utils'
 
 export default function routes(
   router: Router,
   prisonerSearchService: PrisonerSearchService,
-  visitSessionsService: VisitSessionsService,
-  prisonerVisitorsService: PrisonerVisitorsService
+  visitSessionsService: VisitSessionsService
 ): Router {
   const get = (path: string | string[], ...handlers: RequestHandler[]) =>
     router.get(
