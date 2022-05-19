@@ -1732,6 +1732,7 @@ describe('GET /book-a-visit/check-your-booking', () => {
         expect($('.test-prisoner-location').text()).toContain('location place')
         expect($('.test-visit-date').text()).toContain('Saturday 12 March 2022')
         expect($('.test-visit-time').text()).toContain('9:30am to 10:30am')
+        expect($('.test-visit-type').text()).toContain('Open')
         expect($('.test-visitor-name1').text()).toContain('name last (relate of the prisoner)')
         expect($('.test-visitor-address1').text()).toContain('123 Street, Test Town, S1 2QZ')
         expect($('.test-additional-support1').text()).toContain('Wheelchair ramp')
@@ -1800,6 +1801,7 @@ describe('GET /book-a-visit/check-your-booking', () => {
           expect($('.test-prisoner-location').text()).toContain('location place')
           expect($('.test-visit-date').text()).toContain('Saturday 12 March 2022')
           expect($('.test-visit-time').text()).toContain('9:30am to 10:30am')
+          expect($('.test-visit-type').text()).toContain('Open')
           expect($('.test-visitor-name1').text()).toContain('name last (relate of the prisoner)')
           expect($('.test-visitor-address1').text()).toContain('123 Street, Test Town, S1 2QZ')
           expect($('[data-test="no-addition-support-chosen"]').text()).toContain(
@@ -1873,6 +1875,7 @@ describe('GET /book-a-visit/confirmation', () => {
         expect($('.test-prisoner-location').text()).toContain('location place')
         expect($('.test-visit-date').text()).toContain('Saturday 12 March 2022')
         expect($('.test-visit-time').text()).toContain('9:30am to 10:30am')
+        expect($('.test-visit-type').text()).toContain('Open')
         expect($('.test-visitor-name1').text()).toContain('name last (relate of the prisoner)')
         expect($('.test-additional-support1').text()).toContain('Wheelchair ramp')
         expect($('.test-additional-support2').text()).toContain('Portable induction loop for people with hearing aids')
@@ -1943,6 +1946,7 @@ describe('GET /book-a-visit/confirmation', () => {
           expect($('.test-prisoner-location').text()).toContain('location place')
           expect($('.test-visit-date').text()).toContain('Saturday 12 March 2022')
           expect($('.test-visit-time').text()).toContain('9:30am to 10:30am')
+          expect($('.test-visit-type').text()).toContain('Open')
           expect($('.test-visitor-name1').text()).toContain('name last (relate of the prisoner)')
           expect($('[data-test="no-addition-support-chosen"]').text()).toContain(
             'No additional support options were chosen.'

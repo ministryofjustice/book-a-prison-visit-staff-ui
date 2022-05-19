@@ -377,6 +377,7 @@ export default function routes(
       mainContact: visitSessionData.mainContact,
       prisoner: visitSessionData.prisoner,
       visit: visitSessionData.visit,
+      visitRestriction: visitSessionData.visitRestriction,
       visitors: visitSessionData.visitors,
       additionalSupport,
     })
@@ -403,6 +404,7 @@ export default function routes(
         mainContact: visitSessionData.mainContact,
         prisoner: visitSessionData.prisoner,
         visit: visitSessionData.visit,
+        visitRestriction: visitSessionData.visitRestriction,
         visitors: visitSessionData.visitors,
         additionalSupport,
       })
@@ -429,6 +431,7 @@ export default function routes(
         mainContact: visitSessionData.mainContact,
         prisoner: visitSessionData.prisoner,
         visit: visitSessionData.visit,
+        visitRestriction: visitSessionData.visitRestriction,
         visitors: visitSessionData.visitors,
         additionalSupport,
       })
@@ -452,6 +455,7 @@ export default function routes(
       prisoner: visitSessionData.prisoner,
       mainContact: visitSessionData.mainContact,
       visit: visitSessionData.visit,
+      visitRestriction: visitSessionData.visitRestriction,
       visitors: visitSessionData.visitors,
       additionalSupport,
     })
