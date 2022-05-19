@@ -152,6 +152,7 @@ export default function routes(
 
       res.render('pages/dateAndTime', {
         errors: req.flash('errors'),
+        visitRestriction: visitSessionData.visitRestriction,
         prisonerName: visitSessionData.prisoner.name,
         slotsList,
         timeOfDay,

@@ -40,7 +40,7 @@
 
     <p><strong>Prisoner name:</strong> <span data-test="prisoner-name">{{ prisonerName }}</span></p>
 
-    <p><strong>Visit type:</strong> Open</p>
+    <p><strong>Visit type:</strong> <span data-test="visit-restriction">{{ visitRestriction | capitalize }}</span></p>
 
     {% if slotsList | length %}
     <p>Showing visit time slots for the next 28 days.</p>
