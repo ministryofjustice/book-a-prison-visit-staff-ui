@@ -2,6 +2,7 @@ import { format, parseISO, getDay, isAfter, isBefore, parse } from 'date-fns'
 import logger from '../../logger'
 import {
   VisitInformation,
+  ExtendedVisitInformation,
   VisitSlot,
   VisitSlotList,
   VisitSlotsForDay,
@@ -244,16 +245,19 @@ export default class VisitSessionsService {
   }: {
     username: string
     dateString: string
-  }): Promise<VisitInformation[]> {
+  }): Promise<ExtendedVisitInformation[]> {
     const token = await this.systemToken(username)
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
+    const prisonerContactRegistryApiClient = this.prisonerContactRegistryApiClientBuilder(token)
 
     logger.info(`Get visits for ${dateString}`)
     const visits = await visitSchedulerApiClient.getVisitsByDate(dateString)
 
-    return visits.map(visit => {
-      return this.buildVisitInformation(visit)
-    })
+    return Promise.all(
+      visits.map(visit => {
+        return this.buildExtendedVisitInformation(visit, prisonerContactRegistryApiClient)
+      })
+    )
   }
 
   async getFullVisitDetails({
@@ -292,10 +296,33 @@ export default class VisitSessionsService {
       prisonNumber: visit.prisonerId,
       prisonerName: '',
       mainContact: visit.visitContact?.name,
+      visitDate: prisonerDateTimePretty(visit.startTimestamp),
+      visitTime,
+    }
+  }
+
+  private async buildExtendedVisitInformation(
+    visit: Visit,
+    prisonerContactRegistryApiClient: PrisonerContactRegistryApiClient
+  ): Promise<ExtendedVisitInformation> {
+    const visitTime = `${prisonerTimePretty(visit.startTimestamp)} to ${prisonerTimePretty(visit.endTimestamp)}`
+    const contacts = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(visit.prisonerId)
+    const visitorIds = visit.visitors.map(visitor => visitor.nomisPersonId)
+
+    const visitors = contacts
+      .filter(contact => visitorIds.includes(contact.personId))
+      .map(contact => buildVisitorListItem(contact))
+
+    return {
+      reference: visit.reference,
+      prisonNumber: visit.prisonerId,
+      prisonerName: '',
+      mainContact: visit.visitContact?.name,
       startTimestamp: visit.startTimestamp,
       visitDate: prisonerDateTimePretty(visit.startTimestamp),
       visitTime,
       visitRestriction: visit.visitRestriction,
+      visitors,
     }
   }
 }

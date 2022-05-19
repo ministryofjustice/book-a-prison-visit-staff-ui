@@ -18,21 +18,7 @@
         {{ mojSideNavigation({
         label: 'Slots navigation',
         classes: 'govuk-!-padding-top-0',
-        sections: [
-            {
-                heading: {
-                    text: 'Main visits room',
-                    classes: 'govuk-!-padding-top-0'
-                },
-                items: openSlots
-            },
-            {
-                heading: {
-                    text: 'Closed visits room'
-                },
-                items: closedSlots
-            }
-        ]
+        sections: slotsNav
         }) }}
 
       <h3 class="govuk-heading-s">Visitor list</h3>
@@ -59,9 +45,9 @@
     </div>
 
     <div class="govuk-grid-column-three-quarters">
-      <h2 class="govuk-heading-m">X visits room, Y to Z</h2>
-      <p>X of Y tables booked</p>
-      <p>X visits in total (Y adults and Z children)</p>
+      <h2 class="govuk-heading-m">{% if visitType == 'OPEN' %}Main{% else %}Closed{% endif %} visits room, {{ firstSlotTime }}</h2>
+      <p>{{ numberOfResults }} of {{ maxSlots }} tables booked</p>
+      <p>{{ numberOfResults }} visitors in total ({{ totals.adults }} adult{% if totals.adults != 1 %}s{% endif %} and {{ totals.children }} child{% if (totals.children != 1) %}ren{% endif %})</p>
         {% set pagination %}
           {{ mojPagination({
             results: {

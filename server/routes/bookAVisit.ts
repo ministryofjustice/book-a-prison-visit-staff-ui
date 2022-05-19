@@ -30,7 +30,7 @@ export default function routes(
   get('/select-visitors', sessionCheckMiddleware({ stage: 1 }), async (req, res) => {
     const { visitSessionData } = req.session
     const { offenderNo } = visitSessionData.prisoner
-    const visitorList = await prisonerVisitorsService.getVisitors(offenderNo, res.locals.user?.username)
+    const visitorList = await prisonerVisitorsService.getApprovedVisitors(offenderNo, res.locals.user?.username)
     const restrictions = await prisonerProfileService.getRestrictions(offenderNo, res.locals.user?.username)
 
     const formValues = getFlashFormValues(req)

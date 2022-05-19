@@ -195,6 +195,10 @@ export type VisitInformation = {
   mainContact: string
   visitDate: string
   visitTime: string
+}
+
+export interface ExtendedVisitInformation extends VisitInformation {
   startTimestamp?: string
-  visitRestriction?: 'OPEN' | 'CLOSED' | 'UNKNOWN'
+  visitRestriction: 'OPEN' | 'CLOSED' | 'UNKNOWN'
+  visitors?: VisitorListItem[]
 }

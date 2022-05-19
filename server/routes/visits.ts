@@ -1,16 +1,18 @@
 import type { RequestHandler, Router } from 'express'
 import { format } from 'date-fns'
 import config from '../config'
-import { VisitInformation, PrisonerDetailsItem } from '../@types/bapv'
+import { ExtendedVisitInformation, PrisonerDetailsItem } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import PrisonerSearchService from '../services/prisonerSearchService'
 import VisitSessionsService from '../services/visitSessionsService'
+import PrisonerVisitorsService from '../services/prisonerVisitorsService'
 import { getResultsPagingLinks } from '../utils/utils'
 
 export default function routes(
   router: Router,
   prisonerSearchService: PrisonerSearchService,
-  visitSessionsService: VisitSessionsService
+  visitSessionsService: VisitSessionsService,
+  prisonerVisitorsService: PrisonerVisitorsService
 ): Router {
   const get = (path: string | string[], ...handlers: RequestHandler[]) =>
     router.get(
@@ -24,7 +26,7 @@ export default function routes(
   }
 
   const getVisitSlotsFromBookedVisits = (
-    visits: VisitInformation[]
+    visits: ExtendedVisitInformation[]
   ): {
     openSlots: { visitTime: string; sortField: string }[]
     closedSlots: { visitTime: string; sortField: string }[]
@@ -32,7 +34,7 @@ export default function routes(
     const openSlots = new Set<{ visitTime: string; sortField: string }>()
     const closedSlots = new Set<{ visitTime: string; sortField: string }>()
 
-    visits.forEach((visit: VisitInformation) => {
+    visits.forEach((visit: ExtendedVisitInformation) => {
       if (visit.visitRestriction === 'OPEN') {
         openSlots.add({
           visitTime: visit.visitTime,
@@ -127,29 +129,63 @@ export default function routes(
   }
 
   get('/', async (req, res) => {
+    const maxSlotDefaults = {
+      OPEN: 30,
+      CLOSED: 3,
+    }
     const { type = 'OPEN', time = '', startDate = '' } = req.query
+    const visitType = ['OPEN', 'CLOSED'].includes(type as string) ? (type as string) : 'OPEN'
+    const maxSlots = maxSlotDefaults[visitType]
     const startDateString = getStartDate(startDate as string)
-    const visits: VisitInformation[] = await visitSessionsService.getVisitsByDate({
+    const visits: ExtendedVisitInformation[] = await visitSessionsService.getVisitsByDate({
       dateString: startDateString,
       username: res.locals.user?.username,
     })
-    const slots = getVisitSlotsFromBookedVisits(visits)
-    // get slots from scheduler
+    const totals = {
+      adults: 0,
+      children: 0,
+    }
+    visits.forEach(visit => {
+      totals.adults += visit.visitors.filter(visitor => visitor.adult).length
+      totals.children += visit.visitors.filter(visitor => !visitor.adult).length
+    })
 
-    // go through and find first slot for selection if valid.
+    const slots = getVisitSlotsFromBookedVisits(visits)
     const firstSlotTime = getFirstSlot({ ...slots })
 
     const { openSlots, closedSlots } = getSlotsSideMenuData({
       firstSlotTime,
-      slotType: type as string,
+      slotType: visitType,
       slotDate: time as string,
       startDate: startDateString,
       ...slots,
     })
+    const slotsNav = []
 
-    // get filtered visits for p[risoner]
+    if (openSlots.length > 0) {
+      slotsNav.push({
+        heading: {
+          text: 'Main visits room',
+          classes: 'govuk-!-padding-top-0',
+        },
+        items: openSlots,
+      })
+    }
+
+    if (closedSlots.length > 0) {
+      slotsNav.push({
+        heading: {
+          text: 'Closed visits room',
+          classes: 'govuk-!-padding-top-0',
+        },
+        items: closedSlots,
+      })
+    }
+
     const slotFilter = time === '' ? firstSlotTime : time
-    const filteredVisits = visits.filter(visit => visit.visitTime === slotFilter)
+    const filteredVisits = visits.filter(
+      visit => visit.visitTime === slotFilter && visit.visitRestriction === visitType
+    )
     const prisonersForVisit = filteredVisits.map(visit => visit.prisonNumber)
     const currentPage = Number.parseInt((req.query.page || '1') as string, 10)
     const { pageSize } = config.apis.prisonerSearch
@@ -180,9 +216,11 @@ export default function routes(
     })
 
     return res.render('pages/visits/summary', {
-      startDate,
-      closedSlots,
-      openSlots,
+      totals,
+      visitType,
+      maxSlots,
+      firstSlotTime,
+      slotsNav,
       results,
       next,
       previous,
