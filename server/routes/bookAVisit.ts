@@ -137,6 +137,7 @@ export default function routes(
       const slotsList = await visitSessionsService.getVisitSessions({
         username: res.locals.user?.username,
         offenderNo: visitSessionData.prisoner.offenderNo,
+        visitRestriction: visitSessionData.visitRestriction,
         timeOfDay,
         dayOfTheWeek,
       })
