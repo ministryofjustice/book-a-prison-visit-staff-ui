@@ -176,7 +176,7 @@ export type VisitSessionData = {
     location: string
   }
   visit?: VisitSlot
-  visitRestriction?: 'OPEN' | 'CLOSED'
+  visitRestriction?: 'OPEN' | 'CLOSED' | 'UNKNOWN'
   visitors?: VisitorListItem[]
   visitorSupport?: VisitorSupport[]
   mainContact?: {
@@ -195,4 +195,6 @@ export type VisitInformation = {
   mainContact: string
   visitDate: string
   visitTime: string
+  startTimestamp?: string
+  visitRestriction?: 'OPEN' | 'CLOSED' | 'UNKNOWN'
 }

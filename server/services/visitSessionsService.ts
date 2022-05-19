@@ -292,8 +292,10 @@ export default class VisitSessionsService {
       prisonNumber: visit.prisonerId,
       prisonerName: '',
       mainContact: visit.visitContact?.name,
+      startTimestamp: visit.startTimestamp,
       visitDate: prisonerDateTimePretty(visit.startTimestamp),
       visitTime,
+      visitRestriction: visit.visitRestriction,
     }
   }
 }

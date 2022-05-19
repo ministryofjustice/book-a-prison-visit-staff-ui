@@ -24,23 +24,13 @@
                     text: 'Main visits room',
                     classes: 'govuk-!-padding-top-0'
                 },
-                items: [{
-                    text: '11am to 12pm',
-                    href: '/visits/',
-                    active: true
-                }, {
-                    text: '3pm to 4pm',
-                    href: '/visits'
-                }]
+                items: openSlots
             },
             {
                 heading: {
                     text: 'Closed visits room'
                 },
-                items: [{
-                    text: '3pm to 4pm',
-                    href: '/visits'
-                }]
+                items: closedSlots
             }
         ]
         }) }}
