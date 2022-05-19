@@ -149,6 +149,7 @@ describe('GET /book-a-visit/select-visitors', () => {
         dateOfBirth: '25 May 1988',
         location: 'location place',
       },
+      visitRestriction: 'OPEN',
     }
 
     prisonerVisitorsService.getVisitors.mockResolvedValue(returnData)
@@ -458,6 +459,7 @@ describe('POST /book-a-visit/select-visitors', () => {
         dateOfBirth: '25 May 1988',
         location: 'location place',
       },
+      visitRestriction: 'OPEN',
     }
 
     sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, {
@@ -757,6 +759,7 @@ describe('/book-a-visit/select-date-and-time', () => {
         dateOfBirth: '25 May 1988',
         location: 'location place',
       },
+      visitRestriction: 'OPEN',
       visitors: [
         {
           personId: 4323,
@@ -1009,6 +1012,7 @@ describe('GET /book-a-visit/additional-support', () => {
         dateOfBirth: '25 May 1988',
         location: 'location place',
       },
+      visitRestriction: 'OPEN',
       visit: {
         id: 'visitId',
         startTimestamp: '123',
@@ -1178,6 +1182,7 @@ describe('POST /book-a-visit/additional-support', () => {
         dateOfBirth: '25 May 1988',
         location: 'location place',
       },
+      visitRestriction: 'OPEN',
       visit: {
         id: 'visitId',
         startTimestamp: '123',
@@ -1399,6 +1404,7 @@ describe('/book-a-visit/select-main-contact', () => {
         dateOfBirth: '25 May 1988',
         location: 'location place',
       },
+      visitRestriction: 'OPEN',
       visit: {
         id: 'visitId',
         startTimestamp: '123',
@@ -1672,6 +1678,7 @@ describe('GET /book-a-visit/check-your-booking', () => {
         dateOfBirth: '25 May 1988',
         location: 'location place',
       },
+      visitRestriction: 'OPEN',
       visit: {
         id: 'visitId',
         startTimestamp: '2022-03-12T09:30:00',
@@ -1679,7 +1686,6 @@ describe('GET /book-a-visit/check-your-booking', () => {
         availableTables: 1,
         visitRoomName: 'room name',
       },
-      visitRestriction: 'OPEN',
       visitors: [
         {
           personId: 123,
@@ -1743,6 +1749,7 @@ describe('GET /book-a-visit/check-your-booking', () => {
           dateOfBirth: '25 May 1988',
           location: 'location place',
         },
+        visitRestriction: 'OPEN',
         visit: {
           id: 'visitId',
           startTimestamp: '2022-03-12T09:30:00',
@@ -1813,6 +1820,7 @@ describe('GET /book-a-visit/confirmation', () => {
         dateOfBirth: '25 May 1988',
         location: 'location place',
       },
+      visitRestriction: 'OPEN',
       visit: {
         id: 'visitId',
         startTimestamp: '2022-03-12T09:30:00',
@@ -1882,6 +1890,7 @@ describe('GET /book-a-visit/confirmation', () => {
           dateOfBirth: '25 May 1988',
           location: 'location place',
         },
+        visitRestriction: 'OPEN',
         visit: {
           id: 'visitId',
           startTimestamp: '2022-03-12T09:30:00',

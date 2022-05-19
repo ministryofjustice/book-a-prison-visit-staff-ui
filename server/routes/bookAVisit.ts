@@ -191,9 +191,6 @@ export default function routes(
 
       visitSessionData.visit = getSelectedSlot(req.session.slotsList, req.body['visit-date-and-time'])
 
-      // @TODO placeholder until open/closed visits handled properly
-      visitSessionData.visitRestriction = 'OPEN'
-
       if (req.session.visitSessionData.visitReference) {
         await visitSessionsService.updateVisit({
           username: res.locals.user?.username,

@@ -3,13 +3,13 @@ import { Cookie } from 'express-session'
 import { VisitSessionData, VisitSlot } from '../@types/bapv'
 import sessionCheckMiddleware from './sessionCheckMiddleware'
 
-const prisonerData = {
+const prisonerData: VisitSessionData['prisoner'] = {
   name: 'abc',
   offenderNo: 'A1234BC',
   dateOfBirth: '12 May 1977',
   location: 'abc',
 }
-const visitorsData = [
+const visitorsData: VisitSessionData['visitors'] = [
   {
     personId: 123,
     name: 'abc',
@@ -27,13 +27,14 @@ const visitorsData = [
     banned: false,
   },
 ]
-const visit = {
+const visit: VisitSessionData['visit'] = {
   id: 'ab-cd-ef-gh',
   startTimestamp: '123',
   endTimestamp: '123',
   availableTables: 1,
   visitRoomName: 'visitRoom',
 }
+const visitRestriction: VisitSessionData['visitRestriction'] = 'OPEN'
 
 describe('sessionCheckMiddleware', () => {
   let mockResponse: Partial<Response>
@@ -64,7 +65,7 @@ describe('sessionCheckMiddleware', () => {
     expect(mockResponse.redirect).toHaveBeenCalledWith('/search/?error=missing-session')
   })
 
-  describe('prisoner data missing', () => {
+  describe('prisoner or default visitRestriction data missing', () => {
     ;[
       {
         prisoner: {},
@@ -85,10 +86,11 @@ describe('sessionCheckMiddleware', () => {
           name: 'abc',
           offenderNo: 'A1234BC',
           dateOfBirth: '12 May 1977',
+          location: 'abc',
         },
       },
     ].forEach((testData: VisitSessionData) => {
-      it('should redirect to the search page when there are missing bits of prisoner data', () => {
+      it('should redirect to the search page when there are missing bits of prisoner or visitRestriction data', () => {
         req.session.visitSessionData = testData
 
         sessionCheckMiddleware({ stage: 1 })(req as Request, mockResponse as Response, next)
@@ -97,7 +99,7 @@ describe('sessionCheckMiddleware', () => {
       })
     })
 
-    it('should not redirect when there are no bits of missing prisoner data at stage 1', () => {
+    it('should not redirect when there are no bits of missing prisoner and visitRestriction data at stage 1', () => {
       req.session.visitSessionData = {
         prisoner: {
           name: 'abc',
@@ -105,6 +107,7 @@ describe('sessionCheckMiddleware', () => {
           dateOfBirth: '12 May 1977',
           location: 'abc',
         },
+        visitRestriction: 'OPEN',
       }
 
       sessionCheckMiddleware({ stage: 1 })(req as Request, mockResponse as Response, next)
@@ -117,9 +120,11 @@ describe('sessionCheckMiddleware', () => {
     ;[
       {
         prisoner: prisonerData,
+        visitRestriction,
       },
       {
         prisoner: prisonerData,
+        visitRestriction,
         visitors: [],
       },
     ].forEach((testData: VisitSessionData) => {
@@ -137,10 +142,12 @@ describe('sessionCheckMiddleware', () => {
     ;[
       {
         prisoner: prisonerData,
+        visitRestriction,
         visitors: visitorsData,
       },
       {
         prisoner: prisonerData,
+        visitRestriction,
         visitors: visitorsData,
         visit: {
           id: 'ab-cd-ef-gh',
@@ -148,6 +155,7 @@ describe('sessionCheckMiddleware', () => {
       },
       {
         prisoner: prisonerData,
+        visitRestriction,
         visitors: visitorsData,
         visit: {
           id: 'ab-cd-ef-gh',
@@ -156,6 +164,7 @@ describe('sessionCheckMiddleware', () => {
       },
       {
         prisoner: prisonerData,
+        visitRestriction,
         visitors: visitorsData,
         visit: {
           id: 'ab-cd-ef-gh',
@@ -165,6 +174,7 @@ describe('sessionCheckMiddleware', () => {
       },
       {
         prisoner: prisonerData,
+        visitRestriction,
         visitors: visitorsData,
         visit: {
           id: 'ab-cd-ef-gh',
@@ -187,11 +197,13 @@ describe('sessionCheckMiddleware', () => {
     ;[
       {
         prisoner: prisonerData,
+        visitRestriction,
         visit,
         visitors: visitorsData,
       },
       {
         prisoner: prisonerData,
+        visitRestriction,
         visit,
         visitors: visitorsData,
         mainContact: {
