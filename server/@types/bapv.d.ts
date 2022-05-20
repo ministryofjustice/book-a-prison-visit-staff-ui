@@ -202,3 +202,10 @@ export interface ExtendedVisitInformation extends VisitInformation {
   visitRestriction: 'OPEN' | 'CLOSED' | 'UNKNOWN'
   visitors?: VisitorListItem[]
 }
+
+export type VisitsPageSlot = {
+  visitTime: string
+  sortField: string
+  adults: number
+  children: number
+}

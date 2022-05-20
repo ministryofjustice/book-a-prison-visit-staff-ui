@@ -1,11 +1,11 @@
 import type { RequestHandler, Router } from 'express'
 import { format } from 'date-fns'
 import config from '../config'
-import { ExtendedVisitInformation, PrisonerDetailsItem } from '../@types/bapv'
+import { ExtendedVisitInformation, PrisonerDetailsItem, VisitsPageSlot } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import PrisonerSearchService from '../services/prisonerSearchService'
 import VisitSessionsService from '../services/visitSessionsService'
-import { getResultsPagingLinks } from '../utils/utils'
+import { getResultsPagingLinks, sortByTimestamp } from '../utils/utils'
 
 export default function routes(
   router: Router,
@@ -23,80 +23,15 @@ export default function routes(
     return format(startDateObject, 'yyyy-MM-dd')
   }
 
-  const getVisitSlotsFromBookedVisits = (
-    visits: ExtendedVisitInformation[]
-  ): {
-    openSlots: { visitTime: string; sortField: string }[]
-    closedSlots: { visitTime: string; sortField: string }[]
-  } => {
-    const openSlots: { visitTime: string; sortField: string }[] = []
-    const closedSlots: { visitTime: string; sortField: string }[] = []
-
-    visits.forEach((visit: ExtendedVisitInformation) => {
-      if (visit.visitRestriction === 'OPEN') {
-        if (!openSlots.find(openSlot => openSlot.visitTime === visit.visitTime)) {
-          openSlots.push({
-            visitTime: visit.visitTime,
-            sortField: visit.startTimestamp,
-          })
-        }
-      } else if (!closedSlots.find(closedSlot => closedSlot.visitTime === visit.visitTime)) {
-        closedSlots.push({
-          visitTime: visit.visitTime,
-          sortField: visit.startTimestamp,
-        })
-      }
-    })
-
-    return {
-      openSlots: [...openSlots],
-      closedSlots: [...closedSlots],
-    }
-  }
-
-  const sortByTimestamp = (
-    a: { visitTime: string; sortField: string },
-    b: { visitTime: string; sortField: string }
-  ) => {
-    if (a.sortField > b.sortField) {
-      return 1
-    }
-    if (a.sortField < b.sortField) {
-      return -1
-    }
-
-    return 0
-  }
-
-  function getFirstSlot({
-    openSlots,
-    closedSlots,
-  }: {
-    openSlots: { visitTime: string; sortField: string }[]
-    closedSlots: { visitTime: string; sortField: string }[]
-  }): string {
-    let firstSlot: string
-
-    if (openSlots.length > 0) {
-      firstSlot = openSlots.sort(sortByTimestamp)[0].visitTime
-    } else if (closedSlots.length > 0) {
-      firstSlot = closedSlots.sort(sortByTimestamp)[0].visitTime
-    }
-
-    return firstSlot
-  }
-
   function getSlotsSideMenuData({
-    firstSlotTime,
+    slotFilter,
     slotType = '',
-    slotDate = '',
     startDate = '',
     openSlots,
     closedSlots,
   }: {
-    firstSlotTime: string
+    slotFilter: string
     slotType: string
-    slotDate: string
     startDate: string
     openSlots: { visitTime: string; sortField: string }[]
     closedSlots: { visitTime: string; sortField: string }[]
@@ -104,13 +39,12 @@ export default function routes(
     openSlots: { text: string; href: string; active: boolean }[]
     closedSlots: { text: string; href: string; active: boolean }[]
   } {
-    const slotTimeCheck = slotDate === '' ? firstSlotTime : slotDate
-    const url = `/visits?startDate=${startDate}&time=${slotDate}&type=${slotType}`
+    const url = `/visits?startDate=${startDate}&time=${slotFilter}&type=${slotType}`
     const openSlotOptions = openSlots.sort(sortByTimestamp).map(slot => {
       return {
         text: slot.visitTime,
         href: url,
-        active: slotTimeCheck === slot.visitTime,
+        active: slotFilter === slot.visitTime,
       }
     })
 
@@ -118,7 +52,7 @@ export default function routes(
       return {
         text: slot.visitTime,
         href: url,
-        active: slotTimeCheck === slot.visitTime,
+        active: slotFilter === slot.visitTime,
       }
     })
 
@@ -137,26 +71,26 @@ export default function routes(
     const visitType = ['OPEN', 'CLOSED'].includes(type as string) ? (type as string) : 'OPEN'
     const maxSlots = maxSlotDefaults[visitType]
     const startDateString = getStartDate(startDate as string)
-    const visits: ExtendedVisitInformation[] = await visitSessionsService.getVisitsByDate({
+    const {
+      extendedVisitsInfo,
+      slots,
+    }: {
+      extendedVisitsInfo: ExtendedVisitInformation[]
+      slots: {
+        openSlots: VisitsPageSlot[]
+        closedSlots: VisitsPageSlot[]
+        firstSlotTime: string
+      }
+    } = await visitSessionsService.getVisitsByDate({
       dateString: startDateString,
       username: res.locals.user?.username,
     })
-    const totals = {
-      adults: 0,
-      children: 0,
-    }
-    visits.forEach(visit => {
-      totals.adults += visit.visitors.filter(visitor => visitor.adult).length
-      totals.children += visit.visitors.filter(visitor => !visitor.adult).length
-    })
 
-    const slots = getVisitSlotsFromBookedVisits(visits)
-    const firstSlotTime = getFirstSlot({ ...slots })
+    const slotFilter = time === '' ? slots.firstSlotTime : time
 
     const { openSlots, closedSlots } = getSlotsSideMenuData({
-      firstSlotTime,
       slotType: visitType,
-      slotDate: time as string,
+      slotFilter: slotFilter as string,
       startDate: startDateString,
       ...slots,
     })
@@ -182,8 +116,7 @@ export default function routes(
       })
     }
 
-    const slotFilter = time === '' ? firstSlotTime : time
-    const filteredVisits = visits.filter(
+    const filteredVisits = extendedVisitsInfo.filter(
       visit => visit.visitTime === slotFilter && visit.visitRestriction === visitType
     )
     const prisonersForVisit = filteredVisits.map(visit => visit.prisonNumber)
@@ -216,10 +149,10 @@ export default function routes(
     })
 
     return res.render('pages/visits/summary', {
-      totals,
+      // totals,
       visitType,
       maxSlots,
-      firstSlotTime,
+      slotFilter,
       slotsNav,
       results,
       next,

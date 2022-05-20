@@ -10,12 +10,13 @@ import {
   VisitSessionData,
   PrisonerEvent,
   VisitorListItem,
+  VisitsPageSlot,
 } from '../@types/bapv'
 import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
 import WhereaboutsApiClient from '../data/whereaboutsApiClient'
 import { VisitSession, Visit, SupportType, OutcomeDto } from '../data/visitSchedulerApiTypes'
 import { ScheduledEvent } from '../data/whereaboutsApiTypes'
-import { prisonerDateTimePretty, prisonerTimePretty } from '../utils/utils'
+import { prisonerDateTimePretty, prisonerTimePretty, sortByTimestamp } from '../utils/utils'
 import PrisonerContactRegistryApiClient from '../data/prisonerContactRegistryApiClient'
 import buildVisitorListItem from '../utils/visitorUtils'
 import { getSupportTypeDescriptions } from '../routes/visitorUtils'
@@ -239,13 +240,14 @@ export default class VisitSessionsService {
     })
   }
 
-  async getVisitsByDate({
-    username,
-    dateString,
-  }: {
-    username: string
-    dateString: string
-  }): Promise<ExtendedVisitInformation[]> {
+  async getVisitsByDate({ username, dateString }: { username: string; dateString: string }): Promise<{
+    extendedVisitsInfo: ExtendedVisitInformation[]
+    slots: {
+      openSlots: VisitsPageSlot[]
+      closedSlots: VisitsPageSlot[]
+      firstSlotTime: string
+    }
+  }> {
     const token = await this.systemToken(username)
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
     const prisonerContactRegistryApiClient = this.prisonerContactRegistryApiClientBuilder(token)
@@ -253,11 +255,75 @@ export default class VisitSessionsService {
     logger.info(`Get visits for ${dateString}`)
     const visits = await visitSchedulerApiClient.getVisitsByDate(dateString)
 
-    return Promise.all(
+    const extendedVisitsInfo: ExtendedVisitInformation[] = await Promise.all(
       visits.map(visit => {
         return this.buildExtendedVisitInformation(visit, prisonerContactRegistryApiClient)
       })
     )
+
+    return {
+      extendedVisitsInfo,
+      slots: this.getVisitSlotsFromBookedVisits(extendedVisitsInfo),
+    }
+  }
+
+  private getVisitSlotsFromBookedVisits(visits: ExtendedVisitInformation[]): {
+    openSlots: VisitsPageSlot[]
+    closedSlots: VisitsPageSlot[]
+    firstSlotTime: string
+  } {
+    const openSlots: VisitsPageSlot[] = []
+    const closedSlots: VisitsPageSlot[] = []
+
+    visits.forEach((visit: ExtendedVisitInformation) => {
+      if (visit.visitRestriction === 'OPEN') {
+        let matchingOpenSlot = openSlots.findIndex(openSlot => openSlot.visitTime === visit.visitTime)
+
+        if (matchingOpenSlot < 0) {
+          openSlots.push({
+            visitTime: visit.visitTime,
+            sortField: visit.startTimestamp,
+            adults: 0,
+            children: 0,
+          })
+
+          matchingOpenSlot = openSlots.length - 1
+        }
+
+        openSlots[matchingOpenSlot].adults += visit.visitors.filter(visitor => visitor.adult).length
+        openSlots[matchingOpenSlot].children += visit.visitors.filter(visitor => !visitor.adult).length
+      } else {
+        let matchingClosedSlot = closedSlots.findIndex(closedSlot => closedSlot.visitTime === visit.visitTime)
+
+        if (matchingClosedSlot < 0) {
+          closedSlots.push({
+            visitTime: visit.visitTime,
+            sortField: visit.startTimestamp,
+            adults: 0,
+            children: 0,
+          })
+
+          matchingClosedSlot = closedSlots.length - 1
+        }
+
+        closedSlots[matchingClosedSlot].adults += visit.visitors.filter(visitor => visitor.adult).length
+        closedSlots[matchingClosedSlot].children += visit.visitors.filter(visitor => !visitor.adult).length
+      }
+    })
+
+    let firstSlotTime: string
+
+    if (openSlots.length > 0) {
+      firstSlotTime = openSlots.sort(sortByTimestamp)[0].visitTime
+    } else if (closedSlots.length > 0) {
+      firstSlotTime = closedSlots.sort(sortByTimestamp)[0].visitTime
+    }
+
+    return {
+      openSlots,
+      closedSlots,
+      firstSlotTime,
+    }
   }
 
   async getFullVisitDetails({
