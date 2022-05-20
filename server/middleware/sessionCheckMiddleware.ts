@@ -6,7 +6,7 @@ export default function sessionCheckMiddleware({ stage }: { stage: number }): Re
     const { visitSessionData } = req.session
 
     if (!visitSessionData) {
-      return res.redirect('/search/?error=missing-session')
+      return res.redirect('/search/prisoner/?error=missing-session')
     }
 
     if (
@@ -17,7 +17,7 @@ export default function sessionCheckMiddleware({ stage }: { stage: number }): Re
       !visitSessionData.prisoner.location ||
       !visitSessionData.visitRestriction
     ) {
-      return res.redirect('/search/?error=missing-prisoner')
+      return res.redirect('/search/prisoner/?error=missing-prisoner')
     }
 
     if (stage > 1 && (!visitSessionData.visitors || visitSessionData.visitors.length === 0)) {

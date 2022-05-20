@@ -59,10 +59,10 @@ describe('sessionCheckMiddleware', () => {
     }
   })
 
-  it('should redirect to the search page when there is no session', () => {
+  it('should redirect to the prisoner search page when there is no session', () => {
     sessionCheckMiddleware({ stage: 1 })(req as Request, mockResponse as Response, next)
 
-    expect(mockResponse.redirect).toHaveBeenCalledWith('/search/?error=missing-session')
+    expect(mockResponse.redirect).toHaveBeenCalledWith('/search/prisoner/?error=missing-session')
   })
 
   describe('prisoner or default visitRestriction data missing', () => {
@@ -90,12 +90,12 @@ describe('sessionCheckMiddleware', () => {
         },
       },
     ].forEach((testData: VisitSessionData) => {
-      it('should redirect to the search page when there are missing bits of prisoner or visitRestriction data', () => {
+      it('should redirect to the prisoner search page when there are missing bits of prisoner or visitRestriction data', () => {
         req.session.visitSessionData = testData
 
         sessionCheckMiddleware({ stage: 1 })(req as Request, mockResponse as Response, next)
 
-        expect(mockResponse.redirect).toHaveBeenCalledWith('/search/?error=missing-prisoner')
+        expect(mockResponse.redirect).toHaveBeenCalledWith('/search/prisoner/?error=missing-prisoner')
       })
     })
 
