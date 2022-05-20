@@ -1,0 +1,112 @@
+version: '3.1'
+services:
+
+  redis-bapv:
+    image: 'bitnami/redis:5.0'
+    networks:
+      - hmpps
+    container_name: redis-bapv
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - '6379:6379'
+
+# prisoner-offender-search is not working as yet, we are getting problems connecting to elasticsearch
+  prisoner-offender-search:
+    image: quay.io/hmpps/prisoner-offender-search:latest
+    networks:
+      - hmpps
+    container_name: prisoner-offender-search
+    depends_on:
+      - localstack-aws
+      - prisonapi
+    ports:
+      - "8081:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/health"]
+    environment:
+      - SERVER_PORT=8080
+      - SPRING_PROFILES_ACTIVE=dev
+      - API_BASE_URL_OAUTH=http://localhost:8080/auth
+      - API_BASE_URL_NOMIS=http://prisonapi:8080
+      - SQS_ENDPOINT_URL=http://localstack-aws:4566
+      - OAUTH_CLIENT_ID=prisoner-offender-search-client
+      - OAUTH_CLIENT_SECRET=clientsecret
+      - ELASTICSEARCH_PROXY_URL=http://localstack-aws:4568
+      - AWS_PROVIDER=localstack
+
+
+
+  localstack-aws:
+    image: localstack/localstack:0.14.2
+    networks:
+      - hmpps
+    container_name: localstack-aws
+    ports:
+      - "4566:4566"
+      - "4567:4567"
+      - "4568:4571"
+      - "4569:4572"
+    environment:
+      - SERVICES=sqs,sns,es,elasticsearch
+      - DEBUG=${DEBUG- }
+      - DATA_DIR=/tmp/localstack/data
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - DEFAULT_REGION=eu-west-2
+      - HOSTNAME_EXTERNAL=${ES_HOSTNAME:-localstack}
+    volumes:
+      - "$PWD/src/test/resources/localstack:/sqs"
+      - "$PWD/src/test/resources/localstack:/sns"
+      - "$PWD/src/test/resources/localstack:/docker-entrypoint-initaws.d"
+      - "$PWD/src/test/resources/localstack:/docker-elasticsearch-initaws.d"
+
+  prisonapi:
+    image: quay.io/hmpps/prison-api:latest
+    networks:
+      - hmpps
+    container_name: prisonapi
+    ports:
+      - "8082:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/health"]
+    environment:
+      - SERVER_PORT=8080
+      - SPRING_PROFILES_ACTIVE=nomis-hsqldb
+
+  visit-scheduler:
+    image: quay.io/hmpps/visit-scheduler:latest
+    networks:
+      - hmpps
+    container_name: visit-scheduler
+    restart: always
+    depends_on:
+      - localstack-aws
+      - visit-scheduler-db
+    ports:
+      - "8083:8080"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8083/health" ]
+    environment:
+      - SERVER_PORT=8080
+      - SPRING_PROFILES_ACTIVE=dev
+      - HMPPS_AUTH_URL=http://localhost:8080/auth
+      - PRISON_API_URL=http://prison-api:8080
+      - SYSTEM_CLIENT_ID=book-a-prison-visit-client
+      - SYSTEM_CLIENT_SECRET=clientsecret
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://visit-scheduler-db:5432/visit_scheduler
+
+  visit-scheduler-db:
+    image: postgres:13.2
+    networks:
+      - hmpps
+    container_name: visit-scheduler-db
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=visit_scheduler
+      - POSTGRES_USER=visit_scheduler
+      - POSTGRES_DB=visit_scheduler
+
+networks:
+  hmpps:
