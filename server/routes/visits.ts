@@ -29,17 +29,19 @@ export default function routes(
     openSlots: { visitTime: string; sortField: string }[]
     closedSlots: { visitTime: string; sortField: string }[]
   } => {
-    const openSlots = new Set<{ visitTime: string; sortField: string }>()
-    const closedSlots = new Set<{ visitTime: string; sortField: string }>()
+    const openSlots: { visitTime: string; sortField: string }[] = []
+    const closedSlots: { visitTime: string; sortField: string }[] = []
 
     visits.forEach((visit: ExtendedVisitInformation) => {
       if (visit.visitRestriction === 'OPEN') {
-        openSlots.add({
-          visitTime: visit.visitTime,
-          sortField: visit.startTimestamp,
-        })
-      } else {
-        closedSlots.add({
+        if (!openSlots.find(openSlot => openSlot.visitTime === visit.visitTime)) {
+          openSlots.push({
+            visitTime: visit.visitTime,
+            sortField: visit.startTimestamp,
+          })
+        }
+      } else if (!closedSlots.find(closedSlot => closedSlot.visitTime === visit.visitTime)) {
+        closedSlots.push({
           visitTime: visit.visitTime,
           sortField: visit.startTimestamp,
         })
