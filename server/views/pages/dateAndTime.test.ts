@@ -27,6 +27,7 @@ describe('Views - Date and time of visit', () => {
   it('should display date and time picker for two months with morning and afternoon slots', () => {
     viewContext = {
       prisonerName: 'John Smith',
+      visitRestriction: 'OPEN',
       slotsList: {
         'February 2022': [
           {
@@ -95,6 +96,7 @@ describe('Views - Date and time of visit', () => {
     const $ = cheerio.load(compiledTemplate.render(viewContext))
 
     expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
+    expect($('[data-test="visit-restriction"]').text()).toBe('Open')
 
     expect($('[data-test="month"]').eq(0).text()).toBe('February 2022')
     expect($('#slots-month-February2022-heading-1').text().trim()).toBe('Monday 14 February')

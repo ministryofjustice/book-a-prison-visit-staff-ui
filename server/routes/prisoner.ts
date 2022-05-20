@@ -59,6 +59,9 @@ export default function routes(
         : '',
     }
 
+    // default to an OPEN visit; later checks could change this to CLOSED
+    visitSessionData.visitRestriction = 'OPEN'
+
     req.session.visitSessionData = visitSessionData
 
     return res.redirect('/book-a-visit/select-visitors')

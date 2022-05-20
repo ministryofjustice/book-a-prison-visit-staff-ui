@@ -149,6 +149,7 @@ describe('GET /book-a-visit/select-visitors', () => {
         dateOfBirth: '25 May 1988',
         location: 'location place',
       },
+      visitRestriction: 'OPEN',
     }
 
     prisonerVisitorsService.getVisitors.mockResolvedValue(returnData)
@@ -458,6 +459,7 @@ describe('POST /book-a-visit/select-visitors', () => {
         dateOfBirth: '25 May 1988',
         location: 'location place',
       },
+      visitRestriction: 'OPEN',
     }
 
     sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, {
@@ -757,6 +759,7 @@ describe('/book-a-visit/select-date-and-time', () => {
         dateOfBirth: '25 May 1988',
         location: 'location place',
       },
+      visitRestriction: 'OPEN',
       visitors: [
         {
           personId: 4323,
@@ -797,6 +800,7 @@ describe('/book-a-visit/select-date-and-time', () => {
           const $ = cheerio.load(res.text)
           expect($('h1').text().trim()).toBe('Select date and time of visit')
           expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
+          expect($('[data-test="visit-restriction"]').text()).toBe('Open')
           expect($('input[name="visit-date-and-time"]').length).toBe(5)
           expect($('input[name="visit-date-and-time"]:checked').length).toBe(0)
           expect($('.govuk-accordion__section--expanded').length).toBe(0)
@@ -1009,6 +1013,7 @@ describe('GET /book-a-visit/additional-support', () => {
         dateOfBirth: '25 May 1988',
         location: 'location place',
       },
+      visitRestriction: 'OPEN',
       visit: {
         id: 'visitId',
         startTimestamp: '123',
@@ -1178,6 +1183,7 @@ describe('POST /book-a-visit/additional-support', () => {
         dateOfBirth: '25 May 1988',
         location: 'location place',
       },
+      visitRestriction: 'OPEN',
       visit: {
         id: 'visitId',
         startTimestamp: '123',
@@ -1399,6 +1405,7 @@ describe('/book-a-visit/select-main-contact', () => {
         dateOfBirth: '25 May 1988',
         location: 'location place',
       },
+      visitRestriction: 'OPEN',
       visit: {
         id: 'visitId',
         startTimestamp: '123',
@@ -1672,6 +1679,7 @@ describe('GET /book-a-visit/check-your-booking', () => {
         dateOfBirth: '25 May 1988',
         location: 'location place',
       },
+      visitRestriction: 'OPEN',
       visit: {
         id: 'visitId',
         startTimestamp: '2022-03-12T09:30:00',
@@ -1679,7 +1687,6 @@ describe('GET /book-a-visit/check-your-booking', () => {
         availableTables: 1,
         visitRoomName: 'room name',
       },
-      visitRestriction: 'OPEN',
       visitors: [
         {
           personId: 123,
@@ -1725,6 +1732,7 @@ describe('GET /book-a-visit/check-your-booking', () => {
         expect($('.test-prisoner-location').text()).toContain('location place')
         expect($('.test-visit-date').text()).toContain('Saturday 12 March 2022')
         expect($('.test-visit-time').text()).toContain('9:30am to 10:30am')
+        expect($('.test-visit-type').text()).toContain('Open')
         expect($('.test-visitor-name1').text()).toContain('name last (relate of the prisoner)')
         expect($('.test-visitor-address1').text()).toContain('123 Street, Test Town, S1 2QZ')
         expect($('.test-additional-support1').text()).toContain('Wheelchair ramp')
@@ -1743,6 +1751,7 @@ describe('GET /book-a-visit/check-your-booking', () => {
           dateOfBirth: '25 May 1988',
           location: 'location place',
         },
+        visitRestriction: 'OPEN',
         visit: {
           id: 'visitId',
           startTimestamp: '2022-03-12T09:30:00',
@@ -1792,6 +1801,7 @@ describe('GET /book-a-visit/check-your-booking', () => {
           expect($('.test-prisoner-location').text()).toContain('location place')
           expect($('.test-visit-date').text()).toContain('Saturday 12 March 2022')
           expect($('.test-visit-time').text()).toContain('9:30am to 10:30am')
+          expect($('.test-visit-type').text()).toContain('Open')
           expect($('.test-visitor-name1').text()).toContain('name last (relate of the prisoner)')
           expect($('.test-visitor-address1').text()).toContain('123 Street, Test Town, S1 2QZ')
           expect($('[data-test="no-addition-support-chosen"]').text()).toContain(
@@ -1813,6 +1823,7 @@ describe('GET /book-a-visit/confirmation', () => {
         dateOfBirth: '25 May 1988',
         location: 'location place',
       },
+      visitRestriction: 'OPEN',
       visit: {
         id: 'visitId',
         startTimestamp: '2022-03-12T09:30:00',
@@ -1864,6 +1875,7 @@ describe('GET /book-a-visit/confirmation', () => {
         expect($('.test-prisoner-location').text()).toContain('location place')
         expect($('.test-visit-date').text()).toContain('Saturday 12 March 2022')
         expect($('.test-visit-time').text()).toContain('9:30am to 10:30am')
+        expect($('.test-visit-type').text()).toContain('Open')
         expect($('.test-visitor-name1').text()).toContain('name last (relate of the prisoner)')
         expect($('.test-additional-support1').text()).toContain('Wheelchair ramp')
         expect($('.test-additional-support2').text()).toContain('Portable induction loop for people with hearing aids')
@@ -1882,6 +1894,7 @@ describe('GET /book-a-visit/confirmation', () => {
           dateOfBirth: '25 May 1988',
           location: 'location place',
         },
+        visitRestriction: 'OPEN',
         visit: {
           id: 'visitId',
           startTimestamp: '2022-03-12T09:30:00',
@@ -1933,6 +1946,7 @@ describe('GET /book-a-visit/confirmation', () => {
           expect($('.test-prisoner-location').text()).toContain('location place')
           expect($('.test-visit-date').text()).toContain('Saturday 12 March 2022')
           expect($('.test-visit-time').text()).toContain('9:30am to 10:30am')
+          expect($('.test-visit-type').text()).toContain('Open')
           expect($('.test-visitor-name1').text()).toContain('name last (relate of the prisoner)')
           expect($('[data-test="no-addition-support-chosen"]').text()).toContain(
             'No additional support options were chosen.'

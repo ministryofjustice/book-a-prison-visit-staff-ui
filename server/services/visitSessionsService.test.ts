@@ -66,7 +66,11 @@ describe('Visit sessions service', () => {
     it('Should return empty object if no visit sessions', async () => {
       visitSchedulerApiClient.getVisitSessions.mockResolvedValue([])
       whereaboutsApiClient.getEvents.mockResolvedValue([])
-      const results = await visitSessionsService.getVisitSessions({ username: 'user', offenderNo: 'A1234BC' })
+      const results = await visitSessionsService.getVisitSessions({
+        username: 'user',
+        offenderNo: 'A1234BC',
+        visitRestriction: 'OPEN',
+      })
 
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
       expect(results).toEqual({})
@@ -112,7 +116,11 @@ describe('Visit sessions service', () => {
           },
         ]
         whereaboutsApiClient.getEvents.mockResolvedValue(events)
-        const results = await visitSessionsService.getVisitSessions({ username: 'user', offenderNo: 'A1234BC' })
+        const results = await visitSessionsService.getVisitSessions({
+          username: 'user',
+          offenderNo: 'A1234BC',
+          visitRestriction: 'OPEN',
+        })
 
         expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
         expect(whereaboutsApiClient.getEvents).toHaveBeenCalledTimes(1)
@@ -165,7 +173,11 @@ describe('Visit sessions service', () => {
           },
         ]
         whereaboutsApiClient.getEvents.mockResolvedValue(events)
-        const results = await visitSessionsService.getVisitSessions({ username: 'user', offenderNo: 'A1234BC' })
+        const results = await visitSessionsService.getVisitSessions({
+          username: 'user',
+          offenderNo: 'A1234BC',
+          visitRestriction: 'OPEN',
+        })
 
         expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
         expect(whereaboutsApiClient.getEvents).toHaveBeenCalledTimes(1)
@@ -196,7 +208,11 @@ describe('Visit sessions service', () => {
 
       it('with no prisoner events', async () => {
         whereaboutsApiClient.getEvents.mockResolvedValue([])
-        const results = await visitSessionsService.getVisitSessions({ username: 'user', offenderNo: 'A1234BC' })
+        const results = await visitSessionsService.getVisitSessions({
+          username: 'user',
+          offenderNo: 'A1234BC',
+          visitRestriction: 'OPEN',
+        })
 
         expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
         expect(whereaboutsApiClient.getEvents).toHaveBeenCalledTimes(1)
@@ -223,6 +239,56 @@ describe('Visit sessions service', () => {
             },
           ],
         })
+      })
+    })
+
+    it('Should handle closed visits', async () => {
+      const sessions: VisitSession[] = [
+        {
+          sessionTemplateId: 10,
+          visitRoomName: 'A1',
+          visitType: 'SOCIAL',
+          prisonId: 'HEI',
+          openVisitCapacity: 15,
+          openVisitBookedCount: 1,
+          closedVisitCapacity: 10,
+          closedVisitBookedCount: 2,
+          startTimestamp: '2022-02-14T10:00:00',
+          endTimestamp: '2022-02-14T11:00:00',
+        },
+      ]
+
+      visitSchedulerApiClient.getVisitSessions.mockResolvedValue(sessions)
+      whereaboutsApiClient.getEvents.mockResolvedValue([])
+      const results = await visitSessionsService.getVisitSessions({
+        username: 'user',
+        offenderNo: 'A1234BC',
+        visitRestriction: 'CLOSED',
+      })
+
+      expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
+      expect(results).toEqual(<VisitSlotList>{
+        'February 2022': [
+          {
+            date: 'Monday 14 February',
+            prisonerEvents: {
+              morning: [],
+              afternoon: [],
+            },
+            slots: {
+              morning: [
+                {
+                  id: '1',
+                  startTimestamp: '2022-02-14T10:00:00',
+                  endTimestamp: '2022-02-14T11:00:00',
+                  availableTables: 8,
+                  visitRoomName: 'A1',
+                },
+              ],
+              afternoon: [],
+            },
+          },
+        ],
       })
     })
 
@@ -292,7 +358,11 @@ describe('Visit sessions service', () => {
 
       visitSchedulerApiClient.getVisitSessions.mockResolvedValue(sessions)
       whereaboutsApiClient.getEvents.mockResolvedValue([])
-      const results = await visitSessionsService.getVisitSessions({ username: 'user', offenderNo: 'A1234BC' })
+      const results = await visitSessionsService.getVisitSessions({
+        username: 'user',
+        offenderNo: 'A1234BC',
+        visitRestriction: 'OPEN',
+      })
 
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
       expect(results).toEqual(<VisitSlotList>{
@@ -396,6 +466,7 @@ describe('Visit sessions service', () => {
       const results = await visitSessionsService.getVisitSessions({
         username: 'user',
         offenderNo: 'A1234BC',
+        visitRestriction: 'OPEN',
         timeOfDay: 'morning',
       })
 
@@ -446,6 +517,7 @@ describe('Visit sessions service', () => {
       const results = await visitSessionsService.getVisitSessions({
         username: 'user',
         offenderNo: 'A1234BC',
+        visitRestriction: 'OPEN',
         timeOfDay: 'afternoon',
       })
 
@@ -488,6 +560,7 @@ describe('Visit sessions service', () => {
       const results = await visitSessionsService.getVisitSessions({
         username: 'user',
         offenderNo: 'A1234BC',
+        visitRestriction: 'OPEN',
         dayOfTheWeek: '1',
       })
 
@@ -538,6 +611,7 @@ describe('Visit sessions service', () => {
       const results = await visitSessionsService.getVisitSessions({
         username: 'user',
         offenderNo: 'A1234BC',
+        visitRestriction: 'OPEN',
         dayOfTheWeek: '2',
       })
 

@@ -137,6 +137,7 @@ export default function routes(
       const slotsList = await visitSessionsService.getVisitSessions({
         username: res.locals.user?.username,
         offenderNo: visitSessionData.prisoner.offenderNo,
+        visitRestriction: visitSessionData.visitRestriction,
         timeOfDay,
         dayOfTheWeek,
       })
@@ -152,6 +153,7 @@ export default function routes(
 
       res.render('pages/dateAndTime', {
         errors: req.flash('errors'),
+        visitRestriction: visitSessionData.visitRestriction,
         prisonerName: visitSessionData.prisoner.name,
         slotsList,
         timeOfDay,
@@ -190,9 +192,6 @@ export default function routes(
       }
 
       visitSessionData.visit = getSelectedSlot(req.session.slotsList, req.body['visit-date-and-time'])
-
-      // @TODO placeholder until open/closed visits handled properly
-      visitSessionData.visitRestriction = 'OPEN'
 
       if (req.session.visitSessionData.visitReference) {
         await visitSessionsService.updateVisit({
@@ -378,6 +377,7 @@ export default function routes(
       mainContact: visitSessionData.mainContact,
       prisoner: visitSessionData.prisoner,
       visit: visitSessionData.visit,
+      visitRestriction: visitSessionData.visitRestriction,
       visitors: visitSessionData.visitors,
       additionalSupport,
     })
@@ -404,6 +404,7 @@ export default function routes(
         mainContact: visitSessionData.mainContact,
         prisoner: visitSessionData.prisoner,
         visit: visitSessionData.visit,
+        visitRestriction: visitSessionData.visitRestriction,
         visitors: visitSessionData.visitors,
         additionalSupport,
       })
@@ -430,6 +431,7 @@ export default function routes(
         mainContact: visitSessionData.mainContact,
         prisoner: visitSessionData.prisoner,
         visit: visitSessionData.visit,
+        visitRestriction: visitSessionData.visitRestriction,
         visitors: visitSessionData.visitors,
         additionalSupport,
       })
@@ -453,6 +455,7 @@ export default function routes(
       prisoner: visitSessionData.prisoner,
       mainContact: visitSessionData.mainContact,
       visit: visitSessionData.visit,
+      visitRestriction: visitSessionData.visitRestriction,
       visitors: visitSessionData.visitors,
       additionalSupport,
     })

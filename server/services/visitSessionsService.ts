@@ -42,11 +42,13 @@ export default class VisitSessionsService {
   async getVisitSessions({
     username,
     offenderNo,
+    visitRestriction,
     dayOfTheWeek = '',
     timeOfDay = '',
   }: {
     username: string
     offenderNo: string
+    visitRestriction: VisitSessionData['visitRestriction']
     dayOfTheWeek?: string
     timeOfDay?: string
   }): Promise<VisitSlotList> {
@@ -85,8 +87,10 @@ export default class VisitSessionsService {
             id: (slotIdCounter + 1).toString(),
             startTimestamp: visitSession.startTimestamp,
             endTimestamp: visitSession.endTimestamp,
-            // @TODO this will need fixing to handle open/closed visits
-            availableTables: visitSession.openVisitCapacity - visitSession.openVisitBookedCount,
+            availableTables:
+              visitRestriction === 'OPEN'
+                ? visitSession.openVisitCapacity - visitSession.openVisitBookedCount
+                : visitSession.closedVisitCapacity - visitSession.closedVisitBookedCount,
             visitRoomName: visitSession.visitRoomName,
           }
 
