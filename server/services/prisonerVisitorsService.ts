@@ -11,7 +11,7 @@ export default class PrisonerVisitorsService {
     private readonly systemToken: SystemToken
   ) {}
 
-  async getApprovedVisitors(offenderNo: string, username: string): Promise<VisitorListItem[]> {
+  async getVisitors(offenderNo: string, username: string): Promise<VisitorListItem[]> {
     const token = await this.systemToken(username)
     const prisonerContactRegistryApiClient = this.prisonerContactRegistryApiClientBuilder(token)
 
@@ -20,20 +20,6 @@ export default class PrisonerVisitorsService {
 
     const visitorList: VisitorListItem[] = []
     approvedContacts.forEach(contact => {
-      visitorList.push(buildVisitorListItem(contact))
-    })
-
-    return visitorList
-  }
-
-  async getAllVisitors(offenderNo: string, username: string): Promise<VisitorListItem[]> {
-    const token = await this.systemToken(username)
-    const prisonerContactRegistryApiClient = this.prisonerContactRegistryApiClientBuilder(token)
-
-    const allSocialContacts: Contact[] = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(offenderNo)
-    const visitorList: VisitorListItem[] = []
-
-    allSocialContacts.forEach(contact => {
       visitorList.push(buildVisitorListItem(contact))
     })
 

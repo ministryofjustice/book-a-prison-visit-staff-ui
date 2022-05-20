@@ -153,7 +153,7 @@ describe('GET /book-a-visit/select-visitors', () => {
       visitRestriction: 'OPEN',
     }
 
-    prisonerVisitorsService.getApprovedVisitors.mockResolvedValue(returnData)
+    prisonerVisitorsService.getVisitors.mockResolvedValue(returnData)
     prisonerProfileService.getRestrictions.mockResolvedValue(restrictions)
 
     sessionApp = appWithAllRoutes(null, prisonerProfileService, prisonerVisitorsService, null, systemToken, false, {
@@ -359,7 +359,7 @@ describe('GET /book-a-visit/select-visitors', () => {
 
   it('should show message and no Continue button for prisoner with no approved visitors', () => {
     returnData = []
-    prisonerVisitorsService.getApprovedVisitors.mockResolvedValue(returnData)
+    prisonerVisitorsService.getVisitors.mockResolvedValue(returnData)
 
     return request(sessionApp)
       .get('/book-a-visit/select-visitors')
