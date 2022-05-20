@@ -8,6 +8,7 @@ import PrisonerSearchService from '../services/prisonerSearchService'
 import VisitSessionsService from '../services/visitSessionsService'
 import { prisonerDateTimePretty, properCaseFullName } from '../utils/utils'
 import { isValidPrisonerNumber } from './validationChecks'
+import { clearSession } from './visitorUtils'
 
 export default function routes(
   router: Router,
@@ -48,7 +49,8 @@ export default function routes(
       }
     }
 
-    const visitSessionData: VisitSessionData = req.session.visitSessionData || { prisoner: undefined }
+    clearSession(req)
+    const visitSessionData: VisitSessionData = req.session.visitSessionData ?? { prisoner: undefined }
 
     visitSessionData.prisoner = {
       name: properCaseFullName(`${inmateDetail.lastName}, ${inmateDetail.firstName}`),
@@ -59,7 +61,7 @@ export default function routes(
         : '',
     }
 
-    // default to an OPEN visit; later checks could change this to CLOSED
+    // default to an OPEN visit; later checks in journey could change this to CLOSED
     visitSessionData.visitRestriction = 'OPEN'
 
     req.session.visitSessionData = visitSessionData
