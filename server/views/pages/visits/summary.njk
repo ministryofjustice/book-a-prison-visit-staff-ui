@@ -47,7 +47,7 @@
     <div class="govuk-grid-column-three-quarters">
       <h2 class="govuk-heading-m">{% if visitType == 'OPEN' %}Main{% else %}Closed{% endif %} visits room, {{ slotFilter }}</h2>
       <p>{{ numberOfResults }} of {{ maxSlots }} tables booked</p>
-      <p>{{ numberOfResults }} visitors in total ({{ totals.adults }} adult{% if totals.adults != 1 %}s{% endif %} and {{ totals.children }} child{% if (totals.children != 1) %}ren{% endif %})</p>
+      <p>{{ totals.visitors }} visitors in total ({{ totals.adults }} adult{% if totals.adults != 1 %}s{% endif %} and {{ totals.children }} child{% if (totals.children != 1) %}ren{% endif %})</p>
         {% set pagination %}
           {{ mojPagination({
             results: {

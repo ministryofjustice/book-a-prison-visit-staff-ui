@@ -282,6 +282,7 @@ export default class VisitSessionsService {
         if (matchingOpenSlot < 0) {
           openSlots.push({
             visitTime: visit.visitTime,
+            visitType: visit.visitRestriction,
             sortField: visit.startTimestamp,
             adults: 0,
             children: 0,
@@ -298,6 +299,7 @@ export default class VisitSessionsService {
         if (matchingClosedSlot < 0) {
           closedSlots.push({
             visitTime: visit.visitTime,
+            visitType: visit.visitRestriction,
             sortField: visit.startTimestamp,
             adults: 0,
             children: 0,

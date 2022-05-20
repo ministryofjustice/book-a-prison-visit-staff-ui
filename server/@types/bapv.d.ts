@@ -205,6 +205,7 @@ export interface ExtendedVisitInformation extends VisitInformation {
 
 export type VisitsPageSlot = {
   visitTime: string
+  visitType: string
   sortField: string
   adults: number
   children: number

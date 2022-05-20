@@ -33,33 +33,58 @@ export default function routes(
     slotFilter: string
     slotType: string
     startDate: string
-    openSlots: { visitTime: string; sortField: string }[]
-    closedSlots: { visitTime: string; sortField: string }[]
+    openSlots: VisitsPageSlot[]
+    closedSlots: VisitsPageSlot[]
   }): {
-    openSlots: { text: string; href: string; active: boolean }[]
-    closedSlots: { text: string; href: string; active: boolean }[]
-  } {
-    const url = `/visits?startDate=${startDate}&time=${slotFilter}&type=${slotType}`
+    heading: {
+      text: string
+      classes: string
+    }
+    items: {
+      text: string
+      href: string
+      active: boolean
+    }[]
+  }[] {
     const openSlotOptions = openSlots.sort(sortByTimestamp).map(slot => {
       return {
         text: slot.visitTime,
-        href: url,
-        active: slotFilter === slot.visitTime,
+        href: `/visits?startDate=${startDate}&time=${slot.visitTime}&type=OPEN`,
+        active: slotFilter === slot.visitTime && slotType === slot.visitType,
       }
     })
 
     const closedSlotOptions = closedSlots.sort(sortByTimestamp).map(slot => {
       return {
         text: slot.visitTime,
-        href: url,
-        active: slotFilter === slot.visitTime,
+        href: `/visits?startDate=${startDate}&time=${slot.visitTime}&type=CLOSED`,
+        active: slotFilter === slot.visitTime && slotType === slot.visitType,
       }
     })
 
-    return {
-      openSlots: openSlotOptions,
-      closedSlots: closedSlotOptions,
+    const slotsNav = []
+
+    if (openSlotOptions.length > 0) {
+      slotsNav.push({
+        heading: {
+          text: 'Main visits room',
+          classes: 'govuk-!-padding-top-0',
+        },
+        items: openSlotOptions,
+      })
     }
+
+    if (closedSlotOptions.length > 0) {
+      slotsNav.push({
+        heading: {
+          text: 'Closed visits room',
+          classes: 'govuk-!-padding-top-0',
+        },
+        items: closedSlotOptions,
+      })
+    }
+
+    return slotsNav
   }
 
   get('/', async (req, res) => {
@@ -88,32 +113,22 @@ export default function routes(
 
     const slotFilter = time === '' ? slots.firstSlotTime : time
 
-    const { openSlots, closedSlots } = getSlotsSideMenuData({
+    const slotsNav = getSlotsSideMenuData({
       slotType: visitType,
       slotFilter: slotFilter as string,
       startDate: startDateString,
       ...slots,
     })
-    const slotsNav = []
 
-    if (openSlots.length > 0) {
-      slotsNav.push({
-        heading: {
-          text: 'Main visits room',
-          classes: 'govuk-!-padding-top-0',
-        },
-        items: openSlots,
-      })
-    }
-
-    if (closedSlots.length > 0) {
-      slotsNav.push({
-        heading: {
-          text: 'Closed visits room',
-          classes: 'govuk-!-padding-top-0',
-        },
-        items: closedSlots,
-      })
+    const totals = {
+      adults:
+        visitType === 'OPEN'
+          ? slots.openSlots.find(slot => slot.visitTime === slotFilter).adults
+          : slots.closedSlots.find(slot => slot.visitTime === slotFilter).adults,
+      children:
+        visitType === 'OPEN'
+          ? slots.openSlots.find(slot => slot.visitTime === slotFilter).children
+          : slots.closedSlots.find(slot => slot.visitTime === slotFilter).children,
     }
 
     const filteredVisits = extendedVisitsInfo.filter(
@@ -149,7 +164,10 @@ export default function routes(
     })
 
     return res.render('pages/visits/summary', {
-      // totals,
+      totals: {
+        visitors: totals.adults + totals.children,
+        ...totals,
+      },
       visitType,
       maxSlots,
       slotFilter,
