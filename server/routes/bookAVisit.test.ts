@@ -9,7 +9,7 @@ import PrisonerProfileService from '../services/prisonerProfileService'
 import VisitSessionsService from '../services/visitSessionsService'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import { Restriction } from '../data/prisonerContactRegistryApiTypes'
-import { SupportType, VisitorSupport } from '../data/visitSchedulerApiTypes'
+import { SupportType, Visit, VisitorSupport } from '../data/visitSchedulerApiTypes'
 
 jest.mock('../services/prisonerProfileService')
 jest.mock('../services/prisonerVisitorsService')
@@ -881,8 +881,10 @@ describe('/book-a-visit/select-date-and-time', () => {
       systemToken
     ) as jest.Mocked<VisitSessionsService>
 
+    const createdVisit: Partial<Visit> = { reference: '2a-bc-3d-ef', visitStatus: 'RESERVED' }
+
     beforeEach(() => {
-      visitSessionsService.createVisit = jest.fn().mockResolvedValue('2a-bc-3d-ef')
+      visitSessionsService.createVisit = jest.fn().mockResolvedValue(createdVisit)
       visitSessionsService.updateVisit = jest.fn()
 
       sessionApp = appWithAllRoutes(null, null, null, visitSessionsService, systemToken, false, {
@@ -908,6 +910,7 @@ describe('/book-a-visit/select-date-and-time', () => {
           expect(visitSessionsService.createVisit).toHaveBeenCalledTimes(1)
           expect(visitSessionsService.updateVisit).not.toHaveBeenCalled()
           expect(visitSessionData.visitReference).toEqual('2a-bc-3d-ef')
+          expect(visitSessionData.visitStatus).toEqual('RESERVED')
         })
     })
 
@@ -1030,6 +1033,8 @@ describe('GET /book-a-visit/additional-support', () => {
           banned: false,
         },
       ],
+      visitReference: 'ab-cd-ef-gh',
+      visitStatus: 'RESERVED',
     }
 
     sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, {
@@ -1209,6 +1214,8 @@ describe('POST /book-a-visit/additional-support', () => {
           banned: false,
         },
       ],
+      visitReference: 'ab-cd-ef-gh',
+      visitStatus: 'RESERVED',
     }
     sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, {
       availableSupportTypes,
@@ -1423,6 +1430,8 @@ describe('/book-a-visit/select-main-contact', () => {
         },
       ],
       visitorSupport: [],
+      visitReference: 'ab-cd-ef-gh',
+      visitStatus: 'RESERVED',
     }
 
     sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, {
@@ -1711,6 +1720,8 @@ describe('GET /book-a-visit/check-your-booking', () => {
         phoneNumber: '123',
         contactName: 'abc',
       },
+      visitReference: 'ab-cd-ef-gh',
+      visitStatus: 'RESERVED',
     }
     sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, {
       availableSupportTypes,
@@ -1783,6 +1794,8 @@ describe('GET /book-a-visit/check-your-booking', () => {
           phoneNumber: '123',
           contactName: 'abc',
         },
+        visitReference: 'ab-cd-ef-gh',
+        visitStatus: 'RESERVED',
       }
       sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, { visitSessionData } as SessionData)
     })
@@ -1856,6 +1869,7 @@ describe('GET /book-a-visit/confirmation', () => {
         contactName: 'abc',
       },
       visitReference: 'ab-cd-ef-gh',
+      visitStatus: 'BOOKED',
     }
     sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, {
       availableSupportTypes,
@@ -1927,6 +1941,7 @@ describe('GET /book-a-visit/confirmation', () => {
           contactName: 'abc',
         },
         visitReference: 'ab-cd-ef-gh',
+        visitStatus: 'BOOKED',
       }
       sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, {
         availableSupportTypes,

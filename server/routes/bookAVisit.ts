@@ -199,12 +199,13 @@ export default function routes(
           visitData: visitSessionData,
         })
       } else {
-        const visitReference = await visitSessionsService.createVisit({
+        const { reference, visitStatus } = await visitSessionsService.createVisit({
           username: res.locals.user?.username,
           visitData: visitSessionData,
         })
 
-        req.session.visitSessionData.visitReference = visitReference
+        req.session.visitSessionData.visitReference = reference
+        req.session.visitSessionData.visitStatus = visitStatus
       }
 
       return res.redirect('/book-a-visit/additional-support')
@@ -392,24 +393,6 @@ export default function routes(
       visitSessionData.visitorSupport
     )
 
-    if (!req.session.visitSessionData.visitReference) {
-      return res.render('pages/checkYourBooking', {
-        errors: [
-          {
-            msg: 'The visit id is missing',
-            param: 'id',
-          },
-        ],
-        offenderNo,
-        mainContact: visitSessionData.mainContact,
-        prisoner: visitSessionData.prisoner,
-        visit: visitSessionData.visit,
-        visitRestriction: visitSessionData.visitRestriction,
-        visitors: visitSessionData.visitors,
-        additionalSupport,
-      })
-    }
-
     try {
       const bookedVisit = await visitSessionsService.updateVisit({
         username: res.locals.user?.username,
@@ -417,8 +400,7 @@ export default function routes(
         visitStatus: 'BOOKED',
       })
 
-      // TODO: Update to the correct value when schema updated
-      req.session.visitSessionData.visitReference = bookedVisit.reference
+      req.session.visitSessionData.visitStatus = bookedVisit.visitStatus
     } catch (error) {
       return res.render('pages/checkYourBooking', {
         errors: [

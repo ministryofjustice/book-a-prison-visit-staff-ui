@@ -682,7 +682,7 @@ describe('Visit sessions service', () => {
       const result = await visitSessionsService.createVisit({ username: 'user', visitData: visitSessionData })
 
       expect(visitSchedulerApiClient.createVisit).toHaveBeenCalledTimes(1)
-      expect(result).toEqual('ab-cd-ef-gh')
+      expect(result).toEqual(visit)
     })
   })
 
