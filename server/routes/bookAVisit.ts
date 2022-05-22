@@ -5,7 +5,7 @@ import sessionCheckMiddleware from '../middleware/sessionCheckMiddleware'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
 import PrisonerProfileService from '../services/prisonerProfileService'
 import VisitSessionsService from '../services/visitSessionsService'
-import { getFlashFormValues, getSelectedSlot, getSupportTypeDescriptions } from './visitorUtils'
+import { clearSession, getFlashFormValues, getSelectedSlot, getSupportTypeDescriptions } from './visitorUtils'
 import { SupportType, VisitorSupport } from '../data/visitSchedulerApiTypes'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 
@@ -424,23 +424,21 @@ export default function routes(
 
   get('/confirmation', sessionCheckMiddleware({ stage: 6 }), async (req, res) => {
     const { visitSessionData } = req.session
-    const { offenderNo } = req.session.visitSessionData.prisoner
 
-    const additionalSupport = getSupportTypeDescriptions(
+    res.locals.prisoner = visitSessionData.prisoner
+    res.locals.visit = visitSessionData.visit
+    res.locals.visitRestriction = visitSessionData.visitRestriction
+    res.locals.visitors = visitSessionData.visitors
+    res.locals.mainContact = visitSessionData.mainContact
+    res.locals.visitReference = visitSessionData.visitReference
+    res.locals.additionalSupport = getSupportTypeDescriptions(
       req.session.availableSupportTypes,
       visitSessionData.visitorSupport
     )
 
-    res.render('pages/confirmation', {
-      visitReference: visitSessionData.visitReference,
-      offenderNo,
-      prisoner: visitSessionData.prisoner,
-      mainContact: visitSessionData.mainContact,
-      visit: visitSessionData.visit,
-      visitRestriction: visitSessionData.visitRestriction,
-      visitors: visitSessionData.visitors,
-      additionalSupport,
-    })
+    clearSession(req)
+
+    res.render('pages/confirmation')
   })
 
   return router

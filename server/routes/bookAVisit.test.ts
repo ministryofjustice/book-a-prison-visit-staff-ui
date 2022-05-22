@@ -10,6 +10,7 @@ import VisitSessionsService from '../services/visitSessionsService'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import { Restriction } from '../data/prisonerContactRegistryApiTypes'
 import { SupportType, Visit, VisitorSupport } from '../data/visitSchedulerApiTypes'
+import * as visitorUtils from './visitorUtils'
 
 jest.mock('../services/prisonerProfileService')
 jest.mock('../services/prisonerVisitorsService')
@@ -1829,6 +1830,8 @@ describe('GET /book-a-visit/check-your-booking', () => {
 
 describe('GET /book-a-visit/confirmation', () => {
   beforeEach(() => {
+    jest.spyOn(visitorUtils, 'clearSession')
+
     visitSessionData = {
       prisoner: {
         name: 'prisoner name',
@@ -1896,11 +1899,15 @@ describe('GET /book-a-visit/confirmation', () => {
         expect($('.test-main-contact-name').text()).toContain('abc')
         expect($('.test-main-contact-number').text()).toContain('123')
         expect($('.test-booking-reference').text()).toContain('ab-cd-ef-gh')
+
+        expect(visitorUtils.clearSession).toBeCalledTimes(1)
       })
   })
 
   describe('when no additional support options are chosen', () => {
     beforeEach(() => {
+      jest.spyOn(visitorUtils, 'clearSession')
+
       visitSessionData = {
         prisoner: {
           name: 'prisoner name',
@@ -1969,6 +1976,8 @@ describe('GET /book-a-visit/confirmation', () => {
           expect($('.test-main-contact-name').text()).toContain('abc')
           expect($('.test-main-contact-number').text()).toContain('123')
           expect($('.test-booking-reference').text()).toContain('ab-cd-ef-gh')
+
+          expect(visitorUtils.clearSession).toBeCalledTimes(1)
         })
     })
   })
