@@ -170,7 +170,7 @@ export default function routes(
       },
       visitType,
       maxSlots,
-      slotFilter,
+      slotTime: slotFilter,
       slotsNav,
       results,
       next,

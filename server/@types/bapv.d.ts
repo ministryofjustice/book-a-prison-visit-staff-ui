@@ -5,6 +5,9 @@ export type PrisonerDetailsItem = {
   html?: string
   text?: string
   classes?: string
+  attributes?: {
+    'data-test': string
+  }
 }
 
 export type PrisonerAlertItem = [
