@@ -25,3 +25,17 @@ export const getSupportTypeDescriptions = (
       : availableSupportTypes.find(type => type.type === support.type).description
   })
 }
+
+export const clearSession = (req: Request): void => {
+  ;[
+    'availableSupportTypes',
+    'visitorList',
+    'adultVisitors',
+    'slotsList',
+    'timeOfDay',
+    'dayOfTheWeek',
+    'visitSessionData',
+  ].forEach(sessionItem => {
+    delete req.session[sessionItem]
+  })
+}

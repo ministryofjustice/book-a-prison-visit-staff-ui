@@ -9,6 +9,7 @@ import PrisonerSearchService from '../services/prisonerSearchService'
 import VisitSessionsService from '../services/visitSessionsService'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import { Prisoner } from '../data/prisonerOffenderSearchTypes'
+import { clearSession } from './visitorUtils'
 
 jest.mock('../services/prisonerProfileService')
 jest.mock('../services/prisonerSearchService')
@@ -32,6 +33,12 @@ const visitSessionsService = new VisitSessionsService(
   null,
   systemToken
 ) as jest.Mocked<VisitSessionsService>
+
+jest.mock('./visitorUtils', () => ({
+  clearSession: jest.fn((req: Express.Request) => {
+    req.session.visitSessionData = visitSessionData as VisitSessionData
+  }),
+}))
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
@@ -287,6 +294,7 @@ describe('POST /prisoner/A1234BC', () => {
       .expect(res => {
         expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledTimes(1)
         expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledWith('A1234BC', undefined)
+        expect(clearSession).toHaveBeenCalledTimes(1)
         expect(visitSessionData).toEqual(<VisitSessionData>{
           prisoner: {
             name: 'Smith, John',

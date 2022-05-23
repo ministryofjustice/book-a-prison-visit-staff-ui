@@ -5,7 +5,7 @@ import sessionCheckMiddleware from '../middleware/sessionCheckMiddleware'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
 import PrisonerProfileService from '../services/prisonerProfileService'
 import VisitSessionsService from '../services/visitSessionsService'
-import { getFlashFormValues, getSelectedSlot, getSupportTypeDescriptions } from './visitorUtils'
+import { clearSession, getFlashFormValues, getSelectedSlot, getSupportTypeDescriptions } from './visitorUtils'
 import { SupportType, VisitorSupport } from '../data/visitSchedulerApiTypes'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 
@@ -199,12 +199,13 @@ export default function routes(
           visitData: visitSessionData,
         })
       } else {
-        const visitReference = await visitSessionsService.createVisit({
+        const { reference, visitStatus } = await visitSessionsService.createVisit({
           username: res.locals.user?.username,
           visitData: visitSessionData,
         })
 
-        req.session.visitSessionData.visitReference = visitReference
+        req.session.visitSessionData.visitReference = reference
+        req.session.visitSessionData.visitStatus = visitStatus
       }
 
       return res.redirect('/book-a-visit/additional-support')
@@ -392,24 +393,6 @@ export default function routes(
       visitSessionData.visitorSupport
     )
 
-    if (!req.session.visitSessionData.visitReference) {
-      return res.render('pages/checkYourBooking', {
-        errors: [
-          {
-            msg: 'The visit id is missing',
-            param: 'id',
-          },
-        ],
-        offenderNo,
-        mainContact: visitSessionData.mainContact,
-        prisoner: visitSessionData.prisoner,
-        visit: visitSessionData.visit,
-        visitRestriction: visitSessionData.visitRestriction,
-        visitors: visitSessionData.visitors,
-        additionalSupport,
-      })
-    }
-
     try {
       const bookedVisit = await visitSessionsService.updateVisit({
         username: res.locals.user?.username,
@@ -417,8 +400,7 @@ export default function routes(
         visitStatus: 'BOOKED',
       })
 
-      // TODO: Update to the correct value when schema updated
-      req.session.visitSessionData.visitReference = bookedVisit.reference
+      req.session.visitSessionData.visitStatus = bookedVisit.visitStatus
     } catch (error) {
       return res.render('pages/checkYourBooking', {
         errors: [
@@ -442,23 +424,21 @@ export default function routes(
 
   get('/confirmation', sessionCheckMiddleware({ stage: 6 }), async (req, res) => {
     const { visitSessionData } = req.session
-    const { offenderNo } = req.session.visitSessionData.prisoner
 
-    const additionalSupport = getSupportTypeDescriptions(
+    res.locals.prisoner = visitSessionData.prisoner
+    res.locals.visit = visitSessionData.visit
+    res.locals.visitRestriction = visitSessionData.visitRestriction
+    res.locals.visitors = visitSessionData.visitors
+    res.locals.mainContact = visitSessionData.mainContact
+    res.locals.visitReference = visitSessionData.visitReference
+    res.locals.additionalSupport = getSupportTypeDescriptions(
       req.session.availableSupportTypes,
       visitSessionData.visitorSupport
     )
 
-    res.render('pages/confirmation', {
-      visitReference: visitSessionData.visitReference,
-      offenderNo,
-      prisoner: visitSessionData.prisoner,
-      mainContact: visitSessionData.mainContact,
-      visit: visitSessionData.visit,
-      visitRestriction: visitSessionData.visitRestriction,
-      visitors: visitSessionData.visitors,
-      additionalSupport,
-    })
+    clearSession(req)
+
+    res.render('pages/confirmation')
   })
 
   return router

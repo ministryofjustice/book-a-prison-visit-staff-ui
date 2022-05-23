@@ -28,7 +28,7 @@ const visitorsData: VisitSessionData['visitors'] = [
   },
 ]
 const visit: VisitSessionData['visit'] = {
-  id: 'ab-cd-ef-gh',
+  id: '1',
   startTimestamp: '123',
   endTimestamp: '123',
   availableTables: 1,
@@ -59,10 +59,10 @@ describe('sessionCheckMiddleware', () => {
     }
   })
 
-  it('should redirect to the search page when there is no session', () => {
+  it('should redirect to the prisoner search page when there is no session', () => {
     sessionCheckMiddleware({ stage: 1 })(req as Request, mockResponse as Response, next)
 
-    expect(mockResponse.redirect).toHaveBeenCalledWith('/search/?error=missing-session')
+    expect(mockResponse.redirect).toHaveBeenCalledWith('/search/prisoner/?error=missing-session')
   })
 
   describe('prisoner or default visitRestriction data missing', () => {
@@ -90,12 +90,12 @@ describe('sessionCheckMiddleware', () => {
         },
       },
     ].forEach((testData: VisitSessionData) => {
-      it('should redirect to the search page when there are missing bits of prisoner or visitRestriction data', () => {
+      it('should redirect to the prisoner search page when there are missing bits of prisoner or visitRestriction data', () => {
         req.session.visitSessionData = testData
 
         sessionCheckMiddleware({ stage: 1 })(req as Request, mockResponse as Response, next)
 
-        expect(mockResponse.redirect).toHaveBeenCalledWith('/search/?error=missing-prisoner')
+        expect(mockResponse.redirect).toHaveBeenCalledWith('/search/prisoner/?error=missing-prisoner')
       })
     })
 
@@ -150,7 +150,7 @@ describe('sessionCheckMiddleware', () => {
         visitRestriction,
         visitors: visitorsData,
         visit: {
-          id: 'ab-cd-ef-gh',
+          id: '1',
         } as VisitSlot,
       },
       {
@@ -158,7 +158,7 @@ describe('sessionCheckMiddleware', () => {
         visitRestriction,
         visitors: visitorsData,
         visit: {
-          id: 'ab-cd-ef-gh',
+          id: '1',
           startTimestamp: '123',
         } as VisitSlot,
       },
@@ -167,7 +167,7 @@ describe('sessionCheckMiddleware', () => {
         visitRestriction,
         visitors: visitorsData,
         visit: {
-          id: 'ab-cd-ef-gh',
+          id: '1',
           startTimestamp: '123',
           endTimestamp: '123',
         } as VisitSlot,
@@ -177,7 +177,7 @@ describe('sessionCheckMiddleware', () => {
         visitRestriction,
         visitors: visitorsData,
         visit: {
-          id: 'ab-cd-ef-gh',
+          id: '1',
           startTimestamp: '123',
           endTimestamp: '123',
         } as VisitSlot,
@@ -193,6 +193,23 @@ describe('sessionCheckMiddleware', () => {
     })
   })
 
+  describe('visit reference', () => {
+    it('should redirect to the prisoner profile if visit booking reference not set', () => {
+      const testData: VisitSessionData = {
+        prisoner: prisonerData,
+        visitRestriction,
+        visit,
+        visitors: visitorsData,
+      }
+
+      req.session.visitSessionData = testData
+
+      sessionCheckMiddleware({ stage: 3 })(req as Request, mockResponse as Response, next)
+
+      expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/A1234BC?error=missing-visit-reference')
+    })
+  })
+
   describe('main contact data missing', () => {
     ;[
       {
@@ -200,7 +217,9 @@ describe('sessionCheckMiddleware', () => {
         visitRestriction,
         visit,
         visitors: visitorsData,
-      },
+        visitReference: 'ab-cd-ef-gh',
+        visitStatus: 'RESERVED',
+      } as VisitSessionData,
       {
         prisoner: prisonerData,
         visitRestriction,
@@ -209,7 +228,9 @@ describe('sessionCheckMiddleware', () => {
         mainContact: {
           phoneNumber: '',
         },
-      },
+        visitReference: 'ab-cd-ef-gh',
+        visitStatus: 'RESERVED',
+      } as VisitSessionData,
     ].forEach((testData: VisitSessionData) => {
       it('should redirect to the prisoner profile when there is missing main contact data', () => {
         req.session.visitSessionData = testData
@@ -218,6 +239,65 @@ describe('sessionCheckMiddleware', () => {
 
         expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/A1234BC?error=missing-main-contact')
       })
+    })
+  })
+
+  describe('check visit status', () => {
+    beforeEach(() => {
+      const testData: VisitSessionData = {
+        prisoner: prisonerData,
+        visitRestriction,
+        visit,
+        visitors: visitorsData,
+        mainContact: {
+          phoneNumber: '01234567899',
+          contactName: 'abc',
+        },
+      }
+
+      req.session.visitSessionData = testData
+    })
+
+    it('should not redirect if visit status missing prior to selecting a visit slot', () => {
+      sessionCheckMiddleware({ stage: 2 })(req as Request, mockResponse as Response, next)
+
+      expect(mockResponse.redirect).not.toHaveBeenCalled()
+    })
+
+    it('should not redirect if visit status is RESERVED during booking journey', () => {
+      req.session.visitSessionData.visitReference = 'ab-cd-ef-gh'
+      req.session.visitSessionData.visitStatus = 'RESERVED'
+
+      sessionCheckMiddleware({ stage: 3 })(req as Request, mockResponse as Response, next)
+
+      expect(mockResponse.redirect).not.toHaveBeenCalled()
+    })
+
+    it('should redirect to the prisoner profile if visit status is not RESERVED during booking journey', () => {
+      req.session.visitSessionData.visitReference = 'ab-cd-ef-gh'
+      req.session.visitSessionData.visitStatus = 'BOOKED'
+
+      sessionCheckMiddleware({ stage: 3 })(req as Request, mockResponse as Response, next)
+
+      expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/A1234BC?error=visit-already-booked')
+    })
+
+    it('should not redirect if visit status is BOOKED at end of booking journey', () => {
+      req.session.visitSessionData.visitReference = 'ab-cd-ef-gh'
+      req.session.visitSessionData.visitStatus = 'BOOKED'
+
+      sessionCheckMiddleware({ stage: 6 })(req as Request, mockResponse as Response, next)
+
+      expect(mockResponse.redirect).not.toHaveBeenCalled()
+    })
+
+    it('should redirect to the prisoner profile if visit status is not BOOKED at end of booking journey', () => {
+      req.session.visitSessionData.visitReference = 'ab-cd-ef-gh'
+      req.session.visitSessionData.visitStatus = 'RESERVED'
+
+      sessionCheckMiddleware({ stage: 6 })(req as Request, mockResponse as Response, next)
+
+      expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/A1234BC?error=visit-not-booked')
     })
   })
 })

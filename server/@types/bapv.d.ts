@@ -1,5 +1,5 @@
 import { InmateDetail, VisitBalances } from '../data/prisonApiTypes'
-import { VisitorSupport } from '../data/visitSchedulerApiTypes'
+import { Visit, VisitorSupport } from '../data/visitSchedulerApiTypes'
 
 export type PrisonerDetailsItem = {
   html?: string
@@ -185,6 +185,7 @@ export type VisitSessionData = {
     contactName?: string
   }
   visitReference?: string
+  visitStatus?: Visit['visitStatus']
 }
 
 export type VisitInformation = {

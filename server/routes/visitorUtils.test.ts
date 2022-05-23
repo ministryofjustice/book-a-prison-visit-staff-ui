@@ -1,6 +1,7 @@
 import { Request } from 'express'
+import { Session, SessionData } from 'express-session'
 import { VisitSlotList } from '../@types/bapv'
-import { getFlashFormValues, getSelectedSlot } from './visitorUtils'
+import { clearSession, getFlashFormValues, getSelectedSlot } from './visitorUtils'
 
 const slotsList: VisitSlotList = {
   'February 2022': [
@@ -119,5 +120,33 @@ describe('getFlashFormValues', () => {
 
     expect(getFlashFormValues(req)).toEqual({})
     expect(req.flash).toHaveBeenNthCalledWith(1, 'formValues')
+  })
+})
+
+describe('clearSession', () => {
+  const req: Partial<Request> = {}
+  const sessionData: SessionData = {
+    returnTo: '/url',
+    nowInMinutes: 123456,
+    cookie: undefined,
+    availableSupportTypes: [{ type: 'WHEELCHAIR', description: 'Wheelchair ramp' }],
+    visitorList: { visitors: [] },
+    adultVisitors: { adults: [] },
+    slotsList: {},
+    timeOfDay: 'morning',
+    dayOfTheWeek: '1',
+    visitSessionData: { prisoner: undefined },
+  }
+
+  req.session = sessionData as Session & SessionData
+
+  it('should clear only booking journey related data from the session', () => {
+    clearSession(req as Request)
+
+    expect(req.session).toStrictEqual(<Session & Partial<SessionData>>{
+      returnTo: '/url',
+      nowInMinutes: 123456,
+      cookie: undefined,
+    })
   })
 })
