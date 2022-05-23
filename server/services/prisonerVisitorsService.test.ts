@@ -27,7 +27,7 @@ describe('Prisoner visitor service', () => {
       jest.resetAllMocks()
     })
 
-    it('Retrieves and processes prisoner and visitor details', async () => {
+    it('Retrieves and processes prisoner and approved visitor details', async () => {
       const childDateOfBirth = `${new Date().getFullYear() - 4}-03-02`
       const contacts: Contact[] = [
         {

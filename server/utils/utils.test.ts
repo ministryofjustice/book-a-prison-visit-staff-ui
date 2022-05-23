@@ -5,8 +5,9 @@ import {
   prisonerDateTimePretty,
   properCaseFullName,
   properCase,
+  sortByTimestamp,
 } from './utils'
-import getResultsPagingLinksTestData from './utils.testData'
+import { getResultsPagingLinksTestData, sortByTimestampData } from './utils.testData'
 
 describe('Convert to title case', () => {
   it('null string', () => {
@@ -85,5 +86,13 @@ describe('properCase', () => {
   })
   it('empty string', () => {
     expect(properCase('')).toEqual('')
+  })
+})
+
+describe('Sort by timestamp', () => {
+  sortByTimestampData.forEach(testData => {
+    it(testData.description, () => {
+      expect(sortByTimestamp(testData.a, testData.b)).toEqual(testData.result)
+    })
   })
 })

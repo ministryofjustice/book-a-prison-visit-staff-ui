@@ -18,31 +18,7 @@
         {{ mojSideNavigation({
         label: 'Slots navigation',
         classes: 'govuk-!-padding-top-0',
-        sections: [
-            {
-                heading: {
-                    text: 'Main visits room',
-                    classes: 'govuk-!-padding-top-0'
-                },
-                items: [{
-                    text: '11am to 12pm',
-                    href: '/visits/',
-                    active: true
-                }, {
-                    text: '3pm to 4pm',
-                    href: '/visits'
-                }]
-            },
-            {
-                heading: {
-                    text: 'Closed visits room'
-                },
-                items: [{
-                    text: '3pm to 4pm',
-                    href: '/visits'
-                }]
-            }
-        ]
+        sections: slotsNav
         }) }}
 
       <h3 class="govuk-heading-s">Visitor list</h3>
@@ -69,9 +45,9 @@
     </div>
 
     <div class="govuk-grid-column-three-quarters">
-      <h2 class="govuk-heading-m">X visits room, Y to Z</h2>
-      <p>X of Y tables booked</p>
-      <p>X visits in total (Y adults and Z children)</p>
+      <h2 class="govuk-heading-m"><span data-test="visit-room">{% if visitType == 'OPEN' %}Main{% else %}Closed{% endif %}</span> visits room, <span data-test="visit-time">{{ slotTime }}</span></h2>
+      <p><span data-test="visit-tables-booked">{{ numberOfResults }} of {{ maxSlots }}</span> tables booked</p>
+      <p><span data-test="visit-visitors-total">{{ totals.visitors }}</span> visitors in total (<span data-test="visit-adults">{{ totals.adults }}</span> adult{% if totals.adults != 1 %}s{% endif %} and <span data-test="visit-children">{{ totals.children }}</span> child{% if (totals.children != 1) %}ren{% endif %})</p>
         {% set pagination %}
           {{ mojPagination({
             results: {

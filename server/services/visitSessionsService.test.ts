@@ -3,8 +3,15 @@ import VisitSessionsService from './visitSessionsService'
 import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
 import WhereaboutsApiClient from '../data/whereaboutsApiClient'
 import { VisitSession, Visit, SupportType, OutcomeDto } from '../data/visitSchedulerApiTypes'
-import { VisitSlotList, VisitSessionData, VisitInformation, VisitorListItem } from '../@types/bapv'
-import { Contact } from '../data/prisonerContactRegistryApiTypes'
+import { Address, Contact, AddressUsage, Restriction } from '../data/prisonerContactRegistryApiTypes'
+import {
+  VisitSlotList,
+  VisitSessionData,
+  VisitInformation,
+  VisitorListItem,
+  ExtendedVisitInformation,
+  VisitsPageSlot,
+} from '../@types/bapv'
 
 jest.mock('../data/prisonerContactRegistryApiClient')
 jest.mock('../data/visitSchedulerApiClient')
@@ -778,7 +785,7 @@ describe('Visit sessions service', () => {
     })
   })
 
-  describe('Cancel a visit', () => {
+  describe('cancelVisit', () => {
     it('should cancel a visit, giving the status code and reason', async () => {
       const expectedResult: Visit = {
         reference: 'ab-cd-ef-gh',
@@ -828,7 +835,7 @@ describe('Visit sessions service', () => {
     })
   })
 
-  describe('Get visit data', () => {
+  describe('getVisit', () => {
     const visit: Visit = {
       reference: 'ab-cd-ef-gh',
       prisonerId: 'A1234BC',
@@ -1016,6 +1023,241 @@ describe('Visit sessions service', () => {
         expect(visitSchedulerApiClient.getVisit).toHaveBeenCalledTimes(1)
         expect(result).toEqual(expectedResult)
       })
+    })
+  })
+
+  describe('getVisitsByDate', () => {
+    it('should return empty data if no visit sessions on chosen date', async () => {
+      visitSchedulerApiClient.getVisitsByDate.mockResolvedValue([])
+      prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue([])
+      const results = await visitSessionsService.getVisitsByDate({
+        username: 'user',
+        dateString: '2022-01-01',
+      })
+
+      expect(visitSchedulerApiClient.getVisitsByDate).toHaveBeenCalledTimes(1)
+      expect(results).toEqual({
+        extendedVisitsInfo: [],
+        slots: {
+          closedSlots: [],
+          firstSlotTime: undefined,
+          openSlots: [],
+        },
+      })
+    })
+
+    it('should return visit and prisoner data when session exists', async () => {
+      const emptyAddresses: Address[] = []
+      const emptyUsages: AddressUsage[] = []
+      const emptyRestrictions: Restriction[] = []
+
+      const visits: Visit[] = [
+        {
+          reference: 'ob-cw-lx-na',
+          prisonerId: 'A8709DY',
+          prisonId: 'HEI',
+          visitRoom: 'VISITS-VISITS-H1_6LV',
+          visitType: 'SOCIAL',
+          visitStatus: 'BOOKED',
+          outcomeStatus: 'NOT_RECORDED',
+          visitRestriction: 'OPEN',
+          startTimestamp: '2022-05-23T09:00:00',
+          endTimestamp: '2022-05-23T09:29:00',
+          visitNotes: [],
+          visitContact: {
+            name: 'UNKNOWN',
+            telephone: 'UNKNOWN',
+          },
+          visitors: [
+            {
+              nomisPersonId: 4729510,
+            },
+          ],
+          visitorSupport: [],
+          createdTimestamp: '2022-05-23T10:09:56.636334',
+          modifiedTimestamp: '2022-05-23T10:09:56.64691',
+        },
+        {
+          reference: 'lb-co-bn-oe',
+          prisonerId: 'A8709DY',
+          prisonId: 'HEI',
+          visitRoom: 'daily test room',
+          visitType: 'SOCIAL',
+          visitStatus: 'BOOKED',
+          outcomeStatus: 'ADMINISTRATIVE_ERROR',
+          visitRestriction: 'OPEN',
+          startTimestamp: '2022-05-23T10:00:00',
+          endTimestamp: '2022-05-23T11:00:00',
+          visitNotes: [
+            {
+              type: 'VISIT_OUTCOMES',
+              text: 'na',
+            },
+          ],
+          visitContact: {
+            name: 'Tess Bennett',
+            telephone: '0114 5555555',
+          },
+          visitors: [
+            {
+              nomisPersonId: 4729570,
+            },
+            {
+              nomisPersonId: 4729510,
+            },
+          ],
+          visitorSupport: [],
+          createdTimestamp: '2022-05-20T15:29:04.997067',
+          modifiedTimestamp: '2022-05-20T15:51:49.983108',
+        },
+      ]
+      const social: Contact[] = [
+        {
+          personId: 4729510,
+          firstName: 'James',
+          lastName: 'Smith',
+          dateOfBirth: '1983-06-17',
+          relationshipCode: 'BRO',
+          relationshipDescription: 'Brother',
+          contactType: 'S',
+          contactTypeDescription: 'Social/ Family',
+          approvedVisitor: true,
+          emergencyContact: false,
+          nextOfKin: false,
+          addresses: [
+            {
+              addressType: 'Home Address',
+              street: 'Warren way',
+              town: 'Bootle',
+              postalCode: 'DN5 9SD',
+              country: 'England',
+              primary: true,
+              noFixedAddress: false,
+              startDate: '2021-03-01',
+              phones: [
+                {
+                  number: '0113222333',
+                  type: 'BUS',
+                },
+                {
+                  number: '222333',
+                  type: 'HOME',
+                },
+              ],
+              addressUsages: emptyUsages,
+            },
+          ],
+          restrictions: emptyRestrictions,
+        },
+        {
+          personId: 4729570,
+          firstName: 'Tess',
+          lastName: 'Bennett',
+          relationshipCode: 'AUNT',
+          relationshipDescription: 'Aunt',
+          contactType: 'S',
+          contactTypeDescription: 'Social/ Family',
+          approvedVisitor: true,
+          emergencyContact: false,
+          nextOfKin: false,
+          addresses: emptyAddresses,
+          restrictions: emptyRestrictions,
+        },
+      ]
+
+      visitSchedulerApiClient.getVisitsByDate.mockResolvedValue(visits)
+      prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue(social)
+      const results = await visitSessionsService.getVisitsByDate({
+        username: 'user',
+        dateString: '2022-05-23',
+      })
+      const resultsCheck: {
+        extendedVisitsInfo: ExtendedVisitInformation[]
+        slots: {
+          openSlots: VisitsPageSlot[]
+          closedSlots: VisitsPageSlot[]
+          firstSlotTime: string
+        }
+      } = {
+        extendedVisitsInfo: [
+          {
+            reference: 'ob-cw-lx-na',
+            prisonNumber: 'A8709DY',
+            prisonerName: '',
+            mainContact: 'UNKNOWN',
+            startTimestamp: '2022-05-23T09:00:00',
+            visitDate: '23 May 2022',
+            visitTime: '9am to 9:29am',
+            visitRestriction: 'OPEN',
+            visitors: [
+              {
+                personId: 4729510,
+                name: 'James Smith',
+                dateOfBirth: '1983-06-17',
+                adult: true,
+                relationshipDescription: 'Brother',
+                address: 'Warren way,<br>Bootle,<br>DN5 9SD,<br>England',
+                restrictions: [],
+                banned: false,
+              },
+            ],
+          },
+          {
+            reference: 'lb-co-bn-oe',
+            prisonNumber: 'A8709DY',
+            prisonerName: '',
+            mainContact: 'Tess Bennett',
+            startTimestamp: '2022-05-23T10:00:00',
+            visitDate: '23 May 2022',
+            visitTime: '10am to 11am',
+            visitRestriction: 'OPEN',
+            visitors: [
+              {
+                personId: 4729510,
+                name: 'James Smith',
+                dateOfBirth: '1983-06-17',
+                adult: true,
+                relationshipDescription: 'Brother',
+                address: 'Warren way,<br>Bootle,<br>DN5 9SD,<br>England',
+                restrictions: [],
+                banned: false,
+              },
+              {
+                personId: 4729570,
+                name: 'Tess Bennett',
+                relationshipDescription: 'Aunt',
+                address: 'Not entered',
+                restrictions: [],
+                banned: false,
+              },
+            ],
+          },
+        ],
+        slots: {
+          openSlots: [
+            {
+              visitTime: '9am to 9:29am',
+              visitType: 'OPEN',
+              sortField: '2022-05-23T09:00:00',
+              adults: 1,
+              children: 0,
+            },
+            {
+              visitTime: '10am to 11am',
+              visitType: 'OPEN',
+              sortField: '2022-05-23T10:00:00',
+              adults: 1,
+              children: 1,
+            },
+          ],
+          closedSlots: [],
+          firstSlotTime: '9am to 9:29am',
+        },
+      }
+
+      expect(visitSchedulerApiClient.getVisitsByDate).toHaveBeenCalledTimes(1)
+      expect(prisonerContactRegistryApiClient.getPrisonerSocialContacts).toHaveBeenCalledTimes(2)
+      expect(results).toEqual(resultsCheck)
     })
   })
 })

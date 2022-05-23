@@ -110,9 +110,15 @@ export default class PrisonerSearchService {
       const row: PrisonerDetailsItem[] = [
         {
           text: properCaseFullName(`${prisoner.lastName}, ${prisoner.firstName}`),
+          attributes: {
+            'data-test': 'prisoner-name',
+          },
         },
         {
           text: prisoner.prisonerNumber,
+          attributes: {
+            'data-test': 'prisoner-number',
+          },
         },
         {
           html: `<a href="" class="bapv-result-row">View</a>`,

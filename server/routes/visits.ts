@@ -1,11 +1,11 @@
 import type { RequestHandler, Router } from 'express'
 import { format } from 'date-fns'
 import config from '../config'
-import { VisitInformation, PrisonerDetailsItem } from '../@types/bapv'
+import { ExtendedVisitInformation, PrisonerDetailsItem, VisitsPageSlot } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import PrisonerSearchService from '../services/prisonerSearchService'
 import VisitSessionsService from '../services/visitSessionsService'
-import { getResultsPagingLinks } from '../utils/utils'
+import { getResultsPagingLinks, sortByTimestamp } from '../utils/utils'
 
 export default function routes(
   router: Router,
@@ -23,13 +23,117 @@ export default function routes(
     return format(startDateObject, 'yyyy-MM-dd')
   }
 
+  function getSlotsSideMenuData({
+    slotFilter,
+    slotType = '',
+    startDate = '',
+    openSlots,
+    closedSlots,
+  }: {
+    slotFilter: string
+    slotType: string
+    startDate: string
+    openSlots: VisitsPageSlot[]
+    closedSlots: VisitsPageSlot[]
+  }): {
+    heading: {
+      text: string
+      classes: string
+    }
+    items: {
+      text: string
+      href: string
+      active: boolean
+    }[]
+  }[] {
+    const openSlotOptions = openSlots.sort(sortByTimestamp).map(slot => {
+      return {
+        text: slot.visitTime,
+        href: `/visits?startDate=${startDate}&time=${slot.visitTime}&type=OPEN`,
+        active: slotFilter === slot.visitTime && slotType === slot.visitType,
+      }
+    })
+
+    const closedSlotOptions = closedSlots.sort(sortByTimestamp).map(slot => {
+      return {
+        text: slot.visitTime,
+        href: `/visits?startDate=${startDate}&time=${slot.visitTime}&type=CLOSED`,
+        active: slotFilter === slot.visitTime && slotType === slot.visitType,
+      }
+    })
+
+    const slotsNav = []
+
+    if (openSlotOptions.length > 0) {
+      slotsNav.push({
+        heading: {
+          text: 'Main visits room',
+          classes: 'govuk-!-padding-top-0',
+        },
+        items: openSlotOptions,
+      })
+    }
+
+    if (closedSlotOptions.length > 0) {
+      slotsNav.push({
+        heading: {
+          text: 'Closed visits room',
+          classes: 'govuk-!-padding-top-0',
+        },
+        items: closedSlotOptions,
+      })
+    }
+
+    return slotsNav
+  }
+
   get('/', async (req, res) => {
-    const startDate = getStartDate(req.query?.startDate as string)
-    const visits: VisitInformation[] = await visitSessionsService.getVisitsByDate({
-      dateString: startDate,
+    const maxSlotDefaults = {
+      OPEN: 30,
+      CLOSED: 3,
+    }
+    const { type = 'OPEN', time = '', startDate = '' } = req.query
+    const visitType = ['OPEN', 'CLOSED'].includes(type as string) ? (type as string) : 'OPEN'
+    const maxSlots = maxSlotDefaults[visitType]
+    const startDateString = getStartDate(startDate as string)
+    const {
+      extendedVisitsInfo,
+      slots,
+    }: {
+      extendedVisitsInfo: ExtendedVisitInformation[]
+      slots: {
+        openSlots: VisitsPageSlot[]
+        closedSlots: VisitsPageSlot[]
+        firstSlotTime: string
+      }
+    } = await visitSessionsService.getVisitsByDate({
+      dateString: startDateString,
       username: res.locals.user?.username,
     })
-    const prisoners = [...new Set(visits.map(visit => visit.prisonNumber))]
+
+    const slotFilter = time === '' ? slots.firstSlotTime : time
+
+    const slotsNav = getSlotsSideMenuData({
+      slotType: visitType,
+      slotFilter: slotFilter as string,
+      startDate: startDateString,
+      ...slots,
+    })
+
+    const selectedSlots = {
+      open: slots.openSlots.find(slot => slot.visitTime === slotFilter) ?? { adults: 0, children: 0 },
+      closed: slots.closedSlots.find(slot => slot.visitTime === slotFilter) ?? { adults: 0, children: 0 },
+    }
+
+    const totals = {
+      adults: visitType === 'OPEN' ? selectedSlots.open.adults : selectedSlots.closed.adults,
+      children: visitType === 'OPEN' ? selectedSlots.open.children : selectedSlots.closed.children,
+    }
+
+    const filteredVisits = extendedVisitsInfo.filter(
+      visit => visit.visitTime === slotFilter && visit.visitRestriction === visitType
+    )
+    const prisonersForVisit = filteredVisits.map(visit => visit.prisonNumber)
     const currentPage = Number.parseInt((req.query.page || '1') as string, 10)
     const { pageSize } = config.apis.prisonerSearch
 
@@ -39,9 +143,13 @@ export default function routes(
     let next = 1
     let previous = 1
 
-    if (prisoners.length > 0) {
+    if (prisonersForVisit.length > 0) {
       ;({ results, numberOfResults, numberOfPages, next, previous } =
-        await prisonerSearchService.getPrisonersByPrisonerNumbers(prisoners, res.locals.user?.username, currentPage))
+        await prisonerSearchService.getPrisonersByPrisonerNumbers(
+          prisonersForVisit,
+          res.locals.user?.username,
+          currentPage
+        ))
     }
 
     const currentPageMax = currentPage * pageSize
@@ -50,12 +158,19 @@ export default function routes(
       pagesToShow: config.apis.prisonerSearch.pagesLinksToShow,
       numberOfPages,
       currentPage,
-      searchParam: `startDate=${startDate}`,
+      searchParam: `startDate=${startDateString}`,
       searchUrl: '/visits/',
     })
 
     return res.render('pages/visits/summary', {
-      startDate,
+      totals: {
+        visitors: totals.adults + totals.children,
+        ...totals,
+      },
+      visitType,
+      maxSlots,
+      slotTime: slotFilter,
+      slotsNav,
       results,
       next,
       previous,

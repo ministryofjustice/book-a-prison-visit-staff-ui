@@ -5,6 +5,9 @@ export type PrisonerDetailsItem = {
   html?: string
   text?: string
   classes?: string
+  attributes?: {
+    'data-test': string
+  }
 }
 
 export type PrisonerAlertItem = [
@@ -176,7 +179,7 @@ export type VisitSessionData = {
     location: string
   }
   visit?: VisitSlot
-  visitRestriction?: 'OPEN' | 'CLOSED'
+  visitRestriction?: Visit['visitRestriction']
   visitors?: VisitorListItem[]
   visitorSupport?: VisitorSupport[]
   mainContact?: {
@@ -195,4 +198,18 @@ export type VisitInformation = {
   mainContact: string
   visitDate: string
   visitTime: string
+}
+
+export interface ExtendedVisitInformation extends VisitInformation {
+  startTimestamp?: string
+  visitRestriction: Visit['visitRestriction']
+  visitors?: VisitorListItem[]
+}
+
+export type VisitsPageSlot = {
+  visitTime: string
+  visitType: string
+  sortField: string
+  adults: number
+  children: number
 }

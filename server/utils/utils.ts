@@ -144,3 +144,17 @@ export const formatVisitType = ({
     ? `${properCase(visitType)}(${properCase(visitRestriction)})`
     : `${properCase(visitType)}<br>(${properCase(visitRestriction)})`
 }
+
+export const sortByTimestamp = (
+  a: { visitTime: string; sortField: string },
+  b: { visitTime: string; sortField: string }
+) => {
+  if (a.sortField > b.sortField) {
+    return 1
+  }
+  if (a.sortField < b.sortField) {
+    return -1
+  }
+
+  return 0
+}
