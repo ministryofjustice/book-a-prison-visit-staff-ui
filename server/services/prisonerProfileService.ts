@@ -272,14 +272,14 @@ export default class PrisonerProfileService {
 
     const visitBalances = (await prisonApiClient.getVisitBalances(offenderNo)) as BAPVVisitBalances
 
-    if (visitBalances.latestIepAdjustDate) {
+    if (visitBalances?.latestIepAdjustDate) {
       visitBalances.nextIepAdjustDate = nextIepAdjustDate(visitBalances.latestIepAdjustDate)
       visitBalances.latestIepAdjustDate = prisonerDatePretty({
         dateToFormat: visitBalances.latestIepAdjustDate,
       })
     }
 
-    if (visitBalances.latestPrivIepAdjustDate) {
+    if (visitBalances?.latestPrivIepAdjustDate) {
       visitBalances.nextPrivIepAdjustDate = nextPrivIepAdjustDate(visitBalances.latestPrivIepAdjustDate)
       visitBalances.latestPrivIepAdjustDate = prisonerDatePretty({
         dateToFormat: visitBalances.latestPrivIepAdjustDate,
