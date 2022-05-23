@@ -120,15 +120,14 @@ export default function routes(
       ...slots,
     })
 
+    const selectedSlots = {
+      open: slots.openSlots.find(slot => slot.visitTime === slotFilter) ?? { adults: 0, children: 0 },
+      closed: slots.closedSlots.find(slot => slot.visitTime === slotFilter) ?? { adults: 0, children: 0 },
+    }
+
     const totals = {
-      adults:
-        visitType === 'OPEN'
-          ? slots.openSlots.find(slot => slot.visitTime === slotFilter).adults
-          : slots.closedSlots.find(slot => slot.visitTime === slotFilter).adults,
-      children:
-        visitType === 'OPEN'
-          ? slots.openSlots.find(slot => slot.visitTime === slotFilter).children
-          : slots.closedSlots.find(slot => slot.visitTime === slotFilter).children,
+      adults: visitType === 'OPEN' ? selectedSlots.open.adults : selectedSlots.closed.adults,
+      children: visitType === 'OPEN' ? selectedSlots.open.children : selectedSlots.closed.children,
     }
 
     const filteredVisits = extendedVisitsInfo.filter(
