@@ -6,7 +6,7 @@ const getSingleRow = (selected: boolean, page: number): { href: string; selected
   }
 }
 
-export default [
+export const getResultsPagingLinksTestData = [
   {
     description: 'Show 1 page, 1 page available, current page is 1',
     params: {
@@ -138,5 +138,44 @@ export default [
       searchUrl: '/search/prisoner/results',
     },
     result: [getSingleRow(false, 2), getSingleRow(true, 3)],
+  },
+]
+
+export const sortByTimestampData = [
+  {
+    description: 'a and b are equal',
+    a: {
+      visitTime: 'Test',
+      sortField: '2020-04-05T12:12:00',
+    },
+    b: {
+      visitTime: 'Test',
+      sortField: '2020-04-05T12:12:00',
+    },
+    result: 0,
+  },
+  {
+    description: 'a is greater than b',
+    a: {
+      visitTime: 'Test',
+      sortField: '2020-04-06T12:12:00',
+    },
+    b: {
+      visitTime: 'Test',
+      sortField: '2020-04-05T12:12:00',
+    },
+    result: 1,
+  },
+  {
+    description: 'a is less than b',
+    a: {
+      visitTime: 'Test',
+      sortField: '2020-04-05T12:12:00',
+    },
+    b: {
+      visitTime: 'Test',
+      sortField: '2020-04-06T12:12:00',
+    },
+    result: -1,
   },
 ]
