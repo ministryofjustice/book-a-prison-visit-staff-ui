@@ -18,10 +18,10 @@ export default function routes(
       handlers.map(handler => asyncMiddleware(handler))
     )
 
-  const getParsedDateFromQueryString = (selectedDate: string): string => {
-    const selectedDateObject =
-      new Date(selectedDate).toString() === 'Invalid Date' ? new Date() : new Date(selectedDate)
-    return format(selectedDateObject, 'yyyy-MM-dd')
+  const getParsedDateFromQueryString = (dateFromQueryString: string): string => {
+    const parsedDate =
+      new Date(dateFromQueryString).toString() === 'Invalid Date' ? new Date() : new Date(dateFromQueryString)
+    return format(parsedDate, 'yyyy-MM-dd')
   }
 
   const getDateTabs = (
