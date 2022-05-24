@@ -1,11 +1,11 @@
 import type { RequestHandler, Router } from 'express'
-import { format, parse, add } from 'date-fns'
 import config from '../config'
 import { ExtendedVisitInformation, PrisonerDetailsItem, VisitsPageSlot } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import PrisonerSearchService from '../services/prisonerSearchService'
 import VisitSessionsService from '../services/visitSessionsService'
-import { getResultsPagingLinks, sortByTimestamp } from '../utils/utils'
+import { getResultsPagingLinks } from '../utils/utils'
+import { getDateTabs, getParsedDateFromQueryString, getSlotsSideMenuData } from './visitsUtils'
 
 export default function routes(
   router: Router,
@@ -17,103 +17,6 @@ export default function routes(
       path,
       handlers.map(handler => asyncMiddleware(handler))
     )
-
-  const getParsedDateFromQueryString = (dateFromQueryString: string): string => {
-    const parsedDate =
-      new Date(dateFromQueryString).toString() === 'Invalid Date' ? new Date() : new Date(dateFromQueryString)
-    return format(parsedDate, 'yyyy-MM-dd')
-  }
-
-  const getDateTabs = (
-    selectedDate: string,
-    firstTabDate: string,
-    numberOfTabs: number
-  ): {
-    text: string
-    href: string
-    active: boolean
-  }[] => {
-    const firstTabDateObject = parse(firstTabDate, 'yyyy-MM-dd', new Date())
-    const tabs = []
-
-    for (let tab = 0; tab < numberOfTabs; tab += 1) {
-      const dateToUse = add(firstTabDateObject, { days: tab })
-      const dateCheck = format(dateToUse, 'yyyy-MM-dd')
-      const item = {
-        text: format(dateToUse, 'EEEE d MMMM yyyy'),
-        href: `/visits?selectedDate=${dateCheck}&firstTabDate=${firstTabDate}`,
-        active: dateCheck === selectedDate,
-      }
-
-      tabs.push(item)
-    }
-
-    return tabs
-  }
-
-  function getSlotsSideMenuData({
-    slotFilter,
-    slotType = '',
-    selectedDate = '',
-    openSlots,
-    closedSlots,
-  }: {
-    slotFilter: string
-    slotType: string
-    selectedDate: string
-    openSlots: VisitsPageSlot[]
-    closedSlots: VisitsPageSlot[]
-  }): {
-    heading: {
-      text: string
-      classes: string
-    }
-    items: {
-      text: string
-      href: string
-      active: boolean
-    }[]
-  }[] {
-    const openSlotOptions = openSlots.sort(sortByTimestamp).map(slot => {
-      return {
-        text: slot.visitTime,
-        href: `/visits?selectedDate=${selectedDate}&time=${slot.visitTime}&type=OPEN`,
-        active: slotFilter === slot.visitTime && slotType === slot.visitType,
-      }
-    })
-
-    const closedSlotOptions = closedSlots.sort(sortByTimestamp).map(slot => {
-      return {
-        text: slot.visitTime,
-        href: `/visits?selectedDate=${selectedDate}&time=${slot.visitTime}&type=CLOSED`,
-        active: slotFilter === slot.visitTime && slotType === slot.visitType,
-      }
-    })
-
-    const slotsNav = []
-
-    if (openSlotOptions.length > 0) {
-      slotsNav.push({
-        heading: {
-          text: 'Main visits room',
-          classes: 'govuk-!-padding-top-0',
-        },
-        items: openSlotOptions,
-      })
-    }
-
-    if (closedSlotOptions.length > 0) {
-      slotsNav.push({
-        heading: {
-          text: 'Closed visits room',
-          classes: 'govuk-!-padding-top-0',
-        },
-        items: closedSlotOptions,
-      })
-    }
-
-    return slotsNav
-  }
 
   get('/', async (req, res) => {
     const maxSlotDefaults = {
