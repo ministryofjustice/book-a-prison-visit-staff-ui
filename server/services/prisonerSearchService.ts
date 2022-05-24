@@ -84,7 +84,11 @@ export default class PrisonerSearchService {
   }
 
   async getPrisonersByPrisonerNumbers(
-    prisonerNumbers: string[],
+    prisonerVisits: {
+      prisoner: string
+      visit: string
+    }[],
+    queryStringForBackLink: string,
     username: string,
     page: number
   ): Promise<{
@@ -96,6 +100,7 @@ export default class PrisonerSearchService {
   }> {
     const token = await this.systemToken(username)
     const prisonerSearchClient = this.prisonerSearchClientBuilder(token)
+    const prisonerNumbers = prisonerVisits.flatMap(prisonerVisit => prisonerVisit.prisoner)
     this.currentPage = page - 1
     const { totalPages, totalElements, content } = await prisonerSearchClient.getPrisonersByPrisonerNumbers(
       prisonerNumbers,
@@ -105,8 +110,13 @@ export default class PrisonerSearchService {
     const nextPage = this.getNextPage()
     const previousPage = this.getPreviousPage()
     const prisonerList: Array<PrisonerDetailsItem[]> = []
+    const fromQueryString = new URLSearchParams({
+      query: queryStringForBackLink,
+      from: 'visit-search',
+    }).toString()
 
     content.forEach((prisoner: Prisoner) => {
+      const matchingVisit = prisonerVisits.find(prisonerVisit => prisonerVisit.prisoner === prisoner.prisonerNumber)
       const row: PrisonerDetailsItem[] = [
         {
           text: properCaseFullName(`${prisoner.lastName}, ${prisoner.firstName}`),
@@ -121,7 +131,7 @@ export default class PrisonerSearchService {
           },
         },
         {
-          html: `<a href="" class="bapv-result-row">View</a>`,
+          html: `<a href="/visit/${matchingVisit.visit}?${fromQueryString}" class="bapv-result-row">View</a>`,
           classes: 'govuk-!-text-align-right',
         },
       ]

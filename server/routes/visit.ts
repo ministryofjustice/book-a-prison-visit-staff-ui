@@ -31,6 +31,8 @@ export default function routes(
 
   get('/:reference', async (req, res) => {
     const reference = getVisitReference(req)
+    const fromVisitSearch = (req.query?.from as string) === 'visit-search'
+    const fromVisitSearchQuery = req.query?.query as string
 
     const { visit, visitors, additionalSupport } = await visitSessionsService.getFullVisitDetails({
       reference,
@@ -39,7 +41,14 @@ export default function routes(
 
     const prisoner: Prisoner = await prisonerSearchService.getPrisoner(visit.prisonerId, res.locals.user?.username)
 
-    return res.render('pages/visit/summary', { prisoner, visit, visitors, additionalSupport })
+    return res.render('pages/visit/summary', {
+      prisoner,
+      visit,
+      visitors,
+      additionalSupport,
+      fromVisitSearch,
+      fromVisitSearchQuery,
+    })
   })
 
   get('/:reference/cancel', async (req, res) => {
