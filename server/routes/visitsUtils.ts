@@ -60,6 +60,11 @@ export function getSlotsSideMenuData({
     active: boolean
   }[]
 }[] {
+  console.log(slotFilter)
+  console.log(slotType)
+  console.log(selectedDate)
+  console.log(JSON.stringify(openSlots))
+  console.log(JSON.stringify(closedSlots))
   const openSlotOptions = openSlots.sort(sortByTimestamp).map(slot => {
     return {
       text: slot.visitTime,
@@ -97,6 +102,6 @@ export function getSlotsSideMenuData({
       items: closedSlotOptions,
     })
   }
-
+  console.log(JSON.stringify(slotsNav))
   return slotsNav
 }

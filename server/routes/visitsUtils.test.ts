@@ -1,5 +1,5 @@
-import { format, parse } from 'date-fns'
-import { getParsedDateFromQueryString, getDateTabs } from './visitsUtils'
+import { format } from 'date-fns'
+import { getParsedDateFromQueryString, getDateTabs, getSlotsSideMenuData } from './visitsUtils'
 
 describe('getParsedDateFromQueryString', () => {
   const today = format(new Date(), 'yyyy-MM-dd')
@@ -113,6 +113,95 @@ describe('getDateTabs', () => {
 
     it(description, () => {
       expect(getDateTabs(selectedDate, firstTabDate, numberOfTabs, defaultDate)).toStrictEqual(expected)
+    })
+  })
+})
+
+describe('getSlotsSideMenuData', () => {
+  ;[
+    {
+      description: 'should return a single slot for a single session',
+      input: {
+        slotFilter: '3pm to 3:59pm',
+        slotType: 'OPEN',
+        selectedDate: '2022-05-24',
+        openSlots: [
+          {
+            visitTime: '3pm to 3:59pm',
+            visitType: 'OPEN',
+            sortField: '2022-05-24T15:00:00',
+            adults: 1,
+            children: 1,
+          },
+        ],
+        closedSlots: [],
+      },
+      expected: [
+        {
+          heading: {
+            text: 'Main visits room',
+            classes: 'govuk-!-padding-top-0',
+          },
+          items: [
+            {
+              text: '3pm to 3:59pm',
+              href: '/visits?selectedDate=2022-05-24&time=3pm to 3:59pm&type=OPEN',
+              active: true,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      description: 'should return a multiple slots for multiple sessions',
+      input: {
+        slotFilter: '10am to 11am',
+        slotType: 'OPEN',
+        selectedDate: '2022-05-25',
+        openSlots: [
+          {
+            visitTime: '10am to 11am',
+            visitType: 'OPEN',
+            sortField: '2022-05-25T10:00:00',
+            adults: 5,
+            children: 1,
+          },
+          {
+            visitTime: '2:15pm to 3pm',
+            visitType: 'OPEN',
+            sortField: '2022-05-25T14:15:00',
+            adults: 2,
+            children: 1,
+          },
+        ],
+        closedSlots: [],
+      },
+      expected: [
+        {
+          heading: {
+            text: 'Main visits room',
+            classes: 'govuk-!-padding-top-0',
+          },
+          items: [
+            {
+              text: '10am to 11am',
+              href: '/visits?selectedDate=2022-05-25&time=10am to 11am&type=OPEN',
+              active: true,
+            },
+            {
+              text: '2:15pm to 3pm',
+              href: '/visits?selectedDate=2022-05-25&time=2:15pm to 3pm&type=OPEN',
+              active: false,
+            },
+          ],
+        },
+      ],
+    },
+  ].forEach(testData => {
+    const { description, input, expected } = testData
+
+    it(description, () => {
+      expect(getSlotsSideMenuData(input)).toStrictEqual(expected)
     })
   })
 })
