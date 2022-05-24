@@ -1,5 +1,5 @@
 import type { RequestHandler, Router } from 'express'
-import { format } from 'date-fns'
+import { format, parse, add } from 'date-fns'
 import config from '../config'
 import { ExtendedVisitInformation, PrisonerDetailsItem, VisitsPageSlot } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
@@ -18,21 +18,49 @@ export default function routes(
       handlers.map(handler => asyncMiddleware(handler))
     )
 
-  const getStartDate = (startDate: string): string => {
-    const startDateObject = new Date(startDate).toString() === 'Invalid Date' ? new Date() : new Date(startDate)
-    return format(startDateObject, 'yyyy-MM-dd')
+  const getSelectedDate = (selectedDate: string): string => {
+    const selectedDateObject =
+      new Date(selectedDate).toString() === 'Invalid Date' ? new Date() : new Date(selectedDate)
+    return format(selectedDateObject, 'yyyy-MM-dd')
+  }
+
+  const getDateTabs = (
+    firstTabDate: string,
+    tabDate: string,
+    numberOfTabs: number
+  ): {
+    text: string
+    href: string
+    active: boolean
+  }[] => {
+    const selectedDateObject = parse(firstTabDate, 'yyyy-MM-dd', new Date())
+    const tabs = []
+
+    for (let tab = 0; tab < numberOfTabs; tab += 1) {
+      const dateToUse = add(selectedDateObject, { days: tab })
+      const dateCheck = format(dateToUse, 'yyyy-MM-dd')
+      const item = {
+        text: format(dateToUse, 'EEEE d MMMM yyyy'),
+        href: `/visits?selectedDate=${dateCheck}&tabDate=${firstTabDate}`,
+        active: dateCheck === tabDate,
+      }
+
+      tabs.push(item)
+    }
+
+    return tabs
   }
 
   function getSlotsSideMenuData({
     slotFilter,
     slotType = '',
-    startDate = '',
+    selectedDate = '',
     openSlots,
     closedSlots,
   }: {
     slotFilter: string
     slotType: string
-    startDate: string
+    selectedDate: string
     openSlots: VisitsPageSlot[]
     closedSlots: VisitsPageSlot[]
   }): {
@@ -49,7 +77,7 @@ export default function routes(
     const openSlotOptions = openSlots.sort(sortByTimestamp).map(slot => {
       return {
         text: slot.visitTime,
-        href: `/visits?startDate=${startDate}&time=${slot.visitTime}&type=OPEN`,
+        href: `/visits?selectedDate=${selectedDate}&time=${slot.visitTime}&type=OPEN`,
         active: slotFilter === slot.visitTime && slotType === slot.visitType,
       }
     })
@@ -57,7 +85,7 @@ export default function routes(
     const closedSlotOptions = closedSlots.sort(sortByTimestamp).map(slot => {
       return {
         text: slot.visitTime,
-        href: `/visits?startDate=${startDate}&time=${slot.visitTime}&type=CLOSED`,
+        href: `/visits?selectedDate=${selectedDate}&time=${slot.visitTime}&type=CLOSED`,
         active: slotFilter === slot.visitTime && slotType === slot.visitType,
       }
     })
@@ -92,10 +120,10 @@ export default function routes(
       OPEN: 30,
       CLOSED: 3,
     }
-    const { type = 'OPEN', time = '', startDate = '' } = req.query
+    const { type = 'OPEN', time = '', selectedDate = '' } = req.query
     const visitType = ['OPEN', 'CLOSED'].includes(type as string) ? (type as string) : 'OPEN'
     const maxSlots = maxSlotDefaults[visitType]
-    const startDateString = getStartDate(startDate as string)
+    const selectedDateString = getSelectedDate(selectedDate as string)
     const {
       extendedVisitsInfo,
       slots,
@@ -107,7 +135,7 @@ export default function routes(
         firstSlotTime: string
       }
     } = await visitSessionsService.getVisitsByDate({
-      dateString: startDateString,
+      dateString: selectedDateString,
       username: res.locals.user?.username,
     })
 
@@ -116,7 +144,7 @@ export default function routes(
     const slotsNav = getSlotsSideMenuData({
       slotType: visitType,
       slotFilter: slotFilter as string,
-      startDate: startDateString,
+      selectedDate: selectedDateString,
       ...slots,
     })
 
@@ -169,7 +197,7 @@ export default function routes(
       pagesToShow: config.apis.prisonerSearch.pagesLinksToShow,
       numberOfPages,
       currentPage,
-      searchParam: `startDate=${startDateString}`,
+      searchParam: `selectedDate=${selectedDateString}`,
       searchUrl: '/visits/',
     })
 
@@ -190,6 +218,7 @@ export default function routes(
       from: (currentPage - 1) * pageSize + 1,
       to,
       pageLinks: numberOfPages <= 1 ? [] : pageLinks,
+      dateTabs: getDateTabs(selectedDateString, selectedDateString, 3),
     })
   })
 

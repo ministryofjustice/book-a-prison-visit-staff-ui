@@ -39,7 +39,7 @@ describe('Views - Visits summary', () => {
           items: [
             {
               text: '10am to 11am',
-              href: '/visits?startDate=2022-05-23&time=10am to 11am&type=OPEN',
+              href: '/visits?selectedDate=2022-05-23&time=10am to 11am&type=OPEN',
               active: true,
             },
           ],

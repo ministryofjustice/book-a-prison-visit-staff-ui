@@ -3,6 +3,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {%- from "moj/components/side-navigation/macro.njk" import mojSideNavigation -%}
 {% from "moj/components/pagination/macro.njk" import mojPagination %}
+{%- from "moj/components/sub-navigation/macro.njk" import mojSubNavigation -%}
 
 {% set pageHeaderTitle = "View visits by date" %}
 {% set pageTitle = applicationName + " - " + pageHeaderTitle %}
@@ -12,6 +13,9 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+      {{ mojSubNavigation({
+        items: dateTabs
+      }) }}
     </div>
     {% if results | length %}
       <div class="govuk-grid-column-one-quarter">
@@ -57,11 +61,11 @@
             },
             previous: {
               text: 'Previous',
-              href: backLinkHref + '?startDate=' + startDate + '&page=' + previous
+              href: backLinkHref + '?selectedDate=' + selectedDate + '&page=' + previous
             },
             next: {
               text: 'Next',
-              href: backLinkHref + '?startDate=' + startDate + '&page=' + next
+              href: backLinkHref + '?selectedDate=' + selectedDate + '&page=' + next
             },
             items: pageLinks
           }) }}

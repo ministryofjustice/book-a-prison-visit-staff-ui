@@ -186,7 +186,7 @@ describe('GET /visits', () => {
     visitSessionsService.getVisitsByDate.mockResolvedValue(visits)
 
     return request(app)
-      .get('/visits?startDate=2022-05-23&time=10am%20to%2011am&type=OPEN')
+      .get('/visits?selectedDate=2022-05-23&time=10am%20to%2011am&type=OPEN')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -211,7 +211,7 @@ describe('GET /visits', () => {
     visitSessionsService.getVisitsByDate.mockResolvedValue(visits)
 
     return request(app)
-      .get('/visits?startDate=2022-77-23&time=10am%20to%2011am&type=OPEN')
+      .get('/visits?selectedDate=2022-77-23&time=10am%20to%2011am&type=OPEN')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -265,7 +265,7 @@ describe('GET /visits', () => {
     visitSessionsService.getVisitsByDate.mockResolvedValue(visits)
 
     return request(app)
-      .get('/visits?startDate=2022-05-23&time=11am%20to%2011am&type=OPEN')
+      .get('/visits?selectedDate=2022-05-23&time=11am%20to%2011am&type=OPEN')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
