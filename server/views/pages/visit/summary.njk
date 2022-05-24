@@ -5,7 +5,11 @@
 
 {% set pageHeaderTitle = "Booking details" %}
 {% set pageTitle = applicationName + " - " + pageHeaderTitle + " - " + visit.reference %}
+{% if fromVisitSearch %}
+{% set backLinkHref = "/visits?" + fromVisitSearchQuery %}
+{% else %}
 {% set backLinkHref = "/prisoner/" + visit.prisonerId + "/visits" %}
+{% endif %}
 
 {% block content %}
   <div class="govuk-grid-row">

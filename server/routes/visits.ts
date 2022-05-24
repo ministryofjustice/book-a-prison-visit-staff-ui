@@ -133,8 +133,13 @@ export default function routes(
     const filteredVisits = extendedVisitsInfo.filter(
       visit => visit.visitTime === slotFilter && visit.visitRestriction === visitType
     )
-    const prisonersForVisit = filteredVisits.map(visit => visit.prisonNumber)
-    const currentPage = Number.parseInt((req.query.page || '1') as string, 10)
+    const prisonersForVisit = filteredVisits.map(visit => {
+      return {
+        visit: visit.reference,
+        prisoner: visit.prisonNumber,
+      }
+    })
+    const currentPage = Number.parseInt((req.query?.page || '1') as string, 10)
     const { pageSize } = config.apis.prisonerSearch
 
     let results: PrisonerDetailsItem[][] = []
@@ -144,9 +149,15 @@ export default function routes(
     let previous = 1
 
     if (prisonersForVisit.length > 0) {
+      const queryString = new URLSearchParams({
+        startDate: startDateString,
+        type: visitType,
+        time: slotFilter as string,
+      }).toString()
       ;({ results, numberOfResults, numberOfPages, next, previous } =
         await prisonerSearchService.getPrisonersByPrisonerNumbers(
           prisonersForVisit,
+          queryString,
           res.locals.user?.username,
           currentPage
         ))
