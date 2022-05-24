@@ -88,7 +88,7 @@ export default class PrisonerSearchService {
       prisoner: string
       visit: string
     }[],
-    queryString: string,
+    queryStringForBackLink: string,
     username: string,
     page: number
   ): Promise<{
@@ -110,8 +110,8 @@ export default class PrisonerSearchService {
     const nextPage = this.getNextPage()
     const previousPage = this.getPreviousPage()
     const prisonerList: Array<PrisonerDetailsItem[]> = []
-    const from = new URLSearchParams({
-      query: queryString,
+    const fromQueryString = new URLSearchParams({
+      query: queryStringForBackLink,
       from: 'visit-search',
     }).toString()
 
@@ -131,7 +131,7 @@ export default class PrisonerSearchService {
           },
         },
         {
-          html: `<a href="/visit/${matchingVisit.visit}?${from}" class="bapv-result-row">View</a>`,
+          html: `<a href="/visit/${matchingVisit.visit}?${fromQueryString}" class="bapv-result-row">View</a>`,
           classes: 'govuk-!-text-align-right',
         },
       ]
