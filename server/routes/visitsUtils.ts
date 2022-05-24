@@ -2,22 +2,24 @@ import { format, parse, add } from 'date-fns'
 import { VisitsPageSlot } from '../@types/bapv'
 import { sortByTimestamp } from '../utils/utils'
 
-export const getParsedDateFromQueryString = (dateFromQueryString: string): string => {
+export const getParsedDateFromQueryString = (dateFromQueryString: string, defaultDate = new Date()): string => {
   const parsedDate =
-    new Date(dateFromQueryString).toString() === 'Invalid Date' ? new Date() : new Date(dateFromQueryString)
+    new Date(dateFromQueryString).toString() === 'Invalid Date' ? defaultDate : new Date(dateFromQueryString)
   return format(parsedDate, 'yyyy-MM-dd')
 }
 
 export const getDateTabs = (
   selectedDate: string,
   firstTabDate: string,
-  numberOfTabs: number
+  numberOfTabs: number,
+  defaultDate = new Date()
 ): {
   text: string
   href: string
   active: boolean
 }[] => {
-  const firstTabDateObject = parse(firstTabDate, 'yyyy-MM-dd', new Date())
+  const validfirstTabDate = getParsedDateFromQueryString(firstTabDate, defaultDate)
+  const firstTabDateObject = parse(validfirstTabDate, 'yyyy-MM-dd', defaultDate)
   const tabs = []
 
   for (let tab = 0; tab < numberOfTabs; tab += 1) {
@@ -25,7 +27,7 @@ export const getDateTabs = (
     const dateCheck = format(dateToUse, 'yyyy-MM-dd')
     const item = {
       text: format(dateToUse, 'EEEE d MMMM yyyy'),
-      href: `/visits?selectedDate=${dateCheck}&firstTabDate=${firstTabDate}`,
+      href: `/visits?selectedDate=${dateCheck}&firstTabDate=${validfirstTabDate}`,
       active: dateCheck === selectedDate,
     }
 
