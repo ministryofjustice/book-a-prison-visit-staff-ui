@@ -28,6 +28,7 @@ export default function routes(
     const maxSlots = maxSlotDefaults[visitType]
     const selectedDateString = getParsedDateFromQueryString(selectedDate as string)
     const firstTabDateString = getParsedDateFromQueryString(firstTabDate as string)
+
     const {
       extendedVisitsInfo,
       slots,
@@ -44,6 +45,13 @@ export default function routes(
     })
 
     const slotFilter = time === '' ? slots.firstSlotTime : time
+
+    const queryParams = new URLSearchParams({
+      type: visitType,
+      time: slotFilter as string,
+      selectedDate: selectedDateString,
+      firstTabDate: firstTabDateString,
+    }).toString()
 
     const slotsNav = getSlotsSideMenuData({
       slotType: visitType,
@@ -101,7 +109,7 @@ export default function routes(
       pagesToShow: config.apis.prisonerSearch.pagesLinksToShow,
       numberOfPages,
       currentPage,
-      searchParam: `selectedDate=${selectedDateString}`,
+      searchParam: queryParams,
       searchUrl: '/visits/',
     })
 
@@ -123,6 +131,7 @@ export default function routes(
       to,
       pageLinks: numberOfPages <= 1 ? [] : pageLinks,
       dateTabs: getDateTabs(selectedDateString, firstTabDateString, 3),
+      queryParams,
     })
   })
 
