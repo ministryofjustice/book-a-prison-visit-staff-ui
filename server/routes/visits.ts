@@ -1,11 +1,11 @@
 import type { RequestHandler, Router } from 'express'
-import { format } from 'date-fns'
 import config from '../config'
 import { ExtendedVisitInformation, PrisonerDetailsItem, VisitsPageSlot } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import PrisonerSearchService from '../services/prisonerSearchService'
 import VisitSessionsService from '../services/visitSessionsService'
-import { getResultsPagingLinks, sortByTimestamp } from '../utils/utils'
+import { getResultsPagingLinks } from '../utils/utils'
+import { getDateTabs, getParsedDateFromQueryString, getSlotsSideMenuData } from './visitsUtils'
 
 export default function routes(
   router: Router,
@@ -18,84 +18,17 @@ export default function routes(
       handlers.map(handler => asyncMiddleware(handler))
     )
 
-  const getStartDate = (startDate: string): string => {
-    const startDateObject = new Date(startDate).toString() === 'Invalid Date' ? new Date() : new Date(startDate)
-    return format(startDateObject, 'yyyy-MM-dd')
-  }
-
-  function getSlotsSideMenuData({
-    slotFilter,
-    slotType = '',
-    startDate = '',
-    openSlots,
-    closedSlots,
-  }: {
-    slotFilter: string
-    slotType: string
-    startDate: string
-    openSlots: VisitsPageSlot[]
-    closedSlots: VisitsPageSlot[]
-  }): {
-    heading: {
-      text: string
-      classes: string
-    }
-    items: {
-      text: string
-      href: string
-      active: boolean
-    }[]
-  }[] {
-    const openSlotOptions = openSlots.sort(sortByTimestamp).map(slot => {
-      return {
-        text: slot.visitTime,
-        href: `/visits?startDate=${startDate}&time=${slot.visitTime}&type=OPEN`,
-        active: slotFilter === slot.visitTime && slotType === slot.visitType,
-      }
-    })
-
-    const closedSlotOptions = closedSlots.sort(sortByTimestamp).map(slot => {
-      return {
-        text: slot.visitTime,
-        href: `/visits?startDate=${startDate}&time=${slot.visitTime}&type=CLOSED`,
-        active: slotFilter === slot.visitTime && slotType === slot.visitType,
-      }
-    })
-
-    const slotsNav = []
-
-    if (openSlotOptions.length > 0) {
-      slotsNav.push({
-        heading: {
-          text: 'Main visits room',
-          classes: 'govuk-!-padding-top-0',
-        },
-        items: openSlotOptions,
-      })
-    }
-
-    if (closedSlotOptions.length > 0) {
-      slotsNav.push({
-        heading: {
-          text: 'Closed visits room',
-          classes: 'govuk-!-padding-top-0',
-        },
-        items: closedSlotOptions,
-      })
-    }
-
-    return slotsNav
-  }
-
   get('/', async (req, res) => {
     const maxSlotDefaults = {
       OPEN: 30,
       CLOSED: 3,
     }
-    const { type = 'OPEN', time = '', startDate = '' } = req.query
+    const { type = 'OPEN', time = '', selectedDate = '', firstTabDate = '' } = req.query
     const visitType = ['OPEN', 'CLOSED'].includes(type as string) ? (type as string) : 'OPEN'
     const maxSlots = maxSlotDefaults[visitType]
-    const startDateString = getStartDate(startDate as string)
+    const selectedDateString = getParsedDateFromQueryString(selectedDate as string)
+    const firstTabDateString = getParsedDateFromQueryString(firstTabDate as string)
+
     const {
       extendedVisitsInfo,
       slots,
@@ -107,16 +40,24 @@ export default function routes(
         firstSlotTime: string
       }
     } = await visitSessionsService.getVisitsByDate({
-      dateString: startDateString,
+      dateString: selectedDateString,
       username: res.locals.user?.username,
     })
 
     const slotFilter = time === '' ? slots.firstSlotTime : time
 
+    const queryParams = new URLSearchParams({
+      type: visitType,
+      time: slotFilter as string,
+      selectedDate: selectedDateString,
+      firstTabDate: firstTabDateString,
+    }).toString()
+
     const slotsNav = getSlotsSideMenuData({
       slotType: visitType,
       slotFilter: slotFilter as string,
-      startDate: startDateString,
+      selectedDate: selectedDateString,
+      firstTabDate: firstTabDateString,
       ...slots,
     })
 
@@ -149,15 +90,10 @@ export default function routes(
     let previous = 1
 
     if (prisonersForVisit.length > 0) {
-      const queryStringForBackLink = new URLSearchParams({
-        startDate: startDateString,
-        type: visitType,
-        time: slotFilter as string,
-      }).toString()
       ;({ results, numberOfResults, numberOfPages, next, previous } =
         await prisonerSearchService.getPrisonersByPrisonerNumbers(
           prisonersForVisit,
-          queryStringForBackLink,
+          queryParams,
           res.locals.user?.username,
           currentPage
         ))
@@ -169,7 +105,7 @@ export default function routes(
       pagesToShow: config.apis.prisonerSearch.pagesLinksToShow,
       numberOfPages,
       currentPage,
-      searchParam: `startDate=${startDateString}`,
+      searchParam: queryParams,
       searchUrl: '/visits/',
     })
 
@@ -190,6 +126,8 @@ export default function routes(
       from: (currentPage - 1) * pageSize + 1,
       to,
       pageLinks: numberOfPages <= 1 ? [] : pageLinks,
+      dateTabs: getDateTabs(selectedDateString, firstTabDateString, 3),
+      queryParams,
     })
   })
 
