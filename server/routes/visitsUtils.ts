@@ -25,9 +25,13 @@ export const getDateTabs = (
   for (let tab = 0; tab < numberOfTabs; tab += 1) {
     const dateToUse = add(firstTabDateObject, { days: tab })
     const dateCheck = format(dateToUse, 'yyyy-MM-dd')
+    const queryParams = new URLSearchParams({
+      selectedDate: dateCheck,
+      firstTabDate: validfirstTabDate,
+    }).toString()
     const item = {
       text: format(dateToUse, 'EEEE d MMMM yyyy'),
-      href: `/visits?selectedDate=${dateCheck}&firstTabDate=${validfirstTabDate}`,
+      href: `/visits?${queryParams}`,
       active: dateCheck === selectedDate,
     }
 
@@ -41,12 +45,14 @@ export function getSlotsSideMenuData({
   slotFilter,
   slotType = '',
   selectedDate = '',
+  firstTabDate = '',
   openSlots,
   closedSlots,
 }: {
   slotFilter: string
   slotType: string
   selectedDate: string
+  firstTabDate: string
   openSlots: VisitsPageSlot[]
   closedSlots: VisitsPageSlot[]
 }): {
@@ -61,17 +67,31 @@ export function getSlotsSideMenuData({
   }[]
 }[] {
   const openSlotOptions = openSlots.sort(sortByTimestamp).map(slot => {
+    const queryParams = new URLSearchParams({
+      type: 'OPEN',
+      time: slot.visitTime,
+      selectedDate,
+      firstTabDate,
+    }).toString()
+
     return {
       text: slot.visitTime,
-      href: `/visits?selectedDate=${selectedDate}&time=${slot.visitTime}&type=OPEN`,
+      href: `/visits?${queryParams}`,
       active: slotFilter === slot.visitTime && slotType === slot.visitType,
     }
   })
 
   const closedSlotOptions = closedSlots.sort(sortByTimestamp).map(slot => {
+    const queryParams = new URLSearchParams({
+      type: 'CLOSED',
+      time: slot.visitTime,
+      selectedDate,
+      firstTabDate,
+    }).toString()
+
     return {
       text: slot.visitTime,
-      href: `/visits?selectedDate=${selectedDate}&time=${slot.visitTime}&type=CLOSED`,
+      href: `/visits?${queryParams}`,
       active: slotFilter === slot.visitTime && slotType === slot.visitType,
     }
   })

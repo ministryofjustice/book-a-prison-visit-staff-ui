@@ -57,6 +57,7 @@ export default function routes(
       slotType: visitType,
       slotFilter: slotFilter as string,
       selectedDate: selectedDateString,
+      firstTabDate: firstTabDateString,
       ...slots,
     })
 
@@ -89,15 +90,10 @@ export default function routes(
     let previous = 1
 
     if (prisonersForVisit.length > 0) {
-      const queryStringForBackLink = new URLSearchParams({
-        startDate: startDateString,
-        type: visitType,
-        time: slotFilter as string,
-      }).toString()
       ;({ results, numberOfResults, numberOfPages, next, previous } =
         await prisonerSearchService.getPrisonersByPrisonerNumbers(
           prisonersForVisit,
-          queryStringForBackLink,
+          queryParams,
           res.locals.user?.username,
           currentPage
         ))

@@ -167,7 +167,7 @@ describe('GET /visits', () => {
       .expect(res => {
         const $ = cheerio.load(res.text)
         expect($('h1').text()).toBe('View visits by date')
-        expect($('.govuk-back-link').attr('href')).toBe('/visits')
+        expect($('.govuk-back-link').attr('href')).toBe('/')
         expect($('[data-test="visit-room"]').text()).toBe('Main')
         expect($('[data-test="visit-time"]').text()).toBe('9am to 9:29am')
         expect($('[data-test="visit-tables-booked"]').text()).toBe('1 of 30')
@@ -192,7 +192,7 @@ describe('GET /visits', () => {
       .expect(res => {
         const $ = cheerio.load(res.text)
         expect($('h1').text()).toBe('View visits by date')
-        expect($('.govuk-back-link').attr('href')).toBe('/visits')
+        expect($('.govuk-back-link').attr('href')).toBe('/')
         expect($('[data-test="visit-room"]').text()).toBe('Main')
         expect($('[data-test="visit-time"]').text()).toBe('10am to 11am')
         expect($('[data-test="visit-tables-booked"]').text()).toBe('1 of 30')
@@ -217,7 +217,7 @@ describe('GET /visits', () => {
       .expect(res => {
         const $ = cheerio.load(res.text)
         expect($('h1').text()).toBe('View visits by date')
-        expect($('.govuk-back-link').attr('href')).toBe('/visits')
+        expect($('.govuk-back-link').attr('href')).toBe('/')
         expect($('[data-test="visit-room"]').text()).toBe('Main')
         expect($('[data-test="visit-time"]').text()).toBe('10am to 11am')
         expect($('[data-test="visit-tables-booked"]').text()).toBe('1 of 30')
@@ -255,7 +255,7 @@ describe('GET /visits', () => {
       .expect(res => {
         const $ = cheerio.load(res.text)
         expect($('h1').text()).toBe('View visits by date')
-        expect($('.govuk-back-link').attr('href')).toBe('/visits')
+        expect($('.govuk-back-link').attr('href')).toBe('/')
         expect($('#search-results-none').text()).toContain('No visit sessions on this day.')
       })
   })
@@ -271,7 +271,7 @@ describe('GET /visits', () => {
       .expect(res => {
         const $ = cheerio.load(res.text)
         expect($('h1').text()).toBe('View visits by date')
-        expect($('.govuk-back-link').attr('href')).toBe('/visits')
+        expect($('.govuk-back-link').attr('href')).toBe('/')
         expect($('#search-results-none').text()).toContain('No visit sessions on this day.')
       })
   })

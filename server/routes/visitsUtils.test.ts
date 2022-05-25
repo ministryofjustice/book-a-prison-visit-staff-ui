@@ -122,9 +122,10 @@ describe('getSlotsSideMenuData', () => {
     {
       description: 'should return a single slot for a single session',
       input: {
-        slotFilter: '3pm to 3:59pm',
         slotType: 'OPEN',
+        slotFilter: '3pm to 3:59pm',
         selectedDate: '2022-05-24',
+        firstTabDate: '2022-05-24',
         openSlots: [
           {
             visitTime: '3pm to 3:59pm',
@@ -145,7 +146,7 @@ describe('getSlotsSideMenuData', () => {
           items: [
             {
               text: '3pm to 3:59pm',
-              href: '/visits?selectedDate=2022-05-24&time=3pm to 3:59pm&type=OPEN',
+              href: '/visits?type=OPEN&time=3pm+to+3%3A59pm&selectedDate=2022-05-24&firstTabDate=2022-05-24',
               active: true,
             },
           ],
@@ -155,9 +156,10 @@ describe('getSlotsSideMenuData', () => {
     {
       description: 'should return a multiple slots for multiple sessions',
       input: {
-        slotFilter: '10am to 11am',
         slotType: 'OPEN',
+        slotFilter: '10am to 11am',
         selectedDate: '2022-05-25',
+        firstTabDate: '2022-05-25',
         openSlots: [
           {
             visitTime: '10am to 11am',
@@ -185,12 +187,12 @@ describe('getSlotsSideMenuData', () => {
           items: [
             {
               text: '10am to 11am',
-              href: '/visits?selectedDate=2022-05-25&time=10am to 11am&type=OPEN',
+              href: '/visits?type=OPEN&time=10am+to+11am&selectedDate=2022-05-25&firstTabDate=2022-05-25',
               active: true,
             },
             {
               text: '2:15pm to 3pm',
-              href: '/visits?selectedDate=2022-05-25&time=2:15pm to 3pm&type=OPEN',
+              href: '/visits?type=OPEN&time=2%3A15pm+to+3pm&selectedDate=2022-05-25&firstTabDate=2022-05-25',
               active: false,
             },
           ],
