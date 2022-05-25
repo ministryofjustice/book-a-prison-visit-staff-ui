@@ -62,15 +62,15 @@
             previous: {
               text: 'Previous',
               href: backLinkHref + '?' + queryParams + '&page=' + previous
-            },
+            } if numberOfResults > 10,
             next: {
               text: 'Next',
               href: backLinkHref + '?' + queryParams + '&page=' + next
-            },
-            items: pageLinks
+            } if numberOfResults > 10,
+            items: pageLinks if numberOfResults > 10
           }) }}
         {% endset %}
-        {{ pagination | safe if numberOfResults > 10 }}
+        {{ pagination | safe }}
         {{ govukTable({
           classes: "bapv-table govuk-!-margin-top-3",
           head: [
@@ -87,7 +87,7 @@
           ],
           rows: results
         }) }}
-        {{ pagination | safe if numberOfResults > 10 }}
+        {{ pagination | safe }}
       </div>
     {% else %}
       <div class="govuk-grid-column-full">

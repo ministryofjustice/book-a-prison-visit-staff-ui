@@ -100,7 +100,6 @@ describe('Prisoner search page', () => {
           .expect(res => {
             expect(res.text).toContain('Search for a prisoner')
             expect(res.text).toContain('id="search-results-true"')
-            expect(res.text).not.toContain('<p class="moj-pagination__results">')
           })
       })
 
@@ -193,7 +192,6 @@ describe('Prisoner search page', () => {
           .expect(res => {
             expect(res.text).toContain('Search for a prisoner')
             expect(res.text).toContain('id="search-results-true"')
-            expect(res.text).not.toContain('<p class="moj-pagination__results">')
           })
       })
 
