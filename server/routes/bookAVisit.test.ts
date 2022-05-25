@@ -1818,9 +1818,7 @@ describe('GET /book-a-visit/check-your-booking', () => {
           expect($('.test-visit-type').text()).toContain('Open')
           expect($('.test-visitor-name1').text()).toContain('name last (relate of the prisoner)')
           expect($('.test-visitor-address1').text()).toContain('123 Street, Test Town, S1 2QZ')
-          expect($('[data-test="no-addition-support-chosen"]').text()).toContain(
-            'No additional support options were chosen.'
-          )
+          expect($('[data-test="no-addition-support-chosen"]').text()).toContain('None.')
           expect($('.test-main-contact-name').text()).toContain('abc')
           expect($('.test-main-contact-number').text()).toContain('123')
         })
@@ -1970,9 +1968,7 @@ describe('GET /book-a-visit/confirmation', () => {
           expect($('.test-visit-time').text()).toContain('9:30am to 10:30am')
           expect($('.test-visit-type').text()).toContain('Open')
           expect($('.test-visitor-name1').text()).toContain('name last (relate of the prisoner)')
-          expect($('[data-test="no-addition-support-chosen"]').text()).toContain(
-            'No additional support options were chosen.'
-          )
+          expect($('[data-test="no-addition-support-chosen"]').text()).toContain('None.')
           expect($('.test-main-contact-name').text()).toContain('abc')
           expect($('.test-main-contact-number').text()).toContain('123')
           expect($('.test-booking-reference').text()).toContain('ab-cd-ef-gh')
