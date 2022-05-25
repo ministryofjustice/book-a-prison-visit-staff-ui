@@ -29,6 +29,7 @@ export declare global {
     interface Request {
       verified?: boolean
       id: string
+      logout(done: (err: unknown) => void): void
     }
   }
 }
