@@ -4,7 +4,7 @@
 
 {% set pageHeaderTitle = prisonerName | properCaseFullName %}
 {% set pageTitle = applicationName + " - Upcoming Visits - " + pageHeaderTitle %}
-{% set backLinkHref = "/search/prisoner-visit" %}
+{% set backLinkHref = "/search/prisoner-visit/results?" + queryParamsForBackLink %}
 
 {% block content %}
   <div class="govuk-grid-row">

@@ -8,7 +8,7 @@
 
 {% set pageHeaderTitle = displayName %}
 {% set pageTitle = applicationName + " - " + pageHeaderTitle %}
-{% set backLinkHref = "/search/prisoner" %}
+{% set backLinkHref = "/search/prisoner/results?" + queryParamsForBackLink %}
 
 {% block content %}
   <div class="govuk-grid-row">
@@ -62,9 +62,12 @@
         </li>
         {% if visitBalances %}
         <li>
-          <strong>Visiting orders</strong>
-          <span data-test="remaining-vos">Remaining VOs: {{ visitBalances.remainingVo }}</span>
-          <span data-test="remaining-pvos">Remaining PVOs: {{ visitBalances.remainingPvo }}</span>
+          <strong>VO balance</strong>
+          <span data-test="remaining-vos">{{ visitBalances.remainingVo }}</span>
+        </li>
+        <li>
+          <strong>PVO balance</strong>
+          <span data-test="remaining-pvos">{{ visitBalances.remainingPvo }}</span>
         </li>
         {% endif %}
       </ul>
@@ -250,10 +253,11 @@
         rows: pastVisits
       }) }}
     {% else %}
-    <p>There no visit history for this prisoner.</p>
+    <p>There is no visit history for this prisoner.</p>
     {% endif %}
     {% endset %}
     {{ govukTabs({
+      classes: 'bapv-tabs',
       items: [
         {
           label: "Visiting orders",
