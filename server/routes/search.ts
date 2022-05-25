@@ -17,7 +17,7 @@ export default function routes(
   const post = (path: string | string[], handler: RequestHandler) => router.post(path, asyncMiddleware(handler))
 
   get(['/prisoner', '/prisoner-visit'], (req, res) => {
-    const search = req?.body?.search ? req?.body?.search : (req.query?.search as string) ?? ''
+    const search = req?.body?.search
 
     res.render('pages/search/prisoner', { search, visit: req.originalUrl.includes('-visit') })
   })
