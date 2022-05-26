@@ -56,56 +56,53 @@
 
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
 
-      <p><strong class="govuk-!-margin-right-4">Prisoner name:</strong> <span data-test="prisoner-name">{{ prisonerName }}</span></p>
+      <p><strong>Prisoner name:</strong> <span data-test="prisoner-name">{{ prisonerName }}</span></p>
 
       <div class="prisoner-restrictions">
 
+      {% if restrictions | length %}
         <h2 class="govuk-heading-m">Prisoner's active restrictions</h2>
-
-        {% if restrictions | length %}
-          {% set prisonerRestrictions = [] %}
-          {% for restriction in restrictions %}
-            {% set restrictionStartDate %}{% if restriction.startDate %}{{ restriction.startDate | formatDate }}{% else %}Not entered{% endif %}{% endset %}
-            {% set restrictionExpiryDate %}{% if restriction.expiryDate %}{{ restriction.expiryDate | formatDate }}{% else %}Not entered{% endif %}{% endset %}
-            {%- set prisonerRestrictions = (prisonerRestrictions.push([
-              {
-                html: '<span class="test-restrictions-type' + loop.index + ' moj-badge moj-badge--large visitor-restriction-badge visitor-restriction-badge--' + restriction.restrictionType + '">' + restriction.restrictionTypeDescription + '</span>'
-              },
-              {
-                text: restriction.comment,
-                classes: "test-restrictions-comment" + loop.index
-              },
-              {
-                text: restrictionStartDate,
-                classes: "test-restrictions-start-date" + loop.index
-              },
-              {
-                text: restrictionExpiryDate,
-                classes: "test-restrictions-end-date" + loop.index
-              }
-            ]), prisonerRestrictions) %}
-          {% endfor %}
-          {{ govukTable({
-            head: [
-              {
-                text: "Type of restriction"
-              },
-              {
-                text: "Comments"
-              },
-              {
-                text: "Date from"
-              },
-              {
-                text: "Date to"
-              }
-            ],
-            rows: prisonerRestrictions
-          }) }}
-        {% else %}
-        <p class="test-no-prisoner-restrictions">Prisoner has no restrictions.</p>
-        {% endif %}
+        {% set prisonerRestrictions = [] %}
+        {% for restriction in restrictions %}
+          {% set restrictionStartDate %}{% if restriction.startDate %}{{ restriction.startDate | formatDate }}{% else %}Not entered{% endif %}{% endset %}
+          {% set restrictionExpiryDate %}{% if restriction.expiryDate %}{{ restriction.expiryDate | formatDate }}{% else %}Not entered{% endif %}{% endset %}
+          {%- set prisonerRestrictions = (prisonerRestrictions.push([
+            {
+              html: '<span class="test-restrictions-type' + loop.index + ' moj-badge moj-badge--large visitor-restriction-badge visitor-restriction-badge--' + restriction.restrictionType + '">' + restriction.restrictionTypeDescription + '</span>'
+            },
+            {
+              text: restriction.comment,
+              classes: "test-restrictions-comment" + loop.index
+            },
+            {
+              text: restrictionStartDate,
+              classes: "test-restrictions-start-date" + loop.index
+            },
+            {
+              text: restrictionExpiryDate,
+              classes: "test-restrictions-end-date" + loop.index
+            }
+          ]), prisonerRestrictions) %}
+        {% endfor %}
+        {{ govukTable({
+          head: [
+            {
+              text: "Type of restriction"
+            },
+            {
+              text: "Comments"
+            },
+            {
+              text: "Date from"
+            },
+            {
+              text: "Date to"
+            }
+          ],
+          rows: prisonerRestrictions
+        }) }}
       </div>
+      {% endif %}
 
       {% if visitors | length %}
       {% if errors | length %}
@@ -113,9 +110,9 @@
         <span class="govuk-visually-hidden">Error:</span> {{ errors[0].msg }}
       </p>
       {% endif %}
-      <p>Add up to 3 visitors with a maximum of 2 adults.</p>
 
       <h2 class="govuk-heading-m">Approved visitor list</h2>
+      <p>Add up to 3 visitors with a maximum of 2 adults.</p>
 
       <form action="/book-a-visit/select-visitors" method="POST" novalidate>
         <input type="hidden" name="_csrf" value="{{ csrfToken }}">

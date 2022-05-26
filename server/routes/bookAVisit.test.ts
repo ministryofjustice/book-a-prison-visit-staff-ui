@@ -222,7 +222,7 @@ describe('GET /book-a-visit/select-visitors', () => {
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
-        expect($('.test-no-prisoner-restrictions').text()).toBe('Prisoner has no restrictions.')
+        expect($('.test-no-prisoner-restrictions').text()).toBe('')
         expect($('.test-restrictions-type1').text()).toBe('')
         expect($('.test-restrictions-comment1').text().trim()).toBe('')
         expect($('.test-restrictions-start-date1').text().trim()).toBe('')
