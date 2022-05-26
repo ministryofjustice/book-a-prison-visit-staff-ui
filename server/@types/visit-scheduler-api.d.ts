@@ -415,8 +415,6 @@ export interface components {
        * @example A1
        */
       visitRoom: string
-      /** @description restrictions */
-      restrictions?: string
       /** @description frequency */
       frequency: 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'SINGLE'
       /**
@@ -482,8 +480,6 @@ export interface components {
        * @example A1
        */
       visitRoom: string
-      /** @description restrictions */
-      restrictions?: string
       /**
        * @description frequency
        * @example A1
@@ -515,7 +511,7 @@ export interface components {
        * @default UNKNOWN
        * @example 01234 567890
        */
-      telephone?: string
+      telephone: string
     }
     /** @description Create legacy data */
     CreateLegacyDataRequestDto: {
@@ -665,11 +661,6 @@ export interface components {
        * @example LEI
        */
       prisonId: string
-      /**
-       * @description Description of any session restrictions
-       * @example A wing only
-       */
-      restrictions?: string
       /**
        * Format: int32
        * @description The number of concurrent visits which may take place within this session

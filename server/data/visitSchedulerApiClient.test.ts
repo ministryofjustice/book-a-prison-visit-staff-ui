@@ -239,7 +239,6 @@ describe('visitSchedulerApiClient', () => {
           visitRoomName: 'A1',
           visitType: 'SOCIAL',
           prisonId: 'HEI',
-          restrictions: 'restrictions test',
           openVisitCapacity: 15,
           openVisitBookedCount: 0,
           closedVisitCapacity: 10,
