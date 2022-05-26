@@ -65,7 +65,7 @@ describe('sessionCheckMiddleware', () => {
     expect(mockResponse.redirect).toHaveBeenCalledWith('/search/prisoner/?error=missing-session')
   })
 
-  describe('prisoner or default visitRestriction data missing', () => {
+  describe('prisoner data missing', () => {
     ;[
       {
         prisoner: {},
@@ -86,11 +86,10 @@ describe('sessionCheckMiddleware', () => {
           name: 'abc',
           offenderNo: 'A1234BC',
           dateOfBirth: '12 May 1977',
-          location: 'abc',
         },
       },
     ].forEach((testData: VisitSessionData) => {
-      it('should redirect to the prisoner search page when there are missing bits of prisoner or visitRestriction data', () => {
+      it('should redirect to the prisoner search page when there are missing bits of prisoner data', () => {
         req.session.visitSessionData = testData
 
         sessionCheckMiddleware({ stage: 1 })(req as Request, mockResponse as Response, next)
@@ -99,7 +98,7 @@ describe('sessionCheckMiddleware', () => {
       })
     })
 
-    it('should not redirect when there are no bits of missing prisoner and visitRestriction data at stage 1', () => {
+    it('should not redirect when there are no bits of missing prisoner data at stage 1', () => {
       req.session.visitSessionData = {
         prisoner: {
           name: 'abc',
@@ -107,7 +106,6 @@ describe('sessionCheckMiddleware', () => {
           dateOfBirth: '12 May 1977',
           location: 'abc',
         },
-        visitRestriction: 'OPEN',
       }
 
       sessionCheckMiddleware({ stage: 1 })(req as Request, mockResponse as Response, next)
@@ -116,8 +114,11 @@ describe('sessionCheckMiddleware', () => {
     })
   })
 
-  describe('visitors data missing', () => {
+  describe('visitors and visit restriction data missing', () => {
     ;[
+      {
+        prisoner: prisonerData,
+      },
       {
         prisoner: prisonerData,
         visitRestriction,
@@ -128,7 +129,7 @@ describe('sessionCheckMiddleware', () => {
         visitors: [],
       },
     ].forEach((testData: VisitSessionData) => {
-      it('should redirect to the prisoner profile when there is missing visitor data', () => {
+      it('should redirect to the prisoner profile when there is missing visitor or visit restriction data', () => {
         req.session.visitSessionData = testData
 
         sessionCheckMiddleware({ stage: 2 })(req as Request, mockResponse as Response, next)

@@ -14,13 +14,15 @@ export default function sessionCheckMiddleware({ stage }: { stage: number }): Re
       !visitSessionData.prisoner.name ||
       !isValidPrisonerNumber(visitSessionData.prisoner.offenderNo || '') ||
       !visitSessionData.prisoner.dateOfBirth ||
-      !visitSessionData.prisoner.location ||
-      !visitSessionData.visitRestriction
+      !visitSessionData.prisoner.location
     ) {
       return res.redirect('/search/prisoner/?error=missing-prisoner')
     }
 
-    if (stage > 1 && (!visitSessionData.visitors || visitSessionData.visitors.length === 0)) {
+    if (
+      stage > 1 &&
+      (!visitSessionData.visitors || visitSessionData.visitors.length === 0 || !visitSessionData.visitRestriction)
+    ) {
       return res.redirect(`/prisoner/${visitSessionData.prisoner.offenderNo}?error=missing-visitors`)
     }
 
