@@ -79,7 +79,6 @@ context('Search for a prisoner', () => {
 
       const searchForAPrisonerResultsPage = Page.verifyOnPage(SearchForAPrisonerResultsPage)
       searchForAPrisonerResultsPage.hasResults()
-      searchForAPrisonerResultsPage.pagingLinks().should('not.exist')
       searchForAPrisonerResultsPage.resultRows().should('have.length', results.content.length)
 
       results.content.forEach((prisoner, index) => {

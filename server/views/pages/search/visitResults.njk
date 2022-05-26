@@ -28,16 +28,16 @@
           previous: {
             text: 'Previous',
             href: '/search/visit/results?searchBlock1=' + searchBlock1 + '&searchBlock2=' + searchBlock2 + '&searchBlock3=' + searchBlock3 + '&searchBlock4=' + searchBlock4 + '&page=' + previous
-          },
+          } if numberOfResults > 10,
           next: {
             text: 'Next',
             href: '/search/visit/results?searchBlock1=' + searchBlock1 + '&searchBlock2=' + searchBlock2 + '&searchBlock3=' + searchBlock3 + '&searchBlock4=' + searchBlock4 + '&page=' + next
-          },
-          items: pageLinks
+          } if numberOfResults > 10,
+          items: pageLinks if numberOfResults > 10
         }) }}
       {% endset %}
 
-      {{ pagination | safe if numberOfResults > 10 }}
+      {{ pagination | safe }}
 
         {{ govukTable({
             classes: "bapv-table govuk-!-margin-top-3",
@@ -89,7 +89,7 @@
             ]
         }) }}
 
-      {{ pagination | safe if numberOfResults > 10 }}
+      {{ pagination | safe }}
     {% elif errors | length %}
     {% else %}
         <p class="govuk-!-margin-top-6 govuk-!-margin-bottom-6" id="search-results-none">There are no results for this reference at {{ establishment }}.

@@ -27,16 +27,16 @@
           previous: {
             text: 'Previous',
             href: backLinkHref + '/results?search=' + search + '&page=' + previous
-          },
+          } if numberOfResults > 10,
           next: {
             text: 'Next',
             href: backLinkHref + '/results?search=' + search + '&page=' + next
-          },
-          items: pageLinks
+          } if numberOfResults > 10,
+          items: pageLinks if numberOfResults > 10
         }) }}
       {% endset %}
 
-      {{ pagination | safe if numberOfResults > 10 }}
+      {{ pagination | safe }}
 
         {{ govukTable({
             classes: "bapv-table govuk-!-margin-top-3",
@@ -58,7 +58,7 @@
             rows: results
         }) }}
 
-      {{ pagination | safe if numberOfResults > 10 }}
+      {{ pagination | safe }}
     {% elif errors | length %}
     {% else %}
         <p class="govuk-!-margin-top-6 govuk-!-margin-bottom-6" id="search-results-none">There are no results for this name or number at {{ establishment }}.</p>
