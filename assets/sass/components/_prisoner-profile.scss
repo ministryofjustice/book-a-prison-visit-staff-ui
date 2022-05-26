@@ -15,13 +15,6 @@
 
     strong {
       margin-right: govuk-spacing(4);
-      @include govuk-media-query($from: mobile, $until: desktop) {
-        display: block;
-      }
-    }
-
-    span {
-      display: block;
     }
   }
 }

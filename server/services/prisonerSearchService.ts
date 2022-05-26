@@ -43,13 +43,16 @@ export default class PrisonerSearchService {
     const nextPage = this.getNextPage()
     const previousPage = this.getPreviousPage()
     const prisonerList: Array<PrisonerDetailsItem[]> = []
+    const queryParams = new URLSearchParams({ search }).toString()
 
     content.forEach((prisoner: Prisoner) => {
       const url = visit
-        ? `<a href="/prisoner/${prisoner.prisonerNumber}/visits" class="bapv-result-row">${properCaseFullName(
+        ? `<a href="/prisoner/${
+            prisoner.prisonerNumber
+          }/visits?${queryParams}" class="bapv-result-row">${properCaseFullName(
             `${prisoner.lastName}, ${prisoner.firstName}`
           )}</a>`
-        : `<a href="/prisoner/${prisoner.prisonerNumber}" class="bapv-result-row">${properCaseFullName(
+        : `<a href="/prisoner/${prisoner.prisonerNumber}?${queryParams}" class="bapv-result-row">${properCaseFullName(
             `${prisoner.lastName}, ${prisoner.firstName}`
           )}</a>`
       const row: PrisonerDetailsItem[] = [
