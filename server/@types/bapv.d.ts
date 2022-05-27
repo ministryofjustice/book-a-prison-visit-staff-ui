@@ -1,4 +1,4 @@
-import { InmateDetail, VisitBalances } from '../data/prisonApiTypes'
+import { InmateDetail, OffenderRestriction, VisitBalances } from '../data/prisonApiTypes'
 import { Visit, VisitorSupport } from '../data/visitSchedulerApiTypes'
 
 export type PrisonerDetailsItem = {
@@ -177,6 +177,7 @@ export type VisitSessionData = {
     offenderNo: string
     dateOfBirth: string
     location: string
+    restrictions?: OffenderRestriction[]
   }
   visit?: VisitSlot
   visitRestriction?: Visit['visitRestriction']

@@ -173,6 +173,7 @@ describe('GET /book-a-visit/select-visitors', () => {
         expect($('.test-restrictions-comment1').text().trim()).toBe('string')
         expect($('.test-restrictions-start-date1').text().trim()).toBe('15 March 2022')
         expect($('.test-restrictions-end-date1').text().trim()).toBe('15 March 2022')
+        expect(visitSessionData.prisoner.restrictions).toEqual(restrictions)
       })
   })
 
@@ -205,6 +206,7 @@ describe('GET /book-a-visit/select-visitors', () => {
         expect($('.test-restrictions-comment1').text().trim()).toBe('string')
         expect($('.test-restrictions-start-date1').text().trim()).toBe('Not entered')
         expect($('.test-restrictions-end-date1').text().trim()).toBe('Not entered')
+        expect(visitSessionData.prisoner.restrictions).toEqual(restrictions)
       })
   })
 
@@ -227,6 +229,7 @@ describe('GET /book-a-visit/select-visitors', () => {
         expect($('.test-restrictions-comment1').text().trim()).toBe('')
         expect($('.test-restrictions-start-date1').text().trim()).toBe('')
         expect($('.test-restrictions-end-date1').text().trim()).toBe('')
+        expect(visitSessionData.prisoner.restrictions).toEqual([])
       })
   })
 
@@ -265,6 +268,7 @@ describe('GET /book-a-visit/select-visitors', () => {
         expect($('[data-test="submit"]').text().trim()).toBe('Continue')
 
         expect(visitorList.visitors).toEqual(returnData)
+        expect(visitSessionData.prisoner.restrictions).toEqual(restrictions)
       })
   })
 
