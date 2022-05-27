@@ -1,0 +1,74 @@
+{% extends "layout.njk" %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% set pageHeaderTitle = "Check the prisoner's closed visit restrictions" %}
+{% set pageTitle %}
+{% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
+{% endset %}
+{% set backLinkHref = "/book-a-visit/select-visitors" %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+
+      {% include "partials/errorSummary.njk" %}
+      <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+
+      <form action="/book-a-visit/additional-support" method="POST" novalidate>
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+
+        <div class="prisoner-restrictions">
+          {% set prisonerRestrictions = [] %}
+          {% for restriction in restrictions %}
+            {% set restrictionStartDate %}{% if restriction.startDate %}{{ restriction.startDate | formatDate }}{% else %}Not entered{% endif %}{% endset %}
+            {% set restrictionExpiryDate %}{% if restriction.expiryDate %}{{ restriction.expiryDate | formatDate }}{% else %}Not entered{% endif %}{% endset %}
+            {%- set prisonerRestrictions = (prisonerRestrictions.push([
+              {
+                html: '<span class="test-restrictions-type' + loop.index + ' moj-badge moj-badge--large visitor-restriction-badge visitor-restriction-badge--' + restriction.restrictionType + '">' + restriction.restrictionTypeDescription + '</span>'
+              },
+              {
+                text: restriction.comment,
+                classes: "test-restrictions-comment" + loop.index
+              },
+              {
+                text: restrictionStartDate,
+                classes: "test-restrictions-start-date" + loop.index
+              },
+              {
+                text: restrictionExpiryDate,
+                classes: "test-restrictions-end-date" + loop.index
+              }
+            ]), prisonerRestrictions) %}
+          {% endfor %}
+          {{ govukTable({
+            head: [
+              {
+                text: "Type of restriction"
+              },
+              {
+                text: "Comments"
+              },
+              {
+                text: "Date from"
+              },
+              {
+                text: "Date to"
+              }
+            ],
+            rows: prisonerRestrictions
+          }) }}
+        </div>
+
+        {{ govukButton({
+          text: "Continue",
+          attributes: {
+            "data-test": "submit"
+          }
+        }) }} 
+      </form>
+    </div>
+  </div>
+{% endblock %}

@@ -139,6 +139,16 @@ export default function routes(
     }
   )
 
+  get('/visit-type', sessionCheckMiddleware({ stage: 2 }), async (req, res) => {
+    const { visitSessionData } = req.session
+
+    const closedRestrictions = visitSessionData.prisoner.restrictions.filter(
+      restriction => restriction.restrictionType === 'CLOSED'
+    )
+
+    res.render('pages/visitType', { restrictions: closedRestrictions })
+  })
+
   get(
     '/select-date-and-time',
     sessionCheckMiddleware({ stage: 2 }),
