@@ -286,7 +286,7 @@ describe('POST /prisoner/A1234BC', () => {
     prisonerProfileService.getPrisonerAndVisitBalances.mockResolvedValue({ inmateDetail, visitBalances })
   })
 
-  it('should set up visitSessionData (with default OPEN visit) and redirect to select visitors page', () => {
+  it('should set up visitSessionData and redirect to select visitors page', () => {
     return request(app)
       .post('/prisoner/A1234BC')
       .expect(302)
@@ -302,7 +302,6 @@ describe('POST /prisoner/A1234BC', () => {
             dateOfBirth: '2 April 1975',
             location: '1-1-C-028, HMP Hewell',
           },
-          visitRestriction: 'OPEN',
         })
       })
   })
@@ -314,7 +313,6 @@ describe('POST /prisoner/A1234BC', () => {
       dateOfBirth: '5 May 1980',
       location: 'a cell, HMP Prison',
     }
-    visitSessionData.visitRestriction = 'CLOSED'
 
     return request(app)
       .post('/prisoner/A1234BC')
@@ -330,7 +328,6 @@ describe('POST /prisoner/A1234BC', () => {
             dateOfBirth: '2 April 1975',
             location: '1-1-C-028, HMP Hewell',
           },
-          visitRestriction: 'OPEN',
         })
       })
   })

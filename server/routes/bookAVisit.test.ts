@@ -447,7 +447,13 @@ describe('POST /book-a-visit/select-visitors', () => {
           adult: true,
           relationshipDescription: 'Friend',
           address: 'Not entered',
-          restrictions: [],
+          restrictions: [
+            {
+              restrictionType: 'CLOSED',
+              restrictionTypeDescription: 'Closed',
+              startDate: '2022-01-01',
+            },
+          ],
           banned: false,
         },
       ],
@@ -470,7 +476,7 @@ describe('POST /book-a-visit/select-visitors', () => {
     } as SessionData)
   })
 
-  it('should save to session and redirect to the select date and time page if an adult is selected', () => {
+  it('should save to session and redirect to the select date and time page if an adult is selected (OPEN visit)', () => {
     const returnAdult: VisitorListItem[] = [
       {
         address: '1st listed address',
@@ -492,6 +498,52 @@ describe('POST /book-a-visit/select-visitors', () => {
       .expect(() => {
         expect(adultVisitors.adults).toEqual(returnAdult)
         expect(visitSessionData.visitors).toEqual(returnAdult)
+        expect(visitSessionData.visitRestriction).toBe('OPEN')
+        expect(visitSessionData.closedVisitReason).toBe(undefined)
+      })
+  })
+
+  it('should save to session and redirect to the select date and time page if an adult with CLOSED restriction is selected (CLOSED visit)', () => {
+    const returnAdult: VisitorListItem[] = [
+      {
+        address: '1st listed address',
+        adult: true,
+        dateOfBirth: '1986-07-28',
+        name: 'Bob Smith',
+        personId: 4322,
+        relationshipDescription: 'Brother',
+        restrictions: [],
+        banned: false,
+      },
+      {
+        address: 'Not entered',
+        adult: true,
+        dateOfBirth: '1978-05-25',
+        name: 'John Jones',
+        personId: 4326,
+        relationshipDescription: 'Friend',
+        restrictions: [
+          {
+            restrictionType: 'CLOSED',
+            restrictionTypeDescription: 'Closed',
+            startDate: '2022-01-01',
+          },
+        ],
+        banned: false,
+      },
+    ]
+
+    return request(sessionApp)
+      .post('/book-a-visit/select-visitors')
+      .send('visitors=4322')
+      .send('visitors=4326')
+      .expect(302)
+      .expect('location', '/book-a-visit/select-date-and-time')
+      .expect(() => {
+        expect(adultVisitors.adults).toEqual(returnAdult)
+        expect(visitSessionData.visitors).toEqual(returnAdult)
+        expect(visitSessionData.visitRestriction).toBe('CLOSED')
+        expect(visitSessionData.closedVisitReason).toBe('visitor')
       })
   })
 
@@ -526,6 +578,7 @@ describe('POST /book-a-visit/select-visitors', () => {
       .expect(() => {
         expect(adultVisitors.adults).toEqual([returnAdult])
         expect(visitSessionData.visitors).toEqual([returnAdult, returnChild])
+        expect(visitSessionData.visitRestriction).toBe('OPEN')
       })
   })
 
@@ -575,6 +628,7 @@ describe('POST /book-a-visit/select-visitors', () => {
       .expect(() => {
         expect(adultVisitors.adults).toEqual([returnAdult])
         expect(visitSessionData.visitors).toEqual([returnAdult])
+        expect(visitSessionData.visitRestriction).toBe('OPEN')
       })
   })
 
@@ -802,6 +856,7 @@ describe('/book-a-visit/select-date-and-time', () => {
           expect($('h1').text().trim()).toBe('Select date and time of visit')
           expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
           expect($('[data-test="visit-restriction"]').text()).toBe('Open')
+          expect($('[data-test="closed-visit-reason"]').length).toBe(0)
           expect($('input[name="visit-date-and-time"]').length).toBe(5)
           expect($('input[name="visit-date-and-time"]:checked').length).toBe(0)
           expect($('.govuk-accordion__section--expanded').length).toBe(0)
