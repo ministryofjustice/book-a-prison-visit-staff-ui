@@ -1,6 +1,8 @@
 {% extends "layout.njk" %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% set pageHeaderTitle = "Check the prisoner's closed visit restrictions" %}
@@ -61,6 +63,32 @@
             rows: prisonerRestrictions
           }) }}
         </div>
+
+        {% set visitorListItems = [] %}
+        {% for visitor in visitors %}
+          {%- set visitorListItems = (visitorListItems.push(
+            {
+              key: {
+                classes: "govuk-!-width-one-quarter",
+                text: "Visitor " + loop.index
+              },
+              value: {
+                text: visitor.name + " (" + visitor.relationshipDescription | lower + " of the prisoner)"
+              }
+            }
+          ), visitorListItems) %}
+        {% endfor %}
+
+        {% set visitorListHtml %}
+          {{ govukSummaryList({
+            rows: visitorListItems
+          }) }}
+        {% endset %}
+
+        {{ govukDetails({
+          summaryText: "Show visitors on this visit",
+          html: visitorListHtml
+        }) }}
 
         {{ govukButton({
           text: "Continue",

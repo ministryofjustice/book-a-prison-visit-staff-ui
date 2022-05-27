@@ -146,7 +146,10 @@ export default function routes(
       restriction => restriction.restrictionType === 'CLOSED'
     )
 
-    res.render('pages/visitType', { restrictions: closedRestrictions })
+    res.render('pages/visitType', {
+      restrictions: closedRestrictions,
+      visitors: visitSessionData.visitors,
+    })
   })
 
   get(
