@@ -469,6 +469,7 @@ describe('POST /book-a-visit/select-visitors', () => {
         offenderNo: 'A1234BC',
         dateOfBirth: '25 May 1988',
         location: 'location place',
+        restrictions: [],
       },
       visitRestriction: 'OPEN',
     }
@@ -548,6 +549,86 @@ describe('POST /book-a-visit/select-visitors', () => {
         expect(visitSessionData.visitors).toEqual(returnAdult)
         expect(visitSessionData.visitRestriction).toBe('CLOSED')
         expect(visitSessionData.closedVisitReason).toBe('visitor')
+      })
+  })
+
+  it('should save to session and redirect to the select date and time page if prisoner and visitor both have CLOSED restriction (CLOSED visit)', () => {
+    visitSessionData.prisoner.restrictions = [
+      {
+        restrictionId: 12345,
+        restrictionType: 'CLOSED',
+        restrictionTypeDescription: 'Closed',
+        startDate: '2022-05-16',
+        active: true,
+      },
+    ]
+
+    const returnAdult: VisitorListItem[] = [
+      {
+        address: 'Not entered',
+        adult: true,
+        dateOfBirth: '1978-05-25',
+        name: 'John Jones',
+        personId: 4326,
+        relationshipDescription: 'Friend',
+        restrictions: [
+          {
+            restrictionType: 'CLOSED',
+            restrictionTypeDescription: 'Closed',
+            startDate: '2022-01-01',
+          },
+        ],
+        banned: false,
+      },
+    ]
+
+    return request(sessionApp)
+      .post('/book-a-visit/select-visitors')
+      .send('visitors=4326')
+      .expect(302)
+      .expect('location', '/book-a-visit/select-date-and-time')
+      .expect(() => {
+        expect(adultVisitors.adults).toEqual(returnAdult)
+        expect(visitSessionData.visitors).toEqual(returnAdult)
+        expect(visitSessionData.visitRestriction).toBe('CLOSED')
+        expect(visitSessionData.closedVisitReason).toBe('visitor')
+      })
+  })
+
+  it('should save to session and redirect open/closed visit choice if prisoner has CLOSED restriction and visitor not CLOSED', () => {
+    visitSessionData.prisoner.restrictions = [
+      {
+        restrictionId: 12345,
+        restrictionType: 'CLOSED',
+        restrictionTypeDescription: 'Closed',
+        startDate: '2022-05-16',
+        active: true,
+      },
+    ]
+
+    const returnAdult: VisitorListItem[] = [
+      {
+        address: '1st listed address',
+        adult: true,
+        dateOfBirth: '1986-07-28',
+        name: 'Bob Smith',
+        personId: 4322,
+        relationshipDescription: 'Brother',
+        restrictions: [],
+        banned: false,
+      },
+    ]
+
+    return request(sessionApp)
+      .post('/book-a-visit/select-visitors')
+      .send('visitors=4322')
+      .expect(302)
+      .expect('location', '/book-a-visit/visit-type')
+      .expect(() => {
+        expect(adultVisitors.adults).toEqual(returnAdult)
+        expect(visitSessionData.visitors).toEqual(returnAdult)
+        expect(visitSessionData.visitRestriction).toBe('OPEN')
+        expect(visitSessionData.closedVisitReason).toBe(undefined)
       })
   })
 
