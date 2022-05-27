@@ -97,6 +97,7 @@ describe('Views - Date and time of visit', () => {
 
     expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
     expect($('[data-test="visit-restriction"]').text()).toBe('Open')
+    expect($('[data-test="closed-visit-reason"]').length).toBe(0)
 
     expect($('[data-test="month"]').eq(0).text()).toBe('February 2022')
     expect($('#slots-month-February2022-heading-1').text().trim()).toBe('Monday 14 February')
@@ -119,5 +120,21 @@ describe('Views - Date and time of visit', () => {
     expect($('label[for="5"]').text()).toContain('Fully booked')
     expect($('#5').attr('disabled')).toBe('disabled')
     expect($('[data-test="submit"]').text().trim()).toBe('Continue')
+  })
+
+  it('should display information banner for closed visit due to visitor restriction', () => {
+    viewContext = {
+      prisonerName: 'John Smith',
+      visitRestriction: 'CLOSED',
+      closedVisitReason: 'visitor',
+      slotsList: {},
+    }
+    const $ = cheerio.load(compiledTemplate.render(viewContext))
+
+    expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
+    expect($('[data-test="visit-restriction"]').text()).toBe('Closed')
+    expect($('[data-test="closed-visit-reason"]').text()).toContain(
+      'Closed visit as a visitor has a closed visit restriction'
+    )
   })
 })

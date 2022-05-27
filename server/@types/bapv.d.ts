@@ -180,6 +180,7 @@ export type VisitSessionData = {
   }
   visit?: VisitSlot
   visitRestriction?: Visit['visitRestriction']
+  closedVisitReason?: 'prisoner' | 'visitor'
   visitors?: VisitorListItem[]
   visitorSupport?: VisitorSupport[]
   mainContact?: {

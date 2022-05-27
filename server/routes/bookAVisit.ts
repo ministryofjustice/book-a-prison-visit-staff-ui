@@ -124,6 +124,8 @@ export default function routes(
       }, false)
       visitSessionData.visitRestriction = closedVisitVisitors ? 'CLOSED' : 'OPEN'
 
+      visitSessionData.closedVisitReason = closedVisitVisitors ? 'visitor' : undefined
+
       return res.redirect('/book-a-visit/select-date-and-time')
     }
   )
@@ -159,6 +161,7 @@ export default function routes(
         errors: req.flash('errors'),
         visitRestriction: visitSessionData.visitRestriction,
         prisonerName: visitSessionData.prisoner.name,
+        closedVisitReason: visitSessionData.closedVisitReason,
         slotsList,
         timeOfDay,
         dayOfTheWeek,

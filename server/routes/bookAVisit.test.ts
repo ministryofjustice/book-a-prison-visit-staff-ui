@@ -499,6 +499,7 @@ describe('POST /book-a-visit/select-visitors', () => {
         expect(adultVisitors.adults).toEqual(returnAdult)
         expect(visitSessionData.visitors).toEqual(returnAdult)
         expect(visitSessionData.visitRestriction).toBe('OPEN')
+        expect(visitSessionData.closedVisitReason).toBe(undefined)
       })
   })
 
@@ -542,6 +543,7 @@ describe('POST /book-a-visit/select-visitors', () => {
         expect(adultVisitors.adults).toEqual(returnAdult)
         expect(visitSessionData.visitors).toEqual(returnAdult)
         expect(visitSessionData.visitRestriction).toBe('CLOSED')
+        expect(visitSessionData.closedVisitReason).toBe('visitor')
       })
   })
 
@@ -854,6 +856,7 @@ describe('/book-a-visit/select-date-and-time', () => {
           expect($('h1').text().trim()).toBe('Select date and time of visit')
           expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
           expect($('[data-test="visit-restriction"]').text()).toBe('Open')
+          expect($('[data-test="closed-visit-reason"]').length).toBe(0)
           expect($('input[name="visit-date-and-time"]').length).toBe(5)
           expect($('input[name="visit-date-and-time"]:checked').length).toBe(0)
           expect($('.govuk-accordion__section--expanded').length).toBe(0)
