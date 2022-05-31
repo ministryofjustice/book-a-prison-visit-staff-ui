@@ -37,6 +37,7 @@
                         text: "Name"
                     },
                     value: formValues.someoneElseName,
+                    autocomplete: "off",
                     errorMessage: errors | findError('someoneElseName')
                 }) }}
             {% endset -%}
@@ -79,6 +80,7 @@
                 id: "phoneNumber",
                 name: "phoneNumber",
                 value: formValues.phoneNumber,
+                autocomplete: "off",
                 errorMessage: errors | findError('phoneNumber')
             }) }}
             {{ govukButton({
