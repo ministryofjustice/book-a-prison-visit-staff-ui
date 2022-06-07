@@ -135,6 +135,11 @@
   border-bottom: 0;
 }
 
+.bapv-table-no-bottom-border .govuk-table__row:last-child .govuk-table__cell,
 .bapv-tabs .govuk-table__row:last-child .govuk-table__cell {
   border-bottom: 0;
+}
+
+.bapv-extraspacing {
+  line-height: 1.5;
 }
