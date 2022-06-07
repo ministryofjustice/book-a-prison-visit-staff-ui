@@ -17,6 +17,11 @@ export default function routes(
       path,
       handlers.map(handler => asyncMiddleware(handler))
     )
+  const post = (path: string | string[], ...handlers: RequestHandler[]) =>
+    router.post(
+      path,
+      handlers.map(handler => asyncMiddleware(handler))
+    )
 
   get('/', async (req, res) => {
     const maxSlotDefaults = {
@@ -129,6 +134,17 @@ export default function routes(
       dateTabs: getDateTabs(selectedDateString, firstTabDateString, 3),
       queryParams,
     })
+  })
+
+  post('/', async (req, res) => {
+    const day = (req.body['date-picker-day'] as string).padStart(2, '0')
+    const month = (req.body['date-picker-month'] as string).padStart(2, '0')
+    const year = (req.body['date-picker-year'] as string).padStart(4, '0')
+
+    const selectedDateString = getParsedDateFromQueryString(`${year}-${month}-${day}`)
+    const queryParams = new URLSearchParams({ selectedDate: selectedDateString }).toString()
+
+    return res.redirect(`/visits?${queryParams}`)
   })
 
   return router

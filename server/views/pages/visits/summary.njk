@@ -1,6 +1,7 @@
 {% extends "layout.njk" %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 {%- from "moj/components/side-navigation/macro.njk" import mojSideNavigation -%}
 {% from "moj/components/pagination/macro.njk" import mojPagination %}
 {%- from "moj/components/sub-navigation/macro.njk" import mojSubNavigation -%}
@@ -13,10 +14,38 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+    </div>
+  </div>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
       {{ mojSubNavigation({
         items: dateTabs
       }) }}
     </div>
+    <div class="govuk-grid-column-one-quarter">
+      <div class="moj-sub-navigation__list">
+        <div class="moj-sub-navigation" id="" aria-label="Date picker">
+          <div class="govuk-button-group moj-js-hidden">
+            {{ govukDateInput({
+              id: "date-picker",
+              namePrefix: "date-picker",
+              hint: {
+                text: "Enter a date"
+              }
+            }) }}
+            {{ govukButton({
+              text: "View",
+              attributes: {
+                'aria-haspopup': true,
+                'aria-expanded': false
+              }
+            }) }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="govuk-grid-row">
     {% if results | length %}
       <div class="govuk-grid-column-one-quarter">
         {{ mojSideNavigation({
@@ -96,3 +125,8 @@
     {% endif %}
   </div>
 {% endblock %}
+
+{% block pageScripts %}
+  <script src="/assets/viewVisitsDatePicker.js"></script>
+{% endblock %}
+
