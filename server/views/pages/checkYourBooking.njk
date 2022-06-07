@@ -148,7 +148,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-one-half">
-        <h2 class="govuk-heading-m">Additional support</h2>
+        <h2 class="govuk-heading-m">Additional support requests</h2>
     </div>
     <div class="govuk-grid-column-one-half bapv-change-details-link">
         <a href="/book-a-visit/additional-support" class="govuk-link">Change</a>
@@ -170,14 +170,22 @@
               }
             }
           ), additionalSupportRows) %}
-        {% endfor %}
-        {% if (additionalSupportRows | length) %}
-            {{ govukSummaryList({
-                rows: additionalSupportRows
-            }) }}
         {% else %}
-        <p data-test="no-addition-support-chosen">None.</p>
-        {% endif %}
+          {% set additionalSupportRows = (additionalSupportRows.push(
+            {
+              key: {
+                text: "Request 1"
+              },
+              value: {
+                text: "None",
+                classes: "test-additional-support1"
+              }
+            }
+          ), additionalSupportRows) %}
+        {% endfor %}
+        {{ govukSummaryList({
+            rows: additionalSupportRows
+        }) }}
     </div>
 </div>
 

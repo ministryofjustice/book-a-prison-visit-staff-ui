@@ -40,7 +40,7 @@
 
     <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
 
-    <p><strong>Prisoner name:</strong> <span data-test="prisoner-name">{{ prisonerName }}</span>
+    <p class="bapv-extraspacing"><strong>Prisoner name:</strong> <span data-test="prisoner-name">{{ prisonerName }}</span>
     <br><strong>Visit type:</strong> <span data-test="visit-restriction">{{ visitRestriction | capitalize }}</span>
     {% if slotsList | length %}
     <br>Showing visit time slots for the next 28 days.
