@@ -147,10 +147,31 @@ export default function routes(
     )
 
     res.render('pages/visitType', {
+      errors: req.flash('errors'),
       restrictions: closedRestrictions,
       visitors: visitSessionData.visitors,
     })
   })
+
+  post(
+    '/visit-type',
+    sessionCheckMiddleware({ stage: 2 }),
+    body('visitType').isIn(['OPEN', 'CLOSED']).withMessage('No visit type selected'),
+    async (req, res) => {
+      const { visitSessionData } = req.session
+      const errors = validationResult(req)
+
+      if (!errors.isEmpty()) {
+        req.flash('errors', errors.array() as [])
+        return res.redirect(req.originalUrl)
+      }
+
+      visitSessionData.visitRestriction = req.body.visitType
+      visitSessionData.closedVisitReason = 'prisoner'
+
+      return res.redirect('/book-a-visit/select-date-and-time')
+    }
+  )
 
   get(
     '/select-date-and-time',
