@@ -2,6 +2,7 @@ const viewAnotherDateToggle = document.querySelector('.bapv-another-date__toggle
 
 if (viewAnotherDateToggle) {
   function toggleDatePicker(event) {
+    event.preventDefault()
     const datePicker = document.querySelector('.bapv-another-date__form')
 
     if (datePicker.classList.contains('moj-js-hidden')) {
@@ -14,5 +15,6 @@ if (viewAnotherDateToggle) {
     }
   }
 
+  viewAnotherDateToggle.addEventListener('touchend', toggleDatePicker)
   viewAnotherDateToggle.addEventListener('click', toggleDatePicker)
 }

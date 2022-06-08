@@ -164,20 +164,27 @@
 
 .bapv-another-date__toggle {
   button {
-    font-family: "GDS Transport",arial,sans-serif;
-    font-size: 19px;
+    @include govuk-font($size: 19, $weight: "normal");
     border: 0;
-    background-color: govuk-colour("white");
-    color: #1d70b8;
+    background-color: transparent;
+    color: govuk-colour("blue");
     padding: 12px 0;
 
+    & svg {
+      margin-top: -8px;
+      display: inline-block;
+      height: govuk-spacing(6);
+      margin-left: 10px;
+      vertical-align: middle;
+      width: govuk-spacing(6);
+      fill: currentColor;
+    }
+
     &:focus {
-      background-color: #fd0;
-      color: #0b0c0c;
-      box-shadow: 0 0 #fd0, 0 4px #0b0c0c;
+      background-color: govuk-colour("yellow");
+      color: govuk-colour("black");
       outline: none;
-      position: relative;
-      z-index: 1;
+      box-shadow: 0 -4px 0 govuk-colour("black") inset;
     }
   }
 }
@@ -193,7 +200,7 @@
   border-left: 1px solid govuk-colour("mid-grey");
   border-right: 1px solid govuk-colour("mid-grey");
   border-bottom: 1px solid govuk-colour("mid-grey");
-  padding: 15px;
+  padding: govuk-spacing(3);
 
   form {
     display: flex;
