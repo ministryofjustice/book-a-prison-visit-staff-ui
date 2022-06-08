@@ -167,7 +167,7 @@ export default function routes(
       }
 
       visitSessionData.visitRestriction = req.body.visitType
-      visitSessionData.closedVisitReason = 'prisoner'
+      visitSessionData.closedVisitReason = req.body.visitType === 'CLOSED' ? 'prisoner' : undefined
 
       return res.redirect('/book-a-visit/select-date-and-time')
     }

@@ -30,19 +30,29 @@
             {% set restrictionExpiryDate %}{% if restriction.expiryDate %}{{ restriction.expiryDate | formatDate }}{% else %}Not entered{% endif %}{% endset %}
             {%- set prisonerRestrictions = (prisonerRestrictions.push([
               {
-                html: '<span class="test-restrictions-type' + loop.index + ' moj-badge moj-badge--large visitor-restriction-badge visitor-restriction-badge--' + restriction.restrictionType + '">' + restriction.restrictionTypeDescription + '</span>'
+                html: '<span class="test-restrictions-type' + loop.index + ' moj-badge moj-badge--large visitor-restriction-badge visitor-restriction-badge--' +
+                  restriction.restrictionType + '" data-test="restriction-type-' + loop.index + '">' + restriction.restrictionTypeDescription + '</span>'
               },
               {
                 text: restriction.comment,
-                classes: "test-restrictions-comment" + loop.index
+                classes: "test-restrictions-comment" + loop.index,
+                attributes: {
+                  "data-test": "restriction-comment-" + loop.index
+                }
               },
               {
                 text: restrictionStartDate,
-                classes: "test-restrictions-start-date" + loop.index
+                classes: "test-restrictions-start-date" + loop.index,
+                attributes: {
+                  "data-test": "restriction-start-" + loop.index
+                }
               },
               {
                 text: restrictionExpiryDate,
-                classes: "test-restrictions-end-date" + loop.index
+                classes: "test-restrictions-end-date" + loop.index,
+                attributes: {
+                  "data-test": "restriction-end-" + loop.index
+                }
               }
             ]), prisonerRestrictions) %}
           {% endfor %}
@@ -70,10 +80,11 @@
           {%- set visitorListItems = (visitorListItems.push(
             {
               key: {
-                classes: "govuk-!-width-one-quarter",
+                classes: "govuk-!-width-one-quarter test-visitor-key-" + loop.index,
                 text: "Visitor " + loop.index
               },
               value: {
+                classes: "test-visitor-value-" + loop.index,
                 text: visitor.name + " (" + visitor.relationshipDescription | lower + " of the prisoner)"
               }
             }
