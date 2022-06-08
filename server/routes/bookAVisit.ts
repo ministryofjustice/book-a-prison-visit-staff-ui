@@ -30,18 +30,20 @@ export default function routes(
   get('/select-visitors', sessionCheckMiddleware({ stage: 1 }), async (req, res) => {
     const { visitSessionData } = req.session
     const { offenderNo } = visitSessionData.prisoner
+
     const visitorList = await prisonerVisitorsService.getVisitors(offenderNo, res.locals.user?.username)
+    if (!req.session.visitorList) {
+      req.session.visitorList = { visitors: [] }
+    }
+    req.session.visitorList.visitors = visitorList
+
     const restrictions = await prisonerProfileService.getRestrictions(offenderNo, res.locals.user?.username)
+    req.session.visitSessionData.prisoner.restrictions = restrictions
 
     const formValues = getFlashFormValues(req)
     if (!Object.keys(formValues).length && visitSessionData.visitors) {
       formValues.visitors = visitSessionData.visitors.map(visitor => visitor.personId.toString())
     }
-
-    if (!req.session.visitorList) {
-      req.session.visitorList = { visitors: [] }
-    }
-    req.session.visitorList.visitors = visitorList
 
     res.render('pages/visitors', {
       errors: req.flash('errors'),
@@ -123,8 +125,47 @@ export default function routes(
         return closedVisit || visitor.restrictions.some(restriction => restriction.restrictionType === 'CLOSED')
       }, false)
       visitSessionData.visitRestriction = closedVisitVisitors ? 'CLOSED' : 'OPEN'
-
       visitSessionData.closedVisitReason = closedVisitVisitors ? 'visitor' : undefined
+
+      const closedVisitPrisoner = visitSessionData.prisoner.restrictions.some(restriction => {
+        return restriction.restrictionType === 'CLOSED'
+      })
+
+      return !closedVisitVisitors && closedVisitPrisoner
+        ? res.redirect('/book-a-visit/visit-type')
+        : res.redirect('/book-a-visit/select-date-and-time')
+    }
+  )
+
+  get('/visit-type', sessionCheckMiddleware({ stage: 2 }), async (req, res) => {
+    const { visitSessionData } = req.session
+
+    const closedRestrictions = visitSessionData.prisoner.restrictions.filter(
+      restriction => restriction.restrictionType === 'CLOSED'
+    )
+
+    res.render('pages/visitType', {
+      errors: req.flash('errors'),
+      restrictions: closedRestrictions,
+      visitors: visitSessionData.visitors,
+    })
+  })
+
+  post(
+    '/visit-type',
+    sessionCheckMiddleware({ stage: 2 }),
+    body('visitType').isIn(['OPEN', 'CLOSED']).withMessage('No visit type selected'),
+    async (req, res) => {
+      const { visitSessionData } = req.session
+      const errors = validationResult(req)
+
+      if (!errors.isEmpty()) {
+        req.flash('errors', errors.array() as [])
+        return res.redirect(req.originalUrl)
+      }
+
+      visitSessionData.visitRestriction = req.body.visitType
+      visitSessionData.closedVisitReason = req.body.visitType === 'CLOSED' ? 'prisoner' : undefined
 
       return res.redirect('/book-a-visit/select-date-and-time')
     }

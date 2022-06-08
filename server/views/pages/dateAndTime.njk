@@ -48,11 +48,13 @@
     {% endif %}
     </p>
 
-    {% if closedVisitReason == 'visitor' %}
+    {% if visitRestriction == 'CLOSED' and closedVisitReason %}
       {% set closedVisitReasonHtml %}
         {{ govukWarningText({
           classes: "govuk-!-margin-bottom-0",
-          html: '<span class="govuk-!-font-size-24">Closed visit as a visitor has a closed visit restriction.</span>',
+          html: '<span class="govuk-!-font-size-24">Closed visit as ' +
+            ('a visitor' if closedVisitReason == 'visitor' else 'the prisoner') +
+            ' has a closed visit restriction.</span>',
           iconFallbackText: "Warning",
           attributes: {
             "data-test": "closed-visit-reason"

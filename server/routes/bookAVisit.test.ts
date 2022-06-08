@@ -173,6 +173,7 @@ describe('GET /book-a-visit/select-visitors', () => {
         expect($('.test-restrictions-comment1').text().trim()).toBe('string')
         expect($('.test-restrictions-start-date1').text().trim()).toBe('15 March 2022')
         expect($('.test-restrictions-end-date1').text().trim()).toBe('15 March 2022')
+        expect(visitSessionData.prisoner.restrictions).toEqual(restrictions)
       })
   })
 
@@ -205,6 +206,7 @@ describe('GET /book-a-visit/select-visitors', () => {
         expect($('.test-restrictions-comment1').text().trim()).toBe('string')
         expect($('.test-restrictions-start-date1').text().trim()).toBe('Not entered')
         expect($('.test-restrictions-end-date1').text().trim()).toBe('Not entered')
+        expect(visitSessionData.prisoner.restrictions).toEqual(restrictions)
       })
   })
 
@@ -227,6 +229,7 @@ describe('GET /book-a-visit/select-visitors', () => {
         expect($('.test-restrictions-comment1').text().trim()).toBe('')
         expect($('.test-restrictions-start-date1').text().trim()).toBe('')
         expect($('.test-restrictions-end-date1').text().trim()).toBe('')
+        expect(visitSessionData.prisoner.restrictions).toEqual([])
       })
   })
 
@@ -265,6 +268,7 @@ describe('GET /book-a-visit/select-visitors', () => {
         expect($('[data-test="submit"]').text().trim()).toBe('Continue')
 
         expect(visitorList.visitors).toEqual(returnData)
+        expect(visitSessionData.prisoner.restrictions).toEqual(restrictions)
       })
   })
 
@@ -465,6 +469,7 @@ describe('POST /book-a-visit/select-visitors', () => {
         offenderNo: 'A1234BC',
         dateOfBirth: '25 May 1988',
         location: 'location place',
+        restrictions: [],
       },
       visitRestriction: 'OPEN',
     }
@@ -544,6 +549,86 @@ describe('POST /book-a-visit/select-visitors', () => {
         expect(visitSessionData.visitors).toEqual(returnAdult)
         expect(visitSessionData.visitRestriction).toBe('CLOSED')
         expect(visitSessionData.closedVisitReason).toBe('visitor')
+      })
+  })
+
+  it('should save to session and redirect to the select date and time page if prisoner and visitor both have CLOSED restriction (CLOSED visit)', () => {
+    visitSessionData.prisoner.restrictions = [
+      {
+        restrictionId: 12345,
+        restrictionType: 'CLOSED',
+        restrictionTypeDescription: 'Closed',
+        startDate: '2022-05-16',
+        active: true,
+      },
+    ]
+
+    const returnAdult: VisitorListItem[] = [
+      {
+        address: 'Not entered',
+        adult: true,
+        dateOfBirth: '1978-05-25',
+        name: 'John Jones',
+        personId: 4326,
+        relationshipDescription: 'Friend',
+        restrictions: [
+          {
+            restrictionType: 'CLOSED',
+            restrictionTypeDescription: 'Closed',
+            startDate: '2022-01-01',
+          },
+        ],
+        banned: false,
+      },
+    ]
+
+    return request(sessionApp)
+      .post('/book-a-visit/select-visitors')
+      .send('visitors=4326')
+      .expect(302)
+      .expect('location', '/book-a-visit/select-date-and-time')
+      .expect(() => {
+        expect(adultVisitors.adults).toEqual(returnAdult)
+        expect(visitSessionData.visitors).toEqual(returnAdult)
+        expect(visitSessionData.visitRestriction).toBe('CLOSED')
+        expect(visitSessionData.closedVisitReason).toBe('visitor')
+      })
+  })
+
+  it('should save to session and redirect to open/closed visit choice if prisoner has CLOSED restriction and visitor not CLOSED', () => {
+    visitSessionData.prisoner.restrictions = [
+      {
+        restrictionId: 12345,
+        restrictionType: 'CLOSED',
+        restrictionTypeDescription: 'Closed',
+        startDate: '2022-05-16',
+        active: true,
+      },
+    ]
+
+    const returnAdult: VisitorListItem[] = [
+      {
+        address: '1st listed address',
+        adult: true,
+        dateOfBirth: '1986-07-28',
+        name: 'Bob Smith',
+        personId: 4322,
+        relationshipDescription: 'Brother',
+        restrictions: [],
+        banned: false,
+      },
+    ]
+
+    return request(sessionApp)
+      .post('/book-a-visit/select-visitors')
+      .send('visitors=4322')
+      .expect(302)
+      .expect('location', '/book-a-visit/visit-type')
+      .expect(() => {
+        expect(adultVisitors.adults).toEqual(returnAdult)
+        expect(visitSessionData.visitors).toEqual(returnAdult)
+        expect(visitSessionData.visitRestriction).toBe('OPEN')
+        expect(visitSessionData.closedVisitReason).toBe(undefined)
       })
   })
 
@@ -726,6 +811,130 @@ describe('POST /book-a-visit/select-visitors', () => {
   })
 })
 
+describe('/book-a-visit/visit-type', () => {
+  beforeEach(() => {
+    visitSessionData = {
+      prisoner: {
+        name: 'prisoner name',
+        offenderNo: 'A1234BC',
+        dateOfBirth: '25 May 1988',
+        location: 'location place',
+        restrictions: [
+          {
+            restrictionId: 12345,
+            restrictionType: 'CLOSED',
+            restrictionTypeDescription: 'Closed',
+            startDate: '2022-05-16',
+            comment: 'some comment text',
+            active: true,
+          },
+        ],
+      },
+      visitRestriction: 'OPEN',
+      visitors: [
+        {
+          address: '1st listed address',
+          adult: true,
+          dateOfBirth: '1986-07-28',
+          name: 'Bob Smith',
+          personId: 4322,
+          relationshipDescription: 'Brother',
+          restrictions: [],
+          banned: false,
+        },
+      ],
+    }
+
+    sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, {
+      visitSessionData,
+    } as SessionData)
+  })
+
+  describe('GET /book-a-visit/visit-type', () => {
+    it('should render the open/closed visit type page with prisoner restrictions and visitor list', () => {
+      return request(sessionApp)
+        .get('/book-a-visit/visit-type')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text().trim()).toBe("Check the prisoner's closed visit restrictions")
+          expect($('[data-test="restriction-type-1"]').text().trim()).toBe('Closed')
+          expect($('[data-test="restriction-comment-1"]').text().trim()).toBe('some comment text')
+          expect($('[data-test="restriction-start-1"]').text().trim()).toBe('16 May 2022')
+          expect($('[data-test="restriction-end-1"]').text().trim()).toBe('Not entered')
+          expect($('.test-visitor-key-1').text().trim()).toBe('Visitor 1')
+          expect($('.test-visitor-value-1').text().trim()).toBe('Bob Smith (brother of the prisoner)')
+          expect($('[data-test="visit-type-open"]').prop('checked')).toBe(false)
+          expect($('[data-test="visit-type-closed"]').prop('checked')).toBe(false)
+        })
+    })
+
+    it('should render the open/closed visit type page with form validation errors', () => {
+      flashData.errors = [
+        {
+          msg: 'No visit type selected',
+          param: 'visitType',
+          location: 'body',
+        },
+      ]
+
+      return request(sessionApp)
+        .get('/book-a-visit/visit-type')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text().trim()).toBe("Check the prisoner's closed visit restrictions")
+          expect($('.govuk-error-summary__body').text()).toContain('No visit type selected')
+          expect($('#visitType-error').text()).toContain('No visit type selected')
+          expect($('[data-test="visit-type-open"]').prop('checked')).toBe(false)
+          expect($('[data-test="visit-type-closed"]').prop('checked')).toBe(false)
+          expect(flashProvider).toHaveBeenCalledWith('errors')
+          expect(flashProvider).toHaveBeenCalledTimes(1)
+        })
+    })
+  })
+
+  describe('POST /book-a-visit/visit-type', () => {
+    it('should set validation errors in flash and redirect if visit type not selected', () => {
+      return request(sessionApp)
+        .post('/book-a-visit/visit-type')
+        .expect(302)
+        .expect('location', '/book-a-visit/visit-type')
+        .expect(() => {
+          expect(flashProvider).toHaveBeenCalledWith('errors', [
+            { location: 'body', msg: 'No visit type selected', param: 'visitType', value: undefined },
+          ])
+        })
+    })
+
+    it('should set visit type to OPEN when selected and redirect to select date/time', () => {
+      return request(sessionApp)
+        .post('/book-a-visit/visit-type')
+        .send('visitType=OPEN')
+        .expect(302)
+        .expect('location', '/book-a-visit/select-date-and-time')
+        .expect(() => {
+          expect(visitSessionData.visitRestriction).toBe('OPEN')
+          expect(visitSessionData.closedVisitReason).toBe(undefined)
+        })
+    })
+
+    it('should set visit type to CLOSED when selected and redirect to select date/time', () => {
+      return request(sessionApp)
+        .post('/book-a-visit/visit-type')
+        .send('visitType=CLOSED')
+        .expect(302)
+        .expect('location', '/book-a-visit/select-date-and-time')
+        .expect(() => {
+          expect(visitSessionData.visitRestriction).toBe('CLOSED')
+          expect(visitSessionData.closedVisitReason).toBe('prisoner')
+        })
+    })
+  })
+})
+
 describe('/book-a-visit/select-date-and-time', () => {
   const slotsList: VisitSlotList = {
     'February 2022': [
@@ -861,6 +1070,44 @@ describe('/book-a-visit/select-date-and-time', () => {
           expect($('input[name="visit-date-and-time"]:checked').length).toBe(0)
           expect($('.govuk-accordion__section--expanded').length).toBe(0)
           expect($('[data-test="submit"]').text().trim()).toBe('Continue')
+        })
+    })
+
+    it('should render the available sessions list with closed visit reason (visitor)', () => {
+      visitSessionData.visitRestriction = 'CLOSED'
+      visitSessionData.closedVisitReason = 'visitor'
+
+      return request(sessionApp)
+        .get('/book-a-visit/select-date-and-time')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text().trim()).toBe('Select date and time of visit')
+          expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
+          expect($('[data-test="visit-restriction"]').text()).toBe('Closed')
+          expect($('[data-test="closed-visit-reason"]').text()).toContain(
+            'Closed visit as a visitor has a closed visit restriction.'
+          )
+        })
+    })
+
+    it('should render the available sessions list with closed visit reason (prisoner)', () => {
+      visitSessionData.visitRestriction = 'CLOSED'
+      visitSessionData.closedVisitReason = 'prisoner'
+
+      return request(sessionApp)
+        .get('/book-a-visit/select-date-and-time')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text().trim()).toBe('Select date and time of visit')
+          expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
+          expect($('[data-test="visit-restriction"]').text()).toBe('Closed')
+          expect($('[data-test="closed-visit-reason"]').text()).toContain(
+            'Closed visit as the prisoner has a closed visit restriction.'
+          )
         })
     })
 
