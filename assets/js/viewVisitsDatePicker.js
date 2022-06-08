@@ -1,20 +1,18 @@
-const voOverride = document.querySelector('#vo-override')
+const viewAnotherDateToggle = document.querySelector('.bapv-another-date__toggle button')
 
-if (voOverride) {
-  function setBookButtonState() {
-    const bookButton = document.querySelector('.govuk-button')
+if (viewAnotherDateToggle) {
+  function toggleDatePicker(event) {
+    const datePicker = document.querySelector('.bapv-another-date__form')
 
-    if (voOverride.checked) {
-      bookButton.removeAttribute('disabled')
-      bookButton.removeAttribute('aria-disabled')
-      bookButton.classList.remove('govuk-button--disabled')
+    if (datePicker.classList.contains('moj-js-hidden')) {
+      console.log('Found hiden')
+      viewAnotherDateToggle.setAttribute('aria-expanded', 'false')
+      datePicker.classList.remove('moj-js-hidden')
     } else {
-      bookButton.setAttribute('disabled', '')
-      bookButton.setAttribute('aria-disabled', 'true')
-      bookButton.classList.add('govuk-button--disabled')
+      viewAnotherDateToggle.setAttribute('aria-expanded', 'true')
+      datePicker.classList.add('moj-js-hidden')
     }
   }
 
-  setBookButtonState()
-  voOverride.addEventListener('change', setBookButtonState)
+  viewAnotherDateToggle.addEventListener('click', toggleDatePicker)
 }

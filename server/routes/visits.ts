@@ -142,7 +142,10 @@ export default function routes(
     const year = (req.body['date-picker-year'] as string).padStart(4, '0')
 
     const selectedDateString = getParsedDateFromQueryString(`${year}-${month}-${day}`)
-    const queryParams = new URLSearchParams({ selectedDate: selectedDateString }).toString()
+    const queryParams = new URLSearchParams({
+      selectedDate: selectedDateString,
+      firstTabDate: selectedDateString,
+    }).toString()
 
     return res.redirect(`/visits?${queryParams}`)
   })

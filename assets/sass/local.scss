@@ -143,3 +143,75 @@
 .bapv-extraspacing {
   line-height: 1.5;
 }
+
+.bapv-sub-navigation {
+  box-shadow: inset 0 -1px 0 govuk-colour("mid-grey");
+  display: flex;
+
+  & > ul {
+    flex: 3;
+  }
+
+  & > div {
+    flex: 1;
+    text-align: right;
+  }
+}
+
+.bapv-another-date {
+  position: relative;
+}
+
+.bapv-another-date__toggle {
+  button {
+    font-family: "GDS Transport",arial,sans-serif;
+    font-size: 19px;
+    border: 0;
+    background-color: govuk-colour("white");
+    color: #1d70b8;
+    padding: 12px 0;
+
+    &:focus {
+      background-color: #fd0;
+      color: #0b0c0c;
+      box-shadow: 0 0 #fd0, 0 4px #0b0c0c;
+      outline: none;
+      position: relative;
+      z-index: 1;
+    }
+  }
+}
+
+.bapv-another-date__form {
+  text-align: left;
+  position: absolute;
+  max-width: 350px;
+  right: 0;
+  top: 49px;
+  width: 350px;
+  z-index: 10;
+  border-left: 1px solid govuk-colour("mid-grey");
+  border-right: 1px solid govuk-colour("mid-grey");
+  border-bottom: 1px solid govuk-colour("mid-grey");
+  padding: 15px;
+
+  form {
+    display: flex;
+
+    & > div {
+      flex: 5;
+    }
+
+    & > button {
+      align-self: flex-end;
+    }
+  }
+
+  .govuk-button {
+    margin-bottom: 0;
+  }
+
+  .govuk-form-group {
+    margin-bottom: 0;
+  }
+}
