@@ -35,7 +35,7 @@ export default class NotificationsService {
         reference,
       })
     } catch (error) {
-      logger.error('Failed to send SMS', error)
+      logger.error(`Failed to send SMS (ref: ${reference})`, error.message)
 
       return false
     }
