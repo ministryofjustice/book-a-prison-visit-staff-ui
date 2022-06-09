@@ -127,7 +127,7 @@
                             text: "Name"
                         },
                         value: {
-                            text: visitor.name + " (" + (visitor.relationshipDescription | lower) + " of the prisoner)",
+                            text: visitor.name | safe+ " (" + (visitor.relationshipDescription | lower) + " of the prisoner)",
                             classes: "test-visitor-name" + loop.index
                         }
                     },
@@ -202,9 +202,9 @@
     <div class="govuk-grid-column-full">
         {% set contactName %}
         {% if mainContact.contactName %}
-        {{ mainContact.contactName }}
+        {{ mainContact.contactName | safe }}
         {% else %}
-        {{ mainContact.contact.name + " (" + (mainContact.contact.relationshipDescription | lower) + " of the prisoner)" }}
+        {{ mainContact.contact.name | safe + " (" + (mainContact.contact.relationshipDescription | lower) + " of the prisoner)" }}
         {% endif %}
         {% endset %}
         {{ govukSummaryList({
