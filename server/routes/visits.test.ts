@@ -5,6 +5,7 @@ import PrisonerSearchService from '../services/prisonerSearchService'
 import VisitSessionsService from '../services/visitSessionsService'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import { ExtendedVisitInformation, PrisonerDetailsItem, VisitsPageSlot } from '../@types/bapv'
+import { getParsedDateFromQueryString } from './visitsUtils'
 
 jest.mock('../services/prisonerSearchService')
 jest.mock('../services/visitSessionsService')
@@ -274,5 +275,37 @@ describe('GET /visits', () => {
         expect($('.govuk-back-link').attr('href')).toBe('/')
         expect($('#search-results-none').text()).toContain('No visit sessions on this day.')
       })
+  })
+})
+
+describe('POST /visits', () => {
+  it('should redirect to the selected date on the visits page for a valid date', () => {
+    const day = '1'
+    const month = '1'
+    const year = '2022'
+    const selectedDateString = getParsedDateFromQueryString(`${year}-${month}-${day}`)
+
+    return request(app)
+      .post('/visits')
+      .send(`date-picker-day=${day}`)
+      .send(`date-picker-month=${month}`)
+      .send(`date-picker-year=${year}`)
+      .expect(302)
+      .expect('location', `/visits?selectedDate=${selectedDateString}&firstTabDate=${selectedDateString}`)
+  })
+
+  it('should redirect to the current date on the visits page for an invalid date', () => {
+    const day = 'X'
+    const month = 'Y'
+    const year = '20D2'
+    const selectedDateString = getParsedDateFromQueryString(`${year}-${month}-${day}`)
+
+    return request(app)
+      .post('/visits')
+      .send(`date-picker-day=${day}`)
+      .send(`date-picker-month=${month}`)
+      .send(`date-picker-year=${year}`)
+      .expect(302)
+      .expect('location', `/visits?selectedDate=${selectedDateString}&firstTabDate=${selectedDateString}`)
   })
 })
