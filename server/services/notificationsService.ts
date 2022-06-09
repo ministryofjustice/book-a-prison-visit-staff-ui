@@ -26,7 +26,7 @@ export default class NotificationsService {
     const visitDate = format(parsedDate, 'd MMMM yyyy')
 
     try {
-      const a = await notificationsApiClient.sendSms({
+      await notificationsApiClient.sendSms({
         phoneNumber,
         prisonName,
         visitTime,
@@ -34,7 +34,6 @@ export default class NotificationsService {
         visitDate,
         reference,
       })
-      console.log(a)
     } catch (error) {
       logger.error('Failed to send SMS', error)
 
