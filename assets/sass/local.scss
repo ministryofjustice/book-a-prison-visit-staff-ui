@@ -143,3 +143,82 @@
 .bapv-extraspacing {
   line-height: 1.5;
 }
+
+.bapv-sub-navigation {
+  box-shadow: inset 0 -1px 0 govuk-colour("mid-grey");
+  display: flex;
+
+  & > ul {
+    flex: 3;
+  }
+
+  & > div {
+    flex: 1;
+    text-align: right;
+  }
+}
+
+.bapv-another-date {
+  position: relative;
+}
+
+.bapv-another-date__toggle {
+  button {
+    @include govuk-font($size: 19, $weight: "normal");
+    border: 0;
+    background-color: transparent;
+    color: govuk-colour("blue");
+    padding: 12px 0;
+
+    & svg {
+      margin-top: -8px;
+      display: inline-block;
+      height: govuk-spacing(6);
+      margin-left: govuk-spacing(2);
+      vertical-align: middle;
+      width: govuk-spacing(6);
+      fill: currentColor;
+    }
+
+    &:focus {
+      background-color: govuk-colour("yellow");
+      color: govuk-colour("black");
+      outline: none;
+      box-shadow: 0 -4px 0 govuk-colour("black") inset;
+    }
+  }
+}
+
+.bapv-another-date__form {
+  text-align: left;
+  position: absolute;
+  max-width: 350px;
+  right: 0;
+  top: 49px;
+  width: 350px;
+  z-index: 10;
+  border-left: 1px solid govuk-colour("mid-grey");
+  border-right: 1px solid govuk-colour("mid-grey");
+  border-bottom: 1px solid govuk-colour("mid-grey");
+  padding: govuk-spacing(3);
+
+  form {
+    display: flex;
+
+    & > div {
+      flex: 5;
+    }
+
+    & > button {
+      align-self: flex-end;
+    }
+  }
+
+  .govuk-button {
+    margin-bottom: 0;
+  }
+
+  .govuk-form-group {
+    margin-bottom: 0;
+  }
+}
