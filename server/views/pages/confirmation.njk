@@ -143,9 +143,9 @@
         <h2 class="govuk-heading-m">Contact details</h2>
         {% set contactName %}
         {% if mainContact.contactName %}
-        {{ mainContact.contactName }}
+        {{ mainContact.contactName | safe }}
         {% else %}
-        {{ mainContact.contact.name + " (" + (mainContact.contact.relationshipDescription | lower) + " of the prisoner)" }}
+        {{ mainContact.contact.name | safe + " (" + (mainContact.contact.relationshipDescription | lower) + " of the prisoner)" }}
         {% endif %}
         {% endset %}
         {{ govukSummaryList({
