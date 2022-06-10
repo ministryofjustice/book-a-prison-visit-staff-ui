@@ -5,6 +5,7 @@ import { format, parseISO } from 'date-fns'
 import path from 'path'
 import { FormError } from '../@types/bapv'
 import { properCaseFullName } from './utils'
+import config from '../config'
 
 const production = process.env.NODE_ENV === 'production'
 
@@ -13,6 +14,7 @@ export default function nunjucksSetup(app: express.Express): void {
 
   app.locals.asset_path = '/assets/'
   app.locals.applicationName = 'Book A Prison Visit Staff Ui'
+  app.locals.dpsHome = config.dpsHome
 
   // Cachebusting version string
   if (production) {
