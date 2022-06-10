@@ -18,188 +18,18 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-        <h2 class="govuk-heading-m">Prisoner details</h2>
-        {{ govukSummaryList({
-            rows: [
-                {
-                    key: {
-                        text: "Name"
-                    },
-                    value: {
-                        text: prisoner.name,
-                        classes: "test-prisoner-name"
-                    }
-                },
-                {
-                    key: {
-                        text: "Prison number"
-                    },
-                    value: {
-                        text: prisoner.offenderNo,
-                        classes: "test-prisoner-offenderno"
-                    }
-                },
-                {
-                    key: {
-                        text: "Date of birth"
-                    },
-                    value: {
-                        text: prisoner.dateOfBirth,
-                        classes: "test-prisoner-dateofbirth"
-                    }
-                },
-                {
-                    key: {
-                        text: "Location"
-                    },
-                    value: {
-                        text: prisoner.location,
-                        classes: "test-prisoner-location"
-                    }
-                }
-            ]
-        }) }}
+        <p><span class="govuk-!-font-weight-bold">Prisoner details:</span> <span class="test-prisoner-name">{{ prisoner.name }}</span></p>
     </div>
 </div>
 
 <div class="govuk-grid-row">
-    <div class="govuk-grid-column-one-half">
+    <div class="govuk-grid-column-full">
         <h2 class="govuk-heading-m">Visit details</h2>
-    </div>
-    <div class="govuk-grid-column-one-half bapv-change-details-link">
-        <a href="/book-a-visit/select-date-and-time" class="govuk-link">Change</a>
-    </div>
-</div>
 
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
-        {{ govukSummaryList({
-            rows: [
-                {
-                    key: {
-                        text: "Date"
-                    },
-                    value: {
-                        text: visit.startTimestamp | formatDate("EEEE d MMMM yyyy"),
-                        classes: "test-visit-date"
-                    }
-                },
-                {
-                    key: {
-                        text: "Time"
-                    },
-                    value: {
-                        text: visit.startTimestamp | formatTime + " to " + visit.endTimestamp | formatTime,
-                        classes: "test-visit-time"
-                    }
-                },
-                {
-                    key: {
-                        text: "Visit type"
-                    },
-                    value: {
-                        text: visitRestriction | capitalize,
-                        classes: "test-visit-type"
-                    }
-                }
-            ]
-        }) }}
-    </div>
-</div>
+        {% set additionalSupportRows %}
+        {% if additionalSupport | length %}{{ additionalSupport | join(", ") }}{% else %}None{% endif %}
+        {% endset %}
 
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-one-half">
-        <h2 class="govuk-heading-m">Visitor details</h2>
-    </div>
-    <div class="govuk-grid-column-one-half bapv-change-details-link">
-        <a href="/book-a-visit/select-visitors" class="govuk-link">Change</a>
-    </div>
-</div>
-
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
-        {%- for visitor in visitors %}
-            <h3 class="govuk-heading-m">Visitor {{ loop.index }}</h3>
-            {{ govukSummaryList({
-                rows: [
-                    {
-                        key: {
-                            text: "Name"
-                        },
-                        value: {
-                            text: visitor.name | safe+ " (" + (visitor.relationshipDescription | lower) + " of the prisoner)",
-                            classes: "test-visitor-name" + loop.index
-                        }
-                    },
-                    {
-                        key: {
-                            text: "Address"
-                        },
-                        value: {
-                            text: visitor.address | replace("<br>", " "),
-                            classes: "test-visitor-address" + loop.index
-                        }
-                    }
-                ]
-            }) }}
-        {% endfor %}
-    </div>
-</div>
-
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-one-half">
-        <h2 class="govuk-heading-m">Additional support requests</h2>
-    </div>
-    <div class="govuk-grid-column-one-half bapv-change-details-link">
-        <a href="/book-a-visit/additional-support" class="govuk-link">Change</a>
-    </div>
-</div>
-
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
-        {% set additionalSupportRows = [] %}
-        {% for item in additionalSupport %}
-          {% set additionalSupportRows = (additionalSupportRows.push(
-            {
-              key: {
-                text: "Request " + loop.index
-              },
-              value: {
-                text: item,
-                classes: "test-additional-support" + loop.index
-              }
-            }
-          ), additionalSupportRows) %}
-        {% else %}
-          {% set additionalSupportRows = (additionalSupportRows.push(
-            {
-              key: {
-                text: "Request 1"
-              },
-              value: {
-                text: "None",
-                classes: "test-additional-support1"
-              }
-            }
-          ), additionalSupportRows) %}
-        {% endfor %}
-        {{ govukSummaryList({
-            rows: additionalSupportRows
-        }) }}
-    </div>
-</div>
-
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-one-half">
-        <h2 class="govuk-heading-m">Contact details</h2>
-    </div>
-    <div class="govuk-grid-column-one-half bapv-change-details-link">
-        <a href="/book-a-visit/select-main-contact" class="govuk-link">Change</a>
-    </div>
-</div>
-
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
         {% set contactName %}
         {% if mainContact.contactName %}
         {{ mainContact.contactName | safe }}
@@ -207,27 +37,128 @@
         {{ mainContact.contact.name | safe + " (" + (mainContact.contact.relationshipDescription | lower) + " of the prisoner)" }}
         {% endif %}
         {% endset %}
-        {{ govukSummaryList({
-            rows: [
-                {
-                    key: {
-                        text: "Main contact"
-                    },
-                    value: {
-                        text: contactName,
-                        classes: "test-main-contact-name"
-                    }
+
+        {% set displayRows = [
+            {
+                key: {
+                    text: "Date"
                 },
+                value: {
+                    text: visit.startTimestamp | formatDate("EEEE d MMMM yyyy"),
+                    classes: "test-visit-date"
+                },
+                actions: {
+                    items: [
+                        {
+                            href: "/book-a-visit/select-date-and-time",
+                            text: "Change",
+                            visuallyHiddenText: "Main contact"
+                        }
+                    ]
+                }
+            },
+            {
+                key: {
+                    text: "Time"
+                },
+                value: {
+                    text: visit.startTimestamp | formatTime + " to " + visit.endTimestamp | formatTime,
+                    classes: "test-visit-time"
+                },
+                actions: {
+                    items: [
+                        {
+                            href: "/book-a-visit/select-date-and-time",
+                            text: "Change",
+                            visuallyHiddenText: "Main contact"
+                        }
+                    ]
+                }
+            },
+            {
+                key: {
+                    text: "Visit type"
+                },
+                value: {
+                    text: visitRestriction | capitalize,
+                    classes: "test-visit-type"
+                },
+                actions: {
+                    items: [
+                        {
+                            href: "/book-a-visit/select-date-and-time",
+                            text: "Change",
+                            visuallyHiddenText: "Main contact"
+                        }
+                    ]
+                }
+            }
+        ] %}
+
+        {%- for visitor in visitors %}
+            {% set displayRows = (displayRows.push(
                 {
                     key: {
-                        text: "Phone number"
+                        text: 'Visitor ' + loop.index
                     },
                     value: {
-                        text: mainContact.phoneNumber,
-                        classes: "test-main-contact-number"
+                        html: '<p><span class="test-visitor-name' + loop.index + '">' + visitor.name | safe+ " (" + (visitor.relationshipDescription | lower) + ' of the prisoner)</span><br><span class="test-visitor-address' + loop.index + '">' + visitor.address | replace("<br>", " ") + "</span>"
+                    },
+                    actions: {
+                        items: [
+                            {
+                                href: "/book-a-visit/select-visitors",
+                                text: "Change",
+                                visuallyHiddenText: "Visitors"
+                            }
+                        ]
                     }
                 }
-            ]
+            ), displayRows) %}
+        {% endfor %}
+
+        {% set displayRows = (displayRows.push(
+            {
+                key: {
+                    text: "Additional support requests"
+                },
+                value: {
+                    html: '<p class="test-additional-support">' + additionalSupportRows + '</p>'
+                },
+                actions: {
+                    items: [
+                        {
+                            href: "/book-a-visit/additional-support",
+                            text: "Change",
+                            visuallyHiddenText: "Additional support requests"
+                        }
+                    ]
+                }
+            }
+        ), displayRows) %}
+
+        {% set displayRows = (displayRows.push(
+            {
+                key: {
+                    text: "Main contact"
+                },
+                value: {
+                    html: '<p><span class="test-main-contact-name">' + contactName + '</span><br><span class="test-main-contact-number">' + mainContact.phoneNumber + "</span></p>"
+                },
+                actions: {
+                    items: [
+                        {
+                            href: "/book-a-visit/select-main-contact",
+                            text: "Change",
+                            visuallyHiddenText: "Main contact"
+                        }
+                    ]
+                }
+            }
+        ), displayRows) %}
+
+        {{ govukSummaryList({
+            rows: displayRows
         }) }}
     </div>
 </div>
