@@ -11,9 +11,12 @@ export default function createErrorHandler(production: boolean) {
       return res.redirect('/sign-out')
     }
 
-    res.locals.message = production
-      ? 'Something went wrong. The error has been logged. Please try again'
-      : error.message
+    const prodMessage =
+      error.status === 404
+        ? 'The page you were looking for could not be found. Please check the address and try again.'
+        : 'Something went wrong. The error has been logged. Please try again'
+
+    res.locals.message = production ? prodMessage : error.message
     res.locals.status = error.status
     res.locals.stack = production ? null : error.stack
 

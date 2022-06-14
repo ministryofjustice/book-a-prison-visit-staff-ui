@@ -20,7 +20,9 @@ describe('GET 404', () => {
       .expect('Content-Type', /html/)
       .expect(res => {
         expect(res.text).toContain('NotFoundError: Not found')
-        expect(res.text).not.toContain('Something went wrong. The error has been logged. Please try again')
+        expect(res.text).not.toContain(
+          'The page you were looking for could not be found. Please check the address and try again.'
+        )
       })
   })
 
@@ -32,7 +34,9 @@ describe('GET 404', () => {
       .expect(404)
       .expect('Content-Type', /html/)
       .expect(res => {
-        expect(res.text).toContain('Something went wrong. The error has been logged. Please try again')
+        expect(res.text).toContain(
+          'The page you were looking for could not be found. Please check the address and try again.'
+        )
         expect(res.text).not.toContain('NotFoundError: Not found')
       })
   })
