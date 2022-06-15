@@ -106,7 +106,7 @@ describe('prisonSearchClientBuilder', () => {
     it('should return data from api with the multiple pages', async () => {
       const prisonerNumbers = []
       const results = []
-      const numberOfResults = 15
+      const numberOfResults = Math.ceil(config.apis.prisonerSearch.pageSize * 1.5)
 
       for (let index = 0; index < numberOfResults; index += 1) {
         const numericPart = index.toString().padStart(4, '0')
