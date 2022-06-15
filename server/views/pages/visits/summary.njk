@@ -100,11 +100,11 @@
             },
             previous: {
               text: 'Previous',
-              href: backLinkHref + '?' + queryParams + '&page=' + previous
+              href: '/visits?' + queryParams + '&page=' + previous
             } if numberOfResults > 10,
             next: {
               text: 'Next',
-              href: backLinkHref + '?' + queryParams + '&page=' + next
+              href: '/visits?' + queryParams + '&page=' + next
             } if numberOfResults > 10,
             items: pageLinks if numberOfResults > 10
           }) }}
