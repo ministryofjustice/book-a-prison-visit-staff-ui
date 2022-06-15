@@ -477,12 +477,13 @@ export default function routes(
         reference: visitSessionData.visitReference,
       })
     } catch (error) {
-      req.flash('errors', [
+      const errorMessage = [
         {
-          msg: 'Failed to send SMS',
+          msg: 'Unfortunately an SMS was not sent to the contact number. This could be due to it being a landline number or another issue.',
           param: 'id',
         },
-      ])
+      ]
+      req.flash('errors', errorMessage as [])
     }
 
     return res.redirect('/book-a-visit/confirmation')

@@ -1,7 +1,7 @@
 import { format } from 'date-fns'
+import { SmsResponse } from 'notifications-node-client'
 import { VisitSlot } from '../@types/bapv'
 import NotificationsApiClient from '../data/notificationsApiClient'
-import logger from '../../logger'
 
 type NotificationsApiClientBuilder = () => NotificationsApiClient
 
@@ -18,28 +18,20 @@ export default class NotificationsService {
     prisonName: string
     visit: VisitSlot
     reference: string
-  }): Promise<boolean> {
+  }): Promise<SmsResponse> {
     const notificationsApiClient = this.notificationsApiClientBuilder()
     const parsedDate = new Date(visit.startTimestamp)
     const visitTime = format(parsedDate, 'h:mmaaa')
     const visitDay = format(parsedDate, 'EEEE')
     const visitDate = format(parsedDate, 'd MMMM yyyy')
 
-    try {
-      await notificationsApiClient.sendSms({
-        phoneNumber,
-        prisonName,
-        visitTime,
-        visitDay,
-        visitDate,
-        reference,
-      })
-    } catch (error) {
-      logger.error(`Failed to send SMS (ref: ${reference})`, error.message)
-
-      return false
-    }
-
-    return true
+    return notificationsApiClient.sendSms({
+      phoneNumber,
+      prisonName,
+      visitTime,
+      visitDay,
+      visitDate,
+      reference,
+    })
   }
 }
