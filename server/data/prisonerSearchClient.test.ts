@@ -73,7 +73,7 @@ describe('prisonSearchClientBuilder', () => {
   })
 
   describe('getPrisonersByPrisonerNumbers', () => {
-    it('should return data from api', async () => {
+    it('should return data from api with the a single page', async () => {
       const prisonerNumbers = ['A1234BC', 'B1234CD']
       const results = [
         {
@@ -100,6 +100,49 @@ describe('prisonSearchClientBuilder', () => {
         totalPages: 1,
         totalElements: 2,
         content: results,
+      })
+    })
+
+    it('should return data from api with the multiple pages', async () => {
+      const prisonerNumbers = []
+      const results = []
+      const numberOfResults = 15
+
+      for (let index = 0; index < numberOfResults; index += 1) {
+        const numericPart = index.toString().padStart(4, '0')
+        prisonerNumbers.push(`A${numericPart}BC`)
+        results.push({
+          lastName: `lastName${numericPart}`,
+          firstName: `firstName${numericPart}`,
+          prisonerNumber: `A${numericPart}BC`,
+          dateOfBirth: '2000-01-01',
+        })
+      }
+
+      fakePrisonerSearchApi
+        .post('/prisoner-search/prisoner-numbers', `{"prisonerNumbers":${JSON.stringify(prisonerNumbers)}}`)
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, results)
+
+      const page1 = await client.getPrisonersByPrisonerNumbers(prisonerNumbers)
+
+      expect(page1).toEqual({
+        totalPages: Math.ceil(numberOfResults / config.apis.prisonerSearch.pageSize),
+        totalElements: numberOfResults,
+        content: results.slice(0, config.apis.prisonerSearch.pageSize),
+      })
+
+      fakePrisonerSearchApi
+        .post('/prisoner-search/prisoner-numbers', `{"prisonerNumbers":${JSON.stringify(prisonerNumbers)}}`)
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, results)
+
+      const page2 = await client.getPrisonersByPrisonerNumbers(prisonerNumbers, 1)
+
+      expect(page2).toEqual({
+        totalPages: Math.ceil(numberOfResults / config.apis.prisonerSearch.pageSize),
+        totalElements: numberOfResults,
+        content: results.slice(config.apis.prisonerSearch.pageSize),
       })
     })
   })

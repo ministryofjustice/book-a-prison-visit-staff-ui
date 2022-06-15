@@ -43,7 +43,7 @@ class PrisonerSearchClient {
 
   async getPrisonersByPrisonerNumbers(
     prisonerNumbers: string[],
-    page = 1
+    page = 0
   ): Promise<{ totalPages: number; totalElements: number; content: Prisoner[] }> {
     const allResults: Prisoner[] = await this.restClient.post({
       path: '/prisoner-search/prisoner-numbers',
@@ -56,14 +56,16 @@ class PrisonerSearchClient {
     const totalPages = Math.ceil(totalElements / this.pageSize)
     let actualPage = 1
 
-    if (page > 0 || page <= totalPages) {
-      actualPage = page
+    if (page >= 0 && page < totalPages) {
+      actualPage = page + 1
     }
+
+    const startIndex = (actualPage - 1) * this.pageSize
 
     return {
       totalPages,
       totalElements,
-      content: allResults.slice((actualPage - 1) * this.pageSize, this.pageSize),
+      content: allResults.slice(startIndex, startIndex + this.pageSize),
     }
   }
 }
