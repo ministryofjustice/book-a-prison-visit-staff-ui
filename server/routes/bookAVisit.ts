@@ -469,12 +469,21 @@ export default function routes(
       })
     }
 
-    await notificationsService.sendSms({
-      phoneNumber: visitSessionData.mainContact.phoneNumber,
-      visit: visitSessionData.visit,
-      prisonName: 'Hewell',
-      reference: visitSessionData.visitReference,
-    })
+    try {
+      await notificationsService.sendSms({
+        phoneNumber: visitSessionData.mainContact.phoneNumber,
+        visit: visitSessionData.visit,
+        prisonName: 'Hewell',
+        reference: visitSessionData.visitReference,
+      })
+    } catch (error) {
+      req.flash('errors', [
+        {
+          msg: 'Failed to send SMS',
+          param: 'id',
+        },
+      ])
+    }
 
     return res.redirect('/book-a-visit/confirmation')
   })
@@ -495,7 +504,9 @@ export default function routes(
 
     clearSession(req)
 
-    res.render('pages/confirmation')
+    res.render('pages/confirmation', {
+      errors: req.flash('errors'),
+    })
   })
 
   return router
