@@ -9,6 +9,7 @@ import { clearSession, getFlashFormValues, getSelectedSlot, getSupportTypeDescri
 import { SupportType, VisitorSupport } from '../data/visitSchedulerApiTypes'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import NotificationsService from '../services/notificationsService'
+import logger from '../../logger'
 
 export default function routes(
   router: Router,
@@ -477,13 +478,9 @@ export default function routes(
         reference: visitSessionData.visitReference,
       })
     } catch (error) {
-      const errorMessage = [
-        {
-          msg: 'Unfortunately an SMS was not sent to the contact number. This could be due to it being a landline number or another issue.',
-          param: 'id',
-        },
-      ]
-      req.flash('errors', errorMessage as [])
+      logger.error(
+        `Failed to send SMS to ${visitSessionData.mainContact.phoneNumber} for booking ${visitSessionData.visitReference}`
+      )
     }
 
     return res.redirect('/book-a-visit/confirmation')
@@ -505,9 +502,7 @@ export default function routes(
 
     clearSession(req)
 
-    res.render('pages/confirmation', {
-      errors: req.flash('errors'),
-    })
+    res.render('pages/confirmation')
   })
 
   return router

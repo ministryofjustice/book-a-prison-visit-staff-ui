@@ -11,7 +11,7 @@
 
 {% block content %}
   <div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
+    <div class="govuk-grid-column-two-thirds">
         {% include "partials/errorSummary.njk" %}
         <form action="/book-a-visit/select-main-contact" method="POST" novalidate>
             <input type="hidden" name="_csrf" value="{{ csrfToken }}">
@@ -74,7 +74,7 @@
                     isPageHeading: false
                 },
                 hint: {
-                    text: "Phone number"
+                    text: "If this is a UK mobile number, the main contact will receive a text message with the booking reference and visit details"
                 },
                 classes: "govuk-!-width-one-third",
                 id: "phoneNumber",
