@@ -479,6 +479,7 @@ export default function routes(
           prisonName: 'Hewell',
           reference: visitSessionData.visitReference,
         })
+        logger.info(`SMS sent for ${visitSessionData.visitReference}`)
       } catch (error) {
         logger.error(
           `Failed to send SMS to ${visitSessionData.mainContact.phoneNumber} for booking ${visitSessionData.visitReference}`
