@@ -129,6 +129,7 @@ export default {
       agent: new AgentConfig(Number(get('WHEREABOUTS_API_TIMEOUT_RESPONSE', 10000))),
     },
     notifications: {
+      enabled: get('SMS_NOTIFICATIONS_ENABLED', 'false', requiredInProduction) === 'true',
       key: get('GOVUK_NOTIFY_API_KEY', 'abcd', requiredInProduction),
       templates: {
         bookingConfirmation: '85904166-e539-43f5-9f51-7ba106cc61bd',

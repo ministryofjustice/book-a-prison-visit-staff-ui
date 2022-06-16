@@ -9,6 +9,7 @@ import { clearSession, getFlashFormValues, getSelectedSlot, getSupportTypeDescri
 import { SupportType, VisitorSupport } from '../data/visitSchedulerApiTypes'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import NotificationsService from '../services/notificationsService'
+import config from '../config'
 import logger from '../../logger'
 
 export default function routes(
@@ -470,17 +471,19 @@ export default function routes(
       })
     }
 
-    try {
-      await notificationsService.sendSms({
-        phoneNumber: visitSessionData.mainContact.phoneNumber,
-        visit: visitSessionData.visit,
-        prisonName: 'Hewell',
-        reference: visitSessionData.visitReference,
-      })
-    } catch (error) {
-      logger.error(
-        `Failed to send SMS to ${visitSessionData.mainContact.phoneNumber} for booking ${visitSessionData.visitReference}`
-      )
+    if (config.apis.notifications.enabled) {
+      try {
+        await notificationsService.sendSms({
+          phoneNumber: visitSessionData.mainContact.phoneNumber,
+          visit: visitSessionData.visit,
+          prisonName: 'Hewell',
+          reference: visitSessionData.visitReference,
+        })
+      } catch (error) {
+        logger.error(
+          `Failed to send SMS to ${visitSessionData.mainContact.phoneNumber} for booking ${visitSessionData.visitReference}`
+        )
+      }
     }
 
     return res.redirect('/book-a-visit/confirmation')
