@@ -473,8 +473,10 @@ export default function routes(
 
     if (config.apis.notifications.enabled) {
       try {
+        const phoneNumber = visitSessionData.mainContact.phoneNumber.replace(/\s/g, '')
+
         await notificationsService.sendSms({
-          phoneNumber: visitSessionData.mainContact.phoneNumber,
+          phoneNumber,
           visit: visitSessionData.visit,
           prisonName: 'Hewell',
           reference: visitSessionData.visitReference,
