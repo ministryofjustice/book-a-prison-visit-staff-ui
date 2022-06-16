@@ -478,7 +478,7 @@ export default function routes(
         await notificationsService.sendSms({
           phoneNumber,
           visit: visitSessionData.visit,
-          prisonName: 'Hewell',
+          prisonName: 'Hewell (HMP)',
           reference: visitSessionData.visitReference,
         })
         logger.info(`SMS sent for ${visitSessionData.visitReference}`)

@@ -64,7 +64,7 @@ describe('prisonApiClient', () => {
         inactiveAlertCount: 3,
         assignedLivingUnit: {
           description: '1-1-C-028',
-          agencyName: 'HMP Hewell',
+          agencyName: 'Hewell (HMP)',
         },
         legalStatus: 'SENTENCED',
         privilegeSummary: {
