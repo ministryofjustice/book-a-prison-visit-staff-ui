@@ -44,7 +44,7 @@ describe('GET /visit/:reference', () => {
       lastName: 'SMITH',
       prisonerNumber: 'A1234BC',
       dateOfBirth: '1975-04-02',
-      prisonName: 'HMP Hewell',
+      prisonName: 'Hewell (HMP)',
       cellLocation: '1-1-C-028',
       restrictedPatient: false,
     }
@@ -141,7 +141,7 @@ describe('GET /visit/:reference', () => {
         expect($('[data-test="prisoner-name"]').text()).toBe('Smith, John')
         expect($('[data-test="prisoner-number"]').text()).toBe('A1234BC')
         expect($('[data-test="prisoner-dob"]').text()).toBe('2 April 1975')
-        expect($('[data-test="prisoner-location"]').text()).toBe('1-1-C-028, HMP Hewell')
+        expect($('[data-test="prisoner-location"]').text()).toBe('1-1-C-028, Hewell (HMP)')
         // visit details
         expect($('[data-test="visit-date"]').text()).toBe('9 February 2022')
         expect($('[data-test="visit-time"]').text()).toBe('10am to 11:15am')
@@ -177,7 +177,7 @@ describe('GET /visit/:reference', () => {
       lastName: 'SMITH',
       prisonerNumber: 'A1234BC',
       dateOfBirth: '1975-04-02',
-      prisonName: 'HMP Hewell',
+      prisonName: 'Hewell (HMP)',
       cellLocation: '1-1-C-028',
       restrictedPatient: false,
     }
@@ -276,7 +276,7 @@ describe('GET /visit/:reference', () => {
         expect($('[data-test="prisoner-name"]').text()).toBe('Smith, John')
         expect($('[data-test="prisoner-number"]').text()).toBe('A1234BC')
         expect($('[data-test="prisoner-dob"]').text()).toBe('2 April 1975')
-        expect($('[data-test="prisoner-location"]').text()).toBe('1-1-C-028, HMP Hewell')
+        expect($('[data-test="prisoner-location"]').text()).toBe('1-1-C-028, Hewell (HMP)')
         // visit details
         expect($('[data-test="visit-date"]').text()).toBe('9 February 2022')
         expect($('[data-test="visit-time"]').text()).toBe('10am to 11:15am')

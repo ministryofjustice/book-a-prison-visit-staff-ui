@@ -107,7 +107,7 @@ describe('GET /prisoner/A1234BC', () => {
         legalStatus: 'SENTENCED',
         assignedLivingUnit: {
           description: '1-1-C-028',
-          agencyName: 'HMP Hewell',
+          agencyName: 'Hewell (HMP)',
         },
         category: 'Cat C',
         privilegeSummary: {
@@ -144,7 +144,7 @@ describe('GET /prisoner/A1234BC', () => {
         )
         expect($('[data-test="prison-number"]').text()).toBe('A1234BC')
         expect($('[data-test="dob"]').text()).toBe('12 October 1980')
-        expect($('[data-test="location"]').text()).toBe('1-1-C-028, HMP Hewell')
+        expect($('[data-test="location"]').text()).toBe('1-1-C-028, Hewell (HMP)')
         expect($('[data-test="category"]').text()).toBe('Cat C')
         expect($('[data-test="iep-level"]').text()).toBe('Standard')
         expect($('[data-test="convicted-status"]').text()).toBe('Convicted')
@@ -273,7 +273,7 @@ describe('POST /prisoner/A1234BC', () => {
     legalStatus: 'SENTENCED',
     assignedLivingUnit: {
       description: '1-1-C-028',
-      agencyName: 'HMP Hewell',
+      agencyName: 'Hewell (HMP)',
     },
   } as InmateDetail
 
@@ -300,7 +300,7 @@ describe('POST /prisoner/A1234BC', () => {
             name: 'Smith, John',
             offenderNo: 'A1234BC',
             dateOfBirth: '2 April 1975',
-            location: '1-1-C-028, HMP Hewell',
+            location: '1-1-C-028, Hewell (HMP)',
           },
         })
       })
@@ -326,7 +326,7 @@ describe('POST /prisoner/A1234BC', () => {
             name: 'Smith, John',
             offenderNo: 'A1234BC',
             dateOfBirth: '2 April 1975',
-            location: '1-1-C-028, HMP Hewell',
+            location: '1-1-C-028, Hewell (HMP)',
           },
         })
       })
