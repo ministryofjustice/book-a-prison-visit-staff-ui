@@ -13,6 +13,8 @@ import errorHandler from './errorHandler'
 import standardRouter from './routes/standardRouter'
 import type UserService from './services/userService'
 import { prisonerSearchClientBuilder } from './data/prisonerSearchClient'
+import { notificationsApiClientBuilder } from './data/notificationsApiClient'
+import NotificationsService from './services/notificationsService'
 import PrisonerSearchService from './services/prisonerSearchService'
 import { visitSchedulerApiClientBuilder } from './data/visitSchedulerApiClient'
 import { whereaboutsApiClientBuilder } from './data/whereaboutsApiClient'
@@ -95,7 +97,8 @@ export default function createApp(userService: UserService): express.Application
         visitSchedulerApiClientBuilder,
         prisonerContactRegistryApiClientBuilder,
         systemToken
-      )
+      ),
+      new NotificationsService(notificationsApiClientBuilder)
     )
   )
   app.use(

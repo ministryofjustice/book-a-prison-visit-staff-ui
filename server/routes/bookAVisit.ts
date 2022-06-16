@@ -8,12 +8,16 @@ import VisitSessionsService from '../services/visitSessionsService'
 import { clearSession, getFlashFormValues, getSelectedSlot, getSupportTypeDescriptions } from './visitorUtils'
 import { SupportType, VisitorSupport } from '../data/visitSchedulerApiTypes'
 import asyncMiddleware from '../middleware/asyncMiddleware'
+import NotificationsService from '../services/notificationsService'
+import config from '../config'
+import logger from '../../logger'
 
 export default function routes(
   router: Router,
   prisonerVisitorsService: PrisonerVisitorsService,
   visitSessionsService: VisitSessionsService,
-  prisonerProfileService: PrisonerProfileService
+  prisonerProfileService: PrisonerProfileService,
+  notificationsService: NotificationsService
 ): Router {
   const get = (path: string, ...handlers: RequestHandler[]) =>
     router.get(
@@ -465,6 +469,24 @@ export default function routes(
         visitors: visitSessionData.visitors,
         additionalSupport,
       })
+    }
+
+    if (config.apis.notifications.enabled) {
+      try {
+        const phoneNumber = visitSessionData.mainContact.phoneNumber.replace(/\s/g, '')
+
+        await notificationsService.sendSms({
+          phoneNumber,
+          visit: visitSessionData.visit,
+          prisonName: 'Hewell',
+          reference: visitSessionData.visitReference,
+        })
+        logger.info(`SMS sent for ${visitSessionData.visitReference}`)
+      } catch (error) {
+        logger.error(
+          `Failed to send SMS to ${visitSessionData.mainContact.phoneNumber} for booking ${visitSessionData.visitReference}`
+        )
+      }
     }
 
     return res.redirect('/book-a-visit/confirmation')

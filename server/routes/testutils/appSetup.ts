@@ -20,6 +20,8 @@ import { prisonerContactRegistryApiClientBuilder } from '../../data/prisonerCont
 import PrisonerProfileService from '../../services/prisonerProfileService'
 import PrisonerVisitorsService from '../../services/prisonerVisitorsService'
 import VisitSessionsService from '../../services/visitSessionsService'
+import { notificationsApiClientBuilder } from '../../data/notificationsApiClient'
+import NotificationsService from '../../services/notificationsService'
 import * as auth from '../../authentication/auth'
 import systemToken from '../../data/authClient'
 import { SystemToken, VisitorListItem, VisitSlotList, VisitSessionData } from '../../@types/bapv'
@@ -128,13 +130,15 @@ function appSetup(
   const prisonerVisitorsService =
     prisonerVisitorsServiceOverride ||
     new PrisonerVisitorsService(prisonerContactRegistryApiClientBuilder, systemTokenTest)
+  const notificationsService = new NotificationsService(notificationsApiClientBuilder)
   app.use(
     '/book-a-visit/',
     bookAVisitRoutes(
       standardRouter(new MockUserService()),
       prisonerVisitorsService,
       visitSessionsService,
-      prisonerProfileService
+      prisonerProfileService,
+      notificationsService
     )
   )
   app.use('/visit/', visitRoutes(standardRouter(new MockUserService()), prisonerSearchService, visitSessionsService))
