@@ -13,7 +13,7 @@ export default function nunjucksSetup(app: express.Express): void {
   app.set('view engine', 'njk')
 
   app.locals.asset_path = '/assets/'
-  app.locals.applicationName = 'Book A Prison Visit Staff Ui'
+  app.locals.applicationName = 'Manage prison visits'
   app.locals.dpsHome = config.dpsHome
 
   // Cachebusting version string
