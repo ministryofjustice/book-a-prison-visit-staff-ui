@@ -90,7 +90,7 @@
     <div class="govuk-grid-column-three-quarters">
       <h2 class="govuk-heading-m"><span data-test="visit-room">{% if visitType == 'OPEN' %}Main{% else %}Closed{% endif %}</span> visits room, <span data-test="visit-time">{{ slotTime }}</span></h2>
       <p><span data-test="visit-tables-booked">{{ numberOfResults }} of {{ maxSlots }}</span> tables booked</p>
-      <p><span data-test="visit-visitors-total">{{ totals.visitors }}</span> visitors in total (<span data-test="visit-adults">{{ totals.adults }}</span> adult{% if totals.adults != 1 %}s{% endif %} and <span data-test="visit-children">{{ totals.children }}</span> child{% if (totals.children != 1) %}ren{% endif %})</p>
+      <p><span data-test="visit-visitors-total">{{ totals.visitors }}</span> visitor{% if totals.visitors != 1 %}s{% endif %} (<span data-test="visit-adults">{{ totals.adults }}</span> adult{% if totals.adults != 1 %}s{% endif %} and <span data-test="visit-children">{{ totals.children }}</span> child{% if (totals.children != 1) %}ren{% endif %})</p>
         {% set pagination %}
           {{ mojPagination({
             results: {
@@ -130,7 +130,7 @@
       </div>
     {% else %}
       <div class="govuk-grid-column-full">
-        <p class="govuk-!-margin-top-6 govuk-!-margin-bottom-6" id="search-results-none">No visit sessions on this day.</p>
+        <p class="govuk-!-margin-top-0" id="search-results-none">No visit sessions on this day.</p>
       </div>
     {% endif %}
   </div>
