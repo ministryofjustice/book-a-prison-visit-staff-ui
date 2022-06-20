@@ -55,7 +55,7 @@ const apiChecks = [
         service(
           'tokenVerification',
           `${config.apis.tokenVerification.url}/health/ping`,
-          config.apis.tokenVerification.agent
+          config.apis.tokenVerification.agent,
         ),
       ]
     : []),

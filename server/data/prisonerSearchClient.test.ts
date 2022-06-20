@@ -36,7 +36,7 @@ describe('prisonSearchClientBuilder', () => {
       fakePrisonerSearchApi
         .post(
           '/keyword',
-          `{"orWords":"test","fuzzyMatch":true,"prisonIds":["HEI"],"pagination":{"page":0,"size":${config.apis.prisonerSearch.pageSize}}}`
+          `{"orWords":"test","fuzzyMatch":true,"prisonIds":["HEI"],"pagination":{"page":0,"size":${config.apis.prisonerSearch.pageSize}}}`,
         )
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)

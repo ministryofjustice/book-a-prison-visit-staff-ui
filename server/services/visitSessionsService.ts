@@ -32,7 +32,7 @@ export default class VisitSessionsService {
     private readonly prisonerContactRegistryApiClientBuilder: PrisonerContactRegistryApiClientBuilder,
     private readonly visitSchedulerApiClientBuilder: VisitSchedulerApiClientBuilder,
     private readonly whereaboutsApiClientBuilder: WhereaboutsApiClientBuilder,
-    private readonly systemToken: SystemToken
+    private readonly systemToken: SystemToken,
   ) {}
 
   async getAvailableSupportOptions(username: string): Promise<SupportType[]> {
@@ -116,13 +116,13 @@ export default class VisitSessionsService {
 
         return slotList
       },
-      {}
+      {},
     )
 
     const prisonerEvents = await whereaboutsApiClient.getEvents(
       offenderNo,
       format(earliestStartTime, 'yyyy-MM-dd'),
-      format(latestEndTime, 'yyyy-MM-dd')
+      format(latestEndTime, 'yyyy-MM-dd'),
     )
 
     const getPrisonerEvents = (events: ScheduledEvent[], start: Date, end: Date): PrisonerEvent[] => {
@@ -191,7 +191,7 @@ export default class VisitSessionsService {
 
     const visit = await visitSchedulerApiClient.updateVisit(visitData, visitStatus)
     logger.info(
-      `Updated visit ${visit.reference} (status = ${visitStatus}) for offender ${visitData.prisoner.offenderNo}`
+      `Updated visit ${visit.reference} (status = ${visitStatus}) for offender ${visitData.prisoner.offenderNo}`,
     )
 
     return visit
@@ -258,7 +258,7 @@ export default class VisitSessionsService {
     const extendedVisitsInfo: ExtendedVisitInformation[] = await Promise.all(
       visits.map(visit => {
         return this.buildExtendedVisitInformation(visit, prisonerContactRegistryApiClient)
-      })
+      }),
     )
 
     return {
@@ -350,7 +350,7 @@ export default class VisitSessionsService {
 
     const additionalSupport = getSupportTypeDescriptions(
       await this.getAvailableSupportOptions(username),
-      visit.visitorSupport
+      visit.visitorSupport,
     )
 
     return { visit, visitors, additionalSupport }
@@ -371,7 +371,7 @@ export default class VisitSessionsService {
 
   private async buildExtendedVisitInformation(
     visit: Visit,
-    prisonerContactRegistryApiClient: PrisonerContactRegistryApiClient
+    prisonerContactRegistryApiClient: PrisonerContactRegistryApiClient,
   ): Promise<ExtendedVisitInformation> {
     const visitTime = `${prisonerTimePretty(visit.startTimestamp)} to ${prisonerTimePretty(visit.endTimestamp)}`
     const contacts = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(visit.prisonerId)

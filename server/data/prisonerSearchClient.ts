@@ -43,7 +43,7 @@ class PrisonerSearchClient {
 
   async getPrisonersByPrisonerNumbers(
     prisonerNumbers: string[],
-    page = 0
+    page = 0,
   ): Promise<{ totalPages: number; totalElements: number; content: Prisoner[] }> {
     const allResults: Prisoner[] = await this.restClient.post({
       path: '/prisoner-search/prisoner-numbers',

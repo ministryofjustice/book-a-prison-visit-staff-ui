@@ -40,7 +40,7 @@ export type PrisonerAlertItem = [
     attributes?: {
       'data-test': string
     }
-  }
+  },
 ]
 
 export type UpcomingVisitItem = [
@@ -67,7 +67,7 @@ export type UpcomingVisitItem = [
     attributes?: {
       'data-test': string
     }
-  }
+  },
 ]
 
 export type PastVisitItem = [
@@ -100,7 +100,7 @@ export type PastVisitItem = [
     attributes?: {
       'data-test': string
     }
-  }
+  },
 ]
 
 export type VisitorListItem = {

@@ -18,7 +18,7 @@ export const prisonerDatePretty = ({
 
   return `<span class="bapv-table_cell--nowrap">${format(parseISO(dateToFormat), 'd MMMM')}</span> ${format(
     parseISO(dateToFormat),
-    'yyyy'
+    'yyyy',
   )}`
 }
 
@@ -147,7 +147,7 @@ export const formatVisitType = ({
 
 export const sortByTimestamp = (
   a: { visitTime: string; sortField: string },
-  b: { visitTime: string; sortField: string }
+  b: { visitTime: string; sortField: string },
 ) => {
   if (a.sortField > b.sortField) {
     return 1

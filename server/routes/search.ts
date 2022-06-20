@@ -11,7 +11,7 @@ import asyncMiddleware from '../middleware/asyncMiddleware'
 export default function routes(
   router: Router,
   prisonerSearchService: PrisonerSearchService,
-  visitSessionsService: VisitSessionsService
+  visitSessionsService: VisitSessionsService,
 ): Router {
   const get = (path: string | string[], handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
   const post = (path: string | string[], handler: RequestHandler) => router.post(path, asyncMiddleware(handler))
@@ -32,7 +32,7 @@ export default function routes(
         query: {
           ...(search && { search }),
         },
-      })
+      }),
     )
   })
 
@@ -48,7 +48,7 @@ export default function routes(
       search,
       res.locals.user?.username,
       parsedPage,
-      isVisit
+      isVisit,
     )
     const realNumberOfResults = errors.length > 0 ? 0 : numberOfResults
     const currentPageMax = parsedPage * pageSize
@@ -95,7 +95,7 @@ export default function routes(
         query: {
           ...(searchBlock1 && { searchBlock1, searchBlock2, searchBlock3, searchBlock4 }),
         },
-      })
+      }),
     )
   })
 

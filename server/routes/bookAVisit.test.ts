@@ -65,7 +65,7 @@ describe('GET /book-a-visit/select-visitors', () => {
     null,
     null,
     null,
-    systemToken
+    systemToken,
   ) as jest.Mocked<PrisonerProfileService>
 
   let returnData: VisitorListItem[]
@@ -1044,7 +1044,7 @@ describe('/book-a-visit/select-date-and-time', () => {
       null,
       null,
       null,
-      systemToken
+      systemToken,
     ) as jest.Mocked<VisitSessionsService>
 
     beforeEach(() => {
@@ -1087,7 +1087,7 @@ describe('/book-a-visit/select-date-and-time', () => {
           expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
           expect($('[data-test="visit-restriction"]').text()).toBe('Closed')
           expect($('[data-test="closed-visit-reason"]').text()).toContain(
-            'Closed visit as a visitor has a closed visit restriction.'
+            'Closed visit as a visitor has a closed visit restriction.',
           )
         })
     })
@@ -1106,7 +1106,7 @@ describe('/book-a-visit/select-date-and-time', () => {
           expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
           expect($('[data-test="visit-restriction"]').text()).toBe('Closed')
           expect($('[data-test="closed-visit-reason"]').text()).toContain(
-            'Closed visit as the prisoner has a closed visit restriction.'
+            'Closed visit as the prisoner has a closed visit restriction.',
           )
         })
     })
@@ -1181,7 +1181,7 @@ describe('/book-a-visit/select-date-and-time', () => {
       null,
       null,
       null,
-      systemToken
+      systemToken,
     ) as jest.Mocked<VisitSessionsService>
 
     const createdVisit: Partial<Visit> = { reference: '2a-bc-3d-ef', visitStatus: 'RESERVED' }

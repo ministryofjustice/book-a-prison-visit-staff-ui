@@ -58,9 +58,9 @@ export default function createApp(userService: UserService): express.Application
         prisonerContactRegistryApiClientBuilder,
         visitSchedulerApiClientBuilder,
         whereaboutsApiClientBuilder,
-        systemToken
-      )
-    )
+        systemToken,
+      ),
+    ),
   )
   app.use(
     '/prisoner/',
@@ -70,16 +70,16 @@ export default function createApp(userService: UserService): express.Application
         prisonApiClientBuilder,
         visitSchedulerApiClientBuilder,
         prisonerContactRegistryApiClientBuilder,
-        systemToken
+        systemToken,
       ),
       new PrisonerSearchService(prisonerSearchClientBuilder, systemToken),
       new VisitSessionsService(
         prisonerContactRegistryApiClientBuilder,
         visitSchedulerApiClientBuilder,
         whereaboutsApiClientBuilder,
-        systemToken
-      )
-    )
+        systemToken,
+      ),
+    ),
   )
   app.use(
     '/book-a-visit/',
@@ -90,16 +90,16 @@ export default function createApp(userService: UserService): express.Application
         prisonerContactRegistryApiClientBuilder,
         visitSchedulerApiClientBuilder,
         whereaboutsApiClientBuilder,
-        systemToken
+        systemToken,
       ),
       new PrisonerProfileService(
         prisonApiClientBuilder,
         visitSchedulerApiClientBuilder,
         prisonerContactRegistryApiClientBuilder,
-        systemToken
+        systemToken,
       ),
-      new NotificationsService(notificationsApiClientBuilder)
-    )
+      new NotificationsService(notificationsApiClientBuilder),
+    ),
   )
   app.use(
     '/visit/',
@@ -110,9 +110,9 @@ export default function createApp(userService: UserService): express.Application
         prisonerContactRegistryApiClientBuilder,
         visitSchedulerApiClientBuilder,
         whereaboutsApiClientBuilder,
-        systemToken
-      )
-    )
+        systemToken,
+      ),
+    ),
   )
   app.use(
     '/visits/',
@@ -123,9 +123,9 @@ export default function createApp(userService: UserService): express.Application
         prisonerContactRegistryApiClientBuilder,
         visitSchedulerApiClientBuilder,
         whereaboutsApiClientBuilder,
-        systemToken
-      )
-    )
+        systemToken,
+      ),
+    ),
   )
 
   app.use((req, res, next) => next(createError(404, 'Not found')))

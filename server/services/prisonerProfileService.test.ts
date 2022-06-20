@@ -20,7 +20,7 @@ const offenderNo = 'A1234BC'
 const prisonApiClient = new PrisonApiClient(null) as jest.Mocked<PrisonApiClient>
 const visitSchedulerApiClient = new VisitSchedulerApiClient(null) as jest.Mocked<VisitSchedulerApiClient>
 const prisonerContactRegistryApiClient = new PrisonerContactRegistryApiClient(
-  null
+  null,
 ) as jest.Mocked<PrisonerContactRegistryApiClient>
 
 describe('Prisoner profile service', () => {
@@ -39,7 +39,7 @@ describe('Prisoner profile service', () => {
       prisonApiClientBuilder,
       visitSchedulerApiClientBuilder,
       prisonerContactRegistryApiClientBuilder,
-      systemToken
+      systemToken,
     )
   })
 

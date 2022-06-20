@@ -8,7 +8,7 @@ type PrisonerContactRegistryApiClientBuilder = (token: string) => PrisonerContac
 export default class PrisonerVisitorsService {
   constructor(
     private readonly prisonerContactRegistryApiClientBuilder: PrisonerContactRegistryApiClientBuilder,
-    private readonly systemToken: SystemToken
+    private readonly systemToken: SystemToken,
   ) {}
 
   async getVisitors(offenderNo: string, username: string): Promise<VisitorListItem[]> {
