@@ -14,7 +14,7 @@ export default function routes(
   router: Router,
   prisonerProfileService: PrisonerProfileService,
   prisonerSearchService: PrisonerSearchService,
-  visitSessionsService: VisitSessionsService
+  visitSessionsService: VisitSessionsService,
 ): Router {
   const get = (path: string, handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
   const post = (path: string, handler: RequestHandler) => router.post(path, asyncMiddleware(handler))
@@ -38,7 +38,7 @@ export default function routes(
 
     const { inmateDetail, visitBalances } = await prisonerProfileService.getPrisonerAndVisitBalances(
       offenderNo,
-      res.locals.user?.username
+      res.locals.user?.username,
     )
 
     if (visitBalances?.remainingVo <= 0 && visitBalances?.remainingPvo <= 0) {

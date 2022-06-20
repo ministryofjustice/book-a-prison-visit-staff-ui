@@ -17,7 +17,7 @@ export const getFlashFormValues = (req: Request): Record<string, string | string
 
 export const getSupportTypeDescriptions = (
   availableSupportTypes: SupportType[],
-  visitorSupport: VisitorSupport[]
+  visitorSupport: VisitorSupport[],
 ): string[] => {
   return visitorSupport.map(support => {
     return support.type === 'OTHER'

@@ -139,7 +139,7 @@ declare module 'notifications-node-client' {
       templateType?: TemplateType,
       status?: string,
       reference?: string,
-      olderThanID?: string
+      olderThanID?: string,
     ): Promise<NotificationsResponse>
 
     getTemplateById(templateID: string): Promise<Template>

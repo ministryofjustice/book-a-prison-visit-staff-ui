@@ -45,7 +45,7 @@ export function registerNunjucks(app?: express.Express): Environment {
       express: app,
       trimBlocks: true,
       lstripBlocks: true,
-    }
+    },
   )
 
   njkEnv.addFilter('initialiseName', (fullName: string) => {

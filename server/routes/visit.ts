@@ -13,13 +13,13 @@ import { getFlashFormValues } from './visitorUtils'
 export default function routes(
   router: Router,
   prisonerSearchService: PrisonerSearchService,
-  visitSessionsService: VisitSessionsService
+  visitSessionsService: VisitSessionsService,
 ): Router {
   const get = (path: string, handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
   const post = (path: string, ...handlers: RequestHandler[]) =>
     router.post(
       path,
-      handlers.map(handler => asyncMiddleware(handler))
+      handlers.map(handler => asyncMiddleware(handler)),
     )
 
   get('/cancelled', async (req, res) => {
@@ -91,7 +91,7 @@ export default function routes(
       req.flash('endTimestamp', visit.endTimestamp)
 
       return res.redirect('/visit/cancelled')
-    }
+    },
   )
 
   return router

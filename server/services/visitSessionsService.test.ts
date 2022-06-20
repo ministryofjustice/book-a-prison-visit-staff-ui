@@ -18,7 +18,7 @@ jest.mock('../data/visitSchedulerApiClient')
 jest.mock('../data/whereaboutsApiClient')
 
 const prisonerContactRegistryApiClient = new PrisonerContactRegistryApiClient(
-  null
+  null,
 ) as jest.Mocked<PrisonerContactRegistryApiClient>
 const visitSchedulerApiClient = new VisitSchedulerApiClient(null) as jest.Mocked<VisitSchedulerApiClient>
 const whereaboutsApiClient = new WhereaboutsApiClient(null) as jest.Mocked<WhereaboutsApiClient>
@@ -50,7 +50,7 @@ describe('Visit sessions service', () => {
       prisonerContactRegistryApiClientBuilder,
       visitSchedulerApiClientBuilder,
       whereaboutsApiClientBuilder,
-      systemToken
+      systemToken,
     )
   })
 

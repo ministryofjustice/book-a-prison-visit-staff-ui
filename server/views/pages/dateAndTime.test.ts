@@ -134,7 +134,7 @@ describe('Views - Date and time of visit', () => {
     expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
     expect($('[data-test="visit-restriction"]').text()).toBe('Closed')
     expect($('[data-test="closed-visit-reason"]').text()).toContain(
-      'Closed visit as a visitor has a closed visit restriction'
+      'Closed visit as a visitor has a closed visit restriction',
     )
   })
 })

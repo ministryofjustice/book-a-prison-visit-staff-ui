@@ -12,7 +12,7 @@ export default class PrisonerSearchService {
 
   constructor(
     private readonly prisonerSearchClientBuilder: PrisonerSearchClientBuilder,
-    private readonly systemToken: SystemToken
+    private readonly systemToken: SystemToken,
   ) {}
 
   private getPreviousPage(): number {
@@ -27,7 +27,7 @@ export default class PrisonerSearchService {
     search: string,
     username: string,
     page: number,
-    visit?: boolean
+    visit?: boolean,
   ): Promise<{
     results: Array<PrisonerDetailsItem[]>
     numberOfResults: number
@@ -50,10 +50,10 @@ export default class PrisonerSearchService {
         ? `<a href="/prisoner/${
             prisoner.prisonerNumber
           }/visits?${queryParams}" class="bapv-result-row">${properCaseFullName(
-            `${prisoner.lastName}, ${prisoner.firstName}`
+            `${prisoner.lastName}, ${prisoner.firstName}`,
           )}</a>`
         : `<a href="/prisoner/${prisoner.prisonerNumber}?${queryParams}" class="bapv-result-row">${properCaseFullName(
-            `${prisoner.lastName}, ${prisoner.firstName}`
+            `${prisoner.lastName}, ${prisoner.firstName}`,
           )}</a>`
       const row: PrisonerDetailsItem[] = [
         {
@@ -93,7 +93,7 @@ export default class PrisonerSearchService {
     }[],
     queryStringForBackLink: string,
     username: string,
-    page: number
+    page: number,
   ): Promise<{
     results: Array<PrisonerDetailsItem[]>
     numberOfResults: number
@@ -107,7 +107,7 @@ export default class PrisonerSearchService {
     this.currentPage = page - 1
     const { totalPages, totalElements, content } = await prisonerSearchClient.getPrisonersByPrisonerNumbers(
       prisonerNumbers,
-      this.currentPage
+      this.currentPage,
     )
     this.numberOfPages = totalPages
     const nextPage = this.getNextPage()

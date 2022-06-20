@@ -17,7 +17,7 @@ const visitSessionsService = new VisitSessionsService(
   null,
   null,
   null,
-  systemToken
+  systemToken,
 ) as jest.Mocked<VisitSessionsService>
 
 let getPrisonersReturnData: {

@@ -43,7 +43,7 @@ describe('Prisoner search service', () => {
         const { results, numberOfResults, numberOfPages, next, previous } = await prisonerSearchService.getPrisoners(
           search,
           'user',
-          0
+          0,
         )
 
         expect(results).toEqual([
@@ -92,7 +92,7 @@ describe('Prisoner search service', () => {
           search,
           'user',
           0,
-          true
+          true,
         )
 
         expect(results).toEqual([

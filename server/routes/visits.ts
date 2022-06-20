@@ -10,17 +10,17 @@ import { getDateTabs, getParsedDateFromQueryString, getSlotsSideMenuData } from 
 export default function routes(
   router: Router,
   prisonerSearchService: PrisonerSearchService,
-  visitSessionsService: VisitSessionsService
+  visitSessionsService: VisitSessionsService,
 ): Router {
   const get = (path: string | string[], ...handlers: RequestHandler[]) =>
     router.get(
       path,
-      handlers.map(handler => asyncMiddleware(handler))
+      handlers.map(handler => asyncMiddleware(handler)),
     )
   const post = (path: string | string[], ...handlers: RequestHandler[]) =>
     router.post(
       path,
-      handlers.map(handler => asyncMiddleware(handler))
+      handlers.map(handler => asyncMiddleware(handler)),
     )
 
   get('/', async (req, res) => {
@@ -77,7 +77,7 @@ export default function routes(
     }
 
     const filteredVisits = extendedVisitsInfo.filter(
-      visit => visit.visitTime === slotFilter && visit.visitRestriction === visitType
+      visit => visit.visitTime === slotFilter && visit.visitRestriction === visitType,
     )
     const prisonersForVisit = filteredVisits.map(visit => {
       return {
@@ -100,7 +100,7 @@ export default function routes(
           prisonersForVisit,
           queryParams,
           res.locals.user?.username,
-          currentPage
+          currentPage,
         ))
     }
 

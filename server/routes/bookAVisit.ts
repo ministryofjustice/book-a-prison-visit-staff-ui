@@ -17,18 +17,18 @@ export default function routes(
   prisonerVisitorsService: PrisonerVisitorsService,
   visitSessionsService: VisitSessionsService,
   prisonerProfileService: PrisonerProfileService,
-  notificationsService: NotificationsService
+  notificationsService: NotificationsService,
 ): Router {
   const get = (path: string, ...handlers: RequestHandler[]) =>
     router.get(
       path,
-      handlers.map(handler => asyncMiddleware(handler))
+      handlers.map(handler => asyncMiddleware(handler)),
     )
 
   const post = (path: string, ...handlers: RequestHandler[]) =>
     router.post(
       path,
-      handlers.map(handler => asyncMiddleware(handler))
+      handlers.map(handler => asyncMiddleware(handler)),
     )
 
   get('/select-visitors', sessionCheckMiddleware({ stage: 1 }), async (req, res) => {
@@ -108,7 +108,7 @@ export default function routes(
 
       const selectedIds = [].concat(req.body.visitors)
       const selectedVisitors = req.session.visitorList.visitors.filter((visitor: VisitorListItem) =>
-        selectedIds.includes(visitor.personId.toString())
+        selectedIds.includes(visitor.personId.toString()),
       )
 
       const adults = selectedVisitors.reduce((adultVisitors: VisitorListItem[], visitor: VisitorListItem) => {
@@ -138,14 +138,14 @@ export default function routes(
       return !closedVisitVisitors && closedVisitPrisoner
         ? res.redirect('/book-a-visit/visit-type')
         : res.redirect('/book-a-visit/select-date-and-time')
-    }
+    },
   )
 
   get('/visit-type', sessionCheckMiddleware({ stage: 2 }), async (req, res) => {
     const { visitSessionData } = req.session
 
     const closedRestrictions = visitSessionData.prisoner.restrictions.filter(
-      restriction => restriction.restrictionType === 'CLOSED'
+      restriction => restriction.restrictionType === 'CLOSED',
     )
 
     res.render('pages/visitType', {
@@ -172,7 +172,7 @@ export default function routes(
       visitSessionData.closedVisitReason = req.body.visitType === 'CLOSED' ? 'prisoner' : undefined
 
       return res.redirect('/book-a-visit/select-date-and-time')
-    }
+    },
   )
 
   get(
@@ -180,7 +180,7 @@ export default function routes(
     sessionCheckMiddleware({ stage: 2 }),
     query('timeOfDay').customSanitizer((value: string) => (!['morning', 'afternoon'].includes(value) ? '' : value)),
     query('dayOfTheWeek').customSanitizer((value: string) =>
-      parseInt(value, 10) >= 0 && parseInt(value, 10) <= 6 ? value : ''
+      parseInt(value, 10) >= 0 && parseInt(value, 10) <= 6 ? value : '',
     ),
     async (req, res) => {
       const { visitSessionData } = req.session
@@ -212,7 +212,7 @@ export default function routes(
         dayOfTheWeek,
         formValues,
       })
-    }
+    },
   )
 
   post(
@@ -237,7 +237,7 @@ export default function routes(
         req.flash('formValues', req.body)
         if (req.session.timeOfDay || req.session.dayOfTheWeek) {
           return res.redirect(
-            `${req.originalUrl}?timeOfDay=${req.session.timeOfDay}&dayOfTheWeek=${req.session.dayOfTheWeek}`
+            `${req.originalUrl}?timeOfDay=${req.session.timeOfDay}&dayOfTheWeek=${req.session.dayOfTheWeek}`,
           )
         }
         return res.redirect(req.originalUrl)
@@ -261,7 +261,7 @@ export default function routes(
       }
 
       return res.redirect('/book-a-visit/additional-support')
-    }
+    },
   )
 
   get('/additional-support', sessionCheckMiddleware({ stage: 3 }), async (req, res) => {
@@ -270,7 +270,7 @@ export default function routes(
 
     if (!req.session.availableSupportTypes) {
       req.session.availableSupportTypes = await visitSessionsService.getAvailableSupportOptions(
-        res.locals.user?.username
+        res.locals.user?.username,
       )
     }
     const { availableSupportTypes } = req.session
@@ -340,7 +340,7 @@ export default function routes(
       })
 
       return res.redirect('/book-a-visit/select-main-contact')
-    }
+    },
   )
 
   get('/select-main-contact', sessionCheckMiddleware({ stage: 4 }), async (req, res) => {
@@ -403,7 +403,7 @@ export default function routes(
       }
 
       const selectedContact = req.session.visitorList.visitors.find(
-        (visitor: VisitorListItem) => req.body.contact === visitor.personId.toString()
+        (visitor: VisitorListItem) => req.body.contact === visitor.personId.toString(),
       )
 
       visitSessionData.mainContact = {
@@ -413,7 +413,7 @@ export default function routes(
       }
 
       return res.redirect('/book-a-visit/check-your-booking')
-    }
+    },
   )
 
   get('/check-your-booking', sessionCheckMiddleware({ stage: 5 }), async (req, res) => {
@@ -422,7 +422,7 @@ export default function routes(
 
     const additionalSupport = getSupportTypeDescriptions(
       req.session.availableSupportTypes,
-      visitSessionData.visitorSupport
+      visitSessionData.visitorSupport,
     )
 
     res.render('pages/checkYourBooking', {
@@ -442,7 +442,7 @@ export default function routes(
 
     const additionalSupport = getSupportTypeDescriptions(
       req.session.availableSupportTypes,
-      visitSessionData.visitorSupport
+      visitSessionData.visitorSupport,
     )
 
     try {
@@ -484,7 +484,7 @@ export default function routes(
         logger.info(`SMS sent for ${visitSessionData.visitReference}`)
       } catch (error) {
         logger.error(
-          `Failed to send SMS to ${visitSessionData.mainContact.phoneNumber} for booking ${visitSessionData.visitReference}`
+          `Failed to send SMS to ${visitSessionData.mainContact.phoneNumber} for booking ${visitSessionData.visitReference}`,
         )
       }
     }
@@ -503,7 +503,7 @@ export default function routes(
     res.locals.visitReference = visitSessionData.visitReference
     res.locals.additionalSupport = getSupportTypeDescriptions(
       req.session.availableSupportTypes,
-      visitSessionData.visitorSupport
+      visitSessionData.visitorSupport,
     )
 
     clearSession(req)

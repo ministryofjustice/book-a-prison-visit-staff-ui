@@ -66,7 +66,7 @@ function appSetup(
     timeOfDay: '',
     dayOfTheWeek: '',
     visitSessionData: {} as VisitSessionData,
-  }
+  },
 ): Express {
   const app = express()
 
@@ -105,7 +105,7 @@ function appSetup(
       prisonerContactRegistryApiClientBuilder,
       visitSchedulerApiClientBuilder,
       whereaboutsApiClientBuilder,
-      systemTokenTest
+      systemTokenTest,
     )
   app.use('/search/', searchRoutes(standardRouter(new MockUserService()), prisonerSearchService, visitSessionsService))
 
@@ -115,7 +115,7 @@ function appSetup(
       prisonApiClientBuilder,
       visitSchedulerApiClientBuilder,
       prisonerContactRegistryApiClientBuilder,
-      systemTokenTest
+      systemTokenTest,
     )
   app.use(
     '/prisoner/',
@@ -123,8 +123,8 @@ function appSetup(
       standardRouter(new MockUserService()),
       prisonerProfileService,
       prisonerSearchService,
-      visitSessionsService
-    )
+      visitSessionsService,
+    ),
   )
 
   const prisonerVisitorsService =
@@ -138,8 +138,8 @@ function appSetup(
       prisonerVisitorsService,
       visitSessionsService,
       prisonerProfileService,
-      notificationsService
-    )
+      notificationsService,
+    ),
   )
   app.use('/visit/', visitRoutes(standardRouter(new MockUserService()), prisonerSearchService, visitSessionsService))
   app.use('/visits', visitsRoutes(standardRouter(new MockUserService()), prisonerSearchService, visitSessionsService))
@@ -157,7 +157,7 @@ export function appWithAllRoutes(
   visitSessionsServiceOverride?: VisitSessionsService,
   systemTokenOverride?: SystemToken,
   production?: boolean,
-  sessionData?: SessionData
+  sessionData?: SessionData,
 ): Express {
   auth.default.authenticationMiddleware = () => (req, res, next) => next()
   return appSetup(
@@ -167,6 +167,6 @@ export function appWithAllRoutes(
     visitSessionsServiceOverride,
     systemTokenOverride,
     production,
-    sessionData
+    sessionData,
   )
 }

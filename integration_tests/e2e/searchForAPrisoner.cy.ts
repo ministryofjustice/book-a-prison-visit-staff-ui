@@ -240,7 +240,7 @@ context('Search for a prisoner', () => {
                 visitType: upcomingVisits[0].visitType,
                 visitRestriction: upcomingVisits[0].visitRestriction,
                 isIntTest,
-              })
+              }),
             )
           prisonerProfilePage.upcomingTabLocation().eq(0).contains('Hewell (HMP)')
           prisonerProfilePage
@@ -251,7 +251,7 @@ context('Search for a prisoner', () => {
                 startTimestamp: upcomingVisits[0].startTimestamp,
                 endTimestamp: upcomingVisits[0].endTimestamp,
                 isIntTest,
-              })
+              }),
             )
           prisonerProfilePage.upcomingTabVisitors().eq(0).contains('John Smith')
 
@@ -264,7 +264,7 @@ context('Search for a prisoner', () => {
                 visitType: pastVisits[0].visitType,
                 visitRestriction: pastVisits[0].visitRestriction,
                 isIntTest,
-              })
+              }),
             )
           prisonerProfilePage.pastTabLocation().eq(0).contains('Hewell (HMP)')
           prisonerProfilePage
@@ -275,7 +275,7 @@ context('Search for a prisoner', () => {
                 startTimestamp: pastVisits[0].startTimestamp,
                 endTimestamp: pastVisits[0].endTimestamp,
                 isIntTest,
-              })
+              }),
             )
           prisonerProfilePage.pastTabVisitors().eq(0).contains('John Smith')
           prisonerProfilePage.pastTabStatus().eq(0).contains(properCase(pastVisits[0].visitStatus))

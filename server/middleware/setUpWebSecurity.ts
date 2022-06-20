@@ -18,7 +18,7 @@ export default function setUpWebSecurity(): Router {
           fontSrc: ["'self'"],
         },
       },
-    })
+    }),
   )
   return router
 }

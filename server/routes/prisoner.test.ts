@@ -24,14 +24,14 @@ const prisonerProfileService = new PrisonerProfileService(
   null,
   null,
   null,
-  systemToken
+  systemToken,
 ) as jest.Mocked<PrisonerProfileService>
 const prisonerSearchService = new PrisonerSearchService(null, systemToken) as jest.Mocked<PrisonerSearchService>
 const visitSessionsService = new VisitSessionsService(
   null,
   null,
   null,
-  systemToken
+  systemToken,
 ) as jest.Mocked<VisitSessionsService>
 
 jest.mock('./visitorUtils', () => ({
@@ -57,7 +57,7 @@ beforeEach(() => {
     false,
     {
       visitSessionData,
-    } as SessionData
+    } as SessionData,
   )
 })
 
@@ -140,7 +140,7 @@ describe('GET /prisoner/A1234BC', () => {
         expect($('.govuk-error-summary__body').length).toBe(0)
         expect($('h1').text().trim()).toBe('Smith, John')
         expect($('.flagged-alerts-list .flagged-alert.flagged-alert--UPIU').text().trim()).toBe(
-          'Protective Isolation Unit'
+          'Protective Isolation Unit',
         )
         expect($('[data-test="prison-number"]').text()).toBe('A1234BC')
         expect($('[data-test="dob"]').text()).toBe('12 October 1980')

@@ -12,7 +12,7 @@ export const getDateTabs = (
   selectedDate: string,
   firstTabDate: string,
   numberOfTabs: number,
-  defaultDate = new Date()
+  defaultDate = new Date(),
 ): {
   text: string
   href: string

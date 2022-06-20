@@ -34,7 +34,7 @@ export default class PrisonerProfileService {
     private readonly prisonApiClientBuilder: PrisonApiClientBuilder,
     private readonly visitSchedulerApiClientBuilder: VisitSchedulerApiClientBuilder,
     private readonly prisonerContactRegistryApiClientBuilder: PrisonerContactRegistryApiClientBuilder,
-    private readonly systemToken: SystemToken
+    private readonly systemToken: SystemToken,
   ) {}
 
   async getProfile(offenderNo: string, username: string): Promise<PrisonerProfile> {
@@ -57,12 +57,12 @@ export default class PrisonerProfileService {
     const upcomingVisits: UpcomingVisitItem[] = await this.getUpcomingVisits(
       offenderNo,
       visitSchedulerApiClient,
-      prisonerContactRegistryApiClient
+      prisonerContactRegistryApiClient,
     )
     const pastVisits: PastVisitItem[] = await this.getPastVisits(
       offenderNo,
       visitSchedulerApiClient,
-      prisonerContactRegistryApiClient
+      prisonerContactRegistryApiClient,
     )
 
     const activeAlertsForDisplay: PrisonerAlertItem[] = activeAlerts.map(alert => {
@@ -119,7 +119,7 @@ export default class PrisonerProfileService {
 
   async getPrisonerAndVisitBalances(
     offenderNo: string,
-    username: string
+    username: string,
   ): Promise<{ inmateDetail: InmateDetail; visitBalances: VisitBalances }> {
     const token = await this.systemToken(username)
     const prisonApiClient = this.prisonApiClientBuilder(token)
@@ -152,7 +152,7 @@ export default class PrisonerProfileService {
   private async getUpcomingVisits(
     offenderNo: string,
     visitSchedulerApiClient: VisitSchedulerApiClient,
-    prisonerContactRegistryApiClient: PrisonerContactRegistryApiClient
+    prisonerContactRegistryApiClient: PrisonerContactRegistryApiClient,
   ): Promise<UpcomingVisitItem[]> {
     const visits: Visit[] = await visitSchedulerApiClient.getUpcomingVisits(offenderNo)
     const contacts = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(offenderNo)
@@ -197,7 +197,7 @@ export default class PrisonerProfileService {
   private async getPastVisits(
     offenderNo: string,
     visitSchedulerApiClient: VisitSchedulerApiClient,
-    prisonerContactRegistryApiClient: PrisonerContactRegistryApiClient
+    prisonerContactRegistryApiClient: PrisonerContactRegistryApiClient,
   ): Promise<PastVisitItem[]> {
     const visits: Visit[] = await visitSchedulerApiClient.getPastVisits(offenderNo)
     const contacts = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(offenderNo)
@@ -266,7 +266,7 @@ export default class PrisonerProfileService {
   private async getVisitBalances(
     prisonApiClient: PrisonApiClient,
     convictedStatus: string,
-    offenderNo: string
+    offenderNo: string,
   ): Promise<BAPVVisitBalances> {
     if (convictedStatus === 'Remand') return null
 

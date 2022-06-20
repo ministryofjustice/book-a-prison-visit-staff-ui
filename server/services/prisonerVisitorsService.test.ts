@@ -6,7 +6,7 @@ import { VisitorListItem } from '../@types/bapv'
 jest.mock('../data/prisonerContactRegistryApiClient')
 
 const prisonerContactRegistryApiClient = new PrisonerContactRegistryApiClient(
-  null
+  null,
 ) as jest.Mocked<PrisonerContactRegistryApiClient>
 
 describe('Prisoner visitor service', () => {
