@@ -40,9 +40,14 @@
   </span>
 </div>
 
-{{ govukPhaseBanner({
-  tag: {
-    text: "beta"
-  },
-  html: 'This is a new service – your <a class="govuk-link" href="https://eu.surveymonkey.com/r/9ZBN3YJ">feedback</a> will help us to improve it.'
-}) }}
+{% if not hidePhaseBanner %}
+  <div class="bapv-phase-banner-container">
+    {{ govukPhaseBanner({
+      tag: {
+        text: "beta"
+      },
+      html: 'This is a new service – your <a class="govuk-link" href="https://eu.surveymonkey.com/r/9ZBN3YJ">feedback</a> will help us to improve it.',
+      classes: 'bapv-phase-banner'
+    }) }}
+  </div>
+{% endif %}

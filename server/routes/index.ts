@@ -6,7 +6,7 @@ export default function routes(router: Router): Router {
   const get = (path: string | string[], handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
 
   get('/', (req, res, next) => {
-    res.render('pages/index')
+    res.render('pages/index', { hidePhaseBanner: true })
   })
 
   return router
