@@ -86,6 +86,7 @@
     ]
   },
   "dependencies": {
+    "@aws-sdk/client-sqs": "^3.112.0",
     "@ministryofjustice/frontend": "^1.4.2",
     "agentkeepalive": "^4.2.1",
     "applicationinsights": "^2.3.3",
@@ -116,6 +117,7 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "@aws-sdk/types": "^3.110.0",
     "@types/bunyan": "^1.8.8",
     "@types/bunyan-format": "^0.2.4",
     "@types/compression": "^1.7.2",
