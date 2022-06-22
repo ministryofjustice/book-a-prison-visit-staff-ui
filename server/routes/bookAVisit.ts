@@ -131,9 +131,9 @@ export default function routes(
       visitSessionData.visitRestriction = closedVisitVisitors ? 'CLOSED' : 'OPEN'
       visitSessionData.closedVisitReason = closedVisitVisitors ? 'visitor' : undefined
 
-      const closedVisitPrisoner = visitSessionData.prisoner.restrictions.some(restriction => {
-        return restriction.restrictionType === 'CLOSED'
-      })
+      const closedVisitPrisoner = visitSessionData.prisoner.restrictions.some(
+        restriction => restriction.restrictionType === 'CLOSED',
+      )
 
       return !closedVisitVisitors && closedVisitPrisoner
         ? res.redirect('/book-a-visit/visit-type')

@@ -146,7 +146,8 @@
         </div>
         {{ govukButton({
           text: "Continue",
-          attributes: { "data-test": "submit" }
+          attributes: { "data-test": "submit" },
+          preventDoubleClick: true
         }) }} 
       </form>
     {% else %}

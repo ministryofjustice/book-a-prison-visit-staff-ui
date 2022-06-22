@@ -159,7 +159,8 @@
         <form action="/book-a-visit/check-your-booking" method="POST" novalidate>
             <input type="hidden" name="_csrf" value="{{ csrfToken }}">
             {{ govukButton({
-                text: "Submit booking"
+                text: "Submit booking",
+                preventDoubleClick: true
             }) }}
         </form>
     </div>
