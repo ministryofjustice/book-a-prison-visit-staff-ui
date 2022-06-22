@@ -10,7 +10,7 @@ export default class auditService {
     private readonly secretAccessKey = config.apis.audit.secretAccessKey,
     private readonly region = config.apis.audit.region,
     private readonly queueUrl = config.apis.audit.queueUrl,
-    private readonly username: string
+    private readonly username: string,
   ) {
     this.sqsClient = new SQSClient({
       region: this.region,
@@ -46,7 +46,7 @@ export default class auditService {
         new SendMessageCommand({
           MessageBody: JSON.stringify({ action, timestamp, details }),
           QueueUrl: this.queueUrl,
-        })
+        }),
       )
     } catch (error) {
       logger.error('Problem sending message to SQS queue')

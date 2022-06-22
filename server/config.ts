@@ -136,7 +136,7 @@ export default {
       queueUrl: get(
         'AUDIT_SQS_QUEUE_URL',
         'http://localhost:4566/000000000000/audit_event_queue',
-        requiredInProduction
+        requiredInProduction,
       ),
     },
     notifications: {
