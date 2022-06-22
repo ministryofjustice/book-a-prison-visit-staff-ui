@@ -1,3 +1,5 @@
+{% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
+
 <header class="hmpps-header" role="banner">
   <div class="hmpps-header__container">
     <div class="hmpps-header__title">
@@ -37,3 +39,15 @@
     <span>Hewell (HMP)</span>
   </span>
 </div>
+
+{% if not hidePhaseBanner %}
+  <div class="bapv-phase-banner-container">
+    {{ govukPhaseBanner({
+      tag: {
+        text: "beta"
+      },
+      html: 'This is a new service – your <a class="govuk-link" href="https://eu.surveymonkey.com/r/9ZBN3YJ">feedback</a> will help us to improve it.',
+      classes: 'bapv-phase-banner'
+    }) }}
+  </div>
+{% endif %}

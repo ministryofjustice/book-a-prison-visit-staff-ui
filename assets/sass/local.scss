@@ -222,3 +222,25 @@
     margin-bottom: 0;
   }
 }
+
+.bapv-index-header > * {
+  vertical-align: middle;
+}
+
+.bapv-index-header span {
+  padding-left: govuk-spacing(1);
+}
+
+.bapv-phase-banner-container {
+  @include govuk-width-container;
+  width: 100%;
+
+  @media print {
+    display: none;
+  }
+}
+
+.bapv-phase-banner {
+  width: 100%;
+  border: 0;
+}
