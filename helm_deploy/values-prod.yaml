@@ -19,7 +19,6 @@ generic-service:
     PRISONER_CONTACT_REGISTRY_API_URL: "https://prisoner-contact-registry.prison.service.justice.gov.uk"
     WHEREABOUTS_API_URL: "https://whereabouts-api.service.justice.gov.uk"
     DPS_URL: "https://digital.prison.service.justice.gov.uk/"
-    AUDIT_API_URL: "https://audit-api.hmpps.service.justice.gov.uk/"
     SMS_NOTIFICATIONS_ENABLED: "false"
 
 generic-prometheus-alerts:
