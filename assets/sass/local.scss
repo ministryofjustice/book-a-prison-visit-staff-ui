@@ -234,8 +234,6 @@
 .bapv-phase-banner-container {
   @include govuk-width-container;
   width: 100%;
-  display: flex;
-  flex-wrap: wrap;
 
   @media print {
     display: none;
