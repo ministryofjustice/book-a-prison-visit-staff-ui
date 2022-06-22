@@ -47,7 +47,8 @@
                 }
               }) }}
               {{ govukButton({
-                text: "View"
+                text: "View",
+                preventDoubleClick: true
               }) }}
             </form>
           </div>
@@ -67,22 +68,26 @@
       <h3 class="govuk-heading-s">Visitor list</h3>
       <div class="govuk-button-group">
         {{ govukButton({
-            text: "Download CSV"
+            text: "Download CSV",
+            preventDoubleClick: true
         }) }}
         {{ govukButton({
             text: "Print",
-            classes: "govuk-button--secondary"
+            classes: "govuk-button--secondary",
+            preventDoubleClick: true
         }) }}
       </div>
 
       <h3 class="govuk-heading-s">Prisoner list</h3>
       <div class="govuk-button-group">
         {{ govukButton({
-            text: "Download CSV"
+            text: "Download CSV",
+            preventDoubleClick: true
         }) }}
         {{ govukButton({
             text: "Print",
-            classes: "govuk-button--secondary"
+            classes: "govuk-button--secondary",
+            preventDoubleClick: true
         }) }}
       </div>
     </div>

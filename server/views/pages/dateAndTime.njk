@@ -146,7 +146,8 @@
           }) }}
       
           {{ govukButton({
-            text: "Apply filters"
+            text: "Apply filters",
+            preventDoubleClick: true
           }) }} 
         </div>
       </div>
@@ -239,7 +240,8 @@
     
     {{ govukButton({
       text: "Continue",
-      attributes: { "data-test": "submit" }
+      attributes: { "data-test": "submit" },
+      preventDoubleClick: true
     }) }} 
     </form>
 

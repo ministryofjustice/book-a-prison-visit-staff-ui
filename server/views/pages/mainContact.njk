@@ -84,7 +84,8 @@
                 errorMessage: errors | findError('phoneNumber')
             }) }}
             {{ govukButton({
-                text: "Continue"
+                text: "Continue",
+                preventDoubleClick: true
             }) }} 
         </form>
     </div>

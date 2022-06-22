@@ -100,7 +100,8 @@
         <input type="hidden" name="_csrf" value="{{ csrfToken }}">
         {{ govukButton({
           text: "Book a prison visit",
-          attributes: { "data-test": "book-a-visit" }
+          attributes: { "data-test": "book-a-visit" },
+          preventDoubleClick: true
         }) }}
       </form>
 

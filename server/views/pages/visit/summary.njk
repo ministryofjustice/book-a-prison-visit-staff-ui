@@ -67,7 +67,8 @@
         text: "Cancel booking",
         classes: "govuk-!-margin-top-5",
         href: "/visit/" + visit.reference + "/cancel",
-        attributes: { "data-test": "cancel-visit" }
+        attributes: { "data-test": "cancel-visit" },
+        preventDoubleClick: true
       }) }}
 
       {% set visitorRows = [] %}
