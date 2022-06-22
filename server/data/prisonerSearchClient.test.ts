@@ -36,7 +36,7 @@ describe('prisonSearchClientBuilder', () => {
       fakePrisonerSearchApi
         .post(
           '/keyword',
-          `{"orWords":"test","fuzzyMatch":true,"prisonIds":["HEI"],"pagination":{"page":0,"size":${config.apis.prisonerSearch.pageSize}}}`,
+          `{"orWords":"test","fuzzyMatch":true,"prisonIds":["HEI"],"pagination":{"page":0,"size":${config.apis.prisonerSearch.pageSize}},"type":"ESTABLISHMENT"}`,
         )
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
@@ -62,7 +62,7 @@ describe('prisonSearchClientBuilder', () => {
         ],
       }
       fakePrisonerSearchApi
-        .post('/keyword', `{"andWords":"test","prisonIds":["HEI"]}`)
+        .post('/keyword', `{"andWords":"test","prisonIds":["HEI"],"type":"ESTABLISHMENT"}`)
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 

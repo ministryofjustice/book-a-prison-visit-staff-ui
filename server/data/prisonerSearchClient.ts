@@ -27,6 +27,7 @@ class PrisonerSearchClient {
           page,
           size: this.pageSize,
         },
+        type: 'ESTABLISHMENT',
       },
     })
   }
@@ -37,6 +38,7 @@ class PrisonerSearchClient {
       data: {
         andWords: search,
         prisonIds: [this.agencyId],
+        type: 'ESTABLISHMENT',
       },
     })
   }
