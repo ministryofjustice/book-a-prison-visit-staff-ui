@@ -46,6 +46,11 @@ generic-service:
     elasticache-redis:
       REDIS_HOST: "primary_endpoint_address"
       REDIS_AUTH_TOKEN: "auth_token"
+    sqs-hmpps-audit-secret:
+      AUDIT_SQS_ACCESS_KEY_ID: "access_key_id"
+      AUDIT_SQS_SECRET_ACCESS_KEY: "secret_access_key"
+      AUDIT_SQS_QUEUE_URL: "sqs_queue_url"
+      AUDIT_SQS_QUEUE_NAME: "sqs_queue_name"
 
   allowlist:
     office: "217.33.148.210/32"
