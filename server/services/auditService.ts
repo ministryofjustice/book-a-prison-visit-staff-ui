@@ -51,14 +51,16 @@ export default class AuditService {
         when: timestamp,
         details,
       })
-      logger.info(message)
 
-      await this.sqsClient.send(
+      const messageResponse = await this.sqsClient.send(
         new SendMessageCommand({
           MessageBody: message,
           QueueUrl: this.queueUrl,
         }),
       )
+
+      logger.info('SQS Response:')
+      logger.info(JSON.stringify(messageResponse))
     } catch (error) {
       logger.error('Problem sending message to SQS queue')
       logger.error(error)
