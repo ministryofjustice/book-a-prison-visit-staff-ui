@@ -31,6 +31,7 @@ import setUpWebRequestParsing from './middleware/setupRequestParsing'
 import authorisationMiddleware from './middleware/authorisationMiddleware'
 import PrisonerVisitorsService from './services/prisonerVisitorsService'
 import VisitSessionsService from './services/visitSessionsService'
+import AuditService from './services/auditService'
 
 export default function createApp(userService: UserService): express.Application {
   const app = express()
@@ -60,6 +61,7 @@ export default function createApp(userService: UserService): express.Application
         whereaboutsApiClientBuilder,
         systemToken,
       ),
+      new AuditService(),
     ),
   )
   app.use(

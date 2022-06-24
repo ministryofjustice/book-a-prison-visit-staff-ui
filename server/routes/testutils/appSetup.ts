@@ -25,6 +25,7 @@ import NotificationsService from '../../services/notificationsService'
 import * as auth from '../../authentication/auth'
 import systemToken from '../../data/authClient'
 import { SystemToken, VisitorListItem, VisitSlotList, VisitSessionData } from '../../@types/bapv'
+import AuditService from '../../services/auditService'
 
 const user = {
   name: 'john smith',
@@ -116,7 +117,11 @@ function appSetup({
       whereaboutsApiClientBuilder,
       systemTokenTest,
     )
-  app.use('/search/', searchRoutes(standardRouter(new MockUserService()), prisonerSearchService, visitSessionsService))
+  const auditService = new AuditService()
+  app.use(
+    '/search/',
+    searchRoutes(standardRouter(new MockUserService()), prisonerSearchService, visitSessionsService, auditService),
+  )
 
   const prisonerProfileService =
     prisonerProfileServiceOverride ||

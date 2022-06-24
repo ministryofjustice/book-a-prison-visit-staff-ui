@@ -2,7 +2,7 @@ import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs'
 import logger from '../../logger'
 import config from '../config'
 
-export default class auditService {
+export default class AuditService {
   private sqsClient: SQSClient
 
   constructor(
@@ -10,7 +10,6 @@ export default class auditService {
     private readonly secretAccessKey = config.apis.audit.secretAccessKey,
     private readonly region = config.apis.audit.region,
     private readonly queueUrl = config.apis.audit.queueUrl,
-    private readonly username: string,
   ) {
     this.sqsClient = new SQSClient({
       region: this.region,
@@ -22,9 +21,10 @@ export default class auditService {
     })
   }
 
-  async prisonerSearch(searchTerms: string, prisonId: string) {
+  async prisonerSearch(searchTerms: string, prisonId: string, username: string) {
     return this.sendAuditMessage({
       action: 'SEARCHED_PRISONERS',
+      who: username,
       details: {
         searchTerms,
         prisonId,
@@ -34,22 +34,28 @@ export default class auditService {
 
   async sendAuditMessage({
     action,
+    who,
     timestamp = new Date(),
     details,
   }: {
     action: string
+    who: string
     timestamp?: Date
     details: object
   }) {
     try {
+      const message = JSON.stringify({ action, who, timestamp, details })
+      logger.info(message)
+
       await this.sqsClient.send(
         new SendMessageCommand({
-          MessageBody: JSON.stringify({ action, timestamp, details }),
+          MessageBody: message,
           QueueUrl: this.queueUrl,
         }),
       )
     } catch (error) {
       logger.error('Problem sending message to SQS queue')
+      logger.error(error)
     }
   }
 }
