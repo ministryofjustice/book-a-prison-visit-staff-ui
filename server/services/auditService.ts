@@ -59,8 +59,7 @@ export default class AuditService {
         }),
       )
 
-      logger.info('SQS Response:')
-      logger.info(JSON.stringify(messageResponse))
+      logger.info(`SQS message sent (${messageResponse.MessageId})`)
     } catch (error) {
       logger.error('Problem sending message to SQS queue')
       logger.error(error)
