@@ -44,7 +44,13 @@ export default class AuditService {
     details: object
   }) {
     try {
-      const message = JSON.stringify({ action, who, timestamp, details })
+      const message = JSON.stringify({
+        what: action,
+        who,
+        service: config.apis.audit.serviceName,
+        when: timestamp,
+        details,
+      })
       logger.info(message)
 
       await this.sqsClient.send(

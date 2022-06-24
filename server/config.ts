@@ -138,6 +138,7 @@ export default {
         'http://localhost:4566/000000000000/audit_event_queue',
         requiredInProduction,
       ),
+      serviceName: get('AUDIT_SERVICE_NAME', 'book-a-prison-visit-staff-ui', requiredInProduction),
     },
     notifications: {
       enabled: get('SMS_NOTIFICATIONS_ENABLED', 'false', requiredInProduction) === 'true',
