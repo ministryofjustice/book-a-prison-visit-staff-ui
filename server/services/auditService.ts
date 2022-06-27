@@ -32,6 +32,17 @@ export default class AuditService {
     })
   }
 
+  async viewPrisoner(prisonerId: string, prisonId: string, username: string) {
+    return this.sendAuditMessage({
+      action: 'VIEWED_PRISONER',
+      who: username,
+      details: {
+        prisonerId,
+        prisonId,
+      },
+    })
+  }
+
   async sendAuditMessage({
     action,
     who,
