@@ -1130,6 +1130,7 @@ describe('/book-a-visit/select-date-and-time', () => {
           expect($('#main-content').text()).toContain('There are no visit time slots for the next 28 days.')
           expect($('input[name="visit-date-and-time"]').length).toBe(0)
           expect($('[data-test="submit"]').length).toBe(0)
+          expect($('[data-test="back-to-start"]').length).toBe(1)
         })
     })
 
