@@ -43,6 +43,88 @@ export default class AuditService {
     })
   }
 
+  async reservedVisit(reference: string, prisonerId: string, prisonId: string, username: string) {
+    return this.sendAuditMessage({
+      action: 'RESERVED_VISIT',
+      who: username,
+      details: {
+        reference,
+        prisonerId,
+        prisonId,
+      },
+    })
+  }
+
+  async bookedVisit(reference: string, prisonerId: string, prisonId: string, visitorIds: string[], username: string) {
+    return this.sendAuditMessage({
+      action: 'BOOKED_VISIT',
+      who: username,
+      details: {
+        reference,
+        prisonerId,
+        prisonId,
+        visitorIds,
+      },
+    })
+  }
+
+  async cancelledVisit(reference: string, prisonerId: string, prisonId: string, reason: string, username: string) {
+    return this.sendAuditMessage({
+      action: 'CANCELLED_VISIT',
+      who: username,
+      details: {
+        reference,
+        prisonerId,
+        prisonId,
+        reason,
+      },
+    })
+  }
+
+  async viewedVisits(viewDate: string, prisonId: string, username: string) {
+    return this.sendAuditMessage({
+      action: 'VIEWED_VISITS',
+      who: username,
+      details: {
+        viewDate,
+        prisonId,
+      },
+    })
+  }
+
+  async printedVisitList(viewDate: string, prisonId: string, username: string) {
+    return this.sendAuditMessage({
+      action: 'PRINTED_VISIT_LIST',
+      who: username,
+      details: {
+        viewDate,
+        prisonId,
+      },
+    })
+  }
+
+  async pageView(pageName: string, username: string) {
+    return this.sendAuditMessage({
+      action: 'PAGE_VIEW',
+      who: username,
+      details: {
+        pageName,
+      },
+    })
+  }
+
+  async overrodeZeroVO(reference: string, prisonerId: string, reason: string, username: string) {
+    return this.sendAuditMessage({
+      action: 'OVERRODE_ZERO_VO',
+      who: username,
+      details: {
+        reference,
+        prisonerId,
+        reason,
+      },
+    })
+  }
+
   async sendAuditMessage({
     action,
     who,

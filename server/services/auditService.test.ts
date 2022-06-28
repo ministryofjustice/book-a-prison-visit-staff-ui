@@ -1,26 +1,23 @@
-import proxyquire from 'proxyquire'
-import type { SQSClient } from '@aws-sdk/client-sqs'
-import type AuditService from './auditService'
+import AuditService from './auditService'
 
-describe.skip('Audit service', () => {
+const sqsClientInstance = {
+  send: jest.fn().mockReturnThis(),
+}
+
+jest.mock('@aws-sdk/client-sqs', () => {
+  const { SendMessageCommand } = jest.requireActual('@aws-sdk/client-sqs')
+  return {
+    SQSClient: jest.fn(() => sqsClientInstance),
+    SendMessageCommand,
+  }
+})
+
+describe('Audit service', () => {
   let auditService: AuditService
-  let sqsClientInstance: Partial<SQSClient>
 
   describe('getVisitors', () => {
     beforeEach(() => {
-      sqsClientInstance = {
-        send: jest.fn(),
-      }
-      const SQSClientMock = jest.fn().mockReturnValue(sqsClientInstance)
-      const SendMessageCommand = jest.fn()
-      const AuditServiceClass = proxyquire('./auditService.ts', {
-        '@aws-sdk/client-sqs': {
-          SQSClient: SQSClientMock,
-          SendMessageCommand,
-        },
-      }).default
-
-      auditService = new AuditServiceClass()
+      auditService = new AuditService()
     })
 
     afterEach(() => {
