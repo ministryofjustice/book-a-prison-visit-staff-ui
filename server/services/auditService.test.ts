@@ -25,7 +25,7 @@ describe('Audit service', () => {
     })
 
     it('Retrieves and processes prisoner and approved visitor details', async () => {
-      const results = await auditService.prisonerSearch('sdsd', 'HEI', 'username')
+      await auditService.prisonerSearch('sdsd', 'HEI', 'username')
 
       expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
     })
