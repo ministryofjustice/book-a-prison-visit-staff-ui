@@ -58,9 +58,8 @@
 
       <p><strong>Prisoner name:</strong> <span data-test="prisoner-name">{{ prisonerName }}</span></p>
 
-      <div class="prisoner-restrictions">
-
       {% if restrictions | length %}
+      <div class="prisoner-restrictions">
         <h2 class="govuk-heading-m">Prisoner's active restrictions</h2>
         {% set prisonerRestrictions = [] %}
         {% for restriction in restrictions %}
@@ -152,6 +151,9 @@
       </form>
     {% else %}
     <p>The prisoner has no approved visitors.</p>
+
+    {% include "partials/backToStartButton.njk" %}
+
     {% endif %}
     </div>
   </div>

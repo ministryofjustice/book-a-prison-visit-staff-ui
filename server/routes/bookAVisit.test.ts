@@ -361,7 +361,7 @@ describe('GET /book-a-visit/select-visitors', () => {
       })
   })
 
-  it('should show message and no Continue button for prisoner with no approved visitors', () => {
+  it('should show message and back to start button for prisoner with no approved visitors', () => {
     returnData = []
     prisonerVisitorsService.getVisitors.mockResolvedValue(returnData)
 
@@ -375,6 +375,7 @@ describe('GET /book-a-visit/select-visitors', () => {
         expect($('input[name="visitors"]').length).toBe(0)
         expect($('#main-content').text()).toContain('The prisoner has no approved visitors.')
         expect($('[data-test="submit"]').length).toBe(0)
+        expect($('[data-test="back-to-start"]').length).toBe(1)
       })
   })
 })
