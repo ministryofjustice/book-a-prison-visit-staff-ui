@@ -49,12 +49,12 @@ class MockUserService extends UserService {
   }
 }
 
-function appSetup(
-  prisonerSearchServiceOverride: PrisonerSearchService,
-  prisonerProfileServiceOverride: PrisonerProfileService,
-  prisonerVisitorsServiceOverride: PrisonerVisitorsService,
-  visitSessionsServiceOverride: VisitSessionsService,
-  systemTokenOverride: SystemToken,
+function appSetup({
+  prisonerSearchServiceOverride,
+  prisonerProfileServiceOverride,
+  prisonerVisitorsServiceOverride,
+  visitSessionsServiceOverride,
+  systemTokenOverride,
   production = false,
   sessionData = {
     cookie: new Cookie(),
@@ -66,8 +66,17 @@ function appSetup(
     timeOfDay: '',
     dayOfTheWeek: '',
     visitSessionData: {} as VisitSessionData,
+    availableSupportTypes: [],
   },
-): Express {
+}: {
+  prisonerSearchServiceOverride: PrisonerSearchService
+  prisonerProfileServiceOverride: PrisonerProfileService
+  prisonerVisitorsServiceOverride: PrisonerVisitorsService
+  visitSessionsServiceOverride: VisitSessionsService
+  systemTokenOverride: SystemToken
+  production: boolean
+  sessionData: SessionData
+}): Express {
   const app = express()
 
   app.set('view engine', 'njk')
@@ -168,7 +177,7 @@ export function appWithAllRoutes({
   sessionData?: SessionData
 }): Express {
   auth.default.authenticationMiddleware = () => (req, res, next) => next()
-  return appSetup(
+  return appSetup({
     prisonerSearchServiceOverride,
     prisonerProfileServiceOverride,
     prisonerVisitorsServiceOverride,
@@ -176,5 +185,5 @@ export function appWithAllRoutes({
     systemTokenOverride,
     production,
     sessionData,
-  )
+  })
 }
