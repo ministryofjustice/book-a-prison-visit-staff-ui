@@ -48,17 +48,15 @@ beforeEach(() => {
 
   visitSessionData = {}
 
-  app = appWithAllRoutes(
-    prisonerSearchService,
-    prisonerProfileService,
-    null,
-    visitSessionsService,
-    systemToken,
-    false,
-    {
+  app = appWithAllRoutes({
+    prisonerSearchServiceOverride: prisonerSearchService,
+    prisonerProfileServiceOverride: prisonerProfileService,
+    visitSessionsServiceOverride: visitSessionsService,
+    systemTokenOverride: systemToken,
+    sessionData: {
       visitSessionData,
     } as SessionData,
-  )
+  })
 })
 
 afterEach(() => {

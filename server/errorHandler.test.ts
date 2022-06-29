@@ -5,7 +5,7 @@ import { appWithAllRoutes } from './routes/testutils/appSetup'
 let app: Express
 
 beforeEach(() => {
-  app = appWithAllRoutes()
+  app = appWithAllRoutes({})
 })
 
 afterEach(() => {
@@ -29,7 +29,7 @@ describe('GET 404', () => {
   it('should render content without stack in production mode', () => {
     const systemToken = async (user: string): Promise<string> => `${user}-token-1`
 
-    return request(appWithAllRoutes(null, null, null, null, systemToken, true))
+    return request(appWithAllRoutes({ systemTokenOverride: systemToken, production: true }))
       .get('/unknown')
       .expect(404)
       .expect('Content-Type', /html/)

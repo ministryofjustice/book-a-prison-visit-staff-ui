@@ -150,15 +150,23 @@ function appSetup(
   return app
 }
 
-export function appWithAllRoutes(
-  prisonerSearchServiceOverride?: PrisonerSearchService,
-  prisonerProfileServiceOverride?: PrisonerProfileService,
-  prisonerVisitorsServiceOverride?: PrisonerVisitorsService,
-  visitSessionsServiceOverride?: VisitSessionsService,
-  systemTokenOverride?: SystemToken,
-  production?: boolean,
-  sessionData?: SessionData,
-): Express {
+export function appWithAllRoutes({
+  prisonerSearchServiceOverride,
+  prisonerProfileServiceOverride,
+  prisonerVisitorsServiceOverride,
+  visitSessionsServiceOverride,
+  systemTokenOverride,
+  production = false,
+  sessionData,
+}: {
+  prisonerSearchServiceOverride?: PrisonerSearchService
+  prisonerProfileServiceOverride?: PrisonerProfileService
+  prisonerVisitorsServiceOverride?: PrisonerVisitorsService
+  visitSessionsServiceOverride?: VisitSessionsService
+  systemTokenOverride?: SystemToken
+  production?: boolean
+  sessionData?: SessionData
+}): Express {
   auth.default.authenticationMiddleware = () => (req, res, next) => next()
   return appSetup(
     prisonerSearchServiceOverride,

@@ -156,10 +156,15 @@ describe('GET /book-a-visit/select-visitors', () => {
     prisonerVisitorsService.getVisitors.mockResolvedValue(returnData)
     prisonerProfileService.getRestrictions.mockResolvedValue(restrictions)
 
-    sessionApp = appWithAllRoutes(null, prisonerProfileService, prisonerVisitorsService, null, systemToken, false, {
-      visitorList,
-      visitSessionData,
-    } as SessionData)
+    sessionApp = appWithAllRoutes({
+      prisonerProfileServiceOverride: prisonerProfileService,
+      prisonerVisitorsServiceOverride: prisonerVisitorsService,
+      systemTokenOverride: systemToken,
+      sessionData: {
+        visitorList,
+        visitSessionData,
+      } as SessionData,
+    })
   })
 
   it('should render the prisoner restrictions when they are present', () => {
@@ -191,10 +196,15 @@ describe('GET /book-a-visit/select-visitors', () => {
     ]
     prisonerProfileService.getRestrictions.mockResolvedValue(restrictions)
 
-    sessionApp = appWithAllRoutes(null, prisonerProfileService, prisonerVisitorsService, null, systemToken, false, {
-      visitorList,
-      visitSessionData,
-    } as SessionData)
+    sessionApp = appWithAllRoutes({
+      prisonerProfileServiceOverride: prisonerProfileService,
+      prisonerVisitorsServiceOverride: prisonerVisitorsService,
+      systemTokenOverride: systemToken,
+      sessionData: {
+        visitorList,
+        visitSessionData,
+      } as SessionData,
+    })
 
     return request(sessionApp)
       .get('/book-a-visit/select-visitors')
@@ -213,10 +223,15 @@ describe('GET /book-a-visit/select-visitors', () => {
   it('should display a message when there are no prisoner restrictions', () => {
     prisonerProfileService.getRestrictions.mockResolvedValue([])
 
-    sessionApp = appWithAllRoutes(null, prisonerProfileService, prisonerVisitorsService, null, systemToken, false, {
-      visitorList,
-      visitSessionData,
-    } as SessionData)
+    sessionApp = appWithAllRoutes({
+      prisonerProfileServiceOverride: prisonerProfileService,
+      prisonerVisitorsServiceOverride: prisonerVisitorsService,
+      systemTokenOverride: systemToken,
+      sessionData: {
+        visitorList,
+        visitSessionData,
+      } as SessionData,
+    })
 
     return request(sessionApp)
       .get('/book-a-visit/select-visitors')
@@ -475,11 +490,14 @@ describe('POST /book-a-visit/select-visitors', () => {
       visitRestriction: 'OPEN',
     }
 
-    sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, {
-      adultVisitors,
-      visitorList,
-      visitSessionData,
-    } as SessionData)
+    sessionApp = appWithAllRoutes({
+      systemTokenOverride: systemToken,
+      sessionData: {
+        adultVisitors,
+        visitorList,
+        visitSessionData,
+      } as SessionData,
+    })
   })
 
   it('should save to session and redirect to the select date and time page if an adult is selected (OPEN visit)', () => {
@@ -846,9 +864,12 @@ describe('/book-a-visit/visit-type', () => {
       ],
     }
 
-    sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, {
-      visitSessionData,
-    } as SessionData)
+    sessionApp = appWithAllRoutes({
+      systemTokenOverride: systemToken,
+      sessionData: {
+        visitSessionData,
+      } as SessionData,
+    })
   })
 
   describe('GET /book-a-visit/visit-type', () => {
@@ -1051,9 +1072,13 @@ describe('/book-a-visit/select-date-and-time', () => {
     beforeEach(() => {
       visitSessionsService.getVisitSessions.mockResolvedValue(slotsList)
 
-      sessionApp = appWithAllRoutes(null, null, null, visitSessionsService, systemToken, false, {
-        visitSessionData,
-      } as SessionData)
+      sessionApp = appWithAllRoutes({
+        visitSessionsServiceOverride: visitSessionsService,
+        systemTokenOverride: systemToken,
+        sessionData: {
+          visitSessionData,
+        } as SessionData,
+      })
     })
 
     it('should render the available sessions list with none selected', () => {
@@ -1115,9 +1140,13 @@ describe('/book-a-visit/select-date-and-time', () => {
     it('should show message if no sessions are available', () => {
       visitSessionsService.getVisitSessions.mockResolvedValue({})
 
-      sessionApp = appWithAllRoutes(null, null, null, visitSessionsService, systemToken, false, {
-        visitSessionData,
-      } as SessionData)
+      sessionApp = appWithAllRoutes({
+        visitSessionsServiceOverride: visitSessionsService,
+        systemTokenOverride: systemToken,
+        sessionData: {
+          visitSessionData,
+        } as SessionData,
+      })
 
       return request(sessionApp)
         .get('/book-a-visit/select-date-and-time')
@@ -1192,10 +1221,14 @@ describe('/book-a-visit/select-date-and-time', () => {
       visitSessionsService.createVisit = jest.fn().mockResolvedValue(createdVisit)
       visitSessionsService.updateVisit = jest.fn()
 
-      sessionApp = appWithAllRoutes(null, null, null, visitSessionsService, systemToken, false, {
-        slotsList,
-        visitSessionData,
-      } as SessionData)
+      sessionApp = appWithAllRoutes({
+        visitSessionsServiceOverride: visitSessionsService,
+        systemTokenOverride: systemToken,
+        sessionData: {
+          slotsList,
+          visitSessionData,
+        } as SessionData,
+      })
     })
 
     it('should save to session, create visit and redirect to additional support page if slot selected', () => {
@@ -1263,12 +1296,15 @@ describe('/book-a-visit/select-date-and-time', () => {
     })
 
     it('should should set validation errors in flash and redirect, preserving filter settings, if no slot selected', () => {
-      sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, {
-        timeOfDay: 'afternoon',
-        dayOfTheWeek: '3',
-        slotsList,
-        visitSessionData,
-      } as SessionData)
+      sessionApp = appWithAllRoutes({
+        systemTokenOverride: systemToken,
+        sessionData: {
+          timeOfDay: 'afternoon',
+          dayOfTheWeek: '3',
+          slotsList,
+          visitSessionData,
+        } as SessionData,
+      })
 
       return request(sessionApp)
         .post('/book-a-visit/select-date-and-time')
@@ -1342,10 +1378,13 @@ describe('GET /book-a-visit/additional-support', () => {
       visitStatus: 'RESERVED',
     }
 
-    sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, {
-      availableSupportTypes,
-      visitSessionData,
-    } as SessionData)
+    sessionApp = appWithAllRoutes({
+      systemTokenOverride: systemToken,
+      sessionData: {
+        availableSupportTypes,
+        visitSessionData,
+      } as SessionData,
+    })
   })
 
   it('should render the additional support page with no options selected', () => {
@@ -1522,10 +1561,14 @@ describe('POST /book-a-visit/additional-support', () => {
       visitReference: 'ab-cd-ef-gh',
       visitStatus: 'RESERVED',
     }
-    sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, {
-      availableSupportTypes,
-      visitSessionData,
-    } as SessionData)
+
+    sessionApp = appWithAllRoutes({
+      systemTokenOverride: systemToken,
+      sessionData: {
+        availableSupportTypes,
+        visitSessionData,
+      } as SessionData,
+    })
   })
 
   it('should set validation errors in flash and redirect if additional support question not answered', () => {
@@ -1739,11 +1782,14 @@ describe('/book-a-visit/select-main-contact', () => {
       visitStatus: 'RESERVED',
     }
 
-    sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, {
-      adultVisitors,
-      visitorList,
-      visitSessionData,
-    } as SessionData)
+    sessionApp = appWithAllRoutes({
+      systemTokenOverride: systemToken,
+      sessionData: {
+        adultVisitors,
+        visitorList,
+        visitSessionData,
+      } as SessionData,
+    })
   })
 
   describe('GET /book-a-visit/select-main-contact', () => {
@@ -2028,10 +2074,14 @@ describe('GET /book-a-visit/check-your-booking', () => {
       visitReference: 'ab-cd-ef-gh',
       visitStatus: 'RESERVED',
     }
-    sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, {
-      availableSupportTypes,
-      visitSessionData,
-    } as SessionData)
+
+    sessionApp = appWithAllRoutes({
+      systemTokenOverride: systemToken,
+      sessionData: {
+        availableSupportTypes,
+        visitSessionData,
+      } as SessionData,
+    })
   })
 
   it('should render all data from the session', () => {
@@ -2099,7 +2149,13 @@ describe('GET /book-a-visit/check-your-booking', () => {
         visitReference: 'ab-cd-ef-gh',
         visitStatus: 'RESERVED',
       }
-      sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, { visitSessionData } as SessionData)
+
+      sessionApp = appWithAllRoutes({
+        systemTokenOverride: systemToken,
+        sessionData: {
+          visitSessionData,
+        } as SessionData,
+      })
     })
 
     it('should render all data from the session with a message for no selected additional support options', () => {
@@ -2170,10 +2226,14 @@ describe('GET /book-a-visit/confirmation', () => {
       visitReference: 'ab-cd-ef-gh',
       visitStatus: 'BOOKED',
     }
-    sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, {
-      availableSupportTypes,
-      visitSessionData,
-    } as SessionData)
+
+    sessionApp = appWithAllRoutes({
+      systemTokenOverride: systemToken,
+      sessionData: {
+        availableSupportTypes,
+        visitSessionData,
+      } as SessionData,
+    })
   })
 
   it('should render all data from the session', () => {
@@ -2246,10 +2306,14 @@ describe('GET /book-a-visit/confirmation', () => {
         visitReference: 'ab-cd-ef-gh',
         visitStatus: 'BOOKED',
       }
-      sessionApp = appWithAllRoutes(null, null, null, null, systemToken, false, {
-        availableSupportTypes,
-        visitSessionData,
-      } as SessionData)
+
+      sessionApp = appWithAllRoutes({
+        systemTokenOverride: systemToken,
+        sessionData: {
+          availableSupportTypes,
+          visitSessionData,
+        } as SessionData,
+      })
     })
 
     it('should render all data from the session with a message for no selected additional support options', () => {
