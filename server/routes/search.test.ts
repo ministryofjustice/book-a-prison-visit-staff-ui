@@ -44,6 +44,7 @@ beforeEach(() => {
   app = appWithAllRoutes({
     prisonerSearchServiceOverride: prisonerSearchService,
     visitSessionsServiceOverride: visitSessionsService,
+    auditServiceOverride: auditService,
     systemTokenOverride: systemToken,
   })
 })
@@ -83,6 +84,7 @@ describe('Prisoner search page', () => {
           .expect(res => {
             expect(res.text).toContain('Search for a prisoner')
             expect(res.text).toContain('id="search-results-none"')
+            expect(auditService.prisonerSearch).toBeCalledTimes(1)
           })
       })
     })
@@ -107,6 +109,7 @@ describe('Prisoner search page', () => {
           .expect(res => {
             expect(res.text).toContain('Search for a prisoner')
             expect(res.text).toContain('id="search-results-true"')
+            expect(auditService.prisonerSearch).toBeCalledTimes(1)
           })
       })
 
@@ -140,6 +143,7 @@ describe('Prisoner search page', () => {
             expect(res.text).toContain('Search for a prisoner')
             expect(res.text).toContain('id="search-results-true"')
             expect(res.text).toContain('<p class="moj-pagination__results">')
+            expect(auditService.prisonerSearch).toBeCalledTimes(1)
           })
       })
     })

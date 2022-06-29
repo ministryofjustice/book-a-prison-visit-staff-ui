@@ -55,6 +55,7 @@ function appSetup({
   prisonerProfileServiceOverride,
   prisonerVisitorsServiceOverride,
   visitSessionsServiceOverride,
+  auditServiceOverride,
   systemTokenOverride,
   production = false,
   sessionData = {
@@ -74,6 +75,7 @@ function appSetup({
   prisonerProfileServiceOverride: PrisonerProfileService
   prisonerVisitorsServiceOverride: PrisonerVisitorsService
   visitSessionsServiceOverride: VisitSessionsService
+  auditServiceOverride: AuditService
   systemTokenOverride: SystemToken
   production: boolean
   sessionData: SessionData
@@ -117,7 +119,7 @@ function appSetup({
       whereaboutsApiClientBuilder,
       systemTokenTest,
     )
-  const auditService = new AuditService()
+  const auditService = auditServiceOverride || new AuditService()
   app.use(
     '/search/',
     searchRoutes(standardRouter(new MockUserService()), prisonerSearchService, visitSessionsService, auditService),
@@ -169,6 +171,7 @@ export function appWithAllRoutes({
   prisonerProfileServiceOverride,
   prisonerVisitorsServiceOverride,
   visitSessionsServiceOverride,
+  auditServiceOverride,
   systemTokenOverride,
   production = false,
   sessionData,
@@ -177,6 +180,7 @@ export function appWithAllRoutes({
   prisonerProfileServiceOverride?: PrisonerProfileService
   prisonerVisitorsServiceOverride?: PrisonerVisitorsService
   visitSessionsServiceOverride?: VisitSessionsService
+  auditServiceOverride?: AuditService
   systemTokenOverride?: SystemToken
   production?: boolean
   sessionData?: SessionData
@@ -187,6 +191,7 @@ export function appWithAllRoutes({
     prisonerProfileServiceOverride,
     prisonerVisitorsServiceOverride,
     visitSessionsServiceOverride,
+    auditServiceOverride,
     systemTokenOverride,
     production,
     sessionData,
