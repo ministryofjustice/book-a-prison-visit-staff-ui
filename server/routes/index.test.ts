@@ -6,7 +6,7 @@ import * as visitorUtils from './visitorUtils'
 let app: Express
 
 beforeEach(() => {
-  app = appWithAllRoutes()
+  app = appWithAllRoutes({})
 })
 
 afterEach(() => {

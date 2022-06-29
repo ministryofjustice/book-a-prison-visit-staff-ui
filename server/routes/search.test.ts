@@ -38,7 +38,11 @@ let getPrisonerReturnData: Prisoner
 let getVisit: VisitInformation
 
 beforeEach(() => {
-  app = appWithAllRoutes(prisonerSearchService, null, null, visitSessionsService, systemToken)
+  app = appWithAllRoutes({
+    prisonerSearchServiceOverride: prisonerSearchService,
+    visitSessionsServiceOverride: visitSessionsService,
+    systemTokenOverride: systemToken,
+  })
 })
 
 afterEach(() => {

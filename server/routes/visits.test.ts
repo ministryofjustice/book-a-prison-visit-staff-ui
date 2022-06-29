@@ -27,7 +27,11 @@ beforeEach(() => {
   flashProvider.mockImplementation(key => {
     return flashData[key]
   })
-  app = appWithAllRoutes(prisonerSearchService, null, null, visitSessionsService, systemToken)
+  app = appWithAllRoutes({
+    prisonerSearchServiceOverride: prisonerSearchService,
+    visitSessionsServiceOverride: visitSessionsService,
+    systemTokenOverride: systemToken,
+  })
 })
 
 afterEach(() => {
