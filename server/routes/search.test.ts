@@ -6,13 +6,16 @@ import VisitSessionsService from '../services/visitSessionsService'
 import { appWithAllRoutes } from './testutils/appSetup'
 import { PrisonerDetailsItem, VisitInformation } from '../@types/bapv'
 import { Prisoner } from '../data/prisonerOffenderSearchTypes'
+import AuditService from '../services/auditService'
 
 jest.mock('../services/prisonerSearchService')
 jest.mock('../services/visitSessionsService')
+jest.mock('../services/auditService')
 
 let app: Express
 const systemToken = async (user: string): Promise<string> => `${user}-token-1`
 const prisonerSearchService = new PrisonerSearchService(null, systemToken) as jest.Mocked<PrisonerSearchService>
+const auditService = new AuditService() as jest.Mocked<AuditService>
 const visitSessionsService = new VisitSessionsService(
   null,
   null,
