@@ -128,6 +128,18 @@ export default {
       },
       agent: new AgentConfig(Number(get('WHEREABOUTS_API_TIMEOUT_RESPONSE', 10000))),
     },
+    audit: {
+      region: get('AUDIT_SQS_REGION', 'eu-west-2', requiredInProduction),
+      accessKeyId: get('AUDIT_SQS_ACCESS_KEY_ID', 'foobar', requiredInProduction),
+      secretAccessKey: get('AUDIT_SQS_SECRET_ACCESS_KEY', 'foobar', requiredInProduction),
+      endpoint: production ? null : 'http://localhost:4566',
+      queueUrl: get(
+        'AUDIT_SQS_QUEUE_URL',
+        'http://localhost:4566/000000000000/audit_event_queue',
+        requiredInProduction,
+      ),
+      serviceName: get('AUDIT_SERVICE_NAME', 'book-a-prison-visit-staff-ui', requiredInProduction),
+    },
     notifications: {
       enabled: get('SMS_NOTIFICATIONS_ENABLED', 'false', requiredInProduction) === 'true',
       key: get('GOVUK_NOTIFY_API_KEY', 'abcd', requiredInProduction),

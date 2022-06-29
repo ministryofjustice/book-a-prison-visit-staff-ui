@@ -14,12 +14,12 @@ import standardRouter from './routes/standardRouter'
 import type UserService from './services/userService'
 import { prisonerSearchClientBuilder } from './data/prisonerSearchClient'
 import { notificationsApiClientBuilder } from './data/notificationsApiClient'
-import NotificationsService from './services/notificationsService'
-import PrisonerSearchService from './services/prisonerSearchService'
 import { visitSchedulerApiClientBuilder } from './data/visitSchedulerApiClient'
 import { whereaboutsApiClientBuilder } from './data/whereaboutsApiClient'
 import { prisonerContactRegistryApiClientBuilder } from './data/prisonerContactRegistryApiClient'
 import { prisonApiClientBuilder } from './data/prisonApiClient'
+import NotificationsService from './services/notificationsService'
+import PrisonerSearchService from './services/prisonerSearchService'
 import PrisonerProfileService from './services/prisonerProfileService'
 import systemToken from './data/authClient'
 import setUpWebSession from './middleware/setUpWebSession'
@@ -31,6 +31,7 @@ import setUpWebRequestParsing from './middleware/setupRequestParsing'
 import authorisationMiddleware from './middleware/authorisationMiddleware'
 import PrisonerVisitorsService from './services/prisonerVisitorsService'
 import VisitSessionsService from './services/visitSessionsService'
+import AuditService from './services/auditService'
 
 export default function createApp(userService: UserService): express.Application {
   const app = express()
@@ -60,6 +61,7 @@ export default function createApp(userService: UserService): express.Application
         whereaboutsApiClientBuilder,
         systemToken,
       ),
+      new AuditService(),
     ),
   )
   app.use(

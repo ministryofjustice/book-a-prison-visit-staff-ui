@@ -3,6 +3,7 @@ import url from 'url'
 import { validatePrisonerSearch, validateVisitSearch } from './searchValidation'
 import PrisonerSearchService from '../services/prisonerSearchService'
 import VisitSessionsService from '../services/visitSessionsService'
+import AuditService from '../services/auditService'
 import config from '../config'
 import { getResultsPagingLinks } from '../utils/utils'
 import { VisitInformation } from '../@types/bapv'
@@ -12,6 +13,7 @@ export default function routes(
   router: Router,
   prisonerSearchService: PrisonerSearchService,
   visitSessionsService: VisitSessionsService,
+  auditService: AuditService,
 ): Router {
   const get = (path: string | string[], handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
   const post = (path: string | string[], handler: RequestHandler) => router.post(path, asyncMiddleware(handler))
@@ -53,6 +55,8 @@ export default function routes(
     const realNumberOfResults = errors.length > 0 ? 0 : numberOfResults
     const currentPageMax = parsedPage * pageSize
     const to = realNumberOfResults < currentPageMax ? realNumberOfResults : currentPageMax
+    auditService.prisonerSearch(search, 'HEI', res.locals.user?.username)
+
     const pageLinks = getResultsPagingLinks({
       pagesToShow: config.apis.prisonerSearch.pagesLinksToShow,
       numberOfPages,
