@@ -6,6 +6,7 @@ import asyncMiddleware from '../middleware/asyncMiddleware'
 import PrisonerProfileService from '../services/prisonerProfileService'
 import PrisonerSearchService from '../services/prisonerSearchService'
 import VisitSessionsService from '../services/visitSessionsService'
+import AuditService from '../services/auditService'
 import { prisonerDateTimePretty, properCaseFullName } from '../utils/utils'
 import { isValidPrisonerNumber } from './validationChecks'
 import { clearSession } from './visitorUtils'
@@ -15,6 +16,7 @@ export default function routes(
   prisonerProfileService: PrisonerProfileService,
   prisonerSearchService: PrisonerSearchService,
   visitSessionsService: VisitSessionsService,
+  auditService: AuditService,
 ): Router {
   const get = (path: string, handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
   const post = (path: string, handler: RequestHandler) => router.post(path, asyncMiddleware(handler))
@@ -25,6 +27,7 @@ export default function routes(
     const queryParamsForBackLink = new URLSearchParams({ search }).toString()
 
     const prisonerProfile = await prisonerProfileService.getProfile(offenderNo, res.locals.user?.username)
+    auditService.viewPrisoner(offenderNo, 'HEI', res.locals.user?.username)
 
     return res.render('pages/prisoner/profile', {
       errors: req.flash('errors'),

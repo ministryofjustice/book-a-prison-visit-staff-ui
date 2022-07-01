@@ -9,6 +9,7 @@ import { clearSession, getFlashFormValues, getSelectedSlot, getSupportTypeDescri
 import { SupportType, VisitorSupport } from '../data/visitSchedulerApiTypes'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import NotificationsService from '../services/notificationsService'
+import AuditService from '../services/auditService'
 import config from '../config'
 import logger from '../../logger'
 
@@ -18,6 +19,7 @@ export default function routes(
   visitSessionsService: VisitSessionsService,
   prisonerProfileService: PrisonerProfileService,
   notificationsService: NotificationsService,
+  auditService: AuditService,
 ): Router {
   const get = (path: string, ...handlers: RequestHandler[]) =>
     router.get(
@@ -260,6 +262,13 @@ export default function routes(
         req.session.visitSessionData.visitStatus = visitStatus
       }
 
+      auditService.reservedVisit(
+        req.session.visitSessionData.visitStatus,
+        visitSessionData.prisoner.offenderNo,
+        'HEI',
+        res.locals.user?.username,
+      )
+
       return res.redirect('/book-a-visit/additional-support')
     },
   )
@@ -453,6 +462,14 @@ export default function routes(
       })
 
       req.session.visitSessionData.visitStatus = bookedVisit.visitStatus
+
+      auditService.bookedVisit(
+        req.session.visitSessionData.visitStatus,
+        visitSessionData.prisoner.offenderNo,
+        'HEI',
+        visitSessionData.visitors.map(visitor => visitor.personId.toString()),
+        res.locals.user?.username,
+      )
     } catch (error) {
       return res.render('pages/checkYourBooking', {
         errors: [
