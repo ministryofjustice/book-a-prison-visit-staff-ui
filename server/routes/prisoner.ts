@@ -53,6 +53,13 @@ export default function routes(
         req.flash('errors', errors.array() as [])
         return res.redirect(req.originalUrl)
       }
+
+      auditService.overrodeZeroVO(
+        req.session.visitSessionData?.visitReference,
+        offenderNo,
+        'User override',
+        res.locals.user?.username,
+      )
     }
 
     clearSession(req)

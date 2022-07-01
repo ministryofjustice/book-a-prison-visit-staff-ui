@@ -3,6 +3,7 @@ import request from 'supertest'
 import * as cheerio from 'cheerio'
 import PrisonerSearchService from '../services/prisonerSearchService'
 import VisitSessionsService from '../services/visitSessionsService'
+import AuditService from '../services/auditService'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import { OutcomeDto, Visit } from '../data/visitSchedulerApiTypes'
 import { VisitorListItem } from '../@types/bapv'
@@ -10,6 +11,7 @@ import { Prisoner } from '../data/prisonerOffenderSearchTypes'
 
 jest.mock('../services/prisonerSearchService')
 jest.mock('../services/visitSessionsService')
+jest.mock('../services/auditService')
 
 let app: Express
 const systemToken = async (user: string): Promise<string> => `${user}-token-1`
@@ -22,6 +24,7 @@ const visitSessionsService = new VisitSessionsService(
   null,
   systemToken,
 ) as jest.Mocked<VisitSessionsService>
+const auditService = new AuditService() as jest.Mocked<AuditService>
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
@@ -31,6 +34,7 @@ beforeEach(() => {
   app = appWithAllRoutes({
     prisonerSearchServiceOverride: prisonerSearchService,
     visitSessionsServiceOverride: visitSessionsService,
+    auditServiceOverride: auditService,
     systemTokenOverride: systemToken,
   })
 })
@@ -444,6 +448,7 @@ describe('POST /visit/:reference/cancel', () => {
         })
         expect(flashProvider).toHaveBeenCalledWith('startTimestamp', cancelledVisit.startTimestamp)
         expect(flashProvider).toHaveBeenCalledWith('endTimestamp', cancelledVisit.endTimestamp)
+        expect(auditService.cancelledVisit).toBeCalledTimes(1)
       })
   })
 
@@ -457,6 +462,7 @@ describe('POST /visit/:reference/cancel', () => {
           { location: 'body', msg: 'No answer selected', param: 'cancel', value: undefined },
         ])
         expect(flashProvider).toHaveBeenCalledWith('formValues', {})
+        expect(auditService.cancelledVisit).not.toHaveBeenCalled()
       })
   })
 
@@ -476,6 +482,7 @@ describe('POST /visit/:reference/cancel', () => {
           },
         ])
         expect(flashProvider).toHaveBeenCalledWith('formValues', { cancel: 'PRISONER_CANCELLED' })
+        expect(auditService.cancelledVisit).not.toHaveBeenCalled()
       })
   })
 
@@ -494,6 +501,7 @@ describe('POST /visit/:reference/cancel', () => {
           cancel: 'INVALID_VALUE',
           reason_prisoner_cancelled: 'illness',
         })
+        expect(auditService.cancelledVisit).not.toHaveBeenCalled()
       })
   })
 })

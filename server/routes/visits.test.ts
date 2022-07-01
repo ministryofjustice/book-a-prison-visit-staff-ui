@@ -3,12 +3,14 @@ import request from 'supertest'
 import * as cheerio from 'cheerio'
 import PrisonerSearchService from '../services/prisonerSearchService'
 import VisitSessionsService from '../services/visitSessionsService'
+import AuditService from '../services/auditService'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import { ExtendedVisitInformation, PrisonerDetailsItem, VisitsPageSlot } from '../@types/bapv'
 import { getParsedDateFromQueryString } from './visitsUtils'
 
 jest.mock('../services/prisonerSearchService')
 jest.mock('../services/visitSessionsService')
+jest.mock('../services/auditService')
 
 let app: Express
 const systemToken = async (user: string): Promise<string> => `${user}-token-1`
@@ -21,6 +23,7 @@ const visitSessionsService = new VisitSessionsService(
   null,
   systemToken,
 ) as jest.Mocked<VisitSessionsService>
+const auditService = new AuditService() as jest.Mocked<AuditService>
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
@@ -30,6 +33,7 @@ beforeEach(() => {
   app = appWithAllRoutes({
     prisonerSearchServiceOverride: prisonerSearchService,
     visitSessionsServiceOverride: visitSessionsService,
+    auditServiceOverride: auditService,
     systemTokenOverride: systemToken,
   })
 })
@@ -183,6 +187,7 @@ describe('GET /visits', () => {
         expect($('[data-test="prisoner-name"]').text()).toBe('Rocky, Asap')
         expect($('.moj-side-navigation__title').text()).toContain('Main visits room')
         expect($('.moj-side-navigation__item--active').text()).toContain('9am to 9:29am')
+        expect(auditService.viewedVisits).toBeCalledTimes(1)
       })
   })
 
@@ -208,6 +213,7 @@ describe('GET /visits', () => {
         expect($('[data-test="prisoner-name"]').text()).toBe('Rocky, Asap')
         expect($('.moj-side-navigation__title').text()).toContain('Main visits room')
         expect($('.moj-side-navigation__item--active').text()).toContain('10am to 11am')
+        expect(auditService.viewedVisits).toBeCalledTimes(1)
       })
   })
 
@@ -233,6 +239,7 @@ describe('GET /visits', () => {
         expect($('[data-test="prisoner-name"]').text()).toBe('Rocky, Asap')
         expect($('.moj-side-navigation__title').text()).toContain('Main visits room')
         expect($('.moj-side-navigation__item--active').text()).toContain('10am to 11am')
+        expect(auditService.viewedVisits).toBeCalledTimes(1)
       })
   })
 
@@ -262,6 +269,7 @@ describe('GET /visits', () => {
         expect($('h1').text()).toBe('View visits by date')
         expect($('.govuk-back-link').attr('href')).toBe('/')
         expect($('#search-results-none').text()).toContain('No visit sessions on this day.')
+        expect(auditService.viewedVisits).toBeCalledTimes(1)
       })
   })
 
@@ -278,6 +286,7 @@ describe('GET /visits', () => {
         expect($('h1').text()).toBe('View visits by date')
         expect($('.govuk-back-link').attr('href')).toBe('/')
         expect($('#search-results-none').text()).toContain('No visit sessions on this day.')
+        expect(auditService.viewedVisits).toBeCalledTimes(1)
       })
   })
 })

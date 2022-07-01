@@ -7,6 +7,7 @@ import { OffenderRestriction } from '../data/prisonApiTypes'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
 import PrisonerProfileService from '../services/prisonerProfileService'
 import VisitSessionsService from '../services/visitSessionsService'
+import AuditService from '../services/auditService'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import { Restriction } from '../data/prisonerContactRegistryApiTypes'
 import { SupportType, Visit, VisitorSupport } from '../data/visitSchedulerApiTypes'
@@ -15,9 +16,11 @@ import * as visitorUtils from './visitorUtils'
 jest.mock('../services/prisonerProfileService')
 jest.mock('../services/prisonerVisitorsService')
 jest.mock('../services/visitSessionsService')
+jest.mock('../services/auditService')
 
 let sessionApp: Express
 const systemToken = async (user: string): Promise<string> => `${user}-token-1`
+const auditService = new AuditService() as jest.Mocked<AuditService>
 
 let flashData: Record<'errors' | 'formValues', Record<string, string | string[]>[]>
 let visitSessionData: VisitSessionData
@@ -1223,6 +1226,7 @@ describe('/book-a-visit/select-date-and-time', () => {
 
       sessionApp = appWithAllRoutes({
         visitSessionsServiceOverride: visitSessionsService,
+        auditServiceOverride: auditService,
         systemTokenOverride: systemToken,
         sessionData: {
           slotsList,
@@ -1246,6 +1250,7 @@ describe('/book-a-visit/select-date-and-time', () => {
             visitRoomName: 'room name',
           })
           expect(visitSessionsService.createVisit).toHaveBeenCalledTimes(1)
+          expect(auditService.reservedVisit).toBeCalledTimes(1)
           expect(visitSessionsService.updateVisit).not.toHaveBeenCalled()
           expect(visitSessionData.visitReference).toEqual('2a-bc-3d-ef')
           expect(visitSessionData.visitStatus).toEqual('RESERVED')
@@ -1277,6 +1282,7 @@ describe('/book-a-visit/select-date-and-time', () => {
             visitRoomName: 'room name',
           })
           expect(visitSessionsService.createVisit).not.toHaveBeenCalled()
+          expect(auditService.reservedVisit).toBeCalledTimes(1)
           expect(visitSessionsService.updateVisit).toHaveBeenCalledTimes(1)
           expect(visitSessionsService.updateVisit.mock.calls[0][0].visitData.visitReference).toBe('3b-cd-4f-fg')
         })
@@ -1292,11 +1298,13 @@ describe('/book-a-visit/select-date-and-time', () => {
             { location: 'body', msg: 'No time slot selected', param: 'visit-date-and-time', value: undefined },
           ])
           expect(flashProvider).toHaveBeenCalledWith('formValues', {})
+          expect(auditService.reservedVisit).not.toHaveBeenCalled()
         })
     })
 
     it('should should set validation errors in flash and redirect, preserving filter settings, if no slot selected', () => {
       sessionApp = appWithAllRoutes({
+        auditServiceOverride: auditService,
         systemTokenOverride: systemToken,
         sessionData: {
           timeOfDay: 'afternoon',
@@ -1315,6 +1323,7 @@ describe('/book-a-visit/select-date-and-time', () => {
             { location: 'body', msg: 'No time slot selected', param: 'visit-date-and-time', value: undefined },
           ])
           expect(flashProvider).toHaveBeenCalledWith('formValues', {})
+          expect(auditService.reservedVisit).not.toHaveBeenCalled()
         })
     })
 
@@ -1329,6 +1338,7 @@ describe('/book-a-visit/select-date-and-time', () => {
             { location: 'body', msg: 'No time slot selected', param: 'visit-date-and-time', value: '100' },
           ])
           expect(flashProvider).toHaveBeenCalledWith('formValues', { 'visit-date-and-time': '100' })
+          expect(auditService.reservedVisit).not.toHaveBeenCalled()
         })
     })
 
@@ -1343,6 +1353,7 @@ describe('/book-a-visit/select-date-and-time', () => {
             { location: 'body', msg: 'No time slot selected', param: 'visit-date-and-time', value: '5' },
           ])
           expect(flashProvider).toHaveBeenCalledWith('formValues', { 'visit-date-and-time': '5' })
+          expect(auditService.reservedVisit).not.toHaveBeenCalled()
         })
     })
   })
