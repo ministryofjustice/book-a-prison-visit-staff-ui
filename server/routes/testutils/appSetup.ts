@@ -140,6 +140,7 @@ function appSetup({
       prisonerProfileService,
       prisonerSearchService,
       visitSessionsService,
+      auditService,
     ),
   )
 
@@ -155,10 +156,17 @@ function appSetup({
       visitSessionsService,
       prisonerProfileService,
       notificationsService,
+      auditService,
     ),
   )
-  app.use('/visit/', visitRoutes(standardRouter(new MockUserService()), prisonerSearchService, visitSessionsService))
-  app.use('/visits', visitsRoutes(standardRouter(new MockUserService()), prisonerSearchService, visitSessionsService))
+  app.use(
+    '/visit/',
+    visitRoutes(standardRouter(new MockUserService()), prisonerSearchService, visitSessionsService, auditService),
+  )
+  app.use(
+    '/visits',
+    visitsRoutes(standardRouter(new MockUserService()), prisonerSearchService, visitSessionsService, auditService),
+  )
 
   app.use((req, res, next) => next(createError(404, 'Not found')))
   app.use(errorHandler(production))

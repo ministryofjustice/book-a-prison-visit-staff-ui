@@ -7,6 +7,7 @@ import { OutcomeDto } from '../data/visitSchedulerApiTypes'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import PrisonerSearchService from '../services/prisonerSearchService'
 import VisitSessionsService from '../services/visitSessionsService'
+import AuditService from '../services/auditService'
 import { isValidVisitReference } from './validationChecks'
 import { getFlashFormValues } from './visitorUtils'
 
@@ -14,6 +15,7 @@ export default function routes(
   router: Router,
   prisonerSearchService: PrisonerSearchService,
   visitSessionsService: VisitSessionsService,
+  auditService: AuditService,
 ): Router {
   const get = (path: string, handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
   const post = (path: string, ...handlers: RequestHandler[]) =>
@@ -86,6 +88,13 @@ export default function routes(
       }
 
       const visit = await visitSessionsService.cancelVisit({ username: res.locals.user?.username, reference, outcome })
+      auditService.cancelledVisit(
+        reference,
+        visit.prisonerId.toString(),
+        'HEI',
+        req.body[reasonFieldName],
+        res.locals.user?.username,
+      )
 
       req.flash('startTimestamp', visit.startTimestamp)
       req.flash('endTimestamp', visit.endTimestamp)

@@ -81,6 +81,7 @@ export default function createApp(userService: UserService): express.Application
         whereaboutsApiClientBuilder,
         systemToken,
       ),
+      new AuditService(),
     ),
   )
   app.use(
@@ -101,6 +102,7 @@ export default function createApp(userService: UserService): express.Application
         systemToken,
       ),
       new NotificationsService(notificationsApiClientBuilder),
+      new AuditService(),
     ),
   )
   app.use(
@@ -114,6 +116,7 @@ export default function createApp(userService: UserService): express.Application
         whereaboutsApiClientBuilder,
         systemToken,
       ),
+      new AuditService(),
     ),
   )
   app.use(
@@ -127,6 +130,7 @@ export default function createApp(userService: UserService): express.Application
         whereaboutsApiClientBuilder,
         systemToken,
       ),
+      new AuditService(),
     ),
   )
 

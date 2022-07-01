@@ -4,6 +4,7 @@ import { ExtendedVisitInformation, PrisonerDetailsItem, VisitsPageSlot } from '.
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import PrisonerSearchService from '../services/prisonerSearchService'
 import VisitSessionsService from '../services/visitSessionsService'
+import AuditService from '../services/auditService'
 import { getResultsPagingLinks } from '../utils/utils'
 import { getDateTabs, getParsedDateFromQueryString, getSlotsSideMenuData } from './visitsUtils'
 
@@ -11,6 +12,7 @@ export default function routes(
   router: Router,
   prisonerSearchService: PrisonerSearchService,
   visitSessionsService: VisitSessionsService,
+  auditService: AuditService,
 ): Router {
   const get = (path: string | string[], ...handlers: RequestHandler[]) =>
     router.get(
@@ -113,6 +115,8 @@ export default function routes(
       searchParam: queryParams,
       searchUrl: '/visits/',
     })
+
+    auditService.viewedVisits(selectedDateString, 'HEI', res.locals.user?.username)
 
     return res.render('pages/visits/summary', {
       totals: {

@@ -7,6 +7,7 @@ import { InmateDetail, VisitBalances } from '../data/prisonApiTypes'
 import PrisonerProfileService from '../services/prisonerProfileService'
 import PrisonerSearchService from '../services/prisonerSearchService'
 import VisitSessionsService from '../services/visitSessionsService'
+import AuditService from '../services/auditService'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import { Prisoner } from '../data/prisonerOffenderSearchTypes'
 import { clearSession } from './visitorUtils'
@@ -14,6 +15,7 @@ import { clearSession } from './visitorUtils'
 jest.mock('../services/prisonerProfileService')
 jest.mock('../services/prisonerSearchService')
 jest.mock('../services/visitSessionsService')
+jest.mock('../services/auditService')
 
 let app: Express
 const systemToken = async (user: string): Promise<string> => `${user}-token-1`
@@ -33,6 +35,7 @@ const visitSessionsService = new VisitSessionsService(
   null,
   systemToken,
 ) as jest.Mocked<VisitSessionsService>
+const auditService = new AuditService() as jest.Mocked<AuditService>
 
 jest.mock('./visitorUtils', () => ({
   clearSession: jest.fn((req: Express.Request) => {
@@ -52,6 +55,7 @@ beforeEach(() => {
     prisonerSearchServiceOverride: prisonerSearchService,
     prisonerProfileServiceOverride: prisonerProfileService,
     visitSessionsServiceOverride: visitSessionsService,
+    auditServiceOverride: auditService,
     systemTokenOverride: systemToken,
     sessionData: {
       visitSessionData,
@@ -161,6 +165,7 @@ describe('GET /prisoner/A1234BC', () => {
 
         expect($('#vo-override').length).toBe(0)
         expect($('[data-test="book-a-visit"]').length).toBe(1)
+        expect(auditService.viewPrisoner).toBeCalledTimes(1)
       })
   })
 
@@ -179,6 +184,7 @@ describe('GET /prisoner/A1234BC', () => {
         expect($('.flagged-alerts-list').length).toBe(0)
         expect($('[data-test="active-alert-count"]').text()).toBe('0 active')
         expect($('#active-alerts').text()).toContain('There are no active alerts for this prisoner.')
+        expect(auditService.viewPrisoner).toBeCalledTimes(1)
       })
   })
 
@@ -198,6 +204,7 @@ describe('GET /prisoner/A1234BC', () => {
         expect($('[data-test="remaining-pvos"]').length).toBe(0)
         expect($('#vo-override').length).toBe(0)
         expect($('[data-test="book-a-visit"]').length).toBe(1)
+        expect(auditService.viewPrisoner).toBeCalledTimes(1)
       })
   })
 
@@ -216,6 +223,7 @@ describe('GET /prisoner/A1234BC', () => {
         expect($('#vo-override').length).toBe(1)
         expect($('label[for="vo-override"]').text()).toContain('The prisoner has no available visiting orders')
         expect($('[data-test="book-a-visit"]').length).toBe(1)
+        expect(auditService.viewPrisoner).toBeCalledTimes(1)
       })
   })
 
@@ -246,6 +254,7 @@ describe('GET /prisoner/A1234BC', () => {
         expect($('[data-test="book-a-visit"]').length).toBe(1)
         expect(flashProvider).toHaveBeenCalledWith('errors')
         expect(flashProvider).toHaveBeenCalledTimes(1)
+        expect(auditService.viewPrisoner).toBeCalledTimes(1)
       })
   })
 
