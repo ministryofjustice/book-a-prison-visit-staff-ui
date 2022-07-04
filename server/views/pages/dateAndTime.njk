@@ -42,10 +42,8 @@
 
     <p class="bapv-extraspacing"><strong>Prisoner name:</strong> <span data-test="prisoner-name">{{ prisonerName }}</span>
     <br><strong>Visit type:</strong> <span data-test="visit-restriction">{{ visitRestriction | capitalize }}</span>
-    {% if slotsList | length %}
     <br>Showing visit time slots for the next 28 days.
     <br>Time slots with prisoner non-associations are not shown.
-    {% endif %}
     </p>
 
     {% if visitRestriction == 'CLOSED' and closedVisitReason %}
@@ -68,7 +66,6 @@
       }) }}
     {% endif %}
 
-    {% if slotsList | length %}
     <form action="/book-a-visit/select-date-and-time" method="GET" novalidate>
       <div class="bapv-visit-date-time-filter">
         <h3 class="govuk-heading-s">Filter time slots</h3>
@@ -153,6 +150,7 @@
       </div>
     </form>
 
+    {% if slotsList | length %}
     <form action="/book-a-visit/select-date-and-time" method="POST" novalidate>
       <input type="hidden" name="_csrf" value="{{ csrfToken }}">
     {% for month, days in slotsList %}
@@ -246,7 +244,7 @@
     </form>
 
     {% else %}
-    <p>There are no visit time slots for the next 28 days.</p>
+    <p>There are no available slots for this prisoner. A booking cannot be made at this time.</p>
 
     {% include "partials/backToStartButton.njk" %}
     {% endif %}
