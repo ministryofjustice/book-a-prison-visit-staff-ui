@@ -1159,7 +1159,7 @@ describe('/book-a-visit/select-date-and-time', () => {
           const $ = cheerio.load(res.text)
           expect($('h1').text().trim()).toBe('Select date and time of visit')
           expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
-          expect($('#main-content').text()).toContain('There are no visit time slots for the next 28 days.')
+          expect($('#main-content').text()).toContain('There are no available slots for this prisoner.')
           expect($('input[name="visit-date-and-time"]').length).toBe(0)
           expect($('[data-test="submit"]').length).toBe(0)
           expect($('[data-test="back-to-start"]').length).toBe(1)
