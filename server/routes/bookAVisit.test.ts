@@ -391,7 +391,7 @@ describe('GET /book-a-visit/select-visitors', () => {
         expect($('h1').text().trim()).toBe('Select visitors from the prisoner’s approved visitor list')
         expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
         expect($('input[name="visitors"]').length).toBe(0)
-        expect($('#main-content').text()).toContain('The prisoner has no approved visitors.')
+        expect($('#main-content').text()).toContain('There are no approved visitors for this prisoner.')
         expect($('[data-test="submit"]').length).toBe(0)
         expect($('[data-test="back-to-start"]').length).toBe(1)
       })

@@ -104,6 +104,7 @@
       </div>
       {% endif %}
 
+      <h2 class="govuk-heading-m">Approved visitor list</h2>
       {% if visitors | length %}
       {% if errors | length %}
       <p id="visitors-error" class="govuk-error-message">
@@ -111,7 +112,6 @@
       </p>
       {% endif %}
 
-      <h2 class="govuk-heading-m">Approved visitor list</h2>
       <p>Add up to 3 visitors with a maximum of 2 adults.</p>
 
       <form action="/book-a-visit/select-visitors" method="POST" novalidate>
@@ -150,7 +150,7 @@
         }) }} 
       </form>
     {% else %}
-    <p>The prisoner has no approved visitors.</p>
+    <p>There are no approved visitors for this prisoner. A booking cannot be made at this time.</p>
 
     {% include "partials/backToStartButton.njk" %}
 
