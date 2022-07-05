@@ -396,6 +396,50 @@ describe('GET /book-a-visit/select-visitors', () => {
         expect($('[data-test="back-to-start"]').length).toBe(1)
       })
   })
+
+  it('should show back to start rather than continue button if only child or banned visitors listed', () => {
+    returnData = [
+      {
+        personId: 4322,
+        name: 'Bob Smith',
+        dateOfBirth: undefined,
+        adult: undefined,
+        relationshipDescription: 'Brother',
+        address: '1st listed address',
+        restrictions: [
+          {
+            restrictionType: 'BAN',
+            restrictionTypeDescription: 'Banned',
+            startDate: '2022-01-01',
+          },
+        ],
+        banned: true,
+      },
+      {
+        personId: 4324,
+        name: 'Anne Smith',
+        dateOfBirth: '2018-03-02',
+        adult: false,
+        relationshipDescription: 'Niece',
+        address: 'Not entered',
+        restrictions: [],
+        banned: false,
+      },
+    ]
+    prisonerVisitorsService.getVisitors.mockResolvedValue(returnData)
+
+    return request(sessionApp)
+      .get('/book-a-visit/select-visitors')
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('h1').text().trim()).toBe('Select visitors from the prisoner’s approved visitor list')
+        expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
+        expect($('input[name="visitors"]').length).toBe(2)
+        expect($('[data-test="submit"]').length).toBe(0)
+        expect($('[data-test="back-to-start"]').length).toBe(1)
+      })
+  })
 })
 
 describe('POST /book-a-visit/select-visitors', () => {
