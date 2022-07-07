@@ -142,7 +142,7 @@ export default class AuditService {
         who,
         service: config.apis.audit.serviceName,
         when: timestamp,
-        details,
+        details: JSON.stringify(details),
       })
 
       const messageResponse = await this.sqsClient.send(
