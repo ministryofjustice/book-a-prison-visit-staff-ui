@@ -267,6 +267,7 @@ export default function routes(
         visitSessionData.prisoner.offenderNo,
         'HEI',
         res.locals.user?.username,
+        res.locals.appInsightsOperationId,
       )
 
       return res.redirect('/book-a-visit/additional-support')
@@ -469,6 +470,7 @@ export default function routes(
         'HEI',
         visitSessionData.visitors.map(visitor => visitor.personId.toString()),
         res.locals.user?.username,
+        res.locals.appInsightsOperationId,
       )
     } catch (error) {
       return res.render('pages/checkYourBooking', {

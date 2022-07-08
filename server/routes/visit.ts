@@ -94,6 +94,7 @@ export default function routes(
         'HEI',
         req.body[reasonFieldName],
         res.locals.user?.username,
+        res.locals.appInsightsOperationId,
       )
 
       req.flash('startTimestamp', visit.startTimestamp)
