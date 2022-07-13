@@ -32,6 +32,7 @@ import authorisationMiddleware from './middleware/authorisationMiddleware'
 import PrisonerVisitorsService from './services/prisonerVisitorsService'
 import VisitSessionsService from './services/visitSessionsService'
 import AuditService from './services/auditService'
+import appInsightsOperationId from './middleware/appInsightsOperationId'
 
 export default function createApp(userService: UserService): express.Application {
   const app = express()
@@ -48,6 +49,7 @@ export default function createApp(userService: UserService): express.Application
   nunjucksSetup(app)
   app.use(setUpAuthentication())
   app.use(authorisationMiddleware())
+  app.use(appInsightsOperationId)
 
   app.use('/', indexRoutes(standardRouter(userService)))
   app.use(

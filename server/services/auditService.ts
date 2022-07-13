@@ -21,10 +21,11 @@ export default class AuditService {
     })
   }
 
-  async prisonerSearch(searchTerms: string, prisonId: string, username: string) {
+  async prisonerSearch(searchTerms: string, prisonId: string, username: string, operationId: string) {
     return this.sendAuditMessage({
       action: 'SEARCHED_PRISONERS',
       who: username,
+      operationId,
       details: {
         searchTerms,
         prisonId,
@@ -32,10 +33,11 @@ export default class AuditService {
     })
   }
 
-  async viewPrisoner(prisonerId: string, prisonId: string, username: string) {
+  async viewPrisoner(prisonerId: string, prisonId: string, username: string, operationId: string) {
     return this.sendAuditMessage({
       action: 'VIEWED_PRISONER',
       who: username,
+      operationId,
       details: {
         prisonerId,
         prisonId,
@@ -43,24 +45,39 @@ export default class AuditService {
     })
   }
 
-  async reservedVisit(reference: string, prisonerId: string, prisonId: string, username: string) {
+  async reservedVisit(
+    visitReference: string,
+    prisonerId: string,
+    prisonId: string,
+    username: string,
+    operationId: string,
+  ) {
     return this.sendAuditMessage({
       action: 'RESERVED_VISIT',
       who: username,
+      operationId,
       details: {
-        reference,
+        visitReference,
         prisonerId,
         prisonId,
       },
     })
   }
 
-  async bookedVisit(reference: string, prisonerId: string, prisonId: string, visitorIds: string[], username: string) {
+  async bookedVisit(
+    visitReference: string,
+    prisonerId: string,
+    prisonId: string,
+    visitorIds: string[],
+    username: string,
+    operationId: string,
+  ) {
     return this.sendAuditMessage({
       action: 'BOOKED_VISIT',
       who: username,
+      operationId,
       details: {
-        reference,
+        visitReference,
         prisonerId,
         prisonId,
         visitorIds,
@@ -68,12 +85,20 @@ export default class AuditService {
     })
   }
 
-  async cancelledVisit(reference: string, prisonerId: string, prisonId: string, reason: string, username: string) {
+  async cancelledVisit(
+    visitReference: string,
+    prisonerId: string,
+    prisonId: string,
+    reason: string,
+    username: string,
+    operationId: string,
+  ) {
     return this.sendAuditMessage({
       action: 'CANCELLED_VISIT',
       who: username,
+      operationId,
       details: {
-        reference,
+        visitReference,
         prisonerId,
         prisonId,
         reason,
@@ -81,10 +106,11 @@ export default class AuditService {
     })
   }
 
-  async viewedVisits(viewDate: string, prisonId: string, username: string) {
+  async viewedVisits(viewDate: string, prisonId: string, username: string, operationId: string) {
     return this.sendAuditMessage({
       action: 'VIEWED_VISITS',
       who: username,
+      operationId,
       details: {
         viewDate,
         prisonId,
@@ -92,10 +118,11 @@ export default class AuditService {
     })
   }
 
-  async printedVisitList(viewDate: string, prisonId: string, username: string) {
+  async printedVisitList(viewDate: string, prisonId: string, username: string, operationId: string) {
     return this.sendAuditMessage({
       action: 'PRINTED_VISIT_LIST',
       who: username,
+      operationId,
       details: {
         viewDate,
         prisonId,
@@ -103,24 +130,24 @@ export default class AuditService {
     })
   }
 
-  async pageView(pageName: string, username: string) {
+  async pageView(pageName: string, username: string, operationId: string) {
     return this.sendAuditMessage({
       action: 'PAGE_VIEW',
       who: username,
+      operationId,
       details: {
         pageName,
       },
     })
   }
 
-  async overrodeZeroVO(reference: string, prisonerId: string, reason: string, username: string) {
+  async overrodeZeroVO(prisonerId: string, username: string, operationId: string) {
     return this.sendAuditMessage({
       action: 'OVERRODE_ZERO_VO',
       who: username,
+      operationId,
       details: {
-        reference,
         prisonerId,
-        reason,
       },
     })
   }
@@ -129,19 +156,22 @@ export default class AuditService {
     action,
     who,
     timestamp = new Date(),
+    operationId,
     details,
   }: {
     action: string
     who: string
     timestamp?: Date
+    operationId: string
     details: object
   }) {
     try {
       const message = JSON.stringify({
         what: action,
+        when: timestamp,
+        operationId,
         who,
         service: config.apis.audit.serviceName,
-        when: timestamp,
         details: JSON.stringify(details),
       })
 

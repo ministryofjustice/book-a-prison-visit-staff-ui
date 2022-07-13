@@ -258,15 +258,16 @@ export default function routes(
           visitData: visitSessionData,
         })
 
-        req.session.visitSessionData.visitReference = reference
-        req.session.visitSessionData.visitStatus = visitStatus
+        visitSessionData.visitReference = reference
+        visitSessionData.visitStatus = visitStatus
       }
 
       auditService.reservedVisit(
-        req.session.visitSessionData.visitStatus,
+        visitSessionData.visitReference,
         visitSessionData.prisoner.offenderNo,
         'HEI',
         res.locals.user?.username,
+        res.locals.appInsightsOperationId,
       )
 
       return res.redirect('/book-a-visit/additional-support')
@@ -464,11 +465,12 @@ export default function routes(
       req.session.visitSessionData.visitStatus = bookedVisit.visitStatus
 
       auditService.bookedVisit(
-        req.session.visitSessionData.visitStatus,
+        req.session.visitSessionData.visitReference,
         visitSessionData.prisoner.offenderNo,
         'HEI',
         visitSessionData.visitors.map(visitor => visitor.personId.toString()),
         res.locals.user?.username,
+        res.locals.appInsightsOperationId,
       )
     } catch (error) {
       return res.render('pages/checkYourBooking', {

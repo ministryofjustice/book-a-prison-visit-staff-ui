@@ -85,6 +85,7 @@ describe('Prisoner search page', () => {
             expect(res.text).toContain('Search for a prisoner')
             expect(res.text).toContain('id="search-results-none"')
             expect(auditService.prisonerSearch).toBeCalledTimes(1)
+            expect(auditService.prisonerSearch).toBeCalledWith('A1234BC', 'HEI', undefined, undefined)
           })
       })
     })
@@ -110,6 +111,7 @@ describe('Prisoner search page', () => {
             expect(res.text).toContain('Search for a prisoner')
             expect(res.text).toContain('id="search-results-true"')
             expect(auditService.prisonerSearch).toBeCalledTimes(1)
+            expect(auditService.prisonerSearch).toBeCalledWith('A1234BC', 'HEI', undefined, undefined)
           })
       })
 
@@ -144,6 +146,7 @@ describe('Prisoner search page', () => {
             expect(res.text).toContain('id="search-results-true"')
             expect(res.text).toContain('<p class="moj-pagination__results">')
             expect(auditService.prisonerSearch).toBeCalledTimes(1)
+            expect(auditService.prisonerSearch).toBeCalledWith('A1234BC', 'HEI', undefined, undefined)
           })
       })
     })

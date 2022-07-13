@@ -1,6 +1,7 @@
 import type { Express } from 'express'
 import request from 'supertest'
 import * as cheerio from 'cheerio'
+import { format } from 'date-fns'
 import PrisonerSearchService from '../services/prisonerSearchService'
 import VisitSessionsService from '../services/visitSessionsService'
 import AuditService from '../services/auditService'
@@ -58,6 +59,8 @@ describe('GET /visits', () => {
     next: number
     previous: number
   }
+
+  const todayDate = format(new Date(), 'yyyy-MM-dd')
 
   beforeEach(() => {
     visits = {
@@ -188,6 +191,7 @@ describe('GET /visits', () => {
         expect($('.moj-side-navigation__title').text()).toContain('Main visits room')
         expect($('.moj-side-navigation__item--active').text()).toContain('9am to 9:29am')
         expect(auditService.viewedVisits).toBeCalledTimes(1)
+        expect(auditService.viewedVisits).toHaveBeenCalledWith(todayDate, 'HEI', undefined, undefined)
       })
   })
 
@@ -214,6 +218,7 @@ describe('GET /visits', () => {
         expect($('.moj-side-navigation__title').text()).toContain('Main visits room')
         expect($('.moj-side-navigation__item--active').text()).toContain('10am to 11am')
         expect(auditService.viewedVisits).toBeCalledTimes(1)
+        expect(auditService.viewedVisits).toHaveBeenCalledWith('2022-05-23', 'HEI', undefined, undefined)
       })
   })
 
@@ -240,6 +245,7 @@ describe('GET /visits', () => {
         expect($('.moj-side-navigation__title').text()).toContain('Main visits room')
         expect($('.moj-side-navigation__item--active').text()).toContain('10am to 11am')
         expect(auditService.viewedVisits).toBeCalledTimes(1)
+        expect(auditService.viewedVisits).toHaveBeenCalledWith(todayDate, 'HEI', undefined, undefined)
       })
   })
 
@@ -270,6 +276,7 @@ describe('GET /visits', () => {
         expect($('.govuk-back-link').attr('href')).toBe('/')
         expect($('#search-results-none').text()).toContain('No visit sessions on this day.')
         expect(auditService.viewedVisits).toBeCalledTimes(1)
+        expect(auditService.viewedVisits).toHaveBeenCalledWith(todayDate, 'HEI', undefined, undefined)
       })
   })
 
@@ -287,6 +294,7 @@ describe('GET /visits', () => {
         expect($('.govuk-back-link').attr('href')).toBe('/')
         expect($('#search-results-none').text()).toContain('No visit sessions on this day.')
         expect(auditService.viewedVisits).toBeCalledTimes(1)
+        expect(auditService.viewedVisits).toHaveBeenCalledWith('2022-05-23', 'HEI', undefined, undefined)
       })
   })
 })
