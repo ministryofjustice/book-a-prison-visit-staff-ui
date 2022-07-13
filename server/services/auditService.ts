@@ -141,21 +141,13 @@ export default class AuditService {
     })
   }
 
-  async overrodeZeroVO(
-    visitReference: string,
-    prisonerId: string,
-    reason: string,
-    username: string,
-    operationId: string,
-  ) {
+  async overrodeZeroVO(prisonerId: string, username: string, operationId: string) {
     return this.sendAuditMessage({
       action: 'OVERRODE_ZERO_VO',
       who: username,
       operationId,
       details: {
-        visitReference,
         prisonerId,
-        reason,
       },
     })
   }

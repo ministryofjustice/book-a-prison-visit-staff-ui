@@ -191,7 +191,7 @@ describe('Audit service', () => {
   })
 
   it('sends a zero VO overridden audit message', async () => {
-    await auditService.overrodeZeroVO('ab-cd-ef-gh', 'A1234BC', 'User override', 'username', 'operation-id')
+    await auditService.overrodeZeroVO('A1234BC', 'username', 'operation-id')
 
     expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
     expect(sqsClientInstance.send.mock.lastCall[0]).toMatchObject({
@@ -202,7 +202,7 @@ describe('Audit service', () => {
           operationId: 'operation-id',
           who: 'username',
           service: 'book-a-prison-visit-staff-ui',
-          details: '{"visitReference":"ab-cd-ef-gh","prisonerId":"A1234BC","reason":"User override"}',
+          details: '{"prisonerId":"A1234BC"}',
         }),
         QueueUrl,
       },

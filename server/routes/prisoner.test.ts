@@ -166,6 +166,7 @@ describe('GET /prisoner/A1234BC', () => {
         expect($('#vo-override').length).toBe(0)
         expect($('[data-test="book-a-visit"]').length).toBe(1)
         expect(auditService.viewPrisoner).toBeCalledTimes(1)
+        expect(auditService.viewPrisoner).toHaveBeenCalledWith('A1234BC', 'HEI', undefined, undefined)
       })
   })
 
@@ -185,6 +186,7 @@ describe('GET /prisoner/A1234BC', () => {
         expect($('[data-test="active-alert-count"]').text()).toBe('0 active')
         expect($('#active-alerts').text()).toContain('There are no active alerts for this prisoner.')
         expect(auditService.viewPrisoner).toBeCalledTimes(1)
+        expect(auditService.viewPrisoner).toHaveBeenCalledWith('A1234BC', 'HEI', undefined, undefined)
       })
   })
 
@@ -205,6 +207,7 @@ describe('GET /prisoner/A1234BC', () => {
         expect($('#vo-override').length).toBe(0)
         expect($('[data-test="book-a-visit"]').length).toBe(1)
         expect(auditService.viewPrisoner).toBeCalledTimes(1)
+        expect(auditService.viewPrisoner).toHaveBeenCalledWith('A1234BC', 'HEI', undefined, undefined)
       })
   })
 
@@ -224,6 +227,7 @@ describe('GET /prisoner/A1234BC', () => {
         expect($('label[for="vo-override"]').text()).toContain('The prisoner has no available visiting orders')
         expect($('[data-test="book-a-visit"]').length).toBe(1)
         expect(auditService.viewPrisoner).toBeCalledTimes(1)
+        expect(auditService.viewPrisoner).toHaveBeenCalledWith('A1234BC', 'HEI', undefined, undefined)
       })
   })
 
@@ -255,6 +259,7 @@ describe('GET /prisoner/A1234BC', () => {
         expect(flashProvider).toHaveBeenCalledWith('errors')
         expect(flashProvider).toHaveBeenCalledTimes(1)
         expect(auditService.viewPrisoner).toBeCalledTimes(1)
+        expect(auditService.viewPrisoner).toHaveBeenCalledWith('A1234BC', 'HEI', undefined, undefined)
       })
   })
 
@@ -284,12 +289,12 @@ describe('POST /prisoner/A1234BC', () => {
     },
   } as InmateDetail
 
-  const visitBalances: VisitBalances = {
-    remainingVo: 1,
-    remainingPvo: 0,
-  }
+  const visitBalances = {} as VisitBalances
 
   beforeEach(() => {
+    visitBalances.remainingVo = 1
+    visitBalances.remainingPvo = 0
+
     prisonerProfileService.getPrisonerAndVisitBalances.mockResolvedValue({ inmateDetail, visitBalances })
   })
 
@@ -301,6 +306,32 @@ describe('POST /prisoner/A1234BC', () => {
       .expect(res => {
         expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledTimes(1)
         expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledWith('A1234BC', undefined)
+        expect(auditService.overrodeZeroVO).not.toHaveBeenCalled()
+        expect(clearSession).toHaveBeenCalledTimes(1)
+        expect(visitSessionData).toEqual(<VisitSessionData>{
+          prisoner: {
+            name: 'Smith, John',
+            offenderNo: 'A1234BC',
+            dateOfBirth: '2 April 1975',
+            location: '1-1-C-028, Hewell (HMP)',
+          },
+        })
+      })
+  })
+
+  it('should set up visitSessionData, redirect to select visitors page and log VO override to audit', () => {
+    visitBalances.remainingVo = 0
+
+    return request(app)
+      .post('/prisoner/A1234BC')
+      .send('vo-override=override')
+      .expect(302)
+      .expect('location', '/book-a-visit/select-visitors')
+      .expect(res => {
+        expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledTimes(1)
+        expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledWith('A1234BC', undefined)
+        expect(auditService.overrodeZeroVO).toHaveBeenCalledTimes(1)
+        expect(auditService.overrodeZeroVO).toHaveBeenCalledWith('A1234BC', undefined, undefined)
         expect(clearSession).toHaveBeenCalledTimes(1)
         expect(visitSessionData).toEqual(<VisitSessionData>{
           prisoner: {
@@ -328,6 +359,7 @@ describe('POST /prisoner/A1234BC', () => {
       .expect(res => {
         expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledTimes(1)
         expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledWith('A1234BC', undefined)
+        expect(auditService.overrodeZeroVO).not.toHaveBeenCalled()
         expect(visitSessionData).toEqual(<VisitSessionData>{
           prisoner: {
             name: 'Smith, John',
@@ -349,6 +381,7 @@ describe('POST /prisoner/A1234BC', () => {
       .expect(res => {
         expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledTimes(1)
         expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledWith('A1234BC', undefined)
+        expect(auditService.overrodeZeroVO).not.toHaveBeenCalled()
         expect(visitSessionData).toEqual({})
         expect(flashProvider).toHaveBeenCalledWith('errors', [
           {
