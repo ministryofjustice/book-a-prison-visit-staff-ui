@@ -449,6 +449,14 @@ describe('POST /visit/:reference/cancel', () => {
         expect(flashProvider).toHaveBeenCalledWith('startTimestamp', cancelledVisit.startTimestamp)
         expect(flashProvider).toHaveBeenCalledWith('endTimestamp', cancelledVisit.endTimestamp)
         expect(auditService.cancelledVisit).toBeCalledTimes(1)
+        expect(auditService.cancelledVisit).toHaveBeenCalledWith(
+          'ab-cd-ef-gh',
+          'AF34567G',
+          'HEI',
+          'PRISONER_CANCELLED: illness',
+          undefined,
+          undefined,
+        )
       })
   })
 

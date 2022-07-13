@@ -92,7 +92,7 @@ export default function routes(
         reference,
         visit.prisonerId.toString(),
         'HEI',
-        req.body[reasonFieldName],
+        `${req.body.cancel}: ${req.body[reasonFieldName]}`,
         res.locals.user?.username,
         res.locals.appInsightsOperationId,
       )

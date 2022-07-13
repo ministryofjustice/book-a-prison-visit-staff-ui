@@ -111,7 +111,7 @@ describe('Audit service', () => {
       'ab-cd-ef-gh',
       'A1234BC',
       'HEI',
-      'reason for cancellation',
+      'PRISONER_CANCELLED: illness',
       'username',
       'operation-id',
     )
@@ -126,7 +126,7 @@ describe('Audit service', () => {
           who: 'username',
           service: 'book-a-prison-visit-staff-ui',
           details:
-            '{"visitReference":"ab-cd-ef-gh","prisonerId":"A1234BC","prisonId":"HEI","reason":"reason for cancellation"}',
+            '{"visitReference":"ab-cd-ef-gh","prisonerId":"A1234BC","prisonId":"HEI","reason":"PRISONER_CANCELLED: illness"}',
         }),
         QueueUrl,
       },
