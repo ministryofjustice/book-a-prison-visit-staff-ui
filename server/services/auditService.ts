@@ -164,7 +164,7 @@ export default class AuditService {
     action,
     who,
     timestamp = new Date(),
-    operationId = undefined,
+    operationId,
     details,
   }: {
     action: string
@@ -176,10 +176,10 @@ export default class AuditService {
     try {
       const message = JSON.stringify({
         what: action,
-        who,
-        service: config.apis.audit.serviceName,
         when: timestamp,
         operationId,
+        who,
+        service: config.apis.audit.serviceName,
         details: JSON.stringify(details),
       })
 
