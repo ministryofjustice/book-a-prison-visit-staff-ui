@@ -19,7 +19,7 @@ describe('Views - Date and time of visit', () => {
   it('should display message, back to start button and no accordion when no visit slots', () => {
     viewContext = {}
     const $ = cheerio.load(compiledTemplate.render(viewContext))
-    expect($('main p').text()).toContain('There are no available slots for this prisoner.')
+    expect($('main p').text()).toContain('There are no available slots for the selected time and day.')
     expect($('.govuk-accordion').length).toBe(0)
     expect($('[data-test="submit"]').length).toBe(0)
     expect($('[data-test="back-to-start"]').length).toBe(1)
