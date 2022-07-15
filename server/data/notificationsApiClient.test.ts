@@ -61,7 +61,7 @@ describe('GOV.UK Notify client', () => {
       visitDate: '1 August 2022',
     }
 
-    it('should call notifications client sendCancellationSms() with the correct booking confirmation parameters', async () => {
+    it('should call notifications client sendCancellationSms() with the correct booking cancellation parameters', async () => {
       await notificationsApiClient.sendCancellationSms(confirmationDetails)
 
       expect(mockSendSms).toHaveBeenCalledTimes(1)

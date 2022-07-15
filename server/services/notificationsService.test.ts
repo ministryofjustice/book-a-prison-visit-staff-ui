@@ -60,7 +60,7 @@ describe('Notifications service', () => {
       },
     }
 
-    it('should call the notifications client with the confirmation and visit details', async () => {
+    it('should call the notifications client with the cancellation details', async () => {
       await notificationsService.sendCancellationSms(visitDetails)
 
       expect(notificationsApiClient.sendCancellationSms).toHaveBeenCalledTimes(1)
