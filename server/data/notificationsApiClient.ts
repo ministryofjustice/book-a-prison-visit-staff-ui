@@ -14,7 +14,7 @@ class NotificationsApiClient {
     this.notificationsApiClient = new NotifyClient(config.apis.notifications.key)
   }
 
-  async sendSms({
+  async sendBookingSms({
     phoneNumber,
     prisonName,
     visitTime,
@@ -39,6 +39,30 @@ class NotificationsApiClient {
       },
       reference,
     })
+  }
+
+  async sendCancellationSms({
+    phoneNumber,
+    prisonName,
+    visitTime,
+    visitDate,
+  }: {
+    phoneNumber: string
+    prisonName: string
+    visitTime: string
+    visitDate: string
+  }): Promise<SmsResponse> {
+    return this.notificationsApiClient.sendSms(
+      config.apis.notifications.templates.cancellationConfirmation,
+      phoneNumber,
+      {
+        personalisation: {
+          prison: prisonName,
+          time: visitTime,
+          date: visitDate,
+        },
+      },
+    )
   }
 }
 

@@ -22,7 +22,7 @@ describe('GOV.UK Notify client', () => {
     jest.clearAllMocks()
   })
 
-  describe('sendSms', () => {
+  describe('sendBookingSms', () => {
     const confirmationDetails = {
       phoneNumber: '07123456789',
       prisonName: 'Hewell',
@@ -32,8 +32,8 @@ describe('GOV.UK Notify client', () => {
       reference: 'ab-cd-ef-gh',
     }
 
-    it('should call notifications client sendSms() with the correct booking confirmation parameters', async () => {
-      await notificationsApiClient.sendSms(confirmationDetails)
+    it('should call notifications client sendBookingSms() with the correct booking confirmation parameters', async () => {
+      await notificationsApiClient.sendBookingSms(confirmationDetails)
 
       expect(mockSendSms).toHaveBeenCalledTimes(1)
       expect(mockSendSms).toHaveBeenCalledWith(
@@ -48,6 +48,32 @@ describe('GOV.UK Notify client', () => {
             'ref number': confirmationDetails.reference,
           },
           reference: confirmationDetails.reference,
+        },
+      )
+    })
+  })
+
+  describe('sendCancellationSms', () => {
+    const confirmationDetails = {
+      phoneNumber: '07123456789',
+      prisonName: 'Hewell',
+      visitTime: '10:00am',
+      visitDate: '1 August 2022',
+    }
+
+    it('should call notifications client sendCancellationSms() with the correct booking confirmation parameters', async () => {
+      await notificationsApiClient.sendCancellationSms(confirmationDetails)
+
+      expect(mockSendSms).toHaveBeenCalledTimes(1)
+      expect(mockSendSms).toHaveBeenCalledWith(
+        config.apis.notifications.templates.cancellationConfirmation,
+        confirmationDetails.phoneNumber,
+        {
+          personalisation: {
+            prison: confirmationDetails.prisonName,
+            time: confirmationDetails.visitTime,
+            date: confirmationDetails.visitDate,
+          },
         },
       )
     })

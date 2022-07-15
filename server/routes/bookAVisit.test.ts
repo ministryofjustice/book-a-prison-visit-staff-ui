@@ -2202,7 +2202,7 @@ describe('/book-a-visit/check-your-booking', () => {
       const bookedVisit: Partial<Visit> = { reference: visitSessionData.visitReference, visitStatus: 'BOOKED' }
 
       visitSessionsService.updateVisit = jest.fn().mockResolvedValue(bookedVisit)
-      notificationsService.sendSms = jest.fn().mockResolvedValue({})
+      notificationsService.sendBookingSms = jest.fn().mockResolvedValue({})
 
       sessionApp = appWithAllRoutes({
         auditServiceOverride: auditService,
@@ -2235,8 +2235,8 @@ describe('/book-a-visit/check-your-booking', () => {
             undefined,
             undefined,
           )
-          expect(notificationsService.sendSms).toHaveBeenCalledTimes(1)
-          expect(notificationsService.sendSms).toHaveBeenCalledWith({
+          expect(notificationsService.sendBookingSms).toHaveBeenCalledTimes(1)
+          expect(notificationsService.sendBookingSms).toHaveBeenCalledWith({
             phoneNumber: '01234567890',
             visit: visitSessionData.visit,
             prisonName: 'Hewell (HMP)',
@@ -2248,7 +2248,7 @@ describe('/book-a-visit/check-your-booking', () => {
     it('should handle SMS sending failure', () => {
       config.apis.notifications.enabled = true
 
-      notificationsService.sendSms.mockRejectedValue({})
+      notificationsService.sendBookingSms.mockRejectedValue({})
 
       return request(sessionApp)
         .post('/book-a-visit/check-your-booking')
@@ -2258,7 +2258,7 @@ describe('/book-a-visit/check-your-booking', () => {
           expect(visitSessionsService.updateVisit).toBeCalledTimes(1)
           expect(visitSessionData.visitStatus).toBe('BOOKED')
           expect(auditService.bookedVisit).toHaveBeenCalledTimes(1)
-          expect(notificationsService.sendSms).toHaveBeenCalledTimes(1)
+          expect(notificationsService.sendBookingSms).toHaveBeenCalledTimes(1)
         })
     })
 
@@ -2273,7 +2273,7 @@ describe('/book-a-visit/check-your-booking', () => {
           expect(visitSessionsService.updateVisit).toBeCalledTimes(1)
           expect(visitSessionData.visitStatus).toBe('BOOKED')
           expect(auditService.bookedVisit).toHaveBeenCalledTimes(1)
-          expect(notificationsService.sendSms).not.toHaveBeenCalled()
+          expect(notificationsService.sendBookingSms).not.toHaveBeenCalled()
         })
     })
 
@@ -2298,7 +2298,7 @@ describe('/book-a-visit/check-your-booking', () => {
           expect(visitSessionsService.updateVisit).toBeCalledTimes(1)
           expect(visitSessionData.visitStatus).toBe('RESERVED')
           expect(auditService.bookedVisit).not.toHaveBeenCalled()
-          expect(notificationsService.sendSms).not.toHaveBeenCalled()
+          expect(notificationsService.sendBookingSms).not.toHaveBeenCalled()
         })
     })
   })

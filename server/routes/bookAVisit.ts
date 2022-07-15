@@ -477,7 +477,7 @@ export default function routes(
         try {
           const phoneNumber = visitSessionData.mainContact.phoneNumber.replace(/\s/g, '')
 
-          await notificationsService.sendSms({
+          await notificationsService.sendBookingSms({
             phoneNumber,
             visit: visitSessionData.visit,
             prisonName: 'Hewell (HMP)',
