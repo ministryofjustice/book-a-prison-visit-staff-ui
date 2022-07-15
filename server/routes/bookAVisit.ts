@@ -494,7 +494,7 @@ export default function routes(
       return res.render('pages/checkYourBooking', {
         errors: [
           {
-            msg: 'Failed to make complete the reservation',
+            msg: 'Failed to make this reservation. You can try to submit again.',
             param: 'id',
           },
         ],
