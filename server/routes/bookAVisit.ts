@@ -472,6 +472,24 @@ export default function routes(
         res.locals.user?.username,
         res.locals.appInsightsOperationId,
       )
+
+      if (config.apis.notifications.enabled) {
+        try {
+          const phoneNumber = visitSessionData.mainContact.phoneNumber.replace(/\s/g, '')
+
+          await notificationsService.sendSms({
+            phoneNumber,
+            visit: visitSessionData.visit,
+            prisonName: 'Hewell (HMP)',
+            reference: visitSessionData.visitReference,
+          })
+          logger.info(`SMS sent for ${visitSessionData.visitReference}`)
+        } catch (error) {
+          logger.error(
+            `Failed to send SMS to ${visitSessionData.mainContact.phoneNumber} for booking ${visitSessionData.visitReference}`,
+          )
+        }
+      }
     } catch (error) {
       return res.render('pages/checkYourBooking', {
         errors: [
@@ -488,24 +506,6 @@ export default function routes(
         visitors: visitSessionData.visitors,
         additionalSupport,
       })
-    }
-
-    if (config.apis.notifications.enabled) {
-      try {
-        const phoneNumber = visitSessionData.mainContact.phoneNumber.replace(/\s/g, '')
-
-        await notificationsService.sendSms({
-          phoneNumber,
-          visit: visitSessionData.visit,
-          prisonName: 'Hewell (HMP)',
-          reference: visitSessionData.visitReference,
-        })
-        logger.info(`SMS sent for ${visitSessionData.visitReference}`)
-      } catch (error) {
-        logger.error(
-          `Failed to send SMS to ${visitSessionData.mainContact.phoneNumber} for booking ${visitSessionData.visitReference}`,
-        )
-      }
     }
 
     return res.redirect('/book-a-visit/confirmation')
