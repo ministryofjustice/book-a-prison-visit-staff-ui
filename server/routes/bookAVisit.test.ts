@@ -2162,78 +2162,26 @@ describe('GET /book-a-visit/check-your-booking', () => {
       })
   })
 
-  describe('when no additional support options are chosen', () => {
-    beforeEach(() => {
-      visitSessionData = {
-        prisoner: {
-          name: 'prisoner name',
-          offenderNo: 'A1234BC',
-          dateOfBirth: '25 May 1988',
-          location: 'location place',
-        },
-        visitRestriction: 'OPEN',
-        visit: {
-          id: 'visitId',
-          startTimestamp: '2022-03-12T09:30:00',
-          endTimestamp: '2022-03-12T10:30:00',
-          availableTables: 1,
-          visitRoomName: 'room name',
-        },
-        visitors: [
-          {
-            personId: 123,
-            name: 'name last',
-            relationshipDescription: 'relate',
-            restrictions: [
-              {
-                restrictionType: 'AVS',
-                restrictionTypeDescription: 'AVS desc',
-                startDate: '123',
-                expiryDate: '456',
-                globalRestriction: false,
-                comment: 'comment',
-              },
-            ],
-            address: '123 Street,<br>Test Town,<br>S1 2QZ',
-            banned: false,
-          },
-        ],
-        visitorSupport: [],
-        mainContact: {
-          phoneNumber: '123',
-          contactName: 'abc',
-        },
-        visitReference: 'ab-cd-ef-gh',
-        visitStatus: 'RESERVED',
-      }
+  it('should render all data from the session with a message for no selected additional support options', () => {
+    visitSessionData.visitorSupport = []
 
-      sessionApp = appWithAllRoutes({
-        systemTokenOverride: systemToken,
-        sessionData: {
-          visitSessionData,
-        } as SessionData,
+    return request(sessionApp)
+      .get('/book-a-visit/check-your-booking')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('h1').text().trim()).toBe('Check the visit details before booking')
+        expect($('.test-prisoner-name').text()).toContain('prisoner name')
+        expect($('.test-visit-date').text()).toContain('Saturday 12 March 2022')
+        expect($('.test-visit-time').text()).toContain('9:30am to 10:30am')
+        expect($('.test-visit-type').text()).toContain('Open')
+        expect($('.test-visitor-name1').text()).toContain('name last (relate of the prisoner)')
+        expect($('.test-visitor-address1').text()).toContain('123 Street, Test Town, S1 2QZ')
+        expect($('.test-additional-support').text()).toContain('None')
+        expect($('.test-main-contact-name').text()).toContain('abc')
+        expect($('.test-main-contact-number').text()).toContain('123')
       })
-    })
-
-    it('should render all data from the session with a message for no selected additional support options', () => {
-      return request(sessionApp)
-        .get('/book-a-visit/check-your-booking')
-        .expect(200)
-        .expect('Content-Type', /html/)
-        .expect(res => {
-          const $ = cheerio.load(res.text)
-          expect($('h1').text().trim()).toBe('Check the visit details before booking')
-          expect($('.test-prisoner-name').text()).toContain('prisoner name')
-          expect($('.test-visit-date').text()).toContain('Saturday 12 March 2022')
-          expect($('.test-visit-time').text()).toContain('9:30am to 10:30am')
-          expect($('.test-visit-type').text()).toContain('Open')
-          expect($('.test-visitor-name1').text()).toContain('name last (relate of the prisoner)')
-          expect($('.test-visitor-address1').text()).toContain('123 Street, Test Town, S1 2QZ')
-          expect($('.test-additional-support').text()).toContain('None')
-          expect($('.test-main-contact-name').text()).toContain('abc')
-          expect($('.test-main-contact-number').text()).toContain('123')
-        })
-    })
   })
 })
 
