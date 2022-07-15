@@ -56,6 +56,7 @@ function appSetup({
   prisonerVisitorsServiceOverride,
   visitSessionsServiceOverride,
   auditServiceOverride,
+  notificationsServiceOverride,
   systemTokenOverride,
   production = false,
   sessionData = {
@@ -76,6 +77,7 @@ function appSetup({
   prisonerVisitorsServiceOverride: PrisonerVisitorsService
   visitSessionsServiceOverride: VisitSessionsService
   auditServiceOverride: AuditService
+  notificationsServiceOverride: NotificationsService
   systemTokenOverride: SystemToken
   production: boolean
   sessionData: SessionData
@@ -147,7 +149,7 @@ function appSetup({
   const prisonerVisitorsService =
     prisonerVisitorsServiceOverride ||
     new PrisonerVisitorsService(prisonerContactRegistryApiClientBuilder, systemTokenTest)
-  const notificationsService = new NotificationsService(notificationsApiClientBuilder)
+  const notificationsService = notificationsServiceOverride || new NotificationsService(notificationsApiClientBuilder)
   app.use(
     '/book-a-visit/',
     bookAVisitRoutes(
@@ -180,6 +182,7 @@ export function appWithAllRoutes({
   prisonerVisitorsServiceOverride,
   visitSessionsServiceOverride,
   auditServiceOverride,
+  notificationsServiceOverride,
   systemTokenOverride,
   production = false,
   sessionData,
@@ -189,6 +192,7 @@ export function appWithAllRoutes({
   prisonerVisitorsServiceOverride?: PrisonerVisitorsService
   visitSessionsServiceOverride?: VisitSessionsService
   auditServiceOverride?: AuditService
+  notificationsServiceOverride?: NotificationsService
   systemTokenOverride?: SystemToken
   production?: boolean
   sessionData?: SessionData
@@ -200,6 +204,7 @@ export function appWithAllRoutes({
     prisonerVisitorsServiceOverride,
     visitSessionsServiceOverride,
     auditServiceOverride,
+    notificationsServiceOverride,
     systemTokenOverride,
     production,
     sessionData,
