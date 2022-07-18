@@ -8,7 +8,7 @@ type NotificationsApiClientBuilder = () => NotificationsApiClient
 export default class NotificationsService {
   constructor(private readonly notificationsApiClientBuilder: NotificationsApiClientBuilder) {}
 
-  async sendSms({
+  async sendBookingSms({
     phoneNumber,
     prisonName,
     visit,
@@ -25,13 +25,35 @@ export default class NotificationsService {
     const visitDay = format(parsedDate, 'EEEE')
     const visitDate = format(parsedDate, 'd MMMM yyyy')
 
-    return notificationsApiClient.sendSms({
+    return notificationsApiClient.sendBookingSms({
       phoneNumber,
       prisonName,
       visitTime,
       visitDay,
       visitDate,
       reference,
+    })
+  }
+
+  async sendCancellationSms({
+    phoneNumber,
+    prisonName,
+    visit,
+  }: {
+    phoneNumber: string
+    prisonName: string
+    visit: VisitSlot
+  }): Promise<SmsResponse> {
+    const notificationsApiClient = this.notificationsApiClientBuilder()
+    const parsedDate = new Date(visit.startTimestamp)
+    const visitTime = format(parsedDate, 'h:mmaaa')
+    const visitDate = format(parsedDate, 'd MMMM yyyy')
+
+    return notificationsApiClient.sendCancellationSms({
+      phoneNumber,
+      prisonName,
+      visitTime,
+      visitDate,
     })
   }
 }

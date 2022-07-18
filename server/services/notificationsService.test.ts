@@ -18,7 +18,7 @@ describe('Notifications service', () => {
     jest.clearAllMocks()
   })
 
-  describe('sendSms', () => {
+  describe('sendBookingSms', () => {
     const visitDetails = {
       phoneNumber: '07123456789',
       prisonName: 'Hewell',
@@ -33,16 +33,42 @@ describe('Notifications service', () => {
     }
 
     it('should call the notifications client with the confirmation and visit details', async () => {
-      await notificationsService.sendSms(visitDetails)
+      await notificationsService.sendBookingSms(visitDetails)
 
-      expect(notificationsApiClient.sendSms).toHaveBeenCalledTimes(1)
-      expect(notificationsApiClient.sendSms).toHaveBeenCalledWith({
+      expect(notificationsApiClient.sendBookingSms).toHaveBeenCalledTimes(1)
+      expect(notificationsApiClient.sendBookingSms).toHaveBeenCalledWith({
         phoneNumber: visitDetails.phoneNumber,
         prisonName: visitDetails.prisonName,
         visitTime: '10:00am',
         visitDay: 'Monday',
         visitDate: '14 February 2022',
         reference: visitDetails.reference,
+      })
+    })
+  })
+
+  describe('sendCancellationSms', () => {
+    const visitDetails = {
+      phoneNumber: '07123456789',
+      prisonName: 'Hewell',
+      visit: {
+        id: '1',
+        startTimestamp: '2022-02-14T10:00:00',
+        endTimestamp: '2022-02-14T11:00:00',
+        availableTables: 15,
+        visitRoomName: 'room name',
+      },
+    }
+
+    it('should call the notifications client with the cancellation details', async () => {
+      await notificationsService.sendCancellationSms(visitDetails)
+
+      expect(notificationsApiClient.sendCancellationSms).toHaveBeenCalledTimes(1)
+      expect(notificationsApiClient.sendCancellationSms).toHaveBeenCalledWith({
+        phoneNumber: visitDetails.phoneNumber,
+        prisonName: visitDetails.prisonName,
+        visitTime: '10:00am',
+        visitDate: '14 February 2022',
       })
     })
   })

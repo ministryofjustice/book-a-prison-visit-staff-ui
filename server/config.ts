@@ -145,6 +145,7 @@ export default {
       key: get('GOVUK_NOTIFY_API_KEY', 'abcd', requiredInProduction),
       templates: {
         bookingConfirmation: '85904166-e539-43f5-9f51-7ba106cc61bd',
+        cancellationConfirmation: '42a995f2-abbc-474b-8563-ca2995529111',
       },
     },
   },
