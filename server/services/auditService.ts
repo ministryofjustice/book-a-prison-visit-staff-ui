@@ -130,17 +130,6 @@ export default class AuditService {
     })
   }
 
-  async pageView(pageName: string, username: string, operationId: string) {
-    return this.sendAuditMessage({
-      action: 'PAGE_VIEW',
-      who: username,
-      operationId,
-      details: {
-        pageName,
-      },
-    })
-  }
-
   async overrodeZeroVO(prisonerId: string, username: string, operationId: string) {
     return this.sendAuditMessage({
       action: 'OVERRODE_ZERO_VO',

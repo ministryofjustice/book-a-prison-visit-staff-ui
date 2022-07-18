@@ -171,25 +171,6 @@ describe('Audit service', () => {
     })
   })
 
-  it('sends a page view audit message', async () => {
-    await auditService.pageView('Find a slot', 'username', 'operation-id')
-
-    expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
-    expect(sqsClientInstance.send.mock.lastCall[0]).toMatchObject({
-      input: {
-        MessageBody: JSON.stringify({
-          what: 'PAGE_VIEW',
-          when: fakeDate,
-          operationId: 'operation-id',
-          who: 'username',
-          service: 'book-a-prison-visit-staff-ui',
-          details: '{"pageName":"Find a slot"}',
-        }),
-        QueueUrl,
-      },
-    })
-  })
-
   it('sends a zero VO overridden audit message', async () => {
     await auditService.overrodeZeroVO('A1234BC', 'username', 'operation-id')
 
