@@ -174,6 +174,9 @@ describe('GET /visit/:reference', () => {
         expect($('[data-test="visitor-concern"]').eq(0).text()).toBe('Example of a visitor concern')
         expect($('[data-test="additional-support"]').text()).toBe('Wheelchair ramp, custom request')
         expect($('[data-test="visit-booked"]').text()).toBe('Monday 14 February 2022 at 10am')
+
+        expect(auditService.viewedVisitDetails).toBeCalledTimes(1)
+        expect(auditService.viewedVisitDetails).toHaveBeenCalledWith('ab-cd-ef-gh', undefined, undefined)
       })
   })
 
@@ -309,6 +312,9 @@ describe('GET /visit/:reference', () => {
         expect($('[data-test="visitor-concern"]').eq(0).text()).toBe('Example of a visitor concern')
         expect($('[data-test="additional-support"]').text()).toBe('Wheelchair ramp, custom request')
         expect($('[data-test="visit-booked"]').text()).toBe('Monday 14 February 2022 at 10am')
+
+        expect(auditService.viewedVisitDetails).toBeCalledTimes(1)
+        expect(auditService.viewedVisitDetails).toHaveBeenCalledWith('ab-cd-ef-gh', undefined, undefined)
       })
   })
 
