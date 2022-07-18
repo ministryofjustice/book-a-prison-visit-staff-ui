@@ -914,6 +914,7 @@ describe('/book-a-visit/visit-type', () => {
     }
 
     sessionApp = appWithAllRoutes({
+      auditServiceOverride: auditService,
       systemTokenOverride: systemToken,
       sessionData: {
         visitSessionData,
@@ -989,6 +990,14 @@ describe('/book-a-visit/visit-type', () => {
         .expect(() => {
           expect(visitSessionData.visitRestriction).toBe('OPEN')
           expect(visitSessionData.closedVisitReason).toBe(undefined)
+          expect(auditService.visitRestrictionSelected).toHaveBeenCalledTimes(1)
+          expect(auditService.visitRestrictionSelected).toHaveBeenCalledWith(
+            visitSessionData.prisoner.offenderNo,
+            'OPEN',
+            [visitSessionData.visitors[0].personId.toString()],
+            undefined,
+            undefined,
+          )
         })
     })
 
@@ -1001,6 +1010,14 @@ describe('/book-a-visit/visit-type', () => {
         .expect(() => {
           expect(visitSessionData.visitRestriction).toBe('CLOSED')
           expect(visitSessionData.closedVisitReason).toBe('prisoner')
+          expect(auditService.visitRestrictionSelected).toHaveBeenCalledTimes(1)
+          expect(auditService.visitRestrictionSelected).toHaveBeenCalledWith(
+            visitSessionData.prisoner.offenderNo,
+            'CLOSED',
+            [visitSessionData.visitors[0].personId.toString()],
+            undefined,
+            undefined,
+          )
         })
     })
   })

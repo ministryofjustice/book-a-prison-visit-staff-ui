@@ -1,6 +1,7 @@
 import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs'
 import logger from '../../logger'
 import config from '../config'
+import { Visit } from '../data/visitSchedulerApiTypes'
 
 export default class AuditService {
   private sqsClient: SQSClient
@@ -137,6 +138,25 @@ export default class AuditService {
       operationId,
       details: {
         prisonerId,
+      },
+    })
+  }
+
+  async visitRestrictionSelected(
+    prisonerId: string,
+    visitRestriction: Visit['visitRestriction'],
+    visitorIds: string[],
+    username: string,
+    operationId: string,
+  ) {
+    return this.sendAuditMessage({
+      action: 'VISIT_RESTRICTION_SELECTED',
+      who: username,
+      operationId,
+      details: {
+        prisonerId,
+        visitRestriction,
+        visitorIds,
       },
     })
   }

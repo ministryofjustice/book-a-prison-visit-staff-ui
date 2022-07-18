@@ -173,6 +173,14 @@ export default function routes(
       visitSessionData.visitRestriction = req.body.visitType
       visitSessionData.closedVisitReason = req.body.visitType === 'CLOSED' ? 'prisoner' : undefined
 
+      await auditService.visitRestrictionSelected(
+        visitSessionData.prisoner.offenderNo,
+        visitSessionData.visitRestriction,
+        visitSessionData.visitors.map(visitor => visitor.personId.toString()),
+        res.locals.user?.username,
+        res.locals.appInsightsOperationId,
+      )
+
       return res.redirect('/book-a-visit/select-date-and-time')
     },
   )

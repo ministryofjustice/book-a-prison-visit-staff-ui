@@ -189,4 +189,23 @@ describe('Audit service', () => {
       },
     })
   })
+
+  it('sends a visit restriction (open/closed) selected audit message', async () => {
+    await auditService.visitRestrictionSelected('A1234BC', 'CLOSED', ['abc123', 'bcd321'], 'username', 'operation-id')
+
+    expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
+    expect(sqsClientInstance.send.mock.lastCall[0]).toMatchObject({
+      input: {
+        MessageBody: JSON.stringify({
+          what: 'VISIT_RESTRICTION_SELECTED',
+          when: fakeDate,
+          operationId: 'operation-id',
+          who: 'username',
+          service: 'book-a-prison-visit-staff-ui',
+          details: '{"prisonerId":"A1234BC","visitRestriction":"CLOSED","visitorIds":["abc123","bcd321"]}',
+        }),
+        QueueUrl,
+      },
+    })
+  })
 })
