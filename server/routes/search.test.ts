@@ -274,7 +274,7 @@ describe('Booking search page', () => {
         .get('/search/visit/results?searchBlock1=ab&searchBlock2=bc&searchBlock3=cd&searchBlock4=de')
         .expect('Content-Type', /html/)
         .expect(res => {
-          expect(res.text).toContain('Search for a prisoner')
+          expect(res.text).toContain('Search for a booking')
           expect(res.text).toContain('id="search-results-none"')
           expect(auditService.visitSearch).toBeCalledTimes(1)
           expect(auditService.visitSearch).toBeCalledWith('ab-bc-cd-de', undefined, undefined)
@@ -305,7 +305,7 @@ describe('Booking search page', () => {
         .get('/search/visit/results?searchBlock1=ab&searchBlock2=bc&searchBlock3=cd&searchBlock4=de')
         .expect('Content-Type', /html/)
         .expect(res => {
-          expect(res.text).toContain('Search for a prisoner')
+          expect(res.text).toContain('Search for a booking')
           expect(res.text).toContain('id="search-results-true"')
           expect(auditService.visitSearch).toBeCalledTimes(1)
           expect(auditService.visitSearch).toBeCalledWith('ab-bc-cd-de', undefined, undefined)
