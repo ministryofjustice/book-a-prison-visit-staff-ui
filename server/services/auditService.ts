@@ -161,6 +161,17 @@ export default class AuditService {
     })
   }
 
+  async visitSearch(searchTerms: string, username: string, operationId: string) {
+    return this.sendAuditMessage({
+      action: 'SEARCHED_VISITS',
+      who: username,
+      operationId,
+      details: {
+        searchTerms,
+      },
+    })
+  }
+
   async sendAuditMessage({
     action,
     who,

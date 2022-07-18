@@ -208,4 +208,23 @@ describe('Audit service', () => {
       },
     })
   })
+
+  it('sends a visit search audit message', async () => {
+    await auditService.visitSearch('ab-cd-ef-gh', 'username', 'operation-id')
+
+    expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
+    expect(sqsClientInstance.send.mock.lastCall[0]).toMatchObject({
+      input: {
+        MessageBody: JSON.stringify({
+          what: 'SEARCHED_VISITS',
+          when: fakeDate,
+          operationId: 'operation-id',
+          who: 'username',
+          service: 'book-a-prison-visit-staff-ui',
+          details: '{"searchTerms":"ab-cd-ef-gh"}',
+        }),
+        QueueUrl,
+      },
+    })
+  })
 })
