@@ -88,7 +88,7 @@ export default function routes(
       }
 
       const visit = await visitSessionsService.cancelVisit({ username: res.locals.user?.username, reference, outcome })
-      auditService.cancelledVisit(
+      await auditService.cancelledVisit(
         reference,
         visit.prisonerId.toString(),
         'HEI',

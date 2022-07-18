@@ -262,7 +262,7 @@ export default function routes(
         visitSessionData.visitStatus = visitStatus
       }
 
-      auditService.reservedVisit(
+      await auditService.reservedVisit(
         visitSessionData.visitReference,
         visitSessionData.prisoner.offenderNo,
         'HEI',
@@ -464,7 +464,7 @@ export default function routes(
 
       req.session.visitSessionData.visitStatus = bookedVisit.visitStatus
 
-      auditService.bookedVisit(
+      await auditService.bookedVisit(
         req.session.visitSessionData.visitReference,
         visitSessionData.prisoner.offenderNo,
         'HEI',
