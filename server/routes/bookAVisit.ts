@@ -173,6 +173,14 @@ export default function routes(
       visitSessionData.visitRestriction = req.body.visitType
       visitSessionData.closedVisitReason = req.body.visitType === 'CLOSED' ? 'prisoner' : undefined
 
+      await auditService.visitRestrictionSelected(
+        visitSessionData.prisoner.offenderNo,
+        visitSessionData.visitRestriction,
+        visitSessionData.visitors.map(visitor => visitor.personId.toString()),
+        res.locals.user?.username,
+        res.locals.appInsightsOperationId,
+      )
+
       return res.redirect('/book-a-visit/select-date-and-time')
     },
   )
@@ -262,7 +270,7 @@ export default function routes(
         visitSessionData.visitStatus = visitStatus
       }
 
-      auditService.reservedVisit(
+      await auditService.reservedVisit(
         visitSessionData.visitReference,
         visitSessionData.prisoner.offenderNo,
         'HEI',
@@ -464,7 +472,7 @@ export default function routes(
 
       req.session.visitSessionData.visitStatus = bookedVisit.visitStatus
 
-      auditService.bookedVisit(
+      await auditService.bookedVisit(
         req.session.visitSessionData.visitReference,
         visitSessionData.prisoner.offenderNo,
         'HEI',

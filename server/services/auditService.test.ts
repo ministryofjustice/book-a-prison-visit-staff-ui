@@ -171,25 +171,6 @@ describe('Audit service', () => {
     })
   })
 
-  it('sends a page view audit message', async () => {
-    await auditService.pageView('Find a slot', 'username', 'operation-id')
-
-    expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
-    expect(sqsClientInstance.send.mock.lastCall[0]).toMatchObject({
-      input: {
-        MessageBody: JSON.stringify({
-          what: 'PAGE_VIEW',
-          when: fakeDate,
-          operationId: 'operation-id',
-          who: 'username',
-          service: 'book-a-prison-visit-staff-ui',
-          details: '{"pageName":"Find a slot"}',
-        }),
-        QueueUrl,
-      },
-    })
-  })
-
   it('sends a zero VO overridden audit message', async () => {
     await auditService.overrodeZeroVO('A1234BC', 'username', 'operation-id')
 
@@ -203,6 +184,63 @@ describe('Audit service', () => {
           who: 'username',
           service: 'book-a-prison-visit-staff-ui',
           details: '{"prisonerId":"A1234BC"}',
+        }),
+        QueueUrl,
+      },
+    })
+  })
+
+  it('sends a visit restriction (open/closed) selected audit message', async () => {
+    await auditService.visitRestrictionSelected('A1234BC', 'CLOSED', ['abc123', 'bcd321'], 'username', 'operation-id')
+
+    expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
+    expect(sqsClientInstance.send.mock.lastCall[0]).toMatchObject({
+      input: {
+        MessageBody: JSON.stringify({
+          what: 'VISIT_RESTRICTION_SELECTED',
+          when: fakeDate,
+          operationId: 'operation-id',
+          who: 'username',
+          service: 'book-a-prison-visit-staff-ui',
+          details: '{"prisonerId":"A1234BC","visitRestriction":"CLOSED","visitorIds":["abc123","bcd321"]}',
+        }),
+        QueueUrl,
+      },
+    })
+  })
+
+  it('sends a visit search audit message', async () => {
+    await auditService.visitSearch('ab-cd-ef-gh', 'username', 'operation-id')
+
+    expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
+    expect(sqsClientInstance.send.mock.lastCall[0]).toMatchObject({
+      input: {
+        MessageBody: JSON.stringify({
+          what: 'SEARCHED_VISITS',
+          when: fakeDate,
+          operationId: 'operation-id',
+          who: 'username',
+          service: 'book-a-prison-visit-staff-ui',
+          details: '{"searchTerms":"ab-cd-ef-gh"}',
+        }),
+        QueueUrl,
+      },
+    })
+  })
+
+  it('sends a viewed visit details audit message', async () => {
+    await auditService.viewedVisitDetails('ab-cd-ef-gh', 'username', 'operation-id')
+
+    expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
+    expect(sqsClientInstance.send.mock.lastCall[0]).toMatchObject({
+      input: {
+        MessageBody: JSON.stringify({
+          what: 'VIEWED_VISIT_DETAILS',
+          when: fakeDate,
+          operationId: 'operation-id',
+          who: 'username',
+          service: 'book-a-prison-visit-staff-ui',
+          details: '{"visitReference":"ab-cd-ef-gh"}',
         }),
         QueueUrl,
       },

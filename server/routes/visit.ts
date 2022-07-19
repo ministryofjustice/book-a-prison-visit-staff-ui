@@ -43,6 +43,8 @@ export default function routes(
 
     const prisoner: Prisoner = await prisonerSearchService.getPrisoner(visit.prisonerId, res.locals.user?.username)
 
+    await auditService.viewedVisitDetails(reference, res.locals.user?.username, res.locals.appInsightsOperationId)
+
     return res.render('pages/visit/summary', {
       prisoner,
       visit,
@@ -88,7 +90,7 @@ export default function routes(
       }
 
       const visit = await visitSessionsService.cancelVisit({ username: res.locals.user?.username, reference, outcome })
-      auditService.cancelledVisit(
+      await auditService.cancelledVisit(
         reference,
         visit.prisonerId.toString(),
         'HEI',

@@ -1,6 +1,7 @@
 import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs'
 import logger from '../../logger'
 import config from '../config'
+import { Visit } from '../data/visitSchedulerApiTypes'
 
 export default class AuditService {
   private sqsClient: SQSClient
@@ -130,17 +131,6 @@ export default class AuditService {
     })
   }
 
-  async pageView(pageName: string, username: string, operationId: string) {
-    return this.sendAuditMessage({
-      action: 'PAGE_VIEW',
-      who: username,
-      operationId,
-      details: {
-        pageName,
-      },
-    })
-  }
-
   async overrodeZeroVO(prisonerId: string, username: string, operationId: string) {
     return this.sendAuditMessage({
       action: 'OVERRODE_ZERO_VO',
@@ -148,6 +138,47 @@ export default class AuditService {
       operationId,
       details: {
         prisonerId,
+      },
+    })
+  }
+
+  async visitRestrictionSelected(
+    prisonerId: string,
+    visitRestriction: Visit['visitRestriction'],
+    visitorIds: string[],
+    username: string,
+    operationId: string,
+  ) {
+    return this.sendAuditMessage({
+      action: 'VISIT_RESTRICTION_SELECTED',
+      who: username,
+      operationId,
+      details: {
+        prisonerId,
+        visitRestriction,
+        visitorIds,
+      },
+    })
+  }
+
+  async visitSearch(searchTerms: string, username: string, operationId: string) {
+    return this.sendAuditMessage({
+      action: 'SEARCHED_VISITS',
+      who: username,
+      operationId,
+      details: {
+        searchTerms,
+      },
+    })
+  }
+
+  async viewedVisitDetails(visitReference: string, username: string, operationId: string) {
+    return this.sendAuditMessage({
+      action: 'VIEWED_VISIT_DETAILS',
+      who: username,
+      operationId,
+      details: {
+        visitReference,
       },
     })
   }

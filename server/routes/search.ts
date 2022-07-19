@@ -55,7 +55,7 @@ export default function routes(
     const realNumberOfResults = errors.length > 0 ? 0 : numberOfResults
     const currentPageMax = parsedPage * pageSize
     const to = realNumberOfResults < currentPageMax ? realNumberOfResults : currentPageMax
-    auditService.prisonerSearch(search, 'HEI', res.locals.user?.username, res.locals.appInsightsOperationId)
+    await auditService.prisonerSearch(search, 'HEI', res.locals.user?.username, res.locals.appInsightsOperationId)
 
     const pageLinks = getResultsPagingLinks({
       pagesToShow: config.apis.prisonerSearch.pagesLinksToShow,
@@ -134,6 +134,8 @@ export default function routes(
         }
       }
     }
+
+    await auditService.visitSearch(search, res.locals.user?.username, res.locals.appInsightsOperationId)
 
     const realNumberOfResults = errors.length > 0 || noResults ? 0 : 1
     const currentPageMax = parsedPage * pageSize

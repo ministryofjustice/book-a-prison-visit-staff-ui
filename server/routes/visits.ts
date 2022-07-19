@@ -116,7 +116,12 @@ export default function routes(
       searchUrl: '/visits/',
     })
 
-    auditService.viewedVisits(selectedDateString, 'HEI', res.locals.user?.username, res.locals.appInsightsOperationId)
+    await auditService.viewedVisits(
+      selectedDateString,
+      'HEI',
+      res.locals.user?.username,
+      res.locals.appInsightsOperationId,
+    )
 
     return res.render('pages/visits/summary', {
       totals: {
