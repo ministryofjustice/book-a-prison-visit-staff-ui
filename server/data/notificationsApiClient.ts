@@ -46,11 +46,13 @@ class NotificationsApiClient {
     prisonName,
     visitTime,
     visitDate,
+    prisonPhoneNumber,
   }: {
     phoneNumber: string
     prisonName: string
     visitTime: string
     visitDate: string
+    prisonPhoneNumber: string
   }): Promise<SmsResponse> {
     return this.notificationsApiClient.sendSms(
       config.apis.notifications.templates.cancellationConfirmation,
@@ -60,6 +62,7 @@ class NotificationsApiClient {
           prison: prisonName,
           time: visitTime,
           date: visitDate,
+          'prison phone number': prisonPhoneNumber,
         },
       },
     )

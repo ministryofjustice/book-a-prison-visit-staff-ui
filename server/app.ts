@@ -118,6 +118,7 @@ export default function createApp(userService: UserService): express.Application
         whereaboutsApiClientBuilder,
         systemToken,
       ),
+      new NotificationsService(notificationsApiClientBuilder),
       new AuditService(),
     ),
   )

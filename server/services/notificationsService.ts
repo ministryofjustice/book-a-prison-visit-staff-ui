@@ -39,13 +39,15 @@ export default class NotificationsService {
     phoneNumber,
     prisonName,
     visit,
+    prisonPhoneNumber,
   }: {
     phoneNumber: string
     prisonName: string
-    visit: VisitSlot
+    visit: string
+    prisonPhoneNumber: string
   }): Promise<SmsResponse> {
     const notificationsApiClient = this.notificationsApiClientBuilder()
-    const parsedDate = new Date(visit.startTimestamp)
+    const parsedDate = new Date(visit)
     const visitTime = format(parsedDate, 'h:mmaaa')
     const visitDate = format(parsedDate, 'd MMMM yyyy')
 
@@ -54,6 +56,7 @@ export default class NotificationsService {
       prisonName,
       visitTime,
       visitDate,
+      prisonPhoneNumber,
     })
   }
 }

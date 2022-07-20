@@ -8,6 +8,8 @@ import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import { OutcomeDto, Visit } from '../data/visitSchedulerApiTypes'
 import { VisitorListItem } from '../@types/bapv'
 import { Prisoner } from '../data/prisonerOffenderSearchTypes'
+import config from '../config'
+import NotificationsService from '../services/notificationsService'
 
 jest.mock('../services/prisonerSearchService')
 jest.mock('../services/visitSessionsService')
@@ -424,6 +426,10 @@ describe('POST /visit/:reference/cancel', () => {
           text: 'cancellation reason',
         },
       ],
+      visitContact: {
+        name: 'Jeanette Smith',
+        telephone: '01234 567890',
+      },
       visitors: [
         {
           nomisPersonId: 1234,
