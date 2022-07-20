@@ -51,6 +51,7 @@ describe('Notifications service', () => {
     const visitDetails = {
       phoneNumber: '07123456789',
       prisonName: 'Hewell',
+      prisonPhoneNumber: '01234443225',
       visit: '2022-02-14T10:00:00',
     }
 
@@ -60,6 +61,7 @@ describe('Notifications service', () => {
       expect(notificationsApiClient.sendCancellationSms).toHaveBeenCalledTimes(1)
       expect(notificationsApiClient.sendCancellationSms).toHaveBeenCalledWith({
         phoneNumber: visitDetails.phoneNumber,
+        prisonPhoneNumber: '01234443225',
         prisonName: visitDetails.prisonName,
         visitTime: '10:00am',
         visitDate: '14 February 2022',
