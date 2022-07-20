@@ -61,7 +61,7 @@ describe('Notifications service', () => {
       expect(notificationsApiClient.sendCancellationSms).toHaveBeenCalledTimes(1)
       expect(notificationsApiClient.sendCancellationSms).toHaveBeenCalledWith({
         phoneNumber: visitDetails.phoneNumber,
-        prisonPhoneNumber: '01234443225',
+        prisonPhoneNumber: visitDetails.prisonPhoneNumber,
         prisonName: visitDetails.prisonName,
         visitTime: '10:00am',
         visitDate: '14 February 2022',
