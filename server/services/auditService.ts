@@ -172,13 +172,21 @@ export default class AuditService {
     })
   }
 
-  async viewedVisitDetails(visitReference: string, username: string, operationId: string) {
+  async viewedVisitDetails(
+    visitReference: string,
+    prisonerId: string,
+    prisonId: string,
+    username: string,
+    operationId: string,
+  ) {
     return this.sendAuditMessage({
       action: 'VIEWED_VISIT_DETAILS',
       who: username,
       operationId,
       details: {
         visitReference,
+        prisonerId,
+        prisonId,
       },
     })
   }
