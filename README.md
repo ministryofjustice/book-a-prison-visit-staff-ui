@@ -82,7 +82,7 @@ Or run tests with the cypress UI:
 The template project has implemented some scheduled checks to ensure that key dependencies are kept up to date.
 If these are not desired in the cloned project, remove references to `check_outdated` job from `.circleci/config.yml`
 
-### User audit
+## User audit
 To record an audit trail of user actions, events are sent to the [hmpps-audit-api](https://github.com/ministryofjustice/hmpps-audit-api) service SQS queue. Currently, the following are audited (see [auditService.ts](./server/services/auditService.ts) and [auditService.test.ts](./server/services/auditService.test.ts) for details of what is logged):
 
 * `BOOKED_VISIT`
@@ -97,7 +97,7 @@ To record an audit trail of user actions, events are sent to the [hmpps-audit-ap
 * `VIEWED_VISITS`
 * `VISIT_RESTRICTION_SELECTED`
 
-#### Diagnosing audit problems
+### Diagnosing audit problems
 At present there isn't a simple way to retrieve specific data from the audit service. However, using [Application Insights](https://portal.azure.com/#home) logs, it is possible to see whether messages are either being successfully ingested or instead ending up on the audit service's DLQ (dead-letter queue). For example:
 
 * To see SQS massages being sent from this application:
