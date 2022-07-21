@@ -46,15 +46,13 @@ export default function routes(
     const { pageSize } = config.apis.prisonerSearch
     const validationErrors = validatePrisonerSearch(search)
     const errors = validationErrors ? [validationErrors] : []
-    const { results, numberOfResults, numberOfPages, next, previous } = await prisonerSearchService.getPrisoners(
-      search,
-      res.locals.user?.username,
-      parsedPage,
-      isVisit,
-    )
-    const realNumberOfResults = errors.length > 0 ? 0 : numberOfResults
+    const hasValidationErrors = errors.length > 0
+    const { results, numberOfPages, numberOfResults, next, previous } = hasValidationErrors
+      ? { results: 0, numberOfPages: 0, numberOfResults: 0, next: 0, previous: 0 }
+      : await prisonerSearchService.getPrisoners(search, res.locals.user?.username, parsedPage, isVisit)
+
     const currentPageMax = parsedPage * pageSize
-    const to = realNumberOfResults < currentPageMax ? realNumberOfResults : currentPageMax
+    const to = numberOfResults < currentPageMax ? numberOfResults : currentPageMax
     await auditService.prisonerSearch(search, 'HEI', res.locals.user?.username, res.locals.appInsightsOperationId)
 
     const pageLinks = getResultsPagingLinks({
@@ -72,7 +70,7 @@ export default function routes(
       errors,
       next,
       previous,
-      numberOfResults: realNumberOfResults,
+      numberOfResults,
       pageSize,
       from: (parsedPage - 1) * pageSize + 1,
       to,

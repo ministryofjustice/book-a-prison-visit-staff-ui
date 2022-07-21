@@ -86,6 +86,31 @@ describe('Prisoner search page', () => {
             expect(res.text).toContain('id="search-results-none"')
             expect(auditService.prisonerSearch).toBeCalledTimes(1)
             expect(auditService.prisonerSearch).toBeCalledWith('A1234BC', 'HEI', undefined, undefined)
+            expect(prisonerSearchService.getPrisoners).toBeCalledTimes(1)
+          })
+      })
+    })
+
+    describe('GET /search/prisoner/results?search=', () => {
+      it('should render prisoner results page with no results with no search term', () => {
+        getPrisonersReturnData = {
+          results: [],
+          numberOfResults: 0,
+          numberOfPages: 0,
+          next: 0,
+          previous: 0,
+        }
+
+        prisonerSearchService.getPrisoners.mockResolvedValue(getPrisonersReturnData)
+
+        return request(app)
+          .get('/search/prisoner/results?search=')
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            expect(res.text).toContain('Search for a prisoner')
+            expect(res.text).toContain('You must enter at least 2 characters')
+            expect(auditService.prisonerSearch).toBeCalledWith('', 'HEI', undefined, undefined)
+            expect(prisonerSearchService.getPrisoners).not.toBeCalled()
           })
       })
     })
@@ -112,6 +137,7 @@ describe('Prisoner search page', () => {
             expect(res.text).toContain('id="search-results-true"')
             expect(auditService.prisonerSearch).toBeCalledTimes(1)
             expect(auditService.prisonerSearch).toBeCalledWith('A1234BC', 'HEI', undefined, undefined)
+            expect(prisonerSearchService.getPrisoners).toBeCalledTimes(1)
           })
       })
 
@@ -147,6 +173,7 @@ describe('Prisoner search page', () => {
             expect(res.text).toContain('<p class="moj-pagination__results">')
             expect(auditService.prisonerSearch).toBeCalledTimes(1)
             expect(auditService.prisonerSearch).toBeCalledWith('A1234BC', 'HEI', undefined, undefined)
+            expect(prisonerSearchService.getPrisoners).toBeCalledTimes(1)
           })
       })
     })
