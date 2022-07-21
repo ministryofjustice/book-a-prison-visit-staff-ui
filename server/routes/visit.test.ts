@@ -176,7 +176,13 @@ describe('GET /visit/:reference', () => {
         expect($('[data-test="visit-booked"]').text()).toBe('Monday 14 February 2022 at 10am')
 
         expect(auditService.viewedVisitDetails).toBeCalledTimes(1)
-        expect(auditService.viewedVisitDetails).toHaveBeenCalledWith('ab-cd-ef-gh', undefined, undefined)
+        expect(auditService.viewedVisitDetails).toHaveBeenCalledWith(
+          'ab-cd-ef-gh',
+          'A1234BC',
+          'HEI',
+          undefined,
+          undefined,
+        )
       })
   })
 
@@ -314,7 +320,13 @@ describe('GET /visit/:reference', () => {
         expect($('[data-test="visit-booked"]').text()).toBe('Monday 14 February 2022 at 10am')
 
         expect(auditService.viewedVisitDetails).toBeCalledTimes(1)
-        expect(auditService.viewedVisitDetails).toHaveBeenCalledWith('ab-cd-ef-gh', undefined, undefined)
+        expect(auditService.viewedVisitDetails).toHaveBeenCalledWith(
+          'ab-cd-ef-gh',
+          'A1234BC',
+          'HEI',
+          undefined,
+          undefined,
+        )
       })
   })
 
