@@ -21,8 +21,8 @@ export interface paths {
     put: operations['purgeQueue']
   }
   '/visits': {
-    /** Retrieve visits with optional filters, sorted by startTimestamp ascending */
-    get: operations['getVisitsByFilter']
+    /** Retrieve visits with optional filters, sorted by start timestamp descending */
+    get: operations['getVisitsByFilter_1']
     post: operations['createVisit']
   }
   '/visit-session-templates': {
@@ -57,8 +57,8 @@ export interface paths {
 
 export interface components {
   schemas: {
-    /** @description Contact associated with the visit */
-    CreateContactOnVisitRequestDto: {
+    /** @description Contact */
+    ContactDto: {
       /**
        * @description Contact Name
        * @example John Smith
@@ -69,28 +69,6 @@ export interface components {
        * @example 01234 567890
        */
       telephone: string
-    }
-    /** @description List of additional support associated with the visit */
-    CreateSupportOnVisitRequestDto: {
-      /**
-       * @description Support type
-       * @example OTHER
-       */
-      type: string
-      /**
-       * @description Support text description
-       * @example visually impaired assistance
-       */
-      text?: string
-    }
-    /** @description List of visitors associated with the visit */
-    CreateVisitorOnVisitRequestDto: {
-      /**
-       * Format: int64
-       * @description NOMIS person ID
-       * @example 1234556
-       */
-      nomisPersonId: number
     }
     UpdateVisitRequestDto: {
       /**
@@ -133,11 +111,33 @@ export interface components {
        * @description The finishing date and time of the visit
        */
       endTimestamp?: string
-      visitContact?: components['schemas']['CreateContactOnVisitRequestDto']
+      visitContact?: components['schemas']['ContactDto']
       /** @description List of visitors associated with the visit */
-      visitors?: components['schemas']['CreateVisitorOnVisitRequestDto'][]
+      visitors?: components['schemas']['VisitorDto'][]
       /** @description List of additional support associated with the visit */
-      visitorSupport?: components['schemas']['CreateSupportOnVisitRequestDto'][]
+      visitorSupport?: components['schemas']['VisitorSupportDto'][]
+    }
+    /** @description Visitor */
+    VisitorDto: {
+      /**
+       * Format: int64
+       * @description Person ID (nomis) of the visitor
+       * @example 1234
+       */
+      nomisPersonId: number
+    }
+    /** @description Visitor support */
+    VisitorSupportDto: {
+      /**
+       * @description Support type
+       * @example OTHER
+       */
+      type: string
+      /**
+       * @description Support text description
+       * @example visually impaired assistance
+       */
+      text?: string
     }
     ErrorResponse: {
       /** Format: int32 */
@@ -146,19 +146,6 @@ export interface components {
       errorCode?: number
       userMessage?: string
       developerMessage?: string
-    }
-    /** @description Contact */
-    ContactDto: {
-      /**
-       * @description Contact Name
-       * @example John Smith
-       */
-      name: string
-      /**
-       * @description Contact Phone Number
-       * @example 01234 567890
-       */
-      telephone: string
     }
     /** @description Visit */
     VisitDto: {
@@ -261,28 +248,6 @@ export interface components {
        */
       text: string
     }
-    /** @description Visitor */
-    VisitorDto: {
-      /**
-       * Format: int64
-       * @description Person ID (nomis) of the visitor
-       * @example 1234
-       */
-      nomisPersonId: number
-    }
-    /** @description Visitor support */
-    VisitorSupportDto: {
-      /**
-       * @description Support type
-       * @example OTHER
-       */
-      type: string
-      /**
-       * @description Support text description
-       * @example visually impaired assistance
-       */
-      text?: string
-    }
     Message: {
       messageId?: string
       receiptHandle?: string
@@ -291,8 +256,8 @@ export interface components {
       messageAttributes?: {
         [key: string]: components['schemas']['MessageAttributeValue']
       }
-      md5OfBody?: string
       md5OfMessageAttributes?: string
+      md5OfBody?: string
     }
     MessageAttributeValue: {
       stringValue?: string
@@ -379,11 +344,11 @@ export interface components {
        * @description The finishing date and time of the visit
        */
       endTimestamp: string
-      visitContact?: components['schemas']['CreateContactOnVisitRequestDto']
+      visitContact?: components['schemas']['ContactDto']
       /** @description List of visitors associated with the visit */
-      visitors: components['schemas']['CreateVisitorOnVisitRequestDto'][]
+      visitors: components['schemas']['VisitorDto'][]
       /** @description List of additional support associated with the visit */
-      visitorSupport?: components['schemas']['CreateSupportOnVisitRequestDto'][]
+      visitorSupport?: components['schemas']['VisitorSupportDto'][]
     }
     CreateSessionTemplateRequestDto: {
       /**
@@ -590,7 +555,7 @@ export interface components {
       legacyData?: components['schemas']['CreateLegacyDataRequestDto']
       visitContact?: components['schemas']['CreateLegacyContactOnVisitRequestDto']
       /** @description List of visitors associated with the visit */
-      visitors?: components['schemas']['CreateVisitorOnVisitRequestDto'][]
+      visitors?: components['schemas']['VisitorDto'][]
       /** @description Visit notes */
       visitNotes?: components['schemas']['VisitNoteDto'][]
     }
@@ -624,6 +589,40 @@ export interface components {
        * @example Because he got covid
        */
       text?: string
+    }
+    PageVisitDto: {
+      /** Format: int32 */
+      totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
+      /** Format: int32 */
+      size?: number
+      content?: components['schemas']['VisitDto'][]
+      /** Format: int32 */
+      number?: number
+      sort?: components['schemas']['Sort']
+      last?: boolean
+      first?: boolean
+      /** Format: int32 */
+      numberOfElements?: number
+      pageable?: components['schemas']['PageableObject']
+      empty?: boolean
+    }
+    PageableObject: {
+      /** Format: int64 */
+      offset?: number
+      sort?: components['schemas']['Sort']
+      /** Format: int32 */
+      pageSize?: number
+      paged?: boolean
+      unpaged?: boolean
+      /** Format: int32 */
+      pageNumber?: number
+    }
+    Sort: {
+      empty?: boolean
+      sorted?: boolean
+      unsorted?: boolean
     }
     /** @description Support Type */
     SupportTypeDto: {
@@ -859,8 +858,8 @@ export interface operations {
       }
     }
   }
-  /** Retrieve visits with optional filters, sorted by startTimestamp ascending */
-  getVisitsByFilter: {
+  /** Retrieve visits with optional filters, sorted by start timestamp descending */
+  getVisitsByFilter_1: {
     parameters: {
       query: {
         /** Filter results by prisoner id */
@@ -875,31 +874,35 @@ export interface operations {
         nomisPersonId?: number
         /** Filter results by visit status */
         visitStatus?: 'RESERVED' | 'BOOKED' | 'CANCELLED'
+        /** Pagination page number, starting at zero */
+        page?: number
+        /** Pagination size per page */
+        size?: number
       }
     }
     responses: {
       /** Visit Information Returned */
       200: {
         content: {
-          'application/json': components['schemas']['VisitDto'][]
+          'application/json': components['schemas']['PageVisitDto'] | components['schemas']['VisitDto'][]
         }
       }
       /** Incorrect request to Get visits for prisoner */
       400: {
         content: {
-          'application/json': components['schemas']['ErrorResponse']
+          'application/json': components['schemas']['PageVisitDto'] | components['schemas']['ErrorResponse']
         }
       }
       /** Unauthorized to access this endpoint */
       401: {
         content: {
-          'application/json': components['schemas']['ErrorResponse']
+          'application/json': components['schemas']['PageVisitDto'] | components['schemas']['ErrorResponse']
         }
       }
       /** Incorrect permissions to retrieve visits */
       403: {
         content: {
-          'application/json': components['schemas']['ErrorResponse']
+          'application/json': components['schemas']['PageVisitDto'] | components['schemas']['ErrorResponse']
         }
       }
     }
