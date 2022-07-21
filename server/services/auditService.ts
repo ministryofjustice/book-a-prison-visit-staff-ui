@@ -204,26 +204,25 @@ export default class AuditService {
     operationId: string
     details: object
   }) {
-    try {
-      const message = JSON.stringify({
-        what: action,
-        when: timestamp,
-        operationId,
-        who,
-        service: config.apis.audit.serviceName,
-        details: JSON.stringify(details),
-      })
+    const message = JSON.stringify({
+      what: action,
+      when: timestamp,
+      operationId,
+      who,
+      service: config.apis.audit.serviceName,
+      details: JSON.stringify(details),
+    })
 
+    try {
       const messageResponse = await this.sqsClient.send(
         new SendMessageCommand({
           MessageBody: message,
           QueueUrl: this.queueUrl,
         }),
       )
-
-      logger.info(`SQS message sent (${messageResponse.MessageId})`)
+      logger.info(`SQS message sent (MessageId: ${messageResponse.MessageId}, message: ${message})`)
     } catch (error) {
-      logger.error('Problem sending message to SQS queue')
+      logger.error(`Problem sending message to SQS queue (message: ${message})`)
       logger.error(error)
     }
   }
