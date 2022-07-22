@@ -135,7 +135,7 @@ describe('GET /visit/:reference', () => {
 
     const additionalSupport = ['Wheelchair ramp', 'custom request']
 
-    prisonerSearchService.getPrisoner.mockResolvedValue(prisoner)
+    prisonerSearchService.getPrisonerById.mockResolvedValue(prisoner)
     visitSessionsService.getFullVisitDetails.mockResolvedValue({ visit, visitors, additionalSupport })
 
     return request(app)
@@ -279,7 +279,7 @@ describe('GET /visit/:reference', () => {
     const url =
       '/visit/ab-cd-ef-gh?query=startDate%3D2022-05-24%26type%3DOPEN%26time%3D3pm%2Bto%2B3%253A59pm&from=visit-search'
 
-    prisonerSearchService.getPrisoner.mockResolvedValue(prisoner)
+    prisonerSearchService.getPrisonerById.mockResolvedValue(prisoner)
     visitSessionsService.getFullVisitDetails.mockResolvedValue({ visit, visitors, additionalSupport })
 
     return request(app)

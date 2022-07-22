@@ -45,7 +45,7 @@ export default function routes(
       username: res.locals.user?.username,
     })
 
-    const prisoner: Prisoner = await prisonerSearchService.getPrisoner(visit.prisonerId, res.locals.user?.username)
+    const prisoner: Prisoner = await prisonerSearchService.getPrisonerById(visit.prisonerId, res.locals.user?.username)
 
     await auditService.viewedVisitDetails(
       reference,
