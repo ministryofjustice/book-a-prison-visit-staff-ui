@@ -36,6 +36,16 @@ describe('Nunjucks Filters', () => {
       const $ = cheerio.load(compiledTemplate.render(viewContext))
       expect($('body').text()).toBe('Three, One')
     })
+
+    it('should return formatted contact with one name', () => {
+      viewContext = {
+        fullName: 'JOE',
+      }
+      const nunjucksString = '{{ fullName | formatLastNameFirst }}'
+      compiledTemplate = nunjucks.compile(nunjucksString, njkEnv)
+      const $ = cheerio.load(compiledTemplate.render(viewContext))
+      expect($('body').text()).toBe('Joe')
+    })
   })
 
   describe('properCaseFullName', () => {
