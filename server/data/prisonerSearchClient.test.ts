@@ -1,7 +1,6 @@
 import nock from 'nock'
 import config from '../config'
-import PrisonerSearchClient from './prisonerSearchClient'
-import RestClient from './restClient'
+import PrisonerSearchClient, { prisonerSearchClientBuilder } from './prisonerSearchClient'
 
 describe('prisonSearchClientBuilder', () => {
   let fakePrisonerSearchApi: nock.Scope
@@ -11,8 +10,7 @@ describe('prisonSearchClientBuilder', () => {
 
   beforeEach(() => {
     fakePrisonerSearchApi = nock(config.apis.prisonerSearch.url)
-    const restClient = new RestClient('Prisoner Search REST Client', config.apis.prisonerSearch, token)
-    client = new PrisonerSearchClient(restClient)
+    client = prisonerSearchClientBuilder(token)
   })
 
   afterEach(() => {
