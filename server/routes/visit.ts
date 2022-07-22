@@ -94,6 +94,7 @@ export default function routes(
       }
 
       const visit = await visitSessionsService.cancelVisit({ username: res.locals.user?.username, reference, outcome })
+
       await auditService.cancelledVisit(
         reference,
         visit.prisonerId.toString(),
@@ -115,7 +116,7 @@ export default function routes(
           })
           logger.info(`Cancellation SMS sent to ${visit.visitContact.telephone}`)
         } catch (error) {
-          logger.error(`Cancellation Failed to send SMS to ${visit.visitContact.telephone}`)
+          logger.error(`Failed to send Cancellation SMS to ${visit.visitContact.telephone}`)
         }
       }
 

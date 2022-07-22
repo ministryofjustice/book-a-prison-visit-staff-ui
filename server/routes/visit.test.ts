@@ -405,42 +405,57 @@ describe('GET /visit/:reference/cancel', () => {
 })
 
 describe('POST /visit/:reference/cancel', () => {
-  it('should cancel visit, set flash values and redirect to confirmation page if reason and text entered', () => {
-    const cancelledVisit: Visit = {
-      reference: 'ab-cd-ef-gh',
-      prisonerId: 'AF34567G',
-      prisonId: 'HEI',
-      visitRoom: 'A1 L3',
-      visitType: 'SOCIAL',
-      visitStatus: 'CANCELLED',
-      visitRestriction: 'OPEN',
-      startTimestamp: '2022-02-14T10:00:00',
-      endTimestamp: '2022-02-14T11:00:00',
-      visitNotes: [
-        {
-          type: 'VISIT_OUTCOMES',
-          text: 'VISITOR_CANCELLED',
-        },
-        {
-          type: 'STATUS_CHANGED_REASON',
-          text: 'cancellation reason',
-        },
-      ],
-      visitContact: {
-        name: 'Jeanette Smith',
-        telephone: '01234 567890',
-      },
-      visitors: [
-        {
-          nomisPersonId: 1234,
-        },
-      ],
-      visitorSupport: [],
-      createdTimestamp: '2022-02-14T10:00:00',
-      modifiedTimestamp: '2022-02-14T10:05:00',
-    }
+  const notificationsService = new NotificationsService(null) as jest.Mocked<NotificationsService>
 
-    visitSessionsService.cancelVisit.mockResolvedValue(cancelledVisit)
+  const cancelledVisit: Visit = {
+    reference: 'ab-cd-ef-gh',
+    prisonerId: 'AF34567G',
+    prisonId: 'HEI',
+    visitRoom: 'A1 L3',
+    visitType: 'SOCIAL',
+    visitStatus: 'CANCELLED',
+    visitRestriction: 'OPEN',
+    startTimestamp: '2022-02-14T10:00:00',
+    endTimestamp: '2022-02-14T11:00:00',
+    visitNotes: [
+      {
+        type: 'VISIT_OUTCOMES',
+        text: 'VISITOR_CANCELLED',
+      },
+      {
+        type: 'STATUS_CHANGED_REASON',
+        text: 'cancellation reason',
+      },
+    ],
+    visitContact: {
+      name: 'Jeanette Smith',
+      telephone: '01234567890',
+    },
+    visitors: [
+      {
+        nomisPersonId: 1234,
+      },
+    ],
+    visitorSupport: [],
+    createdTimestamp: '2022-02-14T10:00:00',
+    modifiedTimestamp: '2022-02-14T10:05:00',
+  }
+
+  beforeEach(() => {
+    visitSessionsService.cancelVisit = jest.fn().mockResolvedValue(cancelledVisit)
+    notificationsService.sendCancellationSms = jest.fn().mockResolvedValue({})
+
+    app = appWithAllRoutes({
+      prisonerSearchServiceOverride: prisonerSearchService,
+      visitSessionsServiceOverride: visitSessionsService,
+      auditServiceOverride: auditService,
+      systemTokenOverride: systemToken,
+      notificationsServiceOverride: notificationsService,
+    })
+  })
+
+  it('should cancel visit, set flash values, redirect to confirmation page and send cancellation SMS if reason and text entered', () => {
+    config.apis.notifications.enabled = true
 
     return request(app)
       .post('/visit/ab-cd-ef-gh/cancel')
@@ -469,6 +484,47 @@ describe('POST /visit/:reference/cancel', () => {
           undefined,
           undefined,
         )
+        expect(notificationsService.sendCancellationSms).toHaveBeenCalledTimes(1)
+        expect(notificationsService.sendCancellationSms).toHaveBeenCalledWith({
+          phoneNumber: cancelledVisit.visitContact.telephone,
+          visit: cancelledVisit.startTimestamp,
+          prisonName: 'Hewell (HMP)',
+          prisonPhoneNumber: '01234443225',
+        })
+      })
+  })
+
+  it('should not NOT send Cancellation SMS if notifications disabled', () => {
+    config.apis.notifications.enabled = false
+
+    return request(app)
+      .post('/visit/ab-cd-ef-gh/cancel')
+      .send('cancel=PRISONER_CANCELLED')
+      .send('reason_prisoner_cancelled=illness')
+      .expect(302)
+      .expect('location', '/visit/cancelled')
+      .expect(() => {
+        expect(visitSessionsService.cancelVisit).toHaveBeenCalledTimes(1)
+        expect(auditService.cancelledVisit).toBeCalledTimes(1)
+        expect(notificationsService.sendCancellationSms).not.toHaveBeenCalled()
+      })
+  })
+
+  it('should handle SMS sending failure', () => {
+    config.apis.notifications.enabled = true
+
+    notificationsService.sendCancellationSms.mockRejectedValue({})
+
+    return request(app)
+      .post('/visit/ab-cd-ef-gh/cancel')
+      .send('cancel=PRISONER_CANCELLED')
+      .send('reason_prisoner_cancelled=illness')
+      .expect(302)
+      .expect('location', '/visit/cancelled')
+      .expect(() => {
+        expect(visitSessionsService.cancelVisit).toHaveBeenCalledTimes(1)
+        expect(auditService.cancelledVisit).toBeCalledTimes(1)
+        expect(notificationsService.sendCancellationSms).toHaveBeenCalledTimes(1)
       })
   })
 
