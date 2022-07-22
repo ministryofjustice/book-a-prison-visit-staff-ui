@@ -148,4 +148,24 @@ describe('Prisoner search service', () => {
       expect(result).toBe(prisoner.content[0])
     })
   })
+
+  describe('getPrisonerById', () => {
+    it('should return prisoner details for given prisoner ID', async () => {
+      const prisoner: Prisoner = {
+        lastName: 'FORENAME',
+        firstName: 'SURNAME',
+        prisonerNumber: 'A1234BC',
+        dateOfBirth: '2000-01-01',
+        prisonId: 'HEI',
+        prisonName: 'HMP Hewell',
+        cellLocation: '1-1-C-028',
+        restrictedPatient: false,
+      }
+
+      prisonerSearchClient.getPrisonerById.mockResolvedValue(prisoner)
+      const result = await prisonerSearchService.getPrisonerById('A1234BC', 'user')
+
+      expect(result).toBe(prisoner)
+    })
+  })
 })
