@@ -57,16 +57,21 @@ export function registerNunjucks(app?: express.Express): Environment {
     return `${array[0][0]}. ${array.reverse()[0]}`
   })
 
-  njkEnv.addFilter('formatLastNameFirst', (fullName: string) => {
+  njkEnv.addFilter('formatLastNameFirst', (fullName: string, properCase = true) => {
     // this check is for the authError page
     if (!fullName) {
       return null
     }
+
     const array = fullName.split(' ')
 
-    return array.length === 1
-      ? properCaseFullName(array[0])
-      : `${properCaseFullName(array.at(-1))}, ${properCaseFullName(array[0])}`
+    if (properCase) {
+      return array.length === 1
+        ? properCaseFullName(array[0])
+        : `${properCaseFullName(array.at(-1))}, ${properCaseFullName(array[0])}`
+    }
+
+    return array.length === 1 ? array[0] : `${array.at(-1)}, ${array[0]}`
   })
 
   njkEnv.addFilter('properCaseFullName', (name: string) => {
