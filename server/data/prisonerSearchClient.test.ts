@@ -1,5 +1,6 @@
 import nock from 'nock'
 import config from '../config'
+import { Prisoner } from './prisonerOffenderSearchTypes'
 import PrisonerSearchClient, { prisonerSearchClientBuilder } from './prisonerSearchClient'
 
 describe('prisonSearchClientBuilder', () => {
@@ -65,6 +66,26 @@ describe('prisonSearchClientBuilder', () => {
         .reply(200, results)
 
       const output = await client.getPrisoner('test')
+
+      expect(output).toEqual(results)
+    })
+  })
+
+  describe('getPrisonerById', () => {
+    it('should return data for single prisoner by prisoner ID', async () => {
+      const results: Prisoner = {
+        lastName: 'FORENAME',
+        firstName: 'SURNAME',
+        prisonerNumber: 'A1234BC',
+        dateOfBirth: '2000-01-01',
+        prisonId: 'HEI',
+        prisonName: 'HMP Hewell',
+        cellLocation: '1-1-C-028',
+        restrictedPatient: false,
+      }
+      fakePrisonerSearchApi.get('/prisoner/A1234BC').matchHeader('authorization', `Bearer ${token}`).reply(200, results)
+
+      const output = await client.getPrisonerById('A1234BC')
 
       expect(output).toEqual(results)
     })

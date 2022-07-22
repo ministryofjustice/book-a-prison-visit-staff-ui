@@ -43,6 +43,12 @@ class PrisonerSearchClient {
     })
   }
 
+  getPrisonerById(id: string): Promise<Prisoner> {
+    return this.restClient.get({
+      path: `/prisoner/${id}`,
+    })
+  }
+
   async getPrisonersByPrisonerNumbers(
     prisonerNumbers: string[],
     page = 0,
