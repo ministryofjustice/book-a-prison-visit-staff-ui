@@ -17,34 +17,68 @@ describe('Nunjucks Filters', () => {
       expect($('body').text()).toBe('')
     })
 
-    it('should return formatted contact', () => {
-      viewContext = {
-        fullName: 'JOE BLOGGS',
-      }
-      const nunjucksString = '{{ fullName | formatLastNameFirst }}'
-      compiledTemplate = nunjucks.compile(nunjucksString, njkEnv)
-      const $ = cheerio.load(compiledTemplate.render(viewContext))
-      expect($('body').text()).toBe('Bloggs, Joe')
+    describe('with proper case', () => {
+      it('should return formatted contact', () => {
+        viewContext = {
+          fullName: 'JOE BLOGGS',
+        }
+        const nunjucksString = '{{ fullName | formatLastNameFirst }}'
+        compiledTemplate = nunjucks.compile(nunjucksString, njkEnv)
+        const $ = cheerio.load(compiledTemplate.render(viewContext))
+        expect($('body').text()).toBe('Bloggs, Joe')
+      })
+
+      it('should handle contact with middle name', () => {
+        viewContext = {
+          fullName: 'ONE TWO THREE',
+        }
+        const nunjucksString = '{{ fullName | formatLastNameFirst }}'
+        compiledTemplate = nunjucks.compile(nunjucksString, njkEnv)
+        const $ = cheerio.load(compiledTemplate.render(viewContext))
+        expect($('body').text()).toBe('Three, One')
+      })
+
+      it('should return formatted contact with one name', () => {
+        viewContext = {
+          fullName: 'JOE',
+        }
+        const nunjucksString = '{{ fullName | formatLastNameFirst }}'
+        compiledTemplate = nunjucks.compile(nunjucksString, njkEnv)
+        const $ = cheerio.load(compiledTemplate.render(viewContext))
+        expect($('body').text()).toBe('Joe')
+      })
     })
 
-    it('should handle contact with middle name', () => {
-      viewContext = {
-        fullName: 'ONE TWO THREE',
-      }
-      const nunjucksString = '{{ fullName | formatLastNameFirst }}'
-      compiledTemplate = nunjucks.compile(nunjucksString, njkEnv)
-      const $ = cheerio.load(compiledTemplate.render(viewContext))
-      expect($('body').text()).toBe('Three, One')
-    })
+    describe('without proper case', () => {
+      it('should return formatted contact', () => {
+        viewContext = {
+          fullName: 'JOE BLOGGS',
+        }
+        const nunjucksString = '{{ fullName | formatLastNameFirst(false) }}'
+        compiledTemplate = nunjucks.compile(nunjucksString, njkEnv)
+        const $ = cheerio.load(compiledTemplate.render(viewContext))
+        expect($('body').text()).toBe('BLOGGS, JOE')
+      })
 
-    it('should return formatted contact with one name', () => {
-      viewContext = {
-        fullName: 'JOE',
-      }
-      const nunjucksString = '{{ fullName | formatLastNameFirst }}'
-      compiledTemplate = nunjucks.compile(nunjucksString, njkEnv)
-      const $ = cheerio.load(compiledTemplate.render(viewContext))
-      expect($('body').text()).toBe('Joe')
+      it('should handle contact with middle name', () => {
+        viewContext = {
+          fullName: 'ONE TWO THREE',
+        }
+        const nunjucksString = '{{ fullName | formatLastNameFirst(false) }}'
+        compiledTemplate = nunjucks.compile(nunjucksString, njkEnv)
+        const $ = cheerio.load(compiledTemplate.render(viewContext))
+        expect($('body').text()).toBe('THREE, ONE')
+      })
+
+      it('should return formatted contact with one name', () => {
+        viewContext = {
+          fullName: 'JOE',
+        }
+        const nunjucksString = '{{ fullName | formatLastNameFirst(false) }}'
+        compiledTemplate = nunjucks.compile(nunjucksString, njkEnv)
+        const $ = cheerio.load(compiledTemplate.render(viewContext))
+        expect($('body').text()).toBe('JOE')
+      })
     })
   })
 
