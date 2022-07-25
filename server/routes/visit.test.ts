@@ -494,7 +494,7 @@ describe('POST /visit/:reference/cancel', () => {
       })
   })
 
-  it('should not NOT send Cancellation SMS if notifications disabled', () => {
+  it('should NOT send Cancellation SMS if notifications disabled', () => {
     config.apis.notifications.enabled = false
 
     return request(app)
