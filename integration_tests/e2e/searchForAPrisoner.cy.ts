@@ -18,7 +18,7 @@ import {
   multiplePageSearchResultsPage1,
   multiplePageSearchResultsPage2,
   prisonerProfileData,
-} from './searchForAPrisoner.data'
+} from './searchForAPrisoner.data.cy'
 import { Visit } from '../../server/data/visitSchedulerApiTypes'
 
 context('Search for a prisoner', () => {
