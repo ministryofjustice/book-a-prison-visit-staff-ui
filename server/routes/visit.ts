@@ -46,6 +46,9 @@ export default function routes(
     })
 
     const prisoner: Prisoner = await prisonerSearchService.getPrisonerById(visit.prisonerId, res.locals.user?.username)
+    // Temporarily hide any locations other than Hewell pending more work on transfer/release (see VB-907, VB-952)
+    const prisonerLocation =
+      prisoner.prisonId === 'HEI' ? `${prisoner.cellLocation}, ${prisoner.prisonName}` : 'Unknown'
 
     await auditService.viewedVisitDetails(
       reference,
@@ -57,6 +60,7 @@ export default function routes(
 
     return res.render('pages/visit/summary', {
       prisoner,
+      prisonerLocation,
       visit,
       visitors,
       additionalSupport,

@@ -53,6 +53,7 @@ describe('GET /visit/:reference', () => {
     lastName: 'SMITH',
     prisonerNumber: 'A1234BC',
     dateOfBirth: '1975-04-02',
+    prisonId: 'HEI',
     prisonName: 'Hewell (HMP)',
     cellLocation: '1-1-C-028',
     restrictedPatient: false,
@@ -244,6 +245,37 @@ describe('GET /visit/:reference', () => {
           undefined,
           undefined,
         )
+      })
+  })
+
+  // Temporarily hiding any locations other than Hewell pending more work on transfer/release (see VB-907, VB-952)
+  it('should render full booking summary page with prisoner - but showing location as Unknown if not Hewell', () => {
+    const transferPrisoner: Prisoner = {
+      firstName: 'JOHN',
+      lastName: 'SMITH',
+      prisonerNumber: 'A1234BC',
+      dateOfBirth: '1975-04-02',
+      prisonId: 'TRN',
+      prisonName: 'Transfer',
+      restrictedPatient: false,
+    }
+
+    prisonerSearchService.getPrisonerById.mockResolvedValue(transferPrisoner)
+
+    return request(app)
+      .get('/visit/ab-cd-ef-gh')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('h1').text()).toBe('Booking details')
+        expect($('.govuk-back-link').attr('href')).toBe('/prisoner/A1234BC/visits')
+        expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
+        // prisoner details
+        expect($('[data-test="prisoner-name"]').text()).toBe('Smith, John')
+        expect($('[data-test="prisoner-number"]').text()).toBe('A1234BC')
+        expect($('[data-test="prisoner-dob"]').text()).toBe('2 April 1975')
+        expect($('[data-test="prisoner-location"]').text()).toBe('Unknown')
       })
   })
 
