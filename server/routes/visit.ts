@@ -114,9 +114,9 @@ export default function routes(
             prisonName: 'Hewell (HMP)',
             prisonPhoneNumber: '01234443225',
           })
-          logger.info(`Cancellation SMS sent to ${visit.visitContact.telephone}`)
+          logger.info(`Cancellation SMS sent for ${reference}`)
         } catch (error) {
-          logger.error(`Failed to send Cancellation SMS to ${visit.visitContact.telephone}`)
+          logger.error(`Failed to send Cancellation SMS for ${reference}`)
         }
       }
 
