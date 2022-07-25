@@ -292,7 +292,7 @@ describe('Booking search page', () => {
         restrictedPatient: false,
       }
 
-      prisonerSearchService.getPrisoner.mockResolvedValue(getPrisonerReturnData)
+      prisonerSearchService.getPrisonerById.mockResolvedValue(getPrisonerReturnData)
       visitSessionsService.getVisit.mockImplementation(() => {
         throw createError(404, 'Not found')
       })
@@ -325,7 +325,7 @@ describe('Booking search page', () => {
         visitTime: '1pm -2pm',
       }
 
-      prisonerSearchService.getPrisoner.mockResolvedValue(getPrisonerReturnData)
+      prisonerSearchService.getPrisonerById.mockResolvedValue(getPrisonerReturnData)
       visitSessionsService.getVisit.mockResolvedValue(getVisit)
 
       return request(app)
