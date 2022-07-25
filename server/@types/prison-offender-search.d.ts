@@ -41,9 +41,17 @@ export interface paths {
     /** Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role */
     post: operations['findByCriteria']
   }
+  '/prisoner-search/release-date-by-prison': {
+    /** Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role */
+    post: operations['findByReleaseDateAndPrison']
+  }
   '/prisoner-search/prisoner-numbers': {
     /** Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role */
     post: operations['findByNumbers']
+  }
+  '/prisoner-search/possible-matches': {
+    /** Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role */
+    post: operations['findPossibleMatchesBySearchCriteria']
   }
   '/prisoner-search/match': {
     /** Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role */
@@ -86,9 +94,25 @@ export interface paths {
   '/synthetic-monitor': {
     get: operations['syntheticMonitor']
   }
+  '/queue-admin/get-dlq-messages/{dlqName}': {
+    get: operations['getDlqMessages']
+  }
+  '/prisoner/{id}': {
+    /** Requires ROLE_PRISONER_SEARCH or ROLE_VIEW_PRISONER_DATA role */
+    get: operations['findByPrison']
+  }
   '/prisoner-search/prison/{prisonId}': {
     /** Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role */
-    get: operations['findByPrison']
+    get: operations['findByPrison_1']
+  }
+  '/prison/{prisonId}/prisoners': {
+    /**
+     * This search is optimised for clients that have a simple search term typically containing the prisonser's name
+     *       or prisoner number. The user typically is certain the prisoner is within the establishment and knows key information
+     *       about the prisoner.
+     *       Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.
+     */
+    get: operations['search']
   }
 }
 
@@ -108,22 +132,32 @@ export interface components {
     MessageAttributeValue: {
       stringValue?: string
       binaryValue?: {
+        /** Format: int32 */
         short?: number
         char?: string
+        /** Format: int32 */
         int?: number
+        /** Format: int64 */
         long?: number
+        /** Format: float */
         float?: number
+        /** Format: double */
         double?: number
         direct?: boolean
         readOnly?: boolean
       }
       stringListValues?: string[]
       binaryListValues?: {
+        /** Format: int32 */
         short?: number
         char?: string
+        /** Format: int32 */
         int?: number
+        /** Format: int64 */
         long?: number
+        /** Format: float */
         float?: number
+        /** Format: double */
         double?: number
         direct?: boolean
         readOnly?: boolean
@@ -131,78 +165,164 @@ export interface components {
       dataType?: string
     }
     RetryDlqResult: {
+      /** Format: int32 */
       messagesFoundCount: number
       messages: components['schemas']['Message'][]
     }
     PurgeQueueResult: {
+      /** Format: int32 */
       messagesFoundCount: number
     }
     IndexStatus: {
       id: string
       currentIndex: 'INDEX_A' | 'INDEX_B'
+      /** @example 2021-07-05T10:35:17 */
       startIndexTime?: string
+      /** @example 2021-07-05T10:35:17 */
       endIndexTime?: string
       inProgress: boolean
       inError: boolean
     }
     Prisoner: {
-      /** Prisoner Number */
+      /**
+       * @description Prisoner Number
+       * @example A1234AA
+       */
       prisonerNumber?: string
-      /** PNC Number */
+      /**
+       * @description PNC Number
+       * @example 12/394773H
+       */
       pncNumber?: string
-      /** PNC Number */
+      /**
+       * @description PNC Number
+       * @example 12/394773H
+       */
       pncNumberCanonicalShort?: string
-      /** PNC Number */
+      /**
+       * @description PNC Number
+       * @example 2012/394773H
+       */
       pncNumberCanonicalLong?: string
-      /** CRO Number */
+      /**
+       * @description CRO Number
+       * @example 29906/12J
+       */
       croNumber?: string
-      /** Booking No. */
+      /**
+       * @description Booking No.
+       * @example 0001200924
+       */
       bookingId?: string
-      /** Book Number */
+      /**
+       * @description Book Number
+       * @example 38412A
+       */
       bookNumber?: string
-      /** First Name */
+      /**
+       * @description First Name
+       * @example Robert
+       */
       firstName?: string
-      /** Middle Names */
+      /**
+       * @description Middle Names
+       * @example John James
+       */
       middleNames?: string
-      /** Last name */
+      /**
+       * @description Last name
+       * @example Larsen
+       */
       lastName?: string
-      /** Date of Birth */
+      /**
+       * Format: date
+       * @description Date of Birth
+       * @example 1975-04-02
+       */
       dateOfBirth?: string
-      /** Gender */
+      /**
+       * @description Gender
+       * @example Female
+       */
       gender?: string
-      /** Ethnicity */
+      /**
+       * @description Ethnicity
+       * @example White: Eng./Welsh/Scot./N.Irish/British
+       */
       ethnicity?: string
-      /** Youth Offender? */
+      /**
+       * @description Youth Offender?
+       * @example true
+       */
       youthOffender?: boolean
-      /** Marital Status */
+      /**
+       * @description Marital Status
+       * @example Widowed
+       */
       maritalStatus?: string
-      /** Religion */
+      /**
+       * @description Religion
+       * @example Church of England (Anglican)
+       */
       religion?: string
-      /** Nationality */
+      /**
+       * @description Nationality
+       * @example Egyptian
+       */
       nationality?: string
-      /** Status of the prisoner */
+      /**
+       * @description Status of the prisoner
+       * @example ACTIVE IN
+       */
       status?: string
-      /** Last Movement Type Code of prisoner */
+      /**
+       * @description Last Movement Type Code of prisoner
+       * @example CRT
+       */
       lastMovementTypeCode?: string
-      /** Last Movement Reason of prisoner */
+      /**
+       * @description Last Movement Reason of prisoner
+       * @example CA
+       */
       lastMovementReasonCode?: string
-      /** In/Out Status */
-      inOutStatus?: 'IN,OUT'
-      /** Prison ID */
+      /**
+       * @description In/Out Status
+       * @example IN
+       */
+      inOutStatus?: 'IN' | 'OUT'
+      /**
+       * @description Prison ID
+       * @example MDI
+       */
       prisonId?: string
-      /** Prison Name */
+      /**
+       * @description Prison Name
+       * @example HMP Leeds
+       */
       prisonName?: string
-      /** In prison cell location */
+      /**
+       * @description In prison cell location
+       * @example A-1-002
+       */
       cellLocation?: string
-      /** Aliases Names and Details */
+      /** @description Aliases Names and Details */
       aliases?: components['schemas']['PrisonerAlias'][]
-      /** Alerts */
+      /** @description Alerts */
       alerts?: components['schemas']['PrisonerAlert'][]
-      /** Cell Sharing Risk Assessment */
+      /**
+       * @description Cell Sharing Risk Assessment
+       * @example HIGH
+       */
       csra?: string
-      /** Prisoner Category */
+      /**
+       * @description Prisoner Category
+       * @example C
+       */
       category?: string
-      /** Legal Status */
+      /**
+       * @description Legal Status
+       * @example SENTENCED
+       */
       legalStatus?:
         | 'RECALL'
         | 'DEAD'
@@ -214,241 +334,553 @@ export interface components {
         | 'REMAND'
         | 'UNKNOWN'
         | 'OTHER'
-      /** The prisoner's imprisonment status code. */
+      /**
+       * @description The prisoner's imprisonment status code.
+       * @example LIFE
+       */
       imprisonmentStatus?: string
-      /** The prisoner's imprisonment status description. */
+      /**
+       * @description The prisoner's imprisonment status description.
+       * @example Serving Life Imprisonment
+       */
       imprisonmentStatusDescription?: string
-      /** Most serious offence for this sentence */
+      /**
+       * @description Most serious offence for this sentence
+       * @example Robbery
+       */
       mostSeriousOffence?: string
-      /** Indicates that the offender has been recalled */
+      /** @description Indicates that the offender has been recalled */
       recall?: boolean
-      /** Indicates the the offender has an indeterminate sentence */
+      /**
+       * @description Indicates the the offender has an indeterminate sentence
+       * @example true
+       */
       indeterminateSentence?: boolean
-      /** Start Date for this sentence */
+      /**
+       * Format: date
+       * @description Start Date for this sentence
+       * @example 2020-04-03
+       */
       sentenceStartDate?: string
-      /** Actual of most likely Release Date */
+      /**
+       * Format: date
+       * @description Actual of most likely Release Date
+       * @example 2023-05-02
+       */
       releaseDate?: string
-      /** Release Date Confirmed */
+      /**
+       * Format: date
+       * @description Release Date Confirmed
+       * @example 2023-05-01
+       */
       confirmedReleaseDate?: string
-      /** Sentence Expiry Date */
+      /**
+       * Format: date
+       * @description Sentence Expiry Date
+       * @example 2023-05-01
+       */
       sentenceExpiryDate?: string
-      /** Licence Expiry Date */
+      /**
+       * Format: date
+       * @description Licence Expiry Date
+       * @example 2023-05-01
+       */
       licenceExpiryDate?: string
-      /** HDC Eligibility Date */
+      /**
+       * Format: date
+       * @description HDC Eligibility Date
+       * @example 2023-05-01
+       */
       homeDetentionCurfewEligibilityDate?: string
-      /** HDC Actual Date */
+      /**
+       * Format: date
+       * @description HDC Actual Date
+       * @example 2023-05-01
+       */
       homeDetentionCurfewActualDate?: string
-      /** HDC End Date */
+      /**
+       * Format: date
+       * @description HDC End Date
+       * @example 2023-05-02
+       */
       homeDetentionCurfewEndDate?: string
-      /** Top-up supervision start date */
+      /**
+       * Format: date
+       * @description Top-up supervision start date
+       * @example 2023-04-29
+       */
       topupSupervisionStartDate?: string
-      /** Top-up supervision expiry date */
+      /**
+       * Format: date
+       * @description Top-up supervision expiry date
+       * @example 2023-05-01
+       */
       topupSupervisionExpiryDate?: string
-      /** Days added to sentence term due to adjustments. */
+      /**
+       * Format: int32
+       * @description Days added to sentence term due to adjustments.
+       * @example 10
+       */
       additionalDaysAwarded?: number
-      /** Release date for Non determinant sentence (if applicable). This will be based on one of ARD, CRD, NPD or PRRD. */
+      /**
+       * Format: date
+       * @description Release date for Non determinant sentence (if applicable). This will be based on one of ARD, CRD, NPD or PRRD.
+       * @example 2023-05-01
+       */
       nonDtoReleaseDate?: string
-      /** Indicates which type of non-DTO release date is the effective release date. One of 'ARD’, 'CRD’, ‘NPD’ or 'PRRD’. */
+      /**
+       * @description Indicates which type of non-DTO release date is the effective release date. One of 'ARD’, 'CRD’, ‘NPD’ or 'PRRD’.
+       * @example ARD
+       */
       nonDtoReleaseDateType?: 'ARD' | 'CRD' | 'NPD' | 'PRRD'
-      /** Date prisoner was received into the prison */
+      /**
+       * Format: date
+       * @description Date prisoner was received into the prison
+       * @example 2023-05-01
+       */
       receptionDate?: string
-      /** Parole  Eligibility Date */
+      /**
+       * Format: date
+       * @description Parole  Eligibility Date
+       * @example 2023-05-01
+       */
       paroleEligibilityDate?: string
-      /** Automatic Release Date. If automaticReleaseOverrideDate is available then it will be set as automaticReleaseDate */
+      /**
+       * Format: date
+       * @description Automatic Release Date. If automaticReleaseOverrideDate is available then it will be set as automaticReleaseDate
+       * @example 2023-05-01
+       */
       automaticReleaseDate?: string
-      /** Post Recall Release Date. if postRecallReleaseOverrideDate is available then it will be set as postRecallReleaseDate */
+      /**
+       * Format: date
+       * @description Post Recall Release Date. if postRecallReleaseOverrideDate is available then it will be set as postRecallReleaseDate
+       * @example 2023-05-01
+       */
       postRecallReleaseDate?: string
-      /** Conditional Release Date. If conditionalReleaseOverrideDate is available then it will be set as conditionalReleaseDate */
+      /**
+       * Format: date
+       * @description Conditional Release Date. If conditionalReleaseOverrideDate is available then it will be set as conditionalReleaseDate
+       * @example 2023-05-01
+       */
       conditionalReleaseDate?: string
-      /** Actual Parole Date */
+      /**
+       * Format: date
+       * @description Actual Parole Date
+       * @example 2023-05-01
+       */
       actualParoleDate?: string
-      /** Tariff Date */
+      /**
+       * Format: date
+       * @description Tariff Date
+       * @example 2023-05-01
+       */
       tariffDate?: string
-      /** current prison or outside with last movement information. */
+      /**
+       * @description current prison or outside with last movement information.
+       * @example Outside - released from Leeds
+       */
       locationDescription?: string
-      /** Indicates a restricted patient */
+      /**
+       * @description Indicates a restricted patient
+       * @example true
+       */
       restrictedPatient: boolean
-      /** Supporting prison ID for POM */
+      /**
+       * @description Supporting prison ID for POM
+       * @example LEI
+       */
       supportingPrisonId?: string
-      /** Which hospital the offender has been discharged to */
+      /**
+       * @description Which hospital the offender has been discharged to
+       * @example HAZLWD
+       */
       dischargedHospitalId?: string
-      /** Hospital name to which the offender was discharged */
+      /**
+       * @description Hospital name to which the offender was discharged
+       * @example Hazelwood House
+       */
       dischargedHospitalDescription?: string
-      /** Date of discharge */
+      /**
+       * Format: date
+       * @description Date of discharge
+       * @example 2020-05-01
+       */
       dischargeDate?: string
-      /** Any additional discharge details */
+      /**
+       * @description Any additional discharge details
+       * @example Psychiatric Hospital Discharge to Hazelwood House
+       */
       dischargeDetails?: string
     }
-    /** Alerts */
+    /** @description Alerts */
     PrisonerAlert: {
-      /** Alert Type */
+      /**
+       * @description Alert Type
+       * @example H
+       */
       alertType: string
-      /** Alert Code */
+      /**
+       * @description Alert Code
+       * @example HA
+       */
       alertCode: string
-      /** Active */
+      /**
+       * @description Active
+       * @example true
+       */
       active: boolean
-      /** Expired */
+      /**
+       * @description Expired
+       * @example true
+       */
       expired: boolean
     }
-    /** Aliases Names and Details */
+    /** @description Aliases Names and Details */
     PrisonerAlias: {
-      /** First Name */
+      /**
+       * @description First Name
+       * @example Robert
+       */
       firstName: string
-      /** Middle names */
+      /**
+       * @description Middle names
+       * @example Trevor
+       */
       middleNames?: string
-      /** Last name */
+      /**
+       * @description Last name
+       * @example Lorsen
+       */
       lastName: string
-      /** Date of birth */
+      /**
+       * Format: date
+       * @description Date of birth
+       * @example 1975-04-02
+       */
       dateOfBirth: string
-      /** Gender */
+      /**
+       * @description Gender
+       * @example Male
+       */
       gender?: string
-      /** Ethnicity */
+      /**
+       * @description Ethnicity
+       * @example White : Irish
+       */
       ethnicity?: string
     }
-    /** Search Criteria for Prisoner Search */
+    /** @description Search Criteria for Prisoner Search */
     RestrictedPatientSearchCriteria: {
-      /** Prisoner identifier, one of prisoner number, book number, booking ID or PNC */
+      /**
+       * @description Prisoner identifier, one of prisoner number, book number, booking ID or PNC
+       * @example A1234AA,
+       */
       prisonerIdentifier?: string
-      /** First Name */
+      /**
+       * @description First Name
+       * @example John
+       */
       firstName?: string
-      /** Last Name */
+      /**
+       * @description Last Name
+       * @example Smith
+       */
       lastName?: string
-      /** List of supporting Prison Ids to restrict the search by. Unrestricted if not supplied or null */
+      /**
+       * @description List of supporting Prison Ids to restrict the search by. Unrestricted if not supplied or null
+       * @example MDI
+       */
       supportingPrisonIds?: string[]
     }
     PagePrisoner: {
+      /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
       size?: number
       content?: components['schemas']['Prisoner'][]
+      /** Format: int32 */
       number?: number
       sort?: components['schemas']['Sort']
       first?: boolean
       last?: boolean
+      /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     PageableObject: {
+      /** Format: int64 */
       offset?: number
       sort?: components['schemas']['Sort']
+      /** Format: int32 */
+      pageSize?: number
       paged?: boolean
       unpaged?: boolean
-      pageSize?: number
+      /** Format: int32 */
       pageNumber?: number
     }
     Sort: {
       empty?: boolean
-      unsorted?: boolean
       sorted?: boolean
+      unsorted?: boolean
+    }
+    /** @description Search Criteria for Release Date Search */
+    ReleaseDateSearch: {
+      /**
+       * Format: date
+       * @description The lower bound for the release date range of which to search - defaults to today if not provided
+       * @example 2022-04-20
+       */
+      earliestReleaseDate?: string
+      /**
+       * Format: date
+       * @description The upper bound for the release date range of which to search. A required field.
+       * @example 2022-05-20
+       */
+      latestReleaseDate: string
+      /**
+       * @description List of Prison Ids (can include OUT and TRN) to restrict the search by. Unrestricted if not supplied or null
+       * @example MDI
+       */
+      prisonIds?: string[]
     }
     PrisonerNumbers: {
-      /** List of prisoner numbers to search by */
+      /**
+       * @description List of prisoner numbers to search by
+       * @example A1234AA
+       */
       prisonerNumbers: string[]
     }
-    /** Search Criteria for Prisoner Search */
-    PrisonSearch: {
-      /** Prisoner identifier, one of prisoner number, book number, booking ID or PNC */
-      prisonerIdentifier?: string
-      /** First Name */
+    /** @description Search Criteria for possible match */
+    PossibleMatchCriteria: {
+      /**
+       * @description Prisoner first name
+       * @example john
+       */
       firstName?: string
-      /** Last Name */
+      /**
+       * @description Prisoner last Name
+       * @example smith
+       */
       lastName?: string
-      /** Prison Id, Prison Id or OUT or TRN */
+      /**
+       * Format: date
+       * @description Prisoner date of birth
+       * @example 1996-02-10
+       */
+      dateOfBirth?: string
+      /**
+       * @description Police National Computer (PNC) number
+       * @example 2018/0123456X
+       */
+      pncNumber?: string
+      /**
+       * @description The Prisoner NOMIS Id (aka prison number/offender no in DPS)
+       * @example A1234AB
+       */
+      nomsNumber?: string
+    }
+    /** @description Search Criteria for Prisoner Search */
+    PrisonSearch: {
+      /**
+       * @description Prisoner identifier, one of prisoner number, book number, booking ID or PNC
+       * @example A1234AA,
+       */
+      prisonerIdentifier?: string
+      /**
+       * @description First Name
+       * @example John
+       */
+      firstName?: string
+      /**
+       * @description Last Name
+       * @example Smith
+       */
+      lastName?: string
+      /**
+       * @description Prison Id, Prison Id or OUT or TRN
+       * @example MDI
+       */
       prisonId?: string
-      /** Include aliases in search */
+      /** @description Include aliases in search */
       includeAliases: boolean
     }
-    /** Search Criteria for Prisoner Search */
+    /** @description Search Criteria for Prisoner Search */
     SearchCriteria: {
-      /** Prisoner identifier, one of prisoner number, book number, booking ID or PNC */
+      /**
+       * @description Prisoner identifier, one of prisoner number, book number, booking ID or PNC
+       * @example A1234AA,
+       */
       prisonerIdentifier?: string
-      /** First Name */
+      /**
+       * @description First Name
+       * @example John
+       */
       firstName?: string
-      /** Last Name */
+      /**
+       * @description Last Name
+       * @example Smith
+       */
       lastName?: string
-      /** List of Prison Ids (can include OUT and TRN) to restrict the search by. Unrestricted if not supplied or null */
+      /**
+       * @description List of Prison Ids (can include OUT and TRN) to restrict the search by. Unrestricted if not supplied or null
+       * @example MDI
+       */
       prisonIds?: string[]
-      /** Include aliases in search */
+      /** @description Include aliases in search */
       includeAliases: boolean
     }
     BookingIds: {
-      /** List of bookingIds to search by */
+      /**
+       * @description List of bookingIds to search by
+       * @example 1,2,3
+       */
       bookingIds: number[]
     }
-    /** Pagination options. Will default to the first page if omitted. */
     PaginationRequest: {
-      /** The page number required in the paginated response */
+      /**
+       * Format: int32
+       * @description The page number required in the paginated response
+       */
       page: number
-      /** The number of results to return for paginated response */
+      /**
+       * Format: int32
+       * @description The number of results to return for paginated response
+       * @example 10
+       */
       size: number
     }
     PrisonerDetailRequest: {
-      /** Prisoner first name */
+      /**
+       * @description Prisoner first name
+       * @example john
+       */
       firstName?: string
-      /** Prisoner last name */
+      /**
+       * @description Prisoner last name
+       * @example smith
+       */
       lastName?: string
-      /** Prisoner number (aka. offenderId, nomisId) */
+      /**
+       * @description Prisoner number (aka. offenderId, nomisId)
+       * @example A1234AA
+       */
       nomsNumber?: string
-      /** Police National Computer (PNC) number */
+      /**
+       * @description Police National Computer (PNC) number
+       * @example 2018/0123456X
+       */
       pncNumber?: string
-      /** Criminal Records Office (CRO) number */
+      /**
+       * @description Criminal Records Office (CRO) number
+       * @example SF80/655108T
+       */
       croNumber?: string
-      /** Fuzzy matching. Allow a one character difference in spelling in word lengths below five and two differences above. */
+      /** @description Fuzzy matching. Allow a one character difference in spelling in word lengths below five and two differences above. */
       fuzzyMatch?: boolean
-      /** List of prison codes to filter results by */
+      /**
+       * @description List of prison codes to filter results by
+       * @example ['LEI', 'MDI']
+       */
       prisonIds?: string[]
-      /** Include aliases in search */
+      /**
+       * @description Include aliases in search
+       * @default true
+       * @example true
+       */
       includeAliases: boolean
       pagination: components['schemas']['PaginationRequest']
     }
     PrisonerDetailResponse: {
+      /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
       size?: number
       content?: components['schemas']['Prisoner'][]
+      /** Format: int32 */
       number?: number
       sort?: components['schemas']['Sort']
       first?: boolean
       last?: boolean
+      /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     ErrorResponse: {
-      /** Status of Error Code */
+      /**
+       * Format: int32
+       * @description Status of Error Code
+       * @example 400
+       */
       status: number
-      /** Developer Information message */
+      /**
+       * @description Developer Information message
+       * @example System is down
+       */
       developerMessage?: string
-      /** Internal Error Code */
+      /**
+       * Format: int32
+       * @description Internal Error Code
+       * @example 20012
+       */
       errorCode?: number
-      /** Error message information */
+      /**
+       * @description Error message information
+       * @example Prisoner Not Found
+       */
       userMessage?: string
-      /** Additional information about the error */
+      /**
+       * @description Additional information about the error
+       * @example Hard disk failure
+       */
       moreInfo?: string
     }
     MatchRequest: {
-      /** Prisoner first name */
+      /**
+       * @description Prisoner first name
+       * @example john
+       */
       firstName?: string
-      /** Prisoner last Name */
+      /**
+       * @description Prisoner last Name
+       * @example smith
+       */
       lastName: string
-      /** Prisoner date of birth */
+      /**
+       * Format: date
+       * @description Prisoner date of birth
+       * @example 1996-02-10
+       */
       dateOfBirth?: string
-      /** Police National Computer (PNC) number */
+      /**
+       * @description Police National Computer (PNC) number
+       * @example 2018/0123456X
+       */
       pncNumber?: string
-      /** Criminal Records Office (CRO) number */
+      /**
+       * @description Criminal Records Office (CRO) number
+       * @example SF80/655108T
+       */
       croNumber?: string
-      /** The Prisoner NOMIS Id (aka prison number/offender no in DPS) */
+      /**
+       * @description The Prisoner NOMIS Id (aka prison number/offender no in DPS)
+       * @example A1234AB
+       */
       nomsNumber?: string
     }
-    /** List of prisoners that share the same possibility of being the match */
+    /** @description List of prisoners that share the same possibility of being the match */
     PrisonerMatch: {
       prisoner: components['schemas']['Prisoner']
     }
     PrisonerMatches: {
-      /** List of prisoners that share the same possibility of being the match */
+      /** @description List of prisoners that share the same possibility of being the match */
       matches: components['schemas']['PrisonerMatch'][]
-      /** How the match was performed */
+      /** @description How the match was performed */
       matchedBy:
         | 'ALL_SUPPLIED'
         | 'ALL_SUPPLIED_ALIAS'
@@ -460,49 +892,106 @@ export interface components {
         | 'NOTHING'
     }
     KeywordRequest: {
-      /** Match where any of the keywords are present in any text field */
+      /**
+       * @description Match where any of the keywords are present in any text field
+       * @example smith james john
+       */
       orWords?: string
-      /** Match where all keywords are present in any text field */
+      /**
+       * @description Match where all keywords are present in any text field
+       * @example smith james
+       */
       andWords?: string
-      /** Filter results where any of these words are present in any text field */
+      /**
+       * @description Filter results where any of these words are present in any text field
+       * @example jonas
+       */
       notWords?: string
-      /** Match only prisoners where the full phrase is present in any text field */
+      /**
+       * @description Match only prisoners where the full phrase is present in any text field
+       * @example John Smith
+       */
       exactPhrase?: string
-      /** Fuzzy matching. Allow a one character difference in spelling in word lengths below five and two differences above. */
+      /** @description Fuzzy matching. Allow a one character difference in spelling in word lengths below five and two differences above. */
       fuzzyMatch?: boolean
-      /** List of prison codes to filter results */
+      /**
+       * @description List of prison codes to filter results
+       * @example LEI,MDI
+       */
       prisonIds?: string[]
       pagination: components['schemas']['PaginationRequest']
+      /** @description The type of search. When set to DEFAULT (which is the default when not provided) search order is by calculated relevance (AKA score). An ESTABLISHMENT type will order results by name and is designed for using this API for a single quick search field for prisoners within a specific prison */
+      type: 'DEFAULT' | 'ESTABLISHMENT'
     }
     KeywordResponse: {
+      /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
       size?: number
       content?: components['schemas']['Prisoner'][]
+      /** Format: int32 */
       number?: number
       sort?: components['schemas']['Sort']
       first?: boolean
       last?: boolean
+      /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
-    /** Search Criteria for Global Prisoner Search */
+    /** @description Search Criteria for Global Prisoner Search */
     GlobalSearchCriteria: {
-      /** Prisoner identifier, one of prisoner number, book number, booking ID or PNC */
+      /**
+       * @description Prisoner identifier, one of prisoner number, book number, booking ID or PNC
+       * @example A1234AA
+       */
       prisonerIdentifier?: string
-      /** First Name */
+      /**
+       * @description First Name
+       * @example John
+       */
       firstName?: string
-      /** Last Name */
+      /**
+       * @description Last Name
+       * @example Smith
+       */
       lastName?: string
-      /** Gender, F - Female, M - Male, NK - Not Known / Not Recorded or NS - Not Specified (Indeterminate) */
+      /**
+       * @description Gender, F - Female, M - Male, NK - Not Known / Not Recorded or NS - Not Specified (Indeterminate)
+       * @example M
+       */
       gender?: 'M' | 'F' | 'NK' | 'NS' | 'ALL'
-      /** Location, All or Inside or Outside */
+      /**
+       * @description Location, All or Inside or Outside
+       * @example IN
+       */
       location?: string
-      /** Date of birth */
+      /**
+       * Format: date
+       * @description Date of birth
+       * @example 1970-02-28
+       */
       dateOfBirth?: string
-      /** Include aliases in search */
+      /** @description Include aliases in search */
       includeAliases: boolean
+    }
+    DlqMessage: {
+      body: { [key: string]: { [key: string]: unknown } }
+      messageId: string
+    }
+    GetDlqResult: {
+      /** Format: int32 */
+      messagesFoundCount: number
+      /** Format: int32 */
+      messagesReturnedCount: number
+      messages: components['schemas']['DlqMessage'][]
+    }
+    PrisonersInPrisonRequest: {
+      term?: string
+      alertCodes: string[]
+      pagination: components['schemas']['PaginationRequest']
     }
   }
 }
@@ -628,7 +1117,7 @@ export interface operations {
         page?: number
         /** The size of the page to be returned */
         size?: number
-        /** Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
         sort?: string[]
       }
     }
@@ -647,6 +1136,32 @@ export interface operations {
     }
   }
   /** Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role */
+  findByReleaseDateAndPrison: {
+    parameters: {
+      query: {
+        /** Zero-based page index (0..N) */
+        page?: number
+        /** The size of the page to be returned */
+        size?: number
+        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+        sort?: string[]
+      }
+    }
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          'application/json': components['schemas']['PagePrisoner']
+        }
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ReleaseDateSearch']
+      }
+    }
+  }
+  /** Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role */
   findByNumbers: {
     responses: {
       /** OK */
@@ -659,6 +1174,22 @@ export interface operations {
     requestBody: {
       content: {
         'application/json': components['schemas']['PrisonerNumbers']
+      }
+    }
+  }
+  /** Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role */
+  findPossibleMatchesBySearchCriteria: {
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          'application/json': components['schemas']['Prisoner'][]
+        }
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['PossibleMatchCriteria']
       }
     }
   }
@@ -830,7 +1361,7 @@ export interface operations {
         page?: number
         /** The size of the page to be returned */
         size?: number
-        /** Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
         sort?: string[]
       }
     }
@@ -854,18 +1385,53 @@ export interface operations {
       200: unknown
     }
   }
-  /** Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role */
+  getDlqMessages: {
+    parameters: {
+      path: {
+        dlqName: string
+      }
+      query: {
+        maxMessages?: number
+      }
+    }
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['GetDlqResult']
+        }
+      }
+    }
+  }
+  /** Requires ROLE_PRISONER_SEARCH or ROLE_VIEW_PRISONER_DATA role */
   findByPrison: {
+    parameters: {
+      path: {
+        id: string
+      }
+    }
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['Prisoner']
+        }
+      }
+    }
+  }
+  /** Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role */
+  findByPrison_1: {
     parameters: {
       path: {
         prisonId: string
       }
       query: {
+        'include-restricted-patients'?: boolean
         /** Zero-based page index (0..N) */
         page?: number
         /** The size of the page to be returned */
         size?: number
-        /** Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
         sort?: string[]
       }
     }
@@ -875,6 +1441,56 @@ export interface operations {
         content: {
           'application/json': components['schemas']['PagePrisoner']
         }
+      }
+    }
+  }
+  /**
+   * This search is optimised for clients that have a simple search term typically containing the prisonser's name
+   *       or prisoner number. The user typically is certain the prisoner is within the establishment and knows key information
+   *       about the prisoner.
+   *       Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.
+   */
+  search: {
+    parameters: {
+      path: {
+        prisonId: string
+      }
+      query: {
+        term?: string
+        page?: number
+        size?: number
+        alerts?: string[]
+      }
+    }
+    responses: {
+      /** Search successfully performed */
+      200: {
+        content: {
+          'application/json': components['schemas']['PagePrisoner']
+        }
+      }
+      /** Incorrect information provided to perform prisoner match */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** Unauthorized to access this endpoint */
+      401: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** Incorrect permissions to search for prisoner data */
+      403: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['PrisonersInPrisonRequest']
       }
     }
   }
