@@ -56,6 +56,7 @@ describe('GOV.UK Notify client', () => {
   describe('sendCancellationSms', () => {
     const confirmationDetails = {
       phoneNumber: '07123456789',
+      prisonPhoneNumber: '01234443225',
       prisonName: 'Hewell',
       visitTime: '10:00am',
       visitDate: '1 August 2022',
@@ -71,6 +72,7 @@ describe('GOV.UK Notify client', () => {
         {
           personalisation: {
             prison: confirmationDetails.prisonName,
+            'prison phone number': confirmationDetails.prisonPhoneNumber,
             time: confirmationDetails.visitTime,
             date: confirmationDetails.visitDate,
           },

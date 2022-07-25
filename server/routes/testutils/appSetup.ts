@@ -163,7 +163,13 @@ function appSetup({
   )
   app.use(
     '/visit/',
-    visitRoutes(standardRouter(new MockUserService()), prisonerSearchService, visitSessionsService, auditService),
+    visitRoutes(
+      standardRouter(new MockUserService()),
+      prisonerSearchService,
+      visitSessionsService,
+      notificationsService,
+      auditService,
+    ),
   )
   app.use(
     '/visits',

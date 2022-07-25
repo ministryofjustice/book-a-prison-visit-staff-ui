@@ -10,11 +10,15 @@ import VisitSessionsService from '../services/visitSessionsService'
 import AuditService from '../services/auditService'
 import { isValidVisitReference } from './validationChecks'
 import { getFlashFormValues } from './visitorUtils'
+import NotificationsService from '../services/notificationsService'
+import config from '../config'
+import logger from '../../logger'
 
 export default function routes(
   router: Router,
   prisonerSearchService: PrisonerSearchService,
   visitSessionsService: VisitSessionsService,
+  notificationsService: NotificationsService,
   auditService: AuditService,
 ): Router {
   const get = (path: string, handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
@@ -96,6 +100,7 @@ export default function routes(
       }
 
       const visit = await visitSessionsService.cancelVisit({ username: res.locals.user?.username, reference, outcome })
+
       await auditService.cancelledVisit(
         reference,
         visit.prisonerId.toString(),
@@ -104,6 +109,22 @@ export default function routes(
         res.locals.user?.username,
         res.locals.appInsightsOperationId,
       )
+
+      if (config.apis.notifications.enabled) {
+        try {
+          const phoneNumber = visit.visitContact.telephone.replace(/\s/g, '')
+
+          await notificationsService.sendCancellationSms({
+            phoneNumber,
+            visit: visit.startTimestamp,
+            prisonName: 'Hewell (HMP)',
+            prisonPhoneNumber: '01234443225',
+          })
+          logger.info(`Cancellation SMS sent for ${reference}`)
+        } catch (error) {
+          logger.error(`Failed to send Cancellation SMS for ${reference}`)
+        }
+      }
 
       req.flash('startTimestamp', visit.startTimestamp)
       req.flash('endTimestamp', visit.endTimestamp)

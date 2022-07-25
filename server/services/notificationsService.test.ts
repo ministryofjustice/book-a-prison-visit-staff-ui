@@ -51,13 +51,8 @@ describe('Notifications service', () => {
     const visitDetails = {
       phoneNumber: '07123456789',
       prisonName: 'Hewell',
-      visit: {
-        id: '1',
-        startTimestamp: '2022-02-14T10:00:00',
-        endTimestamp: '2022-02-14T11:00:00',
-        availableTables: 15,
-        visitRoomName: 'room name',
-      },
+      prisonPhoneNumber: '01234443225',
+      visit: '2022-02-14T10:00:00',
     }
 
     it('should call the notifications client with the cancellation details', async () => {
@@ -66,6 +61,7 @@ describe('Notifications service', () => {
       expect(notificationsApiClient.sendCancellationSms).toHaveBeenCalledTimes(1)
       expect(notificationsApiClient.sendCancellationSms).toHaveBeenCalledWith({
         phoneNumber: visitDetails.phoneNumber,
+        prisonPhoneNumber: visitDetails.prisonPhoneNumber,
         prisonName: visitDetails.prisonName,
         visitTime: '10:00am',
         visitDate: '14 February 2022',
