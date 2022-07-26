@@ -3,15 +3,19 @@ import { stubFor } from './wiremock'
 import { Prisoner } from '../../server/data/prisonerOffenderSearchTypes'
 
 export default {
-  getPrisoners: (results: {
-    totalPages: number
-    totalElements: number
-    content: Partial<Prisoner>[]
-  }): SuperAgentRequest => {
+  getPrisoners: (
+    results: {
+      totalPages: number
+      totalElements: number
+      content: Partial<Prisoner>[]
+    },
+    page: string,
+    size: string,
+  ): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',
-        url: '/offenderSearch/prison/HEI/prisoners',
+        url: `/offenderSearch/prison/HEI/prisoners?term=A1234BC&page=${page}&size=${size}`,
       },
       response: {
         status: 200,
@@ -28,7 +32,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        url: '/offenderSearch/prison/HEI/prisoners',
+        url: '/offenderSearch/prison/HEI/prisoners?term=A1234BC&page=0&size=10',
       },
       response: {
         status: 200,

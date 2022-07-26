@@ -54,8 +54,15 @@ export default defineConfig({
         stubGetOffenderRestrictions: (offenderNo: string) => prisonApi.getOffenderRestrictions(offenderNo),
         stubGetVisitBalances: ({ offenderNo, visitBalances }: { offenderNo: string; visitBalances: VisitBalances }) =>
           prisonApi.getVisitBalances({ offenderNo, visitBalances }),
-        stubGetPrisoners: (results: { totalPages: number; totalElements: number; content: Partial<Prisoner>[] }) =>
-          offenderSearch.getPrisoners(results),
+        stubGetPrisoners: ({
+          results,
+          page = '0',
+          size = '10',
+        }: {
+          results: { totalPages: number; totalElements: number; content: Partial<Prisoner>[] }
+          page: string
+          size: string
+        }) => offenderSearch.getPrisoners(results, page, size),
         stubGetPrisoner: (results: { totalPages: number; totalElements: number; content: Partial<Prisoner>[] }) =>
           offenderSearch.getPrisoner(results),
         stubGetAvailableSupportOptions: visitScheduler.stubGetAvailableSupportOptions,

@@ -51,7 +51,7 @@ context('Search for a prisoner', () => {
         totalElements: 0,
         content: [],
       }
-      cy.task('stubGetPrisoners', results)
+      cy.task('stubGetPrisoners', { results })
       cy.signIn()
       const indexPage = Page.verifyOnPage(IndexPage)
       indexPage.bookAVisitLink().click()
@@ -68,7 +68,7 @@ context('Search for a prisoner', () => {
     it('should list the results with no paging', () => {
       const results: { totalPages: number; totalElements: number; content: Partial<Prisoner>[] } =
         singlePageSearchResults(prisonerNumber)
-      cy.task('stubGetPrisoners', results)
+      cy.task('stubGetPrisoners', { results })
       cy.signIn()
       const indexPage = Page.verifyOnPage(IndexPage)
       indexPage.bookAVisitLink().click()
@@ -103,7 +103,7 @@ context('Search for a prisoner', () => {
         multiplePageSearchResultsPage1(prisonerNumber)
       const resultsPage2: { totalPages: number; totalElements: number; content: Partial<Prisoner>[] } =
         multiplePageSearchResultsPage2()
-      cy.task('stubGetPrisoners', resultsPage1)
+      cy.task('stubGetPrisoners', { results: resultsPage1 })
       cy.signIn()
       const indexPage = Page.verifyOnPage(IndexPage)
       indexPage.bookAVisitLink().click()
@@ -130,7 +130,7 @@ context('Search for a prisoner', () => {
           })
       })
 
-      cy.task('stubGetPrisoners', resultsPage2)
+      cy.task('stubGetPrisoners', { results: resultsPage2, page: '1' })
       searchForAPrisonerResultsPage.nextPageLink().click()
       searchForAPrisonerResultsPage.hasResults()
       searchForAPrisonerResultsPage.pagingLinks().should('exist')
@@ -169,7 +169,7 @@ context('Search for a prisoner', () => {
         totalElements: 1,
         content: [prisoner],
       }
-      cy.task('stubGetPrisoners', results)
+      cy.task('stubGetPrisoners', { results })
       cy.signIn()
       const indexPage = Page.verifyOnPage(IndexPage)
       indexPage.bookAVisitLink().click()
