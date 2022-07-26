@@ -1,3 +1,4 @@
+import { URLSearchParams } from 'url'
 import RestClient from './restClient'
 import { Prisoner } from './prisonerOffenderSearchTypes'
 import config from '../config'
@@ -17,29 +18,22 @@ class PrisonerSearchClient {
   private pageSize = config.apis.prisonerSearch.pageSize
 
   getPrisoners(search: string, page = 0): Promise<{ totalPages: number; totalElements: number; content: Prisoner[] }> {
-    return this.restClient.post({
-      path: '/keyword',
-      data: {
-        orWords: search,
-        fuzzyMatch: true,
-        prisonIds: [this.agencyId],
-        pagination: {
-          page,
-          size: this.pageSize,
-        },
-        type: 'ESTABLISHMENT',
-      },
+    return this.restClient.get({
+      path: `/prison/${this.agencyId}/prisoners`,
+      query: new URLSearchParams({
+        term: search,
+        page: page.toString(),
+        size: this.pageSize.toString(),
+      }).toString(),
     })
   }
 
   getPrisoner(search: string): Promise<{ content: Prisoner[] }> {
-    return this.restClient.post({
-      path: '/keyword',
-      data: {
-        andWords: search,
-        prisonIds: [this.agencyId],
-        type: 'ESTABLISHMENT',
-      },
+    return this.restClient.get({
+      path: `/prison/${this.agencyId}/prisoners`,
+      query: new URLSearchParams({
+        term: search,
+      }).toString(),
     })
   }
 
