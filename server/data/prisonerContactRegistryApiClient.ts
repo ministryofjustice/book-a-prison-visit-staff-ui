@@ -13,13 +13,23 @@ export const prisonerContactRegistryApiClientBuilder = (token: string): Prisoner
 class PrisonerContactRegistryApiClient {
   constructor(private readonly restclient: RestClient) {}
 
-  getPrisonerSocialContacts(offenderNo: string): Promise<Contact[]> {
-    return this.restclient.get({
-      path: `/prisoners/${offenderNo}/contacts`,
-      query: new URLSearchParams({
-        type: 'S',
-      }).toString(),
-    })
+  async getPrisonerSocialContacts(offenderNo: string): Promise<Contact[]> {
+    let socialContacts: Contact[] = []
+
+    try {
+      socialContacts = await this.restclient.get({
+        path: `/prisoners/${offenderNo}/contacts`,
+        query: new URLSearchParams({
+          type: 'S',
+        }).toString(),
+      })
+    } catch (e) {
+      if (e.data.status !== 404) {
+        throw e
+      }
+    }
+
+    return socialContacts
   }
 }
 

@@ -93,5 +93,26 @@ describe('prisonerContactRegistryApiClient', () => {
 
       expect(output).toEqual(results)
     })
+
+    it('should return an empty array if prisoner not found', async () => {
+      const offenderNo = 'A1234BC'
+
+      fakePrisonerContactRegistryApi
+        .get(`/prisoners/${offenderNo}/contacts`)
+        .query({
+          type: 'S',
+        })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(404, {
+          status: 404,
+          errorCode: 0,
+          userMessage: 'string',
+          developerMessage: 'string',
+        })
+
+      const output = await client.getPrisonerSocialContacts(offenderNo)
+
+      expect(output).toEqual([])
+    })
   })
 })
