@@ -64,7 +64,10 @@ describe('prisonSearchClientBuilder', () => {
         ],
       }
       fakePrisonerSearchApi
-        .post('/keyword', `{"andWords":"test","prisonIds":["HEI"],"type":"ESTABLISHMENT"}`)
+        .get('/prison/HEI/prisoners')
+        .query({
+          term: 'test',
+        })
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 

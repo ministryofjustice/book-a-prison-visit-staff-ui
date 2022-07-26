@@ -10,8 +10,8 @@ export default {
   }): SuperAgentRequest => {
     return stubFor({
       request: {
-        method: 'POST',
-        url: '/offenderSearch/keyword',
+        method: 'GET',
+        url: '/offenderSearch/prison/HEI/prisoners',
       },
       response: {
         status: 200,
@@ -27,8 +27,8 @@ export default {
   }): SuperAgentRequest => {
     return stubFor({
       request: {
-        method: 'POST',
-        urlPattern: '/offenderSearch/keyword',
+        method: 'GET',
+        url: '/offenderSearch/prison/HEI/prisoners',
       },
       response: {
         status: 200,
