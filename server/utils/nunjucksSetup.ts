@@ -111,5 +111,10 @@ export function registerNunjucks(app?: express.Express): Environment {
     }
   })
 
+  // format phone number, just Unknown for now
+  njkEnv.addFilter('formatTelephone', (telephoneNumber: string) => {
+    return telephoneNumber === 'UNKNOWN' ? 'Unknown' : telephoneNumber
+  })
+
   return njkEnv
 }

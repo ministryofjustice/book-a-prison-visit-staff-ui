@@ -191,6 +191,66 @@ describe('GET /visit/:reference', () => {
       })
   })
 
+  it('should render full booking summary page with prisoner, visit and visitor details, with default back link, formatting unknown contact telephone correctly', () => {
+    const unknownTelephoneVisit = JSON.parse(JSON.stringify(visit))
+    unknownTelephoneVisit.visitContact.telephone = 'UNKNOWN'
+    prisonerSearchService.getPrisonerById.mockResolvedValue(prisoner)
+    visitSessionsService.getFullVisitDetails.mockResolvedValue({
+      visit: unknownTelephoneVisit,
+      visitors,
+      additionalSupport,
+    })
+
+    return request(app)
+      .get('/visit/ab-cd-ef-gh')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('h1').text()).toBe('Booking details')
+        expect($('.govuk-back-link').attr('href')).toBe('/prisoner/A1234BC/visits')
+        expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
+        // prisoner details
+        expect($('[data-test="prisoner-name"]').text()).toBe('Smith, John')
+        expect($('[data-test="prisoner-number"]').text()).toBe('A1234BC')
+        expect($('[data-test="prisoner-dob"]').text()).toBe('2 April 1975')
+        expect($('[data-test="prisoner-location"]').text()).toBe('1-1-C-028, Hewell (HMP)')
+        // visit details
+        expect($('[data-test="visit-date"]').text()).toBe('9 February 2022')
+        expect($('[data-test="visit-time"]').text()).toBe('10am to 11:15am')
+        expect($('[data-test="visit-type"]').text()).toBe('Open')
+        expect($('[data-test="visit-contact"]').text()).toBe('Smith, Jeanette')
+        expect($('[data-test="visit-phone"]').text()).toBe('Unknown')
+        expect($('[data-test="cancel-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/cancel')
+        // visitor details
+        expect($('[data-test="visitor-name-1"]').text()).toBe('Smith, Jeanette')
+        expect($('[data-test="visitor-dob-1"]').html()).toBe('28 July 1986<br>(Adult)')
+        expect($('[data-test="visitor-relationship-1"]').text()).toBe('Sister')
+        expect($('[data-test="visitor-address-1"]').html()).toBe('123 The Street,<br>Coventry')
+        expect($('[data-test="visitor-restrictions-1"] .visitor-restriction-badge--CLOSED').text()).toBe('Closed')
+        expect($('[data-test="visitor-restrictions-1"]').text()).toContain('End date not entered')
+        expect($('[data-test="visitor-name-2"]').text()).toBe('Smith, Anne')
+        expect($('[data-test="visitor-dob-2"]').html()).toBe(`2 January ${childBirthYear}<br>(Child)`)
+        expect($('[data-test="visitor-relationship-2"]').text()).toBe('Niece')
+        expect($('[data-test="visitor-address-2"]').html()).toBe('Not entered')
+        expect($('[data-test="visitor-restrictions-2"]').text()).toBe('None')
+        // additional info
+        expect($('[data-test="visit-comment"]').eq(0).text()).toBe('Example of a visit comment')
+        expect($('[data-test="visitor-concern"]').eq(0).text()).toBe('Example of a visitor concern')
+        expect($('[data-test="additional-support"]').text()).toBe('Wheelchair ramp, custom request')
+        expect($('[data-test="visit-booked"]').text()).toBe('Monday 14 February 2022 at 10am')
+
+        expect(auditService.viewedVisitDetails).toBeCalledTimes(1)
+        expect(auditService.viewedVisitDetails).toHaveBeenCalledWith(
+          'ab-cd-ef-gh',
+          'A1234BC',
+          'HEI',
+          undefined,
+          undefined,
+        )
+      })
+  })
+
   it('should render full booking summary page with prisoner, visit and visitor details with search back link when from visits', () => {
     const url =
       '/visit/ab-cd-ef-gh?query=startDate%3D2022-05-24%26type%3DOPEN%26time%3D3pm%2Bto%2B3%253A59pm&from=visit-search'
