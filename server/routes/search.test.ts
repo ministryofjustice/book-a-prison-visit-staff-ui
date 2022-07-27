@@ -109,7 +109,7 @@ describe('Prisoner search page', () => {
           .expect(res => {
             expect(res.text).toContain('Search for a prisoner')
             expect(res.text).toContain('You must enter at least 2 characters')
-            expect(auditService.prisonerSearch).toBeCalledWith('', 'HEI', undefined, undefined)
+            expect(auditService.prisonerSearch).not.toHaveBeenCalled()
             expect(prisonerSearchService.getPrisoners).not.toBeCalled()
           })
       })
@@ -267,6 +267,30 @@ describe('Prisoner search page', () => {
             expect(res.text).toContain('id="search-results-true"')
             expect(res.text).toContain('<p class="moj-pagination__results">')
           })
+      })
+
+      describe('GET /search/prisoner-visit/results?search=', () => {
+        it('should render prisoner results page with no results with no search term', () => {
+          getPrisonersReturnData = {
+            results: [],
+            numberOfResults: 0,
+            numberOfPages: 0,
+            next: 0,
+            previous: 0,
+          }
+
+          prisonerSearchService.getPrisoners.mockResolvedValue(getPrisonersReturnData)
+
+          return request(app)
+            .get('/search/prisoner-visit/results?search=')
+            .expect('Content-Type', /html/)
+            .expect(res => {
+              expect(res.text).toContain('Search for a prisoner')
+              expect(res.text).toContain('You must enter at least 2 characters')
+              expect(auditService.prisonerSearch).not.toHaveBeenCalled()
+              expect(prisonerSearchService.getPrisoners).not.toBeCalled()
+            })
+        })
       })
     })
   })

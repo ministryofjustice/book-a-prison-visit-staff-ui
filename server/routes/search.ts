@@ -47,13 +47,17 @@ export default function routes(
     const validationErrors = validatePrisonerSearch(search)
     const errors = validationErrors ? [validationErrors] : []
     const hasValidationErrors = errors.length > 0
+
     const { results, numberOfPages, numberOfResults, next, previous } = hasValidationErrors
       ? { results: 0, numberOfPages: 0, numberOfResults: 0, next: 0, previous: 0 }
       : await prisonerSearchService.getPrisoners(search, res.locals.user?.username, parsedPage, isVisit)
 
+    if (!hasValidationErrors) {
+      await auditService.prisonerSearch(search, 'HEI', res.locals.user?.username, res.locals.appInsightsOperationId)
+    }
+
     const currentPageMax = parsedPage * pageSize
     const to = numberOfResults < currentPageMax ? numberOfResults : currentPageMax
-    await auditService.prisonerSearch(search, 'HEI', res.locals.user?.username, res.locals.appInsightsOperationId)
 
     const pageLinks = getResultsPagingLinks({
       pagesToShow: config.apis.prisonerSearch.pagesLinksToShow,
