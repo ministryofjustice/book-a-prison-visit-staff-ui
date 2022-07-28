@@ -6,16 +6,18 @@ const getVisitSlotsFromBookedVisits = (
 ): {
   openSlots: VisitsPageSlot[]
   closedSlots: VisitsPageSlot[]
+  unknownSlots: VisitsPageSlot[]
   firstSlotTime: string
 } => {
   const openSlots: VisitsPageSlot[] = []
   const closedSlots: VisitsPageSlot[] = []
+  const unknownSlots: VisitsPageSlot[] = []
 
   visits.forEach((visit: ExtendedVisitInformation) => {
     if (visit.visitRestriction === 'OPEN') {
-      let matchingOpenSlot = openSlots.findIndex(openSlot => openSlot.visitTime === visit.visitTime)
+      let matchingSlot = openSlots.findIndex(slot => slot.visitTime === visit.visitTime)
 
-      if (matchingOpenSlot < 0) {
+      if (matchingSlot < 0) {
         openSlots.push({
           visitTime: visit.visitTime,
           visitType: 'OPEN',
@@ -24,15 +26,15 @@ const getVisitSlotsFromBookedVisits = (
           children: 0,
         })
 
-        matchingOpenSlot = openSlots.length - 1
+        matchingSlot = openSlots.length - 1
       }
 
-      openSlots[matchingOpenSlot].adults += visit.visitors.filter(visitor => visitor.adult).length
-      openSlots[matchingOpenSlot].children += visit.visitors.filter(visitor => !visitor.adult).length
-    } else {
-      let matchingClosedSlot = closedSlots.findIndex(closedSlot => closedSlot.visitTime === visit.visitTime)
+      openSlots[matchingSlot].adults += visit.visitors.filter(visitor => visitor.adult).length
+      openSlots[matchingSlot].children += visit.visitors.filter(visitor => !visitor.adult).length
+    } else if (visit.visitRestriction === 'CLOSED') {
+      let matchingSlot = closedSlots.findIndex(slot => slot.visitTime === visit.visitTime)
 
-      if (matchingClosedSlot < 0) {
+      if (matchingSlot < 0) {
         closedSlots.push({
           visitTime: visit.visitTime,
           visitType: 'CLOSED',
@@ -41,11 +43,28 @@ const getVisitSlotsFromBookedVisits = (
           children: 0,
         })
 
-        matchingClosedSlot = closedSlots.length - 1
+        matchingSlot = closedSlots.length - 1
       }
 
-      closedSlots[matchingClosedSlot].adults += visit.visitors.filter(visitor => visitor.adult).length
-      closedSlots[matchingClosedSlot].children += visit.visitors.filter(visitor => !visitor.adult).length
+      closedSlots[matchingSlot].adults += visit.visitors.filter(visitor => visitor.adult).length
+      closedSlots[matchingSlot].children += visit.visitors.filter(visitor => !visitor.adult).length
+    } else {
+      let matchingSlot = unknownSlots.findIndex(slot => slot.visitTime === visit.visitTime)
+
+      if (matchingSlot < 0) {
+        unknownSlots.push({
+          visitTime: visit.visitTime,
+          visitType: 'UNKNOWN',
+          sortField: visit.startTimestamp,
+          adults: 0,
+          children: 0,
+        })
+
+        matchingSlot = unknownSlots.length - 1
+      }
+
+      unknownSlots[matchingSlot].adults += visit.visitors.filter(visitor => visitor.adult).length
+      unknownSlots[matchingSlot].children += visit.visitors.filter(visitor => !visitor.adult).length
     }
   })
 
@@ -55,11 +74,14 @@ const getVisitSlotsFromBookedVisits = (
     firstSlotTime = openSlots.sort(sortByTimestamp)[0].visitTime
   } else if (closedSlots.length > 0) {
     firstSlotTime = closedSlots.sort(sortByTimestamp)[0].visitTime
+  } else if (unknownSlots.length > 0) {
+    firstSlotTime = unknownSlots.sort(sortByTimestamp)[0].visitTime
   }
 
   return {
     openSlots,
     closedSlots,
+    unknownSlots,
     firstSlotTime,
   }
 }
