@@ -58,7 +58,7 @@ export default class VisitSessionsService {
     const token = await this.systemToken(username)
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
     const whereaboutsApiClient = this.whereaboutsApiClientBuilder(token)
-    const visitSessions = await visitSchedulerApiClient.getVisitSessions()
+    const visitSessions = await visitSchedulerApiClient.getVisitSessions(offenderNo)
 
     let earliestStartTime: Date = new Date()
     let latestEndTime: Date = new Date()

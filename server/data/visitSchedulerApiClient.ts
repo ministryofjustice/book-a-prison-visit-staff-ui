@@ -73,11 +73,12 @@ class VisitSchedulerApiClient {
     })
   }
 
-  getVisitSessions(): Promise<VisitSession[]> {
+  getVisitSessions(offenderNo: string): Promise<VisitSession[]> {
     return this.restclient.get({
       path: '/visit-sessions',
       query: new URLSearchParams({
         prisonId: this.prisonId,
+        prisonerId: offenderNo,
         // 'min' and 'max' params omitted, so using API default between 2 and 28 days from now
       }).toString(),
     })
