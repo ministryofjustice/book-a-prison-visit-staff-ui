@@ -90,7 +90,7 @@ export interface components {
        * @description Visit Type
        * @example SOCIAL
        */
-      visitType?: 'SOCIAL' | 'OFFICIAL' | 'FAMILY'
+      visitType?: 'SOCIAL'
       /**
        * @description Visit Status
        * @example RESERVED
@@ -173,7 +173,7 @@ export interface components {
        * @description Visit Type
        * @example SOCIAL
        */
-      visitType: 'SOCIAL' | 'OFFICIAL' | 'FAMILY'
+      visitType: 'SOCIAL'
       /**
        * @description Visit Status
        * @example RESERVED
@@ -256,8 +256,8 @@ export interface components {
       messageAttributes?: {
         [key: string]: components['schemas']['MessageAttributeValue']
       }
-      md5OfMessageAttributes?: string
       md5OfBody?: string
+      md5OfMessageAttributes?: string
     }
     MessageAttributeValue: {
       stringValue?: string
@@ -323,7 +323,7 @@ export interface components {
        * @description Visit Type
        * @example SOCIAL
        */
-      visitType: 'SOCIAL' | 'OFFICIAL' | 'FAMILY'
+      visitType: 'SOCIAL'
       /**
        * @description Visit Status
        * @example RESERVED
@@ -360,28 +360,26 @@ export interface components {
       endTime: components['schemas']['LocalTime']
       /**
        * Format: date
-       * @description The start date of the session template
+       * @description The start of the Validity period for the session template
        * @example 2019-12-02
        */
-      startDate: string
+      validFromDate: string
       /**
        * Format: date
-       * @description The expiry date of the session template
+       * @description The end of the Validity period for the session template
        * @example 2019-12-02
        */
-      expiryDate?: string
+      validToDate?: string
       /**
        * @description visit type
        * @example SOCIAL
        */
-      visitType: 'SOCIAL' | 'OFFICIAL' | 'FAMILY'
+      visitType: 'SOCIAL'
       /**
        * @description visit room
        * @example A1
        */
       visitRoom: string
-      /** @description frequency */
-      frequency: 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'SINGLE'
       /**
        * Format: int32
        * @description closed capacity
@@ -394,6 +392,11 @@ export interface components {
        * @example 50
        */
       openCapacity: number
+      /**
+       * @description day of week for visit
+       * @example MONDAY
+       */
+      dayOfWeek: 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY'
     }
     /**
      * @description The end time of the generated visit session(s)
@@ -425,31 +428,26 @@ export interface components {
       endTime: components['schemas']['LocalTime']
       /**
        * Format: date
-       * @description The start date of the session template
+       * @description The start of the Validity period for the session template
        * @example 2019-12-02
        */
-      startDate: string
+      validFromDate: string
       /**
        * Format: date
-       * @description The expiry date of the session template
+       * @description The end of the Validity period for the session template
        * @example 2019-12-02
        */
-      expiryDate?: string
+      validToDate?: string
       /**
        * @description visit type
        * @example SOCIAL
        */
-      visitType: 'SOCIAL' | 'OFFICIAL' | 'FAMILY'
+      visitType: 'SOCIAL'
       /**
        * @description visit room
        * @example A1
        */
       visitRoom: string
-      /**
-       * @description frequency
-       * @example A1
-       */
-      frequency: 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'SINGLE'
       /**
        * Format: int32
        * @description closed capacity
@@ -462,6 +460,11 @@ export interface components {
        * @example 50
        */
       openCapacity: number
+      /**
+       * @description day of week fpr visit
+       * @example MONDAY
+       */
+      dayOfWeek?: 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY'
     }
     /** @description Contact associated with the visit */
     CreateLegacyContactOnVisitRequestDto: {
@@ -508,7 +511,7 @@ export interface components {
        * @description Visit Type
        * @example SOCIAL
        */
-      visitType: 'SOCIAL' | 'OFFICIAL' | 'FAMILY'
+      visitType: 'SOCIAL'
       /**
        * @description Visit Status
        * @example RESERVED
@@ -603,9 +606,9 @@ export interface components {
       sort?: components['schemas']['Sort']
       last?: boolean
       first?: boolean
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     PageableObject: {
@@ -614,10 +617,10 @@ export interface components {
       sort?: components['schemas']['Sort']
       /** Format: int32 */
       pageSize?: number
-      paged?: boolean
-      unpaged?: boolean
       /** Format: int32 */
       pageNumber?: number
+      paged?: boolean
+      unpaged?: boolean
     }
     Sort: {
       empty?: boolean
@@ -654,7 +657,7 @@ export interface components {
        * @description The type of visits taking place within this session
        * @example SOCIAL
        */
-      visitType: 'SOCIAL' | 'OFFICIAL' | 'FAMILY'
+      visitType: 'SOCIAL'
       /**
        * @description The prison id
        * @example LEI
@@ -694,6 +697,8 @@ export interface components {
        * @description The end timestamp for this visit session
        */
       endTimestamp: string
+      /** @description Session conflicts */
+      sessionConflicts?: ('NON_ASSOCIATION' | 'DOUBLE_BOOKED')[]
     }
     DlqMessage: {
       body: { [key: string]: { [key: string]: unknown } }
