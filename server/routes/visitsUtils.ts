@@ -41,6 +41,28 @@ export const getDateTabs = (
   return tabs
 }
 
+const getSlotOptions = (
+  slot: VisitsPageSlot,
+  selectedDate: string,
+  firstTabDate: string,
+  slotFilter: string,
+  slotType: string,
+  visitType: string,
+) => {
+  const queryParams = new URLSearchParams({
+    type: visitType,
+    time: slot.visitTime,
+    selectedDate,
+    firstTabDate,
+  }).toString()
+
+  return {
+    text: slot.visitTime,
+    href: `/visits?${queryParams}`,
+    active: slotFilter === slot.visitTime && slotType === slot.visitType,
+  }
+}
+
 export function getSlotsSideMenuData({
   slotFilter,
   slotType = '',
@@ -68,50 +90,15 @@ export function getSlotsSideMenuData({
     active: boolean
   }[]
 }[] {
-  const openSlotOptions = openSlots.sort(sortByTimestamp).map(slot => {
-    const queryParams = new URLSearchParams({
-      type: 'OPEN',
-      time: slot.visitTime,
-      selectedDate,
-      firstTabDate,
-    }).toString()
-
-    return {
-      text: slot.visitTime,
-      href: `/visits?${queryParams}`,
-      active: slotFilter === slot.visitTime && slotType === slot.visitType,
-    }
-  })
-
-  const closedSlotOptions = closedSlots.sort(sortByTimestamp).map(slot => {
-    const queryParams = new URLSearchParams({
-      type: 'CLOSED',
-      time: slot.visitTime,
-      selectedDate,
-      firstTabDate,
-    }).toString()
-
-    return {
-      text: slot.visitTime,
-      href: `/visits?${queryParams}`,
-      active: slotFilter === slot.visitTime && slotType === slot.visitType,
-    }
-  })
-
-  const unknownSlotOptions = unknownSlots.sort(sortByTimestamp).map(slot => {
-    const queryParams = new URLSearchParams({
-      type: 'UNKNOWN',
-      time: slot.visitTime,
-      selectedDate,
-      firstTabDate,
-    }).toString()
-
-    return {
-      text: slot.visitTime,
-      href: `/visits?${queryParams}`,
-      active: slotFilter === slot.visitTime && slotType === slot.visitType,
-    }
-  })
+  const openSlotOptions = openSlots
+    .sort(sortByTimestamp)
+    .map(slot => getSlotOptions(slot, selectedDate, firstTabDate, slotFilter, slotType, 'OPEN'))
+  const closedSlotOptions = closedSlots
+    .sort(sortByTimestamp)
+    .map(slot => getSlotOptions(slot, selectedDate, firstTabDate, slotFilter, slotType, 'CLOSED'))
+  const unknownSlotOptions = unknownSlots
+    .sort(sortByTimestamp)
+    .map(slot => getSlotOptions(slot, selectedDate, firstTabDate, slotFilter, slotType, 'UNKNOWN'))
 
   const slotsNav = []
 
