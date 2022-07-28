@@ -26,16 +26,9 @@ export default function routes(
     )
 
   get('/', async (req, res) => {
-    const maxSlotDefaults = {
-      OPEN: 30,
-      CLOSED: 3,
-    }
     const { type = 'OPEN', time = '', selectedDate = '', firstTabDate = '' } = req.query
-    const visitType = ['OPEN', 'CLOSED'].includes(type as string) ? (type as string) : 'OPEN'
-    const maxSlots = maxSlotDefaults[visitType]
+    let visitType = ['OPEN', 'CLOSED'].includes(type as string) ? (type as string) : 'OPEN'
     const selectedDateString = getParsedDateFromQueryString(selectedDate as string)
-    const firstTabDateString = getParsedDateFromQueryString(firstTabDate as string)
-
     const {
       extendedVisitsInfo,
       slots,
@@ -51,8 +44,18 @@ export default function routes(
       username: res.locals.user?.username,
     })
 
-    const slotFilter = time === '' ? slots.firstSlotTime : time
+    if (slots.openSlots.length === 0 && slots.closedSlots.length > 0 && visitType !== 'CLOSED') {
+      visitType = 'CLOSED'
+    }
 
+    const maxSlotDefaults = {
+      OPEN: 30,
+      CLOSED: 3,
+    }
+    const maxSlots = maxSlotDefaults[visitType]
+    const firstTabDateString = getParsedDateFromQueryString(firstTabDate as string)
+
+    const slotFilter = time === '' ? slots.firstSlotTime : time
     const queryParams = new URLSearchParams({
       type: visitType,
       time: slotFilter as string,
@@ -67,12 +70,10 @@ export default function routes(
       firstTabDate: firstTabDateString,
       ...slots,
     })
-
     const selectedSlots = {
       open: slots.openSlots.find(slot => slot.visitTime === slotFilter) ?? { adults: 0, children: 0 },
       closed: slots.closedSlots.find(slot => slot.visitTime === slotFilter) ?? { adults: 0, children: 0 },
     }
-
     const totals = {
       adults: visitType === 'OPEN' ? selectedSlots.open.adults : selectedSlots.closed.adults,
       children: visitType === 'OPEN' ? selectedSlots.open.children : selectedSlots.closed.children,
