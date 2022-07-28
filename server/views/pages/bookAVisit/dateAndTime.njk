@@ -11,7 +11,7 @@
 {% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
 {% endset %}
 {% set backLinkHref = "/book-a-visit/select-visitors" %}
-
+{% set slotsPresent = false %}
 {% macro buildSlotsRadioItems(slotsList, radios) %}
   {% for slot in slotsList %}
 
@@ -157,6 +157,15 @@
     </form>
 
     {% if slotsList | length %}
+      {% for i in slotsList | list %}
+        {% if i.value | length %}
+          {% set slotsPresent = true %}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+
+    {% if slotsPresent %}
+
     <form action="/book-a-visit/select-date-and-time" method="POST" novalidate>
       <input type="hidden" name="_csrf" value="{{ csrfToken }}">
     {% for month, days in slotsList %}
@@ -255,6 +264,7 @@
 
     {% include "partials/backToStartButton.njk" %}
     {% endif %}
+
   </div>
 </div>
 {% endblock %}
