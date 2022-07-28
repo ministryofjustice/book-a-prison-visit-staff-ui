@@ -48,8 +48,7 @@ export default function routes(
     if (visitType === 'OPEN' && slots.openSlots.length === 0) {
       if (slots.closedSlots.length > 0) {
         visitType = 'CLOSED'
-      }
-      if (slots.unknownSlots.length > 0) {
+      } else if (slots.unknownSlots.length > 0) {
         visitType = 'UNKNOWN'
       }
     }
