@@ -1038,6 +1038,7 @@ describe('Visit sessions service', () => {
           closedSlots: [],
           firstSlotTime: undefined,
           openSlots: [],
+          unknownSlots: [],
         },
       })
     })
@@ -1172,6 +1173,7 @@ describe('Visit sessions service', () => {
         slots: {
           openSlots: VisitsPageSlot[]
           closedSlots: VisitsPageSlot[]
+          unknownSlots: VisitsPageSlot[]
           firstSlotTime: string
         }
       } = {
@@ -1247,6 +1249,7 @@ describe('Visit sessions service', () => {
             },
           ],
           closedSlots: [],
+          unknownSlots: [],
           firstSlotTime: '9am to 9:29am',
         },
       }

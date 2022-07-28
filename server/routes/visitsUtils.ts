@@ -48,6 +48,7 @@ export function getSlotsSideMenuData({
   firstTabDate = '',
   openSlots,
   closedSlots,
+  unknownSlots,
 }: {
   slotFilter: string
   slotType: string
@@ -55,6 +56,7 @@ export function getSlotsSideMenuData({
   firstTabDate: string
   openSlots: VisitsPageSlot[]
   closedSlots: VisitsPageSlot[]
+  unknownSlots: VisitsPageSlot[]
 }): {
   heading: {
     text: string
@@ -96,6 +98,21 @@ export function getSlotsSideMenuData({
     }
   })
 
+  const unknownSlotOptions = unknownSlots.sort(sortByTimestamp).map(slot => {
+    const queryParams = new URLSearchParams({
+      type: 'UNKNOWN',
+      time: slot.visitTime,
+      selectedDate,
+      firstTabDate,
+    }).toString()
+
+    return {
+      text: slot.visitTime,
+      href: `/visits?${queryParams}`,
+      active: slotFilter === slot.visitTime && slotType === slot.visitType,
+    }
+  })
+
   const slotsNav = []
 
   if (openSlotOptions.length > 0) {
@@ -115,6 +132,16 @@ export function getSlotsSideMenuData({
         classes: 'govuk-!-padding-top-0',
       },
       items: closedSlotOptions,
+    })
+  }
+
+  if (unknownSlotOptions.length > 0) {
+    slotsNav.push({
+      heading: {
+        text: 'Unknown',
+        classes: 'govuk-!-padding-top-0',
+      },
+      items: unknownSlotOptions,
     })
   }
 

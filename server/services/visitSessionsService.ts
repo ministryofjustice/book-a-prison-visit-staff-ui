@@ -238,6 +238,7 @@ export default class VisitSessionsService {
     slots: {
       openSlots: VisitsPageSlot[]
       closedSlots: VisitsPageSlot[]
+      unknownSlots: VisitsPageSlot[]
       firstSlotTime: string
     }
   }> {
@@ -321,7 +322,7 @@ export default class VisitSessionsService {
       startTimestamp: visit.startTimestamp,
       visitDate: prisonerDateTimePretty(visit.startTimestamp),
       visitTime,
-      visitRestriction: visit.visitRestriction === 'OPEN' ? 'OPEN' : 'CLOSED',
+      visitRestriction: visit.visitRestriction,
       visitors,
     }
   }

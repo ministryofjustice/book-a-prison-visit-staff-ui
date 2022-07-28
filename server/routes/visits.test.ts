@@ -49,6 +49,7 @@ describe('GET /visits', () => {
     slots: {
       openSlots: VisitsPageSlot[]
       closedSlots: VisitsPageSlot[]
+      unknownSlots: VisitsPageSlot[]
       firstSlotTime: string
     }
   }
@@ -136,6 +137,7 @@ describe('GET /visits', () => {
           },
         ],
         closedSlots: [],
+        unknownSlots: [],
         firstSlotTime: '9am to 9:29am',
       },
     }
@@ -262,6 +264,7 @@ describe('GET /visits', () => {
       slots: {
         openSlots: [],
         closedSlots: [],
+        unknownSlots: [],
         firstSlotTime: '',
       },
     })

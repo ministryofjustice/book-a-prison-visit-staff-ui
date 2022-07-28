@@ -136,6 +136,7 @@ describe('getSlotsSideMenuData', () => {
           },
         ],
         closedSlots: [],
+        unknownSlots: [],
       },
       expected: [
         {
@@ -177,6 +178,7 @@ describe('getSlotsSideMenuData', () => {
           },
         ],
         closedSlots: [],
+        unknownSlots: [],
       },
       expected: [
         {

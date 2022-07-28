@@ -8,6 +8,7 @@ export const getVisitSlotsFromBookedVisits = (
 ): {
   openSlots: VisitsPageSlot[]
   closedSlots: VisitsPageSlot[]
+  unknownSlots: VisitsPageSlot[]
   firstSlotTime: string
 } => {
   const slots: {
