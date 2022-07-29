@@ -1040,6 +1040,8 @@ describe('/book-a-visit/select-date-and-time', () => {
               endTimestamp: '2022-02-14T11:00:00',
               availableTables: 15,
               visitRoomName: 'room name',
+              // representing a pre-existing visit that is BOOKED
+              sessionConflicts: ['DOUBLE_BOOKED'],
             },
             {
               id: '2',
@@ -1056,6 +1058,8 @@ describe('/book-a-visit/select-date-and-time', () => {
               endTimestamp: '2022-02-14T13:05:00',
               availableTables: 5,
               visitRoomName: 'room name',
+              // representing the RESERVED visit being handled in this session
+              sessionConflicts: ['DOUBLE_BOOKED'],
             },
           ],
         },
@@ -1161,6 +1165,10 @@ describe('/book-a-visit/select-date-and-time', () => {
           expect($('input[name="visit-date-and-time"]').length).toBe(5)
           expect($('input[name="visit-date-and-time"]:checked').length).toBe(0)
           expect($('.govuk-accordion__section--expanded').length).toBe(0)
+
+          expect($('label[for="1"]').text()).toContain('Prisoner has a visit')
+          expect($('#1').attr('disabled')).toBe('disabled')
+
           expect($('[data-test="submit"]').text().trim()).toBe('Continue')
         })
     })
@@ -1344,6 +1352,8 @@ describe('/book-a-visit/select-date-and-time', () => {
             endTimestamp: '2022-02-14T13:05:00',
             availableTables: 5,
             visitRoomName: 'room name',
+            // representing the RESERVED visit being handled in this session
+            sessionConflicts: ['DOUBLE_BOOKED'],
           })
           expect(visitSessionsService.createVisit).not.toHaveBeenCalled()
           expect(auditService.reservedVisit).toBeCalledTimes(1)

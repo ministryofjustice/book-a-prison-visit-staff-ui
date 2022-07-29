@@ -95,6 +95,7 @@ export default class VisitSessionsService {
                 ? visitSession.openVisitCapacity - visitSession.openVisitBookedCount
                 : visitSession.closedVisitCapacity - visitSession.closedVisitBookedCount,
             visitRoomName: visitSession.visitRoomName,
+            sessionConflicts: visitSession.sessionConflicts,
           }
 
           // Maybe this needs doing below, twice since technically this may not be pushed
