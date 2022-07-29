@@ -252,11 +252,12 @@ describe('visitSchedulerApiClient', () => {
         .get('/visit-sessions')
         .query({
           prisonId: 'HEI',
+          prisonerId: 'A1234BC',
         })
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
-      const output = await client.getVisitSessions()
+      const output = await client.getVisitSessions('A1234BC')
 
       expect(output).toEqual(results)
     })

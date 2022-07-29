@@ -80,6 +80,7 @@ describe('Visit sessions service', () => {
       })
 
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
+      expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC')
       expect(results).toEqual({})
     })
 
@@ -130,6 +131,7 @@ describe('Visit sessions service', () => {
         })
 
         expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
+        expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC')
         expect(whereaboutsApiClient.getEvents).toHaveBeenCalledTimes(1)
         expect(results).toEqual(<VisitSlotList>{
           'February 2022': [
@@ -187,6 +189,7 @@ describe('Visit sessions service', () => {
         })
 
         expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
+        expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC')
         expect(whereaboutsApiClient.getEvents).toHaveBeenCalledTimes(1)
         expect(results).toEqual(<VisitSlotList>{
           'February 2022': [
@@ -222,6 +225,7 @@ describe('Visit sessions service', () => {
         })
 
         expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
+        expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC')
         expect(whereaboutsApiClient.getEvents).toHaveBeenCalledTimes(1)
         expect(results).toEqual(<VisitSlotList>{
           'February 2022': [
@@ -274,6 +278,7 @@ describe('Visit sessions service', () => {
       })
 
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
+      expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC')
       expect(results).toEqual(<VisitSlotList>{
         'February 2022': [
           {
@@ -372,6 +377,7 @@ describe('Visit sessions service', () => {
       })
 
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
+      expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC')
       expect(results).toEqual(<VisitSlotList>{
         'February 2022': [
           {
@@ -478,6 +484,7 @@ describe('Visit sessions service', () => {
       })
 
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
+      expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC')
       expect(results).toEqual(<VisitSlotList>{
         'February 2022': [
           {
@@ -529,6 +536,7 @@ describe('Visit sessions service', () => {
       })
 
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
+      expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC')
       expect(results).toEqual(<VisitSlotList>{
         'February 2022': [
           {
@@ -572,6 +580,7 @@ describe('Visit sessions service', () => {
       })
 
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
+      expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC')
       expect(results).toEqual(<VisitSlotList>{
         'February 2022': [
           {
@@ -623,6 +632,7 @@ describe('Visit sessions service', () => {
       })
 
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
+      expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC')
       expect(results).toEqual(<VisitSlotList>{})
     })
   })
