@@ -2,7 +2,6 @@ import fs from 'fs'
 import * as cheerio from 'cheerio'
 import nunjucks, { Template } from 'nunjucks'
 import { registerNunjucks } from '../../utils/nunjucksSetup'
-import logger from '../../../logger'
 
 const template = fs.readFileSync('server/views/pages/dateAndTime.njk')
 
