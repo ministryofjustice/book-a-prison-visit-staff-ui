@@ -2,6 +2,7 @@ import fs from 'fs'
 import * as cheerio from 'cheerio'
 import nunjucks, { Template } from 'nunjucks'
 import { registerNunjucks } from '../../utils/nunjucksSetup'
+import logger from '../../../logger'
 
 const template = fs.readFileSync('server/views/pages/dateAndTime.njk')
 
@@ -93,6 +94,7 @@ describe('Views - Date and time of visit', () => {
       timeOfDay: '',
       dayOfTheWeek: '',
       formValues: { 'visit-date-and-time': '4' },
+      slotsPresent: true,
     }
     const $ = cheerio.load(compiledTemplate.render(viewContext))
 
@@ -129,6 +131,7 @@ describe('Views - Date and time of visit', () => {
       visitRestriction: 'CLOSED',
       closedVisitReason: 'visitor',
       slotsList: {},
+      slotsPresent: false,
     }
     const $ = cheerio.load(compiledTemplate.render(viewContext))
 

@@ -216,7 +216,6 @@ export default function routes(
         }
         return true
       })
-      logger.info(slotsPresent)
 
       req.session.slotsList = slotsList
       req.session.timeOfDay = timeOfDay
