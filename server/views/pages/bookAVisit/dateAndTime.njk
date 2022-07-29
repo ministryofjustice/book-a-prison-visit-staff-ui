@@ -11,7 +11,7 @@
 {% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
 {% endset %}
 {% set backLinkHref = "/book-a-visit/select-visitors" %}
-{% set slotsPresent = false %}
+
 {% macro buildSlotsRadioItems(slotsList, radios) %}
   {% for slot in slotsList %}
 
@@ -155,14 +155,6 @@
         </div>
       </div>
     </form>
-
-    {% if slotsList | length %}
-      {% for i in slotsList | list %}
-        {% if i.value | length %}
-          {% set slotsPresent = true %}
-        {% endif %}
-      {% endfor %}
-    {% endif %}
 
     {% if slotsPresent %}
 
