@@ -209,13 +209,6 @@ export default function routes(
       }
       let slotsPresent = false
 
-      Object.entries(slotsList).find(([, value]) => {
-        if (value.length !== 0) {
-          slotsPresent = true
-          return false
-        }
-        return true
-      })
       slotsPresent = Object.values(slotsList).some(value => value.length)
 
       req.session.slotsList = slotsList
