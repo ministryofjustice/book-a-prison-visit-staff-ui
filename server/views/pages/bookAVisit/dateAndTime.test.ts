@@ -115,6 +115,7 @@ describe('Views - Date and time of visit', () => {
       timeOfDay: '',
       dayOfTheWeek: '',
       formValues: { 'visit-date-and-time': '4' },
+      slotsPresent: true,
     }
     const $ = cheerio.load(compiledTemplate.render(viewContext))
 
@@ -154,6 +155,7 @@ describe('Views - Date and time of visit', () => {
       visitRestriction: 'CLOSED',
       closedVisitReason: 'visitor',
       slotsList: {},
+      slotsPresent: false,
     }
     const $ = cheerio.load(compiledTemplate.render(viewContext))
 
