@@ -216,6 +216,7 @@ export default function routes(
         }
         return true
       })
+      slotsPresent = Object.values(slotsList).some(value => value.length)
 
       req.session.slotsList = slotsList
       req.session.timeOfDay = timeOfDay
