@@ -109,7 +109,7 @@ export default function routes(
       }
 
       const selectedIds = [].concat(req.body.visitors)
-      const selectedVisitors = req.session.visitorList.visitors.filter((visitor: VisitorListItem) =>
+      const selectedVisitors: VisitorListItem[] = req.session.visitorList.visitors.filter((visitor: VisitorListItem) =>
         selectedIds.includes(visitor.personId.toString()),
       )
 
