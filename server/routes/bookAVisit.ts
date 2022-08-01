@@ -51,7 +51,7 @@ export default function routes(
       formValues.visitors = visitSessionData.visitors.map(visitor => visitor.personId.toString())
     }
 
-    res.render('pages/visitors', {
+    res.render('pages/bookAVisit/visitors', {
       errors: req.flash('errors'),
       offenderNo: visitSessionData.prisoner.offenderNo,
       prisonerName: visitSessionData.prisoner.name,
@@ -150,7 +150,7 @@ export default function routes(
       restriction => restriction.restrictionType === 'CLOSED',
     )
 
-    res.render('pages/visitType', {
+    res.render('pages/bookAVisit/visitType', {
       errors: req.flash('errors'),
       restrictions: closedRestrictions,
       visitors: visitSessionData.visitors,
@@ -212,7 +212,7 @@ export default function routes(
       req.session.timeOfDay = timeOfDay
       req.session.dayOfTheWeek = dayOfTheWeek
 
-      res.render('pages/dateAndTime', {
+      res.render('pages/bookAVisit/dateAndTime', {
         errors: req.flash('errors'),
         visitRestriction: visitSessionData.visitRestriction,
         prisonerName: visitSessionData.prisoner.name,
@@ -299,7 +299,7 @@ export default function routes(
       formValues.otherSupportDetails = visitSessionData.visitorSupport.find(support => support.type === 'OTHER')?.text
     }
 
-    res.render('pages/additionalSupport', {
+    res.render('pages/bookAVisit/additionalSupport', {
       errors: req.flash('errors'),
       availableSupportTypes,
       formValues,
@@ -375,7 +375,7 @@ export default function routes(
         : visitSessionData.mainContact.contactName
     }
 
-    res.render('pages/mainContact', {
+    res.render('pages/bookAVisit/mainContact', {
       errors: req.flash('errors'),
       adultVisitors: req.session.adultVisitors?.adults,
       formValues,
@@ -443,7 +443,7 @@ export default function routes(
       visitSessionData.visitorSupport,
     )
 
-    res.render('pages/checkYourBooking', {
+    res.render('pages/bookAVisit/checkYourBooking', {
       offenderNo,
       mainContact: visitSessionData.mainContact,
       prisoner: visitSessionData.prisoner,
@@ -497,7 +497,7 @@ export default function routes(
         }
       }
     } catch (error) {
-      return res.render('pages/checkYourBooking', {
+      return res.render('pages/bookAVisit/checkYourBooking', {
         errors: [
           {
             msg: 'Failed to make this reservation. You can try to submit again.',
@@ -533,7 +533,7 @@ export default function routes(
 
     clearSession(req)
 
-    res.render('pages/confirmation')
+    res.render('pages/bookAVisit/confirmation')
   })
 
   return router
