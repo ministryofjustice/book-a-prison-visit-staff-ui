@@ -2,6 +2,7 @@ import fs from 'fs'
 import * as cheerio from 'cheerio'
 import nunjucks, { Template } from 'nunjucks'
 import { registerNunjucks } from '../../utils/nunjucksSetup'
+import { VisitSlotList } from '../../@types/bapv'
 
 const template = fs.readFileSync('server/views/pages/dateAndTime.njk')
 
@@ -29,10 +30,14 @@ describe('Views - Date and time of visit', () => {
     viewContext = {
       prisonerName: 'John Smith',
       visitRestriction: 'OPEN',
-      slotsList: {
+      slotsList: <VisitSlotList>{
         'February 2022': [
           {
             date: 'Monday 14 February',
+            prisonerEvents: {
+              morning: [],
+              afternoon: [],
+            },
             slots: {
               morning: [
                 {
@@ -40,12 +45,14 @@ describe('Views - Date and time of visit', () => {
                   startTimestamp: '2022-02-14T10:00:00',
                   endTimestamp: '2022-02-14T11:00:00',
                   availableTables: 15,
+                  visitRoomName: 'room name',
                 },
                 {
                   id: '2',
                   startTimestamp: '2022-02-14T11:59:00',
                   endTimestamp: '2022-02-14T12:59:00',
                   availableTables: 1,
+                  visitRoomName: 'room name',
                 },
               ],
               afternoon: [
@@ -54,12 +61,19 @@ describe('Views - Date and time of visit', () => {
                   startTimestamp: '2022-02-14T12:00:00',
                   endTimestamp: '2022-02-14T13:05:00',
                   availableTables: 5,
+                  visitRoomName: 'room name',
+                  // representing a pre-existing visit that is BOOKED
+                  sessionConflicts: ['DOUBLE_BOOKED'],
                 },
               ],
             },
           },
           {
             date: 'Tuesday 15 February',
+            prisonerEvents: {
+              morning: [],
+              afternoon: [],
+            },
             slots: {
               morning: [],
               afternoon: [
@@ -68,6 +82,9 @@ describe('Views - Date and time of visit', () => {
                   startTimestamp: '2022-02-15T16:00:00',
                   endTimestamp: '2022-02-15T17:00:00',
                   availableTables: 12,
+                  visitRoomName: 'room name',
+                  // representing the RESERVED visit being handled in this session
+                  sessionConflicts: ['DOUBLE_BOOKED'],
                 },
               ],
             },
@@ -76,6 +93,10 @@ describe('Views - Date and time of visit', () => {
         'March 2022': [
           {
             date: 'Tuesday 1 March',
+            prisonerEvents: {
+              morning: [],
+              afternoon: [],
+            },
             slots: {
               morning: [
                 {
@@ -83,6 +104,7 @@ describe('Views - Date and time of visit', () => {
                   startTimestamp: '2022-03-01T09:30:00',
                   endTimestamp: '2022-03-01T10:30:00',
                   availableTables: 0,
+                  visitRoomName: 'room name',
                 },
               ],
               afternoon: [],
@@ -107,6 +129,9 @@ describe('Views - Date and time of visit', () => {
     expect($('label[for="1"]').text()).toContain('15 tables available')
     expect($('label[for="2"]').text()).toContain('11:59am to 12:59pm')
     expect($('label[for="2"]').text()).toContain('1 table available')
+    expect($('label[for="3"]').text()).toContain('12pm to 1:05pm')
+    expect($('label[for="3"]').text()).toContain('Prisoner has a visit')
+    expect($('#3').attr('disabled')).toBe('disabled')
     expect($('#slots-month-February2022-content-1 .bapv-afternoon-slots > h3').text()).toBe('Afternoon')
     expect($('#slots-month-February2022-heading-2').text().trim()).toBe('Tuesday 15 February')
     expect($('#4').prop('checked')).toBe(true)

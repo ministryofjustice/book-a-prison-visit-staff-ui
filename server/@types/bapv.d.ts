@@ -1,5 +1,5 @@
 import { InmateDetail, OffenderRestriction, VisitBalances } from '../data/prisonApiTypes'
-import { Visit, VisitorSupport } from '../data/visitSchedulerApiTypes'
+import { Visit, VisitorSupport, VisitSession } from '../data/visitSchedulerApiTypes'
 
 export type PrisonerDetailsItem = {
   html?: string
@@ -140,6 +140,7 @@ export type VisitSlot = {
   endTimestamp: string
   availableTables: number
   visitRoomName: string
+  sessionConflicts?: VisitSession['sessionConflicts']
 }
 
 export type PrisonerEvent = {
