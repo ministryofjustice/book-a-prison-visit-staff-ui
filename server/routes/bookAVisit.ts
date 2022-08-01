@@ -207,9 +207,8 @@ export default function routes(
       if (!Object.keys(formValues).length && visitSessionData.visit?.id) {
         formValues['visit-date-and-time'] = visitSessionData.visit?.id
       }
-      let slotsPresent = false
 
-      slotsPresent = Object.values(slotsList).some(value => value.length)
+      const slotsPresent = Object.values(slotsList).some(value => value.length)
 
       req.session.slotsList = slotsList
       req.session.timeOfDay = timeOfDay
