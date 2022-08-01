@@ -161,10 +161,11 @@ export default class VisitSessionsService {
         }
         if (visitSlotsforDay.slots.morning.length > 0 || visitSlotsforDay.slots.afternoon.length > 0) {
           allVisitSlots.push(visitSlotsforDay)
+          availableSessions[month] = allVisitSlots
+        } else {
+          delete availableSessions[month]
         }
       })
-
-      availableSessions[month] = allVisitSlots
     })
 
     return availableSessions
