@@ -159,14 +159,19 @@ export default class VisitSessionsService {
           const timeEnd = parse(`${visitSlotsforDay.date} ${year} 23:59`, 'EEEE d MMMM yyyy H:mm', new Date())
           visitSlotsforDay.prisonerEvents.afternoon = getPrisonerEvents(prisonerEvents, timeStart, timeEnd)
         }
+
         if (visitSlotsforDay.slots.morning.length > 0 || visitSlotsforDay.slots.afternoon.length > 0) {
           allVisitSlots.push(visitSlotsforDay)
-          availableSessions[month] = allVisitSlots
-        } else {
-          delete availableSessions[month]
         }
+
+        availableSessions[month] = allVisitSlots
       })
     })
+
+    const sessionsPresent = Object.values(availableSessions).some(value => value.length)
+    if (!sessionsPresent) {
+      return {}
+    }
 
     return availableSessions
   }
