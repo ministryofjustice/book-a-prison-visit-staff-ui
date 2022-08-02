@@ -1,67 +1,71 @@
-import { ExtendedVisitInformation, VisitsPageSlot } from '../@types/bapv'
+import { isAfter, isBefore, parseISO } from 'date-fns'
+import { ExtendedVisitInformation, PrisonerEvent, VisitsPageSlot } from '../@types/bapv'
+import { ScheduledEvent } from '../data/whereaboutsApiTypes'
 import { sortByTimestamp } from './utils'
 
-const getVisitSlotsFromBookedVisits = (
+export const getVisitSlotsFromBookedVisits = (
   visits: ExtendedVisitInformation[],
 ): {
   openSlots: VisitsPageSlot[]
   closedSlots: VisitsPageSlot[]
   firstSlotTime: string
 } => {
-  const openSlots: VisitsPageSlot[] = []
-  const closedSlots: VisitsPageSlot[] = []
+  const slots: {
+    OPEN: VisitsPageSlot[]
+    CLOSED: VisitsPageSlot[]
+  } = {
+    OPEN: [],
+    CLOSED: [],
+  }
 
   visits.forEach((visit: ExtendedVisitInformation) => {
-    if (visit.visitRestriction === 'OPEN') {
-      let matchingOpenSlot = openSlots.findIndex(openSlot => openSlot.visitTime === visit.visitTime)
+    const visitRestriction = visit.visitRestriction === 'OPEN' ? 'OPEN' : 'CLOSED'
 
-      if (matchingOpenSlot < 0) {
-        openSlots.push({
-          visitTime: visit.visitTime,
-          visitType: 'OPEN',
-          sortField: visit.startTimestamp,
-          adults: 0,
-          children: 0,
-        })
+    let matchingSlot = slots[visitRestriction].findIndex(slot => slot.visitTime === visit.visitTime)
 
-        matchingOpenSlot = openSlots.length - 1
-      }
+    if (matchingSlot < 0) {
+      slots[visitRestriction].push({
+        visitTime: visit.visitTime,
+        visitType: visitRestriction,
+        sortField: visit.startTimestamp,
+        adults: 0,
+        children: 0,
+      })
 
-      openSlots[matchingOpenSlot].adults += visit.visitors.filter(visitor => visitor.adult).length
-      openSlots[matchingOpenSlot].children += visit.visitors.filter(visitor => !visitor.adult).length
-    } else {
-      let matchingClosedSlot = closedSlots.findIndex(closedSlot => closedSlot.visitTime === visit.visitTime)
-
-      if (matchingClosedSlot < 0) {
-        closedSlots.push({
-          visitTime: visit.visitTime,
-          visitType: 'CLOSED',
-          sortField: visit.startTimestamp,
-          adults: 0,
-          children: 0,
-        })
-
-        matchingClosedSlot = closedSlots.length - 1
-      }
-
-      closedSlots[matchingClosedSlot].adults += visit.visitors.filter(visitor => visitor.adult).length
-      closedSlots[matchingClosedSlot].children += visit.visitors.filter(visitor => !visitor.adult).length
+      matchingSlot = slots[visitRestriction].length - 1
     }
+
+    slots[visitRestriction][matchingSlot].adults += visit.visitors.filter(visitor => visitor.adult).length
+    slots[visitRestriction][matchingSlot].children += visit.visitors.filter(visitor => !visitor.adult).length
   })
 
   let firstSlotTime: string
 
-  if (openSlots.length > 0) {
-    firstSlotTime = openSlots.sort(sortByTimestamp)[0].visitTime
-  } else if (closedSlots.length > 0) {
-    firstSlotTime = closedSlots.sort(sortByTimestamp)[0].visitTime
+  if (slots.OPEN.length > 0) {
+    firstSlotTime = slots.OPEN.sort(sortByTimestamp)[0].visitTime
+  } else if (slots.CLOSED.length > 0) {
+    firstSlotTime = slots.CLOSED.sort(sortByTimestamp)[0].visitTime
   }
 
   return {
-    openSlots,
-    closedSlots,
+    openSlots: slots.OPEN,
+    closedSlots: slots.CLOSED,
     firstSlotTime,
   }
 }
 
-export default getVisitSlotsFromBookedVisits
+export const getPrisonerEvents = (events: ScheduledEvent[], start: Date, end: Date): PrisonerEvent[] => {
+  return events
+    .filter(event => {
+      const eventStart = parseISO(event.startTime)
+
+      return isAfter(eventStart, start) && isBefore(eventStart, end)
+    })
+    .map(event => {
+      return {
+        startTimestamp: event.startTime,
+        endTimestamp: event.endTime,
+        description: event.eventSourceDesc,
+      }
+    })
+}
