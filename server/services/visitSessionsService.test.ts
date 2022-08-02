@@ -537,21 +537,7 @@ describe('Visit sessions service', () => {
 
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC')
-      expect(results).toEqual(<VisitSlotList>{
-        'February 2022': [
-          {
-            date: 'Monday 14 February',
-            prisonerEvents: {
-              morning: [],
-              afternoon: [],
-            },
-            slots: {
-              morning: [],
-              afternoon: [],
-            },
-          },
-        ],
-      })
+      expect(results).toEqual({})
     })
 
     it('Should return a single result when filtering by day of the week when single slot matches filter', async () => {

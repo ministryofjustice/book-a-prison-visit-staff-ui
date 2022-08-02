@@ -156,7 +156,8 @@
       </div>
     </form>
 
-    {% if slotsList | length %}
+    {% if slotsPresent %}
+
     <form action="/book-a-visit/select-date-and-time" method="POST" novalidate>
       <input type="hidden" name="_csrf" value="{{ csrfToken }}">
     {% for month, days in slotsList %}
@@ -255,6 +256,7 @@
 
     {% include "partials/backToStartButton.njk" %}
     {% endif %}
+
   </div>
 </div>
 {% endblock %}

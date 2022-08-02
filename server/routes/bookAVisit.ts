@@ -208,6 +208,8 @@ export default function routes(
         formValues['visit-date-and-time'] = visitSessionData.visit?.id
       }
 
+      const slotsPresent = Object.values(slotsList).some(value => value.length)
+
       req.session.slotsList = slotsList
       req.session.timeOfDay = timeOfDay
       req.session.dayOfTheWeek = dayOfTheWeek
@@ -221,6 +223,7 @@ export default function routes(
         timeOfDay,
         dayOfTheWeek,
         formValues,
+        slotsPresent,
       })
     },
   )
