@@ -149,29 +149,31 @@ export default class VisitSessionsService {
       const allVisitSlots: VisitSlotsForDay[] = []
 
       availableSessions[month].forEach((visitSlotsforDay: VisitSlotsForDay) => {
-        if (visitSlotsforDay.slots.morning.length > 0) {
+        const hasMorningSlots = visitSlotsforDay.slots.morning.length > 0
+        const hasAfternoonSlots = visitSlotsforDay.slots.afternoon.length > 0
+
+        if (hasMorningSlots) {
           const timeStart = parse(`${visitSlotsforDay.date} ${year} 00:00`, 'EEEE d MMMM yyyy H:mm', new Date())
           const timeEnd = parse(`${visitSlotsforDay.date} ${year} 12:00`, 'EEEE d MMMM yyyy H:mm', new Date())
           visitSlotsforDay.prisonerEvents.morning = getPrisonerEvents(prisonerEvents, timeStart, timeEnd)
         }
-        if (visitSlotsforDay.slots.afternoon.length > 0) {
+        if (hasAfternoonSlots) {
           const timeStart = parse(`${visitSlotsforDay.date} ${year} 11:59`, 'EEEE d MMMM yyyy H:mm', new Date())
           const timeEnd = parse(`${visitSlotsforDay.date} ${year} 23:59`, 'EEEE d MMMM yyyy H:mm', new Date())
           visitSlotsforDay.prisonerEvents.afternoon = getPrisonerEvents(prisonerEvents, timeStart, timeEnd)
         }
 
-        if (visitSlotsforDay.slots.morning.length > 0 || visitSlotsforDay.slots.afternoon.length > 0) {
+        if (hasMorningSlots || hasAfternoonSlots) {
           allVisitSlots.push(visitSlotsforDay)
         }
-
-        availableSessions[month] = allVisitSlots
       })
-    })
 
-    const sessionsPresent = Object.values(availableSessions).some(value => value.length)
-    if (!sessionsPresent) {
-      return {}
-    }
+      if (allVisitSlots.length > 0) {
+        availableSessions[month] = allVisitSlots
+      } else {
+        delete availableSessions[month]
+      }
+    })
 
     return availableSessions
   }
