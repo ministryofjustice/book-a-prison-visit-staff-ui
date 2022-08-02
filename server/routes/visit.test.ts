@@ -180,7 +180,7 @@ describe('GET /visit/:reference', () => {
         expect($('[data-test="additional-support"]').text()).toBe('Wheelchair ramp, custom request')
         expect($('[data-test="visit-booked"]').text()).toBe('Monday 14 February 2022 at 10am')
 
-        expect(auditService.viewedVisitDetails).toBeCalledTimes(1)
+        expect(auditService.viewedVisitDetails).toHaveBeenCalledTimes(1)
         expect(auditService.viewedVisitDetails).toHaveBeenCalledWith(
           'ab-cd-ef-gh',
           'A1234BC',
@@ -240,7 +240,7 @@ describe('GET /visit/:reference', () => {
         expect($('[data-test="additional-support"]').text()).toBe('Wheelchair ramp, custom request')
         expect($('[data-test="visit-booked"]').text()).toBe('Monday 14 February 2022 at 10am')
 
-        expect(auditService.viewedVisitDetails).toBeCalledTimes(1)
+        expect(auditService.viewedVisitDetails).toHaveBeenCalledTimes(1)
         expect(auditService.viewedVisitDetails).toHaveBeenCalledWith(
           'ab-cd-ef-gh',
           'A1234BC',
@@ -297,7 +297,7 @@ describe('GET /visit/:reference', () => {
         expect($('[data-test="additional-support"]').text()).toBe('Wheelchair ramp, custom request')
         expect($('[data-test="visit-booked"]').text()).toBe('Monday 14 February 2022 at 10am')
 
-        expect(auditService.viewedVisitDetails).toBeCalledTimes(1)
+        expect(auditService.viewedVisitDetails).toHaveBeenCalledTimes(1)
         expect(auditService.viewedVisitDetails).toHaveBeenCalledWith(
           'ab-cd-ef-gh',
           'A1234BC',
@@ -494,7 +494,7 @@ describe('POST /visit/:reference/cancel', () => {
         })
         expect(flashProvider).toHaveBeenCalledWith('startTimestamp', cancelledVisit.startTimestamp)
         expect(flashProvider).toHaveBeenCalledWith('endTimestamp', cancelledVisit.endTimestamp)
-        expect(auditService.cancelledVisit).toBeCalledTimes(1)
+        expect(auditService.cancelledVisit).toHaveBeenCalledTimes(1)
         expect(auditService.cancelledVisit).toHaveBeenCalledWith(
           'ab-cd-ef-gh',
           'AF34567G',
@@ -524,7 +524,7 @@ describe('POST /visit/:reference/cancel', () => {
       .expect('location', '/visit/cancelled')
       .expect(() => {
         expect(visitSessionsService.cancelVisit).toHaveBeenCalledTimes(1)
-        expect(auditService.cancelledVisit).toBeCalledTimes(1)
+        expect(auditService.cancelledVisit).toHaveBeenCalledTimes(1)
         expect(notificationsService.sendCancellationSms).not.toHaveBeenCalled()
       })
   })
@@ -542,7 +542,7 @@ describe('POST /visit/:reference/cancel', () => {
       .expect('location', '/visit/cancelled')
       .expect(() => {
         expect(visitSessionsService.cancelVisit).toHaveBeenCalledTimes(1)
-        expect(auditService.cancelledVisit).toBeCalledTimes(1)
+        expect(auditService.cancelledVisit).toHaveBeenCalledTimes(1)
         expect(notificationsService.sendCancellationSms).toHaveBeenCalledTimes(1)
       })
   })
