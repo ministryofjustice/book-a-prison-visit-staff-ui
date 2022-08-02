@@ -8,18 +8,16 @@ import {
   VisitSlotsForDay,
   SystemToken,
   VisitSessionData,
-  PrisonerEvent,
   VisitorListItem,
   VisitsPageSlot,
 } from '../@types/bapv'
 import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
 import WhereaboutsApiClient from '../data/whereaboutsApiClient'
 import { VisitSession, Visit, SupportType, OutcomeDto } from '../data/visitSchedulerApiTypes'
-import { ScheduledEvent } from '../data/whereaboutsApiTypes'
 import { prisonerDateTimePretty, prisonerTimePretty } from '../utils/utils'
 import PrisonerContactRegistryApiClient from '../data/prisonerContactRegistryApiClient'
 import buildVisitorListItem from '../utils/visitorUtils'
-import getVisitSlotsFromBookedVisits from '../utils/visitsUtils'
+import { getVisitSlotsFromBookedVisits, getPrisonerEvents } from '../utils/visitsUtils'
 import { getSupportTypeDescriptions } from '../routes/visitorUtils'
 
 type PrisonerContactRegistryApiClientBuilder = (token: string) => PrisonerContactRegistryApiClient
@@ -126,22 +124,6 @@ export default class VisitSessionsService {
       format(earliestStartTime, 'yyyy-MM-dd'),
       format(latestEndTime, 'yyyy-MM-dd'),
     )
-
-    const getPrisonerEvents = (events: ScheduledEvent[], start: Date, end: Date): PrisonerEvent[] => {
-      return events
-        .filter(event => {
-          const eventStart = parseISO(event.startTime)
-
-          return isAfter(eventStart, start) && isBefore(eventStart, end)
-        })
-        .map(event => {
-          return {
-            startTimestamp: event.startTime,
-            endTimestamp: event.endTime,
-            description: event.eventSourceDesc,
-          }
-        })
-    }
 
     Object.keys(availableSessions).forEach(month => {
       /* eslint no-param-reassign: ["error", { "props": false }] */
