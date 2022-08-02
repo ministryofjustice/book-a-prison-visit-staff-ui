@@ -1321,7 +1321,7 @@ describe('/book-a-visit/select-date-and-time', () => {
             visitRoomName: 'room name',
           })
           expect(visitSessionsService.createVisit).toHaveBeenCalledTimes(1)
-          expect(auditService.reservedVisit).toBeCalledTimes(1)
+          expect(auditService.reservedVisit).toHaveBeenCalledTimes(1)
           expect(auditService.reservedVisit).toHaveBeenCalledWith('2a-bc-3d-ef', 'A1234BC', 'HEI', undefined, undefined)
           expect(visitSessionsService.updateVisit).not.toHaveBeenCalled()
           expect(visitSessionData.visitReference).toEqual('2a-bc-3d-ef')
@@ -1356,7 +1356,7 @@ describe('/book-a-visit/select-date-and-time', () => {
             sessionConflicts: ['DOUBLE_BOOKED'],
           })
           expect(visitSessionsService.createVisit).not.toHaveBeenCalled()
-          expect(auditService.reservedVisit).toBeCalledTimes(1)
+          expect(auditService.reservedVisit).toHaveBeenCalledTimes(1)
           expect(auditService.reservedVisit).toHaveBeenCalledWith('3b-cd-4f-fg', 'A1234BC', 'HEI', undefined, undefined)
           expect(visitSessionsService.updateVisit).toHaveBeenCalledTimes(1)
           expect(visitSessionsService.updateVisit.mock.calls[0][0].visitData.visitReference).toBe('3b-cd-4f-fg')
@@ -2251,7 +2251,7 @@ describe('/book-a-visit/check-your-booking', () => {
         .expect(302)
         .expect('location', '/book-a-visit/confirmation')
         .expect(() => {
-          expect(visitSessionsService.updateVisit).toBeCalledTimes(1)
+          expect(visitSessionsService.updateVisit).toHaveBeenCalledTimes(1)
           expect(visitSessionData.visitStatus).toBe('BOOKED')
           expect(auditService.bookedVisit).toHaveBeenCalledTimes(1)
           expect(auditService.bookedVisit).toHaveBeenCalledWith(
@@ -2282,7 +2282,7 @@ describe('/book-a-visit/check-your-booking', () => {
         .expect(302)
         .expect('location', '/book-a-visit/confirmation')
         .expect(() => {
-          expect(visitSessionsService.updateVisit).toBeCalledTimes(1)
+          expect(visitSessionsService.updateVisit).toHaveBeenCalledTimes(1)
           expect(visitSessionData.visitStatus).toBe('BOOKED')
           expect(auditService.bookedVisit).toHaveBeenCalledTimes(1)
           expect(notificationsService.sendBookingSms).toHaveBeenCalledTimes(1)
@@ -2297,7 +2297,7 @@ describe('/book-a-visit/check-your-booking', () => {
         .expect(302)
         .expect('location', '/book-a-visit/confirmation')
         .expect(() => {
-          expect(visitSessionsService.updateVisit).toBeCalledTimes(1)
+          expect(visitSessionsService.updateVisit).toHaveBeenCalledTimes(1)
           expect(visitSessionData.visitStatus).toBe('BOOKED')
           expect(auditService.bookedVisit).toHaveBeenCalledTimes(1)
           expect(notificationsService.sendBookingSms).not.toHaveBeenCalled()
@@ -2322,7 +2322,7 @@ describe('/book-a-visit/check-your-booking', () => {
           expect($('.test-visit-time').text()).toContain('9:30am to 10:30am')
           expect($('.test-visit-type').text()).toContain('Open')
 
-          expect(visitSessionsService.updateVisit).toBeCalledTimes(1)
+          expect(visitSessionsService.updateVisit).toHaveBeenCalledTimes(1)
           expect(visitSessionData.visitStatus).toBe('RESERVED')
           expect(auditService.bookedVisit).not.toHaveBeenCalled()
           expect(notificationsService.sendBookingSms).not.toHaveBeenCalled()
@@ -2407,7 +2407,7 @@ describe('GET /book-a-visit/confirmation', () => {
         expect($('.test-main-contact-number').text()).toContain('123')
         expect($('.test-booking-reference').text()).toContain('ab-cd-ef-gh')
 
-        expect(visitorUtils.clearSession).toBeCalledTimes(1)
+        expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)
       })
   })
 
@@ -2486,7 +2486,7 @@ describe('GET /book-a-visit/confirmation', () => {
           expect($('.test-main-contact-number').text()).toContain('123')
           expect($('.test-booking-reference').text()).toContain('ab-cd-ef-gh')
 
-          expect(visitorUtils.clearSession).toBeCalledTimes(1)
+          expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)
         })
     })
   })
