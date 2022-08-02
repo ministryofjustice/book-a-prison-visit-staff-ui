@@ -1,10 +1,10 @@
 import fs from 'fs'
 import * as cheerio from 'cheerio'
 import nunjucks, { Template } from 'nunjucks'
-import { registerNunjucks } from '../../utils/nunjucksSetup'
-import { VisitSlotList } from '../../@types/bapv'
+import { registerNunjucks } from '../../../utils/nunjucksSetup'
+import { VisitSlotList } from '../../../@types/bapv'
 
-const template = fs.readFileSync('server/views/pages/dateAndTime.njk')
+const template = fs.readFileSync('server/views/pages/bookAVisit/dateAndTime.njk')
 
 describe('Views - Date and time of visit', () => {
   let compiledTemplate: Template
