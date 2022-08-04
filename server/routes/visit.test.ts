@@ -162,6 +162,7 @@ describe('GET /visit/:reference', () => {
         expect($('[data-test="visit-contact"]').text()).toBe('Smith, Jeanette')
         expect($('[data-test="visit-phone"]').text()).toBe('01234 567890')
         expect($('[data-test="cancel-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/cancel')
+        expect($('[data-test="update-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/update')
         // visitor details
         expect($('[data-test="visitor-name-1"]').text()).toBe('Smith, Jeanette')
         expect($('[data-test="visitor-dob-1"]').html()).toBe('28 July 1986<br>(Adult)')
@@ -222,6 +223,7 @@ describe('GET /visit/:reference', () => {
         expect($('[data-test="visit-contact"]').text()).toBe('Smith, Jeanette')
         expect($('[data-test="visit-phone"]').text()).toBe('Unknown')
         expect($('[data-test="cancel-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/cancel')
+        expect($('[data-test="update-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/update')
         // visitor details
         expect($('[data-test="visitor-name-1"]').text()).toBe('Smith, Jeanette')
         expect($('[data-test="visitor-dob-1"]').html()).toBe('28 July 1986<br>(Adult)')
@@ -279,6 +281,7 @@ describe('GET /visit/:reference', () => {
         expect($('[data-test="visit-contact"]').text()).toBe('Smith, Jeanette')
         expect($('[data-test="visit-phone"]').text()).toBe('01234 567890')
         expect($('[data-test="cancel-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/cancel')
+        expect($('[data-test="update-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/update')
         // visitor details
         expect($('[data-test="visitor-name-1"]').text()).toBe('Smith, Jeanette')
         expect($('[data-test="visitor-dob-1"]').html()).toBe('28 July 1986<br>(Adult)')

@@ -9,5 +9,5 @@ export default class IndexPage extends Page {
 
   bookAVisitLink = (): PageElement => cy.get('[href="/search/prisoner"]')
 
-  cancelAVisitLink = (): PageElement => cy.get('[href="/search/visit"]')
+  changeAVisitLink = (): PageElement => cy.get('[href="/search/visit"]')
 }
