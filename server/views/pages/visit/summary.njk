@@ -63,13 +63,22 @@
         </li>
       </ul>
 
-      {{ govukButton({
-        text: "Cancel booking",
-        classes: "govuk-!-margin-top-5",
-        href: "/visit/" + visit.reference + "/cancel",
-        attributes: { "data-test": "cancel-visit" },
-        preventDoubleClick: true
-      }) }}
+      <div class="govuk-button-group">
+        {{ govukButton({
+          text: "Update booking",
+          classes: "govuk-!-margin-top-5",
+          href: "/visit/" + visit.reference + "/update",
+          attributes: { "data-test": "update-visit" },
+          preventDoubleClick: true
+        }) }}
+        {{ govukButton({
+          text: "Cancel booking",
+          classes: "govuk-!-margin-top-5 govuk-button--secondary",
+          href: "/visit/" + visit.reference + "/cancel",
+          attributes: { "data-test": "cancel-visit" },
+          preventDoubleClick: true
+        }) }}
+      </div>
 
       {% set visitorRows = [] %}
       {% for visitor in visitors %}
