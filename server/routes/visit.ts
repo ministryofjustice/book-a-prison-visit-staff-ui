@@ -106,10 +106,7 @@ export default function routes(
   })
 
   get('/:reference/update', async (req, res) => {
-    return res.render('pages/visit/update', {
-      errors: req.flash('errors'),
-      formValues: getFlashFormValues(req),
-    })
+    return res.render('pages/visit/update')
   })
 
   get('/:reference/cancel', async (req, res) => {

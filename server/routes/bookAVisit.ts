@@ -12,6 +12,7 @@ import NotificationsService from '../services/notificationsService'
 import AuditService from '../services/auditService'
 import config from '../config'
 import logger from '../../logger'
+import SelectVisitors from './visitJourney/selectVisitors'
 
 export default function routes(
   router: Router,
@@ -33,33 +34,9 @@ export default function routes(
       handlers.map(handler => asyncMiddleware(handler)),
     )
 
-  get('/select-visitors', sessionCheckMiddleware({ stage: 1 }), async (req, res) => {
-    const { visitSessionData } = req.session
-    const { offenderNo } = visitSessionData.prisoner
+  const selectVisitors = new SelectVisitors('book', prisonerVisitorsService, prisonerProfileService)
 
-    const visitorList = await prisonerVisitorsService.getVisitors(offenderNo, res.locals.user?.username)
-    if (!req.session.visitorList) {
-      req.session.visitorList = { visitors: [] }
-    }
-    req.session.visitorList.visitors = visitorList
-
-    const restrictions = await prisonerProfileService.getRestrictions(offenderNo, res.locals.user?.username)
-    req.session.visitSessionData.prisoner.restrictions = restrictions
-
-    const formValues = getFlashFormValues(req)
-    if (!Object.keys(formValues).length && visitSessionData.visitors) {
-      formValues.visitors = visitSessionData.visitors.map(visitor => visitor.personId.toString())
-    }
-
-    res.render('pages/bookAVisit/visitors', {
-      errors: req.flash('errors'),
-      offenderNo: visitSessionData.prisoner.offenderNo,
-      prisonerName: visitSessionData.prisoner.name,
-      visitorList,
-      restrictions,
-      formValues,
-    })
-  })
+  get('/select-visitors', sessionCheckMiddleware({ stage: 1 }), (req, res) => selectVisitors.get(req, res))
 
   post(
     '/select-visitors',
