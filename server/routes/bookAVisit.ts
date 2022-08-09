@@ -75,49 +75,7 @@ export default function routes(
 
       return true
     }),
-    (req, res) => {
-      const { visitSessionData } = req.session
-      const errors = validationResult(req)
-
-      if (!errors.isEmpty()) {
-        req.flash('errors', errors.array() as [])
-        req.flash('formValues', req.body)
-        return res.redirect(req.originalUrl)
-      }
-
-      const selectedIds = [].concat(req.body.visitors)
-      const selectedVisitors = req.session.visitorList.visitors.filter((visitor: VisitorListItem) =>
-        selectedIds.includes(visitor.personId.toString()),
-      )
-
-      const adults = selectedVisitors.reduce((adultVisitors: VisitorListItem[], visitor: VisitorListItem) => {
-        if (visitor.adult ?? true) {
-          adultVisitors.push(visitor)
-        }
-
-        return adultVisitors
-      }, [])
-      visitSessionData.visitors = selectedVisitors
-
-      if (!req.session.adultVisitors) {
-        req.session.adultVisitors = { adults: [] }
-      }
-      req.session.adultVisitors.adults = adults
-
-      const closedVisitVisitors = selectedVisitors.reduce((closedVisit, visitor) => {
-        return closedVisit || visitor.restrictions.some(restriction => restriction.restrictionType === 'CLOSED')
-      }, false)
-      visitSessionData.visitRestriction = closedVisitVisitors ? 'CLOSED' : 'OPEN'
-      visitSessionData.closedVisitReason = closedVisitVisitors ? 'visitor' : undefined
-
-      const closedVisitPrisoner = visitSessionData.prisoner.restrictions.some(
-        restriction => restriction.restrictionType === 'CLOSED',
-      )
-
-      return !closedVisitVisitors && closedVisitPrisoner
-        ? res.redirect('/book-a-visit/visit-type')
-        : res.redirect('/book-a-visit/select-date-and-time')
-    },
+    (req, res) => selectVisitors.post(req, res),
   )
 
   get('/visit-type', sessionCheckMiddleware({ stage: 2 }), async (req, res) => {
