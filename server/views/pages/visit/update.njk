@@ -1,0 +1,68 @@
+{% extends "layout.njk" %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% set pageHeaderTitle = "What do you want to change?" %}
+{% set pageTitle %}
+{% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
+{% endset %}
+{% set backLinkHref = "/visit/" + reference %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      {% include "partials/errorSummary.njk" %}
+
+      <div id="change-hint" class="govuk-hint">
+        <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+        When making several changes, start with the change that is highest in the list.
+      </div>
+
+      <dl class="govuk-summary-list">
+        <div class="govuk-summary-list__row">
+          <dd class="govuk-summary-list__value">
+            The people on the visit
+          </dd>
+          <dd class="govuk-summary-list__actions">
+            <a class="govuk-link" href="/select-visitors">
+              Change<span class="govuk-visually-hidden"> name</span>
+            </a>
+          </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dd class="govuk-summary-list__value">
+            When the visit is happening
+          </dd>
+          <dd class="govuk-summary-list__actions">
+            <a class="govuk-link" href="/select-date-and-time">
+              Change<span class="govuk-visually-hidden"> name</span>
+            </a>
+          </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dd class="govuk-summary-list__value">
+            Additional support
+          </dd>
+          <dd class="govuk-summary-list__actions">
+            <a class="govuk-link" href="/additional-support">
+              Change<span class="govuk-visually-hidden"> name</span>
+            </a>
+          </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dd class="govuk-summary-list__value">
+            The main contact or their phone number
+          </dd>
+          <dd class="govuk-summary-list__actions">
+            <a class="govuk-link" href="/select-main-contact">
+              Change<span class="govuk-visually-hidden"> name</span>
+            </a>
+          </dd>
+        </div>
+      </dl>
+
+    </div>
+  </div>
+{% endblock %}

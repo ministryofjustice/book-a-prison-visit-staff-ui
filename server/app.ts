@@ -120,6 +120,7 @@ export default function createApp(userService: UserService): express.Application
       ),
       new NotificationsService(notificationsApiClientBuilder),
       new AuditService(),
+      new PrisonerVisitorsService(prisonerContactRegistryApiClientBuilder, systemToken),
     ),
   )
   app.use(

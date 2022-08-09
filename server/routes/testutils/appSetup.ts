@@ -69,6 +69,7 @@ function appSetup({
     timeOfDay: '',
     dayOfTheWeek: '',
     visitSessionData: {} as VisitSessionData,
+    amendVisitSessionData: {} as VisitSessionData,
     availableSupportTypes: [],
   },
 }: {
@@ -169,6 +170,7 @@ function appSetup({
       visitSessionsService,
       notificationsService,
       auditService,
+      prisonerVisitorsService,
     ),
   )
   app.use(

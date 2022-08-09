@@ -13,6 +13,8 @@ import { getFlashFormValues } from './visitorUtils'
 import NotificationsService from '../services/notificationsService'
 import config from '../config'
 import logger from '../../logger'
+import { VisitSessionData } from '../@types/bapv'
+import PrisonerVisitorsService from '../services/prisonerVisitorsService'
 
 export default function routes(
   router: Router,
@@ -20,6 +22,7 @@ export default function routes(
   visitSessionsService: VisitSessionsService,
   notificationsService: NotificationsService,
   auditService: AuditService,
+  prisonerVisitorsService: PrisonerVisitorsService,
 ): Router {
   const get = (path: string, handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
   const post = (path: string, ...handlers: RequestHandler[]) =>
@@ -58,6 +61,39 @@ export default function routes(
       res.locals.appInsightsOperationId,
     )
 
+    const visitorIds = visit.visitors.flatMap(visitor => visitor.nomisPersonId)
+    const visitorList = await prisonerVisitorsService.getVisitors(visit.prisonerId, res.locals.user?.username)
+    const currentVisitors = visitorList.filter(visitor => visitorIds.includes(visitor.personId))
+
+    // load session
+    const visitSessionData: VisitSessionData = {
+      prisoner: {
+        name: '',
+        offenderNo: prisoner.prisonerNumber,
+        dateOfBirth: prisoner.dateOfBirth,
+        location: prisoner.locationDescription,
+        // restrictions: prisoner.res
+      },
+      visit: {
+        id: visit.reference,
+        startTimestamp: visit.startTimestamp,
+        endTimestamp: visit.endTimestamp,
+        availableTables: 0,
+        visitRoomName: visit.visitRoom,
+      },
+      visitRestriction: visit.visitRestriction,
+      visitors: currentVisitors,
+      visitorSupport: visit.visitorSupport,
+      mainContact: {
+        phoneNumber: visit.visitContact.telephone,
+        contactName: visit.visitContact.name,
+      },
+      visitReference: visit.reference,
+      visitStatus: visit.visitStatus,
+    }
+
+    req.session.amendVisitSessionData = visitSessionData
+
     return res.render('pages/visit/summary', {
       prisoner,
       prisonerLocation,
@@ -66,6 +102,13 @@ export default function routes(
       additionalSupport,
       fromVisitSearch,
       fromVisitSearchQuery,
+    })
+  })
+
+  get('/:reference/update', async (req, res) => {
+    return res.render('pages/visit/update', {
+      errors: req.flash('errors'),
+      formValues: getFlashFormValues(req),
     })
   })
 
