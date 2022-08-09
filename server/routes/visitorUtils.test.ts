@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import { Session, SessionData } from 'express-session'
-import { VisitSlotList } from '../@types/bapv'
+import { VisitSessionData, VisitSlotList } from '../@types/bapv'
 import { clearSession, getFlashFormValues, getSelectedSlot } from './visitorUtils'
 
 const slotsList: VisitSlotList = {
@@ -136,6 +136,7 @@ describe('clearSession', () => {
     timeOfDay: 'morning',
     dayOfTheWeek: '1',
     visitSessionData: { prisoner: undefined },
+    amendVisitSessionData: {} as VisitSessionData,
   }
 
   req.session = sessionData as Session & SessionData

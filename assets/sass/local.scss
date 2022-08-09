@@ -244,3 +244,11 @@
   width: 100%;
   border: 0;
 }
+
+#change-hint {
+  margin-bottom: govuk-spacing(6);
+
+  &  > h1 {
+    margin-bottom: govuk-spacing(3);
+  }
+}

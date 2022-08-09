@@ -4,6 +4,7 @@ import * as cheerio from 'cheerio'
 import PrisonerSearchService from '../services/prisonerSearchService'
 import VisitSessionsService from '../services/visitSessionsService'
 import AuditService from '../services/auditService'
+import PrisonerVisitorsService from '../services/prisonerVisitorsService'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import { OutcomeDto, Visit } from '../data/visitSchedulerApiTypes'
 import { VisitorListItem } from '../@types/bapv'
@@ -14,6 +15,7 @@ import NotificationsService from '../services/notificationsService'
 jest.mock('../services/prisonerSearchService')
 jest.mock('../services/visitSessionsService')
 jest.mock('../services/auditService')
+jest.mock('../services/prisonerVisitorsService')
 
 let app: Express
 const systemToken = async (user: string): Promise<string> => `${user}-token-1`
@@ -27,6 +29,7 @@ const visitSessionsService = new VisitSessionsService(
   systemToken,
 ) as jest.Mocked<VisitSessionsService>
 const auditService = new AuditService() as jest.Mocked<AuditService>
+const prisonerVisitorsService = new PrisonerVisitorsService(null, systemToken) as jest.Mocked<PrisonerVisitorsService>
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
@@ -37,6 +40,7 @@ beforeEach(() => {
     prisonerSearchServiceOverride: prisonerSearchService,
     visitSessionsServiceOverride: visitSessionsService,
     auditServiceOverride: auditService,
+    prisonerVisitorsServiceOverride: prisonerVisitorsService,
     systemTokenOverride: systemToken,
   })
 })
@@ -138,6 +142,7 @@ describe('GET /visit/:reference', () => {
   beforeEach(() => {
     prisonerSearchService.getPrisonerById.mockResolvedValue(prisoner)
     visitSessionsService.getFullVisitDetails.mockResolvedValue({ visit, visitors, additionalSupport })
+    prisonerVisitorsService.getVisitors.mockResolvedValue(visitors)
   })
 
   it('should render full booking summary page with prisoner, visit and visitor details, with default back link', () => {
