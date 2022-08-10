@@ -15,6 +15,9 @@ import config from '../config'
 import logger from '../../logger'
 import { VisitSessionData } from '../@types/bapv'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
+import SelectVisitors from './visitJourney/selectVisitors'
+import sessionCheckMiddleware from '../middleware/sessionCheckMiddleware'
+import PrisonerProfileService from '../services/prisonerProfileService'
 
 export default function routes(
   router: Router,
@@ -23,8 +26,14 @@ export default function routes(
   notificationsService: NotificationsService,
   auditService: AuditService,
   prisonerVisitorsService: PrisonerVisitorsService,
+  prisonerProfileService: PrisonerProfileService,
 ): Router {
-  const get = (path: string, handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
+  const get = (path: string, ...handlers: RequestHandler[]) =>
+    router.get(
+      path,
+      handlers.map(handler => asyncMiddleware(handler)),
+    )
+
   const post = (path: string, ...handlers: RequestHandler[]) =>
     router.post(
       path,
@@ -68,7 +77,7 @@ export default function routes(
     // load session
     const visitSessionData: VisitSessionData = {
       prisoner: {
-        name: '',
+        name: `${prisoner.lastName}, ${prisoner.firstName}`,
         offenderNo: prisoner.prisonerNumber,
         dateOfBirth: prisoner.dateOfBirth,
         location: prisoner.locationDescription,
@@ -106,8 +115,15 @@ export default function routes(
   })
 
   get('/:reference/update', async (req, res) => {
-    return res.render('pages/visit/update')
+    const reference = getVisitReference(req)
+
+    return res.render('pages/visit/update', { reference })
   })
+
+  const selectVisitors = new SelectVisitors('update', prisonerVisitorsService, prisonerProfileService)
+
+  get('/:reference/update/select-visitors', (req, res) => selectVisitors.get(req, res))
+  post('/:reference/update/select-visitors', selectVisitors.validate(), (req, res) => selectVisitors.post(req, res))
 
   get('/:reference/cancel', async (req, res) => {
     const reference = getVisitReference(req)

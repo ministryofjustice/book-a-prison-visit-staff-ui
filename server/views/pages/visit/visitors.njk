@@ -1,0 +1,174 @@
+{% extends "layout.njk" %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "components/visitors.njk" import visitorDateOfBirth, visitorRestrictions %}
+
+{% set pageHeaderTitle = "Select visitors from the prisoner’s approved visitor list" %}
+{% set pageTitle %}
+{% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
+{% endset %}
+{% set backLinkHref = "/prisoner/" + offenderNo %}
+
+{% set visitors = [] %}
+{% set eligibleVisitorsCount = 0 %}
+
+{% for visitor in visitorList %}
+
+  {# Count adult visitors who aren't banned; at least one needed to continue.
+     Will include those with no DoB set (i.e. 'visitor.adult' == undefined).  #}
+  {% if visitor.banned == false and visitor.adult != false  %}
+    {% set eligibleVisitorsCount = eligibleVisitorsCount + 1 %}
+  {% endif %}
+
+  {% set checkbox -%}
+  <div class="govuk-checkboxes__item">
+    <input class="govuk-checkboxes__input" id="visitor-{{ visitor.personId }}" name="visitors" type="checkbox" value="{{ visitor.personId }}"
+    {{- " checked" if formValues.visitors and visitor.personId | string in formValues.visitors }}{{ " disabled" if visitor.banned }}>
+    <label class="govuk-label govuk-checkboxes__label" for="visitor-{{ visitor.personId }}">
+      <span class="govuk-visually-hidden">Select {{ visitor.name }}</span>
+    </label>
+  </div>
+  {%- endset %}
+
+  {% set visitors = (visitors.push([
+    {
+      html: checkbox
+    },
+    {
+      text: visitor.name,
+      attributes: { "data-test": "visitor-name-" + visitor.personId }
+    },
+    {
+      html: visitorDateOfBirth(visitor),
+      attributes: { "data-test": "visitor-dob-" + visitor.personId }
+    },
+    {
+      text: visitor.relationshipDescription,
+      attributes: { "data-test": "visitor-relation-" + visitor.personId }
+    },
+    {
+      html: visitor.address,
+      attributes: { "data-test": "visitor-address-" + visitor.personId }
+    },
+    {
+      html: visitorRestrictions(visitor),
+      attributes: { "data-test": "visitor-restrictions-" + visitor.personId }
+    }
+  ]), visitors) %}
+{% endfor %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {% include "partials/errorSummary.njk" %}
+
+      <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+
+      <p><strong>Prisoner name:</strong> <span data-test="prisoner-name">{{ prisonerName }}</span></p>
+
+      {% if restrictions | length %}
+      <div class="prisoner-restrictions">
+        <h2 class="govuk-heading-m">Prisoner's active restrictions</h2>
+        {% set prisonerRestrictions = [] %}
+        {% for restriction in restrictions %}
+          {% set restrictionStartDate %}{% if restriction.startDate %}{{ restriction.startDate | formatDate }}{% else %}Not entered{% endif %}{% endset %}
+          {% set restrictionExpiryDate %}{% if restriction.expiryDate %}{{ restriction.expiryDate | formatDate }}{% else %}Not entered{% endif %}{% endset %}
+          {%- set prisonerRestrictions = (prisonerRestrictions.push([
+            {
+              html: '<span class="test-restrictions-type' + loop.index + ' moj-badge moj-badge--large visitor-restriction-badge visitor-restriction-badge--' + restriction.restrictionType + '">' + restriction.restrictionTypeDescription + '</span>'
+            },
+            {
+              text: restriction.comment,
+              classes: "test-restrictions-comment" + loop.index
+            },
+            {
+              text: restrictionStartDate,
+              classes: "test-restrictions-start-date" + loop.index
+            },
+            {
+              text: restrictionExpiryDate,
+              classes: "test-restrictions-end-date" + loop.index
+            }
+          ]), prisonerRestrictions) %}
+        {% endfor %}
+        {{ govukTable({
+          classes: 'bapv-table-no-bottom-border',
+          head: [
+            {
+              text: "Type of restriction"
+            },
+            {
+              text: "Comments"
+            },
+            {
+              text: "Date from"
+            },
+            {
+              text: "Date to"
+            }
+          ],
+          rows: prisonerRestrictions
+        }) }}
+      </div>
+      {% endif %}
+
+      <h2 class="govuk-heading-m">Approved visitor list</h2>
+      {% if visitors | length %}
+      {% if errors | length %}
+      <p id="visitors-error" class="govuk-error-message">
+        <span class="govuk-visually-hidden">Error:</span> {{ errors[0].msg }}
+      </p>
+      {% endif %}
+
+      <p>Add up to 3 visitors with a maximum of 2 adults.</p>
+
+      <form action="/book-a-visit/select-visitors" method="POST" novalidate>
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+        <div class="govuk-form-group{% if errors | length %} govuk-form-group--error{% endif %}">
+        {{ govukTable({
+          head: [
+            {
+              text: "Add to visit"
+            },
+            {
+              text: "Name"
+            },
+            {
+              text: "Date of birth"
+            },
+            {
+              text: "Relationship to prisoner"
+            },
+            {
+              text: "Address"
+            },
+            {
+              html: "Restrictions",
+              classes: "govuk-!-width-one-quarter"
+            }
+          ],
+          rows: visitors
+        }) }}
+        </div>
+
+        {% if eligibleVisitorsCount > 0 %}
+          {{ govukButton({
+            text: "Continue",
+            attributes: { "data-test": "submit" },
+            preventDoubleClick: true
+          }) }}
+        {% else %}
+          {% include "partials/backToStartButton.njk" %}
+        {% endif %}
+
+      </form>
+    {% else %}
+    <p>There are no approved visitors for this prisoner. A booking cannot be made at this time.</p>
+
+    {% include "partials/backToStartButton.njk" %}
+
+    {% endif %}
+    </div>
+  </div>
+{% endblock %}

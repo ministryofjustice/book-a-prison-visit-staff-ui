@@ -37,45 +37,8 @@ export default function routes(
   const selectVisitors = new SelectVisitors('book', prisonerVisitorsService, prisonerProfileService)
 
   get('/select-visitors', sessionCheckMiddleware({ stage: 1 }), (req, res) => selectVisitors.get(req, res))
-
-  post(
-    '/select-visitors',
-    sessionCheckMiddleware({ stage: 1 }),
-    body('visitors').custom((value: string, { req }) => {
-      const selected = [].concat(value)
-
-      if (value === undefined) {
-        throw new Error('No visitors selected')
-      }
-
-      const selectedAndBanned = req.session.visitorList.visitors.filter((visitor: VisitorListItem) => {
-        return selected.includes(visitor.personId.toString()) && visitor.banned
-      })
-      if (selectedAndBanned.length) {
-        throw new Error('Invalid selection')
-      }
-
-      if (selected.length > 3) {
-        throw new Error('Select no more than 3 visitors with a maximum of 2 adults')
-      }
-
-      const adults = req.session.visitorList.visitors
-        .filter((visitor: VisitorListItem) => selected.includes(visitor.personId.toString()))
-        .reduce((count: number, visitor: VisitorListItem) => {
-          return visitor.adult ?? true ? count + 1 : count
-        }, 0)
-
-      if (adults === 0) {
-        throw new Error('Add an adult to the visit')
-      }
-
-      if (adults > 2) {
-        throw new Error('Select no more than 2 adults')
-      }
-
-      return true
-    }),
-    (req, res) => selectVisitors.post(req, res),
+  post('/select-visitors', sessionCheckMiddleware({ stage: 1 }), selectVisitors.validate(), (req, res) =>
+    selectVisitors.post(req, res),
   )
 
   get('/visit-type', sessionCheckMiddleware({ stage: 2 }), async (req, res) => {
