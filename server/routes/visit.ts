@@ -18,6 +18,7 @@ import PrisonerVisitorsService from '../services/prisonerVisitorsService'
 import SelectVisitors from './visitJourney/selectVisitors'
 import sessionCheckMiddleware from '../middleware/sessionCheckMiddleware'
 import PrisonerProfileService from '../services/prisonerProfileService'
+import VisitType from './visitJourney/visitType'
 
 export default function routes(
   router: Router,
@@ -121,9 +122,13 @@ export default function routes(
   })
 
   const selectVisitors = new SelectVisitors('update', prisonerVisitorsService, prisonerProfileService)
+  const visitType = new VisitType('book', auditService)
 
   get('/:reference/update/select-visitors', (req, res) => selectVisitors.get(req, res))
   post('/:reference/update/select-visitors', selectVisitors.validate(), (req, res) => selectVisitors.post(req, res))
+
+  get('/:reference/update/visit-type', (req, res) => visitType.get(req, res))
+  post('/:reference/update/visit-type', visitType.validate(), (req, res) => visitType.post(req, res))
 
   get('/:reference/cancel', async (req, res) => {
     const reference = getVisitReference(req)

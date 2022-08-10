@@ -122,7 +122,7 @@
 
       <p>Add up to 3 visitors with a maximum of 2 adults.</p>
 
-      <form action="/book-a-visit/select-visitors" method="POST" novalidate>
+      <form action="/visit/{{ reference }}/update/select-visitors" method="POST" novalidate>
         <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
         <div class="govuk-form-group{% if errors | length %} govuk-form-group--error{% endif %}">

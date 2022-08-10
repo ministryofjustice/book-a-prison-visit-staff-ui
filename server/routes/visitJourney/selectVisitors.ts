@@ -33,6 +33,7 @@ export default class SelectVisitors {
 
     res.render(`pages/${isUpdate ? 'visit' : 'bookAVisit'}/visitors`, {
       errors: req.flash('errors'),
+      reference: sessionData.visitReference ?? '',
       offenderNo: sessionData.prisoner.offenderNo,
       prisonerName: sessionData.prisoner.name,
       visitorList,
@@ -81,9 +82,11 @@ export default class SelectVisitors {
       restriction => restriction.restrictionType === 'CLOSED',
     )
 
+    const urlPrefix = isUpdate ? `/visit/${sessionData.visitReference}/update` : '/book-a-visit'
+
     return !closedVisitVisitors && closedVisitPrisoner
-      ? res.redirect('/book-a-visit/visit-type')
-      : res.redirect('/book-a-visit/select-date-and-time')
+      ? res.redirect(`${urlPrefix}/visit-type`)
+      : res.redirect(`${urlPrefix}/select-date-and-time`)
   }
 
   validate(): ValidationChain {

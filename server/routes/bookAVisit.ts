@@ -13,6 +13,7 @@ import AuditService from '../services/auditService'
 import config from '../config'
 import logger from '../../logger'
 import SelectVisitors from './visitJourney/selectVisitors'
+import VisitType from './visitJourney/visitType'
 
 export default function routes(
   router: Router,
@@ -35,52 +36,16 @@ export default function routes(
     )
 
   const selectVisitors = new SelectVisitors('book', prisonerVisitorsService, prisonerProfileService)
+  const visitType = new VisitType('book', auditService)
 
   get('/select-visitors', sessionCheckMiddleware({ stage: 1 }), (req, res) => selectVisitors.get(req, res))
   post('/select-visitors', sessionCheckMiddleware({ stage: 1 }), selectVisitors.validate(), (req, res) =>
     selectVisitors.post(req, res),
   )
 
-  get('/visit-type', sessionCheckMiddleware({ stage: 2 }), async (req, res) => {
-    const { visitSessionData } = req.session
-
-    const closedRestrictions = visitSessionData.prisoner.restrictions.filter(
-      restriction => restriction.restrictionType === 'CLOSED',
-    )
-
-    res.render('pages/bookAVisit/visitType', {
-      errors: req.flash('errors'),
-      restrictions: closedRestrictions,
-      visitors: visitSessionData.visitors,
-    })
-  })
-
-  post(
-    '/visit-type',
-    sessionCheckMiddleware({ stage: 2 }),
-    body('visitType').isIn(['OPEN', 'CLOSED']).withMessage('No visit type selected'),
-    async (req, res) => {
-      const { visitSessionData } = req.session
-      const errors = validationResult(req)
-
-      if (!errors.isEmpty()) {
-        req.flash('errors', errors.array() as [])
-        return res.redirect(req.originalUrl)
-      }
-
-      visitSessionData.visitRestriction = req.body.visitType
-      visitSessionData.closedVisitReason = req.body.visitType === 'CLOSED' ? 'prisoner' : undefined
-
-      await auditService.visitRestrictionSelected(
-        visitSessionData.prisoner.offenderNo,
-        visitSessionData.visitRestriction,
-        visitSessionData.visitors.map(visitor => visitor.personId.toString()),
-        res.locals.user?.username,
-        res.locals.appInsightsOperationId,
-      )
-
-      return res.redirect('/book-a-visit/select-date-and-time')
-    },
+  get('/visit-type', sessionCheckMiddleware({ stage: 2 }), (req, res) => visitType.get(req, res))
+  post('/visit-type', sessionCheckMiddleware({ stage: 2 }), visitType.validate(), (req, res) =>
+    visitType.post(req, res),
   )
 
   get(
