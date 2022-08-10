@@ -16,7 +16,6 @@ import logger from '../../logger'
 import { VisitSessionData } from '../@types/bapv'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
 import SelectVisitors from './visitJourney/selectVisitors'
-import sessionCheckMiddleware from '../middleware/sessionCheckMiddleware'
 import PrisonerProfileService from '../services/prisonerProfileService'
 import VisitType from './visitJourney/visitType'
 
