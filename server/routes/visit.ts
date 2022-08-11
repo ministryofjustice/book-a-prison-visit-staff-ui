@@ -114,14 +114,10 @@ export default function routes(
     })
   })
 
-  get('/:reference/update', async (req, res) => {
-    const reference = getVisitReference(req)
-
-    return res.render('pages/visit/update', { reference })
-  })
-
   const selectVisitors = new SelectVisitors('update', prisonerVisitorsService, prisonerProfileService)
   const visitType = new VisitType('book', auditService)
+
+  get('/:reference/update', async (req, res) => res.render('pages/visit/update', { reference: getVisitReference(req) }))
 
   get('/:reference/update/select-visitors', (req, res) => selectVisitors.get(req, res))
   post('/:reference/update/select-visitors', selectVisitors.validate(), (req, res) => selectVisitors.post(req, res))
