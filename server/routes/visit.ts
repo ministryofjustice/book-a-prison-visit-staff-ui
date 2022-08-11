@@ -18,6 +18,7 @@ import PrisonerVisitorsService from '../services/prisonerVisitorsService'
 import SelectVisitors from './visitJourney/selectVisitors'
 import PrisonerProfileService from '../services/prisonerProfileService'
 import VisitType from './visitJourney/visitType'
+import { properCaseFullName } from '../utils/utils'
 
 export default function routes(
   router: Router,
@@ -77,11 +78,10 @@ export default function routes(
     // load session
     const visitSessionData: VisitSessionData = {
       prisoner: {
-        name: `${prisoner.lastName}, ${prisoner.firstName}`,
+        name: properCaseFullName(`${prisoner.lastName}, ${prisoner.firstName}`),
         offenderNo: prisoner.prisonerNumber,
         dateOfBirth: prisoner.dateOfBirth,
         location: prisoner.locationDescription,
-        // restrictions: prisoner.res
       },
       visit: {
         id: visit.reference,
