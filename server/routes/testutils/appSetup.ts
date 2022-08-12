@@ -171,6 +171,7 @@ function appSetup({
       notificationsService,
       auditService,
       prisonerVisitorsService,
+      prisonerProfileService,
     ),
   )
   app.use(

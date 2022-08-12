@@ -15,6 +15,10 @@ import config from '../config'
 import logger from '../../logger'
 import { VisitSessionData } from '../@types/bapv'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
+import SelectVisitors from './visitJourney/selectVisitors'
+import PrisonerProfileService from '../services/prisonerProfileService'
+import VisitType from './visitJourney/visitType'
+import { properCaseFullName } from '../utils/utils'
 
 export default function routes(
   router: Router,
@@ -23,8 +27,14 @@ export default function routes(
   notificationsService: NotificationsService,
   auditService: AuditService,
   prisonerVisitorsService: PrisonerVisitorsService,
+  prisonerProfileService: PrisonerProfileService,
 ): Router {
-  const get = (path: string, handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
+  const get = (path: string, ...handlers: RequestHandler[]) =>
+    router.get(
+      path,
+      handlers.map(handler => asyncMiddleware(handler)),
+    )
+
   const post = (path: string, ...handlers: RequestHandler[]) =>
     router.post(
       path,
@@ -68,11 +78,10 @@ export default function routes(
     // load session
     const visitSessionData: VisitSessionData = {
       prisoner: {
-        name: '',
+        name: properCaseFullName(`${prisoner.lastName}, ${prisoner.firstName}`),
         offenderNo: prisoner.prisonerNumber,
         dateOfBirth: prisoner.dateOfBirth,
         location: prisoner.locationDescription,
-        // restrictions: prisoner.res
       },
       visit: {
         id: visit.reference,
@@ -105,12 +114,16 @@ export default function routes(
     })
   })
 
-  get('/:reference/update', async (req, res) => {
-    return res.render('pages/visit/update', {
-      errors: req.flash('errors'),
-      formValues: getFlashFormValues(req),
-    })
-  })
+  const selectVisitors = new SelectVisitors('update', prisonerVisitorsService, prisonerProfileService)
+  const visitType = new VisitType('book', auditService)
+
+  get('/:reference/update', async (req, res) => res.render('pages/visit/update', { reference: getVisitReference(req) }))
+
+  get('/:reference/update/select-visitors', (req, res) => selectVisitors.get(req, res))
+  post('/:reference/update/select-visitors', selectVisitors.validate(), (req, res) => selectVisitors.post(req, res))
+
+  get('/:reference/update/visit-type', (req, res) => visitType.get(req, res))
+  post('/:reference/update/visit-type', visitType.validate(), (req, res) => visitType.post(req, res))
 
   get('/:reference/cancel', async (req, res) => {
     const reference = getVisitReference(req)

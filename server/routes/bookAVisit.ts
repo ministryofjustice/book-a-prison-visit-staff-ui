@@ -12,6 +12,8 @@ import NotificationsService from '../services/notificationsService'
 import AuditService from '../services/auditService'
 import config from '../config'
 import logger from '../../logger'
+import SelectVisitors from './visitJourney/selectVisitors'
+import VisitType from './visitJourney/visitType'
 
 export default function routes(
   router: Router,
@@ -33,156 +35,17 @@ export default function routes(
       handlers.map(handler => asyncMiddleware(handler)),
     )
 
-  get('/select-visitors', sessionCheckMiddleware({ stage: 1 }), async (req, res) => {
-    const { visitSessionData } = req.session
-    const { offenderNo } = visitSessionData.prisoner
+  const selectVisitors = new SelectVisitors('book', prisonerVisitorsService, prisonerProfileService)
+  const visitType = new VisitType('book', auditService)
 
-    const visitorList = await prisonerVisitorsService.getVisitors(offenderNo, res.locals.user?.username)
-    if (!req.session.visitorList) {
-      req.session.visitorList = { visitors: [] }
-    }
-    req.session.visitorList.visitors = visitorList
-
-    const restrictions = await prisonerProfileService.getRestrictions(offenderNo, res.locals.user?.username)
-    req.session.visitSessionData.prisoner.restrictions = restrictions
-
-    const formValues = getFlashFormValues(req)
-    if (!Object.keys(formValues).length && visitSessionData.visitors) {
-      formValues.visitors = visitSessionData.visitors.map(visitor => visitor.personId.toString())
-    }
-
-    res.render('pages/bookAVisit/visitors', {
-      errors: req.flash('errors'),
-      offenderNo: visitSessionData.prisoner.offenderNo,
-      prisonerName: visitSessionData.prisoner.name,
-      visitorList,
-      restrictions,
-      formValues,
-    })
-  })
-
-  post(
-    '/select-visitors',
-    sessionCheckMiddleware({ stage: 1 }),
-    body('visitors').custom((value: string, { req }) => {
-      const selected = [].concat(value)
-
-      if (value === undefined) {
-        throw new Error('No visitors selected')
-      }
-
-      const selectedAndBanned = req.session.visitorList.visitors.filter((visitor: VisitorListItem) => {
-        return selected.includes(visitor.personId.toString()) && visitor.banned
-      })
-      if (selectedAndBanned.length) {
-        throw new Error('Invalid selection')
-      }
-
-      if (selected.length > 3) {
-        throw new Error('Select no more than 3 visitors with a maximum of 2 adults')
-      }
-
-      const adults = req.session.visitorList.visitors
-        .filter((visitor: VisitorListItem) => selected.includes(visitor.personId.toString()))
-        .reduce((count: number, visitor: VisitorListItem) => {
-          return visitor.adult ?? true ? count + 1 : count
-        }, 0)
-
-      if (adults === 0) {
-        throw new Error('Add an adult to the visit')
-      }
-
-      if (adults > 2) {
-        throw new Error('Select no more than 2 adults')
-      }
-
-      return true
-    }),
-    (req, res) => {
-      const { visitSessionData } = req.session
-      const errors = validationResult(req)
-
-      if (!errors.isEmpty()) {
-        req.flash('errors', errors.array() as [])
-        req.flash('formValues', req.body)
-        return res.redirect(req.originalUrl)
-      }
-
-      const selectedIds = [].concat(req.body.visitors)
-      const selectedVisitors = req.session.visitorList.visitors.filter((visitor: VisitorListItem) =>
-        selectedIds.includes(visitor.personId.toString()),
-      )
-
-      const adults = selectedVisitors.reduce((adultVisitors: VisitorListItem[], visitor: VisitorListItem) => {
-        if (visitor.adult ?? true) {
-          adultVisitors.push(visitor)
-        }
-
-        return adultVisitors
-      }, [])
-      visitSessionData.visitors = selectedVisitors
-
-      if (!req.session.adultVisitors) {
-        req.session.adultVisitors = { adults: [] }
-      }
-      req.session.adultVisitors.adults = adults
-
-      const closedVisitVisitors = selectedVisitors.reduce((closedVisit, visitor) => {
-        return closedVisit || visitor.restrictions.some(restriction => restriction.restrictionType === 'CLOSED')
-      }, false)
-      visitSessionData.visitRestriction = closedVisitVisitors ? 'CLOSED' : 'OPEN'
-      visitSessionData.closedVisitReason = closedVisitVisitors ? 'visitor' : undefined
-
-      const closedVisitPrisoner = visitSessionData.prisoner.restrictions.some(
-        restriction => restriction.restrictionType === 'CLOSED',
-      )
-
-      return !closedVisitVisitors && closedVisitPrisoner
-        ? res.redirect('/book-a-visit/visit-type')
-        : res.redirect('/book-a-visit/select-date-and-time')
-    },
+  get('/select-visitors', sessionCheckMiddleware({ stage: 1 }), (req, res) => selectVisitors.get(req, res))
+  post('/select-visitors', sessionCheckMiddleware({ stage: 1 }), selectVisitors.validate(), (req, res) =>
+    selectVisitors.post(req, res),
   )
 
-  get('/visit-type', sessionCheckMiddleware({ stage: 2 }), async (req, res) => {
-    const { visitSessionData } = req.session
-
-    const closedRestrictions = visitSessionData.prisoner.restrictions.filter(
-      restriction => restriction.restrictionType === 'CLOSED',
-    )
-
-    res.render('pages/bookAVisit/visitType', {
-      errors: req.flash('errors'),
-      restrictions: closedRestrictions,
-      visitors: visitSessionData.visitors,
-    })
-  })
-
-  post(
-    '/visit-type',
-    sessionCheckMiddleware({ stage: 2 }),
-    body('visitType').isIn(['OPEN', 'CLOSED']).withMessage('No visit type selected'),
-    async (req, res) => {
-      const { visitSessionData } = req.session
-      const errors = validationResult(req)
-
-      if (!errors.isEmpty()) {
-        req.flash('errors', errors.array() as [])
-        return res.redirect(req.originalUrl)
-      }
-
-      visitSessionData.visitRestriction = req.body.visitType
-      visitSessionData.closedVisitReason = req.body.visitType === 'CLOSED' ? 'prisoner' : undefined
-
-      await auditService.visitRestrictionSelected(
-        visitSessionData.prisoner.offenderNo,
-        visitSessionData.visitRestriction,
-        visitSessionData.visitors.map(visitor => visitor.personId.toString()),
-        res.locals.user?.username,
-        res.locals.appInsightsOperationId,
-      )
-
-      return res.redirect('/book-a-visit/select-date-and-time')
-    },
+  get('/visit-type', sessionCheckMiddleware({ stage: 2 }), (req, res) => visitType.get(req, res))
+  post('/visit-type', sessionCheckMiddleware({ stage: 2 }), visitType.validate(), (req, res) =>
+    visitType.post(req, res),
   )
 
   get(
