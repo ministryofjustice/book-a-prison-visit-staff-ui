@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express'
-import { body, ValidationChain, validationResult } from 'express-validator'
+import { body, query, ValidationChain, validationResult } from 'express-validator'
 import { VisitSlot } from '../../@types/bapv'
 import AuditService from '../../services/auditService'
 import VisitSessionsService from '../../services/visitSessionsService'
@@ -106,5 +106,14 @@ export default class DateAndTime {
 
       return true
     })
+  }
+
+  validateGet(): ValidationChain[] {
+    return [
+      query('timeOfDay').customSanitizer((value: string) => (!['morning', 'afternoon'].includes(value) ? '' : value)),
+      query('dayOfTheWeek').customSanitizer((value: string) =>
+        parseInt(value, 10) >= 0 && parseInt(value, 10) <= 6 ? value : '',
+      ),
+    ]
   }
 }

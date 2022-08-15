@@ -1,5 +1,5 @@
 import type { RequestHandler, Router } from 'express'
-import { body, validationResult, query } from 'express-validator'
+import { body, validationResult, query, ValidationChain } from 'express-validator'
 import { VisitorListItem } from '../@types/bapv'
 import sessionCheckMiddleware from '../middleware/sessionCheckMiddleware'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
@@ -50,14 +50,8 @@ export default function routes(
     visitType.post(req, res),
   )
 
-  get(
-    '/select-date-and-time',
-    sessionCheckMiddleware({ stage: 2 }),
-    query('timeOfDay').customSanitizer((value: string) => (!['morning', 'afternoon'].includes(value) ? '' : value)),
-    query('dayOfTheWeek').customSanitizer((value: string) =>
-      parseInt(value, 10) >= 0 && parseInt(value, 10) <= 6 ? value : '',
-    ),
-    (req, res) => dateAndTime.get(req, res),
+  get('/select-date-and-time', sessionCheckMiddleware({ stage: 2 }), ...dateAndTime.validateGet(), (req, res) =>
+    dateAndTime.get(req, res),
   )
   post('/select-date-and-time', sessionCheckMiddleware({ stage: 2 }), dateAndTime.validate(), (req, res) =>
     dateAndTime.post(req, res),
