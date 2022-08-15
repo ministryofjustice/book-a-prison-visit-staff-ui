@@ -1,5 +1,5 @@
 import type { RequestHandler, Router } from 'express'
-import { body, validationResult, query, ValidationChain } from 'express-validator'
+import { body, validationResult } from 'express-validator'
 import { VisitorListItem } from '../@types/bapv'
 import sessionCheckMiddleware from '../middleware/sessionCheckMiddleware'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
