@@ -1,11 +1,11 @@
 import type { RequestHandler, Router } from 'express'
-import { body, validationResult, query } from 'express-validator'
-import { VisitorListItem, VisitSlot } from '../@types/bapv'
+import { body, validationResult } from 'express-validator'
+import { VisitorListItem } from '../@types/bapv'
 import sessionCheckMiddleware from '../middleware/sessionCheckMiddleware'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
 import PrisonerProfileService from '../services/prisonerProfileService'
 import VisitSessionsService from '../services/visitSessionsService'
-import { clearSession, getFlashFormValues, getSelectedSlot, getSupportTypeDescriptions } from './visitorUtils'
+import { clearSession, getFlashFormValues, getSupportTypeDescriptions } from './visitorUtils'
 import { SupportType, VisitorSupport } from '../data/visitSchedulerApiTypes'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import NotificationsService from '../services/notificationsService'
@@ -14,6 +14,7 @@ import config from '../config'
 import logger from '../../logger'
 import SelectVisitors from './visitJourney/selectVisitors'
 import VisitType from './visitJourney/visitType'
+import DateAndTime from './visitJourney/dateAndTime'
 
 export default function routes(
   router: Router,
@@ -37,6 +38,7 @@ export default function routes(
 
   const selectVisitors = new SelectVisitors('book', prisonerVisitorsService, prisonerProfileService)
   const visitType = new VisitType('book', auditService)
+  const dateAndTime = new DateAndTime('book', visitSessionsService, auditService)
 
   get('/select-visitors', sessionCheckMiddleware({ stage: 1 }), (req, res) => selectVisitors.get(req, res))
   post('/select-visitors', sessionCheckMiddleware({ stage: 1 }), selectVisitors.validate(), (req, res) =>
@@ -48,104 +50,11 @@ export default function routes(
     visitType.post(req, res),
   )
 
-  get(
-    '/select-date-and-time',
-    sessionCheckMiddleware({ stage: 2 }),
-    query('timeOfDay').customSanitizer((value: string) => (!['morning', 'afternoon'].includes(value) ? '' : value)),
-    query('dayOfTheWeek').customSanitizer((value: string) =>
-      parseInt(value, 10) >= 0 && parseInt(value, 10) <= 6 ? value : '',
-    ),
-    async (req, res) => {
-      const { visitSessionData } = req.session
-      const { timeOfDay, dayOfTheWeek } = req.query as Record<string, string>
-      const slotsList = await visitSessionsService.getVisitSessions({
-        username: res.locals.user?.username,
-        offenderNo: visitSessionData.prisoner.offenderNo,
-        visitRestriction: visitSessionData.visitRestriction,
-        timeOfDay,
-        dayOfTheWeek,
-      })
-
-      const formValues = getFlashFormValues(req)
-      if (!Object.keys(formValues).length && visitSessionData.visit?.id) {
-        formValues['visit-date-and-time'] = visitSessionData.visit?.id
-      }
-
-      const slotsPresent = Object.values(slotsList).some(value => value.length)
-
-      req.session.slotsList = slotsList
-      req.session.timeOfDay = timeOfDay
-      req.session.dayOfTheWeek = dayOfTheWeek
-
-      res.render('pages/bookAVisit/dateAndTime', {
-        errors: req.flash('errors'),
-        visitRestriction: visitSessionData.visitRestriction,
-        prisonerName: visitSessionData.prisoner.name,
-        closedVisitReason: visitSessionData.closedVisitReason,
-        slotsList,
-        timeOfDay,
-        dayOfTheWeek,
-        formValues,
-        slotsPresent,
-      })
-    },
+  get('/select-date-and-time', sessionCheckMiddleware({ stage: 2 }), ...dateAndTime.validateGet(), (req, res) =>
+    dateAndTime.get(req, res),
   )
-
-  post(
-    '/select-date-and-time',
-    sessionCheckMiddleware({ stage: 2 }),
-    body('visit-date-and-time').custom((value: string, { req }) => {
-      // check selected slot is in the list that was shown and has available tables
-      const selectedSlot: VisitSlot = getSelectedSlot(req.session.slotsList, value)
-
-      if (selectedSlot === undefined || selectedSlot.availableTables === 0) {
-        throw new Error('No time slot selected')
-      }
-
-      return true
-    }),
-    async (req, res) => {
-      const { visitSessionData } = req.session
-      const errors = validationResult(req)
-
-      if (!errors.isEmpty()) {
-        req.flash('errors', errors.array() as [])
-        req.flash('formValues', req.body)
-        if (req.session.timeOfDay || req.session.dayOfTheWeek) {
-          return res.redirect(
-            `${req.originalUrl}?timeOfDay=${req.session.timeOfDay}&dayOfTheWeek=${req.session.dayOfTheWeek}`,
-          )
-        }
-        return res.redirect(req.originalUrl)
-      }
-
-      visitSessionData.visit = getSelectedSlot(req.session.slotsList, req.body['visit-date-and-time'])
-
-      if (req.session.visitSessionData.visitReference) {
-        await visitSessionsService.updateVisit({
-          username: res.locals.user?.username,
-          visitData: visitSessionData,
-        })
-      } else {
-        const { reference, visitStatus } = await visitSessionsService.createVisit({
-          username: res.locals.user?.username,
-          visitData: visitSessionData,
-        })
-
-        visitSessionData.visitReference = reference
-        visitSessionData.visitStatus = visitStatus
-      }
-
-      await auditService.reservedVisit(
-        visitSessionData.visitReference,
-        visitSessionData.prisoner.offenderNo,
-        'HEI',
-        res.locals.user?.username,
-        res.locals.appInsightsOperationId,
-      )
-
-      return res.redirect('/book-a-visit/additional-support')
-    },
+  post('/select-date-and-time', sessionCheckMiddleware({ stage: 2 }), dateAndTime.validate(), (req, res) =>
+    dateAndTime.post(req, res),
   )
 
   get('/additional-support', sessionCheckMiddleware({ stage: 3 }), async (req, res) => {

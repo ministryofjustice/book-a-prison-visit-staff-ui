@@ -1,0 +1,262 @@
+{% extends "layout.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/accordion/macro.njk" import govukAccordion %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{%- from "moj/components/banner/macro.njk" import mojBanner -%}
+
+{% set pageHeaderTitle = "Select date and time of visit" %}
+{% set pageTitle %}
+{% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
+{% endset %}
+{% set backLinkHref = "/book-a-visit/select-visitors" %}
+
+{% macro buildSlotsRadioItems(slotsList, radios) %}
+  {% for slot in slotsList %}
+
+    {%- set doubleBooked = slot.sessionConflicts and "DOUBLE_BOOKED" in slot.sessionConflicts %}
+    {%- set checked = true if formValues['visit-date-and-time'] and formValues['visit-date-and-time'] == slot.id else false %}
+
+    {%- set tableText %}
+      {% if (doubleBooked and not checked) -%}
+        Prisoner has a visit
+      {%- elseif slot.availableTables === 0 -%}
+        Fully booked
+      {%- else -%}
+        {{ slot.availableTables }} table{{ "s" if slot.availableTables > 1 }} available
+      {%- endif %}
+    {% endset %}
+
+    {%- set radios = (radios.push({
+      value: slot.id,
+      html: '<p class="bapv-radio-paragraph"><strong>' + slot.startTimestamp | formatTime +
+        " to " + slot.endTimestamp | formatTime + "</strong><br>" + tableText + "</p>",
+      id: slot.id,
+      checked: checked,
+      disabled: slot.availableTables === 0 or (doubleBooked and not checked)
+    }), radios) %}
+  {% endfor %}
+{% endmacro %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+    {% include "partials/errorSummary.njk" %}
+
+    <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+
+    <p class="bapv-extraspacing"><strong>Prisoner name:</strong> <span data-test="prisoner-name">{{ prisonerName }}</span>
+    <br><strong>Visit type:</strong> <span data-test="visit-restriction">{{ visitRestriction | capitalize }}</span>
+    <br>Showing visit time slots for the next 28 days.
+    <br>Time slots with prisoner non-associations are not shown.
+    </p>
+
+    {% if visitRestriction == 'CLOSED' and closedVisitReason %}
+      {% set closedVisitReasonHtml %}
+        {{ govukWarningText({
+          classes: "govuk-!-margin-bottom-0",
+          html: '<span class="govuk-!-font-size-24">Closed visit as ' +
+            ('a visitor' if closedVisitReason == 'visitor' else 'the prisoner') +
+            ' has a closed visit restriction.</span>',
+          iconFallbackText: "Warning",
+          attributes: {
+            "data-test": "closed-visit-reason"
+          }
+        }) }}
+      {% endset %}
+
+      {{ mojBanner({
+        classes: "govuk-!-padding-left-4",
+        html: closedVisitReasonHtml
+      }) }}
+    {% endif %}
+
+    <form action="/visit/{{ reference }}/update/select-date-and-time" method="GET" novalidate>
+      <div class="bapv-visit-date-time-filter">
+        <h3 class="govuk-heading-s">Filter time slots</h3>
+        <div class="govuk-button-group">
+          {{ govukSelect({
+            id: "timeOfDay",
+            name: "timeOfDay",
+            label: {
+              text: "Time of day"
+            },
+            items: [
+              {
+                value: "",
+                text: "Any"
+              },
+              {
+                value: "morning",
+                text: "Morning",
+                selected: timeOfDay == "morning"
+              },
+              {
+                value: "afternoon",
+                text: "Afternoon",
+                selected: timeOfDay == "afternoon"
+              }
+            ]
+          }) }}
+          {{ govukSelect({
+            id: "dayOfTheWeek",
+            name: "dayOfTheWeek",
+            label: {
+              text: "Day of the week"
+            },
+            items: [
+              {
+                value: "",
+                text: "All"
+              },
+              {
+                value: "1",
+                text: "Monday",
+                selected: dayOfTheWeek == "1"
+              },
+              {
+                value: "2",
+                text: "Tuesday",
+                selected: dayOfTheWeek == "2"
+              },
+              {
+                value: "3",
+                text: "Wednesday",
+                selected: dayOfTheWeek == "3"
+              },
+              {
+                value: "4",
+                text: "Thursday",
+                selected: dayOfTheWeek == "4"
+              },
+              {
+                value: "5",
+                text: "Friday",
+                selected: dayOfTheWeek == "5"
+              },
+              {
+                value: "6",
+                text: "Saturday",
+                selected: dayOfTheWeek == "6"
+              },
+              {
+                value: "0",
+                text: "Sunday",
+                selected: dayOfTheWeek == "0"
+              }
+            ]
+          }) }}
+      
+          {{ govukButton({
+            text: "Apply filters",
+            preventDoubleClick: true
+          }) }} 
+        </div>
+      </div>
+    </form>
+
+    {% if slotsPresent %}
+
+    <form action="/visit/{{ reference }}/update/select-date-and-time" method="POST" novalidate>
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+    {% for month, days in slotsList %}
+      <h2 class="govuk-heading-m" data-test="month">{{ month }}</h2>
+      {% set accordion = [] %}
+      {% for day in days %}
+
+        {%- set morningSlotsList = [] %}
+        {{ buildSlotsRadioItems(day.slots.morning, morningSlotsList) }}
+        {%- set morningHtml %}
+          <div class="govuk-grid-row">
+            <div class="govuk-grid-column-one-quarter bapv-morning-slots">
+              <h3 class="govuk-heading-s">Morning</h3>
+              {{ govukRadios({
+                name: "visit-date-and-time",
+                items: morningSlotsList
+              }) }}
+            </div>
+            <div class="govuk-grid-column-three-quarters">
+              {% if day.prisonerEvents.morning | length %}
+                <h3 class="govuk-heading-s">Prisoner schedule</h3>
+                {% for event in day.prisonerEvents.morning %}
+                  <div class="bapv-prisoner-event govuk-grid-column-one-third">{{ event.startTimestamp | formatTime }} to {{ event.endTimestamp | formatTime }}
+                  <br>{{ event.description }}
+                  </div>
+                {% endfor %}
+              {% endif %}
+            </div>
+          </div>
+        {% endset %}
+
+        {%- set afternoonSlotsList = [] %}
+        {{ buildSlotsRadioItems(day.slots.afternoon, afternoonSlotsList) }}
+        {%- set afternoonHtml %}
+          <div class="govuk-grid-row">
+            <div class="govuk-grid-column-one-quarter bapv-afternoon-slots">
+              <h3 class="govuk-heading-s">Afternoon</h3>
+              {{ govukRadios({
+                name: "visit-date-and-time",
+                items: afternoonSlotsList
+              }) }}
+            </div>
+            <div class="govuk-grid-column-three-quarters">
+              {% if day.prisonerEvents.afternoon | length %}
+                {% if not morningSlotsList | length %}<h3 class="govuk-heading-s">Prisoner schedule</h3>{% endif %} 
+                {% for event in day.prisonerEvents.afternoon %}
+                  <div class="bapv-prisoner-event govuk-grid-column-one-third{% if morningSlotsList | length %} bapv-prisoner-event--top-margin{% endif %}">{{ event.startTimestamp | formatTime }} to {{ event.endTimestamp | formatTime }}
+                  <br>{{ event.description }}
+                  </div>
+                {% endfor %}
+              {% endif %}
+            </div>
+          </div>
+        {% endset %}
+
+        {%- set slotsAvailable = (day.slots.morning | length) + (day.slots.afternoon | length) %}
+        {% set slotText %}
+          {% if slotsAvailable === 0 %}Fully booked{% endif %}
+          {% if slotsAvailable === 1 %}1 time slot{% endif %}
+          {% if slotsAvailable > 1 %}{{ slotsAvailable }} time slots{% endif %}
+        {% endset %}
+
+        {%- if (slotsAvailable > 0) %}
+        {% set accordion = (accordion.push({
+          heading: {
+            text: day.date
+          },
+          summary: {
+            text: slotText
+          },
+          content: {
+            html: (morningHtml if morningSlotsList | length) + (afternoonHtml if afternoonSlotsList | length)
+          },
+          expanded: (morningSlotsList | selectattr("checked") | length) or (afternoonSlotsList | selectattr("checked") | length)
+        }), accordion) %}
+        {% endif %}
+      {% endfor -%}
+
+      {{- govukAccordion({
+        id: "slots-month-" + (month | replace(" ", "")),
+        headingLevel: 3,
+        items: accordion
+      }) }}
+    {% endfor %}
+    
+    {{ govukButton({
+      text: "Continue",
+      attributes: { "data-test": "submit" },
+      preventDoubleClick: true
+    }) }} 
+    </form>
+
+    {% else %}
+    <p>There are no available slots for the selected time and day.</p>
+    <p>Change the filter to see more results.</p>
+
+    {% include "partials/backToStartButton.njk" %}
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}
