@@ -9,7 +9,7 @@ import PrisonerSearchService from '../services/prisonerSearchService'
 import VisitSessionsService from '../services/visitSessionsService'
 import AuditService from '../services/auditService'
 import { isValidVisitReference } from './validationChecks'
-import { getFlashFormValues } from './visitorUtils'
+import { clearSession, getFlashFormValues } from './visitorUtils'
 import NotificationsService from '../services/notificationsService'
 import config from '../config'
 import logger from '../../logger'
@@ -75,7 +75,8 @@ export default function routes(
     const visitorList = await prisonerVisitorsService.getVisitors(visit.prisonerId, res.locals.user?.username)
     const currentVisitors = visitorList.filter(visitor => visitorIds.includes(visitor.personId))
 
-    // load session
+    // clean then load session
+    clearSession(req)
     const visitSessionData: VisitSessionData = {
       prisoner: {
         name: properCaseFullName(`${prisoner.lastName}, ${prisoner.firstName}`),

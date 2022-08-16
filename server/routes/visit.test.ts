@@ -11,6 +11,7 @@ import { VisitorListItem } from '../@types/bapv'
 import { Prisoner } from '../data/prisonerOffenderSearchTypes'
 import config from '../config'
 import NotificationsService from '../services/notificationsService'
+import * as visitorUtils from './visitorUtils'
 
 jest.mock('../services/prisonerSearchService')
 jest.mock('../services/visitSessionsService')
@@ -143,6 +144,8 @@ describe('GET /visit/:reference', () => {
     prisonerSearchService.getPrisonerById.mockResolvedValue(prisoner)
     visitSessionsService.getFullVisitDetails.mockResolvedValue({ visit, visitors, additionalSupport })
     prisonerVisitorsService.getVisitors.mockResolvedValue(visitors)
+
+    jest.spyOn(visitorUtils, 'clearSession')
   })
 
   it('should render full booking summary page with prisoner, visit and visitor details, with default back link', () => {
@@ -194,6 +197,8 @@ describe('GET /visit/:reference', () => {
           undefined,
           undefined,
         )
+
+        expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)
       })
   })
 
@@ -255,6 +260,8 @@ describe('GET /visit/:reference', () => {
           undefined,
           undefined,
         )
+
+        expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)
       })
   })
 
@@ -313,6 +320,8 @@ describe('GET /visit/:reference', () => {
           undefined,
           undefined,
         )
+
+        expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)
       })
   })
 
