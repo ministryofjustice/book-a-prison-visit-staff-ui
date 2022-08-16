@@ -5,16 +5,16 @@ import sessionCheckMiddleware from '../middleware/sessionCheckMiddleware'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
 import PrisonerProfileService from '../services/prisonerProfileService'
 import VisitSessionsService from '../services/visitSessionsService'
-import { clearSession, getFlashFormValues, getSupportTypeDescriptions } from './visitorUtils'
+import { getFlashFormValues } from './visitorUtils'
 import { SupportType, VisitorSupport } from '../data/visitSchedulerApiTypes'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import NotificationsService from '../services/notificationsService'
 import AuditService from '../services/auditService'
-import config from '../config'
-import logger from '../../logger'
 import SelectVisitors from './visitJourney/selectVisitors'
 import VisitType from './visitJourney/visitType'
 import DateAndTime from './visitJourney/dateAndTime'
+import CheckYourBooking from './visitJourney/checkYourBooking'
+import Confirmation from './visitJourney/confirmation'
 
 export default function routes(
   router: Router,
@@ -39,6 +39,8 @@ export default function routes(
   const selectVisitors = new SelectVisitors('book', prisonerVisitorsService, prisonerProfileService)
   const visitType = new VisitType('book', auditService)
   const dateAndTime = new DateAndTime('book', visitSessionsService, auditService)
+  const checkYourBooking = new CheckYourBooking('book', visitSessionsService, auditService, notificationsService)
+  const confirmation = new Confirmation('book')
 
   get('/select-visitors', sessionCheckMiddleware({ stage: 1 }), (req, res) => selectVisitors.get(req, res))
   post('/select-visitors', sessionCheckMiddleware({ stage: 1 }), selectVisitors.validate(), (req, res) =>
@@ -209,107 +211,11 @@ export default function routes(
     },
   )
 
-  get('/check-your-booking', sessionCheckMiddleware({ stage: 5 }), async (req, res) => {
-    const { visitSessionData } = req.session
-    const { offenderNo } = visitSessionData.prisoner
+  get('/check-your-booking', sessionCheckMiddleware({ stage: 5 }), (req, res) => checkYourBooking.get(req, res))
 
-    const additionalSupport = getSupportTypeDescriptions(
-      req.session.availableSupportTypes,
-      visitSessionData.visitorSupport,
-    )
+  post('/check-your-booking', sessionCheckMiddleware({ stage: 5 }), (req, res) => checkYourBooking.post(req, res))
 
-    res.render('pages/bookAVisit/checkYourBooking', {
-      offenderNo,
-      mainContact: visitSessionData.mainContact,
-      prisoner: visitSessionData.prisoner,
-      visit: visitSessionData.visit,
-      visitRestriction: visitSessionData.visitRestriction,
-      visitors: visitSessionData.visitors,
-      additionalSupport,
-    })
-  })
-
-  post('/check-your-booking', sessionCheckMiddleware({ stage: 5 }), async (req, res) => {
-    const { visitSessionData } = req.session
-    const { offenderNo } = req.session.visitSessionData.prisoner
-
-    const additionalSupport = getSupportTypeDescriptions(
-      req.session.availableSupportTypes,
-      visitSessionData.visitorSupport,
-    )
-
-    try {
-      const bookedVisit = await visitSessionsService.updateVisit({
-        username: res.locals.user?.username,
-        visitData: req.session.visitSessionData,
-        visitStatus: 'BOOKED',
-      })
-
-      req.session.visitSessionData.visitStatus = bookedVisit.visitStatus
-
-      await auditService.bookedVisit(
-        req.session.visitSessionData.visitReference,
-        visitSessionData.prisoner.offenderNo,
-        'HEI',
-        visitSessionData.visitors.map(visitor => visitor.personId.toString()),
-        res.locals.user?.username,
-        res.locals.appInsightsOperationId,
-      )
-
-      if (config.apis.notifications.enabled) {
-        try {
-          const phoneNumber = visitSessionData.mainContact.phoneNumber.replace(/\s/g, '')
-
-          await notificationsService.sendBookingSms({
-            phoneNumber,
-            visit: visitSessionData.visit,
-            prisonName: 'Hewell (HMP)',
-            reference: visitSessionData.visitReference,
-          })
-          logger.info(`Booking SMS sent for ${visitSessionData.visitReference}`)
-        } catch (error) {
-          logger.error(`Failed to send SMS for booking ${visitSessionData.visitReference}`)
-        }
-      }
-    } catch (error) {
-      return res.render('pages/bookAVisit/checkYourBooking', {
-        errors: [
-          {
-            msg: 'Failed to make this reservation. You can try to submit again.',
-            param: 'id',
-          },
-        ],
-        offenderNo,
-        mainContact: visitSessionData.mainContact,
-        prisoner: visitSessionData.prisoner,
-        visit: visitSessionData.visit,
-        visitRestriction: visitSessionData.visitRestriction,
-        visitors: visitSessionData.visitors,
-        additionalSupport,
-      })
-    }
-
-    return res.redirect('/book-a-visit/confirmation')
-  })
-
-  get('/confirmation', sessionCheckMiddleware({ stage: 6 }), async (req, res) => {
-    const { visitSessionData } = req.session
-
-    res.locals.prisoner = visitSessionData.prisoner
-    res.locals.visit = visitSessionData.visit
-    res.locals.visitRestriction = visitSessionData.visitRestriction
-    res.locals.visitors = visitSessionData.visitors
-    res.locals.mainContact = visitSessionData.mainContact
-    res.locals.visitReference = visitSessionData.visitReference
-    res.locals.additionalSupport = getSupportTypeDescriptions(
-      req.session.availableSupportTypes,
-      visitSessionData.visitorSupport,
-    )
-
-    clearSession(req)
-
-    res.render('pages/bookAVisit/confirmation')
-  })
+  get('/confirmation', sessionCheckMiddleware({ stage: 6 }), (req, res) => confirmation.get(req, res))
 
   return router
 }

@@ -1,0 +1,176 @@
+{% extends "layout.njk" %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+
+{% set pageHeaderTitle = "Booking confirmed" %}
+{% set pageTitle %}
+{{ applicationName }} - {{ pageHeaderTitle }}
+{% endset %}
+
+{% block content %}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        {{ govukPanel({
+            titleText: pageHeaderTitle,
+            html: 'The booking reference is<br><strong class="test-booking-reference">' + visitReference + "</strong>"
+        }) }}
+    </div>
+</div>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        {% include "partials/errorSummary.njk" %}
+        <h2 class="govuk-heading-m govuk-!-margin-top-6">What to do next</h2>
+        <p>Let the caller know:</p>
+        <ul class="govuk-body">
+            <li>if they gave a UK mobile number, the main contact will receive a text message with the booking reference and visit details</li>
+            <li>they will need the booking reference to <a href="/search/visit">cancel the booking</a></li>
+            <li>changes to the booking can be made up to 2 working days before the visit</li>
+            <li>who can <a href="https://www.gov.uk/help-with-prison-visits">get help with the cost of visits</a></li>
+        </ul>
+        <p>To prepare for the visit day, tell them:</p>
+        <ul class="govuk-body">
+            <li>what time to arrive for the visit</li>
+            <li>all adult visitors will need to bring <a href="https://www.gov.uk/government/publications/management-of-security-at-visits-policy-framework-open-estate/acceptable-forms-of-identification-id-when-visiting-a-prison-in-england-and-wales-annex-a">acceptable forms of ID</a></li>
+            <li>any COVID-19 requirements (such as face coverings and lateral flow tests)</li>
+            <li>any prison specific rules (such as clothing guidelines)</li>
+        </ul>
+        {{ govukButton({
+            classes: "govuk-!-margin-top-3, govuk-!-margin-bottom-6",
+            text: "Manage prison visits",
+            href: "/",
+            preventDoubleClick: true
+        }) }}
+    </div>
+</div>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <h2 class="govuk-heading-m">Visit details</h2>
+        {{ govukSummaryList({
+            rows: [
+                {
+                    key: {
+                        text: "Date"
+                    },
+                    value: {
+                        text: visit.startTimestamp | formatDate("EEEE d MMMM yyyy"),
+                        classes: "test-visit-date"
+                    }
+                },
+                {
+                    key: {
+                        text: "Time"
+                    },
+                    value: {
+                        text: visit.startTimestamp | formatTime + " to " + visit.endTimestamp | formatTime,
+                        classes: "test-visit-time"
+                    }
+                },
+                {
+                    key: {
+                        text: "Visit type"
+                    },
+                    value: {
+                        text: visitRestriction | capitalize,
+                        classes: "test-visit-type"
+                    }
+                }
+            ]
+        }) }}
+
+        <h2 class="govuk-heading-m">Prisoner details</h2>
+        {{ govukSummaryList({
+            rows: [
+                {
+                    key: {
+                        text: "Name"
+                    },
+                    value: {
+                        text: prisoner.name,
+                        classes: "test-prisoner-name"
+                    }
+                },
+                {
+                    key: {
+                        text: "Location"
+                    },
+                    value: {
+                        text: prisoner.location,
+                        classes: "test-prisoner-location"
+                    }
+                }
+            ]
+        }) }}
+        <h2 class="govuk-heading-m">Visitor details</h2>
+        {%- for visitor in visitors %}
+            {{ govukSummaryList({
+                rows: [
+                    {
+                        key: {
+                            text: "Visitor " + loop.index
+                        },
+                        value: {
+                            text: visitor.name + " (" + (visitor.relationshipDescription | lower) + " of the prisoner)",
+                            classes: "test-visitor-name" + loop.index
+                        }
+                    }
+                ]
+            }) }}
+        {% endfor %}
+        <h2 class="govuk-heading-m">Additional support</h2>
+        {% set additionalSupportRows = [] %}
+        {% for item in additionalSupport %}
+          {% set additionalSupportRows = (additionalSupportRows.push(
+            {
+              key: {
+                text: "Request " + loop.index
+              },
+              value: {
+                text: item,
+                classes: "test-additional-support" + loop.index
+              }
+            }
+          ), additionalSupportRows) %}
+        {% endfor %}
+        {% if (additionalSupportRows | length) %}
+            {{ govukSummaryList({
+                rows: additionalSupportRows
+            }) }}
+        {% else %}
+        <p data-test="no-addition-support-chosen">None.</p>
+        {% endif %}
+        <h2 class="govuk-heading-m">Contact details</h2>
+        {% set contactName %}
+        {% if mainContact.contactName %}
+        {{ mainContact.contactName | safe }}
+        {% else %}
+        {{ mainContact.contact.name | safe + " (" + (mainContact.contact.relationshipDescription | lower) + " of the prisoner)" }}
+        {% endif %}
+        {% endset %}
+        {{ govukSummaryList({
+            rows: [
+                {
+                    key: {
+                        text: "Main contact"
+                    },
+                    value: {
+                        text: contactName,
+                        classes: "test-main-contact-name"
+                    }
+                },
+                {
+                    key: {
+                        text: "Phone number"
+                    },
+                    value: {
+                        text: mainContact.phoneNumber,
+                        classes: "test-main-contact-number"
+                    }
+                }
+            ]
+        }) }} 
+    </div>
+</div>
+{% endblock %}
