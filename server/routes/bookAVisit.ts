@@ -5,7 +5,7 @@ import sessionCheckMiddleware from '../middleware/sessionCheckMiddleware'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
 import PrisonerProfileService from '../services/prisonerProfileService'
 import VisitSessionsService from '../services/visitSessionsService'
-import { clearSession, getFlashFormValues, getSupportTypeDescriptions } from './visitorUtils'
+import { getFlashFormValues } from './visitorUtils'
 import { SupportType, VisitorSupport } from '../data/visitSchedulerApiTypes'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import NotificationsService from '../services/notificationsService'
@@ -14,6 +14,7 @@ import SelectVisitors from './visitJourney/selectVisitors'
 import VisitType from './visitJourney/visitType'
 import DateAndTime from './visitJourney/dateAndTime'
 import CheckYourBooking from './visitJourney/checkYourBooking'
+import Confirmation from './visitJourney/confirmation'
 
 export default function routes(
   router: Router,
@@ -39,6 +40,7 @@ export default function routes(
   const visitType = new VisitType('book', auditService)
   const dateAndTime = new DateAndTime('book', visitSessionsService, auditService)
   const checkYourBooking = new CheckYourBooking('book', visitSessionsService, auditService, notificationsService)
+  const confirmation = new Confirmation('book')
 
   get('/select-visitors', sessionCheckMiddleware({ stage: 1 }), (req, res) => selectVisitors.get(req, res))
   post('/select-visitors', sessionCheckMiddleware({ stage: 1 }), selectVisitors.validate(), (req, res) =>
@@ -213,24 +215,7 @@ export default function routes(
 
   post('/check-your-booking', sessionCheckMiddleware({ stage: 5 }), (req, res) => checkYourBooking.post(req, res))
 
-  get('/confirmation', sessionCheckMiddleware({ stage: 6 }), async (req, res) => {
-    const { visitSessionData } = req.session
-
-    res.locals.prisoner = visitSessionData.prisoner
-    res.locals.visit = visitSessionData.visit
-    res.locals.visitRestriction = visitSessionData.visitRestriction
-    res.locals.visitors = visitSessionData.visitors
-    res.locals.mainContact = visitSessionData.mainContact
-    res.locals.visitReference = visitSessionData.visitReference
-    res.locals.additionalSupport = getSupportTypeDescriptions(
-      req.session.availableSupportTypes,
-      visitSessionData.visitorSupport,
-    )
-
-    clearSession(req)
-
-    res.render('pages/bookAVisit/confirmation')
-  })
+  get('/confirmation', sessionCheckMiddleware({ stage: 6 }), (req, res) => confirmation.get(req, res))
 
   return router
 }
