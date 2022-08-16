@@ -82,7 +82,7 @@ export default function routes(
         name: properCaseFullName(`${prisoner.lastName}, ${prisoner.firstName}`),
         offenderNo: prisoner.prisonerNumber,
         dateOfBirth: prisoner.dateOfBirth,
-        location: prisoner.locationDescription,
+        location: prisonerLocation,
       },
       visit: {
         id: visit.reference,
@@ -102,7 +102,7 @@ export default function routes(
       visitStatus: visit.visitStatus,
     }
 
-    req.session.amendVisitSessionData = visitSessionData
+    req.session.amendVisitSessionData = Object.assign(req.session.amendVisitSessionData ?? {}, visitSessionData)
 
     return res.render('pages/visit/summary', {
       prisoner,

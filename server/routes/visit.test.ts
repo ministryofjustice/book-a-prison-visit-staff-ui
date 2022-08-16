@@ -1,17 +1,18 @@
 import type { Express } from 'express'
 import request from 'supertest'
 import * as cheerio from 'cheerio'
+import { SessionData } from 'express-session'
 import PrisonerSearchService from '../services/prisonerSearchService'
 import VisitSessionsService from '../services/visitSessionsService'
 import AuditService from '../services/auditService'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import { OutcomeDto, Visit } from '../data/visitSchedulerApiTypes'
-import { VisitorListItem } from '../@types/bapv'
+import { VisitorListItem, VisitSessionData } from '../@types/bapv'
 import { Prisoner } from '../data/prisonerOffenderSearchTypes'
 import config from '../config'
 import NotificationsService from '../services/notificationsService'
-import * as visitorUtils from './visitorUtils'
+import { clearSession } from './visitorUtils'
 
 jest.mock('../services/prisonerSearchService')
 jest.mock('../services/visitSessionsService')
@@ -21,6 +22,7 @@ jest.mock('../services/prisonerVisitorsService')
 let app: Express
 const systemToken = async (user: string): Promise<string> => `${user}-token-1`
 let flashData: Record<string, string[] | Record<string, string>[]>
+let amendVisitSessionData: VisitSessionData
 
 const prisonerSearchService = new PrisonerSearchService(null, systemToken) as jest.Mocked<PrisonerSearchService>
 const visitSessionsService = new VisitSessionsService(
@@ -31,6 +33,16 @@ const visitSessionsService = new VisitSessionsService(
 ) as jest.Mocked<VisitSessionsService>
 const auditService = new AuditService() as jest.Mocked<AuditService>
 const prisonerVisitorsService = new PrisonerVisitorsService(null, systemToken) as jest.Mocked<PrisonerVisitorsService>
+
+jest.mock('./visitorUtils', () => {
+  const visitorUtils = jest.requireActual('./visitorUtils')
+  return {
+    ...visitorUtils,
+    clearSession: jest.fn((req: Express.Request) => {
+      req.session.amendVisitSessionData = amendVisitSessionData as VisitSessionData
+    }),
+  }
+})
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
@@ -145,7 +157,18 @@ describe('GET /visit/:reference', () => {
     visitSessionsService.getFullVisitDetails.mockResolvedValue({ visit, visitors, additionalSupport })
     prisonerVisitorsService.getVisitors.mockResolvedValue(visitors)
 
-    jest.spyOn(visitorUtils, 'clearSession')
+    amendVisitSessionData = { prisoner: undefined }
+
+    app = appWithAllRoutes({
+      prisonerSearchServiceOverride: prisonerSearchService,
+      visitSessionsServiceOverride: visitSessionsService,
+      auditServiceOverride: auditService,
+      prisonerVisitorsServiceOverride: prisonerVisitorsService,
+      systemTokenOverride: systemToken,
+      sessionData: {
+        amendVisitSessionData,
+      } as SessionData,
+    })
   })
 
   it('should render full booking summary page with prisoner, visit and visitor details, with default back link', () => {
@@ -198,7 +221,56 @@ describe('GET /visit/:reference', () => {
           undefined,
         )
 
-        expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)
+        expect(clearSession).toHaveBeenCalledTimes(1)
+        expect(amendVisitSessionData).toEqual({
+          prisoner: {
+            name: 'Smith, John',
+            offenderNo: 'A1234BC',
+            dateOfBirth: '1975-04-02',
+            location: '1-1-C-028, Hewell (HMP)',
+          },
+          visit: {
+            id: 'ab-cd-ef-gh',
+            startTimestamp: '2022-02-09T10:00:00',
+            endTimestamp: '2022-02-09T11:15:00',
+            availableTables: 0,
+            visitRoomName: 'visit room',
+          },
+          visitRestriction: 'OPEN',
+          visitors: [
+            {
+              address: '123 The Street,<br>Coventry',
+              adult: true,
+              banned: false,
+              dateOfBirth: '1986-07-28',
+              name: 'Jeanette Smith',
+              personId: 4321,
+              relationshipDescription: 'Sister',
+              restrictions: [
+                {
+                  globalRestriction: false,
+                  restrictionType: 'CLOSED',
+                  restrictionTypeDescription: 'Closed',
+                  startDate: '2022-01-03',
+                },
+              ],
+            },
+            {
+              address: 'Not entered',
+              adult: false,
+              banned: false,
+              dateOfBirth: '2017-01-02',
+              name: 'Anne Smith',
+              personId: 4324,
+              relationshipDescription: 'Niece',
+              restrictions: [],
+            },
+          ],
+          visitorSupport: [{ type: 'WHEELCHAIR' }, { text: 'custom request', type: 'OTHER' }],
+          mainContact: { phoneNumber: '01234 567890', contactName: 'Jeanette Smith' },
+          visitReference: 'ab-cd-ef-gh',
+          visitStatus: 'BOOKED',
+        })
       })
   })
 
@@ -261,7 +333,7 @@ describe('GET /visit/:reference', () => {
           undefined,
         )
 
-        expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)
+        expect(clearSession).toHaveBeenCalledTimes(1)
       })
   })
 
@@ -321,7 +393,7 @@ describe('GET /visit/:reference', () => {
           undefined,
         )
 
-        expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)
+        expect(clearSession).toHaveBeenCalledTimes(1)
       })
   })
 
