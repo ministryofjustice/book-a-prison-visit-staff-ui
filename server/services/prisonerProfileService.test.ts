@@ -135,6 +135,7 @@ describe('Prisoner profile service', () => {
       expect(prisonApiClient.getBookings).toHaveBeenCalledTimes(1)
       expect(prisonApiClient.getOffender).toHaveBeenCalledTimes(1)
       expect(prisonApiClient.getVisitBalances).toHaveBeenCalledTimes(1)
+      expect(prisonerContactRegistryApiClient.getPrisonerSocialContacts).toHaveBeenCalledTimes(1)
       expect(results).toEqual({
         displayName: 'Smith, John',
         displayDob: '12 October 1980',
@@ -207,6 +208,7 @@ describe('Prisoner profile service', () => {
       expect(prisonApiClient.getBookings).toHaveBeenCalledTimes(1)
       expect(prisonApiClient.getOffender).toHaveBeenCalledTimes(1)
       expect(prisonApiClient.getVisitBalances).not.toHaveBeenCalled()
+      expect(prisonerContactRegistryApiClient.getPrisonerSocialContacts).toHaveBeenCalledTimes(1)
       expect(results).toEqual({
         displayName: 'James, Fred',
         displayDob: '11 December 1985',
@@ -461,6 +463,7 @@ describe('Prisoner profile service', () => {
       expect(prisonApiClient.getBookings).toHaveBeenCalledTimes(1)
       expect(prisonApiClient.getOffender).toHaveBeenCalledTimes(1)
       expect(prisonApiClient.getVisitBalances).not.toHaveBeenCalled()
+      expect(prisonerContactRegistryApiClient.getPrisonerSocialContacts).toHaveBeenCalledTimes(1)
       expect(results).toEqual({
         displayName: 'James, Fred',
         displayDob: '11 December 1985',
