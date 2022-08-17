@@ -11,6 +11,8 @@ import {
   OffenderRestrictions,
 } from '../data/prisonApiTypes'
 import { PrisonerAlertItem } from '../@types/bapv'
+import { Visit } from '../data/visitSchedulerApiTypes'
+import { Contact } from '../data/prisonerContactRegistryApiTypes'
 
 jest.mock('../data/prisonApiClient')
 jest.mock('../data/visitSchedulerApiClient')
@@ -83,11 +85,50 @@ describe('Prisoner profile service', () => {
         latestPrivIepAdjustDate: '2021-12-01',
       }
 
+      const visit: Visit = {
+        reference: 'ab-cd-ef-gh',
+        prisonerId: 'A1234BC',
+        prisonId: 'HEI',
+        visitRoom: 'A1 L3',
+        visitType: 'SOCIAL',
+        visitStatus: 'BOOKED',
+        visitRestriction: 'OPEN',
+        startTimestamp: '2022-08-17T10:00:00',
+        endTimestamp: '2022-08-17T11:00:00',
+        visitNotes: [],
+        visitors: [
+          {
+            nomisPersonId: 1234,
+          },
+        ],
+        visitorSupport: [],
+        createdTimestamp: '',
+        modifiedTimestamp: '',
+      }
+
+      const socialContacts: Contact[] = [
+        {
+          personId: 1234,
+          firstName: 'Mary',
+          lastName: 'Smith',
+          relationshipCode: 'PART',
+          relationshipDescription: 'Partner',
+          contactType: 'S',
+          contactTypeDescription: 'Social/ Family',
+          approvedVisitor: true,
+          emergencyContact: true,
+          nextOfKin: true,
+          restrictions: [],
+          addresses: [],
+        },
+      ]
+
       prisonApiClient.getBookings.mockResolvedValue(bookings)
       prisonApiClient.getOffender.mockResolvedValue(inmateDetail)
       prisonApiClient.getVisitBalances.mockResolvedValue(visitBalances)
-      visitSchedulerApiClient.getUpcomingVisits.mockResolvedValue([])
-      visitSchedulerApiClient.getPastVisits.mockResolvedValue([])
+      visitSchedulerApiClient.getUpcomingVisits.mockResolvedValue([visit])
+      visitSchedulerApiClient.getPastVisits.mockResolvedValue([visit])
+      prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue(socialContacts)
 
       const results = await prisonerProfileService.getProfile(offenderNo, 'user')
 
@@ -102,8 +143,29 @@ describe('Prisoner profile service', () => {
         inmateDetail,
         convictedStatus: 'Convicted',
         visitBalances,
-        upcomingVisits: [],
-        pastVisits: [],
+        upcomingVisits: [
+          [
+            { html: 'Social<br>(Open)', attributes: { 'data-test': 'tab-upcoming-type' } },
+            { text: 'Hewell (HMP)', attributes: { 'data-test': 'tab-upcoming-location' } },
+            {
+              html: '<p>17 August 2022<br>10:00am - 11:00am</p>',
+              attributes: { 'data-test': 'tab-upcoming-date-and-time' },
+            },
+            { html: '<p>Mary Smith</p>', attributes: { 'data-test': 'tab-upcoming-visitors' } },
+          ],
+        ],
+        pastVisits: [
+          [
+            { html: 'Social<br>(Open)', attributes: { 'data-test': 'tab-past-type' } },
+            { text: 'Hewell (HMP)', attributes: { 'data-test': 'tab-past-location' } },
+            {
+              html: '<p>17 August 2022<br>10:00am - 11:00am</p>',
+              attributes: { 'data-test': 'tab-past-date-and-time' },
+            },
+            { html: '<p>Mary Smith</p>', attributes: { 'data-test': 'tab-past-visitors' } },
+            { text: 'Booked', attributes: { 'data-test': 'tab-past-status' } },
+          ],
+        ],
       })
     })
 
