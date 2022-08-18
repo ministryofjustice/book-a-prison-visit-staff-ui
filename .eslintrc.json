@@ -87,16 +87,15 @@
       "error",
       { "devDependencies": ["**/*.test.js", "**/*.test.ts", "cypress.config.ts"] }
     ],
+    "no-only-tests/no-only-tests": "error",
     "prettier/prettier": [
       "error",
       {
         "trailingComma": "all",
         "singleQuote": true,
         "printWidth": 120,
-        "semi": false,
-        "arrowParens": "avoid"
+        "semi": false
       }
-    ],
-    "no-only-tests/no-only-tests": "error"
+    ]
   }
 }
