@@ -71,6 +71,13 @@
         html: closedVisitReasonHtml
       }) }}
     {% endif %}
+    {% if restrictionChangeMessage %}
+      {{ mojBanner({
+        type: 'information',
+        classes: "govuk-!-padding-left-4",
+        html: restrictionChangeMessage
+      }) }}
+    {% endif %}
 
     <form action="/visit/{{ reference }}/update/select-date-and-time" method="GET" novalidate>
       <div class="bapv-visit-date-time-filter">

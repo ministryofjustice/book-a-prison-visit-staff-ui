@@ -137,6 +137,15 @@ class VisitSchedulerApiClient {
     })
   }
 
+  startAmendVisit(visitReference: string): Promise<Visit> {
+    return this.restclient.put({
+      path: `/visits/${visitReference}`,
+      data: <UpdateVisitRequestDto>{
+        visitStatus: 'RESERVED',
+      },
+    })
+  }
+
   cancelVisit(reference: string, outcome: OutcomeDto): Promise<Visit> {
     return this.restclient.patch({
       path: `/visits/${reference}/cancel`,

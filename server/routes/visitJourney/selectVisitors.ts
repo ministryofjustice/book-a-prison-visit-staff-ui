@@ -24,6 +24,11 @@ export default class SelectVisitors {
     req.session.visitorList.visitors = visitorList
 
     const restrictions = await this.prisonerProfileService.getRestrictions(offenderNo, res.locals.user?.username)
+
+    if (isUpdate) {
+      sessionData.prisoner.previousRestrictions = sessionData.prisoner?.restrictions ?? []
+    }
+
     sessionData.prisoner.restrictions = restrictions
 
     const formValues = getFlashFormValues(req)
@@ -75,7 +80,9 @@ export default class SelectVisitors {
     const closedVisitVisitors = selectedVisitors.reduce((closedVisit, visitor) => {
       return closedVisit || visitor.restrictions.some(restriction => restriction.restrictionType === 'CLOSED')
     }, false)
-    sessionData.visitRestriction = closedVisitVisitors ? 'CLOSED' : 'OPEN'
+    const newVisitRestriction = closedVisitVisitors ? 'CLOSED' : 'OPEN'
+    sessionData.previousVisitRestriction = sessionData.visitRestriction
+    sessionData.visitRestriction = newVisitRestriction
     sessionData.closedVisitReason = closedVisitVisitors ? 'visitor' : undefined
 
     const closedVisitPrisoner = sessionData.prisoner.restrictions.some(

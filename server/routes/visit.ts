@@ -85,11 +85,12 @@ export default function routes(
         location: prisonerLocation,
       },
       visit: {
-        id: visit.reference,
+        id: '',
         startTimestamp: visit.startTimestamp,
         endTimestamp: visit.endTimestamp,
         availableTables: 0,
         visitRoomName: visit.visitRoom,
+        visitRestriction: visit.visitRestriction,
       },
       visitRestriction: visit.visitRestriction,
       visitors: currentVisitors,
@@ -103,6 +104,8 @@ export default function routes(
     }
 
     req.session.amendVisitSessionData = Object.assign(req.session.amendVisitSessionData ?? {}, visitSessionData)
+
+    await visitSessionsService.startAmendVisit({ username: res.locals.user?.username, visitReference: reference })
 
     return res.render('pages/visit/summary', {
       prisoner,
