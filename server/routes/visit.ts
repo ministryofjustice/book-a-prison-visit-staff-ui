@@ -19,6 +19,9 @@ import SelectVisitors from './visitJourney/selectVisitors'
 import PrisonerProfileService from '../services/prisonerProfileService'
 import VisitType from './visitJourney/visitType'
 import { properCaseFullName } from '../utils/utils'
+import DateAndTime from './visitJourney/dateAndTime'
+import CheckYourBooking from './visitJourney/checkYourBooking'
+import Confirmation from './visitJourney/confirmation'
 
 export default function routes(
   router: Router,
@@ -105,7 +108,7 @@ export default function routes(
 
     req.session.amendVisitSessionData = Object.assign(req.session.amendVisitSessionData ?? {}, visitSessionData)
 
-    await visitSessionsService.startAmendVisit({ username: res.locals.user?.username, visitReference: reference })
+    // await visitSessionsService.startAmendVisit({ username: res.locals.user?.username, visitReference: reference })
 
     return res.render('pages/visit/summary', {
       prisoner,
@@ -119,7 +122,10 @@ export default function routes(
   })
 
   const selectVisitors = new SelectVisitors('update', prisonerVisitorsService, prisonerProfileService)
-  const visitType = new VisitType('book', auditService)
+  const visitType = new VisitType('update', auditService)
+  const dateAndTime = new DateAndTime('update', visitSessionsService, auditService)
+  const checkYourBooking = new CheckYourBooking('book', visitSessionsService, auditService, notificationsService)
+  const confirmation = new Confirmation('book')
 
   get('/:reference/update', async (req, res) => res.render('pages/visit/update', { reference: getVisitReference(req) }))
 
@@ -128,6 +134,15 @@ export default function routes(
 
   get('/:reference/update/visit-type', (req, res) => visitType.get(req, res))
   post('/:reference/update/visit-type', visitType.validate(), (req, res) => visitType.post(req, res))
+
+  get('/:reference/update/select-date-and-time', ...dateAndTime.validateGet(), (req, res) => dateAndTime.get(req, res))
+  post('/:reference/update/select-date-and-time', dateAndTime.validate(), (req, res) => dateAndTime.post(req, res))
+
+  get('/:reference/update/check-your-booking', (req, res) => checkYourBooking.get(req, res))
+
+  post('/:reference/update/check-your-booking', (req, res) => checkYourBooking.post(req, res))
+
+  get('/:reference/update/confirmation', (req, res) => confirmation.get(req, res))
 
   get('/:reference/cancel', async (req, res) => {
     const reference = getVisitReference(req)

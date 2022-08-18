@@ -284,7 +284,6 @@ export default class VisitSessionsService {
 
     const visit = await visitSchedulerApiClient.getVisit(reference)
     const contacts = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(visit.prisonerId)
-
     const visitorIds = visit.visitors.map(visitor => visitor.nomisPersonId)
 
     const visitors = contacts
