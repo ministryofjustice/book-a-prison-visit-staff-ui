@@ -410,6 +410,7 @@ describe('visitSchedulerApiClient', () => {
           endTimestamp: result.endTimestamp,
           availableTables: 1,
           visitRoomName: result.visitRoom,
+          visitRestriction: 'OPEN',
         },
         visitRestriction: 'OPEN',
         visitors: [
@@ -502,6 +503,7 @@ describe('visitSchedulerApiClient', () => {
           endTimestamp: result.endTimestamp,
           availableTables: 1,
           visitRoomName: result.visitRoom,
+          visitRestriction: 'OPEN',
         },
         visitRestriction: 'OPEN',
         visitors: [

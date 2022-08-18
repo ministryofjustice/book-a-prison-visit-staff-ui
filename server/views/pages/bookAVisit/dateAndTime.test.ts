@@ -46,6 +46,7 @@ describe('Views - Date and time of visit', () => {
                   endTimestamp: '2022-02-14T11:00:00',
                   availableTables: 15,
                   visitRoomName: 'room name',
+                  visitRestriction: 'OPEN',
                 },
                 {
                   id: '2',
@@ -53,6 +54,7 @@ describe('Views - Date and time of visit', () => {
                   endTimestamp: '2022-02-14T12:59:00',
                   availableTables: 1,
                   visitRoomName: 'room name',
+                  visitRestriction: 'OPEN',
                 },
               ],
               afternoon: [
@@ -64,6 +66,7 @@ describe('Views - Date and time of visit', () => {
                   visitRoomName: 'room name',
                   // representing a pre-existing visit that is BOOKED
                   sessionConflicts: ['DOUBLE_BOOKED'],
+                  visitRestriction: 'OPEN',
                 },
               ],
             },
@@ -85,6 +88,7 @@ describe('Views - Date and time of visit', () => {
                   visitRoomName: 'room name',
                   // representing the RESERVED visit being handled in this session
                   sessionConflicts: ['DOUBLE_BOOKED'],
+                  visitRestriction: 'OPEN',
                 },
               ],
             },
@@ -105,6 +109,7 @@ describe('Views - Date and time of visit', () => {
                   endTimestamp: '2022-03-01T10:30:00',
                   availableTables: 0,
                   visitRoomName: 'room name',
+                  visitRestriction: 'OPEN',
                 },
               ],
               afternoon: [],

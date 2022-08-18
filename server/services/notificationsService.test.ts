@@ -1,3 +1,4 @@
+import { VisitSlot } from '../@types/bapv'
 import NotificationsApiClient from '../data/notificationsApiClient'
 import NotificationsService from './notificationsService'
 
@@ -28,7 +29,8 @@ describe('Notifications service', () => {
         endTimestamp: '2022-02-14T11:00:00',
         availableTables: 15,
         visitRoomName: 'room name',
-      },
+        visitRestriction: 'OPEN',
+      } as VisitSlot,
       reference: 'ab-cd-ef-gh',
     }
 

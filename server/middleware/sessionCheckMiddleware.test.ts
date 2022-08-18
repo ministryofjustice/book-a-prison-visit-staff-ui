@@ -33,6 +33,7 @@ const visit: VisitSessionData['visit'] = {
   endTimestamp: '123',
   availableTables: 1,
   visitRoomName: 'visitRoom',
+  visitRestriction: 'OPEN',
 }
 const visitRestriction: VisitSessionData['visitRestriction'] = 'OPEN'
 

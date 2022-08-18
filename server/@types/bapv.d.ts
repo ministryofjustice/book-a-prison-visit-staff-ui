@@ -140,7 +140,7 @@ export type VisitSlot = {
   endTimestamp: string
   availableTables: number
   visitRoomName: string
-  visitRestriction: string
+  visitRestriction: Visit['visitRestriction']
   sessionConflicts?: VisitSession['sessionConflicts']
 }
 
