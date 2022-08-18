@@ -54,16 +54,14 @@ export default class PrisonerProfileService {
     const alerts = inmateDetail.alerts || []
     const activeAlerts: Alert[] = alerts.filter(alert => alert.active)
     const flaggedAlerts: Alert[] = activeAlerts.filter(alert => this.alertCodesToFlag.includes(alert.alertCode))
+
+    const socialContacts = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(offenderNo)
     const upcomingVisits: UpcomingVisitItem[] = await this.getUpcomingVisits(
       offenderNo,
+      socialContacts,
       visitSchedulerApiClient,
-      prisonerContactRegistryApiClient,
     )
-    const pastVisits: PastVisitItem[] = await this.getPastVisits(
-      offenderNo,
-      visitSchedulerApiClient,
-      prisonerContactRegistryApiClient,
-    )
+    const pastVisits: PastVisitItem[] = await this.getPastVisits(offenderNo, socialContacts, visitSchedulerApiClient)
 
     const activeAlertsForDisplay: PrisonerAlertItem[] = activeAlerts.map(alert => {
       return [
@@ -151,15 +149,14 @@ export default class PrisonerProfileService {
 
   private async getUpcomingVisits(
     offenderNo: string,
+    socialContacts: Contact[],
     visitSchedulerApiClient: VisitSchedulerApiClient,
-    prisonerContactRegistryApiClient: PrisonerContactRegistryApiClient,
   ): Promise<UpcomingVisitItem[]> {
     const visits: Visit[] = await visitSchedulerApiClient.getUpcomingVisits(offenderNo)
-    const contacts = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(offenderNo)
     const socialVisits: Visit[] = visits.filter(visit => visit.visitType === 'SOCIAL')
 
     const visitsForDisplay: UpcomingVisitItem[] = socialVisits.map(visit => {
-      const visitContactNames = this.getPrisonerSocialContacts(contacts, visit.visitors)
+      const visitContactNames = this.getPrisonerSocialContacts(socialContacts, visit.visitors)
 
       return [
         {
@@ -196,15 +193,14 @@ export default class PrisonerProfileService {
 
   private async getPastVisits(
     offenderNo: string,
+    socialContacts: Contact[],
     visitSchedulerApiClient: VisitSchedulerApiClient,
-    prisonerContactRegistryApiClient: PrisonerContactRegistryApiClient,
   ): Promise<PastVisitItem[]> {
     const visits: Visit[] = await visitSchedulerApiClient.getPastVisits(offenderNo)
-    const contacts = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(offenderNo)
     const socialVisits: Visit[] = visits.filter(visit => visit.visitType === 'SOCIAL')
 
     const visitsForDisplay: PastVisitItem[] = socialVisits.map(visit => {
-      const visitContactNames = this.getPrisonerSocialContacts(contacts, visit.visitors)
+      const visitContactNames = this.getPrisonerSocialContacts(socialContacts, visit.visitors)
 
       return [
         {
