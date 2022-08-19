@@ -469,7 +469,7 @@ describe('GET /visit/:reference/update', () => {
   })
 })
 
-describe.only('GET /visit/:reference/update/select-visitors', () => {
+describe('GET /visit/:reference/update/select-visitors', () => {
   const visitorList: { visitors: VisitorListItem[] } = { visitors: [] }
   const visitReference = 'ab-cd-ef-gh'
 
@@ -857,7 +857,7 @@ describe.only('GET /visit/:reference/update/select-visitors', () => {
   })
 })
 
-describe('POST /visit/:reference/update/select-visitors', () => {
+describe.only('POST /visit/:reference/update/select-visitors', () => {
   const adultVisitors: { adults: VisitorListItem[] } = { adults: [] }
   const visitReference = 'ab-cd-ef-gh'
 
@@ -951,6 +951,7 @@ describe('POST /visit/:reference/update/select-visitors', () => {
         restrictions: [],
       },
       visitRestriction: 'OPEN',
+      visitReference,
     }
 
     sessionApp = appWithAllRoutes({
