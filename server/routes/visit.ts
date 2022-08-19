@@ -124,8 +124,8 @@ export default function routes(
   const selectVisitors = new SelectVisitors('update', prisonerVisitorsService, prisonerProfileService)
   const visitType = new VisitType('update', auditService)
   const dateAndTime = new DateAndTime('update', visitSessionsService, auditService)
-  const checkYourBooking = new CheckYourBooking('book', visitSessionsService, auditService, notificationsService)
-  const confirmation = new Confirmation('book')
+  const checkYourBooking = new CheckYourBooking('update', visitSessionsService, auditService, notificationsService)
+  const confirmation = new Confirmation('update')
 
   get('/:reference/update', async (req, res) => res.render('pages/visit/update', { reference: getVisitReference(req) }))
 
