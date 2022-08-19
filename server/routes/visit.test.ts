@@ -230,11 +230,12 @@ describe('GET /visit/:reference', () => {
             location: '1-1-C-028, Hewell (HMP)',
           },
           visit: {
-            id: 'ab-cd-ef-gh',
+            id: '',
             startTimestamp: '2022-02-09T10:00:00',
             endTimestamp: '2022-02-09T11:15:00',
             availableTables: 0,
             visitRoomName: 'visit room',
+            visitRestriction: 'OPEN',
           },
           visitRestriction: 'OPEN',
           visitors: [
