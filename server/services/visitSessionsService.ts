@@ -94,6 +94,7 @@ export default class VisitSessionsService {
                 : visitSession.closedVisitCapacity - visitSession.closedVisitBookedCount,
             visitRoomName: visitSession.visitRoomName,
             sessionConflicts: visitSession.sessionConflicts,
+            visitRestriction,
           }
 
           // Maybe this needs doing below, twice since technically this may not be pushed
@@ -190,6 +191,16 @@ export default class VisitSessionsService {
     return visit
   }
 
+  async startAmendVisit({ username, visitReference }: { username: string; visitReference: string }): Promise<Visit> {
+    const token = await this.systemToken(username)
+    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
+
+    const visit = await visitSchedulerApiClient.startAmendVisit(visitReference)
+    logger.info(`Started amend journey for visit ${visit.reference}`)
+
+    return visit
+  }
+
   async cancelVisit({
     username,
     reference,
@@ -273,7 +284,6 @@ export default class VisitSessionsService {
 
     const visit = await visitSchedulerApiClient.getVisit(reference)
     const contacts = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(visit.prisonerId)
-
     const visitorIds = visit.visitors.map(visitor => visitor.nomisPersonId)
 
     const visitors = contacts

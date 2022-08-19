@@ -1042,6 +1042,7 @@ describe('/book-a-visit/select-date-and-time', () => {
               visitRoomName: 'room name',
               // representing a pre-existing visit that is BOOKED
               sessionConflicts: ['DOUBLE_BOOKED'],
+              visitRestriction: 'OPEN',
             },
             {
               id: '2',
@@ -1049,6 +1050,7 @@ describe('/book-a-visit/select-date-and-time', () => {
               endTimestamp: '2022-02-14T12:59:00',
               availableTables: 1,
               visitRoomName: 'room name',
+              visitRestriction: 'OPEN',
             },
           ],
           afternoon: [
@@ -1060,6 +1062,7 @@ describe('/book-a-visit/select-date-and-time', () => {
               visitRoomName: 'room name',
               // representing the RESERVED visit being handled in this session
               sessionConflicts: ['DOUBLE_BOOKED'],
+              visitRestriction: 'OPEN',
             },
           ],
         },
@@ -1079,6 +1082,7 @@ describe('/book-a-visit/select-date-and-time', () => {
               endTimestamp: '2022-02-15T17:00:00',
               availableTables: 12,
               visitRoomName: 'room name',
+              visitRestriction: 'OPEN',
             },
           ],
         },
@@ -1099,6 +1103,7 @@ describe('/book-a-visit/select-date-and-time', () => {
               endTimestamp: '2022-03-01T10:30:00',
               availableTables: 0,
               visitRoomName: 'room name',
+              visitRestriction: 'OPEN',
             },
           ],
           afternoon: [],
@@ -1244,6 +1249,7 @@ describe('/book-a-visit/select-date-and-time', () => {
         endTimestamp: '2022-02-14T13:05:00',
         availableTables: 5,
         visitRoomName: 'room name',
+        visitRestriction: 'OPEN',
       }
 
       return request(sessionApp)
@@ -1319,6 +1325,7 @@ describe('/book-a-visit/select-date-and-time', () => {
             endTimestamp: '2022-02-14T12:59:00',
             availableTables: 1,
             visitRoomName: 'room name',
+            visitRestriction: 'OPEN',
           })
           expect(visitSessionsService.createVisit).toHaveBeenCalledTimes(1)
           expect(auditService.reservedVisit).toHaveBeenCalledTimes(1)
@@ -1336,6 +1343,7 @@ describe('/book-a-visit/select-date-and-time', () => {
         endTimestamp: '2022-02-14T11:00:00',
         availableTables: 15,
         visitRoomName: 'room name',
+        visitRestriction: 'OPEN',
       }
 
       visitSessionData.visitReference = '3b-cd-4f-fg'
@@ -1354,6 +1362,7 @@ describe('/book-a-visit/select-date-and-time', () => {
             visitRoomName: 'room name',
             // representing the RESERVED visit being handled in this session
             sessionConflicts: ['DOUBLE_BOOKED'],
+            visitRestriction: 'OPEN',
           })
           expect(visitSessionsService.createVisit).not.toHaveBeenCalled()
           expect(auditService.reservedVisit).toHaveBeenCalledTimes(1)
@@ -1450,6 +1459,7 @@ describe('GET /book-a-visit/additional-support', () => {
         endTimestamp: '456',
         availableTables: 1,
         visitRoomName: 'room name',
+        visitRestriction: 'OPEN',
       },
       visitors: [
         {
@@ -1625,6 +1635,7 @@ describe('POST /book-a-visit/additional-support', () => {
         endTimestamp: '456',
         availableTables: 1,
         visitRoomName: 'room name',
+        visitRestriction: 'OPEN',
       },
       visitors: [
         {
@@ -1853,6 +1864,7 @@ describe('/book-a-visit/select-main-contact', () => {
         endTimestamp: '456',
         availableTables: 1,
         visitRoomName: 'room name',
+        visitRestriction: 'OPEN',
       },
       visitors: [
         {
@@ -2132,6 +2144,7 @@ describe('/book-a-visit/check-your-booking', () => {
         endTimestamp: '2022-03-12T10:30:00',
         availableTables: 1,
         visitRoomName: 'room name',
+        visitRestriction: 'OPEN',
       },
       visitors: [
         {
@@ -2349,6 +2362,7 @@ describe('GET /book-a-visit/confirmation', () => {
         endTimestamp: '2022-03-12T10:30:00',
         availableTables: 1,
         visitRoomName: 'room name',
+        visitRestriction: 'OPEN',
       },
       visitors: [
         {
@@ -2429,6 +2443,7 @@ describe('GET /book-a-visit/confirmation', () => {
           endTimestamp: '2022-03-12T10:30:00',
           availableTables: 1,
           visitRoomName: 'room name',
+          visitRestriction: 'OPEN',
         },
         visitors: [
           {

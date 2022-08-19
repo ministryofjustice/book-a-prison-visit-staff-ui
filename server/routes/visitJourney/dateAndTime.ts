@@ -3,7 +3,7 @@ import { body, query, ValidationChain, validationResult } from 'express-validato
 import { VisitSlot } from '../../@types/bapv'
 import AuditService from '../../services/auditService'
 import VisitSessionsService from '../../services/visitSessionsService'
-import { getFlashFormValues, getSelectedSlot } from '../visitorUtils'
+import { getFlashFormValues, getSelectedSlot, getSelectedSlotByStartTimestamp } from '../visitorUtils'
 
 export default class DateAndTime {
   constructor(
@@ -24,9 +24,45 @@ export default class DateAndTime {
       dayOfTheWeek,
     })
 
+    let restrictionChangeMessage = ''
+    let matchingSlot = ''
+    let selectedSlot
+
+    if (isUpdate && sessionData.visit?.id === '') {
+      selectedSlot = getSelectedSlotByStartTimestamp(
+        slotsList,
+        sessionData.visit.startTimestamp,
+        sessionData.visitRestriction,
+      )
+
+      if (selectedSlot) {
+        matchingSlot = selectedSlot.id
+      }
+
+      if (sessionData.visitRestriction !== sessionData.previousVisitRestriction) {
+        if (!selectedSlot || selectedSlot.availableTables === 0) {
+          if (sessionData.visitRestriction === 'CLOSED') {
+            restrictionChangeMessage = 'A new visit time must be selected as this is now a closed visit.'
+          } else {
+            restrictionChangeMessage = 'A new visit time must be selected as this is now an open visit.'
+          }
+        } else if (selectedSlot && selectedSlot.availableTables > 0) {
+          // can reserve slot here for same time, different restriction
+          if (sessionData.visitRestriction === 'CLOSED') {
+            restrictionChangeMessage = 'This is now a closed visit. The visit time can stay the same.'
+          } else {
+            restrictionChangeMessage = 'This is now an open visit. The visit time can stay the same.'
+          }
+        }
+      }
+    }
+
     const formValues = getFlashFormValues(req)
     if (!Object.keys(formValues).length && sessionData.visit?.id) {
       formValues['visit-date-and-time'] = sessionData.visit?.id
+    }
+    if (!Object.keys(formValues).length && matchingSlot) {
+      formValues['visit-date-and-time'] = matchingSlot
     }
 
     const slotsPresent = Object.values(slotsList).some(value => value.length)
@@ -46,6 +82,7 @@ export default class DateAndTime {
       formValues,
       slotsPresent,
       reference: sessionData.visitReference,
+      restrictionChangeMessage,
     })
   }
 

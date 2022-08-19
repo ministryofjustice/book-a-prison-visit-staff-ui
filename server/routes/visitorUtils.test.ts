@@ -19,6 +19,7 @@ const slotsList: VisitSlotList = {
             endTimestamp: '2022-02-14T11:00:00',
             availableTables: 15,
             visitRoomName: 'room name',
+            visitRestriction: 'OPEN',
           },
           {
             id: '2',
@@ -26,6 +27,7 @@ const slotsList: VisitSlotList = {
             endTimestamp: '2022-02-14T12:59:00',
             availableTables: 1,
             visitRoomName: 'room name',
+            visitRestriction: 'OPEN',
           },
         ],
         afternoon: [
@@ -35,6 +37,7 @@ const slotsList: VisitSlotList = {
             endTimestamp: '2022-02-14T13:05:00',
             availableTables: 5,
             visitRoomName: 'room name',
+            visitRestriction: 'OPEN',
           },
         ],
       },
@@ -54,6 +57,7 @@ const slotsList: VisitSlotList = {
             endTimestamp: '2022-02-15T17:00:00',
             availableTables: 12,
             visitRoomName: 'room name',
+            visitRestriction: 'OPEN',
           },
         ],
       },
@@ -74,6 +78,7 @@ const slotsList: VisitSlotList = {
             endTimestamp: '2022-03-01T10:30:00',
             availableTables: 0,
             visitRoomName: 'room name',
+            visitRestriction: 'OPEN',
           },
         ],
         afternoon: [],
@@ -90,6 +95,7 @@ describe('getSelectedSlot', () => {
       endTimestamp: '2022-02-15T17:00:00',
       availableTables: 12,
       visitRoomName: 'room name',
+      visitRestriction: 'OPEN',
     })
   })
 
