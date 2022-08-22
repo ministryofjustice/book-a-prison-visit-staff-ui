@@ -1,9 +1,9 @@
-import type { RequestHandler, Request, Router } from 'express'
+import type { RequestHandler, Request, Router, NextFunction } from 'express'
 import { body, validationResult } from 'express-validator'
 import { BadRequest } from 'http-errors'
 import visitCancellationReasons from '../constants/visitCancellationReasons'
 import { Prisoner } from '../data/prisonerOffenderSearchTypes'
-import { OutcomeDto } from '../data/visitSchedulerApiTypes'
+import { OutcomeDto, Visit } from '../data/visitSchedulerApiTypes'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import PrisonerSearchService from '../services/prisonerSearchService'
 import VisitSessionsService from '../services/visitSessionsService'
@@ -13,7 +13,7 @@ import { clearSession, getFlashFormValues } from './visitorUtils'
 import NotificationsService from '../services/notificationsService'
 import config from '../config'
 import logger from '../../logger'
-import { VisitSessionData } from '../@types/bapv'
+import { VisitorListItem, VisitSessionData } from '../@types/bapv'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
 import SelectVisitors from './visitJourney/selectVisitors'
 import PrisonerProfileService from '../services/prisonerProfileService'
@@ -56,10 +56,15 @@ export default function routes(
     const fromVisitSearch = (req.query?.from as string) === 'visit-search'
     const fromVisitSearchQuery = req.query?.query as string
 
-    const { visit, visitors, additionalSupport } = await visitSessionsService.getFullVisitDetails({
-      reference,
-      username: res.locals.user?.username,
-    })
+    const {
+      visit,
+      visitors,
+      additionalSupport,
+    }: { visit: Visit; visitors: VisitorListItem[]; additionalSupport: string[] } =
+      await visitSessionsService.getFullVisitDetails({
+        reference,
+        username: res.locals.user?.username,
+      })
 
     const prisoner: Prisoner = await prisonerSearchService.getPrisonerById(visit.prisonerId, res.locals.user?.username)
     // Temporarily hide any locations other than Hewell pending more work on transfer/release (see VB-907, VB-952)
@@ -127,10 +132,14 @@ export default function routes(
   const checkYourBooking = new CheckYourBooking('update', visitSessionsService, auditService, notificationsService)
   const confirmation = new Confirmation('update')
 
-  get('/:reference/update', async (req, res) => res.render('pages/visit/update', { reference: getVisitReference(req) }))
+  get('/:reference/update', checkVisitReferenceMiddleware, async (req, res) =>
+    res.render('pages/visit/update', { reference: getVisitReference(req) }),
+  )
 
-  get('/:reference/update/select-visitors', (req, res) => selectVisitors.get(req, res))
-  post('/:reference/update/select-visitors', selectVisitors.validate(), (req, res) => selectVisitors.post(req, res))
+  get('/:reference/update/select-visitors', checkVisitReferenceMiddleware, (req, res) => selectVisitors.get(req, res))
+  post('/:reference/update/select-visitors', checkVisitReferenceMiddleware, selectVisitors.validate(), (req, res) =>
+    selectVisitors.post(req, res),
+  )
 
   get('/:reference/update/visit-type', (req, res) => visitType.get(req, res))
   post('/:reference/update/visit-type', visitType.validate(), (req, res) => visitType.post(req, res))
@@ -222,4 +231,14 @@ function getVisitReference(req: Request): string {
     throw new BadRequest()
   }
   return reference
+}
+
+const checkVisitReferenceMiddleware = (req: Request, res: Response, next: NextFunction): void => {
+  const { reference } = req.params
+
+  if (!isValidVisitReference(reference)) {
+    throw new BadRequest()
+  }
+
+  next()
 }

@@ -8,7 +8,6 @@ export default class VisitType {
   async get(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'
     const sessionData = req.session[isUpdate ? 'amendVisitSessionData' : 'visitSessionData']
-
     const closedRestrictions = sessionData.prisoner.restrictions.filter(
       restriction => restriction.restrictionType === 'CLOSED',
     )
@@ -17,6 +16,7 @@ export default class VisitType {
       errors: req.flash('errors'),
       restrictions: closedRestrictions,
       visitors: sessionData.visitors,
+      reference: sessionData.visitReference,
     })
   }
 
