@@ -1,0 +1,109 @@
+{% extends "layout.njk" %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% set pageHeaderTitle = "Is additional support needed for any of the visitors?" %}
+{% set pageTitle %}
+{% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
+{% endset %}
+{% set backLinkHref = "/book-a-visit/select-date-and-time" %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        {% include "partials/errorSummary.njk" %}
+        <form action="/visit/{{ reference }}/update/additional-support" method="POST" novalidate>
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+            {% set otherSupportHtml %}
+              {{ govukInput({
+                id: "otherSupportDetails",
+                name: "otherSupportDetails",
+                type: "text",
+                classes: "govuk-!-width-one-third",
+                label: {
+                  text: "Provide details"
+                },
+                value: formValues.otherSupportDetails,
+                autocomplete: "off",
+                errorMessage: errors | findError('otherSupportDetails')
+              }) }}
+            {% endset -%}
+
+            {% set additionalSupport = additionalSupport or [] %}
+            {% set additionalSupportCheckboxes = [] %}
+            {% for option in availableSupportTypes %}
+              {% set additionalSupportCheckboxes = (additionalSupportCheckboxes.push(
+                {
+                  value: option.type,
+                  text: option.description,
+                  attributes: {
+                    'data-test': option.type
+                  },
+                  checked: formValues.additionalSupport and option.type in formValues.additionalSupport,
+                  conditional: { html: otherSupportHtml } if option.type == "OTHER"
+                }
+              ), additionalSupportCheckboxes) %}
+            {% endfor %}
+            {% set supportOptionsHtml %}
+              {{ govukCheckboxes({
+                idPrefix: "additionalSupport",
+                name: "additionalSupport",
+                fieldset: {
+                  legend: {
+                    text: "Select all that apply.",
+                    classes: ""
+                  }
+                },
+                items: additionalSupportCheckboxes,
+                errorMessage: errors | findError('additionalSupport')
+              }) }}
+            {% endset -%}
+
+            {{ govukRadios({
+              idPrefix: "additionalSupportRequired",
+              name: "additionalSupportRequired",
+              fieldset: {
+                legend: {
+                  text: pageHeaderTitle,
+                  isPageHeading: true,
+                  classes: "govuk-fieldset__legend--l"
+                }
+              },
+              hint: {
+                text: "For example, a wheelchair ramp, an induction loop or an interpreter."
+              },
+              items: [
+                {
+                  value: "yes",
+                  text: "Yes",
+                  attributes: {
+                    'data-test': 'support-required-yes'
+                  },
+                  checked: formValues.additionalSupportRequired == "yes",
+                  conditional: {
+                    html: supportOptionsHtml
+                  }
+                },
+                {
+                  value: "no",
+                  text: "No",
+                  attributes: {
+                    'data-test': 'support-required-no'
+                  },
+                  checked: formValues.additionalSupportRequired == "no"
+                }
+              ],
+              errorMessage: errors | findError('additionalSupportRequired')
+            }) }}
+            
+            {{ govukButton({
+              text: "Continue",
+              preventDoubleClick: true
+            }) }} 
+        </form>
+    </div>
+  </div>
+{% endblock %}

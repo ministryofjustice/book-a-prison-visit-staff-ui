@@ -6,7 +6,6 @@ import PrisonerVisitorsService from '../services/prisonerVisitorsService'
 import PrisonerProfileService from '../services/prisonerProfileService'
 import VisitSessionsService from '../services/visitSessionsService'
 import { getFlashFormValues } from './visitorUtils'
-import { SupportType, VisitorSupport } from '../data/visitSchedulerApiTypes'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import NotificationsService from '../services/notificationsService'
 import AuditService from '../services/auditService'
@@ -15,6 +14,7 @@ import VisitType from './visitJourney/visitType'
 import DateAndTime from './visitJourney/dateAndTime'
 import CheckYourBooking from './visitJourney/checkYourBooking'
 import Confirmation from './visitJourney/confirmation'
+import AdditionalSupport from './visitJourney/additionalSupport'
 
 export default function routes(
   router: Router,
@@ -38,6 +38,7 @@ export default function routes(
 
   const selectVisitors = new SelectVisitors('book', prisonerVisitorsService, prisonerProfileService)
   const visitType = new VisitType('book', auditService)
+  const additionalSupport = new AdditionalSupport('book', visitSessionsService)
   const dateAndTime = new DateAndTime('book', visitSessionsService, auditService)
   const checkYourBooking = new CheckYourBooking('book', visitSessionsService, auditService, notificationsService)
   const confirmation = new Confirmation('book')
@@ -59,83 +60,9 @@ export default function routes(
     dateAndTime.post(req, res),
   )
 
-  get('/additional-support', sessionCheckMiddleware({ stage: 3 }), async (req, res) => {
-    const { visitSessionData } = req.session
-    const formValues = getFlashFormValues(req)
-
-    if (!req.session.availableSupportTypes) {
-      req.session.availableSupportTypes = await visitSessionsService.getAvailableSupportOptions(
-        res.locals.user?.username,
-      )
-    }
-    const { availableSupportTypes } = req.session
-
-    if (!Object.keys(formValues).length && visitSessionData.visitorSupport) {
-      formValues.additionalSupportRequired = visitSessionData.visitorSupport.length ? 'yes' : 'no'
-      formValues.additionalSupport = visitSessionData.visitorSupport.map(support => support.type)
-      formValues.otherSupportDetails = visitSessionData.visitorSupport.find(support => support.type === 'OTHER')?.text
-    }
-
-    res.render('pages/bookAVisit/additionalSupport', {
-      errors: req.flash('errors'),
-      availableSupportTypes,
-      formValues,
-    })
-  })
-
-  post(
-    '/additional-support',
-    sessionCheckMiddleware({ stage: 3 }),
-    body('additionalSupportRequired').custom((value: string) => {
-      if (!/^yes|no$/.test(value)) {
-        throw new Error('No answer selected')
-      }
-
-      return true
-    }),
-    body('additionalSupport')
-      .toArray()
-      .custom((value: string[], { req }) => {
-        if (req.body.additionalSupportRequired === 'yes') {
-          const validSupportRequest = value.reduce((valid, supportReq) => {
-            return valid
-              ? req.session.availableSupportTypes.find((option: SupportType) => option.type === supportReq)
-              : false
-          }, true)
-          if (!value.length || !validSupportRequest) throw new Error('No request selected')
-        }
-
-        return true
-      }),
-    body('otherSupportDetails')
-      .trim()
-      .custom((value: string, { req }) => {
-        if (<string[]>req.body.additionalSupport.includes('OTHER') && (value ?? '').length === 0) {
-          throw new Error('Enter details of the request')
-        }
-
-        return true
-      }),
-    async (req, res) => {
-      const { visitSessionData } = req.session
-      const errors = validationResult(req)
-
-      if (!errors.isEmpty()) {
-        req.flash('errors', errors.array() as [])
-        req.flash('formValues', req.body)
-        return res.redirect(req.originalUrl)
-      }
-
-      visitSessionData.visitorSupport = req.body.additionalSupport.map((support: string): VisitorSupport => {
-        const supportItem: VisitorSupport = { type: support }
-        if (support === 'OTHER') {
-          supportItem.text = req.body.otherSupportDetails
-        }
-        return supportItem
-      })
-
-      return res.redirect('/book-a-visit/select-main-contact')
-    },
+  get('/additional-support', sessionCheckMiddleware({ stage: 3 }), (req, res) => additionalSupport.get(req, res))
+  post('/additional-support', sessionCheckMiddleware({ stage: 3 }), ...additionalSupport.validate(), (req, res) =>
+    additionalSupport.post(req, res),
   )
 
   get('/select-main-contact', sessionCheckMiddleware({ stage: 4 }), async (req, res) => {

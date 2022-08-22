@@ -20,6 +20,7 @@ import PrisonerProfileService from '../services/prisonerProfileService'
 import VisitType from './visitJourney/visitType'
 import { properCaseFullName } from '../utils/utils'
 import DateAndTime from './visitJourney/dateAndTime'
+import AdditionalSupport from './visitJourney/additionalSupport'
 import CheckYourBooking from './visitJourney/checkYourBooking'
 import Confirmation from './visitJourney/confirmation'
 
@@ -129,6 +130,8 @@ export default function routes(
   const selectVisitors = new SelectVisitors('update', prisonerVisitorsService, prisonerProfileService)
   const visitType = new VisitType('update', auditService)
   const dateAndTime = new DateAndTime('update', visitSessionsService, auditService)
+  const additionalSupport = new AdditionalSupport('update', visitSessionsService)
+
   const checkYourBooking = new CheckYourBooking('update', visitSessionsService, auditService, notificationsService)
   const confirmation = new Confirmation('update')
 
@@ -147,8 +150,12 @@ export default function routes(
   get('/:reference/update/select-date-and-time', ...dateAndTime.validateGet(), (req, res) => dateAndTime.get(req, res))
   post('/:reference/update/select-date-and-time', dateAndTime.validate(), (req, res) => dateAndTime.post(req, res))
 
-  get('/:reference/update/check-your-booking', (req, res) => checkYourBooking.get(req, res))
+  get('/:reference/update/additional-support', (req, res) => additionalSupport.get(req, res))
+  post('/:reference/update/additional-support', ...additionalSupport.validate(), (req, res) =>
+    additionalSupport.post(req, res),
+  )
 
+  get('/:reference/update/check-your-booking', (req, res) => checkYourBooking.get(req, res))
   post('/:reference/update/check-your-booking', (req, res) => checkYourBooking.post(req, res))
 
   get('/:reference/update/confirmation', (req, res) => confirmation.get(req, res))
