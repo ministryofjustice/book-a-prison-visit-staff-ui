@@ -857,7 +857,7 @@ describe('GET /visit/:reference/update/select-visitors', () => {
   })
 })
 
-describe.only('POST /visit/:reference/update/select-visitors', () => {
+describe('POST /visit/:reference/update/select-visitors', () => {
   const adultVisitors: { adults: VisitorListItem[] } = { adults: [] }
   const visitReference = 'ab-cd-ef-gh'
 
@@ -1294,555 +1294,560 @@ describe.only('POST /visit/:reference/update/select-visitors', () => {
   })
 })
 
-// describe(`/visit/${visitReference}/update/visit-type', () => {
-//   beforeEach(() => {
-//     amendVisitSessionData = {
-//       prisoner: {
-//         name: 'prisoner name',
-//         offenderNo: 'A1234BC',
-//         dateOfBirth: '25 May 1988',
-//         location: 'location place',
-//         restrictions: [
-//           {
-//             restrictionId: 12345,
-//             restrictionType: 'CLOSED',
-//             restrictionTypeDescription: 'Closed',
-//             startDate: '2022-05-16',
-//             comment: 'some comment text',
-//             active: true,
-//           },
-//         ],
-//       },
-//       visitRestriction: 'OPEN',
-//       visitors: [
-//         {
-//           address: '1st listed address',
-//           adult: true,
-//           dateOfBirth: '1986-07-28',
-//           name: 'Bob Smith',
-//           personId: 4322,
-//           relationshipDescription: 'Brother',
-//           restrictions: [],
-//           banned: false,
-//         },
-//       ],
-//     }
+describe('/visit/:reference/update/visit-type', () => {
+  const visitReference = 'ab-cd-ef-gh'
 
-//     sessionApp = appWithAllRoutes({
-//       auditServiceOverride: auditService,
-//       systemTokenOverride: systemToken,
-//       sessionData: {
-//         amendVisitSessionData,
-//       } as SessionData,
-//     })
-//   })
+  beforeEach(() => {
+    amendVisitSessionData = {
+      prisoner: {
+        name: 'prisoner name',
+        offenderNo: 'A1234BC',
+        dateOfBirth: '25 May 1988',
+        location: 'location place',
+        restrictions: [
+          {
+            restrictionId: 12345,
+            restrictionType: 'CLOSED',
+            restrictionTypeDescription: 'Closed',
+            startDate: '2022-05-16',
+            comment: 'some comment text',
+            active: true,
+          },
+        ],
+      },
+      visitRestriction: 'OPEN',
+      visitors: [
+        {
+          address: '1st listed address',
+          adult: true,
+          dateOfBirth: '1986-07-28',
+          name: 'Bob Smith',
+          personId: 4322,
+          relationshipDescription: 'Brother',
+          restrictions: [],
+          banned: false,
+        },
+      ],
+      visitReference,
+    }
 
-//   describe('GET /visit/:reference/update/visit-type', () => {
-//     it('should render the open/closed visit type page with prisoner restrictions and visitor list', () => {
-//       return request(sessionApp)
-//         .get(`/visit/${visitReference}/update/visit-type')
-//         .expect(200)
-//         .expect('Content-Type', /html/)
-//         .expect(res => {
-//           const $ = cheerio.load(res.text)
-//           expect($('h1').text().trim()).toBe("Check the prisoner's closed visit restrictions")
-//           expect($('[data-test="restriction-type-1"]').text().trim()).toBe('Closed')
-//           expect($('[data-test="restriction-comment-1"]').text().trim()).toBe('some comment text')
-//           expect($('[data-test="restriction-start-1"]').text().trim()).toBe('16 May 2022')
-//           expect($('[data-test="restriction-end-1"]').text().trim()).toBe('Not entered')
-//           expect($('.test-visitor-key-1').text().trim()).toBe('Visitor 1')
-//           expect($('.test-visitor-value-1').text().trim()).toBe('Bob Smith (brother of the prisoner)')
-//           expect($('[data-test="visit-type-open"]').prop('checked')).toBe(false)
-//           expect($('[data-test="visit-type-closed"]').prop('checked')).toBe(false)
-//         })
-//     })
+    sessionApp = appWithAllRoutes({
+      auditServiceOverride: auditService,
+      systemTokenOverride: systemToken,
+      sessionData: {
+        amendVisitSessionData,
+      } as SessionData,
+    })
+  })
 
-//     it('should render the open/closed visit type page with form validation errors', () => {
-//       flashData.errors = [
-//         {
-//           msg: 'No visit type selected',
-//           param: 'visitType',
-//           location: 'body',
-//         },
-//       ]
+  describe('GET /visit/:reference/update/visit-type', () => {
+    it('should render the open/closed visit type page with prisoner restrictions and visitor list', () => {
+      return request(sessionApp)
+        .get(`/visit/${visitReference}/update/visit-type`)
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text().trim()).toBe("Check the prisoner's closed visit restrictions")
+          expect($('[data-test="restriction-type-1"]').text().trim()).toBe('Closed')
+          expect($('[data-test="restriction-comment-1"]').text().trim()).toBe('some comment text')
+          expect($('[data-test="restriction-start-1"]').text().trim()).toBe('16 May 2022')
+          expect($('[data-test="restriction-end-1"]').text().trim()).toBe('Not entered')
+          expect($('.test-visitor-key-1').text().trim()).toBe('Visitor 1')
+          expect($('.test-visitor-value-1').text().trim()).toBe('Bob Smith (brother of the prisoner)')
+          expect($('[data-test="visit-type-open"]').prop('checked')).toBe(false)
+          expect($('[data-test="visit-type-closed"]').prop('checked')).toBe(false)
+        })
+    })
 
-//       return request(sessionApp)
-//         .get(`/visit/${visitReference}/update/visit-type')
-//         .expect(200)
-//         .expect('Content-Type', /html/)
-//         .expect(res => {
-//           const $ = cheerio.load(res.text)
-//           expect($('h1').text().trim()).toBe("Check the prisoner's closed visit restrictions")
-//           expect($('.govuk-error-summary__body').text()).toContain('No visit type selected')
-//           expect($('#visitType-error').text()).toContain('No visit type selected')
-//           expect($('[data-test="visit-type-open"]').prop('checked')).toBe(false)
-//           expect($('[data-test="visit-type-closed"]').prop('checked')).toBe(false)
-//           expect(flashProvider).toHaveBeenCalledWith('errors')
-//           expect(flashProvider).toHaveBeenCalledTimes(1)
-//         })
-//     })
-//   })
+    it('should render the open/closed visit type page with form validation errors', () => {
+      flashData.errors = [
+        {
+          msg: 'No visit type selected',
+          param: 'visitType',
+          location: 'body',
+        },
+      ]
 
-//   describe('POST /visit/:reference/update/visit-type', () => {
-//     it('should set validation errors in flash and redirect if visit type not selected', () => {
-//       return request(sessionApp)
-//         .post(`/visit/${visitReference}/update/visit-type')
-//         .expect(302)
-//         .expect('location', `/visit/${visitReference}/update/visit-type')
-//         .expect(() => {
-//           expect(flashProvider).toHaveBeenCalledWith('errors', [
-//             { location: 'body', msg: 'No visit type selected', param: 'visitType', value: undefined },
-//           ])
-//         })
-//     })
+      return request(sessionApp)
+        .get(`/visit/${visitReference}/update/visit-type`)
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text().trim()).toBe("Check the prisoner's closed visit restrictions")
+          expect($('.govuk-error-summary__body').text()).toContain('No visit type selected')
+          expect($('#visitType-error').text()).toContain('No visit type selected')
+          expect($('[data-test="visit-type-open"]').prop('checked')).toBe(false)
+          expect($('[data-test="visit-type-closed"]').prop('checked')).toBe(false)
+          expect(flashProvider).toHaveBeenCalledWith('errors')
+          expect(flashProvider).toHaveBeenCalledTimes(1)
+        })
+    })
+  })
 
-//     it('should set visit type to OPEN when selected and redirect to select date/time', () => {
-//       return request(sessionApp)
-//         .post(`/visit/${visitReference}/update/visit-type')
-//         .send('visitType=OPEN')
-//         .expect(302)
-//         .expect('location', `/visit/${visitReference}/update/select-date-and-time')
-//         .expect(() => {
-//           expect(amendVisitSessionData.visitRestriction).toBe('OPEN')
-//           expect(amendVisitSessionData.closedVisitReason).toBe(undefined)
-//           expect(auditService.visitRestrictionSelected).toHaveBeenCalledTimes(1)
-//           expect(auditService.visitRestrictionSelected).toHaveBeenCalledWith(
-//             amendVisitSessionData.prisoner.offenderNo,
-//             'OPEN',
-//             [amendVisitSessionData.visitors[0].personId.toString()],
-//             undefined,
-//             undefined,
-//           )
-//         })
-//     })
+  describe('POST /visit/:reference/update/visit-type', () => {
+    it('should set validation errors in flash and redirect if visit type not selected', () => {
+      return request(sessionApp)
+        .post(`/visit/${visitReference}/update/visit-type`)
+        .expect(302)
+        .expect('location', `/visit/${visitReference}/update/visit-type`)
+        .expect(() => {
+          expect(flashProvider).toHaveBeenCalledWith('errors', [
+            { location: 'body', msg: 'No visit type selected', param: 'visitType', value: undefined },
+          ])
+        })
+    })
 
-//     it('should set visit type to CLOSED when selected and redirect to select date/time', () => {
-//       return request(sessionApp)
-//         .post(`/visit/${visitReference}/update/visit-type')
-//         .send('visitType=CLOSED')
-//         .expect(302)
-//         .expect('location', `/visit/${visitReference}/update/select-date-and-time')
-//         .expect(() => {
-//           expect(amendVisitSessionData.visitRestriction).toBe('CLOSED')
-//           expect(amendVisitSessionData.closedVisitReason).toBe('prisoner')
-//           expect(auditService.visitRestrictionSelected).toHaveBeenCalledTimes(1)
-//           expect(auditService.visitRestrictionSelected).toHaveBeenCalledWith(
-//             amendVisitSessionData.prisoner.offenderNo,
-//             'CLOSED',
-//             [amendVisitSessionData.visitors[0].personId.toString()],
-//             undefined,
-//             undefined,
-//           )
-//         })
-//     })
-//   })
-// })
+    it('should set visit type to OPEN when selected and redirect to select date/time', () => {
+      return request(sessionApp)
+        .post(`/visit/${visitReference}/update/visit-type`)
+        .send('visitType=OPEN')
+        .expect(302)
+        .expect('location', `/visit/${visitReference}/update/select-date-and-time`)
+        .expect(() => {
+          expect(amendVisitSessionData.visitRestriction).toBe('OPEN')
+          expect(amendVisitSessionData.closedVisitReason).toBe(undefined)
+          expect(auditService.visitRestrictionSelected).toHaveBeenCalledTimes(1)
+          expect(auditService.visitRestrictionSelected).toHaveBeenCalledWith(
+            amendVisitSessionData.prisoner.offenderNo,
+            'OPEN',
+            [amendVisitSessionData.visitors[0].personId.toString()],
+            undefined,
+            undefined,
+          )
+        })
+    })
 
-// describe(`/visit/${visitReference}/update/select-date-and-time', () => {
-//   const slotsList: VisitSlotList = {
-//     'February 2022': [
-//       {
-//         date: 'Monday 14 February',
-//         prisonerEvents: {
-//           morning: [],
-//           afternoon: [],
-//         },
-//         slots: {
-//           morning: [
-//             {
-//               id: '1',
-//               startTimestamp: '2022-02-14T10:00:00',
-//               endTimestamp: '2022-02-14T11:00:00',
-//               availableTables: 15,
-//               visitRoomName: 'room name',
-//               // representing a pre-existing visit that is BOOKED
-//               sessionConflicts: ['DOUBLE_BOOKED'],
-//               visitRestriction: 'OPEN',
-//             },
-//             {
-//               id: '2',
-//               startTimestamp: '2022-02-14T11:59:00',
-//               endTimestamp: '2022-02-14T12:59:00',
-//               availableTables: 1,
-//               visitRoomName: 'room name',
-//               visitRestriction: 'OPEN',
-//             },
-//           ],
-//           afternoon: [
-//             {
-//               id: '3',
-//               startTimestamp: '2022-02-14T12:00:00',
-//               endTimestamp: '2022-02-14T13:05:00',
-//               availableTables: 5,
-//               visitRoomName: 'room name',
-//               // representing the RESERVED visit being handled in this session
-//               sessionConflicts: ['DOUBLE_BOOKED'],
-//               visitRestriction: 'OPEN',
-//             },
-//           ],
-//         },
-//       },
-//       {
-//         date: 'Tuesday 15 February',
-//         prisonerEvents: {
-//           morning: [],
-//           afternoon: [],
-//         },
-//         slots: {
-//           morning: [],
-//           afternoon: [
-//             {
-//               id: '4',
-//               startTimestamp: '2022-02-15T16:00:00',
-//               endTimestamp: '2022-02-15T17:00:00',
-//               availableTables: 12,
-//               visitRoomName: 'room name',
-//               visitRestriction: 'OPEN',
-//             },
-//           ],
-//         },
-//       },
-//     ],
-//     'March 2022': [
-//       {
-//         date: 'Tuesday 1 March',
-//         prisonerEvents: {
-//           morning: [],
-//           afternoon: [],
-//         },
-//         slots: {
-//           morning: [
-//             {
-//               id: '5',
-//               startTimestamp: '2022-03-01T09:30:00',
-//               endTimestamp: '2022-03-01T10:30:00',
-//               availableTables: 0,
-//               visitRoomName: 'room name',
-//               visitRestriction: 'OPEN',
-//             },
-//           ],
-//           afternoon: [],
-//         },
-//       },
-//     ],
-//   }
+    it('should set visit type to CLOSED when selected and redirect to select date/time', () => {
+      return request(sessionApp)
+        .post(`/visit/${visitReference}/update/visit-type`)
+        .send('visitType=CLOSED')
+        .expect(302)
+        .expect('location', `/visit/${visitReference}/update/select-date-and-time`)
+        .expect(() => {
+          expect(amendVisitSessionData.visitRestriction).toBe('CLOSED')
+          expect(amendVisitSessionData.closedVisitReason).toBe('prisoner')
+          expect(auditService.visitRestrictionSelected).toHaveBeenCalledTimes(1)
+          expect(auditService.visitRestrictionSelected).toHaveBeenCalledWith(
+            amendVisitSessionData.prisoner.offenderNo,
+            'CLOSED',
+            [amendVisitSessionData.visitors[0].personId.toString()],
+            undefined,
+            undefined,
+          )
+        })
+    })
+  })
+})
 
-//   beforeEach(() => {
-//     amendVisitSessionData = {
-//       prisoner: {
-//         name: 'John Smith',
-//         offenderNo: 'A1234BC',
-//         dateOfBirth: '25 May 1988',
-//         location: 'location place',
-//       },
-//       visitRestriction: 'OPEN',
-//       visitors: [
-//         {
-//           personId: 4323,
-//           name: 'Ted Smith',
-//           dateOfBirth: '1968-07-28',
-//           adult: true,
-//           relationshipDescription: 'Father',
-//           address: '1st listed address',
-//           restrictions: [],
-//           banned: false,
-//         },
-//       ],
-//     }
-//   })
+describe('/visit/:reference/update/select-date-and-time', () => {
+  const visitReference = 'ab-cd-ef-gh'
+  const slotsList: VisitSlotList = {
+    'February 2022': [
+      {
+        date: 'Monday 14 February',
+        prisonerEvents: {
+          morning: [],
+          afternoon: [],
+        },
+        slots: {
+          morning: [
+            {
+              id: '1',
+              startTimestamp: '2022-02-14T10:00:00',
+              endTimestamp: '2022-02-14T11:00:00',
+              availableTables: 15,
+              visitRoomName: 'room name',
+              // representing a pre-existing visit that is BOOKED
+              sessionConflicts: ['DOUBLE_BOOKED'],
+              visitRestriction: 'OPEN',
+            },
+            {
+              id: '2',
+              startTimestamp: '2022-02-14T11:59:00',
+              endTimestamp: '2022-02-14T12:59:00',
+              availableTables: 1,
+              visitRoomName: 'room name',
+              visitRestriction: 'OPEN',
+            },
+          ],
+          afternoon: [
+            {
+              id: '3',
+              startTimestamp: '2022-02-14T12:00:00',
+              endTimestamp: '2022-02-14T13:05:00',
+              availableTables: 5,
+              visitRoomName: 'room name',
+              // representing the RESERVED visit being handled in this session
+              sessionConflicts: ['DOUBLE_BOOKED'],
+              visitRestriction: 'OPEN',
+            },
+          ],
+        },
+      },
+      {
+        date: 'Tuesday 15 February',
+        prisonerEvents: {
+          morning: [],
+          afternoon: [],
+        },
+        slots: {
+          morning: [],
+          afternoon: [
+            {
+              id: '4',
+              startTimestamp: '2022-02-15T16:00:00',
+              endTimestamp: '2022-02-15T17:00:00',
+              availableTables: 12,
+              visitRoomName: 'room name',
+              visitRestriction: 'OPEN',
+            },
+          ],
+        },
+      },
+    ],
+    'March 2022': [
+      {
+        date: 'Tuesday 1 March',
+        prisonerEvents: {
+          morning: [],
+          afternoon: [],
+        },
+        slots: {
+          morning: [
+            {
+              id: '5',
+              startTimestamp: '2022-03-01T09:30:00',
+              endTimestamp: '2022-03-01T10:30:00',
+              availableTables: 0,
+              visitRoomName: 'room name',
+              visitRestriction: 'OPEN',
+            },
+          ],
+          afternoon: [],
+        },
+      },
+    ],
+  }
 
-//   describe('GET /visit/:reference/update/select-date-and-time', () => {
-//     beforeEach(() => {
-//       visitSessionsService.getVisitSessions.mockResolvedValue(slotsList)
+  beforeEach(() => {
+    amendVisitSessionData = {
+      prisoner: {
+        name: 'John Smith',
+        offenderNo: 'A1234BC',
+        dateOfBirth: '25 May 1988',
+        location: 'location place',
+      },
+      visitRestriction: 'OPEN',
+      visitors: [
+        {
+          personId: 4323,
+          name: 'Ted Smith',
+          dateOfBirth: '1968-07-28',
+          adult: true,
+          relationshipDescription: 'Father',
+          address: '1st listed address',
+          restrictions: [],
+          banned: false,
+        },
+      ],
+      visitReference,
+    }
+  })
 
-//       sessionApp = appWithAllRoutes({
-//         visitSessionsServiceOverride: visitSessionsService,
-//         systemTokenOverride: systemToken,
-//         sessionData: {
-//           amendVisitSessionData,
-//         } as SessionData,
-//       })
-//     })
+  describe('GET /visit/:reference/update/select-date-and-time', () => {
+    beforeEach(() => {
+      visitSessionsService.getVisitSessions.mockResolvedValue(slotsList)
 
-//     it('should render the available sessions list with none selected', () => {
-//       return request(sessionApp)
-//         .get(`/visit/${visitReference}/update/select-date-and-time')
-//         .expect(200)
-//         .expect('Content-Type', /html/)
-//         .expect(res => {
-//           const $ = cheerio.load(res.text)
-//           expect($('h1').text().trim()).toBe('Select date and time of visit')
-//           expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
-//           expect($('[data-test="visit-restriction"]').text()).toBe('Open')
-//           expect($('[data-test="closed-visit-reason"]').length).toBe(0)
-//           expect($('input[name="visit-date-and-time"]').length).toBe(5)
-//           expect($('input[name="visit-date-and-time"]:checked').length).toBe(0)
-//           expect($('.govuk-accordion__section--expanded').length).toBe(0)
+      sessionApp = appWithAllRoutes({
+        visitSessionsServiceOverride: visitSessionsService,
+        systemTokenOverride: systemToken,
+        sessionData: {
+          amendVisitSessionData,
+        } as SessionData,
+      })
+    })
 
-//           expect($('label[for="1"]').text()).toContain('Prisoner has a visit')
-//           expect($('#1').attr('disabled')).toBe('disabled')
+    it('should render the available sessions list with none selected', () => {
+      return request(sessionApp)
+        .get(`/visit/${visitReference}/update/select-date-and-time`)
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text().trim()).toBe('Select date and time of visit')
+          expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
+          expect($('[data-test="visit-restriction"]').text()).toBe('Open')
+          expect($('[data-test="closed-visit-reason"]').length).toBe(0)
+          expect($('input[name="visit-date-and-time"]').length).toBe(5)
+          expect($('input[name="visit-date-and-time"]:checked').length).toBe(0)
+          expect($('.govuk-accordion__section--expanded').length).toBe(0)
 
-//           expect($('[data-test="submit"]').text().trim()).toBe('Continue')
-//         })
-//     })
+          expect($('label[for="1"]').text()).toContain('Prisoner has a visit')
+          expect($('#1').attr('disabled')).toBe('disabled')
 
-//     it('should render the available sessions list with closed visit reason (visitor)', () => {
-//       amendVisitSessionData.visitRestriction = 'CLOSED'
-//       amendVisitSessionData.closedVisitReason = 'visitor'
+          expect($('[data-test="submit"]').text().trim()).toBe('Continue')
+        })
+    })
 
-//       return request(sessionApp)
-//         .get(`/visit/${visitReference}/update/select-date-and-time')
-//         .expect(200)
-//         .expect('Content-Type', /html/)
-//         .expect(res => {
-//           const $ = cheerio.load(res.text)
-//           expect($('h1').text().trim()).toBe('Select date and time of visit')
-//           expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
-//           expect($('[data-test="visit-restriction"]').text()).toBe('Closed')
-//           expect($('[data-test="closed-visit-reason"]').text()).toContain(
-//             'Closed visit as a visitor has a closed visit restriction.',
-//           )
-//         })
-//     })
+    it('should render the available sessions list with closed visit reason (visitor)', () => {
+      amendVisitSessionData.visitRestriction = 'CLOSED'
+      amendVisitSessionData.closedVisitReason = 'visitor'
 
-//     it('should render the available sessions list with closed visit reason (prisoner)', () => {
-//       amendVisitSessionData.visitRestriction = 'CLOSED'
-//       amendVisitSessionData.closedVisitReason = 'prisoner'
+      return request(sessionApp)
+        .get(`/visit/${visitReference}/update/select-date-and-time`)
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text().trim()).toBe('Select date and time of visit')
+          expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
+          expect($('[data-test="visit-restriction"]').text()).toBe('Closed')
+          expect($('[data-test="closed-visit-reason"]').text()).toContain(
+            'Closed visit as a visitor has a closed visit restriction.',
+          )
+        })
+    })
 
-//       return request(sessionApp)
-//         .get(`/visit/${visitReference}/update/select-date-and-time')
-//         .expect(200)
-//         .expect('Content-Type', /html/)
-//         .expect(res => {
-//           const $ = cheerio.load(res.text)
-//           expect($('h1').text().trim()).toBe('Select date and time of visit')
-//           expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
-//           expect($('[data-test="visit-restriction"]').text()).toBe('Closed')
-//           expect($('[data-test="closed-visit-reason"]').text()).toContain(
-//             'Closed visit as the prisoner has a closed visit restriction.',
-//           )
-//         })
-//     })
+    it('should render the available sessions list with closed visit reason (prisoner)', () => {
+      amendVisitSessionData.visitRestriction = 'CLOSED'
+      amendVisitSessionData.closedVisitReason = 'prisoner'
 
-//     it('should show message if no sessions are available', () => {
-//       visitSessionsService.getVisitSessions.mockResolvedValue({})
+      return request(sessionApp)
+        .get(`/visit/${visitReference}/update/select-date-and-time`)
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text().trim()).toBe('Select date and time of visit')
+          expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
+          expect($('[data-test="visit-restriction"]').text()).toBe('Closed')
+          expect($('[data-test="closed-visit-reason"]').text()).toContain(
+            'Closed visit as the prisoner has a closed visit restriction.',
+          )
+        })
+    })
 
-//       sessionApp = appWithAllRoutes({
-//         visitSessionsServiceOverride: visitSessionsService,
-//         systemTokenOverride: systemToken,
-//         sessionData: {
-//           amendVisitSessionData,
-//         } as SessionData,
-//       })
+    it('should show message if no sessions are available', () => {
+      visitSessionsService.getVisitSessions.mockResolvedValue({})
 
-//       return request(sessionApp)
-//         .get(`/visit/${visitReference}/update/select-date-and-time')
-//         .expect(200)
-//         .expect('Content-Type', /html/)
-//         .expect(res => {
-//           const $ = cheerio.load(res.text)
-//           expect($('h1').text().trim()).toBe('Select date and time of visit')
-//           expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
-//           expect($('#main-content').text()).toContain('There are no available slots for the selected time and day.')
-//           expect($('input[name="visit-date-and-time"]').length).toBe(0)
-//           expect($('[data-test="submit"]').length).toBe(0)
-//           expect($('[data-test="back-to-start"]').length).toBe(1)
-//         })
-//     })
+      sessionApp = appWithAllRoutes({
+        visitSessionsServiceOverride: visitSessionsService,
+        systemTokenOverride: systemToken,
+        sessionData: {
+          amendVisitSessionData,
+        } as SessionData,
+      })
 
-//     it('should render the available sessions list with the slot in the session selected', () => {
-//       amendVisitSessionData.visit = {
-//         id: '3',
-//         startTimestamp: '2022-02-14T12:00:00',
-//         endTimestamp: '2022-02-14T13:05:00',
-//         availableTables: 5,
-//         visitRoomName: 'room name',
-//         visitRestriction: 'OPEN',
-//       }
+      return request(sessionApp)
+        .get(`/visit/${visitReference}/update/select-date-and-time`)
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text().trim()).toBe('Select date and time of visit')
+          expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
+          expect($('#main-content').text()).toContain('There are no available slots for the selected time and day.')
+          expect($('input[name="visit-date-and-time"]').length).toBe(0)
+          expect($('[data-test="submit"]').length).toBe(0)
+          expect($('[data-test="back-to-start"]').length).toBe(1)
+        })
+    })
 
-//       return request(sessionApp)
-//         .get(`/visit/${visitReference}/update/select-date-and-time')
-//         .expect(200)
-//         .expect('Content-Type', /html/)
-//         .expect(res => {
-//           const $ = cheerio.load(res.text)
-//           expect($('h1').text().trim()).toBe('Select date and time of visit')
-//           expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
-//           expect($('input[name="visit-date-and-time"]').length).toBe(5)
-//           expect($('.govuk-accordion__section--expanded').length).toBe(1)
-//           expect($('.govuk-accordion__section--expanded #3').length).toBe(1)
-//           expect($('input#3').prop('checked')).toBe(true)
-//           expect($('[data-test="submit"]').text().trim()).toBe('Continue')
-//         })
-//     })
+    it('should render the available sessions list with the slot in the session selected', () => {
+      amendVisitSessionData.visit = {
+        id: '3',
+        startTimestamp: '2022-02-14T12:00:00',
+        endTimestamp: '2022-02-14T13:05:00',
+        availableTables: 5,
+        visitRoomName: 'room name',
+        visitRestriction: 'OPEN',
+      }
 
-//     it('should render validation errors from flash data for invalid input', () => {
-//       flashData.errors = [{ location: 'body', msg: 'No time slot selected', param: 'visit-date-and-time' }]
+      return request(sessionApp)
+        .get(`/visit/${visitReference}/update/select-date-and-time`)
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text().trim()).toBe('Select date and time of visit')
+          expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
+          expect($('input[name="visit-date-and-time"]').length).toBe(5)
+          expect($('.govuk-accordion__section--expanded').length).toBe(1)
+          expect($('.govuk-accordion__section--expanded #3').length).toBe(1)
+          expect($('input#3').prop('checked')).toBe(true)
+          expect($('[data-test="submit"]').text().trim()).toBe('Continue')
+        })
+    })
 
-//       return request(sessionApp)
-//         .get(`/visit/${visitReference}/update/select-date-and-time')
-//         .expect(200)
-//         .expect('Content-Type', /html/)
-//         .expect(res => {
-//           const $ = cheerio.load(res.text)
-//           expect($('h1').text().trim()).toBe('Select date and time of visit')
-//           expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
-//           expect($('.govuk-error-summary__body').text()).toContain('No time slot selected')
-//           expect(flashProvider).toHaveBeenCalledWith('errors')
-//           expect(flashProvider).toHaveBeenCalledWith('formValues')
-//           expect(flashProvider).toHaveBeenCalledTimes(2)
-//         })
-//     })
-//   })
+    it('should render validation errors from flash data for invalid input', () => {
+      flashData.errors = [{ location: 'body', msg: 'No time slot selected', param: 'visit-date-and-time' }]
 
-//   describe('POST /visit/:reference/update/select-date-and-time', () => {
-//     const createdVisit: Partial<Visit> = { reference: '2a-bc-3d-ef', visitStatus: 'RESERVED' }
+      return request(sessionApp)
+        .get(`/visit/${visitReference}/update/select-date-and-time`)
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text().trim()).toBe('Select date and time of visit')
+          expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
+          expect($('.govuk-error-summary__body').text()).toContain('No time slot selected')
+          expect(flashProvider).toHaveBeenCalledWith('errors')
+          expect(flashProvider).toHaveBeenCalledWith('formValues')
+          expect(flashProvider).toHaveBeenCalledTimes(2)
+        })
+    })
+  })
 
-//     beforeEach(() => {
-//       visitSessionsService.createVisit = jest.fn().mockResolvedValue(createdVisit)
-//       visitSessionsService.updateVisit = jest.fn()
+  describe.skip('POST /visit/:reference/update/select-date-and-time', () => {
+    const createdVisit: Partial<Visit> = { reference: '2a-bc-3d-ef', visitStatus: 'RESERVED' }
 
-//       sessionApp = appWithAllRoutes({
-//         visitSessionsServiceOverride: visitSessionsService,
-//         auditServiceOverride: auditService,
-//         systemTokenOverride: systemToken,
-//         sessionData: {
-//           slotsList,
-//           amendVisitSessionData,
-//         } as SessionData,
-//       })
-//     })
+    beforeEach(() => {
+      visitSessionsService.createVisit = jest.fn().mockResolvedValue(createdVisit)
+      visitSessionsService.updateVisit = jest.fn()
 
-//     it('should save to session, create visit and redirect to additional support page if slot selected', () => {
-//       return request(sessionApp)
-//         .post(`/visit/${visitReference}/update/select-date-and-time')
-//         .send('visit-date-and-time=2')
-//         .expect(302)
-//         .expect('location', `/visit/${visitReference}/update/additional-support')
-//         .expect(() => {
-//           expect(amendVisitSessionData.visit).toEqual({
-//             id: '2',
-//             startTimestamp: '2022-02-14T11:59:00',
-//             endTimestamp: '2022-02-14T12:59:00',
-//             availableTables: 1,
-//             visitRoomName: 'room name',
-//             visitRestriction: 'OPEN',
-//           })
-//           expect(visitSessionsService.createVisit).toHaveBeenCalledTimes(1)
-//           expect(auditService.reservedVisit).toHaveBeenCalledTimes(1)
-//           expect(auditService.reservedVisit).toHaveBeenCalledWith('2a-bc-3d-ef', 'A1234BC', 'HEI', undefined, undefined)
-//           expect(visitSessionsService.updateVisit).not.toHaveBeenCalled()
-//           expect(amendVisitSessionData.visitReference).toEqual('2a-bc-3d-ef')
-//           expect(amendVisitSessionData.visitStatus).toEqual('RESERVED')
-//         })
-//     })
+      sessionApp = appWithAllRoutes({
+        visitSessionsServiceOverride: visitSessionsService,
+        auditServiceOverride: auditService,
+        systemTokenOverride: systemToken,
+        sessionData: {
+          slotsList,
+          amendVisitSessionData,
+        } as SessionData,
+      })
+    })
 
-//     it('should save new choice to session, update visit reservation and redirect to additional support page if existing session data present', () => {
-//       amendVisitSessionData.visit = {
-//         id: '1',
-//         startTimestamp: '2022-02-14T10:00:00',
-//         endTimestamp: '2022-02-14T11:00:00',
-//         availableTables: 15,
-//         visitRoomName: 'room name',
-//         visitRestriction: 'OPEN',
-//       }
+    it('should save to session, create visit and redirect to additional support page if slot selected', () => {
+      return request(sessionApp)
+        .post(`/visit/${visitReference}/update/select-date-and-time`)
+        .send('visit-date-and-time=2')
+        .expect(302)
+        .expect('location', `/visit/${visitReference}/update/additional-support`)
+        .expect(() => {
+          expect(amendVisitSessionData.visit).toEqual({
+            id: '2',
+            startTimestamp: '2022-02-14T11:59:00',
+            endTimestamp: '2022-02-14T12:59:00',
+            availableTables: 1,
+            visitRoomName: 'room name',
+            visitRestriction: 'OPEN',
+          })
+          expect(visitSessionsService.createVisit).toHaveBeenCalledTimes(1)
+          expect(auditService.reservedVisit).toHaveBeenCalledTimes(1)
+          expect(auditService.reservedVisit).toHaveBeenCalledWith('2a-bc-3d-ef', 'A1234BC', 'HEI', undefined, undefined)
+          expect(visitSessionsService.updateVisit).not.toHaveBeenCalled()
+          expect(amendVisitSessionData.visitReference).toEqual('2a-bc-3d-ef')
+          expect(amendVisitSessionData.visitStatus).toEqual('RESERVED')
+        })
+    })
 
-//       amendVisitSessionData.visitReference = '3b-cd-4f-fg'
+    it('should save new choice to session, update visit reservation and redirect to additional support page if existing session data present', () => {
+      amendVisitSessionData.visit = {
+        id: '1',
+        startTimestamp: '2022-02-14T10:00:00',
+        endTimestamp: '2022-02-14T11:00:00',
+        availableTables: 15,
+        visitRoomName: 'room name',
+        visitRestriction: 'OPEN',
+      }
 
-//       return request(sessionApp)
-//         .post(`/visit/${visitReference}/update/select-date-and-time')
-//         .send('visit-date-and-time=3')
-//         .expect(302)
-//         .expect('location', `/visit/${visitReference}/update/additional-support')
-//         .expect(() => {
-//           expect(amendVisitSessionData.visit).toEqual({
-//             id: '3',
-//             startTimestamp: '2022-02-14T12:00:00',
-//             endTimestamp: '2022-02-14T13:05:00',
-//             availableTables: 5,
-//             visitRoomName: 'room name',
-//             // representing the RESERVED visit being handled in this session
-//             sessionConflicts: ['DOUBLE_BOOKED'],
-//             visitRestriction: 'OPEN',
-//           })
-//           expect(visitSessionsService.createVisit).not.toHaveBeenCalled()
-//           expect(auditService.reservedVisit).toHaveBeenCalledTimes(1)
-//           expect(auditService.reservedVisit).toHaveBeenCalledWith('3b-cd-4f-fg', 'A1234BC', 'HEI', undefined, undefined)
-//           expect(visitSessionsService.updateVisit).toHaveBeenCalledTimes(1)
-//           expect(visitSessionsService.updateVisit.mock.calls[0][0].visitData.visitReference).toBe('3b-cd-4f-fg')
-//         })
-//     })
+      amendVisitSessionData.visitReference = '3b-cd-4f-fg'
 
-//     it('should should set validation errors in flash and redirect if no slot selected', () => {
-//       return request(sessionApp)
-//         .post(`/visit/${visitReference}/update/select-date-and-time')
-//         .expect(302)
-//         .expect('location', `/visit/${visitReference}/update/select-date-and-time')
-//         .expect(() => {
-//           expect(flashProvider).toHaveBeenCalledWith('errors', [
-//             { location: 'body', msg: 'No time slot selected', param: 'visit-date-and-time', value: undefined },
-//           ])
-//           expect(flashProvider).toHaveBeenCalledWith('formValues', {})
-//           expect(auditService.reservedVisit).not.toHaveBeenCalled()
-//         })
-//     })
+      return request(sessionApp)
+        .post(`/visit/${visitReference}/update/select-date-and-time`)
+        .send('visit-date-and-time=3')
+        .expect(302)
+        .expect('location', `/visit/${visitReference}/update/additional-support`)
+        .expect(() => {
+          expect(amendVisitSessionData.visit).toEqual({
+            id: '3',
+            startTimestamp: '2022-02-14T12:00:00',
+            endTimestamp: '2022-02-14T13:05:00',
+            availableTables: 5,
+            visitRoomName: 'room name',
+            // representing the RESERVED visit being handled in this session
+            sessionConflicts: ['DOUBLE_BOOKED'],
+            visitRestriction: 'OPEN',
+          })
+          expect(visitSessionsService.createVisit).not.toHaveBeenCalled()
+          expect(auditService.reservedVisit).toHaveBeenCalledTimes(1)
+          expect(auditService.reservedVisit).toHaveBeenCalledWith('3b-cd-4f-fg', 'A1234BC', 'HEI', undefined, undefined)
+          expect(visitSessionsService.updateVisit).toHaveBeenCalledTimes(1)
+          expect(visitSessionsService.updateVisit.mock.calls[0][0].visitData.visitReference).toBe('3b-cd-4f-fg')
+        })
+    })
 
-//     it('should should set validation errors in flash and redirect, preserving filter settings, if no slot selected', () => {
-//       sessionApp = appWithAllRoutes({
-//         auditServiceOverride: auditService,
-//         systemTokenOverride: systemToken,
-//         sessionData: {
-//           timeOfDay: 'afternoon',
-//           dayOfTheWeek: '3',
-//           slotsList,
-//           amendVisitSessionData,
-//         } as SessionData,
-//       })
+    it('should should set validation errors in flash and redirect if no slot selected', () => {
+      return request(sessionApp)
+        .post(`/visit/${visitReference}/update/select-date-and-time`)
+        .expect(302)
+        .expect('location', `/visit/${visitReference}/update/select-date-and-time`)
+        .expect(() => {
+          expect(flashProvider).toHaveBeenCalledWith('errors', [
+            { location: 'body', msg: 'No time slot selected', param: 'visit-date-and-time', value: undefined },
+          ])
+          expect(flashProvider).toHaveBeenCalledWith('formValues', {})
+          expect(auditService.reservedVisit).not.toHaveBeenCalled()
+        })
+    })
 
-//       return request(sessionApp)
-//         .post(`/visit/${visitReference}/update/select-date-and-time')
-//         .expect(302)
-//         .expect('location', `/visit/${visitReference}/update/select-date-and-time?timeOfDay=afternoon&dayOfTheWeek=3')
-//         .expect(() => {
-//           expect(flashProvider).toHaveBeenCalledWith('errors', [
-//             { location: 'body', msg: 'No time slot selected', param: 'visit-date-and-time', value: undefined },
-//           ])
-//           expect(flashProvider).toHaveBeenCalledWith('formValues', {})
-//           expect(auditService.reservedVisit).not.toHaveBeenCalled()
-//         })
-//     })
+    it('should should set validation errors in flash and redirect, preserving filter settings, if no slot selected', () => {
+      sessionApp = appWithAllRoutes({
+        auditServiceOverride: auditService,
+        systemTokenOverride: systemToken,
+        sessionData: {
+          timeOfDay: 'afternoon',
+          dayOfTheWeek: '3',
+          slotsList,
+          amendVisitSessionData,
+        } as SessionData,
+      })
 
-//     it('should should set validation errors in flash and redirect if invalid slot selected', () => {
-//       return request(sessionApp)
-//         .post(`/visit/${visitReference}/update/select-date-and-time')
-//         .send('visit-date-and-time=100')
-//         .expect(302)
-//         .expect('location', `/visit/${visitReference}/update/select-date-and-time')
-//         .expect(() => {
-//           expect(flashProvider).toHaveBeenCalledWith('errors', [
-//             { location: 'body', msg: 'No time slot selected', param: 'visit-date-and-time', value: '100' },
-//           ])
-//           expect(flashProvider).toHaveBeenCalledWith('formValues', { 'visit-date-and-time': '100' })
-//           expect(auditService.reservedVisit).not.toHaveBeenCalled()
-//         })
-//     })
+      return request(sessionApp)
+        .post(`/visit/${visitReference}/update/select-date-and-time`)
+        .expect(302)
+        .expect('location', `/visit/${visitReference}/update/select-date-and-time?timeOfDay=afternoon&dayOfTheWeek=3`)
+        .expect(() => {
+          expect(flashProvider).toHaveBeenCalledWith('errors', [
+            { location: 'body', msg: 'No time slot selected', param: 'visit-date-and-time', value: undefined },
+          ])
+          expect(flashProvider).toHaveBeenCalledWith('formValues', {})
+          expect(auditService.reservedVisit).not.toHaveBeenCalled()
+        })
+    })
 
-//     it('should should set validation errors in flash and redirect if fully booked slot selected', () => {
-//       return request(sessionApp)
-//         .post(`/visit/${visitReference}/update/select-date-and-time')
-//         .send('visit-date-and-time=5')
-//         .expect(302)
-//         .expect('location', `/visit/${visitReference}/update/select-date-and-time')
-//         .expect(() => {
-//           expect(flashProvider).toHaveBeenCalledWith('errors', [
-//             { location: 'body', msg: 'No time slot selected', param: 'visit-date-and-time', value: '5' },
-//           ])
-//           expect(flashProvider).toHaveBeenCalledWith('formValues', { 'visit-date-and-time': '5' })
-//           expect(auditService.reservedVisit).not.toHaveBeenCalled()
-//         })
-//     })
-//   })
-// })
+    it('should should set validation errors in flash and redirect if invalid slot selected', () => {
+      return request(sessionApp)
+        .post(`/visit/${visitReference}/update/select-date-and-time`)
+        .send('visit-date-and-time=100')
+        .expect(302)
+        .expect('location', `/visit/${visitReference}/update/select-date-and-time`)
+        .expect(() => {
+          expect(flashProvider).toHaveBeenCalledWith('errors', [
+            { location: 'body', msg: 'No time slot selected', param: 'visit-date-and-time', value: '100' },
+          ])
+          expect(flashProvider).toHaveBeenCalledWith('formValues', { 'visit-date-and-time': '100' })
+          expect(auditService.reservedVisit).not.toHaveBeenCalled()
+        })
+    })
+
+    it('should should set validation errors in flash and redirect if fully booked slot selected', () => {
+      return request(sessionApp)
+        .post(`/visit/${visitReference}/update/select-date-and-time`)
+        .send('visit-date-and-time=5')
+        .expect(302)
+        .expect('location', `/visit/${visitReference}/update/select-date-and-time`)
+        .expect(() => {
+          expect(flashProvider).toHaveBeenCalledWith('errors', [
+            { location: 'body', msg: 'No time slot selected', param: 'visit-date-and-time', value: '5' },
+          ])
+          expect(flashProvider).toHaveBeenCalledWith('formValues', { 'visit-date-and-time': '5' })
+          expect(auditService.reservedVisit).not.toHaveBeenCalled()
+        })
+    })
+  })
+})
 
 describe('GET /visit/:reference/cancel', () => {
   it('should render the cancellation reasons page with all the reasons and none selected', () => {
