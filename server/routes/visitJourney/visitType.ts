@@ -1,16 +1,19 @@
 import type { Request, Response } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
+import { OffenderRestriction } from '../../data/prisonApiTypes'
 import AuditService from '../../services/auditService'
 
 export default class VisitType {
   constructor(private readonly mode: string, private readonly auditService: AuditService) {}
 
+  getClosedRestrictions = (restrictions: OffenderRestriction[]): OffenderRestriction[] => {
+    return restrictions.filter(restriction => restriction.restrictionType === 'CLOSED')
+  }
+
   async get(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'
     const sessionData = req.session[isUpdate ? 'amendVisitSessionData' : 'visitSessionData']
-    const closedRestrictions = sessionData.prisoner.restrictions.filter(
-      restriction => restriction.restrictionType === 'CLOSED',
-    )
+    const closedRestrictions = this.getClosedRestrictions(sessionData.prisoner.restrictions)
 
     res.render(`pages/${isUpdate ? 'visit' : 'bookAVisit'}/visitType`, {
       errors: req.flash('errors'),
