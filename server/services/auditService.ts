@@ -50,6 +50,7 @@ export default class AuditService {
     visitReference: string,
     prisonerId: string,
     prisonId: string,
+    visitorIds: string[],
     username: string,
     operationId: string,
   ) {
@@ -61,6 +62,7 @@ export default class AuditService {
         visitReference,
         prisonerId,
         prisonId,
+        visitorIds,
       },
     })
   }

@@ -1329,7 +1329,14 @@ describe('/book-a-visit/select-date-and-time', () => {
           })
           expect(visitSessionsService.createVisit).toHaveBeenCalledTimes(1)
           expect(auditService.reservedVisit).toHaveBeenCalledTimes(1)
-          expect(auditService.reservedVisit).toHaveBeenCalledWith('2a-bc-3d-ef', 'A1234BC', 'HEI', undefined, undefined)
+          expect(auditService.reservedVisit).toHaveBeenCalledWith(
+            '2a-bc-3d-ef',
+            'A1234BC',
+            'HEI',
+            ['4323'],
+            undefined,
+            undefined,
+          )
           expect(visitSessionsService.updateVisit).not.toHaveBeenCalled()
           expect(visitSessionData.visitReference).toEqual('2a-bc-3d-ef')
           expect(visitSessionData.visitStatus).toEqual('RESERVED')
@@ -1366,7 +1373,14 @@ describe('/book-a-visit/select-date-and-time', () => {
           })
           expect(visitSessionsService.createVisit).not.toHaveBeenCalled()
           expect(auditService.reservedVisit).toHaveBeenCalledTimes(1)
-          expect(auditService.reservedVisit).toHaveBeenCalledWith('3b-cd-4f-fg', 'A1234BC', 'HEI', undefined, undefined)
+          expect(auditService.reservedVisit).toHaveBeenCalledWith(
+            '3b-cd-4f-fg',
+            'A1234BC',
+            'HEI',
+            ['4323'],
+            undefined,
+            undefined,
+          )
           expect(visitSessionsService.updateVisit).toHaveBeenCalledTimes(1)
           expect(visitSessionsService.updateVisit.mock.calls[0][0].visitData.visitReference).toBe('3b-cd-4f-fg')
         })
