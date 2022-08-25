@@ -99,18 +99,52 @@ export interface paths {
   }
   '/prisoner/{id}': {
     /** Requires ROLE_PRISONER_SEARCH or ROLE_VIEW_PRISONER_DATA role */
-    get: operations['findByPrison']
+    get: operations['findByPrisonNumber']
   }
   '/prisoner-search/prison/{prisonId}': {
     /** Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role */
-    get: operations['findByPrison_1']
+    get: operations['findByPrison']
   }
   '/prison/{prisonId}/prisoners': {
     /**
      * This search is optimised for clients that have a simple search term typically containing the prisonser's name
      *       or prisoner number. The user typically is certain the prisoner is within the establishment and knows key information
      *       about the prisoner.
-     *       Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.
+     *
+     *       Requires ROLE_PRISONER_IN_PRISON_SEARCH or ROLE_PRISONER_SEARCH role.
+     *
+     *       Sort fields supported are: firstName, lastName, prisonerNumber, dateOfBirth, cellLocation e.g "sort=firstName,lastName,desc"
+     *
+     *       Examples:
+     *
+     *       "/prisoners-in-prison/BXI?term=John&sort=firstName,lastName,desc&page=2&size=20"
+     *       This will return all people in HMP Brixton whose first or last names begins with JOHN.
+     *       Results will be ordered by firstName, lastName descending.
+     *       Page 3 will be returned with a maximum of 20 results per page.
+     *
+     *       "/prisoners-in-prison/WWI?sort=cellLocation"
+     *       This will return all people in HMP Wandsworth.
+     *       Results will be ordered by cell location ascending.
+     *       Page 1 will be returned with a maximum of 10 results per page.
+     *
+     *       "/prisoners-in-prison/WWI?cellLocationPrefix=WWI-2&term=smith"
+     *       "/prisoners-in-prison/WWI?cellLocationPrefix=2&term=smith"
+     *       This will return all people in HMP Wandsworth block 2 whose name starts with SMITH.
+     *
+     *       "/prisoners-in-prison/WWI?cellLocationPrefix=2-A-3-001"
+     *       This will return all people in HMP Wandsworth cell WWI-2-A-3-001
+     *
+     *       "/prisoners-in-prison/WWI?term=A1234KJ"
+     *       "/prisoners-in-prison/WWI?term=A1234KJ bananas"
+     *       This will return the single prisoner with prisoner number A1234KJ in HMP Wandsworth.
+     *       An empty page will be returned if not found
+     *
+     *       "/prisoners-in-prison/WWI?term=A J&fromDob=1956-01-01&toDob=2000-01-02"
+     *       This will return all people in HMP Wandsworth. Born on or after 1956-01-01 and on or before 2000-01-02,
+     *       whose name begins with A J, e.g Alan Jones born on 1956-01-01.
+     *
+     *       "/prisoners-in-prison/WWI?alerts=TACT&alerts=PEEP"
+     *       This will return all people in HMP Wandsworth. With the alerts TACT or PEEP.
      */
     get: operations['search']
   }
@@ -593,35 +627,35 @@ export interface components {
       supportingPrisonIds?: string[]
     }
     PagePrisoner: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Prisoner'][]
       /** Format: int32 */
       number?: number
-      sort?: components['schemas']['Sort']
+      sort?: components['schemas']['SortObject']
       first?: boolean
-      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
+      last?: boolean
       empty?: boolean
     }
     PageableObject: {
       /** Format: int64 */
       offset?: number
-      sort?: components['schemas']['Sort']
+      sort?: components['schemas']['SortObject']
       /** Format: int32 */
       pageSize?: number
-      paged?: boolean
-      unpaged?: boolean
       /** Format: int32 */
       pageNumber?: number
+      paged?: boolean
+      unpaged?: boolean
     }
-    Sort: {
+    SortObject: {
       empty?: boolean
       sorted?: boolean
       unsorted?: boolean
@@ -672,7 +706,7 @@ export interface components {
        */
       dateOfBirth?: string
       /**
-       * @description Police National Computer (PNC) number
+       * @description Police National Computer (PNC) number (This will match both long and short PNC formats)
        * @example 2018/0123456X
        */
       pncNumber?: string
@@ -739,6 +773,7 @@ export interface components {
        */
       bookingIds: number[]
     }
+    /** @description Pagination options. Will default to the first page if omitted. */
     PaginationRequest: {
       /**
        * Format: int32
@@ -794,21 +829,21 @@ export interface components {
       pagination: components['schemas']['PaginationRequest']
     }
     PrisonerDetailResponse: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Prisoner'][]
       /** Format: int32 */
       number?: number
-      sort?: components['schemas']['Sort']
+      sort?: components['schemas']['SortObject']
       first?: boolean
-      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
+      last?: boolean
       empty?: boolean
     }
     ErrorResponse: {
@@ -924,21 +959,21 @@ export interface components {
       type: 'DEFAULT' | 'ESTABLISHMENT'
     }
     KeywordResponse: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Prisoner'][]
       /** Format: int32 */
       number?: number
-      sort?: components['schemas']['Sort']
+      sort?: components['schemas']['SortObject']
       first?: boolean
-      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
+      last?: boolean
       empty?: boolean
     }
     /** @description Search Criteria for Global Prisoner Search */
@@ -987,11 +1022,6 @@ export interface components {
       /** Format: int32 */
       messagesReturnedCount: number
       messages: components['schemas']['DlqMessage'][]
-    }
-    PrisonersInPrisonRequest: {
-      term?: string
-      alertCodes: string[]
-      pagination: components['schemas']['PaginationRequest']
     }
   }
 }
@@ -1404,7 +1434,7 @@ export interface operations {
     }
   }
   /** Requires ROLE_PRISONER_SEARCH or ROLE_VIEW_PRISONER_DATA role */
-  findByPrison: {
+  findByPrisonNumber: {
     parameters: {
       path: {
         id: string
@@ -1420,7 +1450,7 @@ export interface operations {
     }
   }
   /** Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role */
-  findByPrison_1: {
+  findByPrison: {
     parameters: {
       path: {
         prisonId: string
@@ -1448,7 +1478,41 @@ export interface operations {
    * This search is optimised for clients that have a simple search term typically containing the prisonser's name
    *       or prisoner number. The user typically is certain the prisoner is within the establishment and knows key information
    *       about the prisoner.
-   *       Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.
+   *
+   *       Requires ROLE_PRISONER_IN_PRISON_SEARCH or ROLE_PRISONER_SEARCH role.
+   *
+   *       Sort fields supported are: firstName, lastName, prisonerNumber, dateOfBirth, cellLocation e.g "sort=firstName,lastName,desc"
+   *
+   *       Examples:
+   *
+   *       "/prisoners-in-prison/BXI?term=John&sort=firstName,lastName,desc&page=2&size=20"
+   *       This will return all people in HMP Brixton whose first or last names begins with JOHN.
+   *       Results will be ordered by firstName, lastName descending.
+   *       Page 3 will be returned with a maximum of 20 results per page.
+   *
+   *       "/prisoners-in-prison/WWI?sort=cellLocation"
+   *       This will return all people in HMP Wandsworth.
+   *       Results will be ordered by cell location ascending.
+   *       Page 1 will be returned with a maximum of 10 results per page.
+   *
+   *       "/prisoners-in-prison/WWI?cellLocationPrefix=WWI-2&term=smith"
+   *       "/prisoners-in-prison/WWI?cellLocationPrefix=2&term=smith"
+   *       This will return all people in HMP Wandsworth block 2 whose name starts with SMITH.
+   *
+   *       "/prisoners-in-prison/WWI?cellLocationPrefix=2-A-3-001"
+   *       This will return all people in HMP Wandsworth cell WWI-2-A-3-001
+   *
+   *       "/prisoners-in-prison/WWI?term=A1234KJ"
+   *       "/prisoners-in-prison/WWI?term=A1234KJ bananas"
+   *       This will return the single prisoner with prisoner number A1234KJ in HMP Wandsworth.
+   *       An empty page will be returned if not found
+   *
+   *       "/prisoners-in-prison/WWI?term=A J&fromDob=1956-01-01&toDob=2000-01-02"
+   *       This will return all people in HMP Wandsworth. Born on or after 1956-01-01 and on or before 2000-01-02,
+   *       whose name begins with A J, e.g Alan Jones born on 1956-01-01.
+   *
+   *       "/prisoners-in-prison/WWI?alerts=TACT&alerts=PEEP"
+   *       This will return all people in HMP Wandsworth. With the alerts TACT or PEEP.
    */
   search: {
     parameters: {
@@ -1456,10 +1520,22 @@ export interface operations {
         prisonId: string
       }
       query: {
+        /** The primary search term. Whe absent all prisoners will be returned at the prison */
         term?: string
-        page?: number
-        size?: number
+        /** alert codes to filter by. Zero or more can be supplied. When multiple supplied the filter is effectively and OR */
         alerts?: string[]
+        /** Offenders with a DOB >= this date */
+        fromDob?: string
+        /** Offenders with a DOB <= this date */
+        toDob?: string
+        /** Filter for the prisoners cell location. A block wing or cell can be specified. With prison id can be included or absent so HEI-3-1 and 3-1 are equivalent when the prison id is HEI */
+        cellLocationPrefix?: string
+        /** Zero-based page index (0..N) */
+        page?: number
+        /** The size of the page to be returned */
+        size?: number
+        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+        sort?: string[]
       }
     }
     responses: {
@@ -1488,12 +1564,8 @@ export interface operations {
         }
       }
     }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['PrisonersInPrisonRequest']
-      }
-    }
   }
 }
 
-// export interface external {}
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface external {}
