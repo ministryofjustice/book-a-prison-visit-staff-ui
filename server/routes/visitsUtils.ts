@@ -105,7 +105,7 @@ export function getSlotsSideMenuData({
   if (openSlotOptions.length > 0) {
     slotsNav.push({
       heading: {
-        text: 'Open visits room',
+        text: 'Open visits',
         classes: 'govuk-!-padding-top-0',
       },
       items: openSlotOptions,
@@ -115,7 +115,7 @@ export function getSlotsSideMenuData({
   if (closedSlotOptions.length > 0) {
     slotsNav.push({
       heading: {
-        text: 'Closed visits room',
+        text: 'Closed visits',
         classes: 'govuk-!-padding-top-0',
       },
       items: closedSlotOptions,
@@ -125,7 +125,7 @@ export function getSlotsSideMenuData({
   if (unknownSlotOptions.length > 0) {
     slotsNav.push({
       heading: {
-        text: 'Unknown',
+        text: 'Visit type unknown',
         classes: 'govuk-!-padding-top-0',
       },
       items: unknownSlotOptions,

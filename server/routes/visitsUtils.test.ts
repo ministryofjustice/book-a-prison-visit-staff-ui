@@ -141,7 +141,7 @@ describe('getSlotsSideMenuData', () => {
       expected: [
         {
           heading: {
-            text: 'Open visits room',
+            text: 'Open visits',
             classes: 'govuk-!-padding-top-0',
           },
           items: [
@@ -183,7 +183,7 @@ describe('getSlotsSideMenuData', () => {
       expected: [
         {
           heading: {
-            text: 'Open visits room',
+            text: 'Open visits',
             classes: 'govuk-!-padding-top-0',
           },
           items: [
