@@ -1334,6 +1334,9 @@ describe('/book-a-visit/select-date-and-time', () => {
             'A1234BC',
             'HEI',
             ['4323'],
+            '2022-02-14T11:59:00',
+            '2022-02-14T12:59:00',
+            'OPEN',
             undefined,
             undefined,
           )
@@ -1378,6 +1381,9 @@ describe('/book-a-visit/select-date-and-time', () => {
             'A1234BC',
             'HEI',
             ['4323'],
+            '2022-02-14T12:00:00',
+            '2022-02-14T13:05:00',
+            'OPEN',
             undefined,
             undefined,
           )
@@ -2286,6 +2292,9 @@ describe('/book-a-visit/check-your-booking', () => {
             visitSessionData.prisoner.offenderNo,
             'HEI',
             [visitSessionData.visitors[0].personId.toString()],
+            '2022-03-12T09:30:00',
+            '2022-03-12T10:30:00',
+            'OPEN',
             undefined,
             undefined,
           )

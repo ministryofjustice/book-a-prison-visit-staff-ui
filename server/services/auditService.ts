@@ -51,6 +51,9 @@ export default class AuditService {
     prisonerId: string,
     prisonId: string,
     visitorIds: string[],
+    startTimestamp: string,
+    endTimestamp: string,
+    visitRestriction: Visit['visitRestriction'],
     username: string,
     operationId: string,
   ) {
@@ -63,6 +66,9 @@ export default class AuditService {
         prisonerId,
         prisonId,
         visitorIds,
+        startTimestamp,
+        endTimestamp,
+        visitRestriction,
       },
     })
   }
@@ -72,6 +78,9 @@ export default class AuditService {
     prisonerId: string,
     prisonId: string,
     visitorIds: string[],
+    startTimestamp: string,
+    endTimestamp: string,
+    visitRestriction: Visit['visitRestriction'],
     username: string,
     operationId: string,
   ) {
@@ -84,6 +93,9 @@ export default class AuditService {
         prisonerId,
         prisonId,
         visitorIds,
+        startTimestamp,
+        endTimestamp,
+        visitRestriction,
       },
     })
   }

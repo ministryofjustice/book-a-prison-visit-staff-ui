@@ -124,6 +124,9 @@ export default class DateAndTime {
       sessionData.prisoner.offenderNo,
       'HEI',
       sessionData.visitors.map(visitor => visitor.personId.toString()),
+      sessionData.visit.startTimestamp,
+      sessionData.visit.endTimestamp,
+      sessionData.visitRestriction,
       res.locals.user?.username,
       res.locals.appInsightsOperationId,
     )
