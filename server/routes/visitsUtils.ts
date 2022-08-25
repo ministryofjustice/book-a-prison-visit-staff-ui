@@ -41,6 +41,28 @@ export const getDateTabs = (
   return tabs
 }
 
+const getSlotOptions = (
+  slot: VisitsPageSlot,
+  selectedDate: string,
+  firstTabDate: string,
+  slotFilter: string,
+  slotType: string,
+  visitType: string,
+) => {
+  const queryParams = new URLSearchParams({
+    type: visitType,
+    time: slot.visitTime,
+    selectedDate,
+    firstTabDate,
+  }).toString()
+
+  return {
+    text: slot.visitTime,
+    href: `/visits?${queryParams}`,
+    active: slotFilter === slot.visitTime && slotType === slot.visitType,
+  }
+}
+
 export function getSlotsSideMenuData({
   slotFilter,
   slotType = '',
@@ -48,6 +70,7 @@ export function getSlotsSideMenuData({
   firstTabDate = '',
   openSlots,
   closedSlots,
+  unknownSlots,
 }: {
   slotFilter: string
   slotType: string
@@ -55,6 +78,7 @@ export function getSlotsSideMenuData({
   firstTabDate: string
   openSlots: VisitsPageSlot[]
   closedSlots: VisitsPageSlot[]
+  unknownSlots: VisitsPageSlot[]
 }): {
   heading: {
     text: string
@@ -66,42 +90,22 @@ export function getSlotsSideMenuData({
     active: boolean
   }[]
 }[] {
-  const openSlotOptions = openSlots.sort(sortByTimestamp).map(slot => {
-    const queryParams = new URLSearchParams({
-      type: 'OPEN',
-      time: slot.visitTime,
-      selectedDate,
-      firstTabDate,
-    }).toString()
-
-    return {
-      text: slot.visitTime,
-      href: `/visits?${queryParams}`,
-      active: slotFilter === slot.visitTime && slotType === slot.visitType,
-    }
-  })
-
-  const closedSlotOptions = closedSlots.sort(sortByTimestamp).map(slot => {
-    const queryParams = new URLSearchParams({
-      type: 'CLOSED',
-      time: slot.visitTime,
-      selectedDate,
-      firstTabDate,
-    }).toString()
-
-    return {
-      text: slot.visitTime,
-      href: `/visits?${queryParams}`,
-      active: slotFilter === slot.visitTime && slotType === slot.visitType,
-    }
-  })
+  const openSlotOptions = openSlots
+    .sort(sortByTimestamp)
+    .map(slot => getSlotOptions(slot, selectedDate, firstTabDate, slotFilter, slotType, 'OPEN'))
+  const closedSlotOptions = closedSlots
+    .sort(sortByTimestamp)
+    .map(slot => getSlotOptions(slot, selectedDate, firstTabDate, slotFilter, slotType, 'CLOSED'))
+  const unknownSlotOptions = unknownSlots
+    .sort(sortByTimestamp)
+    .map(slot => getSlotOptions(slot, selectedDate, firstTabDate, slotFilter, slotType, 'UNKNOWN'))
 
   const slotsNav = []
 
   if (openSlotOptions.length > 0) {
     slotsNav.push({
       heading: {
-        text: 'Main visits room',
+        text: 'Open visits room',
         classes: 'govuk-!-padding-top-0',
       },
       items: openSlotOptions,
@@ -115,6 +119,16 @@ export function getSlotsSideMenuData({
         classes: 'govuk-!-padding-top-0',
       },
       items: closedSlotOptions,
+    })
+  }
+
+  if (unknownSlotOptions.length > 0) {
+    slotsNav.push({
+      heading: {
+        text: 'Unknown',
+        classes: 'govuk-!-padding-top-0',
+      },
+      items: unknownSlotOptions,
     })
   }
 

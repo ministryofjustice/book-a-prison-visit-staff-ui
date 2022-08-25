@@ -49,6 +49,7 @@ describe('GET /visits', () => {
     slots: {
       openSlots: VisitsPageSlot[]
       closedSlots: VisitsPageSlot[]
+      unknownSlots: VisitsPageSlot[]
       firstSlotTime: string
     }
   }
@@ -136,6 +137,7 @@ describe('GET /visits', () => {
           },
         ],
         closedSlots: [],
+        unknownSlots: [],
         firstSlotTime: '9am to 9:29am',
       },
     }
@@ -180,7 +182,7 @@ describe('GET /visits', () => {
         const $ = cheerio.load(res.text)
         expect($('h1').text()).toBe('View visits by date')
         expect($('.govuk-back-link').attr('href')).toBe('/')
-        expect($('[data-test="visit-room"]').text()).toBe('Main')
+        expect($('[data-test="visit-room"]').text()).toBe('Open')
         expect($('[data-test="visit-time"]').text()).toBe('9am to 9:29am')
         expect($('[data-test="visit-tables-booked"]').text()).toBe('1 of 30')
         expect($('[data-test="visit-visitors-total"]').text()).toBe('1')
@@ -188,7 +190,7 @@ describe('GET /visits', () => {
         expect($('[data-test="visit-children"]').text()).toBe('0')
         expect($('[data-test="prisoner-number"]').text()).toBe('A8709DY')
         expect($('[data-test="prisoner-name"]').text()).toBe('Rocky, Asap')
-        expect($('.moj-side-navigation__title').text()).toContain('Main visits room')
+        expect($('.moj-side-navigation__title').text()).toContain('Open visits room')
         expect($('.moj-side-navigation__item--active').text()).toContain('9am to 9:29am')
         expect(auditService.viewedVisits).toHaveBeenCalledTimes(1)
         expect(auditService.viewedVisits).toHaveBeenCalledWith(todayDate, 'HEI', undefined, undefined)
@@ -207,7 +209,7 @@ describe('GET /visits', () => {
         const $ = cheerio.load(res.text)
         expect($('h1').text()).toBe('View visits by date')
         expect($('.govuk-back-link').attr('href')).toBe('/')
-        expect($('[data-test="visit-room"]').text()).toBe('Main')
+        expect($('[data-test="visit-room"]').text()).toBe('Open')
         expect($('[data-test="visit-time"]').text()).toBe('10am to 11am')
         expect($('[data-test="visit-tables-booked"]').text()).toBe('1 of 30')
         expect($('[data-test="visit-visitors-total"]').text()).toBe('2')
@@ -215,7 +217,7 @@ describe('GET /visits', () => {
         expect($('[data-test="visit-children"]').text()).toBe('1')
         expect($('[data-test="prisoner-number"]').text()).toBe('A8709DY')
         expect($('[data-test="prisoner-name"]').text()).toBe('Rocky, Asap')
-        expect($('.moj-side-navigation__title').text()).toContain('Main visits room')
+        expect($('.moj-side-navigation__title').text()).toContain('Open visits room')
         expect($('.moj-side-navigation__item--active').text()).toContain('10am to 11am')
         expect(auditService.viewedVisits).toHaveBeenCalledTimes(1)
         expect(auditService.viewedVisits).toHaveBeenCalledWith('2022-05-23', 'HEI', undefined, undefined)
@@ -234,7 +236,7 @@ describe('GET /visits', () => {
         const $ = cheerio.load(res.text)
         expect($('h1').text()).toBe('View visits by date')
         expect($('.govuk-back-link').attr('href')).toBe('/')
-        expect($('[data-test="visit-room"]').text()).toBe('Main')
+        expect($('[data-test="visit-room"]').text()).toBe('Open')
         expect($('[data-test="visit-time"]').text()).toBe('10am to 11am')
         expect($('[data-test="visit-tables-booked"]').text()).toBe('1 of 30')
         expect($('[data-test="visit-visitors-total"]').text()).toBe('2')
@@ -242,7 +244,7 @@ describe('GET /visits', () => {
         expect($('[data-test="visit-children"]').text()).toBe('1')
         expect($('[data-test="prisoner-number"]').text()).toBe('A8709DY')
         expect($('[data-test="prisoner-name"]').text()).toBe('Rocky, Asap')
-        expect($('.moj-side-navigation__title').text()).toContain('Main visits room')
+        expect($('.moj-side-navigation__title').text()).toContain('Open visits room')
         expect($('.moj-side-navigation__item--active').text()).toContain('10am to 11am')
         expect(auditService.viewedVisits).toHaveBeenCalledTimes(1)
         expect(auditService.viewedVisits).toHaveBeenCalledWith(todayDate, 'HEI', undefined, undefined)
@@ -262,6 +264,7 @@ describe('GET /visits', () => {
       slots: {
         openSlots: [],
         closedSlots: [],
+        unknownSlots: [],
         firstSlotTime: '',
       },
     })

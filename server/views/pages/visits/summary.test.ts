@@ -33,7 +33,7 @@ describe('Views - Visits summary', () => {
       slotsNav: [
         {
           heading: {
-            text: 'Main visits room',
+            text: 'Open visits room',
             classes: 'govuk-!-padding-top-0',
           },
           items: [
@@ -78,7 +78,7 @@ describe('Views - Visits summary', () => {
     }
     const $ = cheerio.load(compiledTemplate.render(viewContext))
 
-    expect($('[data-test="visit-room"]').text()).toBe('Main')
+    expect($('[data-test="visit-room"]').text()).toBe('Open')
     expect($('[data-test="visit-time"]').text()).toBe('9am to 10am')
     expect($('[data-test="visit-tables-booked"]').text()).toBe('2 of 5')
     expect($('[data-test="visit-visitors-total"]').text()).toBe('11')
@@ -86,7 +86,7 @@ describe('Views - Visits summary', () => {
     expect($('[data-test="visit-children"]').text()).toBe('7')
     expect($('[data-test="prisoner-number"]').text()).toBe('A8709DY')
     expect($('[data-test="prisoner-name"]').text()).toBe('Rocky, Asap')
-    expect($('.moj-side-navigation__title').text()).toContain('Main visits room')
+    expect($('.moj-side-navigation__title').text()).toContain('Open visits room')
     expect($('.moj-side-navigation__item--active').text()).toContain('10am to 11am')
   })
 })
