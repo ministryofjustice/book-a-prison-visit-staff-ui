@@ -1,10 +1,13 @@
 import type { Request, Response } from 'express'
-// import * as cheerio from 'cheerio'
 import { Cookie } from 'express-session'
+// import { validationResult } from 'express-validator'
 import AuditService from '../../services/auditService'
 import { VisitorListItem, VisitSessionData, VisitSlotList } from '../../@types/bapv'
 import VisitType from './visitType'
 
+jest.mock('express-validator', () => ({
+  validationResult: () => jest.fn(),
+}))
 jest.mock('../../services/auditService')
 
 const auditService = new AuditService() as jest.Mocked<AuditService>
@@ -145,57 +148,57 @@ describe('Visit Journey', () => {
     })
   })
 
-  // describe.skip('POST /visit/:reference/update/visit-type', () => {
-  //   it('should set validation errors in flash and redirect if visit type not selected', () => {
-  //     return request(sessionApp)
-  //       .post(`/visit/${visitReference}/update/visit-type`)
-  //       .expect(302)
-  //       .expect('location', `/visit/${visitReference}/update/visit-type`)
-  //       .expect(() => {
-  //         expect(flashProvider).toHaveBeenCalledWith('errors', [
-  //           { location: 'body', msg: 'No visit type selected', param: 'visitType', value: undefined },
-  //         ])
-  //       })
-  //   })
+  describe.skip('POST /visit/:reference/update/visit-type', () => {
+    it('should set validation errors in flash and redirect if visit type not selected', () => {
+      return request(sessionApp)
+        .post(`/visit/${visitReference}/update/visit-type`)
+        .expect(302)
+        .expect('location', `/visit/${visitReference}/update/visit-type`)
+        .expect(() => {
+          expect(flashProvider).toHaveBeenCalledWith('errors', [
+            { location: 'body', msg: 'No visit type selected', param: 'visitType', value: undefined },
+          ])
+        })
+    })
 
-  //   it('should set visit type to OPEN when selected and redirect to select date/time', () => {
-  //     return request(sessionApp)
-  //       .post(`/visit/${visitReference}/update/visit-type`)
-  //       .send('visitType=OPEN')
-  //       .expect(302)
-  //       .expect('location', `/visit/${visitReference}/update/select-date-and-time`)
-  //       .expect(() => {
-  //         expect(amendVisitSessionData.visitRestriction).toBe('OPEN')
-  //         expect(amendVisitSessionData.closedVisitReason).toBe(undefined)
-  //         expect(auditService.visitRestrictionSelected).toHaveBeenCalledTimes(1)
-  //         expect(auditService.visitRestrictionSelected).toHaveBeenCalledWith(
-  //           amendVisitSessionData.prisoner.offenderNo,
-  //           'OPEN',
-  //           [amendVisitSessionData.visitors[0].personId.toString()],
-  //           undefined,
-  //           undefined,
-  //         )
-  //       })
-  //   })
+    // it('should set visit type to OPEN when selected and redirect to select date/time', () => {
+    //   return request(sessionApp)
+    //     .post(`/visit/${visitReference}/update/visit-type`)
+    //     .send('visitType=OPEN')
+    //     .expect(302)
+    //     .expect('location', `/visit/${visitReference}/update/select-date-and-time`)
+    //     .expect(() => {
+    //       expect(amendVisitSessionData.visitRestriction).toBe('OPEN')
+    //       expect(amendVisitSessionData.closedVisitReason).toBe(undefined)
+    //       expect(auditService.visitRestrictionSelected).toHaveBeenCalledTimes(1)
+    //       expect(auditService.visitRestrictionSelected).toHaveBeenCalledWith(
+    //         amendVisitSessionData.prisoner.offenderNo,
+    //         'OPEN',
+    //         [amendVisitSessionData.visitors[0].personId.toString()],
+    //         undefined,
+    //         undefined,
+    //       )
+    //     })
+    // })
 
-  //   it('should set visit type to CLOSED when selected and redirect to select date/time', () => {
-  //     return request(sessionApp)
-  //       .post(`/visit/${visitReference}/update/visit-type`)
-  //       .send('visitType=CLOSED')
-  //       .expect(302)
-  //       .expect('location', `/visit/${visitReference}/update/select-date-and-time`)
-  //       .expect(() => {
-  //         expect(amendVisitSessionData.visitRestriction).toBe('CLOSED')
-  //         expect(amendVisitSessionData.closedVisitReason).toBe('prisoner')
-  //         expect(auditService.visitRestrictionSelected).toHaveBeenCalledTimes(1)
-  //         expect(auditService.visitRestrictionSelected).toHaveBeenCalledWith(
-  //           amendVisitSessionData.prisoner.offenderNo,
-  //           'CLOSED',
-  //           [amendVisitSessionData.visitors[0].personId.toString()],
-  //           undefined,
-  //           undefined,
-  //         )
-  //       })
-  //   })
-  // })
+    // it('should set visit type to CLOSED when selected and redirect to select date/time', () => {
+    //   return request(sessionApp)
+    //     .post(`/visit/${visitReference}/update/visit-type`)
+    //     .send('visitType=CLOSED')
+    //     .expect(302)
+    //     .expect('location', `/visit/${visitReference}/update/select-date-and-time`)
+    //     .expect(() => {
+    //       expect(amendVisitSessionData.visitRestriction).toBe('CLOSED')
+    //       expect(amendVisitSessionData.closedVisitReason).toBe('prisoner')
+    //       expect(auditService.visitRestrictionSelected).toHaveBeenCalledTimes(1)
+    //       expect(auditService.visitRestrictionSelected).toHaveBeenCalledWith(
+    //         amendVisitSessionData.prisoner.offenderNo,
+    //         'CLOSED',
+    //         [amendVisitSessionData.visitors[0].personId.toString()],
+    //         undefined,
+    //         undefined,
+    //       )
+    //     })
+    // })
+  })
 })
