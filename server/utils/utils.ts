@@ -131,19 +131,7 @@ export const nextPrivIepAdjustDate = (latestPrivIepAdjustDate: string): string =
   return format(addMonths(startOfMonth(parseISO(latestPrivIepAdjustDate)), 1), 'd MMMM yyyy')
 }
 
-export const formatVisitType = ({
-  visitType,
-  visitRestriction,
-  isIntTest = false,
-}: {
-  visitType: string
-  visitRestriction: string
-  isIntTest?: boolean
-}): string => {
-  return isIntTest
-    ? `${properCase(visitType)}(${properCase(visitRestriction)})`
-    : `${properCase(visitType)}<br>(${properCase(visitRestriction)})`
-}
+export const formatVisitType = (visitType: string): string => properCase(visitType)
 
 export const sortByTimestamp = (
   a: { visitTime: string; sortField: string },

@@ -232,16 +232,7 @@ context('Search for a prisoner', () => {
           prisonerProfilePage.alertsTabExpires().eq(0).contains('Not entered')
 
           prisonerProfilePage.selectUpcomingVisitsTab()
-          prisonerProfilePage
-            .upcomingTabType()
-            .eq(0)
-            .contains(
-              formatVisitType({
-                visitType: upcomingVisits[0].visitType,
-                visitRestriction: upcomingVisits[0].visitRestriction,
-                isIntTest,
-              }),
-            )
+          prisonerProfilePage.upcomingTabType().eq(0).contains(formatVisitType(upcomingVisits[0].visitType))
           prisonerProfilePage.upcomingTabLocation().eq(0).contains('Hewell (HMP)')
           prisonerProfilePage
             .upcomingTabDateAndTime()
@@ -256,16 +247,7 @@ context('Search for a prisoner', () => {
           prisonerProfilePage.upcomingTabVisitors().eq(0).contains('John Smith')
 
           prisonerProfilePage.selectVisitsHistoryTab()
-          prisonerProfilePage
-            .pastTabType()
-            .eq(0)
-            .contains(
-              formatVisitType({
-                visitType: pastVisits[0].visitType,
-                visitRestriction: pastVisits[0].visitRestriction,
-                isIntTest,
-              }),
-            )
+          prisonerProfilePage.pastTabType().eq(0).contains(formatVisitType(pastVisits[0].visitType))
           prisonerProfilePage.pastTabLocation().eq(0).contains('Hewell (HMP)')
           prisonerProfilePage
             .pastTabDateAndTime()
