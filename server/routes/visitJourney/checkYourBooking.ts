@@ -16,7 +16,7 @@ export default class CheckYourBooking {
 
   async get(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'
-    const sessionData = req.session[isUpdate ? 'amendVisitSessionData' : 'visitSessionData']
+    const sessionData = req.session[isUpdate ? 'updateVisitSessionData' : 'visitSessionData']
     const { offenderNo } = sessionData.prisoner
 
     const additionalSupport = getSupportTypeDescriptions(req.session.availableSupportTypes, sessionData.visitorSupport)
@@ -34,7 +34,7 @@ export default class CheckYourBooking {
 
   async post(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'
-    const sessionData = req.session[isUpdate ? 'amendVisitSessionData' : 'visitSessionData']
+    const sessionData = req.session[isUpdate ? 'updateVisitSessionData' : 'visitSessionData']
     const { offenderNo } = sessionData.prisoner
 
     const additionalSupport = getSupportTypeDescriptions(req.session.availableSupportTypes, sessionData.visitorSupport)

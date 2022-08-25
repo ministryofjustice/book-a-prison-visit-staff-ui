@@ -6,7 +6,7 @@ export default class Confirmation {
 
   async get(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'
-    const sessionData = req.session[isUpdate ? 'amendVisitSessionData' : 'visitSessionData']
+    const sessionData = req.session[isUpdate ? 'updateVisitSessionData' : 'visitSessionData']
 
     res.locals.prisoner = sessionData.prisoner
     res.locals.visit = sessionData.visit

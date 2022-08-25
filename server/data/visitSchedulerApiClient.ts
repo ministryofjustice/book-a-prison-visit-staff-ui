@@ -137,7 +137,7 @@ class VisitSchedulerApiClient {
     })
   }
 
-  startAmendVisit(visitReference: string): Promise<Visit> {
+  startUpdateVisit(visitReference: string): Promise<Visit> {
     return this.restclient.put({
       path: `/visits/${visitReference}`,
       data: <UpdateVisitRequestDto>{

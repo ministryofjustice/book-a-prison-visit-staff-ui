@@ -14,7 +14,7 @@ export default class SelectVisitors {
 
   async get(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'
-    const sessionData = req.session[isUpdate ? 'amendVisitSessionData' : 'visitSessionData']
+    const sessionData = req.session[isUpdate ? 'updateVisitSessionData' : 'visitSessionData']
     const { offenderNo } = sessionData.prisoner
 
     const visitorList = await this.prisonerVisitorsService.getVisitors(offenderNo, res.locals.user?.username)
@@ -49,7 +49,7 @@ export default class SelectVisitors {
 
   async post(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'
-    const sessionData = req.session[isUpdate ? 'amendVisitSessionData' : 'visitSessionData']
+    const sessionData = req.session[isUpdate ? 'updateVisitSessionData' : 'visitSessionData']
     const errors = validationResult(req)
 
     if (!errors.isEmpty()) {

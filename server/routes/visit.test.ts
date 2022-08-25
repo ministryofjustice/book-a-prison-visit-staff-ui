@@ -27,7 +27,7 @@ let app: Express
 let sessionApp: Express
 const systemToken = async (user: string): Promise<string> => `${user}-token-1`
 let flashData: Record<string, string[] | Record<string, string>[]>
-let amendVisitSessionData: VisitSessionData
+let updateVisitSessionData: VisitSessionData
 
 const prisonerSearchService = new PrisonerSearchService(null, systemToken) as jest.Mocked<PrisonerSearchService>
 const visitSessionsService = new VisitSessionsService(
@@ -50,7 +50,7 @@ jest.mock('./visitorUtils', () => {
   return {
     ...visitorUtils,
     clearSession: jest.fn((req: Express.Request) => {
-      req.session.amendVisitSessionData = amendVisitSessionData as VisitSessionData
+      req.session.updateVisitSessionData = updateVisitSessionData as VisitSessionData
     }),
   }
 })
@@ -168,7 +168,7 @@ describe('GET /visit/:reference', () => {
     visitSessionsService.getFullVisitDetails.mockResolvedValue({ visit, visitors, additionalSupport })
     prisonerVisitorsService.getVisitors.mockResolvedValue(visitors)
 
-    amendVisitSessionData = { prisoner: undefined }
+    updateVisitSessionData = { prisoner: undefined }
 
     app = appWithAllRoutes({
       prisonerSearchServiceOverride: prisonerSearchService,
@@ -177,7 +177,7 @@ describe('GET /visit/:reference', () => {
       prisonerVisitorsServiceOverride: prisonerVisitorsService,
       systemTokenOverride: systemToken,
       sessionData: {
-        amendVisitSessionData,
+        updateVisitSessionData,
       } as SessionData,
     })
   })
@@ -233,7 +233,7 @@ describe('GET /visit/:reference', () => {
         )
 
         expect(clearSession).toHaveBeenCalledTimes(1)
-        expect(amendVisitSessionData).toEqual({
+        expect(updateVisitSessionData).toEqual({
           prisoner: {
             name: 'Smith, John',
             offenderNo: 'A1234BC',
@@ -548,7 +548,7 @@ describe('GET /visit/:reference/update/select-visitors', () => {
   })
 
   beforeEach(() => {
-    amendVisitSessionData = {
+    updateVisitSessionData = {
       prisoner: {
         name: 'John Smith',
         offenderNo: 'A1234BC',
@@ -579,7 +579,7 @@ describe('GET /visit/:reference/update/select-visitors', () => {
       systemTokenOverride: systemToken,
       sessionData: {
         visitorList,
-        amendVisitSessionData,
+        updateVisitSessionData,
       } as SessionData,
     })
   })
@@ -595,7 +595,7 @@ describe('GET /visit/:reference/update/select-visitors', () => {
         expect($('.test-restrictions-comment1').text().trim()).toBe('string')
         expect($('.test-restrictions-start-date1').text().trim()).toBe('15 March 2022')
         expect($('.test-restrictions-end-date1').text().trim()).toBe('15 March 2022')
-        expect(amendVisitSessionData.prisoner.restrictions).toEqual(restrictions)
+        expect(updateVisitSessionData.prisoner.restrictions).toEqual(restrictions)
       })
   })
 
@@ -619,7 +619,7 @@ describe('GET /visit/:reference/update/select-visitors', () => {
       systemTokenOverride: systemToken,
       sessionData: {
         visitorList,
-        amendVisitSessionData,
+        updateVisitSessionData,
       } as SessionData,
     })
 
@@ -633,7 +633,7 @@ describe('GET /visit/:reference/update/select-visitors', () => {
         expect($('.test-restrictions-comment1').text().trim()).toBe('string')
         expect($('.test-restrictions-start-date1').text().trim()).toBe('Not entered')
         expect($('.test-restrictions-end-date1').text().trim()).toBe('Not entered')
-        expect(amendVisitSessionData.prisoner.restrictions).toEqual(restrictions)
+        expect(updateVisitSessionData.prisoner.restrictions).toEqual(restrictions)
       })
   })
 
@@ -646,7 +646,7 @@ describe('GET /visit/:reference/update/select-visitors', () => {
       systemTokenOverride: systemToken,
       sessionData: {
         visitorList,
-        amendVisitSessionData,
+        updateVisitSessionData,
       } as SessionData,
     })
 
@@ -661,7 +661,7 @@ describe('GET /visit/:reference/update/select-visitors', () => {
         expect($('.test-restrictions-comment1').text().trim()).toBe('')
         expect($('.test-restrictions-start-date1').text().trim()).toBe('')
         expect($('.test-restrictions-end-date1').text().trim()).toBe('')
-        expect(amendVisitSessionData.prisoner.restrictions).toEqual([])
+        expect(updateVisitSessionData.prisoner.restrictions).toEqual([])
       })
   })
 
@@ -701,12 +701,12 @@ describe('GET /visit/:reference/update/select-visitors', () => {
         expect($('[data-test="submit"]').text().trim()).toBe('Continue')
 
         expect(visitorList.visitors).toEqual(returnData)
-        expect(amendVisitSessionData.prisoner.restrictions).toEqual(restrictions)
+        expect(updateVisitSessionData.prisoner.restrictions).toEqual(restrictions)
       })
   })
 
   it('should render the approved visitor list for offender number A1234BC with those in session (single) selected', () => {
-    amendVisitSessionData.visitors = [
+    updateVisitSessionData.visitors = [
       {
         address: '1st listed address',
         adult: undefined,
@@ -736,7 +736,7 @@ describe('GET /visit/:reference/update/select-visitors', () => {
   })
 
   it('should render the approved visitor list for offender number A1234BC with those in session (multiple) selected', () => {
-    amendVisitSessionData.visitors = [
+    updateVisitSessionData.visitors = [
       {
         address: '1st listed address',
         adult: undefined,
@@ -942,7 +942,7 @@ describe('POST /visit/:reference/update/select-visitors', () => {
       ],
     }
 
-    amendVisitSessionData = {
+    updateVisitSessionData = {
       prisoner: {
         name: 'prisoner name',
         offenderNo: 'A1234BC',
@@ -959,7 +959,7 @@ describe('POST /visit/:reference/update/select-visitors', () => {
       sessionData: {
         adultVisitors,
         visitorList,
-        amendVisitSessionData,
+        updateVisitSessionData,
       } as SessionData,
     })
   })
@@ -985,9 +985,9 @@ describe('POST /visit/:reference/update/select-visitors', () => {
       .expect('location', `/visit/${visitReference}/update/select-date-and-time`)
       .expect(() => {
         expect(adultVisitors.adults).toEqual(returnAdult)
-        expect(amendVisitSessionData.visitors).toEqual(returnAdult)
-        expect(amendVisitSessionData.visitRestriction).toBe('OPEN')
-        expect(amendVisitSessionData.closedVisitReason).toBe(undefined)
+        expect(updateVisitSessionData.visitors).toEqual(returnAdult)
+        expect(updateVisitSessionData.visitRestriction).toBe('OPEN')
+        expect(updateVisitSessionData.closedVisitReason).toBe(undefined)
       })
   })
 
@@ -1029,14 +1029,14 @@ describe('POST /visit/:reference/update/select-visitors', () => {
       .expect('location', `/visit/${visitReference}/update/select-date-and-time`)
       .expect(() => {
         expect(adultVisitors.adults).toEqual(returnAdult)
-        expect(amendVisitSessionData.visitors).toEqual(returnAdult)
-        expect(amendVisitSessionData.visitRestriction).toBe('CLOSED')
-        expect(amendVisitSessionData.closedVisitReason).toBe('visitor')
+        expect(updateVisitSessionData.visitors).toEqual(returnAdult)
+        expect(updateVisitSessionData.visitRestriction).toBe('CLOSED')
+        expect(updateVisitSessionData.closedVisitReason).toBe('visitor')
       })
   })
 
   it('should save to session and redirect to the select date and time page if prisoner and visitor both have CLOSED restriction (CLOSED visit)', () => {
-    amendVisitSessionData.prisoner.restrictions = [
+    updateVisitSessionData.prisoner.restrictions = [
       {
         restrictionId: 12345,
         restrictionType: 'CLOSED',
@@ -1072,14 +1072,14 @@ describe('POST /visit/:reference/update/select-visitors', () => {
       .expect('location', `/visit/${visitReference}/update/select-date-and-time`)
       .expect(() => {
         expect(adultVisitors.adults).toEqual(returnAdult)
-        expect(amendVisitSessionData.visitors).toEqual(returnAdult)
-        expect(amendVisitSessionData.visitRestriction).toBe('CLOSED')
-        expect(amendVisitSessionData.closedVisitReason).toBe('visitor')
+        expect(updateVisitSessionData.visitors).toEqual(returnAdult)
+        expect(updateVisitSessionData.visitRestriction).toBe('CLOSED')
+        expect(updateVisitSessionData.closedVisitReason).toBe('visitor')
       })
   })
 
   it('should save to session and redirect to open/closed visit choice if prisoner has CLOSED restriction and visitor not CLOSED', () => {
-    amendVisitSessionData.prisoner.restrictions = [
+    updateVisitSessionData.prisoner.restrictions = [
       {
         restrictionId: 12345,
         restrictionType: 'CLOSED',
@@ -1109,9 +1109,9 @@ describe('POST /visit/:reference/update/select-visitors', () => {
       .expect('location', `/visit/${visitReference}/update/visit-type`)
       .expect(() => {
         expect(adultVisitors.adults).toEqual(returnAdult)
-        expect(amendVisitSessionData.visitors).toEqual(returnAdult)
-        expect(amendVisitSessionData.visitRestriction).toBe('OPEN')
-        expect(amendVisitSessionData.closedVisitReason).toBe(undefined)
+        expect(updateVisitSessionData.visitors).toEqual(returnAdult)
+        expect(updateVisitSessionData.visitRestriction).toBe('OPEN')
+        expect(updateVisitSessionData.closedVisitReason).toBe(undefined)
       })
   })
 
@@ -1145,8 +1145,8 @@ describe('POST /visit/:reference/update/select-visitors', () => {
       .expect('location', `/visit/${visitReference}/update/select-date-and-time`)
       .expect(() => {
         expect(adultVisitors.adults).toEqual([returnAdult])
-        expect(amendVisitSessionData.visitors).toEqual([returnAdult, returnChild])
-        expect(amendVisitSessionData.visitRestriction).toBe('OPEN')
+        expect(updateVisitSessionData.visitors).toEqual([returnAdult, returnChild])
+        expect(updateVisitSessionData.visitRestriction).toBe('OPEN')
       })
   })
 
@@ -1164,7 +1164,7 @@ describe('POST /visit/:reference/update/select-visitors', () => {
       },
     ]
 
-    amendVisitSessionData.visitors = [
+    updateVisitSessionData.visitors = [
       {
         address: '1st listed address',
         adult: true,
@@ -1195,8 +1195,8 @@ describe('POST /visit/:reference/update/select-visitors', () => {
       .expect('location', `/visit/${visitReference}/update/select-date-and-time`)
       .expect(() => {
         expect(adultVisitors.adults).toEqual([returnAdult])
-        expect(amendVisitSessionData.visitors).toEqual([returnAdult])
-        expect(amendVisitSessionData.visitRestriction).toBe('OPEN')
+        expect(updateVisitSessionData.visitors).toEqual([returnAdult])
+        expect(updateVisitSessionData.visitRestriction).toBe('OPEN')
       })
   })
 
@@ -1298,7 +1298,7 @@ describe('/visit/:reference/update/visit-type', () => {
   const visitReference = 'ab-cd-ef-gh'
 
   beforeEach(() => {
-    amendVisitSessionData = {
+    updateVisitSessionData = {
       prisoner: {
         name: 'prisoner name',
         offenderNo: 'A1234BC',
@@ -1335,7 +1335,7 @@ describe('/visit/:reference/update/visit-type', () => {
       auditServiceOverride: auditService,
       systemTokenOverride: systemToken,
       sessionData: {
-        amendVisitSessionData,
+        updateVisitSessionData,
       } as SessionData,
     })
   })
@@ -1406,13 +1406,13 @@ describe('/visit/:reference/update/visit-type', () => {
         .expect(302)
         .expect('location', `/visit/${visitReference}/update/select-date-and-time`)
         .expect(() => {
-          expect(amendVisitSessionData.visitRestriction).toBe('OPEN')
-          expect(amendVisitSessionData.closedVisitReason).toBe(undefined)
+          expect(updateVisitSessionData.visitRestriction).toBe('OPEN')
+          expect(updateVisitSessionData.closedVisitReason).toBe(undefined)
           expect(auditService.visitRestrictionSelected).toHaveBeenCalledTimes(1)
           expect(auditService.visitRestrictionSelected).toHaveBeenCalledWith(
-            amendVisitSessionData.prisoner.offenderNo,
+            updateVisitSessionData.prisoner.offenderNo,
             'OPEN',
-            [amendVisitSessionData.visitors[0].personId.toString()],
+            [updateVisitSessionData.visitors[0].personId.toString()],
             undefined,
             undefined,
           )
@@ -1426,13 +1426,13 @@ describe('/visit/:reference/update/visit-type', () => {
         .expect(302)
         .expect('location', `/visit/${visitReference}/update/select-date-and-time`)
         .expect(() => {
-          expect(amendVisitSessionData.visitRestriction).toBe('CLOSED')
-          expect(amendVisitSessionData.closedVisitReason).toBe('prisoner')
+          expect(updateVisitSessionData.visitRestriction).toBe('CLOSED')
+          expect(updateVisitSessionData.closedVisitReason).toBe('prisoner')
           expect(auditService.visitRestrictionSelected).toHaveBeenCalledTimes(1)
           expect(auditService.visitRestrictionSelected).toHaveBeenCalledWith(
-            amendVisitSessionData.prisoner.offenderNo,
+            updateVisitSessionData.prisoner.offenderNo,
             'CLOSED',
-            [amendVisitSessionData.visitors[0].personId.toString()],
+            [updateVisitSessionData.visitors[0].personId.toString()],
             undefined,
             undefined,
           )
@@ -1532,7 +1532,7 @@ describe('/visit/:reference/update/select-date-and-time', () => {
   }
 
   beforeEach(() => {
-    amendVisitSessionData = {
+    updateVisitSessionData = {
       prisoner: {
         name: 'John Smith',
         offenderNo: 'A1234BC',
@@ -1564,7 +1564,7 @@ describe('/visit/:reference/update/select-date-and-time', () => {
         visitSessionsServiceOverride: visitSessionsService,
         systemTokenOverride: systemToken,
         sessionData: {
-          amendVisitSessionData,
+          updateVisitSessionData,
         } as SessionData,
       })
     })
@@ -1592,8 +1592,8 @@ describe('/visit/:reference/update/select-date-and-time', () => {
     })
 
     it('should render the available sessions list with closed visit reason (visitor)', () => {
-      amendVisitSessionData.visitRestriction = 'CLOSED'
-      amendVisitSessionData.closedVisitReason = 'visitor'
+      updateVisitSessionData.visitRestriction = 'CLOSED'
+      updateVisitSessionData.closedVisitReason = 'visitor'
 
       return request(sessionApp)
         .get(`/visit/${visitReference}/update/select-date-and-time`)
@@ -1611,8 +1611,8 @@ describe('/visit/:reference/update/select-date-and-time', () => {
     })
 
     it('should render the available sessions list with closed visit reason (prisoner)', () => {
-      amendVisitSessionData.visitRestriction = 'CLOSED'
-      amendVisitSessionData.closedVisitReason = 'prisoner'
+      updateVisitSessionData.visitRestriction = 'CLOSED'
+      updateVisitSessionData.closedVisitReason = 'prisoner'
 
       return request(sessionApp)
         .get(`/visit/${visitReference}/update/select-date-and-time`)
@@ -1636,7 +1636,7 @@ describe('/visit/:reference/update/select-date-and-time', () => {
         visitSessionsServiceOverride: visitSessionsService,
         systemTokenOverride: systemToken,
         sessionData: {
-          amendVisitSessionData,
+          updateVisitSessionData,
         } as SessionData,
       })
 
@@ -1656,7 +1656,7 @@ describe('/visit/:reference/update/select-date-and-time', () => {
     })
 
     it('should render the available sessions list with the slot in the session selected', () => {
-      amendVisitSessionData.visit = {
+      updateVisitSessionData.visit = {
         id: '3',
         startTimestamp: '2022-02-14T12:00:00',
         endTimestamp: '2022-02-14T13:05:00',
@@ -1713,7 +1713,7 @@ describe('/visit/:reference/update/select-date-and-time', () => {
         systemTokenOverride: systemToken,
         sessionData: {
           slotsList,
-          amendVisitSessionData,
+          updateVisitSessionData,
         } as SessionData,
       })
     })
@@ -1725,7 +1725,7 @@ describe('/visit/:reference/update/select-date-and-time', () => {
         .expect(302)
         .expect('location', `/visit/${visitReference}/update/additional-support`)
         .expect(() => {
-          expect(amendVisitSessionData.visit).toEqual({
+          expect(updateVisitSessionData.visit).toEqual({
             id: '2',
             startTimestamp: '2022-02-14T11:59:00',
             endTimestamp: '2022-02-14T12:59:00',
@@ -1737,13 +1737,13 @@ describe('/visit/:reference/update/select-date-and-time', () => {
           expect(auditService.reservedVisit).toHaveBeenCalledTimes(1)
           expect(auditService.reservedVisit).toHaveBeenCalledWith('2a-bc-3d-ef', 'A1234BC', 'HEI', undefined, undefined)
           expect(visitSessionsService.updateVisit).not.toHaveBeenCalled()
-          expect(amendVisitSessionData.visitReference).toEqual('2a-bc-3d-ef')
-          expect(amendVisitSessionData.visitStatus).toEqual('RESERVED')
+          expect(updateVisitSessionData.visitReference).toEqual('2a-bc-3d-ef')
+          expect(updateVisitSessionData.visitStatus).toEqual('RESERVED')
         })
     })
 
     it('should save new choice to session, update visit reservation and redirect to additional support page if existing session data present', () => {
-      amendVisitSessionData.visit = {
+      updateVisitSessionData.visit = {
         id: '1',
         startTimestamp: '2022-02-14T10:00:00',
         endTimestamp: '2022-02-14T11:00:00',
@@ -1752,7 +1752,7 @@ describe('/visit/:reference/update/select-date-and-time', () => {
         visitRestriction: 'OPEN',
       }
 
-      amendVisitSessionData.visitReference = '3b-cd-4f-fg'
+      updateVisitSessionData.visitReference = '3b-cd-4f-fg'
 
       return request(sessionApp)
         .post(`/visit/${visitReference}/update/select-date-and-time`)
@@ -1760,7 +1760,7 @@ describe('/visit/:reference/update/select-date-and-time', () => {
         .expect(302)
         .expect('location', `/visit/${visitReference}/update/additional-support`)
         .expect(() => {
-          expect(amendVisitSessionData.visit).toEqual({
+          expect(updateVisitSessionData.visit).toEqual({
             id: '3',
             startTimestamp: '2022-02-14T12:00:00',
             endTimestamp: '2022-02-14T13:05:00',
@@ -1800,7 +1800,7 @@ describe('/visit/:reference/update/select-date-and-time', () => {
           timeOfDay: 'afternoon',
           dayOfTheWeek: '3',
           slotsList,
-          amendVisitSessionData,
+          updateVisitSessionData,
         } as SessionData,
       })
 

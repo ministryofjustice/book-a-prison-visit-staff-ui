@@ -48,7 +48,7 @@ export const clearSession = (req: Request): void => {
     'timeOfDay',
     'dayOfTheWeek',
     'visitSessionData',
-    'amendVisitSessionData',
+    'updateVisitSessionData',
   ].forEach(sessionItem => {
     delete req.session[sessionItem]
   })

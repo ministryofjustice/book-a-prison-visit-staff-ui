@@ -9,7 +9,7 @@ export default class AdditionalSupport {
 
   async get(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'
-    const sessionData = req.session[isUpdate ? 'amendVisitSessionData' : 'visitSessionData']
+    const sessionData = req.session[isUpdate ? 'updateVisitSessionData' : 'visitSessionData']
     const formValues = getFlashFormValues(req)
 
     if (!req.session.availableSupportTypes) {
@@ -35,7 +35,7 @@ export default class AdditionalSupport {
 
   async post(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'
-    const sessionData = req.session[isUpdate ? 'amendVisitSessionData' : 'visitSessionData']
+    const sessionData = req.session[isUpdate ? 'updateVisitSessionData' : 'visitSessionData']
     const errors = validationResult(req)
 
     if (!errors.isEmpty()) {
