@@ -191,11 +191,11 @@ export default class VisitSessionsService {
     return visit
   }
 
-  async startAmendVisit({ username, visitReference }: { username: string; visitReference: string }): Promise<Visit> {
+  async startUpdateVisit({ username, visitReference }: { username: string; visitReference: string }): Promise<Visit> {
     const token = await this.systemToken(username)
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
 
-    const visit = await visitSchedulerApiClient.startAmendVisit(visitReference)
+    const visit = await visitSchedulerApiClient.startUpdateVisit(visitReference)
     logger.info(`Started amend journey for visit ${visit.reference}`)
 
     return visit

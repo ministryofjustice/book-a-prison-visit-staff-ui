@@ -142,7 +142,7 @@ describe('clearSession', () => {
     timeOfDay: 'morning',
     dayOfTheWeek: '1',
     visitSessionData: { prisoner: undefined },
-    amendVisitSessionData: {} as VisitSessionData,
+    updateVisitSessionData: {} as VisitSessionData,
   }
 
   req.session = sessionData as Session & SessionData

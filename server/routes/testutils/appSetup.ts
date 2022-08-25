@@ -69,7 +69,7 @@ function appSetup({
     timeOfDay: '',
     dayOfTheWeek: '',
     visitSessionData: {} as VisitSessionData,
-    amendVisitSessionData: {} as VisitSessionData,
+    updateVisitSessionData: {} as VisitSessionData,
     availableSupportTypes: [],
   },
 }: {

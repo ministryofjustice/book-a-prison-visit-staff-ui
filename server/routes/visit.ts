@@ -112,9 +112,9 @@ export default function routes(
       visitStatus: visit.visitStatus,
     }
 
-    req.session.amendVisitSessionData = Object.assign(req.session.amendVisitSessionData ?? {}, visitSessionData)
+    req.session.updateVisitSessionData = Object.assign(req.session.updateVisitSessionData ?? {}, visitSessionData)
 
-    // await visitSessionsService.startAmendVisit({ username: res.locals.user?.username, visitReference: reference })
+    // await visitSessionsService.startUpdateVisit({ username: res.locals.user?.username, visitReference: reference })
 
     return res.render('pages/visit/summary', {
       prisoner,

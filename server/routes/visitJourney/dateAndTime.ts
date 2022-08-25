@@ -14,7 +14,7 @@ export default class DateAndTime {
 
   async get(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'
-    const sessionData = req.session[isUpdate ? 'amendVisitSessionData' : 'visitSessionData']
+    const sessionData = req.session[isUpdate ? 'updateVisitSessionData' : 'visitSessionData']
     const { timeOfDay, dayOfTheWeek } = req.query as Record<string, string>
     const slotsList = await this.visitSessionsService.getVisitSessions({
       username: res.locals.user?.username,
@@ -88,7 +88,7 @@ export default class DateAndTime {
 
   async post(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'
-    const sessionData = req.session[isUpdate ? 'amendVisitSessionData' : 'visitSessionData']
+    const sessionData = req.session[isUpdate ? 'updateVisitSessionData' : 'visitSessionData']
     const errors = validationResult(req)
 
     if (!errors.isEmpty()) {
