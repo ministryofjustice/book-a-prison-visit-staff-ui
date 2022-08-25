@@ -191,16 +191,6 @@ export default class VisitSessionsService {
     return visit
   }
 
-  async startUpdateVisit({ username, visitReference }: { username: string; visitReference: string }): Promise<Visit> {
-    const token = await this.systemToken(username)
-    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
-
-    const visit = await visitSchedulerApiClient.startUpdateVisit(visitReference)
-    logger.info(`Started update journey for visit ${visit.reference}`)
-
-    return visit
-  }
-
   async cancelVisit({
     username,
     reference,
