@@ -1329,7 +1329,17 @@ describe('/book-a-visit/select-date-and-time', () => {
           })
           expect(visitSessionsService.createVisit).toHaveBeenCalledTimes(1)
           expect(auditService.reservedVisit).toHaveBeenCalledTimes(1)
-          expect(auditService.reservedVisit).toHaveBeenCalledWith('2a-bc-3d-ef', 'A1234BC', 'HEI', undefined, undefined)
+          expect(auditService.reservedVisit).toHaveBeenCalledWith(
+            '2a-bc-3d-ef',
+            'A1234BC',
+            'HEI',
+            ['4323'],
+            '2022-02-14T11:59:00',
+            '2022-02-14T12:59:00',
+            'OPEN',
+            undefined,
+            undefined,
+          )
           expect(visitSessionsService.updateVisit).not.toHaveBeenCalled()
           expect(visitSessionData.visitReference).toEqual('2a-bc-3d-ef')
           expect(visitSessionData.visitStatus).toEqual('RESERVED')
@@ -1366,7 +1376,17 @@ describe('/book-a-visit/select-date-and-time', () => {
           })
           expect(visitSessionsService.createVisit).not.toHaveBeenCalled()
           expect(auditService.reservedVisit).toHaveBeenCalledTimes(1)
-          expect(auditService.reservedVisit).toHaveBeenCalledWith('3b-cd-4f-fg', 'A1234BC', 'HEI', undefined, undefined)
+          expect(auditService.reservedVisit).toHaveBeenCalledWith(
+            '3b-cd-4f-fg',
+            'A1234BC',
+            'HEI',
+            ['4323'],
+            '2022-02-14T12:00:00',
+            '2022-02-14T13:05:00',
+            'OPEN',
+            undefined,
+            undefined,
+          )
           expect(visitSessionsService.updateVisit).toHaveBeenCalledTimes(1)
           expect(visitSessionsService.updateVisit.mock.calls[0][0].visitData.visitReference).toBe('3b-cd-4f-fg')
         })
@@ -2272,6 +2292,9 @@ describe('/book-a-visit/check-your-booking', () => {
             visitSessionData.prisoner.offenderNo,
             'HEI',
             [visitSessionData.visitors[0].personId.toString()],
+            '2022-03-12T09:30:00',
+            '2022-03-12T10:30:00',
+            'OPEN',
             undefined,
             undefined,
           )

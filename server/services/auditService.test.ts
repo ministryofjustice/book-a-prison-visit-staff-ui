@@ -68,7 +68,17 @@ describe('Audit service', () => {
   })
 
   it('sends a visit reserved audit message', async () => {
-    await auditService.reservedVisit('ab-cd-ef-gh', 'A1234BC', 'HEI', 'username', 'operation-id')
+    await auditService.reservedVisit(
+      'ab-cd-ef-gh',
+      'A1234BC',
+      'HEI',
+      ['abc123', 'bcd321'],
+      '2022-08-24T11:00:00',
+      '2022-08-24T12:00:00',
+      'OPEN',
+      'username',
+      'operation-id',
+    )
 
     expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
     expect(sqsClientInstance.send.mock.lastCall[0]).toMatchObject({
@@ -79,7 +89,9 @@ describe('Audit service', () => {
           operationId: 'operation-id',
           who: 'username',
           service: 'book-a-prison-visit-staff-ui',
-          details: '{"visitReference":"ab-cd-ef-gh","prisonerId":"A1234BC","prisonId":"HEI"}',
+          details:
+            '{"visitReference":"ab-cd-ef-gh","prisonerId":"A1234BC","prisonId":"HEI","visitorIds":["abc123","bcd321"],' +
+            '"startTimestamp":"2022-08-24T11:00:00","endTimestamp":"2022-08-24T12:00:00","visitRestriction":"OPEN"}',
         }),
         QueueUrl,
       },
@@ -87,7 +99,17 @@ describe('Audit service', () => {
   })
 
   it('sends a visit booked audit message', async () => {
-    await auditService.bookedVisit('ab-cd-ef-gh', 'A1234BC', 'HEI', ['abc123', 'bcd321'], 'username', 'operation-id')
+    await auditService.bookedVisit(
+      'ab-cd-ef-gh',
+      'A1234BC',
+      'HEI',
+      ['abc123', 'bcd321'],
+      '2022-08-24T11:00:00',
+      '2022-08-24T12:00:00',
+      'OPEN',
+      'username',
+      'operation-id',
+    )
 
     expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
     expect(sqsClientInstance.send.mock.lastCall[0]).toMatchObject({
@@ -99,7 +121,8 @@ describe('Audit service', () => {
           who: 'username',
           service: 'book-a-prison-visit-staff-ui',
           details:
-            '{"visitReference":"ab-cd-ef-gh","prisonerId":"A1234BC","prisonId":"HEI","visitorIds":["abc123","bcd321"]}',
+            '{"visitReference":"ab-cd-ef-gh","prisonerId":"A1234BC","prisonId":"HEI","visitorIds":["abc123","bcd321"],' +
+            '"startTimestamp":"2022-08-24T11:00:00","endTimestamp":"2022-08-24T12:00:00","visitRestriction":"OPEN"}',
         }),
         QueueUrl,
       },
