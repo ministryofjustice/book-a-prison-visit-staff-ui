@@ -6,7 +6,7 @@ import PrisonerContactRegistryApiClient from '../data/prisonerContactRegistryApi
 import {
   Alert,
   InmateDetail,
-  PageOfPrisonerBookingSummary,
+  PagePrisonerBookingSummary,
   VisitBalances,
   OffenderRestrictions,
 } from '../data/prisonApiTypes'
@@ -51,7 +51,7 @@ describe('Prisoner profile service', () => {
 
   describe('getProfile', () => {
     it('Retrieves and processes data for prisoner profile with visit balances', async () => {
-      const bookings = <PageOfPrisonerBookingSummary>{
+      const bookings = <PagePrisonerBookingSummary>{
         content: [
           {
             bookingId: 12345,
@@ -171,7 +171,7 @@ describe('Prisoner profile service', () => {
     })
 
     it('Does not look up visit balances for those on REMAND', async () => {
-      const bookings = <PageOfPrisonerBookingSummary>{
+      const bookings = <PagePrisonerBookingSummary>{
         content: [
           {
             bookingId: 22345,
@@ -425,7 +425,7 @@ describe('Prisoner profile service', () => {
         ],
       ]
 
-      const bookings = <PageOfPrisonerBookingSummary>{
+      const bookings = <PagePrisonerBookingSummary>{
         content: [
           {
             bookingId: 22345,
@@ -479,7 +479,7 @@ describe('Prisoner profile service', () => {
 
     it('Throws 404 if no bookings found for criteria', async () => {
       // e.g. offenderNo doesn't exist - or not at specified prisonId
-      const bookings = <PageOfPrisonerBookingSummary>{
+      const bookings = <PagePrisonerBookingSummary>{
         content: [],
         numberOfElements: 0,
       }
@@ -493,7 +493,7 @@ describe('Prisoner profile service', () => {
   })
 
   describe('getPrisonerAndVisitBalances', () => {
-    const bookings = <PageOfPrisonerBookingSummary>{
+    const bookings = <PagePrisonerBookingSummary>{
       content: [
         {
           bookingId: 12345,
