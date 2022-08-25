@@ -19,7 +19,6 @@ export interface components {
       errorCode?: number
       userMessage?: string
       developerMessage?: string
-      moreInfo?: string
     }
     /** @description An address */
     AddressDto: {
@@ -279,4 +278,5 @@ export interface operations {
   }
 }
 
-// export interface external {}
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface external {}
