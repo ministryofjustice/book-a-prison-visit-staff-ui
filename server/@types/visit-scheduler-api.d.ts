@@ -125,6 +125,11 @@ export interface components {
        * @example 1234
        */
       nomisPersonId: number
+      /**
+       * @description true if visitor is the contact for the visit otherwise false
+       * @example true
+       */
+      visitContact?: boolean
     }
     /** @description Visitor support */
     VisitorSupportDto: {
@@ -202,6 +207,7 @@ export interface components {
         | 'VISITOR_DID_NOT_ARRIVE'
         | 'VISITOR_FAILED_SECURITY_CHECKS'
         | 'VISIT_ORDER_CANCELLED'
+        | 'SUPERSEDED_CANCELLATION'
       /**
        * @description Visit Restriction
        * @example OPEN
@@ -540,6 +546,7 @@ export interface components {
         | 'VISITOR_DID_NOT_ARRIVE'
         | 'VISITOR_FAILED_SECURITY_CHECKS'
         | 'VISIT_ORDER_CANCELLED'
+        | 'SUPERSEDED_CANCELLATION'
       /**
        * @description Visit Restriction
        * @example OPEN
@@ -587,6 +594,7 @@ export interface components {
         | 'VISITOR_DID_NOT_ARRIVE'
         | 'VISITOR_FAILED_SECURITY_CHECKS'
         | 'VISIT_ORDER_CANCELLED'
+        | 'SUPERSEDED_CANCELLATION'
       /**
        * @description Outcome text
        * @example Because he got covid
@@ -603,26 +611,26 @@ export interface components {
       content?: components['schemas']['VisitDto'][]
       /** Format: int32 */
       number?: number
-      sort?: components['schemas']['Sort']
+      sort?: components['schemas']['SortObject']
       last?: boolean
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     PageableObject: {
       /** Format: int64 */
       offset?: number
-      sort?: components['schemas']['Sort']
+      sort?: components['schemas']['SortObject']
       /** Format: int32 */
       pageSize?: number
-      /** Format: int32 */
-      pageNumber?: number
       paged?: boolean
       unpaged?: boolean
+      /** Format: int32 */
+      pageNumber?: number
     }
-    Sort: {
+    SortObject: {
       empty?: boolean
       sorted?: boolean
       unsorted?: boolean
@@ -719,6 +727,7 @@ export interface operations {
   getVisitByReference: {
     parameters: {
       path: {
+        /** reference */
         reference: string
       }
     }
@@ -758,6 +767,7 @@ export interface operations {
   updateVisit: {
     parameters: {
       path: {
+        /** reference */
         reference: string
       }
     }
@@ -803,6 +813,7 @@ export interface operations {
   deleteVisit: {
     parameters: {
       path: {
+        /** reference */
         reference: string
       }
     }
@@ -1037,6 +1048,7 @@ export interface operations {
   cancelVisit: {
     parameters: {
       path: {
+        /** reference */
         reference: string
       }
     }
@@ -1140,7 +1152,8 @@ export interface operations {
   getSessionTemplate: {
     parameters: {
       path: {
-        templateId: number
+        /** Template id */
+        templateId: string
       }
     }
     responses: {
@@ -1168,7 +1181,8 @@ export interface operations {
   deleteSessionTemplate: {
     parameters: {
       path: {
-        templateId: number
+        /** session template id */
+        templateId: string
       }
     }
     responses: {
@@ -1208,4 +1222,5 @@ export interface operations {
   }
 }
 
-// export interface external {}
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface external {}
