@@ -196,7 +196,7 @@ export default class VisitSessionsService {
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
 
     const visit = await visitSchedulerApiClient.startUpdateVisit(visitReference)
-    logger.info(`Started amend journey for visit ${visit.reference}`)
+    logger.info(`Started update journey for visit ${visit.reference}`)
 
     return visit
   }
