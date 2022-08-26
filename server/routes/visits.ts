@@ -27,7 +27,7 @@ export default function routes(
 
   get('/', async (req, res) => {
     const { type = 'OPEN', time = '', selectedDate = '', firstTabDate = '' } = req.query
-    let visitType = ['OPEN', 'CLOSED'].includes(type as string) ? (type as string) : 'OPEN'
+    let visitType = ['OPEN', 'CLOSED', 'UNKNOWN'].includes(type as string) ? (type as string) : 'OPEN'
     const selectedDateString = getParsedDateFromQueryString(selectedDate as string)
     const {
       extendedVisitsInfo,
@@ -37,6 +37,7 @@ export default function routes(
       slots: {
         openSlots: VisitsPageSlot[]
         closedSlots: VisitsPageSlot[]
+        unknownSlots: VisitsPageSlot[]
         firstSlotTime: string
       }
     } = await visitSessionsService.getVisitsByDate({
@@ -44,15 +45,19 @@ export default function routes(
       username: res.locals.user?.username,
     })
 
-    if (slots.openSlots.length === 0 && slots.closedSlots.length > 0 && visitType !== 'CLOSED') {
-      visitType = 'CLOSED'
+    if (visitType === 'OPEN' && slots.openSlots.length === 0) {
+      if (slots.closedSlots.length > 0) {
+        visitType = 'CLOSED'
+      } else if (slots.unknownSlots.length > 0) {
+        visitType = 'UNKNOWN'
+      }
     }
 
     const maxSlotDefaults = {
       OPEN: 30,
       CLOSED: 3,
     }
-    const maxSlots = maxSlotDefaults[visitType]
+    const maxSlots = maxSlotDefaults[visitType] ?? 0
     const firstTabDateString = getParsedDateFromQueryString(firstTabDate as string)
 
     const slotFilter = time === '' ? slots.firstSlotTime : time
@@ -75,8 +80,8 @@ export default function routes(
       closed: slots.closedSlots.find(slot => slot.visitTime === slotFilter) ?? { adults: 0, children: 0 },
     }
     const totals = {
-      adults: visitType === 'OPEN' ? selectedSlots.open.adults : selectedSlots.closed.adults,
-      children: visitType === 'OPEN' ? selectedSlots.open.children : selectedSlots.closed.children,
+      adults: selectedSlots[visitType.toLowerCase()].adults,
+      children: selectedSlots[visitType.toLowerCase()].children,
     }
 
     const filteredVisits = extendedVisitsInfo.filter(

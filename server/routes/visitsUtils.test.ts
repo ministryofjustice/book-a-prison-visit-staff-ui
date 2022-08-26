@@ -136,11 +136,12 @@ describe('getSlotsSideMenuData', () => {
           },
         ],
         closedSlots: [],
+        unknownSlots: [],
       },
       expected: [
         {
           heading: {
-            text: 'Main visits room',
+            text: 'Open visits',
             classes: 'govuk-!-padding-top-0',
           },
           items: [
@@ -177,11 +178,12 @@ describe('getSlotsSideMenuData', () => {
           },
         ],
         closedSlots: [],
+        unknownSlots: [],
       },
       expected: [
         {
           heading: {
-            text: 'Main visits room',
+            text: 'Open visits',
             classes: 'govuk-!-padding-top-0',
           },
           items: [

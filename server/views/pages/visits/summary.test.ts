@@ -33,7 +33,7 @@ describe('Views - Visits summary', () => {
       slotsNav: [
         {
           heading: {
-            text: 'Main visits room',
+            text: 'Open visits',
             classes: 'govuk-!-padding-top-0',
           },
           items: [
@@ -78,7 +78,7 @@ describe('Views - Visits summary', () => {
     }
     const $ = cheerio.load(compiledTemplate.render(viewContext))
 
-    expect($('[data-test="visit-room"]').text()).toBe('Main')
+    expect($('[data-test="visit-room"]').text()).toBe('Open')
     expect($('[data-test="visit-time"]').text()).toBe('9am to 10am')
     expect($('[data-test="visit-tables-booked"]').text()).toBe('2 of 5')
     expect($('[data-test="visit-visitors-total"]').text()).toBe('11')
@@ -86,7 +86,74 @@ describe('Views - Visits summary', () => {
     expect($('[data-test="visit-children"]').text()).toBe('7')
     expect($('[data-test="prisoner-number"]').text()).toBe('A8709DY')
     expect($('[data-test="prisoner-name"]').text()).toBe('Rocky, Asap')
-    expect($('.moj-side-navigation__title').text()).toContain('Main visits room')
+    expect($('.moj-side-navigation__title').text()).toContain('Open visits')
+    expect($('.moj-side-navigation__item--active').text()).toContain('10am to 11am')
+  })
+
+  it('should display side menu, unknown visit type, time, visitor and table totals and list of prisoners in visit slot', () => {
+    viewContext = {
+      totals: {
+        visitors: 11,
+        adults: 4,
+        children: 7,
+      },
+      slotsNav: [
+        {
+          heading: {
+            text: 'Visit type unknown',
+            classes: 'govuk-!-padding-top-0',
+          },
+          items: [
+            {
+              text: '10am to 11am',
+              href: '/visits?selectedDate=2022-05-23&time=10am to 11am&type=OPEN',
+              active: true,
+            },
+          ],
+        },
+      ],
+      results: [
+        [
+          {
+            text: 'Rocky, Asap',
+            attributes: {
+              'data-test': 'prisoner-name',
+            },
+          },
+          {
+            text: 'A8709DY',
+            attributes: {
+              'data-test': 'prisoner-number',
+            },
+          },
+          {
+            html: '<a href="" class="bapv-result-row">View</a>',
+            classes: 'govuk-!-text-align-right',
+          },
+        ],
+      ],
+      visitType: 'UNKNOWN',
+      maxSlots: 5,
+      slotTime: '9am to 10am',
+      next: 1,
+      previous: 1,
+      numberOfResults: 2,
+      pageSize: 10,
+      from: 1,
+      to: 10,
+      pageLinks: '',
+    }
+    const $ = cheerio.load(compiledTemplate.render(viewContext))
+
+    expect($('[data-test="visit-room"]').text()).toBe('Visit type unknown')
+    expect($('[data-test="visit-time"]').text()).toBe('9am to 10am')
+    expect($('[data-test="visit-tables-booked"]').text()).toBe('2 of 5')
+    expect($('[data-test="visit-visitors-total"]').text()).toBe('11')
+    expect($('[data-test="visit-adults"]').text()).toBe('4')
+    expect($('[data-test="visit-children"]').text()).toBe('7')
+    expect($('[data-test="prisoner-number"]').text()).toBe('A8709DY')
+    expect($('[data-test="prisoner-name"]').text()).toBe('Rocky, Asap')
+    expect($('.moj-side-navigation__title').text()).toContain('Visit type unknown')
     expect($('.moj-side-navigation__item--active').text()).toContain('10am to 11am')
   })
 })
