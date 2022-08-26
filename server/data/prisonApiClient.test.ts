@@ -17,7 +17,7 @@ describe('prisonApiClient', () => {
   })
 
   describe('getBookings', () => {
-    it('should return PageOfPrisonerBookingSummary from the Prison API', async () => {
+    it('should return PagePrisonerBookingSummary from the Prison API', async () => {
       const offenderNo = 'A1234BC'
       const results = {
         content: [

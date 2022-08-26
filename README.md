@@ -82,6 +82,24 @@ Or run tests with the cypress UI:
 The template project has implemented some scheduled checks to ensure that key dependencies are kept up to date.
 If these are not desired in the cloned project, remove references to `check_outdated` job from `.circleci/config.yml`
 
+
+## Imported types
+
+Some TypeScript types are imported via the Open API (Swagger) docs, e.g. from the Visit Scheduler, Prisoner Contact Registry, Prison API, etc.
+
+These are stored in [`./server/@types/`](./server/@types/), for example [`./server/@types/visit-scheduler-api.d.ts`](./server/@types/visit-scheduler-api.d.ts). (There are also some corresponding files such as [`./server/data/visitSchedulerApiTypes.ts`](./server/data/visitSchedulerApiTypes.ts) that contain the particular imported types that are actually used in the project.)
+
+For example, to update types for the Visit Scheduler use the [API docs URL](https://visit-scheduler-dev.prison.service.justice.gov.uk/v3/api-docs) from [Swagger](https://visit-scheduler-dev.prison.service.justice.gov.uk/swagger-ui/index.html) and the appropriate output filename:
+```
+# (this will prompt you to install openapi-typescript if needed)
+npx openapi-typescript https://visit-scheduler-dev.prison.service.justice.gov.uk/v3/api-docs --output ./server/@types/visit-scheduler-api.d.ts
+```
+The downloaded file will need tidying (e.g. single rather than double quotes, etc):
+* `npm run lint-fix` should tidy most of the formatting
+* there may be some remaining errors about empty interfaces; these can be fixed be either removing the line or putting `// eslint-disable-next-line @typescript-eslint/no-empty-interface` before.
+
+After updating the types, running the TypeScript complier across the project (`npx tsc`) will show any issues that have been caused by the change.
+
 ## User audit
 To record an audit trail of user actions, events are sent to the [hmpps-audit-api](https://github.com/ministryofjustice/hmpps-audit-api) service SQS queue. Currently, the following are audited (see [auditService.ts](./server/services/auditService.ts) and [auditService.test.ts](./server/services/auditService.test.ts) for details of what is logged):
 

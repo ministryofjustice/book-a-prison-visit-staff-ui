@@ -4,1627 +4,1144 @@
  */
 
 export interface paths {
-  '/absence-reasons': {
-    get: operations['reasonsUsingGET']
-  }
-  '/agencies/{agencyId}/locations/groups': {
-    /** List of all available Location Groups at agency. */
-    get: operations['getAvailableLocationGroups']
-  }
-  '/agencies/{agencyId}/locations/whereabouts': {
-    /** Whereabouts details (e.g. whether enabled) for prison. */
-    get: operations['getWhereabouts']
-  }
-  '/appointment': {
-    post: operations['createAppointment']
-  }
-  '/appointment/recurring/{id}': {
-    delete: operations['deleteRecurringAppointmentSequence']
-  }
-  '/appointment/{id}': {
-    get: operations['getAppointment']
-    delete: operations['deleteAppointment']
-  }
-  '/appointments/{agencyId}': {
-    get: operations['getAppointments']
-  }
-  '/attendance': {
-    /** Stores new attendance record, posts attendance details back up to PNOMIS. IEP warnings are triggered when certain absence reasons are used. */
-    post: operations['postAttendanceUsingPOST']
-  }
-  '/attendance/{id}': {
-    /** Updates the attendance record, posts attendance details back up to PNOMIS. IEP warnings are triggered when certain absence reasons are used. */
-    put: operations['putAttendanceUsingPUT']
-  }
-  '/attendance-statistics/{prison}/over-date-range': {
-    /** Request attendance statistics */
-    get: operations['getAttendanceForEventLocationUsingGET']
-  }
-  '/attendances': {
-    /** Stores new attendance record for multiple offenders, posts attendance details back up to PNOMIS */
-    post: operations['postAttendancesUsingPOST']
-  }
-  '/attendances/changes': {
-    get: operations['getAttendanceChangesUsingGET']
-  }
-  '/attendances/offender/{offenderNo}/unacceptable-absence-count': {
-    get: operations['getAttendanceSummaryUsingGET']
-  }
-  '/attendances/offender/{offenderNo}/unacceptable-absences': {
-    /** Request unacceptable absence details */
-    get: operations['getAttendanceDetailsForOffenderUsingGET']
-  }
-  '/attendances/{prison}': {
-    /** Request attendance details */
-    get: operations['getAttendanceForBookingsUsingGET']
-    /** Request attendance details */
-    post: operations['getAttendanceForBookingsByPostUsingPOST']
-  }
-  '/attendances/{prison}/absences': {
-    /** Request absences details */
-    get: operations['getAbsencesUsingGET']
-  }
-  '/attendances/{prison}/absences-for-scheduled-activities/{absentReason}': {
-    /** Request absences */
-    get: operations['getAbsencesForReasonUsingGET']
-  }
-  '/attendances/{prison}/attendance-for-scheduled-activities': {
-    /** Request attendance details */
-    get: operations['getAttendanceForOffendersThatHaveScheduleActivityUsingGET']
-  }
-  '/attendances/{prison}/attendance-over-date-range': {
-    /** Request attendance details */
-    post: operations['getAttendanceForBookingsOverDateRangeByPostUsingPOST']
-  }
-  '/attendances/{prison}/{event-location}': {
-    /** Request attendance details */
-    get: operations['getAttendanceForEventLocationUsingGET_1']
-  }
-  '/cell/cell-move-reason/booking/{bookingId}/bed-assignment-sequence/{bedAssignmentId}': {
-    get: operations['getCellMoveReasonUsingGET']
-  }
-  '/cell/make-cell-move': {
-    post: operations['makeCellMoveUsingPOST']
-  }
-  '/events/{offenderNo}': {
-    /** All scheduled events for offender. */
-    get: operations['getEvents']
-  }
-  '/locations/cellsWithCapacity/{agencyId}/{group}': {
-    /** List of cells  by group at agency location which have capacity. */
-    get: operations['getCellsWithCapacityForGroup']
-  }
-  '/locations/groups/{agencyId}/{name}': {
-    /** List of cell locations by group at agency location. */
-    get: operations['getLocationGroup']
-  }
-  '/locations/{agencyId}/{group}/location-prefix': {
-    get: operations['getLocationPrefixFromGroup']
-  }
-  '/court/all-courts': {
-    /** Return all court locations */
-    get: operations['getCourtNamesUsingGET']
-  }
-  '/court/courts': {
-    /** Return information about all courts. */
-    get: operations['getCourtsUsingGET']
-  }
-  '/court/video-link-appointments': {
-    /** Return video link appointments */
-    post: operations['getVideoLinkAppointmentsUsingPOST']
-  }
-  '/court/video-link-booking-check': {
-    post: operations['findAvailableVideoLinkBookingOptionsUsingPOST']
-  }
-  '/court/video-link-bookings': {
-    post: operations['createVideoLinkBookingUsingPOST']
-  }
-  '/court/video-link-bookings/prison/{agencyId}/date/{date}': {
-    get: operations['getVideoLinkBookingsByPrisonDateAndCourtUsingGET']
+  '/court/video-link-bookings/{videoLinkBookingId}/comment': {
+    /** Update the comment for a Video Link Booking */
+    put: operations['updateVideoLinkBookingComment']
   }
   '/court/video-link-bookings/{videoBookingId}': {
     /** Return a video Link Booking */
-    get: operations['getVideoLinkBookingUsingGET']
-    put: operations['updateVideoLinkBookingUsingPUT']
-    delete: operations['deleteVideoLinkBookingUsingDELETE']
+    get: operations['getVideoLinkBooking']
+    /** Update a Video Link Booking */
+    put: operations['updateVideoLinkBooking']
+    /** Delete a Video Link Booking */
+    delete: operations['deleteVideoLinkBooking']
   }
-  '/court/video-link-bookings/{videoLinkBookingId}/comment': {
-    put: operations['updateVideoLinkBookingCommentUsingPUT']
+  '/attendance/{id}': {
+    /** Updates the attendance record, posts attendance details back up to PNOMIS. IEP warnings are triggered when certain absence reasons are used. */
+    put: operations['putAttendance']
   }
-  '/events/video-link-booking-events': {
-    /** Return details of Video Link Booking Events (Create, Update, Delete) in CSV format. Restrict the response to events occurring within 'days' of start-date. */
-    get: operations['getVideoLinkBookingEventsUsingGET']
+  '/court/video-link-bookings': {
+    /** Return details of Video Link Bookings in CSV format. Restrict the response to bookings with a main start time within 'days' of start-date. */
+    get: operations['getVideoLinkBookingsByStartDate']
+    /** Create a Video Link Booking */
+    post: operations['createVideoLinkBooking']
+  }
+  '/court/video-link-booking-check': {
+    /** Check that a potential video link booking, described by the supplied specification, can be made.  If not then return information about some alternatives. */
+    post: operations['findAvailableVideoLinkBookingOptions']
+  }
+  '/court/video-link-appointments': {
+    /** Return video link appointments */
+    post: operations['getVideoLinkAppointments']
+  }
+  '/cell/make-cell-move': {
+    /** Make a cell move for an offender. Triggers the creation of a MOVED_CELL case note. */
+    post: operations['makeCellMove']
+  }
+  '/attendances': {
+    /** Stores new attendance record for multiple offenders, posts attendance details back up to PNOMIS */
+    post: operations['postAttendances']
+  }
+  '/attendances/{prison}': {
+    /** Returns set of attendance details for set of booking ids */
+    get: operations['getAttendanceForBookings']
+    /** Returns set of attendance details for set of booking ids */
+    post: operations['getAttendanceForBookingsByPost']
+  }
+  '/attendances/{prison}/attendance-over-date-range': {
+    /** Returns set of attendance details for set of booking ids */
+    post: operations['getAttendanceForBookingsOverDateRangeByPost']
+  }
+  '/attendance': {
+    /** Stores new attendance record, posts attendance details back up to PNOMIS. IEP warnings are triggered when certain absence reasons are used. */
+    post: operations['postAttendance']
+  }
+  '/appointment': {
+    /** Create an appointment */
+    post: operations['createAppointment']
   }
   '/video-link-rooms/{agencyId}': {
     /** List of all the Video Link Booking rooms in the prison. */
     get: operations['getVideoLinkBookingRooms']
   }
+  '/locations/{agencyId}/{group}/location-prefix': {
+    /** Get location prefix by group */
+    get: operations['getLocationPrefixFromGroup']
+  }
+  '/locations/groups/{agencyId}/{name}': {
+    /** List of cell locations by group at agency location. */
+    get: operations['getLocationGroup']
+  }
+  '/locations/cellsWithCapacity/{agencyId}/{group}': {
+    /** List of cells by group at agency location which have capacity. */
+    get: operations['getCellsWithCapacityForGroup']
+  }
+  '/events/{offenderNo}': {
+    /** All scheduled events for offender.  This endpoint filters out cancelled events. */
+    get: operations['getEvents']
+  }
+  '/events/video-link-booking-events': {
+    /** Return details of Video Link Booking Events (Create, Update, Delete) in CSV format. Restrict the response to events occurring within 'days' of start-date. */
+    get: operations['getVideoLinkBookingEvents']
+  }
+  '/court/video-link-bookings/prison/{agencyId}/date/{date}': {
+    /** Get all video link bookings for the specified date and prison, optionally filtering by court. */
+    get: operations['getVideoLinkBookingsByPrisonDateAndCourt']
+  }
+  '/court/courts': {
+    /** Return information about all courts. */
+    get: operations['getCourts']
+  }
+  '/court/courts/{courtId}/email': {
+    /** Return information about email address. */
+    get: operations['getEmailByCourtId']
+  }
+  '/court/all-courts': {
+    /** All court locations */
+    get: operations['getCourtNames']
+  }
+  '/cell/cell-move-reason/booking/{bookingId}/bed-assignment-sequence/{bedAssignmentId}': {
+    /** Return cell move reason */
+    get: operations['getCellMoveReason']
+  }
+  '/attendances/{prison}/{event-location}': {
+    /** Returns set of attendance details */
+    get: operations['getAttendanceForEventLocation']
+  }
+  '/attendances/{prison}/unaccounted-for': {
+    /** Return a set of prisoners that haven't attended a scheduled activity */
+    get: operations['getPrisonersUnaccountedFor']
+  }
+  '/attendances/{prison}/absences': {
+    /** Returns set of attendance details for attendances with an absent reason */
+    get: operations['getAbsences']
+  }
+  '/attendances/{prison}/absences-for-scheduled-activities/{absentReason}': {
+    /** Return a set of absences for all offenders that have scheduled activity */
+    get: operations['getAbsencesForReason']
+  }
+  '/attendances/offender/{offenderNo}/unacceptable-absences': {
+    /** Returns unacceptable absence attendance details for an offender */
+    get: operations['getAttendanceDetailsForOffender']
+  }
+  '/attendances/offender/{offenderNo}/unacceptable-absence-count': {
+    /** Return counts of unacceptable absences and totals over time for an offender */
+    get: operations['getAttendanceSummary']
+  }
+  '/attendances/changes': {
+    /** Return all changes relating to an attendance */
+    get: operations['getAttendanceChanges']
+  }
+  '/attendance-statistics/{prison}/over-date-range': {
+    /** Request attendance statistics */
+    get: operations['getAttendanceForEventLocation_1']
+  }
+  '/appointments/{agencyId}': {
+    /** List of appointments for the given agency that match the search criteria. */
+    get: operations['getAppointments']
+  }
+  '/appointment/{id}': {
+    /** Return appointment details */
+    get: operations['getAppointment']
+    /** Delete an appointment */
+    delete: operations['deleteAppointment']
+  }
+  '/agencies/{agencyId}/locations/whereabouts': {
+    /** Whereabouts details (e.g. whether enabled) for prison. */
+    get: operations['getWhereabouts']
+  }
+  '/agencies/{agencyId}/locations/groups': {
+    /** List of all available Location Groups at agency. */
+    get: operations['getAvailableLocationGroups']
+  }
+  '/absence-reasons': {
+    get: operations['reasons']
+  }
+  '/appointment/recurring/{id}': {
+    /** Delete the whole sequence of a recurring appointment */
+    delete: operations['deleteRecurringAppointmentSequence']
+  }
 }
 
 export interface components {
   schemas: {
-    /** AbsenceDto */
-    AbsenceDto: {
+    VideoLinkAppointmentSpecification: {
       /** Format: int64 */
-      attendanceId?: number
-      /** Format: int64 */
-      bookingId?: number
-      cellLocation?: string
-      comments?: string
-      eventDate?: string
-      eventDescription?: string
-      /** Format: int64 */
-      eventId?: number
-      /** Format: int64 */
-      eventLocationId?: number
-      firstName?: string
-      lastName?: string
-      offenderNo?: string
-      /** @enum {string} */
-      period?: 'AM' | 'ED' | 'PM'
-      /** @enum {string} */
-      reason?:
-        | 'AcceptableAbsence'
-        | 'ApprovedCourse'
-        | 'NotRequired'
-        | 'Refused'
-        | 'RefusedIncentiveLevelWarning'
-        | 'RestDay'
-        | 'RestInCellOrSick'
-        | 'SessionCancelled'
-        | 'UnacceptableAbsence'
-      suspended?: boolean
+      locationId: number
+      /** Format: date-time */
+      startTime: string
+      /** Format: date-time */
+      endTime: string
     }
-    /**
-     * AbsencesResponse
-     * @description Absences response
-     */
-    AbsencesResponse: {
-      /** @description Set of absences */
-      absences?: components['schemas']['AbsenceDto'][]
-    }
-    /** AbsentReasonsDto */
-    AbsentReasonsDto: {
-      /**
-       * @description List of paid absent reasons
-       * @example ["ApprovedCourse"]
-       */
-      paidReasons?: (
-        | 'AcceptableAbsence'
-        | 'ApprovedCourse'
-        | 'NotRequired'
-        | 'Refused'
-        | 'RefusedIncentiveLevelWarning'
-        | 'RestDay'
-        | 'RestInCellOrSick'
-        | 'SessionCancelled'
-        | 'UnacceptableAbsence'
-      )[]
-      /**
-       * @description List of reasons that trigger IEP Warnings
-       * @example ["UnacceptableAbsence"]
-       */
-      triggersIEPWarning?: (
-        | 'AcceptableAbsence'
-        | 'ApprovedCourse'
-        | 'NotRequired'
-        | 'Refused'
-        | 'RefusedIncentiveLevelWarning'
-        | 'RestDay'
-        | 'RestInCellOrSick'
-        | 'SessionCancelled'
-        | 'UnacceptableAbsence'
-      )[]
-      /**
-       * @description List of unpaid absent reasons
-       * @example ["RestInCellOrSick"]
-       */
-      unpaidReasons?: (
-        | 'AcceptableAbsence'
-        | 'ApprovedCourse'
-        | 'NotRequired'
-        | 'Refused'
-        | 'RefusedIncentiveLevelWarning'
-        | 'RestDay'
-        | 'RestInCellOrSick'
-        | 'SessionCancelled'
-        | 'UnacceptableAbsence'
-      )[]
-    }
-    /**
-     * AppointmentDetailsDto
-     * @description Appointment details, linking video link bookings and recurring appointments
-     */
-    AppointmentDetailsDto: {
-      /** @description Appointment details pulled from NOMIS */
-      appointment: components['schemas']['AppointmentDto']
-      /** @description Recurring appointment details */
-      recurring?: components['schemas']['RecurringAppointmentDto']
-      /** @description Video link booking details */
-      videoLinkBooking?: components['schemas']['VideoLinkBookingDto']
-    }
-    /**
-     * AppointmentDto
-     * @description The data related to a single appointment.
-     */
-    AppointmentDto: {
-      /**
-       * @description The Id of the agency where the appointment is
-       * @example MDI
-       */
-      agencyId: string
-      /**
-       * @description The code for the type of appointment this is
-       * @example INTERV
-       */
-      appointmentTypeCode: string
-      /** @description Additional information regarding the appointment */
+    VideoLinkBookingUpdateSpecification: {
+      courtId: string
       comment?: string
-      /** @description Created by user id */
-      createUserId?: string
-      /** @description When the appointment is scheduled to end */
-      endTime?: string
-      /**
-       * Format: int64
-       * @description The event Id associated with this appointment
-       */
-      id: number
-      /**
-       * Format: int64
-       * @description The Id of the location to be used for this appointment
-       */
-      locationId: number
-      /** @description The NOMS Id of the offender who this appointment is for */
-      offenderNo: string
-      /** @description When the appointment is scheduled to start */
-      startTime: string
+      pre?: components['schemas']['VideoLinkAppointmentSpecification']
+      main: components['schemas']['VideoLinkAppointmentSpecification']
+      post?: components['schemas']['VideoLinkAppointmentSpecification']
     }
-    /**
-     * AppointmentSearchDto
-     * @description The data related to a single appointment.
-     */
-    AppointmentSearchDto: {
-      /**
-       * @description The Id of the agency where the appointment is
-       * @example MDI
-       */
-      agencyId: string
-      /**
-       * @description The code for the type of appointment this is
-       * @example INTERV
-       */
-      appointmentTypeCode: string
-      /** @description The description of the appointment type */
-      appointmentTypeDescription: string
-      /**
-       * @description The name of the user who created this appointment
-       * @example ASMITH
-       */
-      createUserId: string
-      /** @description When the appointment is scheduled to end */
-      endTime?: string
-      /** @description Offender first name */
-      firstName: string
-      /**
-       * Format: int64
-       * @description The event Id associated with this appointment
-       */
-      id: number
-      /** @description Offender last name */
-      lastName: string
-      /** @description The description of the location */
-      locationDescription: string
-      /**
-       * Format: int64
-       * @description The Id of the location to be used for this appointment
-       */
-      locationId: number
-      /** @description The NOMS Id of the offender who this appointment is for */
-      offenderNo: string
-      /** @description When the appointment is scheduled to start */
-      startTime: string
-    }
-    /** Attendance change */
-    'Attendance change': {
-      /**
-       * Format: int64
-       * @description Attendance id
-       */
-      attendanceId?: number
-      /**
-       * Format: int64
-       * @description Booking id
-       */
-      bookingId?: number
-      /** @description Changed by username */
-      changedBy?: string
-      /**
-       * @description Previous attendance reason
-       * @enum {string}
-       */
-      changedFrom?:
-        | 'AcceptableAbsence'
-        | 'ApprovedCourse'
-        | 'Attended'
-        | 'NotRequired'
-        | 'Refused'
-        | 'RefusedIncentiveLevelWarning'
-        | 'RestDay'
-        | 'RestInCellOrSick'
-        | 'SessionCancelled'
-        | 'UnacceptableAbsence'
-      /** @description Date and time when the changed occurred */
-      changedOn?: string
-      /**
-       * @description New attendance reason
-       * @enum {string}
-       */
-      changedTo?:
-        | 'AcceptableAbsence'
-        | 'ApprovedCourse'
-        | 'Attended'
-        | 'NotRequired'
-        | 'Refused'
-        | 'RefusedIncentiveLevelWarning'
-        | 'RestDay'
-        | 'RestInCellOrSick'
-        | 'SessionCancelled'
-        | 'UnacceptableAbsence'
-      /**
-       * Format: int64
-       * @description Event id
-       */
-      eventId?: number
-      /**
-       * Format: int64
-       * @description Event location id
-       */
-      eventLocationId?: number
-      /**
-       * Format: int64
-       * @description Id of the change record
-       */
-      id?: number
-      /**
-       * @description Id of the prison example
-       * @example MDI
-       */
-      prisonId?: string
-    }
-    /**
-     * AttendanceChangesResponse
-     * @description Attendance changes
-     */
-    AttendanceChangesResponse: {
-      /** @description Set of changes */
-      changes?: components['schemas']['Attendance change'][]
-    }
-    /** AttendanceDto */
-    AttendanceDto: {
-      /** @enum {string} */
+    UpdateAttendanceDto: {
+      attended: boolean
+      paid: boolean
       absentReason?:
-        | 'AcceptableAbsence'
         | 'ApprovedCourse'
+        | 'AcceptableAbsence'
+        | 'SessionCancelled'
+        | 'RestInCellOrSick'
+        | 'RestDay'
+        | 'UnacceptableAbsence'
+        | 'UnacceptableAbsenceIncentiveLevelWarning'
         | 'NotRequired'
         | 'Refused'
         | 'RefusedIncentiveLevelWarning'
-        | 'RestDay'
-        | 'RestInCellOrSick'
-        | 'SessionCancelled'
-        | 'UnacceptableAbsence'
-      attended?: boolean
-      /** Format: int64 */
-      bookingId?: number
-      /** Format: int64 */
-      caseNoteId?: number
-      cellLocation?: string
+      absentSubReason?:
+        | 'Activities'
+        | 'Behaviour'
+        | 'Courses'
+        | 'ExternalMoves'
+        | 'Healthcare'
+        | 'Operational'
+        | 'OverAllocated'
+        | 'Visits'
+        | 'NotListed'
       comments?: string
-      createDateTime?: string
-      createUserId?: string
-      eventDate?: string
+    }
+    ErrorResponse: {
+      /** Format: int32 */
+      status?: number
+      /** Format: int32 */
+      errorCode?: number
+      userMessage?: string
+      developerMessage?: string
+      moreInfo?: string
+    }
+    VideoLinkBookingSpecification: {
       /** Format: int64 */
-      eventId?: number
-      /** Format: int64 */
-      eventLocationId?: number
-      /** Format: int64 */
-      id?: number
-      locked?: boolean
-      modifyDateTime?: string
-      modifyUserId?: string
-      paid?: boolean
-      /** @enum {string} */
-      period?: 'AM' | 'ED' | 'PM'
-      prisonId?: string
-    }
-    /**
-     * AttendanceHistoryDto
-     * @description Attendance data
-     */
-    AttendanceHistoryDto: {
-      /**
-       * @description Activity name
-       * @example Industries - Food Packing
-       */
-      activity: string
-      /**
-       * @description Activity description
-       * @example Workshop 7
-       */
-      activityDescription: string
-      /**
-       * @description Any activity outcome captured (n.b. for outcomes captured via Whereabouts, this is also the Case note text)
-       * @example Healthcare issue - speak to SO
-       */
-      comments?: string
-      /**
-       * @description Date the event occurred
-       * @example 2021-10-01
-       */
-      eventDate: string
-      /**
-       * @description Prison.
-       * @example MDI
-       */
-      location: string
-    }
-    /**
-     * AttendanceSummary
-     * @description Attendances aggregate data
-     */
-    AttendanceSummary: {
-      /**
-       * Format: int32
-       * @description Number of acceptable absences in period
-       */
-      acceptableAbsence?: number
-      /**
-       * Format: int32
-       * @description Total number of attendances in period (which have an outcome)
-       */
-      total?: number
-      /**
-       * Format: int32
-       * @description Number of unacceptable absences in period
-       */
-      unacceptableAbsence?: number
-    }
-    /**
-     * AttendancesDto
-     * @description Attend all parameters
-     */
-    AttendancesDto: {
-      /**
-       * @description Indication of attendance
-       * @example true
-       */
-      attended?: boolean
-      /** @description Set of active booking and activity ids */
-      bookingActivities: components['schemas']['BookingActivity'][]
-      /**
-       * @description Comment describing the offenders absence
-       * @example They had a medical appointment scheduled
-       */
-      comments?: string
-      /**
-       * @description Date the event is scheduled
-       * @example 2019-10-01
-       */
-      eventDate: string
-      /**
-       * Format: int64
-       * @description Id of the location the event is taking place
-       * @example 4
-       */
-      eventLocationId: number
-      /**
-       * @description Indicates that the offender should be paid
-       * @example true
-       */
-      paid?: boolean
-      /**
-       * @description Time period for the event
-       * @example AM
-       * @enum {string}
-       */
-      period: 'AM' | 'ED' | 'PM'
-      /**
-       * @description Id of prison the event is taking place
-       * @example LEI
-       */
-      prisonId: string
-      /**
-       * @description Absent reason
-       * @example Refused
-       * @enum {string}
-       */
-      reason?:
-        | 'AcceptableAbsence'
-        | 'ApprovedCourse'
-        | 'NotRequired'
-        | 'Refused'
-        | 'RefusedIncentiveLevelWarning'
-        | 'RestDay'
-        | 'RestInCellOrSick'
-        | 'SessionCancelled'
-        | 'UnacceptableAbsence'
-    }
-    /**
-     * AttendancesResponse
-     * @description Attendances response
-     */
-    AttendancesResponse: {
-      /** @description Set of attendances */
-      attendances?: components['schemas']['AttendanceDto'][]
-    }
-    /** BookingActivity */
-    BookingActivity: {
-      /** Format: int64 */
-      activityId?: number
-      /** Format: int64 */
-      bookingId?: number
-    }
-    /**
-     * CellAttribute
-     * @description Cell Attribute Details
-     */
-    CellAttribute: {
-      /**
-       * @description Cell attribute code
-       * @example LC
-       */
-      code: string
-      /**
-       * @description Cell attribute description
-       * @example Listener cell
-       */
-      description: string
-    }
-    /**
-     * CellMoveDetails
-     * @description Cell move details
-     */
-    CellMoveDetails: {
-      /**
-       * Format: int64
-       * @description Offender booking id
-       * @example 1
-       */
       bookingId: number
-      /**
-       * @description Cell move reason code
-       * @example ADM
-       */
-      cellMoveReasonCode: string
-      /**
-       * @description Cell move reason comment
-       * @example The prisoner has been moved for administrative purposes
-       */
-      commentText: string
-      /**
-       * @description Cell to be moved into
-       * @example MDI-1-1
-       */
-      internalLocationDescriptionDestination: string
-      /**
-       * @description Offender number
-       * @example G123V6
-       */
+      court?: string
+      courtId?: string
+      madeByTheCourt: boolean
+      comment?: string
+      pre?: components['schemas']['VideoLinkAppointmentSpecification']
+      main: components['schemas']['VideoLinkAppointmentSpecification']
+      post?: components['schemas']['VideoLinkAppointmentSpecification']
+    }
+    Interval: {
+      start: components['schemas']['LocalTime']
+      end: components['schemas']['LocalTime']
+    }
+    LocalTime: {
+      /** Format: int32 */
+      hour?: number
+      /** Format: int32 */
+      minute?: number
+      /** Format: int32 */
+      second?: number
+      /** Format: int32 */
+      nano?: number
+    }
+    LocationAndInterval: {
+      /** Format: int64 */
+      locationId: number
+      interval: components['schemas']['Interval']
+    }
+    VideoLinkBookingSearchSpecification: {
+      agencyId: string
+      /** Format: date */
+      date: string
+      preAppointment?: components['schemas']['LocationAndInterval']
+      mainAppointment: components['schemas']['LocationAndInterval']
+      postAppointment?: components['schemas']['LocationAndInterval']
+      /** Format: int64 */
+      vlbIdToExclude?: number
+    }
+    VideoLinkBookingOption: {
+      pre?: components['schemas']['LocationAndInterval']
+      main: components['schemas']['LocationAndInterval']
+      post?: components['schemas']['LocationAndInterval']
+    }
+    VideoLinkBookingOptions: {
+      matched: boolean
+      alternatives: components['schemas']['VideoLinkBookingOption'][]
+    }
+    VideoLinkAppointmentDto: {
+      /** Format: int64 */
+      id: number
+      /** Format: int64 */
+      bookingId: number
+      /** Format: int64 */
+      appointmentId: number
+      /** Format: int64 */
+      videoLinkBookingId: number
+      /** Format: int64 */
+      mainAppointmentId?: number
+      court: string
+      courtId?: string
+      hearingType: 'MAIN' | 'PRE' | 'POST'
+      createdByUsername?: string
+      madeByTheCourt?: boolean
+      /** Format: date-time */
+      startTime?: string
+      /** Format: date-time */
+      endTime?: string
+      /** Format: int64 */
+      locationId?: number
+    }
+    VideoLinkAppointmentsResponse: {
+      appointments?: components['schemas']['VideoLinkAppointmentDto'][]
+    }
+    CellMoveDetails: {
+      /** Format: int64 */
+      bookingId: number
       offenderNo: string
+      internalLocationDescriptionDestination: string
+      cellMoveReasonCode: string
+      commentText: string
     }
-    /**
-     * CellMoveReasonDto
-     * @description Cell move reason
-     */
-    CellMoveReasonDto: {
-      /**
-       * Format: int32
-       * @description Bed assignment sequence. Used as a primary key when combined with the booking id
-       * @example 2
-       */
-      bedAssignmentsSequence?: number
-      /**
-       * Format: int64
-       * @description Offender booking id
-       * @example 1
-       */
-      bookingId?: number
-      /**
-       * Format: int64
-       * @description Id of the case note created
-       * @example 3
-       */
-      caseNoteId?: number
-    }
-    /**
-     * CellMoveReasonResponse
-     * @description Cell move reason response
-     */
-    CellMoveReasonResponse: {
-      cellMoveReason: components['schemas']['CellMoveReasonDto']
-    }
-    /**
-     * CellMoveResponse
-     * @description Cell move response
-     */
     CellMoveResponse: {
       cellMoveResult: components['schemas']['CellMoveResult']
     }
-    /**
-     * CellMoveResult
-     * @description Cell move result
-     */
     CellMoveResult: {
-      /**
-       * @description Id of the establishment
-       * @example MDI
-       */
+      /** Format: int64 */
+      bookingId: number
+      agencyId: string
+      /** Format: int64 */
+      assignedLivingUnitId: number
+      assignedLivingUnitDesc: string
+      /** Format: int32 */
+      bedAssignmentHistorySequence: number
+      /** Format: int64 */
+      caseNoteId?: number
+    }
+    /** @description Attendance parameters */
+    AttendancesDto: {
+      bookingActivities: components['schemas']['BookingActivity'][]
+      /** Format: int64 */
+      eventLocationId: number
+      period: 'AM' | 'PM' | 'ED'
+      prisonId: string
+      /** Format: date */
+      eventDate: string
+      reason?:
+        | 'ApprovedCourse'
+        | 'AcceptableAbsence'
+        | 'SessionCancelled'
+        | 'RestInCellOrSick'
+        | 'RestDay'
+        | 'UnacceptableAbsence'
+        | 'UnacceptableAbsenceIncentiveLevelWarning'
+        | 'NotRequired'
+        | 'Refused'
+        | 'RefusedIncentiveLevelWarning'
+      attended: boolean
+      paid: boolean
+      comments?: string
+    }
+    BookingActivity: {
+      /** Format: int64 */
+      bookingId: number
+      /** Format: int64 */
+      activityId: number
+    }
+    AttendanceDto: {
+      /** Format: int64 */
+      id?: number
+      /** Format: int64 */
+      bookingId?: number
+      /** Format: int64 */
+      eventId?: number
+      /** Format: int64 */
+      eventLocationId?: number
+      period?: 'AM' | 'PM' | 'ED'
+      prisonId?: string
+      attended?: boolean
+      absentReason?:
+        | 'ApprovedCourse'
+        | 'AcceptableAbsence'
+        | 'SessionCancelled'
+        | 'RestInCellOrSick'
+        | 'RestDay'
+        | 'UnacceptableAbsence'
+        | 'UnacceptableAbsenceIncentiveLevelWarning'
+        | 'NotRequired'
+        | 'Refused'
+        | 'RefusedIncentiveLevelWarning'
+      absentSubReason?:
+        | 'Activities'
+        | 'Behaviour'
+        | 'Courses'
+        | 'ExternalMoves'
+        | 'Healthcare'
+        | 'Operational'
+        | 'OverAllocated'
+        | 'Visits'
+        | 'NotListed'
+      paid?: boolean
+      /** Format: date */
+      eventDate?: string
+      comments?: string
+      /** Format: date-time */
+      createDateTime?: string
+      createUserId?: string
+      /** Format: date-time */
+      modifyDateTime?: string
+      modifyUserId?: string
+      /** Format: int64 */
+      caseNoteId?: number
+      locked?: boolean
+      cellLocation?: string
+      absentReasonDescription?: string
+      absentSubReasonDescription?: string
+    }
+    AttendancesResponse: {
+      attendances?: components['schemas']['AttendanceDto'][]
+    }
+    /** @description Attendance details */
+    CreateAttendanceDto: {
+      /** Format: int64 */
+      bookingId: number
+      /** Format: int64 */
+      eventId: number
+      /** Format: int64 */
+      eventLocationId: number
+      period: 'AM' | 'PM' | 'ED'
+      prisonId: string
+      attended: boolean
+      paid: boolean
+      absentReason?:
+        | 'ApprovedCourse'
+        | 'AcceptableAbsence'
+        | 'SessionCancelled'
+        | 'RestInCellOrSick'
+        | 'RestDay'
+        | 'UnacceptableAbsence'
+        | 'UnacceptableAbsenceIncentiveLevelWarning'
+        | 'NotRequired'
+        | 'Refused'
+        | 'RefusedIncentiveLevelWarning'
+      absentSubReason?:
+        | 'Activities'
+        | 'Behaviour'
+        | 'Courses'
+        | 'ExternalMoves'
+        | 'Healthcare'
+        | 'Operational'
+        | 'OverAllocated'
+        | 'Visits'
+        | 'NotListed'
+      /** Format: date */
+      eventDate: string
+      comments?: string
+    }
+    CreateAppointmentSpecification: {
+      /** Format: int64 */
+      bookingId: number
+      /** Format: int64 */
+      locationId: number
+      appointmentType: string
+      comment?: string
+      /** Format: date-time */
+      startTime: string
+      /** Format: date-time */
+      endTime?: string
+      repeat?: components['schemas']['Repeat']
+    }
+    Repeat: {
+      repeatPeriod: 'WEEKLY' | 'DAILY' | 'WEEKDAYS' | 'MONTHLY' | 'FORTNIGHTLY'
+      /** Format: int64 */
+      count: number
+    }
+    CreatedAppointmentDetailsDto: {
+      /** Format: int64 */
+      appointmentEventId: number
+      /** Format: int64 */
+      bookingId: number
+      /** Format: date-time */
+      startTime: string
+      /** Format: date-time */
+      endTime?: string
+      appointmentType: string
+      /** Format: int64 */
+      locationId: number
+    }
+    LocationIdAndDescription: {
+      /** Format: int64 */
+      locationId: number
+      description: string
+    }
+    Location: {
+      /** Format: int64 */
+      locationId: number
+      locationType: string
+      description: string
+      locationUsage?: string
+      agencyId: string
+      /** Format: int64 */
+      parentLocationId?: number
+      /** Format: int32 */
+      currentOccupancy: number
+      locationPrefix: string
+      /** Format: int32 */
+      operationalCapacity: number
+      userDescription?: string
+      internalLocationCode: string
+    }
+    CellAttribute: {
+      code: string
+      description: string
+    }
+    CellWithAttributes: {
+      /** Format: int64 */
+      id: number
+      description: string
+      /** Format: int32 */
+      noOfOccupants: number
+      /** Format: int32 */
+      capacity: number
+      userDescription?: string
+      attributes: components['schemas']['CellAttribute'][]
+    }
+    ScheduledEventDto: {
+      /** Format: int64 */
+      bookingId: number
+      eventClass?: string
+      /** Format: int64 */
+      eventId?: number
+      eventStatus?: string
+      eventType?: string
+      eventTypeDesc?: string
+      eventSubType?: string
+      eventSubTypeDesc?: string
+      /** Format: date */
+      eventDate?: string
+      /** Format: date-time */
+      startTime?: string
+      /** Format: date-time */
+      endTime?: string
+      eventLocation?: string
+      /** Format: int64 */
+      eventLocationId?: number
       agencyId?: string
-      /**
-       * @description Description of cell the offender has been moved to
-       * @example MDI-2-2-006
-       */
-      assignedLivingUnitDesc?: string
+      eventSource?: string
+      eventSourceCode?: string
+      eventSourceDesc?: string
+      eventOutcome?: string
+      performance?: string
+      outcomeComment?: string
+      paid?: boolean
+      payRate?: number
+      locationCode?: string
+      createUserId?: string
+    }
+    LocationTimeslot: {
+      /** Format: int64 */
+      locationId: number
+      /** Format: date-time */
+      startTime: string
+      /** Format: date-time */
+      endTime: string
+    }
+    VideoLinkBookingResponse: {
+      /** Format: int64 */
+      videoLinkBookingId: number
+      /** Format: int64 */
+      bookingId: number
+      agencyId: string
+      court: string
+      courtId?: string
+      comment?: string
+      pre?: components['schemas']['LocationTimeslot']
+      main: components['schemas']['LocationTimeslot']
+      post?: components['schemas']['LocationTimeslot']
+    }
+    Court: {
+      id: string
+      name: string
+      email?: string
+    }
+    CourtEmailDto: {
+      email: string
+    }
+    CourtLocationsResponse: {
+      courtLocations?: string[]
+    }
+    CellMoveReasonDto: {
+      /** Format: int64 */
+      bookingId: number
+      /** Format: int32 */
+      bedAssignmentsSequence: number
+      /** Format: int64 */
+      caseNoteId: number
+    }
+    CellMoveReasonResponse: {
+      cellMoveReason: components['schemas']['CellMoveReasonDto']
+    }
+    /** @description Prisoner Schedule */
+    PrisonerScheduleDto: {
+      /** @description Offender number (e.g. NOMS Number) */
+      offenderNo: string
       /**
        * Format: int64
-       * @description Id of the cell location the offender has been moved to
-       * @example 25700
+       * @description Activity id if any. Used to attend or pay the event
        */
-      assignedLivingUnitId?: number
-      /**
-       * Format: int32
-       * @description Bed assignment sequence associated with the entry created for this cell move
-       * @example 2
-       */
-      bedAssignmentHistorySequence?: number
+      eventId?: number
       /**
        * Format: int64
-       * @description Offender booking id
-       * @example 1000
+       * @description Booking id for offender
        */
       bookingId?: number
       /**
        * Format: int64
-       * @description Case note id
-       * @example 2
-       */
-      caseNoteId?: number
-    }
-    /**
-     * CellWithAttributes
-     * @description Cell with Attributes Details
-     */
-    CellWithAttributes: {
-      /**
-       * @description List of attributes for the cell.
-       * @example Listener cell
-       */
-      attributes?: components['schemas']['CellAttribute'][]
-      /**
-       * Format: int32
-       * @description Capacity of the location.
-       * @example 20
-       */
-      capacity: number
-      /**
-       * @description Location description.
-       * @example MDI-RES-HB1-ALE
-       */
-      description: string
-      /**
-       * Format: int64
-       * @description Location identifier.
-       * @example 721705
-       */
-      id: number
-      /**
-       * Format: int32
-       * @description Current occupancy of location.
-       * @example 10
-       */
-      noOfOccupants: number
-      /**
-       * @description User-friendly location description.
-       * @example RES-HB1-ALE
-       */
-      userDescription?: string
-    }
-    /**
-     * Court
-     * @description Video Link Booking related information for a court
-     */
-    Court: {
-      /** @description The court identifier. Unique. Defined by courts registry. */
-      id: string
-      /** @description A name for the court. */
-      name: string
-    }
-    /** CourtLocationsResponse */
-    CourtLocationsResponse: {
-      courtLocations?: string[]
-    }
-    /**
-     * CreateAppointmentSpecification
-     * @description The data required to create an appointment
-     */
-    CreateAppointmentSpecification: {
-      /**
-       * @description Appointment type
-       * @example INST
-       */
-      appointmentType: string
-      /**
-       * Format: int64
-       * @description The offender booking id
-       */
-      bookingId: number
-      /** @description Additional information */
-      comment?: string
-      /**
-       * @description The estimated date time the appointment will end
-       * @example 2021-05-23T17:00:00
-       */
-      endTime?: string
-      /**
-       * Format: int64
-       * @description The location id of where the appointment will take place
-       */
-      locationId: number
-      /** @description Describes how many times this appointment is to be repeated */
-      repeat?: components['schemas']['Repeat']
-      /**
-       * @description The date and time the appointment is scheduled for
-       * @example 2021-05-23T17:00:00
-       */
-      startTime: string
-    }
-    /**
-     * CreateAttendanceDto
-     * @description Create an attendance for a booking
-     */
-    CreateAttendanceDto: {
-      /**
-       * @description Reason the offender did not attendance the event
-       * @example Refused
-       * @enum {string}
-       */
-      absentReason?:
-        | 'AcceptableAbsence'
-        | 'ApprovedCourse'
-        | 'NotRequired'
-        | 'Refused'
-        | 'RefusedIncentiveLevelWarning'
-        | 'RestDay'
-        | 'RestInCellOrSick'
-        | 'SessionCancelled'
-        | 'UnacceptableAbsence'
-      /**
-       * @description Flag to indicate the offender attended the event
-       * @example true
-       */
-      attended: boolean
-      /**
-       * Format: int64
-       * @description Id of active booking
-       * @example 1
-       */
-      bookingId: number
-      /** @description Comments about non attendance. This also gets used for the IEP warning text */
-      comments?: string
-      /**
-       * @description Date the event is scheduled
-       * @example 2019-10-01
-       */
-      eventDate: string
-      /**
-       * Format: int64
-       * @description Id of event
-       * @example 2
-       */
-      eventId: number
-      /**
-       * Format: int64
-       * @description Id of the location the event is taking place
-       * @example 4
-       */
-      eventLocationId: number
-      /**
-       * @description Flag to indicate the offender should be paid
-       * @example true
-       */
-      paid: boolean
-      /**
-       * @description Time period for the event
-       * @example AM
-       * @enum {string}
-       */
-      period: 'AM' | 'ED' | 'PM'
-      /**
-       * @description Id of prison the event is taking place
-       * @example LEI
-       */
-      prisonId: string
-    }
-    /**
-     * CreatedAppointmentDetailsDto
-     * @description The details of an appointment that has just been created
-     */
-    CreatedAppointmentDetailsDto: {
-      /**
-       * Format: int64
-       * @description The id of the appointment that was created.
-       * @example 123456
-       */
-      appointmentEventId?: number
-      /**
-       * @description The scheduled event subType
-       * @example ACTI
-       */
-      appointmentType?: string
-      /**
-       * Format: int64
-       * @description The Booking id of the offender for whom the appointment was created.
-       * @example 123456
-       */
-      bookingId: number
-      /**
-       * @description The end time of the appointment.
-       * @example 2018-12-31T23:59
-       */
-      endTime?: string
-      /**
-       * Format: int64
-       * @description The identifier of the appointments' Location. The location must be situated in the requestor's case load.
-       * @example 25
+       * @description The number which (uniquely) identifies the internal location associated with the Scheduled Event (Prisoner Schedule)
        */
       locationId?: number
-      /**
-       * @description The start time of the appointment.
-       * @example 2018-12-31T23:50
-       */
-      startTime?: string
-    }
-    /** ErrorResponse */
-    ErrorResponse: {
-      developerMessage?: string
-      /** Format: int32 */
-      errorCode?: number
-      moreInfo?: string
-      /** Format: int32 */
-      status?: number
-      userMessage?: string
-    }
-    /**
-     * Interval
-     * @description A closed time interval, being the intervening time between two time points including the start and end points themselves
-     */
-    Interval: {
-      /**
-       * @description The time at which the interval end, inclusive. ISO-8601 format (hh:mm)
-       * @example 09:30
-       */
-      end?: string
-      /**
-       * @description The time at which the interval starts, inclusive. ISO-8601 format (hh:mm)
-       * @example 09:00
-       */
-      start?: string
-    }
-    /**
-     * Location
-     * @description Location Details
-     */
-    Location: {
-      /**
-       * @description Identifier of Agency this location is associated with.
-       * @example MDI
-       */
-      agencyId: string
-      /**
-       * Format: int32
-       * @description Current occupancy of location.
-       * @example 10
-       */
-      currentOccupancy?: number
-      /**
-       * @description Location description.
-       * @example MDI-RES-HB1-ALE
-       */
-      description: string
-      internalLocationCode: string
-      /**
-       * Format: int64
-       * @description Location identifier.
-       * @example 721705
-       */
-      locationId: number
-      /**
-       * @description Location prefix. Defines search prefix that will constrain search to this location and its subordinate locations.
-       * @example RES-HB1-ALE
-       */
-      locationPrefix?: string
-      /**
-       * @description Location type.
-       * @example ROOM
-       */
-      locationType: string
-      /**
-       * @description What events this room can be used for.
-       * @example APP
-       */
-      locationUsage?: string
-      /**
-       * Format: int32
-       * @description Operational capacity of the location.
-       * @example 20
-       */
-      operationalCapacity?: number
-      /**
-       * Format: int64
-       * @description Identifier of this location's parent location.
-       * @example 26960
-       */
-      parentLocationId?: number
-      /**
-       * @description User-friendly location description.
-       * @example RES-HB1-ALE
-       */
-      userDescription?: string
-    }
-    /** LocationAndInterval */
-    LocationAndInterval: {
-      /** @description If present find the locations that can be used for the pre interval. */
-      interval?: components['schemas']['Interval']
-      /** Format: int64 */
-      locationId: number
-    }
-    /**
-     * LocationGroup
-     * @description Cell Locations are grouped for unlock lists as a 2 level tree. The two levels are referred to as Location and Sub-Location in the prisonstaffhub UI. Each (location/sub-location) group has a name that is understood by prison officers and also serves as a key to retrieve the corresponding Cell Locations and information about their occupants.
-     */
-    LocationGroup: {
-      /**
-       * @description The child groups of this group
-       * @example [{"name": "Landing A/1", "key":"1"}, {"name": "Landing A/2", "key": "2"}]
-       */
-      children: components['schemas']['LocationGroup'][]
-      /**
-       * @description A key for the group
-       * @example A
-       */
-      key: string
-      /**
-       * @description The name of the group
-       * @example Block A
-       */
-      name: string
-    }
-    /**
-     * LocationIdAndDescription
-     * @description A minimal representation of a NOMIS agency internal location.
-     */
-    LocationIdAndDescription: {
-      /**
-       * @description The NOMIS description of the location
-       * @example VCC Room 16
-       */
-      description?: string
-      /**
-       * Format: int64
-       * @description The NOMIS agency internal location identifier of the location
-       * @example 12345
-       */
-      locationId?: number
-    }
-    /**
-     * LocationPrefixDto
-     * @description Location prefix response
-     */
-    LocationPrefixDto: {
-      /**
-       * @description Location prefix translated from group name
-       * @example MDI-1-
-       */
-      locationPrefix?: string
-    }
-    /**
-     * LocationTimeslot
-     * @description Detail of a booked location, either pre, main or post
-     */
-    LocationTimeslot: {
-      /**
-       * @description Finish Time. ISO-8601 date-time format
-       * @example 2020-12-23T09:30:00
-       */
-      endTime: string
-      /**
-       * Format: int64
-       * @description The location identifier
-       * @example 1
-       */
-      locationId: number
-      /**
-       * @description Start Time. ISO-8601 date-time format
-       * @example 2020-12-23T09:00:00
-       */
-      startTime: string
-    }
-    /** Pageable */
-    Pageable: {
-      /** Format: int64 */
-      offset?: number
-      /** Format: int32 */
-      pageNumber?: number
-      /** Format: int32 */
-      pageSize?: number
-      paged?: boolean
-      sort?: components['schemas']['Sort']
-      unpaged?: boolean
-    }
-    /** Page«AttendanceHistoryDto» */
-    'Page«AttendanceHistoryDto»': {
-      content?: components['schemas']['AttendanceHistoryDto'][]
-      empty?: boolean
-      first?: boolean
-      last?: boolean
-      /** Format: int32 */
-      number?: number
-      /** Format: int32 */
-      numberOfElements?: number
-      pageable?: components['schemas']['Pageable']
-      /** Format: int32 */
-      size?: number
-      sort?: components['schemas']['Sort']
-      /** Format: int64 */
-      totalElements?: number
-      /** Format: int32 */
-      totalPages?: number
-    }
-    /** PaidReasons */
-    PaidReasons: {
-      /** Format: int32 */
-      acceptableAbsence?: number
-      /** Format: int32 */
-      approvedCourse?: number
-      /** Format: int32 */
-      attended?: number
-      /** Format: int32 */
-      notRequired?: number
-    }
-    /**
-     * RecurringAppointmentDto
-     * @description Recurring appointment
-     */
-    RecurringAppointmentDto: {
-      /**
-       * Format: int64
-       * @description Specifies the amount of times the repeat period will be applied
-       */
-      count: number
-      /**
-       * Format: int64
-       * @description Recurring appointment sequence id
-       * @example 1
-       */
-      id?: number
-      /**
-       * @description Repeat period
-       * @example Daily
-       * @enum {string}
-       */
-      repeatPeriod: 'Daily' | 'Fortnightly' | 'Monthly' | 'Weekday' | 'Weekly'
-      /**
-       * @description The start time of the first appointment in the sequence
-       * @example 2020-12-23T10:00
-       */
-      startTime?: string
-    }
-    /**
-     * Repeat
-     * @description Describes how many times this appointment is to be repeated
-     */
-    Repeat: {
-      /**
-       * Format: int64
-       * @description Specifies the amount of times the repeat period will be applied
-       */
-      count: number
-      /**
-       * @description Repeat period
-       * @example Daily
-       * @enum {string}
-       */
-      repeatPeriod: 'Daily' | 'Fortnightly' | 'Monthly' | 'Weekday' | 'Weekly'
-    }
-    /**
-     * ScheduledEventDto
-     * @description Scheduled Event
-     */
-    ScheduledEventDto: {
-      /**
-       * @description The agency ID for the booked internal location
-       * @example WWI
-       */
-      agencyId?: string
-      /**
-       * Format: int64
-       * @description Offender booking id
-       */
-      bookingId: number
-      /** @description Staff member who created the appointment */
-      createUserId?: string
-      /** @description Date and time at which event ends */
-      endTime?: string
-      /** @description Class of event */
-      eventClass: string
-      /** @description Date on which event occurs */
-      eventDate: string
-      /**
-       * Format: int64
-       * @description Activity id if any. Used to attend or pay an activity.
-       */
-      eventId?: number
-      /** @description Location at which event takes place (could be an internal location, agency or external address). */
+      /** @description Offender first name */
+      firstName?: string
+      /** @description Offender last name */
+      lastName?: string
+      /** @description Offender cell */
+      cellLocation?: string
+      /** @description Event code */
+      event?: string
+      /** @description Event type, e.g. VISIT, APP, PRISON_ACT */
+      eventType?: string
+      /** @description Description of event code */
+      eventDescription?: string
+      /** @description Location of the event */
       eventLocation?: string
       /**
        * Format: int64
        * @description Id of an internal event location
        */
       eventLocationId?: number
-      /** @description Activity attendance, possible values are the codes in the 'PS_PA_OC' reference domain. */
+      /** @description The event's status. Includes 'CANC', meaning cancelled for 'VISIT' */
+      eventStatus?: string
+      /** @description Comment */
+      comment?: string
+      /**
+       * Format: date-time
+       * @description Date and time at which event starts
+       */
+      startTime?: string
+      /**
+       * Format: date-time
+       * @description Date and time at which event ends
+       */
+      endTime?: string
+      /** @description Attendance, possible values are the codes in the 'PS_PA_OC' reference domain */
       eventOutcome?: string
-      /** @description Code identifying underlying source of event data */
-      eventSource: string
-      /** @description Source-specific code for the type or nature of the event */
-      eventSourceCode?: string
-      /** @description Source-specific description for type or nature of the event */
-      eventSourceDesc?: string
-      /** @description Status of event */
-      eventStatus: string
-      /** @description Sub type (or reason) of scheduled event (as a code) */
-      eventSubType: string
-      /** @description Description of scheduled event sub type */
-      eventSubTypeDesc: string
-      /** @description Type of scheduled event (as a code) */
-      eventType: string
-      /** @description Description of scheduled event type */
-      eventTypeDesc: string
+      /** @description Possible values are the codes in the 'PERFORMANCE' reference domain */
+      performance?: string
+      /** @description No-pay reason */
+      outcomeComment?: string
+      /** @description Activity paid flag */
+      paid?: boolean
+      /** @description Amount paid per activity session in pounds */
+      payRate?: number
+      /** @description Activity excluded flag */
+      excluded?: boolean
+      /** @description Activity time slot */
+      timeSlot?: 'AM' | 'PM' | 'ED'
       /** @description The code for the activity location */
       locationCode?: string
-      /** @description Activity no-pay reason. */
-      outcomeComment?: string
-      /** @description Activity paid flag. */
-      paid?: boolean
-      /**
-       * Format: bigdecimal
-       * @description Amount paid per activity session in pounds
-       */
-      payRate?: number
-      /** @description Activity performance, possible values are the codes in the 'PERFORMANCE' reference domain. */
-      performance?: string
-      /** @description Date and time at which event starts */
-      startTime?: string
+      /** @description Event scheduled has been suspended */
+      suspended?: boolean
     }
-    /** Sort */
+    ScheduledResponse: {
+      scheduled: components['schemas']['PrisonerScheduleDto'][]
+    }
+    AbsenceDto: {
+      /** Format: int64 */
+      attendanceId?: number
+      /** Format: int64 */
+      bookingId?: number
+      offenderNo?: string
+      /** Format: int64 */
+      eventId?: number
+      /** Format: int64 */
+      eventLocationId?: number
+      /** Format: date */
+      eventDate?: string
+      period?: 'AM' | 'PM' | 'ED'
+      reason?:
+        | 'ApprovedCourse'
+        | 'AcceptableAbsence'
+        | 'SessionCancelled'
+        | 'RestInCellOrSick'
+        | 'RestDay'
+        | 'UnacceptableAbsence'
+        | 'UnacceptableAbsenceIncentiveLevelWarning'
+        | 'NotRequired'
+        | 'Refused'
+        | 'RefusedIncentiveLevelWarning'
+      subReason?:
+        | 'Activities'
+        | 'Behaviour'
+        | 'Courses'
+        | 'ExternalMoves'
+        | 'Healthcare'
+        | 'Operational'
+        | 'OverAllocated'
+        | 'Visits'
+        | 'NotListed'
+      subReasonDescription?: string
+      eventDescription?: string
+      comments?: string
+      cellLocation?: string
+      firstName?: string
+      lastName?: string
+      suspended?: boolean
+    }
+    AbsencesResponse: {
+      description: string
+      absences: components['schemas']['AbsenceDto'][]
+    }
+    Pageable: {
+      /** Format: int32 */
+      page?: number
+      /** Format: int32 */
+      size?: number
+      sort?: string[]
+    }
+    AttendanceHistoryDto: {
+      /** Format: date */
+      eventDate: string
+      activity?: string
+      activityDescription?: string
+      location?: string
+      comments?: string
+    }
+    PageAttendanceHistoryDto: {
+      /** Format: int64 */
+      totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
+      /** Format: int32 */
+      size?: number
+      content?: components['schemas']['AttendanceHistoryDto'][]
+      /** Format: int32 */
+      number?: number
+      sort?: components['schemas']['Sort']
+      first?: boolean
+      last?: boolean
+      /** Format: int32 */
+      numberOfElements?: number
+      pageable?: components['schemas']['PageableObject']
+      empty?: boolean
+    }
+    PageableObject: {
+      /** Format: int64 */
+      offset?: number
+      sort?: components['schemas']['Sort']
+      /** Format: int32 */
+      pageSize?: number
+      paged?: boolean
+      unpaged?: boolean
+      /** Format: int32 */
+      pageNumber?: number
+    }
     Sort: {
       empty?: boolean
       sorted?: boolean
       unsorted?: boolean
     }
-    /** Stats */
+    AttendanceSummary: {
+      /** Format: int32 */
+      acceptableAbsence: number
+      /** Format: int32 */
+      unacceptableAbsence: number
+      /** Format: int32 */
+      total: number
+    }
+    AttendanceChangeDto: {
+      /** Format: int64 */
+      id: number
+      /** Format: int64 */
+      attendanceId: number
+      /** Format: int64 */
+      eventId: number
+      /** Format: int64 */
+      eventLocationId: number
+      /** Format: int64 */
+      bookingId: number
+      changedFrom:
+        | 'ApprovedCourse'
+        | 'AcceptableAbsence'
+        | 'SessionCancelled'
+        | 'RestInCellOrSick'
+        | 'RestDay'
+        | 'UnacceptableAbsence'
+        | 'UnacceptableAbsenceIncentiveLevelWarning'
+        | 'NotRequired'
+        | 'Refused'
+        | 'RefusedIncentiveLevelWarning'
+        | 'Attended'
+      changedTo:
+        | 'ApprovedCourse'
+        | 'AcceptableAbsence'
+        | 'SessionCancelled'
+        | 'RestInCellOrSick'
+        | 'RestDay'
+        | 'UnacceptableAbsence'
+        | 'UnacceptableAbsenceIncentiveLevelWarning'
+        | 'NotRequired'
+        | 'Refused'
+        | 'RefusedIncentiveLevelWarning'
+        | 'Attended'
+      /** Format: date-time */
+      changedOn?: string
+      changedBy?: string
+      prisonId?: string
+    }
+    AttendanceChangesResponse: {
+      changes?: components['schemas']['AttendanceChangeDto'][]
+    }
+    PaidReasons: {
+      /** Format: int32 */
+      approvedCourse?: number
+      /** Format: int32 */
+      notRequired?: number
+      /** Format: int32 */
+      acceptableAbsence?: number
+      acceptableAbsenceDescription: string
+      approvedCourseDescription: string
+      notRequiredDescription: string
+    }
     Stats: {
       /** Format: int32 */
-      notRecorded?: number
+      scheduleActivities: number
+      /** Format: int32 */
+      notRecorded: number
       paidReasons?: components['schemas']['PaidReasons']
-      /** Format: int32 */
-      scheduleActivities?: number
-      /** Format: int32 */
-      suspended?: number
       unpaidReasons?: components['schemas']['UnpaidReasons']
+      /** Format: int32 */
+      suspended: number
+      /** Format: int32 */
+      attended: number
     }
-    /** UnpaidReasons */
     UnpaidReasons: {
-      /** Format: int32 */
-      refused?: number
-      /** Format: int32 */
-      refusedIncentiveLevelWarning?: number
       /** Format: int32 */
       restDay?: number
       /** Format: int32 */
       restInCellOrSick?: number
       /** Format: int32 */
+      refused?: number
+      /** Format: int32 */
+      refusedIncentiveLevelWarning?: number
+      /** Format: int32 */
       sessionCancelled?: number
       /** Format: int32 */
       unacceptableAbsence?: number
+      /** Format: int32 */
+      unacceptableAbsenceIncentiveLevelWarning?: number
+      refusedDescription: string
+      refusedIncentiveLevelWarningDescription: string
+      sessionCancelledDescription: string
+      unacceptableAbsenceDescription: string
+      unacceptableAbsenceIncentiveLevelWarningDescription: string
+      restDayDescription: string
+      restInCellOrSickDescription: string
     }
-    /**
-     * UpdateAttendanceDto
-     * @description Attendance update details
-     */
-    UpdateAttendanceDto: {
-      /**
-       * @description Reason the offender did not attendance the event
-       * @example Refused
-       * @enum {string}
-       */
-      absentReason?:
-        | 'AcceptableAbsence'
+    AppointmentSearchDto: {
+      /** Format: int64 */
+      id: number
+      agencyId: string
+      /** Format: int64 */
+      locationId: number
+      locationDescription: string
+      appointmentTypeCode: string
+      appointmentTypeDescription: string
+      offenderNo: string
+      firstName: string
+      lastName: string
+      /** Format: date-time */
+      startTime: string
+      /** Format: date-time */
+      endTime?: string
+      createUserId: string
+    }
+    AppointmentDetailsDto: {
+      appointment: components['schemas']['AppointmentDto']
+      videoLinkBooking?: components['schemas']['VideoLinkBookingDto']
+      recurring?: components['schemas']['RecurringAppointmentDto']
+    }
+    AppointmentDto: {
+      /** Format: int64 */
+      id: number
+      agencyId: string
+      /** Format: int64 */
+      locationId: number
+      appointmentTypeCode: string
+      offenderNo?: string
+      /** Format: date-time */
+      startTime: string
+      /** Format: date-time */
+      endTime?: string
+      createUserId?: string
+      comment?: string
+    }
+    RecurringAppointmentDto: {
+      /** Format: int64 */
+      id: number
+      repeatPeriod: 'WEEKLY' | 'DAILY' | 'WEEKDAYS' | 'MONTHLY' | 'FORTNIGHTLY'
+      /** Format: int64 */
+      count: number
+      /** Format: date-time */
+      startTime: string
+    }
+    VideoLinkBookingDto: {
+      /** Format: int64 */
+      id: number
+      main: components['schemas']['VideoLinkAppointmentDto']
+      pre?: components['schemas']['VideoLinkAppointmentDto']
+      post?: components['schemas']['VideoLinkAppointmentDto']
+    }
+    WhereaboutsConfig: {
+      enabled: boolean
+    }
+    LocationGroup: {
+      name: string
+      key: string
+      children: components['schemas']['LocationGroup'][]
+    }
+    AbsentReasonDto: {
+      code:
         | 'ApprovedCourse'
+        | 'AcceptableAbsence'
+        | 'SessionCancelled'
+        | 'RestInCellOrSick'
+        | 'RestDay'
+        | 'UnacceptableAbsence'
+        | 'UnacceptableAbsenceIncentiveLevelWarning'
         | 'NotRequired'
         | 'Refused'
         | 'RefusedIncentiveLevelWarning'
-        | 'RestDay'
-        | 'RestInCellOrSick'
+      name: string
+    }
+    AbsentReasonsDto: {
+      paidReasons: components['schemas']['AbsentReasonDto'][]
+      unpaidReasons: components['schemas']['AbsentReasonDto'][]
+      triggersIEPWarning: (
+        | 'ApprovedCourse'
+        | 'AcceptableAbsence'
         | 'SessionCancelled'
+        | 'RestInCellOrSick'
+        | 'RestDay'
         | 'UnacceptableAbsence'
-      /**
-       * @description Flag to indicate the offender attended the event
-       * @example true
-       */
-      attended: boolean
-      /** @description Comments about non attendance. This also gets used for the IEP warning text */
-      comments?: string
-      /**
-       * @description Flag to indicate the offender should be paid
-       * @example true
-       */
-      paid: boolean
+        | 'UnacceptableAbsenceIncentiveLevelWarning'
+        | 'NotRequired'
+        | 'Refused'
+        | 'RefusedIncentiveLevelWarning'
+      )[]
+      triggersAbsentSubReason: (
+        | 'ApprovedCourse'
+        | 'AcceptableAbsence'
+        | 'SessionCancelled'
+        | 'RestInCellOrSick'
+        | 'RestDay'
+        | 'UnacceptableAbsence'
+        | 'UnacceptableAbsenceIncentiveLevelWarning'
+        | 'NotRequired'
+        | 'Refused'
+        | 'RefusedIncentiveLevelWarning'
+      )[]
+      paidSubReasons: components['schemas']['AbsentSubReasonDto'][]
+      unpaidSubReasons: components['schemas']['AbsentSubReasonDto'][]
     }
-    /**
-     * VideoLinkAppointmentDto
-     * @description Video link appointment details
-     */
-    VideoLinkAppointmentDto: {
-      /**
-       * Format: int64
-       * @description Appointment id, maps to nomis event id
-       * @example 1
-       */
-      appointmentId?: number
-      /**
-       * Format: int64
-       * @description Offender booking id
-       * @example 1
-       */
-      bookingId?: number
-      /**
-       * @description The name of the court that requires the appointment
-       * @example York Crown Court
-       */
-      court?: string
-      /**
-       * @description The identifier of the court that requires the appointment. If present this will be one of the identifier values from the courts register service.
-       * @example CMBGMC
-       */
-      courtId?: string
-      /**
-       * @description Username of the appointment creator
-       * @example john1
-       */
-      createdByUsername?: string
-      /**
-       * @description When the appointment is scheduled to end
-       * @example 2020-12-24T10:00
-       */
-      endTime?: string
-      /**
-       * @description Type of court hearing
-       * @example MAIN, PRE , POST
-       * @enum {string}
-       */
-      hearingType?: 'MAIN' | 'POST' | 'PRE'
-      /**
-       * Format: int64
-       * @description Court appointment id
-       * @example 1
-       */
-      id?: number
-      /**
-       * Format: int64
-       * @description The location id of where the appointment will take place
-       */
-      locationId?: number
-      /** @description Determines if the appointment was made by the court */
-      madeByTheCourt?: boolean
-      /**
-       * Format: int64
-       * @description The id of the main appointment for the related video link booking
-       */
-      mainAppointmentId?: number
-      /**
-       * @description When the appointment is scheduled to start
-       * @example 2020-12-23T10:00
-       */
-      startTime?: string
-      /**
-       * Format: int64
-       * @description Video link booking id. This is the same for any related pre, post and main appointments
-       * @example 1
-       */
-      videoLinkBookingId?: number
-    }
-    /**
-     * VideoLinkAppointmentSpecification
-     * @description Detail of a single Video Link Appointment, either pre, main or post
-     */
-    VideoLinkAppointmentSpecification: {
-      /**
-       * @description Finish Time of the appointment. ISO-8601 date-time format
-       * @example 2020-12-23T09:30:00
-       */
-      endTime: string
-      /**
-       * Format: int64
-       * @description The identifier of the appointment's location
-       * @example 1
-       */
-      locationId: number
-      /**
-       * @description Start Time of the appointment. ISO-8601 date-time format
-       * @example 2020-12-23T09:00:00
-       */
-      startTime: string
-    }
-    /** VideoLinkAppointmentsResponse */
-    VideoLinkAppointmentsResponse: {
-      appointments?: components['schemas']['VideoLinkAppointmentDto'][]
-    }
-    /**
-     * VideoLinkBookingDto
-     * @description Video link appointment booking
-     */
-    VideoLinkBookingDto: {
-      /**
-       * Format: int64
-       * @description id of the video link appointment booking
-       */
-      id: number
-      /** @description Main appointment */
-      main: components['schemas']['VideoLinkAppointmentDto']
-      /** @description Post appointment */
-      post?: components['schemas']['VideoLinkAppointmentDto']
-      /** @description Pre appointment */
-      pre?: components['schemas']['VideoLinkAppointmentDto']
-    }
-    /** VideoLinkBookingOption */
-    VideoLinkBookingOption: {
-      /** @description The location (by location id) and Interval for the main appointment (the court appearance). */
-      main: components['schemas']['LocationAndInterval']
-      /** @description The location and Interval for the post-hearing appointment. */
-      post?: components['schemas']['LocationAndInterval']
-      /** @description The location and Interval for the pre-hearing appointment. */
-      pre?: components['schemas']['LocationAndInterval']
-    }
-    /** VideoLinkBookingOptions */
-    VideoLinkBookingOptions: {
-      /** @description If the specification could not be met then up to three alternative booking times are offered. */
-      alternatives?: components['schemas']['VideoLinkBookingOption'][]
-      /** @description True if the specified rooms are available at the specified times. */
-      matched?: boolean
-    }
-    /**
-     * VideoLinkBookingResponse
-     * @description Video Link Booking details
-     */
-    VideoLinkBookingResponse: {
-      /**
-       * @description Agency Id
-       * @example WWI
-       */
-      agencyId: string
-      /**
-       * Format: int64
-       * @description Offender booking Id
-       * @example 1
-       */
-      bookingId: number
-      /**
-       * @description Free text comments
-       * @example Requires special access
-       */
-      comment?: string
-      /**
-       * @description The name of the court that requires the appointment. May be a place-holder
-       * @example York Crown Court
-       */
-      court: string
-      /**
-       * @description The identifier for the court that requires the appointment. If present this will be one of the identifier values from the courts register service.
-       * @example CMBGMC
-       */
-      courtId?: string
-      /** @description Main appointment */
-      main: components['schemas']['LocationTimeslot']
-      /** @description Post-hearing appointment */
-      post?: components['schemas']['LocationTimeslot']
-      /** @description Pre-hearing appointment */
-      pre?: components['schemas']['LocationTimeslot']
-      /**
-       * Format: int64
-       * @description Video Link booking Id
-       * @example 1
-       */
-      videoLinkBookingId: number
-    }
-    /** VideoLinkBookingSearchSpecification */
-    VideoLinkBookingSearchSpecification: {
-      /**
-       * @description The locations must be within the agency (prison) having this identifier.
-       * @example WWI
-       */
-      agencyId?: string
-      /**
-       * @description The appointment intervals are all on this date.
-       * @example 2021-01-01
-       */
-      date?: string
-      /** @description Specifies the desired main apointment start, end and location. */
-      mainAppointment: components['schemas']['LocationAndInterval']
-      /** @description If present specifies the desired post-appointment start, end and location. */
-      postAppointment?: components['schemas']['LocationAndInterval']
-      /** @description If present specifies the desired pre-appointment start, end and location. */
-      preAppointment?: components['schemas']['LocationAndInterval']
-      /**
-       * Format: int64
-       * @description When checking that the appointment locations and intervals are free, or when searching for alternatives treat appointments for this video link booking as free
-       */
-      vlbIdToExclude?: number
-    }
-    /**
-     * VideoLinkBookingSpecification
-     * @description Video Link Booking details
-     */
-    VideoLinkBookingSpecification: {
-      /**
-       * Format: int64
-       * @description Offender booking Id
-       * @example 1
-       */
-      bookingId?: number
-      /**
-       * @description Free text comments
-       * @example Requires special access
-       */
-      comment?: string
-      /**
-       * @description The location of the court that requires the appointment
-       * @example York Crown Court
-       */
-      court?: string
-      /**
-       * @description The identifier of the court that requires the appointment.  This must be one of the court identifier values from the courts register service.
-       * @example CMBGMC
-       */
-      courtId?: string
-      /** @description Booking placed by the court */
-      madeByTheCourt: boolean
-      /** @description Main appointment */
-      main: components['schemas']['VideoLinkAppointmentSpecification']
-      /** @description Post-hearing appointment */
-      post?: components['schemas']['VideoLinkAppointmentSpecification']
-      /** @description Pre-hearing appointment */
-      pre?: components['schemas']['VideoLinkAppointmentSpecification']
-    }
-    /** VideoLinkBookingUpdateSpecification */
-    VideoLinkBookingUpdateSpecification: {
-      /**
-       * @description Free text comments
-       * @example Requires special access
-       */
-      comment?: string
-      /**
-       * @description The identifier of the court that requires the appointment.
-       * @example CMBGMC
-       */
-      courtId: string
-      /** @description Main appointment */
-      main: components['schemas']['VideoLinkAppointmentSpecification']
-      /** @description Post-hearing appointment */
-      post?: components['schemas']['VideoLinkAppointmentSpecification']
-      /** @description Pre-hearing appointment */
-      pre?: components['schemas']['VideoLinkAppointmentSpecification']
-    }
-    /**
-     * WhereaboutsConfig
-     * @description Whereabouts Details
-     */
-    WhereaboutsConfig: {
-      /** @description Whether this prison is enabled for whereabouts */
-      enabled: boolean
+    AbsentSubReasonDto: {
+      code:
+        | 'Activities'
+        | 'Behaviour'
+        | 'Courses'
+        | 'ExternalMoves'
+        | 'Healthcare'
+        | 'Operational'
+        | 'OverAllocated'
+        | 'Visits'
+        | 'NotListed'
+      name: string
     }
   }
 }
 
 export interface operations {
-  reasonsUsingGET: {
+  /** Update the comment for a Video Link Booking */
+  updateVideoLinkBookingComment: {
+    parameters: {
+      path: {
+        /** Video link booking id */
+        videoLinkBookingId: number
+      }
+    }
+    responses: {
+      /** No Content */
+      204: never
+    }
+    requestBody: {
+      content: {
+        'text/plain': string
+      }
+    }
+  }
+  /** Return a video Link Booking */
+  getVideoLinkBooking: {
+    parameters: {
+      path: {
+        /** Video link booking id */
+        videoBookingId: number
+      }
+    }
     responses: {
       /** OK */
       200: {
         content: {
-          'application/json': components['schemas']['AbsentReasonsDto']
+          'application/json': components['schemas']['VideoLinkBookingResponse']
         }
       }
     }
   }
-  /** List of all available Location Groups at agency. */
-  getAvailableLocationGroups: {
+  /** Update a Video Link Booking */
+  updateVideoLinkBooking: {
     parameters: {
       path: {
-        /** The prison */
-        agencyId: string
+        /** Video link booking id */
+        videoBookingId: number
       }
     }
     responses: {
-      /** OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['LocationGroup'][]
-        }
+      /** No Content */
+      204: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['VideoLinkBookingUpdateSpecification']
       }
+    }
+  }
+  /** Delete a Video Link Booking */
+  deleteVideoLinkBooking: {
+    parameters: {
+      path: {
+        /** Video link booking id */
+        videoBookingId: number
+      }
+    }
+    responses: {
+      /** No Content */
+      204: never
+    }
+  }
+  /** Updates the attendance record, posts attendance details back up to PNOMIS. IEP warnings are triggered when certain absence reasons are used. */
+  putAttendance: {
+    parameters: {
+      path: {
+        id: number
+      }
+    }
+    responses: {
       /** Invalid request. */
       400: {
         content: {
-          'application/json': components['schemas']['ErrorResponse'][]
+          'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** Requested resource not found. */
       404: {
         content: {
-          'application/json': components['schemas']['ErrorResponse'][]
+          'application/json': { [key: string]: unknown }
         }
       }
       /** Unrecoverable error occurred whilst processing request. */
       500: {
         content: {
-          'application/json': components['schemas']['ErrorResponse'][]
+          'application/json': components['schemas']['ErrorResponse']
         }
       }
     }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateAttendanceDto']
+      }
+    }
   }
-  /** Whereabouts details (e.g. whether enabled) for prison. */
-  getWhereabouts: {
+  /** Return details of Video Link Bookings in CSV format. Restrict the response to bookings with a main start time within 'days' of start-date. */
+  getVideoLinkBookingsByStartDate: {
     parameters: {
-      path: {
-        /** The prison */
-        agencyId: string
+      query: {
+        /** The earliest booking start time for which to return bookings for. */
+        'start-date': string
+        /** Return details of bookings occurring within this number of days of start-date */
+        days?: number
       }
     }
     responses: {
       /** OK */
       200: {
         content: {
-          'application/json': components['schemas']['WhereaboutsConfig']
-        }
-      }
-      /** Invalid request. */
-      400: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** Requested resource not found. */
-      404: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** Unrecoverable error occurred whilst processing request. */
-      500: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
+          'text/csv': string
         }
       }
     }
   }
-  createAppointment: {
+  /** Create a Video Link Booking */
+  createVideoLinkBooking: {
     responses: {
       /** Created */
       201: {
         content: {
-          'application/json': components['schemas']['CreatedAppointmentDetailsDto'][]
+          'application/json': number
         }
       }
-      /** Bad request */
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['VideoLinkBookingSpecification']
+      }
+    }
+  }
+  /** Check that a potential video link booking, described by the supplied specification, can be made.  If not then return information about some alternatives. */
+  findAvailableVideoLinkBookingOptions: {
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          'application/json': components['schemas']['VideoLinkBookingOptions']
+        }
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['VideoLinkBookingSearchSpecification']
+      }
+    }
+  }
+  /** Return video link appointments */
+  getVideoLinkAppointments: {
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          'application/json': components['schemas']['VideoLinkAppointmentsResponse']
+        }
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': number[]
+      }
+    }
+  }
+  /** Make a cell move for an offender. Triggers the creation of a MOVED_CELL case note. */
+  makeCellMove: {
+    responses: {
+      /** Invalid request. */
       400: {
+        content: {
+          'application/json': components['schemas']['CellMoveResponse']
+        }
+      }
+      /** Requested resource not found. */
+      404: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
@@ -1638,133 +1155,112 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['CreateAppointmentSpecification']
+        'application/json': components['schemas']['CellMoveDetails']
       }
     }
   }
-  deleteRecurringAppointmentSequence: {
-    parameters: {
-      path: {
-        /** The id of the recurring appointment sequence. */
-        id: number
-      }
-    }
-    responses: {
-      /** OK */
-      200: unknown
-      /** Recurring appointment sequence not found. */
-      404: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** Unrecoverable error occurred whilst processing request. */
-      500: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  getAppointment: {
-    parameters: {
-      path: {
-        /** id */
-        id: number
-      }
-    }
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['AppointmentDetailsDto']
-        }
-      }
-      /** Appointment not found. */
-      404: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** Unrecoverable error occurred whilst processing request. */
-      500: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  deleteAppointment: {
-    parameters: {
-      path: {
-        /** id */
-        id: number
-      }
-    }
-    responses: {
-      /** OK */
-      200: unknown
-      /** Appointment not found. */
-      404: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** Unrecoverable error occurred whilst processing request. */
-      500: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  getAppointments: {
-    parameters: {
-      path: {
-        /** The agency Id */
-        agencyId: string
-      }
-      query: {
-        /** Date the appointments are scheduled */
-        date: string
-        /** AM, PM or ED */
-        timeSlot?: 'AM' | 'ED' | 'PM'
-        /** The location prefix of any offenders' residence associated with a returned appointment */
-        offenderLocationPrefix?: string
-        /** Location id */
-        locationId?: number
-      }
-    }
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['AppointmentDto'][]
-        }
-      }
-      /** Invalid request. */
-      400: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse'][]
-        }
-      }
-      /** Unrecoverable error occurred whilst processing request. */
-      500: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse'][]
-        }
-      }
-    }
-  }
-  /** Stores new attendance record, posts attendance details back up to PNOMIS. IEP warnings are triggered when certain absence reasons are used. */
-  postAttendanceUsingPOST: {
+  /** Stores new attendance record for multiple offenders, posts attendance details back up to PNOMIS */
+  postAttendances: {
     responses: {
       /** Created */
       201: {
         content: {
-          'application/json': components['schemas']['AttendanceDto']
+          'application/json': components['schemas']['AttendancesResponse']
         }
       }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AttendancesDto']
+      }
+    }
+  }
+  /** Returns set of attendance details for set of booking ids */
+  getAttendanceForBookings: {
+    parameters: {
+      path: {
+        /** Prison id (LEI) */
+        prison: string
+      }
+      query: {
+        /** Date of event in format YYYY-MM-DD */
+        date: string
+        /** Time period */
+        period: 'AM' | 'PM' | 'ED'
+        /** Booking ids (bookings=1&bookings=2) */
+        bookings: number[]
+      }
+    }
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          'application/json': components['schemas']['AttendancesResponse']
+        }
+      }
+    }
+  }
+  /** Returns set of attendance details for set of booking ids */
+  getAttendanceForBookingsByPost: {
+    parameters: {
+      path: {
+        /** Prison id (LEI) */
+        prison: string
+      }
+      query: {
+        /** Date of event in format YYYY-MM-DD */
+        date: string
+        /** Time period */
+        period: 'AM' | 'PM' | 'ED'
+      }
+    }
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          'application/json': components['schemas']['AttendancesResponse']
+        }
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': number[]
+      }
+    }
+  }
+  /** Returns set of attendance details for set of booking ids */
+  getAttendanceForBookingsOverDateRangeByPost: {
+    parameters: {
+      path: {
+        /** Prison id (LEI) */
+        prison: string
+      }
+      query: {
+        /** Date of event in format YYYY-MM-DD */
+        fromDate: string
+        /** Date of event in format YYYY-MM-DD defaults to fromDate */
+        toDate?: string
+        /** Time period. Leave blank for AM + PM */
+        period?: 'AM' | 'PM' | 'ED'
+      }
+    }
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          'application/json': components['schemas']['AttendancesResponse']
+        }
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': number[]
+      }
+    }
+  }
+  /** Stores new attendance record, posts attendance details back up to PNOMIS. IEP warnings are triggered when certain absence reasons are used. */
+  postAttendance: {
+    responses: {
       /** Invalid request. */
       400: {
         content: {
@@ -1796,31 +1292,13 @@ export interface operations {
       }
     }
   }
-  /** Updates the attendance record, posts attendance details back up to PNOMIS. IEP warnings are triggered when certain absence reasons are used. */
-  putAttendanceUsingPUT: {
-    parameters: {
-      path: {
-        /** id */
-        id: number
-      }
-    }
+  /** Create an appointment */
+  createAppointment: {
     responses: {
-      /** OK */
-      200: {
-        content: {
-          'application/json': { [key: string]: unknown }
-        }
-      }
-      /** Invalid request. */
+      /** Bad request */
       400: {
         content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** Requested resource not found. */
-      404: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
+          'application/json': components['schemas']['CreatedAppointmentDetailsDto'][]
         }
       }
       /** Unrecoverable error occurred whilst processing request. */
@@ -1832,423 +1310,29 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdateAttendanceDto']
+        'application/json': components['schemas']['CreateAppointmentSpecification']
       }
     }
   }
-  /** Request attendance statistics */
-  getAttendanceForEventLocationUsingGET: {
+  /** List of all the Video Link Booking rooms in the prison. */
+  getVideoLinkBookingRooms: {
     parameters: {
       path: {
-        /** Prison id (LEI) */
-        prison: string
-      }
-      query: {
-        /** Time period. Leave blank for AM + PM */
-        period: 'AM' | 'ED' | 'PM'
-        /** From date of event in format YYYY-MM-DD */
-        fromDate: string
-        /** To date of event in format YYYY-MM-DD */
-        toDate: string
+        /** The prison */
+        agencyId: string
       }
     }
     responses: {
       /** OK */
       200: {
         content: {
-          'application/json': components['schemas']['Stats']
+          'application/json': components['schemas']['LocationIdAndDescription'][]
         }
       }
     }
   }
-  /** Stores new attendance record for multiple offenders, posts attendance details back up to PNOMIS */
-  postAttendancesUsingPOST: {
-    responses: {
-      /** Created */
-      201: {
-        content: {
-          'application/json': components['schemas']['AttendancesResponse']
-        }
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['AttendancesDto']
-      }
-    }
-  }
-  getAttendanceChangesUsingGET: {
-    parameters: {
-      query: {
-        /** Date and Time of change in format YYYY-MM-DDT09:10 */
-        fromDateTime: string
-        /** Date and Time of the change in format YYYY-MM-DDT:09:45 */
-        toDateTime: string
-      }
-    }
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['AttendanceChangesResponse']
-        }
-      }
-    }
-  }
-  getAttendanceSummaryUsingGET: {
-    parameters: {
-      path: {
-        /** offender or Prison number or Noms id */
-        offenderNo: string
-      }
-      query: {
-        /** Start date of range to summarise in format YYYY-MM-DD */
-        fromDate: string
-        /** End date of range to summarise in format YYYY-MM-DD */
-        toDate: string
-      }
-    }
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['AttendanceSummary']
-        }
-      }
-    }
-  }
-  /** Request unacceptable absence details */
-  getAttendanceDetailsForOffenderUsingGET: {
-    parameters: {
-      path: {
-        /** offender or Prison number or Noms id */
-        offenderNo: string
-      }
-      query: {
-        offset?: number
-        pageNumber?: number
-        pageSize?: number
-        paged?: boolean
-        'sort.sorted'?: boolean
-        'sort.unsorted'?: boolean
-        unpaged?: boolean
-        /** Start date of range to summarise in format YYYY-MM-DD */
-        fromDate: string
-        /** End date of range to summarise in format YYYY-MM-DD */
-        toDate: string
-      }
-    }
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['Page«AttendanceHistoryDto»']
-        }
-      }
-    }
-  }
-  /** Request attendance details */
-  getAttendanceForBookingsUsingGET: {
-    parameters: {
-      path: {
-        /** Prison id (LEI) */
-        prison: string
-      }
-      query: {
-        /** Date of event in format YYYY-MM-DD */
-        date: string
-        /** Time period */
-        period: 'AM' | 'ED' | 'PM'
-        /** Booking ids (bookings=1&bookings=2) */
-        bookings: number
-      }
-    }
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['AttendancesResponse']
-        }
-      }
-    }
-  }
-  /** Request attendance details */
-  getAttendanceForBookingsByPostUsingPOST: {
-    parameters: {
-      path: {
-        /** Prison id (LEI) */
-        prison: string
-      }
-      query: {
-        /** Date of event in format YYYY-MM-DD */
-        date: string
-        /** Time period */
-        period: 'AM' | 'ED' | 'PM'
-      }
-    }
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['AttendancesResponse']
-        }
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': number[]
-      }
-    }
-  }
-  /** Request absences details */
-  getAbsencesUsingGET: {
-    parameters: {
-      path: {
-        /** Prison id (LEI) */
-        prison: string
-      }
-      query: {
-        /** Date of event in format YYYY-MM-DD */
-        date: string
-        /** Time period */
-        period: 'AM' | 'ED' | 'PM'
-      }
-    }
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['AttendancesResponse']
-        }
-      }
-    }
-  }
-  /** Request absences */
-  getAbsencesForReasonUsingGET: {
-    parameters: {
-      path: {
-        /** Prison id (LEI) */
-        prison: string
-        /** Absent reason (e.g Refused, AcceptableAbsence) */
-        absentReason:
-          | 'AcceptableAbsence'
-          | 'ApprovedCourse'
-          | 'NotRequired'
-          | 'Refused'
-          | 'RefusedIncentiveLevelWarning'
-          | 'RestDay'
-          | 'RestInCellOrSick'
-          | 'SessionCancelled'
-          | 'UnacceptableAbsence'
-      }
-      query: {
-        /** Date of event in format YYYY-MM-DD */
-        fromDate: string
-        /** Date of event in format YYYY-MM-DD defaults to fromDate */
-        toDate: string
-        /** Time period */
-        period: 'AM' | 'ED' | 'PM'
-      }
-    }
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['AbsencesResponse']
-        }
-      }
-    }
-  }
-  /** Request attendance details */
-  getAttendanceForOffendersThatHaveScheduleActivityUsingGET: {
-    parameters: {
-      path: {
-        /** Prison id (LEI) */
-        prison: string
-      }
-      query: {
-        /** Date of event in format YYYY-MM-DD */
-        date: string
-        /** Time period */
-        period: 'AM' | 'ED' | 'PM'
-      }
-    }
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['AttendancesResponse']
-        }
-      }
-    }
-  }
-  /** Request attendance details */
-  getAttendanceForBookingsOverDateRangeByPostUsingPOST: {
-    parameters: {
-      path: {
-        /** Prison id (LEI) */
-        prison: string
-      }
-      query: {
-        /** Date of event in format YYYY-MM-DD */
-        fromDate: string
-        /** Date of event in format YYYY-MM-DD defaults to fromDate */
-        toDate: string
-        /** Time period. Leave blank for AM + PM */
-        period: 'AM' | 'ED' | 'PM'
-      }
-    }
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['AttendancesResponse']
-        }
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': number[]
-      }
-    }
-  }
-  /** Request attendance details */
-  getAttendanceForEventLocationUsingGET_1: {
-    parameters: {
-      path: {
-        /** Prison id (LEI) */
-        prison: string
-        /** Location id of event */
-        'event-location': number
-      }
-      query: {
-        /** Date of event in format YYYY-MM-DD */
-        date: string
-        /** Time period */
-        period: 'AM' | 'ED' | 'PM'
-      }
-    }
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['AttendancesResponse']
-        }
-      }
-    }
-  }
-  getCellMoveReasonUsingGET: {
-    parameters: {
-      path: {
-        /** bookingId */
-        bookingId: number
-        /** bedAssignmentId */
-        bedAssignmentId: number
-      }
-    }
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['CellMoveReasonResponse']
-        }
-      }
-      /** Invalid request. */
-      400: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** Requested resource not found. */
-      404: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** Unrecoverable error occurred whilst processing request. */
-      500: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  makeCellMoveUsingPOST: {
-    responses: {
-      /** Created */
-      201: {
-        content: {
-          'application/json': components['schemas']['CellMoveResponse']
-        }
-      }
-      /** Invalid request. */
-      400: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** Requested resource not found. */
-      404: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** Unrecoverable error occurred whilst processing request. */
-      500: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CellMoveDetails']
-      }
-    }
-  }
-  /** All scheduled events for offender. */
-  getEvents: {
-    parameters: {
-      path: {
-        /** Offender No */
-        offenderNo: string
-      }
-      query: {
-        /** Returned events must be scheduled on or after this date (in YYYY-MM-DD format). */
-        fromDate?: string
-        /** Returned events must be scheduled on or before this date (in YYYY-MM-DD format). */
-        toDate?: string
-      }
-    }
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['ScheduledEventDto'][]
-        }
-      }
-      /** Invalid request. */
-      400: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** Requested resource not found. */
-      404: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** Unrecoverable error occurred whilst processing request. */
-      500: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  /** List of cells  by group at agency location which have capacity. */
-  getCellsWithCapacityForGroup: {
+  /** Get location prefix by group */
+  getLocationPrefixFromGroup: {
     parameters: {
       path: {
         /** The prison */
@@ -2256,18 +1340,8 @@ export interface operations {
         /** The group name */
         group: string
       }
-      query: {
-        /** Cell attribute */
-        attribute: string
-      }
     }
     responses: {
-      /** OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['CellWithAttributes'][]
-        }
-      }
       /** Invalid request. */
       400: {
         content: {
@@ -2308,24 +1382,25 @@ export interface operations {
       /** Invalid request. */
       400: {
         content: {
-          'application/json': components['schemas']['ErrorResponse']
+          'application/json': components['schemas']['Location'][]
         }
       }
       /** Requested resource not found. */
       404: {
         content: {
-          'application/json': components['schemas']['ErrorResponse']
+          'application/json': components['schemas']['Location'][]
         }
       }
       /** Unrecoverable error occurred whilst processing request. */
       500: {
         content: {
-          'application/json': components['schemas']['ErrorResponse']
+          'application/json': components['schemas']['Location'][]
         }
       }
     }
   }
-  getLocationPrefixFromGroup: {
+  /** List of cells by group at agency location which have capacity. */
+  getCellsWithCapacityForGroup: {
     parameters: {
       path: {
         /** The prison */
@@ -2333,12 +1408,16 @@ export interface operations {
         /** The group name */
         group: string
       }
+      query: {
+        /** Cell attribute */
+        attribute?: string
+      }
     }
     responses: {
       /** OK */
       200: {
         content: {
-          'application/json': components['schemas']['LocationPrefixDto']
+          'application/json': components['schemas']['CellWithAttributes'][]
         }
       }
       /** Invalid request. */
@@ -2361,75 +1440,61 @@ export interface operations {
       }
     }
   }
-  /** Return all court locations */
-  getCourtNamesUsingGET: {
+  /** All scheduled events for offender.  This endpoint filters out cancelled events. */
+  getEvents: {
+    parameters: {
+      path: {
+        offenderNo: string
+      }
+      query: {
+        /** Returned events must be scheduled on or after this date (in YYYY-MM-DD format).  This date must be on or after today. */
+        fromDate?: string
+        /** Returned events must be scheduled on or before this date (in YYYY-MM-DD format).  This date must be on or after the fromDate. */
+        toDate?: string
+      }
+    }
+    responses: {
+      /** Invalid request. */
+      400: {
+        content: {
+          'application/json': components['schemas']['ScheduledEventDto'][]
+        }
+      }
+      /** Requested resource not found. */
+      404: {
+        content: {
+          'application/json': components['schemas']['ScheduledEventDto'][]
+        }
+      }
+      /** Unrecoverable error occurred whilst processing request. */
+      500: {
+        content: {
+          'application/json': components['schemas']['ScheduledEventDto'][]
+        }
+      }
+    }
+  }
+  /** Return details of Video Link Booking Events (Create, Update, Delete) in CSV format. Restrict the response to events occurring within 'days' of start-date. */
+  getVideoLinkBookingEvents: {
+    parameters: {
+      query: {
+        /** The earliest date for which to return event details. */
+        'start-date': string
+        /** Return details of events occurring within this number of days of start-date */
+        days?: number
+      }
+    }
     responses: {
       /** OK */
       200: {
         content: {
-          'application/json': components['schemas']['CourtLocationsResponse']
+          'text/csv': string
         }
       }
     }
   }
-  /** Return information about all courts. */
-  getCourtsUsingGET: {
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['Court'][]
-        }
-      }
-    }
-  }
-  /** Return video link appointments */
-  getVideoLinkAppointmentsUsingPOST: {
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['VideoLinkAppointmentsResponse']
-        }
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': number[]
-      }
-    }
-  }
-  findAvailableVideoLinkBookingOptionsUsingPOST: {
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['VideoLinkBookingOptions']
-        }
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['VideoLinkBookingSearchSpecification']
-      }
-    }
-  }
-  createVideoLinkBookingUsingPOST: {
-    responses: {
-      /** Created */
-      201: {
-        content: {
-          'application/json': number
-        }
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['VideoLinkBookingSpecification']
-      }
-    }
-  }
-  getVideoLinkBookingsByPrisonDateAndCourtUsingGET: {
+  /** Get all video link bookings for the specified date and prison, optionally filtering by court. */
+  getVideoLinkBookingsByPrisonDateAndCourt: {
     parameters: {
       path: {
         /** Return video link bookings for this prison only */
@@ -2453,91 +1518,364 @@ export interface operations {
       }
     }
   }
-  /** Return a video Link Booking */
-  getVideoLinkBookingUsingGET: {
+  /** Return information about all courts. */
+  getCourts: {
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          'application/json': components['schemas']['Court'][]
+        }
+      }
+    }
+  }
+  /** Return information about email address. */
+  getEmailByCourtId: {
     parameters: {
       path: {
-        /** Video link booking id */
-        videoBookingId: number
+        /** Court id */
+        courtId: string
       }
     }
     responses: {
       /** OK */
       200: {
         content: {
-          'application/json': components['schemas']['VideoLinkBookingResponse']
+          'application/json': components['schemas']['CourtEmailDto']
         }
       }
     }
   }
-  updateVideoLinkBookingUsingPUT: {
-    parameters: {
-      path: {
-        /** Video link booking id */
-        videoBookingId: number
-      }
-    }
+  /** All court locations */
+  getCourtNames: {
     responses: {
-      /** No Content */
-      204: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['VideoLinkBookingUpdateSpecification']
+      /** OK */
+      200: {
+        content: {
+          'application/json': components['schemas']['CourtLocationsResponse']
+        }
       }
     }
   }
-  deleteVideoLinkBookingUsingDELETE: {
+  /** Return cell move reason */
+  getCellMoveReason: {
     parameters: {
       path: {
-        /** Video link booking id */
-        videoBookingId: number
+        bookingId: number
+        bedAssignmentId: number
       }
     }
     responses: {
-      /** No Content */
-      204: never
+      /** Invalid request. */
+      400: {
+        content: {
+          'application/json': components['schemas']['CellMoveReasonResponse']
+        }
+      }
+      /** Requested resource not found. */
+      404: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** Unrecoverable error occurred whilst processing request. */
+      500: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
     }
   }
-  updateVideoLinkBookingCommentUsingPUT: {
+  /** Returns set of attendance details */
+  getAttendanceForEventLocation: {
     parameters: {
       path: {
-        /** Video link booking id */
-        videoLinkBookingId: number
+        /** Prison id (LEI) */
+        prison: string
+        /** Location id of event */
+        'event-location': number
+      }
+      query: {
+        /** Date of event in format YYYY-MM-DD */
+        date: string
+        /** Time period */
+        period: 'AM' | 'PM' | 'ED'
       }
     }
     responses: {
-      /** No Content */
-      204: never
-    }
-    requestBody: {
-      content: {
-        'application/json': string
-        'text/plain': string
+      /** OK */
+      200: {
+        content: {
+          'application/json': components['schemas']['AttendancesResponse']
+        }
       }
     }
   }
-  /** Return details of Video Link Booking Events (Create, Update, Delete) in CSV format. Restrict the response to events occurring within 'days' of start-date. */
-  getVideoLinkBookingEventsUsingGET: {
+  /** Return a set of prisoners that haven't attended a scheduled activity */
+  getPrisonersUnaccountedFor: {
+    parameters: {
+      path: {
+        /** Prison id (LEI) */
+        prison: string
+      }
+      query: {
+        /** Date of event in format YYYY-MM-DD */
+        date: string
+        /** Time period */
+        period: 'AM' | 'PM' | 'ED'
+      }
+    }
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          'application/json': components['schemas']['ScheduledResponse']
+        }
+      }
+    }
+  }
+  /** Returns set of attendance details for attendances with an absent reason */
+  getAbsences: {
+    parameters: {
+      path: {
+        /** Prison id (LEI) */
+        prison: string
+      }
+      query: {
+        /** Date of event in format YYYY-MM-DD */
+        date: string
+        /** Time period */
+        period: 'AM' | 'PM' | 'ED'
+      }
+    }
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          'application/json': components['schemas']['AttendancesResponse']
+        }
+      }
+    }
+  }
+  /** Return a set of absences for all offenders that have scheduled activity */
+  getAbsencesForReason: {
+    parameters: {
+      path: {
+        /** Prison id (LEI) */
+        prison: string
+        /** Absent reason (e.g Refused, AcceptableAbsence) */
+        absentReason:
+          | 'ApprovedCourse'
+          | 'AcceptableAbsence'
+          | 'SessionCancelled'
+          | 'RestInCellOrSick'
+          | 'RestDay'
+          | 'UnacceptableAbsence'
+          | 'UnacceptableAbsenceIncentiveLevelWarning'
+          | 'NotRequired'
+          | 'Refused'
+          | 'RefusedIncentiveLevelWarning'
+      }
+      query: {
+        /** Date of event in format YYYY-MM-DD */
+        fromDate: string
+        /** Date of event in format YYYY-MM-DD defaults to fromDate */
+        toDate?: string
+        /** Time period */
+        period?: 'AM' | 'PM' | 'ED'
+      }
+    }
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          'application/json': components['schemas']['AbsencesResponse']
+        }
+      }
+    }
+  }
+  /** Returns unacceptable absence attendance details for an offender */
+  getAttendanceDetailsForOffender: {
+    parameters: {
+      path: {
+        /** offender or Prison number or Noms id */
+        offenderNo: string
+      }
+      query: {
+        /** Start date of range to summarise in format YYYY-MM-DD */
+        fromDate: string
+        /** End date of range to summarise in format YYYY-MM-DD */
+        toDate: string
+        pageable: components['schemas']['Pageable']
+      }
+    }
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          'application/json': components['schemas']['PageAttendanceHistoryDto']
+        }
+      }
+    }
+  }
+  /** Return counts of unacceptable absences and totals over time for an offender */
+  getAttendanceSummary: {
+    parameters: {
+      path: {
+        /** offender or Prison number or Noms id */
+        offenderNo: string
+      }
+      query: {
+        /** Start date of range to summarise in format YYYY-MM-DD */
+        fromDate: string
+        /** End date of range to summarise in format YYYY-MM-DD */
+        toDate: string
+      }
+    }
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          'application/json': components['schemas']['AttendanceSummary']
+        }
+      }
+    }
+  }
+  /** Return all changes relating to an attendance */
+  getAttendanceChanges: {
     parameters: {
       query: {
-        /** The earliest date for which to return event details. */
-        'start-date': string
-        /** Return details of events occurring within this number of days of start-date */
-        days: number
+        /** Date and Time of change in format YYYY-MM-DDT09:10 */
+        fromDateTime: string
+        /** Date and Time of the change in format YYYY-MM-DDT:09:45 */
+        toDateTime?: string
       }
     }
     responses: {
       /** OK */
       200: {
         content: {
-          'text/csv': string
+          'application/json': components['schemas']['AttendanceChangesResponse']
         }
       }
     }
   }
-  /** List of all the Video Link Booking rooms in the prison. */
-  getVideoLinkBookingRooms: {
+  /** Request attendance statistics */
+  getAttendanceForEventLocation_1: {
+    parameters: {
+      path: {
+        /** Prison id (LEI) */
+        prison: string
+      }
+      query: {
+        /** Time period. Leave blank for AM + PM */
+        period?: 'AM' | 'PM' | 'ED'
+        /** From date of event in format YYYY-MM-DD */
+        fromDate: string
+        /** To date of event in format YYYY-MM-DD */
+        toDate: string
+      }
+    }
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          'application/json': components['schemas']['Stats']
+        }
+      }
+    }
+  }
+  /** List of appointments for the given agency that match the search criteria. */
+  getAppointments: {
+    parameters: {
+      path: {
+        /** The agency Id */
+        agencyId: string
+      }
+      query: {
+        /** Date the appointments are scheduled */
+        date: string
+        /** AM, PM or ED */
+        timeSlot?: 'AM' | 'PM' | 'ED'
+        /** The location prefix of any offenders' residence associated with a returned appointment */
+        offenderLocationPrefix?: string
+        /** Location id */
+        locationId?: number
+      }
+    }
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          'application/json': components['schemas']['AppointmentSearchDto'][]
+        }
+      }
+      /** Invalid request. */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** Unrecoverable error occurred whilst processing request. */
+      500: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  /** Return appointment details */
+  getAppointment: {
+    parameters: {
+      path: {
+        id: number
+      }
+    }
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          'application/json': components['schemas']['AppointmentDetailsDto']
+        }
+      }
+      /** Appointment not found. */
+      404: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** Unrecoverable error occurred whilst processing request. */
+      500: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  /** Delete an appointment */
+  deleteAppointment: {
+    parameters: {
+      path: {
+        id: number
+      }
+    }
+    responses: {
+      /** Appointment not found. */
+      404: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** Unrecoverable error occurred whilst processing request. */
+      500: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  /** Whereabouts details (e.g. whether enabled) for prison. */
+  getWhereabouts: {
     parameters: {
       path: {
         /** The prison */
@@ -2548,11 +1886,98 @@ export interface operations {
       /** OK */
       200: {
         content: {
-          'application/json': components['schemas']['LocationIdAndDescription'][]
+          'application/json': components['schemas']['WhereaboutsConfig']
+        }
+      }
+      /** Invalid request. */
+      400: {
+        content: {
+          'application/json': components['schemas']['WhereaboutsConfig']
+        }
+      }
+      /** Requested resource not found. */
+      404: {
+        content: {
+          'application/json': components['schemas']['WhereaboutsConfig']
+        }
+      }
+      /** Unrecoverable error occurred whilst processing request. */
+      500: {
+        content: {
+          'application/json': components['schemas']['WhereaboutsConfig']
+        }
+      }
+    }
+  }
+  /** List of all available Location Groups at agency. */
+  getAvailableLocationGroups: {
+    parameters: {
+      path: {
+        /** The prison */
+        agencyId: string
+      }
+    }
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          'application/json': components['schemas']['LocationGroup'][]
+        }
+      }
+      /** Invalid request. */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** Requested resource not found. */
+      404: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** Unrecoverable error occurred whilst processing request. */
+      500: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  reasons: {
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          'application/json': components['schemas']['AbsentReasonsDto']
+        }
+      }
+    }
+  }
+  /** Delete the whole sequence of a recurring appointment */
+  deleteRecurringAppointmentSequence: {
+    parameters: {
+      path: {
+        /** The id of the recurring appointment sequence. */
+        id: number
+      }
+    }
+    responses: {
+      /** Recurring appointment sequence not found. */
+      404: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** Unrecoverable error occurred whilst processing request. */
+      500: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
         }
       }
     }
   }
 }
 
-// export interface external {}
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface external {}
