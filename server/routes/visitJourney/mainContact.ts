@@ -21,6 +21,7 @@ export default class MainContact {
 
     res.render(`pages/${isUpdate ? 'visit' : 'bookAVisit'}/mainContact`, {
       errors: req.flash('errors'),
+      reference: sessionData.visitReference ?? '',
       adultVisitors: req.session.adultVisitors?.adults,
       formValues,
     })
