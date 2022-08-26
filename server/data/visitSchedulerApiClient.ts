@@ -114,6 +114,8 @@ class VisitSchedulerApiClient {
             : visitData.mainContact.contact.name,
         }
       : undefined
+    const mainContactId =
+      visitData.mainContact && visitData.mainContact.contact ? visitData.mainContact.contact.personId : null
 
     return this.restclient.put({
       path: `/visits/${visitData.visitReference}`,
@@ -130,6 +132,7 @@ class VisitSchedulerApiClient {
         visitors: visitData.visitors.map(visitor => {
           return {
             nomisPersonId: visitor.personId,
+            visitContact: visitor.personId === mainContactId,
           }
         }),
         visitorSupport: visitData.visitorSupport,

@@ -82,8 +82,11 @@ export default function routes(
     )
 
     const visitorIds = visit.visitors.flatMap(visitor => visitor.nomisPersonId)
+    const mainContactVisitor = visit.visitors.find(visitor => visitor.visitContact)
+    const mainContactId = mainContactVisitor ? mainContactVisitor.nomisPersonId : null
     const visitorList = await prisonerVisitorsService.getVisitors(visit.prisonerId, res.locals.user?.username)
     const currentVisitors = visitorList.filter(visitor => visitorIds.includes(visitor.personId))
+    const mainContact = currentVisitors.find(visitor => visitor.personId === mainContactId)
 
     // clean then load session
     clearSession(req)
@@ -106,6 +109,7 @@ export default function routes(
       visitors: currentVisitors,
       visitorSupport: visit.visitorSupport,
       mainContact: {
+        contact: mainContact,
         phoneNumber: visit.visitContact.telephone,
         contactName: visit.visitContact.name,
       },
