@@ -23,6 +23,7 @@ import DateAndTime from './visitJourney/dateAndTime'
 import AdditionalSupport from './visitJourney/additionalSupport'
 import CheckYourBooking from './visitJourney/checkYourBooking'
 import Confirmation from './visitJourney/confirmation'
+import MainContact from './visitJourney/mainContact'
 
 export default function routes(
   router: Router,
@@ -129,7 +130,7 @@ export default function routes(
   const visitType = new VisitType('update', auditService)
   const dateAndTime = new DateAndTime('update', visitSessionsService, auditService)
   const additionalSupport = new AdditionalSupport('update', visitSessionsService)
-
+  const mainContact = new MainContact('book')
   const checkYourBooking = new CheckYourBooking('update', visitSessionsService, auditService, notificationsService)
   const confirmation = new Confirmation('update')
 
@@ -142,19 +143,42 @@ export default function routes(
     selectVisitors.post(req, res),
   )
 
-  get('/:reference/update/visit-type', (req, res) => visitType.get(req, res))
-  post('/:reference/update/visit-type', visitType.validate(), (req, res) => visitType.post(req, res))
-
-  get('/:reference/update/select-date-and-time', ...dateAndTime.validateGet(), (req, res) => dateAndTime.get(req, res))
-  post('/:reference/update/select-date-and-time', dateAndTime.validate(), (req, res) => dateAndTime.post(req, res))
-
-  get('/:reference/update/additional-support', (req, res) => additionalSupport.get(req, res))
-  post('/:reference/update/additional-support', ...additionalSupport.validate(), (req, res) =>
-    additionalSupport.post(req, res),
+  get('/:reference/update/visit-type', checkVisitReferenceMiddleware, (req, res) => visitType.get(req, res))
+  post('/:reference/update/visit-type', checkVisitReferenceMiddleware, visitType.validate(), (req, res) =>
+    visitType.post(req, res),
   )
 
-  get('/:reference/update/check-your-booking', (req, res) => checkYourBooking.get(req, res))
-  post('/:reference/update/check-your-booking', (req, res) => checkYourBooking.post(req, res))
+  get(
+    '/:reference/update/select-date-and-time',
+    checkVisitReferenceMiddleware,
+    ...dateAndTime.validateGet(),
+    (req, res) => dateAndTime.get(req, res),
+  )
+  post('/:reference/update/select-date-and-time', checkVisitReferenceMiddleware, dateAndTime.validate(), (req, res) =>
+    dateAndTime.post(req, res),
+  )
+
+  get('/:reference/update/additional-support', checkVisitReferenceMiddleware, (req, res) =>
+    additionalSupport.get(req, res),
+  )
+  post(
+    '/:reference/update/additional-support',
+    checkVisitReferenceMiddleware,
+    ...additionalSupport.validate(),
+    (req, res) => additionalSupport.post(req, res),
+  )
+
+  get('/:reference/update/select-main-contact', checkVisitReferenceMiddleware, (req, res) => mainContact.get(req, res))
+  post('/:reference/update/select-main-contact', checkVisitReferenceMiddleware, ...mainContact.validate(), (req, res) =>
+    mainContact.post(req, res),
+  )
+
+  get('/:reference/update/check-your-booking', checkVisitReferenceMiddleware, (req, res) =>
+    checkYourBooking.get(req, res),
+  )
+  post('/:reference/update/check-your-booking', checkVisitReferenceMiddleware, (req, res) =>
+    checkYourBooking.post(req, res),
+  )
 
   get('/:reference/update/confirmation', (req, res) => confirmation.get(req, res))
 
