@@ -160,7 +160,7 @@ export default class PrisonerProfileService {
 
       return [
         {
-          html: formatVisitType({ visitType: visit.visitType, visitRestriction: visit.visitRestriction }),
+          html: formatVisitType(visit.visitType),
           attributes: {
             'data-test': 'tab-upcoming-type',
           },
@@ -204,7 +204,7 @@ export default class PrisonerProfileService {
 
       return [
         {
-          html: formatVisitType({ visitType: visit.visitType, visitRestriction: visit.visitRestriction }),
+          html: formatVisitType(visit.visitType),
           attributes: {
             'data-test': 'tab-past-type',
           },

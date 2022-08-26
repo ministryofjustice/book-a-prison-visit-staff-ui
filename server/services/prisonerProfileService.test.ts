@@ -146,7 +146,7 @@ describe('Prisoner profile service', () => {
         visitBalances,
         upcomingVisits: [
           [
-            { html: 'Social<br>(Open)', attributes: { 'data-test': 'tab-upcoming-type' } },
+            { html: 'Social', attributes: { 'data-test': 'tab-upcoming-type' } },
             { text: 'Hewell (HMP)', attributes: { 'data-test': 'tab-upcoming-location' } },
             {
               html: '<p>17 August 2022<br>10:00am - 11:00am</p>',
@@ -157,7 +157,7 @@ describe('Prisoner profile service', () => {
         ],
         pastVisits: [
           [
-            { html: 'Social<br>(Open)', attributes: { 'data-test': 'tab-past-type' } },
+            { html: 'Social', attributes: { 'data-test': 'tab-past-type' } },
             { text: 'Hewell (HMP)', attributes: { 'data-test': 'tab-past-location' } },
             {
               html: '<p>17 August 2022<br>10:00am - 11:00am</p>',
