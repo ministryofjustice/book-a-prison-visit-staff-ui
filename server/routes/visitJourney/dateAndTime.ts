@@ -108,6 +108,7 @@ export default class DateAndTime {
       await this.visitSessionsService.updateVisit({
         username: res.locals.user?.username,
         visitData: sessionData,
+        visitStatus: 'RESERVED',
       })
     } else {
       const { reference, visitStatus } = await this.visitSessionsService.createVisit({

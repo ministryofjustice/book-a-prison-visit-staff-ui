@@ -743,6 +743,7 @@ describe('Visit sessions service', () => {
           contactName: 'John Smith',
         },
         visitReference: 'ab-cd-ef-gh',
+        visitStatus: 'RESERVED',
       }
       const visit: Visit = {
         reference: 'ab-cd-ef-gh',
@@ -771,7 +772,11 @@ describe('Visit sessions service', () => {
 
       visitSchedulerApiClient.updateVisit.mockResolvedValue(visit)
       whereaboutsApiClient.getEvents.mockResolvedValue([])
-      const result = await visitSessionsService.updateVisit({ username: 'user', visitData: visitSessionData })
+      const result = await visitSessionsService.updateVisit({
+        username: 'user',
+        visitData: visitSessionData,
+        visitStatus: 'RESERVED',
+      })
 
       expect(visitSchedulerApiClient.updateVisit).toHaveBeenCalledTimes(1)
       expect(result).toEqual(<Visit>{

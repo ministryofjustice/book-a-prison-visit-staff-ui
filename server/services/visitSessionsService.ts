@@ -174,11 +174,11 @@ export default class VisitSessionsService {
   async updateVisit({
     username,
     visitData,
-    visitStatus = 'RESERVED',
+    visitStatus,
   }: {
     username: string
     visitData: VisitSessionData
-    visitStatus?: string
+    visitStatus: Visit['visitStatus']
   }): Promise<Visit> {
     const token = await this.systemToken(username)
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
