@@ -108,11 +108,12 @@ export default function routes(
         phoneNumber: visit.visitContact.telephone,
         contactName: visit.visitContact.name,
       },
-      visitReference: visit.reference,
       visitStatus: visit.visitStatus,
+      // reference of visit to be updated - as updated visit will get a new reference
+      previousVisitReference: visit.reference,
     }
 
-    req.session.updateVisitSessionData = Object.assign(req.session.updateVisitSessionData ?? {}, visitSessionData)
+    req.session.visitSessionData = Object.assign(req.session.visitSessionData ?? {}, visitSessionData)
 
     return res.render('pages/visit/summary', {
       prisoner,

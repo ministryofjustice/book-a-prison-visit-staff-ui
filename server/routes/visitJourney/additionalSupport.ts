@@ -9,7 +9,7 @@ export default class AdditionalSupport {
 
   async get(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'
-    const sessionData = req.session[isUpdate ? 'updateVisitSessionData' : 'visitSessionData']
+    const { visitSessionData } = req.session
     const formValues = getFlashFormValues(req)
 
     if (!req.session.availableSupportTypes) {
@@ -19,15 +19,15 @@ export default class AdditionalSupport {
     }
     const { availableSupportTypes } = req.session
 
-    if (!Object.keys(formValues).length && sessionData.visitorSupport) {
-      formValues.additionalSupportRequired = sessionData.visitorSupport.length ? 'yes' : 'no'
-      formValues.additionalSupport = sessionData.visitorSupport.map(support => support.type)
-      formValues.otherSupportDetails = sessionData.visitorSupport.find(support => support.type === 'OTHER')?.text
+    if (!Object.keys(formValues).length && visitSessionData.visitorSupport) {
+      formValues.additionalSupportRequired = visitSessionData.visitorSupport.length ? 'yes' : 'no'
+      formValues.additionalSupport = visitSessionData.visitorSupport.map(support => support.type)
+      formValues.otherSupportDetails = visitSessionData.visitorSupport.find(support => support.type === 'OTHER')?.text
     }
 
     res.render(`pages/${isUpdate ? 'visit' : 'bookAVisit'}/additionalSupport`, {
       errors: req.flash('errors'),
-      reference: sessionData.visitReference ?? '',
+      previousReference: visitSessionData.previousVisitReference,
       availableSupportTypes,
       formValues,
     })
@@ -35,7 +35,7 @@ export default class AdditionalSupport {
 
   async post(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'
-    const sessionData = req.session[isUpdate ? 'updateVisitSessionData' : 'visitSessionData']
+    const { visitSessionData } = req.session
     const errors = validationResult(req)
 
     if (!errors.isEmpty()) {
@@ -44,14 +44,14 @@ export default class AdditionalSupport {
       return res.redirect(req.originalUrl)
     }
 
-    sessionData.visitorSupport = req.body.additionalSupport.map((support: string): VisitorSupport => {
+    visitSessionData.visitorSupport = req.body.additionalSupport.map((support: string): VisitorSupport => {
       const supportItem: VisitorSupport = { type: support }
       if (support === 'OTHER') {
         supportItem.text = req.body.otherSupportDetails
       }
       return supportItem
     })
-    const urlPrefix = isUpdate ? `/visit/${sessionData.visitReference}/update` : '/book-a-visit'
+    const urlPrefix = isUpdate ? `/visit/${visitSessionData.previousVisitReference}/update` : '/book-a-visit'
 
     return res.redirect(`${urlPrefix}/select-main-contact`)
   }

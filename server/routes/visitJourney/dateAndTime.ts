@@ -14,12 +14,12 @@ export default class DateAndTime {
 
   async get(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'
-    const sessionData = req.session[isUpdate ? 'updateVisitSessionData' : 'visitSessionData']
+    const { visitSessionData } = req.session
     const { timeOfDay, dayOfTheWeek } = req.query as Record<string, string>
     const slotsList = await this.visitSessionsService.getVisitSessions({
       username: res.locals.user?.username,
-      offenderNo: sessionData.prisoner.offenderNo,
-      visitRestriction: sessionData.visitRestriction,
+      offenderNo: visitSessionData.prisoner.offenderNo,
+      visitRestriction: visitSessionData.visitRestriction,
       timeOfDay,
       dayOfTheWeek,
     })
@@ -28,27 +28,27 @@ export default class DateAndTime {
     let matchingSlot = ''
     let selectedSlot
 
-    if (isUpdate && sessionData.visit?.id === '') {
+    if (isUpdate && visitSessionData.visit?.id === '') {
       selectedSlot = getSelectedSlotByStartTimestamp(
         slotsList,
-        sessionData.visit.startTimestamp,
-        sessionData.visitRestriction,
+        visitSessionData.visit.startTimestamp,
+        visitSessionData.visitRestriction,
       )
 
       if (selectedSlot) {
         matchingSlot = selectedSlot.id
       }
 
-      if (sessionData.visitRestriction !== sessionData.previousVisitRestriction) {
+      if (visitSessionData.visitRestriction !== visitSessionData.previousVisitRestriction) {
         if (!selectedSlot || selectedSlot.availableTables === 0) {
-          if (sessionData.visitRestriction === 'CLOSED') {
+          if (visitSessionData.visitRestriction === 'CLOSED') {
             restrictionChangeMessage = 'A new visit time must be selected as this is now a closed visit.'
           } else {
             restrictionChangeMessage = 'A new visit time must be selected as this is now an open visit.'
           }
         } else if (selectedSlot && selectedSlot.availableTables > 0) {
           // can reserve slot here for same time, different restriction
-          if (sessionData.visitRestriction === 'CLOSED') {
+          if (visitSessionData.visitRestriction === 'CLOSED') {
             restrictionChangeMessage = 'This is now a closed visit. The visit time can stay the same.'
           } else {
             restrictionChangeMessage = 'This is now an open visit. The visit time can stay the same.'
@@ -58,8 +58,8 @@ export default class DateAndTime {
     }
 
     const formValues = getFlashFormValues(req)
-    if (!Object.keys(formValues).length && sessionData.visit?.id) {
-      formValues['visit-date-and-time'] = sessionData.visit?.id
+    if (!Object.keys(formValues).length && visitSessionData.visit?.id) {
+      formValues['visit-date-and-time'] = visitSessionData.visit?.id
     }
     if (!Object.keys(formValues).length && matchingSlot) {
       formValues['visit-date-and-time'] = matchingSlot
@@ -73,22 +73,22 @@ export default class DateAndTime {
 
     res.render(`pages/${isUpdate ? 'visit' : 'bookAVisit'}/dateAndTime`, {
       errors: req.flash('errors'),
-      visitRestriction: sessionData.visitRestriction,
-      prisonerName: sessionData.prisoner.name,
-      closedVisitReason: sessionData.closedVisitReason,
+      visitRestriction: visitSessionData.visitRestriction,
+      prisonerName: visitSessionData.prisoner.name,
+      closedVisitReason: visitSessionData.closedVisitReason,
       slotsList,
       timeOfDay,
       dayOfTheWeek,
       formValues,
       slotsPresent,
-      reference: sessionData.visitReference,
+      previousReference: visitSessionData.previousVisitReference,
       restrictionChangeMessage,
     })
   }
 
   async post(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'
-    const sessionData = req.session[isUpdate ? 'updateVisitSessionData' : 'visitSessionData']
+    const { visitSessionData } = req.session
     const errors = validationResult(req)
 
     if (!errors.isEmpty()) {
@@ -102,37 +102,37 @@ export default class DateAndTime {
       return res.redirect(req.originalUrl)
     }
 
-    sessionData.visit = getSelectedSlot(req.session.slotsList, req.body['visit-date-and-time'])
+    visitSessionData.visit = getSelectedSlot(req.session.slotsList, req.body['visit-date-and-time'])
 
-    if (sessionData.visitReference) {
+    if (visitSessionData.visitReference) {
       await this.visitSessionsService.updateVisit({
         username: res.locals.user?.username,
-        visitData: sessionData,
+        visitData: visitSessionData,
         visitStatus: 'RESERVED',
       })
     } else {
       const { reference, visitStatus } = await this.visitSessionsService.createVisit({
         username: res.locals.user?.username,
-        visitData: sessionData,
+        visitData: visitSessionData,
       })
 
-      sessionData.visitReference = reference
-      sessionData.visitStatus = visitStatus
+      visitSessionData.visitReference = reference
+      visitSessionData.visitStatus = visitStatus
     }
 
     await this.auditService.reservedVisit(
-      sessionData.visitReference,
-      sessionData.prisoner.offenderNo,
+      visitSessionData.visitReference,
+      visitSessionData.prisoner.offenderNo,
       'HEI',
-      sessionData.visitors.map(visitor => visitor.personId.toString()),
-      sessionData.visit.startTimestamp,
-      sessionData.visit.endTimestamp,
-      sessionData.visitRestriction,
+      visitSessionData.visitors.map(visitor => visitor.personId.toString()),
+      visitSessionData.visit.startTimestamp,
+      visitSessionData.visit.endTimestamp,
+      visitSessionData.visitRestriction,
       res.locals.user?.username,
       res.locals.appInsightsOperationId,
     )
 
-    const urlPrefix = isUpdate ? `/visit/${sessionData.visitReference}/update` : '/book-a-visit'
+    const urlPrefix = isUpdate ? `/visit/${visitSessionData.previousVisitReference}/update` : '/book-a-visit'
 
     return res.redirect(`${urlPrefix}/additional-support`)
   }

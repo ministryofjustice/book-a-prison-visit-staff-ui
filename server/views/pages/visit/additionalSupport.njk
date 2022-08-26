@@ -14,7 +14,7 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
         {% include "partials/errorSummary.njk" %}
-        <form action="/visit/{{ reference }}/update/additional-support" method="POST" novalidate>
+        <form action="/visit/{{ previousReference }}/update/additional-support" method="POST" novalidate>
             <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
             {% set otherSupportHtml %}

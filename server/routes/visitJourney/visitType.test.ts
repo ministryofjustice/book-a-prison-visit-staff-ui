@@ -11,7 +11,7 @@ jest.mock('../../services/auditService')
 let sessionApp: Express
 const systemToken = async (user: string): Promise<string> => `${user}-token-1`
 let flashData: Record<string, string[] | Record<string, string>[]>
-let updateVisitSessionData: VisitSessionData
+let visitSessionData: VisitSessionData
 
 const auditService = new AuditService() as jest.Mocked<AuditService>
 
@@ -20,7 +20,7 @@ jest.mock('../visitorUtils', () => {
   return {
     ...visitorUtils,
     clearSession: jest.fn((req: Express.Request) => {
-      req.session.updateVisitSessionData = updateVisitSessionData as VisitSessionData
+      req.session.visitSessionData = visitSessionData as VisitSessionData
     }),
   }
 })
@@ -40,7 +40,7 @@ describe.skip('/visit/:reference/update/visit-type', () => {
   const visitReference = 'ab-cd-ef-gh'
 
   beforeEach(() => {
-    updateVisitSessionData = {
+    visitSessionData = {
       prisoner: {
         name: 'prisoner name',
         offenderNo: 'A1234BC',
@@ -77,7 +77,7 @@ describe.skip('/visit/:reference/update/visit-type', () => {
       auditServiceOverride: auditService,
       systemTokenOverride: systemToken,
       sessionData: {
-        updateVisitSessionData,
+        visitSessionData,
       } as SessionData,
     })
   })
@@ -148,13 +148,13 @@ describe.skip('/visit/:reference/update/visit-type', () => {
         .expect(302)
         .expect('location', `/visit/${visitReference}/update/select-date-and-time`)
         .expect(() => {
-          expect(updateVisitSessionData.visitRestriction).toBe('OPEN')
-          expect(updateVisitSessionData.closedVisitReason).toBe(undefined)
+          expect(visitSessionData.visitRestriction).toBe('OPEN')
+          expect(visitSessionData.closedVisitReason).toBe(undefined)
           expect(auditService.visitRestrictionSelected).toHaveBeenCalledTimes(1)
           expect(auditService.visitRestrictionSelected).toHaveBeenCalledWith(
-            updateVisitSessionData.prisoner.offenderNo,
+            visitSessionData.prisoner.offenderNo,
             'OPEN',
-            [updateVisitSessionData.visitors[0].personId.toString()],
+            [visitSessionData.visitors[0].personId.toString()],
             undefined,
             undefined,
           )
@@ -168,13 +168,13 @@ describe.skip('/visit/:reference/update/visit-type', () => {
         .expect(302)
         .expect('location', `/visit/${visitReference}/update/select-date-and-time`)
         .expect(() => {
-          expect(updateVisitSessionData.visitRestriction).toBe('CLOSED')
-          expect(updateVisitSessionData.closedVisitReason).toBe('prisoner')
+          expect(visitSessionData.visitRestriction).toBe('CLOSED')
+          expect(visitSessionData.closedVisitReason).toBe('prisoner')
           expect(auditService.visitRestrictionSelected).toHaveBeenCalledTimes(1)
           expect(auditService.visitRestrictionSelected).toHaveBeenCalledWith(
-            updateVisitSessionData.prisoner.offenderNo,
+            visitSessionData.prisoner.offenderNo,
             'CLOSED',
-            [updateVisitSessionData.visitors[0].personId.toString()],
+            [visitSessionData.visitors[0].personId.toString()],
             undefined,
             undefined,
           )

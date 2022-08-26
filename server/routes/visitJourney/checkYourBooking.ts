@@ -16,28 +16,34 @@ export default class CheckYourBooking {
 
   async get(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'
-    const sessionData = req.session[isUpdate ? 'updateVisitSessionData' : 'visitSessionData']
-    const { offenderNo } = sessionData.prisoner
+    const { visitSessionData } = req.session
+    const { offenderNo } = visitSessionData.prisoner
 
-    const additionalSupport = getSupportTypeDescriptions(req.session.availableSupportTypes, sessionData.visitorSupport)
+    const additionalSupport = getSupportTypeDescriptions(
+      req.session.availableSupportTypes,
+      visitSessionData.visitorSupport,
+    )
 
     res.render(`pages/${isUpdate ? 'visit' : 'bookAVisit'}/checkYourBooking`, {
       offenderNo,
-      mainContact: sessionData.mainContact,
-      prisoner: sessionData.prisoner,
-      visit: sessionData.visit,
-      visitRestriction: sessionData.visitRestriction,
-      visitors: sessionData.visitors,
+      mainContact: visitSessionData.mainContact,
+      prisoner: visitSessionData.prisoner,
+      visit: visitSessionData.visit,
+      visitRestriction: visitSessionData.visitRestriction,
+      visitors: visitSessionData.visitors,
       additionalSupport,
     })
   }
 
   async post(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'
-    const sessionData = req.session[isUpdate ? 'updateVisitSessionData' : 'visitSessionData']
-    const { offenderNo } = sessionData.prisoner
+    const { visitSessionData } = req.session
+    const { offenderNo } = visitSessionData.prisoner
 
-    const additionalSupport = getSupportTypeDescriptions(req.session.availableSupportTypes, sessionData.visitorSupport)
+    const additionalSupport = getSupportTypeDescriptions(
+      req.session.availableSupportTypes,
+      visitSessionData.visitorSupport,
+    )
 
     try {
       const bookedVisit = await this.visitSessionsService.updateVisit({
@@ -50,29 +56,29 @@ export default class CheckYourBooking {
 
       await this.auditService.bookedVisit(
         req.session.visitSessionData.visitReference,
-        sessionData.prisoner.offenderNo,
+        visitSessionData.prisoner.offenderNo,
         'HEI',
-        sessionData.visitors.map(visitor => visitor.personId.toString()),
-        sessionData.visit.startTimestamp,
-        sessionData.visit.endTimestamp,
-        sessionData.visitRestriction,
+        visitSessionData.visitors.map(visitor => visitor.personId.toString()),
+        visitSessionData.visit.startTimestamp,
+        visitSessionData.visit.endTimestamp,
+        visitSessionData.visitRestriction,
         res.locals.user?.username,
         res.locals.appInsightsOperationId,
       )
 
       if (config.apis.notifications.enabled) {
         try {
-          const phoneNumber = sessionData.mainContact.phoneNumber.replace(/\s/g, '')
+          const phoneNumber = visitSessionData.mainContact.phoneNumber.replace(/\s/g, '')
 
           await this.notificationsService.sendBookingSms({
             phoneNumber,
-            visit: sessionData.visit,
+            visit: visitSessionData.visit,
             prisonName: 'Hewell (HMP)',
-            reference: sessionData.visitReference,
+            reference: visitSessionData.visitReference,
           })
-          logger.info(`Booking SMS sent for ${sessionData.visitReference}`)
+          logger.info(`Booking SMS sent for ${visitSessionData.visitReference}`)
         } catch (error) {
-          logger.error(`Failed to send SMS for booking ${sessionData.visitReference}`)
+          logger.error(`Failed to send SMS for booking ${visitSessionData.visitReference}`)
         }
       }
     } catch (error) {
@@ -84,16 +90,16 @@ export default class CheckYourBooking {
           },
         ],
         offenderNo,
-        mainContact: sessionData.mainContact,
-        prisoner: sessionData.prisoner,
-        visit: sessionData.visit,
-        visitRestriction: sessionData.visitRestriction,
-        visitors: sessionData.visitors,
+        mainContact: visitSessionData.mainContact,
+        prisoner: visitSessionData.prisoner,
+        visit: visitSessionData.visit,
+        visitRestriction: visitSessionData.visitRestriction,
+        visitors: visitSessionData.visitors,
         additionalSupport,
       })
     }
 
-    const urlPrefix = isUpdate ? `/visit/${sessionData.visitReference}/update` : '/book-a-visit'
+    const urlPrefix = isUpdate ? `/visit/${visitSessionData.previousVisitReference}/update` : '/book-a-visit'
 
     return res.redirect(`${urlPrefix}/confirmation`)
   }
