@@ -165,7 +165,7 @@ export default class VisitSessionsService {
     const token = await this.systemToken(username)
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
 
-    const reservation = await visitSchedulerApiClient.createVisit(visitData)
+    const reservation = await visitSchedulerApiClient.reserveVisit(visitData)
     logger.info(`Created visit ${reservation?.reference} for offender ${visitData.prisoner.offenderNo}`)
 
     return reservation

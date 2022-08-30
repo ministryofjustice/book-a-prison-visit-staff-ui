@@ -340,7 +340,6 @@ describe('visitSchedulerApiClient', () => {
           prisonId,
           visitRoom: visitSessionData.visit.visitRoomName,
           visitType,
-          visitStatus,
           visitRestriction,
           startTimestamp: visitSessionData.visit.startTimestamp,
           endTimestamp: visitSessionData.visit.endTimestamp,
@@ -353,7 +352,7 @@ describe('visitSchedulerApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(201, result)
 
-      const output = await client.createVisit(visitSessionData)
+      const output = await client.reserveVisit(visitSessionData)
 
       expect(output).toEqual(result)
     })

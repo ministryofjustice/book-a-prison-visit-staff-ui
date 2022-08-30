@@ -89,16 +89,19 @@ export interface components {
       /**
        * @description Visit Type
        * @example SOCIAL
+       * @enum {string}
        */
       visitType?: 'SOCIAL'
       /**
        * @description Visit Status
        * @example RESERVED
+       * @enum {string}
        */
       visitStatus?: 'RESERVED' | 'BOOKED' | 'CANCELLED'
       /**
        * @description Visit Restriction
        * @example OPEN
+       * @enum {string}
        */
       visitRestriction?: 'OPEN' | 'CLOSED' | 'UNKNOWN'
       /**
@@ -177,16 +180,19 @@ export interface components {
       /**
        * @description Visit Type
        * @example SOCIAL
+       * @enum {string}
        */
       visitType: 'SOCIAL'
       /**
        * @description Visit Status
        * @example RESERVED
+       * @enum {string}
        */
       visitStatus: 'RESERVED' | 'BOOKED' | 'CANCELLED'
       /**
        * @description Outcome Status
        * @example VISITOR_CANCELLED
+       * @enum {string}
        */
       outcomeStatus?:
         | 'ADMINISTRATIVE_CANCELLATION'
@@ -211,6 +217,7 @@ export interface components {
       /**
        * @description Visit Restriction
        * @example OPEN
+       * @enum {string}
        */
       visitRestriction: 'OPEN' | 'CLOSED' | 'UNKNOWN'
       /**
@@ -246,6 +253,7 @@ export interface components {
       /**
        * @description Note type
        * @example VISITOR_CONCERN
+       * @enum {string}
        */
       type: 'VISITOR_CONCERN' | 'VISIT_OUTCOMES' | 'VISIT_COMMENT' | 'STATUS_CHANGED_REASON'
       /**
@@ -328,16 +336,13 @@ export interface components {
       /**
        * @description Visit Type
        * @example SOCIAL
+       * @enum {string}
        */
       visitType: 'SOCIAL'
       /**
-       * @description Visit Status
-       * @example RESERVED
-       */
-      visitStatus: 'RESERVED' | 'BOOKED' | 'CANCELLED'
-      /**
        * @description Visit Restriction
        * @example OPEN
+       * @enum {string}
        */
       visitRestriction: 'OPEN' | 'CLOSED' | 'UNKNOWN'
       /**
@@ -379,6 +384,7 @@ export interface components {
       /**
        * @description visit type
        * @example SOCIAL
+       * @enum {string}
        */
       visitType: 'SOCIAL'
       /**
@@ -401,6 +407,7 @@ export interface components {
       /**
        * @description day of week for visit
        * @example MONDAY
+       * @enum {string}
        */
       dayOfWeek: 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY'
     }
@@ -447,6 +454,7 @@ export interface components {
       /**
        * @description visit type
        * @example SOCIAL
+       * @enum {string}
        */
       visitType: 'SOCIAL'
       /**
@@ -469,6 +477,7 @@ export interface components {
       /**
        * @description day of week fpr visit
        * @example MONDAY
+       * @enum {string}
        */
       dayOfWeek?: 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY'
     }
@@ -516,16 +525,19 @@ export interface components {
       /**
        * @description Visit Type
        * @example SOCIAL
+       * @enum {string}
        */
       visitType: 'SOCIAL'
       /**
        * @description Visit Status
        * @example RESERVED
+       * @enum {string}
        */
       visitStatus: 'RESERVED' | 'BOOKED' | 'CANCELLED'
       /**
        * @description Outcome Status
        * @default NOT_RECORDED
+       * @enum {string}
        */
       outcomeStatus?:
         | 'ADMINISTRATIVE_CANCELLATION'
@@ -550,6 +562,7 @@ export interface components {
       /**
        * @description Visit Restriction
        * @example OPEN
+       * @enum {string}
        */
       visitRestriction: 'OPEN' | 'CLOSED' | 'UNKNOWN'
       /**
@@ -574,6 +587,7 @@ export interface components {
       /**
        * @description Outcome Status
        * @example VISITOR_CANCELLED
+       * @enum {string}
        */
       outcomeStatus:
         | 'ADMINISTRATIVE_CANCELLATION'
@@ -612,8 +626,8 @@ export interface components {
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject']
-      last?: boolean
       first?: boolean
+      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
@@ -625,10 +639,10 @@ export interface components {
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
       pageSize?: number
-      paged?: boolean
-      unpaged?: boolean
       /** Format: int32 */
       pageNumber?: number
+      paged?: boolean
+      unpaged?: boolean
     }
     SortObject: {
       empty?: boolean
@@ -664,6 +678,7 @@ export interface components {
       /**
        * @description The type of visits taking place within this session
        * @example SOCIAL
+       * @enum {string}
        */
       visitType: 'SOCIAL'
       /**
