@@ -139,10 +139,6 @@ export default function routes(
   const checkYourBooking = new CheckYourBooking('update', visitSessionsService, auditService, notificationsService)
   const confirmation = new Confirmation('update')
 
-  get('/:reference/update', checkVisitReferenceMiddleware, async (req, res) =>
-    res.render('pages/visit/update', { reference: getVisitReference(req) }),
-  )
-
   get('/:reference/update/select-visitors', checkVisitReferenceMiddleware, (req, res) => selectVisitors.get(req, res))
   post('/:reference/update/select-visitors', checkVisitReferenceMiddleware, selectVisitors.validate(), (req, res) =>
     selectVisitors.post(req, res),

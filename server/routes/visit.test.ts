@@ -204,7 +204,7 @@ describe('GET /visit/:reference', () => {
         expect($('[data-test="visit-contact"]').text()).toBe('Smith, Jeanette')
         expect($('[data-test="visit-phone"]').text()).toBe('01234 567890')
         expect($('[data-test="cancel-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/cancel')
-        expect($('[data-test="update-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/update')
+        expect($('[data-test="update-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/update/select-visitors')
         // visitor details
         expect($('[data-test="visitor-name-1"]').text()).toBe('Smith, Jeanette')
         expect($('[data-test="visitor-dob-1"]').html()).toBe('28 July 1986<br>(Adult)')
@@ -317,7 +317,7 @@ describe('GET /visit/:reference', () => {
         expect($('[data-test="visit-contact"]').text()).toBe('Smith, Jeanette')
         expect($('[data-test="visit-phone"]').text()).toBe('Unknown')
         expect($('[data-test="cancel-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/cancel')
-        expect($('[data-test="update-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/update')
+        expect($('[data-test="update-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/update/select-visitors')
         // visitor details
         expect($('[data-test="visitor-name-1"]').text()).toBe('Smith, Jeanette')
         expect($('[data-test="visitor-dob-1"]').html()).toBe('28 July 1986<br>(Adult)')
@@ -377,7 +377,7 @@ describe('GET /visit/:reference', () => {
         expect($('[data-test="visit-contact"]').text()).toBe('Smith, Jeanette')
         expect($('[data-test="visit-phone"]').text()).toBe('01234 567890')
         expect($('[data-test="cancel-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/cancel')
-        expect($('[data-test="update-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/update')
+        expect($('[data-test="update-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/update/select-visitors')
         // visitor details
         expect($('[data-test="visitor-name-1"]').text()).toBe('Smith, Jeanette')
         expect($('[data-test="visitor-dob-1"]').html()).toBe('28 July 1986<br>(Adult)')
@@ -447,24 +447,6 @@ describe('GET /visit/:reference', () => {
       .expect('Content-Type', /html/)
       .expect(res => {
         expect(res.text).toContain('BadRequestError: Bad Request')
-      })
-  })
-})
-
-describe('GET /visit/:reference/update', () => {
-  it('should render the choose what to update page', () => {
-    return request(app)
-      .get('/visit/ab-cd-ef-gh/update')
-      .expect(200)
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        const $ = cheerio.load(res.text)
-        expect($('h1').text().trim()).toBe('What do you want to change?')
-        expect($('.govuk-summary-list__value').length).toBe(4)
-        expect($('.govuk-summary-list__value').eq(0).text().trim()).toBe('The people on the visit')
-        expect($('.govuk-summary-list__value').eq(1).text().trim()).toBe('When the visit is happening')
-        expect($('.govuk-summary-list__value').eq(2).text().trim()).toBe('Additional support')
-        expect($('.govuk-summary-list__value').eq(3).text().trim()).toBe('The main contact or their phone number')
       })
   })
 })
