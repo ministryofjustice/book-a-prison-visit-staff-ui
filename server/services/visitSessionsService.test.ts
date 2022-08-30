@@ -692,11 +692,11 @@ describe('Visit sessions service', () => {
         modifiedTimestamp: '2022-02-14T10:05:00',
       }
 
-      visitSchedulerApiClient.createVisit.mockResolvedValue(visit)
+      visitSchedulerApiClient.reserveVisit.mockResolvedValue(visit)
       whereaboutsApiClient.getEvents.mockResolvedValue([])
       const result = await visitSessionsService.createVisit({ username: 'user', visitData: visitSessionData })
 
-      expect(visitSchedulerApiClient.createVisit).toHaveBeenCalledTimes(1)
+      expect(visitSchedulerApiClient.reserveVisit).toHaveBeenCalledTimes(1)
       expect(result).toEqual(visit)
     })
   })

@@ -13,9 +13,7 @@ import config from '../config'
 
 export const visitSchedulerApiClientBuilder = (token: string): VisitSchedulerApiClient => {
   const restClient = new RestClient('visitSchedulerApi', config.apis.visitScheduler, token)
-  const visitSchedulerApiClient = new VisitSchedulerApiClient(restClient)
-
-  return visitSchedulerApiClient
+  return new VisitSchedulerApiClient(restClient)
 }
 
 class VisitSchedulerApiClient {
@@ -84,7 +82,7 @@ class VisitSchedulerApiClient {
     })
   }
 
-  createVisit(visitData: VisitSessionData): Promise<Visit> {
+  reserveVisit(visitData: VisitSessionData): Promise<Visit> {
     return this.restclient.post({
       path: '/visits',
       data: <CreateVisitRequestDto>{
@@ -92,7 +90,6 @@ class VisitSchedulerApiClient {
         prisonId: this.prisonId,
         visitRoom: visitData.visit.visitRoomName,
         visitType: this.visitType,
-        visitStatus: 'RESERVED',
         visitRestriction: visitData.visitRestriction,
         startTimestamp: visitData.visit.startTimestamp,
         endTimestamp: visitData.visit.endTimestamp,
