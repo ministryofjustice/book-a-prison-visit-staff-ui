@@ -382,6 +382,7 @@ describe('visitSchedulerApiClient', () => {
         visitors: [
           {
             nomisPersonId: 1234,
+            visitContact: false,
           },
         ],
         visitorSupport: [
@@ -456,6 +457,7 @@ describe('visitSchedulerApiClient', () => {
           visitors: visitSessionData.visitors.map(visitor => {
             return {
               nomisPersonId: visitor.personId,
+              visitContact: false,
             }
           }),
           visitorSupport: visitSessionData.visitorSupport,
@@ -483,6 +485,7 @@ describe('visitSchedulerApiClient', () => {
         visitors: [
           {
             nomisPersonId: 1234,
+            visitContact: false,
           },
         ],
         visitorSupport: [],
@@ -540,6 +543,7 @@ describe('visitSchedulerApiClient', () => {
           visitors: visitSessionData.visitors.map(visitor => {
             return {
               nomisPersonId: visitor.personId,
+              visitContact: false,
             }
           }),
           visitorSupport: visitSessionData.visitorSupport,
