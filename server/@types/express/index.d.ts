@@ -15,7 +15,6 @@ declare module 'express-session' {
     timeOfDay: string
     dayOfTheWeek: string
     visitSessionData: VisitSessionData
-    updateVisitSessionData: VisitSessionData
   }
 }
 

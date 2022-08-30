@@ -21,7 +21,7 @@
     {%- set tableText %}
       {% if (doubleBooked and not checked) -%}
         Prisoner has a visit
-      {%- elseif slot.availableTables === 0 -%}
+      {%- elseif slot.availableTables <= 0 -%}
         Fully booked
       {%- else -%}
         {{ slot.availableTables }} table{{ "s" if slot.availableTables > 1 }} available
@@ -34,7 +34,7 @@
         " to " + slot.endTimestamp | formatTime + "</strong><br>" + tableText + "</p>",
       id: slot.id,
       checked: checked,
-      disabled: slot.availableTables === 0 or (doubleBooked and not checked)
+      disabled: slot.availableTables <= 0 or (doubleBooked and not checked)
     }), radios) %}
   {% endfor %}
 {% endmacro %}

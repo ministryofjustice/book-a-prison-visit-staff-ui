@@ -6,17 +6,17 @@ export default class Confirmation {
 
   async get(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'
-    const sessionData = req.session[isUpdate ? 'updateVisitSessionData' : 'visitSessionData']
+    const { visitSessionData } = req.session
 
-    res.locals.prisoner = sessionData.prisoner
-    res.locals.visit = sessionData.visit
-    res.locals.visitRestriction = sessionData.visitRestriction
-    res.locals.visitors = sessionData.visitors
-    res.locals.mainContact = sessionData.mainContact
-    res.locals.visitReference = sessionData.visitReference
+    res.locals.prisoner = visitSessionData.prisoner
+    res.locals.visit = visitSessionData.visit
+    res.locals.visitRestriction = visitSessionData.visitRestriction
+    res.locals.visitors = visitSessionData.visitors
+    res.locals.mainContact = visitSessionData.mainContact
+    res.locals.visitReference = visitSessionData.visitReference
     res.locals.additionalSupport = getSupportTypeDescriptions(
       req.session.availableSupportTypes,
-      sessionData.visitorSupport,
+      visitSessionData.visitorSupport,
     )
 
     clearSession(req)

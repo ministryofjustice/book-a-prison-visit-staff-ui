@@ -14,8 +14,8 @@ export default class SelectVisitors {
 
   async get(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'
-    const sessionData = req.session[isUpdate ? 'updateVisitSessionData' : 'visitSessionData']
-    const { offenderNo } = sessionData.prisoner
+    const { visitSessionData } = req.session
+    const { offenderNo } = visitSessionData.prisoner
 
     const visitorList = await this.prisonerVisitorsService.getVisitors(offenderNo, res.locals.user?.username)
     if (!req.session.visitorList) {
@@ -26,21 +26,21 @@ export default class SelectVisitors {
     const restrictions = await this.prisonerProfileService.getRestrictions(offenderNo, res.locals.user?.username)
 
     if (isUpdate) {
-      sessionData.prisoner.previousRestrictions = sessionData.prisoner?.restrictions ?? []
+      visitSessionData.prisoner.previousRestrictions = visitSessionData.prisoner?.restrictions ?? []
     }
 
-    sessionData.prisoner.restrictions = restrictions
+    visitSessionData.prisoner.restrictions = restrictions
 
     const formValues = getFlashFormValues(req)
-    if (!Object.keys(formValues).length && sessionData.visitors) {
-      formValues.visitors = sessionData.visitors.map(visitor => visitor.personId.toString())
+    if (!Object.keys(formValues).length && visitSessionData.visitors) {
+      formValues.visitors = visitSessionData.visitors.map(visitor => visitor.personId.toString())
     }
 
     res.render(`pages/${isUpdate ? 'visit' : 'bookAVisit'}/visitors`, {
       errors: req.flash('errors'),
-      reference: sessionData.visitReference ?? '',
-      offenderNo: sessionData.prisoner.offenderNo,
-      prisonerName: sessionData.prisoner.name,
+      previousReference: visitSessionData.previousVisitReference,
+      offenderNo: visitSessionData.prisoner.offenderNo,
+      prisonerName: visitSessionData.prisoner.name,
       visitorList,
       restrictions,
       formValues,
@@ -49,7 +49,7 @@ export default class SelectVisitors {
 
   async post(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'
-    const sessionData = req.session[isUpdate ? 'updateVisitSessionData' : 'visitSessionData']
+    const { visitSessionData } = req.session
     const errors = validationResult(req)
 
     if (!errors.isEmpty()) {
@@ -70,7 +70,7 @@ export default class SelectVisitors {
 
       return adultVisitors
     }, [])
-    sessionData.visitors = selectedVisitors
+    visitSessionData.visitors = selectedVisitors
 
     if (!req.session.adultVisitors) {
       req.session.adultVisitors = { adults: [] }
@@ -81,15 +81,15 @@ export default class SelectVisitors {
       return closedVisit || visitor.restrictions.some(restriction => restriction.restrictionType === 'CLOSED')
     }, false)
     const newVisitRestriction = closedVisitVisitors ? 'CLOSED' : 'OPEN'
-    sessionData.previousVisitRestriction = sessionData.visitRestriction
-    sessionData.visitRestriction = newVisitRestriction
-    sessionData.closedVisitReason = closedVisitVisitors ? 'visitor' : undefined
+    visitSessionData.previousVisitRestriction = visitSessionData.visitRestriction
+    visitSessionData.visitRestriction = newVisitRestriction
+    visitSessionData.closedVisitReason = closedVisitVisitors ? 'visitor' : undefined
 
-    const closedVisitPrisoner = sessionData.prisoner.restrictions.some(
+    const closedVisitPrisoner = visitSessionData.prisoner.restrictions.some(
       restriction => restriction.restrictionType === 'CLOSED',
     )
 
-    const urlPrefix = isUpdate ? `/visit/${sessionData.visitReference}/update` : '/book-a-visit'
+    const urlPrefix = isUpdate ? `/visit/${visitSessionData.previousVisitReference}/update` : '/book-a-visit'
 
     return !closedVisitVisitors && closedVisitPrisoner
       ? res.redirect(`${urlPrefix}/visit-type`)

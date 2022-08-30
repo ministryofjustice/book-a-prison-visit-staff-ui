@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import { Session, SessionData } from 'express-session'
-import { VisitSessionData, VisitSlotList } from '../@types/bapv'
+import { VisitSlotList } from '../@types/bapv'
 import { clearSession, getFlashFormValues, getSelectedSlot } from './visitorUtils'
 
 const slotsList: VisitSlotList = {
@@ -142,12 +142,11 @@ describe('clearSession', () => {
     timeOfDay: 'morning',
     dayOfTheWeek: '1',
     visitSessionData: { prisoner: undefined },
-    updateVisitSessionData: {} as VisitSessionData,
   }
 
   req.session = sessionData as Session & SessionData
 
-  it('should clear only booking journey related data from the session', () => {
+  it('should clear specified booking data from the session', () => {
     clearSession(req as Request)
 
     expect(req.session).toStrictEqual(<Session & Partial<SessionData>>{

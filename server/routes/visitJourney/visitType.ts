@@ -7,22 +7,22 @@ export default class VisitType {
 
   async get(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'
-    const sessionData = req.session[isUpdate ? 'updateVisitSessionData' : 'visitSessionData']
-    const closedRestrictions = sessionData.prisoner.restrictions.filter(
+    const { visitSessionData } = req.session
+    const closedRestrictions = visitSessionData.prisoner.restrictions.filter(
       restriction => restriction.restrictionType === 'CLOSED',
     )
 
     res.render(`pages/${isUpdate ? 'visit' : 'bookAVisit'}/visitType`, {
       errors: req.flash('errors'),
       restrictions: closedRestrictions,
-      visitors: sessionData.visitors,
-      reference: sessionData.visitReference,
+      visitors: visitSessionData.visitors,
+      previousReference: visitSessionData.previousVisitReference,
     })
   }
 
   async post(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'
-    const sessionData = req.session[isUpdate ? 'updateVisitSessionData' : 'visitSessionData']
+    const { visitSessionData } = req.session
     const errors = validationResult(req)
 
     if (!errors.isEmpty()) {
@@ -30,18 +30,18 @@ export default class VisitType {
       return res.redirect(req.originalUrl)
     }
 
-    sessionData.visitRestriction = req.body.visitType
-    sessionData.closedVisitReason = req.body.visitType === 'CLOSED' ? 'prisoner' : undefined
+    visitSessionData.visitRestriction = req.body.visitType
+    visitSessionData.closedVisitReason = req.body.visitType === 'CLOSED' ? 'prisoner' : undefined
 
     await this.auditService.visitRestrictionSelected(
-      sessionData.prisoner.offenderNo,
-      sessionData.visitRestriction,
-      sessionData.visitors.map(visitor => visitor.personId.toString()),
+      visitSessionData.prisoner.offenderNo,
+      visitSessionData.visitRestriction,
+      visitSessionData.visitors.map(visitor => visitor.personId.toString()),
       res.locals.user?.username,
       res.locals.appInsightsOperationId,
     )
 
-    const urlPrefix = isUpdate ? `/visit/${sessionData.visitReference}/update` : '/book-a-visit'
+    const urlPrefix = isUpdate ? `/visit/${visitSessionData.previousVisitReference}/update` : '/book-a-visit'
 
     return res.redirect(`${urlPrefix}/select-date-and-time`)
   }
