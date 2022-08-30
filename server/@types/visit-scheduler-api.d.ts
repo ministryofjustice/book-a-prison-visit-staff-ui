@@ -340,12 +340,6 @@ export interface components {
        */
       visitType: 'SOCIAL'
       /**
-       * @description Visit Status
-       * @example RESERVED
-       * @enum {string}
-       */
-      visitStatus: 'RESERVED' | 'BOOKED' | 'CANCELLED'
-      /**
        * @description Visit Restriction
        * @example OPEN
        * @enum {string}
