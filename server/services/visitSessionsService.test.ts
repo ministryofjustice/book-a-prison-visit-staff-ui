@@ -634,8 +634,8 @@ describe('Visit sessions service', () => {
     })
   })
 
-  describe('createVisit', () => {
-    it('should create a new visit and return the visit data', async () => {
+  describe('reserveVisit', () => {
+    it('should create a new RESERVED visit and return the visit data', async () => {
       const visitSessionData: VisitSessionData = {
         prisoner: {
           offenderNo: 'A1234BC',
@@ -694,7 +694,7 @@ describe('Visit sessions service', () => {
 
       visitSchedulerApiClient.reserveVisit.mockResolvedValue(visit)
       whereaboutsApiClient.getEvents.mockResolvedValue([])
-      const result = await visitSessionsService.createVisit({ username: 'user', visitData: visitSessionData })
+      const result = await visitSessionsService.reserveVisit({ username: 'user', visitData: visitSessionData })
 
       expect(visitSchedulerApiClient.reserveVisit).toHaveBeenCalledTimes(1)
       expect(result).toEqual(visit)

@@ -1687,7 +1687,7 @@ describe('/visit/:reference/update/select-date-and-time', () => {
     const createdVisit: Partial<Visit> = { reference: '2a-bc-3d-ef', visitStatus: 'RESERVED' }
 
     beforeEach(() => {
-      visitSessionsService.createVisit = jest.fn().mockResolvedValue(createdVisit)
+      visitSessionsService.reserveVisit = jest.fn().mockResolvedValue(createdVisit)
       visitSessionsService.updateVisit = jest.fn()
 
       sessionApp = appWithAllRoutes({
@@ -1716,7 +1716,7 @@ describe('/visit/:reference/update/select-date-and-time', () => {
             visitRoomName: 'room name',
             visitRestriction: 'OPEN',
           })
-          expect(visitSessionsService.createVisit).toHaveBeenCalledTimes(1)
+          expect(visitSessionsService.reserveVisit).toHaveBeenCalledTimes(1)
           expect(auditService.reservedVisit).toHaveBeenCalledTimes(1)
           expect(auditService.reservedVisit).toHaveBeenCalledWith('2a-bc-3d-ef', 'A1234BC', 'HEI', undefined, undefined)
           expect(visitSessionsService.updateVisit).not.toHaveBeenCalled()
@@ -1753,7 +1753,7 @@ describe('/visit/:reference/update/select-date-and-time', () => {
             sessionConflicts: ['DOUBLE_BOOKED'],
             visitRestriction: 'OPEN',
           })
-          expect(visitSessionsService.createVisit).not.toHaveBeenCalled()
+          expect(visitSessionsService.reserveVisit).not.toHaveBeenCalled()
           expect(auditService.reservedVisit).toHaveBeenCalledTimes(1)
           expect(auditService.reservedVisit).toHaveBeenCalledWith('3b-cd-4f-fg', 'A1234BC', 'HEI', undefined, undefined)
           expect(visitSessionsService.updateVisit).toHaveBeenCalledTimes(1)

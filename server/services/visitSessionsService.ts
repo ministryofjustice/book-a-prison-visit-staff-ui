@@ -161,7 +161,7 @@ export default class VisitSessionsService {
     return availableSessions
   }
 
-  async createVisit({ username, visitData }: { username: string; visitData: VisitSessionData }): Promise<Visit> {
+  async reserveVisit({ username, visitData }: { username: string; visitData: VisitSessionData }): Promise<Visit> {
     const token = await this.systemToken(username)
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
 
