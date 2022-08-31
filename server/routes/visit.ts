@@ -47,6 +47,8 @@ export default function routes(
     )
 
   get('/cancelled', async (req, res) => {
+    clearSession(req)
+
     return res.render('pages/visit/cancelConfirmation', {
       startTimestamp: req.flash('startTimestamp')?.[0],
       endTimestamp: req.flash('endTimestamp')?.[0],
