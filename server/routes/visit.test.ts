@@ -1986,7 +1986,7 @@ describe('/visit/:reference/update/check-your-booking', () => {
       })
     })
 
-    it('should book visit, record audit event, send SMS (notifications enabled) and redirect to confirmation page', () => {
+    it('should book new visit, cancel previous one, record audit events, send SMS (notifications enabled) and redirect to confirmation page', () => {
       config.apis.notifications.enabled = true
 
       return request(sessionApp)
@@ -1995,14 +1995,6 @@ describe('/visit/:reference/update/check-your-booking', () => {
         .expect('location', `/visit/${visitSessionData.previousVisitReference}/update/confirmation`)
         .expect(() => {
           expect(visitSessionsService.updateVisit).toHaveBeenCalledTimes(1)
-          expect(visitSessionsService.cancelVisit).toHaveBeenCalledWith({
-            username: undefined,
-            reference: visitSessionData.previousVisitReference,
-            outcome: <OutcomeDto>{
-              outcomeStatus: 'SUPERSEDED_CANCELLATION',
-              text: `Superseded by ${visitSessionData.visitReference}`,
-            },
-          })
           expect(visitSessionData.visitStatus).toBe('BOOKED')
           expect(auditService.bookedVisit).toHaveBeenCalledTimes(1)
           expect(auditService.bookedVisit).toHaveBeenCalledWith(
@@ -2013,6 +2005,22 @@ describe('/visit/:reference/update/check-your-booking', () => {
             '2022-03-12T09:30:00',
             '2022-03-12T10:30:00',
             'OPEN',
+            undefined,
+            undefined,
+          )
+          expect(visitSessionsService.cancelVisit).toHaveBeenCalledWith({
+            username: undefined,
+            reference: visitSessionData.previousVisitReference,
+            outcome: <OutcomeDto>{
+              outcomeStatus: 'SUPERSEDED_CANCELLATION',
+              text: `Superseded by ${visitSessionData.visitReference}`,
+            },
+          })
+          expect(auditService.cancelledVisit).toHaveBeenCalledWith(
+            visitSessionData.previousVisitReference,
+            visitSessionData.prisoner.offenderNo,
+            'HEI',
+            `SUPERSEDED_CANCELLATION: Superseded by ${visitSessionData.visitReference}`,
             undefined,
             undefined,
           )
@@ -2037,16 +2045,10 @@ describe('/visit/:reference/update/check-your-booking', () => {
         .expect('location', `/visit/${visitSessionData.previousVisitReference}/update/confirmation`)
         .expect(() => {
           expect(visitSessionsService.updateVisit).toHaveBeenCalledTimes(1)
-          expect(visitSessionsService.cancelVisit).toHaveBeenCalledWith({
-            username: undefined,
-            reference: visitSessionData.previousVisitReference,
-            outcome: <OutcomeDto>{
-              outcomeStatus: 'SUPERSEDED_CANCELLATION',
-              text: `Superseded by ${visitSessionData.visitReference}`,
-            },
-          })
           expect(visitSessionData.visitStatus).toBe('BOOKED')
           expect(auditService.bookedVisit).toHaveBeenCalledTimes(1)
+          expect(visitSessionsService.cancelVisit).toHaveBeenCalledTimes(1)
+          expect(auditService.cancelledVisit).toHaveBeenCalledTimes(1)
           expect(notificationsService.sendBookingSms).toHaveBeenCalledTimes(1)
         })
     })
@@ -2060,16 +2062,10 @@ describe('/visit/:reference/update/check-your-booking', () => {
         .expect('location', `/visit/${visitSessionData.previousVisitReference}/update/confirmation`)
         .expect(() => {
           expect(visitSessionsService.updateVisit).toHaveBeenCalledTimes(1)
-          expect(visitSessionsService.cancelVisit).toHaveBeenCalledWith({
-            username: undefined,
-            reference: visitSessionData.previousVisitReference,
-            outcome: <OutcomeDto>{
-              outcomeStatus: 'SUPERSEDED_CANCELLATION',
-              text: `Superseded by ${visitSessionData.visitReference}`,
-            },
-          })
           expect(visitSessionData.visitStatus).toBe('BOOKED')
           expect(auditService.bookedVisit).toHaveBeenCalledTimes(1)
+          expect(visitSessionsService.cancelVisit).toHaveBeenCalledTimes(1)
+          expect(auditService.cancelledVisit).toHaveBeenCalledTimes(1)
           expect(notificationsService.sendBookingSms).not.toHaveBeenCalled()
         })
     })
@@ -2096,9 +2092,10 @@ describe('/visit/:reference/update/check-your-booking', () => {
           )
 
           expect(visitSessionsService.updateVisit).toHaveBeenCalledTimes(1)
-          expect(visitSessionsService.cancelVisit).not.toHaveBeenCalled()
           expect(visitSessionData.visitStatus).toBe('RESERVED')
           expect(auditService.bookedVisit).not.toHaveBeenCalled()
+          expect(visitSessionsService.cancelVisit).not.toHaveBeenCalled()
+          expect(auditService.cancelledVisit).not.toHaveBeenCalled()
           expect(notificationsService.sendBookingSms).not.toHaveBeenCalled()
         })
     })
