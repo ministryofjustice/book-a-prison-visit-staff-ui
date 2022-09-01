@@ -5,6 +5,7 @@ import AuditService from '../../services/auditService'
 import NotificationsService from '../../services/notificationsService'
 import VisitSessionsService from '../../services/visitSessionsService'
 import { getSupportTypeDescriptions } from '../visitorUtils'
+import getUrlPrefix from './visitJourneyUtils'
 
 export default class CheckYourBooking {
   constructor(
@@ -24,7 +25,7 @@ export default class CheckYourBooking {
       visitSessionData.visitorSupport,
     )
 
-    res.render(`pages/${isUpdate ? 'visit' : 'bookAVisit'}/checkYourBooking`, {
+    res.render('pages/bookAVisit/checkYourBooking', {
       offenderNo,
       mainContact: visitSessionData.mainContact,
       prisoner: visitSessionData.prisoner,
@@ -32,6 +33,7 @@ export default class CheckYourBooking {
       visitRestriction: visitSessionData.visitRestriction,
       visitors: visitSessionData.visitors,
       additionalSupport,
+      urlPrefix: getUrlPrefix(isUpdate, visitSessionData.previousVisitReference),
     })
   }
 
@@ -96,11 +98,11 @@ export default class CheckYourBooking {
         visitRestriction: visitSessionData.visitRestriction,
         visitors: visitSessionData.visitors,
         additionalSupport,
+        urlPrefix: getUrlPrefix(isUpdate, visitSessionData.previousVisitReference),
       })
     }
 
-    const urlPrefix = isUpdate ? `/visit/${visitSessionData.previousVisitReference}/update` : '/book-a-visit'
-
+    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.previousVisitReference)
     return res.redirect(`${urlPrefix}/confirmation`)
   }
 }
