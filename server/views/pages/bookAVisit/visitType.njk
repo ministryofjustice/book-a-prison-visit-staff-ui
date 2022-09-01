@@ -19,7 +19,7 @@
       {% include "partials/errorSummary.njk" %}
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
 
-      <form action="/book-a-visit/visit-type" method="POST" novalidate>
+      <form action="{{ urlPrefix }}/visit-type" method="POST" novalidate>
         <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
 

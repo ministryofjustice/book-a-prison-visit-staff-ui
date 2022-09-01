@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
 import AuditService from '../../services/auditService'
+import getUrlPrefix from './visitJourneyUtils'
 
 export default class VisitType {
   constructor(private readonly mode: string, private readonly auditService: AuditService) {}
@@ -12,11 +13,11 @@ export default class VisitType {
       restriction => restriction.restrictionType === 'CLOSED',
     )
 
-    res.render(`pages/${isUpdate ? 'visit' : 'bookAVisit'}/visitType`, {
+    res.render('pages/bookAVisit/visitType', {
       errors: req.flash('errors'),
       restrictions: closedRestrictions,
       visitors: visitSessionData.visitors,
-      previousReference: visitSessionData.previousVisitReference,
+      urlPrefix: getUrlPrefix(isUpdate, visitSessionData.previousVisitReference),
     })
   }
 
@@ -41,8 +42,7 @@ export default class VisitType {
       res.locals.appInsightsOperationId,
     )
 
-    const urlPrefix = isUpdate ? `/visit/${visitSessionData.previousVisitReference}/update` : '/book-a-visit'
-
+    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.previousVisitReference)
     return res.redirect(`${urlPrefix}/select-date-and-time`)
   }
 
