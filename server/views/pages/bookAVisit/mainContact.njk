@@ -13,7 +13,7 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         {% include "partials/errorSummary.njk" %}
-        <form action="/book-a-visit/select-main-contact" method="POST" novalidate>
+        <form action="{{ urlPrefix }}/select-main-contact" method="POST" novalidate>
             <input type="hidden" name="_csrf" value="{{ csrfToken }}">
             {% set visitors = [] %}
 
