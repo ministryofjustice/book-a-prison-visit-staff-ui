@@ -2222,6 +2222,7 @@ describe('/book-a-visit/check-your-booking', () => {
           expect($('.test-additional-support').text()).toContain('Portable induction loop for people with hearing aids')
           expect($('.test-main-contact-name').text()).toContain('abc')
           expect($('.test-main-contact-number').text()).toContain('0123 456 7890')
+          expect($('form').prop('action')).toBe('/book-a-visit/check-your-booking')
         })
     })
 
@@ -2244,6 +2245,7 @@ describe('/book-a-visit/check-your-booking', () => {
           expect($('.test-additional-support').text()).toContain('None')
           expect($('.test-main-contact-name').text()).toContain('abc')
           expect($('.test-main-contact-number').text()).toContain('0123 456 7890')
+          expect($('form').prop('action')).toBe('/book-a-visit/check-your-booking')
         })
     })
   })
@@ -2285,6 +2287,7 @@ describe('/book-a-visit/check-your-booking', () => {
         .expect('location', '/book-a-visit/confirmation')
         .expect(() => {
           expect(visitSessionsService.updateVisit).toHaveBeenCalledTimes(1)
+          expect(visitSessionsService.cancelVisit).not.toHaveBeenCalled()
           expect(visitSessionData.visitStatus).toBe('BOOKED')
           expect(auditService.bookedVisit).toHaveBeenCalledTimes(1)
           expect(auditService.bookedVisit).toHaveBeenCalledWith(
@@ -2319,6 +2322,7 @@ describe('/book-a-visit/check-your-booking', () => {
         .expect('location', '/book-a-visit/confirmation')
         .expect(() => {
           expect(visitSessionsService.updateVisit).toHaveBeenCalledTimes(1)
+          expect(visitSessionsService.cancelVisit).not.toHaveBeenCalled()
           expect(visitSessionData.visitStatus).toBe('BOOKED')
           expect(auditService.bookedVisit).toHaveBeenCalledTimes(1)
           expect(notificationsService.sendBookingSms).toHaveBeenCalledTimes(1)
@@ -2334,6 +2338,7 @@ describe('/book-a-visit/check-your-booking', () => {
         .expect('location', '/book-a-visit/confirmation')
         .expect(() => {
           expect(visitSessionsService.updateVisit).toHaveBeenCalledTimes(1)
+          expect(visitSessionsService.cancelVisit).not.toHaveBeenCalled()
           expect(visitSessionData.visitStatus).toBe('BOOKED')
           expect(auditService.bookedVisit).toHaveBeenCalledTimes(1)
           expect(notificationsService.sendBookingSms).not.toHaveBeenCalled()
@@ -2357,8 +2362,10 @@ describe('/book-a-visit/check-your-booking', () => {
           expect($('.test-visit-date').text()).toContain('Saturday 12 March 2022')
           expect($('.test-visit-time').text()).toContain('9:30am to 10:30am')
           expect($('.test-visit-type').text()).toContain('Open')
+          expect($('form').prop('action')).toBe('/book-a-visit/check-your-booking')
 
           expect(visitSessionsService.updateVisit).toHaveBeenCalledTimes(1)
+          expect(visitSessionsService.cancelVisit).not.toHaveBeenCalled()
           expect(visitSessionData.visitStatus).toBe('RESERVED')
           expect(auditService.bookedVisit).not.toHaveBeenCalled()
           expect(notificationsService.sendBookingSms).not.toHaveBeenCalled()
