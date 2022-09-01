@@ -4,6 +4,7 @@ import { VisitSlot } from '../../@types/bapv'
 import AuditService from '../../services/auditService'
 import VisitSessionsService from '../../services/visitSessionsService'
 import { getFlashFormValues, getSelectedSlot, getSelectedSlotByStartTimestamp } from '../visitorUtils'
+import getUrlPrefix from './visitJourneyUtils'
 
 export default class DateAndTime {
   constructor(
@@ -71,7 +72,7 @@ export default class DateAndTime {
     req.session.timeOfDay = timeOfDay
     req.session.dayOfTheWeek = dayOfTheWeek
 
-    res.render(`pages/${isUpdate ? 'visit' : 'bookAVisit'}/dateAndTime`, {
+    res.render('pages/bookAVisit/dateAndTime', {
       errors: req.flash('errors'),
       visitRestriction: visitSessionData.visitRestriction,
       prisonerName: visitSessionData.prisoner.name,
@@ -81,8 +82,8 @@ export default class DateAndTime {
       dayOfTheWeek,
       formValues,
       slotsPresent,
-      previousReference: visitSessionData.previousVisitReference,
       restrictionChangeMessage,
+      urlPrefix: getUrlPrefix(isUpdate, visitSessionData.previousVisitReference),
     })
   }
 
@@ -132,8 +133,7 @@ export default class DateAndTime {
       res.locals.appInsightsOperationId,
     )
 
-    const urlPrefix = isUpdate ? `/visit/${visitSessionData.previousVisitReference}/update` : '/book-a-visit'
-
+    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.previousVisitReference)
     return res.redirect(`${urlPrefix}/additional-support`)
   }
 

@@ -71,8 +71,15 @@
         html: closedVisitReasonHtml
       }) }}
     {% endif %}
+    {% if restrictionChangeMessage %}
+      {{ mojBanner({
+        type: 'information',
+        classes: "govuk-!-padding-left-4",
+        html: restrictionChangeMessage
+      }) }}
+    {% endif %}
 
-    <form action="/book-a-visit/select-date-and-time" method="GET" novalidate>
+    <form action="{{ urlPrefix}}/select-date-and-time" method="GET" novalidate>
       <div class="bapv-visit-date-time-filter">
         <h3 class="govuk-heading-s">Filter time slots</h3>
         <div class="govuk-button-group">
@@ -158,7 +165,7 @@
 
     {% if slotsPresent %}
 
-    <form action="/book-a-visit/select-date-and-time" method="POST" novalidate>
+    <form action="{{ urlPrefix }}/select-date-and-time" method="POST" novalidate>
       <input type="hidden" name="_csrf" value="{{ csrfToken }}">
     {% for month, days in slotsList %}
       <h2 class="govuk-heading-m" data-test="month">{{ month }}</h2>
