@@ -4,6 +4,7 @@ import { VisitorListItem } from '../../@types/bapv'
 import PrisonerProfileService from '../../services/prisonerProfileService'
 import PrisonerVisitorsService from '../../services/prisonerVisitorsService'
 import { getFlashFormValues } from '../visitorUtils'
+import getUrlPrefix from './visitJourneyUtils'
 
 export default class SelectVisitors {
   constructor(
@@ -36,14 +37,14 @@ export default class SelectVisitors {
       formValues.visitors = visitSessionData.visitors.map(visitor => visitor.personId.toString())
     }
 
-    res.render(`pages/${isUpdate ? 'visit' : 'bookAVisit'}/visitors`, {
+    res.render('pages/bookAVisit/visitors', {
       errors: req.flash('errors'),
-      previousReference: visitSessionData.previousVisitReference,
       offenderNo: visitSessionData.prisoner.offenderNo,
       prisonerName: visitSessionData.prisoner.name,
       visitorList,
       restrictions,
       formValues,
+      urlPrefix: getUrlPrefix(isUpdate, visitSessionData.previousVisitReference),
     })
   }
 
@@ -89,7 +90,7 @@ export default class SelectVisitors {
       restriction => restriction.restrictionType === 'CLOSED',
     )
 
-    const urlPrefix = isUpdate ? `/visit/${visitSessionData.previousVisitReference}/update` : '/book-a-visit'
+    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.previousVisitReference)
 
     return !closedVisitVisitors && closedVisitPrisoner
       ? res.redirect(`${urlPrefix}/visit-type`)
