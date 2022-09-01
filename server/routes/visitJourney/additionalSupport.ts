@@ -3,6 +3,7 @@ import { body, ValidationChain, validationResult } from 'express-validator'
 import { SupportType, VisitorSupport } from '../../data/visitSchedulerApiTypes'
 import VisitSessionsService from '../../services/visitSessionsService'
 import { getFlashFormValues } from '../visitorUtils'
+import getUrlPrefix from './visitJourneyUtils'
 
 export default class AdditionalSupport {
   constructor(private readonly mode: string, private readonly visitSessionsService: VisitSessionsService) {}
@@ -25,11 +26,11 @@ export default class AdditionalSupport {
       formValues.otherSupportDetails = visitSessionData.visitorSupport.find(support => support.type === 'OTHER')?.text
     }
 
-    res.render(`pages/${isUpdate ? 'visit' : 'bookAVisit'}/additionalSupport`, {
+    res.render('pages/bookAVisit/additionalSupport', {
       errors: req.flash('errors'),
-      previousReference: visitSessionData.previousVisitReference,
       availableSupportTypes,
       formValues,
+      urlPrefix: getUrlPrefix(isUpdate, visitSessionData.previousVisitReference),
     })
   }
 
@@ -51,8 +52,7 @@ export default class AdditionalSupport {
       }
       return supportItem
     })
-    const urlPrefix = isUpdate ? `/visit/${visitSessionData.previousVisitReference}/update` : '/book-a-visit'
-
+    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.previousVisitReference)
     return res.redirect(`${urlPrefix}/select-main-contact`)
   }
 

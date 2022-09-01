@@ -156,7 +156,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-        <form action="/book-a-visit/check-your-booking" method="POST" novalidate>
+        <form action="{{ urlPrefix }}/check-your-booking" method="POST" novalidate>
             <input type="hidden" name="_csrf" value="{{ csrfToken }}">
             {{ govukButton({
                 text: "Submit booking",

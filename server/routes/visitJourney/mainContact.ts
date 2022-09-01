@@ -2,34 +2,38 @@ import type { Request, Response } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
 import { VisitorListItem } from '../../@types/bapv'
 import { getFlashFormValues } from '../visitorUtils'
+import getUrlPrefix from './visitJourneyUtils'
 
 export default class MainContact {
   constructor(private readonly mode: string) {}
 
   async get(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'
-    const sessionData = req.session[isUpdate ? 'updateVisitSessionData' : 'visitSessionData']
+    const { visitSessionData } = req.session
     const formValues = getFlashFormValues(req)
 
-    if (!Object.keys(formValues).length && sessionData.mainContact) {
-      formValues.contact = sessionData.mainContact.contact
-        ? sessionData.mainContact.contact.personId.toString()
+    if (!Object.keys(formValues).length && visitSessionData.mainContact) {
+      formValues.contact = visitSessionData.mainContact.contact
+        ? visitSessionData.mainContact.contact.personId.toString()
         : 'someoneElse'
-      formValues.phoneNumber = sessionData.mainContact.phoneNumber
-      formValues.someoneElseName = sessionData.mainContact.contact ? undefined : sessionData.mainContact.contactName
+      formValues.phoneNumber = visitSessionData.mainContact.phoneNumber
+      formValues.someoneElseName = visitSessionData.mainContact.contact
+        ? undefined
+        : visitSessionData.mainContact.contactName
     }
 
-    res.render(`pages/${isUpdate ? 'visit' : 'bookAVisit'}/mainContact`, {
+    res.render('pages/bookAVisit/mainContact', {
       errors: req.flash('errors'),
-      reference: sessionData.visitReference ?? '',
+      reference: visitSessionData.visitReference ?? '',
       adultVisitors: req.session.adultVisitors?.adults,
       formValues,
+      urlPrefix: getUrlPrefix(isUpdate, visitSessionData.previousVisitReference),
     })
   }
 
   async post(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'
-    const sessionData = req.session[isUpdate ? 'updateVisitSessionData' : 'visitSessionData']
+    const { visitSessionData } = req.session
     const errors = validationResult(req)
 
     if (!errors.isEmpty()) {
@@ -42,14 +46,13 @@ export default class MainContact {
       (visitor: VisitorListItem) => req.body.contact === visitor.personId.toString(),
     )
 
-    sessionData.mainContact = {
+    visitSessionData.mainContact = {
       contact: selectedContact,
       phoneNumber: req.body.phoneNumber,
       contactName: selectedContact === undefined ? req.body.someoneElseName : undefined,
     }
 
-    const urlPrefix = isUpdate ? `/visit/${sessionData.visitReference}/update` : '/book-a-visit'
-
+    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.previousVisitReference)
     return res.redirect(`${urlPrefix}/check-your-booking`)
   }
 
