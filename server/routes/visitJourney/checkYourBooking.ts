@@ -50,14 +50,14 @@ export default class CheckYourBooking {
     try {
       const bookedVisit = await this.visitSessionsService.updateVisit({
         username: res.locals.user?.username,
-        visitData: req.session.visitSessionData,
+        visitData: visitSessionData,
         visitStatus: 'BOOKED',
       })
 
-      req.session.visitSessionData.visitStatus = bookedVisit.visitStatus
+      visitSessionData.visitStatus = bookedVisit.visitStatus
 
       await this.auditService.bookedVisit(
-        req.session.visitSessionData.visitReference,
+        visitSessionData.visitReference,
         visitSessionData.prisoner.offenderNo,
         'HEI',
         visitSessionData.visitors.map(visitor => visitor.personId.toString()),
