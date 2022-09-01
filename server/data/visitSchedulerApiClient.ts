@@ -17,9 +17,7 @@ export const visitSchedulerApiClientBuilder = (token: string): VisitSchedulerApi
 }
 
 class VisitSchedulerApiClient {
-  constructor(private readonly restclient: RestClient) {}
-
-  private prisonId = 'HEI'
+  constructor(private readonly restclient: RestClient, private readonly prisonId = 'HEI') {}
 
   private visitType = 'SOCIAL'
 

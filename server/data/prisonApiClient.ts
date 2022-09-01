@@ -11,9 +11,7 @@ export const prisonApiClientBuilder = (token: string): PrisonApiClient => {
 }
 
 class PrisonApiClient {
-  constructor(private readonly restclient: RestClient) {}
-
-  private prisonId = 'HEI'
+  constructor(private readonly restclient: RestClient, private readonly prisonId = 'HEI') {}
 
   getBookings(offenderNo: string): Promise<PagePrisonerBookingSummary> {
     return this.restclient.get({
