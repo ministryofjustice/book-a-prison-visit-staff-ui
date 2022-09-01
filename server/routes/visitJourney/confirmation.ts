@@ -5,7 +5,7 @@ export default class Confirmation {
   constructor(private readonly mode: string) {}
 
   async get(req: Request, res: Response): Promise<void> {
-    const isUpdate = this.mode === 'update'
+    // const isUpdate = this.mode === 'update'
     const { visitSessionData } = req.session
 
     res.locals.prisoner = visitSessionData.prisoner
@@ -21,6 +21,6 @@ export default class Confirmation {
 
     clearSession(req)
 
-    res.render(`pages/${isUpdate ? 'visit' : 'bookAVisit'}/confirmation`)
+    res.render('pages/bookAVisit/confirmation')
   }
 }
