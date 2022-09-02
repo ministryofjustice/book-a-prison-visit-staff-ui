@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express'
 import logger from '../../../logger'
 import config from '../../config'
+import { OutcomeDto } from '../../data/visitSchedulerApiTypes'
 import AuditService from '../../services/auditService'
 import NotificationsService from '../../services/notificationsService'
 import VisitSessionsService from '../../services/visitSessionsService'
@@ -50,14 +51,14 @@ export default class CheckYourBooking {
     try {
       const bookedVisit = await this.visitSessionsService.updateVisit({
         username: res.locals.user?.username,
-        visitData: req.session.visitSessionData,
+        visitData: visitSessionData,
         visitStatus: 'BOOKED',
       })
 
-      req.session.visitSessionData.visitStatus = bookedVisit.visitStatus
+      visitSessionData.visitStatus = bookedVisit.visitStatus
 
       await this.auditService.bookedVisit(
-        req.session.visitSessionData.visitReference,
+        visitSessionData.visitReference,
         visitSessionData.prisoner.offenderNo,
         'HEI',
         visitSessionData.visitors.map(visitor => visitor.personId.toString()),
@@ -67,6 +68,28 @@ export default class CheckYourBooking {
         res.locals.user?.username,
         res.locals.appInsightsOperationId,
       )
+
+      if (isUpdate) {
+        const outcome: OutcomeDto = {
+          outcomeStatus: 'SUPERSEDED_CANCELLATION',
+          text: `Superseded by ${visitSessionData.visitReference}`,
+        }
+
+        await this.visitSessionsService.cancelVisit({
+          username: res.locals.user?.username,
+          reference: visitSessionData.previousVisitReference,
+          outcome,
+        })
+
+        await this.auditService.cancelledVisit(
+          visitSessionData.previousVisitReference,
+          visitSessionData.prisoner.offenderNo,
+          'HEI',
+          `${outcome.outcomeStatus}: ${outcome.text}`,
+          res.locals.user?.username,
+          res.locals.appInsightsOperationId,
+        )
+      }
 
       if (config.apis.notifications.enabled) {
         try {
