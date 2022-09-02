@@ -7,7 +7,7 @@
 {% set pageTitle %}
 {% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
 {% endset %}
-{% set backLinkHref = "/book-a-visit/additional-support" %}
+{% set backLinkHref = urlPrefix + "/additional-support" %}
 
 {% block content %}
   <div class="govuk-grid-row">
