@@ -37,6 +37,8 @@ export default class SelectVisitors {
       formValues.visitors = visitSessionData.visitors.map(visitor => visitor.personId.toString())
     }
 
+    const returnAddress = isUpdate ? `/visit/${visitSessionData.previousVisitReference}` : `/prisoner/${offenderNo}`
+
     res.render('pages/bookAVisit/visitors', {
       errors: req.flash('errors'),
       offenderNo: visitSessionData.prisoner.offenderNo,
@@ -45,6 +47,7 @@ export default class SelectVisitors {
       restrictions,
       formValues,
       urlPrefix: getUrlPrefix(isUpdate, visitSessionData.previousVisitReference),
+      backLink: returnAddress,
     })
   }
 

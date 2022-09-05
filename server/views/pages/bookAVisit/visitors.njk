@@ -7,7 +7,7 @@
 {% set pageTitle %}
 {% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
 {% endset %}
-{% set backLinkHref = "/prisoner/" + offenderNo %}
+{% set backLinkHref = backLink %}
 
 {% set visitors = [] %}
 {% set eligibleVisitorsCount = 0 %}
