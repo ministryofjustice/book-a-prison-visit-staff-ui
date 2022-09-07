@@ -4,6 +4,7 @@ import { SupportType, VisitorSupport } from '../../data/visitSchedulerApiTypes'
 import VisitSessionsService from '../../services/visitSessionsService'
 import { getFlashFormValues } from '../visitorUtils'
 import getUrlPrefix from './visitJourneyUtils'
+import logger from '../../../logger'
 
 export default class AdditionalSupport {
   constructor(private readonly mode: string, private readonly visitSessionsService: VisitSessionsService) {}
@@ -45,13 +46,20 @@ export default class AdditionalSupport {
       return res.redirect(req.originalUrl)
     }
 
-    visitSessionData.visitorSupport = req.body.additionalSupport.map((support: string): VisitorSupport => {
-      const supportItem: VisitorSupport = { type: support }
-      if (support === 'OTHER') {
-        supportItem.text = req.body.otherSupportDetails
-      }
-      return supportItem
-    })
+    if (req.body.additionalSupportRequired === 'no') {
+      visitSessionData.visitorSupport = []
+      logger.info('success???')
+    } else {
+      visitSessionData.visitorSupport = req.body.additionalSupport.map((support: string): VisitorSupport => {
+        const supportItem: VisitorSupport = { type: support }
+        if (support === 'OTHER') {
+          supportItem.text = req.body.otherSupportDetails
+        }
+
+        return supportItem
+      })
+    }
+
     const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.previousVisitReference)
     return res.redirect(`${urlPrefix}/select-main-contact`)
   }
