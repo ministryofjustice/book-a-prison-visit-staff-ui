@@ -130,6 +130,7 @@ export default function routes(
       additionalSupport,
       fromVisitSearch,
       fromVisitSearchQuery,
+      updateJourneyEnabled: config.features.updateJourney,
     })
   })
 
