@@ -1,6 +1,6 @@
 import type { RequestHandler, Request, Router, NextFunction } from 'express'
 import { body, validationResult } from 'express-validator'
-import { BadRequest } from 'http-errors'
+import { BadRequest, NotFound } from 'http-errors'
 import visitCancellationReasons from '../constants/visitCancellationReasons'
 import { Prisoner } from '../data/prisonerOffenderSearchTypes'
 import { OutcomeDto, Visit } from '../data/visitSchedulerApiTypes'
@@ -130,7 +130,7 @@ export default function routes(
       additionalSupport,
       fromVisitSearch,
       fromVisitSearchQuery,
-      updateJourneyEnabled: config.features.updateJourney,
+      updateJourneyEnabled: config.features.updateJourneyEnabled,
     })
   })
 
@@ -142,49 +142,85 @@ export default function routes(
   const checkYourBooking = new CheckYourBooking('update', visitSessionsService, auditService, notificationsService)
   const confirmation = new Confirmation('update')
 
-  get('/:reference/update/select-visitors', checkVisitReferenceMiddleware, (req, res) => selectVisitors.get(req, res))
-  post('/:reference/update/select-visitors', checkVisitReferenceMiddleware, selectVisitors.validate(), (req, res) =>
-    selectVisitors.post(req, res),
+  get('/:reference/update/select-visitors', updateJourneyCheckMiddleware, checkVisitReferenceMiddleware, (req, res) =>
+    selectVisitors.get(req, res),
+  )
+  post(
+    '/:reference/update/select-visitors',
+    updateJourneyCheckMiddleware,
+    checkVisitReferenceMiddleware,
+    selectVisitors.validate(),
+    (req, res) => selectVisitors.post(req, res),
   )
 
-  get('/:reference/update/visit-type', checkVisitReferenceMiddleware, (req, res) => visitType.get(req, res))
-  post('/:reference/update/visit-type', checkVisitReferenceMiddleware, visitType.validate(), (req, res) =>
-    visitType.post(req, res),
+  get('/:reference/update/visit-type', updateJourneyCheckMiddleware, checkVisitReferenceMiddleware, (req, res) =>
+    visitType.get(req, res),
+  )
+  post(
+    '/:reference/update/visit-type',
+    updateJourneyCheckMiddleware,
+    checkVisitReferenceMiddleware,
+    visitType.validate(),
+    (req, res) => visitType.post(req, res),
   )
 
   get(
     '/:reference/update/select-date-and-time',
+    updateJourneyCheckMiddleware,
     checkVisitReferenceMiddleware,
     ...dateAndTime.validateGet(),
     (req, res) => dateAndTime.get(req, res),
   )
-  post('/:reference/update/select-date-and-time', checkVisitReferenceMiddleware, dateAndTime.validate(), (req, res) =>
-    dateAndTime.post(req, res),
+  post(
+    '/:reference/update/select-date-and-time',
+    updateJourneyCheckMiddleware,
+    checkVisitReferenceMiddleware,
+    dateAndTime.validate(),
+    (req, res) => dateAndTime.post(req, res),
   )
 
-  get('/:reference/update/additional-support', checkVisitReferenceMiddleware, (req, res) =>
-    additionalSupport.get(req, res),
+  get(
+    '/:reference/update/additional-support',
+    updateJourneyCheckMiddleware,
+    checkVisitReferenceMiddleware,
+    (req, res) => additionalSupport.get(req, res),
   )
   post(
     '/:reference/update/additional-support',
+    updateJourneyCheckMiddleware,
     checkVisitReferenceMiddleware,
     ...additionalSupport.validate(),
     (req, res) => additionalSupport.post(req, res),
   )
 
-  get('/:reference/update/select-main-contact', checkVisitReferenceMiddleware, (req, res) => mainContact.get(req, res))
-  post('/:reference/update/select-main-contact', checkVisitReferenceMiddleware, ...mainContact.validate(), (req, res) =>
-    mainContact.post(req, res),
+  get(
+    '/:reference/update/select-main-contact',
+    updateJourneyCheckMiddleware,
+    checkVisitReferenceMiddleware,
+    (req, res) => mainContact.get(req, res),
+  )
+  post(
+    '/:reference/update/select-main-contact',
+    updateJourneyCheckMiddleware,
+    checkVisitReferenceMiddleware,
+    ...mainContact.validate(),
+    (req, res) => mainContact.post(req, res),
   )
 
-  get('/:reference/update/check-your-booking', checkVisitReferenceMiddleware, (req, res) =>
-    checkYourBooking.get(req, res),
+  get(
+    '/:reference/update/check-your-booking',
+    updateJourneyCheckMiddleware,
+    checkVisitReferenceMiddleware,
+    (req, res) => checkYourBooking.get(req, res),
   )
-  post('/:reference/update/check-your-booking', checkVisitReferenceMiddleware, (req, res) =>
-    checkYourBooking.post(req, res),
+  post(
+    '/:reference/update/check-your-booking',
+    updateJourneyCheckMiddleware,
+    checkVisitReferenceMiddleware,
+    (req, res) => checkYourBooking.post(req, res),
   )
 
-  get('/:reference/update/confirmation', (req, res) => confirmation.get(req, res))
+  get('/:reference/update/confirmation', updateJourneyCheckMiddleware, (req, res) => confirmation.get(req, res))
 
   get('/:reference/cancel', async (req, res) => {
     const reference = getVisitReference(req)
@@ -271,6 +307,16 @@ const checkVisitReferenceMiddleware = (req: Request, res: Response, next: NextFu
 
   if (!isValidVisitReference(reference)) {
     throw new BadRequest()
+  }
+
+  next()
+}
+
+const updateJourneyCheckMiddleware = (req: Request, res: Response, next: NextFunction): void => {
+  const { updateJourneyEnabled } = config.features
+
+  if (!updateJourneyEnabled) {
+    throw new NotFound()
   }
 
   next()

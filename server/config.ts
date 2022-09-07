@@ -150,7 +150,7 @@ export default {
     },
   },
   features: {
-    updateJourney: get('FEATURE_UPDATE_JOURNEY_ENABLED', 'false', requiredInProduction) === 'true',
+    updateJourneyEnabled: get('FEATURE_UPDATE_JOURNEY_ENABLED', 'false', requiredInProduction) === 'true',
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
 }

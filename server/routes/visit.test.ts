@@ -79,7 +79,7 @@ const availableSupportTypes: SupportType[] = [
 ]
 
 beforeEach(() => {
-  config.features.updateJourney = true
+  config.features.updateJourneyEnabled = true
   flashData = { errors: [], formValues: [] }
   flashProvider.mockImplementation(key => {
     return flashData[key]
@@ -311,7 +311,7 @@ describe('GET /visit/:reference', () => {
   })
 
   it('should render full booking summary page with prisoner, visit and visitor details, with default back link, with no update button if feature disabled', () => {
-    config.features.updateJourney = false
+    config.features.updateJourneyEnabled = false
 
     return request(app)
       .get('/visit/ab-cd-ef-gh')
