@@ -118,6 +118,36 @@ describe('GET /visits', () => {
             },
           ],
         },
+        {
+          reference: 'lb-co-bn-un',
+          prisonNumber: 'A8709DY',
+          prisonerName: '',
+          mainContact: 'Tess Bennett',
+          startTimestamp: '2022-05-23T10:00:00',
+          visitDate: '23 May 2022',
+          visitTime: '10am to 11am',
+          visitRestriction: 'UNKNOWN',
+          visitors: [
+            {
+              personId: 4729510,
+              name: 'James Smith',
+              dateOfBirth: '1983-06-17',
+              adult: true,
+              relationshipDescription: 'Brother',
+              address: 'Warren way,<br>Bootle,<br>DN5 9SD,<br>England',
+              restrictions: [],
+              banned: false,
+            },
+            {
+              personId: 4729570,
+              name: 'Tess Bennett',
+              relationshipDescription: 'Aunt',
+              address: 'Not entered',
+              restrictions: [],
+              banned: false,
+            },
+          ],
+        },
       ],
       slots: {
         openSlots: [
@@ -137,7 +167,15 @@ describe('GET /visits', () => {
           },
         ],
         closedSlots: [],
-        unknownSlots: [],
+        unknownSlots: [
+          {
+            visitTime: '10am to 11am',
+            visitType: 'UNKNOWN',
+            sortField: '2022-05-23T10:00:00',
+            adults: 1,
+            children: 1,
+          },
+        ],
         firstSlotTime: '9am to 9:29am',
       },
     }
@@ -197,7 +235,7 @@ describe('GET /visits', () => {
       })
   })
 
-  it('should render visit slot summary page with prisoner list, slot details and menu for choosing other slots, with the chosen slot shown', () => {
+  it('should render visit slot summary page with prisoner list, slot details and menu for choosing other slots, with the chosen slot shown for OPEN', () => {
     prisonerSearchService.getPrisonersByPrisonerNumbers.mockResolvedValue(prisoners)
     visitSessionsService.getVisitsByDate.mockResolvedValue(visits)
 
@@ -218,6 +256,33 @@ describe('GET /visits', () => {
         expect($('[data-test="prisoner-number"]').text()).toBe('A8709DY')
         expect($('[data-test="prisoner-name"]').text()).toBe('Rocky, Asap')
         expect($('.moj-side-navigation__title').text()).toContain('Open visits')
+        expect($('.moj-side-navigation__item--active').text()).toContain('10am to 11am')
+        expect(auditService.viewedVisits).toHaveBeenCalledTimes(1)
+        expect(auditService.viewedVisits).toHaveBeenCalledWith('2022-05-23', 'HEI', undefined, undefined)
+      })
+  })
+
+  it('should render visit slot summary page with prisoner list, slot details and menu for choosing other slots, with the chosen slot shown for UNKNOWN', () => {
+    prisonerSearchService.getPrisonersByPrisonerNumbers.mockResolvedValue(prisoners)
+    visitSessionsService.getVisitsByDate.mockResolvedValue(visits)
+
+    return request(app)
+      .get('/visits?selectedDate=2022-05-23&time=10am+to+11am&type=UNKNOWN')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('h1').text()).toBe('View visits by date')
+        expect($('.govuk-back-link').attr('href')).toBe('/')
+        expect($('[data-test="visit-room"]').text()).toBe('Visit type unknown')
+        expect($('[data-test="visit-time"]').text()).toBe('10am to 11am')
+        expect($('[data-test="visit-tables-booked"]').text()).toBe('1 of 30')
+        expect($('[data-test="visit-visitors-total"]').text()).toBe('2')
+        expect($('[data-test="visit-adults"]').text()).toBe('1')
+        expect($('[data-test="visit-children"]').text()).toBe('1')
+        expect($('[data-test="prisoner-number"]').text()).toBe('A8709DY')
+        expect($('[data-test="prisoner-name"]').text()).toBe('Rocky, Asap')
+        expect($('.moj-side-navigation__title').text()).toContain('Visit type unknown')
         expect($('.moj-side-navigation__item--active').text()).toContain('10am to 11am')
         expect(auditService.viewedVisits).toHaveBeenCalledTimes(1)
         expect(auditService.viewedVisits).toHaveBeenCalledWith('2022-05-23', 'HEI', undefined, undefined)
