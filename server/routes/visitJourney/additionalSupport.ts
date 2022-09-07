@@ -4,7 +4,6 @@ import { SupportType, VisitorSupport } from '../../data/visitSchedulerApiTypes'
 import VisitSessionsService from '../../services/visitSessionsService'
 import { getFlashFormValues } from '../visitorUtils'
 import getUrlPrefix from './visitJourneyUtils'
-import logger from '../../../logger'
 
 export default class AdditionalSupport {
   constructor(private readonly mode: string, private readonly visitSessionsService: VisitSessionsService) {}
@@ -48,7 +47,6 @@ export default class AdditionalSupport {
 
     if (req.body.additionalSupportRequired === 'no') {
       visitSessionData.visitorSupport = []
-      logger.info('success???')
     } else {
       visitSessionData.visitorSupport = req.body.additionalSupport.map((support: string): VisitorSupport => {
         const supportItem: VisitorSupport = { type: support }
