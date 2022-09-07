@@ -56,6 +56,7 @@ export default function routes(
     const maxSlotDefaults = {
       OPEN: 30,
       CLOSED: 3,
+      UNKNOWN: 30,
     }
     const maxSlots = maxSlotDefaults[visitType] ?? 0
     const firstTabDateString = getParsedDateFromQueryString(firstTabDate as string)
@@ -78,6 +79,7 @@ export default function routes(
     const selectedSlots = {
       open: slots.openSlots.find(slot => slot.visitTime === slotFilter) ?? { adults: 0, children: 0 },
       closed: slots.closedSlots.find(slot => slot.visitTime === slotFilter) ?? { adults: 0, children: 0 },
+      unknown: slots.unknownSlots.find(slot => slot.visitTime === slotFilter) ?? { adults: 0, children: 0 },
     }
     const totals = {
       adults: selectedSlots[visitType.toLowerCase()].adults,
