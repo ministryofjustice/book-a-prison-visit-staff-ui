@@ -47,7 +47,7 @@ describe('visitSchedulerApiClient', () => {
     })
   })
 
-  describe('getVisit', () => {
+  describe('getBookedVisit', () => {
     it('should return a single matching Visit from the Visit Scheduler API for a valid reference', async () => {
       const reference = 'ab-cd-ef-gh'
       const result: Visit = {
@@ -77,11 +77,11 @@ describe('visitSchedulerApiClient', () => {
       }
 
       fakeVisitSchedulerApi
-        .get(`/visits/${reference}`)
+        .get(`/visits/booked/${reference}`)
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, result)
 
-      const output = await client.getVisit(reference)
+      const output = await client.getBookedVisit(reference)
 
       expect(output).toEqual(result)
     })

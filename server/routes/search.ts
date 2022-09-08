@@ -120,7 +120,7 @@ export default function routes(
 
     if (errors.length === 0) {
       try {
-        visit = await visitSessionsService.getVisit({ reference: search, username: res.locals.user?.username })
+        visit = await visitSessionsService.getBookedVisit({ reference: search, username: res.locals.user?.username })
         const prisonerDetails = await prisonerSearchService.getPrisonerById(
           visit.prisonNumber,
           res.locals.user?.username,

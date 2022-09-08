@@ -216,6 +216,16 @@ export default class VisitSessionsService {
     return this.buildVisitInformation(visit)
   }
 
+  async getBookedVisit({ username, reference }: { username: string; reference: string }): Promise<VisitInformation> {
+    const token = await this.systemToken(username)
+    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
+
+    logger.info(`Get visit ${reference}`)
+    const visit = await visitSchedulerApiClient.getBookedVisit(reference)
+
+    return this.buildVisitInformation(visit)
+  }
+
   async getUpcomingVisits({
     username,
     offenderNo,

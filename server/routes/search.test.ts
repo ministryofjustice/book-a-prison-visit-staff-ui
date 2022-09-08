@@ -38,7 +38,7 @@ let getPrisonersReturnData: {
 }
 
 let getPrisonerReturnData: Prisoner
-let getVisit: VisitInformation
+let getBookedVisit: VisitInformation
 
 beforeEach(() => {
   app = appWithAllRoutes({
@@ -317,7 +317,7 @@ describe('Booking search page', () => {
       }
 
       prisonerSearchService.getPrisonerById.mockResolvedValue(getPrisonerReturnData)
-      visitSessionsService.getVisit.mockImplementation(() => {
+      visitSessionsService.getBookedVisit.mockImplementation(() => {
         throw createError(404, 'Not found')
       })
 
@@ -340,7 +340,7 @@ describe('Booking search page', () => {
         lastName: 'Smith',
         restrictedPatient: false,
       }
-      getVisit = {
+      getBookedVisit = {
         reference: 'as-sd-df-fg',
         prisonNumber: 'A1234BC',
         prisonerName: 'Smith, Ted',
@@ -350,7 +350,7 @@ describe('Booking search page', () => {
       }
 
       prisonerSearchService.getPrisonerById.mockResolvedValue(getPrisonerReturnData)
-      visitSessionsService.getVisit.mockResolvedValue(getVisit)
+      visitSessionsService.getBookedVisit.mockResolvedValue(getBookedVisit)
 
       return request(app)
         .get('/search/visit/results?searchBlock1=ab&searchBlock2=bc&searchBlock3=cd&searchBlock4=de')
