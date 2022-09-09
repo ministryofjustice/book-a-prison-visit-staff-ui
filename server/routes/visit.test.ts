@@ -155,6 +155,7 @@ describe('GET /visit/:reference', () => {
     createdTimestamp: '2022-02-14T10:00:00',
     modifiedTimestamp: '2022-02-14T10:05:00',
   }
+
   const visitors: VisitorListItem[] = [
     {
       personId: 4321,
@@ -205,7 +206,28 @@ describe('GET /visit/:reference', () => {
       } as SessionData,
     })
   })
-
+  it('should not display button block if visit status is cancelled/superseded', () => {
+    visit.visitStatus = 'CANCELLED'
+    return request(app)
+      .get('/visit/ab-cd-ef-gh')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('[data-test="cancel-visit"]').attr('href')).toBe(undefined)
+      })
+  })
+  it('should display button block if visit status is booked', () => {
+    visit.visitStatus = 'BOOKED'
+    return request(app)
+      .get('/visit/ab-cd-ef-gh')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('[data-test="cancel-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/cancel')
+      })
+  })
   it('should render full booking summary page with prisoner, visit and visitor details, with default back link', () => {
     return request(app)
       .get('/visit/ab-cd-ef-gh')
