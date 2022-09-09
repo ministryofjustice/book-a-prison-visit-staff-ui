@@ -62,27 +62,36 @@
           <span data-test="visit-phone">{{ visit.visitContact.telephone | formatTelephone }}</span>
         </li>
       </ul>
-
-      <div class="govuk-button-group">
-        {% set cancelButtonClasses = 'govuk-!-margin-top-5' %}
-        {% if updateJourneyEnabled %}
-          {% set cancelButtonClasses = 'govuk-!-margin-top-5 govuk-button--secondary' %}
+      
+      {% if visit.visitStatus === "BOOKED" %}
+        <div class="govuk-button-group">
+          {% set cancelButtonClasses = 'govuk-!-margin-top-5' %}
+          {% if updateJourneyEnabled %}
+            {% set cancelButtonClasses = 'govuk-!-margin-top-5 govuk-button--secondary' %}
+            {{ govukButton({
+              text: "Update booking",
+              classes: "govuk-!-margin-top-5",
+              href: "/visit/" + visit.reference + "/update/select-visitors",
+              attributes: { "data-test": "update-visit" },
+              preventDoubleClick: true
+            }) }}
+          {% endif %}
           {{ govukButton({
-            text: "Update booking",
-            classes: "govuk-!-margin-top-5",
-            href: "/visit/" + visit.reference + "/update/select-visitors",
-            attributes: { "data-test": "update-visit" },
+            text: "Cancel booking",
+            classes: cancelButtonClasses,
+            href: "/visit/" + visit.reference + "/cancel",
+            attributes: { "data-test": "cancel-visit" },
             preventDoubleClick: true
           }) }}
+        </div>
+      {% else %}
+        {% if visit.outcomeStatus === 'SUPERSEDED_CANCELLATION' %}
+          <h2 class="govuk-heading-m">This visit has been {{ visit.visitNotes[0].text}} </h2>
+        {% else %}
+          <h2 class="govuk-heading-m">This visit has visit status: {{ visit.visitStatus | capitalize }}</h1>
         {% endif %}
-        {{ govukButton({
-          text: "Cancel booking",
-          classes: cancelButtonClasses,
-          href: "/visit/" + visit.reference + "/cancel",
-          attributes: { "data-test": "cancel-visit" },
-          preventDoubleClick: true
-        }) }}
-      </div>
+
+      {% endif %}
 
       {% set visitorRows = [] %}
       {% for visitor in visitors %}
