@@ -85,6 +85,7 @@
           }) }}
         </div>
       {% else %}
+      
         {% if visit.outcomeStatus === 'SUPERSEDED_CANCELLATION' %}
           <h2 class="govuk-heading-m">This visit has been {{ visit.visitNotes[0].text}} </h2>
         {% else %}
