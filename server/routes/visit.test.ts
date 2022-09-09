@@ -206,6 +206,7 @@ describe('GET /visit/:reference', () => {
       } as SessionData,
     })
   })
+
   it('should not display button block if visit status is cancelled/superseded', () => {
     visit.visitStatus = 'CANCELLED'
     return request(app)
@@ -217,6 +218,7 @@ describe('GET /visit/:reference', () => {
         expect($('[data-test="cancel-visit"]').attr('href')).toBe(undefined)
       })
   })
+
   it('should display button block if visit status is booked', () => {
     visit.visitStatus = 'BOOKED'
     return request(app)
@@ -228,6 +230,7 @@ describe('GET /visit/:reference', () => {
         expect($('[data-test="cancel-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/cancel')
       })
   })
+
   it('should render full booking summary page with prisoner, visit and visitor details, with default back link', () => {
     return request(app)
       .get('/visit/ab-cd-ef-gh')
