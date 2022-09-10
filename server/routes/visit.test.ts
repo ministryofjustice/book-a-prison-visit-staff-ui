@@ -2120,7 +2120,7 @@ describe('/visit/:reference/update/check-your-booking', () => {
             reference: visitSessionData.previousVisitReference,
             outcome: <OutcomeDto>{
               outcomeStatus: 'SUPERSEDED_CANCELLATION',
-              text: `Superseded by ${visitSessionData.visitReference}`,
+              text: visitSessionData.visitReference,
             },
           })
           expect(auditService.cancelledVisit).toHaveBeenCalledWith(
