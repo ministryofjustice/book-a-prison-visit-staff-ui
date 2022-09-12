@@ -100,7 +100,7 @@ export default class CheckYourBooking {
             prisonName: 'Hewell (HMP)',
             reference: visitSessionData.visitReference,
           })
-          logger.info(`Booking SMS sent for ${visitSessionData.visitReference}`)
+          logger.info(`${isUpdate ? 'Update' : 'Booking'} SMS sent for ${visitSessionData.visitReference}`)
         } catch (error) {
           logger.error(`Failed to send SMS for booking ${visitSessionData.visitReference}`)
         }
