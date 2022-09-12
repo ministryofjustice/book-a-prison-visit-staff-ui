@@ -1799,7 +1799,8 @@ describe('POST /book-a-visit/additional-support', () => {
       })
   })
 
-  it('should redirect to the select main contact page if "no" additional support radio selected and store in session', () => {
+  it('should clear the session data and redirect to the select main contact page if "no" additional support radio selected and store in session', () => {
+    visitSessionData.visitorSupport = [{ type: 'BSL_INTERPRETER' }]
     return request(sessionApp)
       .post('/book-a-visit/additional-support')
       .send('additionalSupportRequired=no')
