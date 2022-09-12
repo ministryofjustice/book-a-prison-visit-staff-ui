@@ -3,6 +3,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "components/visitors.njk" import visitorDateOfBirth, visitorRestrictions %}
 
+
 {% set pageHeaderTitle = "Booking details" %}
 {% set pageTitle = applicationName + " - " + pageHeaderTitle + " - " + visit.reference %}
 {% if fromVisitSearch %}
@@ -67,22 +68,63 @@
         {% set cancelButtonClasses = 'govuk-!-margin-top-5' %}
         {% if updateJourneyEnabled %}
           {% set cancelButtonClasses = 'govuk-!-margin-top-5 govuk-button--secondary' %}
+
+          {% if visit.visitStatus === 'BOOKED' %}
+            {{ govukButton({
+              text: "Update booking",
+              classes: "govuk-!-margin-top-5",
+              href: "/visit/" + visit.reference + "/update/select-visitors",
+              attributes: { "data-test": "update-visit" },
+              preventDoubleClick: true
+            }) }}
+          {% else %}
+            {{ govukButton({
+              text: "Update booking",
+              classes: "govuk-!-margin-top-5",
+              attributes: { "data-test": "update-visit" },
+              preventDoubleClick: true,
+              disabled: true
+            }) }}
+          {% endif %}
+        {% endif %}
+
+        {% if visit.visitStatus === 'BOOKED' %}
           {{ govukButton({
-            text: "Update booking",
-            classes: "govuk-!-margin-top-5",
-            href: "/visit/" + visit.reference + "/update/select-visitors",
-            attributes: { "data-test": "update-visit" },
+            text: "Cancel booking",
+            classes: cancelButtonClasses,
+            href: "/visit/" + visit.reference + "/cancel",
+            attributes: { "data-test": "cancel-visit" },
             preventDoubleClick: true
           }) }}
+        {% else %}
+          {{ govukButton({
+            text: "Cancel booking",
+            classes: cancelButtonClasses,
+            attributes: { "data-test": "cancel-visit" },
+            preventDoubleClick: true,
+            disabled: true
+          }) }}
         {% endif %}
-        {{ govukButton({
-          text: "Cancel booking",
-          classes: cancelButtonClasses,
-          href: "/visit/" + visit.reference + "/cancel",
-          attributes: { "data-test": "cancel-visit" },
-          preventDoubleClick: true
-        }) }}
+
       </div>
+        
+      {% if visit.visitStatus !== "BOOKED" %}
+        {% if visit.outcomeStatus === 'SUPERSEDED_CANCELLATION' %}
+          {%- for visitNote in visit.visitNotes %}
+            {% if visitNote.type == 'VISIT_OUTCOMES' %}
+              <p>This visit has been Superseded by: <a href="../{{visitNote.text}}">{{ visitNote.text }}</a> </p>
+            {% endif %}
+          {% endfor %}     
+        {% else %}
+          {% set status = visit.outcomeStatus.split("_") %}
+            <p>This visit has visit status: {{ status[0] | capitalize }} {{status[1] | lower }}
+          {%- for visitNote in visit.visitNotes %}
+            {% if visitNote.type == "VISIT_OUTCOMES" %}
+              <br>Cancellation reason: {{ visitNote.text }} </p>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      {% endif %}
 
       {% set visitorRows = [] %}
       {% for visitor in visitors %}
