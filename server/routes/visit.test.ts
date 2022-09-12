@@ -2079,7 +2079,7 @@ describe('/visit/:reference/update/check-your-booking', () => {
       const bookedVisit: Partial<Visit> = { reference: visitSessionData.visitReference, visitStatus: 'BOOKED' }
 
       visitSessionsService.updateVisit = jest.fn().mockResolvedValue(bookedVisit)
-      notificationsService.sendBookingSms = jest.fn().mockResolvedValue({})
+      notificationsService.sendUpdateSms = jest.fn().mockResolvedValue({})
 
       sessionApp = appWithAllRoutes({
         auditServiceOverride: auditService,
@@ -2131,8 +2131,8 @@ describe('/visit/:reference/update/check-your-booking', () => {
             undefined,
             undefined,
           )
-          expect(notificationsService.sendBookingSms).toHaveBeenCalledTimes(1)
-          expect(notificationsService.sendBookingSms).toHaveBeenCalledWith({
+          expect(notificationsService.sendUpdateSms).toHaveBeenCalledTimes(1)
+          expect(notificationsService.sendUpdateSms).toHaveBeenCalledWith({
             phoneNumber: '01234567890',
             visit: visitSessionData.visit,
             prisonName: 'Hewell (HMP)',
@@ -2144,7 +2144,7 @@ describe('/visit/:reference/update/check-your-booking', () => {
     it('should handle SMS sending failure', () => {
       config.apis.notifications.enabled = true
 
-      notificationsService.sendBookingSms.mockRejectedValue({})
+      notificationsService.sendUpdateSms.mockRejectedValue({})
 
       return request(sessionApp)
         .post(`/visit/${visitSessionData.previousVisitReference}/update/check-your-booking`)
@@ -2156,7 +2156,7 @@ describe('/visit/:reference/update/check-your-booking', () => {
           expect(auditService.bookedVisit).toHaveBeenCalledTimes(1)
           expect(visitSessionsService.cancelVisit).toHaveBeenCalledTimes(1)
           expect(auditService.cancelledVisit).toHaveBeenCalledTimes(1)
-          expect(notificationsService.sendBookingSms).toHaveBeenCalledTimes(1)
+          expect(notificationsService.sendUpdateSms).toHaveBeenCalledTimes(1)
         })
     })
 
@@ -2173,7 +2173,7 @@ describe('/visit/:reference/update/check-your-booking', () => {
           expect(auditService.bookedVisit).toHaveBeenCalledTimes(1)
           expect(visitSessionsService.cancelVisit).toHaveBeenCalledTimes(1)
           expect(auditService.cancelledVisit).toHaveBeenCalledTimes(1)
-          expect(notificationsService.sendBookingSms).not.toHaveBeenCalled()
+          expect(notificationsService.sendUpdateSms).not.toHaveBeenCalled()
         })
     })
 
@@ -2203,7 +2203,7 @@ describe('/visit/:reference/update/check-your-booking', () => {
           expect(auditService.bookedVisit).not.toHaveBeenCalled()
           expect(visitSessionsService.cancelVisit).not.toHaveBeenCalled()
           expect(auditService.cancelledVisit).not.toHaveBeenCalled()
-          expect(notificationsService.sendBookingSms).not.toHaveBeenCalled()
+          expect(notificationsService.sendUpdateSms).not.toHaveBeenCalled()
         })
     })
   })

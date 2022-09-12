@@ -59,4 +59,31 @@ export default class NotificationsService {
       prisonPhoneNumber,
     })
   }
+
+  async sendUpdateSms({
+    phoneNumber,
+    prisonName,
+    visit,
+    reference,
+  }: {
+    phoneNumber: string
+    prisonName: string
+    visit: VisitSlot
+    reference: string
+  }): Promise<SmsResponse> {
+    const notificationsApiClient = this.notificationsApiClientBuilder()
+    const parsedDate = new Date(visit.startTimestamp)
+    const visitTime = format(parsedDate, 'h:mmaaa')
+    const visitDay = format(parsedDate, 'EEEE')
+    const visitDate = format(parsedDate, 'd MMMM yyyy')
+
+    return notificationsApiClient.sendUpdateSms({
+      phoneNumber,
+      prisonName,
+      visitTime,
+      visitDay,
+      visitDate,
+      reference,
+    })
+  }
 }
