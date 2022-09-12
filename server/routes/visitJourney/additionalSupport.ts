@@ -85,9 +85,9 @@ export default class AdditionalSupport {
         .trim()
         .custom((value: string, { req }) => {
           if (
+            req.body.additionalSupportRequired === 'yes' &&
             <string[]>req.body.additionalSupport.includes('OTHER') &&
-            (value ?? '').length === 0 &&
-            req.body.additionalSupportRequired === 'yes'
+            (value ?? '').length === 0
           ) {
             throw new Error('Enter details of the request')
           }
