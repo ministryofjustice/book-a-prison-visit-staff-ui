@@ -94,22 +94,12 @@ export default class CheckYourBooking {
       if (config.apis.notifications.enabled) {
         try {
           const phoneNumber = visitSessionData.mainContact.phoneNumber.replace(/\s/g, '')
-
-          if (isUpdate) {
-            await this.notificationsService.sendUpdateSms({
-              phoneNumber,
-              visit: visitSessionData.visit,
-              prisonName: 'Hewell (HMP)',
-              reference: visitSessionData.visitReference,
-            })
-          } else {
-            await this.notificationsService.sendBookingSms({
-              phoneNumber,
-              visit: visitSessionData.visit,
-              prisonName: 'Hewell (HMP)',
-              reference: visitSessionData.visitReference,
-            })
-          }
+          await this.notificationsService[`send${isUpdate ? 'Update' : 'Booking'}Sms`]({
+            phoneNumber,
+            visit: visitSessionData.visit,
+            prisonName: 'Hewell (HMP)',
+            reference: visitSessionData.visitReference,
+          })
           logger.info(`Booking SMS sent for ${visitSessionData.visitReference}`)
         } catch (error) {
           logger.error(`Failed to send SMS for booking ${visitSessionData.visitReference}`)
