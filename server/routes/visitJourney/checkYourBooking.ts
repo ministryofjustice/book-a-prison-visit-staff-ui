@@ -72,7 +72,7 @@ export default class CheckYourBooking {
       if (isUpdate) {
         const outcome: OutcomeDto = {
           outcomeStatus: 'SUPERSEDED_CANCELLATION',
-          text: `Superseded by ${visitSessionData.visitReference}`,
+          text: visitSessionData.visitReference,
         }
 
         await this.visitSessionsService.cancelVisit({
@@ -85,7 +85,7 @@ export default class CheckYourBooking {
           visitSessionData.previousVisitReference,
           visitSessionData.prisoner.offenderNo,
           'HEI',
-          `${outcome.outcomeStatus}: ${outcome.text}`,
+          `${outcome.outcomeStatus}: Superseded by ${outcome.text}`,
           res.locals.user?.username,
           res.locals.appInsightsOperationId,
         )
