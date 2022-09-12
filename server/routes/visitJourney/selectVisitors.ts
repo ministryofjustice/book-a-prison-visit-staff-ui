@@ -115,10 +115,6 @@ export default class SelectVisitors {
         throw new Error('Invalid selection')
       }
 
-      if (selected.length > 3) {
-        throw new Error('Select no more than 3 visitors with a maximum of 2 adults')
-      }
-
       const adults = req.session.visitorList.visitors
         .filter((visitor: VisitorListItem) => selected.includes(visitor.personId.toString()))
         .reduce((count: number, visitor: VisitorListItem) => {
