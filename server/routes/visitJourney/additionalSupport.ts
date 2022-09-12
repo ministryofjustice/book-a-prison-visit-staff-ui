@@ -45,13 +45,17 @@ export default class AdditionalSupport {
       return res.redirect(req.originalUrl)
     }
 
-    visitSessionData.visitorSupport = req.body.additionalSupport.map((support: string): VisitorSupport => {
-      const supportItem: VisitorSupport = { type: support }
-      if (support === 'OTHER') {
-        supportItem.text = req.body.otherSupportDetails
-      }
-      return supportItem
-    })
+    visitSessionData.visitorSupport =
+      req.body.additionalSupportRequired === 'no'
+        ? []
+        : req.body.additionalSupport.map((support: string): VisitorSupport => {
+            const supportItem: VisitorSupport = { type: support }
+            if (support === 'OTHER') {
+              supportItem.text = req.body.otherSupportDetails
+            }
+            return supportItem
+          })
+
     const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.previousVisitReference)
     return res.redirect(`${urlPrefix}/select-main-contact`)
   }
@@ -80,7 +84,11 @@ export default class AdditionalSupport {
       body('otherSupportDetails')
         .trim()
         .custom((value: string, { req }) => {
-          if (<string[]>req.body.additionalSupport.includes('OTHER') && (value ?? '').length === 0) {
+          if (
+            req.body.additionalSupportRequired === 'yes' &&
+            <string[]>req.body.additionalSupport.includes('OTHER') &&
+            (value ?? '').length === 0
+          ) {
             throw new Error('Enter details of the request')
           }
           return true
