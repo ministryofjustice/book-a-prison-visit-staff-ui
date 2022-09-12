@@ -28,7 +28,7 @@
     "int-test": "cypress run --config video=false",
     "int-test-single": "cypress run --config video=false --spec ",
     "int-test-ui": "cypress open",
-    "clean": "rm -rf dist build node_modules stylesheets coverage"
+    "clean": "rm -rf dist build node_modules stylesheets"
   },
   "engines": {
     "node": "^16",
@@ -41,9 +41,11 @@
         "isolatedModules": true
       }
     },
+    "collectCoverage": true,
     "collectCoverageFrom": [
       "server/**/*.{ts,js,jsx,mjs}"
     ],
+    "coverageDirectory": "test_results/jest/coverage",
     "testMatch": [
       "<rootDir>/(server|job)/**/?(*.)(cy|test).{ts,js,jsx,mjs}"
     ],

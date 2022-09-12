@@ -102,6 +102,8 @@ jobs:
           path: test_results
       - store_artifacts:
           path: test_results/unit-test-reports.html
+      - store_artifacts:
+          path: test_results/jest/coverage
 
   integration_test:
     executor:

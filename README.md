@@ -83,6 +83,14 @@ The template project has implemented some scheduled checks to ensure that key de
 If these are not desired in the cloned project, remove references to `check_outdated` job from `.circleci/config.yml`
 
 
+## Test Coverage Reports
+We use jest code coverage to report on test coverage and produce reports for the unit tests.
+
+### Where are the code coverage reports?
+In the [CircleCI builds](https://app.circleci.com/pipelines/github/ministryofjustice/book-a-prison-visit-staff-ui) find a `unit_test` job and click on the `ARTIFACTS` tab.
+
+The unit test coverage report can be found at `test_results/jest/coverage/lcov-report/index.html`.
+
 ## Imported types
 
 Some TypeScript types are imported via the Open API (Swagger) docs, e.g. from the Visit Scheduler, Prisoner Contact Registry, Prison API, etc.
