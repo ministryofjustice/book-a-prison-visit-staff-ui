@@ -1,4 +1,5 @@
 import { NotifyClient, SmsResponse } from 'notifications-node-client'
+import logger from '../../logger'
 import config from '../config'
 
 const { key, templates } = config.apis.notifications
@@ -31,6 +32,7 @@ class NotificationsApiClient {
     visitDate: string
     reference: string
   }): Promise<SmsResponse> {
+    logger.info(`Sending Booking SMS for ${reference}`)
     return this.notificationsApiClient.sendSms(templates.bookingConfirmation, phoneNumber, {
       personalisation: {
         prison: prisonName,
@@ -81,6 +83,7 @@ class NotificationsApiClient {
     visitDate: string
     reference: string
   }): Promise<SmsResponse> {
+    logger.info(`Sending Update SMS for ${reference}`)
     return this.notificationsApiClient.sendSms(templates.updateConfirmation, phoneNumber, {
       personalisation: {
         prison: prisonName,
