@@ -1406,25 +1406,6 @@ describe('POST /visit/:reference/update/select-visitors', () => {
         expect(flashProvider).toHaveBeenCalledWith('formValues', { visitors: ['4322', '4323', '4326'] })
       })
   })
-
-  it('should set validation errors in flash and redirect if more than 3 visitors are selected', () => {
-    return request(sessionApp)
-      .post(`/visit/${previousVisitReference}/update/select-visitors`)
-      .send('visitors=4322&visitors=4323&visitors=4324&visitors=4325')
-      .expect(302)
-      .expect('location', `/visit/${previousVisitReference}/update/select-visitors`)
-      .expect(() => {
-        expect(flashProvider).toHaveBeenCalledWith('errors', [
-          {
-            location: 'body',
-            msg: 'Select no more than 3 visitors with a maximum of 2 adults',
-            param: 'visitors',
-            value: ['4322', '4323', '4324', '4325'],
-          },
-        ])
-        expect(flashProvider).toHaveBeenCalledWith('formValues', { visitors: ['4322', '4323', '4324', '4325'] })
-      })
-  })
 })
 
 describe('/visit/:reference/update/visit-type', () => {
