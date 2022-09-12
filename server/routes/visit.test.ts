@@ -111,50 +111,7 @@ describe('GET /visit/:reference', () => {
     restrictedPatient: false,
   }
 
-  const visit: Visit = {
-    reference: 'ab-cd-ef-gh',
-    prisonerId: 'A1234BC',
-    prisonId: 'HEI',
-    visitRoom: 'visit room',
-    visitType: 'SOCIAL',
-    visitStatus: 'BOOKED',
-    visitRestriction: 'OPEN',
-    startTimestamp: '2022-02-09T10:00:00',
-    endTimestamp: '2022-02-09T11:15:00',
-    visitNotes: [
-      {
-        type: 'VISIT_COMMENT',
-        text: 'Example of a visit comment',
-      },
-      {
-        type: 'VISITOR_CONCERN',
-        text: 'Example of a visitor concern',
-      },
-    ],
-    visitContact: {
-      name: 'Jeanette Smith',
-      telephone: '01234 567890',
-    },
-    visitors: [
-      {
-        nomisPersonId: 4321,
-      },
-      {
-        nomisPersonId: 4324,
-      },
-    ],
-    visitorSupport: [
-      {
-        type: 'WHEELCHAIR',
-      },
-      {
-        type: 'OTHER',
-        text: 'custom request',
-      },
-    ],
-    createdTimestamp: '2022-02-14T10:00:00',
-    modifiedTimestamp: '2022-02-14T10:05:00',
-  }
+  let visit: Visit
 
   const visitors: VisitorListItem[] = [
     {
@@ -189,6 +146,51 @@ describe('GET /visit/:reference', () => {
   const additionalSupport = ['Wheelchair ramp', 'custom request']
 
   beforeEach(() => {
+    visit = {
+      reference: 'ab-cd-ef-gh',
+      prisonerId: 'A1234BC',
+      prisonId: 'HEI',
+      visitRoom: 'visit room',
+      visitType: 'SOCIAL',
+      visitStatus: 'BOOKED',
+      visitRestriction: 'OPEN',
+      startTimestamp: '2022-02-09T10:00:00',
+      endTimestamp: '2022-02-09T11:15:00',
+      visitNotes: [
+        {
+          type: 'VISIT_COMMENT',
+          text: 'Example of a visit comment',
+        },
+        {
+          type: 'VISITOR_CONCERN',
+          text: 'Example of a visitor concern',
+        },
+      ],
+      visitContact: {
+        name: 'Jeanette Smith',
+        telephone: '01234 567890',
+      },
+      visitors: [
+        {
+          nomisPersonId: 4321,
+        },
+        {
+          nomisPersonId: 4324,
+        },
+      ],
+      visitorSupport: [
+        {
+          type: 'WHEELCHAIR',
+        },
+        {
+          type: 'OTHER',
+          text: 'custom request',
+        },
+      ],
+      createdTimestamp: '2022-02-14T10:00:00',
+      modifiedTimestamp: '2022-02-14T10:05:00',
+    }
+
     prisonerSearchService.getPrisonerById.mockResolvedValue(prisoner)
     visitSessionsService.getFullVisitDetails.mockResolvedValue({ visit, visitors, additionalSupport })
     prisonerVisitorsService.getVisitors.mockResolvedValue(visitors)
@@ -205,30 +207,6 @@ describe('GET /visit/:reference', () => {
         visitSessionData,
       } as SessionData,
     })
-  })
-
-  it('should not display button block if visit status is cancelled/superseded', () => {
-    visit.visitStatus = 'CANCELLED'
-    return request(app)
-      .get('/visit/ab-cd-ef-gh')
-      .expect(200)
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        const $ = cheerio.load(res.text)
-        expect($('[data-test="cancel-visit"]').attr('href')).toBe(undefined)
-      })
-  })
-
-  it('should display button block if visit status is booked', () => {
-    visit.visitStatus = 'BOOKED'
-    return request(app)
-      .get('/visit/ab-cd-ef-gh')
-      .expect(200)
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        const $ = cheerio.load(res.text)
-        expect($('[data-test="cancel-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/cancel')
-      })
   })
 
   it('should render full booking summary page with prisoner, visit and visitor details, with default back link', () => {
@@ -254,6 +232,8 @@ describe('GET /visit/:reference', () => {
         expect($('[data-test="visit-phone"]').text()).toBe('01234 567890')
         expect($('[data-test="cancel-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/cancel')
         expect($('[data-test="update-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/update/select-visitors')
+        expect($('[data-test="cancel-visit"]').prop('disabled')).toBe(false)
+        expect($('[data-test="update-visit"]').prop('disabled')).toBe(false)
         // visitor details
         expect($('[data-test="visitor-name-1"]').text()).toBe('Smith, Jeanette')
         expect($('[data-test="visitor-dob-1"]').html()).toBe('28 July 1986<br>(Adult)')
@@ -561,6 +541,21 @@ describe('GET /visit/:reference', () => {
         )
 
         expect(clearSession).toHaveBeenCalledTimes(1)
+      })
+  })
+
+  it('should disable buttons if visit status is cancelled/superseded', () => {
+    visit.visitStatus = 'CANCELLED'
+    visit.outcomeStatus = 'ADMINISTRATIVE_CANCELLATION'
+    visit.visitNotes = [{ type: 'VISIT_OUTCOMES', text: 'booking error' }]
+    return request(app)
+      .get('/visit/ab-cd-ef-gh')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('[data-test="cancel-visit"]').prop('disabled')).toBe(true)
+        expect($('[data-test="update-visit"]').prop('disabled')).toBe(true)
       })
   })
 
