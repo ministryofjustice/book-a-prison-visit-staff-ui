@@ -95,12 +95,21 @@ export default class CheckYourBooking {
         try {
           const phoneNumber = visitSessionData.mainContact.phoneNumber.replace(/\s/g, '')
 
-          await this.notificationsService.sendBookingSms({
-            phoneNumber,
-            visit: visitSessionData.visit,
-            prisonName: 'Hewell (HMP)',
-            reference: visitSessionData.visitReference,
-          })
+          if (isUpdate) {
+            await this.notificationsService.sendUpdateSms({
+              phoneNumber,
+              visit: visitSessionData.visit,
+              prisonName: 'Hewell (HMP)',
+              reference: visitSessionData.visitReference,
+            })
+          } else {
+            await this.notificationsService.sendBookingSms({
+              phoneNumber,
+              visit: visitSessionData.visit,
+              prisonName: 'Hewell (HMP)',
+              reference: visitSessionData.visitReference,
+            })
+          }
           logger.info(`Booking SMS sent for ${visitSessionData.visitReference}`)
         } catch (error) {
           logger.error(`Failed to send SMS for booking ${visitSessionData.visitReference}`)
