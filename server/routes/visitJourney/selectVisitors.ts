@@ -125,10 +125,6 @@ export default class SelectVisitors {
         throw new Error('Add an adult to the visit')
       }
 
-      if (adults > 2) {
-        throw new Error('Select no more than 2 adults')
-      }
-
       return true
     })
   }
