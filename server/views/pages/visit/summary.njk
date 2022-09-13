@@ -112,15 +112,15 @@
         {% if visit.outcomeStatus === 'SUPERSEDED_CANCELLATION' %}
           {%- for visitNote in visit.visitNotes %}
             {% if visitNote.type == 'VISIT_OUTCOMES' %}
-              <p>This visit has been Superseded by: <a href="../{{visitNote.text}}">{{ visitNote.text }}</a> </p>
+              <p>This booking has been rebooked as <a href="../{{visitNote.text}}">{{ visitNote.text }}</a> </p>
             {% endif %}
           {% endfor %}     
         {% else %}
           {% set status = visit.outcomeStatus.split("_") %}
-            <p>This visit has visit status: {{ status[0] | capitalize }} {{status[1] | lower }}
+            <p>This booking has been cancelled.
           {%- for visitNote in visit.visitNotes %}
             {% if visitNote.type == "VISIT_OUTCOMES" %}
-              <br>Cancellation reason: {{ visitNote.text }} </p>
+              <br>{{ status[0] | capitalize }} {{status[1] | lower }}: {{ visitNote.text }}.</p>
             {% endif %}
           {% endfor %}
         {% endif %}
