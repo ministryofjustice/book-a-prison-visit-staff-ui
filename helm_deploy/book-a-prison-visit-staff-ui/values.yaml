@@ -61,6 +61,9 @@ generic-service:
     cloudplatform-live1-1: "35.178.209.113/32"
     cloudplatform-live1-2: "3.8.51.207/32"
     cloudplatform-live1-3: "35.177.252.54/32"
+    quantum1: 62.25.109.197/32
+    quantum2: 212.137.36.230/32
+    quantum3: 195.92.38.16/28
     petty-france-wifi: "213.121.161.112/28"
     global-protect: "35.176.93.186/32"
 
