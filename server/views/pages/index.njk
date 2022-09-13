@@ -23,13 +23,23 @@
           }) }}
         </li>
         <li class="govuk-grid-column-one-third card-group__item">
-          {{ card({
-            "href": "/search/visit",
-            "clickable": "true",
-            "heading": "Change a visit",
-            "description": "Update or cancel a booking",
-            "id": "change-visit"
-          }) }}
+          {% if updateJourneyEnabled %}
+            {{ card({
+              "href": "/search/visit",
+              "clickable": "true",
+              "heading": "Change a visit",
+              "description": "Update or cancel a booking",
+              "id": "change-visit"
+            }) }}
+          {% else %}
+            {{ card({
+              "href": "/search/visit",
+              "clickable": "true",
+              "heading": "Cancel a visit",
+              "description": "Find and cancel a visit",
+              "id": "cancel-visit"
+            }) }}
+          {% endif %}
         </li>
         <li class="govuk-grid-column-one-third card-group__item">
           {{ card({
