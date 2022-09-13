@@ -2,6 +2,7 @@ import type { Express } from 'express'
 import request from 'supertest'
 import { appWithAllRoutes } from './testutils/appSetup'
 import * as visitorUtils from './visitorUtils'
+import config from '../config'
 
 let app: Express
 
@@ -14,7 +15,10 @@ afterEach(() => {
 })
 
 describe('GET /', () => {
-  it('should render index page', () => {
+  it('should render index page with change visit tile when update feature enabled', () => {
+    config.features.updateJourneyEnabled = true
+    app = appWithAllRoutes({})
+
     return request(app)
       .get('/')
       .expect('Content-Type', /html/)
@@ -22,6 +26,21 @@ describe('GET /', () => {
         expect(res.text).toContain('Manage prison visits')
         expect(res.text).toContain('Book a visit')
         expect(res.text).toContain('Change a visit')
+        expect(res.text).toContain('View visits by date')
+      })
+  })
+
+  it('should render index page with cancel visit tile when update feature disabled', () => {
+    config.features.updateJourneyEnabled = false
+    app = appWithAllRoutes({})
+
+    return request(app)
+      .get('/')
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        expect(res.text).toContain('Manage prison visits')
+        expect(res.text).toContain('Book a visit')
+        expect(res.text).toContain('Cancel a visit')
         expect(res.text).toContain('View visits by date')
       })
   })
