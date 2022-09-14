@@ -71,6 +71,12 @@ generic-service:
     quantum1: 62.25.109.197/32
     quantum2: 212.137.36.230/32
     quantum3: 195.92.38.16/28
+    moj-official-tgw-preprod: 51.149.251.0/24
+    moj-official-tgw-prod: 51.149.250.0/24
+    moj-official-ark-c-expo-e: 51.149.249.0/29
+    moj-official-ark-c-vodafone: 194.33.248.0/29
+    moj-official-ark-f-vodafone: 194.33.249.0/29
+    moj-official-ark-f-expo-e: 51.149.249.32/29
     petty-france-wifi: "213.121.161.112/28"
     global-protect: "35.176.93.186/32"
 
