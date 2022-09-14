@@ -839,25 +839,6 @@ describe('POST /book-a-visit/select-visitors', () => {
         expect(flashProvider).toHaveBeenCalledWith('formValues', { visitors: '4324' })
       })
   })
-
-  it('should set validation errors in flash and redirect if more than 2 adults are selected', () => {
-    return request(sessionApp)
-      .post('/book-a-visit/select-visitors')
-      .send('visitors=4322&visitors=4323&visitors=4326')
-      .expect(302)
-      .expect('location', '/book-a-visit/select-visitors')
-      .expect(() => {
-        expect(flashProvider).toHaveBeenCalledWith('errors', [
-          {
-            location: 'body',
-            msg: 'Select no more than 2 adults',
-            param: 'visitors',
-            value: ['4322', '4323', '4326'],
-          },
-        ])
-        expect(flashProvider).toHaveBeenCalledWith('formValues', { visitors: ['4322', '4323', '4326'] })
-      })
-  })
 })
 
 describe('/book-a-visit/visit-type', () => {
