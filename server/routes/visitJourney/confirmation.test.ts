@@ -2,23 +2,13 @@ import type { Express } from 'express'
 import request from 'supertest'
 import { SessionData } from 'express-session'
 import * as cheerio from 'cheerio'
-import { VisitSessionData } from '../@types/bapv'
-import VisitSessionsService from '../services/visitSessionsService'
-import AuditService from '../services/auditService'
-import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
-import { SupportType, Visit } from '../data/visitSchedulerApiTypes'
-import * as visitorUtils from './visitorUtils'
-import config from '../config'
-import NotificationsService from '../services/notificationsService'
-
-jest.mock('../services/prisonerProfileService')
-jest.mock('../services/prisonerVisitorsService')
-jest.mock('../services/visitSessionsService')
-jest.mock('../services/auditService')
+import { VisitSessionData } from '../../@types/bapv'
+import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
+import { SupportType } from '../../data/visitSchedulerApiTypes'
+import * as visitorUtils from '../visitorUtils'
 
 let sessionApp: Express
 const systemToken = async (user: string): Promise<string> => `${user}-token-1`
-const auditService = new AuditService() as jest.Mocked<AuditService>
 
 let flashData: Record<'errors' | 'formValues', Record<string, string | string[]>[]>
 let visitSessionData: VisitSessionData
