@@ -1,29 +1,19 @@
 import type { Express } from 'express'
 import request from 'supertest'
-import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
+import * as cheerio from 'cheerio'
+import { VisitSessionData } from '../../@types/bapv'
 import AuditService from '../../services/auditService'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
-import { VisitSessionData } from '../../@types/bapv'
 
 jest.mock('../../services/auditService')
 
 let sessionApp: Express
 const systemToken = async (user: string): Promise<string> => `${user}-token-1`
-let flashData: Record<string, string[] | Record<string, string>[]>
-let visitSessionData: VisitSessionData
-
 const auditService = new AuditService() as jest.Mocked<AuditService>
 
-jest.mock('../visitorUtils', () => {
-  const visitorUtils = jest.requireActual('../visitorUtils')
-  return {
-    ...visitorUtils,
-    clearSession: jest.fn((req: Express.Request) => {
-      req.session.visitSessionData = visitSessionData as VisitSessionData
-    }),
-  }
-})
+let flashData: Record<'errors' | 'formValues', Record<string, string | string[]>[]>
+let visitSessionData: VisitSessionData
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
@@ -36,9 +26,7 @@ afterEach(() => {
   jest.resetAllMocks()
 })
 
-describe.skip('/visit/:reference/update/visit-type', () => {
-  const visitReference = 'ab-cd-ef-gh'
-
+describe('/book-a-visit/visit-type', () => {
   beforeEach(() => {
     visitSessionData = {
       prisoner: {
@@ -70,7 +58,6 @@ describe.skip('/visit/:reference/update/visit-type', () => {
           banned: false,
         },
       ],
-      visitReference,
     }
 
     sessionApp = appWithAllRoutes({
@@ -82,10 +69,10 @@ describe.skip('/visit/:reference/update/visit-type', () => {
     })
   })
 
-  describe('GET /visit/:reference/update/visit-type', () => {
+  describe('GET /book-a-visit/visit-type', () => {
     it('should render the open/closed visit type page with prisoner restrictions and visitor list', () => {
       return request(sessionApp)
-        .get(`/visit/${visitReference}/update/visit-type`)
+        .get('/book-a-visit/visit-type')
         .expect(200)
         .expect('Content-Type', /html/)
         .expect(res => {
@@ -112,7 +99,7 @@ describe.skip('/visit/:reference/update/visit-type', () => {
       ]
 
       return request(sessionApp)
-        .get(`/visit/${visitReference}/update/visit-type`)
+        .get('/book-a-visit/visit-type')
         .expect(200)
         .expect('Content-Type', /html/)
         .expect(res => {
@@ -128,12 +115,12 @@ describe.skip('/visit/:reference/update/visit-type', () => {
     })
   })
 
-  describe.skip('POST /visit/:reference/update/visit-type', () => {
+  describe('POST /book-a-visit/visit-type', () => {
     it('should set validation errors in flash and redirect if visit type not selected', () => {
       return request(sessionApp)
-        .post(`/visit/${visitReference}/update/visit-type`)
+        .post('/book-a-visit/visit-type')
         .expect(302)
-        .expect('location', `/visit/${visitReference}/update/visit-type`)
+        .expect('location', '/book-a-visit/visit-type')
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledWith('errors', [
             { location: 'body', msg: 'No visit type selected', param: 'visitType', value: undefined },
@@ -143,10 +130,10 @@ describe.skip('/visit/:reference/update/visit-type', () => {
 
     it('should set visit type to OPEN when selected and redirect to select date/time', () => {
       return request(sessionApp)
-        .post(`/visit/${visitReference}/update/visit-type`)
+        .post('/book-a-visit/visit-type')
         .send('visitType=OPEN')
         .expect(302)
-        .expect('location', `/visit/${visitReference}/update/select-date-and-time`)
+        .expect('location', '/book-a-visit/select-date-and-time')
         .expect(() => {
           expect(visitSessionData.visitRestriction).toBe('OPEN')
           expect(visitSessionData.closedVisitReason).toBe(undefined)
@@ -163,10 +150,10 @@ describe.skip('/visit/:reference/update/visit-type', () => {
 
     it('should set visit type to CLOSED when selected and redirect to select date/time', () => {
       return request(sessionApp)
-        .post(`/visit/${visitReference}/update/visit-type`)
+        .post('/book-a-visit/visit-type')
         .send('visitType=CLOSED')
         .expect(302)
-        .expect('location', `/visit/${visitReference}/update/select-date-and-time`)
+        .expect('location', '/book-a-visit/select-date-and-time')
         .expect(() => {
           expect(visitSessionData.visitRestriction).toBe('CLOSED')
           expect(visitSessionData.closedVisitReason).toBe('prisoner')
