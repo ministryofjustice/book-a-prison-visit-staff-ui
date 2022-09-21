@@ -139,10 +139,10 @@ export default class DateAndTime {
 
   validate(): ValidationChain {
     return body('visit-date-and-time').custom((value: string, { req }) => {
-      // check selected slot is in the list that was shown and has available tables
+      // check selected slot is in the list that was shown
       const selectedSlot: VisitSlot = getSelectedSlot(req.session.slotsList, value)
 
-      if (selectedSlot === undefined || selectedSlot.availableTables === 0) {
+      if (selectedSlot === undefined) {
         throw new Error('No time slot selected')
       }
 

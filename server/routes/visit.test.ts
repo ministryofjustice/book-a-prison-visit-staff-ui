@@ -1936,21 +1936,6 @@ describe('/visit/:reference/update/select-date-and-time', () => {
           expect(auditService.reservedVisit).not.toHaveBeenCalled()
         })
     })
-
-    it('should should set validation errors in flash and redirect if fully booked slot selected', () => {
-      return request(sessionApp)
-        .post(`/visit/${previousVisitReference}/update/select-date-and-time`)
-        .send('visit-date-and-time=5')
-        .expect(302)
-        .expect('location', `/visit/${previousVisitReference}/update/select-date-and-time`)
-        .expect(() => {
-          expect(flashProvider).toHaveBeenCalledWith('errors', [
-            { location: 'body', msg: 'No time slot selected', param: 'visit-date-and-time', value: '5' },
-          ])
-          expect(flashProvider).toHaveBeenCalledWith('formValues', { 'visit-date-and-time': '5' })
-          expect(auditService.reservedVisit).not.toHaveBeenCalled()
-        })
-    })
   })
 })
 
