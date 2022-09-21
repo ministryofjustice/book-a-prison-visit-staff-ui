@@ -30,7 +30,7 @@ export default function sessionCheckMiddleware({ stage }: { stage: number }): Re
       stage > 2 &&
       (!visitSessionData.visit ||
         !visitSessionData.visit.id ||
-        !visitSessionData.visit.availableTables ||
+        typeof visitSessionData.visit.availableTables === 'undefined' ||
         !visitSessionData.visit.startTimestamp ||
         !visitSessionData.visit.endTimestamp)
     ) {
