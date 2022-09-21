@@ -111,7 +111,7 @@ describe('Views - Date and time of visit', () => {
                   id: '5',
                   startTimestamp: '2022-03-01T09:30:00',
                   endTimestamp: '2022-03-01T10:30:00',
-                  availableTables: 0,
+                  availableTables: 0, // fully booked
                   capacity: 30,
                   visitRoomName: 'room name',
                   visitRestriction: 'OPEN',
@@ -121,7 +121,7 @@ describe('Views - Date and time of visit', () => {
                   startTimestamp: '2022-03-01T10:30:00',
                   endTimestamp: '2022-03-01T11:30:00',
                   availableTables: -2, // overbooked
-                  capacity: 30,
+                  capacity: 1,
                   visitRoomName: 'room name',
                   visitRestriction: 'OPEN',
                 },
@@ -166,7 +166,7 @@ describe('Views - Date and time of visit', () => {
     expect($('label[for="5"]').text()).toContain('Fully booked (30 of 30 tables booked)')
     // correctly display overbooking
     expect($('label[for="6"]').text()).toContain('10:30am to 11:30am')
-    expect($('label[for="6"]').text()).toContain('Fully booked (32 of 30 tables booked)')
+    expect($('label[for="6"]').text()).toContain('Fully booked (3 of 1 table booked)')
 
     expect($('[data-test="submit"]').text().trim()).toBe('Continue')
   })

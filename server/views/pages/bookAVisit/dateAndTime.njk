@@ -22,7 +22,7 @@
       {% if (doubleBooked and not checked) -%}
         Prisoner has a visit
       {%- elseif slot.availableTables <= 0 -%}
-        Fully booked ({{ slot.capacity + (slot.availableTables | abs) }} of {{ slot.capacity}} tables booked)
+        Fully booked ({{ slot.capacity + (slot.availableTables | abs) }} of {{ slot.capacity}} table{{ "s" if slot.capacity > 1 }} booked)
       {%- else -%}
         {{ slot.availableTables }} table{{ "s" if slot.availableTables > 1 }} available
       {%- endif %}
