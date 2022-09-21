@@ -116,6 +116,15 @@ describe('Views - Date and time of visit', () => {
                   visitRoomName: 'room name',
                   visitRestriction: 'OPEN',
                 },
+                {
+                  id: '6',
+                  startTimestamp: '2022-03-01T10:30:00',
+                  endTimestamp: '2022-03-01T11:30:00',
+                  availableTables: -2, // overbooked
+                  capacity: 30,
+                  visitRoomName: 'room name',
+                  visitRestriction: 'OPEN',
+                },
               ],
               afternoon: [],
             },
@@ -154,8 +163,11 @@ describe('Views - Date and time of visit', () => {
     expect($('#slots-month-March2022-content-1 .bapv-morning-slots > h3').text()).toBe('Morning')
     expect($('#slots-month-March2022-content-1 .bapv-afternoon-slots > h3').eq(1).length).toBe(0) // no afternoon slots
     expect($('label[for="5"]').text()).toContain('9:30am to 10:30am')
-    expect($('label[for="5"]').text()).toContain('Fully booked')
-    expect($('#5').attr('disabled')).toBe('disabled')
+    expect($('label[for="5"]').text()).toContain('Fully booked (30 of 30 tables booked)')
+    // correctly display overbooking
+    expect($('label[for="6"]').text()).toContain('10:30am to 11:30am')
+    expect($('label[for="6"]').text()).toContain('Fully booked (32 of 30 tables booked)')
+
     expect($('[data-test="submit"]').text().trim()).toBe('Continue')
   })
 
