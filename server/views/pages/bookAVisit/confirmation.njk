@@ -79,31 +79,6 @@
                 }
             ]
         }) }}
-
-        <h2 class="govuk-heading-m">Prisoner details</h2>
-        {{ govukSummaryList({
-            rows: [
-                {
-                    key: {
-                        text: "Name"
-                    },
-                    value: {
-                        text: prisoner.name,
-                        classes: "test-prisoner-name"
-                    }
-                },
-                {
-                    key: {
-                        text: "Location"
-                    },
-                    value: {
-                        text: prisoner.location,
-                        classes: "test-prisoner-location"
-                    }
-                }
-            ]
-        }) }}
-        <h2 class="govuk-heading-m">Visitor details</h2>
         {%- for visitor in visitors %}
             {{ govukSummaryList({
                 rows: [
@@ -119,29 +94,24 @@
                 ]
             }) }}
         {% endfor %}
-        <h2 class="govuk-heading-m">Additional support</h2>
-        {% set additionalSupportRows = [] %}
-        {% for item in additionalSupport %}
-          {% set additionalSupportRows = (additionalSupportRows.push(
-            {
-              key: {
-                text: "Request " + loop.index
-              },
-              value: {
-                text: item,
-                classes: "test-additional-support" + loop.index
-              }
-            }
-          ), additionalSupportRows) %}
-        {% endfor %}
-        {% if (additionalSupportRows | length) %}
-            {{ govukSummaryList({
-                rows: additionalSupportRows
-            }) }}
+        {% if additionalSupport | length %}
+            {% set support = additionalSupport | join(', ') %}
         {% else %}
-        <p data-test="no-addition-support-chosen">None.</p>
+            {% set support = "None" %}
         {% endif %}
-        <h2 class="govuk-heading-m">Contact details</h2>
+        {{ govukSummaryList({
+            rows: [
+                {
+                    key: {
+                        text: "Additional support requests"
+                    },
+                    value: {
+                        html: '<p class="test-additional-support">' + support + '</p>'
+                    }
+                }
+            
+            ]
+        }) }}
         {% set contactName %}
         {% if mainContact.contactName %}
         {{ mainContact.contactName | safe }}
@@ -156,17 +126,7 @@
                         text: "Main contact"
                     },
                     value: {
-                        text: contactName,
-                        classes: "test-main-contact-name"
-                    }
-                },
-                {
-                    key: {
-                        text: "Phone number"
-                    },
-                    value: {
-                        text: mainContact.phoneNumber,
-                        classes: "test-main-contact-number"
+                        html: '<p class="test-main-contact-name">' + contactName + '</p><p class="test-main-contact-number">' + mainContact.phoneNumber + '</p>'
                     }
                 }
             ]
