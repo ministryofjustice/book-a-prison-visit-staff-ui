@@ -69,6 +69,7 @@ describe('/book-a-visit/check-your-booking', () => {
         startTimestamp: '2022-03-12T09:30:00',
         endTimestamp: '2022-03-12T10:30:00',
         availableTables: 1,
+        capacity: 30,
         visitRoomName: 'room name',
         visitRestriction: 'OPEN',
       },

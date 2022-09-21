@@ -139,6 +139,7 @@ export type VisitSlot = {
   startTimestamp: string
   endTimestamp: string
   availableTables: number
+  capacity: number
   visitRoomName: string
   visitRestriction: Visit['visitRestriction']
   sessionConflicts?: VisitSession['sessionConflicts']

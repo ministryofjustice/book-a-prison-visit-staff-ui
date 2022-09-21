@@ -68,6 +68,7 @@ describe('/book-a-visit/select-main-contact', () => {
         startTimestamp: '123',
         endTimestamp: '456',
         availableTables: 1,
+        capacity: 30,
         visitRoomName: 'room name',
         visitRestriction: 'OPEN',
       },

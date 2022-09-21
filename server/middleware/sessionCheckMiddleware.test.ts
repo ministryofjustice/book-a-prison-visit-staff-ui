@@ -32,6 +32,7 @@ const visit: VisitSessionData['visit'] = {
   startTimestamp: '123',
   endTimestamp: '123',
   availableTables: 1,
+  capacity: 30,
   visitRoomName: 'visitRoom',
   visitRestriction: 'OPEN',
 }

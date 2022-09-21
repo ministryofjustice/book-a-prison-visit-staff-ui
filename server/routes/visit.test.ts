@@ -1553,6 +1553,7 @@ describe('/visit/:reference/update/select-date-and-time', () => {
               startTimestamp: '2022-02-14T10:00:00',
               endTimestamp: '2022-02-14T11:00:00',
               availableTables: 15,
+              capacity: 30,
               visitRoomName: 'room name',
               // representing a pre-existing visit that is BOOKED
               sessionConflicts: ['DOUBLE_BOOKED'],
@@ -1563,6 +1564,7 @@ describe('/visit/:reference/update/select-date-and-time', () => {
               startTimestamp: '2022-02-14T11:59:00',
               endTimestamp: '2022-02-14T12:59:00',
               availableTables: 1,
+              capacity: 30,
               visitRoomName: 'room name',
               visitRestriction: 'OPEN',
             },
@@ -1573,6 +1575,7 @@ describe('/visit/:reference/update/select-date-and-time', () => {
               startTimestamp: '2022-02-14T12:00:00',
               endTimestamp: '2022-02-14T13:05:00',
               availableTables: 5,
+              capacity: 30,
               visitRoomName: 'room name',
               // representing the RESERVED visit being handled in this session
               sessionConflicts: ['DOUBLE_BOOKED'],
@@ -1595,6 +1598,7 @@ describe('/visit/:reference/update/select-date-and-time', () => {
               startTimestamp: '2022-02-15T16:00:00',
               endTimestamp: '2022-02-15T17:00:00',
               availableTables: 12,
+              capacity: 30,
               visitRoomName: 'room name',
               visitRestriction: 'OPEN',
             },
@@ -1616,6 +1620,7 @@ describe('/visit/:reference/update/select-date-and-time', () => {
               startTimestamp: '2022-03-01T09:30:00',
               endTimestamp: '2022-03-01T10:30:00',
               availableTables: 0,
+              capacity: 30,
               visitRoomName: 'room name',
               visitRestriction: 'OPEN',
             },
@@ -1756,6 +1761,7 @@ describe('/visit/:reference/update/select-date-and-time', () => {
         startTimestamp: '2022-02-14T12:00:00',
         endTimestamp: '2022-02-14T13:05:00',
         availableTables: 5,
+        capacity: 30,
         visitRoomName: 'room name',
         visitRestriction: 'OPEN',
       }
@@ -1843,6 +1849,7 @@ describe('/visit/:reference/update/select-date-and-time', () => {
         startTimestamp: '2022-02-14T10:00:00',
         endTimestamp: '2022-02-14T11:00:00',
         availableTables: 15,
+        capacity: 30,
         visitRoomName: 'room name',
         visitRestriction: 'OPEN',
       }
@@ -1962,6 +1969,7 @@ describe('/visit/:reference/update/check-your-booking', () => {
         startTimestamp: '2022-03-12T09:30:00',
         endTimestamp: '2022-03-12T10:30:00',
         availableTables: 1,
+        capacity: 30,
         visitRoomName: 'room name',
         visitRestriction: 'OPEN',
       },

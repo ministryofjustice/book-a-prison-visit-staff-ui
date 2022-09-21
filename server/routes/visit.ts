@@ -104,6 +104,7 @@ export default function routes(
         startTimestamp: visit.startTimestamp,
         endTimestamp: visit.endTimestamp,
         availableTables: 0,
+        capacity: undefined,
         visitRoomName: visit.visitRoom,
         visitRestriction: visit.visitRestriction,
       },
