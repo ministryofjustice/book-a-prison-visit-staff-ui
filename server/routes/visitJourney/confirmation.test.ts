@@ -112,14 +112,13 @@ describe('GET /book-a-visit/confirmation', () => {
       .expect(res => {
         const $ = cheerio.load(res.text)
         expect($('h1').text().trim()).toBe('Booking confirmed')
-        expect($('.test-prisoner-name').text()).toContain('prisoner name')
-        expect($('.test-prisoner-location').text()).toContain('location place')
         expect($('.test-visit-date').text()).toContain('Saturday 12 March 2022')
         expect($('.test-visit-time').text()).toContain('9:30am to 10:30am')
         expect($('.test-visit-type').text()).toContain('Open')
         expect($('.test-visitor-name1').text()).toContain('name last (relate of the prisoner)')
-        expect($('.test-additional-support1').text()).toContain('Wheelchair ramp')
-        expect($('.test-additional-support2').text()).toContain('Portable induction loop for people with hearing aids')
+        expect($('.test-additional-support').text()).toContain(
+          'Wheelchair ramp, Portable induction loop for people with hearing aids',
+        )
         expect($('.test-main-contact-name').text()).toContain('abc')
         expect($('.test-main-contact-number').text()).toContain('123')
         expect($('.test-booking-reference').text()).toContain('ab-cd-ef-gh')
@@ -193,13 +192,11 @@ describe('GET /book-a-visit/confirmation', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('h1').text().trim()).toBe('Booking confirmed')
-          expect($('.test-prisoner-name').text()).toContain('prisoner name')
-          expect($('.test-prisoner-location').text()).toContain('location place')
           expect($('.test-visit-date').text()).toContain('Saturday 12 March 2022')
           expect($('.test-visit-time').text()).toContain('9:30am to 10:30am')
           expect($('.test-visit-type').text()).toContain('Open')
           expect($('.test-visitor-name1').text()).toContain('name last (relate of the prisoner)')
-          expect($('[data-test="no-addition-support-chosen"]').text()).toContain('None.')
+          expect($('.test-additional-support').text()).toContain('None.')
           expect($('.test-main-contact-name').text()).toContain('abc')
           expect($('.test-main-contact-number').text()).toContain('123')
           expect($('.test-booking-reference').text()).toContain('ab-cd-ef-gh')
