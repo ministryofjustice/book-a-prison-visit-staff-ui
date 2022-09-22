@@ -11,13 +11,17 @@ export const prisonerSearchClientBuilder = (token: string): PrisonerSearchClient
 }
 
 class PrisonerSearchClient {
-  constructor(private readonly restClient: RestClient, private readonly prisonId = 'HEI') {}
+  constructor(private readonly restClient: RestClient) {}
 
   private pageSize = config.apis.prisonerSearch.pageSize
 
-  getPrisoners(search: string, page = 0): Promise<{ totalPages: number; totalElements: number; content: Prisoner[] }> {
+  getPrisoners(
+    search: string,
+    page = 0,
+    prisonId = 'HEI',
+  ): Promise<{ totalPages: number; totalElements: number; content: Prisoner[] }> {
     return this.restClient.get({
-      path: `/prison/${this.prisonId}/prisoners`,
+      path: `/prison/${prisonId}/prisoners`,
       query: new URLSearchParams({
         term: search,
         page: page.toString(),
@@ -26,9 +30,9 @@ class PrisonerSearchClient {
     })
   }
 
-  getPrisoner(search: string): Promise<{ content: Prisoner[] }> {
+  getPrisoner(search: string, prisonId = 'HEI'): Promise<{ content: Prisoner[] }> {
     return this.restClient.get({
-      path: `/prison/${this.prisonId}/prisoners`,
+      path: `/prison/${prisonId}/prisoners`,
       query: new URLSearchParams({
         term: search,
       }).toString(),
