@@ -11,13 +11,13 @@ export const prisonApiClientBuilder = (token: string): PrisonApiClient => {
 }
 
 class PrisonApiClient {
-  constructor(private readonly restclient: RestClient, private readonly prisonId = 'HEI') {}
+  constructor(private readonly restclient: RestClient) {}
 
-  getBookings(offenderNo: string): Promise<PagePrisonerBookingSummary> {
+  getBookings(offenderNo: string, prisonId = 'HEI'): Promise<PagePrisonerBookingSummary> {
     return this.restclient.get({
       path: '/api/bookings/v2',
       query: new URLSearchParams({
-        prisonId: this.prisonId,
+        prisonId,
         offenderNo,
         legalInfo: 'true',
       }).toString(),
