@@ -84,8 +84,11 @@ describe('Prisoner search page', () => {
           .expect(res => {
             expect(res.text).toContain('Search for a prisoner')
             expect(res.text).toContain('id="search-results-none"')
-            expect(auditService.prisonerSearch).toHaveBeenCalledTimes(1)
-            expect(auditService.prisonerSearch).toHaveBeenCalledWith('A1234BC', 'HEI', undefined, undefined)
+            expect(auditService.prisonerSearch).toHaveBeenCalledWith({
+              searchTerms: 'A1234BC',
+              username: undefined,
+              operationId: undefined,
+            })
             expect(prisonerSearchService.getPrisoners).toHaveBeenCalledTimes(1)
           })
       })
@@ -135,8 +138,11 @@ describe('Prisoner search page', () => {
           .expect(res => {
             expect(res.text).toContain('Search for a prisoner')
             expect(res.text).toContain('id="search-results-true"')
-            expect(auditService.prisonerSearch).toHaveBeenCalledTimes(1)
-            expect(auditService.prisonerSearch).toHaveBeenCalledWith('A1234BC', 'HEI', undefined, undefined)
+            expect(auditService.prisonerSearch).toHaveBeenCalledWith({
+              searchTerms: 'A1234BC',
+              username: undefined,
+              operationId: undefined,
+            })
             expect(prisonerSearchService.getPrisoners).toHaveBeenCalledTimes(1)
           })
       })
@@ -171,8 +177,11 @@ describe('Prisoner search page', () => {
             expect(res.text).toContain('Search for a prisoner')
             expect(res.text).toContain('id="search-results-true"')
             expect(res.text).toContain('<p class="moj-pagination__results">')
-            expect(auditService.prisonerSearch).toHaveBeenCalledTimes(1)
-            expect(auditService.prisonerSearch).toHaveBeenCalledWith('A1234BC', 'HEI', undefined, undefined)
+            expect(auditService.prisonerSearch).toHaveBeenCalledWith({
+              searchTerms: 'A1234BC',
+              username: undefined,
+              operationId: undefined,
+            })
             expect(prisonerSearchService.getPrisoners).toHaveBeenCalledTimes(1)
           })
       })

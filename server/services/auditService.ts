@@ -22,7 +22,17 @@ export default class AuditService {
     })
   }
 
-  async prisonerSearch(searchTerms: string, prisonId: string, username: string, operationId: string) {
+  async prisonerSearch({
+    searchTerms,
+    prisonId = 'HEI',
+    username,
+    operationId,
+  }: {
+    searchTerms: string
+    prisonId?: string
+    username: string
+    operationId: string
+  }) {
     return this.sendAuditMessage({
       action: 'SEARCHED_PRISONERS',
       who: username,
