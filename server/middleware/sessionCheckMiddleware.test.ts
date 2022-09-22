@@ -32,6 +32,7 @@ const visit: VisitSessionData['visit'] = {
   startTimestamp: '123',
   endTimestamp: '123',
   availableTables: 1,
+  capacity: 30,
   visitRoomName: 'visitRoom',
   visitRestriction: 'OPEN',
 }
@@ -192,6 +193,26 @@ describe('sessionCheckMiddleware', () => {
 
         expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/A1234BC?error=missing-visit')
       })
+    })
+
+    it('should not reject a fully booked visit', () => {
+      req.session.visitSessionData = {
+        prisoner: prisonerData,
+        visitRestriction,
+        visitors: visitorsData,
+        visitReference: 'ab-cd-ef-gh',
+        visitStatus: 'RESERVED',
+        visit: {
+          id: '1',
+          availableTables: 0,
+          startTimestamp: '123',
+          endTimestamp: '123',
+        } as VisitSlot,
+      }
+
+      sessionCheckMiddleware({ stage: 3 })(req as Request, mockResponse as Response, next)
+
+      expect(mockResponse.redirect).not.toHaveBeenCalled()
     })
   })
 

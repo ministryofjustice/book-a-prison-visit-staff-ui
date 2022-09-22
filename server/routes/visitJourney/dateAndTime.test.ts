@@ -2,7 +2,7 @@ import type { Express } from 'express'
 import request from 'supertest'
 import { SessionData } from 'express-session'
 import * as cheerio from 'cheerio'
-import { VisitSessionData, VisitSlotList } from '../../@types/bapv'
+import { VisitSessionData, VisitSlot, VisitSlotList } from '../../@types/bapv'
 import VisitSessionsService from '../../services/visitSessionsService'
 import AuditService from '../../services/auditService'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
@@ -45,6 +45,7 @@ describe('/book-a-visit/select-date-and-time', () => {
               startTimestamp: '2022-02-14T10:00:00',
               endTimestamp: '2022-02-14T11:00:00',
               availableTables: 15,
+              capacity: 30,
               visitRoomName: 'room name',
               // representing a pre-existing visit that is BOOKED
               sessionConflicts: ['DOUBLE_BOOKED'],
@@ -55,6 +56,7 @@ describe('/book-a-visit/select-date-and-time', () => {
               startTimestamp: '2022-02-14T11:59:00',
               endTimestamp: '2022-02-14T12:59:00',
               availableTables: 1,
+              capacity: 30,
               visitRoomName: 'room name',
               visitRestriction: 'OPEN',
             },
@@ -65,6 +67,7 @@ describe('/book-a-visit/select-date-and-time', () => {
               startTimestamp: '2022-02-14T12:00:00',
               endTimestamp: '2022-02-14T13:05:00',
               availableTables: 5,
+              capacity: 30,
               visitRoomName: 'room name',
               // representing the RESERVED visit being handled in this session
               sessionConflicts: ['DOUBLE_BOOKED'],
@@ -87,6 +90,7 @@ describe('/book-a-visit/select-date-and-time', () => {
               startTimestamp: '2022-02-15T16:00:00',
               endTimestamp: '2022-02-15T17:00:00',
               availableTables: 12,
+              capacity: 30,
               visitRoomName: 'room name',
               visitRestriction: 'OPEN',
             },
@@ -108,6 +112,7 @@ describe('/book-a-visit/select-date-and-time', () => {
               startTimestamp: '2022-03-01T09:30:00',
               endTimestamp: '2022-03-01T10:30:00',
               availableTables: 0,
+              capacity: 30,
               visitRoomName: 'room name',
               visitRestriction: 'OPEN',
             },
@@ -254,6 +259,7 @@ describe('/book-a-visit/select-date-and-time', () => {
         startTimestamp: '2022-02-14T12:00:00',
         endTimestamp: '2022-02-14T13:05:00',
         availableTables: 5,
+        capacity: 30,
         visitRoomName: 'room name',
         visitRestriction: 'OPEN',
       }
@@ -325,11 +331,12 @@ describe('/book-a-visit/select-date-and-time', () => {
         .expect(302)
         .expect('location', '/book-a-visit/additional-support')
         .expect(() => {
-          expect(visitSessionData.visit).toEqual({
+          expect(visitSessionData.visit).toEqual(<VisitSlot>{
             id: '2',
             startTimestamp: '2022-02-14T11:59:00',
             endTimestamp: '2022-02-14T12:59:00',
             availableTables: 1,
+            capacity: 30,
             visitRoomName: 'room name',
             visitRestriction: 'OPEN',
           })
@@ -358,6 +365,7 @@ describe('/book-a-visit/select-date-and-time', () => {
         startTimestamp: '2022-02-14T10:00:00',
         endTimestamp: '2022-02-14T11:00:00',
         availableTables: 15,
+        capacity: 30,
         visitRoomName: 'room name',
         visitRestriction: 'OPEN',
       }
@@ -370,11 +378,12 @@ describe('/book-a-visit/select-date-and-time', () => {
         .expect(302)
         .expect('location', '/book-a-visit/additional-support')
         .expect(() => {
-          expect(visitSessionData.visit).toEqual({
+          expect(visitSessionData.visit).toEqual(<VisitSlot>{
             id: '3',
             startTimestamp: '2022-02-14T12:00:00',
             endTimestamp: '2022-02-14T13:05:00',
             availableTables: 5,
+            capacity: 30,
             visitRoomName: 'room name',
             // representing the RESERVED visit being handled in this session
             sessionConflicts: ['DOUBLE_BOOKED'],
@@ -448,21 +457,6 @@ describe('/book-a-visit/select-date-and-time', () => {
             { location: 'body', msg: 'No time slot selected', param: 'visit-date-and-time', value: '100' },
           ])
           expect(flashProvider).toHaveBeenCalledWith('formValues', { 'visit-date-and-time': '100' })
-          expect(auditService.reservedVisit).not.toHaveBeenCalled()
-        })
-    })
-
-    it('should should set validation errors in flash and redirect if fully booked slot selected', () => {
-      return request(sessionApp)
-        .post('/book-a-visit/select-date-and-time')
-        .send('visit-date-and-time=5')
-        .expect(302)
-        .expect('location', '/book-a-visit/select-date-and-time')
-        .expect(() => {
-          expect(flashProvider).toHaveBeenCalledWith('errors', [
-            { location: 'body', msg: 'No time slot selected', param: 'visit-date-and-time', value: '5' },
-          ])
-          expect(flashProvider).toHaveBeenCalledWith('formValues', { 'visit-date-and-time': '5' })
           expect(auditService.reservedVisit).not.toHaveBeenCalled()
         })
     })

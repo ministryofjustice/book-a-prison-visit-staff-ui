@@ -45,6 +45,7 @@ describe('Views - Date and time of visit', () => {
                   startTimestamp: '2022-02-14T10:00:00',
                   endTimestamp: '2022-02-14T11:00:00',
                   availableTables: 15,
+                  capacity: 30,
                   visitRoomName: 'room name',
                   visitRestriction: 'OPEN',
                 },
@@ -53,6 +54,7 @@ describe('Views - Date and time of visit', () => {
                   startTimestamp: '2022-02-14T11:59:00',
                   endTimestamp: '2022-02-14T12:59:00',
                   availableTables: 1,
+                  capacity: 30,
                   visitRoomName: 'room name',
                   visitRestriction: 'OPEN',
                 },
@@ -63,6 +65,7 @@ describe('Views - Date and time of visit', () => {
                   startTimestamp: '2022-02-14T12:00:00',
                   endTimestamp: '2022-02-14T13:05:00',
                   availableTables: 5,
+                  capacity: 30,
                   visitRoomName: 'room name',
                   // representing a pre-existing visit that is BOOKED
                   sessionConflicts: ['DOUBLE_BOOKED'],
@@ -85,6 +88,7 @@ describe('Views - Date and time of visit', () => {
                   startTimestamp: '2022-02-15T16:00:00',
                   endTimestamp: '2022-02-15T17:00:00',
                   availableTables: 12,
+                  capacity: 30,
                   visitRoomName: 'room name',
                   // representing the RESERVED visit being handled in this session
                   sessionConflicts: ['DOUBLE_BOOKED'],
@@ -107,7 +111,17 @@ describe('Views - Date and time of visit', () => {
                   id: '5',
                   startTimestamp: '2022-03-01T09:30:00',
                   endTimestamp: '2022-03-01T10:30:00',
-                  availableTables: 0,
+                  availableTables: 0, // fully booked
+                  capacity: 30,
+                  visitRoomName: 'room name',
+                  visitRestriction: 'OPEN',
+                },
+                {
+                  id: '6',
+                  startTimestamp: '2022-03-01T10:30:00',
+                  endTimestamp: '2022-03-01T11:30:00',
+                  availableTables: -2, // overbooked
+                  capacity: 1,
                   visitRoomName: 'room name',
                   visitRestriction: 'OPEN',
                 },
@@ -149,8 +163,11 @@ describe('Views - Date and time of visit', () => {
     expect($('#slots-month-March2022-content-1 .bapv-morning-slots > h3').text()).toBe('Morning')
     expect($('#slots-month-March2022-content-1 .bapv-afternoon-slots > h3').eq(1).length).toBe(0) // no afternoon slots
     expect($('label[for="5"]').text()).toContain('9:30am to 10:30am')
-    expect($('label[for="5"]').text()).toContain('Fully booked')
-    expect($('#5').attr('disabled')).toBe('disabled')
+    expect($('label[for="5"]').text()).toContain('Fully booked (30 of 30 tables booked)')
+    // correctly display overbooking
+    expect($('label[for="6"]').text()).toContain('10:30am to 11:30am')
+    expect($('label[for="6"]').text()).toContain('Fully booked (3 of 1 table booked)')
+
     expect($('[data-test="submit"]').text().trim()).toBe('Continue')
   })
 

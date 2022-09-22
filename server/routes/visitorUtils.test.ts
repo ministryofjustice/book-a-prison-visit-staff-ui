@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import { Session, SessionData } from 'express-session'
-import { VisitSlotList } from '../@types/bapv'
+import { VisitSlot, VisitSlotList } from '../@types/bapv'
 import { clearSession, getFlashFormValues, getSelectedSlot } from './visitorUtils'
 
 const slotsList: VisitSlotList = {
@@ -18,6 +18,7 @@ const slotsList: VisitSlotList = {
             startTimestamp: '2022-02-14T10:00:00',
             endTimestamp: '2022-02-14T11:00:00',
             availableTables: 15,
+            capacity: 30,
             visitRoomName: 'room name',
             visitRestriction: 'OPEN',
           },
@@ -26,6 +27,7 @@ const slotsList: VisitSlotList = {
             startTimestamp: '2022-02-14T11:59:00',
             endTimestamp: '2022-02-14T12:59:00',
             availableTables: 1,
+            capacity: 30,
             visitRoomName: 'room name',
             visitRestriction: 'OPEN',
           },
@@ -36,6 +38,7 @@ const slotsList: VisitSlotList = {
             startTimestamp: '2022-02-14T12:00:00',
             endTimestamp: '2022-02-14T13:05:00',
             availableTables: 5,
+            capacity: 30,
             visitRoomName: 'room name',
             visitRestriction: 'OPEN',
           },
@@ -56,6 +59,7 @@ const slotsList: VisitSlotList = {
             startTimestamp: '2022-02-15T16:00:00',
             endTimestamp: '2022-02-15T17:00:00',
             availableTables: 12,
+            capacity: 30,
             visitRoomName: 'room name',
             visitRestriction: 'OPEN',
           },
@@ -77,6 +81,7 @@ const slotsList: VisitSlotList = {
             startTimestamp: '2022-03-01T09:30:00',
             endTimestamp: '2022-03-01T10:30:00',
             availableTables: 0,
+            capacity: 30,
             visitRoomName: 'room name',
             visitRestriction: 'OPEN',
           },
@@ -89,11 +94,12 @@ const slotsList: VisitSlotList = {
 
 describe('getSelectedSlot', () => {
   it('should return the selected slot if it exists in the slotsList', () => {
-    expect(getSelectedSlot(slotsList, '4')).toEqual({
+    expect(getSelectedSlot(slotsList, '4')).toEqual(<VisitSlot>{
       id: '4',
       startTimestamp: '2022-02-15T16:00:00',
       endTimestamp: '2022-02-15T17:00:00',
       availableTables: 12,
+      capacity: 30,
       visitRoomName: 'room name',
       visitRestriction: 'OPEN',
     })
