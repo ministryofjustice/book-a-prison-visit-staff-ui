@@ -53,7 +53,11 @@ export default function routes(
       : await prisonerSearchService.getPrisoners(search, res.locals.user?.username, parsedPage, isVisit)
 
     if (!hasValidationErrors) {
-      await auditService.prisonerSearch(search, 'HEI', res.locals.user?.username, res.locals.appInsightsOperationId)
+      await auditService.prisonerSearch({
+        searchTerms: search,
+        username: res.locals.user?.username,
+        operationId: res.locals.appInsightsOperationId,
+      })
     }
 
     const currentPageMax = parsedPage * pageSize

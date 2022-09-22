@@ -30,7 +30,7 @@ describe('Audit service', () => {
   })
 
   it('sends a prisoner search audit message', async () => {
-    await auditService.prisonerSearch('Smith', 'HEI', 'username', 'operation-id')
+    await auditService.prisonerSearch({ searchTerms: 'Smith', username: 'username', operationId: 'operation-id' })
 
     expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
     expect(sqsClientInstance.send.mock.lastCall[0]).toMatchObject({
