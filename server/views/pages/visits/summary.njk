@@ -44,7 +44,24 @@
                 namePrefix: "date-picker",
                 hint: {
                   text: "Enter a date"
-                }
+                },
+                items: [
+                  {
+                    name: "day",
+                    classes: "govuk-input--width-2",
+                    autocomplete: "off"
+                  },
+                  {
+                    name: "month",
+                    classes: "govuk-input--width-2",
+                    autocomplete: "off"
+                  },
+                  {
+                    name: "year",
+                    classes: "govuk-input--width-4",
+                    autocomplete: "off"
+                  }
+                ]
               }) }}
               {{ govukButton({
                 text: "View",
