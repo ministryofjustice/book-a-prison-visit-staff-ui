@@ -196,7 +196,7 @@ describe('Audit service', () => {
   })
 
   it('sends a zero VO overridden audit message', async () => {
-    await auditService.overrodeZeroVO('A1234BC', 'username', 'operation-id')
+    await auditService.overrodeZeroVO({ prisonerId: 'A1234BC', username: 'username', operationId: 'operation-id' })
 
     expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
     expect(sqsClientInstance.send.mock.lastCall[0]).toMatchObject({
