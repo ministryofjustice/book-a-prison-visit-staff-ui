@@ -1504,13 +1504,13 @@ describe('/visit/:reference/update/visit-type', () => {
           expect(visitSessionData.visitRestriction).toBe('OPEN')
           expect(visitSessionData.closedVisitReason).toBe(undefined)
           expect(auditService.visitRestrictionSelected).toHaveBeenCalledTimes(1)
-          expect(auditService.visitRestrictionSelected).toHaveBeenCalledWith(
-            visitSessionData.prisoner.offenderNo,
-            'OPEN',
-            [visitSessionData.visitors[0].personId.toString()],
-            undefined,
-            undefined,
-          )
+          expect(auditService.visitRestrictionSelected).toHaveBeenCalledWith({
+            prisonerId: visitSessionData.prisoner.offenderNo,
+            visitRestriction: 'OPEN',
+            visitorIds: [visitSessionData.visitors[0].personId.toString()],
+            username: undefined,
+            offenderId: undefined,
+          })
         })
     })
 
@@ -1524,13 +1524,13 @@ describe('/visit/:reference/update/visit-type', () => {
           expect(visitSessionData.visitRestriction).toBe('CLOSED')
           expect(visitSessionData.closedVisitReason).toBe('prisoner')
           expect(auditService.visitRestrictionSelected).toHaveBeenCalledTimes(1)
-          expect(auditService.visitRestrictionSelected).toHaveBeenCalledWith(
-            visitSessionData.prisoner.offenderNo,
-            'CLOSED',
-            [visitSessionData.visitors[0].personId.toString()],
-            undefined,
-            undefined,
-          )
+          expect(auditService.visitRestrictionSelected).toHaveBeenCalledWith({
+            prisonerId: visitSessionData.prisoner.offenderNo,
+            visitRestriction: 'CLOSED',
+            visitorIds: [visitSessionData.visitors[0].personId.toString()],
+            username: undefined,
+            offenderId: undefined,
+          })
         })
     })
   })

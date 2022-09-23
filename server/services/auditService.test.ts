@@ -215,7 +215,13 @@ describe('Audit service', () => {
   })
 
   it('sends a visit restriction (open/closed) selected audit message', async () => {
-    await auditService.visitRestrictionSelected('A1234BC', 'CLOSED', ['abc123', 'bcd321'], 'username', 'operation-id')
+    await auditService.visitRestrictionSelected({
+      prisonerId: 'A1234BC',
+      visitRestriction: 'CLOSED',
+      visitorIds: ['abc123', 'bcd321'],
+      username: 'username',
+      operationId: 'operation-id',
+    })
 
     expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
     expect(sqsClientInstance.send.mock.lastCall[0]).toMatchObject({

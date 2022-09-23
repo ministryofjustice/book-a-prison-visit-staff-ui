@@ -203,13 +203,19 @@ export default class AuditService {
     })
   }
 
-  async visitRestrictionSelected(
-    prisonerId: string,
-    visitRestriction: Visit['visitRestriction'],
-    visitorIds: string[],
-    username: string,
-    operationId: string,
-  ) {
+  async visitRestrictionSelected({
+    prisonerId,
+    visitRestriction,
+    visitorIds,
+    username,
+    operationId,
+  }: {
+    prisonerId: string
+    visitRestriction: Visit['visitRestriction']
+    visitorIds: string[]
+    username: string
+    operationId: string
+  }) {
     return this.sendAuditMessage({
       action: 'VISIT_RESTRICTION_SELECTED',
       who: username,
