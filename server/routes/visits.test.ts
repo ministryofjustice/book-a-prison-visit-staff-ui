@@ -231,7 +231,11 @@ describe('GET /visits', () => {
         expect($('.moj-side-navigation__title').text()).toContain('Open visits')
         expect($('.moj-side-navigation__item--active').text()).toContain('9am to 9:29am')
         expect(auditService.viewedVisits).toHaveBeenCalledTimes(1)
-        expect(auditService.viewedVisits).toHaveBeenCalledWith(todayDate, 'HEI', undefined, undefined)
+        expect(auditService.viewedVisits).toHaveBeenCalledWith({
+          viewDate: todayDate,
+          username: undefined,
+          operationId: undefined,
+        })
       })
   })
 
@@ -258,7 +262,11 @@ describe('GET /visits', () => {
         expect($('.moj-side-navigation__title').text()).toContain('Open visits')
         expect($('.moj-side-navigation__item--active').text()).toContain('10am to 11am')
         expect(auditService.viewedVisits).toHaveBeenCalledTimes(1)
-        expect(auditService.viewedVisits).toHaveBeenCalledWith('2022-05-23', 'HEI', undefined, undefined)
+        expect(auditService.viewedVisits).toHaveBeenCalledWith({
+          viewDate: '2022-05-23',
+          username: undefined,
+          operationId: undefined,
+        })
       })
   })
 
@@ -285,7 +293,11 @@ describe('GET /visits', () => {
         expect($('.moj-side-navigation__title').text()).toContain('Visit type unknown')
         expect($('.moj-side-navigation__item--active').text()).toContain('10am to 11am')
         expect(auditService.viewedVisits).toHaveBeenCalledTimes(1)
-        expect(auditService.viewedVisits).toHaveBeenCalledWith('2022-05-23', 'HEI', undefined, undefined)
+        expect(auditService.viewedVisits).toHaveBeenCalledWith({
+          viewDate: '2022-05-23',
+          username: undefined,
+          operationId: undefined,
+        })
       })
   })
 
@@ -312,7 +324,11 @@ describe('GET /visits', () => {
         expect($('.moj-side-navigation__title').text()).toContain('Open visits')
         expect($('.moj-side-navigation__item--active').text()).toContain('10am to 11am')
         expect(auditService.viewedVisits).toHaveBeenCalledTimes(1)
-        expect(auditService.viewedVisits).toHaveBeenCalledWith(todayDate, 'HEI', undefined, undefined)
+        expect(auditService.viewedVisits).toHaveBeenCalledWith({
+          viewDate: todayDate,
+          username: undefined,
+          operationId: undefined,
+        })
       })
   })
 
@@ -344,7 +360,11 @@ describe('GET /visits', () => {
         expect($('.govuk-back-link').attr('href')).toBe('/')
         expect($('#search-results-none').text()).toContain('No visit sessions on this day.')
         expect(auditService.viewedVisits).toHaveBeenCalledTimes(1)
-        expect(auditService.viewedVisits).toHaveBeenCalledWith(todayDate, 'HEI', undefined, undefined)
+        expect(auditService.viewedVisits).toHaveBeenCalledWith({
+          viewDate: todayDate,
+          username: undefined,
+          operationId: undefined,
+        })
       })
   })
 
@@ -362,7 +382,11 @@ describe('GET /visits', () => {
         expect($('.govuk-back-link').attr('href')).toBe('/')
         expect($('#search-results-none').text()).toContain('No visit sessions on this day.')
         expect(auditService.viewedVisits).toHaveBeenCalledTimes(1)
-        expect(auditService.viewedVisits).toHaveBeenCalledWith('2022-05-23', 'HEI', undefined, undefined)
+        expect(auditService.viewedVisits).toHaveBeenCalledWith({
+          viewDate: '2022-05-23',
+          username: undefined,
+          operationId: undefined,
+        })
       })
   })
 })
