@@ -259,14 +259,13 @@ export default function routes(
 
       const visit = await visitSessionsService.cancelVisit({ username: res.locals.user?.username, reference, outcome })
 
-      await auditService.cancelledVisit(
-        reference,
-        visit.prisonerId.toString(),
-        'HEI',
-        `${req.body.cancel}: ${req.body[reasonFieldName]}`,
-        res.locals.user?.username,
-        res.locals.appInsightsOperationId,
-      )
+      await auditService.cancelledVisit({
+        visitReference: reference,
+        prisonerId: visit.prisonerId.toString(),
+        reason: `${req.body.cancel}: ${req.body[reasonFieldName]}`,
+        username: res.locals.user?.username,
+        operationId: res.locals.appInsightsOperationId,
+      })
 
       if (config.apis.notifications.enabled) {
         try {
