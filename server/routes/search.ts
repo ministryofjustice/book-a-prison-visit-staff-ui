@@ -144,7 +144,11 @@ export default function routes(
       }
     }
 
-    await auditService.visitSearch(search, res.locals.user?.username, res.locals.appInsightsOperationId)
+    await auditService.visitSearch({
+      searchTerms: search,
+      username: res.locals.user?.username,
+      operationId: res.locals.appInsightsOperationId,
+    })
 
     const realNumberOfResults = errors.length > 0 || noResults ? 0 : 1
     const currentPageMax = parsedPage * pageSize

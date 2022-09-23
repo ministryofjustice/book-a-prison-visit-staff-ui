@@ -248,7 +248,7 @@ describe('Audit service', () => {
   })
 
   it('sends a visit search audit message', async () => {
-    await auditService.visitSearch('ab-cd-ef-gh', 'username', 'operation-id')
+    await auditService.visitSearch({ searchTerms: 'ab-cd-ef-gh', username: 'username', operationId: 'operation-id' })
 
     expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
     expect(sqsClientInstance.send.mock.lastCall[0]).toMatchObject({
