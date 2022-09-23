@@ -166,7 +166,11 @@ describe('GET /prisoner/A1234BC', () => {
         expect($('#vo-override').length).toBe(0)
         expect($('[data-test="book-a-visit"]').length).toBe(1)
         expect(auditService.viewPrisoner).toHaveBeenCalledTimes(1)
-        expect(auditService.viewPrisoner).toHaveBeenCalledWith('A1234BC', 'HEI', undefined, undefined)
+        expect(auditService.viewPrisoner).toHaveBeenCalledWith({
+          prisonerId: 'A1234BC',
+          username: undefined,
+          operationId: undefined,
+        })
       })
   })
 
@@ -186,7 +190,11 @@ describe('GET /prisoner/A1234BC', () => {
         expect($('[data-test="active-alert-count"]').text()).toBe('0 active')
         expect($('#active-alerts').text()).toContain('There are no active alerts for this prisoner.')
         expect(auditService.viewPrisoner).toHaveBeenCalledTimes(1)
-        expect(auditService.viewPrisoner).toHaveBeenCalledWith('A1234BC', 'HEI', undefined, undefined)
+        expect(auditService.viewPrisoner).toHaveBeenCalledWith({
+          prisonerId: 'A1234BC',
+          username: undefined,
+          operationId: undefined,
+        })
       })
   })
 
@@ -207,7 +215,11 @@ describe('GET /prisoner/A1234BC', () => {
         expect($('#vo-override').length).toBe(0)
         expect($('[data-test="book-a-visit"]').length).toBe(1)
         expect(auditService.viewPrisoner).toHaveBeenCalledTimes(1)
-        expect(auditService.viewPrisoner).toHaveBeenCalledWith('A1234BC', 'HEI', undefined, undefined)
+        expect(auditService.viewPrisoner).toHaveBeenCalledWith({
+          prisonerId: 'A1234BC',
+          username: undefined,
+          operationId: undefined,
+        })
       })
   })
 
@@ -227,7 +239,11 @@ describe('GET /prisoner/A1234BC', () => {
         expect($('label[for="vo-override"]').text()).toContain('The prisoner has no available visiting orders')
         expect($('[data-test="book-a-visit"]').length).toBe(1)
         expect(auditService.viewPrisoner).toHaveBeenCalledTimes(1)
-        expect(auditService.viewPrisoner).toHaveBeenCalledWith('A1234BC', 'HEI', undefined, undefined)
+        expect(auditService.viewPrisoner).toHaveBeenCalledWith({
+          prisonerId: 'A1234BC',
+          username: undefined,
+          operationId: undefined,
+        })
       })
   })
 
@@ -259,7 +275,11 @@ describe('GET /prisoner/A1234BC', () => {
         expect(flashProvider).toHaveBeenCalledWith('errors')
         expect(flashProvider).toHaveBeenCalledTimes(1)
         expect(auditService.viewPrisoner).toHaveBeenCalledTimes(1)
-        expect(auditService.viewPrisoner).toHaveBeenCalledWith('A1234BC', 'HEI', undefined, undefined)
+        expect(auditService.viewPrisoner).toHaveBeenCalledWith({
+          prisonerId: 'A1234BC',
+          username: undefined,
+          operationId: undefined,
+        })
       })
   })
 
