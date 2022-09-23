@@ -34,13 +34,13 @@ export default class VisitType {
     visitSessionData.visitRestriction = req.body.visitType
     visitSessionData.closedVisitReason = req.body.visitType === 'CLOSED' ? 'prisoner' : undefined
 
-    await this.auditService.visitRestrictionSelected(
-      visitSessionData.prisoner.offenderNo,
-      visitSessionData.visitRestriction,
-      visitSessionData.visitors.map(visitor => visitor.personId.toString()),
-      res.locals.user?.username,
-      res.locals.appInsightsOperationId,
-    )
+    await this.auditService.visitRestrictionSelected({
+      prisonerId: visitSessionData.prisoner.offenderNo,
+      visitRestriction: visitSessionData.visitRestriction,
+      visitorIds: visitSessionData.visitors.map(visitor => visitor.personId.toString()),
+      username: res.locals.user?.username,
+      operationId: res.locals.appInsightsOperationId,
+    })
 
     const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.previousVisitReference)
     return res.redirect(`${urlPrefix}/select-date-and-time`)
