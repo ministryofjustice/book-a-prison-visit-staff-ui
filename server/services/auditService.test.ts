@@ -68,17 +68,16 @@ describe('Audit service', () => {
   })
 
   it('sends a visit reserved audit message', async () => {
-    await auditService.reservedVisit(
-      'ab-cd-ef-gh',
-      'A1234BC',
-      'HEI',
-      ['abc123', 'bcd321'],
-      '2022-08-24T11:00:00',
-      '2022-08-24T12:00:00',
-      'OPEN',
-      'username',
-      'operation-id',
-    )
+    await auditService.reservedVisit({
+      visitReference: 'ab-cd-ef-gh',
+      prisonerId: 'A1234BC',
+      visitorIds: ['abc123', 'bcd321'],
+      startTimestamp: '2022-08-24T11:00:00',
+      endTimestamp: '2022-08-24T12:00:00',
+      visitRestriction: 'OPEN',
+      username: 'username',
+      operationId: 'operation-id',
+    })
 
     expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
     expect(sqsClientInstance.send.mock.lastCall[0]).toMatchObject({
