@@ -81,14 +81,13 @@ export default class CheckYourBooking {
           outcome,
         })
 
-        await this.auditService.cancelledVisit(
-          visitSessionData.previousVisitReference,
-          visitSessionData.prisoner.offenderNo,
-          'HEI',
-          `${outcome.outcomeStatus}: Superseded by ${outcome.text}`,
-          res.locals.user?.username,
-          res.locals.appInsightsOperationId,
-        )
+        await this.auditService.cancelledVisit({
+          visitReference: visitSessionData.previousVisitReference,
+          prisonerId: visitSessionData.prisoner.offenderNo,
+          reason: `${outcome.outcomeStatus}: Superseded by ${outcome.text}`,
+          username: res.locals.user?.username,
+          operationId: res.locals.appInsightsOperationId,
+        })
       }
 
       if (config.apis.notifications.enabled) {

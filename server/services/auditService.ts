@@ -110,14 +110,21 @@ export default class AuditService {
     })
   }
 
-  async cancelledVisit(
-    visitReference: string,
-    prisonerId: string,
-    prisonId: string,
-    reason: string,
-    username: string,
-    operationId: string,
-  ) {
+  async cancelledVisit({
+    visitReference,
+    prisonerId,
+    prisonId = 'HEI',
+    reason,
+    username,
+    operationId,
+  }: {
+    visitReference: string
+    prisonerId: string
+    prisonId?: string
+    reason: string
+    username: string
+    operationId: string
+  }) {
     return this.sendAuditMessage({
       action: 'CANCELLED_VISIT',
       who: username,

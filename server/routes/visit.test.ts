@@ -2098,14 +2098,13 @@ describe('/visit/:reference/update/check-your-booking', () => {
               text: visitSessionData.visitReference,
             },
           })
-          expect(auditService.cancelledVisit).toHaveBeenCalledWith(
-            visitSessionData.previousVisitReference,
-            visitSessionData.prisoner.offenderNo,
-            'HEI',
-            `SUPERSEDED_CANCELLATION: Superseded by ${visitSessionData.visitReference}`,
-            undefined,
-            undefined,
-          )
+          expect(auditService.cancelledVisit).toHaveBeenCalledWith({
+            visitReference: visitSessionData.previousVisitReference,
+            prisonerId: visitSessionData.prisoner.offenderNo,
+            reason: `SUPERSEDED_CANCELLATION: Superseded by ${visitSessionData.visitReference}`,
+            username: undefined,
+            operationId: undefined,
+          })
           expect(notificationsService.sendUpdateSms).toHaveBeenCalledTimes(1)
           expect(notificationsService.sendUpdateSms).toHaveBeenCalledWith({
             phoneNumber: '01234567890',
@@ -2329,14 +2328,13 @@ describe('POST /visit/:reference/cancel', () => {
         expect(flashProvider).toHaveBeenCalledWith('startTimestamp', cancelledVisit.startTimestamp)
         expect(flashProvider).toHaveBeenCalledWith('endTimestamp', cancelledVisit.endTimestamp)
         expect(auditService.cancelledVisit).toHaveBeenCalledTimes(1)
-        expect(auditService.cancelledVisit).toHaveBeenCalledWith(
-          'ab-cd-ef-gh',
-          'AF34567G',
-          'HEI',
-          'PRISONER_CANCELLED: illness',
-          undefined,
-          undefined,
-        )
+        expect(auditService.cancelledVisit).toHaveBeenCalledWith({
+          visitReference: 'ab-cd-ef-gh',
+          prisonerId: 'AF34567G',
+          reason: 'PRISONER_CANCELLED: illness',
+          username: undefined,
+          operationId: undefined,
+        })
         expect(notificationsService.sendCancellationSms).toHaveBeenCalledTimes(1)
         expect(notificationsService.sendCancellationSms).toHaveBeenCalledWith({
           phoneNumber: cancelledVisit.visitContact.telephone,

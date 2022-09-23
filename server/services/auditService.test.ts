@@ -130,14 +130,13 @@ describe('Audit service', () => {
   })
 
   it('sends a cancelled visit audit message', async () => {
-    await auditService.cancelledVisit(
-      'ab-cd-ef-gh',
-      'A1234BC',
-      'HEI',
-      'PRISONER_CANCELLED: illness',
-      'username',
-      'operation-id',
-    )
+    await auditService.cancelledVisit({
+      visitReference: 'ab-cd-ef-gh',
+      prisonerId: 'A1234BC',
+      reason: 'PRISONER_CANCELLED: illness',
+      username: 'username',
+      operationId: 'operation-id',
+    })
 
     expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
     expect(sqsClientInstance.send.mock.lastCall[0]).toMatchObject({
