@@ -180,7 +180,17 @@ export default class AuditService {
     })
   }
 
-  async printedVisitList(viewDate: string, prisonId: string, username: string, operationId: string) {
+  async printedVisitList({
+    viewDate,
+    prisonId = 'HEI',
+    username,
+    operationId,
+  }: {
+    viewDate: string
+    prisonId?: string
+    username: string
+    operationId: string
+  }) {
     return this.sendAuditMessage({
       action: 'PRINTED_VISIT_LIST',
       who: username,
