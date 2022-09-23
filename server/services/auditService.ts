@@ -56,17 +56,27 @@ export default class AuditService {
     })
   }
 
-  async reservedVisit(
-    visitReference: string,
-    prisonerId: string,
-    prisonId: string,
-    visitorIds: string[],
-    startTimestamp: string,
-    endTimestamp: string,
-    visitRestriction: Visit['visitRestriction'],
-    username: string,
-    operationId: string,
-  ) {
+  async reservedVisit({
+    visitReference,
+    prisonerId,
+    prisonId = 'HEI',
+    visitorIds,
+    startTimestamp,
+    endTimestamp,
+    visitRestriction,
+    username,
+    operationId,
+  }: {
+    visitReference: string
+    prisonerId: string
+    prisonId?: string
+    visitorIds: string[]
+    startTimestamp: string
+    endTimestamp: string
+    visitRestriction: Visit['visitRestriction']
+    username: string
+    operationId: string
+  }) {
     return this.sendAuditMessage({
       action: 'RESERVED_VISIT',
       who: username,

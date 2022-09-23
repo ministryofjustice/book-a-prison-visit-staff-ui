@@ -121,17 +121,16 @@ export default class DateAndTime {
       visitSessionData.visitStatus = visitStatus
     }
 
-    await this.auditService.reservedVisit(
-      visitSessionData.visitReference,
-      visitSessionData.prisoner.offenderNo,
-      'HEI',
-      visitSessionData.visitors.map(visitor => visitor.personId.toString()),
-      visitSessionData.visit.startTimestamp,
-      visitSessionData.visit.endTimestamp,
-      visitSessionData.visitRestriction,
-      res.locals.user?.username,
-      res.locals.appInsightsOperationId,
-    )
+    await this.auditService.reservedVisit({
+      visitReference: visitSessionData.visitReference,
+      prisonerId: visitSessionData.prisoner.offenderNo,
+      visitorIds: visitSessionData.visitors.map(visitor => visitor.personId.toString()),
+      startTimestamp: visitSessionData.visit.startTimestamp,
+      endTimestamp: visitSessionData.visit.endTimestamp,
+      visitRestriction: visitSessionData.visitRestriction,
+      username: res.locals.user?.username,
+      operationId: res.locals.appInsightsOperationId,
+    })
 
     const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.previousVisitReference)
     return res.redirect(`${urlPrefix}/additional-support`)
