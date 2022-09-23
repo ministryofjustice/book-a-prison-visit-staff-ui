@@ -57,17 +57,16 @@ export default class CheckYourBooking {
 
       visitSessionData.visitStatus = bookedVisit.visitStatus
 
-      await this.auditService.bookedVisit(
-        visitSessionData.visitReference,
-        visitSessionData.prisoner.offenderNo,
-        'HEI',
-        visitSessionData.visitors.map(visitor => visitor.personId.toString()),
-        visitSessionData.visit.startTimestamp,
-        visitSessionData.visit.endTimestamp,
-        visitSessionData.visitRestriction,
-        res.locals.user?.username,
-        res.locals.appInsightsOperationId,
-      )
+      await this.auditService.bookedVisit({
+        visitReference: visitSessionData.visitReference,
+        prisonerId: visitSessionData.prisoner.offenderNo,
+        visitorIds: visitSessionData.visitors.map(visitor => visitor.personId.toString()),
+        startTimestamp: visitSessionData.visit.startTimestamp,
+        endTimestamp: visitSessionData.visit.endTimestamp,
+        visitRestriction: visitSessionData.visitRestriction,
+        username: res.locals.user?.username,
+        operationId: res.locals.appInsightsOperationId,
+      })
 
       if (isUpdate) {
         const outcome: OutcomeDto = {
