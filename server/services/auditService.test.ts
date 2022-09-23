@@ -267,7 +267,12 @@ describe('Audit service', () => {
   })
 
   it('sends a viewed visit details audit message', async () => {
-    await auditService.viewedVisitDetails('ab-cd-ef-gh', 'A1234BC', 'HEI', 'username', 'operation-id')
+    await auditService.viewedVisitDetails({
+      visitReference: 'ab-cd-ef-gh',
+      prisonerId: 'A1234BC',
+      username: 'username',
+      operationId: 'operation-id',
+    })
 
     expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
     expect(sqsClientInstance.send.mock.lastCall[0]).toMatchObject({

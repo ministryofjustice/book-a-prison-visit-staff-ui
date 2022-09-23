@@ -253,13 +253,13 @@ describe('GET /visit/:reference', () => {
         expect($('[data-test="visit-booked"]').text()).toBe('Monday 14 February 2022 at 10am')
 
         expect(auditService.viewedVisitDetails).toHaveBeenCalledTimes(1)
-        expect(auditService.viewedVisitDetails).toHaveBeenCalledWith(
-          'ab-cd-ef-gh',
-          'A1234BC',
-          'HEI',
-          undefined,
-          undefined,
-        )
+        expect(auditService.viewedVisitDetails).toHaveBeenCalledWith({
+          visitReference: 'ab-cd-ef-gh',
+          prisonerId: 'A1234BC',
+          prisonId: 'HEI',
+          username: undefined,
+          operationId: undefined,
+        })
 
         expect(clearSession).toHaveBeenCalledTimes(1)
         expect(visitSessionData).toEqual({
@@ -359,13 +359,13 @@ describe('GET /visit/:reference', () => {
         expect($('[data-test="visit-booked"]').text()).toBe('Monday 14 February 2022 at 10am')
 
         expect(auditService.viewedVisitDetails).toHaveBeenCalledTimes(1)
-        expect(auditService.viewedVisitDetails).toHaveBeenCalledWith(
-          'ab-cd-ef-gh',
-          'A1234BC',
-          'HEI',
-          undefined,
-          undefined,
-        )
+        expect(auditService.viewedVisitDetails).toHaveBeenCalledWith({
+          visitReference: 'ab-cd-ef-gh',
+          prisonerId: 'A1234BC',
+          prisonId: 'HEI',
+          username: undefined,
+          operationId: undefined,
+        })
 
         expect(clearSession).toHaveBeenCalledTimes(1)
         expect(visitSessionData).toEqual({
@@ -472,13 +472,13 @@ describe('GET /visit/:reference', () => {
         expect($('[data-test="visit-booked"]').text()).toBe('Monday 14 February 2022 at 10am')
 
         expect(auditService.viewedVisitDetails).toHaveBeenCalledTimes(1)
-        expect(auditService.viewedVisitDetails).toHaveBeenCalledWith(
-          'ab-cd-ef-gh',
-          'A1234BC',
-          'HEI',
-          undefined,
-          undefined,
-        )
+        expect(auditService.viewedVisitDetails).toHaveBeenCalledWith({
+          visitReference: 'ab-cd-ef-gh',
+          prisonerId: 'A1234BC',
+          prisonId: 'HEI',
+          username: undefined,
+          operationId: undefined,
+        })
 
         expect(clearSession).toHaveBeenCalledTimes(1)
       })
@@ -532,13 +532,13 @@ describe('GET /visit/:reference', () => {
         expect($('[data-test="visit-booked"]').text()).toBe('Monday 14 February 2022 at 10am')
 
         expect(auditService.viewedVisitDetails).toHaveBeenCalledTimes(1)
-        expect(auditService.viewedVisitDetails).toHaveBeenCalledWith(
-          'ab-cd-ef-gh',
-          'A1234BC',
-          'HEI',
-          undefined,
-          undefined,
-        )
+        expect(auditService.viewedVisitDetails).toHaveBeenCalledWith({
+          visitReference: 'ab-cd-ef-gh',
+          prisonerId: 'A1234BC',
+          prisonId: 'HEI',
+          username: undefined,
+          operationId: undefined,
+        })
 
         expect(clearSession).toHaveBeenCalledTimes(1)
       })
