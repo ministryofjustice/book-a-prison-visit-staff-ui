@@ -45,132 +45,90 @@
     </div>
 </div>
 
+{% set displayRows = [
+    {
+        key: {
+            text: "Date"
+        },
+        value: {
+            text: visit.startTimestamp | formatDate("EEEE d MMMM yyyy"),
+            classes: "test-visit-date"
+        }
+    },
+    {
+        key: {
+            text: "Time"
+        },
+        value: {
+            text: visit.startTimestamp | formatTime + " to " + visit.endTimestamp | formatTime,
+            classes: "test-visit-time"
+        }
+    },
+    {
+        key: {
+            text: "Visit type"
+        },
+        value: {
+            text: visitRestriction | capitalize,
+            classes: "test-visit-type"
+        }
+    }
+] %}
+
+{%- for visitor in visitors %}
+    {% set displayRows = (displayRows.push(
+        {
+            key: {
+                text: "Visitor " + loop.index
+            },
+            value: {
+                html: '<p><span class="test-visitor-name' + loop.index + '">' + visitor.name | safe+ " (" + (visitor.relationshipDescription | lower) + ' of the prisoner)</span><br><span class="test-visitor-address' + loop.index + '">' + visitor.address | replace("<br>", " ") + "</span>"
+            }
+        }
+    ), displayRows) %}
+{% endfor %}
+{% set support %}
+    {% if additionalSupport | length %}
+        {{ additionalSupport | join(', ') }}
+    {% else %}
+        {{ "None." }}
+    {% endif %}
+{% endset %}
+{% set displayRows = (displayRows.push(
+    {
+        key: {
+            text: "Additional support requests"
+        },
+        value: {
+            html: '<p class="test-additional-support">' + support + '</p>'
+        }
+    }
+), displayRows) %}
+
+{% set contactName %}
+    {% if mainContact.contactName %}
+        {{ mainContact.contactName | safe }}
+    {% else %}
+        {{ mainContact.contact.name | safe + " (" + (mainContact.contact.relationshipDescription | lower) + " of the prisoner)" }}
+    {% endif %}
+{% endset %}
+{% set displayRows = (displayRows.push(
+    {
+        key: {
+            text: "Main contact"
+        },
+        value: {
+            html: '<p class="test-main-contact-name">' + contactName + '</p><p class="test-main-contact-number">' + mainContact.phoneNumber + '</p>'
+        }
+    }
+), displayRows) %}
+     
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
         <h2 class="govuk-heading-m">Visit details</h2>
-        {{ govukSummaryList({
-            rows: [
-                {
-                    key: {
-                        text: "Date"
-                    },
-                    value: {
-                        text: visit.startTimestamp | formatDate("EEEE d MMMM yyyy"),
-                        classes: "test-visit-date"
-                    }
-                },
-                {
-                    key: {
-                        text: "Time"
-                    },
-                    value: {
-                        text: visit.startTimestamp | formatTime + " to " + visit.endTimestamp | formatTime,
-                        classes: "test-visit-time"
-                    }
-                },
-                {
-                    key: {
-                        text: "Visit type"
-                    },
-                    value: {
-                        text: visitRestriction | capitalize,
-                        classes: "test-visit-type"
-                    }
-                }
-            ]
-        }) }}
-
-        <h2 class="govuk-heading-m">Prisoner details</h2>
-        {{ govukSummaryList({
-            rows: [
-                {
-                    key: {
-                        text: "Name"
-                    },
-                    value: {
-                        text: prisoner.name,
-                        classes: "test-prisoner-name"
-                    }
-                },
-                {
-                    key: {
-                        text: "Location"
-                    },
-                    value: {
-                        text: prisoner.location,
-                        classes: "test-prisoner-location"
-                    }
-                }
-            ]
-        }) }}
-        <h2 class="govuk-heading-m">Visitor details</h2>
-        {%- for visitor in visitors %}
-            {{ govukSummaryList({
-                rows: [
-                    {
-                        key: {
-                            text: "Visitor " + loop.index
-                        },
-                        value: {
-                            text: visitor.name + " (" + (visitor.relationshipDescription | lower) + " of the prisoner)",
-                            classes: "test-visitor-name" + loop.index
-                        }
-                    }
-                ]
-            }) }}
-        {% endfor %}
-        <h2 class="govuk-heading-m">Additional support</h2>
-        {% set additionalSupportRows = [] %}
-        {% for item in additionalSupport %}
-          {% set additionalSupportRows = (additionalSupportRows.push(
-            {
-              key: {
-                text: "Request " + loop.index
-              },
-              value: {
-                text: item,
-                classes: "test-additional-support" + loop.index
-              }
-            }
-          ), additionalSupportRows) %}
-        {% endfor %}
-        {% if (additionalSupportRows | length) %}
-            {{ govukSummaryList({
-                rows: additionalSupportRows
-            }) }}
-        {% else %}
-        <p data-test="no-addition-support-chosen">None.</p>
-        {% endif %}
-        <h2 class="govuk-heading-m">Contact details</h2>
-        {% set contactName %}
-        {% if mainContact.contactName %}
-        {{ mainContact.contactName | safe }}
-        {% else %}
-        {{ mainContact.contact.name | safe + " (" + (mainContact.contact.relationshipDescription | lower) + " of the prisoner)" }}
-        {% endif %}
-        {% endset %}
-        {{ govukSummaryList({
-            rows: [
-                {
-                    key: {
-                        text: "Main contact"
-                    },
-                    value: {
-                        text: contactName,
-                        classes: "test-main-contact-name"
-                    }
-                },
-                {
-                    key: {
-                        text: "Phone number"
-                    },
-                    value: {
-                        text: mainContact.phoneNumber,
-                        classes: "test-main-contact-number"
-                    }
-                }
-            ]
-        }) }} 
+        {{ govukSummaryList ({
+            rows: displayRows
+        })}}
     </div>
 </div>
 {% endblock %}
