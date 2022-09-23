@@ -75,13 +75,13 @@ export default function routes(
     const prisonerLocation =
       prisoner.prisonId === 'HEI' ? `${prisoner.cellLocation}, ${prisoner.prisonName}` : 'Unknown'
 
-    await auditService.viewedVisitDetails(
-      reference,
-      visit.prisonerId,
-      visit.prisonId,
-      res.locals.user?.username,
-      res.locals.appInsightsOperationId,
-    )
+    await auditService.viewedVisitDetails({
+      visitReference: reference,
+      prisonerId: visit.prisonerId,
+      prisonId: visit.prisonId,
+      username: res.locals.user?.username,
+      operationId: res.locals.appInsightsOperationId,
+    })
 
     const visitorIds = visit.visitors.flatMap(visitor => visitor.nomisPersonId)
     const mainContactVisitor = visit.visitors.find(visitor => visitor.visitContact)
