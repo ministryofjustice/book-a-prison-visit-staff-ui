@@ -337,7 +337,11 @@ describe('Booking search page', () => {
           expect(res.text).toContain('Search for a booking')
           expect(res.text).toContain('id="search-results-none"')
           expect(auditService.visitSearch).toHaveBeenCalledTimes(1)
-          expect(auditService.visitSearch).toHaveBeenCalledWith('ab-bc-cd-de', undefined, undefined)
+          expect(auditService.visitSearch).toHaveBeenCalledWith({
+            searchTerms: 'ab-bc-cd-de',
+            username: undefined,
+            operationId: undefined,
+          })
         })
     })
   })
@@ -368,7 +372,11 @@ describe('Booking search page', () => {
           expect(res.text).toContain('Search for a booking')
           expect(res.text).toContain('id="search-results-true"')
           expect(auditService.visitSearch).toHaveBeenCalledTimes(1)
-          expect(auditService.visitSearch).toHaveBeenCalledWith('ab-bc-cd-de', undefined, undefined)
+          expect(auditService.visitSearch).toHaveBeenCalledWith({
+            searchTerms: 'ab-bc-cd-de',
+            username: undefined,
+            operationId: undefined,
+          })
         })
     })
   })
