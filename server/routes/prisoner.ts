@@ -58,7 +58,11 @@ export default function routes(
         return res.redirect(req.originalUrl)
       }
 
-      await auditService.overrodeZeroVO(offenderNo, res.locals.user?.username, res.locals.appInsightsOperationId)
+      await auditService.overrodeZeroVO({
+        prisonerId: offenderNo,
+        username: res.locals.user?.username,
+        operationId: res.locals.appInsightsOperationId,
+      })
     }
 
     clearSession(req)
