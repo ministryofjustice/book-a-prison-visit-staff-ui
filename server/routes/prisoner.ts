@@ -27,7 +27,11 @@ export default function routes(
     const queryParamsForBackLink = new URLSearchParams({ search }).toString()
 
     const prisonerProfile = await prisonerProfileService.getProfile(offenderNo, res.locals.user?.username)
-    await auditService.viewPrisoner(offenderNo, 'HEI', res.locals.user?.username, res.locals.appInsightsOperationId)
+    await auditService.viewPrisoner({
+      prisonerId: offenderNo,
+      username: res.locals.user?.username,
+      operationId: res.locals.appInsightsOperationId,
+    })
 
     return res.render('pages/prisoner/profile', {
       errors: req.flash('errors'),
