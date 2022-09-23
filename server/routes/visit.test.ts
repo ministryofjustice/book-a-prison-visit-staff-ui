@@ -2079,17 +2079,16 @@ describe('/visit/:reference/update/check-your-booking', () => {
           expect(visitSessionsService.updateVisit).toHaveBeenCalledTimes(1)
           expect(visitSessionData.visitStatus).toBe('BOOKED')
           expect(auditService.bookedVisit).toHaveBeenCalledTimes(1)
-          expect(auditService.bookedVisit).toHaveBeenCalledWith(
-            visitSessionData.visitReference,
-            visitSessionData.prisoner.offenderNo,
-            'HEI',
-            [visitSessionData.visitors[0].personId.toString()],
-            '2022-03-12T09:30:00',
-            '2022-03-12T10:30:00',
-            'OPEN',
-            undefined,
-            undefined,
-          )
+          expect(auditService.bookedVisit).toHaveBeenCalledWith({
+            visitReference: visitSessionData.visitReference,
+            prisonerId: visitSessionData.prisoner.offenderNo,
+            visitorIds: [visitSessionData.visitors[0].personId.toString()],
+            startTimestamp: '2022-03-12T09:30:00',
+            endTimestamp: '2022-03-12T10:30:00',
+            visitRestriction: 'OPEN',
+            username: undefined,
+            operationId: undefined,
+          })
           expect(visitSessionsService.cancelVisit).toHaveBeenCalledWith({
             username: undefined,
             reference: visitSessionData.previousVisitReference,
