@@ -5,9 +5,10 @@ export default class Confirmation {
   constructor(private readonly mode: string) {}
 
   async get(req: Request, res: Response): Promise<void> {
-    // const isUpdate = this.mode === 'update'
+    const isUpdate = this.mode === 'update'
     const { visitSessionData } = req.session
 
+    res.locals.isUpdate = isUpdate
     res.locals.prisoner = visitSessionData.prisoner
     res.locals.visit = visitSessionData.visit
     res.locals.visitRestriction = visitSessionData.visitRestriction

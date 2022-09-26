@@ -3,7 +3,12 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/panel/macro.njk" import govukPanel %}
 
-{% set pageHeaderTitle = "Booking confirmed" %}
+{% if isUpdate %}
+    {% set pageHeaderTitle = "Booking updated" %}
+{% else %}
+    {% set pageHeaderTitle = "Booking confirmed" %}
+{% endif %}
+
 {% set pageTitle %}
 {{ applicationName }} - {{ pageHeaderTitle }}
 {% endset %}
@@ -21,21 +26,29 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
         {% include "partials/errorSummary.njk" %}
-        <h2 class="govuk-heading-m govuk-!-margin-top-6">What to do next</h2>
-        <p>Let the caller know:</p>
-        <ul class="govuk-body">
-            <li>if they gave a UK mobile number, the main contact will receive a text message with the booking reference and visit details</li>
-            <li>they will need the booking reference to <a href="/search/visit">cancel the booking</a></li>
-            <li>changes to the booking can be made up to 2 working days before the visit</li>
-            <li>who can <a href="https://www.gov.uk/help-with-prison-visits">get help with the cost of visits</a></li>
-        </ul>
-        <p>To prepare for the visit day, tell them:</p>
-        <ul class="govuk-body">
-            <li>what time to arrive for the visit</li>
-            <li>all adult visitors will need to bring <a href="https://www.gov.uk/government/publications/management-of-security-at-visits-policy-framework-open-estate/acceptable-forms-of-identification-id-when-visiting-a-prison-in-england-and-wales-annex-a">acceptable forms of ID</a></li>
-            <li>any COVID-19 requirements (such as face coverings and lateral flow tests)</li>
-            <li>any prison specific rules (such as clothing guidelines)</li>
-        </ul>
+
+        {% if isUpdate %}
+            <h2 class="govuk-heading-m govuk-!-margin-top-6">What happens next</h2>
+            <p>The visit booking for {{ visit.startTimestamp | formatTime + " to " + visit.endTimestamp | formatTime }} on {{ visit.startTimestamp | formatDate("EEEE d MMMM yyyy") }} has been updated.</p>
+            <p>The main contact for this visit will get a text message to confirm the updated booking. This will include the booking reference.</p>
+        {% else %}
+            <h2 class="govuk-heading-m govuk-!-margin-top-6">What to do next</h2>
+            <p>Let the caller know:</p>
+            <ul class="govuk-body">
+                <li>if they gave a UK mobile number, the main contact will receive a text message with the booking reference and visit details</li>
+                <li>they will need the booking reference to <a href="/search/visit">cancel the booking</a></li>
+                <li>changes to the booking can be made up to 2 working days before the visit</li>
+                <li>who can <a href="https://www.gov.uk/help-with-prison-visits">get help with the cost of visits</a></li>
+            </ul>
+            <p>To prepare for the visit day, tell them:</p>
+            <ul class="govuk-body">
+                <li>what time to arrive for the visit</li>
+                <li>all adult visitors will need to bring <a href="https://www.gov.uk/government/publications/management-of-security-at-visits-policy-framework-open-estate/acceptable-forms-of-identification-id-when-visiting-a-prison-in-england-and-wales-annex-a">acceptable forms of ID</a></li>
+                <li>any COVID-19 requirements (such as face coverings and lateral flow tests)</li>
+                <li>any prison specific rules (such as clothing guidelines)</li>
+            </ul>
+        {% endif %}
+
         {{ govukButton({
             classes: "govuk-!-margin-top-3, govuk-!-margin-bottom-6",
             text: "Go to manage prison visits",
