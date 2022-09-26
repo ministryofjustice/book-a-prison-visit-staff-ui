@@ -7,6 +7,7 @@ import {
   VisitSession,
   OutcomeDto,
   ReserveVisitSlotDto,
+  ChangeReservedVisitSlotRequestDto,
 } from './visitSchedulerApiTypes'
 import { VisitSessionData } from '../@types/bapv'
 import config from '../config'
@@ -96,6 +97,38 @@ class VisitSchedulerApiClient {
             nomisPersonId: visitor.personId,
           }
         }),
+      },
+    })
+  }
+
+  changeReservedVisit(visitSessionData: VisitSessionData): Promise<Visit> {
+    const visitContact = visitSessionData.mainContact
+      ? {
+          telephone: visitSessionData.mainContact.phoneNumber,
+          name: visitSessionData.mainContact.contactName
+            ? visitSessionData.mainContact.contactName
+            : visitSessionData.mainContact.contact.name,
+        }
+      : undefined
+    const mainContactId =
+      visitSessionData.mainContact && visitSessionData.mainContact.contact
+        ? visitSessionData.mainContact.contact.personId
+        : null
+
+    return this.restclient.put({
+      path: `/visits/${visitSessionData.applicationReference}/slot/change`,
+      data: <ChangeReservedVisitSlotRequestDto>{
+        visitRestriction: visitSessionData.visitRestriction,
+        startTimestamp: visitSessionData.visit.startTimestamp,
+        endTimestamp: visitSessionData.visit.endTimestamp,
+        visitContact,
+        visitors: visitSessionData.visitors.map(visitor => {
+          return {
+            nomisPersonId: visitor.personId,
+            visitContact: visitor.personId === mainContactId,
+          }
+        }),
+        visitorSupport: visitSessionData.visitorSupport,
       },
     })
   }
