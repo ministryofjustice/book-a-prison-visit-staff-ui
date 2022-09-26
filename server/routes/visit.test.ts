@@ -147,6 +147,7 @@ describe('GET /visit/:reference', () => {
 
   beforeEach(() => {
     visit = {
+      applicationReference: 'aaa-bbb-ccc',
       reference: 'ab-cd-ef-gh',
       prisonerId: 'A1234BC',
       prisonId: 'HEI',
@@ -2122,6 +2123,7 @@ describe('POST /visit/:reference/cancel', () => {
   const notificationsService = new NotificationsService(null) as jest.Mocked<NotificationsService>
 
   const cancelledVisit: Visit = {
+    applicationReference: 'aaa-bbb-ccc',
     reference: 'ab-cd-ef-gh',
     prisonerId: 'AF34567G',
     prisonId: 'HEI',

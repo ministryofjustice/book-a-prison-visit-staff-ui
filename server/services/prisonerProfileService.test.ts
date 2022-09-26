@@ -86,6 +86,7 @@ describe('Prisoner profile service', () => {
       }
 
       const visit: Visit = {
+        applicationReference: 'aaa-bbb-ccc',
         reference: 'ab-cd-ef-gh',
         prisonerId: 'A1234BC',
         prisonId: 'HEI',

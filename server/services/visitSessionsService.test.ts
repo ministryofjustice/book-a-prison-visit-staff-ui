@@ -684,6 +684,7 @@ describe('Visit sessions service', () => {
         ],
       }
       const visit: Visit = {
+        applicationReference: 'aaa-bbb-ccc',
         reference: 'ab-cd-ef-gh',
         prisonerId: visitSessionData.prisoner.offenderNo,
         prisonId: 'HEI',
@@ -759,6 +760,7 @@ describe('Visit sessions service', () => {
         visitStatus: 'RESERVED',
       }
       const visit: Visit = {
+        applicationReference: 'aaa-bbb-ccc',
         reference: 'ab-cd-ef-gh',
         prisonerId: visitSessionData.prisoner.offenderNo,
         prisonId: 'HEI',
@@ -793,6 +795,7 @@ describe('Visit sessions service', () => {
 
       expect(visitSchedulerApiClient.updateVisit).toHaveBeenCalledTimes(1)
       expect(result).toEqual(<Visit>{
+        applicationReference: 'aaa-bbb-ccc',
         reference: 'ab-cd-ef-gh',
         prisonerId: 'A1234BC',
         prisonId: 'HEI',
@@ -815,6 +818,7 @@ describe('Visit sessions service', () => {
   describe('cancelVisit', () => {
     it('should cancel a visit, giving the status code and reason', async () => {
       const expectedResult: Visit = {
+        applicationReference: 'aaa-bbb-ccc',
         reference: 'ab-cd-ef-gh',
         prisonerId: 'AF34567G',
         prisonId: 'HEI',
@@ -864,6 +868,7 @@ describe('Visit sessions service', () => {
 
   describe('getVisit', () => {
     const visit: Visit = {
+      applicationReference: 'aaa-bbb-ccc',
       reference: 'ab-cd-ef-gh',
       prisonerId: 'A1234BC',
       prisonId: 'HEI',
@@ -1081,6 +1086,7 @@ describe('Visit sessions service', () => {
 
       const visits: Visit[] = [
         {
+          applicationReference: 'aaa-bbb-ccc',
           reference: 'ob-cw-lx-na',
           prisonerId: 'A8709DY',
           prisonId: 'HEI',
@@ -1106,6 +1112,7 @@ describe('Visit sessions service', () => {
           modifiedTimestamp: '2022-05-23T10:09:56.64691',
         },
         {
+          applicationReference: 'aaa-bbb-ccc',
           reference: 'lb-co-bn-oe',
           prisonerId: 'A8709DY',
           prisonId: 'HEI',

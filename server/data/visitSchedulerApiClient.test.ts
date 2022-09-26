@@ -51,6 +51,7 @@ describe('visitSchedulerApiClient', () => {
     it('should return a single matching Visit from the Visit Scheduler API for a valid reference', async () => {
       const reference = 'ab-cd-ef-gh'
       const result: Visit = {
+        applicationReference: 'aaa-bbb-ccc',
         reference: 'ab-cd-ef-gh',
         prisonerId: 'A1234BC',
         prisonId: 'HEI',
@@ -92,6 +93,7 @@ describe('visitSchedulerApiClient', () => {
       const offenderNo = 'A1234BC'
       const results: Visit[] = [
         {
+          applicationReference: 'aaa-bbb-ccc',
           reference: 'ab-cd-ef-gh',
           prisonerId: offenderNo,
           prisonId: 'HEI',
@@ -140,6 +142,7 @@ describe('visitSchedulerApiClient', () => {
       const offenderNo = 'A1234BC'
       const results: Visit[] = [
         {
+          applicationReference: 'aaa-bbb-ccc',
           reference: 'ab-cd-ef-gh',
           prisonerId: offenderNo,
           prisonId: 'HEI',
@@ -188,6 +191,7 @@ describe('visitSchedulerApiClient', () => {
       const dateString = '2022-05-06'
       const results: Visit[] = [
         {
+          applicationReference: 'aaa-bbb-ccc',
           reference: 'ab-cd-ef-gh',
           prisonerId: 'A1234BC',
           prisonId: 'HEI',
@@ -271,6 +275,7 @@ describe('visitSchedulerApiClient', () => {
       const visitRestriction = 'OPEN'
 
       const result: Visit = {
+        applicationReference: 'aaa-bbb-ccc',
         reference: 'ab-cd-ef-gh',
         prisonerId: 'AF34567G',
         prisonId,
@@ -365,6 +370,7 @@ describe('visitSchedulerApiClient', () => {
 
     it('should return an updated Visit from the Visit Scheduler API, given full visitSessionData', async () => {
       const result: Visit = {
+        applicationReference: 'aaa-bbb-ccc',
         reference: 'ab-cd-ef-gh',
         prisonerId: 'AF34567G',
         prisonId,
@@ -473,6 +479,7 @@ describe('visitSchedulerApiClient', () => {
 
     it('should return an updated Visit from the Visit Scheduler API, given minimal visitSessionData', async () => {
       const result: Visit = {
+        applicationReference: 'aaa-bbb-ccc',
         reference: 'ab-cd-ef-gh',
         prisonerId: 'AF34567G',
         prisonId,
@@ -569,6 +576,7 @@ describe('visitSchedulerApiClient', () => {
       }
 
       const result: Visit = {
+        applicationReference: 'aaa-bbb-ccc',
         reference: 'ab-cd-ef-gh',
         prisonerId: 'AF34567G',
         prisonId: 'HEI',
