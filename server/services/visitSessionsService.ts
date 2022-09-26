@@ -162,19 +162,9 @@ export default class VisitSessionsService {
     return availableSessions
   }
 
-  async reserveVisit({ username, visitData }: { username: string; visitData: VisitSessionData }): Promise<Visit> {
-    const token = await this.systemToken(username)
-    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
-
-    const reservation = await visitSchedulerApiClient.reserveVisit(visitData)
-    logger.info(`Created visit ${reservation?.reference} for offender ${visitData.prisoner.offenderNo}`)
-
-    return reservation
-  }
-
-  async changeReservedVisit({
+  async reserveVisit({
     username,
-    visitSessionData: visitData,
+    visitSessionData,
   }: {
     username: string
     visitSessionData: VisitSessionData
@@ -182,7 +172,35 @@ export default class VisitSessionsService {
     const token = await this.systemToken(username)
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
 
-    const visit = await visitSchedulerApiClient.changeReservedVisit(visitData)
+    const reservation = await visitSchedulerApiClient.reserveVisit(visitSessionData)
+    return reservation
+  }
+
+  async changeReservedVisit({
+    username,
+    visitSessionData,
+  }: {
+    username: string
+    visitSessionData: VisitSessionData
+  }): Promise<Visit> {
+    const token = await this.systemToken(username)
+    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
+
+    const visit = await visitSchedulerApiClient.changeReservedVisit(visitSessionData)
+    return visit
+  }
+
+  async bookVisit({
+    username,
+    visitSessionData,
+  }: {
+    username: string
+    visitSessionData: VisitSessionData
+  }): Promise<Visit> {
+    const token = await this.systemToken(username)
+    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
+
+    const visit = await visitSchedulerApiClient.bookVisit(visitSessionData)
     return visit
   }
 

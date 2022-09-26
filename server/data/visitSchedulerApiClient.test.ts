@@ -9,6 +9,7 @@ import {
   OutcomeDto,
   VisitSession,
   ReserveVisitSlotDto,
+  ChangeReservedVisitSlotRequestDto,
 } from './visitSchedulerApiTypes'
 
 describe('visitSchedulerApiClient', () => {
@@ -351,6 +352,298 @@ describe('visitSchedulerApiClient', () => {
         .reply(201, result)
 
       const output = await client.reserveVisit(visitSessionData)
+
+      expect(output).toEqual(result)
+    })
+  })
+
+  describe('changeReservedVisit', () => {
+    const prisonId = 'HEI'
+    const visitType = 'SOCIAL'
+    const visitStatus = 'RESERVED'
+
+    it('should return a changed reserved Visit from the Visit Scheduler, given full visitSessionData', async () => {
+      const result: Visit = {
+        applicationReference: 'aaa-bbb-ccc',
+        reference: 'ab-cd-ef-gh',
+        prisonerId: 'AF34567G',
+        prisonId,
+        visitRoom: 'A1 L3',
+        visitType,
+        visitStatus,
+        visitRestriction: 'OPEN',
+        startTimestamp: '2022-02-14T10:00:00',
+        endTimestamp: '2022-02-14T11:00:00',
+        visitNotes: [],
+        visitContact: {
+          name: 'John Smith',
+          telephone: '01234 567890',
+        },
+        visitors: [
+          {
+            nomisPersonId: 1234,
+            visitContact: false,
+          },
+        ],
+        visitorSupport: [
+          { type: 'WHEELCHAIR' },
+          { type: 'MASK_EXEMPT' },
+          {
+            type: 'OTHER',
+            text: 'custom request',
+          },
+        ],
+        createdTimestamp: '2022-02-14T10:00:00',
+        modifiedTimestamp: '2022-02-14T10:05:00',
+      }
+
+      const visitSessionData: VisitSessionData = {
+        prisoner: {
+          offenderNo: result.prisonerId,
+          name: 'prisoner name',
+          dateOfBirth: '23 May 1988',
+          location: 'somewhere',
+        },
+        visit: {
+          id: '1',
+          startTimestamp: result.startTimestamp,
+          endTimestamp: result.endTimestamp,
+          availableTables: 1,
+          capacity: 30,
+          visitRoomName: result.visitRoom,
+          visitRestriction: 'OPEN',
+        },
+        visitRestriction: 'OPEN',
+        visitors: [
+          {
+            personId: 123,
+            name: 'visitor name',
+            relationshipDescription: 'relationship desc',
+            restrictions: [
+              {
+                restrictionType: 'TEST',
+                restrictionTypeDescription: 'test type',
+                startDate: '10 May 2020',
+                expiryDate: '10 May 2022',
+                globalRestriction: false,
+                comment: 'comments',
+              },
+            ],
+            banned: false,
+          },
+        ],
+        visitorSupport: [{ type: 'WHEELCHAIR' }, { type: 'MASK_EXEMPT' }, { type: 'OTHER', text: 'custom request' }],
+        mainContact: {
+          phoneNumber: result.visitContact.telephone,
+          contactName: result.visitContact.name,
+        },
+        applicationReference: 'aaa-bbb-ccc',
+        visitReference: 'ab-cd-ef-gh',
+        visitStatus,
+      }
+      const visitContact = {
+        telephone: visitSessionData.mainContact.phoneNumber,
+        name: visitSessionData.mainContact.contactName,
+      }
+
+      fakeVisitSchedulerApi
+        .put('/visits/aaa-bbb-ccc/slot/change', <ChangeReservedVisitSlotRequestDto>{
+          visitRestriction: visitSessionData.visitRestriction,
+          startTimestamp: visitSessionData.visit.startTimestamp,
+          endTimestamp: visitSessionData.visit.endTimestamp,
+          visitContact,
+          visitors: visitSessionData.visitors.map(visitor => {
+            return {
+              nomisPersonId: visitor.personId,
+              visitContact: false,
+            }
+          }),
+          visitorSupport: visitSessionData.visitorSupport,
+        })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, result)
+
+      const output = await client.changeReservedVisit(visitSessionData)
+
+      expect(output).toEqual(result)
+    })
+
+    it('should return an updated reserved Visit from the Visit Scheduler, given minimal visitSessionData', async () => {
+      const result: Visit = {
+        applicationReference: 'aaa-bbb-ccc',
+        reference: 'ab-cd-ef-gh',
+        prisonerId: 'AF34567G',
+        prisonId,
+        visitRoom: 'A1 L3',
+        visitType,
+        visitStatus,
+        visitRestriction: 'OPEN',
+        startTimestamp: '2022-02-14T10:00:00',
+        endTimestamp: '2022-02-14T11:00:00',
+        visitNotes: [],
+        visitors: [
+          {
+            nomisPersonId: 1234,
+            visitContact: false,
+          },
+        ],
+        visitorSupport: [],
+        createdTimestamp: '2022-02-14T10:00:00',
+        modifiedTimestamp: '2022-02-14T10:05:00',
+      }
+      const visitSessionData: VisitSessionData = {
+        prisoner: {
+          offenderNo: result.prisonerId,
+          name: 'prisoner name',
+          dateOfBirth: '23 May 1988',
+          location: 'somewhere',
+        },
+        visit: {
+          id: '1',
+          startTimestamp: result.startTimestamp,
+          endTimestamp: result.endTimestamp,
+          availableTables: 1,
+          capacity: 30,
+          visitRoomName: result.visitRoom,
+          visitRestriction: 'OPEN',
+        },
+        visitRestriction: 'OPEN',
+        visitors: [
+          {
+            personId: 123,
+            name: 'visitor name',
+            relationshipDescription: 'relationship desc',
+            restrictions: [
+              {
+                restrictionType: 'TEST',
+                restrictionTypeDescription: 'test type',
+                startDate: '10 May 2020',
+                expiryDate: '10 May 2022',
+                globalRestriction: false,
+                comment: 'comments',
+              },
+            ],
+            banned: false,
+          },
+        ],
+        applicationReference: 'aaa-bbb-ccc',
+        visitReference: 'ab-cd-ef-gh',
+        visitStatus,
+      }
+
+      fakeVisitSchedulerApi
+        .put('/visits/aaa-bbb-ccc/slot/change', <ChangeReservedVisitSlotRequestDto>{
+          visitRestriction: visitSessionData.visitRestriction,
+          startTimestamp: visitSessionData.visit.startTimestamp,
+          endTimestamp: visitSessionData.visit.endTimestamp,
+          visitContact: undefined,
+          visitors: visitSessionData.visitors.map(visitor => {
+            return {
+              nomisPersonId: visitor.personId,
+              visitContact: false,
+            }
+          }),
+          visitorSupport: undefined,
+        })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, result)
+
+      const output = await client.changeReservedVisit(visitSessionData)
+
+      expect(output).toEqual(result)
+    })
+  })
+
+  describe('bookVisit', () => {
+    const prisonId = 'HEI'
+    const visitType = 'SOCIAL'
+
+    it('should book a Visit (change status from RESERVED to BOOKED), given full visitSessionData', async () => {
+      const result: Visit = {
+        applicationReference: 'aaa-bbb-ccc',
+        reference: 'ab-cd-ef-gh',
+        prisonerId: 'AF34567G',
+        prisonId,
+        visitRoom: 'A1 L3',
+        visitType,
+        visitStatus: 'BOOKED',
+        visitRestriction: 'OPEN',
+        startTimestamp: '2022-02-14T10:00:00',
+        endTimestamp: '2022-02-14T11:00:00',
+        visitNotes: [],
+        visitContact: {
+          name: 'John Smith',
+          telephone: '01234 567890',
+        },
+        visitors: [
+          {
+            nomisPersonId: 1234,
+            visitContact: false,
+          },
+        ],
+        visitorSupport: [
+          { type: 'WHEELCHAIR' },
+          { type: 'MASK_EXEMPT' },
+          {
+            type: 'OTHER',
+            text: 'custom request',
+          },
+        ],
+        createdTimestamp: '2022-02-14T10:00:00',
+        modifiedTimestamp: '2022-02-14T10:05:00',
+      }
+
+      const visitSessionData: VisitSessionData = {
+        prisoner: {
+          offenderNo: result.prisonerId,
+          name: 'prisoner name',
+          dateOfBirth: '23 May 1988',
+          location: 'somewhere',
+        },
+        visit: {
+          id: '1',
+          startTimestamp: result.startTimestamp,
+          endTimestamp: result.endTimestamp,
+          availableTables: 1,
+          capacity: 30,
+          visitRoomName: result.visitRoom,
+          visitRestriction: 'OPEN',
+        },
+        visitRestriction: 'OPEN',
+        visitors: [
+          {
+            personId: 123,
+            name: 'visitor name',
+            relationshipDescription: 'relationship desc',
+            restrictions: [
+              {
+                restrictionType: 'TEST',
+                restrictionTypeDescription: 'test type',
+                startDate: '10 May 2020',
+                expiryDate: '10 May 2022',
+                globalRestriction: false,
+                comment: 'comments',
+              },
+            ],
+            banned: false,
+          },
+        ],
+        visitorSupport: [{ type: 'WHEELCHAIR' }, { type: 'MASK_EXEMPT' }, { type: 'OTHER', text: 'custom request' }],
+        mainContact: {
+          phoneNumber: result.visitContact.telephone,
+          contactName: result.visitContact.name,
+        },
+        applicationReference: 'aaa-bbb-ccc',
+        visitReference: 'ab-cd-ef-gh',
+        visitStatus: 'RESERVED',
+      }
+
+      fakeVisitSchedulerApi
+        .put('/visits/aaa-bbb-ccc/book')
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, result)
+
+      const output = await client.bookVisit(visitSessionData)
 
       expect(output).toEqual(result)
     })
