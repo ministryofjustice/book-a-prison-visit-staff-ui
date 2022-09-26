@@ -36,10 +36,12 @@
   },
   "jest": {
     "preset": "ts-jest",
-    "globals": {
-      "ts-jest": {
-        "isolatedModules": true
-      }
+    "transform": {
+      "^.+\\.tsx?$": [
+        "ts-jest", {
+          "isolatedModules": true
+        }
+      ]
     },
     "collectCoverage": true,
     "collectCoverageFrom": [
