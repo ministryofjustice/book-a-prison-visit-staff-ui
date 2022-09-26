@@ -6,10 +6,21 @@
 export interface paths {
   '/visits/{reference}': {
     /** Retrieve visit by visit reference */
-    get: operations['getVisitByReference']
+    get: operations['getBookedVisitByReference']
     put: operations['updateVisit']
-    /** Delete a visit by visit reference */
-    delete: operations['deleteVisit']
+  }
+  '/visits/{reference}/change': {
+    put: operations['changeBookedVisit']
+  }
+  '/visits/{reference}/cancel': {
+    put: operations['cancelVisit']
+    patch: operations['cancelVisit_1']
+  }
+  '/visits/{applicationReference}/slot/change': {
+    put: operations['changeReservedVisitSlot']
+  }
+  '/visits/{applicationReference}/book': {
+    put: operations['bookVisit']
   }
   '/queue-admin/retry-dlq/{dlqName}': {
     put: operations['retryDlq']
@@ -25,6 +36,9 @@ export interface paths {
     get: operations['getVisitsByFilter_1']
     post: operations['createVisit']
   }
+  '/visits/slot/reserve': {
+    post: operations['reserveVisitSlot']
+  }
   '/visit-session-templates': {
     /** Get all session templates */
     get: operations['getSessionTemplates']
@@ -32,9 +46,6 @@ export interface paths {
   }
   '/migrate-visits': {
     post: operations['migrateVisit']
-  }
-  '/visits/{reference}/cancel': {
-    patch: operations['cancelVisit']
   }
   '/visit-support': {
     /** Retrieve all available support types */
@@ -158,6 +169,11 @@ export interface components {
     /** @description Visit */
     VisitDto: {
       /**
+       * @description Application Reference
+       * @example dfs-wjs-eqr
+       */
+      applicationReference: string
+      /**
        * @description Visit Reference
        * @example v9-d7-ed-7u
        */
@@ -261,6 +277,106 @@ export interface components {
        * @example Visitor is concerned that his mother in-law is coming!
        */
       text: string
+    }
+    ReserveVisitSlotDto: {
+      /**
+       * @description Prisoner Id
+       * @example AF34567G
+       */
+      prisonerId: string
+      /**
+       * @description Prison Id
+       * @example MDI
+       */
+      prisonId: string
+      /**
+       * @description Visit Room
+       * @example A1
+       */
+      visitRoom: string
+      /**
+       * @description Visit Type
+       * @example SOCIAL
+       * @enum {string}
+       */
+      visitType: 'SOCIAL'
+      /**
+       * @description Visit Restriction
+       * @example OPEN
+       * @enum {string}
+       */
+      visitRestriction: 'OPEN' | 'CLOSED' | 'UNKNOWN'
+      /**
+       * Format: date-time
+       * @description The date and time of the visit
+       */
+      startTimestamp: string
+      /**
+       * Format: date-time
+       * @description The finishing date and time of the visit
+       */
+      endTimestamp: string
+      visitContact?: components['schemas']['ContactDto']
+      /** @description List of visitors associated with the visit */
+      visitors: components['schemas']['VisitorDto'][]
+      /** @description List of additional support associated with the visit */
+      visitorSupport?: components['schemas']['VisitorSupportDto'][]
+    }
+    /** @description Visit Outcome */
+    OutcomeDto: {
+      /**
+       * @description Outcome Status
+       * @example VISITOR_CANCELLED
+       * @enum {string}
+       */
+      outcomeStatus:
+        | 'ADMINISTRATIVE_CANCELLATION'
+        | 'ADMINISTRATIVE_ERROR'
+        | 'BATCH_CANCELLATION'
+        | 'CANCELLATION'
+        | 'COMPLETED_NORMALLY'
+        | 'ESTABLISHMENT_CANCELLED'
+        | 'NOT_RECORDED'
+        | 'NO_VISITING_ORDER'
+        | 'PRISONER_CANCELLED'
+        | 'PRISONER_COMPLETED_EARLY'
+        | 'PRISONER_REFUSED_TO_ATTEND'
+        | 'TERMINATED_BY_STAFF'
+        | 'VISITOR_CANCELLED'
+        | 'VISITOR_COMPLETED_EARLY'
+        | 'VISITOR_DECLINED_ENTRY'
+        | 'VISITOR_DID_NOT_ARRIVE'
+        | 'VISITOR_FAILED_SECURITY_CHECKS'
+        | 'VISIT_ORDER_CANCELLED'
+        | 'SUPERSEDED_CANCELLATION'
+      /**
+       * @description Outcome text
+       * @example Because he got covid
+       */
+      text?: string
+    }
+    ChangeReservedVisitSlotRequestDto: {
+      /**
+       * @description Visit Restriction
+       * @example OPEN
+       * @enum {string}
+       */
+      visitRestriction?: 'OPEN' | 'CLOSED' | 'UNKNOWN'
+      /**
+       * Format: date-time
+       * @description The date and time of the visit
+       */
+      startTimestamp?: string
+      /**
+       * Format: date-time
+       * @description The finishing date and time of the visit
+       */
+      endTimestamp?: string
+      visitContact?: components['schemas']['ContactDto']
+      /** @description List of visitors associated with the visit */
+      visitors?: components['schemas']['VisitorDto'][]
+      /** @description List of additional support associated with the visit */
+      visitorSupport?: components['schemas']['VisitorSupportDto'][]
     }
     Message: {
       messageId?: string
@@ -582,39 +698,6 @@ export interface components {
       /** @description Visit notes */
       visitNotes?: components['schemas']['VisitNoteDto'][]
     }
-    /** @description Visit Outcome */
-    OutcomeDto: {
-      /**
-       * @description Outcome Status
-       * @example VISITOR_CANCELLED
-       * @enum {string}
-       */
-      outcomeStatus:
-        | 'ADMINISTRATIVE_CANCELLATION'
-        | 'ADMINISTRATIVE_ERROR'
-        | 'BATCH_CANCELLATION'
-        | 'CANCELLATION'
-        | 'COMPLETED_NORMALLY'
-        | 'ESTABLISHMENT_CANCELLED'
-        | 'NOT_RECORDED'
-        | 'NO_VISITING_ORDER'
-        | 'PRISONER_CANCELLED'
-        | 'PRISONER_COMPLETED_EARLY'
-        | 'PRISONER_REFUSED_TO_ATTEND'
-        | 'TERMINATED_BY_STAFF'
-        | 'VISITOR_CANCELLED'
-        | 'VISITOR_COMPLETED_EARLY'
-        | 'VISITOR_DECLINED_ENTRY'
-        | 'VISITOR_DID_NOT_ARRIVE'
-        | 'VISITOR_FAILED_SECURITY_CHECKS'
-        | 'VISIT_ORDER_CANCELLED'
-        | 'SUPERSEDED_CANCELLATION'
-      /**
-       * @description Outcome text
-       * @example Because he got covid
-       */
-      text?: string
-    }
     PageVisitDto: {
       /** Format: int32 */
       totalPages?: number
@@ -628,9 +711,9 @@ export interface components {
       sort?: components['schemas']['SortObject']
       first?: boolean
       last?: boolean
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     PageableObject: {
@@ -739,7 +822,7 @@ export interface components {
 
 export interface operations {
   /** Retrieve visit by visit reference */
-  getVisitByReference: {
+  getBookedVisitByReference: {
     parameters: {
       path: {
         /** reference */
@@ -824,8 +907,7 @@ export interface operations {
       }
     }
   }
-  /** Delete a visit by visit reference */
-  deleteVisit: {
+  changeBookedVisit: {
     parameters: {
       path: {
         /** reference */
@@ -833,16 +915,206 @@ export interface operations {
       }
     }
     responses: {
-      /** Visit deleted */
-      200: unknown
+      /** Visit created */
+      201: {
+        content: {
+          'application/json': components['schemas']['VisitDto']
+        }
+      }
+      /** Incorrect request to change a booked visit */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** Unauthorized to access this endpoint */
       401: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
-      /** Incorrect permissions to delete a visit */
+      /** Incorrect permissions to change a booked visit */
       403: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ReserveVisitSlotDto']
+      }
+    }
+  }
+  cancelVisit: {
+    parameters: {
+      path: {
+        /** reference */
+        reference: string
+      }
+    }
+    responses: {
+      /** Visit cancelled */
+      200: {
+        content: {
+          'application/json': components['schemas']['VisitDto']
+        }
+      }
+      /** Incorrect request to cancel a visit */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** Unauthorized to access this endpoint */
+      401: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** Incorrect permissions to cancel a visit */
+      403: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** Visit not found */
+      404: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['OutcomeDto']
+      }
+    }
+  }
+  cancelVisit_1: {
+    parameters: {
+      path: {
+        /** reference */
+        reference: string
+      }
+    }
+    responses: {
+      /** Visit cancelled */
+      200: {
+        content: {
+          'application/json': components['schemas']['VisitDto']
+        }
+      }
+      /** Incorrect request to cancel a visit */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** Unauthorized to access this endpoint */
+      401: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** Incorrect permissions to cancel a visit */
+      403: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** Visit not found */
+      404: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['OutcomeDto']
+      }
+    }
+  }
+  changeReservedVisitSlot: {
+    parameters: {
+      path: {
+        /** applicationReference */
+        applicationReference: string
+      }
+    }
+    responses: {
+      /** Visit slot changed */
+      200: {
+        content: {
+          'application/json': components['schemas']['VisitDto']
+        }
+      }
+      /** Incorrect request to changed a visit slot */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** Unauthorized to access this endpoint */
+      401: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** Incorrect permissions to changed a visit slot */
+      403: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** Visit slot not found */
+      404: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ChangeReservedVisitSlotRequestDto']
+      }
+    }
+  }
+  bookVisit: {
+    parameters: {
+      path: {
+        /** applicationReference */
+        applicationReference: string
+      }
+    }
+    responses: {
+      /** Visit updated */
+      200: {
+        content: {
+          'application/json': components['schemas']['VisitDto']
+        }
+      }
+      /** Incorrect request to book a visit */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** Unauthorized to access this endpoint */
+      401: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** Incorrect permissions to book a visit */
+      403: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** Visit not found */
+      404: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
@@ -971,6 +1243,39 @@ export interface operations {
       }
     }
   }
+  reserveVisitSlot: {
+    responses: {
+      /** Visit slot reserved */
+      201: {
+        content: {
+          'application/json': components['schemas']['VisitDto']
+        }
+      }
+      /** Incorrect request to reserve a slot */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** Unauthorized to access this endpoint */
+      401: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** Incorrect permissions to reserve a slot */
+      403: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ReserveVisitSlotDto']
+      }
+    }
+  }
   /** Get all session templates */
   getSessionTemplates: {
     responses: {
@@ -1057,51 +1362,6 @@ export interface operations {
     requestBody: {
       content: {
         'application/json': components['schemas']['MigrateVisitRequestDto']
-      }
-    }
-  }
-  cancelVisit: {
-    parameters: {
-      path: {
-        /** reference */
-        reference: string
-      }
-    }
-    responses: {
-      /** Visit cancelled */
-      200: {
-        content: {
-          'application/json': components['schemas']['VisitDto']
-        }
-      }
-      /** Incorrect request to cancel a visit */
-      400: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** Unauthorized to access this endpoint */
-      401: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** Incorrect permissions to cancel a visit */
-      403: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** Visit not found */
-      404: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['OutcomeDto']
       }
     }
   }
