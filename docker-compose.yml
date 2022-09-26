@@ -1,11 +1,11 @@
 version: '3.1'
 services:
 
-  redis:
+  redis-bapv:
     image: 'bitnami/redis:5.0'
     networks:
       - hmpps
-    container_name: redis 
+    container_name: redis-bapv
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
     ports:
@@ -28,11 +28,11 @@ services:
     build: .
     networks:
       - hmpps
-    depends_on: [redis]
+    depends_on: [redis-bapv]
     ports:
       - "3000:3000"
     environment:
-      - REDIS_HOST=redis
+      - REDIS_HOST=redis-bapv
       - HMPPS_AUTH_EXTERNAL_URL=http://localhost:9090/auth
       - HMPPS_AUTH_URL=http://hmpps-auth:8080/auth
       - NOMIS_AUTH_EXTERNAL_URL=http://localhost:9090/auth
