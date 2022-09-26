@@ -49,10 +49,15 @@ export default class CheckYourBooking {
     )
 
     try {
-      const bookedVisit = await this.visitSessionsService.updateVisit({
+      // change reserved visit to have the latest data
+      await this.visitSessionsService.changeReservedVisit({
         username: res.locals.user?.username,
-        visitData: visitSessionData,
-        visitStatus: 'BOOKED',
+        visitSessionData,
+      })
+      // 'book' the visit: set it's status to BOOKED
+      const bookedVisit = await this.visitSessionsService.bookVisit({
+        username: res.locals.user?.username,
+        visitSessionData,
       })
 
       visitSessionData.visitStatus = bookedVisit.visitStatus
@@ -107,7 +112,7 @@ export default class CheckYourBooking {
       return res.render('pages/bookAVisit/checkYourBooking', {
         errors: [
           {
-            msg: 'Failed to make this reservation. You can try to submit again.',
+            msg: 'Failed to book this visit. You can try to submit again.',
             param: 'id',
           },
         ],
