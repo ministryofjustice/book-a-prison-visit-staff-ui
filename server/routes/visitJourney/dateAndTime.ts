@@ -116,7 +116,7 @@ export default class DateAndTime {
     } else {
       const { reference, visitStatus } = await this.visitSessionsService.reserveVisit({
         username: res.locals.user?.username,
-        visitData: visitSessionData,
+        visitSessionData,
       })
 
       visitSessionData.visitReference = reference

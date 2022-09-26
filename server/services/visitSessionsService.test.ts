@@ -645,17 +645,17 @@ describe('Visit sessions service', () => {
     })
   })
 
-  describe('reserveVisit', () => {
+  describe('reserveVisitSlot', () => {
     it('should create a new RESERVED visit and return the visit data', async () => {
       const visitSessionData: VisitSessionData = {
         prisoner: {
           offenderNo: 'A1234BC',
-          name: 'pri name',
+          name: 'prisoner name',
           dateOfBirth: '23 May 1988',
           location: 'somewhere',
         },
         visit: {
-          id: 'visitId',
+          id: '1',
           startTimestamp: '2022-02-14T10:00:00',
           endTimestamp: '2022-02-14T11:00:00',
           availableTables: 1,
@@ -668,7 +668,7 @@ describe('Visit sessions service', () => {
           {
             personId: 123,
             name: 'visitor name',
-            relationshipDescription: 'rel desc',
+            relationshipDescription: 'relationship desc',
             restrictions: [
               {
                 restrictionType: 'TEST',

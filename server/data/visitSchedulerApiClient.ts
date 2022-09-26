@@ -1,12 +1,12 @@
 import { URLSearchParams } from 'url'
 import RestClient from './restClient'
 import {
-  CreateVisitRequestDto,
   SupportType,
   UpdateVisitRequestDto,
   Visit,
   VisitSession,
   OutcomeDto,
+  ReserveVisitSlotDto,
 } from './visitSchedulerApiTypes'
 import { VisitSessionData } from '../@types/bapv'
 import config from '../config'
@@ -82,8 +82,8 @@ class VisitSchedulerApiClient {
 
   reserveVisit(visitData: VisitSessionData): Promise<Visit> {
     return this.restclient.post({
-      path: '/visits',
-      data: <CreateVisitRequestDto>{
+      path: '/visits/slot/reserve',
+      data: <ReserveVisitSlotDto>{
         prisonerId: visitData.prisoner.offenderNo,
         prisonId: this.prisonId,
         visitRoom: visitData.visit.visitRoomName,

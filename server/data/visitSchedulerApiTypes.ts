@@ -6,7 +6,8 @@ export type VisitorSupport = components['schemas']['VisitorSupportDto']
 
 export type Visit = components['schemas']['VisitDto']
 export type Visitor = components['schemas']['VisitorDto']
-export type CreateVisitRequestDto = components['schemas']['CreateVisitRequestDto']
+
+export type ReserveVisitSlotDto = components['schemas']['ReserveVisitSlotDto']
 export type UpdateVisitRequestDto = components['schemas']['UpdateVisitRequestDto']
 export type OutcomeDto = components['schemas']['OutcomeDto']
 

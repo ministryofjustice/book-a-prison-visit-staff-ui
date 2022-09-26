@@ -3,12 +3,12 @@ import { VisitSessionData } from '../@types/bapv'
 import config from '../config'
 import VisitSchedulerApiClient, { visitSchedulerApiClientBuilder } from './visitSchedulerApiClient'
 import {
-  CreateVisitRequestDto,
   SupportType,
   UpdateVisitRequestDto,
   Visit,
   OutcomeDto,
   VisitSession,
+  ReserveVisitSlotDto,
 } from './visitSchedulerApiTypes'
 
 describe('visitSchedulerApiClient', () => {
@@ -267,12 +267,14 @@ describe('visitSchedulerApiClient', () => {
     })
   })
 
-  describe('createVisit', () => {
+  describe('reserveVisit', () => {
     it('should return a new Visit from the Visit Scheduler API', async () => {
       const prisonId = 'HEI'
       const visitType = 'SOCIAL'
       const visitStatus = 'RESERVED'
       const visitRestriction = 'OPEN'
+      const startTimestamp = '2022-02-14T10:00:00'
+      const endTimestamp = '2022-02-14T11:00:00'
 
       const result: Visit = {
         applicationReference: 'aaa-bbb-ccc',
@@ -283,38 +285,29 @@ describe('visitSchedulerApiClient', () => {
         visitType,
         visitStatus,
         visitRestriction,
-        startTimestamp: '2022-02-14T10:00:00',
-        endTimestamp: '2022-02-14T11:00:00',
+        startTimestamp,
+        endTimestamp,
         visitNotes: [],
-        visitContact: {
-          name: 'John Smith',
-          telephone: '01234 567890',
-        },
         visitors: [
           {
             nomisPersonId: 1234,
           },
         ],
-        visitorSupport: [
-          {
-            type: 'OTHER',
-            text: 'custom support details',
-          },
-        ],
+        visitorSupport: [],
         createdTimestamp: '2022-02-14T10:00:00',
         modifiedTimestamp: '2022-02-14T10:05:00',
       }
       const visitSessionData = <VisitSessionData>{
         prisoner: {
           offenderNo: result.prisonerId,
-          name: 'pri name',
+          name: 'prisoner name',
           dateOfBirth: '23 May 1988',
           location: 'somewhere',
         },
         visit: {
-          id: 'visitId',
-          startTimestamp: result.startTimestamp,
-          endTimestamp: result.endTimestamp,
+          id: '1',
+          startTimestamp,
+          endTimestamp,
           availableTables: 1,
           visitRoomName: result.visitRoom,
         },
@@ -340,14 +333,14 @@ describe('visitSchedulerApiClient', () => {
       }
 
       fakeVisitSchedulerApi
-        .post('/visits', <CreateVisitRequestDto>{
+        .post('/visits/slot/reserve', <ReserveVisitSlotDto>{
           prisonerId: visitSessionData.prisoner.offenderNo,
           prisonId,
           visitRoom: visitSessionData.visit.visitRoomName,
           visitType,
           visitRestriction,
-          startTimestamp: visitSessionData.visit.startTimestamp,
-          endTimestamp: visitSessionData.visit.endTimestamp,
+          startTimestamp,
+          endTimestamp,
           visitors: visitSessionData.visitors.map(visitor => {
             return {
               nomisPersonId: visitor.personId,
