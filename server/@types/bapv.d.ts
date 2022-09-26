@@ -194,6 +194,7 @@ export type VisitSessionData = {
     phoneNumber: string
     contactName?: string
   }
+  applicationReference?: string
   visitReference?: string
   previousVisitReference?: string
   visitStatus?: Visit['visitStatus']

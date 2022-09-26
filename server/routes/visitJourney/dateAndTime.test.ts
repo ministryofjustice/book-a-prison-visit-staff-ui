@@ -307,10 +307,14 @@ describe('/book-a-visit/select-date-and-time', () => {
       systemToken,
     ) as jest.Mocked<VisitSessionsService>
 
-    const createdVisit: Partial<Visit> = { reference: '2a-bc-3d-ef', visitStatus: 'RESERVED' }
+    const reservedVisit: Partial<Visit> = {
+      applicationReference: 'aaa-bbb-ccc',
+      reference: 'ab-cd-ef-gh',
+      visitStatus: 'RESERVED',
+    }
 
     beforeEach(() => {
-      visitSessionsService.reserveVisit = jest.fn().mockResolvedValue(createdVisit)
+      visitSessionsService.reserveVisit = jest.fn().mockResolvedValue(reservedVisit)
       visitSessionsService.updateVisit = jest.fn()
 
       sessionApp = appWithAllRoutes({
@@ -324,7 +328,7 @@ describe('/book-a-visit/select-date-and-time', () => {
       })
     })
 
-    it('should save to session, create visit and redirect to additional support page if slot selected', () => {
+    it('should save to session, reserve visit and redirect to additional support page if slot selected', () => {
       return request(sessionApp)
         .post('/book-a-visit/select-date-and-time')
         .send('visit-date-and-time=2')
@@ -340,10 +344,16 @@ describe('/book-a-visit/select-date-and-time', () => {
             visitRoomName: 'room name',
             visitRestriction: 'OPEN',
           })
+          expect(visitSessionData.applicationReference).toEqual(reservedVisit.applicationReference)
+          expect(visitSessionData.visitReference).toEqual(reservedVisit.reference)
+          expect(visitSessionData.visitStatus).toEqual(reservedVisit.visitStatus)
+
           expect(visitSessionsService.reserveVisit).toHaveBeenCalledTimes(1)
+          expect(visitSessionsService.updateVisit).not.toHaveBeenCalled()
+
           expect(auditService.reservedVisit).toHaveBeenCalledTimes(1)
           expect(auditService.reservedVisit).toHaveBeenCalledWith({
-            visitReference: '2a-bc-3d-ef',
+            visitReference: reservedVisit.reference,
             prisonerId: 'A1234BC',
             visitorIds: ['4323'],
             startTimestamp: '2022-02-14T11:59:00',
@@ -352,9 +362,6 @@ describe('/book-a-visit/select-date-and-time', () => {
             username: undefined,
             operationId: undefined,
           })
-          expect(visitSessionsService.updateVisit).not.toHaveBeenCalled()
-          expect(visitSessionData.visitReference).toEqual('2a-bc-3d-ef')
-          expect(visitSessionData.visitStatus).toEqual('RESERVED')
         })
     })
 
@@ -369,7 +376,9 @@ describe('/book-a-visit/select-date-and-time', () => {
         visitRestriction: 'OPEN',
       }
 
-      visitSessionData.visitReference = '3b-cd-4f-fg'
+      visitSessionData.applicationReference = reservedVisit.applicationReference
+      visitSessionData.visitReference = reservedVisit.reference
+      visitSessionData.visitStatus = reservedVisit.visitStatus
 
       return request(sessionApp)
         .post('/book-a-visit/select-date-and-time')
@@ -388,10 +397,20 @@ describe('/book-a-visit/select-date-and-time', () => {
             sessionConflicts: ['DOUBLE_BOOKED'],
             visitRestriction: 'OPEN',
           })
+
+          expect(visitSessionData.applicationReference).toEqual(reservedVisit.applicationReference)
+          expect(visitSessionData.visitReference).toEqual(reservedVisit.reference)
+          expect(visitSessionData.visitStatus).toEqual(reservedVisit.visitStatus)
+
           expect(visitSessionsService.reserveVisit).not.toHaveBeenCalled()
+          expect(visitSessionsService.updateVisit).toHaveBeenCalledTimes(1)
+          expect(visitSessionsService.updateVisit.mock.calls[0][0].visitData.visitReference).toBe(
+            reservedVisit.reference,
+          )
+
           expect(auditService.reservedVisit).toHaveBeenCalledTimes(1)
           expect(auditService.reservedVisit).toHaveBeenCalledWith({
-            visitReference: '3b-cd-4f-fg',
+            visitReference: reservedVisit.reference,
             prisonerId: 'A1234BC',
             visitorIds: ['4323'],
             startTimestamp: '2022-02-14T12:00:00',
@@ -400,8 +419,6 @@ describe('/book-a-visit/select-date-and-time', () => {
             username: undefined,
             operationId: undefined,
           })
-          expect(visitSessionsService.updateVisit).toHaveBeenCalledTimes(1)
-          expect(visitSessionsService.updateVisit.mock.calls[0][0].visitData.visitReference).toBe('3b-cd-4f-fg')
         })
     })
 
