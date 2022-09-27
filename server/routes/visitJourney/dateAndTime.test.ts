@@ -315,7 +315,7 @@ describe('/book-a-visit/select-date-and-time', () => {
 
     beforeEach(() => {
       visitSessionsService.reserveVisit = jest.fn().mockResolvedValue(reservedVisit)
-      visitSessionsService.updateVisit = jest.fn()
+      visitSessionsService.changeReservedVisit = jest.fn()
 
       sessionApp = appWithAllRoutes({
         visitSessionsServiceOverride: visitSessionsService,
@@ -349,7 +349,7 @@ describe('/book-a-visit/select-date-and-time', () => {
           expect(visitSessionData.visitStatus).toEqual(reservedVisit.visitStatus)
 
           expect(visitSessionsService.reserveVisit).toHaveBeenCalledTimes(1)
-          expect(visitSessionsService.updateVisit).not.toHaveBeenCalled()
+          expect(visitSessionsService.changeReservedVisit).not.toHaveBeenCalled()
 
           expect(auditService.reservedVisit).toHaveBeenCalledTimes(1)
           expect(auditService.reservedVisit).toHaveBeenCalledWith({
@@ -403,8 +403,11 @@ describe('/book-a-visit/select-date-and-time', () => {
           expect(visitSessionData.visitStatus).toEqual(reservedVisit.visitStatus)
 
           expect(visitSessionsService.reserveVisit).not.toHaveBeenCalled()
-          expect(visitSessionsService.updateVisit).toHaveBeenCalledTimes(1)
-          expect(visitSessionsService.updateVisit.mock.calls[0][0].visitData.visitReference).toBe(
+          expect(visitSessionsService.changeReservedVisit).toHaveBeenCalledTimes(1)
+          expect(visitSessionsService.changeReservedVisit.mock.calls[0][0].visitSessionData.applicationReference).toBe(
+            reservedVisit.applicationReference,
+          )
+          expect(visitSessionsService.changeReservedVisit.mock.calls[0][0].visitSessionData.visitReference).toBe(
             reservedVisit.reference,
           )
 

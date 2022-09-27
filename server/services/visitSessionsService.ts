@@ -204,26 +204,6 @@ export default class VisitSessionsService {
     return visit
   }
 
-  async updateVisit({
-    username,
-    visitData,
-    visitStatus,
-  }: {
-    username: string
-    visitData: VisitSessionData
-    visitStatus: Visit['visitStatus']
-  }): Promise<Visit> {
-    const token = await this.systemToken(username)
-    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
-
-    const visit = await visitSchedulerApiClient.updateVisit(visitData, visitStatus)
-    logger.info(
-      `Updated visit ${visit.reference} (status = ${visitStatus}) for offender ${visitData.prisoner.offenderNo}`,
-    )
-
-    return visit
-  }
-
   async cancelVisit({
     username,
     reference,

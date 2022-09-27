@@ -107,11 +107,10 @@ export default class DateAndTime {
 
     visitSessionData.visit = getSelectedSlot(req.session.slotsList, req.body['visit-date-and-time'])
 
-    if (visitSessionData.visitReference) {
-      await this.visitSessionsService.updateVisit({
+    if (visitSessionData.applicationReference) {
+      await this.visitSessionsService.changeReservedVisit({
         username: res.locals.user?.username,
-        visitData: visitSessionData,
-        visitStatus: 'RESERVED',
+        visitSessionData,
       })
     } else {
       const { applicationReference, reference, visitStatus } = await this.visitSessionsService.reserveVisit({

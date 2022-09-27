@@ -2,7 +2,6 @@ import { URLSearchParams } from 'url'
 import RestClient from './restClient'
 import {
   SupportType,
-  UpdateVisitRequestDto,
   Visit,
   VisitSession,
   OutcomeDto,
@@ -135,41 +134,6 @@ class VisitSchedulerApiClient {
 
   bookVisit(visitSessionData: VisitSessionData): Promise<Visit> {
     return this.restclient.put({ path: `/visits/${visitSessionData.applicationReference}/book` })
-  }
-
-  updateVisit(visitData: VisitSessionData, visitStatus: string): Promise<Visit> {
-    const visitContact = visitData.mainContact
-      ? {
-          telephone: visitData.mainContact.phoneNumber,
-          name: visitData.mainContact.contactName
-            ? visitData.mainContact.contactName
-            : visitData.mainContact.contact.name,
-        }
-      : undefined
-    const mainContactId =
-      visitData.mainContact && visitData.mainContact.contact ? visitData.mainContact.contact.personId : null
-
-    return this.restclient.put({
-      path: `/visits/${visitData.visitReference}`,
-      data: <UpdateVisitRequestDto>{
-        prisonerId: visitData.prisoner.offenderNo,
-        prisonId: this.prisonId,
-        visitRoom: visitData.visit.visitRoomName,
-        visitType: this.visitType,
-        visitStatus,
-        visitRestriction: visitData.visitRestriction,
-        startTimestamp: visitData.visit.startTimestamp,
-        endTimestamp: visitData.visit.endTimestamp,
-        visitContact,
-        visitors: visitData.visitors.map(visitor => {
-          return {
-            nomisPersonId: visitor.personId,
-            visitContact: visitor.personId === mainContactId,
-          }
-        }),
-        visitorSupport: visitData.visitorSupport,
-      },
-    })
   }
 
   cancelVisit(reference: string, outcome: OutcomeDto): Promise<Visit> {
