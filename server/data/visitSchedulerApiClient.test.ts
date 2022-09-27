@@ -606,7 +606,7 @@ describe('visitSchedulerApiClient', () => {
         modifiedTimestamp: '2022-02-14T10:05:00',
       }
       fakeVisitSchedulerApi
-        .patch(`/visits/ab-cd-ef-gh/cancel`, outcome)
+        .put(`/visits/ab-cd-ef-gh/cancel`, outcome)
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, result)
 
