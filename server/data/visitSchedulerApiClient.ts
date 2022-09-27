@@ -136,7 +136,7 @@ class VisitSchedulerApiClient {
   }
 
   cancelVisit(reference: string, outcome: OutcomeDto): Promise<Visit> {
-    return this.restclient.patch({
+    return this.restclient.put({
       path: `/visits/${reference}/cancel`,
       data: outcome,
     })
