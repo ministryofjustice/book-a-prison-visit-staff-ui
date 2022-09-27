@@ -132,8 +132,8 @@ class VisitSchedulerApiClient {
     })
   }
 
-  bookVisit(visitSessionData: VisitSessionData): Promise<Visit> {
-    return this.restclient.put({ path: `/visits/${visitSessionData.applicationReference}/book` })
+  bookVisit(applicationReference: string): Promise<Visit> {
+    return this.restclient.put({ path: `/visits/${applicationReference}/book` })
   }
 
   cancelVisit(reference: string, outcome: OutcomeDto): Promise<Visit> {

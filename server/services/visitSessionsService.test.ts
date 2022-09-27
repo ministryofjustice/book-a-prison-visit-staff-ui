@@ -802,67 +802,17 @@ describe('Visit sessions service', () => {
 
   describe('bookVisit', () => {
     it('should book a visit (change status from RESERVED to BOOKED)', async () => {
-      const visitSessionData: VisitSessionData = {
-        prisoner: {
-          offenderNo: 'A1234BC',
-          name: 'prisoner name',
-          dateOfBirth: '23 May 1988',
-          location: 'somewhere',
-        },
-        visit: {
-          id: '1',
-          startTimestamp: '2022-02-14T10:00:00',
-          endTimestamp: '2022-02-14T11:00:00',
-          availableTables: 1,
-          capacity: 15,
-          visitRoomName: 'visit room',
-          visitRestriction: 'OPEN',
-        },
-        visitRestriction: 'OPEN',
-        visitors: [
-          {
-            personId: 123,
-            name: 'visitor name',
-            relationshipDescription: 'relationship desc',
-            restrictions: [
-              {
-                restrictionType: 'TEST',
-                restrictionTypeDescription: 'test type',
-                startDate: '10 May 2020',
-                expiryDate: '10 May 2022',
-                globalRestriction: false,
-                comment: 'comments',
-              },
-            ],
-            banned: false,
-          },
-        ],
-      }
-      const visit: Visit = {
-        applicationReference: visitSessionData.applicationReference,
-        reference: visitSessionData.visitReference,
-        prisonerId: visitSessionData.prisoner.offenderNo,
-        prisonId: 'HEI',
-        visitRoom: visitSessionData.visit.visitRoomName,
-        visitType: 'SOCIAL',
+      const applicationReference = 'aaa-bbb-ccc'
+
+      const visit: Partial<Visit> = {
+        applicationReference,
+        reference: 'ab-cd-ef-gh',
         visitStatus: 'BOOKED',
-        visitRestriction: visitSessionData.visitRestriction,
-        startTimestamp: visitSessionData.visit.startTimestamp,
-        endTimestamp: visitSessionData.visit.endTimestamp,
-        visitNotes: [],
-        visitors: [
-          {
-            nomisPersonId: 1234,
-          },
-        ],
-        visitorSupport: [],
-        createdTimestamp: '2022-02-14T10:00:00',
-        modifiedTimestamp: '2022-02-14T10:05:00',
       }
 
-      visitSchedulerApiClient.bookVisit.mockResolvedValue(visit)
+      visitSchedulerApiClient.bookVisit.mockResolvedValue(visit as Visit)
       whereaboutsApiClient.getEvents.mockResolvedValue([])
-      const result = await visitSessionsService.bookVisit({ username: 'user', visitSessionData })
+      const result = await visitSessionsService.bookVisit({ username: 'user', applicationReference })
 
       expect(visitSchedulerApiClient.bookVisit).toHaveBeenCalledTimes(1)
       expect(result).toEqual(visit)

@@ -57,7 +57,7 @@ export default class CheckYourBooking {
       // 'book' the visit: set it's status to BOOKED
       const bookedVisit = await this.visitSessionsService.bookVisit({
         username: res.locals.user?.username,
-        visitSessionData,
+        applicationReference: visitSessionData.applicationReference,
       })
 
       visitSessionData.visitStatus = bookedVisit.visitStatus
