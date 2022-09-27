@@ -162,33 +162,45 @@ export default class VisitSessionsService {
     return availableSessions
   }
 
-  async reserveVisit({ username, visitData }: { username: string; visitData: VisitSessionData }): Promise<Visit> {
-    const token = await this.systemToken(username)
-    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
-
-    const reservation = await visitSchedulerApiClient.reserveVisit(visitData)
-    logger.info(`Created visit ${reservation?.reference} for offender ${visitData.prisoner.offenderNo}`)
-
-    return reservation
-  }
-
-  async updateVisit({
+  async reserveVisit({
     username,
-    visitData,
-    visitStatus,
+    visitSessionData,
   }: {
     username: string
-    visitData: VisitSessionData
-    visitStatus: Visit['visitStatus']
+    visitSessionData: VisitSessionData
   }): Promise<Visit> {
     const token = await this.systemToken(username)
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
 
-    const visit = await visitSchedulerApiClient.updateVisit(visitData, visitStatus)
-    logger.info(
-      `Updated visit ${visit.reference} (status = ${visitStatus}) for offender ${visitData.prisoner.offenderNo}`,
-    )
+    const reservation = await visitSchedulerApiClient.reserveVisit(visitSessionData)
+    return reservation
+  }
 
+  async changeReservedVisit({
+    username,
+    visitSessionData,
+  }: {
+    username: string
+    visitSessionData: VisitSessionData
+  }): Promise<Visit> {
+    const token = await this.systemToken(username)
+    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
+
+    const visit = await visitSchedulerApiClient.changeReservedVisit(visitSessionData)
+    return visit
+  }
+
+  async bookVisit({
+    username,
+    applicationReference,
+  }: {
+    username: string
+    applicationReference: string
+  }): Promise<Visit> {
+    const token = await this.systemToken(username)
+    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
+
+    const visit = await visitSchedulerApiClient.bookVisit(applicationReference)
     return visit
   }
 

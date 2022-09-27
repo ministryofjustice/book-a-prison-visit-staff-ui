@@ -1,12 +1,12 @@
 import { URLSearchParams } from 'url'
 import RestClient from './restClient'
 import {
-  CreateVisitRequestDto,
   SupportType,
-  UpdateVisitRequestDto,
   Visit,
   VisitSession,
   OutcomeDto,
+  ReserveVisitSlotDto,
+  ChangeReservedVisitSlotRequestDto,
 } from './visitSchedulerApiTypes'
 import { VisitSessionData } from '../@types/bapv'
 import config from '../config'
@@ -80,18 +80,18 @@ class VisitSchedulerApiClient {
     })
   }
 
-  reserveVisit(visitData: VisitSessionData): Promise<Visit> {
+  reserveVisit(visitSessionData: VisitSessionData): Promise<Visit> {
     return this.restclient.post({
-      path: '/visits',
-      data: <CreateVisitRequestDto>{
-        prisonerId: visitData.prisoner.offenderNo,
+      path: '/visits/slot/reserve',
+      data: <ReserveVisitSlotDto>{
+        prisonerId: visitSessionData.prisoner.offenderNo,
         prisonId: this.prisonId,
-        visitRoom: visitData.visit.visitRoomName,
+        visitRoom: visitSessionData.visit.visitRoomName,
         visitType: this.visitType,
-        visitRestriction: visitData.visitRestriction,
-        startTimestamp: visitData.visit.startTimestamp,
-        endTimestamp: visitData.visit.endTimestamp,
-        visitors: visitData.visitors.map(visitor => {
+        visitRestriction: visitSessionData.visitRestriction,
+        startTimestamp: visitSessionData.visit.startTimestamp,
+        endTimestamp: visitSessionData.visit.endTimestamp,
+        visitors: visitSessionData.visitors.map(visitor => {
           return {
             nomisPersonId: visitor.personId,
           }
@@ -100,39 +100,40 @@ class VisitSchedulerApiClient {
     })
   }
 
-  updateVisit(visitData: VisitSessionData, visitStatus: string): Promise<Visit> {
-    const visitContact = visitData.mainContact
+  changeReservedVisit(visitSessionData: VisitSessionData): Promise<Visit> {
+    const visitContact = visitSessionData.mainContact
       ? {
-          telephone: visitData.mainContact.phoneNumber,
-          name: visitData.mainContact.contactName
-            ? visitData.mainContact.contactName
-            : visitData.mainContact.contact.name,
+          telephone: visitSessionData.mainContact.phoneNumber,
+          name: visitSessionData.mainContact.contactName
+            ? visitSessionData.mainContact.contactName
+            : visitSessionData.mainContact.contact.name,
         }
       : undefined
     const mainContactId =
-      visitData.mainContact && visitData.mainContact.contact ? visitData.mainContact.contact.personId : null
+      visitSessionData.mainContact && visitSessionData.mainContact.contact
+        ? visitSessionData.mainContact.contact.personId
+        : null
 
     return this.restclient.put({
-      path: `/visits/${visitData.visitReference}`,
-      data: <UpdateVisitRequestDto>{
-        prisonerId: visitData.prisoner.offenderNo,
-        prisonId: this.prisonId,
-        visitRoom: visitData.visit.visitRoomName,
-        visitType: this.visitType,
-        visitStatus,
-        visitRestriction: visitData.visitRestriction,
-        startTimestamp: visitData.visit.startTimestamp,
-        endTimestamp: visitData.visit.endTimestamp,
+      path: `/visits/${visitSessionData.applicationReference}/slot/change`,
+      data: <ChangeReservedVisitSlotRequestDto>{
+        visitRestriction: visitSessionData.visitRestriction,
+        startTimestamp: visitSessionData.visit.startTimestamp,
+        endTimestamp: visitSessionData.visit.endTimestamp,
         visitContact,
-        visitors: visitData.visitors.map(visitor => {
+        visitors: visitSessionData.visitors.map(visitor => {
           return {
             nomisPersonId: visitor.personId,
             visitContact: visitor.personId === mainContactId,
           }
         }),
-        visitorSupport: visitData.visitorSupport,
+        visitorSupport: visitSessionData.visitorSupport,
       },
     })
+  }
+
+  bookVisit(applicationReference: string): Promise<Visit> {
+    return this.restclient.put({ path: `/visits/${applicationReference}/book` })
   }
 
   cancelVisit(reference: string, outcome: OutcomeDto): Promise<Visit> {

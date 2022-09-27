@@ -645,17 +645,17 @@ describe('Visit sessions service', () => {
     })
   })
 
-  describe('reserveVisit', () => {
+  describe('reserveVisitSlot', () => {
     it('should create a new RESERVED visit and return the visit data', async () => {
       const visitSessionData: VisitSessionData = {
         prisoner: {
           offenderNo: 'A1234BC',
-          name: 'pri name',
+          name: 'prisoner name',
           dateOfBirth: '23 May 1988',
           location: 'somewhere',
         },
         visit: {
-          id: 'visitId',
+          id: '1',
           startTimestamp: '2022-02-14T10:00:00',
           endTimestamp: '2022-02-14T11:00:00',
           availableTables: 1,
@@ -668,7 +668,7 @@ describe('Visit sessions service', () => {
           {
             personId: 123,
             name: 'visitor name',
-            relationshipDescription: 'rel desc',
+            relationshipDescription: 'relationship desc',
             restrictions: [
               {
                 restrictionType: 'TEST',
@@ -707,19 +707,19 @@ describe('Visit sessions service', () => {
 
       visitSchedulerApiClient.reserveVisit.mockResolvedValue(visit)
       whereaboutsApiClient.getEvents.mockResolvedValue([])
-      const result = await visitSessionsService.reserveVisit({ username: 'user', visitData: visitSessionData })
+      const result = await visitSessionsService.reserveVisit({ username: 'user', visitSessionData })
 
       expect(visitSchedulerApiClient.reserveVisit).toHaveBeenCalledTimes(1)
       expect(result).toEqual(visit)
     })
   })
 
-  describe('updateVisit', () => {
-    it('should update an existing visit and return the visit data', async () => {
+  describe('changeReservedVisit', () => {
+    it('should change an existing reserved visit and return the visit data', async () => {
       const visitSessionData: VisitSessionData = {
         prisoner: {
           offenderNo: 'A1234BC',
-          name: 'pri name',
+          name: 'prisoner name',
           dateOfBirth: '23 May 1988',
           location: 'somewhere',
         },
@@ -756,20 +756,22 @@ describe('Visit sessions service', () => {
           phoneNumber: '01234 567890',
           contactName: 'John Smith',
         },
+        applicationReference: 'aaa-bbb-ccc',
         visitReference: 'ab-cd-ef-gh',
         visitStatus: 'RESERVED',
       }
+
       const visit: Visit = {
-        applicationReference: 'aaa-bbb-ccc',
-        reference: 'ab-cd-ef-gh',
+        applicationReference: visitSessionData.applicationReference,
+        reference: visitSessionData.visitReference,
         prisonerId: visitSessionData.prisoner.offenderNo,
         prisonId: 'HEI',
         visitRoom: visitSessionData.visit.visitRoomName,
         visitType: 'SOCIAL',
-        visitStatus: 'RESERVED',
-        visitRestriction: 'OPEN',
-        startTimestamp: '2022-02-14T10:00:00',
-        endTimestamp: '2022-02-14T11:00:00',
+        visitStatus: visitSessionData.visitStatus,
+        visitRestriction: visitSessionData.visitRestriction,
+        startTimestamp: visitSessionData.visit.startTimestamp,
+        endTimestamp: visitSessionData.visit.endTimestamp,
         visitNotes: [],
         visitContact: {
           name: 'John Smith',
@@ -785,33 +787,35 @@ describe('Visit sessions service', () => {
         modifiedTimestamp: '2022-02-14T10:05:00',
       }
 
-      visitSchedulerApiClient.updateVisit.mockResolvedValue(visit)
+      visitSchedulerApiClient.changeReservedVisit.mockResolvedValue(visit)
       whereaboutsApiClient.getEvents.mockResolvedValue([])
-      const result = await visitSessionsService.updateVisit({
+
+      const result = await visitSessionsService.changeReservedVisit({
         username: 'user',
-        visitData: visitSessionData,
-        visitStatus: 'RESERVED',
+        visitSessionData,
       })
 
-      expect(visitSchedulerApiClient.updateVisit).toHaveBeenCalledTimes(1)
-      expect(result).toEqual(<Visit>{
-        applicationReference: 'aaa-bbb-ccc',
+      expect(visitSchedulerApiClient.changeReservedVisit).toHaveBeenCalledTimes(1)
+      expect(result).toEqual(visit)
+    })
+  })
+
+  describe('bookVisit', () => {
+    it('should book a visit (change status from RESERVED to BOOKED)', async () => {
+      const applicationReference = 'aaa-bbb-ccc'
+
+      const visit: Partial<Visit> = {
+        applicationReference,
         reference: 'ab-cd-ef-gh',
-        prisonerId: 'A1234BC',
-        prisonId: 'HEI',
-        visitRoom: 'visit room',
-        visitType: 'SOCIAL',
-        visitStatus: 'RESERVED',
-        visitRestriction: 'OPEN',
-        startTimestamp: '2022-02-14T10:00:00',
-        endTimestamp: '2022-02-14T11:00:00',
-        visitNotes: [],
-        visitContact: { name: 'John Smith', telephone: '01234 567890' },
-        visitors: [{ nomisPersonId: 1234 }],
-        visitorSupport: [{ type: 'WHEELCHAIR' }, { type: 'MASK_EXEMPT' }, { type: 'OTHER', text: 'custom request' }],
-        createdTimestamp: '2022-02-14T10:00:00',
-        modifiedTimestamp: '2022-02-14T10:05:00',
-      })
+        visitStatus: 'BOOKED',
+      }
+
+      visitSchedulerApiClient.bookVisit.mockResolvedValue(visit as Visit)
+      whereaboutsApiClient.getEvents.mockResolvedValue([])
+      const result = await visitSessionsService.bookVisit({ username: 'user', applicationReference })
+
+      expect(visitSchedulerApiClient.bookVisit).toHaveBeenCalledTimes(1)
+      expect(result).toEqual(visit)
     })
   })
 

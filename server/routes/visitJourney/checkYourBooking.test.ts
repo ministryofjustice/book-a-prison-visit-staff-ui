@@ -97,6 +97,7 @@ describe('/book-a-visit/check-your-booking', () => {
         phoneNumber: '0123 456 7890',
         contactName: 'abc',
       },
+      applicationReference: 'aaa-bbb-ccc',
       visitReference: 'ab-cd-ef-gh',
       visitStatus: 'RESERVED',
     }
@@ -168,9 +169,19 @@ describe('/book-a-visit/check-your-booking', () => {
     const notificationsService = new NotificationsService(null) as jest.Mocked<NotificationsService>
 
     beforeEach(() => {
-      const bookedVisit: Partial<Visit> = { reference: visitSessionData.visitReference, visitStatus: 'BOOKED' }
+      const reservedVisit: Partial<Visit> = {
+        applicationReference: visitSessionData.applicationReference,
+        reference: visitSessionData.visitReference,
+        visitStatus: 'RESERVED',
+      }
+      const bookedVisit: Partial<Visit> = {
+        applicationReference: visitSessionData.applicationReference,
+        reference: visitSessionData.visitReference,
+        visitStatus: 'BOOKED',
+      }
 
-      visitSessionsService.updateVisit = jest.fn().mockResolvedValue(bookedVisit)
+      visitSessionsService.changeReservedVisit = jest.fn().mockResolvedValue(reservedVisit)
+      visitSessionsService.bookVisit = jest.fn().mockResolvedValue(bookedVisit)
       notificationsService.sendBookingSms = jest.fn().mockResolvedValue({})
 
       sessionApp = appWithAllRoutes({
@@ -193,7 +204,9 @@ describe('/book-a-visit/check-your-booking', () => {
         .expect(302)
         .expect('location', '/book-a-visit/confirmation')
         .expect(() => {
-          expect(visitSessionsService.updateVisit).toHaveBeenCalledTimes(1)
+          expect(visitSessionsService.changeReservedVisit).toHaveBeenCalledTimes(1)
+          expect(visitSessionsService.bookVisit).toHaveBeenCalledTimes(1)
+
           expect(visitSessionsService.cancelVisit).not.toHaveBeenCalled()
           expect(visitSessionData.visitStatus).toBe('BOOKED')
           expect(auditService.bookedVisit).toHaveBeenCalledTimes(1)
@@ -227,7 +240,9 @@ describe('/book-a-visit/check-your-booking', () => {
         .expect(302)
         .expect('location', '/book-a-visit/confirmation')
         .expect(() => {
-          expect(visitSessionsService.updateVisit).toHaveBeenCalledTimes(1)
+          expect(visitSessionsService.changeReservedVisit).toHaveBeenCalledTimes(1)
+          expect(visitSessionsService.bookVisit).toHaveBeenCalledTimes(1)
+
           expect(visitSessionsService.cancelVisit).not.toHaveBeenCalled()
           expect(visitSessionData.visitStatus).toBe('BOOKED')
           expect(auditService.bookedVisit).toHaveBeenCalledTimes(1)
@@ -243,7 +258,9 @@ describe('/book-a-visit/check-your-booking', () => {
         .expect(302)
         .expect('location', '/book-a-visit/confirmation')
         .expect(() => {
-          expect(visitSessionsService.updateVisit).toHaveBeenCalledTimes(1)
+          expect(visitSessionsService.changeReservedVisit).toHaveBeenCalledTimes(1)
+          expect(visitSessionsService.bookVisit).toHaveBeenCalledTimes(1)
+
           expect(visitSessionsService.cancelVisit).not.toHaveBeenCalled()
           expect(visitSessionData.visitStatus).toBe('BOOKED')
           expect(auditService.bookedVisit).toHaveBeenCalledTimes(1)
@@ -254,7 +271,7 @@ describe('/book-a-visit/check-your-booking', () => {
     it('should handle booking failure, display error message and NOT record audit event nor send SMS', () => {
       config.apis.notifications.enabled = true
 
-      visitSessionsService.updateVisit.mockRejectedValue({})
+      visitSessionsService.bookVisit.mockRejectedValue({})
 
       return request(sessionApp)
         .post('/book-a-visit/check-your-booking')
@@ -263,14 +280,16 @@ describe('/book-a-visit/check-your-booking', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('h1').text().trim()).toBe('Check the visit details before booking')
-          expect($('.govuk-error-summary__body').text()).toContain('Failed to make this reservation')
+          expect($('.govuk-error-summary__body').text()).toContain('Failed to book this visit')
           expect($('.test-prisoner-name').text()).toContain('prisoner name')
           expect($('.test-visit-date').text()).toContain('Saturday 12 March 2022')
           expect($('.test-visit-time').text()).toContain('9:30am to 10:30am')
           expect($('.test-visit-type').text()).toContain('Open')
           expect($('form').prop('action')).toBe('/book-a-visit/check-your-booking')
 
-          expect(visitSessionsService.updateVisit).toHaveBeenCalledTimes(1)
+          expect(visitSessionsService.changeReservedVisit).toHaveBeenCalledTimes(1)
+          expect(visitSessionsService.bookVisit).toHaveBeenCalledTimes(1)
+
           expect(visitSessionsService.cancelVisit).not.toHaveBeenCalled()
           expect(visitSessionData.visitStatus).toBe('RESERVED')
           expect(auditService.bookedVisit).not.toHaveBeenCalled()
