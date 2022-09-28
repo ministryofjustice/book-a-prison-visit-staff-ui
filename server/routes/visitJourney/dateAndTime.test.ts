@@ -353,6 +353,7 @@ describe('/book-a-visit/select-date-and-time', () => {
 
           expect(auditService.reservedVisit).toHaveBeenCalledTimes(1)
           expect(auditService.reservedVisit).toHaveBeenCalledWith({
+            applicationReference: reservedVisit.applicationReference,
             visitReference: reservedVisit.reference,
             prisonerId: 'A1234BC',
             visitorIds: ['4323'],
@@ -413,6 +414,7 @@ describe('/book-a-visit/select-date-and-time', () => {
 
           expect(auditService.reservedVisit).toHaveBeenCalledTimes(1)
           expect(auditService.reservedVisit).toHaveBeenCalledWith({
+            applicationReference: reservedVisit.applicationReference,
             visitReference: reservedVisit.reference,
             prisonerId: 'A1234BC',
             visitorIds: ['4323'],

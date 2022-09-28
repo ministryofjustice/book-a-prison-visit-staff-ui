@@ -124,6 +124,7 @@ export default class DateAndTime {
     }
 
     await this.auditService.reservedVisit({
+      applicationReference: visitSessionData.applicationReference,
       visitReference: visitSessionData.visitReference,
       prisonerId: visitSessionData.prisoner.offenderNo,
       visitorIds: visitSessionData.visitors.map(visitor => visitor.personId.toString()),

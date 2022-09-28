@@ -1,4 +1,4 @@
-import type { RequestHandler, Request, Router, NextFunction } from 'express'
+import { RequestHandler, Request, Router, NextFunction } from 'express'
 import { body, validationResult } from 'express-validator'
 import { BadRequest, NotFound } from 'http-errors'
 import visitCancellationReasons from '../constants/visitCancellationReasons'
