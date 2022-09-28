@@ -211,6 +211,7 @@ describe('/book-a-visit/check-your-booking', () => {
           expect(visitSessionData.visitStatus).toBe('BOOKED')
           expect(auditService.bookedVisit).toHaveBeenCalledTimes(1)
           expect(auditService.bookedVisit).toHaveBeenCalledWith({
+            applicationReference: visitSessionData.applicationReference,
             visitReference: visitSessionData.visitReference,
             prisonerId: visitSessionData.prisoner.offenderNo,
             visitorIds: [visitSessionData.visitors[0].personId.toString()],

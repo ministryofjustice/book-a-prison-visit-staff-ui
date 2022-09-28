@@ -67,6 +67,7 @@ export default class AuditService {
   }
 
   async reservedVisit({
+    applicationReference,
     visitReference,
     prisonerId,
     prisonId = 'HEI',
@@ -77,6 +78,7 @@ export default class AuditService {
     username,
     operationId,
   }: {
+    applicationReference: string
     visitReference: string
     prisonerId: string
     prisonId?: string
@@ -92,6 +94,7 @@ export default class AuditService {
       who: username,
       operationId,
       details: {
+        applicationReference,
         visitReference,
         prisonerId,
         prisonId,
@@ -104,6 +107,7 @@ export default class AuditService {
   }
 
   async bookedVisit({
+    applicationReference,
     visitReference,
     prisonerId,
     prisonId = 'HEI',
@@ -114,6 +118,7 @@ export default class AuditService {
     username,
     operationId,
   }: {
+    applicationReference: string
     visitReference: string
     prisonerId: string
     prisonId?: string
@@ -129,6 +134,7 @@ export default class AuditService {
       who: username,
       operationId,
       details: {
+        applicationReference,
         visitReference,
         prisonerId,
         prisonId,

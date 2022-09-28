@@ -63,6 +63,7 @@ export default class CheckYourBooking {
       visitSessionData.visitStatus = bookedVisit.visitStatus
 
       await this.auditService.bookedVisit({
+        applicationReference: visitSessionData.applicationReference,
         visitReference: visitSessionData.visitReference,
         prisonerId: visitSessionData.prisoner.offenderNo,
         visitorIds: visitSessionData.visitors.map(visitor => visitor.personId.toString()),
