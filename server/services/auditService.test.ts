@@ -73,7 +73,7 @@ describe('Audit service', () => {
 
   it('sends a visit reserved audit message', async () => {
     await auditService.reservedVisit({
-      applicationReference: 'ab-cd-ef-gh',
+      applicationReference: 'aaa-bbb-ccc',
       visitReference: 'ab-cd-ef-gh',
       prisonerId: 'A1234BC',
       visitorIds: ['abc123', 'bcd321'],
@@ -94,7 +94,7 @@ describe('Audit service', () => {
           who: 'username',
           service: 'book-a-prison-visit-staff-ui',
           details:
-            '{"applicationReference":"ab-cd-ef-gh","visitReference":"ab-cd-ef-gh","prisonerId":"A1234BC","prisonId":"HEI","visitorIds":["abc123","bcd321"],' +
+            '{"applicationReference":"aaa-bbb-ccc","visitReference":"ab-cd-ef-gh","prisonerId":"A1234BC","prisonId":"HEI","visitorIds":["abc123","bcd321"],' +
             '"startTimestamp":"2022-08-24T11:00:00","endTimestamp":"2022-08-24T12:00:00","visitRestriction":"OPEN"}',
         }),
         QueueUrl,
@@ -104,7 +104,7 @@ describe('Audit service', () => {
 
   it('sends a visit booked audit message', async () => {
     await auditService.bookedVisit({
-      applicationReference: 'ab-cd-ef-gh',
+      applicationReference: 'aaa-bbb-ccc',
       visitReference: 'ab-cd-ef-gh',
       prisonerId: 'A1234BC',
       visitorIds: ['abc123', 'bcd321'],
@@ -125,7 +125,7 @@ describe('Audit service', () => {
           who: 'username',
           service: 'book-a-prison-visit-staff-ui',
           details:
-            '{"applicationReference":"ab-cd-ef-gh","visitReference":"ab-cd-ef-gh","prisonerId":"A1234BC","prisonId":"HEI","visitorIds":["abc123","bcd321"],' +
+            '{"applicationReference":"aaa-bbb-ccc","visitReference":"ab-cd-ef-gh","prisonerId":"A1234BC","prisonId":"HEI","visitorIds":["abc123","bcd321"],' +
             '"startTimestamp":"2022-08-24T11:00:00","endTimestamp":"2022-08-24T12:00:00","visitRestriction":"OPEN"}',
         }),
         QueueUrl,
