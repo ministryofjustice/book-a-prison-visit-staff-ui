@@ -6,7 +6,7 @@ import {
   VisitSession,
   OutcomeDto,
   ReserveVisitSlotDto,
-  ChangeReservedVisitSlotRequestDto,
+  ChangeVisitSlotRequestDto,
 } from './visitSchedulerApiTypes'
 import { VisitSessionData } from '../@types/bapv'
 import config from '../config'
@@ -101,22 +101,11 @@ class VisitSchedulerApiClient {
   }
 
   changeReservedVisit(visitSessionData: VisitSessionData): Promise<Visit> {
-    const visitContact = visitSessionData.mainContact
-      ? {
-          telephone: visitSessionData.mainContact.phoneNumber,
-          name: visitSessionData.mainContact.contactName
-            ? visitSessionData.mainContact.contactName
-            : visitSessionData.mainContact.contact.name,
-        }
-      : undefined
-    const mainContactId =
-      visitSessionData.mainContact && visitSessionData.mainContact.contact
-        ? visitSessionData.mainContact.contact.personId
-        : null
+    const { visitContact, mainContactId } = convertMainContactToVisitContact(visitSessionData.mainContact)
 
     return this.restclient.put({
       path: `/visits/${visitSessionData.applicationReference}/slot/change`,
-      data: <ChangeReservedVisitSlotRequestDto>{
+      data: <ChangeVisitSlotRequestDto>{
         visitRestriction: visitSessionData.visitRestriction,
         startTimestamp: visitSessionData.visit.startTimestamp,
         endTimestamp: visitSessionData.visit.endTimestamp,
@@ -136,12 +125,52 @@ class VisitSchedulerApiClient {
     return this.restclient.put({ path: `/visits/${applicationReference}/book` })
   }
 
+  changeBookedVisit(visitSessionData: VisitSessionData): Promise<Visit> {
+    const { visitContact, mainContactId } = convertMainContactToVisitContact(visitSessionData.mainContact)
+
+    return this.restclient.put({
+      path: `/visits/${visitSessionData.visitReference}/change`,
+      data: <ReserveVisitSlotDto>{
+        prisonerId: visitSessionData.prisoner.offenderNo,
+        prisonId: this.prisonId,
+        visitRoom: visitSessionData.visit.visitRoomName,
+        visitType: this.visitType,
+        visitRestriction: visitSessionData.visitRestriction,
+        startTimestamp: visitSessionData.visit.startTimestamp,
+        endTimestamp: visitSessionData.visit.endTimestamp,
+        visitContact,
+        visitors: visitSessionData.visitors.map(visitor => {
+          return {
+            nomisPersonId: visitor.personId,
+            visitContact: visitor.personId === mainContactId,
+          }
+        }),
+        visitorSupport: visitSessionData.visitorSupport,
+      },
+    })
+  }
+
   cancelVisit(reference: string, outcome: OutcomeDto): Promise<Visit> {
     return this.restclient.put({
       path: `/visits/${reference}/cancel`,
       data: outcome,
     })
   }
+}
+
+function convertMainContactToVisitContact(mainContact: VisitSessionData['mainContact']): {
+  visitContact: ReserveVisitSlotDto['visitContact']
+  mainContactId: number
+} {
+  const visitContact = mainContact
+    ? {
+        telephone: mainContact.phoneNumber,
+        name: mainContact.contactName ? mainContact.contactName : mainContact.contact.name,
+      }
+    : undefined
+  const mainContactId = mainContact && mainContact.contact ? mainContact.contact.personId : null
+
+  return { visitContact, mainContactId }
 }
 
 export default VisitSchedulerApiClient
