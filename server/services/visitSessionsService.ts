@@ -204,6 +204,20 @@ export default class VisitSessionsService {
     return visit
   }
 
+  async changeBookedVisit({
+    username,
+    visitSessionData,
+  }: {
+    username: string
+    visitSessionData: VisitSessionData
+  }): Promise<Visit> {
+    const token = await this.systemToken(username)
+    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
+
+    const visit = await visitSchedulerApiClient.changeBookedVisit(visitSessionData)
+    return visit
+  }
+
   async cancelVisit({
     username,
     reference,
