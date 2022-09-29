@@ -17,7 +17,7 @@ export default class VisitType {
       errors: req.flash('errors'),
       restrictions: closedRestrictions,
       visitors: visitSessionData.visitors,
-      urlPrefix: getUrlPrefix(isUpdate, visitSessionData.previousVisitReference),
+      urlPrefix: getUrlPrefix(isUpdate, visitSessionData.visitReference),
     })
   }
 
@@ -42,7 +42,7 @@ export default class VisitType {
       operationId: res.locals.appInsightsOperationId,
     })
 
-    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.previousVisitReference)
+    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
     return res.redirect(`${urlPrefix}/select-date-and-time`)
   }
 

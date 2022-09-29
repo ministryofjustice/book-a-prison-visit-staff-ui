@@ -240,7 +240,7 @@ describe('GET /visit/:reference', () => {
         })
 
         expect(clearSession).toHaveBeenCalledTimes(1)
-        expect(visitSessionData).toEqual({
+        expect(visitSessionData).toEqual(<VisitSessionData>{
           prisoner: {
             name: 'Smith, John',
             offenderNo: 'A1234BC',
@@ -287,7 +287,8 @@ describe('GET /visit/:reference', () => {
           ],
           visitorSupport: [{ type: 'WHEELCHAIR' }, { text: 'custom request', type: 'OTHER' }],
           mainContact: { phoneNumber: '01234 567890', contactName: 'Jeanette Smith' },
-          previousVisitReference: 'ab-cd-ef-gh',
+          applicationReference: undefined,
+          visitReference: 'ab-cd-ef-gh',
           visitStatus: 'BOOKED',
         })
       })
@@ -346,7 +347,7 @@ describe('GET /visit/:reference', () => {
         })
 
         expect(clearSession).toHaveBeenCalledTimes(1)
-        expect(visitSessionData).toEqual({
+        expect(visitSessionData).toEqual(<VisitSessionData>{
           prisoner: {
             name: 'Smith, John',
             offenderNo: 'A1234BC',
@@ -393,7 +394,8 @@ describe('GET /visit/:reference', () => {
           ],
           visitorSupport: [{ type: 'WHEELCHAIR' }, { text: 'custom request', type: 'OTHER' }],
           mainContact: { phoneNumber: '01234 567890', contactName: 'Jeanette Smith' },
-          previousVisitReference: 'ab-cd-ef-gh',
+          applicationReference: undefined,
+          visitReference: 'ab-cd-ef-gh',
           visitStatus: 'BOOKED',
         })
       })
@@ -581,7 +583,7 @@ describe('GET /visit/:reference', () => {
 
 describe('GET /visit/:reference/update/select-visitors', () => {
   const visitorList: { visitors: VisitorListItem[] } = { visitors: [] }
-  const previousVisitReference = 'ab-cd-ef-gh'
+  const visitReference = 'ab-cd-ef-gh'
 
   let returnData: VisitorListItem[]
   let restrictions: OffenderRestriction[]
@@ -678,7 +680,7 @@ describe('GET /visit/:reference/update/select-visitors', () => {
           banned: false,
         },
       ],
-      previousVisitReference,
+      visitReference,
     }
 
     prisonerVisitorsService.getVisitors.mockResolvedValue(returnData)
@@ -697,7 +699,7 @@ describe('GET /visit/:reference/update/select-visitors', () => {
 
   it('should render the prisoner restrictions when they are present', () => {
     return request(sessionApp)
-      .get(`/visit/${previousVisitReference}/update/select-visitors`)
+      .get(`/visit/${visitReference}/update/select-visitors`)
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -735,7 +737,7 @@ describe('GET /visit/:reference/update/select-visitors', () => {
     })
 
     return request(sessionApp)
-      .get(`/visit/${previousVisitReference}/update/select-visitors`)
+      .get(`/visit/${visitReference}/update/select-visitors`)
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -762,7 +764,7 @@ describe('GET /visit/:reference/update/select-visitors', () => {
     })
 
     return request(sessionApp)
-      .get(`/visit/${previousVisitReference}/update/select-visitors`)
+      .get(`/visit/${visitReference}/update/select-visitors`)
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -778,7 +780,7 @@ describe('GET /visit/:reference/update/select-visitors', () => {
 
   it('should render the approved visitor list for offender number A1234BC with the original selected and store visitorList in session', () => {
     return request(sessionApp)
-      .get(`/visit/${previousVisitReference}/update/select-visitors`)
+      .get(`/visit/${visitReference}/update/select-visitors`)
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -831,7 +833,7 @@ describe('GET /visit/:reference/update/select-visitors', () => {
     ]
 
     return request(sessionApp)
-      .get(`/visit/${previousVisitReference}/update/select-visitors`)
+      .get(`/visit/${visitReference}/update/select-visitors`)
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -871,7 +873,7 @@ describe('GET /visit/:reference/update/select-visitors', () => {
     ]
 
     return request(sessionApp)
-      .get(`/visit/${previousVisitReference}/update/select-visitors`)
+      .get(`/visit/${visitReference}/update/select-visitors`)
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -890,7 +892,7 @@ describe('GET /visit/:reference/update/select-visitors', () => {
     flashData.errors = [{ location: 'body', msg: 'No visitors selected', param: 'visitors', value: undefined }]
 
     return request(sessionApp)
-      .get(`/visit/${previousVisitReference}/update/select-visitors`)
+      .get(`/visit/${visitReference}/update/select-visitors`)
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -910,7 +912,7 @@ describe('GET /visit/:reference/update/select-visitors', () => {
     prisonerVisitorsService.getVisitors.mockResolvedValue(returnData)
 
     return request(sessionApp)
-      .get(`/visit/${previousVisitReference}/update/select-visitors`)
+      .get(`/visit/${visitReference}/update/select-visitors`)
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
@@ -955,7 +957,7 @@ describe('GET /visit/:reference/update/select-visitors', () => {
     prisonerVisitorsService.getVisitors.mockResolvedValue(returnData)
 
     return request(sessionApp)
-      .get(`/visit/${previousVisitReference}/update/select-visitors`)
+      .get(`/visit/${visitReference}/update/select-visitors`)
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
@@ -970,7 +972,7 @@ describe('GET /visit/:reference/update/select-visitors', () => {
 
 describe('POST /visit/:reference/update/select-visitors', () => {
   const adultVisitors: { adults: VisitorListItem[] } = { adults: [] }
-  const previousVisitReference = 'ab-cd-ef-gh'
+  const visitReference = 'ab-cd-ef-gh'
 
   beforeEach(() => {
     const visitorList: { visitors: VisitorListItem[] } = {
@@ -1062,7 +1064,7 @@ describe('POST /visit/:reference/update/select-visitors', () => {
         restrictions: [],
       },
       visitRestriction: 'OPEN',
-      previousVisitReference,
+      visitReference,
     }
 
     sessionApp = appWithAllRoutes({
@@ -1090,10 +1092,10 @@ describe('POST /visit/:reference/update/select-visitors', () => {
     ]
 
     return request(sessionApp)
-      .post(`/visit/${previousVisitReference}/update/select-visitors`)
+      .post(`/visit/${visitReference}/update/select-visitors`)
       .send('visitors=4322')
       .expect(302)
-      .expect('location', `/visit/${previousVisitReference}/update/select-date-and-time`)
+      .expect('location', `/visit/${visitReference}/update/select-date-and-time`)
       .expect(() => {
         expect(adultVisitors.adults).toEqual(returnAdult)
         expect(visitSessionData.visitors).toEqual(returnAdult)
@@ -1133,11 +1135,11 @@ describe('POST /visit/:reference/update/select-visitors', () => {
     ]
 
     return request(sessionApp)
-      .post(`/visit/${previousVisitReference}/update/select-visitors`)
+      .post(`/visit/${visitReference}/update/select-visitors`)
       .send('visitors=4322')
       .send('visitors=4326')
       .expect(302)
-      .expect('location', `/visit/${previousVisitReference}/update/select-date-and-time`)
+      .expect('location', `/visit/${visitReference}/update/select-date-and-time`)
       .expect(() => {
         expect(adultVisitors.adults).toEqual(returnAdult)
         expect(visitSessionData.visitors).toEqual(returnAdult)
@@ -1177,10 +1179,10 @@ describe('POST /visit/:reference/update/select-visitors', () => {
     ]
 
     return request(sessionApp)
-      .post(`/visit/${previousVisitReference}/update/select-visitors`)
+      .post(`/visit/${visitReference}/update/select-visitors`)
       .send('visitors=4326')
       .expect(302)
-      .expect('location', `/visit/${previousVisitReference}/update/select-date-and-time`)
+      .expect('location', `/visit/${visitReference}/update/select-date-and-time`)
       .expect(() => {
         expect(adultVisitors.adults).toEqual(returnAdult)
         expect(visitSessionData.visitors).toEqual(returnAdult)
@@ -1214,10 +1216,10 @@ describe('POST /visit/:reference/update/select-visitors', () => {
     ]
 
     return request(sessionApp)
-      .post(`/visit/${previousVisitReference}/update/select-visitors`)
+      .post(`/visit/${visitReference}/update/select-visitors`)
       .send('visitors=4322')
       .expect(302)
-      .expect('location', `/visit/${previousVisitReference}/update/visit-type`)
+      .expect('location', `/visit/${visitReference}/update/visit-type`)
       .expect(() => {
         expect(adultVisitors.adults).toEqual(returnAdult)
         expect(visitSessionData.visitors).toEqual(returnAdult)
@@ -1250,10 +1252,10 @@ describe('POST /visit/:reference/update/select-visitors', () => {
     }
 
     return request(sessionApp)
-      .post(`/visit/${previousVisitReference}/update/select-visitors`)
+      .post(`/visit/${visitReference}/update/select-visitors`)
       .send('visitors=4322&visitors=4324')
       .expect(302)
-      .expect('location', `/visit/${previousVisitReference}/update/select-date-and-time`)
+      .expect('location', `/visit/${visitReference}/update/select-date-and-time`)
       .expect(() => {
         expect(adultVisitors.adults).toEqual([returnAdult])
         expect(visitSessionData.visitors).toEqual([returnAdult, returnChild])
@@ -1300,10 +1302,10 @@ describe('POST /visit/:reference/update/select-visitors', () => {
     }
 
     return request(sessionApp)
-      .post(`/visit/${previousVisitReference}/update/select-visitors`)
+      .post(`/visit/${visitReference}/update/select-visitors`)
       .send('visitors=4323')
       .expect(302)
-      .expect('location', `/visit/${previousVisitReference}/update/select-date-and-time`)
+      .expect('location', `/visit/${visitReference}/update/select-date-and-time`)
       .expect(() => {
         expect(adultVisitors.adults).toEqual([returnAdult])
         expect(visitSessionData.visitors).toEqual([returnAdult])
@@ -1313,10 +1315,10 @@ describe('POST /visit/:reference/update/select-visitors', () => {
 
   it('should should set validation errors in flash and redirect if invalid visitor selected', () => {
     return request(sessionApp)
-      .post(`/visit/${previousVisitReference}/update/select-visitors`)
+      .post(`/visit/${visitReference}/update/select-visitors`)
       .send('visitors=1234')
       .expect(302)
-      .expect('location', `/visit/${previousVisitReference}/update/select-visitors`)
+      .expect('location', `/visit/${visitReference}/update/select-visitors`)
       .expect(() => {
         expect(flashProvider).toHaveBeenCalledWith('errors', [
           { location: 'body', msg: 'Add an adult to the visit', param: 'visitors', value: '1234' },
@@ -1327,10 +1329,10 @@ describe('POST /visit/:reference/update/select-visitors', () => {
 
   it('should should set validation errors in flash and redirect if banned is visitor selected', () => {
     return request(sessionApp)
-      .post(`/visit/${previousVisitReference}/update/select-visitors`)
+      .post(`/visit/${visitReference}/update/select-visitors`)
       .send('visitors=4321')
       .expect(302)
-      .expect('location', `/visit/${previousVisitReference}/update/select-visitors`)
+      .expect('location', `/visit/${visitReference}/update/select-visitors`)
       .expect(() => {
         expect(flashProvider).toHaveBeenCalledWith('errors', [
           { location: 'body', msg: 'Invalid selection', param: 'visitors', value: '4321' },
@@ -1341,9 +1343,9 @@ describe('POST /visit/:reference/update/select-visitors', () => {
 
   it('should set validation errors in flash and redirect if no visitors are selected', () => {
     return request(sessionApp)
-      .post(`/visit/${previousVisitReference}/update/select-visitors`)
+      .post(`/visit/${visitReference}/update/select-visitors`)
       .expect(302)
-      .expect('location', `/visit/${previousVisitReference}/update/select-visitors`)
+      .expect('location', `/visit/${visitReference}/update/select-visitors`)
       .expect(() => {
         expect(flashProvider).toHaveBeenCalledWith('errors', [
           { location: 'body', msg: 'No visitors selected', param: 'visitors', value: undefined },
@@ -1354,10 +1356,10 @@ describe('POST /visit/:reference/update/select-visitors', () => {
 
   it('should set validation errors in flash and redirect if no adults are selected', () => {
     return request(sessionApp)
-      .post(`/visit/${previousVisitReference}/update/select-visitors`)
+      .post(`/visit/${visitReference}/update/select-visitors`)
       .send('visitors=4324')
       .expect(302)
-      .expect('location', `/visit/${previousVisitReference}/update/select-visitors`)
+      .expect('location', `/visit/${visitReference}/update/select-visitors`)
       .expect(() => {
         expect(flashProvider).toHaveBeenCalledWith('errors', [
           { location: 'body', msg: 'Add an adult to the visit', param: 'visitors', value: '4324' },
@@ -1368,7 +1370,7 @@ describe('POST /visit/:reference/update/select-visitors', () => {
 })
 
 describe('/visit/:reference/update/select-date-and-time', () => {
-  const previousVisitReference = 'ab-cd-ef-gh'
+  const visitReference = 'ab-cd-ef-gh'
   const slotsList: VisitSlotList = {
     'February 2022': [
       {
@@ -1483,7 +1485,7 @@ describe('/visit/:reference/update/select-date-and-time', () => {
           banned: false,
         },
       ],
-      previousVisitReference,
+      visitReference,
     }
   })
 
@@ -1502,7 +1504,7 @@ describe('/visit/:reference/update/select-date-and-time', () => {
 
     it('should render the available sessions list with none selected', () => {
       return request(sessionApp)
-        .get(`/visit/${previousVisitReference}/update/select-date-and-time`)
+        .get(`/visit/${visitReference}/update/select-date-and-time`)
         .expect(200)
         .expect('Content-Type', /html/)
         .expect(res => {
@@ -1527,7 +1529,7 @@ describe('/visit/:reference/update/select-date-and-time', () => {
       visitSessionData.closedVisitReason = 'visitor'
 
       return request(sessionApp)
-        .get(`/visit/${previousVisitReference}/update/select-date-and-time`)
+        .get(`/visit/${visitReference}/update/select-date-and-time`)
         .expect(200)
         .expect('Content-Type', /html/)
         .expect(res => {
@@ -1546,7 +1548,7 @@ describe('/visit/:reference/update/select-date-and-time', () => {
       visitSessionData.closedVisitReason = 'prisoner'
 
       return request(sessionApp)
-        .get(`/visit/${previousVisitReference}/update/select-date-and-time`)
+        .get(`/visit/${visitReference}/update/select-date-and-time`)
         .expect(200)
         .expect('Content-Type', /html/)
         .expect(res => {
@@ -1572,7 +1574,7 @@ describe('/visit/:reference/update/select-date-and-time', () => {
       })
 
       return request(sessionApp)
-        .get(`/visit/${previousVisitReference}/update/select-date-and-time`)
+        .get(`/visit/${visitReference}/update/select-date-and-time`)
         .expect(200)
         .expect('Content-Type', /html/)
         .expect(res => {
@@ -1598,7 +1600,7 @@ describe('/visit/:reference/update/select-date-and-time', () => {
       }
 
       return request(sessionApp)
-        .get(`/visit/${previousVisitReference}/update/select-date-and-time`)
+        .get(`/visit/${visitReference}/update/select-date-and-time`)
         .expect(200)
         .expect('Content-Type', /html/)
         .expect(res => {
@@ -1617,7 +1619,7 @@ describe('/visit/:reference/update/select-date-and-time', () => {
       flashData.errors = [{ location: 'body', msg: 'No time slot selected', param: 'visit-date-and-time' }]
 
       return request(sessionApp)
-        .get(`/visit/${previousVisitReference}/update/select-date-and-time`)
+        .get(`/visit/${visitReference}/update/select-date-and-time`)
         .expect(200)
         .expect('Content-Type', /html/)
         .expect(res => {

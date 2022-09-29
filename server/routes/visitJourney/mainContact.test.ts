@@ -13,10 +13,7 @@ let flashData: Record<'errors' | 'formValues', Record<string, string | string[]>
 let visitSessionData: VisitSessionData
 
 // run tests for booking and update journeys
-const testJourneys = [
-  { urlPrefix: '/book-a-visit', previousVisitReference: undefined },
-  { urlPrefix: '/visit/ab-cd-ef-gh/update', previousVisitReference: 'ab-cd-ef-gh' },
-]
+const testJourneys = [{ urlPrefix: '/book-a-visit' }, { urlPrefix: '/visit/ab-cd-ef-gh/update' }]
 
 config.features.updateJourneyEnabled = true
 
@@ -92,7 +89,6 @@ testJourneys.forEach(journey => {
           },
         ],
         visitorSupport: [],
-        previousVisitReference: journey.previousVisitReference,
         visitReference: 'ab-cd-ef-gh',
         visitStatus: 'RESERVED',
       }

@@ -17,10 +17,7 @@ let flashData: Record<'errors' | 'formValues', Record<string, string | string[]>
 let visitSessionData: VisitSessionData
 
 // run tests for booking and update journeys
-const testJourneys = [
-  { urlPrefix: '/book-a-visit', previousVisitReference: undefined },
-  { urlPrefix: '/visit/aa-bb-cc-dd/update', previousVisitReference: 'aa-bb-cc-dd' },
-]
+const testJourneys = [{ urlPrefix: '/book-a-visit' }, { urlPrefix: '/visit/ab-cd-ef-gh/update' }]
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
@@ -68,7 +65,7 @@ testJourneys.forEach(journey => {
             banned: false,
           },
         ],
-        previousVisitReference: journey.previousVisitReference,
+        visitReference: 'ab-cd-ef-gh',
       }
 
       sessionApp = appWithAllRoutes({
@@ -89,6 +86,7 @@ testJourneys.forEach(journey => {
           .expect(res => {
             const $ = cheerio.load(res.text)
             expect($('h1').text().trim()).toBe("Check the prisoner's closed visit restrictions")
+            expect($('.govuk-back-link').attr('href')).toBe(`${journey.urlPrefix}/select-visitors`)
             expect($('[data-test="restriction-type-1"]').text().trim()).toBe('Closed')
             expect($('[data-test="restriction-comment-1"]').text().trim()).toBe('some comment text')
             expect($('[data-test="restriction-start-1"]').text().trim()).toBe('16 May 2022')
@@ -116,6 +114,7 @@ testJourneys.forEach(journey => {
           .expect(res => {
             const $ = cheerio.load(res.text)
             expect($('h1').text().trim()).toBe("Check the prisoner's closed visit restrictions")
+            expect($('.govuk-back-link').attr('href')).toBe(`${journey.urlPrefix}/select-visitors`)
             expect($('.govuk-error-summary__body').text()).toContain('No visit type selected')
             expect($('#visitType-error').text()).toContain('No visit type selected')
             expect($('[data-test="visit-type-open"]').prop('checked')).toBe(false)

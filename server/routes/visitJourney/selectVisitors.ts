@@ -37,7 +37,7 @@ export default class SelectVisitors {
       formValues.visitors = visitSessionData.visitors.map(visitor => visitor.personId.toString())
     }
 
-    const returnAddress = isUpdate ? `/visit/${visitSessionData.previousVisitReference}` : `/prisoner/${offenderNo}`
+    const returnAddress = isUpdate ? `/visit/${visitSessionData.visit}` : `/prisoner/${offenderNo}`
 
     res.render('pages/bookAVisit/visitors', {
       errors: req.flash('errors'),
@@ -46,7 +46,7 @@ export default class SelectVisitors {
       visitorList,
       restrictions,
       formValues,
-      urlPrefix: getUrlPrefix(isUpdate, visitSessionData.previousVisitReference),
+      urlPrefix: getUrlPrefix(isUpdate, visitSessionData.visitReference),
       backLink: returnAddress,
     })
   }
@@ -93,7 +93,7 @@ export default class SelectVisitors {
       restriction => restriction.restrictionType === 'CLOSED',
     )
 
-    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.previousVisitReference)
+    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
 
     return !closedVisitVisitors && closedVisitPrisoner
       ? res.redirect(`${urlPrefix}/visit-type`)

@@ -85,7 +85,7 @@ export default class DateAndTime {
       formValues,
       slotsPresent,
       restrictionChangeMessage,
-      urlPrefix: getUrlPrefix(isUpdate, visitSessionData.previousVisitReference),
+      urlPrefix: getUrlPrefix(isUpdate, visitSessionData.visitReference),
     })
   }
 
@@ -135,7 +135,7 @@ export default class DateAndTime {
       operationId: res.locals.appInsightsOperationId,
     })
 
-    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.previousVisitReference)
+    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
     return res.redirect(`${urlPrefix}/additional-support`)
   }
 
