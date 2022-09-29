@@ -819,6 +819,92 @@ describe('Visit sessions service', () => {
     })
   })
 
+  describe('changeBookedVisit', () => {
+    it('should change an existing booked visit and return the visit data with status RESERVED/CHANGING and new applicationReference', async () => {
+      const visitSessionData: VisitSessionData = {
+        prisoner: {
+          offenderNo: 'A1234BC',
+          name: 'prisoner name',
+          dateOfBirth: '23 May 1988',
+          location: 'somewhere',
+        },
+        visit: {
+          id: 'visitId',
+          startTimestamp: '2022-02-14T10:00:00',
+          endTimestamp: '2022-02-14T11:00:00',
+          availableTables: 1,
+          capacity: 15,
+          visitRoomName: 'visit room',
+          visitRestriction: 'OPEN',
+        },
+        visitRestriction: 'OPEN',
+        visitors: [
+          {
+            personId: 123,
+            name: 'visitor name',
+            relationshipDescription: 'relationship desc',
+            restrictions: [
+              {
+                restrictionType: 'TEST',
+                restrictionTypeDescription: 'test type',
+                startDate: '10 May 2020',
+                expiryDate: '10 May 2022',
+                globalRestriction: false,
+                comment: 'comments',
+              },
+            ],
+            banned: false,
+          },
+        ],
+        visitorSupport: [{ type: 'WHEELCHAIR' }],
+        mainContact: {
+          phoneNumber: '01234 567890',
+          contactName: 'John Smith',
+        },
+        applicationReference: 'aaa-bbb-ccc',
+        visitReference: 'ab-cd-ef-gh',
+        visitStatus: 'BOOKED',
+      }
+
+      const returnedVisit: Visit = {
+        applicationReference: 'ddd-eee-fff',
+        reference: visitSessionData.visitReference,
+        prisonerId: visitSessionData.prisoner.offenderNo,
+        prisonId: 'HEI',
+        visitRoom: visitSessionData.visit.visitRoomName,
+        visitType: 'SOCIAL',
+        visitStatus: 'CHANGING',
+        visitRestriction: visitSessionData.visitRestriction,
+        startTimestamp: visitSessionData.visit.startTimestamp,
+        endTimestamp: visitSessionData.visit.endTimestamp,
+        visitNotes: [],
+        visitContact: {
+          name: 'John Smith',
+          telephone: '01234 567890',
+        },
+        visitors: [
+          {
+            nomisPersonId: 1234,
+          },
+        ],
+        visitorSupport: [{ type: 'WHEELCHAIR' }],
+        createdTimestamp: '2022-02-14T10:00:00',
+        modifiedTimestamp: '2022-02-14T10:05:00',
+      }
+
+      visitSchedulerApiClient.changeBookedVisit.mockResolvedValue(returnedVisit)
+      whereaboutsApiClient.getEvents.mockResolvedValue([])
+
+      const result = await visitSessionsService.changeBookedVisit({
+        username: 'user',
+        visitSessionData,
+      })
+
+      expect(visitSchedulerApiClient.changeBookedVisit).toHaveBeenCalledTimes(1)
+      expect(result).toEqual(returnedVisit)
+    })
+  })
+
   describe('cancelVisit', () => {
     it('should cancel a visit, giving the status code and reason', async () => {
       const expectedResult: Visit = {

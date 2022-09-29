@@ -108,7 +108,7 @@ export interface components {
        * @example RESERVED
        * @enum {string}
        */
-      visitStatus?: 'RESERVED' | 'BOOKED' | 'CANCELLED'
+      visitStatus?: 'RESERVED' | 'CHANGING' | 'BOOKED' | 'CANCELLED'
       /**
        * @description Visit Restriction
        * @example OPEN
@@ -204,7 +204,7 @@ export interface components {
        * @example RESERVED
        * @enum {string}
        */
-      visitStatus: 'RESERVED' | 'BOOKED' | 'CANCELLED'
+      visitStatus: 'RESERVED' | 'CHANGING' | 'BOOKED' | 'CANCELLED'
       /**
        * @description Outcome Status
        * @example VISITOR_CANCELLED
@@ -355,7 +355,7 @@ export interface components {
        */
       text?: string
     }
-    ChangeReservedVisitSlotRequestDto: {
+    ChangeVisitSlotRequestDto: {
       /**
        * @description Visit Restriction
        * @example OPEN
@@ -386,8 +386,8 @@ export interface components {
       messageAttributes?: {
         [key: string]: components['schemas']['MessageAttributeValue']
       }
-      md5OfBody?: string
       md5OfMessageAttributes?: string
+      md5OfBody?: string
     }
     MessageAttributeValue: {
       stringValue?: string
@@ -649,7 +649,7 @@ export interface components {
        * @example RESERVED
        * @enum {string}
        */
-      visitStatus: 'RESERVED' | 'BOOKED' | 'CANCELLED'
+      visitStatus: 'RESERVED' | 'CHANGING' | 'BOOKED' | 'CANCELLED'
       /**
        * @description Outcome Status
        * @default NOT_RECORDED
@@ -709,11 +709,11 @@ export interface components {
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject']
-      first?: boolean
-      last?: boolean
       pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
+      first?: boolean
+      last?: boolean
       empty?: boolean
     }
     PageableObject: {
@@ -721,9 +721,9 @@ export interface components {
       offset?: number
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
-      pageSize?: number
-      /** Format: int32 */
       pageNumber?: number
+      /** Format: int32 */
+      pageSize?: number
       paged?: boolean
       unpaged?: boolean
     }
@@ -1077,7 +1077,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['ChangeReservedVisitSlotRequestDto']
+        'application/json': components['schemas']['ChangeVisitSlotRequestDto']
       }
     }
   }
@@ -1176,7 +1176,7 @@ export interface operations {
         /** Filter results by visitor (contact id) */
         nomisPersonId?: number
         /** Filter results by visit status */
-        visitStatus?: 'RESERVED' | 'BOOKED' | 'CANCELLED'
+        visitStatus?: 'RESERVED' | 'CHANGING' | 'BOOKED' | 'CANCELLED'
         /** Pagination page number, starting at zero */
         page?: number
         /** Pagination size per page */

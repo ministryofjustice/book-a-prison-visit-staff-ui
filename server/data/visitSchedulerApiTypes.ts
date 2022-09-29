@@ -8,7 +8,7 @@ export type Visit = components['schemas']['VisitDto']
 export type Visitor = components['schemas']['VisitorDto']
 
 export type ReserveVisitSlotDto = components['schemas']['ReserveVisitSlotDto']
-export type ChangeReservedVisitSlotRequestDto = components['schemas']['ChangeReservedVisitSlotRequestDto']
+export type ChangeVisitSlotRequestDto = components['schemas']['ChangeVisitSlotRequestDto']
 
 export type OutcomeDto = components['schemas']['OutcomeDto']
 

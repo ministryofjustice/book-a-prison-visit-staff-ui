@@ -8,7 +8,7 @@ import {
   OutcomeDto,
   VisitSession,
   ReserveVisitSlotDto,
-  ChangeReservedVisitSlotRequestDto,
+  ChangeVisitSlotRequestDto,
 } from './visitSchedulerApiTypes'
 
 describe('visitSchedulerApiClient', () => {
@@ -446,7 +446,7 @@ describe('visitSchedulerApiClient', () => {
       }
 
       fakeVisitSchedulerApi
-        .put('/visits/aaa-bbb-ccc/slot/change', <ChangeReservedVisitSlotRequestDto>{
+        .put('/visits/aaa-bbb-ccc/slot/change', <ChangeVisitSlotRequestDto>{
           visitRestriction: visitSessionData.visitRestriction,
           startTimestamp: visitSessionData.visit.startTimestamp,
           endTimestamp: visitSessionData.visit.endTimestamp,
@@ -531,7 +531,7 @@ describe('visitSchedulerApiClient', () => {
       }
 
       fakeVisitSchedulerApi
-        .put('/visits/aaa-bbb-ccc/slot/change', <ChangeReservedVisitSlotRequestDto>{
+        .put('/visits/aaa-bbb-ccc/slot/change', <ChangeVisitSlotRequestDto>{
           visitRestriction: visitSessionData.visitRestriction,
           startTimestamp: visitSessionData.visit.startTimestamp,
           endTimestamp: visitSessionData.visit.endTimestamp,
@@ -569,6 +569,105 @@ describe('visitSchedulerApiClient', () => {
         .reply(200, result)
 
       const output = await client.bookVisit(applicationReference)
+
+      expect(output).toEqual(result)
+    })
+  })
+
+  describe('changeBookedVisit', () => {
+    it('should return the Visit with new status of RESERVED/CHANGING and new applicationReference, from the Visit Scheduler', async () => {
+      const prisonId = 'HEI'
+      const visitType = 'SOCIAL'
+
+      const visitSessionData = <VisitSessionData>{
+        prisoner: {
+          offenderNo: 'AF34567G',
+          name: 'prisoner name',
+          dateOfBirth: '23 May 1988',
+          location: 'somewhere',
+        },
+        visit: {
+          id: '1',
+          startTimestamp: '2022-02-14T10:00:00',
+          endTimestamp: '2022-02-14T11:00:00',
+          availableTables: 1,
+          visitRoomName: 'A1 L3',
+        },
+        visitRestriction: 'OPEN',
+        visitors: [
+          {
+            personId: 123,
+            name: 'visitor name',
+            relationshipDescription: 'relationship desc',
+            restrictions: [],
+            banned: false,
+          },
+        ],
+        visitorSupport: [],
+        mainContact: {
+          phoneNumber: '01234 567890',
+          contactName: 'John Smith',
+          contact: {
+            personId: 123,
+          },
+        },
+        applicationReference: 'aaa-bbb-ccc',
+        visitReference: 'ab-cd-ef-gh',
+        visitStatus: 'BOOKED',
+      }
+
+      const result: Visit = {
+        applicationReference: 'ddd-eee-fff',
+        reference: visitSessionData.visitReference,
+        prisonerId: visitSessionData.prisoner.offenderNo,
+        prisonId,
+        visitRoom: visitSessionData.visit.visitRoomName,
+        visitType,
+        visitStatus: 'CHANGING',
+        visitRestriction: visitSessionData.visitRestriction,
+        startTimestamp: visitSessionData.visit.startTimestamp,
+        endTimestamp: visitSessionData.visit.endTimestamp,
+        visitNotes: [],
+        visitContact: {
+          name: 'John Smith',
+          telephone: '01234 567890',
+        },
+        visitors: [
+          {
+            nomisPersonId: 123,
+            visitContact: true,
+          },
+        ],
+        visitorSupport: [],
+        createdTimestamp: '2022-02-14T10:00:00',
+        modifiedTimestamp: '2022-02-14T10:05:00',
+      }
+
+      fakeVisitSchedulerApi
+        .put(`/visits/${visitSessionData.visitReference}/change`, <ReserveVisitSlotDto>{
+          prisonerId: visitSessionData.prisoner.offenderNo,
+          prisonId,
+          visitRoom: visitSessionData.visit.visitRoomName,
+          visitType,
+          visitRestriction: visitSessionData.visitRestriction,
+          startTimestamp: visitSessionData.visit.startTimestamp,
+          endTimestamp: visitSessionData.visit.endTimestamp,
+          visitContact: {
+            name: visitSessionData.mainContact.contactName,
+            telephone: visitSessionData.mainContact.phoneNumber,
+          },
+          visitors: visitSessionData.visitors.map(visitor => {
+            return {
+              nomisPersonId: visitor.personId,
+              visitContact: true,
+            }
+          }),
+          visitorSupport: visitSessionData.visitorSupport,
+        })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(201, result)
+
+      const output = await client.changeBookedVisit(visitSessionData)
 
       expect(output).toEqual(result)
     })
