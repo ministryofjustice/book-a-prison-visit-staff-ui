@@ -101,7 +101,7 @@ class VisitSchedulerApiClient {
   }
 
   changeReservedVisit(visitSessionData: VisitSessionData): Promise<Visit> {
-    const { visitContact, mainContactId } = convertMainContactToVisitContact(visitSessionData.mainContact)
+    const { visitContact, mainContactId } = this.convertMainContactToVisitContact(visitSessionData.mainContact)
 
     return this.restclient.put({
       path: `/visits/${visitSessionData.applicationReference}/slot/change`,
@@ -126,7 +126,7 @@ class VisitSchedulerApiClient {
   }
 
   changeBookedVisit(visitSessionData: VisitSessionData): Promise<Visit> {
-    const { visitContact, mainContactId } = convertMainContactToVisitContact(visitSessionData.mainContact)
+    const { visitContact, mainContactId } = this.convertMainContactToVisitContact(visitSessionData.mainContact)
 
     return this.restclient.put({
       path: `/visits/${visitSessionData.visitReference}/change`,
@@ -156,21 +156,21 @@ class VisitSchedulerApiClient {
       data: outcome,
     })
   }
-}
 
-function convertMainContactToVisitContact(mainContact: VisitSessionData['mainContact']): {
-  visitContact: ReserveVisitSlotDto['visitContact']
-  mainContactId: number
-} {
-  const visitContact = mainContact
-    ? {
-        telephone: mainContact.phoneNumber,
-        name: mainContact.contactName ? mainContact.contactName : mainContact.contact.name,
-      }
-    : undefined
-  const mainContactId = mainContact && mainContact.contact ? mainContact.contact.personId : null
+  private convertMainContactToVisitContact(mainContact: VisitSessionData['mainContact']): {
+    visitContact: ReserveVisitSlotDto['visitContact']
+    mainContactId: number
+  } {
+    const visitContact = mainContact
+      ? {
+          telephone: mainContact.phoneNumber,
+          name: mainContact.contactName ? mainContact.contactName : mainContact.contact.name,
+        }
+      : undefined
+    const mainContactId = mainContact && mainContact.contact ? mainContact.contact.personId : null
 
-  return { visitContact, mainContactId }
+    return { visitContact, mainContactId }
+  }
 }
 
 export default VisitSchedulerApiClient
