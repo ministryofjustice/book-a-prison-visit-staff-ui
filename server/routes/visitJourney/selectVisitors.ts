@@ -37,7 +37,7 @@ export default class SelectVisitors {
       formValues.visitors = visitSessionData.visitors.map(visitor => visitor.personId.toString())
     }
 
-    const returnAddress = isUpdate ? `/visit/${visitSessionData.visit}` : `/prisoner/${offenderNo}`
+    const returnAddress = isUpdate ? `/visit/${visitSessionData.visitReference}` : `/prisoner/${offenderNo}`
 
     res.render('pages/bookAVisit/visitors', {
       errors: req.flash('errors'),
