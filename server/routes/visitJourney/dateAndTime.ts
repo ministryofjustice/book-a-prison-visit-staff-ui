@@ -107,11 +107,30 @@ export default class DateAndTime {
 
     visitSessionData.visit = getSelectedSlot(req.session.slotsList, req.body['visit-date-and-time'])
 
+    /* Flow here is:
+      * Booking journey
+        - first time confirming date/time => 'reserve new visit'; get reference and applicationReference; status = RESERVED
+        - nth time (before booking) => 'change reserved visit'; status stays as RESERVED
+
+      * Update visit journey
+        - first time confirming date/time => 'change booked visit'; get new applicationReference, with status of
+          RESERVED (for new date/time or visitRestriction) or CHANGING (for same date/time or visitRestriction)
+        - nth time (before booking) => 'change reserved visit'; status RESERVED or CHANGING depending on whether 
+          date/time or restriction changed
+    */
     if (visitSessionData.applicationReference) {
       await this.visitSessionsService.changeReservedVisit({
         username: res.locals.user?.username,
         visitSessionData,
       })
+    } else if (isUpdate) {
+      const { applicationReference, visitStatus } = await this.visitSessionsService.changeBookedVisit({
+        username: res.locals.user?.username,
+        visitSessionData,
+      })
+
+      visitSessionData.applicationReference = applicationReference
+      visitSessionData.visitStatus = visitStatus
     } else {
       const { applicationReference, reference, visitStatus } = await this.visitSessionsService.reserveVisit({
         username: res.locals.user?.username,
