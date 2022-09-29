@@ -5,6 +5,7 @@ import * as cheerio from 'cheerio'
 import { VisitSessionData } from '../../@types/bapv'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
 import { SupportType, VisitorSupport } from '../../data/visitSchedulerApiTypes'
+import config from '../../config'
 
 let sessionApp: Express
 const systemToken = async (user: string): Promise<string> => `${user}-token-1`
@@ -17,6 +18,8 @@ const testJourneys = [
   { urlPrefix: '/book-a-visit', previousVisitReference: undefined },
   { urlPrefix: '/visit/ab-cd-ef-gh/update', previousVisitReference: 'ab-cd-ef-gh' },
 ]
+
+config.features.updateJourneyEnabled = true
 
 const availableSupportTypes: SupportType[] = [
   {
@@ -230,9 +233,7 @@ testJourneys.forEach(journey => {
         })
     })
   })
-})
 
-testJourneys.forEach(journey => {
   describe(`POST ${journey.urlPrefix}/additional-support`, () => {
     beforeEach(() => {
       visitSessionData = {
