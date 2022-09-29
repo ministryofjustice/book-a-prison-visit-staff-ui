@@ -296,6 +296,15 @@ describe('sessionCheckMiddleware', () => {
       expect(mockResponse.redirect).not.toHaveBeenCalled()
     })
 
+    it('should not redirect if visit status is CHANGING during booking journey', () => {
+      req.session.visitSessionData.visitReference = 'ab-cd-ef-gh'
+      req.session.visitSessionData.visitStatus = 'CHANGING'
+
+      sessionCheckMiddleware({ stage: 3 })(req as Request, mockResponse as Response, next)
+
+      expect(mockResponse.redirect).not.toHaveBeenCalled()
+    })
+
     it('should redirect to the prisoner profile if visit status is not RESERVED during booking journey', () => {
       req.session.visitSessionData.visitReference = 'ab-cd-ef-gh'
       req.session.visitSessionData.visitStatus = 'BOOKED'
