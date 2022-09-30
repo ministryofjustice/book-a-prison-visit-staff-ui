@@ -7,6 +7,7 @@ import VisitSessionsService from '../../services/visitSessionsService'
 import AuditService from '../../services/auditService'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
 import { Visit } from '../../data/visitSchedulerApiTypes'
+import config from '../../config'
 
 jest.mock('../../services/visitSessionsService')
 jest.mock('../../services/auditService')
@@ -18,136 +19,142 @@ const auditService = new AuditService() as jest.Mocked<AuditService>
 let flashData: Record<'errors' | 'formValues', Record<string, string | string[]>[]>
 let visitSessionData: VisitSessionData
 
+// run tests for booking and update journeys
+const testJourneys = [
+  { urlPrefix: '/book-a-visit', isUpdate: false },
+  { urlPrefix: '/visit/ab-cd-ef-gh/update', isUpdate: true },
+]
+
+config.features.updateJourneyEnabled = true
+
+const slotsList: VisitSlotList = {
+  'February 2022': [
+    {
+      date: 'Monday 14 February',
+      prisonerEvents: {
+        morning: [],
+        afternoon: [],
+      },
+      slots: {
+        morning: [
+          {
+            id: '1',
+            startTimestamp: '2022-02-14T10:00:00',
+            endTimestamp: '2022-02-14T11:00:00',
+            availableTables: 15,
+            capacity: 30,
+            visitRoomName: 'room name',
+            // representing a pre-existing visit that is BOOKED
+            sessionConflicts: ['DOUBLE_BOOKED'],
+            visitRestriction: 'OPEN',
+          },
+          {
+            id: '2',
+            startTimestamp: '2022-02-14T11:59:00',
+            endTimestamp: '2022-02-14T12:59:00',
+            availableTables: 1,
+            capacity: 30,
+            visitRoomName: 'room name',
+            visitRestriction: 'OPEN',
+          },
+        ],
+        afternoon: [
+          {
+            id: '3',
+            startTimestamp: '2022-02-14T12:00:00',
+            endTimestamp: '2022-02-14T13:05:00',
+            availableTables: 5,
+            capacity: 30,
+            visitRoomName: 'room name',
+            // representing the RESERVED visit being handled in this session
+            sessionConflicts: ['DOUBLE_BOOKED'],
+            visitRestriction: 'OPEN',
+          },
+        ],
+      },
+    },
+    {
+      date: 'Tuesday 15 February',
+      prisonerEvents: {
+        morning: [],
+        afternoon: [],
+      },
+      slots: {
+        morning: [],
+        afternoon: [
+          {
+            id: '4',
+            startTimestamp: '2022-02-15T16:00:00',
+            endTimestamp: '2022-02-15T17:00:00',
+            availableTables: 12,
+            capacity: 30,
+            visitRoomName: 'room name',
+            visitRestriction: 'OPEN',
+          },
+        ],
+      },
+    },
+  ],
+  'March 2022': [
+    {
+      date: 'Tuesday 1 March',
+      prisonerEvents: {
+        morning: [],
+        afternoon: [],
+      },
+      slots: {
+        morning: [
+          {
+            id: '5',
+            startTimestamp: '2022-03-01T09:30:00',
+            endTimestamp: '2022-03-01T10:30:00',
+            availableTables: 0,
+            capacity: 30,
+            visitRoomName: 'room name',
+            visitRestriction: 'OPEN',
+          },
+        ],
+        afternoon: [],
+      },
+    },
+  ],
+}
+
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
   flashProvider.mockImplementation(key => {
     return flashData[key]
   })
+
+  visitSessionData = {
+    prisoner: {
+      name: 'John Smith',
+      offenderNo: 'A1234BC',
+      dateOfBirth: '25 May 1988',
+      location: 'location place',
+    },
+    visitRestriction: 'OPEN',
+    visitors: [
+      {
+        personId: 4323,
+        name: 'Ted Smith',
+        dateOfBirth: '1968-07-28',
+        adult: true,
+        relationshipDescription: 'Father',
+        address: '1st listed address',
+        restrictions: [],
+        banned: false,
+      },
+    ],
+  }
 })
 
 afterEach(() => {
   jest.resetAllMocks()
 })
 
-describe('/book-a-visit/select-date-and-time', () => {
-  const slotsList: VisitSlotList = {
-    'February 2022': [
-      {
-        date: 'Monday 14 February',
-        prisonerEvents: {
-          morning: [],
-          afternoon: [],
-        },
-        slots: {
-          morning: [
-            {
-              id: '1',
-              startTimestamp: '2022-02-14T10:00:00',
-              endTimestamp: '2022-02-14T11:00:00',
-              availableTables: 15,
-              capacity: 30,
-              visitRoomName: 'room name',
-              // representing a pre-existing visit that is BOOKED
-              sessionConflicts: ['DOUBLE_BOOKED'],
-              visitRestriction: 'OPEN',
-            },
-            {
-              id: '2',
-              startTimestamp: '2022-02-14T11:59:00',
-              endTimestamp: '2022-02-14T12:59:00',
-              availableTables: 1,
-              capacity: 30,
-              visitRoomName: 'room name',
-              visitRestriction: 'OPEN',
-            },
-          ],
-          afternoon: [
-            {
-              id: '3',
-              startTimestamp: '2022-02-14T12:00:00',
-              endTimestamp: '2022-02-14T13:05:00',
-              availableTables: 5,
-              capacity: 30,
-              visitRoomName: 'room name',
-              // representing the RESERVED visit being handled in this session
-              sessionConflicts: ['DOUBLE_BOOKED'],
-              visitRestriction: 'OPEN',
-            },
-          ],
-        },
-      },
-      {
-        date: 'Tuesday 15 February',
-        prisonerEvents: {
-          morning: [],
-          afternoon: [],
-        },
-        slots: {
-          morning: [],
-          afternoon: [
-            {
-              id: '4',
-              startTimestamp: '2022-02-15T16:00:00',
-              endTimestamp: '2022-02-15T17:00:00',
-              availableTables: 12,
-              capacity: 30,
-              visitRoomName: 'room name',
-              visitRestriction: 'OPEN',
-            },
-          ],
-        },
-      },
-    ],
-    'March 2022': [
-      {
-        date: 'Tuesday 1 March',
-        prisonerEvents: {
-          morning: [],
-          afternoon: [],
-        },
-        slots: {
-          morning: [
-            {
-              id: '5',
-              startTimestamp: '2022-03-01T09:30:00',
-              endTimestamp: '2022-03-01T10:30:00',
-              availableTables: 0,
-              capacity: 30,
-              visitRoomName: 'room name',
-              visitRestriction: 'OPEN',
-            },
-          ],
-          afternoon: [],
-        },
-      },
-    ],
-  }
-
-  beforeEach(() => {
-    visitSessionData = {
-      prisoner: {
-        name: 'John Smith',
-        offenderNo: 'A1234BC',
-        dateOfBirth: '25 May 1988',
-        location: 'location place',
-      },
-      visitRestriction: 'OPEN',
-      visitors: [
-        {
-          personId: 4323,
-          name: 'Ted Smith',
-          dateOfBirth: '1968-07-28',
-          adult: true,
-          relationshipDescription: 'Father',
-          address: '1st listed address',
-          restrictions: [],
-          banned: false,
-        },
-      ],
-    }
-  })
-
-  describe('GET /book-a-visit/select-date-and-time', () => {
+testJourneys.forEach(journey => {
+  describe(`GET ${journey.urlPrefix}/select-date-and-time`, () => {
     const visitSessionsService = new VisitSessionsService(
       null,
       null,
@@ -169,7 +176,7 @@ describe('/book-a-visit/select-date-and-time', () => {
 
     it('should render the available sessions list with none selected', () => {
       return request(sessionApp)
-        .get('/book-a-visit/select-date-and-time')
+        .get(`${journey.urlPrefix}/select-date-and-time`)
         .expect(200)
         .expect('Content-Type', /html/)
         .expect(res => {
@@ -194,7 +201,7 @@ describe('/book-a-visit/select-date-and-time', () => {
       visitSessionData.closedVisitReason = 'visitor'
 
       return request(sessionApp)
-        .get('/book-a-visit/select-date-and-time')
+        .get(`${journey.urlPrefix}/select-date-and-time`)
         .expect(200)
         .expect('Content-Type', /html/)
         .expect(res => {
@@ -213,7 +220,7 @@ describe('/book-a-visit/select-date-and-time', () => {
       visitSessionData.closedVisitReason = 'prisoner'
 
       return request(sessionApp)
-        .get('/book-a-visit/select-date-and-time')
+        .get(`${journey.urlPrefix}/select-date-and-time`)
         .expect(200)
         .expect('Content-Type', /html/)
         .expect(res => {
@@ -239,7 +246,7 @@ describe('/book-a-visit/select-date-and-time', () => {
       })
 
       return request(sessionApp)
-        .get('/book-a-visit/select-date-and-time')
+        .get(`${journey.urlPrefix}/select-date-and-time`)
         .expect(200)
         .expect('Content-Type', /html/)
         .expect(res => {
@@ -265,7 +272,7 @@ describe('/book-a-visit/select-date-and-time', () => {
       }
 
       return request(sessionApp)
-        .get('/book-a-visit/select-date-and-time')
+        .get(`${journey.urlPrefix}/select-date-and-time`)
         .expect(200)
         .expect('Content-Type', /html/)
         .expect(res => {
@@ -284,7 +291,7 @@ describe('/book-a-visit/select-date-and-time', () => {
       flashData.errors = [{ location: 'body', msg: 'No time slot selected', param: 'visit-date-and-time' }]
 
       return request(sessionApp)
-        .get('/book-a-visit/select-date-and-time')
+        .get(`${journey.urlPrefix}/select-date-and-time`)
         .expect(200)
         .expect('Content-Type', /html/)
         .expect(res => {
@@ -299,7 +306,7 @@ describe('/book-a-visit/select-date-and-time', () => {
     })
   })
 
-  describe('POST /book-a-visit/select-date-and-time', () => {
+  describe(`POST ${journey.urlPrefix}/select-date-and-time`, () => {
     const visitSessionsService = new VisitSessionsService(
       null,
       null,
@@ -313,8 +320,16 @@ describe('/book-a-visit/select-date-and-time', () => {
       visitStatus: 'RESERVED',
     }
 
+    // representing a BOOKED visit on update journey that has moved to status CHANGING
+    const changingVisit: Partial<Visit> = {
+      applicationReference: 'aaa-bbb-ccc',
+      reference: 'ab-cd-ef-gh',
+      visitStatus: 'CHANGING',
+    }
+
     beforeEach(() => {
       visitSessionsService.reserveVisit = jest.fn().mockResolvedValue(reservedVisit)
+      visitSessionsService.changeBookedVisit = jest.fn().mockResolvedValue(changingVisit)
       visitSessionsService.changeReservedVisit = jest.fn()
 
       sessionApp = appWithAllRoutes({
@@ -329,11 +344,13 @@ describe('/book-a-visit/select-date-and-time', () => {
     })
 
     it('should save to session, reserve visit and redirect to additional support page if slot selected', () => {
+      visitSessionData.visitReference = journey.isUpdate ? reservedVisit.reference : undefined
+
       return request(sessionApp)
-        .post('/book-a-visit/select-date-and-time')
+        .post(`${journey.urlPrefix}/select-date-and-time`)
         .send('visit-date-and-time=2')
         .expect(302)
-        .expect('location', '/book-a-visit/additional-support')
+        .expect('location', `${journey.urlPrefix}/additional-support`)
         .expect(() => {
           expect(visitSessionData.visit).toEqual(<VisitSlot>{
             id: '2',
@@ -346,9 +363,13 @@ describe('/book-a-visit/select-date-and-time', () => {
           })
           expect(visitSessionData.applicationReference).toEqual(reservedVisit.applicationReference)
           expect(visitSessionData.visitReference).toEqual(reservedVisit.reference)
-          expect(visitSessionData.visitStatus).toEqual(reservedVisit.visitStatus)
+          expect(visitSessionData.visitStatus).toEqual(
+            journey.isUpdate ? changingVisit.visitStatus : reservedVisit.visitStatus,
+          )
 
-          expect(visitSessionsService.reserveVisit).toHaveBeenCalledTimes(1)
+          expect(
+            journey.isUpdate ? visitSessionsService.changeBookedVisit : visitSessionsService.reserveVisit,
+          ).toHaveBeenCalledTimes(1)
           expect(visitSessionsService.changeReservedVisit).not.toHaveBeenCalled()
 
           expect(auditService.reservedVisit).toHaveBeenCalledTimes(1)
@@ -379,13 +400,13 @@ describe('/book-a-visit/select-date-and-time', () => {
 
       visitSessionData.applicationReference = reservedVisit.applicationReference
       visitSessionData.visitReference = reservedVisit.reference
-      visitSessionData.visitStatus = reservedVisit.visitStatus
+      visitSessionData.visitStatus = journey.isUpdate ? changingVisit.visitStatus : reservedVisit.visitStatus
 
       return request(sessionApp)
-        .post('/book-a-visit/select-date-and-time')
+        .post(`${journey.urlPrefix}/select-date-and-time`)
         .send('visit-date-and-time=3')
         .expect(302)
-        .expect('location', '/book-a-visit/additional-support')
+        .expect('location', `${journey.urlPrefix}/additional-support`)
         .expect(() => {
           expect(visitSessionData.visit).toEqual(<VisitSlot>{
             id: '3',
@@ -401,7 +422,9 @@ describe('/book-a-visit/select-date-and-time', () => {
 
           expect(visitSessionData.applicationReference).toEqual(reservedVisit.applicationReference)
           expect(visitSessionData.visitReference).toEqual(reservedVisit.reference)
-          expect(visitSessionData.visitStatus).toEqual(reservedVisit.visitStatus)
+          expect(visitSessionData.visitStatus).toEqual(
+            journey.isUpdate ? changingVisit.visitStatus : reservedVisit.visitStatus,
+          )
 
           expect(visitSessionsService.reserveVisit).not.toHaveBeenCalled()
           expect(visitSessionsService.changeReservedVisit).toHaveBeenCalledTimes(1)
@@ -429,9 +452,9 @@ describe('/book-a-visit/select-date-and-time', () => {
 
     it('should should set validation errors in flash and redirect if no slot selected', () => {
       return request(sessionApp)
-        .post('/book-a-visit/select-date-and-time')
+        .post(`${journey.urlPrefix}/select-date-and-time`)
         .expect(302)
-        .expect('location', '/book-a-visit/select-date-and-time')
+        .expect('location', `${journey.urlPrefix}/select-date-and-time`)
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledWith('errors', [
             { location: 'body', msg: 'No time slot selected', param: 'visit-date-and-time', value: undefined },
@@ -454,9 +477,9 @@ describe('/book-a-visit/select-date-and-time', () => {
       })
 
       return request(sessionApp)
-        .post('/book-a-visit/select-date-and-time')
+        .post(`${journey.urlPrefix}/select-date-and-time`)
         .expect(302)
-        .expect('location', '/book-a-visit/select-date-and-time?timeOfDay=afternoon&dayOfTheWeek=3')
+        .expect('location', `${journey.urlPrefix}/select-date-and-time?timeOfDay=afternoon&dayOfTheWeek=3`)
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledWith('errors', [
             { location: 'body', msg: 'No time slot selected', param: 'visit-date-and-time', value: undefined },
@@ -468,10 +491,10 @@ describe('/book-a-visit/select-date-and-time', () => {
 
     it('should should set validation errors in flash and redirect if invalid slot selected', () => {
       return request(sessionApp)
-        .post('/book-a-visit/select-date-and-time')
+        .post(`${journey.urlPrefix}/select-date-and-time`)
         .send('visit-date-and-time=100')
         .expect(302)
-        .expect('location', '/book-a-visit/select-date-and-time')
+        .expect('location', `${journey.urlPrefix}/select-date-and-time`)
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledWith('errors', [
             { location: 'body', msg: 'No time slot selected', param: 'visit-date-and-time', value: '100' },
