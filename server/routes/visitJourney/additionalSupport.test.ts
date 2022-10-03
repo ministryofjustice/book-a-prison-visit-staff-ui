@@ -14,10 +14,7 @@ let flashData: Record<'errors' | 'formValues', Record<string, string | string[]>
 let visitSessionData: VisitSessionData
 
 // run tests for booking and update journeys
-const testJourneys = [
-  { urlPrefix: '/book-a-visit', previousVisitReference: undefined },
-  { urlPrefix: '/visit/ab-cd-ef-gh/update', previousVisitReference: 'ab-cd-ef-gh' },
-]
+const testJourneys = [{ urlPrefix: '/book-a-visit' }, { urlPrefix: '/visit/ab-cd-ef-gh/update' }]
 
 config.features.updateJourneyEnabled = true
 
@@ -84,7 +81,6 @@ testJourneys.forEach(journey => {
             banned: false,
           },
         ],
-        previousVisitReference: journey.previousVisitReference,
         visitReference: 'ab-cd-ef-gh',
         visitStatus: 'RESERVED',
       }
@@ -106,6 +102,7 @@ testJourneys.forEach(journey => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('h1').text().trim()).toBe('Is additional support needed for any of the visitors?')
+          expect($('.govuk-back-link').attr('href')).toBe(`${journey.urlPrefix}/select-date-and-time`)
           expect($('[data-test="support-required-yes"]').prop('checked')).toBe(false)
           expect($('[data-test="support-required-no"]').prop('checked')).toBe(false)
         })
@@ -271,7 +268,6 @@ testJourneys.forEach(journey => {
             banned: false,
           },
         ],
-        previousVisitReference: journey.previousVisitReference,
         visitReference: 'ab-cd-ef-gh',
         visitStatus: 'RESERVED',
       }

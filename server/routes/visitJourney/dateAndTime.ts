@@ -85,7 +85,7 @@ export default class DateAndTime {
       formValues,
       slotsPresent,
       restrictionChangeMessage,
-      urlPrefix: getUrlPrefix(isUpdate, visitSessionData.previousVisitReference),
+      urlPrefix: getUrlPrefix(isUpdate, visitSessionData.visitReference),
     })
   }
 
@@ -107,11 +107,20 @@ export default class DateAndTime {
 
     visitSessionData.visit = getSelectedSlot(req.session.slotsList, req.body['visit-date-and-time'])
 
+    // See README ('Visit journeys – book and update') for explanation of this flow
     if (visitSessionData.applicationReference) {
       await this.visitSessionsService.changeReservedVisit({
         username: res.locals.user?.username,
         visitSessionData,
       })
+    } else if (isUpdate) {
+      const { applicationReference, visitStatus } = await this.visitSessionsService.changeBookedVisit({
+        username: res.locals.user?.username,
+        visitSessionData,
+      })
+
+      visitSessionData.applicationReference = applicationReference
+      visitSessionData.visitStatus = visitStatus
     } else {
       const { applicationReference, reference, visitStatus } = await this.visitSessionsService.reserveVisit({
         username: res.locals.user?.username,
@@ -135,7 +144,7 @@ export default class DateAndTime {
       operationId: res.locals.appInsightsOperationId,
     })
 
-    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.previousVisitReference)
+    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
     return res.redirect(`${urlPrefix}/additional-support`)
   }
 

@@ -41,7 +41,11 @@ export default function sessionCheckMiddleware({ stage }: { stage: number }): Re
       return res.redirect(`/prisoner/${visitSessionData.prisoner.offenderNo}?error=missing-visit-reference`)
     }
 
-    if (stage > 2 && stage < 6 && visitSessionData.visitStatus !== 'RESERVED') {
+    if (
+      stage > 2 &&
+      stage < 6 &&
+      !(visitSessionData.visitStatus === 'RESERVED' || visitSessionData.visitStatus === 'CHANGING')
+    ) {
       return res.redirect(`/prisoner/${visitSessionData.prisoner.offenderNo}?error=visit-already-booked`)
     }
 

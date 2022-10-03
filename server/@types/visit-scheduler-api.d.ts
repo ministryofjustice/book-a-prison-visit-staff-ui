@@ -6,7 +6,7 @@
 export interface paths {
   '/visits/{reference}': {
     /** Retrieve visit by visit reference */
-    get: operations['getBookedVisitByReference']
+    get: operations['getVisitByReference']
     put: operations['updateVisit']
   }
   '/visits/{reference}/change': {
@@ -386,8 +386,8 @@ export interface components {
       messageAttributes?: {
         [key: string]: components['schemas']['MessageAttributeValue']
       }
-      md5OfMessageAttributes?: string
       md5OfBody?: string
+      md5OfMessageAttributes?: string
     }
     MessageAttributeValue: {
       stringValue?: string
@@ -709,23 +709,23 @@ export interface components {
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject']
-      pageable?: components['schemas']['PageableObject']
-      /** Format: int32 */
-      numberOfElements?: number
       first?: boolean
       last?: boolean
+      /** Format: int32 */
+      numberOfElements?: number
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     PageableObject: {
       /** Format: int64 */
       offset?: number
       sort?: components['schemas']['SortObject']
-      /** Format: int32 */
-      pageNumber?: number
-      /** Format: int32 */
-      pageSize?: number
       paged?: boolean
       unpaged?: boolean
+      /** Format: int32 */
+      pageSize?: number
+      /** Format: int32 */
+      pageNumber?: number
     }
     SortObject: {
       empty?: boolean
@@ -822,7 +822,7 @@ export interface components {
 
 export interface operations {
   /** Retrieve visit by visit reference */
-  getBookedVisitByReference: {
+  getVisitByReference: {
     parameters: {
       path: {
         /** reference */

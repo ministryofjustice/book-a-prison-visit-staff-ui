@@ -17,7 +17,7 @@ let visitSessionData: VisitSessionData
 // run tests for booking and update journeys
 const testJourneys = [
   { urlPrefix: '/book-a-visit', isUpdate: false },
-  { urlPrefix: '/visit/aa-bb-cc-dd/update', isUpdate: true },
+  { urlPrefix: '/visit/ab-cd-ef-gh/update', isUpdate: true },
 ]
 
 config.features.updateJourneyEnabled = true

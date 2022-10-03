@@ -1,7 +1,6 @@
 import type { Request, Response } from 'express'
 import logger from '../../../logger'
 import config from '../../config'
-import { OutcomeDto } from '../../data/visitSchedulerApiTypes'
 import AuditService from '../../services/auditService'
 import NotificationsService from '../../services/notificationsService'
 import VisitSessionsService from '../../services/visitSessionsService'
@@ -34,7 +33,7 @@ export default class CheckYourBooking {
       visitRestriction: visitSessionData.visitRestriction,
       visitors: visitSessionData.visitors,
       additionalSupport,
-      urlPrefix: getUrlPrefix(isUpdate, visitSessionData.previousVisitReference),
+      urlPrefix: getUrlPrefix(isUpdate, visitSessionData.visitReference),
     })
   }
 
@@ -74,27 +73,6 @@ export default class CheckYourBooking {
         operationId: res.locals.appInsightsOperationId,
       })
 
-      if (isUpdate) {
-        const outcome: OutcomeDto = {
-          outcomeStatus: 'SUPERSEDED_CANCELLATION',
-          text: visitSessionData.visitReference,
-        }
-
-        await this.visitSessionsService.cancelVisit({
-          username: res.locals.user?.username,
-          reference: visitSessionData.previousVisitReference,
-          outcome,
-        })
-
-        await this.auditService.cancelledVisit({
-          visitReference: visitSessionData.previousVisitReference,
-          prisonerId: visitSessionData.prisoner.offenderNo,
-          reason: `${outcome.outcomeStatus}: Superseded by ${outcome.text}`,
-          username: res.locals.user?.username,
-          operationId: res.locals.appInsightsOperationId,
-        })
-      }
-
       if (config.apis.notifications.enabled) {
         try {
           const phoneNumber = visitSessionData.mainContact.phoneNumber.replace(/\s/g, '')
@@ -124,11 +102,11 @@ export default class CheckYourBooking {
         visitRestriction: visitSessionData.visitRestriction,
         visitors: visitSessionData.visitors,
         additionalSupport,
-        urlPrefix: getUrlPrefix(isUpdate, visitSessionData.previousVisitReference),
+        urlPrefix: getUrlPrefix(isUpdate, visitSessionData.visitReference),
       })
     }
 
-    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.previousVisitReference)
+    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
     return res.redirect(`${urlPrefix}/confirmation`)
   }
 }

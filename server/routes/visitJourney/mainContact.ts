@@ -27,7 +27,7 @@ export default class MainContact {
       reference: visitSessionData.visitReference ?? '',
       adultVisitors: req.session.adultVisitors?.adults,
       formValues,
-      urlPrefix: getUrlPrefix(isUpdate, visitSessionData.previousVisitReference),
+      urlPrefix: getUrlPrefix(isUpdate, visitSessionData.visitReference),
     })
   }
 
@@ -52,7 +52,7 @@ export default class MainContact {
       contactName: selectedContact === undefined ? req.body.someoneElseName : undefined,
     }
 
-    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.previousVisitReference)
+    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
     return res.redirect(`${urlPrefix}/check-your-booking`)
   }
 

@@ -30,7 +30,7 @@ export default class AdditionalSupport {
       errors: req.flash('errors'),
       availableSupportTypes,
       formValues,
-      urlPrefix: getUrlPrefix(isUpdate, visitSessionData.previousVisitReference),
+      urlPrefix: getUrlPrefix(isUpdate, visitSessionData.visitReference),
     })
   }
 
@@ -56,7 +56,7 @@ export default class AdditionalSupport {
             return supportItem
           })
 
-    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.previousVisitReference)
+    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
     return res.redirect(`${urlPrefix}/select-main-contact`)
   }
 

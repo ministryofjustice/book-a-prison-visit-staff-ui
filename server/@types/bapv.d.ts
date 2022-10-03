@@ -196,7 +196,6 @@ export type VisitSessionData = {
   }
   applicationReference?: string
   visitReference?: string
-  previousVisitReference?: string
   visitStatus?: Visit['visitStatus']
 }
 
