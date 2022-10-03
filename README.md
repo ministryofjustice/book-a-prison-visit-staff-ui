@@ -91,6 +91,28 @@ In the [CircleCI builds](https://app.circleci.com/pipelines/github/ministryofjus
 
 The unit test coverage report can be found at `test_results/jest/coverage/lcov-report/index.html`.
 
+## Visit journeys – book and update
+The same booking journey is used both for initially booking a visit and updating an existing visit. The difference between the two and the different Visit Scheduler API calls required occurs when submitting the 'Select date and time of visit' page (see `POST` handler in [`dateAndTime.ts`](./server/routes/visitJourney/dateAndTime.ts)).
+
+**Booking a new visit**
+* first time selecting date/time
+  * uses `POST /visits/slot/reserve` and gets a visit `reference` and `applicationReference` with the status `RESERVED`
+* changing date/time (before booking)
+  * uses `PUT /visits/applicationReference/slot/change` and the visit status stays as `RESERVED`
+
+**Updating and existing visit**
+* first time selecting date/time (which will have been pre-populated with the existing slot if possible)
+  * uses `PUT /visits/{reference}/change` to initiate the change and gets a **new** `applicationReference` with a status of either: 
+    * `CHANGING` - date/time slot and open/closed the same
+    * `RESERVED` - date/time slot or open/closed have changed
+* changing date/time (before booking)
+  * also uses `PUT /visits/{applicationReference}/slot/change` with the visit status returned being either `CHANGING` or `RESERVED`
+    depending on whether the date/time slot or open/closed have changed
+
+In both cases, at the end of the journey there are two further calls to confirm the booking:
+1. `PUT /visits/{applicationReference}/slot/change` to set all the visit data
+2. `PUT /visits/{applicationReference}/book` to change the visit's status to `BOOKED`
+
 ## Imported types
 
 Some TypeScript types are imported via the Open API (Swagger) docs, e.g. from the Visit Scheduler, Prisoner Contact Registry, Prison API, etc.
