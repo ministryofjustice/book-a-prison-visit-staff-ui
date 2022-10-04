@@ -146,6 +146,7 @@ beforeEach(() => {
         banned: false,
       },
     ],
+    visitReference: 'ab-cd-ef-gh',
   }
 })
 
