@@ -45,6 +45,7 @@ describe('sessionCheckMiddleware', () => {
 
   beforeEach(() => {
     req = {
+      params: {},
       session: {
         regenerate: jest.fn(),
         destroy: jest.fn(),
@@ -65,6 +66,34 @@ describe('sessionCheckMiddleware', () => {
     sessionCheckMiddleware({ stage: 1 })(req as Request, mockResponse as Response, next)
 
     expect(mockResponse.redirect).toHaveBeenCalledWith('/search/prisoner/?error=missing-session')
+  })
+
+  describe('visit reference in URL (e.g. /visit/:reference/update/select-visitors)', () => {
+    it('should redirect to start page if visit reference in URL does not match that in visitSessionData', () => {
+      req.params.reference = 'ab-cd-ef-gh'
+      req.session.visitSessionData = { visitReference: 'bb-cc-dd-ee-ff' } as VisitSessionData
+
+      sessionCheckMiddleware({ stage: 1 })(req as Request, mockResponse as Response, next)
+
+      expect(mockResponse.redirect).toHaveBeenCalledWith('/?error=reference-mismatch')
+    })
+
+    it('should not redirect if visit reference in URL matches that in visitSessionData', () => {
+      req.params.reference = 'ab-cd-ef-gh'
+      req.session.visitSessionData = {
+        prisoner: {
+          name: 'abc',
+          offenderNo: 'A1234BC',
+          dateOfBirth: '12 May 1977',
+          location: 'abc',
+        },
+        visitReference: 'ab-cd-ef-gh',
+      } as VisitSessionData
+
+      sessionCheckMiddleware({ stage: 1 })(req as Request, mockResponse as Response, next)
+
+      expect(mockResponse.redirect).not.toHaveBeenCalled()
+    })
   })
 
   describe('prisoner data missing', () => {

@@ -4,9 +4,14 @@ import { isValidPrisonerNumber } from '../routes/validationChecks'
 export default function sessionCheckMiddleware({ stage }: { stage: number }): RequestHandler {
   return (req, res, next) => {
     const { visitSessionData } = req.session
+    const { reference } = req.params
 
     if (!visitSessionData) {
       return res.redirect('/search/prisoner/?error=missing-session')
+    }
+
+    if (reference && visitSessionData.visitReference !== reference) {
+      return res.redirect('/?error=reference-mismatch')
     }
 
     if (
