@@ -123,6 +123,10 @@ export default function routes(
 
     req.session.visitSessionData = Object.assign(req.session.visitSessionData ?? {}, visitSessionData)
 
+    const dateToday = new Date()
+    const visitDate = new Date(visitSessionData.visit.startTimestamp)
+    const showButtons = dateToday < visitDate
+
     return res.render('pages/visit/summary', {
       prisoner,
       prisonerLocation,
@@ -132,6 +136,7 @@ export default function routes(
       fromVisitSearch,
       fromVisitSearchQuery,
       updateJourneyEnabled: config.features.updateJourneyEnabled,
+      showButtons,
     })
   })
 
