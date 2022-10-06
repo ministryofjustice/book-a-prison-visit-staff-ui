@@ -58,10 +58,10 @@ export default class DateAndTime {
           if (visitSessionData.visitRestriction === 'CLOSED') {
             if (visitSessionData.closedVisitReason === 'visitor') {
               restrictionChangeMessage =
-                'This is now a closed visit due to a visitor restriction. The visit time can stay the same'
+                'This is now a closed visit due to a visitor restriction. The visit time can stay the same.'
             } else {
               restrictionChangeMessage =
-                'This is now a closed visit due to a prisoner restriction. The visit time can stay the same'
+                'This is now a closed visit due to a prisoner restriction. The visit time can stay the same.'
             }
           } else {
             restrictionChangeMessage = 'This is now an open visit. The visit time can stay the same.'
