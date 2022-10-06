@@ -44,14 +44,25 @@ export default class DateAndTime {
       if (visitSessionData.visitRestriction !== visitSessionData.originalVisitSlot?.visitRestriction) {
         if (!selectedSlot || selectedSlot.availableTables === 0) {
           if (visitSessionData.visitRestriction === 'CLOSED') {
-            restrictionChangeMessage = 'A new visit time must be selected as this is now a closed visit.'
+            if (visitSessionData.closedVisitReason === 'visitor') {
+              restrictionChangeMessage =
+                'A new visit time must be selected as this is now a closed visit due to a visitor restriction.'
+            } else {
+              restrictionChangeMessage =
+                'A new visit time must be selected as this is now a closed visit due to a prisoner restriction.'
+            }
           } else {
             restrictionChangeMessage = 'A new visit time must be selected as this is now an open visit.'
           }
         } else if (selectedSlot && selectedSlot.availableTables > 0) {
-          // can reserve slot here for same time, different restriction
           if (visitSessionData.visitRestriction === 'CLOSED') {
-            restrictionChangeMessage = 'This is now a closed visit. The visit time can stay the same.'
+            if (visitSessionData.closedVisitReason === 'visitor') {
+              restrictionChangeMessage =
+                'This is now a closed visit due to a visitor restriction. The visit time can stay the same.'
+            } else {
+              restrictionChangeMessage =
+                'This is now a closed visit due to a prisoner restriction. The visit time can stay the same.'
+            }
           } else {
             restrictionChangeMessage = 'This is now an open visit. The visit time can stay the same.'
           }
