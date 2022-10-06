@@ -85,7 +85,6 @@ export default class SelectVisitors {
       return closedVisit || visitor.restrictions.some(restriction => restriction.restrictionType === 'CLOSED')
     }, false)
     const newVisitRestriction = closedVisitVisitors ? 'CLOSED' : 'OPEN'
-    visitSessionData.previousVisitRestriction = visitSessionData.visitRestriction
     visitSessionData.visitRestriction = newVisitRestriction
     visitSessionData.closedVisitReason = closedVisitVisitors ? 'visitor' : undefined
 

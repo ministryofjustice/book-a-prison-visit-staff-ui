@@ -13,7 +13,7 @@ import { clearSession, getFlashFormValues } from './visitorUtils'
 import NotificationsService from '../services/notificationsService'
 import config from '../config'
 import logger from '../../logger'
-import { VisitorListItem, VisitSessionData } from '../@types/bapv'
+import { VisitorListItem, VisitSessionData, VisitSlot } from '../@types/bapv'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
 import SelectVisitors from './visitJourney/selectVisitors'
 import PrisonerProfileService from '../services/prisonerProfileService'
@@ -93,6 +93,15 @@ export default function routes(
 
     // clean then load session
     clearSession(req)
+    const visitSlot: VisitSlot = {
+      id: '',
+      startTimestamp: visit.startTimestamp,
+      endTimestamp: visit.endTimestamp,
+      availableTables: 0,
+      capacity: undefined,
+      visitRoomName: visit.visitRoom,
+      visitRestriction: visit.visitRestriction,
+    }
     const visitSessionData: VisitSessionData = {
       prisoner: {
         name: properCaseFullName(`${prisoner.lastName}, ${prisoner.firstName}`),
@@ -100,15 +109,8 @@ export default function routes(
         dateOfBirth: prisoner.dateOfBirth,
         location: prisonerLocation,
       },
-      visit: {
-        id: '',
-        startTimestamp: visit.startTimestamp,
-        endTimestamp: visit.endTimestamp,
-        availableTables: 0,
-        capacity: undefined,
-        visitRoomName: visit.visitRoom,
-        visitRestriction: visit.visitRestriction,
-      },
+      visit: visitSlot,
+      originalVisitSlot: visitSlot,
       visitRestriction: visit.visitRestriction,
       visitors: currentVisitors,
       visitorSupport: visit.visitorSupport,
