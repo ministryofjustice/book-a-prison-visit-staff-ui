@@ -53,7 +53,13 @@
     <br>Time slots with prisoner non-associations are not shown.
     </p>
 
-    {% if visitRestriction == 'CLOSED' and closedVisitReason %}
+    {% if restrictionChangeMessage %}
+      {{ mojBanner({
+        type: 'information',
+        classes: "govuk-!-padding-left-4 test-restriction-reason",
+        html: restrictionChangeMessage
+      }) }}
+    {% elseif visitRestriction == 'CLOSED' and closedVisitReason %}
       {% set closedVisitReasonHtml %}
         {{ govukWarningText({
           classes: "govuk-!-margin-bottom-0",
@@ -72,13 +78,7 @@
         html: closedVisitReasonHtml
       }) }}
     {% endif %}
-    {% if restrictionChangeMessage %}
-      {{ mojBanner({
-        type: 'information',
-        classes: "govuk-!-padding-left-4",
-        html: restrictionChangeMessage
-      }) }}
-    {% endif %}
+    
 
     <form action="{{ urlPrefix}}/select-date-and-time" method="GET" novalidate>
       <div class="bapv-visit-date-time-filter">
