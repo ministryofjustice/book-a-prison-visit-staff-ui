@@ -36,27 +36,25 @@
         }) }}
       {% endset %}
 
-      {{ pagination | safe }}
-
-        {{ govukTable({
-            classes: "bapv-table govuk-!-margin-top-3",
-            captionClasses: "govuk-table__caption--m",
-            attributes: {
-              "id": "search-results-true"
-            },
-            head: [
-                {
-                  text: "Name"
-                },
-                {
-                  text: "Prison number"
-                },
-                {
-                  text: "Date of birth"
-                }
-            ],
-            rows: results
-        }) }}
+      {{ govukTable({
+          classes: "bapv-table govuk-!-margin-top-3",
+          captionClasses: "govuk-table__caption--m",
+          attributes: {
+            "id": "search-results-true"
+          },
+          head: [
+              {
+                text: "Name"
+              },
+              {
+                text: "Prison number"
+              },
+              {
+                text: "Date of birth"
+              }
+          ],
+          rows: results
+      }) }}
 
       {{ pagination | safe }}
     {% elif errors | length %}
