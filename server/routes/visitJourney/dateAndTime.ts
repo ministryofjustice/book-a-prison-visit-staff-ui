@@ -30,10 +30,10 @@ export default class DateAndTime {
     let matchingSlot = ''
     let selectedSlot
 
-    if (isUpdate && visitSessionData.visit?.id === '') {
+    if (isUpdate && visitSessionData.visitSlot?.id === '') {
       selectedSlot = getSelectedSlotByStartTimestamp(
         slotsList,
-        visitSessionData.visit.startTimestamp,
+        visitSessionData.visitSlot.startTimestamp,
         visitSessionData.visitRestriction,
       )
 
@@ -80,8 +80,8 @@ export default class DateAndTime {
     }
 
     const formValues = getFlashFormValues(req)
-    if (!Object.keys(formValues).length && visitSessionData.visit?.id) {
-      formValues['visit-date-and-time'] = visitSessionData.visit?.id
+    if (!Object.keys(formValues).length && visitSessionData.visitSlot?.id) {
+      formValues['visit-date-and-time'] = visitSessionData.visitSlot?.id
     }
     if (!Object.keys(formValues).length && matchingSlot) {
       formValues['visit-date-and-time'] = matchingSlot
@@ -126,7 +126,7 @@ export default class DateAndTime {
       return res.redirect(req.originalUrl)
     }
 
-    visitSessionData.visit = getSelectedSlot(req.session.slotsList, req.body['visit-date-and-time'])
+    visitSessionData.visitSlot = getSelectedSlot(req.session.slotsList, req.body['visit-date-and-time'])
 
     // See README ('Visit journeys – book and update') for explanation of this flow
     if (visitSessionData.applicationReference) {
@@ -158,8 +158,8 @@ export default class DateAndTime {
       visitReference: visitSessionData.visitReference,
       prisonerId: visitSessionData.prisoner.offenderNo,
       visitorIds: visitSessionData.visitors.map(visitor => visitor.personId.toString()),
-      startTimestamp: visitSessionData.visit.startTimestamp,
-      endTimestamp: visitSessionData.visit.endTimestamp,
+      startTimestamp: visitSessionData.visitSlot.startTimestamp,
+      endTimestamp: visitSessionData.visitSlot.endTimestamp,
       visitRestriction: visitSessionData.visitRestriction,
       username: res.locals.user?.username,
       operationId: res.locals.appInsightsOperationId,

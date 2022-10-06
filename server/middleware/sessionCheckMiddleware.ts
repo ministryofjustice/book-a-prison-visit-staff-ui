@@ -33,11 +33,11 @@ export default function sessionCheckMiddleware({ stage }: { stage: number }): Re
 
     if (
       stage > 2 &&
-      (!visitSessionData.visit ||
-        !visitSessionData.visit.id ||
-        typeof visitSessionData.visit.availableTables === 'undefined' ||
-        !visitSessionData.visit.startTimestamp ||
-        !visitSessionData.visit.endTimestamp)
+      (!visitSessionData.visitSlot ||
+        !visitSessionData.visitSlot.id ||
+        typeof visitSessionData.visitSlot.availableTables === 'undefined' ||
+        !visitSessionData.visitSlot.startTimestamp ||
+        !visitSessionData.visitSlot.endTimestamp)
     ) {
       return res.redirect(`/prisoner/${visitSessionData.prisoner.offenderNo}?error=missing-visit`)
     }

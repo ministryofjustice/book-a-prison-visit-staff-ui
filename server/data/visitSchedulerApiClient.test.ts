@@ -304,7 +304,7 @@ describe('visitSchedulerApiClient', () => {
           dateOfBirth: '23 May 1988',
           location: 'somewhere',
         },
-        visit: {
+        visitSlot: {
           id: '1',
           startTimestamp,
           endTimestamp,
@@ -336,7 +336,7 @@ describe('visitSchedulerApiClient', () => {
         .post('/visits/slot/reserve', <ReserveVisitSlotDto>{
           prisonerId: visitSessionData.prisoner.offenderNo,
           prisonId,
-          visitRoom: visitSessionData.visit.visitRoomName,
+          visitRoom: visitSessionData.visitSlot.visitRoomName,
           visitType,
           visitRestriction,
           startTimestamp,
@@ -403,7 +403,7 @@ describe('visitSchedulerApiClient', () => {
           dateOfBirth: '23 May 1988',
           location: 'somewhere',
         },
-        visit: {
+        visitSlot: {
           id: '1',
           startTimestamp: result.startTimestamp,
           endTimestamp: result.endTimestamp,
@@ -448,8 +448,8 @@ describe('visitSchedulerApiClient', () => {
       fakeVisitSchedulerApi
         .put('/visits/aaa-bbb-ccc/slot/change', <ChangeVisitSlotRequestDto>{
           visitRestriction: visitSessionData.visitRestriction,
-          startTimestamp: visitSessionData.visit.startTimestamp,
-          endTimestamp: visitSessionData.visit.endTimestamp,
+          startTimestamp: visitSessionData.visitSlot.startTimestamp,
+          endTimestamp: visitSessionData.visitSlot.endTimestamp,
           visitContact,
           visitors: visitSessionData.visitors.map(visitor => {
             return {
@@ -497,7 +497,7 @@ describe('visitSchedulerApiClient', () => {
           dateOfBirth: '23 May 1988',
           location: 'somewhere',
         },
-        visit: {
+        visitSlot: {
           id: '1',
           startTimestamp: result.startTimestamp,
           endTimestamp: result.endTimestamp,
@@ -533,8 +533,8 @@ describe('visitSchedulerApiClient', () => {
       fakeVisitSchedulerApi
         .put('/visits/aaa-bbb-ccc/slot/change', <ChangeVisitSlotRequestDto>{
           visitRestriction: visitSessionData.visitRestriction,
-          startTimestamp: visitSessionData.visit.startTimestamp,
-          endTimestamp: visitSessionData.visit.endTimestamp,
+          startTimestamp: visitSessionData.visitSlot.startTimestamp,
+          endTimestamp: visitSessionData.visitSlot.endTimestamp,
           visitContact: undefined,
           visitors: visitSessionData.visitors.map(visitor => {
             return {
@@ -586,7 +586,7 @@ describe('visitSchedulerApiClient', () => {
           dateOfBirth: '23 May 1988',
           location: 'somewhere',
         },
-        visit: {
+        visitSlot: {
           id: '1',
           startTimestamp: '2022-02-14T10:00:00',
           endTimestamp: '2022-02-14T11:00:00',
@@ -621,12 +621,12 @@ describe('visitSchedulerApiClient', () => {
         reference: visitSessionData.visitReference,
         prisonerId: visitSessionData.prisoner.offenderNo,
         prisonId,
-        visitRoom: visitSessionData.visit.visitRoomName,
+        visitRoom: visitSessionData.visitSlot.visitRoomName,
         visitType,
         visitStatus: 'CHANGING',
         visitRestriction: visitSessionData.visitRestriction,
-        startTimestamp: visitSessionData.visit.startTimestamp,
-        endTimestamp: visitSessionData.visit.endTimestamp,
+        startTimestamp: visitSessionData.visitSlot.startTimestamp,
+        endTimestamp: visitSessionData.visitSlot.endTimestamp,
         visitNotes: [],
         visitContact: {
           name: 'John Smith',
@@ -647,11 +647,11 @@ describe('visitSchedulerApiClient', () => {
         .put(`/visits/${visitSessionData.visitReference}/change`, <ReserveVisitSlotDto>{
           prisonerId: visitSessionData.prisoner.offenderNo,
           prisonId,
-          visitRoom: visitSessionData.visit.visitRoomName,
+          visitRoom: visitSessionData.visitSlot.visitRoomName,
           visitType,
           visitRestriction: visitSessionData.visitRestriction,
-          startTimestamp: visitSessionData.visit.startTimestamp,
-          endTimestamp: visitSessionData.visit.endTimestamp,
+          startTimestamp: visitSessionData.visitSlot.startTimestamp,
+          endTimestamp: visitSessionData.visitSlot.endTimestamp,
           visitContact: {
             name: visitSessionData.mainContact.contactName,
             telephone: visitSessionData.mainContact.phoneNumber,

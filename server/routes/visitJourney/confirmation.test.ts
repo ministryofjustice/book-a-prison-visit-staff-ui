@@ -68,7 +68,7 @@ testJourneys.forEach(journey => {
           location: 'location place',
         },
         visitRestriction: 'OPEN',
-        visit: {
+        visitSlot: {
           id: 'visitId',
           startTimestamp: '2022-03-12T09:30:00',
           endTimestamp: '2022-03-12T10:30:00',
@@ -149,7 +149,7 @@ testJourneys.forEach(journey => {
             location: 'location place',
           },
           visitRestriction: 'OPEN',
-          visit: {
+          visitSlot: {
             id: 'visitId',
             startTimestamp: '2022-03-12T09:30:00',
             endTimestamp: '2022-03-12T10:30:00',

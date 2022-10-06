@@ -11,16 +11,16 @@ export default class NotificationsService {
   async sendBookingSms({
     phoneNumber,
     prisonName,
-    visit,
+    visitSlot,
     reference,
   }: {
     phoneNumber: string
     prisonName: string
-    visit: VisitSlot
+    visitSlot: VisitSlot
     reference: string
   }): Promise<SmsResponse> {
     const notificationsApiClient = this.notificationsApiClientBuilder()
-    const parsedDate = new Date(visit.startTimestamp)
+    const parsedDate = new Date(visitSlot.startTimestamp)
     const visitTime = format(parsedDate, 'h:mmaaa')
     const visitDay = format(parsedDate, 'EEEE')
     const visitDate = format(parsedDate, 'd MMMM yyyy')
@@ -38,16 +38,16 @@ export default class NotificationsService {
   async sendCancellationSms({
     phoneNumber,
     prisonName,
-    visit,
+    visitSlot,
     prisonPhoneNumber,
   }: {
     phoneNumber: string
     prisonName: string
-    visit: string
+    visitSlot: string
     prisonPhoneNumber: string
   }): Promise<SmsResponse> {
     const notificationsApiClient = this.notificationsApiClientBuilder()
-    const parsedDate = new Date(visit)
+    const parsedDate = new Date(visitSlot)
     const visitTime = format(parsedDate, 'h:mmaaa')
     const visitDate = format(parsedDate, 'd MMMM yyyy')
 
@@ -63,16 +63,16 @@ export default class NotificationsService {
   async sendUpdateSms({
     phoneNumber,
     prisonName,
-    visit,
+    visitSlot,
     reference,
   }: {
     phoneNumber: string
     prisonName: string
-    visit: VisitSlot
+    visitSlot: VisitSlot
     reference: string
   }): Promise<SmsResponse> {
     const notificationsApiClient = this.notificationsApiClientBuilder()
-    const parsedDate = new Date(visit.startTimestamp)
+    const parsedDate = new Date(visitSlot.startTimestamp)
     const visitTime = format(parsedDate, 'h:mmaaa')
     const visitDay = format(parsedDate, 'EEEE')
     const visitDate = format(parsedDate, 'd MMMM yyyy')

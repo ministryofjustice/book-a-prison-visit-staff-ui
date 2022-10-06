@@ -29,7 +29,7 @@
 
         {% if isUpdate %}
             <h2 class="govuk-heading-m govuk-!-margin-top-6">What happens next</h2>
-            <p>The visit booking for {{ visit.startTimestamp | formatTime + " to " + visit.endTimestamp | formatTime }} on {{ visit.startTimestamp | formatDate("EEEE d MMMM yyyy") }} has been updated.</p>
+            <p>The visit booking for {{ visitSlot.startTimestamp | formatTime + " to " + visitSlot.endTimestamp | formatTime }} on {{ visitSlot.startTimestamp | formatDate("EEEE d MMMM yyyy") }} has been updated.</p>
             <p>The main contact for this visit will get a text message to confirm the updated booking. This will include the booking reference.</p>
         {% else %}
             <h2 class="govuk-heading-m govuk-!-margin-top-6">What to do next</h2>
@@ -64,7 +64,7 @@
             text: "Date"
         },
         value: {
-            text: visit.startTimestamp | formatDate("EEEE d MMMM yyyy"),
+            text: visitSlot.startTimestamp | formatDate("EEEE d MMMM yyyy"),
             classes: "test-visit-date"
         }
     },
@@ -73,7 +73,7 @@
             text: "Time"
         },
         value: {
-            text: visit.startTimestamp | formatTime + " to " + visit.endTimestamp | formatTime,
+            text: visitSlot.startTimestamp | formatTime + " to " + visitSlot.endTimestamp | formatTime,
             classes: "test-visit-time"
         }
     },

@@ -654,7 +654,7 @@ describe('Visit sessions service', () => {
           dateOfBirth: '23 May 1988',
           location: 'somewhere',
         },
-        visit: {
+        visitSlot: {
           id: '1',
           startTimestamp: '2022-02-14T10:00:00',
           endTimestamp: '2022-02-14T11:00:00',
@@ -688,7 +688,7 @@ describe('Visit sessions service', () => {
         reference: 'ab-cd-ef-gh',
         prisonerId: visitSessionData.prisoner.offenderNo,
         prisonId: 'HEI',
-        visitRoom: visitSessionData.visit.visitRoomName,
+        visitRoom: visitSessionData.visitSlot.visitRoomName,
         visitType: 'SOCIAL',
         visitStatus: 'RESERVED',
         visitRestriction: 'OPEN',
@@ -723,7 +723,7 @@ describe('Visit sessions service', () => {
           dateOfBirth: '23 May 1988',
           location: 'somewhere',
         },
-        visit: {
+        visitSlot: {
           id: 'visitId',
           startTimestamp: '2022-02-14T10:00:00',
           endTimestamp: '2022-02-14T11:00:00',
@@ -766,12 +766,12 @@ describe('Visit sessions service', () => {
         reference: visitSessionData.visitReference,
         prisonerId: visitSessionData.prisoner.offenderNo,
         prisonId: 'HEI',
-        visitRoom: visitSessionData.visit.visitRoomName,
+        visitRoom: visitSessionData.visitSlot.visitRoomName,
         visitType: 'SOCIAL',
         visitStatus: visitSessionData.visitStatus,
         visitRestriction: visitSessionData.visitRestriction,
-        startTimestamp: visitSessionData.visit.startTimestamp,
-        endTimestamp: visitSessionData.visit.endTimestamp,
+        startTimestamp: visitSessionData.visitSlot.startTimestamp,
+        endTimestamp: visitSessionData.visitSlot.endTimestamp,
         visitNotes: [],
         visitContact: {
           name: 'John Smith',
@@ -828,7 +828,7 @@ describe('Visit sessions service', () => {
           dateOfBirth: '23 May 1988',
           location: 'somewhere',
         },
-        visit: {
+        visitSlot: {
           id: 'visitId',
           startTimestamp: '2022-02-14T10:00:00',
           endTimestamp: '2022-02-14T11:00:00',
@@ -871,12 +871,12 @@ describe('Visit sessions service', () => {
         reference: visitSessionData.visitReference,
         prisonerId: visitSessionData.prisoner.offenderNo,
         prisonId: 'HEI',
-        visitRoom: visitSessionData.visit.visitRoomName,
+        visitRoom: visitSessionData.visitSlot.visitRoomName,
         visitType: 'SOCIAL',
         visitStatus: 'CHANGING',
         visitRestriction: visitSessionData.visitRestriction,
-        startTimestamp: visitSessionData.visit.startTimestamp,
-        endTimestamp: visitSessionData.visit.endTimestamp,
+        startTimestamp: visitSessionData.visitSlot.startTimestamp,
+        endTimestamp: visitSessionData.visitSlot.endTimestamp,
         visitNotes: [],
         visitContact: {
           name: 'John Smith',

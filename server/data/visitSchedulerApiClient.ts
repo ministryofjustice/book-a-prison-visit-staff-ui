@@ -86,11 +86,11 @@ class VisitSchedulerApiClient {
       data: <ReserveVisitSlotDto>{
         prisonerId: visitSessionData.prisoner.offenderNo,
         prisonId: this.prisonId,
-        visitRoom: visitSessionData.visit.visitRoomName,
+        visitRoom: visitSessionData.visitSlot.visitRoomName,
         visitType: this.visitType,
         visitRestriction: visitSessionData.visitRestriction,
-        startTimestamp: visitSessionData.visit.startTimestamp,
-        endTimestamp: visitSessionData.visit.endTimestamp,
+        startTimestamp: visitSessionData.visitSlot.startTimestamp,
+        endTimestamp: visitSessionData.visitSlot.endTimestamp,
         visitors: visitSessionData.visitors.map(visitor => {
           return {
             nomisPersonId: visitor.personId,
@@ -107,8 +107,8 @@ class VisitSchedulerApiClient {
       path: `/visits/${visitSessionData.applicationReference}/slot/change`,
       data: <ChangeVisitSlotRequestDto>{
         visitRestriction: visitSessionData.visitRestriction,
-        startTimestamp: visitSessionData.visit.startTimestamp,
-        endTimestamp: visitSessionData.visit.endTimestamp,
+        startTimestamp: visitSessionData.visitSlot.startTimestamp,
+        endTimestamp: visitSessionData.visitSlot.endTimestamp,
         visitContact,
         visitors: visitSessionData.visitors.map(visitor => {
           return {
@@ -133,11 +133,11 @@ class VisitSchedulerApiClient {
       data: <ReserveVisitSlotDto>{
         prisonerId: visitSessionData.prisoner.offenderNo,
         prisonId: this.prisonId,
-        visitRoom: visitSessionData.visit.visitRoomName,
+        visitRoom: visitSessionData.visitSlot.visitRoomName,
         visitType: this.visitType,
         visitRestriction: visitSessionData.visitRestriction,
-        startTimestamp: visitSessionData.visit.startTimestamp,
-        endTimestamp: visitSessionData.visit.endTimestamp,
+        startTimestamp: visitSessionData.visitSlot.startTimestamp,
+        endTimestamp: visitSessionData.visitSlot.endTimestamp,
         visitContact,
         visitors: visitSessionData.visitors.map(visitor => {
           return {

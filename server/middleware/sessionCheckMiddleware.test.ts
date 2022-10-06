@@ -27,7 +27,7 @@ const visitorsData: VisitSessionData['visitors'] = [
     banned: false,
   },
 ]
-const visit: VisitSessionData['visit'] = {
+const visitSlot: VisitSessionData['visitSlot'] = {
   id: '1',
   startTimestamp: '123',
   endTimestamp: '123',
@@ -231,7 +231,7 @@ describe('sessionCheckMiddleware', () => {
         visitors: visitorsData,
         visitReference: 'ab-cd-ef-gh',
         visitStatus: 'RESERVED',
-        visit: {
+        visitSlot: {
           id: '1',
           availableTables: 0,
           startTimestamp: '123',
@@ -250,7 +250,7 @@ describe('sessionCheckMiddleware', () => {
       const testData: VisitSessionData = {
         prisoner: prisonerData,
         visitRestriction,
-        visit,
+        visitSlot,
         visitors: visitorsData,
       }
 
@@ -267,7 +267,7 @@ describe('sessionCheckMiddleware', () => {
       {
         prisoner: prisonerData,
         visitRestriction,
-        visit,
+        visitSlot,
         visitors: visitorsData,
         visitReference: 'ab-cd-ef-gh',
         visitStatus: 'RESERVED',
@@ -275,7 +275,7 @@ describe('sessionCheckMiddleware', () => {
       {
         prisoner: prisonerData,
         visitRestriction,
-        visit,
+        visitSlot,
         visitors: visitorsData,
         mainContact: {
           phoneNumber: '',
@@ -299,7 +299,7 @@ describe('sessionCheckMiddleware', () => {
       const testData: VisitSessionData = {
         prisoner: prisonerData,
         visitRestriction,
-        visit,
+        visitSlot,
         visitors: visitorsData,
         mainContact: {
           phoneNumber: '01234567899',
