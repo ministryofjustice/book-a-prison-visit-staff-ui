@@ -41,7 +41,7 @@ export default class DateAndTime {
         matchingSlot = selectedSlot.id
       }
 
-      if (visitSessionData.visitRestriction !== visitSessionData.previousVisitRestriction) {
+      if (visitSessionData.visitRestriction !== visitSessionData.originalVisitSlot?.visitRestriction) {
         if (!selectedSlot || selectedSlot.availableTables === 0) {
           if (visitSessionData.visitRestriction === 'CLOSED') {
             restrictionChangeMessage = 'A new visit time must be selected as this is now a closed visit.'
@@ -57,6 +57,15 @@ export default class DateAndTime {
           }
         }
       }
+    }
+
+    let originalSelectedSlot
+    if (isUpdate && visitSessionData.originalVisitSlot) {
+      originalSelectedSlot = getSelectedSlotByStartTimestamp(
+        slotsList,
+        visitSessionData.originalVisitSlot.startTimestamp,
+        visitSessionData.originalVisitSlot.visitRestriction,
+      )
     }
 
     const formValues = getFlashFormValues(req)
@@ -85,6 +94,7 @@ export default class DateAndTime {
       formValues,
       slotsPresent,
       restrictionChangeMessage,
+      originalSelectedSlot,
       urlPrefix: getUrlPrefix(isUpdate, visitSessionData.visitReference),
     })
   }
