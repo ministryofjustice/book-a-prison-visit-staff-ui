@@ -262,7 +262,7 @@ testJourneys.forEach(journey => {
     })
 
     it('should render the available sessions list with the slot in the session selected', () => {
-      visitSessionData.visit = {
+      visitSessionData.visitSlot = {
         id: '3',
         startTimestamp: '2022-02-14T12:00:00',
         endTimestamp: '2022-02-14T13:05:00',
@@ -353,7 +353,7 @@ testJourneys.forEach(journey => {
         .expect(302)
         .expect('location', `${journey.urlPrefix}/additional-support`)
         .expect(() => {
-          expect(visitSessionData.visit).toEqual(<VisitSlot>{
+          expect(visitSessionData.visitSlot).toEqual(<VisitSlot>{
             id: '2',
             startTimestamp: '2022-02-14T11:59:00',
             endTimestamp: '2022-02-14T12:59:00',
@@ -389,7 +389,7 @@ testJourneys.forEach(journey => {
     })
 
     it('should save new choice to session, update visit reservation and redirect to additional support page if existing session data present', () => {
-      visitSessionData.visit = {
+      visitSessionData.visitSlot = {
         id: '1',
         startTimestamp: '2022-02-14T10:00:00',
         endTimestamp: '2022-02-14T11:00:00',
@@ -409,7 +409,7 @@ testJourneys.forEach(journey => {
         .expect(302)
         .expect('location', `${journey.urlPrefix}/additional-support`)
         .expect(() => {
-          expect(visitSessionData.visit).toEqual(<VisitSlot>{
+          expect(visitSessionData.visitSlot).toEqual(<VisitSlot>{
             id: '3',
             startTimestamp: '2022-02-14T12:00:00',
             endTimestamp: '2022-02-14T13:05:00',

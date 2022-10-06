@@ -242,7 +242,7 @@ describe('GET /visit/:reference', () => {
             dateOfBirth: '1975-04-02',
             location: '1-1-C-028, Hewell (HMP)',
           },
-          visit: {
+          visitSlot: {
             id: '',
             startTimestamp: '2022-02-09T10:00:00',
             endTimestamp: '2022-02-09T11:15:00',
@@ -357,7 +357,7 @@ describe('GET /visit/:reference', () => {
             dateOfBirth: '1975-04-02',
             location: '1-1-C-028, Hewell (HMP)',
           },
-          visit: {
+          visitSlot: {
             id: '',
             startTimestamp: '2022-02-09T10:00:00',
             endTimestamp: '2022-02-09T11:15:00',
@@ -763,7 +763,7 @@ describe('POST /visit/:reference/cancel', () => {
         expect(notificationsService.sendCancellationSms).toHaveBeenCalledTimes(1)
         expect(notificationsService.sendCancellationSms).toHaveBeenCalledWith({
           phoneNumber: cancelledVisit.visitContact.telephone,
-          visit: cancelledVisit.startTimestamp,
+          visitSlot: cancelledVisit.startTimestamp,
           prisonName: 'Hewell (HMP)',
           prisonPhoneNumber: '01234443225',
         })

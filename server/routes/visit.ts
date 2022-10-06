@@ -109,7 +109,7 @@ export default function routes(
         dateOfBirth: prisoner.dateOfBirth,
         location: prisonerLocation,
       },
-      visit: visitSlot,
+      visitSlot,
       originalVisitSlot: visitSlot,
       visitRestriction: visit.visitRestriction,
       visitors: currentVisitors,
@@ -126,7 +126,7 @@ export default function routes(
     req.session.visitSessionData = Object.assign(req.session.visitSessionData ?? {}, visitSessionData)
 
     const nowTimestamp = new Date()
-    const visitStartTimestamp = new Date(visitSessionData.visit.startTimestamp)
+    const visitStartTimestamp = new Date(visitSessionData.visitSlot.startTimestamp)
     const showButtons = nowTimestamp < visitStartTimestamp
 
     return res.render('pages/visit/summary', {
@@ -304,7 +304,7 @@ export default function routes(
 
           await notificationsService.sendCancellationSms({
             phoneNumber,
-            visit: visit.startTimestamp,
+            visitSlot: visit.startTimestamp,
             prisonName: 'Hewell (HMP)',
             prisonPhoneNumber: '01234443225',
           })

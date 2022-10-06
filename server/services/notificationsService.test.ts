@@ -23,7 +23,7 @@ describe('Notifications service', () => {
     const visitDetails = {
       phoneNumber: '07123456789',
       prisonName: 'Hewell',
-      visit: {
+      visitSlot: {
         id: '1',
         startTimestamp: '2022-02-14T10:00:00',
         endTimestamp: '2022-02-14T11:00:00',
@@ -54,7 +54,7 @@ describe('Notifications service', () => {
       phoneNumber: '07123456789',
       prisonName: 'Hewell',
       prisonPhoneNumber: '01234443225',
-      visit: '2022-02-14T10:00:00',
+      visitSlot: '2022-02-14T10:00:00',
     }
 
     it('should call the notifications client with the cancellation details', async () => {

@@ -29,7 +29,7 @@ export default class CheckYourBooking {
       offenderNo,
       mainContact: visitSessionData.mainContact,
       prisoner: visitSessionData.prisoner,
-      visit: visitSessionData.visit,
+      visitSlot: visitSessionData.visitSlot,
       visitRestriction: visitSessionData.visitRestriction,
       visitors: visitSessionData.visitors,
       additionalSupport,
@@ -66,8 +66,8 @@ export default class CheckYourBooking {
         visitReference: visitSessionData.visitReference,
         prisonerId: visitSessionData.prisoner.offenderNo,
         visitorIds: visitSessionData.visitors.map(visitor => visitor.personId.toString()),
-        startTimestamp: visitSessionData.visit.startTimestamp,
-        endTimestamp: visitSessionData.visit.endTimestamp,
+        startTimestamp: visitSessionData.visitSlot.startTimestamp,
+        endTimestamp: visitSessionData.visitSlot.endTimestamp,
         visitRestriction: visitSessionData.visitRestriction,
         username: res.locals.user?.username,
         operationId: res.locals.appInsightsOperationId,
@@ -78,7 +78,7 @@ export default class CheckYourBooking {
           const phoneNumber = visitSessionData.mainContact.phoneNumber.replace(/\s/g, '')
           await this.notificationsService[`send${isUpdate ? 'Update' : 'Booking'}Sms`]({
             phoneNumber,
-            visit: visitSessionData.visit,
+            visitSlot: visitSessionData.visitSlot,
             prisonName: 'Hewell (HMP)',
             reference: visitSessionData.visitReference,
           })
@@ -98,7 +98,7 @@ export default class CheckYourBooking {
         offenderNo,
         mainContact: visitSessionData.mainContact,
         prisoner: visitSessionData.prisoner,
-        visit: visitSessionData.visit,
+        visitSlot: visitSessionData.visitSlot,
         visitRestriction: visitSessionData.visitRestriction,
         visitors: visitSessionData.visitors,
         additionalSupport,

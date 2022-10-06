@@ -72,7 +72,7 @@ testJourneys.forEach(journey => {
           location: 'location place',
         },
         visitRestriction: 'OPEN',
-        visit: {
+        visitSlot: {
           id: 'visitId',
           startTimestamp: '2022-03-12T09:30:00',
           endTimestamp: '2022-03-12T10:30:00',
@@ -249,7 +249,7 @@ testJourneys.forEach(journey => {
             expect(notificationsService[journey.isUpdate ? 'sendUpdateSms' : 'sendBookingSms']).toHaveBeenCalledTimes(1)
             expect(notificationsService[journey.isUpdate ? 'sendUpdateSms' : 'sendBookingSms']).toHaveBeenCalledWith({
               phoneNumber: '01234567890',
-              visit: visitSessionData.visit,
+              visitSlot: visitSessionData.visitSlot,
               prisonName: 'Hewell (HMP)',
               reference: visitSessionData.visitReference,
             })

@@ -70,7 +70,7 @@ testJourneys.forEach(journey => {
           location: 'location place',
         },
         visitRestriction: 'OPEN',
-        visit: {
+        visitSlot: {
           id: 'visitId',
           startTimestamp: '123',
           endTimestamp: '456',
