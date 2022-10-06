@@ -160,7 +160,7 @@ describe('GET /visit/:reference', () => {
     }
 
     const fakeDate = new Date('2022-01-01')
-    jest.useFakeTimers({ advanceTimers: true, now: fakeDate })
+    jest.useFakeTimers({ doNotFake: ['nextTick'], now: fakeDate })
 
     prisonerSearchService.getPrisonerById.mockResolvedValue(prisoner)
     visitSessionsService.getFullVisitDetails.mockResolvedValue({ visit, visitors, additionalSupport })
@@ -570,8 +570,8 @@ describe('GET /visit/:reference', () => {
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
-        expect($('[data-test="cancel-visit"]').prop('href')).toBe(undefined)
-        expect($('[data-test="update-visit"]').prop('href')).toBe(undefined)
+        expect($('[data-test="cancel-visit"]').length).toBe(0)
+        expect($('[data-test="update-visit"]').length).toBe(0)
       })
   })
 
@@ -585,8 +585,8 @@ describe('GET /visit/:reference', () => {
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
-        expect($('[data-test="cancel-visit"]').prop('href')).toBe(undefined)
-        expect($('[data-test="update-visit"]').prop('href')).toBe(undefined)
+        expect($('[data-test="cancel-visit"]').length).toBe(0)
+        expect($('[data-test="update-visit"]').length).toBe(0)
       })
   })
 })

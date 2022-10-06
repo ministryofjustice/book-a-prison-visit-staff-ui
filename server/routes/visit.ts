@@ -123,9 +123,9 @@ export default function routes(
 
     req.session.visitSessionData = Object.assign(req.session.visitSessionData ?? {}, visitSessionData)
 
-    const dateToday = new Date()
-    const visitDate = new Date(visitSessionData.visit.startTimestamp)
-    const showButtons = dateToday < visitDate
+    const nowTimestamp = new Date()
+    const visitStartTimestamp = new Date(visitSessionData.visit.startTimestamp)
+    const showButtons = nowTimestamp < visitStartTimestamp
 
     return res.render('pages/visit/summary', {
       prisoner,
