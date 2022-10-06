@@ -159,6 +159,9 @@ describe('GET /visit/:reference', () => {
       modifiedTimestamp: '2022-02-14T10:05:00',
     }
 
+    const fakeDate = new Date('2022-01-01')
+    jest.useFakeTimers({ doNotFake: ['nextTick'], now: fakeDate })
+
     prisonerSearchService.getPrisonerById.mockResolvedValue(prisoner)
     visitSessionsService.getFullVisitDetails.mockResolvedValue({ visit, visitors, additionalSupport })
     prisonerVisitorsService.getVisitors.mockResolvedValue(visitors)
@@ -175,6 +178,10 @@ describe('GET /visit/:reference', () => {
         visitSessionData,
       } as SessionData,
     })
+  })
+
+  afterAll(() => {
+    jest.useRealTimers()
   })
 
   it('should render full booking summary page with prisoner, visit and visitor details, with default back link', () => {
@@ -200,8 +207,6 @@ describe('GET /visit/:reference', () => {
         expect($('[data-test="visit-phone"]').text()).toBe('01234 567890')
         expect($('[data-test="cancel-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/cancel')
         expect($('[data-test="update-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/update/select-visitors')
-        expect($('[data-test="cancel-visit"]').prop('disabled')).toBe(false)
-        expect($('[data-test="update-visit"]').prop('disabled')).toBe(false)
         // visitor details
         expect($('[data-test="visitor-name-1"]').text()).toBe('Smith, Jeanette')
         expect($('[data-test="visitor-dob-1"]').html()).toBe('28 July 1986<br>(Adult)')
@@ -514,21 +519,6 @@ describe('GET /visit/:reference', () => {
       })
   })
 
-  it('should disable buttons if visit status is cancelled/superseded', () => {
-    visit.visitStatus = 'CANCELLED'
-    visit.outcomeStatus = 'ADMINISTRATIVE_CANCELLATION'
-    visit.visitNotes = [{ type: 'VISIT_OUTCOMES', text: 'booking error' }]
-    return request(app)
-      .get('/visit/ab-cd-ef-gh')
-      .expect(200)
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        const $ = cheerio.load(res.text)
-        expect($('[data-test="cancel-visit"]').prop('disabled')).toBe(true)
-        expect($('[data-test="update-visit"]').prop('disabled')).toBe(true)
-      })
-  })
-
   // Temporarily hiding any locations other than Hewell pending more work on transfer/release (see VB-907, VB-952)
   it('should render full booking summary page with prisoner - but showing location as Unknown if not Hewell', () => {
     const transferPrisoner: Prisoner = {
@@ -567,6 +557,36 @@ describe('GET /visit/:reference', () => {
       .expect('Content-Type', /html/)
       .expect(res => {
         expect(res.text).toContain('BadRequestError: Bad Request')
+      })
+  })
+
+  it('should not display update and cancel buttons if visit is cancelled', () => {
+    visit.visitStatus = 'CANCELLED'
+    visit.outcomeStatus = 'ADMINISTRATIVE_CANCELLATION'
+    visit.visitNotes = [{ type: 'VISIT_OUTCOMES', text: 'booking error' }]
+    return request(app)
+      .get('/visit/ab-cd-ef-gh')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('[data-test="cancel-visit"]').length).toBe(0)
+        expect($('[data-test="update-visit"]').length).toBe(0)
+      })
+  })
+
+  it('should not display update and cancel buttons if start date has passed', () => {
+    const visitDate = new Date(visit.startTimestamp)
+    const testDate = visitDate.setFullYear(visitDate.getFullYear() + 1)
+    jest.useFakeTimers({ advanceTimers: true, now: testDate })
+    return request(app)
+      .get('/visit/ab-cd-ef-gh')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('[data-test="cancel-visit"]').length).toBe(0)
+        expect($('[data-test="update-visit"]').length).toBe(0)
       })
   })
 })
