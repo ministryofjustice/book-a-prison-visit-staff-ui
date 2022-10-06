@@ -184,8 +184,8 @@ export type VisitSessionData = {
     previousRestrictions?: OffenderRestriction[]
   }
   visit?: VisitSlot
+  originalVisitSlot?: VisitSlot
   visitRestriction?: Visit['visitRestriction']
-  previousVisitRestriction?: Visit['visitRestriction']
   closedVisitReason?: 'prisoner' | 'visitor'
   visitors?: VisitorListItem[]
   visitorSupport?: VisitorSupport[]
