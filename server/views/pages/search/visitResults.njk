@@ -36,57 +36,55 @@
         }) }}
       {% endset %}
 
-      {{ pagination | safe }}
-
-        {{ govukTable({
-            classes: "bapv-table govuk-!-margin-top-3",
-            captionClasses: "govuk-table__caption--m",
-            attributes: {
-              "id": "search-results-true"
-            },
-            head: [
-                {
-                  text: "Booking reference"
-                },
-                {
-                  text: "Prisoner name"
-                },
-                {
-                  text: "Prison number"
-                },
-                {
-                  text: "Main contact"
-                },
-                {
-                  text: "Visit date"
-                },
-                {
-                  text: "Visit time"
-                }
-            ],
-            rows: [
-              [
-                {
-                  html: '<a href="/visit/' + results[0].reference + '">' + results[0].reference + '</a>'
-                },
-                {
-                  text: results[0].prisonerName | properCaseFullName
-                },
-                {
-                  text: results[0].prisonNumber
-                },
-                {
-                  text: results[0].mainContact | formatLastNameFirst
-                },
-                {
-                  text: results[0].visitDate
-                },
-                {
-                  text: results[0].visitTime
-                }
-              ]
+      {{ govukTable({
+          classes: "bapv-table govuk-!-margin-top-3",
+          captionClasses: "govuk-table__caption--m",
+          attributes: {
+            "id": "search-results-true"
+          },
+          head: [
+              {
+                text: "Booking reference"
+              },
+              {
+                text: "Prisoner name"
+              },
+              {
+                text: "Prison number"
+              },
+              {
+                text: "Main contact"
+              },
+              {
+                text: "Visit date"
+              },
+              {
+                text: "Visit time"
+              }
+          ],
+          rows: [
+            [
+              {
+                html: '<a href="/visit/' + results[0].reference + '">' + results[0].reference + '</a>'
+              },
+              {
+                text: results[0].prisonerName | properCaseFullName
+              },
+              {
+                text: results[0].prisonNumber
+              },
+              {
+                text: results[0].mainContact | formatLastNameFirst
+              },
+              {
+                text: results[0].visitDate
+              },
+              {
+                text: results[0].visitTime
+              }
             ]
-        }) }}
+          ]
+      }) }}
 
       {{ pagination | safe }}
     {% elif errors | length %}

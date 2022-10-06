@@ -140,7 +140,6 @@
             items: pageLinks if numberOfResults > 10
           }) }}
         {% endset %}
-        {{ pagination | safe }}
         {{ govukTable({
           classes: "bapv-table govuk-!-margin-top-3",
           head: [
