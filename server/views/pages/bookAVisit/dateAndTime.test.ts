@@ -132,8 +132,6 @@ describe('Views - Date and time of visit', () => {
           },
         ],
       },
-      timeOfDay: '',
-      dayOfTheWeek: '',
       formValues: { 'visit-date-and-time': '4' },
       slotsPresent: true,
     }

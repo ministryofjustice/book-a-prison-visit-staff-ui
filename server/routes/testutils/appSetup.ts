@@ -67,8 +67,6 @@ function appSetup({
     visitorList: { visitors: [] as VisitorListItem[] },
     adultVisitors: { adults: [] as VisitorListItem[] },
     slotsList: {} as VisitSlotList,
-    timeOfDay: '',
-    dayOfTheWeek: '',
     visitSessionData: {} as VisitSessionData,
   },
 }: {

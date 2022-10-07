@@ -465,31 +465,6 @@ testJourneys.forEach(journey => {
         })
     })
 
-    it('should should set validation errors in flash and redirect, preserving filter settings, if no slot selected', () => {
-      sessionApp = appWithAllRoutes({
-        auditServiceOverride: auditService,
-        systemTokenOverride: systemToken,
-        sessionData: {
-          timeOfDay: 'afternoon',
-          dayOfTheWeek: '3',
-          slotsList,
-          visitSessionData,
-        } as SessionData,
-      })
-
-      return request(sessionApp)
-        .post(`${journey.urlPrefix}/select-date-and-time`)
-        .expect(302)
-        .expect('location', `${journey.urlPrefix}/select-date-and-time?timeOfDay=afternoon&dayOfTheWeek=3`)
-        .expect(() => {
-          expect(flashProvider).toHaveBeenCalledWith('errors', [
-            { location: 'body', msg: 'No time slot selected', param: 'visit-date-and-time', value: undefined },
-          ])
-          expect(flashProvider).toHaveBeenCalledWith('formValues', {})
-          expect(auditService.reservedVisit).not.toHaveBeenCalled()
-        })
-    })
-
     it('should should set validation errors in flash and redirect if invalid slot selected', () => {
       return request(sessionApp)
         .post(`${journey.urlPrefix}/select-date-and-time`)

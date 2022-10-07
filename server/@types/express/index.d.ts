@@ -12,8 +12,6 @@ declare module 'express-session' {
     visitorList: { visitors: VisitorListItem[] }
     adultVisitors: { adults: VisitorListItem[] }
     slotsList: VisitSlotList
-    timeOfDay: string
-    dayOfTheWeek: string
     visitSessionData: VisitSessionData
   }
 }

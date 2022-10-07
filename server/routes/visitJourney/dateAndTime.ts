@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express'
-import { body, query, ValidationChain, validationResult } from 'express-validator'
+import { body, ValidationChain, validationResult } from 'express-validator'
 import { v4 as uuidv4 } from 'uuid'
 import { VisitSlot } from '../../@types/bapv'
 import AuditService from '../../services/auditService'
@@ -17,13 +17,10 @@ export default class DateAndTime {
   async get(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'
     const { visitSessionData } = req.session
-    const { timeOfDay, dayOfTheWeek } = req.query as Record<string, string>
     const slotsList = await this.visitSessionsService.getVisitSessions({
       username: res.locals.user?.username,
       offenderNo: visitSessionData.prisoner.offenderNo,
       visitRestriction: visitSessionData.visitRestriction,
-      timeOfDay,
-      dayOfTheWeek,
     })
 
     let restrictionChangeMessage = ''
@@ -90,8 +87,6 @@ export default class DateAndTime {
     const slotsPresent = Object.values(slotsList).some(value => value.length)
 
     req.session.slotsList = slotsList
-    req.session.timeOfDay = timeOfDay
-    req.session.dayOfTheWeek = dayOfTheWeek
 
     res.render('pages/bookAVisit/dateAndTime', {
       accordionId: uuidv4(),
@@ -100,8 +95,6 @@ export default class DateAndTime {
       prisonerName: visitSessionData.prisoner.name,
       closedVisitReason: visitSessionData.closedVisitReason,
       slotsList,
-      timeOfDay,
-      dayOfTheWeek,
       formValues,
       slotsPresent,
       restrictionChangeMessage,
@@ -118,11 +111,6 @@ export default class DateAndTime {
     if (!errors.isEmpty()) {
       req.flash('errors', errors.array() as [])
       req.flash('formValues', req.body)
-      if (req.session.timeOfDay || req.session.dayOfTheWeek) {
-        return res.redirect(
-          `${req.originalUrl}?timeOfDay=${req.session.timeOfDay}&dayOfTheWeek=${req.session.dayOfTheWeek}`,
-        )
-      }
       return res.redirect(req.originalUrl)
     }
 
@@ -180,14 +168,5 @@ export default class DateAndTime {
 
       return true
     })
-  }
-
-  validateGet(): ValidationChain[] {
-    return [
-      query('timeOfDay').customSanitizer((value: string) => (!['morning', 'afternoon'].includes(value) ? '' : value)),
-      query('dayOfTheWeek').customSanitizer((value: string) =>
-        parseInt(value, 10) >= 0 && parseInt(value, 10) <= 6 ? value : '',
-      ),
-    ]
   }
 }
