@@ -2,7 +2,7 @@ import fs from 'fs'
 import * as cheerio from 'cheerio'
 import nunjucks, { Template } from 'nunjucks'
 import { registerNunjucks } from '../../../utils/nunjucksSetup'
-import { VisitSlotList } from '../../../@types/bapv'
+import { VisitSlot, VisitSlotList } from '../../../@types/bapv'
 
 const template = fs.readFileSync('server/views/pages/bookAVisit/dateAndTime.njk')
 
@@ -185,5 +185,85 @@ describe('Views - Date and time of visit', () => {
     expect($('[data-test="closed-visit-reason"]').text()).toContain(
       'Closed visit as a visitor has a closed visit restriction',
     )
+  })
+
+  describe('slot labelling', () => {
+    beforeEach(() => {
+      viewContext = {
+        accordionId: 'thisAccordion',
+        prisonerName: 'John Smith',
+        visitRestriction: 'OPEN',
+        slotsList: <VisitSlotList>{
+          'February 2022': [
+            {
+              date: 'Monday 14 February',
+              prisonerEvents: {
+                morning: [],
+                afternoon: [],
+              },
+              slots: {
+                morning: [
+                  {
+                    id: '1',
+                    startTimestamp: '2022-02-14T10:00:00',
+                    endTimestamp: '2022-02-14T11:00:00',
+                    availableTables: 15,
+                    capacity: 30,
+                    visitRoomName: 'room name',
+                    visitRestriction: 'OPEN',
+                  },
+                ],
+                afternoon: [],
+              },
+            },
+          ],
+        },
+        timeOfDay: '',
+        dayOfTheWeek: '',
+        slotsPresent: true,
+      }
+    })
+
+    it('should correctly label slot that is NOT checked when booking a visit', () => {
+      viewContext.originalSelectedSlot = undefined // booking journey; so no originally selected slot
+
+      const $ = cheerio.load(compiledTemplate.render(viewContext))
+
+      expect($('#1').prop('checked')).toBe(false)
+      expect($('label[for="1"]').text()).toContain('10am to 11am')
+      expect($('label[for="1"]').text()).toContain('15 tables available')
+    })
+
+    it('should correctly label currently reserved slot when booking a visit', () => {
+      viewContext.formValues = { 'visit-date-and-time': '1' }
+      viewContext.originalSelectedSlot = undefined // booking journey; so no originally selected slot
+
+      const $ = cheerio.load(compiledTemplate.render(viewContext))
+
+      expect($('#1').prop('checked')).toBe(true)
+      expect($('label[for="1"]').text()).toContain('10am to 11am')
+      expect($('label[for="1"]').text()).toContain('Time slot reserved for this booking')
+    })
+
+    it('should correctly label the originally selected slot (when NOT checked) when updating a visit', () => {
+      viewContext.originalSelectedSlot = { id: '1' } as VisitSlot // update journey, so originally selected slot known
+
+      const $ = cheerio.load(compiledTemplate.render(viewContext))
+
+      expect($('#1').prop('checked')).toBe(false)
+      expect($('label[for="1"]').text()).toContain('10am to 11am')
+      expect($('label[for="1"]').text()).toContain('Time slot reserved by the original booking')
+    })
+
+    it('should correctly label the originally selected slot (when checked) when updating a visit', () => {
+      viewContext.formValues = { 'visit-date-and-time': '1' }
+      viewContext.originalSelectedSlot = { id: '1' } as VisitSlot // update journey, so originally selected slot known
+
+      const $ = cheerio.load(compiledTemplate.render(viewContext))
+
+      expect($('#1').prop('checked')).toBe(true)
+      expect($('label[for="1"]').text()).toContain('10am to 11am')
+      expect($('label[for="1"]').text()).toContain('Time slot reserved by the original booking')
+    })
   })
 })

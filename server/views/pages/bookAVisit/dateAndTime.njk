@@ -19,8 +19,11 @@
     {%- set checked = true if formValues['visit-date-and-time'] and formValues['visit-date-and-time'] == slot.id else false %}
 
     {%- set tableText %}
-      {# {% if (slot.id == originalSelectedSlot.id) -%}ORIGINAL SLOT {% endif %} #}
-      {% if (doubleBooked and not checked) -%}
+      {% if (slot.id == originalSelectedSlot.id) -%}
+        Time slot reserved by the original booking
+      {% elseif (checked and not originalSelectedSlot) -%}
+        Time slot reserved for this booking
+      {% elseif (doubleBooked and not checked) -%}
         Prisoner has a visit
       {%- elseif slot.availableTables <= 0 -%}
         Fully booked ({{ slot.capacity + (slot.availableTables | abs) }} of {{ slot.capacity}} table{{ "s" if slot.capacity > 1 }} booked)
