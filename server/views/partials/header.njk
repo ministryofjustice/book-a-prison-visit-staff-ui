@@ -36,18 +36,16 @@
 
 <div class="location-bar">
   <span class="location-bar__location" data-test="active-location">
-    <span>Hewell (HMP)</span>
+    <span>Hewell (HMP)
+      {% if not hidePhaseBanner %}
+        {{ govukPhaseBanner({
+          tag: {
+            text: "beta"
+          },
+          html: 'This is a new service, <a class="govuk-link" target="_blank" href="https://eu.surveymonkey.com/r/9ZBN3YJ">give us your feedback (opens in a new tab)</a>',
+          classes: 'bapv-phase-banner'
+        }) }}
+      {% endif %}
+    </span>
   </span>
 </div>
-
-{% if not hidePhaseBanner %}
-  <div class="bapv-phase-banner-container">
-    {{ govukPhaseBanner({
-      tag: {
-        text: "beta"
-      },
-      html: 'This is a new service, <a class="govuk-link" target="_blank" href="https://eu.surveymonkey.com/r/9ZBN3YJ">give us your feedback (opens in a new tab)</a>',
-      classes: 'bapv-phase-banner'
-    }) }}
-  </div>
-{% endif %}
