@@ -187,7 +187,6 @@ export default function routes(
     updateJourneyCheckMiddleware,
     checkVisitReferenceMiddleware,
     sessionCheckMiddleware({ stage: 2 }),
-    ...dateAndTime.validateGet(),
     (req, res) => dateAndTime.get(req, res),
   )
   post(

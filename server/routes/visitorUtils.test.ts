@@ -145,8 +145,6 @@ describe('clearSession', () => {
     visitorList: { visitors: [] },
     adultVisitors: { adults: [] },
     slotsList: {},
-    timeOfDay: 'morning',
-    dayOfTheWeek: '1',
     visitSessionData: { prisoner: undefined },
   }
 

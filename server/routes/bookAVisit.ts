@@ -52,9 +52,7 @@ export default function routes(
     visitType.post(req, res),
   )
 
-  get('/select-date-and-time', sessionCheckMiddleware({ stage: 2 }), ...dateAndTime.validateGet(), (req, res) =>
-    dateAndTime.get(req, res),
-  )
+  get('/select-date-and-time', sessionCheckMiddleware({ stage: 2 }), (req, res) => dateAndTime.get(req, res))
   post('/select-date-and-time', sessionCheckMiddleware({ stage: 2 }), dateAndTime.validate(), (req, res) =>
     dateAndTime.post(req, res),
   )
