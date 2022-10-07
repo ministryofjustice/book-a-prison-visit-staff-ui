@@ -22,8 +22,8 @@
     "lint": "eslint . --cache --max-warnings 0",
     "lint-fix": "eslint . --fix",
     "typecheck": "tsc && tsc -p integration_tests",
-    "test": "jest",
-    "test:ci": "jest --runInBand",
+    "test": "jest --coverage",
+    "test:ci": "jest --runInBand --coverage",
     "security_audit": "npx audit-ci --config audit-ci.json",
     "int-test": "cypress run --config video=false",
     "int-test-single": "cypress run --config video=false --spec ",
@@ -44,7 +44,6 @@
         }
       ]
     },
-    "collectCoverage": true,
     "collectCoverageFrom": [
       "server/**/*.{ts,js,jsx,mjs}"
     ],
