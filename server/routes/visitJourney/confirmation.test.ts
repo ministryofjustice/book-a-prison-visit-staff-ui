@@ -122,6 +122,7 @@ testJourneys.forEach(journey => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('h1').text().trim()).toBe(journey.isUpdate ? 'Booking updated' : 'Booking confirmed')
+          expect($('main h2').first().text()).toBe(journey.isUpdate ? 'What happens next' : 'What to do next')
           expect($('.test-visit-date').text()).toContain('Saturday 12 March 2022')
           expect($('.test-visit-time').text()).toContain('9:30am to 10:30am')
           expect($('.test-visit-type').text()).toContain('Open')
@@ -203,6 +204,7 @@ testJourneys.forEach(journey => {
           .expect(res => {
             const $ = cheerio.load(res.text)
             expect($('h1').text().trim()).toBe(journey.isUpdate ? 'Booking updated' : 'Booking confirmed')
+            expect($('main h2').first().text()).toBe(journey.isUpdate ? 'What happens next' : 'What to do next')
             expect($('.test-visit-date').text()).toContain('Saturday 12 March 2022')
             expect($('.test-visit-time').text()).toContain('9:30am to 10:30am')
             expect($('.test-visit-type').text()).toContain('Open')
