@@ -54,7 +54,6 @@
     </p>
 
     {% if restrictionChangeMessage %}
-
       {% set restrictionChangeReasonHtml %}
           {{ govukWarningText({
             classes: "govuk-!-margin-bottom-0",
@@ -69,9 +68,7 @@
         classes: "govuk-!-padding-left-4",
         html: restrictionChangeReasonHtml
       }) }}
-
     {% elseif visitRestriction == 'CLOSED' and closedVisitReason %}
-    
       {% set closedVisitReasonHtml %}
         {{ govukWarningText({
           classes: "govuk-!-margin-bottom-0",
@@ -88,93 +85,7 @@
         classes: "govuk-!-padding-left-4",
         html: closedVisitReasonHtml
       }) }}
-
     {% endif %}
-    
-
-    <form action="{{ urlPrefix}}/select-date-and-time" method="GET" novalidate>
-      <div class="bapv-visit-date-time-filter">
-        <h3 class="govuk-heading-s">Filter time slots</h3>
-        <div class="govuk-button-group">
-          {{ govukSelect({
-            id: "timeOfDay",
-            name: "timeOfDay",
-            label: {
-              text: "Time of day"
-            },
-            items: [
-              {
-                value: "",
-                text: "Any"
-              },
-              {
-                value: "morning",
-                text: "Morning",
-                selected: timeOfDay == "morning"
-              },
-              {
-                value: "afternoon",
-                text: "Afternoon",
-                selected: timeOfDay == "afternoon"
-              }
-            ]
-          }) }}
-          {{ govukSelect({
-            id: "dayOfTheWeek",
-            name: "dayOfTheWeek",
-            label: {
-              text: "Day of the week"
-            },
-            items: [
-              {
-                value: "",
-                text: "All"
-              },
-              {
-                value: "1",
-                text: "Monday",
-                selected: dayOfTheWeek == "1"
-              },
-              {
-                value: "2",
-                text: "Tuesday",
-                selected: dayOfTheWeek == "2"
-              },
-              {
-                value: "3",
-                text: "Wednesday",
-                selected: dayOfTheWeek == "3"
-              },
-              {
-                value: "4",
-                text: "Thursday",
-                selected: dayOfTheWeek == "4"
-              },
-              {
-                value: "5",
-                text: "Friday",
-                selected: dayOfTheWeek == "5"
-              },
-              {
-                value: "6",
-                text: "Saturday",
-                selected: dayOfTheWeek == "6"
-              },
-              {
-                value: "0",
-                text: "Sunday",
-                selected: dayOfTheWeek == "0"
-              }
-            ]
-          }) }}
-      
-          {{ govukButton({
-            text: "Apply filters",
-            preventDoubleClick: true
-          }) }} 
-        </div>
-      </div>
-    </form>
 
     {% if slotsPresent %}
 

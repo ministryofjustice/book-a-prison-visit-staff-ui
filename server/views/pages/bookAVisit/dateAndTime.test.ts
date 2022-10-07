@@ -132,8 +132,6 @@ describe('Views - Date and time of visit', () => {
           },
         ],
       },
-      timeOfDay: '',
-      dayOfTheWeek: '',
       formValues: { 'visit-date-and-time': '4' },
       slotsPresent: true,
     }
@@ -183,7 +181,6 @@ describe('Views - Date and time of visit', () => {
     const $ = cheerio.load(compiledTemplate.render(viewContext))
 
     expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
-    expect($('[data-test="visit-restriction"]').text()).toBe('Closed')
     expect($('[data-test="visit-restriction"]').text()).toBe('Closed')
     expect($('[data-test="closed-visit-reason"]').text()).toContain(
       'Closed visit as a visitor has a closed visit restriction',
