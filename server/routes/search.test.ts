@@ -186,6 +186,20 @@ describe('Prisoner search page', () => {
           })
       })
     })
+
+    describe('POST /search/prisoner', () => {
+      it('should redirect to search results page with search query when no search term entered', () => {
+        return request(app).post('/search/prisoner').expect(302).expect('location', '/search/prisoner/results')
+      })
+
+      it('should redirect to search results page with trimmed query param when search term entered', () => {
+        return request(app)
+          .post('/search/prisoner')
+          .send('search= john smith ')
+          .expect(302)
+          .expect('location', '/search/prisoner/results?search=john%20smith')
+      })
+    })
   })
 
   describe('for visit', () => {
@@ -300,6 +314,23 @@ describe('Prisoner search page', () => {
               expect(prisonerSearchService.getPrisoners).not.toHaveBeenCalled()
             })
         })
+      })
+    })
+
+    describe('POST /search/prisoner-visit', () => {
+      it('should redirect to search results page with search query when no search term entered', () => {
+        return request(app)
+          .post('/search/prisoner-visit')
+          .expect(302)
+          .expect('location', '/search/prisoner-visit/results')
+      })
+
+      it('should redirect to search results page with trimmed query param when search term entered', () => {
+        return request(app)
+          .post('/search/prisoner-visit')
+          .send('search= john smith ')
+          .expect(302)
+          .expect('location', '/search/prisoner-visit/results?search=john%20smith')
       })
     })
   })

@@ -1,5 +1,6 @@
 import type { RequestHandler, Router } from 'express'
 import url from 'url'
+import { body } from 'express-validator'
 import { validatePrisonerSearch, validateVisitSearch } from './searchValidation'
 import PrisonerSearchService from '../services/prisonerSearchService'
 import VisitSessionsService from '../services/visitSessionsService'
@@ -16,7 +17,11 @@ export default function routes(
   auditService: AuditService,
 ): Router {
   const get = (path: string | string[], handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
-  const post = (path: string | string[], handler: RequestHandler) => router.post(path, asyncMiddleware(handler))
+  const post = (path: string | string[], ...handlers: RequestHandler[]) =>
+    router.post(
+      path,
+      handlers.map(handler => asyncMiddleware(handler)),
+    )
 
   get(['/prisoner', '/prisoner-visit'], (req, res) => {
     const search = req?.body?.search
@@ -24,7 +29,7 @@ export default function routes(
     res.render('pages/search/prisoner', { search, visit: req.originalUrl.includes('-visit') })
   })
 
-  post(['/prisoner', '/prisoner-visit'], (req, res) => {
+  post(['/prisoner', '/prisoner-visit'], body('search').trim(), (req, res) => {
     const isVisit = req.originalUrl.includes('-visit')
     const { search } = req.body
 
