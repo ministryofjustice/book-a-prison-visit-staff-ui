@@ -57,10 +57,19 @@
     </p>
 
     {% if restrictionChangeMessage %}
+      {% set restrictionChangeReasonHtml %}
+          {{ govukWarningText({
+            classes: "govuk-!-margin-bottom-0",
+            html: '<span class="govuk-!-font-size-24">' + restrictionChangeMessage + '</span>',
+            iconFallbackText: "Warning",
+            attributes: {
+              "data-test": "restriction-change-reason"
+          }
+        }) }}
+      {% endset %}
       {{ mojBanner({
-        type: 'information',
-        classes: "govuk-!-padding-left-4 test-restriction-reason",
-        html: restrictionChangeMessage
+        classes: "govuk-!-padding-left-4",
+        html: restrictionChangeReasonHtml
       }) }}
     {% elseif visitRestriction == 'CLOSED' and closedVisitReason %}
       {% set closedVisitReasonHtml %}
@@ -75,7 +84,6 @@
           }
         }) }}
       {% endset %}
-
       {{ mojBanner({
         classes: "govuk-!-padding-left-4",
         html: closedVisitReasonHtml

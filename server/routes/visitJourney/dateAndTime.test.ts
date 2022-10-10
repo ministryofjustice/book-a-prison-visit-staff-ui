@@ -19,6 +19,13 @@ const auditService = new AuditService() as jest.Mocked<AuditService>
 let flashData: Record<'errors' | 'formValues', Record<string, string | string[]>[]>
 let visitSessionData: VisitSessionData
 
+const visitSessionsService = new VisitSessionsService(
+  null,
+  null,
+  null,
+  systemToken,
+) as jest.Mocked<VisitSessionsService>
+
 // run tests for booking and update journeys
 const testJourneys = [
   { urlPrefix: '/book-a-visit', isUpdate: false },
@@ -91,6 +98,15 @@ const slotsList: VisitSlotList = {
             visitRoomName: 'room name',
             visitRestriction: 'OPEN',
           },
+          {
+            id: '5',
+            startTimestamp: '2022-02-15T16:00:00',
+            endTimestamp: '2022-02-15T17:00:00',
+            availableTables: 12,
+            capacity: 30,
+            visitRoomName: 'room name',
+            visitRestriction: 'CLOSED',
+          },
         ],
       },
     },
@@ -105,13 +121,22 @@ const slotsList: VisitSlotList = {
       slots: {
         morning: [
           {
-            id: '5',
+            id: '6',
             startTimestamp: '2022-03-01T09:30:00',
             endTimestamp: '2022-03-01T10:30:00',
             availableTables: 0,
             capacity: 30,
             visitRoomName: 'room name',
             visitRestriction: 'OPEN',
+          },
+          {
+            id: '7',
+            startTimestamp: '2022-03-01T09:30:00',
+            endTimestamp: '2022-03-01T10:30:00',
+            availableTables: 0,
+            capacity: 30,
+            visitRoomName: 'room name',
+            visitRestriction: 'CLOSED',
           },
         ],
         afternoon: [],
@@ -148,6 +173,16 @@ beforeEach(() => {
     ],
     visitReference: 'ab-cd-ef-gh',
   }
+
+  visitSessionsService.getVisitSessions.mockResolvedValue(slotsList)
+
+  sessionApp = appWithAllRoutes({
+    visitSessionsServiceOverride: visitSessionsService,
+    systemTokenOverride: systemToken,
+    sessionData: {
+      visitSessionData,
+    } as SessionData,
+  })
 })
 
 afterEach(() => {
@@ -156,25 +191,6 @@ afterEach(() => {
 
 testJourneys.forEach(journey => {
   describe(`GET ${journey.urlPrefix}/select-date-and-time`, () => {
-    const visitSessionsService = new VisitSessionsService(
-      null,
-      null,
-      null,
-      systemToken,
-    ) as jest.Mocked<VisitSessionsService>
-
-    beforeEach(() => {
-      visitSessionsService.getVisitSessions.mockResolvedValue(slotsList)
-
-      sessionApp = appWithAllRoutes({
-        visitSessionsServiceOverride: visitSessionsService,
-        systemTokenOverride: systemToken,
-        sessionData: {
-          visitSessionData,
-        } as SessionData,
-      })
-    })
-
     it('should render the available sessions list with none selected', () => {
       return request(sessionApp)
         .get(`${journey.urlPrefix}/select-date-and-time`)
@@ -186,7 +202,7 @@ testJourneys.forEach(journey => {
           expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
           expect($('[data-test="visit-restriction"]').text()).toBe('Open')
           expect($('[data-test="closed-visit-reason"]').length).toBe(0)
-          expect($('input[name="visit-date-and-time"]').length).toBe(5)
+          expect($('input[name="visit-date-and-time"]').length).toBe(7)
           expect($('input[name="visit-date-and-time"]:checked').length).toBe(0)
           expect($('.govuk-accordion__section--expanded').length).toBe(0)
 
@@ -280,7 +296,7 @@ testJourneys.forEach(journey => {
           const $ = cheerio.load(res.text)
           expect($('h1').text().trim()).toBe('Select date and time of visit')
           expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
-          expect($('input[name="visit-date-and-time"]').length).toBe(5)
+          expect($('input[name="visit-date-and-time"]').length).toBe(7)
           expect($('.govuk-accordion__section--expanded').length).toBe(1)
           expect($('.govuk-accordion__section--expanded #3').length).toBe(1)
           expect($('input#3').prop('checked')).toBe(true)
@@ -308,13 +324,6 @@ testJourneys.forEach(journey => {
   })
 
   describe(`POST ${journey.urlPrefix}/select-date-and-time`, () => {
-    const visitSessionsService = new VisitSessionsService(
-      null,
-      null,
-      null,
-      systemToken,
-    ) as jest.Mocked<VisitSessionsService>
-
     const reservedVisit: Partial<Visit> = {
       applicationReference: 'aaa-bbb-ccc',
       reference: 'ab-cd-ef-gh',
@@ -479,5 +488,149 @@ testJourneys.forEach(journey => {
           expect(auditService.reservedVisit).not.toHaveBeenCalled()
         })
     })
+  })
+})
+
+describe(`Update journey specific testing`, () => {
+  it('Restriction change: Open to closed, no availability for the selected visit slot - visitor', () => {
+    visitSessionData.visitRestriction = 'CLOSED'
+    visitSessionData.closedVisitReason = 'visitor'
+    visitSessionData.visitSlot = {
+      id: '',
+      startTimestamp: '2022-03-01T09:30:00',
+      endTimestamp: '2022-03-01T10:30:00',
+      visitRestriction: 'OPEN',
+    } as VisitSlot
+
+    visitSessionData.originalVisitSlot = visitSessionData.visitSlot
+
+    return request(sessionApp)
+      .get('/visit/ab-cd-ef-gh/update/select-date-and-time')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('[data-test="restriction-change-reason"]').text()).toContain(
+          'A new visit time must be selected as this is now a closed visit due to a visitor restriction.',
+        )
+      })
+  })
+
+  it('Restriction change: Open to closed, no availability for the selected visit slot - prisoner', () => {
+    visitSessionData.visitRestriction = 'CLOSED'
+    visitSessionData.closedVisitReason = 'prisoner'
+    visitSessionData.visitSlot = {
+      id: '',
+      startTimestamp: '2022-03-01T09:30:00',
+      endTimestamp: '2022-03-01T10:30:00',
+      visitRestriction: 'OPEN',
+    } as VisitSlot
+
+    visitSessionData.originalVisitSlot = visitSessionData.visitSlot
+
+    return request(sessionApp)
+      .get('/visit/ab-cd-ef-gh/update/select-date-and-time')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('[data-test="restriction-change-reason"]').text()).toContain(
+          'A new visit time must be selected as this is now a closed visit due to a prisoner restriction.',
+        )
+      })
+  })
+
+  it('Restriction change: Open to closed, some visit slots available - visitor', () => {
+    visitSessionData.visitRestriction = 'CLOSED'
+    visitSessionData.closedVisitReason = 'visitor'
+    visitSessionData.visitSlot = {
+      id: '',
+      startTimestamp: '2022-02-15T16:00:00',
+      endTimestamp: '2022-02-15T17:00:00',
+      visitRestriction: 'OPEN',
+    } as VisitSlot
+
+    visitSessionData.originalVisitSlot = visitSessionData.visitSlot
+
+    return request(sessionApp)
+      .get('/visit/ab-cd-ef-gh/update/select-date-and-time')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('[data-test="restriction-change-reason"]').text()).toContain(
+          'This is now a closed visit due to a visitor restriction. The visit time can stay the same.',
+        )
+      })
+  })
+
+  it('Restriction change: Open to closed, some visit slots available - prisoner', () => {
+    visitSessionData.visitRestriction = 'CLOSED'
+    visitSessionData.closedVisitReason = 'prisoner'
+    visitSessionData.visitSlot = {
+      id: '',
+      startTimestamp: '2022-02-15T16:00:00',
+      endTimestamp: '2022-02-15T17:00:00',
+      visitRestriction: 'OPEN',
+    } as VisitSlot
+
+    visitSessionData.originalVisitSlot = visitSessionData.visitSlot
+
+    return request(sessionApp)
+      .get('/visit/ab-cd-ef-gh/update/select-date-and-time')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('[data-test="restriction-change-reason"]').text()).toContain(
+          'This is now a closed visit due to a prisoner restriction. The visit time can stay the same.',
+        )
+      })
+  })
+
+  it('Restriction change: Closed to open, some visit slots available', () => {
+    visitSessionData.visitRestriction = 'OPEN'
+    visitSessionData.visitSlot = {
+      id: '',
+      startTimestamp: '2022-02-15T16:00:00',
+      endTimestamp: '2022-02-15T17:00:00',
+      visitRestriction: 'CLOSED',
+    } as VisitSlot
+
+    visitSessionData.originalVisitSlot = visitSessionData.visitSlot
+
+    return request(sessionApp)
+      .get('/visit/ab-cd-ef-gh/update/select-date-and-time')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('[data-test="restriction-change-reason"]').text()).toContain(
+          'This is now an open visit. The visit time can stay the same.',
+        )
+      })
+  })
+
+  it('Restriction change: Closed to open, no availability for the selected visit slot', () => {
+    visitSessionData.visitRestriction = 'OPEN'
+    visitSessionData.visitSlot = {
+      id: '',
+      startTimestamp: '2022-03-01T09:30:00',
+      endTimestamp: '2022-03-01T10:30:00',
+      visitRestriction: 'CLOSED',
+    } as VisitSlot
+
+    visitSessionData.originalVisitSlot = visitSessionData.visitSlot
+
+    return request(sessionApp)
+      .get('/visit/ab-cd-ef-gh/update/select-date-and-time')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('[data-test="restriction-change-reason"]').text()).toContain(
+          'A new visit time must be selected as this is now an open visit.',
+        )
+      })
   })
 })
