@@ -175,8 +175,6 @@ describe('Views - Date and time of visit', () => {
       prisonerName: 'John Smith',
       visitRestriction: 'CLOSED',
       closedVisitReason: 'visitor',
-      slotsList: {},
-      slotsPresent: false,
     }
     const $ = cheerio.load(compiledTemplate.render(viewContext))
 
@@ -192,11 +190,8 @@ describe('Views - Date and time of visit', () => {
     viewContext = {
       prisonerName: 'John Smith',
       visitRestriction: 'CLOSED',
-      closedVisitReason: 'visitor',
       restrictionChangeMessage:
         'This is now a closed visit due to a visitor restriction. The visit time can stay the same.',
-      slotsList: {},
-      slotsPresent: false,
     }
     const $ = cheerio.load(compiledTemplate.render(viewContext))
 
