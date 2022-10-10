@@ -186,7 +186,7 @@ describe('Views - Date and time of visit', () => {
     expect($('[data-test="restriction-change-reason"]').length).toBe(0)
   })
 
-  it('should display closed restriction reason only, not the restriction change message', () => {
+  it('should display restriction change message, not the closed visit reason', () => {
     viewContext = {
       prisonerName: 'John Smith',
       visitRestriction: 'CLOSED',
