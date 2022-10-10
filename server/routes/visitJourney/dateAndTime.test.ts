@@ -121,7 +121,7 @@ const slotsList: VisitSlotList = {
       slots: {
         morning: [
           {
-            id: '5',
+            id: '6',
             startTimestamp: '2022-03-01T09:30:00',
             endTimestamp: '2022-03-01T10:30:00',
             availableTables: 0,
@@ -130,7 +130,7 @@ const slotsList: VisitSlotList = {
             visitRestriction: 'OPEN',
           },
           {
-            id: '6',
+            id: '7',
             startTimestamp: '2022-03-01T09:30:00',
             endTimestamp: '2022-03-01T10:30:00',
             availableTables: 0,
@@ -492,7 +492,7 @@ testJourneys.forEach(journey => {
 })
 
 describe(`Update journey specific testing`, () => {
-  it('Restriction change: Open to closed, no visit slots available - visitor', () => {
+  it('Restriction change: Open to closed, no availability for the selected visit slot - visitor', () => {
     visitSessionData.visitRestriction = 'CLOSED'
     visitSessionData.closedVisitReason = 'visitor'
     visitSessionData.visitSlot = {
@@ -516,7 +516,7 @@ describe(`Update journey specific testing`, () => {
       })
   })
 
-  it('Restriction change: Open to closed, no visit slots available - prisoner', () => {
+  it('Restriction change: Open to closed, no availability for the selected visit slot - prisoner', () => {
     visitSessionData.visitRestriction = 'CLOSED'
     visitSessionData.closedVisitReason = 'prisoner'
     visitSessionData.visitSlot = {
@@ -611,7 +611,7 @@ describe(`Update journey specific testing`, () => {
       })
   })
 
-  it('Restriction change: Closed to open, no visit slots available', () => {
+  it('Restriction change: Closed to open, no availability for the selected visit slot', () => {
     visitSessionData.visitRestriction = 'OPEN'
     visitSessionData.visitSlot = {
       id: '',
