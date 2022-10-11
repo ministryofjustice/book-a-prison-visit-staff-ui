@@ -30,7 +30,6 @@
     }
 
     &__service-name {
-      display: none;
       @include govuk-font(24);
 
       @include govuk-media-query($from: desktop) {
