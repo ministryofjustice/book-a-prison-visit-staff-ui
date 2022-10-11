@@ -2,6 +2,8 @@
 {% from "govuk/components/table/macro.njk" import govukTable %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "components/visitors.njk" import visitorDateOfBirth, visitorRestrictions %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{%-from "moj/components/banner/macro.njk" import mojBanner %}
 
 
 {% set pageHeaderTitle = "Booking details" %}
@@ -19,6 +21,39 @@
       <p class="bapv-secondary-text govuk-!-margin-bottom-0">Booking reference: <span data-test="reference">{{ visit.reference }}</span></p>
 
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+
+       {% if visit.visitStatus === "CANCELLED" %}
+        {% set status = visit.outcomeStatus.split("_") %}
+            {%- for visitNote in visit.visitNotes %}
+              {% if visitNote.type == "VISIT_OUTCOMES" %}
+
+                {% set cancelledBy %}
+                  {% if status[0] === 'ADMINISTRATIVE' %}
+                    {{ 'This visit was cancelled due to an administrative error with the booking.' }}
+                  {% else %}
+                    {{ 'This visit was cancelled by the ' + status[0] | lower + '.' }}
+                  {% endif %}
+                {% endset %}
+
+                {% set cancelledVisitHtml %}
+                  {{ govukWarningText({
+                    classes: "govuk-!-margin-bottom-0 govuk-!-padding-left-4",
+                    html: "<span>" + cancelledBy + "</span><br><span>Reason: " + visitNote.text + "</span>",
+                    iconFallbackText: "Warning",
+                    attributes: {
+                      "data-test": "cancelled-visit-reason"
+                    }
+                  }) }}
+                {% endset %}
+
+                {{ mojBanner({
+                  classes: "govuk-!-padding-left-4",
+                  html: cancelledVisitHtml
+                }) }}
+
+              {% endif %}
+          {% endfor %}
+        {% endif %}
 
       <h2 class="govuk-heading-m">Prisoner details</h2>
       <ul class="bapv-item-list--horizontal">
@@ -93,24 +128,6 @@
         {% endif %}
 
       </div>
-        
-      {% if visit.visitStatus !== "BOOKED" %}
-        {% if visit.outcomeStatus === 'SUPERSEDED_CANCELLATION' %}
-          {%- for visitNote in visit.visitNotes %}
-            {% if visitNote.type == 'VISIT_OUTCOMES' %}
-              <p>This booking has been rebooked as <a href="../{{visitNote.text}}">{{ visitNote.text }}</a> </p>
-            {% endif %}
-          {% endfor %}     
-        {% else %}
-          {% set status = visit.outcomeStatus.split("_") %}
-            <p>This booking has been cancelled.
-          {%- for visitNote in visit.visitNotes %}
-            {% if visitNote.type == "VISIT_OUTCOMES" %}
-              <br>{{ status[0] | capitalize }} {{status[1] | lower }}: {{ visitNote.text }}.</p>
-            {% endif %}
-          {% endfor %}
-        {% endif %}
-      {% endif %}
 
       {% set visitorRows = [] %}
       {% for visitor in visitors %}
