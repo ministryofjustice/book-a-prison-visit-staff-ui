@@ -26,8 +26,7 @@
         {% set status = visit.outcomeStatus.split("_") %}
             {%- for visitNote in visit.visitNotes %}
               {% if visitNote.type == "VISIT_OUTCOMES" %}
-                {# <h1>This visit was cancelled by the {{ status[0] | lower }}.</h1>
-                <h1>Reason: {{ visitNote.text }}.</h1> #}
+
                 {% set cancelledBy %}
                   {% if status[0] === 'ADMINISTRATIVE' %}
                     {{ 'because of an administrative error.' }}
@@ -35,25 +34,26 @@
                     {{ 'by the ' + status[0] | lower  + '.' }}
                   {% endif %}
                 {% endset %}
-              {% set cancelledVisitHtml %}
-                {{ govukWarningText({
-                  classes: "app-warning-text--long govuk-!-padding-left-4",
-                  html: "<span>This visit was cancelled " + cancelledBy +"</span><br><span>Reason: " + visitNote.text + ".</span>",
-                  iconFallbackText: "Warning",
-                  attributes: {
-                    "data-test": "cancelled-visit-reason"
-                  }
-                }) }}
-              {% endset %}
+
+                {% set cancelledVisitHtml %}
+                  {{ govukWarningText({
+                    classes: "app-warning-text--long govuk-!-padding-left-4",
+                    html: "<span>This visit was cancelled " + cancelledBy +"</span><br><span>Reason: " + visitNote.text + ".</span>",
+                    iconFallbackText: "Warning",
+                    attributes: {
+                      "data-test": "cancelled-visit-reason"
+                    }
+                  }) }}
+                {% endset %}
+
                 {{ mojBanner({
                   classes: "govuk-!-padding-left-4",
                   html: cancelledVisitHtml
                 }) }}
+
               {% endif %}
           {% endfor %}
         {% endif %}
-
-      
 
       <h2 class="govuk-heading-m">Prisoner details</h2>
       <ul class="bapv-item-list--horizontal">
