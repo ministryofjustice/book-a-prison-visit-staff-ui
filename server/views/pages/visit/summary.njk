@@ -29,16 +29,16 @@
 
                 {% set cancelledBy %}
                   {% if status[0] === 'ADMINISTRATIVE' %}
-                    {{ 'because of an administrative error' }}
+                    {{ 'This visit was cancelled due to an administrative error with the booking.' }}
                   {% else %}
-                    {{ 'by the ' + status[0] | lower }}
+                    {{ 'This visit was cancelled by the ' + status[0] | lower + '.' }}
                   {% endif %}
                 {% endset %}
 
                 {% set cancelledVisitHtml %}
                   {{ govukWarningText({
                     classes: "govuk-!-margin-bottom-0 govuk-!-padding-left-4",
-                    html: "<span>This visit was cancelled " + cancelledBy +"</span><br><span>Reason: " + visitNote.text + "</span>",
+                    html: "<span>" + cancelledBy + "</span><br><span>Reason: " + visitNote.text + "</span>",
                     iconFallbackText: "Warning",
                     attributes: {
                       "data-test": "cancelled-visit-reason"

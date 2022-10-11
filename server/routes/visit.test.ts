@@ -616,7 +616,9 @@ describe('GET /visit/:reference', () => {
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
-        expect($('[data-test="cancelled-visit-reason"]').text()).toContain('because of an administrative error')
+        expect($('[data-test="cancelled-visit-reason"]').text()).toContain(
+          'due to an administrative error with the booking',
+        )
         expect($('[data-test="cancelled-visit-reason"]').text()).toContain('booking error')
       })
   })
