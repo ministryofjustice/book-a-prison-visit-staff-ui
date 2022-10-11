@@ -253,3 +253,12 @@
     margin-bottom: govuk-spacing(3);
   }
 }
+
+.moj-banner__message {
+  .app-warning-text--long {
+    margin-bottom: 0;
+    span.govuk-warning-text__icon {
+      margin-top: 5px;
+    }
+  }
+}

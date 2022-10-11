@@ -605,6 +605,36 @@ describe('GET /visit/:reference', () => {
         expect($('[data-test="update-visit"]').length).toBe(0)
       })
   })
+
+  it('should display cancelled message - administrative', () => {
+    visit.visitStatus = 'CANCELLED'
+    visit.outcomeStatus = 'ADMINISTRATIVE_CANCELLATION'
+    visit.visitNotes = [{ type: 'VISIT_OUTCOMES', text: 'booking error' }]
+    return request(app)
+      .get('/visit/ab-cd-ef-gh')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('[data-test="cancelled-visit-reason"]').text()).toContain('because of an administrative error')
+        expect($('[data-test="cancelled-visit-reason"]').text()).toContain('booking error')
+      })
+  })
+
+  it('should display cancelled message - visitor cancelled', () => {
+    visit.visitStatus = 'CANCELLED'
+    visit.outcomeStatus = 'VISITOR_CANCELLED'
+    visit.visitNotes = [{ type: 'VISIT_OUTCOMES', text: 'no longer required' }]
+    return request(app)
+      .get('/visit/ab-cd-ef-gh')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('[data-test="cancelled-visit-reason"]').text()).toContain('by the visitor')
+        expect($('[data-test="cancelled-visit-reason"]').text()).toContain('no longer required')
+      })
+  })
 })
 
 describe('GET /visit/:reference/cancel', () => {
