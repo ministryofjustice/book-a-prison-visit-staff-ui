@@ -1,5 +1,6 @@
 import express, { Router } from 'express'
 import helmet from 'helmet'
+import config from '../config'
 
 export default function setUpWebSecurity(): Router {
   const router = express.Router()
@@ -16,6 +17,7 @@ export default function setUpWebSecurity(): Router {
           scriptSrc: ["'self'", 'code.jquery.com', "'sha256-+6WnXIl4mbFTCARd8N3COQmT3bJJmo32N8q8ZSQAIcU='"],
           styleSrc: ["'self'", 'code.jquery.com'],
           fontSrc: ["'self'"],
+          formAction: ["'self'", `${config.apis.hmppsAuth.url}`],
         },
       },
     }),
