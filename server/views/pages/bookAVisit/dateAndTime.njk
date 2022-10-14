@@ -15,13 +15,13 @@
 {% macro buildSlotsRadioItems(slotsList, radios) %}
   {% for slot in slotsList %}
 
-    {%- set doubleBooked = slot.id != originalSelectedSlot.id and (slot.sessionConflicts and "DOUBLE_BOOKED" in slot.sessionConflicts) %}
+    {%- set doubleBooked = slot.id != originalVisitSlot.id and (slot.sessionConflicts and "DOUBLE_BOOKED" in slot.sessionConflicts) %}
     {%- set checked = true if formValues['visit-date-and-time'] and formValues['visit-date-and-time'] == slot.id else false %}
 
     {%- set tableText %}
-      {% if (slot.id == originalSelectedSlot.id) -%}
+      {% if (slot.id == originalVisitSlot.id) -%}
         Time slot reserved by the original booking
-      {% elseif (checked and not originalSelectedSlot) -%}
+      {% elseif (checked and not originalVisitSlot) -%}
         Time slot reserved for this booking
       {% elseif (doubleBooked and not checked) -%}
         Prisoner has a visit

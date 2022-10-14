@@ -241,7 +241,7 @@ describe('Views - Date and time of visit', () => {
     })
 
     it('should correctly label slot that is NOT checked when booking a visit', () => {
-      viewContext.originalSelectedSlot = undefined // booking journey; so no originally selected slot
+      viewContext.originalVisitSlot = undefined // booking journey; so no originally selected slot
 
       const $ = cheerio.load(compiledTemplate.render(viewContext))
 
@@ -252,7 +252,7 @@ describe('Views - Date and time of visit', () => {
 
     it('should correctly label currently reserved slot when booking a visit', () => {
       viewContext.formValues = { 'visit-date-and-time': '1' }
-      viewContext.originalSelectedSlot = undefined // booking journey; so no originally selected slot
+      viewContext.originalVisitSlot = undefined // booking journey; so no originally selected slot
 
       const $ = cheerio.load(compiledTemplate.render(viewContext))
 
@@ -262,7 +262,7 @@ describe('Views - Date and time of visit', () => {
     })
 
     it('should correctly label the originally selected slot (when NOT checked) when updating a visit', () => {
-      viewContext.originalSelectedSlot = { id: '1' } as VisitSlot // update journey, so originally selected slot known
+      viewContext.originalVisitSlot = { id: '1' } as VisitSlot // update journey, so originally selected slot known
 
       const $ = cheerio.load(compiledTemplate.render(viewContext))
 
@@ -273,7 +273,7 @@ describe('Views - Date and time of visit', () => {
 
     it('should correctly label the originally selected slot (when checked) when updating a visit', () => {
       viewContext.formValues = { 'visit-date-and-time': '1' }
-      viewContext.originalSelectedSlot = { id: '1' } as VisitSlot // update journey, so originally selected slot known
+      viewContext.originalVisitSlot = { id: '1' } as VisitSlot // update journey, so originally selected slot known
 
       const $ = cheerio.load(compiledTemplate.render(viewContext))
 
