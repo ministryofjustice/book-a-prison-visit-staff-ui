@@ -124,68 +124,6 @@ testJourneys.forEach(journey => {
             ],
           },
         },
-        {
-          date: 'Tuesday 15 February',
-          prisonerEvents: {
-            morning: [],
-            afternoon: [],
-          },
-          slots: {
-            morning: [],
-            afternoon: [
-              {
-                id: '4',
-                startTimestamp: '2022-02-15T16:00:00',
-                endTimestamp: '2022-02-15T17:00:00',
-                availableTables: 12,
-                capacity: 30,
-                visitRoomName: 'room name',
-                visitRestriction: 'OPEN',
-              },
-              {
-                id: '5',
-                startTimestamp: '2022-02-15T16:00:00',
-                endTimestamp: '2022-02-15T17:00:00',
-                availableTables: 12,
-                capacity: 30,
-                visitRoomName: 'room name',
-                visitRestriction: 'CLOSED',
-              },
-            ],
-          },
-        },
-      ],
-      'March 2022': [
-        {
-          date: 'Tuesday 1 March',
-          prisonerEvents: {
-            morning: [],
-            afternoon: [],
-          },
-          slots: {
-            morning: [
-              {
-                id: '6',
-                startTimestamp: '2022-03-01T09:30:00',
-                endTimestamp: '2022-03-01T10:30:00',
-                availableTables: 0,
-                capacity: 30,
-                visitRoomName: 'room name',
-                visitRestriction: 'OPEN',
-              },
-              {
-                id: '7',
-                startTimestamp: '2022-03-01T09:30:00',
-                endTimestamp: '2022-03-01T10:30:00',
-                availableTables: 0,
-                capacity: 30,
-                visitRoomName: 'room name',
-                visitRestriction: 'CLOSED',
-              },
-            ],
-            afternoon: [],
-          },
-        },
       ],
     }
 
@@ -205,7 +143,7 @@ testJourneys.forEach(journey => {
             expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
             expect($('[data-test="visit-restriction"]').text()).toBe('Open')
             expect($('[data-test="closed-visit-reason"]').length).toBe(0)
-            expect($('input[name="visit-date-and-time"]').length).toBe(7)
+            expect($('input[name="visit-date-and-time"]').length).toBe(3)
             expect($('input[name="visit-date-and-time"]:checked').length).toBe(0)
             expect($('.govuk-accordion__section--expanded').length).toBe(0)
 
@@ -299,7 +237,7 @@ testJourneys.forEach(journey => {
             const $ = cheerio.load(res.text)
             expect($('h1').text().trim()).toBe('Select date and time of visit')
             expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
-            expect($('input[name="visit-date-and-time"]').length).toBe(7)
+            expect($('input[name="visit-date-and-time"]').length).toBe(3)
             expect($('.govuk-accordion__section--expanded').length).toBe(1)
             expect($('.govuk-accordion__section--expanded #3').length).toBe(1)
             expect($('input#3').prop('checked')).toBe(true)
