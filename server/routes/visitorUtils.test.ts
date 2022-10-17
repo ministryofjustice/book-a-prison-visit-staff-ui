@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import { Session, SessionData } from 'express-session'
 import { VisitSlot, VisitSlotList } from '../@types/bapv'
-import { clearSession, getFlashFormValues, getSelectedSlot } from './visitorUtils'
+import { clearSession, getFlashFormValues, getSelectedSlot, getSlotByStartTimeAndRestriction } from './visitorUtils'
 
 const slotsList: VisitSlotList = {
   'February 2022': [
@@ -108,6 +108,16 @@ describe('getSelectedSlot', () => {
   it('should return undefined if selected slot not present in slotsList', () => {
     expect(getSelectedSlot(slotsList, '0')).toBe(undefined)
     expect(getSelectedSlot(slotsList, '6')).toBe(undefined)
+  })
+})
+
+describe('getSlotByStartTimeAndRestriction', () => {
+  it('should return a slot given matching start timestamp and visit restriction', () => {
+    expect(getSlotByStartTimeAndRestriction(slotsList, '2022-02-14T12:00:00', 'OPEN')).toHaveProperty('id', '3')
+  })
+
+  it('should return undefined if no slot matches given start timestamp and visit restriction', () => {
+    expect(getSlotByStartTimeAndRestriction(slotsList, '2022-01-01T00:00:00', 'OPEN')).toBe(undefined)
   })
 })
 

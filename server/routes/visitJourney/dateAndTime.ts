@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { VisitSlot } from '../../@types/bapv'
 import AuditService from '../../services/auditService'
 import VisitSessionsService from '../../services/visitSessionsService'
-import { getFlashFormValues, getSelectedSlot, getSelectedSlotByStartTimestamp } from '../visitorUtils'
+import { getFlashFormValues, getSelectedSlot, getSlotByStartTimeAndRestriction } from '../visitorUtils'
 import getUrlPrefix from './visitJourneyUtils'
 
 export default class DateAndTime {
@@ -24,64 +24,53 @@ export default class DateAndTime {
     })
 
     let restrictionChangeMessage = ''
-    let matchingSlot = ''
-    let selectedSlot
+    let matchingSlot
 
+    // first time here on update journey, visitSlot.id will be ''
     if (isUpdate && visitSessionData.visitSlot?.id === '') {
-      selectedSlot = getSelectedSlotByStartTimestamp(
+      matchingSlot = getSlotByStartTimeAndRestriction(
         slotsList,
         visitSessionData.visitSlot.startTimestamp,
         visitSessionData.visitRestriction,
       )
 
-      if (selectedSlot) {
-        matchingSlot = selectedSlot.id
+      if (
+        matchingSlot &&
+        (matchingSlot.availableTables > 0 ||
+          visitSessionData.visitRestriction === visitSessionData.originalVisitSlot.visitRestriction)
+      ) {
+        visitSessionData.visitSlot.id = matchingSlot.id
       }
 
-      if (visitSessionData.visitRestriction !== visitSessionData.originalVisitSlot?.visitRestriction) {
-        if (!selectedSlot || selectedSlot.availableTables === 0) {
-          if (visitSessionData.visitRestriction === 'CLOSED') {
-            if (visitSessionData.closedVisitReason === 'visitor') {
-              restrictionChangeMessage =
-                'A new visit time must be selected as this is now a closed visit due to a visitor restriction.'
-            } else {
-              restrictionChangeMessage =
-                'A new visit time must be selected as this is now a closed visit due to a prisoner restriction.'
-            }
-          } else {
-            restrictionChangeMessage = 'A new visit time must be selected as this is now an open visit.'
-          }
-        } else if (selectedSlot && selectedSlot.availableTables > 0) {
-          if (visitSessionData.visitRestriction === 'CLOSED') {
-            if (visitSessionData.closedVisitReason === 'visitor') {
-              restrictionChangeMessage =
-                'This is now a closed visit due to a visitor restriction. The visit time can stay the same.'
-            } else {
-              restrictionChangeMessage =
-                'This is now a closed visit due to a prisoner restriction. The visit time can stay the same.'
-            }
-          } else {
-            restrictionChangeMessage = 'This is now an open visit. The visit time can stay the same.'
-          }
+      if (visitSessionData.visitRestriction !== visitSessionData.originalVisitSlot.visitRestriction) {
+        if (matchingSlot && matchingSlot.availableTables > 0) {
+          restrictionChangeMessage = visitSessionData.closedVisitReason
+            ? `This is now a closed visit due to a ${visitSessionData.closedVisitReason} restriction. `
+            : 'This is now an open visit. '
+          restrictionChangeMessage += 'The visit time can stay the same.'
+        } else {
+          restrictionChangeMessage = 'A new visit time must be selected as this is now '
+          restrictionChangeMessage += visitSessionData.closedVisitReason
+            ? `a closed visit due to a ${visitSessionData.closedVisitReason} restriction.`
+            : 'an open visit.'
         }
       }
     }
 
-    let originalSelectedSlot
+    let originalVisitSlot
     if (isUpdate && visitSessionData.originalVisitSlot) {
-      originalSelectedSlot = getSelectedSlotByStartTimestamp(
+      // matching on original time but session's current visit restriction to ensure
+      // originally selected time slot is available for re-selection even if restriction changes
+      originalVisitSlot = getSlotByStartTimeAndRestriction(
         slotsList,
         visitSessionData.originalVisitSlot.startTimestamp,
-        visitSessionData.originalVisitSlot.visitRestriction,
+        visitSessionData.visitRestriction,
       )
     }
 
     const formValues = getFlashFormValues(req)
     if (!Object.keys(formValues).length && visitSessionData.visitSlot?.id) {
       formValues['visit-date-and-time'] = visitSessionData.visitSlot?.id
-    }
-    if (!Object.keys(formValues).length && matchingSlot) {
-      formValues['visit-date-and-time'] = matchingSlot
     }
 
     const slotsPresent = Object.values(slotsList).some(value => value.length)
@@ -98,7 +87,7 @@ export default class DateAndTime {
       formValues,
       slotsPresent,
       restrictionChangeMessage,
-      originalSelectedSlot,
+      originalVisitSlot,
       urlPrefix: getUrlPrefix(isUpdate, visitSessionData.visitReference),
     })
   }

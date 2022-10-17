@@ -11,7 +11,7 @@ export const getSelectedSlot = (slotsList: VisitSlotList, selectedSlot: string):
     .find(slot => slot.id === selectedSlot)
 }
 
-export const getSelectedSlotByStartTimestamp = (
+export const getSlotByStartTimeAndRestriction = (
   slotsList: VisitSlotList,
   startTimestamp: string,
   visitRestriction: string,

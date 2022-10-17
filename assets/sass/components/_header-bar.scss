@@ -121,7 +121,12 @@
   width: 100%;
   display: flex;
   flex-wrap: wrap;
+  row-gap: govuk-spacing(3);
   border-bottom: 1px solid $govuk-border-colour;
+
+  span {
+    margin-right: govuk-spacing(3);
+  }
 
   &__location {
     @include govuk-font($size: 19, $weight: 'bold');
