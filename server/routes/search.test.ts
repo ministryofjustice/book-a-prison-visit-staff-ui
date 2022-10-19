@@ -224,7 +224,7 @@ describe('Prisoner search page', () => {
           previous: 0,
         }
 
-        prisonerSearchService.getPrisoners.mockResolvedValue(getPrisonersReturnData)
+        const mockGetPrisoners = prisonerSearchService.getPrisoners.mockResolvedValue(getPrisonersReturnData)
 
         return request(app)
           .get('/search/prisoner-visit/results?search=A1234BC')
@@ -232,7 +232,40 @@ describe('Prisoner search page', () => {
           .expect(res => {
             expect(res.text).toContain('Search for a prisoner')
             expect(res.text).toContain('id="search-results-none"')
+            expect(mockGetPrisoners).toHaveBeenCalledWith('A1234BC', undefined, 1, true)
           })
+      })
+    })
+
+    describe('TEST GET /search/prisoner-visit/results?search=A1234BC.  Mac full stop test', () => {
+      it('should remove full stop inserted by mac', () => {
+        // Given
+
+        const mockGetPrisoners = prisonerSearchService.getPrisoners.mockResolvedValue(getPrisonersReturnData)
+
+        // When
+        const result = request(app).get('/search/prisoner-visit/results?search=A1234BC.  ')
+
+        // Then
+        result.expect('Content-Type', /html/).expect(res => {
+          expect(mockGetPrisoners).toHaveBeenCalledWith('A1234BC', undefined, 1, true)
+        })
+      })
+    })
+
+    describe('TEST GET /search/prisoner/results?search=A1234BC.  Mac full stop test', () => {
+      it('should remove full stop inserted by mac', () => {
+        // Given
+
+        const mockGetPrisoners = prisonerSearchService.getPrisoners.mockResolvedValue(getPrisonersReturnData)
+
+        // When
+        const result = request(app).get('/search/prisoner/results?search=A1234BC.  ')
+
+        // Then
+        result.expect('Content-Type', /html/).expect(res => {
+          expect(mockGetPrisoners).toHaveBeenCalledWith('A1234BC', undefined, 1, true)
+        })
       })
     })
 

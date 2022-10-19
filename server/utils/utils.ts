@@ -5,10 +5,6 @@ export const properCase = (word: string): string =>
 
 const isBlank = (str: string): boolean => !str || /^\s*$/.test(str)
 
-export const removeTrailingFullStop = (str: string): string => {
-  return str.replace(/\.\s*$/, '')
-}
-
 export const prisonerDatePretty = ({
   dateToFormat,
   wrapDate = true,

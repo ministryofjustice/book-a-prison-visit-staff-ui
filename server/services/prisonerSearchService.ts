@@ -1,4 +1,4 @@
-import { properCaseFullName, prisonerDatePretty, removeTrailingFullStop } from '../utils/utils'
+import { properCaseFullName, prisonerDatePretty } from '../utils/utils'
 import { Prisoner } from '../data/prisonerOffenderSearchTypes'
 import PrisonerSearchClient from '../data/prisonerSearchClient'
 import { PrisonerDetailsItem, SystemToken } from '../@types/bapv'
@@ -38,10 +38,7 @@ export default class PrisonerSearchService {
     const token = await this.systemToken(username)
     const prisonerSearchClient = this.prisonerSearchClientBuilder(token)
     this.currentPage = page - 1
-    const { totalPages, totalElements, content } = await prisonerSearchClient.getPrisoners(
-      removeTrailingFullStop(search),
-      this.currentPage,
-    )
+    const { totalPages, totalElements, content } = await prisonerSearchClient.getPrisoners(search, this.currentPage)
     this.numberOfPages = totalPages
     const nextPage = this.getNextPage()
     const previousPage = this.getPreviousPage()

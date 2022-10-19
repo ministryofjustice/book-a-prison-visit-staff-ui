@@ -104,26 +104,6 @@ describe('Prisoner search service', () => {
         expect(next).toEqual(1)
         expect(previous).toEqual(1)
       })
-      it('Remove trailing full stop when mac auto insert on search text', async () => {
-        const mockGetPrisoners = prisonerSearchClient.getPrisoners.mockResolvedValue({
-          totalPages: 1,
-          totalElements: 1,
-          content: [prisonerDto],
-        })
-
-        await prisonerSearchService.getPrisoners('Aled.  ', 'user', 1, true)
-        expect(mockGetPrisoners).toHaveBeenCalledWith('Aled', 0)
-      })
-      it('Remove trailing full stop on search text', async () => {
-        const mockGetPrisoners = prisonerSearchClient.getPrisoners.mockResolvedValue({
-          totalPages: 1,
-          totalElements: 1,
-          content: [prisonerDto],
-        })
-
-        await prisonerSearchService.getPrisoners('Aled.', 'user', 1, true)
-        expect(mockGetPrisoners).toHaveBeenCalledWith('Aled', 0)
-      })
       it('Propagates error', async () => {
         prisonerSearchClient.getPrisoners.mockRejectedValue(new Error('some error'))
 
