@@ -224,7 +224,7 @@ describe('Prisoner search page', () => {
           previous: 0,
         }
 
-        prisonerSearchService.getPrisoners.mockResolvedValue(getPrisonersReturnData)
+        const mockGetPrisoners = prisonerSearchService.getPrisoners.mockResolvedValue(getPrisonersReturnData)
 
         return request(app)
           .get('/search/prisoner-visit/results?search=A1234BC')
@@ -232,6 +232,7 @@ describe('Prisoner search page', () => {
           .expect(res => {
             expect(res.text).toContain('Search for a prisoner')
             expect(res.text).toContain('id="search-results-none"')
+            expect(mockGetPrisoners).toHaveBeenCalledWith('A1234BC', undefined, 1, true)
           })
       })
     })
@@ -331,6 +332,36 @@ describe('Prisoner search page', () => {
           .send('search= john smith ')
           .expect(302)
           .expect('location', '/search/prisoner-visit/results?search=john%20smith')
+      })
+    })
+
+    describe('TEST POST /search/prisoner-visit/results?search=A1234BC.  Mac full stop test', () => {
+      it('should remove full stop inserted by mac', () => {
+        // Given
+        const dataToSend = {
+          search: 'A1234BC. ',
+        }
+
+        // When
+        const result = request(app).post('/search/prisoner-visit').send(dataToSend)
+
+        // Then
+        return result.expect(302).expect('location', '/search/prisoner-visit/results?search=A1234BC')
+      })
+    })
+
+    describe('TEST POST /search/prisoner/results?search=A1234BC.   Mac full stop test', () => {
+      it('should remove full stop inserted by mac', () => {
+        // Given
+        const dataToSend = {
+          search: 'A1234BC. ',
+        }
+
+        // When
+        const result = request(app).post('/search/prisoner').send(dataToSend)
+
+        // Then
+        return result.expect(302).expect('location', '/search/prisoner/results?search=A1234BC')
       })
     })
   })

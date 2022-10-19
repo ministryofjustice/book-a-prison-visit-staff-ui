@@ -7,6 +7,15 @@ jest.mock('../data/prisonerSearchClient')
 const search = 'some search'
 const prisonerSearchClient = new PrisonerSearchClient(null) as jest.Mocked<PrisonerSearchClient>
 
+const prisonerDto: Prisoner = {
+  firstName: 'john',
+  lastName: 'smith',
+  prisonerNumber: 'A1234BC',
+  dateOfBirth: '1975-04-02',
+  bookingId: '12345',
+  restrictedPatient: false,
+}
+
 describe('Prisoner search service', () => {
   let prisonerSearchClientBuilder
   let prisonerSearchService: PrisonerSearchService
@@ -28,16 +37,7 @@ describe('Prisoner search service', () => {
         prisonerSearchClient.getPrisoners.mockResolvedValue({
           totalPages: 1,
           totalElements: 1,
-          content: [
-            {
-              firstName: 'john',
-              lastName: 'smith',
-              prisonerNumber: 'A1234BC',
-              dateOfBirth: '1975-04-02',
-              bookingId: '12345',
-              restrictedPatient: false,
-            },
-          ],
+          content: [prisonerDto],
         })
 
         const { results, numberOfResults, numberOfPages, next, previous } = await prisonerSearchService.getPrisoners(
@@ -76,16 +76,7 @@ describe('Prisoner search service', () => {
         prisonerSearchClient.getPrisoners.mockResolvedValue({
           totalPages: 1,
           totalElements: 1,
-          content: [
-            {
-              firstName: 'john',
-              lastName: 'smith',
-              prisonerNumber: 'A1234BC',
-              dateOfBirth: '1975-04-02',
-              bookingId: '12345',
-              restrictedPatient: false,
-            },
-          ],
+          content: [prisonerDto],
         })
 
         const { results, numberOfResults, numberOfPages, next, previous } = await prisonerSearchService.getPrisoners(
@@ -130,16 +121,7 @@ describe('Prisoner search service', () => {
 
     it('should matching prisoner', async () => {
       const prisoner: { content: Prisoner[] } = {
-        content: [
-          {
-            firstName: 'john',
-            lastName: 'smith',
-            prisonerNumber: 'A1234BC',
-            dateOfBirth: '1975-04-02',
-            bookingId: '12345',
-            restrictedPatient: false,
-          },
-        ],
+        content: [prisonerDto],
       }
 
       prisonerSearchClient.getPrisoner.mockResolvedValue(prisoner)

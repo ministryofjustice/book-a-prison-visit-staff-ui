@@ -29,7 +29,7 @@ export default function routes(
     res.render('pages/search/prisoner', { search, visit: req.originalUrl.includes('-visit') })
   })
 
-  post(['/prisoner', '/prisoner-visit'], body('search').trim(), (req, res) => {
+  post(['/prisoner', '/prisoner-visit'], body('search').trim('. '), (req, res) => {
     const isVisit = req.originalUrl.includes('-visit')
     const { search } = req.body
 
