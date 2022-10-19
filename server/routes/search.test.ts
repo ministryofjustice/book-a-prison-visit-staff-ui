@@ -237,38 +237,6 @@ describe('Prisoner search page', () => {
       })
     })
 
-    describe('TEST GET /search/prisoner-visit/results?search=A1234BC.  Mac full stop test', () => {
-      it('should remove full stop inserted by mac', () => {
-        // Given
-
-        const mockGetPrisoners = prisonerSearchService.getPrisoners.mockResolvedValue(getPrisonersReturnData)
-
-        // When
-        const result = request(app).get('/search/prisoner-visit/results?search=A1234BC.  ')
-
-        // Then
-        result.expect('Content-Type', /html/).expect(res => {
-          expect(mockGetPrisoners).toHaveBeenCalledWith('A1234BC', undefined, 1, true)
-        })
-      })
-    })
-
-    describe('TEST GET /search/prisoner/results?search=A1234BC.  Mac full stop test', () => {
-      it('should remove full stop inserted by mac', () => {
-        // Given
-
-        const mockGetPrisoners = prisonerSearchService.getPrisoners.mockResolvedValue(getPrisonersReturnData)
-
-        // When
-        const result = request(app).get('/search/prisoner/results?search=A1234BC.  ')
-
-        // Then
-        result.expect('Content-Type', /html/).expect(res => {
-          expect(mockGetPrisoners).toHaveBeenCalledWith('A1234BC', undefined, 1, true)
-        })
-      })
-    })
-
     describe('GET /search/prisoner-visit/results?search=A1234BC', () => {
       it('should render prisoner results page with results and no next/prev when there are less than 11 results', () => {
         getPrisonersReturnData = {
@@ -364,6 +332,36 @@ describe('Prisoner search page', () => {
           .send('search= john smith ')
           .expect(302)
           .expect('location', '/search/prisoner-visit/results?search=john%20smith')
+      })
+    })
+
+    describe('TEST POST /search/prisoner-visit/results?search=A1234BC.  Mac full stop test', () => {
+      it('should remove full stop inserted by mac', () => {
+        // Given
+        const dataToSend = {
+          search: 'A1234BC. ',
+        }
+
+        // When
+        const result = request(app).post('/search/prisoner-visit').send(dataToSend)
+
+        // Then
+        return result.expect(302).expect('location', '/search/prisoner-visit/results?search=A1234BC')
+      })
+    })
+
+    describe('TEST POST /search/prisoner/results?search=A1234BC.   Mac full stop test', () => {
+      it('should remove full stop inserted by mac', () => {
+        // Given
+        const dataToSend = {
+          search: 'A1234BC. ',
+        }
+
+        // When
+        const result = request(app).post('/search/prisoner').send(dataToSend)
+
+        // Then
+        return result.expect(302).expect('location', '/search/prisoner/results?search=A1234BC')
       })
     })
   })
