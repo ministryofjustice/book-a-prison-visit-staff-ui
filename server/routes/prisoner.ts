@@ -24,7 +24,7 @@ export default function routes(
   get('/:offenderNo', async (req, res) => {
     const offenderNo = getOffenderNo(req)
     const search = (req.query?.search as string) ?? ''
-    const queryParamsForBackLink = new URLSearchParams({ search }).toString()
+    const queryParamsForBackLink = search !== '' ? new URLSearchParams({ search }).toString() : ''
 
     const prisonerProfile = await prisonerProfileService.getProfile(offenderNo, res.locals.user?.username)
     await auditService.viewPrisoner({

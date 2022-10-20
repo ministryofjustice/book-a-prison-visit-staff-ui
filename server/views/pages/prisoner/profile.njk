@@ -8,7 +8,12 @@
 
 {% set pageHeaderTitle = displayName %}
 {% set pageTitle = applicationName + " - " + pageHeaderTitle %}
-{% set backLinkHref = "/search/prisoner/results?" + queryParamsForBackLink %}
+{% set query = '?' + queryParamsForBackLink if queryParamsForBackLink != '' %}
+{% if queryParamsForBackLink %}
+  {% set backLinkHref = "/search/prisoner/results?" + queryParamsForBackLink %}
+{% else %}
+  {% set backLinkHref = "/search/prisoner" %}
+{% endif %}
 
 {% block content %}
   <div class="govuk-grid-row">

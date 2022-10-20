@@ -132,7 +132,7 @@ describe('GET /prisoner/A1234BC', () => {
     prisonerProfileService.getProfile.mockResolvedValue(prisonerProfile)
   })
 
-  it('should render the prisoner profile page for offender number A1234BC', () => {
+  it('should render the prisoner profile page for offender number A1234BC with back link to search page with empty querystring', () => {
     return request(app)
       .get('/prisoner/A1234BC')
       .expect(200)
@@ -160,6 +160,50 @@ describe('GET /prisoner/A1234BC', () => {
         expect($('[data-test="tab-pvo-remaining"]').text()).toBe('0')
         expect($('[data-test="tab-pvo-last-date"]').text()).toBe('1 December 2021')
         expect($('[data-test="tab-pvo-next-date"]').text()).toBe('1 January 2022')
+        expect($('.govuk-back-link').attr('href')).toBe('/search/prisoner')
+
+        expect($('#active-alerts').text()).toContain('Professional lock pick')
+
+        expect($('#vo-override').length).toBe(0)
+        expect($('[data-test="book-a-visit"]').length).toBe(1)
+        expect(auditService.viewPrisoner).toHaveBeenCalledTimes(1)
+        expect(auditService.viewPrisoner).toHaveBeenCalledWith({
+          prisonerId: 'A1234BC',
+          username: undefined,
+          operationId: undefined,
+        })
+      })
+  })
+
+  it('should render the prisoner profile page for offender number A1234BC with back link to search results page with querystring', () => {
+    return request(app)
+      .get('/prisoner/A1234BC?search=A1234BC')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('.govuk-error-summary__body').length).toBe(0)
+        expect($('h1').text().trim()).toBe('Smith, John')
+        expect($('.flagged-alerts-list .flagged-alert.flagged-alert--UPIU').text().trim()).toBe(
+          'Protective Isolation Unit',
+        )
+        expect($('[data-test="prison-number"]').text()).toBe('A1234BC')
+        expect($('[data-test="dob"]').text()).toBe('12 October 1980')
+        expect($('[data-test="location"]').text()).toBe('1-1-C-028, Hewell (HMP)')
+        expect($('[data-test="category"]').text()).toBe('Cat C')
+        expect($('[data-test="iep-level"]').text()).toBe('Standard')
+        expect($('[data-test="convicted-status"]').text()).toBe('Convicted')
+        expect($('[data-test="active-alert-count"]').text()).toBe('1 active')
+        expect($('[data-test="remaining-vos"]').text()).toBe('1')
+        expect($('[data-test="remaining-pvos"]').text()).toBe('0')
+
+        expect($('[data-test="tab-vo-remaining"]').text()).toBe('1')
+        expect($('[data-test="tab-vo-last-date"]').text()).toBe('21 April 2021')
+        expect($('[data-test="tab-vo-next-date"]').text()).toBe('15 May 2021')
+        expect($('[data-test="tab-pvo-remaining"]').text()).toBe('0')
+        expect($('[data-test="tab-pvo-last-date"]').text()).toBe('1 December 2021')
+        expect($('[data-test="tab-pvo-next-date"]').text()).toBe('1 January 2022')
+        expect($('.govuk-back-link').attr('href')).toBe('/search/prisoner/results?search=A1234BC')
 
         expect($('#active-alerts').text()).toContain('Professional lock pick')
 
