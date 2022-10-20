@@ -7,7 +7,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        url: `/api/bookings/v2?prisonId=HEI&offenderNo=${offenderNo}&legalInfo=true`,
+        url: `/prison/api/bookings/v2?prisonId=HEI&offenderNo=${offenderNo}&legalInfo=true`,
       },
       response: {
         status: 200,
@@ -35,7 +35,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/api/offenders/${prisoner.offenderNo}`,
+        urlPattern: `/prison/api/offenders/${prisoner.offenderNo}`,
       },
       response: {
         status: 200,
@@ -48,7 +48,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/api/offenders/${offenderNo}/offender-restrictions?activeRestrictionsOnly=true`,
+        urlPattern: `/prison/api/offenders/${offenderNo}/offender-restrictions?activeRestrictionsOnly=true`,
       },
       response: {
         status: 200,
@@ -80,7 +80,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/api/bookings/offenderNo/${offenderNo}/visit/balances`,
+        urlPattern: `/prison/api/bookings/offenderNo/${offenderNo}/visit/balances`,
       },
       response: {
         status: 200,
