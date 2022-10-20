@@ -8,9 +8,6 @@ import whereaboutsOffenderEvents from './integration_tests/mockApis/whereabouts'
 import prisonApi from './integration_tests/mockApis/prison'
 import offenderSearch from './integration_tests/mockApis/offenderSearch'
 import visitScheduler from './integration_tests/mockApis/visitScheduler'
-import { Prisoner } from './server/data/prisonerOffenderSearchTypes'
-import { InmateDetail, VisitBalances } from './server/data/prisonApiTypes'
-import { Visit } from './server/data/visitSchedulerApiTypes'
 
 export default defineConfig({
   chromeWebSecurity: false,
@@ -33,26 +30,27 @@ export default defineConfig({
         ...tokenVerification,
 
         // Prisoner Contact Registry
-        stubGetPrisonerSocialContacts: prisonerContactRegistry.getPrisonerSocialContacts,
+        stubGetPrisonerSocialContacts: prisonerContactRegistry.stubGetPrisonerSocialContacts,
 
         // Prison API
-        stubGetBookings: prisonApi.getBookings,
-        stubGetOffender: prisonApi.getOffender,
-        stubGetVisitBalances: prisonApi.getVisitBalances,
+        stubGetBookings: prisonApi.stubGetBookings,
+        stubGetOffender: prisonApi.stubGetOffender,
+        stubGetOffenderRestrictions: prisonApi.stubGetOffenderRestrictions,
+        stubGetVisitBalances: prisonApi.stubGetVisitBalances,
 
         // Prisoner offender search
-        // stubGetPrisoner: results => offenderSearch.getPrisoner(results),
-        stubGetPrisoners: ({ results, page, size }) => offenderSearch.getPrisoners(results, page, size),
+        stubGetPrisoner: results => offenderSearch.stubGetPrisoner(results),
+        stubGetPrisoners: ({ results, page, size }) => offenderSearch.stubGetPrisoners(results, page, size),
 
         // Visit scheduler
-        // stubGetAvailableSupportOptions: visitScheduler.stubGetAvailableSupportOptions,
-        // stubGetVisit: visitScheduler.stubGetVisit,
-        stubGetUpcomingVisits: visitScheduler.getUpcomingVisits,
-        stubGetPastVisits: visitScheduler.getPastVisits,
-        // stubGetVisitSessions: visitScheduler.stubGetVisitSessions,
+        stubGetAvailableSupportOptions: visitScheduler.stubGetAvailableSupportOptions,
+        stubGetVisit: visitScheduler.stubGetVisit,
+        stubGetUpcomingVisits: visitScheduler.stubGetUpcomingVisits,
+        stubGetPastVisits: visitScheduler.stubGetPastVisits,
+        stubGetVisitSessions: visitScheduler.stubGetVisitSessions,
 
         // Whereabouts
-        // stubGetOffenderEvents: whereaboutsOffenderEvents.stubGetOffenderEvents,
+        stubGetOffenderEvents: whereaboutsOffenderEvents.stubGetOffenderEvents,
       })
     },
     baseUrl: 'http://localhost:3007',

@@ -3,7 +3,7 @@ import { stubFor } from './wiremock'
 import { Prisoner } from '../../server/data/prisonerOffenderSearchTypes'
 
 export default {
-  getPrisoners: (
+  stubGetPrisoners: (
     results: {
       totalPages: number
       totalElements: number
@@ -24,7 +24,7 @@ export default {
       },
     })
   },
-  getPrisoner: (results: {
+  stubGetPrisoner: (results: {
     totalPages: number
     totalElements: number
     content: Partial<Prisoner>[]

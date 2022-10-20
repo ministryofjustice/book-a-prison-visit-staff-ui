@@ -1,9 +1,10 @@
 import { SuperAgentRequest } from 'superagent'
 import { stubFor } from './wiremock'
+import { Contact } from '../../server/data/prisonerContactRegistryApiTypes'
 
 export default {
-  getPrisonerSocialContacts: (offenderNo: string): SuperAgentRequest => {
-    const results = [
+  stubGetPrisonerSocialContacts: (offenderNo: string): SuperAgentRequest => {
+    const results: Contact[] = [
       {
         personId: 1234,
         firstName: 'John',

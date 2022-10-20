@@ -1,6 +1,7 @@
 import nock from 'nock'
 import config from '../config'
 import PrisonApiClient, { prisonApiClientBuilder } from './prisonApiClient'
+import { InmateDetail, OffenderRestrictions, PagePrisonerBookingSummary, VisitBalances } from './prisonApiTypes'
 
 describe('prisonApiClient', () => {
   let fakePrisonApi: nock.Scope
@@ -34,7 +35,7 @@ describe('prisonApiClient', () => {
           },
         ],
         numberOfElements: 1,
-      }
+      } as PagePrisonerBookingSummary
 
       fakePrisonApi
         .get('/api/bookings/v2')
@@ -70,7 +71,7 @@ describe('prisonApiClient', () => {
         privilegeSummary: {
           iepLevel: 'Basic',
         },
-      }
+      } as InmateDetail
 
       fakePrisonApi
         .get(`/api/offenders/${offenderNo}`)
@@ -86,7 +87,7 @@ describe('prisonApiClient', () => {
   describe('getOffenderRestrictions', () => {
     it('should return offender restrictions from the Prison API', async () => {
       const offenderNo = 'A1234BC'
-      const results = {
+      const results: OffenderRestrictions = {
         bookingId: 0,
         offenderRestrictions: [
           {
@@ -118,7 +119,7 @@ describe('prisonApiClient', () => {
   describe('getVisitBalances', () => {
     it('should return visitBalances for a SENTENCED prisoner', async () => {
       const offenderNo = 'A1234BC'
-      const results = {
+      const results: VisitBalances = {
         remainingVo: 1,
         remainingPvo: 2,
         latestIepAdjustDate: '2021-04-21',

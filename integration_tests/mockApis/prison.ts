@@ -1,9 +1,14 @@
 import { SuperAgentRequest } from 'superagent'
 import { stubFor } from './wiremock'
-import { InmateDetail, VisitBalances } from '../../server/data/prisonApiTypes'
+import {
+  InmateDetail,
+  OffenderRestrictions,
+  PagePrisonerBookingSummary,
+  VisitBalances,
+} from '../../server/data/prisonApiTypes'
 
 export default {
-  getBookings: (offenderNo: string): SuperAgentRequest => {
+  stubGetBookings: (offenderNo: string): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',
@@ -12,7 +17,7 @@ export default {
       response: {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: {
+        jsonBody: <PagePrisonerBookingSummary>{
           numberOfElements: 1,
           content: [
             {
@@ -31,7 +36,7 @@ export default {
       },
     })
   },
-  getOffender: (prisoner: Partial<InmateDetail>): SuperAgentRequest => {
+  stubGetOffender: (prisoner: Partial<InmateDetail>): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',
@@ -44,7 +49,7 @@ export default {
       },
     })
   },
-  getOffenderRestrictions: (offenderNo: string): SuperAgentRequest => {
+  stubGetOffenderRestrictions: (offenderNo: string): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',
@@ -53,24 +58,24 @@ export default {
       response: {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: {
-          bookingId: '1234',
+        jsonBody: <OffenderRestrictions>{
+          bookingId: 0,
           offenderRestrictions: [
             {
+              restrictionId: 0,
+              comment: 'string',
+              restrictionType: 'string',
+              restrictionTypeDescription: 'string',
+              startDate: '2022-03-15',
+              expiryDate: '2022-03-15',
               active: true,
-              comment: 'restriction comment',
-              expiryDate: '2022-04-25T09:35:34.489Z',
-              restrictionId: 123,
-              restrictionType: 'RESTRICTED',
-              restrictionTypeDescription: 'Restricted',
-              startDate: '2022-04-25T09:35:34.489Z',
             },
           ],
         },
       },
     })
   },
-  getVisitBalances: ({
+  stubGetVisitBalances: ({
     offenderNo,
     visitBalances,
   }: {

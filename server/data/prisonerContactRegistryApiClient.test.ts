@@ -3,6 +3,7 @@ import config from '../config'
 import PrisonerContactRegistryApiClient, {
   prisonerContactRegistryApiClientBuilder,
 } from './prisonerContactRegistryApiClient'
+import { Contact } from './prisonerContactRegistryApiTypes'
 
 describe('prisonerContactRegistryApiClient', () => {
   let fakePrisonerContactRegistryApi: nock.Scope
@@ -21,7 +22,7 @@ describe('prisonerContactRegistryApiClient', () => {
   describe('getPrisonerSocialContacts', () => {
     it('should return an array of Contact from the Prisoner Contact Registry API', async () => {
       const offenderNo = 'A1234BC'
-      const results = [
+      const results: Contact[] = [
         {
           personId: 5871791,
           firstName: 'John',
