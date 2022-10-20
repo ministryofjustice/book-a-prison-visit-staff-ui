@@ -9,8 +9,8 @@ export default {
       totalElements: number
       content: Partial<Prisoner>[]
     },
-    page: string,
-    size: string,
+    page = '0',
+    size = '10',
   ): SuperAgentRequest => {
     return stubFor({
       request: {

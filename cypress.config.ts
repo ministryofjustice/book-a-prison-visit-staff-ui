@@ -23,57 +23,36 @@ export default defineConfig({
   },
   videoUploadOnPasses: false,
   taskTimeout: 60000,
-  viewportWidth: 2000,
-  viewportHeight: 2000,
+  viewportWidth: 1280,
+  viewportHeight: 1400,
   e2e: {
-    // We've imported your old cypress plugins here.
-    // You may want to clean this up later by importing these.
     setupNodeEvents(on) {
       on('task', {
         reset: resetStubs,
         ...auth,
         ...tokenVerification,
-        stubGetPrisonerSocialContacts: (offenderNo: string) =>
-          prisonerContactRegistry.getPrisonerSocialContacts(offenderNo),
-        stubGetOffenderEvents: ({
-          offenderNo,
-          fromDate,
-          toDate,
-        }: {
-          offenderNo: string
-          fromDate: string
-          toDate: string
-        }) =>
-          whereaboutsOffenderEvents.stubGetOffenderEvents({
-            offenderNo,
-            fromDate,
-            toDate,
-          }),
-        stubGetBookings: (offenderNo: string) => prisonApi.getBookings(offenderNo),
-        stubGetOffender: (prisoner: Partial<InmateDetail>) => prisonApi.getOffender(prisoner),
-        stubGetOffenderRestrictions: (offenderNo: string) => prisonApi.getOffenderRestrictions(offenderNo),
-        stubGetVisitBalances: ({ offenderNo, visitBalances }: { offenderNo: string; visitBalances: VisitBalances }) =>
-          prisonApi.getVisitBalances({ offenderNo, visitBalances }),
-        stubGetPrisoners: ({
-          results,
-          page = '0',
-          size = '10',
-        }: {
-          results: { totalPages: number; totalElements: number; content: Partial<Prisoner>[] }
-          page: string
-          size: string
-        }) => offenderSearch.getPrisoners(results, page, size),
-        stubGetPrisoner: (results: { totalPages: number; totalElements: number; content: Partial<Prisoner>[] }) =>
-          offenderSearch.getPrisoner(results),
-        stubGetAvailableSupportOptions: visitScheduler.stubGetAvailableSupportOptions,
-        stubGetVisit: (reference: string) => visitScheduler.stubGetVisit(reference),
-        stubGetUpcomingVisits: ({ offenderNo, upcomingVisits }: { offenderNo: string; upcomingVisits: Visit[] }) =>
-          visitScheduler.getUpcomingVisits({ offenderNo, upcomingVisits }),
-        stubGetPastVisits: ({ offenderNo, pastVisits }: { offenderNo: string; pastVisits: Visit[] }) =>
-          visitScheduler.getPastVisits({ offenderNo, pastVisits }),
-        stubGetVisitSessions: visitScheduler.stubGetVisitSessions,
-        stubCreateVisit: visitScheduler.stubCreateVisit,
-        stubUpdateVisit: visitScheduler.stubUpdateVisit,
+
+        // Prisoner Contact Registry
+        stubGetPrisonerSocialContacts: prisonerContactRegistry.getPrisonerSocialContacts,
+
+        // Prison API
+        stubGetBookings: prisonApi.getBookings,
+        stubGetOffender: prisonApi.getOffender,
+        stubGetVisitBalances: prisonApi.getVisitBalances,
+
+        // Prisoner offender search
+        // stubGetPrisoner: results => offenderSearch.getPrisoner(results),
+        stubGetPrisoners: ({ results, page, size }) => offenderSearch.getPrisoners(results, page, size),
+
+        // Visit scheduler
+        // stubGetAvailableSupportOptions: visitScheduler.stubGetAvailableSupportOptions,
+        // stubGetVisit: visitScheduler.stubGetVisit,
+        stubGetUpcomingVisits: visitScheduler.getUpcomingVisits,
+        stubGetPastVisits: visitScheduler.getPastVisits,
+        // stubGetVisitSessions: visitScheduler.stubGetVisitSessions,
+
+        // Whereabouts
+        // stubGetOffenderEvents: whereaboutsOffenderEvents.stubGetOffenderEvents,
       })
     },
     baseUrl: 'http://localhost:3007',
