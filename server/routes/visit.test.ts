@@ -46,7 +46,6 @@ jest.mock('./visitorUtils', () => {
 })
 
 beforeEach(() => {
-  config.features.updateJourneyEnabled = true
   flashData = { errors: [], formValues: [] }
   flashProvider.mockImplementation(key => {
     return flashData[key]
@@ -207,121 +206,6 @@ describe('GET /visit/:reference', () => {
         expect($('[data-test="visit-phone"]').text()).toBe('01234 567890')
         expect($('[data-test="cancel-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/cancel')
         expect($('[data-test="update-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/update/select-visitors')
-        // visitor details
-        expect($('[data-test="visitor-name-1"]').text()).toBe('Smith, Jeanette')
-        expect($('[data-test="visitor-dob-1"]').html()).toBe('28 July 1986<br>(Adult)')
-        expect($('[data-test="visitor-relationship-1"]').text()).toBe('Sister')
-        expect($('[data-test="visitor-address-1"]').html()).toBe('123 The Street,<br>Coventry')
-        expect($('[data-test="visitor-restrictions-1"] .visitor-restriction-badge--CLOSED').text()).toBe('Closed')
-        expect($('[data-test="visitor-restrictions-1"]').text()).toContain('End date not entered')
-        expect($('[data-test="visitor-name-2"]').text()).toBe('Smith, Anne')
-        expect($('[data-test="visitor-dob-2"]').html()).toBe(`2 January ${childBirthYear}<br>(Child)`)
-        expect($('[data-test="visitor-relationship-2"]').text()).toBe('Niece')
-        expect($('[data-test="visitor-address-2"]').html()).toBe('Not entered')
-        expect($('[data-test="visitor-restrictions-2"]').text()).toBe('None')
-        // additional info
-        expect($('[data-test="visit-comment"]').eq(0).text()).toBe('Example of a visit comment')
-        expect($('[data-test="visitor-concern"]').eq(0).text()).toBe('Example of a visitor concern')
-        expect($('[data-test="additional-support"]').text()).toBe('Wheelchair ramp, custom request')
-        expect($('[data-test="visit-booked"]').text()).toBe('Monday 14 February 2022 at 10am')
-
-        expect(auditService.viewedVisitDetails).toHaveBeenCalledTimes(1)
-        expect(auditService.viewedVisitDetails).toHaveBeenCalledWith({
-          visitReference: 'ab-cd-ef-gh',
-          prisonerId: 'A1234BC',
-          prisonId: 'HEI',
-          username: undefined,
-          operationId: undefined,
-        })
-
-        expect(clearSession).toHaveBeenCalledTimes(1)
-        expect(visitSessionData).toEqual(<VisitSessionData>{
-          prisoner: {
-            name: 'Smith, John',
-            offenderNo: 'A1234BC',
-            dateOfBirth: '1975-04-02',
-            location: '1-1-C-028, Hewell (HMP)',
-          },
-          visitSlot: {
-            id: '',
-            startTimestamp: '2022-02-09T10:00:00',
-            endTimestamp: '2022-02-09T11:15:00',
-            availableTables: 0,
-            visitRoomName: 'visit room',
-            visitRestriction: 'OPEN',
-          },
-          originalVisitSlot: {
-            id: '',
-            startTimestamp: '2022-02-09T10:00:00',
-            endTimestamp: '2022-02-09T11:15:00',
-            availableTables: 0,
-            visitRoomName: 'visit room',
-            visitRestriction: 'OPEN',
-          },
-          visitRestriction: 'OPEN',
-          visitors: [
-            {
-              address: '123 The Street,<br>Coventry',
-              adult: true,
-              banned: false,
-              dateOfBirth: '1986-07-28',
-              name: 'Jeanette Smith',
-              personId: 4321,
-              relationshipDescription: 'Sister',
-              restrictions: [
-                {
-                  globalRestriction: false,
-                  restrictionType: 'CLOSED',
-                  restrictionTypeDescription: 'Closed',
-                  startDate: '2022-01-03',
-                },
-              ],
-            },
-            {
-              address: 'Not entered',
-              adult: false,
-              banned: false,
-              dateOfBirth: '2017-01-02',
-              name: 'Anne Smith',
-              personId: 4324,
-              relationshipDescription: 'Niece',
-              restrictions: [],
-            },
-          ],
-          visitorSupport: [{ type: 'WHEELCHAIR' }, { text: 'custom request', type: 'OTHER' }],
-          mainContact: { phoneNumber: '01234 567890', contactName: 'Jeanette Smith' },
-          applicationReference: undefined,
-          visitReference: 'ab-cd-ef-gh',
-          visitStatus: 'BOOKED',
-        })
-      })
-  })
-
-  it('should render full booking summary page with prisoner, visit and visitor details, with default back link, with no update button if feature disabled', () => {
-    config.features.updateJourneyEnabled = false
-
-    return request(app)
-      .get('/visit/ab-cd-ef-gh')
-      .expect(200)
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        const $ = cheerio.load(res.text)
-        expect($('h1').text()).toBe('Booking details')
-        expect($('.govuk-back-link').attr('href')).toBe('/prisoner/A1234BC/visits')
-        expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
-        // prisoner details
-        expect($('[data-test="prisoner-name"]').text()).toBe('Smith, John')
-        expect($('[data-test="prisoner-number"]').text()).toBe('A1234BC')
-        expect($('[data-test="prisoner-dob"]').text()).toBe('2 April 1975')
-        expect($('[data-test="prisoner-location"]').text()).toBe('1-1-C-028, Hewell (HMP)')
-        // visit details
-        expect($('[data-test="visit-date"]').text()).toBe('9 February 2022')
-        expect($('[data-test="visit-time"]').text()).toBe('10am to 11:15am')
-        expect($('[data-test="visit-type"]').text()).toBe('Open')
-        expect($('[data-test="visit-contact"]').text()).toBe('Smith, Jeanette')
-        expect($('[data-test="visit-phone"]').text()).toBe('01234 567890')
-        expect($('[data-test="cancel-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/cancel')
-        expect($('[data-test="update-visit"]').text()).toBeFalsy()
         // visitor details
         expect($('[data-test="visitor-name-1"]').text()).toBe('Smith, Jeanette')
         expect($('[data-test="visitor-dob-1"]').html()).toBe('28 July 1986<br>(Adult)')

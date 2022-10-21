@@ -4,7 +4,6 @@ import { SessionData } from 'express-session'
 import * as cheerio from 'cheerio'
 import { VisitorListItem, VisitSessionData } from '../../@types/bapv'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
-import config from '../../config'
 
 let sessionApp: Express
 const systemToken = async (user: string): Promise<string> => `${user}-token-1`
@@ -14,8 +13,6 @@ let visitSessionData: VisitSessionData
 
 // run tests for booking and update journeys
 const testJourneys = [{ urlPrefix: '/book-a-visit' }, { urlPrefix: '/visit/ab-cd-ef-gh/update' }]
-
-config.features.updateJourneyEnabled = true
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }

@@ -5,7 +5,6 @@ import * as cheerio from 'cheerio'
 import { VisitSessionData } from '../../@types/bapv'
 import AuditService from '../../services/auditService'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
-import config from '../../config'
 
 jest.mock('../../services/auditService')
 
@@ -24,8 +23,6 @@ beforeEach(() => {
   flashProvider.mockImplementation(key => {
     return flashData[key]
   })
-
-  config.features.updateJourneyEnabled = true
 })
 
 afterEach(() => {

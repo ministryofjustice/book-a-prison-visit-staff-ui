@@ -1,6 +1,6 @@
 import type { RequestHandler, Request, Router, NextFunction } from 'express'
 import { body, validationResult } from 'express-validator'
-import { BadRequest, NotFound } from 'http-errors'
+import { BadRequest } from 'http-errors'
 import visitCancellationReasons from '../constants/visitCancellationReasons'
 import { Prisoner } from '../data/prisonerOffenderSearchTypes'
 import { OutcomeDto, Visit } from '../data/visitSchedulerApiTypes'
@@ -137,7 +137,6 @@ export default function routes(
       additionalSupport,
       fromVisitSearch,
       fromVisitSearchQuery,
-      updateJourneyEnabled: config.features.updateJourneyEnabled,
       showButtons,
     })
   })
@@ -152,14 +151,12 @@ export default function routes(
 
   get(
     '/:reference/update/select-visitors',
-    updateJourneyCheckMiddleware,
     checkVisitReferenceMiddleware,
     sessionCheckMiddleware({ stage: 1 }),
     (req, res) => selectVisitors.get(req, res),
   )
   post(
     '/:reference/update/select-visitors',
-    updateJourneyCheckMiddleware,
     checkVisitReferenceMiddleware,
     sessionCheckMiddleware({ stage: 1 }),
     selectVisitors.validate(),
@@ -168,14 +165,12 @@ export default function routes(
 
   get(
     '/:reference/update/visit-type',
-    updateJourneyCheckMiddleware,
     checkVisitReferenceMiddleware,
     sessionCheckMiddleware({ stage: 2 }),
     (req, res) => visitType.get(req, res),
   )
   post(
     '/:reference/update/visit-type',
-    updateJourneyCheckMiddleware,
     checkVisitReferenceMiddleware,
     sessionCheckMiddleware({ stage: 2 }),
     visitType.validate(),
@@ -184,14 +179,12 @@ export default function routes(
 
   get(
     '/:reference/update/select-date-and-time',
-    updateJourneyCheckMiddleware,
     checkVisitReferenceMiddleware,
     sessionCheckMiddleware({ stage: 2 }),
     (req, res) => dateAndTime.get(req, res),
   )
   post(
     '/:reference/update/select-date-and-time',
-    updateJourneyCheckMiddleware,
     checkVisitReferenceMiddleware,
     sessionCheckMiddleware({ stage: 2 }),
     dateAndTime.validate(),
@@ -200,14 +193,12 @@ export default function routes(
 
   get(
     '/:reference/update/additional-support',
-    updateJourneyCheckMiddleware,
     checkVisitReferenceMiddleware,
     sessionCheckMiddleware({ stage: 3 }),
     (req, res) => additionalSupport.get(req, res),
   )
   post(
     '/:reference/update/additional-support',
-    updateJourneyCheckMiddleware,
     checkVisitReferenceMiddleware,
     sessionCheckMiddleware({ stage: 3 }),
     ...additionalSupport.validate(),
@@ -216,14 +207,12 @@ export default function routes(
 
   get(
     '/:reference/update/select-main-contact',
-    updateJourneyCheckMiddleware,
     checkVisitReferenceMiddleware,
     sessionCheckMiddleware({ stage: 4 }),
     (req, res) => mainContact.get(req, res),
   )
   post(
     '/:reference/update/select-main-contact',
-    updateJourneyCheckMiddleware,
     checkVisitReferenceMiddleware,
     sessionCheckMiddleware({ stage: 4 }),
     ...mainContact.validate(),
@@ -232,14 +221,12 @@ export default function routes(
 
   get(
     '/:reference/update/check-your-booking',
-    updateJourneyCheckMiddleware,
     checkVisitReferenceMiddleware,
     sessionCheckMiddleware({ stage: 5 }),
     (req, res) => checkYourBooking.get(req, res),
   )
   post(
     '/:reference/update/check-your-booking',
-    updateJourneyCheckMiddleware,
     checkVisitReferenceMiddleware,
     sessionCheckMiddleware({ stage: 5 }),
     (req, res) => checkYourBooking.post(req, res),
@@ -247,7 +234,6 @@ export default function routes(
 
   get(
     '/:reference/update/confirmation',
-    updateJourneyCheckMiddleware,
     checkVisitReferenceMiddleware,
     sessionCheckMiddleware({ stage: 6 }),
     (req, res) => confirmation.get(req, res),
@@ -337,16 +323,6 @@ const checkVisitReferenceMiddleware = (req: Request, res: Response, next: NextFu
 
   if (!isValidVisitReference(reference)) {
     throw new BadRequest()
-  }
-
-  next()
-}
-
-const updateJourneyCheckMiddleware = (req: Request, res: Response, next: NextFunction): void => {
-  const { updateJourneyEnabled } = config.features
-
-  if (!updateJourneyEnabled) {
-    throw new NotFound()
   }
 
   next()

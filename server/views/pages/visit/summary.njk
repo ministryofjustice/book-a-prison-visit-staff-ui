@@ -102,21 +102,16 @@
       <div class="govuk-button-group">
         {% set cancelButtonClasses = 'govuk-!-margin-top-5' %}
         {% if showButtons %}
-          {% if updateJourneyEnabled %}
-            {% set cancelButtonClasses = 'govuk-!-margin-top-5 govuk-button--secondary' %}
-            {% if visit.visitStatus === 'BOOKED' %}
-              {# If update journey abled and visit is booked, do this #}
-              {{ govukButton({
-                text: "Update booking",
-                classes: "govuk-!-margin-top-5",
-                href: "/visit/" + visit.reference + "/update/select-visitors",
-                attributes: { "data-test": "update-visit" },
-                preventDoubleClick: true
-              }) }}
-            {% endif %}
-          {% endif %}
-
+          {% set cancelButtonClasses = 'govuk-!-margin-top-5 govuk-button--secondary' %}
           {% if visit.visitStatus === 'BOOKED' %}
+            {# If update journey abled and visit is booked, do this #}
+            {{ govukButton({
+              text: "Update booking",
+              classes: "govuk-!-margin-top-5",
+              href: "/visit/" + visit.reference + "/update/select-visitors",
+              attributes: { "data-test": "update-visit" },
+              preventDoubleClick: true
+            }) }}
             {{ govukButton({
               text: "Cancel booking",
               classes: cancelButtonClasses,

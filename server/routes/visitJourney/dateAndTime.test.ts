@@ -7,7 +7,6 @@ import VisitSessionsService from '../../services/visitSessionsService'
 import AuditService from '../../services/auditService'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
 import { Visit } from '../../data/visitSchedulerApiTypes'
-import config from '../../config'
 
 jest.mock('../../services/visitSessionsService')
 jest.mock('../../services/auditService')
@@ -31,8 +30,6 @@ const testJourneys = [
   { urlPrefix: '/book-a-visit', isUpdate: false },
   { urlPrefix: '/visit/ab-cd-ef-gh/update', isUpdate: true },
 ]
-
-config.features.updateJourneyEnabled = true
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
