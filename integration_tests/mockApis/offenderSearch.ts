@@ -3,14 +3,14 @@ import { stubFor } from './wiremock'
 import { Prisoner } from '../../server/data/prisonerOffenderSearchTypes'
 
 export default {
-  getPrisoners: (
+  stubGetPrisoners: (
     results: {
       totalPages: number
       totalElements: number
       content: Partial<Prisoner>[]
     },
-    page: string,
-    size: string,
+    page = '0',
+    size = '10',
   ): SuperAgentRequest => {
     return stubFor({
       request: {
@@ -24,7 +24,7 @@ export default {
       },
     })
   },
-  getPrisoner: (results: {
+  stubGetPrisoner: (results: {
     totalPages: number
     totalElements: number
     content: Partial<Prisoner>[]

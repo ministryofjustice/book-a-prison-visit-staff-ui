@@ -12,6 +12,7 @@ import {
   ExtendedVisitInformation,
   VisitsPageSlot,
 } from '../@types/bapv'
+import { ScheduledEvent } from '../data/whereaboutsApiTypes'
 
 jest.mock('../data/prisonerContactRegistryApiClient')
 jest.mock('../data/visitSchedulerApiClient')
@@ -107,7 +108,7 @@ describe('Visit sessions service', () => {
       })
 
       it('with a prisoner event', async () => {
-        const events = [
+        const events: ScheduledEvent[] = [
           {
             bookingId: 123,
             eventClass: 'eventClass',
@@ -167,7 +168,7 @@ describe('Visit sessions service', () => {
       })
 
       it('with a non-relevant prisoner event', async () => {
-        const events = [
+        const events: ScheduledEvent[] = [
           {
             bookingId: 123,
             eventClass: 'eventClass',

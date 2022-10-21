@@ -1,17 +1,17 @@
 import { SuperAgentRequest } from 'superagent'
 import { stubFor } from './wiremock'
-import { Visit } from '../../server/data/visitSchedulerApiTypes'
+import { SupportType, Visit, VisitSession } from '../../server/data/visitSchedulerApiTypes'
 
 export default {
   stubGetAvailableSupportOptions: (): SuperAgentRequest => {
-    const results = [
+    const results: SupportType[] = [
       {
-        type: 'MASK_EXEMPT',
-        description: 'Face mask exempt',
+        type: 'WHEELCHAIR',
+        description: 'Wheelchair ramp',
       },
       {
-        type: 'UNKNOWN',
-        description: 'Misc',
+        type: 'OTHER',
+        description: 'Other',
       },
     ]
 
@@ -28,16 +28,18 @@ export default {
     })
   },
   stubGetVisit: (reference: string): SuperAgentRequest => {
-    const results = {
-      reference,
+    const result: Visit = {
+      applicationReference: 'aaa-bbb-ccc',
+      reference: 'ab-cd-ef-gh',
       prisonerId: 'A1234BC',
       prisonId: 'HEI',
       visitRoom: 'A1 L3',
       visitType: 'SOCIAL',
       visitStatus: 'RESERVED',
       visitRestriction: 'OPEN',
-      startTimestamp: '2022-04-25T09:35:34.489Z',
-      endTimestamp: '',
+      startTimestamp: '2022-02-14T10:00:00',
+      endTimestamp: '2022-02-14T11:00:00',
+      visitNotes: [],
       visitors: [
         {
           nomisPersonId: 1234,
@@ -49,6 +51,8 @@ export default {
           text: 'custom support details',
         },
       ],
+      createdTimestamp: '2022-02-14T10:00:00',
+      modifiedTimestamp: '2022-02-14T10:05:00',
     }
 
     return stubFor({
@@ -59,11 +63,11 @@ export default {
       response: {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: results,
+        jsonBody: result,
       },
     })
   },
-  getUpcomingVisits: ({
+  stubGetUpcomingVisits: ({
     offenderNo,
     upcomingVisits,
   }: {
@@ -82,7 +86,7 @@ export default {
       },
     })
   },
-  getPastVisits: ({ offenderNo, pastVisits }: { offenderNo: string; pastVisits: Visit[] }): SuperAgentRequest => {
+  stubGetPastVisits: ({ offenderNo, pastVisits }: { offenderNo: string; pastVisits: Visit[] }): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',
@@ -96,13 +100,12 @@ export default {
     })
   },
   stubGetVisitSessions: (): SuperAgentRequest => {
-    const results = [
+    const results: VisitSession[] = [
       {
         sessionTemplateId: 1,
         visitRoomName: 'A1',
         visitType: 'SOCIAL',
         prisonId: 'HEI',
-        restrictions: 'restrictions test',
         openVisitCapacity: 15,
         openVisitBookedCount: 0,
         closedVisitCapacity: 10,
@@ -116,86 +119,6 @@ export default {
       request: {
         method: 'GET',
         urlPattern: '/visitScheduler/visit-sessions?prisonId=HEI',
-      },
-      response: {
-        status: 200,
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: results,
-      },
-    })
-  },
-  stubCreateVisit: (): SuperAgentRequest => {
-    const results = {
-      reference: 'ab-cd-ef-gh',
-      prisonerId: 'AF34567G',
-      prisonId: 'HEI',
-      visitRoom: 'A1 L3',
-      visitType: 'SOCIAL',
-      visitStatus: 'RESERVED',
-      visitRestriction: 'OPEN',
-      startTimestamp: '2022-02-14T10:00:00',
-      endTimestamp: '2022-02-14T11:00:00',
-      visitContact: {
-        name: 'John Smith',
-        telephone: '01234 567890',
-      },
-      visitors: [
-        {
-          nomisPersonId: 1234,
-        },
-      ],
-      visitorSupport: [
-        {
-          type: 'OTHER',
-          text: 'custom support details',
-        },
-      ],
-    }
-
-    return stubFor({
-      request: {
-        method: 'POST',
-        urlPattern: '/visitScheduler/visits',
-      },
-      response: {
-        status: 200,
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: results,
-      },
-    })
-  },
-  stubUpdateVisit: (): SuperAgentRequest => {
-    const results = {
-      reference: 'ab-cd-ef-gh',
-      prisonerId: 'AF34567G',
-      prisonId: 'HEI',
-      visitRoom: 'A1 L3',
-      visitType: 'SOCIAL',
-      visitStatus: 'BOOKED',
-      visitRestriction: 'OPEN',
-      startTimestamp: '2022-02-14T10:00:00',
-      endTimestamp: '2022-02-14T11:00:00',
-      visitContact: {
-        name: 'John Smith',
-        telephone: '01234 567890',
-      },
-      visitors: [
-        {
-          nomisPersonId: 1234,
-        },
-      ],
-      visitorSupport: [
-        {
-          type: 'OTHER',
-          text: 'custom support details',
-        },
-      ],
-    }
-
-    return stubFor({
-      request: {
-        method: 'PUT',
-        urlPattern: '/visitScheduler/visits',
       },
       response: {
         status: 200,
