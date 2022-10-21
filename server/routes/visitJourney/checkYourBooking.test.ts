@@ -25,8 +25,6 @@ const testJourneys = [
   { urlPrefix: '/visit/ab-cd-ef-gh/update', isUpdate: true },
 ]
 
-config.features.updateJourneyEnabled = true
-
 const availableSupportTypes: SupportType[] = [
   {
     type: 'WHEELCHAIR',

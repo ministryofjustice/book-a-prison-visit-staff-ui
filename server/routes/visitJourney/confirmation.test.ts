@@ -6,7 +6,6 @@ import { VisitSessionData } from '../../@types/bapv'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
 import { SupportType } from '../../data/visitSchedulerApiTypes'
 import * as visitorUtils from '../visitorUtils'
-import config from '../../config'
 
 let sessionApp: Express
 const systemToken = async (user: string): Promise<string> => `${user}-token-1`
@@ -19,8 +18,6 @@ const testJourneys = [
   { urlPrefix: '/book-a-visit', isUpdate: false },
   { urlPrefix: '/visit/ab-cd-ef-gh/update', isUpdate: true },
 ]
-
-config.features.updateJourneyEnabled = true
 
 const availableSupportTypes: SupportType[] = [
   {

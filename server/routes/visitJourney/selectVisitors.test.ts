@@ -8,7 +8,6 @@ import PrisonerVisitorsService from '../../services/prisonerVisitorsService'
 import PrisonerProfileService from '../../services/prisonerProfileService'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
 import { Restriction } from '../../data/prisonerContactRegistryApiTypes'
-import config from '../../config'
 
 jest.mock('../../services/prisonerProfileService')
 jest.mock('../../services/prisonerVisitorsService')
@@ -24,8 +23,6 @@ const testJourneys = [
   { urlPrefix: '/book-a-visit', isUpdate: false },
   { urlPrefix: '/visit/ab-cd-ef-gh/update', isUpdate: true },
 ]
-
-config.features.updateJourneyEnabled = true
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
