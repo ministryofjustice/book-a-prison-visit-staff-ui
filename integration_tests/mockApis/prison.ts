@@ -53,13 +53,13 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/offenders/${offenderNo}/offender-restrictions?activeRestrictionsOnly=true`,
+        url: `/prison/api/offenders/${offenderNo}/offender-restrictions?activeRestrictionsOnly=true`,
       },
       response: {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
         jsonBody: <OffenderRestrictions>{
-          bookingId: 0,
+          bookingId: 123,
           offenderRestrictions: [
             {
               restrictionId: 0,

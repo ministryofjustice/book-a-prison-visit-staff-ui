@@ -27,6 +27,8 @@ export default class PrisonerProfilePage extends Page {
 
   remainingPVOs = (): PageElement => cy.get('[data-test="remaining-pvos"]')
 
+  bookAVisitButton = (): PageElement => cy.get('[data-test="book-a-visit"]')
+
   selectVisitingOrdersTab = (): PageElement => cy.get('#tab_visiting-orders').click()
 
   selectActiveAlertsTab = (): PageElement => cy.get('#tab_active-alerts').click()

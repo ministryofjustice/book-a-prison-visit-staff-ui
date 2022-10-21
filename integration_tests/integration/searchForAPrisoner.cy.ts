@@ -1,4 +1,4 @@
-import IndexPage from '../pages/index'
+import HomePage from '../pages/home'
 import Page from '../pages/page'
 import PrisonerProfilePage from '../pages/prisonerProfile'
 import SearchForAPrisonerPage from '../pages/searchForAPrisoner'
@@ -33,8 +33,8 @@ context('Search for a prisoner', () => {
 
   it('should show Search For A Prisoner page', () => {
     cy.signIn()
-    const indexPage = Page.verifyOnPage(IndexPage)
-    indexPage
+    const homePage = Page.verifyOnPage(HomePage)
+    homePage
       .bookAVisitLink()
       .invoke('attr', 'href')
       .then(href => {
@@ -55,8 +55,8 @@ context('Search for a prisoner', () => {
       }
       cy.task('stubGetPrisoners', { results })
       cy.signIn()
-      const indexPage = Page.verifyOnPage(IndexPage)
-      indexPage.bookAVisitLink().click()
+      const homePage = Page.verifyOnPage(HomePage)
+      homePage.bookAVisitLink().click()
       const searchForAPrisonerPage = Page.verifyOnPage(SearchForAPrisonerPage)
       searchForAPrisonerPage.searchInput().clear().type(prisonerNumber)
       searchForAPrisonerPage.searchButton().click()
@@ -72,8 +72,8 @@ context('Search for a prisoner', () => {
         singlePageSearchResults(prisonerNumber)
       cy.task('stubGetPrisoners', { results })
       cy.signIn()
-      const indexPage = Page.verifyOnPage(IndexPage)
-      indexPage.bookAVisitLink().click()
+      const homePage = Page.verifyOnPage(HomePage)
+      homePage.bookAVisitLink().click()
 
       const searchForAPrisonerPage = Page.verifyOnPage(SearchForAPrisonerPage)
       searchForAPrisonerPage.searchInput().clear().type(prisonerNumber)
@@ -107,8 +107,8 @@ context('Search for a prisoner', () => {
         multiplePageSearchResultsPage2()
       cy.task('stubGetPrisoners', { results: resultsPage1 })
       cy.signIn()
-      const indexPage = Page.verifyOnPage(IndexPage)
-      indexPage.bookAVisitLink().click()
+      const homePage = Page.verifyOnPage(HomePage)
+      homePage.bookAVisitLink().click()
 
       const searchForAPrisonerPage = Page.verifyOnPage(SearchForAPrisonerPage)
       searchForAPrisonerPage.searchInput().clear().type(prisonerNumber)
@@ -173,8 +173,8 @@ context('Search for a prisoner', () => {
       }
       cy.task('stubGetPrisoners', { results })
       cy.signIn()
-      const indexPage = Page.verifyOnPage(IndexPage)
-      indexPage.bookAVisitLink().click()
+      const homePage = Page.verifyOnPage(HomePage)
+      homePage.bookAVisitLink().click()
 
       const searchForAPrisonerPage = Page.verifyOnPage(SearchForAPrisonerPage)
       searchForAPrisonerPage.searchInput().clear().type(prisonerNumber)
