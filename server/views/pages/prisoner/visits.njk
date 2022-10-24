@@ -4,7 +4,12 @@
 
 {% set pageHeaderTitle = prisonerName | properCaseFullName %}
 {% set pageTitle = applicationName + " - Upcoming Visits - " + pageHeaderTitle %}
-{% set backLinkHref = "/search/prisoner-visit/results?" + queryParamsForBackLink %}
+{% set query = '?' + queryParamsForBackLink if queryParamsForBackLink != '' %}
+{% if queryParamsForBackLink %}
+  {% set backLinkHref = "/search/prisoner-visit/results?" + queryParamsForBackLink %}
+{% else %}
+  {% set backLinkHref = "/search/prisoner-visit" %}
+{% endif %}
 
 {% block content %}
   <div class="govuk-grid-row">

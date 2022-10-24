@@ -480,7 +480,7 @@ describe('GET /prisoner/A1234BC/visits', () => {
     lastName: 'SMITH',
     restrictedPatient: false,
   }
-  it('should list upcoming visits for the prisoner', () => {
+  it('should list upcoming visits for the prisoner with back link to new search if no search in querystring', () => {
     const visitInfo: VisitInformation[] = [
       {
         reference: 'ab-cd-ef-gh',
@@ -510,6 +510,50 @@ describe('GET /prisoner/A1234BC/visits', () => {
       .expect(res => {
         const $ = cheerio.load(res.text)
         expect($('h1').text()).toBe('Smith, John')
+        expect($('.govuk-back-link').attr('href')).toBe('/search/prisoner-visit')
+        expect($('[data-test="prisoner-number"]').text()).toBe('A1234BC')
+        expect($('[data-test="visit-reference-1"]').text()).toBe('ab-cd-ef-gh')
+        expect($('[data-test="visit-mainContact-1"]').text()).toBe('Smith, John')
+        expect($('[data-test="visit-date-1"]').text()).toBe('14 February 2022')
+        expect($('[data-test="visit-time-1"]').text()).toBe('10am to 11:15am')
+
+        expect($('[data-test="visit-reference-2"]').text()).toBe('gm-in-az-ma')
+        expect($('[data-test="visit-mainContact-2"]').text()).toBe('Smith, Fred')
+        expect($('[data-test="visit-date-2"]').text()).toBe('24 February 2022')
+        expect($('[data-test="visit-time-2"]').text()).toBe('2pm to 3pm')
+      })
+  })
+  it('should list upcoming visits for the prisoner with back link to results if search in querystring', () => {
+    const visitInfo: VisitInformation[] = [
+      {
+        reference: 'ab-cd-ef-gh',
+        prisonNumber: 'A1234BC',
+        prisonerName: '',
+        mainContact: 'John Smith',
+        visitDate: '14 February 2022',
+        visitTime: '10am to 11:15am',
+      },
+      {
+        reference: 'gm-in-az-ma',
+        prisonNumber: 'A1234BC',
+        prisonerName: '',
+        mainContact: 'Fred Smith',
+        visitDate: '24 February 2022',
+        visitTime: '2pm to 3pm',
+      },
+    ]
+
+    prisonerSearchService.getPrisoner.mockResolvedValue(prisoner)
+    visitSessionsService.getUpcomingVisits.mockResolvedValue(visitInfo)
+
+    return request(app)
+      .get('/prisoner/A1234BC/visits?search=A1234BC')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('h1').text()).toBe('Smith, John')
+        expect($('.govuk-back-link').attr('href')).toBe('/search/prisoner-visit/results?search=A1234BC')
         expect($('[data-test="prisoner-number"]').text()).toBe('A1234BC')
         expect($('[data-test="visit-reference-1"]').text()).toBe('ab-cd-ef-gh')
         expect($('[data-test="visit-mainContact-1"]').text()).toBe('Smith, John')
