@@ -197,7 +197,7 @@ workflows:
           env: "staging"
           context:
             - hmpps-common-vars
-            - book-a-prison-visit-staff-ui-staging
+            - book-a-prison-visit-staff-ui-stage
           requires:
             - request-staging-approval
 
