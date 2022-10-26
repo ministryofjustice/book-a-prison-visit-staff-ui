@@ -17,5 +17,9 @@ export default function routes(router: Router): Router {
     res.redirect('/')
   })
 
+  get('/print-test', (req, res) => {
+    res.render('pages/print')
+  })
+
   return router
 }

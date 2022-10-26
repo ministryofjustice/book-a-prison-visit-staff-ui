@@ -1,0 +1,29 @@
+.vsip-print-table {
+  border-spacing: 0;
+
+  col {
+    width: 25%;
+
+    &:last-of-type {
+      width: 50%;
+    }
+  }
+
+  td, th {
+    @include govuk-font($size: 16, $weight: "normal");
+    vertical-align: top;
+    border-bottom: 1px solid govuk-colour("dark-grey");
+    padding-left: 0.25cm;
+    padding-top: 0.25cm;
+    padding-bottom: 0.25cm;
+
+    &:first-of-type {
+      padding-left: 0;
+    }
+  }
+
+  th {
+    @include govuk-font($size: 19, $weight: "bold");
+    text-align: left;
+  }
+}
