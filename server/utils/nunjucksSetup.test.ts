@@ -123,7 +123,7 @@ describe('Nunjucks Filters', () => {
   })
 
   describe('displayAge', () => {
-    it("should return 'years' for any age over 1 year old", () => {
+    it('should return plural years for any age over 2 year old', () => {
       const twoYears = new Date().getFullYear() - 2
       viewContext = {
         dateOfBirth: `${twoYears}-01-01`,
@@ -134,7 +134,7 @@ describe('Nunjucks Filters', () => {
       expect($('body').text()).toBe('2 years old')
     })
 
-    it("should return 'year' for a 1 year old", () => {
+    it('should return singular year for a 1 year old', () => {
       const oneYear = new Date().getFullYear() - 1
       viewContext = {
         dateOfBirth: `${oneYear}-01-01`,
@@ -145,7 +145,7 @@ describe('Nunjucks Filters', () => {
       expect($('body').text()).toBe('1 year old')
     })
 
-    it("should return 'month' for a 1 month old", () => {
+    it('should return singular month for a 1 month old', () => {
       const date = new Date()
       const year = date.getFullYear()
       const month = date.getMonth()
@@ -156,6 +156,20 @@ describe('Nunjucks Filters', () => {
       compiledTemplate = nunjucks.compile(nunjucksString, njkEnv)
       const $ = cheerio.load(compiledTemplate.render(viewContext))
       expect($('body').text()).toBe('1 month old')
+    })
+
+    it('should return plural months for 4 months old', () => {
+      const date = new Date()
+      date.setMonth(date.getMonth() - 3)
+      const year = date.getFullYear()
+      const month = date.getMonth()
+      viewContext = {
+        dateOfBirth: `${year}-${month}-01`,
+      }
+      const nunjucksString = '{{ dateOfBirth | displayAge }}'
+      compiledTemplate = nunjucks.compile(nunjucksString, njkEnv)
+      const $ = cheerio.load(compiledTemplate.render(viewContext))
+      expect($('body').text()).toBe('4 months old')
     })
   })
 
