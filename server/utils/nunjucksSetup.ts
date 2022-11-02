@@ -84,6 +84,29 @@ export function registerNunjucks(app?: express.Express): Environment {
     return dateToFormat ? format(parseISO(dateToFormat), dateFormat) : null
   })
 
+  njkEnv.addFilter('displayAge', (dateOfBirth: string) => {
+    let ageString
+
+    const today = new Date()
+    const dob = new Date(dateOfBirth)
+    const years = today.getFullYear() - dob.getFullYear()
+    if (years > 1) {
+      ageString = `${years} years old`
+    } else if (years === 1) {
+      ageString = '1 year old'
+    } else if (years < 1) {
+      const months = today.getMonth() - dob.getMonth()
+
+      if (months > 1) {
+        ageString = `${months} months old`
+      } else {
+        ageString = `${months} month old`
+      }
+    }
+
+    return ageString
+  })
+
   // format time with minutes only if not on the hour; e.g. 10am / 10:30am
   njkEnv.addFilter('formatTime', (timeToFormat: string) => {
     return timeToFormat ? format(parseISO(timeToFormat), 'h:mmaaa').replace(':00', '') : null

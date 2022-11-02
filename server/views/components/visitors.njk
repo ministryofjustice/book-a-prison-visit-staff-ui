@@ -2,7 +2,9 @@
 
 {% macro visitorDateOfBirth(visitor) %}
   {%- if visitor.dateOfBirth %}
-    {{- visitor.dateOfBirth | formatDate }}<br>({{ "Adult" if visitor.adult else "Child" }})
+
+    {{- visitor.dateOfBirth | formatDate }}<br>({{ visitor.dateOfBirth | displayAge }})
+
   {%- else -%}
     Not entered
   {%- endif %}
