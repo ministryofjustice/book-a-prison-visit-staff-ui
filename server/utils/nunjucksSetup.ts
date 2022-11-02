@@ -97,7 +97,7 @@ export function registerNunjucks(app?: express.Express): Environment {
     } else if (years < 1) {
       const months = today.getMonth() - dob.getMonth()
 
-      if (months > 1) {
+      if (months > 1 || months === 0) {
         ageString = `${months} months old`
       } else {
         ageString = `${months} month old`
