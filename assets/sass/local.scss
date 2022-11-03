@@ -235,15 +235,6 @@
   padding-left: govuk-spacing(1);
 }
 
-.bapv-phase-banner {
-  border: 0;
-  padding: 0 govuk-spacing(5) 0 0;
-
-  @media print {
-    display: none;
-  }
-}
-
 #change-hint {
   margin-bottom: govuk-spacing(6);
 
