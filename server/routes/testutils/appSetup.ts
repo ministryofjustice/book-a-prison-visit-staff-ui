@@ -3,6 +3,7 @@ import createError from 'http-errors'
 import { Cookie, SessionData } from 'express-session'
 import indexRoutes from '../index'
 import searchRoutes from '../search'
+import establishmentRoutes from '../changeEstablishement'
 import prisonerRoutes from '../prisoner'
 import bookAVisitRoutes from '../bookAVisit'
 import visitRoutes from '../visit'
@@ -108,6 +109,7 @@ function appSetup({
   app.use(express.json())
   app.use(express.urlencoded({ extended: true }))
   app.use('/', indexRoutes(standardRouter(new MockUserService())))
+  app.use('/changeEstablishment/', establishmentRoutes(standardRouter(new MockUserService())))
 
   const systemTokenTest = systemTokenOverride || systemToken
   const prisonerSearchService =
