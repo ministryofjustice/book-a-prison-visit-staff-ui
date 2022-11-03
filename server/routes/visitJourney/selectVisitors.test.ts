@@ -245,7 +245,7 @@ testJourneys.forEach(journey => {
           expect($('#visitor-4321').length).toBe(1)
           expect($('#visitor-4321').prop('disabled')).toBe(true)
           expect($('[data-test="visitor-name-4321"]').text()).toBe('Jeanette Smith')
-          expect($('[data-test="visitor-dob-4321"]').text()).toMatch(/28 July 1986.*Adult/)
+          expect($('[data-test="visitor-dob-4321"]').text()).toContain('28 July 1986')
           expect($('[data-test="visitor-relation-4321"]').text()).toContain('Sister')
           expect($('[data-test="visitor-address-4321"]').text()).toContain('123 The Street')
           const visitorRestrictions = $('[data-test="visitor-restrictions-4321"] .visitor-restriction')
@@ -261,7 +261,7 @@ testJourneys.forEach(journey => {
 
           expect($('#visitor-4324').prop('disabled')).toBe(false)
           expect($('[data-test="visitor-name-4324"]').text()).toBe('Anne Smith')
-          expect($('[data-test="visitor-dob-4324"]').text()).toMatch(/2 March 2018.*Child/)
+          expect($('[data-test="visitor-dob-4324"]').text()).toContain('2 March 2018')
 
           expect($('input[name="visitors"]:checked').length).toBe(0)
           expect($('[data-test="submit"]').text().trim()).toBe('Continue')
