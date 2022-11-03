@@ -1,4 +1,4 @@
-{% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
+{%- from "govuk/components/tag/macro.njk" import govukTag -%}
 
 <header class="hmpps-header" role="banner">
   <div class="hmpps-header__container">
@@ -35,17 +35,12 @@
 </header>
 
 <div class="location-bar">
+  {% if not hidePhaseBanner %}
+    {{ govukTag({
+      text: "beta"
+    }) }}
+  {% endif %}
   <span class="location-bar__location" data-test="active-location">
     Hewell (HMP)
   </span>
-  {% if not hidePhaseBanner %}
-    {{ govukPhaseBanner ({
-      tag: {
-        text: "beta"
-      },
-       html: 'This is a new service, <a class="govuk-link" target="_blank" href="https://eu.surveymonkey.com/r/9ZBN3YJ">give us your feedback (opens in a new tab)</a>',
-      classes: 'bapv-phase-banner'
-    }) }}
-  {% endif %}
-
 </div>
