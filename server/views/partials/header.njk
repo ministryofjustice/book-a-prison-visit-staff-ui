@@ -36,7 +36,7 @@
 
 <div class="location-bar">
   <span class="location-bar__location" data-test="active-location">
-    Hewell (HMP)
+    {{ selectedEstablishment.name }}
   </span>
   {% if not hidePhaseBanner %}
     {{ govukPhaseBanner ({
