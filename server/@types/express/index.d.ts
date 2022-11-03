@@ -13,6 +13,7 @@ declare module 'express-session' {
     adultVisitors: { adults: VisitorListItem[] }
     slotsList: VisitSlotList
     visitSessionData: VisitSessionData
+    selectedEstablishment: { prisonId: string; name: string }
   }
 }
 

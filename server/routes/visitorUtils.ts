@@ -40,7 +40,14 @@ export const getSupportTypeDescriptions = (
 }
 
 export const clearSession = (req: Request): void => {
-  ;['availableSupportTypes', 'visitorList', 'adultVisitors', 'slotsList', 'visitSessionData'].forEach(sessionItem => {
+  ;[
+    'availableSupportTypes',
+    'visitorList',
+    'adultVisitors',
+    'slotsList',
+    'visitSessionData',
+    'selectedEstablishment',
+  ].forEach(sessionItem => {
     delete req.session[sessionItem]
   })
 }
