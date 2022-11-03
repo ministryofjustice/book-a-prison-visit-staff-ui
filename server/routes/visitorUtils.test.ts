@@ -156,6 +156,7 @@ describe('clearSession', () => {
     adultVisitors: { adults: [] },
     slotsList: {},
     visitSessionData: { prisoner: undefined },
+    selectedEstablishment: undefined,
   }
 
   req.session = sessionData as Session & SessionData

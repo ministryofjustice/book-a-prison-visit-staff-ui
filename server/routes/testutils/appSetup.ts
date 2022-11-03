@@ -68,6 +68,7 @@ function appSetup({
     adultVisitors: { adults: [] as VisitorListItem[] },
     slotsList: {} as VisitSlotList,
     visitSessionData: {} as VisitSessionData,
+    selectedEstablishment: undefined,
   },
 }: {
   prisonerSearchServiceOverride: PrisonerSearchService
