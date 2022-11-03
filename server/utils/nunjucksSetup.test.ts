@@ -201,6 +201,14 @@ describe('Nunjucks Filters', () => {
       const $ = cheerio.load(compiledTemplate.render(viewContext))
       expect($('body').text()).toBe('')
     })
+
+    it('should handle missing date of birth', () => {
+      viewContext = {}
+      const nunjucksString = '{{ dateOfBirth | displayAge }}'
+      compiledTemplate = nunjucks.compile(nunjucksString, njkEnv)
+      const $ = cheerio.load(compiledTemplate.render(viewContext))
+      expect($('body').text()).toBe('')
+    })
   })
 
   describe('formatTime', () => {
