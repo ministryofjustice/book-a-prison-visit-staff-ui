@@ -10,16 +10,15 @@
 
 {% set backLinkHref = backLink %}
 
-{% set currentPrison = { id: 'BLI'} %}
-{% set enabledPrisons = [{ id: 'HEI', name: 'Hewell (HMP)'}, { id: 'BLI', name: 'Bristol (HMP)'}] %}
+{% set enabledPrisons = [{ prisonId: 'HEI', name: 'Hewell (HMP)'}, { id: 'BLI', name: 'Bristol (HMP)'}] %}
 {% set radios = [] %}
 
 {% for prison in enabledPrisons %}
     {%- set radios = (radios.push({
-        value: prison.id,
+        value: prison.prisonId,
         html: '<p class="bapv-radio-paragraph">' + prison.name + '</p>',
-        id: prison.id,
-        checked: currentPrison.id == prison.id
+        id: prison.prisonId,
+        checked: selectedEstablishment.prisonId == prison.prisonId
     }), radios) %}
 {% endfor %}
 
