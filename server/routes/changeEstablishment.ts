@@ -7,7 +7,7 @@ export default function routes(router: Router): Router {
 
   const prisonList = [
     { prisonId: 'HEI', name: 'Hewell (HMP)' },
-    { id: 'BLI', name: 'Bristol (HMP)' },
+    { prisonId: 'BLI', name: 'Bristol (HMP)' },
   ]
 
   get('/', (req, res, next) => {
