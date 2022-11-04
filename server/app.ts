@@ -4,6 +4,7 @@ import createError from 'http-errors'
 
 import indexRoutes from './routes'
 import searchRoutes from './routes/search'
+import establishmentRoutes from './routes/changeEstablishment'
 import prisonerRoutes from './routes/prisoner'
 import bookAVisitRoutes from './routes/bookAVisit'
 import visitRoutes from './routes/visit'
@@ -52,6 +53,7 @@ export default function createApp(userService: UserService): express.Application
   app.use(appInsightsOperationId)
 
   app.use('/', indexRoutes(standardRouter(userService)))
+  app.use('/change-establishment/', establishmentRoutes(standardRouter(userService)))
   app.use(
     '/search/',
     searchRoutes(

@@ -1,0 +1,44 @@
+{% extends "layout.njk" %}
+{% from "components/card/card.njk" import card %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% set pageHeaderTitle = "Select Establishment" %}
+{% set pageTitle %}
+    {% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
+{% endset %}
+
+{% set backLinkHref = backLink %}
+
+{% set radios = [] %}
+
+{% for prison in enabledPrisons %}
+    {%- set radios = (radios.push({
+        value: prison.prisonId,
+        html: '<p class="bapv-radio-paragraph">' + prison.name + '</p>',
+        id: prison.prisonId,
+        checked: selectedEstablishment.prisonId == prison.prisonId
+    }), radios) %}
+{% endfor %}
+
+{% block content %}
+    <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            {% include "partials/errorSummary.njk" %}
+
+            <form action="{{ urlPrefix }}/changeEstablishment" method="POST" novalidate>
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+            {{ govukRadios({
+                name: "establishment",
+                items: radios
+            })}}
+            {{ govukButton({
+                text: "Submit",
+                preventDoubleClick: true
+            }) }} 
+            </form>
+
+        </div>
+    </div>
+{% endblock %}
