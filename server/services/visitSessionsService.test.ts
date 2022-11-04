@@ -31,6 +31,7 @@ describe('Visit sessions service', () => {
   let visitSessionsService: VisitSessionsService
   let systemToken
 
+  const prisonId = 'HEI'
   const availableSupportTypes: SupportType[] = [
     {
       type: 'WHEELCHAIR',
@@ -77,11 +78,12 @@ describe('Visit sessions service', () => {
       const results = await visitSessionsService.getVisitSessions({
         username: 'user',
         offenderNo: 'A1234BC',
+        prisonId,
         visitRestriction: 'OPEN',
       })
 
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
-      expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC')
+      expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId)
       expect(results).toEqual({})
     })
 
@@ -128,11 +130,12 @@ describe('Visit sessions service', () => {
         const results = await visitSessionsService.getVisitSessions({
           username: 'user',
           offenderNo: 'A1234BC',
+          prisonId,
           visitRestriction: 'OPEN',
         })
 
         expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
-        expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC')
+        expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId)
         expect(whereaboutsApiClient.getEvents).toHaveBeenCalledTimes(1)
         expect(results).toEqual(<VisitSlotList>{
           'February 2022': [
@@ -188,11 +191,12 @@ describe('Visit sessions service', () => {
         const results = await visitSessionsService.getVisitSessions({
           username: 'user',
           offenderNo: 'A1234BC',
+          prisonId,
           visitRestriction: 'OPEN',
         })
 
         expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
-        expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC')
+        expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId)
         expect(whereaboutsApiClient.getEvents).toHaveBeenCalledTimes(1)
         expect(results).toEqual(<VisitSlotList>{
           'February 2022': [
@@ -226,11 +230,12 @@ describe('Visit sessions service', () => {
         const results = await visitSessionsService.getVisitSessions({
           username: 'user',
           offenderNo: 'A1234BC',
+          prisonId,
           visitRestriction: 'OPEN',
         })
 
         expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
-        expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC')
+        expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId)
         expect(whereaboutsApiClient.getEvents).toHaveBeenCalledTimes(1)
         expect(results).toEqual(<VisitSlotList>{
           'February 2022': [
@@ -281,11 +286,12 @@ describe('Visit sessions service', () => {
       const results = await visitSessionsService.getVisitSessions({
         username: 'user',
         offenderNo: 'A1234BC',
+        prisonId,
         visitRestriction: 'CLOSED',
       })
 
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
-      expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC')
+      expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId)
       expect(results).toEqual(<VisitSlotList>{
         'February 2022': [
           {
@@ -382,11 +388,12 @@ describe('Visit sessions service', () => {
       const results = await visitSessionsService.getVisitSessions({
         username: 'user',
         offenderNo: 'A1234BC',
+        prisonId,
         visitRestriction: 'OPEN',
       })
 
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
-      expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC')
+      expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId)
       expect(results).toEqual(<VisitSlotList>{
         'February 2022': [
           {
@@ -540,7 +547,7 @@ describe('Visit sessions service', () => {
 
       visitSchedulerApiClient.reserveVisit.mockResolvedValue(visit)
       whereaboutsApiClient.getEvents.mockResolvedValue([])
-      const result = await visitSessionsService.reserveVisit({ username: 'user', visitSessionData })
+      const result = await visitSessionsService.reserveVisit({ username: 'user', visitSessionData, prisonId })
 
       expect(visitSchedulerApiClient.reserveVisit).toHaveBeenCalledTimes(1)
       expect(result).toEqual(visit)
@@ -731,6 +738,7 @@ describe('Visit sessions service', () => {
       const result = await visitSessionsService.changeBookedVisit({
         username: 'user',
         visitSessionData,
+        prisonId,
       })
 
       expect(visitSchedulerApiClient.changeBookedVisit).toHaveBeenCalledTimes(1)
@@ -849,10 +857,14 @@ describe('Visit sessions service', () => {
         const visits: Visit[] = [visit]
 
         visitSchedulerApiClient.getUpcomingVisits.mockResolvedValue(visits)
-        const result = await visitSessionsService.getUpcomingVisits({ username: 'user', offenderNo: 'A1234BC' })
+        const result = await visitSessionsService.getUpcomingVisits({
+          username: 'user',
+          offenderNo: 'A1234BC',
+          prisonId,
+        })
 
         expect(visitSchedulerApiClient.getUpcomingVisits).toHaveBeenCalledTimes(1)
-        expect(visitSchedulerApiClient.getUpcomingVisits).toHaveBeenCalledWith('A1234BC')
+        expect(visitSchedulerApiClient.getUpcomingVisits).toHaveBeenCalledWith('A1234BC', prisonId)
         expect(result).toEqual(<VisitInformation[]>[
           {
             reference: 'ab-cd-ef-gh',
@@ -869,10 +881,14 @@ describe('Visit sessions service', () => {
         const visits: Visit[] = []
 
         visitSchedulerApiClient.getUpcomingVisits.mockResolvedValue(visits)
-        const result = await visitSessionsService.getUpcomingVisits({ username: 'user', offenderNo: 'A1234BC' })
+        const result = await visitSessionsService.getUpcomingVisits({
+          username: 'user',
+          offenderNo: 'A1234BC',
+          prisonId,
+        })
 
         expect(visitSchedulerApiClient.getUpcomingVisits).toHaveBeenCalledTimes(1)
-        expect(visitSchedulerApiClient.getUpcomingVisits).toHaveBeenCalledWith('A1234BC')
+        expect(visitSchedulerApiClient.getUpcomingVisits).toHaveBeenCalledWith('A1234BC', prisonId)
         expect(result).toEqual([])
       })
     })
@@ -988,6 +1004,7 @@ describe('Visit sessions service', () => {
       const results = await visitSessionsService.getVisitsByDate({
         username: 'user',
         dateString: '2022-01-01',
+        prisonId,
       })
 
       expect(visitSchedulerApiClient.getVisitsByDate).toHaveBeenCalledTimes(1)
@@ -1128,6 +1145,7 @@ describe('Visit sessions service', () => {
       const results = await visitSessionsService.getVisitsByDate({
         username: 'user',
         dateString: '2022-05-23',
+        prisonId,
       })
       const resultsCheck: {
         extendedVisitsInfo: ExtendedVisitInformation[]

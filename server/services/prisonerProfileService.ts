@@ -58,10 +58,16 @@ export default class PrisonerProfileService {
     const socialContacts = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(offenderNo)
     const upcomingVisits: UpcomingVisitItem[] = await this.getUpcomingVisits(
       offenderNo,
+      inmateDetail.agencyId, // @TODO won't need this once VB-1403 resolved
       socialContacts,
       visitSchedulerApiClient,
     )
-    const pastVisits: PastVisitItem[] = await this.getPastVisits(offenderNo, socialContacts, visitSchedulerApiClient)
+    const pastVisits: PastVisitItem[] = await this.getPastVisits(
+      offenderNo,
+      inmateDetail.agencyId, // @TODO won't need this once VB-1403 resolved
+      socialContacts,
+      visitSchedulerApiClient,
+    )
 
     const activeAlertsForDisplay: PrisonerAlertItem[] = activeAlerts.map(alert => {
       return [
@@ -149,10 +155,11 @@ export default class PrisonerProfileService {
 
   private async getUpcomingVisits(
     offenderNo: string,
+    prisonId: string,
     socialContacts: Contact[],
     visitSchedulerApiClient: VisitSchedulerApiClient,
   ): Promise<UpcomingVisitItem[]> {
-    const visits: Visit[] = await visitSchedulerApiClient.getUpcomingVisits(offenderNo)
+    const visits: Visit[] = await visitSchedulerApiClient.getUpcomingVisits(offenderNo, prisonId)
     const socialVisits: Visit[] = visits.filter(visit => visit.visitType === 'SOCIAL')
 
     const visitsForDisplay: UpcomingVisitItem[] = socialVisits.map(visit => {
@@ -166,7 +173,7 @@ export default class PrisonerProfileService {
           },
         },
         {
-          text: 'Hewell (HMP)',
+          text: 'Hewell (HMP)', // @TODO to be fixed in VB-1401
           attributes: {
             'data-test': 'tab-upcoming-location',
           },
@@ -193,10 +200,11 @@ export default class PrisonerProfileService {
 
   private async getPastVisits(
     offenderNo: string,
+    prisonId: string,
     socialContacts: Contact[],
     visitSchedulerApiClient: VisitSchedulerApiClient,
   ): Promise<PastVisitItem[]> {
-    const visits: Visit[] = await visitSchedulerApiClient.getPastVisits(offenderNo)
+    const visits: Visit[] = await visitSchedulerApiClient.getPastVisits(offenderNo, prisonId)
     const socialVisits: Visit[] = visits.filter(visit => visit.visitType === 'SOCIAL')
 
     const visitsForDisplay: PastVisitItem[] = socialVisits.map(visit => {
@@ -210,7 +218,7 @@ export default class PrisonerProfileService {
           },
         },
         {
-          text: 'Hewell (HMP)',
+          text: 'Hewell (HMP)', // @TODO to be fixed in VB-1401
           attributes: {
             'data-test': 'tab-past-location',
           },

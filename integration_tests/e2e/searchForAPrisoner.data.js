@@ -115,6 +115,7 @@ export const prisonerProfileData = prisonerNumber => {
     firstName: 'First Name 1',
     offenderNo: prisonerNumber,
     dateOfBirth: '2000-01-01',
+    agencyId: 'HEI',
     assignedLivingUnit: {
       description: 'ALU Description',
       agencyName: 'ALU Description',

@@ -17,7 +17,7 @@ export const visitSchedulerApiClientBuilder = (token: string): VisitSchedulerApi
 }
 
 class VisitSchedulerApiClient {
-  constructor(private readonly restclient: RestClient, private readonly prisonId = 'HEI') {}
+  constructor(private readonly restclient: RestClient) {}
 
   private visitType = 'SOCIAL'
 
@@ -33,35 +33,35 @@ class VisitSchedulerApiClient {
     return this.restclient.get({ path: `/visits/${reference}` })
   }
 
-  getUpcomingVisits(offenderNo: string, startTimestamp?: string): Promise<Visit[]> {
+  getUpcomingVisits(offenderNo: string, prisonId: string, startTimestamp?: string): Promise<Visit[]> {
     return this.restclient.get({
       path: '/visits',
       query: new URLSearchParams({
         prisonerId: offenderNo,
-        prisonId: this.prisonId,
+        prisonId, // @TODO won't need this once VB-1403 resolved
         startTimestamp: startTimestamp || new Date().toISOString(),
         visitStatus: this.visitStatus,
       }).toString(),
     })
   }
 
-  getPastVisits(offenderNo: string, endTimestamp?: string): Promise<Visit[]> {
+  getPastVisits(offenderNo: string, prisonId: string, endTimestamp?: string): Promise<Visit[]> {
     return this.restclient.get({
       path: '/visits',
       query: new URLSearchParams({
         prisonerId: offenderNo,
-        prisonId: this.prisonId,
+        prisonId, // @TODO won't need this once VB-1403 resolved
         endTimestamp: endTimestamp || new Date().toISOString(),
         visitStatus: this.visitStatus,
       }).toString(),
     })
   }
 
-  getVisitsByDate(dateString?: string): Promise<Visit[]> {
+  getVisitsByDate(dateString: string, prisonId: string): Promise<Visit[]> {
     return this.restclient.get({
       path: '/visits',
       query: new URLSearchParams({
-        prisonId: this.prisonId,
+        prisonId,
         startTimestamp: `${dateString}T00:00:00`,
         endTimestamp: `${dateString}T23:59:59`,
         visitStatus: this.visitStatus,
@@ -69,23 +69,23 @@ class VisitSchedulerApiClient {
     })
   }
 
-  getVisitSessions(offenderNo: string): Promise<VisitSession[]> {
+  getVisitSessions(offenderNo: string, prisonId: string): Promise<VisitSession[]> {
     return this.restclient.get({
       path: '/visit-sessions',
       query: new URLSearchParams({
-        prisonId: this.prisonId,
+        prisonId,
         prisonerId: offenderNo,
         // 'min' and 'max' params omitted, so using API default between 2 and 28 days from now
       }).toString(),
     })
   }
 
-  reserveVisit(visitSessionData: VisitSessionData): Promise<Visit> {
+  reserveVisit(visitSessionData: VisitSessionData, prisonId: string): Promise<Visit> {
     return this.restclient.post({
       path: '/visits/slot/reserve',
       data: <ReserveVisitSlotDto>{
         prisonerId: visitSessionData.prisoner.offenderNo,
-        prisonId: this.prisonId,
+        prisonId,
         visitRoom: visitSessionData.visitSlot.visitRoomName,
         visitType: this.visitType,
         visitRestriction: visitSessionData.visitRestriction,
@@ -125,14 +125,14 @@ class VisitSchedulerApiClient {
     return this.restclient.put({ path: `/visits/${applicationReference}/book` })
   }
 
-  changeBookedVisit(visitSessionData: VisitSessionData): Promise<Visit> {
+  changeBookedVisit(visitSessionData: VisitSessionData, prisonId: string): Promise<Visit> {
     const { visitContact, mainContactId } = this.convertMainContactToVisitContact(visitSessionData.mainContact)
 
     return this.restclient.put({
       path: `/visits/${visitSessionData.visitReference}/change`,
       data: <ReserveVisitSlotDto>{
         prisonerId: visitSessionData.prisoner.offenderNo,
-        prisonId: this.prisonId,
+        prisonId,
         visitRoom: visitSessionData.visitSlot.visitRoomName,
         visitType: this.visitType,
         visitRestriction: visitSessionData.visitRestriction,

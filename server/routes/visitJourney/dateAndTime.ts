@@ -21,6 +21,7 @@ export default class DateAndTime {
       username: res.locals.user?.username,
       offenderNo: visitSessionData.prisoner.offenderNo,
       visitRestriction: visitSessionData.visitRestriction,
+      prisonId: req.session.selectedEstablishment.prisonId,
     })
 
     let restrictionChangeMessage = ''
@@ -115,6 +116,7 @@ export default class DateAndTime {
       const { applicationReference, visitStatus } = await this.visitSessionsService.changeBookedVisit({
         username: res.locals.user?.username,
         visitSessionData,
+        prisonId: req.session.selectedEstablishment.prisonId,
       })
 
       visitSessionData.applicationReference = applicationReference
@@ -123,6 +125,7 @@ export default class DateAndTime {
       const { applicationReference, reference, visitStatus } = await this.visitSessionsService.reserveVisit({
         username: res.locals.user?.username,
         visitSessionData,
+        prisonId: req.session.selectedEstablishment.prisonId,
       })
 
       visitSessionData.applicationReference = applicationReference
