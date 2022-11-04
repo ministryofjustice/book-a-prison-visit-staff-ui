@@ -5,7 +5,7 @@ import asyncMiddleware from '../middleware/asyncMiddleware'
 export default function routes(router: Router): Router {
   const get = (path: string | string[], handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
 
-  const prisonList = [
+  const enabledPrisons = [
     { prisonId: 'HEI', name: 'Hewell (HMP)' },
     { prisonId: 'BLI', name: 'Bristol (HMP)' },
   ]
@@ -13,7 +13,7 @@ export default function routes(router: Router): Router {
   get('/', (req, res, next) => {
     res.render('pages/changeEstablishment', {
       hidePhaseBanner: true,
-      enabledPrisons: prisonList,
+      enabledPrisons,
     })
   })
   return router
