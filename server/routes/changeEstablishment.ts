@@ -1,6 +1,9 @@
 import type { NextFunction, RequestHandler, Router } from 'express'
 import { NotFound } from 'http-errors'
+import { body, validationResult } from 'express-validator'
 import config from '../config'
+import { Prison } from '../@types/bapv'
+
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import SupportedPrisonsService from '../services/supportedPrisonsService'
 
@@ -10,14 +13,38 @@ export default function routes(router: Router, supportedPrisonsService: Supporte
       path,
       handlers.map(handler => asyncMiddleware(handler)),
     )
+  const post = (path: string, ...handlers: RequestHandler[]) =>
+    router.post(
+      path,
+      handlers.map(handler => asyncMiddleware(handler)),
+    )
 
   get('/', establishmentSwitcherCheckMiddleware, async (req, res) => {
     const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(res.locals.user?.username)
 
     res.render('pages/changeEstablishment', {
+      errors: req.flash('errors'),
       supportedPrisons,
     })
   })
+
+  post('/', async (req, res) => {
+    const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(res.locals.user?.username)
+    await body('establishment').isIn(getPrisonIds(supportedPrisons)).withMessage('No prison selected').run(req)
+
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      req.flash('errors', errors.array() as [])
+      return res.redirect(req.originalUrl)
+    }
+
+    req.session.selectedEstablishment = supportedPrisons.find(prison => prison.prisonId === req.body.establishment)
+    return res.redirect('/')
+  })
+
+  function getPrisonIds(prisons: Prison[]) {
+    return prisons.map(prison => prison.prisonId)
+  }
   return router
 }
 

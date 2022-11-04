@@ -26,12 +26,12 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
             {% include "partials/errorSummary.njk" %}
-
-            <form action="{{ urlPrefix }}/changeEstablishment" method="POST" novalidate>
+            <form action="/change-establishment" method="POST" novalidate>
             <input type="hidden" name="_csrf" value="{{ csrfToken }}">
             {{ govukRadios({
                 name: "establishment",
-                items: radios
+                items: radios,
+                errorMessage: errors | findError('establishment')
             })}}
             {{ govukButton({
                 text: "Submit",
