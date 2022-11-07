@@ -55,7 +55,13 @@ export default function routes(
 
     const { results, numberOfPages, numberOfResults, next, previous } = hasValidationErrors
       ? { results: 0, numberOfPages: 0, numberOfResults: 0, next: 0, previous: 0 }
-      : await prisonerSearchService.getPrisoners(search, res.locals.user?.username, parsedPage, isVisit)
+      : await prisonerSearchService.getPrisoners(
+          search,
+          req.session.selectedEstablishment.prisonId,
+          res.locals.user?.username,
+          parsedPage,
+          isVisit,
+        )
 
     if (!hasValidationErrors) {
       await auditService.prisonerSearch({

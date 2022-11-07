@@ -92,7 +92,11 @@ export default function routes(
     const search = (req.query?.search as string) ?? ''
     const queryParamsForBackLink = search !== '' ? new URLSearchParams({ search }).toString() : ''
 
-    const prisonerDetails = await prisonerSearchService.getPrisoner(offenderNo, res.locals.user?.username)
+    const prisonerDetails = await prisonerSearchService.getPrisoner(
+      offenderNo,
+      req.session.selectedEstablishment.prisonId,
+      res.locals.user?.username,
+    )
     if (prisonerDetails === null) {
       throw new NotFound()
     }

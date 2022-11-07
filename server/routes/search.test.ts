@@ -232,7 +232,7 @@ describe('Prisoner search page', () => {
           .expect(res => {
             expect(res.text).toContain('Search for a prisoner')
             expect(res.text).toContain('id="search-results-none"')
-            expect(mockGetPrisoners).toHaveBeenCalledWith('A1234BC', undefined, 1, true)
+            expect(mockGetPrisoners).toHaveBeenCalledWith('A1234BC', 'HEI', undefined, 1, true)
           })
       })
     })

@@ -7,6 +7,7 @@ describe('prisonSearchClientBuilder', () => {
   let fakePrisonerSearchApi: nock.Scope
   let client: PrisonerSearchClient
 
+  const prisonId = 'HEI'
   const token = 'token-1'
 
   beforeEach(() => {
@@ -42,7 +43,7 @@ describe('prisonSearchClientBuilder', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
-      const output = await client.getPrisoners('test')
+      const output = await client.getPrisoners('test', prisonId)
 
       expect(output).toEqual(results)
     })
@@ -70,7 +71,7 @@ describe('prisonSearchClientBuilder', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
-      const output = await client.getPrisoner('test')
+      const output = await client.getPrisoner('test', prisonId)
 
       expect(output).toEqual(results)
     })
