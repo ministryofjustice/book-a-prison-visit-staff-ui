@@ -43,6 +43,7 @@ export default function routes(
     } = await visitSessionsService.getVisitsByDate({
       dateString: selectedDateString,
       username: res.locals.user?.username,
+      prisonId: req.session.selectedEstablishment.prisonId,
     })
 
     if (visitType === 'OPEN' && slots.openSlots.length === 0) {

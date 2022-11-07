@@ -77,7 +77,6 @@ export default function routes(
     })
 
     res.render('pages/search/prisonerResults', {
-      establishment: 'Hewell (HMP)',
       search,
       results: errors.length > 0 ? [] : results,
       errors,
@@ -167,7 +166,6 @@ export default function routes(
     })
 
     res.render('pages/search/visitResults', {
-      establishment: 'Hewell (HMP)',
       searchBlock1,
       searchBlock2,
       searchBlock3,

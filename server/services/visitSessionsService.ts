@@ -43,16 +43,18 @@ export default class VisitSessionsService {
   async getVisitSessions({
     username,
     offenderNo,
+    prisonId,
     visitRestriction,
   }: {
     username: string
     offenderNo: string
+    prisonId: string
     visitRestriction: VisitSessionData['visitRestriction']
   }): Promise<VisitSlotList> {
     const token = await this.systemToken(username)
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
     const whereaboutsApiClient = this.whereaboutsApiClientBuilder(token)
-    const visitSessions = await visitSchedulerApiClient.getVisitSessions(offenderNo)
+    const visitSessions = await visitSchedulerApiClient.getVisitSessions(offenderNo, prisonId)
 
     let earliestStartTime: Date = new Date()
     let latestEndTime: Date = new Date()
@@ -156,14 +158,16 @@ export default class VisitSessionsService {
   async reserveVisit({
     username,
     visitSessionData,
+    prisonId,
   }: {
     username: string
     visitSessionData: VisitSessionData
+    prisonId: string
   }): Promise<Visit> {
     const token = await this.systemToken(username)
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
 
-    const reservation = await visitSchedulerApiClient.reserveVisit(visitSessionData)
+    const reservation = await visitSchedulerApiClient.reserveVisit(visitSessionData, prisonId)
     return reservation
   }
 
@@ -198,14 +202,16 @@ export default class VisitSessionsService {
   async changeBookedVisit({
     username,
     visitSessionData,
+    prisonId,
   }: {
     username: string
     visitSessionData: VisitSessionData
+    prisonId: string
   }): Promise<Visit> {
     const token = await this.systemToken(username)
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
 
-    const visit = await visitSchedulerApiClient.changeBookedVisit(visitSessionData)
+    const visit = await visitSchedulerApiClient.changeBookedVisit(visitSessionData, prisonId)
     return visit
   }
 
@@ -237,22 +243,32 @@ export default class VisitSessionsService {
   async getUpcomingVisits({
     username,
     offenderNo,
+    prisonId,
   }: {
     username: string
     offenderNo: string
+    prisonId: string
   }): Promise<VisitInformation[]> {
     const token = await this.systemToken(username)
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
 
     logger.info(`Get upcoming visits for ${offenderNo}`)
-    const visits = await visitSchedulerApiClient.getUpcomingVisits(offenderNo)
+    const visits = await visitSchedulerApiClient.getUpcomingVisits(offenderNo, prisonId)
 
     return visits.map(visit => {
       return this.buildVisitInformation(visit)
     })
   }
 
-  async getVisitsByDate({ username, dateString }: { username: string; dateString: string }): Promise<{
+  async getVisitsByDate({
+    username,
+    dateString,
+    prisonId,
+  }: {
+    username: string
+    dateString: string
+    prisonId: string
+  }): Promise<{
     extendedVisitsInfo: ExtendedVisitInformation[]
     slots: {
       openSlots: VisitsPageSlot[]
@@ -266,7 +282,7 @@ export default class VisitSessionsService {
     const prisonerContactRegistryApiClient = this.prisonerContactRegistryApiClientBuilder(token)
 
     logger.info(`Get visits for ${dateString}`)
-    const visits = await visitSchedulerApiClient.getVisitsByDate(dateString)
+    const visits = await visitSchedulerApiClient.getVisitsByDate(dateString, prisonId)
 
     const extendedVisitsInfo: ExtendedVisitInformation[] = await Promise.all(
       visits.map(visit => {
