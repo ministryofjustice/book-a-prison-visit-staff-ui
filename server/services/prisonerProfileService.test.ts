@@ -19,6 +19,7 @@ jest.mock('../data/visitSchedulerApiClient')
 jest.mock('../data/prisonerContactRegistryApiClient')
 
 const offenderNo = 'A1234BC'
+const prisonId = 'HEI'
 const prisonApiClient = new PrisonApiClient(null) as jest.Mocked<PrisonApiClient>
 const visitSchedulerApiClient = new VisitSchedulerApiClient(null) as jest.Mocked<VisitSchedulerApiClient>
 const prisonerContactRegistryApiClient = new PrisonerContactRegistryApiClient(
@@ -131,7 +132,7 @@ describe('Prisoner profile service', () => {
       visitSchedulerApiClient.getPastVisits.mockResolvedValue([visit])
       prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue(socialContacts)
 
-      const results = await prisonerProfileService.getProfile(offenderNo, 'user')
+      const results = await prisonerProfileService.getProfile(offenderNo, prisonId, 'user')
 
       expect(prisonApiClient.getBookings).toHaveBeenCalledTimes(1)
       expect(prisonApiClient.getOffender).toHaveBeenCalledTimes(1)
@@ -204,7 +205,7 @@ describe('Prisoner profile service', () => {
       visitSchedulerApiClient.getUpcomingVisits.mockResolvedValue([])
       visitSchedulerApiClient.getPastVisits.mockResolvedValue([])
 
-      const results = await prisonerProfileService.getProfile(offenderNo, 'user')
+      const results = await prisonerProfileService.getProfile(offenderNo, prisonId, 'user')
 
       expect(prisonApiClient.getBookings).toHaveBeenCalledTimes(1)
       expect(prisonApiClient.getOffender).toHaveBeenCalledTimes(1)
@@ -459,7 +460,7 @@ describe('Prisoner profile service', () => {
       visitSchedulerApiClient.getUpcomingVisits.mockResolvedValue([])
       visitSchedulerApiClient.getPastVisits.mockResolvedValue([])
 
-      const results = await prisonerProfileService.getProfile(offenderNo, 'user')
+      const results = await prisonerProfileService.getProfile(offenderNo, prisonId, 'user')
 
       expect(prisonApiClient.getBookings).toHaveBeenCalledTimes(1)
       expect(prisonApiClient.getOffender).toHaveBeenCalledTimes(1)
@@ -488,7 +489,7 @@ describe('Prisoner profile service', () => {
       prisonApiClient.getBookings.mockResolvedValue(bookings)
 
       await expect(async () => {
-        await prisonerProfileService.getProfile(offenderNo, 'user')
+        await prisonerProfileService.getProfile(offenderNo, prisonId, 'user')
       }).rejects.toBeInstanceOf(NotFound)
     })
   })
@@ -535,7 +536,7 @@ describe('Prisoner profile service', () => {
     })
 
     it('Retrieves prisoner details and visit balances for a Convicted prisoner', async () => {
-      const results = await prisonerProfileService.getPrisonerAndVisitBalances(offenderNo, 'user')
+      const results = await prisonerProfileService.getPrisonerAndVisitBalances(offenderNo, prisonId, 'user')
 
       expect(prisonApiClient.getBookings).toHaveBeenCalledTimes(1)
       expect(prisonApiClient.getOffender).toHaveBeenCalledTimes(1)
@@ -546,7 +547,7 @@ describe('Prisoner profile service', () => {
     it('Retrieves prisoner details and no visit balances for prisoner on Remand', async () => {
       bookings.content[0].convictedStatus = 'Remand'
 
-      const results = await prisonerProfileService.getPrisonerAndVisitBalances(offenderNo, 'user')
+      const results = await prisonerProfileService.getPrisonerAndVisitBalances(offenderNo, prisonId, 'user')
 
       expect(prisonApiClient.getBookings).toHaveBeenCalledTimes(1)
       expect(prisonApiClient.getOffender).toHaveBeenCalledTimes(1)

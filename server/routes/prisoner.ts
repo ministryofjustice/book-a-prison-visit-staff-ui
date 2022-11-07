@@ -26,7 +26,11 @@ export default function routes(
     const search = (req.query?.search as string) ?? ''
     const queryParamsForBackLink = search !== '' ? new URLSearchParams({ search }).toString() : ''
 
-    const prisonerProfile = await prisonerProfileService.getProfile(offenderNo, res.locals.user?.username)
+    const prisonerProfile = await prisonerProfileService.getProfile(
+      offenderNo,
+      req.session.selectedEstablishment.prisonId,
+      res.locals.user?.username,
+    )
     await auditService.viewPrisoner({
       prisonerId: offenderNo,
       username: res.locals.user?.username,
@@ -45,6 +49,7 @@ export default function routes(
 
     const { inmateDetail, visitBalances } = await prisonerProfileService.getPrisonerAndVisitBalances(
       offenderNo,
+      req.session.selectedEstablishment.prisonId,
       res.locals.user?.username,
     )
 

@@ -339,6 +339,7 @@ describe('GET /prisoner/A1234BC', () => {
 })
 
 describe('POST /prisoner/A1234BC', () => {
+  const prisonId = 'HEI'
   const inmateDetail = {
     offenderNo: 'A1234BC',
     firstName: 'JOHN',
@@ -369,7 +370,7 @@ describe('POST /prisoner/A1234BC', () => {
       .expect('location', '/book-a-visit/select-visitors')
       .expect(res => {
         expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledTimes(1)
-        expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledWith('A1234BC', undefined)
+        expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledWith('A1234BC', prisonId, undefined)
         expect(auditService.overrodeZeroVO).not.toHaveBeenCalled()
         expect(clearSession).toHaveBeenCalledTimes(1)
         expect(visitSessionData).toEqual(<VisitSessionData>{
@@ -393,7 +394,7 @@ describe('POST /prisoner/A1234BC', () => {
       .expect('location', '/book-a-visit/select-visitors')
       .expect(res => {
         expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledTimes(1)
-        expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledWith('A1234BC', undefined)
+        expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledWith('A1234BC', prisonId, undefined)
         expect(auditService.overrodeZeroVO).toHaveBeenCalledTimes(1)
         expect(auditService.overrodeZeroVO).toHaveBeenCalledWith({
           prisonerId: 'A1234BC',
@@ -426,7 +427,7 @@ describe('POST /prisoner/A1234BC', () => {
       .expect('location', '/book-a-visit/select-visitors')
       .expect(res => {
         expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledTimes(1)
-        expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledWith('A1234BC', undefined)
+        expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledWith('A1234BC', prisonId, undefined)
         expect(auditService.overrodeZeroVO).not.toHaveBeenCalled()
         expect(visitSessionData).toEqual(<VisitSessionData>{
           prisoner: {
@@ -448,7 +449,7 @@ describe('POST /prisoner/A1234BC', () => {
       .expect('location', '/prisoner/A1234BC')
       .expect(res => {
         expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledTimes(1)
-        expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledWith('A1234BC', undefined)
+        expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledWith('A1234BC', prisonId, undefined)
         expect(auditService.overrodeZeroVO).not.toHaveBeenCalled()
         expect(visitSessionData).toEqual({})
         expect(flashProvider).toHaveBeenCalledWith('errors', [

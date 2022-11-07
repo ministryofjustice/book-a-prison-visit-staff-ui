@@ -20,6 +20,7 @@ describe('prisonApiClient', () => {
   describe('getBookings', () => {
     it('should return PagePrisonerBookingSummary from the Prison API', async () => {
       const offenderNo = 'A1234BC'
+      const prisonId = 'HEI'
       const results = {
         content: [
           {
@@ -40,14 +41,14 @@ describe('prisonApiClient', () => {
       fakePrisonApi
         .get('/api/bookings/v2')
         .query({
-          prisonId: 'HEI',
+          prisonId,
           offenderNo,
           legalInfo: 'true',
         })
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
-      const output = await client.getBookings(offenderNo)
+      const output = await client.getBookings(offenderNo, prisonId)
 
       expect(output).toEqual(results)
     })
