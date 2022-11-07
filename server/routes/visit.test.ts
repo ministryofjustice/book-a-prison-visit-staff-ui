@@ -672,6 +672,7 @@ describe('POST /visit/:reference/cancel', () => {
         expect(auditService.cancelledVisit).toHaveBeenCalledWith({
           visitReference: 'ab-cd-ef-gh',
           prisonerId: 'AF34567G',
+          prisonId: 'HEI',
           reason: 'PRISONER_CANCELLED: illness',
           username: undefined,
           operationId: undefined,

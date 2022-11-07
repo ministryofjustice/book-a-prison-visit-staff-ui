@@ -18,6 +18,7 @@ jest.mock('../services/visitSessionsService')
 jest.mock('../services/auditService')
 
 let app: Express
+const prisonId = 'HEI'
 const systemToken = async (user: string): Promise<string> => `${user}-token-1`
 let flashData: Record<string, string[] | Record<string, string>[]>
 let visitSessionData: Partial<VisitSessionData>
@@ -169,6 +170,7 @@ describe('GET /prisoner/A1234BC', () => {
         expect(auditService.viewPrisoner).toHaveBeenCalledTimes(1)
         expect(auditService.viewPrisoner).toHaveBeenCalledWith({
           prisonerId: 'A1234BC',
+          prisonId,
           username: undefined,
           operationId: undefined,
         })
@@ -212,6 +214,7 @@ describe('GET /prisoner/A1234BC', () => {
         expect(auditService.viewPrisoner).toHaveBeenCalledTimes(1)
         expect(auditService.viewPrisoner).toHaveBeenCalledWith({
           prisonerId: 'A1234BC',
+          prisonId,
           username: undefined,
           operationId: undefined,
         })
@@ -236,6 +239,7 @@ describe('GET /prisoner/A1234BC', () => {
         expect(auditService.viewPrisoner).toHaveBeenCalledTimes(1)
         expect(auditService.viewPrisoner).toHaveBeenCalledWith({
           prisonerId: 'A1234BC',
+          prisonId,
           username: undefined,
           operationId: undefined,
         })
@@ -261,6 +265,7 @@ describe('GET /prisoner/A1234BC', () => {
         expect(auditService.viewPrisoner).toHaveBeenCalledTimes(1)
         expect(auditService.viewPrisoner).toHaveBeenCalledWith({
           prisonerId: 'A1234BC',
+          prisonId,
           username: undefined,
           operationId: undefined,
         })
@@ -285,6 +290,7 @@ describe('GET /prisoner/A1234BC', () => {
         expect(auditService.viewPrisoner).toHaveBeenCalledTimes(1)
         expect(auditService.viewPrisoner).toHaveBeenCalledWith({
           prisonerId: 'A1234BC',
+          prisonId,
           username: undefined,
           operationId: undefined,
         })
@@ -321,6 +327,7 @@ describe('GET /prisoner/A1234BC', () => {
         expect(auditService.viewPrisoner).toHaveBeenCalledTimes(1)
         expect(auditService.viewPrisoner).toHaveBeenCalledWith({
           prisonerId: 'A1234BC',
+          prisonId,
           username: undefined,
           operationId: undefined,
         })
@@ -339,7 +346,6 @@ describe('GET /prisoner/A1234BC', () => {
 })
 
 describe('POST /prisoner/A1234BC', () => {
-  const prisonId = 'HEI'
   const inmateDetail = {
     offenderNo: 'A1234BC',
     firstName: 'JOHN',

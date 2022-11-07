@@ -278,6 +278,7 @@ export default function routes(
       await auditService.cancelledVisit({
         visitReference: reference,
         prisonerId: visit.prisonerId.toString(),
+        prisonId: visit.prisonId,
         reason: `${req.body.cancel}: ${req.body[reasonFieldName]}`,
         username: res.locals.user?.username,
         operationId: res.locals.appInsightsOperationId,

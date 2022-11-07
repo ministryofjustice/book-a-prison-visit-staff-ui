@@ -40,6 +40,7 @@ export default class CheckYourBooking {
   async post(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'
     const { visitSessionData } = req.session
+    const { prisonId } = req.session.selectedEstablishment
     const { offenderNo } = visitSessionData.prisoner
 
     const additionalSupport = getSupportTypeDescriptions(
@@ -65,6 +66,7 @@ export default class CheckYourBooking {
         applicationReference: visitSessionData.applicationReference,
         visitReference: visitSessionData.visitReference,
         prisonerId: visitSessionData.prisoner.offenderNo,
+        prisonId,
         visitorIds: visitSessionData.visitors.map(visitor => visitor.personId.toString()),
         startTimestamp: visitSessionData.visitSlot.startTimestamp,
         endTimestamp: visitSessionData.visitSlot.endTimestamp,

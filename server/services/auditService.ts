@@ -24,12 +24,12 @@ export default class AuditService {
 
   async prisonerSearch({
     searchTerms,
-    prisonId = 'HEI',
+    prisonId,
     username,
     operationId,
   }: {
     searchTerms: string
-    prisonId?: string
+    prisonId: string
     username: string
     operationId: string
   }) {
@@ -46,12 +46,12 @@ export default class AuditService {
 
   async viewPrisoner({
     prisonerId,
-    prisonId = 'HEI',
+    prisonId,
     username,
     operationId,
   }: {
     prisonerId: string
-    prisonId?: string
+    prisonId: string
     username: string
     operationId: string
   }) {
@@ -70,7 +70,7 @@ export default class AuditService {
     applicationReference,
     visitReference,
     prisonerId,
-    prisonId = 'HEI',
+    prisonId,
     visitorIds,
     startTimestamp,
     endTimestamp,
@@ -81,7 +81,7 @@ export default class AuditService {
     applicationReference: string
     visitReference: string
     prisonerId: string
-    prisonId?: string
+    prisonId: string
     visitorIds: string[]
     startTimestamp: string
     endTimestamp: string
@@ -110,7 +110,7 @@ export default class AuditService {
     applicationReference,
     visitReference,
     prisonerId,
-    prisonId = 'HEI',
+    prisonId,
     visitorIds,
     startTimestamp,
     endTimestamp,
@@ -121,7 +121,7 @@ export default class AuditService {
     applicationReference: string
     visitReference: string
     prisonerId: string
-    prisonId?: string
+    prisonId: string
     visitorIds: string[]
     startTimestamp: string
     endTimestamp: string
@@ -149,14 +149,14 @@ export default class AuditService {
   async cancelledVisit({
     visitReference,
     prisonerId,
-    prisonId = 'HEI',
+    prisonId,
     reason,
     username,
     operationId,
   }: {
     visitReference: string
     prisonerId: string
-    prisonId?: string
+    prisonId: string
     reason: string
     username: string
     operationId: string
@@ -176,12 +176,12 @@ export default class AuditService {
 
   async viewedVisits({
     viewDate,
-    prisonId = 'HEI',
+    prisonId,
     username,
     operationId,
   }: {
     viewDate: string
-    prisonId?: string
+    prisonId: string
     username: string
     operationId: string
   }) {
@@ -198,12 +198,12 @@ export default class AuditService {
 
   async printedVisitList({
     viewDate,
-    prisonId = 'HEI',
+    prisonId,
     username,
     operationId,
   }: {
     viewDate: string
-    prisonId?: string
+    prisonId: string
     username: string
     operationId: string
   }) {
@@ -284,13 +284,13 @@ export default class AuditService {
   async viewedVisitDetails({
     visitReference,
     prisonerId,
-    prisonId = 'HEI',
+    prisonId,
     username,
     operationId,
   }: {
     visitReference: string
     prisonerId: string
-    prisonId?: string
+    prisonId: string
     username: string
     operationId: string
   }) {

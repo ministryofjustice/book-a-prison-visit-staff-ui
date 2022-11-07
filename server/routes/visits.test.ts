@@ -44,6 +44,7 @@ afterEach(() => {
 })
 
 describe('GET /visits', () => {
+  const prisonId = 'HEI'
   let visits: {
     extendedVisitsInfo: ExtendedVisitInformation[]
     slots: {
@@ -233,6 +234,7 @@ describe('GET /visits', () => {
         expect(auditService.viewedVisits).toHaveBeenCalledTimes(1)
         expect(auditService.viewedVisits).toHaveBeenCalledWith({
           viewDate: todayDate,
+          prisonId,
           username: undefined,
           operationId: undefined,
         })
@@ -264,6 +266,7 @@ describe('GET /visits', () => {
         expect(auditService.viewedVisits).toHaveBeenCalledTimes(1)
         expect(auditService.viewedVisits).toHaveBeenCalledWith({
           viewDate: '2022-05-23',
+          prisonId,
           username: undefined,
           operationId: undefined,
         })
@@ -295,6 +298,7 @@ describe('GET /visits', () => {
         expect(auditService.viewedVisits).toHaveBeenCalledTimes(1)
         expect(auditService.viewedVisits).toHaveBeenCalledWith({
           viewDate: '2022-05-23',
+          prisonId,
           username: undefined,
           operationId: undefined,
         })
@@ -326,6 +330,7 @@ describe('GET /visits', () => {
         expect(auditService.viewedVisits).toHaveBeenCalledTimes(1)
         expect(auditService.viewedVisits).toHaveBeenCalledWith({
           viewDate: todayDate,
+          prisonId,
           username: undefined,
           operationId: undefined,
         })
@@ -362,6 +367,7 @@ describe('GET /visits', () => {
         expect(auditService.viewedVisits).toHaveBeenCalledTimes(1)
         expect(auditService.viewedVisits).toHaveBeenCalledWith({
           viewDate: todayDate,
+          prisonId,
           username: undefined,
           operationId: undefined,
         })
@@ -384,6 +390,7 @@ describe('GET /visits', () => {
         expect(auditService.viewedVisits).toHaveBeenCalledTimes(1)
         expect(auditService.viewedVisits).toHaveBeenCalledWith({
           viewDate: '2022-05-23',
+          prisonId,
           username: undefined,
           operationId: undefined,
         })
