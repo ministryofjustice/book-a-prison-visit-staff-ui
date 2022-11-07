@@ -37,10 +37,10 @@ export default class PrisonerProfileService {
     private readonly systemToken: SystemToken,
   ) {}
 
-  async getProfile(offenderNo: string, username: string): Promise<PrisonerProfile> {
+  async getProfile(offenderNo: string, prisonId: string, username: string): Promise<PrisonerProfile> {
     const token = await this.systemToken(username)
     const prisonApiClient = this.prisonApiClientBuilder(token)
-    const bookings = await prisonApiClient.getBookings(offenderNo)
+    const bookings = await prisonApiClient.getBookings(offenderNo, prisonId)
 
     if (bookings.numberOfElements !== 1) throw new NotFound()
 
@@ -123,12 +123,13 @@ export default class PrisonerProfileService {
 
   async getPrisonerAndVisitBalances(
     offenderNo: string,
+    prisonId: string,
     username: string,
   ): Promise<{ inmateDetail: InmateDetail; visitBalances: VisitBalances }> {
     const token = await this.systemToken(username)
     const prisonApiClient = this.prisonApiClientBuilder(token)
 
-    const bookings = await prisonApiClient.getBookings(offenderNo)
+    const bookings = await prisonApiClient.getBookings(offenderNo, prisonId)
     if (bookings.numberOfElements !== 1) throw new NotFound()
     const { convictedStatus } = bookings.content[0]
 

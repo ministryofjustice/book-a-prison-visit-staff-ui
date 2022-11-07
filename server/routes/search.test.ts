@@ -13,6 +13,7 @@ jest.mock('../services/visitSessionsService')
 jest.mock('../services/auditService')
 
 let app: Express
+const prisonId = 'HEI'
 const systemToken = async (user: string): Promise<string> => `${user}-token-1`
 const prisonerSearchService = new PrisonerSearchService(null, systemToken) as jest.Mocked<PrisonerSearchService>
 const auditService = new AuditService() as jest.Mocked<AuditService>
@@ -86,6 +87,7 @@ describe('Prisoner search page', () => {
             expect(res.text).toContain('id="search-results-none"')
             expect(auditService.prisonerSearch).toHaveBeenCalledWith({
               searchTerms: 'A1234BC',
+              prisonId,
               username: undefined,
               operationId: undefined,
             })
@@ -140,6 +142,7 @@ describe('Prisoner search page', () => {
             expect(res.text).toContain('id="search-results-true"')
             expect(auditService.prisonerSearch).toHaveBeenCalledWith({
               searchTerms: 'A1234BC',
+              prisonId,
               username: undefined,
               operationId: undefined,
             })
@@ -179,6 +182,7 @@ describe('Prisoner search page', () => {
             expect(res.text).toContain('<p class="moj-pagination__results">')
             expect(auditService.prisonerSearch).toHaveBeenCalledWith({
               searchTerms: 'A1234BC',
+              prisonId,
               username: undefined,
               operationId: undefined,
             })
@@ -232,7 +236,7 @@ describe('Prisoner search page', () => {
           .expect(res => {
             expect(res.text).toContain('Search for a prisoner')
             expect(res.text).toContain('id="search-results-none"')
-            expect(mockGetPrisoners).toHaveBeenCalledWith('A1234BC', undefined, 1, true)
+            expect(mockGetPrisoners).toHaveBeenCalledWith('A1234BC', prisonId, undefined, 1, true)
           })
       })
     })

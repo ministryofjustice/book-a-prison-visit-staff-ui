@@ -26,6 +26,7 @@ export default function routes(
     )
 
   get('/', async (req, res) => {
+    const { prisonId } = req.session.selectedEstablishment
     const { type = 'OPEN', time = '', selectedDate = '', firstTabDate = '' } = req.query
     let visitType = ['OPEN', 'CLOSED', 'UNKNOWN'].includes(type as string) ? (type as string) : 'OPEN'
     const selectedDateString = getParsedDateFromQueryString(selectedDate as string)
@@ -43,7 +44,7 @@ export default function routes(
     } = await visitSessionsService.getVisitsByDate({
       dateString: selectedDateString,
       username: res.locals.user?.username,
-      prisonId: req.session.selectedEstablishment.prisonId,
+      prisonId,
     })
 
     if (visitType === 'OPEN' && slots.openSlots.length === 0) {
@@ -127,6 +128,7 @@ export default function routes(
 
     await auditService.viewedVisits({
       viewDate: selectedDateString,
+      prisonId,
       username: res.locals.user?.username,
       operationId: res.locals.appInsightsOperationId,
     })

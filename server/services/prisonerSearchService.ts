@@ -25,6 +25,7 @@ export default class PrisonerSearchService {
 
   async getPrisoners(
     search: string,
+    prisonId: string,
     username: string,
     page: number,
     visit?: boolean,
@@ -38,7 +39,11 @@ export default class PrisonerSearchService {
     const token = await this.systemToken(username)
     const prisonerSearchClient = this.prisonerSearchClientBuilder(token)
     this.currentPage = page - 1
-    const { totalPages, totalElements, content } = await prisonerSearchClient.getPrisoners(search, this.currentPage)
+    const { totalPages, totalElements, content } = await prisonerSearchClient.getPrisoners(
+      search,
+      prisonId,
+      this.currentPage,
+    )
     this.numberOfPages = totalPages
     const nextPage = this.getNextPage()
     const previousPage = this.getPreviousPage()
@@ -79,10 +84,10 @@ export default class PrisonerSearchService {
     }
   }
 
-  async getPrisoner(search: string, username: string): Promise<Prisoner> {
+  async getPrisoner(search: string, prisonId: string, username: string): Promise<Prisoner> {
     const token = await this.systemToken(username)
     const prisonerSearchClient = this.prisonerSearchClientBuilder(token)
-    const { content } = await prisonerSearchClient.getPrisoner(search)
+    const { content } = await prisonerSearchClient.getPrisoner(search, prisonId)
     return content.length === 1 ? content[0] : null
   }
 

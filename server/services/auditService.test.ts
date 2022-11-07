@@ -13,6 +13,7 @@ jest.mock('@aws-sdk/client-sqs', () => {
   }
 })
 
+const prisonId = 'HEI'
 const fakeDate = '2022-07-11T09:00:00.000Z'
 jest.useFakeTimers().setSystemTime(new Date(fakeDate))
 
@@ -30,7 +31,12 @@ describe('Audit service', () => {
   })
 
   it('sends a prisoner search audit message', async () => {
-    await auditService.prisonerSearch({ searchTerms: 'Smith', username: 'username', operationId: 'operation-id' })
+    await auditService.prisonerSearch({
+      searchTerms: 'Smith',
+      prisonId,
+      username: 'username',
+      operationId: 'operation-id',
+    })
 
     expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
     expect(sqsClientInstance.send.mock.lastCall[0]).toMatchObject({
@@ -51,6 +57,7 @@ describe('Audit service', () => {
   it('sends a view prisoner audit message', async () => {
     await auditService.viewPrisoner({
       prisonerId: 'A1234BC',
+      prisonId,
       username: 'username',
       operationId: 'operation-id',
     })
@@ -76,6 +83,7 @@ describe('Audit service', () => {
       applicationReference: 'aaa-bbb-ccc',
       visitReference: 'ab-cd-ef-gh',
       prisonerId: 'A1234BC',
+      prisonId,
       visitorIds: ['abc123', 'bcd321'],
       startTimestamp: '2022-08-24T11:00:00',
       endTimestamp: '2022-08-24T12:00:00',
@@ -107,6 +115,7 @@ describe('Audit service', () => {
       applicationReference: 'aaa-bbb-ccc',
       visitReference: 'ab-cd-ef-gh',
       prisonerId: 'A1234BC',
+      prisonId,
       visitorIds: ['abc123', 'bcd321'],
       startTimestamp: '2022-08-24T11:00:00',
       endTimestamp: '2022-08-24T12:00:00',
@@ -137,6 +146,7 @@ describe('Audit service', () => {
     await auditService.cancelledVisit({
       visitReference: 'ab-cd-ef-gh',
       prisonerId: 'A1234BC',
+      prisonId,
       reason: 'PRISONER_CANCELLED: illness',
       username: 'username',
       operationId: 'operation-id',
@@ -162,6 +172,7 @@ describe('Audit service', () => {
   it('sends a viewd visits page audit message', async () => {
     await auditService.viewedVisits({
       viewDate: '2022-06-01T12:12:12',
+      prisonId,
       username: 'username',
       operationId: 'operation-id',
     })
@@ -185,6 +196,7 @@ describe('Audit service', () => {
   it('sends a visit list printed audit message', async () => {
     await auditService.printedVisitList({
       viewDate: '2022-06-01T12:12:12',
+      prisonId,
       username: 'username',
       operationId: 'operation-id',
     })
@@ -272,6 +284,7 @@ describe('Audit service', () => {
     await auditService.viewedVisitDetails({
       visitReference: 'ab-cd-ef-gh',
       prisonerId: 'A1234BC',
+      prisonId,
       username: 'username',
       operationId: 'operation-id',
     })

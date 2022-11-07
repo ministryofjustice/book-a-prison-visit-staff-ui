@@ -44,6 +44,7 @@ export default function routes(
   })
 
   get(['/prisoner/results', '/prisoner-visit/results'], async (req, res) => {
+    const { prisonId } = req.session.selectedEstablishment
     const isVisit = req.originalUrl.includes('-visit')
     const search = (req.query.search || '') as string
     const currentPage = (req.query.page || '') as string
@@ -55,11 +56,12 @@ export default function routes(
 
     const { results, numberOfPages, numberOfResults, next, previous } = hasValidationErrors
       ? { results: 0, numberOfPages: 0, numberOfResults: 0, next: 0, previous: 0 }
-      : await prisonerSearchService.getPrisoners(search, res.locals.user?.username, parsedPage, isVisit)
+      : await prisonerSearchService.getPrisoners(search, prisonId, res.locals.user?.username, parsedPage, isVisit)
 
     if (!hasValidationErrors) {
       await auditService.prisonerSearch({
         searchTerms: search,
+        prisonId,
         username: res.locals.user?.username,
         operationId: res.locals.appInsightsOperationId,
       })

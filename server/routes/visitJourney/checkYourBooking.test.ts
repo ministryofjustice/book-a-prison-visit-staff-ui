@@ -237,6 +237,7 @@ testJourneys.forEach(journey => {
               applicationReference: visitSessionData.applicationReference,
               visitReference: visitSessionData.visitReference,
               prisonerId: visitSessionData.prisoner.offenderNo,
+              prisonId: 'HEI',
               visitorIds: [visitSessionData.visitors[0].personId.toString()],
               startTimestamp: '2022-03-12T09:30:00',
               endTimestamp: '2022-03-12T10:30:00',

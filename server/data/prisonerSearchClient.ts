@@ -17,8 +17,8 @@ class PrisonerSearchClient {
 
   getPrisoners(
     search: string,
+    prisonId: string,
     page = 0,
-    prisonId = 'HEI',
   ): Promise<{ totalPages: number; totalElements: number; content: Prisoner[] }> {
     return this.restClient.get({
       path: `/prison/${prisonId}/prisoners`,
@@ -30,7 +30,7 @@ class PrisonerSearchClient {
     })
   }
 
-  getPrisoner(search: string, prisonId = 'HEI'): Promise<{ content: Prisoner[] }> {
+  getPrisoner(search: string, prisonId: string): Promise<{ content: Prisoner[] }> {
     return this.restClient.get({
       path: `/prison/${prisonId}/prisoners`,
       query: new URLSearchParams({

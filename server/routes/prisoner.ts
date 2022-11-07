@@ -23,12 +23,14 @@ export default function routes(
 
   get('/:offenderNo', async (req, res) => {
     const offenderNo = getOffenderNo(req)
+    const { prisonId } = req.session.selectedEstablishment
     const search = (req.query?.search as string) ?? ''
     const queryParamsForBackLink = search !== '' ? new URLSearchParams({ search }).toString() : ''
 
-    const prisonerProfile = await prisonerProfileService.getProfile(offenderNo, res.locals.user?.username)
+    const prisonerProfile = await prisonerProfileService.getProfile(offenderNo, prisonId, res.locals.user?.username)
     await auditService.viewPrisoner({
       prisonerId: offenderNo,
+      prisonId,
       username: res.locals.user?.username,
       operationId: res.locals.appInsightsOperationId,
     })
@@ -42,9 +44,11 @@ export default function routes(
 
   post('/:offenderNo', async (req, res) => {
     const offenderNo = getOffenderNo(req)
+    const { prisonId } = req.session.selectedEstablishment
 
     const { inmateDetail, visitBalances } = await prisonerProfileService.getPrisonerAndVisitBalances(
       offenderNo,
+      prisonId,
       res.locals.user?.username,
     )
 
@@ -84,10 +88,11 @@ export default function routes(
 
   get('/:offenderNo/visits', async (req, res) => {
     const offenderNo = getOffenderNo(req)
+    const { prisonId } = req.session.selectedEstablishment
     const search = (req.query?.search as string) ?? ''
     const queryParamsForBackLink = search !== '' ? new URLSearchParams({ search }).toString() : ''
 
-    const prisonerDetails = await prisonerSearchService.getPrisoner(offenderNo, res.locals.user?.username)
+    const prisonerDetails = await prisonerSearchService.getPrisoner(offenderNo, prisonId, res.locals.user?.username)
     if (prisonerDetails === null) {
       throw new NotFound()
     }
@@ -96,7 +101,7 @@ export default function routes(
     const visits = await visitSessionsService.getUpcomingVisits({
       username: res.locals.user?.username,
       offenderNo,
-      prisonId: req.session.selectedEstablishment.prisonId,
+      prisonId,
     })
 
     return res.render('pages/prisoner/visits', { offenderNo, prisonerName, visits, queryParamsForBackLink })
