@@ -2,7 +2,7 @@ import type { Express } from 'express'
 import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
-import { appWithAllRoutes } from './testutils/appSetup'
+import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import * as visitorUtils from './visitorUtils'
 // import { Prison } from '../@types/bapv'
 
@@ -75,6 +75,9 @@ describe('POST /change-establishment', () => {
       .expect(302)
       .expect('location', `/change-establishment`)
       .expect(() => {
+        expect(flashProvider).toHaveBeenCalledWith('errors', [
+          { location: 'body', msg: 'No prison selected', param: 'establishment', value: '' },
+        ])
         expect(visitorUtils.clearSession).toHaveBeenCalledTimes(0)
       })
   })
@@ -91,6 +94,9 @@ describe('POST /change-establishment', () => {
       .expect(302)
       .expect('location', `/change-establishment`)
       .expect(() => {
+        expect(flashProvider).toHaveBeenCalledWith('errors', [
+          { location: 'body', msg: 'No prison selected', param: 'establishment', value: 'HEX' },
+        ])
         expect(visitorUtils.clearSession).toHaveBeenCalledTimes(0)
       })
   })
