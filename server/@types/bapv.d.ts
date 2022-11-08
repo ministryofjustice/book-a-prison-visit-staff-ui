@@ -1,6 +1,11 @@
 import { InmateDetail, OffenderRestriction, VisitBalances } from '../data/prisonApiTypes'
 import { Visit, VisitorSupport, VisitSession } from '../data/visitSchedulerApiTypes'
 
+export type Prison = {
+  prisonId: string
+  prisonName: string
+}
+
 export type PrisonerDetailsItem = {
   html?: string
   text?: string

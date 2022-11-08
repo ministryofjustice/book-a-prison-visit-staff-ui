@@ -81,7 +81,7 @@ export default class CheckYourBooking {
           await this.notificationsService[`send${isUpdate ? 'Update' : 'Booking'}Sms`]({
             phoneNumber,
             visitSlot: visitSessionData.visitSlot,
-            prisonName: req.session.selectedEstablishment.name,
+            prisonName: req.session.selectedEstablishment.prisonName,
             reference: visitSessionData.visitReference,
           })
           logger.info(`${isUpdate ? 'Update' : 'Booking'} SMS sent for ${visitSessionData.visitReference}`)

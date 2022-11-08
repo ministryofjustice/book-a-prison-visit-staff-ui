@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { Cookie } from 'express-session'
+import { Prison } from '../@types/bapv'
 import populateSelectedEstablishment from './populateSelectedEstablishment'
 
 describe('populateSelectedEstablishment', () => {
@@ -25,7 +26,7 @@ describe('populateSelectedEstablishment', () => {
   })
 
   it('should set default establishment if non is set in session and populate res.locals', () => {
-    const defaultEstablishment = { prisonId: 'HEI', name: 'Hewell (HMP)' }
+    const defaultEstablishment: Prison = { prisonId: 'HEI', prisonName: 'Hewell (HMP)' }
 
     populateSelectedEstablishment(req as Request, res as Response, next)
 
@@ -34,7 +35,7 @@ describe('populateSelectedEstablishment', () => {
   })
 
   it('should populate res.locals when establishment already set in session', () => {
-    const alreadySelectedEstablishment = { prisonId: 'BLI', name: 'Bristol (HMP)' }
+    const alreadySelectedEstablishment: Prison = { prisonId: 'BLI', prisonName: 'Bristol (HMP)' }
     req.session.selectedEstablishment = alreadySelectedEstablishment
 
     populateSelectedEstablishment(req as Request, res as Response, next)
