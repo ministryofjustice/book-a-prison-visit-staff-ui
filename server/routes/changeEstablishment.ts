@@ -3,9 +3,9 @@ import { NotFound } from 'http-errors'
 import { body, validationResult } from 'express-validator'
 import config from '../config'
 import { Prison } from '../@types/bapv'
-
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import SupportedPrisonsService from '../services/supportedPrisonsService'
+import { clearSession } from './visitorUtils'
 
 export default function routes(router: Router, supportedPrisonsService: SupportedPrisonsService): Router {
   const get = (path: string, ...handlers: RequestHandler[]) =>
@@ -38,6 +38,7 @@ export default function routes(router: Router, supportedPrisonsService: Supporte
       return res.redirect(req.originalUrl)
     }
 
+    clearSession(req)
     req.session.selectedEstablishment = supportedPrisons.find(prison => prison.prisonId === req.body.establishment)
     return res.redirect('/')
   })
