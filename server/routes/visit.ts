@@ -291,7 +291,7 @@ export default function routes(
           await notificationsService.sendCancellationSms({
             phoneNumber,
             visitSlot: visit.startTimestamp,
-            prisonName: req.session.selectedEstablishment.name,
+            prisonName: req.session.selectedEstablishment.prisonName,
             prisonPhoneNumber: '01234443225',
           })
           logger.info(`Cancellation SMS sent for ${reference}`)

@@ -3,7 +3,7 @@
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
-{% set pageHeaderTitle = "Select Establishment" %}
+{% set pageHeaderTitle = "Select establishment" %}
 {% set pageTitle %}
     {% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
 {% endset %}
@@ -15,7 +15,7 @@
 {% for prison in enabledPrisons %}
     {%- set radios = (radios.push({
         value: prison.prisonId,
-        html: '<p class="bapv-radio-paragraph">' + prison.name + '</p>',
+        html: '<p class="bapv-radio-paragraph">' + prison.prisonName + '</p>',
         id: prison.prisonId,
         checked: selectedEstablishment.prisonId == prison.prisonId
     }), radios) %}
