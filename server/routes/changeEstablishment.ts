@@ -1,19 +1,15 @@
 import type { RequestHandler, Router } from 'express'
-import { Prison } from '../@types/bapv'
-
 import asyncMiddleware from '../middleware/asyncMiddleware'
+import SupportedPrisonsService from '../services/supportedPrisonsService'
 
-export default function routes(router: Router): Router {
+export default function routes(router: Router, supportedPrisonsService: SupportedPrisonsService): Router {
   const get = (path: string | string[], handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
 
-  const enabledPrisons: Prison[] = [
-    { prisonId: 'HEI', prisonName: 'Hewell (HMP)' },
-    { prisonId: 'BLI', prisonName: 'Bristol (HMP)' },
-  ]
+  get('/', async (req, res) => {
+    const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(res.locals.user?.username)
 
-  get('/', (req, res, next) => {
     res.render('pages/changeEstablishment', {
-      enabledPrisons,
+      supportedPrisons,
     })
   })
   return router
