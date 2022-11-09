@@ -12,7 +12,7 @@
 
 {% set radios = [] %}
 
-{% for prison in enabledPrisons %}
+{% for prison in supportedPrisons %}
     {%- set radios = (radios.push({
         value: prison.prisonId,
         html: '<p class="bapv-radio-paragraph">' + prison.prisonName + '</p>',

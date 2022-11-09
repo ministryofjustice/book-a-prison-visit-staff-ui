@@ -23,6 +23,7 @@ import PrisonerProfileService from '../../services/prisonerProfileService'
 import PrisonerVisitorsService from '../../services/prisonerVisitorsService'
 import VisitSessionsService from '../../services/visitSessionsService'
 import NotificationsService from '../../services/notificationsService'
+import SupportedPrisonsService from '../../services/supportedPrisonsService'
 import * as auth from '../../authentication/auth'
 import systemToken from '../../data/authClient'
 import { SystemToken, VisitorListItem, VisitSlotList, VisitSessionData } from '../../@types/bapv'
@@ -58,6 +59,7 @@ function appSetup({
   visitSessionsServiceOverride,
   auditServiceOverride,
   notificationsServiceOverride,
+  supportedPrisonsServiceOverride,
   systemTokenOverride,
   production = false,
   sessionData = {
@@ -78,6 +80,7 @@ function appSetup({
   visitSessionsServiceOverride: VisitSessionsService
   auditServiceOverride: AuditService
   notificationsServiceOverride: NotificationsService
+  supportedPrisonsServiceOverride: SupportedPrisonsService
   systemTokenOverride: SystemToken
   production: boolean
   sessionData: SessionData
@@ -108,10 +111,15 @@ function appSetup({
   // app.use(cookieSession({ keys: [''] }))
   app.use(express.json())
   app.use(express.urlencoded({ extended: true }))
-  app.use('/', indexRoutes(standardRouter(new MockUserService())))
-  app.use('/change-establishment/', establishmentRoutes(standardRouter(new MockUserService())))
 
   const systemTokenTest = systemTokenOverride || systemToken
+
+  app.use('/', indexRoutes(standardRouter(new MockUserService())))
+
+  const supportedPrisonsService =
+    supportedPrisonsServiceOverride || new SupportedPrisonsService(visitSchedulerApiClientBuilder, systemToken)
+  app.use('/change-establishment/', establishmentRoutes(standardRouter(new MockUserService()), supportedPrisonsService))
+
   const prisonerSearchService =
     prisonerSearchServiceOverride || new PrisonerSearchService(prisonerSearchClientBuilder, systemTokenTest)
   const visitSessionsService =
@@ -192,6 +200,7 @@ export function appWithAllRoutes({
   visitSessionsServiceOverride,
   auditServiceOverride,
   notificationsServiceOverride,
+  supportedPrisonsServiceOverride,
   systemTokenOverride,
   production = false,
   sessionData,
@@ -202,6 +211,7 @@ export function appWithAllRoutes({
   visitSessionsServiceOverride?: VisitSessionsService
   auditServiceOverride?: AuditService
   notificationsServiceOverride?: NotificationsService
+  supportedPrisonsServiceOverride?: SupportedPrisonsService
   systemTokenOverride?: SystemToken
   production?: boolean
   sessionData?: SessionData
@@ -214,6 +224,7 @@ export function appWithAllRoutes({
     visitSessionsServiceOverride,
     auditServiceOverride,
     notificationsServiceOverride,
+    supportedPrisonsServiceOverride,
     systemTokenOverride,
     production,
     sessionData,

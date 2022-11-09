@@ -27,6 +27,22 @@ describe('visitSchedulerApiClient', () => {
     nock.cleanAll()
   })
 
+  describe('getSupportedPrisonIds', () => {
+    it('should return an array of supported prison IDs', async () => {
+      const results = ['HEI', 'BLI']
+
+      // awaiting endpoint on visit scheduler - VB-1222
+      // fakeVisitSchedulerApi
+      //   .get('/supported-prisons')
+      //   .matchHeader('authorization', `Bearer ${token}`)
+      //   .reply(200, results)
+
+      const output = await client.getSupportedPrisonIds()
+
+      expect(output).toEqual(results)
+    })
+  })
+
   describe('getAvailableSupportOptions', () => {
     it('should return an array of available support types', async () => {
       const results: SupportType[] = [

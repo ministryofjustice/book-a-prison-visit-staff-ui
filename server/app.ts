@@ -22,6 +22,7 @@ import { prisonApiClientBuilder } from './data/prisonApiClient'
 import NotificationsService from './services/notificationsService'
 import PrisonerSearchService from './services/prisonerSearchService'
 import PrisonerProfileService from './services/prisonerProfileService'
+import SupportedPrisonsService from './services/supportedPrisonsService'
 import systemToken from './data/authClient'
 import setUpWebSession from './middleware/setUpWebSession'
 import setUpStaticResources from './middleware/setUpStaticResources'
@@ -53,7 +54,13 @@ export default function createApp(userService: UserService): express.Application
   app.use(appInsightsOperationId)
 
   app.use('/', indexRoutes(standardRouter(userService)))
-  app.use('/change-establishment/', establishmentRoutes(standardRouter(userService)))
+  app.use(
+    '/change-establishment/',
+    establishmentRoutes(
+      standardRouter(userService),
+      new SupportedPrisonsService(visitSchedulerApiClientBuilder, systemToken),
+    ),
+  )
   app.use(
     '/search/',
     searchRoutes(
