@@ -156,7 +156,7 @@ describe('clearSession', () => {
     adultVisitors: { adults: [] },
     slotsList: {},
     visitSessionData: { prisoner: undefined },
-    selectedEstablishment: undefined,
+    selectedEstablishment: { prisonId: 'HEI', prisonName: 'Hewell (HMP)' },
   }
 
   req.session = sessionData as Session & SessionData
@@ -168,6 +168,7 @@ describe('clearSession', () => {
       returnTo: '/url',
       nowInMinutes: 123456,
       cookie: undefined,
+      selectedEstablishment: { prisonId: 'HEI', prisonName: 'Hewell (HMP)' },
     })
   })
 })
