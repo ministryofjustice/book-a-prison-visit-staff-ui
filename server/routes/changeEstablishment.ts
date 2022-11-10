@@ -1,11 +1,17 @@
-import type { RequestHandler, Router } from 'express'
+import type { NextFunction, RequestHandler, Router } from 'express'
+import { NotFound } from 'http-errors'
+import config from '../config'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import SupportedPrisonsService from '../services/supportedPrisonsService'
 
 export default function routes(router: Router, supportedPrisonsService: SupportedPrisonsService): Router {
-  const get = (path: string | string[], handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
+  const get = (path: string, ...handlers: RequestHandler[]) =>
+    router.get(
+      path,
+      handlers.map(handler => asyncMiddleware(handler)),
+    )
 
-  get('/', async (req, res) => {
+  get('/', establishmentSwitcherCheckMiddleware, async (req, res) => {
     const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(res.locals.user?.username)
 
     res.render('pages/changeEstablishment', {
@@ -13,4 +19,14 @@ export default function routes(router: Router, supportedPrisonsService: Supporte
     })
   })
   return router
+}
+
+const establishmentSwitcherCheckMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  const { establishmentSwitcherEnabled } = config.features
+
+  if (!establishmentSwitcherEnabled) {
+    throw new NotFound()
+  }
+
+  next()
 }
