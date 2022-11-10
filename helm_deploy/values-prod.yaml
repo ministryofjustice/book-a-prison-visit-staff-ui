@@ -22,6 +22,7 @@ generic-service:
     WHEREABOUTS_API_URL: "https://whereabouts-api.service.justice.gov.uk"
     DPS_URL: "https://digital.prison.service.justice.gov.uk/"
     SMS_NOTIFICATIONS_ENABLED: "true"
+    FEATURE_ESTABLISHMENT_SWITCHER_ENABLED: "false"
 
 generic-prometheus-alerts:
   alertSeverity: digital-prison-service
