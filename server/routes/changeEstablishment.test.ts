@@ -2,6 +2,7 @@ import type { Express } from 'express'
 import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
+import config from '../config'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import * as visitorUtils from './visitorUtils'
 import SupportedPrisonsService from '../services/supportedPrisonsService'
@@ -28,6 +29,7 @@ afterEach(() => {
 
 describe('GET /change-establishment', () => {
   it('should render select establishment page, with default establishment selected', () => {
+    config.features.establishmentSwitcherEnabled = true
     app = appWithAllRoutes({
       supportedPrisonsServiceOverride: supportedPrisonsService,
       systemTokenOverride: systemToken,
@@ -47,6 +49,7 @@ describe('GET /change-establishment', () => {
   })
 
   it('should render select establishment page, with current establishment selected', () => {
+    config.features.establishmentSwitcherEnabled = true
     app = appWithAllRoutes({
       supportedPrisonsServiceOverride: supportedPrisonsService,
       systemTokenOverride: systemToken,
@@ -65,15 +68,36 @@ describe('GET /change-establishment', () => {
         expect($('input[name="establishment"]').length).toBe(2)
       })
   })
+
+  it('should not render select establishment page, when feature flag disabled', () => {
+    config.features.establishmentSwitcherEnabled = false
+    app = appWithAllRoutes({
+      supportedPrisonsServiceOverride: supportedPrisonsService,
+      systemTokenOverride: systemToken,
+    })
+
+    return request(app)
+      .get('/change-establishment')
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('h1').text()).toBe('Error')
+        expect($('input[name="establishment"]').length).toBe(0)
+      })
+  })
 })
 
-describe.skip('POST /change-establishment', () => {
+describe('POST /change-establishment', () => {
+  config.features.establishmentSwitcherEnabled = true
+
+  app = appWithAllRoutes({
+    supportedPrisonsServiceOverride: supportedPrisonsService,
+    systemTokenOverride: systemToken,
+  })
+
   it('should set validation errors if no establishment selected', () => {
     jest.spyOn(visitorUtils, 'clearSession')
-    const sessionData = {
-      sessionData: { selectedEstablishment: { prisonId: 'BLI', prisonName: 'Bristol (HMP)' } } as SessionData,
-    }
-    app = appWithAllRoutes(sessionData)
+
     return request(app)
       .post(`/change-establishment`)
       .send('establishment=')
@@ -89,10 +113,7 @@ describe.skip('POST /change-establishment', () => {
 
   it('should set validation errors if invalid establishment selected', () => {
     jest.spyOn(visitorUtils, 'clearSession')
-    const sessionData = {
-      sessionData: { selectedEstablishment: { prisonId: 'BLI', prisonName: 'Bristol (HMP)' } } as SessionData,
-    }
-    app = appWithAllRoutes(sessionData)
+
     return request(app)
       .post(`/change-establishment`)
       .send('establishment=HEX')
@@ -108,18 +129,13 @@ describe.skip('POST /change-establishment', () => {
 
   it('should clear session, set selected establishment and redirect to home page', () => {
     jest.spyOn(visitorUtils, 'clearSession')
-    const sessionData = {
-      sessionData: { selectedEstablishment: { prisonId: 'BLI', prisonName: 'Bristol (HMP)' } } as SessionData,
-    }
 
-    app = appWithAllRoutes(sessionData)
     return request(app)
       .post(`/change-establishment`)
       .send('establishment=HEI')
       .expect(302)
       .expect('location', `/`)
       .expect(() => {
-        // expect(sessionData).toBe('')
         expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)
       })
   })
