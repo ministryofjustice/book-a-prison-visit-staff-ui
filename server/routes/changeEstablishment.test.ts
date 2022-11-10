@@ -21,6 +21,7 @@ const supportedPrisons = [
 
 beforeEach(() => {
   supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
+  config.features.establishmentSwitcherEnabled = true
 })
 
 afterEach(() => {
@@ -29,7 +30,6 @@ afterEach(() => {
 
 describe('GET /change-establishment', () => {
   it('should render select establishment page, with default establishment selected', () => {
-    config.features.establishmentSwitcherEnabled = true
     app = appWithAllRoutes({
       supportedPrisonsServiceOverride: supportedPrisonsService,
       systemTokenOverride: systemToken,
@@ -49,7 +49,6 @@ describe('GET /change-establishment', () => {
   })
 
   it('should render select establishment page, with current establishment selected', () => {
-    config.features.establishmentSwitcherEnabled = true
     app = appWithAllRoutes({
       supportedPrisonsServiceOverride: supportedPrisonsService,
       systemTokenOverride: systemToken,
@@ -76,28 +75,20 @@ describe('GET /change-establishment', () => {
       systemTokenOverride: systemToken,
     })
 
-    return request(app)
-      .get('/change-establishment')
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        const $ = cheerio.load(res.text)
-        expect($('h1').text()).toBe('Error')
-        expect($('input[name="establishment"]').length).toBe(0)
-      })
+    return request(app).get('/change-establishment').expect(404)
   })
 })
 
 describe('POST /change-establishment', () => {
-  config.features.establishmentSwitcherEnabled = true
-
-  app = appWithAllRoutes({
-    supportedPrisonsServiceOverride: supportedPrisonsService,
-    systemTokenOverride: systemToken,
+  beforeEach(() => {
+    jest.spyOn(visitorUtils, 'clearSession')
+    app = appWithAllRoutes({
+      supportedPrisonsServiceOverride: supportedPrisonsService,
+      systemTokenOverride: systemToken,
+    })
   })
 
   it('should set validation errors if no establishment selected', () => {
-    jest.spyOn(visitorUtils, 'clearSession')
-
     return request(app)
       .post(`/change-establishment`)
       .send('establishment=')
@@ -112,8 +103,6 @@ describe('POST /change-establishment', () => {
   })
 
   it('should set validation errors if invalid establishment selected', () => {
-    jest.spyOn(visitorUtils, 'clearSession')
-
     return request(app)
       .post(`/change-establishment`)
       .send('establishment=HEX')
@@ -128,8 +117,6 @@ describe('POST /change-establishment', () => {
   })
 
   it('should clear session, set selected establishment and redirect to home page', () => {
-    jest.spyOn(visitorUtils, 'clearSession')
-
     return request(app)
       .post(`/change-establishment`)
       .send('establishment=HEI')
@@ -138,5 +125,11 @@ describe('POST /change-establishment', () => {
       .expect(() => {
         expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)
       })
+  })
+
+  it('should not post if feature flag is disabled', () => {
+    config.features.establishmentSwitcherEnabled = false
+
+    return request(app).post(`/change-establishment`).send('establishment=HEI').expect(404)
   })
 })

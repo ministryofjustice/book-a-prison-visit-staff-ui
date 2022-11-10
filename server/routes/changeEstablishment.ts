@@ -28,7 +28,7 @@ export default function routes(router: Router, supportedPrisonsService: Supporte
     })
   })
 
-  post('/', async (req, res) => {
+  post('/', establishmentSwitcherCheckMiddleware, async (req, res) => {
     const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(res.locals.user?.username)
     await body('establishment').isIn(getPrisonIds(supportedPrisons)).withMessage('No prison selected').run(req)
 
