@@ -39,7 +39,10 @@ export default function routes(router: Router, supportedPrisonsService: Supporte
     }
 
     clearSession(req)
-    req.session.selectedEstablishment = supportedPrisons.find(prison => prison.prisonId === req.body.establishment)
+
+    const newEstablishment = supportedPrisons.find(prison => prison.prisonId === req.body.establishment)
+    req.session.selectedEstablishment = Object.assign(req.session.selectedEstablishment ?? {}, newEstablishment)
+
     return res.redirect('/')
   })
 

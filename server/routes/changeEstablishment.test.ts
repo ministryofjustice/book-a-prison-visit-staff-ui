@@ -52,7 +52,7 @@ describe('GET /change-establishment', () => {
     app = appWithAllRoutes({
       supportedPrisonsServiceOverride: supportedPrisonsService,
       systemTokenOverride: systemToken,
-      sessionData: { selectedEstablishment: { prisonId: 'BLI', prisonName: 'Bristol (HMP)' } } as SessionData,
+      sessionData: { selectedEstablishment: supportedPrisons[1] } as SessionData,
     })
 
     return request(app)
@@ -80,11 +80,16 @@ describe('GET /change-establishment', () => {
 })
 
 describe('POST /change-establishment', () => {
+  let sessionData: SessionData
+
   beforeEach(() => {
     jest.spyOn(visitorUtils, 'clearSession')
+    sessionData = { selectedEstablishment: supportedPrisons[1] } as SessionData
+
     app = appWithAllRoutes({
       supportedPrisonsServiceOverride: supportedPrisonsService,
       systemTokenOverride: systemToken,
+      sessionData,
     })
   })
 
@@ -95,6 +100,7 @@ describe('POST /change-establishment', () => {
       .expect(302)
       .expect('location', `/change-establishment`)
       .expect(() => {
+        expect(sessionData.selectedEstablishment).toStrictEqual(supportedPrisons[1])
         expect(flashProvider).toHaveBeenCalledWith('errors', [
           { location: 'body', msg: 'No prison selected', param: 'establishment', value: '' },
         ])
@@ -109,6 +115,7 @@ describe('POST /change-establishment', () => {
       .expect(302)
       .expect('location', `/change-establishment`)
       .expect(() => {
+        expect(sessionData.selectedEstablishment).toStrictEqual(supportedPrisons[1])
         expect(flashProvider).toHaveBeenCalledWith('errors', [
           { location: 'body', msg: 'No prison selected', param: 'establishment', value: 'HEX' },
         ])
@@ -123,6 +130,7 @@ describe('POST /change-establishment', () => {
       .expect(302)
       .expect('location', `/`)
       .expect(() => {
+        expect(sessionData.selectedEstablishment).toStrictEqual(supportedPrisons[0])
         expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)
       })
   })
