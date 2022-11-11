@@ -1,6 +1,7 @@
 import type { Express } from 'express'
 import request from 'supertest'
 import createError from 'http-errors'
+import config from '../config'
 import PrisonerSearchService from '../services/prisonerSearchService'
 import VisitSessionsService from '../services/visitSessionsService'
 import { appWithAllRoutes } from './testutils/appSetup'
@@ -42,6 +43,7 @@ let getPrisonerReturnData: Prisoner
 let getVisit: VisitInformation
 
 beforeEach(() => {
+  config.features.establishmentSwitcherEnabled = true
   app = appWithAllRoutes({
     prisonerSearchServiceOverride: prisonerSearchService,
     visitSessionsServiceOverride: visitSessionsService,
@@ -63,6 +65,17 @@ describe('Prisoner search page', () => {
           .expect('Content-Type', /html/)
           .expect(res => {
             expect(res.text).toContain('Search for a prisoner')
+            expect(res.text).toContain('Change establishment')
+          })
+      })
+      it('should not display change establishment link if feature flag disabled', () => {
+        config.features.establishmentSwitcherEnabled = false
+        return request(app)
+          .get('/search/prisoner')
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            expect(res.text).toContain('Search for a prisoner')
+            expect(res.text).not.toContain('Change establishment')
           })
       })
     })
@@ -379,6 +392,17 @@ describe('Booking search page', () => {
         .expect('Content-Type', /html/)
         .expect(res => {
           expect(res.text).toContain('Search for a booking')
+          expect(res.text).toContain('Change establishment')
+        })
+    })
+    it('should not display change establishment link if feature flag disabled', () => {
+      config.features.establishmentSwitcherEnabled = false
+      return request(app)
+        .get('/search/visit')
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          expect(res.text).toContain('Search for a booking')
+          expect(res.text).not.toContain('Change establishment')
         })
     })
   })

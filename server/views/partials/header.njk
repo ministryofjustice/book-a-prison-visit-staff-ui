@@ -43,4 +43,9 @@
   <span class="location-bar__location" data-test="active-location">
     {{ selectedEstablishment.prisonName }}
   </span>
+  {% if showEstablishmentSwitcher %}
+    <span class="location-bar__location" data-test="change-establishment">
+      <a class="govuk-link" href="/change-establishment">Change establishment</a>
+    </span>
+  {% endif %}
 </div>
