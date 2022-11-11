@@ -13,10 +13,12 @@ import {
 import { PrisonerAlertItem } from '../@types/bapv'
 import { Visit } from '../data/visitSchedulerApiTypes'
 import { Contact } from '../data/prisonerContactRegistryApiTypes'
+import SupportedPrisonsService from './supportedPrisonsService'
 
 jest.mock('../data/prisonApiClient')
 jest.mock('../data/visitSchedulerApiClient')
 jest.mock('../data/prisonerContactRegistryApiClient')
+jest.mock('./supportedPrisonsService')
 
 const offenderNo = 'A1234BC'
 const prisonId = 'HEI'
@@ -25,6 +27,7 @@ const visitSchedulerApiClient = new VisitSchedulerApiClient(null) as jest.Mocked
 const prisonerContactRegistryApiClient = new PrisonerContactRegistryApiClient(
   null,
 ) as jest.Mocked<PrisonerContactRegistryApiClient>
+const supportedPrisonsService = new SupportedPrisonsService(null, null) as jest.Mocked<SupportedPrisonsService>
 
 describe('Prisoner profile service', () => {
   let prisonApiClientBuilder
@@ -42,6 +45,7 @@ describe('Prisoner profile service', () => {
       prisonApiClientBuilder,
       visitSchedulerApiClientBuilder,
       prisonerContactRegistryApiClientBuilder,
+      supportedPrisonsService,
       systemToken,
     )
   })
@@ -131,6 +135,7 @@ describe('Prisoner profile service', () => {
       visitSchedulerApiClient.getUpcomingVisits.mockResolvedValue([visit])
       visitSchedulerApiClient.getPastVisits.mockResolvedValue([visit])
       prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue(socialContacts)
+      supportedPrisonsService.getSupportedPrison.mockResolvedValue({ prisonId: 'HEI', prisonName: 'Hewell (HMP)' })
 
       const results = await prisonerProfileService.getProfile(offenderNo, prisonId, 'user')
 
@@ -138,6 +143,8 @@ describe('Prisoner profile service', () => {
       expect(prisonApiClient.getOffender).toHaveBeenCalledTimes(1)
       expect(prisonApiClient.getVisitBalances).toHaveBeenCalledTimes(1)
       expect(prisonerContactRegistryApiClient.getPrisonerSocialContacts).toHaveBeenCalledTimes(1)
+      expect(supportedPrisonsService.getSupportedPrison.mock.calls).toEqual([['HEI'], ['HEI']])
+
       expect(results).toEqual({
         displayName: 'Smith, John',
         displayDob: '12 October 1980',

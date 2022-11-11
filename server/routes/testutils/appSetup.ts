@@ -142,6 +142,7 @@ function appSetup({
       prisonApiClientBuilder,
       visitSchedulerApiClientBuilder,
       prisonerContactRegistryApiClientBuilder,
+      supportedPrisonsServiceOverride || new SupportedPrisonsService(visitSchedulerApiClientBuilder, systemToken),
       systemTokenTest,
     )
   app.use(

@@ -22,6 +22,7 @@ import {
 import { Alert, InmateDetail, OffenderRestriction, VisitBalances } from '../data/prisonApiTypes'
 import { Visit, Visitor } from '../data/visitSchedulerApiTypes'
 import { Contact } from '../data/prisonerContactRegistryApiTypes'
+import SupportedPrisonsService from './supportedPrisonsService'
 
 type PrisonApiClientBuilder = (token: string) => PrisonApiClient
 type VisitSchedulerApiClientBuilder = (token: string) => VisitSchedulerApiClient
@@ -34,6 +35,7 @@ export default class PrisonerProfileService {
     private readonly prisonApiClientBuilder: PrisonApiClientBuilder,
     private readonly visitSchedulerApiClientBuilder: VisitSchedulerApiClientBuilder,
     private readonly prisonerContactRegistryApiClientBuilder: PrisonerContactRegistryApiClientBuilder,
+    private readonly supportedPrisonsService: SupportedPrisonsService,
     private readonly systemToken: SystemToken,
   ) {}
 
@@ -163,38 +165,41 @@ export default class PrisonerProfileService {
     const visits: Visit[] = await visitSchedulerApiClient.getUpcomingVisits(offenderNo, prisonId)
     const socialVisits: Visit[] = visits.filter(visit => visit.visitType === 'SOCIAL')
 
-    const visitsForDisplay: UpcomingVisitItem[] = socialVisits.map(visit => {
-      const visitContactNames = this.getPrisonerSocialContacts(socialContacts, visit.visitors)
+    const visitsForDisplay: UpcomingVisitItem[] = await Promise.all(
+      socialVisits.map(async visit => {
+        const visitContactNames = this.getPrisonerSocialContacts(socialContacts, visit.visitors)
+        const prison = await this.supportedPrisonsService.getSupportedPrison(visit.prisonId)
 
-      return [
-        {
-          html: formatVisitType(visit.visitType),
-          attributes: {
-            'data-test': 'tab-upcoming-type',
+        return [
+          {
+            html: formatVisitType(visit.visitType),
+            attributes: {
+              'data-test': 'tab-upcoming-type',
+            },
           },
-        },
-        {
-          text: 'Hewell (HMP)', // @TODO to be fixed in VB-1401
-          attributes: {
-            'data-test': 'tab-upcoming-location',
+          {
+            text: prison.prisonName,
+            attributes: {
+              'data-test': 'tab-upcoming-location',
+            },
           },
-        },
-        {
-          html: visit.startTimestamp
-            ? `<p>${visitDateAndTime({ startTimestamp: visit.startTimestamp, endTimestamp: visit.endTimestamp })}</p>`
-            : '<p>N/A</p>',
-          attributes: {
-            'data-test': 'tab-upcoming-date-and-time',
+          {
+            html: visit.startTimestamp
+              ? `<p>${visitDateAndTime({ startTimestamp: visit.startTimestamp, endTimestamp: visit.endTimestamp })}</p>`
+              : '<p>N/A</p>',
+            attributes: {
+              'data-test': 'tab-upcoming-date-and-time',
+            },
           },
-        },
-        {
-          html: `<p>${visitContactNames.join('<br>')}</p>`,
-          attributes: {
-            'data-test': 'tab-upcoming-visitors',
+          {
+            html: `<p>${visitContactNames.join('<br>')}</p>`,
+            attributes: {
+              'data-test': 'tab-upcoming-visitors',
+            },
           },
-        },
-      ] as UpcomingVisitItem
-    })
+        ] as UpcomingVisitItem
+      }),
+    )
 
     return visitsForDisplay
   }
@@ -208,44 +213,47 @@ export default class PrisonerProfileService {
     const visits: Visit[] = await visitSchedulerApiClient.getPastVisits(offenderNo, prisonId)
     const socialVisits: Visit[] = visits.filter(visit => visit.visitType === 'SOCIAL')
 
-    const visitsForDisplay: PastVisitItem[] = socialVisits.map(visit => {
-      const visitContactNames = this.getPrisonerSocialContacts(socialContacts, visit.visitors)
+    const visitsForDisplay: PastVisitItem[] = await Promise.all(
+      socialVisits.map(async visit => {
+        const visitContactNames = this.getPrisonerSocialContacts(socialContacts, visit.visitors)
+        const prison = await this.supportedPrisonsService.getSupportedPrison(visit.prisonId)
 
-      return [
-        {
-          html: formatVisitType(visit.visitType),
-          attributes: {
-            'data-test': 'tab-past-type',
+        return [
+          {
+            html: formatVisitType(visit.visitType),
+            attributes: {
+              'data-test': 'tab-past-type',
+            },
           },
-        },
-        {
-          text: 'Hewell (HMP)', // @TODO to be fixed in VB-1401
-          attributes: {
-            'data-test': 'tab-past-location',
+          {
+            text: prison.prisonName,
+            attributes: {
+              'data-test': 'tab-past-location',
+            },
           },
-        },
-        {
-          html: visit.startTimestamp
-            ? `<p>${visitDateAndTime({ startTimestamp: visit.startTimestamp, endTimestamp: visit.endTimestamp })}</p>`
-            : '<p>N/A</p>',
-          attributes: {
-            'data-test': 'tab-past-date-and-time',
+          {
+            html: visit.startTimestamp
+              ? `<p>${visitDateAndTime({ startTimestamp: visit.startTimestamp, endTimestamp: visit.endTimestamp })}</p>`
+              : '<p>N/A</p>',
+            attributes: {
+              'data-test': 'tab-past-date-and-time',
+            },
           },
-        },
-        {
-          html: `<p>${visitContactNames.join('<br>')}</p>`,
-          attributes: {
-            'data-test': 'tab-past-visitors',
+          {
+            html: `<p>${visitContactNames.join('<br>')}</p>`,
+            attributes: {
+              'data-test': 'tab-past-visitors',
+            },
           },
-        },
-        {
-          text: `${properCase(visit.visitStatus)}`,
-          attributes: {
-            'data-test': 'tab-past-status',
+          {
+            text: `${properCase(visit.visitStatus)}`,
+            attributes: {
+              'data-test': 'tab-past-status',
+            },
           },
-        },
-      ] as PastVisitItem
-    })
+        ] as PastVisitItem
+      }),
+    )
 
     return visitsForDisplay
   }
