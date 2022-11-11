@@ -139,6 +139,7 @@ export default function createApp(userService: UserService): express.Application
         new SupportedPrisonsService(visitSchedulerApiClientBuilder, systemToken),
         systemToken,
       ),
+      new SupportedPrisonsService(visitSchedulerApiClientBuilder, systemToken),
     ),
   )
   app.use(

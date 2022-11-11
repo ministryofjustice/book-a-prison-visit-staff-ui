@@ -25,7 +25,7 @@ export default class SupportedPrisonsService {
     return supportedPrisons
   }
 
-  private async getSupportedPrisonIds(username: string): Promise<string[]> {
+  async getSupportedPrisonIds(username: string): Promise<string[]> {
     const token = await this.systemToken(username)
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
     return visitSchedulerApiClient.getSupportedPrisonIds()
