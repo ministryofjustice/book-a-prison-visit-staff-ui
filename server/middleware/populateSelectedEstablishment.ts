@@ -1,8 +1,8 @@
 import type { NextFunction, Request, Response } from 'express'
-import { Prison } from '../@types/bapv'
+import { Prison } from '../data/prisonRegisterApiTypes'
 
 // temporarily hard-coding here pending work on establishment switcher and decision on default value
-const defaultEstablishment: Prison = { prisonId: 'HEI', prisonName: 'Hewell (HMP)' }
+const defaultEstablishment = { prisonId: 'HEI', prisonName: 'Hewell (HMP)' } as Prison
 
 export default function populateSelectedEstablishment(req: Request, res: Response, next: NextFunction) {
   if (req.session.selectedEstablishment === undefined) {

@@ -1,6 +1,6 @@
-import { Prison } from '../@types/bapv'
+import { Prison } from '../data/prisonRegisterApiTypes'
 
-const prisons: Prison[] = [
+const prisons = [
   {
     prisonId: 'HEI',
     prisonName: 'Hewell (HMP)',
@@ -9,6 +9,6 @@ const prisons: Prison[] = [
     prisonId: 'BLI',
     prisonName: 'Bristol (HMP & YOI)',
   },
-]
+] as Prison[]
 
 export default prisons

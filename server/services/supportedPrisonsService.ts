@@ -1,5 +1,6 @@
-import { Prison, SystemToken } from '../@types/bapv'
+import { SystemToken } from '../@types/bapv'
 import prisons from '../constants/prisons'
+import { Prison } from '../data/prisonRegisterApiTypes'
 import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
 
 type VisitSchedulerApiClientBuilder = (token: string) => VisitSchedulerApiClient

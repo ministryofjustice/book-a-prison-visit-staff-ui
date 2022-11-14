@@ -6,6 +6,7 @@ import config from '../config'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import * as visitorUtils from './visitorUtils'
 import SupportedPrisonsService from '../services/supportedPrisonsService'
+import { Prison } from '../data/prisonRegisterApiTypes'
 
 jest.mock('../services/supportedPrisonsService')
 
@@ -17,7 +18,7 @@ const supportedPrisonsService = new SupportedPrisonsService(null, systemToken) a
 const supportedPrisons = [
   { prisonId: 'HEI', prisonName: 'Hewell (HMP)' },
   { prisonId: 'BLI', prisonName: 'Bristol (HMP)' },
-]
+] as Prison[]
 
 beforeEach(() => {
   supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)

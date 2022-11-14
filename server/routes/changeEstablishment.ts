@@ -2,10 +2,10 @@ import type { NextFunction, RequestHandler, Router } from 'express'
 import { NotFound } from 'http-errors'
 import { body, validationResult } from 'express-validator'
 import config from '../config'
-import { Prison } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import SupportedPrisonsService from '../services/supportedPrisonsService'
 import { clearSession } from './visitorUtils'
+import { Prison } from '../data/prisonRegisterApiTypes'
 
 export default function routes(router: Router, supportedPrisonsService: SupportedPrisonsService): Router {
   const get = (path: string, ...handlers: RequestHandler[]) =>

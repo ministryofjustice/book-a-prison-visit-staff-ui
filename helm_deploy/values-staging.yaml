@@ -20,6 +20,7 @@ generic-service:
     VISIT_SCHEDULER_API_URL: "https://visit-scheduler-staging.prison.service.justice.gov.uk"
     PRISONER_CONTACT_REGISTRY_API_URL: "https://prisoner-contact-registry-staging.prison.service.justice.gov.uk"
     WHEREABOUTS_API_URL: "https://whereabouts-api-dev.service.justice.gov.uk"
+    PRISON_REGISTER_API_URL: "https://prison-register-dev.hmpps.service.justice.gov.uk"
     DPS_URL: "https://digital-dev.prison.service.justice.gov.uk/"
     SMS_NOTIFICATIONS_ENABLED: "true"
     FEATURE_ESTABLISHMENT_SWITCHER_ENABLED: "false"

@@ -14,6 +14,7 @@ import { PrisonerAlertItem } from '../@types/bapv'
 import { Visit } from '../data/visitSchedulerApiTypes'
 import { Contact } from '../data/prisonerContactRegistryApiTypes'
 import SupportedPrisonsService from './supportedPrisonsService'
+import { Prison } from '../data/prisonRegisterApiTypes'
 
 jest.mock('../data/prisonApiClient')
 jest.mock('../data/visitSchedulerApiClient')
@@ -135,7 +136,10 @@ describe('Prisoner profile service', () => {
       visitSchedulerApiClient.getUpcomingVisits.mockResolvedValue([visit])
       visitSchedulerApiClient.getPastVisits.mockResolvedValue([visit])
       prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue(socialContacts)
-      supportedPrisonsService.getSupportedPrison.mockResolvedValue({ prisonId: 'HEI', prisonName: 'Hewell (HMP)' })
+      supportedPrisonsService.getSupportedPrison.mockResolvedValue({
+        prisonId: 'HEI',
+        prisonName: 'Hewell (HMP)',
+      } as Prison)
 
       const results = await prisonerProfileService.getProfile(offenderNo, prisonId, 'user')
 
