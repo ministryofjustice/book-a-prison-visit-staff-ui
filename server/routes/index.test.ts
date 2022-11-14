@@ -1,11 +1,14 @@
 import type { Express } from 'express'
 import request from 'supertest'
+import * as cheerio from 'cheerio'
 import { appWithAllRoutes } from './testutils/appSetup'
 import * as visitorUtils from './visitorUtils'
+import config from '../config'
 
 let app: Express
 
 beforeEach(() => {
+  config.features.establishmentSwitcherEnabled = true
   app = appWithAllRoutes({})
 })
 
@@ -21,10 +24,25 @@ describe('GET /', () => {
       .get('/')
       .expect('Content-Type', /html/)
       .expect(res => {
+        const $ = cheerio.load(res.text)
         expect(res.text).toContain('Manage prison visits')
         expect(res.text).toContain('Book a visit')
         expect(res.text).toContain('Change a visit')
         expect(res.text).toContain('View visits by date')
+        expect($('[data-test="change-establishment"]').text()).toContain('Change establishment')
+      })
+  })
+  it('should not display change establishment link if feature flag disabled', () => {
+    config.features.establishmentSwitcherEnabled = false
+    app = appWithAllRoutes({})
+
+    return request(app)
+      .get('/')
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect(res.text).toContain('Manage prison visits')
+        expect($('[data-test="change-establishment"]').text()).not.toContain('Change establishment')
       })
   })
 })

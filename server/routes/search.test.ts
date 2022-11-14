@@ -1,6 +1,8 @@
 import type { Express } from 'express'
 import request from 'supertest'
+import * as cheerio from 'cheerio'
 import createError from 'http-errors'
+import config from '../config'
 import PrisonerSearchService from '../services/prisonerSearchService'
 import VisitSessionsService from '../services/visitSessionsService'
 import { appWithAllRoutes } from './testutils/appSetup'
@@ -42,6 +44,7 @@ let getPrisonerReturnData: Prisoner
 let getVisit: VisitInformation
 
 beforeEach(() => {
+  config.features.establishmentSwitcherEnabled = true
   app = appWithAllRoutes({
     prisonerSearchServiceOverride: prisonerSearchService,
     visitSessionsServiceOverride: visitSessionsService,
@@ -62,7 +65,20 @@ describe('Prisoner search page', () => {
           .get('/search/prisoner')
           .expect('Content-Type', /html/)
           .expect(res => {
+            const $ = cheerio.load(res.text)
             expect(res.text).toContain('Search for a prisoner')
+            expect($('[data-test="change-establishment"]').text()).toContain('Change establishment')
+          })
+      })
+      it('should not display change establishment link if feature flag disabled', () => {
+        config.features.establishmentSwitcherEnabled = false
+        return request(app)
+          .get('/search/prisoner')
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect(res.text).toContain('Search for a prisoner')
+            expect($('[data-test="change-establishment"]').text()).not.toContain('Change establishment')
           })
       })
     })
@@ -378,7 +394,20 @@ describe('Booking search page', () => {
         .get('/search/visit')
         .expect('Content-Type', /html/)
         .expect(res => {
+          const $ = cheerio.load(res.text)
           expect(res.text).toContain('Search for a booking')
+          expect($('[data-test="change-establishment"]').text()).toContain('Change establishment')
+        })
+    })
+    it('should not display change establishment link if feature flag disabled', () => {
+      config.features.establishmentSwitcherEnabled = false
+      return request(app)
+        .get('/search/visit')
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect(res.text).toContain('Search for a booking')
+          expect($('[data-test="change-establishment"]').text()).not.toContain('Change establishment')
         })
     })
   })

@@ -26,7 +26,11 @@ export default function routes(
   get(['/prisoner', '/prisoner-visit'], (req, res) => {
     const search = req?.body?.search
 
-    res.render('pages/search/prisoner', { search, visit: req.originalUrl.includes('-visit') })
+    res.render('pages/search/prisoner', {
+      search,
+      visit: req.originalUrl.includes('-visit'),
+      showEstablishmentSwitcher: config.features.establishmentSwitcherEnabled,
+    })
   })
 
   post(['/prisoner', '/prisoner-visit'], body('search').trim('. '), (req, res) => {
@@ -90,6 +94,7 @@ export default function routes(
       to,
       pageLinks: numberOfPages <= 1 ? [] : pageLinks,
       visit: isVisit,
+      showEstablishmentSwitcher: config.features.establishmentSwitcherEnabled,
     })
   })
 
@@ -99,7 +104,13 @@ export default function routes(
     const searchBlock3 = req?.body?.searchBlock3
     const searchBlock4 = req?.body?.searchBlock4
 
-    res.render('pages/search/visit', { searchBlock1, searchBlock2, searchBlock3, searchBlock4 })
+    res.render('pages/search/visit', {
+      searchBlock1,
+      searchBlock2,
+      searchBlock3,
+      searchBlock4,
+      showEstablishmentSwitcher: config.features.establishmentSwitcherEnabled,
+    })
   })
 
   post('/visit', (req, res) => {
@@ -181,6 +192,7 @@ export default function routes(
       from: (parsedPage - 1) * pageSize + 1,
       to,
       pageLinks: numberOfPages <= 1 ? [] : pageLinks,
+      showEstablishmentSwitcher: config.features.establishmentSwitcherEnabled,
     })
   })
 
