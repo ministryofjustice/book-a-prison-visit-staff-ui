@@ -1,6 +1,4 @@
-.govuk-main-wrapper a:not(.govuk-button, .govuk-tabs__tab):visited {
-  color: $govuk-link-colour;
-}
+.govuk-main-wrapper a:not(.govuk-button, .govuk-tabs__tab):visited,
 .location-bar .location-bar__location a:visited {
   color: $govuk-link-colour;
 }
