@@ -52,4 +52,16 @@ describe('Supported prisons service', () => {
       expect(results).toStrictEqual(prisons)
     })
   })
+
+  describe('getSupportedPrisonIds', () => {
+    it('should return an array of supported prison IDs', async () => {
+      const supportedPrisonIds = ['HEI', 'BLI']
+      visitSchedulerApiClient.getSupportedPrisonIds.mockResolvedValue(supportedPrisonIds)
+
+      const results = await supportedPrisonsService.getSupportedPrisonIds('user')
+
+      expect(visitSchedulerApiClient.getSupportedPrisonIds).toHaveBeenCalledTimes(1)
+      expect(results).toStrictEqual(supportedPrisonIds)
+    })
+  })
 })

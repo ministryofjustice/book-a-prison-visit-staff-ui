@@ -25,6 +25,7 @@ import CheckYourBooking from './visitJourney/checkYourBooking'
 import Confirmation from './visitJourney/confirmation'
 import MainContact from './visitJourney/mainContact'
 import sessionCheckMiddleware from '../middleware/sessionCheckMiddleware'
+import SupportedPrisonsService from '../services/supportedPrisonsService'
 
 export default function routes(
   router: Router,
@@ -34,6 +35,7 @@ export default function routes(
   auditService: AuditService,
   prisonerVisitorsService: PrisonerVisitorsService,
   prisonerProfileService: PrisonerProfileService,
+  supportedPrisonsService: SupportedPrisonsService,
 ): Router {
   const get = (path: string, ...handlers: RequestHandler[]) =>
     router.get(
@@ -72,9 +74,11 @@ export default function routes(
       })
 
     const prisoner: Prisoner = await prisonerSearchService.getPrisonerById(visit.prisonerId, res.locals.user?.username)
-    // Temporarily hide any locations other than Hewell pending more work on transfer/release (see VB-907, VB-952)
-    const prisonerLocation =
-      prisoner.prisonId === 'HEI' ? `${prisoner.cellLocation}, ${prisoner.prisonName}` : 'Unknown'
+    const supportedPrisonIds = await supportedPrisonsService.getSupportedPrisonIds(res.locals.user?.username)
+
+    const prisonerLocation = supportedPrisonIds.includes(prisoner.prisonId)
+      ? `${prisoner.cellLocation}, ${prisoner.prisonName}`
+      : 'Unknown'
 
     await auditService.viewedVisitDetails({
       visitReference: reference,

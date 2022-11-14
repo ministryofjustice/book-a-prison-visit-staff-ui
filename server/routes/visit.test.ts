@@ -6,6 +6,7 @@ import PrisonerSearchService from '../services/prisonerSearchService'
 import VisitSessionsService from '../services/visitSessionsService'
 import AuditService from '../services/auditService'
 import PrisonerVisitorsService from '../services/prisonerVisitorsService'
+import SupportedPrisonsService from '../services/supportedPrisonsService'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import { OutcomeDto, Visit } from '../data/visitSchedulerApiTypes'
 import { VisitorListItem, VisitSessionData } from '../@types/bapv'
@@ -19,6 +20,7 @@ jest.mock('../services/visitSessionsService')
 jest.mock('../services/auditService')
 jest.mock('../services/prisonerVisitorsService')
 jest.mock('../services/prisonerProfileService')
+jest.mock('../services/supportedPrisonsService')
 
 let app: Express
 const systemToken = async (user: string): Promise<string> => `${user}-token-1`
@@ -34,6 +36,7 @@ const visitSessionsService = new VisitSessionsService(
 ) as jest.Mocked<VisitSessionsService>
 const auditService = new AuditService() as jest.Mocked<AuditService>
 const prisonerVisitorsService = new PrisonerVisitorsService(null, systemToken) as jest.Mocked<PrisonerVisitorsService>
+const supportedPrisonsService = new SupportedPrisonsService(null, systemToken) as jest.Mocked<SupportedPrisonsService>
 
 jest.mock('./visitorUtils', () => {
   const visitorUtils = jest.requireActual('./visitorUtils')
@@ -164,6 +167,7 @@ describe('GET /visit/:reference', () => {
     prisonerSearchService.getPrisonerById.mockResolvedValue(prisoner)
     visitSessionsService.getFullVisitDetails.mockResolvedValue({ visit, visitors, additionalSupport })
     prisonerVisitorsService.getVisitors.mockResolvedValue(visitors)
+    supportedPrisonsService.getSupportedPrisonIds.mockResolvedValue(['HEI'])
 
     visitSessionData = { prisoner: undefined }
 
@@ -172,6 +176,7 @@ describe('GET /visit/:reference', () => {
       visitSessionsServiceOverride: visitSessionsService,
       auditServiceOverride: auditService,
       prisonerVisitorsServiceOverride: prisonerVisitorsService,
+      supportedPrisonsServiceOverride: supportedPrisonsService,
       systemTokenOverride: systemToken,
       sessionData: {
         visitSessionData,
@@ -419,8 +424,7 @@ describe('GET /visit/:reference', () => {
       })
   })
 
-  // Temporarily hiding any locations other than Hewell pending more work on transfer/release (see VB-907, VB-952)
-  it('should render full booking summary page with prisoner - but showing location as Unknown if not Hewell', () => {
+  it('should render full booking summary page with prisoner location showing as "Unknown" if not a supported prison', () => {
     const transferPrisoner: Prisoner = {
       firstName: 'JOHN',
       lastName: 'SMITH',
