@@ -1,5 +1,6 @@
 import type { Express } from 'express'
 import request from 'supertest'
+import * as cheerio from 'cheerio'
 import createError from 'http-errors'
 import config from '../config'
 import PrisonerSearchService from '../services/prisonerSearchService'
@@ -64,8 +65,9 @@ describe('Prisoner search page', () => {
           .get('/search/prisoner')
           .expect('Content-Type', /html/)
           .expect(res => {
+            const $ = cheerio.load(res.text)
             expect(res.text).toContain('Search for a prisoner')
-            expect(res.text).toContain('Change establishment')
+            expect($('[data-test="change-establishment"]').text()).toContain('Change establishment')
           })
       })
       it('should not display change establishment link if feature flag disabled', () => {
@@ -74,8 +76,9 @@ describe('Prisoner search page', () => {
           .get('/search/prisoner')
           .expect('Content-Type', /html/)
           .expect(res => {
+            const $ = cheerio.load(res.text)
             expect(res.text).toContain('Search for a prisoner')
-            expect(res.text).not.toContain('Change establishment')
+            expect($('[data-test="change-establishment"]').text()).not.toContain('Change establishment')
           })
       })
     })
@@ -391,8 +394,9 @@ describe('Booking search page', () => {
         .get('/search/visit')
         .expect('Content-Type', /html/)
         .expect(res => {
+          const $ = cheerio.load(res.text)
           expect(res.text).toContain('Search for a booking')
-          expect(res.text).toContain('Change establishment')
+          expect($('[data-test="change-establishment"]').text()).toContain('Change establishment')
         })
     })
     it('should not display change establishment link if feature flag disabled', () => {
@@ -401,8 +405,9 @@ describe('Booking search page', () => {
         .get('/search/visit')
         .expect('Content-Type', /html/)
         .expect(res => {
+          const $ = cheerio.load(res.text)
           expect(res.text).toContain('Search for a booking')
-          expect(res.text).not.toContain('Change establishment')
+          expect($('[data-test="change-establishment"]').text()).not.toContain('Change establishment')
         })
     })
   })

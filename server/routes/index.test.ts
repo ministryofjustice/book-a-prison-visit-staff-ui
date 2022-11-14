@@ -1,5 +1,6 @@
 import type { Express } from 'express'
 import request from 'supertest'
+import * as cheerio from 'cheerio'
 import { appWithAllRoutes } from './testutils/appSetup'
 import * as visitorUtils from './visitorUtils'
 import config from '../config'
@@ -23,11 +24,12 @@ describe('GET /', () => {
       .get('/')
       .expect('Content-Type', /html/)
       .expect(res => {
+        const $ = cheerio.load(res.text)
         expect(res.text).toContain('Manage prison visits')
         expect(res.text).toContain('Book a visit')
         expect(res.text).toContain('Change a visit')
         expect(res.text).toContain('View visits by date')
-        expect(res.text).toContain('Change establishment')
+        expect($('[data-test="change-establishment"]').text()).toContain('Change establishment')
       })
   })
   it('should not display change establishment link if feature flag disabled', () => {
@@ -38,8 +40,9 @@ describe('GET /', () => {
       .get('/')
       .expect('Content-Type', /html/)
       .expect(res => {
+        const $ = cheerio.load(res.text)
         expect(res.text).toContain('Manage prison visits')
-        expect(res.text).not.toContain('Change establishment')
+        expect($('[data-test="change-establishment"]').text()).not.toContain('Change establishment')
       })
   })
 })
