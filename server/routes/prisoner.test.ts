@@ -27,6 +27,7 @@ const prisonerProfileService = new PrisonerProfileService(
   null,
   null,
   null,
+  null,
   systemToken,
 ) as jest.Mocked<PrisonerProfileService>
 const prisonerSearchService = new PrisonerSearchService(null, systemToken) as jest.Mocked<PrisonerSearchService>

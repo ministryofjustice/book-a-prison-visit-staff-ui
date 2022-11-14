@@ -21,6 +21,18 @@ describe('Supported prisons service', () => {
     jest.resetAllMocks()
   })
 
+  describe('getSupportedPrison', () => {
+    it('should return a supported prison given its prisonId', async () => {
+      const results = await supportedPrisonsService.getSupportedPrison('HEI')
+      expect(results).toEqual({ prisonId: 'HEI', prisonName: 'Hewell (HMP)' })
+    })
+
+    it('should return undefined for an unsupported prisonId', async () => {
+      const results = await supportedPrisonsService.getSupportedPrison('XYZ')
+      expect(results).toBe(undefined)
+    })
+  })
+
   describe('getSupportedPrisons', () => {
     it('should return an array of supported prison IDs and names', async () => {
       const supportedPrisonIds = ['HEI', 'BLI']

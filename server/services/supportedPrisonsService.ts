@@ -10,6 +10,10 @@ export default class SupportedPrisonsService {
     private readonly systemToken: SystemToken,
   ) {}
 
+  async getSupportedPrison(prisonId: string): Promise<Prison> {
+    return this.getAllPrisons().find(prison => prison.prisonId === prisonId)
+  }
+
   async getSupportedPrisons(username: string): Promise<Prison[]> {
     const prisonIds = await this.getSupportedPrisonIds(username)
     const allPrisons = this.getAllPrisons()
