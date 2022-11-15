@@ -6,7 +6,6 @@ import { Prison } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import SupportedPrisonsService from '../services/supportedPrisonsService'
 import { clearSession } from './visitorUtils'
-import logger from '../../logger'
 
 export default function routes(router: Router, supportedPrisonsService: SupportedPrisonsService): Router {
   const get = (path: string, ...handlers: RequestHandler[]) =>
@@ -51,8 +50,7 @@ export default function routes(router: Router, supportedPrisonsService: Supporte
 
     const newEstablishment = supportedPrisons.find(prison => prison.prisonId === req.body.establishment)
     req.session.selectedEstablishment = Object.assign(req.session.selectedEstablishment ?? {}, newEstablishment)
-    logger.info('REFER')
-    logger.info(refer)
+
     return res.redirect(`${refer}`)
   })
 
