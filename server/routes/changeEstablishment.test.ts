@@ -6,19 +6,20 @@ import config from '../config'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import * as visitorUtils from './visitorUtils'
 import SupportedPrisonsService from '../services/supportedPrisonsService'
-import { Prison } from '../data/prisonRegisterApiTypes'
+import { createPrisons } from '../data/__testutils/testObjects'
 
 jest.mock('../services/supportedPrisonsService')
 
 let app: Express
 const systemToken = async (user: string): Promise<string> => `${user}-token-1`
 
-const supportedPrisonsService = new SupportedPrisonsService(null, systemToken) as jest.Mocked<SupportedPrisonsService>
+const supportedPrisonsService = new SupportedPrisonsService(
+  null,
+  null,
+  systemToken,
+) as jest.Mocked<SupportedPrisonsService>
 
-const supportedPrisons = [
-  { prisonId: 'HEI', prisonName: 'Hewell (HMP)' },
-  { prisonId: 'BLI', prisonName: 'Bristol (HMP)' },
-] as Prison[]
+const supportedPrisons = createPrisons()
 
 beforeEach(() => {
   supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)

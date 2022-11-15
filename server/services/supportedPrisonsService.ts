@@ -1,23 +1,26 @@
 import { SystemToken } from '../@types/bapv'
-import prisons from '../constants/prisons'
-import { Prison } from '../data/prisonRegisterApiTypes'
+import PrisonRegisterApiClient from '../data/prisonRegisterApiClient'
 import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
+import { Prison } from '../data/prisonRegisterApiTypes'
 
 type VisitSchedulerApiClientBuilder = (token: string) => VisitSchedulerApiClient
+type PrisonRegisterApiClientBuilder = (token: string) => PrisonRegisterApiClient
 
 export default class SupportedPrisonsService {
   constructor(
     private readonly visitSchedulerApiClientBuilder: VisitSchedulerApiClientBuilder,
+    private readonly prisonRegisterApiClientBuilder: PrisonRegisterApiClientBuilder,
     private readonly systemToken: SystemToken,
   ) {}
 
-  async getSupportedPrison(prisonId: string): Promise<Prison> {
-    return this.getAllPrisons().find(prison => prison.prisonId === prisonId)
+  async getSupportedPrison(prisonId: string, username: string): Promise<Prison> {
+    const allPrisons = await this.getAllPrisons(username)
+    return allPrisons.find(prison => prison.prisonId === prisonId)
   }
 
   async getSupportedPrisons(username: string): Promise<Prison[]> {
     const prisonIds = await this.getSupportedPrisonIds(username)
-    const allPrisons = this.getAllPrisons()
+    const allPrisons = await this.getAllPrisons(username)
 
     const supportedPrisons = prisonIds
       .map(prisonId => allPrisons.find(prison => prison.prisonId === prisonId))
@@ -32,8 +35,9 @@ export default class SupportedPrisonsService {
     return visitSchedulerApiClient.getSupportedPrisonIds()
   }
 
-  // @TODO look up from static file to be replaced with call to Prison Register API
-  private getAllPrisons(): Prison[] {
-    return prisons
+  private async getAllPrisons(username: string): Promise<Prison[]> {
+    const token = await this.systemToken(username)
+    const prisonRegisterApiClient = this.prisonRegisterApiClientBuilder(token)
+    return prisonRegisterApiClient.getPrisons()
   }
 }

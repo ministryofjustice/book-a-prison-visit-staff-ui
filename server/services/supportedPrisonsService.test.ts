@@ -1,20 +1,34 @@
 import SupportedPrisonsService from './supportedPrisonsService'
-import prisons from '../constants/prisons'
 import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
+import PrisonRegisterApiClient from '../data/prisonRegisterApiClient'
+import { createPrisons, createSupportedPrisonIds } from '../data/__testutils/testObjects'
 
 jest.mock('../data/visitSchedulerApiClient')
+jest.mock('../data/prisonRegisterApiClient')
 
 const visitSchedulerApiClient = new VisitSchedulerApiClient(null) as jest.Mocked<VisitSchedulerApiClient>
+const prisonRegisterApiClient = new PrisonRegisterApiClient(null) as jest.Mocked<PrisonRegisterApiClient>
 
 describe('Supported prisons service', () => {
   let supportedPrisonsService: SupportedPrisonsService
   let visitSchedulerApiClientBuilder
+  let prisonRegisterApiClientBuilder
   let systemToken
+
+  const allPrisons = createPrisons()
+  const supportedPrisonIds = createSupportedPrisonIds()
 
   beforeEach(() => {
     systemToken = async (user: string): Promise<string> => `${user}-token-1`
     visitSchedulerApiClientBuilder = jest.fn().mockReturnValue(visitSchedulerApiClient)
-    supportedPrisonsService = new SupportedPrisonsService(visitSchedulerApiClientBuilder, systemToken)
+    prisonRegisterApiClientBuilder = jest.fn().mockReturnValue(prisonRegisterApiClient)
+    supportedPrisonsService = new SupportedPrisonsService(
+      visitSchedulerApiClientBuilder,
+      prisonRegisterApiClientBuilder,
+      systemToken,
+    )
+
+    prisonRegisterApiClient.getPrisons.mockResolvedValue(allPrisons)
   })
 
   afterEach(() => {
@@ -23,39 +37,36 @@ describe('Supported prisons service', () => {
 
   describe('getSupportedPrison', () => {
     it('should return a supported prison given its prisonId', async () => {
-      const results = await supportedPrisonsService.getSupportedPrison('HEI')
+      const results = await supportedPrisonsService.getSupportedPrison('HEI', 'user')
       expect(results).toEqual({ prisonId: 'HEI', prisonName: 'Hewell (HMP)' })
     })
 
     it('should return undefined for an unsupported prisonId', async () => {
-      const results = await supportedPrisonsService.getSupportedPrison('XYZ')
+      const results = await supportedPrisonsService.getSupportedPrison('XYZ', 'user')
       expect(results).toBe(undefined)
     })
   })
 
   describe('getSupportedPrisons', () => {
     it('should return an array of supported prison IDs and names', async () => {
-      const supportedPrisonIds = ['HEI', 'BLI']
       visitSchedulerApiClient.getSupportedPrisonIds.mockResolvedValue(supportedPrisonIds)
 
       const results = await supportedPrisonsService.getSupportedPrisons('user')
 
-      expect(results).toEqual(prisons)
+      expect(results).toEqual(allPrisons)
     })
 
     it('should ignore an unknown prison ID', async () => {
-      const supportedPrisonIds = ['HEI', 'BLI', 'unknown']
-      visitSchedulerApiClient.getSupportedPrisonIds.mockResolvedValue(supportedPrisonIds)
+      visitSchedulerApiClient.getSupportedPrisonIds.mockResolvedValue(supportedPrisonIds.concat(['XYZ']))
 
       const results = await supportedPrisonsService.getSupportedPrisons('user')
 
-      expect(results).toStrictEqual(prisons)
+      expect(results).toStrictEqual(allPrisons)
     })
   })
 
   describe('getSupportedPrisonIds', () => {
     it('should return an array of supported prison IDs', async () => {
-      const supportedPrisonIds = ['HEI', 'BLI']
       visitSchedulerApiClient.getSupportedPrisonIds.mockResolvedValue(supportedPrisonIds)
 
       const results = await supportedPrisonsService.getSupportedPrisonIds('user')

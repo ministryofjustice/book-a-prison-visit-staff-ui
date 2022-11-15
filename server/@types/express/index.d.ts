@@ -1,5 +1,6 @@
+import { Prison } from '../../data/prisonRegisterApiTypes'
 import { SupportType } from '../../data/visitSchedulerApiTypes'
-import { Prison, VisitorListItem, VisitSessionData } from '../bapv'
+import { VisitorListItem, VisitSessionData } from '../bapv'
 
 export default {}
 

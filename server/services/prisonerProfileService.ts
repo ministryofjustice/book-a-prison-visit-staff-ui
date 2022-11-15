@@ -63,12 +63,14 @@ export default class PrisonerProfileService {
       inmateDetail.agencyId, // @TODO won't need this once VB-1403 resolved
       socialContacts,
       visitSchedulerApiClient,
+      username,
     )
     const pastVisits: PastVisitItem[] = await this.getPastVisits(
       offenderNo,
       inmateDetail.agencyId, // @TODO won't need this once VB-1403 resolved
       socialContacts,
       visitSchedulerApiClient,
+      username,
     )
 
     const activeAlertsForDisplay: PrisonerAlertItem[] = activeAlerts.map(alert => {
@@ -161,6 +163,7 @@ export default class PrisonerProfileService {
     prisonId: string,
     socialContacts: Contact[],
     visitSchedulerApiClient: VisitSchedulerApiClient,
+    username: string,
   ): Promise<UpcomingVisitItem[]> {
     const visits: Visit[] = await visitSchedulerApiClient.getUpcomingVisits(offenderNo, prisonId)
     const socialVisits: Visit[] = visits.filter(visit => visit.visitType === 'SOCIAL')
@@ -168,7 +171,7 @@ export default class PrisonerProfileService {
     const visitsForDisplay: UpcomingVisitItem[] = await Promise.all(
       socialVisits.map(async visit => {
         const visitContactNames = this.getPrisonerSocialContacts(socialContacts, visit.visitors)
-        const prison = await this.supportedPrisonsService.getSupportedPrison(visit.prisonId)
+        const prison = await this.supportedPrisonsService.getSupportedPrison(visit.prisonId, username)
 
         return [
           {
@@ -209,6 +212,7 @@ export default class PrisonerProfileService {
     prisonId: string,
     socialContacts: Contact[],
     visitSchedulerApiClient: VisitSchedulerApiClient,
+    username: string,
   ): Promise<PastVisitItem[]> {
     const visits: Visit[] = await visitSchedulerApiClient.getPastVisits(offenderNo, prisonId)
     const socialVisits: Visit[] = visits.filter(visit => visit.visitType === 'SOCIAL')
@@ -216,7 +220,7 @@ export default class PrisonerProfileService {
     const visitsForDisplay: PastVisitItem[] = await Promise.all(
       socialVisits.map(async visit => {
         const visitContactNames = this.getPrisonerSocialContacts(socialContacts, visit.visitors)
-        const prison = await this.supportedPrisonsService.getSupportedPrison(visit.prisonId)
+        const prison = await this.supportedPrisonsService.getSupportedPrison(visit.prisonId, username)
 
         return [
           {
