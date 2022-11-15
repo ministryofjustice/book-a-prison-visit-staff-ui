@@ -2,6 +2,9 @@
 .location-bar .location-bar__location a:visited {
   color: $govuk-link-colour;
 }
+.location-bar .location-bar__location a {
+  font-weight: 400;
+}
 .govuk-main-wrapper {
   min-height: 600px;
 }

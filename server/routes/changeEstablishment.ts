@@ -6,6 +6,7 @@ import { Prison } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import SupportedPrisonsService from '../services/supportedPrisonsService'
 import { clearSession } from './visitorUtils'
+import logger from '../../logger'
 
 export default function routes(router: Router, supportedPrisonsService: SupportedPrisonsService): Router {
   const get = (path: string, ...handlers: RequestHandler[]) =>
@@ -22,15 +23,23 @@ export default function routes(router: Router, supportedPrisonsService: Supporte
   get('/', establishmentSwitcherCheckMiddleware, async (req, res) => {
     const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(res.locals.user?.username)
 
+    const refer = (req.query?.refer as string) ?? ''
+
     res.render('pages/changeEstablishment', {
       errors: req.flash('errors'),
       supportedPrisons,
+      refer,
     })
   })
 
   post('/', establishmentSwitcherCheckMiddleware, async (req, res) => {
     const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(res.locals.user?.username)
     await body('establishment').isIn(getPrisonIds(supportedPrisons)).withMessage('No prison selected').run(req)
+
+    let refer = (req.query?.refer as string) ?? ''
+    if (refer.length === 0) {
+      refer = '/'
+    }
 
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
@@ -42,8 +51,9 @@ export default function routes(router: Router, supportedPrisonsService: Supporte
 
     const newEstablishment = supportedPrisons.find(prison => prison.prisonId === req.body.establishment)
     req.session.selectedEstablishment = Object.assign(req.session.selectedEstablishment ?? {}, newEstablishment)
-
-    return res.redirect('/')
+    logger.info('REFER')
+    logger.info(refer)
+    return res.redirect(`${refer}`)
   })
 
   function getPrisonIds(prisons: Prison[]) {
