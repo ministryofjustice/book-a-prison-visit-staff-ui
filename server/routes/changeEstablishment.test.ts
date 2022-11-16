@@ -36,7 +36,7 @@ describe('GET /change-establishment', () => {
     })
 
     return request(app)
-      .get('/change-establishment')
+      .get('/change-establishment?referrer=/search/prisoner/')
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
@@ -45,6 +45,7 @@ describe('GET /change-establishment', () => {
         expect($('input[name="establishment"]').eq(0).prop('checked')).toBe(true)
         expect($('input[name="establishment"]').eq(1).prop('value')).toBe('BLI')
         expect($('input[name="establishment"]').length).toBe(2)
+        expect($('form').attr('action')).toBe('/change-establishment?referrer=/search/prisoner/')
       })
   })
 
@@ -65,6 +66,7 @@ describe('GET /change-establishment', () => {
         expect($('input[name="establishment"]').eq(1).prop('value')).toBe('BLI')
         expect($('input[name="establishment"]').eq(1).prop('checked')).toBe(true)
         expect($('input[name="establishment"]').length).toBe(2)
+        expect($('form').attr('action')).toBe('/change-establishment?referrer=')
       })
   })
 

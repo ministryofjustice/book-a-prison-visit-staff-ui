@@ -46,9 +46,9 @@
   {% if showEstablishmentSwitcher %}
     <span class="location-bar__location" data-test="change-establishment">
       {% if establishmentHref %}
-        <a class="govuk-link" href="/change-establishment?refer={{ establishmentHref }}">Change establishment</a>
+        <a class="govuk-link govuk-!-font-weight-regular" href="/change-establishment?referrer={{ establishmentHref }}">Change establishment</a>
       {% else %}
-        <a class="govuk-link" href="/change-establishment">Change establishment</a>
+        <a class="govuk-link govuk-!-font-weight-regular" href="/change-establishment">Change establishment</a>
       {% endif %}
     </span>
   {% endif %}

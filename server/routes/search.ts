@@ -24,14 +24,14 @@ export default function routes(
     )
 
   get(['/prisoner', '/prisoner-visit'], (req, res) => {
-    const isVisit = req.originalUrl.includes('-visit')
     const search = req?.body?.search
-    let establishmentHref = ''
+
+    const isVisit = req.originalUrl.includes('-visit')
+    let establishmentHref = '/search/prisoner/'
     if (isVisit) {
       establishmentHref = '/search/prisoner-visit/'
-    } else {
-      establishmentHref = '/search/prisoner/'
     }
+
     res.render('pages/search/prisoner', {
       search,
       visit: req.originalUrl.includes('-visit'),

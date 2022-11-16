@@ -22,12 +22,12 @@ export default function routes(router: Router, supportedPrisonsService: Supporte
   get('/', establishmentSwitcherCheckMiddleware, async (req, res) => {
     const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(res.locals.user?.username)
 
-    const refer = (req.query?.refer as string) ?? ''
+    const referrer = (req.query?.referrer as string) ?? ''
 
     res.render('pages/changeEstablishment', {
       errors: req.flash('errors'),
       supportedPrisons,
-      refer,
+      referrer,
     })
   })
 
@@ -35,9 +35,9 @@ export default function routes(router: Router, supportedPrisonsService: Supporte
     const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(res.locals.user?.username)
     await body('establishment').isIn(getPrisonIds(supportedPrisons)).withMessage('No prison selected').run(req)
 
-    let refer = (req.query?.refer as string) ?? ''
-    if (refer.length === 0) {
-      refer = '/'
+    let referrer = (req.query?.referrer as string) ?? ''
+    if (referrer.length === 0) {
+      referrer = '/'
     }
 
     const errors = validationResult(req)
@@ -51,7 +51,7 @@ export default function routes(router: Router, supportedPrisonsService: Supporte
     const newEstablishment = supportedPrisons.find(prison => prison.prisonId === req.body.establishment)
     req.session.selectedEstablishment = Object.assign(req.session.selectedEstablishment ?? {}, newEstablishment)
 
-    return res.redirect(`${refer}`)
+    return res.redirect(`${referrer}`)
   })
 
   function getPrisonIds(prisons: Prison[]) {
