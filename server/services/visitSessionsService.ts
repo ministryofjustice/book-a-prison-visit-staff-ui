@@ -243,17 +243,15 @@ export default class VisitSessionsService {
   async getUpcomingVisits({
     username,
     offenderNo,
-    prisonId,
   }: {
     username: string
     offenderNo: string
-    prisonId: string
   }): Promise<VisitInformation[]> {
     const token = await this.systemToken(username)
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
 
     logger.info(`Get upcoming visits for ${offenderNo}`)
-    const visits = await visitSchedulerApiClient.getUpcomingVisits(offenderNo, prisonId)
+    const visits = await visitSchedulerApiClient.getUpcomingVisits(offenderNo)
 
     return visits.map(visit => {
       return this.buildVisitInformation(visit)

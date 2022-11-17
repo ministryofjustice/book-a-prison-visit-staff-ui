@@ -77,7 +77,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/visitScheduler/visits\\?prisonerId=${offenderNo}&prisonId=HEI&startTimestamp=.*`,
+        urlPattern: `/visitScheduler/visits\\?prisonerId=${offenderNo}&startTimestamp=.*`,
       },
       response: {
         status: 200,
@@ -90,7 +90,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/visitScheduler/visits\\?prisonerId=${offenderNo}&prisonId=HEI&endTimestamp=.*`,
+        urlPattern: `/visitScheduler/visits\\?prisonerId=${offenderNo}&endTimestamp=.*`,
       },
       response: {
         status: 200,

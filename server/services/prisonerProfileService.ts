@@ -60,16 +60,10 @@ export default class PrisonerProfileService {
     const socialContacts = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(offenderNo)
     const upcomingVisits: UpcomingVisitItem[] = await this.getUpcomingVisits(
       offenderNo,
-      inmateDetail.agencyId, // @TODO won't need this once VB-1403 resolved
       socialContacts,
       visitSchedulerApiClient,
     )
-    const pastVisits: PastVisitItem[] = await this.getPastVisits(
-      offenderNo,
-      inmateDetail.agencyId, // @TODO won't need this once VB-1403 resolved
-      socialContacts,
-      visitSchedulerApiClient,
-    )
+    const pastVisits: PastVisitItem[] = await this.getPastVisits(offenderNo, socialContacts, visitSchedulerApiClient)
 
     const activeAlertsForDisplay: PrisonerAlertItem[] = activeAlerts.map(alert => {
       return [
@@ -158,11 +152,10 @@ export default class PrisonerProfileService {
 
   private async getUpcomingVisits(
     offenderNo: string,
-    prisonId: string,
     socialContacts: Contact[],
     visitSchedulerApiClient: VisitSchedulerApiClient,
   ): Promise<UpcomingVisitItem[]> {
-    const visits: Visit[] = await visitSchedulerApiClient.getUpcomingVisits(offenderNo, prisonId)
+    const visits: Visit[] = await visitSchedulerApiClient.getUpcomingVisits(offenderNo)
     const socialVisits: Visit[] = visits.filter(visit => visit.visitType === 'SOCIAL')
 
     const visitsForDisplay: UpcomingVisitItem[] = await Promise.all(
@@ -206,11 +199,10 @@ export default class PrisonerProfileService {
 
   private async getPastVisits(
     offenderNo: string,
-    prisonId: string,
     socialContacts: Contact[],
     visitSchedulerApiClient: VisitSchedulerApiClient,
   ): Promise<PastVisitItem[]> {
-    const visits: Visit[] = await visitSchedulerApiClient.getPastVisits(offenderNo, prisonId)
+    const visits: Visit[] = await visitSchedulerApiClient.getPastVisits(offenderNo)
     const socialVisits: Visit[] = visits.filter(visit => visit.visitType === 'SOCIAL')
 
     const visitsForDisplay: PastVisitItem[] = await Promise.all(
