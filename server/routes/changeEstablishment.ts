@@ -23,11 +23,13 @@ export default function routes(router: Router, supportedPrisonsService: Supporte
     const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(res.locals.user?.username)
 
     const referrer = (req.query?.referrer as string) ?? ''
+    const safeReturnUrl =
+      referrer.length === 0 || referrer.indexOf('://') > 0 || referrer.indexOf('//') === 0 ? '/' : referrer
 
     res.render('pages/changeEstablishment', {
       errors: req.flash('errors'),
       supportedPrisons,
-      referrer,
+      referrer: safeReturnUrl,
     })
   })
 

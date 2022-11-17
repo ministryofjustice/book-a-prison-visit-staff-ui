@@ -49,6 +49,22 @@ describe('GET /change-establishment', () => {
       })
   })
 
+  it('shouldnt set form action to be non-relative link when passed incorrectly', () => {
+    app = appWithAllRoutes({
+      supportedPrisonsServiceOverride: supportedPrisonsService,
+      systemTokenOverride: systemToken,
+    })
+
+    return request(app)
+      .get('/change-establishment?referrer=//search/prisoner/')
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('h1').text()).toBe('Select establishment')
+        expect($('form').attr('action')).toBe('/change-establishment?referrer=/')
+      })
+  })
+
   it('should render select establishment page, with current establishment selected', () => {
     app = appWithAllRoutes({
       supportedPrisonsServiceOverride: supportedPrisonsService,
@@ -66,7 +82,7 @@ describe('GET /change-establishment', () => {
         expect($('input[name="establishment"]').eq(1).prop('value')).toBe('BLI')
         expect($('input[name="establishment"]').eq(1).prop('checked')).toBe(true)
         expect($('input[name="establishment"]').length).toBe(2)
-        expect($('form').attr('action')).toBe('/change-establishment?referrer=')
+        expect($('form').attr('action')).toBe('/change-establishment?referrer=/')
       })
   })
 
