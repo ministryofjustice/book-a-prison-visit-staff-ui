@@ -137,6 +137,18 @@ describe('POST /change-establishment', () => {
       })
   })
 
+  it('should clear session, set selected establishment and redirect to / not the set referrer', () => {
+    return request(app)
+      .post(`/change-establishment?referrer=//search/prisoner/`)
+      .send('establishment=HEI')
+      .expect(302)
+      .expect('location', `/`)
+      .expect(() => {
+        expect(sessionData.selectedEstablishment).toStrictEqual(supportedPrisons[0])
+        expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)
+      })
+  })
+
   it('should not post if feature flag is disabled', () => {
     config.features.establishmentSwitcherEnabled = false
 
