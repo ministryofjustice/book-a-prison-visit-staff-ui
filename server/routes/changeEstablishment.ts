@@ -6,6 +6,7 @@ import { Prison } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import SupportedPrisonsService from '../services/supportedPrisonsService'
 import { clearSession } from './visitorUtils'
+import { safeReturnUrl } from '../utils/utils'
 
 export default function routes(router: Router, supportedPrisonsService: SupportedPrisonsService): Router {
   const get = (path: string, ...handlers: RequestHandler[]) =>
@@ -23,13 +24,12 @@ export default function routes(router: Router, supportedPrisonsService: Supporte
     const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(res.locals.user?.username)
 
     const referrer = (req.query?.referrer as string) ?? ''
-    const safeReturnUrl =
-      referrer.length === 0 || referrer.indexOf('://') > 0 || referrer.indexOf('//') === 0 ? '/' : referrer
+    const redirectUrl = safeReturnUrl(referrer)
 
     res.render('pages/changeEstablishment', {
       errors: req.flash('errors'),
       supportedPrisons,
-      referrer: safeReturnUrl,
+      referrer: redirectUrl,
     })
   })
 
@@ -38,8 +38,7 @@ export default function routes(router: Router, supportedPrisonsService: Supporte
     await body('establishment').isIn(getPrisonIds(supportedPrisons)).withMessage('No prison selected').run(req)
 
     const referrer = (req.query?.referrer as string) ?? ''
-    const safeReturnUrl =
-      referrer.length === 0 || referrer.indexOf('://') > 0 || referrer.indexOf('//') === 0 ? '/' : referrer
+    const redirectUrl = safeReturnUrl(referrer)
 
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
@@ -52,7 +51,7 @@ export default function routes(router: Router, supportedPrisonsService: Supporte
     const newEstablishment = supportedPrisons.find(prison => prison.prisonId === req.body.establishment)
     req.session.selectedEstablishment = Object.assign(req.session.selectedEstablishment ?? {}, newEstablishment)
 
-    return res.redirect(`${safeReturnUrl}`)
+    return res.redirect(redirectUrl)
   })
 
   function getPrisonIds(prisons: Prison[]) {
