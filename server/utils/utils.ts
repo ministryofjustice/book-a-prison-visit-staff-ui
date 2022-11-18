@@ -146,3 +146,9 @@ export const sortByTimestamp = (
 
   return 0
 }
+
+export function safeReturnUrl(originalUrl: string) {
+  return originalUrl.length === 0 || originalUrl.indexOf('://') > 0 || originalUrl.indexOf('//') === 0
+    ? '/'
+    : originalUrl
+}

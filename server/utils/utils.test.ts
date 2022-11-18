@@ -6,6 +6,7 @@ import {
   properCaseFullName,
   properCase,
   sortByTimestamp,
+  safeReturnUrl,
 } from './utils'
 import { getResultsPagingLinksTestData, sortByTimestampData } from './utils.testData'
 
@@ -93,6 +94,35 @@ describe('Sort by timestamp', () => {
   sortByTimestampData.forEach(testData => {
     it(testData.description, () => {
       expect(sortByTimestamp(testData.a, testData.b)).toEqual(testData.result)
+    })
+  })
+})
+
+describe('safeReturnUrl', () => {
+  ;[
+    {
+      input: '',
+      expected: '/',
+    },
+    {
+      input: '/',
+      expected: '/',
+    },
+    {
+      input: '//unsafe/url',
+      expected: '/',
+    },
+    {
+      input: '/safe',
+      expected: '/safe',
+    },
+    {
+      input: '/safe/url',
+      expected: '/safe/url',
+    },
+  ].forEach(testData => {
+    it(`should output ${testData.expected} when supplied with ${testData.input}`, () => {
+      expect(safeReturnUrl(testData.input)).toBe(testData.expected)
     })
   })
 })

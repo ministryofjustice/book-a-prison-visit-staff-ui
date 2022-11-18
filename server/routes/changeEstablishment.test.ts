@@ -36,7 +36,7 @@ describe('GET /change-establishment', () => {
     })
 
     return request(app)
-      .get('/change-establishment')
+      .get('/change-establishment?referrer=/search/prisoner/')
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
@@ -45,6 +45,23 @@ describe('GET /change-establishment', () => {
         expect($('input[name="establishment"]').eq(0).prop('checked')).toBe(true)
         expect($('input[name="establishment"]').eq(1).prop('value')).toBe('BLI')
         expect($('input[name="establishment"]').length).toBe(2)
+        expect($('form').attr('action')).toBe('/change-establishment?referrer=/search/prisoner/')
+      })
+  })
+
+  it('shouldnt set form action to be non-relative link when passed incorrectly', () => {
+    app = appWithAllRoutes({
+      supportedPrisonsServiceOverride: supportedPrisonsService,
+      systemTokenOverride: systemToken,
+    })
+
+    return request(app)
+      .get('/change-establishment?referrer=//search/prisoner/')
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('h1').text()).toBe('Select establishment')
+        expect($('form').attr('action')).toBe('/change-establishment?referrer=/')
       })
   })
 
@@ -65,6 +82,7 @@ describe('GET /change-establishment', () => {
         expect($('input[name="establishment"]').eq(1).prop('value')).toBe('BLI')
         expect($('input[name="establishment"]').eq(1).prop('checked')).toBe(true)
         expect($('input[name="establishment"]').length).toBe(2)
+        expect($('form').attr('action')).toBe('/change-establishment?referrer=/')
       })
   })
 
@@ -129,6 +147,30 @@ describe('POST /change-establishment', () => {
       .send('establishment=HEI')
       .expect(302)
       .expect('location', `/`)
+      .expect(() => {
+        expect(sessionData.selectedEstablishment).toStrictEqual(supportedPrisons[0])
+        expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)
+      })
+  })
+
+  it('should clear session, set selected establishment and redirect to / not the set referrer', () => {
+    return request(app)
+      .post(`/change-establishment?referrer=//search/prisoner/`)
+      .send('establishment=HEI')
+      .expect(302)
+      .expect('location', `/`)
+      .expect(() => {
+        expect(sessionData.selectedEstablishment).toStrictEqual(supportedPrisons[0])
+        expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)
+      })
+  })
+
+  it('should redirect to valid page when passed in querystring', () => {
+    return request(app)
+      .post(`/change-establishment?referrer=/search/prisoner/`)
+      .send('establishment=HEI')
+      .expect(302)
+      .expect('location', `/search/prisoner/`)
       .expect(() => {
         expect(sessionData.selectedEstablishment).toStrictEqual(supportedPrisons[0])
         expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)

@@ -26,10 +26,17 @@ export default function routes(
   get(['/prisoner', '/prisoner-visit'], (req, res) => {
     const search = req?.body?.search
 
+    const isVisit = req.originalUrl.includes('-visit')
+    let establishmentHref = '/search/prisoner/'
+    if (isVisit) {
+      establishmentHref = '/search/prisoner-visit/'
+    }
+
     res.render('pages/search/prisoner', {
       search,
       visit: req.originalUrl.includes('-visit'),
       showEstablishmentSwitcher: config.features.establishmentSwitcherEnabled,
+      establishmentHref,
     })
   })
 
@@ -110,6 +117,7 @@ export default function routes(
       searchBlock3,
       searchBlock4,
       showEstablishmentSwitcher: config.features.establishmentSwitcherEnabled,
+      establishmentHref: '/search/visit',
     })
   })
 
