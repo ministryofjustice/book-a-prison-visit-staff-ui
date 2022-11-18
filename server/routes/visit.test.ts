@@ -36,7 +36,11 @@ const visitSessionsService = new VisitSessionsService(
 ) as jest.Mocked<VisitSessionsService>
 const auditService = new AuditService() as jest.Mocked<AuditService>
 const prisonerVisitorsService = new PrisonerVisitorsService(null, systemToken) as jest.Mocked<PrisonerVisitorsService>
-const supportedPrisonsService = new SupportedPrisonsService(null, systemToken) as jest.Mocked<SupportedPrisonsService>
+const supportedPrisonsService = new SupportedPrisonsService(
+  null,
+  null,
+  systemToken,
+) as jest.Mocked<SupportedPrisonsService>
 
 jest.mock('./visitorUtils', () => {
   const visitorUtils = jest.requireActual('./visitorUtils')

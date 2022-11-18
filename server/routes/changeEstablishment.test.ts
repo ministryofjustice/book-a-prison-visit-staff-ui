@@ -6,18 +6,20 @@ import config from '../config'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import * as visitorUtils from './visitorUtils'
 import SupportedPrisonsService from '../services/supportedPrisonsService'
+import { createPrisons } from '../data/__testutils/testObjects'
 
 jest.mock('../services/supportedPrisonsService')
 
 let app: Express
 const systemToken = async (user: string): Promise<string> => `${user}-token-1`
 
-const supportedPrisonsService = new SupportedPrisonsService(null, systemToken) as jest.Mocked<SupportedPrisonsService>
+const supportedPrisonsService = new SupportedPrisonsService(
+  null,
+  null,
+  systemToken,
+) as jest.Mocked<SupportedPrisonsService>
 
-const supportedPrisons = [
-  { prisonId: 'HEI', prisonName: 'Hewell (HMP)' },
-  { prisonId: 'BLI', prisonName: 'Bristol (HMP)' },
-]
+const supportedPrisons = createPrisons()
 
 beforeEach(() => {
   supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
@@ -49,7 +51,7 @@ describe('GET /change-establishment', () => {
       })
   })
 
-  it('shouldnt set form action to be non-relative link when passed incorrectly', () => {
+  it('should not set form action to be non-relative link when passed incorrectly', () => {
     app = appWithAllRoutes({
       supportedPrisonsServiceOverride: supportedPrisonsService,
       systemTokenOverride: systemToken,

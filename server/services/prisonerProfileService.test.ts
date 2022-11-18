@@ -27,7 +27,7 @@ const visitSchedulerApiClient = new VisitSchedulerApiClient(null) as jest.Mocked
 const prisonerContactRegistryApiClient = new PrisonerContactRegistryApiClient(
   null,
 ) as jest.Mocked<PrisonerContactRegistryApiClient>
-const supportedPrisonsService = new SupportedPrisonsService(null, null) as jest.Mocked<SupportedPrisonsService>
+const supportedPrisonsService = new SupportedPrisonsService(null, null, null) as jest.Mocked<SupportedPrisonsService>
 
 describe('Prisoner profile service', () => {
   let prisonApiClientBuilder
@@ -143,7 +143,10 @@ describe('Prisoner profile service', () => {
       expect(prisonApiClient.getOffender).toHaveBeenCalledTimes(1)
       expect(prisonApiClient.getVisitBalances).toHaveBeenCalledTimes(1)
       expect(prisonerContactRegistryApiClient.getPrisonerSocialContacts).toHaveBeenCalledTimes(1)
-      expect(supportedPrisonsService.getSupportedPrison.mock.calls).toEqual([['HEI'], ['HEI']])
+      expect(supportedPrisonsService.getSupportedPrison.mock.calls).toEqual([
+        ['HEI', 'user'],
+        ['HEI', 'user'],
+      ])
 
       expect(results).toEqual({
         displayName: 'Smith, John',

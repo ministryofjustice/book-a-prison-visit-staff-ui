@@ -18,6 +18,7 @@ import { prisonApiClientBuilder } from '../../data/prisonApiClient'
 import { visitSchedulerApiClientBuilder } from '../../data/visitSchedulerApiClient'
 import { whereaboutsApiClientBuilder } from '../../data/whereaboutsApiClient'
 import { prisonerContactRegistryApiClientBuilder } from '../../data/prisonerContactRegistryApiClient'
+import { prisonRegisterApiClientBuilder } from '../../data/prisonRegisterApiClient'
 import PrisonerSearchService from '../../services/prisonerSearchService'
 import PrisonerProfileService from '../../services/prisonerProfileService'
 import PrisonerVisitorsService from '../../services/prisonerVisitorsService'
@@ -117,7 +118,8 @@ function appSetup({
   app.use('/', indexRoutes(standardRouter(new MockUserService())))
 
   const supportedPrisonsService =
-    supportedPrisonsServiceOverride || new SupportedPrisonsService(visitSchedulerApiClientBuilder, systemToken)
+    supportedPrisonsServiceOverride ||
+    new SupportedPrisonsService(visitSchedulerApiClientBuilder, prisonRegisterApiClientBuilder, systemToken)
   app.use('/change-establishment/', establishmentRoutes(standardRouter(new MockUserService()), supportedPrisonsService))
 
   const prisonerSearchService =
@@ -142,7 +144,8 @@ function appSetup({
       prisonApiClientBuilder,
       visitSchedulerApiClientBuilder,
       prisonerContactRegistryApiClientBuilder,
-      supportedPrisonsServiceOverride || new SupportedPrisonsService(visitSchedulerApiClientBuilder, systemToken),
+      supportedPrisonsServiceOverride ||
+        new SupportedPrisonsService(visitSchedulerApiClientBuilder, prisonRegisterApiClientBuilder, systemToken),
       systemTokenTest,
     )
   app.use(

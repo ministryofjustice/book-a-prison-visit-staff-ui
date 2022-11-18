@@ -19,6 +19,7 @@ import { visitSchedulerApiClientBuilder } from './data/visitSchedulerApiClient'
 import { whereaboutsApiClientBuilder } from './data/whereaboutsApiClient'
 import { prisonerContactRegistryApiClientBuilder } from './data/prisonerContactRegistryApiClient'
 import { prisonApiClientBuilder } from './data/prisonApiClient'
+import { prisonRegisterApiClientBuilder } from './data/prisonRegisterApiClient'
 import NotificationsService from './services/notificationsService'
 import PrisonerSearchService from './services/prisonerSearchService'
 import PrisonerProfileService from './services/prisonerProfileService'
@@ -58,7 +59,7 @@ export default function createApp(userService: UserService): express.Application
     '/change-establishment/',
     establishmentRoutes(
       standardRouter(userService),
-      new SupportedPrisonsService(visitSchedulerApiClientBuilder, systemToken),
+      new SupportedPrisonsService(visitSchedulerApiClientBuilder, prisonRegisterApiClientBuilder, systemToken),
     ),
   )
   app.use(
@@ -83,7 +84,7 @@ export default function createApp(userService: UserService): express.Application
         prisonApiClientBuilder,
         visitSchedulerApiClientBuilder,
         prisonerContactRegistryApiClientBuilder,
-        new SupportedPrisonsService(visitSchedulerApiClientBuilder, systemToken),
+        new SupportedPrisonsService(visitSchedulerApiClientBuilder, prisonRegisterApiClientBuilder, systemToken),
         systemToken,
       ),
       new PrisonerSearchService(prisonerSearchClientBuilder, systemToken),
@@ -111,7 +112,7 @@ export default function createApp(userService: UserService): express.Application
         prisonApiClientBuilder,
         visitSchedulerApiClientBuilder,
         prisonerContactRegistryApiClientBuilder,
-        new SupportedPrisonsService(visitSchedulerApiClientBuilder, systemToken),
+        new SupportedPrisonsService(visitSchedulerApiClientBuilder, prisonRegisterApiClientBuilder, systemToken),
         systemToken,
       ),
       new NotificationsService(notificationsApiClientBuilder),
@@ -136,10 +137,10 @@ export default function createApp(userService: UserService): express.Application
         prisonApiClientBuilder,
         visitSchedulerApiClientBuilder,
         prisonerContactRegistryApiClientBuilder,
-        new SupportedPrisonsService(visitSchedulerApiClientBuilder, systemToken),
+        new SupportedPrisonsService(visitSchedulerApiClientBuilder, prisonRegisterApiClientBuilder, systemToken),
         systemToken,
       ),
-      new SupportedPrisonsService(visitSchedulerApiClientBuilder, systemToken),
+      new SupportedPrisonsService(visitSchedulerApiClientBuilder, prisonRegisterApiClientBuilder, systemToken),
     ),
   )
   app.use(
