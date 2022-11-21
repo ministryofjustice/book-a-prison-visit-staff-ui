@@ -138,6 +138,7 @@ testJourneys.forEach(journey => {
             const $ = cheerio.load(res.text)
             expect($('h1').text().trim()).toBe('Select date and time of visit')
             expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
+            expect($('[data-test="visit-location"]').text()).toBe('location place')
             expect($('[data-test="visit-restriction"]').text()).toBe('Open')
             expect($('[data-test="closed-visit-reason"]').length).toBe(0)
             expect($('input[name="visit-date-and-time"]').length).toBe(3)
@@ -163,6 +164,7 @@ testJourneys.forEach(journey => {
             const $ = cheerio.load(res.text)
             expect($('h1').text().trim()).toBe('Select date and time of visit')
             expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
+            expect($('[data-test="visit-location"]').text()).toBe('location place')
             expect($('[data-test="visit-restriction"]').text()).toBe('Closed')
             expect($('[data-test="closed-visit-reason"]').text()).toContain(
               'Closed visit as a visitor has a closed visit restriction.',
@@ -182,6 +184,7 @@ testJourneys.forEach(journey => {
             const $ = cheerio.load(res.text)
             expect($('h1').text().trim()).toBe('Select date and time of visit')
             expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
+            expect($('[data-test="visit-location"]').text()).toBe('location place')
             expect($('[data-test="visit-restriction"]').text()).toBe('Closed')
             expect($('[data-test="closed-visit-reason"]').text()).toContain(
               'Closed visit as the prisoner has a closed visit restriction.',

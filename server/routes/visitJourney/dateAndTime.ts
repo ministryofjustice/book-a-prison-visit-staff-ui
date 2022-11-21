@@ -84,6 +84,7 @@ export default class DateAndTime {
       errors: req.flash('errors'),
       visitRestriction: visitSessionData.visitRestriction,
       prisonerName: visitSessionData.prisoner.name,
+      location: visitSessionData.prisoner.location,
       closedVisitReason: visitSessionData.closedVisitReason,
       slotsList,
       formValues,
