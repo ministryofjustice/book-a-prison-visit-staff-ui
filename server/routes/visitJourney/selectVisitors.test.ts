@@ -422,6 +422,58 @@ testJourneys.forEach(journey => {
           expect($('[data-test="back-to-start"]').length).toBe(1)
         })
     })
+
+    it('should display prison specific content, related to Hewell prison', () => {
+      sessionApp = appWithAllRoutes({
+        prisonerProfileServiceOverride: prisonerProfileService,
+        prisonerVisitorsServiceOverride: prisonerVisitorsService,
+        systemTokenOverride: systemToken,
+        sessionData: {
+          selectedEstablishment: { prisonId: 'HEI', prisonName: 'Hewell (HMP)' },
+          visitorList,
+          visitSessionData,
+        } as SessionData,
+      })
+
+      return request(sessionApp)
+        .get(`${journey.urlPrefix}/select-visitors`)
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('[data-test="prison-specific-1"]').text()).toBe(
+            'Add up to 3 people aged 10 and over, and 4 children under 10 years old.',
+          )
+          expect($('[data-test="prison-specific-2"]').text()).toBe('At least one visitor must be 18 or older.')
+        })
+    })
+
+    it('should display prison specific content, related to Bristol prison', () => {
+      sessionApp = appWithAllRoutes({
+        prisonerProfileServiceOverride: prisonerProfileService,
+        prisonerVisitorsServiceOverride: prisonerVisitorsService,
+        systemTokenOverride: systemToken,
+        sessionData: {
+          selectedEstablishment: { prisonId: 'BLI', prisonName: 'Bristol (HMP)' },
+          visitorList,
+          visitSessionData,
+        } as SessionData,
+      })
+
+      return request(sessionApp)
+        .get(`${journey.urlPrefix}/select-visitors`)
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('[data-test="prison-specific-1"]').text()).toBe(
+            'Add up to 3 adults (aged 18 or older). Children can also be added to the visit.',
+          )
+          expect($('[data-test="prison-specific-2"]').text()).toBe(
+            'Contact HMP Bristol when the total number of visitors (adults and children) is more than 3.',
+          )
+        })
+    })
   })
 
   describe(`POST ${journey.urlPrefix}/select-visitors`, () => {

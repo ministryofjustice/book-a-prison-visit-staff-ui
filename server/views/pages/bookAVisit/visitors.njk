@@ -120,7 +120,13 @@
       </p>
       {% endif %}
 
-      <p>Add up to 3 visitors with a maximum of 2 adults.</p>
+      {% if selectedEstablishment.prisonId === 'HEI' %}
+        <p data-test="prison-specific-1">Add up to 3 people aged 10 and over, and 4 children under 10 years old.</p>
+        <p data-test="prison-specific-2">At least one visitor must be 18 or older.</p>
+      {% elseif selectedEstablishment.prisonId === 'BLI' %}
+        <p data-test="prison-specific-1">Add up to 3 adults (aged 18 or older). Children can also be added to the visit.</p>
+        <p data-test="prison-specific-2">Contact HMP Bristol when the total number of visitors (adults and children) is more than 3.</p>
+      {% endif %}
 
       <form action="{{ urlPrefix }}/select-visitors" method="POST" novalidate>
         <input type="hidden" name="_csrf" value="{{ csrfToken }}">
