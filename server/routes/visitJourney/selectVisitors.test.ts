@@ -423,56 +423,45 @@ testJourneys.forEach(journey => {
         })
     })
 
-    it('should display prison specific content, related to Hewell prison', () => {
-      sessionApp = appWithAllRoutes({
-        prisonerProfileServiceOverride: prisonerProfileService,
-        prisonerVisitorsServiceOverride: prisonerVisitorsService,
-        systemTokenOverride: systemToken,
-        sessionData: {
-          selectedEstablishment: { prisonId: 'HEI', prisonName: 'Hewell (HMP)' },
-          visitorList,
-          visitSessionData,
-        } as SessionData,
-      })
+    describe(`Display prison specific content for each prison`, () => {
+      const prisons = [
+        {
+          prisonId: 'HEI',
+          prisonName: 'Hewell (HMP)',
+          content1: 'Add up to 3 people aged 10 and over, and 4 children under 10 years old.',
+          content2: 'At least one visitor must be 18 or older.',
+        },
+        {
+          prisonId: 'BLI',
+          prisonName: 'Bristol (HMP)',
+          content1: 'Add up to 3 adults (aged 18 or older). Children can also be added to the visit.',
+          content2: 'Contact HMP Bristol when the total number of visitors (adults and children) is more than 3.',
+        },
+      ]
+      prisons.forEach(prison => {
+        it(`should display prison specific content, related to ${prison.prisonName}`, () => {
+          sessionApp = appWithAllRoutes({
+            prisonerProfileServiceOverride: prisonerProfileService,
+            prisonerVisitorsServiceOverride: prisonerVisitorsService,
+            systemTokenOverride: systemToken,
+            sessionData: {
+              selectedEstablishment: { prisonId: prison.prisonId, prisonName: prison.prisonName },
+              visitorList,
+              visitSessionData,
+            } as SessionData,
+          })
 
-      return request(sessionApp)
-        .get(`${journey.urlPrefix}/select-visitors`)
-        .expect(200)
-        .expect('Content-Type', /html/)
-        .expect(res => {
-          const $ = cheerio.load(res.text)
-          expect($('[data-test="prison-specific-1"]').text()).toBe(
-            'Add up to 3 people aged 10 and over, and 4 children under 10 years old.',
-          )
-          expect($('[data-test="prison-specific-2"]').text()).toBe('At least one visitor must be 18 or older.')
+          return request(sessionApp)
+            .get(`${journey.urlPrefix}/select-visitors`)
+            .expect(200)
+            .expect('Content-Type', /html/)
+            .expect(res => {
+              const $ = cheerio.load(res.text)
+              expect($('[data-test="prison-specific-1"]').text()).toBe(prison.content1)
+              expect($('[data-test="prison-specific-2"]').text()).toBe(prison.content2)
+            })
         })
-    })
-
-    it('should display prison specific content, related to Bristol prison', () => {
-      sessionApp = appWithAllRoutes({
-        prisonerProfileServiceOverride: prisonerProfileService,
-        prisonerVisitorsServiceOverride: prisonerVisitorsService,
-        systemTokenOverride: systemToken,
-        sessionData: {
-          selectedEstablishment: { prisonId: 'BLI', prisonName: 'Bristol (HMP)' },
-          visitorList,
-          visitSessionData,
-        } as SessionData,
       })
-
-      return request(sessionApp)
-        .get(`${journey.urlPrefix}/select-visitors`)
-        .expect(200)
-        .expect('Content-Type', /html/)
-        .expect(res => {
-          const $ = cheerio.load(res.text)
-          expect($('[data-test="prison-specific-1"]').text()).toBe(
-            'Add up to 3 adults (aged 18 or older). Children can also be added to the visit.',
-          )
-          expect($('[data-test="prison-specific-2"]').text()).toBe(
-            'Contact HMP Bristol when the total number of visitors (adults and children) is more than 3.',
-          )
-        })
     })
   })
 
