@@ -76,4 +76,40 @@ describe('Supported prisons service', () => {
       expect(results).toStrictEqual(supportedPrisonIds)
     })
   })
+
+  describe('API response caching', () => {
+    beforeEach(() => {
+      visitSchedulerApiClient.getSupportedPrisonIds.mockResolvedValue(supportedPrisonIds)
+    })
+
+    it('should call API to get all prisons once then use internal cache for subsequent calls', async () => {
+      const results = []
+
+      results[0] = await supportedPrisonsService.getSupportedPrisons('user')
+      results[1] = await supportedPrisonsService.getSupportedPrisons('user')
+
+      expect(results[0]).toEqual(allPrisons)
+      expect(results[1]).toEqual(allPrisons)
+      expect(prisonRegisterApiClient.getPrisons).toHaveBeenCalledTimes(1)
+    })
+
+    it('should refresh internal cache of all prisons after 24 hours', async () => {
+      jest.useFakeTimers()
+
+      const A_DAY_IN_MS = 24 * 60 * 60 * 1000
+      const results = []
+
+      results[0] = await supportedPrisonsService.getSupportedPrisons('user')
+      results[1] = await supportedPrisonsService.getSupportedPrisons('user')
+      jest.advanceTimersByTime(A_DAY_IN_MS)
+      results[2] = await supportedPrisonsService.getSupportedPrisons('user')
+
+      expect(results[0]).toEqual(allPrisons)
+      expect(results[1]).toEqual(allPrisons)
+      expect(results[2]).toEqual(allPrisons)
+      expect(prisonRegisterApiClient.getPrisons).toHaveBeenCalledTimes(2)
+
+      jest.useRealTimers()
+    })
+  })
 })

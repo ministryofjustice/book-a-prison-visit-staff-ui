@@ -54,14 +54,14 @@ export default function createApp(userService: UserService): express.Application
   app.use(authorisationMiddleware())
   app.use(appInsightsOperationId)
 
-  app.use('/', indexRoutes(standardRouter(userService)))
-  app.use(
-    '/change-establishment/',
-    establishmentRoutes(
-      standardRouter(userService),
-      new SupportedPrisonsService(visitSchedulerApiClientBuilder, prisonRegisterApiClientBuilder, systemToken),
-    ),
+  const supportedPrisonsService = new SupportedPrisonsService(
+    visitSchedulerApiClientBuilder,
+    prisonRegisterApiClientBuilder,
+    systemToken,
   )
+
+  app.use('/', indexRoutes(standardRouter(userService)))
+  app.use('/change-establishment/', establishmentRoutes(standardRouter(userService), supportedPrisonsService))
   app.use(
     '/search/',
     searchRoutes(
@@ -84,7 +84,7 @@ export default function createApp(userService: UserService): express.Application
         prisonApiClientBuilder,
         visitSchedulerApiClientBuilder,
         prisonerContactRegistryApiClientBuilder,
-        new SupportedPrisonsService(visitSchedulerApiClientBuilder, prisonRegisterApiClientBuilder, systemToken),
+        supportedPrisonsService,
         systemToken,
       ),
       new PrisonerSearchService(prisonerSearchClientBuilder, systemToken),
@@ -112,7 +112,7 @@ export default function createApp(userService: UserService): express.Application
         prisonApiClientBuilder,
         visitSchedulerApiClientBuilder,
         prisonerContactRegistryApiClientBuilder,
-        new SupportedPrisonsService(visitSchedulerApiClientBuilder, prisonRegisterApiClientBuilder, systemToken),
+        supportedPrisonsService,
         systemToken,
       ),
       new NotificationsService(notificationsApiClientBuilder),
@@ -137,10 +137,10 @@ export default function createApp(userService: UserService): express.Application
         prisonApiClientBuilder,
         visitSchedulerApiClientBuilder,
         prisonerContactRegistryApiClientBuilder,
-        new SupportedPrisonsService(visitSchedulerApiClientBuilder, prisonRegisterApiClientBuilder, systemToken),
+        supportedPrisonsService,
         systemToken,
       ),
-      new SupportedPrisonsService(visitSchedulerApiClientBuilder, prisonRegisterApiClientBuilder, systemToken),
+      supportedPrisonsService,
     ),
   )
   app.use(

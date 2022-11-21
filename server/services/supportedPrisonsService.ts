@@ -5,6 +5,8 @@ import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
 type VisitSchedulerApiClientBuilder = (token: string) => VisitSchedulerApiClient
 type PrisonRegisterApiClientBuilder = (token: string) => PrisonRegisterApiClient
 
+const A_DAY_IN_MS = 24 * 60 * 60 * 1000
+
 export default class SupportedPrisonsService {
   constructor(
     private readonly visitSchedulerApiClientBuilder: VisitSchedulerApiClientBuilder,
@@ -12,17 +14,21 @@ export default class SupportedPrisonsService {
     private readonly systemToken: SystemToken,
   ) {}
 
+  private allPrisons: Prison[]
+
+  private lastUpdated = 0
+
   async getSupportedPrison(prisonId: string, username: string): Promise<Prison> {
-    const allPrisons = await this.getAllPrisons(username)
-    return allPrisons.find(prison => prison.prisonId === prisonId)
+    await this.refreshAllPrisons(username)
+    return this.allPrisons.find(prison => prison.prisonId === prisonId)
   }
 
   async getSupportedPrisons(username: string): Promise<Prison[]> {
+    await this.refreshAllPrisons(username)
     const prisonIds = await this.getSupportedPrisonIds(username)
-    const allPrisons = await this.getAllPrisons(username)
 
     const supportedPrisons = prisonIds
-      .map(prisonId => allPrisons.find(prison => prison.prisonId === prisonId))
+      .map(prisonId => this.allPrisons.find(prison => prison.prisonId === prisonId))
       .filter(prison => prison !== undefined)
 
     return supportedPrisons
@@ -34,9 +40,12 @@ export default class SupportedPrisonsService {
     return visitSchedulerApiClient.getSupportedPrisonIds()
   }
 
-  private async getAllPrisons(username: string): Promise<Prison[]> {
-    const token = await this.systemToken(username)
-    const prisonRegisterApiClient = this.prisonRegisterApiClientBuilder(token)
-    return prisonRegisterApiClient.getPrisons()
+  private async refreshAllPrisons(username: string): Promise<void> {
+    if (this.lastUpdated <= Date.now() - A_DAY_IN_MS) {
+      const token = await this.systemToken(username)
+      const prisonRegisterApiClient = this.prisonRegisterApiClientBuilder(token)
+      this.allPrisons = await prisonRegisterApiClient.getPrisons()
+      this.lastUpdated = Date.now()
+    }
   }
 }
