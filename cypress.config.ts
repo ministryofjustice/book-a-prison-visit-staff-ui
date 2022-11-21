@@ -8,6 +8,7 @@ import whereaboutsOffenderEvents from './integration_tests/mockApis/whereabouts'
 import prisonApi from './integration_tests/mockApis/prison'
 import offenderSearch from './integration_tests/mockApis/offenderSearch'
 import visitScheduler from './integration_tests/mockApis/visitScheduler'
+import prisonRegister from './integration_tests/mockApis/prisonRegister'
 
 export default defineConfig({
   chromeWebSecurity: false,
@@ -41,6 +42,9 @@ export default defineConfig({
         // Prisoner offender search
         stubGetPrisoner: results => offenderSearch.stubGetPrisoner(results),
         stubGetPrisoners: ({ results, page, size }) => offenderSearch.stubGetPrisoners(results, page, size),
+
+        // Prison register API
+        stubGetPrisons: prisonRegister.stubGetPrisons,
 
         // Visit scheduler
         stubGetAvailableSupportOptions: visitScheduler.stubGetAvailableSupportOptions,

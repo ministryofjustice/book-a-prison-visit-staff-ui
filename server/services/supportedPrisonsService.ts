@@ -1,25 +1,34 @@
 import { Prison, SystemToken } from '../@types/bapv'
-import prisons from '../constants/prisons'
+import PrisonRegisterApiClient from '../data/prisonRegisterApiClient'
 import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
 
 type VisitSchedulerApiClientBuilder = (token: string) => VisitSchedulerApiClient
+type PrisonRegisterApiClientBuilder = (token: string) => PrisonRegisterApiClient
+
+const A_DAY_IN_MS = 24 * 60 * 60 * 1000
 
 export default class SupportedPrisonsService {
   constructor(
     private readonly visitSchedulerApiClientBuilder: VisitSchedulerApiClientBuilder,
+    private readonly prisonRegisterApiClientBuilder: PrisonRegisterApiClientBuilder,
     private readonly systemToken: SystemToken,
   ) {}
 
-  async getSupportedPrison(prisonId: string): Promise<Prison> {
-    return this.getAllPrisons().find(prison => prison.prisonId === prisonId)
+  private allPrisons: Prison[]
+
+  private lastUpdated = 0
+
+  async getSupportedPrison(prisonId: string, username: string): Promise<Prison> {
+    await this.refreshAllPrisons(username)
+    return this.allPrisons.find(prison => prison.prisonId === prisonId)
   }
 
   async getSupportedPrisons(username: string): Promise<Prison[]> {
+    await this.refreshAllPrisons(username)
     const prisonIds = await this.getSupportedPrisonIds(username)
-    const allPrisons = this.getAllPrisons()
 
     const supportedPrisons = prisonIds
-      .map(prisonId => allPrisons.find(prison => prison.prisonId === prisonId))
+      .map(prisonId => this.allPrisons.find(prison => prison.prisonId === prisonId))
       .filter(prison => prison !== undefined)
 
     return supportedPrisons
@@ -31,8 +40,12 @@ export default class SupportedPrisonsService {
     return visitSchedulerApiClient.getSupportedPrisonIds()
   }
 
-  // @TODO look up from static file to be replaced with call to Prison Register API
-  private getAllPrisons(): Prison[] {
-    return prisons
+  private async refreshAllPrisons(username: string): Promise<void> {
+    if (this.lastUpdated <= Date.now() - A_DAY_IN_MS) {
+      const token = await this.systemToken(username)
+      const prisonRegisterApiClient = this.prisonRegisterApiClientBuilder(token)
+      this.allPrisons = await prisonRegisterApiClient.getPrisons()
+      this.lastUpdated = Date.now()
+    }
   }
 }

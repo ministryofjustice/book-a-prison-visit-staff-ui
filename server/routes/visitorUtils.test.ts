@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import { Session, SessionData } from 'express-session'
-import { VisitSlot, VisitSlotList } from '../@types/bapv'
+import { Prison, VisitSlot, VisitSlotList } from '../@types/bapv'
 import { clearSession, getFlashFormValues, getSelectedSlot, getSlotByStartTimeAndRestriction } from './visitorUtils'
 
 const slotsList: VisitSlotList = {
@@ -156,7 +156,7 @@ describe('clearSession', () => {
     adultVisitors: { adults: [] },
     slotsList: {},
     visitSessionData: { prisoner: undefined },
-    selectedEstablishment: { prisonId: 'HEI', prisonName: 'Hewell (HMP)' },
+    selectedEstablishment: { prisonId: 'HEI', prisonName: 'Hewell (HMP)' } as Prison,
   }
 
   req.session = sessionData as Session & SessionData
