@@ -44,7 +44,9 @@ export default class SupportedPrisonsService {
     if (this.lastUpdated <= Date.now() - A_DAY_IN_MS) {
       const token = await this.systemToken(username)
       const prisonRegisterApiClient = this.prisonRegisterApiClientBuilder(token)
-      this.allPrisons = await prisonRegisterApiClient.getPrisons()
+      this.allPrisons = (await prisonRegisterApiClient.getPrisons()).map(prison => {
+        return { prisonId: prison.prisonId, prisonName: prison.prisonName }
+      })
       this.lastUpdated = Date.now()
     }
   }
