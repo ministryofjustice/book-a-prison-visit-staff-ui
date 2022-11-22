@@ -1,6 +1,6 @@
 import { SuperAgentRequest } from 'superagent'
 import { stubFor } from './wiremock'
-import allPrisons from './responses/allPrisons'
+import allPrisons from './responses/prisonRegister'
 
 export default {
   stubGetPrisons: (prisons: Record<string, string>[] = allPrisons): SuperAgentRequest => {

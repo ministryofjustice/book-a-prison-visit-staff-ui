@@ -47,6 +47,7 @@ export default defineConfig({
         stubGetPrisons: prisonRegister.stubGetPrisons,
 
         // Visit scheduler
+        stubGetSupportedPrisonIds: visitScheduler.stubGetSupportedPrisonIds,
         stubGetAvailableSupportOptions: visitScheduler.stubGetAvailableSupportOptions,
         stubGetVisit: visitScheduler.stubGetVisit,
         stubGetUpcomingVisits: visitScheduler.stubGetUpcomingVisits,
