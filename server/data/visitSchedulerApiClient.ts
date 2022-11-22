@@ -24,12 +24,9 @@ class VisitSchedulerApiClient {
   private visitStatus = 'BOOKED'
 
   getSupportedPrisonIds(): Promise<string[]> {
-    // return this.restclient.get({
-    //   path: '/supported-prisons',
-    // })
-
-    // hard-coded here, awaiting endpoint on visit scheduler - VB-1222
-    return Promise.resolve(['HEI', 'BLI'])
+    return this.restclient.get({
+      path: '/config/prisons/supported',
+    })
   }
 
   getAvailableSupportOptions(): Promise<SupportType[]> {
