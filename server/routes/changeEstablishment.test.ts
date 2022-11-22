@@ -160,7 +160,7 @@ describe('POST /change-establishment', () => {
         expect(sessionData.selectedEstablishment).toStrictEqual(supportedPrisons[0])
         expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)
         expect(auditService.changeEstablishment).toHaveBeenCalledWith({
-          originEstablishment: 'BLI',
+          previousEstablishment: 'BLI',
           newEstablishment: 'HEI',
           username: undefined,
           operationId: undefined,

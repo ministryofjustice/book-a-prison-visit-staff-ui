@@ -23,12 +23,12 @@ export default class AuditService {
   }
 
   async changeEstablishment({
-    originEstablishment,
+    previousEstablishment,
     newEstablishment,
     username,
     operationId,
   }: {
-    originEstablishment: string
+    previousEstablishment: string
     newEstablishment: string
     username: string
     operationId: string
@@ -38,7 +38,7 @@ export default class AuditService {
       who: username,
       operationId,
       details: {
-        originEstablishment,
+        previousEstablishment,
         newEstablishment,
       },
     })

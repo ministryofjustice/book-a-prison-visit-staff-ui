@@ -32,7 +32,7 @@ describe('Audit service', () => {
 
   it('sends a change establishment message', async () => {
     await auditService.changeEstablishment({
-      originEstablishment: 'HEI',
+      previousEstablishment: 'HEI',
       newEstablishment: 'BLI',
       username: 'username',
       operationId: 'operation-id',
@@ -47,7 +47,7 @@ describe('Audit service', () => {
           operationId: 'operation-id',
           who: 'username',
           service: 'book-a-prison-visit-staff-ui',
-          details: '{"originEstablishment":"HEI","newEstablishment":"BLI"}',
+          details: '{"previousEstablishment":"HEI","newEstablishment":"BLI"}',
         }),
         QueueUrl,
       },

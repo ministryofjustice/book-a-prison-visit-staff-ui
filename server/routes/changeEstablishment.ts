@@ -54,7 +54,7 @@ export default function routes(
     clearSession(req)
 
     await auditService.changeEstablishment({
-      originEstablishment: req.session.selectedEstablishment.prisonId,
+      previousEstablishment: req.session.selectedEstablishment.prisonId,
       newEstablishment: req.body.establishment,
       username: res.locals.user?.username,
       operationId: res.locals.appInsightsOperationId,
