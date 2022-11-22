@@ -62,6 +62,7 @@ export default function routes(
     const reference = getVisitReference(req)
     const fromVisitSearch = (req.query?.from as string) === 'visit-search'
     const fromVisitSearchQuery = req.query?.query as string
+    const { prisonId } = req.session.selectedEstablishment
 
     const {
       visit,
@@ -83,7 +84,7 @@ export default function routes(
     await auditService.viewedVisitDetails({
       visitReference: reference,
       prisonerId: visit.prisonerId,
-      prisonId: visit.prisonId,
+      prisonId,
       username: res.locals.user?.username,
       operationId: res.locals.appInsightsOperationId,
     })
@@ -263,6 +264,7 @@ export default function routes(
         await body(reasonFieldName).notEmpty().withMessage('Enter a reason for the cancellation').run(req)
       }
 
+      const { prisonId } = req.session.selectedEstablishment
       const errors = validationResult(req)
 
       if (!errors.isEmpty()) {
@@ -282,7 +284,7 @@ export default function routes(
       await auditService.cancelledVisit({
         visitReference: reference,
         prisonerId: visit.prisonerId.toString(),
-        prisonId: visit.prisonId,
+        prisonId,
         reason: `${req.body.cancel}: ${req.body[reasonFieldName]}`,
         username: res.locals.user?.username,
         operationId: res.locals.appInsightsOperationId,

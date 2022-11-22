@@ -61,7 +61,10 @@ export default function createApp(userService: UserService): express.Application
   )
 
   app.use('/', indexRoutes(standardRouter(userService)))
-  app.use('/change-establishment/', establishmentRoutes(standardRouter(userService), supportedPrisonsService))
+  app.use(
+    '/change-establishment/',
+    establishmentRoutes(standardRouter(userService), supportedPrisonsService, new AuditService()),
+  )
   app.use(
     '/search/',
     searchRoutes(

@@ -22,6 +22,28 @@ export default class AuditService {
     })
   }
 
+  async changeEstablishment({
+    originEstablishment,
+    newEstablishment,
+    username,
+    operationId,
+  }: {
+    originEstablishment: string
+    newEstablishment: string
+    username: string
+    operationId: string
+  }) {
+    return this.sendAuditMessage({
+      action: 'CHANGE_ESTABLISHMENT',
+      who: username,
+      operationId,
+      details: {
+        originEstablishment,
+        newEstablishment,
+      },
+    })
+  }
+
   async prisonerSearch({
     searchTerms,
     prisonId,
