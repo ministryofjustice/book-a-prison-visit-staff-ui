@@ -23,13 +23,18 @@ export default class SupportedPrisonsService {
     return this.allPrisons.find(prison => prison.prisonId === prisonId)
   }
 
-  async getSupportedPrisons(username: string): Promise<Prison[]> {
+  async getSupportedPrisons(username: string): Promise<Record<string, string>> {
     await this.refreshAllPrisons(username)
-    const prisonIds = await this.getSupportedPrisonIds(username)
+    const supportedPrisonIds = await this.getSupportedPrisonIds(username)
 
-    const supportedPrisons = prisonIds
-      .map(prisonId => this.allPrisons.find(prison => prison.prisonId === prisonId))
-      .filter(prison => prison !== undefined)
+    const supportedPrisons = {}
+
+    supportedPrisonIds.forEach(prisonId => {
+      const supportedPrison = this.allPrisons.find(prison => prison.prisonId === prisonId)
+      if (supportedPrison) {
+        supportedPrisons[supportedPrison.prisonId] = supportedPrison.prisonName
+      }
+    })
 
     return supportedPrisons
   }
