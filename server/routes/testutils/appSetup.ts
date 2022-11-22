@@ -117,10 +117,15 @@ function appSetup({
 
   app.use('/', indexRoutes(standardRouter(new MockUserService())))
 
+  const auditService = auditServiceOverride || new AuditService()
+
   const supportedPrisonsService =
     supportedPrisonsServiceOverride ||
     new SupportedPrisonsService(visitSchedulerApiClientBuilder, prisonRegisterApiClientBuilder, systemToken)
-  app.use('/change-establishment/', establishmentRoutes(standardRouter(new MockUserService()), supportedPrisonsService))
+  app.use(
+    '/change-establishment/',
+    establishmentRoutes(standardRouter(new MockUserService()), supportedPrisonsService, auditService),
+  )
 
   const prisonerSearchService =
     prisonerSearchServiceOverride || new PrisonerSearchService(prisonerSearchClientBuilder, systemTokenTest)
@@ -132,7 +137,6 @@ function appSetup({
       whereaboutsApiClientBuilder,
       systemTokenTest,
     )
-  const auditService = auditServiceOverride || new AuditService()
   app.use(
     '/search/',
     searchRoutes(standardRouter(new MockUserService()), prisonerSearchService, visitSessionsService, auditService),

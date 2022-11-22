@@ -7,8 +7,13 @@ import asyncMiddleware from '../middleware/asyncMiddleware'
 import SupportedPrisonsService from '../services/supportedPrisonsService'
 import { clearSession } from './visitorUtils'
 import { safeReturnUrl } from '../utils/utils'
+import AuditService from '../services/auditService'
 
-export default function routes(router: Router, supportedPrisonsService: SupportedPrisonsService): Router {
+export default function routes(
+  router: Router,
+  supportedPrisonsService: SupportedPrisonsService,
+  auditService: AuditService,
+): Router {
   const get = (path: string, ...handlers: RequestHandler[]) =>
     router.get(
       path,
@@ -47,6 +52,13 @@ export default function routes(router: Router, supportedPrisonsService: Supporte
     }
 
     clearSession(req)
+
+    await auditService.changeEstablishment({
+      previousEstablishment: req.session.selectedEstablishment.prisonId,
+      newEstablishment: req.body.establishment,
+      username: res.locals.user?.username,
+      operationId: res.locals.appInsightsOperationId,
+    })
 
     const newEstablishment = supportedPrisons.find(prison => prison.prisonId === req.body.establishment)
     req.session.selectedEstablishment = Object.assign(req.session.selectedEstablishment ?? {}, newEstablishment)

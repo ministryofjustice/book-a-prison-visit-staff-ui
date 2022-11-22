@@ -7,8 +7,10 @@ import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import * as visitorUtils from './visitorUtils'
 import SupportedPrisonsService from '../services/supportedPrisonsService'
 import { createPrisons } from '../data/__testutils/testObjects'
+import AuditService from '../services/auditService'
 
 jest.mock('../services/supportedPrisonsService')
+jest.mock('../services/auditService')
 
 let app: Express
 const systemToken = async (user: string): Promise<string> => `${user}-token-1`
@@ -20,6 +22,8 @@ const supportedPrisonsService = new SupportedPrisonsService(
 ) as jest.Mocked<SupportedPrisonsService>
 
 const supportedPrisons = createPrisons()
+
+const auditService = new AuditService() as jest.Mocked<AuditService>
 
 beforeEach(() => {
   supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
@@ -108,6 +112,7 @@ describe('POST /change-establishment', () => {
 
     app = appWithAllRoutes({
       supportedPrisonsServiceOverride: supportedPrisonsService,
+      auditServiceOverride: auditService,
       systemTokenOverride: systemToken,
       sessionData,
     })
@@ -125,6 +130,7 @@ describe('POST /change-establishment', () => {
           { location: 'body', msg: 'No prison selected', param: 'establishment', value: '' },
         ])
         expect(visitorUtils.clearSession).toHaveBeenCalledTimes(0)
+        expect(auditService.changeEstablishment).toHaveBeenCalledTimes(0)
       })
   })
 
@@ -140,6 +146,7 @@ describe('POST /change-establishment', () => {
           { location: 'body', msg: 'No prison selected', param: 'establishment', value: 'HEX' },
         ])
         expect(visitorUtils.clearSession).toHaveBeenCalledTimes(0)
+        expect(auditService.changeEstablishment).toHaveBeenCalledTimes(0)
       })
   })
 
@@ -152,6 +159,12 @@ describe('POST /change-establishment', () => {
       .expect(() => {
         expect(sessionData.selectedEstablishment).toStrictEqual(supportedPrisons[0])
         expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)
+        expect(auditService.changeEstablishment).toHaveBeenCalledWith({
+          previousEstablishment: 'BLI',
+          newEstablishment: 'HEI',
+          username: undefined,
+          operationId: undefined,
+        })
       })
   })
 
@@ -164,6 +177,7 @@ describe('POST /change-establishment', () => {
       .expect(() => {
         expect(sessionData.selectedEstablishment).toStrictEqual(supportedPrisons[0])
         expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)
+        expect(auditService.changeEstablishment).toHaveBeenCalledTimes(1)
       })
   })
 
@@ -176,6 +190,7 @@ describe('POST /change-establishment', () => {
       .expect(() => {
         expect(sessionData.selectedEstablishment).toStrictEqual(supportedPrisons[0])
         expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)
+        expect(auditService.changeEstablishment).toHaveBeenCalledTimes(1)
       })
   })
 
