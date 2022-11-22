@@ -37,18 +37,6 @@ describe('Supported prisons service', () => {
     jest.resetAllMocks()
   })
 
-  describe('getSupportedPrison', () => {
-    it('should return a supported prison given its prisonId', async () => {
-      const results = await supportedPrisonsService.getSupportedPrison('HEI', 'user')
-      expect(results).toEqual({ prisonId: 'HEI', prisonName: 'Hewell (HMP)' })
-    })
-
-    it('should return undefined for an unsupported prisonId', async () => {
-      const results = await supportedPrisonsService.getSupportedPrison('XYZ', 'user')
-      expect(results).toBe(undefined)
-    })
-  })
-
   describe('getSupportedPrisons', () => {
     it('should return an object with key/values of supported prison IDs and names', async () => {
       visitSchedulerApiClient.getSupportedPrisonIds.mockResolvedValue(supportedPrisonIds)
