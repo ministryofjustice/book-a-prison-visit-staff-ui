@@ -31,11 +31,10 @@ describe('visitSchedulerApiClient', () => {
     it('should return an array of supported prison IDs', async () => {
       const results = ['HEI', 'BLI']
 
-      // awaiting endpoint on visit scheduler - VB-1222
-      // fakeVisitSchedulerApi
-      //   .get('/supported-prisons')
-      //   .matchHeader('authorization', `Bearer ${token}`)
-      //   .reply(200, results)
+      fakeVisitSchedulerApi
+        .get('/config/prisons/supported')
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, results)
 
       const output = await client.getSupportedPrisonIds()
 
