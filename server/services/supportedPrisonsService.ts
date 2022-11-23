@@ -18,18 +18,18 @@ export default class SupportedPrisonsService {
 
   private lastUpdated = 0
 
-  async getSupportedPrison(prisonId: string, username: string): Promise<Prison> {
+  async getSupportedPrisons(username: string): Promise<Record<string, string>> {
     await this.refreshAllPrisons(username)
-    return this.allPrisons.find(prison => prison.prisonId === prisonId)
-  }
+    const supportedPrisonIds = await this.getSupportedPrisonIds(username)
 
-  async getSupportedPrisons(username: string): Promise<Prison[]> {
-    await this.refreshAllPrisons(username)
-    const prisonIds = await this.getSupportedPrisonIds(username)
+    const supportedPrisons = {}
 
-    const supportedPrisons = prisonIds
-      .map(prisonId => this.allPrisons.find(prison => prison.prisonId === prisonId))
-      .filter(prison => prison !== undefined)
+    supportedPrisonIds.forEach(prisonId => {
+      const supportedPrison = this.allPrisons.find(prison => prison.prisonId === prisonId)
+      if (supportedPrison) {
+        supportedPrisons[supportedPrison.prisonId] = supportedPrison.prisonName
+      }
+    })
 
     return supportedPrisons
   }
@@ -44,7 +44,9 @@ export default class SupportedPrisonsService {
     if (this.lastUpdated <= Date.now() - A_DAY_IN_MS) {
       const token = await this.systemToken(username)
       const prisonRegisterApiClient = this.prisonRegisterApiClientBuilder(token)
-      this.allPrisons = await prisonRegisterApiClient.getPrisons()
+      this.allPrisons = (await prisonRegisterApiClient.getPrisons()).map(prison => {
+        return { prisonId: prison.prisonId, prisonName: prison.prisonName }
+      })
       this.lastUpdated = Date.now()
     }
   }

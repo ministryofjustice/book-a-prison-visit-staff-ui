@@ -14,6 +14,7 @@ import { PrisonerAlertItem } from '../@types/bapv'
 import { Visit } from '../data/visitSchedulerApiTypes'
 import { Contact } from '../data/prisonerContactRegistryApiTypes'
 import SupportedPrisonsService from './supportedPrisonsService'
+import { createSupportedPrisons } from '../data/__testutils/testObjects'
 
 jest.mock('../data/prisonApiClient')
 jest.mock('../data/visitSchedulerApiClient')
@@ -55,6 +56,12 @@ describe('Prisoner profile service', () => {
   })
 
   describe('getProfile', () => {
+    const supportedPrisons = createSupportedPrisons()
+
+    beforeEach(() => {
+      supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
+    })
+
     it('Retrieves and processes data for prisoner profile with visit balances', async () => {
       const bookings = <PagePrisonerBookingSummary>{
         content: [
@@ -135,7 +142,6 @@ describe('Prisoner profile service', () => {
       visitSchedulerApiClient.getUpcomingVisits.mockResolvedValue([visit])
       visitSchedulerApiClient.getPastVisits.mockResolvedValue([visit])
       prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue(socialContacts)
-      supportedPrisonsService.getSupportedPrison.mockResolvedValue({ prisonId: 'HEI', prisonName: 'Hewell (HMP)' })
 
       const results = await prisonerProfileService.getProfile(offenderNo, prisonId, 'user')
 
@@ -143,10 +149,7 @@ describe('Prisoner profile service', () => {
       expect(prisonApiClient.getOffender).toHaveBeenCalledTimes(1)
       expect(prisonApiClient.getVisitBalances).toHaveBeenCalledTimes(1)
       expect(prisonerContactRegistryApiClient.getPrisonerSocialContacts).toHaveBeenCalledTimes(1)
-      expect(supportedPrisonsService.getSupportedPrison.mock.calls).toEqual([
-        ['HEI', 'user'],
-        ['HEI', 'user'],
-      ])
+      expect(supportedPrisonsService.getSupportedPrisons).toHaveBeenCalledTimes(1)
 
       expect(results).toEqual({
         displayName: 'Smith, John',

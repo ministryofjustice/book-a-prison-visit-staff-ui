@@ -13,4 +13,11 @@ export const createPrisons = ({
   ] as Prison[],
 } = {}): Prison[] => prisons
 
+export const createSupportedPrisons = ({
+  prisons = <Record<string, string>>{
+    HEI: 'Hewell (HMP)',
+    BLI: 'Bristol (HMP & YOI)',
+  },
+} = {}): Record<string, string> => prisons
+
 export const createSupportedPrisonIds = ({ prisonIds = ['HEI', 'BLI'] } = {}): string[] => prisonIds

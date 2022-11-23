@@ -2,7 +2,6 @@ import type { NextFunction, RequestHandler, Router } from 'express'
 import { NotFound } from 'http-errors'
 import { body, validationResult } from 'express-validator'
 import config from '../config'
-import { Prison } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import SupportedPrisonsService from '../services/supportedPrisonsService'
 import { clearSession } from './visitorUtils'
@@ -40,7 +39,7 @@ export default function routes(
 
   post('/', establishmentSwitcherCheckMiddleware, async (req, res) => {
     const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(res.locals.user?.username)
-    await body('establishment').isIn(getPrisonIds(supportedPrisons)).withMessage('No prison selected').run(req)
+    await body('establishment').isIn(Object.keys(supportedPrisons)).withMessage('No prison selected').run(req)
 
     const referrer = (req.query?.referrer as string) ?? ''
     const redirectUrl = safeReturnUrl(referrer)
@@ -60,15 +59,13 @@ export default function routes(
       operationId: res.locals.appInsightsOperationId,
     })
 
-    const newEstablishment = supportedPrisons.find(prison => prison.prisonId === req.body.establishment)
-    req.session.selectedEstablishment = Object.assign(req.session.selectedEstablishment ?? {}, newEstablishment)
+    const { selectedEstablishment } = req.session
+    selectedEstablishment.prisonId = req.body.establishment
+    selectedEstablishment.prisonName = supportedPrisons[req.body.establishment]
 
     return res.redirect(redirectUrl)
   })
 
-  function getPrisonIds(prisons: Prison[]) {
-    return prisons.map(prison => prison.prisonId)
-  }
   return router
 }
 

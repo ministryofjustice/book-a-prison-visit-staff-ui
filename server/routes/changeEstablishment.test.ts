@@ -6,8 +6,9 @@ import config from '../config'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import * as visitorUtils from './visitorUtils'
 import SupportedPrisonsService from '../services/supportedPrisonsService'
-import { createPrisons } from '../data/__testutils/testObjects'
 import AuditService from '../services/auditService'
+import { createSupportedPrisons } from '../data/__testutils/testObjects'
+import { Prison } from '../@types/bapv'
 
 jest.mock('../services/supportedPrisonsService')
 jest.mock('../services/auditService')
@@ -21,7 +22,7 @@ const supportedPrisonsService = new SupportedPrisonsService(
   systemToken,
 ) as jest.Mocked<SupportedPrisonsService>
 
-const supportedPrisons = createPrisons()
+const supportedPrisons = createSupportedPrisons()
 
 const auditService = new AuditService() as jest.Mocked<AuditService>
 
@@ -75,7 +76,9 @@ describe('GET /change-establishment', () => {
     app = appWithAllRoutes({
       supportedPrisonsServiceOverride: supportedPrisonsService,
       systemTokenOverride: systemToken,
-      sessionData: { selectedEstablishment: supportedPrisons[1] } as SessionData,
+      sessionData: {
+        selectedEstablishment: { prisonId: 'BLI', prisonName: supportedPrisons.BLI },
+      } as SessionData,
     })
 
     return request(app)
@@ -105,10 +108,13 @@ describe('GET /change-establishment', () => {
 
 describe('POST /change-establishment', () => {
   let sessionData: SessionData
+  let selectedEstablishment: Prison
 
   beforeEach(() => {
     jest.spyOn(visitorUtils, 'clearSession')
-    sessionData = { selectedEstablishment: supportedPrisons[1] } as SessionData
+
+    selectedEstablishment = { prisonId: 'BLI', prisonName: supportedPrisons.BLI }
+    sessionData = { selectedEstablishment } as SessionData
 
     app = appWithAllRoutes({
       supportedPrisonsServiceOverride: supportedPrisonsService,
@@ -125,7 +131,7 @@ describe('POST /change-establishment', () => {
       .expect(302)
       .expect('location', `/change-establishment`)
       .expect(() => {
-        expect(sessionData.selectedEstablishment).toStrictEqual(supportedPrisons[1])
+        expect(sessionData.selectedEstablishment).toStrictEqual(selectedEstablishment)
         expect(flashProvider).toHaveBeenCalledWith('errors', [
           { location: 'body', msg: 'No prison selected', param: 'establishment', value: '' },
         ])
@@ -141,7 +147,7 @@ describe('POST /change-establishment', () => {
       .expect(302)
       .expect('location', `/change-establishment`)
       .expect(() => {
-        expect(sessionData.selectedEstablishment).toStrictEqual(supportedPrisons[1])
+        expect(sessionData.selectedEstablishment).toStrictEqual(selectedEstablishment)
         expect(flashProvider).toHaveBeenCalledWith('errors', [
           { location: 'body', msg: 'No prison selected', param: 'establishment', value: 'HEX' },
         ])
@@ -151,13 +157,15 @@ describe('POST /change-establishment', () => {
   })
 
   it('should clear session, set selected establishment and redirect to home page', () => {
+    const newEstablishment: Prison = { prisonId: 'HEI', prisonName: supportedPrisons.HEI }
+
     return request(app)
       .post(`/change-establishment`)
       .send('establishment=HEI')
       .expect(302)
       .expect('location', `/`)
       .expect(() => {
-        expect(sessionData.selectedEstablishment).toStrictEqual(supportedPrisons[0])
+        expect(sessionData.selectedEstablishment).toStrictEqual(newEstablishment)
         expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)
         expect(auditService.changeEstablishment).toHaveBeenCalledWith({
           previousEstablishment: 'BLI',
@@ -169,26 +177,30 @@ describe('POST /change-establishment', () => {
   })
 
   it('should clear session, set selected establishment and redirect to / not the set referrer', () => {
+    const newEstablishment: Prison = { prisonId: 'HEI', prisonName: supportedPrisons.HEI }
+
     return request(app)
       .post(`/change-establishment?referrer=//search/prisoner/`)
       .send('establishment=HEI')
       .expect(302)
       .expect('location', `/`)
       .expect(() => {
-        expect(sessionData.selectedEstablishment).toStrictEqual(supportedPrisons[0])
+        expect(sessionData.selectedEstablishment).toStrictEqual(newEstablishment)
         expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)
         expect(auditService.changeEstablishment).toHaveBeenCalledTimes(1)
       })
   })
 
   it('should redirect to valid page when passed in querystring', () => {
+    const newEstablishment: Prison = { prisonId: 'HEI', prisonName: supportedPrisons.HEI }
+
     return request(app)
       .post(`/change-establishment?referrer=/search/prisoner/`)
       .send('establishment=HEI')
       .expect(302)
       .expect('location', `/search/prisoner/`)
       .expect(() => {
-        expect(sessionData.selectedEstablishment).toStrictEqual(supportedPrisons[0])
+        expect(sessionData.selectedEstablishment).toStrictEqual(newEstablishment)
         expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)
         expect(auditService.changeEstablishment).toHaveBeenCalledTimes(1)
       })

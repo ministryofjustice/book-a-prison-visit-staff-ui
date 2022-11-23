@@ -1,8 +1,22 @@
 import { SuperAgentRequest } from 'superagent'
 import { stubFor } from './wiremock'
 import { SupportType, Visit, VisitSession } from '../../server/data/visitSchedulerApiTypes'
+import { supportedPrisonIds } from './responses/visitScheduler'
 
 export default {
+  stubGetSupportedPrisonIds: (): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: '/visitScheduler/config/prisons/supported',
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: supportedPrisonIds,
+      },
+    })
+  },
   stubGetAvailableSupportOptions: (): SuperAgentRequest => {
     const results: SupportType[] = [
       {
