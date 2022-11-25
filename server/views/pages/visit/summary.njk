@@ -104,14 +104,21 @@
         {% if showButtons %}
           {% set cancelButtonClasses = 'govuk-!-margin-top-5 govuk-button--secondary' %}
           {% if visit.visitStatus === 'BOOKED' %}
-            {# If update journey abled and visit is booked, do this #}
-            {{ govukButton({
-              text: "Update booking",
-              classes: "govuk-!-margin-top-5",
-              href: "/visit/" + visit.reference + "/update/select-visitors",
-              attributes: { "data-test": "update-visit" },
-              preventDoubleClick: true
-            }) }}
+
+
+            <form action="/visit/{{ visit.reference }}" method="POST" novalidate>
+              <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+              {{ govukButton({
+                text: "Update booking",
+                classes: "govuk-!-margin-top-5",
+                attributes: { "data-test": "update-visit" },
+                preventDoubleClick: true
+              }) }}
+            </form>
+
+
+           
             {{ govukButton({
               text: "Cancel booking",
               classes: cancelButtonClasses,
