@@ -594,7 +594,6 @@ describe('POST /visit/:reference', () => {
       .expect(302)
       .expect('location', '/visit/ab-cd-ef-gh/update/select-visitors')
       .expect(res => {
-        expect(auditService.overrodeZeroVO).not.toHaveBeenCalled()
         expect(clearSession).toHaveBeenCalledTimes(1)
         expect(visitSessionData).toEqual(<VisitSessionData>{
           prisoner: {

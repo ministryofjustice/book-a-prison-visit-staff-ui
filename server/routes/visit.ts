@@ -88,47 +88,6 @@ export default function routes(
       operationId: res.locals.appInsightsOperationId,
     })
 
-    // const visitorIds = visit.visitors.flatMap(visitor => visitor.nomisPersonId)
-    // const mainContactVisitor = visit.visitors.find(visitor => visitor.visitContact)
-    // const mainContactId = mainContactVisitor ? mainContactVisitor.nomisPersonId : null
-    // const visitorList = await prisonerVisitorsService.getVisitors(visit.prisonerId, res.locals.user?.username)
-    // const currentVisitors = visitorList.filter(visitor => visitorIds.includes(visitor.personId))
-    // const mainContact = currentVisitors.find(visitor => visitor.personId === mainContactId)
-
-    // clean then load session
-    // clearSession(req)
-    // const visitSlot: VisitSlot = {
-    //   id: '',
-    //   startTimestamp: visit.startTimestamp,
-    //   endTimestamp: visit.endTimestamp,
-    //   availableTables: 0,
-    //   capacity: undefined,
-    //   visitRoomName: visit.visitRoom,
-    //   visitRestriction: visit.visitRestriction,
-    // }
-    // const visitSessionData: VisitSessionData = {
-    //   prisoner: {
-    //     name: properCaseFullName(`${prisoner.lastName}, ${prisoner.firstName}`),
-    //     offenderNo: prisoner.prisonerNumber,
-    //     dateOfBirth: prisoner.dateOfBirth,
-    //     location: prisonerLocation,
-    //   },
-    //   visitSlot,
-    //   originalVisitSlot: visitSlot,
-    //   visitRestriction: visit.visitRestriction,
-    //   visitors: currentVisitors,
-    //   visitorSupport: visit.visitorSupport,
-    //   mainContact: {
-    //     contact: mainContact,
-    //     phoneNumber: visit.visitContact.telephone,
-    //     contactName: visit.visitContact.name,
-    //   },
-    //   visitReference: visit.reference,
-    //   visitStatus: visit.visitStatus,
-    // }
-
-    // req.session.visitSessionData = Object.assign(req.session.visitSessionData ?? {}, visitSessionData)
-
     const nowTimestamp = new Date()
     const visitStartTimestamp = new Date(visit.startTimestamp)
     const showButtons = nowTimestamp < visitStartTimestamp
