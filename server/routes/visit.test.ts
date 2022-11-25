@@ -182,9 +182,9 @@ describe('GET /visit/:reference', () => {
       prisonerVisitorsServiceOverride: prisonerVisitorsService,
       supportedPrisonsServiceOverride: supportedPrisonsService,
       systemTokenOverride: systemToken,
-      sessionData: {
-        visitSessionData,
-      } as SessionData,
+      // sessionData: {
+      // visitSessionData,
+      // } as SessionData,
     })
   })
 
@@ -462,6 +462,199 @@ describe('GET /visit/:reference', () => {
         const $ = cheerio.load(res.text)
         expect($('[data-test="cancelled-visit-reason"]').text()).toContain('by the visitor')
         expect($('[data-test="cancelled-visit-reason"]').text()).toContain('no longer required')
+      })
+  })
+})
+
+describe('POST /visit/:reference', () => {
+  const childBirthYear = new Date().getFullYear() - 5
+
+  const prisoner: Prisoner = {
+    firstName: 'JOHN',
+    lastName: 'SMITH',
+    prisonerNumber: 'A1234BC',
+    dateOfBirth: '1975-04-02',
+    prisonId: 'HEI',
+    prisonName: 'Hewell (HMP)',
+    cellLocation: '1-1-C-028',
+    restrictedPatient: false,
+  }
+
+  let visit: Visit
+
+  const visitors: VisitorListItem[] = [
+    {
+      personId: 4321,
+      name: 'Jeanette Smith',
+      dateOfBirth: '1986-07-28',
+      adult: true,
+      relationshipDescription: 'Sister',
+      address: '123 The Street,<br>Coventry',
+      restrictions: [
+        {
+          restrictionType: 'CLOSED',
+          restrictionTypeDescription: 'Closed',
+          startDate: '2022-01-03',
+          globalRestriction: false,
+        },
+      ],
+      banned: false,
+    },
+    {
+      personId: 4324,
+      name: 'Anne Smith',
+      dateOfBirth: `${childBirthYear}-01-02`,
+      adult: false,
+      relationshipDescription: 'Niece',
+      address: 'Not entered',
+      restrictions: [],
+      banned: false,
+    },
+  ]
+
+  const additionalSupport = ['Wheelchair ramp', 'custom request']
+
+  beforeEach(() => {
+    visit = {
+      applicationReference: 'aaa-bbb-ccc',
+      reference: 'ab-cd-ef-gh',
+      prisonerId: 'A1234BC',
+      prisonId: 'HEI',
+      visitRoom: 'visit room',
+      visitType: 'SOCIAL',
+      visitStatus: 'BOOKED',
+      visitRestriction: 'OPEN',
+      startTimestamp: '2022-02-09T10:00:00',
+      endTimestamp: '2022-02-09T11:15:00',
+      visitNotes: [
+        {
+          type: 'VISIT_COMMENT',
+          text: 'Example of a visit comment',
+        },
+        {
+          type: 'VISITOR_CONCERN',
+          text: 'Example of a visitor concern',
+        },
+      ],
+      visitContact: {
+        name: 'Jeanette Smith',
+        telephone: '01234 567890',
+      },
+      visitors: [
+        {
+          nomisPersonId: 4321,
+        },
+        {
+          nomisPersonId: 4324,
+        },
+      ],
+      visitorSupport: [
+        {
+          type: 'WHEELCHAIR',
+        },
+        {
+          type: 'OTHER',
+          text: 'custom request',
+        },
+      ],
+      createdTimestamp: '2022-02-14T10:00:00',
+      modifiedTimestamp: '2022-02-14T10:05:00',
+    }
+
+    const fakeDate = new Date('2022-01-01')
+    jest.useFakeTimers({ doNotFake: ['nextTick'], now: fakeDate })
+
+    prisonerSearchService.getPrisonerById.mockResolvedValue(prisoner)
+    visitSessionsService.getFullVisitDetails.mockResolvedValue({ visit, visitors, additionalSupport })
+    prisonerVisitorsService.getVisitors.mockResolvedValue(visitors)
+    supportedPrisonsService.getSupportedPrisonIds.mockResolvedValue(['HEI'])
+
+    visitSessionData = { prisoner: undefined }
+
+    app = appWithAllRoutes({
+      prisonerSearchServiceOverride: prisonerSearchService,
+      visitSessionsServiceOverride: visitSessionsService,
+      auditServiceOverride: auditService,
+      prisonerVisitorsServiceOverride: prisonerVisitorsService,
+      supportedPrisonsServiceOverride: supportedPrisonsService,
+      systemTokenOverride: systemToken,
+      sessionData: {
+        visitSessionData,
+      } as SessionData,
+    })
+  })
+
+  afterAll(() => {
+    jest.useRealTimers()
+  })
+
+  it('should set up sessionData and redirect to select visitors page', () => {
+    return request(app)
+      .post('/visit/ab-cd-ef-gh')
+      .expect(302)
+      .expect('location', '/visit/ab-cd-ef-gh/update/select-visitors')
+      .expect(res => {
+        expect(auditService.overrodeZeroVO).not.toHaveBeenCalled()
+        expect(clearSession).toHaveBeenCalledTimes(1)
+        expect(visitSessionData).toEqual(<VisitSessionData>{
+          prisoner: {
+            name: 'Smith, John',
+            offenderNo: 'A1234BC',
+            dateOfBirth: '1975-04-02',
+            location: '1-1-C-028, Hewell (HMP)',
+          },
+          visitSlot: {
+            id: '',
+            startTimestamp: '2022-02-09T10:00:00',
+            endTimestamp: '2022-02-09T11:15:00',
+            availableTables: 0,
+            visitRoomName: 'visit room',
+            visitRestriction: 'OPEN',
+          },
+          originalVisitSlot: {
+            id: '',
+            startTimestamp: '2022-02-09T10:00:00',
+            endTimestamp: '2022-02-09T11:15:00',
+            availableTables: 0,
+            visitRoomName: 'visit room',
+            visitRestriction: 'OPEN',
+          },
+          visitRestriction: 'OPEN',
+          visitors: [
+            {
+              address: '123 The Street,<br>Coventry',
+              adult: true,
+              banned: false,
+              dateOfBirth: '1986-07-28',
+              name: 'Jeanette Smith',
+              personId: 4321,
+              relationshipDescription: 'Sister',
+              restrictions: [
+                {
+                  globalRestriction: false,
+                  restrictionType: 'CLOSED',
+                  restrictionTypeDescription: 'Closed',
+                  startDate: '2022-01-03',
+                },
+              ],
+            },
+            {
+              address: 'Not entered',
+              adult: false,
+              banned: false,
+              dateOfBirth: '2017-01-02',
+              name: 'Anne Smith',
+              personId: 4324,
+              relationshipDescription: 'Niece',
+              restrictions: [],
+            },
+          ],
+          visitorSupport: [{ type: 'WHEELCHAIR' }, { text: 'custom request', type: 'OTHER' }],
+          mainContact: { phoneNumber: '01234 567890', contactName: 'Jeanette Smith' },
+          applicationReference: undefined,
+          visitReference: 'ab-cd-ef-gh',
+          visitStatus: 'BOOKED',
+        })
       })
   })
 })
