@@ -115,17 +115,16 @@
                 attributes: { "data-test": "update-visit" },
                 preventDoubleClick: true
               }) }}
+            
+              {{ govukButton({
+                text: "Cancel booking",
+                classes: cancelButtonClasses,
+                href: "/visit/" + visit.reference + "/cancel",
+                attributes: { "data-test": "cancel-visit" },
+                preventDoubleClick: true
+              }) }}
+
             </form>
-
-
-           
-            {{ govukButton({
-              text: "Cancel booking",
-              classes: cancelButtonClasses,
-              href: "/visit/" + visit.reference + "/cancel",
-              attributes: { "data-test": "cancel-visit" },
-              preventDoubleClick: true
-            }) }}
           {% endif %}
         {% endif %}
 

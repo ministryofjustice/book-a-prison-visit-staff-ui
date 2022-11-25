@@ -192,7 +192,7 @@ describe('GET /visit/:reference', () => {
     jest.useRealTimers()
   })
 
-  it.skip('should render full booking summary page with prisoner, visit and visitor details, with default back link', () => {
+  it('should render full booking summary page with prisoner, visit and visitor details, with default back link', () => {
     return request(app)
       .get('/visit/ab-cd-ef-gh')
       .expect(200)
@@ -214,7 +214,7 @@ describe('GET /visit/:reference', () => {
         expect($('[data-test="visit-contact"]').text()).toBe('Smith, Jeanette')
         expect($('[data-test="visit-phone"]').text()).toBe('01234 567890')
         expect($('[data-test="cancel-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/cancel')
-        expect($('[data-test="update-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/update/select-visitors')
+        expect($('form').attr('action')).toBe('/visit/ab-cd-ef-gh')
         // visitor details
         expect($('[data-test="visitor-name-1"]').text()).toBe('Smith, Jeanette')
         expect($('[data-test="visitor-dob-1"]').html()).toContain('28 July 1986')
@@ -241,71 +241,10 @@ describe('GET /visit/:reference', () => {
           username: 'user1',
           operationId: undefined,
         })
-
-        expect(clearSession).toHaveBeenCalledTimes(1)
-        expect(visitSessionData).toEqual(<VisitSessionData>{
-          prisoner: {
-            name: 'Smith, John',
-            offenderNo: 'A1234BC',
-            dateOfBirth: '1975-04-02',
-            location: '1-1-C-028, Hewell (HMP)',
-          },
-          visitSlot: {
-            id: '',
-            startTimestamp: '2022-02-09T10:00:00',
-            endTimestamp: '2022-02-09T11:15:00',
-            availableTables: 0,
-            visitRoomName: 'visit room',
-            visitRestriction: 'OPEN',
-          },
-          originalVisitSlot: {
-            id: '',
-            startTimestamp: '2022-02-09T10:00:00',
-            endTimestamp: '2022-02-09T11:15:00',
-            availableTables: 0,
-            visitRoomName: 'visit room',
-            visitRestriction: 'OPEN',
-          },
-          visitRestriction: 'OPEN',
-          visitors: [
-            {
-              address: '123 The Street,<br>Coventry',
-              adult: true,
-              banned: false,
-              dateOfBirth: '1986-07-28',
-              name: 'Jeanette Smith',
-              personId: 4321,
-              relationshipDescription: 'Sister',
-              restrictions: [
-                {
-                  globalRestriction: false,
-                  restrictionType: 'CLOSED',
-                  restrictionTypeDescription: 'Closed',
-                  startDate: '2022-01-03',
-                },
-              ],
-            },
-            {
-              address: 'Not entered',
-              adult: false,
-              banned: false,
-              dateOfBirth: '2017-01-02',
-              name: 'Anne Smith',
-              personId: 4324,
-              relationshipDescription: 'Niece',
-              restrictions: [],
-            },
-          ],
-          visitorSupport: [{ type: 'WHEELCHAIR' }, { text: 'custom request', type: 'OTHER' }],
-          mainContact: { phoneNumber: '01234 567890', contactName: 'Jeanette Smith' },
-          applicationReference: undefined,
-          visitReference: 'ab-cd-ef-gh',
-          visitStatus: 'BOOKED',
-        })
       })
   })
 
-  it.skip('should render full booking summary page with prisoner, visit and visitor details, with default back link, formatting unknown contact telephone correctly', () => {
+  it('should render full booking summary page with prisoner, visit and visitor details, with default back link, formatting unknown contact telephone correctly', () => {
     const unknownTelephoneVisit = JSON.parse(JSON.stringify(visit))
     unknownTelephoneVisit.visitContact.telephone = 'UNKNOWN'
     prisonerSearchService.getPrisonerById.mockResolvedValue(prisoner)
@@ -336,7 +275,7 @@ describe('GET /visit/:reference', () => {
         expect($('[data-test="visit-contact"]').text()).toBe('Smith, Jeanette')
         expect($('[data-test="visit-phone"]').text()).toBe('Unknown')
         expect($('[data-test="cancel-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/cancel')
-        expect($('[data-test="update-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/update/select-visitors')
+        expect($('form').attr('action')).toBe('/visit/ab-cd-ef-gh')
         // visitor details
         expect($('[data-test="visitor-name-1"]').text()).toBe('Smith, Jeanette')
         expect($('[data-test="visitor-dob-1"]').html()).toContain('28 July 1986')
@@ -363,12 +302,10 @@ describe('GET /visit/:reference', () => {
           username: 'user1',
           operationId: undefined,
         })
-
-        expect(clearSession).toHaveBeenCalledTimes(1)
       })
   })
 
-  it.skip('should render full booking summary page with prisoner, visit and visitor details with search back link when from visits', () => {
+  it('should render full booking summary page with prisoner, visit and visitor details with search back link when from visits', () => {
     const url =
       '/visit/ab-cd-ef-gh?query=startDate%3D2022-05-24%26type%3DOPEN%26time%3D3pm%2Bto%2B3%253A59pm&from=visit-search'
 
@@ -396,7 +333,7 @@ describe('GET /visit/:reference', () => {
         expect($('[data-test="visit-contact"]').text()).toBe('Smith, Jeanette')
         expect($('[data-test="visit-phone"]').text()).toBe('01234 567890')
         expect($('[data-test="cancel-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/cancel')
-        expect($('[data-test="update-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/update/select-visitors')
+        expect($('form').attr('action')).toBe('/visit/ab-cd-ef-gh')
         // visitor details
         expect($('[data-test="visitor-name-1"]').text()).toBe('Smith, Jeanette')
         expect($('[data-test="visitor-dob-1"]').html()).toContain('28 July 1986')
@@ -423,8 +360,6 @@ describe('GET /visit/:reference', () => {
           username: 'user1',
           operationId: undefined,
         })
-
-        expect(clearSession).toHaveBeenCalledTimes(1)
       })
   })
 
