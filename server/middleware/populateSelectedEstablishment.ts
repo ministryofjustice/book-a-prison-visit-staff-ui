@@ -15,13 +15,13 @@ export default function populateSelectedEstablishment(
       // Override active caseload with Hewell if establishment switcher feature not enabled
       const activeCaseLoadId = config.features.establishmentSwitcherEnabled ? res.locals.user.activeCaseLoadId : 'HEI'
 
-      if (supportedPrisons[activeCaseLoadId]) {
-        req.session.selectedEstablishment = {
-          prisonId: activeCaseLoadId,
-          prisonName: supportedPrisons[activeCaseLoadId],
-        }
-      } else {
+      if (!supportedPrisons[activeCaseLoadId]) {
         return res.redirect('/change-establishment')
+      }
+
+      req.session.selectedEstablishment = {
+        prisonId: activeCaseLoadId,
+        prisonName: supportedPrisons[activeCaseLoadId],
       }
     }
     res.locals.selectedEstablishment = req.session.selectedEstablishment
