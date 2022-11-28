@@ -104,7 +104,7 @@ describe('Prisoner search page', () => {
             expect(auditService.prisonerSearch).toHaveBeenCalledWith({
               searchTerms: 'A1234BC',
               prisonId,
-              username: undefined,
+              username: 'user1',
               operationId: undefined,
             })
             expect(prisonerSearchService.getPrisoners).toHaveBeenCalledTimes(1)
@@ -159,7 +159,7 @@ describe('Prisoner search page', () => {
             expect(auditService.prisonerSearch).toHaveBeenCalledWith({
               searchTerms: 'A1234BC',
               prisonId,
-              username: undefined,
+              username: 'user1',
               operationId: undefined,
             })
             expect(prisonerSearchService.getPrisoners).toHaveBeenCalledTimes(1)
@@ -199,7 +199,7 @@ describe('Prisoner search page', () => {
             expect(auditService.prisonerSearch).toHaveBeenCalledWith({
               searchTerms: 'A1234BC',
               prisonId,
-              username: undefined,
+              username: 'user1',
               operationId: undefined,
             })
             expect(prisonerSearchService.getPrisoners).toHaveBeenCalledTimes(1)
@@ -252,7 +252,7 @@ describe('Prisoner search page', () => {
           .expect(res => {
             expect(res.text).toContain('Search for a prisoner')
             expect(res.text).toContain('id="search-results-none"')
-            expect(mockGetPrisoners).toHaveBeenCalledWith('A1234BC', prisonId, undefined, 1, true)
+            expect(mockGetPrisoners).toHaveBeenCalledWith('A1234BC', prisonId, 'user1', 1, true)
           })
       })
     })
@@ -434,7 +434,7 @@ describe('Booking search page', () => {
           expect(auditService.visitSearch).toHaveBeenCalledTimes(1)
           expect(auditService.visitSearch).toHaveBeenCalledWith({
             searchTerms: 'ab-bc-cd-de',
-            username: undefined,
+            username: 'user1',
             operationId: undefined,
           })
         })
@@ -469,7 +469,7 @@ describe('Booking search page', () => {
           expect(auditService.visitSearch).toHaveBeenCalledTimes(1)
           expect(auditService.visitSearch).toHaveBeenCalledWith({
             searchTerms: 'ab-bc-cd-de',
-            username: undefined,
+            username: 'user1',
             operationId: undefined,
           })
         })

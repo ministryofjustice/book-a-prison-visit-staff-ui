@@ -172,7 +172,7 @@ describe('GET /prisoner/A1234BC', () => {
         expect(auditService.viewPrisoner).toHaveBeenCalledWith({
           prisonerId: 'A1234BC',
           prisonId,
-          username: undefined,
+          username: 'user1',
           operationId: undefined,
         })
       })
@@ -216,7 +216,7 @@ describe('GET /prisoner/A1234BC', () => {
         expect(auditService.viewPrisoner).toHaveBeenCalledWith({
           prisonerId: 'A1234BC',
           prisonId,
-          username: undefined,
+          username: 'user1',
           operationId: undefined,
         })
       })
@@ -241,7 +241,7 @@ describe('GET /prisoner/A1234BC', () => {
         expect(auditService.viewPrisoner).toHaveBeenCalledWith({
           prisonerId: 'A1234BC',
           prisonId,
-          username: undefined,
+          username: 'user1',
           operationId: undefined,
         })
       })
@@ -267,7 +267,7 @@ describe('GET /prisoner/A1234BC', () => {
         expect(auditService.viewPrisoner).toHaveBeenCalledWith({
           prisonerId: 'A1234BC',
           prisonId,
-          username: undefined,
+          username: 'user1',
           operationId: undefined,
         })
       })
@@ -292,7 +292,7 @@ describe('GET /prisoner/A1234BC', () => {
         expect(auditService.viewPrisoner).toHaveBeenCalledWith({
           prisonerId: 'A1234BC',
           prisonId,
-          username: undefined,
+          username: 'user1',
           operationId: undefined,
         })
       })
@@ -329,7 +329,7 @@ describe('GET /prisoner/A1234BC', () => {
         expect(auditService.viewPrisoner).toHaveBeenCalledWith({
           prisonerId: 'A1234BC',
           prisonId,
-          username: undefined,
+          username: 'user1',
           operationId: undefined,
         })
       })
@@ -377,7 +377,7 @@ describe('POST /prisoner/A1234BC', () => {
       .expect('location', '/book-a-visit/select-visitors')
       .expect(res => {
         expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledTimes(1)
-        expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledWith('A1234BC', prisonId, undefined)
+        expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledWith('A1234BC', prisonId, 'user1')
         expect(auditService.overrodeZeroVO).not.toHaveBeenCalled()
         expect(clearSession).toHaveBeenCalledTimes(1)
         expect(visitSessionData).toEqual(<VisitSessionData>{
@@ -401,11 +401,11 @@ describe('POST /prisoner/A1234BC', () => {
       .expect('location', '/book-a-visit/select-visitors')
       .expect(res => {
         expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledTimes(1)
-        expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledWith('A1234BC', prisonId, undefined)
+        expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledWith('A1234BC', prisonId, 'user1')
         expect(auditService.overrodeZeroVO).toHaveBeenCalledTimes(1)
         expect(auditService.overrodeZeroVO).toHaveBeenCalledWith({
           prisonerId: 'A1234BC',
-          username: undefined,
+          username: 'user1',
           operationId: undefined,
         })
         expect(clearSession).toHaveBeenCalledTimes(1)
@@ -434,7 +434,7 @@ describe('POST /prisoner/A1234BC', () => {
       .expect('location', '/book-a-visit/select-visitors')
       .expect(res => {
         expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledTimes(1)
-        expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledWith('A1234BC', prisonId, undefined)
+        expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledWith('A1234BC', prisonId, 'user1')
         expect(auditService.overrodeZeroVO).not.toHaveBeenCalled()
         expect(visitSessionData).toEqual(<VisitSessionData>{
           prisoner: {
@@ -456,7 +456,7 @@ describe('POST /prisoner/A1234BC', () => {
       .expect('location', '/prisoner/A1234BC')
       .expect(res => {
         expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledTimes(1)
-        expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledWith('A1234BC', prisonId, undefined)
+        expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledWith('A1234BC', prisonId, 'user1')
         expect(auditService.overrodeZeroVO).not.toHaveBeenCalled()
         expect(visitSessionData).toEqual({})
         expect(flashProvider).toHaveBeenCalledWith('errors', [

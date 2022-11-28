@@ -242,7 +242,7 @@ testJourneys.forEach(journey => {
               startTimestamp: '2022-03-12T09:30:00',
               endTimestamp: '2022-03-12T10:30:00',
               visitRestriction: 'OPEN',
-              username: undefined,
+              username: 'user1',
               operationId: undefined,
             })
             expect(notificationsService[journey.isUpdate ? 'sendUpdateSms' : 'sendBookingSms']).toHaveBeenCalledTimes(1)

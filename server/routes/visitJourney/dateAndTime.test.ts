@@ -333,7 +333,7 @@ testJourneys.forEach(journey => {
               startTimestamp: '2022-02-14T11:59:00',
               endTimestamp: '2022-02-14T12:59:00',
               visitRestriction: 'OPEN',
-              username: undefined,
+              username: 'user1',
               operationId: undefined,
             })
           })
@@ -397,7 +397,7 @@ testJourneys.forEach(journey => {
               startTimestamp: '2022-02-14T12:00:00',
               endTimestamp: '2022-02-14T13:05:00',
               visitRestriction: 'OPEN',
-              username: undefined,
+              username: 'user1',
               operationId: undefined,
             })
           })
