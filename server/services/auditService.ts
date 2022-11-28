@@ -347,7 +347,7 @@ export default class AuditService {
       operationId,
       who,
       service: config.apis.audit.serviceName,
-      details: JSON.stringify(details),
+      details: JSON.stringify(details, this.replaceUndefinedWithNull),
     })
 
     try {
@@ -362,5 +362,9 @@ export default class AuditService {
       logger.error(`Problem sending message to SQS queue (message: ${message})`)
       logger.error(error)
     }
+  }
+
+  private replaceUndefinedWithNull(_key: string, value: unknown) {
+    return typeof value === 'undefined' ? null : value
   }
 }

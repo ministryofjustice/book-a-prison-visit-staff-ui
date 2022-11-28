@@ -36,7 +36,7 @@ afterEach(() => {
 })
 
 describe('GET /change-establishment', () => {
-  it('should render select establishment page, with default establishment selected', () => {
+  it('should render select establishment page with none selected', () => {
     app = appWithAllRoutes({
       supportedPrisonsServiceOverride: supportedPrisonsService,
       systemTokenOverride: systemToken,
@@ -49,8 +49,9 @@ describe('GET /change-establishment', () => {
         const $ = cheerio.load(res.text)
         expect($('h1').text()).toBe('Select establishment')
         expect($('input[name="establishment"]').eq(0).prop('value')).toBe('HEI')
-        expect($('input[name="establishment"]').eq(0).prop('checked')).toBe(true)
+        expect($('input[name="establishment"]').eq(0).prop('checked')).toBe(false)
         expect($('input[name="establishment"]').eq(1).prop('value')).toBe('BLI')
+        expect($('input[name="establishment"]').eq(1).prop('checked')).toBe(false)
         expect($('input[name="establishment"]').length).toBe(2)
         expect($('form').attr('action')).toBe('/change-establishment?referrer=/search/prisoner/')
       })
@@ -170,7 +171,7 @@ describe('POST /change-establishment', () => {
         expect(auditService.changeEstablishment).toHaveBeenCalledWith({
           previousEstablishment: 'BLI',
           newEstablishment: 'HEI',
-          username: undefined,
+          username: 'user1',
           operationId: undefined,
         })
       })
