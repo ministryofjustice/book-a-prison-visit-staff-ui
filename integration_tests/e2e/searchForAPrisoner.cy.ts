@@ -27,6 +27,8 @@ context('Search for a prisoner', () => {
     cy.task('reset')
     cy.task('stubSignIn')
     cy.task('stubAuthUser')
+    cy.task('stubGetSupportedPrisonIds')
+    cy.task('stubGetPrisons')
   })
 
   it('should show Search For A Prisoner page', () => {
@@ -190,8 +192,6 @@ context('Search for a prisoner', () => {
           cy.task('stubGetUpcomingVisits', { offenderNo: prisonerNumber, upcomingVisits })
           cy.task('stubGetPastVisits', { offenderNo: prisonerNumber, pastVisits })
           cy.task('stubGetPrisonerSocialContacts', prisonerNumber)
-          cy.task('stubGetSupportedPrisonIds')
-          cy.task('stubGetPrisons')
           searchForAPrisonerResultsPage.firstResultLink().click()
 
           const prisonerProfilePage = new PrisonerProfilePage(pageTitle)
