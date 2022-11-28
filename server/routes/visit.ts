@@ -76,9 +76,7 @@ export default function routes(
     const prisoner: Prisoner = await prisonerSearchService.getPrisonerById(visit.prisonerId, res.locals.user?.username)
     const supportedPrisonIds = await supportedPrisonsService.getSupportedPrisonIds(res.locals.user?.username)
 
-    const prisonerLocation = supportedPrisonIds.includes(prisoner.prisonId)
-      ? `${prisoner.cellLocation}, ${prisoner.prisonName}`
-      : 'Unknown'
+    const prisonerLocation = getPrisonerLocation(supportedPrisonIds, prisoner)
 
     await auditService.viewedVisitDetails({
       visitReference: reference,
@@ -115,9 +113,7 @@ export default function routes(
     const prisoner: Prisoner = await prisonerSearchService.getPrisonerById(visit.prisonerId, res.locals.user?.username)
     const supportedPrisonIds = await supportedPrisonsService.getSupportedPrisonIds(res.locals.user?.username)
 
-    const prisonerLocation = supportedPrisonIds.includes(prisoner.prisonId)
-      ? `${prisoner.cellLocation}, ${prisoner.prisonName}`
-      : 'Unknown'
+    const prisonerLocation = getPrisonerLocation(supportedPrisonIds, prisoner)
 
     const visitorIds = visit.visitors.flatMap(visitor => visitor.nomisPersonId)
     const mainContactVisitor = visit.visitors.find(visitor => visitor.visitContact)
@@ -339,6 +335,10 @@ function getVisitReference(req: Request): string {
     throw new BadRequest()
   }
   return reference
+}
+
+function getPrisonerLocation(supportedPrisonIds: string[], prisoner: Prisoner) {
+  return supportedPrisonIds.includes(prisoner.prisonId) ? `${prisoner.cellLocation}, ${prisoner.prisonName}` : 'Unknown'
 }
 
 const checkVisitReferenceMiddleware = (req: Request, res: Response, next: NextFunction): void => {

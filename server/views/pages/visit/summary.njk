@@ -104,18 +104,14 @@
         {% if showButtons %}
           {% set cancelButtonClasses = 'govuk-!-margin-top-5 govuk-button--secondary' %}
           {% if visit.visitStatus === 'BOOKED' %}
-
-
             <form action="/visit/{{ visit.reference }}" method="POST" novalidate>
               <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-
               {{ govukButton({
                 text: "Update booking",
                 classes: "govuk-!-margin-top-5",
                 attributes: { "data-test": "update-visit" },
                 preventDoubleClick: true
               }) }}
-            
               {{ govukButton({
                 text: "Cancel booking",
                 classes: cancelButtonClasses,
@@ -123,7 +119,6 @@
                 attributes: { "data-test": "cancel-visit" },
                 preventDoubleClick: true
               }) }}
-
             </form>
           {% endif %}
         {% endif %}
