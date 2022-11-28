@@ -1,11 +1,12 @@
 import type { RequestHandler } from 'express'
 import config from '../config'
 import SupportedPrisonsService from '../services/supportedPrisonsService'
+import asyncMiddleware from './asyncMiddleware'
 
 export default function populateSelectedEstablishment(
   supportedPrisonsService: SupportedPrisonsService,
 ): RequestHandler {
-  return async (req, res, next) => {
+  return asyncMiddleware(async (req, res, next) => {
     // using req.originalUrl rather than ideally req.path as this was causing problems
     // because of middleware sometimes being called twice (expected to be resolved in VB-1430)
     if (req.session.selectedEstablishment === undefined && !req.originalUrl.startsWith('/change-establishment')) {
@@ -26,5 +27,5 @@ export default function populateSelectedEstablishment(
     res.locals.selectedEstablishment = req.session.selectedEstablishment
 
     return next()
-  }
+  })
 }
