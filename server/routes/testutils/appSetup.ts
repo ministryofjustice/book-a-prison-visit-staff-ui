@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 import express, { Express } from 'express'
 import createError from 'http-errors'
 import { Cookie, SessionData } from 'express-session'
@@ -29,6 +30,7 @@ import * as auth from '../../authentication/auth'
 import systemToken from '../../data/authClient'
 import { SystemToken, VisitorListItem, VisitSlotList, VisitSessionData } from '../../@types/bapv'
 import AuditService from '../../services/auditService'
+import { createSupportedPrisons } from '../../data/__testutils/testObjects'
 
 const user = {
   name: 'john smith',
@@ -36,6 +38,7 @@ const user = {
   lastName: 'smith',
   username: 'user1',
   displayName: 'John Smith',
+  activeCaseLoadId: 'HEI',
 }
 
 export const flashProvider = jest.fn()
@@ -50,6 +53,16 @@ class MockUserService extends UserService {
       token,
       ...user,
     }
+  }
+}
+
+class MockSupportedPrisonsService extends SupportedPrisonsService {
+  constructor() {
+    super(undefined, undefined, undefined)
+  }
+
+  async getSupportedPrisons(_username: string): Promise<Record<string, string>> {
+    return createSupportedPrisons()
   }
 }
 
@@ -94,7 +107,7 @@ function appSetup({
 
   app.use((req, res, next) => {
     res.locals = {}
-    res.locals.user = req.user
+    res.locals.user = user
     req.flash = flashProvider
     req.session = {
       ...sessionData,
@@ -115,16 +128,21 @@ function appSetup({
 
   const systemTokenTest = systemTokenOverride || systemToken
 
-  app.use('/', indexRoutes(standardRouter(new MockUserService())))
+  const supportedPrisonsService =
+    supportedPrisonsServiceOverride ||
+    new SupportedPrisonsService(visitSchedulerApiClientBuilder, prisonRegisterApiClientBuilder, systemTokenTest)
+
+  app.use('/', indexRoutes(standardRouter(new MockUserService(), new MockSupportedPrisonsService())))
 
   const auditService = auditServiceOverride || new AuditService()
 
-  const supportedPrisonsService =
-    supportedPrisonsServiceOverride ||
-    new SupportedPrisonsService(visitSchedulerApiClientBuilder, prisonRegisterApiClientBuilder, systemToken)
   app.use(
     '/change-establishment/',
-    establishmentRoutes(standardRouter(new MockUserService()), supportedPrisonsService, auditService),
+    establishmentRoutes(
+      standardRouter(new MockUserService(), new MockSupportedPrisonsService()),
+      supportedPrisonsService,
+      auditService,
+    ),
   )
 
   const prisonerSearchService =
@@ -139,7 +157,12 @@ function appSetup({
     )
   app.use(
     '/search/',
-    searchRoutes(standardRouter(new MockUserService()), prisonerSearchService, visitSessionsService, auditService),
+    searchRoutes(
+      standardRouter(new MockUserService(), new MockSupportedPrisonsService()),
+      prisonerSearchService,
+      visitSessionsService,
+      auditService,
+    ),
   )
 
   const prisonerProfileService =
@@ -149,13 +172,13 @@ function appSetup({
       visitSchedulerApiClientBuilder,
       prisonerContactRegistryApiClientBuilder,
       supportedPrisonsServiceOverride ||
-        new SupportedPrisonsService(visitSchedulerApiClientBuilder, prisonRegisterApiClientBuilder, systemToken),
+        new SupportedPrisonsService(visitSchedulerApiClientBuilder, prisonRegisterApiClientBuilder, systemTokenTest),
       systemTokenTest,
     )
   app.use(
     '/prisoner/',
     prisonerRoutes(
-      standardRouter(new MockUserService()),
+      standardRouter(new MockUserService(), new MockSupportedPrisonsService()),
       prisonerProfileService,
       prisonerSearchService,
       visitSessionsService,
@@ -170,7 +193,7 @@ function appSetup({
   app.use(
     '/book-a-visit/',
     bookAVisitRoutes(
-      standardRouter(new MockUserService()),
+      standardRouter(new MockUserService(), new MockSupportedPrisonsService()),
       prisonerVisitorsService,
       visitSessionsService,
       prisonerProfileService,
@@ -181,7 +204,7 @@ function appSetup({
   app.use(
     '/visit/',
     visitRoutes(
-      standardRouter(new MockUserService()),
+      standardRouter(new MockUserService(), new MockSupportedPrisonsService()),
       prisonerSearchService,
       visitSessionsService,
       notificationsService,
@@ -193,7 +216,12 @@ function appSetup({
   )
   app.use(
     '/visits',
-    visitsRoutes(standardRouter(new MockUserService()), prisonerSearchService, visitSessionsService, auditService),
+    visitsRoutes(
+      standardRouter(new MockUserService(), new MockSupportedPrisonsService()),
+      prisonerSearchService,
+      visitSessionsService,
+      auditService,
+    ),
   )
 
   app.use((req, res, next) => next(createError(404, 'Not found')))

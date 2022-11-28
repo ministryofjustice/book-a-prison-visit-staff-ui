@@ -149,7 +149,7 @@ testJourneys.forEach(journey => {
               prisonerId: visitSessionData.prisoner.offenderNo,
               visitRestriction: 'OPEN',
               visitorIds: [visitSessionData.visitors[0].personId.toString()],
-              username: undefined,
+              username: 'user1',
               operationId: undefined,
             })
           })
@@ -169,7 +169,7 @@ testJourneys.forEach(journey => {
               prisonerId: visitSessionData.prisoner.offenderNo,
               visitRestriction: 'CLOSED',
               visitorIds: [visitSessionData.visitors[0].personId.toString()],
-              username: undefined,
+              username: 'user1',
               operationId: undefined,
             })
           })

@@ -7,6 +7,7 @@ import SupportedPrisonsService from '../services/supportedPrisonsService'
 import { clearSession } from './visitorUtils'
 import { safeReturnUrl } from '../utils/utils'
 import AuditService from '../services/auditService'
+import { Prison } from '../@types/bapv'
 
 export default function routes(
   router: Router,
@@ -52,16 +53,20 @@ export default function routes(
 
     clearSession(req)
 
+    const previousEstablishment = req.session.selectedEstablishment?.prisonId
+    const newEstablishment: Prison = {
+      prisonId: req.body.establishment,
+      prisonName: supportedPrisons[req.body.establishment],
+    }
+
+    req.session.selectedEstablishment = Object.assign(req.session.selectedEstablishment ?? {}, newEstablishment)
+
     await auditService.changeEstablishment({
-      previousEstablishment: req.session.selectedEstablishment.prisonId,
-      newEstablishment: req.body.establishment,
+      previousEstablishment,
+      newEstablishment: newEstablishment.prisonId,
       username: res.locals.user?.username,
       operationId: res.locals.appInsightsOperationId,
     })
-
-    const { selectedEstablishment } = req.session
-    selectedEstablishment.prisonId = req.body.establishment
-    selectedEstablishment.prisonName = supportedPrisons[req.body.establishment]
 
     return res.redirect(redirectUrl)
   })

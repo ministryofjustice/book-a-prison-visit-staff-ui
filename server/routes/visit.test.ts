@@ -238,7 +238,7 @@ describe('GET /visit/:reference', () => {
           visitReference: 'ab-cd-ef-gh',
           prisonerId: 'A1234BC',
           prisonId: 'HEI',
-          username: undefined,
+          username: 'user1',
           operationId: undefined,
         })
 
@@ -360,7 +360,7 @@ describe('GET /visit/:reference', () => {
           visitReference: 'ab-cd-ef-gh',
           prisonerId: 'A1234BC',
           prisonId: 'HEI',
-          username: undefined,
+          username: 'user1',
           operationId: undefined,
         })
 
@@ -420,7 +420,7 @@ describe('GET /visit/:reference', () => {
           visitReference: 'ab-cd-ef-gh',
           prisonerId: 'A1234BC',
           prisonId: 'HEI',
-          username: undefined,
+          username: 'user1',
           operationId: undefined,
         })
 
@@ -667,7 +667,7 @@ describe('POST /visit/:reference/cancel', () => {
       .expect(() => {
         expect(visitSessionsService.cancelVisit).toHaveBeenCalledTimes(1)
         expect(visitSessionsService.cancelVisit).toHaveBeenCalledWith({
-          username: undefined,
+          username: 'user1',
           reference: 'ab-cd-ef-gh',
           outcome: <OutcomeDto>{
             outcomeStatus: 'PRISONER_CANCELLED',
@@ -682,7 +682,7 @@ describe('POST /visit/:reference/cancel', () => {
           prisonerId: 'AF34567G',
           prisonId: 'HEI',
           reason: 'PRISONER_CANCELLED: illness',
-          username: undefined,
+          username: 'user1',
           operationId: undefined,
         })
         expect(notificationsService.sendCancellationSms).toHaveBeenCalledTimes(1)

@@ -1,14 +1,31 @@
-import type { NextFunction, Request, Response } from 'express'
-import { Prison } from '../@types/bapv'
+import type { RequestHandler } from 'express'
+import config from '../config'
+import SupportedPrisonsService from '../services/supportedPrisonsService'
+import asyncMiddleware from './asyncMiddleware'
 
-// temporarily hard-coding here pending work on establishment switcher and decision on default value
-const defaultEstablishment: Prison = { prisonId: 'HEI', prisonName: 'Hewell (HMP)' }
+export default function populateSelectedEstablishment(
+  supportedPrisonsService: SupportedPrisonsService,
+): RequestHandler {
+  return asyncMiddleware(async (req, res, next) => {
+    // using req.originalUrl rather than ideally req.path as this was causing problems
+    // because of middleware sometimes being called twice (expected to be resolved in VB-1430)
+    if (req.session.selectedEstablishment === undefined && !req.originalUrl.startsWith('/change-establishment')) {
+      const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(res.locals.user?.username)
 
-export default function populateSelectedEstablishment(req: Request, res: Response, next: NextFunction) {
-  if (req.session.selectedEstablishment === undefined) {
-    req.session.selectedEstablishment = defaultEstablishment
-  }
-  res.locals.selectedEstablishment = req.session.selectedEstablishment
+      // Override active caseload with Hewell if establishment switcher feature not enabled
+      const activeCaseLoadId = config.features.establishmentSwitcherEnabled ? res.locals.user.activeCaseLoadId : 'HEI'
 
-  next()
+      if (!supportedPrisons[activeCaseLoadId]) {
+        return res.redirect('/change-establishment')
+      }
+
+      req.session.selectedEstablishment = {
+        prisonId: activeCaseLoadId,
+        prisonName: supportedPrisons[activeCaseLoadId],
+      }
+    }
+    res.locals.selectedEstablishment = req.session.selectedEstablishment
+
+    return next()
+  })
 }

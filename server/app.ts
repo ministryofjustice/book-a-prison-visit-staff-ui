@@ -60,15 +60,19 @@ export default function createApp(userService: UserService): express.Application
     systemToken,
   )
 
-  app.use('/', indexRoutes(standardRouter(userService)))
+  app.use('/', indexRoutes(standardRouter(userService, supportedPrisonsService)))
   app.use(
     '/change-establishment/',
-    establishmentRoutes(standardRouter(userService), supportedPrisonsService, new AuditService()),
+    establishmentRoutes(
+      standardRouter(userService, supportedPrisonsService),
+      supportedPrisonsService,
+      new AuditService(),
+    ),
   )
   app.use(
     '/search/',
     searchRoutes(
-      standardRouter(userService),
+      standardRouter(userService, supportedPrisonsService),
       new PrisonerSearchService(prisonerSearchClientBuilder, systemToken),
       new VisitSessionsService(
         prisonerContactRegistryApiClientBuilder,
@@ -82,7 +86,7 @@ export default function createApp(userService: UserService): express.Application
   app.use(
     '/prisoner/',
     prisonerRoutes(
-      standardRouter(userService),
+      standardRouter(userService, supportedPrisonsService),
       new PrisonerProfileService(
         prisonApiClientBuilder,
         visitSchedulerApiClientBuilder,
@@ -103,7 +107,7 @@ export default function createApp(userService: UserService): express.Application
   app.use(
     '/book-a-visit/',
     bookAVisitRoutes(
-      standardRouter(userService),
+      standardRouter(userService, supportedPrisonsService),
       new PrisonerVisitorsService(prisonerContactRegistryApiClientBuilder, systemToken),
       new VisitSessionsService(
         prisonerContactRegistryApiClientBuilder,
@@ -125,7 +129,7 @@ export default function createApp(userService: UserService): express.Application
   app.use(
     '/visit/',
     visitRoutes(
-      standardRouter(userService),
+      standardRouter(userService, supportedPrisonsService),
       new PrisonerSearchService(prisonerSearchClientBuilder, systemToken),
       new VisitSessionsService(
         prisonerContactRegistryApiClientBuilder,
@@ -149,7 +153,7 @@ export default function createApp(userService: UserService): express.Application
   app.use(
     '/visits/',
     visitsRoutes(
-      standardRouter(userService),
+      standardRouter(userService, supportedPrisonsService),
       new PrisonerSearchService(prisonerSearchClientBuilder, systemToken),
       new VisitSessionsService(
         prisonerContactRegistryApiClientBuilder,

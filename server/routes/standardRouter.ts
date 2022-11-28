@@ -5,15 +5,19 @@ import tokenVerifier from '../data/tokenVerification'
 import populateCurrentUser from '../middleware/populateCurrentUser'
 import populateSelectedEstablishment from '../middleware/populateSelectedEstablishment'
 import type UserService from '../services/userService'
+import SupportedPrisonsService from '../services/supportedPrisonsService'
 
 const testMode = process.env.NODE_ENV === 'test'
 
-export default function standardRouter(userService: UserService): Router {
+export default function standardRouter(
+  userService: UserService,
+  supportedPrisonsService: SupportedPrisonsService,
+): Router {
   const router = Router({ mergeParams: true })
 
   router.use(auth.authenticationMiddleware(tokenVerifier))
   router.use(populateCurrentUser(userService))
-  router.use(populateSelectedEstablishment)
+  router.use(populateSelectedEstablishment(supportedPrisonsService))
 
   // CSRF protection
   if (!testMode) {

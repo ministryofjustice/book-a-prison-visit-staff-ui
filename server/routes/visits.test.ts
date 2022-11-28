@@ -235,7 +235,7 @@ describe('GET /visits', () => {
         expect(auditService.viewedVisits).toHaveBeenCalledWith({
           viewDate: todayDate,
           prisonId,
-          username: undefined,
+          username: 'user1',
           operationId: undefined,
         })
       })
@@ -267,7 +267,7 @@ describe('GET /visits', () => {
         expect(auditService.viewedVisits).toHaveBeenCalledWith({
           viewDate: '2022-05-23',
           prisonId,
-          username: undefined,
+          username: 'user1',
           operationId: undefined,
         })
       })
@@ -299,7 +299,7 @@ describe('GET /visits', () => {
         expect(auditService.viewedVisits).toHaveBeenCalledWith({
           viewDate: '2022-05-23',
           prisonId,
-          username: undefined,
+          username: 'user1',
           operationId: undefined,
         })
       })
@@ -331,7 +331,7 @@ describe('GET /visits', () => {
         expect(auditService.viewedVisits).toHaveBeenCalledWith({
           viewDate: todayDate,
           prisonId,
-          username: undefined,
+          username: 'user1',
           operationId: undefined,
         })
       })
@@ -368,7 +368,7 @@ describe('GET /visits', () => {
         expect(auditService.viewedVisits).toHaveBeenCalledWith({
           viewDate: todayDate,
           prisonId,
-          username: undefined,
+          username: 'user1',
           operationId: undefined,
         })
       })
@@ -391,7 +391,7 @@ describe('GET /visits', () => {
         expect(auditService.viewedVisits).toHaveBeenCalledWith({
           viewDate: '2022-05-23',
           prisonId,
-          username: undefined,
+          username: 'user1',
           operationId: undefined,
         })
       })
