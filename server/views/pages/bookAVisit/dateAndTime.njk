@@ -53,7 +53,7 @@
 
     <p class="bapv-extraspacing bapv-date-time-information"><strong>Prisoner name:</strong> <span data-test="prisoner-name">{{ prisonerName }}</span> <strong>Location:</strong> <span data-test="visit-location">{{ location }}</span> <strong>Visit type:</strong> <span data-test="visit-restriction">{{ visitRestriction | capitalize }}</span></p>
     {{ govukDetails({
-      summaryText: "Which time slots are shown?",
+      summaryText: "What time slots are shown?",
       html: "<p>Showing time slots:</p><ul><li>suitable for the prisoner’s location</li><li>that do not have non-associations for the prisoner</li><li>over the next 28 days</li></ul>"
     }) }}
 
