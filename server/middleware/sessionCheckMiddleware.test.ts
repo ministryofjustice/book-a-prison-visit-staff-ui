@@ -2,6 +2,10 @@ import { Request, Response } from 'express'
 import { Cookie } from 'express-session'
 import { VisitSessionData, VisitSlot } from '../@types/bapv'
 import sessionCheckMiddleware from './sessionCheckMiddleware'
+import { createSupportedPrisons } from '../data/__testutils/testObjects'
+
+const prisonId = 'HEI'
+const supportedPrisons = createSupportedPrisons()
 
 const prisonerData: VisitSessionData['prisoner'] = {
   name: 'abc',
@@ -55,6 +59,7 @@ describe('sessionCheckMiddleware', () => {
         save: jest.fn(),
         touch: jest.fn(),
         cookie: new Cookie(),
+        selectedEstablishment: { prisonId, prisonName: supportedPrisons[prisonId] },
       },
     }
     mockResponse = {
@@ -68,10 +73,18 @@ describe('sessionCheckMiddleware', () => {
     expect(mockResponse.redirect).toHaveBeenCalledWith('/search/prisoner/?error=missing-session')
   })
 
+  it('should redirect to the start page if selected establishment does not match prison in visitSessionData', () => {
+    req.session.selectedEstablishment = { prisonId: 'BLI', prisonName: supportedPrisons.BLI }
+    req.session.visitSessionData = { prisonId } as VisitSessionData
+    sessionCheckMiddleware({ stage: 1 })(req as Request, mockResponse as Response, next)
+
+    expect(mockResponse.redirect).toHaveBeenCalledWith('/?error=establishment-mismatch')
+  })
+
   describe('visit reference in URL (e.g. /visit/:reference/update/select-visitors)', () => {
     it('should redirect to start page if visit reference in URL does not match that in visitSessionData', () => {
       req.params.reference = 'ab-cd-ef-gh'
-      req.session.visitSessionData = { visitReference: 'bb-cc-dd-ee-ff' } as VisitSessionData
+      req.session.visitSessionData = { prisonId, visitReference: 'bb-cc-dd-ee-ff' } as VisitSessionData
 
       sessionCheckMiddleware({ stage: 1 })(req as Request, mockResponse as Response, next)
 
@@ -87,6 +100,7 @@ describe('sessionCheckMiddleware', () => {
           dateOfBirth: '12 May 1977',
           location: 'abc',
         },
+        prisonId,
         visitReference: 'ab-cd-ef-gh',
       } as VisitSessionData
 
@@ -100,17 +114,20 @@ describe('sessionCheckMiddleware', () => {
     ;[
       {
         prisoner: {},
+        prisonId,
       },
       {
         prisoner: {
           name: 'abc',
         },
+        prisonId,
       },
       {
         prisoner: {
           name: 'abc',
           offenderNo: 'A1234BC',
         },
+        prisonId,
       },
       {
         prisoner: {
@@ -118,6 +135,7 @@ describe('sessionCheckMiddleware', () => {
           offenderNo: 'A1234BC',
           dateOfBirth: '12 May 1977',
         },
+        prisonId,
       },
     ].forEach((testData: VisitSessionData) => {
       it('should redirect to the prisoner search page when there are missing bits of prisoner data', () => {
@@ -137,6 +155,7 @@ describe('sessionCheckMiddleware', () => {
           dateOfBirth: '12 May 1977',
           location: 'abc',
         },
+        prisonId,
       }
 
       sessionCheckMiddleware({ stage: 1 })(req as Request, mockResponse as Response, next)
@@ -149,13 +168,16 @@ describe('sessionCheckMiddleware', () => {
     ;[
       {
         prisoner: prisonerData,
+        prisonId,
       },
       {
         prisoner: prisonerData,
+        prisonId,
         visitRestriction,
       },
       {
         prisoner: prisonerData,
+        prisonId,
         visitRestriction,
         visitors: [],
       },
@@ -174,11 +196,13 @@ describe('sessionCheckMiddleware', () => {
     ;[
       {
         prisoner: prisonerData,
+        prisonId,
         visitRestriction,
         visitors: visitorsData,
       },
       {
         prisoner: prisonerData,
+        prisonId,
         visitRestriction,
         visitors: visitorsData,
         visit: {
@@ -187,6 +211,7 @@ describe('sessionCheckMiddleware', () => {
       },
       {
         prisoner: prisonerData,
+        prisonId,
         visitRestriction,
         visitors: visitorsData,
         visit: {
@@ -196,6 +221,7 @@ describe('sessionCheckMiddleware', () => {
       },
       {
         prisoner: prisonerData,
+        prisonId,
         visitRestriction,
         visitors: visitorsData,
         visit: {
@@ -206,6 +232,7 @@ describe('sessionCheckMiddleware', () => {
       },
       {
         prisoner: prisonerData,
+        prisonId,
         visitRestriction,
         visitors: visitorsData,
         visit: {
@@ -227,6 +254,7 @@ describe('sessionCheckMiddleware', () => {
     it('should not reject a fully booked visit', () => {
       req.session.visitSessionData = {
         prisoner: prisonerData,
+        prisonId,
         visitRestriction,
         visitors: visitorsData,
         visitReference: 'ab-cd-ef-gh',
@@ -249,6 +277,7 @@ describe('sessionCheckMiddleware', () => {
     it('should redirect to the prisoner profile if visit booking reference not set', () => {
       const testData: VisitSessionData = {
         prisoner: prisonerData,
+        prisonId,
         visitRestriction,
         visitSlot,
         visitors: visitorsData,
@@ -266,6 +295,7 @@ describe('sessionCheckMiddleware', () => {
     ;[
       {
         prisoner: prisonerData,
+        prisonId,
         visitRestriction,
         visitSlot,
         visitors: visitorsData,
@@ -274,6 +304,7 @@ describe('sessionCheckMiddleware', () => {
       } as VisitSessionData,
       {
         prisoner: prisonerData,
+        prisonId,
         visitRestriction,
         visitSlot,
         visitors: visitorsData,
@@ -298,6 +329,7 @@ describe('sessionCheckMiddleware', () => {
     beforeEach(() => {
       const testData: VisitSessionData = {
         prisoner: prisonerData,
+        prisonId,
         visitRestriction,
         visitSlot,
         visitors: visitorsData,

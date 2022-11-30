@@ -18,6 +18,8 @@ const systemToken = async (user: string): Promise<string> => `${user}-token-1`
 let flashData: Record<'errors' | 'formValues', Record<string, string | string[]>[]>
 let visitSessionData: VisitSessionData
 
+const prisonId = 'HEI'
+
 // run tests for booking and update journeys
 const testJourneys = [
   { urlPrefix: '/book-a-visit', isUpdate: false },
@@ -134,6 +136,7 @@ testJourneys.forEach(journey => {
           dateOfBirth: '25 May 1988',
           location: 'location place',
         },
+        prisonId,
         visitRestriction: 'OPEN',
         visitReference: 'ab-cd-ef-gh',
       }
@@ -441,6 +444,8 @@ testJourneys.forEach(journey => {
       ]
       prisons.forEach(prison => {
         it(`should display prison specific content, related to ${prison.prisonName}`, () => {
+          visitSessionData.prisonId = prison.prisonId
+
           sessionApp = appWithAllRoutes({
             prisonerProfileServiceOverride: prisonerProfileService,
             prisonerVisitorsServiceOverride: prisonerVisitorsService,
@@ -559,6 +564,7 @@ testJourneys.forEach(journey => {
           location: 'location place',
           restrictions: [],
         },
+        prisonId,
         visitRestriction: 'OPEN',
         visitReference,
       }

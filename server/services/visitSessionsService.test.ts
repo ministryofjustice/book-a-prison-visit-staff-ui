@@ -494,6 +494,7 @@ describe('Visit sessions service', () => {
           dateOfBirth: '23 May 1988',
           location: 'somewhere',
         },
+        prisonId,
         visitSlot: {
           id: '1',
           startTimestamp: '2022-02-14T10:00:00',
@@ -546,11 +547,10 @@ describe('Visit sessions service', () => {
       }
 
       visitSchedulerApiClient.reserveVisit.mockResolvedValue(visit)
-      whereaboutsApiClient.getEvents.mockResolvedValue([])
-      const result = await visitSessionsService.reserveVisit({ username: 'user', visitSessionData, prisonId })
+      const result = await visitSessionsService.reserveVisit({ username: 'user', visitSessionData })
 
       expect(visitSchedulerApiClient.reserveVisit).toHaveBeenCalledTimes(1)
-      expect(result).toEqual(visit)
+      expect(result).toStrictEqual(visit)
     })
   })
 
@@ -563,6 +563,7 @@ describe('Visit sessions service', () => {
           dateOfBirth: '23 May 1988',
           location: 'somewhere',
         },
+        prisonId,
         visitSlot: {
           id: 'visitId',
           startTimestamp: '2022-02-14T10:00:00',
@@ -628,7 +629,6 @@ describe('Visit sessions service', () => {
       }
 
       visitSchedulerApiClient.changeReservedVisit.mockResolvedValue(visit)
-      whereaboutsApiClient.getEvents.mockResolvedValue([])
 
       const result = await visitSessionsService.changeReservedVisit({
         username: 'user',
@@ -636,7 +636,7 @@ describe('Visit sessions service', () => {
       })
 
       expect(visitSchedulerApiClient.changeReservedVisit).toHaveBeenCalledTimes(1)
-      expect(result).toEqual(visit)
+      expect(result).toStrictEqual(visit)
     })
   })
 
@@ -651,11 +651,11 @@ describe('Visit sessions service', () => {
       }
 
       visitSchedulerApiClient.bookVisit.mockResolvedValue(visit as Visit)
-      whereaboutsApiClient.getEvents.mockResolvedValue([])
+
       const result = await visitSessionsService.bookVisit({ username: 'user', applicationReference })
 
       expect(visitSchedulerApiClient.bookVisit).toHaveBeenCalledTimes(1)
-      expect(result).toEqual(visit)
+      expect(result).toStrictEqual(visit)
     })
   })
 
@@ -668,6 +668,7 @@ describe('Visit sessions service', () => {
           dateOfBirth: '23 May 1988',
           location: 'somewhere',
         },
+        prisonId,
         visitSlot: {
           id: 'visitId',
           startTimestamp: '2022-02-14T10:00:00',
@@ -733,13 +734,8 @@ describe('Visit sessions service', () => {
       }
 
       visitSchedulerApiClient.changeBookedVisit.mockResolvedValue(returnedVisit)
-      whereaboutsApiClient.getEvents.mockResolvedValue([])
 
-      const result = await visitSessionsService.changeBookedVisit({
-        username: 'user',
-        visitSessionData,
-        prisonId,
-      })
+      const result = await visitSessionsService.changeBookedVisit({ username: 'user', visitSessionData })
 
       expect(visitSchedulerApiClient.changeBookedVisit).toHaveBeenCalledTimes(1)
       expect(result).toEqual(returnedVisit)

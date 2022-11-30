@@ -70,7 +70,7 @@ export default function routes(
     }
 
     clearSession(req)
-    const visitSessionData: VisitSessionData = req.session.visitSessionData ?? { prisoner: undefined }
+    const visitSessionData: VisitSessionData = req.session.visitSessionData ?? { prisoner: undefined, prisonId }
 
     visitSessionData.prisoner = {
       name: properCaseFullName(`${inmateDetail.lastName}, ${inmateDetail.firstName}`),
@@ -80,6 +80,7 @@ export default function routes(
         ? `${inmateDetail.assignedLivingUnit.description}, ${inmateDetail.assignedLivingUnit.agencyName}`
         : '',
     }
+    visitSessionData.prisonId = prisonId
 
     req.session.visitSessionData = visitSessionData
 

@@ -66,6 +66,7 @@ testJourneys.forEach(journey => {
           dateOfBirth: '25 May 1988',
           location: 'location place',
         },
+        prisonId: 'HEI',
         visitRestriction: 'OPEN',
         visitSlot: {
           id: 'visitId',

@@ -10,6 +10,10 @@ export default function sessionCheckMiddleware({ stage }: { stage: number }): Re
       return res.redirect('/search/prisoner/?error=missing-session')
     }
 
+    if (req.session.selectedEstablishment.prisonId !== visitSessionData.prisonId) {
+      return res.redirect('/?error=establishment-mismatch')
+    }
+
     if (reference && visitSessionData.visitReference !== reference) {
       return res.redirect('/?error=reference-mismatch')
     }

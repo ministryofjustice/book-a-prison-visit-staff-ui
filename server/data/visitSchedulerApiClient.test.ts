@@ -317,6 +317,7 @@ describe('visitSchedulerApiClient', () => {
           dateOfBirth: '23 May 1988',
           location: 'somewhere',
         },
+        prisonId,
         visitSlot: {
           id: '1',
           startTimestamp,
@@ -363,9 +364,9 @@ describe('visitSchedulerApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(201, result)
 
-      const output = await client.reserveVisit(visitSessionData, prisonId)
+      const output = await client.reserveVisit(visitSessionData)
 
-      expect(output).toEqual(result)
+      expect(output).toStrictEqual(result)
     })
   })
 
@@ -415,6 +416,7 @@ describe('visitSchedulerApiClient', () => {
           dateOfBirth: '23 May 1988',
           location: 'somewhere',
         },
+        prisonId,
         visitSlot: {
           id: '1',
           startTimestamp: result.startTimestamp,
@@ -509,6 +511,7 @@ describe('visitSchedulerApiClient', () => {
           dateOfBirth: '23 May 1988',
           location: 'somewhere',
         },
+        prisonId,
         visitSlot: {
           id: '1',
           startTimestamp: result.startTimestamp,
@@ -597,6 +600,7 @@ describe('visitSchedulerApiClient', () => {
           dateOfBirth: '23 May 1988',
           location: 'somewhere',
         },
+        prisonId,
         visitSlot: {
           id: '1',
           startTimestamp: '2022-02-14T10:00:00',
@@ -678,9 +682,9 @@ describe('visitSchedulerApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(201, result)
 
-      const output = await client.changeBookedVisit(visitSessionData, prisonId)
+      const output = await client.changeBookedVisit(visitSessionData)
 
-      expect(output).toEqual(result)
+      expect(output).toStrictEqual(result)
     })
   })
 

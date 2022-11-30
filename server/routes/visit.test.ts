@@ -83,6 +83,7 @@ describe('/visit/:reference', () => {
     cellLocation: '1-1-C-028',
     restrictedPatient: false,
   }
+  const prisonId = 'HEI'
 
   let visit: Visit
 
@@ -123,7 +124,7 @@ describe('/visit/:reference', () => {
       applicationReference: 'aaa-bbb-ccc',
       reference: 'ab-cd-ef-gh',
       prisonerId: 'A1234BC',
-      prisonId: 'HEI',
+      prisonId,
       visitRoom: 'visit room',
       visitType: 'SOCIAL',
       visitStatus: 'BOOKED',
@@ -173,7 +174,7 @@ describe('/visit/:reference', () => {
     prisonerVisitorsService.getVisitors.mockResolvedValue(visitors)
     supportedPrisonsService.getSupportedPrisonIds.mockResolvedValue(['HEI'])
 
-    visitSessionData = { prisoner: undefined }
+    visitSessionData = { prisoner: undefined, prisonId }
 
     app = appWithAllRoutes({
       prisonerSearchServiceOverride: prisonerSearchService,
@@ -233,7 +234,7 @@ describe('/visit/:reference', () => {
           expect($('[data-test="visitor-concern"]').eq(0).text()).toBe('Example of a visitor concern')
           expect($('[data-test="additional-support"]').text()).toBe('Wheelchair ramp, custom request')
           expect($('[data-test="visit-booked"]').text()).toBe('Monday 14 February 2022 at 10am')
-          expect(visitSessionData).toEqual({ prisoner: undefined })
+          expect(visitSessionData).toStrictEqual({ prisoner: undefined, prisonId })
 
           expect(auditService.viewedVisitDetails).toHaveBeenCalledTimes(1)
           expect(auditService.viewedVisitDetails).toHaveBeenCalledWith({
@@ -483,6 +484,7 @@ describe('/visit/:reference', () => {
               dateOfBirth: '1975-04-02',
               location: '1-1-C-028, Hewell (HMP)',
             },
+            prisonId,
             visitSlot: {
               id: '',
               startTimestamp: '2022-02-09T10:00:00',

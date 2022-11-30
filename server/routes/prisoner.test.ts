@@ -380,13 +380,14 @@ describe('POST /prisoner/A1234BC', () => {
         expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledWith('A1234BC', prisonId, 'user1')
         expect(auditService.overrodeZeroVO).not.toHaveBeenCalled()
         expect(clearSession).toHaveBeenCalledTimes(1)
-        expect(visitSessionData).toEqual(<VisitSessionData>{
+        expect(visitSessionData).toStrictEqual(<VisitSessionData>{
           prisoner: {
             name: 'Smith, John',
             offenderNo: 'A1234BC',
             dateOfBirth: '2 April 1975',
             location: '1-1-C-028, Hewell (HMP)',
           },
+          prisonId,
         })
       })
   })
@@ -409,13 +410,14 @@ describe('POST /prisoner/A1234BC', () => {
           operationId: undefined,
         })
         expect(clearSession).toHaveBeenCalledTimes(1)
-        expect(visitSessionData).toEqual(<VisitSessionData>{
+        expect(visitSessionData).toStrictEqual(<VisitSessionData>{
           prisoner: {
             name: 'Smith, John',
             offenderNo: 'A1234BC',
             dateOfBirth: '2 April 1975',
             location: '1-1-C-028, Hewell (HMP)',
           },
+          prisonId,
         })
       })
   })
@@ -436,13 +438,14 @@ describe('POST /prisoner/A1234BC', () => {
         expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledTimes(1)
         expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledWith('A1234BC', prisonId, 'user1')
         expect(auditService.overrodeZeroVO).not.toHaveBeenCalled()
-        expect(visitSessionData).toEqual(<VisitSessionData>{
+        expect(visitSessionData).toStrictEqual(<VisitSessionData>{
           prisoner: {
             name: 'Smith, John',
             offenderNo: 'A1234BC',
             dateOfBirth: '2 April 1975',
             location: '1-1-C-028, Hewell (HMP)',
           },
+          prisonId,
         })
       })
   })

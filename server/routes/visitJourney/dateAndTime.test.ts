@@ -25,6 +25,8 @@ const visitSessionsService = new VisitSessionsService(
   systemToken,
 ) as jest.Mocked<VisitSessionsService>
 
+const prisonId = 'HEI'
+
 // run tests for booking and update journeys
 const testJourneys = [
   { urlPrefix: '/book-a-visit', isUpdate: false },
@@ -44,6 +46,7 @@ beforeEach(() => {
       dateOfBirth: '25 May 1988',
       location: 'location place',
     },
+    prisonId,
     visitRestriction: 'OPEN',
     visitors: [
       {
@@ -328,7 +331,7 @@ testJourneys.forEach(journey => {
               applicationReference: reservedVisit.applicationReference,
               visitReference: reservedVisit.reference,
               prisonerId: 'A1234BC',
-              prisonId: 'HEI',
+              prisonId,
               visitorIds: ['4323'],
               startTimestamp: '2022-02-14T11:59:00',
               endTimestamp: '2022-02-14T12:59:00',
@@ -392,7 +395,7 @@ testJourneys.forEach(journey => {
               applicationReference: reservedVisit.applicationReference,
               visitReference: reservedVisit.reference,
               prisonerId: 'A1234BC',
-              prisonId: 'HEI',
+              prisonId,
               visitorIds: ['4323'],
               startTimestamp: '2022-02-14T12:00:00',
               endTimestamp: '2022-02-14T13:05:00',

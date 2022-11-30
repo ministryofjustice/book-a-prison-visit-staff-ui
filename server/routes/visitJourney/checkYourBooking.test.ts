@@ -25,6 +25,8 @@ const testJourneys = [
   { urlPrefix: '/visit/ab-cd-ef-gh/update', isUpdate: true },
 ]
 
+const prisonId = 'HEI'
+
 const availableSupportTypes: SupportType[] = [
   {
     type: 'WHEELCHAIR',
@@ -69,6 +71,7 @@ testJourneys.forEach(journey => {
           dateOfBirth: '25 May 1988',
           location: 'location place',
         },
+        prisonId,
         visitRestriction: 'OPEN',
         visitSlot: {
           id: 'visitId',

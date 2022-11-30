@@ -119,7 +119,6 @@ export default class DateAndTime {
       const { applicationReference, visitStatus } = await this.visitSessionsService.changeBookedVisit({
         username: res.locals.user?.username,
         visitSessionData,
-        prisonId,
       })
 
       visitSessionData.applicationReference = applicationReference
@@ -128,7 +127,6 @@ export default class DateAndTime {
       const { applicationReference, reference, visitStatus } = await this.visitSessionsService.reserveVisit({
         username: res.locals.user?.username,
         visitSessionData,
-        prisonId,
       })
 
       visitSessionData.applicationReference = applicationReference

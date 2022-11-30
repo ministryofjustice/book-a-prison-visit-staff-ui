@@ -15,6 +15,8 @@ let visitSessionData: VisitSessionData
 // run tests for booking and update journeys
 const testJourneys = [{ urlPrefix: '/book-a-visit' }, { urlPrefix: '/visit/ab-cd-ef-gh/update' }]
 
+const prisonId = 'HEI'
+
 const availableSupportTypes: SupportType[] = [
   {
     type: 'WHEELCHAIR',
@@ -59,6 +61,7 @@ testJourneys.forEach(journey => {
           dateOfBirth: '25 May 1988',
           location: 'location place',
         },
+        prisonId,
         visitRestriction: 'OPEN',
         visitSlot: {
           id: 'visitId',
@@ -237,6 +240,7 @@ testJourneys.forEach(journey => {
           dateOfBirth: '25 May 1988',
           location: 'location place',
         },
+        prisonId,
         visitRestriction: 'OPEN',
         visitSlot: {
           id: 'visitId',

@@ -158,16 +158,14 @@ export default class VisitSessionsService {
   async reserveVisit({
     username,
     visitSessionData,
-    prisonId,
   }: {
     username: string
     visitSessionData: VisitSessionData
-    prisonId: string
   }): Promise<Visit> {
     const token = await this.systemToken(username)
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
 
-    const reservation = await visitSchedulerApiClient.reserveVisit(visitSessionData, prisonId)
+    const reservation = await visitSchedulerApiClient.reserveVisit(visitSessionData)
     return reservation
   }
 
@@ -202,16 +200,14 @@ export default class VisitSessionsService {
   async changeBookedVisit({
     username,
     visitSessionData,
-    prisonId,
   }: {
     username: string
     visitSessionData: VisitSessionData
-    prisonId: string
   }): Promise<Visit> {
     const token = await this.systemToken(username)
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
 
-    const visit = await visitSchedulerApiClient.changeBookedVisit(visitSessionData, prisonId)
+    const visit = await visitSchedulerApiClient.changeBookedVisit(visitSessionData)
     return visit
   }
 

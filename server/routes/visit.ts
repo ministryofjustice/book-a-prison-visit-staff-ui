@@ -140,6 +140,7 @@ export default function routes(
         dateOfBirth: prisoner.dateOfBirth,
         location: prisonerLocation,
       },
+      prisonId: visit.prisonId,
       visitSlot,
       originalVisitSlot: visitSlot,
       visitRestriction: visit.visitRestriction,

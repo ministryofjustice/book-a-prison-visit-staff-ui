@@ -188,6 +188,7 @@ export type VisitSessionData = {
     restrictions?: OffenderRestriction[]
     previousRestrictions?: OffenderRestriction[]
   }
+  prisonId: string
   visitSlot?: VisitSlot
   originalVisitSlot?: VisitSlot
   visitRestriction?: Visit['visitRestriction']

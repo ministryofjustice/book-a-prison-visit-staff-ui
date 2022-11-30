@@ -49,6 +49,7 @@ testJourneys.forEach(journey => {
             },
           ],
         },
+        prisonId: 'HEI',
         visitRestriction: 'OPEN',
         visitors: [
           {
