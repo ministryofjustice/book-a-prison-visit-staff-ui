@@ -557,7 +557,7 @@ describe('Visit sessions service', () => {
 
       visitSchedulerApiClient.reserveVisit.mockResolvedValue(visit)
       whereaboutsApiClient.getEvents.mockResolvedValue([])
-      const result = await visitSessionsService.reserveVisit({ username: 'user', visitSessionData, prisonId })
+      const result = await visitSessionsService.reserveVisit({ username: 'user', visitSessionData })
 
       expect(visitSchedulerApiClient.reserveVisit).toHaveBeenCalledTimes(1)
       expect(result).toEqual(visit)
@@ -750,7 +750,6 @@ describe('Visit sessions service', () => {
       const result = await visitSessionsService.changeBookedVisit({
         username: 'user',
         visitSessionData,
-        prisonId,
       })
 
       expect(visitSchedulerApiClient.changeBookedVisit).toHaveBeenCalledTimes(1)
