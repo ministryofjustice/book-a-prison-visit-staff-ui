@@ -126,6 +126,7 @@ export default function routes(
     clearSession(req)
     const visitSlot: VisitSlot = {
       id: '',
+      prisonId: visit.prisonId,
       startTimestamp: visit.startTimestamp,
       endTimestamp: visit.endTimestamp,
       availableTables: 0,

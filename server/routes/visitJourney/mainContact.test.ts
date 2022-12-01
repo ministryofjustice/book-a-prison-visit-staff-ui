@@ -69,6 +69,7 @@ testJourneys.forEach(journey => {
         visitRestriction: 'OPEN',
         visitSlot: {
           id: 'visitId',
+          prisonId: 'HEI',
           startTimestamp: '123',
           endTimestamp: '456',
           availableTables: 1,

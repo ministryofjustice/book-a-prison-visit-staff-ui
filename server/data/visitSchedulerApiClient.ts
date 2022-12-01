@@ -84,12 +84,12 @@ class VisitSchedulerApiClient {
     })
   }
 
-  reserveVisit(visitSessionData: VisitSessionData, prisonId: string): Promise<Visit> {
+  reserveVisit(visitSessionData: VisitSessionData): Promise<Visit> {
     return this.restclient.post({
       path: '/visits/slot/reserve',
       data: <ReserveVisitSlotDto>{
         prisonerId: visitSessionData.prisoner.offenderNo,
-        prisonId,
+        prisonId: visitSessionData.visitSlot.prisonId,
         visitRoom: visitSessionData.visitSlot.visitRoomName,
         visitType: this.visitType,
         visitRestriction: visitSessionData.visitRestriction,
@@ -129,14 +129,14 @@ class VisitSchedulerApiClient {
     return this.restclient.put({ path: `/visits/${applicationReference}/book` })
   }
 
-  changeBookedVisit(visitSessionData: VisitSessionData, prisonId: string): Promise<Visit> {
+  changeBookedVisit(visitSessionData: VisitSessionData): Promise<Visit> {
     const { visitContact, mainContactId } = this.convertMainContactToVisitContact(visitSessionData.mainContact)
 
     return this.restclient.put({
       path: `/visits/${visitSessionData.visitReference}/change`,
       data: <ReserveVisitSlotDto>{
         prisonerId: visitSessionData.prisoner.offenderNo,
-        prisonId,
+        prisonId: visitSessionData.visitSlot.prisonId,
         visitRoom: visitSessionData.visitSlot.visitRoomName,
         visitType: this.visitType,
         visitRestriction: visitSessionData.visitRestriction,

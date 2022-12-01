@@ -97,7 +97,6 @@ export default class DateAndTime {
 
   async post(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'
-    const { prisonId } = req.session.selectedEstablishment
     const { visitSessionData } = req.session
     const errors = validationResult(req)
 
@@ -119,7 +118,6 @@ export default class DateAndTime {
       const { applicationReference, visitStatus } = await this.visitSessionsService.changeBookedVisit({
         username: res.locals.user?.username,
         visitSessionData,
-        prisonId,
       })
 
       visitSessionData.applicationReference = applicationReference
@@ -128,7 +126,6 @@ export default class DateAndTime {
       const { applicationReference, reference, visitStatus } = await this.visitSessionsService.reserveVisit({
         username: res.locals.user?.username,
         visitSessionData,
-        prisonId,
       })
 
       visitSessionData.applicationReference = applicationReference
@@ -140,7 +137,7 @@ export default class DateAndTime {
       applicationReference: visitSessionData.applicationReference,
       visitReference: visitSessionData.visitReference,
       prisonerId: visitSessionData.prisoner.offenderNo,
-      prisonId,
+      prisonId: visitSessionData.visitSlot.prisonId,
       visitorIds: visitSessionData.visitors.map(visitor => visitor.personId.toString()),
       startTimestamp: visitSessionData.visitSlot.startTimestamp,
       endTimestamp: visitSessionData.visitSlot.endTimestamp,

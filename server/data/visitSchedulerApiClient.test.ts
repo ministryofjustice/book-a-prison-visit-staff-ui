@@ -319,6 +319,7 @@ describe('visitSchedulerApiClient', () => {
         },
         visitSlot: {
           id: '1',
+          prisonId,
           startTimestamp,
           endTimestamp,
           availableTables: 1,
@@ -363,7 +364,7 @@ describe('visitSchedulerApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(201, result)
 
-      const output = await client.reserveVisit(visitSessionData, prisonId)
+      const output = await client.reserveVisit(visitSessionData)
 
       expect(output).toEqual(result)
     })
@@ -417,6 +418,7 @@ describe('visitSchedulerApiClient', () => {
         },
         visitSlot: {
           id: '1',
+          prisonId,
           startTimestamp: result.startTimestamp,
           endTimestamp: result.endTimestamp,
           availableTables: 1,
@@ -511,6 +513,7 @@ describe('visitSchedulerApiClient', () => {
         },
         visitSlot: {
           id: '1',
+          prisonId,
           startTimestamp: result.startTimestamp,
           endTimestamp: result.endTimestamp,
           availableTables: 1,
@@ -599,6 +602,7 @@ describe('visitSchedulerApiClient', () => {
         },
         visitSlot: {
           id: '1',
+          prisonId,
           startTimestamp: '2022-02-14T10:00:00',
           endTimestamp: '2022-02-14T11:00:00',
           availableTables: 1,
@@ -678,7 +682,7 @@ describe('visitSchedulerApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(201, result)
 
-      const output = await client.changeBookedVisit(visitSessionData, prisonId)
+      const output = await client.changeBookedVisit(visitSessionData)
 
       expect(output).toEqual(result)
     })

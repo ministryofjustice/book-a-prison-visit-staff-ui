@@ -485,6 +485,7 @@ describe('/visit/:reference', () => {
             },
             visitSlot: {
               id: '',
+              prisonId: 'HEI',
               startTimestamp: '2022-02-09T10:00:00',
               endTimestamp: '2022-02-09T11:15:00',
               availableTables: 0,
@@ -493,6 +494,7 @@ describe('/visit/:reference', () => {
             },
             originalVisitSlot: {
               id: '',
+              prisonId: 'HEI',
               startTimestamp: '2022-02-09T10:00:00',
               endTimestamp: '2022-02-09T11:15:00',
               availableTables: 0,

@@ -25,6 +25,8 @@ const visitSessionsService = new VisitSessionsService(
   systemToken,
 ) as jest.Mocked<VisitSessionsService>
 
+const prisonId = 'HEI'
+
 // run tests for booking and update journeys
 const testJourneys = [
   { urlPrefix: '/book-a-visit', isUpdate: false },
@@ -87,6 +89,7 @@ testJourneys.forEach(journey => {
             morning: [
               {
                 id: '1',
+                prisonId,
                 startTimestamp: '2022-02-14T10:00:00',
                 endTimestamp: '2022-02-14T11:00:00',
                 availableTables: 15,
@@ -98,6 +101,7 @@ testJourneys.forEach(journey => {
               },
               {
                 id: '2',
+                prisonId,
                 startTimestamp: '2022-02-14T11:59:00',
                 endTimestamp: '2022-02-14T12:59:00',
                 availableTables: 1,
@@ -109,6 +113,7 @@ testJourneys.forEach(journey => {
             afternoon: [
               {
                 id: '3',
+                prisonId,
                 startTimestamp: '2022-02-14T12:00:00',
                 endTimestamp: '2022-02-14T13:05:00',
                 availableTables: 5,
@@ -221,6 +226,7 @@ testJourneys.forEach(journey => {
       it('should render the available sessions list with the slot in the session selected', () => {
         visitSessionData.visitSlot = {
           id: '3',
+          prisonId,
           startTimestamp: '2022-02-14T12:00:00',
           endTimestamp: '2022-02-14T13:05:00',
           availableTables: 5,
@@ -305,6 +311,7 @@ testJourneys.forEach(journey => {
           .expect(() => {
             expect(visitSessionData.visitSlot).toEqual(<VisitSlot>{
               id: '2',
+              prisonId,
               startTimestamp: '2022-02-14T11:59:00',
               endTimestamp: '2022-02-14T12:59:00',
               availableTables: 1,
@@ -328,7 +335,7 @@ testJourneys.forEach(journey => {
               applicationReference: reservedVisit.applicationReference,
               visitReference: reservedVisit.reference,
               prisonerId: 'A1234BC',
-              prisonId: 'HEI',
+              prisonId,
               visitorIds: ['4323'],
               startTimestamp: '2022-02-14T11:59:00',
               endTimestamp: '2022-02-14T12:59:00',
@@ -342,6 +349,7 @@ testJourneys.forEach(journey => {
       it('should save new choice to session, update visit reservation and redirect to additional support page if existing session data present', () => {
         visitSessionData.visitSlot = {
           id: '1',
+          prisonId,
           startTimestamp: '2022-02-14T10:00:00',
           endTimestamp: '2022-02-14T11:00:00',
           availableTables: 15,
@@ -362,6 +370,7 @@ testJourneys.forEach(journey => {
           .expect(() => {
             expect(visitSessionData.visitSlot).toEqual(<VisitSlot>{
               id: '3',
+              prisonId,
               startTimestamp: '2022-02-14T12:00:00',
               endTimestamp: '2022-02-14T13:05:00',
               availableTables: 5,
@@ -392,7 +401,7 @@ testJourneys.forEach(journey => {
               applicationReference: reservedVisit.applicationReference,
               visitReference: reservedVisit.reference,
               prisonerId: 'A1234BC',
-              prisonId: 'HEI',
+              prisonId,
               visitorIds: ['4323'],
               startTimestamp: '2022-02-14T12:00:00',
               endTimestamp: '2022-02-14T13:05:00',
@@ -443,6 +452,7 @@ describe('Update journey specific warning messages', () => {
   beforeEach(() => {
     currentlyBookedSlot = {
       id: '',
+      prisonId,
       startTimestamp: '2022-10-17T09:00:00',
       endTimestamp: '2022-10-17T10:00:00',
     } as VisitSlot
