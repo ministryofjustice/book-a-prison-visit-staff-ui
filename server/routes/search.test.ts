@@ -2,6 +2,7 @@ import type { Express } from 'express'
 import request from 'supertest'
 import * as cheerio from 'cheerio'
 import createError from 'http-errors'
+import { SessionData } from 'express-session'
 import config from '../config'
 import PrisonerSearchService from '../services/prisonerSearchService'
 import VisitSessionsService from '../services/visitSessionsService'
@@ -388,6 +389,21 @@ describe('Prisoner search page', () => {
 })
 
 describe('Booking search page', () => {
+  getPrisonerReturnData = {
+    firstName: 'Geoff',
+    lastName: 'Smith',
+    restrictedPatient: false,
+  }
+
+  getVisit = {
+    reference: 'as-sd-df-fg',
+    prisonNumber: 'A1234BC',
+    prisonerName: 'Smith, Ted',
+    mainContact: 'Jon Smith',
+    visitDate: '12 Nov 2021',
+    visitTime: '1pm -2pm',
+  }
+
   describe('GET /search/visit', () => {
     it('should render booking search page', () => {
       return request(app)
@@ -414,12 +430,6 @@ describe('Booking search page', () => {
 
   describe('GET /search/visit/results?searchBlock1=ab&searchBlock2=bc&searchBlock3=cd&searchBlock4=de', () => {
     it('should not render visit results page when no result', () => {
-      getPrisonerReturnData = {
-        firstName: 'Geoff',
-        lastName: 'Smith',
-        restrictedPatient: false,
-      }
-
       prisonerSearchService.getPrisonerById.mockResolvedValue(getPrisonerReturnData)
       visitSessionsService.getVisit.mockImplementation(() => {
         throw createError(404, 'Not found')
@@ -431,6 +441,11 @@ describe('Booking search page', () => {
         .expect(res => {
           expect(res.text).toContain('Search for a booking')
           expect(res.text).toContain('id="search-results-none"')
+          expect(visitSessionsService.getVisit).toHaveBeenCalledWith({
+            reference: 'ab-bc-cd-de',
+            username: 'user1',
+            prisonId: 'HEI',
+          })
           expect(auditService.visitSearch).toHaveBeenCalledTimes(1)
           expect(auditService.visitSearch).toHaveBeenCalledWith({
             searchTerms: 'ab-bc-cd-de',
@@ -443,20 +458,6 @@ describe('Booking search page', () => {
 
   describe('GET /search/visit/results?searchBlock1=ab&searchBlock2=bc&searchBlock3=cd&searchBlock4=de', () => {
     it('should render visit results page with a single visit', () => {
-      getPrisonerReturnData = {
-        firstName: 'Geoff',
-        lastName: 'Smith',
-        restrictedPatient: false,
-      }
-      getVisit = {
-        reference: 'as-sd-df-fg',
-        prisonNumber: 'A1234BC',
-        prisonerName: 'Smith, Ted',
-        mainContact: 'Jon Smith',
-        visitDate: '12 Nov 2021',
-        visitTime: '1pm -2pm',
-      }
-
       prisonerSearchService.getPrisonerById.mockResolvedValue(getPrisonerReturnData)
       visitSessionsService.getVisit.mockResolvedValue(getVisit)
 
@@ -466,6 +467,45 @@ describe('Booking search page', () => {
         .expect(res => {
           expect(res.text).toContain('Search for a booking')
           expect(res.text).toContain('id="search-results-true"')
+          expect(visitSessionsService.getVisit).toHaveBeenCalledWith({
+            reference: 'ab-bc-cd-de',
+            username: 'user1',
+            prisonId: 'HEI',
+          })
+          expect(auditService.visitSearch).toHaveBeenCalledTimes(1)
+          expect(auditService.visitSearch).toHaveBeenCalledWith({
+            searchTerms: 'ab-bc-cd-de',
+            username: 'user1',
+            operationId: undefined,
+          })
+        })
+    })
+
+    it('should not render visit results page when selected establishment does not equal visit prisonId', () => {
+      prisonerSearchService.getPrisonerById.mockResolvedValue(getPrisonerReturnData)
+      visitSessionsService.getVisit.mockImplementation(() => {
+        throw createError(404, 'Not found')
+      })
+
+      app = appWithAllRoutes({
+        prisonerSearchServiceOverride: prisonerSearchService,
+        visitSessionsServiceOverride: visitSessionsService,
+        auditServiceOverride: auditService,
+        systemTokenOverride: systemToken,
+        sessionData: { selectedEstablishment: { prisonId: 'XYZ' } } as SessionData,
+      })
+
+      return request(app)
+        .get('/search/visit/results?searchBlock1=ab&searchBlock2=bc&searchBlock3=cd&searchBlock4=de')
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          expect(res.text).toContain('Search for a booking')
+          expect(res.text).toContain('id="search-results-none"')
+          expect(visitSessionsService.getVisit).toHaveBeenCalledWith({
+            reference: 'ab-bc-cd-de',
+            username: 'user1',
+            prisonId: 'XYZ',
+          })
           expect(auditService.visitSearch).toHaveBeenCalledTimes(1)
           expect(auditService.visitSearch).toHaveBeenCalledWith({
             searchTerms: 'ab-bc-cd-de',

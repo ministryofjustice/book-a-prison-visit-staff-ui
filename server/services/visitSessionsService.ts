@@ -1,4 +1,5 @@
 import { format, parseISO, isAfter, isBefore, parse } from 'date-fns'
+import { NotFound } from 'http-errors'
 import logger from '../../logger'
 import {
   VisitInformation,
@@ -227,12 +228,25 @@ export default class VisitSessionsService {
     return visitSchedulerApiClient.cancelVisit(reference, outcome)
   }
 
-  async getVisit({ username, reference }: { username: string; reference: string }): Promise<VisitInformation> {
+  async getVisit({
+    username,
+    reference,
+    prisonId,
+  }: {
+    username: string
+    reference: string
+    prisonId: string
+  }): Promise<VisitInformation> {
     const token = await this.systemToken(username)
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
 
     logger.info(`Get visit ${reference}`)
     const visit = await visitSchedulerApiClient.getVisit(reference)
+
+    if (visit.prisonId !== prisonId) {
+      logger.info(`Visit ${reference} is not in prison '${prisonId}'`)
+      throw new NotFound()
+    }
 
     return this.buildVisitInformation(visit)
   }

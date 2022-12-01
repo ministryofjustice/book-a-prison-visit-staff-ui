@@ -1,3 +1,4 @@
+import { NotFound } from 'http-errors'
 import PrisonerContactRegistryApiClient from '../data/prisonerContactRegistryApiClient'
 import VisitSessionsService from './visitSessionsService'
 import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
@@ -847,9 +848,9 @@ describe('Visit sessions service', () => {
     }
 
     describe('getVisit', () => {
-      it('should return VisitInformation given a visit reference', async () => {
+      it('should return VisitInformation given a visit reference and matching prisonId', async () => {
         visitSchedulerApiClient.getVisit.mockResolvedValue(visit)
-        const result = await visitSessionsService.getVisit({ username: 'user', reference: 'ab-cd-ef-gh' })
+        const result = await visitSessionsService.getVisit({ username: 'user', reference: 'ab-cd-ef-gh', prisonId })
 
         expect(visitSchedulerApiClient.getVisit).toHaveBeenCalledTimes(1)
         expect(result).toEqual(<VisitInformation>{
@@ -860,6 +861,20 @@ describe('Visit sessions service', () => {
           visitDate: '14 February 2022',
           visitTime: '10am to 11:15am',
         })
+      })
+
+      it('should throw a 404 if the visit is not at the given prisonId', async () => {
+        visitSchedulerApiClient.getVisit.mockResolvedValue(visit)
+
+        await expect(async () => {
+          await visitSessionsService.getVisit({
+            username: 'user',
+            reference: 'ab-cd-ef-gh',
+            prisonId: 'BLI',
+          })
+
+          expect(visitSchedulerApiClient.getVisit).toHaveBeenCalledTimes(1)
+        }).rejects.toBeInstanceOf(NotFound)
       })
     })
 
