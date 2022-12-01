@@ -2,6 +2,10 @@ import { Request, Response } from 'express'
 import { Cookie } from 'express-session'
 import { VisitSessionData, VisitSlot } from '../@types/bapv'
 import sessionCheckMiddleware from './sessionCheckMiddleware'
+import { createSupportedPrisons } from '../data/__testutils/testObjects'
+
+const prisonId = 'HEI'
+const supportedPrisons = createSupportedPrisons()
 
 const prisonerData: VisitSessionData['prisoner'] = {
   name: 'abc',
@@ -29,7 +33,7 @@ const visitorsData: VisitSessionData['visitors'] = [
 ]
 const visitSlot: VisitSessionData['visitSlot'] = {
   id: '1',
-  prisonId: 'HEI',
+  prisonId,
   startTimestamp: '123',
   endTimestamp: '123',
   availableTables: 1,
@@ -56,6 +60,7 @@ describe('sessionCheckMiddleware', () => {
         save: jest.fn(),
         touch: jest.fn(),
         cookie: new Cookie(),
+        selectedEstablishment: { prisonId, prisonName: supportedPrisons[prisonId] },
       },
     }
     mockResponse = {
@@ -67,6 +72,15 @@ describe('sessionCheckMiddleware', () => {
     sessionCheckMiddleware({ stage: 1 })(req as Request, mockResponse as Response, next)
 
     expect(mockResponse.redirect).toHaveBeenCalledWith('/search/prisoner/?error=missing-session')
+  })
+
+  it('should redirect to the start page if prisonId in originalVisitSlot (set for update journey) does not match selected establishment', () => {
+    req.session.selectedEstablishment = { prisonId: 'BLI', prisonName: supportedPrisons.BLI }
+    req.session.visitSessionData = { originalVisitSlot: visitSlot } as VisitSessionData
+
+    sessionCheckMiddleware({ stage: 1 })(req as Request, mockResponse as Response, next)
+
+    expect(mockResponse.redirect).toHaveBeenCalledWith('/?error=establishment-mismatch')
   })
 
   describe('visit reference in URL (e.g. /visit/:reference/update/select-visitors)', () => {
@@ -225,6 +239,28 @@ describe('sessionCheckMiddleware', () => {
       })
     })
 
+    it('should redirect to the start page if prisonId in visitSlot does not match selected establishment', () => {
+      req.session.selectedEstablishment = { prisonId: 'BLI', prisonName: supportedPrisons.BLI }
+      req.session.visitSessionData = {
+        prisoner: prisonerData,
+        visitRestriction,
+        visitors: visitorsData,
+        visitReference: 'ab-cd-ef-gh',
+        visitStatus: 'RESERVED',
+        visitSlot: {
+          id: '1',
+          prisonId,
+          availableTables: 0,
+          startTimestamp: '123',
+          endTimestamp: '123',
+        } as VisitSlot,
+      }
+
+      sessionCheckMiddleware({ stage: 3 })(req as Request, mockResponse as Response, next)
+
+      expect(mockResponse.redirect).toHaveBeenCalledWith('/?error=establishment-mismatch')
+    })
+
     it('should not reject a fully booked visit', () => {
       req.session.visitSessionData = {
         prisoner: prisonerData,
@@ -234,6 +270,7 @@ describe('sessionCheckMiddleware', () => {
         visitStatus: 'RESERVED',
         visitSlot: {
           id: '1',
+          prisonId,
           availableTables: 0,
           startTimestamp: '123',
           endTimestamp: '123',

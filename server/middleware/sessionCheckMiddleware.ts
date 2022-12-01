@@ -3,11 +3,19 @@ import { isValidPrisonerNumber } from '../routes/validationChecks'
 
 export default function sessionCheckMiddleware({ stage }: { stage: number }): RequestHandler {
   return (req, res, next) => {
+    const { selectedEstablishment } = req.session
     const { visitSessionData } = req.session
     const { reference } = req.params
 
     if (!visitSessionData) {
       return res.redirect('/search/prisoner/?error=missing-session')
+    }
+
+    if (
+      visitSessionData.originalVisitSlot &&
+      visitSessionData.originalVisitSlot.prisonId !== selectedEstablishment.prisonId
+    ) {
+      return res.redirect('/?error=establishment-mismatch')
     }
 
     if (reference && visitSessionData.visitReference !== reference) {
@@ -40,6 +48,10 @@ export default function sessionCheckMiddleware({ stage }: { stage: number }): Re
         !visitSessionData.visitSlot.endTimestamp)
     ) {
       return res.redirect(`/prisoner/${visitSessionData.prisoner.offenderNo}?error=missing-visit`)
+    }
+
+    if (stage > 2 && visitSessionData.visitSlot.prisonId !== selectedEstablishment.prisonId) {
+      return res.redirect('/?error=establishment-mismatch')
     }
 
     if (stage > 2 && !visitSessionData.visitReference) {
