@@ -82,6 +82,7 @@ export default class VisitSessionsService {
 
         const newSlot: VisitSlot = {
           id: (slotIdCounter + 1).toString(),
+          prisonId: visitSession.prisonId,
           startTimestamp: visitSession.startTimestamp,
           endTimestamp: visitSession.endTimestamp,
           availableTables:

@@ -29,6 +29,7 @@ const visitorsData: VisitSessionData['visitors'] = [
 ]
 const visitSlot: VisitSessionData['visitSlot'] = {
   id: '1',
+  prisonId: 'HEI',
   startTimestamp: '123',
   endTimestamp: '123',
   availableTables: 1,

@@ -417,6 +417,7 @@ describe('visitSchedulerApiClient', () => {
         },
         visitSlot: {
           id: '1',
+          prisonId,
           startTimestamp: result.startTimestamp,
           endTimestamp: result.endTimestamp,
           availableTables: 1,
@@ -511,6 +512,7 @@ describe('visitSchedulerApiClient', () => {
         },
         visitSlot: {
           id: '1',
+          prisonId,
           startTimestamp: result.startTimestamp,
           endTimestamp: result.endTimestamp,
           availableTables: 1,

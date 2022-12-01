@@ -3,6 +3,8 @@ import { Session, SessionData } from 'express-session'
 import { Prison, VisitSlot, VisitSlotList } from '../@types/bapv'
 import { clearSession, getFlashFormValues, getSelectedSlot, getSlotByStartTimeAndRestriction } from './visitorUtils'
 
+const prisonId = 'HEI'
+
 const slotsList: VisitSlotList = {
   'February 2022': [
     {
@@ -15,6 +17,7 @@ const slotsList: VisitSlotList = {
         morning: [
           {
             id: '1',
+            prisonId,
             startTimestamp: '2022-02-14T10:00:00',
             endTimestamp: '2022-02-14T11:00:00',
             availableTables: 15,
@@ -24,6 +27,7 @@ const slotsList: VisitSlotList = {
           },
           {
             id: '2',
+            prisonId,
             startTimestamp: '2022-02-14T11:59:00',
             endTimestamp: '2022-02-14T12:59:00',
             availableTables: 1,
@@ -35,6 +39,7 @@ const slotsList: VisitSlotList = {
         afternoon: [
           {
             id: '3',
+            prisonId,
             startTimestamp: '2022-02-14T12:00:00',
             endTimestamp: '2022-02-14T13:05:00',
             availableTables: 5,
@@ -56,6 +61,7 @@ const slotsList: VisitSlotList = {
         afternoon: [
           {
             id: '4',
+            prisonId,
             startTimestamp: '2022-02-15T16:00:00',
             endTimestamp: '2022-02-15T17:00:00',
             availableTables: 12,
@@ -78,6 +84,7 @@ const slotsList: VisitSlotList = {
         morning: [
           {
             id: '5',
+            prisonId,
             startTimestamp: '2022-03-01T09:30:00',
             endTimestamp: '2022-03-01T10:30:00',
             availableTables: 0,
@@ -96,6 +103,7 @@ describe('getSelectedSlot', () => {
   it('should return the selected slot if it exists in the slotsList', () => {
     expect(getSelectedSlot(slotsList, '4')).toEqual(<VisitSlot>{
       id: '4',
+      prisonId,
       startTimestamp: '2022-02-15T16:00:00',
       endTimestamp: '2022-02-15T17:00:00',
       availableTables: 12,

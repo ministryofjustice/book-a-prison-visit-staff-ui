@@ -10,6 +10,8 @@ describe('Views - Date and time of visit', () => {
   let compiledTemplate: Template
   let viewContext: Record<string, unknown>
 
+  const prisonId = 'HEI'
+
   const njkEnv = registerNunjucks()
 
   beforeEach(() => {
@@ -43,6 +45,7 @@ describe('Views - Date and time of visit', () => {
               morning: [
                 {
                   id: '1',
+                  prisonId,
                   startTimestamp: '2022-02-14T10:00:00',
                   endTimestamp: '2022-02-14T11:00:00',
                   availableTables: 15,
@@ -52,6 +55,7 @@ describe('Views - Date and time of visit', () => {
                 },
                 {
                   id: '2',
+                  prisonId,
                   startTimestamp: '2022-02-14T11:59:00',
                   endTimestamp: '2022-02-14T12:59:00',
                   availableTables: 1,
@@ -63,6 +67,7 @@ describe('Views - Date and time of visit', () => {
               afternoon: [
                 {
                   id: '3',
+                  prisonId,
                   startTimestamp: '2022-02-14T12:00:00',
                   endTimestamp: '2022-02-14T13:05:00',
                   availableTables: 5,
@@ -86,6 +91,7 @@ describe('Views - Date and time of visit', () => {
               afternoon: [
                 {
                   id: '4',
+                  prisonId,
                   startTimestamp: '2022-02-15T16:00:00',
                   endTimestamp: '2022-02-15T17:00:00',
                   availableTables: 12,
@@ -110,6 +116,7 @@ describe('Views - Date and time of visit', () => {
               morning: [
                 {
                   id: '5',
+                  prisonId,
                   startTimestamp: '2022-03-01T09:30:00',
                   endTimestamp: '2022-03-01T10:30:00',
                   availableTables: 0, // fully booked
@@ -119,6 +126,7 @@ describe('Views - Date and time of visit', () => {
                 },
                 {
                   id: '6',
+                  prisonId,
                   startTimestamp: '2022-03-01T10:30:00',
                   endTimestamp: '2022-03-01T11:30:00',
                   availableTables: -2, // overbooked
@@ -221,6 +229,7 @@ describe('Views - Date and time of visit', () => {
                 morning: [
                   {
                     id: '1',
+                    prisonId,
                     startTimestamp: '2022-02-14T10:00:00',
                     endTimestamp: '2022-02-14T11:00:00',
                     availableTables: 15,

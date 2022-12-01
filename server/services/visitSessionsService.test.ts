@@ -155,6 +155,7 @@ describe('Visit sessions service', () => {
                 morning: [
                   {
                     id: '1',
+                    prisonId,
                     startTimestamp: '2022-02-14T10:00:00',
                     endTimestamp: '2022-02-14T11:00:00',
                     availableTables: 15,
@@ -210,6 +211,7 @@ describe('Visit sessions service', () => {
                 morning: [
                   {
                     id: '1',
+                    prisonId,
                     startTimestamp: '2022-02-14T10:00:00',
                     endTimestamp: '2022-02-14T11:00:00',
                     availableTables: 15,
@@ -249,6 +251,7 @@ describe('Visit sessions service', () => {
                 morning: [
                   {
                     id: '1',
+                    prisonId,
                     startTimestamp: '2022-02-14T10:00:00',
                     endTimestamp: '2022-02-14T11:00:00',
                     availableTables: 15,
@@ -304,6 +307,7 @@ describe('Visit sessions service', () => {
               morning: [
                 {
                   id: '1',
+                  prisonId,
                   startTimestamp: '2022-02-14T10:00:00',
                   endTimestamp: '2022-02-14T11:00:00',
                   availableTables: 8,
@@ -406,6 +410,7 @@ describe('Visit sessions service', () => {
               morning: [
                 {
                   id: '1',
+                  prisonId,
                   startTimestamp: '2022-02-14T10:00:00',
                   endTimestamp: '2022-02-14T11:00:00',
                   availableTables: 15,
@@ -415,6 +420,7 @@ describe('Visit sessions service', () => {
                 },
                 {
                   id: '2',
+                  prisonId,
                   startTimestamp: '2022-02-14T11:59:00',
                   endTimestamp: '2022-02-14T12:59:00',
                   availableTables: 10,
@@ -426,6 +432,7 @@ describe('Visit sessions service', () => {
               afternoon: [
                 {
                   id: '3',
+                  prisonId,
                   startTimestamp: '2022-02-14T12:00:00',
                   endTimestamp: '2022-02-14T13:05:00',
                   availableTables: 5,
@@ -447,6 +454,7 @@ describe('Visit sessions service', () => {
               afternoon: [
                 {
                   id: '4',
+                  prisonId,
                   startTimestamp: '2022-02-15T16:00:00',
                   endTimestamp: '2022-02-15T17:00:00',
                   availableTables: 12,
@@ -469,6 +477,7 @@ describe('Visit sessions service', () => {
               morning: [
                 {
                   id: '5',
+                  prisonId,
                   startTimestamp: '2022-03-01T09:30:00',
                   endTimestamp: '2022-03-01T10:30:00',
                   availableTables: 0,
@@ -496,6 +505,7 @@ describe('Visit sessions service', () => {
         },
         visitSlot: {
           id: '1',
+          prisonId,
           startTimestamp: '2022-02-14T10:00:00',
           endTimestamp: '2022-02-14T11:00:00',
           availableTables: 1,
@@ -565,6 +575,7 @@ describe('Visit sessions service', () => {
         },
         visitSlot: {
           id: 'visitId',
+          prisonId,
           startTimestamp: '2022-02-14T10:00:00',
           endTimestamp: '2022-02-14T11:00:00',
           availableTables: 1,
@@ -670,6 +681,7 @@ describe('Visit sessions service', () => {
         },
         visitSlot: {
           id: 'visitId',
+          prisonId,
           startTimestamp: '2022-02-14T10:00:00',
           endTimestamp: '2022-02-14T11:00:00',
           availableTables: 1,
