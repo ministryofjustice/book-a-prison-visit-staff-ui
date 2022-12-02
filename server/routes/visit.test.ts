@@ -712,11 +712,13 @@ describe('POST /visit/:reference/cancel', () => {
   beforeEach(() => {
     visitSessionsService.cancelVisit = jest.fn().mockResolvedValue(cancelledVisit)
     notificationsService.sendCancellationSms = jest.fn().mockResolvedValue({})
+    supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
 
     app = appWithAllRoutes({
       prisonerSearchServiceOverride: prisonerSearchService,
       visitSessionsServiceOverride: visitSessionsService,
       auditServiceOverride: auditService,
+      supportedPrisonsServiceOverride: supportedPrisonsService,
       systemTokenOverride: systemToken,
       notificationsServiceOverride: notificationsService,
     })

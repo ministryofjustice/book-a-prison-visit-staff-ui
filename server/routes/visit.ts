@@ -320,10 +320,13 @@ export default function routes(
         try {
           const phoneNumber = visit.visitContact.telephone.replace(/\s/g, '')
 
+          const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(res.locals.user?.username)
+          const prisonName = supportedPrisons[visit.prisonId]
+
           await notificationsService.sendCancellationSms({
             phoneNumber,
             visitSlot: visit.startTimestamp,
-            prisonName: req.session.selectedEstablishment.prisonName,
+            prisonName,
             prisonPhoneNumber: '01234443225',
           })
           logger.info(`Cancellation SMS sent for ${reference}`)
