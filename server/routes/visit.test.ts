@@ -14,6 +14,7 @@ import { Prisoner } from '../data/prisonerOffenderSearchTypes'
 import config from '../config'
 import NotificationsService from '../services/notificationsService'
 import { clearSession } from './visitorUtils'
+import { createSupportedPrisons, createSupportedPrisonIds } from '../data/__testutils/testObjects'
 
 jest.mock('../services/prisonerSearchService')
 jest.mock('../services/visitSessionsService')
@@ -26,6 +27,8 @@ let app: Express
 const systemToken = async (user: string): Promise<string> => `${user}-token-1`
 let flashData: Record<string, string[] | Record<string, string>[]>
 let visitSessionData: VisitSessionData
+const supportedPrisons = createSupportedPrisons()
+const supportedPrisonIds = createSupportedPrisonIds()
 
 const prisonerSearchService = new PrisonerSearchService(null, systemToken) as jest.Mocked<PrisonerSearchService>
 const visitSessionsService = new VisitSessionsService(
@@ -171,7 +174,8 @@ describe('/visit/:reference', () => {
     prisonerSearchService.getPrisonerById.mockResolvedValue(prisoner)
     visitSessionsService.getFullVisitDetails.mockResolvedValue({ visit, visitors, additionalSupport })
     prisonerVisitorsService.getVisitors.mockResolvedValue(visitors)
-    supportedPrisonsService.getSupportedPrisonIds.mockResolvedValue(['HEI'])
+    supportedPrisonsService.getSupportedPrisonIds.mockResolvedValue(supportedPrisonIds)
+    supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
 
     visitSessionData = { prisoner: undefined }
 
@@ -395,6 +399,34 @@ describe('/visit/:reference', () => {
         })
     })
 
+    it('should not show booking summary if selected establishment does not match prison for which visit booked', () => {
+      app = appWithAllRoutes({
+        visitSessionsServiceOverride: visitSessionsService,
+        auditServiceOverride: auditService,
+        supportedPrisonsServiceOverride: supportedPrisonsService,
+        systemTokenOverride: systemToken,
+        sessionData: {
+          selectedEstablishment: { prisonId: 'BLI', prisonName: supportedPrisons.BLI },
+        } as SessionData,
+      })
+
+      return request(app)
+        .get('/visit/ab-cd-ef-gh')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text()).toBe('Booking details')
+          expect($('.govuk-back-link').length).toBe(0)
+          expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
+
+          expect(res.text).toContain(`This booking is not for ${supportedPrisons.BLI.replace('&', '&amp;')}`)
+          expect(res.text).toContain(`change the establishment to ${supportedPrisons[visit.prisonId]}`)
+
+          expect(auditService.viewedVisitDetails).not.toHaveBeenCalled()
+        })
+    })
+
     it('should render 400 Bad Request error for invalid visit reference', () => {
       return request(app)
         .get('/visit/12-34-56-78')
@@ -538,6 +570,20 @@ describe('/visit/:reference', () => {
             visitStatus: 'BOOKED',
           })
         })
+    })
+
+    it('should redirect to /visit/:reference if selected establishment does not match prison for which visit booked', () => {
+      app = appWithAllRoutes({
+        visitSessionsServiceOverride: visitSessionsService,
+        auditServiceOverride: auditService,
+        supportedPrisonsServiceOverride: supportedPrisonsService,
+        systemTokenOverride: systemToken,
+        sessionData: {
+          selectedEstablishment: { prisonId: 'BLI', prisonName: supportedPrisons.BLI },
+        } as SessionData,
+      })
+
+      return request(app).post('/visit/ab-cd-ef-gh').expect(302).expect('location', '/visit/ab-cd-ef-gh')
     })
 
     it('should render 400 Bad Request error for invalid visit reference', () => {

@@ -73,6 +73,15 @@ export default function routes(
         username: res.locals.user?.username,
       })
 
+    if (visit.prisonId !== req.session.selectedEstablishment.prisonId) {
+      const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(res.locals.user?.username)
+
+      return res.render('pages/visit/summary', {
+        visit: { reference: visit.reference },
+        visitPrisonName: supportedPrisons[visit.prisonId],
+      })
+    }
+
     const prisoner: Prisoner = await prisonerSearchService.getPrisonerById(visit.prisonerId, res.locals.user?.username)
     const supportedPrisonIds = await supportedPrisonsService.getSupportedPrisonIds(res.locals.user?.username)
 
@@ -109,6 +118,10 @@ export default function routes(
       reference,
       username: res.locals.user?.username,
     })
+
+    if (visit.prisonId !== req.session.selectedEstablishment.prisonId) {
+      return res.redirect(`/visit/${visit.reference}`)
+    }
 
     const prisoner: Prisoner = await prisonerSearchService.getPrisonerById(visit.prisonerId, res.locals.user?.username)
     const supportedPrisonIds = await supportedPrisonsService.getSupportedPrisonIds(res.locals.user?.username)
