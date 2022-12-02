@@ -5,55 +5,59 @@
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {%-from "moj/components/banner/macro.njk" import mojBanner %}
 
-
 {% set pageHeaderTitle = "Booking details" %}
 {% set pageTitle = applicationName + " - " + pageHeaderTitle + " - " + visit.reference %}
-{% if fromVisitSearch %}
-{% set backLinkHref = "/visits?" + fromVisitSearchQuery %}
-{% else %}
-{% set backLinkHref = "/prisoner/" + visit.prisonerId + "/visits" %}
+
+{% if prisoner %}
+  {% if fromVisitSearch %}
+    {% set backLinkHref = "/visits?" + fromVisitSearchQuery %}
+  {% else %}
+    {% set backLinkHref = "/prisoner/" + visit.prisonerId + "/visits" %}
+  {% endif %}
 {% endif %}
 
 {% block content %}
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
 
-      <p class="bapv-secondary-text govuk-!-margin-bottom-0">Booking reference: <span data-test="reference">{{ visit.reference }}</span></p>
+    <p class="bapv-secondary-text govuk-!-margin-bottom-0">Booking reference: <span data-test="reference">{{ visit.reference }}</span></p>
 
-      <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+    <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
 
-       {% if visit.visitStatus === "CANCELLED" %}
+    {% if prisoner %}
+
+      {% if visit.visitStatus === "CANCELLED" %}
         {% set status = visit.outcomeStatus.split("_") %}
-            {%- for visitNote in visit.visitNotes %}
-              {% if visitNote.type == "VISIT_OUTCOMES" %}
+        {%- for visitNote in visit.visitNotes %}
+          {% if visitNote.type == "VISIT_OUTCOMES" %}
 
-                {% set cancelledBy %}
-                  {% if status[0] === 'ADMINISTRATIVE' %}
-                    {{ 'This visit was cancelled due to an administrative error with the booking.' }}
-                  {% else %}
-                    {{ 'This visit was cancelled by the ' + status[0] | lower + '.' }}
-                  {% endif %}
-                {% endset %}
-
-                {% set cancelledVisitHtml %}
-                  {{ govukWarningText({
-                    classes: "govuk-!-margin-bottom-0 govuk-!-padding-left-4",
-                    html: "<span>" + cancelledBy + "</span><br><span>Reason: " + visitNote.text + "</span>",
-                    iconFallbackText: "Warning",
-                    attributes: {
-                      "data-test": "cancelled-visit-reason"
-                    }
-                  }) }}
-                {% endset %}
-
-                {{ mojBanner({
-                  classes: "govuk-!-padding-left-4",
-                  html: cancelledVisitHtml
-                }) }}
-
+            {% set cancelledBy %}
+              {% if status[0] === 'ADMINISTRATIVE' %}
+                {{ 'This visit was cancelled due to an administrative error with the booking.' }}
+              {% else %}
+                {{ 'This visit was cancelled by the ' + status[0] | lower + '.' }}
               {% endif %}
-          {% endfor %}
-        {% endif %}
+            {% endset %}
+
+            {% set cancelledVisitHtml %}
+              {{ govukWarningText({
+                classes: "govuk-!-margin-bottom-0 govuk-!-padding-left-4",
+                html: "<span>" + cancelledBy + "</span><br><span>Reason: " + visitNote.text + "</span>",
+                iconFallbackText: "Warning",
+                attributes: {
+                  "data-test": "cancelled-visit-reason"
+                }
+              }) }}
+            {% endset %}
+
+            {{ mojBanner({
+              classes: "govuk-!-padding-left-4",
+              html: cancelledVisitHtml
+            }) }}
+
+          {% endif %}
+        {% endfor %}
+      {% endif %}
 
       <h2 class="govuk-heading-m">Prisoner details</h2>
       <ul class="bapv-item-list--horizontal">
@@ -122,7 +126,6 @@
             </form>
           {% endif %}
         {% endif %}
-
       </div>
 
       {% set visitorRows = [] %}
@@ -156,22 +159,22 @@
         captionClasses: "govuk-table__caption--m",
         classes: "bapv-table govuk-!-margin-top-3",
         head: [
-            {
-              text: "Name"
-            },
-            {
-              text: "Date of birth"
-            },
-            {
-              text: "Relationship to prisoner"
-            },
-            {
-              text: "Address"
-            },
-            {
-              text: "Restrictions",
-              classes: "govuk-!-width-one-quarter"
-            }
+          {
+            text: "Name"
+          },
+          {
+            text: "Date of birth"
+          },
+          {
+            text: "Relationship to prisoner"
+          },
+          {
+            text: "Address"
+          },
+          {
+            text: "Restrictions",
+            classes: "govuk-!-width-one-quarter"
+          }
         ],
         rows: visitorRows
       }) }}
@@ -201,6 +204,10 @@
           <span data-test="visit-booked">{{ visit.createdTimestamp | formatDate('EEEE d MMMM yyyy') }} at {{ visit.createdTimestamp | formatTime }}</span>
         </li>
       </ul>
-    </div>
+    {% else %}
+      <p>This booking is not for {{ selectedEstablishment.prisonName }}.</p>
+      <p>To view the booking, change the establishment to {{ visitPrisonName }} and search for it by the booking reference.</p>
+    {% endif %}
   </div>
+</div>
 {% endblock %}
