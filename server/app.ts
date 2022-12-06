@@ -12,7 +12,7 @@ import visitsRoutes from './routes/visits'
 import nunjucksSetup from './utils/nunjucksSetup'
 import errorHandler from './errorHandler'
 import standardRouter from './routes/standardRouter'
-import type UserService from './services/userService'
+import UserService from './services/userService'
 import { prisonerSearchClientBuilder } from './data/prisonerSearchClient'
 import { notificationsApiClientBuilder } from './data/notificationsApiClient'
 import { visitSchedulerApiClientBuilder } from './data/visitSchedulerApiClient'
@@ -67,6 +67,7 @@ export default function createApp(userService: UserService): express.Application
       standardRouter(userService, supportedPrisonsService),
       supportedPrisonsService,
       new AuditService(),
+      userService,
     ),
   )
   app.use(
