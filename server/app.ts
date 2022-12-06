@@ -13,18 +13,6 @@ import nunjucksSetup from './utils/nunjucksSetup'
 import errorHandler from './errorHandler'
 import standardRouter from './routes/standardRouter'
 import type UserService from './services/userService'
-import { prisonerSearchClientBuilder } from './data/prisonerSearchClient'
-import { notificationsApiClientBuilder } from './data/notificationsApiClient'
-import { visitSchedulerApiClientBuilder } from './data/visitSchedulerApiClient'
-import { whereaboutsApiClientBuilder } from './data/whereaboutsApiClient'
-import { prisonerContactRegistryApiClientBuilder } from './data/prisonerContactRegistryApiClient'
-import { prisonApiClientBuilder } from './data/prisonApiClient'
-import { prisonRegisterApiClientBuilder } from './data/prisonRegisterApiClient'
-import NotificationsService from './services/notificationsService'
-import PrisonerSearchService from './services/prisonerSearchService'
-import PrisonerProfileService from './services/prisonerProfileService'
-import SupportedPrisonsService from './services/supportedPrisonsService'
-import systemToken from './data/authClient'
 import setUpWebSession from './middleware/setUpWebSession'
 import setUpStaticResources from './middleware/setUpStaticResources'
 import setUpWebSecurity from './middleware/setUpWebSecurity'
@@ -32,10 +20,16 @@ import setUpAuthentication from './middleware/setUpAuthentication'
 import setUpHealthChecks from './middleware/setUpHealthChecks'
 import setUpWebRequestParsing from './middleware/setupRequestParsing'
 import authorisationMiddleware from './middleware/authorisationMiddleware'
-import PrisonerVisitorsService from './services/prisonerVisitorsService'
-import VisitSessionsService from './services/visitSessionsService'
-import AuditService from './services/auditService'
 import appInsightsOperationId from './middleware/appInsightsOperationId'
+import {
+  supportedPrisonsService,
+  visitSessionsService,
+  prisonerSearchService,
+  prisonerVisitorsService,
+  prisonerProfileService,
+  notificationsService,
+  auditService,
+} from './services'
 
 export default function createApp(userService: UserService): express.Application {
   const app = express()
@@ -54,111 +48,52 @@ export default function createApp(userService: UserService): express.Application
   app.use(authorisationMiddleware())
   app.use(appInsightsOperationId)
 
-  const supportedPrisonsService = new SupportedPrisonsService(
-    visitSchedulerApiClientBuilder,
-    prisonRegisterApiClientBuilder,
-    systemToken,
-  )
-
   app.use('/', indexRoutes(standardRouter(userService)))
   app.use(
     '/change-establishment/',
-    establishmentRoutes(standardRouter(userService), supportedPrisonsService, new AuditService()),
+    establishmentRoutes(standardRouter(userService), supportedPrisonsService, auditService),
   )
   app.use(
     '/search/',
-    searchRoutes(
-      standardRouter(userService),
-      new PrisonerSearchService(prisonerSearchClientBuilder, systemToken),
-      new VisitSessionsService(
-        prisonerContactRegistryApiClientBuilder,
-        visitSchedulerApiClientBuilder,
-        whereaboutsApiClientBuilder,
-        systemToken,
-      ),
-      new AuditService(),
-    ),
+    searchRoutes(standardRouter(userService), prisonerSearchService, visitSessionsService, auditService),
   )
   app.use(
     '/prisoner/',
     prisonerRoutes(
       standardRouter(userService),
-      new PrisonerProfileService(
-        prisonApiClientBuilder,
-        visitSchedulerApiClientBuilder,
-        prisonerContactRegistryApiClientBuilder,
-        supportedPrisonsService,
-        systemToken,
-      ),
-      new PrisonerSearchService(prisonerSearchClientBuilder, systemToken),
-      new VisitSessionsService(
-        prisonerContactRegistryApiClientBuilder,
-        visitSchedulerApiClientBuilder,
-        whereaboutsApiClientBuilder,
-        systemToken,
-      ),
-      new AuditService(),
+      prisonerProfileService,
+      prisonerSearchService,
+      visitSessionsService,
+      auditService,
     ),
   )
   app.use(
     '/book-a-visit/',
     bookAVisitRoutes(
       standardRouter(userService),
-      new PrisonerVisitorsService(prisonerContactRegistryApiClientBuilder, systemToken),
-      new VisitSessionsService(
-        prisonerContactRegistryApiClientBuilder,
-        visitSchedulerApiClientBuilder,
-        whereaboutsApiClientBuilder,
-        systemToken,
-      ),
-      new PrisonerProfileService(
-        prisonApiClientBuilder,
-        visitSchedulerApiClientBuilder,
-        prisonerContactRegistryApiClientBuilder,
-        supportedPrisonsService,
-        systemToken,
-      ),
-      new NotificationsService(notificationsApiClientBuilder),
-      new AuditService(),
+      prisonerVisitorsService,
+      visitSessionsService,
+      prisonerProfileService,
+      notificationsService,
+      auditService,
     ),
   )
   app.use(
     '/visit/',
     visitRoutes(
       standardRouter(userService),
-      new PrisonerSearchService(prisonerSearchClientBuilder, systemToken),
-      new VisitSessionsService(
-        prisonerContactRegistryApiClientBuilder,
-        visitSchedulerApiClientBuilder,
-        whereaboutsApiClientBuilder,
-        systemToken,
-      ),
-      new NotificationsService(notificationsApiClientBuilder),
-      new AuditService(),
-      new PrisonerVisitorsService(prisonerContactRegistryApiClientBuilder, systemToken),
-      new PrisonerProfileService(
-        prisonApiClientBuilder,
-        visitSchedulerApiClientBuilder,
-        prisonerContactRegistryApiClientBuilder,
-        supportedPrisonsService,
-        systemToken,
-      ),
+      prisonerSearchService,
+      visitSessionsService,
+      notificationsService,
+      auditService,
+      prisonerVisitorsService,
+      prisonerProfileService,
       supportedPrisonsService,
     ),
   )
   app.use(
     '/visits/',
-    visitsRoutes(
-      standardRouter(userService),
-      new PrisonerSearchService(prisonerSearchClientBuilder, systemToken),
-      new VisitSessionsService(
-        prisonerContactRegistryApiClientBuilder,
-        visitSchedulerApiClientBuilder,
-        whereaboutsApiClientBuilder,
-        systemToken,
-      ),
-      new AuditService(),
-    ),
+    visitsRoutes(standardRouter(userService), prisonerSearchService, visitSessionsService, auditService),
   )
 
   app.use((req, res, next) => next(createError(404, 'Not found')))
