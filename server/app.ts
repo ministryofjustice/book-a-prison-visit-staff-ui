@@ -1,6 +1,7 @@
 import express from 'express'
-
 import createError from 'http-errors'
+
+import type UserService from './services/userService'
 
 import indexRoutes from './routes'
 import searchRoutes from './routes/search'
@@ -9,10 +10,9 @@ import prisonerRoutes from './routes/prisoner'
 import bookAVisitRoutes from './routes/bookAVisit'
 import visitRoutes from './routes/visit'
 import visitsRoutes from './routes/visits'
+import standardRouter from './routes/standardRouter'
 import nunjucksSetup from './utils/nunjucksSetup'
 import errorHandler from './errorHandler'
-import standardRouter from './routes/standardRouter'
-import type UserService from './services/userService'
 import setUpWebSession from './middleware/setUpWebSession'
 import setUpStaticResources from './middleware/setUpStaticResources'
 import setUpWebSecurity from './middleware/setUpWebSecurity'
