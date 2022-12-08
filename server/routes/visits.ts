@@ -55,11 +55,10 @@ export default function routes(
       }
     }
 
-    const maxSlotDefaults = {
-      OPEN: 30,
-      CLOSED: 3,
-      UNKNOWN: 30,
-    }
+    // VB-1497 - temporary workaround for capacity counts for Hewell / Bristol
+    const maxSlotDefaults =
+      prisonId === 'HEI' ? { OPEN: 30, CLOSED: 3, UNKNOWN: 30 } : { OPEN: 20, CLOSED: 1, UNKNOWN: 20 }
+
     const maxSlots = maxSlotDefaults[visitType] ?? 0
     const firstTabDateString = getParsedDateFromQueryString(firstTabDate as string)
 

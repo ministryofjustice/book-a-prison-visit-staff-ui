@@ -2,12 +2,14 @@ import type { Express } from 'express'
 import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { format } from 'date-fns'
+import { SessionData } from 'express-session'
 import PrisonerSearchService from '../services/prisonerSearchService'
 import VisitSessionsService from '../services/visitSessionsService'
 import AuditService from '../services/auditService'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import { ExtendedVisitInformation, PrisonerDetailsItem, VisitsPageSlot } from '../@types/bapv'
 import { getParsedDateFromQueryString } from './visitsUtils'
+import { createSupportedPrisons } from '../data/__testutils/testObjects'
 
 jest.mock('../services/prisonerSearchService')
 jest.mock('../services/visitSessionsService')
@@ -38,6 +40,8 @@ beforeEach(() => {
     systemTokenOverride: systemToken,
   })
 })
+
+const supportedPrisons = createSupportedPrisons()
 
 afterEach(() => {
   jest.resetAllMocks()
@@ -235,6 +239,47 @@ describe('GET /visits', () => {
         expect(auditService.viewedVisits).toHaveBeenCalledWith({
           viewDate: todayDate,
           prisonId,
+          username: 'user1',
+          operationId: undefined,
+        })
+      })
+  })
+
+  // VB-1497 - checking temporary workaround for capacity counts
+  it('should show the correct capacity for Bristol', () => {
+    prisonerSearchService.getPrisonersByPrisonerNumbers.mockResolvedValue(prisoners)
+    visitSessionsService.getVisitsByDate.mockResolvedValue(visits)
+
+    app = appWithAllRoutes({
+      prisonerSearchServiceOverride: prisonerSearchService,
+      visitSessionsServiceOverride: visitSessionsService,
+      auditServiceOverride: auditService,
+      systemTokenOverride: systemToken,
+      sessionData: { selectedEstablishment: { prisonId: 'BLI', prisonName: supportedPrisons.BLI } } as SessionData,
+    })
+
+    return request(app)
+      .get('/visits')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('h1').text()).toBe('View visits by date')
+        expect($('.govuk-back-link').attr('href')).toBe('/')
+        expect($('[data-test="visit-room"]').text()).toBe('Open')
+        expect($('[data-test="visit-time"]').text()).toBe('9am to 9:29am')
+        expect($('[data-test="visit-tables-booked"]').text()).toBe('1 of 20')
+        expect($('[data-test="visit-visitors-total"]').text()).toBe('1')
+        expect($('[data-test="visit-adults"]').text()).toBe('1')
+        expect($('[data-test="visit-children"]').text()).toBe('0')
+        expect($('[data-test="prisoner-number"]').text()).toBe('A8709DY')
+        expect($('[data-test="prisoner-name"]').text()).toBe('Rocky, Asap')
+        expect($('.moj-side-navigation__title').text()).toContain('Open visits')
+        expect($('.moj-side-navigation__item--active').text()).toContain('9am to 9:29am')
+        expect(auditService.viewedVisits).toHaveBeenCalledTimes(1)
+        expect(auditService.viewedVisits).toHaveBeenCalledWith({
+          viewDate: todayDate,
+          prisonId: 'BLI',
           username: 'user1',
           operationId: undefined,
         })
