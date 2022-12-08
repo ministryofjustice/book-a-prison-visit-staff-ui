@@ -56,13 +56,11 @@ export default function routes(
     }
 
     // VB-1497 - temporary workaround for capacity counts for Hewell / Bristol
-    let maxSlotDefaults: { OPEN: number; CLOSED: number; UNKNOWN: number }
+    let maxSlotDefaults = { OPEN: 0, CLOSED: 0, UNKNOWN: 0 }
     if (prisonId === 'HEI') {
       maxSlotDefaults = { OPEN: 30, CLOSED: 3, UNKNOWN: 30 }
     } else if (prisonId === 'BLI') {
       maxSlotDefaults = { OPEN: 20, CLOSED: 1, UNKNOWN: 20 }
-    } else {
-      maxSlotDefaults = { OPEN: 0, CLOSED: 0, UNKNOWN: 0 }
     }
 
     const maxSlots = maxSlotDefaults[visitType] ?? 0
