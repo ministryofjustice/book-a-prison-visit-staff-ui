@@ -286,6 +286,30 @@ describe('GET /visits', () => {
       })
   })
 
+  // VB-1497 - checking temporary workaround for capacity counts
+  it('should show default capacity if not Hewell or Bristol', () => {
+    prisonerSearchService.getPrisonersByPrisonerNumbers.mockResolvedValue(prisoners)
+    visitSessionsService.getVisitsByDate.mockResolvedValue(visits)
+
+    app = appWithAllRoutes({
+      prisonerSearchServiceOverride: prisonerSearchService,
+      visitSessionsServiceOverride: visitSessionsService,
+      auditServiceOverride: auditService,
+      systemTokenOverride: systemToken,
+      sessionData: { selectedEstablishment: { prisonId: 'XYZ', prisonName: 'XYZ' } } as SessionData,
+    })
+
+    return request(app)
+      .get('/visits')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('h1').text()).toBe('View visits by date')
+        expect($('[data-test="visit-tables-booked"]').text()).toBe('1 of 0')
+      })
+  })
+
   it('should render visit slot summary page with prisoner list, slot details and menu for choosing other slots, with the chosen slot shown for OPEN', () => {
     prisonerSearchService.getPrisonersByPrisonerNumbers.mockResolvedValue(prisoners)
     visitSessionsService.getVisitsByDate.mockResolvedValue(visits)
