@@ -39,13 +39,24 @@ class VisitSchedulerApiClient {
     return this.restclient.get({ path: `/visits/${reference}` })
   }
 
+  getUpcomingVisitsCancelledAndBooked(offenderNo: string, startTimestamp?: string): Promise<Visit[]> {
+    return this.restclient.get({
+      path: '/visits',
+      query: new URLSearchParams({
+        prisonerId: offenderNo,
+        startTimestamp: startTimestamp || new Date().toISOString(),
+        visitStatus: 'BOOKED,CANCELLED',
+      }).toString(),
+    })
+  }
+
   getUpcomingVisits(offenderNo: string, startTimestamp?: string): Promise<Visit[]> {
     return this.restclient.get({
       path: '/visits',
       query: new URLSearchParams({
         prisonerId: offenderNo,
         startTimestamp: startTimestamp || new Date().toISOString(),
-        visitStatus: this.visitStatus,
+        visitStatus: 'BOOKED',
       }).toString(),
     })
   }

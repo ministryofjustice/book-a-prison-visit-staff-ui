@@ -251,6 +251,24 @@ export default class VisitSessionsService {
     return this.buildVisitInformation(visit)
   }
 
+  async getUpcomingVisitsCancelledAndBooked({
+    username,
+    offenderNo,
+  }: {
+    username: string
+    offenderNo: string
+  }): Promise<VisitInformation[]> {
+    const token = await this.systemToken(username)
+    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
+
+    logger.info(`Get booked and cancelled upcoming visits for ${offenderNo}`)
+    const visits = await visitSchedulerApiClient.getUpcomingVisitsCancelledAndBooked(offenderNo)
+
+    return visits.map(visit => {
+      return this.buildVisitInformation(visit)
+    })
+  }
+
   async getUpcomingVisits({
     username,
     offenderNo,
@@ -342,6 +360,7 @@ export default class VisitSessionsService {
       mainContact: visit.visitContact?.name,
       visitDate: prisonerDateTimePretty(visit.startTimestamp),
       visitTime,
+      visitStatus: visit.visitStatus,
     }
   }
 
@@ -365,6 +384,7 @@ export default class VisitSessionsService {
       startTimestamp: visit.startTimestamp,
       visitDate: prisonerDateTimePretty(visit.startTimestamp),
       visitTime,
+      visitStatus: visit.visitStatus,
       visitRestriction: visit.visitRestriction,
       visitors,
     }

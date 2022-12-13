@@ -19,11 +19,12 @@
       <p><strong class="govuk-!-margin-right-2">Prison number:</strong> <span data-test="prisoner-number">{{ offenderNo }}</span></p>
 
       <h2 class="govuk-heading-m">Upcoming visits:</h2>
-
+  
       {% if visits | length %}
 
         {% set visitRows = [] %}
         {% for visit in visits %}
+        {{ visit | dump }}
           {% set visitRows = (visitRows.push([
             {
               html: '<a href="/visit/' + visit.reference + '">' + visit.reference + '</a>',
@@ -38,8 +39,8 @@
               attributes: { "data-test": "visit-date-" + loop.index }
             },
             {
-              text: visit.visitTime,
-              attributes: { "data-test": "visit-time-" + loop.index }
+              text: visit.visitStatus | capitalize,
+              attributes: { "data-test": "visit-status-" + loop.index }
             }
           ]), visitRows) %}
         {% endfor %}
@@ -56,7 +57,7 @@
                   text: "Visit date"
                 },
                 {
-                  text: "Visit time"
+                  text: "Visit status"
                 }
             ],
             rows: visitRows

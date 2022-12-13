@@ -402,6 +402,7 @@ describe('Booking search page', () => {
     mainContact: 'Jon Smith',
     visitDate: '12 Nov 2021',
     visitTime: '1pm -2pm',
+    visitStatus: 'BOOKED',
   }
 
   describe('GET /search/visit', () => {

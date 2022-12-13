@@ -98,7 +98,7 @@ export default function routes(
     }
     const prisonerName = `${prisonerDetails.lastName}, ${prisonerDetails.firstName}`
 
-    const visits = await visitSessionsService.getUpcomingVisits({
+    const visits = await visitSessionsService.getUpcomingVisitsCancelledAndBooked({
       username: res.locals.user?.username,
       offenderNo,
     })

@@ -497,6 +497,7 @@ describe('GET /prisoner/A1234BC/visits', () => {
         mainContact: 'John Smith',
         visitDate: '14 February 2022',
         visitTime: '10am to 11:15am',
+        visitStatus: 'BOOKED',
       },
       {
         reference: 'gm-in-az-ma',
@@ -505,11 +506,12 @@ describe('GET /prisoner/A1234BC/visits', () => {
         mainContact: 'Fred Smith',
         visitDate: '24 February 2022',
         visitTime: '2pm to 3pm',
+        visitStatus: 'BOOKED',
       },
     ]
 
     prisonerSearchService.getPrisoner.mockResolvedValue(prisoner)
-    visitSessionsService.getUpcomingVisits.mockResolvedValue(visitInfo)
+    visitSessionsService.getUpcomingVisitsCancelledAndBooked.mockResolvedValue(visitInfo)
 
     return request(app)
       .get('/prisoner/A1234BC/visits')
@@ -523,12 +525,12 @@ describe('GET /prisoner/A1234BC/visits', () => {
         expect($('[data-test="visit-reference-1"]').text()).toBe('ab-cd-ef-gh')
         expect($('[data-test="visit-mainContact-1"]').text()).toBe('Smith, John')
         expect($('[data-test="visit-date-1"]').text()).toBe('14 February 2022')
-        expect($('[data-test="visit-time-1"]').text()).toBe('10am to 11:15am')
+        expect($('[data-test="visit-status-1"]').text()).toBe('Booked')
 
         expect($('[data-test="visit-reference-2"]').text()).toBe('gm-in-az-ma')
         expect($('[data-test="visit-mainContact-2"]').text()).toBe('Smith, Fred')
         expect($('[data-test="visit-date-2"]').text()).toBe('24 February 2022')
-        expect($('[data-test="visit-time-2"]').text()).toBe('2pm to 3pm')
+        expect($('[data-test="visit-status-2"]').text()).toBe('Booked')
       })
   })
   it('should list upcoming visits for the prisoner with back link to results if search in querystring', () => {
@@ -540,6 +542,7 @@ describe('GET /prisoner/A1234BC/visits', () => {
         mainContact: 'John Smith',
         visitDate: '14 February 2022',
         visitTime: '10am to 11:15am',
+        visitStatus: 'BOOKED',
       },
       {
         reference: 'gm-in-az-ma',
@@ -548,11 +551,12 @@ describe('GET /prisoner/A1234BC/visits', () => {
         mainContact: 'Fred Smith',
         visitDate: '24 February 2022',
         visitTime: '2pm to 3pm',
+        visitStatus: 'BOOKED',
       },
     ]
 
     prisonerSearchService.getPrisoner.mockResolvedValue(prisoner)
-    visitSessionsService.getUpcomingVisits.mockResolvedValue(visitInfo)
+    visitSessionsService.getUpcomingVisitsCancelledAndBooked.mockResolvedValue(visitInfo)
 
     return request(app)
       .get('/prisoner/A1234BC/visits?search=A1234BC')
@@ -566,12 +570,12 @@ describe('GET /prisoner/A1234BC/visits', () => {
         expect($('[data-test="visit-reference-1"]').text()).toBe('ab-cd-ef-gh')
         expect($('[data-test="visit-mainContact-1"]').text()).toBe('Smith, John')
         expect($('[data-test="visit-date-1"]').text()).toBe('14 February 2022')
-        expect($('[data-test="visit-time-1"]').text()).toBe('10am to 11:15am')
+        expect($('[data-test="visit-status-1"]').text()).toBe('Booked')
 
         expect($('[data-test="visit-reference-2"]').text()).toBe('gm-in-az-ma')
         expect($('[data-test="visit-mainContact-2"]').text()).toBe('Smith, Fred')
         expect($('[data-test="visit-date-2"]').text()).toBe('24 February 2022')
-        expect($('[data-test="visit-time-2"]').text()).toBe('2pm to 3pm')
+        expect($('[data-test="visit-status-2"]').text()).toBe('Booked')
       })
   })
 
