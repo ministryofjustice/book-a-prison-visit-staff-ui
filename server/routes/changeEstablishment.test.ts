@@ -174,6 +174,7 @@ describe('POST /change-establishment', () => {
           username: 'user1',
           operationId: undefined,
         })
+        // @TODO should also check setActiveCaseLoad is called (awaiting VB-1430)
       })
   })
 
@@ -190,6 +191,7 @@ describe('POST /change-establishment', () => {
         expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)
         expect(auditService.changeEstablishment).toHaveBeenCalledTimes(1)
       })
+    // @TODO should also check setActiveCaseLoad is called (awaiting VB-1430)
   })
 
   it('should redirect to valid page when passed in querystring', () => {

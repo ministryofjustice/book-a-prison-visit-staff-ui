@@ -117,6 +117,21 @@ describe('prisonApiClient', () => {
     })
   })
 
+  describe('setActiveCaseLoad', () => {
+    it('should set active case load for current user', async () => {
+      const caseLoadId = 'HEI'
+
+      fakePrisonApi
+        .put('/api/users/me/activeCaseLoad', { caseLoadId })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, {})
+
+      const output = await client.setActiveCaseLoad('HEI')
+
+      expect(output).toEqual({})
+    })
+  })
+
   describe('getVisitBalances', () => {
     it('should return visitBalances for a SENTENCED prisoner', async () => {
       const offenderNo = 'A1234BC'
