@@ -161,7 +161,8 @@ workflows:
           name: helm_lint
       - hmpps/build_docker:
           name: build_docker
-      - request_dev_approval:
+
+      - request-dev-preview-approval:
           <<: *feature_branch
           type: approval
           requires:
@@ -175,7 +176,23 @@ workflows:
           env: "dev"
           context: hmpps-common-vars
           requires:
-            - request_dev_approval
+            - request-dev-preview-approval
+
+      - request-staging-preview-approval:
+          <<: *feature_branch
+          type: approval
+          requires:
+            - deploy_dev_preview
+      - hmpps/deploy_env:
+          <<: *feature_branch
+          name: deploy_staging_preview
+          env: "staging"
+          context:
+            - hmpps-common-vars
+            - book-a-prison-visit-staff-ui-stage
+          requires:
+            - request-staging-preview-approval
+
       - hmpps/deploy_env:
           <<: *main_branch
           name: deploy_dev
@@ -214,6 +231,7 @@ workflows:
             - book-a-prison-visit-staff-ui-preprod
           requires:
             - request-preprod-approval
+
       - request-prod-approval:
           type: approval
           requires:
