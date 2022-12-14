@@ -105,7 +105,7 @@ describe('visitSchedulerApiClient', () => {
   })
 
   describe('getUpcomingVisits', () => {
-    it.skip('should return an array of Visit from the Visit Scheduler API', async () => {
+    it('should return an array of Visit from the Visit Scheduler API', async () => {
       const offenderNo = 'A1234BC'
       const results: Visit[] = [
         {
@@ -115,7 +115,7 @@ describe('visitSchedulerApiClient', () => {
           prisonId: 'HEI',
           visitRoom: 'A1 L3',
           visitType: 'SOCIAL',
-          visitStatus: 'BOOKED',
+          visitStatus: 'RESERVED',
           visitRestriction: 'OPEN',
           startTimestamp: timestamp,
           endTimestamp: '',
@@ -136,6 +136,8 @@ describe('visitSchedulerApiClient', () => {
         },
       ]
 
+      jest.useFakeTimers({ advanceTimers: true, now: new Date(timestamp) })
+
       fakeVisitSchedulerApi
         .get('/visits')
         .query({
@@ -149,6 +151,8 @@ describe('visitSchedulerApiClient', () => {
       const output = await client.getUpcomingVisits(offenderNo, ['BOOKED'])
 
       expect(output).toEqual(results)
+
+      jest.useRealTimers()
     })
   })
 
