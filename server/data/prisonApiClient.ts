@@ -37,6 +37,13 @@ class PrisonApiClient {
     })
   }
 
+  async setActiveCaseLoad(caseLoadId: string): Promise<void> {
+    return this.restclient.put({
+      path: '/api/users/me/activeCaseLoad',
+      data: { caseLoadId },
+    })
+  }
+
   async getVisitBalances(offenderNo: string): Promise<VisitBalances | null> {
     try {
       return await this.restclient.get({

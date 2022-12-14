@@ -8,11 +8,13 @@ import { clearSession } from './visitorUtils'
 import { safeReturnUrl } from '../utils/utils'
 import AuditService from '../services/auditService'
 import { Prison } from '../@types/bapv'
+import UserService from '../services/userService'
 
 export default function routes(
   router: Router,
   supportedPrisonsService: SupportedPrisonsService,
   auditService: AuditService,
+  userService: UserService,
 ): Router {
   const get = (path: string, ...handlers: RequestHandler[]) =>
     router.get(
@@ -67,6 +69,8 @@ export default function routes(
       username: res.locals.user?.username,
       operationId: res.locals.appInsightsOperationId,
     })
+
+    await userService.setActiveCaseLoad(newEstablishment.prisonId, res.locals.user?.username)
 
     return res.redirect(redirectUrl)
   })
