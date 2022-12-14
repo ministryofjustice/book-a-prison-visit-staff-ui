@@ -79,6 +79,7 @@ describe('GET /visits', () => {
           startTimestamp: '2022-05-23T09:00:00',
           visitDate: '23 May 2022',
           visitTime: '9am to 9:29am',
+          visitStatus: 'BOOKED',
           visitRestriction: 'OPEN',
           visitors: [
             {
@@ -101,6 +102,7 @@ describe('GET /visits', () => {
           startTimestamp: '2022-05-23T10:00:00',
           visitDate: '23 May 2022',
           visitTime: '10am to 11am',
+          visitStatus: 'BOOKED',
           visitRestriction: 'OPEN',
           visitors: [
             {
@@ -131,6 +133,7 @@ describe('GET /visits', () => {
           startTimestamp: '2022-05-23T10:00:00',
           visitDate: '23 May 2022',
           visitTime: '10am to 11am',
+          visitStatus: 'BOOKED',
           visitRestriction: 'UNKNOWN',
           visitors: [
             {

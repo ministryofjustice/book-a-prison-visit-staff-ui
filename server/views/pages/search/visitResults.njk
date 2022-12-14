@@ -53,13 +53,7 @@
                 text: "Prison number"
               },
               {
-                text: "Main contact"
-              },
-              {
-                text: "Visit date"
-              },
-              {
-                text: "Visit time"
+                text: "Visit status"
               }
           ],
           rows: [
@@ -74,13 +68,7 @@
                 text: results[0].prisonNumber
               },
               {
-                text: results[0].mainContact | formatLastNameFirst
-              },
-              {
-                text: results[0].visitDate
-              },
-              {
-                text: results[0].visitTime
+                text: results[0].visitStatus | capitalize
               }
             ]
           ]

@@ -254,19 +254,19 @@ export default class VisitSessionsService {
   async getUpcomingVisits({
     username,
     offenderNo,
+    visitStatus,
   }: {
     username: string
     offenderNo: string
+    visitStatus: Visit['visitStatus'][]
   }): Promise<VisitInformation[]> {
     const token = await this.systemToken(username)
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
 
     logger.info(`Get upcoming visits for ${offenderNo}`)
-    const visits = await visitSchedulerApiClient.getUpcomingVisits(offenderNo)
+    const visits = await visitSchedulerApiClient.getUpcomingVisits(offenderNo, visitStatus)
 
-    return visits.map(visit => {
-      return this.buildVisitInformation(visit)
-    })
+    return visits.map(visit => this.buildVisitInformation(visit))
   }
 
   async getVisitsByDate({
@@ -342,6 +342,7 @@ export default class VisitSessionsService {
       mainContact: visit.visitContact?.name,
       visitDate: prisonerDateTimePretty(visit.startTimestamp),
       visitTime,
+      visitStatus: visit.visitStatus,
     }
   }
 
@@ -365,6 +366,7 @@ export default class VisitSessionsService {
       startTimestamp: visit.startTimestamp,
       visitDate: prisonerDateTimePretty(visit.startTimestamp),
       visitTime,
+      visitStatus: visit.visitStatus,
       visitRestriction: visit.visitRestriction,
       visitors,
     }

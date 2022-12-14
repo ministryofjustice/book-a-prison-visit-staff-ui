@@ -136,6 +136,8 @@ describe('visitSchedulerApiClient', () => {
         },
       ]
 
+      jest.useFakeTimers({ advanceTimers: true, now: new Date(timestamp) })
+
       fakeVisitSchedulerApi
         .get('/visits')
         .query({
@@ -146,9 +148,11 @@ describe('visitSchedulerApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
-      const output = await client.getUpcomingVisits(offenderNo, timestamp)
+      const output = await client.getUpcomingVisits(offenderNo, ['BOOKED'])
 
       expect(output).toEqual(results)
+
+      jest.useRealTimers()
     })
   })
 
