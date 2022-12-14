@@ -506,7 +506,7 @@ describe('GET /prisoner/A1234BC/visits', () => {
         mainContact: 'Fred Smith',
         visitDate: '24 February 2022',
         visitTime: '2pm to 3pm',
-        visitStatus: 'BOOKED',
+        visitStatus: 'CANCELLED',
       },
     ]
 
@@ -530,7 +530,7 @@ describe('GET /prisoner/A1234BC/visits', () => {
         expect($('[data-test="visit-reference-2"]').text()).toBe('gm-in-az-ma')
         expect($('[data-test="visit-mainContact-2"]').text()).toBe('Smith, Fred')
         expect($('[data-test="visit-date-2"]').text()).toBe('24 February 2022')
-        expect($('[data-test="visit-status-2"]').text()).toBe('Booked')
+        expect($('[data-test="visit-status-2"]').text()).toBe('Cancelled')
       })
   })
   it('should list upcoming visits for the prisoner with back link to results if search in querystring', () => {
