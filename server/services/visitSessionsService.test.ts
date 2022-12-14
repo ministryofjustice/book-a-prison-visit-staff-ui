@@ -887,10 +887,11 @@ describe('Visit sessions service', () => {
         const result = await visitSessionsService.getUpcomingVisits({
           username: 'user',
           offenderNo: 'A1234BC',
+          visitStatus: ['BOOKED'],
         })
 
         expect(visitSchedulerApiClient.getUpcomingVisits).toHaveBeenCalledTimes(1)
-        expect(visitSchedulerApiClient.getUpcomingVisits).toHaveBeenCalledWith('A1234BC')
+        expect(visitSchedulerApiClient.getUpcomingVisits).toHaveBeenCalledWith('A1234BC', ['BOOKED'])
         expect(result).toEqual(<VisitInformation[]>[
           {
             reference: 'ab-cd-ef-gh',
@@ -911,10 +912,11 @@ describe('Visit sessions service', () => {
         const result = await visitSessionsService.getUpcomingVisits({
           username: 'user',
           offenderNo: 'A1234BC',
+          visitStatus: ['BOOKED'],
         })
 
         expect(visitSchedulerApiClient.getUpcomingVisits).toHaveBeenCalledTimes(1)
-        expect(visitSchedulerApiClient.getUpcomingVisits).toHaveBeenCalledWith('A1234BC')
+        expect(visitSchedulerApiClient.getUpcomingVisits).toHaveBeenCalledWith('A1234BC', ['BOOKED'])
         expect(result).toEqual([])
       })
     })

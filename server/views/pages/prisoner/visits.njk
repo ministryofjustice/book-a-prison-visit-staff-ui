@@ -24,7 +24,6 @@
 
         {% set visitRows = [] %}
         {% for visit in visits %}
-        {{ visit | dump }}
           {% set visitRows = (visitRows.push([
             {
               html: '<a href="/visit/' + visit.reference + '">' + visit.reference + '</a>',

@@ -251,40 +251,22 @@ export default class VisitSessionsService {
     return this.buildVisitInformation(visit)
   }
 
-  async getUpcomingVisitsCancelledAndBooked({
-    username,
-    offenderNo,
-  }: {
-    username: string
-    offenderNo: string
-  }): Promise<VisitInformation[]> {
-    const token = await this.systemToken(username)
-    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
-
-    logger.info(`Get booked and cancelled upcoming visits for ${offenderNo}`)
-    const visits = await visitSchedulerApiClient.getUpcomingVisitsCancelledAndBooked(offenderNo)
-
-    return visits.map(visit => {
-      return this.buildVisitInformation(visit)
-    })
-  }
-
   async getUpcomingVisits({
     username,
     offenderNo,
+    visitStatus,
   }: {
     username: string
     offenderNo: string
+    visitStatus: Visit['visitStatus'][]
   }): Promise<VisitInformation[]> {
     const token = await this.systemToken(username)
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
 
     logger.info(`Get upcoming visits for ${offenderNo}`)
-    const visits = await visitSchedulerApiClient.getUpcomingVisits(offenderNo)
+    const visits = await visitSchedulerApiClient.getUpcomingVisits(offenderNo, visitStatus)
 
-    return visits.map(visit => {
-      return this.buildVisitInformation(visit)
-    })
+    return visits.map(visit => this.buildVisitInformation(visit))
   }
 
   async getVisitsByDate({

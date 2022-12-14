@@ -511,7 +511,7 @@ describe('GET /prisoner/A1234BC/visits', () => {
     ]
 
     prisonerSearchService.getPrisoner.mockResolvedValue(prisoner)
-    visitSessionsService.getUpcomingVisitsCancelledAndBooked.mockResolvedValue(visitInfo)
+    visitSessionsService.getUpcomingVisits.mockResolvedValue(visitInfo)
 
     return request(app)
       .get('/prisoner/A1234BC/visits')
@@ -556,7 +556,7 @@ describe('GET /prisoner/A1234BC/visits', () => {
     ]
 
     prisonerSearchService.getPrisoner.mockResolvedValue(prisoner)
-    visitSessionsService.getUpcomingVisitsCancelledAndBooked.mockResolvedValue(visitInfo)
+    visitSessionsService.getUpcomingVisits.mockResolvedValue(visitInfo)
 
     return request(app)
       .get('/prisoner/A1234BC/visits?search=A1234BC')

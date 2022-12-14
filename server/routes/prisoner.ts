@@ -98,9 +98,10 @@ export default function routes(
     }
     const prisonerName = `${prisonerDetails.lastName}, ${prisonerDetails.firstName}`
 
-    const visits = await visitSessionsService.getUpcomingVisitsCancelledAndBooked({
+    const visits = await visitSessionsService.getUpcomingVisits({
       username: res.locals.user?.username,
       offenderNo,
+      visitStatus: ['CANCELLED', 'BOOKED'],
     })
 
     return res.render('pages/prisoner/visits', { offenderNo, prisonerName, visits, queryParamsForBackLink })

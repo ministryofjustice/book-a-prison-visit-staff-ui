@@ -164,7 +164,7 @@ export default class PrisonerProfileService {
     visitSchedulerApiClient: VisitSchedulerApiClient,
     supportedPrisons: Record<string, string>,
   ): Promise<UpcomingVisitItem[]> {
-    const visits: Visit[] = await visitSchedulerApiClient.getUpcomingVisits(offenderNo)
+    const visits: Visit[] = await visitSchedulerApiClient.getUpcomingVisits(offenderNo, ['BOOKED'])
     const socialVisits: Visit[] = visits.filter(visit => visit.visitType === 'SOCIAL')
 
     const visitsForDisplay: UpcomingVisitItem[] = socialVisits.map(visit => {
