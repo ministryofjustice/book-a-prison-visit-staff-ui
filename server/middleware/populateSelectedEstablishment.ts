@@ -11,7 +11,6 @@ export default function populateSelectedEstablishment(
     if (req.session.selectedEstablishment === undefined && !req.originalUrl.startsWith('/change-establishment')) {
       const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(res.locals.user?.username)
 
-      // Override active caseload with Hewell if establishment switcher feature not enabled
       const { activeCaseLoadId } = res.locals.user
 
       if (!supportedPrisons[activeCaseLoadId]) {
