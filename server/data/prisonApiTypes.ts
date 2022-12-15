@@ -2,6 +2,8 @@ import { components } from '../@types/prison-api'
 
 export type Alert = components['schemas']['Alert']
 
+export type CaseLoad = components['schemas']['CaseLoad']
+
 export type InmateDetail = components['schemas']['InmateDetail']
 
 export type PagePrisonerBookingSummary = components['schemas']['PagePrisonerBookingSummary']
