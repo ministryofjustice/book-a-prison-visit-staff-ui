@@ -1,7 +1,6 @@
 import { Request, Response } from 'express'
 import { Cookie } from 'express-session'
 import { Prison } from '../@types/bapv'
-import config from '../config'
 import { User } from '../data/hmppsAuthClient'
 import { createSupportedPrisons } from '../data/__testutils/testObjects'
 import SupportedPrisonsService from '../services/supportedPrisonsService'
@@ -47,27 +46,10 @@ describe('populateSelectedEstablishment', () => {
       selectedEstablishment: <Prison>undefined,
       user: <User>{ activeCaseLoadId: 'HEI' },
     }
-
-    config.features.establishmentSwitcherEnabled = true
   })
 
   afterEach(() => {
     jest.clearAllMocks()
-  })
-
-  describe('establishment switcher feature flag', () => {
-    it('should default to selecting Hewell if feature disabled (even if active case load is different)', async () => {
-      config.features.establishmentSwitcherEnabled = false
-      res.locals.user.activeCaseLoadId = 'BLI'
-
-      const expectedEstablishment: Prison = { prisonId: 'HEI', prisonName: supportedPrisons.HEI }
-
-      await populateSelectedEstablishment(supportedPrisonsService)(req, res, next)
-
-      expect(supportedPrisonsService.getSupportedPrisons).toHaveBeenCalledTimes(1)
-      expect(req.session.selectedEstablishment).toStrictEqual(expectedEstablishment)
-      expect(res.locals.selectedEstablishment).toStrictEqual(expectedEstablishment)
-    })
   })
 
   describe('when establishment not already set in session', () => {

@@ -1,5 +1,4 @@
 import type { RequestHandler } from 'express'
-import config from '../config'
 import SupportedPrisonsService from '../services/supportedPrisonsService'
 import asyncMiddleware from './asyncMiddleware'
 
@@ -13,7 +12,7 @@ export default function populateSelectedEstablishment(
       const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(res.locals.user?.username)
 
       // Override active caseload with Hewell if establishment switcher feature not enabled
-      const activeCaseLoadId = config.features.establishmentSwitcherEnabled ? res.locals.user.activeCaseLoadId : 'HEI'
+      const { activeCaseLoadId } = res.locals.user
 
       if (!supportedPrisons[activeCaseLoadId]) {
         return res.redirect('/change-establishment')

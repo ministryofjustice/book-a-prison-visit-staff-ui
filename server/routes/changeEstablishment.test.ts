@@ -2,7 +2,6 @@ import type { Express } from 'express'
 import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
-import config from '../config'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import * as visitorUtils from './visitorUtils'
 import SupportedPrisonsService from '../services/supportedPrisonsService'
@@ -28,7 +27,6 @@ const auditService = new AuditService() as jest.Mocked<AuditService>
 
 beforeEach(() => {
   supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
-  config.features.establishmentSwitcherEnabled = true
 })
 
 afterEach(() => {
@@ -94,16 +92,6 @@ describe('GET /change-establishment', () => {
         expect($('input[name="establishment"]').length).toBe(2)
         expect($('form').attr('action')).toBe('/change-establishment?referrer=/')
       })
-  })
-
-  it('should not render select establishment page, when feature flag disabled', () => {
-    config.features.establishmentSwitcherEnabled = false
-    app = appWithAllRoutes({
-      supportedPrisonsServiceOverride: supportedPrisonsService,
-      systemTokenOverride: systemToken,
-    })
-
-    return request(app).get('/change-establishment').expect(404)
   })
 })
 
@@ -207,11 +195,5 @@ describe('POST /change-establishment', () => {
         expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)
         expect(auditService.changeEstablishment).toHaveBeenCalledTimes(1)
       })
-  })
-
-  it('should not post if feature flag is disabled', () => {
-    config.features.establishmentSwitcherEnabled = false
-
-    return request(app).post(`/change-establishment`).send('establishment=HEI').expect(404)
   })
 })
