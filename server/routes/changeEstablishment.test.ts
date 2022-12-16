@@ -45,7 +45,7 @@ describe('GET /change-establishment', () => {
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
-        expect($('h1').text()).toBe('Select establishment')
+        expect($('h1').text().trim()).toBe('Select establishment')
         expect($('input[name="establishment"]').eq(0).prop('value')).toBe('HEI')
         expect($('input[name="establishment"]').eq(0).prop('checked')).toBe(false)
         expect($('input[name="establishment"]').eq(1).prop('value')).toBe('BLI')
@@ -66,7 +66,7 @@ describe('GET /change-establishment', () => {
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
-        expect($('h1').text()).toBe('Select establishment')
+        expect($('h1').text().trim()).toBe('Select establishment')
         expect($('form').attr('action')).toBe('/change-establishment?referrer=/')
       })
   })
@@ -85,7 +85,7 @@ describe('GET /change-establishment', () => {
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
-        expect($('h1').text()).toBe('Select establishment')
+        expect($('h1').text().trim()).toBe('Select establishment')
         expect($('input[name="establishment"]').eq(0).prop('value')).toBe('HEI')
         expect($('input[name="establishment"]').eq(1).prop('value')).toBe('BLI')
         expect($('input[name="establishment"]').eq(1).prop('checked')).toBe(true)

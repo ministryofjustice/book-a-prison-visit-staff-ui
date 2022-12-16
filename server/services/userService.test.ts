@@ -36,7 +36,7 @@ describe('User service', () => {
     })
   })
 
-  describe('getUserCaseLoadsIds', () => {
+  describe('getUserCaseLoadIds', () => {
     const prisonApiClient = new PrisonApiClient(null) as jest.Mocked<PrisonApiClient>
     const systemToken = async (user: string): Promise<string> => `${user}-token-1`
     let prisonApiClientBuilder
@@ -51,7 +51,7 @@ describe('User service', () => {
     it('should return an array of available caseload IDs for current user', async () => {
       prisonApiClient.getUserCaseLoads.mockResolvedValue(usersCaseLoads)
 
-      const result = await userService.getUserCaseLoadsIds('user')
+      const result = await userService.getUserCaseLoadIds('user')
 
       expect(result).toStrictEqual(['BLI', 'HEI'])
     })

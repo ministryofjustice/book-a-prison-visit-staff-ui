@@ -26,21 +26,30 @@ export default function routes(
     )
 
   get('/', async (req, res) => {
-    const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(res.locals.user?.username)
+    const availablePrisons = await getAvailablePrisonsForUser(
+      supportedPrisonsService,
+      userService,
+      res.locals.user?.username,
+    )
 
     const referrer = (req.query?.referrer as string) ?? ''
     const redirectUrl = safeReturnUrl(referrer)
 
     res.render('pages/changeEstablishment', {
       errors: req.flash('errors'),
-      supportedPrisons,
+      availablePrisons,
       referrer: redirectUrl,
     })
   })
 
   post('/', async (req, res) => {
-    const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(res.locals.user?.username)
-    await body('establishment').isIn(Object.keys(supportedPrisons)).withMessage('No prison selected').run(req)
+    const availablePrisons = await getAvailablePrisonsForUser(
+      supportedPrisonsService,
+      userService,
+      res.locals.user?.username,
+    )
+
+    await body('establishment').isIn(Object.keys(availablePrisons)).withMessage('No prison selected').run(req)
 
     const referrer = (req.query?.referrer as string) ?? ''
     const redirectUrl = safeReturnUrl(referrer)
@@ -56,7 +65,7 @@ export default function routes(
     const previousEstablishment = req.session.selectedEstablishment?.prisonId
     const newEstablishment: Prison = {
       prisonId: req.body.establishment,
-      prisonName: supportedPrisons[req.body.establishment],
+      prisonName: availablePrisons[req.body.establishment],
     }
 
     req.session.selectedEstablishment = Object.assign(req.session.selectedEstablishment ?? {}, newEstablishment)
@@ -74,4 +83,23 @@ export default function routes(
   })
 
   return router
+}
+
+async function getAvailablePrisonsForUser(
+  supportedPrisonsService: SupportedPrisonsService,
+  userService: UserService,
+  username: string,
+): Promise<Record<string, string>> {
+  const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(username)
+  const userCaseLoadsIds = await userService.getUserCaseLoadIds(username)
+
+  const availablePrisonsForUser = {}
+
+  Object.keys(supportedPrisons)
+    .filter(prisonId => userCaseLoadsIds.includes(prisonId))
+    .forEach(prisonId => {
+      availablePrisonsForUser[prisonId] = supportedPrisons[prisonId]
+    })
+
+  return availablePrisonsForUser
 }

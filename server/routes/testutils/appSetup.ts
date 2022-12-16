@@ -30,7 +30,7 @@ import * as auth from '../../authentication/auth'
 import systemToken from '../../data/authClient'
 import { SystemToken, VisitorListItem, VisitSlotList, VisitSessionData } from '../../@types/bapv'
 import AuditService from '../../services/auditService'
-import { createSupportedPrisons } from '../../data/__testutils/testObjects'
+import { createSupportedPrisonIds, createSupportedPrisons } from '../../data/__testutils/testObjects'
 
 const user = {
   name: 'john smith',
@@ -57,6 +57,10 @@ class MockUserService extends UserService {
 
   async setActiveCaseLoad(_caseLoadId: string, _username: string) {
     return Promise.resolve()
+  }
+
+  async getUserCaseLoadIds(_username: string): Promise<string[]> {
+    return createSupportedPrisonIds()
   }
 }
 
