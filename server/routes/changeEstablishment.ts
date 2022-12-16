@@ -1,7 +1,5 @@
-import type { NextFunction, RequestHandler, Router } from 'express'
-import { NotFound } from 'http-errors'
+import type { RequestHandler, Router } from 'express'
 import { body, validationResult } from 'express-validator'
-import config from '../config'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import SupportedPrisonsService from '../services/supportedPrisonsService'
 import { clearSession } from './visitorUtils'
@@ -27,7 +25,7 @@ export default function routes(
       handlers.map(handler => asyncMiddleware(handler)),
     )
 
-  get('/', establishmentSwitcherCheckMiddleware, async (req, res) => {
+  get('/', async (req, res) => {
     const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(res.locals.user?.username)
 
     const referrer = (req.query?.referrer as string) ?? ''
@@ -40,7 +38,7 @@ export default function routes(
     })
   })
 
-  post('/', establishmentSwitcherCheckMiddleware, async (req, res) => {
+  post('/', async (req, res) => {
     const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(res.locals.user?.username)
     await body('establishment').isIn(Object.keys(supportedPrisons)).withMessage('No prison selected').run(req)
 
@@ -76,14 +74,4 @@ export default function routes(
   })
 
   return router
-}
-
-const establishmentSwitcherCheckMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  const { establishmentSwitcherEnabled } = config.features
-
-  if (!establishmentSwitcherEnabled) {
-    throw new NotFound()
-  }
-
-  next()
 }

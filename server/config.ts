@@ -158,9 +158,5 @@ export default {
       },
     },
   },
-  features: {
-    establishmentSwitcherEnabled:
-      get('FEATURE_ESTABLISHMENT_SWITCHER_ENABLED', 'false', requiredInProduction) === 'true',
-  },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
 }
