@@ -22,6 +22,17 @@ export default class UserService {
     return { ...user, displayName: convertToTitleCase(user.name) }
   }
 
+  async getUserCaseLoadIds(username: string): Promise<string[]> {
+    const token = await this.systemToken(username)
+    const prisonApiClient = this.prisonApiClientBuilder(token)
+
+    const caseLoads = await prisonApiClient.getUserCaseLoads()
+
+    return caseLoads.reduce((caseLoadsIds, caseLoad) => {
+      return caseLoadsIds.concat(caseLoad.caseLoadId)
+    }, [])
+  }
+
   async setActiveCaseLoad(caseLoadId: string, username: string): Promise<void> {
     const token = await this.systemToken(username)
     const prisonApiClient = this.prisonApiClientBuilder(token)

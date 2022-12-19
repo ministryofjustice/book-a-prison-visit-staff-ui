@@ -1,4 +1,24 @@
 import { Prison } from '../../@types/bapv'
+import { CaseLoad } from '../prisonApiTypes'
+
+export const createCaseLoads = ({
+  caseLoads = [
+    {
+      caseLoadId: 'BLI',
+      description: 'Bristol (HMP)',
+      type: 'INST',
+      caseloadFunction: 'GENERAL',
+      currentlyActive: false,
+    },
+    {
+      caseLoadId: 'HEI',
+      description: 'Hewell (HMP)',
+      type: 'INST',
+      caseloadFunction: 'GENERAL',
+      currentlyActive: true,
+    },
+  ] as CaseLoad[],
+} = {}): CaseLoad[] => caseLoads
 
 export const createPrisons = ({
   prisons = [

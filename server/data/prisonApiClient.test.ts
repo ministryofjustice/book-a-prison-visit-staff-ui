@@ -2,6 +2,7 @@ import nock from 'nock'
 import config from '../config'
 import PrisonApiClient, { prisonApiClientBuilder } from './prisonApiClient'
 import { InmateDetail, OffenderRestrictions, PagePrisonerBookingSummary, VisitBalances } from './prisonApiTypes'
+import { createCaseLoads } from './__testutils/testObjects'
 
 describe('prisonApiClient', () => {
   let fakePrisonApi: nock.Scope
@@ -112,6 +113,18 @@ describe('prisonApiClient', () => {
         .reply(200, results)
 
       const output = await client.getOffenderRestrictions(offenderNo)
+
+      expect(output).toEqual(results)
+    })
+  })
+
+  describe('getUserCaseLoads', () => {
+    it('should return available caseloads for current user', async () => {
+      const results = createCaseLoads()
+
+      fakePrisonApi.get('/api/users/me/caseLoads').matchHeader('authorization', `Bearer ${token}`).reply(200, results)
+
+      const output = await client.getUserCaseLoads()
 
       expect(output).toEqual(results)
     })

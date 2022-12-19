@@ -1,6 +1,12 @@
 import { URLSearchParams } from 'url'
 import RestClient from './restClient'
-import { InmateDetail, PagePrisonerBookingSummary, VisitBalances, OffenderRestrictions } from './prisonApiTypes'
+import {
+  InmateDetail,
+  PagePrisonerBookingSummary,
+  VisitBalances,
+  OffenderRestrictions,
+  CaseLoad,
+} from './prisonApiTypes'
 import config from '../config'
 
 export const prisonApiClientBuilder = (token: string): PrisonApiClient => {
@@ -34,6 +40,12 @@ class PrisonApiClient {
     return this.restclient.get({
       path: `/api/offenders/${offenderNo}/offender-restrictions`,
       query: new URLSearchParams({ activeRestrictionsOnly: 'true' }).toString(),
+    })
+  }
+
+  getUserCaseLoads(): Promise<CaseLoad[]> {
+    return this.restclient.get({
+      path: '/api/users/me/caseLoads',
     })
   }
 
