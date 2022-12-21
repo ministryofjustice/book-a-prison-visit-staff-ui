@@ -4,8 +4,8 @@ import { SessionData } from 'express-session'
 import * as cheerio from 'cheerio'
 import { VisitSessionData } from '../../@types/bapv'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
-import { SupportType } from '../../data/visitSchedulerApiTypes'
 import * as visitorUtils from '../visitorUtils'
+import { createSupportTypes } from '../../data/__testutils/testObjects'
 
 let sessionApp: Express
 const systemToken = async (user: string): Promise<string> => `${user}-token-1`
@@ -19,28 +19,7 @@ const testJourneys = [
   { urlPrefix: '/visit/ab-cd-ef-gh/update', isUpdate: true },
 ]
 
-const availableSupportTypes: SupportType[] = [
-  {
-    type: 'WHEELCHAIR',
-    description: 'Wheelchair ramp',
-  },
-  {
-    type: 'INDUCTION_LOOP',
-    description: 'Portable induction loop for people with hearing aids',
-  },
-  {
-    type: 'BSL_INTERPRETER',
-    description: 'British Sign Language (BSL) Interpreter',
-  },
-  {
-    type: 'MASK_EXEMPT',
-    description: 'Face covering exemption',
-  },
-  {
-    type: 'OTHER',
-    description: 'Other',
-  },
-]
+const availableSupportTypes = createSupportTypes()
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }

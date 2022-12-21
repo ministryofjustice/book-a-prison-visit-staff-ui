@@ -1,5 +1,6 @@
 import { Prison } from '../../@types/bapv'
 import { CaseLoad } from '../prisonApiTypes'
+import { SupportType } from '../visitSchedulerApiTypes'
 
 export const createCaseLoads = ({
   caseLoads = [
@@ -41,3 +42,28 @@ export const createSupportedPrisons = ({
 } = {}): Record<string, string> => prisons
 
 export const createSupportedPrisonIds = ({ prisonIds = ['HEI', 'BLI'] } = {}): string[] => prisonIds
+
+export const createSupportTypes = ({
+  supportTypes = [
+    {
+      type: 'WHEELCHAIR',
+      description: 'Wheelchair ramp',
+    },
+    {
+      type: 'INDUCTION_LOOP',
+      description: 'Portable induction loop for people with hearing aids',
+    },
+    {
+      type: 'BSL_INTERPRETER',
+      description: 'British Sign Language (BSL) Interpreter',
+    },
+    {
+      type: 'MASK_EXEMPT',
+      description: 'Face covering exemption',
+    },
+    {
+      type: 'OTHER',
+      description: 'Other',
+    },
+  ] as SupportType[],
+} = {}): SupportType[] => supportTypes
