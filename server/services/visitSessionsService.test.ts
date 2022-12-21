@@ -3,7 +3,7 @@ import PrisonerContactRegistryApiClient from '../data/prisonerContactRegistryApi
 import VisitSessionsService from './visitSessionsService'
 import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
 import WhereaboutsApiClient from '../data/whereaboutsApiClient'
-import { VisitSession, Visit, SupportType, OutcomeDto } from '../data/visitSchedulerApiTypes'
+import { VisitSession, Visit, OutcomeDto } from '../data/visitSchedulerApiTypes'
 import { Address, Contact, AddressUsage, Restriction } from '../data/prisonerContactRegistryApiTypes'
 import {
   VisitSlotList,
@@ -14,6 +14,7 @@ import {
   VisitsPageSlot,
 } from '../@types/bapv'
 import { ScheduledEvent } from '../data/whereaboutsApiTypes'
+import { createSupportTypes } from '../data/__testutils/testObjects'
 
 jest.mock('../data/prisonerContactRegistryApiClient')
 jest.mock('../data/visitSchedulerApiClient')
@@ -33,16 +34,7 @@ describe('Visit sessions service', () => {
   let systemToken
 
   const prisonId = 'HEI'
-  const availableSupportTypes: SupportType[] = [
-    {
-      type: 'WHEELCHAIR',
-      description: 'Wheelchair ramp',
-    },
-    {
-      type: 'OTHER',
-      description: 'Other',
-    },
-  ]
+  const availableSupportTypes = createSupportTypes()
 
   beforeEach(() => {
     systemToken = async (user: string): Promise<string> => `${user}-token-1`
