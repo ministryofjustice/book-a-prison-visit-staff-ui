@@ -1,6 +1,6 @@
 import { Prison } from '../../@types/bapv'
-import { CaseLoad } from '../prisonApiTypes'
 import { SupportType } from '../visitSchedulerApiTypes'
+import { InmateDetail, CaseLoad } from '../prisonApiTypes'
 
 export const createCaseLoads = ({
   caseLoads = [
@@ -67,3 +67,22 @@ export const createSupportTypes = ({
     },
   ] as SupportType[],
 } = {}): SupportType[] => supportTypes
+
+export const createPrisonerProfile = ({
+  offenderNo = 'A1234BC',
+  firstName = 'JOHN',
+  lastName = 'SMITH',
+  dateOfBirth = '1980-10-12',
+  activeAlertCount = 1,
+  inactiveAlertCount = 3,
+  legalStatus = 'SENTENCED',
+}: Partial<InmateDetail> = {}): InmateDetail =>
+  ({
+    offenderNo,
+    firstName,
+    lastName,
+    dateOfBirth,
+    activeAlertCount,
+    inactiveAlertCount,
+    legalStatus,
+  } as InmateDetail)
