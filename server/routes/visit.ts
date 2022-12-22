@@ -288,7 +288,7 @@ export default function routes(
     async (req, res) => {
       const reasonFieldName = `reason_${req.body.cancel}`.toLowerCase()
       if (validationResult(req).isEmpty()) {
-        await body(reasonFieldName).notEmpty().withMessage('Enter a reason for the cancellation').run(req)
+        await body(reasonFieldName).trim().notEmpty().withMessage('Enter a reason for the cancellation').run(req)
       }
 
       const errors = validationResult(req)

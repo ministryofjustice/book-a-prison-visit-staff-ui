@@ -65,24 +65,28 @@ export default class MainContact {
 
         return true
       }),
-      body('someoneElseName').custom((value: string, { req }) => {
-        if (value === '' && req.body.contact === 'someoneElse') {
-          throw new Error('Enter the name of the main contact')
-        }
+      body('someoneElseName')
+        .trim()
+        .custom((value: string, { req }) => {
+          if (value === '' && req.body.contact === 'someoneElse') {
+            throw new Error('Enter the name of the main contact')
+          }
 
-        return true
-      }),
-      body('phoneNumber').custom((value: string) => {
-        if (!value) {
-          throw new Error('Enter a phone number')
-        }
+          return true
+        }),
+      body('phoneNumber')
+        .trim()
+        .custom((value: string) => {
+          if (!value) {
+            throw new Error('Enter a phone number')
+          }
 
-        if (!/^(?:0|\+?44)(?:\d\s?){9,10}$/.test(value)) {
-          throw new Error('Enter a valid UK phone number, like 01632 960 001, 07700 900 982 or +44 808 157 0192')
-        }
+          if (!/^(?:0|\+?44)(?:\d\s?){9,10}$/.test(value)) {
+            throw new Error('Enter a valid UK phone number, like 01632 960 001, 07700 900 982 or +44 808 157 0192')
+          }
 
-        return true
-      }),
+          return true
+        }),
     ]
   }
 }

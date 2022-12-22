@@ -222,7 +222,7 @@ testJourneys.forEach(journey => {
         return request(sessionApp)
           .post(`${journey.urlPrefix}/select-main-contact`)
           .send('contact=123')
-          .send('phoneNumber=0114+1234+567')
+          .send('phoneNumber=+0114+1234+567+')
           .expect(302)
           .expect('location', `${journey.urlPrefix}/check-your-booking`)
           .expect(() => {
@@ -242,7 +242,7 @@ testJourneys.forEach(journey => {
         return request(sessionApp)
           .post(`${journey.urlPrefix}/select-main-contact`)
           .send('contact=someoneElse')
-          .send('someoneElseName=another+person')
+          .send('someoneElseName=++another+person++')
           .send('phoneNumber=0114+7654+321')
           .expect(302)
           .expect('location', `${journey.urlPrefix}/check-your-booking`)
@@ -287,9 +287,9 @@ testJourneys.forEach(journey => {
           .expect(() => {
             expect(flashProvider).toHaveBeenCalledWith('errors', [
               { location: 'body', msg: 'No main contact selected', param: 'contact', value: undefined },
-              { location: 'body', msg: 'Enter a phone number', param: 'phoneNumber', value: undefined },
+              { location: 'body', msg: 'Enter a phone number', param: 'phoneNumber', value: '' },
             ])
-            expect(flashProvider).toHaveBeenCalledWith('formValues', {})
+            expect(flashProvider).toHaveBeenCalledWith('formValues', { phoneNumber: '', someoneElseName: '' })
           })
       })
 
@@ -333,6 +333,7 @@ testJourneys.forEach(journey => {
             expect(flashProvider).toHaveBeenCalledWith('formValues', {
               contact: 'non-existant',
               phoneNumber: 'abc123',
+              someoneElseName: '',
             })
           })
       })
