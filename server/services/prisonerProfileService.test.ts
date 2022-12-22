@@ -14,7 +14,7 @@ import { PrisonerAlertItem } from '../@types/bapv'
 import { Visit } from '../data/visitSchedulerApiTypes'
 import { Contact } from '../data/prisonerContactRegistryApiTypes'
 import SupportedPrisonsService from './supportedPrisonsService'
-import { createPrisonerProfile, createSupportedPrisons } from '../data/__testutils/testObjects'
+import { createInmateDetail, createSupportedPrisons } from '../data/__testutils/testObjects'
 
 jest.mock('../data/prisonApiClient')
 jest.mock('../data/visitSchedulerApiClient')
@@ -80,7 +80,7 @@ describe('Prisoner profile service', () => {
         numberOfElements: 1,
       }
 
-      const inmateDetail = createPrisonerProfile()
+      const inmateDetail = createInmateDetail()
 
       const visitBalances: VisitBalances = {
         remainingVo: 1,
@@ -178,7 +178,7 @@ describe('Prisoner profile service', () => {
     })
 
     it('Does not look up visit balances for those on REMAND', async () => {
-      const inmateDetail = createPrisonerProfile({ legalStatus: 'REMAND' })
+      const inmateDetail = createInmateDetail({ legalStatus: 'REMAND' })
 
       const bookings = <PagePrisonerBookingSummary>{
         content: [
@@ -440,7 +440,7 @@ describe('Prisoner profile service', () => {
         ],
         numberOfElements: 1,
       }
-      const prisonerProfile = createPrisonerProfile()
+      const prisonerProfile = createInmateDetail()
 
       const inmateDetail = <InmateDetail>{
         offenderNo: prisonerProfile.offenderNo,
@@ -510,7 +510,7 @@ describe('Prisoner profile service', () => {
       numberOfElements: 1,
     }
 
-    const inmateDetail = createPrisonerProfile()
+    const inmateDetail = createInmateDetail()
 
     const visitBalances: VisitBalances = {
       remainingVo: 1,

@@ -68,7 +68,7 @@ export const createSupportTypes = ({
   ] as SupportType[],
 } = {}): SupportType[] => supportTypes
 
-export const createPrisonerProfile = ({
+export const createInmateDetail = ({
   offenderNo = 'A1234BC',
   firstName = 'JOHN',
   lastName = 'SMITH',
