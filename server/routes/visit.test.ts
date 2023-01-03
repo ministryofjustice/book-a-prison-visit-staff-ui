@@ -759,7 +759,30 @@ describe('POST /visit/:reference/cancel', () => {
           phoneNumber: cancelledVisit.visitContact.telephone,
           visitSlot: cancelledVisit.startTimestamp,
           prisonName: 'Hewell (HMP)',
-          prisonPhoneNumber: '01234443225',
+          prisonPhoneNumber: '0300 060 6503',
+        })
+      })
+  })
+
+  it('should send the SMS with the correct prison phone number - Bristol', () => {
+    cancelledVisit.prisonId = 'BLI'
+    config.apis.notifications.enabled = true
+
+    return request(app)
+      .post('/visit/ab-cd-ef-gh/cancel')
+      .send('cancel=PRISONER_CANCELLED')
+      .send('reason_prisoner_cancelled=illness')
+      .expect(302)
+      .expect('location', '/visit/cancelled')
+      .expect(() => {
+        expect(visitSessionsService.cancelVisit).toHaveBeenCalledTimes(1)
+        expect(auditService.cancelledVisit).toHaveBeenCalledTimes(1)
+        expect(notificationsService.sendCancellationSms).toHaveBeenCalledTimes(1)
+        expect(notificationsService.sendCancellationSms).toHaveBeenCalledWith({
+          phoneNumber: cancelledVisit.visitContact.telephone,
+          visitSlot: cancelledVisit.startTimestamp,
+          prisonName: 'Bristol (HMP & YOI)',
+          prisonPhoneNumber: '0300 060 6510',
         })
       })
   })
