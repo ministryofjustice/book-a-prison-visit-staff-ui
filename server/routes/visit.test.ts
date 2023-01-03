@@ -556,7 +556,7 @@ describe('/visit/:reference', () => {
                 address: 'Not entered',
                 adult: false,
                 banned: false,
-                dateOfBirth: '2017-01-02',
+                dateOfBirth: '2018-01-02',
                 name: 'Anne Smith',
                 personId: 4324,
                 relationshipDescription: 'Niece',

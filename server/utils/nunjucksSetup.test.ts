@@ -123,53 +123,35 @@ describe('Nunjucks Filters', () => {
   })
 
   describe('displayAge', () => {
-    it('should return plural years for any age over 2 year old', () => {
-      const twoYears = new Date().getFullYear() - 2
-      viewContext = {
-        dateOfBirth: `${twoYears}-01-01`,
-      }
-      const nunjucksString = '{{ dateOfBirth | displayAge }}'
-      compiledTemplate = nunjucks.compile(nunjucksString, njkEnv)
-      const $ = cheerio.load(compiledTemplate.render(viewContext))
-      expect($('body').text()).toBe('2 years old')
+    beforeAll(() => {
+      const fakeDate = new Date('2020-12-14')
+      jest.useFakeTimers({ doNotFake: ['nextTick'], now: fakeDate })
     })
-
-    it('should return singular year for a 1 year old', () => {
-      const oneYear = new Date().getFullYear() - 1
-      viewContext = {
-        dateOfBirth: `${oneYear}-01-01`,
-      }
-      const nunjucksString = '{{ dateOfBirth | displayAge }}'
-      compiledTemplate = nunjucks.compile(nunjucksString, njkEnv)
-      const $ = cheerio.load(compiledTemplate.render(viewContext))
-      expect($('body').text()).toBe('1 year old')
+    afterAll(() => {
+      jest.useRealTimers()
     })
-
-    it('should return singular month for a 1 month old', () => {
-      const date = new Date()
-      const year = date.getFullYear()
-      const month = date.getMonth()
-      viewContext = {
-        dateOfBirth: `${year}-${month}-01`,
-      }
-      const nunjucksString = '{{ dateOfBirth | displayAge }}'
-      compiledTemplate = nunjucks.compile(nunjucksString, njkEnv)
-      const $ = cheerio.load(compiledTemplate.render(viewContext))
-      expect($('body').text()).toBe('1 month old')
-    })
-
-    it('should return plural months for 4 months old', () => {
-      const date = new Date()
-      date.setMonth(date.getMonth() - 3)
-      const year = date.getFullYear()
-      const month = date.getMonth()
-      viewContext = {
-        dateOfBirth: `${year}-${month}-01`,
-      }
-      const nunjucksString = '{{ dateOfBirth | displayAge }}'
-      compiledTemplate = nunjucks.compile(nunjucksString, njkEnv)
-      const $ = cheerio.load(compiledTemplate.render(viewContext))
-      expect($('body').text()).toBe('4 months old')
+    ;[
+      // { input: '2020-11-15', expected: '0 months old' },
+      { input: '2020-11-14', expected: '1 month old' },
+      // { input: '2020-10-15', expected: '1 month old' },
+      { input: '2020-10-14', expected: '2 months old' },
+      { input: '2020-10-13', expected: '2 months old' },
+      // { input: '2019-12-15', expected: '11 months old' },
+      { input: '2019-12-14', expected: '1 year old' },
+      // { input: '2018-12-15', expected: '1 year old' },
+      { input: '2018-12-14', expected: '2 years old' },
+      { input: '', expected: '' },
+    ].forEach(testData => {
+      it(`should output ${testData.expected} when supplied with ${testData.input}`, () => {
+        const dateOfBirth = new Date(testData.input)
+        viewContext = {
+          dateOfBirth,
+        }
+        const nunjucksString = '{{ dateOfBirth | displayAge }}'
+        compiledTemplate = nunjucks.compile(nunjucksString, njkEnv)
+        const $ = cheerio.load(compiledTemplate.render(viewContext))
+        expect($('body').text()).toBe(testData.expected)
+      })
     })
   })
 
@@ -197,14 +179,6 @@ describe('Nunjucks Filters', () => {
     it('should handle missing date', () => {
       viewContext = {}
       const nunjucksString = '{{ date | formatDate }}'
-      compiledTemplate = nunjucks.compile(nunjucksString, njkEnv)
-      const $ = cheerio.load(compiledTemplate.render(viewContext))
-      expect($('body').text()).toBe('')
-    })
-
-    it('should handle missing date of birth', () => {
-      viewContext = {}
-      const nunjucksString = '{{ dateOfBirth | displayAge }}'
       compiledTemplate = nunjucks.compile(nunjucksString, njkEnv)
       const $ = cheerio.load(compiledTemplate.render(viewContext))
       expect($('body').text()).toBe('')
