@@ -323,11 +323,19 @@ export default function routes(
           const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(res.locals.user?.username)
           const prisonName = supportedPrisons[visit.prisonId]
 
+          // Current prison phone number configuration, look to move in the future
+          let prisonPhoneNumber = ''
+          if (prisonName === 'Hewell (HMP)') {
+            prisonPhoneNumber = '0300 060 6503'
+          } else if (prisonName === 'Bristol (HMP & YOI)') {
+            prisonPhoneNumber = '0300 060 6510'
+          }
+
           await notificationsService.sendCancellationSms({
             phoneNumber,
             visitSlot: visit.startTimestamp,
             prisonName,
-            prisonPhoneNumber: '01234443225',
+            prisonPhoneNumber,
           })
           logger.info(`Cancellation SMS sent for ${reference}`)
         } catch (error) {
