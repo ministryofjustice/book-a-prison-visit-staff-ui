@@ -35,7 +35,7 @@ export default function routes(
     res.render('pages/search/prisoner', {
       search,
       visit: req.originalUrl.includes('-visit'),
-      showEstablishmentSwitcher: config.features.establishmentSwitcherEnabled,
+      showEstablishmentSwitcher: true,
       establishmentHref,
     })
   })
@@ -101,7 +101,7 @@ export default function routes(
       to,
       pageLinks: numberOfPages <= 1 ? [] : pageLinks,
       visit: isVisit,
-      showEstablishmentSwitcher: config.features.establishmentSwitcherEnabled,
+      showEstablishmentSwitcher: true,
     })
   })
 
@@ -116,7 +116,7 @@ export default function routes(
       searchBlock2,
       searchBlock3,
       searchBlock4,
-      showEstablishmentSwitcher: config.features.establishmentSwitcherEnabled,
+      showEstablishmentSwitcher: true,
       establishmentHref: '/search/visit',
     })
   })
@@ -204,7 +204,7 @@ export default function routes(
       from: (parsedPage - 1) * pageSize + 1,
       to,
       pageLinks: numberOfPages <= 1 ? [] : pageLinks,
-      showEstablishmentSwitcher: config.features.establishmentSwitcherEnabled,
+      showEstablishmentSwitcher: true,
     })
   })
 

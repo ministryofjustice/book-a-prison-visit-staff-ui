@@ -1,18 +1,18 @@
-import type { NextFunction, RequestHandler, Router } from 'express'
-import { NotFound } from 'http-errors'
+import type { RequestHandler, Router } from 'express'
 import { body, validationResult } from 'express-validator'
-import config from '../config'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import SupportedPrisonsService from '../services/supportedPrisonsService'
 import { clearSession } from './visitorUtils'
 import { safeReturnUrl } from '../utils/utils'
 import AuditService from '../services/auditService'
 import { Prison } from '../@types/bapv'
+import UserService from '../services/userService'
 
 export default function routes(
   router: Router,
   supportedPrisonsService: SupportedPrisonsService,
   auditService: AuditService,
+  userService: UserService,
 ): Router {
   const get = (path: string, ...handlers: RequestHandler[]) =>
     router.get(
@@ -25,22 +25,31 @@ export default function routes(
       handlers.map(handler => asyncMiddleware(handler)),
     )
 
-  get('/', establishmentSwitcherCheckMiddleware, async (req, res) => {
-    const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(res.locals.user?.username)
+  get('/', async (req, res) => {
+    const availablePrisons = await getAvailablePrisonsForUser(
+      supportedPrisonsService,
+      userService,
+      res.locals.user?.username,
+    )
 
     const referrer = (req.query?.referrer as string) ?? ''
     const redirectUrl = safeReturnUrl(referrer)
 
     res.render('pages/changeEstablishment', {
       errors: req.flash('errors'),
-      supportedPrisons,
+      availablePrisons,
       referrer: redirectUrl,
     })
   })
 
-  post('/', establishmentSwitcherCheckMiddleware, async (req, res) => {
-    const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(res.locals.user?.username)
-    await body('establishment').isIn(Object.keys(supportedPrisons)).withMessage('No prison selected').run(req)
+  post('/', async (req, res) => {
+    const availablePrisons = await getAvailablePrisonsForUser(
+      supportedPrisonsService,
+      userService,
+      res.locals.user?.username,
+    )
+
+    await body('establishment').isIn(Object.keys(availablePrisons)).withMessage('No prison selected').run(req)
 
     const referrer = (req.query?.referrer as string) ?? ''
     const redirectUrl = safeReturnUrl(referrer)
@@ -56,7 +65,7 @@ export default function routes(
     const previousEstablishment = req.session.selectedEstablishment?.prisonId
     const newEstablishment: Prison = {
       prisonId: req.body.establishment,
-      prisonName: supportedPrisons[req.body.establishment],
+      prisonName: availablePrisons[req.body.establishment],
     }
 
     req.session.selectedEstablishment = Object.assign(req.session.selectedEstablishment ?? {}, newEstablishment)
@@ -68,18 +77,29 @@ export default function routes(
       operationId: res.locals.appInsightsOperationId,
     })
 
+    await userService.setActiveCaseLoad(newEstablishment.prisonId, res.locals.user?.username)
+
     return res.redirect(redirectUrl)
   })
 
   return router
 }
 
-const establishmentSwitcherCheckMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  const { establishmentSwitcherEnabled } = config.features
+async function getAvailablePrisonsForUser(
+  supportedPrisonsService: SupportedPrisonsService,
+  userService: UserService,
+  username: string,
+): Promise<Record<string, string>> {
+  const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(username)
+  const userCaseLoadsIds = await userService.getUserCaseLoadIds(username)
 
-  if (!establishmentSwitcherEnabled) {
-    throw new NotFound()
-  }
+  const availablePrisonsForUser = {}
 
-  next()
+  Object.keys(supportedPrisons)
+    .filter(prisonId => userCaseLoadsIds.includes(prisonId))
+    .forEach(prisonId => {
+      availablePrisonsForUser[prisonId] = supportedPrisons[prisonId]
+    })
+
+  return availablePrisonsForUser
 }

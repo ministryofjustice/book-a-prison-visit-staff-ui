@@ -6,9 +6,10 @@ import { VisitSessionData } from '../../@types/bapv'
 import VisitSessionsService from '../../services/visitSessionsService'
 import AuditService from '../../services/auditService'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
-import { SupportType, Visit } from '../../data/visitSchedulerApiTypes'
+import { Visit } from '../../data/visitSchedulerApiTypes'
 import config from '../../config'
 import NotificationsService from '../../services/notificationsService'
+import { createSupportTypes } from '../../data/__testutils/testObjects'
 
 jest.mock('../../services/visitSessionsService')
 jest.mock('../../services/auditService')
@@ -25,28 +26,7 @@ const testJourneys = [
   { urlPrefix: '/visit/ab-cd-ef-gh/update', isUpdate: true },
 ]
 
-const availableSupportTypes: SupportType[] = [
-  {
-    type: 'WHEELCHAIR',
-    description: 'Wheelchair ramp',
-  },
-  {
-    type: 'INDUCTION_LOOP',
-    description: 'Portable induction loop for people with hearing aids',
-  },
-  {
-    type: 'BSL_INTERPRETER',
-    description: 'British Sign Language (BSL) Interpreter',
-  },
-  {
-    type: 'MASK_EXEMPT',
-    description: 'Face covering exemption',
-  },
-  {
-    type: 'OTHER',
-    description: 'Other',
-  },
-]
+const availableSupportTypes = createSupportTypes()
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }

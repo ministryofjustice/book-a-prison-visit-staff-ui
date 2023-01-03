@@ -1,5 +1,4 @@
 import type { RequestHandler, Router } from 'express'
-import config from '../config'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import { clearSession } from './visitorUtils'
 
@@ -9,7 +8,7 @@ export default function routes(router: Router): Router {
   get('/', (req, res, next) => {
     res.render('pages/index', {
       hidePhaseBanner: true,
-      showEstablishmentSwitcher: config.features.establishmentSwitcherEnabled,
+      showEstablishmentSwitcher: true,
     })
   })
 

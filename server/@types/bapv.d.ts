@@ -212,6 +212,7 @@ export type VisitInformation = {
   mainContact: string
   visitDate: string
   visitTime: string
+  visitStatus: Visit['visitStatus']
 }
 
 export interface ExtendedVisitInformation extends VisitInformation {

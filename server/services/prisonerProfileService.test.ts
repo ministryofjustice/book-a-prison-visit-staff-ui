@@ -14,7 +14,7 @@ import { PrisonerAlertItem } from '../@types/bapv'
 import { Visit } from '../data/visitSchedulerApiTypes'
 import { Contact } from '../data/prisonerContactRegistryApiTypes'
 import SupportedPrisonsService from './supportedPrisonsService'
-import { createSupportedPrisons } from '../data/__testutils/testObjects'
+import { createInmateDetail, createSupportedPrisons } from '../data/__testutils/testObjects'
 
 jest.mock('../data/prisonApiClient')
 jest.mock('../data/visitSchedulerApiClient')
@@ -80,15 +80,7 @@ describe('Prisoner profile service', () => {
         numberOfElements: 1,
       }
 
-      const inmateDetail = <InmateDetail>{
-        offenderNo: 'A1234BC',
-        firstName: 'JOHN',
-        lastName: 'SMITH',
-        dateOfBirth: '1980-10-12',
-        activeAlertCount: 1,
-        inactiveAlertCount: 3,
-        legalStatus: 'SENTENCED',
-      }
+      const inmateDetail = createInmateDetail()
 
       const visitBalances: VisitBalances = {
         remainingVo: 1,
@@ -186,31 +178,23 @@ describe('Prisoner profile service', () => {
     })
 
     it('Does not look up visit balances for those on REMAND', async () => {
+      const inmateDetail = createInmateDetail({ legalStatus: 'REMAND' })
+
       const bookings = <PagePrisonerBookingSummary>{
         content: [
           {
             bookingId: 22345,
             bookingNo: 'B123445',
-            offenderNo: 'B2345CD',
-            firstName: 'FRED',
-            lastName: 'JAMES',
-            dateOfBirth: '1985-12-11',
+            offenderNo: inmateDetail.offenderNo,
+            firstName: inmateDetail.firstName,
+            lastName: inmateDetail.lastName,
+            dateOfBirth: inmateDetail.dateOfBirth,
             agencyId: 'HEI',
             legalStatus: 'REMAND',
             convictedStatus: 'Remand',
           },
         ],
         numberOfElements: 1,
-      }
-
-      const inmateDetail = <InmateDetail>{
-        offenderNo: 'B2345CD',
-        firstName: 'FRED',
-        lastName: 'JAMES',
-        dateOfBirth: '1985-12-11',
-        activeAlertCount: 2,
-        inactiveAlertCount: 4,
-        legalStatus: 'REMAND',
       }
 
       prisonApiClient.getBookings.mockResolvedValue(bookings)
@@ -225,8 +209,8 @@ describe('Prisoner profile service', () => {
       expect(prisonApiClient.getVisitBalances).not.toHaveBeenCalled()
       expect(prisonerContactRegistryApiClient.getPrisonerSocialContacts).toHaveBeenCalledTimes(1)
       expect(results).toEqual({
-        displayName: 'James, Fred',
-        displayDob: '11 December 1985',
+        displayName: 'Smith, John',
+        displayDob: '12 October 1980',
         activeAlerts: [],
         flaggedAlerts: [],
         inmateDetail,
@@ -445,10 +429,10 @@ describe('Prisoner profile service', () => {
           {
             bookingId: 22345,
             bookingNo: 'B123445',
-            offenderNo: 'B2345CD',
-            firstName: 'FRED',
-            lastName: 'JAMES',
-            dateOfBirth: '1985-12-11',
+            offenderNo: 'A1234BC',
+            firstName: 'JOHN',
+            lastName: 'SMITH',
+            dateOfBirth: '1980-10-12',
             agencyId: 'HEI',
             legalStatus: 'REMAND',
             convictedStatus: 'Remand',
@@ -456,12 +440,13 @@ describe('Prisoner profile service', () => {
         ],
         numberOfElements: 1,
       }
+      const prisonerProfile = createInmateDetail()
 
       const inmateDetail = <InmateDetail>{
-        offenderNo: 'B2345CD',
-        firstName: 'FRED',
-        lastName: 'JAMES',
-        dateOfBirth: '1985-12-11',
+        offenderNo: prisonerProfile.offenderNo,
+        firstName: prisonerProfile.firstName,
+        lastName: prisonerProfile.lastName,
+        dateOfBirth: prisonerProfile.dateOfBirth,
         activeAlertCount: 4,
         inactiveAlertCount: 1,
         legalStatus: 'REMAND',
@@ -480,8 +465,8 @@ describe('Prisoner profile service', () => {
       expect(prisonApiClient.getVisitBalances).not.toHaveBeenCalled()
       expect(prisonerContactRegistryApiClient.getPrisonerSocialContacts).toHaveBeenCalledTimes(1)
       expect(results).toEqual({
-        displayName: 'James, Fred',
-        displayDob: '11 December 1985',
+        displayName: 'Smith, John',
+        displayDob: '12 October 1980',
         activeAlerts: alertsForDisplay,
         flaggedAlerts: alertsToFlag,
         inmateDetail,
@@ -525,15 +510,7 @@ describe('Prisoner profile service', () => {
       numberOfElements: 1,
     }
 
-    const inmateDetail = <InmateDetail>{
-      offenderNo: 'A1234BC',
-      firstName: 'JOHN',
-      lastName: 'SMITH',
-      dateOfBirth: '1980-10-12',
-      activeAlertCount: 1,
-      inactiveAlertCount: 3,
-      legalStatus: 'SENTENCED',
-    }
+    const inmateDetail = createInmateDetail()
 
     const visitBalances: VisitBalances = {
       remainingVo: 1,

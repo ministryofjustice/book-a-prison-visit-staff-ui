@@ -2,13 +2,13 @@ import type { Express } from 'express'
 import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
-import config from '../config'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import * as visitorUtils from './visitorUtils'
 import SupportedPrisonsService from '../services/supportedPrisonsService'
 import AuditService from '../services/auditService'
 import { createSupportedPrisons } from '../data/__testutils/testObjects'
 import { Prison } from '../@types/bapv'
+import config from '../config'
 
 jest.mock('../services/supportedPrisonsService')
 jest.mock('../services/auditService')
@@ -28,7 +28,6 @@ const auditService = new AuditService() as jest.Mocked<AuditService>
 
 beforeEach(() => {
   supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
-  config.features.establishmentSwitcherEnabled = true
 })
 
 afterEach(() => {
@@ -47,7 +46,7 @@ describe('GET /change-establishment', () => {
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
-        expect($('h1').text()).toBe('Select establishment')
+        expect($('h1').text().trim()).toBe('Select establishment')
         expect($('input[name="establishment"]').eq(0).prop('value')).toBe('HEI')
         expect($('input[name="establishment"]').eq(0).prop('checked')).toBe(false)
         expect($('input[name="establishment"]').eq(1).prop('value')).toBe('BLI')
@@ -68,7 +67,7 @@ describe('GET /change-establishment', () => {
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
-        expect($('h1').text()).toBe('Select establishment')
+        expect($('h1').text().trim()).toBe('Select establishment')
         expect($('form').attr('action')).toBe('/change-establishment?referrer=/')
       })
   })
@@ -87,7 +86,7 @@ describe('GET /change-establishment', () => {
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
-        expect($('h1').text()).toBe('Select establishment')
+        expect($('h1').text().trim()).toBe('Select establishment')
         expect($('input[name="establishment"]').eq(0).prop('value')).toBe('HEI')
         expect($('input[name="establishment"]').eq(1).prop('value')).toBe('BLI')
         expect($('input[name="establishment"]').eq(1).prop('checked')).toBe(true)
@@ -96,14 +95,26 @@ describe('GET /change-establishment', () => {
       })
   })
 
-  it('should not render select establishment page, when feature flag disabled', () => {
-    config.features.establishmentSwitcherEnabled = false
+  // Setting up this scenario by having no prisons, rather than more accurately
+  // mocking user having no matching ones in caseload. Because of MockUserService
+  // in appSetup.ts - awaiting VB-1430 to revise once passing services is refactored
+  it('should inform user if they have no available prisons and link back to DPS', () => {
+    supportedPrisonsService.getSupportedPrisons.mockResolvedValue({})
+
     app = appWithAllRoutes({
       supportedPrisonsServiceOverride: supportedPrisonsService,
       systemTokenOverride: systemToken,
     })
 
-    return request(app).get('/change-establishment').expect(404)
+    return request(app)
+      .get('/change-establishment')
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('h1').text().trim()).toBe('You do not have access to an establishment that uses this service')
+        expect($('form').length).toBe(0)
+        expect($('[data-test="go-to-dps"]').attr('href')).toBe(config.dpsHome)
+      })
   })
 })
 
@@ -174,6 +185,7 @@ describe('POST /change-establishment', () => {
           username: 'user1',
           operationId: undefined,
         })
+        // @TODO should also check setActiveCaseLoad is called (awaiting VB-1430)
       })
   })
 
@@ -190,6 +202,7 @@ describe('POST /change-establishment', () => {
         expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)
         expect(auditService.changeEstablishment).toHaveBeenCalledTimes(1)
       })
+    // @TODO should also check setActiveCaseLoad is called (awaiting VB-1430)
   })
 
   it('should redirect to valid page when passed in querystring', () => {
@@ -205,11 +218,5 @@ describe('POST /change-establishment', () => {
         expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)
         expect(auditService.changeEstablishment).toHaveBeenCalledTimes(1)
       })
-  })
-
-  it('should not post if feature flag is disabled', () => {
-    config.features.establishmentSwitcherEnabled = false
-
-    return request(app).post(`/change-establishment`).send('establishment=HEI').expect(404)
   })
 })

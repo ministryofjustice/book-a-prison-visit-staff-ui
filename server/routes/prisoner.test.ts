@@ -178,7 +178,7 @@ describe('GET /prisoner/A1234BC', () => {
       })
   })
 
-  it('should render the prisoner profile page for offender number A1234BC with back link to search results page with querystring', () => {
+  it('should show back link to search results page with querystring', () => {
     return request(app)
       .get('/prisoner/A1234BC?search=A1234BC')
       .expect(200)
@@ -187,30 +187,7 @@ describe('GET /prisoner/A1234BC', () => {
         const $ = cheerio.load(res.text)
         expect($('.govuk-error-summary__body').length).toBe(0)
         expect($('h1').text().trim()).toBe('Smith, John')
-        expect($('.flagged-alerts-list .flagged-alert.flagged-alert--UPIU').text().trim()).toBe(
-          'Protective Isolation Unit',
-        )
-        expect($('[data-test="prison-number"]').text()).toBe('A1234BC')
-        expect($('[data-test="dob"]').text()).toBe('12 October 1980')
-        expect($('[data-test="location"]').text()).toBe('1-1-C-028, Hewell (HMP)')
-        expect($('[data-test="category"]').text()).toBe('Cat C')
-        expect($('[data-test="iep-level"]').text()).toBe('Standard')
-        expect($('[data-test="convicted-status"]').text()).toBe('Convicted')
-        expect($('[data-test="active-alert-count"]').text()).toBe('1 active')
-        expect($('[data-test="remaining-vos"]').text()).toBe('1')
-        expect($('[data-test="remaining-pvos"]').text()).toBe('0')
-
-        expect($('[data-test="tab-vo-remaining"]').text()).toBe('1')
-        expect($('[data-test="tab-vo-last-date"]').text()).toBe('21 April 2021')
-        expect($('[data-test="tab-vo-next-date"]').text()).toBe('15 May 2021')
-        expect($('[data-test="tab-pvo-remaining"]').text()).toBe('0')
-        expect($('[data-test="tab-pvo-last-date"]').text()).toBe('1 December 2021')
-        expect($('[data-test="tab-pvo-next-date"]').text()).toBe('1 January 2022')
         expect($('.govuk-back-link').attr('href')).toBe('/search/prisoner/results?search=A1234BC')
-
-        expect($('#active-alerts').text()).toContain('Professional lock pick')
-
-        expect($('#vo-override').length).toBe(0)
         expect($('[data-test="book-a-visit"]').length).toBe(1)
         expect(auditService.viewPrisoner).toHaveBeenCalledTimes(1)
         expect(auditService.viewPrisoner).toHaveBeenCalledWith({
@@ -497,6 +474,7 @@ describe('GET /prisoner/A1234BC/visits', () => {
         mainContact: 'John Smith',
         visitDate: '14 February 2022',
         visitTime: '10am to 11:15am',
+        visitStatus: 'BOOKED',
       },
       {
         reference: 'gm-in-az-ma',
@@ -505,6 +483,7 @@ describe('GET /prisoner/A1234BC/visits', () => {
         mainContact: 'Fred Smith',
         visitDate: '24 February 2022',
         visitTime: '2pm to 3pm',
+        visitStatus: 'CANCELLED',
       },
     ]
 
@@ -523,12 +502,12 @@ describe('GET /prisoner/A1234BC/visits', () => {
         expect($('[data-test="visit-reference-1"]').text()).toBe('ab-cd-ef-gh')
         expect($('[data-test="visit-mainContact-1"]').text()).toBe('Smith, John')
         expect($('[data-test="visit-date-1"]').text()).toBe('14 February 2022')
-        expect($('[data-test="visit-time-1"]').text()).toBe('10am to 11:15am')
+        expect($('[data-test="visit-status-1"]').text()).toBe('Booked')
 
         expect($('[data-test="visit-reference-2"]').text()).toBe('gm-in-az-ma')
         expect($('[data-test="visit-mainContact-2"]').text()).toBe('Smith, Fred')
         expect($('[data-test="visit-date-2"]').text()).toBe('24 February 2022')
-        expect($('[data-test="visit-time-2"]').text()).toBe('2pm to 3pm')
+        expect($('[data-test="visit-status-2"]').text()).toBe('Cancelled')
       })
   })
   it('should list upcoming visits for the prisoner with back link to results if search in querystring', () => {
@@ -540,6 +519,7 @@ describe('GET /prisoner/A1234BC/visits', () => {
         mainContact: 'John Smith',
         visitDate: '14 February 2022',
         visitTime: '10am to 11:15am',
+        visitStatus: 'BOOKED',
       },
       {
         reference: 'gm-in-az-ma',
@@ -548,6 +528,7 @@ describe('GET /prisoner/A1234BC/visits', () => {
         mainContact: 'Fred Smith',
         visitDate: '24 February 2022',
         visitTime: '2pm to 3pm',
+        visitStatus: 'CANCELLED',
       },
     ]
 
@@ -566,12 +547,12 @@ describe('GET /prisoner/A1234BC/visits', () => {
         expect($('[data-test="visit-reference-1"]').text()).toBe('ab-cd-ef-gh')
         expect($('[data-test="visit-mainContact-1"]').text()).toBe('Smith, John')
         expect($('[data-test="visit-date-1"]').text()).toBe('14 February 2022')
-        expect($('[data-test="visit-time-1"]').text()).toBe('10am to 11:15am')
+        expect($('[data-test="visit-status-1"]').text()).toBe('Booked')
 
         expect($('[data-test="visit-reference-2"]').text()).toBe('gm-in-az-ma')
         expect($('[data-test="visit-mainContact-2"]').text()).toBe('Smith, Fred')
         expect($('[data-test="visit-date-2"]').text()).toBe('24 February 2022')
-        expect($('[data-test="visit-time-2"]').text()).toBe('2pm to 3pm')
+        expect($('[data-test="visit-status-2"]').text()).toBe('Cancelled')
       })
   })
 

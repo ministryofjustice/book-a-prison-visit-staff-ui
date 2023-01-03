@@ -30,7 +30,7 @@ import * as auth from '../../authentication/auth'
 import systemToken from '../../data/authClient'
 import { SystemToken, VisitorListItem, VisitSlotList, VisitSessionData } from '../../@types/bapv'
 import AuditService from '../../services/auditService'
-import { createSupportedPrisons } from '../../data/__testutils/testObjects'
+import { createSupportedPrisonIds, createSupportedPrisons } from '../../data/__testutils/testObjects'
 
 const user = {
   name: 'john smith',
@@ -45,7 +45,7 @@ export const flashProvider = jest.fn()
 
 class MockUserService extends UserService {
   constructor() {
-    super(undefined)
+    super(undefined, undefined, undefined)
   }
 
   async getUser(token: string) {
@@ -53,6 +53,14 @@ class MockUserService extends UserService {
       token,
       ...user,
     }
+  }
+
+  async setActiveCaseLoad(_caseLoadId: string, _username: string) {
+    return Promise.resolve()
+  }
+
+  async getUserCaseLoadIds(_username: string): Promise<string[]> {
+    return createSupportedPrisonIds()
   }
 }
 
@@ -142,6 +150,7 @@ function appSetup({
       standardRouter(new MockUserService(), new MockSupportedPrisonsService()),
       supportedPrisonsService,
       auditService,
+      new MockUserService(),
     ),
   )
 

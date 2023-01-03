@@ -3,13 +3,13 @@ import { VisitSessionData } from '../@types/bapv'
 import config from '../config'
 import VisitSchedulerApiClient, { visitSchedulerApiClientBuilder } from './visitSchedulerApiClient'
 import {
-  SupportType,
   Visit,
   OutcomeDto,
   VisitSession,
   ReserveVisitSlotDto,
   ChangeVisitSlotRequestDto,
 } from './visitSchedulerApiTypes'
+import { createSupportTypes } from './__testutils/testObjects'
 
 describe('visitSchedulerApiClient', () => {
   let fakeVisitSchedulerApi: nock.Scope
@@ -44,16 +44,7 @@ describe('visitSchedulerApiClient', () => {
 
   describe('getAvailableSupportOptions', () => {
     it('should return an array of available support types', async () => {
-      const results: SupportType[] = [
-        {
-          type: 'WHEELCHAIR',
-          description: 'Wheelchair ramp',
-        },
-        {
-          type: 'OTHER',
-          description: 'Other',
-        },
-      ]
+      const results = createSupportTypes()
 
       fakeVisitSchedulerApi.get('/visit-support').matchHeader('authorization', `Bearer ${token}`).reply(200, results)
 
@@ -136,6 +127,8 @@ describe('visitSchedulerApiClient', () => {
         },
       ]
 
+      jest.useFakeTimers({ advanceTimers: true, now: new Date(timestamp) })
+
       fakeVisitSchedulerApi
         .get('/visits')
         .query({
@@ -146,9 +139,11 @@ describe('visitSchedulerApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
-      const output = await client.getUpcomingVisits(offenderNo, timestamp)
+      const output = await client.getUpcomingVisits(offenderNo, ['BOOKED'])
 
       expect(output).toEqual(results)
+
+      jest.useRealTimers()
     })
   })
 

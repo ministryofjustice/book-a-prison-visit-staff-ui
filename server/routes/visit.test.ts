@@ -730,7 +730,7 @@ describe('POST /visit/:reference/cancel', () => {
     return request(app)
       .post('/visit/ab-cd-ef-gh/cancel')
       .send('cancel=PRISONER_CANCELLED')
-      .send('reason_prisoner_cancelled=illness')
+      .send('reason_prisoner_cancelled=++illness++')
       .expect(302)
       .expect('location', '/visit/cancelled')
       .expect(() => {
@@ -847,10 +847,13 @@ describe('POST /visit/:reference/cancel', () => {
             location: 'body',
             msg: 'Enter a reason for the cancellation',
             param: 'reason_prisoner_cancelled',
-            value: undefined,
+            value: '',
           },
         ])
-        expect(flashProvider).toHaveBeenCalledWith('formValues', { cancel: 'PRISONER_CANCELLED' })
+        expect(flashProvider).toHaveBeenCalledWith('formValues', {
+          cancel: 'PRISONER_CANCELLED',
+          reason_prisoner_cancelled: '',
+        })
         expect(auditService.cancelledVisit).not.toHaveBeenCalled()
       })
   })
