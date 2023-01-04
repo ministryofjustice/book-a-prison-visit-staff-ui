@@ -336,6 +336,7 @@ export default function routes(
             visitSlot: visit.startTimestamp,
             prisonName,
             prisonPhoneNumber,
+            reference,
           })
           logger.info(`Cancellation SMS sent for ${reference}`)
         } catch (error) {
