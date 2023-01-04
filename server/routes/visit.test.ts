@@ -760,6 +760,7 @@ describe('POST /visit/:reference/cancel', () => {
           visitSlot: cancelledVisit.startTimestamp,
           prisonName: 'Hewell (HMP)',
           prisonPhoneNumber: '0300 060 6503',
+          reference: 'ab-cd-ef-gh',
         })
       })
   })
@@ -783,6 +784,7 @@ describe('POST /visit/:reference/cancel', () => {
           visitSlot: cancelledVisit.startTimestamp,
           prisonName: 'Bristol (HMP & YOI)',
           prisonPhoneNumber: '0300 060 6510',
+          reference: 'ab-cd-ef-gh',
         })
       })
   })
