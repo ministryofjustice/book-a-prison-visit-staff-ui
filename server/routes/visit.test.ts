@@ -760,6 +760,7 @@ describe('POST /visit/:reference/cancel', () => {
           visitSlot: cancelledVisit.startTimestamp,
           prisonName: 'Hewell (HMP)',
           prisonPhoneNumber: '01234443225',
+          reference: 'ab-cd-ef-gh',
         })
       })
   })

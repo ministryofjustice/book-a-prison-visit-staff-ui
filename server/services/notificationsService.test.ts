@@ -55,6 +55,7 @@ describe('Notifications service', () => {
       prisonName: 'Hewell',
       prisonPhoneNumber: '01234443225',
       visitSlot: '2022-02-14T10:00:00',
+      reference: 'ab-cd-ef-gh',
     }
 
     it('should call the notifications client with the cancellation details', async () => {
@@ -67,6 +68,7 @@ describe('Notifications service', () => {
         prisonName: visitDetails.prisonName,
         visitTime: '10:00am',
         visitDate: '14 February 2022',
+        reference: 'ab-cd-ef-gh',
       })
     })
   })
