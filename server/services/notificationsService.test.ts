@@ -68,7 +68,7 @@ describe('Notifications service', () => {
         prisonName: visitDetails.prisonName,
         visitTime: '10:00am',
         visitDate: '14 February 2022',
-        reference: 'ab-cd-ef-gh',
+        reference: visitDetails.reference,
       })
     })
   })
