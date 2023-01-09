@@ -85,23 +85,30 @@ export function registerNunjucks(app?: express.Express): Environment {
   })
 
   njkEnv.addFilter('displayAge', (dateOfBirth: string) => {
-    let ageString
-
     const today = new Date()
     const dob = new Date(dateOfBirth)
-    const years = today.getFullYear() - dob.getFullYear()
-    if (years > 1) {
+
+    let ageString = ''
+
+    let years = today.getFullYear() - dob.getFullYear()
+    let months = years * 12 + (today.getMonth() - dob.getMonth())
+    const days = today.getDate() - dob.getDate()
+
+    if (days < 0) {
+      months -= 1
+    }
+    if (months % 12 === 11) {
+      years = Math.floor(months / 12)
+    }
+
+    if (years >= 2) {
       ageString = `${years} years old`
     } else if (years === 1) {
-      ageString = '1 year old'
-    } else if (years < 1) {
-      const months = today.getMonth() - dob.getMonth()
-
-      if (months === 1) {
-        ageString = `${months} month old`
-      } else {
-        ageString = `${months} months old`
-      }
+      ageString = `${years} year old`
+    } else if (months >= 2 || months === 0) {
+      ageString = `${months} months old`
+    } else if (months === 1) {
+      ageString = `${months} month old`
     }
 
     return ageString
