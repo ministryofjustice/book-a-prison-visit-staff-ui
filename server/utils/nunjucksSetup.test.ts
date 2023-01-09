@@ -131,15 +131,18 @@ describe('Nunjucks Filters', () => {
       jest.useRealTimers()
     })
     ;[
-      // { input: '2020-11-15', expected: '0 months old' },
+      { input: '2025-11-15', expected: '' },
+      { input: '2020-11-15', expected: '0 months old' },
       { input: '2020-11-14', expected: '1 month old' },
-      // { input: '2020-10-15', expected: '1 month old' },
+      { input: '2020-10-15', expected: '1 month old' },
       { input: '2020-10-14', expected: '2 months old' },
       { input: '2020-10-13', expected: '2 months old' },
-      // { input: '2019-12-15', expected: '11 months old' },
+      { input: '2019-12-15', expected: '11 months old' },
       { input: '2019-12-14', expected: '1 year old' },
-      // { input: '2018-12-15', expected: '1 year old' },
+      { input: '2018-12-15', expected: '1 year old' },
       { input: '2018-12-14', expected: '2 years old' },
+      { input: '2017-12-15', expected: '2 years old' },
+      { input: '2010-12-14', expected: '10 years old' },
       { input: '', expected: '' },
     ].forEach(testData => {
       it(`should output ${testData.expected} when supplied with ${testData.input}`, () => {
