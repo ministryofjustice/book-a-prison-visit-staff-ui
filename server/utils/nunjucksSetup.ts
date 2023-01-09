@@ -100,10 +100,7 @@ export function registerNunjucks(app?: express.Express): Environment {
     if (months % 12 !== 0) {
       years = Math.floor(months / 12)
     }
-    // console.log(days)
-    // console.log(months % 12)
-    // console.log(months)
-    // console.log(years)
+
     if (years >= 2) {
       ageString = `${years} years old`
     } else if (years === 1) {
