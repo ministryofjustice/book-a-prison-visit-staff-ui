@@ -124,14 +124,14 @@ describe('Nunjucks Filters', () => {
 
   describe('displayAge', () => {
     beforeAll(() => {
-      const fakeDate = new Date('2020-12-14')
+      const fakeDate = new Date('2020-12-14T12:00:00')
       jest.useFakeTimers({ doNotFake: ['nextTick'], now: fakeDate })
     })
     afterAll(() => {
       jest.useRealTimers()
     })
     ;[
-      { input: '2025-11-15', expected: '' },
+      { input: '2025-11-15', expected: '' }, // erroneous future date of birth
       { input: '2020-11-15', expected: '0 months old' },
       { input: '2020-11-14', expected: '1 month old' },
       { input: '2020-10-15', expected: '1 month old' },
@@ -144,8 +144,9 @@ describe('Nunjucks Filters', () => {
       { input: '2017-12-15', expected: '2 years old' },
       { input: '2010-12-14', expected: '10 years old' },
       { input: '', expected: '' },
+      { input: 'random string', expected: '' },
     ].forEach(testData => {
-      it(`should output ${testData.expected} when supplied with ${testData.input}`, () => {
+      it(`should output '${testData.expected}' when supplied with '${testData.input}'`, () => {
         const dateOfBirth = new Date(testData.input)
         viewContext = {
           dateOfBirth,
