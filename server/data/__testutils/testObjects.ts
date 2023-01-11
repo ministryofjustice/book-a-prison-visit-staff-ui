@@ -1,6 +1,7 @@
 import { Prison } from '../../@types/bapv'
 import { SupportType } from '../visitSchedulerApiTypes'
 import { InmateDetail, CaseLoad } from '../prisonApiTypes'
+import { CurrentIncentive, Prisoner } from '../prisonerOffenderSearchTypes'
 
 export const createCaseLoads = ({
   caseLoads = [
@@ -20,6 +21,53 @@ export const createCaseLoads = ({
     },
   ] as CaseLoad[],
 } = {}): CaseLoad[] => caseLoads
+
+export const createCurrentIncentive = ({
+  level = {
+    code: 'STD',
+    description: 'Standard',
+  },
+}: Partial<CurrentIncentive> = {}): CurrentIncentive => ({ level } as CurrentIncentive)
+
+export const createInmateDetail = ({
+  offenderNo = 'A1234BC',
+  firstName = 'JOHN',
+  lastName = 'SMITH',
+  dateOfBirth = '1980-10-12',
+  activeAlertCount = 1,
+  inactiveAlertCount = 3,
+  legalStatus = 'SENTENCED',
+}: Partial<InmateDetail> = {}): InmateDetail =>
+  ({
+    offenderNo,
+    firstName,
+    lastName,
+    dateOfBirth,
+    activeAlertCount,
+    inactiveAlertCount,
+    legalStatus,
+  } as InmateDetail)
+
+export const createPrisoner = ({
+  prisonerNumber = 'A1234BC',
+  firstName = 'JOHN',
+  lastName = 'SMITH',
+  dateOfBirth = '1975-04-02',
+  prisonId = 'HEI',
+  prisonName = 'HMP Hewell',
+  cellLocation = '1-1-C-028',
+  currentIncentive = createCurrentIncentive(),
+}: Partial<Prisoner> = {}): Prisoner =>
+  ({
+    prisonerNumber,
+    firstName,
+    lastName,
+    dateOfBirth,
+    prisonId,
+    prisonName,
+    cellLocation,
+    currentIncentive,
+  } as Prisoner)
 
 export const createPrisons = ({
   prisons = [
@@ -67,22 +115,3 @@ export const createSupportTypes = ({
     },
   ] as SupportType[],
 } = {}): SupportType[] => supportTypes
-
-export const createInmateDetail = ({
-  offenderNo = 'A1234BC',
-  firstName = 'JOHN',
-  lastName = 'SMITH',
-  dateOfBirth = '1980-10-12',
-  activeAlertCount = 1,
-  inactiveAlertCount = 3,
-  legalStatus = 'SENTENCED',
-}: Partial<InmateDetail> = {}): InmateDetail =>
-  ({
-    offenderNo,
-    firstName,
-    lastName,
-    dateOfBirth,
-    activeAlertCount,
-    inactiveAlertCount,
-    legalStatus,
-  } as InmateDetail)
