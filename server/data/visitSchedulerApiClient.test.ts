@@ -134,12 +134,12 @@ describe('visitSchedulerApiClient', () => {
         .query({
           prisonerId: offenderNo,
           startTimestamp: timestamp,
-          visitStatus: 'BOOKED',
+          visitStatus: 'BOOKED,CANCELLED',
         })
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
-      const output = await client.getUpcomingVisits(offenderNo, ['BOOKED'])
+      const output = await client.getUpcomingVisits(offenderNo, ['BOOKED', 'CANCELLED'])
 
       expect(output).toEqual(results)
 
@@ -184,12 +184,12 @@ describe('visitSchedulerApiClient', () => {
         .query({
           prisonerId: offenderNo,
           endTimestamp: timestamp,
-          visitStatus: 'BOOKED',
+          visitStatus: 'BOOKED,CANCELLED',
         })
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
-      const output = await client.getPastVisits(offenderNo, ['BOOKED'], timestamp)
+      const output = await client.getPastVisits(offenderNo, ['BOOKED', 'CANCELLED'], timestamp)
 
       expect(output).toEqual(results)
     })
