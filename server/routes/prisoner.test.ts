@@ -9,8 +9,8 @@ import PrisonerSearchService from '../services/prisonerSearchService'
 import VisitSessionsService from '../services/visitSessionsService'
 import AuditService from '../services/auditService'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
-import { Prisoner } from '../data/prisonerOffenderSearchTypes'
 import { clearSession } from './visitorUtils'
+import { createPrisoner } from '../data/__testutils/testObjects'
 
 jest.mock('../services/prisonerProfileService')
 jest.mock('../services/prisonerSearchService')
@@ -459,12 +459,8 @@ describe('POST /prisoner/A1234BC', () => {
 })
 
 describe('GET /prisoner/A1234BC/visits', () => {
-  const prisoner = {
-    prisonerNumber: 'A1234BC',
-    firstName: 'JOHN',
-    lastName: 'SMITH',
-    restrictedPatient: false,
-  } as Prisoner
+  const prisoner = createPrisoner()
+
   it('should list upcoming visits for the prisoner with back link to new search if no search in querystring', () => {
     const visitInfo: VisitInformation[] = [
       {
