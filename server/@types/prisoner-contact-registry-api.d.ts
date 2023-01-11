@@ -5,10 +5,15 @@
 
 export interface paths {
   '/prisoners/{prisonerId}/contacts': {
-    /** Returns details of a prisoner contacts */
+    /**
+     * Get Prisoner Contact
+     * @description Returns details of a prisoner contacts
+     */
     get: operations['getPrisonerContact']
   }
 }
+
+export type webhooks = Record<string, never>
 
 export interface components {
   schemas: {
@@ -72,9 +77,15 @@ export interface components {
        * @example This is a comment text
        */
       comment?: string
-      /** @description Primary Address */
+      /**
+       * @description Primary Address
+       * @example false
+       */
       primary: boolean
-      /** @description No Fixed Address */
+      /**
+       * @description No Fixed Address
+       * @example false
+       */
       noFixedAddress: boolean
       /**
        * Format: date
@@ -227,48 +238,68 @@ export interface components {
       ext?: string
     }
   }
+  responses: never
+  parameters: never
+  requestBodies: never
+  headers: never
+  pathItems: never
 }
 
+export type external = Record<string, never>
+
 export interface operations {
-  /** Returns details of a prisoner contacts */
   getPrisonerContact: {
+    /**
+     * Get Prisoner Contact
+     * @description Returns details of a prisoner contacts
+     */
     parameters: {
+      /**
+       * @description Query by Type (NOMIS Contact Type)
+       * @example S
+       */
+      /**
+       * @description Query by Person Identifier (NOMIS Person ID)
+       * @example 9147510
+       */
+      query?: {
+        type?: string
+        id?: number
+      }
+      /**
+       * @description Prisoner Identifier (NOMIS Offender No)
+       * @example A1234AA
+       */
       path: {
         prisonerId: string
       }
-      query: {
-        /** Query by Type (NOMIS Contact Type) */
-        type?: string
-        /** Query by Person Identifier (NOMIS Person ID) */
-        id?: number
-      }
     }
     responses: {
-      /** Prisoner Contacts Information Returned */
+      /** @description Prisoner Contacts Information Returned */
       200: {
         content: {
           'application/json': components['schemas']['ContactDto'][]
         }
       }
-      /** Incorrect request to Get Prisoner Contacts for Prisoner Identifier */
+      /** @description Incorrect request to Get Prisoner Contacts for Prisoner Identifier */
       400: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
-      /** Unauthorized to access this endpoint */
+      /** @description Unauthorized to access this endpoint */
       401: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
-      /** Incorrect permissions retrieve a Prisoner Contacts */
+      /** @description Incorrect permissions retrieve a Prisoner Contacts */
       403: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
-      /** Prisoner not found */
+      /** @description Prisoner not found */
       404: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
@@ -277,6 +308,3 @@ export interface operations {
     }
   }
 }
-
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface external {}

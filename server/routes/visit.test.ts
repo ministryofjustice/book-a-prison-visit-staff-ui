@@ -76,7 +76,7 @@ afterEach(() => {
 describe('/visit/:reference', () => {
   const childBirthYear = new Date().getFullYear() - 5
 
-  const prisoner: Prisoner = {
+  const prisoner = {
     firstName: 'JOHN',
     lastName: 'SMITH',
     prisonerNumber: 'A1234BC',
@@ -85,7 +85,7 @@ describe('/visit/:reference', () => {
     prisonName: 'Hewell (HMP)',
     cellLocation: '1-1-C-028',
     restrictedPatient: false,
-  }
+  } as Prisoner
 
   let visit: Visit
 
@@ -370,7 +370,7 @@ describe('/visit/:reference', () => {
     })
 
     it('should render full booking summary page with prisoner location showing as "Unknown" if not a supported prison', () => {
-      const transferPrisoner: Prisoner = {
+      const transferPrisoner = {
         firstName: 'JOHN',
         lastName: 'SMITH',
         prisonerNumber: 'A1234BC',
@@ -378,7 +378,7 @@ describe('/visit/:reference', () => {
         prisonId: 'TRN',
         prisonName: 'Transfer',
         restrictedPatient: false,
-      }
+      } as Prisoner
 
       prisonerSearchService.getPrisonerById.mockResolvedValue(transferPrisoner)
 

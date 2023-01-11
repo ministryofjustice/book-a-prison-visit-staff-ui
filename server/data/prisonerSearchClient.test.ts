@@ -79,7 +79,7 @@ describe('prisonSearchClientBuilder', () => {
 
   describe('getPrisonerById', () => {
     it('should return data for single prisoner by prisoner ID', async () => {
-      const results: Prisoner = {
+      const results = {
         lastName: 'FORENAME',
         firstName: 'SURNAME',
         prisonerNumber: 'A1234BC',
@@ -88,7 +88,7 @@ describe('prisonSearchClientBuilder', () => {
         prisonName: 'HMP Hewell',
         cellLocation: '1-1-C-028',
         restrictedPatient: false,
-      }
+      } as Prisoner
       fakePrisonerSearchApi.get('/prisoner/A1234BC').matchHeader('authorization', `Bearer ${token}`).reply(200, results)
 
       const output = await client.getPrisonerById('A1234BC')

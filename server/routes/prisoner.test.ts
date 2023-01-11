@@ -459,12 +459,12 @@ describe('POST /prisoner/A1234BC', () => {
 })
 
 describe('GET /prisoner/A1234BC/visits', () => {
-  const prisoner: Prisoner = {
+  const prisoner = {
     prisonerNumber: 'A1234BC',
     firstName: 'JOHN',
     lastName: 'SMITH',
     restrictedPatient: false,
-  }
+  } as Prisoner
   it('should list upcoming visits for the prisoner with back link to new search if no search in querystring', () => {
     const visitInfo: VisitInformation[] = [
       {
