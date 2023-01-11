@@ -5,13 +5,19 @@
 
 export interface paths {
   '/secure/prisons/id/{prisonId}/videolink-conferencing-centre/email-address': {
+    /** Get a prison's Videolink Conferencing Centre email address */
     get: operations['getEmailForVideoConferencingCentre']
+    /** Set or change a prison's Videolink Conferencing Centre email address */
     put: operations['putEmailAddressForVideolinkConferencingCentre']
+    /** Remove a prison's Videolink Conferencing Centre email address */
     delete: operations['deleteEmailAddressForVideolinkConferencingCentre']
   }
   '/secure/prisons/id/{prisonId}/offender-management-unit/email-address': {
+    /** Get a prison's Offender Management Unit email address */
     get: operations['getEmailForOffenderManagementUnit']
+    /** Set or change a prison's Offender Management Unit email address */
     put: operations['putEmailAddressForOffenderManagementUnit']
+    /** Remove a prison's Offender Management Unit email address */
     delete: operations['deleteEmailAddressForOffenderManagementUnit']
   }
   '/queue-admin/retry-dlq/{dlqName}': {
@@ -24,49 +30,80 @@ export interface paths {
     put: operations['purgeQueue']
   }
   '/prison-maintenance/id/{prisonId}': {
-    /** Updates prison information, role required is MAINTAIN_REF_DATA */
+    /**
+     * Update specified prison details
+     * @description Updates prison information, role required is MAINTAIN_REF_DATA
+     */
     put: operations['updatePrison']
   }
   '/prison-maintenance/id/{prisonId}/address/{addressId}': {
-    /** Updates address information, role required is MAINTAIN_REF_DATA */
+    /**
+     * Update specified address details
+     * @description Updates address information, role required is MAINTAIN_REF_DATA
+     */
     put: operations['updateAddress']
-    /** Deletes address information for a Prison, role required is MAINTAIN_REF_DATA */
+    /**
+     * Delete specified address for specified Prison
+     * @description Deletes address information for a Prison, role required is MAINTAIN_REF_DATA
+     */
     delete: operations['deleteAddress']
   }
   '/prison-maintenance': {
-    /** Adds new prison information, role required is MAINTAIN_REF_DATA */
+    /**
+     * Adds a new prison
+     * @description Adds new prison information, role required is MAINTAIN_REF_DATA
+     */
     post: operations['insertPrison']
   }
   '/prison-maintenance/id/{prisonId}/address': {
-    /** Adds an additional Address to an existing Prison, role required is MAINTAIN_REF_DATA */
+    /**
+     * Add Address to existing Prison
+     * @description Adds an additional Address to an existing Prison, role required is MAINTAIN_REF_DATA
+     */
     post: operations['addAddress']
   }
   '/queue-admin/get-dlq-messages/{dlqName}': {
     get: operations['getDlqMessages']
   }
   '/prisons': {
-    /** All prisons */
+    /**
+     * Get all prisons
+     * @description All prisons
+     */
     get: operations['getPrisons']
   }
   '/prisons/search': {
-    /** All prisons */
+    /**
+     * Get prisons from active and text search
+     * @description All prisons
+     */
     get: operations['getPrisonsBySearchFilter']
   }
   '/prisons/id/{prisonId}': {
-    /** Information on a specific prison */
+    /**
+     * Get specified prison
+     * @description Information on a specific prison
+     */
     get: operations['getPrisonFromId']
   }
   '/prisons/id/{prisonId}/address/{addressId}': {
-    /** Information on a specific prison address */
+    /**
+     * Get specified prison
+     * @description Information on a specific prison address
+     */
     get: operations['getAddressFromId']
   }
   '/gp/prison/{prisonId}': {
+    /** Get GP practice code about specified prison */
     get: operations['getPrisonFromId_1']
   }
   '/gp/practice/{gpPracticeCode}': {
+    /** Get specified prison from GP practice code */
     get: operations['getPrisonFromGpPrescriber']
   }
 }
+
+export type webhooks = Record<string, never>
 
 export interface components {
   schemas: {
@@ -74,9 +111,11 @@ export interface components {
       messageId?: string
       receiptHandle?: string
       body?: string
-      attributes?: { [key: string]: string }
+      attributes?: {
+        [key: string]: string | undefined
+      }
       messageAttributes?: {
-        [key: string]: components['schemas']['MessageAttributeValue']
+        [key: string]: components['schemas']['MessageAttributeValue'] | undefined
       }
       md5OfBody?: string
       md5OfMessageAttributes?: string
@@ -302,7 +341,9 @@ export interface components {
       addresses: components['schemas']['UpdateAddressDto'][]
     }
     DlqMessage: {
-      body: { [key: string]: { [key: string]: unknown } }
+      body: {
+        [key: string]: Record<string, never> | undefined
+      }
       messageId: string
     }
     GetDlqResult: {
@@ -313,30 +354,41 @@ export interface components {
       messages: components['schemas']['DlqMessage'][]
     }
   }
+  responses: never
+  parameters: never
+  requestBodies: never
+  headers: never
+  pathItems: never
 }
+
+export type external = Record<string, never>
 
 export interface operations {
   getEmailForVideoConferencingCentre: {
+    /** Get a prison's Videolink Conferencing Centre email address */
     parameters: {
+      /**
+       * @description Prison ID
+       * @example MDI
+       */
       path: {
-        /** Prison ID */
         prisonId: string
       }
     }
     responses: {
-      /** Returns the email address */
+      /** @description Returns the email address */
       200: {
         content: {
           'text/plain': unknown
         }
       }
-      /** Client error - invalid prisonId or similar */
+      /** @description Client error - invalid prisonId or similar */
       400: {
         content: {
           'text/plain': string
         }
       }
-      /** The prison does not have a Videolink Conferencing Centre email address */
+      /** @description The prison does not have a Videolink Conferencing Centre email address */
       404: {
         content: {
           'text/plain': string
@@ -345,63 +397,75 @@ export interface operations {
     }
   }
   putEmailAddressForVideolinkConferencingCentre: {
+    /** Set or change a prison's Videolink Conferencing Centre email address */
     parameters: {
+      /**
+       * @description Prison ID
+       * @example MDI
+       */
       path: {
-        /** Prison ID */
         prisonId: string
       }
-    }
-    responses: {
-      /** The email address was created */
-      201: unknown
-      /** The email address was updated */
-      204: never
-      /** Client error - invalid prisonId, email address or similar */
-      400: unknown
-      /** No prison found for the supplied prison id */
-      404: unknown
     }
     requestBody: {
       content: {
         'text/plain': string
       }
     }
+    responses: {
+      /** @description The email address was created */
+      201: never
+      /** @description The email address was updated */
+      204: never
+      /** @description Client error - invalid prisonId, email address or similar */
+      400: never
+      /** @description No prison found for the supplied prison id */
+      404: never
+    }
   }
   deleteEmailAddressForVideolinkConferencingCentre: {
+    /** Remove a prison's Videolink Conferencing Centre email address */
     parameters: {
+      /**
+       * @description Prison ID
+       * @example MDI
+       */
       path: {
-        /** Prison ID */
         prisonId: string
       }
     }
     responses: {
-      /** The email address was removed */
+      /** @description The email address was removed */
       204: never
-      /** Client error - invalid prisonId or similar */
-      400: unknown
+      /** @description Client error - invalid prisonId or similar */
+      400: never
     }
   }
   getEmailForOffenderManagementUnit: {
+    /** Get a prison's Offender Management Unit email address */
     parameters: {
+      /**
+       * @description Prison ID
+       * @example MDI
+       */
       path: {
-        /** Prison ID */
         prisonId: string
       }
     }
     responses: {
-      /** Returns the email address */
+      /** @description Returns the email address */
       200: {
         content: {
           'text/plain': unknown
         }
       }
-      /** Client error - invalid prisonId or similar */
+      /** @description Client error - invalid prisonId or similar */
       400: {
         content: {
           'text/plain': string
         }
       }
-      /** The prison does not have a Offender Management Unit email address */
+      /** @description The prison does not have a Offender Management Unit email address */
       404: {
         content: {
           'text/plain': string
@@ -410,40 +474,48 @@ export interface operations {
     }
   }
   putEmailAddressForOffenderManagementUnit: {
+    /** Set or change a prison's Offender Management Unit email address */
     parameters: {
+      /**
+       * @description Prison ID
+       * @example MDI
+       */
       path: {
-        /** Prison ID */
         prisonId: string
       }
-    }
-    responses: {
-      /** The email address was created */
-      201: unknown
-      /** The email address was updated */
-      204: never
-      /** Client error - invalid prisonId, email address, media type or similar */
-      400: unknown
-      /** No prison found for the supplied prison id */
-      404: unknown
     }
     requestBody: {
       content: {
         'text/plain': string
       }
     }
+    responses: {
+      /** @description The email address was created */
+      201: never
+      /** @description The email address was updated */
+      204: never
+      /** @description Client error - invalid prisonId, email address, media type or similar */
+      400: never
+      /** @description No prison found for the supplied prison id */
+      404: never
+    }
   }
   deleteEmailAddressForOffenderManagementUnit: {
+    /** Remove a prison's Offender Management Unit email address */
     parameters: {
+      /**
+       * @description Prison ID
+       * @example MDI
+       */
       path: {
-        /** Prison ID */
         prisonId: string
       }
     }
     responses: {
-      /** The email address was removed */
+      /** @description The email address was removed */
       204: never
-      /** Client error - invalid prisonId or similar */
-      400: unknown
+      /** @description Client error - invalid prisonId or similar */
+      400: never
     }
   }
   retryDlq: {
@@ -453,7 +525,7 @@ export interface operations {
       }
     }
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['RetryDlqResult']
@@ -463,7 +535,7 @@ export interface operations {
   }
   retryAllDlqs: {
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['RetryDlqResult'][]
@@ -478,7 +550,7 @@ export interface operations {
       }
     }
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['PurgeQueueResult']
@@ -486,44 +558,18 @@ export interface operations {
       }
     }
   }
-  /** Updates prison information, role required is MAINTAIN_REF_DATA */
   updatePrison: {
+    /**
+     * Update specified prison details
+     * @description Updates prison information, role required is MAINTAIN_REF_DATA
+     */
     parameters: {
+      /**
+       * @description Prison Id
+       * @example MDI
+       */
       path: {
-        /** Prison Id */
         prisonId: string
-      }
-    }
-    responses: {
-      /** Prison Information Updated */
-      200: {
-        content: {
-          'application/json': components['schemas']['PrisonDto']
-        }
-      }
-      /** Information request to update prison */
-      400: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** Unauthorized to access this endpoint */
-      401: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** Incorrect permissions to make prison update */
-      403: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** Prison ID not found */
-      404: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
       }
     }
     requestBody: {
@@ -531,47 +577,56 @@ export interface operations {
         'application/json': components['schemas']['UpdatePrisonDto']
       }
     }
-  }
-  /** Updates address information, role required is MAINTAIN_REF_DATA */
-  updateAddress: {
-    parameters: {
-      path: {
-        /** Prison Id */
-        prisonId: string
-        /** Address Id */
-        addressId: string
-      }
-    }
     responses: {
-      /** Address Information Updated */
+      /** @description Prison Information Updated */
       200: {
         content: {
-          'application/json': components['schemas']['AddressDto']
+          'application/json': components['schemas']['PrisonDto']
         }
       }
-      /** Bad Information request to update address */
+      /** @description Information request to update prison */
       400: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
-      /** Unauthorized to access this endpoint */
+      /** @description Unauthorized to access this endpoint */
       401: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
-      /** Incorrect permissions to make address update */
+      /** @description Incorrect permissions to make prison update */
       403: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
-      /** Address Id not found */
+      /** @description Prison ID not found */
       404: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
+      }
+    }
+  }
+  updateAddress: {
+    /**
+     * Update specified address details
+     * @description Updates address information, role required is MAINTAIN_REF_DATA
+     */
+    parameters: {
+      /**
+       * @description Prison Id
+       * @example MDI
+       */
+      /**
+       * @description Address Id
+       * @example 234231
+       */
+      path: {
+        prisonId: string
+        addressId: string
       }
     }
     requestBody: {
@@ -579,33 +634,32 @@ export interface operations {
         'application/json': components['schemas']['UpdateAddressDto']
       }
     }
-  }
-  /** Deletes address information for a Prison, role required is MAINTAIN_REF_DATA */
-  deleteAddress: {
-    parameters: {
-      path: {
-        /** Prison Id */
-        prisonId: string
-        /** Address Id */
-        addressId: string
-      }
-    }
     responses: {
-      /** Address Information Deleted */
-      200: unknown
-      /** Unauthorized to access this endpoint */
+      /** @description Address Information Updated */
+      200: {
+        content: {
+          'application/json': components['schemas']['AddressDto']
+        }
+      }
+      /** @description Bad Information request to update address */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
       401: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
-      /** Incorrect permissions to make address update */
+      /** @description Incorrect permissions to make address update */
       403: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
-      /** Address Id not found */
+      /** @description Address Id not found */
       404: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
@@ -613,78 +667,97 @@ export interface operations {
       }
     }
   }
-  /** Adds new prison information, role required is MAINTAIN_REF_DATA */
-  insertPrison: {
+  deleteAddress: {
+    /**
+     * Delete specified address for specified Prison
+     * @description Deletes address information for a Prison, role required is MAINTAIN_REF_DATA
+     */
+    parameters: {
+      /**
+       * @description Prison Id
+       * @example MDI
+       */
+      /**
+       * @description Address Id
+       * @example 234231
+       */
+      path: {
+        prisonId: string
+        addressId: string
+      }
+    }
     responses: {
-      /** Prison Information Inserted */
-      201: {
-        content: {
-          'application/json': components['schemas']['PrisonDto']
-        }
-      }
-      /** Information request to add prison */
-      400: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** Unauthorized to access this endpoint */
+      /** @description Address Information Deleted */
+      200: never
+      /** @description Unauthorized to access this endpoint */
       401: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
-      /** Incorrect permissions to make prison insert */
+      /** @description Incorrect permissions to make address update */
       403: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
+      /** @description Address Id not found */
+      404: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
     }
+  }
+  insertPrison: {
+    /**
+     * Adds a new prison
+     * @description Adds new prison information, role required is MAINTAIN_REF_DATA
+     */
     requestBody: {
       content: {
         'application/json': components['schemas']['InsertPrisonDto']
       }
     }
-  }
-  /** Adds an additional Address to an existing Prison, role required is MAINTAIN_REF_DATA */
-  addAddress: {
-    parameters: {
-      path: {
-        /** Prison Id */
-        prisonId: string
-      }
-    }
     responses: {
-      /** New Address added to Prison */
-      200: {
+      /** @description Prison Information Inserted */
+      201: {
         content: {
-          'application/json': components['schemas']['AddressDto']
+          'application/json': components['schemas']['PrisonDto']
         }
       }
-      /** Bad Information request to update address */
+      /** @description Information request to add prison */
       400: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
-      /** Unauthorized to access this endpoint */
+      /** @description Unauthorized to access this endpoint */
       401: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
-      /** Incorrect permissions to add Prison address */
+      /** @description Incorrect permissions to make prison insert */
       403: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
-      /** Prison Id not found */
-      404: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
+    }
+  }
+  addAddress: {
+    /**
+     * Add Address to existing Prison
+     * @description Adds an additional Address to an existing Prison, role required is MAINTAIN_REF_DATA
+     */
+    parameters: {
+      /**
+       * @description Prison Id
+       * @example MDI
+       */
+      path: {
+        prisonId: string
       }
     }
     requestBody: {
@@ -692,18 +765,50 @@ export interface operations {
         'application/json': components['schemas']['UpdateAddressDto']
       }
     }
+    responses: {
+      /** @description New Address added to Prison */
+      200: {
+        content: {
+          'application/json': components['schemas']['AddressDto']
+        }
+      }
+      /** @description Bad Information request to update address */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to add Prison address */
+      403: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Prison Id not found */
+      404: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
   }
   getDlqMessages: {
     parameters: {
+      query?: {
+        maxMessages?: number
+      }
       path: {
         dlqName: string
       }
-      query: {
-        maxMessages?: number
-      }
     }
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['GetDlqResult']
@@ -711,10 +816,13 @@ export interface operations {
       }
     }
   }
-  /** All prisons */
   getPrisons: {
+    /**
+     * Get all prisons
+     * @description All prisons
+     */
     responses: {
-      /** Successful Operation */
+      /** @description Successful Operation */
       200: {
         content: {
           'application/json': components['schemas']['PrisonDto'][]
@@ -722,22 +830,37 @@ export interface operations {
       }
     }
   }
-  /** All prisons */
   getPrisonsBySearchFilter: {
-    parameters: {
-      query: {
-        /** Active */
+    /**
+     * Get prisons from active and text search
+     * @description All prisons
+     */
+    parameters?: {
+      /**
+       * @description Active
+       * @example true
+       */
+      /**
+       * @description Text search
+       * @example Sheffield
+       */
+      /**
+       * @description Genders to filter by
+       * @example MALE, FEMALE
+       */
+      /**
+       * @description Prison type codes to filter by
+       * @example HMP, YOI
+       */
+      query?: {
         active?: boolean
-        /** Text search */
         textSearch?: string
-        /** Genders to filter by */
         genders?: ('MALE' | 'FEMALE')[]
-        /** Prison type codes to filter by */
         prisonTypeCodes?: ('HMP' | 'YOI' | 'IRC' | 'STC' | 'YCS')[]
       }
     }
     responses: {
-      /** Successful Operation */
+      /** @description Successful Operation */
       200: {
         content: {
           'application/json': components['schemas']['PrisonDto'][]
@@ -745,16 +868,22 @@ export interface operations {
       }
     }
   }
-  /** Information on a specific prison */
   getPrisonFromId: {
+    /**
+     * Get specified prison
+     * @description Information on a specific prison
+     */
     parameters: {
+      /**
+       * @description Prison ID
+       * @example MDI
+       */
       path: {
-        /** Prison ID */
         prisonId: string
       }
     }
     responses: {
-      /** Successful Operation */
+      /** @description Successful Operation */
       200: {
         content: {
           'application/json': components['schemas']['PrisonDto']
@@ -762,18 +891,27 @@ export interface operations {
       }
     }
   }
-  /** Information on a specific prison address */
   getAddressFromId: {
+    /**
+     * Get specified prison
+     * @description Information on a specific prison address
+     */
     parameters: {
+      /**
+       * @description Prison ID
+       * @example MDI
+       */
+      /**
+       * @description Address Id
+       * @example 234231
+       */
       path: {
-        /** Prison ID */
         prisonId: string
-        /** Address Id */
         addressId: string
       }
     }
     responses: {
-      /** Successful Operation */
+      /** @description Successful Operation */
       200: {
         content: {
           'application/json': components['schemas']['AddressDto']
@@ -782,20 +920,24 @@ export interface operations {
     }
   }
   getPrisonFromId_1: {
+    /** Get GP practice code about specified prison */
     parameters: {
+      /**
+       * @description Prison ID
+       * @example MDI
+       */
       path: {
-        /** Prison ID */
         prisonId: string
       }
     }
     responses: {
-      /** Bad request.  Wrong format for prison_id. */
+      /** @description Bad request.  Wrong format for prison_id. */
       400: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
-      /** Prison not found. */
+      /** @description Prison not found. */
       404: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
@@ -804,20 +946,24 @@ export interface operations {
     }
   }
   getPrisonFromGpPrescriber: {
+    /** Get specified prison from GP practice code */
     parameters: {
+      /**
+       * @description GP Practice Code
+       * @example Y05537
+       */
       path: {
-        /** GP Practice Code */
         gpPracticeCode: string
       }
     }
     responses: {
-      /** Bad request.  Wrong format for GP practice code. */
+      /** @description Bad request.  Wrong format for GP practice code. */
       400: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
-      /** No prison linked to the GP practice code. */
+      /** @description No prison linked to the GP practice code. */
       404: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
@@ -826,6 +972,3 @@ export interface operations {
     }
   }
 }
-
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface external {}
