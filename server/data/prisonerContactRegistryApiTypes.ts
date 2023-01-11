@@ -1,4 +1,4 @@
-import { components } from '../@types/prisoner-contact-registry'
+import { components } from '../@types/prisoner-contact-registry-api'
 
 export type Address = components['schemas']['AddressDto']
 

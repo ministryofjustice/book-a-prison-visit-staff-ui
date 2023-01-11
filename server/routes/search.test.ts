@@ -380,7 +380,7 @@ describe('Booking search page', () => {
     firstName: 'Geoff',
     lastName: 'Smith',
     restrictedPatient: false,
-  }
+  } as Prisoner
 
   getVisit = {
     reference: 'as-sd-df-fg',

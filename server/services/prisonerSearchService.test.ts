@@ -8,14 +8,14 @@ const prisonId = 'HEI'
 const search = 'some search'
 const prisonerSearchClient = new PrisonerSearchClient(null) as jest.Mocked<PrisonerSearchClient>
 
-const prisonerDto: Prisoner = {
+const prisonerDto = {
   firstName: 'john',
   lastName: 'smith',
   prisonerNumber: 'A1234BC',
   dateOfBirth: '1975-04-02',
   bookingId: '12345',
   restrictedPatient: false,
-}
+} as Prisoner
 
 describe('Prisoner search service', () => {
   let prisonerSearchClientBuilder
@@ -140,7 +140,7 @@ describe('Prisoner search service', () => {
 
   describe('getPrisonerById', () => {
     it('should return prisoner details for given prisoner ID', async () => {
-      const prisoner: Prisoner = {
+      const prisoner = {
         lastName: 'FORENAME',
         firstName: 'SURNAME',
         prisonerNumber: 'A1234BC',
@@ -149,7 +149,7 @@ describe('Prisoner search service', () => {
         prisonName: 'HMP Hewell',
         cellLocation: '1-1-C-028',
         restrictedPatient: false,
-      }
+      } as Prisoner
 
       prisonerSearchClient.getPrisonerById.mockResolvedValue(prisoner)
       const result = await prisonerSearchService.getPrisonerById('A1234BC', 'user')

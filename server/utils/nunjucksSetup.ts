@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 import nunjucks, { Environment } from 'nunjucks'
 import express from 'express'
-import { format, parseISO } from 'date-fns'
+import { format, formatDuration, intervalToDuration, isAfter, parseISO } from 'date-fns'
 import path from 'path'
 import { FormError } from '../@types/bapv'
 import { properCaseFullName } from './utils'
@@ -85,33 +85,22 @@ export function registerNunjucks(app?: express.Express): Environment {
   })
 
   njkEnv.addFilter('displayAge', (dateOfBirth: string) => {
-    const today = new Date()
     const dob = new Date(dateOfBirth)
+    const today = new Date()
 
-    let ageString = ''
-
-    let years = today.getFullYear() - dob.getFullYear()
-    let months = years * 12 + (today.getMonth() - dob.getMonth())
-    const days = today.getDate() - dob.getDate()
-
-    if (days < 0) {
-      months -= 1
-    }
-    if (months % 12 === 11) {
-      years = Math.floor(months / 12)
+    if (dob.toString() === 'Invalid Date' || isAfter(dob, today)) {
+      return ''
     }
 
-    if (years >= 2) {
-      ageString = `${years} years old`
-    } else if (years === 1) {
-      ageString = `${years} year old`
-    } else if (months >= 2 || months === 0) {
-      ageString = `${months} months old`
-    } else if (months === 1) {
-      ageString = `${months} month old`
+    const duration = intervalToDuration({ start: dob, end: today })
+    let age = ''
+    if (duration.years < 1) {
+      age = formatDuration(duration, { format: ['months'], zero: true })
+    } else {
+      age = formatDuration(duration, { format: ['years'] })
     }
 
-    return ageString
+    return `${age} old`
   })
 
   // format time with minutes only if not on the hour; e.g. 10am / 10:30am
