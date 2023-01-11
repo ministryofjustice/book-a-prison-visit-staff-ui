@@ -189,7 +189,7 @@ describe('visitSchedulerApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
-      const output = await client.getPastVisits(offenderNo, timestamp)
+      const output = await client.getPastVisits(offenderNo, ['BOOKED'], timestamp)
 
       expect(output).toEqual(results)
     })

@@ -217,6 +217,9 @@
       {{ govukTable({
         head: [
           {
+            text: "Visit reference"
+          },
+          {
             text: "Visit type"
           },
           {
@@ -227,6 +230,9 @@
           },
           {
             text: "Visitors"
+          },
+          {
+            text: "Visit status"
           }
         ],
         rows: upcomingVisits
@@ -240,6 +246,9 @@
     {% if pastVisits | length %}
       {{ govukTable({
         head: [
+          {
+            text: "Visit reference"
+          },
           {
             text: "Visit type"
           },

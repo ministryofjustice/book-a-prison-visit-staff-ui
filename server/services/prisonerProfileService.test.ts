@@ -153,6 +153,10 @@ describe('Prisoner profile service', () => {
         visitBalances,
         upcomingVisits: [
           [
+            {
+              html: "<a href='/visit/ab-cd-ef-gh'>ab-cd-ef-gh</a>",
+              attributes: { 'data-test': 'tab-upcoming-reference' },
+            },
             { html: 'Social', attributes: { 'data-test': 'tab-upcoming-type' } },
             { text: 'Hewell (HMP)', attributes: { 'data-test': 'tab-upcoming-location' } },
             {
@@ -160,10 +164,15 @@ describe('Prisoner profile service', () => {
               attributes: { 'data-test': 'tab-upcoming-date-and-time' },
             },
             { html: '<p>Mary Smith</p>', attributes: { 'data-test': 'tab-upcoming-visitors' } },
+            { text: 'Booked', attributes: { 'data-test': 'tab-upcoming-status' } },
           ],
         ],
         pastVisits: [
           [
+            {
+              html: "<a href='/visit/ab-cd-ef-gh'>ab-cd-ef-gh</a>",
+              attributes: { 'data-test': 'tab-past-reference' },
+            },
             { html: 'Social', attributes: { 'data-test': 'tab-past-type' } },
             { text: 'Hewell (HMP)', attributes: { 'data-test': 'tab-past-location' } },
             {

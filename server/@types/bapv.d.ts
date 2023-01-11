@@ -56,6 +56,12 @@ export type UpcomingVisitItem = [
     }
   },
   {
+    html: string
+    attributes?: {
+      'data-test': string
+    }
+  },
+  {
     text: string
     attributes?: {
       'data-test': string
@@ -73,9 +79,21 @@ export type UpcomingVisitItem = [
       'data-test': string
     }
   },
+  {
+    text: string
+    attributes?: {
+      'data-test': string
+    }
+  },
 ]
 
 export type PastVisitItem = [
+  {
+    html: string
+    attributes?: {
+      'data-test': string
+    }
+  },
   {
     html: string
     attributes?: {
