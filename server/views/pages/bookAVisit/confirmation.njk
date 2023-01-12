@@ -55,10 +55,34 @@
             href: "/",
             preventDoubleClick: true
         }) }}
+         {{ govukButton({
+            classes: "govuk-!-margin-top-3, govuk-!-margin-bottom-6 govuk-button--secondary",
+            text: "Book anothe visit for this prisoner",
+            href: "/prisoner/" + prisoner.offenderNo,
+            preventDoubleClick: true
+        }) }}
     </div>
 </div>
 
 {% set displayRows = [
+    {
+        key: {
+            text: "Prisoner name"
+        },
+        value: {
+            text: prisoner.name,
+            classes: "test-visit-prisoner-name"
+        }
+    },
+     {
+        key: {
+            text: "Prisoner number"
+        },
+        value: {
+            text: prisoner.offenderNo,
+            classes: "test-visit-prisoner-number"
+        }
+    },
     {
         key: {
             text: "Date"
