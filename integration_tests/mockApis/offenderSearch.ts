@@ -41,4 +41,17 @@ export default {
       },
     })
   },
+  stubGetPrisonerById: (prisoner: Prisoner): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        url: `/offenderSearch/prisoner/${prisoner.prisonerNumber}`,
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: prisoner,
+      },
+    })
+  },
 }

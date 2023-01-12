@@ -23,8 +23,10 @@ import { Alert, InmateDetail, OffenderRestriction, VisitBalances } from '../data
 import { Visit, Visitor } from '../data/visitSchedulerApiTypes'
 import { Contact } from '../data/prisonerContactRegistryApiTypes'
 import SupportedPrisonsService from './supportedPrisonsService'
+import PrisonerSearchClient from '../data/prisonerSearchClient'
 
 type PrisonApiClientBuilder = (token: string) => PrisonApiClient
+type PrisonerSearchClientBuilder = (token: string) => PrisonerSearchClient
 type VisitSchedulerApiClientBuilder = (token: string) => VisitSchedulerApiClient
 type PrisonerContactRegistryApiClientBuilder = (token: string) => PrisonerContactRegistryApiClient
 
@@ -35,6 +37,7 @@ export default class PrisonerProfileService {
     private readonly prisonApiClientBuilder: PrisonApiClientBuilder,
     private readonly visitSchedulerApiClientBuilder: VisitSchedulerApiClientBuilder,
     private readonly prisonerContactRegistryApiClientBuilder: PrisonerContactRegistryApiClientBuilder,
+    private readonly prisonerSearchClientBuilder: PrisonerSearchClientBuilder,
     private readonly supportedPrisonsService: SupportedPrisonsService,
     private readonly systemToken: SystemToken,
   ) {}
@@ -48,8 +51,13 @@ export default class PrisonerProfileService {
 
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
     const prisonerContactRegistryApiClient = this.prisonerContactRegistryApiClientBuilder(token)
-    const inmateDetail = await prisonApiClient.getOffender(offenderNo)
+    const prisonerSearchClient = this.prisonerSearchClientBuilder(token)
+
     const { convictedStatus } = bookings.content[0]
+    const inmateDetail = await prisonApiClient.getOffender(offenderNo)
+    const prisoner = await prisonerSearchClient.getPrisonerById(offenderNo)
+    const incentiveLevel = prisoner.currentIncentive?.level.description || ''
+
     const visitBalances = await this.getVisitBalances(prisonApiClient, convictedStatus, offenderNo)
     const displayName = properCaseFullName(`${inmateDetail.lastName}, ${inmateDetail.firstName}`)
     const displayDob = prisonerDatePretty({ dateToFormat: inmateDetail.dateOfBirth })
@@ -119,6 +127,7 @@ export default class PrisonerProfileService {
       flaggedAlerts,
       inmateDetail,
       convictedStatus,
+      incentiveLevel,
       visitBalances,
       upcomingVisits,
       pastVisits,

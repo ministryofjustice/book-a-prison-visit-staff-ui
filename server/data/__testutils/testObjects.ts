@@ -1,6 +1,6 @@
 import { Prison } from '../../@types/bapv'
 import { SupportType } from '../visitSchedulerApiTypes'
-import { InmateDetail, CaseLoad } from '../prisonApiTypes'
+import { InmateDetail, CaseLoad, PrisonerBookingSummary } from '../prisonApiTypes'
 import { CurrentIncentive, Prisoner } from '../prisonerOffenderSearchTypes'
 
 export const createCaseLoads = ({
@@ -33,9 +33,15 @@ export const createInmateDetail = ({
   offenderNo = 'A1234BC',
   firstName = 'JOHN',
   lastName = 'SMITH',
-  dateOfBirth = '1980-10-12',
-  activeAlertCount = 1,
-  inactiveAlertCount = 3,
+  dateOfBirth = '1975-04-02',
+  activeAlertCount = undefined,
+  inactiveAlertCount = undefined,
+  alerts = undefined,
+  assignedLivingUnit = {
+    description: '1-1-C-028',
+    agencyName: 'Hewell (HMP)',
+  } as InmateDetail['assignedLivingUnit'],
+  category = 'Cat C',
   legalStatus = 'SENTENCED',
 }: Partial<InmateDetail> = {}): InmateDetail =>
   ({
@@ -45,6 +51,9 @@ export const createInmateDetail = ({
     dateOfBirth,
     activeAlertCount,
     inactiveAlertCount,
+    alerts,
+    assignedLivingUnit,
+    category,
     legalStatus,
   } as InmateDetail)
 
@@ -68,6 +77,27 @@ export const createPrisoner = ({
     cellLocation,
     currentIncentive,
   } as Prisoner)
+
+export const createPrisonerBookingSummary = ({
+  bookingId = 12345,
+  offenderNo = 'A1234BC',
+  firstName = 'JOHN',
+  lastName = 'SMITH',
+  dateOfBirth = '1975-04-02',
+  agencyId = 'HEI',
+  legalStatus = 'SENTENCED',
+  convictedStatus = 'Convicted',
+}: Partial<PrisonerBookingSummary> = {}): PrisonerBookingSummary =>
+  ({
+    bookingId,
+    offenderNo,
+    firstName,
+    lastName,
+    dateOfBirth,
+    agencyId,
+    legalStatus,
+    convictedStatus,
+  } as PrisonerBookingSummary)
 
 export const createPrisons = ({
   prisons = [

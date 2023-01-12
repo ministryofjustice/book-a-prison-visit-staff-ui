@@ -180,6 +180,7 @@ function appSetup({
       prisonApiClientBuilder,
       visitSchedulerApiClientBuilder,
       prisonerContactRegistryApiClientBuilder,
+      prisonerSearchClientBuilder,
       supportedPrisonsServiceOverride ||
         new SupportedPrisonsService(visitSchedulerApiClientBuilder, prisonRegisterApiClientBuilder, systemTokenTest),
       systemTokenTest,

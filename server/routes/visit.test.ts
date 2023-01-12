@@ -360,16 +360,6 @@ describe('/visit/:reference', () => {
     })
 
     it('should render full booking summary page with prisoner location showing as "Unknown" if not a supported prison', () => {
-      // const transferPrisoner = {
-      //   firstName: 'JOHN',
-      //   lastName: 'SMITH',
-      //   prisonerNumber: 'A1234BC',
-      //   dateOfBirth: '1975-04-02',
-      //   prisonId: 'TRN',
-      //   prisonName: 'Transfer',
-      //   restrictedPatient: false,
-      // } as Prisoner
-
       const transferPrisoner = createPrisoner({ prisonId: 'TRN', prisonName: 'Transfer' })
 
       prisonerSearchService.getPrisonerById.mockResolvedValue(transferPrisoner)
