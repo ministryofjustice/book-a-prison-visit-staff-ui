@@ -9,8 +9,8 @@ import PrisonerSearchService from '../services/prisonerSearchService'
 import VisitSessionsService from '../services/visitSessionsService'
 import AuditService from '../services/auditService'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
-import { Prisoner } from '../data/prisonerOffenderSearchTypes'
 import { clearSession } from './visitorUtils'
+import { createInmateDetail, createPrisoner } from '../data/__testutils/testObjects'
 
 jest.mock('../services/prisonerProfileService')
 jest.mock('../services/prisonerSearchService')
@@ -24,6 +24,7 @@ let flashData: Record<string, string[] | Record<string, string>[]>
 let visitSessionData: Partial<VisitSessionData>
 
 const prisonerProfileService = new PrisonerProfileService(
+  null,
   null,
   null,
   null,
@@ -75,7 +76,7 @@ describe('GET /prisoner/A1234BC', () => {
   beforeEach(() => {
     prisonerProfile = {
       displayName: 'Smith, John',
-      displayDob: '12 October 1980',
+      displayDob: '2 April 1975',
       activeAlerts: [
         [
           {
@@ -101,24 +102,9 @@ describe('GET /prisoner/A1234BC', () => {
           alertCodeDescription: 'Protective Isolation Unit',
         },
       ],
-      inmateDetail: {
-        offenderNo: 'A1234BC',
-        firstName: 'JOHN',
-        lastName: 'SMITH',
-        dateOfBirth: '1980-10-12',
-        activeAlertCount: 1,
-        inactiveAlertCount: 3,
-        legalStatus: 'SENTENCED',
-        assignedLivingUnit: {
-          description: '1-1-C-028',
-          agencyName: 'Hewell (HMP)',
-        },
-        category: 'Cat C',
-        privilegeSummary: {
-          iepLevel: 'Standard',
-        },
-      } as InmateDetail,
+      inmateDetail: createInmateDetail({ activeAlertCount: 1 }),
       convictedStatus: 'Convicted',
+      incentiveLevel: 'Standard',
       visitBalances: {
         remainingVo: 1,
         remainingPvo: 0,
@@ -147,7 +133,7 @@ describe('GET /prisoner/A1234BC', () => {
           'Protective Isolation Unit',
         )
         expect($('[data-test="prison-number"]').text()).toBe('A1234BC')
-        expect($('[data-test="dob"]').text()).toBe('12 October 1980')
+        expect($('[data-test="dob"]').text()).toBe('2 April 1975')
         expect($('[data-test="location"]').text()).toBe('1-1-C-028, Hewell (HMP)')
         expect($('[data-test="category"]').text()).toBe('Cat C')
         expect($('[data-test="iep-level"]').text()).toBe('Standard')
@@ -459,12 +445,8 @@ describe('POST /prisoner/A1234BC', () => {
 })
 
 describe('GET /prisoner/A1234BC/visits', () => {
-  const prisoner = {
-    prisonerNumber: 'A1234BC',
-    firstName: 'JOHN',
-    lastName: 'SMITH',
-    restrictedPatient: false,
-  } as Prisoner
+  const prisoner = createPrisoner()
+
   it('should list upcoming visits for the prisoner with back link to new search if no search in querystring', () => {
     const visitInfo: VisitInformation[] = [
       {

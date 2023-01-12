@@ -10,11 +10,10 @@ import SupportedPrisonsService from '../services/supportedPrisonsService'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import { OutcomeDto, Visit } from '../data/visitSchedulerApiTypes'
 import { VisitorListItem, VisitSessionData } from '../@types/bapv'
-import { Prisoner } from '../data/prisonerOffenderSearchTypes'
 import config from '../config'
 import NotificationsService from '../services/notificationsService'
 import { clearSession } from './visitorUtils'
-import { createSupportedPrisons, createSupportedPrisonIds } from '../data/__testutils/testObjects'
+import { createSupportedPrisons, createSupportedPrisonIds, createPrisoner } from '../data/__testutils/testObjects'
 
 jest.mock('../services/prisonerSearchService')
 jest.mock('../services/visitSessionsService')
@@ -76,16 +75,7 @@ afterEach(() => {
 describe('/visit/:reference', () => {
   const childBirthYear = new Date().getFullYear() - 5
 
-  const prisoner = {
-    firstName: 'JOHN',
-    lastName: 'SMITH',
-    prisonerNumber: 'A1234BC',
-    dateOfBirth: '1975-04-02',
-    prisonId: 'HEI',
-    prisonName: 'Hewell (HMP)',
-    cellLocation: '1-1-C-028',
-    restrictedPatient: false,
-  } as Prisoner
+  const prisoner = createPrisoner()
 
   let visit: Visit
 
@@ -211,7 +201,7 @@ describe('/visit/:reference', () => {
           expect($('[data-test="prisoner-name"]').text()).toBe('Smith, John')
           expect($('[data-test="prisoner-number"]').text()).toBe('A1234BC')
           expect($('[data-test="prisoner-dob"]').text()).toBe('2 April 1975')
-          expect($('[data-test="prisoner-location"]').text()).toBe('1-1-C-028, Hewell (HMP)')
+          expect($('[data-test="prisoner-location"]').text()).toBe('1-1-C-028, HMP Hewell')
           // visit details
           expect($('[data-test="visit-date"]').text()).toBe('9 February 2022')
           expect($('[data-test="visit-time"]').text()).toBe('10am to 11:15am')
@@ -273,7 +263,7 @@ describe('/visit/:reference', () => {
           expect($('[data-test="prisoner-name"]').text()).toBe('Smith, John')
           expect($('[data-test="prisoner-number"]').text()).toBe('A1234BC')
           expect($('[data-test="prisoner-dob"]').text()).toBe('2 April 1975')
-          expect($('[data-test="prisoner-location"]').text()).toBe('1-1-C-028, Hewell (HMP)')
+          expect($('[data-test="prisoner-location"]').text()).toBe('1-1-C-028, HMP Hewell')
           // visit details
           expect($('[data-test="visit-date"]').text()).toBe('9 February 2022')
           expect($('[data-test="visit-time"]').text()).toBe('10am to 11:15am')
@@ -331,7 +321,7 @@ describe('/visit/:reference', () => {
           expect($('[data-test="prisoner-name"]').text()).toBe('Smith, John')
           expect($('[data-test="prisoner-number"]').text()).toBe('A1234BC')
           expect($('[data-test="prisoner-dob"]').text()).toBe('2 April 1975')
-          expect($('[data-test="prisoner-location"]').text()).toBe('1-1-C-028, Hewell (HMP)')
+          expect($('[data-test="prisoner-location"]').text()).toBe('1-1-C-028, HMP Hewell')
           // visit details
           expect($('[data-test="visit-date"]').text()).toBe('9 February 2022')
           expect($('[data-test="visit-time"]').text()).toBe('10am to 11:15am')
@@ -370,15 +360,7 @@ describe('/visit/:reference', () => {
     })
 
     it('should render full booking summary page with prisoner location showing as "Unknown" if not a supported prison', () => {
-      const transferPrisoner = {
-        firstName: 'JOHN',
-        lastName: 'SMITH',
-        prisonerNumber: 'A1234BC',
-        dateOfBirth: '1975-04-02',
-        prisonId: 'TRN',
-        prisonName: 'Transfer',
-        restrictedPatient: false,
-      } as Prisoner
+      const transferPrisoner = createPrisoner({ prisonId: 'TRN', prisonName: 'Transfer' })
 
       prisonerSearchService.getPrisonerById.mockResolvedValue(transferPrisoner)
 
@@ -513,7 +495,7 @@ describe('/visit/:reference', () => {
               name: 'Smith, John',
               offenderNo: 'A1234BC',
               dateOfBirth: '1975-04-02',
-              location: '1-1-C-028, Hewell (HMP)',
+              location: '1-1-C-028, HMP Hewell',
             },
             visitSlot: {
               id: '',

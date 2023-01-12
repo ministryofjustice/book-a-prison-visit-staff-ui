@@ -123,12 +123,6 @@ export const prisonerProfileData = prisonerNumber => {
       locationId: 123,
     },
     category: 'SomeCategory',
-    privilegeSummary: {
-      iepLevel: 'Basic',
-      iepDate: '2022-01-01',
-      bookingId: 1234,
-      daysSinceReview: 3,
-    },
     activeAlertCount: 2,
     alerts: [
       {

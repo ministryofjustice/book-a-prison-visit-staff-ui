@@ -1,7 +1,7 @@
 import nock from 'nock'
 import config from '../config'
-import { Prisoner } from './prisonerOffenderSearchTypes'
 import PrisonerSearchClient, { prisonerSearchClientBuilder } from './prisonerSearchClient'
+import { createPrisoner } from './__testutils/testObjects'
 
 describe('prisonSearchClientBuilder', () => {
   let fakePrisonerSearchApi: nock.Scope
@@ -79,21 +79,16 @@ describe('prisonSearchClientBuilder', () => {
 
   describe('getPrisonerById', () => {
     it('should return data for single prisoner by prisoner ID', async () => {
-      const results = {
-        lastName: 'FORENAME',
-        firstName: 'SURNAME',
-        prisonerNumber: 'A1234BC',
-        dateOfBirth: '2000-01-01',
-        prisonId: 'HEI',
-        prisonName: 'HMP Hewell',
-        cellLocation: '1-1-C-028',
-        restrictedPatient: false,
-      } as Prisoner
-      fakePrisonerSearchApi.get('/prisoner/A1234BC').matchHeader('authorization', `Bearer ${token}`).reply(200, results)
+      const prisoner = createPrisoner()
+
+      fakePrisonerSearchApi
+        .get('/prisoner/A1234BC')
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, prisoner)
 
       const output = await client.getPrisonerById('A1234BC')
 
-      expect(output).toEqual(results)
+      expect(output).toEqual(prisoner)
     })
   })
 

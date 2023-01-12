@@ -6,6 +6,8 @@ export type CaseLoad = components['schemas']['CaseLoad']
 
 export type InmateDetail = components['schemas']['InmateDetail']
 
+export type PrisonerBookingSummary = components['schemas']['PrisonerBookingSummary']
+
 export type PagePrisonerBookingSummary = components['schemas']['PagePrisonerBookingSummary']
 
 export type VisitBalances = components['schemas']['VisitBalances']

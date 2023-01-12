@@ -144,6 +144,7 @@ export type PrisonerProfile = {
   flaggedAlerts: Alert[]
   inmateDetail: InmateDetail
   convictedStatus: 'Convicted' | 'Remand'
+  incentiveLevel: string
   visitBalances: VisitBalances
   upcomingVisits: UpcomingVisitItem[]
   pastVisits: PastVisitItem[]

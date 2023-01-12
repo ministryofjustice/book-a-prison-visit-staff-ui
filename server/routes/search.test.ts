@@ -7,8 +7,8 @@ import PrisonerSearchService from '../services/prisonerSearchService'
 import VisitSessionsService from '../services/visitSessionsService'
 import { appWithAllRoutes } from './testutils/appSetup'
 import { PrisonerDetailsItem, VisitInformation } from '../@types/bapv'
-import { Prisoner } from '../data/prisonerOffenderSearchTypes'
 import AuditService from '../services/auditService'
+import { createPrisoner } from '../data/__testutils/testObjects'
 
 jest.mock('../services/prisonerSearchService')
 jest.mock('../services/visitSessionsService')
@@ -40,7 +40,7 @@ let getPrisonersReturnData: {
   previous: 0,
 }
 
-let getPrisonerReturnData: Prisoner
+const getPrisonerReturnData = createPrisoner()
 let getVisit: VisitInformation
 
 beforeEach(() => {
@@ -376,12 +376,6 @@ describe('Prisoner search page', () => {
 })
 
 describe('Booking search page', () => {
-  getPrisonerReturnData = {
-    firstName: 'Geoff',
-    lastName: 'Smith',
-    restrictedPatient: false,
-  } as Prisoner
-
   getVisit = {
     reference: 'as-sd-df-fg',
     prisonNumber: 'A1234BC',
