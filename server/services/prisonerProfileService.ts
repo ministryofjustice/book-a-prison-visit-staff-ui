@@ -164,13 +164,19 @@ export default class PrisonerProfileService {
     visitSchedulerApiClient: VisitSchedulerApiClient,
     supportedPrisons: Record<string, string>,
   ): Promise<UpcomingVisitItem[]> {
-    const visits: Visit[] = await visitSchedulerApiClient.getUpcomingVisits(offenderNo, ['BOOKED'])
+    const visits: Visit[] = await visitSchedulerApiClient.getUpcomingVisits(offenderNo, ['BOOKED', 'CANCELLED'])
     const socialVisits: Visit[] = visits.filter(visit => visit.visitType === 'SOCIAL')
 
     const visitsForDisplay: UpcomingVisitItem[] = socialVisits.map(visit => {
       const visitContactNames = this.getPrisonerSocialContacts(socialContacts, visit.visitors)
 
       return [
+        {
+          html: `<a href='/visit/${visit.reference}'>${visit.reference}</a>`,
+          attributes: {
+            'data-test': 'tab-upcoming-reference',
+          },
+        },
         {
           html: formatVisitType(visit.visitType),
           attributes: {
@@ -197,6 +203,12 @@ export default class PrisonerProfileService {
             'data-test': 'tab-upcoming-visitors',
           },
         },
+        {
+          text: `${properCase(visit.visitStatus)}`,
+          attributes: {
+            'data-test': 'tab-upcoming-status',
+          },
+        },
       ] as UpcomingVisitItem
     })
 
@@ -209,13 +221,19 @@ export default class PrisonerProfileService {
     visitSchedulerApiClient: VisitSchedulerApiClient,
     supportedPrisons: Record<string, string>,
   ): Promise<PastVisitItem[]> {
-    const visits: Visit[] = await visitSchedulerApiClient.getPastVisits(offenderNo)
+    const visits: Visit[] = await visitSchedulerApiClient.getPastVisits(offenderNo, ['BOOKED', 'CANCELLED'])
     const socialVisits: Visit[] = visits.filter(visit => visit.visitType === 'SOCIAL')
 
     const visitsForDisplay: PastVisitItem[] = socialVisits.map(visit => {
       const visitContactNames = this.getPrisonerSocialContacts(socialContacts, visit.visitors)
 
       return [
+        {
+          html: `<a href='/visit/${visit.reference}'>${visit.reference}</a>`,
+          attributes: {
+            'data-test': 'tab-past-reference',
+          },
+        },
         {
           html: formatVisitType(visit.visitType),
           attributes: {

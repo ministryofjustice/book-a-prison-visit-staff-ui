@@ -21,8 +21,6 @@ class VisitSchedulerApiClient {
 
   private visitType = 'SOCIAL'
 
-  private visitStatus = 'BOOKED'
-
   getSupportedPrisonIds(): Promise<string[]> {
     return this.restclient.get({
       path: '/config/prisons/supported',
@@ -50,13 +48,13 @@ class VisitSchedulerApiClient {
     })
   }
 
-  getPastVisits(offenderNo: string, endTimestamp?: string): Promise<Visit[]> {
+  getPastVisits(offenderNo: string, visitStatus: Visit['visitStatus'][], endTimestamp?: string): Promise<Visit[]> {
     return this.restclient.get({
       path: '/visits',
       query: new URLSearchParams({
         prisonerId: offenderNo,
         endTimestamp: endTimestamp || new Date().toISOString(),
-        visitStatus: this.visitStatus,
+        visitStatus: visitStatus.join(','),
       }).toString(),
     })
   }
@@ -68,7 +66,7 @@ class VisitSchedulerApiClient {
         prisonId,
         startTimestamp: `${dateString}T00:00:00`,
         endTimestamp: `${dateString}T23:59:59`,
-        visitStatus: this.visitStatus,
+        visitStatus: 'BOOKED',
       }).toString(),
     })
   }
