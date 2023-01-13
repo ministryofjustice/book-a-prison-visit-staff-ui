@@ -48,20 +48,22 @@
                 <li>any prison specific rules (such as clothing guidelines)</li>
             </ul>
         {% endif %}
-
+        <div>
         {{ govukButton({
             classes: "govuk-!-margin-top-3, govuk-!-margin-bottom-4",
             text: "Go to manage prison visits",
             href: "/",
             preventDoubleClick: true
         }) }}
-        <br>
+        </div>
+        <div>
          {{ govukButton({
             classes: "govuk-!-margin-top-3, govuk-!-margin-bottom-6 govuk-button--secondary",
             text: "Book another visit for this prisoner",
             href: "/prisoner/" + prisoner.offenderNo,
             preventDoubleClick: true
         }) }}
+        </div>
     </div>
 </div>
 
