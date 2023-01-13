@@ -23,8 +23,10 @@ import { Alert, InmateDetail, OffenderRestriction, VisitBalances } from '../data
 import { Visit, Visitor } from '../data/visitSchedulerApiTypes'
 import { Contact } from '../data/prisonerContactRegistryApiTypes'
 import SupportedPrisonsService from './supportedPrisonsService'
+import PrisonerSearchClient from '../data/prisonerSearchClient'
 
 type PrisonApiClientBuilder = (token: string) => PrisonApiClient
+type PrisonerSearchClientBuilder = (token: string) => PrisonerSearchClient
 type VisitSchedulerApiClientBuilder = (token: string) => VisitSchedulerApiClient
 type PrisonerContactRegistryApiClientBuilder = (token: string) => PrisonerContactRegistryApiClient
 
@@ -35,6 +37,7 @@ export default class PrisonerProfileService {
     private readonly prisonApiClientBuilder: PrisonApiClientBuilder,
     private readonly visitSchedulerApiClientBuilder: VisitSchedulerApiClientBuilder,
     private readonly prisonerContactRegistryApiClientBuilder: PrisonerContactRegistryApiClientBuilder,
+    private readonly prisonerSearchClientBuilder: PrisonerSearchClientBuilder,
     private readonly supportedPrisonsService: SupportedPrisonsService,
     private readonly systemToken: SystemToken,
   ) {}
@@ -48,8 +51,13 @@ export default class PrisonerProfileService {
 
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
     const prisonerContactRegistryApiClient = this.prisonerContactRegistryApiClientBuilder(token)
-    const inmateDetail = await prisonApiClient.getOffender(offenderNo)
+    const prisonerSearchClient = this.prisonerSearchClientBuilder(token)
+
     const { convictedStatus } = bookings.content[0]
+    const inmateDetail = await prisonApiClient.getOffender(offenderNo)
+    const prisoner = await prisonerSearchClient.getPrisonerById(offenderNo)
+    const incentiveLevel = prisoner.currentIncentive?.level.description || ''
+
     const visitBalances = await this.getVisitBalances(prisonApiClient, convictedStatus, offenderNo)
     const displayName = properCaseFullName(`${inmateDetail.lastName}, ${inmateDetail.firstName}`)
     const displayDob = prisonerDatePretty({ dateToFormat: inmateDetail.dateOfBirth })
@@ -119,6 +127,7 @@ export default class PrisonerProfileService {
       flaggedAlerts,
       inmateDetail,
       convictedStatus,
+      incentiveLevel,
       visitBalances,
       upcomingVisits,
       pastVisits,
@@ -164,13 +173,19 @@ export default class PrisonerProfileService {
     visitSchedulerApiClient: VisitSchedulerApiClient,
     supportedPrisons: Record<string, string>,
   ): Promise<UpcomingVisitItem[]> {
-    const visits: Visit[] = await visitSchedulerApiClient.getUpcomingVisits(offenderNo, ['BOOKED'])
+    const visits: Visit[] = await visitSchedulerApiClient.getUpcomingVisits(offenderNo, ['BOOKED', 'CANCELLED'])
     const socialVisits: Visit[] = visits.filter(visit => visit.visitType === 'SOCIAL')
 
     const visitsForDisplay: UpcomingVisitItem[] = socialVisits.map(visit => {
       const visitContactNames = this.getPrisonerSocialContacts(socialContacts, visit.visitors)
 
       return [
+        {
+          html: `<a href='/visit/${visit.reference}'>${visit.reference}</a>`,
+          attributes: {
+            'data-test': 'tab-upcoming-reference',
+          },
+        },
         {
           html: formatVisitType(visit.visitType),
           attributes: {
@@ -197,6 +212,12 @@ export default class PrisonerProfileService {
             'data-test': 'tab-upcoming-visitors',
           },
         },
+        {
+          text: `${properCase(visit.visitStatus)}`,
+          attributes: {
+            'data-test': 'tab-upcoming-status',
+          },
+        },
       ] as UpcomingVisitItem
     })
 
@@ -209,13 +230,19 @@ export default class PrisonerProfileService {
     visitSchedulerApiClient: VisitSchedulerApiClient,
     supportedPrisons: Record<string, string>,
   ): Promise<PastVisitItem[]> {
-    const visits: Visit[] = await visitSchedulerApiClient.getPastVisits(offenderNo)
+    const visits: Visit[] = await visitSchedulerApiClient.getPastVisits(offenderNo, ['BOOKED', 'CANCELLED'])
     const socialVisits: Visit[] = visits.filter(visit => visit.visitType === 'SOCIAL')
 
     const visitsForDisplay: PastVisitItem[] = socialVisits.map(visit => {
       const visitContactNames = this.getPrisonerSocialContacts(socialContacts, visit.visitors)
 
       return [
+        {
+          html: `<a href='/visit/${visit.reference}'>${visit.reference}</a>`,
+          attributes: {
+            'data-test': 'tab-past-reference',
+          },
+        },
         {
           html: formatVisitType(visit.visitType),
           attributes: {

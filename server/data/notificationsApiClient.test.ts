@@ -51,24 +51,26 @@ describe('GOV.UK Notify client', () => {
   })
 
   describe('sendCancellationSms', () => {
-    const confirmationDetails = {
+    const cancellationDetails = {
       phoneNumber: '07123456789',
       prisonPhoneNumber: '01234443225',
       prisonName: 'Hewell',
       visitTime: '10:00am',
       visitDate: '1 August 2022',
+      reference: 'ab-cd-ef-gh',
     }
 
     it('should call notifications client sendCancellationSms() with the correct booking cancellation parameters', async () => {
-      await notificationsApiClient.sendCancellationSms(confirmationDetails)
+      await notificationsApiClient.sendCancellationSms(cancellationDetails)
 
       expect(mockSendSms).toHaveBeenCalledTimes(1)
-      expect(mockSendSms).toHaveBeenCalledWith(cancellationConfirmation, confirmationDetails.phoneNumber, {
+      expect(mockSendSms).toHaveBeenCalledWith(cancellationConfirmation, cancellationDetails.phoneNumber, {
         personalisation: {
-          prison: confirmationDetails.prisonName,
-          'prison phone number': confirmationDetails.prisonPhoneNumber,
-          time: confirmationDetails.visitTime,
-          date: confirmationDetails.visitDate,
+          prison: cancellationDetails.prisonName,
+          'prison phone number': cancellationDetails.prisonPhoneNumber,
+          time: cancellationDetails.visitTime,
+          date: cancellationDetails.visitDate,
+          reference: cancellationDetails.reference,
         },
       })
     })

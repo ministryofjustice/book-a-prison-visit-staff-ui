@@ -41,6 +41,7 @@ export default defineConfig({
 
         // Prisoner offender search
         stubGetPrisoner: results => offenderSearch.stubGetPrisoner(results),
+        stubGetPrisonerById: prisoner => offenderSearch.stubGetPrisonerById(prisoner),
         stubGetPrisoners: ({ results, page, size }) => offenderSearch.stubGetPrisoners(results, page, size),
 
         // Prison register API
@@ -62,5 +63,6 @@ export default defineConfig({
     excludeSpecPattern: '**/!(*.cy).ts',
     specPattern: 'integration_tests/e2e/**/*.cy.{js,jsx,ts,tsx}',
     supportFile: 'integration_tests/support/index.ts',
+    experimentalRunAllSpecs: true,
   },
 })

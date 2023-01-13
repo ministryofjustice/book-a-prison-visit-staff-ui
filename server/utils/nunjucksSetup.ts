@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 import nunjucks, { Environment } from 'nunjucks'
 import express from 'express'
-import { format, parseISO } from 'date-fns'
+import { format, formatDuration, intervalToDuration, isAfter, parseISO } from 'date-fns'
 import path from 'path'
 import { FormError } from '../@types/bapv'
 import { properCaseFullName } from './utils'
@@ -85,26 +85,22 @@ export function registerNunjucks(app?: express.Express): Environment {
   })
 
   njkEnv.addFilter('displayAge', (dateOfBirth: string) => {
-    let ageString
-
-    const today = new Date()
     const dob = new Date(dateOfBirth)
-    const years = today.getFullYear() - dob.getFullYear()
-    if (years > 1) {
-      ageString = `${years} years old`
-    } else if (years === 1) {
-      ageString = '1 year old'
-    } else if (years < 1) {
-      const months = today.getMonth() - dob.getMonth()
+    const today = new Date()
 
-      if (months === 1) {
-        ageString = `${months} month old`
-      } else {
-        ageString = `${months} months old`
-      }
+    if (dob.toString() === 'Invalid Date' || isAfter(dob, today)) {
+      return ''
     }
 
-    return ageString
+    const duration = intervalToDuration({ start: dob, end: today })
+    let age = ''
+    if (duration.years < 1) {
+      age = formatDuration(duration, { format: ['months'], zero: true })
+    } else {
+      age = formatDuration(duration, { format: ['years'] })
+    }
+
+    return `${age} old`
   })
 
   // format time with minutes only if not on the hour; e.g. 10am / 10:30am

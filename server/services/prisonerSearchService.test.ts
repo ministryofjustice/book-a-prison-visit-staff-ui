@@ -1,6 +1,6 @@
 import PrisonerSearchService from './prisonerSearchService'
 import PrisonerSearchClient from '../data/prisonerSearchClient'
-import { Prisoner } from '../data/prisonerOffenderSearchTypes'
+import { createPrisoner } from '../data/__testutils/testObjects'
 
 jest.mock('../data/prisonerSearchClient')
 
@@ -8,14 +8,7 @@ const prisonId = 'HEI'
 const search = 'some search'
 const prisonerSearchClient = new PrisonerSearchClient(null) as jest.Mocked<PrisonerSearchClient>
 
-const prisonerDto: Prisoner = {
-  firstName: 'john',
-  lastName: 'smith',
-  prisonerNumber: 'A1234BC',
-  dateOfBirth: '1975-04-02',
-  bookingId: '12345',
-  restrictedPatient: false,
-}
+const prisoner = createPrisoner()
 
 describe('Prisoner search service', () => {
   let prisonerSearchClientBuilder
@@ -38,7 +31,7 @@ describe('Prisoner search service', () => {
         prisonerSearchClient.getPrisoners.mockResolvedValue({
           totalPages: 1,
           totalElements: 1,
-          content: [prisonerDto],
+          content: [prisoner],
         })
 
         const { results, numberOfResults, numberOfPages, next, previous } = await prisonerSearchService.getPrisoners(
@@ -80,7 +73,7 @@ describe('Prisoner search service', () => {
         prisonerSearchClient.getPrisoners.mockResolvedValue({
           totalPages: 1,
           totalElements: 1,
-          content: [prisonerDto],
+          content: [prisoner],
         })
 
         const { results, numberOfResults, numberOfPages, next, previous } = await prisonerSearchService.getPrisoners(
@@ -126,31 +119,16 @@ describe('Prisoner search service', () => {
       expect(result).toBe(null)
     })
 
-    it('should matching prisoner', async () => {
-      const prisoner: { content: Prisoner[] } = {
-        content: [prisonerDto],
-      }
-
-      prisonerSearchClient.getPrisoner.mockResolvedValue(prisoner)
+    it('should return matching prisoner', async () => {
+      prisonerSearchClient.getPrisoner.mockResolvedValue({ content: [prisoner] })
       const result = await prisonerSearchService.getPrisoner('A1234BC', prisonId, 'user')
 
-      expect(result).toBe(prisoner.content[0])
+      expect(result).toBe(prisoner)
     })
   })
 
   describe('getPrisonerById', () => {
     it('should return prisoner details for given prisoner ID', async () => {
-      const prisoner: Prisoner = {
-        lastName: 'FORENAME',
-        firstName: 'SURNAME',
-        prisonerNumber: 'A1234BC',
-        dateOfBirth: '2000-01-01',
-        prisonId: 'HEI',
-        prisonName: 'HMP Hewell',
-        cellLocation: '1-1-C-028',
-        restrictedPatient: false,
-      }
-
       prisonerSearchClient.getPrisonerById.mockResolvedValue(prisoner)
       const result = await prisonerSearchService.getPrisonerById('A1234BC', 'user')
 

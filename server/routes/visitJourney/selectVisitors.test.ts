@@ -49,6 +49,7 @@ testJourneys.forEach(journey => {
       null,
       null,
       null,
+      null,
       systemToken,
     ) as jest.Mocked<PrisonerProfileService>
 

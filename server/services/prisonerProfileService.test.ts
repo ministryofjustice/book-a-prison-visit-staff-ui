@@ -3,22 +3,23 @@ import PrisonerProfileService from './prisonerProfileService'
 import PrisonApiClient from '../data/prisonApiClient'
 import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
 import PrisonerContactRegistryApiClient from '../data/prisonerContactRegistryApiClient'
-import {
-  Alert,
-  InmateDetail,
-  PagePrisonerBookingSummary,
-  VisitBalances,
-  OffenderRestrictions,
-} from '../data/prisonApiTypes'
-import { PrisonerAlertItem } from '../@types/bapv'
+import { Alert, PagePrisonerBookingSummary, VisitBalances, OffenderRestrictions } from '../data/prisonApiTypes'
+import { PrisonerAlertItem, PrisonerProfile } from '../@types/bapv'
 import { Visit } from '../data/visitSchedulerApiTypes'
 import { Contact } from '../data/prisonerContactRegistryApiTypes'
 import SupportedPrisonsService from './supportedPrisonsService'
-import { createInmateDetail, createSupportedPrisons } from '../data/__testutils/testObjects'
+import {
+  createInmateDetail,
+  createPrisoner,
+  createPrisonerBookingSummary,
+  createSupportedPrisons,
+} from '../data/__testutils/testObjects'
+import PrisonerSearchClient from '../data/prisonerSearchClient'
 
 jest.mock('../data/prisonApiClient')
 jest.mock('../data/visitSchedulerApiClient')
 jest.mock('../data/prisonerContactRegistryApiClient')
+jest.mock('../data/prisonerSearchClient')
 jest.mock('./supportedPrisonsService')
 
 const offenderNo = 'A1234BC'
@@ -28,12 +29,14 @@ const visitSchedulerApiClient = new VisitSchedulerApiClient(null) as jest.Mocked
 const prisonerContactRegistryApiClient = new PrisonerContactRegistryApiClient(
   null,
 ) as jest.Mocked<PrisonerContactRegistryApiClient>
+const prisonerSearchClient = new PrisonerSearchClient(null) as jest.Mocked<PrisonerSearchClient>
 const supportedPrisonsService = new SupportedPrisonsService(null, null, null) as jest.Mocked<SupportedPrisonsService>
 
 describe('Prisoner profile service', () => {
   let prisonApiClientBuilder
   let visitSchedulerApiClientBuilder
   let prisonerContactRegistryApiClientBuilder
+  let prisonerSearchClientBuilder
   let prisonerProfileService: PrisonerProfileService
   let systemToken
 
@@ -42,10 +45,12 @@ describe('Prisoner profile service', () => {
     prisonApiClientBuilder = jest.fn().mockReturnValue(prisonApiClient)
     visitSchedulerApiClientBuilder = jest.fn().mockReturnValue(visitSchedulerApiClient)
     prisonerContactRegistryApiClientBuilder = jest.fn().mockReturnValue(prisonerContactRegistryApiClient)
+    prisonerSearchClientBuilder = jest.fn().mockReturnValue(prisonerSearchClient)
     prisonerProfileService = new PrisonerProfileService(
       prisonApiClientBuilder,
       visitSchedulerApiClientBuilder,
       prisonerContactRegistryApiClientBuilder,
+      prisonerSearchClientBuilder,
       supportedPrisonsService,
       systemToken,
     )
@@ -64,23 +69,12 @@ describe('Prisoner profile service', () => {
 
     it('Retrieves and processes data for prisoner profile with visit balances', async () => {
       const bookings = <PagePrisonerBookingSummary>{
-        content: [
-          {
-            bookingId: 12345,
-            bookingNo: 'A123445',
-            offenderNo: 'A1234BC',
-            firstName: 'JOHN',
-            lastName: 'SMITH',
-            dateOfBirth: '1980-10-12',
-            agencyId: 'HEI',
-            legalStatus: 'SENTENCED',
-            convictedStatus: 'Convicted',
-          },
-        ],
+        content: [createPrisonerBookingSummary()],
         numberOfElements: 1,
       }
 
       const inmateDetail = createInmateDetail()
+      const prisoner = createPrisoner()
 
       const visitBalances: VisitBalances = {
         remainingVo: 1,
@@ -131,6 +125,7 @@ describe('Prisoner profile service', () => {
       prisonApiClient.getBookings.mockResolvedValue(bookings)
       prisonApiClient.getOffender.mockResolvedValue(inmateDetail)
       prisonApiClient.getVisitBalances.mockResolvedValue(visitBalances)
+      prisonerSearchClient.getPrisonerById.mockResolvedValue(prisoner)
       visitSchedulerApiClient.getUpcomingVisits.mockResolvedValue([visit])
       visitSchedulerApiClient.getPastVisits.mockResolvedValue([visit])
       prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue(socialContacts)
@@ -140,19 +135,25 @@ describe('Prisoner profile service', () => {
       expect(prisonApiClient.getBookings).toHaveBeenCalledTimes(1)
       expect(prisonApiClient.getOffender).toHaveBeenCalledTimes(1)
       expect(prisonApiClient.getVisitBalances).toHaveBeenCalledTimes(1)
+      expect(prisonerSearchClient.getPrisonerById).toHaveBeenCalledTimes(1)
       expect(prisonerContactRegistryApiClient.getPrisonerSocialContacts).toHaveBeenCalledTimes(1)
       expect(supportedPrisonsService.getSupportedPrisons).toHaveBeenCalledTimes(1)
 
-      expect(results).toEqual({
+      expect(results).toEqual(<PrisonerProfile>{
         displayName: 'Smith, John',
-        displayDob: '12 October 1980',
+        displayDob: '2 April 1975',
         activeAlerts: [],
         flaggedAlerts: [],
         inmateDetail,
         convictedStatus: 'Convicted',
+        incentiveLevel: 'Standard',
         visitBalances,
         upcomingVisits: [
           [
+            {
+              html: "<a href='/visit/ab-cd-ef-gh'>ab-cd-ef-gh</a>",
+              attributes: { 'data-test': 'tab-upcoming-reference' },
+            },
             { html: 'Social', attributes: { 'data-test': 'tab-upcoming-type' } },
             { text: 'Hewell (HMP)', attributes: { 'data-test': 'tab-upcoming-location' } },
             {
@@ -160,10 +161,15 @@ describe('Prisoner profile service', () => {
               attributes: { 'data-test': 'tab-upcoming-date-and-time' },
             },
             { html: '<p>Mary Smith</p>', attributes: { 'data-test': 'tab-upcoming-visitors' } },
+            { text: 'Booked', attributes: { 'data-test': 'tab-upcoming-status' } },
           ],
         ],
         pastVisits: [
           [
+            {
+              html: "<a href='/visit/ab-cd-ef-gh'>ab-cd-ef-gh</a>",
+              attributes: { 'data-test': 'tab-past-reference' },
+            },
             { html: 'Social', attributes: { 'data-test': 'tab-past-type' } },
             { text: 'Hewell (HMP)', attributes: { 'data-test': 'tab-past-location' } },
             {
@@ -179,6 +185,7 @@ describe('Prisoner profile service', () => {
 
     it('Does not look up visit balances for those on REMAND', async () => {
       const inmateDetail = createInmateDetail({ legalStatus: 'REMAND' })
+      const prisoner = createPrisoner()
 
       const bookings = <PagePrisonerBookingSummary>{
         content: [
@@ -199,6 +206,7 @@ describe('Prisoner profile service', () => {
 
       prisonApiClient.getBookings.mockResolvedValue(bookings)
       prisonApiClient.getOffender.mockResolvedValue(inmateDetail)
+      prisonerSearchClient.getPrisonerById.mockResolvedValue(prisoner)
       visitSchedulerApiClient.getUpcomingVisits.mockResolvedValue([])
       visitSchedulerApiClient.getPastVisits.mockResolvedValue([])
 
@@ -207,14 +215,16 @@ describe('Prisoner profile service', () => {
       expect(prisonApiClient.getBookings).toHaveBeenCalledTimes(1)
       expect(prisonApiClient.getOffender).toHaveBeenCalledTimes(1)
       expect(prisonApiClient.getVisitBalances).not.toHaveBeenCalled()
+      expect(prisonerSearchClient.getPrisonerById).toHaveBeenCalledTimes(1)
       expect(prisonerContactRegistryApiClient.getPrisonerSocialContacts).toHaveBeenCalledTimes(1)
-      expect(results).toEqual({
+      expect(results).toEqual(<PrisonerProfile>{
         displayName: 'Smith, John',
-        displayDob: '12 October 1980',
+        displayDob: '2 April 1975',
         activeAlerts: [],
         flaggedAlerts: [],
         inmateDetail,
         convictedStatus: 'Remand',
+        incentiveLevel: 'Standard',
         visitBalances: null,
         upcomingVisits: [],
         pastVisits: [],
@@ -440,21 +450,19 @@ describe('Prisoner profile service', () => {
         ],
         numberOfElements: 1,
       }
-      const prisonerProfile = createInmateDetail()
 
-      const inmateDetail = <InmateDetail>{
-        offenderNo: prisonerProfile.offenderNo,
-        firstName: prisonerProfile.firstName,
-        lastName: prisonerProfile.lastName,
-        dateOfBirth: prisonerProfile.dateOfBirth,
+      const inmateDetail = createInmateDetail({
         activeAlertCount: 4,
         inactiveAlertCount: 1,
-        legalStatus: 'REMAND',
         alerts: [inactiveAlert, nonRelevantAlert, ...alertsToFlag],
-      }
+        legalStatus: 'REMAND',
+      })
+
+      const prisoner = createPrisoner()
 
       prisonApiClient.getBookings.mockResolvedValue(bookings)
       prisonApiClient.getOffender.mockResolvedValue(inmateDetail)
+      prisonerSearchClient.getPrisonerById.mockResolvedValue(prisoner)
       visitSchedulerApiClient.getUpcomingVisits.mockResolvedValue([])
       visitSchedulerApiClient.getPastVisits.mockResolvedValue([])
 
@@ -463,14 +471,16 @@ describe('Prisoner profile service', () => {
       expect(prisonApiClient.getBookings).toHaveBeenCalledTimes(1)
       expect(prisonApiClient.getOffender).toHaveBeenCalledTimes(1)
       expect(prisonApiClient.getVisitBalances).not.toHaveBeenCalled()
+      expect(prisonerSearchClient.getPrisonerById).toHaveBeenCalledTimes(1)
       expect(prisonerContactRegistryApiClient.getPrisonerSocialContacts).toHaveBeenCalledTimes(1)
-      expect(results).toEqual({
+      expect(results).toEqual(<PrisonerProfile>{
         displayName: 'Smith, John',
-        displayDob: '12 October 1980',
+        displayDob: '2 April 1975',
         activeAlerts: alertsForDisplay,
         flaggedAlerts: alertsToFlag,
         inmateDetail,
         convictedStatus: 'Remand',
+        incentiveLevel: 'Standard',
         visitBalances: null,
         upcomingVisits: [],
         pastVisits: [],

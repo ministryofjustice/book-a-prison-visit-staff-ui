@@ -14,60 +14,102 @@ export interface paths {
     put: operations['purgeQueue']
   }
   '/prisoner-index/switch-index': {
-    /** current index will be switched both indexed have to be complete, requires PRISONER_INDEX role */
+    /**
+     * Switch index without rebuilding
+     * @description current index will be switched both indexed have to be complete, requires PRISONER_INDEX role
+     */
     put: operations['switchIndex']
   }
   '/prisoner-index/queue-housekeeping': {
-    /** This is an internal service which isn't exposed to the outside world. It is called from a Kubernetes CronJob named `index-housekeeping-cronjob` */
+    /**
+     * Performs automated housekeeping tasks such as marking builds completed
+     * @description This is an internal service which isn't exposed to the outside world. It is called from a Kubernetes CronJob named `index-housekeeping-cronjob`
+     */
     put: operations['indexQueueHousekeeping']
   }
   '/prisoner-index/mark-complete': {
-    /** Swaps to the newly built index, requires PRISONER_INDEX role */
+    /**
+     * Mark index as complete and swap
+     * @description Swaps to the newly built index, requires PRISONER_INDEX role
+     */
     put: operations['indexComplete']
   }
   '/prisoner-index/index/prisoner/{prisonerNumber}': {
-    /** Requires PRISONER_INDEX role */
+    /**
+     * Index/Refresh Data for Prisoner with specified prisoner Number
+     * @description Requires PRISONER_INDEX role
+     */
     put: operations['indexPrisoner']
   }
   '/prisoner-index/cancel-index': {
-    /** Only cancels if indexing is in progress, requires PRISONER_INDEX role */
+    /**
+     * Cancels a building index
+     * @description Only cancels if indexing is in progress, requires PRISONER_INDEX role
+     */
     put: operations['cancelIndex']
   }
   '/prisoner-index/build-index': {
-    /** Old index is left untouched and will be maintained whilst new index is built, requires PRISONER_INDEX role */
+    /**
+     * Start building a new index
+     * @description Old index is left untouched and will be maintained whilst new index is built, requires PRISONER_INDEX role
+     */
     put: operations['buildIndex']
   }
   '/restricted-patient-search/match-restricted-patients': {
-    /** Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role */
+    /**
+     * Match prisoners by criteria
+     * @description Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role
+     */
     post: operations['findByCriteria']
   }
   '/prisoner-search/release-date-by-prison': {
-    /** Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role */
+    /**
+     * Match prisoners who have a release date within a range, and optionally by prison
+     * @description Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role
+     */
     post: operations['findByReleaseDateAndPrison']
   }
   '/prisoner-search/prisoner-numbers': {
-    /** Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role */
+    /**
+     * Match prisoners by a list of prisoner numbers
+     * @description Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role
+     */
     post: operations['findByNumbers']
   }
   '/prisoner-search/possible-matches': {
-    /** Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role */
+    /**
+     * Search for possible matches by criteria, searching by prison number, PNC number, and/or name and date of birth, returning collated results by order of search. This will also search aliases for possible matches. Use when there is manual input, e.g. a user can select the correct match from search results.
+     * @description Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role
+     */
     post: operations['findPossibleMatchesBySearchCriteria']
   }
   '/prisoner-search/match': {
-    /** Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role */
+    /**
+     * Match prisoners by criteria, to search across a list of specific prisons use /match-prisoners
+     * @deprecated
+     * @description Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role
+     */
     post: operations['findByCriteria_1']
   }
   '/prisoner-search/match-prisoners': {
-    /** Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role */
+    /**
+     * Match prisoners by criteria, searching by prisoner identifier or name and returning results for the criteria matched first. Typically used when the matching data is of high quality where the first match is expected to be a near perfect match.
+     * @description Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role
+     */
     post: operations['findByCriteria_2']
   }
   '/prisoner-search/booking-ids': {
-    /** Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role */
+    /**
+     * Match prisoners by a list of booking ids
+     * @description Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role
+     */
     post: operations['findByIds']
   }
   '/prisoner-detail': {
     /**
-     * Search terms and identifiers can be provided in either or mixed case and are converted to the appropriate case.
+     * Find prisoners by exact or wildcard terms for specified fields and return a paginated result set
+     * @description
+     *       Search terms and identifiers can be provided in either or mixed case and are converted to the appropriate case.
      *       This endpoint will find both exact values (full term matched) or wildcards supporting the '*' and '?' symbols.
      *       The '*' symbol will match any number of characters e.g. firstName='J*' will match 'John', 'Jane', and 'James'.
      *       The '?' symbol will match any letter substituted at that position. e.g. firstName='t?ny' will match 'Tony' and 'Tiny'
@@ -76,19 +118,27 @@ export interface paths {
     post: operations['prisonerDetailSearch']
   }
   '/match-prisoners': {
-    /** Specify the request criteria to match against, role required is ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH */
+    /**
+     * Match for an prisoner by criteria. This is a more lenient version to other match endpoints that includes alias and fuzzy date of birth matching. It will return the best group of matching prisoners based on the request
+     * @description Specify the request criteria to match against, role required is ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH
+     */
     post: operations['matchPrisoners']
   }
   '/keyword': {
     /**
-     * Words and identifiers can be provided in either or mixed case and will be matched against all indexed text and keyword fields.
+     * Search for prisoners by keyword or identifiers within a list of prisons and return a paginated result set
+     * @description
+     *       Words and identifiers can be provided in either or mixed case and will be matched against all indexed text and keyword fields.
      *       Identifiers within the [and, or, not, exact] terms are detected and converted to the appropriate case.
      *       Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.
      */
     post: operations['keywordSearch']
   }
   '/global-search': {
-    /** Requires ROLE_GLOBAL_SEARCH role or ROLE_PRISONER_SEARCH role */
+    /**
+     * Match prisoners by criteria
+     * @description Requires ROLE_GLOBAL_SEARCH role or ROLE_PRISONER_SEARCH role
+     */
     post: operations['globalFindByCriteria']
   }
   '/synthetic-monitor': {
@@ -98,16 +148,24 @@ export interface paths {
     get: operations['getDlqMessages']
   }
   '/prisoner/{id}': {
-    /** Requires ROLE_PRISONER_SEARCH or ROLE_VIEW_PRISONER_DATA role */
+    /**
+     * Get prisoner by prisoner number (AKA NOMS number)
+     * @description Requires ROLE_PRISONER_SEARCH or ROLE_VIEW_PRISONER_DATA role
+     */
     get: operations['findByPrisonNumber']
   }
   '/prisoner-search/prison/{prisonId}': {
-    /** Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role */
+    /**
+     * Get all prisoners in a prison, including restricted patients supported by a POM
+     * @description Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role
+     */
     get: operations['findByPrison']
   }
   '/prison/{prisonId}/prisoners': {
     /**
-     * This search is optimised for clients that have a simple search term typically containing the prisonser's name
+     * Search for prisoners within a particular prison establishment
+     * @description
+     *       This search is optimised for clients that have a simple search term typically containing the prisonser's name
      *       or prisoner number. The user typically is certain the prisoner is within the establishment and knows key information
      *       about the prisoner.
      *
@@ -150,15 +208,19 @@ export interface paths {
   }
 }
 
+export type webhooks = Record<string, never>
+
 export interface components {
   schemas: {
     Message: {
       messageId?: string
       receiptHandle?: string
       body?: string
-      attributes?: { [key: string]: string }
+      attributes?: {
+        [key: string]: string | undefined
+      }
       messageAttributes?: {
-        [key: string]: components['schemas']['MessageAttributeValue']
+        [key: string]: components['schemas']['MessageAttributeValue'] | undefined
       }
       md5OfBody?: string
       md5OfMessageAttributes?: string
@@ -209,6 +271,7 @@ export interface components {
     }
     IndexStatus: {
       id: string
+      /** @enum {string} */
       currentIndex: 'INDEX_A' | 'INDEX_B'
       /** @example 2021-07-05T10:35:17 */
       startIndexTime?: string
@@ -217,12 +280,40 @@ export interface components {
       inProgress: boolean
       inError: boolean
     }
+    /** @description Incentive level */
+    CurrentIncentive: {
+      level: components['schemas']['IncentiveLevel']
+      /**
+       * @description Date time of the incentive
+       * @example 2021-07-05T10:35:17
+       */
+      dateTime: string
+      /**
+       * Format: date
+       * @description Schedule new review date
+       * @example 2022-11-10
+       */
+      nextReviewDate: string
+    }
+    /** @description Incentive level */
+    IncentiveLevel: {
+      /**
+       * @description code
+       * @example STD
+       */
+      code?: string
+      /**
+       * @description description
+       * @example Standard
+       */
+      description: string
+    }
     Prisoner: {
       /**
        * @description Prisoner Number
        * @example A1234AA
        */
-      prisonerNumber?: string
+      prisonerNumber: string
       /**
        * @description PNC Number
        * @example 12/394773H
@@ -257,7 +348,7 @@ export interface components {
        * @description First Name
        * @example Robert
        */
-      firstName?: string
+      firstName: string
       /**
        * @description Middle Names
        * @example John James
@@ -267,48 +358,48 @@ export interface components {
        * @description Last name
        * @example Larsen
        */
-      lastName?: string
+      lastName: string
       /**
        * Format: date
        * @description Date of Birth
        * @example 1975-04-02
        */
-      dateOfBirth?: string
+      dateOfBirth: string
       /**
        * @description Gender
        * @example Female
        */
-      gender?: string
+      gender: string
       /**
        * @description Ethnicity
        * @example White: Eng./Welsh/Scot./N.Irish/British
        */
-      ethnicity?: string
+      ethnicity: string
       /**
        * @description Youth Offender?
        * @example true
        */
-      youthOffender?: boolean
+      youthOffender: boolean
       /**
        * @description Marital Status
        * @example Widowed
        */
-      maritalStatus?: string
+      maritalStatus: string
       /**
        * @description Religion
        * @example Church of England (Anglican)
        */
-      religion?: string
+      religion: string
       /**
        * @description Nationality
        * @example Egyptian
        */
-      nationality?: string
+      nationality: string
       /**
        * @description Status of the prisoner
        * @example ACTIVE IN
        */
-      status?: string
+      status: string
       /**
        * @description Last Movement Type Code of prisoner
        * @example CRT
@@ -322,6 +413,7 @@ export interface components {
       /**
        * @description In/Out Status
        * @example IN
+       * @enum {string}
        */
       inOutStatus?: 'IN' | 'OUT'
       /**
@@ -356,6 +448,7 @@ export interface components {
       /**
        * @description Legal Status
        * @example SENTENCED
+       * @enum {string}
        */
       legalStatus?:
         | 'RECALL'
@@ -382,8 +475,11 @@ export interface components {
        * @description Most serious offence for this sentence
        * @example Robbery
        */
-      mostSeriousOffence?: string
-      /** @description Indicates that the offender has been recalled */
+      mostSeriousOffence: string
+      /**
+       * @description Indicates that the offender has been recalled
+       * @example false
+       */
       recall?: boolean
       /**
        * @description Indicates the the offender has an indeterminate sentence
@@ -465,6 +561,7 @@ export interface components {
       /**
        * @description Indicates which type of non-DTO release date is the effective release date. One of 'ARD’, 'CRD’, ‘NPD’ or 'PRRD’.
        * @example ARD
+       * @enum {string}
        */
       nonDtoReleaseDateType?: 'ARD' | 'CRD' | 'NPD' | 'PRRD'
       /**
@@ -545,6 +642,7 @@ export interface components {
        * @example Psychiatric Hospital Discharge to Hazelwood House
        */
       dischargeDetails?: string
+      currentIncentive?: components['schemas']['CurrentIncentive']
     }
     /** @description Alerts */
     PrisonerAlert: {
@@ -622,7 +720,9 @@ export interface components {
       lastName?: string
       /**
        * @description List of supporting Prison Ids to restrict the search by. Unrestricted if not supplied or null
-       * @example MDI
+       * @example [
+       *   "MDI"
+       * ]
        */
       supportingPrisonIds?: string[]
     }
@@ -649,9 +749,9 @@ export interface components {
       offset?: number
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
-      pageSize?: number
-      /** Format: int32 */
       pageNumber?: number
+      /** Format: int32 */
+      pageSize?: number
       paged?: boolean
       unpaged?: boolean
     }
@@ -676,14 +776,18 @@ export interface components {
       latestReleaseDate: string
       /**
        * @description List of Prison Ids (can include OUT and TRN) to restrict the search by. Unrestricted if not supplied or null
-       * @example MDI
+       * @example [
+       *   "MDI"
+       * ]
        */
       prisonIds?: string[]
     }
     PrisonerNumbers: {
       /**
        * @description List of prisoner numbers to search by
-       * @example A1234AA
+       * @example [
+       *   "A1234AA"
+       * ]
        */
       prisonerNumbers: string[]
     }
@@ -738,7 +842,11 @@ export interface components {
        * @example MDI
        */
       prisonId?: string
-      /** @description Include aliases in search */
+      /**
+       * @description Include aliases in search
+       * @default false
+       * @example false
+       */
       includeAliases: boolean
     }
     /** @description Search Criteria for Prisoner Search */
@@ -760,16 +868,26 @@ export interface components {
       lastName?: string
       /**
        * @description List of Prison Ids (can include OUT and TRN) to restrict the search by. Unrestricted if not supplied or null
-       * @example MDI
+       * @example [
+       *   "MDI"
+       * ]
        */
       prisonIds?: string[]
-      /** @description Include aliases in search */
+      /**
+       * @description Include aliases in search
+       * @default false
+       * @example false
+       */
       includeAliases: boolean
     }
     BookingIds: {
       /**
        * @description List of bookingIds to search by
-       * @example 1,2,3
+       * @example [
+       *   1,
+       *   2,
+       *   3
+       * ]
        */
       bookingIds: number[]
     }
@@ -778,6 +896,7 @@ export interface components {
       /**
        * Format: int32
        * @description The page number required in the paginated response
+       * @example 0
        */
       page: number
       /**
@@ -813,13 +932,16 @@ export interface components {
        * @example SF80/655108T
        */
       croNumber?: string
-      /** @description Fuzzy matching. Allow a one character difference in spelling in word lengths below five and two differences above. */
+      /**
+       * @description Fuzzy matching. Allow a one character difference in spelling in word lengths below five and two differences above.
+       * @example false
+       */
       fuzzyMatch?: boolean
       /**
        * @description List of prison codes to filter results by
        * @example ['LEI', 'MDI']
        */
-      prisonIds?: string[]
+      prisonIds: string[]
       /**
        * @description Include aliases in search
        * @default true
@@ -863,12 +985,12 @@ export interface components {
        * @description Internal Error Code
        * @example 20012
        */
-      errorCode?: number
+      errorCode: number
       /**
        * @description Error message information
        * @example Prisoner Not Found
        */
-      userMessage?: string
+      userMessage: string
       /**
        * @description Additional information about the error
        * @example Hard disk failure
@@ -915,7 +1037,10 @@ export interface components {
     PrisonerMatches: {
       /** @description List of prisoners that share the same possibility of being the match */
       matches: components['schemas']['PrisonerMatch'][]
-      /** @description How the match was performed */
+      /**
+       * @description How the match was performed
+       * @enum {string}
+       */
       matchedBy:
         | 'ALL_SUPPLIED'
         | 'ALL_SUPPLIED_ALIAS'
@@ -947,15 +1072,24 @@ export interface components {
        * @example John Smith
        */
       exactPhrase?: string
-      /** @description Fuzzy matching. Allow a one character difference in spelling in word lengths below five and two differences above. */
+      /**
+       * @description Fuzzy matching. Allow a one character difference in spelling in word lengths below five and two differences above.
+       * @example false
+       */
       fuzzyMatch?: boolean
       /**
        * @description List of prison codes to filter results
-       * @example LEI,MDI
+       * @example [
+       *   "LEI",
+       *   "MDI"
+       * ]
        */
-      prisonIds?: string[]
+      prisonIds: string[]
       pagination: components['schemas']['PaginationRequest']
-      /** @description The type of search. When set to DEFAULT (which is the default when not provided) search order is by calculated relevance (AKA score). An ESTABLISHMENT type will order results by name and is designed for using this API for a single quick search field for prisoners within a specific prison */
+      /**
+       * @description The type of search. When set to DEFAULT (which is the default when not provided) search order is by calculated relevance (AKA score). An ESTABLISHMENT type will order results by name and is designed for using this API for a single quick search field for prisoners within a specific prison
+       * @enum {string}
+       */
       type: 'DEFAULT' | 'ESTABLISHMENT'
     }
     KeywordResponse: {
@@ -996,6 +1130,7 @@ export interface components {
       /**
        * @description Gender, F - Female, M - Male, NK - Not Known / Not Recorded or NS - Not Specified (Indeterminate)
        * @example M
+       * @enum {string}
        */
       gender?: 'M' | 'F' | 'NK' | 'NS' | 'ALL'
       /**
@@ -1009,11 +1144,17 @@ export interface components {
        * @example 1970-02-28
        */
       dateOfBirth?: string
-      /** @description Include aliases in search */
+      /**
+       * @description Include aliases in search
+       * @default false
+       * @example false
+       */
       includeAliases: boolean
     }
     DlqMessage: {
-      body: { [key: string]: { [key: string]: unknown } }
+      body: {
+        [key: string]: Record<string, never> | undefined
+      }
       messageId: string
     }
     GetDlqResult: {
@@ -1024,7 +1165,14 @@ export interface components {
       messages: components['schemas']['DlqMessage'][]
     }
   }
+  responses: never
+  parameters: never
+  requestBodies: never
+  headers: never
+  pathItems: never
 }
+
+export type external = Record<string, never>
 
 export interface operations {
   retryDlq: {
@@ -1034,7 +1182,7 @@ export interface operations {
       }
     }
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['RetryDlqResult']
@@ -1044,7 +1192,7 @@ export interface operations {
   }
   retryAllDlqs: {
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['RetryDlqResult'][]
@@ -1059,7 +1207,7 @@ export interface operations {
       }
     }
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['PurgeQueueResult']
@@ -1067,10 +1215,13 @@ export interface operations {
       }
     }
   }
-  /** current index will be switched both indexed have to be complete, requires PRISONER_INDEX role */
   switchIndex: {
+    /**
+     * Switch index without rebuilding
+     * @description current index will be switched both indexed have to be complete, requires PRISONER_INDEX role
+     */
     responses: {
-      /** Unable to switch indexes - one is marked as in progress or in error */
+      /** @description Unable to switch indexes - one is marked as in progress or in error */
       409: {
         content: {
           'application/json': components['schemas']['IndexStatus']
@@ -1078,22 +1229,28 @@ export interface operations {
       }
     }
   }
-  /** This is an internal service which isn't exposed to the outside world. It is called from a Kubernetes CronJob named `index-housekeeping-cronjob` */
   indexQueueHousekeeping: {
+    /**
+     * Performs automated housekeeping tasks such as marking builds completed
+     * @description This is an internal service which isn't exposed to the outside world. It is called from a Kubernetes CronJob named `index-housekeeping-cronjob`
+     */
     responses: {
-      /** Unable to marked index complete as it is in error */
-      409: unknown
+      /** @description Unable to marked index complete as it is in error */
+      409: never
     }
   }
-  /** Swaps to the newly built index, requires PRISONER_INDEX role */
   indexComplete: {
-    parameters: {
-      query: {
+    /**
+     * Mark index as complete and swap
+     * @description Swaps to the newly built index, requires PRISONER_INDEX role
+     */
+    parameters?: {
+      query?: {
         ignoreThreshold?: boolean
       }
     }
     responses: {
-      /** Unable to marked index complete as it is in error */
+      /** @description Unable to marked index complete as it is in error */
       409: {
         content: {
           'application/json': components['schemas']['IndexStatus']
@@ -1101,15 +1258,19 @@ export interface operations {
       }
     }
   }
-  /** Requires PRISONER_INDEX role */
   indexPrisoner: {
+    /**
+     * Index/Refresh Data for Prisoner with specified prisoner Number
+     * @description Requires PRISONER_INDEX role
+     */
     parameters: {
+      /** @example A1234AA */
       path: {
         prisonerNumber: string
       }
     }
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           'application/json': components['schemas']['Prisoner']
@@ -1117,10 +1278,13 @@ export interface operations {
       }
     }
   }
-  /** Only cancels if indexing is in progress, requires PRISONER_INDEX role */
   cancelIndex: {
+    /**
+     * Cancels a building index
+     * @description Only cancels if indexing is in progress, requires PRISONER_INDEX role
+     */
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           'application/json': components['schemas']['IndexStatus']
@@ -1128,10 +1292,13 @@ export interface operations {
       }
     }
   }
-  /** Old index is left untouched and will be maintained whilst new index is built, requires PRISONER_INDEX role */
   buildIndex: {
+    /**
+     * Start building a new index
+     * @description Old index is left untouched and will be maintained whilst new index is built, requires PRISONER_INDEX role
+     */
     responses: {
-      /** Unable to build index - it is marked as in progress or in error */
+      /** @description Unable to build index - it is marked as in progress or in error */
       409: {
         content: {
           'application/json': components['schemas']['IndexStatus']
@@ -1139,24 +1306,19 @@ export interface operations {
       }
     }
   }
-  /** Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role */
   findByCriteria: {
-    parameters: {
-      query: {
-        /** Zero-based page index (0..N) */
+    /**
+     * Match prisoners by criteria
+     * @description Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role
+     */
+    parameters?: {
+      /** @description Zero-based page index (0..N) */
+      /** @description The size of the page to be returned */
+      /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+      query?: {
         page?: number
-        /** The size of the page to be returned */
         size?: number
-        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
         sort?: string[]
-      }
-    }
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['PagePrisoner']
-        }
       }
     }
     requestBody: {
@@ -1164,25 +1326,28 @@ export interface operations {
         'application/json': components['schemas']['RestrictedPatientSearchCriteria']
       }
     }
-  }
-  /** Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role */
-  findByReleaseDateAndPrison: {
-    parameters: {
-      query: {
-        /** Zero-based page index (0..N) */
-        page?: number
-        /** The size of the page to be returned */
-        size?: number
-        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
-        sort?: string[]
-      }
-    }
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           'application/json': components['schemas']['PagePrisoner']
         }
+      }
+    }
+  }
+  findByReleaseDateAndPrison: {
+    /**
+     * Match prisoners who have a release date within a range, and optionally by prison
+     * @description Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role
+     */
+    parameters?: {
+      /** @description Zero-based page index (0..N) */
+      /** @description The size of the page to be returned */
+      /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+      query?: {
+        page?: number
+        size?: number
+        sort?: string[]
       }
     }
     requestBody: {
@@ -1190,217 +1355,243 @@ export interface operations {
         'application/json': components['schemas']['ReleaseDateSearch']
       }
     }
-  }
-  /** Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role */
-  findByNumbers: {
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
-          'application/json': components['schemas']['Prisoner'][]
+          'application/json': components['schemas']['PagePrisoner']
         }
       }
     }
+  }
+  findByNumbers: {
+    /**
+     * Match prisoners by a list of prisoner numbers
+     * @description Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role
+     */
     requestBody: {
       content: {
         'application/json': components['schemas']['PrisonerNumbers']
       }
     }
-  }
-  /** Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role */
-  findPossibleMatchesBySearchCriteria: {
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           'application/json': components['schemas']['Prisoner'][]
         }
       }
     }
+  }
+  findPossibleMatchesBySearchCriteria: {
+    /**
+     * Search for possible matches by criteria, searching by prison number, PNC number, and/or name and date of birth, returning collated results by order of search. This will also search aliases for possible matches. Use when there is manual input, e.g. a user can select the correct match from search results.
+     * @description Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role
+     */
     requestBody: {
       content: {
         'application/json': components['schemas']['PossibleMatchCriteria']
       }
     }
-  }
-  /** Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role */
-  findByCriteria_1: {
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           'application/json': components['schemas']['Prisoner'][]
         }
       }
     }
+  }
+  findByCriteria_1: {
+    /**
+     * Match prisoners by criteria, to search across a list of specific prisons use /match-prisoners
+     * @deprecated
+     * @description Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role
+     */
     requestBody: {
       content: {
         'application/json': components['schemas']['PrisonSearch']
       }
     }
-  }
-  /** Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role */
-  findByCriteria_2: {
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           'application/json': components['schemas']['Prisoner'][]
         }
       }
     }
+  }
+  findByCriteria_2: {
+    /**
+     * Match prisoners by criteria, searching by prisoner identifier or name and returning results for the criteria matched first. Typically used when the matching data is of high quality where the first match is expected to be a near perfect match.
+     * @description Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role
+     */
     requestBody: {
       content: {
         'application/json': components['schemas']['SearchCriteria']
       }
     }
-  }
-  /** Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role */
-  findByIds: {
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           'application/json': components['schemas']['Prisoner'][]
         }
       }
     }
+  }
+  findByIds: {
+    /**
+     * Match prisoners by a list of booking ids
+     * @description Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role
+     */
     requestBody: {
       content: {
         'application/json': components['schemas']['BookingIds']
       }
     }
-  }
-  /**
-   * Search terms and identifiers can be provided in either or mixed case and are converted to the appropriate case.
-   *       This endpoint will find both exact values (full term matched) or wildcards supporting the '*' and '?' symbols.
-   *       The '*' symbol will match any number of characters e.g. firstName='J*' will match 'John', 'Jane', and 'James'.
-   *       The '?' symbol will match any letter substituted at that position. e.g. firstName='t?ny' will match 'Tony' and 'Tiny'
-   *       Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.
-   */
-  prisonerDetailSearch: {
     responses: {
-      /** Search successfully performed */
+      /** @description OK */
       200: {
         content: {
-          'application/json': components['schemas']['PrisonerDetailResponse']
-        }
-      }
-      /** Incorrect information provided to perform prisoner match */
-      400: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** Unauthorized to access this endpoint */
-      401: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** Incorrect permissions to search for prisoner data */
-      403: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
+          'application/json': components['schemas']['Prisoner'][]
         }
       }
     }
+  }
+  prisonerDetailSearch: {
+    /**
+     * Find prisoners by exact or wildcard terms for specified fields and return a paginated result set
+     * @description
+     *       Search terms and identifiers can be provided in either or mixed case and are converted to the appropriate case.
+     *       This endpoint will find both exact values (full term matched) or wildcards supporting the '*' and '?' symbols.
+     *       The '*' symbol will match any number of characters e.g. firstName='J*' will match 'John', 'Jane', and 'James'.
+     *       The '?' symbol will match any letter substituted at that position. e.g. firstName='t?ny' will match 'Tony' and 'Tiny'
+     *       Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.
+     */
     requestBody: {
       content: {
         'application/json': components['schemas']['PrisonerDetailRequest']
       }
     }
-  }
-  /** Specify the request criteria to match against, role required is ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH */
-  matchPrisoners: {
     responses: {
-      /** Search successfully performed */
+      /** @description Search successfully performed */
       200: {
         content: {
-          'application/json': components['schemas']['PrisonerMatches']
+          'application/json': components['schemas']['PrisonerDetailResponse']
         }
       }
-      /** Incorrect information provided to perform prisoner match */
+      /** @description Incorrect information provided to perform prisoner match */
       400: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
-      /** Unauthorized to access this endpoint */
+      /** @description Unauthorized to access this endpoint */
       401: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
-      /** Incorrect permissions to search for prisoner data */
+      /** @description Incorrect permissions to search for prisoner data */
       403: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
     }
+  }
+  matchPrisoners: {
+    /**
+     * Match for an prisoner by criteria. This is a more lenient version to other match endpoints that includes alias and fuzzy date of birth matching. It will return the best group of matching prisoners based on the request
+     * @description Specify the request criteria to match against, role required is ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH
+     */
     requestBody: {
       content: {
         'application/json': components['schemas']['MatchRequest']
       }
     }
-  }
-  /**
-   * Words and identifiers can be provided in either or mixed case and will be matched against all indexed text and keyword fields.
-   *       Identifiers within the [and, or, not, exact] terms are detected and converted to the appropriate case.
-   *       Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.
-   */
-  keywordSearch: {
     responses: {
-      /** Search successfully performed */
+      /** @description Search successfully performed */
       200: {
         content: {
-          'application/json': components['schemas']['KeywordResponse']
+          'application/json': components['schemas']['PrisonerMatches']
         }
       }
-      /** Incorrect information provided to perform prisoner match */
+      /** @description Incorrect information provided to perform prisoner match */
       400: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
-      /** Unauthorized to access this endpoint */
+      /** @description Unauthorized to access this endpoint */
       401: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
-      /** Incorrect permissions to search for prisoner data */
+      /** @description Incorrect permissions to search for prisoner data */
       403: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
     }
+  }
+  keywordSearch: {
+    /**
+     * Search for prisoners by keyword or identifiers within a list of prisons and return a paginated result set
+     * @description
+     *       Words and identifiers can be provided in either or mixed case and will be matched against all indexed text and keyword fields.
+     *       Identifiers within the [and, or, not, exact] terms are detected and converted to the appropriate case.
+     *       Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.
+     */
     requestBody: {
       content: {
         'application/json': components['schemas']['KeywordRequest']
       }
     }
-  }
-  /** Requires ROLE_GLOBAL_SEARCH role or ROLE_PRISONER_SEARCH role */
-  globalFindByCriteria: {
-    parameters: {
-      query: {
-        /** Zero-based page index (0..N) */
-        page?: number
-        /** The size of the page to be returned */
-        size?: number
-        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
-        sort?: string[]
-      }
-    }
     responses: {
-      /** OK */
+      /** @description Search successfully performed */
       200: {
         content: {
-          'application/json': components['schemas']['PagePrisoner']
+          'application/json': components['schemas']['KeywordResponse']
         }
+      }
+      /** @description Incorrect information provided to perform prisoner match */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to search for prisoner data */
+      403: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  globalFindByCriteria: {
+    /**
+     * Match prisoners by criteria
+     * @description Requires ROLE_GLOBAL_SEARCH role or ROLE_PRISONER_SEARCH role
+     */
+    parameters?: {
+      /** @description Zero-based page index (0..N) */
+      /** @description The size of the page to be returned */
+      /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+      query?: {
+        page?: number
+        size?: number
+        sort?: string[]
       }
     }
     requestBody: {
@@ -1408,24 +1599,32 @@ export interface operations {
         'application/json': components['schemas']['GlobalSearchCriteria']
       }
     }
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          'application/json': components['schemas']['PagePrisoner']
+        }
+      }
+    }
   }
   syntheticMonitor: {
     responses: {
-      /** OK */
-      200: unknown
+      /** @description OK */
+      200: never
     }
   }
   getDlqMessages: {
     parameters: {
+      query?: {
+        maxMessages?: number
+      }
       path: {
         dlqName: string
       }
-      query: {
-        maxMessages?: number
-      }
     }
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['GetDlqResult']
@@ -1433,15 +1632,18 @@ export interface operations {
       }
     }
   }
-  /** Requires ROLE_PRISONER_SEARCH or ROLE_VIEW_PRISONER_DATA role */
   findByPrisonNumber: {
+    /**
+     * Get prisoner by prisoner number (AKA NOMS number)
+     * @description Requires ROLE_PRISONER_SEARCH or ROLE_VIEW_PRISONER_DATA role
+     */
     parameters: {
       path: {
         id: string
       }
     }
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           '*/*': components['schemas']['Prisoner']
@@ -1449,24 +1651,27 @@ export interface operations {
       }
     }
   }
-  /** Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role */
   findByPrison: {
+    /**
+     * Get all prisoners in a prison, including restricted patients supported by a POM
+     * @description Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role
+     */
     parameters: {
+      /** @description Zero-based page index (0..N) */
+      /** @description The size of the page to be returned */
+      /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+      query?: {
+        'include-restricted-patients'?: boolean
+        page?: number
+        size?: number
+        sort?: string[]
+      }
       path: {
         prisonId: string
       }
-      query: {
-        'include-restricted-patients'?: boolean
-        /** Zero-based page index (0..N) */
-        page?: number
-        /** The size of the page to be returned */
-        size?: number
-        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
-        sort?: string[]
-      }
     }
     responses: {
-      /** OK */
+      /** @description OK */
       200: {
         content: {
           'application/json': components['schemas']['PagePrisoner']
@@ -1474,90 +1679,107 @@ export interface operations {
       }
     }
   }
-  /**
-   * This search is optimised for clients that have a simple search term typically containing the prisonser's name
-   *       or prisoner number. The user typically is certain the prisoner is within the establishment and knows key information
-   *       about the prisoner.
-   *
-   *       Requires ROLE_PRISONER_IN_PRISON_SEARCH or ROLE_PRISONER_SEARCH role.
-   *
-   *       Sort fields supported are: firstName, lastName, prisonerNumber, dateOfBirth, cellLocation e.g "sort=firstName,lastName,desc"
-   *
-   *       Examples:
-   *
-   *       "/prisoners-in-prison/BXI?term=John&sort=firstName,lastName,desc&page=2&size=20"
-   *       This will return all people in HMP Brixton whose first or last names begins with JOHN.
-   *       Results will be ordered by firstName, lastName descending.
-   *       Page 3 will be returned with a maximum of 20 results per page.
-   *
-   *       "/prisoners-in-prison/WWI?sort=cellLocation"
-   *       This will return all people in HMP Wandsworth.
-   *       Results will be ordered by cell location ascending.
-   *       Page 1 will be returned with a maximum of 10 results per page.
-   *
-   *       "/prisoners-in-prison/WWI?cellLocationPrefix=WWI-2&term=smith"
-   *       "/prisoners-in-prison/WWI?cellLocationPrefix=2&term=smith"
-   *       This will return all people in HMP Wandsworth block 2 whose name starts with SMITH.
-   *
-   *       "/prisoners-in-prison/WWI?cellLocationPrefix=2-A-3-001"
-   *       This will return all people in HMP Wandsworth cell WWI-2-A-3-001
-   *
-   *       "/prisoners-in-prison/WWI?term=A1234KJ"
-   *       "/prisoners-in-prison/WWI?term=A1234KJ bananas"
-   *       This will return the single prisoner with prisoner number A1234KJ in HMP Wandsworth.
-   *       An empty page will be returned if not found
-   *
-   *       "/prisoners-in-prison/WWI?term=A J&fromDob=1956-01-01&toDob=2000-01-02"
-   *       This will return all people in HMP Wandsworth. Born on or after 1956-01-01 and on or before 2000-01-02,
-   *       whose name begins with A J, e.g Alan Jones born on 1956-01-01.
-   *
-   *       "/prisoners-in-prison/WWI?alerts=TACT&alerts=PEEP"
-   *       This will return all people in HMP Wandsworth. With the alerts TACT or PEEP.
-   */
   search: {
+    /**
+     * Search for prisoners within a particular prison establishment
+     * @description
+     *       This search is optimised for clients that have a simple search term typically containing the prisonser's name
+     *       or prisoner number. The user typically is certain the prisoner is within the establishment and knows key information
+     *       about the prisoner.
+     *
+     *       Requires ROLE_PRISONER_IN_PRISON_SEARCH or ROLE_PRISONER_SEARCH role.
+     *
+     *       Sort fields supported are: firstName, lastName, prisonerNumber, dateOfBirth, cellLocation e.g "sort=firstName,lastName,desc"
+     *
+     *       Examples:
+     *
+     *       "/prisoners-in-prison/BXI?term=John&sort=firstName,lastName,desc&page=2&size=20"
+     *       This will return all people in HMP Brixton whose first or last names begins with JOHN.
+     *       Results will be ordered by firstName, lastName descending.
+     *       Page 3 will be returned with a maximum of 20 results per page.
+     *
+     *       "/prisoners-in-prison/WWI?sort=cellLocation"
+     *       This will return all people in HMP Wandsworth.
+     *       Results will be ordered by cell location ascending.
+     *       Page 1 will be returned with a maximum of 10 results per page.
+     *
+     *       "/prisoners-in-prison/WWI?cellLocationPrefix=WWI-2&term=smith"
+     *       "/prisoners-in-prison/WWI?cellLocationPrefix=2&term=smith"
+     *       This will return all people in HMP Wandsworth block 2 whose name starts with SMITH.
+     *
+     *       "/prisoners-in-prison/WWI?cellLocationPrefix=2-A-3-001"
+     *       This will return all people in HMP Wandsworth cell WWI-2-A-3-001
+     *
+     *       "/prisoners-in-prison/WWI?term=A1234KJ"
+     *       "/prisoners-in-prison/WWI?term=A1234KJ bananas"
+     *       This will return the single prisoner with prisoner number A1234KJ in HMP Wandsworth.
+     *       An empty page will be returned if not found
+     *
+     *       "/prisoners-in-prison/WWI?term=A J&fromDob=1956-01-01&toDob=2000-01-02"
+     *       This will return all people in HMP Wandsworth. Born on or after 1956-01-01 and on or before 2000-01-02,
+     *       whose name begins with A J, e.g Alan Jones born on 1956-01-01.
+     *
+     *       "/prisoners-in-prison/WWI?alerts=TACT&alerts=PEEP"
+     *       This will return all people in HMP Wandsworth. With the alerts TACT or PEEP.
+     */
     parameters: {
+      /**
+       * @description The primary search term. Whe absent all prisoners will be returned at the prison
+       * @example john smith
+       */
+      /**
+       * @description alert codes to filter by. Zero or more can be supplied. When multiple supplied the filter is effectively and OR
+       * @example XTACT
+       */
+      /**
+       * @description Offenders with a DOB >= this date
+       * @example 1970-01-02
+       */
+      /**
+       * @description Offenders with a DOB <= this date
+       * @example 1975-01-02
+       */
+      /**
+       * @description Filter for the prisoners cell location. A block wing or cell can be specified. With prison id can be included or absent so HEI-3-1 and 3-1 are equivalent when the prison id is HEI
+       * @example 3-1
+       */
+      /** @description Zero-based page index (0..N) */
+      /** @description The size of the page to be returned */
+      /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+      query?: {
+        term?: string
+        alerts?: string[]
+        fromDob?: string
+        toDob?: string
+        cellLocationPrefix?: string
+        page?: number
+        size?: number
+        sort?: string[]
+      }
       path: {
         prisonId: string
       }
-      query: {
-        /** The primary search term. Whe absent all prisoners will be returned at the prison */
-        term?: string
-        /** alert codes to filter by. Zero or more can be supplied. When multiple supplied the filter is effectively and OR */
-        alerts?: string[]
-        /** Offenders with a DOB >= this date */
-        fromDob?: string
-        /** Offenders with a DOB <= this date */
-        toDob?: string
-        /** Filter for the prisoners cell location. A block wing or cell can be specified. With prison id can be included or absent so HEI-3-1 and 3-1 are equivalent when the prison id is HEI */
-        cellLocationPrefix?: string
-        /** Zero-based page index (0..N) */
-        page?: number
-        /** The size of the page to be returned */
-        size?: number
-        /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
-        sort?: string[]
-      }
     }
     responses: {
-      /** Search successfully performed */
+      /** @description Search successfully performed */
       200: {
         content: {
           'application/json': components['schemas']['PagePrisoner']
         }
       }
-      /** Incorrect information provided to perform prisoner match */
+      /** @description Incorrect information provided to perform prisoner match */
       400: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
-      /** Unauthorized to access this endpoint */
+      /** @description Unauthorized to access this endpoint */
       401: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
-      /** Incorrect permissions to search for prisoner data */
+      /** @description Incorrect permissions to search for prisoner data */
       403: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
@@ -1566,6 +1788,3 @@ export interface operations {
     }
   }
 }
-
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface external {}

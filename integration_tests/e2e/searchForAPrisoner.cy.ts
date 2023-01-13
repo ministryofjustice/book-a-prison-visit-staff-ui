@@ -188,6 +188,7 @@ context('Search for a prisoner', () => {
         .then(pageTitle => {
           cy.task('stubGetBookings', prisonerNumber)
           cy.task('stubGetOffender', offender)
+          cy.task('stubGetPrisonerById', { prisonerNumber, currentIncentive: { level: { description: 'Standard' } } })
           cy.task('stubGetVisitBalances', { offenderNo: prisonerNumber, visitBalances })
           cy.task('stubGetUpcomingVisits', { offenderNo: prisonerNumber, upcomingVisits })
           cy.task('stubGetPastVisits', { offenderNo: prisonerNumber, pastVisits })
@@ -203,7 +204,7 @@ context('Search for a prisoner', () => {
             .location()
             .contains(`${offender.assignedLivingUnit.description}, ${offender.assignedLivingUnit.agencyName}`)
           prisonerProfilePage.category().contains(offender.category)
-          prisonerProfilePage.incentiveLevel().contains(offender.privilegeSummary.iepLevel)
+          prisonerProfilePage.incentiveLevel().contains('Standard')
           prisonerProfilePage.convictionStatus().contains('Convicted')
           prisonerProfilePage.alertCount().contains(offender.activeAlertCount)
           prisonerProfilePage.remainingVOs().contains(visitBalances.remainingVo)
