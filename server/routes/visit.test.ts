@@ -13,7 +13,12 @@ import { VisitorListItem, VisitSessionData } from '../@types/bapv'
 import config from '../config'
 import NotificationsService from '../services/notificationsService'
 import { clearSession } from './visitorUtils'
-import { createSupportedPrisons, createSupportedPrisonIds, createPrisoner } from '../data/__testutils/testObjects'
+import {
+  createSupportedPrisons,
+  createSupportedPrisonIds,
+  createPrisoner,
+  createVisit,
+} from '../data/__testutils/testObjects'
 
 jest.mock('../services/prisonerSearchService')
 jest.mock('../services/visitSessionsService')
@@ -112,51 +117,7 @@ describe('/visit/:reference', () => {
   const additionalSupport = ['Wheelchair ramp', 'custom request']
 
   beforeEach(() => {
-    visit = {
-      applicationReference: 'aaa-bbb-ccc',
-      reference: 'ab-cd-ef-gh',
-      prisonerId: 'A1234BC',
-      prisonId: 'HEI',
-      visitRoom: 'visit room',
-      visitType: 'SOCIAL',
-      visitStatus: 'BOOKED',
-      visitRestriction: 'OPEN',
-      startTimestamp: '2022-02-09T10:00:00',
-      endTimestamp: '2022-02-09T11:15:00',
-      visitNotes: [
-        {
-          type: 'VISIT_COMMENT',
-          text: 'Example of a visit comment',
-        },
-        {
-          type: 'VISITOR_CONCERN',
-          text: 'Example of a visitor concern',
-        },
-      ],
-      visitContact: {
-        name: 'Jeanette Smith',
-        telephone: '01234 567890',
-      },
-      visitors: [
-        {
-          nomisPersonId: 4321,
-        },
-        {
-          nomisPersonId: 4324,
-        },
-      ],
-      visitorSupport: [
-        {
-          type: 'WHEELCHAIR',
-        },
-        {
-          type: 'OTHER',
-          text: 'custom request',
-        },
-      ],
-      createdTimestamp: '2022-02-14T10:00:00',
-      modifiedTimestamp: '2022-02-14T10:05:00',
-    }
+    visit = createVisit({ createdTimestamp: '2022-01-01' })
 
     const fakeDate = new Date('2022-01-01')
     jest.useFakeTimers({ doNotFake: ['nextTick'], now: fakeDate })
@@ -203,8 +164,8 @@ describe('/visit/:reference', () => {
           expect($('[data-test="prisoner-dob"]').text()).toBe('2 April 1975')
           expect($('[data-test="prisoner-location"]').text()).toBe('1-1-C-028, HMP Hewell')
           // visit details
-          expect($('[data-test="visit-date"]').text()).toBe('9 February 2022')
-          expect($('[data-test="visit-time"]').text()).toBe('10am to 11:15am')
+          expect($('[data-test="visit-date"]').text()).toBe('14 January 2022')
+          expect($('[data-test="visit-time"]').text()).toBe('10am to 11am')
           expect($('[data-test="visit-type"]').text()).toBe('Open')
           expect($('[data-test="visit-contact"]').text()).toBe('Smith, Jeanette')
           expect($('[data-test="visit-phone"]').text()).toBe('01234 567890')
@@ -226,7 +187,7 @@ describe('/visit/:reference', () => {
           expect($('[data-test="visit-comment"]').eq(0).text()).toBe('Example of a visit comment')
           expect($('[data-test="visitor-concern"]').eq(0).text()).toBe('Example of a visitor concern')
           expect($('[data-test="additional-support"]').text()).toBe('Wheelchair ramp, custom request')
-          expect($('[data-test="visit-booked"]').text()).toBe('Monday 14 February 2022 at 10am')
+          expect($('[data-test="visit-booked"]').text()).toBe('Saturday 1 January 2022 at 12am')
           expect(visitSessionData).toEqual({ prisoner: undefined })
 
           expect(auditService.viewedVisitDetails).toHaveBeenCalledTimes(1)
@@ -265,8 +226,8 @@ describe('/visit/:reference', () => {
           expect($('[data-test="prisoner-dob"]').text()).toBe('2 April 1975')
           expect($('[data-test="prisoner-location"]').text()).toBe('1-1-C-028, HMP Hewell')
           // visit details
-          expect($('[data-test="visit-date"]').text()).toBe('9 February 2022')
-          expect($('[data-test="visit-time"]').text()).toBe('10am to 11:15am')
+          expect($('[data-test="visit-date"]').text()).toBe('14 January 2022')
+          expect($('[data-test="visit-time"]').text()).toBe('10am to 11am')
           expect($('[data-test="visit-type"]').text()).toBe('Open')
           expect($('[data-test="visit-contact"]').text()).toBe('Smith, Jeanette')
           expect($('[data-test="visit-phone"]').text()).toBe('Unknown')
@@ -288,7 +249,7 @@ describe('/visit/:reference', () => {
           expect($('[data-test="visit-comment"]').eq(0).text()).toBe('Example of a visit comment')
           expect($('[data-test="visitor-concern"]').eq(0).text()).toBe('Example of a visitor concern')
           expect($('[data-test="additional-support"]').text()).toBe('Wheelchair ramp, custom request')
-          expect($('[data-test="visit-booked"]').text()).toBe('Monday 14 February 2022 at 10am')
+          expect($('[data-test="visit-booked"]').text()).toBe('Saturday 1 January 2022 at 12am')
 
           expect(auditService.viewedVisitDetails).toHaveBeenCalledTimes(1)
           expect(auditService.viewedVisitDetails).toHaveBeenCalledWith({
@@ -323,8 +284,8 @@ describe('/visit/:reference', () => {
           expect($('[data-test="prisoner-dob"]').text()).toBe('2 April 1975')
           expect($('[data-test="prisoner-location"]').text()).toBe('1-1-C-028, HMP Hewell')
           // visit details
-          expect($('[data-test="visit-date"]').text()).toBe('9 February 2022')
-          expect($('[data-test="visit-time"]').text()).toBe('10am to 11:15am')
+          expect($('[data-test="visit-date"]').text()).toBe('14 January 2022')
+          expect($('[data-test="visit-time"]').text()).toBe('10am to 11am')
           expect($('[data-test="visit-type"]').text()).toBe('Open')
           expect($('[data-test="visit-contact"]').text()).toBe('Smith, Jeanette')
           expect($('[data-test="visit-phone"]').text()).toBe('01234 567890')
@@ -346,7 +307,7 @@ describe('/visit/:reference', () => {
           expect($('[data-test="visit-comment"]').eq(0).text()).toBe('Example of a visit comment')
           expect($('[data-test="visitor-concern"]').eq(0).text()).toBe('Example of a visitor concern')
           expect($('[data-test="additional-support"]').text()).toBe('Wheelchair ramp, custom request')
-          expect($('[data-test="visit-booked"]').text()).toBe('Monday 14 February 2022 at 10am')
+          expect($('[data-test="visit-booked"]').text()).toBe('Saturday 1 January 2022 at 12am')
 
           expect(auditService.viewedVisitDetails).toHaveBeenCalledTimes(1)
           expect(auditService.viewedVisitDetails).toHaveBeenCalledWith({
@@ -484,6 +445,7 @@ describe('/visit/:reference', () => {
 
   describe('POST /visit/:reference', () => {
     it('should set up sessionData and redirect to select visitors page', () => {
+      visit.applicationReference = undefined
       return request(app)
         .post('/visit/ab-cd-ef-gh')
         .expect(302)
@@ -500,19 +462,21 @@ describe('/visit/:reference', () => {
             visitSlot: {
               id: '',
               prisonId: 'HEI',
-              startTimestamp: '2022-02-09T10:00:00',
-              endTimestamp: '2022-02-09T11:15:00',
+              startTimestamp: '2022-01-14T10:00:00',
+              endTimestamp: '2022-01-14T11:00:00',
               availableTables: 0,
-              visitRoomName: 'visit room',
+              capacity: undefined,
+              visitRoomName: 'A1 L3',
               visitRestriction: 'OPEN',
             },
             originalVisitSlot: {
               id: '',
               prisonId: 'HEI',
-              startTimestamp: '2022-02-09T10:00:00',
-              endTimestamp: '2022-02-09T11:15:00',
+              startTimestamp: '2022-01-14T10:00:00',
+              endTimestamp: '2022-01-14T11:00:00',
               availableTables: 0,
-              visitRoomName: 'visit room',
+              capacity: undefined,
+              visitRoomName: 'A1 L3',
               visitRestriction: 'OPEN',
             },
             visitRestriction: 'OPEN',
@@ -546,8 +510,7 @@ describe('/visit/:reference', () => {
               },
             ],
             visitorSupport: [{ type: 'WHEELCHAIR' }, { text: 'custom request', type: 'OTHER' }],
-            mainContact: { phoneNumber: '01234 567890', contactName: 'Jeanette Smith' },
-            applicationReference: undefined,
+            mainContact: { contact: undefined, phoneNumber: '01234 567890', contactName: 'Jeanette Smith' },
             visitReference: 'ab-cd-ef-gh',
             visitStatus: 'BOOKED',
           })
@@ -655,43 +618,10 @@ describe('GET /visit/:reference/cancel', () => {
 
 describe('POST /visit/:reference/cancel', () => {
   const notificationsService = new NotificationsService(null) as jest.Mocked<NotificationsService>
-
-  const cancelledVisit: Visit = {
-    applicationReference: 'aaa-bbb-ccc',
-    reference: 'ab-cd-ef-gh',
-    prisonerId: 'AF34567G',
-    prisonId: 'HEI',
-    visitRoom: 'A1 L3',
-    visitType: 'SOCIAL',
-    visitStatus: 'CANCELLED',
-    visitRestriction: 'OPEN',
-    startTimestamp: '2022-02-14T10:00:00',
-    endTimestamp: '2022-02-14T11:00:00',
-    visitNotes: [
-      {
-        type: 'VISIT_OUTCOMES',
-        text: 'VISITOR_CANCELLED',
-      },
-      {
-        type: 'STATUS_CHANGED_REASON',
-        text: 'cancellation reason',
-      },
-    ],
-    visitContact: {
-      name: 'Jeanette Smith',
-      telephone: '01234567890',
-    },
-    visitors: [
-      {
-        nomisPersonId: 1234,
-      },
-    ],
-    visitorSupport: [],
-    createdTimestamp: '2022-02-14T10:00:00',
-    modifiedTimestamp: '2022-02-14T10:05:00',
-  }
-
+  let cancelledVisit: Visit
   beforeEach(() => {
+    cancelledVisit = createVisit()
+
     visitSessionsService.cancelVisit = jest.fn().mockResolvedValue(cancelledVisit)
     notificationsService.sendCancellationSms = jest.fn().mockResolvedValue({})
     supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
@@ -730,7 +660,7 @@ describe('POST /visit/:reference/cancel', () => {
         expect(auditService.cancelledVisit).toHaveBeenCalledTimes(1)
         expect(auditService.cancelledVisit).toHaveBeenCalledWith({
           visitReference: 'ab-cd-ef-gh',
-          prisonerId: 'AF34567G',
+          prisonerId: 'A1234BC',
           prisonId: 'HEI',
           reason: 'PRISONER_CANCELLED: illness',
           username: 'user1',
@@ -738,7 +668,7 @@ describe('POST /visit/:reference/cancel', () => {
         })
         expect(notificationsService.sendCancellationSms).toHaveBeenCalledTimes(1)
         expect(notificationsService.sendCancellationSms).toHaveBeenCalledWith({
-          phoneNumber: cancelledVisit.visitContact.telephone,
+          phoneNumber: '01234567890',
           visitSlot: cancelledVisit.startTimestamp,
           prisonName: 'Hewell (HMP)',
           prisonPhoneNumber: '0300 060 6503',
@@ -762,7 +692,7 @@ describe('POST /visit/:reference/cancel', () => {
         expect(auditService.cancelledVisit).toHaveBeenCalledTimes(1)
         expect(notificationsService.sendCancellationSms).toHaveBeenCalledTimes(1)
         expect(notificationsService.sendCancellationSms).toHaveBeenCalledWith({
-          phoneNumber: cancelledVisit.visitContact.telephone,
+          phoneNumber: '01234567890',
           visitSlot: cancelledVisit.startTimestamp,
           prisonName: 'Bristol (HMP & YOI)',
           prisonPhoneNumber: '0300 060 6510',

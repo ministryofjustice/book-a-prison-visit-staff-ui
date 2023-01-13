@@ -1,5 +1,5 @@
 import { Prison } from '../../@types/bapv'
-import { SupportType } from '../visitSchedulerApiTypes'
+import { SupportType, Visit } from '../visitSchedulerApiTypes'
 import { InmateDetail, CaseLoad, PrisonerBookingSummary } from '../prisonApiTypes'
 import { CurrentIncentive, Prisoner } from '../prisonerOffenderSearchTypes'
 
@@ -145,3 +145,67 @@ export const createSupportTypes = ({
     },
   ] as SupportType[],
 } = {}): SupportType[] => supportTypes
+
+export const createVisit = ({
+  applicationReference = 'aaa-bbb-ccc',
+  reference = 'ab-cd-ef-gh',
+  prisonerId = 'A1234BC',
+  prisonId = 'HEI',
+  visitRoom = 'A1 L3',
+  visitType = 'SOCIAL',
+  visitStatus = 'BOOKED',
+  visitRestriction = 'OPEN',
+  startTimestamp = '2022-01-14T10:00:00',
+  endTimestamp = '2022-01-14T11:00:00',
+  visitNotes = [
+    {
+      type: 'VISIT_COMMENT',
+      text: 'Example of a visit comment',
+    },
+    {
+      type: 'VISITOR_CONCERN',
+      text: 'Example of a visitor concern',
+    },
+  ],
+  visitContact = {
+    name: 'Jeanette Smith',
+    telephone: '01234 567890',
+  },
+  visitors = [
+    {
+      nomisPersonId: 4321,
+    },
+    {
+      nomisPersonId: 4324,
+    },
+  ],
+  visitorSupport = [
+    {
+      type: 'WHEELCHAIR',
+    },
+    {
+      type: 'OTHER',
+      text: 'custom request',
+    },
+  ],
+  createdTimestamp,
+  modifiedTimestamp,
+}: Partial<Visit> = {}): Visit =>
+  ({
+    applicationReference,
+    reference,
+    prisonerId,
+    prisonId,
+    visitRoom,
+    visitType,
+    visitStatus,
+    visitRestriction,
+    startTimestamp,
+    endTimestamp,
+    visitNotes,
+    visitContact,
+    visitors,
+    visitorSupport,
+    createdTimestamp,
+    modifiedTimestamp,
+  } as Visit)
