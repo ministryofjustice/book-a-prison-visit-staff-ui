@@ -16,13 +16,7 @@
       {% endfor %}
 
       {% if showHomeButton %}
-        {{ govukButton({
-          classes: "govuk-!-margin-top-5",
-          text: "Go to manage prison visits",
-          href: '/',
-          attributes: { "data-test": "go-to-home" },
-          preventDoubleClick: true
-        }) }}
+        {% include "partials/backToStartButton.njk" %}
       {% endif %}
 
       {% if stack %}
