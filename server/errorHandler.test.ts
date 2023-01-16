@@ -20,10 +20,12 @@ describe('GET 404', () => {
       .expect(404)
       .expect('Content-Type', /html/)
       .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect(res.text).toContain('Page not found')
+        expect(res.text).toContain('If you typed the web address, check it is correct.')
+        expect(res.text).toContain('If you pasted the web address, check you copied the entire address.')
+        expect($('[data-test="go-to-home"]').attr('href')).toBe('/')
         expect(res.text).toContain('NotFoundError: Not found')
-        expect(res.text).not.toContain(
-          'The page you were looking for could not be found. Please check the address and try again.',
-        )
       })
   })
 
@@ -39,8 +41,8 @@ describe('GET 404', () => {
         expect(res.text).toContain('Page not found')
         expect(res.text).toContain('If you typed the web address, check it is correct.')
         expect(res.text).toContain('If you pasted the web address, check you copied the entire address.')
-        expect(res.text).not.toContain('NotFoundError: Not found')
         expect($('[data-test="go-to-home"]').attr('href')).toBe('/')
+        expect(res.text).not.toContain('NotFoundError: Not found')
       })
   })
 })

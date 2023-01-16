@@ -11,7 +11,7 @@ export default function createErrorHandler(production: boolean) {
       return res.redirect('/sign-out')
     }
 
-    const prodHeading = error.status === 404 ? 'Page not found' : 'Error'
+    const heading = error.status === 404 ? 'Page not found' : 'Error'
     const prodMessage =
       error.status === 404
         ? [
@@ -19,11 +19,13 @@ export default function createErrorHandler(production: boolean) {
             'If you pasted the web address, check you copied the entire address.',
           ]
         : ['Something went wrong. The error has been logged. Please try again']
+    const showHomeButton = error.status === 404
 
-    res.locals.heading = production ? prodHeading : null
-    res.locals.message = production ? prodMessage : error.message
-    res.locals.status = error.status
+    res.locals.heading = heading
+    res.locals.message = prodMessage
+    res.locals.showHomeButton = showHomeButton
     res.locals.stack = production ? null : error.stack
+    res.locals.errorMessage = production ? null : error.message
 
     res.status(error.status || 500)
 

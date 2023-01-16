@@ -10,26 +10,25 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-      {% if stack %}
+      <h1 class="govuk-heading-l">{{ heading }}</h1>
+      {% for item in message %}
+        <p>{{ item }}</p>
+      {% endfor %}
 
-        <h2 class="govuk-heading-m">{{ status }}</h2>
-        <pre>{{ stack }}</pre>
-        
-      {% else %}
-
-        <h1 class="govuk-heading-l">{{ heading }}</h1>
-        {% for item in message %}
-          <p>{{ item }}</p>
-        {% endfor %}
-
-         {{ govukButton({
+      {% if showHomeButton %}
+        {{ govukButton({
           classes: "govuk-!-margin-top-5",
           text: "Go to manage prison visits",
           href: '/',
           attributes: { "data-test": "go-to-home" },
           preventDoubleClick: true
         }) }}
+      {% endif %}
 
+      {% if stack %}
+        <h2 class="govuk-heading-m">{{ status }}</h2>
+        <p>{{ errorMessage }}
+        <pre>{{ stack }}</pre>
       {% endif %}
     </div>
 </div>
