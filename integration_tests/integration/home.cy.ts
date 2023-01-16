@@ -6,8 +6,8 @@ context('Home page', () => {
     cy.task('reset')
     cy.task('stubSignIn')
     cy.task('stubAuthUser')
-    cy.task('stubGetSupportedPrisonIds')
-    cy.task('stubGetPrisons')
+    cy.task('stubSupportedPrisonIds')
+    cy.task('stubPrisons')
     cy.signIn()
   })
 

@@ -8,8 +8,8 @@ context('SignIn', () => {
     cy.task('reset')
     cy.task('stubSignIn')
     cy.task('stubAuthUser')
-    cy.task('stubGetSupportedPrisonIds')
-    cy.task('stubGetPrisons')
+    cy.task('stubSupportedPrisonIds')
+    cy.task('stubPrisons')
   })
 
   it('Unauthenticated user directed to auth', () => {

@@ -165,6 +165,7 @@
             <input type="hidden" name="_csrf" value="{{ csrfToken }}">
             {{ govukButton({
                 text: "Submit booking",
+                attributes: { "data-test": "submit" },
                 preventDoubleClick: true
             }) }}
         </form>

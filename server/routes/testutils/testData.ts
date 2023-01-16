@@ -1,15 +1,45 @@
 import { Prison } from '../../@types/bapv'
-import { SessionCapacity, SupportType, Visit } from '../../data/visitSchedulerApiTypes'
-import { InmateDetail, CaseLoad, PrisonerBookingSummary } from '../../data/prisonApiTypes'
+import { SessionCapacity, SupportType, Visit, VisitSession } from '../../data/visitSchedulerApiTypes'
+import {
+  InmateDetail,
+  CaseLoad,
+  PrisonerBookingSummary,
+  VisitBalances,
+  OffenderRestriction,
+} from '../../data/prisonApiTypes'
 import { CurrentIncentive, Prisoner } from '../../data/prisonerOffenderSearchTypes'
+import { Address, Contact } from '../../data/prisonerContactRegistryApiTypes'
+import { ScheduledEvent } from '../../data/whereaboutsApiTypes'
 
 export default class TestData {
-  static currentIncentive = ({
-    level = {
-      code: 'STD',
-      description: 'Standard',
-    },
-  }: Partial<CurrentIncentive> = {}): CurrentIncentive => ({ level } as CurrentIncentive)
+  static address = ({
+    flat = '23B',
+    premise = 'Premises',
+    street = '123 The Street',
+    locality = 'Springfield',
+    town = 'Coventry',
+    postalCode = 'C1 2AB',
+    county = 'West Midlands',
+    country = 'England',
+    primary = true,
+    noFixedAddress = false,
+    phones = [],
+    addressUsages = [],
+  }: Partial<Address> = {}): Address =>
+    ({
+      flat,
+      premise,
+      street,
+      locality,
+      town,
+      postalCode,
+      county,
+      country,
+      primary,
+      noFixedAddress,
+      phones,
+      addressUsages,
+    } as Address)
 
   static caseLoads = ({
     caseLoads = [
@@ -29,6 +59,42 @@ export default class TestData {
       },
     ] as CaseLoad[],
   } = {}): CaseLoad[] => caseLoads
+
+  static contact = ({
+    personId = 4321,
+    firstName = 'Jeanette',
+    lastName = 'Smith',
+    dateOfBirth = '1986-07-28',
+    relationshipCode = 'WIFE',
+    relationshipDescription = 'Wife',
+    contactType = 'S',
+    approvedVisitor = true,
+    emergencyContact = false,
+    nextOfKin = false,
+    restrictions = [],
+    addresses = [this.address()],
+  }: Partial<Contact> = {}): Contact =>
+    ({
+      personId,
+      firstName,
+      lastName,
+      dateOfBirth,
+      relationshipCode,
+      relationshipDescription,
+      contactType,
+      approvedVisitor,
+      emergencyContact,
+      nextOfKin,
+      restrictions,
+      addresses,
+    } as Contact)
+
+  static currentIncentive = ({
+    level = {
+      code: 'STD',
+      description: 'Standard',
+    },
+  }: Partial<CurrentIncentive> = {}): CurrentIncentive => ({ level } as CurrentIncentive)
 
   static inmateDetail = ({
     offenderNo = 'A1234BC',
@@ -57,6 +123,24 @@ export default class TestData {
       category,
       legalStatus,
     } as InmateDetail)
+
+  static offenderRestriction = ({
+    restrictionId = 0,
+    comment = 'Details about this restriction',
+    restrictionType = 'RESTRICTED',
+    restrictionTypeDescription = 'Restricted',
+    startDate = '2022-03-15',
+    expiryDate = '',
+    active = true,
+  }: Partial<OffenderRestriction> = {}): OffenderRestriction => ({
+    restrictionId,
+    comment,
+    restrictionType,
+    restrictionTypeDescription,
+    startDate,
+    expiryDate,
+    active,
+  })
 
   static prisoner = ({
     prisonerNumber = 'A1234BC',
@@ -113,6 +197,18 @@ export default class TestData {
     ] as Prison[],
   } = {}): Prison[] => prisons
 
+  static scheduledEvent = ({
+    bookingId = 12345,
+    startTime = '2022-02-14T10:00:00',
+    endTime = '2022-02-14T11:00:00',
+    eventSourceDesc = 'Educational activity',
+  }: Partial<ScheduledEvent> = {}): ScheduledEvent => ({
+    bookingId,
+    startTime,
+    endTime,
+    eventSourceDesc,
+  })
+
   static sessionCapacity = ({ open = 30, closed = 3 }: Partial<SessionCapacity> = {}): SessionCapacity =>
     ({ open, closed } as SessionCapacity)
 
@@ -155,7 +251,7 @@ export default class TestData {
     reference = 'ab-cd-ef-gh',
     prisonerId = 'A1234BC',
     prisonId = 'HEI',
-    visitRoom = 'A1 L3',
+    visitRoom = 'Visit room 1',
     visitType = 'SOCIAL',
     visitStatus = 'BOOKED',
     visitRestriction = 'OPEN',
@@ -180,7 +276,7 @@ export default class TestData {
         nomisPersonId: 4321,
       },
       {
-        nomisPersonId: 4324,
+        nomisPersonId: 4322,
       },
     ],
     visitorSupport = [
@@ -213,4 +309,42 @@ export default class TestData {
       createdTimestamp,
       modifiedTimestamp,
     } as Visit)
+
+  static visitBalances = ({
+    remainingVo = 2,
+    remainingPvo = 1,
+    latestIepAdjustDate = '2022-04-25T09:35:34.489Z',
+    latestPrivIepAdjustDate = '2022-04-25T09:35:34.489Z',
+  }: Partial<VisitBalances> = {}): VisitBalances => ({
+    remainingVo,
+    remainingPvo,
+    latestIepAdjustDate,
+    latestPrivIepAdjustDate,
+  })
+
+  static visitSession = ({
+    sessionTemplateId = 1,
+    visitRoomName = 'Visit room 1',
+    visitType = 'SOCIAL',
+    prisonId = 'HEI',
+    openVisitCapacity = 20,
+    openVisitBookedCount = 2,
+    closedVisitCapacity = 2,
+    closedVisitBookedCount = 1,
+    startTimestamp = '2022-01-14T10:00:00',
+    endTimestamp = '2022-01-14T11:00:00',
+    sessionConflicts = undefined,
+  }: Partial<VisitSession> = {}): VisitSession => ({
+    sessionTemplateId,
+    visitRoomName,
+    visitType,
+    prisonId,
+    openVisitCapacity,
+    openVisitBookedCount,
+    closedVisitCapacity,
+    closedVisitBookedCount,
+    startTimestamp,
+    endTimestamp,
+    sessionConflicts,
+  })
 }
