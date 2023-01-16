@@ -9,11 +9,18 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-      <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
-      <h2 class="govuk-heading-m">{{ status }}</h2>
-      <p>{{ message }}</p>
       {% if stack %}
-      <pre>{{ stack }}</pre>
+
+        <h2 class="govuk-heading-m">{{ status }}</h2>
+        <pre>{{ stack }}</pre>
+        
+      {% else %}
+
+        <h1 class="govuk-heading-l">{{ heading }}</h1>
+        {% for item in message %}
+          <p>{{ item }}</p>
+        {% endfor %}
+
       {% endif %}
     </div>
 </div>
