@@ -11,8 +11,6 @@ export default function createErrorHandler(production: boolean) {
       return res.redirect('/sign-out')
     }
 
-    // production = true
-
     const prodHeading = error.status === 404 ? 'Page not found!' : 'Error'
     const prodMessage =
       error.status === 404
