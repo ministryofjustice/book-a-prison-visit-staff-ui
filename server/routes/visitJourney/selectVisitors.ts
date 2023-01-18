@@ -107,6 +107,10 @@ export default class SelectVisitors {
         throw new Error('No visitors selected')
       }
 
+      if (selected.length > 10) {
+        throw new Error('Select no more than 10 visitors')
+      }
+
       const selectedAndBanned = req.session.visitorList.visitors.filter((visitor: VisitorListItem) => {
         return selected.includes(visitor.personId.toString()) && visitor.banned
       })
