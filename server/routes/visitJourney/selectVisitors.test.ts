@@ -864,5 +864,21 @@ testJourneys.forEach(journey => {
           expect(flashProvider).toHaveBeenCalledWith('formValues', { visitors: '4324' })
         })
     })
+
+    it('should set validation errors in flash and redirect if more than 10 visitors are selected', () => {
+      const tooManyVisitorIds = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11']
+
+      return request(sessionApp)
+        .post(`${journey.urlPrefix}/select-visitors`)
+        .send(`visitors=${tooManyVisitorIds.join('&visitors=')}`)
+        .expect(302)
+        .expect('location', `${journey.urlPrefix}/select-visitors`)
+        .expect(() => {
+          expect(flashProvider).toHaveBeenCalledWith('errors', [
+            { location: 'body', msg: 'Select no more than 10 visitors', param: 'visitors', value: tooManyVisitorIds },
+          ])
+          expect(flashProvider).toHaveBeenCalledWith('formValues', { visitors: tooManyVisitorIds })
+        })
+    })
   })
 })
