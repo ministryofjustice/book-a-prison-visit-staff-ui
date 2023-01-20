@@ -144,7 +144,10 @@ describe('Views - Date and time of visit', () => {
       slotsPresent: true,
     }
     const $ = cheerio.load(compiledTemplate.render(viewContext))
-
+    expect($('.govuk-details__text').text()).toContain('Showing time slots:')
+    expect($('.govuk-details__text').text()).toContain('suitable for the prisoner’s location and incentive level')
+    expect($('.govuk-details__text').text()).toContain('that do not have non-associations for the prisoner')
+    expect($('.govuk-details__text').text()).toContain('over the next 28 days')
     expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
     expect($('[data-test="visit-restriction"]').text()).toBe('Open')
     expect($('[data-test="closed-visit-reason"]').length).toBe(0)
