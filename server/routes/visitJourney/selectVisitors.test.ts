@@ -425,44 +425,62 @@ testJourneys.forEach(journey => {
     })
 
     describe(`Display prison specific content for each prison`, () => {
-      const prisons = [
-        {
-          prisonId: 'HEI',
-          prisonName: 'Hewell (HMP)',
-          visitorInformation1: 'Add up to 3 people aged 10 and over, and 4 children under 10 years old.',
-          visitorInformation2: 'At least one visitor must be 18 or older.',
-        },
-        {
-          prisonId: 'BLI',
-          prisonName: 'Bristol (HMP)',
-          visitorInformation1: 'Add up to 3 adults (aged 18 or older). Children can also be added to the visit.',
-          visitorInformation2:
-            'Contact HMP Bristol when the total number of visitors (adults and children) is more than 3.',
-        },
-      ]
-      prisons.forEach(prison => {
-        it(`should display prison specific content, related to ${prison.prisonName}`, () => {
-          sessionApp = appWithAllRoutes({
-            prisonerProfileServiceOverride: prisonerProfileService,
-            prisonerVisitorsServiceOverride: prisonerVisitorsService,
-            systemTokenOverride: systemToken,
-            sessionData: {
-              selectedEstablishment: { prisonId: prison.prisonId, prisonName: prison.prisonName },
-              visitorList,
-              visitSessionData,
-            } as SessionData,
+      it('should display prison specific content for Hewell', () => {
+        return request(sessionApp)
+          .get(`${journey.urlPrefix}/select-visitors`)
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('[data-test="visitor-information-1"]').text()).toContain('Add up to 3 people')
+            expect($('[data-test="visitor-information-2"]').text()).toContain('must be 18 or older')
           })
+      })
 
-          return request(sessionApp)
-            .get(`${journey.urlPrefix}/select-visitors`)
-            .expect(200)
-            .expect('Content-Type', /html/)
-            .expect(res => {
-              const $ = cheerio.load(res.text)
-              expect($('[data-test="visitor-information-1"]').text()).toBe(prison.visitorInformation1)
-              expect($('[data-test="visitor-information-2"]').text()).toBe(prison.visitorInformation2)
-            })
+      it('should display prison specific content for Bristol', () => {
+        sessionApp = appWithAllRoutes({
+          prisonerProfileServiceOverride: prisonerProfileService,
+          prisonerVisitorsServiceOverride: prisonerVisitorsService,
+          systemTokenOverride: systemToken,
+          sessionData: {
+            selectedEstablishment: { prisonId: 'BLI', prisonName: '' },
+            visitorList,
+            visitSessionData,
+          } as SessionData,
         })
+
+        return request(sessionApp)
+          .get(`${journey.urlPrefix}/select-visitors`)
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('[data-test="visitor-information-1"]').text()).toContain('Add up to 3 adults')
+            expect($('[data-test="visitor-information-2"]').text()).toContain('Contact HMP Bristol')
+          })
+      })
+
+      it('should display no prison specific content for a prison that is not configured', () => {
+        sessionApp = appWithAllRoutes({
+          prisonerProfileServiceOverride: prisonerProfileService,
+          prisonerVisitorsServiceOverride: prisonerVisitorsService,
+          systemTokenOverride: systemToken,
+          sessionData: {
+            selectedEstablishment: { prisonId: 'XYZ', prisonName: '' },
+            visitorList,
+            visitSessionData,
+          } as SessionData,
+        })
+
+        return request(sessionApp)
+          .get(`${journey.urlPrefix}/select-visitors`)
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('[data-test="visitor-information-1"]').length).toBe(0)
+            expect($('[data-test="visitor-information-2"]').length).toBe(0)
+          })
       })
     })
   })
