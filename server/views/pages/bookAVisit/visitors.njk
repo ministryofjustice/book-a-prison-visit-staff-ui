@@ -120,13 +120,9 @@
       </p>
       {% endif %}
 
-      {% if selectedEstablishment.prisonId === 'HEI' %}
-        <p data-test="visitor-information-1">Add up to 3 people aged 10 and over, and 4 children under 10 years old.</p>
-        <p data-test="visitor-information-2">At least one visitor must be 18 or older.</p>
-      {% elseif selectedEstablishment.prisonId === 'BLI' %}
-        <p data-test="visitor-information-1">Add up to 3 adults (aged 18 or older). Children can also be added to the visit.</p>
-        <p data-test="visitor-information-2">Contact HMP Bristol when the total number of visitors (adults and children) is more than 3.</p>
-      {% endif %}
+      {% for textItem in selectVisitorsText %}
+        <p data-test="visitor-information-{{ loop.index }}">{{ textItem }}</p>
+      {% endfor %}
 
       <form action="{{ urlPrefix }}/select-visitors" method="POST" novalidate>
         <input type="hidden" name="_csrf" value="{{ csrfToken }}">

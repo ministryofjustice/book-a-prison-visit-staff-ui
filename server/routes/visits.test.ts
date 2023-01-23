@@ -248,7 +248,6 @@ describe('GET /visits', () => {
       })
   })
 
-  // VB-1497 - checking temporary workaround for capacity counts
   it('should show the correct capacity for Bristol', () => {
     prisonerSearchService.getPrisonersByPrisonerNumbers.mockResolvedValue(prisoners)
     visitSessionsService.getVisitsByDate.mockResolvedValue(visits)
@@ -289,8 +288,7 @@ describe('GET /visits', () => {
       })
   })
 
-  // VB-1497 - checking temporary workaround for capacity counts
-  it('should show default capacity if not Hewell or Bristol', () => {
+  it('should not show capacity if not a configured prison (i.e. Hewell or Bristol)', () => {
     prisonerSearchService.getPrisonersByPrisonerNumbers.mockResolvedValue(prisoners)
     visitSessionsService.getVisitsByDate.mockResolvedValue(visits)
 
@@ -309,7 +307,7 @@ describe('GET /visits', () => {
       .expect(res => {
         const $ = cheerio.load(res.text)
         expect($('h1').text()).toBe('View visits by date')
-        expect($('[data-test="visit-tables-booked"]').text()).toBe('1 of 0')
+        expect($('[data-test="visit-tables-booked"]').text()).toBe('1')
       })
   })
 
@@ -359,7 +357,7 @@ describe('GET /visits', () => {
         expect($('.govuk-back-link').attr('href')).toBe('/')
         expect($('[data-test="visit-room"]').text()).toBe('Visit type unknown')
         expect($('[data-test="visit-time"]').text()).toBe('10am to 11am')
-        expect($('[data-test="visit-tables-booked"]').text()).toBe('1 of 30')
+        expect($('[data-test="visit-tables-booked"]').text()).toBe('1')
         expect($('[data-test="visit-visitors-total"]').text()).toBe('2')
         expect($('[data-test="visit-adults"]').text()).toBe('1')
         expect($('[data-test="visit-children"]').text()).toBe('1')
