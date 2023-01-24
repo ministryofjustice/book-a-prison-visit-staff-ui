@@ -103,14 +103,19 @@ export default class VisitSessionsService {
         if (isBefore(parsedStartTimestamp, earliestStartTime)) {
           earliestStartTime = parsedStartTimestamp
         }
-
-        // Add new Slot to morning / afternoon grouping
-        if (parsedStartTimestamp.getHours() < this.morningCutoff) {
-          slotsForDay.slots.morning.push(newSlot)
-        } else {
-          slotsForDay.slots.afternoon.push(newSlot)
+        // Wrapping the slot push in a capacity check ensures that
+        // there is capacity for the slot (with the current restriction)
+        if (
+          (visitRestriction === 'OPEN' && visitSession.openVisitCapacity > 1) ||
+          (visitRestriction === 'CLOSED' && visitSession.closedVisitCapacity > 1)
+        ) {
+          // Add new Slot to morning / afternoon grouping
+          if (parsedStartTimestamp.getHours() < this.morningCutoff) {
+            slotsForDay.slots.morning.push(newSlot)
+          } else {
+            slotsForDay.slots.afternoon.push(newSlot)
+          }
         }
-
         return slotList
       },
       {},
