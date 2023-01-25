@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import { Session, SessionData } from 'express-session'
 import { Prison, VisitSlot, VisitSlotList } from '../@types/bapv'
-import { clearSession, getFlashFormValues, getSelectedSlot, getSlotByStartTimeAndRestriction } from './visitorUtils'
+import { clearSession, getFlashFormValues, getSelectedSlot, getSlotByTimeAndRestriction } from './visitorUtils'
 
 const prisonId = 'HEI'
 
@@ -119,27 +119,24 @@ describe('getSelectedSlot', () => {
   })
 })
 
-describe('getSlotByStartTimeAndRestriction', () => {
+describe('getSlotByTimeAndRestriction', () => {
   it('should return a slot given matching start/end timestamp and visit restriction', () => {
-    expect(
-      getSlotByStartTimeAndRestriction(slotsList, '2022-02-14T12:00:00', '2022-02-14T13:05:00', 'OPEN'),
-    ).toHaveProperty('id', '3')
+    expect(getSlotByTimeAndRestriction(slotsList, '2022-02-14T12:00:00', '2022-02-14T13:05:00', 'OPEN')).toHaveProperty(
+      'id',
+      '3',
+    )
   })
 
   it('should return undefined if correct start but incorrect end start time', () => {
-    expect(getSlotByStartTimeAndRestriction(slotsList, '2022-02-14T12:00:00', '2022-02-14T13:00:00', 'OPEN')).toBe(
-      undefined,
-    )
+    expect(getSlotByTimeAndRestriction(slotsList, '2022-02-14T12:00:00', '2022-02-14T13:00:00', 'OPEN')).toBe(undefined)
   })
 
   it('should return undefined if incorrect start but correct end start time', () => {
-    expect(getSlotByStartTimeAndRestriction(slotsList, '2022-02-14T12:05:00', '2022-02-14T13:05:00', 'OPEN')).toBe(
-      undefined,
-    )
+    expect(getSlotByTimeAndRestriction(slotsList, '2022-02-14T12:05:00', '2022-02-14T13:05:00', 'OPEN')).toBe(undefined)
   })
 
   it('should return undefined if correct start/end but wrong restriction', () => {
-    expect(getSlotByStartTimeAndRestriction(slotsList, '2022-02-14T12:00:00', '2022-02-14T13:05:00', 'CLOSED')).toBe(
+    expect(getSlotByTimeAndRestriction(slotsList, '2022-02-14T12:00:00', '2022-02-14T13:05:00', 'CLOSED')).toBe(
       undefined,
     )
   })

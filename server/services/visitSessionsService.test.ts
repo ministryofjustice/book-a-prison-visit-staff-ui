@@ -485,6 +485,140 @@ describe('Visit sessions service', () => {
         ],
       })
     })
+
+    it('Should display single slot - ignoring slots with no capacity on current visit restriction (open)', async () => {
+      const sessions: VisitSession[] = [
+        {
+          sessionTemplateId: 10,
+          visitRoomName: 'A1',
+          visitType: 'SOCIAL',
+          prisonId: 'HEI',
+          openVisitCapacity: 15,
+          openVisitBookedCount: 0,
+          closedVisitCapacity: 10,
+          closedVisitBookedCount: 0,
+          startTimestamp: '2022-02-14T09:00:00',
+          endTimestamp: '2022-02-14T10:00:00',
+        },
+        {
+          sessionTemplateId: 11,
+          visitRoomName: 'A1',
+          visitType: 'SOCIAL',
+          prisonId: 'HEI',
+          openVisitCapacity: 0,
+          openVisitBookedCount: 0,
+          closedVisitCapacity: 10,
+          closedVisitBookedCount: 0,
+          startTimestamp: '2022-02-14T10:30:00',
+          endTimestamp: '2022-02-14T11:30:00',
+        },
+      ]
+
+      visitSchedulerApiClient.getVisitSessions.mockResolvedValue(sessions)
+      whereaboutsApiClient.getEvents.mockResolvedValue([])
+      const results = await visitSessionsService.getVisitSessions({
+        username: 'user',
+        offenderNo: 'A1234BC',
+        prisonId,
+        visitRestriction: 'OPEN',
+      })
+
+      expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
+      expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId)
+      expect(results).toEqual(<VisitSlotList>{
+        'February 2022': [
+          {
+            date: 'Monday 14 February',
+            prisonerEvents: {
+              morning: [],
+              afternoon: [],
+            },
+            slots: {
+              morning: [
+                {
+                  id: '1',
+                  prisonId,
+                  startTimestamp: '2022-02-14T09:00:00',
+                  endTimestamp: '2022-02-14T10:00:00',
+                  availableTables: 15,
+                  capacity: 15,
+                  visitRoomName: 'A1',
+                  visitRestriction: 'OPEN',
+                },
+              ],
+              afternoon: [],
+            },
+          },
+        ],
+      })
+    })
+
+    it('Should display single slot - ignoring slots with no capacity on current visit restriction (closed)', async () => {
+      const sessions: VisitSession[] = [
+        {
+          sessionTemplateId: 10,
+          visitRoomName: 'A1',
+          visitType: 'SOCIAL',
+          prisonId: 'HEI',
+          openVisitCapacity: 15,
+          openVisitBookedCount: 0,
+          closedVisitCapacity: 10,
+          closedVisitBookedCount: 0,
+          startTimestamp: '2022-02-14T09:00:00',
+          endTimestamp: '2022-02-14T10:00:00',
+        },
+        {
+          sessionTemplateId: 11,
+          visitRoomName: 'A1',
+          visitType: 'SOCIAL',
+          prisonId: 'HEI',
+          openVisitCapacity: 10,
+          openVisitBookedCount: 0,
+          closedVisitCapacity: 0,
+          closedVisitBookedCount: 0,
+          startTimestamp: '2022-02-14T10:30:00',
+          endTimestamp: '2022-02-14T11:30:00',
+        },
+      ]
+
+      visitSchedulerApiClient.getVisitSessions.mockResolvedValue(sessions)
+      whereaboutsApiClient.getEvents.mockResolvedValue([])
+      const results = await visitSessionsService.getVisitSessions({
+        username: 'user',
+        offenderNo: 'A1234BC',
+        prisonId,
+        visitRestriction: 'CLOSED',
+      })
+
+      expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
+      expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId)
+      expect(results).toEqual(<VisitSlotList>{
+        'February 2022': [
+          {
+            date: 'Monday 14 February',
+            prisonerEvents: {
+              morning: [],
+              afternoon: [],
+            },
+            slots: {
+              morning: [
+                {
+                  id: '1',
+                  prisonId,
+                  startTimestamp: '2022-02-14T09:00:00',
+                  endTimestamp: '2022-02-14T10:00:00',
+                  availableTables: 10,
+                  capacity: 10,
+                  visitRoomName: 'A1',
+                  visitRestriction: 'CLOSED',
+                },
+              ],
+              afternoon: [],
+            },
+          },
+        ],
+      })
+    })
   })
 
   describe('reserveVisitSlot', () => {

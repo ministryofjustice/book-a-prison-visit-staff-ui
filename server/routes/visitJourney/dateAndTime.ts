@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { VisitSlot } from '../../@types/bapv'
 import AuditService from '../../services/auditService'
 import VisitSessionsService from '../../services/visitSessionsService'
-import { getFlashFormValues, getSelectedSlot, getSlotByStartTimeAndRestriction } from '../visitorUtils'
+import { getFlashFormValues, getSelectedSlot, getSlotByTimeAndRestriction } from '../visitorUtils'
 import getUrlPrefix from './visitJourneyUtils'
 
 export default class DateAndTime {
@@ -30,7 +30,7 @@ export default class DateAndTime {
 
     // first time here on update journey, visitSlot.id will be ''
     if (isUpdate && visitSessionData.visitSlot?.id === '') {
-      matchingSlot = getSlotByStartTimeAndRestriction(
+      matchingSlot = getSlotByTimeAndRestriction(
         slotsList,
         visitSessionData.visitSlot.startTimestamp,
         visitSessionData.visitSlot.endTimestamp,
@@ -64,7 +64,7 @@ export default class DateAndTime {
     if (isUpdate && visitSessionData.originalVisitSlot) {
       // matching on original time but session's current visit restriction to ensure
       // originally selected time slot is available for re-selection even if restriction changes
-      originalVisitSlot = getSlotByStartTimeAndRestriction(
+      originalVisitSlot = getSlotByTimeAndRestriction(
         slotsList,
         visitSessionData.originalVisitSlot.startTimestamp,
         visitSessionData.originalVisitSlot.endTimestamp,
