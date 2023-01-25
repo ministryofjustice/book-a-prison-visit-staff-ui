@@ -33,6 +33,7 @@ export default class DateAndTime {
       matchingSlot = getSlotByStartTimeAndRestriction(
         slotsList,
         visitSessionData.visitSlot.startTimestamp,
+        visitSessionData.visitSlot.endTimestamp,
         visitSessionData.visitRestriction,
       )
 
@@ -66,6 +67,7 @@ export default class DateAndTime {
       originalVisitSlot = getSlotByStartTimeAndRestriction(
         slotsList,
         visitSessionData.originalVisitSlot.startTimestamp,
+        visitSessionData.originalVisitSlot.endTimestamp,
         visitSessionData.visitRestriction,
       )
     }

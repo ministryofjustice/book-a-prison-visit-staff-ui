@@ -120,12 +120,28 @@ describe('getSelectedSlot', () => {
 })
 
 describe('getSlotByStartTimeAndRestriction', () => {
-  it('should return a slot given matching start timestamp and visit restriction', () => {
-    expect(getSlotByStartTimeAndRestriction(slotsList, '2022-02-14T12:00:00', 'OPEN')).toHaveProperty('id', '3')
+  it('should return a slot given matching start/end timestamp and visit restriction', () => {
+    expect(
+      getSlotByStartTimeAndRestriction(slotsList, '2022-02-14T12:00:00', '2022-02-14T13:05:00', 'OPEN'),
+    ).toHaveProperty('id', '3')
   })
 
-  it('should return undefined if no slot matches given start timestamp and visit restriction', () => {
-    expect(getSlotByStartTimeAndRestriction(slotsList, '2022-01-01T00:00:00', 'OPEN')).toBe(undefined)
+  it('should return undefined if correct start but incorrect end start time', () => {
+    expect(getSlotByStartTimeAndRestriction(slotsList, '2022-02-14T12:00:00', '2022-02-14T13:00:00', 'OPEN')).toBe(
+      undefined,
+    )
+  })
+
+  it('should return undefined if incorrect start but correct end start time', () => {
+    expect(getSlotByStartTimeAndRestriction(slotsList, '2022-02-14T12:05:00', '2022-02-14T13:05:00', 'OPEN')).toBe(
+      undefined,
+    )
+  })
+
+  it('should return undefined if correct start/end but wrong restriction', () => {
+    expect(getSlotByStartTimeAndRestriction(slotsList, '2022-02-14T12:00:00', '2022-02-14T13:05:00', 'CLOSED')).toBe(
+      undefined,
+    )
   })
 })
 
