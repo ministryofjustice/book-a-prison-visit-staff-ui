@@ -1,5 +1,5 @@
 import { Prison } from '../../@types/bapv'
-import { SupportType, Visit } from '../visitSchedulerApiTypes'
+import { SessionCapacity, SupportType, Visit } from '../visitSchedulerApiTypes'
 import { InmateDetail, CaseLoad, PrisonerBookingSummary } from '../prisonApiTypes'
 import { CurrentIncentive, Prisoner } from '../prisonerOffenderSearchTypes'
 
@@ -209,3 +209,6 @@ export const createVisit = ({
     createdTimestamp,
     modifiedTimestamp,
   } as Visit)
+
+export const createSessionCapacity = ({ open = 30, closed = 3 }: Partial<SessionCapacity> = {}): SessionCapacity =>
+  ({ open, closed } as SessionCapacity)
