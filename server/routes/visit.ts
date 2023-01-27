@@ -1,4 +1,4 @@
-import type { RequestHandler, Request, Router, NextFunction } from 'express'
+import type { RequestHandler, Request, Router, NextFunction, Response } from 'express'
 import { body, validationResult } from 'express-validator'
 import { BadRequest } from 'http-errors'
 import visitCancellationReasons from '../constants/visitCancellationReasons'
@@ -26,6 +26,7 @@ import Confirmation from './visitJourney/confirmation'
 import MainContact from './visitJourney/mainContact'
 import sessionCheckMiddleware from '../middleware/sessionCheckMiddleware'
 import SupportedPrisonsService from '../services/supportedPrisonsService'
+import getPrisonConfiguration from '../constants/prisonConfiguration'
 
 export default function routes(
   router: Router,
@@ -323,13 +324,7 @@ export default function routes(
           const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(res.locals.user?.username)
           const prisonName = supportedPrisons[visit.prisonId]
 
-          // Current prison phone number configuration, look to move in the future
-          let prisonPhoneNumber = ''
-          if (prisonName === 'Hewell (HMP)') {
-            prisonPhoneNumber = '0300 060 6503'
-          } else if (prisonName === 'Bristol (HMP & YOI)') {
-            prisonPhoneNumber = '0300 060 6510'
-          }
+          const { prisonPhoneNumber } = getPrisonConfiguration(visit.prisonId)
 
           await notificationsService.sendCancellationSms({
             phoneNumber,

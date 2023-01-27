@@ -1,4 +1,5 @@
 {% extends "layout.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% set pageHeaderTitle = "Error" %}
 {% set pageTitle %}
@@ -9,11 +10,19 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-      <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
-      <h2 class="govuk-heading-m">{{ status }}</h2>
-      <p>{{ message }}</p>
+      <h1 class="govuk-heading-l">{{ heading }}</h1>
+      {% for item in message %}
+        <p>{{ item }}</p>
+      {% endfor %}
+
+      {% if showHomeButton %}
+        {% include "partials/backToStartButton.njk" %}
+      {% endif %}
+
       {% if stack %}
-      <pre>{{ stack }}</pre>
+        <h2 class="govuk-heading-m">{{ status }}</h2>
+        <p>{{ errorMessage }}
+        <pre>{{ stack }}</pre>
       {% endif %}
     </div>
 </div>

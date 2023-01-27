@@ -11,9 +11,10 @@ export const getSelectedSlot = (slotsList: VisitSlotList, selectedSlot: string):
     .find(slot => slot.id === selectedSlot)
 }
 
-export const getSlotByStartTimeAndRestriction = (
+export const getSlotByTimeAndRestriction = (
   slotsList: VisitSlotList,
   startTimestamp: string,
+  endTimestamp: string,
   visitRestriction: string,
 ): VisitSlot => {
   return Object.values(slotsList)
@@ -21,7 +22,12 @@ export const getSlotByStartTimeAndRestriction = (
     .reduce((allSlots, slot) => {
       return allSlots.concat(slot.slots.morning, slot.slots.afternoon)
     }, [])
-    .find(slot => slot.startTimestamp === startTimestamp && slot.visitRestriction === visitRestriction)
+    .find(
+      slot =>
+        slot.startTimestamp === startTimestamp &&
+        slot.endTimestamp === endTimestamp &&
+        slot.visitRestriction === visitRestriction,
+    )
 }
 
 export const getFlashFormValues = (req: Request): Record<string, string | string[]> => {

@@ -7,6 +7,7 @@ import VisitSessionsService from '../services/visitSessionsService'
 import AuditService from '../services/auditService'
 import { getResultsPagingLinks } from '../utils/utils'
 import { getDateTabs, getParsedDateFromQueryString, getSlotsSideMenuData } from './visitsUtils'
+import getPrisonConfiguration from '../constants/prisonConfiguration'
 
 export default function routes(
   router: Router,
@@ -55,15 +56,21 @@ export default function routes(
       }
     }
 
-    // VB-1497 - temporary workaround for capacity counts for Hewell / Bristol
-    let maxSlotDefaults = { OPEN: 0, CLOSED: 0, UNKNOWN: 0 }
-    if (prisonId === 'HEI') {
-      maxSlotDefaults = { OPEN: 30, CLOSED: 3, UNKNOWN: 30 }
-    } else if (prisonId === 'BLI') {
-      maxSlotDefaults = { OPEN: 20, CLOSED: 1, UNKNOWN: 20 }
+    let maxSlots: number
+    const prisonConfiguration = getPrisonConfiguration(prisonId)
+    switch (visitType) {
+      case 'OPEN':
+        maxSlots = prisonConfiguration.visitCapacity.open
+        break
+
+      case 'CLOSED':
+        maxSlots = prisonConfiguration.visitCapacity.closed
+        break
+
+      default:
+        maxSlots = null
     }
 
-    const maxSlots = maxSlotDefaults[visitType] ?? 0
     const firstTabDateString = getParsedDateFromQueryString(firstTabDate as string)
 
     const slotFilter = time === '' ? slots.firstSlotTime : time
