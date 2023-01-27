@@ -14,7 +14,7 @@ import {
   VisitsPageSlot,
 } from '../@types/bapv'
 import { ScheduledEvent } from '../data/whereaboutsApiTypes'
-import { createSupportTypes } from '../data/__testutils/testObjects'
+import { createSessionCapacity, createSupportTypes } from '../data/__testutils/testObjects'
 
 jest.mock('../data/prisonerContactRegistryApiClient')
 jest.mock('../data/visitSchedulerApiClient')
@@ -618,6 +618,33 @@ describe('Visit sessions service', () => {
           },
         ],
       })
+    })
+  })
+
+  describe('getVisitSessionCapacity', () => {
+    it('should return the open and closed capacity for the specified visit session', async () => {
+      const sessionCapacity = createSessionCapacity()
+      const sessionDate = '2023-01-31'
+      const sessionStartTime = '10:00'
+      const sessionEndTime = '11:00'
+
+      visitSchedulerApiClient.getVisitSessionCapacity.mockResolvedValue(sessionCapacity)
+
+      const results = await visitSessionsService.getVisitSessionCapacity(
+        'user',
+        prisonId,
+        sessionDate,
+        sessionStartTime,
+        sessionEndTime,
+      )
+
+      expect(visitSchedulerApiClient.getVisitSessionCapacity).toHaveBeenCalledWith(
+        prisonId,
+        sessionDate,
+        sessionStartTime,
+        sessionEndTime,
+      )
+      expect(results).toEqual(sessionCapacity)
     })
   })
 
