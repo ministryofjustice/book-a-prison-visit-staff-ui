@@ -78,6 +78,13 @@ export interface paths {
      */
     get: operations['getVisitSessions']
   }
+  '/visit-sessions/capacity': {
+    /**
+     * Returns the session capacity for the given sessions
+     * @description Returns the session capacity for the given sessions
+     */
+    get: operations['getSessionCapacity']
+  }
   '/visit-session-templates': {
     /**
      * Get session templates
@@ -378,8 +385,8 @@ export interface components {
       messageAttributes?: {
         [key: string]: components['schemas']['MessageAttributeValue'] | undefined
       }
-      md5OfBody?: string
       md5OfMessageAttributes?: string
+      md5OfBody?: string
     }
     MessageAttributeValue: {
       stringValue?: string
@@ -644,6 +651,21 @@ export interface components {
       /** @description Session conflicts */
       sessionConflicts?: ('NON_ASSOCIATION' | 'DOUBLE_BOOKED')[]
     }
+    /** @description Session Capacity */
+    SessionCapacityDto: {
+      /**
+       * Format: int32
+       * @description closed capacity
+       * @example 10
+       */
+      closed: number
+      /**
+       * Format: int32
+       * @description open capacity
+       * @example 50
+       */
+      open: number
+    }
     /**
      * @description The end time of the generated visit session(s)
      * @example 13:45
@@ -721,6 +743,11 @@ export interface components {
        * @example A1
        */
       visitRoom: string
+      /**
+       * @description enhanced privilege
+       * @example true
+       */
+      enhanced: boolean
       /**
        * Format: int32
        * @description closed capacity
@@ -1371,6 +1398,62 @@ export interface operations {
       }
       /** @description Unauthorized to access this endpoint */
       401: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  getSessionCapacity: {
+    /**
+     * Returns the session capacity for the given sessions
+     * @description Returns the session capacity for the given sessions
+     */
+    parameters: {
+      /**
+       * @description Query by NOMIS Prison Identifier
+       * @example CLI
+       */
+      /**
+       * @description Session date
+       * @example 2020-11-01
+       */
+      /**
+       * @description Session start time
+       * @example 13:30:00
+       */
+      /**
+       * @description Session end time
+       * @example 14:30:00
+       */
+      query: {
+        prisonId: string
+        sessionDate: string
+        sessionStartTime: string
+        sessionEndTime: string
+      }
+    }
+    responses: {
+      /** @description the session capacity for the given sessions */
+      200: {
+        content: {
+          'application/json': components['schemas']['SessionCapacityDto']
+        }
+      }
+      /** @description Incorrect request */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Capacity not found */
+      404: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
