@@ -9,7 +9,7 @@ import AuditService from '../services/auditService'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import { ExtendedVisitInformation, PrisonerDetailsItem, VisitsPageSlot } from '../@types/bapv'
 import { getParsedDateFromQueryString } from './visitsUtils'
-import { createSupportedPrisons } from '../data/__testutils/testObjects'
+import { createSessionCapacity } from '../data/__testutils/testObjects'
 
 jest.mock('../services/prisonerSearchService')
 jest.mock('../services/visitSessionsService')
@@ -41,8 +41,6 @@ beforeEach(() => {
   })
 })
 
-const supportedPrisons = createSupportedPrisons()
-
 afterEach(() => {
   jest.resetAllMocks()
 })
@@ -67,6 +65,7 @@ describe('GET /visits', () => {
   }
 
   const todayDate = format(new Date(), 'yyyy-MM-dd')
+  const sessionCapacity = createSessionCapacity()
 
   beforeEach(() => {
     visits = {
@@ -77,6 +76,7 @@ describe('GET /visits', () => {
           prisonerName: '',
           mainContact: 'UNKNOWN',
           startTimestamp: '2022-05-23T09:00:00',
+          endTimestamp: '2022-05-23T09:29:00',
           visitDate: '23 May 2022',
           visitTime: '9am to 9:29am',
           visitStatus: 'BOOKED',
@@ -100,6 +100,7 @@ describe('GET /visits', () => {
           prisonerName: '',
           mainContact: 'Tess Bennett',
           startTimestamp: '2022-05-23T10:00:00',
+          endTimestamp: '2022-05-23T11:00:00',
           visitDate: '23 May 2022',
           visitTime: '10am to 11am',
           visitStatus: 'BOOKED',
@@ -131,6 +132,7 @@ describe('GET /visits', () => {
           prisonerName: '',
           mainContact: 'Tess Bennett',
           startTimestamp: '2022-05-23T10:00:00',
+          endTimestamp: '2022-05-23T11:00:00',
           visitDate: '23 May 2022',
           visitTime: '10am to 11am',
           visitStatus: 'BOOKED',
@@ -214,6 +216,8 @@ describe('GET /visits', () => {
       next: 1,
       previous: 1,
     }
+
+    visitSessionsService.getVisitSessionCapacity.mockResolvedValue(sessionCapacity)
   })
 
   it('should render visit slot summary page with prisoner list, slot details and menu for choosing other slots, with the first slot chosen by default ', () => {
@@ -230,7 +234,7 @@ describe('GET /visits', () => {
         expect($('.govuk-back-link').attr('href')).toBe('/')
         expect($('[data-test="visit-room"]').text()).toBe('Open')
         expect($('[data-test="visit-time"]').text()).toBe('9am to 9:29am')
-        expect($('[data-test="visit-tables-booked"]').text()).toBe('1 of 30')
+        expect($('[data-test="visit-tables-booked"]').text()).toBe(`1 of ${sessionCapacity.open}`)
         expect($('[data-test="visit-visitors-total"]').text()).toBe('1')
         expect($('[data-test="visit-adults"]').text()).toBe('1')
         expect($('[data-test="visit-children"]').text()).toBe('0')
@@ -248,48 +252,9 @@ describe('GET /visits', () => {
       })
   })
 
-  it('should show the correct capacity for Bristol', () => {
+  it('should not show capacity if session capacity not available', () => {
     prisonerSearchService.getPrisonersByPrisonerNumbers.mockResolvedValue(prisoners)
-    visitSessionsService.getVisitsByDate.mockResolvedValue(visits)
-
-    app = appWithAllRoutes({
-      prisonerSearchServiceOverride: prisonerSearchService,
-      visitSessionsServiceOverride: visitSessionsService,
-      auditServiceOverride: auditService,
-      systemTokenOverride: systemToken,
-      sessionData: { selectedEstablishment: { prisonId: 'BLI', prisonName: supportedPrisons.BLI } } as SessionData,
-    })
-
-    return request(app)
-      .get('/visits')
-      .expect(200)
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        const $ = cheerio.load(res.text)
-        expect($('h1').text()).toBe('View visits by date')
-        expect($('.govuk-back-link').attr('href')).toBe('/')
-        expect($('[data-test="visit-room"]').text()).toBe('Open')
-        expect($('[data-test="visit-time"]').text()).toBe('9am to 9:29am')
-        expect($('[data-test="visit-tables-booked"]').text()).toBe('1 of 20')
-        expect($('[data-test="visit-visitors-total"]').text()).toBe('1')
-        expect($('[data-test="visit-adults"]').text()).toBe('1')
-        expect($('[data-test="visit-children"]').text()).toBe('0')
-        expect($('[data-test="prisoner-number"]').text()).toBe('A8709DY')
-        expect($('[data-test="prisoner-name"]').text()).toBe('Rocky, Asap')
-        expect($('.moj-side-navigation__title').text()).toContain('Open visits')
-        expect($('.moj-side-navigation__item--active').text()).toContain('9am to 9:29am')
-        expect(auditService.viewedVisits).toHaveBeenCalledTimes(1)
-        expect(auditService.viewedVisits).toHaveBeenCalledWith({
-          viewDate: todayDate,
-          prisonId: 'BLI',
-          username: 'user1',
-          operationId: undefined,
-        })
-      })
-  })
-
-  it('should not show capacity if not a configured prison (i.e. Hewell or Bristol)', () => {
-    prisonerSearchService.getPrisonersByPrisonerNumbers.mockResolvedValue(prisoners)
+    visitSessionsService.getVisitSessionCapacity.mockResolvedValue(null)
     visitSessionsService.getVisitsByDate.mockResolvedValue(visits)
 
     app = appWithAllRoutes({

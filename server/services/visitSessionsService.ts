@@ -380,6 +380,7 @@ export default class VisitSessionsService {
       prisonerName: '',
       mainContact: visit.visitContact?.name,
       startTimestamp: visit.startTimestamp,
+      endTimestamp: visit.endTimestamp,
       visitDate: prisonerDateTimePretty(visit.startTimestamp),
       visitTime,
       visitStatus: visit.visitStatus,

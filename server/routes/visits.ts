@@ -1,4 +1,5 @@
 import type { RequestHandler, Router } from 'express'
+import format from 'date-fns/format'
 import config from '../config'
 import { ExtendedVisitInformation, PrisonerDetailsItem, VisitsPageSlot } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
@@ -7,7 +8,7 @@ import VisitSessionsService from '../services/visitSessionsService'
 import AuditService from '../services/auditService'
 import { getResultsPagingLinks } from '../utils/utils'
 import { getDateTabs, getParsedDateFromQueryString, getSlotsSideMenuData } from './visitsUtils'
-import getPrisonConfiguration from '../constants/prisonConfiguration'
+import { SessionCapacity } from '../data/visitSchedulerApiTypes'
 
 export default function routes(
   router: Router,
@@ -56,21 +57,6 @@ export default function routes(
       }
     }
 
-    let maxSlots: number
-    const prisonConfiguration = getPrisonConfiguration(prisonId)
-    switch (visitType) {
-      case 'OPEN':
-        maxSlots = prisonConfiguration.visitCapacity.open
-        break
-
-      case 'CLOSED':
-        maxSlots = prisonConfiguration.visitCapacity.closed
-        break
-
-      default:
-        maxSlots = null
-    }
-
     const firstTabDateString = getParsedDateFromQueryString(firstTabDate as string)
 
     const slotFilter = time === '' ? slots.firstSlotTime : time
@@ -115,6 +101,7 @@ export default function routes(
     let numberOfPages = 1
     let next = 1
     let previous = 1
+    let capacity: number
 
     if (prisonersForVisit.length > 0) {
       ;({ results, numberOfResults, numberOfPages, next, previous } =
@@ -124,6 +111,23 @@ export default function routes(
           res.locals.user?.username,
           currentPage,
         ))
+
+      // use first visit's details to request session capacity
+      const sessionStartTime = format(new Date(filteredVisits[0].startTimestamp), 'HH:mm:ss')
+      const sessionEndTime = format(new Date(filteredVisits[0].endTimestamp), 'HH:mm:ss')
+      const sessionCapacity: SessionCapacity = await visitSessionsService.getVisitSessionCapacity(
+        res.locals.user?.username,
+        prisonId,
+        selectedDateString,
+        sessionStartTime,
+        sessionEndTime,
+      )
+      if (sessionCapacity && visitType === 'OPEN') {
+        capacity = sessionCapacity.open
+      }
+      if (sessionCapacity && visitType === 'CLOSED') {
+        capacity = sessionCapacity.closed
+      }
     }
 
     const currentPageMax = currentPage * pageSize
@@ -149,7 +153,7 @@ export default function routes(
         ...totals,
       },
       visitType,
-      maxSlots,
+      capacity,
       slotTime: slotFilter,
       slotsNav,
       results,
