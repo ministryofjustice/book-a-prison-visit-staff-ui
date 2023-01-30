@@ -120,8 +120,20 @@
         {% endif %}
         <span data-test="visit-time">{{ slotTime }}</span>
       </h2>
-      <p><span data-test="visit-tables-booked">{{ numberOfResults }}{% if capacity %} of {{ capacity }}{% endif %}</span> table{{ "s" if capacity > 1}} booked</p>
-      <p><span data-test="visit-visitors-total">{{ totals.visitors }}</span> visitor{% if totals.visitors != 1 %}s{% endif %} (<span data-test="visit-adults">{{ totals.adults }}</span> adult{% if totals.adults != 1 %}s{% endif %} and <span data-test="visit-children">{{ totals.children }}</span> child{% if (totals.children != 1) %}ren{% endif %})</p>
+      <p>
+        <span data-test="visit-tables-booked">
+        {% if capacity %}
+          {{ numberOfResults }} of {{ capacity }} {{ "table" | pluralise(capacity)}} booked
+        {% else %}
+          {{ numberOfResults }} {{ "table" | pluralise(numberOfResults)}} booked
+        {% endif %}
+        </span>
+      </p>
+      <p>
+        <span data-test="visit-visitors-total">{{ totals.visitors }} {{ "visitor" | pluralise(totals.visitors )}}</span>
+        (<span data-test="visit-adults">{{ totals.adults }} {{ "adult" | pluralise(totals.adults) }}</span> and
+        <span data-test="visit-children">{{ totals.children }} {{ "child" | pluralise(totals.children, "children") }}</span>)
+      </p>
         {% set pagination %}
           {{ mojPagination({
             results: {
