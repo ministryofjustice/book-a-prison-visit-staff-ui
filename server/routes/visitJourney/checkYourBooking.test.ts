@@ -9,10 +9,12 @@ import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
 import { Visit } from '../../data/visitSchedulerApiTypes'
 import config from '../../config'
 import NotificationsService from '../../services/notificationsService'
-import { createSupportTypes } from '../../data/__testutils/testObjects'
+import TestData from '../testutils/testData'
 
 jest.mock('../../services/visitSessionsService')
 jest.mock('../../services/auditService')
+
+const testData = new TestData()
 
 let sessionApp: Express
 const systemToken = async (user: string): Promise<string> => `${user}-token-1`
@@ -26,7 +28,7 @@ const testJourneys = [
   { urlPrefix: '/visit/ab-cd-ef-gh/update', isUpdate: true },
 ]
 
-const availableSupportTypes = createSupportTypes()
+const availableSupportTypes = testData.supportTypes()
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }

@@ -1,11 +1,13 @@
 import SupportedPrisonsService from './supportedPrisonsService'
 import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
 import PrisonRegisterApiClient from '../data/prisonRegisterApiClient'
-import { createPrisons, createSupportedPrisons, createSupportedPrisonIds } from '../data/__testutils/testObjects'
+import TestData from '../routes/testutils/testData'
 import { PrisonDto } from '../data/prisonRegisterApiTypes'
 
 jest.mock('../data/visitSchedulerApiClient')
 jest.mock('../data/prisonRegisterApiClient')
+
+const testData = new TestData()
 
 const visitSchedulerApiClient = new VisitSchedulerApiClient(null) as jest.Mocked<VisitSchedulerApiClient>
 const prisonRegisterApiClient = new PrisonRegisterApiClient(null) as jest.Mocked<PrisonRegisterApiClient>
@@ -16,9 +18,9 @@ describe('Supported prisons service', () => {
   let prisonRegisterApiClientBuilder
   let systemToken
 
-  const allPrisons = createPrisons()
-  const supportedPrisons = createSupportedPrisons()
-  const supportedPrisonIds = createSupportedPrisonIds()
+  const allPrisons = testData.prisons()
+  const supportedPrisons = testData.supportedPrisons()
+  const supportedPrisonIds = testData.supportedPrisonIds()
 
   beforeEach(() => {
     systemToken = async (user: string): Promise<string> => `${user}-token-1`

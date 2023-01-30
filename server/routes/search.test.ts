@@ -8,11 +8,13 @@ import VisitSessionsService from '../services/visitSessionsService'
 import { appWithAllRoutes } from './testutils/appSetup'
 import { PrisonerDetailsItem, VisitInformation } from '../@types/bapv'
 import AuditService from '../services/auditService'
-import { createPrisoner } from '../data/__testutils/testObjects'
+import TestData from './testutils/testData'
 
 jest.mock('../services/prisonerSearchService')
 jest.mock('../services/visitSessionsService')
 jest.mock('../services/auditService')
+
+const testData = new TestData()
 
 let app: Express
 const prisonId = 'HEI'
@@ -40,7 +42,7 @@ let getPrisonersReturnData: {
   previous: 0,
 }
 
-const getPrisonerReturnData = createPrisoner()
+const getPrisonerReturnData = testData.prisoner()
 let getVisit: VisitInformation
 
 beforeEach(() => {

@@ -6,12 +6,14 @@ import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import * as visitorUtils from './visitorUtils'
 import SupportedPrisonsService from '../services/supportedPrisonsService'
 import AuditService from '../services/auditService'
-import { createSupportedPrisons } from '../data/__testutils/testObjects'
+import TestData from './testutils/testData'
 import { Prison } from '../@types/bapv'
 import config from '../config'
 
 jest.mock('../services/supportedPrisonsService')
 jest.mock('../services/auditService')
+
+const testData = new TestData()
 
 let app: Express
 const systemToken = async (user: string): Promise<string> => `${user}-token-1`
@@ -22,7 +24,7 @@ const supportedPrisonsService = new SupportedPrisonsService(
   systemToken,
 ) as jest.Mocked<SupportedPrisonsService>
 
-const supportedPrisons = createSupportedPrisons()
+const supportedPrisons = testData.supportedPrisons()
 
 const auditService = new AuditService() as jest.Mocked<AuditService>
 

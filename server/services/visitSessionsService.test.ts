@@ -14,11 +14,13 @@ import {
   VisitsPageSlot,
 } from '../@types/bapv'
 import { ScheduledEvent } from '../data/whereaboutsApiTypes'
-import { createSessionCapacity, createSupportTypes } from '../data/__testutils/testObjects'
+import TestData from '../routes/testutils/testData'
 
 jest.mock('../data/prisonerContactRegistryApiClient')
 jest.mock('../data/visitSchedulerApiClient')
 jest.mock('../data/whereaboutsApiClient')
+
+const testData = new TestData()
 
 const prisonerContactRegistryApiClient = new PrisonerContactRegistryApiClient(
   null,
@@ -34,7 +36,7 @@ describe('Visit sessions service', () => {
   let systemToken
 
   const prisonId = 'HEI'
-  const availableSupportTypes = createSupportTypes()
+  const availableSupportTypes = testData.supportTypes()
 
   beforeEach(() => {
     systemToken = async (user: string): Promise<string> => `${user}-token-1`
@@ -623,7 +625,7 @@ describe('Visit sessions service', () => {
 
   describe('getVisitSessionCapacity', () => {
     it('should return the open and closed capacity for the specified visit session', async () => {
-      const sessionCapacity = createSessionCapacity()
+      const sessionCapacity = testData.sessionCapacity()
       const sessionDate = '2023-01-31'
       const sessionStartTime = '10:00'
       const sessionEndTime = '11:00'

@@ -5,7 +5,7 @@ import * as cheerio from 'cheerio'
 import { VisitSessionData } from '../../@types/bapv'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
 import * as visitorUtils from '../visitorUtils'
-import { createSupportTypes } from '../../data/__testutils/testObjects'
+import TestData from '../testutils/testData'
 
 let sessionApp: Express
 const systemToken = async (user: string): Promise<string> => `${user}-token-1`
@@ -13,13 +13,15 @@ const systemToken = async (user: string): Promise<string> => `${user}-token-1`
 let flashData: Record<'errors' | 'formValues', Record<string, string | string[]>[]>
 let visitSessionData: VisitSessionData
 
+const testData = new TestData()
+
 // run tests for booking and update journeys
 const testJourneys = [
   { urlPrefix: '/book-a-visit', isUpdate: false },
   { urlPrefix: '/visit/ab-cd-ef-gh/update', isUpdate: true },
 ]
 
-const availableSupportTypes = createSupportTypes()
+const availableSupportTypes = testData.supportTypes()
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }

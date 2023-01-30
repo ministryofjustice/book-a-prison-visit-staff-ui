@@ -9,11 +9,13 @@ import AuditService from '../services/auditService'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import { ExtendedVisitInformation, PrisonerDetailsItem, VisitsPageSlot } from '../@types/bapv'
 import { getParsedDateFromQueryString } from './visitsUtils'
-import { createSessionCapacity } from '../data/__testutils/testObjects'
+import TestData from './testutils/testData'
 
 jest.mock('../services/prisonerSearchService')
 jest.mock('../services/visitSessionsService')
 jest.mock('../services/auditService')
+
+const testData = new TestData()
 
 let app: Express
 const systemToken = async (user: string): Promise<string> => `${user}-token-1`
@@ -65,7 +67,7 @@ describe('GET /visits', () => {
   }
 
   const todayDate = format(new Date(), 'yyyy-MM-dd')
-  const sessionCapacity = createSessionCapacity()
+  const sessionCapacity = testData.sessionCapacity()
 
   beforeEach(() => {
     visits = {

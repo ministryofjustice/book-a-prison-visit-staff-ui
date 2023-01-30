@@ -1,13 +1,14 @@
 import nock from 'nock'
 import config from '../config'
 import PrisonRegisterApiClient, { prisonRegisterApiClientBuilder } from './prisonRegisterApiClient'
-import { createPrisons } from './__testutils/testObjects'
+import TestData from '../routes/testutils/testData'
 
 describe('prisonRegisterApiClient', () => {
   let fakePrisonRegisterApi: nock.Scope
   let client: PrisonRegisterApiClient
   const token = 'token-1'
-  const allPrisons = createPrisons()
+  const testData = new TestData()
+  const allPrisons = testData.prisons()
 
   beforeEach(() => {
     fakePrisonRegisterApi = nock(config.apis.prisonRegister.url)

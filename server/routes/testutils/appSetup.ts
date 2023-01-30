@@ -30,7 +30,7 @@ import * as auth from '../../authentication/auth'
 import systemToken from '../../data/authClient'
 import { SystemToken, VisitorListItem, VisitSlotList, VisitSessionData } from '../../@types/bapv'
 import AuditService from '../../services/auditService'
-import { createSupportedPrisonIds, createSupportedPrisons } from '../../data/__testutils/testObjects'
+import TestData from './testData'
 
 const user = {
   name: 'john smith',
@@ -40,6 +40,8 @@ const user = {
   displayName: 'John Smith',
   activeCaseLoadId: 'HEI',
 }
+
+const testData = new TestData()
 
 export const flashProvider = jest.fn()
 
@@ -60,7 +62,7 @@ class MockUserService extends UserService {
   }
 
   async getUserCaseLoadIds(_username: string): Promise<string[]> {
-    return createSupportedPrisonIds()
+    return testData.supportedPrisonIds()
   }
 }
 
@@ -70,7 +72,7 @@ class MockSupportedPrisonsService extends SupportedPrisonsService {
   }
 
   async getSupportedPrisons(_username: string): Promise<Record<string, string>> {
-    return createSupportedPrisons()
+    return testData.supportedPrisons()
   }
 }
 

@@ -1,10 +1,12 @@
 import UserService from './userService'
 import HmppsAuthClient, { User } from '../data/hmppsAuthClient'
 import PrisonApiClient from '../data/prisonApiClient'
-import { createCaseLoads } from '../data/__testutils/testObjects'
+import TestData from '../routes/testutils/testData'
 
 jest.mock('../data/hmppsAuthClient')
 jest.mock('../data/prisonApiClient')
+
+const testData = new TestData()
 
 const token = 'some token'
 
@@ -41,7 +43,7 @@ describe('User service', () => {
     const systemToken = async (user: string): Promise<string> => `${user}-token-1`
     let prisonApiClientBuilder
 
-    const usersCaseLoads = createCaseLoads()
+    const usersCaseLoads = testData.caseLoads()
 
     beforeEach(() => {
       prisonApiClientBuilder = jest.fn().mockReturnValue(prisonApiClient)

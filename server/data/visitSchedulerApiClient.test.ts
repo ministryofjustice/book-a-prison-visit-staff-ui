@@ -9,7 +9,7 @@ import {
   ReserveVisitSlotDto,
   ChangeVisitSlotRequestDto,
 } from './visitSchedulerApiTypes'
-import { createSessionCapacity, createSupportTypes } from './__testutils/testObjects'
+import TestData from '../routes/testutils/testData'
 
 describe('visitSchedulerApiClient', () => {
   let fakeVisitSchedulerApi: nock.Scope
@@ -17,6 +17,7 @@ describe('visitSchedulerApiClient', () => {
   const token = 'token-1'
   const timestamp = new Date().toISOString()
   const prisonId = 'HEI'
+  const testData = new TestData()
 
   beforeEach(() => {
     fakeVisitSchedulerApi = nock(config.apis.visitScheduler.url)
@@ -44,7 +45,7 @@ describe('visitSchedulerApiClient', () => {
 
   describe('getAvailableSupportOptions', () => {
     it('should return an array of available support types', async () => {
-      const results = createSupportTypes()
+      const results = testData.supportTypes()
 
       fakeVisitSchedulerApi.get('/visit-support').matchHeader('authorization', `Bearer ${token}`).reply(200, results)
 
@@ -282,7 +283,7 @@ describe('visitSchedulerApiClient', () => {
     const sessionEndTime = '11:00:00'
 
     it('should return the open and closed capacity for the specified visit session', async () => {
-      const sessionCapacity = createSessionCapacity()
+      const sessionCapacity = testData.sessionCapacity()
 
       fakeVisitSchedulerApi
         .get('/visit-sessions/capacity')
