@@ -135,5 +135,7 @@ export function registerNunjucks(app?: express.Express): Environment {
     return telephoneNumber === 'UNKNOWN' ? 'Unknown' : telephoneNumber
   })
 
+  njkEnv.addFilter('pluralise', (word, count, plural = `${word}s`) => (count === 1 ? word : plural))
+
   return njkEnv
 }
