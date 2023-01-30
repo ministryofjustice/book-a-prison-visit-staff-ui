@@ -55,7 +55,7 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
   WWI: {
     prisonPhoneNumber: '0300 060 6509',
     selectVisitorsText: [
-      'You can add up to 3 people aged 16 and over, and 3 children under 16 years old.',
+      'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
       'At least one visitor must be 18 or older.',
     ],
     visitCapacity: {
