@@ -70,9 +70,6 @@ describe('prisonApiClient', () => {
           agencyName: 'Hewell (HMP)',
         },
         legalStatus: 'SENTENCED',
-        privilegeSummary: {
-          iepLevel: 'Basic',
-        },
       } as InmateDetail
 
       fakePrisonApi

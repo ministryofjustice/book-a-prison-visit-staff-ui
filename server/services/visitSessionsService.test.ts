@@ -14,7 +14,7 @@ import {
   VisitsPageSlot,
 } from '../@types/bapv'
 import { ScheduledEvent } from '../data/whereaboutsApiTypes'
-import { createSupportTypes } from '../data/__testutils/testObjects'
+import { createSessionCapacity, createSupportTypes } from '../data/__testutils/testObjects'
 
 jest.mock('../data/prisonerContactRegistryApiClient')
 jest.mock('../data/visitSchedulerApiClient')
@@ -618,6 +618,33 @@ describe('Visit sessions service', () => {
           },
         ],
       })
+    })
+  })
+
+  describe('getVisitSessionCapacity', () => {
+    it('should return the open and closed capacity for the specified visit session', async () => {
+      const sessionCapacity = createSessionCapacity()
+      const sessionDate = '2023-01-31'
+      const sessionStartTime = '10:00'
+      const sessionEndTime = '11:00'
+
+      visitSchedulerApiClient.getVisitSessionCapacity.mockResolvedValue(sessionCapacity)
+
+      const results = await visitSessionsService.getVisitSessionCapacity(
+        'user',
+        prisonId,
+        sessionDate,
+        sessionStartTime,
+        sessionEndTime,
+      )
+
+      expect(visitSchedulerApiClient.getVisitSessionCapacity).toHaveBeenCalledWith(
+        prisonId,
+        sessionDate,
+        sessionStartTime,
+        sessionEndTime,
+      )
+      expect(results).toEqual(sessionCapacity)
     })
   })
 
@@ -1317,6 +1344,7 @@ describe('Visit sessions service', () => {
             prisonerName: '',
             mainContact: 'UNKNOWN',
             startTimestamp: '2022-05-23T09:00:00',
+            endTimestamp: '2022-05-23T09:29:00',
             visitDate: '23 May 2022',
             visitTime: '9am to 9:29am',
             visitStatus: 'BOOKED',
@@ -1340,6 +1368,7 @@ describe('Visit sessions service', () => {
             prisonerName: '',
             mainContact: 'Tess Bennett',
             startTimestamp: '2022-05-23T10:00:00',
+            endTimestamp: '2022-05-23T11:00:00',
             visitDate: '23 May 2022',
             visitTime: '10am to 11am',
             visitStatus: 'BOOKED',
