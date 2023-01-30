@@ -13,8 +13,6 @@ import config from '../config'
 jest.mock('../services/supportedPrisonsService')
 jest.mock('../services/auditService')
 
-const testData = new TestData()
-
 let app: Express
 const systemToken = async (user: string): Promise<string> => `${user}-token-1`
 
@@ -24,7 +22,7 @@ const supportedPrisonsService = new SupportedPrisonsService(
   systemToken,
 ) as jest.Mocked<SupportedPrisonsService>
 
-const supportedPrisons = testData.supportedPrisons()
+const supportedPrisons = TestData.supportedPrisons()
 
 const auditService = new AuditService() as jest.Mocked<AuditService>
 

@@ -20,8 +20,6 @@ jest.mock('../data/prisonerContactRegistryApiClient')
 jest.mock('../data/visitSchedulerApiClient')
 jest.mock('../data/whereaboutsApiClient')
 
-const testData = new TestData()
-
 const prisonerContactRegistryApiClient = new PrisonerContactRegistryApiClient(
   null,
 ) as jest.Mocked<PrisonerContactRegistryApiClient>
@@ -36,7 +34,7 @@ describe('Visit sessions service', () => {
   let systemToken
 
   const prisonId = 'HEI'
-  const availableSupportTypes = testData.supportTypes()
+  const availableSupportTypes = TestData.supportTypes()
 
   beforeEach(() => {
     systemToken = async (user: string): Promise<string> => `${user}-token-1`
@@ -625,7 +623,7 @@ describe('Visit sessions service', () => {
 
   describe('getVisitSessionCapacity', () => {
     it('should return the open and closed capacity for the specified visit session', async () => {
-      const sessionCapacity = testData.sessionCapacity()
+      const sessionCapacity = TestData.sessionCapacity()
       const sessionDate = '2023-01-31'
       const sessionStartTime = '10:00'
       const sessionEndTime = '11:00'

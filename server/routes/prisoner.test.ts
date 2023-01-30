@@ -17,8 +17,6 @@ jest.mock('../services/prisonerSearchService')
 jest.mock('../services/visitSessionsService')
 jest.mock('../services/auditService')
 
-const testData = new TestData()
-
 let app: Express
 const prisonId = 'HEI'
 const systemToken = async (user: string): Promise<string> => `${user}-token-1`
@@ -104,7 +102,7 @@ describe('GET /prisoner/A1234BC', () => {
           alertCodeDescription: 'Protective Isolation Unit',
         },
       ],
-      inmateDetail: testData.inmateDetail({ activeAlertCount: 1 }),
+      inmateDetail: TestData.inmateDetail({ activeAlertCount: 1 }),
       convictedStatus: 'Convicted',
       incentiveLevel: 'Standard',
       visitBalances: {
@@ -447,7 +445,7 @@ describe('POST /prisoner/A1234BC', () => {
 })
 
 describe('GET /prisoner/A1234BC/visits', () => {
-  const prisoner = testData.prisoner()
+  const prisoner = TestData.prisoner()
 
   it('should list upcoming visits for the prisoner with back link to new search if no search in querystring', () => {
     const visitInfo: VisitInformation[] = [

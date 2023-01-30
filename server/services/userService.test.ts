@@ -6,8 +6,6 @@ import TestData from '../routes/testutils/testData'
 jest.mock('../data/hmppsAuthClient')
 jest.mock('../data/prisonApiClient')
 
-const testData = new TestData()
-
 const token = 'some token'
 
 afterEach(() => {
@@ -43,7 +41,7 @@ describe('User service', () => {
     const systemToken = async (user: string): Promise<string> => `${user}-token-1`
     let prisonApiClientBuilder
 
-    const usersCaseLoads = testData.caseLoads()
+    const usersCaseLoads = TestData.caseLoads()
 
     beforeEach(() => {
       prisonApiClientBuilder = jest.fn().mockReturnValue(prisonApiClient)

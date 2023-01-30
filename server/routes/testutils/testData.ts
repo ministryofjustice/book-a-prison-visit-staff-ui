@@ -4,14 +4,14 @@ import { InmateDetail, CaseLoad, PrisonerBookingSummary } from '../../data/priso
 import { CurrentIncentive, Prisoner } from '../../data/prisonerOffenderSearchTypes'
 
 export default class TestData {
-  currentIncentive = ({
+  static currentIncentive = ({
     level = {
       code: 'STD',
       description: 'Standard',
     },
   }: Partial<CurrentIncentive> = {}): CurrentIncentive => ({ level } as CurrentIncentive)
 
-  caseLoads = ({
+  static caseLoads = ({
     caseLoads = [
       {
         caseLoadId: 'BLI',
@@ -30,7 +30,7 @@ export default class TestData {
     ] as CaseLoad[],
   } = {}): CaseLoad[] => caseLoads
 
-  inmateDetail = ({
+  static inmateDetail = ({
     offenderNo = 'A1234BC',
     firstName = 'JOHN',
     lastName = 'SMITH',
@@ -58,7 +58,7 @@ export default class TestData {
       legalStatus,
     } as InmateDetail)
 
-  prisoner = ({
+  static prisoner = ({
     prisonerNumber = 'A1234BC',
     firstName = 'JOHN',
     lastName = 'SMITH',
@@ -79,7 +79,7 @@ export default class TestData {
       currentIncentive,
     } as Prisoner)
 
-  prisonerBookingSummary = ({
+  static prisonerBookingSummary = ({
     bookingId = 12345,
     offenderNo = 'A1234BC',
     firstName = 'JOHN',
@@ -100,7 +100,7 @@ export default class TestData {
       convictedStatus,
     } as PrisonerBookingSummary)
 
-  prisons = ({
+  static prisons = ({
     prisons = [
       {
         prisonId: 'HEI',
@@ -113,19 +113,19 @@ export default class TestData {
     ] as Prison[],
   } = {}): Prison[] => prisons
 
-  sessionCapacity = ({ open = 30, closed = 3 }: Partial<SessionCapacity> = {}): SessionCapacity =>
+  static sessionCapacity = ({ open = 30, closed = 3 }: Partial<SessionCapacity> = {}): SessionCapacity =>
     ({ open, closed } as SessionCapacity)
 
-  supportedPrisons = ({
+  static supportedPrisons = ({
     prisons = <Record<string, string>>{
       HEI: 'Hewell (HMP)',
       BLI: 'Bristol (HMP & YOI)',
     },
   } = {}): Record<string, string> => prisons
 
-  supportedPrisonIds = ({ prisonIds = ['HEI', 'BLI'] } = {}): string[] => prisonIds
+  static supportedPrisonIds = ({ prisonIds = ['HEI', 'BLI'] } = {}): string[] => prisonIds
 
-  supportTypes = ({
+  static supportTypes = ({
     supportTypes = [
       {
         type: 'WHEELCHAIR',
@@ -150,7 +150,7 @@ export default class TestData {
     ] as SupportType[],
   } = {}): SupportType[] => supportTypes
 
-  visit = ({
+  static visit = ({
     applicationReference = 'aaa-bbb-ccc',
     reference = 'ab-cd-ef-gh',
     prisonerId = 'A1234BC',

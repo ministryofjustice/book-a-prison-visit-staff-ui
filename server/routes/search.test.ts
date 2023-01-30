@@ -14,8 +14,6 @@ jest.mock('../services/prisonerSearchService')
 jest.mock('../services/visitSessionsService')
 jest.mock('../services/auditService')
 
-const testData = new TestData()
-
 let app: Express
 const prisonId = 'HEI'
 const systemToken = async (user: string): Promise<string> => `${user}-token-1`
@@ -42,7 +40,7 @@ let getPrisonersReturnData: {
   previous: 0,
 }
 
-const getPrisonerReturnData = testData.prisoner()
+const getPrisonerReturnData = TestData.prisoner()
 let getVisit: VisitInformation
 
 beforeEach(() => {

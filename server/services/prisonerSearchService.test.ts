@@ -4,13 +4,11 @@ import TestData from '../routes/testutils/testData'
 
 jest.mock('../data/prisonerSearchClient')
 
-const testData = new TestData()
-
 const prisonId = 'HEI'
 const search = 'some search'
 const prisonerSearchClient = new PrisonerSearchClient(null) as jest.Mocked<PrisonerSearchClient>
 
-const prisoner = testData.prisoner()
+const prisoner = TestData.prisoner()
 
 describe('Prisoner search service', () => {
   let prisonerSearchClientBuilder

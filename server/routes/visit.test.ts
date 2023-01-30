@@ -22,14 +22,12 @@ jest.mock('../services/prisonerVisitorsService')
 jest.mock('../services/prisonerProfileService')
 jest.mock('../services/supportedPrisonsService')
 
-const testData = new TestData()
-
 let app: Express
 const systemToken = async (user: string): Promise<string> => `${user}-token-1`
 let flashData: Record<string, string[] | Record<string, string>[]>
 let visitSessionData: VisitSessionData
-const supportedPrisons = testData.supportedPrisons()
-const supportedPrisonIds = testData.supportedPrisonIds()
+const supportedPrisons = TestData.supportedPrisons()
+const supportedPrisonIds = TestData.supportedPrisonIds()
 
 const prisonerSearchService = new PrisonerSearchService(null, systemToken) as jest.Mocked<PrisonerSearchService>
 const visitSessionsService = new VisitSessionsService(
@@ -77,7 +75,7 @@ afterEach(() => {
 describe('/visit/:reference', () => {
   const childBirthYear = new Date().getFullYear() - 5
 
-  const prisoner = testData.prisoner()
+  const prisoner = TestData.prisoner()
 
   let visit: Visit
 
@@ -114,7 +112,7 @@ describe('/visit/:reference', () => {
   const additionalSupport = ['Wheelchair ramp', 'custom request']
 
   beforeEach(() => {
-    visit = testData.visit({ createdTimestamp: '2022-01-01' })
+    visit = TestData.visit({ createdTimestamp: '2022-01-01' })
 
     const fakeDate = new Date('2022-01-01')
     jest.useFakeTimers({ doNotFake: ['nextTick'], now: fakeDate })
@@ -318,7 +316,7 @@ describe('/visit/:reference', () => {
     })
 
     it('should render full booking summary page with prisoner location showing as "Unknown" if not a supported prison', () => {
-      const transferPrisoner = testData.prisoner({ prisonId: 'TRN', prisonName: 'Transfer' })
+      const transferPrisoner = TestData.prisoner({ prisonId: 'TRN', prisonName: 'Transfer' })
 
       prisonerSearchService.getPrisonerById.mockResolvedValue(transferPrisoner)
 
@@ -617,7 +615,7 @@ describe('POST /visit/:reference/cancel', () => {
   const notificationsService = new NotificationsService(null) as jest.Mocked<NotificationsService>
   let cancelledVisit: Visit
   beforeEach(() => {
-    cancelledVisit = testData.visit()
+    cancelledVisit = TestData.visit()
 
     visitSessionsService.cancelVisit = jest.fn().mockResolvedValue(cancelledVisit)
     notificationsService.sendCancellationSms = jest.fn().mockResolvedValue({})

@@ -17,8 +17,6 @@ jest.mock('../data/prisonerContactRegistryApiClient')
 jest.mock('../data/prisonerSearchClient')
 jest.mock('./supportedPrisonsService')
 
-const testData = new TestData()
-
 const offenderNo = 'A1234BC'
 const prisonId = 'HEI'
 const prisonApiClient = new PrisonApiClient(null) as jest.Mocked<PrisonApiClient>
@@ -58,7 +56,7 @@ describe('Prisoner profile service', () => {
   })
 
   describe('getProfile', () => {
-    const supportedPrisons = testData.supportedPrisons()
+    const supportedPrisons = TestData.supportedPrisons()
 
     beforeEach(() => {
       supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
@@ -66,12 +64,12 @@ describe('Prisoner profile service', () => {
 
     it('Retrieves and processes data for prisoner profile with visit balances', async () => {
       const bookings = <PagePrisonerBookingSummary>{
-        content: [testData.prisonerBookingSummary()],
+        content: [TestData.prisonerBookingSummary()],
         numberOfElements: 1,
       }
 
-      const inmateDetail = testData.inmateDetail()
-      const prisoner = testData.prisoner()
+      const inmateDetail = TestData.inmateDetail()
+      const prisoner = TestData.prisoner()
 
       const visitBalances: VisitBalances = {
         remainingVo: 1,
@@ -181,8 +179,8 @@ describe('Prisoner profile service', () => {
     })
 
     it('Does not look up visit balances for those on REMAND', async () => {
-      const inmateDetail = testData.inmateDetail({ legalStatus: 'REMAND' })
-      const prisoner = testData.prisoner()
+      const inmateDetail = TestData.inmateDetail({ legalStatus: 'REMAND' })
+      const prisoner = TestData.prisoner()
 
       const bookings = <PagePrisonerBookingSummary>{
         content: [
@@ -448,14 +446,14 @@ describe('Prisoner profile service', () => {
         numberOfElements: 1,
       }
 
-      const inmateDetail = testData.inmateDetail({
+      const inmateDetail = TestData.inmateDetail({
         activeAlertCount: 4,
         inactiveAlertCount: 1,
         alerts: [inactiveAlert, nonRelevantAlert, ...alertsToFlag],
         legalStatus: 'REMAND',
       })
 
-      const prisoner = testData.prisoner()
+      const prisoner = TestData.prisoner()
 
       prisonApiClient.getBookings.mockResolvedValue(bookings)
       prisonApiClient.getOffender.mockResolvedValue(inmateDetail)
@@ -517,7 +515,7 @@ describe('Prisoner profile service', () => {
       numberOfElements: 1,
     }
 
-    const inmateDetail = testData.inmateDetail()
+    const inmateDetail = TestData.inmateDetail()
 
     const visitBalances: VisitBalances = {
       remainingVo: 1,

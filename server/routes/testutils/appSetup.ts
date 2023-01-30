@@ -41,8 +41,6 @@ const user = {
   activeCaseLoadId: 'HEI',
 }
 
-const testData = new TestData()
-
 export const flashProvider = jest.fn()
 
 class MockUserService extends UserService {
@@ -62,7 +60,7 @@ class MockUserService extends UserService {
   }
 
   async getUserCaseLoadIds(_username: string): Promise<string[]> {
-    return testData.supportedPrisonIds()
+    return TestData.supportedPrisonIds()
   }
 }
 
@@ -72,7 +70,7 @@ class MockSupportedPrisonsService extends SupportedPrisonsService {
   }
 
   async getSupportedPrisons(_username: string): Promise<Record<string, string>> {
-    return testData.supportedPrisons()
+    return TestData.supportedPrisons()
   }
 }
 

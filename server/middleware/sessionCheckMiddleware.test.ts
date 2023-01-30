@@ -4,9 +4,8 @@ import { VisitSessionData, VisitSlot } from '../@types/bapv'
 import sessionCheckMiddleware from './sessionCheckMiddleware'
 import TestData from '../routes/testutils/testData'
 
-const testData = new TestData()
 const prisonId = 'HEI'
-const supportedPrisons = testData.supportedPrisons()
+const supportedPrisons = TestData.supportedPrisons()
 
 const prisonerData: VisitSessionData['prisoner'] = {
   name: 'abc',
@@ -135,9 +134,9 @@ describe('sessionCheckMiddleware', () => {
           dateOfBirth: '12 May 1977',
         },
       },
-    ].forEach((testSessionData: VisitSessionData) => {
+    ].forEach((testData: VisitSessionData) => {
       it('should redirect to the prisoner search page when there are missing bits of prisoner data', () => {
-        req.session.visitSessionData = testSessionData
+        req.session.visitSessionData = testData
 
         sessionCheckMiddleware({ stage: 1 })(req as Request, mockResponse as Response, next)
 
@@ -175,9 +174,9 @@ describe('sessionCheckMiddleware', () => {
         visitRestriction,
         visitors: [],
       },
-    ].forEach((testSessionData: VisitSessionData) => {
+    ].forEach((testData: VisitSessionData) => {
       it('should redirect to the prisoner profile when there is missing visitor or visit restriction data', () => {
-        req.session.visitSessionData = testSessionData
+        req.session.visitSessionData = testData
 
         sessionCheckMiddleware({ stage: 2 })(req as Request, mockResponse as Response, next)
 
@@ -230,9 +229,9 @@ describe('sessionCheckMiddleware', () => {
           endTimestamp: '123',
         } as VisitSlot,
       },
-    ].forEach((testSessionData: VisitSessionData) => {
+    ].forEach((testData: VisitSessionData) => {
       it('should redirect to the prisoner profile when there is missing visit data', () => {
-        req.session.visitSessionData = testSessionData
+        req.session.visitSessionData = testData
 
         sessionCheckMiddleware({ stage: 3 })(req as Request, mockResponse as Response, next)
 
@@ -286,14 +285,14 @@ describe('sessionCheckMiddleware', () => {
 
   describe('visit reference', () => {
     it('should redirect to the prisoner profile if visit booking reference not set', () => {
-      const testSessionData: VisitSessionData = {
+      const testData: VisitSessionData = {
         prisoner: prisonerData,
         visitRestriction,
         visitSlot,
         visitors: visitorsData,
       }
 
-      req.session.visitSessionData = testSessionData
+      req.session.visitSessionData = testData
 
       sessionCheckMiddleware({ stage: 3 })(req as Request, mockResponse as Response, next)
 
@@ -322,9 +321,9 @@ describe('sessionCheckMiddleware', () => {
         visitReference: 'ab-cd-ef-gh',
         visitStatus: 'RESERVED',
       } as VisitSessionData,
-    ].forEach((testSessionData: VisitSessionData) => {
+    ].forEach((testData: VisitSessionData) => {
       it('should redirect to the prisoner profile when there is missing main contact data', () => {
-        req.session.visitSessionData = testSessionData
+        req.session.visitSessionData = testData
 
         sessionCheckMiddleware({ stage: 5 })(req as Request, mockResponse as Response, next)
 
@@ -335,7 +334,7 @@ describe('sessionCheckMiddleware', () => {
 
   describe('check visit status', () => {
     beforeEach(() => {
-      const testSessionData: VisitSessionData = {
+      const testData: VisitSessionData = {
         prisoner: prisonerData,
         visitRestriction,
         visitSlot,
@@ -346,7 +345,7 @@ describe('sessionCheckMiddleware', () => {
         },
       }
 
-      req.session.visitSessionData = testSessionData
+      req.session.visitSessionData = testData
     })
 
     it('should not redirect if visit status missing prior to selecting a visit slot', () => {

@@ -8,8 +8,6 @@ import populateSelectedEstablishment from './populateSelectedEstablishment'
 
 jest.mock('../services/supportedPrisonsService')
 
-const testData = new TestData()
-
 const systemToken = async (user: string): Promise<string> => `${user}-token-1`
 
 const supportedPrisonsService = new SupportedPrisonsService(
@@ -18,7 +16,7 @@ const supportedPrisonsService = new SupportedPrisonsService(
   systemToken,
 ) as jest.Mocked<SupportedPrisonsService>
 
-const supportedPrisons = testData.supportedPrisons()
+const supportedPrisons = TestData.supportedPrisons()
 supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
 
 let req: Request

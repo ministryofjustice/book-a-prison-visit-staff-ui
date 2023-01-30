@@ -7,8 +7,7 @@ describe('prisonRegisterApiClient', () => {
   let fakePrisonRegisterApi: nock.Scope
   let client: PrisonRegisterApiClient
   const token = 'token-1'
-  const testData = new TestData()
-  const allPrisons = testData.prisons()
+  const allPrisons = TestData.prisons()
 
   beforeEach(() => {
     fakePrisonRegisterApi = nock(config.apis.prisonRegister.url)

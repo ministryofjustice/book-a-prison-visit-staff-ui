@@ -15,8 +15,6 @@ jest.mock('../services/prisonerSearchService')
 jest.mock('../services/visitSessionsService')
 jest.mock('../services/auditService')
 
-const testData = new TestData()
-
 let app: Express
 const systemToken = async (user: string): Promise<string> => `${user}-token-1`
 let flashData: Record<string, string[] | Record<string, string>[]>
@@ -67,7 +65,7 @@ describe('GET /visits', () => {
   }
 
   const todayDate = format(new Date(), 'yyyy-MM-dd')
-  const sessionCapacity = testData.sessionCapacity()
+  const sessionCapacity = TestData.sessionCapacity()
 
   beforeEach(() => {
     visits = {

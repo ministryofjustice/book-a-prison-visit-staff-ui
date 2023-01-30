@@ -13,15 +13,13 @@ const systemToken = async (user: string): Promise<string> => `${user}-token-1`
 let flashData: Record<'errors' | 'formValues', Record<string, string | string[]>[]>
 let visitSessionData: VisitSessionData
 
-const testData = new TestData()
-
 // run tests for booking and update journeys
 const testJourneys = [
   { urlPrefix: '/book-a-visit', isUpdate: false },
   { urlPrefix: '/visit/ab-cd-ef-gh/update', isUpdate: true },
 ]
 
-const availableSupportTypes = testData.supportTypes()
+const availableSupportTypes = TestData.supportTypes()
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
