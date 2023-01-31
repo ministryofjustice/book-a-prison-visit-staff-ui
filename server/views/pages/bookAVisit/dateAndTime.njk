@@ -93,6 +93,23 @@
 
     {% if slotsPresent %}
 
+    {% if not whereaboutsAvailable %}
+    {% set whereaboutsUnavailable %}
+      {{ govukWarningText({
+        classes: "govuk-!-margin-bottom-0",
+        html: '<span class="govuk-!-font-size-24">Prisoner schedule information is unavailable.</span>',
+        iconFallbackText: "Warning",
+        attributes: {
+          "data-test": "whereabouts-unavailable"
+        }
+      }) }}
+      {% endset %}
+      {{ mojBanner({
+        classes: "govuk-!-padding-left-4",
+        html: whereaboutsUnavailable
+      }) }}
+    {% endif %}
+
     <form action="{{ urlPrefix }}/select-date-and-time" method="POST" novalidate>
       <input type="hidden" name="_csrf" value="{{ csrfToken }}">
     {% for month, days in slotsList %}
