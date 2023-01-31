@@ -9,7 +9,7 @@ import {
   ReserveVisitSlotDto,
   ChangeVisitSlotRequestDto,
 } from './visitSchedulerApiTypes'
-import { createSupportTypes } from './__testutils/testObjects'
+import TestData from '../routes/testutils/testData'
 
 describe('visitSchedulerApiClient', () => {
   let fakeVisitSchedulerApi: nock.Scope
@@ -44,7 +44,7 @@ describe('visitSchedulerApiClient', () => {
 
   describe('getAvailableSupportOptions', () => {
     it('should return an array of available support types', async () => {
-      const results = createSupportTypes()
+      const results = TestData.supportTypes()
 
       fakeVisitSchedulerApi.get('/visit-support').matchHeader('authorization', `Bearer ${token}`).reply(200, results)
 
@@ -273,6 +273,52 @@ describe('visitSchedulerApiClient', () => {
       const output = await client.getVisitSessions('A1234BC', prisonId)
 
       expect(output).toEqual(results)
+    })
+  })
+
+  describe('getVisitSessionCapacity', () => {
+    const sessionDate = '2023-01-31'
+    const sessionStartTime = '10:00:00'
+    const sessionEndTime = '11:00:00'
+
+    it('should return the open and closed capacity for the specified visit session', async () => {
+      const sessionCapacity = TestData.sessionCapacity()
+
+      fakeVisitSchedulerApi
+        .get('/visit-sessions/capacity')
+        .query({ prisonId, sessionDate, sessionStartTime, sessionEndTime })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, sessionCapacity)
+
+      const output = await client.getVisitSessionCapacity(prisonId, sessionDate, sessionStartTime, sessionEndTime)
+
+      expect(output).toEqual(sessionCapacity)
+    })
+
+    it('should return null if session capacity not available (404 from API)', async () => {
+      fakeVisitSchedulerApi
+        .get('/visit-sessions/capacity')
+        .query({ prisonId, sessionDate, sessionStartTime, sessionEndTime })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(404)
+
+      const output = await client.getVisitSessionCapacity(prisonId, sessionDate, sessionStartTime, sessionEndTime)
+
+      expect(output).toBeNull()
+    })
+
+    // API returns 500 IllegalStateException if multiple capacities found for specified date & times
+    it('should return null if error retrieving session capacity (500 from API)', async () => {
+      fakeVisitSchedulerApi
+        .persist() // required because 500 causes server/data/restClient.ts to retry but the mock has been consumed
+        .get('/visit-sessions/capacity')
+        .query({ prisonId, sessionDate, sessionStartTime, sessionEndTime })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(500)
+
+      const output = await client.getVisitSessionCapacity(prisonId, sessionDate, sessionStartTime, sessionEndTime)
+
+      expect(output).toBeNull()
     })
   })
 

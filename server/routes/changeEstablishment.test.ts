@@ -6,7 +6,7 @@ import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import * as visitorUtils from './visitorUtils'
 import SupportedPrisonsService from '../services/supportedPrisonsService'
 import AuditService from '../services/auditService'
-import { createSupportedPrisons } from '../data/__testutils/testObjects'
+import TestData from './testutils/testData'
 import { Prison } from '../@types/bapv'
 import config from '../config'
 
@@ -22,7 +22,7 @@ const supportedPrisonsService = new SupportedPrisonsService(
   systemToken,
 ) as jest.Mocked<SupportedPrisonsService>
 
-const supportedPrisons = createSupportedPrisons()
+const supportedPrisons = TestData.supportedPrisons()
 
 const auditService = new AuditService() as jest.Mocked<AuditService>
 

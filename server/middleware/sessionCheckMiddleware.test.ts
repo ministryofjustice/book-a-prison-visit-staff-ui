@@ -2,10 +2,10 @@ import { Request, Response } from 'express'
 import { Cookie } from 'express-session'
 import { VisitSessionData, VisitSlot } from '../@types/bapv'
 import sessionCheckMiddleware from './sessionCheckMiddleware'
-import { createSupportedPrisons } from '../data/__testutils/testObjects'
+import TestData from '../routes/testutils/testData'
 
 const prisonId = 'HEI'
-const supportedPrisons = createSupportedPrisons()
+const supportedPrisons = TestData.supportedPrisons()
 
 const prisonerData: VisitSessionData['prisoner'] = {
   name: 'abc',

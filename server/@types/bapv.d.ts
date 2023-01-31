@@ -235,9 +235,10 @@ export type VisitInformation = {
 }
 
 export interface ExtendedVisitInformation extends VisitInformation {
-  startTimestamp?: string
+  startTimestamp: string
+  endTimestamp: string
   visitRestriction: Visit['visitRestriction']
-  visitors?: VisitorListItem[]
+  visitors: VisitorListItem[]
 }
 
 export type VisitsPageSlot = {

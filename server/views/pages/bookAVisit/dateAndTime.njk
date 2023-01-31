@@ -27,9 +27,9 @@
       {% elseif (doubleBooked and not checked) -%}
         Prisoner has a visit
       {%- elseif slot.availableTables <= 0 -%}
-        Fully booked ({{ slot.capacity + (slot.availableTables | abs) }} of {{ slot.capacity}} table{{ "s" if slot.capacity > 1 }} booked)
+        Fully booked ({{ slot.capacity + (slot.availableTables | abs) }} of {{ slot.capacity}} {{ "table" | pluralise(slot.capacity) }} booked)
       {%- else -%}
-        {{ slot.availableTables }} table{{ "s" if slot.availableTables > 1 }} available
+        {{ slot.availableTables }} {{ "table" | pluralise(slot.availableTables) }} available
       {%- endif %}
     {% endset %}
 
@@ -150,9 +150,7 @@
 
         {%- set slotsAvailable = (day.slots.morning | length) + (day.slots.afternoon | length) %}
         {% set slotText %}
-          {% if slotsAvailable === 0 %}Fully booked{% endif %}
-          {% if slotsAvailable === 1 %}1 time slot{% endif %}
-          {% if slotsAvailable > 1 %}{{ slotsAvailable }} time slots{% endif %}
+          {% if slotsAvailable === 0 %}Fully booked{% else %}{{ slotsAvailable }} time {{ "slot" | pluralise(slotsAvailable) }}{% endif %}
         {% endset %}
 
         {%- if (slotsAvailable > 0) %}

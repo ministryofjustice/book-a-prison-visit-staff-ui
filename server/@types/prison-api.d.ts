@@ -1469,6 +1469,10 @@ export interface paths {
      */
     get: operations['getPrisonerEducations']
   }
+  '/api/digital-warrant/court-date-results/{offenderId}': {
+    /** Returns details of all court dates and the result of each. */
+    get: operations['getCourtDateResults']
+  }
   '/api/cell/{locationId}/history': {
     /** @description <p>This endpoint uses the REPLICA database.</p> */
     get: operations['getBedAssignmentsHistory']
@@ -2589,7 +2593,6 @@ export interface components {
        * @example Serving Life Imprisonment
        */
       imprisonmentStatusDescription?: string
-      privilegeSummary?: components['schemas']['PrivilegeSummary']
       /**
        * Format: date
        * @description Date prisoner was received into the prison.
@@ -2932,77 +2935,6 @@ export interface components {
        * @description Image Id Ref
        */
       imageId?: number
-    }
-    /** @description Incentive & Earned Privilege Details */
-    PrivilegeDetail: {
-      /**
-       * Format: int64
-       * @description Offender booking identifier.
-       */
-      bookingId: number
-      /**
-       * Format: int64
-       * @description Sequence Number of IEP Level
-       * @example 1
-       */
-      sequence: number
-      /**
-       * Format: date
-       * @description Effective date of IEP level.
-       */
-      iepDate: string
-      /**
-       * @description Effective date & time of IEP level.
-       * @example 2021-07-05T10:35:17
-       */
-      iepTime?: string
-      /** @description Identifier of Agency this privilege entry is associated with. */
-      agencyId: string
-      /** @description The IEP level (e.g. Basic, Standard or Enhanced). */
-      iepLevel: string
-      /** @description Further details relating to this privilege entry. */
-      comments?: string
-      /** @description Identifier of user related to this privilege entry. */
-      userId?: string
-      /**
-       * @description The Screen (e.g. NOMIS screen OIDOIEPS) or system (PRISON_API) that made the change
-       * @example PRISON_API
-       */
-      auditModuleName?: string
-    }
-    /** @description Incentive & Earned Privilege Summary */
-    PrivilegeSummary: {
-      /**
-       * Format: int64
-       * @description Offender booking identifier.
-       * @example 112321
-       */
-      bookingId: number
-      /**
-       * @description The current IEP level (e.g. Basic, Standard or Enhanced).
-       * @example Basic
-       * @enum {string}
-       */
-      iepLevel: 'Basic' | 'Standard' | 'Enhanced'
-      /**
-       * Format: date
-       * @description Effective date of current IEP level.
-       * @example 2019-01-24
-       */
-      iepDate: string
-      /**
-       * @description Effective date & time of current IEP level.
-       * @example 2021-07-05T10:35:17
-       */
-      iepTime?: string
-      /**
-       * Format: int64
-       * @description The number of days since last review.
-       * @example 35
-       */
-      daysSinceReview: number
-      /** @description All IEP detail entries for the offender (most recent first). */
-      iepDetails?: components['schemas']['PrivilegeDetail'][]
     }
     /** @description Profile Information */
     ProfileInformation: {
@@ -3843,11 +3775,6 @@ export interface components {
       assignedOfficerUserId?: string
       /** @description List of offender's alias names. */
       aliases?: string[]
-      /**
-       * @description The IEP Level of the offender (UK Only)
-       * @example Basic
-       */
-      iepLevel?: string
       /**
        * @description The Cat A/B/C/D of the offender
        * @example C
@@ -5594,6 +5521,11 @@ export interface components {
     }
     /** @description A new offence from a digital warrant */
     Charge: {
+      /**
+       * Format: int64
+       * @description The id of the charge
+       */
+      chargeId?: number
       /** @description The offence code of the office in the court case */
       offenceCode?: string
       /** @description The offence statute of the office in the court case */
@@ -5615,6 +5547,11 @@ export interface components {
        * @description The id of the court case
        */
       courtCaseId?: number
+      /**
+       * Format: int32
+       * @description The sequence of the sentence from this charge
+       */
+      sentenceSequence?: number
     }
     /** @description An adjustment to a calculation */
     Adjustment: {
@@ -10495,6 +10432,29 @@ export interface components {
       pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
+    /** @description Represents a court date and its outcome */
+    CourtDateResult: {
+      /**
+       * Format: int64
+       * @description The ID of this court date
+       */
+      id: number
+      /**
+       * Format: date
+       * @description The date of the court result
+       */
+      date?: string
+      /** @description The result code of the court date */
+      resultCode?: string
+      /** @description The result description of the court date */
+      resultDescription?: string
+      charge: components['schemas']['Charge']
+      /**
+       * Format: int64
+       * @description The id of the booking this court date was linked to
+       */
+      bookingId?: number
+    }
     /** @description Bed assignment history entry */
     BedAssignment: {
       /**
@@ -11151,11 +11111,6 @@ export interface components {
        * @enum {string}
        */
       convictedStatus?: 'Convicted' | 'Remand'
-      /**
-       * @description IEP level of the prisoner
-       * @example Basic
-       */
-      iepLevel?: string
       /**
        * @description Description of living unit (e.g. cell) that prisoner is assigned to.
        * @example MDI-1-1-3
@@ -20710,6 +20665,29 @@ export interface operations {
       }
       /** @description Unrecoverable error occurred whilst processing request. */
       500: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  getCourtDateResults: {
+    /** Returns details of all court dates and the result of each. */
+    parameters: {
+      /** @description The required offender id (mandatory) */
+      path: {
+        offenderId: string
+      }
+    }
+    responses: {
+      /** @description The court date results. */
+      200: {
+        content: {
+          'application/json': components['schemas']['CourtDateResult']
+        }
+      }
+      /** @description Requested resource not found. */
+      404: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }

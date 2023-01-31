@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import { Cookie } from 'express-session'
 import { Prison } from '../@types/bapv'
 import { User } from '../data/hmppsAuthClient'
-import { createSupportedPrisons } from '../data/__testutils/testObjects'
+import TestData from '../routes/testutils/testData'
 import SupportedPrisonsService from '../services/supportedPrisonsService'
 import populateSelectedEstablishment from './populateSelectedEstablishment'
 
@@ -16,7 +16,7 @@ const supportedPrisonsService = new SupportedPrisonsService(
   systemToken,
 ) as jest.Mocked<SupportedPrisonsService>
 
-const supportedPrisons = createSupportedPrisons()
+const supportedPrisons = TestData.supportedPrisons()
 supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
 
 let req: Request

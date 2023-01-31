@@ -7,6 +7,7 @@ import {
   OutcomeDto,
   ReserveVisitSlotDto,
   ChangeVisitSlotRequestDto,
+  SessionCapacity,
 } from './visitSchedulerApiTypes'
 import { VisitSessionData } from '../@types/bapv'
 import config from '../config'
@@ -80,6 +81,22 @@ class VisitSchedulerApiClient {
         // 'min' and 'max' params omitted, so using API default between 2 and 28 days from now
       }).toString(),
     })
+  }
+
+  async getVisitSessionCapacity(
+    prisonId: string,
+    sessionDate: string,
+    sessionStartTime: string,
+    sessionEndTime: string,
+  ): Promise<SessionCapacity> {
+    try {
+      return await this.restclient.get({
+        path: '/visit-sessions/capacity',
+        query: new URLSearchParams({ prisonId, sessionDate, sessionStartTime, sessionEndTime }).toString(),
+      })
+    } catch (error) {
+      return null
+    }
   }
 
   reserveVisit(visitSessionData: VisitSessionData): Promise<Visit> {
