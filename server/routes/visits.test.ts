@@ -9,7 +9,7 @@ import AuditService from '../services/auditService'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import { ExtendedVisitInformation, PrisonerDetailsItem, VisitsPageSlot } from '../@types/bapv'
 import { getParsedDateFromQueryString } from './visitsUtils'
-import { createSessionCapacity } from '../data/__testutils/testObjects'
+import TestData from './testutils/testData'
 
 jest.mock('../services/prisonerSearchService')
 jest.mock('../services/visitSessionsService')
@@ -65,7 +65,7 @@ describe('GET /visits', () => {
   }
 
   const todayDate = format(new Date(), 'yyyy-MM-dd')
-  const sessionCapacity = createSessionCapacity()
+  const sessionCapacity = TestData.sessionCapacity()
 
   beforeEach(() => {
     visits = {

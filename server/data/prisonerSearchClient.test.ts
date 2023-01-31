@@ -1,7 +1,7 @@
 import nock from 'nock'
 import config from '../config'
 import PrisonerSearchClient, { prisonerSearchClientBuilder } from './prisonerSearchClient'
-import { createPrisoner } from './__testutils/testObjects'
+import TestData from '../routes/testutils/testData'
 
 describe('prisonSearchClientBuilder', () => {
   let fakePrisonerSearchApi: nock.Scope
@@ -79,7 +79,7 @@ describe('prisonSearchClientBuilder', () => {
 
   describe('getPrisonerById', () => {
     it('should return data for single prisoner by prisoner ID', async () => {
-      const prisoner = createPrisoner()
+      const prisoner = TestData.prisoner()
 
       fakePrisonerSearchApi
         .get('/prisoner/A1234BC')

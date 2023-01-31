@@ -10,7 +10,7 @@ import VisitSessionsService from '../services/visitSessionsService'
 import AuditService from '../services/auditService'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import { clearSession } from './visitorUtils'
-import { createInmateDetail, createPrisoner } from '../data/__testutils/testObjects'
+import TestData from './testutils/testData'
 
 jest.mock('../services/prisonerProfileService')
 jest.mock('../services/prisonerSearchService')
@@ -102,7 +102,7 @@ describe('GET /prisoner/A1234BC', () => {
           alertCodeDescription: 'Protective Isolation Unit',
         },
       ],
-      inmateDetail: createInmateDetail({ activeAlertCount: 1 }),
+      inmateDetail: TestData.inmateDetail({ activeAlertCount: 1 }),
       convictedStatus: 'Convicted',
       incentiveLevel: 'Standard',
       visitBalances: {
@@ -445,7 +445,7 @@ describe('POST /prisoner/A1234BC', () => {
 })
 
 describe('GET /prisoner/A1234BC/visits', () => {
-  const prisoner = createPrisoner()
+  const prisoner = TestData.prisoner()
 
   it('should list upcoming visits for the prisoner with back link to new search if no search in querystring', () => {
     const visitInfo: VisitInformation[] = [

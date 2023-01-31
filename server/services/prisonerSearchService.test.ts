@@ -1,6 +1,6 @@
 import PrisonerSearchService from './prisonerSearchService'
 import PrisonerSearchClient from '../data/prisonerSearchClient'
-import { createPrisoner } from '../data/__testutils/testObjects'
+import TestData from '../routes/testutils/testData'
 
 jest.mock('../data/prisonerSearchClient')
 
@@ -8,7 +8,7 @@ const prisonId = 'HEI'
 const search = 'some search'
 const prisonerSearchClient = new PrisonerSearchClient(null) as jest.Mocked<PrisonerSearchClient>
 
-const prisoner = createPrisoner()
+const prisoner = TestData.prisoner()
 
 describe('Prisoner search service', () => {
   let prisonerSearchClientBuilder
