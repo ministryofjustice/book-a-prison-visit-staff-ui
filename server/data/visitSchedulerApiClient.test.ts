@@ -235,8 +235,8 @@ describe('visitSchedulerApiClient', () => {
         .get('/visits/search')
         .query({
           prisonId: 'HEI',
-          startTimestamp: `${dateString}T00:00:00`,
-          endTimestamp: `${dateString}T23:59:59`,
+          startDateTime: `${dateString}T00:00:00`,
+          endDateTime: `${dateString}T23:59:59`,
           visitStatus: 'BOOKED',
           page: '0',
           size: '1000',

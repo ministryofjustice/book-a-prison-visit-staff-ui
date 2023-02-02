@@ -70,13 +70,13 @@ class VisitSchedulerApiClient {
     })
   }
 
-  getVisitsByDate(dateString: string, prisonId: string): Promise<Visit[]> {
+  getVisitsByDate(dateString: string, prisonId: string): Promise<PageVisitDto> {
     return this.restclient.get({
       path: '/visits/search',
       query: new URLSearchParams({
         prisonId,
-        startTimestamp: `${dateString}T00:00:00`,
-        endTimestamp: `${dateString}T23:59:59`,
+        startDateTime: `${dateString}T00:00:00`,
+        endDateTime: `${dateString}T23:59:59`,
         visitStatus: 'BOOKED',
         page: this.page,
         size: this.size,
