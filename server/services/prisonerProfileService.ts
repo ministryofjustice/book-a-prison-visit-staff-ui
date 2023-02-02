@@ -174,7 +174,6 @@ export default class PrisonerProfileService {
     supportedPrisons: Record<string, string>,
   ): Promise<UpcomingVisitItem[]> {
     const { content: visits } = await visitSchedulerApiClient.getUpcomingVisits(offenderNo, ['CANCELLED', 'BOOKED'])
-
     const socialVisits = visits.filter(visit => visit.visitType === 'SOCIAL')
 
     const visitsForDisplay: UpcomingVisitItem[] = socialVisits.map(visit => {
@@ -234,7 +233,6 @@ export default class PrisonerProfileService {
     const { content: visits } = await visitSchedulerApiClient.getPastVisits(offenderNo, ['CANCELLED', 'BOOKED'])
 
     const socialVisits = visits.filter(visit => visit.visitType === 'SOCIAL')
-
     const visitsForDisplay: PastVisitItem[] = socialVisits.map(visit => {
       const visitContactNames = this.getPrisonerSocialContacts(socialContacts, visit.visitors)
 

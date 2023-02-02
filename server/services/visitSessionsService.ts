@@ -306,7 +306,7 @@ export default class VisitSessionsService {
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
     const prisonerContactRegistryApiClient = this.prisonerContactRegistryApiClientBuilder(token)
 
-    logger.info(`Get visits fors ${dateString}`)
+    logger.info(`Get visits for ${dateString}`)
     const { content: visits } = await visitSchedulerApiClient.getVisitsByDate(dateString, prisonId)
 
     const extendedVisitsInfo: ExtendedVisitInformation[] = await Promise.all(
