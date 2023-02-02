@@ -4,6 +4,7 @@ export type SupportType = components['schemas']['SupportTypeDto']
 
 export type VisitorSupport = components['schemas']['VisitorSupportDto']
 
+export type PageVisitDto = components['schemas']['PageVisitDto']
 export type Visit = components['schemas']['VisitDto']
 export type Visitor = components['schemas']['VisitorDto']
 

@@ -1036,7 +1036,7 @@ describe('Visit sessions service', () => {
       it('should return an array of upcoming VisitInformation for an offender', async () => {
         const visits: Visit[] = [visit]
 
-        visitSchedulerApiClient.getUpcomingVisits.mockResolvedValue(visits)
+        visitSchedulerApiClient.getUpcomingVisits.mockResolvedValue({ content: visits })
         const result = await visitSessionsService.getUpcomingVisits({
           username: 'user',
           offenderNo: 'A1234BC',
@@ -1061,7 +1061,7 @@ describe('Visit sessions service', () => {
       it('should return an empty array for an offender with no upcoming visits', async () => {
         const visits: Visit[] = []
 
-        visitSchedulerApiClient.getUpcomingVisits.mockResolvedValue(visits)
+        visitSchedulerApiClient.getUpcomingVisits.mockResolvedValue({ content: visits })
         const result = await visitSessionsService.getUpcomingVisits({
           username: 'user',
           offenderNo: 'A1234BC',

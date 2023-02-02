@@ -20,7 +20,7 @@ import {
   formatVisitType,
 } from '../utils/utils'
 import { Alert, InmateDetail, OffenderRestriction, VisitBalances } from '../data/prisonApiTypes'
-import { Visit, Visitor } from '../data/visitSchedulerApiTypes'
+import { Visitor } from '../data/visitSchedulerApiTypes'
 import { Contact } from '../data/prisonerContactRegistryApiTypes'
 import SupportedPrisonsService from './supportedPrisonsService'
 import PrisonerSearchClient from '../data/prisonerSearchClient'
@@ -173,8 +173,9 @@ export default class PrisonerProfileService {
     visitSchedulerApiClient: VisitSchedulerApiClient,
     supportedPrisons: Record<string, string>,
   ): Promise<UpcomingVisitItem[]> {
-    const visits: Visit[] = await visitSchedulerApiClient.getUpcomingVisits(offenderNo, ['BOOKED', 'CANCELLED'])
-    const socialVisits: Visit[] = visits.filter(visit => visit.visitType === 'SOCIAL')
+    const { content: visits } = await visitSchedulerApiClient.getUpcomingVisits(offenderNo, ['CANCELLED', 'BOOKED'])
+
+    const socialVisits = visits.filter(visit => visit.visitType === 'SOCIAL')
 
     const visitsForDisplay: UpcomingVisitItem[] = socialVisits.map(visit => {
       const visitContactNames = this.getPrisonerSocialContacts(socialContacts, visit.visitors)
@@ -230,8 +231,9 @@ export default class PrisonerProfileService {
     visitSchedulerApiClient: VisitSchedulerApiClient,
     supportedPrisons: Record<string, string>,
   ): Promise<PastVisitItem[]> {
-    const visits: Visit[] = await visitSchedulerApiClient.getPastVisits(offenderNo, ['BOOKED', 'CANCELLED'])
-    const socialVisits: Visit[] = visits.filter(visit => visit.visitType === 'SOCIAL')
+    const { content: visits } = await visitSchedulerApiClient.getPastVisits(offenderNo, ['CANCELLED', 'BOOKED'])
+
+    const socialVisits = visits.filter(visit => visit.visitType === 'SOCIAL')
 
     const visitsForDisplay: PastVisitItem[] = socialVisits.map(visit => {
       const visitContactNames = this.getPrisonerSocialContacts(socialContacts, visit.visitors)

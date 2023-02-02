@@ -280,7 +280,7 @@ export default class VisitSessionsService {
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
 
     logger.info(`Get upcoming visits for ${offenderNo}`)
-    const visits = await visitSchedulerApiClient.getUpcomingVisits(offenderNo, visitStatus)
+    const { content: visits } = await visitSchedulerApiClient.getUpcomingVisits(offenderNo, visitStatus)
 
     return visits.map(visit => this.buildVisitInformation(visit))
   }
