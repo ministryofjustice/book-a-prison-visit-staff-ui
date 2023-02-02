@@ -91,12 +91,12 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/visitScheduler/visits\\?prisonerId=${offenderNo}&startTimestamp=.*`,
+        urlPattern: `/visitScheduler/visits/search\\?prisonerId=${offenderNo}&startDateTime=.*`,
       },
       response: {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: upcomingVisits,
+        jsonBody: { content: upcomingVisits },
       },
     })
   },
@@ -104,12 +104,12 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/visitScheduler/visits\\?prisonerId=${offenderNo}&endTimestamp=.*`,
+        urlPattern: `/visitScheduler/visits/search\\?prisonerId=${offenderNo}&endDateTime=.*&visitStatus=.*`,
       },
       response: {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: pastVisits,
+        jsonBody: { content: pastVisits },
       },
     })
   },
