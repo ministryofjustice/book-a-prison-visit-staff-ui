@@ -121,7 +121,7 @@ export default class VisitSessionsService {
       {},
     )
 
-    let prisonerEvents: ScheduledEvent[]
+    let prisonerEvents: ScheduledEvent[] = []
     let whereaboutsAvailable = true
     try {
       prisonerEvents = await whereaboutsApiClient.getEvents(
@@ -130,7 +130,6 @@ export default class VisitSessionsService {
         format(latestEndTime, 'yyyy-MM-dd'),
       )
     } catch (error) {
-      prisonerEvents = []
       whereaboutsAvailable = false
     }
 
