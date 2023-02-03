@@ -57,6 +57,24 @@
       html: "<p>Showing time slots:</p><ul><li>suitable for the prisoner’s location and incentive level</li><li>that do not have non-associations for the prisoner</li><li>over the next 28 days</li></ul>"
     }) }}
 
+    {% if not whereaboutsAvailable %}
+    {% set whereaboutsUnavailable %}
+      {{ govukWarningText({
+        classes: "govuk-!-margin-bottom-0",
+        html: '<span class="govuk-!-font-size-24">The prisoner schedule is unavailable.' +
+          ' <br />Check NOMIS for court appearances. Prison number: ' + offenderNo + '.</span>',
+        iconFallbackText: "Warning",
+        attributes: {
+          "data-test": "whereabouts-unavailable"
+        }
+      }) }}
+      {% endset %}
+      {{ mojBanner({
+        classes: "govuk-!-padding-left-4",
+        html: whereaboutsUnavailable
+      }) }}
+    {% endif %}
+
     {% if restrictionChangeMessage %}
       {% set restrictionChangeReasonHtml %}
           {{ govukWarningText({
@@ -90,25 +108,8 @@
         html: closedVisitReasonHtml
       }) }}
     {% endif %}
-
+    
     {% if slotsPresent %}
-
-    {% if not whereaboutsAvailable %}
-    {% set whereaboutsUnavailable %}
-      {{ govukWarningText({
-        classes: "govuk-!-margin-bottom-0",
-        html: '<span class="govuk-!-font-size-24">Prisoner schedule information is unavailable.</span>',
-        iconFallbackText: "Warning",
-        attributes: {
-          "data-test": "whereabouts-unavailable"
-        }
-      }) }}
-      {% endset %}
-      {{ mojBanner({
-        classes: "govuk-!-padding-left-4",
-        html: whereaboutsUnavailable
-      }) }}
-    {% endif %}
 
     <form action="{{ urlPrefix }}/select-date-and-time" method="POST" novalidate>
       <input type="hidden" name="_csrf" value="{{ csrfToken }}">
