@@ -77,7 +77,7 @@ describe('Visit sessions service', () => {
 
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId)
-      expect(results).toEqual({})
+      expect(results).toEqual({ slotsList: {}, whereaboutsAvailable: true })
     })
 
     describe('single visit session should return correctly formatted data', () => {
@@ -130,37 +130,40 @@ describe('Visit sessions service', () => {
         expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
         expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId)
         expect(whereaboutsApiClient.getEvents).toHaveBeenCalledTimes(1)
-        expect(results).toEqual(<VisitSlotList>{
-          'February 2022': [
-            {
-              date: 'Monday 14 February',
-              prisonerEvents: {
-                morning: [
-                  {
-                    description: 'eventSourceDesc',
-                    endTimestamp: '2022-02-14T11:00:00',
-                    startTimestamp: '2022-02-14T10:00:00',
-                  },
-                ],
-                afternoon: [],
+        expect(results).toEqual(<{ slotsList: VisitSlotList; whereaboutsAvailable: boolean }>{
+          slotsList: {
+            'February 2022': [
+              {
+                date: 'Monday 14 February',
+                prisonerEvents: {
+                  morning: [
+                    {
+                      description: 'eventSourceDesc',
+                      endTimestamp: '2022-02-14T11:00:00',
+                      startTimestamp: '2022-02-14T10:00:00',
+                    },
+                  ],
+                  afternoon: [],
+                },
+                slots: {
+                  morning: [
+                    {
+                      id: '1',
+                      prisonId,
+                      startTimestamp: '2022-02-14T10:00:00',
+                      endTimestamp: '2022-02-14T11:00:00',
+                      availableTables: 15,
+                      capacity: 15,
+                      visitRoomName: 'A1',
+                      visitRestriction: 'OPEN',
+                    },
+                  ],
+                  afternoon: [],
+                },
               },
-              slots: {
-                morning: [
-                  {
-                    id: '1',
-                    prisonId,
-                    startTimestamp: '2022-02-14T10:00:00',
-                    endTimestamp: '2022-02-14T11:00:00',
-                    availableTables: 15,
-                    capacity: 15,
-                    visitRoomName: 'A1',
-                    visitRestriction: 'OPEN',
-                  },
-                ],
-                afternoon: [],
-              },
-            },
-          ],
+            ],
+          },
+          whereaboutsAvailable: true,
         })
       })
 
@@ -192,31 +195,34 @@ describe('Visit sessions service', () => {
         expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
         expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId)
         expect(whereaboutsApiClient.getEvents).toHaveBeenCalledTimes(1)
-        expect(results).toEqual(<VisitSlotList>{
-          'February 2022': [
-            {
-              date: 'Monday 14 February',
-              prisonerEvents: {
-                morning: [],
-                afternoon: [],
+        expect(results).toEqual(<{ slotsList: VisitSlotList; whereaboutsAvailable: boolean }>{
+          slotsList: {
+            'February 2022': [
+              {
+                date: 'Monday 14 February',
+                prisonerEvents: {
+                  morning: [],
+                  afternoon: [],
+                },
+                slots: {
+                  morning: [
+                    {
+                      id: '1',
+                      prisonId,
+                      startTimestamp: '2022-02-14T10:00:00',
+                      endTimestamp: '2022-02-14T11:00:00',
+                      availableTables: 15,
+                      capacity: 15,
+                      visitRoomName: 'A1',
+                      visitRestriction: 'OPEN',
+                    },
+                  ],
+                  afternoon: [],
+                },
               },
-              slots: {
-                morning: [
-                  {
-                    id: '1',
-                    prisonId,
-                    startTimestamp: '2022-02-14T10:00:00',
-                    endTimestamp: '2022-02-14T11:00:00',
-                    availableTables: 15,
-                    capacity: 15,
-                    visitRoomName: 'A1',
-                    visitRestriction: 'OPEN',
-                  },
-                ],
-                afternoon: [],
-              },
-            },
-          ],
+            ],
+          },
+          whereaboutsAvailable: true,
         })
       })
 
@@ -232,31 +238,34 @@ describe('Visit sessions service', () => {
         expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
         expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId)
         expect(whereaboutsApiClient.getEvents).toHaveBeenCalledTimes(1)
-        expect(results).toEqual(<VisitSlotList>{
-          'February 2022': [
-            {
-              date: 'Monday 14 February',
-              prisonerEvents: {
-                morning: [],
-                afternoon: [],
+        expect(results).toEqual(<{ slotsList: VisitSlotList; whereaboutsAvailable: boolean }>{
+          slotsList: {
+            'February 2022': [
+              {
+                date: 'Monday 14 February',
+                prisonerEvents: {
+                  morning: [],
+                  afternoon: [],
+                },
+                slots: {
+                  morning: [
+                    {
+                      id: '1',
+                      prisonId,
+                      startTimestamp: '2022-02-14T10:00:00',
+                      endTimestamp: '2022-02-14T11:00:00',
+                      availableTables: 15,
+                      capacity: 15,
+                      visitRoomName: 'A1',
+                      visitRestriction: 'OPEN',
+                    },
+                  ],
+                  afternoon: [],
+                },
               },
-              slots: {
-                morning: [
-                  {
-                    id: '1',
-                    prisonId,
-                    startTimestamp: '2022-02-14T10:00:00',
-                    endTimestamp: '2022-02-14T11:00:00',
-                    availableTables: 15,
-                    capacity: 15,
-                    visitRoomName: 'A1',
-                    visitRestriction: 'OPEN',
-                  },
-                ],
-                afternoon: [],
-              },
-            },
-          ],
+            ],
+          },
+          whereaboutsAvailable: true,
         })
       })
     })
@@ -288,31 +297,34 @@ describe('Visit sessions service', () => {
 
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId)
-      expect(results).toEqual(<VisitSlotList>{
-        'February 2022': [
-          {
-            date: 'Monday 14 February',
-            prisonerEvents: {
-              morning: [],
-              afternoon: [],
+      expect(results).toEqual(<{ slotsList: VisitSlotList; whereaboutsAvailable: boolean }>{
+        slotsList: {
+          'February 2022': [
+            {
+              date: 'Monday 14 February',
+              prisonerEvents: {
+                morning: [],
+                afternoon: [],
+              },
+              slots: {
+                morning: [
+                  {
+                    id: '1',
+                    prisonId,
+                    startTimestamp: '2022-02-14T10:00:00',
+                    endTimestamp: '2022-02-14T11:00:00',
+                    availableTables: 8,
+                    capacity: 10,
+                    visitRoomName: 'A1',
+                    visitRestriction: 'CLOSED',
+                  },
+                ],
+                afternoon: [],
+              },
             },
-            slots: {
-              morning: [
-                {
-                  id: '1',
-                  prisonId,
-                  startTimestamp: '2022-02-14T10:00:00',
-                  endTimestamp: '2022-02-14T11:00:00',
-                  availableTables: 8,
-                  capacity: 10,
-                  visitRoomName: 'A1',
-                  visitRestriction: 'CLOSED',
-                },
-              ],
-              afternoon: [],
-            },
-          },
-        ],
+          ],
+        },
+        whereaboutsAvailable: true,
       })
     })
 
@@ -391,98 +403,101 @@ describe('Visit sessions service', () => {
 
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId)
-      expect(results).toEqual(<VisitSlotList>{
-        'February 2022': [
-          {
-            date: 'Monday 14 February',
-            prisonerEvents: {
-              morning: [],
-              afternoon: [],
+      expect(results).toEqual(<{ slotsList: VisitSlotList; whereaboutsAvailable: boolean }>{
+        slotsList: {
+          'February 2022': [
+            {
+              date: 'Monday 14 February',
+              prisonerEvents: {
+                morning: [],
+                afternoon: [],
+              },
+              slots: {
+                morning: [
+                  {
+                    id: '1',
+                    prisonId,
+                    startTimestamp: '2022-02-14T10:00:00',
+                    endTimestamp: '2022-02-14T11:00:00',
+                    availableTables: 15,
+                    capacity: 15,
+                    visitRoomName: 'A1',
+                    visitRestriction: 'OPEN',
+                  },
+                  {
+                    id: '2',
+                    prisonId,
+                    startTimestamp: '2022-02-14T11:59:00',
+                    endTimestamp: '2022-02-14T12:59:00',
+                    availableTables: 10,
+                    capacity: 15,
+                    visitRoomName: 'A1',
+                    visitRestriction: 'OPEN',
+                  },
+                ],
+                afternoon: [
+                  {
+                    id: '3',
+                    prisonId,
+                    startTimestamp: '2022-02-14T12:00:00',
+                    endTimestamp: '2022-02-14T13:05:00',
+                    availableTables: 5,
+                    capacity: 15,
+                    visitRoomName: 'A1',
+                    visitRestriction: 'OPEN',
+                  },
+                ],
+              },
             },
-            slots: {
-              morning: [
-                {
-                  id: '1',
-                  prisonId,
-                  startTimestamp: '2022-02-14T10:00:00',
-                  endTimestamp: '2022-02-14T11:00:00',
-                  availableTables: 15,
-                  capacity: 15,
-                  visitRoomName: 'A1',
-                  visitRestriction: 'OPEN',
-                },
-                {
-                  id: '2',
-                  prisonId,
-                  startTimestamp: '2022-02-14T11:59:00',
-                  endTimestamp: '2022-02-14T12:59:00',
-                  availableTables: 10,
-                  capacity: 15,
-                  visitRoomName: 'A1',
-                  visitRestriction: 'OPEN',
-                },
-              ],
-              afternoon: [
-                {
-                  id: '3',
-                  prisonId,
-                  startTimestamp: '2022-02-14T12:00:00',
-                  endTimestamp: '2022-02-14T13:05:00',
-                  availableTables: 5,
-                  capacity: 15,
-                  visitRoomName: 'A1',
-                  visitRestriction: 'OPEN',
-                },
-              ],
+            {
+              date: 'Tuesday 15 February',
+              prisonerEvents: {
+                morning: [],
+                afternoon: [],
+              },
+              slots: {
+                morning: [],
+                afternoon: [
+                  {
+                    id: '4',
+                    prisonId,
+                    startTimestamp: '2022-02-15T16:00:00',
+                    endTimestamp: '2022-02-15T17:00:00',
+                    availableTables: 12,
+                    capacity: 15,
+                    visitRoomName: 'A1',
+                    visitRestriction: 'OPEN',
+                  },
+                ],
+              },
             },
-          },
-          {
-            date: 'Tuesday 15 February',
-            prisonerEvents: {
-              morning: [],
-              afternoon: [],
+          ],
+          'March 2022': [
+            {
+              date: 'Tuesday 1 March',
+              prisonerEvents: {
+                morning: [],
+                afternoon: [],
+              },
+              slots: {
+                morning: [
+                  {
+                    id: '5',
+                    prisonId,
+                    startTimestamp: '2022-03-01T09:30:00',
+                    endTimestamp: '2022-03-01T10:30:00',
+                    availableTables: 0,
+                    capacity: 15,
+                    visitRoomName: 'A1',
+                    visitRestriction: 'OPEN',
+                  },
+                ],
+                afternoon: [],
+              },
             },
-            slots: {
-              morning: [],
-              afternoon: [
-                {
-                  id: '4',
-                  prisonId,
-                  startTimestamp: '2022-02-15T16:00:00',
-                  endTimestamp: '2022-02-15T17:00:00',
-                  availableTables: 12,
-                  capacity: 15,
-                  visitRoomName: 'A1',
-                  visitRestriction: 'OPEN',
-                },
-              ],
-            },
-          },
-        ],
-        'March 2022': [
-          {
-            date: 'Tuesday 1 March',
-            prisonerEvents: {
-              morning: [],
-              afternoon: [],
-            },
-            slots: {
-              morning: [
-                {
-                  id: '5',
-                  prisonId,
-                  startTimestamp: '2022-03-01T09:30:00',
-                  endTimestamp: '2022-03-01T10:30:00',
-                  availableTables: 0,
-                  capacity: 15,
-                  visitRoomName: 'A1',
-                  visitRestriction: 'OPEN',
-                },
-              ],
-              afternoon: [],
-            },
-          },
-        ],
+          ],
+        },
+        whereaboutsAvailable: true,
       })
     })
 
@@ -525,31 +540,34 @@ describe('Visit sessions service', () => {
 
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId)
-      expect(results).toEqual(<VisitSlotList>{
-        'February 2022': [
-          {
-            date: 'Monday 14 February',
-            prisonerEvents: {
-              morning: [],
-              afternoon: [],
+      expect(results).toEqual(<{ slotsList: VisitSlotList; whereaboutsAvailable: boolean }>{
+        slotsList: {
+          'February 2022': [
+            {
+              date: 'Monday 14 February',
+              prisonerEvents: {
+                morning: [],
+                afternoon: [],
+              },
+              slots: {
+                morning: [
+                  {
+                    id: '1',
+                    prisonId,
+                    startTimestamp: '2022-02-14T09:00:00',
+                    endTimestamp: '2022-02-14T10:00:00',
+                    availableTables: 15,
+                    capacity: 15,
+                    visitRoomName: 'A1',
+                    visitRestriction: 'OPEN',
+                  },
+                ],
+                afternoon: [],
+              },
             },
-            slots: {
-              morning: [
-                {
-                  id: '1',
-                  prisonId,
-                  startTimestamp: '2022-02-14T09:00:00',
-                  endTimestamp: '2022-02-14T10:00:00',
-                  availableTables: 15,
-                  capacity: 15,
-                  visitRoomName: 'A1',
-                  visitRestriction: 'OPEN',
-                },
-              ],
-              afternoon: [],
-            },
-          },
-        ],
+          ],
+        },
+        whereaboutsAvailable: true,
       })
     })
 
@@ -592,31 +610,34 @@ describe('Visit sessions service', () => {
 
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
       expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId)
-      expect(results).toEqual(<VisitSlotList>{
-        'February 2022': [
-          {
-            date: 'Monday 14 February',
-            prisonerEvents: {
-              morning: [],
-              afternoon: [],
+      expect(results).toEqual(<{ slotsList: VisitSlotList; whereaboutsAvailable: boolean }>{
+        slotsList: {
+          'February 2022': [
+            {
+              date: 'Monday 14 February',
+              prisonerEvents: {
+                morning: [],
+                afternoon: [],
+              },
+              slots: {
+                morning: [
+                  {
+                    id: '1',
+                    prisonId,
+                    startTimestamp: '2022-02-14T09:00:00',
+                    endTimestamp: '2022-02-14T10:00:00',
+                    availableTables: 10,
+                    capacity: 10,
+                    visitRoomName: 'A1',
+                    visitRestriction: 'CLOSED',
+                  },
+                ],
+                afternoon: [],
+              },
             },
-            slots: {
-              morning: [
-                {
-                  id: '1',
-                  prisonId,
-                  startTimestamp: '2022-02-14T09:00:00',
-                  endTimestamp: '2022-02-14T10:00:00',
-                  availableTables: 10,
-                  capacity: 10,
-                  visitRoomName: 'A1',
-                  visitRestriction: 'CLOSED',
-                },
-              ],
-              afternoon: [],
-            },
-          },
-        ],
+          ],
+        },
+        whereaboutsAvailable: true,
       })
     })
   })

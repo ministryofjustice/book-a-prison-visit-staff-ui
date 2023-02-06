@@ -18,7 +18,7 @@ export default class DateAndTime {
     const isUpdate = this.mode === 'update'
     const { prisonId } = req.session.selectedEstablishment
     const { visitSessionData } = req.session
-    const slotsList = await this.visitSessionsService.getVisitSessions({
+    const { slotsList, whereaboutsAvailable } = await this.visitSessionsService.getVisitSessions({
       username: res.locals.user?.username,
       offenderNo: visitSessionData.prisoner.offenderNo,
       visitRestriction: visitSessionData.visitRestriction,
@@ -86,8 +86,10 @@ export default class DateAndTime {
       errors: req.flash('errors'),
       visitRestriction: visitSessionData.visitRestriction,
       prisonerName: visitSessionData.prisoner.name,
+      offenderNo: visitSessionData.prisoner.offenderNo,
       location: visitSessionData.prisoner.location,
       closedVisitReason: visitSessionData.closedVisitReason,
+      whereaboutsAvailable,
       slotsList,
       formValues,
       slotsPresent,
