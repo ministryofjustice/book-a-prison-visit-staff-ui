@@ -8,6 +8,7 @@ import {
   ReserveVisitSlotDto,
   ChangeVisitSlotRequestDto,
   SessionCapacity,
+  PageVisitDto,
 } from './visitSchedulerApiTypes'
 import { VisitSessionData } from '../@types/bapv'
 import config from '../config'
@@ -21,6 +22,11 @@ class VisitSchedulerApiClient {
   constructor(private readonly restclient: RestClient) {}
 
   private visitType = 'SOCIAL'
+
+  // Workaround for pagination, mentioned in comments - VB-1760
+  private page = '0'
+
+  private size = '1000'
 
   getSupportedPrisonIds(): Promise<string[]> {
     return this.restclient.get({
@@ -38,36 +44,42 @@ class VisitSchedulerApiClient {
     return this.restclient.get({ path: `/visits/${reference}` })
   }
 
-  getUpcomingVisits(offenderNo: string, visitStatus: Visit['visitStatus'][]): Promise<Visit[]> {
+  getUpcomingVisits(offenderNo: string, visitStatus: Visit['visitStatus'][]): Promise<PageVisitDto> {
     return this.restclient.get({
-      path: '/visits',
+      path: '/visits/search',
       query: new URLSearchParams({
         prisonerId: offenderNo,
-        startTimestamp: new Date().toISOString(),
+        startDateTime: new Date().toISOString(),
         visitStatus: visitStatus.join(','),
+        page: this.page,
+        size: this.size,
       }).toString(),
     })
   }
 
-  getPastVisits(offenderNo: string, visitStatus: Visit['visitStatus'][], endTimestamp?: string): Promise<Visit[]> {
+  getPastVisits(offenderNo: string, visitStatus: Visit['visitStatus'][], endTimestamp?: string): Promise<PageVisitDto> {
     return this.restclient.get({
-      path: '/visits',
+      path: '/visits/search',
       query: new URLSearchParams({
         prisonerId: offenderNo,
-        endTimestamp: endTimestamp || new Date().toISOString(),
+        endDateTime: endTimestamp || new Date().toISOString(),
         visitStatus: visitStatus.join(','),
+        page: this.page,
+        size: this.size,
       }).toString(),
     })
   }
 
-  getVisitsByDate(dateString: string, prisonId: string): Promise<Visit[]> {
+  getVisitsByDate(dateString: string, prisonId: string): Promise<PageVisitDto> {
     return this.restclient.get({
-      path: '/visits',
+      path: '/visits/search',
       query: new URLSearchParams({
         prisonId,
-        startTimestamp: `${dateString}T00:00:00`,
-        endTimestamp: `${dateString}T23:59:59`,
+        startDateTime: `${dateString}T00:00:00`,
+        endDateTime: `${dateString}T23:59:59`,
         visitStatus: 'BOOKED',
+        page: this.page,
+        size: this.size,
       }).toString(),
     })
   }

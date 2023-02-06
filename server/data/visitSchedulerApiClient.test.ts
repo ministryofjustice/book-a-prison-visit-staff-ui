@@ -130,11 +130,13 @@ describe('visitSchedulerApiClient', () => {
       jest.useFakeTimers({ advanceTimers: true, now: new Date(timestamp) })
 
       fakeVisitSchedulerApi
-        .get('/visits')
+        .get('/visits/search')
         .query({
           prisonerId: offenderNo,
-          startTimestamp: timestamp,
+          startDateTime: timestamp,
           visitStatus: 'BOOKED,CANCELLED',
+          page: '0',
+          size: '1000',
         })
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
@@ -180,11 +182,13 @@ describe('visitSchedulerApiClient', () => {
       ]
 
       fakeVisitSchedulerApi
-        .get('/visits')
+        .get('/visits/search')
         .query({
           prisonerId: offenderNo,
-          endTimestamp: timestamp,
+          endDateTime: timestamp,
           visitStatus: 'BOOKED,CANCELLED',
+          page: '0',
+          size: '1000',
         })
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
@@ -228,12 +232,14 @@ describe('visitSchedulerApiClient', () => {
       ]
 
       fakeVisitSchedulerApi
-        .get('/visits')
+        .get('/visits/search')
         .query({
           prisonId: 'HEI',
-          startTimestamp: `${dateString}T00:00:00`,
-          endTimestamp: `${dateString}T23:59:59`,
+          startDateTime: `${dateString}T00:00:00`,
+          endDateTime: `${dateString}T23:59:59`,
           visitStatus: 'BOOKED',
+          page: '0',
+          size: '1000',
         })
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)

@@ -5,7 +5,7 @@ import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
 import PrisonerContactRegistryApiClient from '../data/prisonerContactRegistryApiClient'
 import { Alert, PagePrisonerBookingSummary, VisitBalances, OffenderRestrictions } from '../data/prisonApiTypes'
 import { PrisonerAlertItem, PrisonerProfile } from '../@types/bapv'
-import { Visit } from '../data/visitSchedulerApiTypes'
+import { PageVisitDto } from '../data/visitSchedulerApiTypes'
 import { Contact } from '../data/prisonerContactRegistryApiTypes'
 import SupportedPrisonsService from './supportedPrisonsService'
 import TestData from '../routes/testutils/testData'
@@ -78,26 +78,33 @@ describe('Prisoner profile service', () => {
         latestPrivIepAdjustDate: '2021-12-01',
       }
 
-      const visit: Visit = {
-        applicationReference: 'aaa-bbb-ccc',
-        reference: 'ab-cd-ef-gh',
-        prisonerId: 'A1234BC',
-        prisonId: 'HEI',
-        visitRoom: 'A1 L3',
-        visitType: 'SOCIAL',
-        visitStatus: 'BOOKED',
-        visitRestriction: 'OPEN',
-        startTimestamp: '2022-08-17T10:00:00',
-        endTimestamp: '2022-08-17T11:00:00',
-        visitNotes: [],
-        visitors: [
+      const pagedVisit: PageVisitDto = {
+        totalPages: 1,
+        totalElements: 1,
+        size: 1,
+        content: [
           {
-            nomisPersonId: 1234,
+            applicationReference: 'aaa-bbb-ccc',
+            reference: 'ab-cd-ef-gh',
+            prisonerId: 'A1234BC',
+            prisonId: 'HEI',
+            visitRoom: 'A1 L3',
+            visitType: 'SOCIAL',
+            visitStatus: 'BOOKED',
+            visitRestriction: 'OPEN',
+            startTimestamp: '2022-08-17T10:00:00',
+            endTimestamp: '2022-08-17T11:00:00',
+            visitNotes: [],
+            visitors: [
+              {
+                nomisPersonId: 1234,
+              },
+            ],
+            visitorSupport: [],
+            createdTimestamp: '',
+            modifiedTimestamp: '',
           },
         ],
-        visitorSupport: [],
-        createdTimestamp: '',
-        modifiedTimestamp: '',
       }
 
       const socialContacts: Contact[] = [
@@ -121,8 +128,8 @@ describe('Prisoner profile service', () => {
       prisonApiClient.getOffender.mockResolvedValue(inmateDetail)
       prisonApiClient.getVisitBalances.mockResolvedValue(visitBalances)
       prisonerSearchClient.getPrisonerById.mockResolvedValue(prisoner)
-      visitSchedulerApiClient.getUpcomingVisits.mockResolvedValue([visit])
-      visitSchedulerApiClient.getPastVisits.mockResolvedValue([visit])
+      visitSchedulerApiClient.getUpcomingVisits.mockResolvedValue(pagedVisit)
+      visitSchedulerApiClient.getPastVisits.mockResolvedValue(pagedVisit)
       prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue(socialContacts)
 
       const results = await prisonerProfileService.getProfile(offenderNo, prisonId, 'user')
@@ -202,8 +209,8 @@ describe('Prisoner profile service', () => {
       prisonApiClient.getBookings.mockResolvedValue(bookings)
       prisonApiClient.getOffender.mockResolvedValue(inmateDetail)
       prisonerSearchClient.getPrisonerById.mockResolvedValue(prisoner)
-      visitSchedulerApiClient.getUpcomingVisits.mockResolvedValue([])
-      visitSchedulerApiClient.getPastVisits.mockResolvedValue([])
+      visitSchedulerApiClient.getUpcomingVisits.mockResolvedValue({ content: [] })
+      visitSchedulerApiClient.getPastVisits.mockResolvedValue({ content: [] })
 
       const results = await prisonerProfileService.getProfile(offenderNo, prisonId, 'user')
 
@@ -458,8 +465,8 @@ describe('Prisoner profile service', () => {
       prisonApiClient.getBookings.mockResolvedValue(bookings)
       prisonApiClient.getOffender.mockResolvedValue(inmateDetail)
       prisonerSearchClient.getPrisonerById.mockResolvedValue(prisoner)
-      visitSchedulerApiClient.getUpcomingVisits.mockResolvedValue([])
-      visitSchedulerApiClient.getPastVisits.mockResolvedValue([])
+      visitSchedulerApiClient.getUpcomingVisits.mockResolvedValue({ content: [] })
+      visitSchedulerApiClient.getPastVisits.mockResolvedValue({ content: [] })
 
       const results = await prisonerProfileService.getProfile(offenderNo, prisonId, 'user')
 

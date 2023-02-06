@@ -3,7 +3,7 @@ import PrisonerContactRegistryApiClient from '../data/prisonerContactRegistryApi
 import VisitSessionsService from './visitSessionsService'
 import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
 import WhereaboutsApiClient from '../data/whereaboutsApiClient'
-import { VisitSession, Visit, OutcomeDto } from '../data/visitSchedulerApiTypes'
+import { VisitSession, Visit, OutcomeDto, PageVisitDto } from '../data/visitSchedulerApiTypes'
 import { Address, Contact, AddressUsage, Restriction } from '../data/prisonerContactRegistryApiTypes'
 import {
   VisitSlotList,
@@ -1057,7 +1057,7 @@ describe('Visit sessions service', () => {
       it('should return an array of upcoming VisitInformation for an offender', async () => {
         const visits: Visit[] = [visit]
 
-        visitSchedulerApiClient.getUpcomingVisits.mockResolvedValue(visits)
+        visitSchedulerApiClient.getUpcomingVisits.mockResolvedValue({ content: visits })
         const result = await visitSessionsService.getUpcomingVisits({
           username: 'user',
           offenderNo: 'A1234BC',
@@ -1082,7 +1082,7 @@ describe('Visit sessions service', () => {
       it('should return an empty array for an offender with no upcoming visits', async () => {
         const visits: Visit[] = []
 
-        visitSchedulerApiClient.getUpcomingVisits.mockResolvedValue(visits)
+        visitSchedulerApiClient.getUpcomingVisits.mockResolvedValue({ content: visits })
         const result = await visitSessionsService.getUpcomingVisits({
           username: 'user',
           offenderNo: 'A1234BC',
@@ -1201,7 +1201,7 @@ describe('Visit sessions service', () => {
 
   describe('getVisitsByDate', () => {
     it('should return empty data if no visit sessions on chosen date', async () => {
-      visitSchedulerApiClient.getVisitsByDate.mockResolvedValue([])
+      visitSchedulerApiClient.getVisitsByDate.mockResolvedValue({ content: [] })
       prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue([])
       const results = await visitSessionsService.getVisitsByDate({
         username: 'user',
@@ -1226,68 +1226,74 @@ describe('Visit sessions service', () => {
       const emptyUsages: AddressUsage[] = []
       const emptyRestrictions: Restriction[] = []
 
-      const visits: Visit[] = [
-        {
-          applicationReference: 'aaa-bbb-ccc',
-          reference: 'ob-cw-lx-na',
-          prisonerId: 'A8709DY',
-          prisonId: 'HEI',
-          visitRoom: 'VISITS-VISITS-H1_6LV',
-          visitType: 'SOCIAL',
-          visitStatus: 'BOOKED',
-          outcomeStatus: 'NOT_RECORDED',
-          visitRestriction: 'OPEN',
-          startTimestamp: '2022-05-23T09:00:00',
-          endTimestamp: '2022-05-23T09:29:00',
-          visitNotes: [],
-          visitContact: {
-            name: 'UNKNOWN',
-            telephone: 'UNKNOWN',
+      const pagedVisit: PageVisitDto = {
+        totalPages: 1,
+        totalElements: 1,
+        size: 1,
+        content: [
+          {
+            applicationReference: 'aaa-bbb-ccc',
+            reference: 'ob-cw-lx-na',
+            prisonerId: 'A8709DY',
+            prisonId: 'HEI',
+            visitRoom: 'VISITS-VISITS-H1_6LV',
+            visitType: 'SOCIAL',
+            visitStatus: 'BOOKED',
+            outcomeStatus: 'NOT_RECORDED',
+            visitRestriction: 'OPEN',
+            startTimestamp: '2022-05-23T09:00:00',
+            endTimestamp: '2022-05-23T09:29:00',
+            visitNotes: [],
+            visitContact: {
+              name: 'UNKNOWN',
+              telephone: 'UNKNOWN',
+            },
+            visitors: [
+              {
+                nomisPersonId: 4729510,
+              },
+            ],
+            visitorSupport: [],
+            createdTimestamp: '2022-05-23T10:09:56.636334',
+            modifiedTimestamp: '2022-05-23T10:09:56.64691',
           },
-          visitors: [
-            {
-              nomisPersonId: 4729510,
+          {
+            applicationReference: 'aaa-bbb-ccc',
+            reference: 'lb-co-bn-oe',
+            prisonerId: 'A8709DY',
+            prisonId: 'HEI',
+            visitRoom: 'daily test room',
+            visitType: 'SOCIAL',
+            visitStatus: 'BOOKED',
+            outcomeStatus: 'ADMINISTRATIVE_ERROR',
+            visitRestriction: 'OPEN',
+            startTimestamp: '2022-05-23T10:00:00',
+            endTimestamp: '2022-05-23T11:00:00',
+            visitNotes: [
+              {
+                type: 'VISIT_OUTCOMES',
+                text: 'na',
+              },
+            ],
+            visitContact: {
+              name: 'Tess Bennett',
+              telephone: '0114 5555555',
             },
-          ],
-          visitorSupport: [],
-          createdTimestamp: '2022-05-23T10:09:56.636334',
-          modifiedTimestamp: '2022-05-23T10:09:56.64691',
-        },
-        {
-          applicationReference: 'aaa-bbb-ccc',
-          reference: 'lb-co-bn-oe',
-          prisonerId: 'A8709DY',
-          prisonId: 'HEI',
-          visitRoom: 'daily test room',
-          visitType: 'SOCIAL',
-          visitStatus: 'BOOKED',
-          outcomeStatus: 'ADMINISTRATIVE_ERROR',
-          visitRestriction: 'OPEN',
-          startTimestamp: '2022-05-23T10:00:00',
-          endTimestamp: '2022-05-23T11:00:00',
-          visitNotes: [
-            {
-              type: 'VISIT_OUTCOMES',
-              text: 'na',
-            },
-          ],
-          visitContact: {
-            name: 'Tess Bennett',
-            telephone: '0114 5555555',
+            visitors: [
+              {
+                nomisPersonId: 4729570,
+              },
+              {
+                nomisPersonId: 4729510,
+              },
+            ],
+            visitorSupport: [],
+            createdTimestamp: '2022-05-20T15:29:04.997067',
+            modifiedTimestamp: '2022-05-20T15:51:49.983108',
           },
-          visitors: [
-            {
-              nomisPersonId: 4729570,
-            },
-            {
-              nomisPersonId: 4729510,
-            },
-          ],
-          visitorSupport: [],
-          createdTimestamp: '2022-05-20T15:29:04.997067',
-          modifiedTimestamp: '2022-05-20T15:51:49.983108',
-        },
-      ]
+        ],
+      }
+
       const social: Contact[] = [
         {
           personId: 4729510,
@@ -1342,7 +1348,7 @@ describe('Visit sessions service', () => {
         },
       ]
 
-      visitSchedulerApiClient.getVisitsByDate.mockResolvedValue(visits)
+      visitSchedulerApiClient.getVisitsByDate.mockResolvedValue(pagedVisit)
       prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue(social)
       const results = await visitSessionsService.getVisitsByDate({
         username: 'user',
