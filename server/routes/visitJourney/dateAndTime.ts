@@ -25,7 +25,7 @@ export default class DateAndTime {
       prisonId,
     })
 
-    let restrictionChangeMessage = ''
+    let slotChangeReason = ''
     let matchingSlot
 
     // first time here on update journey, visitSlot.id will be ''
@@ -45,15 +45,19 @@ export default class DateAndTime {
         visitSessionData.visitSlot.id = matchingSlot.id
       }
 
+      if (!matchingSlot) {
+        slotChangeReason = `A new visit time must be selected. A change to the prisoner's information means the original time slot is no longer suitable`
+      }
+
       if (visitSessionData.visitRestriction !== visitSessionData.originalVisitSlot.visitRestriction) {
         if (matchingSlot && matchingSlot.availableTables > 0) {
-          restrictionChangeMessage = visitSessionData.closedVisitReason
+          slotChangeReason = visitSessionData.closedVisitReason
             ? `This is now a closed visit due to a ${visitSessionData.closedVisitReason} restriction. `
             : 'This is now an open visit. '
-          restrictionChangeMessage += 'The visit time can stay the same.'
+          slotChangeReason += 'The visit time can stay the same.'
         } else {
-          restrictionChangeMessage = 'A new visit time must be selected as this is now '
-          restrictionChangeMessage += visitSessionData.closedVisitReason
+          slotChangeReason = 'A new visit time must be selected as this is now '
+          slotChangeReason += visitSessionData.closedVisitReason
             ? `a closed visit due to a ${visitSessionData.closedVisitReason} restriction.`
             : 'an open visit.'
         }
@@ -93,7 +97,7 @@ export default class DateAndTime {
       slotsList,
       formValues,
       slotsPresent,
-      restrictionChangeMessage,
+      slotChangeReason,
       originalVisitSlot,
       urlPrefix: getUrlPrefix(isUpdate, visitSessionData.visitReference),
     })

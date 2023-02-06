@@ -75,11 +75,11 @@
       }) }}
     {% endif %}
 
-    {% if restrictionChangeMessage %}
+    {% if slotChangeReason %}
       {% set restrictionChangeReasonHtml %}
           {{ govukWarningText({
             classes: "govuk-!-margin-bottom-0",
-            html: '<span class="govuk-!-font-size-24">' + restrictionChangeMessage + '</span>',
+            html: '<span class="govuk-!-font-size-24">' + slotChangeReason + '</span>',
             iconFallbackText: "Warning",
             attributes: {
               "data-test": "restriction-change-reason"
