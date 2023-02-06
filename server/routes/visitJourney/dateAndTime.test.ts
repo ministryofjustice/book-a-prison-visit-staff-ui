@@ -247,7 +247,7 @@ testJourneys.forEach(journey => {
             expect($('h1').text().trim()).toBe('Select date and time of visit')
             expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
             expect($('[data-test="whereabouts-unavailable"]').text().trim()).toContain(
-              'The prisoner schedule is unavailable. Check NOMIS for court appearances. Prison number: A1234BC.',
+              'The prisoner schedule is unavailable. Check NOMIS for court appearances. Prison number: A1234BC',
             )
             expect($('[data-test="submit"]').text().trim()).toBe('Continue')
           })
