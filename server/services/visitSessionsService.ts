@@ -20,6 +20,7 @@ import PrisonerContactRegistryApiClient from '../data/prisonerContactRegistryApi
 import buildVisitorListItem from '../utils/visitorUtils'
 import { getVisitSlotsFromBookedVisits, getPrisonerEvents } from '../utils/visitsUtils'
 import { getSupportTypeDescriptions } from '../routes/visitorUtils'
+import { ScheduledEvent } from '../data/whereaboutsApiTypes'
 
 type PrisonerContactRegistryApiClientBuilder = (token: string) => PrisonerContactRegistryApiClient
 type VisitSchedulerApiClientBuilder = (token: string) => VisitSchedulerApiClient
@@ -51,7 +52,7 @@ export default class VisitSessionsService {
     offenderNo: string
     prisonId: string
     visitRestriction: VisitSessionData['visitRestriction']
-  }): Promise<VisitSlotList> {
+  }): Promise<{ slotsList: VisitSlotList; whereaboutsAvailable: boolean }> {
     const token = await this.systemToken(username)
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
     const whereaboutsApiClient = this.whereaboutsApiClientBuilder(token)
@@ -120,11 +121,17 @@ export default class VisitSessionsService {
       {},
     )
 
-    const prisonerEvents = await whereaboutsApiClient.getEvents(
-      offenderNo,
-      format(earliestStartTime, 'yyyy-MM-dd'),
-      format(latestEndTime, 'yyyy-MM-dd'),
-    )
+    let prisonerEvents: ScheduledEvent[] = []
+    let whereaboutsAvailable = true
+    try {
+      prisonerEvents = await whereaboutsApiClient.getEvents(
+        offenderNo,
+        format(earliestStartTime, 'yyyy-MM-dd'),
+        format(latestEndTime, 'yyyy-MM-dd'),
+      )
+    } catch (error) {
+      whereaboutsAvailable = false
+    }
 
     Object.keys(availableSessions).forEach(month => {
       /* eslint no-param-reassign: ["error", { "props": false }] */
@@ -158,7 +165,7 @@ export default class VisitSessionsService {
       }
     })
 
-    return availableSessions
+    return { slotsList: availableSessions, whereaboutsAvailable }
   }
 
   async getVisitSessionCapacity(

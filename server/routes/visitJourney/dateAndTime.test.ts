@@ -130,7 +130,7 @@ testJourneys.forEach(journey => {
     }
 
     beforeEach(() => {
-      visitSessionsService.getVisitSessions.mockResolvedValue(slotsList)
+      visitSessionsService.getVisitSessions.mockResolvedValue({ slotsList, whereaboutsAvailable: true })
     })
 
     describe(`GET ${journey.urlPrefix}/select-date-and-time`, () => {
@@ -146,6 +146,7 @@ testJourneys.forEach(journey => {
             expect($('[data-test="visit-location"]').text()).toBe('location place')
             expect($('[data-test="visit-restriction"]').text()).toBe('Open')
             expect($('[data-test="closed-visit-reason"]').length).toBe(0)
+            expect($('[data-test="whereabouts-unavailable"]').length).toBe(0)
             expect($('input[name="visit-date-and-time"]').length).toBe(3)
             expect($('input[name="visit-date-and-time"]:checked').length).toBe(0)
             expect($('.govuk-accordion__section--expanded').length).toBe(0)
@@ -174,6 +175,7 @@ testJourneys.forEach(journey => {
             expect($('[data-test="closed-visit-reason"]').text()).toContain(
               'Closed visit as a visitor has a closed visit restriction.',
             )
+            expect($('[data-test="whereabouts-unavailable"]').length).toBe(0)
           })
       })
 
@@ -194,11 +196,12 @@ testJourneys.forEach(journey => {
             expect($('[data-test="closed-visit-reason"]').text()).toContain(
               'Closed visit as the prisoner has a closed visit restriction.',
             )
+            expect($('[data-test="whereabouts-unavailable"]').length).toBe(0)
           })
       })
 
       it('should show message if no sessions are available', () => {
-        visitSessionsService.getVisitSessions.mockResolvedValue({})
+        visitSessionsService.getVisitSessions.mockResolvedValue({ slotsList: {}, whereaboutsAvailable: true })
 
         sessionApp = appWithAllRoutes({
           visitSessionsServiceOverride: visitSessionsService,
@@ -218,8 +221,35 @@ testJourneys.forEach(journey => {
             expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
             expect($('#main-content').text()).toContain('There are no available slots for the selected time and day.')
             expect($('input[name="visit-date-and-time"]').length).toBe(0)
+            expect($('[data-test="whereabouts-unavailable"]').length).toBe(0)
             expect($('[data-test="submit"]').length).toBe(0)
             expect($('[data-test="back-to-start"]').length).toBe(1)
+          })
+      })
+
+      it('should show warning message when whereabouts data is not available', () => {
+        visitSessionsService.getVisitSessions.mockResolvedValue({ slotsList, whereaboutsAvailable: false })
+
+        sessionApp = appWithAllRoutes({
+          visitSessionsServiceOverride: visitSessionsService,
+          systemTokenOverride: systemToken,
+          sessionData: {
+            visitSessionData,
+          } as SessionData,
+        })
+
+        return request(sessionApp)
+          .get(`${journey.urlPrefix}/select-date-and-time`)
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('h1').text().trim()).toBe('Select date and time of visit')
+            expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
+            expect($('[data-test="whereabouts-unavailable"]').text().trim()).toContain(
+              'The prisoner schedule is unavailable. Check NOMIS for court appearances. Prison number: A1234BC',
+            )
+            expect($('[data-test="submit"]').text().trim()).toBe('Continue')
           })
       })
 
@@ -481,7 +511,7 @@ describe('Update journey specific warning messages', () => {
     }
     currentlyAvailableSlots = slotsList['October 2022'][0].slots.morning
 
-    visitSessionsService.getVisitSessions.mockResolvedValue(slotsList)
+    visitSessionsService.getVisitSessions.mockResolvedValue({ slotsList, whereaboutsAvailable: true })
 
     visitSessionData.visitSlot = currentlyBookedSlot
     visitSessionData.originalVisitSlot = currentlyBookedSlot
