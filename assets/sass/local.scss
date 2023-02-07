@@ -247,3 +247,7 @@
     margin-bottom: govuk-spacing(3);
   }
 }
+
+.govuk-table__cell {
+  word-break: break-word;
+}
