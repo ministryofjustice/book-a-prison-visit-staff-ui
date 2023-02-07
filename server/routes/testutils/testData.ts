@@ -6,6 +6,7 @@ import {
   PrisonerBookingSummary,
   VisitBalances,
   OffenderRestriction,
+  Alert,
 } from '../../data/prisonApiTypes'
 import { CurrentIncentive, Prisoner } from '../../data/prisonerOffenderSearchTypes'
 import { Address, Contact } from '../../data/prisonerContactRegistryApiTypes'
@@ -40,6 +41,31 @@ export default class TestData {
       phones,
       addressUsages,
     } as Address)
+
+  static alert = ({
+    alertId = 123,
+    alertType = 'U',
+    alertTypeDescription = 'COVID unit management',
+    alertCode = 'UPIU',
+    alertCodeDescription = 'Protective Isolation Unit',
+    comment = 'Alert comment!',
+    dateCreated = '2023-01-02',
+    dateExpires = undefined,
+    expired = false,
+    active = true,
+  }: Partial<Alert> = {}): Alert =>
+    ({
+      alertId,
+      alertType,
+      alertTypeDescription,
+      alertCode,
+      alertCodeDescription,
+      comment,
+      dateCreated,
+      dateExpires,
+      expired,
+      active,
+    } as Alert)
 
   static caseLoads = ({
     caseLoads = [
@@ -101,8 +127,8 @@ export default class TestData {
     firstName = 'JOHN',
     lastName = 'SMITH',
     dateOfBirth = '1975-04-02',
-    activeAlertCount = undefined,
-    inactiveAlertCount = undefined,
+    activeAlertCount = 0,
+    inactiveAlertCount = 0,
     alerts = undefined,
     assignedLivingUnit = {
       description: '1-1-C-028',
@@ -313,8 +339,8 @@ export default class TestData {
   static visitBalances = ({
     remainingVo = 2,
     remainingPvo = 1,
-    latestIepAdjustDate = '2022-04-25T09:35:34.489Z',
-    latestPrivIepAdjustDate = '2022-04-25T09:35:34.489Z',
+    latestIepAdjustDate = '2022-04-25',
+    latestPrivIepAdjustDate = '2022-04-26',
   }: Partial<VisitBalances> = {}): VisitBalances => ({
     remainingVo,
     remainingPvo,

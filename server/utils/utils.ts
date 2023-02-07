@@ -109,18 +109,14 @@ export const convertToTitleCase = (sentence: string): string =>
 export const visitDateAndTime = ({
   startTimestamp,
   endTimestamp,
-  isIntTest = false,
 }: {
   startTimestamp: string
   endTimestamp: string
-  isIntTest?: boolean
 }): string => {
   const startTime = format(parseISO(startTimestamp), 'h:mmaaa')
   const endTime = endTimestamp ? ` - ${format(parseISO(endTimestamp), 'h:mmaaa')}` : ''
 
-  return isIntTest
-    ? `${prisonerDateTimePretty(startTimestamp)}${startTime}${endTime}`
-    : `${prisonerDateTimePretty(startTimestamp)}<br>${startTime}${endTime}`
+  return `${prisonerDateTimePretty(startTimestamp)}<br>${startTime}${endTime}`
 }
 
 export const nextIepAdjustDate = (latestIepAdjustDate: string): string => {
