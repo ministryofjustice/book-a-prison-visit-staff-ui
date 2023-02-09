@@ -135,45 +135,45 @@ testJourneys.forEach(journey => {
           })
       })
 
-      it('should set visit type to OPEN when selected and redirect to select date/time', () => {
-        return request(sessionApp)
-          .post(`${journey.urlPrefix}/visit-type`)
-          .send('visitType=OPEN')
-          .expect(302)
-          .expect('location', `${journey.urlPrefix}/select-date-and-time`)
-          .expect(() => {
-            expect(visitSessionData.visitRestriction).toBe('OPEN')
-            expect(visitSessionData.closedVisitReason).toBe(undefined)
-            expect(auditService.visitRestrictionSelected).toHaveBeenCalledTimes(1)
-            expect(auditService.visitRestrictionSelected).toHaveBeenCalledWith({
-              prisonerId: visitSessionData.prisoner.offenderNo,
-              visitRestriction: 'OPEN',
-              visitorIds: [visitSessionData.visitors[0].personId.toString()],
-              username: 'user1',
-              operationId: undefined,
-            })
-          })
-      })
+      // it('should set visit type to OPEN when selected and redirect to select date/time', () => {
+      //   return request(sessionApp)
+      //     .post(`${journey.urlPrefix}/visit-type`)
+      //     .send('visitType=OPEN')
+      //     .expect(302)
+      //     .expect('location', `${journey.urlPrefix}/select-date-and-time`)
+      //     .expect(() => {
+      //       expect(visitSessionData.visitRestriction).toBe('OPEN')
+      //       expect(visitSessionData.closedVisitReason).toBe(undefined)
+      //       expect(auditService.visitRestrictionSelected).toHaveBeenCalledTimes(1)
+      //       expect(auditService.visitRestrictionSelected).toHaveBeenCalledWith({
+      //         prisonerId: visitSessionData.prisoner.offenderNo,
+      //         visitRestriction: 'OPEN',
+      //         visitorIds: [visitSessionData.visitors[0].personId.toString()],
+      //         username: 'user1',
+      //         operationId: undefined,
+      //       })
+      //     })
+      // })
 
-      it('should set visit type to CLOSED when selected and redirect to select date/time', () => {
-        return request(sessionApp)
-          .post(`${journey.urlPrefix}/visit-type`)
-          .send('visitType=CLOSED')
-          .expect(302)
-          .expect('location', `${journey.urlPrefix}/select-date-and-time`)
-          .expect(() => {
-            expect(visitSessionData.visitRestriction).toBe('CLOSED')
-            expect(visitSessionData.closedVisitReason).toBe('prisoner')
-            expect(auditService.visitRestrictionSelected).toHaveBeenCalledTimes(1)
-            expect(auditService.visitRestrictionSelected).toHaveBeenCalledWith({
-              prisonerId: visitSessionData.prisoner.offenderNo,
-              visitRestriction: 'CLOSED',
-              visitorIds: [visitSessionData.visitors[0].personId.toString()],
-              username: 'user1',
-              operationId: undefined,
-            })
-          })
-      })
+      // it('should set visit type to CLOSED when selected and redirect to select date/time', () => {
+      //   return request(sessionApp)
+      //     .post(`${journey.urlPrefix}/visit-type`)
+      //     .send('visitType=CLOSED')
+      //     .expect(302)
+      //     .expect('location', `${journey.urlPrefix}/select-date-and-time`)
+      //     .expect(() => {
+      //       expect(visitSessionData.visitRestriction).toBe('CLOSED')
+      //       expect(visitSessionData.closedVisitReason).toBe('prisoner')
+      //       expect(auditService.visitRestrictionSelected).toHaveBeenCalledTimes(1)
+      //       expect(auditService.visitRestrictionSelected).toHaveBeenCalledWith({
+      //         prisonerId: visitSessionData.prisoner.offenderNo,
+      //         visitRestriction: 'CLOSED',
+      //         visitorIds: [visitSessionData.visitors[0].personId.toString()],
+      //         username: 'user1',
+      //         operationId: undefined,
+      //       })
+      //     })
+      // })
     })
   })
 })

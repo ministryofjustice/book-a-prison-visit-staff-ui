@@ -27,6 +27,7 @@ export default class DateAndTime {
 
     let restrictionChangeMessage = ''
     let matchingSlot
+    let slotChangeMessage = false
 
     // first time here on update journey, visitSlot.id will be ''
     if (isUpdate && visitSessionData.visitSlot?.id === '') {
@@ -45,18 +46,12 @@ export default class DateAndTime {
         visitSessionData.visitSlot.id = matchingSlot.id
       }
 
+      // if no matching slot, set slotChangeMessage = true
+      slotChangeMessage = !matchingSlot
+
       if (visitSessionData.visitRestriction !== visitSessionData.originalVisitSlot.visitRestriction) {
-        if (matchingSlot && matchingSlot.availableTables > 0) {
-          restrictionChangeMessage = visitSessionData.closedVisitReason
-            ? `This is now a closed visit due to a ${visitSessionData.closedVisitReason} restriction. `
-            : 'This is now an open visit. '
-          restrictionChangeMessage += 'The visit time can stay the same.'
-        } else {
-          restrictionChangeMessage = 'A new visit time must be selected as this is now '
-          restrictionChangeMessage += visitSessionData.closedVisitReason
-            ? `a closed visit due to a ${visitSessionData.closedVisitReason} restriction.`
-            : 'an open visit.'
-        }
+        restrictionChangeMessage = 'The visit type has changed from '
+        restrictionChangeMessage += visitSessionData.visitRestriction === 'OPEN' ? 'closed to open.' : 'open to closed.'
       }
     }
 
@@ -88,11 +83,11 @@ export default class DateAndTime {
       prisonerName: visitSessionData.prisoner.name,
       offenderNo: visitSessionData.prisoner.offenderNo,
       location: visitSessionData.prisoner.location,
-      closedVisitReason: visitSessionData.closedVisitReason,
       whereaboutsAvailable,
       slotsList,
       formValues,
       slotsPresent,
+      slotChangeMessage,
       restrictionChangeMessage,
       originalVisitSlot,
       urlPrefix: getUrlPrefix(isUpdate, visitSessionData.visitReference),
