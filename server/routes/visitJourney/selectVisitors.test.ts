@@ -592,156 +592,141 @@ testJourneys.forEach(journey => {
       })
     })
 
-    // it('should save to session and redirect to the select date and time page if an adult is selected (OPEN visit)', () => {
-    //   const returnAdult: VisitorListItem[] = [
-    //     {
-    //       address: '1st listed address',
-    //       adult: true,
-    //       dateOfBirth: '1986-07-28',
-    //       name: 'Bob Smith',
-    //       personId: 4322,
-    //       relationshipDescription: 'Brother',
-    //       restrictions: [],
-    //       banned: false,
-    //     },
-    //   ]
+    it('should save to session and redirect to the select date and time page if an adult is selected (OPEN visit)', () => {
+      const returnAdult: VisitorListItem[] = [
+        {
+          address: '1st listed address',
+          adult: true,
+          dateOfBirth: '1986-07-28',
+          name: 'Bob Smith',
+          personId: 4322,
+          relationshipDescription: 'Brother',
+          restrictions: [],
+          banned: false,
+        },
+      ]
 
-    //   return request(sessionApp)
-    //     .post(`${journey.urlPrefix}/select-visitors`)
-    //     .send('visitors=4322')
-    //     .expect(302)
-    //     .expect('location', `${journey.urlPrefix}/select-date-and-time`)
-    //     .expect(() => {
-    //       expect(adultVisitors.adults).toEqual(returnAdult)
-    //       expect(visitSessionData.visitors).toEqual(returnAdult)
-    //       expect(visitSessionData.visitRestriction).toBe('OPEN')
-    //       expect(visitSessionData.closedVisitReason).toBe(undefined)
-    //     })
-    // })
+      return request(sessionApp)
+        .post(`${journey.urlPrefix}/select-visitors`)
+        .send('visitors=4322')
+        .expect(302)
+        .expect('location', `${journey.urlPrefix}/select-date-and-time`)
+        .expect(() => {
+          expect(adultVisitors.adults).toEqual(returnAdult)
+          expect(visitSessionData.visitors).toEqual(returnAdult)
+          expect(visitSessionData.visitRestriction).toBe('OPEN')
+        })
+    })
 
-    // it('should save to session and redirect to the select date and time page if an adult with CLOSED restriction is selected (CLOSED visit)', () => {
-    //   const returnAdult: VisitorListItem[] = [
-    //     {
-    //       address: '1st listed address',
-    //       adult: true,
-    //       dateOfBirth: '1986-07-28',
-    //       name: 'Bob Smith',
-    //       personId: 4322,
-    //       relationshipDescription: 'Brother',
-    //       restrictions: [],
-    //       banned: false,
-    //     },
-    //     {
-    //       address: 'Not entered',
-    //       adult: true,
-    //       dateOfBirth: '1978-05-25',
-    //       name: 'John Jones',
-    //       personId: 4326,
-    //       relationshipDescription: 'Friend',
-    //       restrictions: [
-    //         {
-    //           restrictionType: 'CLOSED',
-    //           restrictionTypeDescription: 'Closed',
-    //           startDate: '2022-01-01',
-    //         },
-    //       ],
-    //       banned: false,
-    //     },
-    //   ]
+    it('should save to session and redirect to the select date and time page if VISITOR with CLOSED restriction is selected (CLOSED visit)', () => {
+      const returnAdult: VisitorListItem[] = [
+        {
+          address: 'Not entered',
+          adult: true,
+          dateOfBirth: '1978-05-25',
+          name: 'John Jones',
+          personId: 4326,
+          relationshipDescription: 'Friend',
+          restrictions: [
+            {
+              restrictionType: 'CLOSED',
+              restrictionTypeDescription: 'Closed',
+              startDate: '2022-01-01',
+            },
+          ],
+          banned: false,
+        },
+      ]
 
-    //   return request(sessionApp)
-    //     .post(`${journey.urlPrefix}/select-visitors`)
-    //     .send('visitors=4322')
-    //     .send('visitors=4326')
-    //     .expect(302)
-    //     .expect('location', `${journey.urlPrefix}/select-date-and-time`)
-    //     .expect(() => {
-    //       expect(adultVisitors.adults).toEqual(returnAdult)
-    //       expect(visitSessionData.visitors).toEqual(returnAdult)
-    //       expect(visitSessionData.visitRestriction).toBe('CLOSED')
-    //       expect(visitSessionData.closedVisitReason).toBe('visitor')
-    //     })
-    // })
+      return request(sessionApp)
+        .post(`${journey.urlPrefix}/select-visitors`)
+        .send('visitors=4326')
+        .expect(302)
+        .expect('location', `${journey.urlPrefix}/select-date-and-time`)
+        .expect(() => {
+          expect(adultVisitors.adults).toEqual(returnAdult)
+          expect(visitSessionData.visitors).toEqual(returnAdult)
+          expect(visitSessionData.visitRestriction).toBe('CLOSED')
+        })
+    })
 
-    // it('should save to session and redirect to the select date and time page if prisoner and visitor both have CLOSED restriction (CLOSED visit)', () => {
-    //   visitSessionData.prisoner.restrictions = [
-    //     {
-    //       restrictionId: 12345,
-    //       restrictionType: 'CLOSED',
-    //       restrictionTypeDescription: 'Closed',
-    //       startDate: '2022-05-16',
-    //       active: true,
-    //     },
-    //   ]
+    it('should save to session and redirect to the select date and time page if prisoner and visitor both have CLOSED restriction (CLOSED visit)', () => {
+      visitSessionData.prisoner.restrictions = [
+        {
+          restrictionId: 12345,
+          restrictionType: 'CLOSED',
+          restrictionTypeDescription: 'Closed',
+          startDate: '2022-05-16',
+          active: true,
+        },
+      ]
 
-    //   const returnAdult: VisitorListItem[] = [
-    //     {
-    //       address: 'Not entered',
-    //       adult: true,
-    //       dateOfBirth: '1978-05-25',
-    //       name: 'John Jones',
-    //       personId: 4326,
-    //       relationshipDescription: 'Friend',
-    //       restrictions: [
-    //         {
-    //           restrictionType: 'CLOSED',
-    //           restrictionTypeDescription: 'Closed',
-    //           startDate: '2022-01-01',
-    //         },
-    //       ],
-    //       banned: false,
-    //     },
-    //   ]
+      const returnAdult: VisitorListItem[] = [
+        {
+          address: 'Not entered',
+          adult: true,
+          dateOfBirth: '1978-05-25',
+          name: 'John Jones',
+          personId: 4326,
+          relationshipDescription: 'Friend',
+          restrictions: [
+            {
+              restrictionType: 'CLOSED',
+              restrictionTypeDescription: 'Closed',
+              startDate: '2022-01-01',
+            },
+          ],
+          banned: false,
+        },
+      ]
 
-    //   return request(sessionApp)
-    //     .post(`${journey.urlPrefix}/select-visitors`)
-    //     .send('visitors=4326')
-    //     .expect(302)
-    //     .expect('location', `${journey.urlPrefix}/select-date-and-time`)
-    //     .expect(() => {
-    //       expect(adultVisitors.adults).toEqual(returnAdult)
-    //       expect(visitSessionData.visitors).toEqual(returnAdult)
-    //       expect(visitSessionData.visitRestriction).toBe('CLOSED')
-    //       expect(visitSessionData.closedVisitReason).toBe('visitor')
-    //     })
-    // })
+      return request(sessionApp)
+        .post(`${journey.urlPrefix}/select-visitors`)
+        .send('visitors=4326')
+        .expect(302)
+        .expect('location', `${journey.urlPrefix}/select-date-and-time`)
+        .expect(() => {
+          expect(adultVisitors.adults).toEqual(returnAdult)
+          expect(visitSessionData.visitors).toEqual(returnAdult)
+          expect(visitSessionData.visitRestriction).toBe('CLOSED')
+        })
+    })
 
-    // it('should save to session and redirect to open/closed visit choice if prisoner has CLOSED restriction and visitor not CLOSED', () => {
-    //   visitSessionData.prisoner.restrictions = [
-    //     {
-    //       restrictionId: 12345,
-    //       restrictionType: 'CLOSED',
-    //       restrictionTypeDescription: 'Closed',
-    //       startDate: '2022-05-16',
-    //       active: true,
-    //     },
-    //   ]
+    it('should save to session and redirect to open/closed visit choice if prisoner has CLOSED restriction and visitor not CLOSED', () => {
+      visitSessionData.prisoner.restrictions = [
+        {
+          restrictionId: 12345,
+          restrictionType: 'CLOSED',
+          restrictionTypeDescription: 'Closed',
+          startDate: '2022-05-16',
+          active: true,
+        },
+      ]
 
-    //   const returnAdult: VisitorListItem[] = [
-    //     {
-    //       address: '1st listed address',
-    //       adult: true,
-    //       dateOfBirth: '1986-07-28',
-    //       name: 'Bob Smith',
-    //       personId: 4322,
-    //       relationshipDescription: 'Brother',
-    //       restrictions: [],
-    //       banned: false,
-    //     },
-    //   ]
+      const returnAdult: VisitorListItem[] = [
+        {
+          address: '1st listed address',
+          adult: true,
+          dateOfBirth: '1986-07-28',
+          name: 'Bob Smith',
+          personId: 4322,
+          relationshipDescription: 'Brother',
+          restrictions: [],
+          banned: false,
+        },
+      ]
 
-    //   return request(sessionApp)
-    //     .post(`${journey.urlPrefix}/select-visitors`)
-    //     .send('visitors=4322')
-    //     .expect(302)
-    //     .expect('location', `${journey.urlPrefix}/visit-type`)
-    //     .expect(() => {
-    //       expect(adultVisitors.adults).toEqual(returnAdult)
-    //       expect(visitSessionData.visitors).toEqual(returnAdult)
-    //       expect(visitSessionData.visitRestriction).toBe('OPEN')
-    //       expect(visitSessionData.closedVisitReason).toBe(undefined)
-    //     })
-    // })
+      return request(sessionApp)
+        .post(`${journey.urlPrefix}/select-visitors`)
+        .send('visitors=4322')
+        .expect(302)
+        .expect('location', `${journey.urlPrefix}/visit-type`)
+        .expect(() => {
+          expect(adultVisitors.adults).toEqual(returnAdult)
+          expect(visitSessionData.visitors).toEqual(returnAdult)
+          expect(visitSessionData.visitRestriction).toBe('OPEN')
+        })
+    })
 
     it('should save to session and redirect to the select date and time page if an adult and a child are selected', () => {
       const returnAdult: VisitorListItem = {

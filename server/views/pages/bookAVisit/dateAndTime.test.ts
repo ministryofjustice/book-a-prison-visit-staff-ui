@@ -181,28 +181,11 @@ describe('Views - Date and time of visit', () => {
     expect($('[data-test="submit"]').text().trim()).toBe('Continue')
   })
 
-  // it('should display information banner for closed visit due to visitor restriction, and not the restriction change message', () => {
-  //   viewContext = {
-  //     prisonerName: 'John Smith',
-  //     visitRestriction: 'CLOSED',
-  //     closedVisitReason: 'visitor',
-  //   }
-  //   const $ = cheerio.load(compiledTemplate.render(viewContext))
-
-  //   expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
-  //   expect($('[data-test="visit-restriction"]').text()).toBe('Closed')
-  //   expect($('[data-test="closed-visit-reason"]').text()).toContain(
-  //     'Closed visit as a visitor has a closed visit restriction',
-  //   )
-  //   expect($('[data-test="restriction-change-reason"]').length).toBe(0)
-  // })
-
-  it('should display restriction change message, not the closed visit reason', () => {
+  it('should display restriction change message', () => {
     viewContext = {
       prisonerName: 'John Smith',
       visitRestriction: 'CLOSED',
-      restrictionChangeMessage:
-        'This is now a closed visit due to a visitor restriction. The visit time can stay the same.',
+      restrictionChangeMessage: 'The visit type has changed from closed to open.',
     }
     const $ = cheerio.load(compiledTemplate.render(viewContext))
 
@@ -210,7 +193,7 @@ describe('Views - Date and time of visit', () => {
     expect($('[data-test="visit-restriction"]').text()).toBe('Closed')
     expect($('[data-test="closed-visit-reason"]').length).toBe(0)
     expect($('[data-test="restriction-change-reason"]').text()).toContain(
-      'This is now a closed visit due to a visitor restriction. The visit time can stay the same.',
+      'The visit type has changed from closed to open.',
     )
   })
 
