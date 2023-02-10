@@ -48,6 +48,7 @@
     },
     {
       html: visitor.address,
+      classes: "bapv-force-overflow",
       attributes: { "data-test": "visitor-address-" + visitor.personId }
     },
     {
@@ -79,7 +80,7 @@
             },
             {
               text: restriction.comment,
-              classes: "test-restrictions-comment" + loop.index
+              classes: "bapv-force-overflow test-restrictions-comment" + loop.index
             },
             {
               text: restrictionStartDate,
