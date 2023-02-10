@@ -75,8 +75,8 @@
       }) }}
     {% endif %}
     
-    {% if slotChangeMessage %}
-     {% set slotChangeMessageHtml %}
+    {% if slotChangeMessageBoolean %}
+     {% set slotChangeMessageBooleanHtml %}
           {{ govukWarningText({
             classes: "govuk-!-margin-bottom-0",
             html: "<p class='govuk-!-font-size-24 govuk-!-font-weight-bold'>A new visit time must be selected.</p><p class='govuk-!-font-size-24 govuk-!-font-weight-bold'>A change to the prisoner's information means the original time slot is no longer suitable.</p>",
@@ -89,7 +89,7 @@
 
       {{ mojBanner({
         classes: "govuk-!-padding-left-4",
-        html: slotChangeMessageHtml
+        html: slotChangeMessageBooleanHtml
       }) }}
     {% endif %}
 

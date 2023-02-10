@@ -27,7 +27,7 @@ export default class DateAndTime {
 
     let restrictionChangeMessage = ''
     let matchingSlot
-    let slotChangeMessage = false
+    let slotChangeMessageBoolean = false
 
     // first time here on update journey, visitSlot.id will be ''
     if (isUpdate && visitSessionData.visitSlot?.id === '') {
@@ -46,8 +46,8 @@ export default class DateAndTime {
         visitSessionData.visitSlot.id = matchingSlot.id
       }
 
-      // if no matching slot, set slotChangeMessage = true
-      slotChangeMessage = !matchingSlot
+      // if no matching slot, set slotChangeMessageBoolean = true
+      slotChangeMessageBoolean = !matchingSlot
 
       if (visitSessionData.visitRestriction !== visitSessionData.originalVisitSlot.visitRestriction) {
         restrictionChangeMessage = 'The visit type has changed from '
@@ -87,7 +87,7 @@ export default class DateAndTime {
       slotsList,
       formValues,
       slotsPresent,
-      slotChangeMessage,
+      slotChangeMessageBoolean,
       restrictionChangeMessage,
       originalVisitSlot,
       urlPrefix: getUrlPrefix(isUpdate, visitSessionData.visitReference),
