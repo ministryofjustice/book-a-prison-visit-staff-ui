@@ -97,6 +97,7 @@ export default class PrisonerProfileService {
         },
         {
           text: alert.comment,
+          classes: 'bapv-force-overflow',
           attributes: {
             'data-test': 'tab-alerts-comment',
           },

@@ -30,6 +30,7 @@ export type PrisonerAlertItem = [
   },
   {
     text: string
+    classes?: string
     attributes?: {
       'data-test': string
     }

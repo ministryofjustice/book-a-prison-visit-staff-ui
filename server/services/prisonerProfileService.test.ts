@@ -321,6 +321,7 @@ describe('Prisoner profile service', () => {
           },
           {
             text: 'Test',
+            classes: 'bapv-force-overflow',
             attributes: {
               'data-test': 'tab-alerts-comment',
             },
@@ -353,6 +354,7 @@ describe('Prisoner profile service', () => {
           },
           {
             text: 'Test',
+            classes: 'bapv-force-overflow',
             attributes: {
               'data-test': 'tab-alerts-comment',
             },
@@ -385,6 +387,7 @@ describe('Prisoner profile service', () => {
           },
           {
             text: 'Test',
+            classes: 'bapv-force-overflow',
             attributes: {
               'data-test': 'tab-alerts-comment',
             },
@@ -417,6 +420,7 @@ describe('Prisoner profile service', () => {
           },
           {
             text: 'Test',
+            classes: 'bapv-force-overflow',
             attributes: {
               'data-test': 'tab-alerts-comment',
             },
