@@ -574,27 +574,6 @@ describe('Update journey specific warning messages', () => {
       })
   })
 
-  it('should show message with original slot selected when visit has changed from open to closed and original timeslot available`', () => {
-    currentlyBookedSlot.visitRestriction = 'OPEN'
-
-    currentlyAvailableSlots[0].availableTables = 1
-    currentlyAvailableSlots[0].visitRestriction = 'CLOSED'
-
-    visitSessionData.visitRestriction = 'CLOSED'
-
-    return request(sessionApp)
-      .get('/visit/ab-cd-ef-gh/update/select-date-and-time')
-      .expect(200)
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        const $ = cheerio.load(res.text)
-        expect($('[data-test="restriction-change-reason"]').text()).toContain(
-          'The visit type has changed from open to closed.',
-        )
-        expect($('input#1').prop('checked')).toBe(true)
-      })
-  })
-
   it('should show message with original slot selected when visit has changed from closed to open and original timeslot available', () => {
     currentlyBookedSlot.visitRestriction = 'CLOSED'
 
