@@ -118,7 +118,7 @@ jobs:
           name: Install missing OS dependency
           command: sudo apt-get install libxss1
       - run:
-          name: Get wiremock
+          name: Get wiremock # match version in docker-compose-test.yml
           command: curl -o wiremock.jar https://repo1.maven.org/maven2/com/github/tomakehurst/wiremock-jre8-standalone/2.35.0/wiremock-jre8-standalone-2.35.0.jar
       - run:
           name: Run wiremock
