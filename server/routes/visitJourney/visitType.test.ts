@@ -143,7 +143,6 @@ testJourneys.forEach(journey => {
           .expect('location', `${journey.urlPrefix}/select-date-and-time`)
           .expect(() => {
             expect(visitSessionData.visitRestriction).toBe('OPEN')
-            expect(visitSessionData.closedVisitReason).toBe(undefined)
             expect(auditService.visitRestrictionSelected).toHaveBeenCalledTimes(1)
             expect(auditService.visitRestrictionSelected).toHaveBeenCalledWith({
               prisonerId: visitSessionData.prisoner.offenderNo,
@@ -163,7 +162,6 @@ testJourneys.forEach(journey => {
           .expect('location', `${journey.urlPrefix}/select-date-and-time`)
           .expect(() => {
             expect(visitSessionData.visitRestriction).toBe('CLOSED')
-            expect(visitSessionData.closedVisitReason).toBe('prisoner')
             expect(auditService.visitRestrictionSelected).toHaveBeenCalledTimes(1)
             expect(auditService.visitRestrictionSelected).toHaveBeenCalledWith({
               prisonerId: visitSessionData.prisoner.offenderNo,

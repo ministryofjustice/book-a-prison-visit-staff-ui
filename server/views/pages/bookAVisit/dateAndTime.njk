@@ -74,6 +74,24 @@
         html: whereaboutsUnavailable
       }) }}
     {% endif %}
+    
+    {% if showSlotChangeMessage %}
+     {% set showSlotChangeMessageHtml %}
+          {{ govukWarningText({
+            classes: "govuk-!-margin-bottom-0",
+            html: "<p class='govuk-!-font-size-24 govuk-!-font-weight-bold'>A new visit time must be selected.</p><p class='govuk-!-font-size-24 govuk-!-font-weight-bold'>A change to the prisoner's information means the original time slot is no longer suitable.</p>",
+            iconFallbackText: "Warning",
+            attributes: {
+              "data-test": "slot-change-reason"
+          }
+        }) }}
+      {% endset %}
+
+      {{ mojBanner({
+        classes: "govuk-!-padding-left-4",
+        html: showSlotChangeMessageHtml
+      }) }}
+    {% endif %}
 
     {% if restrictionChangeMessage %}
       {% set restrictionChangeReasonHtml %}
@@ -86,27 +104,13 @@
           }
         }) }}
       {% endset %}
+
       {{ mojBanner({
         classes: "govuk-!-padding-left-4",
         html: restrictionChangeReasonHtml
       }) }}
-    {% elseif visitRestriction == 'CLOSED' and closedVisitReason %}
-      {% set closedVisitReasonHtml %}
-        {{ govukWarningText({
-          classes: "govuk-!-margin-bottom-0",
-          html: '<span class="govuk-!-font-size-24">Closed visit as ' +
-            ('a visitor' if closedVisitReason == 'visitor' else 'the prisoner') +
-            ' has a closed visit restriction.</span>',
-          iconFallbackText: "Warning",
-          attributes: {
-            "data-test": "closed-visit-reason"
-          }
-        }) }}
-      {% endset %}
-      {{ mojBanner({
-        classes: "govuk-!-padding-left-4",
-        html: closedVisitReasonHtml
-      }) }}
+
+
     {% endif %}
     
     {% if slotsPresent %}

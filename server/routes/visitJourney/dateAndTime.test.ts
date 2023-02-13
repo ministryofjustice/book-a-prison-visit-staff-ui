@@ -158,9 +158,8 @@ testJourneys.forEach(journey => {
           })
       })
 
-      it('should render the available sessions list with closed visit reason (visitor)', () => {
+      it('should render the available sessions list for CLOSED restriction', () => {
         visitSessionData.visitRestriction = 'CLOSED'
-        visitSessionData.closedVisitReason = 'visitor'
 
         return request(sessionApp)
           .get(`${journey.urlPrefix}/select-date-and-time`)
@@ -172,30 +171,6 @@ testJourneys.forEach(journey => {
             expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
             expect($('[data-test="visit-location"]').text()).toBe('location place')
             expect($('[data-test="visit-restriction"]').text()).toBe('Closed')
-            expect($('[data-test="closed-visit-reason"]').text()).toContain(
-              'Closed visit as a visitor has a closed visit restriction.',
-            )
-            expect($('[data-test="whereabouts-unavailable"]').length).toBe(0)
-          })
-      })
-
-      it('should render the available sessions list with closed visit reason (prisoner)', () => {
-        visitSessionData.visitRestriction = 'CLOSED'
-        visitSessionData.closedVisitReason = 'prisoner'
-
-        return request(sessionApp)
-          .get(`${journey.urlPrefix}/select-date-and-time`)
-          .expect(200)
-          .expect('Content-Type', /html/)
-          .expect(res => {
-            const $ = cheerio.load(res.text)
-            expect($('h1').text().trim()).toBe('Select date and time of visit')
-            expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
-            expect($('[data-test="visit-location"]').text()).toBe('location place')
-            expect($('[data-test="visit-restriction"]').text()).toBe('Closed')
-            expect($('[data-test="closed-visit-reason"]').text()).toContain(
-              'Closed visit as the prisoner has a closed visit restriction.',
-            )
             expect($('[data-test="whereabouts-unavailable"]').length).toBe(0)
           })
       })
@@ -501,6 +476,7 @@ describe('Update journey specific warning messages', () => {
                 id: '1',
                 startTimestamp: '2022-10-17T09:00:00',
                 endTimestamp: '2022-10-17T10:00:00',
+                availableTables: 15,
                 capacity: 30,
               } as VisitSlot,
             ],
@@ -517,10 +493,11 @@ describe('Update journey specific warning messages', () => {
     visitSessionData.originalVisitSlot = currentlyBookedSlot
   })
 
-  it('should select original slot with no message if no restriction change', () => {
+  it('should select original slot with no messages if no restriction change and original time available', () => {
     currentlyBookedSlot.visitRestriction = 'OPEN'
 
-    currentlyAvailableSlots[0].availableTables = 0 // could be fully booked (including this visit)
+    // No capacity is OK because the original visit (being updated) is one of the already-booked spaces
+    currentlyAvailableSlots[0].availableTables = 0
     currentlyAvailableSlots[0].visitRestriction = 'OPEN'
 
     visitSessionData.visitRestriction = 'OPEN'
@@ -531,59 +508,17 @@ describe('Update journey specific warning messages', () => {
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
+        expect($('[data-test="slot-change-reason"]').length).toBe(0)
         expect($('[data-test="restriction-change-reason"]').length).toBe(0)
         expect($('input#1').prop('checked')).toBe(true)
       })
   })
 
-  it('should show message with no slot selected when visit has changed from open to closed (visitor restriction), but original timeslot unavailable', () => {
+  it('should select original slot with no messages if no restriction change and original time available (even if overbooked)', () => {
     currentlyBookedSlot.visitRestriction = 'OPEN'
 
-    currentlyAvailableSlots[0].availableTables = -1 // test over-booked (which includes fully-booked)
-    currentlyAvailableSlots[0].visitRestriction = 'CLOSED'
-
-    visitSessionData.visitRestriction = 'CLOSED'
-    visitSessionData.closedVisitReason = 'visitor'
-
-    return request(sessionApp)
-      .get('/visit/ab-cd-ef-gh/update/select-date-and-time')
-      .expect(200)
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        const $ = cheerio.load(res.text)
-        expect($('[data-test="restriction-change-reason"]').text()).toContain(
-          'A new visit time must be selected as this is now a closed visit due to a visitor restriction.',
-        )
-        expect($('input:checked').length).toBe(0)
-      })
-  })
-
-  it('should show message with no slot selected when visit has changed from open to closed (prisoner restriction), but original timeslot unavailable', () => {
-    currentlyBookedSlot.visitRestriction = 'OPEN'
-
-    currentlyAvailableSlots[0].availableTables = 0
-    currentlyAvailableSlots[0].visitRestriction = 'CLOSED'
-
-    visitSessionData.visitRestriction = 'CLOSED'
-    visitSessionData.closedVisitReason = 'prisoner'
-
-    return request(sessionApp)
-      .get('/visit/ab-cd-ef-gh/update/select-date-and-time')
-      .expect(200)
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        const $ = cheerio.load(res.text)
-        expect($('[data-test="restriction-change-reason"]').text()).toContain(
-          'A new visit time must be selected as this is now a closed visit due to a prisoner restriction.',
-        )
-        expect($('input:checked').length).toBe(0)
-      })
-  })
-
-  it('should show message with no slot selected when visit has changed from closed to open, but original timeslot unavailable', () => {
-    currentlyBookedSlot.visitRestriction = 'CLOSED'
-
-    currentlyAvailableSlots[0].availableTables = 0
+    // Allowing over-booing is OK because the original visit (being updated) is one of the already-booked spaces
+    currentlyAvailableSlots[0].availableTables = -1
     currentlyAvailableSlots[0].visitRestriction = 'OPEN'
 
     visitSessionData.visitRestriction = 'OPEN'
@@ -594,61 +529,38 @@ describe('Update journey specific warning messages', () => {
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
+        expect($('[data-test="slot-change-reason"]').length).toBe(0)
+        expect($('[data-test="restriction-change-reason"]').length).toBe(0)
+        expect($('input#1').prop('checked')).toBe(true)
+      })
+  })
+
+  it('should show two messages with no slot selected when visit has changed from open to closed and original time slot unavailable', () => {
+    currentlyBookedSlot.visitRestriction = 'OPEN'
+
+    currentlyAvailableSlots[0].startTimestamp = '2022-10-17T09:01:00'
+    currentlyAvailableSlots[0].visitRestriction = 'CLOSED'
+
+    visitSessionData.visitRestriction = 'CLOSED'
+
+    return request(sessionApp)
+      .get('/visit/ab-cd-ef-gh/update/select-date-and-time')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('[data-test="slot-change-reason"]').text()).toContain('A new visit time must be selected.')
         expect($('[data-test="restriction-change-reason"]').text()).toContain(
-          'A new visit time must be selected as this is now an open visit.',
+          'The visit type has changed from open to closed.',
         )
         expect($('input:checked').length).toBe(0)
       })
   })
 
-  it('should show message with original slot selected when visit has changed from open to closed (visitor restriction) and original timeslot available', () => {
-    currentlyBookedSlot.visitRestriction = 'OPEN'
-
-    currentlyAvailableSlots[0].availableTables = 1
-    currentlyAvailableSlots[0].visitRestriction = 'CLOSED'
-
-    visitSessionData.visitRestriction = 'CLOSED'
-    visitSessionData.closedVisitReason = 'visitor'
-
-    return request(sessionApp)
-      .get('/visit/ab-cd-ef-gh/update/select-date-and-time')
-      .expect(200)
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        const $ = cheerio.load(res.text)
-        expect($('[data-test="restriction-change-reason"]').text()).toContain(
-          'This is now a closed visit due to a visitor restriction. The visit time can stay the same.',
-        )
-        expect($('input#1').prop('checked')).toBe(true)
-      })
-  })
-
-  it('should show message with original slot selected when visit has changed from open to closed (prisoner restriction) and original timeslot available', () => {
-    currentlyBookedSlot.visitRestriction = 'OPEN'
-
-    currentlyAvailableSlots[0].availableTables = 1
-    currentlyAvailableSlots[0].visitRestriction = 'CLOSED'
-
-    visitSessionData.visitRestriction = 'CLOSED'
-    visitSessionData.closedVisitReason = 'prisoner'
-
-    return request(sessionApp)
-      .get('/visit/ab-cd-ef-gh/update/select-date-and-time')
-      .expect(200)
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        const $ = cheerio.load(res.text)
-        expect($('[data-test="restriction-change-reason"]').text()).toContain(
-          'This is now a closed visit due to a prisoner restriction. The visit time can stay the same.',
-        )
-        expect($('input#1').prop('checked')).toBe(true)
-      })
-  })
-
-  it('should show message with original slot selected when visit has changed from closed to open and original timeslot available', () => {
+  it('should show two messages with no slot selected when visit has changed from closed to open and original time slot unavailable', () => {
     currentlyBookedSlot.visitRestriction = 'CLOSED'
 
-    currentlyAvailableSlots[0].availableTables = 1
+    currentlyAvailableSlots[0].startTimestamp = '2022-10-17T09:01:00'
     currentlyAvailableSlots[0].visitRestriction = 'OPEN'
 
     visitSessionData.visitRestriction = 'OPEN'
@@ -659,8 +571,51 @@ describe('Update journey specific warning messages', () => {
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
+        expect($('[data-test="slot-change-reason"]').text()).toContain('A new visit time must be selected.')
         expect($('[data-test="restriction-change-reason"]').text()).toContain(
-          'This is now an open visit. The visit time can stay the same.',
+          'The visit type has changed from closed to open.',
+        )
+        expect($('input:checked').length).toBe(0)
+      })
+  })
+
+  it('should show one message with original slot selected when visit has changed from open to closed and original time slot available', () => {
+    currentlyBookedSlot.visitRestriction = 'OPEN'
+
+    currentlyAvailableSlots[0].visitRestriction = 'CLOSED'
+
+    visitSessionData.visitRestriction = 'CLOSED'
+
+    return request(sessionApp)
+      .get('/visit/ab-cd-ef-gh/update/select-date-and-time')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('[data-test="slot-change-reason"]').length).toBe(0)
+        expect($('[data-test="restriction-change-reason"]').text()).toContain(
+          'The visit type has changed from open to closed.',
+        )
+        expect($('input#1').prop('checked')).toBe(true)
+      })
+  })
+
+  it('should show one message with original slot selected when visit has changed from closed to open and original time slot available', () => {
+    currentlyBookedSlot.visitRestriction = 'CLOSED'
+
+    currentlyAvailableSlots[0].visitRestriction = 'OPEN'
+
+    visitSessionData.visitRestriction = 'OPEN'
+
+    return request(sessionApp)
+      .get('/visit/ab-cd-ef-gh/update/select-date-and-time')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('[data-test="slot-change-reason"]').length).toBe(0)
+        expect($('[data-test="restriction-change-reason"]').text()).toContain(
+          'The visit type has changed from closed to open.',
         )
         expect($('input#1').prop('checked')).toBe(true)
       })

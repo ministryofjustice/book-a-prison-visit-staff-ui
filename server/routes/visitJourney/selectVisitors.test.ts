@@ -615,22 +615,11 @@ testJourneys.forEach(journey => {
           expect(adultVisitors.adults).toEqual(returnAdult)
           expect(visitSessionData.visitors).toEqual(returnAdult)
           expect(visitSessionData.visitRestriction).toBe('OPEN')
-          expect(visitSessionData.closedVisitReason).toBe(undefined)
         })
     })
 
-    it('should save to session and redirect to the select date and time page if an adult with CLOSED restriction is selected (CLOSED visit)', () => {
+    it('should save to session and redirect to the select date and time page if VISITOR with CLOSED restriction is selected (CLOSED visit)', () => {
       const returnAdult: VisitorListItem[] = [
-        {
-          address: '1st listed address',
-          adult: true,
-          dateOfBirth: '1986-07-28',
-          name: 'Bob Smith',
-          personId: 4322,
-          relationshipDescription: 'Brother',
-          restrictions: [],
-          banned: false,
-        },
         {
           address: 'Not entered',
           adult: true,
@@ -651,7 +640,6 @@ testJourneys.forEach(journey => {
 
       return request(sessionApp)
         .post(`${journey.urlPrefix}/select-visitors`)
-        .send('visitors=4322')
         .send('visitors=4326')
         .expect(302)
         .expect('location', `${journey.urlPrefix}/select-date-and-time`)
@@ -659,7 +647,6 @@ testJourneys.forEach(journey => {
           expect(adultVisitors.adults).toEqual(returnAdult)
           expect(visitSessionData.visitors).toEqual(returnAdult)
           expect(visitSessionData.visitRestriction).toBe('CLOSED')
-          expect(visitSessionData.closedVisitReason).toBe('visitor')
         })
     })
 
@@ -702,7 +689,6 @@ testJourneys.forEach(journey => {
           expect(adultVisitors.adults).toEqual(returnAdult)
           expect(visitSessionData.visitors).toEqual(returnAdult)
           expect(visitSessionData.visitRestriction).toBe('CLOSED')
-          expect(visitSessionData.closedVisitReason).toBe('visitor')
         })
     })
 
@@ -739,7 +725,6 @@ testJourneys.forEach(journey => {
           expect(adultVisitors.adults).toEqual(returnAdult)
           expect(visitSessionData.visitors).toEqual(returnAdult)
           expect(visitSessionData.visitRestriction).toBe('OPEN')
-          expect(visitSessionData.closedVisitReason).toBe(undefined)
         })
     })
 

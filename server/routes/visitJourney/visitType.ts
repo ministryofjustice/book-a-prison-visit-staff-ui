@@ -32,7 +32,6 @@ export default class VisitType {
     }
 
     visitSessionData.visitRestriction = req.body.visitType
-    visitSessionData.closedVisitReason = req.body.visitType === 'CLOSED' ? 'prisoner' : undefined
 
     await this.auditService.visitRestrictionSelected({
       prisonerId: visitSessionData.prisoner.offenderNo,
