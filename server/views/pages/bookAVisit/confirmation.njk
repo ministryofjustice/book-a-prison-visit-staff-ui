@@ -52,6 +52,7 @@
         {{ govukButton({
             classes: "govuk-!-margin-top-3, govuk-!-margin-bottom-4",
             text: "Go to manage prison visits",
+            attributes: { "data-test": "go-to-home" },
             href: "/",
             preventDoubleClick: true
         }) }}
@@ -60,6 +61,7 @@
          {{ govukButton({
             classes: "govuk-!-margin-top-3, govuk-!-margin-bottom-6 govuk-button--secondary",
             text: "Book another visit for this prisoner",
+            attributes: { "data-test": "go-to-prisoner" },
             href: "/prisoner/" + prisoner.offenderNo,
             preventDoubleClick: true
         }) }}

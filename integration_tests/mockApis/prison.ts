@@ -2,45 +2,35 @@ import { SuperAgentRequest } from 'superagent'
 import { stubFor } from './wiremock'
 import {
   InmateDetail,
+  OffenderRestriction,
   OffenderRestrictions,
   PagePrisonerBookingSummary,
+  PrisonerBookingSummary,
   VisitBalances,
 } from '../../server/data/prisonApiTypes'
 
 export default {
-  stubGetBookings: (offenderNo: string): SuperAgentRequest => {
+  stubBookings: (prisoner: PrisonerBookingSummary): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',
-        url: `/prison/api/bookings/v2?prisonId=HEI&offenderNo=${offenderNo}&legalInfo=true`,
+        url: `/prison/api/bookings/v2?prisonId=${prisoner.agencyId}&offenderNo=${prisoner.offenderNo}&legalInfo=true`,
       },
       response: {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
         jsonBody: <PagePrisonerBookingSummary>{
           numberOfElements: 1,
-          content: [
-            {
-              age: 20,
-              agencyId: 'HEI',
-              bookingId: 123,
-              bookingNo: '123',
-              convictedStatus: 'Convicted',
-              dateOfBirth: '1999-01-01',
-              firstName: 'FirstName',
-              lastName: 'LastName',
-              offenderNo,
-            },
-          ],
+          content: [prisoner],
         },
       },
     })
   },
-  stubGetOffender: (prisoner: Partial<InmateDetail>): SuperAgentRequest => {
+  stubOffender: (prisoner: InmateDetail): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/offenders/${prisoner.offenderNo}`,
+        url: `/prison/api/offenders/${prisoner.offenderNo}`,
       },
       response: {
         status: 200,
@@ -49,33 +39,29 @@ export default {
       },
     })
   },
-  stubGetOffenderRestrictions: (offenderNo: string): SuperAgentRequest => {
+  stubOffenderRestrictions: ({
+    offenderNo,
+    offenderRestrictions = [],
+  }: {
+    offenderNo: string
+    offenderRestrictions: OffenderRestriction[]
+  }): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/offenders/${offenderNo}/offender-restrictions?activeRestrictionsOnly=true`,
+        url: `/prison/api/offenders/${offenderNo}/offender-restrictions?activeRestrictionsOnly=true`,
       },
       response: {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
         jsonBody: <OffenderRestrictions>{
-          bookingId: 0,
-          offenderRestrictions: [
-            {
-              restrictionId: 0,
-              comment: 'string',
-              restrictionType: 'string',
-              restrictionTypeDescription: 'string',
-              startDate: '2022-03-15',
-              expiryDate: '2022-03-15',
-              active: true,
-            },
-          ],
+          bookingId: 12345,
+          offenderRestrictions,
         },
       },
     })
   },
-  stubGetVisitBalances: ({
+  stubVisitBalances: ({
     offenderNo,
     visitBalances,
   }: {
@@ -85,7 +71,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPattern: `/prison/api/bookings/offenderNo/${offenderNo}/visit/balances`,
+        url: `/prison/api/bookings/offenderNo/${offenderNo}/visit/balances`,
       },
       response: {
         status: 200,

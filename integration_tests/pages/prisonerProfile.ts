@@ -5,7 +5,7 @@ export default class PrisonerProfilePage extends Page {
     super(variableTitle)
   }
 
-  backLink = (): PageElement => cy.get('[class="govuk-back-link"]')
+  // backLink = (): PageElement => cy.get('[class="govuk-back-link"]')
 
   flaggedAlerts = (): PageElement => cy.get('.flagged-alert')
 
@@ -26,6 +26,8 @@ export default class PrisonerProfilePage extends Page {
   remainingVOs = (): PageElement => cy.get('[data-test="remaining-vos"]')
 
   remainingPVOs = (): PageElement => cy.get('[data-test="remaining-pvos"]')
+
+  bookAVisitButton = (): PageElement => cy.get('[data-test="book-a-visit"]')
 
   selectVisitingOrdersTab = (): PageElement => cy.get('#tab_visiting-orders').click()
 
@@ -57,6 +59,8 @@ export default class PrisonerProfilePage extends Page {
 
   alertsTabExpires = (): PageElement => cy.get('[data-test="tab-alerts-expires"]')
 
+  upcomingTabReference = (): PageElement => cy.get('[data-test="tab-upcoming-reference"]')
+
   upcomingTabType = (): PageElement => cy.get('[data-test="tab-upcoming-type"]')
 
   upcomingTabLocation = (): PageElement => cy.get('[data-test="tab-upcoming-location"]')
@@ -64,6 +68,10 @@ export default class PrisonerProfilePage extends Page {
   upcomingTabDateAndTime = (): PageElement => cy.get('[data-test="tab-upcoming-date-and-time"]')
 
   upcomingTabVisitors = (): PageElement => cy.get('[data-test="tab-upcoming-visitors"]')
+
+  upcomingTabVisitStatus = (): PageElement => cy.get('[data-test="tab-upcoming-status"]')
+
+  pastTabReference = (): PageElement => cy.get('[data-test="tab-past-reference"]')
 
   pastTabType = (): PageElement => cy.get('[data-test="tab-past-type"]')
 
@@ -73,5 +81,5 @@ export default class PrisonerProfilePage extends Page {
 
   pastTabVisitors = (): PageElement => cy.get('[data-test="tab-past-visitors"]')
 
-  pastTabStatus = (): PageElement => cy.get('[data-test="tab-past-status"]')
+  pastTabVisitStatus = (): PageElement => cy.get('[data-test="tab-past-status"]')
 }

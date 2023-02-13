@@ -6,7 +6,7 @@ import tokenVerification from './integration_tests/mockApis/tokenVerification'
 import prisonerContactRegistry from './integration_tests/mockApis/prisonerContactRegistry'
 import whereaboutsOffenderEvents from './integration_tests/mockApis/whereabouts'
 import prisonApi from './integration_tests/mockApis/prison'
-import offenderSearch from './integration_tests/mockApis/offenderSearch'
+import prisonerSearch from './integration_tests/mockApis/prisonerSearch'
 import visitScheduler from './integration_tests/mockApis/visitScheduler'
 import prisonRegister from './integration_tests/mockApis/prisonRegister'
 
@@ -30,38 +30,41 @@ export default defineConfig({
         ...auth,
         ...tokenVerification,
 
-        // Prisoner Contact Registry
-        stubGetPrisonerSocialContacts: prisonerContactRegistry.stubGetPrisonerSocialContacts,
+        // Prisoner contact registry
+        stubPrisonerSocialContacts: prisonerContactRegistry.stubPrisonerSocialContacts,
 
         // Prison API
-        stubGetBookings: prisonApi.stubGetBookings,
-        stubGetOffender: prisonApi.stubGetOffender,
-        stubGetOffenderRestrictions: prisonApi.stubGetOffenderRestrictions,
-        stubGetVisitBalances: prisonApi.stubGetVisitBalances,
+        stubBookings: prisonApi.stubBookings,
+        stubOffender: prisonApi.stubOffender,
+        stubOffenderRestrictions: prisonApi.stubOffenderRestrictions,
+        stubVisitBalances: prisonApi.stubVisitBalances,
 
         // Prisoner offender search
-        stubGetPrisoner: results => offenderSearch.stubGetPrisoner(results),
-        stubGetPrisonerById: prisoner => offenderSearch.stubGetPrisonerById(prisoner),
-        stubGetPrisoners: ({ results, page, size }) => offenderSearch.stubGetPrisoners(results, page, size),
+        // stubPrisoner: prisonerSearch.stubPrisoner,
+        stubPrisonerById: prisonerSearch.stubPrisonerById,
+        stubPrisoners: prisonerSearch.stubPrisoners,
 
         // Prison register API
-        stubGetPrisons: prisonRegister.stubGetPrisons,
+        stubPrisons: prisonRegister.stubPrisons,
 
         // Visit scheduler
-        stubGetSupportedPrisonIds: visitScheduler.stubGetSupportedPrisonIds,
-        stubGetAvailableSupportOptions: visitScheduler.stubGetAvailableSupportOptions,
-        stubGetVisit: visitScheduler.stubGetVisit,
-        stubGetUpcomingVisits: visitScheduler.stubGetUpcomingVisits,
-        stubGetPastVisits: visitScheduler.stubGetPastVisits,
-        stubGetVisitSessions: visitScheduler.stubGetVisitSessions,
+        stubAvailableSupport: visitScheduler.stubAvailableSupport,
+        stubBookVisit: visitScheduler.stubBookVisit,
+        stubChangeReservedSlot: visitScheduler.stubChangeReservedSlot,
+        stubSupportedPrisonIds: visitScheduler.stubSupportedPrisonIds,
+        stubUpcomingVisits: visitScheduler.stubUpcomingVisits,
+        stubPastVisits: visitScheduler.stubPastVisits,
+        stubReserveVisit: visitScheduler.stubReserveVisit,
+        stubVisit: visitScheduler.stubVisit,
+        stubVisitSessions: visitScheduler.stubVisitSessions,
 
         // Whereabouts
-        stubGetOffenderEvents: whereaboutsOffenderEvents.stubGetOffenderEvents,
+        stubOffenderEvents: whereaboutsOffenderEvents.stubOffenderEvents,
       })
     },
     baseUrl: 'http://localhost:3007',
     excludeSpecPattern: '**/!(*.cy).ts',
-    specPattern: 'integration_tests/e2e/**/*.cy.{js,jsx,ts,tsx}',
+    specPattern: 'integration_tests/integration/**/*.cy.{js,jsx,ts,tsx}',
     supportFile: 'integration_tests/support/index.ts',
     experimentalRunAllSpecs: true,
   },

@@ -3,36 +3,27 @@ import { stubFor } from './wiremock'
 import { Prisoner } from '../../server/data/prisonerOffenderSearchTypes'
 
 export default {
-  stubGetPrisoners: (
-    results: {
-      totalPages: number
-      totalElements: number
-      content: Partial<Prisoner>[]
+  stubPrisoners: ({
+    results = {
+      totalPages: 0,
+      totalElements: 0,
+      content: [],
     },
+    prisonId = 'HEI',
+    term = '',
     page = '0',
     size = '10',
-  ): SuperAgentRequest => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        url: `/offenderSearch/prison/HEI/prisoners?term=A1234BC&page=${page}&size=${size}`,
-      },
-      response: {
-        status: 200,
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: results,
-      },
-    })
-  },
-  stubGetPrisoner: (results: {
-    totalPages: number
-    totalElements: number
-    content: Partial<Prisoner>[]
+  }: {
+    results: { totalPages: number; totalElements: number; content: Partial<Prisoner>[] }
+    prisonId: string
+    term: string
+    page: string
+    size: string
   }): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',
-        url: '/offenderSearch/prison/HEI/prisoners?term=A1234BC&page=0&size=10',
+        url: `/offenderSearch/prison/${prisonId}/prisoners?term=${term}&page=${page}&size=${size}`,
       },
       response: {
         status: 200,
@@ -41,7 +32,7 @@ export default {
       },
     })
   },
-  stubGetPrisonerById: (prisoner: Prisoner): SuperAgentRequest => {
+  stubPrisonerById: (prisoner: Prisoner): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',
