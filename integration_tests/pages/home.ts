@@ -12,4 +12,6 @@ export default class HomePage extends Page {
   changeAVisitTile = (): PageElement => cy.get('[data-test="change-visit"]')
 
   viewVisitsTile = (): PageElement => cy.get('[data-test="view-visits-by-date"]')
+
+  viewTimetableTile = (): PageElement => cy.get('[data-test="view-timetable"]')
 }
