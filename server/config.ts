@@ -158,5 +158,8 @@ export default {
       },
     },
   },
+  features: {
+    viewTimetableEnabled: get('FEATURE_VIEW_TIMETABLE_ENABLED', 'false', requiredInProduction) === 'true',
+  },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
 }
