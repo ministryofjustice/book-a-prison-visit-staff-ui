@@ -16,9 +16,9 @@ describe('Views - Home', () => {
     viewContext = {}
   })
 
-  it('should display the home page cards with Change tile', () => {
+  it('should display the home page cards', () => {
     viewContext = {
-      viewTimetable: true,
+      showViewTimetable: true,
     }
 
     const $ = cheerio.load(compiledTemplate.render(viewContext))
@@ -32,11 +32,11 @@ describe('Views - Home', () => {
     expect($('[data-test="view-visits-by-date"] .card__link').text()).toEqual('View visits by date')
     expect($('[data-test="view-visits-by-date"] .card__link').attr('href')).toEqual('/visits')
 
-    expect($('[data-test="view-timetable"] .card__link').text()).toEqual('View timetable')
+    expect($('[data-test="view-timetable"] .card__link').text()).toEqual('View visit timetable')
     expect($('[data-test="view-timetable"] .card__link').attr('href')).toEqual('/timetable')
   })
 
-  it('Should not display the view timetable card when disabled', () => {
+  it('should not display the view timetable card when disabled', () => {
     const $ = cheerio.load(compiledTemplate.render(viewContext))
 
     expect($('[data-test="book-visit"] .card__link').text()).toEqual('Book a visit')

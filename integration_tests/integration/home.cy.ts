@@ -17,6 +17,6 @@ context('Home page', () => {
     homePage.bookAVisitTile().contains('Book a visit')
     homePage.changeAVisitTile().contains('Change a visit')
     homePage.viewVisitsTile().contains('View visits by date')
-    homePage.viewTimetableTile().contains('View timetable')
+    homePage.viewTimetableTile().contains('View visit timetable')
   })
 })

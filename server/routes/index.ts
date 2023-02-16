@@ -9,7 +9,7 @@ export default function routes(router: Router): Router {
     res.render('pages/index', {
       hidePhaseBanner: true,
       showEstablishmentSwitcher: true,
-      viewTimetable: config.features.viewTimetableEnabled,
+      showViewTimetable: config.features.viewTimetableEnabled,
     })
   })
 
