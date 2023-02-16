@@ -40,6 +40,17 @@
             "id": "view-visits-by-date"
           }) }}
         </li>
+        {% if viewTimetable %}
+          <li class="govuk-grid-column-one-third card-group__item">
+            {{ card({
+              "href": "/timetable",
+              "clickable": "true",
+              "heading": "View timetable",
+              "description": "View the timetable",
+              "id": "view-timetable"
+            }) }}
+          </li>
+        {% endif %}
       </ul>
     </div>
   </div>
