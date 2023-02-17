@@ -9,6 +9,7 @@ import prisonerRoutes from '../prisoner'
 import bookAVisitRoutes from '../bookAVisit'
 import visitRoutes from '../visit'
 import visitsRoutes from '../visits'
+import timetableRoutes from '../timetable'
 import nunjucksSetup from '../../utils/nunjucksSetup'
 import errorHandler from '../../errorHandler'
 import standardRouter from '../standardRouter'
@@ -233,6 +234,8 @@ function appSetup({
       auditService,
     ),
   )
+
+  app.use('/timetable/', timetableRoutes(standardRouter(new MockUserService(), new MockSupportedPrisonsService())))
 
   app.use((req, res, next) => next(createError(404, 'Not found')))
   app.use(errorHandler(production))
