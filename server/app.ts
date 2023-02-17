@@ -9,6 +9,7 @@ import prisonerRoutes from './routes/prisoner'
 import bookAVisitRoutes from './routes/bookAVisit'
 import visitRoutes from './routes/visit'
 import visitsRoutes from './routes/visits'
+import timetableRoutes from './routes/timetable'
 import nunjucksSetup from './utils/nunjucksSetup'
 import errorHandler from './errorHandler'
 import standardRouter from './routes/standardRouter'
@@ -168,6 +169,8 @@ export default function createApp(userService: UserService): express.Application
       new AuditService(),
     ),
   )
+
+  app.use('/timetable/', timetableRoutes(standardRouter(userService, supportedPrisonsService)))
 
   app.use((req, res, next) => next(createError(404, 'Not found')))
   app.use(errorHandler(process.env.NODE_ENV === 'production'))
