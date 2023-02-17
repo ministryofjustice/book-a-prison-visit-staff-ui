@@ -170,7 +170,18 @@ export default function createApp(userService: UserService): express.Application
     ),
   )
 
-  app.use('/timetable/', timetableRoutes(standardRouter(userService, supportedPrisonsService)))
+  app.use(
+    '/timetable/',
+    timetableRoutes(
+      standardRouter(userService, supportedPrisonsService),
+      new VisitSessionsService(
+        prisonerContactRegistryApiClientBuilder,
+        visitSchedulerApiClientBuilder,
+        whereaboutsApiClientBuilder,
+        systemToken,
+      ),
+    ),
+  )
 
   app.use((req, res, next) => next(createError(404, 'Not found')))
   app.use(errorHandler(process.env.NODE_ENV === 'production'))

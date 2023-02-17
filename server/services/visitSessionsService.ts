@@ -168,6 +168,31 @@ export default class VisitSessionsService {
     return { slotsList: availableSessions, whereaboutsAvailable }
   }
 
+  async getVisitSchedule({
+    username,
+    prisonId,
+    sessionDate,
+  }: {
+    username: string
+    prisonId: string
+    sessionDate: string
+  }): Promise<{
+    capacity: {
+      open: number
+      closed: number
+    }
+    endTime: string
+    prisonerLocationGroupNames: string
+    sessionTemplateEndDate: string
+    sessionTemplateFrequency: string
+    startTime: string
+  }> {
+    const token = await this.systemToken(username)
+    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
+
+    return visitSchedulerApiClient.getVisitSchedule(prisonId, sessionDate)
+  }
+
   async getVisitSessionCapacity(
     username: string,
     prisonId: string,

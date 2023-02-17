@@ -95,6 +95,16 @@ class VisitSchedulerApiClient {
     })
   }
 
+  getVisitSchedule(prisonId: string, sessionDate: string) {
+    return this.restclient.get({
+      path: '/visit-sessions/schedule',
+      query: new URLSearchParams({
+        prisonId,
+        sessionDate,
+      }).toString(),
+    })
+  }
+
   async getVisitSessionCapacity(
     prisonId: string,
     sessionDate: string,
