@@ -52,7 +52,7 @@ export default function createApp(userService: UserService): express.Application
   app.use(setUpStaticResources())
   nunjucksSetup(app)
   app.use(setUpAuthentication())
-  app.use(authorisationMiddleware())
+  app.use(authorisationMiddleware(['ROLE_MANAGE_PRISON_VISITS']))
   app.use(appInsightsOperationId)
 
   const supportedPrisonsService = new SupportedPrisonsService(

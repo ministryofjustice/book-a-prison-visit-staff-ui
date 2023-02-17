@@ -9,7 +9,7 @@ const createToken = () => {
     user_name: 'USER1',
     scope: ['read'],
     auth_source: 'nomis',
-    authorities: ['ROLE_GLOBAL_SEARCH'],
+    authorities: ['ROLE_MANAGE_PRISON_VISITS'],
     jti: '83b50a10-cca6-41db-985f-e87efb303ddb',
     client_id: 'clientid',
   }
@@ -112,7 +112,7 @@ const token = () =>
         token_type: 'bearer',
         user_name: 'USER1',
         expires_in: 599,
-        scope: 'read write',
+        scope: 'read',
         internalUser: true,
       },
     },
@@ -134,7 +134,6 @@ const stubUser = (name: string) =>
         username: 'USER1',
         active: true,
         name,
-        authSource: 'nomis',
         activeCaseLoadId: 'HEI',
       },
     },
@@ -151,7 +150,7 @@ const stubUserRoles = () =>
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
       },
-      jsonBody: [{ roleCode: 'GLOBAL_SEARCH' }, { roleId: 'MANAGE_PRISON_VISITS' }],
+      jsonBody: [{ roleCode: 'ROLE_MANAGE_PRISON_VISITS' }],
     },
   })
 
