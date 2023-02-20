@@ -6,8 +6,8 @@ import asyncMiddleware from '../middleware/asyncMiddleware'
 import PrisonerSearchService from '../services/prisonerSearchService'
 import VisitSessionsService from '../services/visitSessionsService'
 import AuditService from '../services/auditService'
-import { getResultsPagingLinks } from '../utils/utils'
-import { getDateTabs, getParsedDateFromQueryString, getSlotsSideMenuData } from './visitsUtils'
+import { getParsedDateFromQueryString, getResultsPagingLinks } from '../utils/utils'
+import { getDateTabs, getSlotsSideMenuData } from './visitsUtils'
 import { SessionCapacity } from '../data/visitSchedulerApiTypes'
 
 export default function routes(

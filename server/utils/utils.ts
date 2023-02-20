@@ -148,3 +148,9 @@ export function safeReturnUrl(originalUrl: string) {
     ? '/'
     : originalUrl
 }
+
+export const getParsedDateFromQueryString = (dateFromQueryString: string, defaultDate = new Date()): string => {
+  const parsedDate =
+    new Date(dateFromQueryString).toString() === 'Invalid Date' ? defaultDate : new Date(dateFromQueryString)
+  return format(parsedDate, 'yyyy-MM-dd')
+}
