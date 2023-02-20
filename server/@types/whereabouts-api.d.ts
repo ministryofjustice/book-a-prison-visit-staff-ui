@@ -4,6 +4,15 @@
  */
 
 export interface paths {
+  '/queue-admin/retry-dlq/{dlqName}': {
+    put: operations['retryDlq']
+  }
+  '/queue-admin/retry-all-dlqs': {
+    put: operations['retryAllDlqs']
+  }
+  '/queue-admin/purge-queue/{queueName}': {
+    put: operations['purgeQueue']
+  }
   '/court/video-link-bookings/{videoLinkBookingId}/comment': {
     /** @description Update the comment for a Video Link Booking */
     put: operations['updateVideoLinkBookingComment']
@@ -100,6 +109,9 @@ export interface paths {
      * @description List of all the Video Link Booking rooms in the prison.
      */
     get: operations['getVideoLinkBookingRooms']
+  }
+  '/queue-admin/get-dlq-messages/{dlqName}': {
+    get: operations['getDlqMessages']
   }
   '/locations/{agencyId}/{group}/location-prefix': {
     /**
@@ -260,6 +272,63 @@ export type webhooks = Record<string, never>
 
 export interface components {
   schemas: {
+    Message: {
+      messageId?: string
+      receiptHandle?: string
+      body?: string
+      attributes?: {
+        [key: string]: string | undefined
+      }
+      messageAttributes?: {
+        [key: string]: components['schemas']['MessageAttributeValue'] | undefined
+      }
+      md5OfBody?: string
+      md5OfMessageAttributes?: string
+    }
+    MessageAttributeValue: {
+      stringValue?: string
+      binaryValue?: {
+        /** Format: int32 */
+        short?: number
+        char?: string
+        /** Format: int32 */
+        int?: number
+        /** Format: int64 */
+        long?: number
+        /** Format: float */
+        float?: number
+        /** Format: double */
+        double?: number
+        direct?: boolean
+        readOnly?: boolean
+      }
+      stringListValues?: string[]
+      binaryListValues?: {
+        /** Format: int32 */
+        short?: number
+        char?: string
+        /** Format: int32 */
+        int?: number
+        /** Format: int64 */
+        long?: number
+        /** Format: float */
+        float?: number
+        /** Format: double */
+        double?: number
+        direct?: boolean
+        readOnly?: boolean
+      }[]
+      dataType?: string
+    }
+    RetryDlqResult: {
+      /** Format: int32 */
+      messagesFoundCount: number
+      messages: components['schemas']['Message'][]
+    }
+    PurgeQueueResult: {
+      /** Format: int32 */
+      messagesFoundCount: number
+    }
     VideoLinkAppointmentSpecification: {
       /** Format: int64 */
       locationId: number
@@ -602,6 +671,19 @@ export interface components {
       locationId: number
       description: string
     }
+    DlqMessage: {
+      body: {
+        [key: string]: Record<string, never> | undefined
+      }
+      messageId: string
+    }
+    GetDlqResult: {
+      /** Format: int32 */
+      messagesFoundCount: number
+      /** Format: int32 */
+      messagesReturnedCount: number
+      messages: components['schemas']['DlqMessage'][]
+    }
     Location: {
       /** Format: int64 */
       locationId: number
@@ -841,19 +923,19 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
       last?: boolean
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     PageableObject: {
       /** Format: int64 */
       offset?: number
       sort?: components['schemas']['SortObject']
-      unpaged?: boolean
       /** Format: int32 */
       pageSize?: number
+      unpaged?: boolean
       /** Format: int32 */
       pageNumber?: number
       paged?: boolean
@@ -1095,6 +1177,46 @@ export interface components {
 export type external = Record<string, never>
 
 export interface operations {
+  retryDlq: {
+    parameters: {
+      path: {
+        dlqName: string
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['RetryDlqResult']
+        }
+      }
+    }
+  }
+  retryAllDlqs: {
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['RetryDlqResult'][]
+        }
+      }
+    }
+  }
+  purgeQueue: {
+    parameters: {
+      path: {
+        queueName: string
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['PurgeQueueResult']
+        }
+      }
+    }
+  }
   updateVideoLinkBookingComment: {
     /** @description Update the comment for a Video Link Booking */
     parameters: {
@@ -1530,6 +1652,24 @@ export interface operations {
       200: {
         content: {
           'application/json': components['schemas']['LocationIdAndDescription'][]
+        }
+      }
+    }
+  }
+  getDlqMessages: {
+    parameters: {
+      query?: {
+        maxMessages?: number
+      }
+      path: {
+        dlqName: string
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          '*/*': components['schemas']['GetDlqResult']
         }
       }
     }

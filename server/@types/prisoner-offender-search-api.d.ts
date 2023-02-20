@@ -875,10 +875,10 @@ export interface components {
       supportingPrisonIds?: string[]
     }
     PagePrisoner: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Prisoner'][]
@@ -886,9 +886,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
+      pageable?: components['schemas']['PageableObject']
       last?: boolean
       empty?: boolean
     }
@@ -1099,10 +1099,10 @@ export interface components {
       pagination: components['schemas']['PaginationRequest']
     }
     PrisonerDetailResponse: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Prisoner'][]
@@ -1110,9 +1110,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
+      pageable?: components['schemas']['PageableObject']
       last?: boolean
       empty?: boolean
     }
@@ -1347,10 +1347,10 @@ export interface components {
       pagination: components['schemas']['PaginationRequest']
     }
     PhysicalDetailResponse: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Prisoner'][]
@@ -1358,9 +1358,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
+      pageable?: components['schemas']['PageableObject']
       last?: boolean
       empty?: boolean
     }
@@ -1460,10 +1460,10 @@ export interface components {
       type: 'DEFAULT' | 'ESTABLISHMENT'
     }
     KeywordResponse: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Prisoner'][]
@@ -1471,9 +1471,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
+      pageable?: components['schemas']['PageableObject']
       last?: boolean
       empty?: boolean
     }
