@@ -14,5 +14,6 @@ export type ChangeVisitSlotRequestDto = components['schemas']['ChangeVisitSlotRe
 export type OutcomeDto = components['schemas']['OutcomeDto']
 
 export type SessionCapacity = components['schemas']['SessionCapacityDto']
+export type SessionSchedule = components['schemas']['SessionScheduleDto']
 
 export type VisitSession = components['schemas']['VisitSessionDto']

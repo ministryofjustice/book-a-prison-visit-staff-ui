@@ -254,7 +254,7 @@ describe('visitSchedulerApiClient', () => {
     it('should return an array of Visit Sessions from the Visit Scheduler API', async () => {
       const results: VisitSession[] = [
         {
-          sessionTemplateId: 1,
+          sessionTemplateReference: '1',
           visitRoomName: 'A1',
           visitType: 'SOCIAL',
           prisonId: 'HEI',

@@ -1,4 +1,5 @@
 {% extends "layout.njk" %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
 
 {% set pageHeaderTitle = "Visits timetable" %}
 {% set pageTitle %}
@@ -15,9 +16,68 @@
 
         <h2 class="govuk-heading-m" data-test="date-heading">Monday DD MMMM 2023</h2>
 
-        <h2 class="govuk-heading-m" data-test="date-heading">Request changes to the timetable</h2>
+        {% if schedules | length %}
+
+        {% set scheduleRows = [] %}
+        {% for schedule in schedules %}
+          {%- set scheduleRows = (scheduleRows.push([
+            {
+              text: (sessionDate + 'T' + schedule.startTime) | formatTime +
+              ' to ' + (sessionDate + 'T' + schedule.endTime) | formatTime,
+              attributes: { "data-test" : "schedule-time-" + loop.index } 
+            },
+            {
+              text: 'Open',
+              attributes: { "data-test" : "schedule-type-" + loop.index } 
+            },
+            {
+              text: schedule.capacity.open + ' tables',
+              attributes: { "data-test" : "schedule-capacity-" + loop.index } 
+            },
+            {
+              text: schedule.prisonerLocationGroupNames | join(', ') or 'All prisoners',
+              attributes: { "data-test" : "schedule-attendees-" + loop.index } 
+            },
+            {
+              text: schedule.sessionTemplateFrequency,
+              attributes: { "data-test" : "schedule-frequency-" + loop.index } 
+            },
+            {
+              text: schedule.endDate or 'Not entered' ,
+              attributes: { "data-test" : "schedule-end-date-" + loop.index } 
+            }
+          ]), scheduleRows) %}
+        {% endfor %}
+        {{ govukTable({
+          classes: 'bapv-table-no-bottom-border',
+          head: [
+            {
+              text: "Time"
+            },
+            {
+              text: "Type"
+            },
+            {
+              text: "Capacity"
+            },
+            {
+              text: "Who can attend"
+            },
+            {
+              text: "How often"
+            },
+            {
+              text: "End date"
+            }
+          ],
+          rows: scheduleRows
+        }) }}
+      </div>
+      {% endif %}
+
+        <h2 class="govuk-heading-m" data-test="request-changes">Request changes to the timetable</h2>
         <p>You need to provide six weeks' notice to change the timetable. To request a change,
-            <a href="LINK_TBC" target="_blank" data-test="change-request">(LINK TBC!) complete the request form (opens in a new tab)</a>.
+            <a href="LINK_TBC" target="_blank" data-test="request-changes-link">(LINK TBC!) complete the request form (opens in a new tab)</a>.
             We will respond within 5 working days.
         </p>
         <p>In exceptional circumstances when you need to make a change to the timetable within the next six weeks,

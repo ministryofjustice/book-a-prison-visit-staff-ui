@@ -248,3 +248,14 @@ export type VisitsPageSlot = {
   adults: number
   children: number
 }
+
+export type Schedule = {
+  sessionTemplateReference: string
+  startTime: string
+  endTime: string
+  type: string
+  capacity: number
+  prisonerLocationGroupNames: string[]
+  sessionTemplateFrequency: string
+  endDate: string
+}

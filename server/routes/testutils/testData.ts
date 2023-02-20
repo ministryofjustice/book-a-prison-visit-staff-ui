@@ -349,7 +349,7 @@ export default class TestData {
   })
 
   static visitSession = ({
-    sessionTemplateId = 1,
+    sessionTemplateReference = '1',
     visitRoomName = 'Visit room 1',
     visitType = 'SOCIAL',
     prisonId = 'HEI',
@@ -361,7 +361,7 @@ export default class TestData {
     endTimestamp = '2022-01-14T11:00:00',
     sessionConflicts = undefined,
   }: Partial<VisitSession> = {}): VisitSession => ({
-    sessionTemplateId,
+    sessionTemplateReference,
     visitRoomName,
     visitType,
     prisonId,
