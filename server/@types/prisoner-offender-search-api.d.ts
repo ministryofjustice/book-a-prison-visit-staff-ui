@@ -117,6 +117,23 @@ export interface paths {
      */
     post: operations['prisonerDetailSearch']
   }
+  '/physical-detail': {
+    /**
+     * *** BETA *** Physical details search for prisoners within a prison / group of prisons - returns a paginated result set
+     * @description
+     *       BETA endpoint - physical details are not currently re-indexed if they change so results will be out of date / incorrect.
+     *       Search by physical details.
+     *       If a cell location is provided then only one prison can be supplied, otherwise multiple prisons are allowed.
+     *       If lenient is set to false (default) then all supplied physical details must match in order for results to be returned.
+     *       If lenient is set to true then at least one physical detail must match.
+     *       Searches will return results for partial string matches, so searching for an ethnicity of white will return all
+     *       prisoners with ethnicity of White: Eng./Welsh/Scot./N.Irish/British, White: Irish etc.
+     *       Results are ordered so that prisoners that match the most criteria are returned first, then secondary order is by
+     *       prisoner number.
+     *       Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.
+     */
+    post: operations['prisonerDetailSearch_1']
+  }
   '/match-prisoners': {
     /**
      * Match for an prisoner by criteria. This is a more lenient version to other match endpoints that includes alias and fuzzy date of birth matching. It will return the best group of matching prisoners based on the request
@@ -206,6 +223,9 @@ export interface paths {
      */
     get: operations['search']
   }
+  '/compare-index': {
+    get: operations['compareIndex']
+  }
 }
 
 export type webhooks = Record<string, never>
@@ -279,6 +299,38 @@ export interface components {
       endIndexTime?: string
       inProgress: boolean
       inError: boolean
+    }
+    /** @description List of parts of the body that have other marks. From REFERENCE_CODES table where DOMAIN = BODY_PART. Allowable values extracted 08/02/2023. */
+    BodyPartDetail: {
+      /**
+       * @description Part of the body that has the mark. From REFERENCE_CODES table where DOMAIN = BODY_PART. Allowable values extracted 08/02/2023.
+       * @example Head
+       * @enum {string}
+       */
+      bodyPart?:
+        | 'Ankle'
+        | 'Arm'
+        | 'Ear'
+        | 'Elbow'
+        | 'Face'
+        | 'Finger'
+        | 'Foot'
+        | 'Hand'
+        | 'Head'
+        | 'Knee'
+        | 'Leg'
+        | 'Lip'
+        | 'Neck'
+        | 'Nose'
+        | 'Shoulder'
+        | 'Thigh'
+        | 'Toe'
+        | 'Torso'
+      /**
+       * @description Optional free text comment describing the mark
+       * @example Skull and crossbones covering chest
+       */
+      comment?: string
     }
     /** @description Incentive level */
     CurrentIncentive: {
@@ -482,7 +534,7 @@ export interface components {
        */
       recall?: boolean
       /**
-       * @description Indicates the the offender has an indeterminate sentence
+       * @description Indicates that the offender has an indeterminate sentence
        * @example true
        */
       indeterminateSentence?: boolean
@@ -643,6 +695,102 @@ export interface components {
        */
       dischargeDetails?: string
       currentIncentive?: components['schemas']['CurrentIncentive']
+      /**
+       * Format: int32
+       * @description Height in centimetres of the offender
+       * @example 200
+       */
+      heightCentimetres?: number
+      /**
+       * Format: int32
+       * @description Weight in kilograms of the offender
+       * @example 102
+       */
+      weightKilograms?: number
+      /**
+       * @description Hair colour. From PROFILE_CODES table where PROFILE_TYPE = HAIR. Allowable values extracted 07/02/2023.
+       * @example Blonde
+       * @enum {string}
+       */
+      hairColour?:
+        | 'Bald'
+        | 'Balding'
+        | 'Black'
+        | 'Blonde'
+        | 'Brown'
+        | 'Brunette'
+        | 'Dark'
+        | 'Dyed'
+        | 'Ginger'
+        | 'Grey'
+        | 'Light'
+        | 'Mouse'
+        | 'Multi-coloured'
+        | 'Red'
+        | 'White'
+      /**
+       * @description Right eye colour. From PROFILE_CODES table where PROFILE_TYPE = R_EYE_C. Allowable values extracted 07/02/2023.
+       * @example Green
+       * @enum {string}
+       */
+      rightEyeColour?: 'Blue' | 'Brown' | 'Clouded' | 'Green' | 'Grey' | 'Hazel' | 'Missing' | 'Pink' | 'White'
+      /**
+       * @description Left eye colour. From PROFILE_CODES table where PROFILE_TYPE = L_EYE_C. Allowable values extracted 07/02/2023.
+       * @example Hazel
+       * @enum {string}
+       */
+      leftEyeColour?: 'Blue' | 'Brown' | 'Clouded' | 'Green' | 'Grey' | 'Hazel' | 'Missing' | 'Pink' | 'White'
+      /**
+       * @description Facial hair. From PROFILE_CODES table where PROFILE_TYPE = FACIAL_HAIR. Allowable values extracted 07/02/2023.
+       * @example Clean Shaven
+       * @enum {string}
+       */
+      facialHair?:
+        | 'Full Beard'
+        | 'Clean Shaven'
+        | 'Goatee Beard'
+        | 'Moustache Only'
+        | 'Not Applicable (Female Offender)'
+        | 'No Facial Hair'
+        | 'Sideburns'
+      /**
+       * @description Shape of face. From PROFILE_CODES table where PROFILE_TYPE = FACE. Allowable values extracted 07/02/2023.
+       * @example Round
+       * @enum {string}
+       */
+      shapeOfFace?: 'Angular' | 'Bullet' | 'Oval' | 'Round' | 'Square' | 'Triangular'
+      /**
+       * @description Build. From PROFILE_CODES table where PROFILE_TYPE = BUILD. Allowable values extracted 07/02/2023.
+       * @example Muscular
+       * @enum {string}
+       */
+      build?:
+        | 'Fat'
+        | 'Frail'
+        | 'Heavy'
+        | 'Medium'
+        | 'Muscular'
+        | 'Obese'
+        | 'Proportional'
+        | 'Slight'
+        | 'Small'
+        | 'Stocky'
+        | 'Stooped'
+        | 'Thin'
+      /**
+       * Format: int32
+       * @description UK shoe size
+       * @example 10
+       */
+      shoeSize?: number
+      /** @description List of parts of the body that have tattoos. From REFERENCE_CODES table where DOMAIN = BODY_PART. Allowable values extracted 08/02/2023. */
+      tattoos?: components['schemas']['BodyPartDetail'][]
+      /** @description List of parts of the body that have scars. From REFERENCE_CODES table where DOMAIN = BODY_PART. Allowable values extracted 08/02/2023. */
+      scars?: components['schemas']['BodyPartDetail'][]
+      /** @description List of parts of the body that have marks. From REFERENCE_CODES table where DOMAIN = BODY_PART. Allowable values extracted 08/02/2023. */
+      marks?: components['schemas']['BodyPartDetail'][]
+      /** @description List of parts of the body that have other marks. From REFERENCE_CODES table where DOMAIN = BODY_PART. Allowable values extracted 08/02/2023. */
+      otherMarks?: components['schemas']['BodyPartDetail'][]
     }
     /** @description Alerts */
     PrisonerAlert: {
@@ -738,9 +886,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
       last?: boolean
       empty?: boolean
     }
@@ -750,10 +898,10 @@ export interface components {
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
       pageSize?: number
-      paged?: boolean
-      unpaged?: boolean
       /** Format: int32 */
       pageNumber?: number
+      paged?: boolean
+      unpaged?: boolean
     }
     SortObject: {
       empty?: boolean
@@ -962,9 +1110,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
       last?: boolean
       empty?: boolean
     }
@@ -996,6 +1144,225 @@ export interface components {
        * @example Hard disk failure
        */
       moreInfo?: string
+    }
+    /** @description List of body parts that have a different mark */
+    BodyPart: {
+      /**
+       * @description Body part that has the physical mark, searching on the description in the type BODY_PART in the REFERENCE_CODES table. Allowable values extracted 08/02/2023.
+       * @example Arm
+       * @enum {string}
+       */
+      bodyPart?:
+        | 'Ankle'
+        | 'Arm'
+        | 'Ear'
+        | 'Elbow'
+        | 'Face'
+        | 'Finger'
+        | 'Foot'
+        | 'Hand'
+        | 'Head'
+        | 'Knee'
+        | 'Leg'
+        | 'Lip'
+        | 'Neck'
+        | 'Nose'
+        | 'Shoulder'
+        | 'Thigh'
+        | 'Toe'
+        | 'Torso'
+      /**
+       * @description Comment on the physical mark.
+       * @example dragon
+       */
+      comment?: string
+    }
+    PhysicalDetailRequest: {
+      /**
+       * @description List of prison codes to filter results by
+       * @example ['LEI', 'MDI']
+       */
+      prisonIds: string[]
+      /**
+       * @description Filter for the prisoners cell location. A block wing or cell can be specified. With prison id can be included or absent so HEI-3-1 and 3-1 are equivalent when the prison id is HEI
+       * @example 3-1
+       */
+      cellLocationPrefix?: string
+      /**
+       * @description Gender, searching on the description in the domain SEX in the REFERENCE_CODES table.
+       * @example Male
+       * @enum {string}
+       */
+      gender?: 'Female' | 'Male' | 'Not Known / Not Recorded' | 'Not Specified (Indeterminate)' | 'Refused'
+      /**
+       * @description Ethnicity, searching on the description in the domain ETHNICITY in the REFERENCE_CODES table.
+       * @example White : Irish
+       * @enum {string}
+       */
+      ethnicity?:
+        | 'Asian/Asian British: Indian'
+        | 'Asian/Asian British: Pakistani'
+        | 'Asian/Asian British: Bangladeshi'
+        | 'Asian/Asian British: Chinese'
+        | "Asian/Asian British: Any other backgr'nd"
+        | 'Black/Black British: Caribbean'
+        | 'Black/Black British: African'
+        | "Black/Black British: Any other Backgr'nd"
+        | 'Mixed: White and Black Caribbean'
+        | 'Mixed: White and Black African'
+        | 'Mixed: White and Asian'
+        | 'Mixed: Any other background'
+        | 'Needs to be confirmed following Merge'
+        | 'Prefer not to say'
+        | 'Chinese'
+        | 'Other: Arab'
+        | 'Other: Any other background'
+        | 'White: Eng./Welsh/Scot./N.Irish/British'
+        | 'White : Irish'
+        | 'White: Gypsy or Irish Traveller'
+        | 'White : Irish Traveller/Gypsy'
+        | 'White: Any other background'
+      /**
+       * Format: int32
+       * @description Minimum height of the prisoner in centimetres
+       * @example 170
+       */
+      minHeight?: number
+      /**
+       * Format: int32
+       * @description Maximum height of the prisoner in centimetres
+       * @example 198
+       */
+      maxHeight?: number
+      /**
+       * Format: int32
+       * @description Minimum weight of the prisoner in kilograms
+       * @example 80
+       */
+      minWeight?: number
+      /**
+       * Format: int32
+       * @description Maximum weight of the prisoner in kilograms
+       * @example 90
+       */
+      maxWeight?: number
+      /**
+       * @description Hair colour, searching on the description in the type HAIR in the PROFILE_CODES table. Allowable values extracted 07/02/2023.
+       * @example Brunette
+       * @enum {string}
+       */
+      hairColour?:
+        | 'Bald'
+        | 'Balding'
+        | 'Black'
+        | 'Blonde'
+        | 'Brown'
+        | 'Brunette'
+        | 'Dark'
+        | 'Dyed'
+        | 'Ginger'
+        | 'Grey'
+        | 'Light'
+        | 'Mouse'
+        | 'Multi-coloured'
+        | 'Red'
+        | 'White'
+      /**
+       * @description Right eye colour, searching on the description in the type R_EYE_C in the PROFILE_CODES table. Allowable values extracted 07/02/2023.
+       * @example Green
+       * @enum {string}
+       */
+      rightEyeColour?: 'Blue' | 'Brown' | 'Clouded' | 'Green' | 'Grey' | 'Hazel' | 'Missing' | 'Pink' | 'White'
+      /**
+       * @description Left eye colour, searching on the description in the type L_EYE_C in the PROFILE_CODES table. Allowable values extracted 07/02/2023.
+       * @example Hazel
+       * @enum {string}
+       */
+      leftEyeColour?: 'Blue' | 'Brown' | 'Clouded' | 'Green' | 'Grey' | 'Hazel' | 'Missing' | 'Pink' | 'White'
+      /**
+       * @description Facial hair, searching on the description in the type FACIAL_HAIR in the PROFILE_CODES table. Allowable values extracted 07/02/2023.
+       * @example Goatee Beard
+       * @enum {string}
+       */
+      facialHair?:
+        | 'Full Beard'
+        | 'Clean Shaven'
+        | 'Goatee Beard'
+        | 'Moustache Only'
+        | 'Not Applicable (Female Offender)'
+        | 'No Facial Hair'
+        | 'Sideburns'
+      /**
+       * @description Shape of face, searching on the description in the type FACE in the PROFILE_CODES table. Allowable values extracted 07/02/2023.
+       * @example Bullet
+       * @enum {string}
+       */
+      shapeOfFace?: 'Angular' | 'Bullet' | 'Oval' | 'Round' | 'Square' | 'Triangular'
+      /**
+       * @description Physical build, searching on the description in the type BUILD in the PROFILE_CODES table. Allowable values extracted 07/02/2023.
+       * @example Medium
+       * @enum {string}
+       */
+      build?:
+        | 'Fat'
+        | 'Frail'
+        | 'Heavy'
+        | 'Medium'
+        | 'Muscular'
+        | 'Obese'
+        | 'Proportional'
+        | 'Slight'
+        | 'Small'
+        | 'Stocky'
+        | 'Stooped'
+        | 'Thin'
+      /**
+       * Format: int32
+       * @description Minimum UK shoe size of the prisoner
+       * @example 5
+       */
+      minShoeSize?: number
+      /**
+       * Format: int32
+       * @description Maximum UK shoe size of the prisoner
+       * @example 10
+       */
+      maxShoeSize?: number
+      /** @description List of body parts that have tattoos */
+      tattoos?: components['schemas']['BodyPart'][]
+      /** @description List of body parts that have marks */
+      marks?: components['schemas']['BodyPart'][]
+      /** @description List of body parts that have scars */
+      scars?: components['schemas']['BodyPart'][]
+      /** @description List of body parts that have a different mark */
+      otherMarks?: components['schemas']['BodyPart'][]
+      /**
+       * @description
+       *         Whether all terms are required to match. If set to true then only matches on all fields will return a result.
+       *         If set to false then matches will return a higher score than non matches, but all will be returned.
+       *         Prison and cell location will always be required to match.
+       * @example false
+       */
+      lenient: boolean
+      pagination: components['schemas']['PaginationRequest']
+    }
+    PhysicalDetailResponse: {
+      /** Format: int64 */
+      totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
+      /** Format: int32 */
+      size?: number
+      content?: components['schemas']['Prisoner'][]
+      /** Format: int32 */
+      number?: number
+      sort?: components['schemas']['SortObject']
+      first?: boolean
+      pageable?: components['schemas']['PageableObject']
+      /** Format: int32 */
+      numberOfElements?: number
+      last?: boolean
+      empty?: boolean
     }
     MatchRequest: {
       /**
@@ -1104,9 +1471,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
       last?: boolean
       empty?: boolean
     }
@@ -1502,6 +1869,53 @@ export interface operations {
       }
     }
   }
+  prisonerDetailSearch_1: {
+    /**
+     * *** BETA *** Physical details search for prisoners within a prison / group of prisons - returns a paginated result set
+     * @description
+     *       BETA endpoint - physical details are not currently re-indexed if they change so results will be out of date / incorrect.
+     *       Search by physical details.
+     *       If a cell location is provided then only one prison can be supplied, otherwise multiple prisons are allowed.
+     *       If lenient is set to false (default) then all supplied physical details must match in order for results to be returned.
+     *       If lenient is set to true then at least one physical detail must match.
+     *       Searches will return results for partial string matches, so searching for an ethnicity of white will return all
+     *       prisoners with ethnicity of White: Eng./Welsh/Scot./N.Irish/British, White: Irish etc.
+     *       Results are ordered so that prisoners that match the most criteria are returned first, then secondary order is by
+     *       prisoner number.
+     *       Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.
+     */
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['PhysicalDetailRequest']
+      }
+    }
+    responses: {
+      /** @description Search successfully performed */
+      200: {
+        content: {
+          'application/json': components['schemas']['PhysicalDetailResponse']
+        }
+      }
+      /** @description Incorrect information provided to perform prisoner match */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to search for prisoner data */
+      403: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
   matchPrisoners: {
     /**
      * Match for an prisoner by criteria. This is a more lenient version to other match endpoints that includes alias and fuzzy date of birth matching. It will return the best group of matching prisoners based on the request
@@ -1785,6 +2199,12 @@ export interface operations {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
+    }
+  }
+  compareIndex: {
+    responses: {
+      /** @description Accepted */
+      202: never
     }
   }
 }

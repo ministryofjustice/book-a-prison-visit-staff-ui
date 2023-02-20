@@ -1,7 +1,6 @@
 import type { RequestHandler, Router } from 'express'
 import { format } from 'date-fns'
 import { NotFound } from 'http-errors'
-import logger from '../../logger'
 import config from '../config'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import VisitSessionsService from '../services/visitSessionsService'
@@ -23,9 +22,7 @@ export default function routes(router: Router, visitSessionService: VisitSession
       prisonId,
       sessionDate,
     })
-    logger.info('.....')
-    console.log(visitSchedule)
-    logger.info('.....')
+
     res.render('pages/timetable', {
       visitSchedule,
     })
