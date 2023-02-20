@@ -1,4 +1,3 @@
-import { format } from 'date-fns'
 import { getDateTabs, getSlotsSideMenuData } from './visitsUtils'
 
 describe('getDateTabs', () => {
