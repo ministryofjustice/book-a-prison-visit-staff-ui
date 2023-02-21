@@ -35,7 +35,7 @@ describe('View visits timetable', () => {
 
         expect($('h1').text()).toBe('Visits timetable')
 
-        expect($('h2:nth-of-type(2)').text()).toBe('Request changes to the timetable')
+        expect($('[data-test="change-timetable"]').text()).toBe('Request changes to the timetable')
         expect($('[data-test="change-request"]').attr('href')).toBe('LINK_TBC')
       })
   })

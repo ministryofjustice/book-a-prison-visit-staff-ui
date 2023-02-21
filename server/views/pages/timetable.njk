@@ -9,22 +9,57 @@
 
 {% block content %}
   <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+
+      <nav aria-labelledby="selected-date">
+        <h2 class="govuk-heading-m" id="selected-date">{{ selectedDate | formatDate('EEEE d MMMM yyyy') }}</h2>
+
+        <ul class="govuk-list bapv-timetable-dates govuk-!-margin-bottom-1">
+          {% for day in weekOfDates %}
+            {% set selected = day == selectedDate %}
+            <li class="bapv-timetable-dates__date {{ 'bapv-timetable-dates__date--selected' if selected }}">
+              <span>{{ day | formatDate('E') }}</span>
+                {% if not selected %}<a href="/timetable?date={{ day | formatDate('yyyy-MM-dd') }}">{% endif %}
+                  {{ day | formatDate('d') }}<span class="govuk-visually-hidden"> {{ day | formatDate('MMMM yyyy') }}</span>
+                {% if not selected %}</a>{% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+        <ul class="govuk-list bapv-timetable-dates">
+          <li class="moj-pagination__item  moj-pagination__item--prev">
+            <a class="moj-pagination__link" href="/timetable?date={{ previousWeek | formatDate('yyyy-MM-dd') }}">Previous week</a>
+          </li>
+          <li class="moj-pagination__item  moj-pagination__item--next">
+            <a class="moj-pagination__link" href="/timetable?date={{ nextWeek | formatDate('yyyy-MM-dd') }}">Next week</a>
+          </li>
+        </ul>
+      </nav>
+      
+    </div>
+  </div>
+
+  <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
+      <hr>
+      <p>schedule....</p>
+      <hr>
+    </div>
+  </div>
 
-        <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
 
-        <h2 class="govuk-heading-m" data-test="date-heading">Monday DD MMMM 2023</h2>
-
-
-        <h2 class="govuk-heading-m" data-test="date-heading">Request changes to the timetable</h2>
-        <p>You need to provide six weeks' notice to change the timetable. To request a change,
-            <a href="LINK_TBC" target="_blank" data-test="change-request">(LINK TBC!) complete the request form (opens in a new tab)</a>.
-            We will respond within 5 working days.
-        </p>
-        <p>In exceptional circumstances when you need to make a change to the timetable within the next six weeks,
-            email or call the Family Services Contact Centre. They will need to cancel any visits already booked
-            for these dates and tell booking staff to not make further bookings for this visit session.
-        </p>
+      <h2 class="govuk-heading-m" data-test="change-timetable">Request changes to the timetable</h2>
+      <p>You need to provide six weeks' notice to change the timetable. To request a change,
+          <a href="LINK_TBC" target="_blank" data-test="change-request">(LINK TBC!) complete the request form (opens in a new tab)</a>.
+          We will respond within 5 working days.
+      </p>
+      <p>In exceptional circumstances when you need to make a change to the timetable within the next six weeks,
+          email or call the Family Services Contact Centre. They will need to cancel any visits already booked
+          for these dates and tell booking staff to not make further bookings for this visit session.
+      </p>
 
     </div>
   </div>
