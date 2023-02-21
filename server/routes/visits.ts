@@ -6,8 +6,8 @@ import asyncMiddleware from '../middleware/asyncMiddleware'
 import PrisonerSearchService from '../services/prisonerSearchService'
 import VisitSessionsService from '../services/visitSessionsService'
 import AuditService from '../services/auditService'
-import { getResultsPagingLinks } from '../utils/utils'
-import { getDateTabs, getParsedDateFromQueryString, getSlotsSideMenuData } from './visitsUtils'
+import { getParsedDateFromQueryString, getResultsPagingLinks } from '../utils/utils'
+import { getDateTabs, getSlotsSideMenuData } from './visitsUtils'
 import { SessionCapacity } from '../data/visitSchedulerApiTypes'
 
 export default function routes(
@@ -29,9 +29,9 @@ export default function routes(
 
   get('/', async (req, res) => {
     const { prisonId } = req.session.selectedEstablishment
-    const { type = 'OPEN', time = '', selectedDate = '', firstTabDate = '' } = req.query
+    const { type = 'OPEN', time = '', sessionDate = '', firstTabDate = '' } = req.query
     let visitType = ['OPEN', 'CLOSED', 'UNKNOWN'].includes(type as string) ? (type as string) : 'OPEN'
-    const selectedDateString = getParsedDateFromQueryString(selectedDate as string)
+    const sessionDateString = getParsedDateFromQueryString(sessionDate as string)
     const {
       extendedVisitsInfo,
       slots,
@@ -44,7 +44,7 @@ export default function routes(
         firstSlotTime: string
       }
     } = await visitSessionsService.getVisitsByDate({
-      dateString: selectedDateString,
+      dateString: sessionDateString,
       username: res.locals.user?.username,
       prisonId,
     })
@@ -63,14 +63,14 @@ export default function routes(
     const queryParams = new URLSearchParams({
       type: visitType,
       time: slotFilter as string,
-      selectedDate: selectedDateString,
+      sessionDate: sessionDateString,
       firstTabDate: firstTabDateString,
     }).toString()
 
     const slotsNav = getSlotsSideMenuData({
       slotType: visitType,
       slotFilter: slotFilter as string,
-      selectedDate: selectedDateString,
+      sessionDate: sessionDateString,
       firstTabDate: firstTabDateString,
       ...slots,
     })
@@ -118,7 +118,7 @@ export default function routes(
       const sessionCapacity: SessionCapacity = await visitSessionsService.getVisitSessionCapacity(
         res.locals.user?.username,
         prisonId,
-        selectedDateString,
+        sessionDateString,
         sessionStartTime,
         sessionEndTime,
       )
@@ -141,7 +141,7 @@ export default function routes(
     })
 
     await auditService.viewedVisits({
-      viewDate: selectedDateString,
+      viewDate: sessionDateString,
       prisonId,
       username: res.locals.user?.username,
       operationId: res.locals.appInsightsOperationId,
@@ -164,7 +164,7 @@ export default function routes(
       from: (currentPage - 1) * pageSize + 1,
       to,
       pageLinks: numberOfPages <= 1 ? [] : pageLinks,
-      dateTabs: getDateTabs(selectedDateString, firstTabDateString, 3),
+      dateTabs: getDateTabs(sessionDateString, firstTabDateString, 3),
       queryParams,
     })
   })
@@ -174,10 +174,10 @@ export default function routes(
     const month = (req.body['date-picker-month'] as string).padStart(2, '0')
     const year = (req.body['date-picker-year'] as string).padStart(4, '0')
 
-    const selectedDateString = getParsedDateFromQueryString(`${year}-${month}-${day}`)
+    const sessionDateString = getParsedDateFromQueryString(`${year}-${month}-${day}`)
     const queryParams = new URLSearchParams({
-      selectedDate: selectedDateString,
-      firstTabDate: selectedDateString,
+      sessionDate: sessionDateString,
+      firstTabDate: sessionDateString,
     }).toString()
 
     return res.redirect(`/visits?${queryParams}`)

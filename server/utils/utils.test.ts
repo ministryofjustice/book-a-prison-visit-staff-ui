@@ -1,3 +1,4 @@
+import { format } from 'date-fns'
 import {
   convertToTitleCase,
   getResultsPagingLinks,
@@ -7,6 +8,8 @@ import {
   properCase,
   sortByTimestamp,
   safeReturnUrl,
+  getParsedDateFromQueryString,
+  getWeekOfDatesStartingMonday,
 } from './utils'
 import { getResultsPagingLinksTestData, sortByTimestampData } from './utils.testData'
 
@@ -123,6 +126,57 @@ describe('safeReturnUrl', () => {
   ].forEach(testData => {
     it(`should output ${testData.expected} when supplied with ${testData.input}`, () => {
       expect(safeReturnUrl(testData.input)).toBe(testData.expected)
+    })
+  })
+})
+
+describe('getParsedDateFromQueryString', () => {
+  const today = format(new Date(), 'yyyy-MM-dd')
+
+  ;[
+    {
+      input: '2022-05-22',
+      expected: '2022-05-22',
+    },
+    {
+      input: '2222-00-12',
+      expected: today,
+    },
+    {
+      input: '!&"-bad-input',
+      expected: today,
+    },
+  ].forEach(testData => {
+    it(`should output ${testData.expected} when supplied with ${testData.input}`, () => {
+      expect(getParsedDateFromQueryString(testData.input)).toBe(testData.expected)
+    })
+  })
+})
+
+describe('getWeekOfDatesStartingMonday', () => {
+  const weekOfDates = {
+    weekOfDates: ['2022-12-26', '2022-12-27', '2022-12-28', '2022-12-29', '2022-12-30', '2022-12-31', '2023-01-01'],
+    previousWeek: '2022-12-19',
+    nextWeek: '2023-01-02',
+  }
+
+  it('should return a week of dates starting on the given date when it is a Monday', () => {
+    expect(getWeekOfDatesStartingMonday('2022-12-26')).toStrictEqual(weekOfDates)
+  })
+
+  it('should return a week of dates starting on the previous closest Monday when given a Wednesday', () => {
+    expect(getWeekOfDatesStartingMonday('2022-12-28')).toStrictEqual(weekOfDates)
+  })
+
+  it('should return a week of dates starting on the previous closest Monday when given a Sunday', () => {
+    expect(getWeekOfDatesStartingMonday('2023-01-01')).toStrictEqual(weekOfDates)
+  })
+
+  it('should return an empty array if given an invalid date', () => {
+    expect(getWeekOfDatesStartingMonday('NOT A DATE')).toStrictEqual({
+      weekOfDates: [],
+      previousWeek: '',
+      nextWeek: '',
     })
   })
 })

@@ -4,12 +4,12 @@ import { Response } from 'superagent'
 import { stubFor, getMatchingRequests } from './wiremock'
 import tokenVerification from './tokenVerification'
 
-const createToken = () => {
+const createToken = (role: string) => {
   const payload = {
     user_name: 'USER1',
     scope: ['read'],
     auth_source: 'nomis',
-    authorities: ['ROLE_GLOBAL_SEARCH'],
+    authorities: [role ?? 'ROLE_MANAGE_PRISON_VISITS'],
     jti: '83b50a10-cca6-41db-985f-e87efb303ddb',
     client_id: 'clientid',
   }
@@ -95,7 +95,7 @@ const manageDetails = () =>
     },
   })
 
-const token = () =>
+const token = (role: string) =>
   stubFor({
     request: {
       method: 'POST',
@@ -108,11 +108,11 @@ const token = () =>
         Location: 'http://localhost:3007/sign-in/callback?code=codexxxx&state=stateyyyy',
       },
       jsonBody: {
-        access_token: createToken(),
+        access_token: createToken(role),
         token_type: 'bearer',
         user_name: 'USER1',
         expires_in: 599,
-        scope: 'read write',
+        scope: 'read',
         internalUser: true,
       },
     },
@@ -134,7 +134,6 @@ const stubUser = (name: string) =>
         username: 'USER1',
         active: true,
         name,
-        authSource: 'nomis',
         activeCaseLoadId: 'HEI',
       },
     },
@@ -151,14 +150,14 @@ const stubUserRoles = () =>
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
       },
-      jsonBody: [{ roleCode: 'GLOBAL_SEARCH' }, { roleId: 'MANAGE_PRISON_VISITS' }],
+      jsonBody: [{ roleCode: 'ROLE_MANAGE_PRISON_VISITS' }],
     },
   })
 
 export default {
   getSignInUrl,
   stubAuthPing: ping,
-  stubSignIn: (): Promise<[Response, Response, Response, Response, Response, Response]> =>
-    Promise.all([favicon(), redirect(), signOut(), manageDetails(), token(), tokenVerification.stubVerifyToken()]),
+  stubSignIn: (role: string): Promise<[Response, Response, Response, Response, Response, Response]> =>
+    Promise.all([favicon(), redirect(), signOut(), manageDetails(), token(role), tokenVerification.stubVerifyToken()]),
   stubAuthUser: (name = 'john smith'): Promise<[Response, Response]> => Promise.all([stubUser(name), stubUserRoles()]),
 }

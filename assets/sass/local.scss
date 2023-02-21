@@ -1,4 +1,4 @@
-.govuk-main-wrapper a:not(.govuk-button, .govuk-tabs__tab):visited,
+.govuk-main-wrapper a:not(.govuk-button, .govuk-tabs__tab, .bapv-timetable-dates__date--selected>a, .moj-pagination__link):visited,
 .location-bar .location-bar__location a:visited {
   color: $govuk-link-colour;
 }
@@ -250,4 +250,36 @@
 
 .bapv-force-overflow {
  overflow-wrap: anywhere;
+}
+
+.bapv-timetable-dates {
+  display: flex;
+  justify-content: space-between;
+  max-width: 600px;
+}
+
+.bapv-timetable-dates__date {
+  flex-basis: 10%;
+  padding: govuk-spacing(2);
+  text-align: center;
+
+  & span {
+    display: block;
+    padding-bottom: govuk-spacing(2);
+    @include govuk-font($size: 19);
+  }
+
+  & a {
+    @include govuk-font($size: 24);
+  }
+
+  & a:hover {
+    text-decoration: none;
+  }
+}
+
+.bapv-timetable-dates__date--selected {
+  background-color: govuk-colour("blue");
+  color: govuk-colour("white");
+  @include govuk-font($size: 24, $weight: "bold");
 }
