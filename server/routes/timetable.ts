@@ -1,6 +1,7 @@
 import type { RequestHandler, Router } from 'express'
 import { NotFound } from 'http-errors'
 import config from '../config'
+import sessionTemplateFrequency from '../constants/sessionTemplateFrequency'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import VisitSessionsService from '../services/visitSessionsService'
 
@@ -11,9 +12,8 @@ export default function routes(router: Router, visitSessionService: VisitSession
     if (!config.features.viewTimetableEnabled) {
       throw new NotFound()
     }
-    // const selectedDate = new Date()
-    // const sessionDate = format(selectedDate, 'yyyy-MM-dd')
-    const sessionDate = '2023-04-02'
+
+    const sessionDate = '2023-02-28'
     const { prisonId } = req.session.selectedEstablishment
 
     const schedules = await visitSessionService.getSessionSchedule({
@@ -22,11 +22,10 @@ export default function routes(router: Router, visitSessionService: VisitSession
       sessionDate,
     })
 
-    // console.log(JSON.stringify(schedules, null, 2))
-
     res.render('pages/timetable', {
       schedules,
       sessionDate,
+      sessionTemplateFrequency,
     })
   })
 

@@ -8,45 +8,52 @@
 
 {% set backLinkHref = "/" %}
 
+{% macro scheduleRowByType(scheduleRows, schedule, type) %}
+  {% if schedule.capacity[type] !== 0 %}
+   {% set rowNumber = scheduleRows | length %}
+    {% set scheduleRows = (scheduleRows.push([
+      {
+        text: (sessionDate + 'T' + schedule.startTime) | formatTime +
+        ' to ' + (sessionDate + 'T' + schedule.endTime) | formatTime,
+        attributes: { "data-test" : "schedule-time-" + rowNumber } 
+      },
+      {
+        text: type | capitalize,
+        attributes: { "data-test" : "schedule-type-" + rowNumber } 
+      },
+      {
+        text: schedule.capacity[type] + ' tables',
+        attributes: { "data-test" : "schedule-capacity-" + rowNumber } 
+      },
+      {
+        text: schedule.prisonerLocationGroupNames | join(', ') or 'All prisoners',
+        attributes: { "data-test" : "schedule-attendees-" + rowNumber } 
+      },
+      {
+        text: sessionTemplateFrequency[schedule.sessionTemplateFrequency],
+        attributes: { "data-test" : "schedule-frequency-" + rowNumber } 
+      },
+      {
+        text: schedule.endDate or 'Not entered' ,
+        attributes: { "data-test" : "schedule-end-date-" + rowNumber } 
+      }
+   ]), scheduleRows) %}
+  {% endif %}
+{% endmacro %}
+
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
 
-        <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+      <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
 
-        <h2 class="govuk-heading-m" data-test="date-heading">Monday DD MMMM 2023</h2>
-
-        {% if schedules | length %}
+      <h2 class="govuk-heading-m" data-test="date-heading">Monday DD MMMM 2023</h2>
+      {% if schedules | length %}
 
         {% set scheduleRows = [] %}
         {% for schedule in schedules %}
-          {%- set scheduleRows = (scheduleRows.push([
-            {
-              text: (sessionDate + 'T' + schedule.startTime) | formatTime +
-              ' to ' + (sessionDate + 'T' + schedule.endTime) | formatTime,
-              attributes: { "data-test" : "schedule-time-" + loop.index } 
-            },
-            {
-              text: 'Open',
-              attributes: { "data-test" : "schedule-type-" + loop.index } 
-            },
-            {
-              text: schedule.capacity.open + ' tables',
-              attributes: { "data-test" : "schedule-capacity-" + loop.index } 
-            },
-            {
-              text: schedule.prisonerLocationGroupNames | join(', ') or 'All prisoners',
-              attributes: { "data-test" : "schedule-attendees-" + loop.index } 
-            },
-            {
-              text: schedule.sessionTemplateFrequency,
-              attributes: { "data-test" : "schedule-frequency-" + loop.index } 
-            },
-            {
-              text: schedule.endDate or 'Not entered' ,
-              attributes: { "data-test" : "schedule-end-date-" + loop.index } 
-            }
-          ]), scheduleRows) %}
+          {{ scheduleRowByType(scheduleRows, schedule, 'open')}}
+          {{ scheduleRowByType(scheduleRows, schedule, 'closed')}}
         {% endfor %}
         {{ govukTable({
           classes: 'bapv-table-no-bottom-border',
@@ -55,7 +62,7 @@
               text: "Time"
             },
             {
-              text: "Type"
+              text: "Visit type"
             },
             {
               text: "Capacity"
@@ -72,8 +79,8 @@
           ],
           rows: scheduleRows
         }) }}
-      </div>
       {% endif %}
+    </div>
 
         <h2 class="govuk-heading-m" data-test="request-changes">Request changes to the timetable</h2>
         <p>You need to provide six weeks' notice to change the timetable. To request a change,
