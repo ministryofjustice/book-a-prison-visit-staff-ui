@@ -29,10 +29,10 @@
         </ul>
         <ul class="govuk-list bapv-timetable-dates">
           <li class="moj-pagination__item  moj-pagination__item--prev">
-            <a class="moj-pagination__link" href="/timetable?date={{ previousWeek | formatDate('yyyy-MM-dd') }}">Previous week</a>
+            <a class="moj-pagination__link" href="/timetable?date={{ previousWeek | formatDate('yyyy-MM-dd') }}" data-test="previous-week">Previous week</a>
           </li>
           <li class="moj-pagination__item  moj-pagination__item--next">
-            <a class="moj-pagination__link" href="/timetable?date={{ nextWeek | formatDate('yyyy-MM-dd') }}">Next week</a>
+            <a class="moj-pagination__link" href="/timetable?date={{ nextWeek | formatDate('yyyy-MM-dd') }}" data-test="next-week">Next week</a>
           </li>
         </ul>
       </nav>
