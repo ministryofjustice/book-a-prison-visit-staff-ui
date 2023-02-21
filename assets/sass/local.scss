@@ -266,6 +266,7 @@
   & span {
     display: block;
     padding-bottom: govuk-spacing(2);
+    @include govuk-font($size: 19);
   }
 
   & a {
@@ -280,5 +281,5 @@
 .bapv-timetable-dates__date--selected {
   background-color: govuk-colour("blue");
   color: govuk-colour("white");
-  font-weight: $govuk-font-weight-bold;
+  @include govuk-font($size: 24, $weight: "bold");
 }
