@@ -1,4 +1,15 @@
-import { differenceInYears, format, parseISO, addDays, startOfMonth, addMonths } from 'date-fns'
+import {
+  differenceInYears,
+  format,
+  parseISO,
+  addDays,
+  startOfMonth,
+  addMonths,
+  isMonday,
+  previousMonday,
+  addWeeks,
+  subWeeks,
+} from 'date-fns'
 
 export const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
@@ -147,4 +158,29 @@ export function safeReturnUrl(originalUrl: string) {
   return originalUrl.length === 0 || originalUrl.indexOf('://') > 0 || originalUrl.indexOf('//') === 0
     ? '/'
     : originalUrl
+}
+
+export const getParsedDateFromQueryString = (dateFromQueryString: string, defaultDate = new Date()): string => {
+  const parsedDate =
+    new Date(dateFromQueryString).toString() === 'Invalid Date' ? defaultDate : new Date(dateFromQueryString)
+  return format(parsedDate, 'yyyy-MM-dd')
+}
+
+export const getWeekOfDatesStartingMonday = (
+  date: string,
+): { weekOfDates: string[]; previousWeek: string; nextWeek: string } => {
+  const startingDate = new Date(date)
+  if (startingDate.toString() === 'Invalid Date') return { weekOfDates: [], previousWeek: '', nextWeek: '' }
+
+  const dateFormat = 'yyyy-MM-dd'
+  const weekStartDate = isMonday(startingDate) ? startingDate : previousMonday(startingDate)
+
+  const weekOfDates = new Array(7).fill('').map((_day, index) => {
+    return format(addDays(weekStartDate, index), dateFormat)
+  })
+
+  const previousWeek = format(subWeeks(weekStartDate, 1), dateFormat)
+  const nextWeek = format(addWeeks(weekStartDate, 1), dateFormat)
+
+  return { weekOfDates, previousWeek, nextWeek }
 }

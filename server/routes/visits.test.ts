@@ -8,8 +8,8 @@ import VisitSessionsService from '../services/visitSessionsService'
 import AuditService from '../services/auditService'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import { ExtendedVisitInformation, PrisonerDetailsItem, VisitsPageSlot } from '../@types/bapv'
-import { getParsedDateFromQueryString } from './visitsUtils'
 import TestData from './testutils/testData'
+import { getParsedDateFromQueryString } from '../utils/utils'
 
 jest.mock('../services/prisonerSearchService')
 jest.mock('../services/visitSessionsService')

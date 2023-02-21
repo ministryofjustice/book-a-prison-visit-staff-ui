@@ -1,24 +1,4 @@
-import { format } from 'date-fns'
-import { getParsedDateFromQueryString, getDateTabs, getSlotsSideMenuData } from './visitsUtils'
-
-describe('getParsedDateFromQueryString', () => {
-  const today = format(new Date(), 'yyyy-MM-dd')
-
-  ;[
-    {
-      input: '2022-05-22',
-      expected: '2022-05-22',
-    },
-    {
-      input: '2222-00-12',
-      expected: today,
-    },
-  ].forEach(testData => {
-    it(`should output ${testData.expected} when supplied with ${testData.input}`, () => {
-      expect(getParsedDateFromQueryString(testData.input)).toBe(testData.expected)
-    })
-  })
-})
+import { getDateTabs, getSlotsSideMenuData } from './visitsUtils'
 
 describe('getDateTabs', () => {
   const todayString = '2022-05-24'

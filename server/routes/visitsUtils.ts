@@ -1,12 +1,6 @@
 import { format, parse, add } from 'date-fns'
 import { VisitsPageSlot } from '../@types/bapv'
-import { sortByTimestamp } from '../utils/utils'
-
-export const getParsedDateFromQueryString = (dateFromQueryString: string, defaultDate = new Date()): string => {
-  const parsedDate =
-    new Date(dateFromQueryString).toString() === 'Invalid Date' ? defaultDate : new Date(dateFromQueryString)
-  return format(parsedDate, 'yyyy-MM-dd')
-}
+import { getParsedDateFromQueryString, sortByTimestamp } from '../utils/utils'
 
 export const getDateTabs = (
   selectedDate: string,
