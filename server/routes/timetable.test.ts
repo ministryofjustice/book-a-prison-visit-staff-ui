@@ -176,14 +176,14 @@ describe('View visits timetable', () => {
         expect($('[data-test="schedule-frequency-1"]').text()).toBe('Fortnightly')
         // Row 2
         expect($('[data-test="schedule-attendees-2"]').text()).toBe('Group 1, Group 2')
-        // Row 3
+        // Row 3 + 4
         expect($('[data-test="schedule-type-3"]').text()).toBe('Open')
         expect($('[data-test="schedule-capacity-3"]').text()).toBe('11 tables')
         expect($('[data-test="schedule-type-4"]').text()).toBe('Closed')
         expect($('[data-test="schedule-capacity-4"]').text()).toBe('22 tables')
-        // Row 4
-        expect($('[data-test="schedule-time-5"]').text()).toBe('3pm to 3:45pm')
         // Row 5
+        expect($('[data-test="schedule-time-5"]').text()).toBe('3pm to 3:45pm')
+        // Row 6
         expect($('[data-test="schedule-end-date-6"]').text()).toBe('31 December 2025')
       })
   })
