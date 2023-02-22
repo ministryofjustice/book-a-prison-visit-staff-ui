@@ -28,7 +28,7 @@ export default function routes(router: Router, visitSessionService: VisitSession
       prisonId,
       sessionDate,
     })
-
+    // console.log(schedules)
     res.render('pages/timetable', {
       schedules,
       sessionDate,

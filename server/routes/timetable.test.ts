@@ -4,6 +4,7 @@ import * as cheerio from 'cheerio'
 import { appWithAllRoutes } from './testutils/appSetup'
 import config from '../config'
 import VisitSessionsService from '../services/visitSessionsService'
+import TestData from './testutils/testData'
 
 jest.mock('../services/visitSessionsService')
 
@@ -40,7 +41,7 @@ describe('View visits timetable', () => {
     return request(app).get('/timetable').expect(404)
   })
 
-  it('should render the visits timetable page with closest Monday selected by default', () => {
+  it('should render the visits timetable page with closest Monday selected by default, with empty schedule', () => {
     fakeDate = '2022-12-27' // a Tuesday
     jest.useFakeTimers({ advanceTimers: true, now: new Date(fakeDate) })
 
@@ -65,8 +66,16 @@ describe('View visits timetable', () => {
         expect($('[data-test="previous-week"]').attr('href')).toBe('/timetable?date=2022-12-19')
         expect($('[data-test="next-week"]').attr('href')).toBe('/timetable?date=2023-01-02')
 
+        expect($('[data-test="empty-schedule"]').text()).toBe('No visit sessions on this day.')
+
         expect($('[data-test="change-timetable"]').text()).toBe('Request changes to the timetable')
         expect($('[data-test="change-request"]').attr('href')).toBe('LINK_TBC')
+
+        expect(visitSessionsService.getSessionSchedule).toHaveBeenCalledWith({
+          prisonId: 'HEI',
+          sessionDate: '2022-12-26',
+          username: 'user1',
+        })
       })
   })
 
@@ -95,6 +104,12 @@ describe('View visits timetable', () => {
 
         expect($('[data-test="previous-week"]').attr('href')).toBe('/timetable?date=2022-12-19')
         expect($('[data-test="next-week"]').attr('href')).toBe('/timetable?date=2023-01-02')
+
+        expect(visitSessionsService.getSessionSchedule).toHaveBeenCalledWith({
+          prisonId: 'HEI',
+          sessionDate: fakeDate,
+          username: 'user1',
+        })
       })
   })
 
@@ -123,6 +138,53 @@ describe('View visits timetable', () => {
 
         expect($('[data-test="previous-week"]').attr('href')).toBe('/timetable?date=2022-12-19')
         expect($('[data-test="next-week"]').attr('href')).toBe('/timetable?date=2023-01-02')
+
+        expect(visitSessionsService.getSessionSchedule).toHaveBeenCalledWith({
+          prisonId: 'HEI',
+          sessionDate: fakeDate,
+          username: 'user1',
+        })
+      })
+  })
+
+  it('should render the visits timetable page with that selectedDates timetable shown', () => {
+    const sessionSchedule = [
+      TestData.sessionSchedule(), // Row 0
+      TestData.sessionSchedule({ sessionTemplateFrequency: 'BI_WEEKLY' }), // Row 1
+      TestData.sessionSchedule({ prisonerLocationGroupNames: ['Group 1', 'Group 2'] }), // Row 2
+      TestData.sessionSchedule({ capacity: { open: 11, closed: 22 } }), // Row 3 + 4
+      TestData.sessionSchedule({ startTime: '15:00:00' }), // Row 5
+      TestData.sessionSchedule({ sessionTemplateEndDate: '2025-12-31' }), // Row 6
+    ]
+    visitSessionsService.getSessionSchedule.mockResolvedValue(sessionSchedule)
+
+    return request(app)
+      .get('/timetable')
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+
+        expect($('h1').text()).toBe('Visits timetable')
+        // Row 0
+        expect($('[data-test="schedule-time-0"]').text()).toBe('1:45pm to 3:45pm')
+        expect($('[data-test="schedule-type-0"]').text()).toBe('Open')
+        expect($('[data-test="schedule-capacity-0"]').text()).toBe('40 tables')
+        expect($('[data-test="schedule-attendees-0"]').text()).toBe('All prisoners')
+        expect($('[data-test="schedule-frequency-0"]').text()).toBe('Weekly')
+        expect($('[data-test="schedule-end-date-0"]').text()).toBe('Not entered')
+        // Row 1
+        expect($('[data-test="schedule-frequency-1"]').text()).toBe('Fortnightly')
+        // Row 2
+        expect($('[data-test="schedule-attendees-2"]').text()).toBe('Group 1, Group 2')
+        // Row 3
+        expect($('[data-test="schedule-type-3"]').text()).toBe('Open')
+        expect($('[data-test="schedule-capacity-3"]').text()).toBe('11 tables')
+        expect($('[data-test="schedule-type-4"]').text()).toBe('Closed')
+        expect($('[data-test="schedule-capacity-4"]').text()).toBe('22 tables')
+        // Row 4
+        expect($('[data-test="schedule-time-5"]').text()).toBe('3pm to 3:45pm')
+        // Row 5
+        expect($('[data-test="schedule-end-date-6"]').text()).toBe('31 December 2025')
       })
   })
 })

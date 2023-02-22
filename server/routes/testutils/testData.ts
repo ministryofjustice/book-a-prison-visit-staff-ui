@@ -1,5 +1,5 @@
 import { Prison } from '../../@types/bapv'
-import { SessionCapacity, SupportType, Visit, VisitSession } from '../../data/visitSchedulerApiTypes'
+import { SessionCapacity, SessionSchedule, SupportType, Visit, VisitSession } from '../../data/visitSchedulerApiTypes'
 import {
   InmateDetail,
   CaseLoad,
@@ -372,5 +372,23 @@ export default class TestData {
     startTimestamp,
     endTimestamp,
     sessionConflicts,
+  })
+
+  static sessionSchedule = ({
+    sessionTemplateReference = '1',
+    startTime = '13:45:00',
+    endTime = '15:45:00',
+    capacity = { closed: 0, open: 40 },
+    prisonerLocationGroupNames = [],
+    sessionTemplateFrequency = 'WEEKLY',
+    sessionTemplateEndDate = '',
+  }: Partial<SessionSchedule> = {}): SessionSchedule => ({
+    sessionTemplateReference,
+    startTime,
+    endTime,
+    capacity,
+    prisonerLocationGroupNames,
+    sessionTemplateFrequency,
+    sessionTemplateEndDate,
   })
 }

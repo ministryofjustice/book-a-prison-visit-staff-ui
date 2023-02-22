@@ -34,7 +34,7 @@
         attributes: { "data-test" : "schedule-frequency-" + rowNumber } 
       },
       {
-        text: schedule.endDate or 'Not entered' ,
+        text: schedule.sessionTemplateEndDate | formatDate or 'Not entered' ,
         attributes: { "data-test" : "schedule-end-date-" + rowNumber } 
       }
    ]), scheduleRows) %}
