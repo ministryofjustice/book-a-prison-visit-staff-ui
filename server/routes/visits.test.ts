@@ -281,7 +281,7 @@ describe('GET /visits', () => {
     visitSessionsService.getVisitsByDate.mockResolvedValue(visits)
 
     return request(app)
-      .get('/visits?sessionDate=2022-05-23&time=10am%20to%2011am&type=OPEN')
+      .get('/visits?selectedDate=2022-05-23&time=10am%20to%2011am&type=OPEN')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -313,7 +313,7 @@ describe('GET /visits', () => {
     visitSessionsService.getVisitsByDate.mockResolvedValue(visits)
 
     return request(app)
-      .get('/visits?sessionDate=2022-05-23&time=10am+to+11am&type=UNKNOWN')
+      .get('/visits?selectedDate=2022-05-23&time=10am+to+11am&type=UNKNOWN')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -345,7 +345,7 @@ describe('GET /visits', () => {
     visitSessionsService.getVisitsByDate.mockResolvedValue(visits)
 
     return request(app)
-      .get('/visits?sessionDate=2022-77-23&time=10am%20to%2011am&type=OPEN')
+      .get('/visits?selectedDate=2022-77-23&time=10am%20to%2011am&type=OPEN')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -414,7 +414,7 @@ describe('GET /visits', () => {
     visitSessionsService.getVisitsByDate.mockResolvedValue(visits)
 
     return request(app)
-      .get('/visits?sessionDate=2022-05-23&time=11am%20to%2011am&type=OPEN')
+      .get('/visits?selectedDate=2022-05-23&time=11am%20to%2011am&type=OPEN')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -438,7 +438,7 @@ describe('POST /visits', () => {
     const day = '1'
     const month = '1'
     const year = '2022'
-    const sessionDateString = getParsedDateFromQueryString(`${year}-${month}-${day}`)
+    const selectedDateString = getParsedDateFromQueryString(`${year}-${month}-${day}`)
 
     return request(app)
       .post('/visits')
@@ -446,14 +446,14 @@ describe('POST /visits', () => {
       .send(`date-picker-month=${month}`)
       .send(`date-picker-year=${year}`)
       .expect(302)
-      .expect('location', `/visits?sessionDate=${sessionDateString}&firstTabDate=${sessionDateString}`)
+      .expect('location', `/visits?selectedDate=${selectedDateString}&firstTabDate=${selectedDateString}`)
   })
 
   it('should redirect to the current date on the visits page for an invalid date', () => {
     const day = 'X'
     const month = 'Y'
     const year = '20D2'
-    const sessionDateString = getParsedDateFromQueryString(`${year}-${month}-${day}`)
+    const selectedDateString = getParsedDateFromQueryString(`${year}-${month}-${day}`)
 
     return request(app)
       .post('/visits')
@@ -461,6 +461,6 @@ describe('POST /visits', () => {
       .send(`date-picker-month=${month}`)
       .send(`date-picker-year=${year}`)
       .expect(302)
-      .expect('location', `/visits?sessionDate=${sessionDateString}&firstTabDate=${sessionDateString}`)
+      .expect('location', `/visits?selectedDate=${selectedDateString}&firstTabDate=${selectedDateString}`)
   })
 })

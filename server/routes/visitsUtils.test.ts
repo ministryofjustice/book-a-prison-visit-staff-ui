@@ -7,7 +7,7 @@ describe('getDateTabs', () => {
     {
       description: 'should list 3 tabs starting from the firstTab date, selecting the selected date',
       input: {
-        sessionDate: '2022-05-22',
+        selectedDate: '2022-05-22',
         firstTabDate: '2022-05-22',
         numberOfTabs: 3,
         defaultDate: today,
@@ -15,17 +15,17 @@ describe('getDateTabs', () => {
       expected: [
         {
           text: 'Sunday 22 May 2022',
-          href: `/visits?sessionDate=2022-05-22&firstTabDate=2022-05-22`,
+          href: `/visits?selectedDate=2022-05-22&firstTabDate=2022-05-22`,
           active: true,
         },
         {
           text: 'Monday 23 May 2022',
-          href: `/visits?sessionDate=2022-05-23&firstTabDate=2022-05-22`,
+          href: `/visits?selectedDate=2022-05-23&firstTabDate=2022-05-22`,
           active: false,
         },
         {
           text: 'Tuesday 24 May 2022',
-          href: `/visits?sessionDate=2022-05-24&firstTabDate=2022-05-22`,
+          href: `/visits?selectedDate=2022-05-24&firstTabDate=2022-05-22`,
           active: false,
         },
       ],
@@ -34,7 +34,7 @@ describe('getDateTabs', () => {
       description:
         'should list 3 tabs starting from the firstTab date, no date selected if selected date after 2 days later',
       input: {
-        sessionDate: '2022-05-27',
+        selectedDate: '2022-05-27',
         firstTabDate: '2022-05-22',
         numberOfTabs: 3,
         defaultDate: today,
@@ -42,17 +42,17 @@ describe('getDateTabs', () => {
       expected: [
         {
           text: 'Sunday 22 May 2022',
-          href: `/visits?sessionDate=2022-05-22&firstTabDate=2022-05-22`,
+          href: `/visits?selectedDate=2022-05-22&firstTabDate=2022-05-22`,
           active: false,
         },
         {
           text: 'Monday 23 May 2022',
-          href: `/visits?sessionDate=2022-05-23&firstTabDate=2022-05-22`,
+          href: `/visits?selectedDate=2022-05-23&firstTabDate=2022-05-22`,
           active: false,
         },
         {
           text: 'Tuesday 24 May 2022',
-          href: `/visits?sessionDate=2022-05-24&firstTabDate=2022-05-22`,
+          href: `/visits?selectedDate=2022-05-24&firstTabDate=2022-05-22`,
           active: false,
         },
       ],
@@ -61,7 +61,7 @@ describe('getDateTabs', () => {
       description:
         'should list 3 tabs starting from the firstTab date, defaulting to today as first tab if bad data passed for firstTabDate',
       input: {
-        sessionDate: todayString,
+        selectedDate: todayString,
         firstTabDate: '2022-35-22',
         numberOfTabs: 3,
         defaultDate: today,
@@ -69,17 +69,17 @@ describe('getDateTabs', () => {
       expected: [
         {
           text: 'Tuesday 24 May 2022',
-          href: `/visits?sessionDate=2022-05-24&firstTabDate=${todayString}`,
+          href: `/visits?selectedDate=2022-05-24&firstTabDate=${todayString}`,
           active: true,
         },
         {
           text: 'Wednesday 25 May 2022',
-          href: `/visits?sessionDate=2022-05-25&firstTabDate=${todayString}`,
+          href: `/visits?selectedDate=2022-05-25&firstTabDate=${todayString}`,
           active: false,
         },
         {
           text: 'Thursday 26 May 2022',
-          href: `/visits?sessionDate=2022-05-26&firstTabDate=${todayString}`,
+          href: `/visits?selectedDate=2022-05-26&firstTabDate=${todayString}`,
           active: false,
         },
       ],
@@ -87,12 +87,12 @@ describe('getDateTabs', () => {
   ].forEach(testData => {
     const {
       description,
-      input: { sessionDate, firstTabDate, numberOfTabs, defaultDate },
+      input: { selectedDate, firstTabDate, numberOfTabs, defaultDate },
       expected,
     } = testData
 
     it(description, () => {
-      expect(getDateTabs(sessionDate, firstTabDate, numberOfTabs, defaultDate)).toStrictEqual(expected)
+      expect(getDateTabs(selectedDate, firstTabDate, numberOfTabs, defaultDate)).toStrictEqual(expected)
     })
   })
 })
@@ -104,7 +104,7 @@ describe('getSlotsSideMenuData', () => {
       input: {
         slotType: 'OPEN',
         slotFilter: '3pm to 3:59pm',
-        sessionDate: '2022-05-24',
+        selectedDate: '2022-05-24',
         firstTabDate: '2022-05-24',
         openSlots: [
           {
@@ -127,7 +127,7 @@ describe('getSlotsSideMenuData', () => {
           items: [
             {
               text: '3pm to 3:59pm',
-              href: '/visits?type=OPEN&time=3pm+to+3%3A59pm&sessionDate=2022-05-24&firstTabDate=2022-05-24',
+              href: '/visits?type=OPEN&time=3pm+to+3%3A59pm&selectedDate=2022-05-24&firstTabDate=2022-05-24',
               active: true,
             },
           ],
@@ -139,7 +139,7 @@ describe('getSlotsSideMenuData', () => {
       input: {
         slotType: 'OPEN',
         slotFilter: '10am to 11am',
-        sessionDate: '2022-05-25',
+        selectedDate: '2022-05-25',
         firstTabDate: '2022-05-25',
         openSlots: [
           {
@@ -169,12 +169,12 @@ describe('getSlotsSideMenuData', () => {
           items: [
             {
               text: '10am to 11am',
-              href: '/visits?type=OPEN&time=10am+to+11am&sessionDate=2022-05-25&firstTabDate=2022-05-25',
+              href: '/visits?type=OPEN&time=10am+to+11am&selectedDate=2022-05-25&firstTabDate=2022-05-25',
               active: true,
             },
             {
               text: '2:15pm to 3pm',
-              href: '/visits?type=OPEN&time=2%3A15pm+to+3pm&sessionDate=2022-05-25&firstTabDate=2022-05-25',
+              href: '/visits?type=OPEN&time=2%3A15pm+to+3pm&selectedDate=2022-05-25&firstTabDate=2022-05-25',
               active: false,
             },
           ],

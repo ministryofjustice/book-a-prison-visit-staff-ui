@@ -3,7 +3,7 @@ import { VisitsPageSlot } from '../@types/bapv'
 import { getParsedDateFromQueryString, sortByTimestamp } from '../utils/utils'
 
 export const getDateTabs = (
-  sessionDate: string,
+  selectedDate: string,
   firstTabDate: string,
   numberOfTabs: number,
   defaultDate = new Date(),
@@ -20,13 +20,13 @@ export const getDateTabs = (
     const dateToUse = add(firstTabDateObject, { days: tab })
     const dateCheck = format(dateToUse, 'yyyy-MM-dd')
     const queryParams = new URLSearchParams({
-      sessionDate: dateCheck,
+      selectedDate: dateCheck,
       firstTabDate: validfirstTabDate,
     }).toString()
     const item = {
       text: format(dateToUse, 'EEEE d MMMM yyyy'),
       href: `/visits?${queryParams}`,
-      active: dateCheck === sessionDate,
+      active: dateCheck === selectedDate,
     }
 
     tabs.push(item)
@@ -37,7 +37,7 @@ export const getDateTabs = (
 
 const getSlotOptions = (
   slot: VisitsPageSlot,
-  sessionDate: string,
+  selectedDate: string,
   firstTabDate: string,
   slotFilter: string,
   slotType: string,
@@ -46,7 +46,7 @@ const getSlotOptions = (
   const queryParams = new URLSearchParams({
     type: visitType,
     time: slot.visitTime,
-    sessionDate,
+    selectedDate,
     firstTabDate,
   }).toString()
 
@@ -60,7 +60,7 @@ const getSlotOptions = (
 export function getSlotsSideMenuData({
   slotFilter,
   slotType = '',
-  sessionDate = '',
+  selectedDate = '',
   firstTabDate = '',
   openSlots,
   closedSlots,
@@ -68,7 +68,7 @@ export function getSlotsSideMenuData({
 }: {
   slotFilter: string
   slotType: string
-  sessionDate: string
+  selectedDate: string
   firstTabDate: string
   openSlots: VisitsPageSlot[]
   closedSlots: VisitsPageSlot[]
@@ -86,13 +86,13 @@ export function getSlotsSideMenuData({
 }[] {
   const openSlotOptions = openSlots
     .sort(sortByTimestamp)
-    .map(slot => getSlotOptions(slot, sessionDate, firstTabDate, slotFilter, slotType, 'OPEN'))
+    .map(slot => getSlotOptions(slot, selectedDate, firstTabDate, slotFilter, slotType, 'OPEN'))
   const closedSlotOptions = closedSlots
     .sort(sortByTimestamp)
-    .map(slot => getSlotOptions(slot, sessionDate, firstTabDate, slotFilter, slotType, 'CLOSED'))
+    .map(slot => getSlotOptions(slot, selectedDate, firstTabDate, slotFilter, slotType, 'CLOSED'))
   const unknownSlotOptions = unknownSlots
     .sort(sortByTimestamp)
-    .map(slot => getSlotOptions(slot, sessionDate, firstTabDate, slotFilter, slotType, 'UNKNOWN'))
+    .map(slot => getSlotOptions(slot, selectedDate, firstTabDate, slotFilter, slotType, 'UNKNOWN'))
 
   const slotsNav = []
 

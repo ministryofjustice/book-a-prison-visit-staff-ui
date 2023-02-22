@@ -3,11 +3,24 @@ import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { appWithAllRoutes } from './testutils/appSetup'
 import config from '../config'
+import VisitSessionsService from '../services/visitSessionsService'
+
+jest.mock('../services/visitSessionsService')
 
 let app: Express
+const systemToken = async (user: string): Promise<string> => `${user}-token-1`
+
+const visitSessionsService = new VisitSessionsService(
+  null,
+  null,
+  null,
+  systemToken,
+) as jest.Mocked<VisitSessionsService>
 
 beforeEach(() => {
-  app = appWithAllRoutes({})
+  visitSessionsService.getSessionSchedule.mockResolvedValue([])
+
+  app = appWithAllRoutes({ visitSessionsServiceOverride: visitSessionsService })
 
   config.features.viewTimetableEnabled = true
 })
@@ -39,7 +52,7 @@ describe('View visits timetable', () => {
 
         expect($('h1').text()).toBe('Visits timetable')
 
-        expect($('#selected-date').text()).toBe('Monday 26 December 2022')
+        expect($('#session-date').text()).toBe('Monday 26 December 2022')
 
         expect($('.bapv-timetable-dates__date--selected').text().trim()).toMatch(/Mon\s+26 December/)
         expect($('.bapv-timetable-dates__date a').eq(0).attr('href')).toBe('/timetable?date=2022-12-27')
@@ -70,7 +83,7 @@ describe('View visits timetable', () => {
 
         expect($('h1').text()).toBe('Visits timetable')
 
-        expect($('#selected-date').text()).toBe('Friday 30 December 2022')
+        expect($('#session-date').text()).toBe('Friday 30 December 2022')
 
         expect($('.bapv-timetable-dates__date a').eq(0).attr('href')).toBe('/timetable?date=2022-12-26')
         expect($('.bapv-timetable-dates__date a').eq(1).attr('href')).toBe('/timetable?date=2022-12-27')
@@ -98,7 +111,7 @@ describe('View visits timetable', () => {
 
         expect($('h1').text()).toBe('Visits timetable')
 
-        expect($('#selected-date').text()).toBe('Monday 26 December 2022')
+        expect($('#session-date').text()).toBe('Monday 26 December 2022')
 
         expect($('.bapv-timetable-dates__date--selected').text().trim()).toMatch(/Mon\s+26 December/)
         expect($('.bapv-timetable-dates__date a').eq(0).attr('href')).toBe('/timetable?date=2022-12-27')

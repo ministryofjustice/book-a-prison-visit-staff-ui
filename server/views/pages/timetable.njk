@@ -48,7 +48,7 @@
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
 
       <nav aria-labelledby="selected-date">
-        <h2 class="govuk-heading-m" id="selected-date">{{ sessionDate | formatDate('EEEE d MMMM yyyy') }}</h2>
+        <h2 class="govuk-heading-m" id="session-date">{{ sessionDate | formatDate('EEEE d MMMM yyyy') }}</h2>
 
         <ul class="govuk-list bapv-timetable-dates govuk-!-margin-bottom-1">
           {% for day in weekOfDates %}
@@ -107,6 +107,9 @@
           ],
           rows: scheduleRows
         }) }}
+
+        {% else %}
+          <p data-test="empty-schedule">No visit sessions on this day.</p>
       {% endif %}
     </div>
   </div>
