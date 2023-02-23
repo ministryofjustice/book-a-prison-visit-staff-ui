@@ -3200,16 +3200,16 @@ export interface components {
       releaseDate?: string
       /**
        * Format: date
-       * @description Offender's home detention curfew end date - calculated as one day before the releaseDate.
-       * @example 2019-04-01
-       */
-      homeDetentionCurfewEndDate?: string
-      /**
-       * Format: date
        * @description Top-up supervision start date for offender - calculated as licence end date + 1 day or releaseDate if licence end date not set.
        * @example 2019-04-01
        */
       topupSupervisionStartDate?: string
+      /**
+       * Format: date
+       * @description Offender's home detention curfew end date - calculated as one day before the releaseDate.
+       * @example 2019-04-01
+       */
+      homeDetentionCurfewEndDate?: string
     }
     /** @description Represents the data required for receiving a prisoner transfer */
     RequestToTransferIn: {
@@ -5410,18 +5410,29 @@ export interface components {
       /**
        * Format: int64
        * @description Image ID
+       * @example 2461788
        */
       imageId: number
       /**
        * Format: date
        * @description Date of image capture
+       * @example 2008-08-27
        */
       captureDate: string
-      /** @description Image view information */
+      /**
+       * @description Image view information
+       * @example FACE
+       */
       imageView: string
-      /** @description Orientation of the image */
+      /**
+       * @description Orientation of the image
+       * @example FRONT
+       */
       imageOrientation: string
-      /** @description Image Type */
+      /**
+       * @description Image Type
+       * @example OFF_BKG
+       */
       imageType: string
       /**
        * Format: int64
@@ -5529,6 +5540,8 @@ export interface components {
       offenceCode?: string
       /** @description The offence statute of the office in the court case */
       offenceStatue?: string
+      /** @description The offence description */
+      offenceDescription?: string
       /**
        * Format: date
        * @description The date of the offence
@@ -5546,6 +5559,8 @@ export interface components {
        * @description The id of the court case
        */
       courtCaseId?: number
+      /** @description Court case reference */
+      courtCaseRef?: string
       /**
        * Format: int32
        * @description The sequence of the sentence from this charge
@@ -7327,10 +7342,10 @@ export interface components {
       establishmentName: string
     }
     PagePrisonerInformation: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['PrisonerInformation'][]
@@ -7338,10 +7353,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
-      last?: boolean
       empty?: boolean
     }
     PageableObject: {
@@ -8531,16 +8546,16 @@ export interface components {
       tariffEarlyRemovalSchemeEligibilityDate?: string
       /**
        * Format: date
-       * @description Offender's home detention curfew end date - calculated as one day before the releaseDate.
-       * @example 2019-04-01
-       */
-      homeDetentionCurfewEndDate?: string
-      /**
-       * Format: date
        * @description Top-up supervision start date for offender - calculated as licence end date + 1 day or releaseDate if licence end date not set.
        * @example 2019-04-01
        */
       topupSupervisionStartDate?: string
+      /**
+       * Format: date
+       * @description Offender's home detention curfew end date - calculated as one day before the releaseDate.
+       * @example 2019-04-01
+       */
+      homeDetentionCurfewEndDate?: string
     }
     /** @description Offence details related to an offender */
     OffenderOffence: {
@@ -8845,63 +8860,6 @@ export interface components {
       /** @description Complete list of agencies where this offender has had adjudications */
       agencies?: components['schemas']['Agency'][]
     }
-    /** @description Detail about an individual Adjudication */
-    AdjudicationDetail: {
-      /**
-       * Format: int64
-       * @description Adjudication Number
-       * @example 1234567
-       */
-      adjudicationNumber?: number
-      /**
-       * @description Incident Time
-       * @example 2021-07-05T10:35:17
-       */
-      incidentTime?: string
-      /**
-       * @description Establishment
-       * @example Moorland (HMP & YOI)
-       */
-      establishment?: string
-      /**
-       * @description Interior Location
-       * @example Wing A
-       */
-      interiorLocation?: string
-      /**
-       * @description Incident Details
-       * @example Whilst conducting an intelligence cell search...
-       */
-      incidentDetails?: string
-      /**
-       * Format: int64
-       * @description Report Number
-       * @example 1234567
-       */
-      reportNumber?: number
-      /**
-       * @description Report Type
-       * @example Governor's Report
-       */
-      reportType?: string
-      /**
-       * @description Reporter First Name
-       * @example John
-       */
-      reporterFirstName?: string
-      /**
-       * @description Reporter Last Name
-       * @example Smith
-       */
-      reporterLastName?: string
-      /**
-       * @description Report Time
-       * @example 2021-07-05T10:35:17
-       */
-      reportTime?: string
-      /** @description Hearings */
-      hearings?: components['schemas']['Hearing'][]
-    }
     /** @description An Adjudication Hearing */
     Hearing: {
       /**
@@ -8981,6 +8939,63 @@ export interface components {
        */
       finding?: string
       sanctions?: components['schemas']['Sanction'][]
+    }
+    /** @description Detail about an individual Adjudication */
+    IndividualAdjudication: {
+      /**
+       * Format: int64
+       * @description Adjudication Number
+       * @example 1234567
+       */
+      adjudicationNumber?: number
+      /**
+       * @description Incident Time
+       * @example 2021-07-05T10:35:17
+       */
+      incidentTime?: string
+      /**
+       * @description Establishment
+       * @example Moorland (HMP & YOI)
+       */
+      establishment?: string
+      /**
+       * @description Interior Location
+       * @example Wing A
+       */
+      interiorLocation?: string
+      /**
+       * @description Incident Details
+       * @example Whilst conducting an intelligence cell search...
+       */
+      incidentDetails?: string
+      /**
+       * Format: int64
+       * @description Report Number
+       * @example 1234567
+       */
+      reportNumber?: number
+      /**
+       * @description Report Type
+       * @example Governor's Report
+       */
+      reportType?: string
+      /**
+       * @description Reporter First Name
+       * @example John
+       */
+      reporterFirstName?: string
+      /**
+       * @description Reporter Last Name
+       * @example Smith
+       */
+      reporterLastName?: string
+      /**
+       * @description Report Time
+       * @example 2021-07-05T10:35:17
+       */
+      reportTime?: string
+      /** @description Hearings */
+      hearings?: components['schemas']['Hearing'][]
     }
     /** @description An Adjudication Sanction */
     Sanction: {
@@ -9498,10 +9513,10 @@ export interface components {
       additionalAnswers?: string[]
     }
     PageOffenceDto: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['OffenceDto'][]
@@ -9509,10 +9524,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
-      last?: boolean
       empty?: boolean
     }
     Pageable: {
@@ -10190,10 +10205,10 @@ export interface components {
       numberAllocated: number
     }
     PageOffenderNumber: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['OffenderNumber'][]
@@ -10201,10 +10216,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
-      last?: boolean
       empty?: boolean
     }
     /** @description Offender Employment */
@@ -10297,10 +10312,10 @@ export interface components {
       addresses: components['schemas']['AddressDto'][]
     }
     PageEmployment: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Employment'][]
@@ -10308,10 +10323,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
-      last?: boolean
       empty?: boolean
     }
     /** @description Offender Education */
@@ -10379,10 +10394,10 @@ export interface components {
       addresses: components['schemas']['AddressDto'][]
     }
     PageEducation: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Education'][]
@@ -10390,10 +10405,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
-      last?: boolean
       empty?: boolean
     }
     /** @description Represents a court date and its outcome */
@@ -10590,10 +10605,10 @@ export interface components {
       hasVisits: boolean
     }
     PageVisitWithVisitors: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['VisitWithVisitors'][]
@@ -10601,10 +10616,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
-      last?: boolean
       empty?: boolean
     }
     /** @description Visit details */
@@ -10859,10 +10874,10 @@ export interface components {
       otherContacts: components['schemas']['Contact'][]
     }
     PageBedAssignment: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['BedAssignment'][]
@@ -10870,17 +10885,17 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
-      last?: boolean
       empty?: boolean
     }
     PageCaseNote: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['CaseNote'][]
@@ -10888,10 +10903,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
-      last?: boolean
       empty?: boolean
     }
     /** @description Case Note Count Detail */
@@ -10935,10 +10950,10 @@ export interface components {
       currency: string
     }
     PageAlert: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Alert'][]
@@ -10946,10 +10961,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
-      last?: boolean
       empty?: boolean
     }
     /** @description Adjudication Summary for offender */
@@ -11013,10 +11028,10 @@ export interface components {
       hearingSequence: number
     }
     PagePrisonerBookingSummary: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['PrisonerBookingSummary'][]
@@ -11024,10 +11039,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
-      last?: boolean
       empty?: boolean
     }
     /** @description Prisoner Booking Summary */
@@ -18901,7 +18916,7 @@ export interface operations {
       /** @description OK */
       200: {
         content: {
-          'application/json': components['schemas']['AdjudicationDetail']
+          'application/json': components['schemas']['IndividualAdjudication']
         }
       }
       /** @description Invalid request. */

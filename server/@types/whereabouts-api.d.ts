@@ -162,6 +162,13 @@ export interface paths {
      */
     get: operations['getEmailByCourtId']
   }
+  '/court/court-hearing-types': {
+    /**
+     * All court hearing types
+     * @description Return a list of all court hearing types.
+     */
+    get: operations['getCourtHearingTypes']
+  }
   '/court/all-courts': {
     /**
      * Return all court locations
@@ -925,8 +932,8 @@ export interface components {
       first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      last?: boolean
       pageable?: components['schemas']['PageableObject']
+      last?: boolean
       empty?: boolean
     }
     PageableObject: {
@@ -935,10 +942,10 @@ export interface components {
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
       pageSize?: number
-      unpaged?: boolean
       /** Format: int32 */
       pageNumber?: number
       paged?: boolean
+      unpaged?: boolean
     }
     SortObject: {
       empty?: boolean
@@ -1885,6 +1892,46 @@ export interface operations {
       200: {
         content: {
           'application/json': components['schemas']['CourtEmailDto']
+        }
+      }
+    }
+  }
+  getCourtHearingTypes: {
+    /**
+     * All court hearing types
+     * @description Return a list of all court hearing types.
+     */
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          'application/json': (
+            | 'APPEAL'
+            | 'APPLICATION'
+            | 'BACKER_TRIAL'
+            | 'BAIL'
+            | 'CIVIL'
+            | 'COMMITTAL_FOR_SENTENCE'
+            | 'CUSTODY_TIME_LIMIT_APPLICATIONS'
+            | 'IMMIGRATION_DEPORTATION'
+            | 'FAMILY'
+            | 'TRIAL'
+            | 'FURTHER_CASE_MANAGEMENT'
+            | 'FUTURE_TRIAL_REVIEW'
+            | 'GROUND_RULES'
+            | 'MENTION_DEFENDANT_MUST_ATTEND'
+            | 'MENTION_TO_FIX'
+            | 'NEWTON'
+            | 'PLEA'
+            | 'PLEA_TRIAL_PREPARATION'
+            | 'PRE_TRIAL_REVIEW'
+            | 'PROCEEDS_OF_CRIME_APPLICATIONS'
+            | 'REMAND'
+            | 'SECTION_28'
+            | 'SENTENCE'
+            | 'TRIBUNAL'
+            | 'OTHER'
+          )[]
         }
       }
     }

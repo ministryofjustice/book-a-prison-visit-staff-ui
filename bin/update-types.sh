@@ -4,7 +4,8 @@
 # Also automatically tidies and fixes linting issues
 
 APIS='{
-  "apis": [{
+  "apis": [
+    {
       "api": "prison-api",
       "url": "https://api-dev.prison.service.justice.gov.uk/v3/api-docs"
     },
@@ -43,3 +44,6 @@ echo $APIS | jq -c '.apis[]' | while read API; do
   sed -i '' 's/^export interface external {}$/\/\/ eslint-disable-next-line @typescript-eslint\/no-empty-interface\n&/'  "./server/@types/$API_NAME.d.ts"
   npx eslint  "./server/@types/$API_NAME.d.ts" --fix
 done
+
+echo "\nNow running type check:"
+npm run typecheck
