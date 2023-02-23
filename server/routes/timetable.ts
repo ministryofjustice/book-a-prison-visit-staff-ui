@@ -1,4 +1,3 @@
-import { isMonday, previousMonday } from 'date-fns'
 import type { RequestHandler, Router } from 'express'
 import { NotFound } from 'http-errors'
 import config from '../config'
@@ -16,10 +15,9 @@ export default function routes(router: Router, visitSessionService: VisitSession
     }
 
     const today = new Date()
-    const defaultDate = isMonday(today) ? today : previousMonday(today)
-
     const { date = '' } = req.query
-    const selectedDate = getParsedDateFromQueryString(date.toString(), defaultDate)
+    const selectedDate = getParsedDateFromQueryString(date.toString(), today)
+
     const { weekOfDates, previousWeek, nextWeek } = getWeekOfDatesStartingMonday(selectedDate)
 
     const { prisonId } = req.session.selectedEstablishment
