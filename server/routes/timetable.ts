@@ -2,13 +2,15 @@ import { isMonday, previousMonday } from 'date-fns'
 import type { RequestHandler, Router } from 'express'
 import { NotFound } from 'http-errors'
 import config from '../config'
+import sessionTemplateFrequency from '../constants/sessionTemplateFrequency'
 import asyncMiddleware from '../middleware/asyncMiddleware'
+import VisitSessionsService from '../services/visitSessionsService'
 import { getParsedDateFromQueryString, getWeekOfDatesStartingMonday } from '../utils/utils'
 
-export default function routes(router: Router): Router {
+export default function routes(router: Router, visitSessionService: VisitSessionsService): Router {
   const get = (path: string | string[], handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
 
-  get('/', (req, res) => {
+  get('/', async (req, res) => {
     if (!config.features.viewTimetableEnabled) {
       throw new NotFound()
     }
@@ -17,12 +19,20 @@ export default function routes(router: Router): Router {
     const defaultDate = isMonday(today) ? today : previousMonday(today)
 
     const { date = '' } = req.query
-    const selectedDate = getParsedDateFromQueryString(date.toString(), defaultDate)
+    const sessionDate = getParsedDateFromQueryString(date.toString(), defaultDate)
+    const { weekOfDates, previousWeek, nextWeek } = getWeekOfDatesStartingMonday(sessionDate)
 
-    const { weekOfDates, previousWeek, nextWeek } = getWeekOfDatesStartingMonday(selectedDate)
-
+    const { prisonId } = req.session.selectedEstablishment
+    const schedules = await visitSessionService.getSessionSchedule({
+      username: res.locals.user?.username,
+      prisonId,
+      sessionDate,
+    })
+    // console.log(schedules)
     res.render('pages/timetable', {
-      selectedDate,
+      schedules,
+      sessionDate,
+      sessionTemplateFrequency,
       weekOfDates,
       previousWeek,
       nextWeek,

@@ -9,6 +9,7 @@ import {
   ChangeVisitSlotRequestDto,
   SessionCapacity,
   PageVisitDto,
+  SessionSchedule,
 } from './visitSchedulerApiTypes'
 import { VisitSessionData } from '../@types/bapv'
 import config from '../config'
@@ -91,6 +92,16 @@ class VisitSchedulerApiClient {
         prisonId,
         prisonerId: offenderNo,
         // 'min' and 'max' params omitted, so using API default between 2 and 28 days from now
+      }).toString(),
+    })
+  }
+
+  getSessionSchedule(prisonId: string, sessionDate: string): Promise<SessionSchedule[]> {
+    return this.restclient.get({
+      path: '/visit-sessions/schedule',
+      query: new URLSearchParams({
+        prisonId,
+        sessionDate,
       }).toString(),
     })
   }

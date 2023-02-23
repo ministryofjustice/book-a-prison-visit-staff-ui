@@ -14,5 +14,18 @@ export type ChangeVisitSlotRequestDto = components['schemas']['ChangeVisitSlotRe
 export type OutcomeDto = components['schemas']['OutcomeDto']
 
 export type SessionCapacity = components['schemas']['SessionCapacityDto']
+// export type SessionSchedule = components['schemas']['SessionScheduleDto']
+export type SessionSchedule = {
+  capacity: {
+    closed: number
+    open: number
+  }
+  endTime: string
+  prisonerLocationGroupNames: string[]
+  sessionTemplateEndDate?: string
+  sessionTemplateFrequency: 'BI_WEEKLY' | 'WEEKLY' | 'ONE_OFF'
+  sessionTemplateReference: string
+  startTime: string
+}
 
 export type VisitSession = components['schemas']['VisitSessionDto']

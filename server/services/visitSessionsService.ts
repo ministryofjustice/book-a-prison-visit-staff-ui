@@ -14,7 +14,14 @@ import {
 } from '../@types/bapv'
 import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
 import WhereaboutsApiClient from '../data/whereaboutsApiClient'
-import { VisitSession, Visit, SupportType, OutcomeDto, SessionCapacity } from '../data/visitSchedulerApiTypes'
+import {
+  VisitSession,
+  Visit,
+  SupportType,
+  OutcomeDto,
+  SessionCapacity,
+  SessionSchedule,
+} from '../data/visitSchedulerApiTypes'
 import { prisonerDateTimePretty, prisonerTimePretty } from '../utils/utils'
 import PrisonerContactRegistryApiClient from '../data/prisonerContactRegistryApiClient'
 import buildVisitorListItem from '../utils/visitorUtils'
@@ -166,6 +173,21 @@ export default class VisitSessionsService {
     })
 
     return { slotsList: availableSessions, whereaboutsAvailable }
+  }
+
+  async getSessionSchedule({
+    username,
+    prisonId,
+    sessionDate,
+  }: {
+    username: string
+    prisonId: string
+    sessionDate: string
+  }): Promise<SessionSchedule[]> {
+    const token = await this.systemToken(username)
+    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
+
+    return visitSchedulerApiClient.getSessionSchedule(prisonId, sessionDate)
   }
 
   async getVisitSessionCapacity(

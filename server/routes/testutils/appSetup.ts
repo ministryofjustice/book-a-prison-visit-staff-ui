@@ -235,7 +235,10 @@ function appSetup({
     ),
   )
 
-  app.use('/timetable/', timetableRoutes(standardRouter(new MockUserService(), new MockSupportedPrisonsService())))
+  app.use(
+    '/timetable/',
+    timetableRoutes(standardRouter(new MockUserService(), new MockSupportedPrisonsService()), visitSessionsService),
+  )
 
   app.use((req, res, next) => next(createError(404, 'Not found')))
   app.use(errorHandler(production))

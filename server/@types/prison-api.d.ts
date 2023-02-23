@@ -527,6 +527,13 @@ export interface paths {
      */
     post: operations['getCaseNoteUsageSummaryByPost']
   }
+  '/api/case-notes/usage-by-types': {
+    /**
+     * Retrieves list of case notes grouped by types, bookings and from dates
+     * @description Retrieves list of case notes grouped by type/sub and offender<p>This endpoint uses the REPLICA database.</p>
+     */
+    post: operations['getCaseNoteUsageSummaryByDates']
+  }
   '/api/case-notes/staff-usage': {
     /**
      * Count of case notes
@@ -1194,7 +1201,10 @@ export interface paths {
     get: operations['getIncidentCandidates']
   }
   '/api/offenders/ids': {
-    /** Return a list of all unique Noms IDs (also called Prisoner number and offenderNo). */
+    /**
+     * Return a list of all unique Noms IDs (also called Prisoner number and offenderNo).
+     * @description <p>This endpoint uses the REPLICA database.</p>
+     */
     get: operations['getOffenderNumbers']
   }
   '/api/offenders/alerts/candidates': {
@@ -1444,17 +1454,6 @@ export interface paths {
      */
     get: operations['getOffenderIdentifiersByTypeAndValue']
   }
-  '/api/events': {
-    /**
-     * Get events
-     * @description **from** and **to** query params are optional.
-     * An awful lot of events occur every day. To guard against unintentionally heavy queries, the following rules are applied:
-     * If **both** are absent, scope will be limited to 24 hours starting from midnight yesterday.
-     * If **to** is present but **from** is absent, **from** will be defaulted to 24 hours before **to**.
-     * If **from** is present but **to** is absent, **to** will be defaulted to 24 hours after **from**.
-     */
-    get: operations['getEvents_1']
-  }
   '/api/employment/prisoner/{offenderNo}': {
     /**
      * A list of offender employments.
@@ -1671,7 +1670,7 @@ export interface paths {
      * All scheduled events for offender.
      * @description All scheduled events for offender.
      */
-    get: operations['getEvents_2']
+    get: operations['getEvents_1']
   }
   '/api/bookings/{bookingId}/events/today': {
     /**
@@ -3201,16 +3200,16 @@ export interface components {
       releaseDate?: string
       /**
        * Format: date
-       * @description Top-up supervision start date for offender - calculated as licence end date + 1 day or releaseDate if licence end date not set.
-       * @example 2019-04-01
-       */
-      topupSupervisionStartDate?: string
-      /**
-       * Format: date
        * @description Offender's home detention curfew end date - calculated as one day before the releaseDate.
        * @example 2019-04-01
        */
       homeDetentionCurfewEndDate?: string
+      /**
+       * Format: date
+       * @description Top-up supervision start date for offender - calculated as licence end date + 1 day or releaseDate if licence end date not set.
+       * @example 2019-04-01
+       */
+      topupSupervisionStartDate?: string
     }
     /** @description Represents the data required for receiving a prisoner transfer */
     RequestToTransferIn: {
@@ -5455,7 +5454,7 @@ export interface components {
       client_unique_ref: string
     }
     /** @description A new sentence from a digital warrant */
-    Sentence: {
+    WarrantSentence: {
       /** @description The type of sentence */
       sentenceType?: string
       /** @description The category of sentence */
@@ -5497,7 +5496,7 @@ export interface components {
       courtCaseId?: number
     }
     /** @description A new offender court case details entered from a digital warrant. */
-    CourtCase: {
+    WarrantCourtCase: {
       /**
        * Format: date
        * @description The begin date
@@ -5520,7 +5519,7 @@ export interface components {
       hearingType?: string
     }
     /** @description A new offence from a digital warrant */
-    Charge: {
+    WarrantCharge: {
       /**
        * Format: int64
        * @description The id of the charge
@@ -5629,6 +5628,56 @@ export interface components {
        * @example ZWE12A
        */
       offenderNo: string
+      /**
+       * @description Case Note Type
+       * @example KA
+       */
+      caseNoteType: string
+      /**
+       * @description Case Note Sub Type
+       * @example KS
+       */
+      caseNoteSubType: string
+      /**
+       * Format: int32
+       * @description Number of case notes of this type/subtype
+       * @example 5
+       */
+      numCaseNotes: number
+      /**
+       * @description Last case note of this type
+       * @example 2021-07-05T10:35:17
+       */
+      latestCaseNote: string
+    }
+    /** @description Booking Id to case note from date pair */
+    BookingFromDatePair: {
+      /**
+       * Format: int32
+       * @description Booking Id
+       */
+      bookingId?: number
+      /**
+       * @description Only case notes occurring on or after this date (in YYYY-MM-DDTHH:MM:SS format) will be considered.
+       * @example 2021-07-05T10:35:17
+       */
+      fromDate?: string
+    }
+    /** @description Case Note Type Usage Request by Date grouped by bookings */
+    CaseNoteTypeSummaryRequest: {
+      /** @description a list of booking id to from date to search. Only case notes occurring on or after this date (in YYYY-MM-DD format) will be considered */
+      bookingFromDateSelection: components['schemas']['BookingFromDatePair'][]
+      /** @description Case note types */
+      types?: string[]
+    }
+    /** @description Case Note Type Usage By Booking Id */
+    CaseNoteUsageByBookingId: {
+      /**
+       * Format: int32
+       * @description Booking Id
+       * @example 123456
+       */
+      bookingId: number
       /**
        * @description Case Note Type
        * @example KA
@@ -6763,6 +6812,35 @@ export interface components {
       /** @description Bookings */
       bookings?: components['schemas']['Booking'][]
     }
+    /** @description Offender Charge */
+    Charge: {
+      statute?: components['schemas']['CodeDescription']
+      offence?: components['schemas']['CodeDescription']
+      /**
+       * @description Most Serious Offence
+       * @example true
+       */
+      most_serious?: boolean
+      /**
+       * @description Charge Active
+       * @example true
+       */
+      charge_active?: boolean
+      /**
+       * @description Severity Ranking
+       * @example 100
+       */
+      severity_ranking?: string
+      result?: components['schemas']['CodeDescription']
+      disposition?: components['schemas']['CodeDescription']
+      /**
+       * @description Convicted
+       * @example true
+       */
+      convicted?: boolean
+      imprisonment_status?: components['schemas']['CodeDescription']
+      band?: components['schemas']['CodeDescription']
+    }
     /** @description Legal Case */
     LegalCase: {
       /**
@@ -7249,10 +7327,10 @@ export interface components {
       establishmentName: string
     }
     PagePrisonerInformation: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['PrisonerInformation'][]
@@ -7262,8 +7340,8 @@ export interface components {
       first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      last?: boolean
       pageable?: components['schemas']['PageableObject']
+      last?: boolean
       empty?: boolean
     }
     PageableObject: {
@@ -8453,16 +8531,16 @@ export interface components {
       tariffEarlyRemovalSchemeEligibilityDate?: string
       /**
        * Format: date
-       * @description Top-up supervision start date for offender - calculated as licence end date + 1 day or releaseDate if licence end date not set.
-       * @example 2019-04-01
-       */
-      topupSupervisionStartDate?: string
-      /**
-       * Format: date
        * @description Offender's home detention curfew end date - calculated as one day before the releaseDate.
        * @example 2019-04-01
        */
       homeDetentionCurfewEndDate?: string
+      /**
+       * Format: date
+       * @description Top-up supervision start date for offender - calculated as licence end date + 1 day or releaseDate if licence end date not set.
+       * @example 2019-04-01
+       */
+      topupSupervisionStartDate?: string
     }
     /** @description Offence details related to an offender */
     OffenderOffence: {
@@ -9420,10 +9498,10 @@ export interface components {
       additionalAnswers?: string[]
     }
     PageOffenceDto: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['OffenceDto'][]
@@ -9433,8 +9511,8 @@ export interface components {
       first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      last?: boolean
       pageable?: components['schemas']['PageableObject']
+      last?: boolean
       empty?: boolean
     }
     Pageable: {
@@ -10112,10 +10190,10 @@ export interface components {
       numberAllocated: number
     }
     PageOffenderNumber: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['OffenderNumber'][]
@@ -10125,123 +10203,9 @@ export interface components {
       first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      last?: boolean
       pageable?: components['schemas']['PageableObject']
+      last?: boolean
       empty?: boolean
-    }
-    /** @description Offender Event */
-    OffenderEvent: {
-      eventId?: string
-      eventType?: string
-      /** @example 2021-07-05T10:35:17 */
-      eventDatetime?: string
-      /** Format: int64 */
-      scheduleEventId?: number
-      /** @example 2021-07-05T10:35:17 */
-      scheduledStartTime?: string
-      /** @example 2021-07-05T10:35:17 */
-      scheduledEndTime?: string
-      scheduleEventClass?: string
-      scheduleEventType?: string
-      scheduleEventSubType?: string
-      scheduleEventStatus?: string
-      recordDeleted?: boolean
-      /** Format: int64 */
-      rootOffenderId?: number
-      /** Format: int64 */
-      offenderId?: number
-      /** Format: int64 */
-      aliasOffenderId?: number
-      /** Format: int64 */
-      previousOffenderId?: number
-      offenderIdDisplay?: string
-      /** Format: int64 */
-      bookingId?: number
-      bookingNumber?: string
-      previousBookingNumber?: string
-      /** Format: int64 */
-      sanctionSeq?: number
-      /** Format: int64 */
-      movementSeq?: number
-      /** Format: int64 */
-      imprisonmentStatusSeq?: number
-      /** Format: int64 */
-      assessmentSeq?: number
-      /** Format: int64 */
-      alertSeq?: number
-      /** @example 2021-07-05T10:35:17 */
-      alertDateTime?: string
-      alertType?: string
-      alertCode?: string
-      /** @example 2021-07-05T10:35:17 */
-      expiryDateTime?: string
-      /** Format: int64 */
-      caseNoteId?: number
-      agencyLocationId?: string
-      /** Format: int64 */
-      riskPredictorId?: number
-      /** Format: int64 */
-      addressId?: number
-      /** Format: int64 */
-      personId?: number
-      /** Format: int64 */
-      sentenceCalculationId?: number
-      /** Format: int64 */
-      oicHearingId?: number
-      /** Format: int64 */
-      oicOffenceId?: number
-      pleaFindingCode?: string
-      findingCode?: string
-      /** Format: int64 */
-      resultSeq?: number
-      /** Format: int64 */
-      agencyIncidentId?: number
-      /** Format: int64 */
-      chargeSeq?: number
-      identifierType?: string
-      identifierValue?: string
-      /** Format: int64 */
-      ownerId?: number
-      ownerClass?: string
-      /** Format: int64 */
-      sentenceSeq?: number
-      conditionCode?: string
-      /** Format: int64 */
-      offenderSentenceConditionId?: number
-      /** Format: date */
-      addressEndDate?: string
-      primaryAddressFlag?: string
-      mailAddressFlag?: string
-      addressUsage?: string
-      /** Format: int64 */
-      incidentCaseId?: number
-      /** Format: int64 */
-      incidentPartySeq?: number
-      /** Format: int64 */
-      incidentRequirementSeq?: number
-      /** Format: int64 */
-      incidentQuestionSeq?: number
-      /** Format: int64 */
-      incidentResponseSeq?: number
-      /** Format: int32 */
-      bedAssignmentSeq?: number
-      /** Format: int64 */
-      livingUnitId?: number
-      /** @example 2021-07-05T10:35:17 */
-      movementDateTime?: string
-      movementType?: string
-      movementReasonCode?: string
-      directionCode?: string
-      escortCode?: string
-      fromAgencyLocationId?: string
-      toAgencyLocationId?: string
-      /** Format: int64 */
-      iepSeq?: number
-      iepLevel?: string
-      /** Format: int64 */
-      visitId?: number
-      nomisEventType?: string
-      auditModuleName?: string
     }
     /** @description Offender Employment */
     Employment: {
@@ -10333,10 +10297,10 @@ export interface components {
       addresses: components['schemas']['AddressDto'][]
     }
     PageEmployment: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Employment'][]
@@ -10346,8 +10310,8 @@ export interface components {
       first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      last?: boolean
       pageable?: components['schemas']['PageableObject']
+      last?: boolean
       empty?: boolean
     }
     /** @description Offender Education */
@@ -10415,10 +10379,10 @@ export interface components {
       addresses: components['schemas']['AddressDto'][]
     }
     PageEducation: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Education'][]
@@ -10428,8 +10392,8 @@ export interface components {
       first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      last?: boolean
       pageable?: components['schemas']['PageableObject']
+      last?: boolean
       empty?: boolean
     }
     /** @description Represents a court date and its outcome */
@@ -10448,7 +10412,9 @@ export interface components {
       resultCode?: string
       /** @description The result description of the court date */
       resultDescription?: string
-      charge: components['schemas']['Charge']
+      /** @description The disposition code of the result of the court date */
+      resultDispositionCode?: string
+      charge: components['schemas']['WarrantCharge']
       /**
        * Format: int64
        * @description The id of the booking this court date was linked to
@@ -10624,10 +10590,10 @@ export interface components {
       hasVisits: boolean
     }
     PageVisitWithVisitors: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['VisitWithVisitors'][]
@@ -10637,8 +10603,8 @@ export interface components {
       first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      last?: boolean
       pageable?: components['schemas']['PageableObject']
+      last?: boolean
       empty?: boolean
     }
     /** @description Visit details */
@@ -10843,6 +10809,48 @@ export interface components {
     CourtHearings: {
       hearings?: components['schemas']['CourtHearing'][]
     }
+    /** @description Offender court case details */
+    CourtCase: {
+      /**
+       * Format: int64
+       * @description The case identifier
+       * @example 1
+       */
+      id?: number
+      /**
+       * Format: int64
+       * @description The case sequence number for the offender
+       * @example 1
+       */
+      caseSeq?: number
+      /**
+       * Format: date
+       * @description The begin date
+       * @example 2019-12-01
+       */
+      beginDate?: string
+      agency?: components['schemas']['Agency']
+      /**
+       * @description The case type
+       * @example Adult
+       */
+      caseType?: string
+      /** @description The prefix of the case number */
+      caseInfoPrefix?: string
+      /**
+       * @description The case information number
+       * @example TD20177010
+       */
+      caseInfoNumber?: string
+      /**
+       * @description The case status
+       * @example ACTIVE
+       * @enum {string}
+       */
+      caseStatus?: 'ACTIVE' | 'CLOSED' | 'INACTIVE'
+      /** @description Court hearings associated with the court case */
+      courtHearings?: components['schemas']['CourtHearing'][]
+    }
     /** @description Contacts Details for offender */
     ContactDetail: {
       /** Format: int64 */
@@ -10851,10 +10859,10 @@ export interface components {
       otherContacts: components['schemas']['Contact'][]
     }
     PageBedAssignment: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['BedAssignment'][]
@@ -10864,15 +10872,15 @@ export interface components {
       first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      last?: boolean
       pageable?: components['schemas']['PageableObject']
+      last?: boolean
       empty?: boolean
     }
     PageCaseNote: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['CaseNote'][]
@@ -10882,8 +10890,8 @@ export interface components {
       first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      last?: boolean
       pageable?: components['schemas']['PageableObject']
+      last?: boolean
       empty?: boolean
     }
     /** @description Case Note Count Detail */
@@ -10927,10 +10935,10 @@ export interface components {
       currency: string
     }
     PageAlert: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Alert'][]
@@ -10940,8 +10948,8 @@ export interface components {
       first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      last?: boolean
       pageable?: components['schemas']['PageableObject']
+      last?: boolean
       empty?: boolean
     }
     /** @description Adjudication Summary for offender */
@@ -11005,10 +11013,10 @@ export interface components {
       hearingSequence: number
     }
     PagePrisonerBookingSummary: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['PrisonerBookingSummary'][]
@@ -11018,8 +11026,8 @@ export interface components {
       first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      last?: boolean
       pageable?: components['schemas']['PageableObject']
+      last?: boolean
       empty?: boolean
     }
     /** @description Prisoner Booking Summary */
@@ -14639,7 +14647,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['Sentence']
+        'application/json': components['schemas']['WarrantSentence']
       }
     }
     responses: {
@@ -14667,7 +14675,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['CourtCase']
+        'application/json': components['schemas']['WarrantCourtCase']
       }
     }
     responses: {
@@ -14695,7 +14703,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['Charge']
+        'application/json': components['schemas']['WarrantCharge']
       }
     }
     responses: {
@@ -14808,6 +14816,25 @@ export interface operations {
       200: {
         content: {
           'application/json': components['schemas']['CaseNoteUsage'][]
+        }
+      }
+    }
+  }
+  getCaseNoteUsageSummaryByDates: {
+    /**
+     * Retrieves list of case notes grouped by types, bookings and from dates
+     * @description Retrieves list of case notes grouped by type/sub and offender<p>This endpoint uses the REPLICA database.</p>
+     */
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CaseNoteTypeSummaryRequest']
+      }
+    }
+    responses: {
+      /** @description The case note usage list is returned. */
+      200: {
+        content: {
+          'application/json': components['schemas']['CaseNoteUsageByBookingId'][]
         }
       }
     }
@@ -18976,7 +19003,10 @@ export interface operations {
     }
   }
   getOffenderNumbers: {
-    /** Return a list of all unique Noms IDs (also called Prisoner number and offenderNo). */
+    /**
+     * Return a list of all unique Noms IDs (also called Prisoner number and offenderNo).
+     * @description <p>This endpoint uses the REPLICA database.</p>
+     */
     parameters?: {
       /** @description Requested offset of first Noms ID in returned list. */
       /** @description Requested limit to the Noms IDs returned. */
@@ -20557,32 +20587,6 @@ export interface operations {
       }
     }
   }
-  getEvents_1: {
-    /**
-     * Get events
-     * @description **from** and **to** query params are optional.
-     * An awful lot of events occur every day. To guard against unintentionally heavy queries, the following rules are applied:
-     * If **both** are absent, scope will be limited to 24 hours starting from midnight yesterday.
-     * If **to** is present but **from** is absent, **from** will be defaulted to 24 hours before **to**.
-     * If **from** is present but **to** is absent, **to** will be defaulted to 24 hours after **from**.
-     */
-    parameters?: {
-      query?: {
-        from?: string
-        to?: string
-        type?: string[]
-        sortBy?: 'TIMESTAMP_ASC' | 'TIMESTAMP_DESC'
-      }
-    }
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['OffenderEvent'][]
-        }
-      }
-    }
-  }
   getPrisonerEmployments: {
     /**
      * A list of offender employments.
@@ -21904,7 +21908,7 @@ export interface operations {
       }
     }
   }
-  getEvents_2: {
+  getEvents_1: {
     /**
      * All scheduled events for offender.
      * @description All scheduled events for offender.

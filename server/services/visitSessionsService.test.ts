@@ -86,7 +86,7 @@ describe('Visit sessions service', () => {
       beforeEach(() => {
         sessions = [
           {
-            sessionTemplateId: 100,
+            sessionTemplateReference: '100',
             visitRoomName: 'A1',
             visitType: 'SOCIAL',
             prisonId: 'HEI',
@@ -273,7 +273,7 @@ describe('Visit sessions service', () => {
     it('Should handle closed visits', async () => {
       const sessions: VisitSession[] = [
         {
-          sessionTemplateId: 10,
+          sessionTemplateReference: '1',
           visitRoomName: 'A1',
           visitType: 'SOCIAL',
           prisonId: 'HEI',
@@ -331,7 +331,7 @@ describe('Visit sessions service', () => {
     it('Should handle multiple visit sessions and return correctly formatted data', async () => {
       const sessions: VisitSession[] = [
         {
-          sessionTemplateId: 10,
+          sessionTemplateReference: '1',
           visitRoomName: 'A1',
           visitType: 'SOCIAL',
           prisonId: 'HEI',
@@ -343,7 +343,7 @@ describe('Visit sessions service', () => {
           endTimestamp: '2022-02-14T11:00:00',
         },
         {
-          sessionTemplateId: 11,
+          sessionTemplateReference: '2',
           visitRoomName: 'A1',
           visitType: 'SOCIAL',
           prisonId: 'HEI',
@@ -355,7 +355,7 @@ describe('Visit sessions service', () => {
           endTimestamp: '2022-02-14T12:59:00',
         },
         {
-          sessionTemplateId: 12,
+          sessionTemplateReference: '3',
           visitRoomName: 'A1',
           visitType: 'SOCIAL',
           prisonId: 'HEI',
@@ -367,7 +367,7 @@ describe('Visit sessions service', () => {
           endTimestamp: '2022-02-14T13:05:00',
         },
         {
-          sessionTemplateId: 13,
+          sessionTemplateReference: '3',
           visitRoomName: 'A1',
           visitType: 'SOCIAL',
           prisonId: 'HEI',
@@ -379,7 +379,7 @@ describe('Visit sessions service', () => {
           endTimestamp: '2022-02-15T17:00:00',
         },
         {
-          sessionTemplateId: 14,
+          sessionTemplateReference: '4',
           visitRoomName: 'A1',
           visitType: 'SOCIAL',
           prisonId: 'HEI',
@@ -504,7 +504,7 @@ describe('Visit sessions service', () => {
     it('Should display single slot - ignoring slots with no capacity on current visit restriction (open)', async () => {
       const sessions: VisitSession[] = [
         {
-          sessionTemplateId: 10,
+          sessionTemplateReference: '10',
           visitRoomName: 'A1',
           visitType: 'SOCIAL',
           prisonId: 'HEI',
@@ -516,7 +516,7 @@ describe('Visit sessions service', () => {
           endTimestamp: '2022-02-14T10:00:00',
         },
         {
-          sessionTemplateId: 11,
+          sessionTemplateReference: '11',
           visitRoomName: 'A1',
           visitType: 'SOCIAL',
           prisonId: 'HEI',
@@ -574,7 +574,7 @@ describe('Visit sessions service', () => {
     it('Should display single slot - ignoring slots with no capacity on current visit restriction (closed)', async () => {
       const sessions: VisitSession[] = [
         {
-          sessionTemplateId: 10,
+          sessionTemplateReference: '10',
           visitRoomName: 'A1',
           visitType: 'SOCIAL',
           prisonId: 'HEI',
@@ -586,7 +586,7 @@ describe('Visit sessions service', () => {
           endTimestamp: '2022-02-14T10:00:00',
         },
         {
-          sessionTemplateId: 11,
+          sessionTemplateReference: '11',
           visitRoomName: 'A1',
           visitType: 'SOCIAL',
           prisonId: 'HEI',
