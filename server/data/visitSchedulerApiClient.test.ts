@@ -8,6 +8,7 @@ import {
   VisitSession,
   ReserveVisitSlotDto,
   ChangeVisitSlotRequestDto,
+  SessionSchedule,
 } from './visitSchedulerApiTypes'
 import TestData from '../routes/testutils/testData'
 
@@ -279,6 +280,23 @@ describe('visitSchedulerApiClient', () => {
       const output = await client.getVisitSessions('A1234BC', prisonId)
 
       expect(output).toEqual(results)
+    })
+  })
+
+  describe('getSessionSchedule', () => {
+    it('should return an array of scheduled sessions for the specified prison and date', async () => {
+      const date = '2023-02-01'
+      const sessionSchedule: SessionSchedule[] = [TestData.sessionSchedule()]
+
+      fakeVisitSchedulerApi
+        .get('/visit-sessions/schedule')
+        .query({ prisonId, date })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, sessionSchedule)
+
+      const output = await client.getSessionSchedule(prisonId, date)
+
+      expect(output).toEqual(sessionSchedule)
     })
   })
 

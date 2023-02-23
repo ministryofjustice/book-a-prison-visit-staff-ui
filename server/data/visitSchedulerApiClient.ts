@@ -96,12 +96,12 @@ class VisitSchedulerApiClient {
     })
   }
 
-  getSessionSchedule(prisonId: string, sessionDate: string): Promise<SessionSchedule[]> {
+  getSessionSchedule(prisonId: string, date: string): Promise<SessionSchedule[]> {
     return this.restclient.get({
       path: '/visit-sessions/schedule',
       query: new URLSearchParams({
         prisonId,
-        sessionDate,
+        date,
       }).toString(),
     })
   }

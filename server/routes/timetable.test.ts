@@ -53,7 +53,7 @@ describe('View visits timetable', () => {
 
         expect($('h1').text()).toBe('Visits timetable')
 
-        expect($('#session-date').text()).toBe('Monday 26 December 2022')
+        expect($('#selected-date').text()).toBe('Monday 26 December 2022')
 
         expect($('.bapv-timetable-dates__date--selected').text().trim()).toMatch(/Mon\s+26 December/)
         expect($('.bapv-timetable-dates__date a').eq(0).attr('href')).toBe('/timetable?date=2022-12-27')
@@ -73,7 +73,7 @@ describe('View visits timetable', () => {
 
         expect(visitSessionsService.getSessionSchedule).toHaveBeenCalledWith({
           prisonId: 'HEI',
-          sessionDate: '2022-12-26',
+          date: '2022-12-26',
           username: 'user1',
         })
       })
@@ -92,7 +92,7 @@ describe('View visits timetable', () => {
 
         expect($('h1').text()).toBe('Visits timetable')
 
-        expect($('#session-date').text()).toBe('Friday 30 December 2022')
+        expect($('#selected-date').text()).toBe('Friday 30 December 2022')
 
         expect($('.bapv-timetable-dates__date a').eq(0).attr('href')).toBe('/timetable?date=2022-12-26')
         expect($('.bapv-timetable-dates__date a').eq(1).attr('href')).toBe('/timetable?date=2022-12-27')
@@ -107,7 +107,7 @@ describe('View visits timetable', () => {
 
         expect(visitSessionsService.getSessionSchedule).toHaveBeenCalledWith({
           prisonId: 'HEI',
-          sessionDate: fakeDate,
+          date: fakeDate,
           username: 'user1',
         })
       })
@@ -126,7 +126,7 @@ describe('View visits timetable', () => {
 
         expect($('h1').text()).toBe('Visits timetable')
 
-        expect($('#session-date').text()).toBe('Monday 26 December 2022')
+        expect($('#selected-date').text()).toBe('Monday 26 December 2022')
 
         expect($('.bapv-timetable-dates__date--selected').text().trim()).toMatch(/Mon\s+26 December/)
         expect($('.bapv-timetable-dates__date a').eq(0).attr('href')).toBe('/timetable?date=2022-12-27')
@@ -141,7 +141,7 @@ describe('View visits timetable', () => {
 
         expect(visitSessionsService.getSessionSchedule).toHaveBeenCalledWith({
           prisonId: 'HEI',
-          sessionDate: fakeDate,
+          date: fakeDate,
           username: 'user1',
         })
       })

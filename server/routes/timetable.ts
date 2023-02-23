@@ -19,19 +19,19 @@ export default function routes(router: Router, visitSessionService: VisitSession
     const defaultDate = isMonday(today) ? today : previousMonday(today)
 
     const { date = '' } = req.query
-    const sessionDate = getParsedDateFromQueryString(date.toString(), defaultDate)
-    const { weekOfDates, previousWeek, nextWeek } = getWeekOfDatesStartingMonday(sessionDate)
+    const selectedDate = getParsedDateFromQueryString(date.toString(), defaultDate)
+    const { weekOfDates, previousWeek, nextWeek } = getWeekOfDatesStartingMonday(selectedDate)
 
     const { prisonId } = req.session.selectedEstablishment
     const schedules = await visitSessionService.getSessionSchedule({
       username: res.locals.user?.username,
       prisonId,
-      sessionDate,
+      date: selectedDate,
     })
-    // console.log(schedules)
+
     res.render('pages/timetable', {
       schedules,
-      sessionDate,
+      selectedDate,
       sessionTemplateFrequency,
       weekOfDates,
       previousWeek,

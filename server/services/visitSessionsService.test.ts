@@ -3,7 +3,7 @@ import PrisonerContactRegistryApiClient from '../data/prisonerContactRegistryApi
 import VisitSessionsService from './visitSessionsService'
 import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
 import WhereaboutsApiClient from '../data/whereaboutsApiClient'
-import { VisitSession, Visit, OutcomeDto, PageVisitDto } from '../data/visitSchedulerApiTypes'
+import { VisitSession, Visit, OutcomeDto, PageVisitDto, SessionSchedule } from '../data/visitSchedulerApiTypes'
 import { Address, Contact, AddressUsage, Restriction } from '../data/prisonerContactRegistryApiTypes'
 import {
   VisitSlotList,
@@ -639,6 +639,20 @@ describe('Visit sessions service', () => {
         },
         whereaboutsAvailable: true,
       })
+    })
+  })
+
+  describe('getSessionSchedule', () => {
+    it('should return an array of scheduled sessions for the specified prison and date', async () => {
+      const date = '2023-02-01'
+      const sessionSchedule: SessionSchedule[] = [TestData.sessionSchedule()]
+
+      visitSchedulerApiClient.getSessionSchedule.mockResolvedValue(sessionSchedule)
+
+      const results = await visitSessionsService.getSessionSchedule({ username: 'user', prisonId, date })
+
+      expect(visitSchedulerApiClient.getSessionSchedule).toHaveBeenCalledWith(prisonId, date)
+      expect(results).toEqual(sessionSchedule)
     })
   })
 
