@@ -41,7 +41,7 @@ describe('View visits timetable', () => {
     return request(app).get('/timetable').expect(404)
   })
 
-  it('should render the visits timetable page with closest Monday selected by default, with empty schedule', () => {
+  it('should render the visits timetable page with current date selected by default, with empty schedule', () => {
     fakeDate = '2022-12-27' // a Tuesday
     jest.useFakeTimers({ advanceTimers: true, now: new Date(fakeDate) })
 
@@ -53,10 +53,10 @@ describe('View visits timetable', () => {
 
         expect($('h1').text()).toBe('Visits timetable')
 
-        expect($('#selected-date').text()).toBe('Monday 26 December 2022')
+        expect($('#selected-date').text()).toBe('Tuesday 27 December 2022')
 
-        expect($('.bapv-timetable-dates__date--selected').text().trim()).toMatch(/Mon\s+26 December/)
-        expect($('.bapv-timetable-dates__date a').eq(0).attr('href')).toBe('/timetable?date=2022-12-27')
+        expect($('.bapv-timetable-dates__date--selected').text().trim()).toMatch(/Tue\s+27 December/)
+        expect($('.bapv-timetable-dates__date a').eq(0).attr('href')).toBe('/timetable?date=2022-12-26')
         expect($('.bapv-timetable-dates__date a').eq(1).attr('href')).toBe('/timetable?date=2022-12-28')
         expect($('.bapv-timetable-dates__date a').eq(2).attr('href')).toBe('/timetable?date=2022-12-29')
         expect($('.bapv-timetable-dates__date a').eq(3).attr('href')).toBe('/timetable?date=2022-12-30')
@@ -73,7 +73,7 @@ describe('View visits timetable', () => {
 
         expect(visitSessionsService.getSessionSchedule).toHaveBeenCalledWith({
           prisonId: 'HEI',
-          date: '2022-12-26',
+          date: fakeDate,
           username: 'user1',
         })
       })
@@ -113,7 +113,7 @@ describe('View visits timetable', () => {
       })
   })
 
-  it('should render the visits timetable page with closest Monday selected when invalid date requested', () => {
+  it('should render the visits timetable page with current date selected by default when invalid date requested', () => {
     fakeDate = '2022-12-26' // a Monday
     jest.useFakeTimers({ advanceTimers: true, now: new Date(fakeDate) })
 
