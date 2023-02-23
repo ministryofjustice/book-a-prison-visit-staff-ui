@@ -376,8 +376,8 @@ export default class TestData {
 
   static sessionSchedule = ({
     sessionTemplateReference = '1',
-    startTime = '13:45:00',
-    endTime = '15:45:00',
+    startTime = '13:45',
+    endTime = '15:45',
     capacity = { closed: 0, open: 40 },
     prisonerLocationGroupNames = [],
     sessionTemplateFrequency = 'WEEKLY',

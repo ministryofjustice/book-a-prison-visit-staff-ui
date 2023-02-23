@@ -106,7 +106,7 @@ export interface paths {
   '/visit-sessions/schedule': {
     /**
      * Returns session scheduled for given prison and date
-     * @description Retrieve all visits for a specified prisoner
+     * @description Returns session scheduled for given prison and date
      */
     get: operations['getSessionSchedule']
   }
@@ -240,7 +240,11 @@ export interface components {
        * @enum {string}
        */
       dayOfWeek: 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY'
-      endTime: components['schemas']['LocalTime']
+      /**
+       * Format: HH:mm
+       * @example 13:45
+       */
+      endTime: string
       /**
        * @description enhanced privilege
        * @example true
@@ -264,7 +268,11 @@ export interface components {
        * @example MDI
        */
       prisonId: string
-      startTime: components['schemas']['LocalTime']
+      /**
+       * Format: HH:mm
+       * @example 13:45
+       */
+      startTime: string
       /**
        * Format: date
        * @description The start of the Validity period for the session template
@@ -303,20 +311,6 @@ export interface components {
       messagesFoundCount: number
       /** Format: int32 */
       messagesReturnedCount: number
-    }
-    /**
-     * @description The start time of the generated visit session(s)
-     * @example 13:45
-     */
-    LocalTime: {
-      /** Format: int32 */
-      hour?: number
-      /** Format: int32 */
-      minute?: number
-      /** Format: int32 */
-      nano?: number
-      /** Format: int32 */
-      second?: number
     }
     Message: {
       attributes?: {
@@ -623,7 +617,11 @@ export interface components {
     /** @description Session schedule */
     SessionScheduleDto: {
       capacity: components['schemas']['SessionCapacityDto']
-      endTime: components['schemas']['LocalTime']
+      /**
+       * Format: HH:mm
+       * @example 13:45
+       */
+      endTime: string
       /**
        * @description prisoner location group
        * @example Wing C
@@ -646,7 +644,11 @@ export interface components {
        * @example v9d.7ed.7u
        */
       sessionTemplateReference: string
-      startTime: components['schemas']['LocalTime']
+      /**
+       * Format: HH:mm
+       * @example 13:45
+       */
+      startTime: string
     }
     SessionTemplateDto: {
       /**
@@ -666,7 +668,11 @@ export interface components {
        * @enum {string}
        */
       dayOfWeek?: 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY'
-      endTime: components['schemas']['LocalTime']
+      /**
+       * Format: HH:mm
+       * @example 13:45
+       */
+      endTime: string
       /**
        * @description enhanced privilege
        * @example true
@@ -695,7 +701,11 @@ export interface components {
        * @example v9d.7ed.7u
        */
       reference: string
-      startTime: components['schemas']['LocalTime']
+      /**
+       * Format: HH:mm
+       * @example 13:45
+       */
+      startTime: string
       /**
        * Format: date
        * @description The start of the Validity period for the session template
@@ -750,7 +760,11 @@ export interface components {
        * @example 10
        */
       closedCapacity: number
-      endTime: components['schemas']['LocalTime']
+      /**
+       * Format: HH:mm
+       * @example 13:45
+       */
+      endTime: string
       /**
        * @description enhanced privilege
        * @example true
@@ -769,7 +783,11 @@ export interface components {
        * @example 50
        */
       openCapacity: number
-      startTime: components['schemas']['LocalTime']
+      /**
+       * Format: HH:mm
+       * @example 13:45
+       */
+      startTime: string
       /**
        * Format: date
        * @description The start of the Validity period for the session template
@@ -1623,7 +1641,7 @@ export interface operations {
   getSessionSchedule: {
     /**
      * Returns session scheduled for given prison and date
-     * @description Retrieve all visits for a specified prisoner
+     * @description Returns session scheduled for given prison and date
      */
     parameters: {
       /**
@@ -1636,7 +1654,7 @@ export interface operations {
        */
       query: {
         prisonId: string
-        sessionDate: string
+        date: string
       }
     }
     responses: {

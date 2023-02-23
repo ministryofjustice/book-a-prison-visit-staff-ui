@@ -886,27 +886,27 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
-      last?: boolean
       empty?: boolean
     }
     PageableObject: {
       /** Format: int64 */
       offset?: number
       sort?: components['schemas']['SortObject']
+      paged?: boolean
+      unpaged?: boolean
       /** Format: int32 */
       pageSize?: number
       /** Format: int32 */
       pageNumber?: number
-      paged?: boolean
-      unpaged?: boolean
     }
     SortObject: {
       empty?: boolean
-      sorted?: boolean
       unsorted?: boolean
+      sorted?: boolean
     }
     /** @description Search Criteria for Release Date Search */
     ReleaseDateSearch: {
@@ -1110,10 +1110,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
-      last?: boolean
       empty?: boolean
     }
     ErrorResponse: {
@@ -1358,10 +1358,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
-      last?: boolean
       empty?: boolean
     }
     MatchRequest: {
@@ -1471,10 +1471,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
-      last?: boolean
       empty?: boolean
     }
     /** @description Search Criteria for Global Prisoner Search */

@@ -178,16 +178,16 @@ export default class VisitSessionsService {
   async getSessionSchedule({
     username,
     prisonId,
-    sessionDate,
+    date,
   }: {
     username: string
     prisonId: string
-    sessionDate: string
+    date: string
   }): Promise<SessionSchedule[]> {
     const token = await this.systemToken(username)
     const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
 
-    return visitSchedulerApiClient.getSessionSchedule(prisonId, sessionDate)
+    return visitSchedulerApiClient.getSessionSchedule(prisonId, date)
   }
 
   async getVisitSessionCapacity(
