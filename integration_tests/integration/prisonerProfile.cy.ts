@@ -1,6 +1,7 @@
 import { addDays, format, sub } from 'date-fns'
 import PrisonerProfilePage from '../pages/prisonerProfile'
 import TestData from '../../server/routes/testutils/testData'
+import Page from '../pages/page'
 
 context('Prisoner profile page', () => {
   const shortDateFormat = 'yyyy-MM-dd'
@@ -55,8 +56,7 @@ context('Prisoner profile page', () => {
 
     // Go to prisoner profile page
     cy.visit(`/prisoner/${prisoner.prisonerNumber}`)
-    const prisonerProfilePage = new PrisonerProfilePage(prisonerDisplayName)
-    prisonerProfilePage.checkOnPage()
+    const prisonerProfilePage = Page.verifyOnPageTitle(PrisonerProfilePage, prisonerDisplayName)
 
     // Prisoner details
     prisonerProfilePage.flaggedAlerts().eq(0).contains(inmateDetail.alerts[0].alertCodeDescription)

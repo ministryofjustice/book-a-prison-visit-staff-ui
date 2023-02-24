@@ -153,7 +153,7 @@ describe('View visits timetable', () => {
       TestData.sessionSchedule({ sessionTemplateFrequency: 'BI_WEEKLY' }), // Row 1
       TestData.sessionSchedule({ prisonerLocationGroupNames: ['Group 1', 'Group 2'] }), // Row 2
       TestData.sessionSchedule({ capacity: { open: 11, closed: 22 } }), // Row 3 + 4
-      TestData.sessionSchedule({ startTime: '15:00:00' }), // Row 5
+      TestData.sessionSchedule({ startTime: '15:00' }), // Row 5
       TestData.sessionSchedule({ sessionTemplateEndDate: '2025-12-31' }), // Row 6
     ]
     visitSessionsService.getSessionSchedule.mockResolvedValue(sessionSchedule)

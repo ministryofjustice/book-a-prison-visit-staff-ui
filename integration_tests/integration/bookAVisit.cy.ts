@@ -101,8 +101,7 @@ context('Book a visit', () => {
     cy.task('stubVisitBalances', { offenderNo, visitBalances: TestData.visitBalances() })
 
     searchForAPrisonerResultsPage.firstResultLink().contains(prisonerDisplayName).click()
-    const prisonerProfilePage = new PrisonerProfilePage(prisonerDisplayName)
-    prisonerProfilePage.checkOnPage()
+    const prisonerProfilePage = Page.verifyOnPageTitle(PrisonerProfilePage, prisonerDisplayName)
 
     // Select visitors
     cy.task('stubOffenderRestrictions', { offenderNo, offenderRestrictions: [TestData.offenderRestriction()] })

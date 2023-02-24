@@ -5,8 +5,6 @@ export default class PrisonerProfilePage extends Page {
     super(variableTitle)
   }
 
-  // backLink = (): PageElement => cy.get('[class="govuk-back-link"]')
-
   flaggedAlerts = (): PageElement => cy.get('.flagged-alert')
 
   prisonNumber = (): PageElement => cy.get('[data-test="prison-number"]')

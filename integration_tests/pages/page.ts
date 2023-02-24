@@ -5,6 +5,10 @@ export default abstract class Page {
     return new constructor()
   }
 
+  static verifyOnPageTitle = <T>(constructor: new (string) => T, title?: string): T => {
+    return new constructor(title)
+  }
+
   constructor(private readonly title: string) {
     this.checkOnPage()
   }
@@ -16,4 +20,6 @@ export default abstract class Page {
   signOut = (): PageElement => cy.get('[data-qa=signOut]')
 
   manageDetails = (): PageElement => cy.get('[data-qa=manageDetails]')
+
+  backLink = (): PageElement => cy.get('[class="govuk-back-link"]')
 }
