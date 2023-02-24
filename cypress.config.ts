@@ -55,6 +55,7 @@ export default defineConfig({
         stubUpcomingVisits: visitScheduler.stubUpcomingVisits,
         stubPastVisits: visitScheduler.stubPastVisits,
         stubReserveVisit: visitScheduler.stubReserveVisit,
+        stubSessionSchedule: visitScheduler.stubSessionSchedule,
         stubVisit: visitScheduler.stubVisit,
         stubVisitSessions: visitScheduler.stubVisitSessions,
 

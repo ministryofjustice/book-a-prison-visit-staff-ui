@@ -1,6 +1,6 @@
 import { SuperAgentRequest } from 'superagent'
 import { stubFor } from './wiremock'
-import { Visit, VisitSession } from '../../server/data/visitSchedulerApiTypes'
+import { SessionSchedule, Visit, VisitSession } from '../../server/data/visitSchedulerApiTypes'
 import TestData from '../../server/routes/testutils/testData'
 
 export default {
@@ -142,24 +142,24 @@ export default {
       },
     })
   },
-  stubVisitSessions: ({
+  stubSessionSchedule: ({
     prisonId,
-    offenderNo,
-    visitSessions,
+    date,
+    sessionSchedule,
   }: {
     prisonId: string
-    offenderNo: string
-    visitSessions: VisitSession[]
+    date: string
+    sessionSchedule: SessionSchedule[]
   }): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',
-        url: `/visitScheduler/visit-sessions?prisonId=${prisonId}&prisonerId=${offenderNo}`,
+        url: `/visitScheduler/visit-sessions/schedule?prisonId=${prisonId}&date=${date}`,
       },
       response: {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: visitSessions,
+        jsonBody: sessionSchedule,
       },
     })
   },
@@ -200,6 +200,27 @@ export default {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
         jsonBody: result,
+      },
+    })
+  },
+  stubVisitSessions: ({
+    prisonId,
+    offenderNo,
+    visitSessions,
+  }: {
+    prisonId: string
+    offenderNo: string
+    visitSessions: VisitSession[]
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        url: `/visitScheduler/visit-sessions?prisonId=${prisonId}&prisonerId=${offenderNo}`,
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: visitSessions,
       },
     })
   },
