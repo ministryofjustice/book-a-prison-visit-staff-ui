@@ -207,7 +207,6 @@ export type VisitSessionData = {
     dateOfBirth: string
     location: string
     restrictions?: OffenderRestriction[]
-    previousRestrictions?: OffenderRestriction[]
   }
   visitSlot?: VisitSlot
   originalVisitSlot?: VisitSlot
