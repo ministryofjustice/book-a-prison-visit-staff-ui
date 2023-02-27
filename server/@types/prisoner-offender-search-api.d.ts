@@ -875,10 +875,10 @@ export interface components {
       supportingPrisonIds?: string[]
     }
     PagePrisoner: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Prisoner'][]
@@ -886,10 +886,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      last?: boolean
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
+      last?: boolean
       empty?: boolean
     }
     PageableObject: {
@@ -1099,10 +1099,10 @@ export interface components {
       pagination: components['schemas']['PaginationRequest']
     }
     PrisonerDetailResponse: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Prisoner'][]
@@ -1110,10 +1110,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      last?: boolean
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
+      last?: boolean
       empty?: boolean
     }
     ErrorResponse: {
@@ -1347,10 +1347,10 @@ export interface components {
       pagination: components['schemas']['PaginationRequest']
     }
     PhysicalDetailResponse: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Prisoner'][]
@@ -1358,10 +1358,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      last?: boolean
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
+      last?: boolean
       empty?: boolean
     }
     MatchRequest: {
@@ -1460,10 +1460,10 @@ export interface components {
       type: 'DEFAULT' | 'ESTABLISHMENT'
     }
     KeywordResponse: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Prisoner'][]
@@ -1471,10 +1471,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      last?: boolean
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
+      last?: boolean
       empty?: boolean
     }
     /** @description Search Criteria for Global Prisoner Search */
