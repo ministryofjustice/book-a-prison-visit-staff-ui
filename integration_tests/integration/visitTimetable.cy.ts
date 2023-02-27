@@ -55,7 +55,9 @@ context('View visit schedule timetable', () => {
     visitTimetablePage.scheduleFrequency(1).contains('Fortnightly')
     visitTimetablePage.scheduleEndDate(1).contains('Not entered')
 
-    visitTimetablePage.requestChangeLink().should('have.attr', 'href', 'LINK_TBC')
+    visitTimetablePage
+      .requestChangeLink()
+      .should('have.attr', 'href', 'https://request-visit-schedule-change.form.service.justice.gov.uk')
   })
 
   // navigate forwards a week, then back, then specific day - empty timetable
