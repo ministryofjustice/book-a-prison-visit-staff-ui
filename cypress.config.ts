@@ -37,6 +37,8 @@ export default defineConfig({
         stubBookings: prisonApi.stubBookings,
         stubOffender: prisonApi.stubOffender,
         stubOffenderRestrictions: prisonApi.stubOffenderRestrictions,
+        stubSetActiveCaseLoad: prisonApi.stubSetActiveCaseLoad,
+        stubUserCaseloads: prisonApi.stubUserCaseloads,
         stubVisitBalances: prisonApi.stubVisitBalances,
 
         // Prisoner offender search

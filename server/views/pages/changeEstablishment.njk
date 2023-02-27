@@ -43,7 +43,8 @@
         })}}
         {{ govukButton({
           text: "Submit",
-          preventDoubleClick: true
+          preventDoubleClick: true,
+          attributes: { "data-test": "submit" }
         }) }} 
         </form>
 
