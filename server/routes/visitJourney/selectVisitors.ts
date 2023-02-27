@@ -26,11 +26,6 @@ export default class SelectVisitors {
     req.session.visitorList.visitors = visitorList
 
     const restrictions = await this.prisonerProfileService.getRestrictions(offenderNo, res.locals.user?.username)
-
-    if (isUpdate) {
-      visitSessionData.prisoner.previousRestrictions = visitSessionData.prisoner?.restrictions ?? []
-    }
-
     visitSessionData.prisoner.restrictions = restrictions
 
     const { selectVisitorsText } = getPrisonConfiguration(req.session.selectedEstablishment.prisonId)
