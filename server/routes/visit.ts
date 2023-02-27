@@ -138,6 +138,8 @@ export default function routes(
 
     // clean then load session
     clearSession(req)
+    const visitRestriction =
+      visit.visitRestriction === 'OPEN' || visit.visitRestriction === 'CLOSED' ? visit.visitRestriction : undefined
     const visitSlot: VisitSlot = {
       id: '',
       prisonId: visit.prisonId,
@@ -146,7 +148,7 @@ export default function routes(
       availableTables: 0,
       capacity: undefined,
       visitRoomName: visit.visitRoom,
-      visitRestriction: visit.visitRestriction,
+      visitRestriction,
     }
     const visitSessionData: VisitSessionData = {
       prisoner: {
@@ -157,7 +159,7 @@ export default function routes(
       },
       visitSlot,
       originalVisitSlot: visitSlot,
-      visitRestriction: visit.visitRestriction,
+      visitRestriction,
       visitors: currentVisitors,
       visitorSupport: visit.visitorSupport,
       mainContact: {

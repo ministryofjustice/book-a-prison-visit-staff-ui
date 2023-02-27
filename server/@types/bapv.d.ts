@@ -167,7 +167,7 @@ export type VisitSlot = {
   availableTables: number
   capacity: number
   visitRoomName: string
-  visitRestriction: Visit['visitRestriction']
+  visitRestriction: 'OPEN' | 'CLOSED'
   sessionConflicts?: VisitSession['sessionConflicts']
 }
 
@@ -210,7 +210,7 @@ export type VisitSessionData = {
   }
   visitSlot?: VisitSlot
   originalVisitSlot?: VisitSlot
-  visitRestriction?: Visit['visitRestriction']
+  visitRestriction?: 'OPEN' | 'CLOSED'
   visitors?: VisitorListItem[]
   visitorSupport?: VisitorSupport[]
   mainContact?: {
