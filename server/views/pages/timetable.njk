@@ -8,6 +8,14 @@
 
 {% set backLinkHref = "/" %}
 
+{% macro attendees(enhanced, prisonerLocationGroupNames) %}
+  {% if prisonerLocationGroupNames | length %}
+    {{- "Enhanced prisoners in " if enhanced}}{{ prisonerLocationGroupNames | join(", ") -}}
+  {% else %}
+    {{- "Enhanced prisoners only" if enhanced else "All prisoners" -}}
+  {% endif %}
+{% endmacro %}
+
 {% macro scheduleRowByType(scheduleRows, schedule, type) %}
   {% if schedule.capacity[type] !== 0 %}
    {% set rowNumber = scheduleRows | length %}
@@ -26,7 +34,7 @@
         attributes: { "data-test" : "schedule-capacity-" + rowNumber } 
       },
       {
-        text: schedule.prisonerLocationGroupNames | join(', ') or 'All prisoners',
+        text: attendees(schedule.enhanced, schedule.prisonerLocationGroupNames),
         attributes: { "data-test" : "schedule-attendees-" + rowNumber } 
       },
       {

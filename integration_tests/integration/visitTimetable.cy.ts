@@ -25,10 +25,12 @@ context('View visit schedule timetable', () => {
       TestData.sessionSchedule({
         startTime: '10:00',
         endTime: '11:30',
+        enhanced: true,
         capacity: { open: 20, closed: 5 }, // will generate 2 session rows
         prisonerLocationGroupNames: ['Group 1', 'Group 2'],
         sessionTemplateFrequency: 'BI_WEEKLY',
       }),
+      TestData.sessionSchedule(),
     ]
     cy.task('stubSessionSchedule', { prisonId, date: format(today, shortDateFormat), sessionSchedule })
 
@@ -44,16 +46,23 @@ context('View visit schedule timetable', () => {
     visitTimetablePage.scheduleTime(0).contains('10am to 11:30am')
     visitTimetablePage.scheduleType(0).contains('Open')
     visitTimetablePage.scheduleCapacity(0).contains('20 tables')
-    visitTimetablePage.scheduleAttendees(0).contains('Group 1, Group 2')
+    visitTimetablePage.scheduleAttendees(0).contains('Enhanced prisoners in Group 1, Group 2')
     visitTimetablePage.scheduleFrequency(0).contains('Fortnightly')
     visitTimetablePage.scheduleEndDate(0).contains('Not entered')
 
     visitTimetablePage.scheduleTime(1).contains('10am to 11:30am')
     visitTimetablePage.scheduleType(1).contains('Closed')
     visitTimetablePage.scheduleCapacity(1).contains('5 tables')
-    visitTimetablePage.scheduleAttendees(1).contains('Group 1, Group 2')
+    visitTimetablePage.scheduleAttendees(1).contains('Enhanced prisoners in Group 1, Group 2')
     visitTimetablePage.scheduleFrequency(1).contains('Fortnightly')
     visitTimetablePage.scheduleEndDate(1).contains('Not entered')
+
+    visitTimetablePage.scheduleTime(2).contains('1:45pm to 3:45pm')
+    visitTimetablePage.scheduleType(2).contains('Open')
+    visitTimetablePage.scheduleCapacity(2).contains('40 tables')
+    visitTimetablePage.scheduleAttendees(2).contains('All prisoners')
+    visitTimetablePage.scheduleFrequency(2).contains('Weekly')
+    visitTimetablePage.scheduleEndDate(2).contains('Not entered')
 
     visitTimetablePage
       .requestChangeLink()

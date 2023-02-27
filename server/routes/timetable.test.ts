@@ -155,8 +155,8 @@ describe('View visits timetable', () => {
       TestData.sessionSchedule({ sessionTemplateFrequency: 'BI_WEEKLY' }), // Row 1
       TestData.sessionSchedule({ prisonerLocationGroupNames: ['Group 1', 'Group 2'] }), // Row 2
       TestData.sessionSchedule({ capacity: { open: 11, closed: 22 } }), // Row 3 + 4
-      TestData.sessionSchedule({ startTime: '15:00' }), // Row 5
-      TestData.sessionSchedule({ sessionTemplateEndDate: '2025-12-31' }), // Row 6
+      TestData.sessionSchedule({ enhanced: true, startTime: '15:00', prisonerLocationGroupNames: ['Group 1'] }), // Row 5
+      TestData.sessionSchedule({ enhanced: true, sessionTemplateEndDate: '2025-12-31' }), // Row 6
     ]
     visitSessionsService.getSessionSchedule.mockResolvedValue(sessionSchedule)
 
@@ -185,7 +185,9 @@ describe('View visits timetable', () => {
         expect($('[data-test="schedule-capacity-4"]').text()).toBe('22 tables')
         // Row 5
         expect($('[data-test="schedule-time-5"]').text()).toBe('3pm to 3:45pm')
+        expect($('[data-test="schedule-attendees-5"]').text()).toBe('Enhanced prisoners in Group 1')
         // Row 6
+        expect($('[data-test="schedule-attendees-6"]').text()).toBe('Enhanced prisoners only')
         expect($('[data-test="schedule-end-date-6"]').text()).toBe('31 December 2025')
       })
   })
