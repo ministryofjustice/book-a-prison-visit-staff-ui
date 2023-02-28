@@ -7342,10 +7342,10 @@ export interface components {
       establishmentName: string
     }
     PagePrisonerInformation: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['PrisonerInformation'][]
@@ -7353,9 +7353,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
+      last?: boolean
       pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
@@ -7363,12 +7363,12 @@ export interface components {
       /** Format: int64 */
       offset?: number
       sort?: components['schemas']['SortObject']
+      paged?: boolean
+      unpaged?: boolean
       /** Format: int32 */
       pageSize?: number
       /** Format: int32 */
       pageNumber?: number
-      paged?: boolean
-      unpaged?: boolean
     }
     SortObject: {
       empty?: boolean
@@ -8352,7 +8352,7 @@ export interface components {
        */
       id?: number
       /**
-       * Format: int64
+       * Format: int32
        * @description The case sequence number for the offender
        * @example 1
        */
@@ -9241,7 +9241,7 @@ export interface components {
        */
       lineSequence?: number
       /**
-       * Format: int64
+       * Format: int32
        * @description Case sequence - a number representing the order of the case this sentence belongs to
        */
       caseSequence?: number
@@ -9513,10 +9513,10 @@ export interface components {
       additionalAnswers?: string[]
     }
     PageOffenceDto: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['OffenceDto'][]
@@ -9524,9 +9524,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
+      last?: boolean
       pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
@@ -10205,10 +10205,10 @@ export interface components {
       numberAllocated: number
     }
     PageOffenderNumber: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['OffenderNumber'][]
@@ -10216,9 +10216,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
+      last?: boolean
       pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
@@ -10312,10 +10312,10 @@ export interface components {
       addresses: components['schemas']['AddressDto'][]
     }
     PageEmployment: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Employment'][]
@@ -10323,9 +10323,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
+      last?: boolean
       pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
@@ -10394,10 +10394,10 @@ export interface components {
       addresses: components['schemas']['AddressDto'][]
     }
     PageEducation: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Education'][]
@@ -10405,9 +10405,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
+      last?: boolean
       pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
@@ -10584,15 +10584,15 @@ export interface components {
        */
       establishmentCode?: string
       /**
-       * @description Case Note Type and Sub Type
-       * @example POS IEP_ENC
-       */
-      noteType: string
-      /**
        * @description Name of staff member who created case note (lastname, firstname)
        * @example Smith, John
        */
       staffName: string
+      /**
+       * @description Case Note Type and Sub Type
+       * @example POS IEP_ENC
+       */
+      noteType: string
     }
     /** @description Visit summary */
     VisitSummary: {
@@ -10605,10 +10605,10 @@ export interface components {
       hasVisits: boolean
     }
     PageVisitWithVisitors: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['VisitWithVisitors'][]
@@ -10616,9 +10616,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
+      last?: boolean
       pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
@@ -10833,7 +10833,7 @@ export interface components {
        */
       id?: number
       /**
-       * Format: int64
+       * Format: int32
        * @description The case sequence number for the offender
        * @example 1
        */
@@ -10874,10 +10874,10 @@ export interface components {
       otherContacts: components['schemas']['Contact'][]
     }
     PageBedAssignment: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['BedAssignment'][]
@@ -10885,17 +10885,17 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
+      last?: boolean
       pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     PageCaseNote: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['CaseNote'][]
@@ -10903,9 +10903,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
+      last?: boolean
       pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
@@ -10950,10 +10950,10 @@ export interface components {
       currency: string
     }
     PageAlert: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Alert'][]
@@ -10961,9 +10961,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
+      last?: boolean
       pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
@@ -11028,10 +11028,10 @@ export interface components {
       hearingSequence: number
     }
     PagePrisonerBookingSummary: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['PrisonerBookingSummary'][]
@@ -11039,9 +11039,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
+      last?: boolean
       pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
@@ -20516,13 +20516,13 @@ export interface operations {
       /** @description Requested resource not found. */
       404: {
         content: {
-          'image/jpeg': string
+          'image/jpeg': string[]
         }
       }
       /** @description Unrecoverable error occurred whilst processing request. */
       500: {
         content: {
-          'image/jpeg': string
+          'image/jpeg': string[]
         }
       }
     }
@@ -21826,19 +21826,19 @@ export interface operations {
       /** @description OK */
       200: {
         content: {
-          'image/jpeg': string
+          'image/jpeg': string[]
         }
       }
       /** @description Requested resource not found. */
       404: {
         content: {
-          'image/jpeg': string
+          'image/jpeg': string[]
         }
       }
       /** @description Unrecoverable error occurred whilst processing request. */
       500: {
         content: {
-          'image/jpeg': string
+          'image/jpeg': string[]
         }
       }
     }
@@ -23170,19 +23170,19 @@ export interface operations {
       /** @description OK */
       200: {
         content: {
-          'image/jpeg': string
+          'image/jpeg': string[]
         }
       }
       /** @description Requested resource not found. */
       404: {
         content: {
-          'image/jpeg': string
+          'image/jpeg': string[]
         }
       }
       /** @description Unrecoverable error occurred whilst processing request. */
       500: {
         content: {
-          'image/jpeg': string
+          'image/jpeg': string[]
         }
       }
     }

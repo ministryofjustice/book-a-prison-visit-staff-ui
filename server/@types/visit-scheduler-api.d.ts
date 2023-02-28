@@ -622,6 +622,8 @@ export interface components {
        * @example 13:45
        */
       endTime: string
+      /** @description The session is for enhanced privileges */
+      enhanced: boolean
       /**
        * @description prisoner location group
        * @example Wing C
