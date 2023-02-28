@@ -53,7 +53,7 @@ describe('GET /', () => {
         expect($('[data-test="view-visits-by-date"] .card__link').text()).toBe('View visits by date')
         expect($('[data-test="view-visits-by-date"] .card__link').attr('href')).toBe('/visits')
 
-        expect($('[data-test="view-timetable"] .card__link').text()).toBe('View visit timetable')
+        expect($('[data-test="view-timetable"] .card__link').text()).toBe('View visits timetable')
         expect($('[data-test="view-timetable"] .card__link').attr('href')).toBe('/timetable')
 
         expect($('[data-test="change-establishment"]').text()).toContain('Change establishment')
