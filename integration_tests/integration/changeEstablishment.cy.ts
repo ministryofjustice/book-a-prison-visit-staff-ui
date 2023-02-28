@@ -3,7 +3,7 @@ import HomePage from '../pages/home'
 import Page from '../pages/page'
 import ChangeEstablishmentPage from '../pages/changeEstablishment'
 
-context('View visit schedule timetable', () => {
+context('Change establishment', () => {
   beforeEach(() => {
     cy.task('reset')
     cy.task('stubSignIn')
@@ -13,12 +13,11 @@ context('View visit schedule timetable', () => {
     cy.signIn()
   })
 
-  // navigate forwards a week, then back, then specific day - empty timetable
-  it('Should change establishment', () => {
+  // Check current establishment, change establishment and check again
+  it('Should change establishment and redirect to home page', () => {
     cy.task('stubUserCaseloads', TestData.caseLoads())
     cy.task('stubSetActiveCaseLoad', 'BLI')
 
-    // Home page - select View visit timetable
     let homePage = Page.verifyOnPage(HomePage)
 
     homePage.currentEstablishment().contains('Hewell (HMP)')
