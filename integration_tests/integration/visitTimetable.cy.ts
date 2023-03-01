@@ -66,7 +66,7 @@ context('View visit schedule timetable', () => {
 
     visitTimetablePage
       .requestChangeLink()
-      .should('have.attr', 'href', 'https://request-visit-schedule-change.form.service.justice.gov.uk')
+      .should('have.attr', 'href', 'https://request-changes-to-the-visits-timetable.form.service.justice.gov.uk/')
   })
 
   // navigate forwards a week, then back, then specific day - empty timetable
