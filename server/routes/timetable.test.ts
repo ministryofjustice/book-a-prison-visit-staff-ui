@@ -70,7 +70,7 @@ describe('View visits timetable', () => {
 
         expect($('[data-test="change-timetable"]').text()).toBe('Request changes to the timetable')
         expect($('[data-test="change-request"]').attr('href')).toBe(
-          'https://request-visit-schedule-change.form.service.justice.gov.uk',
+          'https://request-changes-to-the-visits-timetable.form.service.justice.gov.uk/',
         )
 
         expect(visitSessionsService.getSessionSchedule).toHaveBeenCalledWith({
