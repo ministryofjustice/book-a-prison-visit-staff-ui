@@ -15,7 +15,7 @@
     {% endif %}
     <ul class="govuk-list govuk-!-margin-bottom-0{{ " govuk-!-margin-top-2" if enhanced }}">
       {% for name in prisonerLocationGroupNames %}
-        <li class="{{ "govuk-!-margin-bottom-2" if not loop.last else "govuk-!-margin-bottom-0" }}">{{ name }}</li>
+        <li class="{{ "govuk-!-margin-bottom-0" if loop.last }}">{{ name }}</li>
       {% endfor %}
     </ul>
   {% else %}
