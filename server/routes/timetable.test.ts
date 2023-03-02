@@ -177,7 +177,8 @@ describe('View visits timetable', () => {
         // Row 1
         expect($('[data-test="schedule-frequency-1"]').text()).toBe('Fortnightly')
         // Row 2
-        expect($('[data-test="schedule-attendees-2"]').text()).toBe('Group 1, Group 2')
+        expect($('[data-test="schedule-attendees-2"] li').eq(0).text()).toBe('Group 1')
+        expect($('[data-test="schedule-attendees-2"] li').eq(1).text()).toBe('Group 2')
         // Row 3 + 4
         expect($('[data-test="schedule-type-3"]').text()).toBe('Open')
         expect($('[data-test="schedule-capacity-3"]').text()).toBe('11 tables')
@@ -185,7 +186,8 @@ describe('View visits timetable', () => {
         expect($('[data-test="schedule-capacity-4"]').text()).toBe('22 tables')
         // Row 5
         expect($('[data-test="schedule-time-5"]').text()).toBe('3pm to 3:45pm')
-        expect($('[data-test="schedule-attendees-5"]').text()).toBe('Enhanced prisoners in Group 1')
+        expect($('[data-test="schedule-attendees-5"] > span').text()).toBe('Enhanced prisoners in:')
+        expect($('[data-test="schedule-attendees-5"] li').eq(0).text()).toBe('Group 1')
         // Row 6
         expect($('[data-test="schedule-attendees-6"]').text()).toBe('Enhanced prisoners only')
         expect($('[data-test="schedule-end-date-6"]').text()).toBe('31 December 2025')

@@ -10,7 +10,14 @@
 
 {% macro attendees(enhanced, prisonerLocationGroupNames) %}
   {% if prisonerLocationGroupNames | length %}
-    {{- "Enhanced prisoners in " if enhanced}}{{ prisonerLocationGroupNames | join(", ") -}}
+    {% if enhanced %}
+      <span>Enhanced prisoners in:</span>
+    {% endif %}
+    <ul class="govuk-list govuk-!-margin-bottom-0{{ " govuk-!-margin-top-2" if enhanced }}">
+      {% for name in prisonerLocationGroupNames %}
+        <li class="{{ "govuk-!-margin-bottom-0" if loop.last }}">{{ name }}</li>
+      {% endfor %}
+    </ul>
   {% else %}
     {{- "Enhanced prisoners only" if enhanced else "All prisoners" -}}
   {% endif %}
