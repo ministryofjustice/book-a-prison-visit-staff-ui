@@ -5,20 +5,12 @@ export default class SearchForABookingReferencePage extends Page {
     super('Search for a booking')
   }
 
-  enterReferenceBlockOne = (number: string): void => {
-    cy.get('#searchBlock1').clear().type(number)
-  }
-
-  enterReferenceBlockTwo = (number: string): void => {
-    cy.get('#searchBlock2').clear().type(number)
-  }
-
-  enterReferenceBlockThree = (number: string): void => {
-    cy.get('#searchBlock3').clear().type(number)
-  }
-
-  enterReferenceBlockFour = (number: string): void => {
-    cy.get('#searchBlock4').clear().type(number)
+  enterVisitReference = (reference: string): void => {
+    const blocks = reference.split('-')
+    cy.get('#searchBlock1').clear().type(blocks[0])
+    cy.get('#searchBlock2').clear().type(blocks[1])
+    cy.get('#searchBlock3').clear().type(blocks[2])
+    cy.get('#searchBlock4').clear().type(blocks[3])
   }
 
   continueButton = (): PageElement => cy.get('[data-test=search]')

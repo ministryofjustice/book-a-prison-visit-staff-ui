@@ -16,8 +16,7 @@ context('Search for a booking by reference', () => {
     cy.signIn()
   })
 
-  // Check current establishment, change establishment and check again
-  it('Should change establishment and redirect to home page', () => {
+  it('Should search for a booking, than navigate to the booking summary', () => {
     const homePage = Page.verifyOnPage(HomePage)
     const today = new Date()
     const prisoner = TestData.prisoner()
@@ -40,13 +39,10 @@ context('Search for a booking by reference', () => {
 
     const searchForABookingReferencePage = Page.verifyOnPage(SearchForABookingReferencePage)
 
-    searchForABookingReferencePage.enterReferenceBlockOne('gh')
-    searchForABookingReferencePage.enterReferenceBlockTwo('ef')
-    searchForABookingReferencePage.enterReferenceBlockThree('cd')
-    searchForABookingReferencePage.enterReferenceBlockFour('ab')
+    searchForABookingReferencePage.enterVisitReference('gh-ef-cd-ab')
 
     cy.task('stubPrisonerById', prisoner)
-    cy.task('stubBookedVisit', 'gh-ef-cd-ab')
+    cy.task('stubVisit', 'gh-ef-cd-ab')
 
     searchForABookingReferencePage.continueButton().click()
 
@@ -66,7 +62,8 @@ context('Search for a booking by reference', () => {
     visitDetailsPage.prisonerName().contains('Smith, John')
     visitDetailsPage.visitorName1().contains('Smith, Jeanette')
     visitDetailsPage.visitorName2().contains('Smith, Bob')
-
-    // visitDetailsPage.visitContact().contains('Smith, Jeanette')
+    visitDetailsPage.visitContact().contains('Smith, Bob')
+    visitDetailsPage.additionalSupport().contains('custom support details')
+    visitDetailsPage.bookedDateTime().contains('Monday 14 February 2022 at 10am')
   })
 })

@@ -59,7 +59,6 @@ export default defineConfig({
         stubReserveVisit: visitScheduler.stubReserveVisit,
         stubSessionSchedule: visitScheduler.stubSessionSchedule,
         stubVisit: visitScheduler.stubVisit,
-        stubBookedVisit: visitScheduler.stubBookedVisit,
         stubVisitSessions: visitScheduler.stubVisitSessions,
 
         // Whereabouts
