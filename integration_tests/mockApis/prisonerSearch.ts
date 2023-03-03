@@ -3,6 +3,19 @@ import { stubFor } from './wiremock'
 import { Prisoner } from '../../server/data/prisonerOffenderSearchTypes'
 
 export default {
+  stubPrisoner: (prisoner: Prisoner): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        url: `/offenderSearch/prison/HEI/prisoners?term=${prisoner.prisonerNumber}`,
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: prisoner,
+      },
+    })
+  },
   stubPrisoners: ({
     results = {
       totalPages: 0,
@@ -10,7 +23,7 @@ export default {
       content: [],
     },
     prisonId = 'HEI',
-    term = '',
+    term,
     page = '0',
     size = '10',
   }: {

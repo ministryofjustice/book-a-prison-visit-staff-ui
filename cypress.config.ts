@@ -42,9 +42,9 @@ export default defineConfig({
         stubVisitBalances: prisonApi.stubVisitBalances,
 
         // Prisoner offender search
-        // stubPrisoner: prisonerSearch.stubPrisoner,
         stubPrisonerById: prisonerSearch.stubPrisonerById,
         stubPrisoners: prisonerSearch.stubPrisoners,
+        stubPrisoner: prisonerSearch.stubPrisoner,
 
         // Prison register API
         stubPrisons: prisonRegister.stubPrisons,
