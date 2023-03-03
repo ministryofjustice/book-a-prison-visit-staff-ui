@@ -46,14 +46,22 @@ context('View visit schedule timetable', () => {
     visitTimetablePage.scheduleTime(0).contains('10am to 11:30am')
     visitTimetablePage.scheduleType(0).contains('Open')
     visitTimetablePage.scheduleCapacity(0).contains('20 tables')
-    visitTimetablePage.scheduleAttendees(0).contains('Enhanced prisoners in Group 1, Group 2')
+    visitTimetablePage.scheduleAttendees(0).within(() => {
+      cy.contains('Enhanced prisoners in:')
+      cy.contains('Group 1')
+      cy.contains('Group 2')
+    })
     visitTimetablePage.scheduleFrequency(0).contains('Fortnightly')
     visitTimetablePage.scheduleEndDate(0).contains('Not entered')
 
     visitTimetablePage.scheduleTime(1).contains('10am to 11:30am')
     visitTimetablePage.scheduleType(1).contains('Closed')
     visitTimetablePage.scheduleCapacity(1).contains('5 tables')
-    visitTimetablePage.scheduleAttendees(1).contains('Enhanced prisoners in Group 1, Group 2')
+    visitTimetablePage.scheduleAttendees(1).within(() => {
+      cy.contains('Enhanced prisoners in:')
+      cy.contains('Group 1')
+      cy.contains('Group 2')
+    })
     visitTimetablePage.scheduleFrequency(1).contains('Fortnightly')
     visitTimetablePage.scheduleEndDate(1).contains('Not entered')
 
@@ -66,7 +74,7 @@ context('View visit schedule timetable', () => {
 
     visitTimetablePage
       .requestChangeLink()
-      .should('have.attr', 'href', 'https://request-visit-schedule-change.form.service.justice.gov.uk')
+      .should('have.attr', 'href', 'https://request-changes-to-the-visits-timetable.form.service.justice.gov.uk/')
   })
 
   // navigate forwards a week, then back, then specific day - empty timetable
