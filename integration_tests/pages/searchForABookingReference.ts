@@ -18,4 +18,6 @@ export default class SearchForABookingReferencePage extends Page {
   resultRow = (): PageElement => cy.get('.govuk-table__row')
 
   visitReferenceLink = (): PageElement => cy.get('.govuk-table__row > :nth-child(1) > a')
+
+  searchByPrisonerLink = (): PageElement => cy.get('[data-test=search-by-prisoner]')
 }
