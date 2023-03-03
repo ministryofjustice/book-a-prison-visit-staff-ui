@@ -12,18 +12,12 @@ jest.mock('../../services/visitSessionsService')
 jest.mock('../../services/auditService')
 
 let sessionApp: Express
-const systemToken = async (user: string): Promise<string> => `${user}-token-1`
 const auditService = new AuditService() as jest.Mocked<AuditService>
 
 let flashData: Record<'errors' | 'formValues', Record<string, string | string[]>[]>
 let visitSessionData: VisitSessionData
 
-const visitSessionsService = new VisitSessionsService(
-  null,
-  null,
-  null,
-  systemToken,
-) as jest.Mocked<VisitSessionsService>
+const visitSessionsService = new VisitSessionsService(null, null, null, null) as jest.Mocked<VisitSessionsService>
 
 const prisonId = 'HEI'
 
@@ -64,7 +58,6 @@ beforeEach(() => {
 
   sessionApp = appWithAllRoutes({
     visitSessionsServiceOverride: visitSessionsService,
-    systemTokenOverride: systemToken,
     sessionData: {
       visitSessionData,
     } as SessionData,
@@ -180,7 +173,6 @@ testJourneys.forEach(journey => {
 
         sessionApp = appWithAllRoutes({
           visitSessionsServiceOverride: visitSessionsService,
-          systemTokenOverride: systemToken,
           sessionData: {
             visitSessionData,
           } as SessionData,
@@ -207,7 +199,6 @@ testJourneys.forEach(journey => {
 
         sessionApp = appWithAllRoutes({
           visitSessionsServiceOverride: visitSessionsService,
-          systemTokenOverride: systemToken,
           sessionData: {
             visitSessionData,
           } as SessionData,
@@ -297,7 +288,6 @@ testJourneys.forEach(journey => {
         sessionApp = appWithAllRoutes({
           visitSessionsServiceOverride: visitSessionsService,
           auditServiceOverride: auditService,
-          systemTokenOverride: systemToken,
           sessionData: {
             slotsList,
             visitSessionData,

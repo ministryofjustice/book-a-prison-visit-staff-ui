@@ -15,7 +15,9 @@ import {
 } from '../@types/bapv'
 import { ScheduledEvent } from '../data/whereaboutsApiTypes'
 import TestData from '../routes/testutils/testData'
+import HmppsAuthClient from '../data/hmppsAuthClient'
 
+jest.mock('../data/hmppsAuthClient')
 jest.mock('../data/prisonerContactRegistryApiClient')
 jest.mock('../data/visitSchedulerApiClient')
 jest.mock('../data/whereaboutsApiClient')
@@ -27,17 +29,17 @@ const visitSchedulerApiClient = new VisitSchedulerApiClient(null) as jest.Mocked
 const whereaboutsApiClient = new WhereaboutsApiClient(null) as jest.Mocked<WhereaboutsApiClient>
 
 describe('Visit sessions service', () => {
+  let hmppsAuthClient: jest.Mocked<HmppsAuthClient>
   let prisonerContactRegistryApiClientBuilder
   let visitSchedulerApiClientBuilder
   let whereaboutsApiClientBuilder
   let visitSessionsService: VisitSessionsService
-  let systemToken
 
   const prisonId = 'HEI'
   const availableSupportTypes = TestData.supportTypes()
 
   beforeEach(() => {
-    systemToken = async (user: string): Promise<string> => `${user}-token-1`
+    hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
     prisonerContactRegistryApiClientBuilder = jest.fn().mockReturnValue(prisonerContactRegistryApiClient)
     visitSchedulerApiClientBuilder = jest.fn().mockReturnValue(visitSchedulerApiClient)
     whereaboutsApiClientBuilder = jest.fn().mockReturnValue(whereaboutsApiClient)
@@ -45,7 +47,7 @@ describe('Visit sessions service', () => {
       prisonerContactRegistryApiClientBuilder,
       visitSchedulerApiClientBuilder,
       whereaboutsApiClientBuilder,
-      systemToken,
+      hmppsAuthClient,
     )
   })
 

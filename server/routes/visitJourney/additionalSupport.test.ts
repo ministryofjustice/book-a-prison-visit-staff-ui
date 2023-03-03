@@ -8,7 +8,6 @@ import { VisitorSupport } from '../../data/visitSchedulerApiTypes'
 import TestData from '../testutils/testData'
 
 let sessionApp: Express
-const systemToken = async (user: string): Promise<string> => `${user}-token-1`
 
 let flashData: Record<'errors' | 'formValues', Record<string, string | string[]>[]>
 let visitSessionData: VisitSessionData
@@ -64,7 +63,6 @@ testJourneys.forEach(journey => {
       }
 
       sessionApp = appWithAllRoutes({
-        systemTokenOverride: systemToken,
         sessionData: {
           availableSupportTypes,
           visitSessionData,
@@ -252,7 +250,6 @@ testJourneys.forEach(journey => {
       }
 
       sessionApp = appWithAllRoutes({
-        systemTokenOverride: systemToken,
         sessionData: {
           availableSupportTypes,
           visitSessionData,

@@ -9,14 +9,8 @@ import TestData from './testutils/testData'
 jest.mock('../services/visitSessionsService')
 
 let app: Express
-const systemToken = async (user: string): Promise<string> => `${user}-token-1`
 
-const visitSessionsService = new VisitSessionsService(
-  null,
-  null,
-  null,
-  systemToken,
-) as jest.Mocked<VisitSessionsService>
+const visitSessionsService = new VisitSessionsService(null, null, null, null) as jest.Mocked<VisitSessionsService>
 
 beforeEach(() => {
   visitSessionsService.getSessionSchedule.mockResolvedValue([])

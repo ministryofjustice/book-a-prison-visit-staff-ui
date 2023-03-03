@@ -1,7 +1,8 @@
 import { properCaseFullName, prisonerDatePretty } from '../utils/utils'
 import { Prisoner } from '../data/prisonerOffenderSearchTypes'
 import PrisonerSearchClient from '../data/prisonerSearchClient'
-import { PrisonerDetailsItem, SystemToken } from '../@types/bapv'
+import { PrisonerDetailsItem } from '../@types/bapv'
+import HmppsAuthClient from '../data/hmppsAuthClient'
 
 type PrisonerSearchClientBuilder = (token: string) => PrisonerSearchClient
 
@@ -12,7 +13,7 @@ export default class PrisonerSearchService {
 
   constructor(
     private readonly prisonerSearchClientBuilder: PrisonerSearchClientBuilder,
-    private readonly systemToken: SystemToken,
+    private readonly hmppsAuthClient: HmppsAuthClient,
   ) {}
 
   private getPreviousPage(): number {
@@ -36,7 +37,7 @@ export default class PrisonerSearchService {
     next: number
     previous: number
   }> {
-    const token = await this.systemToken(username)
+    const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const prisonerSearchClient = this.prisonerSearchClientBuilder(token)
     this.currentPage = page - 1
     const { totalPages, totalElements, content } = await prisonerSearchClient.getPrisoners(
@@ -85,14 +86,14 @@ export default class PrisonerSearchService {
   }
 
   async getPrisoner(search: string, prisonId: string, username: string): Promise<Prisoner> {
-    const token = await this.systemToken(username)
+    const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const prisonerSearchClient = this.prisonerSearchClientBuilder(token)
     const { content } = await prisonerSearchClient.getPrisoner(search, prisonId)
     return content.length === 1 ? content[0] : null
   }
 
   async getPrisonerById(id: string, username: string): Promise<Prisoner> {
-    const token = await this.systemToken(username)
+    const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const prisonerSearchClient = this.prisonerSearchClientBuilder(token)
     return prisonerSearchClient.getPrisonerById(id)
   }
@@ -112,7 +113,7 @@ export default class PrisonerSearchService {
     next: number
     previous: number
   }> {
-    const token = await this.systemToken(username)
+    const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const prisonerSearchClient = this.prisonerSearchClientBuilder(token)
     const prisonerNumbers = prisonerVisits.flatMap(prisonerVisit => prisonerVisit.prisoner)
     this.currentPage = page - 1

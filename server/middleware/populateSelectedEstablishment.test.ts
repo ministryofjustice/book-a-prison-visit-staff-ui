@@ -1,19 +1,20 @@
 import { Request, Response } from 'express'
 import { Cookie } from 'express-session'
 import { Prison } from '../@types/bapv'
-import { User } from '../data/hmppsAuthClient'
+import HmppsAuthClient, { User } from '../data/hmppsAuthClient'
 import TestData from '../routes/testutils/testData'
 import SupportedPrisonsService from '../services/supportedPrisonsService'
 import populateSelectedEstablishment from './populateSelectedEstablishment'
 
+jest.mock('../data/hmppsAuthClient')
 jest.mock('../services/supportedPrisonsService')
 
-const systemToken = async (user: string): Promise<string> => `${user}-token-1`
+const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
 
 const supportedPrisonsService = new SupportedPrisonsService(
   null,
   null,
-  systemToken,
+  hmppsAuthClient,
 ) as jest.Mocked<SupportedPrisonsService>
 
 const supportedPrisons = TestData.supportedPrisons()

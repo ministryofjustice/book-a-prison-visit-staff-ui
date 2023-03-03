@@ -2,14 +2,7 @@ import { NotFound } from 'http-errors'
 import PrisonApiClient from '../data/prisonApiClient'
 import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
 import PrisonerContactRegistryApiClient from '../data/prisonerContactRegistryApiClient'
-import {
-  PrisonerProfile,
-  SystemToken,
-  BAPVVisitBalances,
-  PrisonerAlertItem,
-  UpcomingVisitItem,
-  PastVisitItem,
-} from '../@types/bapv'
+import { PrisonerProfile, BAPVVisitBalances, PrisonerAlertItem, UpcomingVisitItem, PastVisitItem } from '../@types/bapv'
 import {
   prisonerDatePretty,
   properCaseFullName,
@@ -24,6 +17,7 @@ import { Visitor } from '../data/visitSchedulerApiTypes'
 import { Contact } from '../data/prisonerContactRegistryApiTypes'
 import SupportedPrisonsService from './supportedPrisonsService'
 import PrisonerSearchClient from '../data/prisonerSearchClient'
+import HmppsAuthClient from '../data/hmppsAuthClient'
 
 type PrisonApiClientBuilder = (token: string) => PrisonApiClient
 type PrisonerSearchClientBuilder = (token: string) => PrisonerSearchClient
@@ -39,11 +33,11 @@ export default class PrisonerProfileService {
     private readonly prisonerContactRegistryApiClientBuilder: PrisonerContactRegistryApiClientBuilder,
     private readonly prisonerSearchClientBuilder: PrisonerSearchClientBuilder,
     private readonly supportedPrisonsService: SupportedPrisonsService,
-    private readonly systemToken: SystemToken,
+    private readonly hmppsAuthClient: HmppsAuthClient,
   ) {}
 
   async getProfile(offenderNo: string, prisonId: string, username: string): Promise<PrisonerProfile> {
-    const token = await this.systemToken(username)
+    const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const prisonApiClient = this.prisonApiClientBuilder(token)
     const bookings = await prisonApiClient.getBookings(offenderNo, prisonId)
 
@@ -140,7 +134,7 @@ export default class PrisonerProfileService {
     prisonId: string,
     username: string,
   ): Promise<{ inmateDetail: InmateDetail; visitBalances: VisitBalances }> {
-    const token = await this.systemToken(username)
+    const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const prisonApiClient = this.prisonApiClientBuilder(token)
 
     const bookings = await prisonApiClient.getBookings(offenderNo, prisonId)
@@ -157,7 +151,7 @@ export default class PrisonerProfileService {
   }
 
   async getRestrictions(offenderNo: string, username: string): Promise<OffenderRestriction[]> {
-    const token = await this.systemToken(username)
+    const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const prisonApiClient = this.prisonApiClientBuilder(token)
     const restrictions = await prisonApiClient.getOffenderRestrictions(offenderNo)
 

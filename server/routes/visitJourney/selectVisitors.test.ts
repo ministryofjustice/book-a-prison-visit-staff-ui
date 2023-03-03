@@ -13,7 +13,6 @@ jest.mock('../../services/prisonerProfileService')
 jest.mock('../../services/prisonerVisitorsService')
 
 let sessionApp: Express
-const systemToken = async (user: string): Promise<string> => `${user}-token-1`
 
 let flashData: Record<'errors' | 'formValues', Record<string, string | string[]>[]>
 let visitSessionData: VisitSessionData
@@ -39,10 +38,7 @@ testJourneys.forEach(journey => {
   describe(`GET ${journey.urlPrefix}/select-visitors`, () => {
     const visitorList: { visitors: VisitorListItem[] } = { visitors: [] }
 
-    const prisonerVisitorsService = new PrisonerVisitorsService(
-      null,
-      systemToken,
-    ) as jest.Mocked<PrisonerVisitorsService>
+    const prisonerVisitorsService = new PrisonerVisitorsService(null, null) as jest.Mocked<PrisonerVisitorsService>
 
     const prisonerProfileService = new PrisonerProfileService(
       null,
@@ -50,7 +46,7 @@ testJourneys.forEach(journey => {
       null,
       null,
       null,
-      systemToken,
+      null,
     ) as jest.Mocked<PrisonerProfileService>
 
     let returnData: VisitorListItem[]
@@ -145,7 +141,6 @@ testJourneys.forEach(journey => {
       sessionApp = appWithAllRoutes({
         prisonerProfileServiceOverride: prisonerProfileService,
         prisonerVisitorsServiceOverride: prisonerVisitorsService,
-        systemTokenOverride: systemToken,
         sessionData: {
           visitorList,
           visitSessionData,
@@ -185,7 +180,6 @@ testJourneys.forEach(journey => {
       sessionApp = appWithAllRoutes({
         prisonerProfileServiceOverride: prisonerProfileService,
         prisonerVisitorsServiceOverride: prisonerVisitorsService,
-        systemTokenOverride: systemToken,
         sessionData: {
           visitorList,
           visitSessionData,
@@ -212,7 +206,6 @@ testJourneys.forEach(journey => {
       sessionApp = appWithAllRoutes({
         prisonerProfileServiceOverride: prisonerProfileService,
         prisonerVisitorsServiceOverride: prisonerVisitorsService,
-        systemTokenOverride: systemToken,
         sessionData: {
           visitorList,
           visitSessionData,
@@ -441,7 +434,6 @@ testJourneys.forEach(journey => {
         sessionApp = appWithAllRoutes({
           prisonerProfileServiceOverride: prisonerProfileService,
           prisonerVisitorsServiceOverride: prisonerVisitorsService,
-          systemTokenOverride: systemToken,
           sessionData: {
             selectedEstablishment: { prisonId: 'BLI', prisonName: '' },
             visitorList,
@@ -464,7 +456,6 @@ testJourneys.forEach(journey => {
         sessionApp = appWithAllRoutes({
           prisonerProfileServiceOverride: prisonerProfileService,
           prisonerVisitorsServiceOverride: prisonerVisitorsService,
-          systemTokenOverride: systemToken,
           sessionData: {
             selectedEstablishment: { prisonId: 'XYZ', prisonName: '' },
             visitorList,
@@ -583,7 +574,6 @@ testJourneys.forEach(journey => {
       }
 
       sessionApp = appWithAllRoutes({
-        systemTokenOverride: systemToken,
         sessionData: {
           adultVisitors,
           visitorList,
