@@ -7,6 +7,10 @@ export default class HomePage extends Page {
 
   headerUserName = (): PageElement => cy.get('[data-qa=header-user-name]')
 
+  currentEstablishment = (): PageElement => cy.get('[data-test="active-location"]')
+
+  changeEstablishmentLink = (): PageElement => cy.get('[data-test="change-establishment"]')
+
   bookAVisitTile = (): PageElement => cy.get('[data-test="book-visit"]')
 
   changeAVisitTile = (): PageElement => cy.get('[data-test="change-visit"]')
