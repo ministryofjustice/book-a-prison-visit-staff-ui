@@ -18,7 +18,7 @@ context('Search for a booking by reference', () => {
     cy.signIn()
   })
 
-  it.skip('Should search via booking reference, than navigate to the summary page', () => {
+  it('Should search via booking reference, than navigate to the summary page', () => {
     const homePage = Page.verifyOnPage(HomePage)
     const today = new Date()
     const prisoner = TestData.prisoner()
