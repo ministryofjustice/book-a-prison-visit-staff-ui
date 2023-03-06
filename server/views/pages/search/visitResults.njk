@@ -59,16 +59,28 @@
           rows: [
             [
               {
-                html: '<a href="/visit/' + results[0].reference + '">' + results[0].reference + '</a>'
+                html: '<a href="/visit/' + results[0].reference + '">' + results[0].reference + '</a>',
+                attributes: {
+                  "data-test": "visit-reference"
+                }
               },
               {
-                text: results[0].prisonerName | properCaseFullName
+                text: results[0].prisonerName | properCaseFullName,
+                attributes: {
+                  "data-test": "prisoner-name"
+                }
               },
               {
-                text: results[0].prisonNumber
+                text: results[0].prisonNumber,
+                 attributes: {
+                  "data-test": "prisoner-number"
+                }
               },
               {
-                text: results[0].visitStatus | capitalize
+                text: results[0].visitStatus | capitalize,
+                 attributes: {
+                  "data-test": "visit-status"
+                }
               }
             ]
           ]
