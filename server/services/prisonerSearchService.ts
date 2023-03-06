@@ -88,9 +88,6 @@ export default class PrisonerSearchService {
     const token = await this.systemToken(username)
     const prisonerSearchClient = this.prisonerSearchClientBuilder(token)
     const { content } = await prisonerSearchClient.getPrisoner(search, prisonId)
-    // console.log('000000000')
-    // console.log(content)
-    // console.log('000000000')
     return content.length === 1 ? content[0] : null
   }
 

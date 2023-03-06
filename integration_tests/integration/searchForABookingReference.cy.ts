@@ -1,4 +1,4 @@
-import { format, sub } from 'date-fns'
+import { addDays, format, sub } from 'date-fns'
 import TestData from '../../server/routes/testutils/testData'
 import HomePage from '../pages/home'
 import Page from '../pages/page'
@@ -70,7 +70,7 @@ context('Search for a booking by reference', () => {
 
   it('Should search via prisonerId, than navigate to the summary page', () => {
     const homePage = Page.verifyOnPage(HomePage)
-    // const today = new Date()
+    const today = new Date()
     const prisoner = TestData.prisoner()
     const { prisonerNumber: offenderNo } = prisoner
     const prisonerDisplayName = 'Smith, John'
@@ -114,7 +114,13 @@ context('Search for a booking by reference', () => {
 
     cy.task('stubPrisoner', prisoner)
     cy.task('stubPrisonerById', prisoner)
-    cy.task('stubVisit', 'gh-ef-cd-ab')
+
+    const upcomingVisit = TestData.visit({
+      reference: 'bc-de-fg-hi',
+      startTimestamp: format(addDays(today, 7), `${shortDateFormat}'T'13:30:00`),
+      endTimestamp: format(addDays(today, 7), `${shortDateFormat}'T'14:30:00`),
+    })
+    cy.task('stubUpcomingVisits', { offenderNo: prisoner.prisonerNumber, upcomingVisits: [upcomingVisit] })
 
     searchForABookingPrisonerPage.prisonerLink().click()
   })
