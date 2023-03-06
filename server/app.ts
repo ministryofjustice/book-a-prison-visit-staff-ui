@@ -25,7 +25,6 @@ import NotificationsService from './services/notificationsService'
 import PrisonerSearchService from './services/prisonerSearchService'
 import PrisonerProfileService from './services/prisonerProfileService'
 import SupportedPrisonsService from './services/supportedPrisonsService'
-import systemToken from './data/authClient'
 import setUpWebSession from './middleware/setUpWebSession'
 import setUpStaticResources from './middleware/setUpStaticResources'
 import setUpWebSecurity from './middleware/setUpWebSecurity'
@@ -37,8 +36,9 @@ import PrisonerVisitorsService from './services/prisonerVisitorsService'
 import VisitSessionsService from './services/visitSessionsService'
 import AuditService from './services/auditService'
 import appInsightsOperationId from './middleware/appInsightsOperationId'
+import HmppsAuthClient from './data/hmppsAuthClient'
 
-export default function createApp(userService: UserService): express.Application {
+export default function createApp(userService: UserService, hmppsAuthClient: HmppsAuthClient): express.Application {
   const app = express()
 
   app.set('json spaces', 2)
@@ -58,7 +58,7 @@ export default function createApp(userService: UserService): express.Application
   const supportedPrisonsService = new SupportedPrisonsService(
     visitSchedulerApiClientBuilder,
     prisonRegisterApiClientBuilder,
-    systemToken,
+    hmppsAuthClient,
   )
 
   app.use('/', indexRoutes(standardRouter(userService, supportedPrisonsService)))
@@ -75,12 +75,12 @@ export default function createApp(userService: UserService): express.Application
     '/search/',
     searchRoutes(
       standardRouter(userService, supportedPrisonsService),
-      new PrisonerSearchService(prisonerSearchClientBuilder, systemToken),
+      new PrisonerSearchService(prisonerSearchClientBuilder, hmppsAuthClient),
       new VisitSessionsService(
         prisonerContactRegistryApiClientBuilder,
         visitSchedulerApiClientBuilder,
         whereaboutsApiClientBuilder,
-        systemToken,
+        hmppsAuthClient,
       ),
       new AuditService(),
     ),
@@ -95,14 +95,14 @@ export default function createApp(userService: UserService): express.Application
         prisonerContactRegistryApiClientBuilder,
         prisonerSearchClientBuilder,
         supportedPrisonsService,
-        systemToken,
+        hmppsAuthClient,
       ),
-      new PrisonerSearchService(prisonerSearchClientBuilder, systemToken),
+      new PrisonerSearchService(prisonerSearchClientBuilder, hmppsAuthClient),
       new VisitSessionsService(
         prisonerContactRegistryApiClientBuilder,
         visitSchedulerApiClientBuilder,
         whereaboutsApiClientBuilder,
-        systemToken,
+        hmppsAuthClient,
       ),
       new AuditService(),
     ),
@@ -111,12 +111,12 @@ export default function createApp(userService: UserService): express.Application
     '/book-a-visit/',
     bookAVisitRoutes(
       standardRouter(userService, supportedPrisonsService),
-      new PrisonerVisitorsService(prisonerContactRegistryApiClientBuilder, systemToken),
+      new PrisonerVisitorsService(prisonerContactRegistryApiClientBuilder, hmppsAuthClient),
       new VisitSessionsService(
         prisonerContactRegistryApiClientBuilder,
         visitSchedulerApiClientBuilder,
         whereaboutsApiClientBuilder,
-        systemToken,
+        hmppsAuthClient,
       ),
       new PrisonerProfileService(
         prisonApiClientBuilder,
@@ -124,7 +124,7 @@ export default function createApp(userService: UserService): express.Application
         prisonerContactRegistryApiClientBuilder,
         prisonerSearchClientBuilder,
         supportedPrisonsService,
-        systemToken,
+        hmppsAuthClient,
       ),
       new NotificationsService(notificationsApiClientBuilder),
       new AuditService(),
@@ -134,23 +134,23 @@ export default function createApp(userService: UserService): express.Application
     '/visit/',
     visitRoutes(
       standardRouter(userService, supportedPrisonsService),
-      new PrisonerSearchService(prisonerSearchClientBuilder, systemToken),
+      new PrisonerSearchService(prisonerSearchClientBuilder, hmppsAuthClient),
       new VisitSessionsService(
         prisonerContactRegistryApiClientBuilder,
         visitSchedulerApiClientBuilder,
         whereaboutsApiClientBuilder,
-        systemToken,
+        hmppsAuthClient,
       ),
       new NotificationsService(notificationsApiClientBuilder),
       new AuditService(),
-      new PrisonerVisitorsService(prisonerContactRegistryApiClientBuilder, systemToken),
+      new PrisonerVisitorsService(prisonerContactRegistryApiClientBuilder, hmppsAuthClient),
       new PrisonerProfileService(
         prisonApiClientBuilder,
         visitSchedulerApiClientBuilder,
         prisonerContactRegistryApiClientBuilder,
         prisonerSearchClientBuilder,
         supportedPrisonsService,
-        systemToken,
+        hmppsAuthClient,
       ),
       supportedPrisonsService,
     ),
@@ -159,12 +159,12 @@ export default function createApp(userService: UserService): express.Application
     '/visits/',
     visitsRoutes(
       standardRouter(userService, supportedPrisonsService),
-      new PrisonerSearchService(prisonerSearchClientBuilder, systemToken),
+      new PrisonerSearchService(prisonerSearchClientBuilder, hmppsAuthClient),
       new VisitSessionsService(
         prisonerContactRegistryApiClientBuilder,
         visitSchedulerApiClientBuilder,
         whereaboutsApiClientBuilder,
-        systemToken,
+        hmppsAuthClient,
       ),
       new AuditService(),
     ),
@@ -178,7 +178,7 @@ export default function createApp(userService: UserService): express.Application
         prisonerContactRegistryApiClientBuilder,
         visitSchedulerApiClientBuilder,
         whereaboutsApiClientBuilder,
-        systemToken,
+        hmppsAuthClient,
       ),
     ),
   )

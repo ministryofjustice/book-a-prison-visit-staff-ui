@@ -6,7 +6,6 @@ import { VisitorListItem, VisitSessionData } from '../../@types/bapv'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
 
 let sessionApp: Express
-const systemToken = async (user: string): Promise<string> => `${user}-token-1`
 
 let flashData: Record<'errors' | 'formValues', Record<string, string | string[]>[]>
 let visitSessionData: VisitSessionData
@@ -92,7 +91,6 @@ testJourneys.forEach(journey => {
       }
 
       sessionApp = appWithAllRoutes({
-        systemTokenOverride: systemToken,
         sessionData: {
           adultVisitors,
           visitorList,

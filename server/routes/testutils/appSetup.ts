@@ -28,8 +28,7 @@ import VisitSessionsService from '../../services/visitSessionsService'
 import NotificationsService from '../../services/notificationsService'
 import SupportedPrisonsService from '../../services/supportedPrisonsService'
 import * as auth from '../../authentication/auth'
-import systemToken from '../../data/authClient'
-import { SystemToken, VisitorListItem, VisitSlotList, VisitSessionData } from '../../@types/bapv'
+import { VisitorListItem, VisitSlotList, VisitSessionData } from '../../@types/bapv'
 import AuditService from '../../services/auditService'
 import TestData from './testData'
 
@@ -46,7 +45,7 @@ export const flashProvider = jest.fn()
 
 class MockUserService extends UserService {
   constructor() {
-    super(undefined, undefined, undefined)
+    super(undefined, undefined)
   }
 
   async getUser(token: string) {
@@ -83,7 +82,6 @@ function appSetup({
   auditServiceOverride,
   notificationsServiceOverride,
   supportedPrisonsServiceOverride,
-  systemTokenOverride,
   production = false,
   sessionData = {
     cookie: new Cookie(),
@@ -104,7 +102,6 @@ function appSetup({
   auditServiceOverride: AuditService
   notificationsServiceOverride: NotificationsService
   supportedPrisonsServiceOverride: SupportedPrisonsService
-  systemTokenOverride: SystemToken
   production: boolean
   sessionData: SessionData
 }): Express {
@@ -135,11 +132,9 @@ function appSetup({
   app.use(express.json())
   app.use(express.urlencoded({ extended: true }))
 
-  const systemTokenTest = systemTokenOverride || systemToken
-
   const supportedPrisonsService =
     supportedPrisonsServiceOverride ||
-    new SupportedPrisonsService(visitSchedulerApiClientBuilder, prisonRegisterApiClientBuilder, systemTokenTest)
+    new SupportedPrisonsService(visitSchedulerApiClientBuilder, prisonRegisterApiClientBuilder, null)
 
   app.use('/', indexRoutes(standardRouter(new MockUserService(), new MockSupportedPrisonsService())))
 
@@ -156,14 +151,14 @@ function appSetup({
   )
 
   const prisonerSearchService =
-    prisonerSearchServiceOverride || new PrisonerSearchService(prisonerSearchClientBuilder, systemTokenTest)
+    prisonerSearchServiceOverride || new PrisonerSearchService(prisonerSearchClientBuilder, null)
   const visitSessionsService =
     visitSessionsServiceOverride ||
     new VisitSessionsService(
       prisonerContactRegistryApiClientBuilder,
       visitSchedulerApiClientBuilder,
       whereaboutsApiClientBuilder,
-      systemTokenTest,
+      null,
     )
   app.use(
     '/search/',
@@ -183,8 +178,8 @@ function appSetup({
       prisonerContactRegistryApiClientBuilder,
       prisonerSearchClientBuilder,
       supportedPrisonsServiceOverride ||
-        new SupportedPrisonsService(visitSchedulerApiClientBuilder, prisonRegisterApiClientBuilder, systemTokenTest),
-      systemTokenTest,
+        new SupportedPrisonsService(visitSchedulerApiClientBuilder, prisonRegisterApiClientBuilder, null),
+      null,
     )
   app.use(
     '/prisoner/',
@@ -198,8 +193,7 @@ function appSetup({
   )
 
   const prisonerVisitorsService =
-    prisonerVisitorsServiceOverride ||
-    new PrisonerVisitorsService(prisonerContactRegistryApiClientBuilder, systemTokenTest)
+    prisonerVisitorsServiceOverride || new PrisonerVisitorsService(prisonerContactRegistryApiClientBuilder, null)
   const notificationsService = notificationsServiceOverride || new NotificationsService(notificationsApiClientBuilder)
   app.use(
     '/book-a-visit/',
@@ -254,7 +248,6 @@ export function appWithAllRoutes({
   auditServiceOverride,
   notificationsServiceOverride,
   supportedPrisonsServiceOverride,
-  systemTokenOverride,
   production = false,
   sessionData,
 }: {
@@ -265,7 +258,6 @@ export function appWithAllRoutes({
   auditServiceOverride?: AuditService
   notificationsServiceOverride?: NotificationsService
   supportedPrisonsServiceOverride?: SupportedPrisonsService
-  systemTokenOverride?: SystemToken
   production?: boolean
   sessionData?: SessionData
 }): Express {
@@ -278,7 +270,6 @@ export function appWithAllRoutes({
     auditServiceOverride,
     notificationsServiceOverride,
     supportedPrisonsServiceOverride,
-    systemTokenOverride,
     production,
     sessionData,
   })

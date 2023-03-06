@@ -16,16 +16,10 @@ jest.mock('../services/visitSessionsService')
 jest.mock('../services/auditService')
 
 let app: Express
-const systemToken = async (user: string): Promise<string> => `${user}-token-1`
 let flashData: Record<string, string[] | Record<string, string>[]>
 
-const prisonerSearchService = new PrisonerSearchService(null, systemToken) as jest.Mocked<PrisonerSearchService>
-const visitSessionsService = new VisitSessionsService(
-  null,
-  null,
-  null,
-  systemToken,
-) as jest.Mocked<VisitSessionsService>
+const prisonerSearchService = new PrisonerSearchService(null, null) as jest.Mocked<PrisonerSearchService>
+const visitSessionsService = new VisitSessionsService(null, null, null, null) as jest.Mocked<VisitSessionsService>
 const auditService = new AuditService() as jest.Mocked<AuditService>
 
 beforeEach(() => {
@@ -37,7 +31,6 @@ beforeEach(() => {
     prisonerSearchServiceOverride: prisonerSearchService,
     visitSessionsServiceOverride: visitSessionsService,
     auditServiceOverride: auditService,
-    systemTokenOverride: systemToken,
   })
 })
 
@@ -261,7 +254,6 @@ describe('GET /visits', () => {
       prisonerSearchServiceOverride: prisonerSearchService,
       visitSessionsServiceOverride: visitSessionsService,
       auditServiceOverride: auditService,
-      systemTokenOverride: systemToken,
       sessionData: { selectedEstablishment: { prisonId: 'XYZ', prisonName: 'XYZ' } } as SessionData,
     })
 

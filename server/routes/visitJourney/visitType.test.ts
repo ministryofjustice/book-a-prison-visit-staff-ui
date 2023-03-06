@@ -9,7 +9,6 @@ import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
 jest.mock('../../services/auditService')
 
 let sessionApp: Express
-const systemToken = async (user: string): Promise<string> => `${user}-token-1`
 const auditService = new AuditService() as jest.Mocked<AuditService>
 
 let flashData: Record<'errors' | 'formValues', Record<string, string | string[]>[]>
@@ -67,7 +66,6 @@ testJourneys.forEach(journey => {
 
       sessionApp = appWithAllRoutes({
         auditServiceOverride: auditService,
-        systemTokenOverride: systemToken,
         sessionData: {
           visitSessionData,
         } as SessionData,

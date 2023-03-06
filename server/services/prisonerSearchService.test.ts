@@ -1,7 +1,9 @@
 import PrisonerSearchService from './prisonerSearchService'
 import PrisonerSearchClient from '../data/prisonerSearchClient'
 import TestData from '../routes/testutils/testData'
+import HmppsAuthClient from '../data/hmppsAuthClient'
 
+jest.mock('../data/hmppsAuthClient')
 jest.mock('../data/prisonerSearchClient')
 
 const prisonId = 'HEI'
@@ -11,14 +13,14 @@ const prisonerSearchClient = new PrisonerSearchClient(null) as jest.Mocked<Priso
 const prisoner = TestData.prisoner()
 
 describe('Prisoner search service', () => {
+  let hmppsAuthClient: jest.Mocked<HmppsAuthClient>
   let prisonerSearchClientBuilder
   let prisonerSearchService: PrisonerSearchService
-  let systemToken
 
   beforeEach(() => {
-    systemToken = async (user: string): Promise<string> => `${user}-token-1`
+    hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
     prisonerSearchClientBuilder = jest.fn().mockReturnValue(prisonerSearchClient)
-    prisonerSearchService = new PrisonerSearchService(prisonerSearchClientBuilder, systemToken)
+    prisonerSearchService = new PrisonerSearchService(prisonerSearchClientBuilder, hmppsAuthClient)
   })
 
   describe('getPrisoners', () => {

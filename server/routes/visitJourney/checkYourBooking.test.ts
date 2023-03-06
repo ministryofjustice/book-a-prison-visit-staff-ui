@@ -15,7 +15,6 @@ jest.mock('../../services/visitSessionsService')
 jest.mock('../../services/auditService')
 
 let sessionApp: Express
-const systemToken = async (user: string): Promise<string> => `${user}-token-1`
 const auditService = new AuditService() as jest.Mocked<AuditService>
 
 let flashData: Record<'errors' | 'formValues', Record<string, string | string[]>[]>
@@ -90,7 +89,6 @@ testJourneys.forEach(journey => {
       }
 
       sessionApp = appWithAllRoutes({
-        systemTokenOverride: systemToken,
         sessionData: {
           availableSupportTypes,
           visitSessionData,
@@ -162,12 +160,7 @@ testJourneys.forEach(journey => {
     })
 
     describe(`POST ${journey.urlPrefix}/check-your-booking`, () => {
-      const visitSessionsService = new VisitSessionsService(
-        null,
-        null,
-        null,
-        systemToken,
-      ) as jest.Mocked<VisitSessionsService>
+      const visitSessionsService = new VisitSessionsService(null, null, null, null) as jest.Mocked<VisitSessionsService>
 
       const notificationsService = new NotificationsService(null) as jest.Mocked<NotificationsService>
 
@@ -192,7 +185,6 @@ testJourneys.forEach(journey => {
           auditServiceOverride: auditService,
           notificationsServiceOverride: notificationsService,
           visitSessionsServiceOverride: visitSessionsService,
-          systemTokenOverride: systemToken,
           sessionData: {
             availableSupportTypes,
             visitSessionData,
