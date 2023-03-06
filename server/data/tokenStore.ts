@@ -1,9 +1,12 @@
 import type { RedisClient } from './redisClient'
 
+import config from '../config'
 import logger from '../../logger'
 
 export default class TokenStore {
-  private readonly prefix = 'systemToken:'
+  private readonly prefix = config.apis.hmppsAuth?.systemClientRedisKey
+    ? config.apis.hmppsAuth.systemClientRedisKey
+    : 'systemToken:'
 
   constructor(private readonly client: RedisClient) {
     client.on('error', error => {

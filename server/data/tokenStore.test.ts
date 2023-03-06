@@ -1,5 +1,8 @@
 import { RedisClient } from './redisClient'
 import TokenStore from './tokenStore'
+import config from '../config'
+
+const { systemClientRedisKey } = config.apis.hmppsAuth
 
 const redisClient = {
   get: jest.fn(),
@@ -26,7 +29,7 @@ describe('tokenStore', () => {
 
       await expect(tokenStore.getToken('user-1')).resolves.toBe('token-1')
 
-      expect(redisClient.get).toHaveBeenCalledWith('systemToken:user-1')
+      expect(redisClient.get).toHaveBeenCalledWith(`${systemClientRedisKey}user-1`)
     })
 
     it('Connects when no connection calling getToken', async () => {
@@ -42,7 +45,7 @@ describe('tokenStore', () => {
     it('Can set token', async () => {
       await tokenStore.setToken('user-1', 'token-1', 10)
 
-      expect(redisClient.set).toHaveBeenCalledWith('systemToken:user-1', 'token-1', { EX: 10 })
+      expect(redisClient.set).toHaveBeenCalledWith(`${systemClientRedisKey}user-1`, 'token-1', { EX: 10 })
     })
 
     it('Connects when no connection calling set token', async () => {
