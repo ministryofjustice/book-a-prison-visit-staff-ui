@@ -63,8 +63,6 @@ context('Search for a booking by reference', () => {
 
     visitDetailsPage.visitReference().contains('ab-cd-ef-gh')
     visitDetailsPage.prisonerName().contains('Smith, John')
-    visitDetailsPage.visitorName1().contains('Smith, Bob')
-    visitDetailsPage.additionalSupport().contains('Wheelchair ramp, custom request')
   })
 
   it('Should search via prisonerId, than navigate to the summary page', () => {

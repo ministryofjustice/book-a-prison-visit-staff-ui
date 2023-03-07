@@ -7,6 +7,11 @@ export default class VisitDetailsPage extends Page {
 
   visitReference = (): PageElement => cy.get('[data-test=reference]')
 
+  // Buttons
+  updateBooking = (): PageElement => cy.get('[data-test="update-visit"]')
+
+  cancelBooking = (): PageElement => cy.get('[data-test="cancel-visit"]')
+
   // Prisoner Details
   prisonerName = (): PageElement => cy.get('[data-test=prisoner-name]')
 
