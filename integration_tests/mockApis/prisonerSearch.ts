@@ -3,11 +3,11 @@ import { stubFor } from './wiremock'
 import { Prisoner } from '../../server/data/prisonerOffenderSearchTypes'
 
 export default {
-  stubPrisoner: (prisoner: Prisoner): SuperAgentRequest => {
+  stubPrisoner: (prisoner: Prisoner, prisonId = 'HEI'): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',
-        url: `/offenderSearch/prison/HEI/prisoners?term=${prisoner.prisonerNumber}`,
+        url: `/offenderSearch/prison/${prisonId}/prisoners?term=${prisoner.prisonerNumber}`,
       },
       response: {
         status: 200,
