@@ -163,43 +163,16 @@ export default {
       },
     })
   },
-  stubVisit: (reference: string): SuperAgentRequest => {
-    const result: Visit = {
-      applicationReference: 'aaa-bbb-ccc',
-      reference: 'ab-cd-ef-gh',
-      prisonerId: 'A1234BC',
-      prisonId: 'HEI',
-      visitRoom: 'A1 L3',
-      visitType: 'SOCIAL',
-      visitStatus: 'RESERVED',
-      visitRestriction: 'OPEN',
-      startTimestamp: '2022-02-14T10:00:00',
-      endTimestamp: '2022-02-14T11:00:00',
-      visitNotes: [],
-      visitors: [
-        {
-          nomisPersonId: 1234,
-        },
-      ],
-      visitorSupport: [
-        {
-          type: 'OTHER',
-          text: 'custom support details',
-        },
-      ],
-      createdTimestamp: '2022-02-14T10:00:00',
-      modifiedTimestamp: '2022-02-14T10:05:00',
-    }
-
+  stubVisit: (visit: Visit): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',
-        url: `/visitScheduler/visits/${reference}`,
+        url: `/visitScheduler/visits/${visit.reference}`,
       },
       response: {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: result,
+        jsonBody: visit,
       },
     })
   },

@@ -22,7 +22,10 @@
                 {{ govukButton({
                     classes: "moj-search__button",
                     text: "Search",
-                    preventDoubleClick: true
+                    preventDoubleClick: true,
+                    attributes: {
+                        "data-test": "search"
+                    }
                 }) }}
 
             </form>
