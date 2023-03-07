@@ -1,7 +1,6 @@
 import { convertToTitleCase } from '../utils/utils'
 import type HmppsAuthClient from '../data/hmppsAuthClient'
 import PrisonApiClient from '../data/prisonApiClient'
-import { SystemToken } from '../@types/bapv'
 import logger from '../../logger'
 
 interface UserDetails {
@@ -14,7 +13,6 @@ export default class UserService {
   constructor(
     private readonly hmppsAuthClient: HmppsAuthClient,
     private readonly prisonApiClientBuilder: PrisonApiClientBuilder,
-    private readonly systemToken: SystemToken,
   ) {}
 
   async getUser(token: string): Promise<UserDetails> {
@@ -23,7 +21,7 @@ export default class UserService {
   }
 
   async getUserCaseLoadIds(username: string): Promise<string[]> {
-    const token = await this.systemToken(username)
+    const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const prisonApiClient = this.prisonApiClientBuilder(token)
 
     const caseLoads = await prisonApiClient.getUserCaseLoads()
@@ -34,7 +32,7 @@ export default class UserService {
   }
 
   async setActiveCaseLoad(caseLoadId: string, username: string): Promise<void> {
-    const token = await this.systemToken(username)
+    const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const prisonApiClient = this.prisonApiClientBuilder(token)
 
     logger.info(`Setting case load to ${caseLoadId} for ${username}`)

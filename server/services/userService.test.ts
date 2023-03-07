@@ -19,7 +19,7 @@ describe('User service', () => {
   describe('getUser', () => {
     beforeEach(() => {
       hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
-      userService = new UserService(hmppsAuthClient, undefined, undefined)
+      userService = new UserService(hmppsAuthClient, undefined)
     })
 
     it('Retrieves and formats user name', async () => {
@@ -38,14 +38,13 @@ describe('User service', () => {
 
   describe('getUserCaseLoadIds', () => {
     const prisonApiClient = new PrisonApiClient(null) as jest.Mocked<PrisonApiClient>
-    const systemToken = async (user: string): Promise<string> => `${user}-token-1`
     let prisonApiClientBuilder
 
     const usersCaseLoads = TestData.caseLoads()
 
     beforeEach(() => {
       prisonApiClientBuilder = jest.fn().mockReturnValue(prisonApiClient)
-      userService = new UserService(undefined, prisonApiClientBuilder, systemToken)
+      userService = new UserService(hmppsAuthClient, prisonApiClientBuilder)
     })
 
     it('should return an array of available caseload IDs for current user', async () => {
@@ -59,12 +58,11 @@ describe('User service', () => {
 
   describe('setActiveCaseLoad', () => {
     const prisonApiClient = new PrisonApiClient(null) as jest.Mocked<PrisonApiClient>
-    const systemToken = async (user: string): Promise<string> => `${user}-token-1`
     let prisonApiClientBuilder
 
     beforeEach(() => {
       prisonApiClientBuilder = jest.fn().mockReturnValue(prisonApiClient)
-      userService = new UserService(undefined, prisonApiClientBuilder, systemToken)
+      userService = new UserService(hmppsAuthClient, prisonApiClientBuilder)
     })
 
     it('should set active case load for current user', async () => {

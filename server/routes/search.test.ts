@@ -16,15 +16,9 @@ jest.mock('../services/auditService')
 
 let app: Express
 const prisonId = 'HEI'
-const systemToken = async (user: string): Promise<string> => `${user}-token-1`
-const prisonerSearchService = new PrisonerSearchService(null, systemToken) as jest.Mocked<PrisonerSearchService>
+const prisonerSearchService = new PrisonerSearchService(null, null) as jest.Mocked<PrisonerSearchService>
 const auditService = new AuditService() as jest.Mocked<AuditService>
-const visitSessionsService = new VisitSessionsService(
-  null,
-  null,
-  null,
-  systemToken,
-) as jest.Mocked<VisitSessionsService>
+const visitSessionsService = new VisitSessionsService(null, null, null, null) as jest.Mocked<VisitSessionsService>
 
 let getPrisonersReturnData: {
   results: Array<PrisonerDetailsItem[]>
@@ -48,7 +42,6 @@ beforeEach(() => {
     prisonerSearchServiceOverride: prisonerSearchService,
     visitSessionsServiceOverride: visitSessionsService,
     auditServiceOverride: auditService,
-    systemTokenOverride: systemToken,
   })
 })
 
@@ -462,7 +455,6 @@ describe('Booking search page', () => {
         prisonerSearchServiceOverride: prisonerSearchService,
         visitSessionsServiceOverride: visitSessionsService,
         auditServiceOverride: auditService,
-        systemTokenOverride: systemToken,
         sessionData: { selectedEstablishment: { prisonId: 'XYZ' } } as SessionData,
       })
 

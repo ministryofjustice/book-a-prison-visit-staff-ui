@@ -30,9 +30,7 @@ describe('GET 404', () => {
   })
 
   it('should render content without stack in production mode', () => {
-    const systemToken = async (user: string): Promise<string> => `${user}-token-1`
-
-    return request(appWithAllRoutes({ systemTokenOverride: systemToken, production: true }))
+    return request(appWithAllRoutes({ production: true }))
       .get('/unknown')
       .expect(404)
       .expect('Content-Type', /html/)
