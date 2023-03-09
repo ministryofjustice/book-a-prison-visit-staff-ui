@@ -1,20 +1,25 @@
 import nock from 'nock'
 import config from '../config'
-import PrisonApiClient, { prisonApiClientBuilder } from './prisonApiClient'
+import PrisonApiClient from './prisonApiClient'
 import { InmateDetail, OffenderRestrictions, PagePrisonerBookingSummary, VisitBalances } from './prisonApiTypes'
 import TestData from '../routes/testutils/testData'
 
 describe('prisonApiClient', () => {
   let fakePrisonApi: nock.Scope
-  let client: PrisonApiClient
+  let prisonApiClient: PrisonApiClient
   const token = 'token-1'
 
   beforeEach(() => {
     fakePrisonApi = nock(config.apis.prison.url)
-    client = prisonApiClientBuilder(token)
+    prisonApiClient = new PrisonApiClient(token)
   })
 
   afterEach(() => {
+    if (!nock.isDone()) {
+      nock.cleanAll()
+      throw new Error('Not all nock interceptors were used!')
+    }
+    nock.abortPendingRequests()
     nock.cleanAll()
   })
 
@@ -49,7 +54,7 @@ describe('prisonApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
-      const output = await client.getBookings(offenderNo, prisonId)
+      const output = await prisonApiClient.getBookings(offenderNo, prisonId)
 
       expect(output).toEqual(results)
     })
@@ -77,7 +82,7 @@ describe('prisonApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
-      const output = await client.getOffender(offenderNo)
+      const output = await prisonApiClient.getOffender(offenderNo)
 
       expect(output).toEqual(results)
     })
@@ -109,7 +114,7 @@ describe('prisonApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
-      const output = await client.getOffenderRestrictions(offenderNo)
+      const output = await prisonApiClient.getOffenderRestrictions(offenderNo)
 
       expect(output).toEqual(results)
     })
@@ -121,7 +126,7 @@ describe('prisonApiClient', () => {
 
       fakePrisonApi.get('/api/users/me/caseLoads').matchHeader('authorization', `Bearer ${token}`).reply(200, results)
 
-      const output = await client.getUserCaseLoads()
+      const output = await prisonApiClient.getUserCaseLoads()
 
       expect(output).toEqual(results)
     })
@@ -136,7 +141,7 @@ describe('prisonApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, {})
 
-      const output = await client.setActiveCaseLoad('HEI')
+      const output = await prisonApiClient.setActiveCaseLoad('HEI')
 
       expect(output).toEqual({})
     })
@@ -157,7 +162,7 @@ describe('prisonApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
-      const output = await client.getVisitBalances(offenderNo)
+      const output = await prisonApiClient.getVisitBalances(offenderNo)
 
       expect(output).toEqual(results)
     })
@@ -170,7 +175,7 @@ describe('prisonApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(404)
 
-      const output = await client.getVisitBalances(offenderNo)
+      const output = await prisonApiClient.getVisitBalances(offenderNo)
 
       expect(output).toBeNull()
     })
@@ -185,7 +190,7 @@ describe('prisonApiClient', () => {
 
       expect.assertions(1)
       try {
-        await client.getVisitBalances(offenderNo)
+        await prisonApiClient.getVisitBalances(offenderNo)
       } catch (error) {
         expect(error.message).toMatch(/Bad Request/)
       }

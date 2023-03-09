@@ -1,21 +1,26 @@
 import nock from 'nock'
 import config from '../config'
-import PrisonerSearchClient, { prisonerSearchClientBuilder } from './prisonerSearchClient'
+import PrisonerSearchClient from './prisonerSearchClient'
 import TestData from '../routes/testutils/testData'
 
 describe('prisonSearchClientBuilder', () => {
   let fakePrisonerSearchApi: nock.Scope
-  let client: PrisonerSearchClient
+  let prisonerSearchClient: PrisonerSearchClient
 
   const prisonId = 'HEI'
   const token = 'token-1'
 
   beforeEach(() => {
     fakePrisonerSearchApi = nock(config.apis.prisonerSearch.url)
-    client = prisonerSearchClientBuilder(token)
+    prisonerSearchClient = new PrisonerSearchClient(token)
   })
 
   afterEach(() => {
+    if (!nock.isDone()) {
+      nock.cleanAll()
+      throw new Error('Not all nock interceptors were used!')
+    }
+    nock.abortPendingRequests()
     nock.cleanAll()
   })
 
@@ -43,7 +48,7 @@ describe('prisonSearchClientBuilder', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
-      const output = await client.getPrisoners('test', prisonId)
+      const output = await prisonerSearchClient.getPrisoners('test', prisonId)
 
       expect(output).toEqual(results)
     })
@@ -71,7 +76,7 @@ describe('prisonSearchClientBuilder', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
-      const output = await client.getPrisoner('test', prisonId)
+      const output = await prisonerSearchClient.getPrisoner('test', prisonId)
 
       expect(output).toEqual(results)
     })
@@ -86,7 +91,7 @@ describe('prisonSearchClientBuilder', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, prisoner)
 
-      const output = await client.getPrisonerById('A1234BC')
+      const output = await prisonerSearchClient.getPrisonerById('A1234BC')
 
       expect(output).toEqual(prisoner)
     })
@@ -114,7 +119,7 @@ describe('prisonSearchClientBuilder', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
-      const output = await client.getPrisonersByPrisonerNumbers(prisonerNumbers)
+      const output = await prisonerSearchClient.getPrisonersByPrisonerNumbers(prisonerNumbers)
 
       expect(output).toEqual({
         totalPages: 1,
@@ -144,7 +149,7 @@ describe('prisonSearchClientBuilder', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
-      const page1 = await client.getPrisonersByPrisonerNumbers(prisonerNumbers)
+      const page1 = await prisonerSearchClient.getPrisonersByPrisonerNumbers(prisonerNumbers)
 
       expect(page1).toEqual({
         totalPages: Math.ceil(numberOfResults / config.apis.prisonerSearch.pageSize),
@@ -157,7 +162,7 @@ describe('prisonSearchClientBuilder', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
-      const page2 = await client.getPrisonersByPrisonerNumbers(prisonerNumbers, 1)
+      const page2 = await prisonerSearchClient.getPrisonersByPrisonerNumbers(prisonerNumbers, 1)
 
       expect(page2).toEqual({
         totalPages: Math.ceil(numberOfResults / config.apis.prisonerSearch.pageSize),

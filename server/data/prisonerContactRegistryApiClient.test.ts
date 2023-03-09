@@ -1,21 +1,24 @@
 import nock from 'nock'
 import config from '../config'
-import PrisonerContactRegistryApiClient, {
-  prisonerContactRegistryApiClientBuilder,
-} from './prisonerContactRegistryApiClient'
+import PrisonerContactRegistryApiClient from './prisonerContactRegistryApiClient'
 import { Contact } from './prisonerContactRegistryApiTypes'
 
 describe('prisonerContactRegistryApiClient', () => {
   let fakePrisonerContactRegistryApi: nock.Scope
-  let client: PrisonerContactRegistryApiClient
+  let prisonerContactRegistryApiClient: PrisonerContactRegistryApiClient
   const token = 'token-1'
 
   beforeEach(() => {
     fakePrisonerContactRegistryApi = nock(config.apis.prisonerContactRegistry.url)
-    client = prisonerContactRegistryApiClientBuilder(token)
+    prisonerContactRegistryApiClient = new PrisonerContactRegistryApiClient(token)
   })
 
   afterEach(() => {
+    if (!nock.isDone()) {
+      nock.cleanAll()
+      throw new Error('Not all nock interceptors were used!')
+    }
+    nock.abortPendingRequests()
     nock.cleanAll()
   })
 
@@ -90,7 +93,7 @@ describe('prisonerContactRegistryApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
-      const output = await client.getPrisonerSocialContacts(offenderNo)
+      const output = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(offenderNo)
 
       expect(output).toEqual(results)
     })
@@ -111,7 +114,7 @@ describe('prisonerContactRegistryApiClient', () => {
           developerMessage: 'string',
         })
 
-      const output = await client.getPrisonerSocialContacts(offenderNo)
+      const output = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(offenderNo)
 
       expect(output).toEqual([])
     })

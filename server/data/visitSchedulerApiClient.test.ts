@@ -1,7 +1,7 @@
 import nock from 'nock'
 import { VisitSessionData } from '../@types/bapv'
 import config from '../config'
-import VisitSchedulerApiClient, { visitSchedulerApiClientBuilder } from './visitSchedulerApiClient'
+import VisitSchedulerApiClient from './visitSchedulerApiClient'
 import {
   Visit,
   OutcomeDto,
@@ -14,17 +14,22 @@ import TestData from '../routes/testutils/testData'
 
 describe('visitSchedulerApiClient', () => {
   let fakeVisitSchedulerApi: nock.Scope
-  let client: VisitSchedulerApiClient
+  let visitSchedulerApiClient: VisitSchedulerApiClient
   const token = 'token-1'
   const timestamp = new Date().toISOString()
   const prisonId = 'HEI'
 
   beforeEach(() => {
     fakeVisitSchedulerApi = nock(config.apis.visitScheduler.url)
-    client = visitSchedulerApiClientBuilder(token)
+    visitSchedulerApiClient = new VisitSchedulerApiClient(token)
   })
 
   afterEach(() => {
+    if (!nock.isDone()) {
+      nock.cleanAll()
+      throw new Error('Not all nock interceptors were used!')
+    }
+    nock.abortPendingRequests()
     nock.cleanAll()
   })
 
@@ -37,7 +42,7 @@ describe('visitSchedulerApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
-      const output = await client.getSupportedPrisonIds()
+      const output = await visitSchedulerApiClient.getSupportedPrisonIds()
 
       expect(output).toEqual(results)
     })
@@ -49,7 +54,7 @@ describe('visitSchedulerApiClient', () => {
 
       fakeVisitSchedulerApi.get('/visit-support').matchHeader('authorization', `Bearer ${token}`).reply(200, results)
 
-      const output = await client.getAvailableSupportOptions()
+      const output = await visitSchedulerApiClient.getAvailableSupportOptions()
 
       expect(output).toEqual(results)
     })
@@ -90,7 +95,7 @@ describe('visitSchedulerApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, result)
 
-      const output = await client.getVisit(reference)
+      const output = await visitSchedulerApiClient.getVisit(reference)
 
       expect(output).toEqual(result)
     })
@@ -142,7 +147,7 @@ describe('visitSchedulerApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
-      const output = await client.getUpcomingVisits(offenderNo, ['BOOKED', 'CANCELLED'])
+      const output = await visitSchedulerApiClient.getUpcomingVisits(offenderNo, ['BOOKED', 'CANCELLED'])
 
       expect(output).toEqual(results)
 
@@ -194,7 +199,7 @@ describe('visitSchedulerApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
-      const output = await client.getPastVisits(offenderNo, ['BOOKED', 'CANCELLED'], timestamp)
+      const output = await visitSchedulerApiClient.getPastVisits(offenderNo, ['BOOKED', 'CANCELLED'], timestamp)
 
       expect(output).toEqual(results)
     })
@@ -245,7 +250,7 @@ describe('visitSchedulerApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
-      const output = await client.getVisitsByDate(dateString, prisonId)
+      const output = await visitSchedulerApiClient.getVisitsByDate(dateString, prisonId)
 
       expect(output).toEqual(results)
     })
@@ -277,7 +282,7 @@ describe('visitSchedulerApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
-      const output = await client.getVisitSessions('A1234BC', prisonId)
+      const output = await visitSchedulerApiClient.getVisitSessions('A1234BC', prisonId)
 
       expect(output).toEqual(results)
     })
@@ -294,7 +299,7 @@ describe('visitSchedulerApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, sessionSchedule)
 
-      const output = await client.getSessionSchedule(prisonId, date)
+      const output = await visitSchedulerApiClient.getSessionSchedule(prisonId, date)
 
       expect(output).toEqual(sessionSchedule)
     })
@@ -314,7 +319,12 @@ describe('visitSchedulerApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, sessionCapacity)
 
-      const output = await client.getVisitSessionCapacity(prisonId, sessionDate, sessionStartTime, sessionEndTime)
+      const output = await visitSchedulerApiClient.getVisitSessionCapacity(
+        prisonId,
+        sessionDate,
+        sessionStartTime,
+        sessionEndTime,
+      )
 
       expect(output).toEqual(sessionCapacity)
     })
@@ -326,7 +336,12 @@ describe('visitSchedulerApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(404)
 
-      const output = await client.getVisitSessionCapacity(prisonId, sessionDate, sessionStartTime, sessionEndTime)
+      const output = await visitSchedulerApiClient.getVisitSessionCapacity(
+        prisonId,
+        sessionDate,
+        sessionStartTime,
+        sessionEndTime,
+      )
 
       expect(output).toBeNull()
     })
@@ -340,7 +355,12 @@ describe('visitSchedulerApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(500)
 
-      const output = await client.getVisitSessionCapacity(prisonId, sessionDate, sessionStartTime, sessionEndTime)
+      const output = await visitSchedulerApiClient.getVisitSessionCapacity(
+        prisonId,
+        sessionDate,
+        sessionStartTime,
+        sessionEndTime,
+      )
 
       expect(output).toBeNull()
     })
@@ -429,7 +449,7 @@ describe('visitSchedulerApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(201, result)
 
-      const output = await client.reserveVisit(visitSessionData)
+      const output = await visitSchedulerApiClient.reserveVisit(visitSessionData)
 
       expect(output).toEqual(result)
     })
@@ -541,7 +561,7 @@ describe('visitSchedulerApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, result)
 
-      const output = await client.changeReservedVisit(visitSessionData)
+      const output = await visitSchedulerApiClient.changeReservedVisit(visitSessionData)
 
       expect(output).toEqual(result)
     })
@@ -627,7 +647,7 @@ describe('visitSchedulerApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, result)
 
-      const output = await client.changeReservedVisit(visitSessionData)
+      const output = await visitSchedulerApiClient.changeReservedVisit(visitSessionData)
 
       expect(output).toEqual(result)
     })
@@ -648,7 +668,7 @@ describe('visitSchedulerApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, result)
 
-      const output = await client.bookVisit(applicationReference)
+      const output = await visitSchedulerApiClient.bookVisit(applicationReference)
 
       expect(output).toEqual(result)
     })
@@ -747,7 +767,7 @@ describe('visitSchedulerApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(201, result)
 
-      const output = await client.changeBookedVisit(visitSessionData)
+      const output = await visitSchedulerApiClient.changeBookedVisit(visitSessionData)
 
       expect(output).toEqual(result)
     })
@@ -797,7 +817,7 @@ describe('visitSchedulerApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, result)
 
-      const output = await client.cancelVisit(reference, outcome)
+      const output = await visitSchedulerApiClient.cancelVisit(reference, outcome)
 
       expect(output).toEqual(result)
     })

@@ -14,13 +14,6 @@ import nunjucksSetup from './utils/nunjucksSetup'
 import errorHandler from './errorHandler'
 import standardRouter from './routes/standardRouter'
 import UserService from './services/userService'
-import { prisonerSearchClientBuilder } from './data/prisonerSearchClient'
-import { notificationsApiClientBuilder } from './data/notificationsApiClient'
-import { visitSchedulerApiClientBuilder } from './data/visitSchedulerApiClient'
-import { whereaboutsApiClientBuilder } from './data/whereaboutsApiClient'
-import { prisonerContactRegistryApiClientBuilder } from './data/prisonerContactRegistryApiClient'
-import { prisonApiClientBuilder } from './data/prisonApiClient'
-import { prisonRegisterApiClientBuilder } from './data/prisonRegisterApiClient'
 import NotificationsService from './services/notificationsService'
 import PrisonerSearchService from './services/prisonerSearchService'
 import PrisonerProfileService from './services/prisonerProfileService'
@@ -37,6 +30,7 @@ import VisitSessionsService from './services/visitSessionsService'
 import AuditService from './services/auditService'
 import appInsightsOperationId from './middleware/appInsightsOperationId'
 import HmppsAuthClient from './data/hmppsAuthClient'
+import { dataAccess } from './data'
 
 export default function createApp(userService: UserService, hmppsAuthClient: HmppsAuthClient): express.Application {
   const app = express()
@@ -54,6 +48,16 @@ export default function createApp(userService: UserService, hmppsAuthClient: Hmp
   app.use(setUpAuthentication())
   app.use(authorisationMiddleware(['ROLE_MANAGE_PRISON_VISITS']))
   app.use(appInsightsOperationId)
+
+  const {
+    notificationsApiClientBuilder,
+    prisonApiClientBuilder,
+    prisonerContactRegistryApiClientBuilder,
+    prisonRegisterApiClientBuilder,
+    prisonerSearchClientBuilder,
+    visitSchedulerApiClientBuilder,
+    whereaboutsApiClientBuilder,
+  } = dataAccess()
 
   const supportedPrisonsService = new SupportedPrisonsService(
     visitSchedulerApiClientBuilder,
