@@ -1,23 +1,24 @@
 import { URLSearchParams } from 'url'
 import RestClient from './restClient'
 import { Contact } from './prisonerContactRegistryApiTypes'
-import config from '../config'
+import config, { ApiConfig } from '../config'
 
-export const prisonerContactRegistryApiClientBuilder = (token: string): PrisonerContactRegistryApiClient => {
-  const restClient = new RestClient('prisonerContactRegistryApi', config.apis.prisonerContactRegistry, token)
-  const prisonerContactRegistryApiClient = new PrisonerContactRegistryApiClient(restClient)
+export default class PrisonerContactRegistryApiClient {
+  private restClient: RestClient
 
-  return prisonerContactRegistryApiClient
-}
-
-class PrisonerContactRegistryApiClient {
-  constructor(private readonly restclient: RestClient) {}
+  constructor(token: string) {
+    this.restClient = new RestClient(
+      'prisonerContactRegistryApiClient',
+      config.apis.prisonerContactRegistry as ApiConfig,
+      token,
+    )
+  }
 
   async getPrisonerSocialContacts(offenderNo: string): Promise<Contact[]> {
     let socialContacts: Contact[] = []
 
     try {
-      socialContacts = await this.restclient.get({
+      socialContacts = await this.restClient.get({
         path: `/prisoners/${offenderNo}/contacts`,
         query: new URLSearchParams({
           type: 'S',
@@ -32,5 +33,3 @@ class PrisonerContactRegistryApiClient {
     return socialContacts
   }
 }
-
-export default PrisonerContactRegistryApiClient

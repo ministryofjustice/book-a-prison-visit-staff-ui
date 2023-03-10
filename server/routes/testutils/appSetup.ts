@@ -14,13 +14,6 @@ import nunjucksSetup from '../../utils/nunjucksSetup'
 import errorHandler from '../../errorHandler'
 import standardRouter from '../standardRouter'
 import UserService from '../../services/userService'
-import { notificationsApiClientBuilder } from '../../data/notificationsApiClient'
-import { prisonerSearchClientBuilder } from '../../data/prisonerSearchClient'
-import { prisonApiClientBuilder } from '../../data/prisonApiClient'
-import { visitSchedulerApiClientBuilder } from '../../data/visitSchedulerApiClient'
-import { whereaboutsApiClientBuilder } from '../../data/whereaboutsApiClient'
-import { prisonerContactRegistryApiClientBuilder } from '../../data/prisonerContactRegistryApiClient'
-import { prisonRegisterApiClientBuilder } from '../../data/prisonRegisterApiClient'
 import PrisonerSearchService from '../../services/prisonerSearchService'
 import PrisonerProfileService from '../../services/prisonerProfileService'
 import PrisonerVisitorsService from '../../services/prisonerVisitorsService'
@@ -31,6 +24,17 @@ import * as auth from '../../authentication/auth'
 import { VisitorListItem, VisitSlotList, VisitSessionData } from '../../@types/bapv'
 import AuditService from '../../services/auditService'
 import TestData from './testData'
+import { dataAccess } from '../../data'
+
+const {
+  notificationsApiClientBuilder,
+  prisonApiClientBuilder,
+  prisonerContactRegistryApiClientBuilder,
+  prisonRegisterApiClientBuilder,
+  prisonerSearchClientBuilder,
+  visitSchedulerApiClientBuilder,
+  whereaboutsApiClientBuilder,
+} = dataAccess()
 
 const user = {
   name: 'john smith',
