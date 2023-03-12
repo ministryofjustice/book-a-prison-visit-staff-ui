@@ -1,17 +1,12 @@
 import { Prison } from '../@types/bapv'
-import HmppsAuthClient from '../data/hmppsAuthClient'
-import PrisonRegisterApiClient from '../data/prisonRegisterApiClient'
-import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
-
-type VisitSchedulerApiClientBuilder = (token: string) => VisitSchedulerApiClient
-type PrisonRegisterApiClientBuilder = (token: string) => PrisonRegisterApiClient
+import { HmppsAuthClient, PrisonRegisterApiClient, RestClientBuilder, VisitSchedulerApiClient } from '../data'
 
 const A_DAY_IN_MS = 24 * 60 * 60 * 1000
 
 export default class SupportedPrisonsService {
   constructor(
-    private readonly visitSchedulerApiClientBuilder: VisitSchedulerApiClientBuilder,
-    private readonly prisonRegisterApiClientBuilder: PrisonRegisterApiClientBuilder,
+    private readonly visitSchedulerApiClientFactory: RestClientBuilder<VisitSchedulerApiClient>,
+    private readonly prisonRegisterApiClientFactory: RestClientBuilder<PrisonRegisterApiClient>,
     private readonly hmppsAuthClient: HmppsAuthClient,
   ) {}
 
@@ -37,14 +32,14 @@ export default class SupportedPrisonsService {
 
   async getSupportedPrisonIds(username: string): Promise<string[]> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
+    const visitSchedulerApiClient = this.visitSchedulerApiClientFactory(token)
     return visitSchedulerApiClient.getSupportedPrisonIds()
   }
 
   private async refreshAllPrisons(username: string): Promise<void> {
     if (this.lastUpdated <= Date.now() - A_DAY_IN_MS) {
       const token = await this.hmppsAuthClient.getSystemClientToken(username)
-      const prisonRegisterApiClient = this.prisonRegisterApiClientBuilder(token)
+      const prisonRegisterApiClient = this.prisonRegisterApiClientFactory(token)
       this.allPrisons = (await prisonRegisterApiClient.getPrisons()).map(prison => {
         return { prisonId: prison.prisonId, prisonName: prison.prisonName }
       })

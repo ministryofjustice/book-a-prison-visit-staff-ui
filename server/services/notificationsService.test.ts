@@ -1,5 +1,5 @@
 import { VisitSlot } from '../@types/bapv'
-import NotificationsApiClient from '../data/notificationsApiClient'
+import { NotificationsApiClient } from '../data'
 import NotificationsService from './notificationsService'
 
 jest.mock('../data/notificationsApiClient')
