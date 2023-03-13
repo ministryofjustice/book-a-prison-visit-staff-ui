@@ -1,55 +1,59 @@
 import { NotFound } from 'http-errors'
 import PrisonerProfileService from './prisonerProfileService'
-import PrisonApiClient from '../data/prisonApiClient'
-import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
-import PrisonerContactRegistryApiClient from '../data/prisonerContactRegistryApiClient'
 import { Alert, PagePrisonerBookingSummary, VisitBalances, OffenderRestrictions } from '../data/prisonApiTypes'
 import { PrisonerAlertItem, PrisonerProfile } from '../@types/bapv'
 import { PageVisitDto } from '../data/visitSchedulerApiTypes'
 import { Contact } from '../data/prisonerContactRegistryApiTypes'
 import SupportedPrisonsService from './supportedPrisonsService'
 import TestData from '../routes/testutils/testData'
-import PrisonerSearchClient from '../data/prisonerSearchClient'
-import HmppsAuthClient from '../data/hmppsAuthClient'
+import {
+  HmppsAuthClient,
+  PrisonApiClient,
+  PrisonerContactRegistryApiClient,
+  PrisonerSearchClient,
+  VisitSchedulerApiClient,
+} from '../data'
 
 jest.mock('../data/hmppsAuthClient')
 jest.mock('../data/prisonApiClient')
-jest.mock('../data/visitSchedulerApiClient')
 jest.mock('../data/prisonerContactRegistryApiClient')
 jest.mock('../data/prisonerSearchClient')
+jest.mock('../data/visitSchedulerApiClient')
 jest.mock('./supportedPrisonsService')
 
 const token = 'some token'
 
-const offenderNo = 'A1234BC'
-const prisonId = 'HEI'
-const prisonApiClient = new PrisonApiClient(null) as jest.Mocked<PrisonApiClient>
-const visitSchedulerApiClient = new VisitSchedulerApiClient(null) as jest.Mocked<VisitSchedulerApiClient>
-const prisonerContactRegistryApiClient = new PrisonerContactRegistryApiClient(
-  null,
-) as jest.Mocked<PrisonerContactRegistryApiClient>
-const prisonerSearchClient = new PrisonerSearchClient(null) as jest.Mocked<PrisonerSearchClient>
-const supportedPrisonsService = new SupportedPrisonsService(null, null, null) as jest.Mocked<SupportedPrisonsService>
-
 describe('Prisoner profile service', () => {
-  let hmppsAuthClient: jest.Mocked<HmppsAuthClient>
-  let prisonApiClientBuilder
-  let visitSchedulerApiClientBuilder
-  let prisonerContactRegistryApiClientBuilder
-  let prisonerSearchClientBuilder
+  const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
+  const prisonApiClient = new PrisonApiClient(null) as jest.Mocked<PrisonApiClient>
+  const prisonerContactRegistryApiClient = new PrisonerContactRegistryApiClient(
+    null,
+  ) as jest.Mocked<PrisonerContactRegistryApiClient>
+  const prisonerSearchClient = new PrisonerSearchClient(null) as jest.Mocked<PrisonerSearchClient>
+  const visitSchedulerApiClient = new VisitSchedulerApiClient(null) as jest.Mocked<VisitSchedulerApiClient>
+  const supportedPrisonsService = new SupportedPrisonsService(null, null, null) as jest.Mocked<SupportedPrisonsService>
+
   let prisonerProfileService: PrisonerProfileService
 
+  const PrisonApiClientFactory = jest.fn()
+  const PrisonerContactRegistryApiClientFactory = jest.fn()
+  const PrisonerSearchClientFactory = jest.fn()
+  const VisitSchedulerApiClientFactory = jest.fn()
+
+  const offenderNo = 'A1234BC'
+  const prisonId = 'HEI'
+
   beforeEach(() => {
-    hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
-    prisonApiClientBuilder = jest.fn().mockReturnValue(prisonApiClient)
-    visitSchedulerApiClientBuilder = jest.fn().mockReturnValue(visitSchedulerApiClient)
-    prisonerContactRegistryApiClientBuilder = jest.fn().mockReturnValue(prisonerContactRegistryApiClient)
-    prisonerSearchClientBuilder = jest.fn().mockReturnValue(prisonerSearchClient)
+    PrisonApiClientFactory.mockReturnValue(prisonApiClient)
+    PrisonerContactRegistryApiClientFactory.mockReturnValue(prisonerContactRegistryApiClient)
+    PrisonerSearchClientFactory.mockReturnValue(prisonerSearchClient)
+    VisitSchedulerApiClientFactory.mockReturnValue(visitSchedulerApiClient)
+
     prisonerProfileService = new PrisonerProfileService(
-      prisonApiClientBuilder,
-      visitSchedulerApiClientBuilder,
-      prisonerContactRegistryApiClientBuilder,
-      prisonerSearchClientBuilder,
+      PrisonApiClientFactory,
+      VisitSchedulerApiClientFactory,
+      PrisonerContactRegistryApiClientFactory,
+      PrisonerSearchClientFactory,
       supportedPrisonsService,
       hmppsAuthClient,
     )
@@ -139,6 +143,8 @@ describe('Prisoner profile service', () => {
 
       const results = await prisonerProfileService.getProfile(offenderNo, prisonId, 'user')
 
+      expect(PrisonApiClientFactory).toHaveBeenCalledWith(token)
+      expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user')
       expect(prisonApiClient.getBookings).toHaveBeenCalledTimes(1)
       expect(prisonApiClient.getOffender).toHaveBeenCalledTimes(1)
       expect(prisonApiClient.getVisitBalances).toHaveBeenCalledTimes(1)
@@ -219,6 +225,8 @@ describe('Prisoner profile service', () => {
 
       const results = await prisonerProfileService.getProfile(offenderNo, prisonId, 'user')
 
+      expect(PrisonApiClientFactory).toHaveBeenCalledWith(token)
+      expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user')
       expect(prisonApiClient.getBookings).toHaveBeenCalledTimes(1)
       expect(prisonApiClient.getOffender).toHaveBeenCalledTimes(1)
       expect(prisonApiClient.getVisitBalances).not.toHaveBeenCalled()

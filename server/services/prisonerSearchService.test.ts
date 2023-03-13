@@ -1,33 +1,36 @@
 import PrisonerSearchService from './prisonerSearchService'
-import PrisonerSearchClient from '../data/prisonerSearchClient'
 import TestData from '../routes/testutils/testData'
-import HmppsAuthClient from '../data/hmppsAuthClient'
+import { HmppsAuthClient, PrisonerSearchClient } from '../data'
 
 jest.mock('../data/hmppsAuthClient')
 jest.mock('../data/prisonerSearchClient')
 
-const prisonId = 'HEI'
-const search = 'some search'
-const prisonerSearchClient = new PrisonerSearchClient(null) as jest.Mocked<PrisonerSearchClient>
-
-const prisoner = TestData.prisoner()
+const token = 'some token'
 
 describe('Prisoner search service', () => {
-  let hmppsAuthClient: jest.Mocked<HmppsAuthClient>
-  let prisonerSearchClientBuilder
+  const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
+  const prisonerSearchClient = new PrisonerSearchClient(null) as jest.Mocked<PrisonerSearchClient>
+
   let prisonerSearchService: PrisonerSearchService
 
+  const PrisonerSearchClientFactory = jest.fn()
+
+  const prisonId = 'HEI'
+  const search = 'some search'
+
+  const prisoner = TestData.prisoner()
+
   beforeEach(() => {
-    hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
-    prisonerSearchClientBuilder = jest.fn().mockReturnValue(prisonerSearchClient)
-    prisonerSearchService = new PrisonerSearchService(prisonerSearchClientBuilder, hmppsAuthClient)
+    PrisonerSearchClientFactory.mockReturnValue(prisonerSearchClient)
+    prisonerSearchService = new PrisonerSearchService(PrisonerSearchClientFactory, hmppsAuthClient)
+    hmppsAuthClient.getSystemClientToken.mockResolvedValue(token)
+  })
+
+  afterEach(() => {
+    jest.resetAllMocks()
   })
 
   describe('getPrisoners', () => {
-    afterEach(() => {
-      jest.resetAllMocks()
-    })
-
     describe('prisoner search', () => {
       it('Retrieves and formats user name', async () => {
         prisonerSearchClient.getPrisoners.mockResolvedValue({

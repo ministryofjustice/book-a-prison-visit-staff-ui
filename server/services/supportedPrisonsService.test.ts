@@ -1,38 +1,39 @@
 import SupportedPrisonsService from './supportedPrisonsService'
-import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
-import PrisonRegisterApiClient from '../data/prisonRegisterApiClient'
 import TestData from '../routes/testutils/testData'
 import { PrisonDto } from '../data/prisonRegisterApiTypes'
-import HmppsAuthClient from '../data/hmppsAuthClient'
+import { HmppsAuthClient, PrisonRegisterApiClient, VisitSchedulerApiClient } from '../data'
 
 jest.mock('../data/hmppsAuthClient')
 jest.mock('../data/visitSchedulerApiClient')
 jest.mock('../data/prisonRegisterApiClient')
 
-const visitSchedulerApiClient = new VisitSchedulerApiClient(null) as jest.Mocked<VisitSchedulerApiClient>
-const prisonRegisterApiClient = new PrisonRegisterApiClient(null) as jest.Mocked<PrisonRegisterApiClient>
+const token = 'some token'
 
 describe('Supported prisons service', () => {
-  let hmppsAuthClient: jest.Mocked<HmppsAuthClient>
+  const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
+  const prisonRegisterApiClient = new PrisonRegisterApiClient(null) as jest.Mocked<PrisonRegisterApiClient>
+  const visitSchedulerApiClient = new VisitSchedulerApiClient(null) as jest.Mocked<VisitSchedulerApiClient>
+
   let supportedPrisonsService: SupportedPrisonsService
-  let visitSchedulerApiClientBuilder
-  let prisonRegisterApiClientBuilder
+
+  const PrisonRegisterApiClientFactory = jest.fn()
+  const VisitSchedulerApiClientFactory = jest.fn()
 
   const allPrisons = TestData.prisons()
   const supportedPrisons = TestData.supportedPrisons()
   const supportedPrisonIds = TestData.supportedPrisonIds()
 
   beforeEach(() => {
-    hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
-    visitSchedulerApiClientBuilder = jest.fn().mockReturnValue(visitSchedulerApiClient)
-    prisonRegisterApiClientBuilder = jest.fn().mockReturnValue(prisonRegisterApiClient)
+    PrisonRegisterApiClientFactory.mockReturnValue(prisonRegisterApiClient)
+    VisitSchedulerApiClientFactory.mockReturnValue(visitSchedulerApiClient)
     supportedPrisonsService = new SupportedPrisonsService(
-      visitSchedulerApiClientBuilder,
-      prisonRegisterApiClientBuilder,
+      VisitSchedulerApiClientFactory,
+      PrisonRegisterApiClientFactory,
       hmppsAuthClient,
     )
 
     prisonRegisterApiClient.getPrisons.mockResolvedValue(allPrisons as PrisonDto[])
+    hmppsAuthClient.getSystemClientToken.mockResolvedValue(token)
   })
 
   afterEach(() => {

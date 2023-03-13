@@ -8,18 +8,20 @@ jest.mock('../data/prisonApiClient')
 
 const token = 'some token'
 
-afterEach(() => {
-  jest.resetAllMocks()
-})
-
 describe('User service', () => {
   let hmppsAuthClient: jest.Mocked<HmppsAuthClient>
+  let prisonApiClient: jest.Mocked<PrisonApiClient>
   let userService: UserService
+
+  const PrisonApiClientFactory = jest.fn()
 
   describe('getUser', () => {
     beforeEach(() => {
       hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
-      userService = new UserService(hmppsAuthClient, undefined)
+      prisonApiClient = new PrisonApiClient(null) as jest.Mocked<PrisonApiClient>
+      PrisonApiClientFactory.mockReturnValue(prisonApiClient)
+      userService = new UserService(hmppsAuthClient, PrisonApiClientFactory)
+      hmppsAuthClient.getSystemClientToken.mockResolvedValue(token)
     })
 
     it('Retrieves and formats user name', async () => {
@@ -37,15 +39,7 @@ describe('User service', () => {
   })
 
   describe('getUserCaseLoadIds', () => {
-    const prisonApiClient = new PrisonApiClient(null) as jest.Mocked<PrisonApiClient>
-    let prisonApiClientBuilder
-
     const usersCaseLoads = TestData.caseLoads()
-
-    beforeEach(() => {
-      prisonApiClientBuilder = jest.fn().mockReturnValue(prisonApiClient)
-      userService = new UserService(hmppsAuthClient, prisonApiClientBuilder)
-    })
 
     it('should return an array of available caseload IDs for current user', async () => {
       prisonApiClient.getUserCaseLoads.mockResolvedValue(usersCaseLoads)
@@ -57,14 +51,6 @@ describe('User service', () => {
   })
 
   describe('setActiveCaseLoad', () => {
-    const prisonApiClient = new PrisonApiClient(null) as jest.Mocked<PrisonApiClient>
-    let prisonApiClientBuilder
-
-    beforeEach(() => {
-      prisonApiClientBuilder = jest.fn().mockReturnValue(prisonApiClient)
-      userService = new UserService(hmppsAuthClient, prisonApiClientBuilder)
-    })
-
     it('should set active case load for current user', async () => {
       prisonApiClient.setActiveCaseLoad.mockResolvedValue()
 
