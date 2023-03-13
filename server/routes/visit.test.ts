@@ -2,37 +2,34 @@ import type { Express } from 'express'
 import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
-import PrisonerSearchService from '../services/prisonerSearchService'
-import VisitSessionsService from '../services/visitSessionsService'
-import AuditService from '../services/auditService'
-import PrisonerVisitorsService from '../services/prisonerVisitorsService'
-import SupportedPrisonsService from '../services/supportedPrisonsService'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import { OutcomeDto, Visit } from '../data/visitSchedulerApiTypes'
 import { VisitorListItem, VisitSessionData } from '../@types/bapv'
 import config from '../config'
-import NotificationsService from '../services/notificationsService'
 import { clearSession } from './visitorUtils'
 import TestData from './testutils/testData'
-
-jest.mock('../services/prisonerSearchService')
-jest.mock('../services/visitSessionsService')
-jest.mock('../services/auditService')
-jest.mock('../services/prisonerVisitorsService')
-jest.mock('../services/prisonerProfileService')
-jest.mock('../services/supportedPrisonsService')
+import {
+  createMockAuditService,
+  createMockNotificationsService,
+  createMockPrisonerSearchService,
+  createMockPrisonerVisitorsService,
+  createMockSupportedPrisonsService,
+  createMockVisitSessionsService,
+} from '../services/testutils/mocks'
 
 let app: Express
+
+const auditService = createMockAuditService()
+const prisonerSearchService = createMockPrisonerSearchService()
+const prisonerVisitorsService = createMockPrisonerVisitorsService()
+const supportedPrisonsService = createMockSupportedPrisonsService()
+const visitSessionsService = createMockVisitSessionsService()
+
 let flashData: Record<string, string[] | Record<string, string>[]>
 let visitSessionData: VisitSessionData
+
 const supportedPrisons = TestData.supportedPrisons()
 const supportedPrisonIds = TestData.supportedPrisonIds()
-
-const prisonerSearchService = new PrisonerSearchService(null, null) as jest.Mocked<PrisonerSearchService>
-const visitSessionsService = new VisitSessionsService(null, null, null, null) as jest.Mocked<VisitSessionsService>
-const auditService = new AuditService() as jest.Mocked<AuditService>
-const prisonerVisitorsService = new PrisonerVisitorsService(null, null) as jest.Mocked<PrisonerVisitorsService>
-const supportedPrisonsService = new SupportedPrisonsService(null, null, null) as jest.Mocked<SupportedPrisonsService>
 
 jest.mock('./visitorUtils', () => {
   const visitorUtils = jest.requireActual('./visitorUtils')
@@ -50,10 +47,7 @@ beforeEach(() => {
     return flashData[key]
   })
   app = appWithAllRoutes({
-    prisonerSearchServiceOverride: prisonerSearchService,
-    visitSessionsServiceOverride: visitSessionsService,
-    auditServiceOverride: auditService,
-    prisonerVisitorsServiceOverride: prisonerVisitorsService,
+    services: { auditService, prisonerSearchService, prisonerVisitorsService, visitSessionsService },
   })
 })
 
@@ -115,11 +109,13 @@ describe('/visit/:reference', () => {
     visitSessionData = { prisoner: undefined }
 
     app = appWithAllRoutes({
-      prisonerSearchServiceOverride: prisonerSearchService,
-      visitSessionsServiceOverride: visitSessionsService,
-      auditServiceOverride: auditService,
-      prisonerVisitorsServiceOverride: prisonerVisitorsService,
-      supportedPrisonsServiceOverride: supportedPrisonsService,
+      services: {
+        auditService,
+        prisonerSearchService,
+        prisonerVisitorsService,
+        supportedPrisonsService,
+        visitSessionsService,
+      },
       sessionData: {
         visitSessionData,
       } as SessionData,
@@ -327,9 +323,7 @@ describe('/visit/:reference', () => {
 
     it('should not show booking summary if selected establishment does not match prison for which visit booked', () => {
       app = appWithAllRoutes({
-        visitSessionsServiceOverride: visitSessionsService,
-        auditServiceOverride: auditService,
-        supportedPrisonsServiceOverride: supportedPrisonsService,
+        services: { auditService, supportedPrisonsService, visitSessionsService },
         sessionData: {
           selectedEstablishment: { prisonId: 'BLI', prisonName: supportedPrisons.BLI },
         } as SessionData,
@@ -501,9 +495,7 @@ describe('/visit/:reference', () => {
 
     it('should redirect to /visit/:reference if selected establishment does not match prison for which visit booked', () => {
       app = appWithAllRoutes({
-        visitSessionsServiceOverride: visitSessionsService,
-        auditServiceOverride: auditService,
-        supportedPrisonsServiceOverride: supportedPrisonsService,
+        services: { auditService, supportedPrisonsService, visitSessionsService },
         sessionData: {
           selectedEstablishment: { prisonId: 'BLI', prisonName: supportedPrisons.BLI },
         } as SessionData,
@@ -598,7 +590,7 @@ describe('GET /visit/:reference/cancel', () => {
 })
 
 describe('POST /visit/:reference/cancel', () => {
-  const notificationsService = new NotificationsService(null) as jest.Mocked<NotificationsService>
+  const notificationsService = createMockNotificationsService()
   let cancelledVisit: Visit
   beforeEach(() => {
     cancelledVisit = TestData.visit()
@@ -608,11 +600,13 @@ describe('POST /visit/:reference/cancel', () => {
     supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
 
     app = appWithAllRoutes({
-      prisonerSearchServiceOverride: prisonerSearchService,
-      visitSessionsServiceOverride: visitSessionsService,
-      auditServiceOverride: auditService,
-      supportedPrisonsServiceOverride: supportedPrisonsService,
-      notificationsServiceOverride: notificationsService,
+      services: {
+        auditService,
+        notificationsService,
+        prisonerSearchService,
+        supportedPrisonsService,
+        visitSessionsService,
+      },
     })
   })
 

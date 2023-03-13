@@ -3,21 +3,17 @@ import request from 'supertest'
 import { SessionData } from 'express-session'
 import * as cheerio from 'cheerio'
 import { VisitSessionData, VisitSlot, VisitSlotList } from '../../@types/bapv'
-import VisitSessionsService from '../../services/visitSessionsService'
-import AuditService from '../../services/auditService'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
 import { Visit } from '../../data/visitSchedulerApiTypes'
-
-jest.mock('../../services/visitSessionsService')
-jest.mock('../../services/auditService')
+import { createMockAuditService, createMockVisitSessionsService } from '../../services/testutils/mocks'
 
 let sessionApp: Express
-const auditService = new AuditService() as jest.Mocked<AuditService>
+
+const auditService = createMockAuditService()
+const visitSessionsService = createMockVisitSessionsService()
 
 let flashData: Record<'errors' | 'formValues', Record<string, string | string[]>[]>
 let visitSessionData: VisitSessionData
-
-const visitSessionsService = new VisitSessionsService(null, null, null, null) as jest.Mocked<VisitSessionsService>
 
 const prisonId = 'HEI'
 
@@ -57,7 +53,7 @@ beforeEach(() => {
   }
 
   sessionApp = appWithAllRoutes({
-    visitSessionsServiceOverride: visitSessionsService,
+    services: { visitSessionsService },
     sessionData: {
       visitSessionData,
     } as SessionData,
@@ -172,7 +168,7 @@ testJourneys.forEach(journey => {
         visitSessionsService.getVisitSessions.mockResolvedValue({ slotsList: {}, whereaboutsAvailable: true })
 
         sessionApp = appWithAllRoutes({
-          visitSessionsServiceOverride: visitSessionsService,
+          services: { visitSessionsService },
           sessionData: {
             visitSessionData,
           } as SessionData,
@@ -198,7 +194,7 @@ testJourneys.forEach(journey => {
         visitSessionsService.getVisitSessions.mockResolvedValue({ slotsList, whereaboutsAvailable: false })
 
         sessionApp = appWithAllRoutes({
-          visitSessionsServiceOverride: visitSessionsService,
+          services: { visitSessionsService },
           sessionData: {
             visitSessionData,
           } as SessionData,
@@ -286,8 +282,7 @@ testJourneys.forEach(journey => {
         visitSessionsService.changeReservedVisit = jest.fn()
 
         sessionApp = appWithAllRoutes({
-          visitSessionsServiceOverride: visitSessionsService,
-          auditServiceOverride: auditService,
+          services: { auditService, visitSessionsService },
           sessionData: {
             slotsList,
             visitSessionData,

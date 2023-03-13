@@ -3,19 +3,17 @@ import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { appWithAllRoutes } from './testutils/appSetup'
 import config from '../config'
-import VisitSessionsService from '../services/visitSessionsService'
 import TestData from './testutils/testData'
-
-jest.mock('../services/visitSessionsService')
+import { createMockVisitSessionsService } from '../services/testutils/mocks'
 
 let app: Express
 
-const visitSessionsService = new VisitSessionsService(null, null, null, null) as jest.Mocked<VisitSessionsService>
+const visitSessionsService = createMockVisitSessionsService()
 
 beforeEach(() => {
   visitSessionsService.getSessionSchedule.mockResolvedValue([])
 
-  app = appWithAllRoutes({ visitSessionsServiceOverride: visitSessionsService })
+  app = appWithAllRoutes({ services: { visitSessionsService } })
 
   config.features.viewTimetableEnabled = true
 })

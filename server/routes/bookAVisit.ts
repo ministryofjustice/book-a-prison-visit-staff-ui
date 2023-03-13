@@ -1,11 +1,6 @@
 import type { RequestHandler, Router } from 'express'
 import sessionCheckMiddleware from '../middleware/sessionCheckMiddleware'
-import PrisonerVisitorsService from '../services/prisonerVisitorsService'
-import PrisonerProfileService from '../services/prisonerProfileService'
-import VisitSessionsService from '../services/visitSessionsService'
 import asyncMiddleware from '../middleware/asyncMiddleware'
-import NotificationsService from '../services/notificationsService'
-import AuditService from '../services/auditService'
 import SelectVisitors from './visitJourney/selectVisitors'
 import VisitType from './visitJourney/visitType'
 import DateAndTime from './visitJourney/dateAndTime'
@@ -13,15 +8,9 @@ import CheckYourBooking from './visitJourney/checkYourBooking'
 import Confirmation from './visitJourney/confirmation'
 import AdditionalSupport from './visitJourney/additionalSupport'
 import MainContact from './visitJourney/mainContact'
+import type { Services } from '../services'
 
-export default function routes(
-  router: Router,
-  prisonerVisitorsService: PrisonerVisitorsService,
-  visitSessionsService: VisitSessionsService,
-  prisonerProfileService: PrisonerProfileService,
-  notificationsService: NotificationsService,
-  auditService: AuditService,
-): Router {
+export default function routes(router: Router, services: Services): Router {
   const get = (path: string, ...handlers: RequestHandler[]) =>
     router.get(
       path,
@@ -34,12 +23,17 @@ export default function routes(
       handlers.map(handler => asyncMiddleware(handler)),
     )
 
-  const selectVisitors = new SelectVisitors('book', prisonerVisitorsService, prisonerProfileService)
-  const visitType = new VisitType('book', auditService)
-  const additionalSupport = new AdditionalSupport('book', visitSessionsService)
-  const dateAndTime = new DateAndTime('book', visitSessionsService, auditService)
+  const selectVisitors = new SelectVisitors('book', services.prisonerVisitorsService, services.prisonerProfileService)
+  const visitType = new VisitType('book', services.auditService)
+  const additionalSupport = new AdditionalSupport('book', services.visitSessionsService)
+  const dateAndTime = new DateAndTime('book', services.visitSessionsService, services.auditService)
   const mainContact = new MainContact('book')
-  const checkYourBooking = new CheckYourBooking('book', visitSessionsService, auditService, notificationsService)
+  const checkYourBooking = new CheckYourBooking(
+    'book',
+    services.visitSessionsService,
+    services.auditService,
+    services.notificationsService,
+  )
   const confirmation = new Confirmation('book')
 
   get('/select-visitors', sessionCheckMiddleware({ stage: 1 }), (req, res) => selectVisitors.get(req, res))

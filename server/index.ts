@@ -1,10 +1,6 @@
-import { dataAccess } from './data'
 import createApp from './app'
-import UserService from './services/userService'
+import { services } from './services'
 
-const { hmppsAuthClient, prisonApiClientBuilder } = dataAccess()
-const userService = new UserService(hmppsAuthClient, prisonApiClientBuilder)
-
-const app = createApp(userService, hmppsAuthClient)
+const app = createApp(services())
 
 export default app
