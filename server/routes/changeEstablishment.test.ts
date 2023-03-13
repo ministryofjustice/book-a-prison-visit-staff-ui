@@ -4,22 +4,17 @@ import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import * as visitorUtils from './visitorUtils'
-import SupportedPrisonsService from '../services/supportedPrisonsService'
-import AuditService from '../services/auditService'
 import TestData from './testutils/testData'
 import { Prison } from '../@types/bapv'
 import config from '../config'
-
-jest.mock('../services/supportedPrisonsService')
-jest.mock('../services/auditService')
+import { createMockAuditService, createMockSupportedPrisonsService } from '../services/testutils/mocks'
 
 let app: Express
 
-const supportedPrisonsService = new SupportedPrisonsService(null, null, null) as jest.Mocked<SupportedPrisonsService>
+const auditService = createMockAuditService()
+const supportedPrisonsService = createMockSupportedPrisonsService()
 
 const supportedPrisons = TestData.supportedPrisons()
-
-const auditService = new AuditService() as jest.Mocked<AuditService>
 
 beforeEach(() => {
   supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
@@ -31,7 +26,7 @@ afterEach(() => {
 
 describe('GET /change-establishment', () => {
   it('should render select establishment page with none selected', () => {
-    app = appWithAllRoutes({ supportedPrisonsServiceOverride: supportedPrisonsService })
+    app = appWithAllRoutes({ services: { supportedPrisonsService } })
 
     return request(app)
       .get('/change-establishment?referrer=/search/prisoner/')
@@ -49,7 +44,7 @@ describe('GET /change-establishment', () => {
   })
 
   it('should not set form action to be non-relative link when passed incorrectly', () => {
-    app = appWithAllRoutes({ supportedPrisonsServiceOverride: supportedPrisonsService })
+    app = appWithAllRoutes({ services: { supportedPrisonsService } })
 
     return request(app)
       .get('/change-establishment?referrer=//search/prisoner/')
@@ -63,7 +58,7 @@ describe('GET /change-establishment', () => {
 
   it('should render select establishment page, with current establishment selected', () => {
     app = appWithAllRoutes({
-      supportedPrisonsServiceOverride: supportedPrisonsService,
+      services: { supportedPrisonsService },
       sessionData: {
         selectedEstablishment: { prisonId: 'BLI', prisonName: supportedPrisons.BLI },
       } as SessionData,
@@ -89,7 +84,7 @@ describe('GET /change-establishment', () => {
   it('should inform user if they have no available prisons and link back to DPS', () => {
     supportedPrisonsService.getSupportedPrisons.mockResolvedValue({})
 
-    app = appWithAllRoutes({ supportedPrisonsServiceOverride: supportedPrisonsService })
+    app = appWithAllRoutes({ services: { supportedPrisonsService } })
 
     return request(app)
       .get('/change-establishment')
@@ -114,8 +109,7 @@ describe('POST /change-establishment', () => {
     sessionData = { selectedEstablishment } as SessionData
 
     app = appWithAllRoutes({
-      supportedPrisonsServiceOverride: supportedPrisonsService,
-      auditServiceOverride: auditService,
+      services: { supportedPrisonsService, auditService },
       sessionData,
     })
   })

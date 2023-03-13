@@ -3,10 +3,10 @@ import { NotFound } from 'http-errors'
 import config from '../config'
 import sessionTemplateFrequency from '../constants/sessionTemplateFrequency'
 import asyncMiddleware from '../middleware/asyncMiddleware'
-import VisitSessionsService from '../services/visitSessionsService'
+import type { Services } from '../services'
 import { getParsedDateFromQueryString, getWeekOfDatesStartingMonday } from '../utils/utils'
 
-export default function routes(router: Router, visitSessionService: VisitSessionsService): Router {
+export default function routes(router: Router, services: Services): Router {
   const get = (path: string | string[], handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
 
   get('/', async (req, res) => {
@@ -21,7 +21,7 @@ export default function routes(router: Router, visitSessionService: VisitSession
     const { weekOfDates, previousWeek, nextWeek } = getWeekOfDatesStartingMonday(selectedDate)
 
     const { prisonId } = req.session.selectedEstablishment
-    const schedules = await visitSessionService.getSessionSchedule({
+    const schedules = await services.visitSessionsService.getSessionSchedule({
       username: res.locals.user?.username,
       prisonId,
       date: selectedDate,

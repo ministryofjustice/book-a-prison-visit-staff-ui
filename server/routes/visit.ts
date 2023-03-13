@@ -5,18 +5,12 @@ import visitCancellationReasons from '../constants/visitCancellationReasons'
 import { Prisoner } from '../data/prisonerOffenderSearchTypes'
 import { OutcomeDto, Visit } from '../data/visitSchedulerApiTypes'
 import asyncMiddleware from '../middleware/asyncMiddleware'
-import PrisonerSearchService from '../services/prisonerSearchService'
-import VisitSessionsService from '../services/visitSessionsService'
-import AuditService from '../services/auditService'
 import { isValidVisitReference } from './validationChecks'
 import { clearSession, getFlashFormValues } from './visitorUtils'
-import NotificationsService from '../services/notificationsService'
 import config from '../config'
 import logger from '../../logger'
 import { VisitorListItem, VisitSessionData, VisitSlot } from '../@types/bapv'
-import PrisonerVisitorsService from '../services/prisonerVisitorsService'
 import SelectVisitors from './visitJourney/selectVisitors'
-import PrisonerProfileService from '../services/prisonerProfileService'
 import VisitType from './visitJourney/visitType'
 import { properCaseFullName } from '../utils/utils'
 import DateAndTime from './visitJourney/dateAndTime'
@@ -25,19 +19,10 @@ import CheckYourBooking from './visitJourney/checkYourBooking'
 import Confirmation from './visitJourney/confirmation'
 import MainContact from './visitJourney/mainContact'
 import sessionCheckMiddleware from '../middleware/sessionCheckMiddleware'
-import SupportedPrisonsService from '../services/supportedPrisonsService'
 import getPrisonConfiguration from '../constants/prisonConfiguration'
+import type { Services } from '../services'
 
-export default function routes(
-  router: Router,
-  prisonerSearchService: PrisonerSearchService,
-  visitSessionsService: VisitSessionsService,
-  notificationsService: NotificationsService,
-  auditService: AuditService,
-  prisonerVisitorsService: PrisonerVisitorsService,
-  prisonerProfileService: PrisonerProfileService,
-  supportedPrisonsService: SupportedPrisonsService,
-): Router {
+export default function routes(router: Router, services: Services): Router {
   const get = (path: string, ...handlers: RequestHandler[]) =>
     router.get(
       path,
@@ -69,13 +54,13 @@ export default function routes(
       visitors,
       additionalSupport,
     }: { visit: Visit; visitors: VisitorListItem[]; additionalSupport: string[] } =
-      await visitSessionsService.getFullVisitDetails({
+      await services.visitSessionsService.getFullVisitDetails({
         reference,
         username: res.locals.user?.username,
       })
 
     if (visit.prisonId !== req.session.selectedEstablishment.prisonId) {
-      const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(res.locals.user?.username)
+      const supportedPrisons = await services.supportedPrisonsService.getSupportedPrisons(res.locals.user?.username)
 
       return res.render('pages/visit/summary', {
         visit: { reference: visit.reference },
@@ -83,12 +68,15 @@ export default function routes(
       })
     }
 
-    const prisoner: Prisoner = await prisonerSearchService.getPrisonerById(visit.prisonerId, res.locals.user?.username)
-    const supportedPrisonIds = await supportedPrisonsService.getSupportedPrisonIds(res.locals.user?.username)
+    const prisoner: Prisoner = await services.prisonerSearchService.getPrisonerById(
+      visit.prisonerId,
+      res.locals.user?.username,
+    )
+    const supportedPrisonIds = await services.supportedPrisonsService.getSupportedPrisonIds(res.locals.user?.username)
 
     const prisonerLocation = getPrisonerLocation(supportedPrisonIds, prisoner)
 
-    await auditService.viewedVisitDetails({
+    await services.auditService.viewedVisitDetails({
       visitReference: reference,
       prisonerId: visit.prisonerId,
       prisonId: visit.prisonId,
@@ -115,7 +103,7 @@ export default function routes(
   post('/:reference', async (req, res) => {
     const reference = getVisitReference(req)
 
-    const { visit }: { visit: Visit } = await visitSessionsService.getFullVisitDetails({
+    const { visit }: { visit: Visit } = await services.visitSessionsService.getFullVisitDetails({
       reference,
       username: res.locals.user?.username,
     })
@@ -124,15 +112,18 @@ export default function routes(
       return res.redirect(`/visit/${visit.reference}`)
     }
 
-    const prisoner: Prisoner = await prisonerSearchService.getPrisonerById(visit.prisonerId, res.locals.user?.username)
-    const supportedPrisonIds = await supportedPrisonsService.getSupportedPrisonIds(res.locals.user?.username)
+    const prisoner: Prisoner = await services.prisonerSearchService.getPrisonerById(
+      visit.prisonerId,
+      res.locals.user?.username,
+    )
+    const supportedPrisonIds = await services.supportedPrisonsService.getSupportedPrisonIds(res.locals.user?.username)
 
     const prisonerLocation = getPrisonerLocation(supportedPrisonIds, prisoner)
 
     const visitorIds = visit.visitors.flatMap(visitor => visitor.nomisPersonId)
     const mainContactVisitor = visit.visitors.find(visitor => visitor.visitContact)
     const mainContactId = mainContactVisitor ? mainContactVisitor.nomisPersonId : null
-    const visitorList = await prisonerVisitorsService.getVisitors(visit.prisonerId, res.locals.user?.username)
+    const visitorList = await services.prisonerVisitorsService.getVisitors(visit.prisonerId, res.locals.user?.username)
     const currentVisitors = visitorList.filter(visitor => visitorIds.includes(visitor.personId))
     const mainContact = currentVisitors.find(visitor => visitor.personId === mainContactId)
 
@@ -176,12 +167,17 @@ export default function routes(
     return res.redirect(`/visit/${reference}/update/select-visitors`)
   })
 
-  const selectVisitors = new SelectVisitors('update', prisonerVisitorsService, prisonerProfileService)
-  const visitType = new VisitType('update', auditService)
-  const dateAndTime = new DateAndTime('update', visitSessionsService, auditService)
-  const additionalSupport = new AdditionalSupport('update', visitSessionsService)
+  const selectVisitors = new SelectVisitors('update', services.prisonerVisitorsService, services.prisonerProfileService)
+  const visitType = new VisitType('update', services.auditService)
+  const dateAndTime = new DateAndTime('update', services.visitSessionsService, services.auditService)
+  const additionalSupport = new AdditionalSupport('update', services.visitSessionsService)
   const mainContact = new MainContact('update')
-  const checkYourBooking = new CheckYourBooking('update', visitSessionsService, auditService, notificationsService)
+  const checkYourBooking = new CheckYourBooking(
+    'update',
+    services.visitSessionsService,
+    services.auditService,
+    services.notificationsService,
+  )
   const confirmation = new Confirmation('update')
 
   get(
@@ -308,9 +304,13 @@ export default function routes(
         text: req.body[reasonFieldName],
       }
 
-      const visit = await visitSessionsService.cancelVisit({ username: res.locals.user?.username, reference, outcome })
+      const visit = await services.visitSessionsService.cancelVisit({
+        username: res.locals.user?.username,
+        reference,
+        outcome,
+      })
 
-      await auditService.cancelledVisit({
+      await services.auditService.cancelledVisit({
         visitReference: reference,
         prisonerId: visit.prisonerId.toString(),
         prisonId: visit.prisonId,
@@ -323,12 +323,12 @@ export default function routes(
         try {
           const phoneNumber = visit.visitContact.telephone.replace(/\s/g, '')
 
-          const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(res.locals.user?.username)
+          const supportedPrisons = await services.supportedPrisonsService.getSupportedPrisons(res.locals.user?.username)
           const prisonName = supportedPrisons[visit.prisonId]
 
           const { prisonPhoneNumber } = getPrisonConfiguration(visit.prisonId)
 
-          await notificationsService.sendCancellationSms({
+          await services.notificationsService.sendCancellationSms({
             phoneNumber,
             visitSlot: visit.startTimestamp,
             prisonName,

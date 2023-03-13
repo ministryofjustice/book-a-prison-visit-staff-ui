@@ -3,22 +3,22 @@ import request from 'supertest'
 import * as cheerio from 'cheerio'
 import createError from 'http-errors'
 import { SessionData } from 'express-session'
-import PrisonerSearchService from '../services/prisonerSearchService'
-import VisitSessionsService from '../services/visitSessionsService'
 import { appWithAllRoutes } from './testutils/appSetup'
 import { PrisonerDetailsItem, VisitInformation } from '../@types/bapv'
-import AuditService from '../services/auditService'
 import TestData from './testutils/testData'
-
-jest.mock('../services/prisonerSearchService')
-jest.mock('../services/visitSessionsService')
-jest.mock('../services/auditService')
+import {
+  createMockAuditService,
+  createMockPrisonerSearchService,
+  createMockVisitSessionsService,
+} from '../services/testutils/mocks'
 
 let app: Express
+
+const auditService = createMockAuditService()
+const prisonerSearchService = createMockPrisonerSearchService()
+const visitSessionsService = createMockVisitSessionsService()
+
 const prisonId = 'HEI'
-const prisonerSearchService = new PrisonerSearchService(null, null) as jest.Mocked<PrisonerSearchService>
-const auditService = new AuditService() as jest.Mocked<AuditService>
-const visitSessionsService = new VisitSessionsService(null, null, null, null) as jest.Mocked<VisitSessionsService>
 
 let getPrisonersReturnData: {
   results: Array<PrisonerDetailsItem[]>
@@ -38,11 +38,7 @@ const getPrisonerReturnData = TestData.prisoner()
 let getVisit: VisitInformation
 
 beforeEach(() => {
-  app = appWithAllRoutes({
-    prisonerSearchServiceOverride: prisonerSearchService,
-    visitSessionsServiceOverride: visitSessionsService,
-    auditServiceOverride: auditService,
-  })
+  app = appWithAllRoutes({ services: { auditService, prisonerSearchService, visitSessionsService } })
 })
 
 afterEach(() => {
@@ -452,9 +448,7 @@ describe('Booking search page', () => {
       })
 
       app = appWithAllRoutes({
-        prisonerSearchServiceOverride: prisonerSearchService,
-        visitSessionsServiceOverride: visitSessionsService,
-        auditServiceOverride: auditService,
+        services: { auditService, prisonerSearchService, visitSessionsService },
         sessionData: { selectedEstablishment: { prisonId: 'XYZ' } } as SessionData,
       })
 

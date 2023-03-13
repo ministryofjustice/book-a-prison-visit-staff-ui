@@ -4,15 +4,14 @@ import { SessionData } from 'express-session'
 import * as cheerio from 'cheerio'
 import { VisitorListItem, VisitSessionData } from '../../@types/bapv'
 import { OffenderRestriction } from '../../data/prisonApiTypes'
-import PrisonerVisitorsService from '../../services/prisonerVisitorsService'
-import PrisonerProfileService from '../../services/prisonerProfileService'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
 import { Restriction } from '../../data/prisonerContactRegistryApiTypes'
-
-jest.mock('../../services/prisonerProfileService')
-jest.mock('../../services/prisonerVisitorsService')
+import { createMockPrisonerProfileService, createMockPrisonerVisitorsService } from '../../services/testutils/mocks'
 
 let sessionApp: Express
+
+const prisonerVisitorsService = createMockPrisonerVisitorsService()
+const prisonerProfileService = createMockPrisonerProfileService()
 
 let flashData: Record<'errors' | 'formValues', Record<string, string | string[]>[]>
 let visitSessionData: VisitSessionData
@@ -37,17 +36,6 @@ afterEach(() => {
 testJourneys.forEach(journey => {
   describe(`GET ${journey.urlPrefix}/select-visitors`, () => {
     const visitorList: { visitors: VisitorListItem[] } = { visitors: [] }
-
-    const prisonerVisitorsService = new PrisonerVisitorsService(null, null) as jest.Mocked<PrisonerVisitorsService>
-
-    const prisonerProfileService = new PrisonerProfileService(
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-    ) as jest.Mocked<PrisonerProfileService>
 
     let returnData: VisitorListItem[]
     let restrictions: OffenderRestriction[]
@@ -139,8 +127,7 @@ testJourneys.forEach(journey => {
       prisonerProfileService.getRestrictions.mockResolvedValue(restrictions)
 
       sessionApp = appWithAllRoutes({
-        prisonerProfileServiceOverride: prisonerProfileService,
-        prisonerVisitorsServiceOverride: prisonerVisitorsService,
+        services: { prisonerProfileService, prisonerVisitorsService },
         sessionData: {
           visitorList,
           visitSessionData,
@@ -178,8 +165,7 @@ testJourneys.forEach(journey => {
       prisonerProfileService.getRestrictions.mockResolvedValue(restrictions)
 
       sessionApp = appWithAllRoutes({
-        prisonerProfileServiceOverride: prisonerProfileService,
-        prisonerVisitorsServiceOverride: prisonerVisitorsService,
+        services: { prisonerProfileService, prisonerVisitorsService },
         sessionData: {
           visitorList,
           visitSessionData,
@@ -204,8 +190,7 @@ testJourneys.forEach(journey => {
       prisonerProfileService.getRestrictions.mockResolvedValue([])
 
       sessionApp = appWithAllRoutes({
-        prisonerProfileServiceOverride: prisonerProfileService,
-        prisonerVisitorsServiceOverride: prisonerVisitorsService,
+        services: { prisonerProfileService, prisonerVisitorsService },
         sessionData: {
           visitorList,
           visitSessionData,
@@ -432,8 +417,7 @@ testJourneys.forEach(journey => {
 
       it('should display prison specific content for Bristol', () => {
         sessionApp = appWithAllRoutes({
-          prisonerProfileServiceOverride: prisonerProfileService,
-          prisonerVisitorsServiceOverride: prisonerVisitorsService,
+          services: { prisonerProfileService, prisonerVisitorsService },
           sessionData: {
             selectedEstablishment: { prisonId: 'BLI', prisonName: '' },
             visitorList,
@@ -454,8 +438,7 @@ testJourneys.forEach(journey => {
 
       it('should display no prison specific content for a prison that is not configured', () => {
         sessionApp = appWithAllRoutes({
-          prisonerProfileServiceOverride: prisonerProfileService,
-          prisonerVisitorsServiceOverride: prisonerVisitorsService,
+          services: { prisonerProfileService, prisonerVisitorsService },
           sessionData: {
             selectedEstablishment: { prisonId: 'XYZ', prisonName: '' },
             visitorList,

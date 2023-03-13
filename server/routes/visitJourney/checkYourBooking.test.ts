@@ -3,19 +3,19 @@ import request from 'supertest'
 import { SessionData } from 'express-session'
 import * as cheerio from 'cheerio'
 import { VisitSessionData } from '../../@types/bapv'
-import VisitSessionsService from '../../services/visitSessionsService'
-import AuditService from '../../services/auditService'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
 import { Visit } from '../../data/visitSchedulerApiTypes'
 import config from '../../config'
-import NotificationsService from '../../services/notificationsService'
 import TestData from '../testutils/testData'
-
-jest.mock('../../services/visitSessionsService')
-jest.mock('../../services/auditService')
+import {
+  createMockAuditService,
+  createMockNotificationsService,
+  createMockVisitSessionsService,
+} from '../../services/testutils/mocks'
 
 let sessionApp: Express
-const auditService = new AuditService() as jest.Mocked<AuditService>
+
+const auditService = createMockAuditService()
 
 let flashData: Record<'errors' | 'formValues', Record<string, string | string[]>[]>
 let visitSessionData: VisitSessionData
@@ -160,9 +160,8 @@ testJourneys.forEach(journey => {
     })
 
     describe(`POST ${journey.urlPrefix}/check-your-booking`, () => {
-      const visitSessionsService = new VisitSessionsService(null, null, null, null) as jest.Mocked<VisitSessionsService>
-
-      const notificationsService = new NotificationsService(null) as jest.Mocked<NotificationsService>
+      const notificationsService = createMockNotificationsService()
+      const visitSessionsService = createMockVisitSessionsService()
 
       beforeEach(() => {
         const reservedVisit: Partial<Visit> = {
@@ -182,9 +181,7 @@ testJourneys.forEach(journey => {
         notificationsService.sendUpdateSms = jest.fn().mockResolvedValue({})
 
         sessionApp = appWithAllRoutes({
-          auditServiceOverride: auditService,
-          notificationsServiceOverride: notificationsService,
-          visitSessionsServiceOverride: visitSessionsService,
+          services: { auditService, notificationsService, visitSessionsService },
           sessionData: {
             availableSupportTypes,
             visitSessionData,
