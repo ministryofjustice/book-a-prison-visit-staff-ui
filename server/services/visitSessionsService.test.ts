@@ -13,26 +13,19 @@ import { ScheduledEvent } from '../data/whereaboutsApiTypes'
 import TestData from '../routes/testutils/testData'
 import VisitSessionsService from './visitSessionsService'
 import {
-  HmppsAuthClient,
-  PrisonerContactRegistryApiClient,
-  VisitSchedulerApiClient,
-  WhereaboutsApiClient,
-} from '../data'
-
-jest.mock('../data/hmppsAuthClient')
-jest.mock('../data/prisonerContactRegistryApiClient')
-jest.mock('../data/visitSchedulerApiClient')
-jest.mock('../data/whereaboutsApiClient')
+  createMockHmppsAuthClient,
+  createMockPrisonerContactRegistryApiClient,
+  createMockVisitSchedulerApiClient,
+  createMockWhereaboutsApiClient,
+} from '../data/testutils/mocks'
 
 const token = 'some token'
 
 describe('Visit sessions service', () => {
-  const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
-  const prisonerContactRegistryApiClient = new PrisonerContactRegistryApiClient(
-    null,
-  ) as jest.Mocked<PrisonerContactRegistryApiClient>
-  const visitSchedulerApiClient = new VisitSchedulerApiClient(null) as jest.Mocked<VisitSchedulerApiClient>
-  const whereaboutsApiClient = new WhereaboutsApiClient(null) as jest.Mocked<WhereaboutsApiClient>
+  const hmppsAuthClient = createMockHmppsAuthClient()
+  const prisonerContactRegistryApiClient = createMockPrisonerContactRegistryApiClient()
+  const visitSchedulerApiClient = createMockVisitSchedulerApiClient()
+  const whereaboutsApiClient = createMockWhereaboutsApiClient()
 
   let visitSessionsService: VisitSessionsService
 

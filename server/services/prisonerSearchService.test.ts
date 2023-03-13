@@ -1,15 +1,12 @@
 import PrisonerSearchService from './prisonerSearchService'
 import TestData from '../routes/testutils/testData'
-import { HmppsAuthClient, PrisonerSearchClient } from '../data'
-
-jest.mock('../data/hmppsAuthClient')
-jest.mock('../data/prisonerSearchClient')
+import { createMockHmppsAuthClient, createMockPrisonerSearchClient } from '../data/testutils/mocks'
 
 const token = 'some token'
 
 describe('Prisoner search service', () => {
-  const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
-  const prisonerSearchClient = new PrisonerSearchClient(null) as jest.Mocked<PrisonerSearchClient>
+  const hmppsAuthClient = createMockHmppsAuthClient()
+  const prisonerSearchClient = createMockPrisonerSearchClient()
 
   let prisonerSearchService: PrisonerSearchService
 
