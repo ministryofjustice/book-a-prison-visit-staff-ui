@@ -1,21 +1,12 @@
 import { Request, Response } from 'express'
 import { Cookie } from 'express-session'
 import { Prison } from '../@types/bapv'
-import HmppsAuthClient, { User } from '../data/hmppsAuthClient'
+import type { User } from '../data/hmppsAuthClient'
 import TestData from '../routes/testutils/testData'
-import SupportedPrisonsService from '../services/supportedPrisonsService'
+import { createMockSupportedPrisonsService } from '../services/testutils/mocks'
 import populateSelectedEstablishment from './populateSelectedEstablishment'
 
-jest.mock('../data/hmppsAuthClient')
-jest.mock('../services/supportedPrisonsService')
-
-const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
-
-const supportedPrisonsService = new SupportedPrisonsService(
-  null,
-  null,
-  hmppsAuthClient,
-) as jest.Mocked<SupportedPrisonsService>
+const supportedPrisonsService = createMockSupportedPrisonsService()
 
 const supportedPrisons = TestData.supportedPrisons()
 supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)

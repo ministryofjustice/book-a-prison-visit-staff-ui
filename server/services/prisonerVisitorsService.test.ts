@@ -1,18 +1,13 @@
 import PrisonerVisitorsService from './prisonerVisitorsService'
 import { Contact } from '../data/prisonerContactRegistryApiTypes'
 import { VisitorListItem } from '../@types/bapv'
-import { HmppsAuthClient, PrisonerContactRegistryApiClient } from '../data'
-
-jest.mock('../data/hmppsAuthClient')
-jest.mock('../data/prisonerContactRegistryApiClient')
+import { createMockHmppsAuthClient, createMockPrisonerContactRegistryApiClient } from '../data/testutils/mocks'
 
 const token = 'some token'
 
 describe('Prisoner visitor service', () => {
-  const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
-  const prisonerContactRegistryApiClient = new PrisonerContactRegistryApiClient(
-    null,
-  ) as jest.Mocked<PrisonerContactRegistryApiClient>
+  const hmppsAuthClient = createMockHmppsAuthClient()
+  const prisonerContactRegistryApiClient = createMockPrisonerContactRegistryApiClient()
   let prisonerVisitorsService: PrisonerVisitorsService
 
   const PrisonerContactRegistryApiClientFactory = jest.fn()

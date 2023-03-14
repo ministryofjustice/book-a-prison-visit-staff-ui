@@ -4,34 +4,25 @@ import { Alert, PagePrisonerBookingSummary, VisitBalances, OffenderRestrictions 
 import { PrisonerAlertItem, PrisonerProfile } from '../@types/bapv'
 import { PageVisitDto } from '../data/visitSchedulerApiTypes'
 import { Contact } from '../data/prisonerContactRegistryApiTypes'
-import SupportedPrisonsService from './supportedPrisonsService'
 import TestData from '../routes/testutils/testData'
 import {
-  HmppsAuthClient,
-  PrisonApiClient,
-  PrisonerContactRegistryApiClient,
-  PrisonerSearchClient,
-  VisitSchedulerApiClient,
-} from '../data'
-
-jest.mock('../data/hmppsAuthClient')
-jest.mock('../data/prisonApiClient')
-jest.mock('../data/prisonerContactRegistryApiClient')
-jest.mock('../data/prisonerSearchClient')
-jest.mock('../data/visitSchedulerApiClient')
-jest.mock('./supportedPrisonsService')
+  createMockHmppsAuthClient,
+  createMockPrisonApiClient,
+  createMockPrisonerContactRegistryApiClient,
+  createMockPrisonerSearchClient,
+  createMockVisitSchedulerApiClient,
+} from '../data/testutils/mocks'
+import { createMockSupportedPrisonsService } from './testutils/mocks'
 
 const token = 'some token'
 
 describe('Prisoner profile service', () => {
-  const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
-  const prisonApiClient = new PrisonApiClient(null) as jest.Mocked<PrisonApiClient>
-  const prisonerContactRegistryApiClient = new PrisonerContactRegistryApiClient(
-    null,
-  ) as jest.Mocked<PrisonerContactRegistryApiClient>
-  const prisonerSearchClient = new PrisonerSearchClient(null) as jest.Mocked<PrisonerSearchClient>
-  const visitSchedulerApiClient = new VisitSchedulerApiClient(null) as jest.Mocked<VisitSchedulerApiClient>
-  const supportedPrisonsService = new SupportedPrisonsService(null, null, null) as jest.Mocked<SupportedPrisonsService>
+  const hmppsAuthClient = createMockHmppsAuthClient()
+  const prisonApiClient = createMockPrisonApiClient()
+  const prisonerContactRegistryApiClient = createMockPrisonerContactRegistryApiClient()
+  const prisonerSearchClient = createMockPrisonerSearchClient()
+  const visitSchedulerApiClient = createMockVisitSchedulerApiClient()
+  const supportedPrisonsService = createMockSupportedPrisonsService()
 
   let prisonerProfileService: PrisonerProfileService
 

@@ -1,24 +1,19 @@
 import UserService from './userService'
-import HmppsAuthClient, { User } from '../data/hmppsAuthClient'
-import PrisonApiClient from '../data/prisonApiClient'
 import TestData from '../routes/testutils/testData'
-
-jest.mock('../data/hmppsAuthClient')
-jest.mock('../data/prisonApiClient')
+import { createMockHmppsAuthClient, createMockPrisonApiClient } from '../data/testutils/mocks'
+import type { User } from '../data/hmppsAuthClient'
 
 const token = 'some token'
 
 describe('User service', () => {
-  let hmppsAuthClient: jest.Mocked<HmppsAuthClient>
-  let prisonApiClient: jest.Mocked<PrisonApiClient>
+  const hmppsAuthClient = createMockHmppsAuthClient()
+  const prisonApiClient = createMockPrisonApiClient()
   let userService: UserService
 
   const PrisonApiClientFactory = jest.fn()
 
   describe('getUser', () => {
     beforeEach(() => {
-      hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
-      prisonApiClient = new PrisonApiClient(null) as jest.Mocked<PrisonApiClient>
       PrisonApiClientFactory.mockReturnValue(prisonApiClient)
       userService = new UserService(hmppsAuthClient, PrisonApiClientFactory)
       hmppsAuthClient.getSystemClientToken.mockResolvedValue(token)

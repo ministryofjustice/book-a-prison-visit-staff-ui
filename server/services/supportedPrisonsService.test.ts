@@ -1,18 +1,18 @@
 import SupportedPrisonsService from './supportedPrisonsService'
 import TestData from '../routes/testutils/testData'
 import { PrisonDto } from '../data/prisonRegisterApiTypes'
-import { HmppsAuthClient, PrisonRegisterApiClient, VisitSchedulerApiClient } from '../data'
-
-jest.mock('../data/hmppsAuthClient')
-jest.mock('../data/visitSchedulerApiClient')
-jest.mock('../data/prisonRegisterApiClient')
+import {
+  createMockHmppsAuthClient,
+  createMockPrisonRegisterApiClient,
+  createMockVisitSchedulerApiClient,
+} from '../data/testutils/mocks'
 
 const token = 'some token'
 
 describe('Supported prisons service', () => {
-  const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
-  const prisonRegisterApiClient = new PrisonRegisterApiClient(null) as jest.Mocked<PrisonRegisterApiClient>
-  const visitSchedulerApiClient = new VisitSchedulerApiClient(null) as jest.Mocked<VisitSchedulerApiClient>
+  const hmppsAuthClient = createMockHmppsAuthClient()
+  const prisonRegisterApiClient = createMockPrisonRegisterApiClient()
+  const visitSchedulerApiClient = createMockVisitSchedulerApiClient()
 
   let supportedPrisonsService: SupportedPrisonsService
 
