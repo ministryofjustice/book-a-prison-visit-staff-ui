@@ -1,4 +1,4 @@
-import type { RequestHandler, Router } from 'express'
+import { type RequestHandler, Router } from 'express'
 import sessionCheckMiddleware from '../middleware/sessionCheckMiddleware'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import SelectVisitors from './visitJourney/selectVisitors'
@@ -10,7 +10,15 @@ import AdditionalSupport from './visitJourney/additionalSupport'
 import MainContact from './visitJourney/mainContact'
 import type { Services } from '../services'
 
-export default function routes(router: Router, services: Services): Router {
+export default function routes({
+  auditService,
+  notificationsService,
+  prisonerProfileService,
+  prisonerVisitorsService,
+  visitSessionsService,
+}: Services): Router {
+  const router = Router()
+
   const get = (path: string, ...handlers: RequestHandler[]) =>
     router.get(
       path,
@@ -23,17 +31,12 @@ export default function routes(router: Router, services: Services): Router {
       handlers.map(handler => asyncMiddleware(handler)),
     )
 
-  const selectVisitors = new SelectVisitors('book', services.prisonerVisitorsService, services.prisonerProfileService)
-  const visitType = new VisitType('book', services.auditService)
-  const additionalSupport = new AdditionalSupport('book', services.visitSessionsService)
-  const dateAndTime = new DateAndTime('book', services.visitSessionsService, services.auditService)
+  const selectVisitors = new SelectVisitors('book', prisonerVisitorsService, prisonerProfileService)
+  const visitType = new VisitType('book', auditService)
+  const additionalSupport = new AdditionalSupport('book', visitSessionsService)
+  const dateAndTime = new DateAndTime('book', visitSessionsService, auditService)
   const mainContact = new MainContact('book')
-  const checkYourBooking = new CheckYourBooking(
-    'book',
-    services.visitSessionsService,
-    services.auditService,
-    services.notificationsService,
-  )
+  const checkYourBooking = new CheckYourBooking('book', visitSessionsService, auditService, notificationsService)
   const confirmation = new Confirmation('book')
 
   get('/select-visitors', sessionCheckMiddleware({ stage: 1 }), (req, res) => selectVisitors.get(req, res))

@@ -98,7 +98,7 @@ describe('/visit/:reference', () => {
     visit = TestData.visit({ createdTimestamp: '2022-01-01' })
 
     const fakeDate = new Date('2022-01-01')
-    jest.useFakeTimers({ doNotFake: ['nextTick'], now: fakeDate })
+    jest.useFakeTimers({ advanceTimers: true, now: new Date(fakeDate) })
 
     prisonerSearchService.getPrisonerById.mockResolvedValue(prisoner)
     visitSessionsService.getFullVisitDetails.mockResolvedValue({ visit, visitors, additionalSupport })

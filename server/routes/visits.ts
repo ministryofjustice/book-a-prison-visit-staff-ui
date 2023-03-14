@@ -1,4 +1,4 @@
-import type { RequestHandler, Router } from 'express'
+import { type RequestHandler, Router } from 'express'
 import format from 'date-fns/format'
 import config from '../config'
 import { ExtendedVisitInformation, PrisonerDetailsItem, VisitsPageSlot } from '../@types/bapv'
@@ -8,7 +8,9 @@ import { getDateTabs, getSlotsSideMenuData } from './visitsUtils'
 import { SessionCapacity } from '../data/visitSchedulerApiTypes'
 import type { Services } from '../services'
 
-export default function routes(router: Router, services: Services): Router {
+export default function routes({ auditService, prisonerSearchService, visitSessionsService }: Services): Router {
+  const router = Router()
+
   const get = (path: string | string[], ...handlers: RequestHandler[]) =>
     router.get(
       path,
@@ -36,7 +38,7 @@ export default function routes(router: Router, services: Services): Router {
         unknownSlots: VisitsPageSlot[]
         firstSlotTime: string
       }
-    } = await services.visitSessionsService.getVisitsByDate({
+    } = await visitSessionsService.getVisitsByDate({
       dateString: selectedDateString,
       username: res.locals.user?.username,
       prisonId,
@@ -98,7 +100,7 @@ export default function routes(router: Router, services: Services): Router {
 
     if (prisonersForVisit.length > 0) {
       ;({ results, numberOfResults, numberOfPages, next, previous } =
-        await services.prisonerSearchService.getPrisonersByPrisonerNumbers(
+        await prisonerSearchService.getPrisonersByPrisonerNumbers(
           prisonersForVisit,
           queryParams,
           res.locals.user?.username,
@@ -108,7 +110,7 @@ export default function routes(router: Router, services: Services): Router {
       // use first visit's details to request session capacity
       const sessionStartTime = format(new Date(filteredVisits[0].startTimestamp), 'HH:mm:ss')
       const sessionEndTime = format(new Date(filteredVisits[0].endTimestamp), 'HH:mm:ss')
-      const sessionCapacity: SessionCapacity = await services.visitSessionsService.getVisitSessionCapacity(
+      const sessionCapacity: SessionCapacity = await visitSessionsService.getVisitSessionCapacity(
         res.locals.user?.username,
         prisonId,
         selectedDateString,
@@ -133,7 +135,7 @@ export default function routes(router: Router, services: Services): Router {
       searchUrl: '/visits/',
     })
 
-    await services.auditService.viewedVisits({
+    await auditService.viewedVisits({
       viewDate: selectedDateString,
       prisonId,
       username: res.locals.user?.username,

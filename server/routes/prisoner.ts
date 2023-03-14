@@ -1,4 +1,4 @@
-import type { RequestHandler, Request, Router } from 'express'
+import { type RequestHandler, type Request, Router } from 'express'
 import { body, validationResult } from 'express-validator'
 import { BadRequest, NotFound } from 'http-errors'
 import { VisitSessionData } from '../@types/bapv'
@@ -8,7 +8,14 @@ import { isValidPrisonerNumber } from './validationChecks'
 import { clearSession } from './visitorUtils'
 import type { Services } from '../services'
 
-export default function routes(router: Router, services: Services): Router {
+export default function routes({
+  auditService,
+  prisonerProfileService,
+  prisonerSearchService,
+  visitSessionsService,
+}: Services): Router {
+  const router = Router()
+
   const get = (path: string, handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
   const post = (path: string, handler: RequestHandler) => router.post(path, asyncMiddleware(handler))
 
@@ -18,12 +25,8 @@ export default function routes(router: Router, services: Services): Router {
     const search = (req.query?.search as string) ?? ''
     const queryParamsForBackLink = search !== '' ? new URLSearchParams({ search }).toString() : ''
 
-    const prisonerProfile = await services.prisonerProfileService.getProfile(
-      offenderNo,
-      prisonId,
-      res.locals.user?.username,
-    )
-    await services.auditService.viewPrisoner({
+    const prisonerProfile = await prisonerProfileService.getProfile(offenderNo, prisonId, res.locals.user?.username)
+    await auditService.viewPrisoner({
       prisonerId: offenderNo,
       prisonId,
       username: res.locals.user?.username,
@@ -41,7 +44,7 @@ export default function routes(router: Router, services: Services): Router {
     const offenderNo = getOffenderNo(req)
     const { prisonId } = req.session.selectedEstablishment
 
-    const { inmateDetail, visitBalances } = await services.prisonerProfileService.getPrisonerAndVisitBalances(
+    const { inmateDetail, visitBalances } = await prisonerProfileService.getPrisonerAndVisitBalances(
       offenderNo,
       prisonId,
       res.locals.user?.username,
@@ -57,7 +60,7 @@ export default function routes(router: Router, services: Services): Router {
         return res.redirect(req.originalUrl)
       }
 
-      await services.auditService.overrodeZeroVO({
+      await auditService.overrodeZeroVO({
         prisonerId: offenderNo,
         username: res.locals.user?.username,
         operationId: res.locals.appInsightsOperationId,
@@ -87,17 +90,13 @@ export default function routes(router: Router, services: Services): Router {
     const search = (req.query?.search as string) ?? ''
     const queryParamsForBackLink = search !== '' ? new URLSearchParams({ search }).toString() : ''
 
-    const prisonerDetails = await services.prisonerSearchService.getPrisoner(
-      offenderNo,
-      prisonId,
-      res.locals.user?.username,
-    )
+    const prisonerDetails = await prisonerSearchService.getPrisoner(offenderNo, prisonId, res.locals.user?.username)
     if (prisonerDetails === null) {
       throw new NotFound()
     }
     const prisonerName = `${prisonerDetails.lastName}, ${prisonerDetails.firstName}`
 
-    const visits = await services.visitSessionsService.getUpcomingVisits({
+    const visits = await visitSessionsService.getUpcomingVisits({
       username: res.locals.user?.username,
       offenderNo,
       visitStatus: ['CANCELLED', 'BOOKED'],
