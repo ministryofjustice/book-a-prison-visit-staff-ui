@@ -25,11 +25,11 @@ export default function routes({
     const search = (req.query?.search as string) ?? ''
     const queryParamsForBackLink = search !== '' ? new URLSearchParams({ search }).toString() : ''
 
-    const prisonerProfile = await prisonerProfileService.getProfile(offenderNo, prisonId, res.locals.user?.username)
+    const prisonerProfile = await prisonerProfileService.getProfile(offenderNo, prisonId, res.locals.user.username)
     await auditService.viewPrisoner({
       prisonerId: offenderNo,
       prisonId,
-      username: res.locals.user?.username,
+      username: res.locals.user.username,
       operationId: res.locals.appInsightsOperationId,
     })
 
@@ -47,7 +47,7 @@ export default function routes({
     const { inmateDetail, visitBalances } = await prisonerProfileService.getPrisonerAndVisitBalances(
       offenderNo,
       prisonId,
-      res.locals.user?.username,
+      res.locals.user.username,
     )
 
     if (visitBalances?.remainingVo <= 0 && visitBalances?.remainingPvo <= 0) {
@@ -62,7 +62,7 @@ export default function routes({
 
       await auditService.overrodeZeroVO({
         prisonerId: offenderNo,
-        username: res.locals.user?.username,
+        username: res.locals.user.username,
         operationId: res.locals.appInsightsOperationId,
       })
     }
@@ -90,14 +90,14 @@ export default function routes({
     const search = (req.query?.search as string) ?? ''
     const queryParamsForBackLink = search !== '' ? new URLSearchParams({ search }).toString() : ''
 
-    const prisonerDetails = await prisonerSearchService.getPrisoner(offenderNo, prisonId, res.locals.user?.username)
+    const prisonerDetails = await prisonerSearchService.getPrisoner(offenderNo, prisonId, res.locals.user.username)
     if (prisonerDetails === null) {
       throw new NotFound()
     }
     const prisonerName = `${prisonerDetails.lastName}, ${prisonerDetails.firstName}`
 
     const visits = await visitSessionsService.getUpcomingVisits({
-      username: res.locals.user?.username,
+      username: res.locals.user.username,
       offenderNo,
       visitStatus: ['CANCELLED', 'BOOKED'],
     })

@@ -24,7 +24,7 @@ export default function routes({ auditService, supportedPrisonsService, userServ
     const availablePrisons = await getAvailablePrisonsForUser(
       supportedPrisonsService,
       userService,
-      res.locals.user?.username,
+      res.locals.user.username,
     )
 
     const referrer = (req.query?.referrer as string) ?? ''
@@ -41,7 +41,7 @@ export default function routes({ auditService, supportedPrisonsService, userServ
     const availablePrisons = await getAvailablePrisonsForUser(
       supportedPrisonsService,
       userService,
-      res.locals.user?.username,
+      res.locals.user.username,
     )
 
     await body('establishment').isIn(Object.keys(availablePrisons)).withMessage('No prison selected').run(req)
@@ -68,11 +68,11 @@ export default function routes({ auditService, supportedPrisonsService, userServ
     await auditService.changeEstablishment({
       previousEstablishment,
       newEstablishment: newEstablishment.prisonId,
-      username: res.locals.user?.username,
+      username: res.locals.user.username,
       operationId: res.locals.appInsightsOperationId,
     })
 
-    await userService.setActiveCaseLoad(newEstablishment.prisonId, res.locals.user?.username)
+    await userService.setActiveCaseLoad(newEstablishment.prisonId, res.locals.user.username)
 
     return res.redirect(redirectUrl)
   })

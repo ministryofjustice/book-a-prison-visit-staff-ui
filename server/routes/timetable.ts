@@ -24,7 +24,7 @@ export default function routes({ visitSessionsService }: Services): Router {
 
     const { prisonId } = req.session.selectedEstablishment
     const schedules = await visitSessionsService.getSessionSchedule({
-      username: res.locals.user?.username,
+      username: res.locals.user.username,
       prisonId,
       date: selectedDate,
     })

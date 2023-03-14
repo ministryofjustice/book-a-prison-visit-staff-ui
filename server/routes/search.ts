@@ -62,13 +62,13 @@ export default function routes({ auditService, prisonerSearchService, visitSessi
 
     const { results, numberOfPages, numberOfResults, next, previous } = hasValidationErrors
       ? { results: 0, numberOfPages: 0, numberOfResults: 0, next: 0, previous: 0 }
-      : await prisonerSearchService.getPrisoners(search, prisonId, res.locals.user?.username, parsedPage, isVisit)
+      : await prisonerSearchService.getPrisoners(search, prisonId, res.locals.user.username, parsedPage, isVisit)
 
     if (!hasValidationErrors) {
       await auditService.prisonerSearch({
         searchTerms: search,
         prisonId,
-        username: res.locals.user?.username,
+        username: res.locals.user.username,
         operationId: res.locals.appInsightsOperationId,
       })
     }
@@ -146,12 +146,12 @@ export default function routes({ auditService, prisonerSearchService, visitSessi
       try {
         visit = await visitSessionsService.getVisit({
           reference: search,
-          username: res.locals.user?.username,
+          username: res.locals.user.username,
           prisonId: req.session.selectedEstablishment.prisonId,
         })
         const prisonerDetails = await prisonerSearchService.getPrisonerById(
           visit.prisonNumber,
-          res.locals.user?.username,
+          res.locals.user.username,
         )
         visit.prisonerName = `${prisonerDetails.lastName}, ${prisonerDetails.firstName}`
       } catch (e) {
@@ -170,7 +170,7 @@ export default function routes({ auditService, prisonerSearchService, visitSessi
 
     await auditService.visitSearch({
       searchTerms: search,
-      username: res.locals.user?.username,
+      username: res.locals.user.username,
       operationId: res.locals.appInsightsOperationId,
     })
 

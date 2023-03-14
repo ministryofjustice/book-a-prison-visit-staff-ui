@@ -40,7 +40,7 @@ export default function routes({ auditService, prisonerSearchService, visitSessi
       }
     } = await visitSessionsService.getVisitsByDate({
       dateString: selectedDateString,
-      username: res.locals.user?.username,
+      username: res.locals.user.username,
       prisonId,
     })
 
@@ -103,7 +103,7 @@ export default function routes({ auditService, prisonerSearchService, visitSessi
         await prisonerSearchService.getPrisonersByPrisonerNumbers(
           prisonersForVisit,
           queryParams,
-          res.locals.user?.username,
+          res.locals.user.username,
           currentPage,
         ))
 
@@ -111,7 +111,7 @@ export default function routes({ auditService, prisonerSearchService, visitSessi
       const sessionStartTime = format(new Date(filteredVisits[0].startTimestamp), 'HH:mm:ss')
       const sessionEndTime = format(new Date(filteredVisits[0].endTimestamp), 'HH:mm:ss')
       const sessionCapacity: SessionCapacity = await visitSessionsService.getVisitSessionCapacity(
-        res.locals.user?.username,
+        res.locals.user.username,
         prisonId,
         selectedDateString,
         sessionStartTime,
@@ -138,7 +138,7 @@ export default function routes({ auditService, prisonerSearchService, visitSessi
     await auditService.viewedVisits({
       viewDate: selectedDateString,
       prisonId,
-      username: res.locals.user?.username,
+      username: res.locals.user.username,
       operationId: res.locals.appInsightsOperationId,
     })
 

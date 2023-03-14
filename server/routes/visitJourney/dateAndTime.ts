@@ -19,7 +19,7 @@ export default class DateAndTime {
     const { prisonId } = req.session.selectedEstablishment
     const { visitSessionData } = req.session
     const { slotsList, whereaboutsAvailable } = await this.visitSessionsService.getVisitSessions({
-      username: res.locals.user?.username,
+      username: res.locals.user.username,
       offenderNo: visitSessionData.prisoner.offenderNo,
       visitRestriction: visitSessionData.visitRestriction,
       prisonId,
@@ -110,12 +110,12 @@ export default class DateAndTime {
     // See README ('Visit journeys – book and update') for explanation of this flow
     if (visitSessionData.applicationReference) {
       await this.visitSessionsService.changeReservedVisit({
-        username: res.locals.user?.username,
+        username: res.locals.user.username,
         visitSessionData,
       })
     } else if (isUpdate) {
       const { applicationReference, visitStatus } = await this.visitSessionsService.changeBookedVisit({
-        username: res.locals.user?.username,
+        username: res.locals.user.username,
         visitSessionData,
       })
 
@@ -123,7 +123,7 @@ export default class DateAndTime {
       visitSessionData.visitStatus = visitStatus
     } else {
       const { applicationReference, reference, visitStatus } = await this.visitSessionsService.reserveVisit({
-        username: res.locals.user?.username,
+        username: res.locals.user.username,
         visitSessionData,
       })
 
@@ -141,7 +141,7 @@ export default class DateAndTime {
       startTimestamp: visitSessionData.visitSlot.startTimestamp,
       endTimestamp: visitSessionData.visitSlot.endTimestamp,
       visitRestriction: visitSessionData.visitRestriction,
-      username: res.locals.user?.username,
+      username: res.locals.user.username,
       operationId: res.locals.appInsightsOperationId,
     })
 
