@@ -51,7 +51,7 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
     selectVisitorsText: ['You can add up to 3 people.', 'At least one visitor must be 18 or older.'],
   },
   MHI: {
-    prisonPhoneNumber: 'To be confirmed',
+    prisonPhoneNumber: 'TBC',
     selectVisitorsText: [
       'You can add up to 3 people aged 18 and over, and 3 children under 18 years old. ',
       'At least one visitor must be 18 or older.',
