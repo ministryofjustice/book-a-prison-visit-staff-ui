@@ -15,7 +15,7 @@ export default class AdditionalSupport {
 
     if (!req.session.availableSupportTypes) {
       req.session.availableSupportTypes = await this.visitSessionsService.getAvailableSupportOptions(
-        res.locals.user?.username,
+        res.locals.user.username,
       )
     }
     const { availableSupportTypes } = req.session

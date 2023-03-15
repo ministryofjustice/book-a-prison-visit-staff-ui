@@ -2,23 +2,26 @@
 import express, { Express } from 'express'
 import createError from 'http-errors'
 import { Cookie, SessionData } from 'express-session'
+
 import indexRoutes from '../index'
-import searchRoutes from '../search'
+import bookAVisitRoutes from '../bookAVisit'
 import establishmentRoutes from '../changeEstablishment'
 import prisonerRoutes from '../prisoner'
-import bookAVisitRoutes from '../bookAVisit'
+import searchRoutes from '../search'
+import timetableRoutes from '../timetable'
 import visitRoutes from '../visit'
 import visitsRoutes from '../visits'
-import timetableRoutes from '../timetable'
+
 import nunjucksSetup from '../../utils/nunjucksSetup'
 import errorHandler from '../../errorHandler'
-import standardRouter from '../standardRouter'
+import * as auth from '../../authentication/auth'
+import setUpCurrentUser from '../../middleware/setUpCurrentUser'
+import type { Services } from '../../services'
+
 import UserService from '../../services/userService'
 import SupportedPrisonsService from '../../services/supportedPrisonsService'
-import * as auth from '../../authentication/auth'
 import { VisitorListItem, VisitSlotList, VisitSessionData } from '../../@types/bapv'
 import TestData from './testData'
-import type { Services } from '../../services'
 
 const user = {
   name: 'john smith',
@@ -82,7 +85,6 @@ function appSetup(
   app.set('view engine', 'njk')
 
   nunjucksSetup(app)
-
   app.use((req, res, next) => {
     res.locals = {}
     res.locals.user = user
@@ -99,8 +101,6 @@ function appSetup(
     }
     next()
   })
-
-  // app.use(cookieSession({ keys: [''] }))
   app.use(express.json())
   app.use(express.urlencoded({ extended: true }))
 
@@ -112,15 +112,16 @@ function appSetup(
     // eslint-disable-next-line no-param-reassign
     services.supportedPrisonsService = new MockSupportedPrisonsService()
   }
+  app.use(setUpCurrentUser(services))
 
-  app.use('/', indexRoutes(standardRouter(services)))
-  app.use('/book-a-visit/', bookAVisitRoutes(standardRouter(services), services))
-  app.use('/change-establishment/', establishmentRoutes(standardRouter(services), services))
-  app.use('/prisoner/', prisonerRoutes(standardRouter(services), services))
-  app.use('/search/', searchRoutes(standardRouter(services), services))
-  app.use('/timetable/', timetableRoutes(standardRouter(services), services))
-  app.use('/visit/', visitRoutes(standardRouter(services), services))
-  app.use('/visits', visitsRoutes(standardRouter(services), services))
+  app.use('/', indexRoutes())
+  app.use('/book-a-visit', bookAVisitRoutes(services))
+  app.use('/change-establishment', establishmentRoutes(services))
+  app.use('/prisoner', prisonerRoutes(services))
+  app.use('/search', searchRoutes(services))
+  app.use('/timetable', timetableRoutes(services))
+  app.use('/visit', visitRoutes(services))
+  app.use('/visits', visitsRoutes(services))
 
   app.use((req, res, next) => next(createError(404, 'Not found')))
   app.use(errorHandler(production))

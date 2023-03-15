@@ -1,4 +1,4 @@
-import type { RequestHandler, Router } from 'express'
+import { type RequestHandler, Router } from 'express'
 import { NotFound } from 'http-errors'
 import config from '../config'
 import sessionTemplateFrequency from '../constants/sessionTemplateFrequency'
@@ -6,7 +6,9 @@ import asyncMiddleware from '../middleware/asyncMiddleware'
 import type { Services } from '../services'
 import { getParsedDateFromQueryString, getWeekOfDatesStartingMonday } from '../utils/utils'
 
-export default function routes(router: Router, services: Services): Router {
+export default function routes({ visitSessionsService }: Services): Router {
+  const router = Router()
+
   const get = (path: string | string[], handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
 
   get('/', async (req, res) => {
@@ -21,8 +23,8 @@ export default function routes(router: Router, services: Services): Router {
     const { weekOfDates, previousWeek, nextWeek } = getWeekOfDatesStartingMonday(selectedDate)
 
     const { prisonId } = req.session.selectedEstablishment
-    const schedules = await services.visitSessionsService.getSessionSchedule({
-      username: res.locals.user?.username,
+    const schedules = await visitSessionsService.getSessionSchedule({
+      username: res.locals.user.username,
       prisonId,
       date: selectedDate,
     })
