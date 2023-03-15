@@ -52,6 +52,7 @@ export default defineConfig({
         // Visit scheduler
         stubAvailableSupport: visitScheduler.stubAvailableSupport,
         stubBookVisit: visitScheduler.stubBookVisit,
+        stubCancelVisit: visitScheduler.stubCancelVisit,
         stubChangeReservedSlot: visitScheduler.stubChangeReservedSlot,
         stubSupportedPrisonIds: visitScheduler.stubSupportedPrisonIds,
         stubUpcomingVisits: visitScheduler.stubUpcomingVisits,
