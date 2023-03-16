@@ -7,17 +7,24 @@ import * as visitorUtils from './visitorUtils'
 import TestData from './testutils/testData'
 import { Prison } from '../@types/bapv'
 import config from '../config'
-import { createMockAuditService, createMockSupportedPrisonsService } from '../services/testutils/mocks'
+import {
+  createMockAuditService,
+  createMockSupportedPrisonsService,
+  createMockUserService,
+} from '../services/testutils/mocks'
 
 let app: Express
 
 const auditService = createMockAuditService()
+const userService = createMockUserService()
 const supportedPrisonsService = createMockSupportedPrisonsService()
 
 const supportedPrisons = TestData.supportedPrisons()
 
 beforeEach(() => {
   supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
+
+  app = appWithAllRoutes({ services: { supportedPrisonsService } })
 })
 
 afterEach(() => {
@@ -26,8 +33,6 @@ afterEach(() => {
 
 describe('GET /change-establishment', () => {
   it('should render select establishment page with none selected', () => {
-    app = appWithAllRoutes({ services: { supportedPrisonsService } })
-
     return request(app)
       .get('/change-establishment?referrer=/search/prisoner/')
       .expect('Content-Type', /html/)
@@ -44,8 +49,6 @@ describe('GET /change-establishment', () => {
   })
 
   it('should not set form action to be non-relative link when passed incorrectly', () => {
-    app = appWithAllRoutes({ services: { supportedPrisonsService } })
-
     return request(app)
       .get('/change-establishment?referrer=//search/prisoner/')
       .expect('Content-Type', /html/)
@@ -78,13 +81,10 @@ describe('GET /change-establishment', () => {
       })
   })
 
-  // Setting up this scenario by having no prisons, rather than more accurately
-  // mocking user having no matching ones in caseload. Because of MockUserService
-  // in appSetup.ts - awaiting VB-1430 to revise once passing services is refactored
-  it('should inform user if they have no available prisons and link back to DPS', () => {
-    supportedPrisonsService.getSupportedPrisons.mockResolvedValue({})
+  it('should inform user if they have no available prisons in their caseload and link back to DPS', () => {
+    userService.getUserCaseLoadIds.mockResolvedValue(['UNSUPPORTED', 'PRISONS'])
 
-    app = appWithAllRoutes({ services: { supportedPrisonsService } })
+    app = appWithAllRoutes({ services: { supportedPrisonsService, userService } })
 
     return request(app)
       .get('/change-establishment')
@@ -107,9 +107,10 @@ describe('POST /change-establishment', () => {
 
     selectedEstablishment = { prisonId: 'BLI', prisonName: supportedPrisons.BLI }
     sessionData = { selectedEstablishment } as SessionData
+    userService.getUserCaseLoadIds.mockResolvedValue(TestData.supportedPrisonIds())
 
     app = appWithAllRoutes({
-      services: { supportedPrisonsService, auditService },
+      services: { auditService, supportedPrisonsService, userService },
       sessionData,
     })
   })
@@ -127,6 +128,7 @@ describe('POST /change-establishment', () => {
         ])
         expect(visitorUtils.clearSession).toHaveBeenCalledTimes(0)
         expect(auditService.changeEstablishment).toHaveBeenCalledTimes(0)
+        expect(userService.setActiveCaseLoad).not.toHaveBeenCalled()
       })
   })
 
@@ -143,6 +145,7 @@ describe('POST /change-establishment', () => {
         ])
         expect(visitorUtils.clearSession).toHaveBeenCalledTimes(0)
         expect(auditService.changeEstablishment).toHaveBeenCalledTimes(0)
+        expect(userService.setActiveCaseLoad).not.toHaveBeenCalled()
       })
   })
 
@@ -163,7 +166,7 @@ describe('POST /change-establishment', () => {
           username: 'user1',
           operationId: undefined,
         })
-        // @TODO should also check setActiveCaseLoad is called (awaiting VB-1430)
+        expect(userService.setActiveCaseLoad).toHaveBeenCalledWith('HEI', 'user1')
       })
   })
 
@@ -179,8 +182,8 @@ describe('POST /change-establishment', () => {
         expect(sessionData.selectedEstablishment).toStrictEqual(newEstablishment)
         expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)
         expect(auditService.changeEstablishment).toHaveBeenCalledTimes(1)
+        expect(userService.setActiveCaseLoad).toHaveBeenCalledWith('HEI', 'user1')
       })
-    // @TODO should also check setActiveCaseLoad is called (awaiting VB-1430)
   })
 
   it('should redirect to valid page when passed in querystring', () => {
@@ -195,6 +198,7 @@ describe('POST /change-establishment', () => {
         expect(sessionData.selectedEstablishment).toStrictEqual(newEstablishment)
         expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)
         expect(auditService.changeEstablishment).toHaveBeenCalledTimes(1)
+        expect(userService.setActiveCaseLoad).toHaveBeenCalledWith('HEI', 'user1')
       })
   })
 })
