@@ -1,6 +1,4 @@
 import type { RequestHandler, Router } from 'express'
-import { NotFound } from 'http-errors'
-import config from '../config'
 import sessionTemplateFrequency from '../constants/sessionTemplateFrequency'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import VisitSessionsService from '../services/visitSessionsService'
@@ -10,10 +8,6 @@ export default function routes(router: Router, visitSessionService: VisitSession
   const get = (path: string | string[], handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
 
   get('/', async (req, res) => {
-    if (!config.features.viewTimetableEnabled) {
-      throw new NotFound()
-    }
-
     const today = new Date()
     const { date = '' } = req.query
     const selectedDate = getParsedDateFromQueryString(date.toString(), today)
