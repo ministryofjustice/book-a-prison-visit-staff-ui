@@ -63,7 +63,7 @@ export default class AdditionalSupport {
   validate(): ValidationChain[] {
     return [
       body('additionalSupportRequired').custom((value: string) => {
-        if (!/^yes|no$/.test(value)) {
+        if (!/^(yes|no)$/.test(value)) {
           throw new Error('No answer selected')
         }
         return true
