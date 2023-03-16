@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
+import logger from '../../../logger'
 import { SupportType, VisitorSupport } from '../../data/visitSchedulerApiTypes'
 import VisitSessionsService from '../../services/visitSessionsService'
 import { getFlashFormValues } from '../visitorUtils'
@@ -56,6 +57,15 @@ export default class AdditionalSupport {
             return supportItem
           })
 
+    // Log info to debug VB-2004
+    const debugInfo = {
+      additionalSupportRequired: req.body.additionalSupportRequired,
+      additionalSupport: req.body.additionalSupport,
+      visitorSupport: visitSessionData.visitorSupport,
+      availableSupportTypes: req.session.availableSupportTypes?.length,
+    }
+    logger.info(`choose support visitorSupport debug: ${JSON.stringify(debugInfo)}`)
+
     const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
     return res.redirect(`${urlPrefix}/select-main-contact`)
   }
@@ -63,7 +73,7 @@ export default class AdditionalSupport {
   validate(): ValidationChain[] {
     return [
       body('additionalSupportRequired').custom((value: string) => {
-        if (!/^yes|no$/.test(value)) {
+        if (!/^(yes|no)$/.test(value)) {
           throw new Error('No answer selected')
         }
         return true

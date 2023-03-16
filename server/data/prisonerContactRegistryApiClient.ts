@@ -25,7 +25,7 @@ export default class PrisonerContactRegistryApiClient {
         }).toString(),
       })
     } catch (e) {
-      if (e.data.status !== 404) {
+      if (e.status !== 404) {
         throw e
       }
     }

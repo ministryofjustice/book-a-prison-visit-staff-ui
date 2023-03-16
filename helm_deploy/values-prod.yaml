@@ -23,7 +23,6 @@ generic-service:
     PRISON_REGISTER_API_URL: "https://prison-register.hmpps.service.justice.gov.uk"
     DPS_URL: "https://digital.prison.service.justice.gov.uk/"
     SMS_NOTIFICATIONS_ENABLED: "true"
-    FEATURE_VIEW_TIMETABLE_ENABLED: "false"
 
 generic-prometheus-alerts:
   alertSeverity: digital-prison-service
