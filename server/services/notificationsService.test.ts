@@ -1,18 +1,15 @@
 import { VisitSlot } from '../@types/bapv'
-import NotificationsApiClient from '../data/notificationsApiClient'
+import { createMockNotificationsApiClient } from '../data/testutils/mocks'
 import NotificationsService from './notificationsService'
 
-jest.mock('../data/notificationsApiClient')
-
-const notificationsApiClient = new NotificationsApiClient() as jest.Mocked<NotificationsApiClient>
-
 describe('Notifications service', () => {
-  let notificationsApiClientBuilder: () => NotificationsApiClient
+  const notificationsApiClient = createMockNotificationsApiClient()
+  const NotificationsApiClientFactory = jest.fn()
   let notificationsService: NotificationsService
 
   beforeEach(() => {
-    notificationsApiClientBuilder = jest.fn().mockReturnValue(notificationsApiClient)
-    notificationsService = new NotificationsService(notificationsApiClientBuilder)
+    NotificationsApiClientFactory.mockReturnValue(notificationsApiClient)
+    notificationsService = new NotificationsService(NotificationsApiClientFactory)
   })
 
   afterEach(() => {

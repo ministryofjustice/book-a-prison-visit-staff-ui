@@ -1,10 +1,4 @@
 import { NotFound } from 'http-errors'
-import PrisonerContactRegistryApiClient from '../data/prisonerContactRegistryApiClient'
-import VisitSessionsService from './visitSessionsService'
-import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
-import WhereaboutsApiClient from '../data/whereaboutsApiClient'
-import { VisitSession, Visit, OutcomeDto, PageVisitDto, SessionSchedule } from '../data/visitSchedulerApiTypes'
-import { Address, Contact, AddressUsage, Restriction } from '../data/prisonerContactRegistryApiTypes'
 import {
   VisitSlotList,
   VisitSessionData,
@@ -13,42 +7,47 @@ import {
   ExtendedVisitInformation,
   VisitsPageSlot,
 } from '../@types/bapv'
+import { Address, Contact, AddressUsage, Restriction } from '../data/prisonerContactRegistryApiTypes'
+import { VisitSession, Visit, OutcomeDto, PageVisitDto, SessionSchedule } from '../data/visitSchedulerApiTypes'
 import { ScheduledEvent } from '../data/whereaboutsApiTypes'
 import TestData from '../routes/testutils/testData'
-import HmppsAuthClient from '../data/hmppsAuthClient'
+import VisitSessionsService from './visitSessionsService'
+import {
+  createMockHmppsAuthClient,
+  createMockPrisonerContactRegistryApiClient,
+  createMockVisitSchedulerApiClient,
+  createMockWhereaboutsApiClient,
+} from '../data/testutils/mocks'
 
-jest.mock('../data/hmppsAuthClient')
-jest.mock('../data/prisonerContactRegistryApiClient')
-jest.mock('../data/visitSchedulerApiClient')
-jest.mock('../data/whereaboutsApiClient')
-
-const prisonerContactRegistryApiClient = new PrisonerContactRegistryApiClient(
-  null,
-) as jest.Mocked<PrisonerContactRegistryApiClient>
-const visitSchedulerApiClient = new VisitSchedulerApiClient(null) as jest.Mocked<VisitSchedulerApiClient>
-const whereaboutsApiClient = new WhereaboutsApiClient(null) as jest.Mocked<WhereaboutsApiClient>
+const token = 'some token'
 
 describe('Visit sessions service', () => {
-  let hmppsAuthClient: jest.Mocked<HmppsAuthClient>
-  let prisonerContactRegistryApiClientBuilder
-  let visitSchedulerApiClientBuilder
-  let whereaboutsApiClientBuilder
+  const hmppsAuthClient = createMockHmppsAuthClient()
+  const prisonerContactRegistryApiClient = createMockPrisonerContactRegistryApiClient()
+  const visitSchedulerApiClient = createMockVisitSchedulerApiClient()
+  const whereaboutsApiClient = createMockWhereaboutsApiClient()
+
   let visitSessionsService: VisitSessionsService
+
+  const PrisonerContactRegistryApiClientFactory = jest.fn()
+  const VisitSchedulerApiClientFactory = jest.fn()
+  const WhereaboutsApiClientFactory = jest.fn()
 
   const prisonId = 'HEI'
   const availableSupportTypes = TestData.supportTypes()
 
   beforeEach(() => {
-    hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
-    prisonerContactRegistryApiClientBuilder = jest.fn().mockReturnValue(prisonerContactRegistryApiClient)
-    visitSchedulerApiClientBuilder = jest.fn().mockReturnValue(visitSchedulerApiClient)
-    whereaboutsApiClientBuilder = jest.fn().mockReturnValue(whereaboutsApiClient)
+    PrisonerContactRegistryApiClientFactory.mockReturnValue(prisonerContactRegistryApiClient)
+    VisitSchedulerApiClientFactory.mockReturnValue(visitSchedulerApiClient)
+    WhereaboutsApiClientFactory.mockReturnValue(whereaboutsApiClient)
+
     visitSessionsService = new VisitSessionsService(
-      prisonerContactRegistryApiClientBuilder,
-      visitSchedulerApiClientBuilder,
-      whereaboutsApiClientBuilder,
+      PrisonerContactRegistryApiClientFactory,
+      VisitSchedulerApiClientFactory,
+      WhereaboutsApiClientFactory,
       hmppsAuthClient,
     )
+    hmppsAuthClient.getSystemClientToken.mockResolvedValue(token)
   })
 
   afterEach(() => {

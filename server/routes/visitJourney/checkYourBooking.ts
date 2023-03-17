@@ -58,12 +58,12 @@ export default class CheckYourBooking {
     try {
       // change reserved visit to have the latest data
       await this.visitSessionsService.changeReservedVisit({
-        username: res.locals.user?.username,
+        username: res.locals.user.username,
         visitSessionData,
       })
       // 'book' the visit: set it's status to BOOKED
       const bookedVisit = await this.visitSessionsService.bookVisit({
-        username: res.locals.user?.username,
+        username: res.locals.user.username,
         applicationReference: visitSessionData.applicationReference,
       })
 
@@ -78,7 +78,7 @@ export default class CheckYourBooking {
         startTimestamp: visitSessionData.visitSlot.startTimestamp,
         endTimestamp: visitSessionData.visitSlot.endTimestamp,
         visitRestriction: visitSessionData.visitRestriction,
-        username: res.locals.user?.username,
+        username: res.locals.user.username,
         operationId: res.locals.appInsightsOperationId,
       })
 

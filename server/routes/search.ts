@@ -1,21 +1,16 @@
-import type { RequestHandler, Router } from 'express'
+import { type RequestHandler, Router } from 'express'
 import url from 'url'
 import { body } from 'express-validator'
 import { validatePrisonerSearch, validateVisitSearch } from './searchValidation'
-import PrisonerSearchService from '../services/prisonerSearchService'
-import VisitSessionsService from '../services/visitSessionsService'
-import AuditService from '../services/auditService'
 import config from '../config'
 import { getResultsPagingLinks } from '../utils/utils'
 import { VisitInformation } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
+import type { Services } from '../services'
 
-export default function routes(
-  router: Router,
-  prisonerSearchService: PrisonerSearchService,
-  visitSessionsService: VisitSessionsService,
-  auditService: AuditService,
-): Router {
+export default function routes({ auditService, prisonerSearchService, visitSessionsService }: Services): Router {
+  const router = Router()
+
   const get = (path: string | string[], handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
   const post = (path: string | string[], ...handlers: RequestHandler[]) =>
     router.post(
@@ -67,13 +62,13 @@ export default function routes(
 
     const { results, numberOfPages, numberOfResults, next, previous } = hasValidationErrors
       ? { results: 0, numberOfPages: 0, numberOfResults: 0, next: 0, previous: 0 }
-      : await prisonerSearchService.getPrisoners(search, prisonId, res.locals.user?.username, parsedPage, isVisit)
+      : await prisonerSearchService.getPrisoners(search, prisonId, res.locals.user.username, parsedPage, isVisit)
 
     if (!hasValidationErrors) {
       await auditService.prisonerSearch({
         searchTerms: search,
         prisonId,
-        username: res.locals.user?.username,
+        username: res.locals.user.username,
         operationId: res.locals.appInsightsOperationId,
       })
     }
@@ -151,12 +146,12 @@ export default function routes(
       try {
         visit = await visitSessionsService.getVisit({
           reference: search,
-          username: res.locals.user?.username,
+          username: res.locals.user.username,
           prisonId: req.session.selectedEstablishment.prisonId,
         })
         const prisonerDetails = await prisonerSearchService.getPrisonerById(
           visit.prisonNumber,
-          res.locals.user?.username,
+          res.locals.user.username,
         )
         visit.prisonerName = `${prisonerDetails.lastName}, ${prisonerDetails.firstName}`
       } catch (e) {
@@ -175,7 +170,7 @@ export default function routes(
 
     await auditService.visitSearch({
       searchTerms: search,
-      username: res.locals.user?.username,
+      username: res.locals.user.username,
       operationId: res.locals.appInsightsOperationId,
     })
 

@@ -19,13 +19,13 @@ export default class SelectVisitors {
     const { visitSessionData } = req.session
     const { offenderNo } = visitSessionData.prisoner
 
-    const visitorList = await this.prisonerVisitorsService.getVisitors(offenderNo, res.locals.user?.username)
+    const visitorList = await this.prisonerVisitorsService.getVisitors(offenderNo, res.locals.user.username)
     if (!req.session.visitorList) {
       req.session.visitorList = { visitors: [] }
     }
     req.session.visitorList.visitors = visitorList
 
-    const restrictions = await this.prisonerProfileService.getRestrictions(offenderNo, res.locals.user?.username)
+    const restrictions = await this.prisonerProfileService.getRestrictions(offenderNo, res.locals.user.username)
     visitSessionData.prisoner.restrictions = restrictions
 
     const { selectVisitorsText } = getPrisonConfiguration(req.session.selectedEstablishment.prisonId)

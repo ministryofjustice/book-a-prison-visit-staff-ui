@@ -6,10 +6,8 @@ export default function populateSelectedEstablishment(
   supportedPrisonsService: SupportedPrisonsService,
 ): RequestHandler {
   return asyncMiddleware(async (req, res, next) => {
-    // using req.originalUrl rather than ideally req.path as this was causing problems
-    // because of middleware sometimes being called twice (expected to be resolved in VB-1430)
-    if (req.session.selectedEstablishment === undefined && !req.originalUrl.startsWith('/change-establishment')) {
-      const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(res.locals.user?.username)
+    if (req.session.selectedEstablishment === undefined && req.path !== '/change-establishment') {
+      const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(res.locals.user.username)
 
       const { activeCaseLoadId } = res.locals.user
 
@@ -23,7 +21,6 @@ export default function populateSelectedEstablishment(
       }
     }
     res.locals.selectedEstablishment = req.session.selectedEstablishment
-
     return next()
   })
 }

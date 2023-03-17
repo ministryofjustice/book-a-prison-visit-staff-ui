@@ -1,6 +1,5 @@
 import { convertToTitleCase } from '../utils/utils'
-import type HmppsAuthClient from '../data/hmppsAuthClient'
-import PrisonApiClient from '../data/prisonApiClient'
+import type { HmppsAuthClient, PrisonApiClient, RestClientBuilder } from '../data'
 import logger from '../../logger'
 
 interface UserDetails {
@@ -8,11 +7,10 @@ interface UserDetails {
   displayName: string
 }
 
-type PrisonApiClientBuilder = (token: string) => PrisonApiClient
 export default class UserService {
   constructor(
     private readonly hmppsAuthClient: HmppsAuthClient,
-    private readonly prisonApiClientBuilder: PrisonApiClientBuilder,
+    private readonly prisonApiClientFactory: RestClientBuilder<PrisonApiClient>,
   ) {}
 
   async getUser(token: string): Promise<UserDetails> {
@@ -22,7 +20,7 @@ export default class UserService {
 
   async getUserCaseLoadIds(username: string): Promise<string[]> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const prisonApiClient = this.prisonApiClientBuilder(token)
+    const prisonApiClient = this.prisonApiClientFactory(token)
 
     const caseLoads = await prisonApiClient.getUserCaseLoads()
 
@@ -33,7 +31,7 @@ export default class UserService {
 
   async setActiveCaseLoad(caseLoadId: string, username: string): Promise<void> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const prisonApiClient = this.prisonApiClientBuilder(token)
+    const prisonApiClient = this.prisonApiClientFactory(token)
 
     logger.info(`Setting case load to ${caseLoadId} for ${username}`)
     try {

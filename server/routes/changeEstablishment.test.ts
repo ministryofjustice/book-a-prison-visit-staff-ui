@@ -4,25 +4,27 @@ import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import * as visitorUtils from './visitorUtils'
-import SupportedPrisonsService from '../services/supportedPrisonsService'
-import AuditService from '../services/auditService'
 import TestData from './testutils/testData'
 import { Prison } from '../@types/bapv'
 import config from '../config'
-
-jest.mock('../services/supportedPrisonsService')
-jest.mock('../services/auditService')
+import {
+  createMockAuditService,
+  createMockSupportedPrisonsService,
+  createMockUserService,
+} from '../services/testutils/mocks'
 
 let app: Express
 
-const supportedPrisonsService = new SupportedPrisonsService(null, null, null) as jest.Mocked<SupportedPrisonsService>
+const auditService = createMockAuditService()
+const userService = createMockUserService()
+const supportedPrisonsService = createMockSupportedPrisonsService()
 
 const supportedPrisons = TestData.supportedPrisons()
 
-const auditService = new AuditService() as jest.Mocked<AuditService>
-
 beforeEach(() => {
   supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
+
+  app = appWithAllRoutes({ services: { supportedPrisonsService } })
 })
 
 afterEach(() => {
@@ -31,8 +33,6 @@ afterEach(() => {
 
 describe('GET /change-establishment', () => {
   it('should render select establishment page with none selected', () => {
-    app = appWithAllRoutes({ supportedPrisonsServiceOverride: supportedPrisonsService })
-
     return request(app)
       .get('/change-establishment?referrer=/search/prisoner/')
       .expect('Content-Type', /html/)
@@ -49,8 +49,6 @@ describe('GET /change-establishment', () => {
   })
 
   it('should not set form action to be non-relative link when passed incorrectly', () => {
-    app = appWithAllRoutes({ supportedPrisonsServiceOverride: supportedPrisonsService })
-
     return request(app)
       .get('/change-establishment?referrer=//search/prisoner/')
       .expect('Content-Type', /html/)
@@ -63,7 +61,7 @@ describe('GET /change-establishment', () => {
 
   it('should render select establishment page, with current establishment selected', () => {
     app = appWithAllRoutes({
-      supportedPrisonsServiceOverride: supportedPrisonsService,
+      services: { supportedPrisonsService },
       sessionData: {
         selectedEstablishment: { prisonId: 'BLI', prisonName: supportedPrisons.BLI },
       } as SessionData,
@@ -83,13 +81,10 @@ describe('GET /change-establishment', () => {
       })
   })
 
-  // Setting up this scenario by having no prisons, rather than more accurately
-  // mocking user having no matching ones in caseload. Because of MockUserService
-  // in appSetup.ts - awaiting VB-1430 to revise once passing services is refactored
-  it('should inform user if they have no available prisons and link back to DPS', () => {
-    supportedPrisonsService.getSupportedPrisons.mockResolvedValue({})
+  it('should inform user if they have no available prisons in their caseload and link back to DPS', () => {
+    userService.getUserCaseLoadIds.mockResolvedValue(['UNSUPPORTED', 'PRISONS'])
 
-    app = appWithAllRoutes({ supportedPrisonsServiceOverride: supportedPrisonsService })
+    app = appWithAllRoutes({ services: { supportedPrisonsService, userService } })
 
     return request(app)
       .get('/change-establishment')
@@ -112,10 +107,10 @@ describe('POST /change-establishment', () => {
 
     selectedEstablishment = { prisonId: 'BLI', prisonName: supportedPrisons.BLI }
     sessionData = { selectedEstablishment } as SessionData
+    userService.getUserCaseLoadIds.mockResolvedValue(TestData.supportedPrisonIds())
 
     app = appWithAllRoutes({
-      supportedPrisonsServiceOverride: supportedPrisonsService,
-      auditServiceOverride: auditService,
+      services: { auditService, supportedPrisonsService, userService },
       sessionData,
     })
   })
@@ -133,6 +128,7 @@ describe('POST /change-establishment', () => {
         ])
         expect(visitorUtils.clearSession).toHaveBeenCalledTimes(0)
         expect(auditService.changeEstablishment).toHaveBeenCalledTimes(0)
+        expect(userService.setActiveCaseLoad).not.toHaveBeenCalled()
       })
   })
 
@@ -149,6 +145,7 @@ describe('POST /change-establishment', () => {
         ])
         expect(visitorUtils.clearSession).toHaveBeenCalledTimes(0)
         expect(auditService.changeEstablishment).toHaveBeenCalledTimes(0)
+        expect(userService.setActiveCaseLoad).not.toHaveBeenCalled()
       })
   })
 
@@ -169,7 +166,7 @@ describe('POST /change-establishment', () => {
           username: 'user1',
           operationId: undefined,
         })
-        // @TODO should also check setActiveCaseLoad is called (awaiting VB-1430)
+        expect(userService.setActiveCaseLoad).toHaveBeenCalledWith('HEI', 'user1')
       })
   })
 
@@ -185,8 +182,8 @@ describe('POST /change-establishment', () => {
         expect(sessionData.selectedEstablishment).toStrictEqual(newEstablishment)
         expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)
         expect(auditService.changeEstablishment).toHaveBeenCalledTimes(1)
+        expect(userService.setActiveCaseLoad).toHaveBeenCalledWith('HEI', 'user1')
       })
-    // @TODO should also check setActiveCaseLoad is called (awaiting VB-1430)
   })
 
   it('should redirect to valid page when passed in querystring', () => {
@@ -201,6 +198,7 @@ describe('POST /change-establishment', () => {
         expect(sessionData.selectedEstablishment).toStrictEqual(newEstablishment)
         expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)
         expect(auditService.changeEstablishment).toHaveBeenCalledTimes(1)
+        expect(userService.setActiveCaseLoad).toHaveBeenCalledWith('HEI', 'user1')
       })
   })
 })

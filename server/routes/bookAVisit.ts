@@ -1,11 +1,6 @@
-import type { RequestHandler, Router } from 'express'
+import { type RequestHandler, Router } from 'express'
 import sessionCheckMiddleware from '../middleware/sessionCheckMiddleware'
-import PrisonerVisitorsService from '../services/prisonerVisitorsService'
-import PrisonerProfileService from '../services/prisonerProfileService'
-import VisitSessionsService from '../services/visitSessionsService'
 import asyncMiddleware from '../middleware/asyncMiddleware'
-import NotificationsService from '../services/notificationsService'
-import AuditService from '../services/auditService'
 import SelectVisitors from './visitJourney/selectVisitors'
 import VisitType from './visitJourney/visitType'
 import DateAndTime from './visitJourney/dateAndTime'
@@ -13,15 +8,17 @@ import CheckYourBooking from './visitJourney/checkYourBooking'
 import Confirmation from './visitJourney/confirmation'
 import AdditionalSupport from './visitJourney/additionalSupport'
 import MainContact from './visitJourney/mainContact'
+import type { Services } from '../services'
 
-export default function routes(
-  router: Router,
-  prisonerVisitorsService: PrisonerVisitorsService,
-  visitSessionsService: VisitSessionsService,
-  prisonerProfileService: PrisonerProfileService,
-  notificationsService: NotificationsService,
-  auditService: AuditService,
-): Router {
+export default function routes({
+  auditService,
+  notificationsService,
+  prisonerProfileService,
+  prisonerVisitorsService,
+  visitSessionsService,
+}: Services): Router {
+  const router = Router()
+
   const get = (path: string, ...handlers: RequestHandler[]) =>
     router.get(
       path,

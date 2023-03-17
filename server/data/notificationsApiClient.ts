@@ -4,13 +4,7 @@ import config from '../config'
 
 const { key, templates } = config.apis.notifications
 
-export const notificationsApiClientBuilder = (): NotificationsApiClient => {
-  const notificationsApiClient = new NotificationsApiClient()
-
-  return notificationsApiClient
-}
-
-class NotificationsApiClient {
+export default class NotificationsApiClient {
   private notificationsApiClient: NotifyClient
 
   constructor() {
@@ -99,5 +93,3 @@ class NotificationsApiClient {
     })
   }
 }
-
-export default NotificationsApiClient

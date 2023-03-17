@@ -1,5 +1,5 @@
 import config from '../config'
-import NotificationsApiClient, { notificationsApiClientBuilder } from './notificationsApiClient'
+import NotificationsApiClient from './notificationsApiClient'
 
 const { bookingConfirmation, cancellationConfirmation, updateConfirmation } = config.apis.notifications.templates
 const mockSendSms = jest.fn()
@@ -16,7 +16,7 @@ describe('GOV.UK Notify client', () => {
   let notificationsApiClient: NotificationsApiClient
 
   beforeEach(() => {
-    notificationsApiClient = notificationsApiClientBuilder()
+    notificationsApiClient = new NotificationsApiClient()
   })
 
   afterEach(() => {

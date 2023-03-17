@@ -1,7 +1,7 @@
 import { format } from 'date-fns'
 import { SmsResponse } from 'notifications-node-client'
 import { VisitSlot } from '../@types/bapv'
-import NotificationsApiClient from '../data/notificationsApiClient'
+import { NotificationsApiClient } from '../data'
 
 type NotificationsApiClientBuilder = () => NotificationsApiClient
 

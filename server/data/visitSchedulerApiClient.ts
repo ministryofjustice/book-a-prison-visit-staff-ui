@@ -12,41 +12,40 @@ import {
   SessionSchedule,
 } from './visitSchedulerApiTypes'
 import { VisitSessionData } from '../@types/bapv'
-import config from '../config'
+import config, { ApiConfig } from '../config'
 
-export const visitSchedulerApiClientBuilder = (token: string): VisitSchedulerApiClient => {
-  const restClient = new RestClient('visitSchedulerApi', config.apis.visitScheduler, token)
-  return new VisitSchedulerApiClient(restClient)
-}
-
-class VisitSchedulerApiClient {
-  constructor(private readonly restclient: RestClient) {}
+export default class VisitSchedulerApiClient {
+  private restClient: RestClient
 
   private visitType = 'SOCIAL'
+
+  constructor(token: string) {
+    this.restClient = new RestClient('visitSchedulerApiClient', config.apis.visitScheduler as ApiConfig, token)
+  }
 
   // Workaround for pagination, mentioned in comments - VB-1760
   private page = '0'
 
   private size = '1000'
 
-  getSupportedPrisonIds(): Promise<string[]> {
-    return this.restclient.get({
+  async getSupportedPrisonIds(): Promise<string[]> {
+    return this.restClient.get({
       path: '/config/prisons/supported',
     })
   }
 
-  getAvailableSupportOptions(): Promise<SupportType[]> {
-    return this.restclient.get({
+  async getAvailableSupportOptions(): Promise<SupportType[]> {
+    return this.restClient.get({
       path: '/visit-support',
     })
   }
 
-  getVisit(reference: string): Promise<Visit> {
-    return this.restclient.get({ path: `/visits/${reference}` })
+  async getVisit(reference: string): Promise<Visit> {
+    return this.restClient.get({ path: `/visits/${reference}` })
   }
 
-  getUpcomingVisits(offenderNo: string, visitStatus: Visit['visitStatus'][]): Promise<PageVisitDto> {
-    return this.restclient.get({
+  async getUpcomingVisits(offenderNo: string, visitStatus: Visit['visitStatus'][]): Promise<PageVisitDto> {
+    return this.restClient.get({
       path: '/visits/search',
       query: new URLSearchParams({
         prisonerId: offenderNo,
@@ -58,8 +57,12 @@ class VisitSchedulerApiClient {
     })
   }
 
-  getPastVisits(offenderNo: string, visitStatus: Visit['visitStatus'][], endTimestamp?: string): Promise<PageVisitDto> {
-    return this.restclient.get({
+  async getPastVisits(
+    offenderNo: string,
+    visitStatus: Visit['visitStatus'][],
+    endTimestamp?: string,
+  ): Promise<PageVisitDto> {
+    return this.restClient.get({
       path: '/visits/search',
       query: new URLSearchParams({
         prisonerId: offenderNo,
@@ -71,8 +74,8 @@ class VisitSchedulerApiClient {
     })
   }
 
-  getVisitsByDate(dateString: string, prisonId: string): Promise<PageVisitDto> {
-    return this.restclient.get({
+  async getVisitsByDate(dateString: string, prisonId: string): Promise<PageVisitDto> {
+    return this.restClient.get({
       path: '/visits/search',
       query: new URLSearchParams({
         prisonId,
@@ -85,8 +88,8 @@ class VisitSchedulerApiClient {
     })
   }
 
-  getVisitSessions(offenderNo: string, prisonId: string): Promise<VisitSession[]> {
-    return this.restclient.get({
+  async getVisitSessions(offenderNo: string, prisonId: string): Promise<VisitSession[]> {
+    return this.restClient.get({
       path: '/visit-sessions',
       query: new URLSearchParams({
         prisonId,
@@ -96,8 +99,8 @@ class VisitSchedulerApiClient {
     })
   }
 
-  getSessionSchedule(prisonId: string, date: string): Promise<SessionSchedule[]> {
-    return this.restclient.get({
+  async getSessionSchedule(prisonId: string, date: string): Promise<SessionSchedule[]> {
+    return this.restClient.get({
       path: '/visit-sessions/schedule',
       query: new URLSearchParams({
         prisonId,
@@ -113,7 +116,7 @@ class VisitSchedulerApiClient {
     sessionEndTime: string,
   ): Promise<SessionCapacity> {
     try {
-      return await this.restclient.get({
+      return await this.restClient.get({
         path: '/visit-sessions/capacity',
         query: new URLSearchParams({ prisonId, sessionDate, sessionStartTime, sessionEndTime }).toString(),
       })
@@ -122,8 +125,8 @@ class VisitSchedulerApiClient {
     }
   }
 
-  reserveVisit(visitSessionData: VisitSessionData): Promise<Visit> {
-    return this.restclient.post({
+  async reserveVisit(visitSessionData: VisitSessionData): Promise<Visit> {
+    return this.restClient.post({
       path: '/visits/slot/reserve',
       data: <ReserveVisitSlotDto>{
         prisonerId: visitSessionData.prisoner.offenderNo,
@@ -142,10 +145,10 @@ class VisitSchedulerApiClient {
     })
   }
 
-  changeReservedVisit(visitSessionData: VisitSessionData): Promise<Visit> {
+  async changeReservedVisit(visitSessionData: VisitSessionData): Promise<Visit> {
     const { visitContact, mainContactId } = this.convertMainContactToVisitContact(visitSessionData.mainContact)
 
-    return this.restclient.put({
+    return this.restClient.put({
       path: `/visits/${visitSessionData.applicationReference}/slot/change`,
       data: <ChangeVisitSlotRequestDto>{
         visitRestriction: visitSessionData.visitRestriction,
@@ -163,14 +166,14 @@ class VisitSchedulerApiClient {
     })
   }
 
-  bookVisit(applicationReference: string): Promise<Visit> {
-    return this.restclient.put({ path: `/visits/${applicationReference}/book` })
+  async bookVisit(applicationReference: string): Promise<Visit> {
+    return this.restClient.put({ path: `/visits/${applicationReference}/book` })
   }
 
-  changeBookedVisit(visitSessionData: VisitSessionData): Promise<Visit> {
+  async changeBookedVisit(visitSessionData: VisitSessionData): Promise<Visit> {
     const { visitContact, mainContactId } = this.convertMainContactToVisitContact(visitSessionData.mainContact)
 
-    return this.restclient.put({
+    return this.restClient.put({
       path: `/visits/${visitSessionData.visitReference}/change`,
       data: <ReserveVisitSlotDto>{
         prisonerId: visitSessionData.prisoner.offenderNo,
@@ -192,8 +195,8 @@ class VisitSchedulerApiClient {
     })
   }
 
-  cancelVisit(reference: string, outcome: OutcomeDto): Promise<Visit> {
-    return this.restclient.put({
+  async cancelVisit(reference: string, outcome: OutcomeDto): Promise<Visit> {
+    return this.restClient.put({
       path: `/visits/${reference}/cancel`,
       data: outcome,
     })
@@ -214,5 +217,3 @@ class VisitSchedulerApiClient {
     return { visitContact, mainContactId }
   }
 }
-
-export default VisitSchedulerApiClient
