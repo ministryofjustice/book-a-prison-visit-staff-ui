@@ -21,7 +21,7 @@ const next = jest.fn()
 describe('populateSelectedEstablishment', () => {
   beforeEach(() => {
     req = {
-      originalUrl: '/',
+      path: '/',
       session: {
         regenerate: jest.fn(),
         destroy: jest.fn(),
@@ -80,7 +80,7 @@ describe('populateSelectedEstablishment', () => {
     })
 
     it('should make no changes and not redirect if request path is /change-establishment', async () => {
-      req.originalUrl = '/change-establishment'
+      req.path = '/change-establishment'
 
       await populateSelectedEstablishment(supportedPrisonsService)(req, res, next)
 
@@ -112,7 +112,7 @@ describe('populateSelectedEstablishment', () => {
     })
 
     it('should make no changes and not redirect if request path is /change-establishment', async () => {
-      req.originalUrl = '/change-establishment'
+      req.path = '/change-establishment'
       res.locals.user.activeCaseLoadId = 'BLI'
       req.session.selectedEstablishment = { prisonId: 'HEI', prisonName: supportedPrisons.HEI }
 
