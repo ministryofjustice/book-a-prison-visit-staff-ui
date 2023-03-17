@@ -42,6 +42,8 @@ export default {
     port: parseInt(process.env.REDIS_PORT, 10) || 6379,
     password: process.env.REDIS_AUTH_TOKEN,
     tls_enabled: get('REDIS_TLS_ENABLED', 'false'),
+    systemTokenPrefix: `systemToken-${get('REDIS_KEY', 'clientsecretrediskey', requiredInProduction)}:`,
+    sessionPrefix: `sess-${get('REDIS_KEY', 'clientsecretrediskey', requiredInProduction)}:`,
   },
   session: {
     secret: get('SESSION_SECRET', 'app-insecure-default-session', requiredInProduction),
@@ -61,7 +63,6 @@ export default {
       apiClientSecret: get('API_CLIENT_SECRET', 'clientsecret', requiredInProduction),
       systemClientId: get('SYSTEM_CLIENT_ID', 'clientid', requiredInProduction),
       systemClientSecret: get('SYSTEM_CLIENT_SECRET', 'clientsecret', requiredInProduction),
-      systemClientRedisKey: get('SYSTEM_CLIENT_REDIS_KEY', 'clientsecretrediskey', requiredInProduction),
     },
     tokenVerification: {
       url: get('TOKEN_VERIFICATION_API_URL', 'http://localhost:8100', requiredInProduction),
