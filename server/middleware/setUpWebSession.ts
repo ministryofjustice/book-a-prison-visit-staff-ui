@@ -15,7 +15,7 @@ export default function setUpWebSession(): Router {
   const router = express.Router()
   router.use(
     session({
-      store: new RedisStore({ client: client as unknown as Client }),
+      store: new RedisStore({ client: client as unknown as Client, prefix: config.redis.sessionPrefix }),
       cookie: { secure: config.https, sameSite: 'lax', maxAge: config.session.expiryMinutes * 60 * 1000 },
       secret: config.session.secret,
       resave: false, // redis implements touch so shouldn't need this

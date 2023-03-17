@@ -42,6 +42,8 @@ export default {
     port: parseInt(process.env.REDIS_PORT, 10) || 6379,
     password: process.env.REDIS_AUTH_TOKEN,
     tls_enabled: get('REDIS_TLS_ENABLED', 'false'),
+    systemTokenPrefix: `systemToken-${get('REDIS_KEY', 'bapv-staff', requiredInProduction)}:`,
+    sessionPrefix: `sess-${get('REDIS_KEY', 'bapv-staff', requiredInProduction)}:`,
   },
   session: {
     secret: get('SESSION_SECRET', 'app-insecure-default-session', requiredInProduction),

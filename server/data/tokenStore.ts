@@ -1,9 +1,10 @@
 import type { RedisClient } from './redisClient'
 
+import config from '../config'
 import logger from '../../logger'
 
 export default class TokenStore {
-  private readonly prefix = 'systemToken:'
+  private readonly prefix = config.redis.systemTokenPrefix
 
   constructor(private readonly client: RedisClient) {
     client.on('error', error => {
