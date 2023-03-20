@@ -23,6 +23,7 @@ export default class SupportedPrisonsService {
     supportedPrisonIds.forEach(prisonId => {
       const supportedPrison = this.allPrisons.find(prison => prison.prisonId === prisonId)
       if (supportedPrison) {
+        // @ts-ignore
         supportedPrisons[supportedPrison.prisonId] = supportedPrison.prisonName
       }
     })

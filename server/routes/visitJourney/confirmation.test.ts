@@ -23,6 +23,7 @@ const availableSupportTypes = TestData.supportTypes()
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
   flashProvider.mockImplementation(key => {
+    // @ts-ignore
     return flashData[key]
   })
 })

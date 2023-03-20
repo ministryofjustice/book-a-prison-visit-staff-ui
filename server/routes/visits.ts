@@ -75,7 +75,9 @@ export default function routes({ auditService, prisonerSearchService, visitSessi
       unknown: slots.unknownSlots.find(slot => slot.visitTime === slotFilter) ?? { adults: 0, children: 0 },
     }
     const totals = {
+      // @ts-ignore
       adults: selectedSlots[visitType.toLowerCase()].adults,
+      // @ts-ignore
       children: selectedSlots[visitType.toLowerCase()].children,
     }
 

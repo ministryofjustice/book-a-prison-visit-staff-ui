@@ -93,6 +93,7 @@ async function getAvailablePrisonsForUser(
   Object.keys(supportedPrisons)
     .filter(prisonId => userCaseLoadsIds.includes(prisonId))
     .forEach(prisonId => {
+      // @ts-ignore
       availablePrisonsForUser[prisonId] = supportedPrisons[prisonId]
     })
 
