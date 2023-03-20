@@ -43,7 +43,7 @@ jest.mock('./visitorUtils', () => {
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
-  flashProvider.mockImplementation(key => {
+  flashProvider.mockImplementation((key: 'errors' | 'formValues') => {
     return flashData[key]
   })
   app = appWithAllRoutes({

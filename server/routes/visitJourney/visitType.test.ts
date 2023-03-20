@@ -18,8 +18,7 @@ const testJourneys = [{ urlPrefix: '/book-a-visit' }, { urlPrefix: '/visit/ab-cd
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
-  flashProvider.mockImplementation(key => {
-    // @ts-ignore
+  flashProvider.mockImplementation((key: 'errors' | 'formValues') => {
     return flashData[key]
   })
 })

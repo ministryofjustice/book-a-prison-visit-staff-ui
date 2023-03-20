@@ -23,7 +23,7 @@ let flashData: Record<string, string[] | Record<string, string>[]>
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
-  flashProvider.mockImplementation(key => {
+  flashProvider.mockImplementation((key: 'errors' | 'formValues') => {
     return flashData[key]
   })
   app = appWithAllRoutes({ services: { auditService, prisonerSearchService, visitSessionsService } })
