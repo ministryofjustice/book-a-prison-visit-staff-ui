@@ -74,11 +74,10 @@ export default function routes({ auditService, prisonerSearchService, visitSessi
       closed: slots.closedSlots.find(slot => slot.visitTime === slotFilter) ?? { adults: 0, children: 0 },
       unknown: slots.unknownSlots.find(slot => slot.visitTime === slotFilter) ?? { adults: 0, children: 0 },
     }
+    const visitTypeLowercase = visitType.toLowerCase() as 'open' | 'closed' | 'unknown'
     const totals = {
-      // @ts-ignore
-      adults: selectedSlots[visitType.toLowerCase()].adults,
-      // @ts-ignore
-      children: selectedSlots[visitType.toLowerCase()].children,
+      adults: selectedSlots[visitTypeLowercase].adults,
+      children: selectedSlots[visitTypeLowercase].children,
     }
 
     const filteredVisits = extendedVisitsInfo.filter(
