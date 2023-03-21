@@ -2,14 +2,15 @@ import type { Express } from 'express'
 import request from 'supertest'
 import { SessionData } from 'express-session'
 import * as cheerio from 'cheerio'
-import { VisitSessionData } from '../../@types/bapv'
+import { FlashData, VisitSessionData } from '../../@types/bapv'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
 import { VisitorSupport } from '../../data/visitSchedulerApiTypes'
 import TestData from '../testutils/testData'
 
 let sessionApp: Express
 
-let flashData: Record<'errors' | 'formValues', Record<string, string | string[]>[]>
+let flashData: FlashData
+
 let visitSessionData: VisitSessionData
 
 // run tests for booking and update journeys
@@ -19,7 +20,7 @@ const availableSupportTypes = TestData.supportTypes()
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
-  flashProvider.mockImplementation(key => {
+  flashProvider.mockImplementation((key: keyof FlashData) => {
     return flashData[key]
   })
 })

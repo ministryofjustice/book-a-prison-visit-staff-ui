@@ -4,7 +4,7 @@ import * as cheerio from 'cheerio'
 import { format } from 'date-fns'
 import { SessionData } from 'express-session'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
-import { ExtendedVisitInformation, PrisonerDetailsItem, VisitsPageSlot } from '../@types/bapv'
+import { ExtendedVisitInformation, FlashData, PrisonerDetailsItem, VisitsPageSlot } from '../@types/bapv'
 import TestData from './testutils/testData'
 import { getParsedDateFromQueryString } from '../utils/utils'
 import {
@@ -15,15 +15,15 @@ import {
 
 let app: Express
 
+let flashData: FlashData
+
 const auditService = createMockAuditService()
 const prisonerSearchService = createMockPrisonerSearchService()
 const visitSessionsService = createMockVisitSessionsService()
 
-let flashData: Record<string, string[] | Record<string, string>[]>
-
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
-  flashProvider.mockImplementation(key => {
+  flashProvider.mockImplementation((key: keyof FlashData) => {
     return flashData[key]
   })
   app = appWithAllRoutes({ services: { auditService, prisonerSearchService, visitSessionsService } })

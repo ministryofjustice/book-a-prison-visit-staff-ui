@@ -2,7 +2,7 @@ import type { Express } from 'express'
 import request from 'supertest'
 import { SessionData } from 'express-session'
 import * as cheerio from 'cheerio'
-import { VisitorListItem, VisitSessionData } from '../../@types/bapv'
+import { FlashData, VisitorListItem, VisitSessionData } from '../../@types/bapv'
 import { OffenderRestriction } from '../../data/prisonApiTypes'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
 import { Restriction } from '../../data/prisonerContactRegistryApiTypes'
@@ -10,10 +10,11 @@ import { createMockPrisonerProfileService, createMockPrisonerVisitorsService } f
 
 let sessionApp: Express
 
+let flashData: FlashData
+
 const prisonerVisitorsService = createMockPrisonerVisitorsService()
 const prisonerProfileService = createMockPrisonerProfileService()
 
-let flashData: Record<'errors' | 'formValues', Record<string, string | string[]>[]>
 let visitSessionData: VisitSessionData
 
 // run tests for booking and update journeys
@@ -24,7 +25,7 @@ const testJourneys = [
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
-  flashProvider.mockImplementation(key => {
+  flashProvider.mockImplementation((key: keyof FlashData) => {
     return flashData[key]
   })
 })

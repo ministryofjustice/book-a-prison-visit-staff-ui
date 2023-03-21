@@ -5,7 +5,7 @@ import { ExtendedVisitInformation, PrisonerDetailsItem, VisitsPageSlot } from '.
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import { getParsedDateFromQueryString, getResultsPagingLinks } from '../utils/utils'
 import { getDateTabs, getSlotsSideMenuData } from './visitsUtils'
-import { SessionCapacity } from '../data/visitSchedulerApiTypes'
+import { SessionCapacity, Visit } from '../data/visitSchedulerApiTypes'
 import type { Services } from '../services'
 
 export default function routes({ auditService, prisonerSearchService, visitSessionsService }: Services): Router {
@@ -24,8 +24,16 @@ export default function routes({ auditService, prisonerSearchService, visitSessi
 
   get('/', async (req, res) => {
     const { prisonId } = req.session.selectedEstablishment
+
+    type VisitRestriction = Visit['visitRestriction']
     const { type = 'OPEN', time = '', selectedDate = '', firstTabDate = '' } = req.query
-    let visitType = ['OPEN', 'CLOSED', 'UNKNOWN'].includes(type as string) ? (type as string) : 'OPEN'
+    let visitType: Visit['visitRestriction']
+    if (type === 'OPEN' || type === 'CLOSED' || type === 'UNKNOWN') {
+      visitType = type
+    } else {
+      visitType = 'OPEN'
+    }
+
     const selectedDateString = getParsedDateFromQueryString(selectedDate as string)
     const {
       extendedVisitsInfo,
@@ -75,8 +83,8 @@ export default function routes({ auditService, prisonerSearchService, visitSessi
       unknown: slots.unknownSlots.find(slot => slot.visitTime === slotFilter) ?? { adults: 0, children: 0 },
     }
     const totals = {
-      adults: selectedSlots[visitType.toLowerCase()].adults,
-      children: selectedSlots[visitType.toLowerCase()].children,
+      adults: selectedSlots[<Lowercase<VisitRestriction>>visitType.toLowerCase()].adults,
+      children: selectedSlots[<Lowercase<VisitRestriction>>visitType.toLowerCase()].children,
     }
 
     const filteredVisits = extendedVisitsInfo.filter(

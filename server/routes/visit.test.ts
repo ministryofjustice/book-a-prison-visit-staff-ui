@@ -4,7 +4,7 @@ import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import { OutcomeDto, Visit } from '../data/visitSchedulerApiTypes'
-import { VisitorListItem, VisitSessionData } from '../@types/bapv'
+import { FlashData, VisitorListItem, VisitSessionData } from '../@types/bapv'
 import config from '../config'
 import { clearSession } from './visitorUtils'
 import TestData from './testutils/testData'
@@ -19,13 +19,14 @@ import {
 
 let app: Express
 
+let flashData: FlashData
+
 const auditService = createMockAuditService()
 const prisonerSearchService = createMockPrisonerSearchService()
 const prisonerVisitorsService = createMockPrisonerVisitorsService()
 const supportedPrisonsService = createMockSupportedPrisonsService()
 const visitSessionsService = createMockVisitSessionsService()
 
-let flashData: Record<string, string[] | Record<string, string>[]>
 let visitSessionData: VisitSessionData
 
 const supportedPrisons = TestData.supportedPrisons()
@@ -43,7 +44,7 @@ jest.mock('./visitorUtils', () => {
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
-  flashProvider.mockImplementation(key => {
+  flashProvider.mockImplementation((key: keyof FlashData) => {
     return flashData[key]
   })
   app = appWithAllRoutes({

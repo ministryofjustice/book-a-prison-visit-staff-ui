@@ -88,7 +88,7 @@ async function getAvailablePrisonsForUser(
   const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(username)
   const userCaseLoadsIds = await userService.getUserCaseLoadIds(username)
 
-  const availablePrisonsForUser = {}
+  const availablePrisonsForUser: Record<string, string> = {}
 
   Object.keys(supportedPrisons)
     .filter(prisonId => userCaseLoadsIds.includes(prisonId))

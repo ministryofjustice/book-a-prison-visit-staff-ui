@@ -2,17 +2,18 @@ import type { Express } from 'express'
 import request from 'supertest'
 import { SessionData } from 'express-session'
 import * as cheerio from 'cheerio'
-import { VisitSessionData, VisitSlot, VisitSlotList } from '../../@types/bapv'
+import { FlashData, VisitSessionData, VisitSlot, VisitSlotList } from '../../@types/bapv'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
 import { Visit } from '../../data/visitSchedulerApiTypes'
 import { createMockAuditService, createMockVisitSessionsService } from '../../services/testutils/mocks'
 
 let sessionApp: Express
 
+let flashData: FlashData
+
 const auditService = createMockAuditService()
 const visitSessionsService = createMockVisitSessionsService()
 
-let flashData: Record<'errors' | 'formValues', Record<string, string | string[]>[]>
 let visitSessionData: VisitSessionData
 
 const prisonId = 'HEI'
@@ -25,7 +26,7 @@ const testJourneys = [
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
-  flashProvider.mockImplementation(key => {
+  flashProvider.mockImplementation((key: keyof FlashData) => {
     return flashData[key]
   })
 

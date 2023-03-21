@@ -2,7 +2,7 @@ import type { Express } from 'express'
 import request from 'supertest'
 import { SessionData } from 'express-session'
 import * as cheerio from 'cheerio'
-import { VisitSessionData } from '../../@types/bapv'
+import { FlashData, VisitSessionData } from '../../@types/bapv'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
 import { Visit } from '../../data/visitSchedulerApiTypes'
 import config from '../../config'
@@ -15,9 +15,10 @@ import {
 
 let sessionApp: Express
 
+let flashData: FlashData
+
 const auditService = createMockAuditService()
 
-let flashData: Record<'errors' | 'formValues', Record<string, string | string[]>[]>
 let visitSessionData: VisitSessionData
 
 const testJourneys = [
@@ -29,7 +30,7 @@ const availableSupportTypes = TestData.supportTypes()
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
-  flashProvider.mockImplementation(key => {
+  flashProvider.mockImplementation((key: keyof FlashData) => {
     return flashData[key]
   })
 })
