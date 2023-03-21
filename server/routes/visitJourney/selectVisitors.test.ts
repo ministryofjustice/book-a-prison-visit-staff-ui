@@ -2,7 +2,7 @@ import type { Express } from 'express'
 import request from 'supertest'
 import { SessionData } from 'express-session'
 import * as cheerio from 'cheerio'
-import { VisitorListItem, VisitSessionData } from '../../@types/bapv'
+import { FlashData, VisitorListItem, VisitSessionData } from '../../@types/bapv'
 import { OffenderRestriction } from '../../data/prisonApiTypes'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
 import { Restriction } from '../../data/prisonerContactRegistryApiTypes'
@@ -10,7 +10,6 @@ import { createMockPrisonerProfileService, createMockPrisonerVisitorsService } f
 
 let sessionApp: Express
 
-type FlashData = Record<string, string[] | Record<string, string>[]>
 let flashData: FlashData
 
 const prisonerVisitorsService = createMockPrisonerVisitorsService()

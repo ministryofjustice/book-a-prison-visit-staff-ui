@@ -2,7 +2,7 @@ import type { Express } from 'express'
 import request from 'supertest'
 import { SessionData } from 'express-session'
 import * as cheerio from 'cheerio'
-import { VisitSessionData } from '../../@types/bapv'
+import { FlashData, VisitSessionData } from '../../@types/bapv'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
 import { Visit } from '../../data/visitSchedulerApiTypes'
 import config from '../../config'
@@ -19,7 +19,6 @@ const auditService = createMockAuditService()
 
 let visitSessionData: VisitSessionData
 
-type FlashData = Record<string, string[] | Record<string, string>[]>
 let flashData: FlashData
 
 const testJourneys = [
