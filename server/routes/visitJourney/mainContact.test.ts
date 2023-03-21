@@ -2,12 +2,11 @@ import type { Express } from 'express'
 import request from 'supertest'
 import { SessionData } from 'express-session'
 import * as cheerio from 'cheerio'
-import { VisitorListItem, VisitSessionData } from '../../@types/bapv'
+import { FlashData, VisitorListItem, VisitSessionData } from '../../@types/bapv'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
 
 let sessionApp: Express
 
-type FlashData = Record<string, string[] | Record<string, string>[]>
 let flashData: FlashData
 
 let visitSessionData: VisitSessionData

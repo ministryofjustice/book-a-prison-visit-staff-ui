@@ -245,3 +245,5 @@ export type VisitsPageSlot = {
   adults: number
   children: number
 }
+
+export type FlashData = Record<string, string[] | Record<string, string>[]>

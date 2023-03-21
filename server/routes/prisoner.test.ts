@@ -2,7 +2,7 @@ import type { Express } from 'express'
 import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
-import { PrisonerProfile, BAPVVisitBalances, VisitInformation, VisitSessionData } from '../@types/bapv'
+import { PrisonerProfile, BAPVVisitBalances, VisitInformation, VisitSessionData, FlashData } from '../@types/bapv'
 import { InmateDetail, VisitBalances } from '../data/prisonApiTypes'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import { clearSession } from './visitorUtils'
@@ -25,7 +25,6 @@ const prisonId = 'HEI'
 
 let visitSessionData: Partial<VisitSessionData>
 
-type FlashData = Record<string, string[] | Record<string, string>[]>
 let flashData: FlashData
 
 jest.mock('./visitorUtils', () => ({

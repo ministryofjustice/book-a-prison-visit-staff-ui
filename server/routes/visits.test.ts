@@ -4,7 +4,7 @@ import * as cheerio from 'cheerio'
 import { format } from 'date-fns'
 import { SessionData } from 'express-session'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
-import { ExtendedVisitInformation, PrisonerDetailsItem, VisitsPageSlot } from '../@types/bapv'
+import { ExtendedVisitInformation, FlashData, PrisonerDetailsItem, VisitsPageSlot } from '../@types/bapv'
 import TestData from './testutils/testData'
 import { getParsedDateFromQueryString } from '../utils/utils'
 import {
@@ -15,7 +15,6 @@ import {
 
 let app: Express
 
-type FlashData = Record<string, string[] | Record<string, string>[]>
 let flashData: FlashData
 
 const auditService = createMockAuditService()
