@@ -17,8 +17,10 @@ let sessionApp: Express
 
 const auditService = createMockAuditService()
 
-let flashData: Record<'errors' | 'formValues', Record<string, string | string[]>[]>
 let visitSessionData: VisitSessionData
+
+type FlashData = Record<string, string[] | Record<string, string>[]>
+let flashData: FlashData
 
 const testJourneys = [
   { urlPrefix: '/book-a-visit', isUpdate: false },
@@ -29,7 +31,7 @@ const availableSupportTypes = TestData.supportTypes()
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
-  flashProvider.mockImplementation((key: 'errors' | 'formValues') => {
+  flashProvider.mockImplementation((key: keyof FlashData) => {
     return flashData[key]
   })
 })

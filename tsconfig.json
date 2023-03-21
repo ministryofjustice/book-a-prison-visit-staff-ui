@@ -16,8 +16,7 @@
     "noImplicitAny": true,
     "experimentalDecorators": true,
     "typeRoots": ["./server/@types", "./node_modules/@types"],
-    "lib": ["es5", "es2015.promise"],
-    "ignoreDeprecations": "5.0"
+    "lib": ["es5", "es2015.promise"]
   },
   "exclude": [
     "node_modules",

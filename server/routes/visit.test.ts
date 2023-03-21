@@ -25,7 +25,8 @@ const prisonerVisitorsService = createMockPrisonerVisitorsService()
 const supportedPrisonsService = createMockSupportedPrisonsService()
 const visitSessionsService = createMockVisitSessionsService()
 
-let flashData: Record<string, string[] | Record<string, string>[]>
+type FlashData = Record<string, string[] | Record<string, string>[]>
+let flashData: FlashData
 let visitSessionData: VisitSessionData
 
 const supportedPrisons = TestData.supportedPrisons()
@@ -43,7 +44,7 @@ jest.mock('./visitorUtils', () => {
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
-  flashProvider.mockImplementation((key: 'errors' | 'formValues') => {
+  flashProvider.mockImplementation((key: keyof FlashData) => {
     return flashData[key]
   })
   app = appWithAllRoutes({

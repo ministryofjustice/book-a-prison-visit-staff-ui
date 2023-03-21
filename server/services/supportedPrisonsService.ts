@@ -18,12 +18,11 @@ export default class SupportedPrisonsService {
     await this.refreshAllPrisons(username)
     const supportedPrisonIds = await this.getSupportedPrisonIds(username)
 
-    const supportedPrisons = {}
+    const supportedPrisons: Record<string, string> = {}
 
     supportedPrisonIds.forEach(prisonId => {
       const supportedPrison = this.allPrisons.find(prison => prison.prisonId === prisonId)
       if (supportedPrison) {
-        // @ts-ignore
         supportedPrisons[supportedPrison.prisonId] = supportedPrison.prisonName
       }
     })
