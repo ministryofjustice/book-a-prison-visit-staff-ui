@@ -16,6 +16,8 @@ import {
 
 let app: Express
 
+let flashData: FlashData
+
 const auditService = createMockAuditService()
 const prisonerProfileService = createMockPrisonerProfileService()
 const prisonerSearchService = createMockPrisonerSearchService()
@@ -24,8 +26,6 @@ const visitSessionsService = createMockVisitSessionsService()
 const prisonId = 'HEI'
 
 let visitSessionData: Partial<VisitSessionData>
-
-let flashData: FlashData
 
 jest.mock('./visitorUtils', () => ({
   clearSession: jest.fn((req: Express.Request) => {

@@ -15,11 +15,11 @@ import {
 
 let sessionApp: Express
 
+let flashData: FlashData
+
 const auditService = createMockAuditService()
 
 let visitSessionData: VisitSessionData
-
-let flashData: FlashData
 
 const testJourneys = [
   { urlPrefix: '/book-a-visit', isUpdate: false },
