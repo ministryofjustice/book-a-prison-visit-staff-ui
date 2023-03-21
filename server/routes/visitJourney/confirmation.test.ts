@@ -9,7 +9,9 @@ import TestData from '../testutils/testData'
 
 let sessionApp: Express
 
-let flashData: Record<'errors' | 'formValues', Record<string, string | string[]>[]>
+type FlashData = Record<string, string[] | Record<string, string>[]>
+let flashData: FlashData
+
 let visitSessionData: VisitSessionData
 
 // run tests for booking and update journeys
@@ -22,7 +24,7 @@ const availableSupportTypes = TestData.supportTypes()
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
-  flashProvider.mockImplementation((key: 'errors' | 'formValues') => {
+  flashProvider.mockImplementation((key: keyof FlashData) => {
     return flashData[key]
   })
 })

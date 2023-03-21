@@ -7,7 +7,9 @@ import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
 
 let sessionApp: Express
 
-let flashData: Record<'errors' | 'formValues', Record<string, string | string[]>[]>
+type FlashData = Record<string, string[] | Record<string, string>[]>
+let flashData: FlashData
+
 let visitSessionData: VisitSessionData
 
 // run tests for booking and update journeys
@@ -15,7 +17,7 @@ const testJourneys = [{ urlPrefix: '/book-a-visit' }, { urlPrefix: '/visit/ab-cd
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
-  flashProvider.mockImplementation((key: 'errors' | 'formValues') => {
+  flashProvider.mockImplementation((key: keyof FlashData) => {
     return flashData[key]
   })
 })

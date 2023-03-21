@@ -19,14 +19,15 @@ import {
 
 let app: Express
 
+type FlashData = Record<string, string[] | Record<string, string>[]>
+let flashData: FlashData
+
 const auditService = createMockAuditService()
 const prisonerSearchService = createMockPrisonerSearchService()
 const prisonerVisitorsService = createMockPrisonerVisitorsService()
 const supportedPrisonsService = createMockSupportedPrisonsService()
 const visitSessionsService = createMockVisitSessionsService()
 
-type FlashData = Record<string, string[] | Record<string, string>[]>
-let flashData: FlashData
 let visitSessionData: VisitSessionData
 
 const supportedPrisons = TestData.supportedPrisons()

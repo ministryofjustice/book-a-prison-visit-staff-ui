@@ -9,7 +9,9 @@ import TestData from '../testutils/testData'
 
 let sessionApp: Express
 
+// Requires bringing in line with the other implementation used, caused issues
 let flashData: Record<'errors' | 'formValues', Record<string, string | string[]>[]>
+
 let visitSessionData: VisitSessionData
 
 // run tests for booking and update journeys

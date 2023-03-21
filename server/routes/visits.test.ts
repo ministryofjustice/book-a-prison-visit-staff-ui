@@ -15,12 +15,12 @@ import {
 
 let app: Express
 
+type FlashData = Record<string, string[] | Record<string, string>[]>
+let flashData: FlashData
+
 const auditService = createMockAuditService()
 const prisonerSearchService = createMockPrisonerSearchService()
 const visitSessionsService = createMockVisitSessionsService()
-
-type FlashData = Record<string, string[] | Record<string, string>[]>
-let flashData: FlashData
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }

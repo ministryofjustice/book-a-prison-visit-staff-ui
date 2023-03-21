@@ -9,10 +9,12 @@ import { createMockAuditService, createMockVisitSessionsService } from '../../se
 
 let sessionApp: Express
 
+type FlashData = Record<string, string[] | Record<string, string>[]>
+let flashData: FlashData
+
 const auditService = createMockAuditService()
 const visitSessionsService = createMockVisitSessionsService()
 
-let flashData: Record<'errors' | 'formValues', Record<string, string | string[]>[]>
 let visitSessionData: VisitSessionData
 
 const prisonId = 'HEI'
@@ -25,7 +27,7 @@ const testJourneys = [
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
-  flashProvider.mockImplementation((key: 'errors' | 'formValues') => {
+  flashProvider.mockImplementation((key: keyof FlashData) => {
     return flashData[key]
   })
 
