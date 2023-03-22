@@ -33,9 +33,9 @@ jobs:
       tag: << pipeline.parameters.node-version >>
     steps:
       - checkout
-      - run:
-          name: Update npm
-          command: 'npm install -g npm@latest'
+      # - run:
+      #     name: Update npm
+      #     command: 'npm install -g npm@latest'
       - restore_cache:
           key: dependency-cache-{{ checksum "package-lock.json" }}
       - run:
