@@ -66,6 +66,10 @@ export default function sessionCheckMiddleware({ stage }: { stage: number }): Re
       return res.redirect(`/prisoner/${visitSessionData.prisoner.offenderNo}?error=visit-already-booked`)
     }
 
+    if (stage > 3 && !visitSessionData.visitorSupport) {
+      return res.redirect(`/prisoner/${visitSessionData.prisoner.offenderNo}?error=missing-additional-support`)
+    }
+
     if (
       stage > 4 &&
       (!visitSessionData.mainContact ||
