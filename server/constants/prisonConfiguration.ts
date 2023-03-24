@@ -39,6 +39,31 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'At least one visitor must be 18 or older.',
     ],
   },
+  DHI: {
+    prisonPhoneNumber: '0300 060 6501',
+    selectVisitorsText: [
+      'You can add up to 3 people aged 17 and over, and 4 children under 17 years old. ',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
+  EWI: {
+    prisonPhoneNumber: '0300 303 0631',
+    selectVisitorsText: ['You can add up to 3 people.', 'At least one visitor must be 18 or older.'],
+  },
+  MHI: {
+    prisonPhoneNumber: '0300 303 0649',
+    selectVisitorsText: [
+      'You can add up to 3 people aged 18 and over, and 3 children under 18 years old. ',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
+  BNI: {
+    prisonPhoneNumber: '01869 353 176',
+    selectVisitorsText: [
+      'You can add up to 3 people aged 18 and over, and 3 children under 18 years old. ',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
 }
 
 const defaultConfiguration: PrisonConfiguration = {
