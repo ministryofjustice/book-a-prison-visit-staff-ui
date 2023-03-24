@@ -1,21 +1,16 @@
-import type { RequestHandler, Router } from 'express'
+import { type RequestHandler, Router } from 'express'
 import format from 'date-fns/format'
 import config from '../config'
 import { ExtendedVisitInformation, PrisonerDetailsItem, VisitsPageSlot } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
-import PrisonerSearchService from '../services/prisonerSearchService'
-import VisitSessionsService from '../services/visitSessionsService'
-import AuditService from '../services/auditService'
 import { getParsedDateFromQueryString, getResultsPagingLinks } from '../utils/utils'
 import { getDateTabs, getSlotsSideMenuData } from './visitsUtils'
-import { SessionCapacity } from '../data/visitSchedulerApiTypes'
+import { SessionCapacity, Visit } from '../data/visitSchedulerApiTypes'
+import type { Services } from '../services'
 
-export default function routes(
-  router: Router,
-  prisonerSearchService: PrisonerSearchService,
-  visitSessionsService: VisitSessionsService,
-  auditService: AuditService,
-): Router {
+export default function routes({ auditService, prisonerSearchService, visitSessionsService }: Services): Router {
+  const router = Router()
+
   const get = (path: string | string[], ...handlers: RequestHandler[]) =>
     router.get(
       path,
@@ -29,8 +24,16 @@ export default function routes(
 
   get('/', async (req, res) => {
     const { prisonId } = req.session.selectedEstablishment
+
+    type VisitRestriction = Visit['visitRestriction']
     const { type = 'OPEN', time = '', selectedDate = '', firstTabDate = '' } = req.query
-    let visitType = ['OPEN', 'CLOSED', 'UNKNOWN'].includes(type as string) ? (type as string) : 'OPEN'
+    let visitType: Visit['visitRestriction']
+    if (type === 'OPEN' || type === 'CLOSED' || type === 'UNKNOWN') {
+      visitType = type
+    } else {
+      visitType = 'OPEN'
+    }
+
     const selectedDateString = getParsedDateFromQueryString(selectedDate as string)
     const {
       extendedVisitsInfo,
@@ -45,7 +48,7 @@ export default function routes(
       }
     } = await visitSessionsService.getVisitsByDate({
       dateString: selectedDateString,
-      username: res.locals.user?.username,
+      username: res.locals.user.username,
       prisonId,
     })
 
@@ -80,8 +83,8 @@ export default function routes(
       unknown: slots.unknownSlots.find(slot => slot.visitTime === slotFilter) ?? { adults: 0, children: 0 },
     }
     const totals = {
-      adults: selectedSlots[visitType.toLowerCase()].adults,
-      children: selectedSlots[visitType.toLowerCase()].children,
+      adults: selectedSlots[<Lowercase<VisitRestriction>>visitType.toLowerCase()].adults,
+      children: selectedSlots[<Lowercase<VisitRestriction>>visitType.toLowerCase()].children,
     }
 
     const filteredVisits = extendedVisitsInfo.filter(
@@ -108,7 +111,7 @@ export default function routes(
         await prisonerSearchService.getPrisonersByPrisonerNumbers(
           prisonersForVisit,
           queryParams,
-          res.locals.user?.username,
+          res.locals.user.username,
           currentPage,
         ))
 
@@ -116,7 +119,7 @@ export default function routes(
       const sessionStartTime = format(new Date(filteredVisits[0].startTimestamp), 'HH:mm:ss')
       const sessionEndTime = format(new Date(filteredVisits[0].endTimestamp), 'HH:mm:ss')
       const sessionCapacity: SessionCapacity = await visitSessionsService.getVisitSessionCapacity(
-        res.locals.user?.username,
+        res.locals.user.username,
         prisonId,
         selectedDateString,
         sessionStartTime,
@@ -143,7 +146,7 @@ export default function routes(
     await auditService.viewedVisits({
       viewDate: selectedDateString,
       prisonId,
-      username: res.locals.user?.username,
+      username: res.locals.user.username,
       operationId: res.locals.appInsightsOperationId,
     })
 

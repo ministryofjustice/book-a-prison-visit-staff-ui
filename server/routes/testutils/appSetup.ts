@@ -2,34 +2,25 @@
 import express, { Express } from 'express'
 import createError from 'http-errors'
 import { Cookie, SessionData } from 'express-session'
+
 import indexRoutes from '../index'
-import searchRoutes from '../search'
+import bookAVisitRoutes from '../bookAVisit'
 import establishmentRoutes from '../changeEstablishment'
 import prisonerRoutes from '../prisoner'
-import bookAVisitRoutes from '../bookAVisit'
+import searchRoutes from '../search'
+import timetableRoutes from '../timetable'
 import visitRoutes from '../visit'
 import visitsRoutes from '../visits'
-import timetableRoutes from '../timetable'
+
 import nunjucksSetup from '../../utils/nunjucksSetup'
 import errorHandler from '../../errorHandler'
-import standardRouter from '../standardRouter'
-import UserService from '../../services/userService'
-import { notificationsApiClientBuilder } from '../../data/notificationsApiClient'
-import { prisonerSearchClientBuilder } from '../../data/prisonerSearchClient'
-import { prisonApiClientBuilder } from '../../data/prisonApiClient'
-import { visitSchedulerApiClientBuilder } from '../../data/visitSchedulerApiClient'
-import { whereaboutsApiClientBuilder } from '../../data/whereaboutsApiClient'
-import { prisonerContactRegistryApiClientBuilder } from '../../data/prisonerContactRegistryApiClient'
-import { prisonRegisterApiClientBuilder } from '../../data/prisonRegisterApiClient'
-import PrisonerSearchService from '../../services/prisonerSearchService'
-import PrisonerProfileService from '../../services/prisonerProfileService'
-import PrisonerVisitorsService from '../../services/prisonerVisitorsService'
-import VisitSessionsService from '../../services/visitSessionsService'
-import NotificationsService from '../../services/notificationsService'
-import SupportedPrisonsService from '../../services/supportedPrisonsService'
 import * as auth from '../../authentication/auth'
+import setUpCurrentUser from '../../middleware/setUpCurrentUser'
+import type { Services } from '../../services'
+
+import UserService from '../../services/userService'
+import SupportedPrisonsService from '../../services/supportedPrisonsService'
 import { VisitorListItem, VisitSlotList, VisitSessionData } from '../../@types/bapv'
-import AuditService from '../../services/auditService'
 import TestData from './testData'
 
 const user = {
@@ -74,16 +65,10 @@ class MockSupportedPrisonsService extends SupportedPrisonsService {
   }
 }
 
-function appSetup({
-  prisonerSearchServiceOverride,
-  prisonerProfileServiceOverride,
-  prisonerVisitorsServiceOverride,
-  visitSessionsServiceOverride,
-  auditServiceOverride,
-  notificationsServiceOverride,
-  supportedPrisonsServiceOverride,
-  production = false,
-  sessionData = {
+function appSetup(
+  services: Services,
+  production: boolean,
+  sessionData: SessionData = {
     cookie: new Cookie(),
     returnTo: '',
     nowInMinutes: 0,
@@ -94,23 +79,12 @@ function appSetup({
     visitSessionData: {} as VisitSessionData,
     selectedEstablishment: undefined,
   },
-}: {
-  prisonerSearchServiceOverride: PrisonerSearchService
-  prisonerProfileServiceOverride: PrisonerProfileService
-  prisonerVisitorsServiceOverride: PrisonerVisitorsService
-  visitSessionsServiceOverride: VisitSessionsService
-  auditServiceOverride: AuditService
-  notificationsServiceOverride: NotificationsService
-  supportedPrisonsServiceOverride: SupportedPrisonsService
-  production: boolean
-  sessionData: SessionData
-}): Express {
+): Express {
   const app = express()
 
   app.set('view engine', 'njk')
 
   nunjucksSetup(app)
-
   app.use((req, res, next) => {
     res.locals = {}
     res.locals.user = user
@@ -127,112 +101,27 @@ function appSetup({
     }
     next()
   })
-
-  // app.use(cookieSession({ keys: [''] }))
   app.use(express.json())
   app.use(express.urlencoded({ extended: true }))
 
-  const supportedPrisonsService =
-    supportedPrisonsServiceOverride ||
-    new SupportedPrisonsService(visitSchedulerApiClientBuilder, prisonRegisterApiClientBuilder, null)
+  if (services.userService === undefined) {
+    // eslint-disable-next-line no-param-reassign
+    services.userService = new MockUserService()
+  }
+  if (services.supportedPrisonsService === undefined) {
+    // eslint-disable-next-line no-param-reassign
+    services.supportedPrisonsService = new MockSupportedPrisonsService()
+  }
+  app.use(setUpCurrentUser(services))
 
-  app.use('/', indexRoutes(standardRouter(new MockUserService(), new MockSupportedPrisonsService())))
-
-  const auditService = auditServiceOverride || new AuditService()
-
-  app.use(
-    '/change-establishment/',
-    establishmentRoutes(
-      standardRouter(new MockUserService(), new MockSupportedPrisonsService()),
-      supportedPrisonsService,
-      auditService,
-      new MockUserService(),
-    ),
-  )
-
-  const prisonerSearchService =
-    prisonerSearchServiceOverride || new PrisonerSearchService(prisonerSearchClientBuilder, null)
-  const visitSessionsService =
-    visitSessionsServiceOverride ||
-    new VisitSessionsService(
-      prisonerContactRegistryApiClientBuilder,
-      visitSchedulerApiClientBuilder,
-      whereaboutsApiClientBuilder,
-      null,
-    )
-  app.use(
-    '/search/',
-    searchRoutes(
-      standardRouter(new MockUserService(), new MockSupportedPrisonsService()),
-      prisonerSearchService,
-      visitSessionsService,
-      auditService,
-    ),
-  )
-
-  const prisonerProfileService =
-    prisonerProfileServiceOverride ||
-    new PrisonerProfileService(
-      prisonApiClientBuilder,
-      visitSchedulerApiClientBuilder,
-      prisonerContactRegistryApiClientBuilder,
-      prisonerSearchClientBuilder,
-      supportedPrisonsServiceOverride ||
-        new SupportedPrisonsService(visitSchedulerApiClientBuilder, prisonRegisterApiClientBuilder, null),
-      null,
-    )
-  app.use(
-    '/prisoner/',
-    prisonerRoutes(
-      standardRouter(new MockUserService(), new MockSupportedPrisonsService()),
-      prisonerProfileService,
-      prisonerSearchService,
-      visitSessionsService,
-      auditService,
-    ),
-  )
-
-  const prisonerVisitorsService =
-    prisonerVisitorsServiceOverride || new PrisonerVisitorsService(prisonerContactRegistryApiClientBuilder, null)
-  const notificationsService = notificationsServiceOverride || new NotificationsService(notificationsApiClientBuilder)
-  app.use(
-    '/book-a-visit/',
-    bookAVisitRoutes(
-      standardRouter(new MockUserService(), new MockSupportedPrisonsService()),
-      prisonerVisitorsService,
-      visitSessionsService,
-      prisonerProfileService,
-      notificationsService,
-      auditService,
-    ),
-  )
-  app.use(
-    '/visit/',
-    visitRoutes(
-      standardRouter(new MockUserService(), new MockSupportedPrisonsService()),
-      prisonerSearchService,
-      visitSessionsService,
-      notificationsService,
-      auditService,
-      prisonerVisitorsService,
-      prisonerProfileService,
-      supportedPrisonsService,
-    ),
-  )
-  app.use(
-    '/visits',
-    visitsRoutes(
-      standardRouter(new MockUserService(), new MockSupportedPrisonsService()),
-      prisonerSearchService,
-      visitSessionsService,
-      auditService,
-    ),
-  )
-
-  app.use(
-    '/timetable/',
-    timetableRoutes(standardRouter(new MockUserService(), new MockSupportedPrisonsService()), visitSessionsService),
-  )
+  app.use('/', indexRoutes())
+  app.use('/book-a-visit', bookAVisitRoutes(services))
+  app.use('/change-establishment', establishmentRoutes(services))
+  app.use('/prisoner', prisonerRoutes(services))
+  app.use('/search', searchRoutes(services))
+  app.use('/timetable', timetableRoutes(services))
+  app.use('/visit', visitRoutes(services))
+  app.use('/visits', visitsRoutes(services))
 
   app.use((req, res, next) => next(createError(404, 'Not found')))
   app.use(errorHandler(production))
@@ -241,36 +130,14 @@ function appSetup({
 }
 
 export function appWithAllRoutes({
-  prisonerSearchServiceOverride,
-  prisonerProfileServiceOverride,
-  prisonerVisitorsServiceOverride,
-  visitSessionsServiceOverride,
-  auditServiceOverride,
-  notificationsServiceOverride,
-  supportedPrisonsServiceOverride,
   production = false,
+  services = {},
   sessionData,
 }: {
-  prisonerSearchServiceOverride?: PrisonerSearchService
-  prisonerProfileServiceOverride?: PrisonerProfileService
-  prisonerVisitorsServiceOverride?: PrisonerVisitorsService
-  visitSessionsServiceOverride?: VisitSessionsService
-  auditServiceOverride?: AuditService
-  notificationsServiceOverride?: NotificationsService
-  supportedPrisonsServiceOverride?: SupportedPrisonsService
   production?: boolean
+  services?: Partial<Services>
   sessionData?: SessionData
 }): Express {
   auth.default.authenticationMiddleware = () => (req, res, next) => next()
-  return appSetup({
-    prisonerSearchServiceOverride,
-    prisonerProfileServiceOverride,
-    prisonerVisitorsServiceOverride,
-    visitSessionsServiceOverride,
-    auditServiceOverride,
-    notificationsServiceOverride,
-    supportedPrisonsServiceOverride,
-    production,
-    sessionData,
-  })
+  return appSetup(services as Services, production, sessionData)
 }

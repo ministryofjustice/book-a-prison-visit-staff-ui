@@ -23,7 +23,7 @@ generic-service:
     PRISON_REGISTER_API_URL: "https://prison-register-dev.hmpps.service.justice.gov.uk"
     DPS_URL: "https://digital-dev.prison.service.justice.gov.uk/"
     SMS_NOTIFICATIONS_ENABLED: "true"
-    FEATURE_VIEW_TIMETABLE_ENABLED: "true"
+    REDIS_KEY: "bapv-staff-staging"
 
 generic-prometheus-alerts:
   alertSeverity: digital-prison-service-dev

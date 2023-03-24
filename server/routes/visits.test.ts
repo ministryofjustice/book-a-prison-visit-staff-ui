@@ -3,35 +3,30 @@ import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { format } from 'date-fns'
 import { SessionData } from 'express-session'
-import PrisonerSearchService from '../services/prisonerSearchService'
-import VisitSessionsService from '../services/visitSessionsService'
-import AuditService from '../services/auditService'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
-import { ExtendedVisitInformation, PrisonerDetailsItem, VisitsPageSlot } from '../@types/bapv'
+import { ExtendedVisitInformation, FlashData, PrisonerDetailsItem, VisitsPageSlot } from '../@types/bapv'
 import TestData from './testutils/testData'
 import { getParsedDateFromQueryString } from '../utils/utils'
-
-jest.mock('../services/prisonerSearchService')
-jest.mock('../services/visitSessionsService')
-jest.mock('../services/auditService')
+import {
+  createMockAuditService,
+  createMockPrisonerSearchService,
+  createMockVisitSessionsService,
+} from '../services/testutils/mocks'
 
 let app: Express
-let flashData: Record<string, string[] | Record<string, string>[]>
 
-const prisonerSearchService = new PrisonerSearchService(null, null) as jest.Mocked<PrisonerSearchService>
-const visitSessionsService = new VisitSessionsService(null, null, null, null) as jest.Mocked<VisitSessionsService>
-const auditService = new AuditService() as jest.Mocked<AuditService>
+let flashData: FlashData
+
+const auditService = createMockAuditService()
+const prisonerSearchService = createMockPrisonerSearchService()
+const visitSessionsService = createMockVisitSessionsService()
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
-  flashProvider.mockImplementation(key => {
+  flashProvider.mockImplementation((key: keyof FlashData) => {
     return flashData[key]
   })
-  app = appWithAllRoutes({
-    prisonerSearchServiceOverride: prisonerSearchService,
-    visitSessionsServiceOverride: visitSessionsService,
-    auditServiceOverride: auditService,
-  })
+  app = appWithAllRoutes({ services: { auditService, prisonerSearchService, visitSessionsService } })
 })
 
 afterEach(() => {
@@ -251,9 +246,7 @@ describe('GET /visits', () => {
     visitSessionsService.getVisitsByDate.mockResolvedValue(visits)
 
     app = appWithAllRoutes({
-      prisonerSearchServiceOverride: prisonerSearchService,
-      visitSessionsServiceOverride: visitSessionsService,
-      auditServiceOverride: auditService,
+      services: { auditService, prisonerSearchService, visitSessionsService },
       sessionData: { selectedEstablishment: { prisonId: 'XYZ', prisonName: 'XYZ' } } as SessionData,
     })
 

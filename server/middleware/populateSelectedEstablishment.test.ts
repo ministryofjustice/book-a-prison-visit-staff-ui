@@ -1,21 +1,12 @@
 import { Request, Response } from 'express'
 import { Cookie } from 'express-session'
 import { Prison } from '../@types/bapv'
-import HmppsAuthClient, { User } from '../data/hmppsAuthClient'
+import type { User } from '../data/hmppsAuthClient'
 import TestData from '../routes/testutils/testData'
-import SupportedPrisonsService from '../services/supportedPrisonsService'
+import { createMockSupportedPrisonsService } from '../services/testutils/mocks'
 import populateSelectedEstablishment from './populateSelectedEstablishment'
 
-jest.mock('../data/hmppsAuthClient')
-jest.mock('../services/supportedPrisonsService')
-
-const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
-
-const supportedPrisonsService = new SupportedPrisonsService(
-  null,
-  null,
-  hmppsAuthClient,
-) as jest.Mocked<SupportedPrisonsService>
+const supportedPrisonsService = createMockSupportedPrisonsService()
 
 const supportedPrisons = TestData.supportedPrisons()
 supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
@@ -30,7 +21,7 @@ const next = jest.fn()
 describe('populateSelectedEstablishment', () => {
   beforeEach(() => {
     req = {
-      originalUrl: '/',
+      path: '/',
       session: {
         regenerate: jest.fn(),
         destroy: jest.fn(),
@@ -89,7 +80,7 @@ describe('populateSelectedEstablishment', () => {
     })
 
     it('should make no changes and not redirect if request path is /change-establishment', async () => {
-      req.originalUrl = '/change-establishment'
+      req.path = '/change-establishment'
 
       await populateSelectedEstablishment(supportedPrisonsService)(req, res, next)
 
@@ -121,7 +112,7 @@ describe('populateSelectedEstablishment', () => {
     })
 
     it('should make no changes and not redirect if request path is /change-establishment', async () => {
-      req.originalUrl = '/change-establishment'
+      req.path = '/change-establishment'
       res.locals.user.activeCaseLoadId = 'BLI'
       req.session.selectedEstablishment = { prisonId: 'HEI', prisonName: supportedPrisons.HEI }
 

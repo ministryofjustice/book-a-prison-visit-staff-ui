@@ -1,5 +1,3 @@
-import 'dotenv/config'
-
 const production = process.env.NODE_ENV === 'production'
 
 function get<T>(name: string, fallback: T, options = { requireInProduction: false }): T | string {
@@ -44,6 +42,8 @@ export default {
     port: parseInt(process.env.REDIS_PORT, 10) || 6379,
     password: process.env.REDIS_AUTH_TOKEN,
     tls_enabled: get('REDIS_TLS_ENABLED', 'false'),
+    systemTokenPrefix: `systemToken-${get('REDIS_KEY', 'bapv-staff', requiredInProduction)}:`,
+    sessionPrefix: `sess-${get('REDIS_KEY', 'bapv-staff', requiredInProduction)}:`,
   },
   session: {
     secret: get('SESSION_SECRET', 'app-insecure-default-session', requiredInProduction),
@@ -144,9 +144,6 @@ export default {
         updateConfirmation: '386e83ff-5734-4d99-8279-b3eacb7cc8b8',
       },
     },
-  },
-  features: {
-    viewTimetableEnabled: get('FEATURE_VIEW_TIMETABLE_ENABLED', 'false', requiredInProduction) === 'true',
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
 }

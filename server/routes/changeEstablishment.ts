@@ -1,19 +1,14 @@
-import type { RequestHandler, Router } from 'express'
+import { type RequestHandler, Router } from 'express'
 import { body, validationResult } from 'express-validator'
 import asyncMiddleware from '../middleware/asyncMiddleware'
-import SupportedPrisonsService from '../services/supportedPrisonsService'
 import { clearSession } from './visitorUtils'
 import { safeReturnUrl } from '../utils/utils'
-import AuditService from '../services/auditService'
 import { Prison } from '../@types/bapv'
-import UserService from '../services/userService'
+import type { Services, SupportedPrisonsService, UserService } from '../services'
 
-export default function routes(
-  router: Router,
-  supportedPrisonsService: SupportedPrisonsService,
-  auditService: AuditService,
-  userService: UserService,
-): Router {
+export default function routes({ auditService, supportedPrisonsService, userService }: Services): Router {
+  const router = Router()
+
   const get = (path: string, ...handlers: RequestHandler[]) =>
     router.get(
       path,
@@ -29,7 +24,7 @@ export default function routes(
     const availablePrisons = await getAvailablePrisonsForUser(
       supportedPrisonsService,
       userService,
-      res.locals.user?.username,
+      res.locals.user.username,
     )
 
     const referrer = (req.query?.referrer as string) ?? ''
@@ -46,7 +41,7 @@ export default function routes(
     const availablePrisons = await getAvailablePrisonsForUser(
       supportedPrisonsService,
       userService,
-      res.locals.user?.username,
+      res.locals.user.username,
     )
 
     await body('establishment').isIn(Object.keys(availablePrisons)).withMessage('No prison selected').run(req)
@@ -73,11 +68,11 @@ export default function routes(
     await auditService.changeEstablishment({
       previousEstablishment,
       newEstablishment: newEstablishment.prisonId,
-      username: res.locals.user?.username,
+      username: res.locals.user.username,
       operationId: res.locals.appInsightsOperationId,
     })
 
-    await userService.setActiveCaseLoad(newEstablishment.prisonId, res.locals.user?.username)
+    await userService.setActiveCaseLoad(newEstablishment.prisonId, res.locals.user.username)
 
     return res.redirect(redirectUrl)
   })
@@ -93,7 +88,7 @@ async function getAvailablePrisonsForUser(
   const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(username)
   const userCaseLoadsIds = await userService.getUserCaseLoadIds(username)
 
-  const availablePrisonsForUser = {}
+  const availablePrisonsForUser: Record<string, string> = {}
 
   Object.keys(supportedPrisons)
     .filter(prisonId => userCaseLoadsIds.includes(prisonId))

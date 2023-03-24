@@ -1,7 +1,4 @@
 import { NotFound } from 'http-errors'
-import PrisonApiClient from '../data/prisonApiClient'
-import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
-import PrisonerContactRegistryApiClient from '../data/prisonerContactRegistryApiClient'
 import { PrisonerProfile, BAPVVisitBalances, PrisonerAlertItem, UpcomingVisitItem, PastVisitItem } from '../@types/bapv'
 import {
   prisonerDatePretty,
@@ -16,36 +13,37 @@ import { Alert, InmateDetail, OffenderRestriction, VisitBalances } from '../data
 import { Visitor } from '../data/visitSchedulerApiTypes'
 import { Contact } from '../data/prisonerContactRegistryApiTypes'
 import SupportedPrisonsService from './supportedPrisonsService'
-import PrisonerSearchClient from '../data/prisonerSearchClient'
-import HmppsAuthClient from '../data/hmppsAuthClient'
-
-type PrisonApiClientBuilder = (token: string) => PrisonApiClient
-type PrisonerSearchClientBuilder = (token: string) => PrisonerSearchClient
-type VisitSchedulerApiClientBuilder = (token: string) => VisitSchedulerApiClient
-type PrisonerContactRegistryApiClientBuilder = (token: string) => PrisonerContactRegistryApiClient
+import {
+  HmppsAuthClient,
+  PrisonApiClient,
+  PrisonerContactRegistryApiClient,
+  PrisonerSearchClient,
+  RestClientBuilder,
+  VisitSchedulerApiClient,
+} from '../data'
 
 export default class PrisonerProfileService {
   private alertCodesToFlag = ['UPIU', 'RCDR', 'URCU']
 
   constructor(
-    private readonly prisonApiClientBuilder: PrisonApiClientBuilder,
-    private readonly visitSchedulerApiClientBuilder: VisitSchedulerApiClientBuilder,
-    private readonly prisonerContactRegistryApiClientBuilder: PrisonerContactRegistryApiClientBuilder,
-    private readonly prisonerSearchClientBuilder: PrisonerSearchClientBuilder,
+    private readonly prisonApiClientFactory: RestClientBuilder<PrisonApiClient>,
+    private readonly visitSchedulerApiClientFactory: RestClientBuilder<VisitSchedulerApiClient>,
+    private readonly prisonerContactRegistryApiClientFactory: RestClientBuilder<PrisonerContactRegistryApiClient>,
+    private readonly prisonerSearchClientFactory: RestClientBuilder<PrisonerSearchClient>,
     private readonly supportedPrisonsService: SupportedPrisonsService,
     private readonly hmppsAuthClient: HmppsAuthClient,
   ) {}
 
   async getProfile(offenderNo: string, prisonId: string, username: string): Promise<PrisonerProfile> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const prisonApiClient = this.prisonApiClientBuilder(token)
+    const prisonApiClient = this.prisonApiClientFactory(token)
     const bookings = await prisonApiClient.getBookings(offenderNo, prisonId)
 
     if (bookings.numberOfElements !== 1) throw new NotFound()
 
-    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
-    const prisonerContactRegistryApiClient = this.prisonerContactRegistryApiClientBuilder(token)
-    const prisonerSearchClient = this.prisonerSearchClientBuilder(token)
+    const visitSchedulerApiClient = this.visitSchedulerApiClientFactory(token)
+    const prisonerContactRegistryApiClient = this.prisonerContactRegistryApiClientFactory(token)
+    const prisonerSearchClient = this.prisonerSearchClientFactory(token)
 
     const { convictedStatus } = bookings.content[0]
     const inmateDetail = await prisonApiClient.getOffender(offenderNo)
@@ -135,7 +133,7 @@ export default class PrisonerProfileService {
     username: string,
   ): Promise<{ inmateDetail: InmateDetail; visitBalances: VisitBalances }> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const prisonApiClient = this.prisonApiClientBuilder(token)
+    const prisonApiClient = this.prisonApiClientFactory(token)
 
     const bookings = await prisonApiClient.getBookings(offenderNo, prisonId)
     if (bookings.numberOfElements !== 1) throw new NotFound()
@@ -152,7 +150,7 @@ export default class PrisonerProfileService {
 
   async getRestrictions(offenderNo: string, username: string): Promise<OffenderRestriction[]> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const prisonApiClient = this.prisonApiClientBuilder(token)
+    const prisonApiClient = this.prisonApiClientFactory(token)
     const restrictions = await prisonApiClient.getOffenderRestrictions(offenderNo)
 
     if (!restrictions.bookingId) throw new NotFound()

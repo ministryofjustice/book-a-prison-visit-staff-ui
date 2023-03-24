@@ -2,16 +2,16 @@ import type { Express } from 'express'
 import request from 'supertest'
 import { SessionData } from 'express-session'
 import * as cheerio from 'cheerio'
-import { VisitSessionData } from '../../@types/bapv'
-import AuditService from '../../services/auditService'
+import { FlashData, VisitSessionData } from '../../@types/bapv'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
-
-jest.mock('../../services/auditService')
+import { createMockAuditService } from '../../services/testutils/mocks'
 
 let sessionApp: Express
-const auditService = new AuditService() as jest.Mocked<AuditService>
 
-let flashData: Record<'errors' | 'formValues', Record<string, string | string[]>[]>
+let flashData: FlashData
+
+const auditService = createMockAuditService()
+
 let visitSessionData: VisitSessionData
 
 // run tests for booking and update journeys
@@ -19,7 +19,7 @@ const testJourneys = [{ urlPrefix: '/book-a-visit' }, { urlPrefix: '/visit/ab-cd
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
-  flashProvider.mockImplementation(key => {
+  flashProvider.mockImplementation((key: keyof FlashData) => {
     return flashData[key]
   })
 })
@@ -65,7 +65,7 @@ testJourneys.forEach(journey => {
       }
 
       sessionApp = appWithAllRoutes({
-        auditServiceOverride: auditService,
+        services: { auditService },
         sessionData: {
           visitSessionData,
         } as SessionData,

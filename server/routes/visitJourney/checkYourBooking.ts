@@ -20,6 +20,13 @@ export default class CheckYourBooking {
     const { visitSessionData } = req.session
     const { offenderNo } = visitSessionData.prisoner
 
+    // Log info to debug VB-2004
+    const debugInfo = {
+      visitorSupport: visitSessionData.visitorSupport,
+      availableSupportTypes: req.session.availableSupportTypes?.length,
+    }
+    logger.info(`check booking visitorSupport debug: ${JSON.stringify(debugInfo)}`)
+
     const additionalSupport = getSupportTypeDescriptions(
       req.session.availableSupportTypes,
       visitSessionData.visitorSupport,
@@ -51,12 +58,12 @@ export default class CheckYourBooking {
     try {
       // change reserved visit to have the latest data
       await this.visitSessionsService.changeReservedVisit({
-        username: res.locals.user?.username,
+        username: res.locals.user.username,
         visitSessionData,
       })
       // 'book' the visit: set it's status to BOOKED
       const bookedVisit = await this.visitSessionsService.bookVisit({
-        username: res.locals.user?.username,
+        username: res.locals.user.username,
         applicationReference: visitSessionData.applicationReference,
       })
 
@@ -71,7 +78,7 @@ export default class CheckYourBooking {
         startTimestamp: visitSessionData.visitSlot.startTimestamp,
         endTimestamp: visitSessionData.visitSlot.endTimestamp,
         visitRestriction: visitSessionData.visitRestriction,
-        username: res.locals.user?.username,
+        username: res.locals.user.username,
         operationId: res.locals.appInsightsOperationId,
       })
 

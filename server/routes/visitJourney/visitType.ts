@@ -37,7 +37,7 @@ export default class VisitType {
       prisonerId: visitSessionData.prisoner.offenderNo,
       visitRestriction: visitSessionData.visitRestriction,
       visitorIds: visitSessionData.visitors.map(visitor => visitor.personId.toString()),
-      username: res.locals.user?.username,
+      username: res.locals.user.username,
       operationId: res.locals.appInsightsOperationId,
     })
 

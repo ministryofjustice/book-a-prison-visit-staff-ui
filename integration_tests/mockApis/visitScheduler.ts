@@ -1,6 +1,6 @@
 import { SuperAgentRequest } from 'superagent'
 import { stubFor } from './wiremock'
-import { SessionSchedule, Visit, VisitSession } from '../../server/data/visitSchedulerApiTypes'
+import { OutcomeDto, SessionSchedule, Visit, VisitSession } from '../../server/data/visitSchedulerApiTypes'
 import TestData from '../../server/routes/testutils/testData'
 
 export default {
@@ -30,6 +30,28 @@ export default {
       },
     })
   },
+  stubCancelVisit: ({ visit, outcome }: { visit: Visit; outcome: OutcomeDto }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'PUT',
+        url: `/visitScheduler/visits/${visit.reference}/cancel`,
+        bodyPatterns: [
+          {
+            equalToJson: {
+              outcomeStatus: outcome.outcomeStatus,
+              text: outcome.text,
+            },
+            ignoreArrayOrder: true,
+          },
+        ],
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: visit,
+      },
+    })
+  },
   stubChangeReservedSlot: (visit: Visit): SuperAgentRequest => {
     return stubFor({
       request: {
@@ -45,7 +67,6 @@ export default {
               visitors: visit.visitors,
               visitorSupport: visit.visitorSupport,
             },
-            ignoreArrayOrder: true,
           },
         ],
       },

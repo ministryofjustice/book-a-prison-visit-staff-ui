@@ -1,21 +1,18 @@
 import { URLSearchParams } from 'url'
 import RestClient from './restClient'
 import { Prisoner } from './prisonerOffenderSearchTypes'
-import config from '../config'
+import config, { ApiConfig } from '../config'
 
-export const prisonerSearchClientBuilder = (token: string): PrisonerSearchClient => {
-  const restClient = new RestClient('prisonerSearchApi', config.apis.prisonerSearch, token)
-  const prisonerSearchClient = new PrisonerSearchClient(restClient)
-
-  return prisonerSearchClient
-}
-
-class PrisonerSearchClient {
-  constructor(private readonly restClient: RestClient) {}
+export default class PrisonerSearchClient {
+  private restClient: RestClient
 
   private pageSize = config.apis.prisonerSearch.pageSize
 
-  getPrisoners(
+  constructor(token: string) {
+    this.restClient = new RestClient('prisonerSearchApiClient', config.apis.prisonerSearch as ApiConfig, token)
+  }
+
+  async getPrisoners(
     search: string,
     prisonId: string,
     page = 0,
@@ -30,7 +27,7 @@ class PrisonerSearchClient {
     })
   }
 
-  getPrisoner(search: string, prisonId: string): Promise<{ content: Prisoner[] }> {
+  async getPrisoner(search: string, prisonId: string): Promise<{ content: Prisoner[] }> {
     return this.restClient.get({
       path: `/prison/${prisonId}/prisoners`,
       query: new URLSearchParams({
@@ -39,7 +36,7 @@ class PrisonerSearchClient {
     })
   }
 
-  getPrisonerById(id: string): Promise<Prisoner> {
+  async getPrisonerById(id: string): Promise<Prisoner> {
     return this.restClient.get({
       path: `/prisoner/${id}`,
     })
@@ -73,5 +70,3 @@ class PrisonerSearchClient {
     }
   }
 }
-
-export default PrisonerSearchClient

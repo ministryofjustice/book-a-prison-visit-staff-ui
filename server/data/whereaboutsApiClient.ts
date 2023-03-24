@@ -1,20 +1,17 @@
 import { URLSearchParams } from 'url'
 import RestClient from './restClient'
 import { ScheduledEvent } from './whereaboutsApiTypes'
-import config from '../config'
+import config, { ApiConfig } from '../config'
 
-export const whereaboutsApiClientBuilder = (token: string): WhereaboutsApiClient => {
-  const restClient = new RestClient('whereaboutsApi', config.apis.whereabouts, token)
-  const whereaboutsClient = new WhereaboutsApiClient(restClient)
+export default class WhereaboutsApiClient {
+  private restClient: RestClient
 
-  return whereaboutsClient
-}
+  constructor(token: string) {
+    this.restClient = new RestClient('whereaboutsApiClient', config.apis.whereabouts as ApiConfig, token)
+  }
 
-class WhereaboutsApiClient {
-  constructor(private readonly restclient: RestClient) {}
-
-  getEvents(offenderNo: string, fromDate: string, toDate: string): Promise<ScheduledEvent[]> {
-    return this.restclient.get({
+  async getEvents(offenderNo: string, fromDate: string, toDate: string): Promise<ScheduledEvent[]> {
+    return this.restClient.get({
       path: `/events/${offenderNo}`,
       query: new URLSearchParams({
         fromDate,
@@ -23,5 +20,3 @@ class WhereaboutsApiClient {
     })
   }
 }
-
-export default WhereaboutsApiClient

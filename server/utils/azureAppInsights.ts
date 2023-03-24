@@ -1,4 +1,3 @@
-import { config } from 'dotenv'
 import { setup, defaultClient, TelemetryClient, DistributedTracingModes } from 'applicationinsights'
 import applicationVersion from '../applicationVersion'
 
@@ -15,8 +14,6 @@ function version(): string {
 }
 
 export function initialiseAppInsights(): void {
-  // Loads .env file contents into | process.env
-  config()
   if (process.env.APPLICATIONINSIGHTS_CONNECTION_STRING) {
     // eslint-disable-next-line no-console
     console.log('Enabling azure application insights')

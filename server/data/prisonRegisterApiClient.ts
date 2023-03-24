@@ -1,20 +1,15 @@
 import RestClient from './restClient'
-import config from '../config'
+import config, { ApiConfig } from '../config'
 import { PrisonDto } from './prisonRegisterApiTypes'
 
-export const prisonRegisterApiClientBuilder = (token: string): PrisonRegisterApiClient => {
-  const restClient = new RestClient('prisonRegisterApi', config.apis.prisonRegister, token)
-  const prisonRegisterClient = new PrisonRegisterApiClient(restClient)
+export default class PrisonRegisterApiClient {
+  private restClient: RestClient
 
-  return prisonRegisterClient
-}
+  constructor(token: string) {
+    this.restClient = new RestClient('prisonRegisterApiClient', config.apis.prisonRegister as ApiConfig, token)
+  }
 
-class PrisonRegisterApiClient {
-  constructor(private readonly restclient: RestClient) {}
-
-  getPrisons(): Promise<PrisonDto[]> {
-    return this.restclient.get({ path: '/prisons' })
+  async getPrisons(): Promise<PrisonDto[]> {
+    return this.restClient.get({ path: '/prisons' })
   }
 }
-
-export default PrisonRegisterApiClient

@@ -2,22 +2,16 @@ import type { Express } from 'express'
 import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { appWithAllRoutes } from './testutils/appSetup'
-import config from '../config'
-import VisitSessionsService from '../services/visitSessionsService'
 import TestData from './testutils/testData'
-
-jest.mock('../services/visitSessionsService')
+import { createMockVisitSessionsService } from '../services/testutils/mocks'
 
 let app: Express
 
-const visitSessionsService = new VisitSessionsService(null, null, null, null) as jest.Mocked<VisitSessionsService>
+const visitSessionsService = createMockVisitSessionsService()
 
 beforeEach(() => {
   visitSessionsService.getSessionSchedule.mockResolvedValue([])
-
-  app = appWithAllRoutes({ visitSessionsServiceOverride: visitSessionsService })
-
-  config.features.viewTimetableEnabled = true
+  app = appWithAllRoutes({ services: { visitSessionsService } })
 })
 
 afterEach(() => {
@@ -27,13 +21,6 @@ afterEach(() => {
 
 describe('View visits timetable', () => {
   let fakeDate: string
-
-  it('should return a 404 if the feature is disabled', () => {
-    config.features.viewTimetableEnabled = false
-    app = appWithAllRoutes({})
-
-    return request(app).get('/timetable').expect(404)
-  })
 
   it('should render the visits timetable page with current date selected by default, with empty schedule', () => {
     fakeDate = '2022-12-27' // a Tuesday

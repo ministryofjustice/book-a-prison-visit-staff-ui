@@ -1,4 +1,5 @@
 import type { Request } from 'express'
+import type { SessionData } from 'express-session'
 import { VisitSlot, VisitSlotList } from '../@types/bapv'
 import { SupportType, VisitorSupport } from '../data/visitSchedulerApiTypes'
 
@@ -46,7 +47,9 @@ export const getSupportTypeDescriptions = (
 }
 
 export const clearSession = (req: Request): void => {
-  ;['availableSupportTypes', 'visitorList', 'adultVisitors', 'slotsList', 'visitSessionData'].forEach(sessionItem => {
-    delete req.session[sessionItem]
-  })
+  ;['availableSupportTypes', 'visitorList', 'adultVisitors', 'slotsList', 'visitSessionData'].forEach(
+    (sessionItem: keyof SessionData) => {
+      delete req.session[sessionItem]
+    },
+  )
 }

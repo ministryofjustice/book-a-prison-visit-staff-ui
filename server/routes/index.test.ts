@@ -3,14 +3,11 @@ import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { appWithAllRoutes } from './testutils/appSetup'
 import * as visitorUtils from './visitorUtils'
-import config from '../config'
 
 let app: Express
 
 beforeEach(() => {
   app = appWithAllRoutes({})
-
-  config.features.viewTimetableEnabled = true
 })
 
 afterEach(() => {
@@ -18,21 +15,6 @@ afterEach(() => {
 })
 
 describe('GET /', () => {
-  it('should hide the View timetable card when feature disabled', () => {
-    config.features.viewTimetableEnabled = false
-    app = appWithAllRoutes({})
-
-    return request(app)
-      .get('/')
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        const $ = cheerio.load(res.text)
-
-        expect($('.card').length).toBe(3)
-        expect($('[data-test="view-timetable"]').length).toBe(0)
-      })
-  })
-
   it('should render the home page cards and change establishment link', () => {
     app = appWithAllRoutes({})
 

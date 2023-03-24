@@ -125,7 +125,7 @@ describe('Nunjucks Filters', () => {
   describe('displayAge', () => {
     beforeAll(() => {
       const fakeDate = new Date('2020-12-14T12:00:00')
-      jest.useFakeTimers({ doNotFake: ['nextTick'], now: fakeDate })
+      jest.useFakeTimers({ advanceTimers: true, now: new Date(fakeDate) })
     })
     afterAll(() => {
       jest.useRealTimers()

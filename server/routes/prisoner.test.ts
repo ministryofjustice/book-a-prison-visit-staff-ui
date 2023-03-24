@@ -2,37 +2,30 @@ import type { Express } from 'express'
 import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
-import { PrisonerProfile, BAPVVisitBalances, VisitInformation, VisitSessionData } from '../@types/bapv'
+import { PrisonerProfile, BAPVVisitBalances, VisitInformation, VisitSessionData, FlashData } from '../@types/bapv'
 import { InmateDetail, VisitBalances } from '../data/prisonApiTypes'
-import PrisonerProfileService from '../services/prisonerProfileService'
-import PrisonerSearchService from '../services/prisonerSearchService'
-import VisitSessionsService from '../services/visitSessionsService'
-import AuditService from '../services/auditService'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import { clearSession } from './visitorUtils'
 import TestData from './testutils/testData'
-
-jest.mock('../services/prisonerProfileService')
-jest.mock('../services/prisonerSearchService')
-jest.mock('../services/visitSessionsService')
-jest.mock('../services/auditService')
+import {
+  createMockAuditService,
+  createMockPrisonerProfileService,
+  createMockPrisonerSearchService,
+  createMockVisitSessionsService,
+} from '../services/testutils/mocks'
 
 let app: Express
-const prisonId = 'HEI'
-let flashData: Record<string, string[] | Record<string, string>[]>
-let visitSessionData: Partial<VisitSessionData>
 
-const prisonerProfileService = new PrisonerProfileService(
-  null,
-  null,
-  null,
-  null,
-  null,
-  null,
-) as jest.Mocked<PrisonerProfileService>
-const prisonerSearchService = new PrisonerSearchService(null, null) as jest.Mocked<PrisonerSearchService>
-const visitSessionsService = new VisitSessionsService(null, null, null, null) as jest.Mocked<VisitSessionsService>
-const auditService = new AuditService() as jest.Mocked<AuditService>
+let flashData: FlashData
+
+const auditService = createMockAuditService()
+const prisonerProfileService = createMockPrisonerProfileService()
+const prisonerSearchService = createMockPrisonerSearchService()
+const visitSessionsService = createMockVisitSessionsService()
+
+const prisonId = 'HEI'
+
+let visitSessionData: Partial<VisitSessionData>
 
 jest.mock('./visitorUtils', () => ({
   clearSession: jest.fn((req: Express.Request) => {
@@ -42,17 +35,14 @@ jest.mock('./visitorUtils', () => ({
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
-  flashProvider.mockImplementation(key => {
+  flashProvider.mockImplementation((key: keyof FlashData) => {
     return flashData[key]
   })
 
   visitSessionData = {}
 
   app = appWithAllRoutes({
-    prisonerSearchServiceOverride: prisonerSearchService,
-    prisonerProfileServiceOverride: prisonerProfileService,
-    visitSessionsServiceOverride: visitSessionsService,
-    auditServiceOverride: auditService,
+    services: { auditService, prisonerProfileService, prisonerSearchService, visitSessionsService },
     sessionData: {
       visitSessionData,
     } as SessionData,

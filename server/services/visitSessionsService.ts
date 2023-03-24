@@ -11,8 +11,6 @@ import {
   VisitorListItem,
   VisitsPageSlot,
 } from '../@types/bapv'
-import VisitSchedulerApiClient from '../data/visitSchedulerApiClient'
-import WhereaboutsApiClient from '../data/whereaboutsApiClient'
 import {
   VisitSession,
   Visit,
@@ -21,31 +19,32 @@ import {
   SessionCapacity,
   SessionSchedule,
 } from '../data/visitSchedulerApiTypes'
+import { ScheduledEvent } from '../data/whereaboutsApiTypes'
 import { prisonerDateTimePretty, prisonerTimePretty } from '../utils/utils'
-import PrisonerContactRegistryApiClient from '../data/prisonerContactRegistryApiClient'
 import buildVisitorListItem from '../utils/visitorUtils'
 import { getVisitSlotsFromBookedVisits, getPrisonerEvents } from '../utils/visitsUtils'
 import { getSupportTypeDescriptions } from '../routes/visitorUtils'
-import { ScheduledEvent } from '../data/whereaboutsApiTypes'
-import HmppsAuthClient from '../data/hmppsAuthClient'
-
-type PrisonerContactRegistryApiClientBuilder = (token: string) => PrisonerContactRegistryApiClient
-type VisitSchedulerApiClientBuilder = (token: string) => VisitSchedulerApiClient
-type WhereaboutsApiClientBuilder = (token: string) => WhereaboutsApiClient
+import {
+  HmppsAuthClient,
+  PrisonerContactRegistryApiClient,
+  RestClientBuilder,
+  VisitSchedulerApiClient,
+  WhereaboutsApiClient,
+} from '../data'
 
 export default class VisitSessionsService {
   private morningCutoff = 12
 
   constructor(
-    private readonly prisonerContactRegistryApiClientBuilder: PrisonerContactRegistryApiClientBuilder,
-    private readonly visitSchedulerApiClientBuilder: VisitSchedulerApiClientBuilder,
-    private readonly whereaboutsApiClientBuilder: WhereaboutsApiClientBuilder,
+    private readonly prisonerContactRegistryApiClientFactory: RestClientBuilder<PrisonerContactRegistryApiClient>,
+    private readonly visitSchedulerApiClientFactory: RestClientBuilder<VisitSchedulerApiClient>,
+    private readonly whereaboutsApiClientFactory: RestClientBuilder<WhereaboutsApiClient>,
     private readonly hmppsAuthClient: HmppsAuthClient,
   ) {}
 
   async getAvailableSupportOptions(username: string): Promise<SupportType[]> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
+    const visitSchedulerApiClient = this.visitSchedulerApiClientFactory(token)
     return visitSchedulerApiClient.getAvailableSupportOptions()
   }
 
@@ -61,8 +60,8 @@ export default class VisitSessionsService {
     visitRestriction: VisitSessionData['visitRestriction']
   }): Promise<{ slotsList: VisitSlotList; whereaboutsAvailable: boolean }> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
-    const whereaboutsApiClient = this.whereaboutsApiClientBuilder(token)
+    const visitSchedulerApiClient = this.visitSchedulerApiClientFactory(token)
+    const whereaboutsApiClient = this.whereaboutsApiClientFactory(token)
     const visitSessions = await visitSchedulerApiClient.getVisitSessions(offenderNo, prisonId)
 
     let earliestStartTime: Date = new Date()
@@ -185,7 +184,7 @@ export default class VisitSessionsService {
     date: string
   }): Promise<SessionSchedule[]> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
+    const visitSchedulerApiClient = this.visitSchedulerApiClientFactory(token)
 
     return visitSchedulerApiClient.getSessionSchedule(prisonId, date)
   }
@@ -198,7 +197,7 @@ export default class VisitSessionsService {
     sessionEndTime: string,
   ): Promise<SessionCapacity> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
+    const visitSchedulerApiClient = this.visitSchedulerApiClientFactory(token)
     return visitSchedulerApiClient.getVisitSessionCapacity(prisonId, sessionDate, sessionStartTime, sessionEndTime)
   }
 
@@ -210,7 +209,7 @@ export default class VisitSessionsService {
     visitSessionData: VisitSessionData
   }): Promise<Visit> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
+    const visitSchedulerApiClient = this.visitSchedulerApiClientFactory(token)
 
     const reservation = await visitSchedulerApiClient.reserveVisit(visitSessionData)
     return reservation
@@ -224,7 +223,7 @@ export default class VisitSessionsService {
     visitSessionData: VisitSessionData
   }): Promise<Visit> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
+    const visitSchedulerApiClient = this.visitSchedulerApiClientFactory(token)
 
     const visit = await visitSchedulerApiClient.changeReservedVisit(visitSessionData)
     return visit
@@ -238,7 +237,7 @@ export default class VisitSessionsService {
     applicationReference: string
   }): Promise<Visit> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
+    const visitSchedulerApiClient = this.visitSchedulerApiClientFactory(token)
 
     const visit = await visitSchedulerApiClient.bookVisit(applicationReference)
     return visit
@@ -252,7 +251,7 @@ export default class VisitSessionsService {
     visitSessionData: VisitSessionData
   }): Promise<Visit> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
+    const visitSchedulerApiClient = this.visitSchedulerApiClientFactory(token)
 
     const visit = await visitSchedulerApiClient.changeBookedVisit(visitSessionData)
     return visit
@@ -268,7 +267,7 @@ export default class VisitSessionsService {
     outcome: OutcomeDto
   }): Promise<Visit> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
+    const visitSchedulerApiClient = this.visitSchedulerApiClientFactory(token)
 
     return visitSchedulerApiClient.cancelVisit(reference, outcome)
   }
@@ -283,7 +282,7 @@ export default class VisitSessionsService {
     prisonId: string
   }): Promise<VisitInformation> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
+    const visitSchedulerApiClient = this.visitSchedulerApiClientFactory(token)
 
     logger.info(`Get visit ${reference}`)
     const visit = await visitSchedulerApiClient.getVisit(reference)
@@ -306,7 +305,7 @@ export default class VisitSessionsService {
     visitStatus: Visit['visitStatus'][]
   }): Promise<VisitInformation[]> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
+    const visitSchedulerApiClient = this.visitSchedulerApiClientFactory(token)
 
     logger.info(`Get upcoming visits for ${offenderNo}`)
     const { content: visits } = await visitSchedulerApiClient.getUpcomingVisits(offenderNo, visitStatus)
@@ -332,8 +331,8 @@ export default class VisitSessionsService {
     }
   }> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
-    const prisonerContactRegistryApiClient = this.prisonerContactRegistryApiClientBuilder(token)
+    const visitSchedulerApiClient = this.visitSchedulerApiClientFactory(token)
+    const prisonerContactRegistryApiClient = this.prisonerContactRegistryApiClientFactory(token)
 
     logger.info(`Get visits for ${dateString}`)
     const { content: visits } = await visitSchedulerApiClient.getVisitsByDate(dateString, prisonId)
@@ -358,8 +357,8 @@ export default class VisitSessionsService {
     reference: string
   }): Promise<{ visit: Visit; visitors: VisitorListItem[]; additionalSupport: string[] }> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const visitSchedulerApiClient = this.visitSchedulerApiClientBuilder(token)
-    const prisonerContactRegistryApiClient = this.prisonerContactRegistryApiClientBuilder(token)
+    const visitSchedulerApiClient = this.visitSchedulerApiClientFactory(token)
+    const prisonerContactRegistryApiClient = this.prisonerContactRegistryApiClientFactory(token)
 
     const visit = await visitSchedulerApiClient.getVisit(reference)
     const contacts = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(visit.prisonerId)
