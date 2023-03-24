@@ -300,6 +300,25 @@ describe('sessionCheckMiddleware', () => {
     })
   })
 
+  describe('additional support', () => {
+    it('should redirect to the prisoner profile if additional support is not set', () => {
+      const testData: VisitSessionData = {
+        prisoner: prisonerData,
+        visitRestriction,
+        visitSlot,
+        visitors: visitorsData,
+        visitReference: 'ab-cd-ef-gh',
+        visitStatus: 'RESERVED',
+      }
+
+      req.session.visitSessionData = testData
+
+      sessionCheckMiddleware({ stage: 4 })(req as Request, mockResponse as Response, next)
+
+      expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/A1234BC?error=missing-additional-support')
+    })
+  })
+
   describe('main contact data missing', () => {
     ;[
       {
@@ -307,6 +326,7 @@ describe('sessionCheckMiddleware', () => {
         visitRestriction,
         visitSlot,
         visitors: visitorsData,
+        visitorSupport: [],
         visitReference: 'ab-cd-ef-gh',
         visitStatus: 'RESERVED',
       } as VisitSessionData,
@@ -315,6 +335,7 @@ describe('sessionCheckMiddleware', () => {
         visitRestriction,
         visitSlot,
         visitors: visitorsData,
+        visitorSupport: [],
         mainContact: {
           phoneNumber: '',
         },
@@ -339,6 +360,7 @@ describe('sessionCheckMiddleware', () => {
         visitRestriction,
         visitSlot,
         visitors: visitorsData,
+        visitorSupport: [],
         mainContact: {
           phoneNumber: '01234567899',
           contactName: 'abc',
