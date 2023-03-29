@@ -6,7 +6,7 @@ export default class SearchForBookingByPrisonerPage extends Page {
   }
 
   enterSearchTerm = (term: string): void => {
-    cy.get('#search').clear().type(term)
+    cy.get('#search').type(term)
   }
 
   continueButton = (): PageElement => cy.get('[data-test=search]')
