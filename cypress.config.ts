@@ -45,6 +45,7 @@ export default defineConfig({
         stubPrisonerById: prisonerSearch.stubPrisonerById,
         stubPrisoners: prisonerSearch.stubPrisoners,
         stubPrisoner: prisonerSearch.stubPrisoner,
+        stubGetPrisonersByPrisonerNumbers: prisonerSearch.stubGetPrisonersByPrisonerNumbers,
 
         // Prison register API
         stubPrisons: prisonRegister.stubPrisons,
@@ -61,6 +62,8 @@ export default defineConfig({
         stubSessionSchedule: visitScheduler.stubSessionSchedule,
         stubVisit: visitScheduler.stubVisit,
         stubVisitSessions: visitScheduler.stubVisitSessions,
+        stubVisitsByDate: visitScheduler.stubVisitsByDate,
+        stubVisitSessionCapacity: visitScheduler.stubVisitSessionCapacity,
 
         // Whereabouts
         stubOffenderEvents: whereaboutsOffenderEvents.stubOffenderEvents,
