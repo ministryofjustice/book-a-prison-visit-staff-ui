@@ -1,4 +1,4 @@
-import { format } from 'date-fns'
+import { format, sub, add } from 'date-fns'
 import TestData from '../../server/routes/testutils/testData'
 import HomePage from '../pages/home'
 import Page from '../pages/page'
@@ -6,49 +6,50 @@ import VisitsByDatePage from '../pages/visitsByDate'
 
 context('View visit schedule timetable', () => {
   const shortDateFormat = 'yyyy-MM-dd'
+  const longDateFormat = 'EEEE d MMMM yyyy'
+
+  const today = new Date()
+  const todayShortString = format(today, shortDateFormat)
+  const todayLongString = format(today, longDateFormat)
+  const tomorrowShortString = format(add(today, { days: 1 }), shortDateFormat)
+  const tomorrowLongString = format(add(today, { days: 1 }), longDateFormat)
+
   const prisonerNumber1 = 'A1234BC'
   const prisonerNumber2 = 'A1592EC'
-  const today = new Date()
   const visits = [
     TestData.visit({ reference: 'ab-cd-ef-gh', prisonerId: prisonerNumber1 }),
     TestData.visit({ reference: 'gh-ef-cd-ab', prisonerId: prisonerNumber2 }),
   ]
+
   const prisonerNumbers = [visits[0].prisonerId, visits[1].prisonerId]
-  const prisonId = 'HEI'
-
-  const dateString = format(today, shortDateFormat)
-
-  const startDateTime = `${dateString}T00:00:00`
-  const endDateTime = `${dateString}T23:59:59`
-
-  const sessionStartTime = '10:00:00'
-  const sessionEndTime = '11:00:00'
-
-  const sessionCapacity = TestData.sessionCapacity()
-
-  const results = [
+  const prisonersResults = [
     {
-      lastName: 'lastName1',
-      firstName: 'firstName1',
+      lastName: 'Smith',
+      firstName: 'Jack',
       prisonerNumber: prisonerNumber1,
       dateOfBirth: '2000-01-01',
     },
     {
-      lastName: 'lastName2',
-      firstName: 'firstName2',
+      lastName: 'Smith',
+      firstName: 'Philip',
       prisonerNumber: prisonerNumber2,
       dateOfBirth: '2000-01-02',
     },
   ]
+
+  const childDob = format(sub(today, { years: 5 }), shortDateFormat)
   const contacts = [
     TestData.contact(),
     TestData.contact({
       personId: 4322,
       firstName: 'Bob',
+      dateOfBirth: childDob,
       relationshipCode: 'SON',
       relationshipDescription: 'Son',
     }),
   ]
+
+  const prisonId = 'HEI'
 
   beforeEach(() => {
     cy.task('reset')
@@ -59,10 +60,11 @@ context('View visit schedule timetable', () => {
     cy.signIn()
   })
 
-  it('should show the visits timetable with the current day selected', () => {
-    // Home page - select View visit timetable
+  it('Should show visits by date, and change view to tomorrow', () => {
     const homePage = Page.verifyOnPage(HomePage)
 
+    let startDateTime = `${todayShortString}T00:00:00`
+    let endDateTime = `${todayShortString}T23:59:59`
     cy.task('stubVisitsByDate', {
       startDateTime,
       endDateTime,
@@ -72,14 +74,18 @@ context('View visit schedule timetable', () => {
 
     cy.task('stubGetPrisonersByPrisonerNumbers', {
       prisonerNumbers,
-      results,
+      results: prisonersResults,
     })
+
     cy.task('stubPrisonerSocialContacts', { offenderNo: prisonerNumber1, contacts })
     cy.task('stubPrisonerSocialContacts', { offenderNo: prisonerNumber2, contacts })
 
+    const sessionStartTime = '10:00:00'
+    const sessionEndTime = '11:00:00'
+    let sessionCapacity = TestData.sessionCapacity()
     cy.task('stubVisitSessionCapacity', {
       prisonId,
-      sessionDate: dateString,
+      sessionDate: todayShortString,
       sessionStartTime,
       sessionEndTime,
       sessionCapacity,
@@ -87,6 +93,48 @@ context('View visit schedule timetable', () => {
 
     homePage.viewVisitsTile().click()
 
-    Page.verifyOnPage(VisitsByDatePage)
+    const visitsByDatePage = Page.verifyOnPage(VisitsByDatePage)
+
+    visitsByDatePage.today().contains(todayLongString)
+    visitsByDatePage.tomorrow().contains(tomorrowLongString)
+
+    visitsByDatePage.today().should('have.attr', 'aria-current', 'page')
+    visitsByDatePage.tomorrow().should('not.have.attr', 'aria-current', 'page')
+
+    visitsByDatePage.tablesBookedCount().contains('2 of 30 tables booked')
+    visitsByDatePage.visitorsTotalCount().contains('4 visitors')
+    visitsByDatePage.adultVisitorsCount().contains('2 adults')
+    visitsByDatePage.childVisitorsCount().contains('2 children')
+
+    visitsByDatePage.prisonerOneName().contains(`${prisonersResults[0].lastName}, ${prisonersResults[0].firstName}`)
+    visitsByDatePage.prisonerOneNumber().contains(prisonerNumber1)
+    visitsByDatePage.prisonerTwoName().contains(`${prisonersResults[1].lastName}, ${prisonersResults[1].firstName}`)
+    visitsByDatePage.prisonerTwoNumber().contains(prisonerNumber2)
+
+    startDateTime = `${tomorrowShortString}T00:00:00`
+    endDateTime = `${tomorrowShortString}T23:59:59`
+
+    cy.task('stubVisitsByDate', {
+      startDateTime,
+      endDateTime,
+      prisonId,
+      visits,
+    })
+
+    sessionCapacity = TestData.sessionCapacity({ open: 20, closed: 1 })
+    cy.task('stubVisitSessionCapacity', {
+      prisonId,
+      sessionDate: tomorrowShortString,
+      sessionStartTime,
+      sessionEndTime,
+      sessionCapacity,
+    })
+
+    visitsByDatePage.tomorrow().click()
+
+    visitsByDatePage.today().should('not.have.attr', 'aria-current', 'page')
+    visitsByDatePage.tomorrow().should('have.attr', 'aria-current', 'page')
+
+    visitsByDatePage.tablesBookedCount().contains('2 of 20 tables booked')
   })
 })
