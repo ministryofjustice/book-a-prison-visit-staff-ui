@@ -52,8 +52,8 @@ export default function routes({ auditService, prisonerSearchService, visitSessi
   get(['/prisoner/results', '/prisoner-visit/results'], async (req, res) => {
     const { prisonId } = req.session.selectedEstablishment
     const isVisit = req.originalUrl.includes('-visit')
-    const search = (req.query.search || '') as string
-    const currentPage = (req.query.page || '') as string
+    const search = typeof req.query.search === 'string' ? req.query.search : ''
+    const currentPage = typeof req.query.page === 'string' ? req.query.page : ''
     const parsedPage = Number.parseInt(currentPage, 10) || 1
     const { pageSize } = config.apis.prisonerSearch
     const validationErrors = validatePrisonerSearch(search)

@@ -340,7 +340,7 @@ describe('/visit/:reference', () => {
           expect($('.govuk-back-link').length).toBe(0)
           expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
 
-          expect(res.text).toContain(`This booking is not for ${supportedPrisons.BLI.replace('&', '&amp;')}`)
+          expect(res.text).toContain(`This booking is not for ${supportedPrisons.BLI.replace(/&/g, '&amp;')}`)
           expect(res.text).toContain(`change the establishment to ${supportedPrisons[visit.prisonId]}`)
 
           expect(auditService.viewedVisitDetails).not.toHaveBeenCalled()
