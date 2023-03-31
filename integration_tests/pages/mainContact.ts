@@ -8,7 +8,7 @@ export default class MainContactPage extends Page {
   getFirstContact = (): PageElement => cy.get('#contact')
 
   enterPhoneNumber = (number: string): void => {
-    cy.get('#phoneNumber').clear().type(number)
+    cy.get('#phoneNumber').type(number)
   }
 
   continueButton = (): PageElement => cy.get('[data-test=submit]')

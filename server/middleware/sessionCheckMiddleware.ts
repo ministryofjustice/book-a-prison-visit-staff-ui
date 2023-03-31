@@ -1,4 +1,5 @@
-import { RequestHandler } from 'express'
+import type { Request, RequestHandler, Response } from 'express'
+import logger from '../../logger'
 import { isValidPrisonerNumber } from '../routes/validationChecks'
 
 export default function sessionCheckMiddleware({ stage }: { stage: number }): RequestHandler {
@@ -8,18 +9,18 @@ export default function sessionCheckMiddleware({ stage }: { stage: number }): Re
     const { reference } = req.params
 
     if (!visitSessionData) {
-      return res.redirect('/search/prisoner/?error=missing-session')
+      return logAndRedirect(req, res, '/search/prisoner/?error=missing-session')
     }
 
     if (
       visitSessionData.originalVisitSlot &&
       visitSessionData.originalVisitSlot.prisonId !== selectedEstablishment.prisonId
     ) {
-      return res.redirect('/?error=establishment-mismatch')
+      return logAndRedirect(req, res, '/?error=establishment-mismatch')
     }
 
     if (reference && visitSessionData.visitReference !== reference) {
-      return res.redirect('/?error=reference-mismatch')
+      return logAndRedirect(req, res, '/?error=reference-mismatch')
     }
 
     if (
@@ -29,14 +30,14 @@ export default function sessionCheckMiddleware({ stage }: { stage: number }): Re
       !visitSessionData.prisoner.dateOfBirth ||
       !visitSessionData.prisoner.location
     ) {
-      return res.redirect('/search/prisoner/?error=missing-prisoner')
+      return logAndRedirect(req, res, '/search/prisoner/?error=missing-prisoner')
     }
 
     if (
       stage > 1 &&
       (!visitSessionData.visitors || visitSessionData.visitors.length === 0 || !visitSessionData.visitRestriction)
     ) {
-      return res.redirect(`/prisoner/${visitSessionData.prisoner.offenderNo}?error=missing-visitors`)
+      return logAndRedirect(req, res, `/prisoner/${visitSessionData.prisoner.offenderNo}?error=missing-visitors`)
     }
 
     if (
@@ -47,15 +48,15 @@ export default function sessionCheckMiddleware({ stage }: { stage: number }): Re
         !visitSessionData.visitSlot.startTimestamp ||
         !visitSessionData.visitSlot.endTimestamp)
     ) {
-      return res.redirect(`/prisoner/${visitSessionData.prisoner.offenderNo}?error=missing-visit`)
+      return logAndRedirect(req, res, `/prisoner/${visitSessionData.prisoner.offenderNo}?error=missing-visit`)
     }
 
     if (stage > 2 && visitSessionData.visitSlot.prisonId !== selectedEstablishment.prisonId) {
-      return res.redirect('/?error=establishment-mismatch')
+      return logAndRedirect(req, res, '/?error=establishment-mismatch')
     }
 
     if (stage > 2 && !visitSessionData.visitReference) {
-      return res.redirect(`/prisoner/${visitSessionData.prisoner.offenderNo}?error=missing-visit-reference`)
+      return logAndRedirect(req, res, `/prisoner/${visitSessionData.prisoner.offenderNo}?error=missing-visit-reference`)
     }
 
     if (
@@ -63,7 +64,15 @@ export default function sessionCheckMiddleware({ stage }: { stage: number }): Re
       stage < 6 &&
       !(visitSessionData.visitStatus === 'RESERVED' || visitSessionData.visitStatus === 'CHANGING')
     ) {
-      return res.redirect(`/prisoner/${visitSessionData.prisoner.offenderNo}?error=visit-already-booked`)
+      return logAndRedirect(req, res, `/prisoner/${visitSessionData.prisoner.offenderNo}?error=visit-already-booked`)
+    }
+
+    if (stage > 3 && !visitSessionData.visitorSupport) {
+      return logAndRedirect(
+        req,
+        res,
+        `/prisoner/${visitSessionData.prisoner.offenderNo}?error=missing-additional-support`,
+      )
     }
 
     if (
@@ -72,13 +81,24 @@ export default function sessionCheckMiddleware({ stage }: { stage: number }): Re
         !visitSessionData.mainContact.phoneNumber ||
         (!visitSessionData.mainContact.contact && !visitSessionData.mainContact.contactName))
     ) {
-      return res.redirect(`/prisoner/${visitSessionData.prisoner.offenderNo}?error=missing-main-contact`)
+      return logAndRedirect(req, res, `/prisoner/${visitSessionData.prisoner.offenderNo}?error=missing-main-contact`)
     }
 
     if (stage > 5 && visitSessionData.visitStatus !== 'BOOKED') {
-      return res.redirect(`/prisoner/${visitSessionData.prisoner.offenderNo}?error=visit-not-booked`)
+      return logAndRedirect(req, res, `/prisoner/${visitSessionData.prisoner.offenderNo}?error=visit-not-booked`)
     }
 
     return next()
+  }
+
+  function logAndRedirect(req: Request, res: Response, redirectUrl: string) {
+    const { applicationReference, visitReference } = req.session?.visitSessionData ?? {}
+
+    logger.info(
+      `Session check failure: stage ${stage}, user: '${res.locals?.user?.username}', ${req.method} ${req.originalUrl}, \
+applicationReference: '${applicationReference}', visitReference: '${visitReference}'. Redirecting to '${redirectUrl}'`,
+    )
+
+    return res.redirect(redirectUrl)
   }
 }
