@@ -17,11 +17,13 @@ export default class VisitsByDatePage extends Page {
 
   childVisitorsCount = (): PageElement => cy.get('[data-test="visit-children"]')
 
-  prisonerOneName = (): PageElement => cy.get(':nth-child(1) > [data-test="prisoner-name"]')
+  prisonerRowOneName = (): PageElement => cy.get(':nth-child(1) > [data-test="prisoner-name"]')
 
-  prisonerOneNumber = (): PageElement => cy.get(':nth-child(1) > [data-test="prisoner-number"]')
+  prisonerRowOneNumber = (): PageElement => cy.get(':nth-child(1) > [data-test="prisoner-number"]')
 
-  prisonerTwoName = (): PageElement => cy.get(':nth-child(2) > [data-test="prisoner-name"]')
+  prisonerRowTwoName = (): PageElement => cy.get(':nth-child(2) > [data-test="prisoner-name"]')
 
-  prisonerTwoNumber = (): PageElement => cy.get(':nth-child(2) > [data-test="prisoner-number"]')
+  prisonerRowTwoNumber = (): PageElement => cy.get(':nth-child(2) > [data-test="prisoner-number"]')
+
+  visitType = (): PageElement => cy.get('[data-test="visit-room"]')
 }

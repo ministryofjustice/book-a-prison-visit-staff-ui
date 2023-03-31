@@ -16,26 +16,6 @@ context('View visit schedule timetable', () => {
 
   const prisonerNumber1 = 'A1234BC'
   const prisonerNumber2 = 'A1592EC'
-  const visits = [
-    TestData.visit({ reference: 'ab-cd-ef-gh', prisonerId: prisonerNumber1 }),
-    TestData.visit({ reference: 'gh-ef-cd-ab', prisonerId: prisonerNumber2 }),
-  ]
-
-  const prisonerNumbers = [visits[0].prisonerId, visits[1].prisonerId]
-  const prisonersResults = [
-    {
-      lastName: 'Smith',
-      firstName: 'Jack',
-      prisonerNumber: prisonerNumber1,
-      dateOfBirth: '2000-01-01',
-    },
-    {
-      lastName: 'Smith',
-      firstName: 'Philip',
-      prisonerNumber: prisonerNumber2,
-      dateOfBirth: '2000-01-02',
-    },
-  ]
 
   const childDob = format(sub(today, { years: 5 }), shortDateFormat)
   const contacts = [
@@ -65,6 +45,10 @@ context('View visit schedule timetable', () => {
 
     let startDateTime = `${todayShortString}T00:00:00`
     let endDateTime = `${todayShortString}T23:59:59`
+    let visits = [
+      TestData.visit({ reference: 'ab-cd-ef-gh', prisonerId: prisonerNumber1 }),
+      TestData.visit({ reference: 'gh-ef-cd-ab', prisonerId: prisonerNumber2 }),
+    ]
     cy.task('stubVisitsByDate', {
       startDateTime,
       endDateTime,
@@ -72,6 +56,21 @@ context('View visit schedule timetable', () => {
       visits,
     })
 
+    let prisonerNumbers = [prisonerNumber1, prisonerNumber2]
+    let prisonersResults = [
+      {
+        lastName: 'Smith',
+        firstName: 'Jack',
+        prisonerNumber: prisonerNumber1,
+        dateOfBirth: '2000-01-01',
+      },
+      {
+        lastName: 'Smith',
+        firstName: 'Philip',
+        prisonerNumber: prisonerNumber2,
+        dateOfBirth: '2000-01-02',
+      },
+    ]
     cy.task('stubGetPrisonersByPrisonerNumbers', {
       prisonerNumbers,
       results: prisonersResults,
@@ -106,19 +105,36 @@ context('View visit schedule timetable', () => {
     visitsByDatePage.adultVisitorsCount().contains('2 adults')
     visitsByDatePage.childVisitorsCount().contains('2 children')
 
-    visitsByDatePage.prisonerOneName().contains(`${prisonersResults[0].lastName}, ${prisonersResults[0].firstName}`)
-    visitsByDatePage.prisonerOneNumber().contains(prisonerNumber1)
-    visitsByDatePage.prisonerTwoName().contains(`${prisonersResults[1].lastName}, ${prisonersResults[1].firstName}`)
-    visitsByDatePage.prisonerTwoNumber().contains(prisonerNumber2)
+    visitsByDatePage.prisonerRowOneName().contains(`${prisonersResults[0].lastName}, ${prisonersResults[0].firstName}`)
+    visitsByDatePage.prisonerRowOneNumber().contains(prisonerNumber1)
+    visitsByDatePage.prisonerRowTwoName().contains(`${prisonersResults[1].lastName}, ${prisonersResults[1].firstName}`)
+    visitsByDatePage.prisonerRowTwoNumber().contains(prisonerNumber2)
 
     startDateTime = `${tomorrowShortString}T00:00:00`
     endDateTime = `${tomorrowShortString}T23:59:59`
-
+    visits = [
+      TestData.visit({ reference: 'ab-cd-ef-gh', prisonerId: prisonerNumber1, visitRestriction: 'CLOSED' }),
+      TestData.visit({ reference: 'gh-ef-cd-ab', prisonerId: prisonerNumber2 }),
+    ]
     cy.task('stubVisitsByDate', {
       startDateTime,
       endDateTime,
       prisonId,
       visits,
+    })
+
+    prisonerNumbers = [prisonerNumber2]
+    prisonersResults = [
+      {
+        lastName: 'Smith',
+        firstName: 'Philip',
+        prisonerNumber: prisonerNumber2,
+        dateOfBirth: '2000-01-02',
+      },
+    ]
+    cy.task('stubGetPrisonersByPrisonerNumbers', {
+      prisonerNumbers,
+      results: prisonersResults,
     })
 
     sessionCapacity = TestData.sessionCapacity({ open: 20, closed: 1 })
@@ -135,6 +151,12 @@ context('View visit schedule timetable', () => {
     visitsByDatePage.today().should('not.have.attr', 'aria-current', 'page')
     visitsByDatePage.tomorrow().should('have.attr', 'aria-current', 'page')
 
-    visitsByDatePage.tablesBookedCount().contains('2 of 20 tables booked')
+    visitsByDatePage.tablesBookedCount().contains('1 of 20 tables booked')
+    visitsByDatePage.visitType().contains('Open')
+
+    visitsByDatePage.prisonerRowOneName().contains(`${prisonersResults[0].lastName}, ${prisonersResults[0].firstName}`)
+    visitsByDatePage.prisonerRowOneNumber().contains(prisonerNumber2)
+    visitsByDatePage.prisonerRowTwoName().should('not.exist')
+    visitsByDatePage.prisonerRowTwoNumber().should('not.exist')
   })
 })
