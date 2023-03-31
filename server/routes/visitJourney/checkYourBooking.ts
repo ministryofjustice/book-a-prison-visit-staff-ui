@@ -20,13 +20,6 @@ export default class CheckYourBooking {
     const { visitSessionData } = req.session
     const { offenderNo } = visitSessionData.prisoner
 
-    // Log info to debug VB-2004
-    const debugInfo = {
-      visitorSupport: visitSessionData.visitorSupport,
-      availableSupportTypes: req.session.availableSupportTypes?.length,
-    }
-    logger.info(`check booking visitorSupport debug: ${JSON.stringify(debugInfo)}`)
-
     const additionalSupport = getSupportTypeDescriptions(
       req.session.availableSupportTypes,
       visitSessionData.visitorSupport,

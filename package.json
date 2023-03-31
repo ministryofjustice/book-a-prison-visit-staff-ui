@@ -96,7 +96,7 @@
     ]
   },
   "dependencies": {
-    "@aws-sdk/client-sqs": "^3.301.0",
+    "@aws-sdk/client-sqs": "^3.303.0",
     "@ministryofjustice/frontend": "^1.6.6",
     "agentkeepalive": "^4.3.0",
     "applicationinsights": "^2.5.1",
@@ -126,7 +126,7 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
-    "@aws-sdk/types": "^3.296.0",
+    "@aws-sdk/types": "^3.303.0",
     "@types/bunyan": "^1.8.8",
     "@types/bunyan-format": "^0.2.5",
     "@types/compression": "^1.7.2",
@@ -170,11 +170,11 @@
     "mocha-junit-reporter": "^2.2.0",
     "nock": "^13.3.0",
     "nodemon": "^2.0.22",
-    "openapi-typescript": "^6.2.0",
+    "openapi-typescript": "^6.2.1",
     "prettier": "^2.8.7",
     "sass": "^1.60.0",
     "supertest": "^6.3.3",
     "ts-jest": "^29.0.5",
-    "typescript": "^5.0.2"
+    "typescript": "^5.0.3"
   }
 }
