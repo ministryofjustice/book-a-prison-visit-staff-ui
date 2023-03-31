@@ -1,4 +1,4 @@
-import { SupportType } from '../../data/visitSchedulerApiTypes'
+import { SupportType } from '../../data/orchestrationApiTypes'
 import { Prison, VisitorListItem, VisitSessionData } from '../bapv'
 
 export default {}

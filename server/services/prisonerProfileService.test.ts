@@ -2,7 +2,7 @@ import { NotFound } from 'http-errors'
 import PrisonerProfileService from './prisonerProfileService'
 import { Alert, PagePrisonerBookingSummary, VisitBalances, OffenderRestrictions } from '../data/prisonApiTypes'
 import { PrisonerAlertItem, PrisonerProfile } from '../@types/bapv'
-import { PageVisitDto } from '../data/visitSchedulerApiTypes'
+import { PageVisitDto } from '../data/orchestrationApiTypes'
 import { Contact } from '../data/prisonerContactRegistryApiTypes'
 import TestData from '../routes/testutils/testData'
 import {
@@ -101,6 +101,7 @@ describe('Prisoner profile service', () => {
               },
             ],
             visitorSupport: [],
+            createdBy: 'user1',
             createdTimestamp: '',
             modifiedTimestamp: '',
           },

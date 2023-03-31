@@ -1,6 +1,6 @@
 import { SuperAgentRequest } from 'superagent'
 import { stubFor } from './wiremock'
-import { OutcomeDto, SessionSchedule, Visit, VisitSession } from '../../server/data/visitSchedulerApiTypes'
+import { OutcomeDto, SessionSchedule, Visit, VisitSession } from '../../server/data/orchestrationApiTypes'
 import TestData from '../../server/routes/testutils/testData'
 
 export default {

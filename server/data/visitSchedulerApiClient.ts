@@ -10,7 +10,7 @@ import {
   SessionCapacity,
   PageVisitDto,
   SessionSchedule,
-} from './visitSchedulerApiTypes'
+} from './orchestrationApiTypes'
 import { VisitSessionData } from '../@types/bapv'
 import config, { ApiConfig } from '../config'
 

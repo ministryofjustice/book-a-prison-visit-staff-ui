@@ -174,13 +174,13 @@ export interface components {
       /** @description Whether the prison is still active */
       active: boolean
       /** @description If this is a male prison */
-      male: boolean
+      male?: boolean
       /** @description If this is a female prison */
-      female: boolean
+      female?: boolean
       /** @description If this is a contracted prison */
-      contracted: boolean
+      contracted?: boolean
       /** @description Set of types for this prison */
-      prisonTypes: ('HMP' | 'YOI' | 'IRC' | 'STC' | 'YCS')[]
+      prisonTypes?: ('HMP' | 'YOI' | 'IRC' | 'STC' | 'YCS')[]
     }
     ErrorResponse: {
       /** Format: int32 */
@@ -245,17 +245,17 @@ export interface components {
       /** @description Whether the prison is still active */
       active: boolean
       /** @description Whether the prison has male prisoners */
-      male: boolean
+      male?: boolean
       /** @description Whether the prison has female prisoners */
-      female: boolean
+      female?: boolean
       /** @description Whether the prison is contracted */
-      contracted: boolean
+      contracted?: boolean
       /** @description List of types for this prison */
-      types: components['schemas']['PrisonTypeDto'][]
+      types?: components['schemas']['PrisonTypeDto'][]
       /** @description List of address for this prison */
-      addresses: components['schemas']['AddressDto'][]
+      addresses?: components['schemas']['AddressDto'][]
       /** @description List of operators for this prison */
-      operators: components['schemas']['PrisonOperatorDto'][]
+      operators?: components['schemas']['PrisonOperatorDto'][]
     }
     /** @description List of operators for this prison */
     PrisonOperatorDto: {
@@ -325,20 +325,20 @@ export interface components {
        */
       prisonName: string
       /** @description Whether the prison is still active */
-      active: boolean
+      active?: boolean
       /** @description If this is a male prison */
-      male: boolean
+      male?: boolean
       /** @description If this is a female prison */
-      female: boolean
+      female?: boolean
       /** @description If this is a contracted prison */
       contracted: boolean
       /**
        * @description Set of types for this prison
        * @example HMP
        */
-      prisonTypes: ('HMP' | 'YOI' | 'IRC' | 'STC' | 'YCS')[]
+      prisonTypes?: ('HMP' | 'YOI' | 'IRC' | 'STC' | 'YCS')[]
       /** @description List of addresses for this prison */
-      addresses: components['schemas']['UpdateAddressDto'][]
+      addresses?: components['schemas']['UpdateAddressDto'][]
     }
     DlqMessage: {
       body: {
@@ -364,14 +364,14 @@ export interface components {
 export type external = Record<string, never>
 
 export interface operations {
+  /** Get a prison's Videolink Conferencing Centre email address */
   getEmailForVideoConferencingCentre: {
-    /** Get a prison's Videolink Conferencing Centre email address */
     parameters: {
-      /**
-       * @description Prison ID
-       * @example MDI
-       */
       path: {
+        /**
+         * @description Prison ID
+         * @example MDI
+         */
         prisonId: string
       }
     }
@@ -396,14 +396,14 @@ export interface operations {
       }
     }
   }
+  /** Set or change a prison's Videolink Conferencing Centre email address */
   putEmailAddressForVideolinkConferencingCentre: {
-    /** Set or change a prison's Videolink Conferencing Centre email address */
     parameters: {
-      /**
-       * @description Prison ID
-       * @example MDI
-       */
       path: {
+        /**
+         * @description Prison ID
+         * @example MDI
+         */
         prisonId: string
       }
     }
@@ -423,14 +423,14 @@ export interface operations {
       404: never
     }
   }
+  /** Remove a prison's Videolink Conferencing Centre email address */
   deleteEmailAddressForVideolinkConferencingCentre: {
-    /** Remove a prison's Videolink Conferencing Centre email address */
     parameters: {
-      /**
-       * @description Prison ID
-       * @example MDI
-       */
       path: {
+        /**
+         * @description Prison ID
+         * @example MDI
+         */
         prisonId: string
       }
     }
@@ -441,14 +441,14 @@ export interface operations {
       400: never
     }
   }
+  /** Get a prison's Offender Management Unit email address */
   getEmailForOffenderManagementUnit: {
-    /** Get a prison's Offender Management Unit email address */
     parameters: {
-      /**
-       * @description Prison ID
-       * @example MDI
-       */
       path: {
+        /**
+         * @description Prison ID
+         * @example MDI
+         */
         prisonId: string
       }
     }
@@ -473,14 +473,14 @@ export interface operations {
       }
     }
   }
+  /** Set or change a prison's Offender Management Unit email address */
   putEmailAddressForOffenderManagementUnit: {
-    /** Set or change a prison's Offender Management Unit email address */
     parameters: {
-      /**
-       * @description Prison ID
-       * @example MDI
-       */
       path: {
+        /**
+         * @description Prison ID
+         * @example MDI
+         */
         prisonId: string
       }
     }
@@ -500,14 +500,14 @@ export interface operations {
       404: never
     }
   }
+  /** Remove a prison's Offender Management Unit email address */
   deleteEmailAddressForOffenderManagementUnit: {
-    /** Remove a prison's Offender Management Unit email address */
     parameters: {
-      /**
-       * @description Prison ID
-       * @example MDI
-       */
       path: {
+        /**
+         * @description Prison ID
+         * @example MDI
+         */
         prisonId: string
       }
     }
@@ -558,17 +558,17 @@ export interface operations {
       }
     }
   }
+  /**
+   * Update specified prison details
+   * @description Updates prison information, role required is MAINTAIN_REF_DATA
+   */
   updatePrison: {
-    /**
-     * Update specified prison details
-     * @description Updates prison information, role required is MAINTAIN_REF_DATA
-     */
     parameters: {
-      /**
-       * @description Prison Id
-       * @example MDI
-       */
       path: {
+        /**
+         * @description Prison Id
+         * @example MDI
+         */
         prisonId: string
       }
     }
@@ -610,22 +610,22 @@ export interface operations {
       }
     }
   }
+  /**
+   * Update specified address details
+   * @description Updates address information, role required is MAINTAIN_REF_DATA
+   */
   updateAddress: {
-    /**
-     * Update specified address details
-     * @description Updates address information, role required is MAINTAIN_REF_DATA
-     */
     parameters: {
-      /**
-       * @description Prison Id
-       * @example MDI
-       */
-      /**
-       * @description Address Id
-       * @example 234231
-       */
       path: {
+        /**
+         * @description Prison Id
+         * @example MDI
+         */
         prisonId: string
+        /**
+         * @description Address Id
+         * @example 234231
+         */
         addressId: string
       }
     }
@@ -667,22 +667,22 @@ export interface operations {
       }
     }
   }
+  /**
+   * Delete specified address for specified Prison
+   * @description Deletes address information for a Prison, role required is MAINTAIN_REF_DATA
+   */
   deleteAddress: {
-    /**
-     * Delete specified address for specified Prison
-     * @description Deletes address information for a Prison, role required is MAINTAIN_REF_DATA
-     */
     parameters: {
-      /**
-       * @description Prison Id
-       * @example MDI
-       */
-      /**
-       * @description Address Id
-       * @example 234231
-       */
       path: {
+        /**
+         * @description Prison Id
+         * @example MDI
+         */
         prisonId: string
+        /**
+         * @description Address Id
+         * @example 234231
+         */
         addressId: string
       }
     }
@@ -709,11 +709,11 @@ export interface operations {
       }
     }
   }
+  /**
+   * Adds a new prison
+   * @description Adds new prison information, role required is MAINTAIN_REF_DATA
+   */
   insertPrison: {
-    /**
-     * Adds a new prison
-     * @description Adds new prison information, role required is MAINTAIN_REF_DATA
-     */
     requestBody: {
       content: {
         'application/json': components['schemas']['InsertPrisonDto']
@@ -746,17 +746,17 @@ export interface operations {
       }
     }
   }
+  /**
+   * Add Address to existing Prison
+   * @description Adds an additional Address to an existing Prison, role required is MAINTAIN_REF_DATA
+   */
   addAddress: {
-    /**
-     * Add Address to existing Prison
-     * @description Adds an additional Address to an existing Prison, role required is MAINTAIN_REF_DATA
-     */
     parameters: {
-      /**
-       * @description Prison Id
-       * @example MDI
-       */
       path: {
+        /**
+         * @description Prison Id
+         * @example MDI
+         */
         prisonId: string
       }
     }
@@ -800,8 +800,8 @@ export interface operations {
   }
   getDlqMessages: {
     parameters: {
-      query?: {
-        maxMessages?: number
+      query: {
+        maxMessages: number
       }
       path: {
         dlqName: string
@@ -816,11 +816,11 @@ export interface operations {
       }
     }
   }
+  /**
+   * Get all prisons
+   * @description All prisons
+   */
   getPrisons: {
-    /**
-     * Get all prisons
-     * @description All prisons
-     */
     responses: {
       /** @description Successful Operation */
       200: {
@@ -830,32 +830,32 @@ export interface operations {
       }
     }
   }
+  /**
+   * Get prisons from active and text search
+   * @description All prisons
+   */
   getPrisonsBySearchFilter: {
-    /**
-     * Get prisons from active and text search
-     * @description All prisons
-     */
-    parameters?: {
-      /**
-       * @description Active
-       * @example true
-       */
-      /**
-       * @description Text search
-       * @example Sheffield
-       */
-      /**
-       * @description Genders to filter by
-       * @example MALE, FEMALE
-       */
-      /**
-       * @description Prison type codes to filter by
-       * @example HMP, YOI
-       */
-      query?: {
+    parameters: {
+      query: {
+        /**
+         * @description Active
+         * @example true
+         */
         active?: boolean
+        /**
+         * @description Text search
+         * @example Sheffield
+         */
         textSearch?: string
+        /**
+         * @description Genders to filter by
+         * @example MALE, FEMALE
+         */
         genders?: ('MALE' | 'FEMALE')[]
+        /**
+         * @description Prison type codes to filter by
+         * @example HMP, YOI
+         */
         prisonTypeCodes?: ('HMP' | 'YOI' | 'IRC' | 'STC' | 'YCS')[]
       }
     }
@@ -868,17 +868,17 @@ export interface operations {
       }
     }
   }
+  /**
+   * Get specified prison
+   * @description Information on a specific prison
+   */
   getPrisonFromId: {
-    /**
-     * Get specified prison
-     * @description Information on a specific prison
-     */
     parameters: {
-      /**
-       * @description Prison ID
-       * @example MDI
-       */
       path: {
+        /**
+         * @description Prison ID
+         * @example MDI
+         */
         prisonId: string
       }
     }
@@ -891,22 +891,22 @@ export interface operations {
       }
     }
   }
+  /**
+   * Get specified prison
+   * @description Information on a specific prison address
+   */
   getAddressFromId: {
-    /**
-     * Get specified prison
-     * @description Information on a specific prison address
-     */
     parameters: {
-      /**
-       * @description Prison ID
-       * @example MDI
-       */
-      /**
-       * @description Address Id
-       * @example 234231
-       */
       path: {
+        /**
+         * @description Prison ID
+         * @example MDI
+         */
         prisonId: string
+        /**
+         * @description Address Id
+         * @example 234231
+         */
         addressId: string
       }
     }
@@ -919,14 +919,14 @@ export interface operations {
       }
     }
   }
+  /** Get GP practice code about specified prison */
   getPrisonFromId_1: {
-    /** Get GP practice code about specified prison */
     parameters: {
-      /**
-       * @description Prison ID
-       * @example MDI
-       */
       path: {
+        /**
+         * @description Prison ID
+         * @example MDI
+         */
         prisonId: string
       }
     }
@@ -945,14 +945,14 @@ export interface operations {
       }
     }
   }
+  /** Get specified prison from GP practice code */
   getPrisonFromGpPrescriber: {
-    /** Get specified prison from GP practice code */
     parameters: {
-      /**
-       * @description GP Practice Code
-       * @example Y05537
-       */
       path: {
+        /**
+         * @description GP Practice Code
+         * @example Y05537
+         */
         gpPracticeCode: string
       }
     }
