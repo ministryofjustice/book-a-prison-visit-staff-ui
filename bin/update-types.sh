@@ -6,6 +6,10 @@
 APIS='{
   "apis": [
     {
+      "api": "orchestration-api",
+      "url": "https://hmpps-manage-prison-visits-orchestration-dev.prison.service.justice.gov.uk/v3/api-docs"
+    },
+    {
       "api": "prison-api",
       "url": "https://api-dev.prison.service.justice.gov.uk/v3/api-docs"
     },
