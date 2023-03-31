@@ -1,4 +1,4 @@
-import { Request, RequestHandler, Response } from 'express'
+import type { Request, RequestHandler, Response } from 'express'
 import logger from '../../logger'
 import { isValidPrisonerNumber } from '../routes/validationChecks'
 
