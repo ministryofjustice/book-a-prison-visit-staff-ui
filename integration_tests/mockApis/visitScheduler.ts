@@ -1,6 +1,12 @@
 import { SuperAgentRequest } from 'superagent'
 import { stubFor } from './wiremock'
-import { OutcomeDto, SessionSchedule, Visit, VisitSession } from '../../server/data/orchestrationApiTypes'
+import {
+  OutcomeDto,
+  SessionCapacity,
+  SessionSchedule,
+  Visit,
+  VisitSession,
+} from '../../server/data/orchestrationApiTypes'
 import TestData from '../../server/routes/testutils/testData'
 
 export default {
@@ -215,6 +221,68 @@ export default {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
         jsonBody: visitSessions,
+      },
+    })
+  },
+  stubVisitSessionCapacity: ({
+    prisonId,
+    sessionDate,
+    sessionStartTime,
+    sessionEndTime,
+    sessionCapacity,
+  }: {
+    prisonId: string
+    sessionDate: string
+    sessionStartTime: string
+    sessionEndTime: string
+    sessionCapacity: SessionCapacity
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPath: `/visitScheduler/visit-sessions/capacity`,
+        queryParameters: {
+          prisonId: { equalTo: prisonId },
+          sessionDate: { equalTo: sessionDate },
+          sessionStartTime: { equalTo: sessionStartTime },
+          sessionEndTime: { equalTo: sessionEndTime },
+        },
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: sessionCapacity,
+      },
+    })
+  },
+  stubVisitsByDate: ({
+    startDateTime,
+    endDateTime,
+    prisonId,
+    visits,
+  }: {
+    startDateTime: string
+    endDateTime: string
+    prisonId: string
+    visits: Visit
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPath: `/visitScheduler/visits/search`,
+        queryParameters: {
+          prisonId: { equalTo: prisonId },
+          startDateTime: { equalTo: startDateTime },
+          endDateTime: { equalTo: endDateTime },
+          visitStatus: { equalTo: 'BOOKED' },
+          page: { equalTo: '0' },
+          size: { equalTo: '1000' },
+        },
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: { content: visits },
       },
     })
   },

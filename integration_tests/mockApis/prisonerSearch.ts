@@ -58,4 +58,30 @@ export default {
       },
     })
   },
+  stubGetPrisonersByPrisonerNumbers: ({
+    prisonerNumbers,
+    results,
+  }: {
+    prisonerNumbers: []
+    results: []
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'POST',
+        url: `/offenderSearch/prisoner-search/prisoner-numbers`,
+        bodyPatterns: [
+          {
+            equalToJson: {
+              prisonerNumbers,
+            },
+          },
+        ],
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: results,
+      },
+    })
+  },
 }
