@@ -223,7 +223,7 @@ testJourneys.forEach(journey => {
           .send('contact=123')
           .send('phoneNumber=+0114+1234+567+')
           .expect(302)
-          .expect('location', `${journey.urlPrefix}/check-your-booking`)
+          .expect('location', `${journey.urlPrefix}/request-method`)
           .expect(() => {
             expect(visitSessionData.mainContact.contact).toEqual({
               personId: 123,
@@ -244,7 +244,7 @@ testJourneys.forEach(journey => {
           .send('someoneElseName=++another+person++')
           .send('phoneNumber=0114+7654+321')
           .expect(302)
-          .expect('location', `${journey.urlPrefix}/check-your-booking`)
+          .expect('location', `${journey.urlPrefix}/request-method`)
           .expect(() => {
             expect(visitSessionData.mainContact.contact).toBe(undefined)
             expect(visitSessionData.mainContact.contactName).toBe('another person')
@@ -270,7 +270,7 @@ testJourneys.forEach(journey => {
           .send('someoneElseName=another+person')
           .send('phoneNumber=0114+7654+321')
           .expect(302)
-          .expect('location', `${journey.urlPrefix}/check-your-booking`)
+          .expect('location', `${journey.urlPrefix}/request-method`)
           .expect(() => {
             expect(visitSessionData.mainContact.contact).toBe(undefined)
             expect(visitSessionData.mainContact.contactName).toBe('another person')

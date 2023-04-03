@@ -219,6 +219,7 @@ export type VisitSessionData = {
   applicationReference?: string
   visitReference?: string
   visitStatus?: Visit['visitStatus']
+  requestMethod?: string
 }
 
 export type VisitInformation = {

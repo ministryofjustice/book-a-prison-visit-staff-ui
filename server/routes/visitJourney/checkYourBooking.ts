@@ -33,6 +33,7 @@ export default class CheckYourBooking {
       visitRestriction: visitSessionData.visitRestriction,
       visitors: visitSessionData.visitors,
       additionalSupport,
+      requestMethod: visitSessionData.requestMethod,
       urlPrefix: getUrlPrefix(isUpdate, visitSessionData.visitReference),
     })
   }

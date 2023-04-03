@@ -53,7 +53,7 @@ export default class MainContact {
     }
 
     const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
-    return res.redirect(`${urlPrefix}/check-your-booking`)
+    return res.redirect(`${urlPrefix}/request-method`)
   }
 
   validate(): ValidationChain[] {

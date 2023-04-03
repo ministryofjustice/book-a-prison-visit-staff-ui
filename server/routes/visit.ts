@@ -19,6 +19,7 @@ import AdditionalSupport from './visitJourney/additionalSupport'
 import CheckYourBooking from './visitJourney/checkYourBooking'
 import Confirmation from './visitJourney/confirmation'
 import MainContact from './visitJourney/mainContact'
+import RequestMethod from './visitJourney/requestMethod'
 import sessionCheckMiddleware from '../middleware/sessionCheckMiddleware'
 import getPrisonConfiguration from '../constants/prisonConfiguration'
 import type { Services } from '../services'
@@ -54,6 +55,18 @@ export default function routes({
       endTimestamp: req.flash('endTimestamp')?.[0],
     })
   })
+  // get('/request-method', async (req, res) => {
+  //   const requestMethods = [
+  //     { id: 'phone', value: 'Phone call' },
+  //     { id: 'website', value: 'GOV.UK' },
+  //     { id: 'email', value: 'Email' },
+  //     { id: 'person', value: 'In person' },
+  //   ]
+
+  //   return res.render('pages/requestMethod', {
+  //     requestMethods,
+  //   })
+  // })
 
   get('/:reference', async (req, res) => {
     const reference = getVisitReference(req)
@@ -177,6 +190,7 @@ export default function routes({
   const dateAndTime = new DateAndTime('update', visitSessionsService, auditService)
   const additionalSupport = new AdditionalSupport('update', visitSessionsService)
   const mainContact = new MainContact('update')
+  const requestMethod = new RequestMethod('update')
   const checkYourBooking = new CheckYourBooking('update', visitSessionsService, auditService, notificationsService)
   const confirmation = new Confirmation('update')
 
@@ -248,6 +262,20 @@ export default function routes({
     sessionCheckMiddleware({ stage: 4 }),
     ...mainContact.validate(),
     (req, res) => mainContact.post(req, res),
+  )
+
+  get(
+    '/:reference/update/request-method',
+    checkVisitReferenceMiddleware,
+    sessionCheckMiddleware({ stage: 4 }),
+    (req, res) => requestMethod.get(req, res),
+  )
+  post(
+    '/:reference/update/request-method',
+    checkVisitReferenceMiddleware,
+    sessionCheckMiddleware({ stage: 4 }),
+    ...requestMethod.validate(),
+    (req, res) => requestMethod.post(req, res),
   )
 
   get(
