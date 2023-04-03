@@ -1,7 +1,7 @@
 import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs'
 import logger from '../../logger'
 import config from '../config'
-import { Visit } from '../data/visitSchedulerApiTypes'
+import { Visit } from '../data/orchestrationApiTypes'
 
 export default class AuditService {
   private sqsClient: SQSClient

@@ -4,7 +4,7 @@ import { SessionData } from 'express-session'
 import * as cheerio from 'cheerio'
 import { FlashData, VisitSessionData } from '../../@types/bapv'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
-import { Visit } from '../../data/visitSchedulerApiTypes'
+import { Visit } from '../../data/orchestrationApiTypes'
 import config from '../../config'
 import TestData from '../testutils/testData'
 import {

@@ -148,6 +148,13 @@ export interface paths {
      */
     get: operations['getVideoLinkBookingEvents']
   }
+  '/court/hearing-type': {
+    /**
+     * Return all court hearing types
+     * @description Get court hearing types
+     */
+    get: operations['getCourtHearingTypes']
+  }
   '/court/courts': {
     /**
      * All courts
@@ -167,7 +174,7 @@ export interface paths {
      * All court hearing types
      * @description Return a list of all court hearing types.
      */
-    get: operations['getCourtHearingTypes']
+    get: operations['getCourtHearingTypes_1']
   }
   '/court/all-courts': {
     /**
@@ -279,58 +286,16 @@ export type webhooks = Record<string, never>
 
 export interface components {
   schemas: {
-    Message: {
-      messageId?: string
-      receiptHandle?: string
-      body?: string
-      attributes?: {
-        [key: string]: string | undefined
+    DlqMessage: {
+      body: {
+        [key: string]: Record<string, never> | undefined
       }
-      messageAttributes?: {
-        [key: string]: components['schemas']['MessageAttributeValue'] | undefined
-      }
-      md5OfBody?: string
-      md5OfMessageAttributes?: string
-    }
-    MessageAttributeValue: {
-      stringValue?: string
-      binaryValue?: {
-        /** Format: int32 */
-        short?: number
-        char?: string
-        /** Format: int32 */
-        int?: number
-        /** Format: int64 */
-        long?: number
-        /** Format: float */
-        float?: number
-        /** Format: double */
-        double?: number
-        direct?: boolean
-        readOnly?: boolean
-      }
-      stringListValues?: string[]
-      binaryListValues?: {
-        /** Format: int32 */
-        short?: number
-        char?: string
-        /** Format: int32 */
-        int?: number
-        /** Format: int64 */
-        long?: number
-        /** Format: float */
-        float?: number
-        /** Format: double */
-        double?: number
-        direct?: boolean
-        readOnly?: boolean
-      }[]
-      dataType?: string
+      messageId: string
     }
     RetryDlqResult: {
       /** Format: int32 */
       messagesFoundCount: number
-      messages: components['schemas']['Message'][]
+      messages: components['schemas']['DlqMessage'][]
     }
     PurgeQueueResult: {
       /** Format: int32 */
@@ -393,6 +358,33 @@ export interface components {
       bookingId: number
       court?: string
       courtId?: string
+      /** @enum {string} */
+      courtHearingType?:
+        | 'APPEAL'
+        | 'APPLICATION'
+        | 'BACKER_TRIAL'
+        | 'BAIL'
+        | 'CIVIL'
+        | 'COMMITTAL_FOR_SENTENCE'
+        | 'CUSTODY_TIME_LIMIT_APPLICATIONS'
+        | 'IMMIGRATION_DEPORTATION'
+        | 'FAMILY'
+        | 'TRIAL'
+        | 'FURTHER_CASE_MANAGEMENT'
+        | 'FUTURE_TRIAL_REVIEW'
+        | 'GROUND_RULES'
+        | 'MENTION_DEFENDANT_MUST_ATTEND'
+        | 'MENTION_TO_FIX'
+        | 'NEWTON'
+        | 'PLEA'
+        | 'PLEA_TRIAL_PREPARATION'
+        | 'PRE_TRIAL_REVIEW'
+        | 'PROCEEDS_OF_CRIME_APPLICATIONS'
+        | 'REMAND'
+        | 'SECTION_28'
+        | 'SENTENCE'
+        | 'TRIBUNAL'
+        | 'OTHER'
       madeByTheCourt: boolean
       comment?: string
       pre?: components['schemas']['VideoLinkAppointmentSpecification']
@@ -419,6 +411,33 @@ export interface components {
       bookingId: number
       agencyId: string
       court?: string
+      /** @enum {string} */
+      courtHearingType?:
+        | 'APPEAL'
+        | 'APPLICATION'
+        | 'BACKER_TRIAL'
+        | 'BAIL'
+        | 'CIVIL'
+        | 'COMMITTAL_FOR_SENTENCE'
+        | 'CUSTODY_TIME_LIMIT_APPLICATIONS'
+        | 'IMMIGRATION_DEPORTATION'
+        | 'FAMILY'
+        | 'TRIAL'
+        | 'FURTHER_CASE_MANAGEMENT'
+        | 'FUTURE_TRIAL_REVIEW'
+        | 'GROUND_RULES'
+        | 'MENTION_DEFENDANT_MUST_ATTEND'
+        | 'MENTION_TO_FIX'
+        | 'NEWTON'
+        | 'PLEA'
+        | 'PLEA_TRIAL_PREPARATION'
+        | 'PRE_TRIAL_REVIEW'
+        | 'PROCEEDS_OF_CRIME_APPLICATIONS'
+        | 'REMAND'
+        | 'SECTION_28'
+        | 'SENTENCE'
+        | 'TRIBUNAL'
+        | 'OTHER'
       courtId?: string
       comment?: string
       pre?: components['schemas']['LocationTimeslot']
@@ -678,12 +697,6 @@ export interface components {
       locationId: number
       description: string
     }
-    DlqMessage: {
-      body: {
-        [key: string]: Record<string, never> | undefined
-      }
-      messageId: string
-    }
     GetDlqResult: {
       /** Format: int32 */
       messagesFoundCount: number
@@ -932,8 +945,8 @@ export interface components {
       first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
       last?: boolean
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     PageableObject: {
@@ -943,9 +956,9 @@ export interface components {
       /** Format: int32 */
       pageSize?: number
       paged?: boolean
+      unpaged?: boolean
       /** Format: int32 */
       pageNumber?: number
-      unpaged?: boolean
     }
     SortObject: {
       empty?: boolean
@@ -1224,11 +1237,11 @@ export interface operations {
       }
     }
   }
+  /** @description Update the comment for a Video Link Booking */
   updateVideoLinkBookingComment: {
-    /** @description Update the comment for a Video Link Booking */
     parameters: {
-      /** @description Video link booking id */
       path: {
+        /** @description Video link booking id */
         videoLinkBookingId: number
       }
     }
@@ -1242,14 +1255,14 @@ export interface operations {
       204: never
     }
   }
+  /**
+   * A video Link Booking
+   * @description Return a video Link Booking
+   */
   getVideoLinkBooking: {
-    /**
-     * A video Link Booking
-     * @description Return a video Link Booking
-     */
     parameters: {
-      /** @description Video link booking id */
       path: {
+        /** @description Video link booking id */
         videoBookingId: number
       }
     }
@@ -1262,11 +1275,11 @@ export interface operations {
       }
     }
   }
+  /** @description Update a Video Link Booking */
   updateVideoLinkBooking: {
-    /** @description Update a Video Link Booking */
     parameters: {
-      /** @description Video link booking id */
       path: {
+        /** @description Video link booking id */
         videoBookingId: number
       }
     }
@@ -1280,11 +1293,11 @@ export interface operations {
       204: never
     }
   }
+  /** @description Delete a Video Link Booking */
   deleteVideoLinkBooking: {
-    /** @description Delete a Video Link Booking */
     parameters: {
-      /** @description Video link booking id */
       path: {
+        /** @description Video link booking id */
         videoBookingId: number
       }
     }
@@ -1293,11 +1306,11 @@ export interface operations {
       204: never
     }
   }
+  /**
+   * Updates existing attendance information
+   * @description Updates the attendance record, posts attendance details back up to PNOMIS. IEP warnings are triggered when certain absence reasons are used.
+   */
   putAttendance: {
-    /**
-     * Updates existing attendance information
-     * @description Updates the attendance record, posts attendance details back up to PNOMIS. IEP warnings are triggered when certain absence reasons are used.
-     */
     parameters: {
       path: {
         id: number
@@ -1329,16 +1342,16 @@ export interface operations {
       }
     }
   }
+  /**
+   * Video Link Bookings
+   * @description Return details of Video Link Bookings in CSV format. Restrict the response to bookings with a main start time within 'days' of start-date.
+   */
   getVideoLinkBookingsByStartDate: {
-    /**
-     * Video Link Bookings
-     * @description Return details of Video Link Bookings in CSV format. Restrict the response to bookings with a main start time within 'days' of start-date.
-     */
     parameters: {
-      /** @description The earliest booking start time for which to return bookings for. */
-      /** @description Return details of bookings occurring within this number of days of start-date */
       query: {
+        /** @description The earliest booking start time for which to return bookings for. */
         'start-date': string
+        /** @description Return details of bookings occurring within this number of days of start-date */
         days?: number
       }
     }
@@ -1351,8 +1364,8 @@ export interface operations {
       }
     }
   }
+  /** @description Create a Video Link Booking */
   createVideoLinkBooking: {
-    /** @description Create a Video Link Booking */
     requestBody: {
       content: {
         'application/json': components['schemas']['VideoLinkBookingSpecification']
@@ -1367,11 +1380,11 @@ export interface operations {
       }
     }
   }
+  /** @description Return all video link bookings for the specified date and prisons, optionally filtering by court. */
   getVideoLinkBookingsBySearchDetails: {
-    /** @description Return all video link bookings for the specified date and prisons, optionally filtering by court. */
     parameters: {
-      /** @description Return video link bookings for this date only. ISO-8601 date format */
       path: {
+        /** @description Return video link bookings for this date only. ISO-8601 date format */
         date: string
       }
     }
@@ -1389,8 +1402,8 @@ export interface operations {
       }
     }
   }
+  /** @description Check that a potential video link booking, described by the supplied specification, can be made.  If not then return information about some alternatives. */
   findAvailableVideoLinkBookingOptions: {
-    /** @description Check that a potential video link booking, described by the supplied specification, can be made.  If not then return information about some alternatives. */
     requestBody: {
       content: {
         'application/json': components['schemas']['VideoLinkBookingSearchSpecification']
@@ -1405,11 +1418,11 @@ export interface operations {
       }
     }
   }
+  /**
+   * Video link appointments
+   * @description Return video link appointments
+   */
   getVideoLinkAppointments: {
-    /**
-     * Video link appointments
-     * @description Return video link appointments
-     */
     requestBody: {
       content: {
         'application/json': number[]
@@ -1424,8 +1437,8 @@ export interface operations {
       }
     }
   }
+  /** @description Make a cell move for an offender. Triggers the creation of a MOVED_CELL case note. */
   makeCellMove: {
-    /** @description Make a cell move for an offender. Triggers the creation of a MOVED_CELL case note. */
     requestBody: {
       content: {
         'application/json': components['schemas']['CellMoveDetails']
@@ -1458,11 +1471,11 @@ export interface operations {
       }
     }
   }
+  /**
+   * Create new attendance records for multiple offenders (This endpoint does not trigger IEP warnings)
+   * @description Stores new attendance record for multiple offenders, posts attendance details back up to PNOMIS
+   */
   postAttendances: {
-    /**
-     * Create new attendance records for multiple offenders (This endpoint does not trigger IEP warnings)
-     * @description Stores new attendance record for multiple offenders, posts attendance details back up to PNOMIS
-     */
     requestBody: {
       content: {
         'application/json': components['schemas']['AttendancesDto']
@@ -1477,22 +1490,22 @@ export interface operations {
       }
     }
   }
+  /**
+   * Request attendance details
+   * @description Returns set of attendance details for set of booking ids
+   */
   getAttendanceForBookings: {
-    /**
-     * Request attendance details
-     * @description Returns set of attendance details for set of booking ids
-     */
     parameters: {
-      /** @description Date of event in format YYYY-MM-DD */
-      /** @description Time period */
-      /** @description Booking ids (bookings=1&bookings=2) */
       query: {
+        /** @description Date of event in format YYYY-MM-DD */
         date: string
+        /** @description Time period */
         period: 'AM' | 'PM' | 'ED'
+        /** @description Booking ids (bookings=1&bookings=2) */
         bookings: number[]
       }
-      /** @description Prison id (LEI) */
       path: {
+        /** @description Prison id (LEI) */
         prison: string
       }
     }
@@ -1505,20 +1518,20 @@ export interface operations {
       }
     }
   }
+  /**
+   * Request attendance details
+   * @description Returns set of attendance details for set of booking ids
+   */
   getAttendanceForBookingsByPost: {
-    /**
-     * Request attendance details
-     * @description Returns set of attendance details for set of booking ids
-     */
     parameters: {
-      /** @description Date of event in format YYYY-MM-DD */
-      /** @description Time period */
       query: {
+        /** @description Date of event in format YYYY-MM-DD */
         date: string
+        /** @description Time period */
         period: 'AM' | 'PM' | 'ED'
       }
-      /** @description Prison id (LEI) */
       path: {
+        /** @description Prison id (LEI) */
         prison: string
       }
     }
@@ -1536,22 +1549,22 @@ export interface operations {
       }
     }
   }
+  /**
+   * Request attendance details
+   * @description Returns set of attendance details for set of booking ids
+   */
   getAttendanceForBookingsOverDateRangeByPost: {
-    /**
-     * Request attendance details
-     * @description Returns set of attendance details for set of booking ids
-     */
     parameters: {
-      /** @description Date of event in format YYYY-MM-DD */
-      /** @description Date of event in format YYYY-MM-DD defaults to fromDate */
-      /** @description Time period. Leave blank for AM + PM */
       query: {
+        /** @description Date of event in format YYYY-MM-DD */
         fromDate: string
+        /** @description Date of event in format YYYY-MM-DD defaults to fromDate */
         toDate?: string
+        /** @description Time period. Leave blank for AM + PM */
         period?: 'AM' | 'PM' | 'ED'
       }
-      /** @description Prison id (LEI) */
       path: {
+        /** @description Prison id (LEI) */
         prison: string
       }
     }
@@ -1569,11 +1582,11 @@ export interface operations {
       }
     }
   }
+  /**
+   * Create new attendance
+   * @description Stores new attendance record, posts attendance details back up to PNOMIS. IEP warnings are triggered when certain absence reasons are used.
+   */
   postAttendance: {
-    /**
-     * Create new attendance
-     * @description Stores new attendance record, posts attendance details back up to PNOMIS. IEP warnings are triggered when certain absence reasons are used.
-     */
     requestBody: {
       content: {
         'application/json': components['schemas']['CreateAttendanceDto']
@@ -1612,11 +1625,11 @@ export interface operations {
       }
     }
   }
+  /**
+   * createAppointment
+   * @description Create an appointment
+   */
   createAppointment: {
-    /**
-     * createAppointment
-     * @description Create an appointment
-     */
     requestBody: {
       content: {
         'application/json': components['schemas']['CreateAppointmentSpecification']
@@ -1643,14 +1656,14 @@ export interface operations {
       }
     }
   }
+  /**
+   * getVideoLinkBookingRooms
+   * @description List of all the Video Link Booking rooms in the prison.
+   */
   getVideoLinkBookingRooms: {
-    /**
-     * getVideoLinkBookingRooms
-     * @description List of all the Video Link Booking rooms in the prison.
-     */
     parameters: {
-      /** @description The prison */
       path: {
+        /** @description The prison */
         agencyId: string
       }
     }
@@ -1665,7 +1678,7 @@ export interface operations {
   }
   getDlqMessages: {
     parameters: {
-      query?: {
+      query: {
         maxMessages?: number
       }
       path: {
@@ -1681,19 +1694,19 @@ export interface operations {
       }
     }
   }
+  /**
+   * getLocationPrefixFromGroup
+   * @description Get location prefix by group
+   */
   getLocationPrefixFromGroup: {
-    /**
-     * getLocationPrefixFromGroup
-     * @description Get location prefix by group
-     */
     parameters: {
-      /** @description The prison */
-      /**
-       * @description The group name
-       * @example Houseblock 1
-       */
       path: {
+        /** @description The prison */
         agencyId: string
+        /**
+         * @description The group name
+         * @example Houseblock 1
+         */
         group: string
       }
     }
@@ -1718,16 +1731,16 @@ export interface operations {
       }
     }
   }
+  /**
+   * getLocationGroup
+   * @description List of cell locations by group at agency location.
+   */
   getLocationGroup: {
-    /**
-     * getLocationGroup
-     * @description List of cell locations by group at agency location.
-     */
     parameters: {
-      /** @description The prison */
-      /** @description The group name */
       path: {
+        /** @description The prison */
         agencyId: string
+        /** @description The group name */
         name: string
       }
     }
@@ -1758,20 +1771,20 @@ export interface operations {
       }
     }
   }
+  /**
+   * getCellsWithCapacityForGroup
+   * @description List of cells by group at agency location which have capacity.
+   */
   getCellsWithCapacityForGroup: {
-    /**
-     * getCellsWithCapacityForGroup
-     * @description List of cells by group at agency location which have capacity.
-     */
     parameters: {
-      /** @description Cell attribute */
-      query?: {
+      query: {
+        /** @description Cell attribute */
         attribute?: string
       }
-      /** @description The prison */
-      /** @description The group name */
       path: {
+        /** @description The prison */
         agencyId: string
+        /** @description The group name */
         group: string
       }
     }
@@ -1802,20 +1815,20 @@ export interface operations {
       }
     }
   }
+  /**
+   * getEvents
+   * @description All scheduled events for offender.  This endpoint filters out cancelled events.
+   */
   getEvents: {
-    /**
-     * getEvents
-     * @description All scheduled events for offender.  This endpoint filters out cancelled events.
-     */
     parameters: {
-      /** @description Returned events must be scheduled on or after this date (in YYYY-MM-DD format).  This date must be on or after today. */
-      /** @description Returned events must be scheduled on or before this date (in YYYY-MM-DD format).  This date must be on or after the fromDate. */
-      query?: {
+      query: {
+        /** @description Returned events must be scheduled on or after this date (in YYYY-MM-DD format).  This date must be on or after today. */
         fromDate?: string
+        /** @description Returned events must be scheduled on or before this date (in YYYY-MM-DD format).  This date must be on or after the fromDate. */
         toDate?: string
       }
-      /** @example A1234AA */
       path: {
+        /** @example A1234AA */
         offenderNo: string
       }
     }
@@ -1840,16 +1853,16 @@ export interface operations {
       }
     }
   }
+  /**
+   * Video Link Booking Events
+   * @description Return details of Video Link Booking Events (Create, Update, Delete) in CSV format. Restrict the response to events occurring within 'days' of start-date.
+   */
   getVideoLinkBookingEvents: {
-    /**
-     * Video Link Booking Events
-     * @description Return details of Video Link Booking Events (Create, Update, Delete) in CSV format. Restrict the response to events occurring within 'days' of start-date.
-     */
     parameters: {
-      /** @description The earliest date for which to return event details. */
-      /** @description Return details of events occurring within this number of days of start-date */
       query: {
+        /** @description The earliest date for which to return event details. */
         'start-date': string
+        /** @description Return details of events occurring within this number of days of start-date */
         days?: number
       }
     }
@@ -1862,45 +1875,11 @@ export interface operations {
       }
     }
   }
-  getCourts: {
-    /**
-     * All courts
-     * @description Return information about all courts.
-     */
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['Court'][]
-        }
-      }
-    }
-  }
-  getEmailByCourtId: {
-    /**
-     * Court email address
-     * @description Return information about email address.
-     */
-    parameters: {
-      /** @description Court id */
-      path: {
-        courtId: string
-      }
-    }
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['CourtEmailDto']
-        }
-      }
-    }
-  }
+  /**
+   * Return all court hearing types
+   * @description Get court hearing types
+   */
   getCourtHearingTypes: {
-    /**
-     * All court hearing types
-     * @description Return a list of all court hearing types.
-     */
     responses: {
       /** @description OK */
       200: {
@@ -1936,11 +1915,85 @@ export interface operations {
       }
     }
   }
+  /**
+   * All courts
+   * @description Return information about all courts.
+   */
+  getCourts: {
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          'application/json': components['schemas']['Court'][]
+        }
+      }
+    }
+  }
+  /**
+   * Court email address
+   * @description Return information about email address.
+   */
+  getEmailByCourtId: {
+    parameters: {
+      path: {
+        /** @description Court id */
+        courtId: string
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          'application/json': components['schemas']['CourtEmailDto']
+        }
+      }
+    }
+  }
+  /**
+   * All court hearing types
+   * @description Return a list of all court hearing types.
+   */
+  getCourtHearingTypes_1: {
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          'application/json': (
+            | 'APPEAL'
+            | 'APPLICATION'
+            | 'BACKER_TRIAL'
+            | 'BAIL'
+            | 'CIVIL'
+            | 'COMMITTAL_FOR_SENTENCE'
+            | 'CUSTODY_TIME_LIMIT_APPLICATIONS'
+            | 'IMMIGRATION_DEPORTATION'
+            | 'FAMILY'
+            | 'TRIAL'
+            | 'FURTHER_CASE_MANAGEMENT'
+            | 'FUTURE_TRIAL_REVIEW'
+            | 'GROUND_RULES'
+            | 'MENTION_DEFENDANT_MUST_ATTEND'
+            | 'MENTION_TO_FIX'
+            | 'NEWTON'
+            | 'PLEA'
+            | 'PLEA_TRIAL_PREPARATION'
+            | 'PRE_TRIAL_REVIEW'
+            | 'PROCEEDS_OF_CRIME_APPLICATIONS'
+            | 'REMAND'
+            | 'SECTION_28'
+            | 'SENTENCE'
+            | 'TRIBUNAL'
+            | 'OTHER'
+          )[]
+        }
+      }
+    }
+  }
+  /**
+   * Return all court locations
+   * @description All court locations
+   */
   getCourtNames: {
-    /**
-     * Return all court locations
-     * @description All court locations
-     */
     responses: {
       /** @description OK */
       200: {
@@ -1950,8 +2003,8 @@ export interface operations {
       }
     }
   }
+  /** @description Return cell move reason */
   getCellMoveReason: {
-    /** @description Return cell move reason */
     parameters: {
       path: {
         bookingId: number
@@ -1979,22 +2032,22 @@ export interface operations {
       }
     }
   }
+  /**
+   * Request attendance details
+   * @description Returns set of attendance details
+   */
   getAttendanceForEventLocation: {
-    /**
-     * Request attendance details
-     * @description Returns set of attendance details
-     */
     parameters: {
-      /** @description Date of event in format YYYY-MM-DD */
-      /** @description Time period */
       query: {
+        /** @description Date of event in format YYYY-MM-DD */
         date: string
+        /** @description Time period */
         period: 'AM' | 'PM' | 'ED'
       }
-      /** @description Prison id (LEI) */
-      /** @description Location id of event */
       path: {
+        /** @description Prison id (LEI) */
         prison: string
+        /** @description Location id of event */
         'event-location': number
       }
     }
@@ -2007,20 +2060,20 @@ export interface operations {
       }
     }
   }
+  /**
+   * Request unaccounted for prisoners
+   * @description Return a set of prisoners that haven't attended a scheduled activity
+   */
   getPrisonersUnaccountedFor: {
-    /**
-     * Request unaccounted for prisoners
-     * @description Return a set of prisoners that haven't attended a scheduled activity
-     */
     parameters: {
-      /** @description Date of event in format YYYY-MM-DD */
-      /** @description Time period */
       query: {
+        /** @description Date of event in format YYYY-MM-DD */
         date: string
+        /** @description Time period */
         period: 'AM' | 'PM' | 'ED'
       }
-      /** @description Prison id (LEI) */
       path: {
+        /** @description Prison id (LEI) */
         prison: string
       }
     }
@@ -2033,20 +2086,20 @@ export interface operations {
       }
     }
   }
+  /**
+   * Request absences details
+   * @description Returns set of attendance details for attendances with an absent reason
+   */
   getAbsences: {
-    /**
-     * Request absences details
-     * @description Returns set of attendance details for attendances with an absent reason
-     */
     parameters: {
-      /** @description Date of event in format YYYY-MM-DD */
-      /** @description Time period */
       query: {
+        /** @description Date of event in format YYYY-MM-DD */
         date: string
+        /** @description Time period */
         period: 'AM' | 'PM' | 'ED'
       }
-      /** @description Prison id (LEI) */
       path: {
+        /** @description Prison id (LEI) */
         prison: string
       }
     }
@@ -2059,24 +2112,24 @@ export interface operations {
       }
     }
   }
+  /**
+   * Request absences
+   * @description Return a set of absences for all offenders that have scheduled activity
+   */
   getAbsencesForReason: {
-    /**
-     * Request absences
-     * @description Return a set of absences for all offenders that have scheduled activity
-     */
     parameters: {
-      /** @description Date of event in format YYYY-MM-DD */
-      /** @description Date of event in format YYYY-MM-DD defaults to fromDate */
-      /** @description Time period */
       query: {
+        /** @description Date of event in format YYYY-MM-DD */
         fromDate: string
+        /** @description Date of event in format YYYY-MM-DD defaults to fromDate */
         toDate?: string
+        /** @description Time period */
         period?: 'AM' | 'PM' | 'ED'
       }
-      /** @description Prison id (LEI) */
-      /** @description Absent reason (e.g Refused, AcceptableAbsence) */
       path: {
+        /** @description Prison id (LEI) */
         prison: string
+        /** @description Absent reason (e.g Refused, AcceptableAbsence) */
         absentReason:
           | 'ApprovedCourse'
           | 'AcceptableAbsence'
@@ -2099,21 +2152,21 @@ export interface operations {
       }
     }
   }
+  /**
+   * Request unacceptable absence details
+   * @description Returns unacceptable absence attendance details for an offender
+   */
   getAttendanceDetailsForOffender: {
-    /**
-     * Request unacceptable absence details
-     * @description Returns unacceptable absence attendance details for an offender
-     */
     parameters: {
-      /** @description Start date of range to summarise in format YYYY-MM-DD */
-      /** @description End date of range to summarise in format YYYY-MM-DD */
       query: {
+        /** @description Start date of range to summarise in format YYYY-MM-DD */
         fromDate: string
+        /** @description End date of range to summarise in format YYYY-MM-DD */
         toDate: string
         pageable: components['schemas']['Pageable']
       }
-      /** @description offender or Prison number or Noms id */
       path: {
+        /** @description offender or Prison number or Noms id */
         offenderNo: string
       }
     }
@@ -2126,17 +2179,17 @@ export interface operations {
       }
     }
   }
+  /** @description Return counts of unacceptable absences and totals over time for an offender */
   getAttendanceSummary: {
-    /** @description Return counts of unacceptable absences and totals over time for an offender */
     parameters: {
-      /** @description Start date of range to summarise in format YYYY-MM-DD */
-      /** @description End date of range to summarise in format YYYY-MM-DD */
       query: {
+        /** @description Start date of range to summarise in format YYYY-MM-DD */
         fromDate: string
+        /** @description End date of range to summarise in format YYYY-MM-DD */
         toDate: string
       }
-      /** @description offender or Prison number or Noms id */
       path: {
+        /** @description offender or Prison number or Noms id */
         offenderNo: string
       }
     }
@@ -2149,13 +2202,13 @@ export interface operations {
       }
     }
   }
+  /** @description Return all changes relating to an attendance */
   getAttendanceChanges: {
-    /** @description Return all changes relating to an attendance */
     parameters: {
-      /** @description Date and Time of change in format YYYY-MM-DDT09:10 */
-      /** @description Date and Time of the change in format YYYY-MM-DDT:09:45 */
       query: {
+        /** @description Date and Time of change in format YYYY-MM-DDT09:10 */
         fromDateTime: string
+        /** @description Date and Time of the change in format YYYY-MM-DDT:09:45 */
         toDateTime?: string
       }
     }
@@ -2168,22 +2221,22 @@ export interface operations {
       }
     }
   }
+  /**
+   * Request attendance statistics
+   * @description Request attendance statistics
+   */
   getAttendanceForEventLocation_1: {
-    /**
-     * Request attendance statistics
-     * @description Request attendance statistics
-     */
     parameters: {
-      /** @description Time period. Leave blank for AM + PM */
-      /** @description From date of event in format YYYY-MM-DD */
-      /** @description To date of event in format YYYY-MM-DD */
       query: {
+        /** @description Time period. Leave blank for AM + PM */
         period?: 'AM' | 'PM' | 'ED'
+        /** @description From date of event in format YYYY-MM-DD */
         fromDate: string
+        /** @description To date of event in format YYYY-MM-DD */
         toDate: string
       }
-      /** @description Prison id (LEI) */
       path: {
+        /** @description Prison id (LEI) */
         prison: string
       }
     }
@@ -2196,27 +2249,27 @@ export interface operations {
       }
     }
   }
+  /**
+   * getAppointments
+   * @description List of appointments for the given agency that match the search criteria.
+   */
   getAppointments: {
-    /**
-     * getAppointments
-     * @description List of appointments for the given agency that match the search criteria.
-     */
     parameters: {
-      /** @description Date the appointments are scheduled */
-      /** @description AM, PM or ED */
-      /**
-       * @description The location prefix of any offenders' residence associated with a returned appointment
-       * @example Block A
-       */
-      /** @description Location id */
       query: {
+        /** @description Date the appointments are scheduled */
         date: string
+        /** @description AM, PM or ED */
         timeSlot?: 'AM' | 'PM' | 'ED'
+        /**
+         * @description The location prefix of any offenders' residence associated with a returned appointment
+         * @example Block A
+         */
         offenderLocationPrefix?: string
+        /** @description Location id */
         locationId?: number
       }
-      /** @description The agency Id */
       path: {
+        /** @description The agency Id */
         agencyId: string
       }
     }
@@ -2241,11 +2294,11 @@ export interface operations {
       }
     }
   }
+  /**
+   * getAppointment
+   * @description Return appointment details
+   */
   getAppointment: {
-    /**
-     * getAppointment
-     * @description Return appointment details
-     */
     parameters: {
       path: {
         id: number
@@ -2272,11 +2325,11 @@ export interface operations {
       }
     }
   }
+  /**
+   * deleteAppointment
+   * @description Delete an appointment
+   */
   deleteAppointment: {
-    /**
-     * deleteAppointment
-     * @description Delete an appointment
-     */
     parameters: {
       path: {
         id: number
@@ -2297,14 +2350,14 @@ export interface operations {
       }
     }
   }
+  /**
+   * getWhereabouts
+   * @description Whereabouts details (e.g. whether enabled) for prison.
+   */
   getWhereabouts: {
-    /**
-     * getWhereabouts
-     * @description Whereabouts details (e.g. whether enabled) for prison.
-     */
     parameters: {
-      /** @description The prison */
       path: {
+        /** @description The prison */
         agencyId: string
       }
     }
@@ -2335,14 +2388,14 @@ export interface operations {
       }
     }
   }
+  /**
+   * getAvailableLocationGroups
+   * @description List of all available Location Groups at agency.
+   */
   getAvailableLocationGroups: {
-    /**
-     * getAvailableLocationGroups
-     * @description List of all available Location Groups at agency.
-     */
     parameters: {
-      /** @description The prison */
       path: {
+        /** @description The prison */
         agencyId: string
       }
     }
@@ -2383,14 +2436,14 @@ export interface operations {
       }
     }
   }
+  /**
+   * deleteRecurringAppointmentSequence
+   * @description Delete the whole sequence of a recurring appointment
+   */
   deleteRecurringAppointmentSequence: {
-    /**
-     * deleteRecurringAppointmentSequence
-     * @description Delete the whole sequence of a recurring appointment
-     */
     parameters: {
-      /** @description The id of the recurring appointment sequence. */
       path: {
+        /** @description The id of the recurring appointment sequence. */
         id: number
       }
     }

@@ -18,7 +18,7 @@ import {
   OutcomeDto,
   SessionCapacity,
   SessionSchedule,
-} from '../data/visitSchedulerApiTypes'
+} from '../data/orchestrationApiTypes'
 import { ScheduledEvent } from '../data/whereaboutsApiTypes'
 import { prisonerDateTimePretty, prisonerTimePretty } from '../utils/utils'
 import buildVisitorListItem from '../utils/visitorUtils'

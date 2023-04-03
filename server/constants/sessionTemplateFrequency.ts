@@ -1,4 +1,4 @@
-import { SessionSchedule } from '../data/visitSchedulerApiTypes'
+import { SessionSchedule } from '../data/orchestrationApiTypes'
 
 const sessionTemplateFrequency: Record<SessionSchedule['sessionTemplateFrequency'], string> = {
   WEEKLY: 'Weekly',

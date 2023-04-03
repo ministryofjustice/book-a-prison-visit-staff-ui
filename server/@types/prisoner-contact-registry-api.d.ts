@@ -248,29 +248,29 @@ export interface components {
 export type external = Record<string, never>
 
 export interface operations {
+  /**
+   * Get Prisoner Contact
+   * @description Returns details of a prisoner contacts
+   */
   getPrisonerContact: {
-    /**
-     * Get Prisoner Contact
-     * @description Returns details of a prisoner contacts
-     */
     parameters: {
-      /**
-       * @description Query by Type (NOMIS Contact Type)
-       * @example S
-       */
-      /**
-       * @description Query by Person Identifier (NOMIS Person ID)
-       * @example 9147510
-       */
-      query?: {
+      query: {
+        /**
+         * @description Query by Type (NOMIS Contact Type)
+         * @example S
+         */
         type?: string
+        /**
+         * @description Query by Person Identifier (NOMIS Person ID)
+         * @example 9147510
+         */
         id?: number
       }
-      /**
-       * @description Prisoner Identifier (NOMIS Offender No)
-       * @example A1234AA
-       */
       path: {
+        /**
+         * @description Prisoner Identifier (NOMIS Offender No)
+         * @example A1234AA
+         */
         prisonerId: string
       }
     }

@@ -8,7 +8,7 @@ import {
   VisitsPageSlot,
 } from '../@types/bapv'
 import { Address, Contact, AddressUsage, Restriction } from '../data/prisonerContactRegistryApiTypes'
-import { VisitSession, Visit, OutcomeDto, PageVisitDto, SessionSchedule } from '../data/visitSchedulerApiTypes'
+import { VisitSession, Visit, OutcomeDto, PageVisitDto, SessionSchedule } from '../data/orchestrationApiTypes'
 import { ScheduledEvent } from '../data/whereaboutsApiTypes'
 import TestData from '../routes/testutils/testData'
 import VisitSessionsService from './visitSessionsService'
@@ -87,7 +87,7 @@ describe('Visit sessions service', () => {
       beforeEach(() => {
         sessions = [
           {
-            sessionTemplateReference: '100',
+            sessionTemplateId: 100,
             visitRoomName: 'A1',
             visitType: 'SOCIAL',
             prisonId: 'HEI',
@@ -274,7 +274,7 @@ describe('Visit sessions service', () => {
     it('Should handle closed visits', async () => {
       const sessions: VisitSession[] = [
         {
-          sessionTemplateReference: '1',
+          sessionTemplateId: 1,
           visitRoomName: 'A1',
           visitType: 'SOCIAL',
           prisonId: 'HEI',
@@ -332,7 +332,7 @@ describe('Visit sessions service', () => {
     it('Should handle multiple visit sessions and return correctly formatted data', async () => {
       const sessions: VisitSession[] = [
         {
-          sessionTemplateReference: '1',
+          sessionTemplateId: 1,
           visitRoomName: 'A1',
           visitType: 'SOCIAL',
           prisonId: 'HEI',
@@ -344,7 +344,7 @@ describe('Visit sessions service', () => {
           endTimestamp: '2022-02-14T11:00:00',
         },
         {
-          sessionTemplateReference: '2',
+          sessionTemplateId: 2,
           visitRoomName: 'A1',
           visitType: 'SOCIAL',
           prisonId: 'HEI',
@@ -356,7 +356,7 @@ describe('Visit sessions service', () => {
           endTimestamp: '2022-02-14T12:59:00',
         },
         {
-          sessionTemplateReference: '3',
+          sessionTemplateId: 3,
           visitRoomName: 'A1',
           visitType: 'SOCIAL',
           prisonId: 'HEI',
@@ -368,7 +368,7 @@ describe('Visit sessions service', () => {
           endTimestamp: '2022-02-14T13:05:00',
         },
         {
-          sessionTemplateReference: '3',
+          sessionTemplateId: 3,
           visitRoomName: 'A1',
           visitType: 'SOCIAL',
           prisonId: 'HEI',
@@ -380,7 +380,7 @@ describe('Visit sessions service', () => {
           endTimestamp: '2022-02-15T17:00:00',
         },
         {
-          sessionTemplateReference: '4',
+          sessionTemplateId: 4,
           visitRoomName: 'A1',
           visitType: 'SOCIAL',
           prisonId: 'HEI',
@@ -505,7 +505,7 @@ describe('Visit sessions service', () => {
     it('Should display single slot - ignoring slots with no capacity on current visit restriction (open)', async () => {
       const sessions: VisitSession[] = [
         {
-          sessionTemplateReference: '10',
+          sessionTemplateId: 10,
           visitRoomName: 'A1',
           visitType: 'SOCIAL',
           prisonId: 'HEI',
@@ -517,7 +517,7 @@ describe('Visit sessions service', () => {
           endTimestamp: '2022-02-14T10:00:00',
         },
         {
-          sessionTemplateReference: '11',
+          sessionTemplateId: 11,
           visitRoomName: 'A1',
           visitType: 'SOCIAL',
           prisonId: 'HEI',
@@ -575,7 +575,7 @@ describe('Visit sessions service', () => {
     it('Should display single slot - ignoring slots with no capacity on current visit restriction (closed)', async () => {
       const sessions: VisitSession[] = [
         {
-          sessionTemplateReference: '10',
+          sessionTemplateId: 10,
           visitRoomName: 'A1',
           visitType: 'SOCIAL',
           prisonId: 'HEI',
@@ -587,7 +587,7 @@ describe('Visit sessions service', () => {
           endTimestamp: '2022-02-14T10:00:00',
         },
         {
-          sessionTemplateReference: '11',
+          sessionTemplateId: 11,
           visitRoomName: 'A1',
           visitType: 'SOCIAL',
           prisonId: 'HEI',
@@ -741,6 +741,7 @@ describe('Visit sessions service', () => {
           },
         ],
         visitorSupport: [],
+        createdBy: 'user1',
         createdTimestamp: '2022-02-14T10:00:00',
         modifiedTimestamp: '2022-02-14T10:05:00',
       }
@@ -824,6 +825,7 @@ describe('Visit sessions service', () => {
           },
         ],
         visitorSupport: [{ type: 'WHEELCHAIR' }, { type: 'MASK_EXEMPT' }, { type: 'OTHER', text: 'custom request' }],
+        createdBy: 'user1',
         createdTimestamp: '2022-02-14T10:00:00',
         modifiedTimestamp: '2022-02-14T10:05:00',
       }
@@ -930,6 +932,7 @@ describe('Visit sessions service', () => {
           },
         ],
         visitorSupport: [{ type: 'WHEELCHAIR' }],
+        createdBy: 'user1',
         createdTimestamp: '2022-02-14T10:00:00',
         modifiedTimestamp: '2022-02-14T10:05:00',
       }
@@ -976,6 +979,7 @@ describe('Visit sessions service', () => {
           },
         ],
         visitorSupport: [],
+        createdBy: 'user1',
         createdTimestamp: '2022-02-14T10:00:00',
         modifiedTimestamp: '2022-02-14T10:05:00',
       }
@@ -1032,6 +1036,7 @@ describe('Visit sessions service', () => {
           text: 'custom request',
         },
       ],
+      createdBy: 'user1',
       createdTimestamp: '2022-02-14T10:00:00',
       modifiedTimestamp: '2022-02-14T10:05:00',
     }
@@ -1269,6 +1274,7 @@ describe('Visit sessions service', () => {
               },
             ],
             visitorSupport: [],
+            createdBy: 'user1',
             createdTimestamp: '2022-05-23T10:09:56.636334',
             modifiedTimestamp: '2022-05-23T10:09:56.64691',
           },
@@ -1303,6 +1309,7 @@ describe('Visit sessions service', () => {
               },
             ],
             visitorSupport: [],
+            createdBy: 'user1',
             createdTimestamp: '2022-05-20T15:29:04.997067',
             modifiedTimestamp: '2022-05-20T15:51:49.983108',
           },

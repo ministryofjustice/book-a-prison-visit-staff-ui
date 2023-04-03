@@ -10,7 +10,7 @@ import {
   formatVisitType,
 } from '../utils/utils'
 import { Alert, InmateDetail, OffenderRestriction, VisitBalances } from '../data/prisonApiTypes'
-import { Visitor } from '../data/visitSchedulerApiTypes'
+import { Visitor } from '../data/orchestrationApiTypes'
 import { Contact } from '../data/prisonerContactRegistryApiTypes'
 import SupportedPrisonsService from './supportedPrisonsService'
 import {
