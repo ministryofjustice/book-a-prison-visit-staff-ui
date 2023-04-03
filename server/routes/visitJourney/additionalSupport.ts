@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
-import { SupportType, VisitorSupport } from '../../data/visitSchedulerApiTypes'
+import { SupportType, VisitorSupport } from '../../data/orchestrationApiTypes'
 import VisitSessionsService from '../../services/visitSessionsService'
 import { getFlashFormValues } from '../visitorUtils'
 import getUrlPrefix from './visitJourneyUtils'

@@ -5,7 +5,7 @@ import { ExtendedVisitInformation, PrisonerDetailsItem, VisitsPageSlot } from '.
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import { getParsedDateFromQueryString, getResultsPagingLinks } from '../utils/utils'
 import { getDateTabs, getSlotsSideMenuData } from './visitsUtils'
-import { SessionCapacity, Visit } from '../data/visitSchedulerApiTypes'
+import { SessionCapacity, Visit } from '../data/orchestrationApiTypes'
 import type { Services } from '../services'
 
 export default function routes({ auditService, prisonerSearchService, visitSessionsService }: Services): Router {

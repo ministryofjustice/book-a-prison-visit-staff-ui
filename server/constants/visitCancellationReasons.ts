@@ -1,4 +1,4 @@
-import { OutcomeDto } from '../data/visitSchedulerApiTypes'
+import { OutcomeDto } from '../data/orchestrationApiTypes'
 
 const visitCancellationReasons: Partial<Record<OutcomeDto['outcomeStatus'], string>> = {
   VISITOR_CANCELLED: 'Visitor cancelled',

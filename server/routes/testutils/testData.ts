@@ -1,5 +1,5 @@
 import { Prison } from '../../@types/bapv'
-import { SessionCapacity, SessionSchedule, SupportType, Visit, VisitSession } from '../../data/visitSchedulerApiTypes'
+import { SessionCapacity, SessionSchedule, SupportType, Visit, VisitSession } from '../../data/orchestrationApiTypes'
 import {
   InmateDetail,
   CaseLoad,
@@ -314,6 +314,7 @@ export default class TestData {
         text: 'custom request',
       },
     ],
+    createdBy = 'user1',
     createdTimestamp,
     modifiedTimestamp,
   }: Partial<Visit> = {}): Visit =>
@@ -332,6 +333,7 @@ export default class TestData {
       visitContact,
       visitors,
       visitorSupport,
+      createdBy,
       createdTimestamp,
       modifiedTimestamp,
     } as Visit)
@@ -349,7 +351,7 @@ export default class TestData {
   })
 
   static visitSession = ({
-    sessionTemplateReference = '1',
+    sessionTemplateId = 1,
     visitRoomName = 'Visit room 1',
     visitType = 'SOCIAL',
     prisonId = 'HEI',
@@ -361,7 +363,7 @@ export default class TestData {
     endTimestamp = '2022-01-14T11:00:00',
     sessionConflicts = undefined,
   }: Partial<VisitSession> = {}): VisitSession => ({
-    sessionTemplateReference,
+    sessionTemplateId,
     visitRoomName,
     visitType,
     prisonId,

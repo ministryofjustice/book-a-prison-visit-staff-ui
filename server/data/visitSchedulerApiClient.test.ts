@@ -9,7 +9,7 @@ import {
   ReserveVisitSlotDto,
   ChangeVisitSlotRequestDto,
   SessionSchedule,
-} from './visitSchedulerApiTypes'
+} from './orchestrationApiTypes'
 import TestData from '../routes/testutils/testData'
 
 describe('visitSchedulerApiClient', () => {
@@ -86,6 +86,7 @@ describe('visitSchedulerApiClient', () => {
             text: 'custom support details',
           },
         ],
+        createdBy: 'user1',
         createdTimestamp: '2022-02-14T10:00:00',
         modifiedTimestamp: '2022-02-14T10:05:00',
       }
@@ -128,6 +129,7 @@ describe('visitSchedulerApiClient', () => {
               text: 'custom support details',
             },
           ],
+          createdBy: 'user1',
           createdTimestamp: '2022-02-14T10:00:00',
           modifiedTimestamp: '2022-02-14T10:05:00',
         },
@@ -182,6 +184,7 @@ describe('visitSchedulerApiClient', () => {
               text: 'custom support details',
             },
           ],
+          createdBy: 'user1',
           createdTimestamp: '2022-02-14T10:00:00',
           modifiedTimestamp: '2022-02-14T10:05:00',
         },
@@ -232,6 +235,7 @@ describe('visitSchedulerApiClient', () => {
               text: 'custom support details',
             },
           ],
+          createdBy: 'user1',
           createdTimestamp: '2022-02-14T10:00:00',
           modifiedTimestamp: '2022-02-14T10:05:00',
         },
@@ -260,7 +264,7 @@ describe('visitSchedulerApiClient', () => {
     it('should return an array of Visit Sessions from the Visit Scheduler API', async () => {
       const results: VisitSession[] = [
         {
-          sessionTemplateReference: '1',
+          sessionTemplateId: 1,
           visitRoomName: 'A1',
           visitType: 'SOCIAL',
           prisonId: 'HEI',
@@ -392,6 +396,7 @@ describe('visitSchedulerApiClient', () => {
           },
         ],
         visitorSupport: [],
+        createdBy: 'user1',
         createdTimestamp: '2022-02-14T10:00:00',
         modifiedTimestamp: '2022-02-14T10:05:00',
       }
@@ -490,6 +495,7 @@ describe('visitSchedulerApiClient', () => {
             text: 'custom request',
           },
         ],
+        createdBy: 'user1',
         createdTimestamp: '2022-02-14T10:00:00',
         modifiedTimestamp: '2022-02-14T10:05:00',
       }
@@ -586,6 +592,7 @@ describe('visitSchedulerApiClient', () => {
           },
         ],
         visitorSupport: [],
+        createdBy: 'user1',
         createdTimestamp: '2022-02-14T10:00:00',
         modifiedTimestamp: '2022-02-14T10:05:00',
       }
@@ -739,6 +746,7 @@ describe('visitSchedulerApiClient', () => {
           },
         ],
         visitorSupport: [],
+        createdBy: 'user1',
         createdTimestamp: '2022-02-14T10:00:00',
         modifiedTimestamp: '2022-02-14T10:05:00',
       }
@@ -809,6 +817,7 @@ describe('visitSchedulerApiClient', () => {
           },
         ],
         visitorSupport: [],
+        createdBy: 'user1',
         createdTimestamp: '2022-02-14T10:00:00',
         modifiedTimestamp: '2022-02-14T10:05:00',
       }

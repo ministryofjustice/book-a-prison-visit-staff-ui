@@ -6,7 +6,7 @@ import {
   SessionSchedule,
   Visit,
   VisitSession,
-} from '../../server/data/visitSchedulerApiTypes'
+} from '../../server/data/orchestrationApiTypes'
 import TestData from '../../server/routes/testutils/testData'
 
 export default {

@@ -1,5 +1,5 @@
 import { InmateDetail, OffenderRestriction, VisitBalances } from '../data/prisonApiTypes'
-import { Visit, VisitorSupport, VisitSession } from '../data/visitSchedulerApiTypes'
+import { Visit, VisitorSupport, VisitSession } from '../data/orchestrationApiTypes'
 
 export type Prison = {
   prisonId: string

@@ -6,6 +6,10 @@
 APIS='{
   "apis": [
     {
+      "api": "orchestration-api",
+      "url": "https://hmpps-manage-prison-visits-orchestration-dev.prison.service.justice.gov.uk/v3/api-docs"
+    },
+    {
       "api": "prison-api",
       "url": "https://api-dev.prison.service.justice.gov.uk/v3/api-docs"
     },
@@ -20,10 +24,6 @@ APIS='{
     {
       "api": "prisoner-offender-search-api",
       "url": "https://prisoner-offender-search-dev.prison.service.justice.gov.uk/v3/api-docs"
-    },
-    {
-      "api": "visit-scheduler-api",
-      "url": "https://visit-scheduler-dev.prison.service.justice.gov.uk/v3/api-docs"
     },
     {
       "api": "whereabouts-api",
