@@ -33,11 +33,6 @@ export default class RequestMethod {
       return res.redirect(req.originalUrl)
     }
 
-    // visitSessionData.mainContact = {
-    //   contact: selectedContact,
-    //   phoneNumber: req.body.phoneNumber,
-    //   contactName: selectedContact === undefined ? req.body.someoneElseName : undefined,
-    // }
     visitSessionData.requestMethod = req.body.method
 
     const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)

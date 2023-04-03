@@ -55,18 +55,6 @@ export default function routes({
       endTimestamp: req.flash('endTimestamp')?.[0],
     })
   })
-  // get('/request-method', async (req, res) => {
-  //   const requestMethods = [
-  //     { id: 'phone', value: 'Phone call' },
-  //     { id: 'website', value: 'GOV.UK' },
-  //     { id: 'email', value: 'Email' },
-  //     { id: 'person', value: 'In person' },
-  //   ]
-
-  //   return res.render('pages/requestMethod', {
-  //     requestMethods,
-  //   })
-  // })
 
   get('/:reference', async (req, res) => {
     const reference = getVisitReference(req)
