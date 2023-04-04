@@ -14,6 +14,8 @@ export type Visit = Omit<components['schemas']['VisitDto'], 'visitRestriction' |
 }
 export type PageVisitDto = Omit<components['schemas']['PageVisitDto'], 'content'> & { content: Visit[] }
 
+export type VisitHistoryDetails = components['schemas']['VisitHistoryDetailsDto']
+
 export type Visitor = components['schemas']['VisitorDto']
 
 export type ReserveVisitSlotDto = components['schemas']['ReserveVisitSlotDto']

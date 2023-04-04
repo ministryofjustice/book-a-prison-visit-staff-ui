@@ -1,5 +1,12 @@
 import { Prison } from '../../@types/bapv'
-import { SessionCapacity, SessionSchedule, SupportType, Visit, VisitSession } from '../../data/orchestrationApiTypes'
+import {
+  SessionCapacity,
+  SessionSchedule,
+  SupportType,
+  Visit,
+  VisitHistoryDetails,
+  VisitSession,
+} from '../../data/orchestrationApiTypes'
 import {
   InmateDetail,
   CaseLoad,
@@ -238,6 +245,26 @@ export default class TestData {
   static sessionCapacity = ({ open = 30, closed = 3 }: Partial<SessionCapacity> = {}): SessionCapacity =>
     ({ open, closed } as SessionCapacity)
 
+  static sessionSchedule = ({
+    sessionTemplateReference = '1',
+    startTime = '13:45',
+    endTime = '15:45',
+    enhanced = false,
+    capacity = { closed: 0, open: 40 },
+    prisonerLocationGroupNames = [],
+    sessionTemplateFrequency = 'WEEKLY',
+    sessionTemplateEndDate = '',
+  }: Partial<SessionSchedule> = {}): SessionSchedule => ({
+    sessionTemplateReference,
+    startTime,
+    endTime,
+    enhanced,
+    capacity,
+    prisonerLocationGroupNames,
+    sessionTemplateFrequency,
+    sessionTemplateEndDate,
+  })
+
   static supportedPrisons = ({
     prisons = <Record<string, string>>{
       HEI: 'Hewell (HMP)',
@@ -350,6 +377,24 @@ export default class TestData {
     latestPrivIepAdjustDate,
   })
 
+  static VisitHistoryDetails = ({
+    createdBy = 'User One',
+    updatedBy = 'User Two',
+    cancelledBy = 'User Three',
+    createdDateAndTime = '2023-04-01T08:00:00',
+    updatedDateAndTime = '2023-04-01T09:00:00',
+    cancelledDateAndTime = '2023-04-01T10:00:00',
+    visit = this.visit(),
+  }: Partial<VisitHistoryDetails> = {}): VisitHistoryDetails => ({
+    createdBy,
+    updatedBy,
+    cancelledBy,
+    createdDateAndTime,
+    updatedDateAndTime,
+    cancelledDateAndTime,
+    visit,
+  })
+
   static visitSession = ({
     sessionTemplateId = 1,
     visitRoomName = 'Visit room 1',
@@ -374,25 +419,5 @@ export default class TestData {
     startTimestamp,
     endTimestamp,
     sessionConflicts,
-  })
-
-  static sessionSchedule = ({
-    sessionTemplateReference = '1',
-    startTime = '13:45',
-    endTime = '15:45',
-    enhanced = false,
-    capacity = { closed: 0, open: 40 },
-    prisonerLocationGroupNames = [],
-    sessionTemplateFrequency = 'WEEKLY',
-    sessionTemplateEndDate = '',
-  }: Partial<SessionSchedule> = {}): SessionSchedule => ({
-    sessionTemplateReference,
-    startTime,
-    endTime,
-    enhanced,
-    capacity,
-    prisonerLocationGroupNames,
-    sessionTemplateFrequency,
-    sessionTemplateEndDate,
   })
 }
