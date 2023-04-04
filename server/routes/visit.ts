@@ -30,6 +30,7 @@ export default function routes({
   prisonerSearchService,
   prisonerVisitorsService,
   supportedPrisonsService,
+  visitService,
   visitSessionsService,
 }: Services): Router {
   const router = Router()
@@ -65,7 +66,7 @@ export default function routes({
       visitors,
       additionalSupport,
     }: { visit: Visit; visitors: VisitorListItem[]; additionalSupport: string[] } =
-      await visitSessionsService.getFullVisitDetails({
+      await visitService.getFullVisitDetails({
         reference,
         username: res.locals.user.username,
       })
@@ -111,7 +112,8 @@ export default function routes({
   post('/:reference', async (req, res) => {
     const reference = getVisitReference(req)
 
-    const { visit }: { visit: Visit } = await visitSessionsService.getFullVisitDetails({
+    // @TODO - not really using full visit details here so could request less information
+    const { visit }: { visit: Visit } = await visitService.getFullVisitDetails({
       reference,
       username: res.locals.user.username,
     })

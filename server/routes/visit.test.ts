@@ -14,6 +14,7 @@ import {
   createMockPrisonerSearchService,
   createMockPrisonerVisitorsService,
   createMockSupportedPrisonsService,
+  createMockVisitService,
   createMockVisitSessionsService,
 } from '../services/testutils/mocks'
 
@@ -25,6 +26,7 @@ const auditService = createMockAuditService()
 const prisonerSearchService = createMockPrisonerSearchService()
 const prisonerVisitorsService = createMockPrisonerVisitorsService()
 const supportedPrisonsService = createMockSupportedPrisonsService()
+const visitService = createMockVisitService()
 const visitSessionsService = createMockVisitSessionsService()
 
 let visitSessionData: VisitSessionData
@@ -102,7 +104,7 @@ describe('/visit/:reference', () => {
     jest.useFakeTimers({ advanceTimers: true, now: new Date(fakeDate) })
 
     prisonerSearchService.getPrisonerById.mockResolvedValue(prisoner)
-    visitSessionsService.getFullVisitDetails.mockResolvedValue({ visit, visitors, additionalSupport })
+    visitService.getFullVisitDetails.mockResolvedValue({ visit, visitors, additionalSupport })
     prisonerVisitorsService.getVisitors.mockResolvedValue(visitors)
     supportedPrisonsService.getSupportedPrisonIds.mockResolvedValue(supportedPrisonIds)
     supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
@@ -115,6 +117,7 @@ describe('/visit/:reference', () => {
         prisonerSearchService,
         prisonerVisitorsService,
         supportedPrisonsService,
+        visitService,
         visitSessionsService,
       },
       sessionData: {
@@ -185,7 +188,7 @@ describe('/visit/:reference', () => {
       const unknownTelephoneVisit = JSON.parse(JSON.stringify(visit))
       unknownTelephoneVisit.visitContact.telephone = 'UNKNOWN'
       prisonerSearchService.getPrisonerById.mockResolvedValue(prisoner)
-      visitSessionsService.getFullVisitDetails.mockResolvedValue({
+      visitService.getFullVisitDetails.mockResolvedValue({
         visit: unknownTelephoneVisit,
         visitors,
         additionalSupport,
@@ -247,7 +250,7 @@ describe('/visit/:reference', () => {
         '/visit/ab-cd-ef-gh?query=startDate%3D2022-05-24%26type%3DOPEN%26time%3D3pm%2Bto%2B3%253A59pm&from=visit-search'
 
       prisonerSearchService.getPrisonerById.mockResolvedValue(prisoner)
-      visitSessionsService.getFullVisitDetails.mockResolvedValue({ visit, visitors, additionalSupport })
+      visitService.getFullVisitDetails.mockResolvedValue({ visit, visitors, additionalSupport })
 
       return request(app)
         .get(url)
@@ -324,7 +327,7 @@ describe('/visit/:reference', () => {
 
     it('should not show booking summary if selected establishment does not match prison for which visit booked', () => {
       app = appWithAllRoutes({
-        services: { auditService, supportedPrisonsService, visitSessionsService },
+        services: { auditService, supportedPrisonsService, visitService, visitSessionsService },
         sessionData: {
           selectedEstablishment: { prisonId: 'BLI', prisonName: supportedPrisons.BLI },
         } as SessionData,
@@ -496,7 +499,7 @@ describe('/visit/:reference', () => {
 
     it('should redirect to /visit/:reference if selected establishment does not match prison for which visit booked', () => {
       app = appWithAllRoutes({
-        services: { auditService, supportedPrisonsService, visitSessionsService },
+        services: { auditService, supportedPrisonsService, visitService, visitSessionsService },
         sessionData: {
           selectedEstablishment: { prisonId: 'BLI', prisonName: supportedPrisons.BLI },
         } as SessionData,

@@ -6,6 +6,7 @@ import PrisonerSearchService from './prisonerSearchService'
 import PrisonerVisitorsService from './prisonerVisitorsService'
 import SupportedPrisonsService from './supportedPrisonsService'
 import UserService from './userService'
+import VisitService from './visitService'
 import VisitSessionsService from './visitSessionsService'
 
 export const services = () => {
@@ -52,6 +53,13 @@ export const services = () => {
     hmppsAuthClient,
   )
 
+  const visitService = new VisitService(
+    prisonerContactRegistryApiClientBuilder,
+    visitSchedulerApiClientBuilder,
+    visitSessionsService,
+    hmppsAuthClient,
+  )
+
   return {
     auditService,
     notificationsService,
@@ -60,6 +68,7 @@ export const services = () => {
     prisonerVisitorsService,
     supportedPrisonsService,
     userService,
+    visitService,
     visitSessionsService,
   }
 }
@@ -74,5 +83,6 @@ export {
   PrisonerVisitorsService,
   SupportedPrisonsService,
   UserService,
+  VisitService,
   VisitSessionsService,
 }

@@ -8,7 +8,6 @@ import {
   VisitSlotList,
   VisitSlotsForDay,
   VisitSessionData,
-  VisitorListItem,
   VisitsPageSlot,
 } from '../@types/bapv'
 import {
@@ -23,7 +22,6 @@ import { ScheduledEvent } from '../data/whereaboutsApiTypes'
 import { prisonerDateTimePretty, prisonerTimePretty } from '../utils/utils'
 import buildVisitorListItem from '../utils/visitorUtils'
 import { getVisitSlotsFromBookedVisits, getPrisonerEvents } from '../utils/visitsUtils'
-import { getSupportTypeDescriptions } from '../routes/visitorUtils'
 import {
   HmppsAuthClient,
   PrisonerContactRegistryApiClient,
@@ -347,33 +345,6 @@ export default class VisitSessionsService {
       extendedVisitsInfo,
       slots: getVisitSlotsFromBookedVisits(extendedVisitsInfo),
     }
-  }
-
-  async getFullVisitDetails({
-    username,
-    reference,
-  }: {
-    username: string
-    reference: string
-  }): Promise<{ visit: Visit; visitors: VisitorListItem[]; additionalSupport: string[] }> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const visitSchedulerApiClient = this.visitSchedulerApiClientFactory(token)
-    const prisonerContactRegistryApiClient = this.prisonerContactRegistryApiClientFactory(token)
-
-    const visit = await visitSchedulerApiClient.getVisit(reference)
-    const contacts = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(visit.prisonerId)
-    const visitorIds = visit.visitors.map(visitor => visitor.nomisPersonId)
-
-    const visitors = contacts
-      .filter(contact => visitorIds.includes(contact.personId))
-      .map(contact => buildVisitorListItem(contact))
-
-    const additionalSupport = getSupportTypeDescriptions(
-      await this.getAvailableSupportOptions(username),
-      visit.visitorSupport,
-    )
-
-    return { visit, visitors, additionalSupport }
   }
 
   private buildVisitInformation(visit: Visit): VisitInformation {

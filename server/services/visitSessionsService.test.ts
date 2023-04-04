@@ -3,7 +3,6 @@ import {
   VisitSlotList,
   VisitSessionData,
   VisitInformation,
-  VisitorListItem,
   ExtendedVisitInformation,
   VisitsPageSlot,
 } from '../@types/bapv'
@@ -1112,109 +1111,6 @@ describe('Visit sessions service', () => {
         expect(visitSchedulerApiClient.getUpcomingVisits).toHaveBeenCalledTimes(1)
         expect(visitSchedulerApiClient.getUpcomingVisits).toHaveBeenCalledWith('A1234BC', ['BOOKED'])
         expect(result).toEqual([])
-      })
-    })
-
-    describe('getFullVisitDetails', () => {
-      it('should return full details of visit, visitors and additional support options', async () => {
-        const childDateOfBirth = `${new Date().getFullYear() - 4}-03-02`
-        const contacts: Contact[] = [
-          {
-            personId: 4321,
-            firstName: 'Jeanette',
-            lastName: 'Smith',
-            dateOfBirth: '1986-07-28',
-            relationshipCode: 'SIS',
-            relationshipDescription: 'Sister',
-            contactType: 'S',
-            approvedVisitor: true,
-            emergencyContact: false,
-            nextOfKin: false,
-            restrictions: [
-              {
-                restrictionType: 'CLOSED',
-                restrictionTypeDescription: 'Closed',
-                startDate: '2022-01-03',
-                globalRestriction: false,
-              },
-            ],
-            addresses: [
-              {
-                street: '123 The Street',
-                town: 'Coventry',
-                primary: true,
-                noFixedAddress: false,
-                phones: [],
-                addressUsages: [],
-              },
-            ],
-          },
-          {
-            personId: 4322,
-            firstName: 'Bob',
-            lastName: 'Smith',
-            relationshipCode: 'BRO',
-            relationshipDescription: 'Brother',
-            contactType: 'S',
-            approvedVisitor: true,
-            emergencyContact: false,
-            nextOfKin: false,
-            restrictions: [],
-            addresses: [],
-          },
-          {
-            personId: 4324,
-            firstName: 'Anne',
-            lastName: 'Smith',
-            relationshipCode: 'NIE',
-            dateOfBirth: childDateOfBirth,
-            relationshipDescription: 'Niece',
-            contactType: 'S',
-            approvedVisitor: true,
-            emergencyContact: false,
-            nextOfKin: false,
-            restrictions: [],
-            addresses: [],
-          },
-        ]
-
-        const expectedResult: { visit: Visit; visitors: VisitorListItem[]; additionalSupport: string[] } = {
-          visit,
-          visitors: [
-            {
-              personId: 4321,
-              name: 'Jeanette Smith',
-              dateOfBirth: '1986-07-28',
-              adult: true,
-              relationshipDescription: 'Sister',
-              address: '123 The Street,<br>Coventry',
-              restrictions: contacts[0].restrictions,
-              banned: false,
-            },
-            {
-              personId: 4324,
-              name: 'Anne Smith',
-              dateOfBirth: childDateOfBirth,
-              adult: false,
-              relationshipDescription: 'Niece',
-              address: 'Not entered',
-              restrictions: [],
-              banned: false,
-            },
-          ],
-          additionalSupport: ['Wheelchair ramp', 'custom request'],
-        }
-
-        prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue(contacts)
-        visitSchedulerApiClient.getAvailableSupportOptions.mockResolvedValue(availableSupportTypes)
-        visitSchedulerApiClient.getVisit.mockResolvedValue(visit)
-
-        const result = await visitSessionsService.getFullVisitDetails({ username: 'user', reference: 'ab-cd-ef-gh' })
-
-        expect(prisonerContactRegistryApiClient.getPrisonerSocialContacts).toHaveBeenCalledTimes(1)
-        expect(visitSchedulerApiClient.getAvailableSupportOptions).toHaveBeenCalledTimes(1)
-        expect(visitSchedulerApiClient.getVisit).toHaveBeenCalledTimes(1)
-        expect(result).toEqual(expectedResult)
       })
     })
   })
