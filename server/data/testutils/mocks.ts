@@ -1,6 +1,7 @@
 import {
   HmppsAuthClient,
   NotificationsApiClient,
+  OrchestrationApiClient,
   PrisonApiClient,
   PrisonerContactRegistryApiClient,
   PrisonerSearchClient,
@@ -15,6 +16,9 @@ export const createMockHmppsAuthClient = () => new HmppsAuthClient(null) as jest
 
 export const createMockNotificationsApiClient = () =>
   new NotificationsApiClient() as jest.Mocked<NotificationsApiClient>
+
+export const createMockOrchestrationApiClient = () =>
+  new OrchestrationApiClient(null) as jest.Mocked<OrchestrationApiClient>
 
 export const createMockPrisonApiClient = () => new PrisonApiClient(null) as jest.Mocked<PrisonApiClient>
 

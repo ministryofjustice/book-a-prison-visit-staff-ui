@@ -2,13 +2,13 @@ import { VisitorListItem } from '../@types/bapv'
 import { Visit } from '../data/orchestrationApiTypes'
 import buildVisitorListItem from '../utils/visitorUtils'
 import { getSupportTypeDescriptions } from '../routes/visitorUtils'
-import { HmppsAuthClient, PrisonerContactRegistryApiClient, RestClientBuilder, VisitSchedulerApiClient } from '../data'
+import { HmppsAuthClient, OrchestrationApiClient, PrisonerContactRegistryApiClient, RestClientBuilder } from '../data'
 import VisitSessionsService from './visitSessionsService'
 
 export default class VisitService {
   constructor(
+    private readonly orchestrationApiClientFactory: RestClientBuilder<OrchestrationApiClient>,
     private readonly prisonerContactRegistryApiClientFactory: RestClientBuilder<PrisonerContactRegistryApiClient>,
-    private readonly visitSchedulerApiClientFactory: RestClientBuilder<VisitSchedulerApiClient>,
     private readonly visitSessionsService: VisitSessionsService,
     private readonly hmppsAuthClient: HmppsAuthClient,
   ) {}
@@ -21,10 +21,10 @@ export default class VisitService {
     reference: string
   }): Promise<{ visit: Visit; visitors: VisitorListItem[]; additionalSupport: string[] }> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const visitSchedulerApiClient = this.visitSchedulerApiClientFactory(token)
+    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
     const prisonerContactRegistryApiClient = this.prisonerContactRegistryApiClientFactory(token)
 
-    const visit = await visitSchedulerApiClient.getVisit(reference)
+    const { visit } = await orchestrationApiClient.getVisitHistory(reference)
     const contacts = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(visit.prisonerId)
     const visitorIds = visit.visitors.map(visitor => visitor.nomisPersonId)
 

@@ -4,8 +4,8 @@ import TestData from '../routes/testutils/testData'
 import VisitService from './visitService'
 import {
   createMockHmppsAuthClient,
+  createMockOrchestrationApiClient,
   createMockPrisonerContactRegistryApiClient,
-  createMockVisitSchedulerApiClient,
 } from '../data/testutils/mocks'
 import { createMockVisitSessionsService } from './testutils/mocks'
 
@@ -13,24 +13,24 @@ const token = 'some token'
 
 describe('Visit service', () => {
   const hmppsAuthClient = createMockHmppsAuthClient()
+  const orchestrationApiClient = createMockOrchestrationApiClient()
   const prisonerContactRegistryApiClient = createMockPrisonerContactRegistryApiClient()
-  const visitSchedulerApiClient = createMockVisitSchedulerApiClient()
   const visitSessionsService = createMockVisitSessionsService()
 
   let visitService: VisitService
 
+  const OrchestrationApiClientFactory = jest.fn()
   const PrisonerContactRegistryApiClientFactory = jest.fn()
-  const VisitSchedulerApiClientFactory = jest.fn()
 
   const availableSupportTypes = TestData.supportTypes()
 
   beforeEach(() => {
+    OrchestrationApiClientFactory.mockReturnValue(orchestrationApiClient)
     PrisonerContactRegistryApiClientFactory.mockReturnValue(prisonerContactRegistryApiClient)
-    VisitSchedulerApiClientFactory.mockReturnValue(visitSchedulerApiClient)
 
     visitService = new VisitService(
+      OrchestrationApiClientFactory,
       PrisonerContactRegistryApiClientFactory,
-      VisitSchedulerApiClientFactory,
       visitSessionsService,
       hmppsAuthClient,
     )
@@ -43,8 +43,10 @@ describe('Visit service', () => {
 
   describe('Get Visit', () => {
     describe('getFullVisitDetails', () => {
-      const visit = TestData.visit({
-        visitorSupport: [{ type: 'WHEELCHAIR' }, { type: 'OTHER', text: 'custom request' }],
+      const visitHistoryDetails = TestData.VisitHistoryDetails({
+        visit: TestData.visit({
+          visitorSupport: [{ type: 'WHEELCHAIR' }, { type: 'OTHER', text: 'custom request' }],
+        }),
       })
 
       const childDateOfBirth = `${new Date().getFullYear() - 4}-03-02`
@@ -62,7 +64,7 @@ describe('Visit service', () => {
 
       it('should return full details of visit, visitors and additional support options', async () => {
         const expectedResult: { visit: Visit; visitors: VisitorListItem[]; additionalSupport: string[] } = {
-          visit,
+          visit: visitHistoryDetails.visit,
           visitors: [
             {
               personId: 4321,
@@ -91,13 +93,13 @@ describe('Visit service', () => {
 
         prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue(contacts)
         visitSessionsService.getAvailableSupportOptions.mockResolvedValue(availableSupportTypes)
-        visitSchedulerApiClient.getVisit.mockResolvedValue(visit)
+        orchestrationApiClient.getVisitHistory.mockResolvedValue(visitHistoryDetails)
 
         const result = await visitService.getFullVisitDetails({ username: 'user', reference: 'ab-cd-ef-gh' })
 
         expect(prisonerContactRegistryApiClient.getPrisonerSocialContacts).toHaveBeenCalledTimes(1)
         expect(visitSessionsService.getAvailableSupportOptions).toHaveBeenCalledTimes(1)
-        expect(visitSchedulerApiClient.getVisit).toHaveBeenCalledTimes(1)
+        expect(orchestrationApiClient.getVisitHistory).toHaveBeenCalledTimes(1)
         expect(result).toEqual(expectedResult)
       })
     })
