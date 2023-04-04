@@ -97,6 +97,7 @@ export default function routes({
       prisoner,
       prisonerLocation,
       visit,
+      visitHistoryDetails,
       visitors,
       additionalSupport,
       fromVisitSearch,

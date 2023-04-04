@@ -20,8 +20,15 @@ context('Visit details page', () => {
     const prisoner = TestData.prisoner()
     const { prisonerNumber: offenderNo } = prisoner
     const prisonerDisplayName = 'Smith, John'
+    const visit = TestData.visit({
+      visitStatus: 'CANCELLED',
+      outcomeStatus: 'VISITOR_CANCELLED',
+    })
+    visit.visitNotes.push({ type: 'VISIT_OUTCOMES', text: 'Illness' })
     const visitHistoryDetails = TestData.visitHistoryDetails({
-      visit: TestData.visit({ createdTimestamp: '2022-02-14T10:00:00' }),
+      cancelledBy: 'User Three',
+      cancelledDateAndTime: '2022-01-01T11:00:00',
+      visit,
     })
 
     const contacts = [TestData.contact({ personId: 4321 })]
@@ -34,6 +41,10 @@ context('Visit details page', () => {
     const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage)
 
     visitDetailsPage.visitReference().contains('ab-cd-ef-gh')
+    visitDetailsPage.cancellationReason().within(() => {
+      cy.contains('This visit was cancelled by the visitor.')
+      cy.contains('Reason: Illness')
+    })
     visitDetailsPage.updateBooking().should('have.length', 0)
     visitDetailsPage.cancelBooking().should('have.length', 0)
 
@@ -58,7 +69,8 @@ context('Visit details page', () => {
     visitDetailsPage.visitComment().contains('Example of a visit comment')
     visitDetailsPage.visitorConcern().contains('Example of a visitor concern')
     visitDetailsPage.additionalSupport().contains('Wheelchair ramp, custom request')
-    visitDetailsPage.visitBooked().contains('Monday 14 February 2022 at 10am')
+    visitDetailsPage.visitBooked().contains('Saturday 1 January 2022 at 9am by User One')
+    visitDetailsPage.visitUpdated().contains('Saturday 1 January 2022 at 10am by User Two')
   })
 
   it('Should show update/cancel button for future visit', () => {
@@ -72,7 +84,6 @@ context('Visit details page', () => {
       visit: TestData.visit({
         startTimestamp: `${futureVisitDate}T12:00:00`,
         endTimestamp: `${futureVisitDate}T14:00:00`,
-        createdTimestamp: '2022-02-14T10:00:00',
       }),
     })
 
@@ -112,6 +123,7 @@ context('Visit details page', () => {
     visitDetailsPage.visitorAddress2().contains('C1 2AB')
     visitDetailsPage.visitorRestrictions2().contains('None')
     // Additional Information
-    visitDetailsPage.visitBooked().contains('Monday 14 February 2022 at 10am')
+    visitDetailsPage.visitBooked().contains('Saturday 1 January 2022 at 9am by User One')
+    visitDetailsPage.visitUpdated().contains('Saturday 1 January 2022 at 10am by User Two')
   })
 })

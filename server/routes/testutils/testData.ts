@@ -307,6 +307,7 @@ export default class TestData {
     visitRoom = 'Visit room 1',
     visitType = 'SOCIAL',
     visitStatus = 'BOOKED',
+    outcomeStatus = undefined,
     visitRestriction = 'OPEN',
     startTimestamp = '2022-01-14T10:00:00',
     endTimestamp = '2022-01-14T11:00:00',
@@ -342,8 +343,8 @@ export default class TestData {
       },
     ],
     createdBy = 'user1',
-    createdTimestamp,
-    modifiedTimestamp,
+    createdTimestamp = '2022-01-01T09:00:00',
+    modifiedTimestamp = '2022-01-01T09:00:00',
   }: Partial<Visit> = {}): Visit =>
     ({
       applicationReference,
@@ -353,6 +354,7 @@ export default class TestData {
       visitRoom,
       visitType,
       visitStatus,
+      outcomeStatus,
       visitRestriction,
       startTimestamp,
       endTimestamp,
@@ -380,10 +382,10 @@ export default class TestData {
   static visitHistoryDetails = ({
     createdBy = 'User One',
     updatedBy = 'User Two',
-    cancelledBy = 'User Three',
-    createdDateAndTime = '2023-04-01T08:00:00',
-    updatedDateAndTime = '2023-04-01T09:00:00',
-    cancelledDateAndTime = '2023-04-01T10:00:00',
+    cancelledBy = undefined,
+    createdDateAndTime = '2022-01-01T09:00:00',
+    updatedDateAndTime = '2022-01-01T10:00:00',
+    cancelledDateAndTime = undefined,
     visit = this.visit(),
   }: Partial<VisitHistoryDetails> = {}): VisitHistoryDetails => ({
     createdBy,
