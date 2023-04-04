@@ -20,12 +20,14 @@ context('Visit details page', () => {
     const prisoner = TestData.prisoner()
     const { prisonerNumber: offenderNo } = prisoner
     const prisonerDisplayName = 'Smith, John'
-    const visit = TestData.visit({ createdTimestamp: '2022-02-14T10:00:00' })
+    const visitHistoryDetails = TestData.visitHistoryDetails({
+      visit: TestData.visit({ createdTimestamp: '2022-02-14T10:00:00' }),
+    })
 
     const contacts = [TestData.contact({ personId: 4321 })]
 
     cy.task('stubPrisonerById', prisoner)
-    cy.task('stubVisit', visit)
+    cy.task('stubVisitHistory', visitHistoryDetails)
     cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
     cy.task('stubAvailableSupport')
     cy.visit('/visit/ab-cd-ef-gh')
@@ -66,10 +68,12 @@ context('Visit details page', () => {
     const prisonerDisplayName = 'Smith, John'
 
     const futureVisitDate = format(add(today, { months: 1 }), shortDateFormat)
-    const visit = TestData.visit({
-      startTimestamp: `${futureVisitDate}T12:00:00`,
-      endTimestamp: `${futureVisitDate}T14:00:00`,
-      createdTimestamp: '2022-02-14T10:00:00',
+    const visitHistoryDetails = TestData.visitHistoryDetails({
+      visit: TestData.visit({
+        startTimestamp: `${futureVisitDate}T12:00:00`,
+        endTimestamp: `${futureVisitDate}T14:00:00`,
+        createdTimestamp: '2022-02-14T10:00:00',
+      }),
     })
 
     const childDob = format(sub(today, { years: 5 }), shortDateFormat)
@@ -85,7 +89,7 @@ context('Visit details page', () => {
     ]
 
     cy.task('stubPrisonerById', prisoner)
-    cy.task('stubVisit', visit)
+    cy.task('stubVisitHistory', visitHistoryDetails)
     cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
     cy.task('stubAvailableSupport')
     cy.visit('/visit/ab-cd-ef-gh')
