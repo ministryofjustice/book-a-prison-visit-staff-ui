@@ -1,5 +1,5 @@
 import { VisitorListItem } from '../@types/bapv'
-import { Visit } from '../data/orchestrationApiTypes'
+import { VisitHistoryDetails } from '../data/orchestrationApiTypes'
 import buildVisitorListItem from '../utils/visitorUtils'
 import { getSupportTypeDescriptions } from '../routes/visitorUtils'
 import { HmppsAuthClient, OrchestrationApiClient, PrisonerContactRegistryApiClient, RestClientBuilder } from '../data'
@@ -19,12 +19,13 @@ export default class VisitService {
   }: {
     username: string
     reference: string
-  }): Promise<{ visit: Visit; visitors: VisitorListItem[]; additionalSupport: string[] }> {
+  }): Promise<{ visitHistoryDetails: VisitHistoryDetails; visitors: VisitorListItem[]; additionalSupport: string[] }> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
     const prisonerContactRegistryApiClient = this.prisonerContactRegistryApiClientFactory(token)
 
-    const { visit } = await orchestrationApiClient.getVisitHistory(reference)
+    const visitHistoryDetails = await orchestrationApiClient.getVisitHistory(reference)
+    const { visit } = visitHistoryDetails
     const contacts = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(visit.prisonerId)
     const visitorIds = visit.visitors.map(visitor => visitor.nomisPersonId)
 
@@ -37,6 +38,6 @@ export default class VisitService {
       visit.visitorSupport,
     )
 
-    return { visit, visitors, additionalSupport }
+    return { visitHistoryDetails, visitors, additionalSupport }
   }
 }

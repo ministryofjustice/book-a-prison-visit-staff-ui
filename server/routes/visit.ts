@@ -4,13 +4,13 @@ import { body, validationResult } from 'express-validator'
 import { BadRequest } from 'http-errors'
 import visitCancellationReasons from '../constants/visitCancellationReasons'
 import { Prisoner } from '../data/prisonerOffenderSearchTypes'
-import { OutcomeDto, Visit } from '../data/orchestrationApiTypes'
+import { OutcomeDto } from '../data/orchestrationApiTypes'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import { isValidVisitReference } from './validationChecks'
 import { clearSession, getFlashFormValues } from './visitorUtils'
 import config from '../config'
 import logger from '../../logger'
-import { VisitorListItem, VisitSessionData, VisitSlot } from '../@types/bapv'
+import { VisitSessionData, VisitSlot } from '../@types/bapv'
 import SelectVisitors from './visitJourney/selectVisitors'
 import VisitType from './visitJourney/visitType'
 import { properCaseFullName } from '../utils/utils'
@@ -61,15 +61,11 @@ export default function routes({
     const fromVisitSearch = (req.query?.from as string) === 'visit-search'
     const fromVisitSearchQuery = req.query?.query as string
 
-    const {
-      visit,
-      visitors,
-      additionalSupport,
-    }: { visit: Visit; visitors: VisitorListItem[]; additionalSupport: string[] } =
-      await visitService.getFullVisitDetails({
-        reference,
-        username: res.locals.user.username,
-      })
+    const { visitHistoryDetails, visitors, additionalSupport } = await visitService.getFullVisitDetails({
+      reference,
+      username: res.locals.user.username,
+    })
+    const { visit } = visitHistoryDetails
 
     if (visit.prisonId !== req.session.selectedEstablishment.prisonId) {
       const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(res.locals.user.username)
@@ -113,7 +109,9 @@ export default function routes({
     const reference = getVisitReference(req)
 
     // @TODO - not really using full visit details here so could request less information
-    const { visit }: { visit: Visit } = await visitService.getFullVisitDetails({
+    const {
+      visitHistoryDetails: { visit },
+    } = await visitService.getFullVisitDetails({
       reference,
       username: res.locals.user.username,
     })

@@ -3,7 +3,7 @@ import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
-import { OutcomeDto, Visit } from '../data/orchestrationApiTypes'
+import { OutcomeDto, Visit, VisitHistoryDetails } from '../data/orchestrationApiTypes'
 import { FlashData, VisitorListItem, VisitSessionData } from '../@types/bapv'
 import config from '../config'
 import { clearSession } from './visitorUtils'
@@ -64,6 +64,7 @@ describe('/visit/:reference', () => {
   const prisoner = TestData.prisoner()
 
   let visit: Visit
+  let visitHistoryDetails: VisitHistoryDetails
 
   const visitors: VisitorListItem[] = [
     {
@@ -99,12 +100,13 @@ describe('/visit/:reference', () => {
 
   beforeEach(() => {
     visit = TestData.visit({ createdTimestamp: '2022-01-01' })
+    visitHistoryDetails = TestData.visitHistoryDetails({ visit })
 
     const fakeDate = new Date('2022-01-01')
     jest.useFakeTimers({ advanceTimers: true, now: new Date(fakeDate) })
 
     prisonerSearchService.getPrisonerById.mockResolvedValue(prisoner)
-    visitService.getFullVisitDetails.mockResolvedValue({ visit, visitors, additionalSupport })
+    visitService.getFullVisitDetails.mockResolvedValue({ visitHistoryDetails, visitors, additionalSupport })
     prisonerVisitorsService.getVisitors.mockResolvedValue(visitors)
     supportedPrisonsService.getSupportedPrisonIds.mockResolvedValue(supportedPrisonIds)
     supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
@@ -185,11 +187,10 @@ describe('/visit/:reference', () => {
     })
 
     it('should render full booking summary page with prisoner, visit and visitor details, with default back link, formatting unknown contact telephone correctly', () => {
-      const unknownTelephoneVisit = JSON.parse(JSON.stringify(visit))
-      unknownTelephoneVisit.visitContact.telephone = 'UNKNOWN'
+      visitHistoryDetails.visit.visitContact.telephone = 'UNKNOWN'
       prisonerSearchService.getPrisonerById.mockResolvedValue(prisoner)
       visitService.getFullVisitDetails.mockResolvedValue({
-        visit: unknownTelephoneVisit,
+        visitHistoryDetails,
         visitors,
         additionalSupport,
       })
@@ -250,7 +251,7 @@ describe('/visit/:reference', () => {
         '/visit/ab-cd-ef-gh?query=startDate%3D2022-05-24%26type%3DOPEN%26time%3D3pm%2Bto%2B3%253A59pm&from=visit-search'
 
       prisonerSearchService.getPrisonerById.mockResolvedValue(prisoner)
-      visitService.getFullVisitDetails.mockResolvedValue({ visit, visitors, additionalSupport })
+      visitService.getFullVisitDetails.mockResolvedValue({ visitHistoryDetails, visitors, additionalSupport })
 
       return request(app)
         .get(url)

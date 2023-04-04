@@ -377,7 +377,7 @@ export default class TestData {
     latestPrivIepAdjustDate,
   })
 
-  static VisitHistoryDetails = ({
+  static visitHistoryDetails = ({
     createdBy = 'User One',
     updatedBy = 'User Two',
     cancelledBy = 'User Three',

@@ -24,7 +24,7 @@ describe('orchestrationApiClient', () => {
 
   describe('getVisitHistory', () => {
     it('should return visit history details for requested visit', async () => {
-      const visitHistoryDetails = TestData.VisitHistoryDetails()
+      const visitHistoryDetails = TestData.visitHistoryDetails()
 
       fakeOrchestrationApi
         .get(`/visits/${visitHistoryDetails.visit.reference}/history`)

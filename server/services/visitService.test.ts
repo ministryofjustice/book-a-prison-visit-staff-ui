@@ -1,5 +1,5 @@
 import { VisitorListItem } from '../@types/bapv'
-import { Visit } from '../data/orchestrationApiTypes'
+import { VisitHistoryDetails } from '../data/orchestrationApiTypes'
 import TestData from '../routes/testutils/testData'
 import VisitService from './visitService'
 import {
@@ -43,7 +43,7 @@ describe('Visit service', () => {
 
   describe('Get Visit', () => {
     describe('getFullVisitDetails', () => {
-      const visitHistoryDetails = TestData.VisitHistoryDetails({
+      const visitHistoryDetails = TestData.visitHistoryDetails({
         visit: TestData.visit({
           visitorSupport: [{ type: 'WHEELCHAIR' }, { type: 'OTHER', text: 'custom request' }],
         }),
@@ -63,8 +63,12 @@ describe('Visit service', () => {
       ]
 
       it('should return full details of visit, visitors and additional support options', async () => {
-        const expectedResult: { visit: Visit; visitors: VisitorListItem[]; additionalSupport: string[] } = {
-          visit: visitHistoryDetails.visit,
+        const expectedResult: {
+          visitHistoryDetails: VisitHistoryDetails
+          visitors: VisitorListItem[]
+          additionalSupport: string[]
+        } = {
+          visitHistoryDetails,
           visitors: [
             {
               personId: 4321,
