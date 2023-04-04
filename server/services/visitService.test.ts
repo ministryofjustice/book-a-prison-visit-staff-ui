@@ -1,5 +1,4 @@
 import { VisitorListItem } from '../@types/bapv'
-import { Contact } from '../data/prisonerContactRegistryApiTypes'
 import { Visit } from '../data/orchestrationApiTypes'
 import TestData from '../routes/testutils/testData'
 import VisitService from './visitService'
@@ -42,108 +41,26 @@ describe('Visit service', () => {
     jest.resetAllMocks()
   })
 
-  describe('getVisit', () => {
-    const visit: Visit = {
-      applicationReference: 'aaa-bbb-ccc',
-      reference: 'ab-cd-ef-gh',
-      prisonerId: 'A1234BC',
-      prisonId: 'HEI',
-      visitRoom: 'visit room',
-      visitType: 'SOCIAL',
-      visitStatus: 'BOOKED',
-      visitRestriction: 'OPEN',
-      startTimestamp: '2022-02-14T10:00:00',
-      endTimestamp: '2022-02-14T11:15:00',
-      visitNotes: [],
-      visitContact: {
-        name: 'John Smith',
-        telephone: '01234 567890',
-      },
-      visitors: [
-        {
-          nomisPersonId: 4321,
-        },
-        {
-          nomisPersonId: 4324,
-        },
-      ],
-      visitorSupport: [
-        {
-          type: 'WHEELCHAIR',
-        },
-        {
-          type: 'OTHER',
-          text: 'custom request',
-        },
-      ],
-      createdBy: 'user1',
-      createdTimestamp: '2022-02-14T10:00:00',
-      modifiedTimestamp: '2022-02-14T10:05:00',
-    }
-
+  describe('Get Visit', () => {
     describe('getFullVisitDetails', () => {
-      it('should return full details of visit, visitors and additional support options', async () => {
-        const childDateOfBirth = `${new Date().getFullYear() - 4}-03-02`
-        const contacts: Contact[] = [
-          {
-            personId: 4321,
-            firstName: 'Jeanette',
-            lastName: 'Smith',
-            dateOfBirth: '1986-07-28',
-            relationshipCode: 'SIS',
-            relationshipDescription: 'Sister',
-            contactType: 'S',
-            approvedVisitor: true,
-            emergencyContact: false,
-            nextOfKin: false,
-            restrictions: [
-              {
-                restrictionType: 'CLOSED',
-                restrictionTypeDescription: 'Closed',
-                startDate: '2022-01-03',
-                globalRestriction: false,
-              },
-            ],
-            addresses: [
-              {
-                street: '123 The Street',
-                town: 'Coventry',
-                primary: true,
-                noFixedAddress: false,
-                phones: [],
-                addressUsages: [],
-              },
-            ],
-          },
-          {
-            personId: 4322,
-            firstName: 'Bob',
-            lastName: 'Smith',
-            relationshipCode: 'BRO',
-            relationshipDescription: 'Brother',
-            contactType: 'S',
-            approvedVisitor: true,
-            emergencyContact: false,
-            nextOfKin: false,
-            restrictions: [],
-            addresses: [],
-          },
-          {
-            personId: 4324,
-            firstName: 'Anne',
-            lastName: 'Smith',
-            relationshipCode: 'NIE',
-            dateOfBirth: childDateOfBirth,
-            relationshipDescription: 'Niece',
-            contactType: 'S',
-            approvedVisitor: true,
-            emergencyContact: false,
-            nextOfKin: false,
-            restrictions: [],
-            addresses: [],
-          },
-        ]
+      const visit = TestData.visit({
+        visitorSupport: [{ type: 'WHEELCHAIR' }, { type: 'OTHER', text: 'custom request' }],
+      })
 
+      const childDateOfBirth = `${new Date().getFullYear() - 4}-03-02`
+      const contacts = [
+        TestData.contact({}),
+        TestData.contact({
+          personId: 4322,
+          firstName: 'Anne',
+          dateOfBirth: childDateOfBirth,
+          relationshipCode: 'NIE',
+          relationshipDescription: 'Niece',
+          addresses: [],
+        }),
+      ]
+
+      it('should return full details of visit, visitors and additional support options', async () => {
         const expectedResult: { visit: Visit; visitors: VisitorListItem[]; additionalSupport: string[] } = {
           visit,
           visitors: [
@@ -152,13 +69,14 @@ describe('Visit service', () => {
               name: 'Jeanette Smith',
               dateOfBirth: '1986-07-28',
               adult: true,
-              relationshipDescription: 'Sister',
-              address: '123 The Street,<br>Coventry',
+              relationshipDescription: 'Wife',
+              address:
+                'Premises,<br>Flat 23B,<br>123 The Street,<br>Springfield,<br>Coventry,<br>West Midlands,<br>C1 2AB,<br>England',
               restrictions: contacts[0].restrictions,
               banned: false,
             },
             {
-              personId: 4324,
+              personId: 4322,
               name: 'Anne Smith',
               dateOfBirth: childDateOfBirth,
               adult: false,
