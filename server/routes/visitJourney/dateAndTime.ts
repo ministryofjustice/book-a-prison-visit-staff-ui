@@ -99,10 +99,12 @@ export default class DateAndTime {
     const { visitSessionData } = req.session
     const errors = validationResult(req)
 
+    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
+
     if (!errors.isEmpty()) {
       req.flash('errors', errors.array() as [])
       req.flash('formValues', req.body)
-      return res.redirect(req.originalUrl)
+      return res.redirect(`${urlPrefix}/select-date-and-time`)
     }
 
     visitSessionData.visitSlot = getSelectedSlot(req.session.slotsList, req.body['visit-date-and-time'])
@@ -145,7 +147,6 @@ export default class DateAndTime {
       operationId: res.locals.appInsightsOperationId,
     })
 
-    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
     return res.redirect(`${urlPrefix}/additional-support`)
   }
 

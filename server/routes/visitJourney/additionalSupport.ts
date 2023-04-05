@@ -39,10 +39,12 @@ export default class AdditionalSupport {
     const { visitSessionData } = req.session
     const errors = validationResult(req)
 
+    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
+
     if (!errors.isEmpty()) {
       req.flash('errors', errors.array() as [])
       req.flash('formValues', req.body)
-      return res.redirect(req.originalUrl)
+      return res.redirect(`${urlPrefix}/additional-support`)
     }
 
     visitSessionData.visitorSupport =
@@ -56,7 +58,6 @@ export default class AdditionalSupport {
             return supportItem
           })
 
-    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
     return res.redirect(`${urlPrefix}/select-main-contact`)
   }
 
