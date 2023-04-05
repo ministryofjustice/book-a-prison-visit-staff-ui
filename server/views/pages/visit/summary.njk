@@ -199,13 +199,11 @@
           <span data-test="additional-support">{{ additionalSupport | join(", ") if additionalSupport | length else "None"}}</span>
         </li>
 
-        {% if visitHistoryDetails.createdDateAndTime %}
-          <li>
-            <strong>Visit booked</strong>
-            <span data-test="visit-booked">{{ visitHistoryDetails.createdDateAndTime | formatDate('EEEE d MMMM yyyy') }} at {{ visitHistoryDetails.createdDateAndTime | formatTime }}
-              {{ 'by ' + visitHistoryDetails.createdBy if visitHistoryDetails.createdBy }}</span>
-          </li>
-        {% endif %}
+        <li>
+          <strong>Visit booked</strong>
+          <span data-test="visit-booked">{{ visitHistoryDetails.createdDateAndTime | formatDate('EEEE d MMMM yyyy') }} at {{ visitHistoryDetails.createdDateAndTime | formatTime }}
+            {{ 'by ' + visitHistoryDetails.createdBy if visitHistoryDetails.createdBy }}</span>
+        </li>
 
         {% if visitHistoryDetails.updatedDateAndTime %}
           <li>
