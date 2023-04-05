@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
+import requestMethods from '../../constants/requestMethod'
 import getUrlPrefix from './visitJourneyUtils'
 
 export default class RequestMethod {
@@ -8,13 +9,6 @@ export default class RequestMethod {
   async get(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'
     const { visitSessionData } = req.session
-
-    const requestMethods = [
-      { id: 'phone', value: 'Phone call' },
-      { id: 'website', value: 'GOV.UK' },
-      { id: 'email', value: 'Email' },
-      { id: 'person', value: 'In person' },
-    ]
 
     res.render('pages/requestMethod', {
       errors: req.flash('errors'),
@@ -40,13 +34,6 @@ export default class RequestMethod {
   }
 
   validate(): ValidationChain[] {
-    return [
-      body('method').custom((value: string) => {
-        if (!/^(phone|website|email|person)$/.test(value)) {
-          throw new Error('No request method selected')
-        }
-        return true
-      }),
-    ]
+    return [body('method').isIn(Object.keys(requestMethods)).withMessage('No request method selected')]
   }
 }

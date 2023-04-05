@@ -255,13 +255,13 @@ export default function routes({
   get(
     '/:reference/update/request-method',
     checkVisitReferenceMiddleware,
-    sessionCheckMiddleware({ stage: 4 }),
+    sessionCheckMiddleware({ stage: 5 }),
     (req, res) => requestMethod.get(req, res),
   )
   post(
     '/:reference/update/request-method',
     checkVisitReferenceMiddleware,
-    sessionCheckMiddleware({ stage: 4 }),
+    sessionCheckMiddleware({ stage: 5 }),
     ...requestMethod.validate(),
     (req, res) => requestMethod.post(req, res),
   )
@@ -269,20 +269,20 @@ export default function routes({
   get(
     '/:reference/update/check-your-booking',
     checkVisitReferenceMiddleware,
-    sessionCheckMiddleware({ stage: 5 }),
+    sessionCheckMiddleware({ stage: 6 }),
     (req, res) => checkYourBooking.get(req, res),
   )
   post(
     '/:reference/update/check-your-booking',
     checkVisitReferenceMiddleware,
-    sessionCheckMiddleware({ stage: 5 }),
+    sessionCheckMiddleware({ stage: 6 }),
     (req, res) => checkYourBooking.post(req, res),
   )
 
   get(
     '/:reference/update/confirmation',
     checkVisitReferenceMiddleware,
-    sessionCheckMiddleware({ stage: 6 }),
+    sessionCheckMiddleware({ stage: 7 }),
     (req, res) => confirmation.get(req, res),
   )
 

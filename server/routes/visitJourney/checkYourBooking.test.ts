@@ -87,6 +87,7 @@ testJourneys.forEach(journey => {
         applicationReference: 'aaa-bbb-ccc',
         visitReference: 'ab-cd-ef-gh',
         visitStatus: 'RESERVED',
+        requestMethod: 'PHONE',
       }
 
       sessionApp = appWithAllRoutes({

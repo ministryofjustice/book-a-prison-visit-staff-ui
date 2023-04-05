@@ -12,6 +12,7 @@ import AdditionalSupportPage from '../pages/additionalSupport'
 import MainContactPage from '../pages/mainContact'
 import CheckYourBookingPage from '../pages/checkYourBooking'
 import ConfirmationPage from '../pages/confirmation'
+import RequestMethodPage from '../pages/requestMethod'
 
 context('Book a visit', () => {
   const shortDateFormat = 'yyyy-MM-dd'
@@ -152,8 +153,14 @@ context('Book a visit', () => {
     mainContactPage.getFirstContact().check()
     mainContactPage.enterPhoneNumber('01234 567890')
 
-    // Check booking details
+    // Request method
     mainContactPage.continueButton().click()
+    const requestMethodPage = Page.verifyOnPage(RequestMethodPage)
+    requestMethodPage.textValue1().contains('Phone call')
+    requestMethodPage.checkbox1().check()
+    requestMethodPage.continueButton().click()
+
+    // Check booking details
     const checkYourBookingPage = Page.verifyOnPage(CheckYourBookingPage)
     checkYourBookingPage.prisonerName().contains(prisonerDisplayName)
     checkYourBookingPage.visitDate().contains(format(new Date(visitSessions[0].startTimestamp), longDateFormat))

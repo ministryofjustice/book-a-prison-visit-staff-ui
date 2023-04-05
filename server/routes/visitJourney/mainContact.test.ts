@@ -217,7 +217,7 @@ testJourneys.forEach(journey => {
     })
 
     describe(`POST ${journey.urlPrefix}/select-main-contact`, () => {
-      it('should redirect to check answers page and store in session if contact selected and phone number entered', () => {
+      it('should redirect to request method page and store in session if contact selected and phone number entered', () => {
         return request(sessionApp)
           .post(`${journey.urlPrefix}/select-main-contact`)
           .send('contact=123')
@@ -237,7 +237,7 @@ testJourneys.forEach(journey => {
           })
       })
 
-      it('should redirect to check answers page and store in session if other contact named and phone number entered', () => {
+      it('should redirect to request method page and store in session if other contact named and phone number entered', () => {
         return request(sessionApp)
           .post(`${journey.urlPrefix}/select-main-contact`)
           .send('contact=someoneElse')
@@ -252,7 +252,7 @@ testJourneys.forEach(journey => {
           })
       })
 
-      it('should save new choice to session and redirect to check answers page if existing session data present', () => {
+      it('should save new choice to session and redirect to request method page if existing session data present', () => {
         visitSessionData.mainContact = {
           contact: {
             personId: 123,

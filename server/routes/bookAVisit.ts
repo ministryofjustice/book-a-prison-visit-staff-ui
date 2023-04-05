@@ -66,15 +66,15 @@ export default function routes({
     mainContact.post(req, res),
   )
 
-  get('/request-method', sessionCheckMiddleware({ stage: 4 }), (req, res) => requestMethod.get(req, res))
-  post('/request-method', sessionCheckMiddleware({ stage: 4 }), ...requestMethod.validate(), (req, res) =>
+  get('/request-method', sessionCheckMiddleware({ stage: 5 }), (req, res) => requestMethod.get(req, res))
+  post('/request-method', sessionCheckMiddleware({ stage: 5 }), ...requestMethod.validate(), (req, res) =>
     requestMethod.post(req, res),
   )
 
-  get('/check-your-booking', sessionCheckMiddleware({ stage: 5 }), (req, res) => checkYourBooking.get(req, res))
-  post('/check-your-booking', sessionCheckMiddleware({ stage: 5 }), (req, res) => checkYourBooking.post(req, res))
+  get('/check-your-booking', sessionCheckMiddleware({ stage: 6 }), (req, res) => checkYourBooking.get(req, res))
+  post('/check-your-booking', sessionCheckMiddleware({ stage: 6 }), (req, res) => checkYourBooking.post(req, res))
 
-  get('/confirmation', sessionCheckMiddleware({ stage: 6 }), (req, res) => confirmation.get(req, res))
+  get('/confirmation', sessionCheckMiddleware({ stage: 7 }), (req, res) => confirmation.get(req, res))
 
   return router
 }

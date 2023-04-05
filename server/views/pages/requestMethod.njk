@@ -7,7 +7,7 @@
 {% set pageTitle %}
     {% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
 {% endset %}
-{% set backLinkHref = "/visit/select-main-contact" %}
+{% set backLinkHref = urlPrefix + "/select-main-contact" %}
 
 {% block content %}
   <div class="govuk-grid-row">
@@ -15,11 +15,11 @@
 
     {% set methods = [] %}
 
-    {% for method in requestMethods %}
+    {% for key,text in requestMethods %}
         {% set methods = (methods.push(
             {
-                value: method.id,
-                text: method.value
+                value: key,
+                text: text
             }
         ), methods) %}
     {% endfor %}

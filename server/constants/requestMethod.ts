@@ -1,12 +1,8 @@
-// type RequestMethod = {
-//   methodText: string
-// }
+const requestMethods: Record<string, string> = {
+  PHONE: 'Phone call',
+  WEBSITE: 'GOV.UK',
+  EMAIL: 'Email',
+  IN_PERSON: 'In person',
+}
 
-// const requestMethods: Record<RequestMethod, string> = {
-//   phone: 'Phone Call',
-//   website: 'GOV.UK',
-//   email: 'Email',
-//   person: 'In person',
-// }
-
-// export default requestMethods
+export default requestMethods

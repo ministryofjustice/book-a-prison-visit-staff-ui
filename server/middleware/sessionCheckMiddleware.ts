@@ -61,7 +61,7 @@ export default function sessionCheckMiddleware({ stage }: { stage: number }): Re
 
     if (
       stage > 2 &&
-      stage < 6 &&
+      stage < 7 &&
       !(visitSessionData.visitStatus === 'RESERVED' || visitSessionData.visitStatus === 'CHANGING')
     ) {
       return logAndRedirect(req, res, `/prisoner/${visitSessionData.prisoner.offenderNo}?error=visit-already-booked`)
@@ -84,7 +84,11 @@ export default function sessionCheckMiddleware({ stage }: { stage: number }): Re
       return logAndRedirect(req, res, `/prisoner/${visitSessionData.prisoner.offenderNo}?error=missing-main-contact`)
     }
 
-    if (stage > 5 && visitSessionData.visitStatus !== 'BOOKED') {
+    if (stage > 5 && !visitSessionData.requestMethod) {
+      return logAndRedirect(req, res, `/prisoner/${visitSessionData.prisoner.offenderNo}?error=missing-request-method`)
+    }
+
+    if (stage > 6 && visitSessionData.visitStatus !== 'BOOKED') {
       return logAndRedirect(req, res, `/prisoner/${visitSessionData.prisoner.offenderNo}?error=visit-not-booked`)
     }
 
