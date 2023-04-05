@@ -202,14 +202,14 @@
         <li>
           <strong>Visit booked</strong>
           <span data-test="visit-booked">{{ visitHistoryDetails.createdDateAndTime | formatDate('EEEE d MMMM yyyy') }} at {{ visitHistoryDetails.createdDateAndTime | formatTime }}
-            {{ 'by ' + visitHistoryDetails.createdBy if visitHistoryDetails.createdBy }}</span>
+            {{ 'by ' + visitHistoryDetails.createdBy if (visitHistoryDetails.createdBy and visitHistoryDetails.createdBy != 'NOT_KNOWN') }}</span>
         </li>
 
         {% if visitHistoryDetails.updatedDateAndTime %}
           <li>
             <strong>Visit updated</strong>
             <span data-test="visit-updated">{{ visitHistoryDetails.updatedDateAndTime | formatDate('EEEE d MMMM yyyy') }} at {{ visitHistoryDetails.updatedDateAndTime | formatTime }}
-              {{ 'by ' + visitHistoryDetails.updatedBy if visitHistoryDetails.updatedBy }}</span>
+              {{ 'by ' + visitHistoryDetails.updatedBy if (visitHistoryDetails.updatedBy and visitHistoryDetails.updatedBy != 'NOT_KNOWN') }}</span>
           </li>
         {% endif %}
 
@@ -217,7 +217,7 @@
           <li>
             <strong>Visit cancelled</strong>
             <span data-test="visit-cancelled">{{ visitHistoryDetails.cancelledDateAndTime | formatDate('EEEE d MMMM yyyy') }} at {{ visitHistoryDetails.cancelledDateAndTime | formatTime }}
-              {{ 'by ' + visitHistoryDetails.cancelledBy if visitHistoryDetails.cancelledBy }}</span>
+              {{ 'by ' + visitHistoryDetails.cancelledBy if (visitHistoryDetails.cancelledBy and visitHistoryDetails.cancelledBy != 'NOT_KNOWN') }}</span>
           </li>
         {% endif %}
 
