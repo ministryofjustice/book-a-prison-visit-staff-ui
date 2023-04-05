@@ -24,11 +24,13 @@ context('Cancel visit journey', () => {
     const { prisonerNumber: offenderNo } = prisoner
 
     const futureVisitDate = format(add(today, { months: 1 }), shortDateFormat)
-    const visit = TestData.visit({
-      startTimestamp: `${futureVisitDate}T12:00:00`,
-      endTimestamp: `${futureVisitDate}T14:00:00`,
-      createdTimestamp: '2022-02-14T10:00:00',
-      visitors: [{ nomisPersonId: 4321 }],
+    const visitHistoryDetails = TestData.visitHistoryDetails({
+      visit: TestData.visit({
+        startTimestamp: `${futureVisitDate}T12:00:00`,
+        endTimestamp: `${futureVisitDate}T14:00:00`,
+        createdTimestamp: '2022-02-14T10:00:00',
+        visitors: [{ nomisPersonId: 4321 }],
+      }),
     })
     const contacts = [TestData.contact({ personId: 4321 })]
 
@@ -38,7 +40,7 @@ context('Cancel visit journey', () => {
     }
 
     cy.task('stubPrisonerById', prisoner)
-    cy.task('stubVisit', visit)
+    cy.task('stubVisitHistory', visitHistoryDetails)
     cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
     cy.task('stubAvailableSupport')
     cy.visit('/visit/ab-cd-ef-gh')
@@ -51,7 +53,7 @@ context('Cancel visit journey', () => {
     cancelVisitPage.establishmentCancelledRadio().click()
     cancelVisitPage.establishmentCancelledText(outcome.text)
 
-    cy.task('stubCancelVisit', { visit, outcome })
+    cy.task('stubCancelVisit', { visit: visitHistoryDetails.visit, outcome })
 
     cancelVisitPage.submit().click()
 

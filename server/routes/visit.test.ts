@@ -3,7 +3,7 @@ import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
-import { OutcomeDto, Visit } from '../data/orchestrationApiTypes'
+import { OutcomeDto, Visit, VisitHistoryDetails } from '../data/orchestrationApiTypes'
 import { FlashData, VisitorListItem, VisitSessionData } from '../@types/bapv'
 import config from '../config'
 import { clearSession } from './visitorUtils'
@@ -14,6 +14,7 @@ import {
   createMockPrisonerSearchService,
   createMockPrisonerVisitorsService,
   createMockSupportedPrisonsService,
+  createMockVisitService,
   createMockVisitSessionsService,
 } from '../services/testutils/mocks'
 
@@ -25,6 +26,7 @@ const auditService = createMockAuditService()
 const prisonerSearchService = createMockPrisonerSearchService()
 const prisonerVisitorsService = createMockPrisonerVisitorsService()
 const supportedPrisonsService = createMockSupportedPrisonsService()
+const visitService = createMockVisitService()
 const visitSessionsService = createMockVisitSessionsService()
 
 let visitSessionData: VisitSessionData
@@ -62,6 +64,7 @@ describe('/visit/:reference', () => {
   const prisoner = TestData.prisoner()
 
   let visit: Visit
+  let visitHistoryDetails: VisitHistoryDetails
 
   const visitors: VisitorListItem[] = [
     {
@@ -96,13 +99,14 @@ describe('/visit/:reference', () => {
   const additionalSupport = ['Wheelchair ramp', 'custom request']
 
   beforeEach(() => {
-    visit = TestData.visit({ createdTimestamp: '2022-01-01' })
+    visit = TestData.visit()
+    visitHistoryDetails = TestData.visitHistoryDetails({ visit })
 
     const fakeDate = new Date('2022-01-01')
     jest.useFakeTimers({ advanceTimers: true, now: new Date(fakeDate) })
 
     prisonerSearchService.getPrisonerById.mockResolvedValue(prisoner)
-    visitSessionsService.getFullVisitDetails.mockResolvedValue({ visit, visitors, additionalSupport })
+    visitService.getFullVisitDetails.mockResolvedValue({ visitHistoryDetails, visitors, additionalSupport })
     prisonerVisitorsService.getVisitors.mockResolvedValue(visitors)
     supportedPrisonsService.getSupportedPrisonIds.mockResolvedValue(supportedPrisonIds)
     supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
@@ -115,6 +119,7 @@ describe('/visit/:reference', () => {
         prisonerSearchService,
         prisonerVisitorsService,
         supportedPrisonsService,
+        visitService,
         visitSessionsService,
       },
       sessionData: {
@@ -167,7 +172,12 @@ describe('/visit/:reference', () => {
           expect($('[data-test="visit-comment"]').eq(0).text()).toBe('Example of a visit comment')
           expect($('[data-test="visitor-concern"]').eq(0).text()).toBe('Example of a visitor concern')
           expect($('[data-test="additional-support"]').text()).toBe('Wheelchair ramp, custom request')
-          expect($('[data-test="visit-booked"]').text()).toBe('Saturday 1 January 2022 at 12am')
+          expect($('[data-test="visit-booked"]').text().replace(/\s+/g, ' ')).toBe(
+            'Saturday 1 January 2022 at 9am by User One',
+          )
+          expect($('[data-test="visit-updated"]').text().replace(/\s+/g, ' ')).toBe(
+            'Saturday 1 January 2022 at 10am by User Two',
+          )
           expect(visitSessionData).toEqual({ prisoner: undefined })
 
           expect(auditService.viewedVisitDetails).toHaveBeenCalledTimes(1)
@@ -182,11 +192,10 @@ describe('/visit/:reference', () => {
     })
 
     it('should render full booking summary page with prisoner, visit and visitor details, with default back link, formatting unknown contact telephone correctly', () => {
-      const unknownTelephoneVisit = JSON.parse(JSON.stringify(visit))
-      unknownTelephoneVisit.visitContact.telephone = 'UNKNOWN'
+      visitHistoryDetails.visit.visitContact.telephone = 'UNKNOWN'
       prisonerSearchService.getPrisonerById.mockResolvedValue(prisoner)
-      visitSessionsService.getFullVisitDetails.mockResolvedValue({
-        visit: unknownTelephoneVisit,
+      visitService.getFullVisitDetails.mockResolvedValue({
+        visitHistoryDetails,
         visitors,
         additionalSupport,
       })
@@ -229,7 +238,9 @@ describe('/visit/:reference', () => {
           expect($('[data-test="visit-comment"]').eq(0).text()).toBe('Example of a visit comment')
           expect($('[data-test="visitor-concern"]').eq(0).text()).toBe('Example of a visitor concern')
           expect($('[data-test="additional-support"]').text()).toBe('Wheelchair ramp, custom request')
-          expect($('[data-test="visit-booked"]').text()).toBe('Saturday 1 January 2022 at 12am')
+          expect($('[data-test="visit-booked"]').text().replace(/\s+/g, ' ')).toBe(
+            'Saturday 1 January 2022 at 9am by User One',
+          )
 
           expect(auditService.viewedVisitDetails).toHaveBeenCalledTimes(1)
           expect(auditService.viewedVisitDetails).toHaveBeenCalledWith({
@@ -247,7 +258,7 @@ describe('/visit/:reference', () => {
         '/visit/ab-cd-ef-gh?query=startDate%3D2022-05-24%26type%3DOPEN%26time%3D3pm%2Bto%2B3%253A59pm&from=visit-search'
 
       prisonerSearchService.getPrisonerById.mockResolvedValue(prisoner)
-      visitSessionsService.getFullVisitDetails.mockResolvedValue({ visit, visitors, additionalSupport })
+      visitService.getFullVisitDetails.mockResolvedValue({ visitHistoryDetails, visitors, additionalSupport })
 
       return request(app)
         .get(url)
@@ -287,7 +298,9 @@ describe('/visit/:reference', () => {
           expect($('[data-test="visit-comment"]').eq(0).text()).toBe('Example of a visit comment')
           expect($('[data-test="visitor-concern"]').eq(0).text()).toBe('Example of a visitor concern')
           expect($('[data-test="additional-support"]').text()).toBe('Wheelchair ramp, custom request')
-          expect($('[data-test="visit-booked"]').text()).toBe('Saturday 1 January 2022 at 12am')
+          expect($('[data-test="visit-booked"]').text().replace(/\s+/g, ' ')).toBe(
+            'Saturday 1 January 2022 at 9am by User One',
+          )
 
           expect(auditService.viewedVisitDetails).toHaveBeenCalledTimes(1)
           expect(auditService.viewedVisitDetails).toHaveBeenCalledWith({
@@ -324,7 +337,7 @@ describe('/visit/:reference', () => {
 
     it('should not show booking summary if selected establishment does not match prison for which visit booked', () => {
       app = appWithAllRoutes({
-        services: { auditService, supportedPrisonsService, visitSessionsService },
+        services: { auditService, supportedPrisonsService, visitService, visitSessionsService },
         sessionData: {
           selectedEstablishment: { prisonId: 'BLI', prisonName: supportedPrisons.BLI },
         } as SessionData,
@@ -408,6 +421,9 @@ describe('/visit/:reference', () => {
       visit.visitStatus = 'CANCELLED'
       visit.outcomeStatus = 'VISITOR_CANCELLED'
       visit.visitNotes = [{ type: 'VISIT_OUTCOMES', text: 'no longer required' }]
+      visitHistoryDetails.cancelledBy = 'User Three'
+      visitHistoryDetails.cancelledDateAndTime = '2022-01-01T11:00:00'
+
       return request(app)
         .get('/visit/ab-cd-ef-gh')
         .expect(200)
@@ -416,6 +432,9 @@ describe('/visit/:reference', () => {
           const $ = cheerio.load(res.text)
           expect($('[data-test="cancelled-visit-reason"]').text()).toContain('by the visitor')
           expect($('[data-test="cancelled-visit-reason"]').text()).toContain('no longer required')
+          expect($('[data-test="visit-cancelled"]').text().replace(/\s+/g, ' ')).toBe(
+            'Saturday 1 January 2022 at 11am by User Three',
+          )
         })
     })
   })
@@ -496,7 +515,7 @@ describe('/visit/:reference', () => {
 
     it('should redirect to /visit/:reference if selected establishment does not match prison for which visit booked', () => {
       app = appWithAllRoutes({
-        services: { auditService, supportedPrisonsService, visitSessionsService },
+        services: { auditService, supportedPrisonsService, visitService, visitSessionsService },
         sessionData: {
           selectedEstablishment: { prisonId: 'BLI', prisonName: supportedPrisons.BLI },
         } as SessionData,

@@ -3,6 +3,7 @@ import { resetStubs } from './integration_tests/mockApis/wiremock'
 
 import auth from './integration_tests/mockApis/auth'
 import tokenVerification from './integration_tests/mockApis/tokenVerification'
+import orchestrationService from './integration_tests/mockApis/orchestration'
 import prisonerContactRegistry from './integration_tests/mockApis/prisonerContactRegistry'
 import whereaboutsOffenderEvents from './integration_tests/mockApis/whereabouts'
 import prisonApi from './integration_tests/mockApis/prison'
@@ -29,6 +30,9 @@ export default defineConfig({
         reset: resetStubs,
         ...auth,
         ...tokenVerification,
+
+        // Orchestration service
+        stubVisitHistory: orchestrationService.stubVisitHistory,
 
         // Prisoner contact registry
         stubPrisonerSocialContacts: prisonerContactRegistry.stubPrisonerSocialContacts,
