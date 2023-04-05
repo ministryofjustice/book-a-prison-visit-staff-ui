@@ -380,7 +380,7 @@ describe('sessionCheckMiddleware', () => {
     })
 
     it('should not redirect if request method is populated', () => {
-      req.session.visitSessionData.requestMethod = 'phone'
+      req.session.visitSessionData.requestMethod = 'PHONE'
 
       sessionCheckMiddleware({ stage: 6 })(req as Request, mockResponse as Response, next)
 
@@ -400,7 +400,7 @@ describe('sessionCheckMiddleware', () => {
           phoneNumber: '01234567899',
           contactName: 'abc',
         },
-        requestMethod: 'phone',
+        requestMethod: 'PHONE',
       }
 
       req.session.visitSessionData = testData

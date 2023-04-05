@@ -19,7 +19,8 @@
         {% set methods = (methods.push(
             {
                 value: key,
-                text: text
+                text: text,
+                checked: formValues.method == key
             }
         ), methods) %}
     {% endfor %}

@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
 import requestMethods from '../../constants/requestMethod'
+import { getFlashFormValues } from '../visitorUtils'
 import getUrlPrefix from './visitJourneyUtils'
 
 export default class RequestMethod {
@@ -10,8 +11,14 @@ export default class RequestMethod {
     const isUpdate = this.mode === 'update'
     const { visitSessionData } = req.session
 
+    const formValues = getFlashFormValues(req)
+    if (!Object.keys(formValues).length && visitSessionData.requestMethod) {
+      formValues.method = visitSessionData.requestMethod
+    }
+
     res.render('pages/requestMethod', {
       errors: req.flash('errors'),
+      formValues,
       requestMethods,
       urlPrefix: getUrlPrefix(isUpdate, visitSessionData.visitReference),
     })
