@@ -26,7 +26,7 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
     ],
   },
   PNI: {
-    prisonPhoneNumber: '0300 058 8224',
+    prisonPhoneNumber: '0330 058 8224',
     selectVisitorsText: [
       'You can add up to 3 people aged 16 and over, and 3 children under 16 years old.',
       'At least one visitor must be 18 or older.',
