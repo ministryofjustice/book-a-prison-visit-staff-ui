@@ -52,7 +52,7 @@ export default function routes({ auditService, supportedPrisonsService, userServ
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
       req.flash('errors', errors.array() as [])
-      return res.redirect(req.originalUrl)
+      return res.redirect('/change-establishment')
     }
 
     clearSession(req)
