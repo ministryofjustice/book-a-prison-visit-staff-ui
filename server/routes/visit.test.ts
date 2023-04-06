@@ -134,6 +134,8 @@ describe('/visit/:reference', () => {
 
   describe('GET /visit/:reference', () => {
     it('should render full booking summary page with prisoner, visit and visitor details, with default back link', () => {
+      visitHistoryDetails.createdBy = 'NOT_KNOWN' // test case for old / migrated data
+
       return request(app)
         .get('/visit/ab-cd-ef-gh')
         .expect(200)
@@ -172,9 +174,7 @@ describe('/visit/:reference', () => {
           expect($('[data-test="visit-comment"]').eq(0).text()).toBe('Example of a visit comment')
           expect($('[data-test="visitor-concern"]').eq(0).text()).toBe('Example of a visitor concern')
           expect($('[data-test="additional-support"]').text()).toBe('Wheelchair ramp, custom request')
-          expect($('[data-test="visit-booked"]').text().replace(/\s+/g, ' ')).toBe(
-            'Saturday 1 January 2022 at 9am by User One',
-          )
+          expect($('[data-test="visit-booked"]').text().trim()).toBe('Saturday 1 January 2022 at 9am')
           expect($('[data-test="visit-updated"]').text().replace(/\s+/g, ' ')).toBe(
             'Saturday 1 January 2022 at 10am by User Two',
           )
