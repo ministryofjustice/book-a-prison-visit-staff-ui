@@ -292,14 +292,14 @@ export default function routes({
       }
 
       const errors = validationResult(req)
+      const reference = getVisitReference(req)
 
       if (!errors.isEmpty()) {
         req.flash('errors', errors.array() as [])
         req.flash('formValues', req.body)
-        return res.redirect(req.originalUrl)
+        return res.redirect(`/visit/${reference}/cancel`)
       }
 
-      const reference = getVisitReference(req)
       const outcome: OutcomeDto = {
         outcomeStatus: req.body.cancel,
         text: req.body[reasonFieldName],

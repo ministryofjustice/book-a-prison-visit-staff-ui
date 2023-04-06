@@ -26,9 +26,11 @@ export default class VisitType {
     const { visitSessionData } = req.session
     const errors = validationResult(req)
 
+    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
+
     if (!errors.isEmpty()) {
       req.flash('errors', errors.array() as [])
-      return res.redirect(req.originalUrl)
+      return res.redirect(`${urlPrefix}/visit-type`)
     }
 
     visitSessionData.visitRestriction = req.body.visitType
@@ -41,7 +43,6 @@ export default class VisitType {
       operationId: res.locals.appInsightsOperationId,
     })
 
-    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
     return res.redirect(`${urlPrefix}/select-date-and-time`)
   }
 

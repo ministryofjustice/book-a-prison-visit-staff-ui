@@ -54,10 +54,12 @@ export default class SelectVisitors {
     const { visitSessionData } = req.session
     const errors = validationResult(req)
 
+    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
+
     if (!errors.isEmpty()) {
       req.flash('errors', errors.array() as [])
       req.flash('formValues', req.body)
-      return res.redirect(req.originalUrl)
+      return res.redirect(`${urlPrefix}/select-visitors`)
     }
 
     const selectedIds = [].concat(req.body.visitors)
@@ -88,8 +90,6 @@ export default class SelectVisitors {
     const closedVisitPrisoner = visitSessionData.prisoner.restrictions.some(
       restriction => restriction.restrictionType === 'CLOSED',
     )
-
-    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
 
     return !closedVisitVisitors && closedVisitPrisoner
       ? res.redirect(`${urlPrefix}/visit-type`)

@@ -57,7 +57,7 @@ export default function routes({
 
       if (!errors.isEmpty()) {
         req.flash('errors', errors.array() as [])
-        return res.redirect(req.originalUrl)
+        return res.redirect(`/prisoner/${offenderNo}`)
       }
 
       await auditService.overrodeZeroVO({
