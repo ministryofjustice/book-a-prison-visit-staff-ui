@@ -71,6 +71,20 @@ export default defineConfig({
 
         // Whereabouts
         stubOffenderEvents: whereaboutsOffenderEvents.stubOffenderEvents,
+
+        // Log message to console
+        log: (message: string) => {
+          // eslint-disable-next-line no-console
+          console.log(message)
+          return null
+        },
+
+        // Log table to console
+        table: (violationData: Record<string, string>[]) => {
+          // eslint-disable-next-line no-console
+          console.table(violationData)
+          return null
+        },
       })
     },
     baseUrl: 'http://localhost:3007',
