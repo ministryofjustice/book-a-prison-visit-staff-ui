@@ -5821,7 +5821,7 @@ export interface components {
     /** @description Booking Id to case note from date pair */
     BookingFromDatePair: {
       /**
-       * Format: int32
+       * Format: int64
        * @description Booking Id
        */
       bookingId?: number
@@ -5838,35 +5838,30 @@ export interface components {
       /** @description Case note types */
       types?: string[]
     }
-    /** @description Case Note Type Usage By Booking Id */
-    CaseNoteUsageByBookingId: {
+    /** @description Case Note Type Counts By Booking Id, type and sub type */
+    CaseNoteTypeCount: {
       /**
-       * Format: int32
+       * Format: int64
        * @description Booking Id
-       * @example 123456
+       * @example 12345678
        */
       bookingId: number
       /**
        * @description Case Note Type
-       * @example KA
+       * @example POS
        */
       caseNoteType: string
       /**
        * @description Case Note Sub Type
-       * @example KS
+       * @example IEP_ENC
        */
       caseNoteSubType: string
       /**
-       * Format: int32
-       * @description Number of case notes of this type/subtype
+       * Format: int64
+       * @description Number of case notes of this type and subtype
        * @example 5
        */
       numCaseNotes: number
-      /**
-       * @description Last case note of this type
-       * @example 2021-07-05T10:35:17
-       */
-      latestCaseNote: string
     }
     /** @description Case Note Type Staff Usage Request */
     CaseNoteStaffUsageRequest: {
@@ -7495,10 +7490,10 @@ export interface components {
       establishmentName: string
     }
     PagePrisonerInformation: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['PrisonerInformation'][]
@@ -7506,9 +7501,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
+      pageable?: components['schemas']['PageableObject']
       last?: boolean
       empty?: boolean
     }
@@ -7518,8 +7513,8 @@ export interface components {
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
       pageSize?: number
-      paged?: boolean
       unpaged?: boolean
+      paged?: boolean
       /** Format: int32 */
       pageNumber?: number
     }
@@ -9666,10 +9661,10 @@ export interface components {
       additionalAnswers?: string[]
     }
     PageOffenceDto: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['OffenceDto'][]
@@ -9677,9 +9672,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
+      pageable?: components['schemas']['PageableObject']
       last?: boolean
       empty?: boolean
     }
@@ -10358,10 +10353,10 @@ export interface components {
       numberAllocated: number
     }
     PageOffenderNumber: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['OffenderNumber'][]
@@ -10369,9 +10364,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
+      pageable?: components['schemas']['PageableObject']
       last?: boolean
       empty?: boolean
     }
@@ -10465,10 +10460,10 @@ export interface components {
       addresses: components['schemas']['AddressDto'][]
     }
     PageEmployment: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Employment'][]
@@ -10476,17 +10471,17 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
+      pageable?: components['schemas']['PageableObject']
       last?: boolean
       empty?: boolean
     }
     PageEducation: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Education'][]
@@ -10494,9 +10489,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
+      pageable?: components['schemas']['PageableObject']
       last?: boolean
       empty?: boolean
     }
@@ -10694,10 +10689,10 @@ export interface components {
       hasVisits: boolean
     }
     PageVisitWithVisitors: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['VisitWithVisitors'][]
@@ -10705,9 +10700,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
+      pageable?: components['schemas']['PageableObject']
       last?: boolean
       empty?: boolean
     }
@@ -10968,10 +10963,10 @@ export interface components {
       otherContacts: components['schemas']['Contact'][]
     }
     PageBedAssignment: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['BedAssignment'][]
@@ -10979,17 +10974,17 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
+      pageable?: components['schemas']['PageableObject']
       last?: boolean
       empty?: boolean
     }
     PageCaseNote: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['CaseNote'][]
@@ -10997,9 +10992,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
+      pageable?: components['schemas']['PageableObject']
       last?: boolean
       empty?: boolean
     }
@@ -11044,10 +11039,10 @@ export interface components {
       currency: string
     }
     PageAlert: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Alert'][]
@@ -11055,9 +11050,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
+      pageable?: components['schemas']['PageableObject']
       last?: boolean
       empty?: boolean
     }
@@ -11122,10 +11117,10 @@ export interface components {
       hearingSequence: number
     }
     PagePrisonerBookingSummary: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['PrisonerBookingSummary'][]
@@ -11133,9 +11128,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
+      pageable?: components['schemas']['PageableObject']
       last?: boolean
       empty?: boolean
     }
@@ -15012,7 +15007,7 @@ export interface operations {
       /** @description The case note usage list is returned. */
       200: {
         content: {
-          'application/json': components['schemas']['CaseNoteUsageByBookingId'][]
+          'application/json': components['schemas']['CaseNoteTypeCount'][]
         }
       }
     }
