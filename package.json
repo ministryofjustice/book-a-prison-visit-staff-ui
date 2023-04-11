@@ -96,7 +96,7 @@
     ]
   },
   "dependencies": {
-    "@aws-sdk/client-sqs": "^3.303.0",
+    "@aws-sdk/client-sqs": "^3.310.0",
     "@ministryofjustice/frontend": "^1.6.6",
     "agentkeepalive": "^4.3.0",
     "applicationinsights": "^2.5.1",
@@ -112,7 +112,7 @@
     "express-session": "^1.17.3",
     "express-validator": "^6.15.0",
     "govuk-frontend": "^4.5.0",
-    "helmet": "^6.0.1",
+    "helmet": "^6.1.5",
     "http-errors": "^2.0.0",
     "jquery": "^3.6.4",
     "jwt-decode": "^3.1.2",
@@ -126,7 +126,7 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
-    "@aws-sdk/types": "^3.303.0",
+    "@aws-sdk/types": "^3.310.0",
     "@types/bunyan": "^1.8.8",
     "@types/bunyan-format": "^0.2.5",
     "@types/compression": "^1.7.2",
@@ -144,8 +144,8 @@
     "@types/superagent": "^4.1.16",
     "@types/supertest": "^2.0.12",
     "@types/uuid": "^9.0.1",
-    "@typescript-eslint/eslint-plugin": "^5.57.0",
-    "@typescript-eslint/parser": "^5.57.0",
+    "@typescript-eslint/eslint-plugin": "^5.58.0",
+    "@typescript-eslint/parser": "^5.58.0",
     "audit-ci": "^6.6.1",
     "axe-core": "^4.6.3",
     "cheerio": "^1.0.0-rc.12",
@@ -154,10 +154,10 @@
     "cypress-axe": "^1.4.0",
     "cypress-multi-reporters": "^1.6.3",
     "dotenv": "^16.0.3",
-    "eslint": "^8.37.0",
+    "eslint": "^8.38.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.8.0",
-    "eslint-import-resolver-typescript": "^3.5.4",
+    "eslint-import-resolver-typescript": "^3.5.5",
     "eslint-plugin-cypress": "^2.13.2",
     "eslint-plugin-import": "2.27.5",
     "eslint-plugin-no-only-tests": "^3.1.0",
@@ -167,16 +167,16 @@
     "jest-html-reporter": "^3.7.1",
     "jest-junit": "^15.0.0",
     "jsonwebtoken": "^9.0.0",
-    "lint-staged": "^13.2.0",
+    "lint-staged": "^13.2.1",
     "mocha": "10.2.0",
     "mocha-junit-reporter": "^2.2.0",
     "nock": "^13.3.0",
     "nodemon": "^2.0.22",
     "openapi-typescript": "^6.2.1",
     "prettier": "^2.8.7",
-    "sass": "^1.60.0",
+    "sass": "^1.61.0",
     "supertest": "^6.3.3",
-    "ts-jest": "^29.0.5",
-    "typescript": "^5.0.3"
+    "ts-jest": "^29.1.0",
+    "typescript": "^5.0.4"
   }
 }
