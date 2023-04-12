@@ -143,12 +143,11 @@ export type PrisonerProfile = {
   displayDob: string
   activeAlerts: PrisonerAlertItem[]
   flaggedAlerts: Alert[]
-  inmateDetail: InmateDetail
   convictedStatus: 'Convicted' | 'Remand'
   incentiveLevel: string
   visitBalances: VisitBalances
-  upcomingVisits: UpcomingVisitItem[]
-  pastVisits: PastVisitItem[]
+  visits: Visit[]
+  prisonerDetails: PrisonerDetails
 }
 
 export type BAPVVisitBalances = VisitBalances & {
@@ -247,3 +246,9 @@ export type VisitsPageSlot = {
 }
 
 export type FlashData = Record<string, string[] | Record<string, string | string[]>[]>
+
+export type PrisonerDetails = {
+  offenderNo: string
+  category: string
+  location: string
+}

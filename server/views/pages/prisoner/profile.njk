@@ -39,7 +39,7 @@
       <ul class="prisoner-profile-summary">
         <li>
           <strong>Prison number</strong>
-          <span data-test="prison-number">{{ inmateDetail.offenderNo }}</span>
+          <span data-test="prison-number">{{ prisonerDetails.offenderNo }}</span>
         </li>
         <li>
           <strong>Date of birth</strong>
@@ -47,11 +47,11 @@
         </li>
         <li>
           <strong>Location</strong>
-          <span data-test="location">{{ inmateDetail.assignedLivingUnit.description + ", " + inmateDetail.assignedLivingUnit.agencyName if inmateDetail.assignedLivingUnit}}</span>
+          <span data-test="location">{{ prisonerDetails.location }}</span>
         </li>
         <li>
           <strong>Category</strong>
-          <span data-test="category">{{ inmateDetail.category }}</span>
+          <span data-test="category">{{ prisonerDetails.category }}</span>
         </li>
         <li>
           <strong>Conviction status</strong>
@@ -77,7 +77,7 @@
         {% endif %}
       </ul>
 
-      <form action="/prisoner/{{ inmateDetail.offenderNo }}" method="POST" novalidate>
+      <form action="/prisoner/{{ prisonerDetails.offenderNo }}" method="POST" novalidate>
         {% if visitBalances.remainingVo <= 0 and visitBalances.remainingPvo <= 0 %}
           {% set voOverrideCheckbox %}
             {{ govukCheckboxes({

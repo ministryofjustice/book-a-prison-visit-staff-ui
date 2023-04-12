@@ -890,13 +890,6 @@ export interface paths {
      */
     get: operations['getMyLocations']
   }
-  '/api/users/me/caseNoteTypes': {
-    /**
-     * List of all case note types (with sub-types) accessible to current user (and based on working caseload).
-     * @description List of all case note types (with sub-types) accessible to current user (and based on working caseload).
-     */
-    get: operations['getMyCaseNoteTypes']
-  }
   '/api/users/me/caseLoads': {
     /**
      * List of caseloads accessible to current user.
@@ -1005,20 +998,6 @@ export interface paths {
      * @description List of reference codes for reference domain ordered by code ascending. The list is an un-paged flat list<p>This endpoint uses the REPLICA database.</p>
      */
     get: operations['getReferenceCodesByDomain_1']
-  }
-  '/api/reference-domains/caseNoteTypes': {
-    /**
-     * List of all used case note types (with sub-types).
-     * @description List of all used case note types (with sub-types).<p>This endpoint uses the REPLICA database.</p>
-     */
-    get: operations['getCaseNoteTypes']
-  }
-  '/api/reference-domains/caseNoteSources': {
-    /**
-     * List of case note source codes.
-     * @description List of case note source codes.<p>This endpoint uses the REPLICA database.</p>
-     */
-    get: operations['getCaseNoteSources']
   }
   '/api/reference-domains/alertTypes': {
     /**
@@ -1149,6 +1128,9 @@ export interface paths {
      * For example Bristol has wings, spurs and landings, but this endpoint will only return wings and landings as spurs are not mapped in NOMIS.
      * Another example is Moorland where 5-1-B-014 in NOMIS is Wing 5, Landing 1, Cell B and Cell 014, whereas in reality it should be Houseblock 5, Spur 1, Wing B and Cell 014 instead.
      * This endpoint will therefore also return different information from Whereabouts API as that service re-maps the NOMIS layout to include spurs etc.</p>
+     * <p>If the current location is temporary (reception, court, tap, cell swap or early conditional licence) then the previous permanent location is also returned, provided
+     * that the location is at the same prison and they haven't moved to a different prison in the meantime.</p>
+     * <p>Requires a relationship (via caseload) with the prisoner or VIEW_PRISONER_DATA role.</p>
      */
     get: operations['getHousingLocation']
   }
@@ -1169,20 +1151,6 @@ export interface paths {
      * @description Active Contacts including restrictions, using latest offender booking  and including inactive contacts by default
      */
     get: operations['getOffenderContacts']
-  }
-  '/api/offenders/{offenderNo}/case-notes/{caseNoteId}': {
-    /**
-     * Offender case note detail.
-     * @description Retrieve an single offender case note
-     */
-    get: operations['getOffenderCaseNote']
-  }
-  '/api/offenders/{offenderNo}/case-notes/v2': {
-    /**
-     * Offender case notes
-     * @description Retrieve an offenders case notes for latest booking<p>This endpoint uses the REPLICA database.</p>
-     */
-    get: operations['getOffenderCaseNotes']
   }
   '/api/offenders/{offenderNo}/bookings/latest/alerts': {
     /**
@@ -1741,16 +1709,9 @@ export interface paths {
   '/api/bookings/{bookingId}/cell-history': {
     /**
      * Gets cell history for an offender booking
-     * @description Default sort order is by assignment date descending<p>This endpoint uses the REPLICA database.</p>
+     * @description Default sort order is by assignment date descending.  Requires a relationship (via caseload) with the prisoner or VIEW_PRISONER_DATA role.<p>This endpoint uses the REPLICA database.</p>
      */
     get: operations['getBedAssignmentsHistory_1']
-  }
-  '/api/bookings/{bookingId}/caseNotes': {
-    /**
-     * Offender case notes.
-     * @description Offender case notes.<p>This endpoint uses the REPLICA database.</p>
-     */
-    get: operations['getOffenderCaseNotes_1']
   }
   '/api/bookings/{bookingId}/caseNotes/{type}/{subType}/count': {
     /**
@@ -1758,13 +1719,6 @@ export interface paths {
      * @description Count of case notes<p>This endpoint uses the REPLICA database.</p>
      */
     get: operations['getCaseNoteCount']
-  }
-  '/api/bookings/{bookingId}/caseNotes/{caseNoteId}': {
-    /**
-     * Offender case note detail.
-     * @description Offender case note detail.
-     */
-    get: operations['getOffenderCaseNote_1']
   }
   '/api/bookings/{bookingId}/balances': {
     /**
@@ -7490,10 +7444,10 @@ export interface components {
       establishmentName: string
     }
     PagePrisonerInformation: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['PrisonerInformation'][]
@@ -7503,25 +7457,25 @@ export interface components {
       first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
       last?: boolean
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     PageableObject: {
       /** Format: int64 */
       offset?: number
       sort?: components['schemas']['SortObject']
+      paged?: boolean
+      unpaged?: boolean
       /** Format: int32 */
       pageSize?: number
-      unpaged?: boolean
-      paged?: boolean
       /** Format: int32 */
       pageNumber?: number
     }
     SortObject: {
       empty?: boolean
-      sorted?: boolean
       unsorted?: boolean
+      sorted?: boolean
     }
     /** @description PersonIdentifier */
     PersonIdentifier: {
@@ -8179,6 +8133,7 @@ export interface components {
        */
       recordStaffId?: number
     }
+    /** @description Previous permanent housing levels at the same prison without moving to a different prison inbetween */
     HousingLocation: {
       /**
        * Format: int32
@@ -8204,7 +8159,10 @@ export interface components {
       description?: string
     }
     OffenderLocation: {
+      /** @description Current housing levels or null if not currently in prison */
       levels?: components['schemas']['HousingLocation'][]
+      /** @description Previous permanent housing levels at the same prison without moving to a different prison inbetween */
+      lastPermanentLevels?: components['schemas']['HousingLocation'][]
     }
     /** @description Damage obligation for an offender */
     OffenderDamageObligationModel: {
@@ -8389,102 +8347,6 @@ export interface components {
       expiryDate?: string
       /** @description true if applied globally to the contact or false if applied in the context of a visit */
       globalRestriction: boolean
-    }
-    /** @description Case Note */
-    CaseNote: {
-      /**
-       * Format: int64
-       * @description Case Note Id (unique)
-       * @example 12311312
-       */
-      caseNoteId: number
-      /**
-       * Format: int64
-       * @description Booking Id of offender
-       * @example 512321
-       */
-      bookingId: number
-      /**
-       * @description Case Note Type
-       * @example KA
-       */
-      type: string
-      /**
-       * @description Case Note Type Description
-       * @example Key Worker Activity
-       */
-      typeDescription?: string
-      /**
-       * @description Case Note Sub Type
-       * @example KS
-       */
-      subType: string
-      /**
-       * @description Case Note Sub Type Description
-       * @example Key Worker Session
-       */
-      subTypeDescription?: string
-      /**
-       * @description Source Type
-       * @example INST
-       */
-      source: string
-      /**
-       * @description Date and Time of Case Note creation
-       * @example 2021-07-05T10:35:17
-       */
-      creationDateTime: string
-      /**
-       * @description Date and Time of when case note contact with offender was made
-       * @example 2021-07-05T10:35:17
-       */
-      occurrenceDateTime: string
-      /**
-       * Format: int64
-       * @description Id of staff member who created case note
-       * @example 321241
-       */
-      staffId: number
-      /**
-       * @description Name of staff member who created case note (lastname, firstname)
-       * @example Smith, John
-       */
-      authorName: string
-      /**
-       * @description Case Note Text
-       * @example This is some text
-       */
-      text: string
-      /**
-       * @description The initial case note information that was entered
-       * @example This is some text
-       */
-      originalNoteText: string
-      /**
-       * @description Agency Code where Case Note was made.
-       * @example MDI
-       */
-      agencyId?: string
-      /** @description Ordered list of amendments to the case note (oldest first) */
-      amendments: components['schemas']['CaseNoteAmendment'][]
-    }
-    /** @description Case Note Amendment */
-    CaseNoteAmendment: {
-      /**
-       * @description Date and Time of Case Note creation
-       * @example 2021-07-05T10:35:17
-       */
-      creationDateTime: string
-      /**
-       * @description Name of the user amending the case note (lastname, firstname)
-       * @example Smith, John
-       */
-      authorName: string
-      /**
-       * @description Additional Case Note Information
-       * @example Some Additional Text
-       */
-      additionalNoteText: string
     }
     /** @description Court case details */
     CourtSentences: {
@@ -9661,10 +9523,10 @@ export interface components {
       additionalAnswers?: string[]
     }
     PageOffenceDto: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['OffenceDto'][]
@@ -9674,8 +9536,8 @@ export interface components {
       first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
       last?: boolean
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     Pageable: {
@@ -10353,10 +10215,10 @@ export interface components {
       numberAllocated: number
     }
     PageOffenderNumber: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['OffenderNumber'][]
@@ -10366,8 +10228,8 @@ export interface components {
       first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
       last?: boolean
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     /** @description Offender Employment */
@@ -10460,10 +10322,10 @@ export interface components {
       addresses: components['schemas']['AddressDto'][]
     }
     PageEmployment: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Employment'][]
@@ -10473,15 +10335,15 @@ export interface components {
       first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
       last?: boolean
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     PageEducation: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Education'][]
@@ -10491,8 +10353,8 @@ export interface components {
       first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
       last?: boolean
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     /** @description Represents a court date and its outcome */
@@ -10689,10 +10551,10 @@ export interface components {
       hasVisits: boolean
     }
     PageVisitWithVisitors: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['VisitWithVisitors'][]
@@ -10702,8 +10564,8 @@ export interface components {
       first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
       last?: boolean
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     /** @description Visit details */
@@ -10963,10 +10825,10 @@ export interface components {
       otherContacts: components['schemas']['Contact'][]
     }
     PageBedAssignment: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['BedAssignment'][]
@@ -10976,26 +10838,8 @@ export interface components {
       first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
       last?: boolean
-      empty?: boolean
-    }
-    PageCaseNote: {
-      /** Format: int64 */
-      totalElements?: number
-      /** Format: int32 */
-      totalPages?: number
-      /** Format: int32 */
-      size?: number
-      content?: components['schemas']['CaseNote'][]
-      /** Format: int32 */
-      number?: number
-      sort?: components['schemas']['SortObject']
-      first?: boolean
-      /** Format: int32 */
-      numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
-      last?: boolean
       empty?: boolean
     }
     /** @description Case Note Count Detail */
@@ -11039,10 +10883,10 @@ export interface components {
       currency: string
     }
     PageAlert: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Alert'][]
@@ -11052,8 +10896,8 @@ export interface components {
       first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
       last?: boolean
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     /** @description Adjudication Summary for offender */
@@ -11117,10 +10961,10 @@ export interface components {
       hearingSequence: number
     }
     PagePrisonerBookingSummary: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['PrisonerBookingSummary'][]
@@ -11130,8 +10974,8 @@ export interface components {
       first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
       last?: boolean
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     /** @description Prisoner Booking Summary */
@@ -17067,38 +16911,6 @@ export interface operations {
     }
   }
   /**
-   * List of all case note types (with sub-types) accessible to current user (and based on working caseload).
-   * @description List of all case note types (with sub-types) accessible to current user (and based on working caseload).
-   */
-  getMyCaseNoteTypes: {
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['ReferenceCode'][]
-        }
-      }
-      /** @description Invalid request. */
-      400: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Requested resource not found. */
-      404: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Unrecoverable error occurred whilst processing request. */
-      500: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  /**
    * List of caseloads accessible to current user.
    * @description List of caseloads accessible to current user.<p>This endpoint uses the REPLICA database.</p>
    */
@@ -17755,82 +17567,6 @@ export interface operations {
       path: {
         /** @description The domain identifier/name. */
         domain: string
-      }
-    }
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['ReferenceCode'][]
-        }
-      }
-      /** @description Invalid request. */
-      400: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Requested resource not found. */
-      404: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Unrecoverable error occurred whilst processing request. */
-      500: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  /**
-   * List of all used case note types (with sub-types).
-   * @description List of all used case note types (with sub-types).<p>This endpoint uses the REPLICA database.</p>
-   */
-  getCaseNoteTypes: {
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['ReferenceCode'][]
-        }
-      }
-      /** @description Invalid request. */
-      400: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Requested resource not found. */
-      404: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Unrecoverable error occurred whilst processing request. */
-      500: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  /**
-   * List of case note source codes.
-   * @description List of case note source codes.<p>This endpoint uses the REPLICA database.</p>
-   */
-  getCaseNoteSources: {
-    parameters: {
-      header: {
-        /** @description Requested offset of first record in returned collection of caseNoteSource records. */
-        'Page-Offset'?: number
-        /** @description Requested limit to number of caseNoteSource records returned. */
-        'Page-Limit'?: number
-        /** @description Comma separated list of one or more of the following fields - <b>code, description</b> */
-        'Sort-Fields'?: string
-        /** @description Sort order (ASC or DESC) - defaults to ASC. */
-        'Sort-Order'?: 'ASC' | 'DESC'
       }
     }
     responses: {
@@ -18654,6 +18390,9 @@ export interface operations {
    * For example Bristol has wings, spurs and landings, but this endpoint will only return wings and landings as spurs are not mapped in NOMIS.
    * Another example is Moorland where 5-1-B-014 in NOMIS is Wing 5, Landing 1, Cell B and Cell 014, whereas in reality it should be Houseblock 5, Spur 1, Wing B and Cell 014 instead.
    * This endpoint will therefore also return different information from Whereabouts API as that service re-maps the NOMIS layout to include spurs etc.</p>
+   * <p>If the current location is temporary (reception, court, tap, cell swap or early conditional licence) then the previous permanent location is also returned, provided
+   * that the location is at the same prison and they haven't moved to a different prison in the meantime.</p>
+   * <p>Requires a relationship (via caseload) with the prisoner or VIEW_PRISONER_DATA role.</p>
    */
   getHousingLocation: {
     parameters: {
@@ -18821,84 +18560,6 @@ export interface operations {
       500: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  /**
-   * Offender case note detail.
-   * @description Retrieve an single offender case note
-   */
-  getOffenderCaseNote: {
-    parameters: {
-      path: {
-        /** @description Noms ID or Prisoner number (also called offenderNo) */
-        offenderNo: string
-        /** @description The case note id */
-        caseNoteId: number
-      }
-    }
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['CaseNote']
-        }
-      }
-    }
-  }
-  /**
-   * Offender case notes
-   * @description Retrieve an offenders case notes for latest booking<p>This endpoint uses the REPLICA database.</p>
-   */
-  getOffenderCaseNotes: {
-    parameters: {
-      query: {
-        /**
-         * @description start contact date to search from
-         * @example 2021-02-03
-         */
-        from?: string
-        /**
-         * @description end contact date to search up to (including this date)
-         * @example 2021-02-04
-         */
-        to?: string
-        /**
-         * @description Filter by case note type
-         * @example GEN
-         */
-        type?: string
-        /**
-         * @description Filter by case note sub-type
-         * @example OBS
-         */
-        subType?: string
-        /**
-         * @description Filter by the ID of the prison
-         * @example LEI
-         */
-        prisonId?: string
-        /** @description Zero-based page index (0..N) */
-        page?: number
-        /** @description The size of the page to be returned */
-        size?: number
-        /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
-        sort?: string[]
-      }
-      path: {
-        /**
-         * @description Noms ID or Prisoner number (also called offenderNo)
-         * @example A1234AA
-         */
-        offenderNo: string
-      }
-    }
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['CaseNote']
         }
       }
     }
@@ -22408,7 +22069,7 @@ export interface operations {
   }
   /**
    * Gets cell history for an offender booking
-   * @description Default sort order is by assignment date descending<p>This endpoint uses the REPLICA database.</p>
+   * @description Default sort order is by assignment date descending.  Requires a relationship (via caseload) with the prisoner or VIEW_PRISONER_DATA role.<p>This endpoint uses the REPLICA database.</p>
    */
   getBedAssignmentsHistory_1: {
     parameters: {
@@ -22428,80 +22089,6 @@ export interface operations {
       200: {
         content: {
           'application/json': components['schemas']['PageBedAssignment']
-        }
-      }
-      /** @description Invalid request. */
-      400: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Requested resource not found. */
-      404: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Unrecoverable error occurred whilst processing request. */
-      500: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  /**
-   * Offender case notes.
-   * @description Offender case notes.<p>This endpoint uses the REPLICA database.</p>
-   */
-  getOffenderCaseNotes_1: {
-    parameters: {
-      query: {
-        /**
-         * @description start contact date to search from
-         * @example 2021-02-03
-         */
-        from?: string
-        /**
-         * @description end contact date to search up to (including this date)
-         * @example 2021-02-04
-         */
-        to?: string
-        /**
-         * @description Filter by case note type
-         * @example GEN
-         */
-        type?: string
-        /**
-         * @description Filter by case note sub-type
-         * @example OBS
-         */
-        subType?: string
-        /**
-         * @description Filter by the ID of the prison
-         * @example LEI
-         */
-        prisonId?: string
-        /** @description Zero-based page index (0..N) */
-        page?: number
-        /** @description The size of the page to be returned */
-        size?: number
-        /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
-        sort?: string[]
-      }
-      path: {
-        /**
-         * @description The booking id of offender
-         * @example 23412312
-         */
-        bookingId: number
-      }
-    }
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['PageCaseNote']
         }
       }
       /** @description Invalid request. */
@@ -22568,28 +22155,6 @@ export interface operations {
       500: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  /**
-   * Offender case note detail.
-   * @description Offender case note detail.
-   */
-  getOffenderCaseNote_1: {
-    parameters: {
-      path: {
-        /** @description The booking id of offender */
-        bookingId: number
-        /** @description The case note id */
-        caseNoteId: number
-      }
-    }
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['CaseNote']
         }
       }
     }

@@ -27,3 +27,7 @@ export type SessionCapacity = components['schemas']['SessionCapacityDto']
 export type SessionSchedule = components['schemas']['SessionScheduleDto']
 
 export type VisitSession = components['schemas']['VisitSessionDto']
+
+export type PrisonerProfile = Omit<components['schemas']['PrisonerProfileDto'], 'visits'> & {
+  visits: Visit[]
+}
