@@ -29,7 +29,7 @@ export const services = () => {
   const supportedPrisonsService = new SupportedPrisonsService(
     visitSchedulerApiClientBuilder,
     prisonRegisterApiClientBuilder,
-    hmppsAuthClient,
+    hmppsAuthClient
   )
 
   const prisonerProfileService = new PrisonerProfileService(
@@ -39,7 +39,7 @@ export const services = () => {
     prisonerContactRegistryApiClientBuilder,
     prisonerSearchClientBuilder,
     supportedPrisonsService,
-    hmppsAuthClient,
+    hmppsAuthClient
   )
 
   const prisonerSearchService = new PrisonerSearchService(prisonerSearchClientBuilder, hmppsAuthClient)
@@ -52,14 +52,14 @@ export const services = () => {
     prisonerContactRegistryApiClientBuilder,
     visitSchedulerApiClientBuilder,
     whereaboutsApiClientBuilder,
-    hmppsAuthClient,
+    hmppsAuthClient
   )
 
   const visitService = new VisitService(
     orchestrationApiClientBuilder,
     prisonerContactRegistryApiClientBuilder,
     visitSessionsService,
-    hmppsAuthClient,
+    hmppsAuthClient
   )
 
   return {

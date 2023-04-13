@@ -139,14 +139,10 @@ export type VisitorListItem = {
 }
 
 export type PrisonerProfile = {
-  displayName: string
-  displayDob: string
   activeAlerts: PrisonerAlertItem[]
+  activeAlertCount: number
   flaggedAlerts: Alert[]
-  convictedStatus: 'Convicted' | 'Remand'
-  incentiveLevel: string
-  visitBalances: VisitBalances
-  visits: Visit[]
+  visits: visitItem[]
   prisonerDetails: PrisonerDetails
 }
 
@@ -249,6 +245,51 @@ export type FlashData = Record<string, string[] | Record<string, string | string
 
 export type PrisonerDetails = {
   offenderNo: string
+  name: string
+  dob: string
+  convictedStatus: 'Convicted' | 'Remand'
   category: string
   location: string
+  prisonName: string
+  incentiveLevel: string
+  visitBalances: VisitBalances
 }
+
+export type visitItem = [
+  {
+    html: string
+    attributes?: {
+      'data-test': string
+    }
+  },
+  {
+    html: string
+    attributes?: {
+      'data-test': string
+    }
+  },
+  {
+    text: string
+    attributes?: {
+      'data-test': string
+    }
+  },
+  {
+    html: string
+    attributes?: {
+      'data-test': string
+    }
+  },
+  {
+    html: string
+    attributes?: {
+      'data-test': string
+    }
+  },
+  {
+    text: string
+    attributes?: {
+      'data-test': string
+    }
+  },
+]

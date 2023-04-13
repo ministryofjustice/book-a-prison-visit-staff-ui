@@ -51,7 +51,7 @@ describe('Prisoner profile service', () => {
       PrisonerContactRegistryApiClientFactory,
       PrisonerSearchClientFactory,
       supportedPrisonsService,
-      hmppsAuthClient,
+      hmppsAuthClient
     )
     hmppsAuthClient.getSystemClientToken.mockResolvedValue(token)
   })

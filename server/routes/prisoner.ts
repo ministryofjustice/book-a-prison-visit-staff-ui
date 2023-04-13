@@ -47,7 +47,7 @@ export default function routes({
     const { inmateDetail, visitBalances } = await prisonerProfileService.getPrisonerAndVisitBalances(
       offenderNo,
       prisonId,
-      res.locals.user.username,
+      res.locals.user.username
     )
 
     if (visitBalances?.remainingVo <= 0 && visitBalances?.remainingPvo <= 0) {

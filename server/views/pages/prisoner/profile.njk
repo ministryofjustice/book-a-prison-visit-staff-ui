@@ -6,7 +6,7 @@
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {%- from "moj/components/banner/macro.njk" import mojBanner -%}
 
-{% set pageHeaderTitle = displayName %}
+{% set pageHeaderTitle = prisonerDetails.name %}
 {% set pageTitle = applicationName + " - " + pageHeaderTitle %}
 {% set query = '?' + queryParamsForBackLink if queryParamsForBackLink != '' %}
 {% if queryParamsForBackLink %}
@@ -43,11 +43,11 @@
         </li>
         <li>
           <strong>Date of birth</strong>
-          <span data-test="dob">{{ displayDob }}</span>
+          <span data-test="dob">{{ prisonerDetails.dob }}</span>
         </li>
         <li>
           <strong>Location</strong>
-          <span data-test="location">{{ prisonerDetails.location }}</span>
+          <span data-test="location">{{ prisonerDetails.location }}, {{ prisonerDetails.prisonName }}</span>
         </li>
         <li>
           <strong>Category</strong>
@@ -55,24 +55,24 @@
         </li>
         <li>
           <strong>Conviction status</strong>
-          <span data-test="convicted-status">{{ convictedStatus }}</span>
+          <span data-test="convicted-status">{{ prisonerDetails.convictedStatus }}</span>
         </li>
         <li>
           <strong>Incentive level</strong>
-          <span data-test="iep-level">{{ incentiveLevel }}</span>
+          <span data-test="iep-level">{{ prisonerDetails.incentiveLevel }}</span>
         </li>
         <li>
           <strong>Alerts</strong>
-          <span data-test="active-alert-count">{{ inmateDetail.activeAlertCount }} active</span>
+          <span data-test="active-alert-count">{{ activeAlertCount }} active</span>
         </li>
         {% if visitBalances %}
         <li>
           <strong>VO balance</strong>
-          <span data-test="remaining-vos">{{ visitBalances.remainingVo }}</span>
+          <span data-test="remaining-vos">{{ prisonerDetails.visitBalances.remainingVo }}</span>
         </li>
         <li>
           <strong>PVO balance</strong>
-          <span data-test="remaining-pvos">{{ visitBalances.remainingPvo }}</span>
+          <span data-test="remaining-pvos">{{ prisonerDetails.visitBalances.remainingPvo }}</span>
         </li>
         {% endif %}
       </ul>
@@ -114,6 +114,66 @@
   </div>
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
+    {% set visitsTab %}
+      <h2 class="govuk-heading-m">Visits</h2>
+      {% if visits | length %}
+        {{ govukTable({
+          head: [
+            {
+              text: "Visit reference"
+            },
+            {
+              text: "Visit type"
+            },
+            {
+              text: "Establishment"
+            },
+            {
+              text: "Date and time"
+            },
+            {
+              text: "Visitors"
+            },
+            {
+              text: "Visit status"
+            }
+          ],
+          rows: visits
+        }) }}
+      {% else %}
+    <p>There are no visits for this prisoner.</p>
+    {% endif %}
+    {% endset %}
+    {% set alertsTab %}
+    <h2 class="govuk-heading-m">Active alerts</h2>
+    {% if activeAlerts | length %}
+      {{ govukTable({
+        head: [
+          {
+            text: "Type of alert",
+            classes: "bapv-table_cell--nowrap"
+          },
+          {
+            text: "Alert"
+          },
+          {
+            text: "Comments"
+          },
+          {
+            text: "Date from",
+            classes: "bapv-table_cell--nowrap"
+          },
+          {
+            text: "Date to",
+            classes: "bapv-table_cell--nowrap"
+          }
+        ],
+        rows: activeAlerts
+      }) }}
+    {% else %}
+    <p>There are no active alerts for this prisoner.</p>
+    {% endif %}
+    {% endset %}
     {% set visitingOrdersTab %}
     <h2 class="govuk-heading-m">Visiting orders</h2>
     {{ govukTable({
@@ -181,127 +241,30 @@
       ]
     }) }}
     {% endset %}
-    {% set alertsTab %}
-    <h2 class="govuk-heading-m">Active alerts</h2>
-    {% if activeAlerts | length %}
-      {{ govukTable({
-        head: [
-          {
-            text: "Type of alert",
-            classes: "bapv-table_cell--nowrap"
-          },
-          {
-            text: "Alert"
-          },
-          {
-            text: "Comments"
-          },
-          {
-            text: "Date from",
-            classes: "bapv-table_cell--nowrap"
-          },
-          {
-            text: "Date to",
-            classes: "bapv-table_cell--nowrap"
-          }
-        ],
-        rows: activeAlerts
-      }) }}
-    {% else %}
-    <p>There are no active alerts for this prisoner.</p>
-    {% endif %}
-    {% endset %}
-    {% set upcomingVisitsTab %}
-    <h2 class="govuk-heading-m">Upcoming visits</h2>
-    {% if upcomingVisits | length %}
-      {{ govukTable({
-        head: [
-          {
-            text: "Visit reference"
-          },
-          {
-            text: "Visit type"
-          },
-          {
-            text: "Location"
-          },
-          {
-            text: "Date and time"
-          },
-          {
-            text: "Visitors"
-          },
-          {
-            text: "Visit status"
-          }
-        ],
-        rows: upcomingVisits
-      }) }}
-    {% else %}
-    <p>There are no upcoming visits for this prisoner.</p>
-    {% endif %}
-    {% endset %}
-    {% set pastVisitsTab %}
-    <h2 class="govuk-heading-m">Visits history</h2>
-    {% if pastVisits | length %}
-      {{ govukTable({
-        head: [
-          {
-            text: "Visit reference"
-          },
-          {
-            text: "Visit type"
-          },
-          {
-            text: "Location"
-          },
-          {
-            text: "Date and time"
-          },
-          {
-            text: "Visitors"
-          },
-          {
-            text: "Visit status"
-          }
-        ],
-        rows: pastVisits
-      }) }}
-    {% else %}
-    <p>There is no visit history for this prisoner.</p>
-    {% endif %}
-    {% endset %}
     {{ govukTabs({
       classes: 'bapv-tabs',
       items: [
-        {
-          label: "Visiting orders",
-          id: "visiting-orders",
+       {
+          label: "Visits",
+          id: "visits",
           panel: {
-            html: visitingOrdersTab
+            html: visitsTab
           }
-        } if visitBalances,
+        },
         {
-          label: "Active alerts",
+          label: "Alerts",
           id: "active-alerts",
           panel: {
             html: alertsTab
           }
         },
         {
-          label: "Upcoming visits",
-          id: "upcoming-visits",
+          label: "Visiting orders",
+          id: "visiting-orders",
           panel: {
-            html: upcomingVisitsTab
+            html: visitingOrdersTab
           }
-        },
-        {
-          label: "Visits history",
-          id: "visits-history",
-          panel: {
-            html: pastVisitsTab
-          }
-        }
+        } if visitBalances
       ]
     }) }}
     </div>

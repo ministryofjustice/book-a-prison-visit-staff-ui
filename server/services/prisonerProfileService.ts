@@ -6,6 +6,7 @@ import {
   UpcomingVisitItem,
   PastVisitItem,
   PrisonerDetails,
+  visitItem,
 } from '../@types/bapv'
 import {
   prisonerDatePretty,
@@ -15,6 +16,7 @@ import {
   nextIepAdjustDate,
   nextPrivIepAdjustDate,
   formatVisitType,
+  longVisitDateAndTime,
 } from '../utils/utils'
 import { Alert, InmateDetail, OffenderRestriction, VisitBalances } from '../data/prisonApiTypes'
 import { Visitor } from '../data/orchestrationApiTypes'
@@ -48,13 +50,10 @@ export default class PrisonerProfileService {
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
     const fullPrisoner = await orchestrationApiClient.getPrisonerProfile(prisonId, prisonerId)
 
-    const displayName = properCaseFullName(`${fullPrisoner.lastName}, ${fullPrisoner.firstName}`)
-    const displayDob = prisonerDatePretty({ dateToFormat: fullPrisoner.dateOfBirth })
-
     const alerts = fullPrisoner.alerts || []
     const activeAlerts: Alert[] = alerts.filter(alert => alert.active)
+    const activeAlertCount = activeAlerts.length
     const flaggedAlerts: Alert[] = activeAlerts.filter(alert => this.alertCodesToFlag.includes(alert.alertCode))
-
     const activeAlertsForDisplay: PrisonerAlertItem[] = activeAlerts.map(alert => {
       return [
         {
@@ -95,27 +94,73 @@ export default class PrisonerProfileService {
       ]
     })
 
-    const { convictedStatus, incentiveLevel } = fullPrisoner
-
-    const { visitBalances } = fullPrisoner
-
     const { visits } = fullPrisoner
+
+    const supportedPrisons = await this.supportedPrisonsService.getSupportedPrisons(username)
+
+    const visitsForDisplay: visitItem[] = visits.map(visit => {
+      return [
+        {
+          html: `<a href='/visit/${visit.reference}'>${visit.reference}</a>`,
+          attributes: {
+            'data-test': 'tab-upcoming-reference',
+          },
+        },
+        {
+          html: `<span>${properCase(visit.visitType)}<br>(${properCase(visit.visitRestriction)})</span>`,
+          attributes: {
+            'data-test': 'tab-upcoming-type',
+          },
+        },
+        {
+          text: supportedPrisons[visit.prisonId],
+          attributes: {
+            'data-test': 'tab-upcoming-location',
+          },
+        },
+        {
+          html: visit.startTimestamp
+            ? `<p>${longVisitDateAndTime({
+                startTimestamp: visit.startTimestamp,
+                endTimestamp: visit.endTimestamp,
+              })}</p>`
+            : '<p>N/A</p>',
+          attributes: {
+            'data-test': 'tab-upcoming-date-and-time',
+          },
+        },
+        {
+          html: `<p>${visit.visitContact.name}</p>`,
+          attributes: {
+            'data-test': 'tab-upcoming-visitors',
+          },
+        },
+        {
+          text: `${properCase(visit.visitStatus)}`,
+          attributes: {
+            'data-test': 'tab-upcoming-status',
+          },
+        },
+      ] as visitItem
+    })
 
     const prisonerDetails: PrisonerDetails = {
       offenderNo: fullPrisoner.prisonerId,
+      name: properCaseFullName(`${fullPrisoner.lastName}, ${fullPrisoner.firstName}`),
+      dob: prisonerDatePretty({ dateToFormat: fullPrisoner.dateOfBirth }),
+      convictedStatus: fullPrisoner.convictedStatus,
       category: fullPrisoner.category,
       location: fullPrisoner.cellLocation,
+      prisonName: fullPrisoner.prisonName,
+      incentiveLevel: fullPrisoner.incentiveLevel,
+      visitBalances: fullPrisoner.visitBalances,
     }
 
     return {
-      displayName,
-      displayDob,
       activeAlerts: activeAlertsForDisplay,
+      activeAlertCount,
       flaggedAlerts,
-      convictedStatus,
-      incentiveLevel,
-      visitBalances,
-      visits,
+      visits: visitsForDisplay,
       prisonerDetails,
     }
   }

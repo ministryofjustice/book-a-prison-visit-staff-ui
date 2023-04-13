@@ -184,3 +184,26 @@ export const getWeekOfDatesStartingMonday = (
 
   return { weekOfDates, previousWeek, nextWeek }
 }
+
+export const longPrisonerDateTimePretty = (dateToFormat: string): string => {
+  return format(new Date(dateToFormat), 'EEEE d MMMM yyyy')
+}
+export const longVisitDateAndTime = ({
+  startTimestamp,
+  endTimestamp,
+}: {
+  startTimestamp: string
+  endTimestamp: string
+}): string => {
+  const startTime =
+    format(parseISO(startTimestamp), 'mm') === '00'
+      ? format(parseISO(startTimestamp), 'haaa')
+      : format(parseISO(startTimestamp), 'h:mmaaa')
+
+  const endTime =
+    format(parseISO(endTimestamp), 'mm') === '00'
+      ? format(parseISO(endTimestamp), 'haaa')
+      : format(parseISO(endTimestamp), 'h:mmaaa')
+
+  return `${longPrisonerDateTimePretty(startTimestamp)}<br>${startTime} - ${endTime}`
+}
