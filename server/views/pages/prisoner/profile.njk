@@ -65,7 +65,7 @@
           <strong>Alerts</strong>
           <span data-test="active-alert-count">{{ activeAlertCount }} active</span>
         </li>
-        {% if visitBalances %}
+        {% if prisonerDetails.visitBalances %}
         <li>
           <strong>VO balance</strong>
           <span data-test="remaining-vos">{{ prisonerDetails.visitBalances.remainingVo }}</span>
@@ -78,7 +78,7 @@
       </ul>
 
       <form action="/prisoner/{{ prisonerDetails.offenderNo }}" method="POST" novalidate>
-        {% if visitBalances.remainingVo <= 0 and visitBalances.remainingPvo <= 0 %}
+        {% if prisonerDetails.visitBalances.remainingVo <= 0 and prisonerDetails.visitBalances.remainingPvo <= 0 %}
           {% set voOverrideCheckbox %}
             {{ govukCheckboxes({
               name: "vo-override",
@@ -197,19 +197,19 @@
             html: "<strong>VO</strong>"
           },
           {
-            text: visitBalances.remainingVo,
+            text: prisonerDetails.visitBalances.remainingVo,
             attributes: {
               "data-test": "tab-vo-remaining"
             }
           },
           {
-            text: visitBalances.latestIepAdjustDate,
+            text: prisonerDetails.visitBalances.latestIepAdjustDate,
             attributes: {
               "data-test": "tab-vo-last-date"
             }
           },
           {
-            text: visitBalances.nextIepAdjustDate,
+            text: prisonerDetails.visitBalances.nextIepAdjustDate,
             attributes: {
               "data-test": "tab-vo-next-date"
             }
@@ -220,19 +220,19 @@
             html: "<strong>PVO</strong>"
           },
           {
-            text: visitBalances.remainingPvo,
+            text: prisonerDetails.visitBalances.remainingPvo,
             attributes: {
               "data-test": "tab-pvo-remaining"
             }
           },
           {
-            text: visitBalances.latestPrivIepAdjustDate,
+            text: prisonerDetails.visitBalances.latestPrivIepAdjustDate,
             attributes: {
               "data-test": "tab-pvo-last-date"
             }
           },
           {
-            text: visitBalances.nextPrivIepAdjustDate,
+            text: prisonerDetails.visitBalances.nextPrivIepAdjustDate,
             attributes: {
               "data-test": "tab-pvo-next-date"
             }
@@ -264,7 +264,7 @@
           panel: {
             html: visitingOrdersTab
           }
-        } if visitBalances
+        } if prisonerDetails.visitBalances
       ]
     }) }}
     </div>

@@ -120,7 +120,7 @@ export default class PrisonerProfileService {
         },
         {
           html: visit.startTimestamp
-            ? `<p>${longVisitDateAndTime({
+            ? `<p>${visitDateAndTime({
                 startTimestamp: visit.startTimestamp,
                 endTimestamp: visit.endTimestamp,
               })}</p>`
@@ -155,7 +155,7 @@ export default class PrisonerProfileService {
       incentiveLevel: fullPrisoner.incentiveLevel,
       visitBalances: fullPrisoner.visitBalances,
     }
-
+    console.log(visitsForDisplay)
     return {
       activeAlerts: activeAlertsForDisplay,
       activeAlertCount,
