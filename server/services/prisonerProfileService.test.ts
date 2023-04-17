@@ -1,9 +1,8 @@
 import { NotFound } from 'http-errors'
 import PrisonerProfileService from './prisonerProfileService'
 import { PagePrisonerBookingSummary, VisitBalances, OffenderRestrictions } from '../data/prisonApiTypes'
-import { PrisonerAlertItem, PrisonerProfile } from '../@types/bapv'
-import { PageVisitDto, Alert } from '../data/orchestrationApiTypes'
-import { Contact } from '../data/prisonerContactRegistryApiTypes'
+import { PrisonerAlertItem, PrisonerProfilePage } from '../@types/bapv'
+import { Alert, PrisonerProfile } from '../data/orchestrationApiTypes'
 import TestData from '../routes/testutils/testData'
 import {
   createMockHmppsAuthClient,
@@ -68,7 +67,7 @@ describe('Prisoner profile service', () => {
     })
 
     it('Retrieves and processes data for prisoner profile with visit balances', async () => {
-      const fullPrisoner = {
+      const fullPrisoner = <PrisonerProfile>{
         prisonerId: 'A1234BC',
         firstName: 'JOHN',
         lastName: 'SMITH',
@@ -124,7 +123,7 @@ describe('Prisoner profile service', () => {
       expect(orchestrationApiClient.getPrisonerProfile).toHaveBeenCalledTimes(1)
       expect(supportedPrisonsService.getSupportedPrisons).toHaveBeenCalledTimes(1)
 
-      expect(results).toEqual(<PrisonerProfile>{
+      expect(results).toEqual(<PrisonerProfilePage>{
         activeAlerts: [],
         activeAlertCount: 0,
         flaggedAlerts: [],
@@ -163,15 +162,15 @@ describe('Prisoner profile service', () => {
           visitBalances: {
             remainingVo: 1,
             remainingPvo: 2,
-            latestIepAdjustDate: '2021-04-21',
-            latestPrivIepAdjustDate: '2021-12-01',
+            latestIepAdjustDate: '21 April 2021',
+            latestPrivIepAdjustDate: '1 December 2021',
           },
         },
       })
     })
     // Skipped - previously used endpoints were skipped if prisoner was on remand, this logic may wish be to included in the new endpoint
     it.skip('Does not return visit balances for those on REMAND', async () => {
-      const fullPrisoner = {
+      const fullPrisoner = <PrisonerProfile>{
         prisonerId: 'A1234BC',
         firstName: 'JOHN',
         lastName: 'SMITH',
@@ -199,7 +198,7 @@ describe('Prisoner profile service', () => {
       expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user')
       expect(orchestrationApiClient.getPrisonerProfile).toHaveBeenCalledTimes(1)
       expect(supportedPrisonsService.getSupportedPrisons).toHaveBeenCalledTimes(1)
-      expect(results).toEqual(<PrisonerProfile>{
+      expect(results).toEqual(<PrisonerProfilePage>{
         activeAlerts: [],
         activeAlertCount: 0,
         flaggedAlerts: [],
@@ -410,7 +409,7 @@ describe('Prisoner profile service', () => {
         ],
       ]
 
-      const fullPrisoner = {
+      const fullPrisoner = <PrisonerProfile>{
         prisonerId: 'A1234BC',
         firstName: 'JOHN',
         lastName: 'SMITH',
@@ -432,8 +431,6 @@ describe('Prisoner profile service', () => {
 
       fullPrisoner.alerts = [inactiveAlert, nonRelevantAlert, ...alertsToFlag]
 
-      const prisoner = TestData.prisoner()
-
       orchestrationApiClient.getPrisonerProfile.mockResolvedValue(fullPrisoner)
 
       const results = await prisonerProfileService.getProfile(prisonId, prisonerId, 'user')
@@ -443,7 +440,7 @@ describe('Prisoner profile service', () => {
       expect(orchestrationApiClient.getPrisonerProfile).toHaveBeenCalledTimes(1)
       expect(supportedPrisonsService.getSupportedPrisons).toHaveBeenCalledTimes(1)
 
-      expect(results).toEqual(<PrisonerProfile>{
+      expect(results).toEqual(<PrisonerProfilePage>{
         activeAlerts: alertsForDisplay,
         activeAlertCount: 4,
         flaggedAlerts: alertsToFlag,
@@ -460,8 +457,8 @@ describe('Prisoner profile service', () => {
           visitBalances: {
             remainingVo: 1,
             remainingPvo: 2,
-            latestIepAdjustDate: '2021-04-21',
-            latestPrivIepAdjustDate: '2021-12-01',
+            latestIepAdjustDate: '21 April 2021',
+            latestPrivIepAdjustDate: '1 December 2021',
           },
         },
       })

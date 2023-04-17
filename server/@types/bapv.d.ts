@@ -1,4 +1,4 @@
-import { InmateDetail, OffenderRestriction, VisitBalances } from '../data/prisonApiTypes'
+import { OffenderRestriction, VisitBalances } from '../data/prisonApiTypes'
 import { Visit, VisitorSupport, VisitSession } from '../data/orchestrationApiTypes'
 
 export type Prison = {
@@ -138,7 +138,7 @@ export type VisitorListItem = {
   banned: boolean
 }
 
-export type PrisonerProfile = {
+export type PrisonerProfilePage = {
   activeAlerts: PrisonerAlertItem[]
   activeAlertCount: number
   flaggedAlerts: Alert[]

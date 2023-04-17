@@ -1,12 +1,12 @@
 import { NotFound } from 'http-errors'
 import {
-  PrisonerProfile,
   BAPVVisitBalances,
   PrisonerAlertItem,
   UpcomingVisitItem,
   PastVisitItem,
   PrisonerDetails,
   visitItem,
+  PrisonerProfilePage,
 } from '../@types/bapv'
 import {
   prisonerDatePretty,
@@ -16,7 +16,6 @@ import {
   nextIepAdjustDate,
   nextPrivIepAdjustDate,
   formatVisitType,
-  longVisitDateAndTime,
 } from '../utils/utils'
 import { Alert, InmateDetail, OffenderRestriction, VisitBalances } from '../data/prisonApiTypes'
 import { Visitor } from '../data/orchestrationApiTypes'
@@ -45,7 +44,7 @@ export default class PrisonerProfileService {
     private readonly hmppsAuthClient: HmppsAuthClient,
   ) {}
 
-  async getProfile(prisonId: string, prisonerId: string, username: string): Promise<PrisonerProfile> {
+  async getProfile(prisonId: string, prisonerId: string, username: string): Promise<PrisonerProfilePage> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
     const fullPrisoner = await orchestrationApiClient.getPrisonerProfile(prisonId, prisonerId)
@@ -94,11 +93,9 @@ export default class PrisonerProfileService {
       ]
     })
 
-    const { visits } = fullPrisoner
-
     const supportedPrisons = await this.supportedPrisonsService.getSupportedPrisons(username)
 
-    const visitsForDisplay: visitItem[] = visits.map(visit => {
+    const visitsForDisplay: visitItem[] = fullPrisoner.visits.map(visit => {
       return [
         {
           html: `<a href='/visit/${visit.reference}'>${visit.reference}</a>`,
@@ -155,7 +152,19 @@ export default class PrisonerProfileService {
       incentiveLevel: fullPrisoner.incentiveLevel,
       visitBalances: fullPrisoner.visitBalances,
     }
-    console.log(visitsForDisplay)
+
+    if (prisonerDetails.visitBalances?.latestIepAdjustDate) {
+      prisonerDetails.visitBalances.latestIepAdjustDate = prisonerDatePretty({
+        dateToFormat: prisonerDetails.visitBalances.latestIepAdjustDate,
+      })
+    }
+
+    if (prisonerDetails.visitBalances?.latestPrivIepAdjustDate) {
+      prisonerDetails.visitBalances.latestPrivIepAdjustDate = prisonerDatePretty({
+        dateToFormat: prisonerDetails.visitBalances.latestPrivIepAdjustDate,
+      })
+    }
+
     return {
       activeAlerts: activeAlertsForDisplay,
       activeAlertCount,

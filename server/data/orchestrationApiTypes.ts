@@ -33,4 +33,3 @@ export type Alert = components['schemas']['AlertDto']
 export type PrisonerProfile = Omit<components['schemas']['PrisonerProfileDto'], 'visits'> & {
   visits: Visit[]
 }
-

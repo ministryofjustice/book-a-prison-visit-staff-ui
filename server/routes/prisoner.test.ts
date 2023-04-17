@@ -2,7 +2,7 @@ import type { Express } from 'express'
 import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
-import { PrisonerProfile, BAPVVisitBalances, VisitInformation, VisitSessionData, FlashData } from '../@types/bapv'
+import { PrisonerProfilePage, VisitInformation, VisitSessionData, FlashData } from '../@types/bapv'
 import { InmateDetail, VisitBalances } from '../data/prisonApiTypes'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import { clearSession } from './visitorUtils'
@@ -53,13 +53,11 @@ afterEach(() => {
   jest.resetAllMocks()
 })
 
-describe.skip('GET /prisoner/A1234BC', () => {
-  let prisonerProfile: PrisonerProfile
+describe('GET /prisoner/A1234BC', () => {
+  let prisonerProfile: PrisonerProfilePage
 
   beforeEach(() => {
     prisonerProfile = {
-      displayName: 'Smith, John',
-      displayDob: '2 April 1975',
       activeAlerts: [
         [
           {
@@ -79,25 +77,52 @@ describe.skip('GET /prisoner/A1234BC', () => {
           },
         ],
       ],
+      activeAlertCount: 1,
       flaggedAlerts: [
         {
           alertCode: 'UPIU',
           alertCodeDescription: 'Protective Isolation Unit',
         },
       ],
-      inmateDetail: TestData.inmateDetail({ activeAlertCount: 1 }),
-      convictedStatus: 'Convicted',
-      incentiveLevel: 'Standard',
-      visitBalances: {
-        remainingVo: 1,
-        remainingPvo: 0,
-        latestIepAdjustDate: '21 April 2021',
-        latestPrivIepAdjustDate: '1 December 2021',
-        nextIepAdjustDate: '15 May 2021',
-        nextPrivIepAdjustDate: '1 January 2022',
-      } as BAPVVisitBalances,
-      upcomingVisits: [],
-      pastVisits: [],
+      visits: [
+        [
+          {
+            html: "<a href='/visit/ab-cd-ef-gh'>ab-cd-ef-gh</a>",
+            attributes: {
+              'data-test': 'tab-upcoming-reference',
+            },
+          },
+          {
+            html: '<span>Social<br>(Open)</span>',
+            attributes: {
+              'data-test': 'tab-upcoming-type',
+            },
+          },
+          { text: 'Hewell (HMP)', attributes: { 'data-test': 'tab-upcoming-location' } },
+          {
+            html: '<p>17 August 2022<br>10:00am - 11:00am</p>',
+            attributes: { 'data-test': 'tab-upcoming-date-and-time' },
+          },
+          { html: '<p>Mary Smith</p>', attributes: { 'data-test': 'tab-upcoming-visitors' } },
+          { text: 'Booked', attributes: { 'data-test': 'tab-upcoming-status' } },
+        ],
+      ],
+      prisonerDetails: {
+        offenderNo: 'A1234BC',
+        name: 'Smith, John',
+        dob: '2 April 1975',
+        convictedStatus: 'Convicted',
+        category: 'Cat C',
+        location: '1-1-C-028',
+        prisonName: 'Hewell (HMP)',
+        incentiveLevel: 'Standard',
+        visitBalances: {
+          remainingVo: 1,
+          remainingPvo: 0,
+          latestIepAdjustDate: '21 April 2021',
+          latestPrivIepAdjustDate: '1 December 2021',
+        },
+      },
     }
 
     prisonerProfileService.getProfile.mockResolvedValue(prisonerProfile)
@@ -127,10 +152,10 @@ describe.skip('GET /prisoner/A1234BC', () => {
 
         expect($('[data-test="tab-vo-remaining"]').text()).toBe('1')
         expect($('[data-test="tab-vo-last-date"]').text()).toBe('21 April 2021')
-        expect($('[data-test="tab-vo-next-date"]').text()).toBe('15 May 2021')
+        // expect($('[data-test="tab-vo-next-date"]').text()).toBe('15 May 2021')
         expect($('[data-test="tab-pvo-remaining"]').text()).toBe('0')
         expect($('[data-test="tab-pvo-last-date"]').text()).toBe('1 December 2021')
-        expect($('[data-test="tab-pvo-next-date"]').text()).toBe('1 January 2022')
+        // expect($('[data-test="tab-pvo-next-date"]').text()).toBe('1 January 2022')
         expect($('.govuk-back-link').attr('href')).toBe('/search/prisoner')
 
         expect($('#active-alerts').text()).toContain('Professional lock pick')
@@ -171,7 +196,7 @@ describe.skip('GET /prisoner/A1234BC', () => {
   it('should render the prisoner profile page for offender number A1234BC without active alerts if there are none', () => {
     prisonerProfile.flaggedAlerts = []
     prisonerProfile.activeAlerts = []
-    prisonerProfile.inmateDetail.activeAlertCount = 0
+    prisonerProfile.activeAlertCount = 0
 
     return request(app)
       .get('/prisoner/A1234BC')
@@ -192,10 +217,10 @@ describe.skip('GET /prisoner/A1234BC', () => {
         })
       })
   })
-
-  it('should render prisoner profile page without visiting orders for REMAND', () => {
-    prisonerProfile.convictedStatus = 'Remand'
-    prisonerProfile.visitBalances = undefined
+  // Skipped as currently not got logic incorportated to skip requesting VO's for remand
+  it.skip('should render prisoner profile page without visiting orders for REMAND', () => {
+    prisonerProfile.prisonerDetails.convictedStatus = 'Remand'
+    prisonerProfile.prisonerDetails.visitBalances = undefined
 
     return request(app)
       .get('/prisoner/A1234BC')
@@ -220,7 +245,7 @@ describe.skip('GET /prisoner/A1234BC', () => {
   })
 
   it('should render prisoner profile page with VO Override checkbox if VO balances zero', () => {
-    prisonerProfile.visitBalances.remainingVo = 0
+    prisonerProfile.prisonerDetails.visitBalances.remainingVo = 0
 
     return request(app)
       .get('/prisoner/A1234BC')
@@ -245,7 +270,7 @@ describe.skip('GET /prisoner/A1234BC', () => {
   })
 
   it('should render prisoner profile page with VO Override validation errors', () => {
-    prisonerProfile.visitBalances.remainingVo = 0
+    prisonerProfile.prisonerDetails.visitBalances.remainingVo = 0
 
     flashData.errors = [
       {
