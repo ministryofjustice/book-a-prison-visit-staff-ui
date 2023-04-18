@@ -955,9 +955,9 @@ export interface components {
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
       pageSize?: number
-      unpaged?: boolean
       /** Format: int32 */
       pageNumber?: number
+      unpaged?: boolean
       paged?: boolean
     }
     SortObject: {
