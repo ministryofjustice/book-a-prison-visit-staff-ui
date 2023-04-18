@@ -4,17 +4,9 @@ export type SupportType = components['schemas']['SupportTypeDto']
 
 export type VisitorSupport = components['schemas']['VisitorSupportDto']
 
-// Temp fixes for enums incorrectly defined as strings in orchestration API - VB-2081
-// export type PageVisitDto = components['schemas']['PageVisitDto']
-// export type Visit = components['schemas']['VisitDto']
-// export type VisitHistoryDetails = components['schemas']['VisitHistoryDetailsDto']
-export type Visit = Omit<components['schemas']['VisitDto'], 'visitRestriction' | 'visitStatus' | 'visitType'> & {
-  visitRestriction: 'OPEN' | 'CLOSED' | 'UNKNOWN'
-  visitStatus: 'RESERVED' | 'CHANGING' | 'BOOKED' | 'CANCELLED'
-  visitType: 'SOCIAL'
-}
-export type PageVisitDto = Omit<components['schemas']['PageVisitDto'], 'content'> & { content: Visit[] }
-export type VisitHistoryDetails = Omit<components['schemas']['VisitHistoryDetailsDto'], 'visit'> & { visit: Visit }
+export type PageVisitDto = components['schemas']['PageVisitDto']
+export type Visit = components['schemas']['VisitDto']
+export type VisitHistoryDetails = components['schemas']['VisitHistoryDetailsDto']
 
 export type Visitor = components['schemas']['VisitorDto']
 
