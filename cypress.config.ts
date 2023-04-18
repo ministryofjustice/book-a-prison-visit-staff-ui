@@ -33,6 +33,7 @@ export default defineConfig({
 
         // Orchestration service
         stubVisitHistory: orchestrationService.stubVisitHistory,
+        stubPrisonerProfile: orchestrationService.stubPrisonerProfile,
 
         // Prisoner contact registry
         stubPrisonerSocialContacts: prisonerContactRegistry.stubPrisonerSocialContacts,
