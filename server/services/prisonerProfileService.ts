@@ -5,7 +5,7 @@ import {
   UpcomingVisitItem,
   PastVisitItem,
   PrisonerDetails,
-  visitItem,
+  VisitItem,
   PrisonerProfilePage,
 } from '../@types/bapv'
 import {
@@ -95,7 +95,7 @@ export default class PrisonerProfileService {
 
     const supportedPrisons = await this.supportedPrisonsService.getSupportedPrisons(username)
 
-    const visitsForDisplay: visitItem[] = fullPrisoner.visits.map(visit => {
+    const visitsForDisplay: VisitItem[] = fullPrisoner.visits.map(visit => {
       return [
         {
           html: `<a href='/visit/${visit.reference}'>${visit.reference}</a>`,
@@ -138,7 +138,7 @@ export default class PrisonerProfileService {
             'data-test': 'tab-visits-status',
           },
         },
-      ] as visitItem
+      ] as VisitItem
     })
 
     const prisonerDetails: PrisonerDetails = {

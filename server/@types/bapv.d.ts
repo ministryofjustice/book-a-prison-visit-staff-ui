@@ -142,7 +142,7 @@ export type PrisonerProfilePage = {
   activeAlerts: PrisonerAlertItem[]
   activeAlertCount: number
   flaggedAlerts: Alert[]
-  visits: visitItem[]
+  visits: VisitItem[]
   prisonerDetails: PrisonerDetails
 }
 
@@ -255,7 +255,7 @@ export type PrisonerDetails = {
   visitBalances: VisitBalances
 }
 
-export type visitItem = [
+export type VisitItem = [
   {
     html: string
     attributes?: {

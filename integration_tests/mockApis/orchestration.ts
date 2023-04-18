@@ -1,7 +1,6 @@
 import { SuperAgentRequest } from 'superagent'
 import { stubFor } from './wiremock'
-import { VisitHistoryDetails } from '../../server/data/orchestrationApiTypes'
-import { PrisonerProfilePage } from '../../server/@types/bapv'
+import { PrisonerProfile, VisitHistoryDetails } from '../../server/data/orchestrationApiTypes'
 
 export default {
   stubVisitHistory: (visitHistoryDetails: VisitHistoryDetails): SuperAgentRequest => {
@@ -24,7 +23,7 @@ export default {
   }: {
     prisonId: string
     prisonerId: string
-    profile: PrisonerProfilePage
+    profile: PrisonerProfile
   }): SuperAgentRequest => {
     return stubFor({
       request: {
