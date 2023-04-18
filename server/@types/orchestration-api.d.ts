@@ -137,13 +137,15 @@ export interface components {
       /**
        * @description Visit Type
        * @example SOCIAL
+       * @enum {string}
        */
-      visitType: string
+      visitType: 'SOCIAL'
       /**
        * @description Visit Restriction
        * @example OPEN
+       * @enum {string}
        */
-      visitRestriction: string
+      visitRestriction: 'OPEN' | 'CLOSED' | 'UNKNOWN'
       /**
        * Format: date-time
        * @description The date and time of the visit
@@ -226,23 +228,46 @@ export interface components {
       /**
        * @description Visit Type
        * @example SOCIAL
+       * @enum {string}
        */
-      visitType: string
+      visitType: 'SOCIAL'
       /**
        * @description Visit Status
        * @example RESERVED
+       * @enum {string}
        */
-      visitStatus: string
+      visitStatus: 'RESERVED' | 'CHANGING' | 'BOOKED' | 'CANCELLED'
       /**
        * @description Outcome Status
        * @example VISITOR_CANCELLED
+       * @enum {string}
        */
-      outcomeStatus?: string
+      outcomeStatus?:
+        | 'ADMINISTRATIVE_CANCELLATION'
+        | 'ADMINISTRATIVE_ERROR'
+        | 'BATCH_CANCELLATION'
+        | 'CANCELLATION'
+        | 'COMPLETED_NORMALLY'
+        | 'ESTABLISHMENT_CANCELLED'
+        | 'NOT_RECORDED'
+        | 'NO_VISITING_ORDER'
+        | 'PRISONER_CANCELLED'
+        | 'PRISONER_COMPLETED_EARLY'
+        | 'PRISONER_REFUSED_TO_ATTEND'
+        | 'TERMINATED_BY_STAFF'
+        | 'VISITOR_CANCELLED'
+        | 'VISITOR_COMPLETED_EARLY'
+        | 'VISITOR_DECLINED_ENTRY'
+        | 'VISITOR_DID_NOT_ARRIVE'
+        | 'VISITOR_FAILED_SECURITY_CHECKS'
+        | 'VISIT_ORDER_CANCELLED'
+        | 'SUPERSEDED_CANCELLATION'
       /**
        * @description Visit Restriction
        * @example OPEN
+       * @enum {string}
        */
-      visitRestriction: string
+      visitRestriction: 'OPEN' | 'CLOSED' | 'UNKNOWN'
       /**
        * Format: date-time
        * @description The date and time of the visit
@@ -291,8 +316,9 @@ export interface components {
       /**
        * @description Note type
        * @example VISITOR_CONCERN
+       * @enum {string}
        */
-      type: string
+      type: 'VISITOR_CONCERN' | 'VISIT_OUTCOMES' | 'VISIT_COMMENT' | 'STATUS_CHANGED_REASON'
       /**
        * @description Note text
        * @example Visitor is concerned that his mother in-law is coming!
@@ -307,8 +333,28 @@ export interface components {
       /**
        * @description Outcome Status
        * @example VISITOR_CANCELLED
+       * @enum {string}
        */
-      outcomeStatus: string
+      outcomeStatus:
+        | 'ADMINISTRATIVE_CANCELLATION'
+        | 'ADMINISTRATIVE_ERROR'
+        | 'BATCH_CANCELLATION'
+        | 'CANCELLATION'
+        | 'COMPLETED_NORMALLY'
+        | 'ESTABLISHMENT_CANCELLED'
+        | 'NOT_RECORDED'
+        | 'NO_VISITING_ORDER'
+        | 'PRISONER_CANCELLED'
+        | 'PRISONER_COMPLETED_EARLY'
+        | 'PRISONER_REFUSED_TO_ATTEND'
+        | 'TERMINATED_BY_STAFF'
+        | 'VISITOR_CANCELLED'
+        | 'VISITOR_COMPLETED_EARLY'
+        | 'VISITOR_DECLINED_ENTRY'
+        | 'VISITOR_DID_NOT_ARRIVE'
+        | 'VISITOR_FAILED_SECURITY_CHECKS'
+        | 'VISIT_ORDER_CANCELLED'
+        | 'SUPERSEDED_CANCELLATION'
       /**
        * @description Outcome text
        * @example Because he got covid
@@ -319,8 +365,9 @@ export interface components {
       /**
        * @description Visit Restriction
        * @example OPEN
+       * @enum {string}
        */
-      visitRestriction?: string
+      visitRestriction?: 'OPEN' | 'CLOSED' | 'UNKNOWN'
       /**
        * Format: date-time
        * @description The date and time of the visit
@@ -398,9 +445,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      last?: boolean
       pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
@@ -417,8 +464,8 @@ export interface components {
     }
     SortObject: {
       empty?: boolean
-      sorted?: boolean
       unsorted?: boolean
+      sorted?: boolean
     }
     /** @description Support Type */
     SupportTypeDto: {
@@ -491,7 +538,7 @@ export interface components {
        */
       endTimestamp: string
       /** @description Session conflicts */
-      sessionConflicts?: string[]
+      sessionConflicts?: ('NON_ASSOCIATION' | 'DOUBLE_BOOKED')[]
     }
     /** @description Session Capacity */
     SessionCapacityDto: {
@@ -534,10 +581,16 @@ export interface components {
        */
       prisonerLocationGroupNames?: string[]
       /**
+       * @description prisoner category groups
+       * @example Category A Prisoners
+       */
+      prisonerCategoryGroupNames?: string[]
+      /**
        * @description The session template frequency
        * @example BI_WEEKLY
+       * @enum {string}
        */
-      sessionTemplateFrequency: string
+      sessionTemplateFrequency: 'BI_WEEKLY' | 'WEEKLY' | 'ONE_OFF'
       /**
        * Format: date
        * @description The end date of sessionTemplate

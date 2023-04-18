@@ -1099,7 +1099,7 @@ export interface paths {
   }
   '/api/offenders/{offenderNo}/non-association-details': {
     /**
-     * Gets the offender non-association details for a given offender using the latest booking
+     * Gets the offender non-association details for a given offender for ALL bookings
      * @description Get offender non-association details by offender No
      */
     get: operations['getNonAssociationDetails']
@@ -4911,13 +4911,13 @@ export interface components {
     OffenderAdjudicationHearing: {
       agencyId: string
       /** @description Display Prisoner Number (UK is NOMS ID) */
-      offenderNo?: string
+      offenderNo: string
       /**
        * Format: int64
        * @description OIC Hearing ID
        * @example 1985937
        */
-      hearingId?: number
+      hearingId: number
       /**
        * @description Hearing Type
        * @example Governor's Hearing Adult
@@ -4933,7 +4933,7 @@ export interface components {
        * @description The internal location id of the hearing
        * @example 789448
        */
-      internalLocationId?: number
+      internalLocationId: number
       /**
        * @description The internal location description of the hearing
        * @example PVI-RES-MCASU-ADJUD
@@ -6275,12 +6275,12 @@ export interface components {
     }
     PersonalCareCounterDto: {
       /** @description Offender number */
-      offenderNo?: string
+      offenderNo: string
       /**
        * Format: int32
        * @description Number of health problems records in set time
        */
-      size?: number
+      size: number
     }
     /** @description Offence Details */
     OffenceDetail: {
@@ -7465,17 +7465,17 @@ export interface components {
       /** Format: int64 */
       offset?: number
       sort?: components['schemas']['SortObject']
-      paged?: boolean
-      unpaged?: boolean
       /** Format: int32 */
       pageSize?: number
       /** Format: int32 */
       pageNumber?: number
+      paged?: boolean
+      unpaged?: boolean
     }
     SortObject: {
       empty?: boolean
-      unsorted?: boolean
       sorted?: boolean
+      unsorted?: boolean
     }
     /** @description PersonIdentifier */
     PersonIdentifier: {
@@ -8140,12 +8140,12 @@ export interface components {
        * @description The level (starting from 1) of the individual location. The highest number level will be the cell.
        * @example 1
        */
-      level?: number
+      level: number
       /**
        * @description The code for the location e.g. 010 for a cell, A for a wing
        * @example 010
        */
-      code?: string
+      code: string
       /**
        * @description The type of the location - from LIVING_UNIT reference code
        * @example WING
@@ -8156,7 +8156,7 @@ export interface components {
        * @description Description of the location, either from the user description if set or reference code description and code
        * @example Wing A
        */
-      description?: string
+      description: string
     }
     OffenderLocation: {
       /** @description Current housing levels or null if not currently in prison */
@@ -10363,7 +10363,7 @@ export interface components {
        * Format: int64
        * @description The ID of this court date
        */
-      id?: number
+      id: number
       /**
        * Format: date
        * @description The date of the court result
@@ -10375,7 +10375,7 @@ export interface components {
       resultDescription?: string
       /** @description The disposition code of the result of the court date */
       resultDispositionCode?: string
-      charge?: components['schemas']['WarrantCharge']
+      charge: components['schemas']['WarrantCharge']
       /**
        * Format: int64
        * @description The id of the booking this court date was linked to
@@ -18247,7 +18247,7 @@ export interface operations {
     }
   }
   /**
-   * Gets the offender non-association details for a given offender using the latest booking
+   * Gets the offender non-association details for a given offender for ALL bookings
    * @description Get offender non-association details by offender No
    */
   getNonAssociationDetails: {

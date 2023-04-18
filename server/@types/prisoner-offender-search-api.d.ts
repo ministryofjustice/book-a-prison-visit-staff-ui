@@ -334,7 +334,7 @@ export interface components {
     }
     /** @description Incentive level */
     CurrentIncentive: {
-      level?: components['schemas']['IncentiveLevel']
+      level: components['schemas']['IncentiveLevel']
       /**
        * @description Date time of the incentive
        * @example 2021-07-05T10:35:17
@@ -358,7 +358,7 @@ export interface components {
        * @description description
        * @example Standard
        */
-      description?: string
+      description: string
     }
     Prisoner: {
       /**
@@ -798,22 +798,22 @@ export interface components {
        * @description Alert Type
        * @example H
        */
-      alertType?: string
+      alertType: string
       /**
        * @description Alert Code
        * @example HA
        */
-      alertCode?: string
+      alertCode: string
       /**
        * @description Active
        * @example true
        */
-      active?: boolean
+      active: boolean
       /**
        * @description Expired
        * @example true
        */
-      expired?: boolean
+      expired: boolean
     }
     /** @description Aliases Names and Details */
     PrisonerAlias: {
@@ -821,7 +821,7 @@ export interface components {
        * @description First Name
        * @example Robert
        */
-      firstName?: string
+      firstName: string
       /**
        * @description Middle names
        * @example Trevor
@@ -831,13 +831,13 @@ export interface components {
        * @description Last name
        * @example Lorsen
        */
-      lastName?: string
+      lastName: string
       /**
        * Format: date
        * @description Date of birth
        * @example 1975-04-02
        */
-      dateOfBirth?: string
+      dateOfBirth: string
       /**
        * @description Gender
        * @example Male
@@ -886,10 +886,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
-      last?: boolean
       empty?: boolean
     }
     PageableObject: {
@@ -898,10 +898,10 @@ export interface components {
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
       pageSize?: number
-      /** Format: int32 */
-      pageNumber?: number
       paged?: boolean
       unpaged?: boolean
+      /** Format: int32 */
+      pageNumber?: number
     }
     SortObject: {
       empty?: boolean
@@ -995,7 +995,7 @@ export interface components {
        * @default false
        * @example false
        */
-      includeAliases?: boolean
+      includeAliases: boolean
     }
     /** @description Search Criteria for Prisoner Search */
     SearchCriteria: {
@@ -1026,7 +1026,7 @@ export interface components {
        * @default false
        * @example false
        */
-      includeAliases?: boolean
+      includeAliases: boolean
     }
     BookingIds: {
       /**
@@ -1046,13 +1046,13 @@ export interface components {
        * @description The page number required in the paginated response
        * @example 0
        */
-      page?: number
+      page: number
       /**
        * Format: int32
        * @description The number of results to return for paginated response
        * @example 10
        */
-      size?: number
+      size: number
     }
     PrisonerDetailRequest: {
       /**
@@ -1095,8 +1095,8 @@ export interface components {
        * @default true
        * @example true
        */
-      includeAliases?: boolean
-      pagination?: components['schemas']['PaginationRequest']
+      includeAliases: boolean
+      pagination: components['schemas']['PaginationRequest']
     }
     PrisonerDetailResponse: {
       /** Format: int64 */
@@ -1110,10 +1110,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
-      last?: boolean
       empty?: boolean
     }
     ErrorResponse: {
@@ -1122,7 +1122,7 @@ export interface components {
        * @description Status of Error Code
        * @example 400
        */
-      status?: number
+      status: number
       /**
        * @description Developer Information message
        * @example System is down
@@ -1343,8 +1343,8 @@ export interface components {
        *         Prison and cell location will always be required to match.
        * @example false
        */
-      lenient?: boolean
-      pagination?: components['schemas']['PaginationRequest']
+      lenient: boolean
+      pagination: components['schemas']['PaginationRequest']
     }
     PhysicalDetailResponse: {
       /** Format: int64 */
@@ -1358,10 +1358,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
-      last?: boolean
       empty?: boolean
     }
     MatchRequest: {
@@ -1452,12 +1452,12 @@ export interface components {
        * ]
        */
       prisonIds: string[]
-      pagination?: components['schemas']['PaginationRequest']
+      pagination: components['schemas']['PaginationRequest']
       /**
        * @description The type of search. When set to DEFAULT (which is the default when not provided) search order is by calculated relevance (AKA score). An ESTABLISHMENT type will order results by name and is designed for using this API for a single quick search field for prisoners within a specific prison
        * @enum {string}
        */
-      type?: 'DEFAULT' | 'ESTABLISHMENT'
+      type: 'DEFAULT' | 'ESTABLISHMENT'
     }
     KeywordResponse: {
       /** Format: int64 */
@@ -1471,10 +1471,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
-      last?: boolean
       empty?: boolean
     }
     /** @description Search Criteria for Global Prisoner Search */
@@ -1516,7 +1516,7 @@ export interface components {
        * @default false
        * @example false
        */
-      includeAliases?: boolean
+      includeAliases: boolean
     }
     DlqMessage: {
       body: {
@@ -1613,7 +1613,7 @@ export interface operations {
   indexComplete: {
     parameters: {
       query: {
-        ignoreThreshold: boolean
+        ignoreThreshold?: boolean
       }
     }
     responses: {
@@ -2031,7 +2031,7 @@ export interface operations {
   getDlqMessages: {
     parameters: {
       query: {
-        maxMessages: number
+        maxMessages?: number
       }
       path: {
         dlqName: string
@@ -2072,7 +2072,7 @@ export interface operations {
   findByPrison: {
     parameters: {
       query: {
-        'include-restricted-patients': boolean
+        'include-restricted-patients'?: boolean
         /** @description Zero-based page index (0..N) */
         page?: number
         /** @description The size of the page to be returned */
@@ -2142,12 +2142,12 @@ export interface operations {
          * @description The primary search term. Whe absent all prisoners will be returned at the prison
          * @example john smith
          */
-        term: string
+        term?: string
         /**
          * @description alert codes to filter by. Zero or more can be supplied. When multiple supplied the filter is effectively and OR
          * @example XTACT
          */
-        alerts: string[]
+        alerts?: string[]
         /**
          * @description Offenders with a DOB >= this date
          * @example 1970-01-02
