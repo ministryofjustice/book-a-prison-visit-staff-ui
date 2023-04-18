@@ -89,22 +89,22 @@ describe('GET /prisoner/A1234BC', () => {
           {
             html: "<a href='/visit/ab-cd-ef-gh'>ab-cd-ef-gh</a>",
             attributes: {
-              'data-test': 'tab-upcoming-reference',
+              'data-test': 'tab-visits-reference',
             },
           },
           {
             html: '<span>Social<br>(Open)</span>',
             attributes: {
-              'data-test': 'tab-upcoming-type',
+              'data-test': 'tab-visits-type',
             },
           },
-          { text: 'Hewell (HMP)', attributes: { 'data-test': 'tab-upcoming-location' } },
+          { text: 'Hewell (HMP)', attributes: { 'data-test': 'tab-visits-location' } },
           {
             html: '<p>17 August 2022<br>10:00am - 11:00am</p>',
-            attributes: { 'data-test': 'tab-upcoming-date-and-time' },
+            attributes: { 'data-test': 'tab-visits-date-and-time' },
           },
-          { html: '<p>Mary Smith</p>', attributes: { 'data-test': 'tab-upcoming-visitors' } },
-          { text: 'Booked', attributes: { 'data-test': 'tab-upcoming-status' } },
+          { html: '<p>Mary Smith</p>', attributes: { 'data-test': 'tab-visits-visitors' } },
+          { text: 'Booked', attributes: { 'data-test': 'tab-visits-status' } },
         ],
       ],
       prisonerDetails: {

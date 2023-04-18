@@ -100,19 +100,19 @@ export default class PrisonerProfileService {
         {
           html: `<a href='/visit/${visit.reference}'>${visit.reference}</a>`,
           attributes: {
-            'data-test': 'tab-upcoming-reference',
+            'data-test': 'tab-visits-reference',
           },
         },
         {
           html: `<span>${properCase(visit.visitType)}<br>(${properCase(visit.visitRestriction)})</span>`,
           attributes: {
-            'data-test': 'tab-upcoming-type',
+            'data-test': 'tab-visits-type',
           },
         },
         {
           text: supportedPrisons[visit.prisonId],
           attributes: {
-            'data-test': 'tab-upcoming-location',
+            'data-test': 'tab-visits-location',
           },
         },
         {
@@ -123,19 +123,19 @@ export default class PrisonerProfileService {
               })}</p>`
             : '<p>N/A</p>',
           attributes: {
-            'data-test': 'tab-upcoming-date-and-time',
+            'data-test': 'tab-visits-date-and-time',
           },
         },
         {
           html: `<p>${visit.visitContact.name}</p>`,
           attributes: {
-            'data-test': 'tab-upcoming-visitors',
+            'data-test': 'tab-visits-visitors',
           },
         },
         {
           text: `${properCase(visit.visitStatus)}`,
           attributes: {
-            'data-test': 'tab-upcoming-status',
+            'data-test': 'tab-visits-status',
           },
         },
       ] as visitItem
@@ -223,19 +223,19 @@ export default class PrisonerProfileService {
         {
           html: `<a href='/visit/${visit.reference}'>${visit.reference}</a>`,
           attributes: {
-            'data-test': 'tab-upcoming-reference',
+            'data-test': 'tab-visits-reference',
           },
         },
         {
           html: formatVisitType(visit.visitType),
           attributes: {
-            'data-test': 'tab-upcoming-type',
+            'data-test': 'tab-visits-type',
           },
         },
         {
           text: supportedPrisons[visit.prisonId],
           attributes: {
-            'data-test': 'tab-upcoming-location',
+            'data-test': 'tab-visits-location',
           },
         },
         {
@@ -243,19 +243,19 @@ export default class PrisonerProfileService {
             ? `<p>${visitDateAndTime({ startTimestamp: visit.startTimestamp, endTimestamp: visit.endTimestamp })}</p>`
             : '<p>N/A</p>',
           attributes: {
-            'data-test': 'tab-upcoming-date-and-time',
+            'data-test': 'tab-visits-date-and-time',
           },
         },
         {
           html: `<p>${visitContactNames.join('<br>')}</p>`,
           attributes: {
-            'data-test': 'tab-upcoming-visitors',
+            'data-test': 'tab-visits-visitors',
           },
         },
         {
           text: `${properCase(visit.visitStatus)}`,
           attributes: {
-            'data-test': 'tab-upcoming-status',
+            'data-test': 'tab-visits-status',
           },
         },
       ] as UpcomingVisitItem
