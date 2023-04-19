@@ -20,14 +20,14 @@ export default function routes({
   const post = (path: string, handler: RequestHandler) => router.post(path, asyncMiddleware(handler))
 
   get('/:offenderNo', async (req, res) => {
-    const offenderNo = getOffenderNo(req)
+    const prisonerId = getOffenderNo(req)
     const { prisonId } = req.session.selectedEstablishment
     const search = (req.query?.search as string) ?? ''
     const queryParamsForBackLink = search !== '' ? new URLSearchParams({ search }).toString() : ''
 
-    const prisonerProfile = await prisonerProfileService.getProfile(offenderNo, prisonId, res.locals.user.username)
+    const prisonerProfile = await prisonerProfileService.getProfile(prisonId, prisonerId, res.locals.user.username)
     await auditService.viewPrisoner({
-      prisonerId: offenderNo,
+      prisonerId,
       prisonId,
       username: res.locals.user.username,
       operationId: res.locals.appInsightsOperationId,

@@ -1,5 +1,13 @@
 import { NotFound } from 'http-errors'
-import { PrisonerProfile, BAPVVisitBalances, PrisonerAlertItem, UpcomingVisitItem, PastVisitItem } from '../@types/bapv'
+import {
+  BAPVVisitBalances,
+  PrisonerAlertItem,
+  UpcomingVisitItem,
+  PastVisitItem,
+  PrisonerDetails,
+  VisitItem,
+  PrisonerProfilePage,
+} from '../@types/bapv'
 import {
   prisonerDatePretty,
   properCaseFullName,
@@ -15,6 +23,7 @@ import { Contact } from '../data/prisonerContactRegistryApiTypes'
 import SupportedPrisonsService from './supportedPrisonsService'
 import {
   HmppsAuthClient,
+  OrchestrationApiClient,
   PrisonApiClient,
   PrisonerContactRegistryApiClient,
   PrisonerSearchClient,
@@ -26,6 +35,7 @@ export default class PrisonerProfileService {
   private alertCodesToFlag = ['UPIU', 'RCDR', 'URCU']
 
   constructor(
+    private readonly orchestrationApiClientFactory: RestClientBuilder<OrchestrationApiClient>,
     private readonly prisonApiClientFactory: RestClientBuilder<PrisonApiClient>,
     private readonly visitSchedulerApiClientFactory: RestClientBuilder<VisitSchedulerApiClient>,
     private readonly prisonerContactRegistryApiClientFactory: RestClientBuilder<PrisonerContactRegistryApiClient>,
@@ -34,45 +44,15 @@ export default class PrisonerProfileService {
     private readonly hmppsAuthClient: HmppsAuthClient,
   ) {}
 
-  async getProfile(offenderNo: string, prisonId: string, username: string): Promise<PrisonerProfile> {
+  async getProfile(prisonId: string, prisonerId: string, username: string): Promise<PrisonerProfilePage> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const prisonApiClient = this.prisonApiClientFactory(token)
-    const bookings = await prisonApiClient.getBookings(offenderNo, prisonId)
+    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+    const fullPrisoner = await orchestrationApiClient.getPrisonerProfile(prisonId, prisonerId)
 
-    if (bookings.numberOfElements !== 1) throw new NotFound()
-
-    const visitSchedulerApiClient = this.visitSchedulerApiClientFactory(token)
-    const prisonerContactRegistryApiClient = this.prisonerContactRegistryApiClientFactory(token)
-    const prisonerSearchClient = this.prisonerSearchClientFactory(token)
-
-    const { convictedStatus } = bookings.content[0]
-    const inmateDetail = await prisonApiClient.getOffender(offenderNo)
-    const prisoner = await prisonerSearchClient.getPrisonerById(offenderNo)
-    const incentiveLevel = prisoner.currentIncentive?.level.description || ''
-
-    const visitBalances = await this.getVisitBalances(prisonApiClient, convictedStatus, offenderNo)
-    const displayName = properCaseFullName(`${inmateDetail.lastName}, ${inmateDetail.firstName}`)
-    const displayDob = prisonerDatePretty({ dateToFormat: inmateDetail.dateOfBirth })
-    const alerts = inmateDetail.alerts || []
+    const alerts = fullPrisoner.alerts || []
     const activeAlerts: Alert[] = alerts.filter(alert => alert.active)
+    const activeAlertCount = activeAlerts.length
     const flaggedAlerts: Alert[] = activeAlerts.filter(alert => this.alertCodesToFlag.includes(alert.alertCode))
-
-    const socialContacts = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(offenderNo)
-    const supportedPrisons = await this.supportedPrisonsService.getSupportedPrisons(username)
-
-    const upcomingVisits: UpcomingVisitItem[] = await this.getUpcomingVisits(
-      offenderNo,
-      socialContacts,
-      visitSchedulerApiClient,
-      supportedPrisons,
-    )
-    const pastVisits: PastVisitItem[] = await this.getPastVisits(
-      offenderNo,
-      socialContacts,
-      visitSchedulerApiClient,
-      supportedPrisons,
-    )
-
     const activeAlertsForDisplay: PrisonerAlertItem[] = activeAlerts.map(alert => {
       return [
         {
@@ -113,17 +93,84 @@ export default class PrisonerProfileService {
       ]
     })
 
+    const supportedPrisons = await this.supportedPrisonsService.getSupportedPrisons(username)
+
+    const visitsForDisplay: VisitItem[] = fullPrisoner.visits.map(visit => {
+      return [
+        {
+          html: `<a href='/visit/${visit.reference}'>${visit.reference}</a>`,
+          attributes: {
+            'data-test': 'tab-visits-reference',
+          },
+        },
+        {
+          html: `<span>${properCase(visit.visitType)}<br>(${properCase(visit.visitRestriction)})</span>`,
+          attributes: {
+            'data-test': 'tab-visits-type',
+          },
+        },
+        {
+          text: supportedPrisons[visit.prisonId],
+          attributes: {
+            'data-test': 'tab-visits-location',
+          },
+        },
+        {
+          html: visit.startTimestamp
+            ? `<p>${visitDateAndTime({
+                startTimestamp: visit.startTimestamp,
+                endTimestamp: visit.endTimestamp,
+              })}</p>`
+            : '<p>N/A</p>',
+          attributes: {
+            'data-test': 'tab-visits-date-and-time',
+          },
+        },
+        {
+          html: `<p>${visit.visitContact.name}</p>`,
+          attributes: {
+            'data-test': 'tab-visits-visitors',
+          },
+        },
+        {
+          text: `${properCase(visit.visitStatus)}`,
+          attributes: {
+            'data-test': 'tab-visits-status',
+          },
+        },
+      ] as VisitItem
+    })
+
+    const prisonerDetails: PrisonerDetails = {
+      offenderNo: fullPrisoner.prisonerId,
+      name: properCaseFullName(`${fullPrisoner.lastName}, ${fullPrisoner.firstName}`),
+      dob: prisonerDatePretty({ dateToFormat: fullPrisoner.dateOfBirth }),
+      convictedStatus: fullPrisoner.convictedStatus,
+      category: fullPrisoner.category,
+      location: fullPrisoner.cellLocation,
+      prisonName: fullPrisoner.prisonName,
+      incentiveLevel: fullPrisoner.incentiveLevel,
+      visitBalances: fullPrisoner.visitBalances,
+    }
+
+    if (prisonerDetails.visitBalances?.latestIepAdjustDate) {
+      prisonerDetails.visitBalances.latestIepAdjustDate = prisonerDatePretty({
+        dateToFormat: prisonerDetails.visitBalances.latestIepAdjustDate,
+      })
+    }
+
+    if (prisonerDetails.visitBalances?.latestPrivIepAdjustDate) {
+      prisonerDetails.visitBalances.latestPrivIepAdjustDate = prisonerDatePretty({
+        dateToFormat: prisonerDetails.visitBalances.latestPrivIepAdjustDate,
+      })
+    }
+
     return {
-      displayName,
-      displayDob,
       activeAlerts: activeAlertsForDisplay,
+      activeAlertCount,
       flaggedAlerts,
-      inmateDetail,
-      convictedStatus,
-      incentiveLevel,
-      visitBalances,
-      upcomingVisits,
-      pastVisits,
+      visits: visitsForDisplay,
+      prisonerDetails,
     }
   }
 
@@ -176,19 +223,19 @@ export default class PrisonerProfileService {
         {
           html: `<a href='/visit/${visit.reference}'>${visit.reference}</a>`,
           attributes: {
-            'data-test': 'tab-upcoming-reference',
+            'data-test': 'tab-visits-reference',
           },
         },
         {
           html: formatVisitType(visit.visitType),
           attributes: {
-            'data-test': 'tab-upcoming-type',
+            'data-test': 'tab-visits-type',
           },
         },
         {
           text: supportedPrisons[visit.prisonId],
           attributes: {
-            'data-test': 'tab-upcoming-location',
+            'data-test': 'tab-visits-location',
           },
         },
         {
@@ -196,19 +243,19 @@ export default class PrisonerProfileService {
             ? `<p>${visitDateAndTime({ startTimestamp: visit.startTimestamp, endTimestamp: visit.endTimestamp })}</p>`
             : '<p>N/A</p>',
           attributes: {
-            'data-test': 'tab-upcoming-date-and-time',
+            'data-test': 'tab-visits-date-and-time',
           },
         },
         {
           html: `<p>${visitContactNames.join('<br>')}</p>`,
           attributes: {
-            'data-test': 'tab-upcoming-visitors',
+            'data-test': 'tab-visits-visitors',
           },
         },
         {
           text: `${properCase(visit.visitStatus)}`,
           attributes: {
-            'data-test': 'tab-upcoming-status',
+            'data-test': 'tab-visits-status',
           },
         },
       ] as UpcomingVisitItem

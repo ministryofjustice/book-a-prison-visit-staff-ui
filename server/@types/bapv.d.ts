@@ -1,4 +1,4 @@
-import { InmateDetail, OffenderRestriction, VisitBalances } from '../data/prisonApiTypes'
+import { OffenderRestriction, VisitBalances } from '../data/prisonApiTypes'
 import { Visit, VisitorSupport, VisitSession } from '../data/orchestrationApiTypes'
 
 export type Prison = {
@@ -138,17 +138,12 @@ export type VisitorListItem = {
   banned: boolean
 }
 
-export type PrisonerProfile = {
-  displayName: string
-  displayDob: string
+export type PrisonerProfilePage = {
   activeAlerts: PrisonerAlertItem[]
+  activeAlertCount: number
   flaggedAlerts: Alert[]
-  inmateDetail: InmateDetail
-  convictedStatus: 'Convicted' | 'Remand'
-  incentiveLevel: string
-  visitBalances: VisitBalances
-  upcomingVisits: UpcomingVisitItem[]
-  pastVisits: PastVisitItem[]
+  visits: VisitItem[]
+  prisonerDetails: PrisonerDetails
 }
 
 export type BAPVVisitBalances = VisitBalances & {
@@ -247,3 +242,54 @@ export type VisitsPageSlot = {
 }
 
 export type FlashData = Record<string, string[] | Record<string, string | string[]>[]>
+
+export type PrisonerDetails = {
+  offenderNo: string
+  name: string
+  dob: string
+  convictedStatus: 'Convicted' | 'Remand'
+  category: string
+  location: string
+  prisonName: string
+  incentiveLevel: string
+  visitBalances: VisitBalances
+}
+
+export type VisitItem = [
+  {
+    html: string
+    attributes?: {
+      'data-test': string
+    }
+  },
+  {
+    html: string
+    attributes?: {
+      'data-test': string
+    }
+  },
+  {
+    text: string
+    attributes?: {
+      'data-test': string
+    }
+  },
+  {
+    html: string
+    attributes?: {
+      'data-test': string
+    }
+  },
+  {
+    html: string
+    attributes?: {
+      'data-test': string
+    }
+  },
+  {
+    text: string
+    attributes?: {
+      'data-test': string
+    }
+  },
+]
