@@ -1,7 +1,7 @@
 import { format } from 'date-fns'
 import PrisonerProfilePage from '../pages/prisonerProfile'
 import Page from '../pages/page'
-import { PrisonerProfile } from '../../server/data/orchestrationApiTypes'
+import TestData from '../../server/routes/testutils/testData'
 
 context('Prisoner profile page', () => {
   const prettyDateFormat = 'd MMMM yyyy'
@@ -18,73 +18,31 @@ context('Prisoner profile page', () => {
   it('should show the prisoner profile page', () => {
     const prisonerDisplayName = 'Smith, John'
 
-    const profile = <PrisonerProfile>{
-      prisonerId: 'A1234BC',
-      firstName: 'JOHN',
-      lastName: 'SMITH',
-      dateOfBirth: '1975-04-02',
-      cellLocation: '1-1-C-028',
-      prisonName: 'Hewell (HMP)',
-      category: 'Cat C',
-      convictedStatus: 'Convicted',
-      incentiveLevel: 'Standard',
-      alerts: [
-        {
-          alertType: 'U',
-          alertTypeDescription: 'COVID unit management',
-          alertCode: 'UPIU',
-          alertCodeDescription: 'Protective Isolation Unit',
-          comment: 'Test',
-          dateCreated: '2022-01-02',
-          expired: false,
-          active: true,
-        },
-        {
-          alertType: 'X',
-          alertTypeDescription: 'Security',
-          alertCode: 'XR',
-          alertCodeDescription: 'Racist',
-          comment: 'Test',
-          dateCreated: '2022-01-01',
-          expired: false,
-          active: true,
-        },
-      ],
-      visitBalances: {
-        remainingVo: 1,
-        remainingPvo: 2,
-        latestIepAdjustDate: '2023-01-01',
-        latestPrivIepAdjustDate: '2023-02-01',
+    const alerts = [
+      {
+        alertType: 'U',
+        alertTypeDescription: 'COVID unit management',
+        alertCode: 'UPIU',
+        alertCodeDescription: 'Protective Isolation Unit',
+        comment: 'Test',
+        dateCreated: '2022-01-02',
+        expired: false,
+        active: true,
       },
-      visits: [
-        {
-          applicationReference: 'aaa-bbb-ccc',
-          reference: 'ab-cd-ef-gh',
-          prisonerId: 'A1234BC',
-          prisonId: 'HEI',
-          visitRoom: 'A1 L3',
-          visitType: 'SOCIAL',
-          visitStatus: 'BOOKED',
-          visitRestriction: 'OPEN',
-          startTimestamp: '2022-08-17T10:00:00',
-          endTimestamp: '2022-08-17T11:00:00',
-          visitNotes: [],
-          visitContact: {
-            name: 'Mary Smith',
-            telephone: '01234 555444',
-          },
-          visitors: [
-            {
-              nomisPersonId: 1234,
-            },
-          ],
-          visitorSupport: [],
-          createdBy: 'user1',
-          createdTimestamp: '',
-          modifiedTimestamp: '',
-        },
-      ],
-    }
+      {
+        alertType: 'X',
+        alertTypeDescription: 'Security',
+        alertCode: 'XR',
+        alertCodeDescription: 'Racist',
+        comment: 'Test',
+        dateCreated: '2022-01-01',
+        expired: false,
+        active: true,
+      },
+    ]
+
+    const profile = TestData.prisonerProfile({ alerts })
+
     const { prisonerId } = profile
     const prisonId = 'HEI'
     // Prisoner profile page
