@@ -7458,10 +7458,10 @@ export interface components {
       establishmentName: string
     }
     PagePrisonerInformation: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['PrisonerInformation'][]
@@ -9537,10 +9537,10 @@ export interface components {
       additionalAnswers?: string[]
     }
     PageOffenceDto: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['OffenceDto'][]
@@ -10229,10 +10229,10 @@ export interface components {
       numberAllocated: number
     }
     PageOffenderNumber: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['OffenderNumber'][]
@@ -10336,10 +10336,10 @@ export interface components {
       addresses: components['schemas']['AddressDto'][]
     }
     PageEmployment: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Employment'][]
@@ -10354,10 +10354,10 @@ export interface components {
       empty?: boolean
     }
     PageEducation: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Education'][]
@@ -10544,15 +10544,15 @@ export interface components {
        */
       establishmentCode?: string
       /**
-       * @description Case Note Type and Sub Type
-       * @example POS IEP_ENC
-       */
-      noteType: string
-      /**
        * @description Name of staff member who created case note (lastname, firstname)
        * @example Smith, John
        */
       staffName: string
+      /**
+       * @description Case Note Type and Sub Type
+       * @example POS IEP_ENC
+       */
+      noteType: string
     }
     /** @description Visit summary */
     VisitSummary: {
@@ -10565,10 +10565,10 @@ export interface components {
       hasVisits: boolean
     }
     PageVisitWithVisitors: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['VisitWithVisitors'][]
@@ -10839,10 +10839,10 @@ export interface components {
       otherContacts: components['schemas']['Contact'][]
     }
     PageBedAssignment: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['BedAssignment'][]
@@ -10897,10 +10897,10 @@ export interface components {
       currency: string
     }
     PageAlert: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Alert'][]
@@ -10975,10 +10975,10 @@ export interface components {
       hearingSequence: number
     }
     PagePrisonerBookingSummary: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['PrisonerBookingSummary'][]

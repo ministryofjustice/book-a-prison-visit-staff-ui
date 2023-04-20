@@ -252,6 +252,7 @@ export default class TestData {
     enhanced = false,
     capacity = { closed: 0, open: 40 },
     prisonerLocationGroupNames = [],
+    prisonerCategoryGroupNames = [],
     sessionTemplateFrequency = 'WEEKLY',
     sessionTemplateEndDate = '',
   }: Partial<SessionSchedule> = {}): SessionSchedule => ({
@@ -261,6 +262,7 @@ export default class TestData {
     enhanced,
     capacity,
     prisonerLocationGroupNames,
+    prisonerCategoryGroupNames,
     sessionTemplateFrequency,
     sessionTemplateEndDate,
   })

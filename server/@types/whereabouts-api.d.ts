@@ -945,8 +945,8 @@ export interface components {
       first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
       last?: boolean
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     PageableObject: {
@@ -955,10 +955,10 @@ export interface components {
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
       pageSize?: number
-      unpaged?: boolean
-      paged?: boolean
       /** Format: int32 */
       pageNumber?: number
+      unpaged?: boolean
+      paged?: boolean
     }
     SortObject: {
       empty?: boolean
