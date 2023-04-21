@@ -2,7 +2,7 @@ import { NotFound } from 'http-errors'
 import PrisonerProfileService from './prisonerProfileService'
 import { PagePrisonerBookingSummary, VisitBalances, OffenderRestrictions } from '../data/prisonApiTypes'
 import { PrisonerAlertItem, PrisonerProfilePage } from '../@types/bapv'
-import { Alert, PrisonerProfile } from '../data/orchestrationApiTypes'
+import { Alert } from '../data/orchestrationApiTypes'
 import TestData from '../routes/testutils/testData'
 import {
   createMockHmppsAuthClient,
@@ -67,52 +67,7 @@ describe('Prisoner profile service', () => {
     })
 
     it('Retrieves and processes data for prisoner profile with visit balances', async () => {
-      const fullPrisoner = <PrisonerProfile>{
-        prisonerId: 'A1234BC',
-        firstName: 'JOHN',
-        lastName: 'SMITH',
-        dateOfBirth: '1975-04-02',
-        cellLocation: '1-1-C-028',
-        prisonName: 'Hewell (HMP)',
-        category: 'Cat C',
-        convictedStatus: 'Convicted',
-        incentiveLevel: 'Standard',
-        alerts: [],
-        visitBalances: {
-          remainingVo: 1,
-          remainingPvo: 2,
-          latestIepAdjustDate: '2021-04-21',
-          latestPrivIepAdjustDate: '2021-12-01',
-        },
-        visits: [
-          {
-            applicationReference: 'aaa-bbb-ccc',
-            reference: 'ab-cd-ef-gh',
-            prisonerId: 'A1234BC',
-            prisonId: 'HEI',
-            visitRoom: 'A1 L3',
-            visitType: 'SOCIAL',
-            visitStatus: 'BOOKED',
-            visitRestriction: 'OPEN',
-            startTimestamp: '2022-08-17T10:00:00',
-            endTimestamp: '2022-08-17T11:00:00',
-            visitNotes: [],
-            visitContact: {
-              name: 'Mary Smith',
-              telephone: '01234 555444',
-            },
-            visitors: [
-              {
-                nomisPersonId: 1234,
-              },
-            ],
-            visitorSupport: [],
-            createdBy: 'user1',
-            createdTimestamp: '',
-            modifiedTimestamp: '',
-          },
-        ],
-      }
+      const fullPrisoner = TestData.prisonerProfile()
 
       orchestrationApiClient.getPrisonerProfile.mockResolvedValue(fullPrisoner)
 
@@ -170,25 +125,9 @@ describe('Prisoner profile service', () => {
     })
     // Skipped - previously used endpoints were skipped if prisoner was on remand, this logic may wish be to included in the new endpoint
     it.skip('Does not return visit balances for those on REMAND', async () => {
-      const fullPrisoner = <PrisonerProfile>{
-        prisonerId: 'A1234BC',
-        firstName: 'JOHN',
-        lastName: 'SMITH',
-        dateOfBirth: '1975-04-02',
-        cellLocation: '1-1-C-028',
-        prisonName: 'Hewell (HMP)',
-        category: 'Cat C',
+      const fullPrisoner = TestData.prisonerProfile({
         convictedStatus: 'Remand',
-        incentiveLevel: 'Standard',
-        alerts: [],
-        visitBalances: {
-          remainingVo: 1,
-          remainingPvo: 2,
-          latestIepAdjustDate: '2021-04-21',
-          latestPrivIepAdjustDate: '2021-12-01',
-        },
-        visits: [],
-      }
+      })
 
       orchestrationApiClient.getPrisonerProfile.mockResolvedValue(fullPrisoner)
 
@@ -409,25 +348,10 @@ describe('Prisoner profile service', () => {
         ],
       ]
 
-      const fullPrisoner = <PrisonerProfile>{
-        prisonerId: 'A1234BC',
-        firstName: 'JOHN',
-        lastName: 'SMITH',
-        dateOfBirth: '1975-04-02',
-        cellLocation: '1-1-C-028',
-        prisonName: 'Hewell (HMP)',
-        category: 'Cat C',
-        convictedStatus: 'Convicted',
-        incentiveLevel: 'Standard',
-        alerts: [],
-        visitBalances: {
-          remainingVo: 1,
-          remainingPvo: 2,
-          latestIepAdjustDate: '2021-04-21',
-          latestPrivIepAdjustDate: '2021-12-01',
-        },
+      const fullPrisoner = TestData.prisonerProfile({
+        alerts: [inactiveAlert, nonRelevantAlert, ...alertsToFlag],
         visits: [],
-      }
+      })
 
       fullPrisoner.alerts = [inactiveAlert, nonRelevantAlert, ...alertsToFlag]
 

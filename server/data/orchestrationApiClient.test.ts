@@ -36,4 +36,20 @@ describe('orchestrationApiClient', () => {
       expect(output).toEqual(visitHistoryDetails)
     })
   })
+
+  describe('getPrisonerProfile', () => {
+    it('should return prisoner profile page for selected prisoner', async () => {
+      const fullPrisoner = TestData.prisonerProfile()
+      const prisonId = 'HEI'
+
+      fakeOrchestrationApi
+        .get(`/prisoner/${prisonId}/${fullPrisoner.prisonerId}/profile`)
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, fullPrisoner)
+
+      const output = await orchestrationApiClient.getPrisonerProfile(prisonId, fullPrisoner.prisonerId)
+
+      expect(output).toEqual(fullPrisoner)
+    })
+  })
 })

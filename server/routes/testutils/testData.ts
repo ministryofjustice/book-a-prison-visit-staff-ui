@@ -1,5 +1,6 @@
 import { Prison } from '../../@types/bapv'
 import {
+  PrisonerProfile,
   SessionCapacity,
   SessionSchedule,
   SupportType,
@@ -20,6 +21,67 @@ import { Address, Contact } from '../../data/prisonerContactRegistryApiTypes'
 import { ScheduledEvent } from '../../data/whereaboutsApiTypes'
 
 export default class TestData {
+  static prisonerProfile = ({
+    prisonerId = 'A1234BC',
+    firstName = 'JOHN',
+    lastName = 'SMITH',
+    dateOfBirth = '1975-04-02',
+    cellLocation = '1-1-C-028',
+    prisonName = 'Hewell (HMP)',
+    category = 'Cat C',
+    convictedStatus = 'Convicted',
+    incentiveLevel = 'Standard',
+    alerts = [],
+    visitBalances = {
+      remainingVo: 1,
+      remainingPvo: 2,
+      latestIepAdjustDate: '2021-04-21',
+      latestPrivIepAdjustDate: '2021-12-01',
+    },
+    visits = [
+      {
+        applicationReference: 'aaa-bbb-ccc',
+        reference: 'ab-cd-ef-gh',
+        prisonerId: 'A1234BC',
+        prisonId: 'HEI',
+        visitRoom: 'A1 L3',
+        visitType: 'SOCIAL',
+        visitStatus: 'BOOKED',
+        visitRestriction: 'OPEN',
+        startTimestamp: '2022-08-17T10:00:00',
+        endTimestamp: '2022-08-17T11:00:00',
+        visitNotes: [],
+        visitContact: {
+          name: 'Mary Smith',
+          telephone: '01234 555444',
+        },
+        visitors: [
+          {
+            nomisPersonId: 1234,
+          },
+        ],
+        visitorSupport: [],
+        createdBy: 'user1',
+        createdTimestamp: '',
+        modifiedTimestamp: '',
+      },
+    ],
+  }: Partial<PrisonerProfile> = {}): PrisonerProfile =>
+    ({
+      prisonerId,
+      firstName,
+      lastName,
+      dateOfBirth,
+      cellLocation,
+      prisonName,
+      category,
+      convictedStatus,
+      incentiveLevel,
+      alerts,
+      visitBalances,
+      visits,
+    } as PrisonerProfile)
+
   static address = ({
     flat = '23B',
     premise = 'Premises',
