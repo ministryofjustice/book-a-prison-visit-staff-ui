@@ -25,7 +25,7 @@ describe('Notifications service', () => {
         startTimestamp: '2022-02-14T10:00:00',
         endTimestamp: '2022-02-14T11:00:00',
         availableTables: 15,
-        visitRoomName: 'room name',
+        capacityGroup: null,
         visitRestriction: 'OPEN',
       } as VisitSlot,
       reference: 'ab-cd-ef-gh',

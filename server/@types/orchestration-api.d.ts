@@ -130,10 +130,10 @@ export interface components {
        */
       prisonId: string
       /**
-       * @description Visit Room
-       * @example A1
+       * @description Capacity group
+       * @example Main Group
        */
-      visitRoom: string
+      capacityGroup?: string
       /**
        * @description Visit Type
        * @example SOCIAL
@@ -221,10 +221,10 @@ export interface components {
        */
       prisonId: string
       /**
-       * @description Visit Room
-       * @example A1 L3
+       * @description Capacity group
+       * @example Main Group
        */
-      visitRoom: string
+      capacityGroup?: string
       /**
        * @description Visit Type
        * @example SOCIAL
@@ -445,9 +445,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
+      last?: boolean
       pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
@@ -455,12 +455,12 @@ export interface components {
       /** Format: int64 */
       offset?: number
       sort?: components['schemas']['SortObject']
-      paged?: boolean
-      unpaged?: boolean
       /** Format: int32 */
       pageSize?: number
       /** Format: int32 */
       pageNumber?: number
+      paged?: boolean
+      unpaged?: boolean
     }
     SortObject: {
       empty?: boolean
@@ -489,10 +489,10 @@ export interface components {
        */
       sessionTemplateId: number
       /**
-       * @description The Name of the visit room in which this visit session takes place
-       * @example Visit room 1
+       * @description Capacity group
+       * @example Main Group
        */
-      visitRoomName: string
+      capacityGroup?: string
       /**
        * @description The type of visits taking place within this session
        * @example SOCIAL

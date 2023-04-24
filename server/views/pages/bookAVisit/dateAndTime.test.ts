@@ -50,7 +50,7 @@ describe('Views - Date and time of visit', () => {
                   endTimestamp: '2022-02-14T11:00:00',
                   availableTables: 15,
                   capacity: 30,
-                  visitRoomName: 'room name',
+                  capacityGroup: null,
                   visitRestriction: 'OPEN',
                 },
                 {
@@ -60,7 +60,7 @@ describe('Views - Date and time of visit', () => {
                   endTimestamp: '2022-02-14T12:59:00',
                   availableTables: 1,
                   capacity: 30,
-                  visitRoomName: 'room name',
+                  capacityGroup: null,
                   visitRestriction: 'OPEN',
                 },
               ],
@@ -72,7 +72,7 @@ describe('Views - Date and time of visit', () => {
                   endTimestamp: '2022-02-14T13:05:00',
                   availableTables: 5,
                   capacity: 30,
-                  visitRoomName: 'room name',
+                  capacityGroup: null,
                   // representing a pre-existing visit that is BOOKED
                   sessionConflicts: ['DOUBLE_BOOKED'],
                   visitRestriction: 'OPEN',
@@ -96,7 +96,7 @@ describe('Views - Date and time of visit', () => {
                   endTimestamp: '2022-02-15T17:00:00',
                   availableTables: 12,
                   capacity: 30,
-                  visitRoomName: 'room name',
+                  capacityGroup: null,
                   // representing the RESERVED visit being handled in this session
                   sessionConflicts: ['DOUBLE_BOOKED'],
                   visitRestriction: 'OPEN',
@@ -121,7 +121,7 @@ describe('Views - Date and time of visit', () => {
                   endTimestamp: '2022-03-01T10:30:00',
                   availableTables: 0, // fully booked
                   capacity: 30,
-                  visitRoomName: 'room name',
+                  capacityGroup: null,
                   visitRestriction: 'OPEN',
                 },
                 {
@@ -131,7 +131,7 @@ describe('Views - Date and time of visit', () => {
                   endTimestamp: '2022-03-01T11:30:00',
                   availableTables: -2, // overbooked
                   capacity: 1,
-                  visitRoomName: 'room name',
+                  capacityGroup: null,
                   visitRestriction: 'OPEN',
                 },
               ],
@@ -222,7 +222,7 @@ describe('Views - Date and time of visit', () => {
                     endTimestamp: '2022-02-14T11:00:00',
                     availableTables: 15,
                     capacity: 30,
-                    visitRoomName: 'room name',
+                    capacityGroup: null,
                     visitRestriction: 'OPEN',
                   },
                 ],
