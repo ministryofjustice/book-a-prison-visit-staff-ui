@@ -131,7 +131,7 @@ export default class VisitSchedulerApiClient {
       data: <ReserveVisitSlotDto>{
         prisonerId: visitSessionData.prisoner.offenderNo,
         prisonId: visitSessionData.visitSlot.prisonId,
-        visitRoom: visitSessionData.visitSlot.visitRoomName,
+        capacityGroup: visitSessionData.visitSlot.capacityGroup,
         visitType: this.visitType,
         visitRestriction: visitSessionData.visitRestriction,
         startTimestamp: visitSessionData.visitSlot.startTimestamp,
@@ -178,7 +178,7 @@ export default class VisitSchedulerApiClient {
       data: <ReserveVisitSlotDto>{
         prisonerId: visitSessionData.prisoner.offenderNo,
         prisonId: visitSessionData.visitSlot.prisonId,
-        visitRoom: visitSessionData.visitSlot.visitRoomName,
+        capacityGroup: visitSessionData.visitSlot.capacityGroup,
         visitType: this.visitType,
         visitRestriction: visitSessionData.visitRestriction,
         startTimestamp: visitSessionData.visitSlot.startTimestamp,

@@ -96,7 +96,7 @@ export default class VisitSessionsService {
               ? visitSession.openVisitCapacity - visitSession.openVisitBookedCount
               : visitSession.closedVisitCapacity - visitSession.closedVisitBookedCount,
           capacity: visitRestriction === 'OPEN' ? visitSession.openVisitCapacity : visitSession.closedVisitCapacity,
-          visitRoomName: visitSession.visitRoomName,
+          capacityGroup: visitSession.capacityGroup,
           sessionConflicts: visitSession.sessionConflicts,
           visitRestriction,
         }

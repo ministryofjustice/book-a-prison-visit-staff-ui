@@ -144,7 +144,7 @@ export default function routes({
       endTimestamp: visit.endTimestamp,
       availableTables: 0,
       capacity: undefined,
-      visitRoomName: visit.visitRoom,
+      capacityGroup: visit.capacityGroup,
       visitRestriction,
     }
     const visitSessionData: VisitSessionData = {

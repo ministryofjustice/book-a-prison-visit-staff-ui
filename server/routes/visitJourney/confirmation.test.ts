@@ -51,7 +51,7 @@ testJourneys.forEach(journey => {
           endTimestamp: '2022-03-12T10:30:00',
           availableTables: 1,
           capacity: 30,
-          visitRoomName: 'room name',
+          capacityGroup: null,
           visitRestriction: 'OPEN',
         },
         visitors: [
@@ -136,7 +136,7 @@ testJourneys.forEach(journey => {
             endTimestamp: '2022-03-12T10:30:00',
             availableTables: 1,
             capacity: 30,
-            visitRoomName: 'room name',
+            capacityGroup: null,
             visitRestriction: 'OPEN',
           },
           visitors: [
