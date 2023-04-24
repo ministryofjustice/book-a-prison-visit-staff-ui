@@ -6,8 +6,12 @@
 {%-from "moj/components/banner/macro.njk" import mojBanner %}
 
 {% macro actionedByUser(user) %}
-  {% if user and user != 'NOT_KNOWN' and user != 'NOT_KNOWN_NOMIS' %}
-    by {{ user -}}
+  {% if user and user != 'NOT_KNOWN' %}
+    {% if user == 'NOT_KNOWN_NOMIS' %}
+      in NOMIS
+    {%- else %}
+      by {{ user -}}
+    {% endif %}
   {% endif %}
 {% endmacro %}
 

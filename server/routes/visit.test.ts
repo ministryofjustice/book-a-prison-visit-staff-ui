@@ -192,8 +192,8 @@ describe('/visit/:reference', () => {
     })
 
     it('should handle special cases for migrated data when showing actioned by user details', () => {
-      visitHistoryDetails.createdBy = 'NOT_KNOWN' // test cases for old / migrated data
-      visitHistoryDetails.updatedBy = 'NOT_KNOWN_NOMIS'
+      visitHistoryDetails.createdBy = 'NOT_KNOWN' // test case for old / migrated data
+      visitHistoryDetails.updatedBy = 'NOT_KNOWN_NOMIS' // migrated from Nomis, but user not available
       visitHistoryDetails.cancelledBy = 'User Three'
       visitHistoryDetails.cancelledDateAndTime = '2022-01-01T11:30:00'
 
@@ -204,7 +204,9 @@ describe('/visit/:reference', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('[data-test="visit-booked"]').text().replace(/\s+/g, ' ')).toBe('Saturday 1 January 2022 at 9am')
-          expect($('[data-test="visit-updated"]').text().replace(/\s+/g, ' ')).toBe('Saturday 1 January 2022 at 10am')
+          expect($('[data-test="visit-updated"]').text().replace(/\s+/g, ' ')).toBe(
+            'Saturday 1 January 2022 at 10am in NOMIS',
+          )
           expect($('[data-test="visit-cancelled"]').text().replace(/\s+/g, ' ')).toBe(
             'Saturday 1 January 2022 at 11:30am by User Three',
           )
