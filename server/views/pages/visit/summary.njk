@@ -5,6 +5,12 @@
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {%-from "moj/components/banner/macro.njk" import mojBanner %}
 
+{% macro actionedByUser(user) %}
+  {% if user and user != 'NOT_KNOWN' and user != 'NOT_KNOWN_NOMIS' %}
+    by {{ user -}}
+  {% endif %}
+{% endmacro %}
+
 {% set pageHeaderTitle = "Booking details" %}
 {% set pageTitle = applicationName + " - " + pageHeaderTitle + " - " + visit.reference %}
 
@@ -201,23 +207,23 @@
 
         <li>
           <strong>Visit booked</strong>
-          <span data-test="visit-booked">{{ visitHistoryDetails.createdDateAndTime | formatDate('EEEE d MMMM yyyy') }} at {{ visitHistoryDetails.createdDateAndTime | formatTime }}
-            {{ 'by ' + visitHistoryDetails.createdBy if (visitHistoryDetails.createdBy and visitHistoryDetails.createdBy != 'NOT_KNOWN') }}</span>
+          <span data-test="visit-booked">{{ visitHistoryDetails.createdDateAndTime | formatDate('EEEE d MMMM yyyy') }}
+             at {{ visitHistoryDetails.createdDateAndTime | formatTime }}{{ actionedByUser(visitHistoryDetails.createdBy) }}</span>
         </li>
 
         {% if visitHistoryDetails.updatedDateAndTime %}
           <li>
             <strong>Visit updated</strong>
-            <span data-test="visit-updated">{{ visitHistoryDetails.updatedDateAndTime | formatDate('EEEE d MMMM yyyy') }} at {{ visitHistoryDetails.updatedDateAndTime | formatTime }}
-              {{ 'by ' + visitHistoryDetails.updatedBy if (visitHistoryDetails.updatedBy and visitHistoryDetails.updatedBy != 'NOT_KNOWN') }}</span>
+            <span data-test="visit-updated">{{ visitHistoryDetails.updatedDateAndTime | formatDate('EEEE d MMMM yyyy') }}
+               at {{ visitHistoryDetails.updatedDateAndTime | formatTime }}{{ actionedByUser(visitHistoryDetails.updatedBy) }}</span>
           </li>
         {% endif %}
 
         {% if visitHistoryDetails.cancelledDateAndTime %}
           <li>
             <strong>Visit cancelled</strong>
-            <span data-test="visit-cancelled">{{ visitHistoryDetails.cancelledDateAndTime | formatDate('EEEE d MMMM yyyy') }} at {{ visitHistoryDetails.cancelledDateAndTime | formatTime }}
-              {{ 'by ' + visitHistoryDetails.cancelledBy if (visitHistoryDetails.cancelledBy and visitHistoryDetails.cancelledBy != 'NOT_KNOWN') }}</span>
+            <span data-test="visit-cancelled">{{ visitHistoryDetails.cancelledDateAndTime | formatDate('EEEE d MMMM yyyy') }}
+               at {{ visitHistoryDetails.cancelledDateAndTime | formatTime }}{{ actionedByUser(visitHistoryDetails.cancelledBy) }}</span>
           </li>
         {% endif %}
 
