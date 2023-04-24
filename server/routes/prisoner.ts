@@ -3,7 +3,6 @@ import { body, validationResult } from 'express-validator'
 import { BadRequest, NotFound } from 'http-errors'
 import { VisitSessionData } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
-import { prisonerDateTimePretty, properCaseFullName } from '../utils/utils'
 import { isValidPrisonerNumber } from './validationChecks'
 import { clearSession } from './visitorUtils'
 import type { Services } from '../services'
@@ -44,13 +43,9 @@ export default function routes({
     const offenderNo = getOffenderNo(req)
     const { prisonId } = req.session.selectedEstablishment
 
-    const { inmateDetail, visitBalances } = await prisonerProfileService.getPrisonerAndVisitBalances(
-      offenderNo,
-      prisonId,
-      res.locals.user.username,
-    )
+    const { prisonerDetails } = await prisonerProfileService.getProfile(prisonId, offenderNo, res.locals.user.username)
 
-    if (visitBalances?.remainingVo <= 0 && visitBalances?.remainingPvo <= 0) {
+    if (prisonerDetails.visitBalances?.remainingVo <= 0 && prisonerDetails.visitBalances?.remainingPvo <= 0) {
       await body('vo-override').equals('override').withMessage('Select the box to book a prison visit').run(req)
 
       const errors = validationResult(req)
@@ -71,12 +66,10 @@ export default function routes({
     const visitSessionData: VisitSessionData = req.session.visitSessionData ?? { prisoner: undefined }
 
     visitSessionData.prisoner = {
-      name: properCaseFullName(`${inmateDetail.lastName}, ${inmateDetail.firstName}`),
+      name: prisonerDetails.name,
       offenderNo,
-      dateOfBirth: prisonerDateTimePretty(inmateDetail.dateOfBirth),
-      location: inmateDetail.assignedLivingUnit
-        ? `${inmateDetail.assignedLivingUnit.description}, ${inmateDetail.assignedLivingUnit.agencyName}`
-        : '',
+      dateOfBirth: prisonerDetails.dob,
+      location: prisonerDetails.location ? `${prisonerDetails.location}, ${prisonerDetails.prisonName}` : '',
     }
 
     req.session.visitSessionData = visitSessionData

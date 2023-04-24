@@ -3,7 +3,6 @@ import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
 import { PrisonerProfilePage, VisitInformation, VisitSessionData, FlashData } from '../@types/bapv'
-import { InmateDetail, VisitBalances } from '../data/prisonApiTypes'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import { clearSession } from './visitorUtils'
 import TestData from './testutils/testData'
@@ -318,27 +317,78 @@ describe('GET /prisoner/A1234BC', () => {
 })
 
 describe('POST /prisoner/A1234BC', () => {
-  const inmateDetail = {
-    offenderNo: 'A1234BC',
-    firstName: 'JOHN',
-    lastName: 'SMITH',
-    dateOfBirth: '1975-04-02',
-    activeAlertCount: 0,
-    inactiveAlertCount: 3,
-    legalStatus: 'SENTENCED',
-    assignedLivingUnit: {
-      description: '1-1-C-028',
-      agencyName: 'Hewell (HMP)',
-    },
-  } as InmateDetail
-
-  const visitBalances = {} as VisitBalances
+  let prisonerProfile: PrisonerProfilePage
 
   beforeEach(() => {
-    visitBalances.remainingVo = 1
-    visitBalances.remainingPvo = 0
+    prisonerProfile = {
+      activeAlerts: [
+        [
+          {
+            text: 'Security',
+          },
+          {
+            text: 'Protective Isolation Unit',
+          },
+          {
+            text: 'Professional lock pick',
+          },
+          {
+            html: '1 January 2022',
+          },
+          {
+            html: '2 January 2022',
+          },
+        ],
+      ],
+      activeAlertCount: 1,
+      flaggedAlerts: [
+        {
+          alertCode: 'UPIU',
+          alertCodeDescription: 'Protective Isolation Unit',
+        },
+      ],
+      visits: [
+        [
+          {
+            html: "<a href='/visit/ab-cd-ef-gh'>ab-cd-ef-gh</a>",
+            attributes: {
+              'data-test': 'tab-visits-reference',
+            },
+          },
+          {
+            html: '<span>Social<br>(Open)</span>',
+            attributes: {
+              'data-test': 'tab-visits-type',
+            },
+          },
+          { text: 'Hewell (HMP)', attributes: { 'data-test': 'tab-visits-location' } },
+          {
+            html: '<p>17 August 2022<br>10:00am - 11:00am</p>',
+            attributes: { 'data-test': 'tab-visits-date-and-time' },
+          },
+          { html: '<p>Mary Smith</p>', attributes: { 'data-test': 'tab-visits-visitors' } },
+          { text: 'Booked', attributes: { 'data-test': 'tab-visits-status' } },
+        ],
+      ],
+      prisonerDetails: {
+        offenderNo: 'A1234BC',
+        name: 'Smith, John',
+        dob: '2 April 1975',
+        convictedStatus: 'Convicted',
+        category: 'Cat C',
+        location: '1-1-C-028',
+        prisonName: 'Hewell (HMP)',
+        incentiveLevel: 'Standard',
+        visitBalances: {
+          remainingVo: 1,
+          remainingPvo: 0,
+          latestIepAdjustDate: '21 April 2021',
+          latestPrivIepAdjustDate: '1 December 2021',
+        },
+      },
+    }
 
-    prisonerProfileService.getPrisonerAndVisitBalances.mockResolvedValue({ inmateDetail, visitBalances })
+    prisonerProfileService.getProfile.mockResolvedValue(prisonerProfile)
   })
 
   it('should set up visitSessionData and redirect to select visitors page', () => {
@@ -347,8 +397,8 @@ describe('POST /prisoner/A1234BC', () => {
       .expect(302)
       .expect('location', '/book-a-visit/select-visitors')
       .expect(res => {
-        expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledTimes(1)
-        expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledWith('A1234BC', prisonId, 'user1')
+        expect(prisonerProfileService.getProfile).toHaveBeenCalledTimes(1)
+        expect(prisonerProfileService.getProfile).toHaveBeenCalledWith(prisonId, 'A1234BC', 'user1')
         expect(auditService.overrodeZeroVO).not.toHaveBeenCalled()
         expect(clearSession).toHaveBeenCalledTimes(1)
         expect(visitSessionData).toEqual(<VisitSessionData>{
@@ -363,7 +413,7 @@ describe('POST /prisoner/A1234BC', () => {
   })
 
   it('should set up visitSessionData, redirect to select visitors page and log VO override to audit', () => {
-    visitBalances.remainingVo = 0
+    prisonerProfile.prisonerDetails.visitBalances.remainingVo = 0
 
     return request(app)
       .post('/prisoner/A1234BC')
@@ -371,8 +421,8 @@ describe('POST /prisoner/A1234BC', () => {
       .expect(302)
       .expect('location', '/book-a-visit/select-visitors')
       .expect(res => {
-        expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledTimes(1)
-        expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledWith('A1234BC', prisonId, 'user1')
+        expect(prisonerProfileService.getProfile).toHaveBeenCalledTimes(1)
+        expect(prisonerProfileService.getProfile).toHaveBeenCalledWith(prisonId, 'A1234BC', 'user1')
         expect(auditService.overrodeZeroVO).toHaveBeenCalledTimes(1)
         expect(auditService.overrodeZeroVO).toHaveBeenCalledWith({
           prisonerId: 'A1234BC',
@@ -404,8 +454,8 @@ describe('POST /prisoner/A1234BC', () => {
       .expect(302)
       .expect('location', '/book-a-visit/select-visitors')
       .expect(res => {
-        expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledTimes(1)
-        expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledWith('A1234BC', prisonId, 'user1')
+        expect(prisonerProfileService.getProfile).toHaveBeenCalledTimes(1)
+        expect(prisonerProfileService.getProfile).toHaveBeenCalledWith(prisonId, 'A1234BC', 'user1')
         expect(auditService.overrodeZeroVO).not.toHaveBeenCalled()
         expect(visitSessionData).toEqual(<VisitSessionData>{
           prisoner: {
@@ -419,15 +469,15 @@ describe('POST /prisoner/A1234BC', () => {
   })
 
   it('should set error in flash and redirect back to profile page if VO balances zero', () => {
-    visitBalances.remainingVo = 0
+    prisonerProfile.prisonerDetails.visitBalances.remainingVo = 0
 
     return request(app)
       .post('/prisoner/A1234BC')
       .expect(302)
       .expect('location', '/prisoner/A1234BC')
       .expect(res => {
-        expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledTimes(1)
-        expect(prisonerProfileService.getPrisonerAndVisitBalances).toHaveBeenCalledWith('A1234BC', prisonId, 'user1')
+        expect(prisonerProfileService.getProfile).toHaveBeenCalledTimes(1)
+        expect(prisonerProfileService.getProfile).toHaveBeenCalledWith(prisonId, 'A1234BC', 'user1')
         expect(auditService.overrodeZeroVO).not.toHaveBeenCalled()
         expect(visitSessionData).toEqual({})
         expect(flashProvider).toHaveBeenCalledWith('errors', [

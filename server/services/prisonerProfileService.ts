@@ -1,13 +1,6 @@
 import { NotFound } from 'http-errors'
-import { BAPVVisitBalances, PrisonerAlertItem, PrisonerDetails, VisitItem, PrisonerProfilePage } from '../@types/bapv'
-import {
-  prisonerDatePretty,
-  properCaseFullName,
-  properCase,
-  visitDateAndTime,
-  nextIepAdjustDate,
-  nextPrivIepAdjustDate,
-} from '../utils/utils'
+import { PrisonerAlertItem, PrisonerDetails, VisitItem, PrisonerProfilePage } from '../@types/bapv'
+import { prisonerDatePretty, properCaseFullName, properCase, visitDateAndTime } from '../utils/utils'
 import { Alert, InmateDetail, OffenderRestriction, VisitBalances } from '../data/prisonApiTypes'
 import { Visitor } from '../data/orchestrationApiTypes'
 import { Contact } from '../data/prisonerContactRegistryApiTypes'
@@ -214,31 +207,5 @@ export default class PrisonerProfileService {
     }, [])
 
     return contactsForDisplay
-  }
-
-  private async getVisitBalances(
-    prisonApiClient: PrisonApiClient,
-    convictedStatus: string,
-    offenderNo: string,
-  ): Promise<BAPVVisitBalances> {
-    if (convictedStatus === 'Remand') return null
-
-    const visitBalances = (await prisonApiClient.getVisitBalances(offenderNo)) as BAPVVisitBalances
-
-    if (visitBalances?.latestIepAdjustDate) {
-      visitBalances.nextIepAdjustDate = nextIepAdjustDate(visitBalances.latestIepAdjustDate)
-      visitBalances.latestIepAdjustDate = prisonerDatePretty({
-        dateToFormat: visitBalances.latestIepAdjustDate,
-      })
-    }
-
-    if (visitBalances?.latestPrivIepAdjustDate) {
-      visitBalances.nextPrivIepAdjustDate = nextPrivIepAdjustDate(visitBalances.latestPrivIepAdjustDate)
-      visitBalances.latestPrivIepAdjustDate = prisonerDatePretty({
-        dateToFormat: visitBalances.latestPrivIepAdjustDate,
-      })
-    }
-
-    return visitBalances
   }
 }
