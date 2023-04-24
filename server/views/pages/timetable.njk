@@ -8,18 +8,28 @@
 
 {% set backLinkHref = "/" %}
 
-{% macro attendees(enhanced, prisonerLocationGroupNames) %}
+{% macro attendees(enhanced, prisonerCategoryGroupNames, prisonerLocationGroupNames) %}
   {% if prisonerLocationGroupNames | length %}
-    {% if enhanced %}
-      <span>Enhanced prisoners in:</span>
-    {% endif %}
+    <span>
+      {{ "Enhanced prisoners" if enhanced -}}
+      {% if prisonerCategoryGroupNames | length %}
+        {% if enhanced %},<br>{% endif %}
+        {{ prisonerCategoryGroupNames | join(",<br>") | safe }}
+      {% endif %}
+      {{- " in:" if enhanced or prisonerCategoryGroupNames | length }}
+    </span>
     <ul class="govuk-list govuk-!-margin-bottom-0{{ " govuk-!-margin-top-2" if enhanced }}">
       {% for name in prisonerLocationGroupNames %}
         <li class="{{ "govuk-!-margin-bottom-0" if loop.last }}">{{ name }}</li>
       {% endfor %}
     </ul>
   {% else %}
-    {{- "Enhanced prisoners only" if enhanced else "All prisoners" -}}
+    {{ "Enhanced prisoners" if enhanced }}
+    {% if prisonerCategoryGroupNames | length %}
+      {% if enhanced %}<br>{% endif %}
+      {{ prisonerCategoryGroupNames | join("<br>") | safe }}
+    {% endif %}
+    {{ "All prisoners" if not enhanced and not prisonerCategoryGroupNames | length }}
   {% endif %}
 {% endmacro %}
 
@@ -41,7 +51,7 @@
         attributes: { "data-test" : "schedule-capacity-" + rowNumber } 
       },
       {
-        text: attendees(schedule.enhanced, schedule.prisonerLocationGroupNames),
+        text: attendees(schedule.enhanced, schedule.prisonerCategoryGroupNames, schedule.prisonerLocationGroupNames),
         attributes: { "data-test" : "schedule-attendees-" + rowNumber } 
       },
       {

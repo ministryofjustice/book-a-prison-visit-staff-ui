@@ -31,6 +31,11 @@ context('View visit schedule timetable', () => {
         sessionTemplateFrequency: 'BI_WEEKLY',
       }),
       TestData.sessionSchedule(),
+      TestData.sessionSchedule({
+        prisonerCategoryGroupNames: ['Category A (High Risk) prisoners'],
+        sessionTemplateEndDate: '2023-04-01',
+        sessionTemplateFrequency: 'ONE_OFF',
+      }),
     ]
     cy.task('stubSessionSchedule', { prisonId, date: format(today, shortDateFormat), sessionSchedule })
 
@@ -71,6 +76,13 @@ context('View visit schedule timetable', () => {
     visitTimetablePage.scheduleAttendees(2).contains('All prisoners')
     visitTimetablePage.scheduleFrequency(2).contains('Weekly')
     visitTimetablePage.scheduleEndDate(2).contains('Not entered')
+
+    visitTimetablePage.scheduleTime(3).contains('1:45pm to 3:45pm')
+    visitTimetablePage.scheduleType(3).contains('Open')
+    visitTimetablePage.scheduleCapacity(3).contains('40 tables')
+    visitTimetablePage.scheduleAttendees(3).contains('Category A (High Risk) prisoners')
+    visitTimetablePage.scheduleFrequency(3).contains('One off')
+    visitTimetablePage.scheduleEndDate(3).contains('1 April 2023')
 
     visitTimetablePage
       .requestChangeLink()
