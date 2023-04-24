@@ -1,13 +1,5 @@
 import { NotFound } from 'http-errors'
-import {
-  BAPVVisitBalances,
-  PrisonerAlertItem,
-  UpcomingVisitItem,
-  PastVisitItem,
-  PrisonerDetails,
-  VisitItem,
-  PrisonerProfilePage,
-} from '../@types/bapv'
+import { BAPVVisitBalances, PrisonerAlertItem, PrisonerDetails, VisitItem, PrisonerProfilePage } from '../@types/bapv'
 import {
   prisonerDatePretty,
   properCaseFullName,
@@ -15,7 +7,6 @@ import {
   visitDateAndTime,
   nextIepAdjustDate,
   nextPrivIepAdjustDate,
-  formatVisitType,
 } from '../utils/utils'
 import { Alert, InmateDetail, OffenderRestriction, VisitBalances } from '../data/prisonApiTypes'
 import { Visitor } from '../data/orchestrationApiTypes'
@@ -205,120 +196,6 @@ export default class PrisonerProfileService {
     const { offenderRestrictions } = restrictions
 
     return offenderRestrictions
-  }
-
-  private async getUpcomingVisits(
-    offenderNo: string,
-    socialContacts: Contact[],
-    visitSchedulerApiClient: VisitSchedulerApiClient,
-    supportedPrisons: Record<string, string>,
-  ): Promise<UpcomingVisitItem[]> {
-    const { content: visits } = await visitSchedulerApiClient.getUpcomingVisits(offenderNo, ['CANCELLED', 'BOOKED'])
-    const socialVisits = visits.filter(visit => visit.visitType === 'SOCIAL')
-
-    const visitsForDisplay: UpcomingVisitItem[] = socialVisits.map(visit => {
-      const visitContactNames = this.getPrisonerSocialContacts(socialContacts, visit.visitors)
-
-      return [
-        {
-          html: `<a href='/visit/${visit.reference}'>${visit.reference}</a>`,
-          attributes: {
-            'data-test': 'tab-visits-reference',
-          },
-        },
-        {
-          html: formatVisitType(visit.visitType),
-          attributes: {
-            'data-test': 'tab-visits-type',
-          },
-        },
-        {
-          text: supportedPrisons[visit.prisonId],
-          attributes: {
-            'data-test': 'tab-visits-location',
-          },
-        },
-        {
-          html: visit.startTimestamp
-            ? `<p>${visitDateAndTime({ startTimestamp: visit.startTimestamp, endTimestamp: visit.endTimestamp })}</p>`
-            : '<p>N/A</p>',
-          attributes: {
-            'data-test': 'tab-visits-date-and-time',
-          },
-        },
-        {
-          html: `<p>${visitContactNames.join('<br>')}</p>`,
-          attributes: {
-            'data-test': 'tab-visits-visitors',
-          },
-        },
-        {
-          text: `${properCase(visit.visitStatus)}`,
-          attributes: {
-            'data-test': 'tab-visits-status',
-          },
-        },
-      ] as UpcomingVisitItem
-    })
-
-    return visitsForDisplay
-  }
-
-  private async getPastVisits(
-    offenderNo: string,
-    socialContacts: Contact[],
-    visitSchedulerApiClient: VisitSchedulerApiClient,
-    supportedPrisons: Record<string, string>,
-  ): Promise<PastVisitItem[]> {
-    const { content: visits } = await visitSchedulerApiClient.getPastVisits(offenderNo, ['CANCELLED', 'BOOKED'])
-
-    const socialVisits = visits.filter(visit => visit.visitType === 'SOCIAL')
-    const visitsForDisplay: PastVisitItem[] = socialVisits.map(visit => {
-      const visitContactNames = this.getPrisonerSocialContacts(socialContacts, visit.visitors)
-
-      return [
-        {
-          html: `<a href='/visit/${visit.reference}'>${visit.reference}</a>`,
-          attributes: {
-            'data-test': 'tab-past-reference',
-          },
-        },
-        {
-          html: formatVisitType(visit.visitType),
-          attributes: {
-            'data-test': 'tab-past-type',
-          },
-        },
-        {
-          text: supportedPrisons[visit.prisonId],
-          attributes: {
-            'data-test': 'tab-past-location',
-          },
-        },
-        {
-          html: visit.startTimestamp
-            ? `<p>${visitDateAndTime({ startTimestamp: visit.startTimestamp, endTimestamp: visit.endTimestamp })}</p>`
-            : '<p>N/A</p>',
-          attributes: {
-            'data-test': 'tab-past-date-and-time',
-          },
-        },
-        {
-          html: `<p>${visitContactNames.join('<br>')}</p>`,
-          attributes: {
-            'data-test': 'tab-past-visitors',
-          },
-        },
-        {
-          text: `${properCase(visit.visitStatus)}`,
-          attributes: {
-            'data-test': 'tab-past-status',
-          },
-        },
-      ] as PastVisitItem
-    })
-
-    return visitsForDisplay
   }
 
   private getPrisonerSocialContacts(contacts: Contact[], visitors: Visitor[]): string[] {

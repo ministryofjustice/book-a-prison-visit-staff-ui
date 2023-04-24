@@ -57,23 +57,6 @@ export default class VisitSchedulerApiClient {
     })
   }
 
-  async getPastVisits(
-    offenderNo: string,
-    visitStatus: Visit['visitStatus'][],
-    endTimestamp?: string,
-  ): Promise<PageVisitDto> {
-    return this.restClient.get({
-      path: '/visits/search',
-      query: new URLSearchParams({
-        prisonerId: offenderNo,
-        endDateTime: endTimestamp || new Date().toISOString(),
-        visitStatus: visitStatus.join(','),
-        page: this.page,
-        size: this.size,
-      }).toString(),
-    })
-  }
-
   async getVisitsByDate(dateString: string, prisonId: string): Promise<PageVisitDto> {
     return this.restClient.get({
       path: '/visits/search',
