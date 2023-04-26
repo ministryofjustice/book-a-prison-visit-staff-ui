@@ -47,7 +47,7 @@ testJourneys.forEach(journey => {
           endTimestamp: '456',
           availableTables: 1,
           capacity: 30,
-          capacityGroup: null,
+          visitRoomName: 'room name',
           visitRestriction: 'OPEN',
         },
         visitors: [
@@ -225,7 +225,7 @@ testJourneys.forEach(journey => {
           endTimestamp: '456',
           availableTables: 1,
           capacity: 30,
-          capacityGroup: null,
+          visitRoomName: 'room name',
           visitRestriction: 'OPEN',
         },
         visitors: [
