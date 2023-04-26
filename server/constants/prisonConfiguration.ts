@@ -11,10 +11,10 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'Contact HMP Bristol when the total number of visitors (adults and children) is more than 3.',
     ],
   },
-  HEI: {
-    prisonPhoneNumber: '0300 060 6503',
+  BNI: {
+    prisonPhoneNumber: '01869 353 176',
     selectVisitorsText: [
-      'Add up to 3 people aged 10 and over, and 4 children under 10 years old.',
+      'You can add up to 3 people aged 18 and over, and 3 children under 18 years old. ',
       'At least one visitor must be 18 or older.',
     ],
   },
@@ -22,20 +22,6 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
     prisonPhoneNumber: '0300 303 2301',
     selectVisitorsText: [
       'You can add up to 3 people aged 16 and over, and 3 children under 16 years old.',
-      'At least one visitor must be 18 or older.',
-    ],
-  },
-  PNI: {
-    prisonPhoneNumber: '0330 058 8224',
-    selectVisitorsText: [
-      'You can add up to 3 people aged 16 and over, and 3 children under 16 years old.',
-      'At least one visitor must be 18 or older.',
-    ],
-  },
-  WWI: {
-    prisonPhoneNumber: '0300 060 6509',
-    selectVisitorsText: [
-      'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
@@ -50,6 +36,13 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
     prisonPhoneNumber: '0300 303 0631',
     selectVisitorsText: ['You can add up to 3 people.', 'At least one visitor must be 18 or older.'],
   },
+  HEI: {
+    prisonPhoneNumber: '0300 060 6503',
+    selectVisitorsText: [
+      'Add up to 3 people aged 10 and over, and 4 children under 10 years old.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
   MHI: {
     prisonPhoneNumber: '0300 303 0649',
     selectVisitorsText: [
@@ -57,10 +50,17 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'At least one visitor must be 18 or older.',
     ],
   },
-  BNI: {
-    prisonPhoneNumber: '01869 353 176',
+  PNI: {
+    prisonPhoneNumber: '0330 058 8224',
     selectVisitorsText: [
-      'You can add up to 3 people aged 18 and over, and 3 children under 18 years old. ',
+      'You can add up to 3 people aged 16 and over, and 3 children under 16 years old.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
+  WWI: {
+    prisonPhoneNumber: '0300 060 6509',
+    selectVisitorsText: [
+      'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
