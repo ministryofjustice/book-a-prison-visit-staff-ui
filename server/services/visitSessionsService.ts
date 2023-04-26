@@ -111,7 +111,7 @@ export default class VisitSessionsService {
 
         // slotHasCapacity == true when the slot has capacity for this selected restriction
         const slotHasCapacity =
-          visitRestriction === 'OPEN' ? visitSession.openVisitCapacity > 1 : visitSession.closedVisitCapacity > 1
+          visitRestriction === 'OPEN' ? visitSession.openVisitCapacity > 0 : visitSession.closedVisitCapacity > 0
         if (slotHasCapacity) {
           // Add new Slot to morning / afternoon grouping
           if (parsedStartTimestamp.getHours() < this.morningCutoff) {
