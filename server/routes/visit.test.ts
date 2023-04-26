@@ -484,7 +484,7 @@ describe('/visit/:reference', () => {
               endTimestamp: '2022-01-14T11:00:00',
               availableTables: 0,
               capacity: undefined,
-              capacityGroup: null,
+              visitRoomName: 'Visit room 1',
               visitRestriction: 'OPEN',
             },
             originalVisitSlot: {
@@ -494,7 +494,7 @@ describe('/visit/:reference', () => {
               endTimestamp: '2022-01-14T11:00:00',
               availableTables: 0,
               capacity: undefined,
-              capacityGroup: null,
+              visitRoomName: 'Visit room 1',
               visitRestriction: 'OPEN',
             },
             visitRestriction: 'OPEN',

@@ -84,7 +84,7 @@ testJourneys.forEach(journey => {
                 endTimestamp: '2022-02-14T11:00:00',
                 availableTables: 15,
                 capacity: 30,
-                capacityGroup: null,
+                visitRoomName: 'room name',
                 // representing a pre-existing visit that is BOOKED
                 sessionConflicts: ['DOUBLE_BOOKED'],
                 visitRestriction: 'OPEN',
@@ -96,7 +96,7 @@ testJourneys.forEach(journey => {
                 endTimestamp: '2022-02-14T12:59:00',
                 availableTables: 1,
                 capacity: 30,
-                capacityGroup: null,
+                visitRoomName: 'room name',
                 visitRestriction: 'OPEN',
               },
             ],
@@ -108,7 +108,7 @@ testJourneys.forEach(journey => {
                 endTimestamp: '2022-02-14T13:05:00',
                 availableTables: 5,
                 capacity: 30,
-                capacityGroup: null,
+                visitRoomName: 'room name',
                 // representing the RESERVED visit being handled in this session
                 sessionConflicts: ['DOUBLE_BOOKED'],
                 visitRestriction: 'OPEN',
@@ -224,7 +224,7 @@ testJourneys.forEach(journey => {
           endTimestamp: '2022-02-14T13:05:00',
           availableTables: 5,
           capacity: 30,
-          capacityGroup: null,
+          visitRoomName: 'room name',
           visitRestriction: 'OPEN',
         }
 
@@ -307,7 +307,7 @@ testJourneys.forEach(journey => {
               endTimestamp: '2022-02-14T12:59:00',
               availableTables: 1,
               capacity: 30,
-              capacityGroup: null,
+              visitRoomName: 'room name',
               visitRestriction: 'OPEN',
             })
             expect(visitSessionData.applicationReference).toEqual(reservedVisit.applicationReference)
@@ -345,7 +345,7 @@ testJourneys.forEach(journey => {
           endTimestamp: '2022-02-14T11:00:00',
           availableTables: 15,
           capacity: 30,
-          capacityGroup: null,
+          visitRoomName: 'room name',
           visitRestriction: 'OPEN',
         }
 
@@ -366,7 +366,7 @@ testJourneys.forEach(journey => {
               endTimestamp: '2022-02-14T13:05:00',
               availableTables: 5,
               capacity: 30,
-              capacityGroup: null,
+              visitRoomName: 'room name',
               // representing the RESERVED visit being handled in this session
               sessionConflicts: ['DOUBLE_BOOKED'],
               visitRestriction: 'OPEN',

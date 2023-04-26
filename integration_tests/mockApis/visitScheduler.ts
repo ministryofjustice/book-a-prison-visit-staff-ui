@@ -152,7 +152,7 @@ export default {
             equalToJson: {
               prisonerId: visit.prisonerId,
               prisonId: visit.prisonId,
-              capacityGroup: visit.capacityGroup,
+              visitRoom: visit.visitRoom,
               visitType: visit.visitType,
               visitRestriction: visit.visitRestriction,
               startTimestamp: visit.startTimestamp,

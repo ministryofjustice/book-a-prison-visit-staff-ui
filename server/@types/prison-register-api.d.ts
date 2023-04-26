@@ -174,13 +174,13 @@ export interface components {
       /** @description Whether the prison is still active */
       active: boolean
       /** @description If this is a male prison */
-      male: boolean
+      male?: boolean
       /** @description If this is a female prison */
-      female: boolean
+      female?: boolean
       /** @description If this is a contracted prison */
-      contracted: boolean
+      contracted?: boolean
       /** @description Set of types for this prison */
-      prisonTypes: ('HMP' | 'YOI' | 'IRC' | 'STC' | 'YCS')[]
+      prisonTypes?: ('HMP' | 'YOI' | 'IRC' | 'STC' | 'YCS')[]
     }
     ErrorResponse: {
       /** Format: int32 */
@@ -245,17 +245,17 @@ export interface components {
       /** @description Whether the prison is still active */
       active: boolean
       /** @description Whether the prison has male prisoners */
-      male: boolean
+      male?: boolean
       /** @description Whether the prison has female prisoners */
-      female: boolean
+      female?: boolean
       /** @description Whether the prison is contracted */
-      contracted: boolean
+      contracted?: boolean
       /** @description List of types for this prison */
-      types: components['schemas']['PrisonTypeDto'][]
+      types?: components['schemas']['PrisonTypeDto'][]
       /** @description List of address for this prison */
-      addresses: components['schemas']['AddressDto'][]
+      addresses?: components['schemas']['AddressDto'][]
       /** @description List of operators for this prison */
-      operators: components['schemas']['PrisonOperatorDto'][]
+      operators?: components['schemas']['PrisonOperatorDto'][]
     }
     /** @description List of operators for this prison */
     PrisonOperatorDto: {
@@ -325,20 +325,20 @@ export interface components {
        */
       prisonName: string
       /** @description Whether the prison is still active */
-      active: boolean
+      active?: boolean
       /** @description If this is a male prison */
-      male: boolean
+      male?: boolean
       /** @description If this is a female prison */
-      female: boolean
+      female?: boolean
       /** @description If this is a contracted prison */
       contracted: boolean
       /**
        * @description Set of types for this prison
        * @example HMP
        */
-      prisonTypes: ('HMP' | 'YOI' | 'IRC' | 'STC' | 'YCS')[]
+      prisonTypes?: ('HMP' | 'YOI' | 'IRC' | 'STC' | 'YCS')[]
       /** @description List of addresses for this prison */
-      addresses: components['schemas']['UpdateAddressDto'][]
+      addresses?: components['schemas']['UpdateAddressDto'][]
     }
     DlqMessage: {
       body: {
@@ -801,7 +801,7 @@ export interface operations {
   getDlqMessages: {
     parameters: {
       query: {
-        maxMessages?: number
+        maxMessages: number
       }
       path: {
         dlqName: string

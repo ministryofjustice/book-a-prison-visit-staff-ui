@@ -88,7 +88,7 @@ describe('Prisoner profile service', () => {
             reference: 'ab-cd-ef-gh',
             prisonerId: 'A1234BC',
             prisonId: 'HEI',
-            capacityGroup: null,
+            visitRoom: 'A1 L3',
             visitType: 'SOCIAL',
             visitStatus: 'BOOKED',
             visitRestriction: 'OPEN',

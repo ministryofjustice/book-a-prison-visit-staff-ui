@@ -164,7 +164,7 @@ export type VisitSlot = {
   endTimestamp: string
   availableTables: number
   capacity: number
-  capacityGroup: string
+  visitRoomName: string
   visitRestriction: 'OPEN' | 'CLOSED'
   sessionConflicts?: VisitSession['sessionConflicts']
 }
