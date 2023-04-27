@@ -6,43 +6,43 @@
   }
 }
 
-.visitor-restriction-badge {
+.restriction-tag {
   margin-top: govuk-spacing(-1);
 
   &--CHILD {
-    @extend .moj-badge--purple;
+    @extend .govuk-tag--grey;
   }
 
   &--CLOSED {
-    @extend .moj-badge--black;
+    @extend .govuk-tag--purple;
   }
 
   &--NONCON {
-    @extend .moj-badge--green;
+    @extend .govuk-tag--green;
   }
 
   &--RESTRICTED {
-    @extend .moj-badge--bright-purple;
+    @extend .govuk-tag--pink;
   }
 
   &--PREINF {
-    @extend .moj-badge--purple;
+    @extend .govuk-tag--orange;
   }
 
   &--DIHCON {
-    @extend .moj-badge--grey;
+    @extend .govuk-tag--blue;
   }
 
   &--ACC {
-    @extend .moj-badge--blue;
+    @extend .govuk-tag--turquoise;
   }
 
   &--CCTV {
-    @extend .moj-badge--grey;
+    @extend .govuk-tag--yellow;
   }
 
   &--BAN {
-    @extend .moj-badge--red;
+    @extend .govuk-tag--red;
   }
 }
 

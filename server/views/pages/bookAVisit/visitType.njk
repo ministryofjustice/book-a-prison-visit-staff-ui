@@ -30,7 +30,7 @@
             {% set restrictionExpiryDate %}{% if restriction.expiryDate %}{{ restriction.expiryDate | formatDate }}{% else %}Not entered{% endif %}{% endset %}
             {%- set prisonerRestrictions = (prisonerRestrictions.push([
               {
-                html: '<span class="test-restrictions-type' + loop.index + ' moj-badge moj-badge--large visitor-restriction-badge visitor-restriction-badge--' +
+                html: '<span class="test-restrictions-type' + loop.index + ' govuk-tag restriction-tag restriction-tag--' +
                   restriction.restrictionType + '" data-test="restriction-type-' + loop.index + '">' + restriction.restrictionTypeDescription + '</span>'
               },
               {
