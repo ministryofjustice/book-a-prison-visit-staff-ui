@@ -14,7 +14,7 @@
   {%- if visitor.restrictions | length %}
     {%- for restriction in visitor.restrictions -%}
       <div class="visitor-restriction">
-        <span class="moj-badge moj-badge--large visitor-restriction-badge visitor-restriction-badge--{{ restriction.restrictionType }}">{{- restriction.restrictionTypeDescription }}</span>
+        <span class="govuk-tag restriction-tag restriction-tag--{{ restriction.restrictionType }}">{{- restriction.restrictionTypeDescription }}</span>
       {%- if restriction.expiryDate %} until {{ restriction.expiryDate | formatDate }}{% else %} End date not entered{% endif %}
       {% if restriction.comment %}
         {{- govukDetails({

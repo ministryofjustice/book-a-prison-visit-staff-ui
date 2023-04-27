@@ -31,7 +31,7 @@ context('Visit details page', () => {
       visit,
     })
 
-    const contacts = [TestData.contact({ personId: 4321 })]
+    const contacts = [TestData.contact({ personId: 4321, restrictions: [TestData.restriction()] })]
 
     cy.task('stubPrisonerById', prisoner)
     cy.task('stubVisitHistory', visitHistoryDetails)
@@ -64,7 +64,10 @@ context('Visit details page', () => {
     visitDetailsPage.visitorDob1().contains('28 July 1986')
     visitDetailsPage.visitorRelationship1().contains('Wife')
     visitDetailsPage.visitorAddress1().contains('C1 2AB')
-    visitDetailsPage.visitorRestrictions1().contains('None')
+    visitDetailsPage.visitorRestrictions1().within(() => {
+      cy.contains(contacts[0].restrictions[0].restrictionTypeDescription)
+      cy.contains('End date not entered')
+    })
     // Additional Information
     visitDetailsPage.visitComment().contains('Example of a visit comment')
     visitDetailsPage.visitorConcern().contains('Example of a visitor concern')

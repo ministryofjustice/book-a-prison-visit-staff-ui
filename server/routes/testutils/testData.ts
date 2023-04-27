@@ -16,7 +16,7 @@ import {
   Alert,
 } from '../../data/prisonApiTypes'
 import { CurrentIncentive, Prisoner } from '../../data/prisonerOffenderSearchTypes'
-import { Address, Contact } from '../../data/prisonerContactRegistryApiTypes'
+import { Address, Contact, Restriction } from '../../data/prisonerContactRegistryApiTypes'
 import { ScheduledEvent } from '../../data/whereaboutsApiTypes'
 
 export default class TestData {
@@ -229,6 +229,23 @@ export default class TestData {
       },
     ] as Prison[],
   } = {}): Prison[] => prisons
+
+  // Visitor restrictions
+  static restriction = ({
+    restrictionType = 'NONCON',
+    restrictionTypeDescription = 'Non-Contact Visit',
+    startDate = '2023-02-01',
+    expiryDate = undefined,
+    globalRestriction = true,
+    comment = 'Restriction test comment',
+  }: Partial<Restriction> = {}): Restriction => ({
+    restrictionType,
+    restrictionTypeDescription,
+    startDate,
+    expiryDate,
+    globalRestriction,
+    comment,
+  })
 
   static scheduledEvent = ({
     bookingId = 12345,
