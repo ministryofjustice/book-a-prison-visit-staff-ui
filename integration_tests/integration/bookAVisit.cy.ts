@@ -101,8 +101,6 @@ context('Book a visit', () => {
     const prisonerProfilePage = Page.verifyOnPageTitle(PrisonerProfilePage, prisonerDisplayName)
 
     // Select visitors
-    cy.task('stubBookings', TestData.prisonerBookingSummary())
-    cy.task('stubOffender', TestData.inmateDetail())
     cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
     cy.task('stubOffenderRestrictions', { offenderNo, offenderRestrictions: [TestData.offenderRestriction()] })
     prisonerProfilePage.bookAVisitButton().click()
