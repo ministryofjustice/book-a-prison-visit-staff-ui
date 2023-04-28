@@ -92,12 +92,12 @@ describe('visitorRestrictions(visitor) macro', () => {
     compiledTemplate = nunjucks.compile(nunjucksBaseString + nunjucksString, njkEnv)
     const $ = cheerio.load(compiledTemplate.render(viewContext))
 
-    expect($('.visitor-restriction:nth-child(1) .visitor-restriction-badge--BAN').text()).toBe('Banned')
+    expect($('.visitor-restriction:nth-child(1) .restriction-tag--BAN').text()).toBe('Banned')
     expect($('.visitor-restriction:nth-child(1)').text()).toContain('Banned until 31 July 2022')
     expect($('.visitor-restriction:nth-child(1)').text()).toContain('See comment')
     expect($('.visitor-restriction:nth-child(1)').text()).toContain('Ban details')
 
-    expect($('.visitor-restriction:nth-child(2) .visitor-restriction-badge--RESTRICTED').text()).toBe('Restricted')
+    expect($('.visitor-restriction:nth-child(2) .restriction-tag--RESTRICTED').text()).toBe('Restricted')
     expect($('.visitor-restriction:nth-child(2)').text()).toContain('End date not entered')
   })
 })

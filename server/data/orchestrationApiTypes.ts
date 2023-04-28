@@ -4,7 +4,6 @@ export type SupportType = components['schemas']['SupportTypeDto']
 
 export type VisitorSupport = components['schemas']['VisitorSupportDto']
 
-// Temp fixes for enums incorrectly defined as strings in orchestration API - VB-2081
 export type PageVisitDto = components['schemas']['PageVisitDto']
 export type Visit = components['schemas']['VisitDto']
 export type VisitHistoryDetails = components['schemas']['VisitHistoryDetailsDto']

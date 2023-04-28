@@ -455,10 +455,10 @@ export interface components {
       /** Format: int64 */
       offset?: number
       sort?: components['schemas']['SortObject']
-      /** Format: int32 */
-      pageSize?: number
       paged?: boolean
       unpaged?: boolean
+      /** Format: int32 */
+      pageSize?: number
       /** Format: int32 */
       pageNumber?: number
     }

@@ -17,7 +17,7 @@ import {
   Alert,
 } from '../../data/prisonApiTypes'
 import { CurrentIncentive, Prisoner } from '../../data/prisonerOffenderSearchTypes'
-import { Address, Contact } from '../../data/prisonerContactRegistryApiTypes'
+import { Address, Contact, Restriction } from '../../data/prisonerContactRegistryApiTypes'
 import { ScheduledEvent } from '../../data/whereaboutsApiTypes'
 
 export default class TestData {
@@ -292,6 +292,23 @@ export default class TestData {
     ] as Prison[],
   } = {}): Prison[] => prisons
 
+  // Visitor restrictions
+  static restriction = ({
+    restrictionType = 'NONCON',
+    restrictionTypeDescription = 'Non-Contact Visit',
+    startDate = '2023-02-01',
+    expiryDate = undefined,
+    globalRestriction = true,
+    comment = 'Restriction test comment',
+  }: Partial<Restriction> = {}): Restriction => ({
+    restrictionType,
+    restrictionTypeDescription,
+    startDate,
+    expiryDate,
+    globalRestriction,
+    comment,
+  })
+
   static scheduledEvent = ({
     bookingId = 12345,
     startTime = '2022-02-14T10:00:00',
@@ -314,6 +331,7 @@ export default class TestData {
     enhanced = false,
     capacity = { closed: 0, open: 40 },
     prisonerLocationGroupNames = [],
+    prisonerCategoryGroupNames = [],
     sessionTemplateFrequency = 'WEEKLY',
     sessionTemplateEndDate = '',
   }: Partial<SessionSchedule> = {}): SessionSchedule => ({
@@ -323,6 +341,7 @@ export default class TestData {
     enhanced,
     capacity,
     prisonerLocationGroupNames,
+    prisonerCategoryGroupNames,
     sessionTemplateFrequency,
     sessionTemplateEndDate,
   })
