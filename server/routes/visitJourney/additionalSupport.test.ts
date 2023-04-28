@@ -41,13 +41,14 @@ testJourneys.forEach(journey => {
         },
         visitRestriction: 'OPEN',
         visitSlot: {
-          id: 'visitId',
+          id: '1',
+          sessionTemplateReference: 'v9d.7ed.7u',
           prisonId: 'HEI',
           startTimestamp: '123',
           endTimestamp: '456',
           availableTables: 1,
           capacity: 30,
-          visitRoomName: 'room name',
+          visitRoom: 'room name',
           visitRestriction: 'OPEN',
         },
         visitors: [
@@ -219,13 +220,14 @@ testJourneys.forEach(journey => {
         },
         visitRestriction: 'OPEN',
         visitSlot: {
-          id: 'visitId',
+          id: '1',
+          sessionTemplateReference: 'v9d.7ed.7u',
           prisonId: 'HEI',
           startTimestamp: '123',
           endTimestamp: '456',
           availableTables: 1,
           capacity: 30,
-          visitRoomName: 'room name',
+          visitRoom: 'room name',
           visitRestriction: 'OPEN',
         },
         visitors: [

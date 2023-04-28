@@ -88,6 +88,7 @@ describe('Prisoner profile service', () => {
             reference: 'ab-cd-ef-gh',
             prisonerId: 'A1234BC',
             prisonId: 'HEI',
+            sessionTemplateReference: 'v9d.7ed.7u',
             visitRoom: 'A1 L3',
             visitType: 'SOCIAL',
             visitStatus: 'BOOKED',

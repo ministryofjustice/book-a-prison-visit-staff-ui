@@ -323,6 +323,7 @@ export default class TestData {
     reference = 'ab-cd-ef-gh',
     prisonerId = 'A1234BC',
     prisonId = 'HEI',
+    sessionTemplateReference = 'v9d.7ed.7u',
     visitRoom = 'Visit room 1',
     visitType = 'SOCIAL',
     visitStatus = 'BOOKED',
@@ -370,6 +371,7 @@ export default class TestData {
       reference,
       prisonerId,
       prisonId,
+      sessionTemplateReference,
       visitRoom,
       visitType,
       visitStatus,
@@ -417,8 +419,8 @@ export default class TestData {
   })
 
   static visitSession = ({
-    sessionTemplateId = 1,
-    visitRoomName = 'Visit room 1',
+    sessionTemplateReference = 'v9d.7ed.7u',
+    visitRoom = 'Visit room 1',
     visitType = 'SOCIAL',
     prisonId = 'HEI',
     openVisitCapacity = 20,
@@ -429,8 +431,8 @@ export default class TestData {
     endTimestamp = '2022-01-14T11:00:00',
     sessionConflicts = undefined,
   }: Partial<VisitSession> = {}): VisitSession => ({
-    sessionTemplateId,
-    visitRoomName,
+    sessionTemplateReference,
+    visitRoom,
     visitType,
     prisonId,
     openVisitCapacity,

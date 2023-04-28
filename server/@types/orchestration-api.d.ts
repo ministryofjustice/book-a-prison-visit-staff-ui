@@ -125,21 +125,10 @@ export interface components {
        */
       prisonerId: string
       /**
-       * @description Prison Id
-       * @example MDI
+       * @description Session template reference
+       * @example v9d.7ed.7u
        */
-      prisonId: string
-      /**
-       * @description Visit Room
-       * @example A1
-       */
-      visitRoom: string
-      /**
-       * @description Visit Type
-       * @example SOCIAL
-       * @enum {string}
-       */
-      visitType: 'SOCIAL'
+      sessionTemplateReference: string
       /**
        * @description Visit Restriction
        * @example OPEN
@@ -221,8 +210,13 @@ export interface components {
        */
       prisonId: string
       /**
+       * @description Session Template Reference
+       * @example v9d.7ed.7u
+       */
+      sessionTemplateReference: string
+      /**
        * @description Visit Room
-       * @example A1 L3
+       * @example Visits Main Hall
        */
       visitRoom: string
       /**
@@ -445,9 +439,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
+      last?: boolean
       pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
@@ -455,12 +449,12 @@ export interface components {
       /** Format: int64 */
       offset?: number
       sort?: components['schemas']['SortObject']
-      paged?: boolean
-      unpaged?: boolean
       /** Format: int32 */
       pageSize?: number
       /** Format: int32 */
       pageNumber?: number
+      paged?: boolean
+      unpaged?: boolean
     }
     SortObject: {
       empty?: boolean
@@ -483,21 +477,21 @@ export interface components {
     /** @description Visit Session */
     VisitSessionDto: {
       /**
-       * Format: int64
-       * @description session id
-       * @example 123
+       * @description Session Template Reference
+       * @example v9d.7ed.7u
        */
-      sessionTemplateId: number
+      sessionTemplateReference: string
       /**
-       * @description The Name of the visit room in which this visit session takes place
-       * @example Visit room 1
+       * @description Visit Room
+       * @example Visits Main Hall
        */
-      visitRoomName: string
+      visitRoom: string
       /**
        * @description The type of visits taking place within this session
        * @example SOCIAL
+       * @enum {string}
        */
-      visitType: string
+      visitType: 'SOCIAL'
       /**
        * @description The prison id
        * @example LEI

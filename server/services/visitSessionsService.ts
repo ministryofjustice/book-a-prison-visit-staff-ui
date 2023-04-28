@@ -88,6 +88,7 @@ export default class VisitSessionsService {
 
         const newSlot: VisitSlot = {
           id: (slotIdCounter + 1).toString(),
+          sessionTemplateReference: visitSession.sessionTemplateReference,
           prisonId: visitSession.prisonId,
           startTimestamp: visitSession.startTimestamp,
           endTimestamp: visitSession.endTimestamp,
@@ -96,7 +97,7 @@ export default class VisitSessionsService {
               ? visitSession.openVisitCapacity - visitSession.openVisitBookedCount
               : visitSession.closedVisitCapacity - visitSession.closedVisitBookedCount,
           capacity: visitRestriction === 'OPEN' ? visitSession.openVisitCapacity : visitSession.closedVisitCapacity,
-          visitRoomName: visitSession.visitRoomName,
+          visitRoom: visitSession.visitRoom,
           sessionConflicts: visitSession.sessionConflicts,
           visitRestriction,
         }

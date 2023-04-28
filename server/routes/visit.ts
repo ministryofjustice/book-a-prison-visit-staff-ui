@@ -139,12 +139,13 @@ export default function routes({
       visit.visitRestriction === 'OPEN' || visit.visitRestriction === 'CLOSED' ? visit.visitRestriction : undefined
     const visitSlot: VisitSlot = {
       id: '',
+      sessionTemplateReference: visit.sessionTemplateReference,
       prisonId: visit.prisonId,
       startTimestamp: visit.startTimestamp,
       endTimestamp: visit.endTimestamp,
       availableTables: 0,
       capacity: undefined,
-      visitRoomName: visit.visitRoom,
+      visitRoom: visit.visitRoom,
       visitRestriction,
     }
     const visitSessionData: VisitSessionData = {
