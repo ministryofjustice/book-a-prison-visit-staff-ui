@@ -138,6 +138,7 @@ describe('View visits timetable', () => {
       TestData.sessionSchedule({ capacity: { open: 11, closed: 22 } }), // Row 3 + 4
       TestData.sessionSchedule({ enhanced: true, startTime: '15:00', prisonerLocationGroupNames: ['Group 1'] }), // Row 5
       TestData.sessionSchedule({ enhanced: true, sessionTemplateEndDate: '2025-12-31' }), // Row 6
+      TestData.sessionSchedule({ prisonerCategoryGroupNames: ['Category A (High Risk) prisoners'] }), // Row 7
     ]
     visitSessionsService.getSessionSchedule.mockResolvedValue(sessionSchedule)
 
@@ -152,7 +153,7 @@ describe('View visits timetable', () => {
         expect($('[data-test="schedule-time-0"]').text()).toBe('1:45pm to 3:45pm')
         expect($('[data-test="schedule-type-0"]').text()).toBe('Open')
         expect($('[data-test="schedule-capacity-0"]').text()).toBe('40 tables')
-        expect($('[data-test="schedule-attendees-0"]').text()).toBe('All prisoners')
+        expect($('[data-test="schedule-attendees-0"]').text().trim()).toBe('All prisoners')
         expect($('[data-test="schedule-frequency-0"]').text()).toBe('Weekly')
         expect($('[data-test="schedule-end-date-0"]').text()).toBe('Not entered')
         // Row 1
@@ -167,11 +168,13 @@ describe('View visits timetable', () => {
         expect($('[data-test="schedule-capacity-4"]').text()).toBe('22 tables')
         // Row 5
         expect($('[data-test="schedule-time-5"]').text()).toBe('3pm to 3:45pm')
-        expect($('[data-test="schedule-attendees-5"] > span').text()).toBe('Enhanced prisoners in:')
+        expect($('[data-test="schedule-attendees-5"] > span').text().trim()).toBe('Enhanced prisoners in:')
         expect($('[data-test="schedule-attendees-5"] li').eq(0).text()).toBe('Group 1')
         // Row 6
-        expect($('[data-test="schedule-attendees-6"]').text()).toBe('Enhanced prisoners only')
+        expect($('[data-test="schedule-attendees-6"]').text().trim()).toBe('Enhanced prisoners')
         expect($('[data-test="schedule-end-date-6"]').text()).toBe('31 December 2025')
+        // Row 7
+        expect($('[data-test="schedule-attendees-7"]').text().trim()).toBe('Category A (High Risk) prisoners')
       })
   })
 })

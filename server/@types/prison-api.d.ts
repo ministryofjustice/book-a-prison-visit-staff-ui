@@ -7455,6 +7455,7 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
       last?: boolean
@@ -7467,9 +7468,9 @@ export interface components {
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
       pageSize?: number
+      paged?: boolean
       /** Format: int32 */
       pageNumber?: number
-      paged?: boolean
       unpaged?: boolean
     }
     SortObject: {
@@ -9534,6 +9535,7 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
       last?: boolean
@@ -10226,6 +10228,7 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
       last?: boolean
@@ -10333,6 +10336,7 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
       last?: boolean
@@ -10351,6 +10355,7 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
       last?: boolean
@@ -10530,15 +10535,15 @@ export interface components {
        */
       establishmentCode?: string
       /**
-       * @description Case Note Type and Sub Type
-       * @example POS IEP_ENC
-       */
-      noteType: string
-      /**
        * @description Name of staff member who created case note (lastname, firstname)
        * @example Smith, John
        */
       staffName: string
+      /**
+       * @description Case Note Type and Sub Type
+       * @example POS IEP_ENC
+       */
+      noteType: string
     }
     /** @description Visit summary */
     VisitSummary: {
@@ -10562,6 +10567,7 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
       last?: boolean
@@ -10836,10 +10842,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
       last?: boolean
-      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     /** @description Case Note Count Detail */
@@ -10894,6 +10900,7 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
       last?: boolean
@@ -10972,6 +10979,7 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
       last?: boolean

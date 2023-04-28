@@ -15,6 +15,7 @@ import ConfirmationPage from '../pages/confirmation'
 
 context('Book a visit', () => {
   const shortDateFormat = 'yyyy-MM-dd'
+  const mediumDateFormat = 'd MMMM yyyy'
   const longDateFormat = 'EEEE d MMMM yyyy'
 
   beforeEach(() => {
@@ -34,7 +35,7 @@ context('Book a visit', () => {
 
     const childDob = format(sub(today, { years: 5 }), shortDateFormat)
     const contacts = [
-      TestData.contact(),
+      TestData.contact({ restrictions: [TestData.restriction()] }),
       TestData.contact({
         personId: 4322,
         firstName: 'Bob',
@@ -101,10 +102,21 @@ context('Book a visit', () => {
     const prisonerProfilePage = Page.verifyOnPageTitle(PrisonerProfilePage, prisonerDisplayName)
 
     // Select visitors
+    const offenderRestrictions = [TestData.offenderRestriction()]
+    cy.task('stubOffenderRestrictions', { offenderNo, offenderRestrictions })
     cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
-    cy.task('stubOffenderRestrictions', { offenderNo, offenderRestrictions: [TestData.offenderRestriction()] })
     prisonerProfilePage.bookAVisitButton().click()
     const selectVisitorsPage = Page.verifyOnPage(SelectVisitorsPage)
+    selectVisitorsPage.getPrisonerRestrictionType(1).contains(offenderRestrictions[0].restrictionTypeDescription)
+    selectVisitorsPage.getPrisonerRestrictionComment(1).contains(offenderRestrictions[0].comment)
+    selectVisitorsPage
+      .getPrisonerRestrictionStartDate(1)
+      .contains(format(new Date(offenderRestrictions[0].startDate), mediumDateFormat))
+    selectVisitorsPage.getPrisonerRestrictionEndDate(1).contains('Not entered')
+    selectVisitorsPage.getVisitorRestrictions(contacts[0].personId).within(() => {
+      cy.contains(contacts[0].restrictions[0].restrictionTypeDescription)
+      cy.contains('End date not entered')
+    })
     selectVisitorsPage.getVisitor(contacts[0].personId).check()
     selectVisitorsPage.getVisitor(contacts[1].personId).check()
 

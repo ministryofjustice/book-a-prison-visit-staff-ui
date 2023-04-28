@@ -22,7 +22,7 @@ describe('Views - Date and time of visit', () => {
   it('should display message, back to start button and no accordion when no visit slots', () => {
     viewContext = {}
     const $ = cheerio.load(compiledTemplate.render(viewContext))
-    expect($('main p').text()).toContain('There are no available slots for the selected time and day.')
+    expect($('main p').text()).toContain('There are no available time slots for this prisoner.')
     expect($('.govuk-accordion').length).toBe(0)
     expect($('[data-test="submit"]').length).toBe(0)
     expect($('[data-test="back-to-start"]').length).toBe(1)
@@ -145,7 +145,9 @@ describe('Views - Date and time of visit', () => {
     }
     const $ = cheerio.load(compiledTemplate.render(viewContext))
     expect($('.govuk-details__text').text()).toContain('Showing time slots:')
-    expect($('.govuk-details__text').text()).toContain('suitable for the prisoner’s location and incentive level')
+    expect($('.govuk-details__text').text()).toContain(
+      'suitable for the prisoner’s location, category and incentive level',
+    )
     expect($('.govuk-details__text').text()).toContain('that do not have non-associations for the prisoner')
     expect($('.govuk-details__text').text()).toContain('over the next 28 days')
     expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')

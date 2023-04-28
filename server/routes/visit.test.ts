@@ -134,8 +134,6 @@ describe('/visit/:reference', () => {
 
   describe('GET /visit/:reference', () => {
     it('should render full booking summary page with prisoner, visit and visitor details, with default back link', () => {
-      visitHistoryDetails.createdBy = 'NOT_KNOWN' // test case for old / migrated data
-
       return request(app)
         .get('/visit/ab-cd-ef-gh')
         .expect(200)
@@ -163,7 +161,7 @@ describe('/visit/:reference', () => {
           expect($('[data-test="visitor-dob-1"]').html()).toContain('28 July 1986')
           expect($('[data-test="visitor-relationship-1"]').text()).toBe('Sister')
           expect($('[data-test="visitor-address-1"]').html()).toBe('123 The Street,<br>Coventry')
-          expect($('[data-test="visitor-restrictions-1"] .visitor-restriction-badge--CLOSED').text()).toBe('Closed')
+          expect($('[data-test="visitor-restrictions-1"] .restriction-tag--CLOSED').text()).toBe('Closed')
           expect($('[data-test="visitor-restrictions-1"]').text()).toContain('End date not entered')
           expect($('[data-test="visitor-name-2"]').text()).toBe('Smith, Anne')
           expect($('[data-test="visitor-dob-2"]').html()).toContain(`2 January ${childBirthYear}`)
@@ -174,7 +172,9 @@ describe('/visit/:reference', () => {
           expect($('[data-test="visit-comment"]').eq(0).text()).toBe('Example of a visit comment')
           expect($('[data-test="visitor-concern"]').eq(0).text()).toBe('Example of a visitor concern')
           expect($('[data-test="additional-support"]').text()).toBe('Wheelchair ramp, custom request')
-          expect($('[data-test="visit-booked"]').text().trim()).toBe('Saturday 1 January 2022 at 9am')
+          expect($('[data-test="visit-booked"]').text().replace(/\s+/g, ' ')).toBe(
+            'Saturday 1 January 2022 at 9am by User One',
+          )
           expect($('[data-test="visit-updated"]').text().replace(/\s+/g, ' ')).toBe(
             'Saturday 1 January 2022 at 10am by User Two',
           )
@@ -188,6 +188,28 @@ describe('/visit/:reference', () => {
             username: 'user1',
             operationId: undefined,
           })
+        })
+    })
+
+    it('should handle special cases for migrated data when showing actioned by user details', () => {
+      visitHistoryDetails.createdBy = 'NOT_KNOWN' // test case for old / migrated data
+      visitHistoryDetails.updatedBy = 'NOT_KNOWN_NOMIS' // migrated from Nomis, but user not available
+      visitHistoryDetails.cancelledBy = 'User Three'
+      visitHistoryDetails.cancelledDateAndTime = '2022-01-01T11:30:00'
+
+      return request(app)
+        .get('/visit/ab-cd-ef-gh')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('[data-test="visit-booked"]').text().replace(/\s+/g, ' ')).toBe('Saturday 1 January 2022 at 9am')
+          expect($('[data-test="visit-updated"]').text().replace(/\s+/g, ' ')).toBe(
+            'Saturday 1 January 2022 at 10am in NOMIS',
+          )
+          expect($('[data-test="visit-cancelled"]').text().replace(/\s+/g, ' ')).toBe(
+            'Saturday 1 January 2022 at 11:30am by User Three',
+          )
         })
     })
 
@@ -227,7 +249,7 @@ describe('/visit/:reference', () => {
           expect($('[data-test="visitor-dob-1"]').html()).toContain('28 July 1986')
           expect($('[data-test="visitor-relationship-1"]').text()).toBe('Sister')
           expect($('[data-test="visitor-address-1"]').html()).toBe('123 The Street,<br>Coventry')
-          expect($('[data-test="visitor-restrictions-1"] .visitor-restriction-badge--CLOSED').text()).toBe('Closed')
+          expect($('[data-test="visitor-restrictions-1"] .restriction-tag--CLOSED').text()).toBe('Closed')
           expect($('[data-test="visitor-restrictions-1"]').text()).toContain('End date not entered')
           expect($('[data-test="visitor-name-2"]').text()).toBe('Smith, Anne')
           expect($('[data-test="visitor-dob-2"]').html()).toContain(`2 January ${childBirthYear}`)
@@ -287,7 +309,7 @@ describe('/visit/:reference', () => {
           expect($('[data-test="visitor-dob-1"]').html()).toContain('28 July 1986')
           expect($('[data-test="visitor-relationship-1"]').text()).toBe('Sister')
           expect($('[data-test="visitor-address-1"]').html()).toBe('123 The Street,<br>Coventry')
-          expect($('[data-test="visitor-restrictions-1"] .visitor-restriction-badge--CLOSED').text()).toBe('Closed')
+          expect($('[data-test="visitor-restrictions-1"] .restriction-tag--CLOSED').text()).toBe('Closed')
           expect($('[data-test="visitor-restrictions-1"]').text()).toContain('End date not entered')
           expect($('[data-test="visitor-name-2"]').text()).toBe('Smith, Anne')
           expect($('[data-test="visitor-dob-2"]').html()).toContain(`2 January ${childBirthYear}`)
