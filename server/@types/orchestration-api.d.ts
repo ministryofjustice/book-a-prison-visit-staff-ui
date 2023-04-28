@@ -213,7 +213,7 @@ export interface components {
        * @description Session Template Reference
        * @example v9d.7ed.7u
        */
-      sessionTemplateReference: string
+      sessionTemplateReference?: string
       /**
        * @description Visit Room
        * @example Visits Main Hall
@@ -441,8 +441,8 @@ export interface components {
       first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      last?: boolean
       pageable?: components['schemas']['PageableObject']
+      last?: boolean
       empty?: boolean
     }
     PageableObject: {
@@ -573,12 +573,12 @@ export interface components {
        * @description prisoner location group
        * @example Wing C
        */
-      prisonerLocationGroupNames?: string[]
+      prisonerLocationGroupNames: string[]
       /**
        * @description prisoner category groups
        * @example Category A Prisoners
        */
-      prisonerCategoryGroupNames?: string[]
+      prisonerCategoryGroupNames: string[]
       /**
        * @description The session template frequency
        * @example BI_WEEKLY
@@ -675,7 +675,7 @@ export interface components {
        * @description Date of Birth
        * @example 1975-04-02
        */
-      dateOfBirth?: string
+      dateOfBirth: string
       /**
        * @description In prison cell location
        * @example A-1-002
@@ -706,7 +706,7 @@ export interface components {
       alerts?: components['schemas']['AlertDto'][]
       visitBalances?: components['schemas']['VisitBalancesDto']
       /** @description Past and future visits for the prisoner based on configured duration. */
-      visits?: components['schemas']['VisitDto'][]
+      visits: components['schemas']['VisitDto'][]
     }
     /** @description Balances of visit orders and privilege visit orders */
     VisitBalancesDto: {
@@ -1334,7 +1334,7 @@ export interface operations {
   getDlqMessages: {
     parameters: {
       query: {
-        maxMessages: number
+        maxMessages?: number
       }
       path: {
         dlqName: string

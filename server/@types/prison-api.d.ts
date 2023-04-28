@@ -7476,27 +7476,27 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
       last?: boolean
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     PageableObject: {
       /** Format: int64 */
       offset?: number
       sort?: components['schemas']['SortObject']
+      paged?: boolean
+      unpaged?: boolean
       /** Format: int32 */
       pageSize?: number
       /** Format: int32 */
       pageNumber?: number
-      paged?: boolean
-      unpaged?: boolean
     }
     SortObject: {
       empty?: boolean
-      sorted?: boolean
       unsorted?: boolean
+      sorted?: boolean
     }
     /** @description PersonIdentifier */
     PersonIdentifier: {
@@ -9555,10 +9555,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
       last?: boolean
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     Pageable: {
@@ -10247,10 +10247,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
       last?: boolean
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     /** @description Offender Employment */
@@ -10354,10 +10354,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
       last?: boolean
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     PageEducation: {
@@ -10372,10 +10372,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
       last?: boolean
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     /** @description Represents a court date and its outcome */
@@ -10583,10 +10583,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
       last?: boolean
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     /** @description Visit details */
@@ -10857,10 +10857,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
       last?: boolean
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     /** @description Case Note Count Detail */
@@ -10915,10 +10915,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
       last?: boolean
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     /** @description Adjudication Summary for offender */
@@ -10993,10 +10993,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
       last?: boolean
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     /** @description Prisoner Booking Summary */
@@ -18854,7 +18854,7 @@ export interface operations {
         agencyId?: string
         /**
          * @description Finding code to allow optionally filtering by type of finding
-         * @example NOT_PROVED
+         * @example NOT_PROVEN
          */
         finding?: string
         /** @description Adjudications must have been reported on or after this date (in YYYY-MM-DD format). */
