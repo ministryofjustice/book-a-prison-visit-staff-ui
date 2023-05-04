@@ -35,10 +35,6 @@ export const services = () => {
   const prisonerProfileService = new PrisonerProfileService(
     orchestrationApiClientBuilder,
     prisonApiClientBuilder,
-    visitSchedulerApiClientBuilder,
-    prisonerContactRegistryApiClientBuilder,
-    prisonerSearchClientBuilder,
-    supportedPrisonsService,
     hmppsAuthClient,
   )
 

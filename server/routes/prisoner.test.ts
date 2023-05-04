@@ -83,29 +83,7 @@ describe('GET /prisoner/A1234BC', () => {
           alertCodeDescription: 'Protective Isolation Unit',
         },
       ],
-      visits: [
-        [
-          {
-            html: "<a href='/visit/ab-cd-ef-gh'>ab-cd-ef-gh</a>",
-            attributes: {
-              'data-test': 'tab-visits-reference',
-            },
-          },
-          {
-            html: '<span>Social<br>(Open)</span>',
-            attributes: {
-              'data-test': 'tab-visits-type',
-            },
-          },
-          { text: 'Hewell (HMP)', attributes: { 'data-test': 'tab-visits-location' } },
-          {
-            html: '<p>17 August 2022<br>10:00am - 11:00am</p>',
-            attributes: { 'data-test': 'tab-visits-date-and-time' },
-          },
-          { html: '<p>Mary Smith</p>', attributes: { 'data-test': 'tab-visits-visitors' } },
-          { text: 'Booked', attributes: { 'data-test': 'tab-visits-status' } },
-        ],
-      ],
+      visitsByMonth: new Map(),
       prisonerDetails: {
         offenderNo: 'A1234BC',
         name: 'Smith, John',
@@ -318,7 +296,6 @@ describe('GET /prisoner/A1234BC', () => {
 
 describe('POST /prisoner/A1234BC', () => {
   let prisonerProfile: PrisonerProfilePage
-
   beforeEach(() => {
     prisonerProfile = {
       activeAlerts: [
@@ -347,29 +324,7 @@ describe('POST /prisoner/A1234BC', () => {
           alertCodeDescription: 'Protective Isolation Unit',
         },
       ],
-      visits: [
-        [
-          {
-            html: "<a href='/visit/ab-cd-ef-gh'>ab-cd-ef-gh</a>",
-            attributes: {
-              'data-test': 'tab-visits-reference',
-            },
-          },
-          {
-            html: '<span>Social<br>(Open)</span>',
-            attributes: {
-              'data-test': 'tab-visits-type',
-            },
-          },
-          { text: 'Hewell (HMP)', attributes: { 'data-test': 'tab-visits-location' } },
-          {
-            html: '<p>17 August 2022<br>10:00am - 11:00am</p>',
-            attributes: { 'data-test': 'tab-visits-date-and-time' },
-          },
-          { html: '<p>Mary Smith</p>', attributes: { 'data-test': 'tab-visits-visitors' } },
-          { text: 'Booked', attributes: { 'data-test': 'tab-visits-status' } },
-        ],
-      ],
+      visitsByMonth: new Map(),
       prisonerDetails: {
         offenderNo: 'A1234BC',
         name: 'Smith, John',

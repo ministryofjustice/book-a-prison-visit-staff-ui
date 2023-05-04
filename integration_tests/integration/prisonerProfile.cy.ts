@@ -40,8 +40,8 @@ context('Prisoner profile page', () => {
         active: true,
       },
     ]
-
-    const profile = TestData.prisonerProfile({ alerts })
+    const visit = TestData.visit()
+    const profile = TestData.prisonerProfile({ alerts, visits: [visit] })
 
     const { prisonerId } = profile
     const prisonId = 'HEI'
@@ -86,6 +86,7 @@ context('Prisoner profile page', () => {
 
     // Visits history tab
     prisonerProfilePage.selectVisitsTab()
+    prisonerProfilePage.visitTabCaption().contains('January 2022 (1 past visit)')
     prisonerProfilePage
       .visitTabReference()
       .eq(0)
@@ -97,8 +98,8 @@ context('Prisoner profile page', () => {
       .visitTabDateAndTime()
       .eq(0)
       .contains(format(new Date(profile.visits[0].startTimestamp), prettyDateFormat))
-      .contains('10:00am - 11:00am')
-    prisonerProfilePage.visitTabVisitors().eq(0).contains('Mary Smith')
+      .contains('10am - 11am')
+    prisonerProfilePage.visitTabVisitors().eq(0).contains('Jeanette Smith')
     prisonerProfilePage.visitTabVisitStatus().eq(0).contains('Booked')
   })
 })
