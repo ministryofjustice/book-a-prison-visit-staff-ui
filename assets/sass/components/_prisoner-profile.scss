@@ -43,3 +43,39 @@
     background-color: govuk-colour("purple");
   }
 }
+
+.prisoner-profile-visits {
+  & td:nth-child(1) {
+    width: 15%;
+  }
+
+  & td:nth-child(2) {
+    width: 12%;
+  }
+
+  & td:nth-child(3) {
+    width: 20%;
+  }
+
+  & td:nth-child(4) {
+    width: 20%;
+  }
+
+  & td:nth-child(6) {
+    width: 10%;
+  }
+
+  & tbody tr:last-child {
+    border-bottom: 1px solid $govuk-border-colour;
+  }
+}
+
+.prisoner-profile-visits:not(:first-of-type) {
+  & thead {
+    border-bottom: 1px solid $govuk-border-colour;
+  }
+
+  & th {
+    @include govuk-visually-hidden($important: true);
+  }
+}

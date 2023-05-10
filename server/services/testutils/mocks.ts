@@ -17,7 +17,7 @@ export const createMockAuditService = () => new AuditService(null, null, null, n
 export const createMockNotificationsService = () => new NotificationsService(null) as jest.Mocked<NotificationsService>
 
 export const createMockPrisonerProfileService = () =>
-  new PrisonerProfileService(null, null, null, null, null, null, null) as jest.Mocked<PrisonerProfileService>
+  new PrisonerProfileService(null, null, null, null) as jest.Mocked<PrisonerProfileService>
 
 export const createMockPrisonerSearchService = () =>
   new PrisonerSearchService(null, null) as jest.Mocked<PrisonerSearchService>

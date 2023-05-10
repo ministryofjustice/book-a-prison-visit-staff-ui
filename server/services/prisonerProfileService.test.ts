@@ -1,4 +1,4 @@
-import { NotFound } from 'http-errors'
+import { addMonths, format, subMonths } from 'date-fns'
 import PrisonerProfileService from './prisonerProfileService'
 import { PagePrisonerBookingSummary, VisitBalances, OffenderRestrictions } from '../data/prisonApiTypes'
 import { PrisonerAlertItem, PrisonerProfilePage } from '../@types/bapv'
@@ -46,10 +46,7 @@ describe('Prisoner profile service', () => {
     prisonerProfileService = new PrisonerProfileService(
       OrchestrationApiClientFactory,
       PrisonApiClientFactory,
-      VisitSchedulerApiClientFactory,
       PrisonerContactRegistryApiClientFactory,
-      PrisonerSearchClientFactory,
-      supportedPrisonsService,
       hmppsAuthClient,
     )
     hmppsAuthClient.getSystemClientToken.mockResolvedValue(token)
@@ -66,45 +63,24 @@ describe('Prisoner profile service', () => {
       supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
     })
 
-    it('Retrieves and processes data for prisoner profile with visit balances', async () => {
-      const fullPrisoner = TestData.prisonerProfile()
+    it('should retrieve and process data for prisoner profile (with visit balances)', async () => {
+      const prisonerProfile = TestData.prisonerProfile()
+      orchestrationApiClient.getPrisonerProfile.mockResolvedValue(prisonerProfile)
 
-      orchestrationApiClient.getPrisonerProfile.mockResolvedValue(fullPrisoner)
+      const contacts = [TestData.contact(), TestData.contact({ personId: 4322, firstName: 'Bob' })]
+      prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue(contacts)
 
       const results = await prisonerProfileService.getProfile(prisonId, prisonerId, 'user')
 
       expect(OrchestrationApiClientFactory).toHaveBeenCalledWith(token)
       expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user')
       expect(orchestrationApiClient.getPrisonerProfile).toHaveBeenCalledTimes(1)
-      expect(supportedPrisonsService.getSupportedPrisons).toHaveBeenCalledTimes(1)
 
       expect(results).toEqual(<PrisonerProfilePage>{
         activeAlerts: [],
         activeAlertCount: 0,
         flaggedAlerts: [],
-        visits: [
-          [
-            {
-              html: "<a href='/visit/ab-cd-ef-gh'>ab-cd-ef-gh</a>",
-              attributes: {
-                'data-test': 'tab-visits-reference',
-              },
-            },
-            {
-              html: '<span>Social<br>(Open)</span>',
-              attributes: {
-                'data-test': 'tab-visits-type',
-              },
-            },
-            { text: 'Hewell (HMP)', attributes: { 'data-test': 'tab-visits-location' } },
-            {
-              html: '<p>17 August 2022<br>10:00am - 11:00am</p>',
-              attributes: { 'data-test': 'tab-visits-date-and-time' },
-            },
-            { html: '<p>Mary Smith</p>', attributes: { 'data-test': 'tab-visits-visitors' } },
-            { text: 'Booked', attributes: { 'data-test': 'tab-visits-status' } },
-          ],
-        ],
+        visitsByMonth: new Map(),
         prisonerDetails: {
           offenderNo: 'A1234BC',
           name: 'Smith, John',
@@ -121,27 +97,28 @@ describe('Prisoner profile service', () => {
             latestPrivIepAdjustDate: '1 December 2021',
           },
         },
+        contactNames: { 4321: 'Jeanette Smith', 4322: 'Bob Smith' },
       })
     })
+
     // Skipped - previously used endpoints were skipped if prisoner was on remand, this logic may wish be to included in the new endpoint
-    it.skip('Does not return visit balances for those on REMAND', async () => {
-      const fullPrisoner = TestData.prisonerProfile({
+    it.skip('should not return visit balances for those on REMAND', async () => {
+      const prisonerProfile = TestData.prisonerProfile({
         convictedStatus: 'Remand',
       })
 
-      orchestrationApiClient.getPrisonerProfile.mockResolvedValue(fullPrisoner)
+      orchestrationApiClient.getPrisonerProfile.mockResolvedValue(prisonerProfile)
 
       const results = await prisonerProfileService.getProfile(prisonId, prisonerId, 'user')
 
       expect(OrchestrationApiClientFactory).toHaveBeenCalledWith(token)
       expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user')
       expect(orchestrationApiClient.getPrisonerProfile).toHaveBeenCalledTimes(1)
-      expect(supportedPrisonsService.getSupportedPrisons).toHaveBeenCalledTimes(1)
       expect(results).toEqual(<PrisonerProfilePage>{
         activeAlerts: [],
         activeAlertCount: 0,
         flaggedAlerts: [],
-        visits: [],
+        visitsByMonth: new Map(),
         prisonerDetails: {
           offenderNo: 'A1234BC',
           name: 'Smith, John',
@@ -154,6 +131,34 @@ describe('Prisoner profile service', () => {
           visitBalances: {},
         },
       })
+    })
+
+    it('should group upcoming and past visits by month, with totals for BOOKED only', async () => {
+      const today = new Date()
+      const nextMonth = new Date(addMonths(today, 1))
+      const previousMonth = new Date(subMonths(today, 1))
+      const nextMonthKey = format(nextMonth, 'MMMM yyyy')
+      const previousMonthKey = format(previousMonth, 'MMMM yyyy')
+
+      const visit1 = TestData.visit({ startTimestamp: nextMonth.toISOString() })
+      const visit2 = TestData.visit({ startTimestamp: previousMonth.toISOString() })
+      const visit3 = TestData.visit({ visitStatus: 'CANCELLED', startTimestamp: previousMonth.toISOString() })
+
+      const prisonerProfile = TestData.prisonerProfile({
+        visits: [visit1, visit2, visit3],
+      })
+
+      orchestrationApiClient.getPrisonerProfile.mockResolvedValue(prisonerProfile)
+      prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue([])
+
+      const results = await prisonerProfileService.getProfile(prisonId, prisonerId, 'user')
+
+      expect(results.visitsByMonth).toEqual(
+        new Map([
+          [nextMonthKey, { upcomingCount: 1, pastCount: 0, visits: [visit1] }],
+          [previousMonthKey, { upcomingCount: 0, pastCount: 1, visits: [visit2, visit3] }],
+        ]),
+      )
     })
 
     it('Filters active alerts that should be flagged', async () => {
@@ -348,58 +353,24 @@ describe('Prisoner profile service', () => {
         ],
       ]
 
-      const fullPrisoner = TestData.prisonerProfile({
+      const prisonerProfile = TestData.prisonerProfile({
         alerts: [inactiveAlert, nonRelevantAlert, ...alertsToFlag],
-        visits: [],
       })
 
-      fullPrisoner.alerts = [inactiveAlert, nonRelevantAlert, ...alertsToFlag]
+      prisonerProfile.alerts = [inactiveAlert, nonRelevantAlert, ...alertsToFlag]
 
-      orchestrationApiClient.getPrisonerProfile.mockResolvedValue(fullPrisoner)
+      orchestrationApiClient.getPrisonerProfile.mockResolvedValue(prisonerProfile)
+      prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue([])
 
       const results = await prisonerProfileService.getProfile(prisonId, prisonerId, 'user')
 
       expect(OrchestrationApiClientFactory).toHaveBeenCalledWith(token)
       expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user')
       expect(orchestrationApiClient.getPrisonerProfile).toHaveBeenCalledTimes(1)
-      expect(supportedPrisonsService.getSupportedPrisons).toHaveBeenCalledTimes(1)
 
-      expect(results).toEqual(<PrisonerProfilePage>{
-        activeAlerts: alertsForDisplay,
-        activeAlertCount: 4,
-        flaggedAlerts: alertsToFlag,
-        visits: [],
-        prisonerDetails: {
-          offenderNo: 'A1234BC',
-          name: 'Smith, John',
-          dob: '2 April 1975',
-          convictedStatus: 'Convicted',
-          category: 'Cat C',
-          location: '1-1-C-028',
-          prisonName: 'Hewell (HMP)',
-          incentiveLevel: 'Standard',
-          visitBalances: {
-            remainingVo: 1,
-            remainingPvo: 2,
-            latestIepAdjustDate: '21 April 2021',
-            latestPrivIepAdjustDate: '1 December 2021',
-          },
-        },
-      })
-    })
-
-    it.skip('Throws 404 if no bookings found for criteria', async () => {
-      // e.g. offenderNo doesn't exist - or not at specified prisonId
-      const bookings = <PagePrisonerBookingSummary>{
-        content: [],
-        numberOfElements: 0,
-      }
-
-      prisonApiClient.getBookings.mockResolvedValue(bookings)
-
-      await expect(async () => {
-        await prisonerProfileService.getProfile(prisonerId, prisonId, 'user')
-      }).rejects.toBeInstanceOf(NotFound)
+      expect(results.activeAlerts).toStrictEqual(alertsForDisplay)
+      expect(results.activeAlertCount).toBe(4)
+      expect(results.flaggedAlerts).toStrictEqual(alertsToFlag)
     })
   })
 

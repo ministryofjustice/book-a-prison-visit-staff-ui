@@ -49,84 +49,6 @@ export type PrisonerAlertItem = [
   },
 ]
 
-export type UpcomingVisitItem = [
-  {
-    html: string
-    attributes?: {
-      'data-test': string
-    }
-  },
-  {
-    html: string
-    attributes?: {
-      'data-test': string
-    }
-  },
-  {
-    text: string
-    attributes?: {
-      'data-test': string
-    }
-  },
-  {
-    html: string
-    attributes?: {
-      'data-test': string
-    }
-  },
-  {
-    html: string
-    attributes?: {
-      'data-test': string
-    }
-  },
-  {
-    text: string
-    attributes?: {
-      'data-test': string
-    }
-  },
-]
-
-export type PastVisitItem = [
-  {
-    html: string
-    attributes?: {
-      'data-test': string
-    }
-  },
-  {
-    html: string
-    attributes?: {
-      'data-test': string
-    }
-  },
-  {
-    text: string
-    attributes?: {
-      'data-test': string
-    }
-  },
-  {
-    html: string
-    attributes?: {
-      'data-test': string
-    }
-  },
-  {
-    html: string
-    attributes?: {
-      'data-test': string
-    }
-  },
-  {
-    text: string
-    attributes?: {
-      'data-test': string
-    }
-  },
-]
-
 export type VisitorListItem = {
   personId: number
   name: string
@@ -142,8 +64,9 @@ export type PrisonerProfilePage = {
   activeAlerts: PrisonerAlertItem[]
   activeAlertCount: number
   flaggedAlerts: Alert[]
-  visits: VisitItem[]
+  visitsByMonth: Map<string, { upcomingCount: number; pastCount: number; visits: Visit[] }>
   prisonerDetails: PrisonerDetails
+  contactNames: Record<number, string>
 }
 
 export type BAPVVisitBalances = VisitBalances & {
@@ -254,42 +177,3 @@ export type PrisonerDetails = {
   incentiveLevel: string
   visitBalances: VisitBalances
 }
-
-export type VisitItem = [
-  {
-    html: string
-    attributes?: {
-      'data-test': string
-    }
-  },
-  {
-    html: string
-    attributes?: {
-      'data-test': string
-    }
-  },
-  {
-    text: string
-    attributes?: {
-      'data-test': string
-    }
-  },
-  {
-    html: string
-    attributes?: {
-      'data-test': string
-    }
-  },
-  {
-    html: string
-    attributes?: {
-      'data-test': string
-    }
-  },
-  {
-    text: string
-    attributes?: {
-      'data-test': string
-    }
-  },
-]

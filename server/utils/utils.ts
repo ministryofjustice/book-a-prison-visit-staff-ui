@@ -117,19 +117,6 @@ const properCaseName = (name: string): string => (isBlank(name) ? '' : name.spli
 export const convertToTitleCase = (sentence: string): string =>
   isBlank(sentence) ? '' : sentence.split(' ').map(properCaseName).join(' ')
 
-export const visitDateAndTime = ({
-  startTimestamp,
-  endTimestamp,
-}: {
-  startTimestamp: string
-  endTimestamp: string
-}): string => {
-  const startTime = format(parseISO(startTimestamp), 'h:mmaaa')
-  const endTime = endTimestamp ? ` - ${format(parseISO(endTimestamp), 'h:mmaaa')}` : ''
-
-  return `${prisonerDateTimePretty(startTimestamp)}<br>${startTime}${endTime}`
-}
-
 export const nextIepAdjustDate = (latestIepAdjustDate: string): string => {
   return format(addDays(parseISO(latestIepAdjustDate), 14), 'd MMMM yyyy')
 }
@@ -183,27 +170,4 @@ export const getWeekOfDatesStartingMonday = (
   const nextWeek = format(addWeeks(weekStartDate, 1), dateFormat)
 
   return { weekOfDates, previousWeek, nextWeek }
-}
-
-export const longPrisonerDateTimePretty = (dateToFormat: string): string => {
-  return format(new Date(dateToFormat), 'EEEE d MMMM yyyy')
-}
-export const longVisitDateAndTime = ({
-  startTimestamp,
-  endTimestamp,
-}: {
-  startTimestamp: string
-  endTimestamp: string
-}): string => {
-  const startTime =
-    format(parseISO(startTimestamp), 'mm') === '00'
-      ? format(parseISO(startTimestamp), 'haaa')
-      : format(parseISO(startTimestamp), 'h:mmaaa')
-
-  const endTime =
-    format(parseISO(endTimestamp), 'mm') === '00'
-      ? format(parseISO(endTimestamp), 'haaa')
-      : format(parseISO(endTimestamp), 'h:mmaaa')
-
-  return `${longPrisonerDateTimePretty(startTimestamp)}<br>${startTime} - ${endTime}`
 }

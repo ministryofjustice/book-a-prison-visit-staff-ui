@@ -55,6 +55,8 @@ export default class PrisonerProfilePage extends Page {
 
   alertsTabExpires = (): PageElement => cy.get('[data-test="tab-alerts-expires"]')
 
+  visitTabCaption = (index: number): PageElement => cy.get(`#visits caption:nth-of-type(${index})`)
+
   visitTabReference = (): PageElement => cy.get('[data-test="tab-visits-reference"]')
 
   visitTabType = (): PageElement => cy.get('[data-test="tab-visits-type"]')

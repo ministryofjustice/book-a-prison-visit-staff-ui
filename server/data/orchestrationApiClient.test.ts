@@ -39,17 +39,17 @@ describe('orchestrationApiClient', () => {
 
   describe('getPrisonerProfile', () => {
     it('should return prisoner profile page for selected prisoner', async () => {
-      const fullPrisoner = TestData.prisonerProfile()
+      const prisonerProfile = TestData.prisonerProfile()
       const prisonId = 'HEI'
 
       fakeOrchestrationApi
-        .get(`/prisoner/${prisonId}/${fullPrisoner.prisonerId}/profile`)
+        .get(`/prisoner/${prisonId}/${prisonerProfile.prisonerId}/profile`)
         .matchHeader('authorization', `Bearer ${token}`)
-        .reply(200, fullPrisoner)
+        .reply(200, prisonerProfile)
 
-      const output = await orchestrationApiClient.getPrisonerProfile(prisonId, fullPrisoner.prisonerId)
+      const output = await orchestrationApiClient.getPrisonerProfile(prisonId, prisonerProfile.prisonerId)
 
-      expect(output).toEqual(fullPrisoner)
+      expect(output).toEqual(prisonerProfile)
     })
   })
 })

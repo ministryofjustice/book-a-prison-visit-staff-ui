@@ -1,18 +1,14 @@
 import { NotFound } from 'http-errors'
-import { PrisonerAlertItem, PrisonerDetails, VisitItem, PrisonerProfilePage } from '../@types/bapv'
-import { prisonerDatePretty, properCaseFullName, properCase, visitDateAndTime } from '../utils/utils'
+import { format, isBefore } from 'date-fns'
+import { PrisonerAlertItem, PrisonerDetails, PrisonerProfilePage } from '../@types/bapv'
+import { prisonerDatePretty, properCaseFullName } from '../utils/utils'
 import { Alert, InmateDetail, OffenderRestriction, VisitBalances } from '../data/prisonApiTypes'
-import { Visitor } from '../data/orchestrationApiTypes'
-import { Contact } from '../data/prisonerContactRegistryApiTypes'
-import SupportedPrisonsService from './supportedPrisonsService'
 import {
   HmppsAuthClient,
   OrchestrationApiClient,
   PrisonApiClient,
   PrisonerContactRegistryApiClient,
-  PrisonerSearchClient,
   RestClientBuilder,
-  VisitSchedulerApiClient,
 } from '../data'
 
 export default class PrisonerProfileService {
@@ -21,19 +17,24 @@ export default class PrisonerProfileService {
   constructor(
     private readonly orchestrationApiClientFactory: RestClientBuilder<OrchestrationApiClient>,
     private readonly prisonApiClientFactory: RestClientBuilder<PrisonApiClient>,
-    private readonly visitSchedulerApiClientFactory: RestClientBuilder<VisitSchedulerApiClient>,
     private readonly prisonerContactRegistryApiClientFactory: RestClientBuilder<PrisonerContactRegistryApiClient>,
-    private readonly prisonerSearchClientFactory: RestClientBuilder<PrisonerSearchClient>,
-    private readonly supportedPrisonsService: SupportedPrisonsService,
     private readonly hmppsAuthClient: HmppsAuthClient,
   ) {}
 
   async getProfile(prisonId: string, prisonerId: string, username: string): Promise<PrisonerProfilePage> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
-    const fullPrisoner = await orchestrationApiClient.getPrisonerProfile(prisonId, prisonerId)
+    const prisonerProfile = await orchestrationApiClient.getPrisonerProfile(prisonId, prisonerId)
 
-    const alerts = fullPrisoner.alerts || []
+    // To remove when VB-2060 done - build list of contact IDs => contact name
+    const prisonerContactRegistryApiClient = this.prisonerContactRegistryApiClientFactory(token)
+    const socialContacts = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(prisonerId)
+    const contactNames: Record<number, string> = {}
+    socialContacts.forEach(contact => {
+      contactNames[contact.personId] = `${contact.firstName} ${contact.lastName}`
+    })
+
+    const alerts = prisonerProfile.alerts || []
     const activeAlerts: Alert[] = alerts.filter(alert => alert.active)
     const activeAlertCount = activeAlerts.length
     const flaggedAlerts: Alert[] = activeAlerts.filter(alert => this.alertCodesToFlag.includes(alert.alertCode))
@@ -77,64 +78,39 @@ export default class PrisonerProfileService {
       ]
     })
 
-    const supportedPrisons = await this.supportedPrisonsService.getSupportedPrisons(username)
+    const visitsByMonth: PrisonerProfilePage['visitsByMonth'] = new Map()
+    const now = new Date()
 
-    const visitsForDisplay: VisitItem[] = fullPrisoner.visits.map(visit => {
-      return [
-        {
-          html: `<a href='/visit/${visit.reference}'>${visit.reference}</a>`,
-          attributes: {
-            'data-test': 'tab-visits-reference',
-          },
-        },
-        {
-          html: `<span>${properCase(visit.visitType)}<br>(${properCase(visit.visitRestriction)})</span>`,
-          attributes: {
-            'data-test': 'tab-visits-type',
-          },
-        },
-        {
-          text: supportedPrisons[visit.prisonId],
-          attributes: {
-            'data-test': 'tab-visits-location',
-          },
-        },
-        {
-          html: visit.startTimestamp
-            ? `<p>${visitDateAndTime({
-                startTimestamp: visit.startTimestamp,
-                endTimestamp: visit.endTimestamp,
-              })}</p>`
-            : '<p>N/A</p>',
-          attributes: {
-            'data-test': 'tab-visits-date-and-time',
-          },
-        },
-        {
-          html: `<p>${visit.visitContact.name}</p>`,
-          attributes: {
-            'data-test': 'tab-visits-visitors',
-          },
-        },
-        {
-          text: `${properCase(visit.visitStatus)}`,
-          attributes: {
-            'data-test': 'tab-visits-status',
-          },
-        },
-      ] as VisitItem
+    prisonerProfile.visits.forEach(visit => {
+      const visitStartTime = new Date(visit.startTimestamp)
+      const visitMonth = format(visitStartTime, 'MMMM yyyy') // e.g. 'May 2023'
+
+      if (!visitsByMonth.has(visitMonth)) {
+        visitsByMonth.set(visitMonth, { upcomingCount: 0, pastCount: 0, visits: [] })
+      }
+      const month = visitsByMonth.get(visitMonth)
+
+      if (visit.visitStatus === 'BOOKED') {
+        const isUpcoming = isBefore(now, visitStartTime)
+        if (isUpcoming) {
+          month.upcomingCount += 1
+        } else {
+          month.pastCount += 1
+        }
+      }
+      month.visits.push(visit)
     })
 
     const prisonerDetails: PrisonerDetails = {
-      offenderNo: fullPrisoner.prisonerId,
-      name: properCaseFullName(`${fullPrisoner.lastName}, ${fullPrisoner.firstName}`),
-      dob: prisonerDatePretty({ dateToFormat: fullPrisoner.dateOfBirth }),
-      convictedStatus: fullPrisoner.convictedStatus,
-      category: fullPrisoner.category,
-      location: fullPrisoner.cellLocation,
-      prisonName: fullPrisoner.prisonName,
-      incentiveLevel: fullPrisoner.incentiveLevel,
-      visitBalances: fullPrisoner.visitBalances,
+      offenderNo: prisonerProfile.prisonerId,
+      name: properCaseFullName(`${prisonerProfile.lastName}, ${prisonerProfile.firstName}`),
+      dob: prisonerDatePretty({ dateToFormat: prisonerProfile.dateOfBirth }),
+      convictedStatus: prisonerProfile.convictedStatus,
+      category: prisonerProfile.category,
+      location: prisonerProfile.cellLocation,
+      prisonName: prisonerProfile.prisonName,
+      incentiveLevel: prisonerProfile.incentiveLevel,
+      visitBalances: prisonerProfile.visitBalances,
     }
 
     if (prisonerDetails.visitBalances?.latestIepAdjustDate) {
@@ -153,8 +129,9 @@ export default class PrisonerProfileService {
       activeAlerts: activeAlertsForDisplay,
       activeAlertCount,
       flaggedAlerts,
-      visits: visitsForDisplay,
+      visitsByMonth,
       prisonerDetails,
+      contactNames,
     }
   }
 
@@ -189,23 +166,5 @@ export default class PrisonerProfileService {
     const { offenderRestrictions } = restrictions
 
     return offenderRestrictions
-  }
-
-  private getPrisonerSocialContacts(contacts: Contact[], visitors: Visitor[]): string[] {
-    const contactIds: number[] = visitors.reduce((personIds, visitor) => {
-      personIds.push(visitor.nomisPersonId)
-
-      return personIds
-    }, [])
-
-    const contactsForDisplay: string[] = contacts.reduce((contactNames, contact) => {
-      if (contactIds.includes(contact.personId)) {
-        contactNames.push(`${contact.firstName} ${contact.lastName}`)
-      }
-
-      return contactNames
-    }, [])
-
-    return contactsForDisplay
   }
 }
