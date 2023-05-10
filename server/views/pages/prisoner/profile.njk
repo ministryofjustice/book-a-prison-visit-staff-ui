@@ -120,6 +120,7 @@
 
         {% for month, data in visitsByMonth %}
 
+          {# Build month headings with visit counts - e.g. "January 2022 (1 upcoming visit, 1 past visit)" #}
           {% set upcomingCount %}{{ data.upcomingCount }} upcoming {{ "visit" | pluralise(data.upcomingCount) }}{% endset %}
           {% set pastCount %}{{ data.pastCount }} past {{ "visit" | pluralise(data.pastCount) }}{% endset %}
           {% set visitTotals %}
@@ -128,6 +129,7 @@
             {{- pastCount if data.pastCount -}}
           {% endset %}
 
+          {# Build rows for this month's visits table #}
           {% set visits = [] %}
           {% for visit in data.visits %}
 

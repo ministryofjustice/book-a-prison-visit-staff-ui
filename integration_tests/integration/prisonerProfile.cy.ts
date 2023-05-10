@@ -89,7 +89,7 @@ context('Prisoner profile page', () => {
 
     // Visits tab
     prisonerProfilePage.selectVisitsTab()
-    prisonerProfilePage.visitTabCaption().contains('January 2022 (1 past visit)')
+    prisonerProfilePage.visitTabCaption(1).contains('January 2022 (1 past visit)')
     prisonerProfilePage
       .visitTabReference()
       .eq(0)

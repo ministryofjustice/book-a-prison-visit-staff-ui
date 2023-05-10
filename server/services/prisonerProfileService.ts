@@ -24,7 +24,7 @@ export default class PrisonerProfileService {
   async getProfile(prisonId: string, prisonerId: string, username: string): Promise<PrisonerProfilePage> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
-    const fullPrisoner = await orchestrationApiClient.getPrisonerProfile(prisonId, prisonerId)
+    const prisonerProfile = await orchestrationApiClient.getPrisonerProfile(prisonId, prisonerId)
 
     // To remove when VB-2060 done - build list of contact IDs => contact name
     const prisonerContactRegistryApiClient = this.prisonerContactRegistryApiClientFactory(token)
@@ -34,7 +34,7 @@ export default class PrisonerProfileService {
       contactNames[contact.personId] = `${contact.firstName} ${contact.lastName}`
     })
 
-    const alerts = fullPrisoner.alerts || []
+    const alerts = prisonerProfile.alerts || []
     const activeAlerts: Alert[] = alerts.filter(alert => alert.active)
     const activeAlertCount = activeAlerts.length
     const flaggedAlerts: Alert[] = activeAlerts.filter(alert => this.alertCodesToFlag.includes(alert.alertCode))
@@ -81,7 +81,7 @@ export default class PrisonerProfileService {
     const visitsByMonth: PrisonerProfilePage['visitsByMonth'] = new Map()
     const now = new Date()
 
-    fullPrisoner.visits.forEach(visit => {
+    prisonerProfile.visits.forEach(visit => {
       const visitStartTime = new Date(visit.startTimestamp)
       const visitMonth = format(visitStartTime, 'MMMM yyyy') // e.g. 'May 2023'
 
@@ -102,15 +102,15 @@ export default class PrisonerProfileService {
     })
 
     const prisonerDetails: PrisonerDetails = {
-      offenderNo: fullPrisoner.prisonerId,
-      name: properCaseFullName(`${fullPrisoner.lastName}, ${fullPrisoner.firstName}`),
-      dob: prisonerDatePretty({ dateToFormat: fullPrisoner.dateOfBirth }),
-      convictedStatus: fullPrisoner.convictedStatus,
-      category: fullPrisoner.category,
-      location: fullPrisoner.cellLocation,
-      prisonName: fullPrisoner.prisonName,
-      incentiveLevel: fullPrisoner.incentiveLevel,
-      visitBalances: fullPrisoner.visitBalances,
+      offenderNo: prisonerProfile.prisonerId,
+      name: properCaseFullName(`${prisonerProfile.lastName}, ${prisonerProfile.firstName}`),
+      dob: prisonerDatePretty({ dateToFormat: prisonerProfile.dateOfBirth }),
+      convictedStatus: prisonerProfile.convictedStatus,
+      category: prisonerProfile.category,
+      location: prisonerProfile.cellLocation,
+      prisonName: prisonerProfile.prisonName,
+      incentiveLevel: prisonerProfile.incentiveLevel,
+      visitBalances: prisonerProfile.visitBalances,
     }
 
     if (prisonerDetails.visitBalances?.latestIepAdjustDate) {
