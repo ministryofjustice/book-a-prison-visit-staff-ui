@@ -133,7 +133,7 @@
 
             {% set visitors = [] %}
             {% for visitor in visit.visitors %}
-              {% set visitors = (visitors.push([visitor.nomisPersonId]), visitors) %}
+              {% set visitors = (visitors.push(contactNames[visitor.nomisPersonId]), visitors) %}
             {% endfor %}
 
             {% set visits = (visits.push([
@@ -155,7 +155,7 @@
                 attributes: { "data-test": "tab-visits-date-and-time" }
               },
               {
-                text: visitors,
+                html: visitors | join('<br>'),
                 attributes: { "data-test": "tab-visits-visitors" }
               },
               {

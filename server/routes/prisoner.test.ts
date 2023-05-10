@@ -100,6 +100,7 @@ describe('GET /prisoner/A1234BC', () => {
           latestPrivIepAdjustDate: '1 December 2021',
         },
       },
+      contactNames: {},
     }
 
     prisonerProfileService.getProfile.mockResolvedValue(prisonerProfile)
@@ -341,6 +342,7 @@ describe('POST /prisoner/A1234BC', () => {
           latestPrivIepAdjustDate: '1 December 2021',
         },
       },
+      contactNames: {},
     }
 
     prisonerProfileService.getProfile.mockResolvedValue(prisonerProfile)

@@ -46,6 +46,7 @@ describe('Prisoner profile service', () => {
     prisonerProfileService = new PrisonerProfileService(
       OrchestrationApiClientFactory,
       PrisonApiClientFactory,
+      PrisonerContactRegistryApiClientFactory,
       hmppsAuthClient,
     )
     hmppsAuthClient.getSystemClientToken.mockResolvedValue(token)
@@ -64,8 +65,10 @@ describe('Prisoner profile service', () => {
 
     it('should retrieve and process data for prisoner profile (with visit balances)', async () => {
       const prisonerProfile = TestData.prisonerProfile()
-
       orchestrationApiClient.getPrisonerProfile.mockResolvedValue(prisonerProfile)
+
+      const contacts = [TestData.contact(), TestData.contact({ personId: 4322, firstName: 'Bob' })]
+      prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue(contacts)
 
       const results = await prisonerProfileService.getProfile(prisonId, prisonerId, 'user')
 
@@ -94,6 +97,7 @@ describe('Prisoner profile service', () => {
             latestPrivIepAdjustDate: '1 December 2021',
           },
         },
+        contactNames: { 4321: 'Jeanette Smith', 4322: 'Bob Smith' },
       })
     })
 
@@ -145,6 +149,8 @@ describe('Prisoner profile service', () => {
       })
 
       orchestrationApiClient.getPrisonerProfile.mockResolvedValue(prisonerProfile)
+      prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue([])
+
       const results = await prisonerProfileService.getProfile(prisonId, prisonerId, 'user')
 
       expect(results.visitsByMonth).toEqual(
@@ -354,6 +360,7 @@ describe('Prisoner profile service', () => {
       prisonerProfile.alerts = [inactiveAlert, nonRelevantAlert, ...alertsToFlag]
 
       orchestrationApiClient.getPrisonerProfile.mockResolvedValue(prisonerProfile)
+      prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue([])
 
       const results = await prisonerProfileService.getProfile(prisonId, prisonerId, 'user')
 

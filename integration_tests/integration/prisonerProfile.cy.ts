@@ -41,11 +41,14 @@ context('Prisoner profile page', () => {
       },
     ]
     const visit = TestData.visit()
+    const contacts = [TestData.contact(), TestData.contact({ personId: 4322, firstName: 'Bob' })]
     const profile = TestData.prisonerProfile({ alerts, visits: [visit] })
 
     const { prisonerId } = profile
     const prisonId = 'HEI'
+
     // Prisoner profile page
+    cy.task('stubPrisonerSocialContacts', { offenderNo: prisonerId, contacts })
     cy.task('stubPrisonerProfile', { prisonId, prisonerId, profile })
 
     // Go to prisoner profile page
@@ -84,7 +87,7 @@ context('Prisoner profile page', () => {
       .contains(format(new Date('01-02-2022'), prettyDateFormat))
     prisonerProfilePage.alertsTabExpires().eq(0).contains('Not entered')
 
-    // Visits history tab
+    // Visits tab
     prisonerProfilePage.selectVisitsTab()
     prisonerProfilePage.visitTabCaption().contains('January 2022 (1 past visit)')
     prisonerProfilePage
@@ -99,7 +102,13 @@ context('Prisoner profile page', () => {
       .eq(0)
       .contains(format(new Date(profile.visits[0].startTimestamp), prettyDateFormat))
       .contains('10am - 11am')
-    prisonerProfilePage.visitTabVisitors().eq(0).contains('Jeanette Smith')
+    prisonerProfilePage
+      .visitTabVisitors()
+      .eq(0)
+      .within(() => {
+        cy.contains('Jeanette Smith')
+        cy.contains('Bob Smith')
+      })
     prisonerProfilePage.visitTabVisitStatus().eq(0).contains('Booked')
   })
 })

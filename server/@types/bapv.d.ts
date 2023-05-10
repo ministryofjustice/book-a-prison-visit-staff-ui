@@ -66,6 +66,7 @@ export type PrisonerProfilePage = {
   flaggedAlerts: Alert[]
   visitsByMonth: Map<string, { upcomingCount: number; pastCount: number; visits: Visit[] }>
   prisonerDetails: PrisonerDetails
+  contactNames: Record<number, string>
 }
 
 export type BAPVVisitBalances = VisitBalances & {
