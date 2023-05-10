@@ -171,6 +171,20 @@ describe('GET /prisoner/A1234BC', () => {
       })
   })
 
+  it('should display message in the Visits tab when there are no upcoming or past visits', () => {
+    return request(app)
+      .get('/prisoner/A1234BC')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('h1').text().trim()).toBe('Smith, John')
+        expect($('#visits').text()).toContain(
+          'There are no upcoming visits or visits within the last 3 months for this prisoner.',
+        )
+      })
+  })
+
   it('should render the prisoner profile page for offender number A1234BC without active alerts if there are none', () => {
     prisonerProfile.flaggedAlerts = []
     prisonerProfile.activeAlerts = []
