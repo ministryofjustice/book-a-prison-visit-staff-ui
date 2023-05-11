@@ -107,19 +107,6 @@ export default class PrisonerProfileService {
       month.visits.push(visit)
     })
 
-    const { visitBalances }: { visitBalances?: PrisonerProfilePage['prisonerDetails']['visitBalances'] } =
-      prisonerProfile
-    if (visitBalances) {
-      if (visitBalances.latestIepAdjustDate) {
-        visitBalances.nextIepAdjustDate = nextIepAdjustDate(visitBalances.latestIepAdjustDate)
-        visitBalances.latestIepAdjustDate = prisonerDateTimePretty(visitBalances.latestIepAdjustDate)
-      }
-      if (visitBalances.latestPrivIepAdjustDate) {
-        visitBalances.nextPrivIepAdjustDate = nextPrivIepAdjustDate(visitBalances.latestPrivIepAdjustDate)
-        visitBalances.latestPrivIepAdjustDate = prisonerDateTimePretty(visitBalances.latestPrivIepAdjustDate)
-      }
-    }
-
     const prisonerDetails: PrisonerProfilePage['prisonerDetails'] = {
       prisonerId,
       name: properCaseFullName(`${prisonerProfile.lastName}, ${prisonerProfile.firstName}`),
@@ -129,7 +116,19 @@ export default class PrisonerProfileService {
       convictedStatus: prisonerProfile.convictedStatus,
       category: prisonerProfile.category,
       incentiveLevel: prisonerProfile.incentiveLevel,
-      visitBalances,
+      visitBalances: prisonerProfile.convictedStatus === 'Convicted' ? prisonerProfile.visitBalances : null,
+    }
+
+    const { visitBalances } = prisonerDetails
+    if (visitBalances) {
+      if (visitBalances.latestIepAdjustDate) {
+        visitBalances.nextIepAdjustDate = nextIepAdjustDate(visitBalances.latestIepAdjustDate)
+        visitBalances.latestIepAdjustDate = prisonerDateTimePretty(visitBalances.latestIepAdjustDate)
+      }
+      if (visitBalances.latestPrivIepAdjustDate) {
+        visitBalances.nextPrivIepAdjustDate = nextPrivIepAdjustDate(visitBalances.latestPrivIepAdjustDate)
+        visitBalances.latestPrivIepAdjustDate = prisonerDateTimePretty(visitBalances.latestPrivIepAdjustDate)
+      }
     }
 
     return {

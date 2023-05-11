@@ -130,6 +130,7 @@ describe('GET /prisoner/A1234BC', () => {
         expect($('[data-test="remaining-vos"]').text()).toBe('1')
         expect($('[data-test="remaining-pvos"]').text()).toBe('0')
 
+        expect($('#visiting-orders').length).toBe(1)
         expect($('[data-test="tab-vo-remaining"]').text()).toBe('1')
         expect($('[data-test="tab-vo-last-date"]').text()).toBe('21 April 2021')
         expect($('[data-test="tab-vo-next-date"]').text()).toBe('5 May 2021')
@@ -211,10 +212,10 @@ describe('GET /prisoner/A1234BC', () => {
         })
       })
   })
-  // Skipped as currently not got logic incorportated to skip requesting VO's for remand
-  it.skip('should render prisoner profile page without visiting orders for REMAND', () => {
+
+  it('should render prisoner profile page without visiting orders for REMAND', () => {
     prisonerProfile.prisonerDetails.convictedStatus = 'Remand'
-    prisonerProfile.prisonerDetails.visitBalances = undefined
+    prisonerProfile.prisonerDetails.visitBalances = null
 
     return request(app)
       .get('/prisoner/A1234BC')
@@ -226,15 +227,7 @@ describe('GET /prisoner/A1234BC', () => {
         expect($('[data-test="convicted-status"]').text()).toBe('Remand')
         expect($('[data-test="remaining-vos"]').length).toBe(0)
         expect($('[data-test="remaining-pvos"]').length).toBe(0)
-        expect($('#vo-override').length).toBe(0)
-        expect($('[data-test="book-a-visit"]').length).toBe(1)
-        expect(auditService.viewPrisoner).toHaveBeenCalledTimes(1)
-        expect(auditService.viewPrisoner).toHaveBeenCalledWith({
-          prisonerId: 'A1234BC',
-          prisonId,
-          username: 'user1',
-          operationId: undefined,
-        })
+        expect($('#visiting-orders').length).toBe(0)
       })
   })
 

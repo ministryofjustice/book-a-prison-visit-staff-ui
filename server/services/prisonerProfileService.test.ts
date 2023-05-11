@@ -63,7 +63,7 @@ describe('Prisoner profile service', () => {
       supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
     })
 
-    it('should retrieve and process data for prisoner profile (with visit balances)', async () => {
+    it('should retrieve and process data for prisoner profile', async () => {
       const prisonerProfile = TestData.prisonerProfile()
       orchestrationApiClient.getPrisonerProfile.mockResolvedValue(prisonerProfile)
 
@@ -103,36 +103,19 @@ describe('Prisoner profile service', () => {
       })
     })
 
-    // Skipped - previously used endpoints were skipped if prisoner was on remand, this logic may wish be to included in the new endpoint
-    it.skip('should not return visit balances for those on REMAND', async () => {
-      const prisonerProfile = TestData.prisonerProfile({
-        convictedStatus: 'Remand',
-      })
-
+    it('should return visit balances as null if prisoner is on REMAND', async () => {
+      const prisonerProfile = TestData.prisonerProfile({ convictedStatus: 'Remand' })
       orchestrationApiClient.getPrisonerProfile.mockResolvedValue(prisonerProfile)
+
+      prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue([])
 
       const results = await prisonerProfileService.getProfile(prisonId, prisonerId, 'user')
 
       expect(OrchestrationApiClientFactory).toHaveBeenCalledWith(token)
       expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user')
       expect(orchestrationApiClient.getPrisonerProfile).toHaveBeenCalledTimes(1)
-      expect(results).toEqual(<PrisonerProfilePage>{
-        activeAlerts: [],
-        activeAlertCount: 0,
-        flaggedAlerts: [],
-        visitsByMonth: new Map(),
-        prisonerDetails: {
-          prisonerId: 'A1234BC',
-          name: 'Smith, John',
-          dateOfBirth: '2 April 1975',
-          cellLocation: '1-1-C-028',
-          prisonName: 'Hewell (HMP)',
-          convictedStatus: 'Convicted',
-          category: 'Cat C',
-          incentiveLevel: 'Standard',
-          visitBalances: {},
-        },
-      })
+
+      expect(results.prisonerDetails.visitBalances).toBeNull()
     })
 
     it('should group upcoming and past visits by month, with totals for BOOKED only', async () => {

@@ -66,14 +66,14 @@
           <span data-test="active-alert-count">{{ activeAlertCount }} active</span>
         </li>
         {% if prisonerDetails.visitBalances %}
-        <li>
-          <strong>VO balance</strong>
-          <span data-test="remaining-vos">{{ prisonerDetails.visitBalances.remainingVo }}</span>
-        </li>
-        <li>
-          <strong>PVO balance</strong>
-          <span data-test="remaining-pvos">{{ prisonerDetails.visitBalances.remainingPvo }}</span>
-        </li>
+          <li>
+            <strong>VO balance</strong>
+            <span data-test="remaining-vos">{{ prisonerDetails.visitBalances.remainingVo }}</span>
+          </li>
+          <li>
+            <strong>PVO balance</strong>
+            <span data-test="remaining-pvos">{{ prisonerDetails.visitBalances.remainingPvo }}</span>
+          </li>
         {% endif %}
       </ul>
 

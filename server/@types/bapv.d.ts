@@ -1,4 +1,4 @@
-import { OffenderRestriction, VisitBalances } from '../data/prisonApiTypes'
+import { OffenderRestriction } from '../data/prisonApiTypes'
 import { PrisonerProfile, Visit, VisitorSupport, VisitSession } from '../data/orchestrationApiTypes'
 
 export type Prison = {
