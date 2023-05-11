@@ -72,8 +72,8 @@ export default function routes({
     visitSessionData.prisoner = {
       name: prisonerDetails.name,
       offenderNo,
-      dateOfBirth: prisonerDetails.dob,
-      location: prisonerDetails.location ? `${prisonerDetails.location}, ${prisonerDetails.prisonName}` : '',
+      dateOfBirth: prisonerDetails.dateOfBirth,
+      location: prisonerDetails.cellLocation ? `${prisonerDetails.cellLocation}, ${prisonerDetails.prisonName}` : '',
     }
 
     req.session.visitSessionData = visitSessionData

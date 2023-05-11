@@ -1,6 +1,6 @@
 import { NotFound } from 'http-errors'
 import { format, isBefore } from 'date-fns'
-import { PrisonerAlertItem, PrisonerDetails, PrisonerProfilePage } from '../@types/bapv'
+import { PrisonerAlertItem, PrisonerProfilePage } from '../@types/bapv'
 import { prisonerDatePretty, properCaseFullName } from '../utils/utils'
 import { Alert, InmateDetail, OffenderRestriction, VisitBalances } from '../data/prisonApiTypes'
 import {
@@ -101,14 +101,14 @@ export default class PrisonerProfileService {
       month.visits.push(visit)
     })
 
-    const prisonerDetails: PrisonerDetails = {
-      offenderNo: prisonerProfile.prisonerId,
+    const prisonerDetails: PrisonerProfilePage['prisonerDetails'] = {
+      prisonerId,
       name: properCaseFullName(`${prisonerProfile.lastName}, ${prisonerProfile.firstName}`),
-      dob: prisonerDatePretty({ dateToFormat: prisonerProfile.dateOfBirth }),
+      dateOfBirth: prisonerDatePretty({ dateToFormat: prisonerProfile.dateOfBirth }),
+      cellLocation: prisonerProfile.cellLocation,
+      prisonName: prisonerProfile.prisonName,
       convictedStatus: prisonerProfile.convictedStatus,
       category: prisonerProfile.category,
-      location: prisonerProfile.cellLocation,
-      prisonName: prisonerProfile.prisonName,
       incentiveLevel: prisonerProfile.incentiveLevel,
       visitBalances: prisonerProfile.visitBalances,
     }
@@ -129,8 +129,8 @@ export default class PrisonerProfileService {
       activeAlerts: activeAlertsForDisplay,
       activeAlertCount,
       flaggedAlerts,
-      visitsByMonth,
       prisonerDetails,
+      visitsByMonth,
       contactNames,
     }
   }

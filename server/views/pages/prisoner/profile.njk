@@ -39,15 +39,15 @@
       <ul class="prisoner-profile-summary">
         <li>
           <strong>Prison number</strong>
-          <span data-test="prison-number">{{ prisonerDetails.offenderNo }}</span>
+          <span data-test="prison-number">{{ prisonerDetails.prisonerId }}</span>
         </li>
         <li>
           <strong>Date of birth</strong>
-          <span data-test="dob">{{ prisonerDetails.dob }}</span>
+          <span data-test="dob">{{ prisonerDetails.dateOfBirth }}</span>
         </li>
         <li>
           <strong>Location</strong>
-          <span data-test="location">{{ prisonerDetails.location }}, {{ prisonerDetails.prisonName }}</span>
+          <span data-test="location">{{ prisonerDetails.cellLocation }}, {{ prisonerDetails.prisonName }}</span>
         </li>
         <li>
           <strong>Category</strong>
@@ -77,7 +77,7 @@
         {% endif %}
       </ul>
 
-      <form action="/prisoner/{{ prisonerDetails.offenderNo }}" method="POST" novalidate>
+      <form action="/prisoner/{{ prisonerDetails.prisonerId }}" method="POST" novalidate>
         {% if prisonerDetails.visitBalances.remainingVo <= 0 and prisonerDetails.visitBalances.remainingPvo <= 0 %}
           {% set voOverrideCheckbox %}
             {{ govukCheckboxes({
@@ -202,7 +202,7 @@
       {{ govukButton({
         text: "View full visits history",
         classes: "govuk-!-margin-top-3 govuk-button--secondary",
-        href: dpsHome + "prisoner/" + prisonerDetails.offenderNo + '/visits-details',
+        href: dpsHome + "prisoner/" + prisonerDetails.prisonerId + '/visits-details',
         attributes: { "data-test": "view-dps-profile" },
         preventDoubleClick: true
       })}}
