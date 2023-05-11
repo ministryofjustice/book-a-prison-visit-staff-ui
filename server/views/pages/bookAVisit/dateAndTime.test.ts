@@ -30,7 +30,6 @@ describe('Views - Date and time of visit', () => {
 
   it('should display date and time picker for two months with morning and afternoon slots', () => {
     viewContext = {
-      accordionId: 'thisAccordion',
       prisonerName: 'John Smith',
       visitRestriction: 'OPEN',
       slotsList: <VisitSlotList>{
@@ -202,7 +201,6 @@ describe('Views - Date and time of visit', () => {
   describe('slot labelling', () => {
     beforeEach(() => {
       viewContext = {
-        accordionId: 'thisAccordion',
         prisonerName: 'John Smith',
         visitRestriction: 'OPEN',
         slotsList: <VisitSlotList>{
