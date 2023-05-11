@@ -1,6 +1,6 @@
 import { addMonths, format, subMonths } from 'date-fns'
 import PrisonerProfileService from './prisonerProfileService'
-import { PagePrisonerBookingSummary, VisitBalances, OffenderRestrictions } from '../data/prisonApiTypes'
+import { OffenderRestrictions } from '../data/prisonApiTypes'
 import { PrisonerAlertItem, PrisonerProfilePage } from '../@types/bapv'
 import { Alert } from '../data/orchestrationApiTypes'
 import TestData from '../routes/testutils/testData'
@@ -371,61 +371,6 @@ describe('Prisoner profile service', () => {
       expect(results.activeAlerts).toStrictEqual(alertsForDisplay)
       expect(results.activeAlertCount).toBe(4)
       expect(results.flaggedAlerts).toStrictEqual(alertsToFlag)
-    })
-  })
-
-  describe('getPrisonerAndVisitBalances', () => {
-    const offenderNo = 'A1234BC'
-    const bookings = <PagePrisonerBookingSummary>{
-      content: [
-        {
-          bookingId: 12345,
-          bookingNo: 'A123445',
-          offenderNo: 'A1234BC',
-          firstName: 'JOHN',
-          lastName: 'SMITH',
-          dateOfBirth: '1980-10-12',
-          agencyId: 'HEI',
-          legalStatus: 'SENTENCED',
-          convictedStatus: 'Convicted',
-        },
-      ],
-      numberOfElements: 1,
-    }
-
-    const inmateDetail = TestData.inmateDetail()
-
-    const visitBalances: VisitBalances = {
-      remainingVo: 1,
-      remainingPvo: 2,
-      latestIepAdjustDate: '2021-04-21',
-      latestPrivIepAdjustDate: '2021-12-01',
-    }
-
-    beforeEach(() => {
-      prisonApiClient.getBookings.mockResolvedValue(bookings)
-      prisonApiClient.getOffender.mockResolvedValue(inmateDetail)
-      prisonApiClient.getVisitBalances.mockResolvedValue(visitBalances)
-    })
-
-    it('Retrieves prisoner details and visit balances for a Convicted prisoner', async () => {
-      const results = await prisonerProfileService.getPrisonerAndVisitBalances(offenderNo, prisonId, 'user')
-
-      expect(prisonApiClient.getBookings).toHaveBeenCalledTimes(1)
-      expect(prisonApiClient.getOffender).toHaveBeenCalledTimes(1)
-      expect(prisonApiClient.getVisitBalances).toHaveBeenCalledTimes(1)
-      expect(results).toEqual({ inmateDetail, visitBalances })
-    })
-
-    it('Retrieves prisoner details and no visit balances for prisoner on Remand', async () => {
-      bookings.content[0].convictedStatus = 'Remand'
-
-      const results = await prisonerProfileService.getPrisonerAndVisitBalances(offenderNo, prisonId, 'user')
-
-      expect(prisonApiClient.getBookings).toHaveBeenCalledTimes(1)
-      expect(prisonApiClient.getOffender).toHaveBeenCalledTimes(1)
-      expect(prisonApiClient.getVisitBalances).toHaveBeenCalledTimes(0)
-      expect(results).toEqual({ inmateDetail, visitBalances: undefined })
     })
   })
 

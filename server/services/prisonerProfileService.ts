@@ -135,27 +135,6 @@ export default class PrisonerProfileService {
     }
   }
 
-  async getPrisonerAndVisitBalances(
-    offenderNo: string,
-    prisonId: string,
-    username: string,
-  ): Promise<{ inmateDetail: InmateDetail; visitBalances: VisitBalances }> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const prisonApiClient = this.prisonApiClientFactory(token)
-
-    const bookings = await prisonApiClient.getBookings(offenderNo, prisonId)
-    if (bookings.numberOfElements !== 1) throw new NotFound()
-    const { convictedStatus } = bookings.content[0]
-
-    const inmateDetail = await prisonApiClient.getOffender(offenderNo)
-
-    if (convictedStatus === 'Remand') {
-      return { inmateDetail, visitBalances: undefined }
-    }
-
-    return { inmateDetail, visitBalances: await prisonApiClient.getVisitBalances(offenderNo) }
-  }
-
   async getRestrictions(offenderNo: string, username: string): Promise<OffenderRestriction[]> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const prisonApiClient = this.prisonApiClientFactory(token)
