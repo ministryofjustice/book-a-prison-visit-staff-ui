@@ -98,6 +98,8 @@ describe('GET /prisoner/A1234BC', () => {
           remainingPvo: 0,
           latestIepAdjustDate: '21 April 2021',
           latestPrivIepAdjustDate: '1 December 2021',
+          nextIepAdjustDate: '5 May 2021',
+          nextPrivIepAdjustDate: '1 January 2022',
         },
       },
       contactNames: {},
@@ -130,10 +132,10 @@ describe('GET /prisoner/A1234BC', () => {
 
         expect($('[data-test="tab-vo-remaining"]').text()).toBe('1')
         expect($('[data-test="tab-vo-last-date"]').text()).toBe('21 April 2021')
-        // expect($('[data-test="tab-vo-next-date"]').text()).toBe('15 May 2021')
+        expect($('[data-test="tab-vo-next-date"]').text()).toBe('5 May 2021')
         expect($('[data-test="tab-pvo-remaining"]').text()).toBe('0')
         expect($('[data-test="tab-pvo-last-date"]').text()).toBe('1 December 2021')
-        // expect($('[data-test="tab-pvo-next-date"]').text()).toBe('1 January 2022')
+        expect($('[data-test="tab-pvo-next-date"]').text()).toBe('1 January 2022')
         expect($('.govuk-back-link').attr('href')).toBe('/search/prisoner')
 
         expect($('#active-alerts').text()).toContain('Professional lock pick')

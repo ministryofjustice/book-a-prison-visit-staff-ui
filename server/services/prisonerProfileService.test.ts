@@ -95,6 +95,8 @@ describe('Prisoner profile service', () => {
             remainingPvo: 2,
             latestIepAdjustDate: '21 April 2021',
             latestPrivIepAdjustDate: '1 December 2021',
+            nextIepAdjustDate: '5 May 2021',
+            nextPrivIepAdjustDate: '1 January 2022',
           },
         },
         contactNames: { 4321: 'Jeanette Smith', 4322: 'Bob Smith' },

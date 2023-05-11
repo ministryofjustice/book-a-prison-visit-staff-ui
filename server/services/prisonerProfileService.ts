@@ -1,8 +1,14 @@
 import { NotFound } from 'http-errors'
 import { format, isBefore } from 'date-fns'
 import { PrisonerAlertItem, PrisonerProfilePage } from '../@types/bapv'
-import { prisonerDatePretty, properCaseFullName } from '../utils/utils'
-import { Alert, InmateDetail, OffenderRestriction, VisitBalances } from '../data/prisonApiTypes'
+import {
+  nextIepAdjustDate,
+  nextPrivIepAdjustDate,
+  prisonerDatePretty,
+  prisonerDateTimePretty,
+  properCaseFullName,
+} from '../utils/utils'
+import { Alert, OffenderRestriction } from '../data/prisonApiTypes'
 import {
   HmppsAuthClient,
   OrchestrationApiClient,
@@ -101,28 +107,29 @@ export default class PrisonerProfileService {
       month.visits.push(visit)
     })
 
+    const { visitBalances }: { visitBalances?: PrisonerProfilePage['prisonerDetails']['visitBalances'] } =
+      prisonerProfile
+    if (visitBalances) {
+      if (visitBalances.latestIepAdjustDate) {
+        visitBalances.nextIepAdjustDate = nextIepAdjustDate(visitBalances.latestIepAdjustDate)
+        visitBalances.latestIepAdjustDate = prisonerDateTimePretty(visitBalances.latestIepAdjustDate)
+      }
+      if (visitBalances.latestPrivIepAdjustDate) {
+        visitBalances.nextPrivIepAdjustDate = nextPrivIepAdjustDate(visitBalances.latestPrivIepAdjustDate)
+        visitBalances.latestPrivIepAdjustDate = prisonerDateTimePretty(visitBalances.latestPrivIepAdjustDate)
+      }
+    }
+
     const prisonerDetails: PrisonerProfilePage['prisonerDetails'] = {
       prisonerId,
       name: properCaseFullName(`${prisonerProfile.lastName}, ${prisonerProfile.firstName}`),
-      dateOfBirth: prisonerDatePretty({ dateToFormat: prisonerProfile.dateOfBirth }),
+      dateOfBirth: prisonerDateTimePretty(prisonerProfile.dateOfBirth),
       cellLocation: prisonerProfile.cellLocation,
       prisonName: prisonerProfile.prisonName,
       convictedStatus: prisonerProfile.convictedStatus,
       category: prisonerProfile.category,
       incentiveLevel: prisonerProfile.incentiveLevel,
-      visitBalances: prisonerProfile.visitBalances,
-    }
-
-    if (prisonerDetails.visitBalances?.latestIepAdjustDate) {
-      prisonerDetails.visitBalances.latestIepAdjustDate = prisonerDatePretty({
-        dateToFormat: prisonerDetails.visitBalances.latestIepAdjustDate,
-      })
-    }
-
-    if (prisonerDetails.visitBalances?.latestPrivIepAdjustDate) {
-      prisonerDetails.visitBalances.latestPrivIepAdjustDate = prisonerDatePretty({
-        dateToFormat: prisonerDetails.visitBalances.latestPrivIepAdjustDate,
-      })
+      visitBalances,
     }
 
     return {

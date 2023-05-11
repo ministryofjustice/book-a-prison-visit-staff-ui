@@ -73,15 +73,13 @@ export type PrisonerProfilePage = {
     convictedStatus: PrisonerProfile['convictedStatus']
     category: string
     incentiveLevel: string
-    visitBalances: VisitBalances
+    visitBalances: PrisonerProfile['visitBalances'] & {
+      nextIepAdjustDate?: string
+      nextPrivIepAdjustDate?: string
+    }
   }
   visitsByMonth: Map<string, { upcomingCount: number; pastCount: number; visits: Visit[] }>
   contactNames: Record<number, string>
-}
-
-export type BAPVVisitBalances = VisitBalances & {
-  nextIepAdjustDate?: string
-  nextPrivIepAdjustDate?: string
 }
 
 // Visit slots, for representing data derived from VisitSessions

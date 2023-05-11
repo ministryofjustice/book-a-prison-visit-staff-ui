@@ -71,10 +71,10 @@ context('Prisoner profile page', () => {
     prisonerProfilePage.selectVisitingOrdersTab()
     prisonerProfilePage.visitTabVORemaining().contains(1)
     prisonerProfilePage.visitTabVOLastAdjustment().contains('21 April 2021')
-    // prisonerProfilePage.visitTabVONextAdjustment().contains('15 January 2023') // in 14 days' time
+    prisonerProfilePage.visitTabVONextAdjustment().contains('5 May 2021')
     prisonerProfilePage.visitTabPVORemaining().contains(2)
     prisonerProfilePage.visitTabPVOLastAdjustment().contains('1 December 2021')
-    // prisonerProfilePage.visitTabPVONextAdjustment().contains('1 March 2023') // 1st of following month
+    prisonerProfilePage.visitTabPVONextAdjustment().contains('1 January 2022')
 
     // Active alerts tab
     prisonerProfilePage.selectActiveAlertsTab()
