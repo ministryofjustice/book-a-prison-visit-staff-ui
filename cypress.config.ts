@@ -39,12 +39,9 @@ export default defineConfig({
         stubPrisonerSocialContacts: prisonerContactRegistry.stubPrisonerSocialContacts,
 
         // Prison API
-        stubBookings: prisonApi.stubBookings,
-        stubOffender: prisonApi.stubOffender,
         stubOffenderRestrictions: prisonApi.stubOffenderRestrictions,
         stubSetActiveCaseLoad: prisonApi.stubSetActiveCaseLoad,
         stubUserCaseloads: prisonApi.stubUserCaseloads,
-        stubVisitBalances: prisonApi.stubVisitBalances,
 
         // Prisoner offender search
         stubPrisonerById: prisonerSearch.stubPrisonerById,
