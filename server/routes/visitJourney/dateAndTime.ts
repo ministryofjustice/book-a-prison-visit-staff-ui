@@ -1,6 +1,5 @@
 import type { Request, Response } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
-import { v4 as uuidv4 } from 'uuid'
 import { VisitSlot } from '../../@types/bapv'
 import AuditService from '../../services/auditService'
 import VisitSessionsService from '../../services/visitSessionsService'
@@ -77,7 +76,6 @@ export default class DateAndTime {
     req.session.slotsList = slotsList
 
     res.render('pages/bookAVisit/dateAndTime', {
-      accordionId: uuidv4(),
       errors: req.flash('errors'),
       visitRestriction: visitSessionData.visitRestriction,
       prisonerName: visitSessionData.prisoner.name,
