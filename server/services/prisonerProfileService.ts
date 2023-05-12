@@ -1,8 +1,14 @@
 import { NotFound } from 'http-errors'
 import { format, isBefore } from 'date-fns'
-import { PrisonerAlertItem, PrisonerDetails, PrisonerProfilePage } from '../@types/bapv'
-import { prisonerDatePretty, properCaseFullName } from '../utils/utils'
-import { Alert, InmateDetail, OffenderRestriction, VisitBalances } from '../data/prisonApiTypes'
+import { PrisonerAlertItem, PrisonerProfilePage } from '../@types/bapv'
+import {
+  nextIepAdjustDate,
+  nextPrivIepAdjustDate,
+  prisonerDatePretty,
+  prisonerDateTimePretty,
+  properCaseFullName,
+} from '../utils/utils'
+import { Alert, OffenderRestriction } from '../data/prisonApiTypes'
 import {
   HmppsAuthClient,
   OrchestrationApiClient,
@@ -101,59 +107,38 @@ export default class PrisonerProfileService {
       month.visits.push(visit)
     })
 
-    const prisonerDetails: PrisonerDetails = {
-      offenderNo: prisonerProfile.prisonerId,
+    const prisonerDetails: PrisonerProfilePage['prisonerDetails'] = {
+      prisonerId,
       name: properCaseFullName(`${prisonerProfile.lastName}, ${prisonerProfile.firstName}`),
-      dob: prisonerDatePretty({ dateToFormat: prisonerProfile.dateOfBirth }),
+      dateOfBirth: prisonerDateTimePretty(prisonerProfile.dateOfBirth),
+      cellLocation: prisonerProfile.cellLocation,
+      prisonName: prisonerProfile.prisonName,
       convictedStatus: prisonerProfile.convictedStatus,
       category: prisonerProfile.category,
-      location: prisonerProfile.cellLocation,
-      prisonName: prisonerProfile.prisonName,
       incentiveLevel: prisonerProfile.incentiveLevel,
-      visitBalances: prisonerProfile.visitBalances,
+      visitBalances: prisonerProfile.convictedStatus === 'Convicted' ? prisonerProfile.visitBalances : null,
     }
 
-    if (prisonerDetails.visitBalances?.latestIepAdjustDate) {
-      prisonerDetails.visitBalances.latestIepAdjustDate = prisonerDatePretty({
-        dateToFormat: prisonerDetails.visitBalances.latestIepAdjustDate,
-      })
-    }
-
-    if (prisonerDetails.visitBalances?.latestPrivIepAdjustDate) {
-      prisonerDetails.visitBalances.latestPrivIepAdjustDate = prisonerDatePretty({
-        dateToFormat: prisonerDetails.visitBalances.latestPrivIepAdjustDate,
-      })
+    const { visitBalances } = prisonerDetails
+    if (visitBalances) {
+      if (visitBalances.latestIepAdjustDate) {
+        visitBalances.nextIepAdjustDate = nextIepAdjustDate(visitBalances.latestIepAdjustDate)
+        visitBalances.latestIepAdjustDate = prisonerDateTimePretty(visitBalances.latestIepAdjustDate)
+      }
+      if (visitBalances.latestPrivIepAdjustDate) {
+        visitBalances.nextPrivIepAdjustDate = nextPrivIepAdjustDate(visitBalances.latestPrivIepAdjustDate)
+        visitBalances.latestPrivIepAdjustDate = prisonerDateTimePretty(visitBalances.latestPrivIepAdjustDate)
+      }
     }
 
     return {
       activeAlerts: activeAlertsForDisplay,
       activeAlertCount,
       flaggedAlerts,
-      visitsByMonth,
       prisonerDetails,
+      visitsByMonth,
       contactNames,
     }
-  }
-
-  async getPrisonerAndVisitBalances(
-    offenderNo: string,
-    prisonId: string,
-    username: string,
-  ): Promise<{ inmateDetail: InmateDetail; visitBalances: VisitBalances }> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const prisonApiClient = this.prisonApiClientFactory(token)
-
-    const bookings = await prisonApiClient.getBookings(offenderNo, prisonId)
-    if (bookings.numberOfElements !== 1) throw new NotFound()
-    const { convictedStatus } = bookings.content[0]
-
-    const inmateDetail = await prisonApiClient.getOffender(offenderNo)
-
-    if (convictedStatus === 'Remand') {
-      return { inmateDetail, visitBalances: undefined }
-    }
-
-    return { inmateDetail, visitBalances: await prisonApiClient.getVisitBalances(offenderNo) }
   }
 
   async getRestrictions(offenderNo: string, username: string): Promise<OffenderRestriction[]> {

@@ -1,6 +1,6 @@
 import { addMonths, format, subMonths } from 'date-fns'
 import PrisonerProfileService from './prisonerProfileService'
-import { PagePrisonerBookingSummary, VisitBalances, OffenderRestrictions } from '../data/prisonApiTypes'
+import { OffenderRestrictions } from '../data/prisonApiTypes'
 import { PrisonerAlertItem, PrisonerProfilePage } from '../@types/bapv'
 import { Alert } from '../data/orchestrationApiTypes'
 import TestData from '../routes/testutils/testData'
@@ -63,7 +63,7 @@ describe('Prisoner profile service', () => {
       supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
     })
 
-    it('should retrieve and process data for prisoner profile (with visit balances)', async () => {
+    it('should retrieve and process data for prisoner profile', async () => {
       const prisonerProfile = TestData.prisonerProfile()
       orchestrationApiClient.getPrisonerProfile.mockResolvedValue(prisonerProfile)
 
@@ -82,55 +82,40 @@ describe('Prisoner profile service', () => {
         flaggedAlerts: [],
         visitsByMonth: new Map(),
         prisonerDetails: {
-          offenderNo: 'A1234BC',
+          prisonerId: 'A1234BC',
           name: 'Smith, John',
-          dob: '2 April 1975',
+          dateOfBirth: '2 April 1975',
+          cellLocation: '1-1-C-028',
+          prisonName: 'Hewell (HMP)',
           convictedStatus: 'Convicted',
           category: 'Cat C',
-          location: '1-1-C-028',
-          prisonName: 'Hewell (HMP)',
           incentiveLevel: 'Standard',
           visitBalances: {
             remainingVo: 1,
             remainingPvo: 2,
             latestIepAdjustDate: '21 April 2021',
             latestPrivIepAdjustDate: '1 December 2021',
+            nextIepAdjustDate: '5 May 2021',
+            nextPrivIepAdjustDate: '1 January 2022',
           },
         },
         contactNames: { 4321: 'Jeanette Smith', 4322: 'Bob Smith' },
       })
     })
 
-    // Skipped - previously used endpoints were skipped if prisoner was on remand, this logic may wish be to included in the new endpoint
-    it.skip('should not return visit balances for those on REMAND', async () => {
-      const prisonerProfile = TestData.prisonerProfile({
-        convictedStatus: 'Remand',
-      })
-
+    it('should return visit balances as null if prisoner is on REMAND', async () => {
+      const prisonerProfile = TestData.prisonerProfile({ convictedStatus: 'Remand' })
       orchestrationApiClient.getPrisonerProfile.mockResolvedValue(prisonerProfile)
+
+      prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue([])
 
       const results = await prisonerProfileService.getProfile(prisonId, prisonerId, 'user')
 
       expect(OrchestrationApiClientFactory).toHaveBeenCalledWith(token)
       expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user')
       expect(orchestrationApiClient.getPrisonerProfile).toHaveBeenCalledTimes(1)
-      expect(results).toEqual(<PrisonerProfilePage>{
-        activeAlerts: [],
-        activeAlertCount: 0,
-        flaggedAlerts: [],
-        visitsByMonth: new Map(),
-        prisonerDetails: {
-          offenderNo: 'A1234BC',
-          name: 'Smith, John',
-          dob: '2 April 1975',
-          convictedStatus: 'Convicted',
-          category: 'Cat C',
-          location: '1-1-C-028',
-          prisonName: 'Hewell (HMP)',
-          incentiveLevel: 'Standard',
-          visitBalances: {},
-        },
-      })
+
+      expect(results.prisonerDetails.visitBalances).toBeNull()
     })
 
     it('should group upcoming and past visits by month, with totals for BOOKED only', async () => {
@@ -371,61 +356,6 @@ describe('Prisoner profile service', () => {
       expect(results.activeAlerts).toStrictEqual(alertsForDisplay)
       expect(results.activeAlertCount).toBe(4)
       expect(results.flaggedAlerts).toStrictEqual(alertsToFlag)
-    })
-  })
-
-  describe('getPrisonerAndVisitBalances', () => {
-    const offenderNo = 'A1234BC'
-    const bookings = <PagePrisonerBookingSummary>{
-      content: [
-        {
-          bookingId: 12345,
-          bookingNo: 'A123445',
-          offenderNo: 'A1234BC',
-          firstName: 'JOHN',
-          lastName: 'SMITH',
-          dateOfBirth: '1980-10-12',
-          agencyId: 'HEI',
-          legalStatus: 'SENTENCED',
-          convictedStatus: 'Convicted',
-        },
-      ],
-      numberOfElements: 1,
-    }
-
-    const inmateDetail = TestData.inmateDetail()
-
-    const visitBalances: VisitBalances = {
-      remainingVo: 1,
-      remainingPvo: 2,
-      latestIepAdjustDate: '2021-04-21',
-      latestPrivIepAdjustDate: '2021-12-01',
-    }
-
-    beforeEach(() => {
-      prisonApiClient.getBookings.mockResolvedValue(bookings)
-      prisonApiClient.getOffender.mockResolvedValue(inmateDetail)
-      prisonApiClient.getVisitBalances.mockResolvedValue(visitBalances)
-    })
-
-    it('Retrieves prisoner details and visit balances for a Convicted prisoner', async () => {
-      const results = await prisonerProfileService.getPrisonerAndVisitBalances(offenderNo, prisonId, 'user')
-
-      expect(prisonApiClient.getBookings).toHaveBeenCalledTimes(1)
-      expect(prisonApiClient.getOffender).toHaveBeenCalledTimes(1)
-      expect(prisonApiClient.getVisitBalances).toHaveBeenCalledTimes(1)
-      expect(results).toEqual({ inmateDetail, visitBalances })
-    })
-
-    it('Retrieves prisoner details and no visit balances for prisoner on Remand', async () => {
-      bookings.content[0].convictedStatus = 'Remand'
-
-      const results = await prisonerProfileService.getPrisonerAndVisitBalances(offenderNo, prisonId, 'user')
-
-      expect(prisonApiClient.getBookings).toHaveBeenCalledTimes(1)
-      expect(prisonApiClient.getOffender).toHaveBeenCalledTimes(1)
-      expect(prisonApiClient.getVisitBalances).toHaveBeenCalledTimes(0)
-      expect(results).toEqual({ inmateDetail, visitBalances: undefined })
     })
   })
 

@@ -85,19 +85,21 @@ describe('GET /prisoner/A1234BC', () => {
       ],
       visitsByMonth: new Map(),
       prisonerDetails: {
-        offenderNo: 'A1234BC',
+        prisonerId: 'A1234BC',
         name: 'Smith, John',
-        dob: '2 April 1975',
+        dateOfBirth: '2 April 1975',
+        cellLocation: '1-1-C-028',
+        prisonName: 'Hewell (HMP)',
         convictedStatus: 'Convicted',
         category: 'Cat C',
-        location: '1-1-C-028',
-        prisonName: 'Hewell (HMP)',
         incentiveLevel: 'Standard',
         visitBalances: {
           remainingVo: 1,
           remainingPvo: 0,
           latestIepAdjustDate: '21 April 2021',
           latestPrivIepAdjustDate: '1 December 2021',
+          nextIepAdjustDate: '5 May 2021',
+          nextPrivIepAdjustDate: '1 January 2022',
         },
       },
       contactNames: {},
@@ -128,12 +130,13 @@ describe('GET /prisoner/A1234BC', () => {
         expect($('[data-test="remaining-vos"]').text()).toBe('1')
         expect($('[data-test="remaining-pvos"]').text()).toBe('0')
 
+        expect($('#visiting-orders').length).toBe(1)
         expect($('[data-test="tab-vo-remaining"]').text()).toBe('1')
         expect($('[data-test="tab-vo-last-date"]').text()).toBe('21 April 2021')
-        // expect($('[data-test="tab-vo-next-date"]').text()).toBe('15 May 2021')
+        expect($('[data-test="tab-vo-next-date"]').text()).toBe('5 May 2021')
         expect($('[data-test="tab-pvo-remaining"]').text()).toBe('0')
         expect($('[data-test="tab-pvo-last-date"]').text()).toBe('1 December 2021')
-        // expect($('[data-test="tab-pvo-next-date"]').text()).toBe('1 January 2022')
+        expect($('[data-test="tab-pvo-next-date"]').text()).toBe('1 January 2022')
         expect($('.govuk-back-link').attr('href')).toBe('/search/prisoner')
 
         expect($('#active-alerts').text()).toContain('Professional lock pick')
@@ -209,10 +212,10 @@ describe('GET /prisoner/A1234BC', () => {
         })
       })
   })
-  // Skipped as currently not got logic incorportated to skip requesting VO's for remand
-  it.skip('should render prisoner profile page without visiting orders for REMAND', () => {
+
+  it('should render prisoner profile page without visiting orders for REMAND', () => {
     prisonerProfile.prisonerDetails.convictedStatus = 'Remand'
-    prisonerProfile.prisonerDetails.visitBalances = undefined
+    prisonerProfile.prisonerDetails.visitBalances = null
 
     return request(app)
       .get('/prisoner/A1234BC')
@@ -224,15 +227,7 @@ describe('GET /prisoner/A1234BC', () => {
         expect($('[data-test="convicted-status"]').text()).toBe('Remand')
         expect($('[data-test="remaining-vos"]').length).toBe(0)
         expect($('[data-test="remaining-pvos"]').length).toBe(0)
-        expect($('#vo-override').length).toBe(0)
-        expect($('[data-test="book-a-visit"]').length).toBe(1)
-        expect(auditService.viewPrisoner).toHaveBeenCalledTimes(1)
-        expect(auditService.viewPrisoner).toHaveBeenCalledWith({
-          prisonerId: 'A1234BC',
-          prisonId,
-          username: 'user1',
-          operationId: undefined,
-        })
+        expect($('#visiting-orders').length).toBe(0)
       })
   })
 
@@ -341,13 +336,13 @@ describe('POST /prisoner/A1234BC', () => {
       ],
       visitsByMonth: new Map(),
       prisonerDetails: {
-        offenderNo: 'A1234BC',
+        prisonerId: 'A1234BC',
         name: 'Smith, John',
-        dob: '2 April 1975',
+        dateOfBirth: '2 April 1975',
+        cellLocation: '1-1-C-028',
+        prisonName: 'Hewell (HMP)',
         convictedStatus: 'Convicted',
         category: 'Cat C',
-        location: '1-1-C-028',
-        prisonName: 'Hewell (HMP)',
         incentiveLevel: 'Standard',
         visitBalances: {
           remainingVo: 1,

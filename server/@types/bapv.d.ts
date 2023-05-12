@@ -1,5 +1,5 @@
-import { OffenderRestriction, VisitBalances } from '../data/prisonApiTypes'
-import { Visit, VisitorSupport, VisitSession } from '../data/orchestrationApiTypes'
+import { OffenderRestriction } from '../data/prisonApiTypes'
+import { PrisonerProfile, Visit, VisitorSupport, VisitSession } from '../data/orchestrationApiTypes'
 
 export type Prison = {
   prisonId: string
@@ -64,14 +64,22 @@ export type PrisonerProfilePage = {
   activeAlerts: PrisonerAlertItem[]
   activeAlertCount: number
   flaggedAlerts: Alert[]
+  prisonerDetails: {
+    prisonerId: string
+    name: string
+    dateOfBirth: string
+    cellLocation: string
+    prisonName: string
+    convictedStatus: PrisonerProfile['convictedStatus']
+    category: string
+    incentiveLevel: string
+    visitBalances: PrisonerProfile['visitBalances'] & {
+      nextIepAdjustDate?: string
+      nextPrivIepAdjustDate?: string
+    }
+  }
   visitsByMonth: Map<string, { upcomingCount: number; pastCount: number; visits: Visit[] }>
-  prisonerDetails: PrisonerDetails
   contactNames: Record<number, string>
-}
-
-export type BAPVVisitBalances = VisitBalances & {
-  nextIepAdjustDate?: string
-  nextPrivIepAdjustDate?: string
 }
 
 // Visit slots, for representing data derived from VisitSessions
@@ -165,15 +173,3 @@ export type VisitsPageSlot = {
 }
 
 export type FlashData = Record<string, string[] | Record<string, string | string[]>[]>
-
-export type PrisonerDetails = {
-  offenderNo: string
-  name: string
-  dob: string
-  convictedStatus: 'Convicted' | 'Remand'
-  category: string
-  location: string
-  prisonName: string
-  incentiveLevel: string
-  visitBalances: VisitBalances
-}
