@@ -110,5 +110,6 @@ context('Prisoner profile page', () => {
         cy.contains('Bob Smith')
       })
     prisonerProfilePage.visitTabVisitStatus().eq(0).contains('Booked')
+    prisonerProfilePage.visitTabViewFullHistory().contains('View full visits history')
   })
 })
