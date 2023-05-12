@@ -192,7 +192,8 @@
       {% endfor -%}
 
       {{- govukAccordion({
-        id: "slots-month-" + (month | replace(" ", "")) + "-" + accordionId,
+        id: "slots-month-" + (month | replace(" ", "")),
+        rememberExpanded: false,
         headingLevel: 3,
         items: accordion
       }) }}
