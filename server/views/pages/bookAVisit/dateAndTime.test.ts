@@ -30,7 +30,6 @@ describe('Views - Date and time of visit', () => {
 
   it('should display date and time picker for two months with morning and afternoon slots', () => {
     viewContext = {
-      accordionId: 'thisAccordion',
       prisonerName: 'John Smith',
       visitRestriction: 'OPEN',
       slotsList: <VisitSlotList>{
@@ -155,8 +154,8 @@ describe('Views - Date and time of visit', () => {
     expect($('[data-test="closed-visit-reason"]').length).toBe(0)
 
     expect($('[data-test="month"]').eq(0).text()).toBe('February 2022')
-    expect($('#slots-month-February2022-thisAccordion-heading-1').text().trim()).toBe('Monday 14 February')
-    expect($('#slots-month-February2022-thisAccordion-content-1 h3').eq(0).text()).toBe('Morning')
+    expect($('#slots-month-February2022-heading-1').text().trim()).toBe('Monday 14 February')
+    expect($('#slots-month-February2022-content-1 h3').eq(0).text()).toBe('Morning')
     expect($('label[for="1"]').text()).toContain('10am to 11am')
     expect($('label[for="1"]').text()).toContain('15 tables available')
     expect($('label[for="2"]').text()).toContain('11:59am to 12:59pm')
@@ -164,16 +163,16 @@ describe('Views - Date and time of visit', () => {
     expect($('label[for="3"]').text()).toContain('12pm to 1:05pm')
     expect($('label[for="3"]').text()).toContain('Prisoner has a visit')
     expect($('#3').attr('disabled')).toBe('disabled')
-    expect($('#slots-month-February2022-thisAccordion-content-1 .bapv-afternoon-slots > h3').text()).toBe('Afternoon')
-    expect($('#slots-month-February2022-thisAccordion-heading-2').text().trim()).toBe('Tuesday 15 February')
+    expect($('#slots-month-February2022-content-1 .bapv-afternoon-slots > h3').text()).toBe('Afternoon')
+    expect($('#slots-month-February2022-heading-2').text().trim()).toBe('Tuesday 15 February')
     expect($('#4').prop('checked')).toBe(true)
     expect($('.govuk-accordion__section--expanded').length).toBe(1)
     expect($('.govuk-accordion__section--expanded #4').length).toBe(1)
 
     expect($('[data-test="month"]').eq(1).text()).toBe('March 2022')
-    expect($('#slots-month-March2022-thisAccordion-heading-1').text().trim()).toBe('Tuesday 1 March')
-    expect($('#slots-month-March2022-thisAccordion-content-1 .bapv-morning-slots > h3').text()).toBe('Morning')
-    expect($('#slots-month-March2022-thisAccordion-content-1 .bapv-afternoon-slots > h3').eq(1).length).toBe(0) // no afternoon slots
+    expect($('#slots-month-March2022-heading-1').text().trim()).toBe('Tuesday 1 March')
+    expect($('#slots-month-March2022-content-1 .bapv-morning-slots > h3').text()).toBe('Morning')
+    expect($('#slots-month-March2022-content-1 .bapv-afternoon-slots > h3').eq(1).length).toBe(0) // no afternoon slots
     expect($('label[for="5"]').text()).toContain('9:30am to 10:30am')
     expect($('label[for="5"]').text()).toContain('Fully booked (30 of 30 tables booked)')
     // correctly display overbooking
@@ -202,7 +201,6 @@ describe('Views - Date and time of visit', () => {
   describe('slot labelling', () => {
     beforeEach(() => {
       viewContext = {
-        accordionId: 'thisAccordion',
         prisonerName: 'John Smith',
         visitRestriction: 'OPEN',
         slotsList: <VisitSlotList>{
