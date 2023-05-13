@@ -125,12 +125,12 @@ describe('Prisoner profile service', () => {
       const nextMonthKey = format(nextMonth, 'MMMM yyyy')
       const previousMonthKey = format(previousMonth, 'MMMM yyyy')
 
-      const visit1 = TestData.visit({ startTimestamp: nextMonth.toISOString() })
-      const visit2 = TestData.visit({ startTimestamp: previousMonth.toISOString() })
-      const visit3 = TestData.visit({ visitStatus: 'CANCELLED', startTimestamp: previousMonth.toISOString() })
+      const upcomingVisit = TestData.visit({ startTimestamp: nextMonth.toISOString() })
+      const pastVisit = TestData.visit({ startTimestamp: previousMonth.toISOString() })
+      const cancelledVisit = TestData.visit({ visitStatus: 'CANCELLED', startTimestamp: previousMonth.toISOString() })
 
       const prisonerProfile = TestData.prisonerProfile({
-        visits: [visit1, visit2, visit3],
+        visits: [upcomingVisit, pastVisit, cancelledVisit],
       })
 
       orchestrationApiClient.getPrisonerProfile.mockResolvedValue(prisonerProfile)
@@ -140,8 +140,8 @@ describe('Prisoner profile service', () => {
 
       expect(results.visitsByMonth).toEqual(
         new Map([
-          [nextMonthKey, { upcomingCount: 1, pastCount: 0, visits: [visit1] }],
-          [previousMonthKey, { upcomingCount: 0, pastCount: 1, visits: [visit2, visit3] }],
+          [nextMonthKey, { upcomingCount: 1, pastCount: 0, visits: [upcomingVisit] }],
+          [previousMonthKey, { upcomingCount: 0, pastCount: 1, visits: [pastVisit, cancelledVisit] }],
         ]),
       )
     })

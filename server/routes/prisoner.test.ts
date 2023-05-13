@@ -108,6 +108,10 @@ describe('GET /prisoner/A1234BC', () => {
     prisonerProfileService.getProfile.mockResolvedValue(prisonerProfile)
   })
 
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
   it('should render the prisoner profile page for offender number A1234BC with back link to search page with empty querystring', () => {
     return request(app)
       .get('/prisoner/A1234BC')
@@ -174,6 +178,56 @@ describe('GET /prisoner/A1234BC', () => {
       })
   })
 
+  it('should group upcoming and past visits by month in the Visits tab', () => {
+    const fakeDateTime = '2023-03-01T09:00'
+    jest.useFakeTimers({ advanceTimers: true, now: new Date(fakeDateTime) })
+
+    const upcomingVisit = TestData.visit({ startTimestamp: '2023-03-02T10:00', endTimestamp: '2023-03-02T11:00' })
+    const pastVisit = TestData.visit({ startTimestamp: '2023-02-03T10:00', endTimestamp: '2023-02-03T11:00' })
+    const cancelledVisit = TestData.visit({
+      startTimestamp: '2023-02-03T10:00',
+      endTimestamp: '2023-02-03T11:00',
+      visitStatus: 'CANCELLED',
+    })
+
+    prisonerProfile.visitsByMonth = new Map([
+      ['March 2023', { upcomingCount: 1, pastCount: 0, visits: [upcomingVisit] }],
+      ['February 2023', { upcomingCount: 0, pastCount: 1, visits: [pastVisit, cancelledVisit] }],
+    ])
+    prisonerProfile.contactNames = { 4321: 'Jeanette Smith', 4322: 'Bob Smith' }
+
+    return request(app)
+      .get('/prisoner/A1234BC')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('h1').text().trim()).toBe('Smith, John')
+        expect($('.prisoner-profile-visits:nth-child(1) caption').text()).toBe('March 2023 (1 upcoming visit)')
+        expect($('.prisoner-profile-visits:nth-child(1) [data-test="tab-visits-reference"]').length).toBe(1)
+        expect($('.prisoner-profile-visits:nth-child(1) [data-test="tab-visits-reference"]').eq(0).text()).toBe(
+          upcomingVisit.reference,
+        )
+        expect($('.prisoner-profile-visits:nth-child(1) [data-test="tab-visits-type"] > span').eq(0).html()).toBe(
+          'Social<br>(Open)',
+        )
+        expect($('.prisoner-profile-visits:nth-child(1) [data-test="tab-visits-location"]').eq(0).text()).toBe(
+          'Hewell (HMP)',
+        )
+        expect($('.prisoner-profile-visits:nth-child(1) [data-test="tab-visits-date-and-time"]').eq(0).html()).toBe(
+          '2 March 2023<br>10am - 11am',
+        )
+        expect($('.prisoner-profile-visits:nth-child(1) [data-test="tab-visits-visitors"]').eq(0).html()).toBe(
+          'Jeanette Smith<br>Bob Smith',
+        )
+        expect($('.prisoner-profile-visits:nth-child(1) [data-test="tab-visits-status"]').eq(0).text()).toBe('Booked')
+
+        expect($('.prisoner-profile-visits:nth-child(2) caption').text()).toBe('February 2023 (1 past visit)')
+        expect($('.prisoner-profile-visits:nth-child(2) [data-test="tab-visits-reference"]').length).toBe(2)
+        expect($('[data-test="view-dps-profile"]').text().trim()).toBe('View full visits history')
+      })
+  })
+
   it('should display message in the Visits tab when there are no upcoming or past visits', () => {
     return request(app)
       .get('/prisoner/A1234BC')
@@ -185,6 +239,7 @@ describe('GET /prisoner/A1234BC', () => {
         expect($('#visits').text()).toContain(
           'There are no upcoming visits or visits within the last 3 months for this prisoner.',
         )
+        expect($('[data-test="view-dps-profile"]').text().trim()).toBe('View full visits history')
       })
   })
 

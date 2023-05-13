@@ -68,4 +68,6 @@ export default class PrisonerProfilePage extends Page {
   visitTabVisitors = (): PageElement => cy.get('[data-test="tab-visits-visitors"]')
 
   visitTabVisitStatus = (): PageElement => cy.get('[data-test="tab-visits-status"]')
+
+  visitTabViewFullHistory = (): PageElement => cy.get('[data-test="view-dps-profile"]')
 }
