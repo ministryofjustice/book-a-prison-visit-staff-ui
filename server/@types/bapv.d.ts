@@ -15,40 +15,6 @@ export type PrisonerDetailsItem = {
   }
 }
 
-export type PrisonerAlertItem = [
-  {
-    text: string
-    attributes?: {
-      'data-test': string
-    }
-  },
-  {
-    text: string
-    attributes?: {
-      'data-test': string
-    }
-  },
-  {
-    text: string
-    classes?: string
-    attributes?: {
-      'data-test': string
-    }
-  },
-  {
-    html: string
-    attributes?: {
-      'data-test': string
-    }
-  },
-  {
-    html: string
-    attributes?: {
-      'data-test': string
-    }
-  },
-]
-
 export type VisitorListItem = {
   personId: number
   name: string
@@ -61,7 +27,7 @@ export type VisitorListItem = {
 }
 
 export type PrisonerProfilePage = {
-  activeAlerts: PrisonerAlertItem[]
+  activeAlerts: Alert[]
   activeAlertCount: number
   flaggedAlerts: Alert[]
   prisonerDetails: {

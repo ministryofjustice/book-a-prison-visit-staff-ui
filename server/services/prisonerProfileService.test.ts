@@ -1,8 +1,7 @@
 import { addMonths, format, subMonths } from 'date-fns'
 import PrisonerProfileService from './prisonerProfileService'
 import { OffenderRestrictions } from '../data/prisonApiTypes'
-import { PrisonerAlertItem, PrisonerProfilePage } from '../@types/bapv'
-import { Alert } from '../data/orchestrationApiTypes'
+import { PrisonerProfilePage } from '../@types/bapv'
 import TestData from '../routes/testutils/testData'
 import {
   createMockHmppsAuthClient,
@@ -146,203 +145,21 @@ describe('Prisoner profile service', () => {
       )
     })
 
-    it('Filters active alerts that should be flagged', async () => {
-      const inactiveAlert: Alert = {
-        alertType: 'R',
-        alertTypeDescription: 'Risk',
-        alertCode: 'RCON',
-        alertCodeDescription: 'Conflict with other prisoners',
-        comment: 'Test',
-        dateCreated: '2021-07-27',
-        dateExpires: '2021-08-10',
-        expired: true,
-        active: false,
-      }
+    it('should filter active alerts and those to be flagged', async () => {
+      const inactiveAlert = TestData.alert({ active: false })
 
-      const nonRelevantAlert: Alert = {
-        alertType: 'X',
-        alertTypeDescription: 'Security',
-        alertCode: 'XR',
-        alertCodeDescription: 'Racist',
-        comment: 'Test',
-        dateCreated: '2022-01-01',
-        expired: false,
-        active: true,
-      }
-
-      const alertsToFlag: Alert[] = [
-        {
-          alertType: 'U',
-          alertTypeDescription: 'COVID unit management',
-          alertCode: 'UPIU',
-          alertCodeDescription: 'Protective Isolation Unit',
-          comment: 'Test',
-          dateCreated: '2022-01-02',
-          expired: false,
-          active: true,
-        },
-        {
-          alertType: 'R',
-          alertTypeDescription: 'Risk',
-          alertCode: 'RCDR',
-          alertCodeDescription: 'Quarantined – Communicable Disease Risk',
-          comment: 'Test',
-          dateCreated: '2022-01-03',
-          expired: false,
-          active: true,
-        },
-        {
-          alertType: 'U',
-          alertTypeDescription: 'COVID unit management',
-          alertCode: 'URCU',
-          alertCodeDescription: 'Reverse Cohorting Unit',
-          comment: 'Test',
-          dateCreated: '2022-01-04',
-          expired: false,
-          active: true,
-        },
+      const alertsToFlag = [
+        TestData.alert({ alertCode: 'UPIU' }),
+        TestData.alert({ alertCode: 'RCDR' }),
+        TestData.alert({ alertCode: 'URCU' }),
       ]
-
-      const alertsForDisplay: PrisonerAlertItem[] = [
-        [
-          {
-            text: 'Security (X)',
-            attributes: {
-              'data-test': 'tab-alerts-type-desc',
-            },
-          },
-          {
-            text: 'Racist (XR)',
-            attributes: {
-              'data-test': 'tab-alerts-code-desc',
-            },
-          },
-          {
-            text: 'Test',
-            classes: 'bapv-force-overflow',
-            attributes: {
-              'data-test': 'tab-alerts-comment',
-            },
-          },
-          {
-            html: '<span class="bapv-table_cell--nowrap">1 January</span> 2022',
-            attributes: {
-              'data-test': 'tab-alerts-created',
-            },
-          },
-          {
-            html: 'Not entered',
-            attributes: {
-              'data-test': 'tab-alerts-expires',
-            },
-          },
-        ],
-        [
-          {
-            text: 'COVID unit management (U)',
-            attributes: {
-              'data-test': 'tab-alerts-type-desc',
-            },
-          },
-          {
-            text: 'Protective Isolation Unit (UPIU)',
-            attributes: {
-              'data-test': 'tab-alerts-code-desc',
-            },
-          },
-          {
-            text: 'Test',
-            classes: 'bapv-force-overflow',
-            attributes: {
-              'data-test': 'tab-alerts-comment',
-            },
-          },
-          {
-            html: '<span class="bapv-table_cell--nowrap">2 January</span> 2022',
-            attributes: {
-              'data-test': 'tab-alerts-created',
-            },
-          },
-          {
-            html: 'Not entered',
-            attributes: {
-              'data-test': 'tab-alerts-expires',
-            },
-          },
-        ],
-        [
-          {
-            text: 'Risk (R)',
-            attributes: {
-              'data-test': 'tab-alerts-type-desc',
-            },
-          },
-          {
-            text: 'Quarantined – Communicable Disease Risk (RCDR)',
-            attributes: {
-              'data-test': 'tab-alerts-code-desc',
-            },
-          },
-          {
-            text: 'Test',
-            classes: 'bapv-force-overflow',
-            attributes: {
-              'data-test': 'tab-alerts-comment',
-            },
-          },
-          {
-            html: '<span class="bapv-table_cell--nowrap">3 January</span> 2022',
-            attributes: {
-              'data-test': 'tab-alerts-created',
-            },
-          },
-          {
-            html: 'Not entered',
-            attributes: {
-              'data-test': 'tab-alerts-expires',
-            },
-          },
-        ],
-        [
-          {
-            text: 'COVID unit management (U)',
-            attributes: {
-              'data-test': 'tab-alerts-type-desc',
-            },
-          },
-          {
-            text: 'Reverse Cohorting Unit (URCU)',
-            attributes: {
-              'data-test': 'tab-alerts-code-desc',
-            },
-          },
-          {
-            text: 'Test',
-            classes: 'bapv-force-overflow',
-            attributes: {
-              'data-test': 'tab-alerts-comment',
-            },
-          },
-          {
-            html: '<span class="bapv-table_cell--nowrap">4 January</span> 2022',
-            attributes: {
-              'data-test': 'tab-alerts-created',
-            },
-          },
-          {
-            html: 'Not entered',
-            attributes: {
-              'data-test': 'tab-alerts-expires',
-            },
-          },
-        ],
-      ]
+      const alertNotToFlag = TestData.alert({ alertCode: 'XR' })
 
       const prisonerProfile = TestData.prisonerProfile({
-        alerts: [inactiveAlert, nonRelevantAlert, ...alertsToFlag],
+        alerts: [inactiveAlert, alertNotToFlag, ...alertsToFlag],
       })
 
-      prisonerProfile.alerts = [inactiveAlert, nonRelevantAlert, ...alertsToFlag]
+      prisonerProfile.alerts = [inactiveAlert, alertNotToFlag, ...alertsToFlag]
 
       orchestrationApiClient.getPrisonerProfile.mockResolvedValue(prisonerProfile)
       prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue([])
@@ -353,7 +170,7 @@ describe('Prisoner profile service', () => {
       expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user')
       expect(orchestrationApiClient.getPrisonerProfile).toHaveBeenCalledTimes(1)
 
-      expect(results.activeAlerts).toStrictEqual(alertsForDisplay)
+      expect(results.activeAlerts).toStrictEqual([alertNotToFlag, ...alertsToFlag])
       expect(results.activeAlertCount).toBe(4)
       expect(results.flaggedAlerts).toStrictEqual(alertsToFlag)
     })

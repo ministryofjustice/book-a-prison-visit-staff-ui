@@ -130,7 +130,7 @@
           {% endset %}
 
           {# Build rows for this month's visits table #}
-          {% set visits = [] %}
+          {% set visitRows = [] %}
           {% for visit in data.visits %}
 
             {% set visitors = [] %}
@@ -138,7 +138,7 @@
               {% set visitors = (visitors.push(contactNames[visitor.nomisPersonId]), visitors) %}
             {% endfor %}
 
-            {% set visits = (visits.push([
+            {% set visitRows = (visitRows.push([
               {
                 html: '<a href="/visit/' + visit.reference + '">' +  visit.reference + '</a>',
                 attributes: { "data-test": "tab-visits-reference" }
@@ -164,7 +164,7 @@
                 text: visit.visitStatus | capitalize,
                 attributes: { "data-test": "tab-visits-status" }
               }
-            ]), visits) %}
+            ]), visitRows) %}
           {% endfor %}
 
           {{ govukTable({
@@ -191,7 +191,7 @@
                 text: "Visit status"
               }
             ],
-            rows: visits
+            rows: visitRows
           }) }}
         {% endfor %}
 
@@ -209,102 +209,133 @@
     {% endset %}
 
     {% set alertsTab %}
-    <h2 class="govuk-heading-m">Active alerts</h2>
-    {% if activeAlerts | length %}
+      <h2 class="govuk-heading-m">Active alerts</h2>
+      {% if activeAlerts | length %}
+
+        {# Build rows for alerts table #}
+        {% set alertRows = [] %}
+        {% for alert in activeAlerts %}
+          {% set alertRows = (alertRows.push([
+            {
+              text: alert.alertTypeDescription + " (" + alert.alertType + ")",
+              attributes: { "data-test": "tab-alerts-type-desc" }
+            },
+            {
+              text: alert.alertCodeDescription + " (" + alert.alertCode + ")",
+              attributes: { "data-test": "tab-alerts-code-desc" }
+            },
+            {
+              text: alert.comment,
+              classes: "bapv-force-overflow",
+              attributes: { "data-test": "tab-alerts-comment" }
+            },
+            {
+              text: alert.dateCreated | formatDate if alert.dateCreated else "Not entered",
+              attributes: { "data-test": "tab-alerts-created" }
+            },
+            {
+              text: alert.dateExpires | formatDate if alert.dateExpires else "Not entered",
+              attributes: { "data-test": "tab-alerts-expires" }
+            }
+          ]), alertRows) %}
+        {% endfor %}
+
+        {{ govukTable({
+          head: [
+            {
+              text: "Type of alert",
+              classes: "bapv-table_cell--nowrap"
+            },
+            {
+              text: "Alert"
+            },
+            {
+              text: "Comments"
+            },
+            {
+              text: "Date from",
+              classes: "bapv-table_cell--nowrap"
+            },
+            {
+              text: "Date to",
+              classes: "bapv-table_cell--nowrap"
+            }
+          ],
+          rows: alertRows
+        }) }}
+      {% else %}
+        <p>There are no active alerts for this prisoner.</p>
+      {% endif %}
+    {% endset %}
+
+    {% set visitingOrdersTab %}
+      <h2 class="govuk-heading-m">Visiting orders</h2>
       {{ govukTable({
         head: [
           {
-            text: "Type of alert",
-            classes: "bapv-table_cell--nowrap"
+            text: "Type"
           },
           {
-            text: "Alert"
+            text: "Balance"
           },
           {
-            text: "Comments"
+            text: "Last allocation date"
           },
           {
-            text: "Date from",
-            classes: "bapv-table_cell--nowrap"
-          },
-          {
-            text: "Date to",
-            classes: "bapv-table_cell--nowrap"
+            text: "Next allocation date"
           }
         ],
-        rows: activeAlerts
-      }) }}
-    {% else %}
-    <p>There are no active alerts for this prisoner.</p>
-    {% endif %}
-    {% endset %}
-    {% set visitingOrdersTab %}
-    <h2 class="govuk-heading-m">Visiting orders</h2>
-    {{ govukTable({
-      head: [
-        {
-          text: "Type"
-        },
-        {
-          text: "Balance"
-        },
-        {
-          text: "Last allocation date"
-        },
-        {
-          text: "Next allocation date"
-        }
-      ],
-      rows: [
-        [
-          {
-            html: "<strong>VO</strong>"
-          },
-          {
-            text: prisonerDetails.visitBalances.remainingVo,
-            attributes: {
-              "data-test": "tab-vo-remaining"
+        rows: [
+          [
+            {
+              html: "<strong>VO</strong>"
+            },
+            {
+              text: prisonerDetails.visitBalances.remainingVo,
+              attributes: {
+                "data-test": "tab-vo-remaining"
+              }
+            },
+            {
+              text: prisonerDetails.visitBalances.latestIepAdjustDate,
+              attributes: {
+                "data-test": "tab-vo-last-date"
+              }
+            },
+            {
+              text: prisonerDetails.visitBalances.nextIepAdjustDate,
+              attributes: {
+                "data-test": "tab-vo-next-date"
+              }
             }
-          },
-          {
-            text: prisonerDetails.visitBalances.latestIepAdjustDate,
-            attributes: {
-              "data-test": "tab-vo-last-date"
+          ],
+          [
+            {
+              html: "<strong>PVO</strong>"
+            },
+            {
+              text: prisonerDetails.visitBalances.remainingPvo,
+              attributes: {
+                "data-test": "tab-pvo-remaining"
+              }
+            },
+            {
+              text: prisonerDetails.visitBalances.latestPrivIepAdjustDate,
+              attributes: {
+                "data-test": "tab-pvo-last-date"
+              }
+            },
+            {
+              text: prisonerDetails.visitBalances.nextPrivIepAdjustDate,
+              attributes: {
+                "data-test": "tab-pvo-next-date"
+              }
             }
-          },
-          {
-            text: prisonerDetails.visitBalances.nextIepAdjustDate,
-            attributes: {
-              "data-test": "tab-vo-next-date"
-            }
-          }
-        ],
-        [
-          {
-            html: "<strong>PVO</strong>"
-          },
-          {
-            text: prisonerDetails.visitBalances.remainingPvo,
-            attributes: {
-              "data-test": "tab-pvo-remaining"
-            }
-          },
-          {
-            text: prisonerDetails.visitBalances.latestPrivIepAdjustDate,
-            attributes: {
-              "data-test": "tab-pvo-last-date"
-            }
-          },
-          {
-            text: prisonerDetails.visitBalances.nextPrivIepAdjustDate,
-            attributes: {
-              "data-test": "tab-pvo-next-date"
-            }
-          }
+          ]
         ]
-      ]
-    }) }}
+      }) }}
     {% endset %}
+
     {{ govukTabs({
       classes: 'bapv-tabs',
       items: [

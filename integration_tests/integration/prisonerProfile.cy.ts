@@ -19,26 +19,20 @@ context('Prisoner profile page', () => {
     const prisonerDisplayName = 'Smith, John'
 
     const alerts = [
-      {
+      TestData.alert({
         alertType: 'U',
         alertTypeDescription: 'COVID unit management',
         alertCode: 'UPIU',
         alertCodeDescription: 'Protective Isolation Unit',
-        comment: 'Test',
         dateCreated: '2022-01-02',
-        expired: false,
-        active: true,
-      },
-      {
+      }),
+      TestData.alert({
         alertType: 'X',
         alertTypeDescription: 'Security',
         alertCode: 'XR',
         alertCodeDescription: 'Racist',
-        comment: 'Test',
         dateCreated: '2022-01-01',
-        expired: false,
-        active: true,
-      },
+      }),
     ]
     const visit = TestData.visit()
     const contacts = [TestData.contact(), TestData.contact({ personId: 4322, firstName: 'Bob' })]
@@ -80,7 +74,7 @@ context('Prisoner profile page', () => {
     prisonerProfilePage.selectActiveAlertsTab()
     prisonerProfilePage.alertsTabType().eq(0).contains('COVID unit management (U)')
     prisonerProfilePage.alertsTabCode().eq(0).contains('UPIU')
-    prisonerProfilePage.alertsTabComment().eq(0).contains('Test')
+    prisonerProfilePage.alertsTabComment().eq(0).contains('Alert comment')
     prisonerProfilePage
       .alertsTabCreated()
       .eq(0)
