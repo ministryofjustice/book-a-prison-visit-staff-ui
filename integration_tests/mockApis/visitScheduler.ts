@@ -7,22 +7,8 @@ import {
   Visit,
   VisitSession,
 } from '../../server/data/orchestrationApiTypes'
-import TestData from '../../server/routes/testutils/testData'
 
 export default {
-  stubAvailableSupport: (): SuperAgentRequest => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        url: '/visitScheduler/visit-support',
-      },
-      response: {
-        status: 200,
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: TestData.supportTypes(),
-      },
-    })
-  },
   stubBookVisit: (visit: Visit): SuperAgentRequest => {
     return stubFor({
       request: {

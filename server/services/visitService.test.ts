@@ -7,7 +7,7 @@ import {
   createMockOrchestrationApiClient,
   createMockPrisonerContactRegistryApiClient,
 } from '../data/testutils/mocks'
-import { createMockVisitSessionsService } from './testutils/mocks'
+import { createMockAdditionalSupportService } from './testutils/mocks'
 
 const token = 'some token'
 
@@ -15,7 +15,7 @@ describe('Visit service', () => {
   const hmppsAuthClient = createMockHmppsAuthClient()
   const orchestrationApiClient = createMockOrchestrationApiClient()
   const prisonerContactRegistryApiClient = createMockPrisonerContactRegistryApiClient()
-  const visitSessionsService = createMockVisitSessionsService()
+  const additionalSupportService = createMockAdditionalSupportService()
 
   let visitService: VisitService
 
@@ -31,7 +31,7 @@ describe('Visit service', () => {
     visitService = new VisitService(
       OrchestrationApiClientFactory,
       PrisonerContactRegistryApiClientFactory,
-      visitSessionsService,
+      additionalSupportService,
       hmppsAuthClient,
     )
     hmppsAuthClient.getSystemClientToken.mockResolvedValue(token)
@@ -96,13 +96,13 @@ describe('Visit service', () => {
         }
 
         prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue(contacts)
-        visitSessionsService.getAvailableSupportOptions.mockResolvedValue(availableSupportTypes)
+        additionalSupportService.getAvailableSupportOptions.mockResolvedValue(availableSupportTypes)
         orchestrationApiClient.getVisitHistory.mockResolvedValue(visitHistoryDetails)
 
         const result = await visitService.getFullVisitDetails({ username: 'user', reference: 'ab-cd-ef-gh' })
 
         expect(prisonerContactRegistryApiClient.getPrisonerSocialContacts).toHaveBeenCalledTimes(1)
-        expect(visitSessionsService.getAvailableSupportOptions).toHaveBeenCalledTimes(1)
+        expect(additionalSupportService.getAvailableSupportOptions).toHaveBeenCalledTimes(1)
         expect(orchestrationApiClient.getVisitHistory).toHaveBeenCalledTimes(1)
         expect(result).toEqual(expectedResult)
       })

@@ -1,4 +1,5 @@
 import { dataAccess } from '../data'
+import AdditionalSupportService from './additionalSupportService'
 import AuditService from './auditService'
 import NotificationsService from './notificationsService'
 import PrisonerProfileService from './prisonerProfileService'
@@ -21,6 +22,8 @@ export const services = () => {
     visitSchedulerApiClientBuilder,
     whereaboutsApiClientBuilder,
   } = dataAccess()
+
+  const additionalSupportService = new AdditionalSupportService(orchestrationApiClientBuilder, hmppsAuthClient)
 
   const auditService = new AuditService()
 
@@ -55,11 +58,12 @@ export const services = () => {
   const visitService = new VisitService(
     orchestrationApiClientBuilder,
     prisonerContactRegistryApiClientBuilder,
-    visitSessionsService,
+    additionalSupportService,
     hmppsAuthClient,
   )
 
   return {
+    additionalSupportService,
     auditService,
     notificationsService,
     prisonerProfileService,
@@ -75,6 +79,7 @@ export const services = () => {
 export type Services = ReturnType<typeof services>
 
 export {
+  AdditionalSupportService,
   AuditService,
   NotificationsService,
   PrisonerProfileService,

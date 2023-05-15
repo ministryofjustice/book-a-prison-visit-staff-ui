@@ -1,7 +1,6 @@
 import { URLSearchParams } from 'url'
 import RestClient from './restClient'
 import {
-  SupportType,
   Visit,
   VisitSession,
   OutcomeDto,
@@ -27,12 +26,6 @@ export default class VisitSchedulerApiClient {
   private page = '0'
 
   private size = '1000'
-
-  async getAvailableSupportOptions(): Promise<SupportType[]> {
-    return this.restClient.get({
-      path: '/visit-support',
-    })
-  }
 
   async getVisit(reference: string): Promise<Visit> {
     return this.restClient.get({ path: `/visits/${reference}` })

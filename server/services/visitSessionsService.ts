@@ -10,14 +10,7 @@ import {
   VisitSessionData,
   VisitsPageSlot,
 } from '../@types/bapv'
-import {
-  VisitSession,
-  Visit,
-  SupportType,
-  OutcomeDto,
-  SessionCapacity,
-  SessionSchedule,
-} from '../data/orchestrationApiTypes'
+import { VisitSession, Visit, OutcomeDto, SessionCapacity, SessionSchedule } from '../data/orchestrationApiTypes'
 import { ScheduledEvent } from '../data/whereaboutsApiTypes'
 import { prisonerDateTimePretty, prisonerTimePretty } from '../utils/utils'
 import buildVisitorListItem from '../utils/visitorUtils'
@@ -39,12 +32,6 @@ export default class VisitSessionsService {
     private readonly whereaboutsApiClientFactory: RestClientBuilder<WhereaboutsApiClient>,
     private readonly hmppsAuthClient: HmppsAuthClient,
   ) {}
-
-  async getAvailableSupportOptions(username: string): Promise<SupportType[]> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const visitSchedulerApiClient = this.visitSchedulerApiClientFactory(token)
-    return visitSchedulerApiClient.getAvailableSupportOptions()
-  }
 
   async getVisitSessions({
     username,

@@ -33,7 +33,6 @@ describe('Visit sessions service', () => {
   const WhereaboutsApiClientFactory = jest.fn()
 
   const prisonId = 'HEI'
-  const availableSupportTypes = TestData.supportTypes()
 
   beforeEach(() => {
     PrisonerContactRegistryApiClientFactory.mockReturnValue(prisonerContactRegistryApiClient)
@@ -51,17 +50,6 @@ describe('Visit sessions service', () => {
 
   afterEach(() => {
     jest.resetAllMocks()
-  })
-
-  describe('getAdditionalSupportOptions', () => {
-    it('should return an array of available support options', async () => {
-      visitSchedulerApiClient.getAvailableSupportOptions.mockResolvedValue(availableSupportTypes)
-
-      const results = await visitSessionsService.getAvailableSupportOptions('user')
-
-      expect(visitSchedulerApiClient.getAvailableSupportOptions).toHaveBeenCalledTimes(1)
-      expect(results).toEqual(availableSupportTypes)
-    })
   })
 
   describe('getVisitSessions', () => {
