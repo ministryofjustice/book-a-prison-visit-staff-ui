@@ -230,7 +230,7 @@
               attributes: { "data-test": "tab-alerts-comment" }
             },
             {
-              text: alert.dateCreated | formatDate if alert.dateCreated else "Not entered",
+              html: alert.dateCreated | formatDate("d'&nbsp;'MMMM yyyy") if alert.dateCreated else "Not entered",
               attributes: { "data-test": "tab-alerts-created" }
             },
             {
