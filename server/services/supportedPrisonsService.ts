@@ -1,11 +1,11 @@
 import { Prison } from '../@types/bapv'
-import { HmppsAuthClient, PrisonRegisterApiClient, RestClientBuilder, VisitSchedulerApiClient } from '../data'
+import { HmppsAuthClient, OrchestrationApiClient, PrisonRegisterApiClient, RestClientBuilder } from '../data'
 
 const A_DAY_IN_MS = 24 * 60 * 60 * 1000
 
 export default class SupportedPrisonsService {
   constructor(
-    private readonly visitSchedulerApiClientFactory: RestClientBuilder<VisitSchedulerApiClient>,
+    private readonly orchestrationApiClientFactory: RestClientBuilder<OrchestrationApiClient>,
     private readonly prisonRegisterApiClientFactory: RestClientBuilder<PrisonRegisterApiClient>,
     private readonly hmppsAuthClient: HmppsAuthClient,
   ) {}
@@ -32,8 +32,8 @@ export default class SupportedPrisonsService {
 
   async getSupportedPrisonIds(username: string): Promise<string[]> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const visitSchedulerApiClient = this.visitSchedulerApiClientFactory(token)
-    return visitSchedulerApiClient.getSupportedPrisonIds()
+    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+    return orchestrationApiClient.getSupportedPrisonIds()
   }
 
   private async refreshAllPrisons(username: string): Promise<void> {

@@ -27,7 +27,7 @@ export const services = () => {
   const notificationsService = new NotificationsService(notificationsApiClientBuilder)
 
   const supportedPrisonsService = new SupportedPrisonsService(
-    visitSchedulerApiClientBuilder,
+    orchestrationApiClientBuilder,
     prisonRegisterApiClientBuilder,
     hmppsAuthClient,
   )

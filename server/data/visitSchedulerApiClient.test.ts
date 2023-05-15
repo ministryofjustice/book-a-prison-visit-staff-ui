@@ -33,21 +33,6 @@ describe('visitSchedulerApiClient', () => {
     nock.cleanAll()
   })
 
-  describe('getSupportedPrisonIds', () => {
-    it('should return an array of supported prison IDs', async () => {
-      const results = ['HEI', 'BLI']
-
-      fakeVisitSchedulerApi
-        .get('/config/prisons/supported')
-        .matchHeader('authorization', `Bearer ${token}`)
-        .reply(200, results)
-
-      const output = await visitSchedulerApiClient.getSupportedPrisonIds()
-
-      expect(output).toEqual(results)
-    })
-  })
-
   describe('getAvailableSupportOptions', () => {
     it('should return an array of available support types', async () => {
       const results = TestData.supportTypes()

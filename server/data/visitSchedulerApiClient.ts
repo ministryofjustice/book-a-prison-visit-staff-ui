@@ -28,12 +28,6 @@ export default class VisitSchedulerApiClient {
 
   private size = '1000'
 
-  async getSupportedPrisonIds(): Promise<string[]> {
-    return this.restClient.get({
-      path: '/config/prisons/supported',
-    })
-  }
-
   async getAvailableSupportOptions(): Promise<SupportType[]> {
     return this.restClient.get({
       path: '/visit-support',
