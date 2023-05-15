@@ -1,5 +1,6 @@
 import { Prison } from '../../@types/bapv'
 import {
+  Alert,
   PrisonerProfile,
   SessionCapacity,
   SessionSchedule,
@@ -8,7 +9,7 @@ import {
   VisitHistoryDetails,
   VisitSession,
 } from '../../data/orchestrationApiTypes'
-import { CaseLoad, OffenderRestriction, Alert } from '../../data/prisonApiTypes'
+import { CaseLoad, OffenderRestriction } from '../../data/prisonApiTypes'
 import { CurrentIncentive, Prisoner } from '../../data/prisonerOffenderSearchTypes'
 import { Address, Contact, Restriction } from '../../data/prisonerContactRegistryApiTypes'
 import { ScheduledEvent } from '../../data/whereaboutsApiTypes'
@@ -44,19 +45,17 @@ export default class TestData {
     } as Address)
 
   static alert = ({
-    alertId = 123,
     alertType = 'U',
     alertTypeDescription = 'COVID unit management',
     alertCode = 'UPIU',
     alertCodeDescription = 'Protective Isolation Unit',
-    comment = 'Alert comment!',
+    comment = 'Alert comment',
     dateCreated = '2023-01-02',
     dateExpires = undefined,
     expired = false,
     active = true,
   }: Partial<Alert> = {}): Alert =>
     ({
-      alertId,
       alertType,
       alertTypeDescription,
       alertCode,

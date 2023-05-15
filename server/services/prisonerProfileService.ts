@@ -1,13 +1,7 @@
 import { NotFound } from 'http-errors'
 import { format, isBefore } from 'date-fns'
-import { PrisonerAlertItem, PrisonerProfilePage } from '../@types/bapv'
-import {
-  nextIepAdjustDate,
-  nextPrivIepAdjustDate,
-  prisonerDatePretty,
-  prisonerDateTimePretty,
-  properCaseFullName,
-} from '../utils/utils'
+import { PrisonerProfilePage } from '../@types/bapv'
+import { nextIepAdjustDate, nextPrivIepAdjustDate, prisonerDateTimePretty, properCaseFullName } from '../utils/utils'
 import { Alert, OffenderRestriction } from '../data/prisonApiTypes'
 import {
   HmppsAuthClient,
@@ -44,45 +38,6 @@ export default class PrisonerProfileService {
     const activeAlerts: Alert[] = alerts.filter(alert => alert.active)
     const activeAlertCount = activeAlerts.length
     const flaggedAlerts: Alert[] = activeAlerts.filter(alert => this.alertCodesToFlag.includes(alert.alertCode))
-    const activeAlertsForDisplay: PrisonerAlertItem[] = activeAlerts.map(alert => {
-      return [
-        {
-          text: `${alert.alertTypeDescription} (${alert.alertType})`,
-          attributes: {
-            'data-test': 'tab-alerts-type-desc',
-          },
-        },
-        {
-          text: `${alert.alertCodeDescription} (${alert.alertCode})`,
-          attributes: {
-            'data-test': 'tab-alerts-code-desc',
-          },
-        },
-        {
-          text: alert.comment,
-          classes: 'bapv-force-overflow',
-          attributes: {
-            'data-test': 'tab-alerts-comment',
-          },
-        },
-        {
-          html: alert.dateCreated
-            ? prisonerDatePretty({ dateToFormat: alert.dateCreated, wrapDate: false })
-            : 'Not entered',
-          attributes: {
-            'data-test': 'tab-alerts-created',
-          },
-        },
-        {
-          html: alert.dateExpires
-            ? prisonerDatePretty({ dateToFormat: alert.dateExpires, wrapDate: false })
-            : 'Not entered',
-          attributes: {
-            'data-test': 'tab-alerts-expires',
-          },
-        },
-      ]
-    })
 
     const visitsByMonth: PrisonerProfilePage['visitsByMonth'] = new Map()
     const now = new Date()
@@ -132,7 +87,7 @@ export default class PrisonerProfileService {
     }
 
     return {
-      activeAlerts: activeAlertsForDisplay,
+      activeAlerts,
       activeAlertCount,
       flaggedAlerts,
       prisonerDetails,
