@@ -10,7 +10,7 @@ import {
   VisitSessionData,
   VisitsPageSlot,
 } from '../@types/bapv'
-import { VisitSession, Visit, OutcomeDto, SessionCapacity, SessionSchedule } from '../data/orchestrationApiTypes'
+import { VisitSession, Visit, SessionCapacity, SessionSchedule } from '../data/orchestrationApiTypes'
 import { ScheduledEvent } from '../data/whereaboutsApiTypes'
 import { prisonerDateTimePretty, prisonerTimePretty } from '../utils/utils'
 import buildVisitorListItem from '../utils/visitorUtils'
@@ -185,77 +185,6 @@ export default class VisitSessionsService {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const visitSchedulerApiClient = this.visitSchedulerApiClientFactory(token)
     return visitSchedulerApiClient.getVisitSessionCapacity(prisonId, sessionDate, sessionStartTime, sessionEndTime)
-  }
-
-  async reserveVisit({
-    username,
-    visitSessionData,
-  }: {
-    username: string
-    visitSessionData: VisitSessionData
-  }): Promise<Visit> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const visitSchedulerApiClient = this.visitSchedulerApiClientFactory(token)
-
-    const reservation = await visitSchedulerApiClient.reserveVisit(visitSessionData)
-    return reservation
-  }
-
-  async changeReservedVisit({
-    username,
-    visitSessionData,
-  }: {
-    username: string
-    visitSessionData: VisitSessionData
-  }): Promise<Visit> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const visitSchedulerApiClient = this.visitSchedulerApiClientFactory(token)
-
-    const visit = await visitSchedulerApiClient.changeReservedVisit(visitSessionData)
-    return visit
-  }
-
-  async bookVisit({
-    username,
-    applicationReference,
-  }: {
-    username: string
-    applicationReference: string
-  }): Promise<Visit> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const visitSchedulerApiClient = this.visitSchedulerApiClientFactory(token)
-
-    const visit = await visitSchedulerApiClient.bookVisit(applicationReference)
-    return visit
-  }
-
-  async changeBookedVisit({
-    username,
-    visitSessionData,
-  }: {
-    username: string
-    visitSessionData: VisitSessionData
-  }): Promise<Visit> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const visitSchedulerApiClient = this.visitSchedulerApiClientFactory(token)
-
-    const visit = await visitSchedulerApiClient.changeBookedVisit(visitSessionData)
-    return visit
-  }
-
-  async cancelVisit({
-    username,
-    reference,
-    outcome,
-  }: {
-    username: string
-    reference: string
-    outcome: OutcomeDto
-  }): Promise<Visit> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const visitSchedulerApiClient = this.visitSchedulerApiClientFactory(token)
-
-    return visitSchedulerApiClient.cancelVisit(reference, outcome)
   }
 
   async getVisit({

@@ -1,16 +1,6 @@
 import { URLSearchParams } from 'url'
 import RestClient from './restClient'
-import {
-  Visit,
-  VisitSession,
-  OutcomeDto,
-  ReserveVisitSlotDto,
-  ChangeVisitSlotRequestDto,
-  SessionCapacity,
-  PageVisitDto,
-  SessionSchedule,
-} from './orchestrationApiTypes'
-import { VisitSessionData } from '../@types/bapv'
+import { Visit, VisitSession, SessionCapacity, PageVisitDto, SessionSchedule } from './orchestrationApiTypes'
 import config, { ApiConfig } from '../config'
 
 export default class VisitSchedulerApiClient {
@@ -93,93 +83,5 @@ export default class VisitSchedulerApiClient {
     } catch (error) {
       return null
     }
-  }
-
-  async reserveVisit(visitSessionData: VisitSessionData): Promise<Visit> {
-    return this.restClient.post({
-      path: '/visits/slot/reserve',
-      data: <ReserveVisitSlotDto>{
-        prisonerId: visitSessionData.prisoner.offenderNo,
-        sessionTemplateReference: visitSessionData.visitSlot.sessionTemplateReference,
-        visitRestriction: visitSessionData.visitRestriction,
-        startTimestamp: visitSessionData.visitSlot.startTimestamp,
-        endTimestamp: visitSessionData.visitSlot.endTimestamp,
-        visitors: visitSessionData.visitors.map(visitor => {
-          return {
-            nomisPersonId: visitor.personId,
-          }
-        }),
-      },
-    })
-  }
-
-  async changeReservedVisit(visitSessionData: VisitSessionData): Promise<Visit> {
-    const { visitContact, mainContactId } = this.convertMainContactToVisitContact(visitSessionData.mainContact)
-
-    return this.restClient.put({
-      path: `/visits/${visitSessionData.applicationReference}/slot/change`,
-      data: <ChangeVisitSlotRequestDto>{
-        visitRestriction: visitSessionData.visitRestriction,
-        startTimestamp: visitSessionData.visitSlot.startTimestamp,
-        endTimestamp: visitSessionData.visitSlot.endTimestamp,
-        visitContact,
-        visitors: visitSessionData.visitors.map(visitor => {
-          return {
-            nomisPersonId: visitor.personId,
-            visitContact: visitor.personId === mainContactId,
-          }
-        }),
-        visitorSupport: visitSessionData.visitorSupport,
-      },
-    })
-  }
-
-  async bookVisit(applicationReference: string): Promise<Visit> {
-    return this.restClient.put({ path: `/visits/${applicationReference}/book` })
-  }
-
-  async changeBookedVisit(visitSessionData: VisitSessionData): Promise<Visit> {
-    const { visitContact, mainContactId } = this.convertMainContactToVisitContact(visitSessionData.mainContact)
-
-    return this.restClient.put({
-      path: `/visits/${visitSessionData.visitReference}/change`,
-      data: <ReserveVisitSlotDto>{
-        prisonerId: visitSessionData.prisoner.offenderNo,
-        sessionTemplateReference: visitSessionData.visitSlot.sessionTemplateReference,
-        visitRestriction: visitSessionData.visitRestriction,
-        startTimestamp: visitSessionData.visitSlot.startTimestamp,
-        endTimestamp: visitSessionData.visitSlot.endTimestamp,
-        visitContact,
-        visitors: visitSessionData.visitors.map(visitor => {
-          return {
-            nomisPersonId: visitor.personId,
-            visitContact: visitor.personId === mainContactId,
-          }
-        }),
-        visitorSupport: visitSessionData.visitorSupport,
-      },
-    })
-  }
-
-  async cancelVisit(reference: string, outcome: OutcomeDto): Promise<Visit> {
-    return this.restClient.put({
-      path: `/visits/${reference}/cancel`,
-      data: outcome,
-    })
-  }
-
-  private convertMainContactToVisitContact(mainContact: VisitSessionData['mainContact']): {
-    visitContact: ReserveVisitSlotDto['visitContact']
-    mainContactId: number
-  } {
-    const visitContact = mainContact
-      ? {
-          telephone: mainContact.phoneNumber,
-          name: mainContact.contactName ? mainContact.contactName : mainContact.contact.name,
-        }
-      : undefined
-    const mainContactId = mainContact && mainContact.contact ? mainContact.contact.personId : null
-
-    return { visitContact, mainContactId }
   }
 }

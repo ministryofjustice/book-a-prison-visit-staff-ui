@@ -32,6 +32,10 @@ export default defineConfig({
         ...tokenVerification,
 
         // Orchestration service
+        stubBookVisit: orchestrationService.stubBookVisit,
+        stubCancelVisit: orchestrationService.stubCancelVisit,
+        stubChangeReservedSlot: orchestrationService.stubChangeReservedSlot,
+        stubReserveVisit: orchestrationService.stubReserveVisit,
         stubAvailableSupport: orchestrationService.stubAvailableSupport,
         stubPrisonerProfile: orchestrationService.stubPrisonerProfile,
         stubSupportedPrisonIds: orchestrationService.stubSupportedPrisonIds,
@@ -55,12 +59,8 @@ export default defineConfig({
         stubPrisons: prisonRegister.stubPrisons,
 
         // Visit scheduler
-        stubBookVisit: visitScheduler.stubBookVisit,
-        stubCancelVisit: visitScheduler.stubCancelVisit,
-        stubChangeReservedSlot: visitScheduler.stubChangeReservedSlot,
         stubUpcomingVisits: visitScheduler.stubUpcomingVisits,
         stubPastVisits: visitScheduler.stubPastVisits,
-        stubReserveVisit: visitScheduler.stubReserveVisit,
         stubSessionSchedule: visitScheduler.stubSessionSchedule,
         stubVisit: visitScheduler.stubVisit,
         stubVisitSessions: visitScheduler.stubVisitSessions,

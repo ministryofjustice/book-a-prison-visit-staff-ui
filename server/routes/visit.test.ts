@@ -639,7 +639,7 @@ describe('POST /visit/:reference/cancel', () => {
   beforeEach(() => {
     cancelledVisit = TestData.visit()
 
-    visitSessionsService.cancelVisit = jest.fn().mockResolvedValue(cancelledVisit)
+    visitService.cancelVisit = jest.fn().mockResolvedValue(cancelledVisit)
     notificationsService.sendCancellationSms = jest.fn().mockResolvedValue({})
     supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
 
@@ -649,7 +649,7 @@ describe('POST /visit/:reference/cancel', () => {
         notificationsService,
         prisonerSearchService,
         supportedPrisonsService,
-        visitSessionsService,
+        visitService,
       },
     })
   })
@@ -664,8 +664,8 @@ describe('POST /visit/:reference/cancel', () => {
       .expect(302)
       .expect('location', '/visit/cancelled')
       .expect(() => {
-        expect(visitSessionsService.cancelVisit).toHaveBeenCalledTimes(1)
-        expect(visitSessionsService.cancelVisit).toHaveBeenCalledWith({
+        expect(visitService.cancelVisit).toHaveBeenCalledTimes(1)
+        expect(visitService.cancelVisit).toHaveBeenCalledWith({
           username: 'user1',
           reference: 'ab-cd-ef-gh',
           outcome: <OutcomeDto>{
@@ -706,7 +706,7 @@ describe('POST /visit/:reference/cancel', () => {
       .expect(302)
       .expect('location', '/visit/cancelled')
       .expect(() => {
-        expect(visitSessionsService.cancelVisit).toHaveBeenCalledTimes(1)
+        expect(visitService.cancelVisit).toHaveBeenCalledTimes(1)
         expect(auditService.cancelledVisit).toHaveBeenCalledTimes(1)
         expect(notificationsService.sendCancellationSms).toHaveBeenCalledTimes(1)
         expect(notificationsService.sendCancellationSms).toHaveBeenCalledWith({
@@ -729,7 +729,7 @@ describe('POST /visit/:reference/cancel', () => {
       .expect(302)
       .expect('location', '/visit/cancelled')
       .expect(() => {
-        expect(visitSessionsService.cancelVisit).toHaveBeenCalledTimes(1)
+        expect(visitService.cancelVisit).toHaveBeenCalledTimes(1)
         expect(auditService.cancelledVisit).toHaveBeenCalledTimes(1)
         expect(notificationsService.sendCancellationSms).not.toHaveBeenCalled()
       })
@@ -747,7 +747,7 @@ describe('POST /visit/:reference/cancel', () => {
       .expect(302)
       .expect('location', '/visit/cancelled')
       .expect(() => {
-        expect(visitSessionsService.cancelVisit).toHaveBeenCalledTimes(1)
+        expect(visitService.cancelVisit).toHaveBeenCalledTimes(1)
         expect(auditService.cancelledVisit).toHaveBeenCalledTimes(1)
         expect(notificationsService.sendCancellationSms).toHaveBeenCalledTimes(1)
       })
