@@ -441,8 +441,8 @@ export interface components {
       first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
       last?: boolean
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     PageableObject: {
@@ -451,10 +451,10 @@ export interface components {
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
       pageSize?: number
-      /** Format: int32 */
-      pageNumber?: number
       paged?: boolean
       unpaged?: boolean
+      /** Format: int32 */
+      pageNumber?: number
     }
     SortObject: {
       empty?: boolean
@@ -567,8 +567,6 @@ export interface components {
        */
       endTime: string
       capacity: components['schemas']['SessionCapacityDto']
-      /** @description The session is for enhanced privileges */
-      enhanced: boolean
       /**
        * @description prisoner location group
        * @example Wing C
@@ -579,6 +577,11 @@ export interface components {
        * @example Category A Prisoners
        */
       prisonerCategoryGroupNames: string[]
+      /**
+       * @description prisoner incentive level groups
+       * @example Enhanced Incentive Level Prisoners
+       */
+      prisonerIncentiveLevelGroupNames: string[]
       /**
        * @description The session template frequency
        * @example BI_WEEKLY

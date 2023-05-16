@@ -185,6 +185,25 @@ export interface paths {
      */
     get: operations['findByPrison']
   }
+  '/prisoner-index/reconcile-prisoner/{prisonerNumber}': {
+    /**
+     * Compare a prisoner's index with Nomis
+     * @description Existing index is compared in detail with current Nomis data for a specific prisoner, requires ROLE_PRISONER_INDEX.
+     */
+    get: operations['reconcilePrisoner']
+  }
+  '/prisoner-index/reconcile-index': {
+    /**
+     * Start a full index comparison
+     * @description The whole existing index is compared in detail with current Nomis data, requires ROLE_PRISONER_INDEX.
+     *       Results are written as customEvents. Nothing is written where a prisoner's data matches.
+     *       Note this is a heavyweight operation, like a full index rebuild
+     */
+    get: operations['startIndexReconciliation']
+  }
+  '/prisoner-index/compare-index': {
+    get: operations['compareIndex']
+  }
   '/prison/{prisonId}/prisoners': {
     /**
      * Search for prisoners within a particular prison establishment
@@ -229,9 +248,6 @@ export interface paths {
      *       This will return all people in HMP Wandsworth. With the alerts TACT or PEEP.
      */
     get: operations['search']
-  }
-  '/compare-index': {
-    get: operations['compareIndex']
   }
 }
 
@@ -2146,6 +2162,43 @@ export interface operations {
     }
   }
   /**
+   * Compare a prisoner's index with Nomis
+   * @description Existing index is compared in detail with current Nomis data for a specific prisoner, requires ROLE_PRISONER_INDEX.
+   */
+  reconcilePrisoner: {
+    parameters: {
+      path: {
+        prisonerNumber: string
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          'application/json': string
+        }
+      }
+    }
+  }
+  /**
+   * Start a full index comparison
+   * @description The whole existing index is compared in detail with current Nomis data, requires ROLE_PRISONER_INDEX.
+   *       Results are written as customEvents. Nothing is written where a prisoner's data matches.
+   *       Note this is a heavyweight operation, like a full index rebuild
+   */
+  startIndexReconciliation: {
+    responses: {
+      /** @description Accepted */
+      202: never
+    }
+  }
+  compareIndex: {
+    responses: {
+      /** @description Accepted */
+      202: never
+    }
+  }
+  /**
    * Search for prisoners within a particular prison establishment
    * @description
    *       This search is optimised for clients that have a simple search term typically containing the prisonser's name
@@ -2256,12 +2309,6 @@ export interface operations {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
-    }
-  }
-  compareIndex: {
-    responses: {
-      /** @description Accepted */
-      202: never
     }
   }
 }
