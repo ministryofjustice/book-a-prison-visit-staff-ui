@@ -1,54 +1,8 @@
 import { SuperAgentRequest } from 'superagent'
 import { stubFor } from './wiremock'
-import { SessionCapacity, SessionSchedule, Visit, VisitSession } from '../../server/data/orchestrationApiTypes'
+import { SessionCapacity, SessionSchedule, VisitSession } from '../../server/data/orchestrationApiTypes'
 
 export default {
-  stubUpcomingVisits: ({
-    offenderNo,
-    upcomingVisits,
-  }: {
-    offenderNo: string
-    upcomingVisits: Visit[]
-  }): SuperAgentRequest => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPath: '/visitScheduler/visits/search',
-        queryParameters: {
-          prisonerId: { equalTo: offenderNo },
-          startDateTime: { matches: '.*' },
-          visitStatus: { and: [{ contains: 'BOOKED' }, { contains: 'CANCELLED' }] },
-          page: { equalTo: '0' },
-          size: { equalTo: '1000' },
-        },
-      },
-      response: {
-        status: 200,
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: { content: upcomingVisits },
-      },
-    })
-  },
-  stubPastVisits: ({ offenderNo, pastVisits }: { offenderNo: string; pastVisits: Visit[] }): SuperAgentRequest => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPath: '/visitScheduler/visits/search',
-        queryParameters: {
-          prisonerId: { equalTo: offenderNo },
-          endDateTime: { matches: '.*' },
-          visitStatus: { and: [{ contains: 'BOOKED' }, { contains: 'CANCELLED' }] },
-          page: { equalTo: '0' },
-          size: { equalTo: '1000' },
-        },
-      },
-      response: {
-        status: 200,
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: { content: pastVisits },
-      },
-    })
-  },
   stubSessionSchedule: ({
     prisonId,
     date,
@@ -67,19 +21,6 @@ export default {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
         jsonBody: sessionSchedule,
-      },
-    })
-  },
-  stubVisit: (visit: Visit): SuperAgentRequest => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        url: `/visitScheduler/visits/${visit.reference}`,
-      },
-      response: {
-        status: 200,
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: visit,
       },
     })
   },
@@ -132,37 +73,6 @@ export default {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
         jsonBody: sessionCapacity,
-      },
-    })
-  },
-  stubVisitsByDate: ({
-    startDateTime,
-    endDateTime,
-    prisonId,
-    visits,
-  }: {
-    startDateTime: string
-    endDateTime: string
-    prisonId: string
-    visits: Visit
-  }): SuperAgentRequest => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPath: `/visitScheduler/visits/search`,
-        queryParameters: {
-          prisonId: { equalTo: prisonId },
-          startDateTime: { equalTo: startDateTime },
-          endDateTime: { equalTo: endDateTime },
-          visitStatus: { equalTo: 'BOOKED' },
-          page: { equalTo: '0' },
-          size: { equalTo: '1000' },
-        },
-      },
-      response: {
-        status: 200,
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: { content: visits },
       },
     })
   },

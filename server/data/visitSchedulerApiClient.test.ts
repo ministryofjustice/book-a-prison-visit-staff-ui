@@ -1,14 +1,13 @@
 import nock from 'nock'
 import config from '../config'
 import VisitSchedulerApiClient from './visitSchedulerApiClient'
-import { Visit, VisitSession, SessionSchedule } from './orchestrationApiTypes'
+import { VisitSession, SessionSchedule } from './orchestrationApiTypes'
 import TestData from '../routes/testutils/testData'
 
 describe('visitSchedulerApiClient', () => {
   let fakeVisitSchedulerApi: nock.Scope
   let visitSchedulerApiClient: VisitSchedulerApiClient
   const token = 'token-1'
-  const timestamp = new Date().toISOString()
   const prisonId = 'HEI'
 
   beforeEach(() => {
@@ -23,73 +22,6 @@ describe('visitSchedulerApiClient', () => {
     }
     nock.abortPendingRequests()
     nock.cleanAll()
-  })
-
-  describe('getVisit', () => {
-    it('should return a single matching Visit from the Visit Scheduler API for a valid reference', async () => {
-      const reference = 'ab-cd-ef-gh'
-      const result = TestData.visit()
-
-      fakeVisitSchedulerApi
-        .get(`/visits/${reference}`)
-        .matchHeader('authorization', `Bearer ${token}`)
-        .reply(200, result)
-
-      const output = await visitSchedulerApiClient.getVisit(reference)
-
-      expect(output).toEqual(result)
-    })
-  })
-
-  describe('getUpcomingVisits', () => {
-    it('should return an array of Visit from the Visit Scheduler API', async () => {
-      const offenderNo = 'A1234BC'
-      const results: Visit[] = [TestData.visit()]
-
-      jest.useFakeTimers({ advanceTimers: true, now: new Date(timestamp) })
-
-      fakeVisitSchedulerApi
-        .get('/visits/search')
-        .query({
-          prisonerId: offenderNo,
-          startDateTime: timestamp,
-          visitStatus: 'BOOKED,CANCELLED',
-          page: '0',
-          size: '1000',
-        })
-        .matchHeader('authorization', `Bearer ${token}`)
-        .reply(200, results)
-
-      const output = await visitSchedulerApiClient.getUpcomingVisits(offenderNo, ['BOOKED', 'CANCELLED'])
-
-      expect(output).toEqual(results)
-
-      jest.useRealTimers()
-    })
-  })
-
-  describe('getVisitsByDate', () => {
-    it('should return an array of Visit from the Visit Scheduler API', async () => {
-      const dateString = '2022-05-06'
-      const results: Visit[] = [TestData.visit()]
-
-      fakeVisitSchedulerApi
-        .get('/visits/search')
-        .query({
-          prisonId: 'HEI',
-          startDateTime: `${dateString}T00:00:00`,
-          endDateTime: `${dateString}T23:59:59`,
-          visitStatus: 'BOOKED',
-          page: '0',
-          size: '1000',
-        })
-        .matchHeader('authorization', `Bearer ${token}`)
-        .reply(200, results)
-
-      const output = await visitSchedulerApiClient.getVisitsByDate(dateString, prisonId)
-
-      expect(output).toEqual(results)
-    })
   })
 
   describe('getVisitSessions', () => {
