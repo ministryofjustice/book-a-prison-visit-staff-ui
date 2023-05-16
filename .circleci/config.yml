@@ -190,6 +190,21 @@ workflows:
           requires:
             - request-staging-preview-approval
 
+      - request-preprod-preview-approval:
+          <<: *feature_branch
+          type: approval
+          requires:
+            - deploy_staging_preview
+      - hmpps/deploy_env:
+          <<: *feature_branch
+          name: deploy_preprod_preview
+          env: "preprod"
+          context:
+            - hmpps-common-vars
+            - book-a-prison-visit-staff-ui-preprod
+          requires:
+            - request-preprod-preview-approval
+
       - hmpps/deploy_env:
           <<: *main_branch
           name: deploy_dev

@@ -79,36 +79,39 @@ testJourneys.forEach(journey => {
             morning: [
               {
                 id: '1',
+                sessionTemplateReference: 'v9d.7ed.7u1',
                 prisonId,
                 startTimestamp: '2022-02-14T10:00:00',
                 endTimestamp: '2022-02-14T11:00:00',
                 availableTables: 15,
                 capacity: 30,
-                visitRoomName: 'room name',
+                visitRoom: 'room name',
                 // representing a pre-existing visit that is BOOKED
                 sessionConflicts: ['DOUBLE_BOOKED'],
                 visitRestriction: 'OPEN',
               },
               {
                 id: '2',
+                sessionTemplateReference: 'v9d.7ed.7u2',
                 prisonId,
                 startTimestamp: '2022-02-14T11:59:00',
                 endTimestamp: '2022-02-14T12:59:00',
                 availableTables: 1,
                 capacity: 30,
-                visitRoomName: 'room name',
+                visitRoom: 'room name',
                 visitRestriction: 'OPEN',
               },
             ],
             afternoon: [
               {
                 id: '3',
+                sessionTemplateReference: 'v9d.7ed.7u3',
                 prisonId,
                 startTimestamp: '2022-02-14T12:00:00',
                 endTimestamp: '2022-02-14T13:05:00',
                 availableTables: 5,
                 capacity: 30,
-                visitRoomName: 'room name',
+                visitRoom: 'room name',
                 // representing the RESERVED visit being handled in this session
                 sessionConflicts: ['DOUBLE_BOOKED'],
                 visitRestriction: 'OPEN',
@@ -219,12 +222,13 @@ testJourneys.forEach(journey => {
       it('should render the available sessions list with the slot in the session selected', () => {
         visitSessionData.visitSlot = {
           id: '3',
+          sessionTemplateReference: 'v9d.7ed.7u3',
           prisonId,
           startTimestamp: '2022-02-14T12:00:00',
           endTimestamp: '2022-02-14T13:05:00',
           availableTables: 5,
           capacity: 30,
-          visitRoomName: 'room name',
+          visitRoom: 'room name',
           visitRestriction: 'OPEN',
         }
 
@@ -302,12 +306,13 @@ testJourneys.forEach(journey => {
           .expect(() => {
             expect(visitSessionData.visitSlot).toEqual(<VisitSlot>{
               id: '2',
+              sessionTemplateReference: 'v9d.7ed.7u2',
               prisonId,
               startTimestamp: '2022-02-14T11:59:00',
               endTimestamp: '2022-02-14T12:59:00',
               availableTables: 1,
               capacity: 30,
-              visitRoomName: 'room name',
+              visitRoom: 'room name',
               visitRestriction: 'OPEN',
             })
             expect(visitSessionData.applicationReference).toEqual(reservedVisit.applicationReference)
@@ -340,12 +345,13 @@ testJourneys.forEach(journey => {
       it('should save new choice to session, update visit reservation and redirect to additional support page if existing session data present', () => {
         visitSessionData.visitSlot = {
           id: '1',
+          sessionTemplateReference: 'v9d.7ed.7u1',
           prisonId,
           startTimestamp: '2022-02-14T10:00:00',
           endTimestamp: '2022-02-14T11:00:00',
           availableTables: 15,
           capacity: 30,
-          visitRoomName: 'room name',
+          visitRoom: 'room name',
           visitRestriction: 'OPEN',
         }
 
@@ -361,12 +367,13 @@ testJourneys.forEach(journey => {
           .expect(() => {
             expect(visitSessionData.visitSlot).toEqual(<VisitSlot>{
               id: '3',
+              sessionTemplateReference: 'v9d.7ed.7u3',
               prisonId,
               startTimestamp: '2022-02-14T12:00:00',
               endTimestamp: '2022-02-14T13:05:00',
               availableTables: 5,
               capacity: 30,
-              visitRoomName: 'room name',
+              visitRoom: 'room name',
               // representing the RESERVED visit being handled in this session
               sessionConflicts: ['DOUBLE_BOOKED'],
               visitRestriction: 'OPEN',
