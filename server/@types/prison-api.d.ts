@@ -688,6 +688,13 @@ export interface paths {
      */
     post: operations['getAlertsByOffenderNos']
   }
+  '/api/bookings/offence-history': {
+    /**
+     * Offence histories.
+     * @description Offence histories for a set of booking ids.
+     */
+    post: operations['getOffenceHistoryForBookings']
+  }
   '/api/bookings/mainOffence': {
     /**
      * Get Offender main offence detail.
@@ -5212,9 +5219,8 @@ export interface components {
       /**
        * Format: int64
        * @description assessment type
-       * @enum {integer}
        */
-      assessmentTypeId?: null
+      assessmentTypeId?: number
       /**
        * @description Categorisation status
        * @enum {string}
@@ -5320,18 +5326,7 @@ export interface components {
        * @example OUT
        * @enum {string}
        */
-      directionCode: 'IN' | 'OUT' | 'IN' | 'OUT'
-    }
-    /** @description Movement time */
-    LocalTime: {
-      /** Format: int32 */
-      hour?: number
-      /** Format: int32 */
-      minute?: number
-      /** Format: int32 */
-      second?: number
-      /** Format: int32 */
-      nano?: number
+      directionCode: 'IN' | 'OUT'
     }
     /** @description Prisoner Movement */
     OffenderMovement: {
@@ -5366,7 +5361,11 @@ export interface components {
       movementReasonDescription: string
       /** @description IN or OUT */
       directionCode: string
-      movementTime: components['schemas']['LocalTime']
+      /**
+       * Format: partial-time
+       * @description Movement time
+       */
+      movementTime: string
       /**
        * Format: date
        * @description Movement date
@@ -5409,7 +5408,11 @@ export interface components {
        * @description Movement date
        */
       movementDate: string
-      movementTime: components['schemas']['LocalTime']
+      /**
+       * Format: partial-time
+       * @description Movement time
+       */
+      movementTime: string
       /** @description Description of movement reason */
       movementReason: string
       /** @description Comment */
@@ -5500,20 +5503,46 @@ export interface components {
        */
       captureDate: string
       /**
-       * @description Image view information
+       * @description Image view information.  Actual values extracted 10/05/2023, with the majority of values being FACE. This doesn't appear to be mapped to any REFERENCE_CODE data, even though there is a domain called IMAGE_VIEW.
        * @example FACE
+       * @enum {string}
        */
-      imageView: string
+      imageView: 'OIC' | 'FACE' | 'TAT' | 'MARK' | 'SCAR' | 'OTH'
       /**
-       * @description Orientation of the image
+       * @description Orientation of the image. Actual values extracted 10/05/2023, with the majority of values being FRONT. This doesn't appear to be mapped to any REFERENCE_CODE data, even though there is a domain called PART_ORIENT.
        * @example FRONT
+       * @enum {string}
        */
-      imageOrientation: string
+      imageOrientation:
+        | 'NECK'
+        | 'KNEE'
+        | 'TORSO'
+        | 'FACE'
+        | 'DAMAGE'
+        | 'INJURY'
+        | 'HAND'
+        | 'HEAD'
+        | 'THIGH'
+        | 'ELBOW'
+        | 'FOOT'
+        | 'INCIDENT'
+        | 'ARM'
+        | 'SHOULDER'
+        | 'ANKLE'
+        | 'FINGER'
+        | 'EAR'
+        | 'TOE'
+        | 'FIGHT'
+        | 'FRONT'
+        | 'LEG'
+        | 'LIP'
+        | 'NOSE'
       /**
-       * @description Image Type
+       * @description Image Type. Actual values extracted 10/05/2023, with the majority of values being OFF_BKG. This doesn't appear to be mapped to any REFERENCE_CODE data.
        * @example OFF_BKG
+       * @enum {string}
        */
-      imageType: string
+      imageType: 'OFF_IDM' | 'OFF_BKG' | 'OIC'
       /**
        * Format: int64
        * @description Object ID
@@ -5975,9 +6004,8 @@ export interface components {
       /**
        * @description Active indicator flag.
        * @example true
-       * @enum {boolean}
        */
-      activeFlag: true | false
+      activeFlag: boolean
       /**
        * Format: date
        * @description Date made inactive
@@ -5987,21 +6015,18 @@ export interface components {
       /**
        * @description Approved Visitor
        * @example true
-       * @enum {boolean}
        */
-      approvedVisitorFlag: true | false
+      approvedVisitorFlag: boolean
       /**
        * @description Can be contacted
        * @example false
-       * @enum {boolean}
        */
-      canBeContactedFlag: true | false
+      canBeContactedFlag: boolean
       /**
        * @description Aware of charges against prisoner
        * @example true
-       * @enum {boolean}
        */
-      awareOfChargesFlag: true | false
+      awareOfChargesFlag: boolean
       /**
        * Format: int64
        * @description Link to root offender ID
@@ -6391,17 +6416,7 @@ export interface components {
        * @example WEEKLY
        * @enum {string}
        */
-      repeatPeriod:
-        | 'DAILY'
-        | 'WEEKDAYS'
-        | 'WEEKLY'
-        | 'FORTNIGHTLY'
-        | 'MONTHLY'
-        | 'DAILY'
-        | 'WEEKDAYS'
-        | 'WEEKLY'
-        | 'FORTNIGHTLY'
-        | 'MONTHLY'
+      repeatPeriod: 'DAILY' | 'WEEKDAYS' | 'WEEKLY' | 'FORTNIGHTLY' | 'MONTHLY'
       /**
        * Format: int32
        * @description The total number of appointments. Must be greater than 0
@@ -7476,27 +7491,27 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
       last?: boolean
-      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     PageableObject: {
       /** Format: int64 */
       offset?: number
       sort?: components['schemas']['SortObject']
-      paged?: boolean
-      unpaged?: boolean
       /** Format: int32 */
       pageSize?: number
+      paged?: boolean
+      unpaged?: boolean
       /** Format: int32 */
       pageNumber?: number
     }
     SortObject: {
       empty?: boolean
-      unsorted?: boolean
       sorted?: boolean
+      unsorted?: boolean
     }
     /** @description PersonIdentifier */
     PersonIdentifier: {
@@ -9555,10 +9570,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
       last?: boolean
-      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     Pageable: {
@@ -9576,7 +9591,8 @@ export interface components {
       dateOfBirth: string
       /** @description Reason for out movement */
       reasonDescription?: string
-      timeOut: components['schemas']['LocalTime']
+      /** Format: partial-time */
+      timeOut: string
       firstName: string
       lastName: string
     }
@@ -9603,7 +9619,11 @@ export interface components {
       fromCity: string
       /** @description City offender was sent to */
       toCity: string
-      movementTime: components['schemas']['LocalTime']
+      /**
+       * Format: partial-time
+       * @description Movement time
+       */
+      movementTime: string
       /**
        * @description Movement date time
        * @example 2021-07-05T10:35:17
@@ -10247,10 +10267,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
       last?: boolean
-      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     /** @description Offender Employment */
@@ -10354,10 +10374,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
       last?: boolean
-      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     PageEducation: {
@@ -10372,10 +10392,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
       last?: boolean
-      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     /** @description Represents a court date and its outcome */
@@ -10551,15 +10571,15 @@ export interface components {
        */
       establishmentCode?: string
       /**
-       * @description Case Note Type and Sub Type
-       * @example POS IEP_ENC
-       */
-      noteType: string
-      /**
        * @description Name of staff member who created case note (lastname, firstname)
        * @example Smith, John
        */
       staffName: string
+      /**
+       * @description Case Note Type and Sub Type
+       * @example POS IEP_ENC
+       */
+      noteType: string
     }
     /** @description Visit summary */
     VisitSummary: {
@@ -10583,10 +10603,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
       last?: boolean
-      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     /** @description Visit details */
@@ -10857,10 +10877,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
       last?: boolean
-      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     /** @description Case Note Count Detail */
@@ -10915,10 +10935,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
       last?: boolean
-      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     /** @description Adjudication Summary for offender */
@@ -10993,10 +11013,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
       last?: boolean
-      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     /** @description Prisoner Booking Summary */
@@ -15776,6 +15796,37 @@ export interface operations {
       200: {
         content: {
           'application/json': components['schemas']['Alert'][]
+        }
+      }
+    }
+  }
+  /**
+   * Offence histories.
+   * @description Offence histories for a set of booking ids.
+   */
+  getOffenceHistoryForBookings: {
+    requestBody: {
+      content: {
+        'application/json': number[]
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          'application/json': components['schemas']['OffenceHistoryDetail'][]
+        }
+      }
+      /** @description Invalid request. */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unrecoverable error occurred whilst processing request. */
+      500: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
         }
       }
     }

@@ -25,7 +25,7 @@ context('View visit schedule timetable', () => {
       TestData.sessionSchedule({
         startTime: '10:00',
         endTime: '11:30',
-        enhanced: true,
+        prisonerIncentiveLevelGroupNames: ['Enhanced prisoners'],
         capacity: { open: 20, closed: 5 }, // will generate 2 session rows
         prisonerLocationGroupNames: ['Group 1', 'Group 2'],
         sessionTemplateFrequency: 'BI_WEEKLY',
