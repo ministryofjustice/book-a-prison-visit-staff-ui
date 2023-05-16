@@ -20,7 +20,7 @@
         {% endif %}
         {{- " in:" if prisonerIncentiveLevelGroupNames | length or prisonerCategoryGroupNames | length }}
       </span>
-      <ul class="govuk-list govuk-!-margin-bottom-0{{ " govuk-!-margin-top-2" if enhanced }}">
+      <ul class="govuk-list govuk-!-margin-bottom-0{{ " govuk-!-margin-top-2" if prisonerIncentiveLevelGroupNames | length }}">
         {% for name in prisonerLocationGroupNames %}
           <li class="{{ "govuk-!-margin-bottom-0" if loop.last }}">{{ name }}</li>
         {% endfor %}
