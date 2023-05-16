@@ -9,7 +9,6 @@ import {
   createMockPrisonApiClient,
   createMockPrisonerContactRegistryApiClient,
   createMockPrisonerSearchClient,
-  createMockVisitSchedulerApiClient,
 } from '../data/testutils/mocks'
 import { createMockSupportedPrisonsService } from './testutils/mocks'
 
@@ -21,7 +20,6 @@ describe('Prisoner profile service', () => {
   const prisonApiClient = createMockPrisonApiClient()
   const prisonerContactRegistryApiClient = createMockPrisonerContactRegistryApiClient()
   const prisonerSearchClient = createMockPrisonerSearchClient()
-  const visitSchedulerApiClient = createMockVisitSchedulerApiClient()
   const supportedPrisonsService = createMockSupportedPrisonsService()
 
   let prisonerProfileService: PrisonerProfileService
@@ -30,7 +28,6 @@ describe('Prisoner profile service', () => {
   const PrisonApiClientFactory = jest.fn()
   const PrisonerContactRegistryApiClientFactory = jest.fn()
   const PrisonerSearchClientFactory = jest.fn()
-  const VisitSchedulerApiClientFactory = jest.fn()
 
   const prisonerId = 'A1234BC'
   const prisonId = 'HEI'
@@ -40,7 +37,6 @@ describe('Prisoner profile service', () => {
     PrisonApiClientFactory.mockReturnValue(prisonApiClient)
     PrisonerContactRegistryApiClientFactory.mockReturnValue(prisonerContactRegistryApiClient)
     PrisonerSearchClientFactory.mockReturnValue(prisonerSearchClient)
-    VisitSchedulerApiClientFactory.mockReturnValue(visitSchedulerApiClient)
 
     prisonerProfileService = new PrisonerProfileService(
       OrchestrationApiClientFactory,

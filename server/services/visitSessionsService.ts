@@ -3,13 +3,13 @@ import { VisitSlot, VisitSlotList, VisitSlotsForDay, VisitSessionData } from '..
 import { VisitSession, SessionCapacity, SessionSchedule } from '../data/orchestrationApiTypes'
 import { ScheduledEvent } from '../data/whereaboutsApiTypes'
 import { getPrisonerEvents } from '../utils/visitsUtils'
-import { HmppsAuthClient, RestClientBuilder, VisitSchedulerApiClient, WhereaboutsApiClient } from '../data'
+import { HmppsAuthClient, RestClientBuilder, OrchestrationApiClient, WhereaboutsApiClient } from '../data'
 
 export default class VisitSessionsService {
   private morningCutoff = 12
 
   constructor(
-    private readonly visitSchedulerApiClientFactory: RestClientBuilder<VisitSchedulerApiClient>,
+    private readonly orchestrationApiClientFactory: RestClientBuilder<OrchestrationApiClient>,
     private readonly whereaboutsApiClientFactory: RestClientBuilder<WhereaboutsApiClient>,
     private readonly hmppsAuthClient: HmppsAuthClient,
   ) {}
@@ -26,9 +26,9 @@ export default class VisitSessionsService {
     visitRestriction: VisitSessionData['visitRestriction']
   }): Promise<{ slotsList: VisitSlotList; whereaboutsAvailable: boolean }> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const visitSchedulerApiClient = this.visitSchedulerApiClientFactory(token)
+    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
     const whereaboutsApiClient = this.whereaboutsApiClientFactory(token)
-    const visitSessions = await visitSchedulerApiClient.getVisitSessions(offenderNo, prisonId)
+    const visitSessions = await orchestrationApiClient.getVisitSessions(offenderNo, prisonId)
 
     let earliestStartTime: Date = new Date()
     let latestEndTime: Date = new Date()
@@ -151,9 +151,9 @@ export default class VisitSessionsService {
     date: string
   }): Promise<SessionSchedule[]> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const visitSchedulerApiClient = this.visitSchedulerApiClientFactory(token)
+    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
-    return visitSchedulerApiClient.getSessionSchedule(prisonId, date)
+    return orchestrationApiClient.getSessionSchedule(prisonId, date)
   }
 
   async getVisitSessionCapacity(
@@ -164,7 +164,8 @@ export default class VisitSessionsService {
     sessionEndTime: string,
   ): Promise<SessionCapacity> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const visitSchedulerApiClient = this.visitSchedulerApiClientFactory(token)
-    return visitSchedulerApiClient.getVisitSessionCapacity(prisonId, sessionDate, sessionStartTime, sessionEndTime)
+    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+
+    return orchestrationApiClient.getVisitSessionCapacity(prisonId, sessionDate, sessionStartTime, sessionEndTime)
   }
 }

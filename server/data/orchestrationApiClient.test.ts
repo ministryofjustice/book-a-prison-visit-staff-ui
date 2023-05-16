@@ -2,7 +2,13 @@ import nock from 'nock'
 import config from '../config'
 import TestData from '../routes/testutils/testData'
 import OrchestrationApiClient from './orchestrationApiClient'
-import { ChangeVisitSlotRequestDto, OutcomeDto, ReserveVisitSlotDto, Visit } from './orchestrationApiTypes'
+import {
+  ChangeVisitSlotRequestDto,
+  OutcomeDto,
+  ReserveVisitSlotDto,
+  SessionSchedule,
+  Visit,
+} from './orchestrationApiTypes'
 import { VisitSessionData } from '../@types/bapv'
 
 describe('orchestrationApiClient', () => {
@@ -98,7 +104,7 @@ describe('orchestrationApiClient', () => {
   })
 
   describe('changeBookedVisit', () => {
-    it('should return the Visit with new status of RESERVED/CHANGING and new applicationReference, from the Visit Scheduler', async () => {
+    it('should return the Visit with new status of RESERVED/CHANGING and new applicationReference', async () => {
       const visitType = 'SOCIAL'
       const sessionTemplateReference = 'v9d.7ed.7u'
 
@@ -203,7 +209,7 @@ describe('orchestrationApiClient', () => {
     const visitType = 'SOCIAL'
     const visitStatus = 'RESERVED'
 
-    it('should return a changed reserved Visit from the Visit Scheduler, given full visitSessionData', async () => {
+    it('should return a changed reserved Visit given full visitSessionData', async () => {
       const result: Visit = {
         applicationReference: 'aaa-bbb-ccc',
         reference: 'ab-cd-ef-gh',
@@ -313,7 +319,7 @@ describe('orchestrationApiClient', () => {
       expect(output).toEqual(result)
     })
 
-    it('should return an updated reserved Visit from the Visit Scheduler, given minimal visitSessionData', async () => {
+    it('should return an updated reserved Visit given minimal visitSessionData', async () => {
       const result: Visit = {
         applicationReference: 'aaa-bbb-ccc',
         reference: 'ab-cd-ef-gh',
@@ -404,7 +410,7 @@ describe('orchestrationApiClient', () => {
   })
 
   describe('reserveVisit', () => {
-    it('should return a new Visit from the Visit Scheduler API', async () => {
+    it('should return a new Visit', async () => {
       const visitType = 'SOCIAL'
       const visitStatus = 'RESERVED'
       const visitRestriction = 'OPEN'
@@ -487,7 +493,7 @@ describe('orchestrationApiClient', () => {
   })
 
   describe('getVisit', () => {
-    it('should return a single matching Visit from the Visit Scheduler API for a valid reference', async () => {
+    it('should return a single matching Visit for a valid reference', async () => {
       const visit = TestData.visit()
 
       fakeOrchestrationApi
@@ -517,7 +523,7 @@ describe('orchestrationApiClient', () => {
   })
 
   describe('getUpcomingVisits', () => {
-    it('should return an array of Visit from the Visit Scheduler API', async () => {
+    it('should return an array of Visits', async () => {
       const timestamp = new Date().toISOString()
       const offenderNo = 'A1234BC'
       const results: Visit[] = [
@@ -573,7 +579,7 @@ describe('orchestrationApiClient', () => {
   })
 
   describe('getVisitsByDate', () => {
-    it('should return an array of Visit from the Visit Scheduler API', async () => {
+    it('should return an array of Visits', async () => {
       const dateString = '2022-05-06'
       const results: Visit[] = [
         {
@@ -633,6 +639,103 @@ describe('orchestrationApiClient', () => {
       const output = await orchestrationApiClient.getAvailableSupportOptions()
 
       expect(output).toEqual(results)
+    })
+  })
+
+  describe('getVisitSessions', () => {
+    it('should return an array of Visit Sessions', async () => {
+      const results = [TestData.visitSession()]
+
+      fakeOrchestrationApi
+        .get('/visit-sessions')
+        .query({
+          prisonId: 'HEI',
+          prisonerId: 'A1234BC',
+        })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, results)
+
+      const output = await orchestrationApiClient.getVisitSessions('A1234BC', prisonId)
+
+      expect(output).toEqual(results)
+    })
+  })
+
+  describe('getSessionSchedule', () => {
+    it('should return an array of scheduled sessions for the specified prison and date', async () => {
+      const date = '2023-02-01'
+      const sessionSchedule: SessionSchedule[] = [TestData.sessionSchedule()]
+
+      fakeOrchestrationApi
+        .get('/visit-sessions/schedule')
+        .query({ prisonId, date })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, sessionSchedule)
+
+      const output = await orchestrationApiClient.getSessionSchedule(prisonId, date)
+
+      expect(output).toEqual(sessionSchedule)
+    })
+  })
+
+  describe('getVisitSessionCapacity', () => {
+    const sessionDate = '2023-01-31'
+    const sessionStartTime = '10:00:00'
+    const sessionEndTime = '11:00:00'
+
+    it('should return the open and closed capacity for the specified visit session', async () => {
+      const sessionCapacity = TestData.sessionCapacity()
+
+      fakeOrchestrationApi
+        .get('/visit-sessions/capacity')
+        .query({ prisonId, sessionDate, sessionStartTime, sessionEndTime })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, sessionCapacity)
+
+      const output = await orchestrationApiClient.getVisitSessionCapacity(
+        prisonId,
+        sessionDate,
+        sessionStartTime,
+        sessionEndTime,
+      )
+
+      expect(output).toEqual(sessionCapacity)
+    })
+
+    it('should return null if session capacity not available (404 from API)', async () => {
+      fakeOrchestrationApi
+        .get('/visit-sessions/capacity')
+        .query({ prisonId, sessionDate, sessionStartTime, sessionEndTime })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(404)
+
+      const output = await orchestrationApiClient.getVisitSessionCapacity(
+        prisonId,
+        sessionDate,
+        sessionStartTime,
+        sessionEndTime,
+      )
+
+      expect(output).toBeNull()
+    })
+
+    // API returns 500 IllegalStateException if multiple capacities found for specified date & times
+    it('should return null if error retrieving session capacity (500 from API)', async () => {
+      fakeOrchestrationApi
+        .persist() // required because 500 causes server/data/restClient.ts to retry but the mock has been consumed
+        .get('/visit-sessions/capacity')
+        .query({ prisonId, sessionDate, sessionStartTime, sessionEndTime })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(500)
+
+      const output = await orchestrationApiClient.getVisitSessionCapacity(
+        prisonId,
+        sessionDate,
+        sessionStartTime,
+        sessionEndTime,
+      )
+
+      expect(output).toBeNull()
     })
   })
 

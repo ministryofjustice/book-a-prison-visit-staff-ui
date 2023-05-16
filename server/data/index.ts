@@ -17,7 +17,6 @@ import PrisonerSearchClient from './prisonerSearchClient'
 import PrisonRegisterApiClient from './prisonRegisterApiClient'
 import { createRedisClient } from './redisClient'
 import TokenStore from './tokenStore'
-import VisitSchedulerApiClient from './visitSchedulerApiClient'
 import WhereaboutsApiClient from './whereaboutsApiClient'
 
 type RestClientBuilder<T> = (token: string) => T
@@ -34,8 +33,6 @@ export const dataAccess = () => ({
     new PrisonerSearchClient(token)) as RestClientBuilder<PrisonerSearchClient>,
   prisonRegisterApiClientBuilder: ((token: string) =>
     new PrisonRegisterApiClient(token)) as RestClientBuilder<PrisonRegisterApiClient>,
-  visitSchedulerApiClientBuilder: ((token: string) =>
-    new VisitSchedulerApiClient(token)) as RestClientBuilder<VisitSchedulerApiClient>,
   whereaboutsApiClientBuilder: ((token: string) =>
     new WhereaboutsApiClient(token)) as RestClientBuilder<WhereaboutsApiClient>,
 })
@@ -51,6 +48,5 @@ export {
   PrisonerSearchClient,
   PrisonRegisterApiClient,
   RestClientBuilder,
-  VisitSchedulerApiClient,
   WhereaboutsApiClient,
 }
