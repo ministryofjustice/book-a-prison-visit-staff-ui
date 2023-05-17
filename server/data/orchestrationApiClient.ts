@@ -1,6 +1,6 @@
 import RestClient from './restClient'
 import config, { ApiConfig } from '../config'
-import { PrisonerProfile, VisitHistoryDetails } from './orchestrationApiTypes'
+import { PrisonerProfile, SupportType, VisitHistoryDetails } from './orchestrationApiTypes'
 
 export default class OrchestrationApiClient {
   private restClient: RestClient
@@ -13,6 +13,12 @@ export default class OrchestrationApiClient {
 
   async getVisitHistory(reference: string): Promise<VisitHistoryDetails> {
     return this.restClient.get({ path: `/visits/${reference}/history` })
+  }
+
+  async getAvailableSupportOptions(): Promise<SupportType[]> {
+    return this.restClient.get({
+      path: '/visit-support',
+    })
   }
 
   // prisoner-profile-controller

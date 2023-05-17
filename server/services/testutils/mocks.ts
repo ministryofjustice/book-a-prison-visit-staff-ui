@@ -1,4 +1,5 @@
 import {
+  AdditionalSupportService,
   AuditService,
   NotificationsService,
   PrisonerProfileService,
@@ -11,6 +12,9 @@ import {
 } from '..'
 
 jest.mock('..')
+
+export const createMockAdditionalSupportService = () =>
+  new AdditionalSupportService(null, null) as jest.Mocked<AdditionalSupportService>
 
 export const createMockAuditService = () => new AuditService(null, null, null, null) as jest.Mocked<AuditService>
 

@@ -96,6 +96,7 @@ context('Book a visit', () => {
 
     const { prisonerId } = profile
     // Prisoner profile page
+    cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
     cy.task('stubPrisonerProfile', { prisonId, prisonerId, profile })
 
     searchForAPrisonerResultsPage.firstResultLink().contains(prisonerDisplayName).click()
@@ -104,7 +105,6 @@ context('Book a visit', () => {
     // Select visitors
     const offenderRestrictions = [TestData.offenderRestriction()]
     cy.task('stubOffenderRestrictions', { offenderNo, offenderRestrictions })
-    cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
     prisonerProfilePage.bookAVisitButton().click()
     const selectVisitorsPage = Page.verifyOnPage(SelectVisitorsPage)
     selectVisitorsPage.getPrisonerRestrictionType(1).contains(offenderRestrictions[0].restrictionTypeDescription)

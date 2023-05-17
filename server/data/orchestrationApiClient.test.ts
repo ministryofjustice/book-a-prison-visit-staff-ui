@@ -37,6 +37,18 @@ describe('orchestrationApiClient', () => {
     })
   })
 
+  describe('getAvailableSupportOptions', () => {
+    it('should return an array of available support types', async () => {
+      const results = TestData.supportTypes()
+
+      fakeOrchestrationApi.get('/visit-support').matchHeader('authorization', `Bearer ${token}`).reply(200, results)
+
+      const output = await orchestrationApiClient.getAvailableSupportOptions()
+
+      expect(output).toEqual(results)
+    })
+  })
+
   describe('getPrisonerProfile', () => {
     it('should return prisoner profile page for selected prisoner', async () => {
       const prisonerProfile = TestData.prisonerProfile()

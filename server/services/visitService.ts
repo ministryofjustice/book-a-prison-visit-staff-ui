@@ -3,13 +3,13 @@ import { VisitHistoryDetails } from '../data/orchestrationApiTypes'
 import buildVisitorListItem from '../utils/visitorUtils'
 import { getSupportTypeDescriptions } from '../routes/visitorUtils'
 import { HmppsAuthClient, OrchestrationApiClient, PrisonerContactRegistryApiClient, RestClientBuilder } from '../data'
-import VisitSessionsService from './visitSessionsService'
+import AdditionalSupportService from './additionalSupportService'
 
 export default class VisitService {
   constructor(
     private readonly orchestrationApiClientFactory: RestClientBuilder<OrchestrationApiClient>,
     private readonly prisonerContactRegistryApiClientFactory: RestClientBuilder<PrisonerContactRegistryApiClient>,
-    private readonly visitSessionsService: VisitSessionsService,
+    private readonly additionalSupportService: AdditionalSupportService,
     private readonly hmppsAuthClient: HmppsAuthClient,
   ) {}
 
@@ -34,7 +34,7 @@ export default class VisitService {
       .map(contact => buildVisitorListItem(contact))
 
     const additionalSupport = getSupportTypeDescriptions(
-      await this.visitSessionsService.getAvailableSupportOptions(username),
+      await this.additionalSupportService.getAvailableSupportOptions(username),
       visit.visitorSupport,
     )
 
