@@ -151,9 +151,7 @@ export default {
           {
             equalToJson: {
               prisonerId: visit.prisonerId,
-              prisonId: visit.prisonId,
-              visitRoom: visit.visitRoom,
-              visitType: visit.visitType,
+              sessionTemplateReference: visit.sessionTemplateReference,
               visitRestriction: visit.visitRestriction,
               startTimestamp: visit.startTimestamp,
               endTimestamp: visit.endTimestamp,

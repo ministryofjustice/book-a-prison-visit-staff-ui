@@ -63,33 +63,7 @@ describe('visitSchedulerApiClient', () => {
   describe('getVisit', () => {
     it('should return a single matching Visit from the Visit Scheduler API for a valid reference', async () => {
       const reference = 'ab-cd-ef-gh'
-      const result: Visit = {
-        applicationReference: 'aaa-bbb-ccc',
-        reference: 'ab-cd-ef-gh',
-        prisonerId: 'A1234BC',
-        prisonId: 'HEI',
-        visitRoom: 'A1 L3',
-        visitType: 'SOCIAL',
-        visitStatus: 'RESERVED',
-        visitRestriction: 'OPEN',
-        startTimestamp: timestamp,
-        endTimestamp: '',
-        visitNotes: [],
-        visitors: [
-          {
-            nomisPersonId: 1234,
-          },
-        ],
-        visitorSupport: [
-          {
-            type: 'OTHER',
-            text: 'custom support details',
-          },
-        ],
-        createdBy: 'user1',
-        createdTimestamp: '2022-02-14T10:00:00',
-        modifiedTimestamp: '2022-02-14T10:05:00',
-      }
+      const result = TestData.visit()
 
       fakeVisitSchedulerApi
         .get(`/visits/${reference}`)
@@ -105,35 +79,7 @@ describe('visitSchedulerApiClient', () => {
   describe('getUpcomingVisits', () => {
     it('should return an array of Visit from the Visit Scheduler API', async () => {
       const offenderNo = 'A1234BC'
-      const results: Visit[] = [
-        {
-          applicationReference: 'aaa-bbb-ccc',
-          reference: 'ab-cd-ef-gh',
-          prisonerId: offenderNo,
-          prisonId: 'HEI',
-          visitRoom: 'A1 L3',
-          visitType: 'SOCIAL',
-          visitStatus: 'RESERVED',
-          visitRestriction: 'OPEN',
-          startTimestamp: timestamp,
-          endTimestamp: '',
-          visitNotes: [],
-          visitors: [
-            {
-              nomisPersonId: 1234,
-            },
-          ],
-          visitorSupport: [
-            {
-              type: 'OTHER',
-              text: 'custom support details',
-            },
-          ],
-          createdBy: 'user1',
-          createdTimestamp: '2022-02-14T10:00:00',
-          modifiedTimestamp: '2022-02-14T10:05:00',
-        },
-      ]
+      const results: Visit[] = [TestData.visit()]
 
       jest.useFakeTimers({ advanceTimers: true, now: new Date(timestamp) })
 
@@ -160,35 +106,7 @@ describe('visitSchedulerApiClient', () => {
   describe('getVisitsByDate', () => {
     it('should return an array of Visit from the Visit Scheduler API', async () => {
       const dateString = '2022-05-06'
-      const results: Visit[] = [
-        {
-          applicationReference: 'aaa-bbb-ccc',
-          reference: 'ab-cd-ef-gh',
-          prisonerId: 'A1234BC',
-          prisonId: 'HEI',
-          visitRoom: 'A1 L3',
-          visitType: 'SOCIAL',
-          visitStatus: 'RESERVED',
-          visitRestriction: 'OPEN',
-          startTimestamp: `${dateString}T10:00:00`,
-          endTimestamp: '',
-          visitNotes: [],
-          visitors: [
-            {
-              nomisPersonId: 1234,
-            },
-          ],
-          visitorSupport: [
-            {
-              type: 'OTHER',
-              text: 'custom support details',
-            },
-          ],
-          createdBy: 'user1',
-          createdTimestamp: '2022-02-14T10:00:00',
-          modifiedTimestamp: '2022-02-14T10:05:00',
-        },
-      ]
+      const results: Visit[] = [TestData.visit()]
 
       fakeVisitSchedulerApi
         .get('/visits/search')
@@ -211,20 +129,7 @@ describe('visitSchedulerApiClient', () => {
 
   describe('getVisitSessions', () => {
     it('should return an array of Visit Sessions from the Visit Scheduler API', async () => {
-      const results: VisitSession[] = [
-        {
-          sessionTemplateId: 1,
-          visitRoomName: 'A1',
-          visitType: 'SOCIAL',
-          prisonId: 'HEI',
-          openVisitCapacity: 15,
-          openVisitBookedCount: 0,
-          closedVisitCapacity: 10,
-          closedVisitBookedCount: 0,
-          startTimestamp: '2022-02-14T10:00:00',
-          endTimestamp: '2022-02-14T11:00:00',
-        },
-      ]
+      const results: VisitSession[] = [TestData.visitSession()]
 
       fakeVisitSchedulerApi
         .get('/visit-sessions')
@@ -321,20 +226,20 @@ describe('visitSchedulerApiClient', () => {
 
   describe('reserveVisit', () => {
     it('should return a new Visit from the Visit Scheduler API', async () => {
-      const visitType = 'SOCIAL'
-      const visitStatus = 'RESERVED'
       const visitRestriction = 'OPEN'
       const startTimestamp = '2022-02-14T10:00:00'
       const endTimestamp = '2022-02-14T11:00:00'
+      const sessionTemplateReference = 'v9d.7ed.7u'
 
       const result: Visit = {
         applicationReference: 'aaa-bbb-ccc',
         reference: 'ab-cd-ef-gh',
         prisonerId: 'AF34567G',
         prisonId,
+        sessionTemplateReference,
         visitRoom: 'A1 L3',
-        visitType,
-        visitStatus,
+        visitType: 'SOCIAL',
+        visitStatus: 'RESERVED',
         visitRestriction,
         startTimestamp,
         endTimestamp,
@@ -349,7 +254,7 @@ describe('visitSchedulerApiClient', () => {
         createdTimestamp: '2022-02-14T10:00:00',
         modifiedTimestamp: '2022-02-14T10:05:00',
       }
-      const visitSessionData = <VisitSessionData>{
+      const visitSessionData: VisitSessionData = {
         prisoner: {
           offenderNo: result.prisonerId,
           name: 'prisoner name',
@@ -358,28 +263,22 @@ describe('visitSchedulerApiClient', () => {
         },
         visitSlot: {
           id: '1',
+          sessionTemplateReference,
           prisonId,
           startTimestamp,
           endTimestamp,
           availableTables: 1,
-          visitRoomName: result.visitRoom,
+          capacity: 1,
+          visitRoom: result.visitRoom,
+          visitRestriction,
         },
-        visitRestriction: 'OPEN',
+        visitRestriction,
         visitors: [
           {
             personId: 123,
             name: 'visitor name',
             relationshipDescription: 'rel desc',
-            restrictions: [
-              {
-                restrictionType: 'TEST',
-                restrictionTypeDescription: 'test type',
-                startDate: '10 May 2020',
-                expiryDate: '10 May 2022',
-                globalRestriction: false,
-                comment: 'comments',
-              },
-            ],
+            restrictions: [],
             banned: false,
           },
         ],
@@ -388,9 +287,7 @@ describe('visitSchedulerApiClient', () => {
       fakeVisitSchedulerApi
         .post('/visits/slot/reserve', <ReserveVisitSlotDto>{
           prisonerId: visitSessionData.prisoner.offenderNo,
-          prisonId,
-          visitRoom: visitSessionData.visitSlot.visitRoomName,
-          visitType,
+          sessionTemplateReference,
           visitRestriction,
           startTimestamp,
           endTimestamp,
@@ -419,6 +316,7 @@ describe('visitSchedulerApiClient', () => {
         reference: 'ab-cd-ef-gh',
         prisonerId: 'AF34567G',
         prisonId,
+        sessionTemplateReference: 'v9d.7ed.7u',
         visitRoom: 'A1 L3',
         visitType,
         visitStatus,
@@ -458,12 +356,13 @@ describe('visitSchedulerApiClient', () => {
         },
         visitSlot: {
           id: '1',
+          sessionTemplateReference: 'v9d.7ed.7u',
           prisonId,
           startTimestamp: result.startTimestamp,
           endTimestamp: result.endTimestamp,
           availableTables: 1,
           capacity: 30,
-          visitRoomName: result.visitRoom,
+          visitRoom: result.visitRoom,
           visitRestriction: 'OPEN',
         },
         visitRestriction: 'OPEN',
@@ -472,16 +371,7 @@ describe('visitSchedulerApiClient', () => {
             personId: 123,
             name: 'visitor name',
             relationshipDescription: 'relationship desc',
-            restrictions: [
-              {
-                restrictionType: 'TEST',
-                restrictionTypeDescription: 'test type',
-                startDate: '10 May 2020',
-                expiryDate: '10 May 2022',
-                globalRestriction: false,
-                comment: 'comments',
-              },
-            ],
+            restrictions: [],
             banned: false,
           },
         ],
@@ -527,6 +417,7 @@ describe('visitSchedulerApiClient', () => {
         reference: 'ab-cd-ef-gh',
         prisonerId: 'AF34567G',
         prisonId,
+        sessionTemplateReference: 'v9d.7ed.7u',
         visitRoom: 'A1 L3',
         visitType,
         visitStatus,
@@ -554,12 +445,13 @@ describe('visitSchedulerApiClient', () => {
         },
         visitSlot: {
           id: '1',
+          sessionTemplateReference: 'v9d.7ed.7u',
           prisonId,
           startTimestamp: result.startTimestamp,
           endTimestamp: result.endTimestamp,
           availableTables: 1,
           capacity: 30,
-          visitRoomName: result.visitRoom,
+          visitRoom: result.visitRoom,
           visitRestriction: 'OPEN',
         },
         visitRestriction: 'OPEN',
@@ -632,9 +524,12 @@ describe('visitSchedulerApiClient', () => {
 
   describe('changeBookedVisit', () => {
     it('should return the Visit with new status of RESERVED/CHANGING and new applicationReference, from the Visit Scheduler', async () => {
-      const visitType = 'SOCIAL'
+      const visitRestriction = 'OPEN'
+      const startTimestamp = '2022-02-14T10:00:00'
+      const endTimestamp = '2022-02-14T11:00:00'
+      const sessionTemplateReference = 'v9d.7ed.7u'
 
-      const visitSessionData = <VisitSessionData>{
+      const visitSessionData: VisitSessionData = {
         prisoner: {
           offenderNo: 'AF34567G',
           name: 'prisoner name',
@@ -643,11 +538,14 @@ describe('visitSchedulerApiClient', () => {
         },
         visitSlot: {
           id: '1',
+          sessionTemplateReference,
           prisonId,
-          startTimestamp: '2022-02-14T10:00:00',
-          endTimestamp: '2022-02-14T11:00:00',
+          startTimestamp,
+          endTimestamp,
           availableTables: 1,
-          visitRoomName: 'A1 L3',
+          capacity: 1,
+          visitRoom: 'A1 L3',
+          visitRestriction,
         },
         visitRestriction: 'OPEN',
         visitors: [
@@ -665,6 +563,10 @@ describe('visitSchedulerApiClient', () => {
           contactName: 'John Smith',
           contact: {
             personId: 123,
+            name: 'visitor name',
+            relationshipDescription: 'relationship desc',
+            restrictions: [],
+            banned: false,
           },
         },
         applicationReference: 'aaa-bbb-ccc',
@@ -677,8 +579,9 @@ describe('visitSchedulerApiClient', () => {
         reference: visitSessionData.visitReference,
         prisonerId: visitSessionData.prisoner.offenderNo,
         prisonId,
-        visitRoom: visitSessionData.visitSlot.visitRoomName,
-        visitType,
+        sessionTemplateReference: 'v9d.7ed.7u',
+        visitRoom: visitSessionData.visitSlot.visitRoom,
+        visitType: 'SOCIAL',
         visitStatus: 'CHANGING',
         visitRestriction: visitSessionData.visitRestriction,
         startTimestamp: visitSessionData.visitSlot.startTimestamp,
@@ -703,9 +606,7 @@ describe('visitSchedulerApiClient', () => {
       fakeVisitSchedulerApi
         .put(`/visits/${visitSessionData.visitReference}/change`, <ReserveVisitSlotDto>{
           prisonerId: visitSessionData.prisoner.offenderNo,
-          prisonId,
-          visitRoom: visitSessionData.visitSlot.visitRoomName,
-          visitType,
+          sessionTemplateReference: 'v9d.7ed.7u',
           visitRestriction: visitSessionData.visitRestriction,
           startTimestamp: visitSessionData.visitSlot.startTimestamp,
           endTimestamp: visitSessionData.visitSlot.endTimestamp,
@@ -744,6 +645,7 @@ describe('visitSchedulerApiClient', () => {
         reference: 'ab-cd-ef-gh',
         prisonerId: 'AF34567G',
         prisonId: 'HEI',
+        sessionTemplateReference: 'v9d.7ed.7u',
         visitRoom: 'A1 L3',
         visitType: 'SOCIAL',
         visitStatus: 'CANCELLED',

@@ -113,9 +113,7 @@ export default class VisitSchedulerApiClient {
       path: '/visits/slot/reserve',
       data: <ReserveVisitSlotDto>{
         prisonerId: visitSessionData.prisoner.offenderNo,
-        prisonId: visitSessionData.visitSlot.prisonId,
-        visitRoom: visitSessionData.visitSlot.visitRoomName,
-        visitType: this.visitType,
+        sessionTemplateReference: visitSessionData.visitSlot.sessionTemplateReference,
         visitRestriction: visitSessionData.visitRestriction,
         startTimestamp: visitSessionData.visitSlot.startTimestamp,
         endTimestamp: visitSessionData.visitSlot.endTimestamp,
@@ -160,9 +158,7 @@ export default class VisitSchedulerApiClient {
       path: `/visits/${visitSessionData.visitReference}/change`,
       data: <ReserveVisitSlotDto>{
         prisonerId: visitSessionData.prisoner.offenderNo,
-        prisonId: visitSessionData.visitSlot.prisonId,
-        visitRoom: visitSessionData.visitSlot.visitRoomName,
-        visitType: this.visitType,
+        sessionTemplateReference: visitSessionData.visitSlot.sessionTemplateReference,
         visitRestriction: visitSessionData.visitRestriction,
         startTimestamp: visitSessionData.visitSlot.startTimestamp,
         endTimestamp: visitSessionData.visitSlot.endTimestamp,

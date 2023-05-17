@@ -33,12 +33,13 @@ const visitorsData: VisitSessionData['visitors'] = [
 ]
 const visitSlot: VisitSessionData['visitSlot'] = {
   id: '1',
+  sessionTemplateReference: 'v9d.7ed.7u',
   prisonId,
   startTimestamp: '123',
   endTimestamp: '123',
   availableTables: 1,
   capacity: 30,
-  visitRoomName: 'visitRoom',
+  visitRoom: 'visitRoom',
   visitRestriction: 'OPEN',
 }
 const visitRestriction: VisitSessionData['visitRestriction'] = 'OPEN'
