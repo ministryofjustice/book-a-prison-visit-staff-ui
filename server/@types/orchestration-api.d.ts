@@ -125,21 +125,10 @@ export interface components {
        */
       prisonerId: string
       /**
-       * @description Prison Id
-       * @example MDI
+       * @description Session template reference
+       * @example v9d.7ed.7u
        */
-      prisonId: string
-      /**
-       * @description Visit Room
-       * @example A1
-       */
-      visitRoom: string
-      /**
-       * @description Visit Type
-       * @example SOCIAL
-       * @enum {string}
-       */
-      visitType: 'SOCIAL'
+      sessionTemplateReference: string
       /**
        * @description Visit Restriction
        * @example OPEN
@@ -221,8 +210,13 @@ export interface components {
        */
       prisonId: string
       /**
+       * @description Session Template Reference
+       * @example v9d.7ed.7u
+       */
+      sessionTemplateReference?: string
+      /**
        * @description Visit Room
-       * @example A1 L3
+       * @example Visits Main Hall
        */
       visitRoom: string
       /**
@@ -445,9 +439,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
+      last?: boolean
       pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
@@ -455,17 +449,17 @@ export interface components {
       /** Format: int64 */
       offset?: number
       sort?: components['schemas']['SortObject']
-      paged?: boolean
-      unpaged?: boolean
       /** Format: int32 */
       pageSize?: number
+      paged?: boolean
+      unpaged?: boolean
       /** Format: int32 */
       pageNumber?: number
     }
     SortObject: {
       empty?: boolean
-      unsorted?: boolean
       sorted?: boolean
+      unsorted?: boolean
     }
     /** @description Support Type */
     SupportTypeDto: {
@@ -483,21 +477,21 @@ export interface components {
     /** @description Visit Session */
     VisitSessionDto: {
       /**
-       * Format: int64
-       * @description session id
-       * @example 123
+       * @description Session Template Reference
+       * @example v9d.7ed.7u
        */
-      sessionTemplateId: number
+      sessionTemplateReference: string
       /**
-       * @description The Name of the visit room in which this visit session takes place
-       * @example Visit room 1
+       * @description Visit Room
+       * @example Visits Main Hall
        */
-      visitRoomName: string
+      visitRoom: string
       /**
        * @description The type of visits taking place within this session
        * @example SOCIAL
+       * @enum {string}
        */
-      visitType: string
+      visitType: 'SOCIAL'
       /**
        * @description The prison id
        * @example LEI
@@ -573,18 +567,21 @@ export interface components {
        */
       endTime: string
       capacity: components['schemas']['SessionCapacityDto']
-      /** @description The session is for enhanced privileges */
-      enhanced: boolean
       /**
        * @description prisoner location group
        * @example Wing C
        */
-      prisonerLocationGroupNames?: string[]
+      prisonerLocationGroupNames: string[]
       /**
        * @description prisoner category groups
        * @example Category A Prisoners
        */
-      prisonerCategoryGroupNames?: string[]
+      prisonerCategoryGroupNames: string[]
+      /**
+       * @description prisoner incentive level groups
+       * @example Enhanced Incentive Level Prisoners
+       */
+      prisonerIncentiveLevelGroupNames: string[]
       /**
        * @description The session template frequency
        * @example BI_WEEKLY
@@ -681,7 +678,7 @@ export interface components {
        * @description Date of Birth
        * @example 1975-04-02
        */
-      dateOfBirth?: string
+      dateOfBirth: string
       /**
        * @description In prison cell location
        * @example A-1-002
@@ -712,7 +709,7 @@ export interface components {
       alerts?: components['schemas']['AlertDto'][]
       visitBalances?: components['schemas']['VisitBalancesDto']
       /** @description Past and future visits for the prisoner based on configured duration. */
-      visits?: components['schemas']['VisitDto'][]
+      visits: components['schemas']['VisitDto'][]
     }
     /** @description Balances of visit orders and privilege visit orders */
     VisitBalancesDto: {
@@ -1340,7 +1337,7 @@ export interface operations {
   getDlqMessages: {
     parameters: {
       query: {
-        maxMessages: number
+        maxMessages?: number
       }
       path: {
         dlqName: string

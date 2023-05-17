@@ -51,12 +51,13 @@ export type PrisonerProfilePage = {
 // Visit slots, for representing data derived from VisitSessions
 export type VisitSlot = {
   id: string
+  sessionTemplateReference: string
   prisonId: string
   startTimestamp: string
   endTimestamp: string
   availableTables: number
   capacity: number
-  visitRoomName: string
+  visitRoom: string
   visitRestriction: 'OPEN' | 'CLOSED'
   sessionConflicts?: VisitSession['sessionConflicts']
 }
