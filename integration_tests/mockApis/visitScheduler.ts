@@ -83,19 +83,6 @@ export default {
       },
     })
   },
-  stubSupportedPrisonIds: (): SuperAgentRequest => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        url: '/visitScheduler/config/prisons/supported',
-      },
-      response: {
-        status: 200,
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: TestData.supportedPrisonIds(),
-      },
-    })
-  },
   stubUpcomingVisits: ({
     offenderNo,
     upcomingVisits,

@@ -34,6 +34,7 @@ export default defineConfig({
         // Orchestration service
         stubVisitHistory: orchestrationService.stubVisitHistory,
         stubPrisonerProfile: orchestrationService.stubPrisonerProfile,
+        stubSupportedPrisonIds: orchestrationService.stubSupportedPrisonIds,
 
         // Prisoner contact registry
         stubPrisonerSocialContacts: prisonerContactRegistry.stubPrisonerSocialContacts,
@@ -57,7 +58,6 @@ export default defineConfig({
         stubBookVisit: visitScheduler.stubBookVisit,
         stubCancelVisit: visitScheduler.stubCancelVisit,
         stubChangeReservedSlot: visitScheduler.stubChangeReservedSlot,
-        stubSupportedPrisonIds: visitScheduler.stubSupportedPrisonIds,
         stubUpcomingVisits: visitScheduler.stubUpcomingVisits,
         stubPastVisits: visitScheduler.stubPastVisits,
         stubReserveVisit: visitScheduler.stubReserveVisit,

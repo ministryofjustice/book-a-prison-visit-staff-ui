@@ -52,4 +52,19 @@ describe('orchestrationApiClient', () => {
       expect(output).toEqual(prisonerProfile)
     })
   })
+
+  describe('getSupportedPrisonIds', () => {
+    it('should return an array of supported prison IDs', async () => {
+      const results = ['HEI', 'BLI']
+
+      fakeOrchestrationApi
+        .get('/config/prisons/supported')
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, results)
+
+      const output = await orchestrationApiClient.getSupportedPrisonIds()
+
+      expect(output).toEqual(results)
+    })
+  })
 })

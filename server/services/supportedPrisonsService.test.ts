@@ -3,31 +3,31 @@ import TestData from '../routes/testutils/testData'
 import { PrisonDto } from '../data/prisonRegisterApiTypes'
 import {
   createMockHmppsAuthClient,
+  createMockOrchestrationApiClient,
   createMockPrisonRegisterApiClient,
-  createMockVisitSchedulerApiClient,
 } from '../data/testutils/mocks'
 
 const token = 'some token'
 
 describe('Supported prisons service', () => {
   const hmppsAuthClient = createMockHmppsAuthClient()
+  const orchestrationApiClient = createMockOrchestrationApiClient()
   const prisonRegisterApiClient = createMockPrisonRegisterApiClient()
-  const visitSchedulerApiClient = createMockVisitSchedulerApiClient()
 
   let supportedPrisonsService: SupportedPrisonsService
 
+  const OrchestrationApiClientFactory = jest.fn()
   const PrisonRegisterApiClientFactory = jest.fn()
-  const VisitSchedulerApiClientFactory = jest.fn()
 
   const allPrisons = TestData.prisons()
   const supportedPrisons = TestData.supportedPrisons()
   const supportedPrisonIds = TestData.supportedPrisonIds()
 
   beforeEach(() => {
+    OrchestrationApiClientFactory.mockReturnValue(orchestrationApiClient)
     PrisonRegisterApiClientFactory.mockReturnValue(prisonRegisterApiClient)
-    VisitSchedulerApiClientFactory.mockReturnValue(visitSchedulerApiClient)
     supportedPrisonsService = new SupportedPrisonsService(
-      VisitSchedulerApiClientFactory,
+      OrchestrationApiClientFactory,
       PrisonRegisterApiClientFactory,
       hmppsAuthClient,
     )
@@ -42,7 +42,7 @@ describe('Supported prisons service', () => {
 
   describe('getSupportedPrisons', () => {
     it('should return an object with key/values of supported prison IDs and names', async () => {
-      visitSchedulerApiClient.getSupportedPrisonIds.mockResolvedValue(supportedPrisonIds)
+      orchestrationApiClient.getSupportedPrisonIds.mockResolvedValue(supportedPrisonIds)
 
       const results = await supportedPrisonsService.getSupportedPrisons('user')
 
@@ -50,7 +50,7 @@ describe('Supported prisons service', () => {
     })
 
     it('should ignore an unknown prison ID', async () => {
-      visitSchedulerApiClient.getSupportedPrisonIds.mockResolvedValue(supportedPrisonIds.concat(['XYZ']))
+      orchestrationApiClient.getSupportedPrisonIds.mockResolvedValue(supportedPrisonIds.concat(['XYZ']))
 
       const results = await supportedPrisonsService.getSupportedPrisons('user')
 
@@ -60,18 +60,18 @@ describe('Supported prisons service', () => {
 
   describe('getSupportedPrisonIds', () => {
     it('should return an array of supported prison IDs', async () => {
-      visitSchedulerApiClient.getSupportedPrisonIds.mockResolvedValue(supportedPrisonIds)
+      orchestrationApiClient.getSupportedPrisonIds.mockResolvedValue(supportedPrisonIds)
 
       const results = await supportedPrisonsService.getSupportedPrisonIds('user')
 
-      expect(visitSchedulerApiClient.getSupportedPrisonIds).toHaveBeenCalledTimes(1)
+      expect(orchestrationApiClient.getSupportedPrisonIds).toHaveBeenCalledTimes(1)
       expect(results).toStrictEqual(supportedPrisonIds)
     })
   })
 
   describe('API response caching', () => {
     beforeEach(() => {
-      visitSchedulerApiClient.getSupportedPrisonIds.mockResolvedValue(supportedPrisonIds)
+      orchestrationApiClient.getSupportedPrisonIds.mockResolvedValue(supportedPrisonIds)
     })
 
     it('should call API to get all prisons once then use internal cache for subsequent calls', async () => {
