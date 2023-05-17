@@ -177,10 +177,10 @@ export default function routes({
 
   const selectVisitors = new SelectVisitors('update', prisonerVisitorsService, prisonerProfileService)
   const visitType = new VisitType('update', auditService)
-  const dateAndTime = new DateAndTime('update', visitSessionsService, auditService)
+  const dateAndTime = new DateAndTime('update', visitService, visitSessionsService, auditService)
   const additionalSupport = new AdditionalSupport('update', additionalSupportService)
   const mainContact = new MainContact('update')
-  const checkYourBooking = new CheckYourBooking('update', visitSessionsService, auditService, notificationsService)
+  const checkYourBooking = new CheckYourBooking('update', auditService, notificationsService, visitService)
   const confirmation = new Confirmation('update')
 
   get(
@@ -307,7 +307,7 @@ export default function routes({
         text: req.body[reasonFieldName],
       }
 
-      const visit = await visitSessionsService.cancelVisit({
+      const visit = await visitService.cancelVisit({
         username: res.locals.user.username,
         reference,
         outcome,

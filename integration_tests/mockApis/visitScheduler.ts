@@ -1,74 +1,8 @@
 import { SuperAgentRequest } from 'superagent'
 import { stubFor } from './wiremock'
-import {
-  OutcomeDto,
-  SessionCapacity,
-  SessionSchedule,
-  Visit,
-  VisitSession,
-} from '../../server/data/orchestrationApiTypes'
+import { SessionCapacity, SessionSchedule, Visit, VisitSession } from '../../server/data/orchestrationApiTypes'
 
 export default {
-  stubBookVisit: (visit: Visit): SuperAgentRequest => {
-    return stubFor({
-      request: {
-        method: 'PUT',
-        url: `/visitScheduler/visits/${visit.applicationReference}/book`,
-      },
-      response: {
-        status: 200,
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: visit,
-      },
-    })
-  },
-  stubCancelVisit: ({ visit, outcome }: { visit: Visit; outcome: OutcomeDto }): SuperAgentRequest => {
-    return stubFor({
-      request: {
-        method: 'PUT',
-        url: `/visitScheduler/visits/${visit.reference}/cancel`,
-        bodyPatterns: [
-          {
-            equalToJson: {
-              outcomeStatus: outcome.outcomeStatus,
-              text: outcome.text,
-            },
-            ignoreArrayOrder: true,
-          },
-        ],
-      },
-      response: {
-        status: 200,
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: visit,
-      },
-    })
-  },
-  stubChangeReservedSlot: (visit: Visit): SuperAgentRequest => {
-    return stubFor({
-      request: {
-        method: 'PUT',
-        url: `/visitScheduler/visits/${visit.applicationReference}/slot/change`,
-        bodyPatterns: [
-          {
-            equalToJson: {
-              visitRestriction: visit.visitRestriction,
-              startTimestamp: visit.startTimestamp,
-              endTimestamp: visit.endTimestamp,
-              visitContact: visit.visitContact,
-              visitors: visit.visitors,
-              visitorSupport: visit.visitorSupport,
-            },
-          },
-        ],
-      },
-      response: {
-        status: 200,
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: visit,
-      },
-    })
-  },
   stubUpcomingVisits: ({
     offenderNo,
     upcomingVisits,
@@ -112,31 +46,6 @@ export default {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
         jsonBody: { content: pastVisits },
-      },
-    })
-  },
-  stubReserveVisit: (visit: Visit): SuperAgentRequest => {
-    return stubFor({
-      request: {
-        method: 'POST',
-        url: '/visitScheduler/visits/slot/reserve',
-        bodyPatterns: [
-          {
-            equalToJson: {
-              prisonerId: visit.prisonerId,
-              sessionTemplateReference: visit.sessionTemplateReference,
-              visitRestriction: visit.visitRestriction,
-              startTimestamp: visit.startTimestamp,
-              endTimestamp: visit.endTimestamp,
-              visitors: visit.visitors,
-            },
-          },
-        ],
-      },
-      response: {
-        status: 200,
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: visit,
       },
     })
   },
