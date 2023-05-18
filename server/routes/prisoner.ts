@@ -12,7 +12,7 @@ export default function routes({
   prisonerProfileService,
   prisonerSearchService,
   supportedPrisonsService,
-  visitSessionsService,
+  visitService,
 }: Services): Router {
   const router = Router()
 
@@ -93,7 +93,7 @@ export default function routes({
     }
     const prisonerName = `${prisonerDetails.lastName}, ${prisonerDetails.firstName}`
 
-    const visits = await visitSessionsService.getUpcomingVisits({
+    const visits = await visitService.getUpcomingVisits({
       username: res.locals.user.username,
       offenderNo,
       visitStatus: ['CANCELLED', 'BOOKED'],

@@ -486,6 +486,21 @@ describe('orchestrationApiClient', () => {
     })
   })
 
+  describe('getVisit', () => {
+    it('should return a single matching Visit from the Visit Scheduler API for a valid reference', async () => {
+      const visit = TestData.visit()
+
+      fakeOrchestrationApi
+        .get(`/visits/${visit.reference}`)
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, visit)
+
+      const output = await orchestrationApiClient.getVisit(visit.reference)
+
+      expect(output).toEqual(visit)
+    })
+  })
+
   describe('getVisitHistory', () => {
     it('should return visit history details for requested visit', async () => {
       const visitHistoryDetails = TestData.visitHistoryDetails()
@@ -498,6 +513,114 @@ describe('orchestrationApiClient', () => {
       const output = await orchestrationApiClient.getVisitHistory(visitHistoryDetails.visit.reference)
 
       expect(output).toEqual(visitHistoryDetails)
+    })
+  })
+
+  describe('getUpcomingVisits', () => {
+    it('should return an array of Visit from the Visit Scheduler API', async () => {
+      const timestamp = new Date().toISOString()
+      const offenderNo = 'A1234BC'
+      const results: Visit[] = [
+        {
+          applicationReference: 'aaa-bbb-ccc',
+          reference: 'ab-cd-ef-gh',
+          prisonerId: offenderNo,
+          prisonId: 'HEI',
+          visitRoom: 'A1 L3',
+          visitType: 'SOCIAL',
+          visitStatus: 'RESERVED',
+          visitRestriction: 'OPEN',
+          startTimestamp: timestamp,
+          endTimestamp: '',
+          visitNotes: [],
+          visitors: [
+            {
+              nomisPersonId: 1234,
+            },
+          ],
+          visitorSupport: [
+            {
+              type: 'OTHER',
+              text: 'custom support details',
+            },
+          ],
+          createdBy: 'user1',
+          createdTimestamp: '2022-02-14T10:00:00',
+          modifiedTimestamp: '2022-02-14T10:05:00',
+        },
+      ]
+
+      jest.useFakeTimers({ advanceTimers: true, now: new Date(timestamp) })
+
+      fakeOrchestrationApi
+        .get('/visits/search')
+        .query({
+          prisonerId: offenderNo,
+          startDateTime: timestamp,
+          visitStatus: 'BOOKED,CANCELLED',
+          page: '0',
+          size: '1000',
+        })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, results)
+
+      const output = await orchestrationApiClient.getUpcomingVisits(offenderNo, ['BOOKED', 'CANCELLED'])
+
+      expect(output).toEqual(results)
+
+      jest.useRealTimers()
+    })
+  })
+
+  describe('getVisitsByDate', () => {
+    it('should return an array of Visit from the Visit Scheduler API', async () => {
+      const dateString = '2022-05-06'
+      const results: Visit[] = [
+        {
+          applicationReference: 'aaa-bbb-ccc',
+          reference: 'ab-cd-ef-gh',
+          prisonerId: 'A1234BC',
+          prisonId: 'HEI',
+          visitRoom: 'A1 L3',
+          visitType: 'SOCIAL',
+          visitStatus: 'RESERVED',
+          visitRestriction: 'OPEN',
+          startTimestamp: `${dateString}T10:00:00`,
+          endTimestamp: '',
+          visitNotes: [],
+          visitors: [
+            {
+              nomisPersonId: 1234,
+            },
+          ],
+          visitorSupport: [
+            {
+              type: 'OTHER',
+              text: 'custom support details',
+            },
+          ],
+          createdBy: 'user1',
+          createdTimestamp: '2022-02-14T10:00:00',
+          modifiedTimestamp: '2022-02-14T10:05:00',
+        },
+      ]
+
+      fakeOrchestrationApi
+        .get('/visits/search')
+        .query({
+          prisonId: 'HEI',
+          startDateTime: `${dateString}T00:00:00`,
+          endDateTime: `${dateString}T23:59:59`,
+          visitStatus: 'BOOKED',
+          page: '0',
+          size: '1000',
+        })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, results)
+
+      const output = await orchestrationApiClient.getVisitsByDate(dateString, prisonId)
+
+      expect(output).toEqual(results)
     })
   })
 

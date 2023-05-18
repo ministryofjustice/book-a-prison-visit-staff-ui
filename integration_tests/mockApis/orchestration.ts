@@ -89,6 +89,19 @@ export default {
       },
     })
   },
+  stubVisit: (visit: Visit): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        url: `/orchestration/visits/${visit.reference}`,
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: visit,
+      },
+    })
+  },
   stubVisitHistory: (visitHistoryDetails: VisitHistoryDetails): SuperAgentRequest => {
     return stubFor({
       request: {
@@ -99,6 +112,63 @@ export default {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
         jsonBody: visitHistoryDetails,
+      },
+    })
+  },
+  stubUpcomingVisits: ({
+    offenderNo,
+    upcomingVisits,
+  }: {
+    offenderNo: string
+    upcomingVisits: Visit[]
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPath: '/orchestration/visits/search',
+        queryParameters: {
+          prisonerId: { equalTo: offenderNo },
+          startDateTime: { matches: '.*' },
+          visitStatus: { and: [{ contains: 'BOOKED' }, { contains: 'CANCELLED' }] },
+          page: { equalTo: '0' },
+          size: { equalTo: '1000' },
+        },
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: { content: upcomingVisits },
+      },
+    })
+  },
+  stubVisitsByDate: ({
+    startDateTime,
+    endDateTime,
+    prisonId,
+    visits,
+  }: {
+    startDateTime: string
+    endDateTime: string
+    prisonId: string
+    visits: Visit
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPath: `/orchestration/visits/search`,
+        queryParameters: {
+          prisonId: { equalTo: prisonId },
+          startDateTime: { equalTo: startDateTime },
+          endDateTime: { equalTo: endDateTime },
+          visitStatus: { equalTo: 'BOOKED' },
+          page: { equalTo: '0' },
+          size: { equalTo: '1000' },
+        },
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: { content: visits },
       },
     })
   },

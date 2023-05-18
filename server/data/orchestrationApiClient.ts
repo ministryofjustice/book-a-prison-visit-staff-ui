@@ -3,6 +3,7 @@ import config, { ApiConfig } from '../config'
 import {
   ChangeVisitSlotRequestDto,
   OutcomeDto,
+  PageVisitDto,
   PrisonerProfile,
   ReserveVisitSlotDto,
   SupportType,
@@ -19,6 +20,11 @@ export default class OrchestrationApiClient {
   constructor(token: string) {
     this.restClient = new RestClient('orchestrationApiClient', config.apis.orchestration as ApiConfig, token)
   }
+
+  // Workaround for pagination, mentioned in comments - VB-1760
+  private page = '0'
+
+  private size = '1000'
 
   // orchestration-visits-controller
 
@@ -95,8 +101,39 @@ export default class OrchestrationApiClient {
     })
   }
 
+  async getVisit(reference: string): Promise<Visit> {
+    return this.restClient.get({ path: `/visits/${reference}` })
+  }
+
   async getVisitHistory(reference: string): Promise<VisitHistoryDetails> {
     return this.restClient.get({ path: `/visits/${reference}/history` })
+  }
+
+  async getUpcomingVisits(offenderNo: string, visitStatus: Visit['visitStatus'][]): Promise<PageVisitDto> {
+    return this.restClient.get({
+      path: '/visits/search',
+      query: new URLSearchParams({
+        prisonerId: offenderNo,
+        startDateTime: new Date().toISOString(),
+        visitStatus: visitStatus.join(','),
+        page: this.page,
+        size: this.size,
+      }).toString(),
+    })
+  }
+
+  async getVisitsByDate(dateString: string, prisonId: string): Promise<PageVisitDto> {
+    return this.restClient.get({
+      path: '/visits/search',
+      query: new URLSearchParams({
+        prisonId,
+        startDateTime: `${dateString}T00:00:00`,
+        endDateTime: `${dateString}T23:59:59`,
+        visitStatus: 'BOOKED',
+        page: this.page,
+        size: this.size,
+      }).toString(),
+    })
   }
 
   async getAvailableSupportOptions(): Promise<SupportType[]> {

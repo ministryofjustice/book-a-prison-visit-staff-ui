@@ -9,14 +9,14 @@ import TestData from './testutils/testData'
 import {
   createMockAuditService,
   createMockPrisonerSearchService,
-  createMockVisitSessionsService,
+  createMockVisitService,
 } from '../services/testutils/mocks'
 
 let app: Express
 
 const auditService = createMockAuditService()
 const prisonerSearchService = createMockPrisonerSearchService()
-const visitSessionsService = createMockVisitSessionsService()
+const visitService = createMockVisitService()
 
 const prisonId = 'HEI'
 
@@ -38,7 +38,7 @@ const getPrisonerReturnData = TestData.prisoner()
 let getVisit: VisitInformation
 
 beforeEach(() => {
-  app = appWithAllRoutes({ services: { auditService, prisonerSearchService, visitSessionsService } })
+  app = appWithAllRoutes({ services: { auditService, prisonerSearchService, visitService } })
 })
 
 afterEach(() => {
@@ -391,7 +391,7 @@ describe('Booking search page', () => {
   describe('GET /search/visit/results?searchBlock1=ab&searchBlock2=bc&searchBlock3=cd&searchBlock4=de', () => {
     it('should not render visit results page when no result', () => {
       prisonerSearchService.getPrisonerById.mockResolvedValue(getPrisonerReturnData)
-      visitSessionsService.getVisit.mockImplementation(() => {
+      visitService.getVisit.mockImplementation(() => {
         throw createError(404, 'Not found')
       })
 
@@ -401,7 +401,7 @@ describe('Booking search page', () => {
         .expect(res => {
           expect(res.text).toContain('Search for a booking')
           expect(res.text).toContain('id="search-results-none"')
-          expect(visitSessionsService.getVisit).toHaveBeenCalledWith({
+          expect(visitService.getVisit).toHaveBeenCalledWith({
             reference: 'ab-bc-cd-de',
             username: 'user1',
             prisonId: 'HEI',
@@ -419,7 +419,7 @@ describe('Booking search page', () => {
   describe('GET /search/visit/results?searchBlock1=ab&searchBlock2=bc&searchBlock3=cd&searchBlock4=de', () => {
     it('should render visit results page with a single visit', () => {
       prisonerSearchService.getPrisonerById.mockResolvedValue(getPrisonerReturnData)
-      visitSessionsService.getVisit.mockResolvedValue(getVisit)
+      visitService.getVisit.mockResolvedValue(getVisit)
 
       return request(app)
         .get('/search/visit/results?searchBlock1=ab&searchBlock2=bc&searchBlock3=cd&searchBlock4=de')
@@ -427,7 +427,7 @@ describe('Booking search page', () => {
         .expect(res => {
           expect(res.text).toContain('Search for a booking')
           expect(res.text).toContain('id="search-results-true"')
-          expect(visitSessionsService.getVisit).toHaveBeenCalledWith({
+          expect(visitService.getVisit).toHaveBeenCalledWith({
             reference: 'ab-bc-cd-de',
             username: 'user1',
             prisonId: 'HEI',
@@ -443,12 +443,12 @@ describe('Booking search page', () => {
 
     it('should not render visit results page when selected establishment does not equal visit prisonId', () => {
       prisonerSearchService.getPrisonerById.mockResolvedValue(getPrisonerReturnData)
-      visitSessionsService.getVisit.mockImplementation(() => {
+      visitService.getVisit.mockImplementation(() => {
         throw createError(404, 'Not found')
       })
 
       app = appWithAllRoutes({
-        services: { auditService, prisonerSearchService, visitSessionsService },
+        services: { auditService, prisonerSearchService, visitService },
         sessionData: { selectedEstablishment: { prisonId: 'XYZ' } } as SessionData,
       })
 
@@ -458,7 +458,7 @@ describe('Booking search page', () => {
         .expect(res => {
           expect(res.text).toContain('Search for a booking')
           expect(res.text).toContain('id="search-results-none"')
-          expect(visitSessionsService.getVisit).toHaveBeenCalledWith({
+          expect(visitService.getVisit).toHaveBeenCalledWith({
             reference: 'ab-bc-cd-de',
             username: 'user1',
             prisonId: 'XYZ',
