@@ -91,14 +91,6 @@ export default {
       },
       agent: new AgentConfig(Number(get('PRISONER_DETAILS_API_TIMEOUT_RESPONSE', 10000))),
     },
-    visitScheduler: {
-      url: get('VISIT_SCHEDULER_API_URL', 'http://localhost:8080', requiredInProduction),
-      timeout: {
-        response: Number(get('VISIT_SCHEDULER_API_TIMEOUT_RESPONSE', 10000)),
-        deadline: Number(get('VISIT_SCHEDULER_API_TIMEOUT_DEADLINE', 10000)),
-      },
-      agent: new AgentConfig(Number(get('VISIT_SCHEDULER_API_TIMEOUT_RESPONSE', 10000))),
-    },
     prisonerContactRegistry: {
       url: get('PRISONER_CONTACT_REGISTRY_API_URL', 'http://localhost:8080', requiredInProduction),
       timeout: {

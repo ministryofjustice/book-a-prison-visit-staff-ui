@@ -5,7 +5,7 @@ import TestData from '../routes/testutils/testData'
 import VisitSessionsService from './visitSessionsService'
 import {
   createMockHmppsAuthClient,
-  createMockVisitSchedulerApiClient,
+  createMockOrchestrationApiClient,
   createMockWhereaboutsApiClient,
 } from '../data/testutils/mocks'
 
@@ -13,22 +13,22 @@ const token = 'some token'
 
 describe('Visit sessions service', () => {
   const hmppsAuthClient = createMockHmppsAuthClient()
-  const visitSchedulerApiClient = createMockVisitSchedulerApiClient()
+  const orchestrationApiClient = createMockOrchestrationApiClient()
   const whereaboutsApiClient = createMockWhereaboutsApiClient()
 
   let visitSessionsService: VisitSessionsService
 
-  const VisitSchedulerApiClientFactory = jest.fn()
+  const OrchestrationApiClientFactory = jest.fn()
   const WhereaboutsApiClientFactory = jest.fn()
 
   const prisonId = 'HEI'
 
   beforeEach(() => {
-    VisitSchedulerApiClientFactory.mockReturnValue(visitSchedulerApiClient)
+    OrchestrationApiClientFactory.mockReturnValue(orchestrationApiClient)
     WhereaboutsApiClientFactory.mockReturnValue(whereaboutsApiClient)
 
     visitSessionsService = new VisitSessionsService(
-      VisitSchedulerApiClientFactory,
+      OrchestrationApiClientFactory,
       WhereaboutsApiClientFactory,
       hmppsAuthClient,
     )
@@ -41,7 +41,7 @@ describe('Visit sessions service', () => {
 
   describe('getVisitSessions', () => {
     it('Should return empty object if no visit sessions', async () => {
-      visitSchedulerApiClient.getVisitSessions.mockResolvedValue([])
+      orchestrationApiClient.getVisitSessions.mockResolvedValue([])
       whereaboutsApiClient.getEvents.mockResolvedValue([])
       const results = await visitSessionsService.getVisitSessions({
         username: 'user',
@@ -50,8 +50,8 @@ describe('Visit sessions service', () => {
         visitRestriction: 'OPEN',
       })
 
-      expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
-      expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId)
+      expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
+      expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId)
       expect(results).toEqual({ slotsList: {}, whereaboutsAvailable: true })
     })
 
@@ -74,7 +74,7 @@ describe('Visit sessions service', () => {
           },
         ]
 
-        visitSchedulerApiClient.getVisitSessions.mockResolvedValue(sessions)
+        orchestrationApiClient.getVisitSessions.mockResolvedValue(sessions)
       })
 
       it('with a prisoner event', async () => {
@@ -102,8 +102,8 @@ describe('Visit sessions service', () => {
           visitRestriction: 'OPEN',
         })
 
-        expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
-        expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId)
+        expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
+        expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId)
         expect(whereaboutsApiClient.getEvents).toHaveBeenCalledTimes(1)
         expect(results).toEqual(<{ slotsList: VisitSlotList; whereaboutsAvailable: boolean }>{
           slotsList: {
@@ -168,8 +168,8 @@ describe('Visit sessions service', () => {
           visitRestriction: 'OPEN',
         })
 
-        expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
-        expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId)
+        expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
+        expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId)
         expect(whereaboutsApiClient.getEvents).toHaveBeenCalledTimes(1)
         expect(results).toEqual(<{ slotsList: VisitSlotList; whereaboutsAvailable: boolean }>{
           slotsList: {
@@ -212,8 +212,8 @@ describe('Visit sessions service', () => {
           visitRestriction: 'OPEN',
         })
 
-        expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
-        expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId)
+        expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
+        expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId)
         expect(whereaboutsApiClient.getEvents).toHaveBeenCalledTimes(1)
         expect(results).toEqual(<{ slotsList: VisitSlotList; whereaboutsAvailable: boolean }>{
           slotsList: {
@@ -264,7 +264,7 @@ describe('Visit sessions service', () => {
         },
       ]
 
-      visitSchedulerApiClient.getVisitSessions.mockResolvedValue(sessions)
+      orchestrationApiClient.getVisitSessions.mockResolvedValue(sessions)
       whereaboutsApiClient.getEvents.mockResolvedValue([])
       const results = await visitSessionsService.getVisitSessions({
         username: 'user',
@@ -273,8 +273,8 @@ describe('Visit sessions service', () => {
         visitRestriction: 'CLOSED',
       })
 
-      expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
-      expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId)
+      expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
+      expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId)
       expect(results).toEqual(<{ slotsList: VisitSlotList; whereaboutsAvailable: boolean }>{
         slotsList: {
           'February 2022': [
@@ -371,7 +371,7 @@ describe('Visit sessions service', () => {
         },
       ]
 
-      visitSchedulerApiClient.getVisitSessions.mockResolvedValue(sessions)
+      orchestrationApiClient.getVisitSessions.mockResolvedValue(sessions)
       whereaboutsApiClient.getEvents.mockResolvedValue([])
       const results = await visitSessionsService.getVisitSessions({
         username: 'user',
@@ -380,8 +380,8 @@ describe('Visit sessions service', () => {
         visitRestriction: 'OPEN',
       })
 
-      expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
-      expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId)
+      expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
+      expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId)
       expect(results).toEqual(<{ slotsList: VisitSlotList; whereaboutsAvailable: boolean }>{
         slotsList: {
           'February 2022': [
@@ -513,7 +513,7 @@ describe('Visit sessions service', () => {
         },
       ]
 
-      visitSchedulerApiClient.getVisitSessions.mockResolvedValue(sessions)
+      orchestrationApiClient.getVisitSessions.mockResolvedValue(sessions)
       whereaboutsApiClient.getEvents.mockResolvedValue([])
       const results = await visitSessionsService.getVisitSessions({
         username: 'user',
@@ -522,8 +522,8 @@ describe('Visit sessions service', () => {
         visitRestriction: 'OPEN',
       })
 
-      expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
-      expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId)
+      expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
+      expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId)
       expect(results).toEqual(<{ slotsList: VisitSlotList; whereaboutsAvailable: boolean }>{
         slotsList: {
           'February 2022': [
@@ -584,7 +584,7 @@ describe('Visit sessions service', () => {
         },
       ]
 
-      visitSchedulerApiClient.getVisitSessions.mockResolvedValue(sessions)
+      orchestrationApiClient.getVisitSessions.mockResolvedValue(sessions)
       whereaboutsApiClient.getEvents.mockResolvedValue([])
       const results = await visitSessionsService.getVisitSessions({
         username: 'user',
@@ -593,8 +593,8 @@ describe('Visit sessions service', () => {
         visitRestriction: 'CLOSED',
       })
 
-      expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
-      expect(visitSchedulerApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId)
+      expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
+      expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId)
       expect(results).toEqual(<{ slotsList: VisitSlotList; whereaboutsAvailable: boolean }>{
         slotsList: {
           'February 2022': [
@@ -633,11 +633,11 @@ describe('Visit sessions service', () => {
       const date = '2023-02-01'
       const sessionSchedule: SessionSchedule[] = [TestData.sessionSchedule()]
 
-      visitSchedulerApiClient.getSessionSchedule.mockResolvedValue(sessionSchedule)
+      orchestrationApiClient.getSessionSchedule.mockResolvedValue(sessionSchedule)
 
       const results = await visitSessionsService.getSessionSchedule({ username: 'user', prisonId, date })
 
-      expect(visitSchedulerApiClient.getSessionSchedule).toHaveBeenCalledWith(prisonId, date)
+      expect(orchestrationApiClient.getSessionSchedule).toHaveBeenCalledWith(prisonId, date)
       expect(results).toEqual(sessionSchedule)
     })
   })
@@ -649,7 +649,7 @@ describe('Visit sessions service', () => {
       const sessionStartTime = '10:00'
       const sessionEndTime = '11:00'
 
-      visitSchedulerApiClient.getVisitSessionCapacity.mockResolvedValue(sessionCapacity)
+      orchestrationApiClient.getVisitSessionCapacity.mockResolvedValue(sessionCapacity)
 
       const results = await visitSessionsService.getVisitSessionCapacity(
         'user',
@@ -659,7 +659,7 @@ describe('Visit sessions service', () => {
         sessionEndTime,
       )
 
-      expect(visitSchedulerApiClient.getVisitSessionCapacity).toHaveBeenCalledWith(
+      expect(orchestrationApiClient.getVisitSessionCapacity).toHaveBeenCalledWith(
         prisonId,
         sessionDate,
         sessionStartTime,

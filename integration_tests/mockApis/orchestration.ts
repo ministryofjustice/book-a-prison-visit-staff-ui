@@ -1,6 +1,14 @@
 import { SuperAgentRequest } from 'superagent'
 import { stubFor } from './wiremock'
-import { OutcomeDto, PrisonerProfile, Visit, VisitHistoryDetails } from '../../server/data/orchestrationApiTypes'
+import {
+  OutcomeDto,
+  PrisonerProfile,
+  SessionCapacity,
+  SessionSchedule,
+  Visit,
+  VisitHistoryDetails,
+  VisitSession,
+} from '../../server/data/orchestrationApiTypes'
 import TestData from '../../server/routes/testutils/testData'
 
 export default {
@@ -172,6 +180,92 @@ export default {
       },
     })
   },
+  stubAvailableSupport: (): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        url: '/orchestration/visit-support',
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: TestData.supportTypes(),
+      },
+    })
+  },
+  stubVisitSessions: ({
+    prisonId,
+    offenderNo,
+    visitSessions,
+  }: {
+    prisonId: string
+    offenderNo: string
+    visitSessions: VisitSession[]
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        url: `/orchestration/visit-sessions?prisonId=${prisonId}&prisonerId=${offenderNo}`,
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: visitSessions,
+      },
+    })
+  },
+  stubSessionSchedule: ({
+    prisonId,
+    date,
+    sessionSchedule,
+  }: {
+    prisonId: string
+    date: string
+    sessionSchedule: SessionSchedule[]
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        url: `/orchestration/visit-sessions/schedule?prisonId=${prisonId}&date=${date}`,
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: sessionSchedule,
+      },
+    })
+  },
+  stubVisitSessionCapacity: ({
+    prisonId,
+    sessionDate,
+    sessionStartTime,
+    sessionEndTime,
+    sessionCapacity,
+  }: {
+    prisonId: string
+    sessionDate: string
+    sessionStartTime: string
+    sessionEndTime: string
+    sessionCapacity: SessionCapacity
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPath: `/orchestration/visit-sessions/capacity`,
+        queryParameters: {
+          prisonId: { equalTo: prisonId },
+          sessionDate: { equalTo: sessionDate },
+          sessionStartTime: { equalTo: sessionStartTime },
+          sessionEndTime: { equalTo: sessionEndTime },
+        },
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: sessionCapacity,
+      },
+    })
+  },
   stubPrisonerProfile: ({
     prisonId,
     prisonerId,
@@ -203,19 +297,6 @@ export default {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
         jsonBody: TestData.supportedPrisonIds(),
-      },
-    })
-  },
-  stubAvailableSupport: (): SuperAgentRequest => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        url: '/orchestration/visit-support',
-      },
-      response: {
-        status: 200,
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: TestData.supportTypes(),
       },
     })
   },

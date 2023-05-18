@@ -8,7 +8,6 @@ import prisonerContactRegistry from './integration_tests/mockApis/prisonerContac
 import whereaboutsOffenderEvents from './integration_tests/mockApis/whereabouts'
 import prisonApi from './integration_tests/mockApis/prison'
 import prisonerSearch from './integration_tests/mockApis/prisonerSearch'
-import visitScheduler from './integration_tests/mockApis/visitScheduler'
 import prisonRegister from './integration_tests/mockApis/prisonRegister'
 
 export default defineConfig({
@@ -37,12 +36,15 @@ export default defineConfig({
         stubChangeReservedSlot: orchestrationService.stubChangeReservedSlot,
         stubReserveVisit: orchestrationService.stubReserveVisit,
         stubVisit: orchestrationService.stubVisit,
+        stubVisitHistory: orchestrationService.stubVisitHistory,
+        stubUpcomingVisits: orchestrationService.stubUpcomingVisits,
+        stubVisitsByDate: orchestrationService.stubVisitsByDate,
         stubAvailableSupport: orchestrationService.stubAvailableSupport,
+        stubVisitSessions: orchestrationService.stubVisitSessions,
+        stubSessionSchedule: orchestrationService.stubSessionSchedule,
+        stubVisitSessionCapacity: orchestrationService.stubVisitSessionCapacity,
         stubPrisonerProfile: orchestrationService.stubPrisonerProfile,
         stubSupportedPrisonIds: orchestrationService.stubSupportedPrisonIds,
-        stubUpcomingVisits: orchestrationService.stubUpcomingVisits,
-        stubVisitHistory: orchestrationService.stubVisitHistory,
-        stubVisitsByDate: orchestrationService.stubVisitsByDate,
 
         // Prisoner contact registry
         stubPrisonerSocialContacts: prisonerContactRegistry.stubPrisonerSocialContacts,
@@ -60,11 +62,6 @@ export default defineConfig({
 
         // Prison register API
         stubPrisons: prisonRegister.stubPrisons,
-
-        // Visit scheduler
-        stubSessionSchedule: visitScheduler.stubSessionSchedule,
-        stubVisitSessions: visitScheduler.stubVisitSessions,
-        stubVisitSessionCapacity: visitScheduler.stubVisitSessionCapacity,
 
         // Whereabouts
         stubOffenderEvents: whereaboutsOffenderEvents.stubOffenderEvents,
