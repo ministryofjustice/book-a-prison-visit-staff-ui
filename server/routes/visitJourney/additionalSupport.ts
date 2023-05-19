@@ -1,12 +1,12 @@
 import { Request, Response } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
 import { SupportType, VisitorSupport } from '../../data/orchestrationApiTypes'
-import VisitSessionsService from '../../services/visitSessionsService'
 import { getFlashFormValues } from '../visitorUtils'
 import getUrlPrefix from './visitJourneyUtils'
+import { AdditionalSupportService } from '../../services'
 
 export default class AdditionalSupport {
-  constructor(private readonly mode: string, private readonly visitSessionsService: VisitSessionsService) {}
+  constructor(private readonly mode: string, private readonly additionalSupportService: AdditionalSupportService) {}
 
   async get(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'
@@ -14,7 +14,7 @@ export default class AdditionalSupport {
     const formValues = getFlashFormValues(req)
 
     if (!req.session.availableSupportTypes) {
-      req.session.availableSupportTypes = await this.visitSessionsService.getAvailableSupportOptions(
+      req.session.availableSupportTypes = await this.additionalSupportService.getAvailableSupportOptions(
         res.locals.user.username,
       )
     }

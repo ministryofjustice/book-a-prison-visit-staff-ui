@@ -933,9 +933,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
       last?: boolean
       empty?: boolean
     }
@@ -945,10 +945,10 @@ export interface components {
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
       pageSize?: number
-      /** Format: int32 */
-      pageNumber?: number
       paged?: boolean
       unpaged?: boolean
+      /** Format: int32 */
+      pageNumber?: number
     }
     SortObject: {
       empty?: boolean
@@ -1157,9 +1157,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
       last?: boolean
       empty?: boolean
     }
@@ -1405,9 +1405,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
       last?: boolean
       empty?: boolean
     }
@@ -1518,9 +1518,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
       last?: boolean
       empty?: boolean
     }

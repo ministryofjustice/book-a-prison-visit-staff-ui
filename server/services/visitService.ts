@@ -1,17 +1,121 @@
-import { VisitorListItem } from '../@types/bapv'
-import { VisitHistoryDetails } from '../data/orchestrationApiTypes'
+import { NotFound } from 'http-errors'
+import {
+  ExtendedVisitInformation,
+  VisitInformation,
+  VisitSessionData,
+  VisitorListItem,
+  VisitsPageSlot,
+} from '../@types/bapv'
+import { OutcomeDto, Visit, VisitHistoryDetails } from '../data/orchestrationApiTypes'
 import buildVisitorListItem from '../utils/visitorUtils'
 import { getSupportTypeDescriptions } from '../routes/visitorUtils'
 import { HmppsAuthClient, OrchestrationApiClient, PrisonerContactRegistryApiClient, RestClientBuilder } from '../data'
-import VisitSessionsService from './visitSessionsService'
+import AdditionalSupportService from './additionalSupportService'
+import logger from '../../logger'
+import { prisonerDateTimePretty, prisonerTimePretty } from '../utils/utils'
+import { getVisitSlotsFromBookedVisits } from '../utils/visitsUtils'
 
 export default class VisitService {
   constructor(
     private readonly orchestrationApiClientFactory: RestClientBuilder<OrchestrationApiClient>,
     private readonly prisonerContactRegistryApiClientFactory: RestClientBuilder<PrisonerContactRegistryApiClient>,
-    private readonly visitSessionsService: VisitSessionsService,
+    private readonly additionalSupportService: AdditionalSupportService,
     private readonly hmppsAuthClient: HmppsAuthClient,
   ) {}
+
+  async bookVisit({
+    username,
+    applicationReference,
+  }: {
+    username: string
+    applicationReference: string
+  }): Promise<Visit> {
+    const token = await this.hmppsAuthClient.getSystemClientToken(username)
+    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+
+    const visit = await orchestrationApiClient.bookVisit(applicationReference)
+    return visit
+  }
+
+  async cancelVisit({
+    username,
+    reference,
+    outcome,
+  }: {
+    username: string
+    reference: string
+    outcome: OutcomeDto
+  }): Promise<Visit> {
+    const token = await this.hmppsAuthClient.getSystemClientToken(username)
+    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+
+    return orchestrationApiClient.cancelVisit(reference, outcome)
+  }
+
+  async changeBookedVisit({
+    username,
+    visitSessionData,
+  }: {
+    username: string
+    visitSessionData: VisitSessionData
+  }): Promise<Visit> {
+    const token = await this.hmppsAuthClient.getSystemClientToken(username)
+    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+
+    const visit = await orchestrationApiClient.changeBookedVisit(visitSessionData)
+    return visit
+  }
+
+  async changeReservedVisit({
+    username,
+    visitSessionData,
+  }: {
+    username: string
+    visitSessionData: VisitSessionData
+  }): Promise<Visit> {
+    const token = await this.hmppsAuthClient.getSystemClientToken(username)
+    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+
+    const visit = await orchestrationApiClient.changeReservedVisit(visitSessionData)
+    return visit
+  }
+
+  async reserveVisit({
+    username,
+    visitSessionData,
+  }: {
+    username: string
+    visitSessionData: VisitSessionData
+  }): Promise<Visit> {
+    const token = await this.hmppsAuthClient.getSystemClientToken(username)
+    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+
+    const reservation = await orchestrationApiClient.reserveVisit(visitSessionData)
+    return reservation
+  }
+
+  async getVisit({
+    username,
+    reference,
+    prisonId,
+  }: {
+    username: string
+    reference: string
+    prisonId: string
+  }): Promise<VisitInformation> {
+    const token = await this.hmppsAuthClient.getSystemClientToken(username)
+    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+
+    logger.info(`Get visit ${reference}`)
+    const visit = await orchestrationApiClient.getVisit(reference)
+
+    if (visit.prisonId !== prisonId) {
+      logger.info(`Visit ${reference} is not in prison '${prisonId}'`)
+      throw new NotFound()
+    }
+
+    return this.buildVisitInformation(visit)
+  }
 
   async getFullVisitDetails({
     username,
@@ -34,10 +138,105 @@ export default class VisitService {
       .map(contact => buildVisitorListItem(contact))
 
     const additionalSupport = getSupportTypeDescriptions(
-      await this.visitSessionsService.getAvailableSupportOptions(username),
+      await this.additionalSupportService.getAvailableSupportOptions(username),
       visit.visitorSupport,
     )
 
     return { visitHistoryDetails, visitors, additionalSupport }
+  }
+
+  async getUpcomingVisits({
+    username,
+    offenderNo,
+    visitStatus,
+  }: {
+    username: string
+    offenderNo: string
+    visitStatus: Visit['visitStatus'][]
+  }): Promise<VisitInformation[]> {
+    const token = await this.hmppsAuthClient.getSystemClientToken(username)
+    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+
+    logger.info(`Get upcoming visits for ${offenderNo}`)
+    const { content: visits } = await orchestrationApiClient.getUpcomingVisits(offenderNo, visitStatus)
+
+    return visits.map(visit => this.buildVisitInformation(visit))
+  }
+
+  async getVisitsByDate({
+    username,
+    dateString,
+    prisonId,
+  }: {
+    username: string
+    dateString: string
+    prisonId: string
+  }): Promise<{
+    extendedVisitsInfo: ExtendedVisitInformation[]
+    slots: {
+      openSlots: VisitsPageSlot[]
+      closedSlots: VisitsPageSlot[]
+      unknownSlots: VisitsPageSlot[]
+      firstSlotTime: string
+    }
+  }> {
+    const token = await this.hmppsAuthClient.getSystemClientToken(username)
+    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+    const prisonerContactRegistryApiClient = this.prisonerContactRegistryApiClientFactory(token)
+
+    logger.info(`Get visits for ${dateString}`)
+    const { content: visits } = await orchestrationApiClient.getVisitsByDate(dateString, prisonId)
+
+    const extendedVisitsInfo: ExtendedVisitInformation[] = await Promise.all(
+      visits.map(visit => {
+        return this.buildExtendedVisitInformation(visit, prisonerContactRegistryApiClient)
+      }),
+    )
+
+    return {
+      extendedVisitsInfo,
+      slots: getVisitSlotsFromBookedVisits(extendedVisitsInfo),
+    }
+  }
+
+  private buildVisitInformation(visit: Visit): VisitInformation {
+    const visitTime = `${prisonerTimePretty(visit.startTimestamp)} to ${prisonerTimePretty(visit.endTimestamp)}`
+
+    return {
+      reference: visit.reference,
+      prisonNumber: visit.prisonerId,
+      prisonerName: '',
+      mainContact: visit.visitContact?.name,
+      visitDate: prisonerDateTimePretty(visit.startTimestamp),
+      visitTime,
+      visitStatus: visit.visitStatus,
+    }
+  }
+
+  private async buildExtendedVisitInformation(
+    visit: Visit,
+    prisonerContactRegistryApiClient: PrisonerContactRegistryApiClient,
+  ): Promise<ExtendedVisitInformation> {
+    const visitTime = `${prisonerTimePretty(visit.startTimestamp)} to ${prisonerTimePretty(visit.endTimestamp)}`
+    const contacts = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(visit.prisonerId)
+    const visitorIds = visit.visitors.map(visitor => visitor.nomisPersonId)
+
+    const visitors = contacts
+      .filter(contact => visitorIds.includes(contact.personId))
+      .map(contact => buildVisitorListItem(contact))
+
+    return {
+      reference: visit.reference,
+      prisonNumber: visit.prisonerId,
+      prisonerName: '',
+      mainContact: visit.visitContact?.name,
+      startTimestamp: visit.startTimestamp,
+      endTimestamp: visit.endTimestamp,
+      visitDate: prisonerDateTimePretty(visit.startTimestamp),
+      visitTime,
+      visitStatus: visit.visitStatus,
+      visitRestriction: visit.visitRestriction,
+      visitors,
+    }
   }
 }

@@ -7503,15 +7503,15 @@ export interface components {
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
       pageSize?: number
-      paged?: boolean
-      unpaged?: boolean
       /** Format: int32 */
       pageNumber?: number
+      paged?: boolean
+      unpaged?: boolean
     }
     SortObject: {
       empty?: boolean
-      sorted?: boolean
       unsorted?: boolean
+      sorted?: boolean
     }
     /** @description PersonIdentifier */
     PersonIdentifier: {
@@ -10571,15 +10571,15 @@ export interface components {
        */
       establishmentCode?: string
       /**
-       * @description Name of staff member who created case note (lastname, firstname)
-       * @example Smith, John
-       */
-      staffName: string
-      /**
        * @description Case Note Type and Sub Type
        * @example POS IEP_ENC
        */
       noteType: string
+      /**
+       * @description Name of staff member who created case note (lastname, firstname)
+       * @example Smith, John
+       */
+      staffName: string
     }
     /** @description Visit summary */
     VisitSummary: {

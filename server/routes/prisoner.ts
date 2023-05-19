@@ -3,7 +3,6 @@ import { body, validationResult } from 'express-validator'
 import { BadRequest, NotFound } from 'http-errors'
 import { VisitSessionData } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
-import { prisonerDateTimePretty, properCaseFullName } from '../utils/utils'
 import { isValidPrisonerNumber } from './validationChecks'
 import { clearSession } from './visitorUtils'
 import type { Services } from '../services'
@@ -12,7 +11,8 @@ export default function routes({
   auditService,
   prisonerProfileService,
   prisonerSearchService,
-  visitSessionsService,
+  supportedPrisonsService,
+  visitService,
 }: Services): Router {
   const router = Router()
 
@@ -20,14 +20,16 @@ export default function routes({
   const post = (path: string, handler: RequestHandler) => router.post(path, asyncMiddleware(handler))
 
   get('/:offenderNo', async (req, res) => {
-    const offenderNo = getOffenderNo(req)
+    const prisonerId = getOffenderNo(req)
     const { prisonId } = req.session.selectedEstablishment
     const search = (req.query?.search as string) ?? ''
     const queryParamsForBackLink = search !== '' ? new URLSearchParams({ search }).toString() : ''
 
-    const prisonerProfile = await prisonerProfileService.getProfile(offenderNo, prisonId, res.locals.user.username)
+    const prisonerProfile = await prisonerProfileService.getProfile(prisonId, prisonerId, res.locals.user.username)
+    const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(res.locals.user.username)
+
     await auditService.viewPrisoner({
-      prisonerId: offenderNo,
+      prisonerId,
       prisonId,
       username: res.locals.user.username,
       operationId: res.locals.appInsightsOperationId,
@@ -36,6 +38,7 @@ export default function routes({
     return res.render('pages/prisoner/profile', {
       errors: req.flash('errors'),
       ...prisonerProfile,
+      supportedPrisons,
       queryParamsForBackLink,
     })
   })
@@ -44,13 +47,9 @@ export default function routes({
     const offenderNo = getOffenderNo(req)
     const { prisonId } = req.session.selectedEstablishment
 
-    const { inmateDetail, visitBalances } = await prisonerProfileService.getPrisonerAndVisitBalances(
-      offenderNo,
-      prisonId,
-      res.locals.user.username,
-    )
+    const { prisonerDetails } = await prisonerProfileService.getProfile(prisonId, offenderNo, res.locals.user.username)
 
-    if (visitBalances?.remainingVo <= 0 && visitBalances?.remainingPvo <= 0) {
+    if (prisonerDetails.visitBalances?.remainingVo <= 0 && prisonerDetails.visitBalances?.remainingPvo <= 0) {
       await body('vo-override').equals('override').withMessage('Select the box to book a prison visit').run(req)
 
       const errors = validationResult(req)
@@ -71,12 +70,10 @@ export default function routes({
     const visitSessionData: VisitSessionData = req.session.visitSessionData ?? { prisoner: undefined }
 
     visitSessionData.prisoner = {
-      name: properCaseFullName(`${inmateDetail.lastName}, ${inmateDetail.firstName}`),
+      name: prisonerDetails.name,
       offenderNo,
-      dateOfBirth: prisonerDateTimePretty(inmateDetail.dateOfBirth),
-      location: inmateDetail.assignedLivingUnit
-        ? `${inmateDetail.assignedLivingUnit.description}, ${inmateDetail.assignedLivingUnit.agencyName}`
-        : '',
+      dateOfBirth: prisonerDetails.dateOfBirth,
+      location: prisonerDetails.cellLocation ? `${prisonerDetails.cellLocation}, ${prisonerDetails.prisonName}` : '',
     }
 
     req.session.visitSessionData = visitSessionData
@@ -96,7 +93,7 @@ export default function routes({
     }
     const prisonerName = `${prisonerDetails.lastName}, ${prisonerDetails.firstName}`
 
-    const visits = await visitSessionsService.getUpcomingVisits({
+    const visits = await visitService.getUpcomingVisits({
       username: res.locals.user.username,
       offenderNo,
       visitStatus: ['CANCELLED', 'BOOKED'],

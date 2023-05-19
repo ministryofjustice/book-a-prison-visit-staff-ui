@@ -1,16 +1,14 @@
-import { NotFound } from 'http-errors'
+import { addMonths, format, subMonths } from 'date-fns'
 import PrisonerProfileService from './prisonerProfileService'
-import { Alert, PagePrisonerBookingSummary, VisitBalances, OffenderRestrictions } from '../data/prisonApiTypes'
-import { PrisonerAlertItem, PrisonerProfile } from '../@types/bapv'
-import { PageVisitDto } from '../data/orchestrationApiTypes'
-import { Contact } from '../data/prisonerContactRegistryApiTypes'
+import { OffenderRestrictions } from '../data/prisonApiTypes'
+import { PrisonerProfilePage } from '../@types/bapv'
 import TestData from '../routes/testutils/testData'
 import {
   createMockHmppsAuthClient,
+  createMockOrchestrationApiClient,
   createMockPrisonApiClient,
   createMockPrisonerContactRegistryApiClient,
   createMockPrisonerSearchClient,
-  createMockVisitSchedulerApiClient,
 } from '../data/testutils/mocks'
 import { createMockSupportedPrisonsService } from './testutils/mocks'
 
@@ -18,34 +16,32 @@ const token = 'some token'
 
 describe('Prisoner profile service', () => {
   const hmppsAuthClient = createMockHmppsAuthClient()
+  const orchestrationApiClient = createMockOrchestrationApiClient()
   const prisonApiClient = createMockPrisonApiClient()
   const prisonerContactRegistryApiClient = createMockPrisonerContactRegistryApiClient()
   const prisonerSearchClient = createMockPrisonerSearchClient()
-  const visitSchedulerApiClient = createMockVisitSchedulerApiClient()
   const supportedPrisonsService = createMockSupportedPrisonsService()
 
   let prisonerProfileService: PrisonerProfileService
 
+  const OrchestrationApiClientFactory = jest.fn()
   const PrisonApiClientFactory = jest.fn()
   const PrisonerContactRegistryApiClientFactory = jest.fn()
   const PrisonerSearchClientFactory = jest.fn()
-  const VisitSchedulerApiClientFactory = jest.fn()
 
-  const offenderNo = 'A1234BC'
+  const prisonerId = 'A1234BC'
   const prisonId = 'HEI'
 
   beforeEach(() => {
+    OrchestrationApiClientFactory.mockReturnValue(orchestrationApiClient)
     PrisonApiClientFactory.mockReturnValue(prisonApiClient)
     PrisonerContactRegistryApiClientFactory.mockReturnValue(prisonerContactRegistryApiClient)
     PrisonerSearchClientFactory.mockReturnValue(prisonerSearchClient)
-    VisitSchedulerApiClientFactory.mockReturnValue(visitSchedulerApiClient)
 
     prisonerProfileService = new PrisonerProfileService(
+      OrchestrationApiClientFactory,
       PrisonApiClientFactory,
-      VisitSchedulerApiClientFactory,
       PrisonerContactRegistryApiClientFactory,
-      PrisonerSearchClientFactory,
-      supportedPrisonsService,
       hmppsAuthClient,
     )
     hmppsAuthClient.getSystemClientToken.mockResolvedValue(token)
@@ -62,513 +58,122 @@ describe('Prisoner profile service', () => {
       supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
     })
 
-    it('Retrieves and processes data for prisoner profile with visit balances', async () => {
-      const bookings = <PagePrisonerBookingSummary>{
-        content: [TestData.prisonerBookingSummary()],
-        numberOfElements: 1,
-      }
+    it('should retrieve and process data for prisoner profile', async () => {
+      const prisonerProfile = TestData.prisonerProfile()
+      orchestrationApiClient.getPrisonerProfile.mockResolvedValue(prisonerProfile)
 
-      const inmateDetail = TestData.inmateDetail()
-      const prisoner = TestData.prisoner()
+      const contacts = [TestData.contact(), TestData.contact({ personId: 4322, firstName: 'Bob' })]
+      prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue(contacts)
 
-      const visitBalances: VisitBalances = {
-        remainingVo: 1,
-        remainingPvo: 2,
-        latestIepAdjustDate: '2021-04-21',
-        latestPrivIepAdjustDate: '2021-12-01',
-      }
+      const results = await prisonerProfileService.getProfile(prisonId, prisonerId, 'user')
 
-      const pagedVisit: PageVisitDto = {
-        totalPages: 1,
-        totalElements: 1,
-        size: 1,
-        content: [
-          {
-            applicationReference: 'aaa-bbb-ccc',
-            reference: 'ab-cd-ef-gh',
-            prisonerId: 'A1234BC',
-            prisonId: 'HEI',
-            sessionTemplateReference: 'v9d.7ed.7u',
-            visitRoom: 'A1 L3',
-            visitType: 'SOCIAL',
-            visitStatus: 'BOOKED',
-            visitRestriction: 'OPEN',
-            startTimestamp: '2022-08-17T10:00:00',
-            endTimestamp: '2022-08-17T11:00:00',
-            visitNotes: [],
-            visitors: [
-              {
-                nomisPersonId: 1234,
-              },
-            ],
-            visitorSupport: [],
-            createdBy: 'user1',
-            createdTimestamp: '',
-            modifiedTimestamp: '',
-          },
-        ],
-      }
-
-      const socialContacts: Contact[] = [
-        {
-          personId: 1234,
-          firstName: 'Mary',
-          lastName: 'Smith',
-          relationshipCode: 'PART',
-          relationshipDescription: 'Partner',
-          contactType: 'S',
-          contactTypeDescription: 'Social/ Family',
-          approvedVisitor: true,
-          emergencyContact: true,
-          nextOfKin: true,
-          restrictions: [],
-          addresses: [],
-        },
-      ]
-
-      prisonApiClient.getBookings.mockResolvedValue(bookings)
-      prisonApiClient.getOffender.mockResolvedValue(inmateDetail)
-      prisonApiClient.getVisitBalances.mockResolvedValue(visitBalances)
-      prisonerSearchClient.getPrisonerById.mockResolvedValue(prisoner)
-      visitSchedulerApiClient.getUpcomingVisits.mockResolvedValue(pagedVisit)
-      visitSchedulerApiClient.getPastVisits.mockResolvedValue(pagedVisit)
-      prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue(socialContacts)
-
-      const results = await prisonerProfileService.getProfile(offenderNo, prisonId, 'user')
-
-      expect(PrisonApiClientFactory).toHaveBeenCalledWith(token)
+      expect(OrchestrationApiClientFactory).toHaveBeenCalledWith(token)
       expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user')
-      expect(prisonApiClient.getBookings).toHaveBeenCalledTimes(1)
-      expect(prisonApiClient.getOffender).toHaveBeenCalledTimes(1)
-      expect(prisonApiClient.getVisitBalances).toHaveBeenCalledTimes(1)
-      expect(prisonerSearchClient.getPrisonerById).toHaveBeenCalledTimes(1)
-      expect(prisonerContactRegistryApiClient.getPrisonerSocialContacts).toHaveBeenCalledTimes(1)
-      expect(supportedPrisonsService.getSupportedPrisons).toHaveBeenCalledTimes(1)
+      expect(orchestrationApiClient.getPrisonerProfile).toHaveBeenCalledTimes(1)
 
-      expect(results).toEqual(<PrisonerProfile>{
-        displayName: 'Smith, John',
-        displayDob: '2 April 1975',
+      expect(results).toEqual(<PrisonerProfilePage>{
         activeAlerts: [],
+        activeAlertCount: 0,
         flaggedAlerts: [],
-        inmateDetail,
-        convictedStatus: 'Convicted',
-        incentiveLevel: 'Standard',
-        visitBalances,
-        upcomingVisits: [
-          [
-            {
-              html: "<a href='/visit/ab-cd-ef-gh'>ab-cd-ef-gh</a>",
-              attributes: { 'data-test': 'tab-upcoming-reference' },
-            },
-            { html: 'Social', attributes: { 'data-test': 'tab-upcoming-type' } },
-            { text: 'Hewell (HMP)', attributes: { 'data-test': 'tab-upcoming-location' } },
-            {
-              html: '<p>17 August 2022<br>10:00am - 11:00am</p>',
-              attributes: { 'data-test': 'tab-upcoming-date-and-time' },
-            },
-            { html: '<p>Mary Smith</p>', attributes: { 'data-test': 'tab-upcoming-visitors' } },
-            { text: 'Booked', attributes: { 'data-test': 'tab-upcoming-status' } },
-          ],
-        ],
-        pastVisits: [
-          [
-            {
-              html: "<a href='/visit/ab-cd-ef-gh'>ab-cd-ef-gh</a>",
-              attributes: { 'data-test': 'tab-past-reference' },
-            },
-            { html: 'Social', attributes: { 'data-test': 'tab-past-type' } },
-            { text: 'Hewell (HMP)', attributes: { 'data-test': 'tab-past-location' } },
-            {
-              html: '<p>17 August 2022<br>10:00am - 11:00am</p>',
-              attributes: { 'data-test': 'tab-past-date-and-time' },
-            },
-            { html: '<p>Mary Smith</p>', attributes: { 'data-test': 'tab-past-visitors' } },
-            { text: 'Booked', attributes: { 'data-test': 'tab-past-status' } },
-          ],
-        ],
-      })
-    })
-
-    it('Does not look up visit balances for those on REMAND', async () => {
-      const inmateDetail = TestData.inmateDetail({ legalStatus: 'REMAND' })
-      const prisoner = TestData.prisoner()
-
-      const bookings = <PagePrisonerBookingSummary>{
-        content: [
-          {
-            bookingId: 22345,
-            bookingNo: 'B123445',
-            offenderNo: inmateDetail.offenderNo,
-            firstName: inmateDetail.firstName,
-            lastName: inmateDetail.lastName,
-            dateOfBirth: inmateDetail.dateOfBirth,
-            agencyId: 'HEI',
-            legalStatus: 'REMAND',
-            convictedStatus: 'Remand',
-          },
-        ],
-        numberOfElements: 1,
-      }
-
-      prisonApiClient.getBookings.mockResolvedValue(bookings)
-      prisonApiClient.getOffender.mockResolvedValue(inmateDetail)
-      prisonerSearchClient.getPrisonerById.mockResolvedValue(prisoner)
-      visitSchedulerApiClient.getUpcomingVisits.mockResolvedValue({ content: [] })
-      visitSchedulerApiClient.getPastVisits.mockResolvedValue({ content: [] })
-
-      const results = await prisonerProfileService.getProfile(offenderNo, prisonId, 'user')
-
-      expect(PrisonApiClientFactory).toHaveBeenCalledWith(token)
-      expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user')
-      expect(prisonApiClient.getBookings).toHaveBeenCalledTimes(1)
-      expect(prisonApiClient.getOffender).toHaveBeenCalledTimes(1)
-      expect(prisonApiClient.getVisitBalances).not.toHaveBeenCalled()
-      expect(prisonerSearchClient.getPrisonerById).toHaveBeenCalledTimes(1)
-      expect(prisonerContactRegistryApiClient.getPrisonerSocialContacts).toHaveBeenCalledTimes(1)
-      expect(results).toEqual(<PrisonerProfile>{
-        displayName: 'Smith, John',
-        displayDob: '2 April 1975',
-        activeAlerts: [],
-        flaggedAlerts: [],
-        inmateDetail,
-        convictedStatus: 'Remand',
-        incentiveLevel: 'Standard',
-        visitBalances: null,
-        upcomingVisits: [],
-        pastVisits: [],
-      })
-    })
-
-    it('Filters active alerts that should be flagged', async () => {
-      const inactiveAlert: Alert = {
-        alertId: 1,
-        alertType: 'R',
-        alertTypeDescription: 'Risk',
-        bookingId: 1234,
-        alertCode: 'RCON',
-        alertCodeDescription: 'Conflict with other prisoners',
-        comment: 'Test',
-        dateCreated: '2021-07-27',
-        dateExpires: '2021-08-10',
-        expired: true,
-        active: false,
-        offenderNo: 'B2345CD',
-      }
-
-      const nonRelevantAlert: Alert = {
-        alertId: 2,
-        alertType: 'X',
-        alertTypeDescription: 'Security',
-        bookingId: 1234,
-        alertCode: 'XR',
-        alertCodeDescription: 'Racist',
-        comment: 'Test',
-        dateCreated: '2022-01-01',
-        expired: false,
-        active: true,
-        offenderNo: 'B2345CD',
-      }
-
-      const alertsToFlag: Alert[] = [
-        {
-          alertId: 3,
-          alertType: 'U',
-          alertTypeDescription: 'COVID unit management',
-          bookingId: 1234,
-          alertCode: 'UPIU',
-          alertCodeDescription: 'Protective Isolation Unit',
-          comment: 'Test',
-          dateCreated: '2022-01-02',
-          expired: false,
-          active: true,
-          offenderNo: 'B2345CD',
-        },
-        {
-          alertId: 4,
-          alertType: 'R',
-          alertTypeDescription: 'Risk',
-          bookingId: 1234,
-          alertCode: 'RCDR',
-          alertCodeDescription: 'Quarantined – Communicable Disease Risk',
-          comment: 'Test',
-          dateCreated: '2022-01-03',
-          expired: false,
-          active: true,
-          offenderNo: 'B2345CD',
-        },
-        {
-          alertId: 5,
-          alertType: 'U',
-          alertTypeDescription: 'COVID unit management',
-          bookingId: 1234,
-          alertCode: 'URCU',
-          alertCodeDescription: 'Reverse Cohorting Unit',
-          comment: 'Test',
-          dateCreated: '2022-01-04',
-          expired: false,
-          active: true,
-          offenderNo: 'B2345CD',
-        },
-      ]
-
-      const alertsForDisplay: PrisonerAlertItem[] = [
-        [
-          {
-            text: 'Security (X)',
-            attributes: {
-              'data-test': 'tab-alerts-type-desc',
-            },
-          },
-          {
-            text: 'Racist (XR)',
-            attributes: {
-              'data-test': 'tab-alerts-code-desc',
-            },
-          },
-          {
-            text: 'Test',
-            classes: 'bapv-force-overflow',
-            attributes: {
-              'data-test': 'tab-alerts-comment',
-            },
-          },
-          {
-            html: '<span class="bapv-table_cell--nowrap">1 January</span> 2022',
-            attributes: {
-              'data-test': 'tab-alerts-created',
-            },
-          },
-          {
-            html: 'Not entered',
-            attributes: {
-              'data-test': 'tab-alerts-expires',
-            },
-          },
-        ],
-        [
-          {
-            text: 'COVID unit management (U)',
-            attributes: {
-              'data-test': 'tab-alerts-type-desc',
-            },
-          },
-          {
-            text: 'Protective Isolation Unit (UPIU)',
-            attributes: {
-              'data-test': 'tab-alerts-code-desc',
-            },
-          },
-          {
-            text: 'Test',
-            classes: 'bapv-force-overflow',
-            attributes: {
-              'data-test': 'tab-alerts-comment',
-            },
-          },
-          {
-            html: '<span class="bapv-table_cell--nowrap">2 January</span> 2022',
-            attributes: {
-              'data-test': 'tab-alerts-created',
-            },
-          },
-          {
-            html: 'Not entered',
-            attributes: {
-              'data-test': 'tab-alerts-expires',
-            },
-          },
-        ],
-        [
-          {
-            text: 'Risk (R)',
-            attributes: {
-              'data-test': 'tab-alerts-type-desc',
-            },
-          },
-          {
-            text: 'Quarantined – Communicable Disease Risk (RCDR)',
-            attributes: {
-              'data-test': 'tab-alerts-code-desc',
-            },
-          },
-          {
-            text: 'Test',
-            classes: 'bapv-force-overflow',
-            attributes: {
-              'data-test': 'tab-alerts-comment',
-            },
-          },
-          {
-            html: '<span class="bapv-table_cell--nowrap">3 January</span> 2022',
-            attributes: {
-              'data-test': 'tab-alerts-created',
-            },
-          },
-          {
-            html: 'Not entered',
-            attributes: {
-              'data-test': 'tab-alerts-expires',
-            },
-          },
-        ],
-        [
-          {
-            text: 'COVID unit management (U)',
-            attributes: {
-              'data-test': 'tab-alerts-type-desc',
-            },
-          },
-          {
-            text: 'Reverse Cohorting Unit (URCU)',
-            attributes: {
-              'data-test': 'tab-alerts-code-desc',
-            },
-          },
-          {
-            text: 'Test',
-            classes: 'bapv-force-overflow',
-            attributes: {
-              'data-test': 'tab-alerts-comment',
-            },
-          },
-          {
-            html: '<span class="bapv-table_cell--nowrap">4 January</span> 2022',
-            attributes: {
-              'data-test': 'tab-alerts-created',
-            },
-          },
-          {
-            html: 'Not entered',
-            attributes: {
-              'data-test': 'tab-alerts-expires',
-            },
-          },
-        ],
-      ]
-
-      const bookings = <PagePrisonerBookingSummary>{
-        content: [
-          {
-            bookingId: 22345,
-            bookingNo: 'B123445',
-            offenderNo: 'A1234BC',
-            firstName: 'JOHN',
-            lastName: 'SMITH',
-            dateOfBirth: '1980-10-12',
-            agencyId: 'HEI',
-            legalStatus: 'REMAND',
-            convictedStatus: 'Remand',
-          },
-        ],
-        numberOfElements: 1,
-      }
-
-      const inmateDetail = TestData.inmateDetail({
-        activeAlertCount: 4,
-        inactiveAlertCount: 1,
-        alerts: [inactiveAlert, nonRelevantAlert, ...alertsToFlag],
-        legalStatus: 'REMAND',
-      })
-
-      const prisoner = TestData.prisoner()
-
-      prisonApiClient.getBookings.mockResolvedValue(bookings)
-      prisonApiClient.getOffender.mockResolvedValue(inmateDetail)
-      prisonerSearchClient.getPrisonerById.mockResolvedValue(prisoner)
-      visitSchedulerApiClient.getUpcomingVisits.mockResolvedValue({ content: [] })
-      visitSchedulerApiClient.getPastVisits.mockResolvedValue({ content: [] })
-
-      const results = await prisonerProfileService.getProfile(offenderNo, prisonId, 'user')
-
-      expect(prisonApiClient.getBookings).toHaveBeenCalledTimes(1)
-      expect(prisonApiClient.getOffender).toHaveBeenCalledTimes(1)
-      expect(prisonApiClient.getVisitBalances).not.toHaveBeenCalled()
-      expect(prisonerSearchClient.getPrisonerById).toHaveBeenCalledTimes(1)
-      expect(prisonerContactRegistryApiClient.getPrisonerSocialContacts).toHaveBeenCalledTimes(1)
-      expect(results).toEqual(<PrisonerProfile>{
-        displayName: 'Smith, John',
-        displayDob: '2 April 1975',
-        activeAlerts: alertsForDisplay,
-        flaggedAlerts: alertsToFlag,
-        inmateDetail,
-        convictedStatus: 'Remand',
-        incentiveLevel: 'Standard',
-        visitBalances: null,
-        upcomingVisits: [],
-        pastVisits: [],
-      })
-    })
-
-    it('Throws 404 if no bookings found for criteria', async () => {
-      // e.g. offenderNo doesn't exist - or not at specified prisonId
-      const bookings = <PagePrisonerBookingSummary>{
-        content: [],
-        numberOfElements: 0,
-      }
-
-      prisonApiClient.getBookings.mockResolvedValue(bookings)
-
-      await expect(async () => {
-        await prisonerProfileService.getProfile(offenderNo, prisonId, 'user')
-      }).rejects.toBeInstanceOf(NotFound)
-    })
-  })
-
-  describe('getPrisonerAndVisitBalances', () => {
-    const bookings = <PagePrisonerBookingSummary>{
-      content: [
-        {
-          bookingId: 12345,
-          bookingNo: 'A123445',
-          offenderNo: 'A1234BC',
-          firstName: 'JOHN',
-          lastName: 'SMITH',
-          dateOfBirth: '1980-10-12',
-          agencyId: 'HEI',
-          legalStatus: 'SENTENCED',
+        visitsByMonth: new Map(),
+        prisonerDetails: {
+          prisonerId: 'A1234BC',
+          name: 'Smith, John',
+          dateOfBirth: '2 April 1975',
+          cellLocation: '1-1-C-028',
+          prisonName: 'Hewell (HMP)',
           convictedStatus: 'Convicted',
+          category: 'Cat C',
+          incentiveLevel: 'Standard',
+          visitBalances: {
+            remainingVo: 1,
+            remainingPvo: 2,
+            latestIepAdjustDate: '21 April 2021',
+            latestPrivIepAdjustDate: '1 December 2021',
+            nextIepAdjustDate: '5 May 2021',
+            nextPrivIepAdjustDate: '1 January 2022',
+          },
         },
-      ],
-      numberOfElements: 1,
-    }
-
-    const inmateDetail = TestData.inmateDetail()
-
-    const visitBalances: VisitBalances = {
-      remainingVo: 1,
-      remainingPvo: 2,
-      latestIepAdjustDate: '2021-04-21',
-      latestPrivIepAdjustDate: '2021-12-01',
-    }
-
-    beforeEach(() => {
-      prisonApiClient.getBookings.mockResolvedValue(bookings)
-      prisonApiClient.getOffender.mockResolvedValue(inmateDetail)
-      prisonApiClient.getVisitBalances.mockResolvedValue(visitBalances)
+        contactNames: { 4321: 'Jeanette Smith', 4322: 'Bob Smith' },
+      })
     })
 
-    it('Retrieves prisoner details and visit balances for a Convicted prisoner', async () => {
-      const results = await prisonerProfileService.getPrisonerAndVisitBalances(offenderNo, prisonId, 'user')
+    it('should return visit balances as null if prisoner is on REMAND', async () => {
+      const prisonerProfile = TestData.prisonerProfile({ convictedStatus: 'Remand' })
+      orchestrationApiClient.getPrisonerProfile.mockResolvedValue(prisonerProfile)
 
-      expect(prisonApiClient.getBookings).toHaveBeenCalledTimes(1)
-      expect(prisonApiClient.getOffender).toHaveBeenCalledTimes(1)
-      expect(prisonApiClient.getVisitBalances).toHaveBeenCalledTimes(1)
-      expect(results).toEqual({ inmateDetail, visitBalances })
+      prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue([])
+
+      const results = await prisonerProfileService.getProfile(prisonId, prisonerId, 'user')
+
+      expect(OrchestrationApiClientFactory).toHaveBeenCalledWith(token)
+      expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user')
+      expect(orchestrationApiClient.getPrisonerProfile).toHaveBeenCalledTimes(1)
+
+      expect(results.prisonerDetails.visitBalances).toBeNull()
     })
 
-    it('Retrieves prisoner details and no visit balances for prisoner on Remand', async () => {
-      bookings.content[0].convictedStatus = 'Remand'
+    it('should group upcoming and past visits by month, with totals for BOOKED only', async () => {
+      const today = new Date()
+      const nextMonth = new Date(addMonths(today, 1))
+      const previousMonth = new Date(subMonths(today, 1))
+      const nextMonthKey = format(nextMonth, 'MMMM yyyy')
+      const previousMonthKey = format(previousMonth, 'MMMM yyyy')
 
-      const results = await prisonerProfileService.getPrisonerAndVisitBalances(offenderNo, prisonId, 'user')
+      const upcomingVisit = TestData.visit({ startTimestamp: nextMonth.toISOString() })
+      const pastVisit = TestData.visit({ startTimestamp: previousMonth.toISOString() })
+      const cancelledVisit = TestData.visit({ visitStatus: 'CANCELLED', startTimestamp: previousMonth.toISOString() })
 
-      expect(prisonApiClient.getBookings).toHaveBeenCalledTimes(1)
-      expect(prisonApiClient.getOffender).toHaveBeenCalledTimes(1)
-      expect(prisonApiClient.getVisitBalances).toHaveBeenCalledTimes(0)
-      expect(results).toEqual({ inmateDetail, visitBalances: undefined })
+      const prisonerProfile = TestData.prisonerProfile({
+        visits: [upcomingVisit, pastVisit, cancelledVisit],
+      })
+
+      orchestrationApiClient.getPrisonerProfile.mockResolvedValue(prisonerProfile)
+      prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue([])
+
+      const results = await prisonerProfileService.getProfile(prisonId, prisonerId, 'user')
+
+      expect(results.visitsByMonth).toEqual(
+        new Map([
+          [nextMonthKey, { upcomingCount: 1, pastCount: 0, visits: [upcomingVisit] }],
+          [previousMonthKey, { upcomingCount: 0, pastCount: 1, visits: [pastVisit, cancelledVisit] }],
+        ]),
+      )
+    })
+
+    it('should filter active alerts and those to be flagged', async () => {
+      const inactiveAlert = TestData.alert({ active: false })
+
+      const alertsToFlag = [
+        TestData.alert({ alertCode: 'UPIU' }),
+        TestData.alert({ alertCode: 'RCDR' }),
+        TestData.alert({ alertCode: 'URCU' }),
+      ]
+      const alertNotToFlag = TestData.alert({ alertCode: 'XR' })
+
+      const prisonerProfile = TestData.prisonerProfile({
+        alerts: [inactiveAlert, alertNotToFlag, ...alertsToFlag],
+      })
+
+      prisonerProfile.alerts = [inactiveAlert, alertNotToFlag, ...alertsToFlag]
+
+      orchestrationApiClient.getPrisonerProfile.mockResolvedValue(prisonerProfile)
+      prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue([])
+
+      const results = await prisonerProfileService.getProfile(prisonId, prisonerId, 'user')
+
+      expect(OrchestrationApiClientFactory).toHaveBeenCalledWith(token)
+      expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user')
+      expect(orchestrationApiClient.getPrisonerProfile).toHaveBeenCalledTimes(1)
+
+      expect(results.activeAlerts).toStrictEqual([alertNotToFlag, ...alertsToFlag])
+      expect(results.activeAlertCount).toBe(4)
+      expect(results.flaggedAlerts).toStrictEqual(alertsToFlag)
     })
   })
 
   describe('getRestrictions', () => {
+    const offenderNo = 'A1234BC'
     it('Retrieves and passes through the offender restrictions', async () => {
       const restrictions = <OffenderRestrictions>{
         bookingId: 12345,

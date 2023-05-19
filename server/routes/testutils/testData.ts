@@ -1,5 +1,7 @@
 import { Prison } from '../../@types/bapv'
 import {
+  Alert,
+  PrisonerProfile,
   SessionCapacity,
   SessionSchedule,
   SupportType,
@@ -7,14 +9,7 @@ import {
   VisitHistoryDetails,
   VisitSession,
 } from '../../data/orchestrationApiTypes'
-import {
-  InmateDetail,
-  CaseLoad,
-  PrisonerBookingSummary,
-  VisitBalances,
-  OffenderRestriction,
-  Alert,
-} from '../../data/prisonApiTypes'
+import { CaseLoad, OffenderRestriction } from '../../data/prisonApiTypes'
 import { CurrentIncentive, Prisoner } from '../../data/prisonerOffenderSearchTypes'
 import { Address, Contact, Restriction } from '../../data/prisonerContactRegistryApiTypes'
 import { ScheduledEvent } from '../../data/whereaboutsApiTypes'
@@ -50,19 +45,17 @@ export default class TestData {
     } as Address)
 
   static alert = ({
-    alertId = 123,
     alertType = 'U',
     alertTypeDescription = 'COVID unit management',
     alertCode = 'UPIU',
     alertCodeDescription = 'Protective Isolation Unit',
-    comment = 'Alert comment!',
+    comment = 'Alert comment',
     dateCreated = '2023-01-02',
     dateExpires = undefined,
     expired = false,
     active = true,
   }: Partial<Alert> = {}): Alert =>
     ({
-      alertId,
       alertType,
       alertTypeDescription,
       alertCode,
@@ -129,34 +122,6 @@ export default class TestData {
     },
   }: Partial<CurrentIncentive> = {}): CurrentIncentive => ({ level } as CurrentIncentive)
 
-  static inmateDetail = ({
-    offenderNo = 'A1234BC',
-    firstName = 'JOHN',
-    lastName = 'SMITH',
-    dateOfBirth = '1975-04-02',
-    activeAlertCount = 0,
-    inactiveAlertCount = 0,
-    alerts = undefined,
-    assignedLivingUnit = {
-      description: '1-1-C-028',
-      agencyName: 'Hewell (HMP)',
-    } as InmateDetail['assignedLivingUnit'],
-    category = 'Cat C',
-    legalStatus = 'SENTENCED',
-  }: Partial<InmateDetail> = {}): InmateDetail =>
-    ({
-      offenderNo,
-      firstName,
-      lastName,
-      dateOfBirth,
-      activeAlertCount,
-      inactiveAlertCount,
-      alerts,
-      assignedLivingUnit,
-      category,
-      legalStatus,
-    } as InmateDetail)
-
   static offenderRestriction = ({
     restrictionId = 0,
     comment = 'Details about this restriction',
@@ -196,27 +161,6 @@ export default class TestData {
       currentIncentive,
     } as Prisoner)
 
-  static prisonerBookingSummary = ({
-    bookingId = 12345,
-    offenderNo = 'A1234BC',
-    firstName = 'JOHN',
-    lastName = 'SMITH',
-    dateOfBirth = '1975-04-02',
-    agencyId = 'HEI',
-    legalStatus = 'SENTENCED',
-    convictedStatus = 'Convicted',
-  }: Partial<PrisonerBookingSummary> = {}): PrisonerBookingSummary =>
-    ({
-      bookingId,
-      offenderNo,
-      firstName,
-      lastName,
-      dateOfBirth,
-      agencyId,
-      legalStatus,
-      convictedStatus,
-    } as PrisonerBookingSummary)
-
   static prisons = ({
     prisons = [
       {
@@ -229,6 +173,40 @@ export default class TestData {
       },
     ] as Prison[],
   } = {}): Prison[] => prisons
+
+  static prisonerProfile = ({
+    prisonerId = 'A1234BC',
+    firstName = 'JOHN',
+    lastName = 'SMITH',
+    dateOfBirth = '1975-04-02',
+    cellLocation = '1-1-C-028',
+    prisonName = 'Hewell (HMP)',
+    category = 'Cat C',
+    convictedStatus = 'Convicted',
+    incentiveLevel = 'Standard',
+    alerts = [],
+    visitBalances = {
+      remainingVo: 1,
+      remainingPvo: 2,
+      latestIepAdjustDate: '2021-04-21',
+      latestPrivIepAdjustDate: '2021-12-01',
+    },
+    visits = [],
+  }: Partial<PrisonerProfile> = {}): PrisonerProfile =>
+    ({
+      prisonerId,
+      firstName,
+      lastName,
+      dateOfBirth,
+      cellLocation,
+      prisonName,
+      category,
+      convictedStatus,
+      incentiveLevel,
+      alerts,
+      visitBalances,
+      visits,
+    } as PrisonerProfile)
 
   // Visitor restrictions
   static restriction = ({
@@ -387,18 +365,6 @@ export default class TestData {
       createdTimestamp,
       modifiedTimestamp,
     } as Visit)
-
-  static visitBalances = ({
-    remainingVo = 2,
-    remainingPvo = 1,
-    latestIepAdjustDate = '2022-04-25',
-    latestPrivIepAdjustDate = '2022-04-26',
-  }: Partial<VisitBalances> = {}): VisitBalances => ({
-    remainingVo,
-    remainingPvo,
-    latestIepAdjustDate,
-    latestPrivIepAdjustDate,
-  })
 
   static visitHistoryDetails = ({
     createdBy = 'User One',

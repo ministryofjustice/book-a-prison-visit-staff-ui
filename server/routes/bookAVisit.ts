@@ -11,10 +11,12 @@ import MainContact from './visitJourney/mainContact'
 import type { Services } from '../services'
 
 export default function routes({
+  additionalSupportService,
   auditService,
   notificationsService,
   prisonerProfileService,
   prisonerVisitorsService,
+  visitService,
   visitSessionsService,
 }: Services): Router {
   const router = Router()
@@ -33,10 +35,10 @@ export default function routes({
 
   const selectVisitors = new SelectVisitors('book', prisonerVisitorsService, prisonerProfileService)
   const visitType = new VisitType('book', auditService)
-  const additionalSupport = new AdditionalSupport('book', visitSessionsService)
-  const dateAndTime = new DateAndTime('book', visitSessionsService, auditService)
+  const additionalSupport = new AdditionalSupport('book', additionalSupportService)
+  const dateAndTime = new DateAndTime('book', visitService, visitSessionsService, auditService)
   const mainContact = new MainContact('book')
-  const checkYourBooking = new CheckYourBooking('book', visitSessionsService, auditService, notificationsService)
+  const checkYourBooking = new CheckYourBooking('book', auditService, notificationsService, visitService)
   const confirmation = new Confirmation('book')
 
   get('/select-visitors', sessionCheckMiddleware({ stage: 1 }), (req, res) => selectVisitors.get(req, res))

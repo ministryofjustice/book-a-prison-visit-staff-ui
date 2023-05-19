@@ -1,4 +1,5 @@
 import { dataAccess } from '../data'
+import AdditionalSupportService from './additionalSupportService'
 import AuditService from './auditService'
 import NotificationsService from './notificationsService'
 import PrisonerProfileService from './prisonerProfileService'
@@ -18,26 +19,25 @@ export const services = () => {
     prisonerContactRegistryApiClientBuilder,
     prisonRegisterApiClientBuilder,
     prisonerSearchClientBuilder,
-    visitSchedulerApiClientBuilder,
     whereaboutsApiClientBuilder,
   } = dataAccess()
+
+  const additionalSupportService = new AdditionalSupportService(orchestrationApiClientBuilder, hmppsAuthClient)
 
   const auditService = new AuditService()
 
   const notificationsService = new NotificationsService(notificationsApiClientBuilder)
 
   const supportedPrisonsService = new SupportedPrisonsService(
-    visitSchedulerApiClientBuilder,
+    orchestrationApiClientBuilder,
     prisonRegisterApiClientBuilder,
     hmppsAuthClient,
   )
 
   const prisonerProfileService = new PrisonerProfileService(
+    orchestrationApiClientBuilder,
     prisonApiClientBuilder,
-    visitSchedulerApiClientBuilder,
     prisonerContactRegistryApiClientBuilder,
-    prisonerSearchClientBuilder,
-    supportedPrisonsService,
     hmppsAuthClient,
   )
 
@@ -48,8 +48,7 @@ export const services = () => {
   const userService = new UserService(hmppsAuthClient, prisonApiClientBuilder)
 
   const visitSessionsService = new VisitSessionsService(
-    prisonerContactRegistryApiClientBuilder,
-    visitSchedulerApiClientBuilder,
+    orchestrationApiClientBuilder,
     whereaboutsApiClientBuilder,
     hmppsAuthClient,
   )
@@ -57,11 +56,12 @@ export const services = () => {
   const visitService = new VisitService(
     orchestrationApiClientBuilder,
     prisonerContactRegistryApiClientBuilder,
-    visitSessionsService,
+    additionalSupportService,
     hmppsAuthClient,
   )
 
   return {
+    additionalSupportService,
     auditService,
     notificationsService,
     prisonerProfileService,
@@ -77,6 +77,7 @@ export const services = () => {
 export type Services = ReturnType<typeof services>
 
 export {
+  AdditionalSupportService,
   AuditService,
   NotificationsService,
   PrisonerProfileService,

@@ -19,3 +19,7 @@ export type SessionCapacity = components['schemas']['SessionCapacityDto']
 export type SessionSchedule = components['schemas']['SessionScheduleDto']
 
 export type VisitSession = components['schemas']['VisitSessionDto']
+
+export type Alert = components['schemas']['AlertDto']
+
+export type PrisonerProfile = components['schemas']['PrisonerProfileDto']

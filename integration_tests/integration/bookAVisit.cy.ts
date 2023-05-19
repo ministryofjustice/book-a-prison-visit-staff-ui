@@ -92,14 +92,12 @@ context('Book a visit', () => {
     const searchForAPrisonerResultsPage = Page.verifyOnPage(SearchForAPrisonerResultsPage)
     searchForAPrisonerResultsPage.resultRows().should('have.length', 1)
 
+    const profile = TestData.prisonerProfile()
+
+    const { prisonerId } = profile
     // Prisoner profile page
-    cy.task('stubBookings', TestData.prisonerBookingSummary())
-    cy.task('stubOffender', TestData.inmateDetail())
-    cy.task('stubPrisonerById', prisoner)
     cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
-    cy.task('stubPastVisits', { offenderNo, pastVisits: [] })
-    cy.task('stubUpcomingVisits', { offenderNo, upcomingVisits: [] })
-    cy.task('stubVisitBalances', { offenderNo, visitBalances: TestData.visitBalances() })
+    cy.task('stubPrisonerProfile', { prisonId, prisonerId, profile })
 
     searchForAPrisonerResultsPage.firstResultLink().contains(prisonerDisplayName).click()
     const prisonerProfilePage = Page.verifyOnPageTitle(PrisonerProfilePage, prisonerDisplayName)

@@ -1,4 +1,5 @@
 import {
+  AdditionalSupportService,
   AuditService,
   NotificationsService,
   PrisonerProfileService,
@@ -12,12 +13,15 @@ import {
 
 jest.mock('..')
 
+export const createMockAdditionalSupportService = () =>
+  new AdditionalSupportService(null, null) as jest.Mocked<AdditionalSupportService>
+
 export const createMockAuditService = () => new AuditService(null, null, null, null) as jest.Mocked<AuditService>
 
 export const createMockNotificationsService = () => new NotificationsService(null) as jest.Mocked<NotificationsService>
 
 export const createMockPrisonerProfileService = () =>
-  new PrisonerProfileService(null, null, null, null, null, null) as jest.Mocked<PrisonerProfileService>
+  new PrisonerProfileService(null, null, null, null) as jest.Mocked<PrisonerProfileService>
 
 export const createMockPrisonerSearchService = () =>
   new PrisonerSearchService(null, null) as jest.Mocked<PrisonerSearchService>
@@ -33,4 +37,4 @@ export const createMockUserService = () => new UserService(null, null) as jest.M
 export const createMockVisitService = () => new VisitService(null, null, null, null) as jest.Mocked<VisitService>
 
 export const createMockVisitSessionsService = () =>
-  new VisitSessionsService(null, null, null, null) as jest.Mocked<VisitSessionsService>
+  new VisitSessionsService(null, null, null) as jest.Mocked<VisitSessionsService>

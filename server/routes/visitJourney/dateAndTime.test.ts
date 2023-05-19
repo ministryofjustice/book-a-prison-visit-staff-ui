@@ -5,13 +5,18 @@ import * as cheerio from 'cheerio'
 import { FlashData, VisitSessionData, VisitSlot, VisitSlotList } from '../../@types/bapv'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
 import { Visit } from '../../data/orchestrationApiTypes'
-import { createMockAuditService, createMockVisitSessionsService } from '../../services/testutils/mocks'
+import {
+  createMockAuditService,
+  createMockVisitService,
+  createMockVisitSessionsService,
+} from '../../services/testutils/mocks'
 
 let sessionApp: Express
 
 let flashData: FlashData
 
 const auditService = createMockAuditService()
+const visitService = createMockVisitService()
 const visitSessionsService = createMockVisitSessionsService()
 
 let visitSessionData: VisitSessionData
@@ -282,12 +287,12 @@ testJourneys.forEach(journey => {
       }
 
       beforeEach(() => {
-        visitSessionsService.reserveVisit = jest.fn().mockResolvedValue(reservedVisit)
-        visitSessionsService.changeBookedVisit = jest.fn().mockResolvedValue(changingVisit)
-        visitSessionsService.changeReservedVisit = jest.fn()
+        visitService.reserveVisit = jest.fn().mockResolvedValue(reservedVisit)
+        visitService.changeBookedVisit = jest.fn().mockResolvedValue(changingVisit)
+        visitService.changeReservedVisit = jest.fn()
 
         sessionApp = appWithAllRoutes({
-          services: { auditService, visitSessionsService },
+          services: { auditService, visitService },
           sessionData: {
             slotsList,
             visitSessionData,
@@ -321,10 +326,10 @@ testJourneys.forEach(journey => {
               journey.isUpdate ? changingVisit.visitStatus : reservedVisit.visitStatus,
             )
 
-            expect(
-              journey.isUpdate ? visitSessionsService.changeBookedVisit : visitSessionsService.reserveVisit,
-            ).toHaveBeenCalledTimes(1)
-            expect(visitSessionsService.changeReservedVisit).not.toHaveBeenCalled()
+            expect(journey.isUpdate ? visitService.changeBookedVisit : visitService.reserveVisit).toHaveBeenCalledTimes(
+              1,
+            )
+            expect(visitService.changeReservedVisit).not.toHaveBeenCalled()
 
             expect(auditService.reservedVisit).toHaveBeenCalledTimes(1)
             expect(auditService.reservedVisit).toHaveBeenCalledWith({
@@ -385,12 +390,12 @@ testJourneys.forEach(journey => {
               journey.isUpdate ? changingVisit.visitStatus : reservedVisit.visitStatus,
             )
 
-            expect(visitSessionsService.reserveVisit).not.toHaveBeenCalled()
-            expect(visitSessionsService.changeReservedVisit).toHaveBeenCalledTimes(1)
-            expect(
-              visitSessionsService.changeReservedVisit.mock.calls[0][0].visitSessionData.applicationReference,
-            ).toBe(reservedVisit.applicationReference)
-            expect(visitSessionsService.changeReservedVisit.mock.calls[0][0].visitSessionData.visitReference).toBe(
+            expect(visitService.reserveVisit).not.toHaveBeenCalled()
+            expect(visitService.changeReservedVisit).toHaveBeenCalledTimes(1)
+            expect(visitService.changeReservedVisit.mock.calls[0][0].visitSessionData.applicationReference).toBe(
+              reservedVisit.applicationReference,
+            )
+            expect(visitService.changeReservedVisit.mock.calls[0][0].visitSessionData.visitReference).toBe(
               reservedVisit.reference,
             )
 
