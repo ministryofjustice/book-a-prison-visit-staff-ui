@@ -176,6 +176,7 @@ export default class TestData {
 
   static prisonerProfile = ({
     prisonerId = 'A1234BC',
+    prisonId = 'HEI',
     firstName = 'JOHN',
     lastName = 'SMITH',
     dateOfBirth = '1975-04-02',
@@ -195,6 +196,7 @@ export default class TestData {
   }: Partial<PrisonerProfile> = {}): PrisonerProfile =>
     ({
       prisonerId,
+      prisonId,
       firstName,
       lastName,
       dateOfBirth,
