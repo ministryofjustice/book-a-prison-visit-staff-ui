@@ -218,4 +218,39 @@ context('Book a visit', () => {
     confirmationPage.mainContactNumber().contains('01234 567890')
     confirmationPage.bookAnotherVisitButton(offenderNo)
   })
+
+  it('should allow VO balance override', () => {
+    const prisoner = TestData.prisoner()
+    const { prisonId, prisonerNumber: offenderNo } = prisoner
+    const prisonerDisplayName = 'Smith, John'
+
+    const profile = TestData.prisonerProfile({
+      visitBalances: {
+        remainingVo: 0,
+        remainingPvo: 0,
+        latestIepAdjustDate: '2021-04-21',
+        latestPrivIepAdjustDate: '2021-12-01',
+      },
+    })
+
+    const { prisonerId } = profile
+    // Prisoner profile page
+    cy.task('stubPrisonerSocialContacts', { offenderNo, contacts: [] })
+    cy.task('stubPrisonerProfile', { prisonId, prisonerId, profile })
+
+    cy.visit(`/prisoner/${prisonerId}`)
+
+    const prisonerProfilePage = Page.verifyOnPageTitle(PrisonerProfilePage, prisonerDisplayName)
+
+    prisonerProfilePage.bookAVisitButton().should('be.disabled')
+    prisonerProfilePage
+      .voOverrideText()
+      .contains('The prisoner has no available visiting orders. Select the box if a booking can still be made.')
+    prisonerProfilePage.voOverrideButton().click()
+
+    const offenderRestrictions = [TestData.offenderRestriction()]
+    cy.task('stubOffenderRestrictions', { offenderNo, offenderRestrictions })
+    prisonerProfilePage.bookAVisitButton().click()
+    Page.verifyOnPage(SelectVisitorsPage)
+  })
 })
