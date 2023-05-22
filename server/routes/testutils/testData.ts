@@ -328,9 +328,11 @@ export default class TestData {
     visitors = [
       {
         nomisPersonId: 4321,
+        visitContact: true,
       },
       {
         nomisPersonId: 4322,
+        visitContact: false,
       },
     ],
     visitorSupport = [
@@ -370,10 +372,10 @@ export default class TestData {
 
   static visitHistoryDetails = ({
     createdBy = 'User One',
-    updatedBy = 'User Two',
+    updatedBy = undefined,
     cancelledBy = undefined,
     createdDateAndTime = '2022-01-01T09:00:00',
-    updatedDateAndTime = '2022-01-01T10:00:00',
+    updatedDateAndTime = undefined,
     cancelledDateAndTime = undefined,
     visit = this.visit(),
   }: Partial<VisitHistoryDetails> = {}): VisitHistoryDetails => ({

@@ -100,7 +100,11 @@ describe('/visit/:reference', () => {
 
   beforeEach(() => {
     visit = TestData.visit()
-    visitHistoryDetails = TestData.visitHistoryDetails({ visit })
+    visitHistoryDetails = TestData.visitHistoryDetails({
+      updatedBy: 'User Two',
+      updatedDateAndTime: '2022-01-01T10:00:00',
+      visit,
+    })
 
     const fakeDate = new Date('2022-01-01')
     jest.useFakeTimers({ advanceTimers: true, now: new Date(fakeDate) })
@@ -530,7 +534,7 @@ describe('/visit/:reference', () => {
               },
             ],
             visitorSupport: [{ type: 'WHEELCHAIR' }, { text: 'custom request', type: 'OTHER' }],
-            mainContact: { contact: undefined, phoneNumber: '01234 567890', contactName: 'Jeanette Smith' },
+            mainContact: { contact: visitors[0], phoneNumber: '01234 567890', contactName: 'Jeanette Smith' },
             visitReference: 'ab-cd-ef-gh',
             visitStatus: 'BOOKED',
           })
