@@ -146,7 +146,7 @@ context('Book a visit', () => {
     selectVisitorsPage.continueButton().click()
     const selectVisitDateAndTime = Page.verifyOnPage(SelectVisitDateAndTime)
     selectVisitDateAndTime.expandAllSections()
-    selectVisitDateAndTime.getFirstSlot().check()
+    selectVisitDateAndTime.getSlotById(1).check()
 
     // Additional support
     cy.task('stubAvailableSupport')
@@ -205,7 +205,7 @@ context('Book a visit', () => {
     )
 
     checkYourBookingPage.bookButton().click()
-    const confirmationPage = Page.verifyOnPage(ConfirmationPage)
+    const confirmationPage = Page.verifyOnPageTitle(ConfirmationPage, 'Booking confirmed')
     confirmationPage.bookingReference().contains(TestData.visit().reference)
     confirmationPage.prisonerName().contains(prisonerDisplayName)
     confirmationPage.prisonerNumber().contains(offenderNo)

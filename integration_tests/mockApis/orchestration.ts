@@ -47,6 +47,33 @@ export default {
       },
     })
   },
+  stubChangeBookedVisit: (visit: Visit): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'PUT',
+        url: `/orchestration/visits/${visit.reference}/change`,
+        bodyPatterns: [
+          {
+            equalToJson: {
+              prisonerId: visit.prisonerId,
+              sessionTemplateReference: visit.sessionTemplateReference,
+              visitRestriction: visit.visitRestriction,
+              startTimestamp: visit.startTimestamp,
+              endTimestamp: visit.endTimestamp,
+              visitContact: visit.visitContact,
+              visitors: visit.visitors,
+              visitorSupport: visit.visitorSupport,
+            },
+          },
+        ],
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: visit,
+      },
+    })
+  },
   stubChangeReservedSlot: (visit: Visit): SuperAgentRequest => {
     return stubFor({
       request: {
