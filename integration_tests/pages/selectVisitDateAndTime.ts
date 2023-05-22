@@ -12,4 +12,6 @@ export default class SelectVisitDateAndTime extends Page {
   getFirstSlot = (): PageElement => cy.get('#1')
 
   continueButton = (): PageElement => cy.get('[data-test=submit]')
+
+  visitRestriction = (): PageElement => cy.get('[data-test="visit-restriction"]')
 }

@@ -6,17 +6,31 @@ import SearchForAPrisonerResultsPage from '../pages/searchForAPrisonerResults'
 import PrisonerProfilePage from '../pages/prisonerProfile'
 import SelectVisitorsPage from '../pages/selectVisitors'
 import TestData from '../../server/routes/testutils/testData'
-import SelectVisitDateAndTime from '../pages/selectVisitDateAndTime'
 import { VisitSession } from '../../server/data/orchestrationApiTypes'
 import AdditionalSupportPage from '../pages/additionalSupport'
 import MainContactPage from '../pages/mainContact'
 import CheckYourBookingPage from '../pages/checkYourBooking'
 import ConfirmationPage from '../pages/confirmation'
+import SelectVisitTypePage from '../pages/visitType'
+import SelectVisitDateAndTime from '../pages/selectVisitDateAndTime'
 
 context('Book a visit', () => {
   const shortDateFormat = 'yyyy-MM-dd'
   const mediumDateFormat = 'd MMMM yyyy'
   const longDateFormat = 'EEEE d MMMM yyyy'
+
+  const today = new Date()
+  const childDob = format(sub(today, { years: 5 }), shortDateFormat)
+  const contacts = [
+    TestData.contact({ restrictions: [TestData.restriction()] }),
+    TestData.contact({
+      personId: 4322,
+      firstName: 'Bob',
+      dateOfBirth: childDob,
+      relationshipCode: 'SON',
+      relationshipDescription: 'Son',
+    }),
+  ]
 
   beforeEach(() => {
     cy.task('reset')
@@ -28,22 +42,9 @@ context('Book a visit', () => {
   })
 
   it('should complete the book a visit journey', () => {
-    const today = new Date()
     const prisoner = TestData.prisoner()
     const { prisonId, prisonerNumber: offenderNo } = prisoner
     const prisonerDisplayName = 'Smith, John'
-
-    const childDob = format(sub(today, { years: 5 }), shortDateFormat)
-    const contacts = [
-      TestData.contact({ restrictions: [TestData.restriction()] }),
-      TestData.contact({
-        personId: 4322,
-        firstName: 'Bob',
-        dateOfBirth: childDob,
-        relationshipCode: 'SON',
-        relationshipDescription: 'Son',
-      }),
-    ]
 
     const visitSessions: VisitSession[] = [
       TestData.visitSession({
@@ -220,10 +221,7 @@ context('Book a visit', () => {
   })
 
   it('should allow VO balance override', () => {
-    const prisoner = TestData.prisoner()
-    const { prisonId, prisonerNumber: offenderNo } = prisoner
     const prisonerDisplayName = 'Smith, John'
-
     const profile = TestData.prisonerProfile({
       visitBalances: {
         remainingVo: 0,
@@ -232,10 +230,10 @@ context('Book a visit', () => {
         latestPrivIepAdjustDate: '2021-12-01',
       },
     })
+    const { prisonerId, prisonId } = profile
 
-    const { prisonerId } = profile
     // Prisoner profile page
-    cy.task('stubPrisonerSocialContacts', { offenderNo, contacts: [] })
+    cy.task('stubPrisonerSocialContacts', { offenderNo: prisonerId, contacts: [] })
     cy.task('stubPrisonerProfile', { prisonId, prisonerId, profile })
 
     cy.visit(`/prisoner/${prisonerId}`)
@@ -249,8 +247,58 @@ context('Book a visit', () => {
     prisonerProfilePage.voOverrideButton().click()
 
     const offenderRestrictions = [TestData.offenderRestriction()]
-    cy.task('stubOffenderRestrictions', { offenderNo, offenderRestrictions })
+    cy.task('stubOffenderRestrictions', { offenderNo: prisonerId, offenderRestrictions })
     prisonerProfilePage.bookAVisitButton().click()
     Page.verifyOnPage(SelectVisitorsPage)
+  })
+
+  it('should prompt for visit type selection for prisoner with closed restriction', () => {
+    const prisonerDisplayName = 'Smith, John'
+    const profile = TestData.prisonerProfile({})
+    const { prisonerId, prisonId } = profile
+
+    // Prisoner profile page
+    cy.task('stubPrisonerSocialContacts', { offenderNo: prisonerId, contacts })
+    cy.task('stubPrisonerProfile', { prisonId, prisonerId, profile })
+
+    cy.visit(`/prisoner/${prisonerId}`)
+
+    const prisonerProfilePage = Page.verifyOnPageTitle(PrisonerProfilePage, prisonerDisplayName)
+
+    const offenderRestrictions = [
+      TestData.offenderRestriction({
+        restrictionType: 'CLOSED',
+        restrictionTypeDescription: 'Closed',
+        startDate: '2022-01-03',
+      }),
+    ]
+    cy.task('stubOffenderRestrictions', { offenderNo: prisonerId, offenderRestrictions })
+    prisonerProfilePage.bookAVisitButton().click()
+
+    const selectVisitorsPage = Page.verifyOnPage(SelectVisitorsPage)
+    selectVisitorsPage.getVisitor(contacts[0].personId).check()
+    selectVisitorsPage.getVisitor(contacts[1].personId).check()
+    selectVisitorsPage.continueButton().click()
+
+    const selectVisitTypePage = Page.verifyOnPage(SelectVisitTypePage)
+    selectVisitTypePage.getPrisonerRestrictionType(1).contains('Closed')
+    selectVisitTypePage.selectClosedVisitType()
+
+    cy.task('stubVisitSessions', {
+      offenderNo: prisonerId,
+      prisonId,
+      visitSessions: [],
+    })
+    cy.task('stubOffenderEvents', {
+      offenderNo: prisonerId,
+      fromDate: format(today, shortDateFormat),
+      toDate: format(today, shortDateFormat),
+      scheduledEvents: [],
+    })
+
+    selectVisitTypePage.submitButton().click()
+
+    const selectVisitDateAndTime = Page.verifyOnPage(SelectVisitDateAndTime)
+    selectVisitDateAndTime.visitRestriction().contains('Closed')
   })
 })
