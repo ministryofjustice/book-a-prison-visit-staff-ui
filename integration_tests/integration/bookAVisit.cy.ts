@@ -218,4 +218,71 @@ context('Book a visit', () => {
     confirmationPage.mainContactNumber().contains('01234 567890')
     confirmationPage.bookAnotherVisitButton(offenderNo)
   })
+
+  it('should sucessfully navigate to select visitor if no VO balance present', () => {
+    const today = new Date()
+    const prisoner = TestData.prisoner()
+    const { prisonId, prisonerNumber: offenderNo } = prisoner
+    const prisonerDisplayName = 'Smith, John'
+
+    const childDob = format(sub(today, { years: 5 }), shortDateFormat)
+    const contacts = [
+      TestData.contact({ restrictions: [TestData.restriction()] }),
+      TestData.contact({
+        personId: 4322,
+        firstName: 'Bob',
+        dateOfBirth: childDob,
+        relationshipCode: 'SON',
+        relationshipDescription: 'Son',
+      }),
+    ]
+
+    // Home page - start booking journey
+    const homePage = Page.verifyOnPage(HomePage)
+    homePage.bookAVisitTile().click()
+
+    // Search for prisoner
+    cy.task('stubPrisoners', {
+      term: offenderNo,
+      results: {
+        totalElements: 1,
+        totalPages: 1,
+        content: [prisoner],
+      },
+    })
+    const searchForAPrisonerPage = Page.verifyOnPage(SearchForAPrisonerPage)
+    searchForAPrisonerPage.searchInput().type(offenderNo)
+
+    // Search results page
+    searchForAPrisonerPage.searchButton().click()
+    const searchForAPrisonerResultsPage = Page.verifyOnPage(SearchForAPrisonerResultsPage)
+    searchForAPrisonerResultsPage.resultRows().should('have.length', 1)
+
+    const profile = TestData.prisonerProfile({
+      visitBalances: {
+        remainingVo: 0,
+        remainingPvo: 0,
+        latestIepAdjustDate: '2021-04-21',
+        latestPrivIepAdjustDate: '2021-12-01',
+      },
+    })
+
+    const { prisonerId } = profile
+    // Prisoner profile page
+    cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
+    cy.task('stubPrisonerProfile', { prisonId, prisonerId, profile })
+
+    searchForAPrisonerResultsPage.firstResultLink().contains(prisonerDisplayName).click()
+    const prisonerProfilePage = Page.verifyOnPageTitle(PrisonerProfilePage, prisonerDisplayName)
+
+    prisonerProfilePage
+      .voOverrideText()
+      .contains('The prisoner has no available visiting orders. Select the box if a booking can still be made.')
+    prisonerProfilePage.voOverrideButton().click()
+
+    const offenderRestrictions = [TestData.offenderRestriction()]
+    cy.task('stubOffenderRestrictions', { offenderNo, offenderRestrictions })
+    prisonerProfilePage.bookAVisitButton().click()
+    Page.verifyOnPage(SelectVisitorsPage)
+  })
 })

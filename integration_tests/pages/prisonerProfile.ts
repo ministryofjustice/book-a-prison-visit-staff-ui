@@ -70,4 +70,8 @@ export default class PrisonerProfilePage extends Page {
   visitTabVisitStatus = (): PageElement => cy.get('[data-test="tab-visits-status"]')
 
   visitTabViewFullHistory = (): PageElement => cy.get('[data-test="view-dps-profile"]')
+
+  voOverrideButton = (): PageElement => cy.get('#vo-override')
+
+  voOverrideText = (): PageElement => cy.get('.moj-banner__message')
 }
