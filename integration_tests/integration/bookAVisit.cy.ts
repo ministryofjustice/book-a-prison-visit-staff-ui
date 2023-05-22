@@ -219,44 +219,10 @@ context('Book a visit', () => {
     confirmationPage.bookAnotherVisitButton(offenderNo)
   })
 
-  it('should sucessfully navigate to select visitor if no VO balance present', () => {
-    const today = new Date()
+  it('should allow VO balance override', () => {
     const prisoner = TestData.prisoner()
     const { prisonId, prisonerNumber: offenderNo } = prisoner
     const prisonerDisplayName = 'Smith, John'
-
-    const childDob = format(sub(today, { years: 5 }), shortDateFormat)
-    const contacts = [
-      TestData.contact({ restrictions: [TestData.restriction()] }),
-      TestData.contact({
-        personId: 4322,
-        firstName: 'Bob',
-        dateOfBirth: childDob,
-        relationshipCode: 'SON',
-        relationshipDescription: 'Son',
-      }),
-    ]
-
-    // Home page - start booking journey
-    const homePage = Page.verifyOnPage(HomePage)
-    homePage.bookAVisitTile().click()
-
-    // Search for prisoner
-    cy.task('stubPrisoners', {
-      term: offenderNo,
-      results: {
-        totalElements: 1,
-        totalPages: 1,
-        content: [prisoner],
-      },
-    })
-    const searchForAPrisonerPage = Page.verifyOnPage(SearchForAPrisonerPage)
-    searchForAPrisonerPage.searchInput().type(offenderNo)
-
-    // Search results page
-    searchForAPrisonerPage.searchButton().click()
-    const searchForAPrisonerResultsPage = Page.verifyOnPage(SearchForAPrisonerResultsPage)
-    searchForAPrisonerResultsPage.resultRows().should('have.length', 1)
 
     const profile = TestData.prisonerProfile({
       visitBalances: {
@@ -269,12 +235,14 @@ context('Book a visit', () => {
 
     const { prisonerId } = profile
     // Prisoner profile page
-    cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
+    cy.task('stubPrisonerSocialContacts', { offenderNo, contacts: [] })
     cy.task('stubPrisonerProfile', { prisonId, prisonerId, profile })
 
-    searchForAPrisonerResultsPage.firstResultLink().contains(prisonerDisplayName).click()
+    cy.visit(`/prisoner/${prisonerId}`)
+
     const prisonerProfilePage = Page.verifyOnPageTitle(PrisonerProfilePage, prisonerDisplayName)
 
+    prisonerProfilePage.bookAVisitButton().should('be.disabled')
     prisonerProfilePage
       .voOverrideText()
       .contains('The prisoner has no available visiting orders. Select the box if a booking can still be made.')
