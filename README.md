@@ -1,4 +1,7 @@
 # book-a-prison-visit-staff-ui
+[![repo standards badge](https://img.shields.io/badge/dynamic/json?color=blue&style=flat&logo=github&label=MoJ%20Compliant&query=%24.result&url=https%3A%2F%2Foperations-engineering-reports.cloud-platform.service.justice.gov.uk%2Fapi%2Fv1%2Fcompliant_public_repositories%2Fbook-a-prison-visit-staff-ui)](https://operations-engineering-reports.cloud-platform.service.justice.gov.uk/public-github-repositories.html#book-a-prison-visit-staff-ui "Link to report")
+[![CircleCI](https://circleci.com/gh/ministryofjustice/book-a-prison-visit-staff-ui/tree/main.svg?style=svg)](https://circleci.com/gh/ministryofjustice/book-a-prison-visit-staff-ui)
+
 Staff UI for new Manage a Prison Visit project.
 
 ## Running the app

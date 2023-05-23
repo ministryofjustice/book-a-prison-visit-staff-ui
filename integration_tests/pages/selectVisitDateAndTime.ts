@@ -9,7 +9,7 @@ export default class SelectVisitDateAndTime extends Page {
     cy.get('.govuk-accordion__show-all').each(section => cy.wrap(section).click())
   }
 
-  getFirstSlot = (): PageElement => cy.get('#1')
+  getSlotById = (id: number): PageElement => cy.get(`#${id}`)
 
   continueButton = (): PageElement => cy.get('[data-test=submit]')
 

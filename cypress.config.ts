@@ -33,6 +33,7 @@ export default defineConfig({
         // Orchestration service
         stubBookVisit: orchestrationService.stubBookVisit,
         stubCancelVisit: orchestrationService.stubCancelVisit,
+        stubChangeBookedVisit: orchestrationService.stubChangeBookedVisit,
         stubChangeReservedSlot: orchestrationService.stubChangeReservedSlot,
         stubReserveVisit: orchestrationService.stubReserveVisit,
         stubVisit: orchestrationService.stubVisit,
