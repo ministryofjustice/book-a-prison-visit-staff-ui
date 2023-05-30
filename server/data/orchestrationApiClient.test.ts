@@ -310,6 +310,7 @@ describe('orchestrationApiClient', () => {
             }
           }),
           visitorSupport: visitSessionData.visitorSupport,
+          sessionTemplateReference: visitSessionData.visitSlot.sessionTemplateReference,
         })
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, result)
@@ -399,6 +400,7 @@ describe('orchestrationApiClient', () => {
             }
           }),
           visitorSupport: undefined,
+          sessionTemplateReference: visitSessionData.visitSlot.sessionTemplateReference,
         })
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, result)

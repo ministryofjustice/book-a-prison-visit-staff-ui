@@ -82,6 +82,7 @@ export default class OrchestrationApiClient {
           }
         }),
         visitorSupport: visitSessionData.visitorSupport,
+        sessionTemplateReference: visitSessionData.visitSlot.sessionTemplateReference,
       },
     })
   }

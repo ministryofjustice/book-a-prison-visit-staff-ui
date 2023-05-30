@@ -614,8 +614,8 @@ export interface components {
       caseNoteId?: number
       locked?: boolean
       cellLocation?: string
-      absentSubReasonDescription?: string
       absentReasonDescription?: string
+      absentSubReasonDescription?: string
     }
     AttendancesResponse: {
       attendances?: components['schemas']['AttendanceDto'][]
@@ -943,10 +943,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
       last?: boolean
-      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     PageableObject: {
@@ -954,11 +954,11 @@ export interface components {
       offset?: number
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
+      pageNumber?: number
+      /** Format: int32 */
       pageSize?: number
       paged?: boolean
       unpaged?: boolean
-      /** Format: int32 */
-      pageNumber?: number
     }
     SortObject: {
       empty?: boolean

@@ -188,6 +188,7 @@ context('Book a visit', () => {
           { nomisPersonId: contacts[1].personId, visitContact: false },
         ],
         visitorSupport: [{ type: 'WHEELCHAIR' }, { type: 'OTHER', text: 'Some extra help!' }],
+        sessionTemplateReference: visitSessions[0].sessionTemplateReference,
       }),
     )
     cy.task(
