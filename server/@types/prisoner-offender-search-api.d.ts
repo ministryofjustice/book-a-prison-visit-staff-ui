@@ -188,7 +188,8 @@ export interface paths {
   '/prisoner-index/reconcile-prisoner/{prisonerNumber}': {
     /**
      * Compare a prisoner's index with Nomis
-     * @description Existing index is compared in detail with current Nomis data for a specific prisoner, requires ROLE_PRISONER_INDEX.
+     * @description Existing index is compared in detail with current Nomis data for a specific prisoner,
+     *       with the index value coming first, Nomis second in the returned details. Requires ROLE_PRISONER_INDEX.
      */
     get: operations['reconcilePrisoner']
   }
@@ -490,7 +491,7 @@ export interface components {
        * @example IN
        * @enum {string}
        */
-      inOutStatus?: 'IN' | 'OUT'
+      inOutStatus?: 'IN' | 'OUT' | 'TRN'
       /**
        * @description Prison ID
        * @example MDI
@@ -945,10 +946,10 @@ export interface components {
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
       pageSize?: number
-      paged?: boolean
-      unpaged?: boolean
       /** Format: int32 */
       pageNumber?: number
+      paged?: boolean
+      unpaged?: boolean
     }
     SortObject: {
       empty?: boolean
@@ -2163,7 +2164,8 @@ export interface operations {
   }
   /**
    * Compare a prisoner's index with Nomis
-   * @description Existing index is compared in detail with current Nomis data for a specific prisoner, requires ROLE_PRISONER_INDEX.
+   * @description Existing index is compared in detail with current Nomis data for a specific prisoner,
+   *       with the index value coming first, Nomis second in the returned details. Requires ROLE_PRISONER_INDEX.
    */
   reconcilePrisoner: {
     parameters: {

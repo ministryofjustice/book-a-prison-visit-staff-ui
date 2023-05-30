@@ -5171,6 +5171,8 @@ export interface components {
       /** @description DPS/NOMIS user who submitted the calculated dates. */
       submissionUser: string
       keyDates: components['schemas']['OffenderKeyDates']
+      /** @description Comment to be associated with the sentence calculation, if not set a default comment is used */
+      comment?: string
     }
     /** @description AssessmentRating */
     AssessmentClassification: {
@@ -5497,13 +5499,23 @@ export interface components {
        */
       imageId: number
       /**
+       * @description An active image means that it is to be used and is current for the prisoner. An inactive image means that it has been superseded by another image or the image is no longer relevant.
+       * @example false
+       */
+      active: boolean
+      /**
        * Format: date
        * @description Date of image capture
        * @example 2008-08-27
        */
       captureDate: string
       /**
-       * @description Image view information.  Actual values extracted 10/05/2023, with the majority of values being FACE. This doesn't appear to be mapped to any REFERENCE_CODE data, even though there is a domain called IMAGE_VIEW.
+       * @description Date and time of image capture
+       * @example 2021-07-05T10:35:17
+       */
+      captureDateTime: string
+      /**
+       * @description Image view information. Actual values extracted 10/05/2023, with the majority of values being FACE. This doesn't appear to be mapped to any REFERENCE_CODE data, even though there is a domain called IMAGE_VIEW.
        * @example FACE
        * @enum {string}
        */
@@ -7491,10 +7503,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
       last?: boolean
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     PageableObject: {
@@ -7510,8 +7522,8 @@ export interface components {
     }
     SortObject: {
       empty?: boolean
-      unsorted?: boolean
       sorted?: boolean
+      unsorted?: boolean
     }
     /** @description PersonIdentifier */
     PersonIdentifier: {
@@ -9570,10 +9582,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
       last?: boolean
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     Pageable: {
@@ -10267,10 +10279,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
       last?: boolean
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     /** @description Offender Employment */
@@ -10374,10 +10386,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
       last?: boolean
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     PageEducation: {
@@ -10392,10 +10404,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
       last?: boolean
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     /** @description Represents a court date and its outcome */
@@ -10571,15 +10583,15 @@ export interface components {
        */
       establishmentCode?: string
       /**
-       * @description Case Note Type and Sub Type
-       * @example POS IEP_ENC
-       */
-      noteType: string
-      /**
        * @description Name of staff member who created case note (lastname, firstname)
        * @example Smith, John
        */
       staffName: string
+      /**
+       * @description Case Note Type and Sub Type
+       * @example POS IEP_ENC
+       */
+      noteType: string
     }
     /** @description Visit summary */
     VisitSummary: {
@@ -10603,10 +10615,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
       last?: boolean
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     /** @description Visit details */
@@ -10877,10 +10889,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
       last?: boolean
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     /** @description Case Note Count Detail */
@@ -10935,10 +10947,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
       last?: boolean
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     /** @description Adjudication Summary for offender */
@@ -11013,10 +11025,10 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
       last?: boolean
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     /** @description Prisoner Booking Summary */

@@ -377,6 +377,11 @@ export interface components {
       visitors?: components['schemas']['VisitorDto'][]
       /** @description List of additional support associated with the visit */
       visitorSupport?: components['schemas']['VisitorSupportDto'][]
+      /**
+       * @description Session template reference
+       * @example v9d.7ed.7u
+       */
+      sessionTemplateReference: string
     }
     DlqMessage: {
       body: {
@@ -439,27 +444,27 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
-      last?: boolean
       empty?: boolean
     }
     PageableObject: {
       /** Format: int64 */
       offset?: number
       sort?: components['schemas']['SortObject']
-      /** Format: int32 */
-      pageSize?: number
-      /** Format: int32 */
-      pageNumber?: number
       paged?: boolean
       unpaged?: boolean
+      /** Format: int32 */
+      pageNumber?: number
+      /** Format: int32 */
+      pageSize?: number
     }
     SortObject: {
       empty?: boolean
-      sorted?: boolean
       unsorted?: boolean
+      sorted?: boolean
     }
     /** @description Support Type */
     SupportTypeDto: {
