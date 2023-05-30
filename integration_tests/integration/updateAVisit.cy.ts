@@ -154,6 +154,7 @@ context('Update a visit', () => {
           { nomisPersonId: contacts[1].personId, visitContact: false },
         ],
         visitorSupport: [{ type: 'WHEELCHAIR' }, { type: 'OTHER', text: 'Some extra help!' }],
+        sessionTemplateReference: visitSessions[1].sessionTemplateReference,
       }),
     )
     cy.task(

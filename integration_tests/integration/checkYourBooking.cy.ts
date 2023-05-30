@@ -130,6 +130,7 @@ context('Check visit details page', () => {
         visitContact: { name: 'Jeanette Smith', telephone: '01234 567890' },
         visitors: [{ nomisPersonId: contacts[0].personId, visitContact: true }],
         visitorSupport: [],
+        sessionTemplateReference: visitSessions[1].sessionTemplateReference,
       }),
     )
     selectVisitDateAndTime.continueButton().click()
@@ -157,6 +158,7 @@ context('Check visit details page', () => {
           { nomisPersonId: contacts[1].personId, visitContact: false },
         ],
         visitorSupport: [],
+        sessionTemplateReference: visitSessions[1].sessionTemplateReference,
       }),
     )
     selectVisitDateAndTime.continueButton().click()
@@ -193,6 +195,7 @@ context('Check visit details page', () => {
           { nomisPersonId: contacts[1].personId, visitContact: false },
         ],
         visitorSupport: [{ type: 'WHEELCHAIR' }],
+        sessionTemplateReference: visitSessions[1].sessionTemplateReference,
       }),
     )
     cy.task(

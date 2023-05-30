@@ -88,6 +88,7 @@ export default {
               visitContact: visit.visitContact,
               visitors: visit.visitors,
               visitorSupport: visit.visitorSupport,
+              sessionTemplateReference: visit.sessionTemplateReference,
             },
           },
         ],
