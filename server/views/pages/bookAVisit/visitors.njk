@@ -1,6 +1,8 @@
 {% extends "layout.njk" %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{%- from "moj/components/banner/macro.njk" import mojBanner -%}
 {% from "components/visitors.njk" import visitorDateOfBirth, visitorRestrictions %}
 
 {% set pageHeaderTitle = "Select visitors from the prisoner’s approved visitor list" %}
@@ -11,6 +13,7 @@
 
 {% set visitors = [] %}
 {% set eligibleVisitorsCount = 0 %}
+{% set noVisitorsText = '' %}
 
 {% for visitor in visitorList %}
 
@@ -59,6 +62,7 @@
 {% endfor %}
 
 {% block content %}
+
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
       {% include "partials/errorSummary.njk" %}
@@ -111,6 +115,30 @@
           rows: prisonerRestrictions
         }) }}
       </div>
+      {% endif %}
+
+      {% set noVisitorsText %}
+        {% if adultVisitors === false %}
+          {{ 'approved' }}
+        {% elif adultVisitors === true and eligibleVisitorsCount === 0 %}
+          {{ 'permitted' }}
+        {% endif %}
+      {% endset %}
+      {% if noVisitorsText !== '' %}
+        {% set noVisitorsHtml %}
+          {{ govukWarningText({
+            classes: "govuk-!-margin-bottom-0",
+            html: '<span class="govuk-!-font-size-24">There are no' + noVisitorsText + ' visitors over 18 for this prisoner. A booking cannot be made at this time</span>',
+            iconFallbackText: "Warning",
+            attributes: {
+              "data-test": "no-suitable-visitors"
+            }
+          }) }}
+        {% endset %}
+        {{ mojBanner({
+          classes: "govuk-!-padding-left-4" ,
+          html: noVisitorsHtml
+        }) }}
       {% endif %}
 
       <h2 class="govuk-heading-m">Approved visitor list</h2>
