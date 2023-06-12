@@ -384,6 +384,7 @@ testJourneys.forEach(journey => {
           expect($('input[name="visitors"]').length).toBe(1)
           expect($('[data-test="submit"]').length).toBe(0)
           expect($('[data-test="back-to-start"]').length).toBe(1)
+          expect($('#visitor-4324').attr('disabled')).toBe('disabled')
           expect($('.govuk-warning-text__text').text()).toContain('There are no')
           expect($('.govuk-warning-text__text').text()).toContain('approved')
           expect($('.govuk-warning-text__text').text()).toContain(
@@ -395,7 +396,7 @@ testJourneys.forEach(journey => {
     it('should show back to start button and warning message if only banned visitors listed', () => {
       returnData = [
         {
-          personId: 4324,
+          personId: 3984,
           name: 'John Smith',
           dateOfBirth: '2000-03-02',
           adult: true,
@@ -417,6 +418,7 @@ testJourneys.forEach(journey => {
           expect($('input[name="visitors"]').length).toBe(1)
           expect($('[data-test="submit"]').length).toBe(0)
           expect($('[data-test="back-to-start"]').length).toBe(1)
+          expect($('#visitor-3984').attr('disabled')).toBe('disabled')
           expect($('.govuk-warning-text__text').text()).toContain('There are no')
           expect($('.govuk-warning-text__text').text()).toContain('permitted')
           expect($('.govuk-warning-text__text').text()).toContain(
