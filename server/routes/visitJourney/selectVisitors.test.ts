@@ -388,7 +388,7 @@ testJourneys.forEach(journey => {
           expect($('.govuk-warning-text__text').text()).toContain('There are no')
           expect($('.govuk-warning-text__text').text()).toContain('approved')
           expect($('.govuk-warning-text__text').text()).toContain(
-            'visitors over 18 for this prisoner. A booking cannot be made at this time',
+            'visitors over 18 for this prisoner. A booking cannot be made at this time.',
           )
         })
     })
@@ -422,7 +422,7 @@ testJourneys.forEach(journey => {
           expect($('.govuk-warning-text__text').text()).toContain('There are no')
           expect($('.govuk-warning-text__text').text()).toContain('permitted')
           expect($('.govuk-warning-text__text').text()).toContain(
-            'visitors over 18 for this prisoner. A booking cannot be made at this time',
+            'visitors over 18 for this prisoner. A booking cannot be made at this time.',
           )
         })
     })
