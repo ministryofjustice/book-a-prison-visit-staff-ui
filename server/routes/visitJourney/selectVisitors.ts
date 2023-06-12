@@ -25,12 +25,7 @@ export default class SelectVisitors {
     }
     req.session.visitorList.visitors = visitorList
 
-    let adultVisitors = false
-    visitorList.forEach(visitor => {
-      if (visitor.adult === true) {
-        adultVisitors = true
-      }
-    })
+    const atLeastOneAdult = visitorList.some(visitor => visitor.adult === true)
 
     const restrictions = await this.prisonerProfileService.getRestrictions(offenderNo, res.locals.user.username)
     visitSessionData.prisoner.restrictions = restrictions
@@ -48,7 +43,7 @@ export default class SelectVisitors {
       offenderNo: visitSessionData.prisoner.offenderNo,
       prisonerName: visitSessionData.prisoner.name,
       visitorList,
-      adultVisitors,
+      atLeastOneAdult,
       restrictions,
       selectVisitorsText,
       formValues,

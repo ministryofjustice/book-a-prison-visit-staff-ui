@@ -118,9 +118,9 @@
       {% endif %}
 
       {% set noVisitorsText %}
-        {% if adultVisitors === false %}
+        {% if atLeastOneAdult === false %}
           {{ 'approved' }}
-        {% elif adultVisitors === true and eligibleVisitorsCount === 0 %}
+        {% elif atLeastOneAdult === true and eligibleVisitorsCount === 0 %}
           {{ 'permitted' }}
         {% endif %}
       {% endset %}
