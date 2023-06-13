@@ -385,10 +385,8 @@ testJourneys.forEach(journey => {
           expect($('[data-test="submit"]').length).toBe(0)
           expect($('[data-test="back-to-start"]').length).toBe(1)
           expect($('#visitor-4324').attr('disabled')).toBe('disabled')
-          expect($('.govuk-warning-text__text').text()).toContain('There are no')
-          expect($('.govuk-warning-text__text').text()).toContain('approved')
-          expect($('.govuk-warning-text__text').text()).toContain(
-            'visitors over 18 for this prisoner. A booking cannot be made at this time.',
+          expect($('.govuk-warning-text__text').text().replace(/\s+/g, ' ')).toContain(
+            'There are no approved visitors over 18 for this prisoner. A booking cannot be made at this time.',
           )
         })
     })
@@ -419,10 +417,8 @@ testJourneys.forEach(journey => {
           expect($('[data-test="submit"]').length).toBe(0)
           expect($('[data-test="back-to-start"]').length).toBe(1)
           expect($('#visitor-3984').attr('disabled')).toBe('disabled')
-          expect($('.govuk-warning-text__text').text()).toContain('There are no')
-          expect($('.govuk-warning-text__text').text()).toContain('permitted')
-          expect($('.govuk-warning-text__text').text()).toContain(
-            'visitors over 18 for this prisoner. A booking cannot be made at this time.',
+          expect($('.govuk-warning-text__text').text().replace(/\s+/g, ' ')).toContain(
+            'There are no permitted visitors over 18 for this prisoner. A booking cannot be made at this time.',
           )
         })
     })
