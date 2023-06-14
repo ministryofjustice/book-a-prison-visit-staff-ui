@@ -16,7 +16,7 @@ jest.mock('..')
 export const createMockAdditionalSupportService = () =>
   new AdditionalSupportService(null, null) as jest.Mocked<AdditionalSupportService>
 
-export const createMockAuditService = () => new AuditService(null, null) as jest.Mocked<AuditService>
+export const createMockAuditService = () => new AuditService(null) as jest.Mocked<AuditService>
 
 export const createMockNotificationsService = () => new NotificationsService(null) as jest.Mocked<NotificationsService>
 

@@ -6,13 +6,8 @@ import { Visit } from '../data/orchestrationApiTypes'
 export default class AuditService {
   private sqsClient: SQSClient
 
-  constructor(
-    private readonly region = config.apis.audit.region,
-    private readonly queueUrl = config.apis.audit.queueUrl,
-  ) {
-    this.sqsClient = new SQSClient({
-      region: this.region,
-    })
+  constructor(private readonly queueUrl = config.apis.audit.queueUrl) {
+    this.sqsClient = new SQSClient({})
   }
 
   async changeEstablishment({
