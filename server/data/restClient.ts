@@ -21,6 +21,7 @@ interface PostRequest {
   responseType?: string
   data?: Record<string, unknown>
   raw?: boolean
+  retry?: boolean
 }
 
 interface PutRequest {
@@ -29,6 +30,7 @@ interface PutRequest {
   responseType?: string
   data?: Record<string, unknown>
   raw?: boolean
+  retry?: boolean
 }
 
 interface StreamRequest {
@@ -82,6 +84,7 @@ export default class RestClient {
     responseType = '',
     data = {},
     raw = false,
+    retry = false,
   }: PostRequest = {}): Promise<T> {
     logger.info(`Post using user credentials: calling ${this.name}: ${path}`)
     try {
@@ -90,6 +93,9 @@ export default class RestClient {
         .send(data)
         .agent(this.agent)
         .retry(2, (err, res) => {
+          if (retry === false) {
+            return false
+          }
           if (err) logger.info(`Retry handler found API error with ${err.code} ${err.message}`)
           return undefined // retry handler only for logging retries, not to influence retry logic
         })
@@ -106,7 +112,14 @@ export default class RestClient {
     }
   }
 
-  async put<T>({ path = null, headers = {}, responseType = '', data = {}, raw = false }: PutRequest = {}): Promise<T> {
+  async put<T>({
+    path = null,
+    headers = {},
+    responseType = '',
+    data = {},
+    raw = false,
+    retry = false,
+  }: PutRequest = {}): Promise<T> {
     logger.info(`Put using user credentials: calling ${this.name}: ${path}`)
     try {
       const result = await superagent
@@ -114,6 +127,9 @@ export default class RestClient {
         .send(data)
         .agent(this.agent)
         .retry(2, (err, res) => {
+          if (retry === false) {
+            return false
+          }
           if (err) logger.info(`Retry handler found API error with ${err.code} ${err.message}`)
           return undefined // retry handler only for logging retries, not to influence retry logic
         })
