@@ -6,20 +6,8 @@ import { Visit } from '../data/orchestrationApiTypes'
 export default class AuditService {
   private sqsClient: SQSClient
 
-  constructor(
-    private readonly accessKeyId = config.apis.audit.accessKeyId,
-    private readonly secretAccessKey = config.apis.audit.secretAccessKey,
-    private readonly region = config.apis.audit.region,
-    private readonly queueUrl = config.apis.audit.queueUrl,
-  ) {
-    this.sqsClient = new SQSClient({
-      region: this.region,
-      credentials: {
-        accessKeyId: this.accessKeyId,
-        secretAccessKey: this.secretAccessKey,
-      },
-      endpoint: config.apis.audit.endpoint,
-    })
+  constructor(private readonly queueUrl = config.apis.audit.queueUrl) {
+    this.sqsClient = new SQSClient({})
   }
 
   async changeEstablishment({
