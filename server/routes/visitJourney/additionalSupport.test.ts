@@ -267,7 +267,13 @@ testJourneys.forEach(journey => {
         .expect('location', `${journey.urlPrefix}/additional-support`)
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledWith('errors', [
-            { location: 'body', msg: 'No answer selected', param: 'additionalSupportRequired', value: undefined },
+            {
+              location: 'body',
+              msg: 'No answer selected',
+              path: 'additionalSupportRequired',
+              type: 'field',
+              value: undefined,
+            },
           ])
           expect(flashProvider).toHaveBeenCalledWith('formValues', {
             additionalSupport: [],
@@ -284,7 +290,13 @@ testJourneys.forEach(journey => {
         .expect('location', `${journey.urlPrefix}/additional-support`)
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledWith('errors', [
-            { location: 'body', msg: 'No answer selected', param: 'additionalSupportRequired', value: 'xyz' },
+            {
+              location: 'body',
+              msg: 'No answer selected',
+              path: 'additionalSupportRequired',
+              type: 'field',
+              value: 'xyz',
+            },
           ])
           expect(flashProvider).toHaveBeenCalledWith('formValues', {
             additionalSupportRequired: 'xyz',
@@ -302,7 +314,7 @@ testJourneys.forEach(journey => {
         .expect('location', `${journey.urlPrefix}/additional-support`)
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledWith('errors', [
-            { location: 'body', msg: 'No request selected', param: 'additionalSupport', value: [] },
+            { location: 'body', msg: 'No request selected', path: 'additionalSupport', type: 'field', value: [] },
           ])
           expect(flashProvider).toHaveBeenCalledWith('formValues', {
             additionalSupportRequired: 'yes',
@@ -322,7 +334,13 @@ testJourneys.forEach(journey => {
         .expect('location', `${journey.urlPrefix}/additional-support`)
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledWith('errors', [
-            { location: 'body', msg: 'No request selected', param: 'additionalSupport', value: ['xyz', 'WHEELCHAIR'] },
+            {
+              location: 'body',
+              msg: 'No request selected',
+              path: 'additionalSupport',
+              type: 'field',
+              value: ['xyz', 'WHEELCHAIR'],
+            },
           ])
           expect(flashProvider).toHaveBeenCalledWith('formValues', {
             additionalSupportRequired: 'yes',
@@ -341,7 +359,13 @@ testJourneys.forEach(journey => {
         .expect('location', `${journey.urlPrefix}/additional-support`)
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledWith('errors', [
-            { location: 'body', msg: 'Enter details of the request', param: 'otherSupportDetails', value: '' },
+            {
+              location: 'body',
+              msg: 'Enter details of the request',
+              path: 'otherSupportDetails',
+              type: 'field',
+              value: '',
+            },
           ])
           expect(flashProvider).toHaveBeenCalledWith('formValues', {
             additionalSupportRequired: 'yes',
@@ -361,7 +385,7 @@ testJourneys.forEach(journey => {
         .expect('location', `${journey.urlPrefix}/additional-support`)
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledWith('errors', [
-            { location: 'body', msg: 'No request selected', param: 'additionalSupport', value: [] },
+            { location: 'body', msg: 'No request selected', path: 'additionalSupport', type: 'field', value: [] },
           ])
           expect(flashProvider).toHaveBeenCalledWith('formValues', {
             additionalSupportRequired: 'yes',

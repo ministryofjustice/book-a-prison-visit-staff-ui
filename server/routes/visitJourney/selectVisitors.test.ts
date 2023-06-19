@@ -323,7 +323,9 @@ testJourneys.forEach(journey => {
     })
 
     it('should render validation errors from flash data for invalid input', () => {
-      flashData.errors = [{ location: 'body', msg: 'No visitors selected', param: 'visitors', value: undefined }]
+      flashData.errors = [
+        { location: 'body', msg: 'No visitors selected', path: 'visitors', type: 'field', value: undefined },
+      ]
 
       return request(sessionApp)
         .get(`${journey.urlPrefix}/select-visitors`)
@@ -815,7 +817,7 @@ testJourneys.forEach(journey => {
         .expect('location', `${journey.urlPrefix}/select-visitors`)
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledWith('errors', [
-            { location: 'body', msg: 'Add an adult to the visit', param: 'visitors', value: '1234' },
+            { location: 'body', msg: 'Add an adult to the visit', path: 'visitors', type: 'field', value: '1234' },
           ])
           expect(flashProvider).toHaveBeenCalledWith('formValues', { visitors: '1234' })
         })
@@ -829,7 +831,7 @@ testJourneys.forEach(journey => {
         .expect('location', `${journey.urlPrefix}/select-visitors`)
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledWith('errors', [
-            { location: 'body', msg: 'Invalid selection', param: 'visitors', value: '4321' },
+            { location: 'body', msg: 'Invalid selection', path: 'visitors', type: 'field', value: '4321' },
           ])
           expect(flashProvider).toHaveBeenCalledWith('formValues', { visitors: '4321' })
         })
@@ -842,7 +844,7 @@ testJourneys.forEach(journey => {
         .expect('location', `${journey.urlPrefix}/select-visitors`)
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledWith('errors', [
-            { location: 'body', msg: 'No visitors selected', param: 'visitors', value: undefined },
+            { location: 'body', msg: 'No visitors selected', path: 'visitors', type: 'field', value: undefined },
           ])
           expect(flashProvider).toHaveBeenCalledWith('formValues', {})
         })
@@ -856,7 +858,7 @@ testJourneys.forEach(journey => {
         .expect('location', `${journey.urlPrefix}/select-visitors`)
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledWith('errors', [
-            { location: 'body', msg: 'Add an adult to the visit', param: 'visitors', value: '4324' },
+            { location: 'body', msg: 'Add an adult to the visit', path: 'visitors', type: 'field', value: '4324' },
           ])
           expect(flashProvider).toHaveBeenCalledWith('formValues', { visitors: '4324' })
         })
@@ -872,7 +874,13 @@ testJourneys.forEach(journey => {
         .expect('location', `${journey.urlPrefix}/select-visitors`)
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledWith('errors', [
-            { location: 'body', msg: 'Select no more than 10 visitors', param: 'visitors', value: tooManyVisitorIds },
+            {
+              location: 'body',
+              msg: 'Select no more than 10 visitors',
+              path: 'visitors',
+              type: 'field',
+              value: tooManyVisitorIds,
+            },
           ])
           expect(flashProvider).toHaveBeenCalledWith('formValues', { visitors: tooManyVisitorIds })
         })

@@ -286,8 +286,8 @@ testJourneys.forEach(journey => {
           .expect('location', `${journey.urlPrefix}/select-main-contact`)
           .expect(() => {
             expect(flashProvider).toHaveBeenCalledWith('errors', [
-              { location: 'body', msg: 'No main contact selected', param: 'contact', value: undefined },
-              { location: 'body', msg: 'Enter a phone number', param: 'phoneNumber', value: '' },
+              { location: 'body', msg: 'No main contact selected', path: 'contact', type: 'field', value: undefined },
+              { location: 'body', msg: 'Enter a phone number', path: 'phoneNumber', type: 'field', value: '' },
             ])
             expect(flashProvider).toHaveBeenCalledWith('formValues', { phoneNumber: '', someoneElseName: '' })
           })
@@ -303,8 +303,14 @@ testJourneys.forEach(journey => {
           .expect('location', `${journey.urlPrefix}/select-main-contact`)
           .expect(() => {
             expect(flashProvider).toHaveBeenCalledWith('errors', [
-              { location: 'body', msg: 'Enter the name of the main contact', param: 'someoneElseName', value: '' },
-              { location: 'body', msg: 'Enter a phone number', param: 'phoneNumber', value: '' },
+              {
+                location: 'body',
+                msg: 'Enter the name of the main contact',
+                path: 'someoneElseName',
+                type: 'field',
+                value: '',
+              },
+              { location: 'body', msg: 'Enter a phone number', path: 'phoneNumber', type: 'field', value: '' },
             ])
             expect(flashProvider).toHaveBeenCalledWith('formValues', {
               contact: 'someoneElse',
@@ -326,7 +332,8 @@ testJourneys.forEach(journey => {
               {
                 location: 'body',
                 msg: 'Enter a valid UK phone number, like 01632 960 001, 07700 900 982 or +44 808 157 0192',
-                param: 'phoneNumber',
+                path: 'phoneNumber',
+                type: 'field',
                 value: 'abc123',
               },
             ])

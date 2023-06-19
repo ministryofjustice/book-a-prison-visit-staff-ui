@@ -764,7 +764,7 @@ describe('POST /visit/:reference/cancel', () => {
       .expect('location', '/visit/ab-cd-ef-gh/cancel')
       .expect(() => {
         expect(flashProvider).toHaveBeenCalledWith('errors', [
-          { location: 'body', msg: 'No answer selected', param: 'cancel', value: undefined },
+          { location: 'body', msg: 'No answer selected', path: 'cancel', type: 'field', value: undefined },
         ])
         expect(flashProvider).toHaveBeenCalledWith('formValues', {})
         expect(auditService.cancelledVisit).not.toHaveBeenCalled()
@@ -782,7 +782,8 @@ describe('POST /visit/:reference/cancel', () => {
           {
             location: 'body',
             msg: 'Enter a reason for the cancellation',
-            param: 'reason_prisoner_cancelled',
+            path: 'reason_prisoner_cancelled',
+            type: 'field',
             value: '',
           },
         ])
@@ -803,7 +804,7 @@ describe('POST /visit/:reference/cancel', () => {
       .expect('location', '/visit/ab-cd-ef-gh/cancel')
       .expect(() => {
         expect(flashProvider).toHaveBeenCalledWith('errors', [
-          { location: 'body', msg: 'No answer selected', param: 'cancel', value: 'INVALID_VALUE' },
+          { location: 'body', msg: 'No answer selected', path: 'cancel', type: 'field', value: 'INVALID_VALUE' },
         ])
         expect(flashProvider).toHaveBeenCalledWith('formValues', {
           cancel: 'INVALID_VALUE',

@@ -128,7 +128,7 @@ testJourneys.forEach(journey => {
           .expect('location', `${journey.urlPrefix}/visit-type`)
           .expect(() => {
             expect(flashProvider).toHaveBeenCalledWith('errors', [
-              { location: 'body', msg: 'No visit type selected', param: 'visitType', value: undefined },
+              { location: 'body', msg: 'No visit type selected', path: 'visitType', type: 'field', value: undefined },
             ])
           })
       })

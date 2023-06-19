@@ -440,7 +440,8 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
             {
               location: 'body',
               msg: 'Select the box to book a prison visit',
-              param: 'vo-override',
+              path: 'vo-override',
+              type: 'field',
               value: undefined,
             },
           ])
