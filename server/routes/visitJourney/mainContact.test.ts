@@ -170,8 +170,8 @@ testJourneys.forEach(journey => {
 
       it('should render validation errors from flash data for when no data entered', () => {
         flashData.errors = [
-          { location: 'body', msg: 'No main contact selected', param: 'contact', value: undefined },
-          { location: 'body', msg: 'Enter a phone number', param: 'phoneNumber', value: undefined },
+          { location: 'body', msg: 'No main contact selected', path: 'contact', type: 'field', value: undefined },
+          { location: 'body', msg: 'Enter a phone number', path: 'phoneNumber', type: 'field', value: undefined },
         ]
 
         return request(sessionApp)
@@ -193,8 +193,14 @@ testJourneys.forEach(journey => {
 
       it('should render validation errors from flash data for when no data entered', () => {
         flashData.errors = [
-          { location: 'body', msg: 'Enter the name of the main contact', param: 'someoneElseName', value: '' },
-          { location: 'body', msg: 'Enter a phone number', param: 'phoneNumber', value: '' },
+          {
+            location: 'body',
+            msg: 'Enter the name of the main contact',
+            path: 'someoneElseName',
+            type: 'field',
+            value: '',
+          },
+          { location: 'body', msg: 'Enter a phone number', path: 'phoneNumber', type: 'field', value: '' },
         ]
 
         flashData.formValues = [{ contact: 'someoneElse' }]

@@ -130,7 +130,8 @@ testJourneys.forEach(journey => {
       flashData.errors = [
         {
           msg: 'No answer selected',
-          param: 'additionalSupportRequired',
+          path: 'additionalSupportRequired',
+          type: 'field',
           location: 'body',
         },
       ]
@@ -155,7 +156,8 @@ testJourneys.forEach(journey => {
         {
           value: [],
           msg: 'No request selected',
-          param: 'additionalSupport',
+          path: 'additionalSupport',
+          type: 'field',
           location: 'body',
         },
       ]
@@ -183,7 +185,8 @@ testJourneys.forEach(journey => {
         {
           value: '',
           msg: 'Enter details of the request',
-          param: 'otherSupportDetails',
+          path: 'otherSupportDetails',
+          type: 'field',
           location: 'body',
         },
       ]

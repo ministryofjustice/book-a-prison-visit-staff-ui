@@ -97,7 +97,8 @@ testJourneys.forEach(journey => {
         flashData.errors = [
           {
             msg: 'No visit type selected',
-            param: 'visitType',
+            path: 'visitType',
+            type: 'field',
             location: 'body',
           },
         ]

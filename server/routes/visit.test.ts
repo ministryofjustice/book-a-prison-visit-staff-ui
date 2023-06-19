@@ -587,7 +587,8 @@ describe('GET /visit/:reference/cancel', () => {
     flashData.errors = [
       {
         msg: 'No answer selected',
-        param: 'cancel',
+        path: 'cancel',
+        type: 'field',
         location: 'body',
       },
     ]
@@ -613,7 +614,8 @@ describe('GET /visit/:reference/cancel', () => {
       {
         value: '',
         msg: 'Enter a reason for the cancellation',
-        param: 'reason_establishment_cancelled',
+        path: 'reason_establishment_cancelled',
+        type: 'field',
         location: 'body',
       },
     ]

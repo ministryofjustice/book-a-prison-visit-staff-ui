@@ -113,7 +113,7 @@ export function registerNunjucks(app?: express.Express): Environment {
     return Object.keys(errors).map(error => {
       return {
         text: errors[error].msg,
-        href: `#${errors[error].param}-error`,
+        href: `#${errors[error].path}-error`,
       }
     })
   })
@@ -121,7 +121,7 @@ export function registerNunjucks(app?: express.Express): Environment {
   // find specific error and return errorMessage for field validation
   njkEnv.addFilter('findError', (errors, formFieldId) => {
     if (!errors || !formFieldId) return null
-    const errorForMessage = errors.find((error: FormError) => error.param === formFieldId)
+    const errorForMessage = errors.find((error: FormError) => error.path === formFieldId)
 
     if (errorForMessage === undefined) return null
 

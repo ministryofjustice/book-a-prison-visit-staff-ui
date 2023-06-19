@@ -87,7 +87,8 @@ export type VisitSlotList = {
 export type FormError = {
   value: string
   msg: string
-  param: string
+  path: string
+  type: string
   location: string
 }
 

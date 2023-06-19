@@ -304,7 +304,8 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
       flashData.errors = [
         {
           msg: 'Select the box to book a prison visit',
-          param: 'vo-override',
+          path: 'vo-override',
+          type: 'field',
           location: 'body',
         },
       ]
