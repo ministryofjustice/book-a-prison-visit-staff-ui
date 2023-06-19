@@ -336,6 +336,7 @@ testJourneys.forEach(journey => {
           expect($('h1').text().trim()).toBe('Select visitors from the prisoner’s approved visitor list')
           expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
           expect($('.govuk-error-summary__body').text()).toContain('No visitors selected')
+          expect($('.govuk-error-summary__body a').attr('href')).toBe('#visitors-error')
           expect($('#visitors-error').text()).toContain('No visitors selected')
           expect(flashProvider).toHaveBeenCalledWith('errors')
           expect(flashProvider).toHaveBeenCalledWith('formValues')

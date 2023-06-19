@@ -267,6 +267,7 @@ testJourneys.forEach(journey => {
             expect($('h1').text().trim()).toBe('Select date and time of visit')
             expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
             expect($('.govuk-error-summary__body').text()).toContain('No time slot selected')
+            expect($('.govuk-error-summary__body a').attr('href')).toBe('#visit-date-and-time-error')
             expect(flashProvider).toHaveBeenCalledWith('errors')
             expect(flashProvider).toHaveBeenCalledWith('formValues')
             expect(flashProvider).toHaveBeenCalledTimes(2)
