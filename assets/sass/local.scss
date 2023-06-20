@@ -1,4 +1,4 @@
-.govuk-main-wrapper a:not(.govuk-button, .govuk-tabs__tab, .bapv-timetable-dates__date--selected>a, .moj-pagination__link):visited,
+.govuk-main-wrapper a:not(.govuk-button, .govuk-tabs__tab, .bapv-timetable-dates__date--selected>a, .moj-pagination__link, .govuk-error-summary a):visited,
 .location-bar .location-bar__location a:visited {
   color: $govuk-link-colour;
 }
