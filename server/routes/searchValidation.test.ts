@@ -6,7 +6,8 @@ describe('validatePrisonerSearch', () => {
   })
   it('tooShort', () => {
     expect(validatePrisonerSearch('b')).toStrictEqual({
-      param: '#search',
+      path: 'search',
+      type: 'field',
       msg: 'You must enter at least 2 characters',
     })
   })
@@ -18,19 +19,22 @@ describe('validateVisitSearch', () => {
   })
   it('empty', () => {
     expect(validateVisitSearch('')).toStrictEqual({
-      param: '#searchBlock1',
+      path: 'searchBlock1',
+      type: 'field',
       msg: 'Booking reference must be 8 characters',
     })
   })
   it('short', () => {
     expect(validateVisitSearch('sd-fs-df-f')).toStrictEqual({
-      param: '#searchBlock1',
+      path: 'searchBlock1',
+      type: 'field',
       msg: 'Booking reference must be 8 characters',
     })
   })
   it('invalid', () => {
     expect(validateVisitSearch('sd-lf-s1-ff')).toStrictEqual({
-      param: '#searchBlock1',
+      path: 'searchBlock1',
+      type: 'field',
       msg: 'Booking reference must only include lower case letters',
     })
   })
