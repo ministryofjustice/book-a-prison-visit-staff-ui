@@ -410,7 +410,7 @@ testJourneys.forEach(journey => {
           personId: 4322,
           name: 'Bob Smith',
           dateOfBirth: undefined,
-          adult: undefined,
+          adult: true,
           relationshipDescription: 'Brother',
           address: '1st listed address',
           restrictions: [],
