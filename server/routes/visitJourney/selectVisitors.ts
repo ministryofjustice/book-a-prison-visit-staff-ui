@@ -25,7 +25,7 @@ export default class SelectVisitors {
     }
     req.session.visitorList.visitors = visitorList
 
-    const atLeastOneAdult = visitorList.some(visitor => visitor.adult === true)
+    const atLeastOneAdult = visitorList.some(visitor => visitor.adult === true || visitor.adult === undefined)
 
     const restrictions = await this.prisonerProfileService.getRestrictions(offenderNo, res.locals.user.username)
     visitSessionData.prisoner.restrictions = restrictions
