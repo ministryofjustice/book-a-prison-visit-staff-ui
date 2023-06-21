@@ -170,8 +170,8 @@ testJourneys.forEach(journey => {
 
       it('should render validation errors from flash data for when no data entered', () => {
         flashData.errors = [
-          { location: 'body', msg: 'No main contact selected', param: 'contact', value: undefined },
-          { location: 'body', msg: 'Enter a phone number', param: 'phoneNumber', value: undefined },
+          { location: 'body', msg: 'No main contact selected', path: 'contact', type: 'field', value: undefined },
+          { location: 'body', msg: 'Enter a phone number', path: 'phoneNumber', type: 'field', value: undefined },
         ]
 
         return request(sessionApp)
@@ -182,7 +182,9 @@ testJourneys.forEach(journey => {
             const $ = cheerio.load(res.text)
             expect($('h1').text().trim()).toBe('Who is the main contact for this booking?')
             expect($('.govuk-error-summary__body').text()).toContain('No main contact selected')
+            expect($('.govuk-error-summary__body a').eq(0).attr('href')).toBe('#contact-error')
             expect($('.govuk-error-summary__body').text()).toContain('Enter a phone number')
+            expect($('.govuk-error-summary__body a').eq(1).attr('href')).toBe('#phoneNumber-error')
             expect($('#contact-error').text()).toContain('No main contact selected')
             expect($('#phoneNumber-error').text()).toContain('Enter a phone number')
             expect(flashProvider).toHaveBeenCalledWith('errors')
@@ -193,8 +195,14 @@ testJourneys.forEach(journey => {
 
       it('should render validation errors from flash data for when no data entered', () => {
         flashData.errors = [
-          { location: 'body', msg: 'Enter the name of the main contact', param: 'someoneElseName', value: '' },
-          { location: 'body', msg: 'Enter a phone number', param: 'phoneNumber', value: '' },
+          {
+            location: 'body',
+            msg: 'Enter the name of the main contact',
+            path: 'someoneElseName',
+            type: 'field',
+            value: '',
+          },
+          { location: 'body', msg: 'Enter a phone number', path: 'phoneNumber', type: 'field', value: '' },
         ]
 
         flashData.formValues = [{ contact: 'someoneElse' }]
@@ -286,8 +294,8 @@ testJourneys.forEach(journey => {
           .expect('location', `${journey.urlPrefix}/select-main-contact`)
           .expect(() => {
             expect(flashProvider).toHaveBeenCalledWith('errors', [
-              { location: 'body', msg: 'No main contact selected', param: 'contact', value: undefined },
-              { location: 'body', msg: 'Enter a phone number', param: 'phoneNumber', value: '' },
+              { location: 'body', msg: 'No main contact selected', path: 'contact', type: 'field', value: undefined },
+              { location: 'body', msg: 'Enter a phone number', path: 'phoneNumber', type: 'field', value: '' },
             ])
             expect(flashProvider).toHaveBeenCalledWith('formValues', { phoneNumber: '', someoneElseName: '' })
           })
@@ -303,8 +311,14 @@ testJourneys.forEach(journey => {
           .expect('location', `${journey.urlPrefix}/select-main-contact`)
           .expect(() => {
             expect(flashProvider).toHaveBeenCalledWith('errors', [
-              { location: 'body', msg: 'Enter the name of the main contact', param: 'someoneElseName', value: '' },
-              { location: 'body', msg: 'Enter a phone number', param: 'phoneNumber', value: '' },
+              {
+                location: 'body',
+                msg: 'Enter the name of the main contact',
+                path: 'someoneElseName',
+                type: 'field',
+                value: '',
+              },
+              { location: 'body', msg: 'Enter a phone number', path: 'phoneNumber', type: 'field', value: '' },
             ])
             expect(flashProvider).toHaveBeenCalledWith('formValues', {
               contact: 'someoneElse',
@@ -326,7 +340,8 @@ testJourneys.forEach(journey => {
               {
                 location: 'body',
                 msg: 'Enter a valid UK phone number, like 01632 960 001, 07700 900 982 or +44 808 157 0192',
-                param: 'phoneNumber',
+                path: 'phoneNumber',
+                type: 'field',
                 value: 'abc123',
               },
             ])

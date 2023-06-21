@@ -162,7 +162,8 @@ export default function routes({ auditService, prisonerSearchService, visitServi
         if (e?.status !== 404) {
           errors.push({
             msg: e.message,
-            param: '#searchBlock1',
+            path: 'searchBlock1',
+            type: 'field',
           })
         }
       }

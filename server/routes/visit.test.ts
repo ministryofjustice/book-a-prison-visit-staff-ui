@@ -587,7 +587,8 @@ describe('GET /visit/:reference/cancel', () => {
     flashData.errors = [
       {
         msg: 'No answer selected',
-        param: 'cancel',
+        path: 'cancel',
+        type: 'field',
         location: 'body',
       },
     ]
@@ -602,6 +603,7 @@ describe('GET /visit/:reference/cancel', () => {
         expect($('input[name="cancel"]').length).toBe(4)
         expect($('input[name="cancel"]:checked').length).toBe(0)
         expect($('.govuk-error-summary__body').text()).toContain('No answer selected')
+        expect($('.govuk-error-summary__body a').attr('href')).toBe('#cancel-error')
         expect(flashProvider).toHaveBeenCalledWith('errors')
         expect(flashProvider).toHaveBeenCalledWith('formValues')
         expect(flashProvider).toHaveBeenCalledTimes(2)
@@ -613,7 +615,8 @@ describe('GET /visit/:reference/cancel', () => {
       {
         value: '',
         msg: 'Enter a reason for the cancellation',
-        param: 'reason_establishment_cancelled',
+        path: 'reason_establishment_cancelled',
+        type: 'field',
         location: 'body',
       },
     ]
@@ -630,6 +633,7 @@ describe('GET /visit/:reference/cancel', () => {
         expect($('input[name="cancel"]').length).toBe(4)
         expect($('[data-test="establishment_cancelled"]').prop('checked')).toBe(true)
         expect($('.govuk-error-summary__body').text()).toContain('Enter a reason for the cancellation')
+        expect($('.govuk-error-summary__body a').attr('href')).toBe('#reason_establishment_cancelled-error')
         expect(flashProvider).toHaveBeenCalledWith('errors')
         expect(flashProvider).toHaveBeenCalledWith('formValues')
         expect(flashProvider).toHaveBeenCalledTimes(2)
@@ -764,7 +768,7 @@ describe('POST /visit/:reference/cancel', () => {
       .expect('location', '/visit/ab-cd-ef-gh/cancel')
       .expect(() => {
         expect(flashProvider).toHaveBeenCalledWith('errors', [
-          { location: 'body', msg: 'No answer selected', param: 'cancel', value: undefined },
+          { location: 'body', msg: 'No answer selected', path: 'cancel', type: 'field', value: undefined },
         ])
         expect(flashProvider).toHaveBeenCalledWith('formValues', {})
         expect(auditService.cancelledVisit).not.toHaveBeenCalled()
@@ -782,7 +786,8 @@ describe('POST /visit/:reference/cancel', () => {
           {
             location: 'body',
             msg: 'Enter a reason for the cancellation',
-            param: 'reason_prisoner_cancelled',
+            path: 'reason_prisoner_cancelled',
+            type: 'field',
             value: '',
           },
         ])
@@ -803,7 +808,7 @@ describe('POST /visit/:reference/cancel', () => {
       .expect('location', '/visit/ab-cd-ef-gh/cancel')
       .expect(() => {
         expect(flashProvider).toHaveBeenCalledWith('errors', [
-          { location: 'body', msg: 'No answer selected', param: 'cancel', value: 'INVALID_VALUE' },
+          { location: 'body', msg: 'No answer selected', path: 'cancel', type: 'field', value: 'INVALID_VALUE' },
         ])
         expect(flashProvider).toHaveBeenCalledWith('formValues', {
           cancel: 'INVALID_VALUE',

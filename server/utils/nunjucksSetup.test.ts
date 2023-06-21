@@ -225,11 +225,13 @@ describe('Nunjucks Filters', () => {
         errors: [
           {
             msg: 'Field 1 message',
-            param: 'field1',
+            path: 'field1',
+            type: 'field',
           },
           {
             msg: 'Field 2 message',
-            param: 'field2',
+            path: 'field2',
+            type: 'field',
           },
         ],
       }

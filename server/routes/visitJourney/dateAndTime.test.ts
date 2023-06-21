@@ -254,7 +254,9 @@ testJourneys.forEach(journey => {
       })
 
       it('should render validation errors from flash data for invalid input', () => {
-        flashData.errors = [{ location: 'body', msg: 'No time slot selected', param: 'visit-date-and-time' }]
+        flashData.errors = [
+          { location: 'body', msg: 'No time slot selected', path: 'visit-date-and-time', type: 'field' },
+        ]
 
         return request(sessionApp)
           .get(`${journey.urlPrefix}/select-date-and-time`)
@@ -265,6 +267,7 @@ testJourneys.forEach(journey => {
             expect($('h1').text().trim()).toBe('Select date and time of visit')
             expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
             expect($('.govuk-error-summary__body').text()).toContain('No time slot selected')
+            expect($('.govuk-error-summary__body a').attr('href')).toBe('#visit-date-and-time-error')
             expect(flashProvider).toHaveBeenCalledWith('errors')
             expect(flashProvider).toHaveBeenCalledWith('formValues')
             expect(flashProvider).toHaveBeenCalledTimes(2)
@@ -422,7 +425,13 @@ testJourneys.forEach(journey => {
           .expect('location', `${journey.urlPrefix}/select-date-and-time`)
           .expect(() => {
             expect(flashProvider).toHaveBeenCalledWith('errors', [
-              { location: 'body', msg: 'No time slot selected', param: 'visit-date-and-time', value: undefined },
+              {
+                location: 'body',
+                msg: 'No time slot selected',
+                path: 'visit-date-and-time',
+                type: 'field',
+                value: undefined,
+              },
             ])
             expect(flashProvider).toHaveBeenCalledWith('formValues', {})
             expect(auditService.reservedVisit).not.toHaveBeenCalled()
@@ -437,7 +446,13 @@ testJourneys.forEach(journey => {
           .expect('location', `${journey.urlPrefix}/select-date-and-time`)
           .expect(() => {
             expect(flashProvider).toHaveBeenCalledWith('errors', [
-              { location: 'body', msg: 'No time slot selected', param: 'visit-date-and-time', value: '100' },
+              {
+                location: 'body',
+                msg: 'No time slot selected',
+                path: 'visit-date-and-time',
+                type: 'field',
+                value: '100',
+              },
             ])
             expect(flashProvider).toHaveBeenCalledWith('formValues', { 'visit-date-and-time': '100' })
             expect(auditService.reservedVisit).not.toHaveBeenCalled()

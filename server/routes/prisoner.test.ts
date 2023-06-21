@@ -304,7 +304,8 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
       flashData.errors = [
         {
           msg: 'Select the box to book a prison visit',
-          param: 'vo-override',
+          path: 'vo-override',
+          type: 'field',
           location: 'body',
         },
       ]
@@ -316,6 +317,7 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('.govuk-error-summary__body').text()).toContain('Select the box to book a prison visit')
+          expect($('.govuk-error-summary__body a').attr('href')).toBe('#vo-override-error')
           expect($('h1').text().trim()).toBe('Smith, John')
           expect($('[data-test="remaining-vos"]').text()).toBe('0')
           expect($('[data-test="remaining-pvos"]').text()).toBe('0')
@@ -440,7 +442,8 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
             {
               location: 'body',
               msg: 'Select the box to book a prison visit',
-              param: 'vo-override',
+              path: 'vo-override',
+              type: 'field',
               value: undefined,
             },
           ])
