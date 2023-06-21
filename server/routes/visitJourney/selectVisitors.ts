@@ -25,7 +25,8 @@ export default class SelectVisitors {
     }
     req.session.visitorList.visitors = visitorList
 
-    const atLeastOneAdult = visitorList.some(visitor => visitor.adult === true || visitor.adult === undefined)
+    const atLeastOneAdult = visitorList.some(visitor => visitor.adult !== false)
+    const eligibleVisitors = visitorList.some(visitor => visitor.banned === false && visitor.adult !== false)
 
     const restrictions = await this.prisonerProfileService.getRestrictions(offenderNo, res.locals.user.username)
     visitSessionData.prisoner.restrictions = restrictions
@@ -44,6 +45,7 @@ export default class SelectVisitors {
       prisonerName: visitSessionData.prisoner.name,
       visitorList,
       atLeastOneAdult,
+      eligibleVisitors,
       restrictions,
       selectVisitorsText,
       formValues,
