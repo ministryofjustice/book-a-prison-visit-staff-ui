@@ -148,6 +148,7 @@ describe('Visit service', () => {
             {
               personId: 123,
               name: 'visitor name',
+              adult: true,
               relationshipDescription: 'relationship desc',
               restrictions: [
                 {
@@ -237,6 +238,7 @@ describe('Visit service', () => {
             {
               personId: 123,
               name: 'visitor name',
+              adult: true,
               relationshipDescription: 'rel desc',
               restrictions: [
                 {
@@ -326,6 +328,7 @@ describe('Visit service', () => {
             {
               personId: 123,
               name: 'visitor name',
+              adult: true,
               relationshipDescription: 'relationship desc',
               restrictions: [
                 {
@@ -734,6 +737,7 @@ describe('Visit service', () => {
                 {
                   personId: 4729570,
                   name: 'Tess Bennett',
+                  adult: true,
                   relationshipDescription: 'Aunt',
                   address: 'Not entered',
                   restrictions: [],
@@ -755,8 +759,8 @@ describe('Visit service', () => {
                 visitTime: '10am to 11am',
                 visitType: 'OPEN',
                 sortField: '2022-05-23T10:00:00',
-                adults: 1,
-                children: 1,
+                adults: 2,
+                children: 0,
               },
             ],
             closedSlots: [],

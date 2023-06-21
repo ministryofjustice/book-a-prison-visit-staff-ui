@@ -32,6 +32,7 @@ testJourneys.forEach(journey => {
         {
           personId: 123,
           name: 'name last',
+          adult: true,
           relationshipDescription: 'relate',
           restrictions: [],
           banned: false,
@@ -44,6 +45,7 @@ testJourneys.forEach(journey => {
         {
           personId: 122,
           name: 'first last',
+          adult: true,
           relationshipDescription: 'cousin',
           restrictions: [],
           banned: false,
@@ -51,6 +53,7 @@ testJourneys.forEach(journey => {
         {
           personId: 123,
           name: 'name last',
+          adult: true,
           relationshipDescription: 'relate',
           restrictions: [],
           banned: false,
@@ -82,6 +85,7 @@ testJourneys.forEach(journey => {
           {
             personId: 123,
             name: 'name last',
+            adult: true,
             relationshipDescription: 'relate',
             restrictions: [],
             banned: false,
@@ -124,6 +128,7 @@ testJourneys.forEach(journey => {
           contact: {
             personId: 123,
             name: 'name last',
+            adult: true,
             relationshipDescription: 'relate',
             restrictions: [],
             banned: false,
@@ -237,6 +242,7 @@ testJourneys.forEach(journey => {
             expect(visitSessionData.mainContact.contact).toEqual({
               personId: 123,
               name: 'name last',
+              adult: true,
               relationshipDescription: 'relate',
               restrictions: [],
               banned: false,
@@ -266,6 +272,7 @@ testJourneys.forEach(journey => {
           contact: {
             personId: 123,
             name: 'name last',
+            adult: true,
             relationshipDescription: 'relate',
             restrictions: [],
             banned: false,

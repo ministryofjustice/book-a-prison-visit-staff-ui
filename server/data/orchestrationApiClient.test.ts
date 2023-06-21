@@ -269,6 +269,7 @@ describe('orchestrationApiClient', () => {
           {
             personId: 123,
             name: 'visitor name',
+            adult: true,
             relationshipDescription: 'relationship desc',
             restrictions: [
               {
@@ -368,6 +369,7 @@ describe('orchestrationApiClient', () => {
           {
             personId: 123,
             name: 'visitor name',
+            adult: true,
             relationshipDescription: 'relationship desc',
             restrictions: [
               {
