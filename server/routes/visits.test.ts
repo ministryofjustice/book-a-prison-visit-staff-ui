@@ -109,6 +109,7 @@ describe('GET /visits', () => {
             {
               personId: 4729570,
               name: 'Tess Bennett',
+              adult: true,
               relationshipDescription: 'Aunt',
               address: 'Not entered',
               restrictions: [],
@@ -141,6 +142,7 @@ describe('GET /visits', () => {
             {
               personId: 4729570,
               name: 'Tess Bennett',
+              adult: true,
               relationshipDescription: 'Aunt',
               address: 'Not entered',
               restrictions: [],

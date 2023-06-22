@@ -59,6 +59,7 @@ testJourneys.forEach(journey => {
           {
             personId: 123,
             name: 'name last',
+            adult: true,
             relationshipDescription: 'relate',
             restrictions: [
               {
@@ -145,6 +146,7 @@ testJourneys.forEach(journey => {
             {
               personId: 123,
               name: 'name last',
+              adult: true,
               relationshipDescription: 'relate',
               restrictions: [
                 {

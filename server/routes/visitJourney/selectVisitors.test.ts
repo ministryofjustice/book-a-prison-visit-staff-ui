@@ -81,7 +81,7 @@ testJourneys.forEach(journey => {
           personId: 4322,
           name: 'Bob Smith',
           dateOfBirth: undefined,
-          adult: undefined,
+          adult: true,
           relationshipDescription: 'Brother',
           address: '1st listed address',
           restrictions: [],
@@ -256,8 +256,8 @@ testJourneys.forEach(journey => {
       visitSessionData.visitors = [
         {
           address: '1st listed address',
-          adult: undefined,
           dateOfBirth: undefined,
+          adult: true,
           name: 'Bob Smith',
           personId: 4322,
           relationshipDescription: 'Brother',
@@ -286,8 +286,8 @@ testJourneys.forEach(journey => {
       visitSessionData.visitors = [
         {
           address: '1st listed address',
-          adult: undefined,
           dateOfBirth: undefined,
+          adult: true,
           name: 'Bob Smith',
           personId: 4322,
           relationshipDescription: 'Brother',
