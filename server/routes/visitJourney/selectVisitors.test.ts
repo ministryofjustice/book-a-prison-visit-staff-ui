@@ -387,10 +387,50 @@ testJourneys.forEach(journey => {
           expect($('input[name="visitors"]').length).toBe(1)
           expect($('[data-test="submit"]').length).toBe(0)
           expect($('[data-test="back-to-start"]').length).toBe(1)
-          // expect($('#visitor-4324').attr('disabled')).toBe('disabled')
+          expect($('#visitor-4324').attr('disabled')).toBe('disabled')
           expect($('.govuk-warning-text__text').text().replace(/\s+/g, ' ')).toContain(
             'There are no approved visitors over 18 for this prisoner. A booking cannot be made at this time.',
           )
+        })
+    })
+
+    it('should show not disable child visitors if an unbanned adult visitor is also present', () => {
+      returnData = [
+        {
+          personId: 4324,
+          name: 'Anne Smith',
+          dateOfBirth: '2018-03-02',
+          adult: false,
+          relationshipDescription: 'Niece',
+          address: 'Not entered',
+          restrictions: [],
+          banned: false,
+        },
+        {
+          personId: 4322,
+          name: 'Bob Smith',
+          dateOfBirth: undefined,
+          adult: true,
+          relationshipDescription: 'Brother',
+          address: '1st listed address',
+          restrictions: [],
+          banned: false,
+        },
+      ]
+      prisonerVisitorsService.getVisitors.mockResolvedValue(returnData)
+
+      return request(sessionApp)
+        .get(`${journey.urlPrefix}/select-visitors`)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text().trim()).toBe('Select visitors from the prisoner’s approved visitor list')
+          expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
+          expect($('input[name="visitors"]').length).toBe(2)
+          expect($('[data-test="submit"]').length).toBe(1)
+          expect($('[data-test="back-to-start"]').length).toBe(0)
+          expect($('#visitor-4324').attr('disabled')).toBe(undefined)
+          expect($('#visitor-4322').attr('disabled')).toBe(undefined)
         })
     })
 
