@@ -254,7 +254,7 @@ export interface operations {
    */
   getPrisonerContact: {
     parameters: {
-      query: {
+      query?: {
         /**
          * @description Query by Type (NOMIS Contact Type)
          * @example S

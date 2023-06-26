@@ -244,24 +244,28 @@ export default class TestData {
 
   static sessionSchedule = ({
     sessionTemplateReference = '1',
-    startTime = '13:45',
-    endTime = '15:45',
+    sessionTimeSlot = {
+      startTime: '13:45',
+      endTime: '15:45',
+    },
+    sessionDateRange = {
+      validFromDate: '2023-02-01',
+      validToDate: undefined,
+    },
     capacity = { closed: 0, open: 40 },
     prisonerLocationGroupNames = [],
     prisonerCategoryGroupNames = [],
     prisonerIncentiveLevelGroupNames = [],
-    sessionTemplateFrequency = 'WEEKLY',
-    sessionTemplateEndDate = '',
+    weeklyFrequency = 1,
   }: Partial<SessionSchedule> = {}): SessionSchedule => ({
     sessionTemplateReference,
-    startTime,
-    endTime,
+    sessionTimeSlot,
+    sessionDateRange,
     capacity,
     prisonerLocationGroupNames,
     prisonerCategoryGroupNames,
     prisonerIncentiveLevelGroupNames,
-    sessionTemplateFrequency,
-    sessionTemplateEndDate,
+    weeklyFrequency,
   })
 
   static supportedPrisons = ({
