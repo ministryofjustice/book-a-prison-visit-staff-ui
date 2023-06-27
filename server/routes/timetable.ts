@@ -1,5 +1,4 @@
 import { type RequestHandler, Router } from 'express'
-import sessionTemplateFrequency from '../constants/sessionTemplateFrequency'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import type { Services } from '../services'
 import { getParsedDateFromQueryString, getWeekOfDatesStartingMonday } from '../utils/utils'
@@ -26,7 +25,6 @@ export default function routes({ visitSessionsService }: Services): Router {
     res.render('pages/timetable', {
       schedules,
       selectedDate,
-      sessionTemplateFrequency,
       weekOfDates,
       previousWeek,
       nextWeek,
