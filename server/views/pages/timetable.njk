@@ -39,34 +39,43 @@
 
 {% macro scheduleRowByType(scheduleRows, schedule, type) %}
   {% if schedule.capacity[type] !== 0 %}
-   {% set rowNumber = scheduleRows | length %}
-    {% set scheduleRows = (scheduleRows.push([
-      {
-        text: (selectedDate + 'T' + schedule.sessionTimeSlot.startTime) | formatTime +
-        ' to ' + (selectedDate + 'T' + schedule.sessionTimeSlot.endTime) | formatTime,
-        attributes: { "data-test" : "schedule-time-" + rowNumber } 
-      },
-      {
-        text: type | capitalize,
-        attributes: { "data-test" : "schedule-type-" + rowNumber } 
-      },
-      {
-        text: schedule.capacity[type] + ' tables',
-        attributes: { "data-test" : "schedule-capacity-" + rowNumber } 
-      },
-      {
-        text: attendees(schedule.prisonerIncentiveLevelGroupNames, schedule.prisonerCategoryGroupNames, schedule.prisonerLocationGroupNames),
-        attributes: { "data-test" : "schedule-attendees-" + rowNumber } 
-      },
-      {
-        text: "Every week" if schedule.weeklyFrequency === 1 else "Every " + schedule.weeklyFrequency + " weeks",
-        attributes: { "data-test" : "schedule-frequency-" + rowNumber } 
-      },
-      {
-        text: schedule.sessionDateRange.validToDate | formatDate or 'Not entered' ,
-        attributes: { "data-test" : "schedule-end-date-" + rowNumber } 
-      }
-   ]), scheduleRows) %}
+    {% set rowNumber = scheduleRows | length %}
+
+      {% set frequency -%}
+        {% if schedule.sessionDateRange.validToDate and schedule.sessionDateRange.validFromDate === schedule.sessionDateRange.validToDate -%}
+          One off
+        {%- else %}
+          {{- "Every week" if schedule.weeklyFrequency === 1 else "Every " + schedule.weeklyFrequency + " weeks" -}}
+        {% endif %}
+      {%- endset %}
+    
+      {% set scheduleRows = (scheduleRows.push([
+        {
+          text: (selectedDate + 'T' + schedule.sessionTimeSlot.startTime) | formatTime +
+          ' to ' + (selectedDate + 'T' + schedule.sessionTimeSlot.endTime) | formatTime,
+          attributes: { "data-test" : "schedule-time-" + rowNumber } 
+        },
+        {
+          text: type | capitalize,
+          attributes: { "data-test" : "schedule-type-" + rowNumber } 
+        },
+        {
+          text: schedule.capacity[type] + ' tables',
+          attributes: { "data-test" : "schedule-capacity-" + rowNumber } 
+        },
+        {
+          text: attendees(schedule.prisonerIncentiveLevelGroupNames, schedule.prisonerCategoryGroupNames, schedule.prisonerLocationGroupNames),
+          attributes: { "data-test" : "schedule-attendees-" + rowNumber } 
+        },
+        {
+          text: frequency,
+          attributes: { "data-test" : "schedule-frequency-" + rowNumber } 
+        },
+        {
+          text: schedule.sessionDateRange.validToDate | formatDate or 'Not entered' ,
+          attributes: { "data-test" : "schedule-end-date-" + rowNumber } 
+        }
+    ]), scheduleRows) %}
   {% endif %}
 {% endmacro %}
 
