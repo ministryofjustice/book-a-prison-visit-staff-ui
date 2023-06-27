@@ -512,7 +512,12 @@ export interface paths {
   '/api/finance/prison/{prisonId}/offenders/{offenderNo}/transfer-to-savings': {
     /**
      * Post a financial transaction to NOMIS.
-     * @description Notes:<br/><ul><li>If the field X-Client-Name is present in the request header then the value is prepended to the client_unique_ref separated by a dash</li><li>The client_unique_ref can have a maximum of 64 characters, only alphabetic, numeric, ‘-’ and ‘_’ characters are allowed</li></ul>
+     * @description Notes:<br/>
+     *   <ul>
+     *     <li>If the field X-Client-Name is present in the request header then the value is prepended to the client_unique_ref separated by a dash</li>
+     *     <li>The client_unique_ref can have a maximum of 64 characters, only alphabetic, numeric, ‘-’ and ‘_’ characters are allowed</li>
+     *   </ul>
+     * <p>Requires role NOMIS_API_V1</p>
      */
     post: operations['transferToSavings']
   }
@@ -522,18 +527,6 @@ export interface paths {
      * @description A list of offender educations given a list of offender identifiers
      */
     post: operations['getPrisonerEducationsInBulk']
-  }
-  '/api/digital-warrant/booking/{bookingId}/sentence': {
-    /** Create a sentence */
-    post: operations['createSentence']
-  }
-  '/api/digital-warrant/booking/{bookingId}/court-case': {
-    /** Create a court case */
-    post: operations['createCourtCase']
-  }
-  '/api/digital-warrant/booking/{bookingId}/charge': {
-    /** Create a Court case charge */
-    post: operations['createCharge']
   }
   '/api/case-notes/usage': {
     /**
@@ -691,7 +684,7 @@ export interface paths {
   '/api/bookings/offence-history': {
     /**
      * Offence histories.
-     * @description Offence histories for a set of booking ids.
+     * @description Offence histories for a set of booking ids.<p>This endpoint uses the REPLICA database.</p>
      */
     post: operations['getOffenceHistoryForBookings']
   }
@@ -1107,7 +1100,7 @@ export interface paths {
   '/api/offenders/{offenderNo}/non-association-details': {
     /**
      * Gets the offender non-association details for a given offender for ALL bookings
-     * @description Get offender non-association details by offender No
+     * @description Get offender non-association details by offender No<p>This endpoint uses the REPLICA database.</p>
      */
     get: operations['getNonAssociationDetails']
   }
@@ -1471,9 +1464,19 @@ export interface paths {
      */
     get: operations['getPrisonerEducations']
   }
-  '/api/digital-warrant/court-date-results/{offenderId}': {
-    /** Returns details of all court dates and the result of each. */
+  '/api/court-date-results/{offenderId}': {
+    /**
+     * Returns details of all court dates and the result of each.
+     * @description <p>This endpoint uses the REPLICA database.</p>
+     */
     get: operations['getCourtDateResults']
+  }
+  '/api/digital-warrant/court-date-results/{offenderId}': {
+    /**
+     * Returns details of all court dates and the result of each.
+     * @description <p>This endpoint uses the REPLICA database.</p>
+     */
+    get: operations['getCourtDateResults_1']
   }
   '/api/cell/{locationId}/history': {
     /** @description <p>This endpoint uses the REPLICA database.</p> */
@@ -1611,7 +1614,7 @@ export interface paths {
   '/api/bookings/{bookingId}/non-association-details': {
     /**
      * Gets the offender non-association details for a given booking
-     * @description Get offender non-association details
+     * @description Get offender non-association details<p>This endpoint uses the REPLICA database.</p>
      */
     get: operations['getNonAssociationDetails_1']
   }
@@ -5155,6 +5158,30 @@ export interface components {
        * @example 11/00/00
        */
       sentenceLength: string
+      /**
+       * Format: date
+       * @description HDCAD - Home Detention Curfew Approved date
+       * @example 2020-02-03
+       */
+      homeDetentionCurfewApprovedDate?: string
+      /**
+       * Format: date
+       * @description Tarrif - Tarrif date
+       * @example 2020-02-03
+       */
+      tariffDate?: string
+      /**
+       * Format: date
+       * @description Tarrif Expiry date
+       * @example 2020-02-03
+       */
+      tariffExpiredRemovalSchemeEligibilityDate?: string
+      /**
+       * Format: date
+       * @description APD - Approved Parole date
+       * @example 2020-02-03
+       */
+      approvedParoleDate?: string
     }
     /** @description Update Offender Dates Request */
     RequestToUpdateOffenderDates: {
@@ -5173,6 +5200,8 @@ export interface components {
       keyDates: components['schemas']['OffenderKeyDates']
       /** @description Comment to be associated with the sentence calculation, if not set a default comment is used */
       comment?: string
+      /** @description Is true, when there are no dates to be recorded in NOMIS */
+      noDates?: boolean
     }
     /** @description AssessmentRating */
     AssessmentClassification: {
@@ -5648,118 +5677,6 @@ export interface components {
       schedule: string
       /** @description A list of addresses associated with the education */
       addresses: components['schemas']['AddressDto'][]
-    }
-    /** @description A new sentence from a digital warrant */
-    WarrantSentence: {
-      /** @description The type of sentence */
-      sentenceType?: string
-      /** @description The category of sentence */
-      sentenceCategory?: string
-      /**
-       * Format: date
-       * @description The date of sentencing
-       */
-      sentenceDate?: string
-      /**
-       * Format: int32
-       * @description Days sentence to
-       */
-      days?: number
-      /**
-       * Format: int32
-       * @description Weeks sentence to
-       */
-      weeks?: number
-      /**
-       * Format: int32
-       * @description Months sentence to
-       */
-      months?: number
-      /**
-       * Format: int32
-       * @description Years sentence to
-       */
-      years?: number
-      /**
-       * Format: int64
-       * @description The id of the offender charge
-       */
-      offenderChargeId?: number
-      /**
-       * Format: int64
-       * @description The id of the court case
-       */
-      courtCaseId?: number
-    }
-    /** @description A new offender court case details entered from a digital warrant. */
-    WarrantCourtCase: {
-      /**
-       * Format: date
-       * @description The begin date
-       * @example 2019-12-01
-       */
-      beginDate?: string
-      /** @description The location of the court case */
-      agencyId?: string
-      /**
-       * @description The case type
-       * @example Adult
-       */
-      caseType?: string
-      /**
-       * @description The case information number
-       * @example TD20177010
-       */
-      caseInfoNumber?: string
-      /** @description Type of court hearing */
-      hearingType?: string
-    }
-    /** @description A new offence from a digital warrant */
-    WarrantCharge: {
-      /**
-       * Format: int64
-       * @description The id of the charge
-       */
-      chargeId?: number
-      /** @description The offence code of the office in the court case */
-      offenceCode?: string
-      /** @description The offence statute of the office in the court case */
-      offenceStatue?: string
-      /** @description The offence description */
-      offenceDescription?: string
-      /**
-       * Format: date
-       * @description The date of the offence
-       */
-      offenceDate?: string
-      /**
-       * Format: date
-       * @description The offence end date
-       */
-      offenceEndDate?: string
-      /** @description Was the verdict guilty or not guilty */
-      guilty?: boolean
-      /**
-       * Format: int64
-       * @description The id of the court case
-       */
-      courtCaseId?: number
-      /** @description Court case reference */
-      courtCaseRef?: string
-      /** @description Court case location */
-      courtLocation?: string
-      /**
-       * Format: int32
-       * @description The sequence of the sentence from this charge
-       */
-      sentenceSequence?: number
-      /**
-       * Format: date
-       * @description The sentence date
-       */
-      sentenceDate?: string
-      /** @description The result description of the charge */
-      resultDescription?: string
     }
     /** @description Case Note Type Usage Request */
     CaseNoteUsageRequest: {
@@ -7492,10 +7409,10 @@ export interface components {
       establishmentName: string
     }
     PagePrisonerInformation: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['PrisonerInformation'][]
@@ -9571,10 +9488,10 @@ export interface components {
       additionalAnswers?: string[]
     }
     PageOffenceDto: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['OffenceDto'][]
@@ -10268,10 +10185,10 @@ export interface components {
       numberAllocated: number
     }
     PageOffenderNumber: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['OffenderNumber'][]
@@ -10375,10 +10292,10 @@ export interface components {
       addresses: components['schemas']['AddressDto'][]
     }
     PageEmployment: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Employment'][]
@@ -10393,10 +10310,10 @@ export interface components {
       empty?: boolean
     }
     PageEducation: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Education'][]
@@ -10409,6 +10326,53 @@ export interface components {
       last?: boolean
       pageable?: components['schemas']['PageableObject']
       empty?: boolean
+    }
+    /** @description A charge linked to a court date */
+    CourtDateCharge: {
+      /**
+       * Format: int64
+       * @description The id of the charge
+       */
+      chargeId?: number
+      /** @description The offence code of the office in the court case */
+      offenceCode?: string
+      /** @description The offence statute of the office in the court case */
+      offenceStatue?: string
+      /** @description The offence description */
+      offenceDescription?: string
+      /**
+       * Format: date
+       * @description The date of the offence
+       */
+      offenceDate?: string
+      /**
+       * Format: date
+       * @description The offence end date
+       */
+      offenceEndDate?: string
+      /** @description Was the verdict guilty or not guilty */
+      guilty?: boolean
+      /**
+       * Format: int64
+       * @description The id of the court case
+       */
+      courtCaseId?: number
+      /** @description Court case reference */
+      courtCaseRef?: string
+      /** @description Court case location */
+      courtLocation?: string
+      /**
+       * Format: int32
+       * @description The sequence of the sentence from this charge
+       */
+      sentenceSequence?: number
+      /**
+       * Format: date
+       * @description The sentence date
+       */
+      sentenceDate?: string
+      /** @description The result description of the charge */
+      resultDescription?: string
     }
     /** @description Represents a court date and its outcome */
     CourtDateResult: {
@@ -10428,7 +10392,7 @@ export interface components {
       resultDescription?: string
       /** @description The disposition code of the result of the court date */
       resultDispositionCode?: string
-      charge: components['schemas']['WarrantCharge']
+      charge: components['schemas']['CourtDateCharge']
       /**
        * Format: int64
        * @description The id of the booking this court date was linked to
@@ -10583,15 +10547,15 @@ export interface components {
        */
       establishmentCode?: string
       /**
-       * @description Name of staff member who created case note (lastname, firstname)
-       * @example Smith, John
-       */
-      staffName: string
-      /**
        * @description Case Note Type and Sub Type
        * @example POS IEP_ENC
        */
       noteType: string
+      /**
+       * @description Name of staff member who created case note (lastname, firstname)
+       * @example Smith, John
+       */
+      staffName: string
     }
     /** @description Visit summary */
     VisitSummary: {
@@ -10604,10 +10568,10 @@ export interface components {
       hasVisits: boolean
     }
     PageVisitWithVisitors: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['VisitWithVisitors'][]
@@ -10878,10 +10842,10 @@ export interface components {
       otherContacts: components['schemas']['Contact'][]
     }
     PageBedAssignment: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['BedAssignment'][]
@@ -10936,10 +10900,10 @@ export interface components {
       currency: string
     }
     PageAlert: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Alert'][]
@@ -11014,10 +10978,10 @@ export interface components {
       hearingSequence: number
     }
     PagePrisonerBookingSummary: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['PrisonerBookingSummary'][]
@@ -11548,7 +11512,7 @@ export interface operations {
    */
   getReferenceCodeByDomainAndCode: {
     parameters: {
-      query: {
+      query?: {
         /** @description Specify whether or not to return the reference code with its associated sub-codes. */
         withSubCodes?: boolean
       }
@@ -12235,7 +12199,7 @@ export interface operations {
    */
   setCategorisationInactive: {
     parameters: {
-      query: {
+      query?: {
         /** @description Indicates which categorisation statuses to set.<li>ACTIVE (default): set all active (i.e. approved) categorisations inactive,</li><li>PENDING: set all pending (i.e. awaiting approval) categorisations inactive,</li> */
         status?: string
       }
@@ -12821,7 +12785,7 @@ export interface operations {
    */
   getAgency: {
     parameters: {
-      query: {
+      query?: {
         /** @description Only return active agencies */
         activeOnly?: boolean
         /** @description Agency Type */
@@ -13096,7 +13060,7 @@ export interface operations {
    */
   createTransaction: {
     parameters: {
-      header: {
+      header?: {
         /** @description If present then the value is prepended to the client_unique_ref separated by a dash. When this API is invoked via the Nomis gateway this will already have been created by the gateway. */
         'X-Client-Name'?: string
       }
@@ -13221,7 +13185,7 @@ export interface operations {
    */
   transferTransaction: {
     parameters: {
-      header: {
+      header?: {
         /** @description If present then the value is prepended to the client_unique_ref separated by a dash. When this API is invoked via the Nomis gateway this will already have been created by the gateway. */
         'X-Client-Name'?: string
       }
@@ -13326,7 +13290,7 @@ export interface operations {
   /** @description <p>This endpoint uses the REPLICA database.</p> */
   getVisits: {
     parameters: {
-      query: {
+      query?: {
         /** @description Date of whereabouts list, default today */
         date?: string
         /** @description AM, PM or ED */
@@ -13381,13 +13345,13 @@ export interface operations {
    */
   getEventsByLocationId: {
     parameters: {
-      query: {
+      query?: {
         /** @description Date of whereabouts list, default today */
         date?: string
         /** @description AM, PM or ED */
         timeSlot?: 'AM' | 'PM' | 'ED'
       }
-      header: {
+      header?: {
         /** @description Comma separated list of one or more of the following fields - <b>cellLocation or lastName</b> */
         'Sort-Fields'?: string
         /** @description Sort order (ASC or DESC) - defaults to ASC. */
@@ -13433,7 +13397,7 @@ export interface operations {
   /** @description <p>This endpoint uses the REPLICA database.</p> */
   getCourtEvents: {
     parameters: {
-      query: {
+      query?: {
         /** @description Date of whereabouts list, default today */
         date?: string
         /** @description AM, PM or ED */
@@ -13540,7 +13504,7 @@ export interface operations {
   /** @description <p>This endpoint uses the REPLICA database.</p> */
   getAppointmentsForOffenders: {
     parameters: {
-      query: {
+      query?: {
         /** @description Date of whereabouts list, default today */
         date?: string
         /** @description AM, PM or ED */
@@ -13570,7 +13534,7 @@ export interface operations {
    */
   getActivitiesAtAllLocations: {
     parameters: {
-      query: {
+      query?: {
         /** @description Date of whereabouts list, default today */
         date?: string
         /** @description AM, PM or ED */
@@ -13578,7 +13542,7 @@ export interface operations {
         /** @description Include suspended scheduled activity - defaults to false */
         includeSuspended?: boolean
       }
-      header: {
+      header?: {
         /** @description Comma separated list of one or more of the following fields - <b>cellLocation or lastName</b> */
         'Sort-Fields'?: string
         /** @description Sort order (ASC or DESC) - defaults to ASC. */
@@ -13619,7 +13583,7 @@ export interface operations {
   /** @description <p>This endpoint uses the REPLICA database.</p> */
   getActivitiesForBookings: {
     parameters: {
-      query: {
+      query?: {
         /** @description Date of whereabouts list, default today */
         date?: string
         /** @description AM, PM or ED */
@@ -13672,7 +13636,7 @@ export interface operations {
    */
   getPrisoners_1: {
     parameters: {
-      query: {
+      query?: {
         /** @description If true the result set should include a row for every matched alias.  If the request includes some combination of firstName, lastName and dateOfBirth then this will be a subset of the OFFENDERS records for one or more offenders. Otherwise it will be every OFFENDERS record for each match on the other search criteria. Default is false. */
         includeAliases?: boolean
         /** @description List of offender NOMS numbers. NOMS numbers have the format:<b>ANNNNAA</b> */
@@ -13704,7 +13668,7 @@ export interface operations {
         /** @description If <i>true</i>, offenders that match any of the specified criteria will be returned. The default search behaviour is to only return offenders that match <i>all</i> of the specified criteria. If the <i>prioritisedMatch</i> parameter is also set <i>true</i>, this parameter will only impact the behaviour of searching using offender name and date of birth criteria. */
         anyMatch?: boolean
       }
-      header: {
+      header?: {
         /** @description Requested offset of first record in returned collection of prisoner records. */
         'Page-Offset'?: number
         /** @description Requested limit to number of prisoner records returned. */
@@ -13748,7 +13712,7 @@ export interface operations {
    */
   getPrisoners: {
     parameters: {
-      header: {
+      header?: {
         /** @description Requested offset of first record in returned collection of prisoner records. */
         'Page-Offset'?: number
         /** @description Requested limit to number of prisoner records returned. */
@@ -13941,7 +13905,7 @@ export interface operations {
    */
   getOffenderSentences: {
     parameters: {
-      query: {
+      query?: {
         /** @description agency/prison to restrict results, if none provided current active caseload will be used, unless offenderNo list is specified */
         agencyId?: string
         /** @description a list of offender numbers to search. */
@@ -14185,7 +14149,7 @@ export interface operations {
    */
   postOffenderAssessmentsAssessmentCode: {
     parameters: {
-      query: {
+      query?: {
         /** @description Returns only assessments for the current sentence if true, otherwise assessments for all previous sentences are included */
         latestOnly?: boolean
         /** @description Returns only active assessments if true, otherwise inactive and pending assessments are included */
@@ -14256,7 +14220,7 @@ export interface operations {
    */
   getOffenderCategorisationsSystem: {
     parameters: {
-      query: {
+      query?: {
         /** @description Only get the latest category for each booking */
         latestOnly?: boolean
       }
@@ -14307,7 +14271,7 @@ export interface operations {
    */
   getOffenderCategorisations: {
     parameters: {
-      query: {
+      query?: {
         /** @description Only get the latest category for each booking */
         latestOnly?: boolean
       }
@@ -14566,7 +14530,7 @@ export interface operations {
   }
   getMovementsByOffenders: {
     parameters: {
-      query: {
+      query?: {
         /** @description movement type codes to filter by */
         movementTypes?: string[]
         /** @description Returns only latest movement for the offenders specified */
@@ -14762,11 +14726,16 @@ export interface operations {
   }
   /**
    * Post a financial transaction to NOMIS.
-   * @description Notes:<br/><ul><li>If the field X-Client-Name is present in the request header then the value is prepended to the client_unique_ref separated by a dash</li><li>The client_unique_ref can have a maximum of 64 characters, only alphabetic, numeric, ‘-’ and ‘_’ characters are allowed</li></ul>
+   * @description Notes:<br/>
+   *   <ul>
+   *     <li>If the field X-Client-Name is present in the request header then the value is prepended to the client_unique_ref separated by a dash</li>
+   *     <li>The client_unique_ref can have a maximum of 64 characters, only alphabetic, numeric, ‘-’ and ‘_’ characters are allowed</li>
+   *   </ul>
+   * <p>Requires role NOMIS_API_V1</p>
    */
   transferToSavings: {
     parameters: {
-      header: {
+      header?: {
         /** @description If present then the value is prepended to the client_unique_ref separated by a dash. When this API is invoked via the Nomis gateway this will already have been created by the gateway. */
         'X-Client-Name'?: string
       }
@@ -14852,97 +14821,13 @@ export interface operations {
       }
     }
   }
-  /** Create a sentence */
-  createSentence: {
-    parameters: {
-      path: {
-        /** @description The required booking id (mandatory) */
-        bookingId: number
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['WarrantSentence']
-      }
-    }
-    responses: {
-      /** @description Sentence created. */
-      201: {
-        content: {
-          'application/json': number
-        }
-      }
-      /** @description Requested resource not found. */
-      404: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  /** Create a court case */
-  createCourtCase: {
-    parameters: {
-      path: {
-        /** @description The required booking id (mandatory) */
-        bookingId: number
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['WarrantCourtCase']
-      }
-    }
-    responses: {
-      /** @description Court case created. */
-      201: {
-        content: {
-          'application/json': number
-        }
-      }
-      /** @description Requested resource not found. */
-      404: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  /** Create a Court case charge */
-  createCharge: {
-    parameters: {
-      path: {
-        /** @description The required booking id (mandatory) */
-        bookingId: number
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['WarrantCharge']
-      }
-    }
-    responses: {
-      /** @description Court case charge created. */
-      201: {
-        content: {
-          'application/json': number
-        }
-      }
-      /** @description Requested resource not found. */
-      404: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
   /**
    * Count of case notes
    * @description Count of case notes<p>This endpoint uses the REPLICA database.</p>
    */
   getCaseNoteUsageSummary: {
     parameters: {
-      query: {
+      query?: {
         /** @description a list of offender numbers to search. */
         offenderNo?: string[]
         /** @description Staff Id to filter by */
@@ -15099,7 +14984,7 @@ export interface operations {
    */
   getRelationships: {
     parameters: {
-      query: {
+      query?: {
         /** @description filter by the relationship type */
         relationshipType?: string
       }
@@ -15381,13 +15266,13 @@ export interface operations {
    */
   getBookingsBookingIdAppointments: {
     parameters: {
-      query: {
+      query?: {
         /** @description Returned appointments must be scheduled on or after this date (in YYYY-MM-DD format). */
         fromDate?: string
         /** @description Returned appointments must be scheduled on or before this date (in YYYY-MM-DD format). */
         toDate?: string
       }
-      header: {
+      header?: {
         /** @description Requested offset of first record in returned collection of appointment records. */
         'Page-Offset'?: number
         /** @description Requested limit to number of appointment records returned. */
@@ -15482,7 +15367,7 @@ export interface operations {
    */
   getProvenAdjudicationSummaryForBookings: {
     parameters: {
-      query: {
+      query?: {
         /** @description Only proved adjudications ending on or after this date (in YYYY-MM-DD format) will be counted. Default is 3 months */
         adjudicationCutoffDate?: string
       }
@@ -15525,7 +15410,7 @@ export interface operations {
    */
   getBasicInmateDetailsForOffenders: {
     parameters: {
-      query: {
+      query?: {
         /** @description Returns only Offender details with an active booking if true, otherwise Offenders without an active booking are included */
         activeOnly?: boolean
       }
@@ -15814,7 +15699,7 @@ export interface operations {
   }
   /**
    * Offence histories.
-   * @description Offence histories for a set of booking ids.
+   * @description Offence histories for a set of booking ids.<p>This endpoint uses the REPLICA database.</p>
    */
   getOffenceHistoryForBookings: {
     requestBody: {
@@ -15924,7 +15809,7 @@ export interface operations {
    */
   getAgencies: {
     parameters: {
-      header: {
+      header?: {
         /** @description Requested offset of first record in returned collection of agency records. */
         'Page-Offset'?: number
         /** @description Requested limit to number of agency records returned. */
@@ -16166,7 +16051,7 @@ export interface operations {
    */
   getTransactionByClientUniqueRef: {
     parameters: {
-      header: {
+      header?: {
         /** @description If present then the value is prepended to the client_unique_ref separated by a dash. When this API is invoked via the Nomis gateway this will already have been created by the gateway. */
         'X-Client-Name'?: string
       }
@@ -16218,11 +16103,11 @@ export interface operations {
    */
   getHolds: {
     parameters: {
-      query: {
+      query?: {
         /** @description Client unique reference */
         client_unique_ref?: string
       }
-      header: {
+      header?: {
         /** @description If present then the value is prepended to the client_unique_ref separated by a dash. When this API is invoked via the Nomis gateway this will already have been created by the gateway. */
         'X-Client-Name'?: string
       }
@@ -16318,7 +16203,7 @@ export interface operations {
    */
   getAccountTransactions: {
     parameters: {
-      query: {
+      query?: {
         /**
          * @description Start date for transactions (defaults to today if not supplied)
          * @example 2019-04-01
@@ -16812,7 +16697,7 @@ export interface operations {
    */
   getAlerts: {
     parameters: {
-      query: {
+      query?: {
         /**
          * @description Alert Type, if alert_type is specified then only alerts of that type are returned
          * @example H
@@ -17047,7 +16932,7 @@ export interface operations {
    */
   getMyRoles: {
     parameters: {
-      query: {
+      query?: {
         /** @description If set to true then all roles are returned rather than just API roles */
         allRoles?: boolean
       }
@@ -17117,7 +17002,7 @@ export interface operations {
    */
   getMyCaseLoads: {
     parameters: {
-      query: {
+      query?: {
         /** @description If set to true then all caseloads are returned */
         allCaseloads?: boolean
       }
@@ -17312,7 +17197,7 @@ export interface operations {
    */
   getStaffByAgencyRole: {
     parameters: {
-      query: {
+      query?: {
         /** @description Filter results by first name and/or last name of staff member. Supplied filter term is matched to start of staff member's first and last name. */
         nameFilter?: string
         /** @description The staff id of a staff member. */
@@ -17320,7 +17205,7 @@ export interface operations {
         /** @description Filters results by activeOnly staff members. */
         activeOnly?: boolean
       }
-      header: {
+      header?: {
         /** @description Requested offset of first record in returned collection of role records. */
         'Page-Offset'?: number
         /** @description Requested limit to number of role records returned. */
@@ -17370,7 +17255,7 @@ export interface operations {
    */
   getSuspendedActivitiesAtAllLocationsByDateRange: {
     parameters: {
-      query: {
+      query?: {
         /** @description From date of whereabouts list, default today */
         fromDate?: string
         /** @description To Date of whereabouts list, default from date */
@@ -17416,13 +17301,13 @@ export interface operations {
    */
   getLocationEvents: {
     parameters: {
-      query: {
+      query?: {
         /** @description Date of whereabouts list, default today */
         date?: string
         /** @description AM, PM or ED */
         timeSlot?: 'AM' | 'PM' | 'ED'
       }
-      header: {
+      header?: {
         /** @description Comma separated list of one or more of the following fields - <b>cellLocation or lastName</b> */
         'Sort-Fields'?: string
         /** @description Sort order (ASC or DESC) - defaults to ASC. */
@@ -17470,7 +17355,7 @@ export interface operations {
    */
   getActivitiesAtAllLocationsByDateRange: {
     parameters: {
-      query: {
+      query?: {
         /** @description From date of whereabouts list, default today */
         fromDate?: string
         /** @description To Date of whereabouts list, default from date */
@@ -17480,7 +17365,7 @@ export interface operations {
         /** @description Include suspended scheduled activity - defaults to false */
         includeSuspended?: boolean
       }
-      header: {
+      header?: {
         /** @description Comma separated list of one or more of the following fields - <b>cellLocation or lastName</b> */
         'Sort-Fields'?: string
         /** @description Sort order (ASC or DESC) - defaults to ASC. */
@@ -17524,7 +17409,7 @@ export interface operations {
    */
   getActivitiesAtLocation: {
     parameters: {
-      query: {
+      query?: {
         /** @description Date of whereabouts list, default today */
         date?: string
         /** @description AM, PM or ED */
@@ -17532,7 +17417,7 @@ export interface operations {
         /** @description Include suspended scheduled activity - defaults to false */
         includeSuspended?: boolean
       }
-      header: {
+      header?: {
         /** @description Comma separated list of one or more of the following fields - <b>cellLocation or lastName</b> */
         'Sort-Fields'?: string
         /** @description Sort order (ASC or DESC) - defaults to ASC. */
@@ -17669,11 +17554,11 @@ export interface operations {
    */
   getReferenceCodesByDomain: {
     parameters: {
-      query: {
+      query?: {
         /** @description Specify whether or not to return reference codes with their associated sub-codes. */
         withSubCodes?: boolean
       }
-      header: {
+      header?: {
         /** @description Requested offset of first record in returned collection of domain records. */
         'Page-Offset'?: number
         /** @description Requested limit to number of domain records returned. */
@@ -17803,7 +17688,7 @@ export interface operations {
    */
   getAlertTypes: {
     parameters: {
-      header: {
+      header?: {
         /** @description Requested offset of first record in returned collection of alertType records. */
         'Page-Offset'?: number
         /** @description Requested limit to number of alertType records returned. */
@@ -17957,7 +17842,7 @@ export interface operations {
   /** List of prisoners at a prison establishment */
   getPrisonerDetailAtLocation: {
     parameters: {
-      query: {
+      query?: {
         /** @description Zero-based page index (0..N) */
         page?: number
         /** @description The size of the page to be returned */
@@ -18001,7 +17886,7 @@ export interface operations {
    */
   getPrisonerDetailAtLocationOld: {
     parameters: {
-      header: {
+      header?: {
         /** @description Requested offset of first record in returned collection of prisoner records. */
         'Page-Offset'?: number
         /** @description Requested limit to number of prisoner records returned. */
@@ -18195,7 +18080,7 @@ export interface operations {
   /** Full details about the current state of an offender */
   getOffender_1: {
     parameters: {
-      header: {
+      header?: {
         /** @description Version of Offender details, default is 1.0, Beta is version 1.1_beta and is WIP (do not use in production) */
         version?: string
       }
@@ -18240,7 +18125,7 @@ export interface operations {
    */
   getTransactionsHistory: {
     parameters: {
-      query: {
+      query?: {
         /**
          * @description Account code
          * @example spends
@@ -18323,7 +18208,7 @@ export interface operations {
    */
   getScheduledEvents: {
     parameters: {
-      query: {
+      query?: {
         /** @description Returned events must be scheduled on or after this date (in YYYY-MM-DD format).  The from date must be on or after today. */
         fromDate?: string
         /** @description Returned events must be scheduled on or before this date (in YYYY-MM-DD format). */
@@ -18408,7 +18293,7 @@ export interface operations {
    */
   getVisitRestrictions: {
     parameters: {
-      query: {
+      query?: {
         /** @description return only restriction that are active (derived from startDate and expiryDate) */
         activeRestrictionsOnly?: boolean
       }
@@ -18449,7 +18334,7 @@ export interface operations {
   }
   /**
    * Gets the offender non-association details for a given offender for ALL bookings
-   * @description Get offender non-association details by offender No
+   * @description Get offender non-association details by offender No<p>This endpoint uses the REPLICA database.</p>
    */
   getNonAssociationDetails: {
     parameters: {
@@ -18638,7 +18523,7 @@ export interface operations {
    */
   getEvents: {
     parameters: {
-      query: {
+      query?: {
         /** @description Returned events must be scheduled on or after this date (in YYYY-MM-DD format). */
         fromDate?: string
         /** @description Returned events must be scheduled on or before this date (in YYYY-MM-DD format). */
@@ -18682,7 +18567,7 @@ export interface operations {
   /** Return a list of damage obligations */
   getOffenderDamageObligations: {
     parameters: {
-      query: {
+      query?: {
         /**
          * @description Filter by obligation status. Leave blank to return all
          * @example ACTIVE
@@ -18724,7 +18609,7 @@ export interface operations {
    */
   getOffenderContacts: {
     parameters: {
-      query: {
+      query?: {
         /** @description return only contacts approved for visits */
         approvedVisitorsOnly?: boolean
         /** @description return only active contacts, nb visitors can be inactive contacts */
@@ -18771,7 +18656,7 @@ export interface operations {
    */
   getAlertsForLatestBookingByOffenderNo: {
     parameters: {
-      query: {
+      query?: {
         /**
          * @description Comma separated list of alertCodes to filter by
          * @example XA,RSS
@@ -18858,7 +18743,7 @@ export interface operations {
    */
   getAlertsForAllBookingByOffenderNo: {
     parameters: {
-      query: {
+      query?: {
         /**
          * @description Comma separated list of alertCodes to filter by
          * @example XA,RSS
@@ -18910,7 +18795,7 @@ export interface operations {
   /** Return a list of adjudications for a given offender */
   getAdjudicationsByOffenderNo: {
     parameters: {
-      query: {
+      query?: {
         /** @description An offence id to allow optionally filtering by type of offence */
         offenceId?: string
         /** @description An agency id to allow optionally filtering by the agency in which the offence occurred */
@@ -18925,7 +18810,7 @@ export interface operations {
         /** @description Adjudications must have been reported on or before this date (in YYYY-MM-DD format). */
         toDate?: string
       }
-      header: {
+      header?: {
         /** @description Requested offset of first record in returned collection of adjudications. */
         'Page-Offset'?: number
         /** @description Requested limit to number of adjudications returned. */
@@ -19068,7 +18953,7 @@ export interface operations {
          */
         fromDateTime: string
       }
-      header: {
+      header?: {
         /** @description Requested offset of first offender in returned list. */
         'Page-Offset'?: number
         /** @description Requested limit to number of offenders returned. */
@@ -19090,7 +18975,7 @@ export interface operations {
    */
   getOffenderNumbers: {
     parameters: {
-      header: {
+      header?: {
         /** @description Requested offset of first Noms ID in returned list. */
         'Page-Offset'?: number
         /** @description Requested limit to the Noms IDs returned. */
@@ -19131,7 +19016,7 @@ export interface operations {
          */
         fromDateTime: string
       }
-      header: {
+      header?: {
         /** @description Requested offset of first offender in returned list. */
         'Page-Offset'?: number
         /** @description Requested limit to number of offenders returned. */
@@ -19205,7 +19090,7 @@ export interface operations {
   /** Sentence term details for a prisoner */
   getOffenderSentenceTerms: {
     parameters: {
-      query: {
+      query?: {
         filterBySentenceTermCodes?: string[]
       }
       path: {
@@ -19527,7 +19412,7 @@ export interface operations {
   /** Paged List of active offences */
   getActiveOffences: {
     parameters: {
-      query: {
+      query?: {
         /** @description Zero-based page index (0..N) */
         page?: number
         /** @description The size of the page to be returned */
@@ -19593,7 +19478,7 @@ export interface operations {
   /** Paged List of all offences where the offence code starts with the passed in offenceCode param */
   getOffencesThatStartWith: {
     parameters: {
-      query: {
+      query?: {
         /** @description Zero-based page index (0..N) */
         page?: number
         /** @description The size of the page to be returned */
@@ -19633,7 +19518,7 @@ export interface operations {
   /** Paged List of all offences */
   getOffences: {
     parameters: {
-      query: {
+      query?: {
         /** @description Zero-based page index (0..N) */
         page?: number
         /** @description The size of the page to be returned */
@@ -19665,7 +19550,7 @@ export interface operations {
   }
   getOffendersOutToday: {
     parameters: {
-      query: {
+      query?: {
         /** @description The optional movement type to filter by e.g CRT, REL, TAP, TRN */
         movementType?: string
       }
@@ -19717,7 +19602,7 @@ export interface operations {
         /** @description toDateTime */
         toDateTime?: string
       }
-      header: {
+      header?: {
         /** @description Requested offset of first record in returned collection of prisoner records. */
         'Page-Offset'?: number
         /** @description Requested limit to number of records returned. */
@@ -19801,7 +19686,7 @@ export interface operations {
    */
   getEnrouteOffenderMovements: {
     parameters: {
-      query: {
+      query?: {
         /** @description Optional filter on date of movement */
         movementDate?: string
       }
@@ -19907,7 +19792,7 @@ export interface operations {
    */
   getRollcount: {
     parameters: {
-      query: {
+      query?: {
         /** @description If false return data for prisoners in cell locations, if true return unassigned prisoners, i.e. those in non-cell locations. */
         unassigned?: boolean
       }
@@ -19949,7 +19834,7 @@ export interface operations {
    */
   getRollcountMovements: {
     parameters: {
-      query: {
+      query?: {
         /** @description The date for which movements are counted, default today. */
         movementDate?: string
       }
@@ -20025,7 +19910,7 @@ export interface operations {
    */
   getEnrouteOffenderMovementCount: {
     parameters: {
-      query: {
+      query?: {
         /** @description Optional filter on date of movement. Defaults to today */
         movementDate?: string
       }
@@ -20172,7 +20057,7 @@ export interface operations {
    */
   getLocation: {
     parameters: {
-      query: {
+      query?: {
         /** @description Match a location that is inactive? */
         includeInactive?: string
       }
@@ -20214,7 +20099,7 @@ export interface operations {
    */
   getOffendersAtLocation: {
     parameters: {
-      header: {
+      header?: {
         /** @description Requested offset of first record in returned collection of inmate records. */
         'Page-Offset'?: number
         /** @description Requested limit to number of inmate records returned. */
@@ -20262,7 +20147,7 @@ export interface operations {
    */
   getOffendersAtLocationDescription: {
     parameters: {
-      query: {
+      query?: {
         /** @description offender name or id to match */
         keywords?: string
         /**
@@ -20284,7 +20169,7 @@ export interface operations {
         /** @description retrieve inmates with a specific convicted status (Convicted, Remand, default: All) */
         convictedStatus?: string
       }
-      header: {
+      header?: {
         /** @description Requested offset of first record in returned collection of inmate records. */
         'Page-Offset'?: number
         /** @description Requested limit to number of inmate records returned. */
@@ -20444,7 +20329,7 @@ export interface operations {
    */
   getAllocationHistory: {
     parameters: {
-      header: {
+      header?: {
         /** @description Requested offset of first record in returned collection of allocationHistory records. */
         'Page-Offset'?: number
         /** @description Requested limit to number of allocationHistory records returned. */
@@ -20564,7 +20449,7 @@ export interface operations {
    */
   getImageData: {
     parameters: {
-      query: {
+      query?: {
         /** @description Return full size image */
         fullSizeImage?: boolean
       }
@@ -20675,7 +20560,7 @@ export interface operations {
    */
   getPrisonerEmployments: {
     parameters: {
-      query: {
+      query?: {
         /** @description The page number of the paged results */
         page?: number
         /** @description Requested limit to number of results returned. */
@@ -20719,7 +20604,7 @@ export interface operations {
    */
   getPrisonerEducations: {
     parameters: {
-      query: {
+      query?: {
         /** @description The page number of the paged results */
         page?: number
         /** @description Requested limit to number of results returned. */
@@ -20757,8 +20642,37 @@ export interface operations {
       }
     }
   }
-  /** Returns details of all court dates and the result of each. */
+  /**
+   * Returns details of all court dates and the result of each.
+   * @description <p>This endpoint uses the REPLICA database.</p>
+   */
   getCourtDateResults: {
+    parameters: {
+      path: {
+        /** @description The required offender id (mandatory) */
+        offenderId: string
+      }
+    }
+    responses: {
+      /** @description The court date results. */
+      200: {
+        content: {
+          'application/json': components['schemas']['CourtDateResult']
+        }
+      }
+      /** @description Requested resource not found. */
+      404: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  /**
+   * Returns details of all court dates and the result of each.
+   * @description <p>This endpoint uses the REPLICA database.</p>
+   */
+  getCourtDateResults_1: {
     parameters: {
       path: {
         /** @description The required offender id (mandatory) */
@@ -20952,7 +20866,7 @@ export interface operations {
    */
   getOffenderBooking: {
     parameters: {
-      query: {
+      query?: {
         /** @description If set to true then only basic data is returned */
         basicInfo?: boolean
         /** @description Only used when requesting more than basic data, returns identifiers,offences,aliases,sentence dates,convicted status */
@@ -20996,13 +20910,13 @@ export interface operations {
    */
   getBookingVisits: {
     parameters: {
-      query: {
+      query?: {
         /** @description Returned visits must be scheduled on or after this date (in YYYY-MM-DD format). */
         fromDate?: string
         /** @description Returned visits must be scheduled on or before this date (in YYYY-MM-DD format). */
         toDate?: string
       }
-      header: {
+      header?: {
         /** @description Requested offset of first record in returned collection of visit records. */
         'Page-Offset'?: number
         /** @description Requested limit to number of visit records returned. */
@@ -21050,7 +20964,7 @@ export interface operations {
    */
   getBookingVisitsForToday: {
     parameters: {
-      header: {
+      header?: {
         /** @description Comma separated list of one or more of the following fields - <b>eventDate, startTime, endTime, eventLocation</b> */
         'Sort-Fields'?: string
         /** @description Sort order (ASC or DESC) - defaults to ASC. */
@@ -21170,7 +21084,7 @@ export interface operations {
    */
   getBookingVisitsNext: {
     parameters: {
-      query: {
+      query?: {
         /** @description Toggle to return Visitors in response (or not). */
         withVisitors?: boolean
       }
@@ -21212,7 +21126,7 @@ export interface operations {
    */
   getBookingVisitsWithVisitor: {
     parameters: {
-      query: {
+      query?: {
         /** @description Returned visits must be scheduled on or after this date (in YYYY-MM-DD format). */
         fromDate?: string
         /** @description Returned visits must be scheduled on or before this date (in YYYY-MM-DD format). */
@@ -21277,7 +21191,7 @@ export interface operations {
    */
   getBookingSentenceDetail: {
     parameters: {
-      header: {
+      header?: {
         /** @description Version of Sentence Calc Dates, 1.0 is default */
         version?: string
       }
@@ -21623,7 +21537,7 @@ export interface operations {
   }
   /**
    * Gets the offender non-association details for a given booking
-   * @description Get offender non-association details
+   * @description Get offender non-association details<p>This endpoint uses the REPLICA database.</p>
    */
   getNonAssociationDetails_1: {
     parameters: {
@@ -21880,7 +21794,7 @@ export interface operations {
    */
   getMainBookingImageData: {
     parameters: {
-      query: {
+      query?: {
         /** @description Return full size image */
         fullSizeImage?: boolean
       }
@@ -21916,7 +21830,7 @@ export interface operations {
    */
   getOffenderIdentifiers: {
     parameters: {
-      query: {
+      query?: {
         /**
          * @description Filter By Type
          * @example PNC
@@ -21996,7 +21910,7 @@ export interface operations {
    */
   getEvents_1: {
     parameters: {
-      query: {
+      query?: {
         /** @description Returned events must be scheduled on or after this date (in YYYY-MM-DD format). */
         fromDate?: string
         /** @description Returned events must be scheduled on or before this date (in YYYY-MM-DD format). */
@@ -22150,7 +22064,7 @@ export interface operations {
   }
   getCourtHearings: {
     parameters: {
-      query: {
+      query?: {
         /** @description Return court hearings on or after this date (in YYYY-MM-DD format). */
         fromDate?: string
         /** @description Return court hearings on or before this date (in YYYY-MM-DD format). */
@@ -22194,7 +22108,7 @@ export interface operations {
    */
   getCourtCases: {
     parameters: {
-      query: {
+      query?: {
         /** @description Only return active court cases */
         activeOnly?: boolean
       }
@@ -22274,7 +22188,7 @@ export interface operations {
    */
   getBedAssignmentsHistory_1: {
     parameters: {
-      query: {
+      query?: {
         /** @description The page number to return. Index starts at 0 */
         page?: number
         /** @description The number of results per page. Defaults to 20. */
@@ -22318,7 +22232,7 @@ export interface operations {
    */
   getCaseNoteCount: {
     parameters: {
-      query: {
+      query?: {
         /** @description Only case notes occurring on or after this date (in YYYY-MM-DD format) will be considered. */
         fromDate?: string
         /** @description Only case notes occurring on or before this date (in YYYY-MM-DD format) will be considered. */
@@ -22482,7 +22396,7 @@ export interface operations {
    */
   getBookingAppointmentsForToday: {
     parameters: {
-      header: {
+      header?: {
         /** @description Comma separated list of one or more of the following fields - <b>eventDate, startTime, endTime, eventLocation</b> */
         'Sort-Fields'?: string
         /** @description Sort order (ASC or DESC) - defaults to ASC. */
@@ -22526,7 +22440,7 @@ export interface operations {
    */
   getBookingAppointmentsForThisWeek: {
     parameters: {
-      header: {
+      header?: {
         /** @description Comma separated list of one or more of the following fields - <b>eventDate, startTime, endTime, eventLocation</b> */
         'Sort-Fields'?: string
         /** @description Sort order (ASC or DESC) - defaults to ASC. */
@@ -22570,7 +22484,7 @@ export interface operations {
    */
   getBookingAppointmentsForNextWeek: {
     parameters: {
-      header: {
+      header?: {
         /** @description Comma separated list of one or more of the following fields - <b>eventDate, startTime, endTime, eventLocation</b> */
         'Sort-Fields'?: string
         /** @description Sort order (ASC or DESC) - defaults to ASC. */
@@ -22614,7 +22528,7 @@ export interface operations {
    */
   getOffenderAliases: {
     parameters: {
-      header: {
+      header?: {
         /** @description Requested offset of first record in returned collection of alias records. */
         'Page-Offset'?: number
         /** @description Requested limit to number of alias records returned. */
@@ -22702,7 +22616,7 @@ export interface operations {
    */
   getOffenderAlertsV2: {
     parameters: {
-      query: {
+      query?: {
         /**
          * @description start alert date to search from
          * @example 2021-02-03
@@ -22768,7 +22682,7 @@ export interface operations {
    */
   getAdjudicationSummary: {
     parameters: {
-      query: {
+      query?: {
         /** @description Only awards ending on or after this date (in YYYY-MM-DD format) will be considered. */
         awardCutoffDate?: string
         /** @description Only proved adjudications ending on or after this date (in YYYY-MM-DD format) will be counted. */
@@ -22812,13 +22726,13 @@ export interface operations {
    */
   getBookingActivities: {
     parameters: {
-      query: {
+      query?: {
         /** @description Returned activities must be scheduled on or after this date (in YYYY-MM-DD format). */
         fromDate?: string
         /** @description Returned activities must be scheduled on or before this date (in YYYY-MM-DD format). */
         toDate?: string
       }
-      header: {
+      header?: {
         /** @description Requested offset of first record in returned collection of activity records. */
         'Page-Offset'?: number
         /** @description Requested limit to number of activity records returned. */
@@ -22866,7 +22780,7 @@ export interface operations {
    */
   getBookingActivitiesForToday: {
     parameters: {
-      header: {
+      header?: {
         /** @description Comma separated list of one or more of the following fields - <b>eventDate, startTime, endTime, eventLocation</b> */
         'Sort-Fields'?: string
         /** @description Sort order (ASC or DESC) - defaults to ASC. */
@@ -22910,7 +22824,7 @@ export interface operations {
    */
   getPrisonerBookingsV2: {
     parameters: {
-      query: {
+      query?: {
         /**
          * @description Filter by prison Id
          * @example MDI
@@ -22959,7 +22873,7 @@ export interface operations {
    */
   getOffenderBookingByOffenderNo: {
     parameters: {
-      query: {
+      query?: {
         /** @description If set to true then full data is returned */
         fullInfo?: boolean
         /** @description Only used when fullInfo=true, returns identifiers,offences,aliases,sentence dates,convicted status */
@@ -23005,7 +22919,7 @@ export interface operations {
    */
   getBookingVisitBalances: {
     parameters: {
-      query: {
+      query?: {
         /** @description Allow no content (204) response if no data rather than returning a not found (404) */
         allowNoContent?: boolean
       }
@@ -23047,7 +22961,7 @@ export interface operations {
    */
   getOffenceHistory: {
     parameters: {
-      query: {
+      query?: {
         /** @description include offences with convictions only */
         convictionsOnly?: boolean
       }
@@ -23128,7 +23042,7 @@ export interface operations {
    */
   getMainBookingImageDataByNo: {
     parameters: {
-      query: {
+      query?: {
         /** @description Return full size image */
         fullSizeImage?: boolean
       }
@@ -23253,11 +23167,11 @@ export interface operations {
    */
   getAgencyLocations: {
     parameters: {
-      query: {
+      query?: {
         /** @description Restricts list of locations returned to those that can be used for the specified event type. */
         eventType?: string
       }
-      header: {
+      header?: {
         /** @description Comma separated list of one or more of the following fields - <b>description, userDescription</b> */
         'Sort-Fields'?: string
         /** @description Sort order (ASC or DESC) - defaults to ASC. */
@@ -23378,7 +23292,7 @@ export interface operations {
    */
   getAgencyEventLocations: {
     parameters: {
-      header: {
+      header?: {
         /** @description Comma separated list of one or more of the following fields - <b>description, userDescription</b> */
         'Sort-Fields'?: string
         /** @description Sort order (ASC or DESC) - defaults to ASC. */
@@ -23501,7 +23415,7 @@ export interface operations {
    */
   getAgencyActiveCellsWithCapacity: {
     parameters: {
-      query: {
+      query?: {
         /** @description Restricts list of cells returned to those that have a specified attribute. */
         attribute?: string
       }
@@ -23542,7 +23456,7 @@ export interface operations {
    */
   getAgenciesByType: {
     parameters: {
-      query: {
+      query?: {
         /** @description Only return active agencies */
         activeOnly?: boolean
         /**

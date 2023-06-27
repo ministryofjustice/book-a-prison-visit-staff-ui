@@ -209,7 +209,7 @@ export interface paths {
     /**
      * Search for prisoners within a particular prison establishment
      * @description
-     *       This search is optimised for clients that have a simple search term typically containing the prisonser's name
+     *       This search is optimised for clients that have a simple search term typically containing the prisoner's name
      *       or prisoner number. The user typically is certain the prisoner is within the establishment and knows key information
      *       about the prisoner.
      *
@@ -219,33 +219,33 @@ export interface paths {
      *
      *       Examples:
      *
-     *       "/prisoners-in-prison/BXI?term=John&sort=firstName,lastName,desc&page=2&size=20"
+     *       "/prison/BXI/prisoners?term=John&sort=firstName,lastName,desc&page=2&size=20"
      *       This will return all people in HMP Brixton whose first or last names begins with JOHN.
      *       Results will be ordered by firstName, lastName descending.
      *       Page 3 will be returned with a maximum of 20 results per page.
      *
-     *       "/prisoners-in-prison/WWI?sort=cellLocation"
+     *       "/prison/WWI/prisoners?sort=cellLocation"
      *       This will return all people in HMP Wandsworth.
      *       Results will be ordered by cell location ascending.
      *       Page 1 will be returned with a maximum of 10 results per page.
      *
-     *       "/prisoners-in-prison/WWI?cellLocationPrefix=WWI-2&term=smith"
-     *       "/prisoners-in-prison/WWI?cellLocationPrefix=2&term=smith"
+     *       "/prison/WWI/prisoners?cellLocationPrefix=WWI-2&term=smith"
+     *       "/prison/WWI/prisoners?cellLocationPrefix=2&term=smith"
      *       This will return all people in HMP Wandsworth block 2 whose name starts with SMITH.
      *
-     *       "/prisoners-in-prison/WWI?cellLocationPrefix=2-A-3-001"
+     *       "/prison/WWI/prisoners?cellLocationPrefix=2-A-3-001"
      *       This will return all people in HMP Wandsworth cell WWI-2-A-3-001
      *
-     *       "/prisoners-in-prison/WWI?term=A1234KJ"
-     *       "/prisoners-in-prison/WWI?term=A1234KJ bananas"
+     *       "/prison/WWI/prisoners?term=A1234KJ"
+     *       "/prison/WWI/prisoners?term=A1234KJ bananas"
      *       This will return the single prisoner with prisoner number A1234KJ in HMP Wandsworth.
-     *       An empty page will be returned if not found
+     *       An empty page will be returned if not found.
      *
-     *       "/prisoners-in-prison/WWI?term=A J&fromDob=1956-01-01&toDob=2000-01-02"
+     *       "/prison/WWI/prisoners?term=A J&fromDob=1956-01-01&toDob=2000-01-02"
      *       This will return all people in HMP Wandsworth. Born on or after 1956-01-01 and on or before 2000-01-02,
      *       whose name begins with A J, e.g Alan Jones born on 1956-01-01.
      *
-     *       "/prisoners-in-prison/WWI?alerts=TACT&alerts=PEEP"
+     *       "/prison/WWI/prisoners?alerts=TACT&alerts=PEEP"
      *       This will return all people in HMP Wandsworth. With the alerts TACT or PEEP.
      */
     get: operations['search']
@@ -1660,7 +1660,7 @@ export interface operations {
    */
   indexComplete: {
     parameters: {
-      query: {
+      query?: {
         ignoreThreshold?: boolean
       }
     }
@@ -1748,7 +1748,7 @@ export interface operations {
    */
   findByCriteria: {
     parameters: {
-      query: {
+      query?: {
         /** @description Zero-based page index (0..N) */
         page?: number
         /** @description The size of the page to be returned */
@@ -1777,7 +1777,7 @@ export interface operations {
    */
   findByReleaseDateAndPrison: {
     parameters: {
-      query: {
+      query?: {
         /** @description Zero-based page index (0..N) */
         page?: number
         /** @description The size of the page to be returned */
@@ -2068,7 +2068,7 @@ export interface operations {
    */
   globalFindByCriteria: {
     parameters: {
-      query: {
+      query?: {
         /** @description Zero-based page index (0..N) */
         page?: number
         /** @description The size of the page to be returned */
@@ -2099,7 +2099,7 @@ export interface operations {
   }
   getDlqMessages: {
     parameters: {
-      query: {
+      query?: {
         maxMessages?: number
       }
       path: {
@@ -2140,7 +2140,7 @@ export interface operations {
    */
   findByPrison: {
     parameters: {
-      query: {
+      query?: {
         'include-restricted-patients'?: boolean
         /** @description Zero-based page index (0..N) */
         page?: number
@@ -2203,7 +2203,7 @@ export interface operations {
   /**
    * Search for prisoners within a particular prison establishment
    * @description
-   *       This search is optimised for clients that have a simple search term typically containing the prisonser's name
+   *       This search is optimised for clients that have a simple search term typically containing the prisoner's name
    *       or prisoner number. The user typically is certain the prisoner is within the establishment and knows key information
    *       about the prisoner.
    *
@@ -2213,38 +2213,38 @@ export interface operations {
    *
    *       Examples:
    *
-   *       "/prisoners-in-prison/BXI?term=John&sort=firstName,lastName,desc&page=2&size=20"
+   *       "/prison/BXI/prisoners?term=John&sort=firstName,lastName,desc&page=2&size=20"
    *       This will return all people in HMP Brixton whose first or last names begins with JOHN.
    *       Results will be ordered by firstName, lastName descending.
    *       Page 3 will be returned with a maximum of 20 results per page.
    *
-   *       "/prisoners-in-prison/WWI?sort=cellLocation"
+   *       "/prison/WWI/prisoners?sort=cellLocation"
    *       This will return all people in HMP Wandsworth.
    *       Results will be ordered by cell location ascending.
    *       Page 1 will be returned with a maximum of 10 results per page.
    *
-   *       "/prisoners-in-prison/WWI?cellLocationPrefix=WWI-2&term=smith"
-   *       "/prisoners-in-prison/WWI?cellLocationPrefix=2&term=smith"
+   *       "/prison/WWI/prisoners?cellLocationPrefix=WWI-2&term=smith"
+   *       "/prison/WWI/prisoners?cellLocationPrefix=2&term=smith"
    *       This will return all people in HMP Wandsworth block 2 whose name starts with SMITH.
    *
-   *       "/prisoners-in-prison/WWI?cellLocationPrefix=2-A-3-001"
+   *       "/prison/WWI/prisoners?cellLocationPrefix=2-A-3-001"
    *       This will return all people in HMP Wandsworth cell WWI-2-A-3-001
    *
-   *       "/prisoners-in-prison/WWI?term=A1234KJ"
-   *       "/prisoners-in-prison/WWI?term=A1234KJ bananas"
+   *       "/prison/WWI/prisoners?term=A1234KJ"
+   *       "/prison/WWI/prisoners?term=A1234KJ bananas"
    *       This will return the single prisoner with prisoner number A1234KJ in HMP Wandsworth.
-   *       An empty page will be returned if not found
+   *       An empty page will be returned if not found.
    *
-   *       "/prisoners-in-prison/WWI?term=A J&fromDob=1956-01-01&toDob=2000-01-02"
+   *       "/prison/WWI/prisoners?term=A J&fromDob=1956-01-01&toDob=2000-01-02"
    *       This will return all people in HMP Wandsworth. Born on or after 1956-01-01 and on or before 2000-01-02,
    *       whose name begins with A J, e.g Alan Jones born on 1956-01-01.
    *
-   *       "/prisoners-in-prison/WWI?alerts=TACT&alerts=PEEP"
+   *       "/prison/WWI/prisoners?alerts=TACT&alerts=PEEP"
    *       This will return all people in HMP Wandsworth. With the alerts TACT or PEEP.
    */
   search: {
     parameters: {
-      query: {
+      query?: {
         /**
          * @description The primary search term. Whe absent all prisoners will be returned at the prison
          * @example john smith
