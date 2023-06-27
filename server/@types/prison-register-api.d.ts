@@ -752,7 +752,7 @@ export interface operations {
   }
   getDlqMessages: {
     parameters: {
-      query?: {
+      query: {
         maxMessages?: number
       }
       path: {
@@ -788,7 +788,7 @@ export interface operations {
    */
   getPrisonsBySearchFilter: {
     parameters: {
-      query?: {
+      query: {
         /**
          * @description Active
          * @example true

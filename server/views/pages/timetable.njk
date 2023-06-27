@@ -42,8 +42,8 @@
    {% set rowNumber = scheduleRows | length %}
     {% set scheduleRows = (scheduleRows.push([
       {
-        text: (selectedDate + 'T' + schedule.sessionTimeSlot.startTime) | formatTime +
-        ' to ' + (selectedDate + 'T' + schedule.sessionTimeSlot.endTime) | formatTime,
+        text: (selectedDate + 'T' + schedule.startTime) | formatTime +
+        ' to ' + (selectedDate + 'T' + schedule.endTime) | formatTime,
         attributes: { "data-test" : "schedule-time-" + rowNumber } 
       },
       {
@@ -59,11 +59,11 @@
         attributes: { "data-test" : "schedule-attendees-" + rowNumber } 
       },
       {
-        text: "Every week" if schedule.weeklyFrequency === 1 else "Every " + schedule.weeklyFrequency + " weeks",
+        text: sessionTemplateFrequency[schedule.sessionTemplateFrequency],
         attributes: { "data-test" : "schedule-frequency-" + rowNumber } 
       },
       {
-        text: schedule.sessionDateRange.validToDate | formatDate or 'Not entered' ,
+        text: schedule.sessionTemplateEndDate | formatDate or 'Not entered' ,
         attributes: { "data-test" : "schedule-end-date-" + rowNumber } 
       }
    ]), scheduleRows) %}
