@@ -1,4 +1,4 @@
-import { format, nextMonday, nextWednesday, previousMonday } from 'date-fns'
+import { addYears, format, nextMonday, nextWednesday, previousMonday } from 'date-fns'
 import TestData from '../../server/routes/testutils/testData'
 import HomePage from '../pages/home'
 import Page from '../pages/page'
@@ -8,6 +8,7 @@ context('View visit schedule timetable', () => {
   const prisonId = 'HEI'
 
   const shortDateFormat = 'yyyy-MM-dd'
+  const mediumDateFormat = 'd MMMM yyyy'
 
   const today = new Date()
 
@@ -21,6 +22,7 @@ context('View visit schedule timetable', () => {
   })
 
   it('should show the visits timetable with the current day selected', () => {
+    const futureEndDate = addYears(today, 1)
     const sessionSchedule = [
       TestData.sessionSchedule({
         sessionTimeSlot: {
@@ -35,8 +37,14 @@ context('View visit schedule timetable', () => {
       TestData.sessionSchedule(),
       TestData.sessionSchedule({
         prisonerCategoryGroupNames: ['Category A (High Risk) prisoners'],
-        sessionDateRange: { validFromDate: '2023-02-01', validToDate: '2023-04-01' },
+        sessionDateRange: { validFromDate: '2023-02-01', validToDate: format(futureEndDate, shortDateFormat) },
         weeklyFrequency: 3,
+      }),
+      TestData.sessionSchedule({
+        sessionDateRange: {
+          validFromDate: format(today, shortDateFormat),
+          validToDate: format(today, shortDateFormat),
+        },
       }),
     ]
     cy.task('stubSessionSchedule', { prisonId, date: format(today, shortDateFormat), sessionSchedule })
@@ -84,7 +92,10 @@ context('View visit schedule timetable', () => {
     visitTimetablePage.scheduleCapacity(3).contains('40 tables')
     visitTimetablePage.scheduleAttendees(3).contains('Category A (High Risk) prisoners')
     visitTimetablePage.scheduleFrequency(3).contains('Every 3 weeks')
-    visitTimetablePage.scheduleEndDate(3).contains('1 April 2023')
+    visitTimetablePage.scheduleEndDate(3).contains(format(futureEndDate, mediumDateFormat))
+
+    visitTimetablePage.scheduleFrequency(4).contains('One off')
+    visitTimetablePage.scheduleEndDate(4).contains(format(today, mediumDateFormat))
 
     visitTimetablePage
       .requestChangeLink()

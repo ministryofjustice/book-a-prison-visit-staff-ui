@@ -130,13 +130,14 @@ describe('View visits timetable', () => {
       })
   })
 
-  it('should render the visits timetable page with that selectedDates timetable shown', () => {
+  it('should render the visits timetable page with the full range of schedule data', () => {
     const sessionSchedule = [
       TestData.sessionSchedule(), // Row 0
       TestData.sessionSchedule({ weeklyFrequency: 2 }), // Row 1
       TestData.sessionSchedule({ prisonerLocationGroupNames: ['Group 1', 'Group 2'] }), // Row 2
       TestData.sessionSchedule({ capacity: { open: 11, closed: 22 }, weeklyFrequency: 3 }), // Row 3 + 4
       TestData.sessionSchedule({
+        sessionDateRange: { validFromDate: '2023-02-01', validToDate: '2023-02-01' },
         sessionTimeSlot: { startTime: '15:00', endTime: '15:45' },
         prisonerIncentiveLevelGroupNames: ['Enhanced prisoners'],
         prisonerLocationGroupNames: ['Group 1'],
@@ -188,6 +189,7 @@ describe('View visits timetable', () => {
         expect($('[data-test="schedule-time-5"]').text()).toBe('3pm to 3:45pm')
         expect($('[data-test="schedule-attendees-5"] > span').text().trim()).toBe('Enhanced prisoners in:')
         expect($('[data-test="schedule-attendees-5"] li').eq(0).text()).toBe('Group 1')
+        expect($('[data-test="schedule-frequency-5"]').text()).toBe('One off')
         // Row 6
         expect($('[data-test="schedule-attendees-6"]').text().trim()).toBe('Enhanced prisoners')
         expect($('[data-test="schedule-end-date-6"]').text()).toBe('31 December 2025')
