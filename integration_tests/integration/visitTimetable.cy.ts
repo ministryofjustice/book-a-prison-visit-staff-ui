@@ -23,20 +23,18 @@ context('View visit schedule timetable', () => {
   it('should show the visits timetable with the current day selected', () => {
     const sessionSchedule = [
       TestData.sessionSchedule({
-        sessionTimeSlot: {
-          startTime: '10:00',
-          endTime: '11:30',
-        },
+        startTime: '10:00',
+        endTime: '11:30',
         prisonerIncentiveLevelGroupNames: ['Enhanced prisoners'],
         capacity: { open: 20, closed: 5 }, // will generate 2 session rows
         prisonerLocationGroupNames: ['Group 1', 'Group 2'],
-        weeklyFrequency: 2,
+        sessionTemplateFrequency: 'BI_WEEKLY',
       }),
       TestData.sessionSchedule(),
       TestData.sessionSchedule({
         prisonerCategoryGroupNames: ['Category A (High Risk) prisoners'],
-        sessionDateRange: { validFromDate: '2023-02-01', validToDate: '2023-04-01' },
-        weeklyFrequency: 3,
+        sessionTemplateEndDate: '2023-04-01',
+        sessionTemplateFrequency: 'ONE_OFF',
       }),
     ]
     cy.task('stubSessionSchedule', { prisonId, date: format(today, shortDateFormat), sessionSchedule })
@@ -58,7 +56,7 @@ context('View visit schedule timetable', () => {
       cy.contains('Group 1')
       cy.contains('Group 2')
     })
-    visitTimetablePage.scheduleFrequency(0).contains('Every 2 weeks')
+    visitTimetablePage.scheduleFrequency(0).contains('Fortnightly')
     visitTimetablePage.scheduleEndDate(0).contains('Not entered')
 
     visitTimetablePage.scheduleTime(1).contains('10am to 11:30am')
@@ -69,21 +67,21 @@ context('View visit schedule timetable', () => {
       cy.contains('Group 1')
       cy.contains('Group 2')
     })
-    visitTimetablePage.scheduleFrequency(1).contains('Every 2 weeks')
+    visitTimetablePage.scheduleFrequency(1).contains('Fortnightly')
     visitTimetablePage.scheduleEndDate(1).contains('Not entered')
 
     visitTimetablePage.scheduleTime(2).contains('1:45pm to 3:45pm')
     visitTimetablePage.scheduleType(2).contains('Open')
     visitTimetablePage.scheduleCapacity(2).contains('40 tables')
     visitTimetablePage.scheduleAttendees(2).contains('All prisoners')
-    visitTimetablePage.scheduleFrequency(2).contains('Every week')
+    visitTimetablePage.scheduleFrequency(2).contains('Weekly')
     visitTimetablePage.scheduleEndDate(2).contains('Not entered')
 
     visitTimetablePage.scheduleTime(3).contains('1:45pm to 3:45pm')
     visitTimetablePage.scheduleType(3).contains('Open')
     visitTimetablePage.scheduleCapacity(3).contains('40 tables')
     visitTimetablePage.scheduleAttendees(3).contains('Category A (High Risk) prisoners')
-    visitTimetablePage.scheduleFrequency(3).contains('Every 3 weeks')
+    visitTimetablePage.scheduleFrequency(3).contains('One off')
     visitTimetablePage.scheduleEndDate(3).contains('1 April 2023')
 
     visitTimetablePage

@@ -443,28 +443,28 @@ export interface components {
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject']
-      pageable?: components['schemas']['PageableObject']
-      /** Format: int32 */
-      numberOfElements?: number
       first?: boolean
       last?: boolean
+      /** Format: int32 */
+      numberOfElements?: number
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     PageableObject: {
       /** Format: int64 */
       offset?: number
       sort?: components['schemas']['SortObject']
+      paged?: boolean
+      unpaged?: boolean
       /** Format: int32 */
       pageNumber?: number
       /** Format: int32 */
       pageSize?: number
-      paged?: boolean
-      unpaged?: boolean
     }
     SortObject: {
       empty?: boolean
-      sorted?: boolean
       unsorted?: boolean
+      sorted?: boolean
     }
     /** @description Support Type */
     SupportTypeDto: {
@@ -554,21 +554,6 @@ export interface components {
        */
       open: number
     }
-    /** @description Validity period for the session template */
-    SessionDateRangeDto: {
-      /**
-       * Format: date
-       * @description The start of the Validity period for the session template
-       * @example 2019-11-02
-       */
-      validFromDate: string
-      /**
-       * Format: date
-       * @description The end of the Validity period for the session template
-       * @example 2019-12-02
-       */
-      validToDate?: string
-    }
     /** @description Session schedule */
     SessionScheduleDto: {
       /**
@@ -576,8 +561,16 @@ export interface components {
        * @example v9d.7ed.7u
        */
       sessionTemplateReference: string
-      sessionTimeSlot: components['schemas']['SessionTimeSlotDto']
-      sessionDateRange: components['schemas']['SessionDateRangeDto']
+      /**
+       * Format: HH:mm
+       * @example 13:45
+       */
+      startTime: string
+      /**
+       * Format: HH:mm
+       * @example 13:45
+       */
+      endTime: string
       capacity: components['schemas']['SessionCapacityDto']
       /**
        * @description prisoner location group
@@ -595,24 +588,17 @@ export interface components {
        */
       prisonerIncentiveLevelGroupNames: string[]
       /**
-       * Format: int32
-       * @description number of weeks until the weekly day is repeated
-       * @example 1
+       * @description The session template frequency
+       * @example BI_WEEKLY
+       * @enum {string}
        */
-      weeklyFrequency: number
-    }
-    /** @description The time slot of the generated visit session(s) */
-    SessionTimeSlotDto: {
+      sessionTemplateFrequency: 'BI_WEEKLY' | 'WEEKLY' | 'ONE_OFF'
       /**
-       * Format: HH:mm
-       * @example 13:45
+       * Format: date
+       * @description The end date of sessionTemplate
+       * @example 2020-11-01
        */
-      startTime: string
-      /**
-       * Format: HH:mm
-       * @example 13:45
-       */
-      endTime: string
+      sessionTemplateEndDate?: string
     }
     GetDlqResult: {
       /** Format: int32 */
@@ -1355,7 +1341,7 @@ export interface operations {
   }
   getDlqMessages: {
     parameters: {
-      query?: {
+      query: {
         maxMessages?: number
       }
       path: {

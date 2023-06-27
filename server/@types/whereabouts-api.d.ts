@@ -943,9 +943,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
       last?: boolean
       empty?: boolean
     }
@@ -954,9 +954,9 @@ export interface components {
       offset?: number
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
-      pageSize?: number
-      /** Format: int32 */
       pageNumber?: number
+      /** Format: int32 */
+      pageSize?: number
       paged?: boolean
       unpaged?: boolean
     }
@@ -1678,7 +1678,7 @@ export interface operations {
   }
   getDlqMessages: {
     parameters: {
-      query?: {
+      query: {
         maxMessages?: number
       }
       path: {
@@ -1777,7 +1777,7 @@ export interface operations {
    */
   getCellsWithCapacityForGroup: {
     parameters: {
-      query?: {
+      query: {
         /** @description Cell attribute */
         attribute?: string
       }
@@ -1821,7 +1821,7 @@ export interface operations {
    */
   getEvents: {
     parameters: {
-      query?: {
+      query: {
         /** @description Returned events must be scheduled on or after this date (in YYYY-MM-DD format).  This date must be on or after today. */
         fromDate?: string
         /** @description Returned events must be scheduled on or before this date (in YYYY-MM-DD format).  This date must be on or after the fromDate. */
