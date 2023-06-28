@@ -25,10 +25,5 @@ generic-service:
     SMS_NOTIFICATIONS_ENABLED: "true"
     REDIS_KEY: "bapv-staff-prod"
 
-  namespace_secrets:
-    elasticache-redis:
-      REDIS_HOST: "primary_endpoint_address"
-      REDIS_AUTH_TOKEN: "auth_token"
-
 generic-prometheus-alerts:
   alertSeverity: digital-prison-service

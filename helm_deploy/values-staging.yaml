@@ -25,11 +25,6 @@ generic-service:
     SMS_NOTIFICATIONS_ENABLED: "true"
     REDIS_KEY: "bapv-staff-staging"
 
-  namespace_secrets:
-    elasticache-redis:
-      REDIS_HOST: "primary_endpoint_address"
-      REDIS_AUTH_TOKEN: "auth_token"
-
   allowlist:
     office: "217.33.148.210/32"
     health-kick: "35.177.252.195/32"

@@ -47,6 +47,9 @@ generic-service:
       GOVUK_NOTIFY_API_KEY: "GOVUK_NOTIFY_API_KEY"
     sqs-hmpps-audit-secret:
       AUDIT_SQS_QUEUE_URL: "sqs_queue_url"
+    elasticache-redis-staff:
+      REDIS_HOST: "primary_endpoint_address"
+      REDIS_AUTH_TOKEN: "auth_token"
 
   allowlist:
     office: "217.33.148.210/32"
