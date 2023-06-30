@@ -45,11 +45,11 @@ generic-service:
       SYSTEM_CLIENT_SECRET: "SYSTEM_CLIENT_SECRET"
       SESSION_SECRET: "SESSION_SECRET"
       GOVUK_NOTIFY_API_KEY: "GOVUK_NOTIFY_API_KEY"
-    elasticache-redis:
-      REDIS_HOST: "primary_endpoint_address"
-      REDIS_AUTH_TOKEN: "auth_token"
     sqs-hmpps-audit-secret:
       AUDIT_SQS_QUEUE_URL: "sqs_queue_url"
+    elasticache-redis-staff:
+      REDIS_HOST: "primary_endpoint_address"
+      REDIS_AUTH_TOKEN: "auth_token"
 
   allowlist:
     office: "217.33.148.210/32"
