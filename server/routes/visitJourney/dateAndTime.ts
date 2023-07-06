@@ -1,15 +1,15 @@
 import type { Request, Response } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
-import { v4 as uuidv4 } from 'uuid'
 import { VisitSlot } from '../../@types/bapv'
 import AuditService from '../../services/auditService'
-import VisitSessionsService from '../../services/visitSessionsService'
 import { getFlashFormValues, getSelectedSlot, getSlotByTimeAndRestriction } from '../visitorUtils'
 import getUrlPrefix from './visitJourneyUtils'
+import { VisitService, VisitSessionsService } from '../../services'
 
 export default class DateAndTime {
   constructor(
     private readonly mode: string,
+    private readonly visitService: VisitService,
     private readonly visitSessionsService: VisitSessionsService,
     private readonly auditService: AuditService,
   ) {}
@@ -77,7 +77,6 @@ export default class DateAndTime {
     req.session.slotsList = slotsList
 
     res.render('pages/bookAVisit/dateAndTime', {
-      accordionId: uuidv4(),
       errors: req.flash('errors'),
       visitRestriction: visitSessionData.visitRestriction,
       prisonerName: visitSessionData.prisoner.name,
@@ -99,22 +98,24 @@ export default class DateAndTime {
     const { visitSessionData } = req.session
     const errors = validationResult(req)
 
+    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
+
     if (!errors.isEmpty()) {
       req.flash('errors', errors.array() as [])
       req.flash('formValues', req.body)
-      return res.redirect(req.originalUrl)
+      return res.redirect(`${urlPrefix}/select-date-and-time`)
     }
 
     visitSessionData.visitSlot = getSelectedSlot(req.session.slotsList, req.body['visit-date-and-time'])
 
     // See README ('Visit journeys – book and update') for explanation of this flow
     if (visitSessionData.applicationReference) {
-      await this.visitSessionsService.changeReservedVisit({
+      await this.visitService.changeReservedVisit({
         username: res.locals.user.username,
         visitSessionData,
       })
     } else if (isUpdate) {
-      const { applicationReference, visitStatus } = await this.visitSessionsService.changeBookedVisit({
+      const { applicationReference, visitStatus } = await this.visitService.changeBookedVisit({
         username: res.locals.user.username,
         visitSessionData,
       })
@@ -122,7 +123,7 @@ export default class DateAndTime {
       visitSessionData.applicationReference = applicationReference
       visitSessionData.visitStatus = visitStatus
     } else {
-      const { applicationReference, reference, visitStatus } = await this.visitSessionsService.reserveVisit({
+      const { applicationReference, reference, visitStatus } = await this.visitService.reserveVisit({
         username: res.locals.user.username,
         visitSessionData,
       })
@@ -145,7 +146,6 @@ export default class DateAndTime {
       operationId: res.locals.appInsightsOperationId,
     })
 
-    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
     return res.redirect(`${urlPrefix}/additional-support`)
   }
 

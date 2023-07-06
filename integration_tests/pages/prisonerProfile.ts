@@ -31,9 +31,7 @@ export default class PrisonerProfilePage extends Page {
 
   selectActiveAlertsTab = (): PageElement => cy.get('#tab_active-alerts').click()
 
-  selectUpcomingVisitsTab = (): PageElement => cy.get('#tab_upcoming-visits').click()
-
-  selectVisitsHistoryTab = (): PageElement => cy.get('#tab_visits-history').click()
+  selectVisitsTab = (): PageElement => cy.get('#tab_visits').click()
 
   visitTabVORemaining = (): PageElement => cy.get('[data-test="tab-vo-remaining"]')
 
@@ -57,27 +55,23 @@ export default class PrisonerProfilePage extends Page {
 
   alertsTabExpires = (): PageElement => cy.get('[data-test="tab-alerts-expires"]')
 
-  upcomingTabReference = (): PageElement => cy.get('[data-test="tab-upcoming-reference"]')
+  visitTabCaption = (index: number): PageElement => cy.get(`#visits caption:nth-of-type(${index})`)
 
-  upcomingTabType = (): PageElement => cy.get('[data-test="tab-upcoming-type"]')
+  visitTabReference = (): PageElement => cy.get('[data-test="tab-visits-reference"]')
 
-  upcomingTabLocation = (): PageElement => cy.get('[data-test="tab-upcoming-location"]')
+  visitTabType = (): PageElement => cy.get('[data-test="tab-visits-type"]')
 
-  upcomingTabDateAndTime = (): PageElement => cy.get('[data-test="tab-upcoming-date-and-time"]')
+  visitTabLocation = (): PageElement => cy.get('[data-test="tab-visits-location"]')
 
-  upcomingTabVisitors = (): PageElement => cy.get('[data-test="tab-upcoming-visitors"]')
+  visitTabDateAndTime = (): PageElement => cy.get('[data-test="tab-visits-date-and-time"]')
 
-  upcomingTabVisitStatus = (): PageElement => cy.get('[data-test="tab-upcoming-status"]')
+  visitTabVisitors = (): PageElement => cy.get('[data-test="tab-visits-visitors"]')
 
-  pastTabReference = (): PageElement => cy.get('[data-test="tab-past-reference"]')
+  visitTabVisitStatus = (): PageElement => cy.get('[data-test="tab-visits-status"]')
 
-  pastTabType = (): PageElement => cy.get('[data-test="tab-past-type"]')
+  visitTabViewFullHistory = (): PageElement => cy.get('[data-test="view-dps-profile"]')
 
-  pastTabLocation = (): PageElement => cy.get('[data-test="tab-past-location"]')
+  voOverrideButton = (): PageElement => cy.get('#vo-override')
 
-  pastTabDateAndTime = (): PageElement => cy.get('[data-test="tab-past-date-and-time"]')
-
-  pastTabVisitors = (): PageElement => cy.get('[data-test="tab-past-visitors"]')
-
-  pastTabVisitStatus = (): PageElement => cy.get('[data-test="tab-past-status"]')
+  voOverrideText = (): PageElement => cy.get('.moj-banner__message')
 }

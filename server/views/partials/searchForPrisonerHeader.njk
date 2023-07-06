@@ -16,7 +16,7 @@
                     spellcheck: false,
                     value: search,
                     autocomplete: "off",
-                    errorMessage: error
+                    errorMessage: errors | findError('search')
                 }) }}
 
                 {{ govukButton({

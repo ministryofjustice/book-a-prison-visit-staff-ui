@@ -9,7 +9,7 @@ const buildVisitorListItem = (visitor: Contact): VisitorListItem => {
     personId: visitor.personId,
     name: `${visitor.firstName} ${visitor.lastName}`,
     dateOfBirth: visitor.dateOfBirth,
-    adult: visitor.dateOfBirth ? isAdult(visitor.dateOfBirth) : undefined,
+    adult: visitor.dateOfBirth ? isAdult(visitor.dateOfBirth) : true,
     relationshipDescription: visitor.relationshipDescription,
     address: getAddressToDisplay(visitor.addresses),
     restrictions: getRestrictionsToDisplay(visitor.restrictions),

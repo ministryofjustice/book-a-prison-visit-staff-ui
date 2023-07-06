@@ -130,14 +130,32 @@ describe('View visits timetable', () => {
       })
   })
 
-  it('should render the visits timetable page with that selectedDates timetable shown', () => {
+  it('should render the visits timetable page with the full range of schedule data', () => {
     const sessionSchedule = [
       TestData.sessionSchedule(), // Row 0
-      TestData.sessionSchedule({ sessionTemplateFrequency: 'BI_WEEKLY' }), // Row 1
+      TestData.sessionSchedule({ weeklyFrequency: 2 }), // Row 1
       TestData.sessionSchedule({ prisonerLocationGroupNames: ['Group 1', 'Group 2'] }), // Row 2
-      TestData.sessionSchedule({ capacity: { open: 11, closed: 22 } }), // Row 3 + 4
-      TestData.sessionSchedule({ enhanced: true, startTime: '15:00', prisonerLocationGroupNames: ['Group 1'] }), // Row 5
-      TestData.sessionSchedule({ enhanced: true, sessionTemplateEndDate: '2025-12-31' }), // Row 6
+      TestData.sessionSchedule({ capacity: { open: 11, closed: 22 }, weeklyFrequency: 3 }), // Row 3 + 4
+      TestData.sessionSchedule({
+        sessionDateRange: { validFromDate: '2023-02-01', validToDate: '2023-02-01' },
+        sessionTimeSlot: { startTime: '15:00', endTime: '15:45' },
+        prisonerIncentiveLevelGroupNames: ['Enhanced prisoners'],
+        prisonerLocationGroupNames: ['Group 1'],
+      }), // Row 5
+      TestData.sessionSchedule({
+        sessionDateRange: { validFromDate: '2023-02-01', validToDate: '2025-12-31' },
+        prisonerIncentiveLevelGroupNames: ['Enhanced prisoners'],
+      }), // Row 6
+      TestData.sessionSchedule({
+        sessionTimeSlot: { startTime: '15:00', endTime: '15:45' },
+        prisonerIncentiveLevelGroupNames: ['Super enhanced prisoners'],
+        prisonerLocationGroupNames: ['Group 1'],
+      }), // Row 7
+      TestData.sessionSchedule({
+        sessionDateRange: { validFromDate: '2023-02-01', validToDate: '2025-12-31' },
+        prisonerIncentiveLevelGroupNames: ['Super enhanced prisoners'],
+      }), // Row 8
+      TestData.sessionSchedule({ prisonerCategoryGroupNames: ['Category A (High Risk) prisoners'] }), // Row 9
     ]
     visitSessionsService.getSessionSchedule.mockResolvedValue(sessionSchedule)
 
@@ -152,26 +170,38 @@ describe('View visits timetable', () => {
         expect($('[data-test="schedule-time-0"]').text()).toBe('1:45pm to 3:45pm')
         expect($('[data-test="schedule-type-0"]').text()).toBe('Open')
         expect($('[data-test="schedule-capacity-0"]').text()).toBe('40 tables')
-        expect($('[data-test="schedule-attendees-0"]').text()).toBe('All prisoners')
-        expect($('[data-test="schedule-frequency-0"]').text()).toBe('Weekly')
+        expect($('[data-test="schedule-attendees-0"]').text().trim()).toBe('All prisoners')
+        expect($('[data-test="schedule-frequency-0"]').text()).toBe('Every week')
         expect($('[data-test="schedule-end-date-0"]').text()).toBe('Not entered')
         // Row 1
-        expect($('[data-test="schedule-frequency-1"]').text()).toBe('Fortnightly')
+        expect($('[data-test="schedule-frequency-1"]').text()).toBe('Every 2 weeks')
         // Row 2
         expect($('[data-test="schedule-attendees-2"] li').eq(0).text()).toBe('Group 1')
         expect($('[data-test="schedule-attendees-2"] li').eq(1).text()).toBe('Group 2')
         // Row 3 + 4
         expect($('[data-test="schedule-type-3"]').text()).toBe('Open')
         expect($('[data-test="schedule-capacity-3"]').text()).toBe('11 tables')
+        expect($('[data-test="schedule-frequency-3"]').text()).toBe('Every 3 weeks')
         expect($('[data-test="schedule-type-4"]').text()).toBe('Closed')
         expect($('[data-test="schedule-capacity-4"]').text()).toBe('22 tables')
+        expect($('[data-test="schedule-frequency-3"]').text()).toBe('Every 3 weeks')
         // Row 5
         expect($('[data-test="schedule-time-5"]').text()).toBe('3pm to 3:45pm')
-        expect($('[data-test="schedule-attendees-5"] > span').text()).toBe('Enhanced prisoners in:')
+        expect($('[data-test="schedule-attendees-5"] > span').text().trim()).toBe('Enhanced prisoners in:')
         expect($('[data-test="schedule-attendees-5"] li').eq(0).text()).toBe('Group 1')
+        expect($('[data-test="schedule-frequency-5"]').text()).toBe('One off')
         // Row 6
-        expect($('[data-test="schedule-attendees-6"]').text()).toBe('Enhanced prisoners only')
+        expect($('[data-test="schedule-attendees-6"]').text().trim()).toBe('Enhanced prisoners')
         expect($('[data-test="schedule-end-date-6"]').text()).toBe('31 December 2025')
+        // Row 7
+        expect($('[data-test="schedule-time-7"]').text()).toBe('3pm to 3:45pm')
+        expect($('[data-test="schedule-attendees-7"] > span').text().trim()).toBe('Super enhanced prisoners in:')
+        expect($('[data-test="schedule-attendees-7"] li').eq(0).text()).toBe('Group 1')
+        // Row 8
+        expect($('[data-test="schedule-attendees-8"]').text().trim()).toBe('Super enhanced prisoners')
+        expect($('[data-test="schedule-end-date-8"]').text()).toBe('31 December 2025')
+        // Row 9
+        expect($('[data-test="schedule-attendees-9"]').text().trim()).toBe('Category A (High Risk) prisoners')
       })
   })
 })

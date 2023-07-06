@@ -97,7 +97,8 @@ testJourneys.forEach(journey => {
         flashData.errors = [
           {
             msg: 'No visit type selected',
-            param: 'visitType',
+            path: 'visitType',
+            type: 'field',
             location: 'body',
           },
         ]
@@ -111,6 +112,7 @@ testJourneys.forEach(journey => {
             expect($('h1').text().trim()).toBe("Check the prisoner's closed visit restrictions")
             expect($('.govuk-back-link').attr('href')).toBe(`${journey.urlPrefix}/select-visitors`)
             expect($('.govuk-error-summary__body').text()).toContain('No visit type selected')
+            expect($('.govuk-error-summary__body a').attr('href')).toBe('#visitType-error')
             expect($('#visitType-error').text()).toContain('No visit type selected')
             expect($('[data-test="visit-type-open"]').prop('checked')).toBe(false)
             expect($('[data-test="visit-type-closed"]').prop('checked')).toBe(false)
@@ -128,7 +130,7 @@ testJourneys.forEach(journey => {
           .expect('location', `${journey.urlPrefix}/visit-type`)
           .expect(() => {
             expect(flashProvider).toHaveBeenCalledWith('errors', [
-              { location: 'body', msg: 'No visit type selected', param: 'visitType', value: undefined },
+              { location: 'body', msg: 'No visit type selected', path: 'visitType', type: 'field', value: undefined },
             ])
           })
       })

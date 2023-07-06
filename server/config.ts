@@ -47,7 +47,7 @@ export default {
   },
   session: {
     secret: get('SESSION_SECRET', 'app-insecure-default-session', requiredInProduction),
-    expiryMinutes: Number(get('WEB_SESSION_TIMEOUT_IN_MINUTES', 20)),
+    expiryMinutes: Number(get('WEB_SESSION_TIMEOUT_IN_MINUTES', 120)),
   },
   dpsHome: get('DPS_URL', 'https://digital-dev.prison.service.justice.gov.uk/', requiredInProduction),
   apis: {
@@ -91,14 +91,6 @@ export default {
       },
       agent: new AgentConfig(Number(get('PRISONER_DETAILS_API_TIMEOUT_RESPONSE', 10000))),
     },
-    visitScheduler: {
-      url: get('VISIT_SCHEDULER_API_URL', 'http://localhost:8080', requiredInProduction),
-      timeout: {
-        response: Number(get('VISIT_SCHEDULER_API_TIMEOUT_RESPONSE', 10000)),
-        deadline: Number(get('VISIT_SCHEDULER_API_TIMEOUT_DEADLINE', 10000)),
-      },
-      agent: new AgentConfig(Number(get('VISIT_SCHEDULER_API_TIMEOUT_RESPONSE', 10000))),
-    },
     prisonerContactRegistry: {
       url: get('PRISONER_CONTACT_REGISTRY_API_URL', 'http://localhost:8080', requiredInProduction),
       timeout: {
@@ -124,10 +116,6 @@ export default {
       agent: new AgentConfig(Number(get('PRISON_REGISTER_API_URL_TIMEOUT_RESPONSE', 10000))),
     },
     audit: {
-      region: get('AUDIT_SQS_REGION', 'eu-west-2', requiredInProduction),
-      accessKeyId: get('AUDIT_SQS_ACCESS_KEY_ID', 'foobar', requiredInProduction),
-      secretAccessKey: get('AUDIT_SQS_SECRET_ACCESS_KEY', 'foobar', requiredInProduction),
-      endpoint: production ? null : 'http://localhost:4566',
       queueUrl: get(
         'AUDIT_SQS_QUEUE_URL',
         'http://localhost:4566/000000000000/audit_event_queue',

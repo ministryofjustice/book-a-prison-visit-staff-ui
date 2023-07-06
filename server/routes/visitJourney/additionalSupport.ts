@@ -1,12 +1,12 @@
 import { Request, Response } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
 import { SupportType, VisitorSupport } from '../../data/orchestrationApiTypes'
-import VisitSessionsService from '../../services/visitSessionsService'
 import { getFlashFormValues } from '../visitorUtils'
 import getUrlPrefix from './visitJourneyUtils'
+import { AdditionalSupportService } from '../../services'
 
 export default class AdditionalSupport {
-  constructor(private readonly mode: string, private readonly visitSessionsService: VisitSessionsService) {}
+  constructor(private readonly mode: string, private readonly additionalSupportService: AdditionalSupportService) {}
 
   async get(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'
@@ -14,7 +14,7 @@ export default class AdditionalSupport {
     const formValues = getFlashFormValues(req)
 
     if (!req.session.availableSupportTypes) {
-      req.session.availableSupportTypes = await this.visitSessionsService.getAvailableSupportOptions(
+      req.session.availableSupportTypes = await this.additionalSupportService.getAvailableSupportOptions(
         res.locals.user.username,
       )
     }
@@ -39,10 +39,12 @@ export default class AdditionalSupport {
     const { visitSessionData } = req.session
     const errors = validationResult(req)
 
+    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
+
     if (!errors.isEmpty()) {
       req.flash('errors', errors.array() as [])
       req.flash('formValues', req.body)
-      return res.redirect(req.originalUrl)
+      return res.redirect(`${urlPrefix}/additional-support`)
     }
 
     visitSessionData.visitorSupport =
@@ -56,7 +58,6 @@ export default class AdditionalSupport {
             return supportItem
           })
 
-    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
     return res.redirect(`${urlPrefix}/select-main-contact`)
   }
 

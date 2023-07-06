@@ -55,6 +55,13 @@ export interface paths {
      */
     put: operations['buildIndex']
   }
+  '/events/prisoner/received/{prisonerNumber}': {
+    /**
+     * Fires a domain event 'prisoner-offender-search.prisoner.received'. This is to be used in a catastrophic failure scenario when the original event was not raised
+     * @description Requires EVENTS_ADMIN role
+     */
+    put: operations['raisePrisonerReceivedEvent']
+  }
   '/restricted-patient-search/match-restricted-patients': {
     /**
      * Match prisoners by criteria
@@ -178,11 +185,31 @@ export interface paths {
      */
     get: operations['findByPrison']
   }
+  '/prisoner-index/reconcile-prisoner/{prisonerNumber}': {
+    /**
+     * Compare a prisoner's index with Nomis
+     * @description Existing index is compared in detail with current Nomis data for a specific prisoner,
+     *       with the index value coming first, Nomis second in the returned details. Requires ROLE_PRISONER_INDEX.
+     */
+    get: operations['reconcilePrisoner']
+  }
+  '/prisoner-index/reconcile-index': {
+    /**
+     * Start a full index comparison
+     * @description The whole existing index is compared in detail with current Nomis data, requires ROLE_PRISONER_INDEX.
+     *       Results are written as customEvents. Nothing is written where a prisoner's data matches.
+     *       Note this is a heavyweight operation, like a full index rebuild
+     */
+    get: operations['startIndexReconciliation']
+  }
+  '/prisoner-index/compare-index': {
+    get: operations['compareIndex']
+  }
   '/prison/{prisonId}/prisoners': {
     /**
      * Search for prisoners within a particular prison establishment
      * @description
-     *       This search is optimised for clients that have a simple search term typically containing the prisonser's name
+     *       This search is optimised for clients that have a simple search term typically containing the prisoner's name
      *       or prisoner number. The user typically is certain the prisoner is within the establishment and knows key information
      *       about the prisoner.
      *
@@ -192,39 +219,36 @@ export interface paths {
      *
      *       Examples:
      *
-     *       "/prisoners-in-prison/BXI?term=John&sort=firstName,lastName,desc&page=2&size=20"
+     *       "/prison/BXI/prisoners?term=John&sort=firstName,lastName,desc&page=2&size=20"
      *       This will return all people in HMP Brixton whose first or last names begins with JOHN.
      *       Results will be ordered by firstName, lastName descending.
      *       Page 3 will be returned with a maximum of 20 results per page.
      *
-     *       "/prisoners-in-prison/WWI?sort=cellLocation"
+     *       "/prison/WWI/prisoners?sort=cellLocation"
      *       This will return all people in HMP Wandsworth.
      *       Results will be ordered by cell location ascending.
      *       Page 1 will be returned with a maximum of 10 results per page.
      *
-     *       "/prisoners-in-prison/WWI?cellLocationPrefix=WWI-2&term=smith"
-     *       "/prisoners-in-prison/WWI?cellLocationPrefix=2&term=smith"
+     *       "/prison/WWI/prisoners?cellLocationPrefix=WWI-2&term=smith"
+     *       "/prison/WWI/prisoners?cellLocationPrefix=2&term=smith"
      *       This will return all people in HMP Wandsworth block 2 whose name starts with SMITH.
      *
-     *       "/prisoners-in-prison/WWI?cellLocationPrefix=2-A-3-001"
+     *       "/prison/WWI/prisoners?cellLocationPrefix=2-A-3-001"
      *       This will return all people in HMP Wandsworth cell WWI-2-A-3-001
      *
-     *       "/prisoners-in-prison/WWI?term=A1234KJ"
-     *       "/prisoners-in-prison/WWI?term=A1234KJ bananas"
+     *       "/prison/WWI/prisoners?term=A1234KJ"
+     *       "/prison/WWI/prisoners?term=A1234KJ bananas"
      *       This will return the single prisoner with prisoner number A1234KJ in HMP Wandsworth.
-     *       An empty page will be returned if not found
+     *       An empty page will be returned if not found.
      *
-     *       "/prisoners-in-prison/WWI?term=A J&fromDob=1956-01-01&toDob=2000-01-02"
+     *       "/prison/WWI/prisoners?term=A J&fromDob=1956-01-01&toDob=2000-01-02"
      *       This will return all people in HMP Wandsworth. Born on or after 1956-01-01 and on or before 2000-01-02,
      *       whose name begins with A J, e.g Alan Jones born on 1956-01-01.
      *
-     *       "/prisoners-in-prison/WWI?alerts=TACT&alerts=PEEP"
+     *       "/prison/WWI/prisoners?alerts=TACT&alerts=PEEP"
      *       This will return all people in HMP Wandsworth. With the alerts TACT or PEEP.
      */
     get: operations['search']
-  }
-  '/compare-index': {
-    get: operations['compareIndex']
   }
 }
 
@@ -334,7 +358,7 @@ export interface components {
     }
     /** @description Incentive level */
     CurrentIncentive: {
-      level?: components['schemas']['IncentiveLevel']
+      level: components['schemas']['IncentiveLevel']
       /**
        * @description Date time of the incentive
        * @example 2021-07-05T10:35:17
@@ -358,7 +382,7 @@ export interface components {
        * @description description
        * @example Standard
        */
-      description?: string
+      description: string
     }
     Prisoner: {
       /**
@@ -467,7 +491,7 @@ export interface components {
        * @example IN
        * @enum {string}
        */
-      inOutStatus?: 'IN' | 'OUT'
+      inOutStatus?: 'IN' | 'OUT' | 'TRN'
       /**
        * @description Prison ID
        * @example MDI
@@ -798,22 +822,22 @@ export interface components {
        * @description Alert Type
        * @example H
        */
-      alertType?: string
+      alertType: string
       /**
        * @description Alert Code
        * @example HA
        */
-      alertCode?: string
+      alertCode: string
       /**
        * @description Active
        * @example true
        */
-      active?: boolean
+      active: boolean
       /**
        * @description Expired
        * @example true
        */
-      expired?: boolean
+      expired: boolean
     }
     /** @description Aliases Names and Details */
     PrisonerAlias: {
@@ -821,7 +845,7 @@ export interface components {
        * @description First Name
        * @example Robert
        */
-      firstName?: string
+      firstName: string
       /**
        * @description Middle names
        * @example Trevor
@@ -831,13 +855,13 @@ export interface components {
        * @description Last name
        * @example Lorsen
        */
-      lastName?: string
+      lastName: string
       /**
        * Format: date
        * @description Date of birth
        * @example 1975-04-02
        */
-      dateOfBirth?: string
+      dateOfBirth: string
       /**
        * @description Gender
        * @example Male
@@ -848,6 +872,30 @@ export interface components {
        * @example White : Irish
        */
       ethnicity?: string
+    }
+    PrisonerReceivedEventDetails: {
+      /**
+       * @description reason for receive event
+       * @example TRANSFERRED
+       * @enum {string}
+       */
+      reason:
+        | 'NEW_ADMISSION'
+        | 'READMISSION'
+        | 'TRANSFERRED'
+        | 'RETURN_FROM_COURT'
+        | 'TEMPORARY_ABSENCE_RETURN'
+        | 'POST_MERGE_ADMISSION'
+      /**
+       * @description prison agency id of new prison
+       * @example WWI
+       */
+      prisonId: string
+      /**
+       * @description local date time movement happened
+       * @example 2021-07-05T10:35:17
+       */
+      occurredAt: string
     }
     /** @description Search Criteria for Prisoner Search */
     RestrictedPatientSearchCriteria: {
@@ -886,9 +934,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
       last?: boolean
       empty?: boolean
     }
@@ -896,17 +944,17 @@ export interface components {
       /** Format: int64 */
       offset?: number
       sort?: components['schemas']['SortObject']
-      paged?: boolean
-      unpaged?: boolean
       /** Format: int32 */
       pageSize?: number
       /** Format: int32 */
       pageNumber?: number
+      paged?: boolean
+      unpaged?: boolean
     }
     SortObject: {
       empty?: boolean
-      unsorted?: boolean
       sorted?: boolean
+      unsorted?: boolean
     }
     /** @description Search Criteria for Release Date Search */
     ReleaseDateSearch: {
@@ -995,7 +1043,7 @@ export interface components {
        * @default false
        * @example false
        */
-      includeAliases?: boolean
+      includeAliases: boolean
     }
     /** @description Search Criteria for Prisoner Search */
     SearchCriteria: {
@@ -1026,7 +1074,7 @@ export interface components {
        * @default false
        * @example false
        */
-      includeAliases?: boolean
+      includeAliases: boolean
     }
     BookingIds: {
       /**
@@ -1046,13 +1094,13 @@ export interface components {
        * @description The page number required in the paginated response
        * @example 0
        */
-      page?: number
+      page: number
       /**
        * Format: int32
        * @description The number of results to return for paginated response
        * @example 10
        */
-      size?: number
+      size: number
     }
     PrisonerDetailRequest: {
       /**
@@ -1095,8 +1143,8 @@ export interface components {
        * @default true
        * @example true
        */
-      includeAliases?: boolean
-      pagination?: components['schemas']['PaginationRequest']
+      includeAliases: boolean
+      pagination: components['schemas']['PaginationRequest']
     }
     PrisonerDetailResponse: {
       /** Format: int64 */
@@ -1110,9 +1158,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
       last?: boolean
       empty?: boolean
     }
@@ -1122,7 +1170,7 @@ export interface components {
        * @description Status of Error Code
        * @example 400
        */
-      status?: number
+      status: number
       /**
        * @description Developer Information message
        * @example System is down
@@ -1343,8 +1391,8 @@ export interface components {
        *         Prison and cell location will always be required to match.
        * @example false
        */
-      lenient?: boolean
-      pagination?: components['schemas']['PaginationRequest']
+      lenient: boolean
+      pagination: components['schemas']['PaginationRequest']
     }
     PhysicalDetailResponse: {
       /** Format: int64 */
@@ -1358,9 +1406,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
       last?: boolean
       empty?: boolean
     }
@@ -1452,12 +1500,12 @@ export interface components {
        * ]
        */
       prisonIds: string[]
-      pagination?: components['schemas']['PaginationRequest']
+      pagination: components['schemas']['PaginationRequest']
       /**
        * @description The type of search. When set to DEFAULT (which is the default when not provided) search order is by calculated relevance (AKA score). An ESTABLISHMENT type will order results by name and is designed for using this API for a single quick search field for prisoners within a specific prison
        * @enum {string}
        */
-      type?: 'DEFAULT' | 'ESTABLISHMENT'
+      type: 'DEFAULT' | 'ESTABLISHMENT'
     }
     KeywordResponse: {
       /** Format: int64 */
@@ -1471,9 +1519,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
       last?: boolean
       empty?: boolean
     }
@@ -1516,7 +1564,7 @@ export interface components {
        * @default false
        * @example false
        */
-      includeAliases?: boolean
+      includeAliases: boolean
     }
     DlqMessage: {
       body: {
@@ -1612,8 +1660,8 @@ export interface operations {
    */
   indexComplete: {
     parameters: {
-      query: {
-        ignoreThreshold: boolean
+      query?: {
+        ignoreThreshold?: boolean
       }
     }
     responses: {
@@ -1674,12 +1722,33 @@ export interface operations {
     }
   }
   /**
+   * Fires a domain event 'prisoner-offender-search.prisoner.received'. This is to be used in a catastrophic failure scenario when the original event was not raised
+   * @description Requires EVENTS_ADMIN role
+   */
+  raisePrisonerReceivedEvent: {
+    parameters: {
+      path: {
+        /** @example A1234AA */
+        prisonerNumber: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['PrisonerReceivedEventDetails']
+      }
+    }
+    responses: {
+      /** @description Accepted */
+      202: never
+    }
+  }
+  /**
    * Match prisoners by criteria
    * @description Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role
    */
   findByCriteria: {
     parameters: {
-      query: {
+      query?: {
         /** @description Zero-based page index (0..N) */
         page?: number
         /** @description The size of the page to be returned */
@@ -1708,7 +1777,7 @@ export interface operations {
    */
   findByReleaseDateAndPrison: {
     parameters: {
-      query: {
+      query?: {
         /** @description Zero-based page index (0..N) */
         page?: number
         /** @description The size of the page to be returned */
@@ -1999,7 +2068,7 @@ export interface operations {
    */
   globalFindByCriteria: {
     parameters: {
-      query: {
+      query?: {
         /** @description Zero-based page index (0..N) */
         page?: number
         /** @description The size of the page to be returned */
@@ -2030,8 +2099,8 @@ export interface operations {
   }
   getDlqMessages: {
     parameters: {
-      query: {
-        maxMessages: number
+      query?: {
+        maxMessages?: number
       }
       path: {
         dlqName: string
@@ -2071,8 +2140,8 @@ export interface operations {
    */
   findByPrison: {
     parameters: {
-      query: {
-        'include-restricted-patients': boolean
+      query?: {
+        'include-restricted-patients'?: boolean
         /** @description Zero-based page index (0..N) */
         page?: number
         /** @description The size of the page to be returned */
@@ -2094,9 +2163,47 @@ export interface operations {
     }
   }
   /**
+   * Compare a prisoner's index with Nomis
+   * @description Existing index is compared in detail with current Nomis data for a specific prisoner,
+   *       with the index value coming first, Nomis second in the returned details. Requires ROLE_PRISONER_INDEX.
+   */
+  reconcilePrisoner: {
+    parameters: {
+      path: {
+        prisonerNumber: string
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          'application/json': string
+        }
+      }
+    }
+  }
+  /**
+   * Start a full index comparison
+   * @description The whole existing index is compared in detail with current Nomis data, requires ROLE_PRISONER_INDEX.
+   *       Results are written as customEvents. Nothing is written where a prisoner's data matches.
+   *       Note this is a heavyweight operation, like a full index rebuild
+   */
+  startIndexReconciliation: {
+    responses: {
+      /** @description Accepted */
+      202: never
+    }
+  }
+  compareIndex: {
+    responses: {
+      /** @description Accepted */
+      202: never
+    }
+  }
+  /**
    * Search for prisoners within a particular prison establishment
    * @description
-   *       This search is optimised for clients that have a simple search term typically containing the prisonser's name
+   *       This search is optimised for clients that have a simple search term typically containing the prisoner's name
    *       or prisoner number. The user typically is certain the prisoner is within the establishment and knows key information
    *       about the prisoner.
    *
@@ -2106,48 +2213,48 @@ export interface operations {
    *
    *       Examples:
    *
-   *       "/prisoners-in-prison/BXI?term=John&sort=firstName,lastName,desc&page=2&size=20"
+   *       "/prison/BXI/prisoners?term=John&sort=firstName,lastName,desc&page=2&size=20"
    *       This will return all people in HMP Brixton whose first or last names begins with JOHN.
    *       Results will be ordered by firstName, lastName descending.
    *       Page 3 will be returned with a maximum of 20 results per page.
    *
-   *       "/prisoners-in-prison/WWI?sort=cellLocation"
+   *       "/prison/WWI/prisoners?sort=cellLocation"
    *       This will return all people in HMP Wandsworth.
    *       Results will be ordered by cell location ascending.
    *       Page 1 will be returned with a maximum of 10 results per page.
    *
-   *       "/prisoners-in-prison/WWI?cellLocationPrefix=WWI-2&term=smith"
-   *       "/prisoners-in-prison/WWI?cellLocationPrefix=2&term=smith"
+   *       "/prison/WWI/prisoners?cellLocationPrefix=WWI-2&term=smith"
+   *       "/prison/WWI/prisoners?cellLocationPrefix=2&term=smith"
    *       This will return all people in HMP Wandsworth block 2 whose name starts with SMITH.
    *
-   *       "/prisoners-in-prison/WWI?cellLocationPrefix=2-A-3-001"
+   *       "/prison/WWI/prisoners?cellLocationPrefix=2-A-3-001"
    *       This will return all people in HMP Wandsworth cell WWI-2-A-3-001
    *
-   *       "/prisoners-in-prison/WWI?term=A1234KJ"
-   *       "/prisoners-in-prison/WWI?term=A1234KJ bananas"
+   *       "/prison/WWI/prisoners?term=A1234KJ"
+   *       "/prison/WWI/prisoners?term=A1234KJ bananas"
    *       This will return the single prisoner with prisoner number A1234KJ in HMP Wandsworth.
-   *       An empty page will be returned if not found
+   *       An empty page will be returned if not found.
    *
-   *       "/prisoners-in-prison/WWI?term=A J&fromDob=1956-01-01&toDob=2000-01-02"
+   *       "/prison/WWI/prisoners?term=A J&fromDob=1956-01-01&toDob=2000-01-02"
    *       This will return all people in HMP Wandsworth. Born on or after 1956-01-01 and on or before 2000-01-02,
    *       whose name begins with A J, e.g Alan Jones born on 1956-01-01.
    *
-   *       "/prisoners-in-prison/WWI?alerts=TACT&alerts=PEEP"
+   *       "/prison/WWI/prisoners?alerts=TACT&alerts=PEEP"
    *       This will return all people in HMP Wandsworth. With the alerts TACT or PEEP.
    */
   search: {
     parameters: {
-      query: {
+      query?: {
         /**
          * @description The primary search term. Whe absent all prisoners will be returned at the prison
          * @example john smith
          */
-        term: string
+        term?: string
         /**
          * @description alert codes to filter by. Zero or more can be supplied. When multiple supplied the filter is effectively and OR
          * @example XTACT
          */
-        alerts: string[]
+        alerts?: string[]
         /**
          * @description Offenders with a DOB >= this date
          * @example 1970-01-02
@@ -2163,6 +2270,11 @@ export interface operations {
          * @example 3-1
          */
         cellLocationPrefix?: string
+        /**
+         * @description Filter for the prisoners on an incentive level.
+         * @example STD
+         */
+        incentiveLevelCode?: string
         /** @description Zero-based page index (0..N) */
         page?: number
         /** @description The size of the page to be returned */
@@ -2199,12 +2311,6 @@ export interface operations {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
-    }
-  }
-  compareIndex: {
-    responses: {
-      /** @description Accepted */
-      202: never
     }
   }
 }

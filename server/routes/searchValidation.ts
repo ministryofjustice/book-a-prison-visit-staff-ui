@@ -1,21 +1,25 @@
 import { isValidVisitReference } from './validationChecks'
 
 type Error = {
-  param: string
+  path: string
+  type: string
   msg: string
 }
 
 const errors: { [key: string]: Error } = {
   INVALID_PRISONER_QUERY: {
-    param: '#search',
+    path: 'search',
+    type: 'field',
     msg: 'You must enter at least 2 characters',
   },
   INVALID_VISIT_QUERY: {
-    param: '#searchBlock1',
+    path: 'searchBlock1',
+    type: 'field',
     msg: 'Booking reference must only include lower case letters',
   },
   SHORT_VISIT_QUERY: {
-    param: '#searchBlock1',
+    path: 'searchBlock1',
+    type: 'field',
     msg: 'Booking reference must be 8 characters',
   },
 }

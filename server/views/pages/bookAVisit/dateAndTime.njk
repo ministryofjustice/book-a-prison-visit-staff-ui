@@ -5,6 +5,7 @@
 {% from "govuk/components/select/macro.njk" import govukSelect %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {% from "govuk/components/details/macro.njk" import govukDetails %}
+{%- from "govuk/components/tag/macro.njk" import govukTag -%}
 {%- from "moj/components/banner/macro.njk" import mojBanner -%}
 
 {% set pageHeaderTitle = "Select date and time of visit" %}
@@ -27,7 +28,12 @@
       {% elseif (doubleBooked and not checked) -%}
         Prisoner has a visit
       {%- elseif slot.availableTables <= 0 -%}
-        Fully booked ({{ slot.capacity + (slot.availableTables | abs) }} of {{ slot.capacity}} {{ "table" | pluralise(slot.capacity) }} booked)
+        {{ govukTag({
+          text: "Fully booked",
+          classes: "govuk-tag--red"
+          })}}
+          <br>
+          {{ slot.capacity + (slot.availableTables | abs) }} of {{ slot.capacity}} {{ "table" | pluralise(slot.capacity) }} booked
       {%- else -%}
         {{ slot.availableTables }} {{ "table" | pluralise(slot.availableTables) }} available
       {%- endif %}
@@ -54,7 +60,7 @@
     <p class="bapv-extraspacing bapv-date-time-information"><strong>Prisoner name:</strong> <span data-test="prisoner-name">{{ prisonerName }}</span> <strong>Location:</strong> <span data-test="visit-location">{{ location }}</span> <strong>Visit type:</strong> <span data-test="visit-restriction">{{ visitRestriction | capitalize }}</span></p>
     {{ govukDetails({
       summaryText: "What time slots are shown?",
-      html: "<p>Showing time slots:</p><ul><li>suitable for the prisoner’s location and incentive level</li><li>that do not have non-associations for the prisoner</li><li>over the next 28 days</li></ul>"
+      html: "<p>Showing time slots:</p><ul><li>suitable for the prisoner’s location, category and incentive level</li><li>that do not have non-associations for the prisoner</li><li>over the next 28 days</li></ul>"
     }) }}
 
     {% if not whereaboutsAvailable %}
@@ -192,7 +198,8 @@
       {% endfor -%}
 
       {{- govukAccordion({
-        id: "slots-month-" + (month | replace(" ", "")) + "-" + accordionId,
+        id: "slots-month-" + (month | replace(" ", "")),
+        rememberExpanded: false,
         headingLevel: 3,
         items: accordion
       }) }}
@@ -206,8 +213,7 @@
     </form>
 
     {% else %}
-    <p>There are no available slots for the selected time and day.</p>
-    <p>Change the filter to see more results.</p>
+    <p>There are no available time slots for this prisoner.</p>
 
     {% include "partials/backToStartButton.njk" %}
     {% endif %}

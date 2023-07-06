@@ -1,151 +1,99 @@
 import { NotFound } from 'http-errors'
-import { PrisonerProfile, BAPVVisitBalances, PrisonerAlertItem, UpcomingVisitItem, PastVisitItem } from '../@types/bapv'
-import {
-  prisonerDatePretty,
-  properCaseFullName,
-  properCase,
-  visitDateAndTime,
-  nextIepAdjustDate,
-  nextPrivIepAdjustDate,
-  formatVisitType,
-} from '../utils/utils'
-import { Alert, InmateDetail, OffenderRestriction, VisitBalances } from '../data/prisonApiTypes'
-import { Visitor } from '../data/orchestrationApiTypes'
-import { Contact } from '../data/prisonerContactRegistryApiTypes'
-import SupportedPrisonsService from './supportedPrisonsService'
+import { format, isBefore } from 'date-fns'
+import { PrisonerProfilePage } from '../@types/bapv'
+import { nextIepAdjustDate, nextPrivIepAdjustDate, prisonerDateTimePretty, properCaseFullName } from '../utils/utils'
+import { Alert, OffenderRestriction } from '../data/prisonApiTypes'
 import {
   HmppsAuthClient,
+  OrchestrationApiClient,
   PrisonApiClient,
   PrisonerContactRegistryApiClient,
-  PrisonerSearchClient,
   RestClientBuilder,
-  VisitSchedulerApiClient,
 } from '../data'
 
 export default class PrisonerProfileService {
   private alertCodesToFlag = ['UPIU', 'RCDR', 'URCU']
 
   constructor(
+    private readonly orchestrationApiClientFactory: RestClientBuilder<OrchestrationApiClient>,
     private readonly prisonApiClientFactory: RestClientBuilder<PrisonApiClient>,
-    private readonly visitSchedulerApiClientFactory: RestClientBuilder<VisitSchedulerApiClient>,
     private readonly prisonerContactRegistryApiClientFactory: RestClientBuilder<PrisonerContactRegistryApiClient>,
-    private readonly prisonerSearchClientFactory: RestClientBuilder<PrisonerSearchClient>,
-    private readonly supportedPrisonsService: SupportedPrisonsService,
     private readonly hmppsAuthClient: HmppsAuthClient,
   ) {}
 
-  async getProfile(offenderNo: string, prisonId: string, username: string): Promise<PrisonerProfile> {
+  async getProfile(prisonId: string, prisonerId: string, username: string): Promise<PrisonerProfilePage> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const prisonApiClient = this.prisonApiClientFactory(token)
-    const bookings = await prisonApiClient.getBookings(offenderNo, prisonId)
+    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+    const prisonerProfile = await orchestrationApiClient.getPrisonerProfile(prisonId, prisonerId)
 
-    if (bookings.numberOfElements !== 1) throw new NotFound()
-
-    const visitSchedulerApiClient = this.visitSchedulerApiClientFactory(token)
+    // To remove when VB-2060 done - build list of contact IDs => contact name
     const prisonerContactRegistryApiClient = this.prisonerContactRegistryApiClientFactory(token)
-    const prisonerSearchClient = this.prisonerSearchClientFactory(token)
-
-    const { convictedStatus } = bookings.content[0]
-    const inmateDetail = await prisonApiClient.getOffender(offenderNo)
-    const prisoner = await prisonerSearchClient.getPrisonerById(offenderNo)
-    const incentiveLevel = prisoner.currentIncentive?.level.description || ''
-
-    const visitBalances = await this.getVisitBalances(prisonApiClient, convictedStatus, offenderNo)
-    const displayName = properCaseFullName(`${inmateDetail.lastName}, ${inmateDetail.firstName}`)
-    const displayDob = prisonerDatePretty({ dateToFormat: inmateDetail.dateOfBirth })
-    const alerts = inmateDetail.alerts || []
-    const activeAlerts: Alert[] = alerts.filter(alert => alert.active)
-    const flaggedAlerts: Alert[] = activeAlerts.filter(alert => this.alertCodesToFlag.includes(alert.alertCode))
-
-    const socialContacts = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(offenderNo)
-    const supportedPrisons = await this.supportedPrisonsService.getSupportedPrisons(username)
-
-    const upcomingVisits: UpcomingVisitItem[] = await this.getUpcomingVisits(
-      offenderNo,
-      socialContacts,
-      visitSchedulerApiClient,
-      supportedPrisons,
-    )
-    const pastVisits: PastVisitItem[] = await this.getPastVisits(
-      offenderNo,
-      socialContacts,
-      visitSchedulerApiClient,
-      supportedPrisons,
-    )
-
-    const activeAlertsForDisplay: PrisonerAlertItem[] = activeAlerts.map(alert => {
-      return [
-        {
-          text: `${alert.alertTypeDescription} (${alert.alertType})`,
-          attributes: {
-            'data-test': 'tab-alerts-type-desc',
-          },
-        },
-        {
-          text: `${alert.alertCodeDescription} (${alert.alertCode})`,
-          attributes: {
-            'data-test': 'tab-alerts-code-desc',
-          },
-        },
-        {
-          text: alert.comment,
-          classes: 'bapv-force-overflow',
-          attributes: {
-            'data-test': 'tab-alerts-comment',
-          },
-        },
-        {
-          html: alert.dateCreated
-            ? prisonerDatePretty({ dateToFormat: alert.dateCreated, wrapDate: false })
-            : 'Not entered',
-          attributes: {
-            'data-test': 'tab-alerts-created',
-          },
-        },
-        {
-          html: alert.dateExpires
-            ? prisonerDatePretty({ dateToFormat: alert.dateExpires, wrapDate: false })
-            : 'Not entered',
-          attributes: {
-            'data-test': 'tab-alerts-expires',
-          },
-        },
-      ]
+    const socialContacts = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(prisonerId)
+    const contactNames: Record<number, string> = {}
+    socialContacts.forEach(contact => {
+      contactNames[contact.personId] = `${contact.firstName} ${contact.lastName}`
     })
 
+    const alerts = prisonerProfile.alerts || []
+    const activeAlerts: Alert[] = alerts.filter(alert => alert.active)
+    const activeAlertCount = activeAlerts.length
+    const flaggedAlerts: Alert[] = activeAlerts.filter(alert => this.alertCodesToFlag.includes(alert.alertCode))
+
+    const visitsByMonth: PrisonerProfilePage['visitsByMonth'] = new Map()
+    const now = new Date()
+
+    prisonerProfile.visits.forEach(visit => {
+      const visitStartTime = new Date(visit.startTimestamp)
+      const visitMonth = format(visitStartTime, 'MMMM yyyy') // e.g. 'May 2023'
+
+      if (!visitsByMonth.has(visitMonth)) {
+        visitsByMonth.set(visitMonth, { upcomingCount: 0, pastCount: 0, visits: [] })
+      }
+      const month = visitsByMonth.get(visitMonth)
+
+      if (visit.visitStatus === 'BOOKED') {
+        const isUpcoming = isBefore(now, visitStartTime)
+        if (isUpcoming) {
+          month.upcomingCount += 1
+        } else {
+          month.pastCount += 1
+        }
+      }
+      month.visits.push(visit)
+    })
+
+    const prisonerDetails: PrisonerProfilePage['prisonerDetails'] = {
+      prisonerId,
+      name: properCaseFullName(`${prisonerProfile.lastName}, ${prisonerProfile.firstName}`),
+      dateOfBirth: prisonerDateTimePretty(prisonerProfile.dateOfBirth),
+      cellLocation: prisonerProfile.cellLocation,
+      prisonName: prisonerProfile.prisonName,
+      convictedStatus: prisonerProfile.convictedStatus,
+      category: prisonerProfile.category,
+      incentiveLevel: prisonerProfile.incentiveLevel,
+      visitBalances: prisonerProfile.convictedStatus === 'Convicted' ? prisonerProfile.visitBalances : null,
+    }
+
+    const { visitBalances } = prisonerDetails
+    if (visitBalances) {
+      if (visitBalances.latestIepAdjustDate) {
+        visitBalances.nextIepAdjustDate = nextIepAdjustDate(visitBalances.latestIepAdjustDate)
+        visitBalances.latestIepAdjustDate = prisonerDateTimePretty(visitBalances.latestIepAdjustDate)
+      }
+      if (visitBalances.latestPrivIepAdjustDate) {
+        visitBalances.nextPrivIepAdjustDate = nextPrivIepAdjustDate(visitBalances.latestPrivIepAdjustDate)
+        visitBalances.latestPrivIepAdjustDate = prisonerDateTimePretty(visitBalances.latestPrivIepAdjustDate)
+      }
+    }
+
     return {
-      displayName,
-      displayDob,
-      activeAlerts: activeAlertsForDisplay,
+      activeAlerts,
+      activeAlertCount,
       flaggedAlerts,
-      inmateDetail,
-      convictedStatus,
-      incentiveLevel,
-      visitBalances,
-      upcomingVisits,
-      pastVisits,
+      prisonerDetails,
+      visitsByMonth,
+      contactNames,
     }
-  }
-
-  async getPrisonerAndVisitBalances(
-    offenderNo: string,
-    prisonId: string,
-    username: string,
-  ): Promise<{ inmateDetail: InmateDetail; visitBalances: VisitBalances }> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const prisonApiClient = this.prisonApiClientFactory(token)
-
-    const bookings = await prisonApiClient.getBookings(offenderNo, prisonId)
-    if (bookings.numberOfElements !== 1) throw new NotFound()
-    const { convictedStatus } = bookings.content[0]
-
-    const inmateDetail = await prisonApiClient.getOffender(offenderNo)
-
-    if (convictedStatus === 'Remand') {
-      return { inmateDetail, visitBalances: undefined }
-    }
-
-    return { inmateDetail, visitBalances: await prisonApiClient.getVisitBalances(offenderNo) }
   }
 
   async getRestrictions(offenderNo: string, username: string): Promise<OffenderRestriction[]> {
@@ -158,163 +106,5 @@ export default class PrisonerProfileService {
     const { offenderRestrictions } = restrictions
 
     return offenderRestrictions
-  }
-
-  private async getUpcomingVisits(
-    offenderNo: string,
-    socialContacts: Contact[],
-    visitSchedulerApiClient: VisitSchedulerApiClient,
-    supportedPrisons: Record<string, string>,
-  ): Promise<UpcomingVisitItem[]> {
-    const { content: visits } = await visitSchedulerApiClient.getUpcomingVisits(offenderNo, ['CANCELLED', 'BOOKED'])
-    const socialVisits = visits.filter(visit => visit.visitType === 'SOCIAL')
-
-    const visitsForDisplay: UpcomingVisitItem[] = socialVisits.map(visit => {
-      const visitContactNames = this.getPrisonerSocialContacts(socialContacts, visit.visitors)
-
-      return [
-        {
-          html: `<a href='/visit/${visit.reference}'>${visit.reference}</a>`,
-          attributes: {
-            'data-test': 'tab-upcoming-reference',
-          },
-        },
-        {
-          html: formatVisitType(visit.visitType),
-          attributes: {
-            'data-test': 'tab-upcoming-type',
-          },
-        },
-        {
-          text: supportedPrisons[visit.prisonId],
-          attributes: {
-            'data-test': 'tab-upcoming-location',
-          },
-        },
-        {
-          html: visit.startTimestamp
-            ? `<p>${visitDateAndTime({ startTimestamp: visit.startTimestamp, endTimestamp: visit.endTimestamp })}</p>`
-            : '<p>N/A</p>',
-          attributes: {
-            'data-test': 'tab-upcoming-date-and-time',
-          },
-        },
-        {
-          html: `<p>${visitContactNames.join('<br>')}</p>`,
-          attributes: {
-            'data-test': 'tab-upcoming-visitors',
-          },
-        },
-        {
-          text: `${properCase(visit.visitStatus)}`,
-          attributes: {
-            'data-test': 'tab-upcoming-status',
-          },
-        },
-      ] as UpcomingVisitItem
-    })
-
-    return visitsForDisplay
-  }
-
-  private async getPastVisits(
-    offenderNo: string,
-    socialContacts: Contact[],
-    visitSchedulerApiClient: VisitSchedulerApiClient,
-    supportedPrisons: Record<string, string>,
-  ): Promise<PastVisitItem[]> {
-    const { content: visits } = await visitSchedulerApiClient.getPastVisits(offenderNo, ['CANCELLED', 'BOOKED'])
-
-    const socialVisits = visits.filter(visit => visit.visitType === 'SOCIAL')
-    const visitsForDisplay: PastVisitItem[] = socialVisits.map(visit => {
-      const visitContactNames = this.getPrisonerSocialContacts(socialContacts, visit.visitors)
-
-      return [
-        {
-          html: `<a href='/visit/${visit.reference}'>${visit.reference}</a>`,
-          attributes: {
-            'data-test': 'tab-past-reference',
-          },
-        },
-        {
-          html: formatVisitType(visit.visitType),
-          attributes: {
-            'data-test': 'tab-past-type',
-          },
-        },
-        {
-          text: supportedPrisons[visit.prisonId],
-          attributes: {
-            'data-test': 'tab-past-location',
-          },
-        },
-        {
-          html: visit.startTimestamp
-            ? `<p>${visitDateAndTime({ startTimestamp: visit.startTimestamp, endTimestamp: visit.endTimestamp })}</p>`
-            : '<p>N/A</p>',
-          attributes: {
-            'data-test': 'tab-past-date-and-time',
-          },
-        },
-        {
-          html: `<p>${visitContactNames.join('<br>')}</p>`,
-          attributes: {
-            'data-test': 'tab-past-visitors',
-          },
-        },
-        {
-          text: `${properCase(visit.visitStatus)}`,
-          attributes: {
-            'data-test': 'tab-past-status',
-          },
-        },
-      ] as PastVisitItem
-    })
-
-    return visitsForDisplay
-  }
-
-  private getPrisonerSocialContacts(contacts: Contact[], visitors: Visitor[]): string[] {
-    const contactIds: number[] = visitors.reduce((personIds, visitor) => {
-      personIds.push(visitor.nomisPersonId)
-
-      return personIds
-    }, [])
-
-    const contactsForDisplay: string[] = contacts.reduce((contactNames, contact) => {
-      if (contactIds.includes(contact.personId)) {
-        contactNames.push(`${contact.firstName} ${contact.lastName}`)
-      }
-
-      return contactNames
-    }, [])
-
-    return contactsForDisplay
-  }
-
-  private async getVisitBalances(
-    prisonApiClient: PrisonApiClient,
-    convictedStatus: string,
-    offenderNo: string,
-  ): Promise<BAPVVisitBalances> {
-    if (convictedStatus === 'Remand') return null
-
-    const visitBalances = (await prisonApiClient.getVisitBalances(offenderNo)) as BAPVVisitBalances
-
-    if (visitBalances?.latestIepAdjustDate) {
-      visitBalances.nextIepAdjustDate = nextIepAdjustDate(visitBalances.latestIepAdjustDate)
-      visitBalances.latestIepAdjustDate = prisonerDatePretty({
-        dateToFormat: visitBalances.latestIepAdjustDate,
-      })
-    }
-
-    if (visitBalances?.latestPrivIepAdjustDate) {
-      visitBalances.nextPrivIepAdjustDate = nextPrivIepAdjustDate(visitBalances.latestPrivIepAdjustDate)
-      visitBalances.latestPrivIepAdjustDate = prisonerDatePretty({
-        dateToFormat: visitBalances.latestPrivIepAdjustDate,
-      })
-    }
-
-    return visitBalances
   }
 }

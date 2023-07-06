@@ -39,18 +39,20 @@ testJourneys.forEach(journey => {
         visitRestriction: 'OPEN',
         visitSlot: {
           id: 'visitId',
+          sessionTemplateReference: 'ab-cd-ef',
           prisonId: 'HEI',
           startTimestamp: '2022-03-12T09:30:00',
           endTimestamp: '2022-03-12T10:30:00',
           availableTables: 1,
           capacity: 30,
-          visitRoomName: 'room name',
+          visitRoom: 'room name',
           visitRestriction: 'OPEN',
         },
         visitors: [
           {
             personId: 123,
             name: 'name last',
+            adult: true,
             relationshipDescription: 'relate',
             restrictions: [
               {
@@ -101,7 +103,9 @@ testJourneys.forEach(journey => {
       })
 
       it('should render validation errors from flash data for when no data entered', () => {
-        flashData.errors = [{ location: 'body', msg: 'No request method selected', param: 'method', value: undefined }]
+        flashData.errors = [
+          { location: 'body', msg: 'No request method selected', path: 'method', type: 'field', value: undefined },
+        ]
 
         return request(sessionApp)
           .get(`${journey.urlPrefix}/request-method`)
@@ -141,7 +145,8 @@ testJourneys.forEach(journey => {
               {
                 location: 'body',
                 msg: 'No request method selected',
-                param: 'method',
+                path: 'method',
+                type: 'field',
                 value: 'somestring',
               },
             ])
@@ -159,7 +164,8 @@ testJourneys.forEach(journey => {
               {
                 location: 'body',
                 msg: 'No request method selected',
-                param: 'method',
+                path: 'method',
+                type: 'field',
                 value: '',
               },
             ])

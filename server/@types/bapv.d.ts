@@ -1,5 +1,5 @@
-import { InmateDetail, OffenderRestriction, VisitBalances } from '../data/prisonApiTypes'
-import { Visit, VisitorSupport, VisitSession } from '../data/orchestrationApiTypes'
+import { OffenderRestriction } from '../data/prisonApiTypes'
+import { PrisonerProfile, Visit, VisitorSupport, VisitSession } from '../data/orchestrationApiTypes'
 
 export type Prison = {
   prisonId: string
@@ -15,156 +15,49 @@ export type PrisonerDetailsItem = {
   }
 }
 
-export type PrisonerAlertItem = [
-  {
-    text: string
-    attributes?: {
-      'data-test': string
-    }
-  },
-  {
-    text: string
-    attributes?: {
-      'data-test': string
-    }
-  },
-  {
-    text: string
-    classes?: string
-    attributes?: {
-      'data-test': string
-    }
-  },
-  {
-    html: string
-    attributes?: {
-      'data-test': string
-    }
-  },
-  {
-    html: string
-    attributes?: {
-      'data-test': string
-    }
-  },
-]
-
-export type UpcomingVisitItem = [
-  {
-    html: string
-    attributes?: {
-      'data-test': string
-    }
-  },
-  {
-    html: string
-    attributes?: {
-      'data-test': string
-    }
-  },
-  {
-    text: string
-    attributes?: {
-      'data-test': string
-    }
-  },
-  {
-    html: string
-    attributes?: {
-      'data-test': string
-    }
-  },
-  {
-    html: string
-    attributes?: {
-      'data-test': string
-    }
-  },
-  {
-    text: string
-    attributes?: {
-      'data-test': string
-    }
-  },
-]
-
-export type PastVisitItem = [
-  {
-    html: string
-    attributes?: {
-      'data-test': string
-    }
-  },
-  {
-    html: string
-    attributes?: {
-      'data-test': string
-    }
-  },
-  {
-    text: string
-    attributes?: {
-      'data-test': string
-    }
-  },
-  {
-    html: string
-    attributes?: {
-      'data-test': string
-    }
-  },
-  {
-    html: string
-    attributes?: {
-      'data-test': string
-    }
-  },
-  {
-    text: string
-    attributes?: {
-      'data-test': string
-    }
-  },
-]
-
 export type VisitorListItem = {
   personId: number
   name: string
   dateOfBirth?: string
-  adult?: boolean
+  adult: boolean
   relationshipDescription: string
   address?: string
   restrictions: Restriction[]
   banned: boolean
 }
 
-export type PrisonerProfile = {
-  displayName: string
-  displayDob: string
-  activeAlerts: PrisonerAlertItem[]
+export type PrisonerProfilePage = {
+  activeAlerts: Alert[]
+  activeAlertCount: number
   flaggedAlerts: Alert[]
-  inmateDetail: InmateDetail
-  convictedStatus: 'Convicted' | 'Remand'
-  incentiveLevel: string
-  visitBalances: VisitBalances
-  upcomingVisits: UpcomingVisitItem[]
-  pastVisits: PastVisitItem[]
-}
-
-export type BAPVVisitBalances = VisitBalances & {
-  nextIepAdjustDate?: string
-  nextPrivIepAdjustDate?: string
+  prisonerDetails: {
+    prisonerId: string
+    name: string
+    dateOfBirth: string
+    cellLocation: string
+    prisonName: string
+    convictedStatus: PrisonerProfile['convictedStatus']
+    category: string
+    incentiveLevel: string
+    visitBalances: PrisonerProfile['visitBalances'] & {
+      nextIepAdjustDate?: string
+      nextPrivIepAdjustDate?: string
+    }
+  }
+  visitsByMonth: Map<string, { upcomingCount: number; pastCount: number; visits: Visit[] }>
+  contactNames: Record<number, string>
 }
 
 // Visit slots, for representing data derived from VisitSessions
 export type VisitSlot = {
   id: string
+  sessionTemplateReference: string
   prisonId: string
   startTimestamp: string
   endTimestamp: string
   availableTables: number
   capacity: number
-  visitRoomName: string
+  visitRoom: string
   visitRestriction: 'OPEN' | 'CLOSED'
   sessionConflicts?: VisitSession['sessionConflicts']
 }
@@ -194,7 +87,8 @@ export type VisitSlotList = {
 export type FormError = {
   value: string
   msg: string
-  param: string
+  path: string
+  type: string
   location: string
 }
 

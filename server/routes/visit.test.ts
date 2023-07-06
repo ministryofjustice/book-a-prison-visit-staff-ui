@@ -3,7 +3,7 @@ import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
-import { OutcomeDto, Visit } from '../data/orchestrationApiTypes'
+import { OutcomeDto, Visit, VisitHistoryDetails } from '../data/orchestrationApiTypes'
 import { FlashData, VisitorListItem, VisitSessionData } from '../@types/bapv'
 import config from '../config'
 import { clearSession } from './visitorUtils'
@@ -14,6 +14,7 @@ import {
   createMockPrisonerSearchService,
   createMockPrisonerVisitorsService,
   createMockSupportedPrisonsService,
+  createMockVisitService,
   createMockVisitSessionsService,
 } from '../services/testutils/mocks'
 
@@ -25,6 +26,7 @@ const auditService = createMockAuditService()
 const prisonerSearchService = createMockPrisonerSearchService()
 const prisonerVisitorsService = createMockPrisonerVisitorsService()
 const supportedPrisonsService = createMockSupportedPrisonsService()
+const visitService = createMockVisitService()
 const visitSessionsService = createMockVisitSessionsService()
 
 let visitSessionData: VisitSessionData
@@ -62,6 +64,7 @@ describe('/visit/:reference', () => {
   const prisoner = TestData.prisoner()
 
   let visit: Visit
+  let visitHistoryDetails: VisitHistoryDetails
 
   const visitors: VisitorListItem[] = [
     {
@@ -96,13 +99,18 @@ describe('/visit/:reference', () => {
   const additionalSupport = ['Wheelchair ramp', 'custom request']
 
   beforeEach(() => {
-    visit = TestData.visit({ createdTimestamp: '2022-01-01' })
+    visit = TestData.visit()
+    visitHistoryDetails = TestData.visitHistoryDetails({
+      updatedBy: 'User Two',
+      updatedDateAndTime: '2022-01-01T10:00:00',
+      visit,
+    })
 
     const fakeDate = new Date('2022-01-01')
     jest.useFakeTimers({ advanceTimers: true, now: new Date(fakeDate) })
 
     prisonerSearchService.getPrisonerById.mockResolvedValue(prisoner)
-    visitSessionsService.getFullVisitDetails.mockResolvedValue({ visit, visitors, additionalSupport })
+    visitService.getFullVisitDetails.mockResolvedValue({ visitHistoryDetails, visitors, additionalSupport })
     prisonerVisitorsService.getVisitors.mockResolvedValue(visitors)
     supportedPrisonsService.getSupportedPrisonIds.mockResolvedValue(supportedPrisonIds)
     supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
@@ -115,6 +123,7 @@ describe('/visit/:reference', () => {
         prisonerSearchService,
         prisonerVisitorsService,
         supportedPrisonsService,
+        visitService,
         visitSessionsService,
       },
       sessionData: {
@@ -156,7 +165,7 @@ describe('/visit/:reference', () => {
           expect($('[data-test="visitor-dob-1"]').html()).toContain('28 July 1986')
           expect($('[data-test="visitor-relationship-1"]').text()).toBe('Sister')
           expect($('[data-test="visitor-address-1"]').html()).toBe('123 The Street,<br>Coventry')
-          expect($('[data-test="visitor-restrictions-1"] .visitor-restriction-badge--CLOSED').text()).toBe('Closed')
+          expect($('[data-test="visitor-restrictions-1"] .restriction-tag--CLOSED').text()).toBe('Closed')
           expect($('[data-test="visitor-restrictions-1"]').text()).toContain('End date not entered')
           expect($('[data-test="visitor-name-2"]').text()).toBe('Smith, Anne')
           expect($('[data-test="visitor-dob-2"]').html()).toContain(`2 January ${childBirthYear}`)
@@ -167,7 +176,12 @@ describe('/visit/:reference', () => {
           expect($('[data-test="visit-comment"]').eq(0).text()).toBe('Example of a visit comment')
           expect($('[data-test="visitor-concern"]').eq(0).text()).toBe('Example of a visitor concern')
           expect($('[data-test="additional-support"]').text()).toBe('Wheelchair ramp, custom request')
-          expect($('[data-test="visit-booked"]').text()).toBe('Saturday 1 January 2022 at 12am')
+          expect($('[data-test="visit-booked"]').text().replace(/\s+/g, ' ')).toBe(
+            'Saturday 1 January 2022 at 9am by User One',
+          )
+          expect($('[data-test="visit-updated"]').text().replace(/\s+/g, ' ')).toBe(
+            'Saturday 1 January 2022 at 10am by User Two',
+          )
           expect(visitSessionData).toEqual({ prisoner: undefined })
 
           expect(auditService.viewedVisitDetails).toHaveBeenCalledTimes(1)
@@ -181,12 +195,33 @@ describe('/visit/:reference', () => {
         })
     })
 
+    it('should handle special cases for migrated data when showing actioned by user details', () => {
+      visitHistoryDetails.createdBy = 'NOT_KNOWN' // test case for old / migrated data
+      visitHistoryDetails.updatedBy = 'NOT_KNOWN_NOMIS' // migrated from Nomis, but user not available
+      visitHistoryDetails.cancelledBy = 'User Three'
+      visitHistoryDetails.cancelledDateAndTime = '2022-01-01T11:30:00'
+
+      return request(app)
+        .get('/visit/ab-cd-ef-gh')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('[data-test="visit-booked"]').text().replace(/\s+/g, ' ')).toBe('Saturday 1 January 2022 at 9am')
+          expect($('[data-test="visit-updated"]').text().replace(/\s+/g, ' ')).toBe(
+            'Saturday 1 January 2022 at 10am in NOMIS',
+          )
+          expect($('[data-test="visit-cancelled"]').text().replace(/\s+/g, ' ')).toBe(
+            'Saturday 1 January 2022 at 11:30am by User Three',
+          )
+        })
+    })
+
     it('should render full booking summary page with prisoner, visit and visitor details, with default back link, formatting unknown contact telephone correctly', () => {
-      const unknownTelephoneVisit = JSON.parse(JSON.stringify(visit))
-      unknownTelephoneVisit.visitContact.telephone = 'UNKNOWN'
+      visitHistoryDetails.visit.visitContact.telephone = 'UNKNOWN'
       prisonerSearchService.getPrisonerById.mockResolvedValue(prisoner)
-      visitSessionsService.getFullVisitDetails.mockResolvedValue({
-        visit: unknownTelephoneVisit,
+      visitService.getFullVisitDetails.mockResolvedValue({
+        visitHistoryDetails,
         visitors,
         additionalSupport,
       })
@@ -218,7 +253,7 @@ describe('/visit/:reference', () => {
           expect($('[data-test="visitor-dob-1"]').html()).toContain('28 July 1986')
           expect($('[data-test="visitor-relationship-1"]').text()).toBe('Sister')
           expect($('[data-test="visitor-address-1"]').html()).toBe('123 The Street,<br>Coventry')
-          expect($('[data-test="visitor-restrictions-1"] .visitor-restriction-badge--CLOSED').text()).toBe('Closed')
+          expect($('[data-test="visitor-restrictions-1"] .restriction-tag--CLOSED').text()).toBe('Closed')
           expect($('[data-test="visitor-restrictions-1"]').text()).toContain('End date not entered')
           expect($('[data-test="visitor-name-2"]').text()).toBe('Smith, Anne')
           expect($('[data-test="visitor-dob-2"]').html()).toContain(`2 January ${childBirthYear}`)
@@ -229,7 +264,9 @@ describe('/visit/:reference', () => {
           expect($('[data-test="visit-comment"]').eq(0).text()).toBe('Example of a visit comment')
           expect($('[data-test="visitor-concern"]').eq(0).text()).toBe('Example of a visitor concern')
           expect($('[data-test="additional-support"]').text()).toBe('Wheelchair ramp, custom request')
-          expect($('[data-test="visit-booked"]').text()).toBe('Saturday 1 January 2022 at 12am')
+          expect($('[data-test="visit-booked"]').text().replace(/\s+/g, ' ')).toBe(
+            'Saturday 1 January 2022 at 9am by User One',
+          )
 
           expect(auditService.viewedVisitDetails).toHaveBeenCalledTimes(1)
           expect(auditService.viewedVisitDetails).toHaveBeenCalledWith({
@@ -247,7 +284,7 @@ describe('/visit/:reference', () => {
         '/visit/ab-cd-ef-gh?query=startDate%3D2022-05-24%26type%3DOPEN%26time%3D3pm%2Bto%2B3%253A59pm&from=visit-search'
 
       prisonerSearchService.getPrisonerById.mockResolvedValue(prisoner)
-      visitSessionsService.getFullVisitDetails.mockResolvedValue({ visit, visitors, additionalSupport })
+      visitService.getFullVisitDetails.mockResolvedValue({ visitHistoryDetails, visitors, additionalSupport })
 
       return request(app)
         .get(url)
@@ -276,7 +313,7 @@ describe('/visit/:reference', () => {
           expect($('[data-test="visitor-dob-1"]').html()).toContain('28 July 1986')
           expect($('[data-test="visitor-relationship-1"]').text()).toBe('Sister')
           expect($('[data-test="visitor-address-1"]').html()).toBe('123 The Street,<br>Coventry')
-          expect($('[data-test="visitor-restrictions-1"] .visitor-restriction-badge--CLOSED').text()).toBe('Closed')
+          expect($('[data-test="visitor-restrictions-1"] .restriction-tag--CLOSED').text()).toBe('Closed')
           expect($('[data-test="visitor-restrictions-1"]').text()).toContain('End date not entered')
           expect($('[data-test="visitor-name-2"]').text()).toBe('Smith, Anne')
           expect($('[data-test="visitor-dob-2"]').html()).toContain(`2 January ${childBirthYear}`)
@@ -287,7 +324,9 @@ describe('/visit/:reference', () => {
           expect($('[data-test="visit-comment"]').eq(0).text()).toBe('Example of a visit comment')
           expect($('[data-test="visitor-concern"]').eq(0).text()).toBe('Example of a visitor concern')
           expect($('[data-test="additional-support"]').text()).toBe('Wheelchair ramp, custom request')
-          expect($('[data-test="visit-booked"]').text()).toBe('Saturday 1 January 2022 at 12am')
+          expect($('[data-test="visit-booked"]').text().replace(/\s+/g, ' ')).toBe(
+            'Saturday 1 January 2022 at 9am by User One',
+          )
 
           expect(auditService.viewedVisitDetails).toHaveBeenCalledTimes(1)
           expect(auditService.viewedVisitDetails).toHaveBeenCalledWith({
@@ -324,7 +363,7 @@ describe('/visit/:reference', () => {
 
     it('should not show booking summary if selected establishment does not match prison for which visit booked', () => {
       app = appWithAllRoutes({
-        services: { auditService, supportedPrisonsService, visitSessionsService },
+        services: { auditService, supportedPrisonsService, visitService, visitSessionsService },
         sessionData: {
           selectedEstablishment: { prisonId: 'BLI', prisonName: supportedPrisons.BLI },
         } as SessionData,
@@ -408,6 +447,9 @@ describe('/visit/:reference', () => {
       visit.visitStatus = 'CANCELLED'
       visit.outcomeStatus = 'VISITOR_CANCELLED'
       visit.visitNotes = [{ type: 'VISIT_OUTCOMES', text: 'no longer required' }]
+      visitHistoryDetails.cancelledBy = 'User Three'
+      visitHistoryDetails.cancelledDateAndTime = '2022-01-01T11:00:00'
+
       return request(app)
         .get('/visit/ab-cd-ef-gh')
         .expect(200)
@@ -416,6 +458,9 @@ describe('/visit/:reference', () => {
           const $ = cheerio.load(res.text)
           expect($('[data-test="cancelled-visit-reason"]').text()).toContain('by the visitor')
           expect($('[data-test="cancelled-visit-reason"]').text()).toContain('no longer required')
+          expect($('[data-test="visit-cancelled"]').text().replace(/\s+/g, ' ')).toBe(
+            'Saturday 1 January 2022 at 11am by User Three',
+          )
         })
     })
   })
@@ -438,22 +483,24 @@ describe('/visit/:reference', () => {
             },
             visitSlot: {
               id: '',
+              sessionTemplateReference: 'v9d.7ed.7u',
               prisonId: 'HEI',
               startTimestamp: '2022-01-14T10:00:00',
               endTimestamp: '2022-01-14T11:00:00',
               availableTables: 0,
               capacity: undefined,
-              visitRoomName: 'Visit room 1',
+              visitRoom: 'Visit room 1',
               visitRestriction: 'OPEN',
             },
             originalVisitSlot: {
               id: '',
+              sessionTemplateReference: 'v9d.7ed.7u',
               prisonId: 'HEI',
               startTimestamp: '2022-01-14T10:00:00',
               endTimestamp: '2022-01-14T11:00:00',
               availableTables: 0,
               capacity: undefined,
-              visitRoomName: 'Visit room 1',
+              visitRoom: 'Visit room 1',
               visitRestriction: 'OPEN',
             },
             visitRestriction: 'OPEN',
@@ -487,7 +534,7 @@ describe('/visit/:reference', () => {
               },
             ],
             visitorSupport: [{ type: 'WHEELCHAIR' }, { text: 'custom request', type: 'OTHER' }],
-            mainContact: { contact: undefined, phoneNumber: '01234 567890', contactName: 'Jeanette Smith' },
+            mainContact: { contact: visitors[0], phoneNumber: '01234 567890', contactName: 'Jeanette Smith' },
             visitReference: 'ab-cd-ef-gh',
             visitStatus: 'BOOKED',
           })
@@ -496,7 +543,7 @@ describe('/visit/:reference', () => {
 
     it('should redirect to /visit/:reference if selected establishment does not match prison for which visit booked', () => {
       app = appWithAllRoutes({
-        services: { auditService, supportedPrisonsService, visitSessionsService },
+        services: { auditService, supportedPrisonsService, visitService, visitSessionsService },
         sessionData: {
           selectedEstablishment: { prisonId: 'BLI', prisonName: supportedPrisons.BLI },
         } as SessionData,
@@ -540,7 +587,8 @@ describe('GET /visit/:reference/cancel', () => {
     flashData.errors = [
       {
         msg: 'No answer selected',
-        param: 'cancel',
+        path: 'cancel',
+        type: 'field',
         location: 'body',
       },
     ]
@@ -555,6 +603,7 @@ describe('GET /visit/:reference/cancel', () => {
         expect($('input[name="cancel"]').length).toBe(4)
         expect($('input[name="cancel"]:checked').length).toBe(0)
         expect($('.govuk-error-summary__body').text()).toContain('No answer selected')
+        expect($('.govuk-error-summary__body a').attr('href')).toBe('#cancel-error')
         expect(flashProvider).toHaveBeenCalledWith('errors')
         expect(flashProvider).toHaveBeenCalledWith('formValues')
         expect(flashProvider).toHaveBeenCalledTimes(2)
@@ -566,7 +615,8 @@ describe('GET /visit/:reference/cancel', () => {
       {
         value: '',
         msg: 'Enter a reason for the cancellation',
-        param: 'reason_establishment_cancelled',
+        path: 'reason_establishment_cancelled',
+        type: 'field',
         location: 'body',
       },
     ]
@@ -583,6 +633,7 @@ describe('GET /visit/:reference/cancel', () => {
         expect($('input[name="cancel"]').length).toBe(4)
         expect($('[data-test="establishment_cancelled"]').prop('checked')).toBe(true)
         expect($('.govuk-error-summary__body').text()).toContain('Enter a reason for the cancellation')
+        expect($('.govuk-error-summary__body a').attr('href')).toBe('#reason_establishment_cancelled-error')
         expect(flashProvider).toHaveBeenCalledWith('errors')
         expect(flashProvider).toHaveBeenCalledWith('formValues')
         expect(flashProvider).toHaveBeenCalledTimes(2)
@@ -596,7 +647,7 @@ describe('POST /visit/:reference/cancel', () => {
   beforeEach(() => {
     cancelledVisit = TestData.visit()
 
-    visitSessionsService.cancelVisit = jest.fn().mockResolvedValue(cancelledVisit)
+    visitService.cancelVisit = jest.fn().mockResolvedValue(cancelledVisit)
     notificationsService.sendCancellationSms = jest.fn().mockResolvedValue({})
     supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
 
@@ -606,7 +657,7 @@ describe('POST /visit/:reference/cancel', () => {
         notificationsService,
         prisonerSearchService,
         supportedPrisonsService,
-        visitSessionsService,
+        visitService,
       },
     })
   })
@@ -621,8 +672,8 @@ describe('POST /visit/:reference/cancel', () => {
       .expect(302)
       .expect('location', '/visit/cancelled')
       .expect(() => {
-        expect(visitSessionsService.cancelVisit).toHaveBeenCalledTimes(1)
-        expect(visitSessionsService.cancelVisit).toHaveBeenCalledWith({
+        expect(visitService.cancelVisit).toHaveBeenCalledTimes(1)
+        expect(visitService.cancelVisit).toHaveBeenCalledWith({
           username: 'user1',
           reference: 'ab-cd-ef-gh',
           outcome: <OutcomeDto>{
@@ -663,7 +714,7 @@ describe('POST /visit/:reference/cancel', () => {
       .expect(302)
       .expect('location', '/visit/cancelled')
       .expect(() => {
-        expect(visitSessionsService.cancelVisit).toHaveBeenCalledTimes(1)
+        expect(visitService.cancelVisit).toHaveBeenCalledTimes(1)
         expect(auditService.cancelledVisit).toHaveBeenCalledTimes(1)
         expect(notificationsService.sendCancellationSms).toHaveBeenCalledTimes(1)
         expect(notificationsService.sendCancellationSms).toHaveBeenCalledWith({
@@ -686,7 +737,7 @@ describe('POST /visit/:reference/cancel', () => {
       .expect(302)
       .expect('location', '/visit/cancelled')
       .expect(() => {
-        expect(visitSessionsService.cancelVisit).toHaveBeenCalledTimes(1)
+        expect(visitService.cancelVisit).toHaveBeenCalledTimes(1)
         expect(auditService.cancelledVisit).toHaveBeenCalledTimes(1)
         expect(notificationsService.sendCancellationSms).not.toHaveBeenCalled()
       })
@@ -704,7 +755,7 @@ describe('POST /visit/:reference/cancel', () => {
       .expect(302)
       .expect('location', '/visit/cancelled')
       .expect(() => {
-        expect(visitSessionsService.cancelVisit).toHaveBeenCalledTimes(1)
+        expect(visitService.cancelVisit).toHaveBeenCalledTimes(1)
         expect(auditService.cancelledVisit).toHaveBeenCalledTimes(1)
         expect(notificationsService.sendCancellationSms).toHaveBeenCalledTimes(1)
       })
@@ -717,7 +768,7 @@ describe('POST /visit/:reference/cancel', () => {
       .expect('location', '/visit/ab-cd-ef-gh/cancel')
       .expect(() => {
         expect(flashProvider).toHaveBeenCalledWith('errors', [
-          { location: 'body', msg: 'No answer selected', param: 'cancel', value: undefined },
+          { location: 'body', msg: 'No answer selected', path: 'cancel', type: 'field', value: undefined },
         ])
         expect(flashProvider).toHaveBeenCalledWith('formValues', {})
         expect(auditService.cancelledVisit).not.toHaveBeenCalled()
@@ -735,7 +786,8 @@ describe('POST /visit/:reference/cancel', () => {
           {
             location: 'body',
             msg: 'Enter a reason for the cancellation',
-            param: 'reason_prisoner_cancelled',
+            path: 'reason_prisoner_cancelled',
+            type: 'field',
             value: '',
           },
         ])
@@ -756,7 +808,7 @@ describe('POST /visit/:reference/cancel', () => {
       .expect('location', '/visit/ab-cd-ef-gh/cancel')
       .expect(() => {
         expect(flashProvider).toHaveBeenCalledWith('errors', [
-          { location: 'body', msg: 'No answer selected', param: 'cancel', value: 'INVALID_VALUE' },
+          { location: 'body', msg: 'No answer selected', path: 'cancel', type: 'field', value: 'INVALID_VALUE' },
         ])
         expect(flashProvider).toHaveBeenCalledWith('formValues', {
           cancel: 'INVALID_VALUE',

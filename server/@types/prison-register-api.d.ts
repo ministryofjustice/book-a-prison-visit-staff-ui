@@ -107,58 +107,16 @@ export type webhooks = Record<string, never>
 
 export interface components {
   schemas: {
-    Message: {
-      messageId?: string
-      receiptHandle?: string
-      body?: string
-      attributes?: {
-        [key: string]: string | undefined
+    DlqMessage: {
+      body: {
+        [key: string]: Record<string, never> | undefined
       }
-      messageAttributes?: {
-        [key: string]: components['schemas']['MessageAttributeValue'] | undefined
-      }
-      md5OfBody?: string
-      md5OfMessageAttributes?: string
-    }
-    MessageAttributeValue: {
-      stringValue?: string
-      binaryValue?: {
-        /** Format: int32 */
-        short?: number
-        char?: string
-        /** Format: int32 */
-        int?: number
-        /** Format: int64 */
-        long?: number
-        /** Format: float */
-        float?: number
-        /** Format: double */
-        double?: number
-        direct?: boolean
-        readOnly?: boolean
-      }
-      stringListValues?: string[]
-      binaryListValues?: {
-        /** Format: int32 */
-        short?: number
-        char?: string
-        /** Format: int32 */
-        int?: number
-        /** Format: int64 */
-        long?: number
-        /** Format: float */
-        float?: number
-        /** Format: double */
-        double?: number
-        direct?: boolean
-        readOnly?: boolean
-      }[]
-      dataType?: string
+      messageId: string
     }
     RetryDlqResult: {
       /** Format: int32 */
       messagesFoundCount: number
-      messages: components['schemas']['Message'][]
+      messages: components['schemas']['DlqMessage'][]
     }
     PurgeQueueResult: {
       /** Format: int32 */
@@ -174,13 +132,13 @@ export interface components {
       /** @description Whether the prison is still active */
       active: boolean
       /** @description If this is a male prison */
-      male?: boolean
+      male: boolean
       /** @description If this is a female prison */
-      female?: boolean
+      female: boolean
       /** @description If this is a contracted prison */
-      contracted?: boolean
+      contracted: boolean
       /** @description Set of types for this prison */
-      prisonTypes?: ('HMP' | 'YOI' | 'IRC' | 'STC' | 'YCS')[]
+      prisonTypes: ('HMP' | 'YOI' | 'IRC' | 'STC' | 'YCS')[]
     }
     ErrorResponse: {
       /** Format: int32 */
@@ -245,17 +203,17 @@ export interface components {
       /** @description Whether the prison is still active */
       active: boolean
       /** @description Whether the prison has male prisoners */
-      male?: boolean
+      male: boolean
       /** @description Whether the prison has female prisoners */
-      female?: boolean
+      female: boolean
       /** @description Whether the prison is contracted */
-      contracted?: boolean
+      contracted: boolean
       /** @description List of types for this prison */
-      types?: components['schemas']['PrisonTypeDto'][]
+      types: components['schemas']['PrisonTypeDto'][]
       /** @description List of address for this prison */
-      addresses?: components['schemas']['AddressDto'][]
+      addresses: components['schemas']['AddressDto'][]
       /** @description List of operators for this prison */
-      operators?: components['schemas']['PrisonOperatorDto'][]
+      operators: components['schemas']['PrisonOperatorDto'][]
     }
     /** @description List of operators for this prison */
     PrisonOperatorDto: {
@@ -325,26 +283,20 @@ export interface components {
        */
       prisonName: string
       /** @description Whether the prison is still active */
-      active?: boolean
+      active: boolean
       /** @description If this is a male prison */
-      male?: boolean
+      male: boolean
       /** @description If this is a female prison */
-      female?: boolean
+      female: boolean
       /** @description If this is a contracted prison */
       contracted: boolean
       /**
        * @description Set of types for this prison
        * @example HMP
        */
-      prisonTypes?: ('HMP' | 'YOI' | 'IRC' | 'STC' | 'YCS')[]
+      prisonTypes: ('HMP' | 'YOI' | 'IRC' | 'STC' | 'YCS')[]
       /** @description List of addresses for this prison */
-      addresses?: components['schemas']['UpdateAddressDto'][]
-    }
-    DlqMessage: {
-      body: {
-        [key: string]: Record<string, never> | undefined
-      }
-      messageId: string
+      addresses: components['schemas']['UpdateAddressDto'][]
     }
     GetDlqResult: {
       /** Format: int32 */
@@ -800,8 +752,8 @@ export interface operations {
   }
   getDlqMessages: {
     parameters: {
-      query: {
-        maxMessages: number
+      query?: {
+        maxMessages?: number
       }
       path: {
         dlqName: string
@@ -836,7 +788,7 @@ export interface operations {
    */
   getPrisonsBySearchFilter: {
     parameters: {
-      query: {
+      query?: {
         /**
          * @description Active
          * @example true

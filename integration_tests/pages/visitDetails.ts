@@ -7,6 +7,8 @@ export default class VisitDetailsPage extends Page {
 
   visitReference = (): PageElement => cy.get('[data-test=reference]')
 
+  cancellationReason = (): PageElement => cy.get('[data-test="cancelled-visit-reason')
+
   // Buttons
   updateBooking = (): PageElement => cy.get('[data-test="update-visit"]')
 
@@ -62,4 +64,8 @@ export default class VisitDetailsPage extends Page {
   additionalSupport = (): PageElement => cy.get('[data-test=additional-support]')
 
   visitBooked = (): PageElement => cy.get('[data-test="visit-booked"]')
+
+  visitUpdated = (): PageElement => cy.get('[data-test="visit-updated"]')
+
+  visitCancelled = (): PageElement => cy.get('[data-test="visit-cancelled"]')
 }

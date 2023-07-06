@@ -8,7 +8,7 @@ import { VisitInformation } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import type { Services } from '../services'
 
-export default function routes({ auditService, prisonerSearchService, visitSessionsService }: Services): Router {
+export default function routes({ auditService, prisonerSearchService, visitService }: Services): Router {
   const router = Router()
 
   const get = (path: string | string[], handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
@@ -144,7 +144,7 @@ export default function routes({ auditService, prisonerSearchService, visitSessi
 
     if (errors.length === 0) {
       try {
-        visit = await visitSessionsService.getVisit({
+        visit = await visitService.getVisit({
           reference: search,
           username: res.locals.user.username,
           prisonId: req.session.selectedEstablishment.prisonId,
@@ -162,7 +162,8 @@ export default function routes({ auditService, prisonerSearchService, visitSessi
         if (e?.status !== 404) {
           errors.push({
             msg: e.message,
-            param: '#searchBlock1',
+            path: 'searchBlock1',
+            type: 'field',
           })
         }
       }

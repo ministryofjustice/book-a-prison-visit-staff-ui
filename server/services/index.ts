@@ -1,4 +1,5 @@
 import { dataAccess } from '../data'
+import AdditionalSupportService from './additionalSupportService'
 import AuditService from './auditService'
 import NotificationsService from './notificationsService'
 import PrisonerProfileService from './prisonerProfileService'
@@ -6,36 +7,37 @@ import PrisonerSearchService from './prisonerSearchService'
 import PrisonerVisitorsService from './prisonerVisitorsService'
 import SupportedPrisonsService from './supportedPrisonsService'
 import UserService from './userService'
+import VisitService from './visitService'
 import VisitSessionsService from './visitSessionsService'
 
 export const services = () => {
   const {
     hmppsAuthClient,
     notificationsApiClientBuilder,
+    orchestrationApiClientBuilder,
     prisonApiClientBuilder,
     prisonerContactRegistryApiClientBuilder,
     prisonRegisterApiClientBuilder,
     prisonerSearchClientBuilder,
-    visitSchedulerApiClientBuilder,
     whereaboutsApiClientBuilder,
   } = dataAccess()
+
+  const additionalSupportService = new AdditionalSupportService(orchestrationApiClientBuilder, hmppsAuthClient)
 
   const auditService = new AuditService()
 
   const notificationsService = new NotificationsService(notificationsApiClientBuilder)
 
   const supportedPrisonsService = new SupportedPrisonsService(
-    visitSchedulerApiClientBuilder,
+    orchestrationApiClientBuilder,
     prisonRegisterApiClientBuilder,
     hmppsAuthClient,
   )
 
   const prisonerProfileService = new PrisonerProfileService(
+    orchestrationApiClientBuilder,
     prisonApiClientBuilder,
-    visitSchedulerApiClientBuilder,
     prisonerContactRegistryApiClientBuilder,
-    prisonerSearchClientBuilder,
-    supportedPrisonsService,
     hmppsAuthClient,
   )
 
@@ -46,13 +48,20 @@ export const services = () => {
   const userService = new UserService(hmppsAuthClient, prisonApiClientBuilder)
 
   const visitSessionsService = new VisitSessionsService(
-    prisonerContactRegistryApiClientBuilder,
-    visitSchedulerApiClientBuilder,
+    orchestrationApiClientBuilder,
     whereaboutsApiClientBuilder,
     hmppsAuthClient,
   )
 
+  const visitService = new VisitService(
+    orchestrationApiClientBuilder,
+    prisonerContactRegistryApiClientBuilder,
+    additionalSupportService,
+    hmppsAuthClient,
+  )
+
   return {
+    additionalSupportService,
     auditService,
     notificationsService,
     prisonerProfileService,
@@ -60,6 +69,7 @@ export const services = () => {
     prisonerVisitorsService,
     supportedPrisonsService,
     userService,
+    visitService,
     visitSessionsService,
   }
 }
@@ -67,6 +77,7 @@ export const services = () => {
 export type Services = ReturnType<typeof services>
 
 export {
+  AdditionalSupportService,
   AuditService,
   NotificationsService,
   PrisonerProfileService,
@@ -74,5 +85,6 @@ export {
   PrisonerVisitorsService,
   SupportedPrisonsService,
   UserService,
+  VisitService,
   VisitSessionsService,
 }

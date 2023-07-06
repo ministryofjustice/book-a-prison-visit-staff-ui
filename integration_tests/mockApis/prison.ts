@@ -1,45 +1,8 @@
 import { SuperAgentRequest } from 'superagent'
 import { stubFor } from './wiremock'
-import {
-  InmateDetail,
-  OffenderRestriction,
-  OffenderRestrictions,
-  PagePrisonerBookingSummary,
-  PrisonerBookingSummary,
-  VisitBalances,
-  CaseLoad,
-} from '../../server/data/prisonApiTypes'
+import { OffenderRestriction, OffenderRestrictions, CaseLoad } from '../../server/data/prisonApiTypes'
 
 export default {
-  stubBookings: (prisoner: PrisonerBookingSummary): SuperAgentRequest => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        url: `/prison/api/bookings/v2?prisonId=${prisoner.agencyId}&offenderNo=${prisoner.offenderNo}&legalInfo=true`,
-      },
-      response: {
-        status: 200,
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: <PagePrisonerBookingSummary>{
-          numberOfElements: 1,
-          content: [prisoner],
-        },
-      },
-    })
-  },
-  stubOffender: (prisoner: InmateDetail): SuperAgentRequest => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        url: `/prison/api/offenders/${prisoner.offenderNo}`,
-      },
-      response: {
-        status: 200,
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: prisoner,
-      },
-    })
-  },
   stubOffenderRestrictions: ({
     offenderNo,
     offenderRestrictions = [],
@@ -92,25 +55,6 @@ export default {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
         jsonBody: caseLoads,
-      },
-    })
-  },
-  stubVisitBalances: ({
-    offenderNo,
-    visitBalances,
-  }: {
-    offenderNo: string
-    visitBalances: VisitBalances
-  }): SuperAgentRequest => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        url: `/prison/api/bookings/offenderNo/${offenderNo}/visit/balances`,
-      },
-      response: {
-        status: 200,
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: visitBalances,
       },
     })
   },

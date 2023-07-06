@@ -5,13 +5,18 @@ import * as cheerio from 'cheerio'
 import { FlashData, VisitSessionData, VisitSlot, VisitSlotList } from '../../@types/bapv'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
 import { Visit } from '../../data/orchestrationApiTypes'
-import { createMockAuditService, createMockVisitSessionsService } from '../../services/testutils/mocks'
+import {
+  createMockAuditService,
+  createMockVisitService,
+  createMockVisitSessionsService,
+} from '../../services/testutils/mocks'
 
 let sessionApp: Express
 
 let flashData: FlashData
 
 const auditService = createMockAuditService()
+const visitService = createMockVisitService()
 const visitSessionsService = createMockVisitSessionsService()
 
 let visitSessionData: VisitSessionData
@@ -79,36 +84,39 @@ testJourneys.forEach(journey => {
             morning: [
               {
                 id: '1',
+                sessionTemplateReference: 'v9d.7ed.7u1',
                 prisonId,
                 startTimestamp: '2022-02-14T10:00:00',
                 endTimestamp: '2022-02-14T11:00:00',
                 availableTables: 15,
                 capacity: 30,
-                visitRoomName: 'room name',
+                visitRoom: 'room name',
                 // representing a pre-existing visit that is BOOKED
                 sessionConflicts: ['DOUBLE_BOOKED'],
                 visitRestriction: 'OPEN',
               },
               {
                 id: '2',
+                sessionTemplateReference: 'v9d.7ed.7u2',
                 prisonId,
                 startTimestamp: '2022-02-14T11:59:00',
                 endTimestamp: '2022-02-14T12:59:00',
                 availableTables: 1,
                 capacity: 30,
-                visitRoomName: 'room name',
+                visitRoom: 'room name',
                 visitRestriction: 'OPEN',
               },
             ],
             afternoon: [
               {
                 id: '3',
+                sessionTemplateReference: 'v9d.7ed.7u3',
                 prisonId,
                 startTimestamp: '2022-02-14T12:00:00',
                 endTimestamp: '2022-02-14T13:05:00',
                 availableTables: 5,
                 capacity: 30,
-                visitRoomName: 'room name',
+                visitRoom: 'room name',
                 // representing the RESERVED visit being handled in this session
                 sessionConflicts: ['DOUBLE_BOOKED'],
                 visitRestriction: 'OPEN',
@@ -183,7 +191,7 @@ testJourneys.forEach(journey => {
             const $ = cheerio.load(res.text)
             expect($('h1').text().trim()).toBe('Select date and time of visit')
             expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
-            expect($('#main-content').text()).toContain('There are no available slots for the selected time and day.')
+            expect($('#main-content').text()).toContain('There are no available time slots for this prisoner.')
             expect($('input[name="visit-date-and-time"]').length).toBe(0)
             expect($('[data-test="whereabouts-unavailable"]').length).toBe(0)
             expect($('[data-test="submit"]').length).toBe(0)
@@ -219,12 +227,13 @@ testJourneys.forEach(journey => {
       it('should render the available sessions list with the slot in the session selected', () => {
         visitSessionData.visitSlot = {
           id: '3',
+          sessionTemplateReference: 'v9d.7ed.7u3',
           prisonId,
           startTimestamp: '2022-02-14T12:00:00',
           endTimestamp: '2022-02-14T13:05:00',
           availableTables: 5,
           capacity: 30,
-          visitRoomName: 'room name',
+          visitRoom: 'room name',
           visitRestriction: 'OPEN',
         }
 
@@ -245,7 +254,9 @@ testJourneys.forEach(journey => {
       })
 
       it('should render validation errors from flash data for invalid input', () => {
-        flashData.errors = [{ location: 'body', msg: 'No time slot selected', param: 'visit-date-and-time' }]
+        flashData.errors = [
+          { location: 'body', msg: 'No time slot selected', path: 'visit-date-and-time', type: 'field' },
+        ]
 
         return request(sessionApp)
           .get(`${journey.urlPrefix}/select-date-and-time`)
@@ -256,6 +267,7 @@ testJourneys.forEach(journey => {
             expect($('h1').text().trim()).toBe('Select date and time of visit')
             expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
             expect($('.govuk-error-summary__body').text()).toContain('No time slot selected')
+            expect($('.govuk-error-summary__body a').attr('href')).toBe('#visit-date-and-time-error')
             expect(flashProvider).toHaveBeenCalledWith('errors')
             expect(flashProvider).toHaveBeenCalledWith('formValues')
             expect(flashProvider).toHaveBeenCalledTimes(2)
@@ -278,12 +290,12 @@ testJourneys.forEach(journey => {
       }
 
       beforeEach(() => {
-        visitSessionsService.reserveVisit = jest.fn().mockResolvedValue(reservedVisit)
-        visitSessionsService.changeBookedVisit = jest.fn().mockResolvedValue(changingVisit)
-        visitSessionsService.changeReservedVisit = jest.fn()
+        visitService.reserveVisit = jest.fn().mockResolvedValue(reservedVisit)
+        visitService.changeBookedVisit = jest.fn().mockResolvedValue(changingVisit)
+        visitService.changeReservedVisit = jest.fn()
 
         sessionApp = appWithAllRoutes({
-          services: { auditService, visitSessionsService },
+          services: { auditService, visitService },
           sessionData: {
             slotsList,
             visitSessionData,
@@ -302,12 +314,13 @@ testJourneys.forEach(journey => {
           .expect(() => {
             expect(visitSessionData.visitSlot).toEqual(<VisitSlot>{
               id: '2',
+              sessionTemplateReference: 'v9d.7ed.7u2',
               prisonId,
               startTimestamp: '2022-02-14T11:59:00',
               endTimestamp: '2022-02-14T12:59:00',
               availableTables: 1,
               capacity: 30,
-              visitRoomName: 'room name',
+              visitRoom: 'room name',
               visitRestriction: 'OPEN',
             })
             expect(visitSessionData.applicationReference).toEqual(reservedVisit.applicationReference)
@@ -316,10 +329,10 @@ testJourneys.forEach(journey => {
               journey.isUpdate ? changingVisit.visitStatus : reservedVisit.visitStatus,
             )
 
-            expect(
-              journey.isUpdate ? visitSessionsService.changeBookedVisit : visitSessionsService.reserveVisit,
-            ).toHaveBeenCalledTimes(1)
-            expect(visitSessionsService.changeReservedVisit).not.toHaveBeenCalled()
+            expect(journey.isUpdate ? visitService.changeBookedVisit : visitService.reserveVisit).toHaveBeenCalledTimes(
+              1,
+            )
+            expect(visitService.changeReservedVisit).not.toHaveBeenCalled()
 
             expect(auditService.reservedVisit).toHaveBeenCalledTimes(1)
             expect(auditService.reservedVisit).toHaveBeenCalledWith({
@@ -340,12 +353,13 @@ testJourneys.forEach(journey => {
       it('should save new choice to session, update visit reservation and redirect to additional support page if existing session data present', () => {
         visitSessionData.visitSlot = {
           id: '1',
+          sessionTemplateReference: 'v9d.7ed.7u1',
           prisonId,
           startTimestamp: '2022-02-14T10:00:00',
           endTimestamp: '2022-02-14T11:00:00',
           availableTables: 15,
           capacity: 30,
-          visitRoomName: 'room name',
+          visitRoom: 'room name',
           visitRestriction: 'OPEN',
         }
 
@@ -361,12 +375,13 @@ testJourneys.forEach(journey => {
           .expect(() => {
             expect(visitSessionData.visitSlot).toEqual(<VisitSlot>{
               id: '3',
+              sessionTemplateReference: 'v9d.7ed.7u3',
               prisonId,
               startTimestamp: '2022-02-14T12:00:00',
               endTimestamp: '2022-02-14T13:05:00',
               availableTables: 5,
               capacity: 30,
-              visitRoomName: 'room name',
+              visitRoom: 'room name',
               // representing the RESERVED visit being handled in this session
               sessionConflicts: ['DOUBLE_BOOKED'],
               visitRestriction: 'OPEN',
@@ -378,12 +393,12 @@ testJourneys.forEach(journey => {
               journey.isUpdate ? changingVisit.visitStatus : reservedVisit.visitStatus,
             )
 
-            expect(visitSessionsService.reserveVisit).not.toHaveBeenCalled()
-            expect(visitSessionsService.changeReservedVisit).toHaveBeenCalledTimes(1)
-            expect(
-              visitSessionsService.changeReservedVisit.mock.calls[0][0].visitSessionData.applicationReference,
-            ).toBe(reservedVisit.applicationReference)
-            expect(visitSessionsService.changeReservedVisit.mock.calls[0][0].visitSessionData.visitReference).toBe(
+            expect(visitService.reserveVisit).not.toHaveBeenCalled()
+            expect(visitService.changeReservedVisit).toHaveBeenCalledTimes(1)
+            expect(visitService.changeReservedVisit.mock.calls[0][0].visitSessionData.applicationReference).toBe(
+              reservedVisit.applicationReference,
+            )
+            expect(visitService.changeReservedVisit.mock.calls[0][0].visitSessionData.visitReference).toBe(
               reservedVisit.reference,
             )
 
@@ -410,7 +425,13 @@ testJourneys.forEach(journey => {
           .expect('location', `${journey.urlPrefix}/select-date-and-time`)
           .expect(() => {
             expect(flashProvider).toHaveBeenCalledWith('errors', [
-              { location: 'body', msg: 'No time slot selected', param: 'visit-date-and-time', value: undefined },
+              {
+                location: 'body',
+                msg: 'No time slot selected',
+                path: 'visit-date-and-time',
+                type: 'field',
+                value: undefined,
+              },
             ])
             expect(flashProvider).toHaveBeenCalledWith('formValues', {})
             expect(auditService.reservedVisit).not.toHaveBeenCalled()
@@ -425,7 +446,13 @@ testJourneys.forEach(journey => {
           .expect('location', `${journey.urlPrefix}/select-date-and-time`)
           .expect(() => {
             expect(flashProvider).toHaveBeenCalledWith('errors', [
-              { location: 'body', msg: 'No time slot selected', param: 'visit-date-and-time', value: '100' },
+              {
+                location: 'body',
+                msg: 'No time slot selected',
+                path: 'visit-date-and-time',
+                type: 'field',
+                value: '100',
+              },
             ])
             expect(flashProvider).toHaveBeenCalledWith('formValues', { 'visit-date-and-time': '100' })
             expect(auditService.reservedVisit).not.toHaveBeenCalled()

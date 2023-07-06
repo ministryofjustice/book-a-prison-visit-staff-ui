@@ -124,7 +124,7 @@ describe('POST /change-establishment', () => {
       .expect(() => {
         expect(sessionData.selectedEstablishment).toStrictEqual(selectedEstablishment)
         expect(flashProvider).toHaveBeenCalledWith('errors', [
-          { location: 'body', msg: 'No prison selected', param: 'establishment', value: '' },
+          { location: 'body', msg: 'No prison selected', path: 'establishment', type: 'field', value: '' },
         ])
         expect(visitorUtils.clearSession).toHaveBeenCalledTimes(0)
         expect(auditService.changeEstablishment).toHaveBeenCalledTimes(0)
@@ -141,7 +141,7 @@ describe('POST /change-establishment', () => {
       .expect(() => {
         expect(sessionData.selectedEstablishment).toStrictEqual(selectedEstablishment)
         expect(flashProvider).toHaveBeenCalledWith('errors', [
-          { location: 'body', msg: 'No prison selected', param: 'establishment', value: 'HEX' },
+          { location: 'body', msg: 'No prison selected', path: 'establishment', type: 'field', value: 'HEX' },
         ])
         expect(visitorUtils.clearSession).toHaveBeenCalledTimes(0)
         expect(auditService.changeEstablishment).toHaveBeenCalledTimes(0)

@@ -3,11 +3,11 @@ import { resetStubs } from './integration_tests/mockApis/wiremock'
 
 import auth from './integration_tests/mockApis/auth'
 import tokenVerification from './integration_tests/mockApis/tokenVerification'
+import orchestrationService from './integration_tests/mockApis/orchestration'
 import prisonerContactRegistry from './integration_tests/mockApis/prisonerContactRegistry'
 import whereaboutsOffenderEvents from './integration_tests/mockApis/whereabouts'
 import prisonApi from './integration_tests/mockApis/prison'
 import prisonerSearch from './integration_tests/mockApis/prisonerSearch'
-import visitScheduler from './integration_tests/mockApis/visitScheduler'
 import prisonRegister from './integration_tests/mockApis/prisonRegister'
 
 export default defineConfig({
@@ -30,16 +30,30 @@ export default defineConfig({
         ...auth,
         ...tokenVerification,
 
+        // Orchestration service
+        stubBookVisit: orchestrationService.stubBookVisit,
+        stubCancelVisit: orchestrationService.stubCancelVisit,
+        stubChangeBookedVisit: orchestrationService.stubChangeBookedVisit,
+        stubChangeReservedSlot: orchestrationService.stubChangeReservedSlot,
+        stubReserveVisit: orchestrationService.stubReserveVisit,
+        stubVisit: orchestrationService.stubVisit,
+        stubVisitHistory: orchestrationService.stubVisitHistory,
+        stubUpcomingVisits: orchestrationService.stubUpcomingVisits,
+        stubVisitsByDate: orchestrationService.stubVisitsByDate,
+        stubAvailableSupport: orchestrationService.stubAvailableSupport,
+        stubVisitSessions: orchestrationService.stubVisitSessions,
+        stubSessionSchedule: orchestrationService.stubSessionSchedule,
+        stubVisitSessionCapacity: orchestrationService.stubVisitSessionCapacity,
+        stubPrisonerProfile: orchestrationService.stubPrisonerProfile,
+        stubSupportedPrisonIds: orchestrationService.stubSupportedPrisonIds,
+
         // Prisoner contact registry
         stubPrisonerSocialContacts: prisonerContactRegistry.stubPrisonerSocialContacts,
 
         // Prison API
-        stubBookings: prisonApi.stubBookings,
-        stubOffender: prisonApi.stubOffender,
         stubOffenderRestrictions: prisonApi.stubOffenderRestrictions,
         stubSetActiveCaseLoad: prisonApi.stubSetActiveCaseLoad,
         stubUserCaseloads: prisonApi.stubUserCaseloads,
-        stubVisitBalances: prisonApi.stubVisitBalances,
 
         // Prisoner offender search
         stubPrisonerById: prisonerSearch.stubPrisonerById,
@@ -50,23 +64,22 @@ export default defineConfig({
         // Prison register API
         stubPrisons: prisonRegister.stubPrisons,
 
-        // Visit scheduler
-        stubAvailableSupport: visitScheduler.stubAvailableSupport,
-        stubBookVisit: visitScheduler.stubBookVisit,
-        stubCancelVisit: visitScheduler.stubCancelVisit,
-        stubChangeReservedSlot: visitScheduler.stubChangeReservedSlot,
-        stubSupportedPrisonIds: visitScheduler.stubSupportedPrisonIds,
-        stubUpcomingVisits: visitScheduler.stubUpcomingVisits,
-        stubPastVisits: visitScheduler.stubPastVisits,
-        stubReserveVisit: visitScheduler.stubReserveVisit,
-        stubSessionSchedule: visitScheduler.stubSessionSchedule,
-        stubVisit: visitScheduler.stubVisit,
-        stubVisitSessions: visitScheduler.stubVisitSessions,
-        stubVisitsByDate: visitScheduler.stubVisitsByDate,
-        stubVisitSessionCapacity: visitScheduler.stubVisitSessionCapacity,
-
         // Whereabouts
         stubOffenderEvents: whereaboutsOffenderEvents.stubOffenderEvents,
+
+        // Log message to console
+        log: (message: string) => {
+          // eslint-disable-next-line no-console
+          console.log(message)
+          return null
+        },
+
+        // Log table to console
+        table: (violationData: Record<string, string>[]) => {
+          // eslint-disable-next-line no-console
+          console.table(violationData)
+          return null
+        },
       })
     },
     baseUrl: 'http://localhost:3007',

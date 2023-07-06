@@ -36,10 +36,12 @@ export default class MainContact {
     const { visitSessionData } = req.session
     const errors = validationResult(req)
 
+    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
+
     if (!errors.isEmpty()) {
       req.flash('errors', errors.array() as [])
       req.flash('formValues', req.body)
-      return res.redirect(req.originalUrl)
+      return res.redirect(`${urlPrefix}/select-main-contact`)
     }
 
     const selectedContact = req.session.visitorList.visitors.find(
@@ -52,7 +54,6 @@ export default class MainContact {
       contactName: selectedContact === undefined ? req.body.someoneElseName : undefined,
     }
 
-    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
     return res.redirect(`${urlPrefix}/request-method`)
   }
 

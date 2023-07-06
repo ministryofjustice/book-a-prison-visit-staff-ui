@@ -4,16 +4,16 @@ import config from '../../config'
 import requestMethods from '../../constants/requestMethod'
 import AuditService from '../../services/auditService'
 import NotificationsService from '../../services/notificationsService'
-import VisitSessionsService from '../../services/visitSessionsService'
 import { getSupportTypeDescriptions } from '../visitorUtils'
 import getUrlPrefix from './visitJourneyUtils'
+import { VisitService } from '../../services'
 
 export default class CheckYourBooking {
   constructor(
     private readonly mode: string,
-    private readonly visitSessionsService: VisitSessionsService,
     private readonly auditService: AuditService,
     private readonly notificationsService: NotificationsService,
+    private readonly visitService: VisitService,
   ) {}
 
   async get(req: Request, res: Response): Promise<void> {
@@ -52,12 +52,12 @@ export default class CheckYourBooking {
 
     try {
       // change reserved visit to have the latest data
-      await this.visitSessionsService.changeReservedVisit({
+      await this.visitService.changeReservedVisit({
         username: res.locals.user.username,
         visitSessionData,
       })
       // 'book' the visit: set it's status to BOOKED
-      const bookedVisit = await this.visitSessionsService.bookVisit({
+      const bookedVisit = await this.visitService.bookVisit({
         username: res.locals.user.username,
         applicationReference: visitSessionData.applicationReference,
       })

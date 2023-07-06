@@ -8,7 +8,12 @@ import { getDateTabs, getSlotsSideMenuData } from './visitsUtils'
 import { SessionCapacity, Visit } from '../data/orchestrationApiTypes'
 import type { Services } from '../services'
 
-export default function routes({ auditService, prisonerSearchService, visitSessionsService }: Services): Router {
+export default function routes({
+  auditService,
+  prisonerSearchService,
+  visitService,
+  visitSessionsService,
+}: Services): Router {
   const router = Router()
 
   const get = (path: string | string[], ...handlers: RequestHandler[]) =>
@@ -46,7 +51,7 @@ export default function routes({ auditService, prisonerSearchService, visitSessi
         unknownSlots: VisitsPageSlot[]
         firstSlotTime: string
       }
-    } = await visitSessionsService.getVisitsByDate({
+    } = await visitService.getVisitsByDate({
       dateString: selectedDateString,
       username: res.locals.user.username,
       prisonId,

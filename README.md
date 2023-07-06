@@ -1,4 +1,7 @@
 # book-a-prison-visit-staff-ui
+[![repo standards badge](https://img.shields.io/badge/dynamic/json?color=blue&style=flat&logo=github&label=MoJ%20Compliant&query=%24.result&url=https%3A%2F%2Foperations-engineering-reports.cloud-platform.service.justice.gov.uk%2Fapi%2Fv1%2Fcompliant_public_repositories%2Fbook-a-prison-visit-staff-ui)](https://operations-engineering-reports.cloud-platform.service.justice.gov.uk/public-github-repositories.html#book-a-prison-visit-staff-ui "Link to report")
+[![CircleCI](https://circleci.com/gh/ministryofjustice/book-a-prison-visit-staff-ui/tree/main.svg?style=svg)](https://circleci.com/gh/ministryofjustice/book-a-prison-visit-staff-ui)
+
 Staff UI for new Manage a Prison Visit project.
 
 ## Running the app
@@ -23,7 +26,7 @@ Or, to start just Redis if using HMPPS Auth dev:
 
 `docker-compose up redis-bapv`
 
-Install dependencies using `npm install`, ensuring you are using >= `Node v16.x`
+Install dependencies using `npm install`, ensuring you are using >= `Node v18.x`
 
 Using your personal client credentials, create a `.env` local settings file
 ```bash
@@ -42,7 +45,6 @@ SYSTEM_CLIENT_SECRET=clientsecret
 ORCHESTRATION_API_URL="https://hmpps-manage-prison-visits-orchestration-dev.prison.service.justice.gov.uk"
 PRISONER_SEARCH_API_URL="https://prisoner-offender-search-dev.prison.service.justice.gov.uk"
 PRISON_API_URL="https://api-dev.prison.service.justice.gov.uk"
-VISIT_SCHEDULER_API_URL="https://hmpps-manage-prison-visits-orchestration-dev.prison.service.justice.gov.uk"
 PRISONER_CONTACT_REGISTRY_API_URL="https://prisoner-contact-registry-dev.prison.service.justice.gov.uk"
 WHEREABOUTS_API_URL="https://whereabouts-api-dev.service.justice.gov.uk"
 PRISON_REGISTER_API_URL="https://prison-register-dev.hmpps.service.justice.gov.uk"
@@ -94,7 +96,7 @@ In the [CircleCI builds](https://app.circleci.com/pipelines/github/ministryofjus
 The unit test coverage report can be found at `test_results/jest/coverage/lcov-report/index.html`.
 
 ## Visit journeys – book and update
-The same booking journey is used both for initially booking a visit and updating an existing visit. The difference between the two and the different Visit Scheduler API calls required occurs when submitting the 'Select date and time of visit' page (see `POST` handler in [`dateAndTime.ts`](./server/routes/visitJourney/dateAndTime.ts)).
+The same booking journey is used both for initially booking a visit and updating an existing visit. The difference between the two and the different API calls required occurs when submitting the 'Select date and time of visit' page (see `POST` handler in [`dateAndTime.ts`](./server/routes/visitJourney/dateAndTime.ts)).
 
 **Booking a new visit**
 * first time selecting date/time
@@ -117,14 +119,14 @@ In both cases, at the end of the journey there are two further calls to confirm 
 
 ## Imported types
 
-Some TypeScript types are imported via the Open API (Swagger) docs, e.g. from the Visit Scheduler, Prisoner Contact Registry, Prison API, etc.
+Some TypeScript types are imported via the Open API (Swagger) docs, e.g. from the Visits Orchestration Service, Prisoner Contact Registry, Prison API, etc.
 
-These are stored in [`./server/@types/`](./server/@types/), for example [`./server/@types/visit-scheduler-api.d.ts`](./server/@types/visit-scheduler-api.d.ts). There are also some corresponding files such as [`./server/data/visitSchedulerApiTypes.ts`](./server/data/visitSchedulerApiTypes.ts) that contain the particular imported types that are actually used in the project.
+These are stored in [`./server/@types/`](./server/@types/), for example [`./server/@types/orchestration-api.d.ts`](./server/@types/orchestration-api.d.ts). There are also some corresponding files such as [`./server/data/orchestrationApiTypes.ts`](./server/data/orchestrationApiTypes.ts) that contain the particular imported types that are actually used in the project.
 
-For example, to update types for the Visit Scheduler use the [API docs URL](https://visit-scheduler-dev.prison.service.justice.gov.uk/v3/api-docs) from [Swagger](https://visit-scheduler-dev.prison.service.justice.gov.uk/swagger-ui/index.html) and the appropriate output filename:
+For example, to update types for the Orchestration service, use the [API docs URL](https://hmpps-manage-prison-visits-orchestration-dev.prison.service.justice.gov.uk/v3/api-docs) from [Swagger](https://hmpps-manage-prison-visits-orchestration-dev.prison.service.justice.gov.uk/swagger-ui/index.html) and the appropriate output filename:
 
 ```
-npx openapi-typescript https://visit-scheduler-dev.prison.service.justice.gov.uk/v3/api-docs --output ./server/@types/visit-scheduler-api.d.ts
+npx openapi-typescript https://hmpps-manage-prison-visits-orchestration-dev.prison.service.justice.gov.uk/v3/api-docs --output ./server/@types/orchestration-api.d.ts
 ```
 
 The downloaded file will need tidying (e.g. single rather than double quotes, etc):

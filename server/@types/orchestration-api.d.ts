@@ -125,25 +125,16 @@ export interface components {
        */
       prisonerId: string
       /**
-       * @description Prison Id
-       * @example MDI
+       * @description Session template reference
+       * @example v9d.7ed.7u
        */
-      prisonId: string
-      /**
-       * @description Visit Room
-       * @example A1
-       */
-      visitRoom: string
-      /**
-       * @description Visit Type
-       * @example SOCIAL
-       */
-      visitType: string
+      sessionTemplateReference: string
       /**
        * @description Visit Restriction
        * @example OPEN
+       * @enum {string}
        */
-      visitRestriction: string
+      visitRestriction: 'OPEN' | 'CLOSED' | 'UNKNOWN'
       /**
        * Format: date-time
        * @description The date and time of the visit
@@ -219,30 +210,58 @@ export interface components {
        */
       prisonId: string
       /**
+       * @description Session Template Reference
+       * @example v9d.7ed.7u
+       */
+      sessionTemplateReference?: string
+      /**
        * @description Visit Room
-       * @example A1 L3
+       * @example Visits Main Hall
        */
       visitRoom: string
       /**
        * @description Visit Type
        * @example SOCIAL
+       * @enum {string}
        */
-      visitType: string
+      visitType: 'SOCIAL'
       /**
        * @description Visit Status
        * @example RESERVED
+       * @enum {string}
        */
-      visitStatus: string
+      visitStatus: 'RESERVED' | 'CHANGING' | 'BOOKED' | 'CANCELLED'
       /**
        * @description Outcome Status
        * @example VISITOR_CANCELLED
+       * @enum {string}
        */
-      outcomeStatus?: string
+      outcomeStatus?:
+        | 'ADMINISTRATIVE_CANCELLATION'
+        | 'ADMINISTRATIVE_ERROR'
+        | 'BATCH_CANCELLATION'
+        | 'CANCELLATION'
+        | 'COMPLETED_NORMALLY'
+        | 'ESTABLISHMENT_CANCELLED'
+        | 'NOT_RECORDED'
+        | 'NO_VISITING_ORDER'
+        | 'PRISONER_CANCELLED'
+        | 'PRISONER_COMPLETED_EARLY'
+        | 'PRISONER_REFUSED_TO_ATTEND'
+        | 'TERMINATED_BY_STAFF'
+        | 'VISITOR_CANCELLED'
+        | 'VISITOR_COMPLETED_EARLY'
+        | 'VISITOR_DECLINED_ENTRY'
+        | 'VISITOR_DID_NOT_ARRIVE'
+        | 'VISITOR_FAILED_SECURITY_CHECKS'
+        | 'VISIT_ORDER_CANCELLED'
+        | 'SUPERSEDED_CANCELLATION'
       /**
        * @description Visit Restriction
        * @example OPEN
+       * @enum {string}
        */
-      visitRestriction: string
+      visitRestriction: 'OPEN' | 'CLOSED' | 'UNKNOWN'
       /**
        * Format: date-time
        * @description The date and time of the visit
@@ -291,8 +310,9 @@ export interface components {
       /**
        * @description Note type
        * @example VISITOR_CONCERN
+       * @enum {string}
        */
-      type: string
+      type: 'VISITOR_CONCERN' | 'VISIT_OUTCOMES' | 'VISIT_COMMENT' | 'STATUS_CHANGED_REASON'
       /**
        * @description Note text
        * @example Visitor is concerned that his mother in-law is coming!
@@ -307,8 +327,28 @@ export interface components {
       /**
        * @description Outcome Status
        * @example VISITOR_CANCELLED
+       * @enum {string}
        */
-      outcomeStatus: string
+      outcomeStatus:
+        | 'ADMINISTRATIVE_CANCELLATION'
+        | 'ADMINISTRATIVE_ERROR'
+        | 'BATCH_CANCELLATION'
+        | 'CANCELLATION'
+        | 'COMPLETED_NORMALLY'
+        | 'ESTABLISHMENT_CANCELLED'
+        | 'NOT_RECORDED'
+        | 'NO_VISITING_ORDER'
+        | 'PRISONER_CANCELLED'
+        | 'PRISONER_COMPLETED_EARLY'
+        | 'PRISONER_REFUSED_TO_ATTEND'
+        | 'TERMINATED_BY_STAFF'
+        | 'VISITOR_CANCELLED'
+        | 'VISITOR_COMPLETED_EARLY'
+        | 'VISITOR_DECLINED_ENTRY'
+        | 'VISITOR_DID_NOT_ARRIVE'
+        | 'VISITOR_FAILED_SECURITY_CHECKS'
+        | 'VISIT_ORDER_CANCELLED'
+        | 'SUPERSEDED_CANCELLATION'
       /**
        * @description Outcome text
        * @example Because he got covid
@@ -319,8 +359,9 @@ export interface components {
       /**
        * @description Visit Restriction
        * @example OPEN
+       * @enum {string}
        */
-      visitRestriction?: string
+      visitRestriction?: 'OPEN' | 'CLOSED' | 'UNKNOWN'
       /**
        * Format: date-time
        * @description The date and time of the visit
@@ -336,6 +377,11 @@ export interface components {
       visitors?: components['schemas']['VisitorDto'][]
       /** @description List of additional support associated with the visit */
       visitorSupport?: components['schemas']['VisitorSupportDto'][]
+      /**
+       * @description Session template reference
+       * @example v9d.7ed.7u
+       */
+      sessionTemplateReference: string
     }
     DlqMessage: {
       body: {
@@ -397,10 +443,10 @@ export interface components {
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject']
-      first?: boolean
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
+      first?: boolean
       last?: boolean
       empty?: boolean
     }
@@ -409,11 +455,11 @@ export interface components {
       offset?: number
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
+      pageNumber?: number
+      /** Format: int32 */
       pageSize?: number
       paged?: boolean
       unpaged?: boolean
-      /** Format: int32 */
-      pageNumber?: number
     }
     SortObject: {
       empty?: boolean
@@ -436,21 +482,21 @@ export interface components {
     /** @description Visit Session */
     VisitSessionDto: {
       /**
-       * Format: int64
-       * @description session id
-       * @example 123
+       * @description Session Template Reference
+       * @example v9d.7ed.7u
        */
-      sessionTemplateId: number
+      sessionTemplateReference: string
       /**
-       * @description The Name of the visit room in which this visit session takes place
-       * @example Visit room 1
+       * @description Visit Room
+       * @example Visits Main Hall
        */
-      visitRoomName: string
+      visitRoom: string
       /**
        * @description The type of visits taking place within this session
        * @example SOCIAL
+       * @enum {string}
        */
-      visitType: string
+      visitType: 'SOCIAL'
       /**
        * @description The prison id
        * @example LEI
@@ -491,7 +537,7 @@ export interface components {
        */
       endTimestamp: string
       /** @description Session conflicts */
-      sessionConflicts?: string[]
+      sessionConflicts?: ('NON_ASSOCIATION' | 'DOUBLE_BOOKED')[]
     }
     /** @description Session Capacity */
     SessionCapacityDto: {
@@ -508,6 +554,21 @@ export interface components {
        */
       open: number
     }
+    /** @description Validity period for the session template */
+    SessionDateRangeDto: {
+      /**
+       * Format: date
+       * @description The start of the Validity period for the session template
+       * @example 2019-11-02
+       */
+      validFromDate: string
+      /**
+       * Format: date
+       * @description The end of the Validity period for the session template
+       * @example 2019-12-02
+       */
+      validToDate?: string
+    }
     /** @description Session schedule */
     SessionScheduleDto: {
       /**
@@ -515,6 +576,33 @@ export interface components {
        * @example v9d.7ed.7u
        */
       sessionTemplateReference: string
+      sessionTimeSlot: components['schemas']['SessionTimeSlotDto']
+      sessionDateRange: components['schemas']['SessionDateRangeDto']
+      capacity: components['schemas']['SessionCapacityDto']
+      /**
+       * @description prisoner location group
+       * @example Wing C
+       */
+      prisonerLocationGroupNames: string[]
+      /**
+       * @description prisoner category groups
+       * @example Category A Prisoners
+       */
+      prisonerCategoryGroupNames: string[]
+      /**
+       * @description prisoner incentive level groups
+       * @example Enhanced Incentive Level Prisoners
+       */
+      prisonerIncentiveLevelGroupNames: string[]
+      /**
+       * Format: int32
+       * @description number of weeks until the weekly day is repeated
+       * @example 1
+       */
+      weeklyFrequency: number
+    }
+    /** @description The time slot of the generated visit session(s) */
+    SessionTimeSlotDto: {
       /**
        * Format: HH:mm
        * @example 13:45
@@ -525,25 +613,6 @@ export interface components {
        * @example 13:45
        */
       endTime: string
-      capacity: components['schemas']['SessionCapacityDto']
-      /** @description The session is for enhanced privileges */
-      enhanced: boolean
-      /**
-       * @description prisoner location group
-       * @example Wing C
-       */
-      prisonerLocationGroupNames?: string[]
-      /**
-       * @description The session template frequency
-       * @example BI_WEEKLY
-       */
-      sessionTemplateFrequency: string
-      /**
-       * Format: date
-       * @description The end date of sessionTemplate
-       * @example 2020-11-01
-       */
-      sessionTemplateEndDate?: string
     }
     GetDlqResult: {
       /** Format: int32 */
@@ -628,7 +697,7 @@ export interface components {
        * @description Date of Birth
        * @example 1975-04-02
        */
-      dateOfBirth?: string
+      dateOfBirth: string
       /**
        * @description In prison cell location
        * @example A-1-002
@@ -659,7 +728,7 @@ export interface components {
       alerts?: components['schemas']['AlertDto'][]
       visitBalances?: components['schemas']['VisitBalancesDto']
       /** @description Past and future visits for the prisoner based on configured duration. */
-      visits?: components['schemas']['VisitDto'][]
+      visits: components['schemas']['VisitDto'][]
     }
     /** @description Balances of visit orders and privilege visit orders */
     VisitBalancesDto: {
@@ -1286,8 +1355,8 @@ export interface operations {
   }
   getDlqMessages: {
     parameters: {
-      query: {
-        maxMessages: number
+      query?: {
+        maxMessages?: number
       }
       path: {
         dlqName: string

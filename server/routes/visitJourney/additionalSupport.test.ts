@@ -41,19 +41,21 @@ testJourneys.forEach(journey => {
         },
         visitRestriction: 'OPEN',
         visitSlot: {
-          id: 'visitId',
+          id: '1',
+          sessionTemplateReference: 'v9d.7ed.7u',
           prisonId: 'HEI',
           startTimestamp: '123',
           endTimestamp: '456',
           availableTables: 1,
           capacity: 30,
-          visitRoomName: 'room name',
+          visitRoom: 'room name',
           visitRestriction: 'OPEN',
         },
         visitors: [
           {
             personId: 123,
             name: 'name last',
+            adult: true,
             relationshipDescription: 'relate',
             restrictions: [],
             banned: false,
@@ -129,7 +131,8 @@ testJourneys.forEach(journey => {
       flashData.errors = [
         {
           msg: 'No answer selected',
-          param: 'additionalSupportRequired',
+          path: 'additionalSupportRequired',
+          type: 'field',
           location: 'body',
         },
       ]
@@ -142,6 +145,7 @@ testJourneys.forEach(journey => {
           const $ = cheerio.load(res.text)
           expect($('h1').text().trim()).toBe('Is additional support needed for any of the visitors?')
           expect($('.govuk-error-summary__body').text()).toContain('No answer selected')
+          expect($('.govuk-error-summary__body a').attr('href')).toBe('#additionalSupportRequired-error')
           expect($('#additionalSupportRequired-error').text()).toContain('No answer selected')
           expect(flashProvider).toHaveBeenCalledWith('errors')
           expect(flashProvider).toHaveBeenCalledWith('formValues')
@@ -154,7 +158,8 @@ testJourneys.forEach(journey => {
         {
           value: [],
           msg: 'No request selected',
-          param: 'additionalSupport',
+          path: 'additionalSupport',
+          type: 'field',
           location: 'body',
         },
       ]
@@ -169,6 +174,7 @@ testJourneys.forEach(journey => {
           const $ = cheerio.load(res.text)
           expect($('h1').text().trim()).toBe('Is additional support needed for any of the visitors?')
           expect($('.govuk-error-summary__body').text()).toContain('No request selected')
+          expect($('.govuk-error-summary__body a').attr('href')).toBe('#additionalSupport-error')
           expect($('[data-test="support-required-yes"]').prop('checked')).toBe(true)
           expect($('#additionalSupport-error').text()).toContain('No request selected')
           expect(flashProvider).toHaveBeenCalledWith('errors')
@@ -182,7 +188,8 @@ testJourneys.forEach(journey => {
         {
           value: '',
           msg: 'Enter details of the request',
-          param: 'otherSupportDetails',
+          path: 'otherSupportDetails',
+          type: 'field',
           location: 'body',
         },
       ]
@@ -197,6 +204,7 @@ testJourneys.forEach(journey => {
           const $ = cheerio.load(res.text)
           expect($('h1').text().trim()).toBe('Is additional support needed for any of the visitors?')
           expect($('.govuk-error-summary__body').text()).toContain('Enter details of the request')
+          expect($('.govuk-error-summary__body a').attr('href')).toBe('#otherSupportDetails-error')
           expect($('[data-test="support-required-yes"]').prop('checked')).toBe(true)
           expect($('[data-test="WHEELCHAIR"]').prop('checked')).toBe(true)
           expect($('[data-test="OTHER"]').prop('checked')).toBe(true)
@@ -219,19 +227,21 @@ testJourneys.forEach(journey => {
         },
         visitRestriction: 'OPEN',
         visitSlot: {
-          id: 'visitId',
+          id: '1',
+          sessionTemplateReference: 'v9d.7ed.7u',
           prisonId: 'HEI',
           startTimestamp: '123',
           endTimestamp: '456',
           availableTables: 1,
           capacity: 30,
-          visitRoomName: 'room name',
+          visitRoom: 'room name',
           visitRestriction: 'OPEN',
         },
         visitors: [
           {
             personId: 123,
             name: 'name last',
+            adult: true,
             relationshipDescription: 'relate',
             restrictions: [
               {
@@ -265,7 +275,13 @@ testJourneys.forEach(journey => {
         .expect('location', `${journey.urlPrefix}/additional-support`)
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledWith('errors', [
-            { location: 'body', msg: 'No answer selected', param: 'additionalSupportRequired', value: undefined },
+            {
+              location: 'body',
+              msg: 'No answer selected',
+              path: 'additionalSupportRequired',
+              type: 'field',
+              value: undefined,
+            },
           ])
           expect(flashProvider).toHaveBeenCalledWith('formValues', {
             additionalSupport: [],
@@ -282,7 +298,13 @@ testJourneys.forEach(journey => {
         .expect('location', `${journey.urlPrefix}/additional-support`)
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledWith('errors', [
-            { location: 'body', msg: 'No answer selected', param: 'additionalSupportRequired', value: 'xyz' },
+            {
+              location: 'body',
+              msg: 'No answer selected',
+              path: 'additionalSupportRequired',
+              type: 'field',
+              value: 'xyz',
+            },
           ])
           expect(flashProvider).toHaveBeenCalledWith('formValues', {
             additionalSupportRequired: 'xyz',
@@ -300,7 +322,7 @@ testJourneys.forEach(journey => {
         .expect('location', `${journey.urlPrefix}/additional-support`)
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledWith('errors', [
-            { location: 'body', msg: 'No request selected', param: 'additionalSupport', value: [] },
+            { location: 'body', msg: 'No request selected', path: 'additionalSupport', type: 'field', value: [] },
           ])
           expect(flashProvider).toHaveBeenCalledWith('formValues', {
             additionalSupportRequired: 'yes',
@@ -320,7 +342,13 @@ testJourneys.forEach(journey => {
         .expect('location', `${journey.urlPrefix}/additional-support`)
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledWith('errors', [
-            { location: 'body', msg: 'No request selected', param: 'additionalSupport', value: ['xyz', 'WHEELCHAIR'] },
+            {
+              location: 'body',
+              msg: 'No request selected',
+              path: 'additionalSupport',
+              type: 'field',
+              value: ['xyz', 'WHEELCHAIR'],
+            },
           ])
           expect(flashProvider).toHaveBeenCalledWith('formValues', {
             additionalSupportRequired: 'yes',
@@ -339,7 +367,13 @@ testJourneys.forEach(journey => {
         .expect('location', `${journey.urlPrefix}/additional-support`)
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledWith('errors', [
-            { location: 'body', msg: 'Enter details of the request', param: 'otherSupportDetails', value: '' },
+            {
+              location: 'body',
+              msg: 'Enter details of the request',
+              path: 'otherSupportDetails',
+              type: 'field',
+              value: '',
+            },
           ])
           expect(flashProvider).toHaveBeenCalledWith('formValues', {
             additionalSupportRequired: 'yes',
@@ -359,7 +393,7 @@ testJourneys.forEach(journey => {
         .expect('location', `${journey.urlPrefix}/additional-support`)
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledWith('errors', [
-            { location: 'body', msg: 'No request selected', param: 'additionalSupport', value: [] },
+            { location: 'body', msg: 'No request selected', path: 'additionalSupport', type: 'field', value: [] },
           ])
           expect(flashProvider).toHaveBeenCalledWith('formValues', {
             additionalSupportRequired: 'yes',

@@ -25,6 +25,9 @@ export default class SelectVisitors {
     }
     req.session.visitorList.visitors = visitorList
 
+    const atLeastOneAdult = visitorList.some(visitor => visitor.adult === true)
+    const eligibleVisitors = visitorList.some(visitor => visitor.banned === false && visitor.adult === true)
+
     const restrictions = await this.prisonerProfileService.getRestrictions(offenderNo, res.locals.user.username)
     visitSessionData.prisoner.restrictions = restrictions
 
@@ -41,6 +44,8 @@ export default class SelectVisitors {
       offenderNo: visitSessionData.prisoner.offenderNo,
       prisonerName: visitSessionData.prisoner.name,
       visitorList,
+      atLeastOneAdult,
+      eligibleVisitors,
       restrictions,
       selectVisitorsText,
       formValues,
@@ -54,10 +59,12 @@ export default class SelectVisitors {
     const { visitSessionData } = req.session
     const errors = validationResult(req)
 
+    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
+
     if (!errors.isEmpty()) {
       req.flash('errors', errors.array() as [])
       req.flash('formValues', req.body)
-      return res.redirect(req.originalUrl)
+      return res.redirect(`${urlPrefix}/select-visitors`)
     }
 
     const selectedIds = [].concat(req.body.visitors)
@@ -88,8 +95,6 @@ export default class SelectVisitors {
     const closedVisitPrisoner = visitSessionData.prisoner.restrictions.some(
       restriction => restriction.restrictionType === 'CLOSED',
     )
-
-    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
 
     return !closedVisitVisitors && closedVisitPrisoner
       ? res.redirect(`${urlPrefix}/visit-type`)

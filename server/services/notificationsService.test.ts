@@ -22,10 +22,11 @@ describe('Notifications service', () => {
       prisonName: 'Hewell',
       visitSlot: {
         id: '1',
+        sessionTemplateReference: 'v9d.7ed.7u',
         startTimestamp: '2022-02-14T10:00:00',
         endTimestamp: '2022-02-14T11:00:00',
         availableTables: 15,
-        visitRoomName: 'room name',
+        visitRoom: 'room name',
         visitRestriction: 'OPEN',
       } as VisitSlot,
       reference: 'ab-cd-ef-gh',

@@ -81,7 +81,7 @@ testJourneys.forEach(journey => {
           personId: 4322,
           name: 'Bob Smith',
           dateOfBirth: undefined,
-          adult: undefined,
+          adult: true,
           relationshipDescription: 'Brother',
           address: '1st listed address',
           restrictions: [],
@@ -256,8 +256,8 @@ testJourneys.forEach(journey => {
       visitSessionData.visitors = [
         {
           address: '1st listed address',
-          adult: undefined,
           dateOfBirth: undefined,
+          adult: true,
           name: 'Bob Smith',
           personId: 4322,
           relationshipDescription: 'Brother',
@@ -286,8 +286,8 @@ testJourneys.forEach(journey => {
       visitSessionData.visitors = [
         {
           address: '1st listed address',
-          adult: undefined,
           dateOfBirth: undefined,
+          adult: true,
           name: 'Bob Smith',
           personId: 4322,
           relationshipDescription: 'Brother',
@@ -323,7 +323,9 @@ testJourneys.forEach(journey => {
     })
 
     it('should render validation errors from flash data for invalid input', () => {
-      flashData.errors = [{ location: 'body', msg: 'No visitors selected', param: 'visitors', value: undefined }]
+      flashData.errors = [
+        { location: 'body', msg: 'No visitors selected', path: 'visitors', type: 'field', value: undefined },
+      ]
 
       return request(sessionApp)
         .get(`${journey.urlPrefix}/select-visitors`)
@@ -334,6 +336,7 @@ testJourneys.forEach(journey => {
           expect($('h1').text().trim()).toBe('Select visitors from the prisoner’s approved visitor list')
           expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
           expect($('.govuk-error-summary__body').text()).toContain('No visitors selected')
+          expect($('.govuk-error-summary__body a').attr('href')).toBe('#visitors-error')
           expect($('#visitors-error').text()).toContain('No visitors selected')
           expect(flashProvider).toHaveBeenCalledWith('errors')
           expect(flashProvider).toHaveBeenCalledWith('formValues')
@@ -359,24 +362,8 @@ testJourneys.forEach(journey => {
         })
     })
 
-    it('should show back to start rather than continue button if only child or banned visitors listed', () => {
+    it('should show back to start button and warning message if only child visitors listed', () => {
       returnData = [
-        {
-          personId: 4322,
-          name: 'Bob Smith',
-          dateOfBirth: undefined,
-          adult: undefined,
-          relationshipDescription: 'Brother',
-          address: '1st listed address',
-          restrictions: [
-            {
-              restrictionType: 'BAN',
-              restrictionTypeDescription: 'Banned',
-              startDate: '2022-01-01',
-            },
-          ],
-          banned: true,
-        },
         {
           personId: 4324,
           name: 'Anne Smith',
@@ -397,9 +384,85 @@ testJourneys.forEach(journey => {
           const $ = cheerio.load(res.text)
           expect($('h1').text().trim()).toBe('Select visitors from the prisoner’s approved visitor list')
           expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
-          expect($('input[name="visitors"]').length).toBe(2)
+          expect($('input[name="visitors"]').length).toBe(1)
           expect($('[data-test="submit"]').length).toBe(0)
           expect($('[data-test="back-to-start"]').length).toBe(1)
+          expect($('#visitor-4324').attr('disabled')).toBe('disabled')
+          expect($('.govuk-warning-text__text').text().replace(/\s+/g, ' ')).toContain(
+            'There are no approved visitors over 18 for this prisoner. A booking cannot be made at this time.',
+          )
+        })
+    })
+
+    it('should show not disable child visitors if an unbanned adult visitor is also present', () => {
+      returnData = [
+        {
+          personId: 4324,
+          name: 'Anne Smith',
+          dateOfBirth: '2018-03-02',
+          adult: false,
+          relationshipDescription: 'Niece',
+          address: 'Not entered',
+          restrictions: [],
+          banned: false,
+        },
+        {
+          personId: 4322,
+          name: 'Bob Smith',
+          dateOfBirth: undefined,
+          adult: true,
+          relationshipDescription: 'Brother',
+          address: '1st listed address',
+          restrictions: [],
+          banned: false,
+        },
+      ]
+      prisonerVisitorsService.getVisitors.mockResolvedValue(returnData)
+
+      return request(sessionApp)
+        .get(`${journey.urlPrefix}/select-visitors`)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text().trim()).toBe('Select visitors from the prisoner’s approved visitor list')
+          expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
+          expect($('input[name="visitors"]').length).toBe(2)
+          expect($('[data-test="submit"]').length).toBe(1)
+          expect($('[data-test="back-to-start"]').length).toBe(0)
+          expect($('#visitor-4324').attr('disabled')).toBe(undefined)
+          expect($('#visitor-4322').attr('disabled')).toBe(undefined)
+        })
+    })
+
+    it('should show back to start button and warning message if only banned visitors listed', () => {
+      returnData = [
+        {
+          personId: 3984,
+          name: 'John Smith',
+          dateOfBirth: '2000-03-02',
+          adult: true,
+          relationshipDescription: 'Uncle',
+          address: 'Not entered',
+          restrictions: [],
+          banned: true,
+        },
+      ]
+      prisonerVisitorsService.getVisitors.mockResolvedValue(returnData)
+
+      return request(sessionApp)
+        .get(`${journey.urlPrefix}/select-visitors`)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text().trim()).toBe('Select visitors from the prisoner’s approved visitor list')
+          expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
+          expect($('input[name="visitors"]').length).toBe(1)
+          expect($('[data-test="submit"]').length).toBe(0)
+          expect($('[data-test="back-to-start"]').length).toBe(1)
+          expect($('#visitor-3984').attr('disabled')).toBe('disabled')
+          expect($('.govuk-warning-text__text').text().replace(/\s+/g, ' ')).toContain(
+            'There are no permitted visitors over 18 for this prisoner. A booking cannot be made at this time.',
+          )
         })
     })
 
@@ -795,7 +858,7 @@ testJourneys.forEach(journey => {
         .expect('location', `${journey.urlPrefix}/select-visitors`)
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledWith('errors', [
-            { location: 'body', msg: 'Add an adult to the visit', param: 'visitors', value: '1234' },
+            { location: 'body', msg: 'Add an adult to the visit', path: 'visitors', type: 'field', value: '1234' },
           ])
           expect(flashProvider).toHaveBeenCalledWith('formValues', { visitors: '1234' })
         })
@@ -809,7 +872,7 @@ testJourneys.forEach(journey => {
         .expect('location', `${journey.urlPrefix}/select-visitors`)
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledWith('errors', [
-            { location: 'body', msg: 'Invalid selection', param: 'visitors', value: '4321' },
+            { location: 'body', msg: 'Invalid selection', path: 'visitors', type: 'field', value: '4321' },
           ])
           expect(flashProvider).toHaveBeenCalledWith('formValues', { visitors: '4321' })
         })
@@ -822,7 +885,7 @@ testJourneys.forEach(journey => {
         .expect('location', `${journey.urlPrefix}/select-visitors`)
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledWith('errors', [
-            { location: 'body', msg: 'No visitors selected', param: 'visitors', value: undefined },
+            { location: 'body', msg: 'No visitors selected', path: 'visitors', type: 'field', value: undefined },
           ])
           expect(flashProvider).toHaveBeenCalledWith('formValues', {})
         })
@@ -836,7 +899,7 @@ testJourneys.forEach(journey => {
         .expect('location', `${journey.urlPrefix}/select-visitors`)
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledWith('errors', [
-            { location: 'body', msg: 'Add an adult to the visit', param: 'visitors', value: '4324' },
+            { location: 'body', msg: 'Add an adult to the visit', path: 'visitors', type: 'field', value: '4324' },
           ])
           expect(flashProvider).toHaveBeenCalledWith('formValues', { visitors: '4324' })
         })
@@ -852,7 +915,13 @@ testJourneys.forEach(journey => {
         .expect('location', `${journey.urlPrefix}/select-visitors`)
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledWith('errors', [
-            { location: 'body', msg: 'Select no more than 10 visitors', param: 'visitors', value: tooManyVisitorIds },
+            {
+              location: 'body',
+              msg: 'Select no more than 10 visitors',
+              path: 'visitors',
+              type: 'field',
+              value: tooManyVisitorIds,
+            },
           ])
           expect(flashProvider).toHaveBeenCalledWith('formValues', { visitors: tooManyVisitorIds })
         })

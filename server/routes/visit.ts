@@ -4,13 +4,13 @@ import { body, validationResult } from 'express-validator'
 import { BadRequest } from 'http-errors'
 import visitCancellationReasons from '../constants/visitCancellationReasons'
 import { Prisoner } from '../data/prisonerOffenderSearchTypes'
-import { OutcomeDto, Visit } from '../data/orchestrationApiTypes'
+import { OutcomeDto } from '../data/orchestrationApiTypes'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import { isValidVisitReference } from './validationChecks'
 import { clearSession, getFlashFormValues } from './visitorUtils'
 import config from '../config'
 import logger from '../../logger'
-import { VisitorListItem, VisitSessionData, VisitSlot } from '../@types/bapv'
+import { VisitSessionData, VisitSlot } from '../@types/bapv'
 import SelectVisitors from './visitJourney/selectVisitors'
 import VisitType from './visitJourney/visitType'
 import { properCaseFullName } from '../utils/utils'
@@ -25,12 +25,14 @@ import getPrisonConfiguration from '../constants/prisonConfiguration'
 import type { Services } from '../services'
 
 export default function routes({
+  additionalSupportService,
   auditService,
   notificationsService,
   prisonerProfileService,
   prisonerSearchService,
   prisonerVisitorsService,
   supportedPrisonsService,
+  visitService,
   visitSessionsService,
 }: Services): Router {
   const router = Router()
@@ -61,15 +63,11 @@ export default function routes({
     const fromVisitSearch = (req.query?.from as string) === 'visit-search'
     const fromVisitSearchQuery = req.query?.query as string
 
-    const {
-      visit,
-      visitors,
-      additionalSupport,
-    }: { visit: Visit; visitors: VisitorListItem[]; additionalSupport: string[] } =
-      await visitSessionsService.getFullVisitDetails({
-        reference,
-        username: res.locals.user.username,
-      })
+    const { visitHistoryDetails, visitors, additionalSupport } = await visitService.getFullVisitDetails({
+      reference,
+      username: res.locals.user.username,
+    })
+    const { visit } = visitHistoryDetails
 
     if (visit.prisonId !== req.session.selectedEstablishment.prisonId) {
       const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(res.locals.user.username)
@@ -101,6 +99,7 @@ export default function routes({
       prisoner,
       prisonerLocation,
       visit,
+      visitHistoryDetails,
       visitors,
       additionalSupport,
       fromVisitSearch,
@@ -112,7 +111,10 @@ export default function routes({
   post('/:reference', async (req, res) => {
     const reference = getVisitReference(req)
 
-    const { visit }: { visit: Visit } = await visitSessionsService.getFullVisitDetails({
+    // @TODO - not really using full visit details here so could request less information
+    const {
+      visitHistoryDetails: { visit },
+    } = await visitService.getFullVisitDetails({
       reference,
       username: res.locals.user.username,
     })
@@ -139,12 +141,13 @@ export default function routes({
       visit.visitRestriction === 'OPEN' || visit.visitRestriction === 'CLOSED' ? visit.visitRestriction : undefined
     const visitSlot: VisitSlot = {
       id: '',
+      sessionTemplateReference: visit.sessionTemplateReference,
       prisonId: visit.prisonId,
       startTimestamp: visit.startTimestamp,
       endTimestamp: visit.endTimestamp,
       availableTables: 0,
       capacity: undefined,
-      visitRoomName: visit.visitRoom,
+      visitRoom: visit.visitRoom,
       visitRestriction,
     }
     const visitSessionData: VisitSessionData = {
@@ -175,11 +178,11 @@ export default function routes({
 
   const selectVisitors = new SelectVisitors('update', prisonerVisitorsService, prisonerProfileService)
   const visitType = new VisitType('update', auditService)
-  const dateAndTime = new DateAndTime('update', visitSessionsService, auditService)
-  const additionalSupport = new AdditionalSupport('update', visitSessionsService)
+  const dateAndTime = new DateAndTime('update', visitService, visitSessionsService, auditService)
+  const additionalSupport = new AdditionalSupport('update', additionalSupportService)
   const mainContact = new MainContact('update')
   const requestMethod = new RequestMethod('update')
-  const checkYourBooking = new CheckYourBooking('update', visitSessionsService, auditService, notificationsService)
+  const checkYourBooking = new CheckYourBooking('update', auditService, notificationsService, visitService)
   const confirmation = new Confirmation('update')
 
   get(
@@ -307,20 +310,20 @@ export default function routes({
       }
 
       const errors = validationResult(req)
+      const reference = getVisitReference(req)
 
       if (!errors.isEmpty()) {
         req.flash('errors', errors.array() as [])
         req.flash('formValues', req.body)
-        return res.redirect(req.originalUrl)
+        return res.redirect(`/visit/${reference}/cancel`)
       }
 
-      const reference = getVisitReference(req)
       const outcome: OutcomeDto = {
         outcomeStatus: req.body.cancel,
         text: req.body[reasonFieldName],
       }
 
-      const visit = await visitSessionsService.cancelVisit({
+      const visit = await visitService.cancelVisit({
         username: res.locals.user.username,
         reference,
         outcome,

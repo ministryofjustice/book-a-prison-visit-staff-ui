@@ -10,6 +10,7 @@ import { getParsedDateFromQueryString } from '../utils/utils'
 import {
   createMockAuditService,
   createMockPrisonerSearchService,
+  createMockVisitService,
   createMockVisitSessionsService,
 } from '../services/testutils/mocks'
 
@@ -19,6 +20,7 @@ let flashData: FlashData
 
 const auditService = createMockAuditService()
 const prisonerSearchService = createMockPrisonerSearchService()
+const visitService = createMockVisitService()
 const visitSessionsService = createMockVisitSessionsService()
 
 beforeEach(() => {
@@ -26,7 +28,7 @@ beforeEach(() => {
   flashProvider.mockImplementation((key: keyof FlashData) => {
     return flashData[key]
   })
-  app = appWithAllRoutes({ services: { auditService, prisonerSearchService, visitSessionsService } })
+  app = appWithAllRoutes({ services: { auditService, prisonerSearchService, visitService, visitSessionsService } })
 })
 
 afterEach(() => {
@@ -107,6 +109,7 @@ describe('GET /visits', () => {
             {
               personId: 4729570,
               name: 'Tess Bennett',
+              adult: true,
               relationshipDescription: 'Aunt',
               address: 'Not entered',
               restrictions: [],
@@ -139,6 +142,7 @@ describe('GET /visits', () => {
             {
               personId: 4729570,
               name: 'Tess Bennett',
+              adult: true,
               relationshipDescription: 'Aunt',
               address: 'Not entered',
               restrictions: [],
@@ -210,7 +214,7 @@ describe('GET /visits', () => {
 
   it('should render visit slot summary page with prisoner list, slot details and menu for choosing other slots, with the first slot chosen by default ', () => {
     prisonerSearchService.getPrisonersByPrisonerNumbers.mockResolvedValue(prisoners)
-    visitSessionsService.getVisitsByDate.mockResolvedValue(visits)
+    visitService.getVisitsByDate.mockResolvedValue(visits)
 
     return request(app)
       .get('/visits')
@@ -243,10 +247,10 @@ describe('GET /visits', () => {
   it('should not show capacity if session capacity not available', () => {
     prisonerSearchService.getPrisonersByPrisonerNumbers.mockResolvedValue(prisoners)
     visitSessionsService.getVisitSessionCapacity.mockResolvedValue(null)
-    visitSessionsService.getVisitsByDate.mockResolvedValue(visits)
+    visitService.getVisitsByDate.mockResolvedValue(visits)
 
     app = appWithAllRoutes({
-      services: { auditService, prisonerSearchService, visitSessionsService },
+      services: { auditService, prisonerSearchService, visitService, visitSessionsService },
       sessionData: { selectedEstablishment: { prisonId: 'XYZ', prisonName: 'XYZ' } } as SessionData,
     })
 
@@ -263,7 +267,7 @@ describe('GET /visits', () => {
 
   it('should render visit slot summary page with prisoner list, slot details and menu for choosing other slots, with the chosen slot shown for OPEN', () => {
     prisonerSearchService.getPrisonersByPrisonerNumbers.mockResolvedValue(prisoners)
-    visitSessionsService.getVisitsByDate.mockResolvedValue(visits)
+    visitService.getVisitsByDate.mockResolvedValue(visits)
 
     return request(app)
       .get('/visits?selectedDate=2022-05-23&time=10am%20to%2011am&type=OPEN')
@@ -295,7 +299,7 @@ describe('GET /visits', () => {
 
   it('should render visit slot summary page with prisoner list, slot details and menu for choosing other slots, with the chosen slot shown for UNKNOWN', () => {
     prisonerSearchService.getPrisonersByPrisonerNumbers.mockResolvedValue(prisoners)
-    visitSessionsService.getVisitsByDate.mockResolvedValue(visits)
+    visitService.getVisitsByDate.mockResolvedValue(visits)
 
     return request(app)
       .get('/visits?selectedDate=2022-05-23&time=10am+to+11am&type=UNKNOWN')
@@ -327,7 +331,7 @@ describe('GET /visits', () => {
 
   it('should render visit slot summary page with prisoner list, slot details and menu for choosing other slots, with the chosen slot shown, bad date defaults to today', () => {
     prisonerSearchService.getPrisonersByPrisonerNumbers.mockResolvedValue(prisoners)
-    visitSessionsService.getVisitsByDate.mockResolvedValue(visits)
+    visitService.getVisitsByDate.mockResolvedValue(visits)
 
     return request(app)
       .get('/visits?selectedDate=2022-77-23&time=10am%20to%2011am&type=OPEN')
@@ -365,7 +369,7 @@ describe('GET /visits', () => {
       next: 0,
       previous: 0,
     })
-    visitSessionsService.getVisitsByDate.mockResolvedValue({
+    visitService.getVisitsByDate.mockResolvedValue({
       extendedVisitsInfo: [],
       slots: {
         openSlots: [],
@@ -396,7 +400,7 @@ describe('GET /visits', () => {
 
   it('should render no slots message when bad slot', () => {
     prisonerSearchService.getPrisonersByPrisonerNumbers.mockResolvedValue(prisoners)
-    visitSessionsService.getVisitsByDate.mockResolvedValue(visits)
+    visitService.getVisitsByDate.mockResolvedValue(visits)
 
     return request(app)
       .get('/visits?selectedDate=2022-05-23&time=11am%20to%2011am&type=OPEN')

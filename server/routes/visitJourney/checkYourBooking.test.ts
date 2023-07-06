@@ -10,7 +10,7 @@ import TestData from '../testutils/testData'
 import {
   createMockAuditService,
   createMockNotificationsService,
-  createMockVisitSessionsService,
+  createMockVisitService,
 } from '../../services/testutils/mocks'
 
 let sessionApp: Express
@@ -51,19 +51,21 @@ testJourneys.forEach(journey => {
         },
         visitRestriction: 'OPEN',
         visitSlot: {
-          id: 'visitId',
+          id: '1',
+          sessionTemplateReference: 'v9d.7ed.7u',
           prisonId: 'HEI',
           startTimestamp: '2022-03-12T09:30:00',
           endTimestamp: '2022-03-12T10:30:00',
           availableTables: 1,
           capacity: 30,
-          visitRoomName: 'room name',
+          visitRoom: 'room name',
           visitRestriction: 'OPEN',
         },
         visitors: [
           {
             personId: 123,
             name: 'name last',
+            adult: true,
             relationshipDescription: 'relate',
             restrictions: [
               {
@@ -163,7 +165,7 @@ testJourneys.forEach(journey => {
 
     describe(`POST ${journey.urlPrefix}/check-your-booking`, () => {
       const notificationsService = createMockNotificationsService()
-      const visitSessionsService = createMockVisitSessionsService()
+      const visitService = createMockVisitService()
 
       beforeEach(() => {
         const reservedVisit: Partial<Visit> = {
@@ -177,13 +179,13 @@ testJourneys.forEach(journey => {
           visitStatus: 'BOOKED',
         }
 
-        visitSessionsService.changeReservedVisit = jest.fn().mockResolvedValue(reservedVisit)
-        visitSessionsService.bookVisit = jest.fn().mockResolvedValue(bookedVisit)
+        visitService.changeReservedVisit = jest.fn().mockResolvedValue(reservedVisit)
+        visitService.bookVisit = jest.fn().mockResolvedValue(bookedVisit)
         notificationsService.sendBookingSms = jest.fn().mockResolvedValue({})
         notificationsService.sendUpdateSms = jest.fn().mockResolvedValue({})
 
         sessionApp = appWithAllRoutes({
-          services: { auditService, notificationsService, visitSessionsService },
+          services: { auditService, notificationsService, visitService },
           sessionData: {
             availableSupportTypes,
             visitSessionData,
@@ -199,10 +201,10 @@ testJourneys.forEach(journey => {
           .expect(302)
           .expect('location', `${journey.urlPrefix}/confirmation`)
           .expect(() => {
-            expect(visitSessionsService.changeReservedVisit).toHaveBeenCalledTimes(1)
-            expect(visitSessionsService.bookVisit).toHaveBeenCalledTimes(1)
+            expect(visitService.changeReservedVisit).toHaveBeenCalledTimes(1)
+            expect(visitService.bookVisit).toHaveBeenCalledTimes(1)
 
-            expect(visitSessionsService.cancelVisit).not.toHaveBeenCalled()
+            expect(visitService.cancelVisit).not.toHaveBeenCalled()
             expect(visitSessionData.visitStatus).toBe('BOOKED')
             expect(auditService.bookedVisit).toHaveBeenCalledTimes(1)
             expect(auditService.bookedVisit).toHaveBeenCalledWith({
@@ -237,10 +239,10 @@ testJourneys.forEach(journey => {
           .expect(302)
           .expect('location', `${journey.urlPrefix}/confirmation`)
           .expect(() => {
-            expect(visitSessionsService.changeReservedVisit).toHaveBeenCalledTimes(1)
-            expect(visitSessionsService.bookVisit).toHaveBeenCalledTimes(1)
+            expect(visitService.changeReservedVisit).toHaveBeenCalledTimes(1)
+            expect(visitService.bookVisit).toHaveBeenCalledTimes(1)
 
-            expect(visitSessionsService.cancelVisit).not.toHaveBeenCalled()
+            expect(visitService.cancelVisit).not.toHaveBeenCalled()
             expect(visitSessionData.visitStatus).toBe('BOOKED')
             expect(auditService.bookedVisit).toHaveBeenCalledTimes(1)
             expect(notificationsService[journey.isUpdate ? 'sendUpdateSms' : 'sendBookingSms']).toHaveBeenCalledTimes(1)
@@ -255,10 +257,10 @@ testJourneys.forEach(journey => {
           .expect(302)
           .expect('location', `${journey.urlPrefix}/confirmation`)
           .expect(() => {
-            expect(visitSessionsService.changeReservedVisit).toHaveBeenCalledTimes(1)
-            expect(visitSessionsService.bookVisit).toHaveBeenCalledTimes(1)
+            expect(visitService.changeReservedVisit).toHaveBeenCalledTimes(1)
+            expect(visitService.bookVisit).toHaveBeenCalledTimes(1)
 
-            expect(visitSessionsService.cancelVisit).not.toHaveBeenCalled()
+            expect(visitService.cancelVisit).not.toHaveBeenCalled()
             expect(visitSessionData.visitStatus).toBe('BOOKED')
             expect(auditService.bookedVisit).toHaveBeenCalledTimes(1)
             expect(notificationsService.sendBookingSms).not.toHaveBeenCalled()
@@ -269,7 +271,7 @@ testJourneys.forEach(journey => {
       it('should handle booking failure, display error message and NOT record audit event nor send SMS', () => {
         config.apis.notifications.enabled = true
 
-        visitSessionsService.bookVisit.mockRejectedValue({})
+        visitService.bookVisit.mockRejectedValue({})
 
         return request(sessionApp)
           .post(`${journey.urlPrefix}/check-your-booking`)
@@ -285,10 +287,10 @@ testJourneys.forEach(journey => {
             expect($('.test-visit-type').text()).toContain('Open')
             expect($('form').prop('action')).toBe(`${journey.urlPrefix}/check-your-booking`)
 
-            expect(visitSessionsService.changeReservedVisit).toHaveBeenCalledTimes(1)
-            expect(visitSessionsService.bookVisit).toHaveBeenCalledTimes(1)
+            expect(visitService.changeReservedVisit).toHaveBeenCalledTimes(1)
+            expect(visitService.bookVisit).toHaveBeenCalledTimes(1)
 
-            expect(visitSessionsService.cancelVisit).not.toHaveBeenCalled()
+            expect(visitService.cancelVisit).not.toHaveBeenCalled()
             expect(visitSessionData.visitStatus).toBe('RESERVED')
             expect(auditService.bookedVisit).not.toHaveBeenCalled()
             expect(notificationsService.sendBookingSms).not.toHaveBeenCalled()
