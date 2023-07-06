@@ -28,15 +28,16 @@ export default class RequestMethod {
     const isUpdate = this.mode === 'update'
     const { visitSessionData } = req.session
 
+    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
+
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
       req.flash('errors', errors.array() as [])
-      return res.redirect(req.originalUrl)
+      return res.redirect(`${urlPrefix}/request-method`)
     }
 
     visitSessionData.requestMethod = req.body.method
 
-    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
     return res.redirect(`${urlPrefix}/check-your-booking`)
   }
 
