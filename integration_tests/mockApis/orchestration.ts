@@ -1,7 +1,7 @@
 import { SuperAgentRequest } from 'superagent'
 import { stubFor } from './wiremock'
 import {
-  OutcomeDto,
+  CancelVisitOrchestrationDto,
   PrisonerProfile,
   SessionCapacity,
   SessionSchedule,
@@ -25,7 +25,13 @@ export default {
       },
     })
   },
-  stubCancelVisit: ({ visit, outcome }: { visit: Visit; outcome: OutcomeDto }): SuperAgentRequest => {
+  stubCancelVisit: ({
+    visit,
+    cancelVisitDto,
+  }: {
+    visit: Visit
+    cancelVisitDto: CancelVisitOrchestrationDto
+  }): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'PUT',
@@ -33,8 +39,11 @@ export default {
         bodyPatterns: [
           {
             equalToJson: {
-              outcomeStatus: outcome.outcomeStatus,
-              text: outcome.text,
+              cancelOutcome: {
+                outcomeStatus: cancelVisitDto.cancelOutcome.outcomeStatus,
+                text: cancelVisitDto.cancelOutcome.text,
+              },
+              applicationMethodType: cancelVisitDto.applicationMethodType,
             },
             ignoreArrayOrder: true,
           },
