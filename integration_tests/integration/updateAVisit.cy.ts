@@ -157,9 +157,8 @@ context('Update a visit', () => {
         sessionTemplateReference: visitSessions[1].sessionTemplateReference,
       }),
     )
-    cy.task(
-      'stubBookVisit',
-      TestData.visit({
+    cy.task('stubBookVisit', {
+      visit: TestData.visit({
         visitStatus: 'BOOKED',
         startTimestamp: visitSessions[1].startTimestamp,
         endTimestamp: visitSessions[1].endTimestamp,
@@ -169,7 +168,8 @@ context('Update a visit', () => {
         ],
         visitorSupport: [{ type: 'WHEELCHAIR' }, { type: 'OTHER', text: 'Some extra help!' }],
       }),
-    )
+      applicationMethod: 'NOT_KNOWN',
+    })
     checkYourBookingPage.bookButton().click()
 
     // Confirmation page
