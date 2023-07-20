@@ -6,7 +6,12 @@ import {
   VisitorListItem,
   VisitsPageSlot,
 } from '../@types/bapv'
-import { OutcomeDto, Visit, VisitHistoryDetails } from '../data/orchestrationApiTypes'
+import {
+  ApplicationMethodType,
+  CancelVisitOrchestrationDto,
+  Visit,
+  VisitHistoryDetails,
+} from '../data/orchestrationApiTypes'
 import buildVisitorListItem from '../utils/visitorUtils'
 import { getSupportTypeDescriptions } from '../routes/visitorUtils'
 import { HmppsAuthClient, OrchestrationApiClient, PrisonerContactRegistryApiClient, RestClientBuilder } from '../data'
@@ -26,30 +31,32 @@ export default class VisitService {
   async bookVisit({
     username,
     applicationReference,
+    applicationMethod,
   }: {
     username: string
     applicationReference: string
+    applicationMethod: ApplicationMethodType
   }): Promise<Visit> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
-    const visit = await orchestrationApiClient.bookVisit(applicationReference)
+    const visit = await orchestrationApiClient.bookVisit(applicationReference, applicationMethod)
     return visit
   }
 
   async cancelVisit({
     username,
     reference,
-    outcome,
+    cancelVisitDto,
   }: {
     username: string
     reference: string
-    outcome: OutcomeDto
+    cancelVisitDto: CancelVisitOrchestrationDto
   }): Promise<Visit> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
-    return orchestrationApiClient.cancelVisit(reference, outcome)
+    return orchestrationApiClient.cancelVisit(reference, cancelVisitDto)
   }
 
   async changeBookedVisit({

@@ -348,7 +348,6 @@ export default class TestData {
         text: 'custom request',
       },
     ],
-    createdBy = 'user1',
     createdTimestamp = '2022-01-01T09:00:00',
     modifiedTimestamp = '2022-01-01T09:00:00',
   }: Partial<Visit> = {}): Visit =>
@@ -369,26 +368,28 @@ export default class TestData {
       visitContact,
       visitors,
       visitorSupport,
-      createdBy,
       createdTimestamp,
       modifiedTimestamp,
     } as Visit)
 
   static visitHistoryDetails = ({
-    createdBy = 'User One',
-    updatedBy = undefined,
-    cancelledBy = undefined,
-    createdDateAndTime = '2022-01-01T09:00:00',
-    updatedDateAndTime = undefined,
-    cancelledDateAndTime = undefined,
+    eventsAudit = [
+      {
+        type: 'BOOKED_VISIT',
+        applicationMethodType: 'NOT_KNOWN',
+        actionedBy: 'User One',
+        createTimestamp: '2022-01-01T09:00:00',
+      },
+      {
+        type: 'UPDATED_VISIT',
+        applicationMethodType: 'NOT_KNOWN',
+        actionedBy: 'User Two',
+        createTimestamp: '2022-01-01T10:00:00',
+      },
+    ],
     visit = this.visit(),
   }: Partial<VisitHistoryDetails> = {}): VisitHistoryDetails => ({
-    createdBy,
-    updatedBy,
-    cancelledBy,
-    createdDateAndTime,
-    updatedDateAndTime,
-    cancelledDateAndTime,
+    eventsAudit,
     visit,
   })
 

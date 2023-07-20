@@ -6,7 +6,13 @@ import {
   VisitorListItem,
   VisitsPageSlot,
 } from '../@types/bapv'
-import { OutcomeDto, PageVisitDto, Visit, VisitHistoryDetails } from '../data/orchestrationApiTypes'
+import {
+  ApplicationMethodType,
+  CancelVisitOrchestrationDto,
+  PageVisitDto,
+  Visit,
+  VisitHistoryDetails,
+} from '../data/orchestrationApiTypes'
 import TestData from '../routes/testutils/testData'
 import VisitService from './visitService'
 import {
@@ -55,6 +61,7 @@ describe('Visit service', () => {
     describe('bookVisit', () => {
       it('should book a visit (change status from RESERVED to BOOKED)', async () => {
         const applicationReference = 'aaa-bbb-ccc'
+        const applicationMethod: ApplicationMethodType = 'NOT_KNOWN'
 
         const visit: Partial<Visit> = {
           applicationReference,
@@ -63,7 +70,7 @@ describe('Visit service', () => {
         }
 
         orchestrationApiClient.bookVisit.mockResolvedValue(visit as Visit)
-        const result = await visitService.bookVisit({ username: 'user', applicationReference })
+        const result = await visitService.bookVisit({ username: 'user', applicationReference, applicationMethod })
 
         expect(orchestrationApiClient.bookVisit).toHaveBeenCalledTimes(1)
         expect(result).toEqual(visit)
@@ -100,25 +107,27 @@ describe('Visit service', () => {
             },
           ],
           visitorSupport: [],
-          createdBy: 'user1',
           createdTimestamp: '2022-02-14T10:00:00',
           modifiedTimestamp: '2022-02-14T10:05:00',
         }
 
-        const outcome: OutcomeDto = {
-          outcomeStatus: 'VISITOR_CANCELLED',
-          text: 'cancellation reason',
+        const cancelVisitDto: CancelVisitOrchestrationDto = {
+          cancelOutcome: {
+            outcomeStatus: 'VISITOR_CANCELLED',
+            text: 'cancellation reason',
+          },
+          applicationMethodType: 'NOT_KNOWN',
         }
 
         orchestrationApiClient.cancelVisit.mockResolvedValue(expectedResult)
         const result = await visitService.cancelVisit({
           username: 'user',
           reference: expectedResult.reference,
-          outcome,
+          cancelVisitDto,
         })
 
         expect(orchestrationApiClient.cancelVisit).toHaveBeenCalledTimes(1)
-        expect(orchestrationApiClient.cancelVisit).toHaveBeenCalledWith(expectedResult.reference, outcome)
+        expect(orchestrationApiClient.cancelVisit).toHaveBeenCalledWith(expectedResult.reference, cancelVisitDto)
         expect(result).toEqual(expectedResult)
       })
     })
@@ -196,7 +205,6 @@ describe('Visit service', () => {
             },
           ],
           visitorSupport: [{ type: 'WHEELCHAIR' }],
-          createdBy: 'user1',
           createdTimestamp: '2022-02-14T10:00:00',
           modifiedTimestamp: '2022-02-14T10:05:00',
         }
@@ -286,7 +294,6 @@ describe('Visit service', () => {
             },
           ],
           visitorSupport: [{ type: 'WHEELCHAIR' }, { type: 'MASK_EXEMPT' }, { type: 'OTHER', text: 'custom request' }],
-          createdBy: 'user1',
           createdTimestamp: '2022-02-14T10:00:00',
           modifiedTimestamp: '2022-02-14T10:05:00',
         }
@@ -363,7 +370,6 @@ describe('Visit service', () => {
             },
           ],
           visitorSupport: [],
-          createdBy: 'user1',
           createdTimestamp: '2022-02-14T10:00:00',
           modifiedTimestamp: '2022-02-14T10:05:00',
         }
@@ -575,7 +581,6 @@ describe('Visit service', () => {
                 },
               ],
               visitorSupport: [],
-              createdBy: 'user1',
               createdTimestamp: '2022-05-23T10:09:56.636334',
               modifiedTimestamp: '2022-05-23T10:09:56.64691',
             },
@@ -610,7 +615,6 @@ describe('Visit service', () => {
                 },
               ],
               visitorSupport: [],
-              createdBy: 'user1',
               createdTimestamp: '2022-05-20T15:29:04.997067',
               modifiedTimestamp: '2022-05-20T15:51:49.983108',
             },

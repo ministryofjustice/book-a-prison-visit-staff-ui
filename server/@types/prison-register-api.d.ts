@@ -139,6 +139,8 @@ export interface components {
       contracted: boolean
       /** @description Set of types for this prison */
       prisonTypes: ('HMP' | 'YOI' | 'IRC' | 'STC' | 'YCS')[]
+      /** @description Set of categories for this prison */
+      categories: ('A' | 'B' | 'C' | 'D')[]
     }
     ErrorResponse: {
       /** Format: int32 */
@@ -210,6 +212,8 @@ export interface components {
       contracted: boolean
       /** @description List of types for this prison */
       types: components['schemas']['PrisonTypeDto'][]
+      /** @description List of the categories for this prison */
+      categories: ('A' | 'B' | 'C' | 'D')[]
       /** @description List of address for this prison */
       addresses: components['schemas']['AddressDto'][]
       /** @description List of operators for this prison */
@@ -297,6 +301,8 @@ export interface components {
       prisonTypes: ('HMP' | 'YOI' | 'IRC' | 'STC' | 'YCS')[]
       /** @description List of addresses for this prison */
       addresses: components['schemas']['UpdateAddressDto'][]
+      /** @description Set of categories for this prison */
+      categories: ('A' | 'B' | 'C' | 'D')[]
     }
     GetDlqResult: {
       /** Format: int32 */
