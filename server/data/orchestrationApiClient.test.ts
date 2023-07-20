@@ -3,7 +3,7 @@ import config from '../config'
 import TestData from '../routes/testutils/testData'
 import OrchestrationApiClient from './orchestrationApiClient'
 import {
-  ApplicationMethodType,
+  BookingOrchestrationRequestDto,
   CancelVisitOrchestrationDto,
   ChangeVisitSlotRequestDto,
   ReserveVisitSlotDto,
@@ -35,7 +35,9 @@ describe('orchestrationApiClient', () => {
   describe('bookVisit', () => {
     it('should book a Visit (change status from RESERVED to BOOKED), given applicationReference', async () => {
       const applicationReference = 'aaa-bbb-ccc'
-      const applicationMethod: ApplicationMethodType = 'NOT_KNOWN'
+      const bookingOrchestrationRequestDto: BookingOrchestrationRequestDto = {
+        applicationMethodType: 'NOT_KNOWN',
+      }
 
       const result: Partial<Visit> = {
         applicationReference,
@@ -44,11 +46,14 @@ describe('orchestrationApiClient', () => {
       }
 
       fakeOrchestrationApi
-        .put(`/visits/${applicationReference}/book`)
+        .put(`/visits/${applicationReference}/book`, bookingOrchestrationRequestDto)
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, result)
 
-      const output = await orchestrationApiClient.bookVisit(applicationReference, applicationMethod)
+      const output = await orchestrationApiClient.bookVisit(
+        applicationReference,
+        bookingOrchestrationRequestDto.applicationMethodType,
+      )
 
       expect(output).toEqual(result)
     })

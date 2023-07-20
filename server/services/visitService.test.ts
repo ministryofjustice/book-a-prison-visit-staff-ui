@@ -73,6 +73,7 @@ describe('Visit service', () => {
         const result = await visitService.bookVisit({ username: 'user', applicationReference, applicationMethod })
 
         expect(orchestrationApiClient.bookVisit).toHaveBeenCalledTimes(1)
+        expect(orchestrationApiClient.bookVisit).toHaveBeenCalledWith(applicationReference, applicationMethod)
         expect(result).toEqual(visit)
       })
     })
