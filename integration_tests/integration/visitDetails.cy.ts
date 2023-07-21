@@ -26,12 +26,14 @@ context('Visit details page', () => {
     })
     visit.visitNotes.push({ type: 'VISIT_OUTCOMES', text: 'Illness' })
     const visitHistoryDetails = TestData.visitHistoryDetails({
-      updatedBy: 'User Two',
-      updatedDateAndTime: '2022-01-01T10:00:00',
-      cancelledBy: 'User Three',
-      cancelledDateAndTime: '2022-01-01T11:00:00',
       visit,
     })
+    visitHistoryDetails.eventsAudit[2] = {
+      type: 'UPDATED_VISIT',
+      applicationMethodType: 'NOT_KNOWN',
+      actionedBy: 'User Two',
+      createTimestamp: '2022-01-01T10:00:00',
+    }
 
     const contacts = [TestData.contact({ personId: 4321, restrictions: [TestData.restriction()] })]
 
@@ -86,8 +88,6 @@ context('Visit details page', () => {
 
     const futureVisitDate = format(add(today, { months: 1 }), shortDateFormat)
     const visitHistoryDetails = TestData.visitHistoryDetails({
-      updatedBy: 'User Two',
-      updatedDateAndTime: '2022-01-01T10:00:00',
       visit: TestData.visit({
         startTimestamp: `${futureVisitDate}T12:00:00`,
         endTimestamp: `${futureVisitDate}T14:00:00`,

@@ -30,42 +30,12 @@ export default defineConfig({
         ...auth,
         ...tokenVerification,
 
-        // Orchestration service
-        stubBookVisit: orchestrationService.stubBookVisit,
-        stubCancelVisit: orchestrationService.stubCancelVisit,
-        stubChangeBookedVisit: orchestrationService.stubChangeBookedVisit,
-        stubChangeReservedSlot: orchestrationService.stubChangeReservedSlot,
-        stubReserveVisit: orchestrationService.stubReserveVisit,
-        stubVisit: orchestrationService.stubVisit,
-        stubVisitHistory: orchestrationService.stubVisitHistory,
-        stubUpcomingVisits: orchestrationService.stubUpcomingVisits,
-        stubVisitsByDate: orchestrationService.stubVisitsByDate,
-        stubAvailableSupport: orchestrationService.stubAvailableSupport,
-        stubVisitSessions: orchestrationService.stubVisitSessions,
-        stubSessionSchedule: orchestrationService.stubSessionSchedule,
-        stubVisitSessionCapacity: orchestrationService.stubVisitSessionCapacity,
-        stubPrisonerProfile: orchestrationService.stubPrisonerProfile,
-        stubSupportedPrisonIds: orchestrationService.stubSupportedPrisonIds,
-
-        // Prisoner contact registry
-        stubPrisonerSocialContacts: prisonerContactRegistry.stubPrisonerSocialContacts,
-
-        // Prison API
-        stubOffenderRestrictions: prisonApi.stubOffenderRestrictions,
-        stubSetActiveCaseLoad: prisonApi.stubSetActiveCaseLoad,
-        stubUserCaseloads: prisonApi.stubUserCaseloads,
-
-        // Prisoner offender search
-        stubPrisonerById: prisonerSearch.stubPrisonerById,
-        stubPrisoners: prisonerSearch.stubPrisoners,
-        stubPrisoner: prisonerSearch.stubPrisoner,
-        stubGetPrisonersByPrisonerNumbers: prisonerSearch.stubGetPrisonersByPrisonerNumbers,
-
-        // Prison register API
-        stubPrisons: prisonRegister.stubPrisons,
-
-        // Whereabouts
-        stubOffenderEvents: whereaboutsOffenderEvents.stubOffenderEvents,
+        ...orchestrationService,
+        ...prisonerContactRegistry,
+        ...prisonApi,
+        ...prisonerSearch,
+        ...prisonRegister,
+        ...whereaboutsOffenderEvents,
 
         // Log message to console
         log: (message: string) => {

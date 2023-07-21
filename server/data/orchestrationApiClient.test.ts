@@ -3,8 +3,9 @@ import config from '../config'
 import TestData from '../routes/testutils/testData'
 import OrchestrationApiClient from './orchestrationApiClient'
 import {
+  BookingOrchestrationRequestDto,
+  CancelVisitOrchestrationDto,
   ChangeVisitSlotRequestDto,
-  OutcomeDto,
   ReserveVisitSlotDto,
   SessionSchedule,
   Visit,
@@ -34,6 +35,9 @@ describe('orchestrationApiClient', () => {
   describe('bookVisit', () => {
     it('should book a Visit (change status from RESERVED to BOOKED), given applicationReference', async () => {
       const applicationReference = 'aaa-bbb-ccc'
+      const bookingOrchestrationRequestDto: BookingOrchestrationRequestDto = {
+        applicationMethodType: 'NOT_KNOWN',
+      }
 
       const result: Partial<Visit> = {
         applicationReference,
@@ -42,11 +46,14 @@ describe('orchestrationApiClient', () => {
       }
 
       fakeOrchestrationApi
-        .put(`/visits/${applicationReference}/book`)
+        .put(`/visits/${applicationReference}/book`, bookingOrchestrationRequestDto)
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, result)
 
-      const output = await orchestrationApiClient.bookVisit(applicationReference)
+      const output = await orchestrationApiClient.bookVisit(
+        applicationReference,
+        bookingOrchestrationRequestDto.applicationMethodType,
+      )
 
       expect(output).toEqual(result)
     })
@@ -56,9 +63,12 @@ describe('orchestrationApiClient', () => {
     it('should cancel visit with the specified outcome', async () => {
       const reference = 'ab-cd-ef-gh'
 
-      const outcome: OutcomeDto = {
-        outcomeStatus: 'VISITOR_CANCELLED',
-        text: 'cancellation reason',
+      const cancelVisitDto: CancelVisitOrchestrationDto = {
+        cancelOutcome: {
+          outcomeStatus: 'VISITOR_CANCELLED',
+          text: 'cancellation reason',
+        },
+        applicationMethodType: 'NOT_KNOWN',
       }
 
       const result: Visit = {
@@ -88,16 +98,15 @@ describe('orchestrationApiClient', () => {
           },
         ],
         visitorSupport: [],
-        createdBy: 'user1',
         createdTimestamp: '2022-02-14T10:00:00',
         modifiedTimestamp: '2022-02-14T10:05:00',
       }
       fakeOrchestrationApi
-        .put(`/visits/ab-cd-ef-gh/cancel`, outcome)
+        .put(`/visits/ab-cd-ef-gh/cancel`, cancelVisitDto)
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, result)
 
-      const output = await orchestrationApiClient.cancelVisit(reference, outcome)
+      const output = await orchestrationApiClient.cancelVisit(reference, cancelVisitDto)
 
       expect(output).toEqual(result)
     })
@@ -172,7 +181,6 @@ describe('orchestrationApiClient', () => {
           },
         ],
         visitorSupport: [],
-        createdBy: 'user1',
         createdTimestamp: '2022-02-14T10:00:00',
         modifiedTimestamp: '2022-02-14T10:05:00',
       }
@@ -241,7 +249,6 @@ describe('orchestrationApiClient', () => {
             text: 'custom request',
           },
         ],
-        createdBy: 'user1',
         createdTimestamp: '2022-02-14T10:00:00',
         modifiedTimestamp: '2022-02-14T10:05:00',
       }
@@ -342,7 +349,6 @@ describe('orchestrationApiClient', () => {
           },
         ],
         visitorSupport: [],
-        createdBy: 'user1',
         createdTimestamp: '2022-02-14T10:00:00',
         modifiedTimestamp: '2022-02-14T10:05:00',
       }
@@ -441,7 +447,6 @@ describe('orchestrationApiClient', () => {
           },
         ],
         visitorSupport: [],
-        createdBy: 'user1',
         createdTimestamp: '2022-02-14T10:00:00',
         modifiedTimestamp: '2022-02-14T10:05:00',
       }
@@ -554,7 +559,6 @@ describe('orchestrationApiClient', () => {
               text: 'custom support details',
             },
           ],
-          createdBy: 'user1',
           createdTimestamp: '2022-02-14T10:00:00',
           modifiedTimestamp: '2022-02-14T10:05:00',
         },
@@ -609,7 +613,6 @@ describe('orchestrationApiClient', () => {
               text: 'custom support details',
             },
           ],
-          createdBy: 'user1',
           createdTimestamp: '2022-02-14T10:00:00',
           modifiedTimestamp: '2022-02-14T10:05:00',
         },

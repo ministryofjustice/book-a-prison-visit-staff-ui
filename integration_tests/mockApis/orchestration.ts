@@ -1,7 +1,8 @@
 import { SuperAgentRequest } from 'superagent'
 import { stubFor } from './wiremock'
 import {
-  OutcomeDto,
+  ApplicationMethodType,
+  CancelVisitOrchestrationDto,
   PrisonerProfile,
   SessionCapacity,
   SessionSchedule,
@@ -12,11 +13,24 @@ import {
 import TestData from '../../server/routes/testutils/testData'
 
 export default {
-  stubBookVisit: (visit: Visit): SuperAgentRequest => {
+  stubBookVisit: ({
+    visit,
+    applicationMethod,
+  }: {
+    visit: Visit
+    applicationMethod: ApplicationMethodType
+  }): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'PUT',
         url: `/orchestration/visits/${visit.applicationReference}/book`,
+        bodyPatterns: [
+          {
+            equalToJson: {
+              applicationMethodType: applicationMethod,
+            },
+          },
+        ],
       },
       response: {
         status: 200,
@@ -25,7 +39,13 @@ export default {
       },
     })
   },
-  stubCancelVisit: ({ visit, outcome }: { visit: Visit; outcome: OutcomeDto }): SuperAgentRequest => {
+  stubCancelVisit: ({
+    visit,
+    cancelVisitDto,
+  }: {
+    visit: Visit
+    cancelVisitDto: CancelVisitOrchestrationDto
+  }): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'PUT',
@@ -33,8 +53,11 @@ export default {
         bodyPatterns: [
           {
             equalToJson: {
-              outcomeStatus: outcome.outcomeStatus,
-              text: outcome.text,
+              cancelOutcome: {
+                outcomeStatus: cancelVisitDto.cancelOutcome.outcomeStatus,
+                text: cancelVisitDto.cancelOutcome.text,
+              },
+              applicationMethodType: cancelVisitDto.applicationMethodType,
             },
             ignoreArrayOrder: true,
           },
