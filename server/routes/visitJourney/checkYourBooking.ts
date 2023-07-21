@@ -7,6 +7,7 @@ import NotificationsService from '../../services/notificationsService'
 import { getSupportTypeDescriptions } from '../visitorUtils'
 import getUrlPrefix from './visitJourneyUtils'
 import { VisitService } from '../../services'
+import { ApplicationMethodType } from '../../data/orchestrationApiTypes'
 
 export default class CheckYourBooking {
   constructor(
@@ -50,6 +51,8 @@ export default class CheckYourBooking {
       visitSessionData.visitorSupport,
     )
 
+    const applicationMethod: ApplicationMethodType = 'NOT_KNOWN'
+
     try {
       // change reserved visit to have the latest data
       await this.visitService.changeReservedVisit({
@@ -60,6 +63,7 @@ export default class CheckYourBooking {
       const bookedVisit = await this.visitService.bookVisit({
         username: res.locals.user.username,
         applicationReference: visitSessionData.applicationReference,
+        applicationMethod,
       })
 
       visitSessionData.visitStatus = bookedVisit.visitStatus

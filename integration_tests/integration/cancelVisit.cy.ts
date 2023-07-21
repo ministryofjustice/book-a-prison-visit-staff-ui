@@ -34,9 +34,12 @@ context('Cancel visit journey', () => {
     })
     const contacts = [TestData.contact({ personId: 4321 })]
 
-    const outcome = {
-      outcomeStatus: 'ESTABLISHMENT_CANCELLED',
-      text: 'Overbooking error',
+    const cancelVisitDto = {
+      cancelOutcome: {
+        outcomeStatus: 'ESTABLISHMENT_CANCELLED',
+        text: 'Overbooking error',
+      },
+      applicationMethodType: 'NOT_KNOWN',
     }
 
     cy.task('stubPrisonerById', prisoner)
@@ -51,9 +54,9 @@ context('Cancel visit journey', () => {
 
     const cancelVisitPage = Page.verifyOnPage(CancelVisitPage)
     cancelVisitPage.establishmentCancelledRadio().click()
-    cancelVisitPage.establishmentCancelledText(outcome.text)
+    cancelVisitPage.establishmentCancelledText(cancelVisitDto.cancelOutcome.text)
 
-    cy.task('stubCancelVisit', { visit: visitHistoryDetails.visit, outcome })
+    cy.task('stubCancelVisit', { visit: visitHistoryDetails.visit, cancelVisitDto })
 
     cancelVisitPage.submit().click()
 

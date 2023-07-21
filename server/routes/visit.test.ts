@@ -3,7 +3,7 @@ import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
-import { OutcomeDto, Visit, VisitHistoryDetails } from '../data/orchestrationApiTypes'
+import { CancelVisitOrchestrationDto, Visit, VisitHistoryDetails } from '../data/orchestrationApiTypes'
 import { FlashData, VisitorListItem, VisitSessionData } from '../@types/bapv'
 import config from '../config'
 import { clearSession } from './visitorUtils'
@@ -101,8 +101,6 @@ describe('/visit/:reference', () => {
   beforeEach(() => {
     visit = TestData.visit()
     visitHistoryDetails = TestData.visitHistoryDetails({
-      updatedBy: 'User Two',
-      updatedDateAndTime: '2022-01-01T10:00:00',
       visit,
     })
 
@@ -176,10 +174,10 @@ describe('/visit/:reference', () => {
           expect($('[data-test="visit-comment"]').eq(0).text()).toBe('Example of a visit comment')
           expect($('[data-test="visitor-concern"]').eq(0).text()).toBe('Example of a visitor concern')
           expect($('[data-test="additional-support"]').text()).toBe('Wheelchair ramp, custom request')
-          expect($('[data-test="visit-booked"]').text().replace(/\s+/g, ' ')).toBe(
+          expect($('[data-test="booked_visit"]').text().replace(/\s+/g, ' ')).toBe(
             'Saturday 1 January 2022 at 9am by User One',
           )
-          expect($('[data-test="visit-updated"]').text().replace(/\s+/g, ' ')).toBe(
+          expect($('[data-test="updated_visit"]').text().replace(/\s+/g, ' ')).toBe(
             'Saturday 1 January 2022 at 10am by User Two',
           )
           expect(visitSessionData).toEqual({ prisoner: undefined })
@@ -196,10 +194,14 @@ describe('/visit/:reference', () => {
     })
 
     it('should handle special cases for migrated data when showing actioned by user details', () => {
-      visitHistoryDetails.createdBy = 'NOT_KNOWN' // test case for old / migrated data
-      visitHistoryDetails.updatedBy = 'NOT_KNOWN_NOMIS' // migrated from Nomis, but user not available
-      visitHistoryDetails.cancelledBy = 'User Three'
-      visitHistoryDetails.cancelledDateAndTime = '2022-01-01T11:30:00'
+      visitHistoryDetails.eventsAudit[0].actionedBy = 'NOT_KNOWN'
+      visitHistoryDetails.eventsAudit[1].actionedBy = 'NOT_KNOWN_NOMIS'
+      visitHistoryDetails.eventsAudit[2] = {
+        type: 'CANCELED_VISIT',
+        applicationMethodType: 'NOT_KNOWN',
+        actionedBy: 'User Three',
+        createTimestamp: '2022-01-01T11:30:00',
+      }
 
       return request(app)
         .get('/visit/ab-cd-ef-gh')
@@ -207,11 +209,11 @@ describe('/visit/:reference', () => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('[data-test="visit-booked"]').text().replace(/\s+/g, ' ')).toBe('Saturday 1 January 2022 at 9am')
-          expect($('[data-test="visit-updated"]').text().replace(/\s+/g, ' ')).toBe(
+          expect($('[data-test="booked_visit"]').text().replace(/\s+/g, ' ')).toBe('Saturday 1 January 2022 at 9am')
+          expect($('[data-test="updated_visit"]').text().replace(/\s+/g, ' ')).toBe(
             'Saturday 1 January 2022 at 10am in NOMIS',
           )
-          expect($('[data-test="visit-cancelled"]').text().replace(/\s+/g, ' ')).toBe(
+          expect($('[data-test="canceled_visit"]').text().replace(/\s+/g, ' ')).toBe(
             'Saturday 1 January 2022 at 11:30am by User Three',
           )
         })
@@ -264,7 +266,7 @@ describe('/visit/:reference', () => {
           expect($('[data-test="visit-comment"]').eq(0).text()).toBe('Example of a visit comment')
           expect($('[data-test="visitor-concern"]').eq(0).text()).toBe('Example of a visitor concern')
           expect($('[data-test="additional-support"]').text()).toBe('Wheelchair ramp, custom request')
-          expect($('[data-test="visit-booked"]').text().replace(/\s+/g, ' ')).toBe(
+          expect($('[data-test="booked_visit"]').text().replace(/\s+/g, ' ')).toBe(
             'Saturday 1 January 2022 at 9am by User One',
           )
 
@@ -324,7 +326,7 @@ describe('/visit/:reference', () => {
           expect($('[data-test="visit-comment"]').eq(0).text()).toBe('Example of a visit comment')
           expect($('[data-test="visitor-concern"]').eq(0).text()).toBe('Example of a visitor concern')
           expect($('[data-test="additional-support"]').text()).toBe('Wheelchair ramp, custom request')
-          expect($('[data-test="visit-booked"]').text().replace(/\s+/g, ' ')).toBe(
+          expect($('[data-test="booked_visit"]').text().replace(/\s+/g, ' ')).toBe(
             'Saturday 1 January 2022 at 9am by User One',
           )
 
@@ -447,8 +449,14 @@ describe('/visit/:reference', () => {
       visit.visitStatus = 'CANCELLED'
       visit.outcomeStatus = 'VISITOR_CANCELLED'
       visit.visitNotes = [{ type: 'VISIT_OUTCOMES', text: 'no longer required' }]
-      visitHistoryDetails.cancelledBy = 'User Three'
-      visitHistoryDetails.cancelledDateAndTime = '2022-01-01T11:00:00'
+      visitHistoryDetails.eventsAudit = [
+        {
+          type: 'CANCELED_VISIT',
+          applicationMethodType: 'NOT_KNOWN',
+          actionedBy: 'User Three',
+          createTimestamp: '2022-01-01T11:00:00',
+        },
+      ]
 
       return request(app)
         .get('/visit/ab-cd-ef-gh')
@@ -458,7 +466,7 @@ describe('/visit/:reference', () => {
           const $ = cheerio.load(res.text)
           expect($('[data-test="cancelled-visit-reason"]').text()).toContain('by the visitor')
           expect($('[data-test="cancelled-visit-reason"]').text()).toContain('no longer required')
-          expect($('[data-test="visit-cancelled"]').text().replace(/\s+/g, ' ')).toBe(
+          expect($('[data-test="canceled_visit"]').text().replace(/\s+/g, ' ')).toBe(
             'Saturday 1 January 2022 at 11am by User Three',
           )
         })
@@ -676,9 +684,12 @@ describe('POST /visit/:reference/cancel', () => {
         expect(visitService.cancelVisit).toHaveBeenCalledWith({
           username: 'user1',
           reference: 'ab-cd-ef-gh',
-          outcome: <OutcomeDto>{
-            outcomeStatus: 'PRISONER_CANCELLED',
-            text: 'illness',
+          cancelVisitDto: <CancelVisitOrchestrationDto>{
+            cancelOutcome: {
+              outcomeStatus: 'PRISONER_CANCELLED',
+              text: 'illness',
+            },
+            applicationMethodType: 'NOT_KNOWN',
           },
         })
         expect(flashProvider).toHaveBeenCalledWith('startTimestamp', cancelledVisit.startTimestamp)

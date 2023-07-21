@@ -14,6 +14,10 @@ export type ReserveVisitSlotDto = components['schemas']['ReserveVisitSlotDto']
 export type ChangeVisitSlotRequestDto = components['schemas']['ChangeVisitSlotRequestDto']
 
 export type OutcomeDto = components['schemas']['OutcomeDto']
+export type CancelVisitOrchestrationDto = components['schemas']['CancelVisitOrchestrationDto']
+
+export type ApplicationMethodType = components['schemas']['BookingOrchestrationRequestDto']['applicationMethodType']
+export type BookingOrchestrationRequestDto = components['schemas']['BookingOrchestrationRequestDto']
 
 export type SessionCapacity = components['schemas']['SessionCapacityDto']
 export type SessionSchedule = components['schemas']['SessionScheduleDto']

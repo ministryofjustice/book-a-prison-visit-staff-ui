@@ -4,7 +4,7 @@ import { body, validationResult } from 'express-validator'
 import { BadRequest } from 'http-errors'
 import visitCancellationReasons from '../constants/visitCancellationReasons'
 import { Prisoner } from '../data/prisonerOffenderSearchTypes'
-import { OutcomeDto } from '../data/orchestrationApiTypes'
+import { CancelVisitOrchestrationDto } from '../data/orchestrationApiTypes'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import { isValidVisitReference } from './validationChecks'
 import { clearSession, getFlashFormValues } from './visitorUtils'
@@ -317,16 +317,18 @@ export default function routes({
         req.flash('formValues', req.body)
         return res.redirect(`/visit/${reference}/cancel`)
       }
-
-      const outcome: OutcomeDto = {
-        outcomeStatus: req.body.cancel,
-        text: req.body[reasonFieldName],
+      const cancelVisitDto: CancelVisitOrchestrationDto = {
+        cancelOutcome: {
+          outcomeStatus: req.body.cancel,
+          text: req.body[reasonFieldName],
+        },
+        applicationMethodType: 'NOT_KNOWN',
       }
 
       const visit = await visitService.cancelVisit({
         username: res.locals.user.username,
         reference,
-        outcome,
+        cancelVisitDto,
       })
 
       await auditService.cancelledVisit({
