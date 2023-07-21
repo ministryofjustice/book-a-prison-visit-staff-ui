@@ -1,6 +1,7 @@
 import { SuperAgentRequest } from 'superagent'
 import { stubFor } from './wiremock'
 import {
+  ApplicationMethodType,
   CancelVisitOrchestrationDto,
   PrisonerProfile,
   SessionCapacity,
@@ -12,11 +13,24 @@ import {
 import TestData from '../../server/routes/testutils/testData'
 
 export default {
-  stubBookVisit: (visit: Visit): SuperAgentRequest => {
+  stubBookVisit: ({
+    visit,
+    applicationMethod,
+  }: {
+    visit: Visit
+    applicationMethod: ApplicationMethodType
+  }): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'PUT',
         url: `/orchestration/visits/${visit.applicationReference}/book`,
+        bodyPatterns: [
+          {
+            equalToJson: {
+              applicationMethodType: applicationMethod,
+            },
+          },
+        ],
       },
       response: {
         status: 200,
