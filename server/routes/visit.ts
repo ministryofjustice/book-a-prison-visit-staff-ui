@@ -19,6 +19,7 @@ import AdditionalSupport from './visitJourney/additionalSupport'
 import CheckYourBooking from './visitJourney/checkYourBooking'
 import Confirmation from './visitJourney/confirmation'
 import MainContact from './visitJourney/mainContact'
+import RequestMethod from './visitJourney/requestMethod'
 import sessionCheckMiddleware from '../middleware/sessionCheckMiddleware'
 import getPrisonConfiguration from '../constants/prisonConfiguration'
 import type { Services } from '../services'
@@ -168,6 +169,7 @@ export default function routes({
       },
       visitReference: visit.reference,
       visitStatus: visit.visitStatus,
+      requestMethod: undefined, // request method should NOT be pre-populated
     }
 
     req.session.visitSessionData = Object.assign(req.session.visitSessionData ?? {}, visitSessionData)
@@ -180,6 +182,7 @@ export default function routes({
   const dateAndTime = new DateAndTime('update', visitService, visitSessionsService, auditService)
   const additionalSupport = new AdditionalSupport('update', additionalSupportService)
   const mainContact = new MainContact('update')
+  const requestMethod = new RequestMethod('update')
   const checkYourBooking = new CheckYourBooking('update', auditService, notificationsService, visitService)
   const confirmation = new Confirmation('update')
 
@@ -254,22 +257,36 @@ export default function routes({
   )
 
   get(
-    '/:reference/update/check-your-booking',
+    '/:reference/update/request-method',
     checkVisitReferenceMiddleware,
     sessionCheckMiddleware({ stage: 5 }),
+    (req, res) => requestMethod.get(req, res),
+  )
+  post(
+    '/:reference/update/request-method',
+    checkVisitReferenceMiddleware,
+    sessionCheckMiddleware({ stage: 5 }),
+    ...requestMethod.validate(),
+    (req, res) => requestMethod.post(req, res),
+  )
+
+  get(
+    '/:reference/update/check-your-booking',
+    checkVisitReferenceMiddleware,
+    sessionCheckMiddleware({ stage: 6 }),
     (req, res) => checkYourBooking.get(req, res),
   )
   post(
     '/:reference/update/check-your-booking',
     checkVisitReferenceMiddleware,
-    sessionCheckMiddleware({ stage: 5 }),
+    sessionCheckMiddleware({ stage: 6 }),
     (req, res) => checkYourBooking.post(req, res),
   )
 
   get(
     '/:reference/update/confirmation',
     checkVisitReferenceMiddleware,
-    sessionCheckMiddleware({ stage: 6 }),
+    sessionCheckMiddleware({ stage: 7 }),
     (req, res) => confirmation.get(req, res),
   )
 

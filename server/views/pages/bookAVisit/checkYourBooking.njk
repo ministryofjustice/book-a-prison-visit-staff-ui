@@ -153,6 +153,27 @@
             }
         ), displayRows) %}
 
+        {% set displayRows = (displayRows.push(
+            {
+                key: {
+                    text: "Request method"
+                },
+                value: {
+                    html: '<p class="test-request-method">' + requestMethod + '</p>'
+                },
+                actions: {
+                    items: [
+                        {
+                            href: urlPrefix + "/request-method",
+                            text: "Change",
+                            visuallyHiddenText: "request method",
+                            attributes: { "data-test": "change-request-method" }
+                        }
+                    ]
+                }
+            }
+        ), displayRows) %}
+
         {{ govukSummaryList({
             rows: displayRows
         }) }}

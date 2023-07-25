@@ -1,12 +1,12 @@
 import type { Request, Response } from 'express'
 import logger from '../../../logger'
 import config from '../../config'
+import { requestMethodOptions } from '../../constants/requestMethods'
 import AuditService from '../../services/auditService'
 import NotificationsService from '../../services/notificationsService'
 import { getSupportTypeDescriptions } from '../visitorUtils'
 import getUrlPrefix from './visitJourneyUtils'
 import { VisitService } from '../../services'
-import { ApplicationMethodType } from '../../data/orchestrationApiTypes'
 
 export default class CheckYourBooking {
   constructor(
@@ -34,6 +34,7 @@ export default class CheckYourBooking {
       visitRestriction: visitSessionData.visitRestriction,
       visitors: visitSessionData.visitors,
       additionalSupport,
+      requestMethod: requestMethodOptions[visitSessionData.requestMethod],
       urlPrefix: getUrlPrefix(isUpdate, visitSessionData.visitReference),
     })
   }
@@ -49,8 +50,6 @@ export default class CheckYourBooking {
       visitSessionData.visitorSupport,
     )
 
-    const applicationMethod: ApplicationMethodType = 'NOT_KNOWN'
-
     try {
       // change reserved visit to have the latest data
       await this.visitService.changeReservedVisit({
@@ -61,7 +60,7 @@ export default class CheckYourBooking {
       const bookedVisit = await this.visitService.bookVisit({
         username: res.locals.user.username,
         applicationReference: visitSessionData.applicationReference,
-        applicationMethod,
+        applicationMethod: visitSessionData.requestMethod,
       })
 
       visitSessionData.visitStatus = bookedVisit.visitStatus

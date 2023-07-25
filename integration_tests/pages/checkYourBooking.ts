@@ -29,5 +29,9 @@ export default class CheckYourBookingPage extends Page {
 
   changeMainContact = (): PageElement => cy.get('[data-test="change-main-contact"]')
 
+  requestMethod = (): PageElement => cy.get('.test-request-method')
+
+  changeRequestMethod = (): PageElement => cy.get('[data-test="change-request-method"]')
+
   bookButton = (): PageElement => cy.get('[data-test=submit]')
 }

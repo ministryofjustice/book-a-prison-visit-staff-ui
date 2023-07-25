@@ -231,13 +231,13 @@ testJourneys.forEach(journey => {
     })
 
     describe(`POST ${journey.urlPrefix}/select-main-contact`, () => {
-      it('should redirect to check answers page and store in session if contact selected and phone number entered', () => {
+      it('should redirect to request method page and store in session if contact selected and phone number entered', () => {
         return request(sessionApp)
           .post(`${journey.urlPrefix}/select-main-contact`)
           .send('contact=123')
           .send('phoneNumber=+0114+1234+567+')
           .expect(302)
-          .expect('location', `${journey.urlPrefix}/check-your-booking`)
+          .expect('location', `${journey.urlPrefix}/request-method`)
           .expect(() => {
             expect(visitSessionData.mainContact.contact).toEqual({
               personId: 123,
@@ -252,14 +252,14 @@ testJourneys.forEach(journey => {
           })
       })
 
-      it('should redirect to check answers page and store in session if other contact named and phone number entered', () => {
+      it('should redirect to request method page and store in session if other contact named and phone number entered', () => {
         return request(sessionApp)
           .post(`${journey.urlPrefix}/select-main-contact`)
           .send('contact=someoneElse')
           .send('someoneElseName=++another+person++')
           .send('phoneNumber=0114+7654+321')
           .expect(302)
-          .expect('location', `${journey.urlPrefix}/check-your-booking`)
+          .expect('location', `${journey.urlPrefix}/request-method`)
           .expect(() => {
             expect(visitSessionData.mainContact.contact).toBe(undefined)
             expect(visitSessionData.mainContact.contactName).toBe('another person')
@@ -267,7 +267,7 @@ testJourneys.forEach(journey => {
           })
       })
 
-      it('should save new choice to session and redirect to check answers page if existing session data present', () => {
+      it('should save new choice to session and redirect to request method page if existing session data present', () => {
         visitSessionData.mainContact = {
           contact: {
             personId: 123,
@@ -286,7 +286,7 @@ testJourneys.forEach(journey => {
           .send('someoneElseName=another+person')
           .send('phoneNumber=0114+7654+321')
           .expect(302)
-          .expect('location', `${journey.urlPrefix}/check-your-booking`)
+          .expect('location', `${journey.urlPrefix}/request-method`)
           .expect(() => {
             expect(visitSessionData.mainContact.contact).toBe(undefined)
             expect(visitSessionData.mainContact.contactName).toBe('another person')

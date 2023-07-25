@@ -1,5 +1,11 @@
 import { OffenderRestriction } from '../data/prisonApiTypes'
-import { PrisonerProfile, Visit, VisitorSupport, VisitSession } from '../data/orchestrationApiTypes'
+import {
+  ApplicationMethodType,
+  PrisonerProfile,
+  Visit,
+  VisitorSupport,
+  VisitSession,
+} from '../data/orchestrationApiTypes'
 
 export type Prison = {
   prisonId: string
@@ -113,6 +119,7 @@ export type VisitSessionData = {
   applicationReference?: string
   visitReference?: string
   visitStatus?: Visit['visitStatus']
+  requestMethod?: ApplicationMethodType
 }
 
 export type VisitInformation = {
