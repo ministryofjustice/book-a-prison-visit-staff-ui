@@ -5,13 +5,9 @@ export default class RequestMethodPage extends Page {
     super('What method was used to make this request?')
   }
 
-  checkbox1 = (): PageElement => cy.get('#method')
+  getRequestMethodByValue = (value: string): PageElement => cy.get(`input[value="${value}"]`)
 
-  textValue1 = (): PageElement => cy.get(':nth-child(1) > .govuk-label')
-
-  checkbox2 = (): PageElement => cy.get('#method-2')
-
-  textValue2 = (): PageElement => cy.get(':nth-child(2) > .govuk-label')
+  getRequestLabelByValue = (value: string): PageElement => cy.get(`input[value="${value}"] + label`)
 
   continueButton = (): PageElement => cy.get('[data-test=submit]')
 }

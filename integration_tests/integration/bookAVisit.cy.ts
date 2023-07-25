@@ -167,8 +167,8 @@ context('Book a visit', () => {
     // Request method
     mainContactPage.continueButton().click()
     const requestMethodPage = Page.verifyOnPage(RequestMethodPage)
-    requestMethodPage.textValue1().contains('Phone call')
-    requestMethodPage.checkbox1().check()
+    requestMethodPage.getRequestLabelByValue('PHONE').contains('Phone call')
+    requestMethodPage.getRequestMethodByValue('PHONE').check()
     requestMethodPage.continueButton().click()
 
     // Check booking details

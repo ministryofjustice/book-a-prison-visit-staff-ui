@@ -107,8 +107,8 @@ context('Check visit details page', () => {
     // Request method
     mainContactPage.continueButton().click()
     const requestMethodPage = Page.verifyOnPage(RequestMethodPage)
-    requestMethodPage.textValue1().contains('Phone call')
-    requestMethodPage.checkbox1().check()
+    requestMethodPage.getRequestLabelByValue('PHONE').contains('Phone call')
+    requestMethodPage.getRequestMethodByValue('PHONE').check()
     requestMethodPage.continueButton().click()
 
     // Check visit details
@@ -196,8 +196,8 @@ context('Check visit details page', () => {
 
     // Check details - change request method - then proceed through journey
     checkYourBookingPage.changeRequestMethod().click()
-    requestMethodPage.textValue2().contains('GOV.UK')
-    requestMethodPage.checkbox2().check()
+    requestMethodPage.getRequestLabelByValue('WEBSITE').contains('GOV.UK')
+    requestMethodPage.getRequestMethodByValue('WEBSITE').check()
     requestMethodPage.continueButton().click()
     checkYourBookingPage.requestMethod().contains('GOV.UK')
 

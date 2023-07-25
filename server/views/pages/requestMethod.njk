@@ -5,48 +5,49 @@
 
 {% set pageHeaderTitle = "What method was used to make this request?" %}
 {% set pageTitle %}
-    {% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
+  {% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
 {% endset %}
 {% set backLinkHref = urlPrefix + "/select-main-contact" %}
 
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
+      {% include "partials/errorSummary.njk" %}
+    
+      {% set methods = [] %}
 
-    {% set methods = [] %}
-
-    {% for key,text in requestMethods %}
+      {% for key,text in requestMethods %}
         {% set methods = (methods.push(
-            {
-                value: key,
-                text: text,
-                checked: formValues.method == key
-            }
+          {
+            value: key,
+            text: text,
+            checked: formValues.method == key
+          }
         ), methods) %}
-    {% endfor %}
+      {% endfor %}
 
-    <form action="{{ urlPrefix }}/request-method" method="POST" novalidate>
+      <form action="{{ urlPrefix }}/request-method" method="POST" novalidate>
         <input type="hidden" name="_csrf" value="{{ csrfToken }}">
         {{ govukRadios({
-            idPrefix: "method",
-            name: "method",
-            fieldset: {
-                legend: {
-                    text: pageHeaderTitle,
-                    isPageHeading: true,
-                    classes: "govuk-fieldset__legend--l"
-                }
-            },
-            items: methods,
-            errorMessage: errors | findError('method')
+          idPrefix: "method",
+          name: "method",
+          fieldset: {
+            legend: {
+              text: pageHeaderTitle,
+              isPageHeading: true,
+              classes: "govuk-fieldset__legend--l"
+            }
+          },
+          items: methods,
+          errorMessage: errors | findError('method')
         }) }}
 
         {{ govukButton({
-            text: "Continue",
-            attributes: { "data-test": "submit" },
-            preventDoubleClick: true
+          text: "Continue",
+          attributes: { "data-test": "submit" },
+          preventDoubleClick: true
         }) }} 
-    </form>
+      </form>
     </div>
   </div>
 {% endblock %}
