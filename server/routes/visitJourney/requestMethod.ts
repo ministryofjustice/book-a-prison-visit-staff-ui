@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
-import requestMethods from '../../constants/requestMethod'
+import { requestMethodOptions } from '../../constants/requestMethods'
 import { getFlashFormValues } from '../visitorUtils'
 import getUrlPrefix from './visitJourneyUtils'
 
@@ -19,7 +19,7 @@ export default class RequestMethod {
     res.render('pages/requestMethod', {
       errors: req.flash('errors'),
       formValues,
-      requestMethods,
+      requestMethods: requestMethodOptions,
       urlPrefix: getUrlPrefix(isUpdate, visitSessionData.visitReference),
     })
   }
@@ -42,6 +42,6 @@ export default class RequestMethod {
   }
 
   validate(): ValidationChain[] {
-    return [body('method').isIn(Object.keys(requestMethods)).withMessage('No request method selected')]
+    return [body('method').isIn(Object.keys(requestMethodOptions)).withMessage('No request method selected')]
   }
 }
