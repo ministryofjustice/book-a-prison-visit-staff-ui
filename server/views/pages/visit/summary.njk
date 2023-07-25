@@ -212,8 +212,8 @@
         {% for event in visitHistoryDetails.eventsAudit %}
           {% if event.type in [ 'MIGRATED_VISIT', 'BOOKED_VISIT', 'UPDATED_VISIT', 'CANCELED_VISIT' ] %}
             <li>
-              <strong>{{ event.type }}</strong>
-              <span data-test="{{ event.type | lower }}" >{{ event.createTimestamp | formatDate('EEEE d MMMM yyyy') }} at {{ event.createTimestamp | formatTime }}{{ actionedByUser(event.actionedBy) }}</span>
+              <strong>{{ eventAuditText[event.type] }}</strong>
+              <span data-test="{{ event.type | lower }}" >{{ event.createTimestamp | formatDate('EEEE d MMMM yyyy') }} at {{ event.createTimestamp | formatTime }}{{ actionedByUser(event.actionedBy) }} ({{ requestMethodDescriptions[event.applicationMethodType] }})</span>
             </li>
           {% endif %}
         {% endfor %}
@@ -224,6 +224,7 @@
       <p>This booking is not for {{ selectedEstablishment.prisonName }}.</p>
       <p>To view the booking, change the establishment to {{ visitPrisonName }} and search for it by the booking reference.</p>
     {% endif %}
+
   </div>
 </div>
 {% endblock %}

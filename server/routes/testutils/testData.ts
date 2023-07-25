@@ -376,13 +376,13 @@ export default class TestData {
     eventsAudit = [
       {
         type: 'BOOKED_VISIT',
-        applicationMethodType: 'NOT_KNOWN',
+        applicationMethodType: 'PHONE',
         actionedBy: 'User One',
         createTimestamp: '2022-01-01T09:00:00',
       },
       {
         type: 'UPDATED_VISIT',
-        applicationMethodType: 'NOT_KNOWN',
+        applicationMethodType: 'EMAIL',
         actionedBy: 'User Two',
         createTimestamp: '2022-01-01T10:00:00',
       },
