@@ -9,6 +9,7 @@ import AdditionalSupportPage from '../pages/additionalSupport'
 import MainContactPage from '../pages/mainContact'
 import CheckYourBookingPage from '../pages/checkYourBooking'
 import ConfirmationPage from '../pages/confirmation'
+import RequestMethodPage from '../pages/requestMethod'
 
 context('Update a visit', () => {
   const shortDateFormat = 'yyyy-MM-dd'
@@ -130,6 +131,12 @@ context('Update a visit', () => {
     mainContactPage.enterPhoneNumber('09876 543 321')
     mainContactPage.continueButton().click()
 
+    // Request method
+    const requestMethodPage = Page.verifyOnPage(RequestMethodPage)
+    requestMethodPage.textValue1().contains('Phone call')
+    requestMethodPage.checkbox1().check()
+    requestMethodPage.continueButton().click()
+
     // Check your booking page
     const checkYourBookingPage = Page.verifyOnPage(CheckYourBookingPage)
     checkYourBookingPage.visitDate().contains(format(new Date(visitSessions[1].startTimestamp), longDateFormat))
@@ -140,6 +147,7 @@ context('Update a visit', () => {
     checkYourBookingPage.additionalSupport().contains('Wheelchair ramp, Some extra help!')
     checkYourBookingPage.mainContactName().contains('Jeanette Smith (wife of the prisoner)')
     checkYourBookingPage.mainContactNumber().contains('09876 543 321')
+    checkYourBookingPage.requestMethod().contains('Phone call')
 
     // Submit booking
     cy.task(
@@ -168,7 +176,7 @@ context('Update a visit', () => {
         ],
         visitorSupport: [{ type: 'WHEELCHAIR' }, { type: 'OTHER', text: 'Some extra help!' }],
       }),
-      applicationMethod: 'NOT_KNOWN',
+      applicationMethod: 'PHONE',
     })
     checkYourBookingPage.bookButton().click()
 

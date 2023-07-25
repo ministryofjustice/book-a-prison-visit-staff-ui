@@ -182,6 +182,7 @@ context('Book a visit', () => {
     checkYourBookingPage.additionalSupport().contains('Wheelchair ramp, Some extra help!')
     checkYourBookingPage.mainContactName().contains('Jeanette Smith (wife of the prisoner)')
     checkYourBookingPage.mainContactNumber().contains('01234 567890')
+    checkYourBookingPage.requestMethod().contains('Phone call')
 
     // Confirmation
     cy.task(
@@ -209,7 +210,7 @@ context('Book a visit', () => {
         ],
         visitorSupport: [{ type: 'WHEELCHAIR' }, { type: 'OTHER', text: 'Some extra help!' }],
       }),
-      applicationMethod: 'NOT_KNOWN',
+      applicationMethod: 'PHONE',
     })
 
     checkYourBookingPage.bookButton().click()

@@ -9,5 +9,9 @@ export default class RequestMethodPage extends Page {
 
   textValue1 = (): PageElement => cy.get(':nth-child(1) > .govuk-label')
 
+  checkbox2 = (): PageElement => cy.get('#method-2')
+
+  textValue2 = (): PageElement => cy.get(':nth-child(2) > .govuk-label')
+
   continueButton = (): PageElement => cy.get('[data-test=submit]')
 }
