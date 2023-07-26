@@ -13,4 +13,5 @@ export const requestMethodDescriptions: Readonly<Record<ApplicationMethodType, s
   EMAIL: '(email request)',
   IN_PERSON: '(in person request)',
   NOT_KNOWN: '', // Return empty string when request method is unknown
+  NOT_APPLICABLE: '', // Return empty string when request method is not applicable
 }
