@@ -28,4 +28,4 @@ export type Alert = components['schemas']['AlertDto']
 
 export type PrisonerProfile = components['schemas']['PrisonerProfileDto']
 
-export type EventAuditOutcomes = components['schemas']['EventAuditDto']['type']
+export type EventAuditType = components['schemas']['EventAuditDto']['type']
