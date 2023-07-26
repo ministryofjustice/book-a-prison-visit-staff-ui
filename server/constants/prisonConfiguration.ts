@@ -4,6 +4,7 @@ type PrisonConfiguration = {
 }
 
 const prisonConfiguration: Record<string, PrisonConfiguration> = {
+  // Askham Grange (HMP & YOI)
   AGI: {
     prisonPhoneNumber: '0300 060 6513',
     selectVisitorsText: [
@@ -11,6 +12,7 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'At least one visitor must be 18 or older.',
     ],
   },
+  // Bristol (HMP & YOI)
   BLI: {
     prisonPhoneNumber: '0300 060 6510',
     selectVisitorsText: [
@@ -18,6 +20,7 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'Contact HMP Bristol when the total number of visitors (adults and children) is more than 3.',
     ],
   },
+  // Bullingdon (HMP & YOI)
   BNI: {
     prisonPhoneNumber: '01869 353 176',
     selectVisitorsText: [
@@ -25,6 +28,7 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'At least one visitor must be 18 or older.',
     ],
   },
+  // Brinsford (HMP & YOI)
   BSI: {
     prisonPhoneNumber: '0300 060 6500',
     selectVisitorsText: [
@@ -32,6 +36,7 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'At least one visitor must be 18 or older.',
     ],
   },
+  // Cardiff (HMP & YOI)
   CFI: {
     prisonPhoneNumber: '0300 303 2301',
     selectVisitorsText: [
@@ -39,6 +44,7 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'At least one visitor must be 18 or older.',
     ],
   },
+  // Drake Hall (HMP & YOI)
   DHI: {
     prisonPhoneNumber: '0300 060 6501',
     selectVisitorsText: [
@@ -46,6 +52,7 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'At least one visitor must be 18 or older.',
     ],
   },
+  // Durham (HMP & YOI)
   DMI: {
     prisonPhoneNumber: '0300 303 2300',
     selectVisitorsText: [
@@ -54,6 +61,15 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'Contact HMP Durham if you would like to bring more than 3 children.',
     ],
   },
+  // Erlestoke (HMP & YOI)
+  EEI: {
+    prisonPhoneNumber: '0300 303 0634',
+    selectVisitorsText: [
+      'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
+  // East Sutton Park (HMP & YOI)
   ESI: {
     prisonPhoneNumber: '0300 060 6513',
     selectVisitorsText: [
@@ -61,10 +77,12 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'At least one visitor must be 18 or older.',
     ],
   },
+  // Eastwood Park (HMP & YOI)
   EWI: {
     prisonPhoneNumber: '0300 303 0631',
     selectVisitorsText: ['You can add up to 3 people.', 'At least one visitor must be 18 or older.'],
   },
+  // Foston Hall (HMP & YOI)
   FHI: {
     prisonPhoneNumber: '0300 060 6516',
     selectVisitorsText: [
@@ -72,6 +90,7 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'At least one visitor must be 18 or older.',
     ],
   },
+  // Full Sutton (HMP)
   FNI: {
     prisonPhoneNumber: '01759 475 355',
     selectVisitorsText: [
@@ -79,6 +98,7 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'At least one visitor must be 18 or older.',
     ],
   },
+  // Hewell (HMP)
   HEI: {
     prisonPhoneNumber: '0300 060 6503',
     selectVisitorsText: [
@@ -86,6 +106,7 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'At least one visitor must be 18 or older.',
     ],
   },
+  // Low Newton (HMP & YOI)
   LNI: {
     prisonPhoneNumber: '0300 303 0632',
     selectVisitorsText: [
@@ -94,13 +115,23 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'Contact the establishment if you would like to bring more than 3 children.',
     ],
   },
+  // Morton Hall (HMP)
   MHI: {
     prisonPhoneNumber: '0300 303 0649',
     selectVisitorsText: [
-      'You can add up to 3 people aged 18 and over, and 3 children under 18 years old. ',
+      'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
+  // New Hall (HMP & YOI)
+  NHI: {
+    prisonPhoneNumber: '0300 060 6515',
+    selectVisitorsText: [
+      'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
+  // Preston (HMP & YOI)
   PNI: {
     prisonPhoneNumber: '0330 058 8224',
     selectVisitorsText: [
@@ -108,6 +139,31 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'At least one visitor must be 18 or older.',
     ],
   },
+  // Send (HMP)
+  SDI: {
+    prisonPhoneNumber: '0300 060 6514',
+    selectVisitorsText: [
+      'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
+  // Stoke Heath (HMP & YOI)
+  SHI: {
+    prisonPhoneNumber: '0300 060 6506',
+    selectVisitorsText: [
+      'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
+  // Werrington (HMYOI)
+  WNI: {
+    prisonPhoneNumber: '0300 060 6508',
+    selectVisitorsText: [
+      'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
+  // Wandsworth (HMP & YOI)
   WWI: {
     prisonPhoneNumber: '0300 060 6509',
     selectVisitorsText: [
