@@ -14,20 +14,20 @@
     <div class="govuk-grid-column-full">
       {% include "partials/errorSummary.njk" %}
     
-      {% set methods = [] %}
-
-      {% for key,text in requestMethods %}
-        {% set methods = (methods.push(
+      {% set requestMethods = [] %}
+      {% for key, text in requestMethodOptions %}
+        {% set requestMethods = (requestMethods.push(
           {
             value: key,
             text: text,
             checked: formValues.method == key
           }
-        ), methods) %}
+        ), requestMethods) %}
       {% endfor %}
 
       <form action="{{ urlPrefix }}/request-method" method="POST" novalidate>
         <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
         {{ govukRadios({
           idPrefix: "method",
           name: "method",
@@ -38,7 +38,7 @@
               classes: "govuk-fieldset__legend--l"
             }
           },
-          items: methods,
+          items: requestMethods,
           errorMessage: errors | findError('method')
         }) }}
 

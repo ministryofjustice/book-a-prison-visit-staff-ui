@@ -24,7 +24,7 @@ import sessionCheckMiddleware from '../middleware/sessionCheckMiddleware'
 import getPrisonConfiguration from '../constants/prisonConfiguration'
 import type { Services } from '../services'
 import eventAuditTypes from '../constants/eventAuditTypes'
-import { requestMethodDescriptions } from '../constants/requestMethods'
+import { requestMethodDescriptions, requestMethodOptions } from '../constants/requestMethods'
 
 export default function routes({
   additionalSupportService,
@@ -301,14 +301,18 @@ export default function routes({
       errors: req.flash('errors'),
       reference,
       visitCancellationReasons,
+      requestMethodOptions,
       formValues: getFlashFormValues(req),
     })
   })
 
   post(
     '/:reference/cancel',
-    body('cancel').isIn(Object.keys(visitCancellationReasons)).withMessage('No answer selected'),
-    body('reason').trim().notEmpty().withMessage('Enter a reason for the cancellation'),
+    body('cancel', 'No answer selected').isIn(Object.keys(visitCancellationReasons)),
+    body('method', 'No request method selected')
+      .if(body('cancel').equals('VISITOR_CANCELLED'))
+      .isIn(Object.keys(requestMethodOptions)),
+    body('reason', 'Enter a reason for the cancellation').trim().notEmpty(),
     async (req, res) => {
       const errors = validationResult(req)
       const reference = getVisitReference(req)
@@ -318,12 +322,17 @@ export default function routes({
         req.flash('formValues', req.body)
         return res.redirect(`/visit/${reference}/cancel`)
       }
+
+      const outcomeStatus = req.body.cancel
+      const text = req.body.reason
+      const applicationMethodType = outcomeStatus === 'VISITOR_CANCELLED' ? req.body.method : 'NOT_APPLICABLE'
+
       const cancelVisitDto: CancelVisitOrchestrationDto = {
         cancelOutcome: {
-          outcomeStatus: req.body.cancel,
-          text: req.body.reason,
+          outcomeStatus,
+          text,
         },
-        applicationMethodType: 'NOT_APPLICABLE',
+        applicationMethodType,
       }
 
       const visit = await visitService.cancelVisit({

@@ -5,7 +5,7 @@ export default class CancelVisitPage extends Page {
     super('Why is this booking being cancelled?')
   }
 
-  // Radios
+  // Cancellation reason radios
   visitorCancelledRadio = (): PageElement => cy.get('[data-test="visitor_cancelled"]')
 
   establishmentCancelledRadio = (): PageElement => cy.get('[data-test="establishment_cancelled"]')
@@ -14,8 +14,11 @@ export default class CancelVisitPage extends Page {
 
   administrativeErrorRadio = (): PageElement => cy.get('[data-test="administrative_error"]')
 
+  // Request method
+  getRequestMethodByValue = (value: string): PageElement => cy.get(`input[value="${value}"]`)
+
   // Text input
-  cancellationReasonText = (reason: string): void => {
+  enterCancellationReasonText = (reason: string): void => {
     cy.get('#reason').type(reason)
   }
 

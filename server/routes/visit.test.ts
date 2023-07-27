@@ -583,19 +583,25 @@ describe('GET /visit/:reference/cancel', () => {
         expect($('label[for="cancel"]').text().trim()).toBe('Visitor cancelled')
         expect($('[data-test="administrative_error"]').attr('value')).toBe('ADMINISTRATIVE_ERROR')
         expect($('label[for="cancel-4"]').text().trim()).toBe('Administrative error')
+
+        expect($('input[name="method"]').eq(0).prop('value')).toBe('PHONE')
+        expect($('input[name="method"]').eq(1).prop('value')).toBe('WEBSITE')
+        expect($('input[name="method"]').eq(2).prop('value')).toBe('EMAIL')
+        expect($('input[name="method"]').eq(3).prop('value')).toBe('IN_PERSON')
+        expect($('input[name="method"]:checked').length).toBe(0)
+
         expect($('[data-test="cancel-booking"]').length).toBe(1)
       })
   })
 
-  it('should render the cancellation reasons page with no selection validation error', () => {
+  it('should render the cancellation reasons page, showing validation errors and re-populating fields', () => {
     flashData.errors = [
-      {
-        msg: 'No answer selected',
-        path: 'cancel',
-        type: 'field',
-        location: 'body',
-      },
+      { msg: 'No answer selected', path: 'cancel' },
+      { msg: 'No request method selected', path: 'method' },
+      { msg: 'Enter a reason', path: 'reason' },
     ]
+
+    flashData.formValues = [{ cancel: 'VISITOR_CANCELLED', method: 'EMAIL', reason: 'illness' }]
 
     return request(app)
       .get('/visit/ab-cd-ef-gh/cancel')
@@ -604,40 +610,18 @@ describe('GET /visit/:reference/cancel', () => {
       .expect(res => {
         const $ = cheerio.load(res.text)
         expect($('h1').text().trim()).toBe('Why is this booking being cancelled?')
-        expect($('input[name="cancel"]').length).toBe(4)
-        expect($('input[name="cancel"]:checked').length).toBe(0)
+
         expect($('.govuk-error-summary__body').text()).toContain('No answer selected')
-        expect($('.govuk-error-summary__body a').attr('href')).toBe('#cancel-error')
-        expect(flashProvider).toHaveBeenCalledWith('errors')
-        expect(flashProvider).toHaveBeenCalledWith('formValues')
-        expect(flashProvider).toHaveBeenCalledTimes(2)
-      })
-  })
+        expect($('.govuk-error-summary__body').text()).toContain('No request method selected')
+        expect($('.govuk-error-summary__body').text()).toContain('Enter a reason')
+        expect($('.govuk-error-summary__body a').eq(0).attr('href')).toBe('#cancel-error')
+        expect($('.govuk-error-summary__body a').eq(1).attr('href')).toBe('#method-error')
+        expect($('.govuk-error-summary__body a').eq(2).attr('href')).toBe('#reason-error')
 
-  it('should render the cancellation reasons page with no reason text validation error', () => {
-    flashData.errors = [
-      {
-        value: '',
-        msg: 'Enter a reason for the cancellation',
-        path: 'reason',
-        type: 'field',
-        location: 'body',
-      },
-    ]
+        expect($('input[name="cancel"][value="VISITOR_CANCELLED"]').prop('checked')).toBe(true)
+        expect($('input[name="method"][value="EMAIL"]').prop('checked')).toBe(true)
+        expect($('input[name="reason"]').val()).toBe('illness')
 
-    flashData.formValues = [{ cancel: 'ESTABLISHMENT_CANCELLED' }]
-
-    return request(app)
-      .get('/visit/ab-cd-ef-gh/cancel')
-      .expect(200)
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        const $ = cheerio.load(res.text)
-        expect($('h1').text().trim()).toBe('Why is this booking being cancelled?')
-        expect($('input[name="cancel"]').length).toBe(4)
-        expect($('[data-test="establishment_cancelled"]').prop('checked')).toBe(true)
-        expect($('.govuk-error-summary__body').text()).toContain('Enter a reason for the cancellation')
-        expect($('.govuk-error-summary__body a').attr('href')).toBe('#reason-error')
         expect(flashProvider).toHaveBeenCalledWith('errors')
         expect(flashProvider).toHaveBeenCalledWith('formValues')
         expect(flashProvider).toHaveBeenCalledTimes(2)
@@ -666,7 +650,7 @@ describe('POST /visit/:reference/cancel', () => {
     })
   })
 
-  it('should cancel visit, set flash values, redirect to confirmation page and send cancellation SMS if reason and text entered', () => {
+  it('should cancel visit (default method NOT_APPLICABLE), set flash values, send SMS and redirect to confirmation page', () => {
     config.apis.notifications.enabled = true
 
     return request(app)
@@ -706,6 +690,30 @@ describe('POST /visit/:reference/cancel', () => {
           prisonName: 'Hewell (HMP)',
           prisonPhoneNumber: '0300 060 6503',
           reference: 'ab-cd-ef-gh',
+        })
+      })
+  })
+
+  it('should capture the request method if VISITOR_CANCELLED', () => {
+    return request(app)
+      .post('/visit/ab-cd-ef-gh/cancel')
+      .send('cancel=VISITOR_CANCELLED')
+      .send('method=EMAIL')
+      .send('reason=++illness++')
+      .expect(302)
+      .expect('location', '/visit/cancelled')
+      .expect(() => {
+        expect(visitService.cancelVisit).toHaveBeenCalledTimes(1)
+        expect(visitService.cancelVisit).toHaveBeenCalledWith({
+          username: 'user1',
+          reference: 'ab-cd-ef-gh',
+          cancelVisitDto: <CancelVisitOrchestrationDto>{
+            cancelOutcome: {
+              outcomeStatus: 'VISITOR_CANCELLED',
+              text: 'illness',
+            },
+            applicationMethodType: 'EMAIL',
+          },
         })
       })
   })
@@ -785,6 +793,22 @@ describe('POST /visit/:reference/cancel', () => {
           },
         ])
         expect(flashProvider).toHaveBeenCalledWith('formValues', { reason: '' })
+        expect(auditService.cancelledVisit).not.toHaveBeenCalled()
+      })
+  })
+
+  it('should set validation errors in flash and redirect if VISITOR_CANCELLED and no method selected', () => {
+    return request(app)
+      .post('/visit/ab-cd-ef-gh/cancel')
+      .send('cancel=VISITOR_CANCELLED')
+      .send('reason=illness')
+      .expect(302)
+      .expect('location', '/visit/ab-cd-ef-gh/cancel')
+      .expect(() => {
+        expect(flashProvider).toHaveBeenCalledWith('errors', [
+          { location: 'body', msg: 'No request method selected', path: 'method', type: 'field', value: undefined },
+        ])
+        expect(flashProvider).toHaveBeenCalledWith('formValues', { cancel: 'VISITOR_CANCELLED', reason: 'illness' })
         expect(auditService.cancelledVisit).not.toHaveBeenCalled()
       })
   })
