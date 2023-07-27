@@ -96,5 +96,7 @@ async function getAvailablePrisonsForUser(
       availablePrisonsForUser[prisonId] = supportedPrisons[prisonId]
     })
 
-  return availablePrisonsForUser
+  const prisonsSortedByName = Object.entries(availablePrisonsForUser).sort((a, b) => a[1].localeCompare(b[1]))
+
+  return Object.fromEntries(prisonsSortedByName)
 }

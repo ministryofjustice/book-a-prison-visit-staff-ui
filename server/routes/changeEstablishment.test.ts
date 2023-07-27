@@ -39,12 +39,44 @@ describe('GET /change-establishment', () => {
       .expect(res => {
         const $ = cheerio.load(res.text)
         expect($('h1').text().trim()).toBe('Select establishment')
-        expect($('input[name="establishment"]').eq(0).prop('value')).toBe('HEI')
+        expect($('input[name="establishment"]').eq(0).prop('value')).toBe('BLI')
         expect($('input[name="establishment"]').eq(0).prop('checked')).toBe(false)
-        expect($('input[name="establishment"]').eq(1).prop('value')).toBe('BLI')
+        expect($('input[name="establishment"]').eq(1).prop('value')).toBe('HEI')
         expect($('input[name="establishment"]').eq(1).prop('checked')).toBe(false)
         expect($('input[name="establishment"]').length).toBe(2)
         expect($('form').attr('action')).toBe('/change-establishment?referrer=/search/prisoner/')
+      })
+  })
+
+  it('should render establishments sorted by prison name', () => {
+    const supportedPrisonsUnsorted = {
+      CFI: 'Cardiff (HMP & YOI)',
+      BNI: 'Bullingdon (HMP & YOI)',
+      BSI: 'Brinsford (HMP & YOI)',
+      BLI: 'Bristol (HMP & YOI)',
+    }
+    supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisonsUnsorted)
+    userService.getUserCaseLoadIds.mockResolvedValue(Object.keys(supportedPrisonsUnsorted))
+    app = appWithAllRoutes({ services: { supportedPrisonsService, userService } })
+
+    return request(app)
+      .get('/change-establishment')
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('h1').text().trim()).toBe('Select establishment')
+
+        expect($('input[name="establishment"]').eq(0).prop('value')).toBe('BSI')
+        expect($('input[name="establishment"] + label').eq(0).text().trim()).toBe('Brinsford (HMP & YOI)')
+
+        expect($('input[name="establishment"]').eq(1).prop('value')).toBe('BLI')
+        expect($('input[name="establishment"] + label').eq(1).text().trim()).toBe('Bristol (HMP & YOI)')
+
+        expect($('input[name="establishment"]').eq(2).prop('value')).toBe('BNI')
+        expect($('input[name="establishment"] + label').eq(2).text().trim()).toBe('Bullingdon (HMP & YOI)')
+
+        expect($('input[name="establishment"]').eq(3).prop('value')).toBe('CFI')
+        expect($('input[name="establishment"] + label').eq(3).text().trim()).toBe('Cardiff (HMP & YOI)')
       })
   })
 
@@ -73,9 +105,9 @@ describe('GET /change-establishment', () => {
       .expect(res => {
         const $ = cheerio.load(res.text)
         expect($('h1').text().trim()).toBe('Select establishment')
-        expect($('input[name="establishment"]').eq(0).prop('value')).toBe('HEI')
-        expect($('input[name="establishment"]').eq(1).prop('value')).toBe('BLI')
-        expect($('input[name="establishment"]').eq(1).prop('checked')).toBe(true)
+        expect($('input[name="establishment"]').eq(0).prop('value')).toBe('BLI')
+        expect($('input[name="establishment"]').eq(0).prop('checked')).toBe(true)
+        expect($('input[name="establishment"]').eq(1).prop('value')).toBe('HEI')
         expect($('input[name="establishment"]').length).toBe(2)
         expect($('form').attr('action')).toBe('/change-establishment?referrer=/')
       })
