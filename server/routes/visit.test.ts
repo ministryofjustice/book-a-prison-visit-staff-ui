@@ -174,11 +174,11 @@ describe('/visit/:reference', () => {
           expect($('[data-test="visit-comment"]').eq(0).text()).toBe('Example of a visit comment')
           expect($('[data-test="visitor-concern"]').eq(0).text()).toBe('Example of a visitor concern')
           expect($('[data-test="additional-support"]').text()).toBe('Wheelchair ramp, custom request')
-          expect($('[data-test="booked_visit"]').text().replace(/\s+/g, ' ')).toBe(
-            'Saturday 1 January 2022 at 9am by User One',
+          expect($('[data-test="booked_visit"]').text().trim().replace(/\s+/g, ' ')).toBe(
+            'Saturday 1 January 2022 at 9am by User One (phone call request)',
           )
-          expect($('[data-test="updated_visit"]').text().replace(/\s+/g, ' ')).toBe(
-            'Saturday 1 January 2022 at 10am by User Two',
+          expect($('[data-test="updated_visit"]').text().trim().replace(/\s+/g, ' ')).toBe(
+            'Saturday 1 January 2022 at 10am by User Two (email request)',
           )
           expect(visitSessionData).toEqual({ prisoner: undefined })
 
@@ -194,14 +194,14 @@ describe('/visit/:reference', () => {
     })
 
     it('should handle special cases for migrated data when showing actioned by user details', () => {
-      visitHistoryDetails.eventsAudit[0].actionedBy = 'NOT_KNOWN'
-      visitHistoryDetails.eventsAudit[1].actionedBy = 'NOT_KNOWN_NOMIS'
-      visitHistoryDetails.eventsAudit[2] = {
-        type: 'CANCELED_VISIT',
-        applicationMethodType: 'NOT_KNOWN',
-        actionedBy: 'User Three',
-        createTimestamp: '2022-01-01T11:30:00',
-      }
+      visitHistoryDetails.eventsAudit = [
+        {
+          type: 'BOOKED_VISIT',
+          applicationMethodType: 'NOT_KNOWN',
+          actionedBy: 'NOT_KNOWN_NOMIS',
+          createTimestamp: '2022-01-01T11:30:00',
+        },
+      ]
 
       return request(app)
         .get('/visit/ab-cd-ef-gh')
@@ -209,12 +209,8 @@ describe('/visit/:reference', () => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('[data-test="booked_visit"]').text().replace(/\s+/g, ' ')).toBe('Saturday 1 January 2022 at 9am')
-          expect($('[data-test="updated_visit"]').text().replace(/\s+/g, ' ')).toBe(
-            'Saturday 1 January 2022 at 10am in NOMIS',
-          )
-          expect($('[data-test="canceled_visit"]').text().replace(/\s+/g, ' ')).toBe(
-            'Saturday 1 January 2022 at 11:30am by User Three',
+          expect($('[data-test="booked_visit"]').text().trim().replace(/\s+/g, ' ')).toBe(
+            'Saturday 1 January 2022 at 11:30am in NOMIS',
           )
         })
     })
@@ -266,8 +262,8 @@ describe('/visit/:reference', () => {
           expect($('[data-test="visit-comment"]').eq(0).text()).toBe('Example of a visit comment')
           expect($('[data-test="visitor-concern"]').eq(0).text()).toBe('Example of a visitor concern')
           expect($('[data-test="additional-support"]').text()).toBe('Wheelchair ramp, custom request')
-          expect($('[data-test="booked_visit"]').text().replace(/\s+/g, ' ')).toBe(
-            'Saturday 1 January 2022 at 9am by User One',
+          expect($('[data-test="booked_visit"]').text().trim().replace(/\s+/g, ' ')).toBe(
+            'Saturday 1 January 2022 at 9am by User One (phone call request)',
           )
 
           expect(auditService.viewedVisitDetails).toHaveBeenCalledTimes(1)
@@ -326,8 +322,8 @@ describe('/visit/:reference', () => {
           expect($('[data-test="visit-comment"]').eq(0).text()).toBe('Example of a visit comment')
           expect($('[data-test="visitor-concern"]').eq(0).text()).toBe('Example of a visitor concern')
           expect($('[data-test="additional-support"]').text()).toBe('Wheelchair ramp, custom request')
-          expect($('[data-test="booked_visit"]').text().replace(/\s+/g, ' ')).toBe(
-            'Saturday 1 January 2022 at 9am by User One',
+          expect($('[data-test="booked_visit"]').text().trim().replace(/\s+/g, ' ')).toBe(
+            'Saturday 1 January 2022 at 9am by User One (phone call request)',
           )
 
           expect(auditService.viewedVisitDetails).toHaveBeenCalledTimes(1)
@@ -466,7 +462,7 @@ describe('/visit/:reference', () => {
           const $ = cheerio.load(res.text)
           expect($('[data-test="cancelled-visit-reason"]').text()).toContain('by the visitor')
           expect($('[data-test="cancelled-visit-reason"]').text()).toContain('no longer required')
-          expect($('[data-test="canceled_visit"]').text().replace(/\s+/g, ' ')).toBe(
+          expect($('[data-test="canceled_visit"]').text().trim().replace(/\s+/g, ' ')).toBe(
             'Saturday 1 January 2022 at 11am by User Three',
           )
         })

@@ -27,3 +27,5 @@ export type VisitSession = components['schemas']['VisitSessionDto']
 export type Alert = components['schemas']['AlertDto']
 
 export type PrisonerProfile = components['schemas']['PrisonerProfileDto']
+
+export type EventAuditType = components['schemas']['EventAuditDto']['type']

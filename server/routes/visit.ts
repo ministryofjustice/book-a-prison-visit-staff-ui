@@ -23,6 +23,8 @@ import RequestMethod from './visitJourney/requestMethod'
 import sessionCheckMiddleware from '../middleware/sessionCheckMiddleware'
 import getPrisonConfiguration from '../constants/prisonConfiguration'
 import type { Services } from '../services'
+import eventAuditTypes from '../constants/eventAuditTypes'
+import { requestMethodDescriptions } from '../constants/requestMethods'
 
 export default function routes({
   additionalSupportService,
@@ -105,6 +107,8 @@ export default function routes({
       fromVisitSearch,
       fromVisitSearchQuery,
       showButtons,
+      eventAuditTypes,
+      requestMethodDescriptions,
     })
   })
 

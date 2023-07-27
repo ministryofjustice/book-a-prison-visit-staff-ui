@@ -76,8 +76,8 @@ context('Visit details page', () => {
     visitDetailsPage.visitComment().contains('Example of a visit comment')
     visitDetailsPage.visitorConcern().contains('Example of a visitor concern')
     visitDetailsPage.additionalSupport().contains('Wheelchair ramp, custom request')
-    visitDetailsPage.visitBooked().contains('Saturday 1 January 2022 at 9am by User One')
-    visitDetailsPage.visitUpdated().contains('Saturday 1 January 2022 at 10am by User Two')
+    visitDetailsPage.visitBooked().contains('Saturday 1 January 2022 at 9am by User One (phone call request')
+    visitDetailsPage.visitUpdated().contains('Saturday 1 January 2022 at 10am by User Two (email request)')
   })
 
   it('Should show update/cancel button for future visit', () => {
@@ -130,7 +130,7 @@ context('Visit details page', () => {
     visitDetailsPage.visitorAddress2().contains('C1 2AB')
     visitDetailsPage.visitorRestrictions2().contains('None')
     // Additional Information
-    visitDetailsPage.visitBooked().contains('Saturday 1 January 2022 at 9am by User One')
-    visitDetailsPage.visitUpdated().contains('Saturday 1 January 2022 at 10am by User Two')
+    visitDetailsPage.visitBooked().contains('Saturday 1 January 2022 at 9am by User One (phone call request)')
+    visitDetailsPage.visitUpdated().contains('Saturday 1 January 2022 at 10am by User Two (email request)')
   })
 })

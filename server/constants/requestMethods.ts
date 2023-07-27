@@ -8,9 +8,10 @@ export const requestMethodOptions: Readonly<Partial<Record<ApplicationMethodType
 }
 
 export const requestMethodDescriptions: Readonly<Record<ApplicationMethodType, string>> = {
-  PHONE: 'Phone call',
-  WEBSITE: 'GOV.UK',
-  EMAIL: 'Email',
-  IN_PERSON: 'In person',
-  NOT_KNOWN: 'Unknown',
+  PHONE: '(phone call request)',
+  WEBSITE: '(GOV.UK request)',
+  EMAIL: '(email request)',
+  IN_PERSON: '(in person request)',
+  NOT_KNOWN: '', // Return empty string when request method is unknown
+  NOT_APPLICABLE: '', // Return empty string when request method is not applicable
 }

@@ -67,7 +67,7 @@ export interface paths {
      * @description Unilink specific version of /api/bookings/{bookingId}/living-unit/{internalLocationDescription}.<br/>
      *       Requires either a valid user token or a token with UNILINK role.
      */
-    put: operations['moveToCell']
+    put: operations['moveToCellOrReception']
   }
   '/api/offenders/{offenderNo}/discharge-to-hospital': {
     /** *** BETA *** Discharges a prisoner to hospital, requires the RELEASE_PRISONER role */
@@ -163,7 +163,7 @@ export interface paths {
     put: operations['moveToCellSwap']
   }
   '/api/bookings/{bookingId}/living-unit/{internalLocationDescription}': {
-    put: operations['moveToCell_1']
+    put: operations['moveToCell']
   }
   '/api/bookings/{bookingId}/court-hearings/{hearingId}/hearing-date': {
     /**
@@ -7523,9 +7523,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
+      pageable?: components['schemas']['PageableObject']
       last?: boolean
       empty?: boolean
     }
@@ -7533,17 +7533,17 @@ export interface components {
       /** Format: int64 */
       offset?: number
       sort?: components['schemas']['SortObject']
-      paged?: boolean
-      unpaged?: boolean
       /** Format: int32 */
       pageSize?: number
       /** Format: int32 */
       pageNumber?: number
+      paged?: boolean
+      unpaged?: boolean
     }
     SortObject: {
       empty?: boolean
-      unsorted?: boolean
       sorted?: boolean
+      unsorted?: boolean
     }
     /** @description Sentence Adjustment values */
     BookingAdjustment: {
@@ -9718,9 +9718,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
+      pageable?: components['schemas']['PageableObject']
       last?: boolean
       empty?: boolean
     }
@@ -10415,9 +10415,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
+      pageable?: components['schemas']['PageableObject']
       last?: boolean
       empty?: boolean
     }
@@ -10522,9 +10522,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
+      pageable?: components['schemas']['PageableObject']
       last?: boolean
       empty?: boolean
     }
@@ -10540,9 +10540,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
+      pageable?: components['schemas']['PageableObject']
       last?: boolean
       empty?: boolean
     }
@@ -10798,9 +10798,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
+      pageable?: components['schemas']['PageableObject']
       last?: boolean
       empty?: boolean
     }
@@ -11054,9 +11054,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
+      pageable?: components['schemas']['PageableObject']
       last?: boolean
       empty?: boolean
     }
@@ -11112,9 +11112,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
+      pageable?: components['schemas']['PageableObject']
       last?: boolean
       empty?: boolean
     }
@@ -11190,9 +11190,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
+      pageable?: components['schemas']['PageableObject']
       last?: boolean
       empty?: boolean
     }
@@ -12048,7 +12048,7 @@ export interface operations {
    * @description Unilink specific version of /api/bookings/{bookingId}/living-unit/{internalLocationDescription}.<br/>
    *       Requires either a valid user token or a token with UNILINK role.
    */
-  moveToCell: {
+  moveToCellOrReception: {
     parameters: {
       query: {
         /**
@@ -12685,7 +12685,7 @@ export interface operations {
       }
     }
   }
-  moveToCell_1: {
+  moveToCell: {
     parameters: {
       query: {
         /**
@@ -12787,6 +12787,13 @@ export interface operations {
   /** Update an alert */
   updateAlert: {
     parameters: {
+      query?: {
+        /**
+         * @description Whether to timeout if locked
+         * @example true
+         */
+        lockTimeout?: boolean
+      }
       path: {
         /** @description bookingId */
         bookingId: number
@@ -12818,6 +12825,12 @@ export interface operations {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
+      /** @description Record in use for this booking id (possibly in P-Nomis). */
+      423: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description Unrecoverable error occurred whilst processing request. */
       500: {
         content: {
@@ -12832,6 +12845,13 @@ export interface operations {
    */
   updateAttendance: {
     parameters: {
+      query?: {
+        /**
+         * @description Whether to timeout if locked
+         * @example true
+         */
+        lockTimeout?: boolean
+      }
       path: {
         /**
          * @description The booking Id of the prisoner
@@ -12867,6 +12887,12 @@ export interface operations {
       }
       /** @description Resource not found - booking or event does not exist or is not accessible to user. */
       404: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Record in use for this booking id (possibly in P-Nomis). */
+      423: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }

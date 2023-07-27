@@ -936,8 +936,8 @@ export interface components {
       first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
       last?: boolean
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     PageableObject: {
@@ -1160,8 +1160,8 @@ export interface components {
       first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
       last?: boolean
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     ErrorResponse: {
@@ -1408,8 +1408,8 @@ export interface components {
       first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
       last?: boolean
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     MatchRequest: {
@@ -1521,8 +1521,8 @@ export interface components {
       first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
       last?: boolean
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     /** @description Search Criteria for Global Prisoner Search */
