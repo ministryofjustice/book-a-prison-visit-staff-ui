@@ -39,7 +39,7 @@ context('Cancel visit journey', () => {
         outcomeStatus: 'ESTABLISHMENT_CANCELLED',
         text: 'Overbooking error',
       },
-      applicationMethodType: 'NOT_KNOWN',
+      applicationMethodType: 'NOT_APPLICABLE',
     }
 
     cy.task('stubPrisonerById', prisoner)
@@ -54,7 +54,7 @@ context('Cancel visit journey', () => {
 
     const cancelVisitPage = Page.verifyOnPage(CancelVisitPage)
     cancelVisitPage.establishmentCancelledRadio().click()
-    cancelVisitPage.establishmentCancelledText(cancelVisitDto.cancelOutcome.text)
+    cancelVisitPage.cancellationReasonText(cancelVisitDto.cancelOutcome.text)
 
     cy.task('stubCancelVisit', { visit: visitHistoryDetails.visit, cancelVisitDto })
 

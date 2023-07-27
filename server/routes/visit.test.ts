@@ -197,7 +197,7 @@ describe('/visit/:reference', () => {
       visitHistoryDetails.eventsAudit = [
         {
           type: 'BOOKED_VISIT',
-          applicationMethodType: 'NOT_KNOWN',
+          applicationMethodType: 'NOT_APPLICABLE',
           actionedBy: 'NOT_KNOWN_NOMIS',
           createTimestamp: '2022-01-01T11:30:00',
         },
@@ -448,7 +448,7 @@ describe('/visit/:reference', () => {
       visitHistoryDetails.eventsAudit = [
         {
           type: 'CANCELED_VISIT',
-          applicationMethodType: 'NOT_KNOWN',
+          applicationMethodType: 'NOT_APPLICABLE',
           actionedBy: 'User Three',
           createTimestamp: '2022-01-01T11:00:00',
         },
@@ -619,7 +619,7 @@ describe('GET /visit/:reference/cancel', () => {
       {
         value: '',
         msg: 'Enter a reason for the cancellation',
-        path: 'reason_establishment_cancelled',
+        path: 'reason',
         type: 'field',
         location: 'body',
       },
@@ -637,7 +637,7 @@ describe('GET /visit/:reference/cancel', () => {
         expect($('input[name="cancel"]').length).toBe(4)
         expect($('[data-test="establishment_cancelled"]').prop('checked')).toBe(true)
         expect($('.govuk-error-summary__body').text()).toContain('Enter a reason for the cancellation')
-        expect($('.govuk-error-summary__body a').attr('href')).toBe('#reason_establishment_cancelled-error')
+        expect($('.govuk-error-summary__body a').attr('href')).toBe('#reason-error')
         expect(flashProvider).toHaveBeenCalledWith('errors')
         expect(flashProvider).toHaveBeenCalledWith('formValues')
         expect(flashProvider).toHaveBeenCalledTimes(2)
@@ -672,7 +672,7 @@ describe('POST /visit/:reference/cancel', () => {
     return request(app)
       .post('/visit/ab-cd-ef-gh/cancel')
       .send('cancel=PRISONER_CANCELLED')
-      .send('reason_prisoner_cancelled=++illness++')
+      .send('reason=++illness++')
       .expect(302)
       .expect('location', '/visit/cancelled')
       .expect(() => {
@@ -685,7 +685,7 @@ describe('POST /visit/:reference/cancel', () => {
               outcomeStatus: 'PRISONER_CANCELLED',
               text: 'illness',
             },
-            applicationMethodType: 'NOT_KNOWN',
+            applicationMethodType: 'NOT_APPLICABLE',
           },
         })
         expect(flashProvider).toHaveBeenCalledWith('startTimestamp', cancelledVisit.startTimestamp)
@@ -717,7 +717,7 @@ describe('POST /visit/:reference/cancel', () => {
     return request(app)
       .post('/visit/ab-cd-ef-gh/cancel')
       .send('cancel=PRISONER_CANCELLED')
-      .send('reason_prisoner_cancelled=illness')
+      .send('reason=illness')
       .expect(302)
       .expect('location', '/visit/cancelled')
       .expect(() => {
@@ -740,7 +740,7 @@ describe('POST /visit/:reference/cancel', () => {
     return request(app)
       .post('/visit/ab-cd-ef-gh/cancel')
       .send('cancel=PRISONER_CANCELLED')
-      .send('reason_prisoner_cancelled=illness')
+      .send('reason=illness')
       .expect(302)
       .expect('location', '/visit/cancelled')
       .expect(() => {
@@ -758,7 +758,7 @@ describe('POST /visit/:reference/cancel', () => {
     return request(app)
       .post('/visit/ab-cd-ef-gh/cancel')
       .send('cancel=PRISONER_CANCELLED')
-      .send('reason_prisoner_cancelled=illness')
+      .send('reason=illness')
       .expect(302)
       .expect('location', '/visit/cancelled')
       .expect(() => {
@@ -776,8 +776,15 @@ describe('POST /visit/:reference/cancel', () => {
       .expect(() => {
         expect(flashProvider).toHaveBeenCalledWith('errors', [
           { location: 'body', msg: 'No answer selected', path: 'cancel', type: 'field', value: undefined },
+          {
+            location: 'body',
+            msg: 'Enter a reason for the cancellation',
+            path: 'reason',
+            type: 'field',
+            value: '',
+          },
         ])
-        expect(flashProvider).toHaveBeenCalledWith('formValues', {})
+        expect(flashProvider).toHaveBeenCalledWith('formValues', { reason: '' })
         expect(auditService.cancelledVisit).not.toHaveBeenCalled()
       })
   })
@@ -793,14 +800,14 @@ describe('POST /visit/:reference/cancel', () => {
           {
             location: 'body',
             msg: 'Enter a reason for the cancellation',
-            path: 'reason_prisoner_cancelled',
+            path: 'reason',
             type: 'field',
             value: '',
           },
         ])
         expect(flashProvider).toHaveBeenCalledWith('formValues', {
           cancel: 'PRISONER_CANCELLED',
-          reason_prisoner_cancelled: '',
+          reason: '',
         })
         expect(auditService.cancelledVisit).not.toHaveBeenCalled()
       })
@@ -810,7 +817,7 @@ describe('POST /visit/:reference/cancel', () => {
     return request(app)
       .post('/visit/ab-cd-ef-gh/cancel')
       .send('cancel=INVALID_VALUE')
-      .send('reason_prisoner_cancelled=illness')
+      .send('reason=illness')
       .expect(302)
       .expect('location', '/visit/ab-cd-ef-gh/cancel')
       .expect(() => {
@@ -819,7 +826,7 @@ describe('POST /visit/:reference/cancel', () => {
         ])
         expect(flashProvider).toHaveBeenCalledWith('formValues', {
           cancel: 'INVALID_VALUE',
-          reason_prisoner_cancelled: 'illness',
+          reason: 'illness',
         })
         expect(auditService.cancelledVisit).not.toHaveBeenCalled()
       })

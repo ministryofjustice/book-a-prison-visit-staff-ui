@@ -308,12 +308,8 @@ export default function routes({
   post(
     '/:reference/cancel',
     body('cancel').isIn(Object.keys(visitCancellationReasons)).withMessage('No answer selected'),
+    body('reason').trim().notEmpty().withMessage('Enter a reason for the cancellation'),
     async (req, res) => {
-      const reasonFieldName = `reason_${req.body.cancel}`.toLowerCase()
-      if (validationResult(req).isEmpty()) {
-        await body(reasonFieldName).trim().notEmpty().withMessage('Enter a reason for the cancellation').run(req)
-      }
-
       const errors = validationResult(req)
       const reference = getVisitReference(req)
 
@@ -325,9 +321,9 @@ export default function routes({
       const cancelVisitDto: CancelVisitOrchestrationDto = {
         cancelOutcome: {
           outcomeStatus: req.body.cancel,
-          text: req.body[reasonFieldName],
+          text: req.body.reason,
         },
-        applicationMethodType: 'NOT_KNOWN',
+        applicationMethodType: 'NOT_APPLICABLE',
       }
 
       const visit = await visitService.cancelVisit({
@@ -340,7 +336,7 @@ export default function routes({
         visitReference: reference,
         prisonerId: visit.prisonerId.toString(),
         prisonId: visit.prisonId,
-        reason: `${req.body.cancel}: ${req.body[reasonFieldName]}`,
+        reason: `${req.body.cancel}: ${req.body.reason}`,
         username: res.locals.user.username,
         operationId: res.locals.appInsightsOperationId,
       })

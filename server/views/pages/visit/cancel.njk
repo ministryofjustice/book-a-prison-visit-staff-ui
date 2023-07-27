@@ -20,35 +20,16 @@
 
         {% set reasonsRadioItems = [] %}
         {% for key, text in visitCancellationReasons %}
-        {% set reasonFieldName = "reason_" + (key | lower) %}
-        {% set reasonHtml %}
-          {{ govukInput({
-            id: reasonFieldName,
-            name: reasonFieldName,
-            type: "text",
-            classes: "govuk-!-width-one-third",
-            label: {
-              text: "Reason"
-            },
-            value: formValues[reasonFieldName],
-            autocomplete: "off",
-            errorMessage: errors | findError(reasonFieldName)
-          }) -}}
-        {% endset -%}
-
-        {% set reasonsRadioItems = (reasonsRadioItems.push(
-          {
-            value: key,
-            text: text,
-            checked: formValues.cancel == key,
-            conditional: {
-              html: reasonHtml
-            },
-            attributes: {
-              "data-test": key | lower
+          {% set reasonsRadioItems = (reasonsRadioItems.push(
+            {
+              value: key,
+              text: text,
+              checked: formValues.cancel == key,
+              attributes: {
+                "data-test": key | lower
+              }
             }
-          }
-        ), reasonsRadioItems) %}
+          ), reasonsRadioItems) %}
         {% endfor %}
 
         {{ govukRadios({
@@ -64,7 +45,21 @@
           items: reasonsRadioItems,
           errorMessage: errors | findError('cancel')
         }) }}
-        
+
+        {{ govukInput({
+          id: "reason",
+          name: "reason",
+          type: "text",
+          classes: "govuk-!-width-one-third",
+          label: {
+            text: "Reason for cancellation",
+            classes: "govuk-label--s"
+          },
+          value: formValues["reason"],
+          autocomplete: "off",
+          errorMessage: errors | findError("reason")
+        }) }}
+
         {{ govukButton({
           text: "Cancel booking",
           attributes: {

@@ -14,21 +14,9 @@ export default class CancelVisitPage extends Page {
 
   administrativeErrorRadio = (): PageElement => cy.get('[data-test="administrative_error"]')
 
-  // Hidden text inputs
-  visitorCancelledText = (reason: string): void => {
-    cy.get('#reason_visitor_cancelled').type(reason)
-  }
-
-  establishmentCancelledText = (reason: string): void => {
-    cy.get('#reason_establishment_cancelled').type(reason)
-  }
-
-  prisonerCancelledText = (reason: string): void => {
-    cy.get('#reason_prisoner_cancelled').type(reason)
-  }
-
-  administrativeErrorText = (reason: string): void => {
-    cy.get('#reason_administrative_error').type(reason)
+  // Text input
+  cancellationReasonText = (reason: string): void => {
+    cy.get('#reason').type(reason)
   }
 
   // Cancel visit button
