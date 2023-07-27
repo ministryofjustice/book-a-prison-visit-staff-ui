@@ -180,6 +180,7 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
       prisonerProfile.visitsByMonth = new Map([
         ['March 2023', { upcomingCount: 1, pastCount: 0, visits: [upcomingVisit] }],
         ['February 2023', { upcomingCount: 0, pastCount: 1, visits: [pastVisit, cancelledVisit] }],
+        ['January 2023', { upcomingCount: 0, pastCount: 0, visits: [cancelledVisit] }],
       ])
       prisonerProfile.contactNames = { 4321: 'Jeanette Smith', 4322: 'Bob Smith' }
 
@@ -211,6 +212,10 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
 
           expect($('.prisoner-profile-visits:nth-child(2) caption').text()).toBe('February 2023 (1 past visit)')
           expect($('.prisoner-profile-visits:nth-child(2) [data-test="tab-visits-reference"]').length).toBe(2)
+
+          expect($('.prisoner-profile-visits:nth-child(3) caption').text()).toBe('January 2023')
+          expect($('.prisoner-profile-visits:nth-child(3) [data-test="tab-visits-reference"]').length).toBe(1)
+
           expect($('[data-test="view-dps-profile"]').text().trim()).toBe('View full visits history')
         })
     })
