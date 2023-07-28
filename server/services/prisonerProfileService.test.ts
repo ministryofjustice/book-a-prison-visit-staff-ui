@@ -7,7 +7,6 @@ import {
   createMockHmppsAuthClient,
   createMockOrchestrationApiClient,
   createMockPrisonApiClient,
-  createMockPrisonerContactRegistryApiClient,
   createMockPrisonerSearchClient,
 } from '../data/testutils/mocks'
 import { createMockSupportedPrisonsService } from './testutils/mocks'
@@ -18,7 +17,6 @@ describe('Prisoner profile service', () => {
   const hmppsAuthClient = createMockHmppsAuthClient()
   const orchestrationApiClient = createMockOrchestrationApiClient()
   const prisonApiClient = createMockPrisonApiClient()
-  const prisonerContactRegistryApiClient = createMockPrisonerContactRegistryApiClient()
   const prisonerSearchClient = createMockPrisonerSearchClient()
   const supportedPrisonsService = createMockSupportedPrisonsService()
 
@@ -26,7 +24,6 @@ describe('Prisoner profile service', () => {
 
   const OrchestrationApiClientFactory = jest.fn()
   const PrisonApiClientFactory = jest.fn()
-  const PrisonerContactRegistryApiClientFactory = jest.fn()
   const PrisonerSearchClientFactory = jest.fn()
 
   const prisonerId = 'A1234BC'
@@ -35,13 +32,11 @@ describe('Prisoner profile service', () => {
   beforeEach(() => {
     OrchestrationApiClientFactory.mockReturnValue(orchestrationApiClient)
     PrisonApiClientFactory.mockReturnValue(prisonApiClient)
-    PrisonerContactRegistryApiClientFactory.mockReturnValue(prisonerContactRegistryApiClient)
     PrisonerSearchClientFactory.mockReturnValue(prisonerSearchClient)
 
     prisonerProfileService = new PrisonerProfileService(
       OrchestrationApiClientFactory,
       PrisonApiClientFactory,
-      PrisonerContactRegistryApiClientFactory,
       hmppsAuthClient,
     )
     hmppsAuthClient.getSystemClientToken.mockResolvedValue(token)
@@ -62,16 +57,7 @@ describe('Prisoner profile service', () => {
       const prisonerProfile = TestData.prisonerProfile()
       orchestrationApiClient.getPrisonerProfile.mockResolvedValue(prisonerProfile)
 
-      const contacts = [TestData.contact(), TestData.contact({ personId: 4322, firstName: 'Bob' })]
-      prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue(contacts)
-
-      const results = await prisonerProfileService.getProfile(prisonId, prisonerId, 'user')
-
-      expect(OrchestrationApiClientFactory).toHaveBeenCalledWith(token)
-      expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user')
-      expect(orchestrationApiClient.getPrisonerProfile).toHaveBeenCalledTimes(1)
-
-      expect(results).toEqual(<PrisonerProfilePage>{
+      const prisonerProfilePage: PrisonerProfilePage = {
         activeAlerts: [],
         activeAlertCount: 0,
         flaggedAlerts: [],
@@ -94,15 +80,20 @@ describe('Prisoner profile service', () => {
             nextPrivIepAdjustDate: '1 January 2022',
           },
         },
-        contactNames: { 4321: 'Jeanette Smith', 4322: 'Bob Smith' },
-      })
+      }
+
+      const results = await prisonerProfileService.getProfile(prisonId, prisonerId, 'user')
+
+      expect(OrchestrationApiClientFactory).toHaveBeenCalledWith(token)
+      expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user')
+      expect(orchestrationApiClient.getPrisonerProfile).toHaveBeenCalledTimes(1)
+
+      expect(results).toEqual(prisonerProfilePage)
     })
 
     it('should return visit balances as null if prisoner is on REMAND', async () => {
       const prisonerProfile = TestData.prisonerProfile({ convictedStatus: 'Remand' })
       orchestrationApiClient.getPrisonerProfile.mockResolvedValue(prisonerProfile)
-
-      prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue([])
 
       const results = await prisonerProfileService.getProfile(prisonId, prisonerId, 'user')
 
@@ -120,16 +111,18 @@ describe('Prisoner profile service', () => {
       const nextMonthKey = format(nextMonth, 'MMMM yyyy')
       const previousMonthKey = format(previousMonth, 'MMMM yyyy')
 
-      const upcomingVisit = TestData.visit({ startTimestamp: nextMonth.toISOString() })
-      const pastVisit = TestData.visit({ startTimestamp: previousMonth.toISOString() })
-      const cancelledVisit = TestData.visit({ visitStatus: 'CANCELLED', startTimestamp: previousMonth.toISOString() })
+      const upcomingVisit = TestData.visitSummary({ startTimestamp: nextMonth.toISOString() })
+      const pastVisit = TestData.visitSummary({ startTimestamp: previousMonth.toISOString() })
+      const cancelledVisit = TestData.visitSummary({
+        visitStatus: 'CANCELLED',
+        startTimestamp: previousMonth.toISOString(),
+      })
 
       const prisonerProfile = TestData.prisonerProfile({
         visits: [upcomingVisit, pastVisit, cancelledVisit],
       })
 
       orchestrationApiClient.getPrisonerProfile.mockResolvedValue(prisonerProfile)
-      prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue([])
 
       const results = await prisonerProfileService.getProfile(prisonId, prisonerId, 'user')
 
@@ -158,7 +151,6 @@ describe('Prisoner profile service', () => {
       prisonerProfile.alerts = [inactiveAlert, alertNotToFlag, ...alertsToFlag]
 
       orchestrationApiClient.getPrisonerProfile.mockResolvedValue(prisonerProfile)
-      prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue([])
 
       const results = await prisonerProfileService.getProfile(prisonId, prisonerId, 'user')
 
