@@ -16,10 +16,10 @@ export default class RequestMethod {
       formValues.method = visitSessionData.requestMethod
     }
 
-    res.render('pages/requestMethod', {
+    res.render('pages/bookAVisit/requestMethod', {
       errors: req.flash('errors'),
       formValues,
-      requestMethods: requestMethodOptions,
+      requestMethodOptions,
       urlPrefix: getUrlPrefix(isUpdate, visitSessionData.visitReference),
     })
   }
