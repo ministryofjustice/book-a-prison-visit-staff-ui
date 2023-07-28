@@ -9,7 +9,6 @@ import {
   createMockPrisonApiClient,
   createMockPrisonerSearchClient,
 } from '../data/testutils/mocks'
-import { createMockSupportedPrisonsService } from './testutils/mocks'
 
 const token = 'some token'
 
@@ -18,7 +17,6 @@ describe('Prisoner profile service', () => {
   const orchestrationApiClient = createMockOrchestrationApiClient()
   const prisonApiClient = createMockPrisonApiClient()
   const prisonerSearchClient = createMockPrisonerSearchClient()
-  const supportedPrisonsService = createMockSupportedPrisonsService()
 
   let prisonerProfileService: PrisonerProfileService
 
@@ -47,12 +45,6 @@ describe('Prisoner profile service', () => {
   })
 
   describe('getProfile', () => {
-    const supportedPrisons = TestData.supportedPrisons()
-
-    beforeEach(() => {
-      supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
-    })
-
     it('should retrieve and process data for prisoner profile', async () => {
       const prisonerProfile = TestData.prisonerProfile()
       orchestrationApiClient.getPrisonerProfile.mockResolvedValue(prisonerProfile)
