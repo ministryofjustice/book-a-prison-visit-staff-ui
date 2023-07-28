@@ -441,8 +441,6 @@ export interface components {
       totalPages?: number
       /** Format: int64 */
       totalElements?: number
-      first?: boolean
-      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['VisitDto'][]
@@ -452,6 +450,8 @@ export interface components {
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
+      first?: boolean
+      last?: boolean
       empty?: boolean
     }
     PageableObject: {
@@ -732,7 +732,7 @@ export interface components {
       alerts?: components['schemas']['AlertDto'][]
       visitBalances?: components['schemas']['VisitBalancesDto']
       /** @description Past and future visits for the prisoner based on configured duration. */
-      visits: components['schemas']['VisitDto'][]
+      visits: components['schemas']['VisitSummaryDto'][]
     }
     /** @description Balances of visit orders and privilege visit orders */
     VisitBalancesDto: {
@@ -756,6 +756,78 @@ export interface components {
        * @description Date of last IEP adjustment for Privilege Visit orders
        */
       latestPrivIepAdjustDate?: string
+    }
+    /** @description Visit Summary */
+    VisitSummaryDto: {
+      /**
+       * @description Visit Reference
+       * @example v9-d7-ed-7u
+       */
+      reference: string
+      /**
+       * @description Prisoner Id
+       * @example AF34567G
+       */
+      prisonerId: string
+      /**
+       * @description Prison Id
+       * @example MDI
+       */
+      prisonId: string
+      /**
+       * @description Prison name
+       * @example MDI Prison
+       */
+      prisonName?: string
+      /**
+       * @description Visit Type
+       * @example SOCIAL
+       * @enum {string}
+       */
+      visitType: 'SOCIAL'
+      /**
+       * @description Visit Status
+       * @example RESERVED
+       * @enum {string}
+       */
+      visitStatus: 'RESERVED' | 'CHANGING' | 'BOOKED' | 'CANCELLED'
+      /**
+       * @description Visit Restriction
+       * @example OPEN
+       * @enum {string}
+       */
+      visitRestriction: 'OPEN' | 'CLOSED' | 'UNKNOWN'
+      /**
+       * Format: date-time
+       * @description The date and time of the visit
+       */
+      startTimestamp: string
+      /**
+       * Format: date-time
+       * @description The finishing date and time of the visit
+       */
+      endTimestamp: string
+      /** @description List of visitors associated with the visit */
+      visitors?: components['schemas']['VisitorSummaryDto'][]
+    }
+    /** @description Full Visitor details */
+    VisitorSummaryDto: {
+      /**
+       * Format: int64
+       * @description Person ID (nomis) of the visitor
+       * @example 1234
+       */
+      nomisPersonId: number
+      /**
+       * @description Visitor's first name
+       * @example John
+       */
+      firstName?: string
+      /**
+       * @description Visitor's last name
+       * @example Smith
+       */
+      lastName?: string
     }
   }
   responses: never

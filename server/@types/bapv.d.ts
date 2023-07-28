@@ -5,6 +5,7 @@ import {
   Visit,
   VisitorSupport,
   VisitSession,
+  VisitSummary,
 } from '../data/orchestrationApiTypes'
 
 export type Prison = {
@@ -50,8 +51,7 @@ export type PrisonerProfilePage = {
       nextPrivIepAdjustDate?: string
     }
   }
-  visitsByMonth: Map<string, { upcomingCount: number; pastCount: number; visits: Visit[] }>
-  contactNames: Record<number, string>
+  visitsByMonth: Map<string, { upcomingCount: number; pastCount: number; visits: VisitSummary[] }>
 }
 
 // Visit slots, for representing data derived from VisitSessions
