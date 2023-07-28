@@ -447,7 +447,7 @@ describe('/visit/:reference', () => {
       visit.visitNotes = [{ type: 'VISIT_OUTCOMES', text: 'no longer required' }]
       visitHistoryDetails.eventsAudit = [
         {
-          type: 'CANCELED_VISIT',
+          type: 'CANCELLED_VISIT',
           applicationMethodType: 'NOT_APPLICABLE',
           actionedBy: 'User Three',
           createTimestamp: '2022-01-01T11:00:00',
@@ -462,7 +462,7 @@ describe('/visit/:reference', () => {
           const $ = cheerio.load(res.text)
           expect($('[data-test="cancelled-visit-reason"]').text()).toContain('by the visitor')
           expect($('[data-test="cancelled-visit-reason"]').text()).toContain('no longer required')
-          expect($('[data-test="canceled_visit"]').text().trim().replace(/\s+/g, ' ')).toBe(
+          expect($('[data-test="cancelled_visit"]').text().trim().replace(/\s+/g, ' ')).toBe(
             'Saturday 1 January 2022 at 11am by User Three',
           )
         })

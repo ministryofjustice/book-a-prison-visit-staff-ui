@@ -411,7 +411,13 @@ export interface components {
        * @description The type of event
        * @enum {string}
        */
-      type: 'RESERVED_VISIT' | 'CHANGING_VISIT' | 'MIGRATED_VISIT' | 'BOOKED_VISIT' | 'UPDATED_VISIT' | 'CANCELED_VISIT'
+      type:
+        | 'RESERVED_VISIT'
+        | 'CHANGING_VISIT'
+        | 'MIGRATED_VISIT'
+        | 'BOOKED_VISIT'
+        | 'UPDATED_VISIT'
+        | 'CANCELLED_VISIT'
       /**
        * @description What was the application method for this event
        * @enum {string}
@@ -447,10 +453,10 @@ export interface components {
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject']
+      first?: boolean
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
-      first?: boolean
       last?: boolean
       empty?: boolean
     }
@@ -459,9 +465,9 @@ export interface components {
       offset?: number
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
-      pageNumber?: number
-      /** Format: int32 */
       pageSize?: number
+      /** Format: int32 */
+      pageNumber?: number
       paged?: boolean
       unpaged?: boolean
     }
