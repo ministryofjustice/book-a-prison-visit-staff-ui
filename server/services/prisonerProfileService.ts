@@ -3,13 +3,7 @@ import { format, isBefore } from 'date-fns'
 import { PrisonerProfilePage } from '../@types/bapv'
 import { nextIepAdjustDate, nextPrivIepAdjustDate, prisonerDateTimePretty, properCaseFullName } from '../utils/utils'
 import { Alert, OffenderRestriction } from '../data/prisonApiTypes'
-import {
-  HmppsAuthClient,
-  OrchestrationApiClient,
-  PrisonApiClient,
-  PrisonerContactRegistryApiClient,
-  RestClientBuilder,
-} from '../data'
+import { HmppsAuthClient, OrchestrationApiClient, PrisonApiClient, RestClientBuilder } from '../data'
 
 export default class PrisonerProfileService {
   private alertCodesToFlag = ['UPIU', 'RCDR', 'URCU']
@@ -17,7 +11,6 @@ export default class PrisonerProfileService {
   constructor(
     private readonly orchestrationApiClientFactory: RestClientBuilder<OrchestrationApiClient>,
     private readonly prisonApiClientFactory: RestClientBuilder<PrisonApiClient>,
-    private readonly prisonerContactRegistryApiClientFactory: RestClientBuilder<PrisonerContactRegistryApiClient>,
     private readonly hmppsAuthClient: HmppsAuthClient,
   ) {}
 
@@ -25,14 +18,6 @@ export default class PrisonerProfileService {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
     const prisonerProfile = await orchestrationApiClient.getPrisonerProfile(prisonId, prisonerId)
-
-    // To remove when VB-2060 done - build list of contact IDs => contact name
-    const prisonerContactRegistryApiClient = this.prisonerContactRegistryApiClientFactory(token)
-    const socialContacts = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(prisonerId)
-    const contactNames: Record<number, string> = {}
-    socialContacts.forEach(contact => {
-      contactNames[contact.personId] = `${contact.firstName} ${contact.lastName}`
-    })
 
     const alerts = prisonerProfile.alerts || []
     const activeAlerts: Alert[] = alerts.filter(alert => alert.active)
@@ -92,7 +77,6 @@ export default class PrisonerProfileService {
       flaggedAlerts,
       prisonerDetails,
       visitsByMonth,
-      contactNames,
     }
   }
 

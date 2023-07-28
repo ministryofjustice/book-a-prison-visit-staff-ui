@@ -88,7 +88,6 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
           nextPrivIepAdjustDate: '1 January 2022',
         },
       },
-      contactNames: {},
     }
 
     prisonerProfileService.getProfile.mockResolvedValue(prisonerProfile)
@@ -169,19 +168,31 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
       const fakeDateTime = '2023-03-01T09:00'
       jest.useFakeTimers({ advanceTimers: true, now: new Date(fakeDateTime) })
 
-      const upcomingVisit = TestData.visit({ startTimestamp: '2023-03-02T10:00', endTimestamp: '2023-03-02T11:00' })
-      const pastVisit = TestData.visit({ startTimestamp: '2023-02-03T10:00', endTimestamp: '2023-02-03T11:00' })
-      const cancelledVisit = TestData.visit({
+      const visitors = [
+        { nomisPersonId: 4321, firstName: 'Jeanette', lastName: 'Smith' },
+        { nomisPersonId: 4322, firstName: 'Bob', lastName: 'Smith' },
+      ]
+      const upcomingVisit = TestData.visitSummary({
+        startTimestamp: '2023-03-02T10:00',
+        endTimestamp: '2023-03-02T11:00',
+        visitors,
+      })
+      const pastVisit = TestData.visitSummary({
+        startTimestamp: '2023-02-03T10:00',
+        endTimestamp: '2023-02-03T11:00',
+        visitors,
+      })
+      const cancelledVisit = TestData.visitSummary({
         startTimestamp: '2023-02-03T10:00',
         endTimestamp: '2023-02-03T11:00',
         visitStatus: 'CANCELLED',
+        visitors,
       })
 
       prisonerProfile.visitsByMonth = new Map([
         ['March 2023', { upcomingCount: 1, pastCount: 0, visits: [upcomingVisit] }],
         ['February 2023', { upcomingCount: 0, pastCount: 1, visits: [pastVisit, cancelledVisit] }],
       ])
-      prisonerProfile.contactNames = { 4321: 'Jeanette Smith', 4322: 'Bob Smith' }
 
       return request(app)
         .get('/prisoner/A1234BC')

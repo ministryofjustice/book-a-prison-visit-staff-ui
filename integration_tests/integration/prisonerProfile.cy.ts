@@ -34,15 +34,17 @@ context('Prisoner profile page', () => {
         dateCreated: '2022-01-01',
       }),
     ]
-    const visit = TestData.visit()
-    const contacts = [TestData.contact(), TestData.contact({ personId: 4322, firstName: 'Bob' })]
-    const profile = TestData.prisonerProfile({ alerts, visits: [visit] })
+    const visitors = [
+      { nomisPersonId: 4321, firstName: 'Jeanette', lastName: 'Smith' },
+      { nomisPersonId: 4322, firstName: 'Bob', lastName: 'Smith' },
+    ]
+    const visitSummary = TestData.visitSummary({ visitors })
+    const profile = TestData.prisonerProfile({ alerts, visits: [visitSummary] })
 
     const { prisonerId } = profile
     const prisonId = 'HEI'
 
     // Prisoner profile page
-    cy.task('stubPrisonerSocialContacts', { offenderNo: prisonerId, contacts })
     cy.task('stubPrisonerProfile', { prisonId, prisonerId, profile })
 
     // Go to prisoner profile page
