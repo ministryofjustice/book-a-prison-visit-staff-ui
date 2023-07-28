@@ -3,7 +3,7 @@ import { EventAuditType } from '../data/orchestrationApiTypes'
 const eventAuditTypes: Partial<Record<EventAuditType, string>> = {
   BOOKED_VISIT: 'Visit booked',
   UPDATED_VISIT: 'Visit updated',
-  CANCELED_VISIT: 'Visit cancelled',
+  CANCELLED_VISIT: 'Visit cancelled',
   MIGRATED_VISIT: 'Visit migrated',
 }
 

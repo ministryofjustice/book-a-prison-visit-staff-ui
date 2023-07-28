@@ -67,5 +67,5 @@ export default class VisitDetailsPage extends Page {
 
   visitUpdated = (): PageElement => cy.get('[data-test="updated_visit"]')
 
-  visitCancelled = (): PageElement => cy.get('[data-test="canceled_visit"]')
+  visitCancelled = (): PageElement => cy.get('[data-test="cancelled_visit"]')
 }
