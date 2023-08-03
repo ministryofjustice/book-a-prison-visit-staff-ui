@@ -1,5 +1,12 @@
 import { OffenderRestriction } from '../data/prisonApiTypes'
-import { PrisonerProfile, Visit, VisitorSupport, VisitSession } from '../data/orchestrationApiTypes'
+import {
+  ApplicationMethodType,
+  PrisonerProfile,
+  Visit,
+  VisitorSupport,
+  VisitSession,
+  VisitSummary,
+} from '../data/orchestrationApiTypes'
 
 export type Prison = {
   prisonId: string
@@ -44,8 +51,7 @@ export type PrisonerProfilePage = {
       nextPrivIepAdjustDate?: string
     }
   }
-  visitsByMonth: Map<string, { upcomingCount: number; pastCount: number; visits: Visit[] }>
-  contactNames: Record<number, string>
+  visitsByMonth: Map<string, { upcomingCount: number; pastCount: number; visits: VisitSummary[] }>
 }
 
 // Visit slots, for representing data derived from VisitSessions
@@ -113,6 +119,7 @@ export type VisitSessionData = {
   applicationReference?: string
   visitReference?: string
   visitStatus?: Visit['visitStatus']
+  requestMethod?: ApplicationMethodType
 }
 
 export type VisitInformation = {

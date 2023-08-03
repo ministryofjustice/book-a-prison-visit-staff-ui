@@ -61,6 +61,14 @@ export interface paths {
     /** Recalls a prisoner into prison. TRANSFER_PRISONER role */
     put: operations['recallPrisoner_1']
   }
+  '/api/offenders/{offenderNo}/living-unit/{internalLocationDescription}': {
+    /**
+     * Move the prisoner to the specified cell.
+     * @description Unilink specific version of /api/bookings/{bookingId}/living-unit/{internalLocationDescription}.<br/>
+     *       Requires either a valid user token or a token with UNILINK role.
+     */
+    put: operations['moveToCellOrReception']
+  }
   '/api/offenders/{offenderNo}/discharge-to-hospital': {
     /** *** BETA *** Discharges a prisoner to hospital, requires the RELEASE_PRISONER role */
     put: operations['dischargePrisonerToHospital']
@@ -228,7 +236,26 @@ export interface paths {
   '/api/v1/prison/{prison_id}/offenders/{noms_id}/transactions': {
     /**
      * Post a financial transaction to NOMIS.
-     * @description The valid prison_id and type combinations are defined in the Nomis transaction_operations table which is maintained by the Maintain Transaction Operations screen (OCMTROPS), from the Financials Maintenance menu. Only those prisons (Caseloads) and Transaction types associated with the NOMISAPI module are valid.<br/>This will be setup by script intially as part of the deployment process as shown below<br/><br/><table><tr><th>Transaction Type</th><th>Description</th><th>Digital Prison</th><th>Non Digital Prison</th></tr><tr><td>CANT</td><td>Canteen Spend</td><td>Yes</td><td>No</td></tr><tr><td>REFND</td><td>Canteen Refund</td><td>Yes</td><td>No</td></tr><tr><td>PHONE</td><td>Phone Credit</td><td>Yes</td><td>No</td></tr><tr><td>MRPR</td><td>Misc Receipt - Private Cash</td><td>Yes</td><td>Yes</td></tr><tr><td>MTDS</td><td>Money through digital service</td><td>Yes</td><td>Yes</td></tr><tr><td>DTDS</td><td>Disbursement through Digital service</td><td>Yes</td><td>Yes</td></tr><tr><td>CASHD</td><td>Cash Disbursement</td><td>Yes</td><td>Yes</td></tr><tr><td>RELA</td><td>Money to Relatives</td><td>Yes</td><td>Yes</td></tr><tr><td>RELS</td><td>Money to Relatives- Spends</td><td>Yes</td><td>Yes</td></tr></table>Notes:<br/><ul><li>The sub_account the amount is debited or credited from will be determined by the transaction_type definition in NOMIS.</li><li>If the field X-Client-Name is present in the request header then the value is prepended to the client_unique_ref separated by a dash. When this API is invoked via the Nomis gateway this will already have been created by the gateway.</li><li>The client_unique_ref can have a maximum of 64 characters, only alphabetic, numeric, ‘-’ and ‘_’ characters are allowed</li></ul>
+     * @description The valid prison_id and type combinations are defined in the Nomis transaction_operations table which is maintained by the Maintain Transaction Operations screen (OCMTROPS), from the Financials Maintenance menu. Only those prisons (Caseloads) and Transaction types associated with the NOMISAPI module are valid.<br/>
+     * This will be setup by script intially as part of the deployment process as shown below<br/><br/>
+     * <table>
+     *   <tr><th>Transaction Type</th><th>Description</th><th>Digital Prison</th><th>Non Digital Prison</th></tr>
+     *   <tr><td>CANT</td><td>Canteen Spend</td><td>Yes</td><td>No</td></tr>
+     *   <tr><td>REFND</td><td>Canteen Refund</td><td>Yes</td><td>No</td></tr>
+     *   <tr><td>PHONE</td><td>Phone Credit</td><td>Yes</td><td>No</td></tr>
+     *   <tr><td>MRPR</td><td>Misc Receipt - Private Cash</td><td>Yes</td><td>Yes</td></tr>
+     *   <tr><td>MTDS</td><td>Money through digital service</td><td>Yes</td><td>Yes</td></tr>
+     *   <tr><td>DTDS</td><td>Disbursement through Digital service</td><td>Yes</td><td>Yes</td></tr>
+     *   <tr><td>CASHD</td><td>Cash Disbursement</td><td>Yes</td><td>Yes</td></tr>
+     *   <tr><td>RELA</td><td>Money to Relatives</td><td>Yes</td><td>Yes</td></tr>
+     *   <tr><td>RELS</td><td>Money to Relatives- Spends</td><td>Yes</td><td>Yes</td></tr>
+     * </table>Notes:<br/>
+     * <ul>
+     *   <li>The sub_account the amount is debited or credited from will be determined by the transaction_type definition in NOMIS.</li>
+     *   <li>If the field X-Client-Name is present in the request header then the value is prepended to the client_unique_ref separated by a dash. When this API is invoked via the Nomis gateway this will already have been created by the gateway.</li>
+     *   <li>The client_unique_ref can have a maximum of 64 characters, only alphabetic, numeric, ‘-’ and ‘_’ characters are allowed</li>
+     * </ul>
+     * Requires NOMIS_API_V1 or UNILINK role.
      */
     post: operations['createTransaction']
   }
@@ -236,13 +263,18 @@ export interface paths {
     /**
      * Store a payment for an offender account.
      * @description Pay events will be stored in a table on receipt by Nomis to be processed by a batch job scheduled to run after the last Nomis payroll batch job but before the advances and scheduled payments batch jobs.
-     * <br/>Possible payment types are:<br/><table><tr><td>A_EARN</td><td>Credit, Offender Payroll</td></tr><tr><td>ADJ</td><td>Debit, Adjudication Award</td></tr></table><br/>Example request:<br/>{
+     * <br/>Possible payment types are:<br/><table><tr><td>A_EARN</td><td>Credit, Offender Payroll</td></tr><tr><td>ADJ</td><td>Debit, Adjudication Award</td></tr></table><br/>Example request:<br/>
+     * <pre>
+     * {
      *   "type": "A_EARN",
      *   "description": "May earnings",
      *   "amount": 1,
      *   "client_transaction_id": "PAY-05-19"
-     * }<br/>The valid prison_id and type combinations are defined in the Nomis transaction_operations table which is maintained by the Maintain Transaction Operations screen (OCMTROPS), from the Financials Maintenance menu.
+     * }
+     * </pre>
+     * <br/>The valid prison_id and type combinations are defined in the Nomis transaction_operations table which is maintained by the Maintain Transaction Operations screen (OCMTROPS), from the Financials Maintenance menu.
      * Only those prisons (Caseloads) and Transaction types associated with the NOMISAPI module are valid.<br/>This will be setup by script intially as part of the deployment process as shown below<br/><br/>
+     * Requires NOMIS_API_V1 or UNILINK role.
      */
     post: operations['storePayment']
   }
@@ -404,7 +436,7 @@ export interface paths {
   }
   '/api/offender-assessments/csra/list': {
     /**
-     * Retrieves Offender CRSAs for multiple offenders - POST version to allow large offender lists.
+     * Retrieves Offender CSRAs for multiple offenders - POST version to allow large offender lists.
      * @description <p>This endpoint uses the REPLICA database.</p>
      */
     post: operations['postOffenderAssessmentsCsraList']
@@ -517,7 +549,7 @@ export interface paths {
      *     <li>If the field X-Client-Name is present in the request header then the value is prepended to the client_unique_ref separated by a dash</li>
      *     <li>The client_unique_ref can have a maximum of 64 characters, only alphabetic, numeric, ‘-’ and ‘_’ characters are allowed</li>
      *   </ul>
-     * <p>Requires role NOMIS_API_V1</p>
+     * <p>Requires role NOMIS_API_V1 or UNILINK</p>
      */
     post: operations['transferToSavings']
   }
@@ -745,7 +777,9 @@ export interface paths {
   '/api/v1/prison/{prison_id}/offenders/{noms_id}/transactions/{client_unique_ref}': {
     /**
      * Retrieve a single financial transaction using client unique ref.
-     * @description All transaction amounts are represented as pence values.<p>This endpoint uses the REPLICA database.</p>
+     * @description All transaction amounts are represented as pence values.<br/>
+     * Requires NOMIS_API_V1 or UNILINK role.
+     * <p>This endpoint uses the REPLICA database.</p>
      */
     get: operations['getTransactionByClientUniqueRef']
   }
@@ -759,14 +793,20 @@ export interface paths {
   '/api/v1/prison/{prison_id}/offenders/{noms_id}/accounts': {
     /**
      * Retrieve an offender's financial account balances.
-     * @description Returns balances for the offender’s three sub accounts (spends, savings and cash) at the specified prison.<br/>All balance values are represented as pence values.<p>This endpoint uses the REPLICA database.</p>
+     * @description Returns balances for the offender’s three sub accounts (spends, savings and cash) at the specified prison.<br/>
+     * All balance values are represented as pence values.<br/>
+     * Requires NOMIS_API_V1 or UNILINK role.
+     * <p>This endpoint uses the REPLICA database.</p>
      */
     get: operations['getAccountBalance']
   }
   '/api/v1/prison/{prison_id}/offenders/{noms_id}/accounts/{account_code}/transactions': {
     /**
      * Retrieve an offender's financial transaction history for cash, spends or savings.
-     * @description Transactions are returned in NOMIS ordee (Descending date followed by id).<br/>All transaction amounts are represented as pence values.<p>This endpoint uses the REPLICA database.</p>
+     * @description Transactions are returned in NOMIS ordee (Descending date followed by id).<br/>
+     * All transaction amounts are represented as pence values.<br/>
+     * Requires NOMIS_API_V1 or UNILINK role.
+     * <p>This endpoint uses the REPLICA database.</p>
      */
     get: operations['getAccountTransactions']
   }
@@ -774,14 +814,17 @@ export interface paths {
     /**
      * Deprecated - use the version without the trailing slash. Retrieve an offender's financial account balances.
      * @deprecated
-     * @description Returns balances for the offender’s three sub accounts (spends, savings and cash) at the specified prison.<br/>All balance values are represented as pence values.<p>This endpoint uses the REPLICA database.</p>
+     * @description Returns balances for the offender’s three sub accounts (spends, savings and cash) at the specified prison.<br/>
+     * All balance values are represented as pence values.<br/>
+     * Requires NOMIS_API_V1 or UNILINK role.
+     * <p>This endpoint uses the REPLICA database.</p>
      */
     get: operations['getAccountBalanceTrailingSlash']
   }
   '/api/v1/prison/{prison_id}/live_roll': {
     /**
      * Fetching live roll.
-     * @description <p>This endpoint uses the REPLICA database.</p>
+     * @description Requires NOMIS_API_V1 or UNILINK role.<p>This endpoint uses the REPLICA database.</p>
      */
     get: operations['getLiveRoll']
   }
@@ -816,7 +859,14 @@ export interface paths {
   '/api/v1/offenders/{noms_id}/pss_detail': {
     /**
      * Get the PSS detail by offender
-     * @description Returns the PSS detail information for the specified offender including personal data, warnings, sentence details and location information.<br/><ul><li>The 'type' field is always OFFENDER_DETAILS_REQUEST</li><br/><li>The field 'offender_details_request' contains a JSON block of data containing the offender data.</li></ul>The format of 'offender_details_request' is not specified here.<p>This endpoint uses the REPLICA database.</p>
+     * @description Returns the PSS detail information for the specified offender including personal data, warnings, sentence details and location information.<br/>
+     * <ul>
+     *   <li>The 'type' field is always OFFENDER_DETAILS_REQUEST</li>
+     *   <li>The field 'offender_details_request' contains a JSON block of data containing the offender data.</li>
+     * </ul>
+     * The format of 'offender_details_request' is not specified here.<br/>
+     * Requires NOMIS_API_V1 or UNILINK role.
+     * <p>This endpoint uses the REPLICA database.</p>
      */
     get: operations['getOffenderPssDetail']
   }
@@ -844,14 +894,35 @@ export interface paths {
   '/api/v1/offenders/{noms_id}/alerts': {
     /**
      * Fetch alerts by offender
-     * @description Returns all active alerts for the specified offender or those that meet the optional criteria. Active alerts are listed first, followed by inactive alerts, both sorted by ascending order of alert date.<br/><ul><li>if alert_type is specified then only alerts of that type are returned</li><li>if modified_since is specified then only those alerts created or modified on or after the specified date time. The following formats are supported: 2018-01-10, 2018-01-10 03:34, 2018-01-10 03:34:12, 2018-01-10 03:34:12.123</li><li>If include_inactive=true is specified then inactive alerts are also returned.</li></ul><p>This endpoint uses the REPLICA database.</p>
+     * @description Returns all active alerts for the specified offender or those that meet the optional criteria. Active alerts are listed first, followed by inactive alerts, both sorted by ascending order of alert date.<br/>
+     * <ul>
+     *   <li>if alert_type is specified then only alerts of that type are returned</li>
+     *   <li>if modified_since is specified then only those alerts created or modified on or after the specified date time. The following formats are supported: 2018-01-10, 2018-01-10 03:34, 2018-01-10 03:34:12, 2018-01-10 03:34:12.123</li>
+     *   <li>If include_inactive=true is specified then inactive alerts are also returned.</li>
+     * </ul>
+     * Requires NOMIS_API_V1 or UNILINK role.
+     * <p>This endpoint uses the REPLICA database.</p>
      */
     get: operations['getAlerts']
   }
   '/api/v1/offenders/events': {
     /**
      * Fetch events
-     * @description Returns all events that required to update the prisoner self service application. Currently these are:<ul><li>ALERT</li><li>DISCHARGE</li><li>IEP_CHANGED</li><li>INTERNAL_LOCATION_CHANGED</li><li>NOMS_ID_CHANGED</li><li>PERSONAL_DETAILS_CHANGED</li><li>PERSONAL_OFFICER_CHANGED</li><li>RECEPTION</li><li>SENTENCE_INFORMATION_CHANGED</li><li>BALANCE_UPDATE</li></ul><p>This endpoint uses the REPLICA database.</p>
+     * @description Returns all events that required to update the prisoner self service application. Currently these are:
+     * <ul>
+     *   <li>ALERT</li>
+     *   <li>DISCHARGE</li>
+     *   <li>IEP_CHANGED</li>
+     *   <li>INTERNAL_LOCATION_CHANGED</li>
+     *   <li>NOMS_ID_CHANGED</li>
+     *   <li>PERSONAL_DETAILS_CHANGED</li>
+     *   <li>PERSONAL_OFFICER_CHANGED</li>
+     *   <li>RECEPTION</li>
+     *   <li>SENTENCE_INFORMATION_CHANGED</li>
+     *   <li>BALANCE_UPDATE</li>
+     * </ul>
+     * Requires NOMIS_API_V1 or UNILINK role.
+     * <p>This endpoint uses the REPLICA database.</p>
      */
     get: operations['getOffenderEvents']
   }
@@ -1013,7 +1084,7 @@ export interface paths {
   '/api/prisoners/{offenderNo}': {
     /**
      * List of offenders globally matching the offenderNo.
-     * @description List of offenders globally matching the offenderNo.
+     * @description List of offenders globally matching the offenderNo, restricted by the VIEW_PRISONER_DATA or SYSTEM_USER role. Returns an empty array if no results are found or if does not have correct permissions
      */
     get: operations['getPrisonersOffenderNo']
   }
@@ -1021,17 +1092,22 @@ export interface paths {
     /** Status and core offender information */
     get: operations['getPrisonerInformationById']
   }
-  '/api/prisoners/by-establishment/{establishmentCode}': {
-    /** List of prisoners at a prison establishment */
-    get: operations['getPrisonerDetailAtLocation']
-  }
-  '/api/prisoners/at-location/{establishmentCode}': {
+  '/api/prisoners/prisoner-numbers': {
     /**
-     * List of prisoners at a prison establishment
-     * @deprecated
-     * @description Pagination In Headers
+     * Return a list of all unique prisoner numbers (also called NOMS ID or offenderNo).
+     *     Results are ordered by max(ROOT_OFFENDER_ID), therefore ensuring that new offenders are added to the end of the
+     *     results.
+     *     This is an internal endpoint used by Prisoner Search to ensure that NOMIS and OpenSearch are in sync.
+     *     Other services should use Prisoner Search instead to get the list of prisoners.
+     *     Requires PRISONER_INDEX role.
+     *
+     * @description <p>This endpoint uses the REPLICA database.</p>
      */
-    get: operations['getPrisonerDetailAtLocationOld']
+    get: operations['getPrisonerNumbers']
+  }
+  '/api/prison/{establishmentId}/booking/latest/calculable-sentence-envelope': {
+    /** Details of the active sentence envelope, a combination of the person information, the active booking and calculable sentences at a particular establishment */
+    get: operations['getCalculableSentenceEnvelopeByEstablishment']
   }
   '/api/persons/{personId}/phones': {
     /**
@@ -1100,7 +1176,8 @@ export interface paths {
   '/api/offenders/{offenderNo}/non-association-details': {
     /**
      * Gets the offender non-association details for a given offender for ALL bookings
-     * @description Get offender non-association details by offender No<p>This endpoint uses the REPLICA database.</p>
+     * @deprecated
+     * @description Do NOT use, please use Non-Associations API at https://non-associations-api.hmpps.service.justice.gov.uk/swagger-ui/index.html<p>This endpoint uses the REPLICA database.</p>
      */
     get: operations['getNonAssociationDetails']
   }
@@ -1182,7 +1259,10 @@ export interface paths {
     get: operations['getAdjudication']
   }
   '/api/offenders/{offenderNo}/addresses': {
-    /** Return a list of addresses for a given offender, most recent first. */
+    /**
+     * Return a list of addresses for a given offender, most recent first.
+     * @description <p>This endpoint uses the REPLICA database.</p>
+     */
     get: operations['getAddressesByOffenderNo']
   }
   '/api/offenders/next-sequence': {
@@ -1613,8 +1693,9 @@ export interface paths {
   }
   '/api/bookings/{bookingId}/non-association-details': {
     /**
-     * Gets the offender non-association details for a given booking
-     * @description Get offender non-association details<p>This endpoint uses the REPLICA database.</p>
+     * Gets the offender non-association details for a given booking (DEPRECATED)
+     * @deprecated
+     * @description Do not use this endpoint, calls should be made in the context of a prisoner, not their current booking<p>This endpoint uses the REPLICA database.</p>
      */
     get: operations['getNonAssociationDetails_1']
   }
@@ -1868,6 +1949,13 @@ export interface paths {
      * @description Delete appointment.
      */
     delete: operations['deleteAppointment']
+  }
+  '/api/agencies/{agencyId}/receptionsWithCapacity': {
+    /**
+     * List of receptions with capacity for agency.
+     * @description List of active receptions with capacity for agency.<p>This endpoint uses the REPLICA database.</p>
+     */
+    get: operations['getAgencyActiveReceptionsWithCapacity']
   }
   '/api/agencies/{agencyId}/pay-profile': {
     /**
@@ -2771,21 +2859,25 @@ export interface components {
       /**
        * Format: int32
        * @description Sentence length years.
+       * @example 1
        */
       years?: number
       /**
        * Format: int32
        * @description Sentence length months.
+       * @example 2
        */
       months?: number
       /**
        * Format: int32
        * @description Sentence length weeks.
+       * @example 3
        */
       weeks?: number
       /**
        * Format: int32
        * @description Sentence length days.
+       * @example 4
        */
       days?: number
       /** @description Whether this is a life sentence. */
@@ -3435,6 +3527,37 @@ export interface components {
        */
       imprisonmentStatus?: string
     }
+    /** @description Cell move result */
+    CellMoveResult: {
+      /**
+       * Format: int64
+       * @description Unique, numeric booking id.
+       * @example 1234134
+       */
+      bookingId: number
+      /**
+       * @description Identifier of agency that offender is associated with.
+       * @example MDI
+       */
+      agencyId: string
+      /**
+       * Format: int64
+       * @description Identifier of living unit (e.g. cell) that offender is assigned to.
+       * @example 123123
+       */
+      assignedLivingUnitId?: number
+      /**
+       * @description Description of living unit (e.g. cell) that offender is assigned to.
+       * @example MDI-1-1-3
+       */
+      assignedLivingUnitDesc?: string
+      /**
+       * Format: int32
+       * @description Bed assignment sequence associated with the entry created for this cell move
+       * @example 2
+       */
+      bedAssignmentHistorySequence?: number
+    }
     /** @description Request release of prisoner */
     RequestToDischargePrisoner: {
       /**
@@ -3863,37 +3986,6 @@ export interface components {
         | 'REMAND'
         | 'UNKNOWN'
         | 'OTHER'
-    }
-    /** @description Cell move result */
-    CellMoveResult: {
-      /**
-       * Format: int64
-       * @description Unique, numeric booking id.
-       * @example 1234134
-       */
-      bookingId: number
-      /**
-       * @description Identifier of agency that offender is associated with.
-       * @example MDI
-       */
-      agencyId: string
-      /**
-       * Format: int64
-       * @description Identifier of living unit (e.g. cell) that offender is assigned to.
-       * @example 123123
-       */
-      assignedLivingUnitId?: number
-      /**
-       * @description Description of living unit (e.g. cell) that offender is assigned to.
-       * @example MDI-1-1-3
-       */
-      assignedLivingUnitDesc?: string
-      /**
-       * Format: int32
-       * @description Bed assignment sequence associated with the entry created for this cell move
-       * @example 2
-       */
-      bedAssignmentHistorySequence?: number
     }
     /** @description The amendments for the scheduled court hearing. */
     CourtHearingDateAmendment: {
@@ -5182,6 +5274,12 @@ export interface components {
        * @example 2020-02-03
        */
       approvedParoleDate?: string
+      /**
+       * Format: date
+       * @description ROTL = Release on temporary licence date
+       * @example 2020-02-03
+       */
+      releaseOnTemporaryLicenceDate?: string
     }
     /** @description Update Offender Dates Request */
     RequestToUpdateOffenderDates: {
@@ -5318,6 +5416,9 @@ export interface components {
         | 'SCHEDULE_17A_PART_1'
         | 'SCHEDULE_17A_PART_2'
         | 'SCHEDULE_19ZA'
+        | 'PCSC_SDS'
+        | 'PCSC_SDS_PLUS'
+        | 'PCSC_SEC_250'
     }
     /** @description Create external movement */
     CreateExternalMovement: {
@@ -6846,6 +6947,8 @@ export interface components {
       /** @description User-friendly location description. */
       userDescription?: string
       internalLocationCode?: string
+      /** @description Indicates that sub locations exist for this location e.g. landings or cells */
+      subLocations?: boolean
     }
     /** @description Prisoner Photo */
     Image: {
@@ -7408,22 +7511,22 @@ export interface components {
        */
       establishmentName: string
     }
-    PagePrisonerInformation: {
+    PageString: {
       /** Format: int32 */
       totalPages?: number
       /** Format: int64 */
       totalElements?: number
       /** Format: int32 */
       size?: number
-      content?: components['schemas']['PrisonerInformation'][]
+      content?: string[]
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      last?: boolean
       pageable?: components['schemas']['PageableObject']
+      last?: boolean
       empty?: boolean
     }
     PageableObject: {
@@ -7441,6 +7544,569 @@ export interface components {
       empty?: boolean
       sorted?: boolean
       unsorted?: boolean
+    }
+    /** @description Sentence Adjustment values */
+    BookingAdjustment: {
+      /**
+       * @description Adjustment type
+       * @enum {string}
+       */
+      type?:
+        | 'SPECIAL_REMISSION'
+        | 'ADDITIONAL_DAYS_AWARDED'
+        | 'RESTORED_ADDITIONAL_DAYS_AWARDED'
+        | 'UNLAWFULLY_AT_LARGE'
+        | 'LAWFULLY_AT_LARGE'
+        | 'SPECIAL_REMISSION, ADDITIONAL_DAYS_AWARDED, RESTORED_ADDITIONAL_DAYS_AWARDED, UNLAWFULLY_AT_LARGE, LAWFULLY_AT_LARGE'
+      /**
+       * Format: int32
+       * @description Number of days to adjust
+       * @example 12
+       */
+      numberOfDays?: number
+      /**
+       * Format: date
+       * @description The 'from date' of the adjustment
+       * @example 2022-01-01
+       */
+      fromDate?: string
+      /**
+       * Format: date
+       * @description The 'to date' of the adjustment
+       * @example 2022-01-31
+       */
+      toDate?: string
+      /**
+       * @description Boolean flag showing if the adjustment is active
+       * @example true
+       */
+      active?: boolean
+    }
+    /** @description The active sentence envelope is a combination of the person information, the active booking and calculable sentences at a particular establishment */
+    CalculableSentenceEnvelope: {
+      person: components['schemas']['Person']
+      latestPrisonTerm?: components['schemas']['PrisonTerm']
+      /** @description Adjustments at a sentence level */
+      sentenceAdjustments: components['schemas']['SentenceAdjustmentValues'][]
+      /** @description Adjustments at a booking level */
+      bookingAdjustments: components['schemas']['BookingAdjustment'][]
+      /** @description List of offender fine payments */
+      offenderFinePayments: components['schemas']['OffenderFinePaymentDto'][]
+      fixedTermRecallDetails?: components['schemas']['FixedTermRecallDetails']
+    }
+    /** @description Court case details */
+    CourtSentences: {
+      /**
+       * @description The case information number
+       * @example TD20177010
+       */
+      caseInfoNumber?: string
+      /**
+       * Format: int64
+       * @description The case identifier (internal)
+       * @example 1
+       */
+      id?: number
+      /**
+       * Format: int32
+       * @description The case sequence number for the offender
+       * @example 1
+       */
+      caseSeq?: number
+      /**
+       * Format: date
+       * @description The begin date of the court hearings
+       * @example 2019-12-01
+       */
+      beginDate?: string
+      court?: components['schemas']['Agency']
+      /**
+       * @description The case type
+       * @example Adult
+       */
+      caseType?: string
+      /** @description The prefix of the case number */
+      caseInfoPrefix?: string
+      /**
+       * @description The case status
+       * @example ACTIVE
+       * @enum {string}
+       */
+      caseStatus?: 'ACTIVE' | 'CLOSED' | 'INACTIVE'
+      /** @description Court sentences associated with the court case */
+      sentences?: components['schemas']['SentencesOffencesTerms'][]
+      issuingCourt?: components['schemas']['Agency']
+      /**
+       * Format: date
+       * @description Issuing Court Date
+       */
+      issuingCourtDate?: string
+    }
+    /** @description Details relating to the fixed term recall on a booking */
+    FixedTermRecallDetails: {
+      /**
+       * Format: int64
+       * @description The booking id
+       */
+      bookingId?: number
+      /**
+       * Format: date
+       * @description The date the offender returned to custody
+       */
+      returnToCustodyDate?: string
+      /**
+       * Format: int32
+       * @description The length of the fixed term recall
+       */
+      recallLength?: number
+    }
+    /** @description Key Dates */
+    KeyDates: {
+      /**
+       * Format: date
+       * @description Sentence start date.
+       * @example 2010-02-03
+       */
+      sentenceStartDate: string
+      /**
+       * Format: date
+       * @description Effective sentence end date
+       * @example 2020-02-03
+       */
+      effectiveSentenceEndDate?: string
+      /**
+       * Format: int32
+       * @description ADA - days added to sentence term due to adjustments.
+       * @example 5
+       */
+      additionalDaysAwarded?: number
+      /**
+       * Format: date
+       * @description Release date for non-DTO sentence (if applicable). This will be based on one of ARD, CRD, NPD or PRRD.
+       * @example 2020-04-01
+       */
+      nonDtoReleaseDate?: string
+      /**
+       * @description Indicates which type of non-DTO release date is the effective release date. One of 'ARD', 'CRD', 'NPD' or 'PRRD'.
+       * @example CRD
+       * @enum {string}
+       */
+      nonDtoReleaseDateType: 'ARD' | 'CRD' | 'NPD' | 'PRRD'
+      /**
+       * Format: date
+       * @description Confirmed release date for offender.
+       * @example 2020-04-20
+       */
+      confirmedReleaseDate?: string
+      /**
+       * Format: date
+       * @description Confirmed, actual, approved, provisional or calculated release date for offender, according to offender release date algorithm.<h3>Algorithm</h3><ul><li>If there is a confirmed release date, the offender release date is the confirmed release date.</li><li>If there is no confirmed release date for the offender, the offender release date is either the actual parole date or the home detention curfew actual date.</li><li>If there is no confirmed release date, actual parole date or home detention curfew actual date for the offender, the release date is the later of the nonDtoReleaseDate or midTermDate value (if either or both are present)</li></ul>
+       * @example 2020-04-01
+       */
+      releaseDate?: string
+      /**
+       * Format: date
+       * @description SED - date on which sentence expires.
+       * @example 2020-02-03
+       */
+      sentenceExpiryDate?: string
+      /**
+       * Format: date
+       * @description ARD - calculated automatic (unconditional) release date for offender.
+       * @example 2020-02-03
+       */
+      automaticReleaseDate?: string
+      /**
+       * Format: date
+       * @description CRD - calculated conditional release date for offender.
+       * @example 2020-02-03
+       */
+      conditionalReleaseDate?: string
+      /**
+       * Format: date
+       * @description NPD - calculated non-parole date for offender (relating to the 1991 act).
+       * @example 2020-02-03
+       */
+      nonParoleDate?: string
+      /**
+       * Format: date
+       * @description PRRD - calculated post-recall release date for offender.
+       * @example 2020-02-03
+       */
+      postRecallReleaseDate?: string
+      /**
+       * Format: date
+       * @description LED - date on which offender licence expires.
+       * @example 2020-02-03
+       */
+      licenceExpiryDate?: string
+      /**
+       * Format: date
+       * @description HDCED - date on which offender will be eligible for home detention curfew.
+       * @example 2020-02-03
+       */
+      homeDetentionCurfewEligibilityDate?: string
+      /**
+       * Format: date
+       * @description PED - date on which offender is eligible for parole.
+       * @example 2020-02-03
+       */
+      paroleEligibilityDate?: string
+      /**
+       * Format: date
+       * @description HDCAD - the offender's actual home detention curfew date.
+       * @example 2020-02-03
+       */
+      homeDetentionCurfewActualDate?: string
+      /**
+       * Format: date
+       * @description APD - the offender's actual parole date.
+       * @example 2020-02-03
+       */
+      actualParoleDate?: string
+      /**
+       * Format: date
+       * @description ROTL - the date on which offender will be released on temporary licence.
+       * @example 2020-02-03
+       */
+      releaseOnTemporaryLicenceDate?: string
+      /**
+       * Format: date
+       * @description ERSED - the date on which offender will be eligible for early removal (under the Early Removal Scheme for foreign nationals).
+       * @example 2020-02-03
+       */
+      earlyRemovalSchemeEligibilityDate?: string
+      /**
+       * Format: date
+       * @description ETD - early term date for offender.
+       * @example 2020-02-03
+       */
+      earlyTermDate?: string
+      /**
+       * Format: date
+       * @description MTD - mid term date for offender.
+       * @example 2020-02-03
+       */
+      midTermDate?: string
+      /**
+       * Format: date
+       * @description LTD - late term date for offender.
+       * @example 2020-02-03
+       */
+      lateTermDate?: string
+      /**
+       * Format: date
+       * @description TUSED - top-up supervision expiry date for offender.
+       * @example 2020-02-03
+       */
+      topupSupervisionExpiryDate?: string
+      /**
+       * Format: date
+       * @description Date on which minimum term is reached for parole (indeterminate/life sentences).
+       * @example 2020-02-03
+       */
+      tariffDate?: string
+      /**
+       * Format: date
+       * @description DPRRD - Detention training order post recall release date
+       * @example 2020-02-03
+       */
+      dtoPostRecallReleaseDate?: string
+      /**
+       * Format: date
+       * @description TERSED - Tariff early removal scheme eligibility date
+       * @example 2020-02-03
+       */
+      tariffEarlyRemovalSchemeEligibilityDate?: string
+      /**
+       * Format: date
+       * @description Top-up supervision start date for offender - calculated as licence end date + 1 day or releaseDate if licence end date not set.
+       * @example 2019-04-01
+       */
+      topupSupervisionStartDate?: string
+      /**
+       * Format: date
+       * @description Offender's home detention curfew end date - calculated as one day before the releaseDate.
+       * @example 2019-04-01
+       */
+      homeDetentionCurfewEndDate?: string
+    }
+    /** @description Offender fine payments */
+    OffenderFinePaymentDto: {
+      /**
+       * Format: int64
+       * @description The bookingId this payment relates to
+       */
+      bookingId?: number
+      /**
+       * Format: int32
+       * @description Payment sequence - a unique identifier a payment on a booking
+       */
+      sequence?: number
+      /**
+       * Format: date
+       * @description The date of the payment
+       */
+      paymentDate?: string
+      /** @description The amount of the payment */
+      paymentAmount?: number
+    }
+    /** @description Offence details related to an offender */
+    OffenderOffence: {
+      /**
+       * Format: int64
+       * @description Internal ID for charge relating to offender
+       */
+      offenderChargeId?: number
+      /**
+       * Format: date
+       * @description Offence Start Date
+       */
+      offenceStartDate?: string
+      /**
+       * Format: date
+       * @description Offence End Date
+       */
+      offenceEndDate?: string
+      /** @description Offence Code */
+      offenceCode?: string
+      /** @description Offence Description */
+      offenceDescription?: string
+      /** @description Offence Indicators */
+      indicators?: string[]
+    }
+    /** @description The identifiers of a person necessary for a calculation */
+    Person: {
+      /**
+       * @description Prisoner Identifier
+       * @example A1234AA
+       */
+      prisonerNumber: string
+      /** Format: date */
+      dateOfBirth: string
+    }
+    /** @description Prison Term */
+    PrisonTerm: {
+      /**
+       * @description Book Number (Prison) / Prison Number (Probation)
+       * @example B45232
+       */
+      bookNumber: string
+      /**
+       * Format: int64
+       * @description Booking Identifier (internal)
+       * @example 12312312
+       */
+      bookingId: number
+      courtSentences?: components['schemas']['CourtSentences'][]
+      /** @description Licence sentences */
+      licenceSentences?: components['schemas']['SentencesOffencesTerms'][]
+      keyDates?: components['schemas']['KeyDates']
+      sentenceAdjustments?: components['schemas']['SentenceAdjustmentDetail']
+    }
+    /** @description Sentence adjustments */
+    SentenceAdjustmentDetail: {
+      /**
+       * Format: int32
+       * @description Number of additional days awarded
+       * @example 12
+       */
+      additionalDaysAwarded?: number
+      /**
+       * Format: int32
+       * @description Number unlawfully at large days
+       * @example 12
+       */
+      unlawfullyAtLarge?: number
+      /**
+       * Format: int32
+       * @description Number of lawfully at large days
+       * @example 12
+       */
+      lawfullyAtLarge?: number
+      /**
+       * Format: int32
+       * @description Number of restored additional days awarded
+       * @example 12
+       */
+      restoredAdditionalDaysAwarded?: number
+      /**
+       * Format: int32
+       * @description Number of special remission days
+       * @example 12
+       */
+      specialRemission?: number
+      /**
+       * Format: int32
+       * @description Number of recall sentence remand days
+       * @example 12
+       */
+      recallSentenceRemand?: number
+      /**
+       * Format: int32
+       * @description Number of recall sentence tagged bail days
+       * @example 12
+       */
+      recallSentenceTaggedBail?: number
+      /**
+       * Format: int32
+       * @description Number of remand days
+       * @example 12
+       */
+      remand?: number
+      /**
+       * Format: int32
+       * @description Number of tagged bail days
+       * @example 12
+       */
+      taggedBail?: number
+      /**
+       * Format: int32
+       * @description Number of unused remand days
+       * @example 12
+       */
+      unusedRemand?: number
+    }
+    /** @description Sentence Adjustment values */
+    SentenceAdjustmentValues: {
+      /**
+       * Format: int32
+       * @description Sentence sequence
+       * @example 1
+       */
+      sentenceSequence?: number
+      /**
+       * @description Adjustment type
+       * @enum {string}
+       */
+      type?: 'RECALL_SENTENCE_REMAND' | 'TAGGED_BAIL' | 'RECALL_SENTENCE_TAGGED_BAIL' | 'REMAND' | 'UNUSED_REMAND'
+      /**
+       * Format: int32
+       * @description Number of days to adjust
+       * @example 12
+       */
+      numberOfDays?: number
+      /**
+       * Format: date
+       * @description The 'from date' of the adjustment
+       * @example 2022-01-01
+       */
+      fromDate?: string
+      /**
+       * Format: date
+       * @description The 'to date' of the adjustment
+       * @example 2022-01-31
+       */
+      toDate?: string
+      /**
+       * @description Boolean flag showing if the adjustment is active
+       * @example true
+       */
+      active?: boolean
+    }
+    /** @description Offender sentence and offence details */
+    SentencesOffencesTerms: {
+      /**
+       * Format: int32
+       * @description Sentence sequence - a number representing the order
+       */
+      sentenceSequence?: number
+      /**
+       * Format: int32
+       * @description This sentence is consecutive to this sequence (if populated)
+       */
+      consecutiveToSequence?: number
+      /** @description This sentence status: A = Active I = Inactive */
+      sentenceStatus?: string
+      /** @description The sentence category e.g. 2003 or Licence */
+      sentenceCategory?: string
+      /** @description The sentence calculation type e.g. R or ADIMP_ORA */
+      sentenceCalculationType?: string
+      /** @description The sentence type description e.g. Standard Determinate Sentence */
+      sentenceTypeDescription?: string
+      /**
+       * Format: date
+       * @description The sentence start date for this sentence (aka court date)
+       */
+      sentenceStartDate?: string
+      /**
+       * Format: date
+       * @description The sentence end date for this sentence
+       */
+      sentenceEndDate?: string
+      /**
+       * Format: double
+       * @description Fine amount.
+       */
+      fineAmount: number
+      /**
+       * Format: int64
+       * @description Sentence line number
+       * @example 1
+       */
+      lineSeq: number
+      /** @description The offences related to this sentence (will usually only have one offence per sentence) */
+      offences?: components['schemas']['OffenderOffence'][]
+      /** @description The terms related to this sentence (will usually only have one term per sentence) */
+      terms?: components['schemas']['Terms'][]
+    }
+    /** @description Offender Sentence terms details for booking id */
+    Terms: {
+      /**
+       * Format: int32
+       * @description Sentence term number within sentence.
+       * @example 1
+       */
+      termSequence: number
+      /**
+       * Format: int32
+       * @description Sentence number which this sentence follows if consecutive, otherwise concurrent.
+       * @example 2
+       */
+      consecutiveTo?: number
+      /**
+       * @description Sentence type, using reference data from table SENTENCE_CALC_TYPES.
+       * @example 2
+       */
+      sentenceType?: string
+      /**
+       * @description Sentence term code.
+       * @example IMP
+       */
+      sentenceTermCode: string
+      /**
+       * @description Sentence type description.
+       * @example 2
+       */
+      sentenceTypeDescription?: string
+      /**
+       * Format: date
+       * @description Start date of sentence term.
+       * @example 2018-12-31
+       */
+      startDate: string
+      /**
+       * Format: int32
+       * @description Sentence length years.
+       */
+      years?: number
+      /**
+       * Format: int32
+       * @description Sentence length months.
+       */
+      months?: number
+      /**
+       * Format: int32
+       * @description Sentence length weeks.
+       */
+      weeks?: number
+      /**
+       * Format: int32
+       * @description Sentence length days.
+       */
+      days?: number
+      /** @description Whether this is a life sentence. */
+      lifeSentence: boolean
     }
     /** @description PersonIdentifier */
     PersonIdentifier: {
@@ -8313,331 +8979,6 @@ export interface components {
       /** @description true if applied globally to the contact or false if applied in the context of a visit */
       globalRestriction: boolean
     }
-    /** @description Court case details */
-    CourtSentences: {
-      /**
-       * @description The case information number
-       * @example TD20177010
-       */
-      caseInfoNumber?: string
-      /**
-       * Format: int64
-       * @description The case identifier (internal)
-       * @example 1
-       */
-      id?: number
-      /**
-       * Format: int32
-       * @description The case sequence number for the offender
-       * @example 1
-       */
-      caseSeq?: number
-      /**
-       * Format: date
-       * @description The begin date of the court hearings
-       * @example 2019-12-01
-       */
-      beginDate?: string
-      court?: components['schemas']['Agency']
-      /**
-       * @description The case type
-       * @example Adult
-       */
-      caseType?: string
-      /** @description The prefix of the case number */
-      caseInfoPrefix?: string
-      /**
-       * @description The case status
-       * @example ACTIVE
-       * @enum {string}
-       */
-      caseStatus?: 'ACTIVE' | 'CLOSED' | 'INACTIVE'
-      /** @description Court sentences associated with the court case */
-      sentences?: components['schemas']['SentencesOffencesTerms'][]
-      issuingCourt?: components['schemas']['Agency']
-      /**
-       * Format: date
-       * @description Issuing Court Date
-       */
-      issuingCourtDate?: string
-    }
-    /** @description Key Dates */
-    KeyDates: {
-      /**
-       * Format: date
-       * @description Sentence start date.
-       * @example 2010-02-03
-       */
-      sentenceStartDate: string
-      /**
-       * Format: date
-       * @description Effective sentence end date
-       * @example 2020-02-03
-       */
-      effectiveSentenceEndDate?: string
-      /**
-       * Format: int32
-       * @description ADA - days added to sentence term due to adjustments.
-       * @example 5
-       */
-      additionalDaysAwarded?: number
-      /**
-       * Format: date
-       * @description Release date for non-DTO sentence (if applicable). This will be based on one of ARD, CRD, NPD or PRRD.
-       * @example 2020-04-01
-       */
-      nonDtoReleaseDate?: string
-      /**
-       * @description Indicates which type of non-DTO release date is the effective release date. One of 'ARD', 'CRD', 'NPD' or 'PRRD'.
-       * @example CRD
-       * @enum {string}
-       */
-      nonDtoReleaseDateType: 'ARD' | 'CRD' | 'NPD' | 'PRRD'
-      /**
-       * Format: date
-       * @description Confirmed release date for offender.
-       * @example 2020-04-20
-       */
-      confirmedReleaseDate?: string
-      /**
-       * Format: date
-       * @description Confirmed, actual, approved, provisional or calculated release date for offender, according to offender release date algorithm.<h3>Algorithm</h3><ul><li>If there is a confirmed release date, the offender release date is the confirmed release date.</li><li>If there is no confirmed release date for the offender, the offender release date is either the actual parole date or the home detention curfew actual date.</li><li>If there is no confirmed release date, actual parole date or home detention curfew actual date for the offender, the release date is the later of the nonDtoReleaseDate or midTermDate value (if either or both are present)</li></ul>
-       * @example 2020-04-01
-       */
-      releaseDate?: string
-      /**
-       * Format: date
-       * @description SED - date on which sentence expires.
-       * @example 2020-02-03
-       */
-      sentenceExpiryDate?: string
-      /**
-       * Format: date
-       * @description ARD - calculated automatic (unconditional) release date for offender.
-       * @example 2020-02-03
-       */
-      automaticReleaseDate?: string
-      /**
-       * Format: date
-       * @description CRD - calculated conditional release date for offender.
-       * @example 2020-02-03
-       */
-      conditionalReleaseDate?: string
-      /**
-       * Format: date
-       * @description NPD - calculated non-parole date for offender (relating to the 1991 act).
-       * @example 2020-02-03
-       */
-      nonParoleDate?: string
-      /**
-       * Format: date
-       * @description PRRD - calculated post-recall release date for offender.
-       * @example 2020-02-03
-       */
-      postRecallReleaseDate?: string
-      /**
-       * Format: date
-       * @description LED - date on which offender licence expires.
-       * @example 2020-02-03
-       */
-      licenceExpiryDate?: string
-      /**
-       * Format: date
-       * @description HDCED - date on which offender will be eligible for home detention curfew.
-       * @example 2020-02-03
-       */
-      homeDetentionCurfewEligibilityDate?: string
-      /**
-       * Format: date
-       * @description PED - date on which offender is eligible for parole.
-       * @example 2020-02-03
-       */
-      paroleEligibilityDate?: string
-      /**
-       * Format: date
-       * @description HDCAD - the offender's actual home detention curfew date.
-       * @example 2020-02-03
-       */
-      homeDetentionCurfewActualDate?: string
-      /**
-       * Format: date
-       * @description APD - the offender's actual parole date.
-       * @example 2020-02-03
-       */
-      actualParoleDate?: string
-      /**
-       * Format: date
-       * @description ROTL - the date on which offender will be released on temporary licence.
-       * @example 2020-02-03
-       */
-      releaseOnTemporaryLicenceDate?: string
-      /**
-       * Format: date
-       * @description ERSED - the date on which offender will be eligible for early removal (under the Early Removal Scheme for foreign nationals).
-       * @example 2020-02-03
-       */
-      earlyRemovalSchemeEligibilityDate?: string
-      /**
-       * Format: date
-       * @description ETD - early term date for offender.
-       * @example 2020-02-03
-       */
-      earlyTermDate?: string
-      /**
-       * Format: date
-       * @description MTD - mid term date for offender.
-       * @example 2020-02-03
-       */
-      midTermDate?: string
-      /**
-       * Format: date
-       * @description LTD - late term date for offender.
-       * @example 2020-02-03
-       */
-      lateTermDate?: string
-      /**
-       * Format: date
-       * @description TUSED - top-up supervision expiry date for offender.
-       * @example 2020-02-03
-       */
-      topupSupervisionExpiryDate?: string
-      /**
-       * Format: date
-       * @description Date on which minimum term is reached for parole (indeterminate/life sentences).
-       * @example 2020-02-03
-       */
-      tariffDate?: string
-      /**
-       * Format: date
-       * @description DPRRD - Detention training order post recall release date
-       * @example 2020-02-03
-       */
-      dtoPostRecallReleaseDate?: string
-      /**
-       * Format: date
-       * @description TERSED - Tariff early removal scheme eligibility date
-       * @example 2020-02-03
-       */
-      tariffEarlyRemovalSchemeEligibilityDate?: string
-      /**
-       * Format: date
-       * @description Top-up supervision start date for offender - calculated as licence end date + 1 day or releaseDate if licence end date not set.
-       * @example 2019-04-01
-       */
-      topupSupervisionStartDate?: string
-      /**
-       * Format: date
-       * @description Offender's home detention curfew end date - calculated as one day before the releaseDate.
-       * @example 2019-04-01
-       */
-      homeDetentionCurfewEndDate?: string
-    }
-    /** @description Offence details related to an offender */
-    OffenderOffence: {
-      /**
-       * Format: int64
-       * @description Internal ID for charge relating to offender
-       */
-      offenderChargeId?: number
-      /**
-       * Format: date
-       * @description Offence Start Date
-       */
-      offenceStartDate?: string
-      /**
-       * Format: date
-       * @description Offence End Date
-       */
-      offenceEndDate?: string
-      /** @description Offence Code */
-      offenceCode?: string
-      /** @description Offence Description */
-      offenceDescription?: string
-      /** @description Offence Indicators */
-      indicators?: string[]
-    }
-    /** @description Prison Term */
-    PrisonTerm: {
-      /**
-       * @description Book Number (Prison) / Prison Number (Probation)
-       * @example B45232
-       */
-      bookNumber: string
-      /**
-       * Format: int64
-       * @description Booking Identifier (internal)
-       * @example 12312312
-       */
-      bookingId: number
-      courtSentences?: components['schemas']['CourtSentences'][]
-      /** @description Licence sentences */
-      licenceSentences?: components['schemas']['SentencesOffencesTerms'][]
-      keyDates?: components['schemas']['KeyDates']
-      sentenceAdjustments?: components['schemas']['SentenceAdjustmentDetail']
-    }
-    /** @description Sentence adjustments */
-    SentenceAdjustmentDetail: {
-      /**
-       * Format: int32
-       * @description Number of additional days awarded
-       * @example 12
-       */
-      additionalDaysAwarded?: number
-      /**
-       * Format: int32
-       * @description Number unlawfully at large days
-       * @example 12
-       */
-      unlawfullyAtLarge?: number
-      /**
-       * Format: int32
-       * @description Number of lawfully at large days
-       * @example 12
-       */
-      lawfullyAtLarge?: number
-      /**
-       * Format: int32
-       * @description Number of restored additional days awarded
-       * @example 12
-       */
-      restoredAdditionalDaysAwarded?: number
-      /**
-       * Format: int32
-       * @description Number of special remission days
-       * @example 12
-       */
-      specialRemission?: number
-      /**
-       * Format: int32
-       * @description Number of recall sentence remand days
-       * @example 12
-       */
-      recallSentenceRemand?: number
-      /**
-       * Format: int32
-       * @description Number of recall sentence tagged bail days
-       * @example 12
-       */
-      recallSentenceTaggedBail?: number
-      /**
-       * Format: int32
-       * @description Number of remand days
-       * @example 12
-       */
-      remand?: number
-      /**
-       * Format: int32
-       * @description Number of tagged bail days
-       * @example 12
-       */
-      taggedBail?: number
-      /**
-       * Format: int32
-       * @description Number of unused remand days
-       * @example 12
-       */
-      unusedRemand?: number
-    }
     /** @description Sentence Summary */
     SentenceSummary: {
       /**
@@ -8646,112 +8987,6 @@ export interface components {
        */
       prisonerNumber: string
       latestPrisonTerm?: components['schemas']['PrisonTerm']
-      /** @description Other prison terms */
-      previousPrisonTerms?: components['schemas']['PrisonTerm'][]
-    }
-    /** @description Offender sentence and offence details */
-    SentencesOffencesTerms: {
-      /**
-       * Format: int32
-       * @description Sentence sequence - a number representing the order
-       */
-      sentenceSequence?: number
-      /**
-       * Format: int32
-       * @description This sentence is consecutive to this sequence (if populated)
-       */
-      consecutiveToSequence?: number
-      /** @description This sentence status: A = Active I = Inactive */
-      sentenceStatus?: string
-      /** @description The sentence category e.g. 2003 or Licence */
-      sentenceCategory?: string
-      /** @description The sentence calculation type e.g. R or ADIMP_ORA */
-      sentenceCalculationType?: string
-      /** @description The sentence type description e.g. Standard Determinate Sentence */
-      sentenceTypeDescription?: string
-      /**
-       * Format: date
-       * @description The sentence start date for this sentence (aka court date)
-       */
-      sentenceStartDate?: string
-      /**
-       * Format: date
-       * @description The sentence end date for this sentence
-       */
-      sentenceEndDate?: string
-      /**
-       * Format: double
-       * @description Fine amount.
-       */
-      fineAmount: number
-      /**
-       * Format: int64
-       * @description Sentence line number
-       * @example 1
-       */
-      lineSeq: number
-      /** @description The offences related to this sentence (will usually only have one offence per sentence) */
-      offences?: components['schemas']['OffenderOffence'][]
-      /** @description The terms related to this sentence (will usually only have one term per sentence) */
-      terms?: components['schemas']['Terms'][]
-    }
-    /** @description Offender Sentence terms details for booking id */
-    Terms: {
-      /**
-       * Format: int32
-       * @description Sentence term number within sentence.
-       * @example 1
-       */
-      termSequence: number
-      /**
-       * Format: int32
-       * @description Sentence number which this sentence follows if consecutive, otherwise concurrent.
-       * @example 2
-       */
-      consecutiveTo?: number
-      /**
-       * @description Sentence type, using reference data from table SENTENCE_CALC_TYPES.
-       * @example 2
-       */
-      sentenceType?: string
-      /**
-       * @description Sentence term code.
-       * @example IMP
-       */
-      sentenceTermCode: string
-      /**
-       * @description Sentence type description.
-       * @example 2
-       */
-      sentenceTypeDescription?: string
-      /**
-       * Format: date
-       * @description Start date of sentence term.
-       * @example 2018-12-31
-       */
-      startDate: string
-      /**
-       * Format: int32
-       * @description Sentence length years.
-       */
-      years?: number
-      /**
-       * Format: int32
-       * @description Sentence length months.
-       */
-      months?: number
-      /**
-       * Format: int32
-       * @description Sentence length weeks.
-       */
-      weeks?: number
-      /**
-       * Format: int32
-       * @description Sentence length days.
-       */
-      days?: number
-      /** @description Whether this is a life sentence. */
-      lifeSentence: boolean
     }
     /** @description An overview of an adjudication */
     Adjudication: {
@@ -9252,21 +9487,25 @@ export interface components {
       /**
        * Format: int32
        * @description The term duration - years
+       * @example 1
        */
       years?: number
       /**
        * Format: int32
        * @description The term duration - months
+       * @example 2
        */
       months?: number
       /**
        * Format: int32
        * @description The term duration - weeks
+       * @example 3
        */
       weeks?: number
       /**
        * Format: int32
        * @description The term duration - days
+       * @example 4
        */
       days?: number
       /** @description The sentence term code, indicating if this is the term of imprisonment or license */
@@ -9301,26 +9540,6 @@ export interface components {
       internalLocationId?: string
       /** @description Internal location description (if known) */
       internalLocationDesc?: string
-    }
-    /** @description Offender fine payments */
-    OffenderFinePaymentDto: {
-      /**
-       * Format: int64
-       * @description The bookingId this payment relates to
-       */
-      bookingId?: number
-      /**
-       * Format: int32
-       * @description Payment sequence - a unique identifier a payment on a booking
-       */
-      sequence?: number
-      /**
-       * Format: date
-       * @description The date of the payment
-       */
-      paymentDate?: string
-      /** @description The amount of the payment */
-      paymentAmount?: number
     }
     /** @description AssessmentSummary */
     AssessmentSummary: {
@@ -9501,8 +9720,8 @@ export interface components {
       first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      last?: boolean
       pageable?: components['schemas']['PageableObject']
+      last?: boolean
       empty?: boolean
     }
     Pageable: {
@@ -10198,8 +10417,8 @@ export interface components {
       first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      last?: boolean
       pageable?: components['schemas']['PageableObject']
+      last?: boolean
       empty?: boolean
     }
     /** @description Offender Employment */
@@ -10305,8 +10524,8 @@ export interface components {
       first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      last?: boolean
       pageable?: components['schemas']['PageableObject']
+      last?: boolean
       empty?: boolean
     }
     PageEducation: {
@@ -10323,8 +10542,8 @@ export interface components {
       first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      last?: boolean
       pageable?: components['schemas']['PageableObject']
+      last?: boolean
       empty?: boolean
     }
     /** @description A charge linked to a court date */
@@ -10581,8 +10800,8 @@ export interface components {
       first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      last?: boolean
       pageable?: components['schemas']['PageableObject']
+      last?: boolean
       empty?: boolean
     }
     /** @description Visit details */
@@ -10770,24 +10989,6 @@ export interface components {
        */
       containerType?: string
     }
-    /** @description Details relating to the fixed term recall on a booking */
-    FixedTermRecallDetails: {
-      /**
-       * Format: int64
-       * @description The booking id
-       */
-      bookingId?: number
-      /**
-       * Format: date
-       * @description The date the offender returned to custody
-       */
-      returnToCustodyDate?: string
-      /**
-       * Format: int32
-       * @description The length of the fixed term recall
-       */
-      recallLength?: number
-    }
     /** @description Represents court hearings for an offender booking. */
     CourtHearings: {
       hearings?: components['schemas']['CourtHearing'][]
@@ -10855,8 +11056,8 @@ export interface components {
       first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      last?: boolean
       pageable?: components['schemas']['PageableObject']
+      last?: boolean
       empty?: boolean
     }
     /** @description Case Note Count Detail */
@@ -10913,8 +11114,8 @@ export interface components {
       first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      last?: boolean
       pageable?: components['schemas']['PageableObject']
+      last?: boolean
       empty?: boolean
     }
     /** @description Adjudication Summary for offender */
@@ -10991,8 +11192,8 @@ export interface components {
       first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      last?: boolean
       pageable?: components['schemas']['PageableObject']
+      last?: boolean
       empty?: boolean
     }
     /** @description Prisoner Booking Summary */
@@ -11301,86 +11502,12 @@ export interface components {
       /** @description List of Address details */
       addresses: components['schemas']['AddressDto'][]
     }
-    /** @description Sentence Adjustment values */
-    BookingAdjustment: {
-      /**
-       * @description Adjustment type
-       * @enum {string}
-       */
-      type?:
-        | 'SPECIAL_REMISSION'
-        | 'ADDITIONAL_DAYS_AWARDED'
-        | 'RESTORED_ADDITIONAL_DAYS_AWARDED'
-        | 'UNLAWFULLY_AT_LARGE'
-        | 'LAWFULLY_AT_LARGE'
-        | 'SPECIAL_REMISSION, ADDITIONAL_DAYS_AWARDED, RESTORED_ADDITIONAL_DAYS_AWARDED, UNLAWFULLY_AT_LARGE, LAWFULLY_AT_LARGE'
-      /**
-       * Format: int32
-       * @description Number of days to adjust
-       * @example 12
-       */
-      numberOfDays?: number
-      /**
-       * Format: date
-       * @description The 'from date' of the adjustment
-       * @example 2022-01-01
-       */
-      fromDate?: string
-      /**
-       * Format: date
-       * @description The 'to date' of the adjustment
-       * @example 2022-01-31
-       */
-      toDate?: string
-      /**
-       * @description Boolean flag showing if the adjustment is active
-       * @example true
-       */
-      active?: boolean
-    }
     /** @description Adjustments associated at a booking level and a sentence level */
     BookingAndSentenceAdjustments: {
       /** @description Adjustments associated at a sentence level (of type RECALL_SENTENCE_REMAND, TAGGED_BAIL, RECALL_SENTENCE_TAGGED_BAIL, REMAND or UNUSED_REMAND) */
       sentenceAdjustments?: components['schemas']['SentenceAdjustmentValues'][]
       /** @description Adjustments associated at a booking level (of type SPECIAL_REMISSION, ADDITIONAL_DAYS_AWARDED, RESTORED_ADDITIONAL_DAYS_AWARDED, UNLAWFULLY_AT_LARGE, LAWFULLY_AT_LARGE) */
       bookingAdjustments?: components['schemas']['BookingAdjustment'][]
-    }
-    /** @description Sentence Adjustment values */
-    SentenceAdjustmentValues: {
-      /**
-       * Format: int32
-       * @description Sentence sequence
-       * @example 1
-       */
-      sentenceSequence?: number
-      /**
-       * @description Adjustment type
-       * @enum {string}
-       */
-      type?: 'RECALL_SENTENCE_REMAND' | 'TAGGED_BAIL' | 'RECALL_SENTENCE_TAGGED_BAIL' | 'REMAND' | 'UNUSED_REMAND'
-      /**
-       * Format: int32
-       * @description Number of days to adjust
-       * @example 12
-       */
-      numberOfDays?: number
-      /**
-       * Format: date
-       * @description The 'from date' of the adjustment
-       * @example 2022-01-01
-       */
-      fromDate?: string
-      /**
-       * Format: date
-       * @description The 'to date' of the adjustment
-       * @example 2022-01-31
-       */
-      toDate?: string
-      /**
-       * @description Boolean flag showing if the adjustment is active
-       * @example true
-       */
-      active?: boolean
     }
   }
   responses: never
@@ -11916,6 +12043,65 @@ export interface operations {
       }
     }
   }
+  /**
+   * Move the prisoner to the specified cell.
+   * @description Unilink specific version of /api/bookings/{bookingId}/living-unit/{internalLocationDescription}.<br/>
+   *       Requires either a valid user token or a token with UNILINK role.
+   */
+  moveToCellOrReception: {
+    parameters: {
+      query: {
+        /**
+         * @description The reason code for the move (from reason code domain CHG_HOUS_RSN)
+         * @example ADM
+         */
+        reasonCode: string
+        /**
+         * @description The date / time of the move (defaults to current)
+         * @example 2020-03-24T12:13:40
+         */
+        dateTime?: string
+      }
+      path: {
+        /**
+         * @description Offender No
+         * @example A1234AA
+         */
+        offenderNo: string
+        /**
+         * @description The cell location the offender has been moved to
+         * @example MDI-1-1
+         */
+        internalLocationDescription: string
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          'application/json': components['schemas']['CellMoveResult']
+        }
+      }
+      /** @description Invalid request. */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Requested resource not found. */
+      404: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unrecoverable error occurred whilst processing request. */
+      500: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
   /** *** BETA *** Discharges a prisoner to hospital, requires the RELEASE_PRISONER role */
   dischargePrisonerToHospital: {
     parameters: {
@@ -12084,6 +12270,12 @@ export interface operations {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
+      /** @description Curfew or HDC status in use for this booking id (possibly in P-Nomis). */
+      423: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
     }
   }
   /** Clear the HDC checks passed flag */
@@ -12104,6 +12296,12 @@ export interface operations {
       }
       /** @description Requested resource not found. */
       404: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Curfew or HDC status in use for this booking id (possibly in P-Nomis). */
+      423: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
@@ -12137,6 +12335,12 @@ export interface operations {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
+      /** @description Curfew or HDC status in use for this booking id (possibly in P-Nomis). */
+      423: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
     }
   }
   /** Clear the HDC approval status */
@@ -12157,6 +12361,12 @@ export interface operations {
       }
       /** @description Requested resource not found. */
       404: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Curfew or HDC status in use for this booking id (possibly in P-Nomis). */
+      423: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
@@ -12577,6 +12787,13 @@ export interface operations {
   /** Update an alert */
   updateAlert: {
     parameters: {
+      query?: {
+        /**
+         * @description Whether to timeout if locked
+         * @example true
+         */
+        lockTimeout?: boolean
+      }
       path: {
         /** @description bookingId */
         bookingId: number
@@ -12608,6 +12825,12 @@ export interface operations {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
+      /** @description Record in use for this booking id (possibly in P-Nomis). */
+      423: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
       /** @description Unrecoverable error occurred whilst processing request. */
       500: {
         content: {
@@ -12622,6 +12845,13 @@ export interface operations {
    */
   updateAttendance: {
     parameters: {
+      query?: {
+        /**
+         * @description Whether to timeout if locked
+         * @example true
+         */
+        lockTimeout?: boolean
+      }
       path: {
         /**
          * @description The booking Id of the prisoner
@@ -12657,6 +12887,12 @@ export interface operations {
       }
       /** @description Resource not found - booking or event does not exist or is not accessible to user. */
       404: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Record in use for this booking id (possibly in P-Nomis). */
+      423: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
@@ -13056,7 +13292,26 @@ export interface operations {
   }
   /**
    * Post a financial transaction to NOMIS.
-   * @description The valid prison_id and type combinations are defined in the Nomis transaction_operations table which is maintained by the Maintain Transaction Operations screen (OCMTROPS), from the Financials Maintenance menu. Only those prisons (Caseloads) and Transaction types associated with the NOMISAPI module are valid.<br/>This will be setup by script intially as part of the deployment process as shown below<br/><br/><table><tr><th>Transaction Type</th><th>Description</th><th>Digital Prison</th><th>Non Digital Prison</th></tr><tr><td>CANT</td><td>Canteen Spend</td><td>Yes</td><td>No</td></tr><tr><td>REFND</td><td>Canteen Refund</td><td>Yes</td><td>No</td></tr><tr><td>PHONE</td><td>Phone Credit</td><td>Yes</td><td>No</td></tr><tr><td>MRPR</td><td>Misc Receipt - Private Cash</td><td>Yes</td><td>Yes</td></tr><tr><td>MTDS</td><td>Money through digital service</td><td>Yes</td><td>Yes</td></tr><tr><td>DTDS</td><td>Disbursement through Digital service</td><td>Yes</td><td>Yes</td></tr><tr><td>CASHD</td><td>Cash Disbursement</td><td>Yes</td><td>Yes</td></tr><tr><td>RELA</td><td>Money to Relatives</td><td>Yes</td><td>Yes</td></tr><tr><td>RELS</td><td>Money to Relatives- Spends</td><td>Yes</td><td>Yes</td></tr></table>Notes:<br/><ul><li>The sub_account the amount is debited or credited from will be determined by the transaction_type definition in NOMIS.</li><li>If the field X-Client-Name is present in the request header then the value is prepended to the client_unique_ref separated by a dash. When this API is invoked via the Nomis gateway this will already have been created by the gateway.</li><li>The client_unique_ref can have a maximum of 64 characters, only alphabetic, numeric, ‘-’ and ‘_’ characters are allowed</li></ul>
+   * @description The valid prison_id and type combinations are defined in the Nomis transaction_operations table which is maintained by the Maintain Transaction Operations screen (OCMTROPS), from the Financials Maintenance menu. Only those prisons (Caseloads) and Transaction types associated with the NOMISAPI module are valid.<br/>
+   * This will be setup by script intially as part of the deployment process as shown below<br/><br/>
+   * <table>
+   *   <tr><th>Transaction Type</th><th>Description</th><th>Digital Prison</th><th>Non Digital Prison</th></tr>
+   *   <tr><td>CANT</td><td>Canteen Spend</td><td>Yes</td><td>No</td></tr>
+   *   <tr><td>REFND</td><td>Canteen Refund</td><td>Yes</td><td>No</td></tr>
+   *   <tr><td>PHONE</td><td>Phone Credit</td><td>Yes</td><td>No</td></tr>
+   *   <tr><td>MRPR</td><td>Misc Receipt - Private Cash</td><td>Yes</td><td>Yes</td></tr>
+   *   <tr><td>MTDS</td><td>Money through digital service</td><td>Yes</td><td>Yes</td></tr>
+   *   <tr><td>DTDS</td><td>Disbursement through Digital service</td><td>Yes</td><td>Yes</td></tr>
+   *   <tr><td>CASHD</td><td>Cash Disbursement</td><td>Yes</td><td>Yes</td></tr>
+   *   <tr><td>RELA</td><td>Money to Relatives</td><td>Yes</td><td>Yes</td></tr>
+   *   <tr><td>RELS</td><td>Money to Relatives- Spends</td><td>Yes</td><td>Yes</td></tr>
+   * </table>Notes:<br/>
+   * <ul>
+   *   <li>The sub_account the amount is debited or credited from will be determined by the transaction_type definition in NOMIS.</li>
+   *   <li>If the field X-Client-Name is present in the request header then the value is prepended to the client_unique_ref separated by a dash. When this API is invoked via the Nomis gateway this will already have been created by the gateway.</li>
+   *   <li>The client_unique_ref can have a maximum of 64 characters, only alphabetic, numeric, ‘-’ and ‘_’ characters are allowed</li>
+   * </ul>
+   * Requires NOMIS_API_V1 or UNILINK role.
    */
   createTransaction: {
     parameters: {
@@ -13118,13 +13373,18 @@ export interface operations {
   /**
    * Store a payment for an offender account.
    * @description Pay events will be stored in a table on receipt by Nomis to be processed by a batch job scheduled to run after the last Nomis payroll batch job but before the advances and scheduled payments batch jobs.
-   * <br/>Possible payment types are:<br/><table><tr><td>A_EARN</td><td>Credit, Offender Payroll</td></tr><tr><td>ADJ</td><td>Debit, Adjudication Award</td></tr></table><br/>Example request:<br/>{
+   * <br/>Possible payment types are:<br/><table><tr><td>A_EARN</td><td>Credit, Offender Payroll</td></tr><tr><td>ADJ</td><td>Debit, Adjudication Award</td></tr></table><br/>Example request:<br/>
+   * <pre>
+   * {
    *   "type": "A_EARN",
    *   "description": "May earnings",
    *   "amount": 1,
    *   "client_transaction_id": "PAY-05-19"
-   * }<br/>The valid prison_id and type combinations are defined in the Nomis transaction_operations table which is maintained by the Maintain Transaction Operations screen (OCMTROPS), from the Financials Maintenance menu.
+   * }
+   * </pre>
+   * <br/>The valid prison_id and type combinations are defined in the Nomis transaction_operations table which is maintained by the Maintain Transaction Operations screen (OCMTROPS), from the Financials Maintenance menu.
    * Only those prisons (Caseloads) and Transaction types associated with the NOMISAPI module are valid.<br/>This will be setup by script intially as part of the deployment process as shown below<br/><br/>
+   * Requires NOMIS_API_V1 or UNILINK role.
    */
   storePayment: {
     parameters: {
@@ -14196,7 +14456,7 @@ export interface operations {
     }
   }
   /**
-   * Retrieves Offender CRSAs for multiple offenders - POST version to allow large offender lists.
+   * Retrieves Offender CSRAs for multiple offenders - POST version to allow large offender lists.
    * @description <p>This endpoint uses the REPLICA database.</p>
    */
   postOffenderAssessmentsCsraList: {
@@ -14731,7 +14991,7 @@ export interface operations {
    *     <li>If the field X-Client-Name is present in the request header then the value is prepended to the client_unique_ref separated by a dash</li>
    *     <li>The client_unique_ref can have a maximum of 64 characters, only alphabetic, numeric, ‘-’ and ‘_’ characters are allowed</li>
    *   </ul>
-   * <p>Requires role NOMIS_API_V1</p>
+   * <p>Requires role NOMIS_API_V1 or UNILINK</p>
    */
   transferToSavings: {
     parameters: {
@@ -16047,7 +16307,9 @@ export interface operations {
   }
   /**
    * Retrieve a single financial transaction using client unique ref.
-   * @description All transaction amounts are represented as pence values.<p>This endpoint uses the REPLICA database.</p>
+   * @description All transaction amounts are represented as pence values.<br/>
+   * Requires NOMIS_API_V1 or UNILINK role.
+   * <p>This endpoint uses the REPLICA database.</p>
    */
   getTransactionByClientUniqueRef: {
     parameters: {
@@ -16153,7 +16415,10 @@ export interface operations {
   }
   /**
    * Retrieve an offender's financial account balances.
-   * @description Returns balances for the offender’s three sub accounts (spends, savings and cash) at the specified prison.<br/>All balance values are represented as pence values.<p>This endpoint uses the REPLICA database.</p>
+   * @description Returns balances for the offender’s three sub accounts (spends, savings and cash) at the specified prison.<br/>
+   * All balance values are represented as pence values.<br/>
+   * Requires NOMIS_API_V1 or UNILINK role.
+   * <p>This endpoint uses the REPLICA database.</p>
    */
   getAccountBalance: {
     parameters: {
@@ -16199,7 +16464,10 @@ export interface operations {
   }
   /**
    * Retrieve an offender's financial transaction history for cash, spends or savings.
-   * @description Transactions are returned in NOMIS ordee (Descending date followed by id).<br/>All transaction amounts are represented as pence values.<p>This endpoint uses the REPLICA database.</p>
+   * @description Transactions are returned in NOMIS ordee (Descending date followed by id).<br/>
+   * All transaction amounts are represented as pence values.<br/>
+   * Requires NOMIS_API_V1 or UNILINK role.
+   * <p>This endpoint uses the REPLICA database.</p>
    */
   getAccountTransactions: {
     parameters: {
@@ -16263,7 +16531,10 @@ export interface operations {
   /**
    * Deprecated - use the version without the trailing slash. Retrieve an offender's financial account balances.
    * @deprecated
-   * @description Returns balances for the offender’s three sub accounts (spends, savings and cash) at the specified prison.<br/>All balance values are represented as pence values.<p>This endpoint uses the REPLICA database.</p>
+   * @description Returns balances for the offender’s three sub accounts (spends, savings and cash) at the specified prison.<br/>
+   * All balance values are represented as pence values.<br/>
+   * Requires NOMIS_API_V1 or UNILINK role.
+   * <p>This endpoint uses the REPLICA database.</p>
    */
   getAccountBalanceTrailingSlash: {
     parameters: {
@@ -16309,7 +16580,7 @@ export interface operations {
   }
   /**
    * Fetching live roll.
-   * @description <p>This endpoint uses the REPLICA database.</p>
+   * @description Requires NOMIS_API_V1 or UNILINK role.<p>This endpoint uses the REPLICA database.</p>
    */
   getLiveRoll: {
     parameters: {
@@ -16529,7 +16800,14 @@ export interface operations {
   }
   /**
    * Get the PSS detail by offender
-   * @description Returns the PSS detail information for the specified offender including personal data, warnings, sentence details and location information.<br/><ul><li>The 'type' field is always OFFENDER_DETAILS_REQUEST</li><br/><li>The field 'offender_details_request' contains a JSON block of data containing the offender data.</li></ul>The format of 'offender_details_request' is not specified here.<p>This endpoint uses the REPLICA database.</p>
+   * @description Returns the PSS detail information for the specified offender including personal data, warnings, sentence details and location information.<br/>
+   * <ul>
+   *   <li>The 'type' field is always OFFENDER_DETAILS_REQUEST</li>
+   *   <li>The field 'offender_details_request' contains a JSON block of data containing the offender data.</li>
+   * </ul>
+   * The format of 'offender_details_request' is not specified here.<br/>
+   * Requires NOMIS_API_V1 or UNILINK role.
+   * <p>This endpoint uses the REPLICA database.</p>
    */
   getOffenderPssDetail: {
     parameters: {
@@ -16693,7 +16971,14 @@ export interface operations {
   }
   /**
    * Fetch alerts by offender
-   * @description Returns all active alerts for the specified offender or those that meet the optional criteria. Active alerts are listed first, followed by inactive alerts, both sorted by ascending order of alert date.<br/><ul><li>if alert_type is specified then only alerts of that type are returned</li><li>if modified_since is specified then only those alerts created or modified on or after the specified date time. The following formats are supported: 2018-01-10, 2018-01-10 03:34, 2018-01-10 03:34:12, 2018-01-10 03:34:12.123</li><li>If include_inactive=true is specified then inactive alerts are also returned.</li></ul><p>This endpoint uses the REPLICA database.</p>
+   * @description Returns all active alerts for the specified offender or those that meet the optional criteria. Active alerts are listed first, followed by inactive alerts, both sorted by ascending order of alert date.<br/>
+   * <ul>
+   *   <li>if alert_type is specified then only alerts of that type are returned</li>
+   *   <li>if modified_since is specified then only those alerts created or modified on or after the specified date time. The following formats are supported: 2018-01-10, 2018-01-10 03:34, 2018-01-10 03:34:12, 2018-01-10 03:34:12.123</li>
+   *   <li>If include_inactive=true is specified then inactive alerts are also returned.</li>
+   * </ul>
+   * Requires NOMIS_API_V1 or UNILINK role.
+   * <p>This endpoint uses the REPLICA database.</p>
    */
   getAlerts: {
     parameters: {
@@ -16751,7 +17036,21 @@ export interface operations {
   }
   /**
    * Fetch events
-   * @description Returns all events that required to update the prisoner self service application. Currently these are:<ul><li>ALERT</li><li>DISCHARGE</li><li>IEP_CHANGED</li><li>INTERNAL_LOCATION_CHANGED</li><li>NOMS_ID_CHANGED</li><li>PERSONAL_DETAILS_CHANGED</li><li>PERSONAL_OFFICER_CHANGED</li><li>RECEPTION</li><li>SENTENCE_INFORMATION_CHANGED</li><li>BALANCE_UPDATE</li></ul><p>This endpoint uses the REPLICA database.</p>
+   * @description Returns all events that required to update the prisoner self service application. Currently these are:
+   * <ul>
+   *   <li>ALERT</li>
+   *   <li>DISCHARGE</li>
+   *   <li>IEP_CHANGED</li>
+   *   <li>INTERNAL_LOCATION_CHANGED</li>
+   *   <li>NOMS_ID_CHANGED</li>
+   *   <li>PERSONAL_DETAILS_CHANGED</li>
+   *   <li>PERSONAL_OFFICER_CHANGED</li>
+   *   <li>RECEPTION</li>
+   *   <li>SENTENCE_INFORMATION_CHANGED</li>
+   *   <li>BALANCE_UPDATE</li>
+   * </ul>
+   * Requires NOMIS_API_V1 or UNILINK role.
+   * <p>This endpoint uses the REPLICA database.</p>
    */
   getOffenderEvents: {
     parameters: {
@@ -16969,6 +17268,12 @@ export interface operations {
    * @description List of locations accessible to current user.<p>This endpoint uses the REPLICA database.</p>
    */
   getMyLocations: {
+    parameters: {
+      query?: {
+        /** @description Indicates non residential locations should be included */
+        'include-non-residential-locations'?: boolean
+      }
+    }
     responses: {
       /** @description OK */
       200: {
@@ -17771,7 +18076,7 @@ export interface operations {
   }
   /**
    * List of offenders globally matching the offenderNo.
-   * @description List of offenders globally matching the offenderNo.
+   * @description List of offenders globally matching the offenderNo, restricted by the VIEW_PRISONER_DATA or SYSTEM_USER role. Returns an empty array if no results are found or if does not have correct permissions
    */
   getPrisonersOffenderNo: {
     parameters: {
@@ -17789,12 +18094,6 @@ export interface operations {
       }
       /** @description Invalid request. */
       400: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Requested resource not found. */
-      404: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
@@ -17839,30 +18138,30 @@ export interface operations {
       }
     }
   }
-  /** List of prisoners at a prison establishment */
-  getPrisonerDetailAtLocation: {
+  /**
+   * Return a list of all unique prisoner numbers (also called NOMS ID or offenderNo).
+   *     Results are ordered by max(ROOT_OFFENDER_ID), therefore ensuring that new offenders are added to the end of the
+   *     results.
+   *     This is an internal endpoint used by Prisoner Search to ensure that NOMIS and OpenSearch are in sync.
+   *     Other services should use Prisoner Search instead to get the list of prisoners.
+   *     Requires PRISONER_INDEX role.
+   *
+   * @description <p>This endpoint uses the REPLICA database.</p>
+   */
+  getPrisonerNumbers: {
     parameters: {
       query?: {
-        /** @description Zero-based page index (0..N) */
+        /** @description The page number of the paged results */
         page?: number
-        /** @description The size of the page to be returned */
+        /** @description Requested limit to number of prisoner numbers returned. */
         size?: number
-        /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
-        sort?: string[]
-      }
-      path: {
-        /**
-         * @description Establishment Code
-         * @example MDI
-         */
-        establishmentCode: string
       }
     }
     responses: {
       /** @description OK */
       200: {
         content: {
-          'application/json': components['schemas']['PagePrisonerInformation']
+          'application/json': components['schemas']['PageString']
         }
       }
       /** @description Invalid request. */
@@ -17879,40 +18178,29 @@ export interface operations {
       }
     }
   }
-  /**
-   * List of prisoners at a prison establishment
-   * @deprecated
-   * @description Pagination In Headers
-   */
-  getPrisonerDetailAtLocationOld: {
+  /** Details of the active sentence envelope, a combination of the person information, the active booking and calculable sentences at a particular establishment */
+  getCalculableSentenceEnvelopeByEstablishment: {
     parameters: {
-      header?: {
-        /** @description Requested offset of first record in returned collection of prisoner records. */
-        'Page-Offset'?: number
-        /** @description Requested limit to number of prisoner records returned. */
-        'Page-Limit'?: number
-        /** @description Comma separated list of one or more of the following fields - <b>bookingId, nomsId, cellLocation</b> */
-        'Sort-Fields'?: string
-        /** @description Sort order (ASC or DESC) - defaults to ASC. */
-        'Sort-Order'?: 'ASC' | 'DESC'
-      }
       path: {
-        /**
-         * @description Establishment Code
-         * @example MDI
-         */
-        establishmentCode: string
+        /** @description The identifier of the establishment(prison) to get the active bookings for */
+        establishmentId: string
       }
     }
     responses: {
       /** @description OK */
       200: {
         content: {
-          'application/json': components['schemas']['PrisonerInformation'][]
+          'application/json': components['schemas']['CalculableSentenceEnvelope'][]
         }
       }
       /** @description Invalid request. */
       400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Requested resource not found. */
+      404: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
@@ -18334,7 +18622,8 @@ export interface operations {
   }
   /**
    * Gets the offender non-association details for a given offender for ALL bookings
-   * @description Get offender non-association details by offender No<p>This endpoint uses the REPLICA database.</p>
+   * @deprecated
+   * @description Do NOT use, please use Non-Associations API at https://non-associations-api.hmpps.service.justice.gov.uk/swagger-ui/index.html<p>This endpoint uses the REPLICA database.</p>
    */
   getNonAssociationDetails: {
     parameters: {
@@ -18891,7 +19180,10 @@ export interface operations {
       }
     }
   }
-  /** Return a list of addresses for a given offender, most recent first. */
+  /**
+   * Return a list of addresses for a given offender, most recent first.
+   * @description <p>This endpoint uses the REPLICA database.</p>
+   */
   getAddressesByOffenderNo: {
     parameters: {
       path: {
@@ -19102,7 +19394,7 @@ export interface operations {
       /** @description Sentence term details for a prisoner. */
       200: {
         content: {
-          'application/json': components['schemas']['OffenderSentenceTerms']
+          'application/json': components['schemas']['OffenderSentenceTerms'][]
         }
       }
       /** @description Requested resource not found. */
@@ -21536,8 +21828,9 @@ export interface operations {
     }
   }
   /**
-   * Gets the offender non-association details for a given booking
-   * @description Get offender non-association details<p>This endpoint uses the REPLICA database.</p>
+   * Gets the offender non-association details for a given booking (DEPRECATED)
+   * @deprecated
+   * @description Do not use this endpoint, calls should be made in the context of a prisoner, not their current booking<p>This endpoint uses the REPLICA database.</p>
    */
   getNonAssociationDetails_1: {
     parameters: {
@@ -23122,6 +23415,47 @@ export interface operations {
       403: never
       /** @description The appointment was not found */
       404: never
+    }
+  }
+  /**
+   * List of receptions with capacity for agency.
+   * @description List of active receptions with capacity for agency.<p>This endpoint uses the REPLICA database.</p>
+   */
+  getAgencyActiveReceptionsWithCapacity: {
+    parameters: {
+      query?: {
+        /** @description Restricts list of receptions returned to those that have a specified attribute. */
+        attribute?: string
+      }
+      path: {
+        agencyId: string
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          'application/json': components['schemas']['OffenderCell'][]
+        }
+      }
+      /** @description Invalid request. */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Requested resource not found. */
+      404: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unrecoverable error occurred whilst processing request. */
+      500: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
     }
   }
   /**

@@ -26,12 +26,14 @@ context('Visit details page', () => {
     })
     visit.visitNotes.push({ type: 'VISIT_OUTCOMES', text: 'Illness' })
     const visitHistoryDetails = TestData.visitHistoryDetails({
-      updatedBy: 'User Two',
-      updatedDateAndTime: '2022-01-01T10:00:00',
-      cancelledBy: 'User Three',
-      cancelledDateAndTime: '2022-01-01T11:00:00',
       visit,
     })
+    visitHistoryDetails.eventsAudit[2] = {
+      type: 'UPDATED_VISIT',
+      applicationMethodType: 'NOT_KNOWN',
+      actionedBy: 'User Two',
+      createTimestamp: '2022-01-01T10:00:00',
+    }
 
     const contacts = [TestData.contact({ personId: 4321, restrictions: [TestData.restriction()] })]
 
@@ -74,8 +76,8 @@ context('Visit details page', () => {
     visitDetailsPage.visitComment().contains('Example of a visit comment')
     visitDetailsPage.visitorConcern().contains('Example of a visitor concern')
     visitDetailsPage.additionalSupport().contains('Wheelchair ramp, custom request')
-    visitDetailsPage.visitBooked().contains('Saturday 1 January 2022 at 9am by User One')
-    visitDetailsPage.visitUpdated().contains('Saturday 1 January 2022 at 10am by User Two')
+    visitDetailsPage.visitBooked().contains('Saturday 1 January 2022 at 9am by User One (phone call request')
+    visitDetailsPage.visitUpdated().contains('Saturday 1 January 2022 at 10am by User Two (email request)')
   })
 
   it('Should show update/cancel button for future visit', () => {
@@ -86,8 +88,6 @@ context('Visit details page', () => {
 
     const futureVisitDate = format(add(today, { months: 1 }), shortDateFormat)
     const visitHistoryDetails = TestData.visitHistoryDetails({
-      updatedBy: 'User Two',
-      updatedDateAndTime: '2022-01-01T10:00:00',
       visit: TestData.visit({
         startTimestamp: `${futureVisitDate}T12:00:00`,
         endTimestamp: `${futureVisitDate}T14:00:00`,
@@ -130,7 +130,7 @@ context('Visit details page', () => {
     visitDetailsPage.visitorAddress2().contains('C1 2AB')
     visitDetailsPage.visitorRestrictions2().contains('None')
     // Additional Information
-    visitDetailsPage.visitBooked().contains('Saturday 1 January 2022 at 9am by User One')
-    visitDetailsPage.visitUpdated().contains('Saturday 1 January 2022 at 10am by User Two')
+    visitDetailsPage.visitBooked().contains('Saturday 1 January 2022 at 9am by User One (phone call request)')
+    visitDetailsPage.visitUpdated().contains('Saturday 1 January 2022 at 10am by User Two (email request)')
   })
 })

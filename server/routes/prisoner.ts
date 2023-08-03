@@ -11,7 +11,6 @@ export default function routes({
   auditService,
   prisonerProfileService,
   prisonerSearchService,
-  supportedPrisonsService,
   visitService,
 }: Services): Router {
   const router = Router()
@@ -26,7 +25,6 @@ export default function routes({
     const queryParamsForBackLink = search !== '' ? new URLSearchParams({ search }).toString() : ''
 
     const prisonerProfile = await prisonerProfileService.getProfile(prisonId, prisonerId, res.locals.user.username)
-    const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(res.locals.user.username)
 
     await auditService.viewPrisoner({
       prisonerId,
@@ -38,7 +36,6 @@ export default function routes({
     return res.render('pages/prisoner/profile', {
       errors: req.flash('errors'),
       ...prisonerProfile,
-      supportedPrisons,
       queryParamsForBackLink,
     })
   })

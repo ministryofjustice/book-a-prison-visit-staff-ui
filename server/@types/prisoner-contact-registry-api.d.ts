@@ -265,6 +265,11 @@ export interface operations {
          * @example 9147510
          */
         id?: number
+        /**
+         * @description by default returns addresses for all contacts, set to false if contact addresses not needed.
+         * @example false
+         */
+        withAddress?: boolean
       }
       path: {
         /**

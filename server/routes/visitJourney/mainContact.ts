@@ -54,7 +54,7 @@ export default class MainContact {
       contactName: selectedContact === undefined ? req.body.someoneElseName : undefined,
     }
 
-    return res.redirect(`${urlPrefix}/check-your-booking`)
+    return res.redirect(`${urlPrefix}/request-method`)
   }
 
   validate(): ValidationChain[] {
