@@ -1,8 +1,10 @@
 import RestClient from './restClient'
 import config, { ApiConfig } from '../config'
 import {
+  ApplicationMethodType,
+  BookingOrchestrationRequestDto,
+  CancelVisitOrchestrationDto,
   ChangeVisitSlotRequestDto,
-  OutcomeDto,
   PageVisitDto,
   PrisonerProfile,
   ReserveVisitSlotDto,
@@ -31,14 +33,19 @@ export default class OrchestrationApiClient {
 
   // orchestration-visits-controller
 
-  async bookVisit(applicationReference: string): Promise<Visit> {
-    return this.restClient.put({ path: `/visits/${applicationReference}/book` })
+  async bookVisit(applicationReference: string, applicationMethod: ApplicationMethodType): Promise<Visit> {
+    return this.restClient.put({
+      path: `/visits/${applicationReference}/book`,
+      data: <BookingOrchestrationRequestDto>{
+        applicationMethodType: applicationMethod,
+      },
+    })
   }
 
-  async cancelVisit(reference: string, outcome: OutcomeDto): Promise<Visit> {
+  async cancelVisit(reference: string, cancelVisitDto: CancelVisitOrchestrationDto): Promise<Visit> {
     return this.restClient.put({
       path: `/visits/${reference}/cancel`,
-      data: outcome,
+      data: cancelVisitDto,
     })
   }
 

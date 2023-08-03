@@ -35,7 +35,6 @@
     <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
 
     {% if prisoner %}
-
       {% if visit.visitStatus === "CANCELLED" %}
         {% set status = visit.outcomeStatus.split("_") %}
         {%- for visitNote in visit.visitNotes %}
@@ -190,52 +189,57 @@
       }) }}
 
       <ul class="bapv-item-list">
-      {%- for visitNote in visit.visitNotes %}
-        {% if visitNote.type == "VISIT_COMMENT" %}
-          <li>
-            <strong>Comments</strong>
-            <span data-test="visit-comment">{{ visitNote.text }}</span>
-          </li>
-        {% elseif visitNote.type == "VISITOR_CONCERN" %}
-          <li>
-            <strong>Visitor concerns</strong>
-            <span data-test="visitor-concern">{{ visitNote.text }}</span>
-          </li>
-        {% endif %}
-      {% endfor %}
+        {%- for visitNote in visit.visitNotes %}
+          {% if visitNote.type == "VISIT_COMMENT" %}
+            <li>
+              <strong>Comments</strong>
+              <span data-test="visit-comment">{{ visitNote.text }}</span>
+            </li>
+          {% elseif visitNote.type == "VISITOR_CONCERN" %}
+            <li>
+              <strong>Visitor concerns</strong>
+              <span data-test="visitor-concern">{{ visitNote.text }}</span>
+            </li>
+          {% endif %}
+        {% endfor %}
 
         <li>
           <strong>Additional support</strong>
           <span data-test="additional-support">{{ additionalSupport | join(", ") if additionalSupport | length else "None"}}</span>
         </li>
 
-        <li>
-          <strong>Visit booked</strong>
-          <span data-test="visit-booked">{{ visitHistoryDetails.createdDateAndTime | formatDate('EEEE d MMMM yyyy') }}
-             at {{ visitHistoryDetails.createdDateAndTime | formatTime }}{{ actionedByUser(visitHistoryDetails.createdBy) }}</span>
-        </li>
-
-        {% if visitHistoryDetails.updatedDateAndTime %}
-          <li>
-            <strong>Visit updated</strong>
-            <span data-test="visit-updated">{{ visitHistoryDetails.updatedDateAndTime | formatDate('EEEE d MMMM yyyy') }}
-               at {{ visitHistoryDetails.updatedDateAndTime | formatTime }}{{ actionedByUser(visitHistoryDetails.updatedBy) }}</span>
-          </li>
-        {% endif %}
-
-        {% if visitHistoryDetails.cancelledDateAndTime %}
-          <li>
-            <strong>Visit cancelled</strong>
-            <span data-test="visit-cancelled">{{ visitHistoryDetails.cancelledDateAndTime | formatDate('EEEE d MMMM yyyy') }}
-               at {{ visitHistoryDetails.cancelledDateAndTime | formatTime }}{{ actionedByUser(visitHistoryDetails.cancelledBy) }}</span>
-          </li>
-        {% endif %}
+        {% if visitHistoryDetails.eventsAudit %}
+        {% for event in visitHistoryDetails.eventsAudit %}
+          {% if event.type in [ 'BOOKED_VISIT', 'UPDATED_VISIT', 'CANCELLED_VISIT' ] %}
+            <li>
+              <strong>{{ eventAuditTypes[event.type] }}</strong>
+              <span data-test="{{ event.type | lower }}" >
+                {{ event.createTimestamp | formatDate('EEEE d MMMM yyyy') }}
+                at {{ event.createTimestamp | formatTime }}
+                {{ actionedByUser(event.actionedBy) }} 
+                {{ requestMethodDescriptions[event.applicationMethodType] }}
+              </span>
+            </li>
+          {% endif %}
+          {% if event.type === 'MIGRATED_VISIT' %}
+            <li>
+              <strong>{{ "Booked visit" if visit.visitStatus === 'BOOKED' else "Cancelled visit" }}</strong>
+              <span data-test="{{ event.type | lower }}" >
+                {{ event.createTimestamp | formatDate('EEEE d MMMM yyyy') }}
+                at {{ event.createTimestamp | formatTime }}
+                {{ actionedByUser(event.actionedBy) }} 
+              </span>
+            </li>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
 
       </ul>
     {% else %}
       <p>This booking is not for {{ selectedEstablishment.prisonName }}.</p>
       <p>To view the booking, change the establishment to {{ visitPrisonName }} and search for it by the booking reference.</p>
     {% endif %}
+
   </div>
 </div>
 {% endblock %}

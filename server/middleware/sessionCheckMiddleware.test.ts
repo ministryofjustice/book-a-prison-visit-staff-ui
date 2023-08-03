@@ -355,6 +355,41 @@ describe('sessionCheckMiddleware', () => {
     })
   })
 
+  describe('request method', () => {
+    beforeEach(() => {
+      const testData: VisitSessionData = {
+        visitReference: 'ab-cd-ef-gh',
+        visitStatus: 'RESERVED',
+        prisoner: prisonerData,
+        visitRestriction,
+        visitSlot,
+        visitors: visitorsData,
+        visitorSupport: [],
+        mainContact: {
+          phoneNumber: '01234567899',
+          contactName: 'abc',
+        },
+      }
+      req.session.visitSessionData = testData
+    })
+
+    it('should redirect if request method is empty', () => {
+      req.session.visitSessionData.requestMethod = undefined
+
+      sessionCheckMiddleware({ stage: 6 })(req as Request, mockResponse as Response, next)
+
+      expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/A1234BC?error=missing-request-method')
+    })
+
+    it('should not redirect if request method is populated', () => {
+      req.session.visitSessionData.requestMethod = 'PHONE'
+
+      sessionCheckMiddleware({ stage: 6 })(req as Request, mockResponse as Response, next)
+
+      expect(mockResponse.redirect).not.toHaveBeenCalled()
+    })
+  })
+
   describe('check visit status', () => {
     beforeEach(() => {
       const testData: VisitSessionData = {
@@ -367,6 +402,7 @@ describe('sessionCheckMiddleware', () => {
           phoneNumber: '01234567899',
           contactName: 'abc',
         },
+        requestMethod: 'PHONE',
       }
 
       req.session.visitSessionData = testData
@@ -409,7 +445,7 @@ describe('sessionCheckMiddleware', () => {
       req.session.visitSessionData.visitReference = 'ab-cd-ef-gh'
       req.session.visitSessionData.visitStatus = 'BOOKED'
 
-      sessionCheckMiddleware({ stage: 6 })(req as Request, mockResponse as Response, next)
+      sessionCheckMiddleware({ stage: 7 })(req as Request, mockResponse as Response, next)
 
       expect(mockResponse.redirect).not.toHaveBeenCalled()
     })
@@ -418,7 +454,7 @@ describe('sessionCheckMiddleware', () => {
       req.session.visitSessionData.visitReference = 'ab-cd-ef-gh'
       req.session.visitSessionData.visitStatus = 'RESERVED'
 
-      sessionCheckMiddleware({ stage: 6 })(req as Request, mockResponse as Response, next)
+      sessionCheckMiddleware({ stage: 7 })(req as Request, mockResponse as Response, next)
 
       expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/A1234BC?error=visit-not-booked')
     })

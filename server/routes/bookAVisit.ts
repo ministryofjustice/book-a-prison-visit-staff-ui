@@ -8,6 +8,7 @@ import CheckYourBooking from './visitJourney/checkYourBooking'
 import Confirmation from './visitJourney/confirmation'
 import AdditionalSupport from './visitJourney/additionalSupport'
 import MainContact from './visitJourney/mainContact'
+import RequestMethod from './visitJourney/requestMethod'
 import type { Services } from '../services'
 
 export default function routes({
@@ -38,6 +39,7 @@ export default function routes({
   const additionalSupport = new AdditionalSupport('book', additionalSupportService)
   const dateAndTime = new DateAndTime('book', visitService, visitSessionsService, auditService)
   const mainContact = new MainContact('book')
+  const requestMethod = new RequestMethod('book')
   const checkYourBooking = new CheckYourBooking('book', auditService, notificationsService, visitService)
   const confirmation = new Confirmation('book')
 
@@ -66,10 +68,15 @@ export default function routes({
     mainContact.post(req, res),
   )
 
-  get('/check-your-booking', sessionCheckMiddleware({ stage: 5 }), (req, res) => checkYourBooking.get(req, res))
-  post('/check-your-booking', sessionCheckMiddleware({ stage: 5 }), (req, res) => checkYourBooking.post(req, res))
+  get('/request-method', sessionCheckMiddleware({ stage: 5 }), (req, res) => requestMethod.get(req, res))
+  post('/request-method', sessionCheckMiddleware({ stage: 5 }), ...requestMethod.validate(), (req, res) =>
+    requestMethod.post(req, res),
+  )
 
-  get('/confirmation', sessionCheckMiddleware({ stage: 6 }), (req, res) => confirmation.get(req, res))
+  get('/check-your-booking', sessionCheckMiddleware({ stage: 6 }), (req, res) => checkYourBooking.get(req, res))
+  post('/check-your-booking', sessionCheckMiddleware({ stage: 6 }), (req, res) => checkYourBooking.post(req, res))
+
+  get('/confirmation', sessionCheckMiddleware({ stage: 7 }), (req, res) => confirmation.get(req, res))
 
   return router
 }

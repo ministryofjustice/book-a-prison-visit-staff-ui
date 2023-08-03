@@ -8,6 +8,7 @@ import {
   Visit,
   VisitHistoryDetails,
   VisitSession,
+  VisitSummary,
 } from '../../data/orchestrationApiTypes'
 import { CaseLoad, OffenderRestriction } from '../../data/prisonApiTypes'
 import { CurrentIncentive, Prisoner } from '../../data/prisonerOffenderSearchTypes'
@@ -348,7 +349,6 @@ export default class TestData {
         text: 'custom request',
       },
     ],
-    createdBy = 'user1',
     createdTimestamp = '2022-01-01T09:00:00',
     modifiedTimestamp = '2022-01-01T09:00:00',
   }: Partial<Visit> = {}): Visit =>
@@ -369,26 +369,28 @@ export default class TestData {
       visitContact,
       visitors,
       visitorSupport,
-      createdBy,
       createdTimestamp,
       modifiedTimestamp,
     } as Visit)
 
   static visitHistoryDetails = ({
-    createdBy = 'User One',
-    updatedBy = undefined,
-    cancelledBy = undefined,
-    createdDateAndTime = '2022-01-01T09:00:00',
-    updatedDateAndTime = undefined,
-    cancelledDateAndTime = undefined,
+    eventsAudit = [
+      {
+        type: 'BOOKED_VISIT',
+        applicationMethodType: 'PHONE',
+        actionedBy: 'User One',
+        createTimestamp: '2022-01-01T09:00:00',
+      },
+      {
+        type: 'UPDATED_VISIT',
+        applicationMethodType: 'EMAIL',
+        actionedBy: 'User Two',
+        createTimestamp: '2022-01-01T10:00:00',
+      },
+    ],
     visit = this.visit(),
   }: Partial<VisitHistoryDetails> = {}): VisitHistoryDetails => ({
-    createdBy,
-    updatedBy,
-    cancelledBy,
-    createdDateAndTime,
-    updatedDateAndTime,
-    cancelledDateAndTime,
+    eventsAudit,
     visit,
   })
 
@@ -417,4 +419,35 @@ export default class TestData {
     endTimestamp,
     sessionConflicts,
   })
+
+  static visitSummary = ({
+    reference = 'ab-cd-ef-gh',
+    prisonerId = 'A1234BC',
+    prisonId = 'HEI',
+    prisonName = 'Hewell (HMP)',
+    visitType = 'SOCIAL',
+    visitStatus = 'BOOKED',
+    visitRestriction = 'OPEN',
+    startTimestamp = '2022-01-14T10:00:00',
+    endTimestamp = '2022-01-14T11:00:00',
+    visitors = [
+      {
+        nomisPersonId: 4321,
+        firstName: 'Jeanette',
+        lastName: 'Smith',
+      },
+    ],
+  }: Partial<VisitSummary> = {}): VisitSummary =>
+    ({
+      reference,
+      prisonerId,
+      prisonId,
+      prisonName,
+      visitType,
+      visitStatus,
+      visitRestriction,
+      startTimestamp,
+      endTimestamp,
+      visitors,
+    } as VisitSummary)
 }

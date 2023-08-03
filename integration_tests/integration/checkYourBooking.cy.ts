@@ -9,6 +9,7 @@ import MainContactPage from '../pages/mainContact'
 import CheckYourBookingPage from '../pages/checkYourBooking'
 import ConfirmationPage from '../pages/confirmation'
 import SelectVisitDateAndTime from '../pages/selectVisitDateAndTime'
+import RequestMethodPage from '../pages/requestMethod'
 
 context('Check visit details page', () => {
   const shortDateFormat = 'yyyy-MM-dd'
@@ -103,8 +104,14 @@ context('Check visit details page', () => {
     mainContactPage.getFirstContact().check()
     mainContactPage.enterPhoneNumber('01234 567890')
 
-    // Check visit details
+    // Request method
     mainContactPage.continueButton().click()
+    const requestMethodPage = Page.verifyOnPage(RequestMethodPage)
+    requestMethodPage.getRequestLabelByValue('PHONE').contains('Phone call')
+    requestMethodPage.getRequestMethodByValue('PHONE').check()
+    requestMethodPage.continueButton().click()
+
+    // Check visit details
     const checkYourBookingPage = Page.verifyOnPage(CheckYourBookingPage)
     checkYourBookingPage.prisonerName().contains(prisonerDisplayName)
     checkYourBookingPage.visitDate().contains(format(new Date(visitSessions[0].startTimestamp), longDateFormat))
@@ -114,6 +121,7 @@ context('Check visit details page', () => {
     checkYourBookingPage.additionalSupport().contains('None')
     checkYourBookingPage.mainContactName().contains('Jeanette Smith (wife of the prisoner)')
     checkYourBookingPage.mainContactNumber().contains('01234 567890')
+    checkYourBookingPage.requestMethod().contains('Phone call')
 
     // Check details - change visit date - then proceed through journey
     checkYourBookingPage.changeVisitDate().click()
@@ -136,6 +144,7 @@ context('Check visit details page', () => {
     selectVisitDateAndTime.continueButton().click()
     additionalSupportPage.continueButton().click()
     mainContactPage.continueButton().click()
+    requestMethodPage.continueButton().click()
     checkYourBookingPage.visitDate().contains(format(new Date(visitSessions[1].startTimestamp), longDateFormat))
     checkYourBookingPage.visitTime().contains('1:30pm to 3pm')
 
@@ -164,6 +173,7 @@ context('Check visit details page', () => {
     selectVisitDateAndTime.continueButton().click()
     additionalSupportPage.continueButton().click()
     mainContactPage.continueButton().click()
+    requestMethodPage.continueButton().click()
     checkYourBookingPage.visitorName(1).contains('Jeanette Smith (wife of the prisoner)')
     checkYourBookingPage.visitorName(2).contains('Bob Smith (son of the prisoner)')
 
@@ -174,13 +184,22 @@ context('Check visit details page', () => {
     additionalSupportPage.selectSupportType('WHEELCHAIR')
     additionalSupportPage.continueButton().click()
     mainContactPage.continueButton().click()
+    requestMethodPage.continueButton().click()
     checkYourBookingPage.additionalSupport().contains('Wheelchair ramp')
 
     // Check details - change main contact number - then proceed through journey
     checkYourBookingPage.changeMainContact().click()
     mainContactPage.enterPhoneNumber('09876 543 321')
     mainContactPage.continueButton().click()
+    requestMethodPage.continueButton().click()
     checkYourBookingPage.mainContactNumber().contains('09876 543 321')
+
+    // Check details - change request method - then proceed through journey
+    checkYourBookingPage.changeRequestMethod().click()
+    requestMethodPage.getRequestLabelByValue('WEBSITE').contains('GOV.UK')
+    requestMethodPage.getRequestMethodByValue('WEBSITE').check()
+    requestMethodPage.continueButton().click()
+    checkYourBookingPage.requestMethod().contains('GOV.UK')
 
     // Confirmation
     cy.task(
@@ -198,9 +217,8 @@ context('Check visit details page', () => {
         sessionTemplateReference: visitSessions[1].sessionTemplateReference,
       }),
     )
-    cy.task(
-      'stubBookVisit',
-      TestData.visit({
+    cy.task('stubBookVisit', {
+      visit: TestData.visit({
         visitStatus: 'BOOKED',
         startTimestamp: visitSessions[1].startTimestamp,
         endTimestamp: visitSessions[1].endTimestamp,
@@ -211,7 +229,8 @@ context('Check visit details page', () => {
         ],
         visitorSupport: [{ type: 'WHEELCHAIR' }],
       }),
-    )
+      applicationMethod: 'WEBSITE',
+    })
 
     checkYourBookingPage.bookButton().click()
     const confirmationPage = Page.verifyOnPageTitle(ConfirmationPage, 'Booking confirmed')

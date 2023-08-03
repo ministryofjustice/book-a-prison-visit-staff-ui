@@ -13,6 +13,7 @@ import CheckYourBookingPage from '../pages/checkYourBooking'
 import ConfirmationPage from '../pages/confirmation'
 import SelectVisitTypePage from '../pages/visitType'
 import SelectVisitDateAndTime from '../pages/selectVisitDateAndTime'
+import RequestMethodPage from '../pages/requestMethod'
 
 context('Book a visit', () => {
   const shortDateFormat = 'yyyy-MM-dd'
@@ -97,13 +98,12 @@ context('Book a visit', () => {
 
     const { prisonerId } = profile
     // Prisoner profile page
-    cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
     cy.task('stubPrisonerProfile', { prisonId, prisonerId, profile })
-
     searchForAPrisonerResultsPage.firstResultLink().contains(prisonerDisplayName).click()
     const prisonerProfilePage = Page.verifyOnPageTitle(PrisonerProfilePage, prisonerDisplayName)
 
     // Select visitors
+    cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
     const offenderRestrictions = [TestData.offenderRestriction()]
     cy.task('stubOffenderRestrictions', { offenderNo, offenderRestrictions })
     prisonerProfilePage.bookAVisitButton().click()
@@ -163,8 +163,14 @@ context('Book a visit', () => {
     mainContactPage.getFirstContact().check()
     mainContactPage.enterPhoneNumber('01234 567890')
 
-    // Check booking details
+    // Request method
     mainContactPage.continueButton().click()
+    const requestMethodPage = Page.verifyOnPage(RequestMethodPage)
+    requestMethodPage.getRequestLabelByValue('PHONE').contains('Phone call')
+    requestMethodPage.getRequestMethodByValue('PHONE').check()
+    requestMethodPage.continueButton().click()
+
+    // Check booking details
     const checkYourBookingPage = Page.verifyOnPage(CheckYourBookingPage)
     checkYourBookingPage.prisonerName().contains(prisonerDisplayName)
     checkYourBookingPage.visitDate().contains(format(new Date(visitSessions[0].startTimestamp), longDateFormat))
@@ -175,6 +181,7 @@ context('Book a visit', () => {
     checkYourBookingPage.additionalSupport().contains('Wheelchair ramp, Some extra help!')
     checkYourBookingPage.mainContactName().contains('Jeanette Smith (wife of the prisoner)')
     checkYourBookingPage.mainContactNumber().contains('01234 567890')
+    checkYourBookingPage.requestMethod().contains('Phone call')
 
     // Confirmation
     cy.task(
@@ -191,9 +198,8 @@ context('Book a visit', () => {
         sessionTemplateReference: visitSessions[0].sessionTemplateReference,
       }),
     )
-    cy.task(
-      'stubBookVisit',
-      TestData.visit({
+    cy.task('stubBookVisit', {
+      visit: TestData.visit({
         visitStatus: 'BOOKED',
         startTimestamp: visitSessions[0].startTimestamp,
         endTimestamp: visitSessions[0].endTimestamp,
@@ -203,7 +209,8 @@ context('Book a visit', () => {
         ],
         visitorSupport: [{ type: 'WHEELCHAIR' }, { type: 'OTHER', text: 'Some extra help!' }],
       }),
-    )
+      applicationMethod: 'PHONE',
+    })
 
     checkYourBookingPage.bookButton().click()
     const confirmationPage = Page.verifyOnPageTitle(ConfirmationPage, 'Booking confirmed')

@@ -4,7 +4,7 @@ import { body, validationResult } from 'express-validator'
 import { BadRequest } from 'http-errors'
 import visitCancellationReasons from '../constants/visitCancellationReasons'
 import { Prisoner } from '../data/prisonerOffenderSearchTypes'
-import { OutcomeDto } from '../data/orchestrationApiTypes'
+import { CancelVisitOrchestrationDto } from '../data/orchestrationApiTypes'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import { isValidVisitReference } from './validationChecks'
 import { clearSession, getFlashFormValues } from './visitorUtils'
@@ -19,9 +19,12 @@ import AdditionalSupport from './visitJourney/additionalSupport'
 import CheckYourBooking from './visitJourney/checkYourBooking'
 import Confirmation from './visitJourney/confirmation'
 import MainContact from './visitJourney/mainContact'
+import RequestMethod from './visitJourney/requestMethod'
 import sessionCheckMiddleware from '../middleware/sessionCheckMiddleware'
 import getPrisonConfiguration from '../constants/prisonConfiguration'
 import type { Services } from '../services'
+import eventAuditTypes from '../constants/eventAuditTypes'
+import { requestMethodDescriptions, requestMethodOptions } from '../constants/requestMethods'
 
 export default function routes({
   additionalSupportService,
@@ -104,6 +107,8 @@ export default function routes({
       fromVisitSearch,
       fromVisitSearchQuery,
       showButtons,
+      eventAuditTypes,
+      requestMethodDescriptions,
     })
   })
 
@@ -168,6 +173,7 @@ export default function routes({
       },
       visitReference: visit.reference,
       visitStatus: visit.visitStatus,
+      requestMethod: undefined, // request method should NOT be pre-populated
     }
 
     req.session.visitSessionData = Object.assign(req.session.visitSessionData ?? {}, visitSessionData)
@@ -180,6 +186,7 @@ export default function routes({
   const dateAndTime = new DateAndTime('update', visitService, visitSessionsService, auditService)
   const additionalSupport = new AdditionalSupport('update', additionalSupportService)
   const mainContact = new MainContact('update')
+  const requestMethod = new RequestMethod('update')
   const checkYourBooking = new CheckYourBooking('update', auditService, notificationsService, visitService)
   const confirmation = new Confirmation('update')
 
@@ -254,22 +261,36 @@ export default function routes({
   )
 
   get(
-    '/:reference/update/check-your-booking',
+    '/:reference/update/request-method',
     checkVisitReferenceMiddleware,
     sessionCheckMiddleware({ stage: 5 }),
+    (req, res) => requestMethod.get(req, res),
+  )
+  post(
+    '/:reference/update/request-method',
+    checkVisitReferenceMiddleware,
+    sessionCheckMiddleware({ stage: 5 }),
+    ...requestMethod.validate(),
+    (req, res) => requestMethod.post(req, res),
+  )
+
+  get(
+    '/:reference/update/check-your-booking',
+    checkVisitReferenceMiddleware,
+    sessionCheckMiddleware({ stage: 6 }),
     (req, res) => checkYourBooking.get(req, res),
   )
   post(
     '/:reference/update/check-your-booking',
     checkVisitReferenceMiddleware,
-    sessionCheckMiddleware({ stage: 5 }),
+    sessionCheckMiddleware({ stage: 6 }),
     (req, res) => checkYourBooking.post(req, res),
   )
 
   get(
     '/:reference/update/confirmation',
     checkVisitReferenceMiddleware,
-    sessionCheckMiddleware({ stage: 6 }),
+    sessionCheckMiddleware({ stage: 7 }),
     (req, res) => confirmation.get(req, res),
   )
 
@@ -280,19 +301,19 @@ export default function routes({
       errors: req.flash('errors'),
       reference,
       visitCancellationReasons,
+      requestMethodOptions,
       formValues: getFlashFormValues(req),
     })
   })
 
   post(
     '/:reference/cancel',
-    body('cancel').isIn(Object.keys(visitCancellationReasons)).withMessage('No answer selected'),
+    body('cancel', 'No answer selected').isIn(Object.keys(visitCancellationReasons)),
+    body('method', 'No request method selected')
+      .if(body('cancel').equals('VISITOR_CANCELLED'))
+      .isIn(Object.keys(requestMethodOptions)),
+    body('reason', 'Enter a reason for the cancellation').trim().notEmpty(),
     async (req, res) => {
-      const reasonFieldName = `reason_${req.body.cancel}`.toLowerCase()
-      if (validationResult(req).isEmpty()) {
-        await body(reasonFieldName).trim().notEmpty().withMessage('Enter a reason for the cancellation').run(req)
-      }
-
       const errors = validationResult(req)
       const reference = getVisitReference(req)
 
@@ -302,22 +323,29 @@ export default function routes({
         return res.redirect(`/visit/${reference}/cancel`)
       }
 
-      const outcome: OutcomeDto = {
-        outcomeStatus: req.body.cancel,
-        text: req.body[reasonFieldName],
+      const outcomeStatus = req.body.cancel
+      const text = req.body.reason
+      const applicationMethodType = outcomeStatus === 'VISITOR_CANCELLED' ? req.body.method : 'NOT_APPLICABLE'
+
+      const cancelVisitDto: CancelVisitOrchestrationDto = {
+        cancelOutcome: {
+          outcomeStatus,
+          text,
+        },
+        applicationMethodType,
       }
 
       const visit = await visitService.cancelVisit({
         username: res.locals.user.username,
         reference,
-        outcome,
+        cancelVisitDto,
       })
 
       await auditService.cancelledVisit({
         visitReference: reference,
         prisonerId: visit.prisonerId.toString(),
         prisonId: visit.prisonId,
-        reason: `${req.body.cancel}: ${req.body[reasonFieldName]}`,
+        reason: `${req.body.cancel}: ${req.body.reason}`,
         username: res.locals.user.username,
         operationId: res.locals.appInsightsOperationId,
       })

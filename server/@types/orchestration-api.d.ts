@@ -164,6 +164,8 @@ export interface components {
        * @example true
        */
       visitContact?: boolean
+      firstName?: string
+      lastName?: string
     }
     /** @description Visitor support */
     VisitorSupportDto: {
@@ -209,6 +211,11 @@ export interface components {
        * @example MDI
        */
       prisonId: string
+      /**
+       * @description Prison Name
+       * @example Moorland (HMP & YOI)
+       */
+      prisonName?: string
       /**
        * @description Session Template Reference
        * @example v9d.7ed.7u
@@ -280,21 +287,6 @@ export interface components {
       /** @description List of additional support associated with the visit */
       visitorSupport?: components['schemas']['VisitorSupportDto'][]
       /**
-       * @description Created By ID - user id for the user who created the visit
-       * @example AB12345A
-       */
-      createdBy: string
-      /**
-       * @description Updated By ID - user id for the user who last updated the visit
-       * @example AB12345A
-       */
-      updatedBy?: string
-      /**
-       * @description Cancelled By ID - user id for the user who cancelled the visit
-       * @example AB12345A
-       */
-      cancelledBy?: string
-      /**
        * Format: date-time
        * @description The visit created date and time
        */
@@ -318,6 +310,14 @@ export interface components {
        * @example Visitor is concerned that his mother in-law is coming!
        */
       text: string
+    }
+    CancelVisitOrchestrationDto: {
+      cancelOutcome: components['schemas']['OutcomeDto']
+      /**
+       * @description application method
+       * @enum {string}
+       */
+      applicationMethodType: 'PHONE' | 'WEBSITE' | 'EMAIL' | 'IN_PERSON' | 'NOT_KNOWN' | 'NOT_APPLICABLE'
     }
     /**
      * @description Contact Phone Number
@@ -383,6 +383,13 @@ export interface components {
        */
       sessionTemplateReference: string
     }
+    BookingOrchestrationRequestDto: {
+      /**
+       * @description application method
+       * @enum {string}
+       */
+      applicationMethodType: 'PHONE' | 'WEBSITE' | 'EMAIL' | 'IN_PERSON' | 'NOT_KNOWN' | 'NOT_APPLICABLE'
+    }
     DlqMessage: {
       body: {
         [key: string]: Record<string, never> | undefined
@@ -398,38 +405,41 @@ export interface components {
       /** Format: int32 */
       messagesFoundCount: number
     }
+    /** @description Event Audit */
+    EventAuditDto: {
+      /**
+       * @description The type of event
+       * @enum {string}
+       */
+      type:
+        | 'RESERVED_VISIT'
+        | 'CHANGING_VISIT'
+        | 'MIGRATED_VISIT'
+        | 'BOOKED_VISIT'
+        | 'UPDATED_VISIT'
+        | 'CANCELLED_VISIT'
+      /**
+       * @description What was the application method for this event
+       * @enum {string}
+       */
+      applicationMethodType: 'PHONE' | 'WEBSITE' | 'EMAIL' | 'IN_PERSON' | 'NOT_KNOWN' | 'NOT_APPLICABLE'
+      /**
+       * @description Event actioned by - user id
+       * @example AB12345A
+       */
+      actionedBy?: string
+      /** @description Session template used for this event */
+      sessionTemplateReference?: string
+      /**
+       * Format: date-time
+       * @description event creat date and time
+       */
+      createTimestamp: string
+    }
     /** @description Visit */
     VisitHistoryDetailsDto: {
-      /**
-       * @description Created By - user details  for the user who created the visit, NOT_KNOWN is used for historical cases
-       * @example AB12345A
-       */
-      createdBy: string
-      /**
-       * @description Updated By - user details for the user who last updated the visit
-       * @example AB12345A
-       */
-      updatedBy?: string
-      /**
-       * @description Cancelled By - user details for the user who cancelled the visit
-       * @example AB12345A
-       */
-      cancelledBy?: string
-      /**
-       * Format: date-time
-       * @description The visit created date and time
-       */
-      createdDateAndTime: string
-      /**
-       * Format: date-time
-       * @description The visit updated date and time
-       */
-      updatedDateAndTime?: string
-      /**
-       * Format: date-time
-       * @description The visit cancelled date and time
-       */
-      cancelledDateAndTime?: string
+      /** @description The visit details */
+      eventsAudit: components['schemas']['EventAuditDto'][]
       visit: components['schemas']['VisitDto']
     }
     PageVisitDto: {
@@ -443,10 +453,10 @@ export interface components {
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject']
+      first?: boolean
       pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
-      first?: boolean
       last?: boolean
       empty?: boolean
     }
@@ -455,9 +465,9 @@ export interface components {
       offset?: number
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
-      pageNumber?: number
-      /** Format: int32 */
       pageSize?: number
+      /** Format: int32 */
+      pageNumber?: number
       paged?: boolean
       unpaged?: boolean
     }
@@ -728,7 +738,7 @@ export interface components {
       alerts?: components['schemas']['AlertDto'][]
       visitBalances?: components['schemas']['VisitBalancesDto']
       /** @description Past and future visits for the prisoner based on configured duration. */
-      visits: components['schemas']['VisitDto'][]
+      visits: components['schemas']['VisitSummaryDto'][]
     }
     /** @description Balances of visit orders and privilege visit orders */
     VisitBalancesDto: {
@@ -752,6 +762,78 @@ export interface components {
        * @description Date of last IEP adjustment for Privilege Visit orders
        */
       latestPrivIepAdjustDate?: string
+    }
+    /** @description Visit Summary */
+    VisitSummaryDto: {
+      /**
+       * @description Visit Reference
+       * @example v9-d7-ed-7u
+       */
+      reference: string
+      /**
+       * @description Prisoner Id
+       * @example AF34567G
+       */
+      prisonerId: string
+      /**
+       * @description Prison Id
+       * @example MDI
+       */
+      prisonId: string
+      /**
+       * @description Prison name
+       * @example MDI Prison
+       */
+      prisonName?: string
+      /**
+       * @description Visit Type
+       * @example SOCIAL
+       * @enum {string}
+       */
+      visitType: 'SOCIAL'
+      /**
+       * @description Visit Status
+       * @example RESERVED
+       * @enum {string}
+       */
+      visitStatus: 'RESERVED' | 'CHANGING' | 'BOOKED' | 'CANCELLED'
+      /**
+       * @description Visit Restriction
+       * @example OPEN
+       * @enum {string}
+       */
+      visitRestriction: 'OPEN' | 'CLOSED' | 'UNKNOWN'
+      /**
+       * Format: date-time
+       * @description The date and time of the visit
+       */
+      startTimestamp: string
+      /**
+       * Format: date-time
+       * @description The finishing date and time of the visit
+       */
+      endTimestamp: string
+      /** @description List of visitors associated with the visit */
+      visitors?: components['schemas']['VisitorSummaryDto'][]
+    }
+    /** @description Full Visitor details */
+    VisitorSummaryDto: {
+      /**
+       * Format: int64
+       * @description Person ID (nomis) of the visitor
+       * @example 1234
+       */
+      nomisPersonId: number
+      /**
+       * @description Visitor's first name
+       * @example John
+       */
+      firstName?: string
+      /**
+       * @description Visitor's last name
+       * @example Smith
+       */
+      lastName?: string
     }
   }
   responses: never
@@ -816,7 +898,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['OutcomeDto']
+        'application/json': components['schemas']['CancelVisitOrchestrationDto']
       }
     }
     responses: {
@@ -910,6 +992,11 @@ export interface operations {
          * @example dfs-wjs-eqr
          */
         applicationReference: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['BookingOrchestrationRequestDto']
       }
     }
     responses: {

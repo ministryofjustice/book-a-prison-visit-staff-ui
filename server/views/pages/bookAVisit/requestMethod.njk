@@ -1,0 +1,53 @@
+{% extends "layout.njk" %}
+{% from "components/card/card.njk" import card %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% set pageHeaderTitle = "What method was used to make this request?" %}
+{% set pageTitle %}
+  {% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
+{% endset %}
+{% set backLinkHref = urlPrefix + "/select-main-contact" %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {% include "partials/errorSummary.njk" %}
+    
+      {% set requestMethods = [] %}
+      {% for key, text in requestMethodOptions %}
+        {% set requestMethods = (requestMethods.push(
+          {
+            value: key,
+            text: text,
+            checked: formValues.method == key
+          }
+        ), requestMethods) %}
+      {% endfor %}
+
+      <form action="{{ urlPrefix }}/request-method" method="POST" novalidate>
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+        {{ govukRadios({
+          idPrefix: "method",
+          name: "method",
+          fieldset: {
+            legend: {
+              text: pageHeaderTitle,
+              isPageHeading: true,
+              classes: "govuk-fieldset__legend--l"
+            }
+          },
+          items: requestMethods,
+          errorMessage: errors | findError('method')
+        }) }}
+
+        {{ govukButton({
+          text: "Continue",
+          attributes: { "data-test": "submit" },
+          preventDoubleClick: true
+        }) }} 
+      </form>
+    </div>
+  </div>
+{% endblock %}

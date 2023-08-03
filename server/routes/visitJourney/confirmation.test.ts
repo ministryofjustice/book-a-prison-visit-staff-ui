@@ -82,6 +82,7 @@ testJourneys.forEach(journey => {
         },
         visitReference: 'ab-cd-ef-gh',
         visitStatus: 'BOOKED',
+        requestMethod: 'PHONE',
       }
 
       sessionApp = appWithAllRoutes({
@@ -169,6 +170,7 @@ testJourneys.forEach(journey => {
           },
           visitReference: 'ab-cd-ef-gh',
           visitStatus: 'BOOKED',
+          requestMethod: 'PHONE',
         }
 
         sessionApp = appWithAllRoutes({
