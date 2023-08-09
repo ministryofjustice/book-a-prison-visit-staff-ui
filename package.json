@@ -96,9 +96,9 @@
     ]
   },
   "dependencies": {
-    "@aws-sdk/client-sqs": "^3.382.0",
+    "@aws-sdk/client-sqs": "^3.387.0",
     "@ministryofjustice/frontend": "^1.8.0",
-    "agentkeepalive": "^4.3.0",
+    "agentkeepalive": "^4.5.0",
     "applicationinsights": "^2.7.0",
     "body-parser": "^1.20.2",
     "bunyan": "^1.8.15",
@@ -126,7 +126,7 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
-    "@aws-sdk/types": "^3.378.0",
+    "@aws-sdk/types": "^3.387.0",
     "@types/bunyan": "^1.8.8",
     "@types/bunyan-format": "^0.2.5",
     "@types/compression": "^1.7.2",
@@ -136,7 +136,7 @@
     "@types/http-errors": "^2.0.1",
     "@types/jest": "^29.5.3",
     "@types/jsonwebtoken": "^9.0.2",
-    "@types/node": "^18.17.1",
+    "@types/node": "^18.17.4",
     "@types/nunjucks": "^3.2.3",
     "@types/passport": "^1.0.12",
     "@types/passport-oauth2": "^1.4.12",
@@ -158,7 +158,7 @@
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.10.0",
     "eslint-import-resolver-typescript": "^3.5.5",
-    "eslint-plugin-cypress": "^2.13.3",
+    "eslint-plugin-cypress": "^2.14.0",
     "eslint-plugin-import": "2.27.5",
     "eslint-plugin-no-only-tests": "^3.1.0",
     "eslint-plugin-prettier": "^4.2.1",
@@ -172,7 +172,7 @@
     "mocha-junit-reporter": "^2.2.1",
     "nock": "^13.3.2",
     "nodemon": "^2.0.22",
-    "openapi-typescript": "^6.4.0",
+    "openapi-typescript": "^6.4.3",
     "prettier": "^2.8.8",
     "sass": "^1.64.2",
     "supertest": "^6.3.3",
