@@ -210,7 +210,7 @@
 
         {% if visitHistoryDetails.eventsAudit %}
         {% for event in visitHistoryDetails.eventsAudit %}
-          {% if event.type in [ 'BOOKED_VISIT', 'UPDATED_VISIT', 'CANCELLED_VISIT' ] %}
+          {% if event.type in [ 'BOOKED_VISIT', 'UPDATED_VISIT', 'CANCELLED_VISIT', 'MIGRATED_VISIT' ] %}
             <li>
               <strong>{{ eventAuditTypes[event.type] }}</strong>
               <span data-test="{{ event.type | lower }}" >
@@ -218,16 +218,6 @@
                 at {{ event.createTimestamp | formatTime }}
                 {{ actionedByUser(event.actionedBy) }} 
                 {{ requestMethodDescriptions[event.applicationMethodType] }}
-              </span>
-            </li>
-          {% endif %}
-          {% if event.type === 'MIGRATED_VISIT' %}
-            <li>
-              <strong>{{ "Booked visit" if visit.visitStatus === 'BOOKED' else "Cancelled visit" }}</strong>
-              <span data-test="{{ event.type | lower }}" >
-                {{ event.createTimestamp | formatDate('EEEE d MMMM yyyy') }}
-                at {{ event.createTimestamp | formatTime }}
-                {{ actionedByUser(event.actionedBy) }} 
               </span>
             </li>
           {% endif %}
