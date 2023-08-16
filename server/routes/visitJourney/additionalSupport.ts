@@ -6,7 +6,10 @@ import getUrlPrefix from './visitJourneyUtils'
 import { AdditionalSupportService } from '../../services'
 
 export default class AdditionalSupport {
-  constructor(private readonly mode: string, private readonly additionalSupportService: AdditionalSupportService) {}
+  constructor(
+    private readonly mode: string,
+    private readonly additionalSupportService: AdditionalSupportService,
+  ) {}
 
   async get(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'
