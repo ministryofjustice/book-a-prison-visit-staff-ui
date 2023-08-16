@@ -1,5 +1,5 @@
-import { type RequestHandler, Router } from 'express'
 import url from 'url'
+import { type RequestHandler, Router } from 'express'
 import { body } from 'express-validator'
 import { validatePrisonerSearch, validateVisitSearch } from './searchValidation'
 import config from '../config'
