@@ -185,10 +185,9 @@ describe('/visit/:reference', () => {
           const $ = cheerio.load(res.text)
           expect($('h1').text()).toBe('Visit booking details')
           expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
-          // visit details
           expect($('[data-test="visit-date-and-time"]').text()).toContain('14 January 2022')
           expect($('[data-test="visit-date-and-time"]').text()).toContain('10am to 11am')
-          // visitor details - tab not selected - check not displayed
+          // visitor details - tab selected - check information displayed
           expect($('.test-visitor-name1').text()).toBe('Jeanette Smith (sister of the prisoner)')
           expect($('.test-visitor-address1').text()).toBe('123 The Street, Coventry')
           expect($('.test-visitor-restriction').text()).toContain('Closed')
@@ -217,11 +216,10 @@ describe('/visit/:reference', () => {
           const $ = cheerio.load(res.text)
           expect($('h1').text()).toBe('Visit booking details')
           expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
-          // visit details
           expect($('[data-test="visit-date-and-time"]').text()).toContain('14 January 2022')
           // visitor details - tab not selected - check not displayed
           expect($('.test-visitor-name1').length).toBe(0)
-          // booking history - tab not selected - check not displayed
+          // booking history - tab selected - check information displayed
           expect($('[data-test="visit-event"]').eq(0).text()).toBe('Visit booked')
           expect($('[data-test="visit-actioned-by"]').eq(0).text().trim().replace(/\s+/g, ' ')).toBe('by User One')
           expect($('[data-test="visit-event-date-time"]').eq(0).text()).toBe('Saturday 1 January 2022 at 9am')
