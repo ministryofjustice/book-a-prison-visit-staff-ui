@@ -106,17 +106,6 @@ context('Visit details page', () => {
     visitDetailsPage.prisonerName().contains(prisonerDisplayName)
     // Visit Details
     visitDetailsPage.visitDateAndTime().contains(format(new Date(futureVisitDate), longDateFormat))
-    // Visitor Details - 1
-    // visitDetailsPage.visitorName1().contains('Smith, Jeanette')
-    // Visitor Details - 2
-    // visitDetailsPage.visitorName2().contains('Smith, Bob')
-    // visitDetailsPage.visitorDob2().contains(format(new Date(childDob), longDateFormat))
-    // visitDetailsPage.visitorRelationship2().contains('Son')
-    // visitDetailsPage.visitorAddress2().contains('C1 2AB')
-    // visitDetailsPage.visitorRestrictions2().contains('None')
-    // Additional Information
-    // visitDetailsPage.visitBooked().contains('Saturday 1 January 2022 at 9am by User One (phone call request)')
-    // visitDetailsPage.visitUpdated().contains('Saturday 1 January 2022 at 10am by User Two (email request)')
   })
 
   it('Should show different tabs when sub navigation is used', () => {
