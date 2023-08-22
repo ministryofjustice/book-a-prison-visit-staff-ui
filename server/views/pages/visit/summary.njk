@@ -133,109 +133,132 @@
         }]
       }) }}
 
-      {% if selectedTab == undefined %}
-        {{ govukSummaryList({
-          rows: [
-            {
-              key: {
-                text: "Name"
-              },
-              value: {
-                html: "<span data-test='prisoner-name'>" + (prisoner.firstName + ' ' + prisoner.lastName) | formatLastNameFirst + "</span>"
-              }
-            },
-            {
-              key: {
-                text: "Prison number"
-              },
-              value: {
-                html: "<span data-test='prisoner-number'>" + prisoner.prisonerNumber + "</span>"
-              }
-            },
-            {
-              key: {
-                text: "Date of birth"
-              },
-              value: {
-                html: "<span data-test='prisoner-dob'>" + prisoner.dateOfBirth | formatDate + "</span>"
-              }
-            },
-            {
-              key: {
-                text: "Location"
-              },
-              value: {
-                html: "<span data-test='prisoner-location'>" + prisonerLocation + "</span>"
-              }
-            }
-          ]
-        }) }}
-      {% elseif selectedTab == 'visitors' %}
+      <div class="govuk-!-width-one-half">
 
-        {%- for visitor in visitors %}
-          {% set displayRows = [] %}
-          {% set displayRows = (displayRows.push(
-            {
-              key: {
-                text: 'Name'
-              },
-              value: {
-                html: '<span class="test-visitor-name' + loop.index + '">' + visitor.name | safe + ' (' + (visitor.relationshipDescription | lower) + ' of the prisoner)</span>'
-              }
-            },
-            {
-              key: {
-                text: 'Address '
-              },
-              value: {
-                html: '<span class="test-visitor-address' + loop.index + '">' + (visitor.address | replace("<br>", " ")) + '</span>'
-              }
-            },
-            {
-              key: {
-                text: 'Restrictions '
-              },
-              value: {
-                html: '<span class="test-visitor-restriction">' + visitorRestrictions(visitor) + '</span>'
-              }
-            }
-
-          ), displayRows) %}
-          <h2 class"govuk-heading-m"=>Visitor {{ loop.index }}</h1>
+        {% if selectedTab == undefined %}
           {{ govukSummaryList({
-            rows: displayRows
+            rows: [
+              {
+                key: {
+                  text: "Name"
+                },
+                value: {
+                  html: "<span data-test='prisoner-name'>" + (prisoner.firstName + ' ' + prisoner.lastName) | formatLastNameFirst + "</span>"
+                }
+              },
+              {
+                key: {
+                  text: "Prison number"
+                },
+                value: {
+                  html: "<span data-test='prisoner-number'>" + prisoner.prisonerNumber + "</span>"
+                }
+              },
+              {
+                key: {
+                  text: "Date of birth"
+                },
+                value: {
+                  html: "<span data-test='prisoner-dob'>" + prisoner.dateOfBirth | formatDate + "</span>"
+                }
+              },
+              {
+                key: {
+                  text: "Location"
+                },
+                value: {
+                  html: "<span data-test='prisoner-location'>" + prisonerLocation + "</span>"
+                }
+              }
+            ]
           }) }}
+        {% elseif selectedTab == 'visitors' %}
 
-        {% endfor %}
-      {% elseif selectedTab == 'history' %}
+          {%- for visitor in visitors %}
 
-        {% if visitHistoryDetails.eventsAudit %}
-          <div class="moj-timeline">
-            {% for event in visitHistoryDetails.eventsAudit %}
-              {% if event.type in [ 'BOOKED_VISIT', 'UPDATED_VISIT', 'CANCELLED_VISIT', 'MIGRATED_VISIT' ] %}
-                <div class="moj-timeline__item">
+            <h2 class="govuk-heading-m"=>Visitor {{ loop.index }}</h1>
 
-                  <div class="moj-timeline__header">
-                    <h2 data-test="visit-event" class="moj-timeline__title">{{ eventAuditTypes[event.type]}}</h2>
-                    <p data-test="visit-actioned-by" class="moj-timeline__byline">{{ actionedByUser(event.actionedBy) }}</p>
+            {% set displayRows = [] %}
+            {% set displayRows = (displayRows.push(
+              {
+                key: {
+                  text: 'Name'
+                },
+                value: {
+                  html: '<span class="test-visitor-name' + loop.index + '">' + visitor.name | safe + ' (' + (visitor.relationshipDescription | lower) + ' of the prisoner)</span>'
+                }
+              },
+              {
+                key: {
+                  text: 'Address '
+                },
+                value: {
+                  html: '<span class="test-visitor-address' + loop.index + '">' + (visitor.address | replace("<br>", " ")) + '</span>'
+                }
+              },
+              {
+                key: {
+                  text: 'Restrictions '
+                },
+                value: {
+                  html: '<span class="test-visitor-restriction' + loop.index + '">' + visitorRestrictions(visitor) + '</span>'
+                }
+              }
+
+            ), displayRows) %}
+
+            {{ govukSummaryList({
+              rows: displayRows
+            }) }}
+
+          {% endfor %}
+
+          <h2 class="govuk-heading-m"=>Visitor information</h1>
+        
+          {{ govukSummaryList ({
+            rows: [
+            {
+                key: {
+                  text: "Additional support"
+                },
+                value: {
+                  html: '<span data-test="additional-support">' + additionalSupport | join(", ") if additionalSupport | length else "None" + '</span>'
+                }
+              }
+            ]
+          })}}
+
+        {% elseif selectedTab == 'history' %}
+
+          {% if visitHistoryDetails.eventsAudit %}
+            <div class="moj-timeline">
+              {% for event in visitHistoryDetails.eventsAudit %}
+                {% if event.type in [ 'BOOKED_VISIT', 'UPDATED_VISIT', 'CANCELLED_VISIT', 'MIGRATED_VISIT' ] %}
+                  <div class="moj-timeline__item">
+
+                    <div class="moj-timeline__header">
+                      <h2 data-test="visit-event" class="moj-timeline__title">{{ eventAuditTypes[event.type]}}</h2>
+                      <p data-test="visit-actioned-by" class="moj-timeline__byline">{{ actionedByUser(event.actionedBy) }}</p>
+                    </div>
+
+                    <p class="moj-timeline__date">
+                      <time data-test="visit-event-date-time" datetime="{{ event.createTimestamp }}">{{ event.createTimestamp | formatDate('EEEE d MMMM yyyy') }} at {{ event.createTimestamp | formatTime }}</time>
+                    </p>
+
+                    <div class="moj-timeline__description">
+                      <p data-test="visit-request-method">{{ requestMethodDescriptions[event.applicationMethodType] }}</p>
+                    </div>
+
                   </div>
+                {% endif %}
+              {% endfor %}
+            </div>
 
-                  <p class="moj-timeline__date">
-                    <time data-test="visit-event-date-time" datetime="{{ event.createTimestamp }}">{{ event.createTimestamp | formatDate('EEEE d MMMM yyyy') }} at {{ event.createTimestamp | formatTime }}</time>
-                  </p>
-
-                  <div class="moj-timeline__description">
-                    <p data-test="visit-request-method">{{ requestMethodDescriptions[event.applicationMethodType] }}</p>
-                  </div>
-
-                </div>
-              {% endif %}
-            {% endfor %}
-          </div>
+          {% endif %}
 
         {% endif %}
-
-      {% endif %}
+      
+      </div>
 
     {% else %}
       <p>This booking is not for {{ selectedEstablishment.prisonName }}.</p>

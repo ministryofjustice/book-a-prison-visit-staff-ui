@@ -2,7 +2,7 @@ import Page, { PageElement } from './page'
 
 export default class VisitDetailsPage extends Page {
   constructor() {
-    super('Booking details')
+    super('Visit booking details')
   }
 
   visitReference = (): PageElement => cy.get('[data-test=reference]')
@@ -24,9 +24,7 @@ export default class VisitDetailsPage extends Page {
   prisonerLocation = (): PageElement => cy.get('[data-test=prisoner-location]')
 
   // Visit Details
-  visitDate = (): PageElement => cy.get('[data-test=visit-date]')
-
-  visitTime = (): PageElement => cy.get('[data-test=visit-time]')
+  visitDateAndTime = (): PageElement => cy.get('[data-test=visit-date-and-time]')
 
   visitType = (): PageElement => cy.get('[data-test=visit-type]')
 

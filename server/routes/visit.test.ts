@@ -190,7 +190,8 @@ describe('/visit/:reference', () => {
           // visitor details - tab selected - check information displayed
           expect($('.test-visitor-name1').text()).toBe('Jeanette Smith (sister of the prisoner)')
           expect($('.test-visitor-address1').text()).toBe('123 The Street, Coventry')
-          expect($('.test-visitor-restriction').text()).toContain('Closed')
+          expect($('.test-visitor-restriction1').text()).toContain('Closed')
+          expect($('[data-test="additional-support"]').text()).toContain('Wheelchair ramp, custom request')
           // booking history - tab not selected - check not displayed
           expect($('.moj-timeline').length).toBe(0)
 
