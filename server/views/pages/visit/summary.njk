@@ -121,15 +121,18 @@
         items: [{
           text: "Prisoner details",
           href: "/visit/" + visit.reference,
-          active: true if selectedTab == undefined
+          active: true if selectedTab == undefined,
+          attributes: { "data-test": "select-prisoner-tab" }
         }, {
           text: "Visitors",
           href: "/visit/" + visit.reference + "?tab=visitors",
-          active: true if selectedTab == 'visitors'
+          active: true if selectedTab == 'visitors',
+          attributes: { "data-test": "select-visitor-tab" }
         }, {
           text: "Booking history",
           href: "/visit/" + visit.reference + "?tab=history",
-          active: true if selectedTab == 'history'
+          active: true if selectedTab == 'history',
+          attributes: { "data-test": "select-history-tab" }
         }]
       }) }}
 
@@ -185,7 +188,15 @@
                   text: 'Name'
                 },
                 value: {
-                  html: '<span class="test-visitor-name' + loop.index + '">' + visitor.name | safe + ' (' + (visitor.relationshipDescription | lower) + ' of the prisoner)</span>'
+                  html: '<span data-test="test-visitor-name' + loop.index + '">' + visitor.name | safe + ' (' + (visitor.relationshipDescription | lower) + ' of the prisoner)</span>'
+                }
+              },
+              {
+                key: {
+                  text: 'Date of birth'
+                },
+                value: {
+                  html: '<span data-test="test-visitor-dob' + loop.index + '">' + visitorDateOfBirth(visitor) + '</span>'
                 }
               },
               {
@@ -193,7 +204,7 @@
                   text: 'Address '
                 },
                 value: {
-                  html: '<span class="test-visitor-address' + loop.index + '">' + (visitor.address | replace("<br>", " ")) + '</span>'
+                  html: '<span data-test="test-visitor-address' + loop.index + '">' + (visitor.address | replace("<br>", " ")) + '</span>'
                 }
               },
               {
@@ -201,7 +212,7 @@
                   text: 'Restrictions '
                 },
                 value: {
-                  html: '<span class="test-visitor-restriction' + loop.index + '">' + visitorRestrictions(visitor) + '</span>'
+                  html: '<span data-test="test-visitor-restriction' + loop.index + '">' + visitorRestrictions(visitor) + '</span>'
                 }
               }
 

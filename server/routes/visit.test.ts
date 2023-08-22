@@ -188,9 +188,11 @@ describe('/visit/:reference', () => {
           expect($('[data-test="visit-date-and-time"]').text()).toContain('14 January 2022')
           expect($('[data-test="visit-date-and-time"]').text()).toContain('10am to 11am')
           // visitor details - tab selected - check information displayed
-          expect($('.test-visitor-name1').text()).toBe('Jeanette Smith (sister of the prisoner)')
-          expect($('.test-visitor-address1').text()).toBe('123 The Street, Coventry')
-          expect($('.test-visitor-restriction1').text()).toContain('Closed')
+          expect($('[data-test="test-visitor-name1"]').text()).toBe('Jeanette Smith (sister of the prisoner)')
+          expect($('[data-test="test-visitor-dob1"]').text()).toContain('28 July 1986')
+          expect($('[data-test="test-visitor-dob1"]').text()).toContain('(35 years old)')
+          expect($('[data-test="test-visitor-address1"]').text()).toBe('123 The Street, Coventry')
+          expect($('[data-test="test-visitor-restriction1"]').text()).toContain('Closed')
           expect($('[data-test="additional-support"]').text()).toContain('Wheelchair ramp, custom request')
           // booking history - tab not selected - check not displayed
           expect($('.moj-timeline').length).toBe(0)

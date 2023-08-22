@@ -133,4 +133,67 @@ context('Visit details page', () => {
     // visitDetailsPage.visitBooked().contains('Saturday 1 January 2022 at 9am by User One (phone call request)')
     // visitDetailsPage.visitUpdated().contains('Saturday 1 January 2022 at 10am by User Two (email request)')
   })
+
+  it('Should show different tabs when sub navigation is used', () => {
+    const today = new Date()
+    const prisoner = TestData.prisoner()
+    const { prisonerNumber: offenderNo } = prisoner
+    const prisonerDisplayName = 'Smith, John'
+
+    const futureVisitDate = format(add(today, { months: 1 }), shortDateFormat)
+    const visitHistoryDetails = TestData.visitHistoryDetails({
+      visit: TestData.visit({
+        startTimestamp: `${futureVisitDate}T12:00:00`,
+        endTimestamp: `${futureVisitDate}T14:00:00`,
+      }),
+    })
+
+    const childDob = format(sub(today, { years: 5 }), shortDateFormat)
+    const contacts = [
+      TestData.contact({ personId: 4321 }),
+      TestData.contact({
+        personId: 4322,
+        firstName: 'Bob',
+        dateOfBirth: childDob,
+        relationshipCode: 'SON',
+        relationshipDescription: 'Son',
+      }),
+    ]
+
+    cy.task('stubPrisonerById', prisoner)
+    cy.task('stubVisitHistory', visitHistoryDetails)
+    cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
+    cy.task('stubAvailableSupport')
+    cy.visit('/visit/ab-cd-ef-gh')
+
+    const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage)
+
+    visitDetailsPage.visitReference().contains('ab-cd-ef-gh')
+    // Prisoner Details
+    visitDetailsPage.prisonerName().contains(prisonerDisplayName)
+    // Visit Details
+    visitDetailsPage.visitDateAndTime().contains(format(new Date(futureVisitDate), longDateFormat))
+
+    // Select prisoner tab
+    visitDetailsPage.selectVisitorTab()
+    // Visitor Details - 1
+    visitDetailsPage.visitorName1().contains('Jeanette Smith (wife of the prisoner)')
+    // Visitor Details - 2
+    visitDetailsPage.visitorName2().contains('Bob Smith (son of the prisoner)')
+    visitDetailsPage.visitorDob2().contains(format(new Date(childDob), longDateFormat))
+    visitDetailsPage.visitorAddress2().contains('C1 2AB')
+    visitDetailsPage.visitorRestrictions2().contains('None')
+    visitDetailsPage.additionalSupport().contains('Wheelchair ramp, custom request')
+
+    // Select history tab
+    visitDetailsPage.selectHistoryTab()
+    visitDetailsPage.firstActionedBy().contains('User One')
+    visitDetailsPage.firstEventHeader().contains('Visit booked')
+    visitDetailsPage.firstEventTime().contains('Saturday 1 January 2022 at 9am')
+    visitDetailsPage.firstRequestMethod().contains('Phone call request')
+    visitDetailsPage.secondActionedBy().contains('User Two')
+    visitDetailsPage.secondEventHeader().contains('Visit updated')
+    visitDetailsPage.secondEventTime().contains('Saturday 1 January 2022 at 10am')
+    visitDetailsPage.secondRequestMethod().contains('Email request')
+  })
 })
