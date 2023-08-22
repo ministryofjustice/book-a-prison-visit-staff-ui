@@ -63,21 +63,6 @@ context('Visit details page', () => {
     visitDetailsPage.visitType().contains('Open')
     visitDetailsPage.visitContact().contains('Smith, Jeanette')
     visitDetailsPage.visitPhone().contains('01234 567890')
-    // Visitor Details
-    // visitDetailsPage.visitorName1().contains('Smith, Jeanette')
-    // visitDetailsPage.visitorDob1().contains('28 July 1986')
-    // visitDetailsPage.visitorRelationship1().contains('Wife')
-    // visitDetailsPage.visitorAddress1().contains('C1 2AB')
-    // visitDetailsPage.visitorRestrictions1().within(() => {
-    //   cy.contains(contacts[0].restrictions[0].restrictionTypeDescription)
-    //   cy.contains('End date not entered')
-    // })
-    // Additional Information
-    // visitDetailsPage.visitComment().contains('Example of a visit comment')
-    // visitDetailsPage.visitorConcern().contains('Example of a visitor concern')
-    // visitDetailsPage.additionalSupport().contains('Wheelchair ramp, custom request')
-    // visitDetailsPage.visitBooked().contains('Saturday 1 January 2022 at 9am by User One (phone call request')
-    // visitDetailsPage.visitUpdated().contains('Saturday 1 January 2022 at 10am by User Two (email request)')
   })
 
   it('Should show update/cancel button for future visit', () => {
