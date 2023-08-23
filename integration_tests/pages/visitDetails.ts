@@ -2,7 +2,7 @@ import Page, { PageElement } from './page'
 
 export default class VisitDetailsPage extends Page {
   constructor() {
-    super('Booking details')
+    super('Visit booking details')
   }
 
   visitReference = (): PageElement => cy.get('[data-test=reference]')
@@ -14,58 +14,76 @@ export default class VisitDetailsPage extends Page {
 
   cancelBooking = (): PageElement => cy.get('[data-test="cancel-visit"]')
 
+  // Subnavigation
+
+  selectPrisonerTab = (): PageElement => cy.get('[data-test="select-prisoner-tab"]').click()
+
+  selectVisitorTab = (): PageElement => cy.get('[data-test="select-visitor-tab"]').click()
+
+  selectHistoryTab = (): PageElement => cy.get('[data-test="select-history-tab"]').click()
+
   // Prisoner Details
-  prisonerName = (): PageElement => cy.get('[data-test=prisoner-name]')
+  prisonerName = (): PageElement => cy.get('[data-test="prisoner-name"]')
 
-  prisonerNumber = (): PageElement => cy.get('[data-test=prisoner-number]')
+  prisonerNumber = (): PageElement => cy.get('[data-test="prisoner-number"]')
 
-  prisonerDob = (): PageElement => cy.get('[data-test=prisoner-dob]')
+  prisonerDob = (): PageElement => cy.get('[data-test="prisoner-dob"]')
 
-  prisonerLocation = (): PageElement => cy.get('[data-test=prisoner-location]')
+  prisonerLocation = (): PageElement => cy.get('[data-test="prisoner-location"]')
 
   // Visit Details
-  visitDate = (): PageElement => cy.get('[data-test=visit-date]')
+  visitDateAndTime = (): PageElement => cy.get('[data-test="visit-date-and-time"]')
 
-  visitTime = (): PageElement => cy.get('[data-test=visit-time]')
+  visitType = (): PageElement => cy.get('[data-test="visit-type"]')
 
-  visitType = (): PageElement => cy.get('[data-test=visit-type]')
+  visitContact = (): PageElement => cy.get('[data-test="visit-contact"]')
 
-  visitContact = (): PageElement => cy.get('[data-test=visit-contact]')
-
-  visitPhone = (): PageElement => cy.get('[data-test=visit-phone]')
+  visitPhone = (): PageElement => cy.get('[data-test="visit-phone"]')
 
   // Visitor Details-1
-  visitorName1 = (): PageElement => cy.get('[data-test=visitor-name-1]')
+  visitorName1 = (): PageElement => cy.get('[data-test="test-visitor-name1"]')
 
-  visitorDob1 = (): PageElement => cy.get('[data-test=visitor-dob-1]')
+  visitorDob1 = (): PageElement => cy.get('[data-test="test-visitor-dob1"]')
 
-  visitorRelationship1 = (): PageElement => cy.get('[data-test=visitor-relationship-1]')
+  visitorRelationship1 = (): PageElement => cy.get('[data-test="test-visitor-relationship1"]')
 
-  visitorAddress1 = (): PageElement => cy.get('[data-test=visitor-address-1]')
+  visitorAddress1 = (): PageElement => cy.get('[data-test="test-visitor-address1"]')
 
-  visitorRestrictions1 = (): PageElement => cy.get('[data-test=visitor-restrictions-1]')
+  visitorRestrictions1 = (): PageElement => cy.get('[data-test="test-visitor-restrictions1"]')
 
   // Visitor Details-2
-  visitorName2 = (): PageElement => cy.get('[data-test=visitor-name-2]')
+  visitorName2 = (): PageElement => cy.get('[data-test="test-visitor-name2"]')
 
-  visitorDob2 = (): PageElement => cy.get('[data-test=visitor-dob-2]')
+  visitorDob2 = (): PageElement => cy.get('[data-test="test-visitor-dob2"]')
 
-  visitorRelationship2 = (): PageElement => cy.get('[data-test=visitor-relationship-2]')
+  visitorRelationship2 = (): PageElement => cy.get('[data-test="test-visitor-relationship2"]')
 
-  visitorAddress2 = (): PageElement => cy.get('[data-test=visitor-address-2]')
+  visitorAddress2 = (): PageElement => cy.get('[data-test="test-visitor-address2"]')
 
-  visitorRestrictions2 = (): PageElement => cy.get('[data-test=visitor-restrictions-2]')
+  visitorRestrictions2 = (): PageElement => cy.get('[data-test="test-visitor-restriction2"]')
 
   // Additional Information
-  visitComment = (): PageElement => cy.get('[data-test=visit-comment]')
-
-  visitorConcern = (): PageElement => cy.get('[data-test=visitor-concern]')
-
   additionalSupport = (): PageElement => cy.get('[data-test=additional-support]')
 
-  visitBooked = (): PageElement => cy.get('[data-test="booked_visit"]')
+  // Visit history
+  firstEventHeader = (): PageElement => cy.get(':nth-child(1) > .moj-timeline__header > [data-test="visit-event"]')
 
-  visitUpdated = (): PageElement => cy.get('[data-test="updated_visit"]')
+  firstActionedBy = (): PageElement => cy.get(':nth-child(1) > .moj-timeline__header > [data-test="visit-actioned-by"]')
 
-  visitCancelled = (): PageElement => cy.get('[data-test="cancelled_visit"]')
+  firstEventTime = (): PageElement =>
+    cy.get(':nth-child(1) > .moj-timeline__date > [data-test="visit-event-date-time"]')
+
+  firstRequestMethod = (): PageElement =>
+    cy.get(':nth-child(1) > .moj-timeline__description > [data-test="visit-request-method"]')
+
+  secondEventHeader = (): PageElement => cy.get(':nth-child(2) > .moj-timeline__header > [data-test="visit-event"]')
+
+  secondActionedBy = (): PageElement =>
+    cy.get(':nth-child(2) > .moj-timeline__header > [data-test="visit-actioned-by"]')
+
+  secondEventTime = (): PageElement =>
+    cy.get(':nth-child(2) > .moj-timeline__date > [data-test="visit-event-date-time"]')
+
+  secondRequestMethod = (): PageElement =>
+    cy.get(':nth-child(2) > .moj-timeline__description > [data-test="visit-request-method"]')
 }

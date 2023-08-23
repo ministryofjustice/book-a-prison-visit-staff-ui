@@ -135,14 +135,14 @@ describe('/visit/:reference', () => {
   })
 
   describe('GET /visit/:reference', () => {
-    it('should render full booking summary page with prisoner, visit and visitor details, with default back link', () => {
+    it('should render full booking summary page with visit information and prisoner tab selected, with default back link', () => {
       return request(app)
         .get('/visit/ab-cd-ef-gh')
         .expect(200)
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('h1').text()).toBe('Booking details')
+          expect($('h1').text()).toBe('Visit booking details')
           expect($('.govuk-back-link').attr('href')).toBe('/prisoner/A1234BC/visits')
           expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
           // prisoner details
@@ -151,35 +151,18 @@ describe('/visit/:reference', () => {
           expect($('[data-test="prisoner-dob"]').text()).toBe('2 April 1975')
           expect($('[data-test="prisoner-location"]').text()).toBe('1-1-C-028, HMP Hewell')
           // visit details
-          expect($('[data-test="visit-date"]').text()).toBe('14 January 2022')
-          expect($('[data-test="visit-time"]').text()).toBe('10am to 11am')
+          expect($('[data-test="visit-date-and-time"]').text()).toContain('14 January 2022')
+          expect($('[data-test="visit-date-and-time"]').text()).toContain('10am to 11am')
           expect($('[data-test="visit-type"]').text()).toBe('Open')
           expect($('[data-test="visit-contact"]').text()).toBe('Smith, Jeanette')
           expect($('[data-test="visit-phone"]').text()).toBe('01234 567890')
           expect($('[data-test="cancel-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/cancel')
           expect($('form').attr('action')).toBe('/visit/ab-cd-ef-gh')
-          // visitor details
-          expect($('[data-test="visitor-name-1"]').text()).toBe('Smith, Jeanette')
-          expect($('[data-test="visitor-dob-1"]').html()).toContain('28 July 1986')
-          expect($('[data-test="visitor-relationship-1"]').text()).toBe('Sister')
-          expect($('[data-test="visitor-address-1"]').html()).toBe('123 The Street,<br>Coventry')
-          expect($('[data-test="visitor-restrictions-1"] .restriction-tag--CLOSED').text()).toBe('Closed')
-          expect($('[data-test="visitor-restrictions-1"]').text()).toContain('End date not entered')
-          expect($('[data-test="visitor-name-2"]').text()).toBe('Smith, Anne')
-          expect($('[data-test="visitor-dob-2"]').html()).toContain(`2 January ${childBirthYear}`)
-          expect($('[data-test="visitor-relationship-2"]').text()).toBe('Niece')
-          expect($('[data-test="visitor-address-2"]').html()).toBe('Not entered')
-          expect($('[data-test="visitor-restrictions-2"]').text()).toBe('None')
-          // additional info
-          expect($('[data-test="visit-comment"]').eq(0).text()).toBe('Example of a visit comment')
-          expect($('[data-test="visitor-concern"]').eq(0).text()).toBe('Example of a visitor concern')
-          expect($('[data-test="additional-support"]').text()).toBe('Wheelchair ramp, custom request')
-          expect($('[data-test="booked_visit"]').text().trim().replace(/\s+/g, ' ')).toBe(
-            'Saturday 1 January 2022 at 9am by User One (phone call request)',
-          )
-          expect($('[data-test="updated_visit"]').text().trim().replace(/\s+/g, ' ')).toBe(
-            'Saturday 1 January 2022 at 10am by User Two (email request)',
-          )
+          // visitor details - tab not selected - check not displayed
+          expect($('.test-visitor-name1').length).toBe(0)
+          // booking history - tab not selected - check not displayed
+          expect($('.moj-timeline').length).toBe(0)
+
           expect(visitSessionData).toEqual({ prisoner: undefined })
 
           expect(auditService.viewedVisitDetails).toHaveBeenCalledTimes(1)
@@ -193,29 +176,72 @@ describe('/visit/:reference', () => {
         })
     })
 
-    it('should handle special cases for migrated data when showing actioned by user details', () => {
-      visitHistoryDetails.eventsAudit = [
-        {
-          type: 'BOOKED_VISIT',
-          applicationMethodType: 'NOT_APPLICABLE',
-          actionedBy: 'NOT_KNOWN_NOMIS',
-          createTimestamp: '2022-01-01T11:30:00',
-        },
-      ]
-
+    it('should render full booking summary page with visit information and visitor tab selected', () => {
       return request(app)
-        .get('/visit/ab-cd-ef-gh')
+        .get('/visit/ab-cd-ef-gh?tab=visitors')
         .expect(200)
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('[data-test="booked_visit"]').text().trim().replace(/\s+/g, ' ')).toBe(
-            'Saturday 1 January 2022 at 11:30am in NOMIS',
-          )
+          expect($('h1').text()).toBe('Visit booking details')
+          expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
+          expect($('[data-test="visit-date-and-time"]').text()).toContain('14 January 2022')
+          expect($('[data-test="visit-date-and-time"]').text()).toContain('10am to 11am')
+          // visitor details - tab selected - check information displayed
+          expect($('[data-test="test-visitor-name1"]').text()).toBe('Jeanette Smith (sister of the prisoner)')
+          expect($('[data-test="test-visitor-dob1"]').text()).toContain('28 July 1986')
+          expect($('[data-test="test-visitor-dob1"]').text()).toContain('(35 years old)')
+          expect($('[data-test="test-visitor-address1"]').text()).toBe('123 The Street, Coventry')
+          expect($('[data-test="test-visitor-restriction1"]').text()).toContain('Closed')
+          expect($('[data-test="additional-support"]').text()).toContain('Wheelchair ramp, custom request')
+          // booking history - tab not selected - check not displayed
+          expect($('.moj-timeline').length).toBe(0)
+
+          expect(visitSessionData).toEqual({ prisoner: undefined })
+
+          expect(auditService.viewedVisitDetails).toHaveBeenCalledTimes(1)
+          expect(auditService.viewedVisitDetails).toHaveBeenCalledWith({
+            visitReference: 'ab-cd-ef-gh',
+            prisonerId: 'A1234BC',
+            prisonId: 'HEI',
+            username: 'user1',
+            operationId: undefined,
+          })
         })
     })
 
-    it('should render full booking summary page with prisoner, visit and visitor details, with default back link, formatting unknown contact telephone correctly', () => {
+    it('should render full booking summary page with visit information and history tab selected', () => {
+      return request(app)
+        .get('/visit/ab-cd-ef-gh?tab=history')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text()).toBe('Visit booking details')
+          expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
+          expect($('[data-test="visit-date-and-time"]').text()).toContain('14 January 2022')
+          // visitor details - tab not selected - check not displayed
+          expect($('.test-visitor-name1').length).toBe(0)
+          // booking history - tab selected - check information displayed
+          expect($('[data-test="visit-event"]').eq(0).text()).toBe('Visit booked')
+          expect($('[data-test="visit-actioned-by"]').eq(0).text().trim().replace(/\s+/g, ' ')).toBe('by User One')
+          expect($('[data-test="visit-event-date-time"]').eq(0).text()).toBe('Saturday 1 January 2022 at 9am')
+          expect($('[data-test="visit-request-method"]').eq(0).text()).toBe('Phone call request')
+
+          expect(visitSessionData).toEqual({ prisoner: undefined })
+
+          expect(auditService.viewedVisitDetails).toHaveBeenCalledTimes(1)
+          expect(auditService.viewedVisitDetails).toHaveBeenCalledWith({
+            visitReference: 'ab-cd-ef-gh',
+            prisonerId: 'A1234BC',
+            prisonId: 'HEI',
+            username: 'user1',
+            operationId: undefined,
+          })
+        })
+    })
+
+    it('should render full booking summary page with visit information and prisoner tab selected, with default back link, formatting unknown contact telephone correctly', () => {
       visitHistoryDetails.visit.visitContact.telephone = 'UNKNOWN'
       prisonerSearchService.getPrisonerById.mockResolvedValue(prisoner)
       visitService.getFullVisitDetails.mockResolvedValue({
@@ -230,41 +256,16 @@ describe('/visit/:reference', () => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('h1').text()).toBe('Booking details')
+          expect($('h1').text()).toBe('Visit booking details')
           expect($('.govuk-back-link').attr('href')).toBe('/prisoner/A1234BC/visits')
           expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
           // prisoner details
           expect($('[data-test="prisoner-name"]').text()).toBe('Smith, John')
-          expect($('[data-test="prisoner-number"]').text()).toBe('A1234BC')
-          expect($('[data-test="prisoner-dob"]').text()).toBe('2 April 1975')
-          expect($('[data-test="prisoner-location"]').text()).toBe('1-1-C-028, HMP Hewell')
           // visit details
-          expect($('[data-test="visit-date"]').text()).toBe('14 January 2022')
-          expect($('[data-test="visit-time"]').text()).toBe('10am to 11am')
-          expect($('[data-test="visit-type"]').text()).toBe('Open')
           expect($('[data-test="visit-contact"]').text()).toBe('Smith, Jeanette')
           expect($('[data-test="visit-phone"]').text()).toBe('Unknown')
           expect($('[data-test="cancel-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/cancel')
           expect($('form').attr('action')).toBe('/visit/ab-cd-ef-gh')
-          // visitor details
-          expect($('[data-test="visitor-name-1"]').text()).toBe('Smith, Jeanette')
-          expect($('[data-test="visitor-dob-1"]').html()).toContain('28 July 1986')
-          expect($('[data-test="visitor-relationship-1"]').text()).toBe('Sister')
-          expect($('[data-test="visitor-address-1"]').html()).toBe('123 The Street,<br>Coventry')
-          expect($('[data-test="visitor-restrictions-1"] .restriction-tag--CLOSED').text()).toBe('Closed')
-          expect($('[data-test="visitor-restrictions-1"]').text()).toContain('End date not entered')
-          expect($('[data-test="visitor-name-2"]').text()).toBe('Smith, Anne')
-          expect($('[data-test="visitor-dob-2"]').html()).toContain(`2 January ${childBirthYear}`)
-          expect($('[data-test="visitor-relationship-2"]').text()).toBe('Niece')
-          expect($('[data-test="visitor-address-2"]').html()).toBe('Not entered')
-          expect($('[data-test="visitor-restrictions-2"]').text()).toBe('None')
-          // additional info
-          expect($('[data-test="visit-comment"]').eq(0).text()).toBe('Example of a visit comment')
-          expect($('[data-test="visitor-concern"]').eq(0).text()).toBe('Example of a visitor concern')
-          expect($('[data-test="additional-support"]').text()).toBe('Wheelchair ramp, custom request')
-          expect($('[data-test="booked_visit"]').text().trim().replace(/\s+/g, ' ')).toBe(
-            'Saturday 1 January 2022 at 9am by User One (phone call request)',
-          )
 
           expect(auditService.viewedVisitDetails).toHaveBeenCalledTimes(1)
           expect(auditService.viewedVisitDetails).toHaveBeenCalledWith({
@@ -277,7 +278,7 @@ describe('/visit/:reference', () => {
         })
     })
 
-    it('should render full booking summary page with prisoner, visit and visitor details with search back link when from visits', () => {
+    it('should render full booking summary page with visit information and prisoner tab selected with search back link when from visits', () => {
       const url =
         '/visit/ab-cd-ef-gh?query=startDate%3D2022-05-24%26type%3DOPEN%26time%3D3pm%2Bto%2B3%253A59pm&from=visit-search'
 
@@ -290,41 +291,11 @@ describe('/visit/:reference', () => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('h1').text()).toBe('Booking details')
+          expect($('h1').text()).toBe('Visit booking details')
           expect($('.govuk-back-link').attr('href')).toBe('/visits?startDate=2022-05-24&type=OPEN&time=3pm+to+3%3A59pm')
           expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
           // prisoner details
           expect($('[data-test="prisoner-name"]').text()).toBe('Smith, John')
-          expect($('[data-test="prisoner-number"]').text()).toBe('A1234BC')
-          expect($('[data-test="prisoner-dob"]').text()).toBe('2 April 1975')
-          expect($('[data-test="prisoner-location"]').text()).toBe('1-1-C-028, HMP Hewell')
-          // visit details
-          expect($('[data-test="visit-date"]').text()).toBe('14 January 2022')
-          expect($('[data-test="visit-time"]').text()).toBe('10am to 11am')
-          expect($('[data-test="visit-type"]').text()).toBe('Open')
-          expect($('[data-test="visit-contact"]').text()).toBe('Smith, Jeanette')
-          expect($('[data-test="visit-phone"]').text()).toBe('01234 567890')
-          expect($('[data-test="cancel-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/cancel')
-          expect($('form').attr('action')).toBe('/visit/ab-cd-ef-gh')
-          // visitor details
-          expect($('[data-test="visitor-name-1"]').text()).toBe('Smith, Jeanette')
-          expect($('[data-test="visitor-dob-1"]').html()).toContain('28 July 1986')
-          expect($('[data-test="visitor-relationship-1"]').text()).toBe('Sister')
-          expect($('[data-test="visitor-address-1"]').html()).toBe('123 The Street,<br>Coventry')
-          expect($('[data-test="visitor-restrictions-1"] .restriction-tag--CLOSED').text()).toBe('Closed')
-          expect($('[data-test="visitor-restrictions-1"]').text()).toContain('End date not entered')
-          expect($('[data-test="visitor-name-2"]').text()).toBe('Smith, Anne')
-          expect($('[data-test="visitor-dob-2"]').html()).toContain(`2 January ${childBirthYear}`)
-          expect($('[data-test="visitor-relationship-2"]').text()).toBe('Niece')
-          expect($('[data-test="visitor-address-2"]').html()).toBe('Not entered')
-          expect($('[data-test="visitor-restrictions-2"]').text()).toBe('None')
-          // additional info
-          expect($('[data-test="visit-comment"]').eq(0).text()).toBe('Example of a visit comment')
-          expect($('[data-test="visitor-concern"]').eq(0).text()).toBe('Example of a visitor concern')
-          expect($('[data-test="additional-support"]').text()).toBe('Wheelchair ramp, custom request')
-          expect($('[data-test="booked_visit"]').text().trim().replace(/\s+/g, ' ')).toBe(
-            'Saturday 1 January 2022 at 9am by User One (phone call request)',
-          )
 
           expect(auditService.viewedVisitDetails).toHaveBeenCalledTimes(1)
           expect(auditService.viewedVisitDetails).toHaveBeenCalledWith({
@@ -348,7 +319,7 @@ describe('/visit/:reference', () => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('h1').text()).toBe('Booking details')
+          expect($('h1').text()).toBe('Visit booking details')
           expect($('.govuk-back-link').attr('href')).toBe('/prisoner/A1234BC/visits')
           expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
           // prisoner details
@@ -373,7 +344,7 @@ describe('/visit/:reference', () => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('h1').text()).toBe('Booking details')
+          expect($('h1').text()).toBe('Visit booking details')
           expect($('.govuk-back-link').length).toBe(0)
           expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
 
@@ -455,15 +426,17 @@ describe('/visit/:reference', () => {
       ]
 
       return request(app)
-        .get('/visit/ab-cd-ef-gh')
+        .get('/visit/ab-cd-ef-gh?tab=history')
         .expect(200)
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('[data-test="cancelled-visit-reason"]').text()).toContain('by the visitor')
           expect($('[data-test="cancelled-visit-reason"]').text()).toContain('no longer required')
-          expect($('[data-test="cancelled_visit"]').text().trim().replace(/\s+/g, ' ')).toBe(
-            'Saturday 1 January 2022 at 11am by User Three',
+          expect($('[data-test="visit-event"]').text().trim().replace(/\s+/g, ' ')).toBe('Visit cancelled')
+          expect($('[data-test="visit-actioned-by"]').text().trim().replace(/\s+/g, ' ')).toBe('by User Three')
+          expect($('[data-test="visit-event-date-time"]').text().trim().replace(/\s+/g, ' ')).toBe(
+            'Saturday 1 January 2022 at 11am',
           )
         })
     })
