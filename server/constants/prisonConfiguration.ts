@@ -44,6 +44,14 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'At least one visitor must be 18 or older.',
     ],
   },
+  // Coldingley (HMP)
+  CLI: {
+    prisonPhoneNumber: '0330 016 8787',
+    selectVisitorsText: [
+      'You can add up to 3 people aged 16 and over, and any number of children related to the prisoner.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
   // Drake Hall (HMP & YOI)
   DHI: {
     prisonPhoneNumber: '0300 060 6501',
@@ -98,6 +106,14 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'At least one visitor must be 18 or older.',
     ],
   },
+  // Featherstone (HMP)
+  FSI: {
+    prisonPhoneNumber: '0300 060 6502',
+    selectVisitorsText: [
+      'You can add up to 3 people aged 18 and over, and any number of approved children.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
   // Hewell (HMP)
   HEI: {
     prisonPhoneNumber: '0300 060 6503',
@@ -139,9 +155,25 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'At least one visitor must be 18 or older.',
     ],
   },
+  // Rochester (HMP & YOI)
+  RCI: {
+    prisonPhoneNumber: '0300 060 6513',
+    selectVisitorsText: [
+      'You can add up to 3 people aged 16 and over, and 3 children under 16 years old.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
   // Send (HMP)
   SDI: {
     prisonPhoneNumber: '0300 060 6514',
+    selectVisitorsText: [
+      'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
+  // Stafford (HMP)
+  SFI: {
+    prisonPhoneNumber: '0300 060 6505',
     selectVisitorsText: [
       'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
       'At least one visitor must be 18 or older.',
@@ -155,11 +187,28 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'At least one visitor must be 18 or older.',
     ],
   },
+  // Swinfen Hall (HMP & YOI)
+  SNI: {
+    prisonPhoneNumber: '0300 060 6507',
+    selectVisitorsText: [
+      'You can add up to a total of 3 people.',
+      'A total of 4 people can attend if one is under 5.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
+  // Styal (HMP & YOI)
+  STI: {
+    prisonPhoneNumber: '0300 060 6512',
+    selectVisitorsText: [
+      'You can add up to a total of 5 people, with a maximum of 3 people aged 18 and over.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
   // Werrington (HMYOI)
   WNI: {
     prisonPhoneNumber: '0300 060 6508',
     selectVisitorsText: [
-      'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
+      'You can add up to 3 people aged 15 and over, and 2 children under 15 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
