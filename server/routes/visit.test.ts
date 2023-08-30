@@ -405,10 +405,10 @@ describe('/visit/:reference', () => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('[data-test="cancelled-visit-reason"]').text()).toContain(
-            'due to an administrative error with the booking',
+          expect($('[data-test="visit-cancelled-type"]').text()).toBe(
+            'This visit was cancelled due to an administrative error with the booking.',
           )
-          expect($('[data-test="cancelled-visit-reason"]').text()).toContain('booking error')
+          expect($('[data-test="visit-cancelled-reason"]').text()).toBe('Reason: booking error')
         })
     })
 
@@ -431,8 +431,8 @@ describe('/visit/:reference', () => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('[data-test="cancelled-visit-reason"]').text()).toContain('by the visitor')
-          expect($('[data-test="cancelled-visit-reason"]').text()).toContain('no longer required')
+          expect($('[data-test="visit-cancelled-type"]').text()).toBe('This visit was cancelled by the visitor.')
+          expect($('[data-test="visit-cancelled-reason"]').text()).toBe('Reason: no longer required')
           expect($('[data-test="visit-event-1"]').text().trim().replace(/\s+/g, ' ')).toBe('Visit cancelled')
           expect($('[data-test="visit-actioned-by-1"]').text().trim().replace(/\s+/g, ' ')).toBe('by User Three')
           expect($('[data-test="visit-event-date-time-1"]').text().trim().replace(/\s+/g, ' ')).toBe(

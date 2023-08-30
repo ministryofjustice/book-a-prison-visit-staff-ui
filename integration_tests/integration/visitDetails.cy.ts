@@ -45,10 +45,10 @@ context('Visit details page', () => {
     const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage)
 
     visitDetailsPage.visitReference().contains('ab-cd-ef-gh')
-    visitDetailsPage.cancellationReason().within(() => {
-      cy.contains('This visit was cancelled by the visitor.')
-      cy.contains('Reason: Illness')
-    })
+
+    visitDetailsPage.cancellationType().contains('This visit was cancelled by the visitor.')
+    visitDetailsPage.cancellationReason().contains('Reason: Illness')
+
     visitDetailsPage.updateBooking().should('have.length', 0)
     visitDetailsPage.cancelBooking().should('have.length', 0)
 
