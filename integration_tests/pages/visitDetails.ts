@@ -66,24 +66,11 @@ export default class VisitDetailsPage extends Page {
   additionalSupport = (): PageElement => cy.get('[data-test=additional-support]')
 
   // Visit history
-  firstEventHeader = (): PageElement => cy.get(':nth-child(1) > .moj-timeline__header > [data-test="visit-event"]')
+  eventHeader = (index: number): PageElement => cy.get(`[data-test="visit-event-${index}"]`)
 
-  firstActionedBy = (): PageElement => cy.get(':nth-child(1) > .moj-timeline__header > [data-test="visit-actioned-by"]')
+  actionedBy = (index: number): PageElement => cy.get(`[data-test="visit-actioned-by-${index}"]`)
 
-  firstEventTime = (): PageElement =>
-    cy.get(':nth-child(1) > .moj-timeline__date > [data-test="visit-event-date-time"]')
+  eventTime = (index: number): PageElement => cy.get(`[data-test="visit-event-date-time-${index}"]`)
 
-  firstRequestMethod = (): PageElement =>
-    cy.get(':nth-child(1) > .moj-timeline__description > [data-test="visit-request-method"]')
-
-  secondEventHeader = (): PageElement => cy.get(':nth-child(2) > .moj-timeline__header > [data-test="visit-event"]')
-
-  secondActionedBy = (): PageElement =>
-    cy.get(':nth-child(2) > .moj-timeline__header > [data-test="visit-actioned-by"]')
-
-  secondEventTime = (): PageElement =>
-    cy.get(':nth-child(2) > .moj-timeline__date > [data-test="visit-event-date-time"]')
-
-  secondRequestMethod = (): PageElement =>
-    cy.get(':nth-child(2) > .moj-timeline__description > [data-test="visit-request-method"]')
+  requestMethod = (index: number): PageElement => cy.get(`[data-test="visit-request-method-${index}"]`)
 }
