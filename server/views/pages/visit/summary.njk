@@ -45,20 +45,18 @@
 
             {% set cancelledBy %}
               {% if status[0] === 'ADMINISTRATIVE' %}
-                {{ 'This visit was cancelled due to an administrative error with the booking.' }}
+                {{- 'This visit was cancelled due to an administrative error with the booking.' -}}
               {% else %}
-                {{ 'This visit was cancelled by the ' + status[0] | lower + '.' }}
+                {{- 'This visit was cancelled by the ' + status[0] | lower + '.' -}}
               {% endif %}
             {% endset %}
 
             {% set cancelledVisitHtml %}
               {{ govukWarningText({
                 classes: "govuk-!-margin-bottom-0 govuk-!-padding-left-4",
-                html: "<span>" + cancelledBy + "</span><br><span>Reason: " + visitNote.text + "</span>",
-                iconFallbackText: "Warning",
-                attributes: {
-                  "data-test": "cancelled-visit-reason"
-                }
+                html: '<span data-test="visit-cancelled-type">' + cancelledBy + "</span>" +
+                  '<br><span data-test="visit-cancelled-reason">Reason: ' + visitNote.text + "</span>",
+                iconFallbackText: "Warning"
               }) }}
             {% endset %}
 
@@ -243,24 +241,26 @@
 
           {% if visitHistoryDetails.eventsAudit %}
             <div class="moj-timeline">
+              {% set itemCount = 1 %}
               {% for event in visitHistoryDetails.eventsAudit %}
                 {% if event.type in [ 'BOOKED_VISIT', 'UPDATED_VISIT', 'CANCELLED_VISIT', 'MIGRATED_VISIT' ] %}
                   <div class="moj-timeline__item">
 
                     <div class="moj-timeline__header">
-                      <h2 data-test="visit-event" class="moj-timeline__title">{{ eventAuditTypes[event.type]}}</h2>
-                      <p data-test="visit-actioned-by" class="moj-timeline__byline">{{ actionedByUser(event.actionedBy) }}</p>
+                      <h2 data-test="visit-event-{{ itemCount }}" class="moj-timeline__title">{{ eventAuditTypes[event.type]}}</h2>
+                      <p data-test="visit-actioned-by-{{ itemCount }}" class="moj-timeline__byline">{{ actionedByUser(event.actionedBy) }}</p>
                     </div>
 
                     <p class="moj-timeline__date">
-                      <time data-test="visit-event-date-time" datetime="{{ event.createTimestamp }}">{{ event.createTimestamp | formatDate('EEEE d MMMM yyyy') }} at {{ event.createTimestamp | formatTime }}</time>
+                      <time data-test="visit-event-date-time-{{ itemCount }}" datetime="{{ event.createTimestamp }}">{{ event.createTimestamp | formatDate('EEEE d MMMM yyyy') }} at {{ event.createTimestamp | formatTime }}</time>
                     </p>
 
                     <div class="moj-timeline__description">
-                      <p data-test="visit-request-method">{{ requestMethodDescriptions[event.applicationMethodType] }}</p>
+                      <p data-test="visit-request-method-{{ itemCount }}">{{ requestMethodDescriptions[event.applicationMethodType] }}</p>
                     </div>
 
                   </div>
+                  {% set itemCount = itemCount + 1 %}
                 {% endif %}
               {% endfor %}
             </div>

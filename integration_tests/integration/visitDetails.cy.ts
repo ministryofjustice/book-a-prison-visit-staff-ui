@@ -45,10 +45,10 @@ context('Visit details page', () => {
     const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage)
 
     visitDetailsPage.visitReference().contains('ab-cd-ef-gh')
-    visitDetailsPage.cancellationReason().within(() => {
-      cy.contains('This visit was cancelled by the visitor.')
-      cy.contains('Reason: Illness')
-    })
+
+    visitDetailsPage.cancellationType().contains('This visit was cancelled by the visitor.')
+    visitDetailsPage.cancellationReason().contains('Reason: Illness')
+
     visitDetailsPage.updateBooking().should('have.length', 0)
     visitDetailsPage.cancelBooking().should('have.length', 0)
 
@@ -161,13 +161,13 @@ context('Visit details page', () => {
 
     // Select history tab
     visitDetailsPage.selectHistoryTab()
-    visitDetailsPage.firstActionedBy().contains('User One')
-    visitDetailsPage.firstEventHeader().contains('Visit booked')
-    visitDetailsPage.firstEventTime().contains('Saturday 1 January 2022 at 9am')
-    visitDetailsPage.firstRequestMethod().contains('Phone call request')
-    visitDetailsPage.secondActionedBy().contains('User Two')
-    visitDetailsPage.secondEventHeader().contains('Visit updated')
-    visitDetailsPage.secondEventTime().contains('Saturday 1 January 2022 at 10am')
-    visitDetailsPage.secondRequestMethod().contains('Email request')
+    visitDetailsPage.actionedBy(1).contains('User One')
+    visitDetailsPage.eventHeader(1).contains('Visit booked')
+    visitDetailsPage.eventTime(1).contains('Saturday 1 January 2022 at 9am')
+    visitDetailsPage.requestMethod(1).contains('Phone call request')
+    visitDetailsPage.actionedBy(2).contains('User Two')
+    visitDetailsPage.eventHeader(2).contains('Visit updated')
+    visitDetailsPage.eventTime(2).contains('Saturday 1 January 2022 at 10am')
+    visitDetailsPage.requestMethod(2).contains('Email request')
   })
 })
