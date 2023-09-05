@@ -17,7 +17,7 @@ export default function setUpWebSecurity(): Router {
           scriptSrc: ["'self'", 'code.jquery.com', "'sha256-+6WnXIl4mbFTCARd8N3COQmT3bJJmo32N8q8ZSQAIcU='"],
           styleSrc: ["'self'", 'code.jquery.com'],
           fontSrc: ["'self'"],
-          formAction: ["'self'", `${config.apis.hmppsAuth.url}`],
+          formAction: [`'self' ${config.apis.hmppsAuth.externalUrl}`],
           upgradeInsecureRequests: process.env.NODE_ENV === 'development' ? null : [],
         },
       },
