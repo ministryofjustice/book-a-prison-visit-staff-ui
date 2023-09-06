@@ -10,8 +10,8 @@ feature_branch: &feature_branch
 version: 2.1
 
 orbs:
-  hmpps: ministryofjustice/hmpps@7.2.1
-  slack: circleci/slack@4.12.1
+  hmpps: ministryofjustice/hmpps@7.3.4
+  slack: circleci/slack@4.12.5
 
 parameters:
   alerts-slack-channel:
@@ -24,7 +24,7 @@ parameters:
 
   node-version:
     type: string
-    default: 18.15-browsers
+    default: 18.17-browsers
 
 jobs:
   build:
@@ -60,29 +60,7 @@ jobs:
             - build-info.json
             - build
             - dist
-            - .cache/Cypress
-
-  check_outdated:
-    executor:
-      name: hmpps/node
-      tag: << pipeline.parameters.node-version >>
-    steps:
-      - checkout
-      - restore_cache:
-          key: dependency-cache-{{ checksum "package-lock.json" }}
-      - run:
-          name: install-npm
-          command: 'npm ci --no-audit'
-      - run:
-          name: Check version
-          command: 'npm --version'
-      - run:
-          name: Run check
-          command: 'npm outdated typescript govuk-frontend'
-      - slack/notify:
-          event: fail
-          channel: << pipeline.parameters.alerts-slack-channel >>
-          template: basic_fail_1
+            - assets/stylesheets
 
   unit_test:
     executor:
@@ -106,7 +84,7 @@ jobs:
     executor:
       name: hmpps/node_redis
       node_tag: << pipeline.parameters.node-version >>
-      redis_tag: "6.2"
+      redis_tag: "7.0"
     steps:
       - checkout
       - attach_workspace:
@@ -268,7 +246,8 @@ workflows:
               only:
                 - main
     jobs:
-      - check_outdated:
+      - hmpps/npm_outdated:
+          slack_channel: << pipeline.parameters.alerts-slack-channel >>
           context:
             - hmpps-common-vars
       - hmpps/npm_security_audit:
