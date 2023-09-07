@@ -41,7 +41,8 @@ describe('visitorDateOfBirth(visitor) macro', () => {
     compiledTemplate = nunjucks.compile(nunjucksBaseString + nunjucksString, njkEnv)
     const $ = cheerio.load(compiledTemplate.render(viewContext))
 
-    expect($('body').html()).toBe(`1 January ${adultYear}<br>(30 years old)`)
+    expect($('body').html()).toBe(`1 January ${adultYear}
+    (30 years old)`)
   })
 
   it(`should format date of birth for a child (${childBirthYear}-01-01)`, () => {
@@ -56,7 +57,8 @@ describe('visitorDateOfBirth(visitor) macro', () => {
     compiledTemplate = nunjucks.compile(nunjucksBaseString + nunjucksString, njkEnv)
     const $ = cheerio.load(compiledTemplate.render(viewContext))
 
-    expect($('body').html()).toBe(`1 January ${childBirthYear}<br>(5 years old)`)
+    expect($('body').html()).toBe(`1 January ${childBirthYear}
+    (5 years old)`)
   })
 })
 

@@ -1,8 +1,8 @@
 /* eslint-disable no-param-reassign */
+import path from 'path'
 import nunjucks, { Environment } from 'nunjucks'
 import express from 'express'
 import { format, formatDuration, intervalToDuration, isAfter, parseISO } from 'date-fns'
-import path from 'path'
 import { FormError } from '../@types/bapv'
 import { properCaseFullName } from './utils'
 import config from '../config'

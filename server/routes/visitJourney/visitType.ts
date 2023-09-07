@@ -4,7 +4,10 @@ import AuditService from '../../services/auditService'
 import getUrlPrefix from './visitJourneyUtils'
 
 export default class VisitType {
-  constructor(private readonly mode: string, private readonly auditService: AuditService) {}
+  constructor(
+    private readonly mode: string,
+    private readonly auditService: AuditService,
+  ) {}
 
   async get(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'

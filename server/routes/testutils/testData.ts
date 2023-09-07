@@ -43,7 +43,7 @@ export default class TestData {
       noFixedAddress,
       phones,
       addressUsages,
-    } as Address)
+    }) as Address
 
   static alert = ({
     alertType = 'U',
@@ -66,7 +66,7 @@ export default class TestData {
       dateExpires,
       expired,
       active,
-    } as Alert)
+    }) as Alert
 
   static caseLoads = ({
     caseLoads = [
@@ -114,14 +114,14 @@ export default class TestData {
       nextOfKin,
       restrictions,
       addresses,
-    } as Contact)
+    }) as Contact
 
   static currentIncentive = ({
     level = {
       code: 'STD',
       description: 'Standard',
     },
-  }: Partial<CurrentIncentive> = {}): CurrentIncentive => ({ level } as CurrentIncentive)
+  }: Partial<CurrentIncentive> = {}): CurrentIncentive => ({ level }) as CurrentIncentive
 
   static offenderRestriction = ({
     restrictionId = 0,
@@ -160,7 +160,7 @@ export default class TestData {
       prisonName,
       cellLocation,
       currentIncentive,
-    } as Prisoner)
+    }) as Prisoner
 
   static prisons = ({
     prisons = [
@@ -209,7 +209,7 @@ export default class TestData {
       alerts,
       visitBalances,
       visits,
-    } as PrisonerProfile)
+    }) as PrisonerProfile
 
   // Visitor restrictions
   static restriction = ({
@@ -241,7 +241,7 @@ export default class TestData {
   })
 
   static sessionCapacity = ({ open = 30, closed = 3 }: Partial<SessionCapacity> = {}): SessionCapacity =>
-    ({ open, closed } as SessionCapacity)
+    ({ open, closed }) as SessionCapacity
 
   static sessionSchedule = ({
     sessionTemplateReference = '1',
@@ -371,7 +371,7 @@ export default class TestData {
       visitorSupport,
       createdTimestamp,
       modifiedTimestamp,
-    } as Visit)
+    }) as Visit
 
   static visitHistoryDetails = ({
     eventsAudit = [
@@ -449,5 +449,5 @@ export default class TestData {
       startTimestamp,
       endTimestamp,
       visitors,
-    } as VisitSummary)
+    }) as VisitSummary
 }
