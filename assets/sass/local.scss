@@ -94,7 +94,7 @@
   }
   
   strong {
-    flex-basis: 20%;
+    flex-basis: 15%;
     flex-shrink: 0;
   }
 }
@@ -282,4 +282,13 @@
   background-color: govuk-colour("blue");
   color: govuk-colour("white");
   @include govuk-font($size: 24, $weight: "bold");
+}
+
+.hide-timeline {
+  &:before {
+    background-color: white!important;
+  }
+  .moj-timeline__item:before {
+    background-color: white!important;
+  }
 }

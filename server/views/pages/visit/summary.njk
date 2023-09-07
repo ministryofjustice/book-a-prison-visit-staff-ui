@@ -6,7 +6,7 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {%- from "moj/components/timeline/macro.njk" import mojTimeline -%}
 {%- from "moj/components/sub-navigation/macro.njk" import mojSubNavigation -%}
-
+{% from "govuk/components/tabs/macro.njk" import govukTabs %}
 
 {% macro actionedByUser(user) %}
   {% if user and user != 'NOT_KNOWN' %}
@@ -113,7 +113,7 @@
         {% endif %}
       </div>
 
-      {{ mojSubNavigation({
+      {# {{ mojSubNavigation({
         label: "Sub navigation",
         classes: "govuk-!-margin-top-3",
         items: [{
@@ -132,11 +132,10 @@
           active: true if selectedTab == 'history',
           attributes: { "data-test": "select-history-tab" }
         }]
-      }) }}
+      }) }} #}
 
-      <div class="govuk-!-width-one-half">
-
-        {% if selectedTab == undefined %}
+      {% set prisonerDetailsHtml %}
+        <div class="govuk-!-width-one-half">
           {{ govukSummaryList({
             rows: [
               {
@@ -173,7 +172,13 @@
               }
             ]
           }) }}
-        {% elseif selectedTab == 'visitors' %}
+        </div>
+
+      {% endset %}
+
+      {% set visitorDetailsHtml %}
+
+        <div class="govuk-!-width-two-thirds">
 
           {%- for visitor in visitors %}
 
@@ -237,39 +242,67 @@
             ]
           })}}
 
-        {% elseif selectedTab == 'history' %}
+        </div>
 
-          {% if visitHistoryDetails.eventsAudit %}
-            <div class="moj-timeline">
-              {% set itemCount = 1 %}
-              {% for event in visitHistoryDetails.eventsAudit %}
-                {% if event.type in [ 'BOOKED_VISIT', 'UPDATED_VISIT', 'CANCELLED_VISIT', 'MIGRATED_VISIT' ] %}
-                  <div class="moj-timeline__item">
+      {% endset %}
 
-                    <div class="moj-timeline__header">
-                      <h2 data-test="visit-event-{{ itemCount }}" class="moj-timeline__title">{{ eventAuditTypes[event.type]}}</h2>
-                      <p data-test="visit-actioned-by-{{ itemCount }}" class="moj-timeline__byline">{{ actionedByUser(event.actionedBy) }}</p>
-                    </div>
+      {% set historyHtml %}
 
-                    <p class="moj-timeline__date">
-                      <time data-test="visit-event-date-time-{{ itemCount }}" datetime="{{ event.createTimestamp }}">{{ event.createTimestamp | formatDate('EEEE d MMMM yyyy') }} at {{ event.createTimestamp | formatTime }}</time>
-                    </p>
+        {% if filteredVisitHistoryDetails %}
+          <div class="moj-timeline {{ 'hide-timeline' if filteredVisitHistoryDetails.length === 1 }}">
+            {% for event in filteredVisitHistoryDetails | reverse %}
+              <div class="moj-timeline__item">
 
-                    <div class="moj-timeline__description">
-                      <p data-test="visit-request-method-{{ itemCount }}">{{ requestMethodDescriptions[event.applicationMethodType] }}</p>
-                    </div>
+                <div class="moj-timeline__header">
+                  <h2 data-test="visit-event-{{ loop.index }}" class="moj-timeline__title">{{ eventAuditTypes[event.type]}}</h2>
+                  <p data-test="visit-actioned-by-{{ loop.index }}" class="moj-timeline__byline">{{ actionedByUser(event.actionedBy) }}</p>
+                </div>
 
-                  </div>
-                  {% set itemCount = itemCount + 1 %}
-                {% endif %}
-              {% endfor %}
-            </div>
+                <p class="moj-timeline__date">
+                  <time data-test="visit-event-date-time-{{ loop.index }}" datetime="{{ event.createTimestamp }}">{{ event.createTimestamp | formatDate('EEEE d MMMM yyyy') }} at {{ event.createTimestamp | formatTime }}</time>
+                </p>
 
-          {% endif %}
+                <div class="moj-timeline__description">
+                  <p data-test="visit-request-method-{{ loop.index }}">{{ requestMethodDescriptions[event.applicationMethodType] }}</p>
+                </div>
+
+              </div>
+            {% endfor %}
+          </div>
 
         {% endif %}
-      
-      </div>
+
+      {% endset %}
+
+      {{ govukTabs({ 
+        items: [
+          {
+            label: "Prisoner details",
+            id: "prisoner-details",
+            panel: {
+              html: prisonerDetailsHtml,
+              attributes: { "data-test": "select-prisoner-tab" }
+            }
+          },
+          {
+            label: "Visitors",
+            id: "visitors",
+            panel: {
+              html: visitorDetailsHtml,
+              attributes: { "data-test": "select-visitor-tab" }
+
+            }
+          },
+          {
+            label: "Booking history",
+            id: "history",
+            panel: {
+              html: historyHtml,
+              attributes: { "data-test": "select-history-tab" }
+            }
+          }
+        ]
+      })}}
 
     {% else %}
       <p>This booking is not for {{ selectedEstablishment.prisonName }}.</p>

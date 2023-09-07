@@ -158,10 +158,6 @@ describe('/visit/:reference', () => {
           expect($('[data-test="visit-phone"]').text()).toBe('01234 567890')
           expect($('[data-test="cancel-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/cancel')
           expect($('form').attr('action')).toBe('/visit/ab-cd-ef-gh')
-          // visitor details - tab not selected - check not displayed
-          expect($('.test-visitor-name1').length).toBe(0)
-          // booking history - tab not selected - check not displayed
-          expect($('.moj-timeline').length).toBe(0)
 
           expect(visitSessionData).toEqual({ prisoner: undefined })
 
@@ -194,8 +190,6 @@ describe('/visit/:reference', () => {
           expect($('[data-test="test-visitor-address1"]').text()).toBe('123 The Street, Coventry')
           expect($('[data-test="test-visitor-restriction1"]').text()).toContain('Closed')
           expect($('[data-test="additional-support"]').text()).toContain('Wheelchair ramp, custom request')
-          // booking history - tab not selected - check not displayed
-          expect($('.moj-timeline').length).toBe(0)
 
           expect(visitSessionData).toEqual({ prisoner: undefined })
 
@@ -210,7 +204,7 @@ describe('/visit/:reference', () => {
         })
     })
 
-    it('should render full booking summary page with visit information and history tab selected', () => {
+    it('should render full booking summary page with visit information and history tab selected - check order is reversed', () => {
       return request(app)
         .get('/visit/ab-cd-ef-gh?tab=history')
         .expect(200)
@@ -223,10 +217,16 @@ describe('/visit/:reference', () => {
           // visitor details - tab not selected - check not displayed
           expect($('.test-visitor-name1').length).toBe(0)
           // booking history - tab selected - check information displayed
-          expect($('[data-test="visit-event-1"]').text()).toBe('Visit booked')
-          expect($('[data-test="visit-actioned-by-1"]').text().trim().replace(/\s+/g, ' ')).toBe('by User One')
-          expect($('[data-test="visit-event-date-time-1"]').text()).toBe('Saturday 1 January 2022 at 9am')
-          expect($('[data-test="visit-request-method-1"]').text()).toBe('Phone call request')
+          // first event
+          expect($('[data-test="visit-event-1"]').text()).toBe('Visit updated')
+          expect($('[data-test="visit-actioned-by-1"]').text().trim().replace(/\s+/g, ' ')).toBe('by User Two')
+          expect($('[data-test="visit-event-date-time-1"]').text()).toBe('Saturday 1 January 2022 at 10am')
+          expect($('[data-test="visit-request-method-1"]').text()).toBe('Email request')
+          // second event
+          expect($('[data-test="visit-event-2"]').text()).toBe('Visit booked')
+          expect($('[data-test="visit-actioned-by-2"]').text().trim().replace(/\s+/g, ' ')).toBe('by User One')
+          expect($('[data-test="visit-event-date-time-2"]').text()).toBe('Saturday 1 January 2022 at 9am')
+          expect($('[data-test="visit-request-method-2"]').text()).toBe('Phone call request')
 
           expect(visitSessionData).toEqual({ prisoner: undefined })
 

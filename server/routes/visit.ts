@@ -72,6 +72,14 @@ export default function routes({
     })
     const { visit } = visitHistoryDetails
 
+    const filteredVisitHistoryDetails = visitHistoryDetails.eventsAudit.filter(
+      event =>
+        event.type === 'BOOKED_VISIT' ||
+        event.type === 'CANCELLED_VISIT' ||
+        event.type === 'MIGRATED_VISIT' ||
+        event.type === 'UPDATED_VISIT',
+    )
+
     if (visit.prisonId !== req.session.selectedEstablishment.prisonId) {
       const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(res.locals.user.username)
 
@@ -103,7 +111,7 @@ export default function routes({
       prisoner,
       prisonerLocation,
       visit,
-      visitHistoryDetails,
+      filteredVisitHistoryDetails,
       visitors,
       additionalSupport,
       fromVisitSearch,

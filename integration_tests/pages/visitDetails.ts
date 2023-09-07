@@ -18,11 +18,11 @@ export default class VisitDetailsPage extends Page {
 
   // Subnavigation
 
-  selectPrisonerTab = (): PageElement => cy.get('[data-test="select-prisoner-tab"]').click()
+  selectPrisonerTab = (): PageElement => cy.get('#tab_prisoner-details').click()
 
-  selectVisitorTab = (): PageElement => cy.get('[data-test="select-visitor-tab"]').click()
+  selectVisitorTab = (): PageElement => cy.get('#tab_visitors').click()
 
-  selectHistoryTab = (): PageElement => cy.get('[data-test="select-history-tab"]').click()
+  selectHistoryTab = (): PageElement => cy.get('#tab_history').click()
 
   // Prisoner Details
   prisonerName = (): PageElement => cy.get('[data-test="prisoner-name"]')
