@@ -257,7 +257,6 @@ workflows:
 
       - acceptance_tests:
           <<: *main_branch
-          env: "preprod"
           requires:
             - request-acceptance-tests-approval
 
