@@ -40,6 +40,13 @@ jobs:
             name: Checkout VSIP UI Tests
             command:
               git clone https://github.com/ministryofjustice/hmpps-vsip-ui-tests.git
+      - run:
+          name: Change to project directory
+          command: cd /pom.xml
+
+      - run:
+          name: Run Maven Build
+          command: mvn -f /pom.xml clean install
 
       - run:
           name: Build and Run tests
@@ -228,13 +235,13 @@ workflows:
             - request-staging-approval
 
       - request-acceptance-tests-approval:
-          <<: *main_branch
+#          <<: *main_branch
           type: approval
           requires:
             - deploy_staging
 
       - acceptance_tests:
-          <<: *main_branch
+#          <<: *main_branch
           requires:
             - request-acceptance-tests-approval
 
