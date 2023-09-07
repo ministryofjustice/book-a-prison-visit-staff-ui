@@ -254,11 +254,12 @@ workflows:
           type: approval
           requires:
             - deploy_staging
-            - acceptance_tests:
-                <<: *main_branch
-                env: "preprod"
-                requires:
-                  - request-acceptance-tests-approval
+
+      - acceptance_tests:
+          <<: *main_branch
+          env: "preprod"
+          requires:
+            - request-acceptance-tests-approval
 
       - request-preprod-approval:
           <<: *main_branch
