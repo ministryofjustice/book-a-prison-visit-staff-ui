@@ -155,16 +155,16 @@ workflows:
           filters:
             tags:
               ignore: /.*/
-      # - unit_test:
-      #     requires:
-      #       - build
-      # - integration_test:
-      #     requires:
-      #       - build
-      # - hmpps/helm_lint:
-      #     name: helm_lint
-      # - hmpps/build_docker:
-      #     name: build_docker
+      - unit_test:
+          requires:
+            - build
+      - integration_test:
+          requires:
+            - build
+      - hmpps/helm_lint:
+          name: helm_lint
+      - hmpps/build_docker:
+          name: build_docker
 
       - request-dev-preview-approval:
           <<: *feature_branch
