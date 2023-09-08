@@ -42,7 +42,7 @@ jobs:
               git clone https://github.com/ministryofjustice/hmpps-vsip-ui-tests.git
       - run:
           name: Change to project directory
-          command: hmpps-vsip-ui-tests
+          command: cd hmpps-vsip-ui-tests
 
       - run:
           name: Run Maven Build
