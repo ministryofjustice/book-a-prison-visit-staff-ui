@@ -46,7 +46,7 @@ jobs:
 
       - run:
           name: Run Maven Build
-          command: mvn -f /hmpps-vsip-ui-tests/pom.xml clean install
+          command: mvn -f pom.xml clean install
 
       - run:
           name: Build and Run tests
