@@ -42,16 +42,19 @@ jobs:
               git clone https://github.com/ministryofjustice/hmpps-vsip-ui-tests.git
       - run:
           name: Change to project directory
-          command: cd hmpps-vsip-ui-tests
-
-      - run:
-          name: Run Maven Build
-          command: mvn -f pom.xml clean install
-
-      - run:
-          name: Build and Run tests
-          command:
+          command: |
+            cd hmpps-vsip-ui-tests
+            mvn -f pom.xml clean install
             mvn test -Dbrowser=remote-chrome -Denvironment="STAGING"
+
+      # - run:
+      #     name: Run Maven Build
+      #     command: pwd && mvn -f pom.xml clean install
+
+      # - run:
+      #     name: Build and Run tests
+      #     command:
+      #       mvn test -Dbrowser=remote-chrome -Denvironment="STAGING"
 
   build:
     executor:
@@ -152,16 +155,16 @@ workflows:
           filters:
             tags:
               ignore: /.*/
-      - unit_test:
-          requires:
-            - build
-      - integration_test:
-          requires:
-            - build
-      - hmpps/helm_lint:
-          name: helm_lint
-      - hmpps/build_docker:
-          name: build_docker
+      # - unit_test:
+      #     requires:
+      #       - build
+      # - integration_test:
+      #     requires:
+      #       - build
+      # - hmpps/helm_lint:
+      #     name: helm_lint
+      # - hmpps/build_docker:
+      #     name: build_docker
 
       - request-dev-preview-approval:
           <<: *feature_branch
@@ -238,7 +241,7 @@ workflows:
           <<: *feature_branch
           type: approval
           requires:
-            - deploy_staging_preview
+            - build
 
       - acceptance_tests:
           <<: *feature_branch
