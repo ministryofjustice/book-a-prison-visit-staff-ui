@@ -113,27 +113,6 @@
         {% endif %}
       </div>
 
-      {# {{ mojSubNavigation({
-        label: "Sub navigation",
-        classes: "govuk-!-margin-top-3",
-        items: [{
-          text: "Prisoner details",
-          href: "/visit/" + visit.reference,
-          active: true if selectedTab == undefined,
-          attributes: { "data-test": "select-prisoner-tab" }
-        }, {
-          text: "Visitors",
-          href: "/visit/" + visit.reference + "?tab=visitors",
-          active: true if selectedTab == 'visitors',
-          attributes: { "data-test": "select-visitor-tab" }
-        }, {
-          text: "Booking history",
-          href: "/visit/" + visit.reference + "?tab=history",
-          active: true if selectedTab == 'history',
-          attributes: { "data-test": "select-history-tab" }
-        }]
-      }) }} #}
-
       {% set prisonerDetailsHtml %}
         <div class="govuk-!-width-one-half">
           {{ govukSummaryList({
