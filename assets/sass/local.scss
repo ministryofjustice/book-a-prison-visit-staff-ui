@@ -286,9 +286,9 @@
 
 .hide-timeline {
   &:before {
-    background-color: white!important;
+    background-color: $govuk-body-background-colour!important;
   }
   .moj-timeline__item:before {
-    background-color: white!important;
+    background-color: $govuk-body-background-colour!important;
   }
 }
