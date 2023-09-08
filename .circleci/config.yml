@@ -238,7 +238,7 @@ workflows:
           <<: *feature_branch
           type: approval
           requires:
-            - deploy_staging
+            - deploy_staging_preview
 
       - acceptance_tests:
           <<: *feature_branch
