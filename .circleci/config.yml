@@ -52,8 +52,8 @@ jobs:
           name: Change to project directory
           command: |
             cd hmpps-vsip-ui-tests
-            mvn -f pom.xml clean install
-            mvn test -Dbrowser=remote-chrome -Denvironment="STAGING"
+            mvn -f pom.xml clean install -e -X
+            mvn test -Dbrowser=remote-chrome -Denvironment="STAGING" -e -X
 
       # - run:
       #     name: Run Maven Build
