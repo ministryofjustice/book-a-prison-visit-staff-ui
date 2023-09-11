@@ -44,13 +44,12 @@ jobs:
       - run:
           name: Pull and checkout latest version of code
           command: |
+            cd hmpps-vsip-ui-tests
             git pull
             git checkout main
-
       - run:
           name: Change to project directory
           command: |
-            cd hmpps-vsip-ui-tests
             mvn -f pom.xml clean install
             mvn test -Dbrowser=remote-chrome -Denvironment="STAGING"
 
