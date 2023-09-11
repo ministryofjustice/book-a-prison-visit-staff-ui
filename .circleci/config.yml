@@ -47,6 +47,7 @@ jobs:
             cd hmpps-vsip-ui-tests
             git pull
             git checkout main
+            git status
       - run:
           name: Change to project directory
           command: |
