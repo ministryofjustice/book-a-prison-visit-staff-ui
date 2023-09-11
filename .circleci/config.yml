@@ -49,21 +49,12 @@ jobs:
           name: Change to project directory then clean install
           command: |
             cd hmpps-vsip-ui-tests
-            mvn -f pom.xml clean install -Dmaven.test.skip=true -e -X
+            mvn -f pom.xml clean install
       - run:
           name: Change to project directory and run tests
           command: |
             cd hmpps-vsip-ui-tests
-            mvn test -Dbrowser=remote-chrome -Denvironment="STAGING" -e -X   
-
-      # - run:
-      #     name: Run Maven Build
-      #     command: pwd && mvn -f pom.xml clean install
-
-      # - run:
-      #     name: Build and Run tests
-      #     command:
-      #       mvn test -Dbrowser=remote-chrome -Denvironment="STAGING"
+            mvn test -Dbrowser=remote-chrome -Denvironment="STAGING"   
 
   build:
     executor:
