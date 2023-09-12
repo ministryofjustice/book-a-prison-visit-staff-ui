@@ -238,13 +238,13 @@ workflows:
             - request-staging-approval
 
       - request-acceptance-tests-approval:
-          <<: *feature_branch
+          <<: *main_branch
           type: approval
           requires:
-            - build
+            - deploy_staging
 
       - acceptance_tests:
-          <<: *feature_branch
+          <<: *main_branch
           requires:
             - request-acceptance-tests-approval
 
