@@ -37,21 +37,24 @@ jobs:
 
     steps:
       - run:
-            name: Checkout VSIP UI Tests
-            command:
-              git clone https://github.com/ministryofjustice/hmpps-vsip-ui-tests.git
-      - run:
-          name: Change to project directory
-          command: cd /pom.xml
-
-      - run:
-          name: Run Maven Build
-          command: mvn -f /pom.xml clean install
-
-      - run:
-          name: Build and Run tests
+          name: Checkout VSIP UI Tests
           command:
-            mvn test -Dbrowser=remote-chrome -Denvironment="STAGING"
+            git clone https://github.com/ministryofjustice/hmpps-vsip-ui-tests.git
+      - run:
+          name: get git status
+          command: |
+            cd hmpps-vsip-ui-tests
+            git status
+      - run:
+          name: Change to project directory then clean install
+          command: |
+            cd hmpps-vsip-ui-tests
+            mvn -f pom.xml clean install -Dmaven.test.skip=true
+      - run:
+          name: Change to project directory and run tests
+          command: |
+            cd hmpps-vsip-ui-tests
+            mvn test -Dbrowser=remote-chrome -Denvironment="STAGING"   
 
   build:
     executor:
