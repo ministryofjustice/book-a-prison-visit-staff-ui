@@ -17,12 +17,14 @@
 {% endblock %}
 
 {% block beforeContent %}
-  {% if backLinkHref %}
-    {{ govukBackLink({
-      text: "Back",
-      href: backLinkHref
-    }) }}
-  {% endif %}
+  <div role="navigation">
+    {% if backLinkHref %}
+      {{ govukBackLink({
+        text: "Back",
+        href: backLinkHref
+      }) }}
+    {% endif %}
+  </nav>
 {% endblock %}
 
 {% block footer %}
