@@ -89,27 +89,27 @@
       </ul>
 
       <div class="govuk-button-group">
-        {% set cancelButtonClasses = 'govuk-!-margin-top-5' %}
-        {% if showButtons %}
-          {% set cancelButtonClasses = 'govuk-!-margin-top-5 govuk-button--secondary' %}
-          {% if visit.visitStatus === 'BOOKED' %}
-            <form action="/visit/{{ visit.reference }}" method="POST" novalidate>
-              <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+        {% if visit.visitStatus === 'BOOKED' %}
+          <form action="/visit/{{ visit.reference }}" method="POST" novalidate>
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+            {% if showUpdate %}
               {{ govukButton({
                 text: "Update booking",
                 classes: "govuk-!-margin-top-5",
                 attributes: { "data-test": "update-visit" },
                 preventDoubleClick: true
               }) }}
+            {% endif %}
+            {% if showCancel %}
               {{ govukButton({
                 text: "Cancel booking",
-                classes: cancelButtonClasses,
+                classes: "govuk-!-margin-top-5 govuk-button--secondary",
                 href: "/visit/" + visit.reference + "/cancel",
                 attributes: { "data-test": "cancel-visit" },
                 preventDoubleClick: true
               }) }}
-            </form>
-          {% endif %}
+            {% endif %}
+          </form>
         {% endif %}
       </div>
 

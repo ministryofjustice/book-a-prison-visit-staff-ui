@@ -329,7 +329,7 @@ describe('/visit/:reference', () => {
         })
     })
 
-    it('should not display update and cancel buttons if start date has passed', () => {
+    it('should not display update and cancel buttons if start date has passed by one year', () => {
       const visitDate = new Date(visit.startTimestamp)
       const testDate = visitDate.setFullYear(visitDate.getFullYear() + 1)
       jest.useFakeTimers({ advanceTimers: true, now: testDate })
@@ -340,6 +340,21 @@ describe('/visit/:reference', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('[data-test="cancel-visit"]').length).toBe(0)
+          expect($('[data-test="update-visit"]').length).toBe(0)
+        })
+    })
+
+    it('should display cancel and not the update button if start date has passed by 20 days', () => {
+      const visitDate = new Date(visit.startTimestamp)
+      const testDate = visitDate.setDate(visitDate.getDate() + 20)
+      jest.useFakeTimers({ advanceTimers: true, now: testDate })
+      return request(app)
+        .get('/visit/ab-cd-ef-gh')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('[data-test="cancel-visit"]').length).toBe(1)
           expect($('[data-test="update-visit"]').length).toBe(0)
         })
     })

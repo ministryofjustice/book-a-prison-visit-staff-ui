@@ -99,9 +99,13 @@ export default function routes({
       operationId: res.locals.appInsightsOperationId,
     })
 
+    const oneDayInMs = 1000 * 60 * 60 * 24
     const nowTimestamp = new Date()
     const visitStartTimestamp = new Date(visit.startTimestamp)
-    const showButtons = nowTimestamp < visitStartTimestamp
+    const chosenFutureInterval = new Date(visitStartTimestamp.getTime() + oneDayInMs * 28)
+
+    const showUpdate = nowTimestamp < visitStartTimestamp
+    const showCancel = nowTimestamp < chosenFutureInterval
 
     return res.render('pages/visit/summary', {
       prisoner,
@@ -112,7 +116,8 @@ export default function routes({
       additionalSupport,
       fromVisitSearch,
       fromVisitSearchQuery,
-      showButtons,
+      showUpdate,
+      showCancel,
       eventAuditTypes,
       requestMethodDescriptions,
       selectedTab,
