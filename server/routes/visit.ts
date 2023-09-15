@@ -26,6 +26,9 @@ import type { Services } from '../services'
 import eventAuditTypes from '../constants/eventAuditTypes'
 import { requestMethodDescriptions, requestMethodOptions } from '../constants/requestMethods'
 
+const A_DAY_IN_MS = 24 * 60 * 60 * 1000
+const CANCELLATION_LIMIT_DAYS = 28
+
 export default function routes({
   additionalSupportService,
   auditService,
@@ -99,10 +102,9 @@ export default function routes({
       operationId: res.locals.appInsightsOperationId,
     })
 
-    const oneDayInMs = 1000 * 60 * 60 * 24
     const nowTimestamp = new Date()
     const visitStartTimestamp = new Date(visit.startTimestamp)
-    const chosenFutureInterval = new Date(visitStartTimestamp.getTime() + oneDayInMs * 28)
+    const chosenFutureInterval = new Date(visitStartTimestamp.getTime() + A_DAY_IN_MS * CANCELLATION_LIMIT_DAYS)
 
     const showUpdate = nowTimestamp < visitStartTimestamp
     const showCancel = nowTimestamp < chosenFutureInterval

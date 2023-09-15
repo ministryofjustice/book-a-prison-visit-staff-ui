@@ -331,7 +331,7 @@ describe('/visit/:reference', () => {
 
     it('should not display update and cancel buttons if start date has passed by one year', () => {
       const visitDate = new Date(visit.startTimestamp)
-      const testDate = visitDate.setFullYear(visitDate.getFullYear() + 1)
+      const testDate = visitDate.setDate(visitDate.getDate() + 29)
       jest.useFakeTimers({ advanceTimers: true, now: testDate })
       return request(app)
         .get('/visit/ab-cd-ef-gh')
@@ -346,7 +346,7 @@ describe('/visit/:reference', () => {
 
     it('should display cancel and not the update button if start date has passed by 20 days', () => {
       const visitDate = new Date(visit.startTimestamp)
-      const testDate = visitDate.setDate(visitDate.getDate() + 20)
+      const testDate = visitDate.setDate(visitDate.getDate() + 27)
       jest.useFakeTimers({ advanceTimers: true, now: testDate })
       return request(app)
         .get('/visit/ab-cd-ef-gh')
