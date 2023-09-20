@@ -7,6 +7,7 @@ import { getResultsPagingLinks } from '../utils/utils'
 import { VisitInformation } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import type { Services } from '../services'
+import { extractPrisonerNumber } from './validationChecks'
 
 export default function routes({ auditService, prisonerSearchService, visitService }: Services): Router {
   const router = Router()
@@ -84,7 +85,18 @@ export default function routes({ auditService, prisonerSearchService, visitServi
       searchUrl: `/search/prisoner${isVisit ? '-visit' : ''}/results`,
     })
 
+    const validPrisonerNumber = extractPrisonerNumber(search)
+    const doSearchByPrisonerId = numberOfResults === 0 && typeof validPrisonerNumber === 'string'
+    const customMessage = doSearchByPrisonerId
+      ? await prisonerSearchService.getMessagePrisoner(
+          validPrisonerNumber,
+          req.session.selectedEstablishment.prisonName,
+          res.locals.user.username,
+        )
+      : `There are no results for this name or number at ${req.session.selectedEstablishment.prisonName}.`
+
     res.render('pages/search/prisonerResults', {
+      customMessage,
       search,
       results: errors.length > 0 ? [] : results,
       errors,
