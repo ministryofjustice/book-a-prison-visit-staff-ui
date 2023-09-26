@@ -9,7 +9,7 @@ services:
       - '6379:6379'
 
   wiremock:
-    image: wiremock/wiremock:2.35.0 # match version in .circleci/config.yml
+    image: wiremock/wiremock
     networks:
     - hmpps_int
     container_name: wiremock
