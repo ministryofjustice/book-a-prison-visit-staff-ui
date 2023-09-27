@@ -69,11 +69,27 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'Contact HMP Durham if you would like to bring more than 3 children.',
     ],
   },
+  // Downview (HMP & YOI)
+  DWI: {
+    prisonPhoneNumber: '0300 303 0633',
+    selectVisitorsText: [
+      'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
   // Erlestoke (HMP & YOI)
   EEI: {
     prisonPhoneNumber: '0300 303 0634',
     selectVisitorsText: [
       'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
+  // Standford Hill (HMP & YOI)
+  EHI: {
+    prisonPhoneNumber: '0300 060 6603',
+    selectVisitorsText: [
+      'You can add up to 4 people aged 18 and over, and any number of children related to the prisoner.',
       'At least one visitor must be 18 or older.',
     ],
   },
