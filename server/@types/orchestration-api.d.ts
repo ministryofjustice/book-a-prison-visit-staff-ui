@@ -392,7 +392,7 @@ export interface components {
     }
     DlqMessage: {
       body: {
-        [key: string]: Record<string, never> | undefined
+        [key: string]: Record<string, never>
       }
       messageId: string
     }
@@ -447,16 +447,16 @@ export interface components {
       totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      first?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['VisitDto'][]
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject']
-      first?: boolean
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
+      pageable?: components['schemas']['PageableObject']
       last?: boolean
       empty?: boolean
     }
@@ -589,6 +589,12 @@ export interface components {
       sessionTimeSlot: components['schemas']['SessionTimeSlotDto']
       sessionDateRange: components['schemas']['SessionDateRangeDto']
       capacity: components['schemas']['SessionCapacityDto']
+      /**
+       * @description visit type
+       * @example Social
+       * @enum {string}
+       */
+      visitType: 'SOCIAL'
       /**
        * @description prisoner location group
        * @example Wing C
@@ -842,6 +848,8 @@ export interface components {
   headers: never
   pathItems: never
 }
+
+export type $defs = Record<string, never>
 
 export type external = Record<string, never>
 
