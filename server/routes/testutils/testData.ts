@@ -258,6 +258,7 @@ export default class TestData {
     prisonerCategoryGroupNames = [],
     prisonerIncentiveLevelGroupNames = [],
     weeklyFrequency = 1,
+    visitType = 'SOCIAL',
   }: Partial<SessionSchedule> = {}): SessionSchedule => ({
     sessionTemplateReference,
     sessionTimeSlot,
@@ -267,6 +268,7 @@ export default class TestData {
     prisonerCategoryGroupNames,
     prisonerIncentiveLevelGroupNames,
     weeklyFrequency,
+    visitType,
   })
 
   static supportedPrisons = ({

@@ -205,6 +205,15 @@ export interface paths {
   '/prisoner-index/compare-index': {
     get: operations['compareIndex']
   }
+  '/prisoner-differences': {
+    /**
+     * Find all prisoner differences
+     * @description
+     *       Find all prisoner differences since a given date time.  This defaults to within the last 24 hours.
+     *       Requires PRISONER_INDEX role.
+     */
+    get: operations['prisonerDifferences']
+  }
   '/prison/{prisonId}/prisoners': {
     /**
      * Search for prisoners within a particular prison establishment
@@ -261,10 +270,10 @@ export interface components {
       receiptHandle?: string
       body?: string
       attributes?: {
-        [key: string]: string | undefined
+        [key: string]: string
       }
       messageAttributes?: {
-        [key: string]: components['schemas']['MessageAttributeValue'] | undefined
+        [key: string]: components['schemas']['MessageAttributeValue']
       }
       md5OfBody?: string
       md5OfMessageAttributes?: string
@@ -927,17 +936,17 @@ export interface components {
       totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      first?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Prisoner'][]
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject']
-      first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      last?: boolean
       pageable?: components['schemas']['PageableObject']
+      last?: boolean
       empty?: boolean
     }
     PageableObject: {
@@ -946,10 +955,10 @@ export interface components {
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
       pageSize?: number
-      paged?: boolean
-      unpaged?: boolean
       /** Format: int32 */
       pageNumber?: number
+      paged?: boolean
+      unpaged?: boolean
     }
     SortObject: {
       empty?: boolean
@@ -1151,17 +1160,17 @@ export interface components {
       totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      first?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Prisoner'][]
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject']
-      first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      last?: boolean
       pageable?: components['schemas']['PageableObject']
+      last?: boolean
       empty?: boolean
     }
     ErrorResponse: {
@@ -1399,17 +1408,17 @@ export interface components {
       totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      first?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Prisoner'][]
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject']
-      first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      last?: boolean
       pageable?: components['schemas']['PageableObject']
+      last?: boolean
       empty?: boolean
     }
     MatchRequest: {
@@ -1512,17 +1521,17 @@ export interface components {
       totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      first?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Prisoner'][]
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject']
-      first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      last?: boolean
       pageable?: components['schemas']['PageableObject']
+      last?: boolean
       empty?: boolean
     }
     /** @description Search Criteria for Global Prisoner Search */
@@ -1568,7 +1577,7 @@ export interface components {
     }
     DlqMessage: {
       body: {
-        [key: string]: Record<string, never> | undefined
+        [key: string]: Record<string, never>
       }
       messageId: string
     }
@@ -1579,6 +1588,14 @@ export interface components {
       messagesReturnedCount: number
       messages: components['schemas']['DlqMessage'][]
     }
+    PrisonerDifferences: {
+      /** Format: uuid */
+      prisonerDifferencesId?: string
+      nomsNumber: string
+      differences: string
+      /** @example 2021-07-05T10:35:17 */
+      dateTime: string
+    }
   }
   responses: never
   parameters: never
@@ -1586,6 +1603,8 @@ export interface components {
   headers: never
   pathItems: never
 }
+
+export type $defs = Record<string, never>
 
 export type external = Record<string, never>
 
@@ -1651,7 +1670,9 @@ export interface operations {
   indexQueueHousekeeping: {
     responses: {
       /** @description Unable to marked index complete as it is in error */
-      409: never
+      409: {
+        content: never
+      }
     }
   }
   /**
@@ -1739,7 +1760,9 @@ export interface operations {
     }
     responses: {
       /** @description Accepted */
-      202: never
+      202: {
+        content: never
+      }
     }
   }
   /**
@@ -2094,7 +2117,9 @@ export interface operations {
   syntheticMonitor: {
     responses: {
       /** @description OK */
-      200: never
+      200: {
+        content: never
+      }
     }
   }
   getDlqMessages: {
@@ -2191,13 +2216,66 @@ export interface operations {
   startIndexReconciliation: {
     responses: {
       /** @description Accepted */
-      202: never
+      202: {
+        content: never
+      }
     }
   }
   compareIndex: {
     responses: {
       /** @description Accepted */
-      202: never
+      202: {
+        content: never
+      }
+    }
+  }
+  /**
+   * Find all prisoner differences
+   * @description
+   *       Find all prisoner differences since a given date time.  This defaults to within the last 24 hours.
+   *       Requires PRISONER_INDEX role.
+   */
+  prisonerDifferences: {
+    parameters: {
+      query?: {
+        /**
+         * @description Report on differences that have been generated. Defaults to the last one day
+         * @example 2023-01-02T02:23:45
+         */
+        from?: string
+        to?: string
+      }
+    }
+    requestBody?: {
+      content: {
+        'application/json': components['schemas']['PrisonerDetailRequest']
+      }
+    }
+    responses: {
+      /** @description Search successfully performed */
+      200: {
+        content: {
+          'application/json': components['schemas']['PrisonerDifferences'][]
+        }
+      }
+      /** @description Incorrect information provided to perform prisoner match */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to search for prisoner data */
+      403: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
     }
   }
   /**

@@ -160,6 +160,11 @@ export interface paths {
     put: operations['cancelPrisonToPrisonMove']
   }
   '/api/bookings/{bookingId}/move-to-cell-swap': {
+    /**
+     * Move the prisoner from current cell to cell swap
+     * @deprecated
+     * @description Using role MAINTAIN_CELL_MOVEMENTS will no longer check for user access to prisoner booking, this endpoint will be removed in future releases
+     */
     put: operations['moveToCellSwap']
   }
   '/api/bookings/{bookingId}/living-unit/{internalLocationDescription}': {
@@ -651,13 +656,6 @@ export interface paths {
   '/api/bookings/{bookingId}/alert': {
     /** Create an alert */
     post: operations['postAlert']
-  }
-  '/api/bookings/proven-adjudications': {
-    /**
-     * Offender proven adjudications count
-     * @description <p>This endpoint uses the REPLICA database.</p>
-     */
-    post: operations['getProvenAdjudicationSummaryForBookings']
   }
   '/api/bookings/offenders': {
     /**
@@ -1250,14 +1248,6 @@ export interface paths {
      */
     get: operations['getAlertsForAllBookingByOffenderNo']
   }
-  '/api/offenders/{offenderNo}/adjudications': {
-    /** Return a list of adjudications for a given offender */
-    get: operations['getAdjudicationsByOffenderNo']
-  }
-  '/api/offenders/{offenderNo}/adjudications/{adjudicationNo}': {
-    /** Return a specific adjudication */
-    get: operations['getAdjudication']
-  }
   '/api/offenders/{offenderNo}/addresses': {
     /**
      * Return a list of addresses for a given offender, most recent first.
@@ -1691,14 +1681,6 @@ export interface paths {
      */
     get: operations['getPhysicalAttributes']
   }
-  '/api/bookings/{bookingId}/non-association-details': {
-    /**
-     * Gets the offender non-association details for a given booking (DEPRECATED)
-     * @deprecated
-     * @description Do not use this endpoint, calls should be made in the context of a prisoner, not their current booking<p>This endpoint uses the REPLICA database.</p>
-     */
-    get: operations['getNonAssociationDetails_1']
-  }
   '/api/bookings/{bookingId}/movement/{sequenceNumber}': {
     /**
      * Retrieves a specific movement for a booking
@@ -1873,13 +1855,6 @@ export interface paths {
      * @description Offender alerts.
      */
     get: operations['getOffenderAlertsV2']
-  }
-  '/api/bookings/{bookingId}/adjudications': {
-    /**
-     * Offender adjudications summary (awards and sanctions).
-     * @description Offender adjudications (awards and sanctions).
-     */
-    get: operations['getAdjudicationSummary']
   }
   '/api/bookings/{bookingId}/activities': {
     /**
@@ -2326,6 +2301,11 @@ export interface components {
        * @example 2020-08-20
        */
       dateExpires?: string
+      /**
+       * @description The date and time the alert was last modified in Europe/London (ISO 8601) format without timezone offset e.g. YYYY-MM-DDTHH:MM:SS. If this Alert hasn't been modified since its creation this field will be null
+       * @example 2021-07-05T10:35:17
+       */
+      modifiedDateTime?: string
       /**
        * @description True / False based on presence of expiry date
        * @example true
@@ -2909,6 +2889,12 @@ export interface components {
     }
     /** @description Personal Care Need */
     PersonalCareNeed: {
+      /**
+       * Format: int64
+       * @description ID
+       * @example 1
+       */
+      personalCareNeedId?: number
       /**
        * @description Problem Type
        * @example MATSTAT
@@ -6289,19 +6275,6 @@ export interface components {
       /** Format: int64 */
       alertId?: number
     }
-    /** @description Proven Adjudication Summary for offender */
-    ProvenAdjudicationSummary: {
-      /**
-       * Format: int64
-       * @description Offender Booking Id
-       */
-      bookingId: number
-      /**
-       * Format: int32
-       * @description Number of proven adjudications
-       */
-      provenAdjudicationCount: number
-    }
     /** @description Offender basic detail */
     InmateBasicDetails: {
       /**
@@ -7512,21 +7485,21 @@ export interface components {
       establishmentName: string
     }
     PageString: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
+      first?: boolean
       /** Format: int32 */
       size?: number
       content?: string[]
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject']
-      first?: boolean
-      /** Format: int32 */
-      numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
       last?: boolean
+      /** Format: int32 */
+      numberOfElements?: number
       empty?: boolean
     }
     PageableObject: {
@@ -7535,10 +7508,10 @@ export interface components {
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
       pageSize?: number
-      /** Format: int32 */
-      pageNumber?: number
       paged?: boolean
       unpaged?: boolean
+      /** Format: int32 */
+      pageNumber?: number
     }
     SortObject: {
       empty?: boolean
@@ -7593,6 +7566,7 @@ export interface components {
       /** @description List of offender fine payments */
       offenderFinePayments: components['schemas']['OffenderFinePaymentDto'][]
       fixedTermRecallDetails?: components['schemas']['FixedTermRecallDetails']
+      sentenceCalcDates?: components['schemas']['SentenceCalcDates']
     }
     /** @description Court case details */
     CourtSentences: {
@@ -7868,6 +7842,8 @@ export interface components {
        * @description Offence End Date
        */
       offenceEndDate?: string
+      /** @description Offence statute */
+      offenceStatute?: string
       /** @description Offence Code */
       offenceCode?: string
       /** @description Offence Description */
@@ -8366,13 +8342,19 @@ export interface components {
        */
       agencyDescription: string
       /**
+       * @description Prison ID
+       * @example PVI
+       */
+      agencyId: string
+      /**
        * @description Description of living unit (e.g. cell) the offender is assigned to.
        * @example PVI-1-2-4
        */
       assignedLivingUnitDescription: string
       /**
        * Format: int64
-       * @description Id of living unit (e.g. cell) the offender is assigned to.
+       * @deprecated
+       * @description Id of living unit (e.g. cell) the offender is assigned to. Will be removed in new API
        * @example 123
        */
       assignedLivingUnitId: number
@@ -8400,12 +8382,12 @@ export interface components {
        */
       typeDescription: string
       /**
-       * @description Date and time the mom-association is effective from. In Europe/London (ISO 8601) format without timezone offset e.g. YYYY-MM-DDTHH:MM:SS.
+       * @description Date and time the non-association is effective from. In Europe/London (ISO 8601) format without timezone offset e.g. YYYY-MM-DDTHH:MM:SS.
        * @example 2021-07-05T10:35:17
        */
       effectiveDate: string
       /**
-       * @description Date and time the mom-association expires. In Europe/London (ISO 8601) format without timezone offset e.g. YYYY-MM-DDTHH:MM:SS.
+       * @description Date and time the non-association expires. In Europe/London (ISO 8601) format without timezone offset e.g. YYYY-MM-DDTHH:MM:SS.
        * @example 2021-07-05T10:35:17
        */
       expiryDate?: string
@@ -8438,6 +8420,11 @@ export interface components {
        */
       agencyDescription: string
       /**
+       * @description Prison ID
+       * @example MDI
+       */
+      agencyId: string
+      /**
        * @description Description of living unit (e.g. cell) the offender is assigned to.
        * @example MDI-1-1-3
        */
@@ -8446,7 +8433,8 @@ export interface components {
       nonAssociations?: components['schemas']['OffenderNonAssociationDetail'][]
       /**
        * Format: int64
-       * @description Id of living unit (e.g. cell) the offender is assigned to.
+       * @deprecated
+       * @description Id of living unit (e.g. cell) the offender is assigned to., will be removed in new API
        * @example 123
        */
       assignedLivingUnitId: number
@@ -8988,283 +8976,6 @@ export interface components {
       prisonerNumber: string
       latestPrisonTerm?: components['schemas']['PrisonTerm']
     }
-    /** @description An overview of an adjudication */
-    Adjudication: {
-      /**
-       * Format: int64
-       * @description Adjudication Number
-       * @example 1234567
-       */
-      adjudicationNumber?: number
-      /**
-       * @description Report Time
-       * @example 2021-07-05T10:35:17
-       */
-      reportTime?: string
-      /**
-       * Format: int64
-       * @description Agency Incident Id
-       * @example 1484302
-       */
-      agencyIncidentId?: number
-      /**
-       * @description Agency Id
-       * @example MDI
-       */
-      agencyId?: string
-      /**
-       * Format: int64
-       * @description Party Sequence
-       * @example 1
-       */
-      partySeq?: number
-      /** @description Charges made as part of the adjudication */
-      adjudicationCharges?: components['schemas']['AdjudicationCharge'][]
-    }
-    /** @description A charge which was made as part of an adjudication */
-    AdjudicationCharge: {
-      /**
-       * @description Charge Id
-       * @example 1506763/1
-       */
-      oicChargeId?: string
-      /**
-       * @description Offence Code
-       * @example 51:22
-       */
-      offenceCode?: string
-      /**
-       * @description Offence Description
-       * @example Disobeys any lawful order
-       */
-      offenceDescription?: string
-      /**
-       * @description Offence Finding Code
-       * @example PROVED
-       */
-      findingCode?: string
-    }
-    /** @description A type of offence that can be made as part of an adjudication */
-    AdjudicationOffence: {
-      /**
-       * @description Offence Id
-       * @example 8
-       */
-      id?: string
-      /**
-       * @description Offence Code
-       * @example 51:7
-       */
-      code?: string
-      /**
-       * @description Offence Description
-       * @example Escapes or absconds from prison or from legal custody
-       */
-      description?: string
-    }
-    AdjudicationSearchResponse: {
-      /** @description Search results */
-      results?: components['schemas']['Adjudication'][]
-      /** @description A complete list of the type of offences that this offender has had adjudications for */
-      offences?: components['schemas']['AdjudicationOffence'][]
-      /** @description Complete list of agencies where this offender has had adjudications */
-      agencies?: components['schemas']['Agency'][]
-    }
-    /** @description An Adjudication Hearing */
-    Hearing: {
-      /**
-       * Format: int64
-       * @description OIC Hearing ID
-       * @example 1985937
-       */
-      oicHearingId?: number
-      /**
-       * @description Hearing Type
-       * @example Governor's Hearing Adult
-       */
-      hearingType?: string
-      /**
-       * @description Hearing Time
-       * @example 2021-07-05T10:35:17
-       */
-      hearingTime?: string
-      /**
-       * @description Establishment
-       * @example Moorland (HMP & YOI)
-       */
-      establishment?: string
-      /**
-       * @description Hearing Location
-       * @example Adjudication Room
-       */
-      location?: string
-      /**
-       * @description Adjudicator First name
-       * @example Bob
-       */
-      heardByFirstName?: string
-      /**
-       * @description Adjudicator Last name
-       * @example Smith
-       */
-      heardByLastName?: string
-      /**
-       * @description Other Representatives
-       * @example Councillor Adams
-       */
-      otherRepresentatives?: string
-      /**
-       * @description Comment
-       * @example The defendant conducted themselves in a manner...
-       */
-      comment?: string
-      /** @description Hearing Results */
-      results?: components['schemas']['HearingResult'][]
-    }
-    /** @description A result from a hearing */
-    HearingResult: {
-      /**
-       * @description OIC Offence Code
-       * @example 51:22
-       */
-      oicOffenceCode?: string
-      /**
-       * @description Offence Type
-       * @example Prison Rule 51
-       */
-      offenceType?: string
-      /**
-       * @description Offence Description
-       * @example Disobeys any lawful order
-       */
-      offenceDescription?: string
-      /**
-       * @description Plea
-       * @example Guilty
-       */
-      plea?: string
-      /**
-       * @description Finding
-       * @example Charge Proved
-       */
-      finding?: string
-      sanctions?: components['schemas']['Sanction'][]
-    }
-    /** @description Detail about an individual Adjudication */
-    IndividualAdjudication: {
-      /**
-       * Format: int64
-       * @description Adjudication Number
-       * @example 1234567
-       */
-      adjudicationNumber?: number
-      /**
-       * @description Incident Time
-       * @example 2021-07-05T10:35:17
-       */
-      incidentTime?: string
-      /**
-       * @description Establishment
-       * @example Moorland (HMP & YOI)
-       */
-      establishment?: string
-      /**
-       * @description Interior Location
-       * @example Wing A
-       */
-      interiorLocation?: string
-      /**
-       * @description Incident Details
-       * @example Whilst conducting an intelligence cell search...
-       */
-      incidentDetails?: string
-      /**
-       * Format: int64
-       * @description Report Number
-       * @example 1234567
-       */
-      reportNumber?: number
-      /**
-       * @description Report Type
-       * @example Governor's Report
-       */
-      reportType?: string
-      /**
-       * @description Reporter First Name
-       * @example John
-       */
-      reporterFirstName?: string
-      /**
-       * @description Reporter Last Name
-       * @example Smith
-       */
-      reporterLastName?: string
-      /**
-       * @description Report Time
-       * @example 2021-07-05T10:35:17
-       */
-      reportTime?: string
-      /** @description Hearings */
-      hearings?: components['schemas']['Hearing'][]
-    }
-    /** @description An Adjudication Sanction */
-    Sanction: {
-      /**
-       * @description Sanction Type
-       * @example Stoppage of Earnings (amount)
-       */
-      sanctionType?: string
-      /**
-       * Format: int64
-       * @description Sanction Days
-       * @example 14
-       */
-      sanctionDays?: number
-      /**
-       * Format: int64
-       * @description Sanction Months
-       * @example 1
-       */
-      sanctionMonths?: number
-      /**
-       * Format: int64
-       * @description Compensation Amount
-       * @example 50
-       */
-      compensationAmount?: number
-      /**
-       * @description Effective
-       * @example 2021-07-05T10:35:17
-       */
-      effectiveDate?: string
-      /**
-       * @description Sanction status
-       * @example Immediate
-       */
-      status?: string
-      /**
-       * @description Status Date
-       * @example 2021-07-05T10:35:17
-       */
-      statusDate?: string
-      /**
-       * @description Comment
-       * @example 14x LOTV, 14x LOGYM, 14x LOC, 14x LOA, 14x LOE 50%, 14x CC
-       */
-      comment?: string
-      /**
-       * Format: int64
-       * @description Sanction Seq
-       * @example 1
-       */
-      sanctionSeq?: number
-      /**
-       * Format: int64
-       * @description Consecutive Sanction Seq
-       * @example 1
-       */
-      consecutiveSanctionSeq?: number
-    }
     /** @description The NOMS Offender Number */
     OffenderNumber: {
       /** @description offenderNumber */
@@ -9707,21 +9418,21 @@ export interface components {
       additionalAnswers?: string[]
     }
     PageOffenceDto: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
+      first?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['OffenceDto'][]
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject']
-      first?: boolean
-      /** Format: int32 */
-      numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
       last?: boolean
+      /** Format: int32 */
+      numberOfElements?: number
       empty?: boolean
     }
     Pageable: {
@@ -10404,21 +10115,21 @@ export interface components {
       numberAllocated: number
     }
     PageOffenderNumber: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
+      first?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['OffenderNumber'][]
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject']
-      first?: boolean
-      /** Format: int32 */
-      numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
       last?: boolean
+      /** Format: int32 */
+      numberOfElements?: number
       empty?: boolean
     }
     /** @description Offender Employment */
@@ -10511,39 +10222,39 @@ export interface components {
       addresses: components['schemas']['AddressDto'][]
     }
     PageEmployment: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
+      first?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Employment'][]
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject']
-      first?: boolean
-      /** Format: int32 */
-      numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
       last?: boolean
+      /** Format: int32 */
+      numberOfElements?: number
       empty?: boolean
     }
     PageEducation: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
+      first?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Education'][]
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject']
-      first?: boolean
-      /** Format: int32 */
-      numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
       last?: boolean
+      /** Format: int32 */
+      numberOfElements?: number
       empty?: boolean
     }
     /** @description A charge linked to a court date */
@@ -10616,7 +10327,9 @@ export interface components {
        * Format: int64
        * @description The id of the booking this court date was linked to
        */
-      bookingId?: number
+      bookingId: number
+      /** @description The user readable ID for a booking */
+      bookNumber: string
     }
     /** @description Bed assignment history entry */
     BedAssignment: {
@@ -10787,21 +10500,21 @@ export interface components {
       hasVisits: boolean
     }
     PageVisitWithVisitors: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
+      first?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['VisitWithVisitors'][]
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject']
-      first?: boolean
-      /** Format: int32 */
-      numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
       last?: boolean
+      /** Format: int32 */
+      numberOfElements?: number
       empty?: boolean
     }
     /** @description Visit details */
@@ -10969,6 +10682,12 @@ export interface components {
        * @example Wheelchair accessibility
        */
       treatmentDescription?: string
+      /**
+       * Format: int64
+       * @description Personal care need ID
+       * @example 1
+       */
+      personalCareNeedId?: number
     }
     /** @description Reasonable Adjustments */
     ReasonableAdjustments: {
@@ -11043,21 +10762,21 @@ export interface components {
       otherContacts: components['schemas']['Contact'][]
     }
     PageBedAssignment: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
+      first?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['BedAssignment'][]
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject']
-      first?: boolean
-      /** Format: int32 */
-      numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
       last?: boolean
+      /** Format: int32 */
+      numberOfElements?: number
       empty?: boolean
     }
     /** @description Case Note Count Detail */
@@ -11101,99 +10820,39 @@ export interface components {
       currency: string
     }
     PageAlert: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
+      first?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Alert'][]
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject']
-      first?: boolean
-      /** Format: int32 */
-      numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
       last?: boolean
+      /** Format: int32 */
+      numberOfElements?: number
       empty?: boolean
     }
-    /** @description Adjudication Summary for offender */
-    AdjudicationSummary: {
-      /**
-       * Format: int64
-       * @description Offender Booking Id
-       */
-      bookingId: number
-      /**
-       * Format: int32
-       * @description Number of proven adjudications
-       */
-      adjudicationCount: number
-      /** @description List of awards / sanctions */
-      awards: components['schemas']['Award'][]
-    }
-    /** @description Adjudication award / sanction */
-    Award: {
-      /**
-       * Format: int64
-       * @description Id of booking
-       */
-      bookingId: number
-      /** @description Type of award */
-      sanctionCode: string
-      /** @description Award type description */
-      sanctionCodeDescription?: string
-      /**
-       * Format: int32
-       * @description Number of months duration
-       */
-      months?: number
-      /**
-       * Format: int32
-       * @description Number of days duration
-       */
-      days?: number
-      /** @description Compensation amount */
-      limit?: number
-      /** @description Optional details */
-      comment?: string
-      /**
-       * Format: date
-       * @description Start of sanction
-       */
-      effectiveDate: string
-      /** @description Award status (ref domain OIC_SANCT_ST) */
-      status?: string
-      /** @description Award status description */
-      statusDescription?: string
-      /**
-       * Format: int64
-       * @description Id of hearing
-       */
-      hearingId: number
-      /**
-       * Format: int32
-       * @description hearing record sequence number
-       */
-      hearingSequence: number
-    }
     PagePrisonerBookingSummary: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
+      first?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['PrisonerBookingSummary'][]
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject']
-      first?: boolean
-      /** Format: int32 */
-      numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
       last?: boolean
+      /** Format: int32 */
+      numberOfElements?: number
       empty?: boolean
     }
     /** @description Prisoner Booking Summary */
@@ -11517,6 +11176,8 @@ export interface components {
   pathItems: never
 }
 
+export type $defs = Record<string, never>
+
 export type external = Record<string, never>
 
 export interface operations {
@@ -11590,7 +11251,9 @@ export interface operations {
     }
     responses: {
       /** @description OK */
-      200: never
+      200: {
+        content: never
+      }
       /** @description Requires role ROLE_SMOKE_TEST */
       403: {
         content: {
@@ -11618,7 +11281,9 @@ export interface operations {
     }
     responses: {
       /** @description OK */
-      200: never
+      200: {
+        content: never
+      }
       /** @description Requires role ROLE_SMOKE_TEST */
       403: {
         content: {
@@ -12257,7 +11922,9 @@ export interface operations {
     }
     responses: {
       /** @description The checks passed flag was set */
-      204: never
+      204: {
+        content: never
+      }
       /** @description Invalid request. */
       400: {
         content: {
@@ -12287,7 +11954,9 @@ export interface operations {
     }
     responses: {
       /** @description The checks passed flag was cleared */
-      204: never
+      204: {
+        content: never
+      }
       /** @description Invalid request. */
       400: {
         content: {
@@ -12322,7 +11991,9 @@ export interface operations {
     }
     responses: {
       /** @description The new approval status was set */
-      204: never
+      204: {
+        content: never
+      }
       /** @description Invalid request. */
       400: {
         content: {
@@ -12352,7 +12023,9 @@ export interface operations {
     }
     responses: {
       /** @description The new approval status was cleared */
-      204: never
+      204: {
+        content: never
+      }
       /** @description Invalid request. */
       400: {
         content: {
@@ -12388,7 +12061,9 @@ export interface operations {
     }
     responses: {
       /** @description OK */
-      200: never
+      200: {
+        content: never
+      }
       /** @description Forbidden - user not authorised to update the categorisation. */
       403: {
         content: {
@@ -12420,7 +12095,9 @@ export interface operations {
     }
     responses: {
       /** @description OK */
-      200: never
+      200: {
+        content: never
+      }
       /** @description Invalid request - e.g. invalid status. */
       400: {
         content: {
@@ -12447,7 +12124,9 @@ export interface operations {
     }
     responses: {
       /** @description Created */
-      201: never
+      201: {
+        content: never
+      }
       /** @description Validation error - e.g. comment too long or committee code does not exist. */
       400: {
         content: {
@@ -12468,7 +12147,9 @@ export interface operations {
     }
     responses: {
       /** @description OK */
-      200: never
+      200: {
+        content: never
+      }
       /** @description Invalid request - e.g. category does not exist. */
       400: {
         content: {
@@ -12492,7 +12173,7 @@ export interface operations {
       201: {
         content: {
           'application/json': {
-            [key: string]: number | undefined
+            [key: string]: number
           }
         }
       }
@@ -12516,7 +12197,9 @@ export interface operations {
     }
     responses: {
       /** @description Created */
-      201: never
+      201: {
+        content: never
+      }
       /** @description Validation error - e.g. category does not exist. */
       400: {
         content: {
@@ -12537,9 +12220,13 @@ export interface operations {
     }
     responses: {
       /** @description The active flag has been updated successfully */
-      200: never
+      200: {
+        content: never
+      }
       /** @description Unrecoverable error occurred whilst processing request. */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /**
@@ -12554,7 +12241,9 @@ export interface operations {
     }
     responses: {
       /** @description Offence updated successfully */
-      204: never
+      204: {
+        content: never
+      }
       /** @description A dependent resource is missing (either the offence or the home office code doesnt exist) */
       404: {
         content: {
@@ -12581,7 +12270,9 @@ export interface operations {
     }
     responses: {
       /** @description Offences created successfully */
-      201: never
+      201: {
+        content: never
+      }
       /** @description A dependent resource is missing (either the statute or the home office code doesnt exist) */
       404: {
         content: {
@@ -12622,7 +12313,9 @@ export interface operations {
     }
     responses: {
       /** @description OK */
-      200: never
+      200: {
+        content: never
+      }
       /** @description Invalid request. */
       400: {
         content: {
@@ -12643,6 +12336,11 @@ export interface operations {
       }
     }
   }
+  /**
+   * Move the prisoner from current cell to cell swap
+   * @deprecated
+   * @description Using role MAINTAIN_CELL_MOVEMENTS will no longer check for user access to prisoner booking, this endpoint will be removed in future releases
+   */
   moveToCellSwap: {
     parameters: {
       path: {
@@ -12872,7 +12570,9 @@ export interface operations {
     }
     responses: {
       /** @description Attendance data has been updated */
-      201: never
+      201: {
+        content: never
+      }
       /** @description Invalid request - e.g. validation error. */
       400: {
         content: {
@@ -12927,7 +12627,9 @@ export interface operations {
     }
     responses: {
       /** @description Attendance data has been updated */
-      201: never
+      201: {
+        content: never
+      }
       /** @description Invalid request - e.g. validation error. */
       400: {
         content: {
@@ -12966,7 +12668,9 @@ export interface operations {
     }
     responses: {
       /** @description Attendance data has been updated */
-      201: never
+      201: {
+        content: never
+      }
       /** @description Invalid request - e.g. validation error. */
       400: {
         content: {
@@ -13008,11 +12712,17 @@ export interface operations {
     }
     responses: {
       /** @description The appointment's comment has been set. */
-      204: never
+      204: {
+        content: never
+      }
       /** @description The client is not authorised for this operation */
-      403: never
+      403: {
+        content: never
+      }
       /** @description The appointment was not found. */
-      404: never
+      404: {
+        content: never
+      }
     }
   }
   /**
@@ -13178,7 +12888,9 @@ export interface operations {
     }
     responses: {
       /** @description OK */
-      200: never
+      200: {
+        content: never
+      }
       /** @description Forbidden - user not authorised to delete a agency address */
       403: {
         content: {
@@ -13269,7 +12981,9 @@ export interface operations {
     }
     responses: {
       /** @description OK */
-      200: never
+      200: {
+        content: never
+      }
       /** @description Forbidden - user not authorised to delete a agency address */
       403: {
         content: {
@@ -13532,7 +13246,9 @@ export interface operations {
     }
     responses: {
       /** @description OK */
-      200: never
+      200: {
+        content: never
+      }
       /** @description Requires role ROLE_SMOKE_TEST */
       403: {
         content: {
@@ -13706,7 +13422,7 @@ export interface operations {
     requestBody: {
       content: {
         'application/json': {
-          [key: string]: number | undefined
+          [key: string]: number
         }
       }
     }
@@ -14566,9 +14282,13 @@ export interface operations {
     }
     responses: {
       /** @description Offences unlinked from schedules successfully */
-      200: never
+      200: {
+        content: never
+      }
       /** @description Unrecoverable error occurred whilst processing request. */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Paged List of offences by Statute */
@@ -14621,7 +14341,9 @@ export interface operations {
     }
     responses: {
       /** @description Statutes created successfully */
-      201: never
+      201: {
+        content: never
+      }
       /** @description Unrecoverable error occurred whilst processing request. */
       500: {
         content: {
@@ -14642,9 +14364,13 @@ export interface operations {
     }
     responses: {
       /** @description Offences linked to schedules successfully */
-      201: never
+      201: {
+        content: never
+      }
       /** @description Unrecoverable error occurred whilst processing request. */
-      500: never
+      500: {
+        content: never
+      }
     }
   }
   /** Paged List of offences by HO Code */
@@ -14697,7 +14423,9 @@ export interface operations {
     }
     responses: {
       /** @description Home Office Notifiable Offence Codes created successfully */
-      201: never
+      201: {
+        content: never
+      }
       /** @description Unrecoverable error occurred whilst processing request. */
       500: {
         content: {
@@ -15454,7 +15182,9 @@ export interface operations {
     }
     responses: {
       /** @description If successful the Personal Care Need is returned. */
-      201: never
+      201: {
+        content: never
+      }
       /** @description Invalid request. */
       400: {
         content: {
@@ -15599,49 +15329,6 @@ export interface operations {
       201: {
         content: {
           'application/json': components['schemas']['AlertCreated']
-        }
-      }
-      /** @description Invalid request. */
-      400: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Requested resource not found. */
-      404: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Unrecoverable error occurred whilst processing request. */
-      500: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  /**
-   * Offender proven adjudications count
-   * @description <p>This endpoint uses the REPLICA database.</p>
-   */
-  getProvenAdjudicationSummaryForBookings: {
-    parameters: {
-      query?: {
-        /** @description Only proved adjudications ending on or after this date (in YYYY-MM-DD format) will be counted. Default is 3 months */
-        adjudicationCutoffDate?: string
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': number[]
-      }
-    }
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['ProvenAdjudicationSummary'][]
         }
       }
       /** @description Invalid request. */
@@ -16056,11 +15743,17 @@ export interface operations {
     }
     responses: {
       /** @description OK */
-      200: never
+      200: {
+        content: never
+      }
       /** @description No Content */
-      204: never
+      204: {
+        content: never
+      }
       /** @description The client is not authorised for this operation */
-      403: never
+      403: {
+        content: never
+      }
     }
   }
   /**
@@ -16639,7 +16332,7 @@ export interface operations {
       200: {
         content: {
           'application/json': {
-            [key: string]: components['schemas']['UnavailabilityReason'] | undefined
+            [key: string]: components['schemas']['UnavailabilityReason']
           }
         }
       }
@@ -18627,6 +18320,12 @@ export interface operations {
    */
   getNonAssociationDetails: {
     parameters: {
+      query?: {
+        /** @description Returns only non-association details for this prisoner in the same prison */
+        currentPrisonOnly?: boolean
+        /** @description Returns only active non-association details for this prisoner */
+        excludeInactive?: boolean
+      }
       path: {
         /**
          * @description Offender No
@@ -19059,105 +18758,6 @@ export interface operations {
       200: {
         content: {
           'application/json': components['schemas']['Alert'][]
-        }
-      }
-      /** @description Invalid request. */
-      400: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Requested resource not found. */
-      404: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Unrecoverable error occurred whilst processing request. */
-      500: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  /** Return a list of adjudications for a given offender */
-  getAdjudicationsByOffenderNo: {
-    parameters: {
-      query?: {
-        /** @description An offence id to allow optionally filtering by type of offence */
-        offenceId?: string
-        /** @description An agency id to allow optionally filtering by the agency in which the offence occurred */
-        agencyId?: string
-        /**
-         * @description Finding code to allow optionally filtering by type of finding
-         * @example NOT_PROVEN
-         */
-        finding?: string
-        /** @description Adjudications must have been reported on or after this date (in YYYY-MM-DD format). */
-        fromDate?: string
-        /** @description Adjudications must have been reported on or before this date (in YYYY-MM-DD format). */
-        toDate?: string
-      }
-      header?: {
-        /** @description Requested offset of first record in returned collection of adjudications. */
-        'Page-Offset'?: number
-        /** @description Requested limit to number of adjudications returned. */
-        'Page-Limit'?: number
-      }
-      path: {
-        /**
-         * @description offenderNo
-         * @example A1234AA
-         */
-        offenderNo: string
-      }
-    }
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['AdjudicationSearchResponse']
-        }
-      }
-      /** @description Invalid request. */
-      400: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Requested resource not found. */
-      404: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Unrecoverable error occurred whilst processing request. */
-      500: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  /** Return a specific adjudication */
-  getAdjudication: {
-    parameters: {
-      path: {
-        /**
-         * @description offenderNo
-         * @example A1234AA
-         */
-        offenderNo: string
-        /** @description adjudicationNo */
-        adjudicationNo: number
-      }
-    }
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['IndividualAdjudication']
         }
       }
       /** @description Invalid request. */
@@ -21828,45 +21428,6 @@ export interface operations {
     }
   }
   /**
-   * Gets the offender non-association details for a given booking (DEPRECATED)
-   * @deprecated
-   * @description Do not use this endpoint, calls should be made in the context of a prisoner, not their current booking<p>This endpoint uses the REPLICA database.</p>
-   */
-  getNonAssociationDetails_1: {
-    parameters: {
-      path: {
-        /** @description The offender booking id */
-        bookingId: number
-      }
-    }
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['OffenderNonAssociationDetails']
-        }
-      }
-      /** @description Invalid request. */
-      400: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Requested resource not found. */
-      404: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Unrecoverable error occurred whilst processing request. */
-      500: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  /**
    * Retrieves a specific movement for a booking
    * @description Must booking in user caseload or have system privilege
    */
@@ -22970,50 +22531,6 @@ export interface operations {
     }
   }
   /**
-   * Offender adjudications summary (awards and sanctions).
-   * @description Offender adjudications (awards and sanctions).
-   */
-  getAdjudicationSummary: {
-    parameters: {
-      query?: {
-        /** @description Only awards ending on or after this date (in YYYY-MM-DD format) will be considered. */
-        awardCutoffDate?: string
-        /** @description Only proved adjudications ending on or after this date (in YYYY-MM-DD format) will be counted. */
-        adjudicationCutoffDate?: string
-      }
-      path: {
-        /** @description The offender booking id */
-        bookingId: number
-      }
-    }
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['AdjudicationSummary']
-        }
-      }
-      /** @description Invalid request. */
-      400: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Requested resource not found. */
-      404: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Unrecoverable error occurred whilst processing request. */
-      500: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  /**
    * All scheduled activities for offender.
    * @description All scheduled activities for offender.<p>This endpoint uses the REPLICA database.</p>
    */
@@ -23410,11 +22927,17 @@ export interface operations {
     }
     responses: {
       /** @description The appointment has been deleted */
-      204: never
+      204: {
+        content: never
+      }
       /** @description The client is not authorised for this operation */
-      403: never
+      403: {
+        content: never
+      }
       /** @description The appointment was not found */
-      404: never
+      404: {
+        content: never
+      }
     }
   }
   /**
@@ -24036,7 +23559,9 @@ export interface operations {
     }
     responses: {
       /** @description OK */
-      200: never
+      200: {
+        content: never
+      }
       /** @description Invalid request. */
       400: {
         content: {

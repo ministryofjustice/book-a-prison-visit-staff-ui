@@ -109,7 +109,7 @@ export interface components {
   schemas: {
     DlqMessage: {
       body: {
-        [key: string]: Record<string, never> | undefined
+        [key: string]: Record<string, never>
       }
       messageId: string
     }
@@ -319,6 +319,8 @@ export interface components {
   pathItems: never
 }
 
+export type $defs = Record<string, never>
+
 export type external = Record<string, never>
 
 export interface operations {
@@ -372,13 +374,21 @@ export interface operations {
     }
     responses: {
       /** @description The email address was created */
-      201: never
+      201: {
+        content: never
+      }
       /** @description The email address was updated */
-      204: never
+      204: {
+        content: never
+      }
       /** @description Client error - invalid prisonId, email address or similar */
-      400: never
+      400: {
+        content: never
+      }
       /** @description No prison found for the supplied prison id */
-      404: never
+      404: {
+        content: never
+      }
     }
   }
   /** Remove a prison's Videolink Conferencing Centre email address */
@@ -394,9 +404,13 @@ export interface operations {
     }
     responses: {
       /** @description The email address was removed */
-      204: never
+      204: {
+        content: never
+      }
       /** @description Client error - invalid prisonId or similar */
-      400: never
+      400: {
+        content: never
+      }
     }
   }
   /** Get a prison's Offender Management Unit email address */
@@ -449,13 +463,21 @@ export interface operations {
     }
     responses: {
       /** @description The email address was created */
-      201: never
+      201: {
+        content: never
+      }
       /** @description The email address was updated */
-      204: never
+      204: {
+        content: never
+      }
       /** @description Client error - invalid prisonId, email address, media type or similar */
-      400: never
+      400: {
+        content: never
+      }
       /** @description No prison found for the supplied prison id */
-      404: never
+      404: {
+        content: never
+      }
     }
   }
   /** Remove a prison's Offender Management Unit email address */
@@ -471,9 +493,13 @@ export interface operations {
     }
     responses: {
       /** @description The email address was removed */
-      204: never
+      204: {
+        content: never
+      }
       /** @description Client error - invalid prisonId or similar */
-      400: never
+      400: {
+        content: never
+      }
     }
   }
   retryDlq: {
@@ -646,7 +672,9 @@ export interface operations {
     }
     responses: {
       /** @description Address Information Deleted */
-      200: never
+      200: {
+        content: never
+      }
       /** @description Unauthorized to access this endpoint */
       401: {
         content: {
