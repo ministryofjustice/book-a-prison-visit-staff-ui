@@ -23,7 +23,7 @@ APIS='{
     },
     {
       "api": "prisoner-offender-search-api",
-      "url": "https://prisoner-offender-search-dev.prison.service.justice.gov.uk/v3/api-docs"
+      "url": "https://prisoner-search-dev.prison.service.justice.gov.uk/v3/api-docs"
     },
     {
       "api": "whereabouts-api",

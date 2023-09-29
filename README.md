@@ -43,7 +43,7 @@ SYSTEM_CLIENT_ID=clientid
 SYSTEM_CLIENT_SECRET=clientsecret
 
 ORCHESTRATION_API_URL="https://hmpps-manage-prison-visits-orchestration-dev.prison.service.justice.gov.uk"
-PRISONER_SEARCH_API_URL="https://prisoner-offender-search-dev.prison.service.justice.gov.uk"
+PRISONER_SEARCH_API_URL="https://prisoner-search-dev.prison.service.justice.gov.uk"
 PRISON_API_URL="https://prison-api-dev.prison.service.justice.gov.uk"
 PRISONER_CONTACT_REGISTRY_API_URL="https://prisoner-contact-registry-dev.prison.service.justice.gov.uk"
 WHEREABOUTS_API_URL="https://whereabouts-api-dev.service.justice.gov.uk"
