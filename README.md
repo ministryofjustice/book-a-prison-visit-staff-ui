@@ -28,7 +28,7 @@ Or, to start just Redis if using HMPPS Auth dev:
 
 Install dependencies using `npm install`, ensuring you are using >= `Node v18.x`
 
-Using your personal client credentials, create a `.env` local settings file
+Using credentials from the dev namespace, create a `.env` local settings file
 ```bash
 REDIS_HOST=localhost
 HMPPS_AUTH_URL=https://sign-in-dev.hmpps.service.justice.gov.uk/auth
@@ -36,7 +36,7 @@ HMPPS_AUTH_EXTERNAL_URL=https://sign-in-dev.hmpps.service.justice.gov.uk/auth
 NOMIS_AUTH_URL=https://sign-in-dev.hmpps.service.justice.gov.uk/auth
 NODE_ENV=development
 
-# Use personal client credentials for API and SYSTEM client
+# Use credentials from the dev namespace for API and SYSTEM client
 API_CLIENT_ID=clientid
 API_CLIENT_SECRET=clientsecret
 SYSTEM_CLIENT_ID=clientid
