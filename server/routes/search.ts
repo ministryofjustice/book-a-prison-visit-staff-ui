@@ -86,17 +86,19 @@ export default function routes({ auditService, prisonerSearchService, visitServi
     })
 
     const validPrisonerNumber = extractPrisonerNumber(search)
-    const doSearchByPrisonerId = numberOfResults === 0 && typeof validPrisonerNumber === 'string'
-    const customMessage = doSearchByPrisonerId
-      ? await prisonerSearchService.getMessagePrisoner(
-          validPrisonerNumber,
-          req.session.selectedEstablishment.prisonName,
-          res.locals.user.username,
-        )
-      : `There are no results for this name or number at ${req.session.selectedEstablishment.prisonName}.`
+    let prisonerNotFoundMessage
+    if (numberOfResults === 0 && validPrisonerNumber) {
+      prisonerNotFoundMessage = await prisonerSearchService.getPrisonerNotFoundMessage(
+        validPrisonerNumber,
+        req.session.selectedEstablishment.prisonName,
+        res.locals.user.username,
+      )
+    } else {
+      prisonerNotFoundMessage = `!There are no results for this name or number at ${req.session.selectedEstablishment.prisonName}.`
+    }
 
     res.render('pages/search/prisonerResults', {
-      customMessage,
+      prisonerNotFoundMessage,
       search,
       results: errors.length > 0 ? [] : results,
       errors,

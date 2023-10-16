@@ -4,7 +4,7 @@ export const isValidPrisonerNumber = (prisonerNo: string): boolean => {
   return matches !== null
 }
 
-export const extractPrisonerNumber = (search: string): string | boolean => {
+export const extractPrisonerNumber = (search: string): string | false => {
   const prisonerNoRegExp = /[A-Z][0-9]{4}[A-Z]{2}/
   const matches = search.toUpperCase().match(prisonerNoRegExp)
   return matches ? matches[0] : false

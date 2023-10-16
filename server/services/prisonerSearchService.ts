@@ -95,18 +95,25 @@ export default class PrisonerSearchService {
     return prisonerSearchClient.getPrisonerById(id)
   }
 
-  async getMessagePrisoner(id: string, establishmentName: string, username: string): Promise<string> {
+  async getPrisonerNotFoundMessage(id: string, prisonName: string, username: string): Promise<string> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const prisonerSearchClient = this.prisonerSearchClientFactory(token)
-    const prisoner = await prisonerSearchClient.getPrisonerById(id)
-    let message = 'There are no results for this prison number at any establishment.'
-    if (prisoner.inOutStatus === 'OUT' || prisoner.inOutStatus === 'TRN') {
-      message = `This prisoner is not in ${establishmentName}. They might be being moved to another establishment or have been released.`
-    } else if (prisoner.inOutStatus === 'IN') {
-      message =
-        'This prisoner is located at another establishment. The visitor should contact the prisoner to find out their location.'
-    }
 
+    let message
+    try {
+      const prisoner = await prisonerSearchClient.getPrisonerById(id)
+      if (prisoner.inOutStatus === 'OUT' || prisoner.inOutStatus === 'TRN') {
+        message = `This prisoner is not in ${prisonName}. They might be being moved to another establishment or have been released.`
+      } else if (prisoner.inOutStatus === 'IN') {
+        message =
+          'This prisoner is located at another establishment. The visitor should contact the prisoner to find out their location.'
+      }
+    } catch (error) {
+      if (error.status === 404) {
+        message =
+          'There are no results for this prison number at any establishment. Check the number is correct and try again.'
+      }
+    }
     return message
   }
 
