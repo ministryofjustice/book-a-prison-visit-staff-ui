@@ -288,7 +288,7 @@ export interface components {
   schemas: {
     DlqMessage: {
       body: {
-        [key: string]: Record<string, never> | undefined
+        [key: string]: Record<string, never>
       }
       messageId: string
     }
@@ -955,9 +955,9 @@ export interface components {
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
       pageSize?: number
-      paged?: boolean
       /** Format: int32 */
       pageNumber?: number
+      paged?: boolean
       unpaged?: boolean
     }
     SortObject: {
@@ -1194,6 +1194,8 @@ export interface components {
   pathItems: never
 }
 
+export type $defs = Record<string, never>
+
 export type external = Record<string, never>
 
 export interface operations {
@@ -1252,7 +1254,9 @@ export interface operations {
     }
     responses: {
       /** @description No Content */
-      204: never
+      204: {
+        content: never
+      }
     }
   }
   /**
@@ -1290,7 +1294,9 @@ export interface operations {
     }
     responses: {
       /** @description No Content */
-      204: never
+      204: {
+        content: never
+      }
     }
   }
   /** @description Delete a Video Link Booking */
@@ -1303,7 +1309,9 @@ export interface operations {
     }
     responses: {
       /** @description No Content */
-      204: never
+      204: {
+        content: never
+      }
     }
   }
   /**
@@ -1353,6 +1361,8 @@ export interface operations {
         'start-date': string
         /** @description Return details of bookings occurring within this number of days of start-date */
         days?: number
+        /** @description Include room names in CSV */
+        'room-names'?: boolean
       }
     }
     responses: {
@@ -1864,6 +1874,8 @@ export interface operations {
         'start-date': string
         /** @description Return details of events occurring within this number of days of start-date */
         days?: number
+        /** @description Include room names in CSV */
+        'room-names'?: boolean
       }
     }
     responses: {

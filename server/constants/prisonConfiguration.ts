@@ -52,6 +52,14 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'At least one visitor must be 18 or older.',
     ],
   },
+  // Dartmoor (HMP)
+  DAI: {
+    prisonPhoneNumber: '01822 322 022',
+    selectVisitorsText: [
+      'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
   // Drake Hall (HMP & YOI)
   DHI: {
     prisonPhoneNumber: '0300 060 6501',
@@ -69,11 +77,27 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'Contact HMP Durham if you would like to bring more than 3 children.',
     ],
   },
+  // Downview (HMP & YOI)
+  DWI: {
+    prisonPhoneNumber: '0300 303 0633',
+    selectVisitorsText: [
+      'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
   // Erlestoke (HMP & YOI)
   EEI: {
     prisonPhoneNumber: '0300 303 0634',
     selectVisitorsText: [
       'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
+  // Standford Hill (HMP & YOI)
+  EHI: {
+    prisonPhoneNumber: '0300 060 6603',
+    selectVisitorsText: [
+      'You can add up to 4 people aged 18 and over, and any number of children related to the prisoner.',
       'At least one visitor must be 18 or older.',
     ],
   },
@@ -131,9 +155,25 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'Contact the establishment if you would like to bring more than 3 children.',
     ],
   },
+  // Moorland (HMP & YOI)
+  MDI: {
+    prisonPhoneNumber: '01302 523 289',
+    selectVisitorsText: [
+      'You can add up to a total of 5 people, with a maximum of 3 people aged 18 and over.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
   // Morton Hall (HMP)
   MHI: {
     prisonPhoneNumber: '0300 303 0649',
+    selectVisitorsText: [
+      'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
+  // The Mount (HMP)
+  MTI: {
+    prisonPhoneNumber: '01442 836 352',
     selectVisitorsText: [
       'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
       'At least one visitor must be 18 or older.',

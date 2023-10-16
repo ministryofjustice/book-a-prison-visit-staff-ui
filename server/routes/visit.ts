@@ -26,6 +26,9 @@ import type { Services } from '../services'
 import eventAuditTypes from '../constants/eventAuditTypes'
 import { requestMethodDescriptions, requestMethodOptions } from '../constants/requestMethods'
 
+const A_DAY_IN_MS = 24 * 60 * 60 * 1000
+const CANCELLATION_LIMIT_DAYS = 28
+
 export default function routes({
   additionalSupportService,
   auditService,
@@ -101,7 +104,10 @@ export default function routes({
 
     const nowTimestamp = new Date()
     const visitStartTimestamp = new Date(visit.startTimestamp)
-    const showButtons = nowTimestamp < visitStartTimestamp
+    const chosenFutureInterval = new Date(visitStartTimestamp.getTime() + A_DAY_IN_MS * CANCELLATION_LIMIT_DAYS)
+
+    const showUpdate = nowTimestamp < visitStartTimestamp
+    const showCancel = nowTimestamp < chosenFutureInterval
 
     return res.render('pages/visit/summary', {
       prisoner,
@@ -112,7 +118,8 @@ export default function routes({
       additionalSupport,
       fromVisitSearch,
       fromVisitSearchQuery,
-      showButtons,
+      showUpdate,
+      showCancel,
       eventAuditTypes,
       requestMethodDescriptions,
       selectedTab,

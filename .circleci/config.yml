@@ -54,7 +54,7 @@ jobs:
           name: Change to project directory and run tests
           command: |
             cd hmpps-vsip-ui-tests
-            mvn test -Dbrowser=remote-chrome -Denvironment="STAGING"   
+            mvn test -Dbrowser=remote-chrome -Denvironment="STAGING" -Dtest=suites.RunSmokeTest
 
   build:
     executor:
@@ -121,9 +121,14 @@ jobs:
       - run:
           name: Install missing OS dependency
           command: sudo apt-get install libxss1
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package-lock.json" }}
       - run:
-          name: Get wiremock # match version in docker-compose-test.yml
-          command: curl -o wiremock.jar https://repo1.maven.org/maven2/com/github/tomakehurst/wiremock-jre8-standalone/2.35.0/wiremock-jre8-standalone-2.35.0.jar
+          name: Get wiremock (latest version)
+          command: |
+            LATEST_WIREMOCK_VERSION=$(curl --silent https://repo1.maven.org/maven2/org/wiremock/wiremock-standalone/maven-metadata.xml | sed -n 's/[[:space:]]*<latest>\(.*\)<\/latest>/\1/p')
+            echo "Wiremock latest version is: $LATEST_WIREMOCK_VERSION"
+            curl -o wiremock.jar "https://repo1.maven.org/maven2/org/wiremock/wiremock-standalone/$LATEST_WIREMOCK_VERSION/wiremock-standalone-$LATEST_WIREMOCK_VERSION.jar"
       - run:
           name: Run wiremock
           command: java -jar wiremock.jar --port 9091
@@ -135,8 +140,6 @@ jobs:
       - run:
           name: Wait for node app to start
           command: sleep 5
-      - restore_cache:
-          key: dependency-cache-{{ checksum "package-lock.json" }}
       - run:
           name: integration tests
           command: npm run int-test
