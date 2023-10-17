@@ -3,11 +3,13 @@ import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { appWithAllRoutes } from './testutils/appSetup'
 import * as visitorUtils from './visitorUtils'
+import config from '../config'
 
 let app: Express
 
 beforeEach(() => {
   app = appWithAllRoutes({})
+  config.features.displayRequestsEnabled = true
 })
 
 afterEach(() => {
@@ -24,13 +26,17 @@ describe('GET /', () => {
       .expect(res => {
         const $ = cheerio.load(res.text)
 
-        expect($('.card').length).toBe(4)
+        expect($('.card').length).toBe(5)
 
         expect($('[data-test="book-visit"] .card__link').text()).toBe('Book a visit')
         expect($('[data-test="book-visit"] .card__link').attr('href')).toBe('/search/prisoner')
 
         expect($('[data-test="change-visit"] .card__link').text()).toBe('Change a visit')
         expect($('[data-test="change-visit"] .card__link').attr('href')).toBe('/search/visit')
+
+        expect($('[data-test="need-review"] .card__link').text()).toContain('Need review')
+        expect($('[data-test="need-review"] .card__link #notifications').text()).toBe('10')
+        expect($('[data-test="need-review"] .card__link').attr('href')).toBe('/')
 
         expect($('[data-test="view-visits-by-date"] .card__link').text()).toBe('View visits by date')
         expect($('[data-test="view-visits-by-date"] .card__link').attr('href')).toBe('/visits')
@@ -39,6 +45,30 @@ describe('GET /', () => {
         expect($('[data-test="view-timetable"] .card__link').attr('href')).toBe('/timetable')
 
         expect($('[data-test="change-establishment"]').text()).toContain('Change establishment')
+      })
+  })
+
+  it('should not render the review request tab if feature disabled', () => {
+    config.features.displayRequestsEnabled = false
+    app = appWithAllRoutes({})
+
+    return request(app)
+      .get('/')
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+
+        expect($('.card').length).toBe(4)
+
+        expect($('[data-test="book-visit"] .card__link').text()).toBe('Book a visit')
+
+        expect($('[data-test="change-visit"] .card__link').text()).toBe('Change a visit')
+
+        expect($('[data-test="need-review"]').length).toBe(0)
+
+        expect($('[data-test="view-visits-by-date"] .card__link').text()).toBe('View visits by date')
+
+        expect($('[data-test="view-timetable"] .card__link').text()).toBe('View visits timetable')
       })
   })
 })

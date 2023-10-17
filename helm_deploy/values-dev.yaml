@@ -24,6 +24,7 @@ generic-service:
     DPS_URL: "https://digital-dev.prison.service.justice.gov.uk/"
     SMS_NOTIFICATIONS_ENABLED: "true"
     REDIS_KEY: "bapv-staff-dev"
+    FEATURE_DISPLAY_REQUESTS_COUNT: "true"
 
   allowlist:
     office: "217.33.148.210/32"

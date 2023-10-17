@@ -1,10 +1,13 @@
 {% extends "layout.njk" %}
 {% from "components/card/card.njk" import card %}
 {%- from "govuk/components/tag/macro.njk" import govukTag -%}
+{%- from "moj/components/notification-badge/macro.njk" import mojNotificationBadge -%}
+
 
 {% set pageHeaderTitle = "Manage prison visits" %}
 {% set pageTitle = applicationName + " - " + pageHeaderTitle %}
 
+{% set reviewCountHeader -%}Need review <span id="notifications" class="moj-notification-badge">{{ requestCount }}</span>{%- endset %}
 {% block content %}
 
   <div class="govuk-body">
@@ -31,6 +34,17 @@
             "id": "change-visit"
           }) }}
         </li>
+        {% if showRequestsTab %}
+          <li class="govuk-grid-column-one-third card-group__item">
+            {{ card({
+              "href": "/",
+              "clickable": "true",
+              "heading": reviewCountHeader if requestCount else 'Need review',
+              "description": "Check bookings that need review",
+              "id": "need-review"
+            }) }}
+          </li>
+        {% endif %}
         <li class="govuk-grid-column-one-third card-group__item">
           {{ card({
             "href": "/visits",
