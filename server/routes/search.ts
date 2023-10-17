@@ -94,7 +94,7 @@ export default function routes({ auditService, prisonerSearchService, visitServi
         res.locals.user.username,
       )
     } else {
-      prisonerNotFoundMessage = `!There are no results for this name or number at ${req.session.selectedEstablishment.prisonName}.`
+      prisonerNotFoundMessage = `There are no results for this name or number at ${req.session.selectedEstablishment.prisonName}.`
     }
 
     res.render('pages/search/prisonerResults', {
