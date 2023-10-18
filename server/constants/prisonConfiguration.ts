@@ -12,6 +12,14 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'At least one visitor must be 18 or older.',
     ],
   },
+  // Aylesbury (HMYOI)
+  AYI: {
+    prisonPhoneNumber: '01296 444 302',
+    selectVisitorsText: [
+      'You can add up to 3 people aged 16 and over, and 3 children under 16 years old.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
   // Bristol (HMP & YOI)
   BLI: {
     prisonPhoneNumber: '0300 060 6510',
@@ -146,6 +154,14 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'At least one visitor must be 18 or older.',
     ],
   },
+  // Lancaster Farms (HMP)
+  LFI: {
+    prisonPhoneNumber: '01524 563 636',
+    selectVisitorsText: [
+      'You can add up to 3 people aged 10 and over, and 3 children under 10 years old.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
   // Low Newton (HMP & YOI)
   LNI: {
     prisonPhoneNumber: '0300 303 0632',
@@ -184,6 +200,14 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
     prisonPhoneNumber: '0300 060 6515',
     selectVisitorsText: [
       'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
+  // North Sea Camp (HMP)
+  NSI: {
+    prisonPhoneNumber: '01205 769 368',
+    selectVisitorsText: [
+      'You can add up to 3 people aged 16 and over, and 3 children under 16 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
