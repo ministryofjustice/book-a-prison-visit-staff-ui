@@ -60,24 +60,26 @@ describe('Prisoner search page', () => {
       })
     })
 
-    describe('GET /search/prisoner/results?search=A1234BC', () => {
-      it('should render prisoner results page with no results', () => {
-        getPrisonersReturnData = {
-          results: [],
-          numberOfResults: 0,
-          numberOfPages: 0,
-          next: 0,
-          previous: 0,
-        }
+    describe('GET /search/prisoner/results?search=<search-term>', () => {
+      getPrisonersReturnData = {
+        results: [],
+        numberOfResults: 0,
+        numberOfPages: 0,
+        next: 0,
+        previous: 0,
+      }
 
+      it('should render prisoner results page with no results and custom message for prison number search', () => {
         prisonerSearchService.getPrisoners.mockResolvedValue(getPrisonersReturnData)
+        prisonerSearchService.getPrisonerNotFoundMessage.mockResolvedValue('custom not found message')
 
         return request(app)
           .get('/search/prisoner/results?search=A1234BC')
           .expect('Content-Type', /html/)
           .expect(res => {
+            const $ = cheerio.load(res.text)
             expect(res.text).toContain('Search for a prisoner')
-            expect(res.text).toContain('id="search-results-none"')
+            expect($('#search-results-none').text()).toBe('custom not found message')
             expect(auditService.prisonerSearch).toHaveBeenCalledWith({
               searchTerms: 'A1234BC',
               prisonId,
@@ -85,6 +87,29 @@ describe('Prisoner search page', () => {
               operationId: undefined,
             })
             expect(prisonerSearchService.getPrisoners).toHaveBeenCalledTimes(1)
+          })
+      })
+
+      it('should render prisoner results page with no results and default message for prisoner name search', () => {
+        prisonerSearchService.getPrisoners.mockResolvedValue(getPrisonersReturnData)
+
+        return request(app)
+          .get('/search/prisoner/results?search=prisoner-name')
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect(res.text).toContain('Search for a prisoner')
+            expect($('#search-results-none').text()).toBe(
+              'There are no results for this name or number at Hewell (HMP).',
+            )
+            expect(auditService.prisonerSearch).toHaveBeenCalledWith({
+              searchTerms: 'prisoner-name',
+              prisonId,
+              username: 'user1',
+              operationId: undefined,
+            })
+            expect(prisonerSearchService.getPrisoners).toHaveBeenCalledTimes(1)
+            expect(prisonerSearchService.getPrisonerNotFoundMessage).not.toHaveBeenCalled()
           })
       })
     })
