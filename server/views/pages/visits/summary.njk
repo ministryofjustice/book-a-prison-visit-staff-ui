@@ -5,6 +5,7 @@
 {%- from "moj/components/side-navigation/macro.njk" import mojSideNavigation -%}
 {% from "moj/components/pagination/macro.njk" import mojPagination %}
 {%- from "moj/components/sub-navigation/macro.njk" import mojSubNavigation -%}
+{% from 'components/datepicker/macro.njk' import hmppsDatepicker %}
 
 {% set pageHeaderTitle = "View visits by date" %}
 {% set pageTitle = applicationName + " - " + pageHeaderTitle %}
@@ -39,34 +40,20 @@
           <div class="bapv-another-date__form moj-js-hidden">
             <form action="" method="POST" novalidate>
               <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-              {{ govukDateInput({
-                id: "date-picker",
-                namePrefix: "date-picker",
-                hint: {
-                  text: "Enter a date"
-                },
-                items: [
-                  {
-                    name: "day",
-                    classes: "govuk-input--width-2",
-                    autocomplete: "off"
+                {{ hmppsDatepicker({
+                  id: "date",
+                  name: "date",
+                  label: {
+                      text: "Date"
                   },
-                  {
-                    name: "month",
-                    classes: "govuk-input--width-2",
-                    autocomplete: "off"
-                  },
-                  {
-                    name: "year",
-                    classes: "govuk-input--width-4",
-                    autocomplete: "off"
-                  }
-                ]
-              }) }}
-              {{ govukButton({
-                text: "View",
-                preventDoubleClick: true
-              }) }}
+                  errorMessage: errors | findError('date'),
+                  classes: 'hmpps-datepicker--fixed-width',
+                  value: formValues.date
+                }) }}
+                {{ govukButton({
+                  text: "View",
+                  preventDoubleClick: true
+                }) }}
             </form>
           </div>
         </div>
@@ -176,9 +163,11 @@
       </div>
     {% endif %}
   </div>
+
 {% endblock %}
 
 {% block pageScripts %}
   <script src="/assets/viewVisitsDatePicker.js"></script>
+  <script src="/assets/datepicker.js"></script>
 {% endblock %}
 
