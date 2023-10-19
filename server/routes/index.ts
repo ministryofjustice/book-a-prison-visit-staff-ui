@@ -13,6 +13,7 @@ export default function routes(): Router {
       hidePhaseBanner: true,
       showEstablishmentSwitcher: true,
       showRequestsTab: config.features.displayRequestsEnabled,
+      // todo - needs test coverage for 0, X, 99+
       requestCount: 10,
     })
   })

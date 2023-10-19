@@ -7,7 +7,8 @@
 {% set pageHeaderTitle = "Manage prison visits" %}
 {% set pageTitle = applicationName + " - " + pageHeaderTitle %}
 
-{% set reviewCountHeader -%}Need review <span id="notifications" class="moj-notification-badge">{{ requestCount }}</span>{%- endset %}
+{% set reviewBadgeCount = requestCount if requestCount < 100 else "99+" %}
+
 {% block content %}
 
   <div class="govuk-body">
@@ -36,10 +37,11 @@
         </li>
         {% if showRequestsTab %}
           <li class="govuk-grid-column-one-third card-group__item">
-            {{ card({
+             {{ card({
               "href": "/",
               "clickable": "true",
-              "heading": reviewCountHeader if requestCount else 'Need review',
+              "heading": "Need review" +
+                (mojNotificationBadge({ text: reviewBadgeCount | string }) if requestCount > 0),
               "description": "Check bookings that need review",
               "id": "need-review"
             }) }}
