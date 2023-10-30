@@ -154,6 +154,14 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'At least one visitor must be 18 or older.',
     ],
   },
+  // Hull (HMP & YOI)
+  HLI: {
+    prisonPhoneNumber: '01482 282 016',
+    selectVisitorsText: [
+      'You can add up to 4 people aged 16 and over, and any number of children.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
   // Lancaster Farms (HMP)
   LFI: {
     prisonPhoneNumber: '01524 563 636',
