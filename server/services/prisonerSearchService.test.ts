@@ -1,3 +1,4 @@
+import createError, { BadRequest } from 'http-errors'
 import PrisonerSearchService from './prisonerSearchService'
 import TestData from '../routes/testutils/testData'
 import { createMockHmppsAuthClient, createMockPrisonerSearchClient } from '../data/testutils/mocks'
@@ -13,6 +14,7 @@ describe('Prisoner search service', () => {
   const PrisonerSearchClientFactory = jest.fn()
 
   const prisonId = 'HEI'
+  const prisonName = 'Hewell (HMP)'
   const search = 'some search'
 
   const prisoner = TestData.prisoner()
@@ -135,6 +137,51 @@ describe('Prisoner search service', () => {
       const result = await prisonerSearchService.getPrisonerById('A1234BC', 'user')
 
       expect(result).toBe(prisoner)
+    })
+  })
+
+  describe('getPrisonerNotFoundMessage', () => {
+    it('should handle prisoner not found in any establishment', async () => {
+      prisonerSearchClient.getPrisonerById.mockRejectedValue(createError.NotFound())
+      const message = await prisonerSearchService.getPrisonerNotFoundMessage('A1234BC', prisonName, 'user')
+
+      expect(message).toBe(
+        'There are no results for this prison number at any establishment. Check the number is correct and try again.',
+      )
+    })
+
+    it('should propagate errors other than NotFound (404) ', async () => {
+      prisonerSearchClient.getPrisonerById.mockRejectedValue(createError.BadRequest())
+      await expect(
+        prisonerSearchService.getPrisonerNotFoundMessage('A1234BC', prisonName, 'user'),
+      ).rejects.toBeInstanceOf(BadRequest)
+    })
+
+    it('should handle a prisoner being found in another establishment', async () => {
+      prisonerSearchClient.getPrisonerById.mockResolvedValue({ ...prisoner, inOutStatus: 'IN' })
+      const message = await prisonerSearchService.getPrisonerNotFoundMessage('A1234BC', prisonName, 'user')
+
+      expect(message).toBe(
+        'This prisoner is located at another establishment. The visitor should contact the prisoner to find out their location.',
+      )
+    })
+
+    it('should handle a prisoner who has been released', async () => {
+      prisonerSearchClient.getPrisonerById.mockResolvedValue({ ...prisoner, inOutStatus: 'OUT' })
+      const message = await prisonerSearchService.getPrisonerNotFoundMessage('A1234BC', prisonName, 'user')
+
+      expect(message).toBe(
+        `This prisoner is not in ${prisonName}. They might be being moved to another establishment or have been released.`,
+      )
+    })
+
+    it('should handle a prisoner who is being transferred', async () => {
+      prisonerSearchClient.getPrisonerById.mockResolvedValue({ ...prisoner, inOutStatus: 'TRN' })
+      const message = await prisonerSearchService.getPrisonerNotFoundMessage('A1234BC', prisonName, 'user')
+
+      expect(message).toBe(
+        `This prisoner is not in ${prisonName}. They might be being moved to another establishment or have been released.`,
+      )
     })
   })
 })

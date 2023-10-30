@@ -6,6 +6,7 @@ import TestData from '../../server/routes/testutils/testData'
 
 context('Search for a prisoner', () => {
   const { prisonerNumber } = TestData.prisoner()
+  const prisoner = TestData.prisoner()
 
   beforeEach(() => {
     cy.task('reset')
@@ -28,6 +29,7 @@ context('Search for a prisoner', () => {
   context('when there are no results', () => {
     it('should show that there are no results', () => {
       cy.task('stubPrisoners', { term: prisonerNumber })
+      cy.task('stubPrisonerById', prisoner)
 
       const homePage = Page.verifyOnPage(HomePage)
       homePage.bookAVisitTile().click()

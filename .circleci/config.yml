@@ -10,7 +10,7 @@ feature_branch: &feature_branch
 version: 2.1
 
 orbs:
-  hmpps: ministryofjustice/hmpps@7.3.4
+  hmpps: ministryofjustice/hmpps@7
   slack: circleci/slack@4.12.5
 
 parameters:
@@ -24,7 +24,7 @@ parameters:
 
   node-version:
     type: string
-    default: 18.17-browsers
+    default: 20.9-browsers
 
 jobs:
   acceptance_tests:
