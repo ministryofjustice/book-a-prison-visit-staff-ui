@@ -31,6 +31,7 @@ context('Cancel visit journey', () => {
     cy.task('stubAuthUser')
     cy.task('stubSupportedPrisonIds')
     cy.task('stubPrisons')
+    cy.task('stubGetNotificationCount', {})
     cy.signIn()
 
     cy.task('stubPrisonerById', prisoner)

@@ -1,13 +1,17 @@
+import TestData from '../../server/routes/testutils/testData'
 import HomePage from '../pages/home'
 import Page from '../pages/page'
 
 context('Home page', () => {
+  const notificationCount = TestData.notificationCount()
+
   beforeEach(() => {
     cy.task('reset')
     cy.task('stubSignIn')
     cy.task('stubAuthUser')
     cy.task('stubSupportedPrisonIds')
     cy.task('stubPrisons')
+    cy.task('stubGetNotificationCount', { notificationCount })
     cy.signIn()
   })
 
@@ -16,7 +20,8 @@ context('Home page', () => {
 
     homePage.bookAVisitTile().contains('Book a visit')
     homePage.changeAVisitTile().contains('Change a visit')
-    homePage.reviewRequestsTile().contains('Need review')
+    homePage.needReviewTile().contains('Need review')
+    homePage.needReviewBadgeCount().contains(notificationCount.count)
     homePage.viewVisitsTile().contains('View visits by date')
     homePage.viewTimetableTile().contains('View visits timetable')
   })

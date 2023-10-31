@@ -10,6 +10,7 @@ context('Change establishment', () => {
     cy.task('stubAuthUser')
     cy.task('stubSupportedPrisonIds')
     cy.task('stubPrisons')
+    cy.task('stubGetNotificationCount', {})
     cy.signIn()
   })
 
