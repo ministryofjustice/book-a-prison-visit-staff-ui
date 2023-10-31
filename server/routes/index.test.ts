@@ -9,7 +9,7 @@ let app: Express
 
 beforeEach(() => {
   app = appWithAllRoutes({})
-  config.features.displayRequestsEnabled = true
+  config.features.showReviewBookingsTile = true
 })
 
 afterEach(() => {
@@ -35,7 +35,7 @@ describe('GET /', () => {
         expect($('[data-test="change-visit"] .card__link').attr('href')).toBe('/search/visit')
 
         expect($('[data-test="need-review"] .card__link').text()).toContain('Need review')
-        expect($('[data-test="need-review"] .card__link #notifications').text()).toBe('10')
+        expect($('[data-test="need-review"] [data-test="need-review-count"]').text()).toBe('10')
         expect($('[data-test="need-review"] .card__link').attr('href')).toBe('/')
 
         expect($('[data-test="view-visits-by-date"] .card__link').text()).toBe('View visits by date')
@@ -49,7 +49,7 @@ describe('GET /', () => {
   })
 
   it('should not render the review request tab if feature disabled', () => {
-    config.features.displayRequestsEnabled = false
+    config.features.showReviewBookingsTile = false
     app = appWithAllRoutes({})
 
     return request(app)

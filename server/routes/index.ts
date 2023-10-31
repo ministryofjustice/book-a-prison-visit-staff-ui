@@ -12,9 +12,9 @@ export default function routes(): Router {
     res.render('pages/index', {
       hidePhaseBanner: true,
       showEstablishmentSwitcher: true,
-      showRequestsTab: config.features.displayRequestsEnabled,
+      showReviewBookingsTile: config.features.showReviewBookingsTile,
       // todo - needs test coverage for 0, X, 99+
-      requestCount: 10,
+      reviewCount: 10,
     })
   })
 

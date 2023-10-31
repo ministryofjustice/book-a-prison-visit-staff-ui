@@ -143,7 +143,7 @@ export default {
     },
   },
   features: {
-    displayRequestsEnabled: get('FEATURE_DISPLAY_REQUESTS_COUNT', 'false', requiredInProduction) === 'true',
+    showReviewBookingsTile: get('FEATURE_REVIEW_BOOKINGS', 'false', requiredInProduction) === 'true',
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
 }
