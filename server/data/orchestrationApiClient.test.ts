@@ -649,6 +649,21 @@ describe('orchestrationApiClient', () => {
     })
   })
 
+  describe('getNotificationCount', () => {
+    it('should return notification count for given prison', async () => {
+      const notificationCount = TestData.notificationCount()
+
+      fakeOrchestrationApi
+        .get(`/visits/notification/${prisonId}/count`)
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, notificationCount)
+
+      const output = await orchestrationApiClient.getNotificationCount(prisonId)
+
+      expect(output).toEqual(notificationCount)
+    })
+  })
+
   describe('getVisitSessions', () => {
     it('should return an array of Visit Sessions', async () => {
       const results = [TestData.visitSession()]
