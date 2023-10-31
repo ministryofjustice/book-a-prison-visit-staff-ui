@@ -206,9 +206,7 @@
   width: 290px;
   background-color: $govuk-body-background-colour;
   z-index: 10;
-  border-left: 1px solid govuk-colour("mid-grey");
-  border-right: 1px solid govuk-colour("mid-grey");
-  border-bottom: 1px solid govuk-colour("mid-grey");
+  background-color: govuk-colour("light-grey");
   padding: govuk-spacing(3);
 
   form {
@@ -230,6 +228,11 @@
   .govuk-form-group {
     margin-bottom: 0;
   }
+}
+
+#datepicker-date {
+  left: -(govuk-spacing(3)) !important;
+  top: 80px
 }
 
 .bapv-index-header > * {

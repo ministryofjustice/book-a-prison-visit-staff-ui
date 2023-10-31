@@ -437,10 +437,6 @@ describe('POST /visits', () => {
   it('should redirect to the current date on the visits page for an invalid date', () => {
     const date = 'X/Y/20D2'
 
-    return request(app)
-      .post('/visits')
-      .send(`date=${date}`)
-      .expect(302)
-      .expect('location', `/visits?error=invalidFormat`)
+    return request(app).post('/visits').send(`date=${date}`).expect(302).expect('location', '/visits')
   })
 })
