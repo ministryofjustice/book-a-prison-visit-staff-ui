@@ -155,8 +155,6 @@ export default function routes({
       operationId: res.locals.appInsightsOperationId,
     })
 
-    const invalidFormatErrorMessage = { text: 'Please enter the date in the format DD/MM/YYYY' }
-
     return res.render('pages/visits/summary', {
       totals: {
         visitors: totals.adults + totals.children,
@@ -176,14 +174,13 @@ export default function routes({
       pageLinks: numberOfPages <= 1 ? [] : pageLinks,
       dateTabs: getDateTabs(selectedDateString, firstTabDateString, 3),
       queryParams,
-      invalidFormat: req.query.error === 'invalidFormat' ? invalidFormatErrorMessage : false,
     })
   })
 
   post('/', async (req, res) => {
     const validDate = /^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{1,4}$/
     if (!req.body.date.match(validDate)) {
-      return res.redirect('/visits?error=invalidFormat')
+      return res.redirect('/visits')
     }
     const date = req.body.date.split('/')
     const day = (date[0] as string).padStart(2, '0')
