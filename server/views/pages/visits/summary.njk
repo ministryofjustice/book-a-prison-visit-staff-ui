@@ -8,13 +8,17 @@
 {% from 'components/datepicker/macro.njk' import hmppsDatepicker %}
 
 {% set pageHeaderTitle = "View visits by date" %}
-{% set pageTitle = applicationName + " - " + pageHeaderTitle %}
+{% set pageTitle %}
+  {% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
+{% endset %}
+
 {% set backLinkHref = "/" %}
 
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+      {% include "partials/errorSummary.njk" %}
     </div>
   </div>
   <div class="govuk-grid-row">
@@ -44,9 +48,12 @@
                   id: "date",
                   name: "date",
                   label: {
-                      text: "Date"
+                    text: "Date"
                   },
-                  errorMessage: errors | findError('date'),
+                  hint: {
+                    text: "For example, 31/03/2022"
+                  },
+                  errorMessage: invalidFormat if invalidFormat,
                   classes: 'hmpps-datepicker--fixed-width',
                   value: formValues.date
                 }) }}

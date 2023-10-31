@@ -24,7 +24,7 @@ function Datepicker($module, config) {
     return this
   }
   const defaultConfig = {
-    imagePath: '/public/images/',
+    imagePath: '/assets/images/',
   }
   this.config = { ...defaultConfig, ...config }
 
@@ -160,12 +160,12 @@ Datepicker.prototype.createDialogMarkup = function (titleId) {
         <div class="hmpps-datepicker__dialog__navbuttons">
             <button class="js-datepicker-prev-year" aria-label="previous year" data-button="button-datepicker-prevyear">
                 <span class="govuk-visually-hidden">Previous year</span>
-                <svg focusable="false" class="hmpps-datepicker-icon" aria-hidden="true" role="img"><use href="/public/images/icons.stack.svg#double_chevron_left"></use></svg>
+                <svg focusable="false" class="hmpps-datepicker-icon" aria-hidden="true" role="img"><use href="/assets/images/icons.stack.svg#double_chevron_left"></use></svg>
             </button>
 
             <button class="js-datepicker-prev-month" aria-label="previous month" data-button="button-datepicker-prevmonth">
                 <span class="govuk-visually-hidden">Previous month</span>
-                <svg focusable="false" class="hmpps-datepicker-icon" aria-hidden="true" role="img"><use href="/public/images/icons.stack.svg#chevron_left"></use></svg>
+                <svg focusable="false" class="hmpps-datepicker-icon" aria-hidden="true" role="img"><use href="/assets/images/icons.stack.svg#chevron_left"></use></svg>
             </button>
         </div>
 
@@ -174,12 +174,12 @@ Datepicker.prototype.createDialogMarkup = function (titleId) {
         <div class="hmpps-datepicker__dialog__navbuttons">
             <button class="js-datepicker-next-month" aria-label="next month" data-button="button-datepicker-nextmonth">
                 <span class="govuk-visually-hidden">Next month</span>
-                <svg focusable="false" class="hmpps-datepicker-icon" aria-hidden="true" role="img"><use href="/public/images/icons.stack.svg#chevron_right"></use></svg>
+                <svg focusable="false" class="hmpps-datepicker-icon" aria-hidden="true" role="img"><use href="/assets/images/icons.stack.svg#chevron_right"></use></svg>
             </button>
 
             <button class="js-datepicker-next-year" aria-label="next year" data-button="button-datepicker-nextyear">
                 <span class="govuk-visually-hidden">Next year</span>
-                <svg focusable="false" class="hmpps-datepicker-icon" aria-hidden="true" role="img"><use href="/public/images/icons.stack.svg#double_chevron_right"></use></svg>
+                <svg focusable="false" class="hmpps-datepicker-icon" aria-hidden="true" role="img"><use href="/assets/images/icons.stack.svg#double_chevron_right"></use></svg>
             </button>
         </div>
       </div>

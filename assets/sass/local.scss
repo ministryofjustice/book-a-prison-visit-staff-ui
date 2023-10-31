@@ -200,10 +200,10 @@
 .bapv-another-date__form {
   text-align: left;
   position: absolute;
-  max-width: 350px;
+  max-width: 290px;
   right: 0;
   top: 49px;
-  width: 350px;
+  width: 290px;
   background-color: $govuk-body-background-colour;
   z-index: 10;
   border-left: 1px solid govuk-colour("mid-grey");
@@ -224,7 +224,7 @@
   }
 
   .govuk-button {
-    margin-bottom: 0;
+    margin-bottom: 26px;
   }
 
   .govuk-form-group {

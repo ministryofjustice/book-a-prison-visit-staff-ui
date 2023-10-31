@@ -15,3 +15,9 @@ export const isValidVisitReference = (reference: string): boolean => {
 
   return matches !== null
 }
+
+export const isCorrectDateFormat = (date: string): boolean => {
+  const matches = date.match(/^^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{1,4}$$/)
+
+  return matches !== null
+}
