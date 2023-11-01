@@ -11,13 +11,17 @@ export default function routes({ visitService }: Services): Router {
 
   get('/', async (req, res) => {
     const { prisonId } = req.session.selectedEstablishment
-    const reviewCount = await visitService.getNotificationCount(res.locals.user.username, prisonId)
+    const { showReviewBookingsTile } = config.features
+
+    const reviewCount = showReviewBookingsTile
+      ? (await visitService.getNotificationCount(res.locals.user.username, prisonId)).count
+      : undefined
 
     res.render('pages/index', {
       hidePhaseBanner: true,
       showEstablishmentSwitcher: true,
-      showReviewBookingsTile: config.features.showReviewBookingsTile,
-      reviewCount: reviewCount.count,
+      showReviewBookingsTile,
+      reviewCount,
     })
   })
 

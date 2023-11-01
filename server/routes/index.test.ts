@@ -70,6 +70,8 @@ describe('GET /', () => {
           expect($('[data-test="need-review"]').length).toBe(0)
           expect($('[data-test="view-visits-by-date"] .card__link').text()).toBe('View visits by date')
           expect($('[data-test="view-timetable"] .card__link').text()).toBe('View visits timetable')
+
+          expect(visitService.getNotificationCount).not.toHaveBeenCalled()
         })
     })
 
