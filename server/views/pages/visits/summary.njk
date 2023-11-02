@@ -54,7 +54,9 @@
                   hint: {
                     text: "For example, 31/03/2022"
                   },
-                  classes: 'hmpps-datepicker--fixed-width'
+                  errorMessage: errors | findError('date'),
+                  classes: 'hmpps-datepicker--fixed-width',
+                  value: formValues.date
                 }) }}
                 {{ govukButton({
                   text: "View",

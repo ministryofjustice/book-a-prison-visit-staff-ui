@@ -424,8 +424,8 @@ describe('GET /visits', () => {
 
 describe('POST /visits', () => {
   it('should redirect to the selected date on the visits page for a valid date', () => {
-    const date = '01/01/2023'
-    const selectedDateString = getParsedDateFromQueryString('2023-01-01')
+    const date = '01/02/2023'
+    const selectedDateString = getParsedDateFromQueryString('2023-02-01')
 
     return request(app)
       .post('/visits')

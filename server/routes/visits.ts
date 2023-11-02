@@ -1,5 +1,6 @@
 import { type RequestHandler, Router } from 'express'
 import format from 'date-fns/format'
+import { body, validationResult } from 'express-validator'
 import config from '../config'
 import { ExtendedVisitInformation, PrisonerDetailsItem, VisitsPageSlot } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
@@ -7,6 +8,7 @@ import { getParsedDateFromQueryString, getResultsPagingLinks } from '../utils/ut
 import { getDateTabs, getSlotsSideMenuData } from './visitsUtils'
 import { SessionCapacity, Visit } from '../data/orchestrationApiTypes'
 import type { Services } from '../services'
+import { getFlashFormValues } from './visitorUtils'
 
 export default function routes({
   auditService,
@@ -155,6 +157,8 @@ export default function routes({
       operationId: res.locals.appInsightsOperationId,
     })
 
+    const formValues = getFlashFormValues(req)
+
     return res.render('pages/visits/summary', {
       totals: {
         visitors: totals.adults + totals.children,
@@ -174,18 +178,28 @@ export default function routes({
       pageLinks: numberOfPages <= 1 ? [] : pageLinks,
       dateTabs: getDateTabs(selectedDateString, firstTabDateString, 3),
       queryParams,
+      errors: req.flash('errors'),
+      formValues,
     })
   })
 
   post('/', async (req, res) => {
-    const validDate = /^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{1,4}$/
-    if (!req.body.date.match(validDate)) {
+    await body('date')
+      .isDate({ format: 'DD/MM/YYYY', strictMode: true })
+      .withMessage('Please enter a valid date')
+      .run(req)
+
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      req.flash('errors', errors.array() as [])
+      req.flash('formValues', req.body)
       return res.redirect('/visits')
     }
-    const date = req.body.date.split('/')
-    const day = (date[0] as string).padStart(2, '0')
-    const month = (date[1] as string).padStart(2, '0')
-    const year = (date[2] as string).padStart(4, '0')
+
+    const date: string[] = req.body.date.split('/')
+    const day = date[0]
+    const month = date[1]
+    const year = date[2]
 
     const selectedDateString = getParsedDateFromQueryString(`${year}-${month}-${day}`)
     const queryParams = new URLSearchParams({
