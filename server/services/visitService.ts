@@ -9,6 +9,7 @@ import {
 import {
   ApplicationMethodType,
   CancelVisitOrchestrationDto,
+  NotificationCount,
   Visit,
   VisitHistoryDetails,
 } from '../data/orchestrationApiTypes'
@@ -204,6 +205,13 @@ export default class VisitService {
       extendedVisitsInfo,
       slots: getVisitSlotsFromBookedVisits(extendedVisitsInfo),
     }
+  }
+
+  async getNotificationCount(username: string, prisonId: string): Promise<NotificationCount> {
+    const token = await this.hmppsAuthClient.getSystemClientToken(username)
+    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+
+    return orchestrationApiClient.getNotificationCount(prisonId)
   }
 
   private buildVisitInformation(visit: Visit): VisitInformation {

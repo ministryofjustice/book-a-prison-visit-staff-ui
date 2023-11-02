@@ -11,6 +11,7 @@ context('SignIn', () => {
     cy.task('stubAuthUser')
     cy.task('stubSupportedPrisonIds')
     cy.task('stubPrisons')
+    cy.task('stubGetNotificationCount', {})
   })
 
   it('Unauthenticated user directed to auth', () => {

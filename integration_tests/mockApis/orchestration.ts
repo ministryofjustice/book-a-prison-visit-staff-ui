@@ -3,6 +3,7 @@ import { stubFor } from './wiremock'
 import {
   ApplicationMethodType,
   CancelVisitOrchestrationDto,
+  NotificationCount,
   PrisonerProfile,
   SessionCapacity,
   SessionSchedule,
@@ -241,6 +242,25 @@ export default {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
         jsonBody: TestData.supportTypes(),
+      },
+    })
+  },
+  stubGetNotificationCount: ({
+    prisonId = 'HEI',
+    notificationCount = TestData.notificationCount(),
+  }: {
+    prisonId: string
+    notificationCount: NotificationCount
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        url: `/orchestration/visits/notification/${prisonId}/count`,
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: notificationCount,
       },
     })
   },

@@ -1,6 +1,7 @@
 import { Prison } from '../../@types/bapv'
 import {
   Alert,
+  NotificationCount,
   PrisonerProfile,
   SessionCapacity,
   SessionSchedule,
@@ -122,6 +123,8 @@ export default class TestData {
       description: 'Standard',
     },
   }: Partial<CurrentIncentive> = {}): CurrentIncentive => ({ level }) as CurrentIncentive
+
+  static notificationCount = ({ count = 5 }: Partial<NotificationCount> = {}): NotificationCount => ({ count })
 
   static offenderRestriction = ({
     restrictionId = 0,

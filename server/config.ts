@@ -142,5 +142,8 @@ export default {
       agent: new AgentConfig(Number(get('ORCHESTRATION_API_TIMEOUT_RESPONSE', 10000))),
     },
   },
+  features: {
+    showReviewBookingsTile: get('FEATURE_REVIEW_BOOKINGS', 'false', requiredInProduction) === 'true',
+  },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
 }

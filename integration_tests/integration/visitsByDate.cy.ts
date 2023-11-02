@@ -37,6 +37,7 @@ context('View visit schedule timetable', () => {
     cy.task('stubAuthUser')
     cy.task('stubSupportedPrisonIds')
     cy.task('stubPrisons')
+    cy.task('stubGetNotificationCount', {})
     cy.signIn()
   })
 

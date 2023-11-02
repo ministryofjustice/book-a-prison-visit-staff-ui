@@ -10,6 +10,7 @@ context('Change establishment', () => {
     cy.task('stubAuthUser')
     cy.task('stubSupportedPrisonIds')
     cy.task('stubPrisons')
+    cy.task('stubGetNotificationCount', {})
     cy.signIn()
   })
 
@@ -17,6 +18,7 @@ context('Change establishment', () => {
   it('Should change establishment and redirect to home page', () => {
     cy.task('stubUserCaseloads', TestData.caseLoads())
     cy.task('stubSetActiveCaseLoad', 'BLI')
+    cy.task('stubGetNotificationCount', { prisonId: 'BLI' })
 
     let homePage = Page.verifyOnPage(HomePage)
 
@@ -26,7 +28,6 @@ context('Change establishment', () => {
     const changeEstablishmentPage = Page.verifyOnPage(ChangeEstablishmentPage)
     changeEstablishmentPage.selectEstablishment('BLI')
     changeEstablishmentPage.continueButton().click()
-    cy.task('stubSetActiveCaseLoad', 'BLI')
 
     homePage = Page.verifyOnPage(HomePage)
     homePage.currentEstablishment().contains('Bristol (HMP & YOI)')

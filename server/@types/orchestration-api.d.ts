@@ -54,6 +54,20 @@ export interface paths {
      */
     get: operations['getVisitsByFilterPageable']
   }
+  '/visits/notification/{prisonCode}/count': {
+    /**
+     * Get notification count for a prison
+     * @description Retrieve notification count by prison code
+     */
+    get: operations['getNotificationCountForPrison']
+  }
+  '/visits/notification/count': {
+    /**
+     * Get notification count
+     * @description Retrieve notification count by visit reference
+     */
+    get: operations['getNotificationCount']
+  }
   '/visit-support': {
     /**
      * Available Support
@@ -454,9 +468,9 @@ export interface components {
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject']
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
       last?: boolean
       empty?: boolean
     }
@@ -475,6 +489,10 @@ export interface components {
       empty?: boolean
       sorted?: boolean
       unsorted?: boolean
+    }
+    NotificationCountDto: {
+      /** Format: int32 */
+      count: number
     }
     /** @description Support Type */
     SupportTypeDto: {
@@ -1269,6 +1287,67 @@ export interface operations {
         }
       }
       /** @description Incorrect permissions to retrieve visits */
+      403: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  /**
+   * Get notification count for a prison
+   * @description Retrieve notification count by prison code
+   */
+  getNotificationCountForPrison: {
+    parameters: {
+      path: {
+        /**
+         * @description prisonCode
+         * @example CFI
+         */
+        prisonCode: string
+      }
+    }
+    responses: {
+      /** @description Retrieve notification count for a prison */
+      200: {
+        content: {
+          'application/json': components['schemas']['NotificationCountDto']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to access this endpoint */
+      403: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  /**
+   * Get notification count
+   * @description Retrieve notification count by visit reference
+   */
+  getNotificationCount: {
+    responses: {
+      /** @description Retrieve notification count */
+      200: {
+        content: {
+          'application/json': components['schemas']['NotificationCountDto']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to access this endpoint */
       403: {
         content: {
           'application/json': components['schemas']['ErrorResponse']

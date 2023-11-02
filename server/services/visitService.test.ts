@@ -780,4 +780,17 @@ describe('Visit service', () => {
       })
     })
   })
+
+  describe('Visit notifications', () => {
+    describe('getNotificationCount', () => {
+      it('should return notification count for given prison', async () => {
+        const notificationCount = TestData.notificationCount()
+        orchestrationApiClient.getNotificationCount.mockResolvedValue(notificationCount)
+        const result = await visitService.getNotificationCount('user', prisonId)
+
+        expect(orchestrationApiClient.getNotificationCount).toHaveBeenCalledTimes(1)
+        expect(result).toStrictEqual(notificationCount)
+      })
+    })
+  })
 })

@@ -114,7 +114,7 @@ function appSetup(
   }
   app.use(setUpCurrentUser(services))
 
-  app.use('/', indexRoutes())
+  app.use('/', indexRoutes(services))
   app.use('/book-a-visit', bookAVisitRoutes(services))
   app.use('/change-establishment', establishmentRoutes(services))
   app.use('/prisoner', prisonerRoutes(services))

@@ -30,3 +30,5 @@ export type PrisonerProfile = components['schemas']['PrisonerProfileDto']
 export type VisitSummary = components['schemas']['VisitSummaryDto']
 
 export type EventAuditType = components['schemas']['EventAuditDto']['type']
+
+export type NotificationCount = components['schemas']['NotificationCountDto']

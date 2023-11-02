@@ -31,6 +31,22 @@
             "id": "change-visit"
           }) }}
         </li>
+        {% if showReviewBookingsTile %}
+          <li class="govuk-grid-column-one-third card-group__item">
+            {{ card({
+              "href": "/",
+              "clickable": "true",
+              "heading":
+                '<span class="bapv-nowrap">Need review' +
+                  '<span class="govuk-!-margin-left-2' + (" moj-notification-badge" if reviewCount > 0) + '" data-test="need-review-count">' +
+                    ((reviewCount if reviewCount < 100 else "99+") if reviewCount > 0)+
+                  "</span>" +
+                "</span>",
+              "description": "Check bookings that need review",
+              "id": "need-review"
+            }) }}
+          </li>
+        {% endif %}
         <li class="govuk-grid-column-one-third card-group__item">
           {{ card({
             "href": "/visits",
