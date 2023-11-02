@@ -184,10 +184,7 @@ export default function routes({
   })
 
   post('/', async (req, res) => {
-    await body('date')
-      .isDate({ format: 'DD/MM/YYYY', strictMode: true })
-      .withMessage('Please enter a valid date')
-      .run(req)
+    await body('date').isDate({ format: 'DD/MM/YYYY', strictMode: true }).withMessage('Enter a valid date').run(req)
 
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
