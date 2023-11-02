@@ -18,7 +18,6 @@ if (viewAnotherDateToggle) {
   viewAnotherDateToggle.addEventListener('click', toggleDatePicker)
 
   if (document.querySelector('.govuk-error-summary') !== null) {
-    console.log('HERE')
     viewAnotherDateToggle.setAttribute('aria-expanded', 'false')
     document.querySelector('.bapv-another-date__form').classList.remove('moj-js-hidden')
   }
