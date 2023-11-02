@@ -35,7 +35,7 @@
 
         <div class="bapv-another-date">
           <div class="bapv-another-date__toggle">
-            <button type="button" aria-haspopup="true" aria-expanded="false">View another date
+            <button type="button" aria-haspopup="true" aria-expanded="false" data-test="another-date-button">View another date
               <svg viewBox="0 0 28 31" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M4.94118 2.47059C4.94118 1.10612 6.0473 0 7.41176 0C8.77623 0 9.88235 1.10612 9.88235 2.47059V4.89474H18.1176V2.47059C18.1176 1.10612 19.2238 0 20.5882 0C21.9527 0 23.0588 1.10612 23.0588 2.47059V4.89474H24.7059C26.5252 4.89474 28 6.3557 28 8.15789V27.7368C28 29.539 26.5252 31 24.7059 31H3.29412C1.47483 31 0 29.539 0 27.7368V8.15789C0 6.3557 1.47483 4.89474 3.29412 4.89474H4.94118V2.47059ZM24.7059 9.78947H3.29412L3.29412 27.7368H24.7059V9.78947ZM9.88235 13.0526V17.9474H4.94118V13.0526H9.88235ZM9.88235 24.4737V19.5789H4.94118V24.4737H9.88235ZM11.5294 13.0526H16.4706V17.9474H11.5294V13.0526ZM16.4706 19.5789H11.5294V24.4737H16.4706V19.5789ZM23.0588 13.0526V17.9474H18.1176V13.0526H23.0588ZM23.0588 24.4737V19.5789H18.1176V24.4737H23.0588Z"></path>
               </svg>
@@ -60,7 +60,8 @@
                 }) }}
                 {{ govukButton({
                   text: "View",
-                  preventDoubleClick: true
+                  preventDoubleClick: true,
+                  attributes: { "data-test": "submit" }
                 }) }}
             </form>
           </div>
