@@ -474,14 +474,14 @@ Datepicker.prototype.focusLastDayOfWeek = function () {
 Datepicker.prototype.focusNextMonth = function (event, focus = true) {
   event.preventDefault()
   const date = new Date(this.currentDate)
-  date.setMonth(date.getMonth() + 1)
+  date.setMonth(date.getMonth() + 1, 1)
   this.goToDate(date, focus)
 }
 
 Datepicker.prototype.focusPreviousMonth = function (event, focus = true) {
   event.preventDefault()
   const date = new Date(this.currentDate)
-  date.setMonth(date.getMonth() - 1)
+  date.setMonth(date.getMonth() - 1, 1)
   this.goToDate(date, focus)
 }
 
@@ -489,14 +489,14 @@ Datepicker.prototype.focusPreviousMonth = function (event, focus = true) {
 Datepicker.prototype.focusNextYear = function (event, focus = true) {
   event.preventDefault()
   const date = new Date(this.currentDate)
-  date.setFullYear(date.getFullYear() + 1)
+  date.setFullYear(date.getFullYear() + 1, date.getMonth(), 1)
   this.goToDate(date, focus)
 }
 
 Datepicker.prototype.focusPreviousYear = function (event, focus = true) {
   event.preventDefault()
   const date = new Date(this.currentDate)
-  date.setFullYear(date.getFullYear() - 1)
+  date.setFullYear(date.getFullYear() - 1, date.getMonth(), 1)
   this.goToDate(date, focus)
 }
 
