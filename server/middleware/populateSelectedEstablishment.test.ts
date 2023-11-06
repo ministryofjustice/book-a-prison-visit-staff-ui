@@ -1,10 +1,10 @@
 import { Request, Response } from 'express'
 import { Cookie } from 'express-session'
-import { Prison } from '../@types/bapv'
 import type { User } from '../data/hmppsAuthClient'
 import TestData from '../routes/testutils/testData'
 import { createMockSupportedPrisonsService } from '../services/testutils/mocks'
 import populateSelectedEstablishment from './populateSelectedEstablishment'
+import { PrisonName } from '../data/prisonRegisterApiTypes'
 
 const supportedPrisonsService = createMockSupportedPrisonsService()
 
@@ -35,7 +35,7 @@ describe('populateSelectedEstablishment', () => {
     } as unknown as Request
 
     res.locals = {
-      selectedEstablishment: <Prison>undefined,
+      selectedEstablishment: <PrisonName>undefined,
       user: <User>{ activeCaseLoadId: 'HEI' },
     }
   })
@@ -48,7 +48,7 @@ describe('populateSelectedEstablishment', () => {
     it('should set establishment in session and populate res.locals if active caseload is a supported prison', async () => {
       res.locals.user.activeCaseLoadId = 'BLI'
 
-      const expectedEstablishment: Prison = { prisonId: 'BLI', prisonName: supportedPrisons.BLI }
+      const expectedEstablishment: PrisonName = { prisonId: 'BLI', prisonName: supportedPrisons.BLI }
 
       await populateSelectedEstablishment(supportedPrisonsService)(req, res, next)
 

@@ -1,14 +1,14 @@
 import { SuperAgentRequest } from 'superagent'
 import { stubFor } from './wiremock'
 import TestData from '../../server/routes/testutils/testData'
-import { Prison } from '../../server/@types/bapv'
+import { PrisonName } from '../../server/data/prisonRegisterApiTypes'
 
 export default {
-  stubPrisons: (prisons: Prison[] = TestData.prisons()): SuperAgentRequest => {
+  stubPrisonNames: (prisons: PrisonName[] = TestData.prisonNames()): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',
-        url: '/prisonRegister/prisons',
+        url: '/prisonRegister/prisons/names',
       },
       response: {
         status: 200,
