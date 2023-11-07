@@ -19,23 +19,17 @@ describe('isValidPrisonerNumber', () => {
 })
 
 describe('extractPrisonerNumber', () => {
-  it('valid', () => {
-    expect(extractPrisonerNumber('A1234BC')).toEqual('A1234BC')
-  })
-  it('valid - extra characters', () => {
-    expect(extractPrisonerNumber('name A1234BC ssea')).toEqual('A1234BC')
-  })
-  it('empty string', () => {
-    expect(extractPrisonerNumber('')).toEqual(false)
-  })
-  it('disallowed characters', () => {
-    expect(extractPrisonerNumber('A123-4BC')).toEqual(false)
-  })
-  it('wrong format', () => {
-    expect(extractPrisonerNumber('1ABCD23')).toEqual(false)
-  })
-  it('lowercase', () => {
-    expect(extractPrisonerNumber('a1234bc')).toEqual('A1234BC')
+  it.each([
+    ['valid prisoner number', 'A1234BC', 'A1234BC'],
+    ['valid prisoner number (lowercase)', 'a1234bc', 'A1234BC'],
+    ['valid prisoner number (within string)', 'name A1234BC name', 'A1234BC'],
+    ['do not match a sub-string', 'nameA1234BCname', false],
+    ['empty string', '', false],
+    ['empty string', '', false],
+    ['disallowed characters', 'A123-4BC', false],
+    ['wrong format', '1ABCD23', false],
+  ])('%s: extractPrisonerNumber(%s) => %s', (_: string, input: string, expected: string | false) => {
+    expect(extractPrisonerNumber(input)).toEqual(expected)
   })
 })
 
