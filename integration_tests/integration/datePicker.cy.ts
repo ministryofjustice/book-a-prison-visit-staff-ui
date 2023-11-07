@@ -14,7 +14,7 @@ context('Date picker', () => {
     cy.task('stubSignIn')
     cy.task('stubAuthUser')
     cy.task('stubSupportedPrisonIds')
-    cy.task('stubPrisons')
+    cy.task('stubPrisonNames')
     cy.task('stubGetNotificationCount', {})
     cy.signIn()
 
@@ -71,5 +71,10 @@ context('Date picker', () => {
     visitsByDatePage.datePickerGoToNextYear()
     visitsByDatePage.datePickerSelectDay(1)
     visitsByDatePage.datePickerGetEnteredDate().should('have.value', '01/02/2025')
+
+    // handle months where the 1st is a Sunday (i.e not truncate this date)
+    visitsByDatePage.datePickerEnterDate('01/10/2023')
+    visitsByDatePage.datePickerSelectDay(1)
+    visitsByDatePage.datePickerGetEnteredDate().should('have.value', '01/10/2023')
   })
 })
