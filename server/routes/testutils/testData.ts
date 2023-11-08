@@ -1,4 +1,3 @@
-import { Prison } from '../../@types/bapv'
 import {
   Alert,
   NotificationCount,
@@ -15,6 +14,7 @@ import { CaseLoad, OffenderRestriction } from '../../data/prisonApiTypes'
 import { CurrentIncentive, Prisoner } from '../../data/prisonerOffenderSearchTypes'
 import { Address, Contact, Restriction } from '../../data/prisonerContactRegistryApiTypes'
 import { ScheduledEvent } from '../../data/whereaboutsApiTypes'
+import { PrisonName } from '../../data/prisonRegisterApiTypes'
 
 export default class TestData {
   static address = ({
@@ -165,7 +165,7 @@ export default class TestData {
       currentIncentive,
     }) as Prisoner
 
-  static prisons = ({
+  static prisonNames = ({
     prisons = [
       {
         prisonId: 'HEI',
@@ -175,8 +175,8 @@ export default class TestData {
         prisonId: 'BLI',
         prisonName: 'Bristol (HMP & YOI)',
       },
-    ] as Prison[],
-  } = {}): Prison[] => prisons
+    ] as PrisonName[],
+  } = {}): PrisonName[] => prisons
 
   static prisonerProfile = ({
     prisonerId = 'A1234BC',

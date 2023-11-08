@@ -8,11 +8,6 @@ import {
   VisitSummary,
 } from '../data/orchestrationApiTypes'
 
-export type Prison = {
-  prisonId: string
-  prisonName: string
-}
-
 export type PrisonerDetailsItem = {
   html?: string
   text?: string
