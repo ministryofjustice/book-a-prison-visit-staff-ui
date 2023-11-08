@@ -424,32 +424,19 @@ describe('GET /visits', () => {
 
 describe('POST /visits', () => {
   it('should redirect to the selected date on the visits page for a valid date', () => {
-    const day = '1'
-    const month = '1'
-    const year = '2022'
-    const selectedDateString = getParsedDateFromQueryString(`${year}-${month}-${day}`)
+    const date = '01/02/2023'
+    const selectedDateString = getParsedDateFromQueryString('2023-02-01')
 
     return request(app)
       .post('/visits')
-      .send(`date-picker-day=${day}`)
-      .send(`date-picker-month=${month}`)
-      .send(`date-picker-year=${year}`)
+      .send(`date=${date}`)
       .expect(302)
       .expect('location', `/visits?selectedDate=${selectedDateString}&firstTabDate=${selectedDateString}`)
   })
 
   it('should redirect to the current date on the visits page for an invalid date', () => {
-    const day = 'X'
-    const month = 'Y'
-    const year = '20D2'
-    const selectedDateString = getParsedDateFromQueryString(`${year}-${month}-${day}`)
+    const date = 'X/Y/20D2'
 
-    return request(app)
-      .post('/visits')
-      .send(`date-picker-day=${day}`)
-      .send(`date-picker-month=${month}`)
-      .send(`date-picker-year=${year}`)
-      .expect(302)
-      .expect('location', `/visits?selectedDate=${selectedDateString}&firstTabDate=${selectedDateString}`)
+    return request(app).post('/visits').send(`date=${date}`).expect(302).expect('location', '/visits')
   })
 })
