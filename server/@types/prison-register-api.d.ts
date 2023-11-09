@@ -5,20 +5,48 @@
 
 export interface paths {
   '/secure/prisons/id/{prisonId}/videolink-conferencing-centre/email-address': {
-    /** Get a prison's Videolink Conferencing Centre email address */
+    /**
+     * Get a prison's Videolink Conferencing Centre email address
+     * @deprecated
+     */
     get: operations['getEmailForVideoConferencingCentre']
-    /** Set or change a prison's Videolink Conferencing Centre email address */
+    /**
+     * Set or change a prison's Videolink Conferencing Centre email address
+     * @deprecated
+     */
     put: operations['putEmailAddressForVideolinkConferencingCentre']
-    /** Remove a prison's Videolink Conferencing Centre email address */
+    /**
+     * Remove a prison's Videolink Conferencing Centre email address
+     * @deprecated
+     */
     delete: operations['deleteEmailAddressForVideolinkConferencingCentre']
   }
   '/secure/prisons/id/{prisonId}/offender-management-unit/email-address': {
-    /** Get a prison's Offender Management Unit email address */
+    /**
+     * Get a prison's Offender Management Unit email address
+     * @deprecated
+     */
     get: operations['getEmailForOffenderManagementUnit']
-    /** Set or change a prison's Offender Management Unit email address */
+    /**
+     * Set or change a prison's Offender Management Unit email address
+     * @deprecated
+     */
     put: operations['putEmailAddressForOffenderManagementUnit']
-    /** Remove a prison's Offender Management Unit email address */
+    /**
+     * Remove a prison's Offender Management Unit email address
+     * @deprecated
+     */
     delete: operations['deleteEmailAddressForOffenderManagementUnit']
+  }
+  '/secure/prisons/id/{prisonId}/department/contact-details': {
+    /** Get a prison department's contact details */
+    get: operations['getContactDetails']
+    /** Change a prison department's contact details */
+    put: operations['updateContactDetails']
+    /** Create a prison department's contact details */
+    post: operations['createContactDetails']
+    /** Remove a prison department's contact details */
+    delete: operations['deletePhoneNumber']
   }
   '/queue-admin/retry-dlq/{dlqName}': {
     put: operations['retryDlq']
@@ -32,33 +60,33 @@ export interface paths {
   '/prison-maintenance/id/{prisonId}': {
     /**
      * Update specified prison details
-     * @description Updates prison information, role required is MAINTAIN_REF_DATA
+     * @description Updates prison information, role required is MAINTAIN_REF_DATA or MAINTAIN_PRISON_DATA
      */
     put: operations['updatePrison']
   }
   '/prison-maintenance/id/{prisonId}/address/{addressId}': {
     /**
      * Update specified address details
-     * @description Updates address information, role required is MAINTAIN_REF_DATA
+     * @description Updates address information, role required is MAINTAIN_REF_DATA or MAINTAIN_PRISON_DATA
      */
     put: operations['updateAddress']
     /**
      * Delete specified address for specified Prison
-     * @description Deletes address information for a Prison, role required is MAINTAIN_REF_DATA
+     * @description Deletes address information for a Prison, role required is MAINTAIN_REF_DATA or MAINTAIN_PRISON_DATA
      */
     delete: operations['deleteAddress']
   }
   '/prison-maintenance': {
     /**
      * Adds a new prison
-     * @description Adds new prison information, role required is MAINTAIN_REF_DATA
+     * @description Adds new prison information, role required is MAINTAIN_REF_DATA or MAINTAIN_PRISON_DATA
      */
     post: operations['insertPrison']
   }
   '/prison-maintenance/id/{prisonId}/address': {
     /**
      * Add Address to existing Prison
-     * @description Adds an additional Address to an existing Prison, role required is MAINTAIN_REF_DATA
+     * @description Adds an additional Address to an existing Prison, role required is MAINTAIN_REF_DATA or MAINTAIN_PRISON_DATA
      */
     post: operations['addAddress']
   }
@@ -78,6 +106,13 @@ export interface paths {
      * @description All prisons
      */
     get: operations['getPrisonsBySearchFilter']
+  }
+  '/prisons/names': {
+    /**
+     * Get prison names
+     * @description prison id and full name
+     */
+    get: operations['getPrisonNames']
   }
   '/prisons/id/{prisonId}': {
     /**
@@ -107,6 +142,39 @@ export type webhooks = Record<string, never>
 
 export interface components {
   schemas: {
+    /** @description Contact information for a prison department */
+    ContactDetailsDto: {
+      /**
+       * @description Department Type
+       * @example SOCIAL_VISIT or PRISON
+       * @enum {string}
+       */
+      type: 'PRISON' | 'SOCIAL_VISIT' | 'VIDEOLINK_CONFERENCING_CENTRE' | 'OFFENDER_MANAGEMENT_UNIT'
+      /**
+       * @description email address
+       * @example example@example.com
+       */
+      emailAddress?: string
+      /**
+       * @description Phone Number
+       * @example 01234567890
+       */
+      phoneNumber?: string
+      /**
+       * @description Web address
+       * @example https://www.example.co.uk
+       */
+      webAddress?: string
+    }
+    ErrorResponse: {
+      /** Format: int32 */
+      status: number
+      /** Format: int32 */
+      errorCode?: number
+      userMessage?: string
+      developerMessage?: string
+      moreInfo?: string
+    }
     DlqMessage: {
       body: {
         [key: string]: Record<string, never>
@@ -141,15 +209,6 @@ export interface components {
       prisonTypes: ('HMP' | 'YOI' | 'IRC' | 'STC' | 'YCS')[]
       /** @description Set of categories for this prison */
       categories: ('A' | 'B' | 'C' | 'D')[]
-    }
-    ErrorResponse: {
-      /** Format: int32 */
-      status: number
-      /** Format: int32 */
-      errorCode?: number
-      userMessage?: string
-      developerMessage?: string
-      moreInfo?: string
     }
     /** @description List of address for this prison */
     AddressDto: {
@@ -311,6 +370,19 @@ export interface components {
       messagesReturnedCount: number
       messages: components['schemas']['DlqMessage'][]
     }
+    /** @description Full name of prison with id */
+    PrisonNameDto: {
+      /**
+       * @description Prison ID
+       * @example MDI
+       */
+      prisonId: string
+      /**
+       * @description Name of the prison
+       * @example Moorland HMP
+       */
+      prisonName: string
+    }
   }
   responses: never
   parameters: never
@@ -324,7 +396,10 @@ export type $defs = Record<string, never>
 export type external = Record<string, never>
 
 export interface operations {
-  /** Get a prison's Videolink Conferencing Centre email address */
+  /**
+   * Get a prison's Videolink Conferencing Centre email address
+   * @deprecated
+   */
   getEmailForVideoConferencingCentre: {
     parameters: {
       path: {
@@ -356,7 +431,10 @@ export interface operations {
       }
     }
   }
-  /** Set or change a prison's Videolink Conferencing Centre email address */
+  /**
+   * Set or change a prison's Videolink Conferencing Centre email address
+   * @deprecated
+   */
   putEmailAddressForVideolinkConferencingCentre: {
     parameters: {
       path: {
@@ -391,7 +469,10 @@ export interface operations {
       }
     }
   }
-  /** Remove a prison's Videolink Conferencing Centre email address */
+  /**
+   * Remove a prison's Videolink Conferencing Centre email address
+   * @deprecated
+   */
   deleteEmailAddressForVideolinkConferencingCentre: {
     parameters: {
       path: {
@@ -413,7 +494,10 @@ export interface operations {
       }
     }
   }
-  /** Get a prison's Offender Management Unit email address */
+  /**
+   * Get a prison's Offender Management Unit email address
+   * @deprecated
+   */
   getEmailForOffenderManagementUnit: {
     parameters: {
       path: {
@@ -445,7 +529,10 @@ export interface operations {
       }
     }
   }
-  /** Set or change a prison's Offender Management Unit email address */
+  /**
+   * Set or change a prison's Offender Management Unit email address
+   * @deprecated
+   */
   putEmailAddressForOffenderManagementUnit: {
     parameters: {
       path: {
@@ -480,7 +567,10 @@ export interface operations {
       }
     }
   }
-  /** Remove a prison's Offender Management Unit email address */
+  /**
+   * Remove a prison's Offender Management Unit email address
+   * @deprecated
+   */
   deleteEmailAddressForOffenderManagementUnit: {
     parameters: {
       path: {
@@ -499,6 +589,234 @@ export interface operations {
       /** @description Client error - invalid prisonId or similar */
       400: {
         content: never
+      }
+    }
+  }
+  /** Get a prison department's contact details */
+  getContactDetails: {
+    parameters: {
+      query: {
+        /**
+         * @description Department type
+         * @example SOCIAL_VISIT
+         */
+        departmentType: string
+      }
+      path: {
+        /**
+         * @description Prison ID
+         * @example MDI
+         */
+        prisonId: string
+      }
+    }
+    responses: {
+      /** @description Returns the departments contact details */
+      200: {
+        content: {
+          'application/json': components['schemas']['ContactDetailsDto']
+        }
+      }
+      /** @description Client error - invalid prisonId or similar */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description The prison does not have contact details for this department */
+      404: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  /** Change a prison department's contact details */
+  updateContactDetails: {
+    parameters: {
+      query?: {
+        /**
+         * @description if true individual contact details are removed if null
+         * @example true
+         */
+        removeIfNull?: string
+      }
+      path: {
+        /**
+         * @description Prison ID
+         * @example MDI
+         */
+        prisonId: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ContactDetailsDto']
+      }
+    }
+    responses: {
+      /** @description The Contact details have been updated */
+      200: {
+        content: {
+          'application/json': components['schemas']['ContactDetailsDto']
+        }
+      }
+      /** @description Client error - invalid prisonId, contact details, media type or similar */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description The given prison or contact details for this prison cannot be found. */
+      404: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  /** Create a prison department's contact details */
+  createContactDetails: {
+    parameters: {
+      path: {
+        /**
+         * @description Prison ID
+         * @example MDI
+         */
+        prisonId: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ContactDetailsDto']
+      }
+    }
+    responses: {
+      /** @description Contact details have been created */
+      201: {
+        content: {
+          'application/json': components['schemas']['ContactDetailsDto']
+        }
+      }
+      /** @description Client error - invalid prisonId, contact details, media type or similar */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description The prison does not exist */
+      404: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  /** Remove a prison department's contact details */
+  deletePhoneNumber: {
+    parameters: {
+      query: {
+        /**
+         * @description Department type
+         * @example SOCIAL_VISIT
+         */
+        departmentType: string
+      }
+      path: {
+        /**
+         * @description Prison ID
+         * @example MDI
+         */
+        prisonId: string
+      }
+    }
+    responses: {
+      /** @description The contact details were removed */
+      204: {
+        content: {
+          'application/json':
+            | '100 CONTINUE'
+            | '101 SWITCHING_PROTOCOLS'
+            | '102 PROCESSING'
+            | '103 EARLY_HINTS'
+            | '103 CHECKPOINT'
+            | '200 OK'
+            | '201 CREATED'
+            | '202 ACCEPTED'
+            | '203 NON_AUTHORITATIVE_INFORMATION'
+            | '204 NO_CONTENT'
+            | '205 RESET_CONTENT'
+            | '206 PARTIAL_CONTENT'
+            | '207 MULTI_STATUS'
+            | '208 ALREADY_REPORTED'
+            | '226 IM_USED'
+            | '300 MULTIPLE_CHOICES'
+            | '301 MOVED_PERMANENTLY'
+            | '302 FOUND'
+            | '302 MOVED_TEMPORARILY'
+            | '303 SEE_OTHER'
+            | '304 NOT_MODIFIED'
+            | '305 USE_PROXY'
+            | '307 TEMPORARY_REDIRECT'
+            | '308 PERMANENT_REDIRECT'
+            | '400 BAD_REQUEST'
+            | '401 UNAUTHORIZED'
+            | '402 PAYMENT_REQUIRED'
+            | '403 FORBIDDEN'
+            | '404 NOT_FOUND'
+            | '405 METHOD_NOT_ALLOWED'
+            | '406 NOT_ACCEPTABLE'
+            | '407 PROXY_AUTHENTICATION_REQUIRED'
+            | '408 REQUEST_TIMEOUT'
+            | '409 CONFLICT'
+            | '410 GONE'
+            | '411 LENGTH_REQUIRED'
+            | '412 PRECONDITION_FAILED'
+            | '413 PAYLOAD_TOO_LARGE'
+            | '413 REQUEST_ENTITY_TOO_LARGE'
+            | '414 URI_TOO_LONG'
+            | '414 REQUEST_URI_TOO_LONG'
+            | '415 UNSUPPORTED_MEDIA_TYPE'
+            | '416 REQUESTED_RANGE_NOT_SATISFIABLE'
+            | '417 EXPECTATION_FAILED'
+            | '418 I_AM_A_TEAPOT'
+            | '419 INSUFFICIENT_SPACE_ON_RESOURCE'
+            | '420 METHOD_FAILURE'
+            | '421 DESTINATION_LOCKED'
+            | '422 UNPROCESSABLE_ENTITY'
+            | '423 LOCKED'
+            | '424 FAILED_DEPENDENCY'
+            | '425 TOO_EARLY'
+            | '426 UPGRADE_REQUIRED'
+            | '428 PRECONDITION_REQUIRED'
+            | '429 TOO_MANY_REQUESTS'
+            | '431 REQUEST_HEADER_FIELDS_TOO_LARGE'
+            | '451 UNAVAILABLE_FOR_LEGAL_REASONS'
+            | '500 INTERNAL_SERVER_ERROR'
+            | '501 NOT_IMPLEMENTED'
+            | '502 BAD_GATEWAY'
+            | '503 SERVICE_UNAVAILABLE'
+            | '504 GATEWAY_TIMEOUT'
+            | '505 HTTP_VERSION_NOT_SUPPORTED'
+            | '506 VARIANT_ALSO_NEGOTIATES'
+            | '507 INSUFFICIENT_STORAGE'
+            | '508 LOOP_DETECTED'
+            | '509 BANDWIDTH_LIMIT_EXCEEDED'
+            | '510 NOT_EXTENDED'
+            | '511 NETWORK_AUTHENTICATION_REQUIRED'
+        }
+      }
+      /** @description Client error - invalid prisonId or similar */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description The contact details for this prison cannot be found. */
+      404: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
       }
     }
   }
@@ -544,7 +862,7 @@ export interface operations {
   }
   /**
    * Update specified prison details
-   * @description Updates prison information, role required is MAINTAIN_REF_DATA
+   * @description Updates prison information, role required is MAINTAIN_REF_DATA or MAINTAIN_PRISON_DATA
    */
   updatePrison: {
     parameters: {
@@ -596,7 +914,7 @@ export interface operations {
   }
   /**
    * Update specified address details
-   * @description Updates address information, role required is MAINTAIN_REF_DATA
+   * @description Updates address information, role required is MAINTAIN_REF_DATA or MAINTAIN_PRISON_DATA
    */
   updateAddress: {
     parameters: {
@@ -653,7 +971,7 @@ export interface operations {
   }
   /**
    * Delete specified address for specified Prison
-   * @description Deletes address information for a Prison, role required is MAINTAIN_REF_DATA
+   * @description Deletes address information for a Prison, role required is MAINTAIN_REF_DATA or MAINTAIN_PRISON_DATA
    */
   deleteAddress: {
     parameters: {
@@ -697,7 +1015,7 @@ export interface operations {
   }
   /**
    * Adds a new prison
-   * @description Adds new prison information, role required is MAINTAIN_REF_DATA
+   * @description Adds new prison information, role required is MAINTAIN_REF_DATA or MAINTAIN_PRISON_DATA
    */
   insertPrison: {
     requestBody: {
@@ -734,7 +1052,7 @@ export interface operations {
   }
   /**
    * Add Address to existing Prison
-   * @description Adds an additional Address to an existing Prison, role required is MAINTAIN_REF_DATA
+   * @description Adds an additional Address to an existing Prison, role required is MAINTAIN_REF_DATA or MAINTAIN_PRISON_DATA
    */
   addAddress: {
     parameters: {
@@ -850,6 +1168,20 @@ export interface operations {
       200: {
         content: {
           'application/json': components['schemas']['PrisonDto'][]
+        }
+      }
+    }
+  }
+  /**
+   * Get prison names
+   * @description prison id and full name
+   */
+  getPrisonNames: {
+    responses: {
+      /** @description Successful Operation */
+      200: {
+        content: {
+          'application/json': components['schemas']['PrisonNameDto'][]
         }
       }
     }

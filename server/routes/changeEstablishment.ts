@@ -3,8 +3,8 @@ import { body, validationResult } from 'express-validator'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import { clearSession } from './visitorUtils'
 import { safeReturnUrl } from '../utils/utils'
-import { Prison } from '../@types/bapv'
 import type { Services, SupportedPrisonsService, UserService } from '../services'
+import { PrisonName } from '../data/prisonRegisterApiTypes'
 
 export default function routes({ auditService, supportedPrisonsService, userService }: Services): Router {
   const router = Router()
@@ -58,7 +58,7 @@ export default function routes({ auditService, supportedPrisonsService, userServ
     clearSession(req)
 
     const previousEstablishment = req.session.selectedEstablishment?.prisonId
-    const newEstablishment: Prison = {
+    const newEstablishment: PrisonName = {
       prisonId: req.body.establishment,
       prisonName: availablePrisons[req.body.establishment],
     }

@@ -1,6 +1,5 @@
 import SupportedPrisonsService from './supportedPrisonsService'
 import TestData from '../routes/testutils/testData'
-import { PrisonDto } from '../data/prisonRegisterApiTypes'
 import {
   createMockHmppsAuthClient,
   createMockOrchestrationApiClient,
@@ -19,7 +18,7 @@ describe('Supported prisons service', () => {
   const OrchestrationApiClientFactory = jest.fn()
   const PrisonRegisterApiClientFactory = jest.fn()
 
-  const allPrisons = TestData.prisons()
+  const prisonNames = TestData.prisonNames()
   const supportedPrisons = TestData.supportedPrisons()
   const supportedPrisonIds = TestData.supportedPrisonIds()
 
@@ -32,7 +31,7 @@ describe('Supported prisons service', () => {
       hmppsAuthClient,
     )
 
-    prisonRegisterApiClient.getPrisons.mockResolvedValue(allPrisons as PrisonDto[])
+    prisonRegisterApiClient.getPrisonNames.mockResolvedValue(prisonNames)
     hmppsAuthClient.getSystemClientToken.mockResolvedValue(token)
   })
 
@@ -82,7 +81,7 @@ describe('Supported prisons service', () => {
 
       expect(results[0]).toEqual(supportedPrisons)
       expect(results[1]).toEqual(supportedPrisons)
-      expect(prisonRegisterApiClient.getPrisons).toHaveBeenCalledTimes(1)
+      expect(prisonRegisterApiClient.getPrisonNames).toHaveBeenCalledTimes(1)
     })
 
     it('should refresh internal cache of all prisons after 24 hours', async () => {
@@ -99,7 +98,7 @@ describe('Supported prisons service', () => {
       expect(results[0]).toEqual(supportedPrisons)
       expect(results[1]).toEqual(supportedPrisons)
       expect(results[2]).toEqual(supportedPrisons)
-      expect(prisonRegisterApiClient.getPrisons).toHaveBeenCalledTimes(2)
+      expect(prisonRegisterApiClient.getPrisonNames).toHaveBeenCalledTimes(2)
 
       jest.useRealTimers()
     })

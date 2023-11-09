@@ -5,13 +5,13 @@ import { SessionData } from 'express-session'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import * as visitorUtils from './visitorUtils'
 import TestData from './testutils/testData'
-import { Prison } from '../@types/bapv'
 import config from '../config'
 import {
   createMockAuditService,
   createMockSupportedPrisonsService,
   createMockUserService,
 } from '../services/testutils/mocks'
+import { PrisonName } from '../data/prisonRegisterApiTypes'
 
 let app: Express
 
@@ -132,7 +132,7 @@ describe('GET /change-establishment', () => {
 
 describe('POST /change-establishment', () => {
   let sessionData: SessionData
-  let selectedEstablishment: Prison
+  let selectedEstablishment: PrisonName
 
   beforeEach(() => {
     jest.spyOn(visitorUtils, 'clearSession')
@@ -182,7 +182,7 @@ describe('POST /change-establishment', () => {
   })
 
   it('should clear session, set selected establishment and redirect to home page', () => {
-    const newEstablishment: Prison = { prisonId: 'HEI', prisonName: supportedPrisons.HEI }
+    const newEstablishment: PrisonName = { prisonId: 'HEI', prisonName: supportedPrisons.HEI }
 
     return request(app)
       .post(`/change-establishment`)
@@ -203,7 +203,7 @@ describe('POST /change-establishment', () => {
   })
 
   it('should clear session, set selected establishment and redirect to / not the set referrer', () => {
-    const newEstablishment: Prison = { prisonId: 'HEI', prisonName: supportedPrisons.HEI }
+    const newEstablishment: PrisonName = { prisonId: 'HEI', prisonName: supportedPrisons.HEI }
 
     return request(app)
       .post(`/change-establishment?referrer=//search/prisoner/`)
@@ -219,7 +219,7 @@ describe('POST /change-establishment', () => {
   })
 
   it('should redirect to valid page when passed in querystring', () => {
-    const newEstablishment: Prison = { prisonId: 'HEI', prisonName: supportedPrisons.HEI }
+    const newEstablishment: PrisonName = { prisonId: 'HEI', prisonName: supportedPrisons.HEI }
 
     return request(app)
       .post(`/change-establishment?referrer=/search/prisoner/`)
