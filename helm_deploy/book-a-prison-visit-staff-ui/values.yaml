@@ -3,6 +3,7 @@ generic-service:
 
   replicaCount: 4
   serviceAccountName: visit-someone-in-prison
+  productId: "DPS035"
 
   image:
     repository: quay.io/hmpps/book-a-prison-visit-staff-ui
