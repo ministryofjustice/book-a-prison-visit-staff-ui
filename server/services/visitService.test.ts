@@ -792,5 +792,16 @@ describe('Visit service', () => {
         expect(result).toStrictEqual(notificationCount)
       })
     })
+
+    describe('getNotificationGroups', () => {
+      it('should return notification groups for given prison', async () => {
+        const notificationGroups = [TestData.notificationGroup()]
+        orchestrationApiClient.getNotificationGroups.mockResolvedValue(notificationGroups)
+        const result = await visitService.getNotificationGroups('user', prisonId)
+
+        expect(orchestrationApiClient.getNotificationGroups).toHaveBeenCalledTimes(1)
+        expect(result).toStrictEqual(notificationGroups)
+      })
+    })
   })
 })
