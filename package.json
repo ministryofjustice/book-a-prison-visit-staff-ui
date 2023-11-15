@@ -22,7 +22,7 @@
     "lint": "eslint . --cache --max-warnings 0",
     "lint-fix": "eslint . --fix",
     "typecheck": "tsc && tsc -p integration_tests",
-    "test": "jest --coverage",
+    "test": "jest",
     "test:ci": "jest --runInBand --coverage",
     "security_audit": "npx audit-ci --config audit-ci.json",
     "int-test": "cypress run --config video=false",
