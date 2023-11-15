@@ -115,6 +115,7 @@ export type VisitSessionData = {
   visitReference?: string
   visitStatus?: Visit['visitStatus']
   requestMethod?: ApplicationMethodType
+  earliestDate?: string
 }
 
 export type VisitInformation = {

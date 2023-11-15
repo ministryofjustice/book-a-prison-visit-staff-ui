@@ -1,8 +1,10 @@
+import { addDays, isAfter } from 'date-fns'
 import { VisitorListItem } from '../@types/bapv'
 import { Address, Contact, Restriction } from '../data/prisonerContactRegistryApiTypes'
 import { isAdult } from './utils'
 
 const visitorRestrictionsToShow = ['BAN', 'PREINF', 'RESTRICTED', 'CLOSED', 'NONCON']
+const maximumNumberOfDays = 28
 
 const buildVisitorListItem = (visitor: Contact): VisitorListItem => {
   return {
@@ -47,7 +49,18 @@ const getRestrictionsToDisplay = (restrictions: Restriction[]): Restriction[] =>
 }
 
 const isBanned = (restrictions: Restriction[]): boolean => {
-  return !!restrictions.find(restriction => restriction.restrictionType === 'BAN')
+  const banned = restrictions.find(restriction => restriction.restrictionType === 'BAN')
+  const futureDate = addDays(new Date(), maximumNumberOfDays)
+  if (banned) {
+    if (banned.expiryDate) {
+      // return true if ban is after today + maximum number of days
+      return isAfter(new Date(banned.expiryDate), futureDate)
+    }
+    // return true if ban has no expiry
+    return true
+  }
+  // return false if no ban found
+  return false
 }
 
 export default buildVisitorListItem

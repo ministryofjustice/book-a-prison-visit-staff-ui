@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
+import { isBefore } from 'date-fns'
 import { VisitorListItem } from '../../@types/bapv'
 import getPrisonConfiguration from '../../constants/prisonConfiguration'
 import PrisonerProfileService from '../../services/prisonerProfileService'
@@ -95,6 +96,20 @@ export default class SelectVisitors {
     const closedVisitPrisoner = visitSessionData.prisoner.restrictions.some(
       restriction => restriction.restrictionType === 'CLOSED',
     )
+
+    selectedVisitors.forEach(visitor => {
+      visitor.restrictions.forEach(restriction => {
+        if (restriction.restrictionType === 'BAN' && restriction.expiryDate) {
+          if (req.session.visitSessionData.earliestDate) {
+            if (isBefore(new Date(req.session.visitSessionData.earliestDate), new Date(restriction.expiryDate))) {
+              req.session.visitSessionData.earliestDate = restriction.expiryDate
+            }
+          } else {
+            req.session.visitSessionData.earliestDate = restriction.expiryDate
+          }
+        }
+      })
+    })
 
     return !closedVisitVisitors && closedVisitPrisoner
       ? res.redirect(`${urlPrefix}/visit-type`)

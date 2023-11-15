@@ -161,13 +161,13 @@ export default class OrchestrationApiClient {
 
   // orchestration-sessions-controller
 
-  async getVisitSessions(offenderNo: string, prisonId: string): Promise<VisitSession[]> {
+  async getVisitSessions(offenderNo: string, prisonId: string, minNumberOfDays: string): Promise<VisitSession[]> {
     return this.restClient.get({
       path: '/visit-sessions',
       query: new URLSearchParams({
         prisonId,
         prisonerId: offenderNo,
-        // 'min' and 'max' params omitted, so using API default between 2 and 28 days from now
+        min: minNumberOfDays,
       }).toString(),
     })
   }

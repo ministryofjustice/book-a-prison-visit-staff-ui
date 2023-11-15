@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
+import { differenceInDays } from 'date-fns'
 import { VisitSlot } from '../../@types/bapv'
 import AuditService from '../../services/auditService'
 import { getFlashFormValues, getSelectedSlot, getSlotByTimeAndRestriction } from '../visitorUtils'
@@ -15,17 +16,30 @@ export default class DateAndTime {
   ) {}
 
   async get(req: Request, res: Response): Promise<void> {
+    let daysUntilVisitStart = 2
+
     const isUpdate = this.mode === 'update'
     const { prisonId } = req.session.selectedEstablishment
     const { visitSessionData } = req.session
+
+    let warningBannerText = ''
+
+    if (visitSessionData.earliestDate) {
+      const numberOfDays = differenceInDays(new Date(visitSessionData.earliestDate), new Date())
+      if (numberOfDays > daysUntilVisitStart) {
+        daysUntilVisitStart = numberOfDays
+        warningBannerText += 'A selected visitor is banned. Time slots during the period of the ban are not shown.'
+      }
+    }
+
     const { slotsList, whereaboutsAvailable } = await this.visitSessionsService.getVisitSessions({
       username: res.locals.user.username,
       offenderNo: visitSessionData.prisoner.offenderNo,
       visitRestriction: visitSessionData.visitRestriction,
       prisonId,
+      minNumberOfDays: daysUntilVisitStart.toString(),
     })
 
-    let restrictionChangeMessage = ''
     let matchingSlot
     let showSlotChangeMessage = false
 
@@ -50,8 +64,8 @@ export default class DateAndTime {
       showSlotChangeMessage = !matchingSlot
 
       if (visitSessionData.visitRestriction !== visitSessionData.originalVisitSlot.visitRestriction) {
-        restrictionChangeMessage = 'The visit type has changed from '
-        restrictionChangeMessage += visitSessionData.visitRestriction === 'OPEN' ? 'closed to open.' : 'open to closed.'
+        warningBannerText += 'The visit type has changed from '
+        warningBannerText += visitSessionData.visitRestriction === 'OPEN' ? 'closed to open.' : 'open to closed.'
       }
     }
 
@@ -87,7 +101,7 @@ export default class DateAndTime {
       formValues,
       slotsPresent,
       showSlotChangeMessage,
-      restrictionChangeMessage,
+      warningBannerText,
       originalVisitSlot,
       urlPrefix: getUrlPrefix(isUpdate, visitSessionData.visitReference),
     })

@@ -563,7 +563,7 @@ describe('Update journey specific warning messages', () => {
       .expect(res => {
         const $ = cheerio.load(res.text)
         expect($('[data-test="slot-change-reason"]').text()).toContain('A new visit time must be selected.')
-        expect($('[data-test="restriction-change-reason"]').text()).toContain(
+        expect($('[data-test="warning-banner-text"]').text()).toContain(
           'The visit type has changed from open to closed.',
         )
         expect($('input:checked').length).toBe(0)
@@ -585,7 +585,7 @@ describe('Update journey specific warning messages', () => {
       .expect(res => {
         const $ = cheerio.load(res.text)
         expect($('[data-test="slot-change-reason"]').text()).toContain('A new visit time must be selected.')
-        expect($('[data-test="restriction-change-reason"]').text()).toContain(
+        expect($('[data-test="warning-banner-text"]').text()).toContain(
           'The visit type has changed from closed to open.',
         )
         expect($('input:checked').length).toBe(0)
@@ -606,7 +606,7 @@ describe('Update journey specific warning messages', () => {
       .expect(res => {
         const $ = cheerio.load(res.text)
         expect($('[data-test="slot-change-reason"]').length).toBe(0)
-        expect($('[data-test="restriction-change-reason"]').text()).toContain(
+        expect($('[data-test="warning-banner-text"]').text()).toContain(
           'The visit type has changed from open to closed.',
         )
         expect($('input#1').prop('checked')).toBe(true)
@@ -627,7 +627,7 @@ describe('Update journey specific warning messages', () => {
       .expect(res => {
         const $ = cheerio.load(res.text)
         expect($('[data-test="slot-change-reason"]').length).toBe(0)
-        expect($('[data-test="restriction-change-reason"]').text()).toContain(
+        expect($('[data-test="warning-banner-text"]').text()).toContain(
           'The visit type has changed from closed to open.',
         )
         expect($('input#1').prop('checked')).toBe(true)

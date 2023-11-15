@@ -99,21 +99,21 @@
       }) }}
     {% endif %}
 
-    {% if restrictionChangeMessage %}
-      {% set restrictionChangeReasonHtml %}
+    {% if warningBannerText %}
+      {% set warningBannerHtml %}
           {{ govukWarningText({
             classes: "govuk-!-margin-bottom-0",
-            html: '<span class="govuk-!-font-size-24">' + restrictionChangeMessage + '</span>',
+            html: '<span class="govuk-!-font-size-24">' + warningBannerText + '</span>',
             iconFallbackText: "Warning",
             attributes: {
-              "data-test": "restriction-change-reason"
+              "data-test": "warning-banner-text"
           }
         }) }}
       {% endset %}
 
       {{ mojBanner({
         classes: "govuk-!-padding-left-4",
-        html: restrictionChangeReasonHtml
+        html: warningBannerHtml
       }) }}
 
 
