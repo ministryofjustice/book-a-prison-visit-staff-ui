@@ -16,7 +16,7 @@ export default class DateAndTime {
   ) {}
 
   async get(req: Request, res: Response): Promise<void> {
-    let daysTillVisitStart = 2
+    let daysUntilVisitStart = 2
 
     const isUpdate = this.mode === 'update'
     const { prisonId } = req.session.selectedEstablishment
@@ -27,8 +27,8 @@ export default class DateAndTime {
     if (visitSessionData.earliestDate) {
       // numberOfDays is the number of days between the ban expiry and the current date
       const numberOfDays = differenceInDays(new Date(visitSessionData.earliestDate), new Date())
-      if (numberOfDays > daysTillVisitStart) {
-        daysTillVisitStart = numberOfDays
+      if (numberOfDays > daysUntilVisitStart) {
+        daysUntilVisitStart = numberOfDays
         warningBannerText += 'A selected visitor is banned. Time slots during the period of the ban are not shown.'
       }
     }
@@ -38,7 +38,7 @@ export default class DateAndTime {
       offenderNo: visitSessionData.prisoner.offenderNo,
       visitRestriction: visitSessionData.visitRestriction,
       prisonId,
-      minNumberOfDays: daysTillVisitStart.toString(),
+      minNumberOfDays: daysUntilVisitStart.toString(),
     })
 
     let matchingSlot

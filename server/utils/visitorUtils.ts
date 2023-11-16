@@ -1,12 +1,12 @@
-import { addDays, isAfter } from 'date-fns'
+import { addDays, differenceInBusinessDays, differenceInDays, isAfter } from 'date-fns'
 import { VisitorListItem } from '../@types/bapv'
 import { Address, Contact, Restriction } from '../data/prisonerContactRegistryApiTypes'
 import { isAdult } from './utils'
 
 const visitorRestrictionsToShow = ['BAN', 'PREINF', 'RESTRICTED', 'CLOSED', 'NONCON']
-const maximumNumberOfDays = 28
+const MAXIMUM_NUMBER_DAYS = 28
 
-const buildVisitorListItem = (visitor: Contact): VisitorListItem => {
+export const buildVisitorListItem = (visitor: Contact): VisitorListItem => {
   return {
     personId: visitor.personId,
     name: `${visitor.firstName} ${visitor.lastName}`,
@@ -15,7 +15,7 @@ const buildVisitorListItem = (visitor: Contact): VisitorListItem => {
     relationshipDescription: visitor.relationshipDescription,
     address: getAddressToDisplay(visitor.addresses),
     restrictions: getRestrictionsToDisplay(visitor.restrictions),
-    banned: isBanned(visitor.restrictions),
+    banned: getBanStatus(visitor.restrictions).isBanned,
   }
 }
 
@@ -48,19 +48,28 @@ const getRestrictionsToDisplay = (restrictions: Restriction[]): Restriction[] =>
   return restrictions.filter(restriction => visitorRestrictionsToShow.includes(restriction.restrictionType))
 }
 
-const isBanned = (restrictions: Restriction[]): boolean => {
-  const banned = restrictions.find(restriction => restriction.restrictionType === 'BAN')
-  const futureDate = addDays(new Date(), maximumNumberOfDays)
-  if (banned) {
-    if (banned.expiryDate) {
-      // return true if ban is after today + maximum number of days
-      return isAfter(new Date(banned.expiryDate), futureDate)
-    }
-    // return true if ban has no expiry
-    return true
-  }
-  // return false if no ban found
-  return false
-}
+export const getBanStatus = (restrictions: Restriction[]): { isBanned: boolean; numDays?: number } => {
+  const banned = restrictions.filter(restriction => restriction.restrictionType === 'BAN')
+  let isBanned = false
+  let numDays = 0
+  let counter = 0
+  banned.forEach(restriction => {
+    if (restriction.expiryDate) {
+      counter = differenceInDays(new Date(restriction.expiryDate), new Date()) + 1
 
-export default buildVisitorListItem
+      if (counter > numDays && counter >= 1) {
+        numDays = counter
+      }
+
+      if (numDays >= 29) {
+        isBanned = true
+        return { isBanned, numDays }
+      }
+    } else {
+      isBanned = true
+      numDays = undefined
+      return { isBanned, numDays }
+    }
+  })
+  return { isBanned, numDays }
+}
