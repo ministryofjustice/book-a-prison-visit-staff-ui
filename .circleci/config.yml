@@ -45,6 +45,7 @@ jobs:
           command: |
             cd hmpps-vsip-ui-tests
             git checkout main
+            git pull
             git status
       - run:
           name: Change to project directory then clean install
@@ -75,6 +76,7 @@ jobs:
           command: |
             cd hmpps-vsip-ui-tests
             git checkout develop
+            git pull
             git status
       - run:
           name: Change to project directory then clean install
