@@ -4,15 +4,15 @@ import * as cheerio from 'cheerio'
 import { appWithAllRoutes } from './testutils/appSetup'
 import * as visitorUtils from './visitorUtils'
 import config from '../config'
-import { createMockVisitService } from '../services/testutils/mocks'
+import { createMockVisitNotificationsService } from '../services/testutils/mocks'
 import TestData from './testutils/testData'
 
 let app: Express
 
-const visitService = createMockVisitService()
+const visitNotificationsService = createMockVisitNotificationsService()
 
 beforeEach(() => {
-  app = appWithAllRoutes({ services: { visitService } })
+  app = appWithAllRoutes({ services: { visitNotificationsService } })
   config.features.showReviewBookingsTile = true
 })
 
@@ -24,7 +24,7 @@ describe('GET /', () => {
   let notificationCount = TestData.notificationCount()
 
   beforeEach(() => {
-    visitService.getNotificationCount.mockResolvedValue(notificationCount)
+    visitNotificationsService.getNotificationCount.mockResolvedValue(notificationCount)
   })
 
   it('should render the home page cards and change establishment link', () => {
@@ -43,7 +43,7 @@ describe('GET /', () => {
         expect($('[data-test="change-visit"] .card__link').attr('href')).toBe('/search/visit')
 
         expect($('[data-test="need-review"] .card__link').text()).toContain('Need review')
-        expect($('[data-test="need-review"] .card__link').attr('href')).toBe('/')
+        expect($('[data-test="need-review"] .card__link').attr('href')).toBe('/review')
 
         expect($('[data-test="view-visits-by-date"] .card__link').text()).toBe('View visits by date')
         expect($('[data-test="view-visits-by-date"] .card__link').attr('href')).toBe('/visits')
@@ -71,7 +71,7 @@ describe('GET /', () => {
           expect($('[data-test="view-visits-by-date"] .card__link').text()).toBe('View visits by date')
           expect($('[data-test="view-timetable"] .card__link').text()).toBe('View visits timetable')
 
-          expect(visitService.getNotificationCount).not.toHaveBeenCalled()
+          expect(visitNotificationsService.getNotificationCount).not.toHaveBeenCalled()
         })
     })
 
@@ -87,7 +87,7 @@ describe('GET /', () => {
 
     it('should not render badge if review count is zero', () => {
       notificationCount = TestData.notificationCount({ count: 0 })
-      visitService.getNotificationCount.mockResolvedValue(notificationCount)
+      visitNotificationsService.getNotificationCount.mockResolvedValue(notificationCount)
 
       return request(app)
         .get('/')
@@ -100,7 +100,7 @@ describe('GET /', () => {
 
     it('should render badge with value of "99+" if review count is greater than 99', () => {
       notificationCount = TestData.notificationCount({ count: 100 })
-      visitService.getNotificationCount.mockResolvedValue(notificationCount)
+      visitNotificationsService.getNotificationCount.mockResolvedValue(notificationCount)
 
       return request(app)
         .get('/')

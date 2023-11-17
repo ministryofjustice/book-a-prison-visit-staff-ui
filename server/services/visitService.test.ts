@@ -780,28 +780,4 @@ describe('Visit service', () => {
       })
     })
   })
-
-  describe('Visit notifications', () => {
-    describe('getNotificationCount', () => {
-      it('should return notification count for given prison', async () => {
-        const notificationCount = TestData.notificationCount()
-        orchestrationApiClient.getNotificationCount.mockResolvedValue(notificationCount)
-        const result = await visitService.getNotificationCount('user', prisonId)
-
-        expect(orchestrationApiClient.getNotificationCount).toHaveBeenCalledTimes(1)
-        expect(result).toStrictEqual(notificationCount)
-      })
-    })
-
-    describe('getNotificationGroups', () => {
-      it('should return notification groups for given prison', async () => {
-        const notificationGroups = [TestData.notificationGroup()]
-        orchestrationApiClient.getNotificationGroups.mockResolvedValue(notificationGroups)
-        const result = await visitService.getNotificationGroups('user', prisonId)
-
-        expect(orchestrationApiClient.getNotificationGroups).toHaveBeenCalledTimes(1)
-        expect(result).toStrictEqual(notificationGroups)
-      })
-    })
-  })
 })
