@@ -22,127 +22,83 @@ describe('visitorUtils', () => {
         restrictions,
       })
     })
-
-    it.each([
-      // ['label', 'input', 'expected'....]
-      ['Single ban with no end date', [TestData.restriction({ restrictionType: 'BAN', expiryDate: undefined })], true],
-      [
-        'Single ban with past end date',
-        [TestData.restriction({ restrictionType: 'BAN', expiryDate: '2020-12-12' })],
-        false,
-      ],
-      [
-        'Single ban with future (close) end date',
-        [TestData.restriction({ restrictionType: 'BAN', expiryDate: format(addDays(new Date(), 5), 'yyyy-MM-dd') })],
-        false,
-      ],
-      [
-        'Single ban with future (28 days) end date',
-        [TestData.restriction({ restrictionType: 'BAN', expiryDate: format(addDays(new Date(), 28), 'yyyy-MM-dd') })],
-        false,
-      ],
-      [
-        'Single ban with future (29 days) end date',
-        [TestData.restriction({ restrictionType: 'BAN', expiryDate: format(addDays(new Date(), 29), 'yyyy-MM-dd') })],
-        true,
-      ],
-      [
-        'Multiple bans (acceptable)',
-        [
-          TestData.restriction({ restrictionType: 'BAN', expiryDate: format(addDays(new Date(), 1), 'yyyy-MM-dd') }),
-          TestData.restriction({ restrictionType: 'BAN', expiryDate: format(addDays(new Date(), 10), 'yyyy-MM-dd') }),
-        ],
-        true,
-      ],
-      [
-        'Multiple bans (acceptable)',
-        [
-          TestData.restriction({ restrictionType: 'BAN', expiryDate: format(addDays(new Date(), 1), 'yyyy-MM-dd') }),
-          TestData.restriction({ restrictionType: 'BAN', expiryDate: format(addDays(new Date(), 10), 'yyyy-MM-dd') }),
-        ],
-        true,
-      ],
-      [
-        'Multiple bans (unacceptable)',
-        [
-          TestData.restriction({ restrictionType: 'BAN', expiryDate: undefined }),
-          TestData.restriction({ restrictionType: 'BAN', expiryDate: format(addDays(new Date(), 10), 'yyyy-MM-dd') }),
-        ],
-        true,
-      ],
-      [
-        'Multiple bans (unacceptable)',
-        [
-          TestData.restriction({ restrictionType: 'BAN', expiryDate: format(addDays(new Date(), 10), 'yyyy-MM-dd') }),
-          TestData.restriction({ restrictionType: 'BAN', expiryDate: undefined }),
-        ],
-        true,
-      ],
-    ])('%s', (_: string, restrictions: Restriction[], expected: boolean) => {
-      const contact = TestData.contact({ restrictions })
-      const visitorListItem = buildVisitorListItem(contact)
-
-      expect(visitorListItem.banned).toBe(expected)
-    })
   })
 
-  describe.only('getBanStatus', () => {
-    const twoDaysFromNow = format(addDays(new Date(), 2), 'yyyy-MM-dd')
-    const twentyEightDaysFromNow = format(addDays(new Date(), 28), 'yyyy-MM-dd')
-    const twentyNineDaysFromNow = format(addDays(new Date(), 29), 'yyyy-MM-dd')
+  describe('getBanStatus - based on max booking window', () => {
+    const MAX_BOOKING_DAYS_AHEAD = 28
+    const dateWithinBookingLimit = format(addDays(new Date(), 2), 'yyyy-MM-dd')
+    const dateAtBookingLimit = format(addDays(new Date(), MAX_BOOKING_DAYS_AHEAD), 'yyyy-MM-dd')
+    const dateBeyondBookingLimit = format(addDays(new Date(), MAX_BOOKING_DAYS_AHEAD + 1), 'yyyy-MM-dd')
     it.each([
-      // ['label', 'input', 'expected'....]
+      ['No restrictions', [], { isBanned: false }],
+      ['No BAN restrictions', [TestData.restriction({ restrictionType: 'CLOSED' })], { isBanned: false }],
       [
         'Single ban with no end date',
         [TestData.restriction({ restrictionType: 'BAN', expiryDate: undefined })],
-        { isBanned: true, numDays: undefined },
+        { isBanned: true },
       ],
       [
-        'Single ban with future (close) end date',
-        [TestData.restriction({ restrictionType: 'BAN', expiryDate: twoDaysFromNow })],
+        'Single ban with future end date within booking limit',
+        [TestData.restriction({ restrictionType: 'BAN', expiryDate: dateWithinBookingLimit })],
         { isBanned: false, numDays: 2 },
       ],
       [
-        'Single ban with future (28 days) end date',
-        [TestData.restriction({ restrictionType: 'BAN', expiryDate: twentyEightDaysFromNow })],
-        { isBanned: false, numDays: 28 },
+        'Single ban with future end date at booking limit',
+        [TestData.restriction({ restrictionType: 'BAN', expiryDate: dateAtBookingLimit })],
+        { isBanned: false, numDays: MAX_BOOKING_DAYS_AHEAD },
       ],
       [
-        'Single ban with future (29 days) end date',
-        [TestData.restriction({ restrictionType: 'BAN', expiryDate: twentyNineDaysFromNow })],
-        { isBanned: true, numDays: 29 },
+        'Single ban with future end date beyond booking limit',
+        [TestData.restriction({ restrictionType: 'BAN', expiryDate: dateBeyondBookingLimit })],
+        { isBanned: true, numDays: MAX_BOOKING_DAYS_AHEAD + 1 },
       ],
       [
-        'Multiple bans (not banned)',
+        'Multiple bans (not banned) - short and long ban',
         [
-          TestData.restriction({ restrictionType: 'BAN', expiryDate: twoDaysFromNow }),
-          TestData.restriction({ restrictionType: 'BAN', expiryDate: twentyEightDaysFromNow }),
+          TestData.restriction({ restrictionType: 'BAN', expiryDate: dateWithinBookingLimit }),
+          TestData.restriction({ restrictionType: 'BAN', expiryDate: dateAtBookingLimit }),
         ],
-        { isBanned: false, numDays: 28 },
+        { isBanned: false, numDays: MAX_BOOKING_DAYS_AHEAD },
       ],
       [
-        'Multiple bans (not banned)',
+        'Multiple bans (not banned) - long and short ban',
         [
-          TestData.restriction({ restrictionType: 'BAN', expiryDate: twentyEightDaysFromNow }),
-          TestData.restriction({ restrictionType: 'BAN', expiryDate: twoDaysFromNow }),
+          TestData.restriction({ restrictionType: 'BAN', expiryDate: dateAtBookingLimit }),
+          TestData.restriction({ restrictionType: 'BAN', expiryDate: dateWithinBookingLimit }),
         ],
-        { isBanned: false, numDays: 28 },
+        { isBanned: false, numDays: MAX_BOOKING_DAYS_AHEAD },
       ],
       [
-        'Multiple bans (banned)',
+        'Multiple bans (banned) - short and limit-exceeding long ban',
         [
-          TestData.restriction({ restrictionType: 'BAN', expiryDate: twoDaysFromNow }),
-          TestData.restriction({ restrictionType: 'BAN', expiryDate: twentyNineDaysFromNow }),
+          TestData.restriction({ restrictionType: 'BAN', expiryDate: dateWithinBookingLimit }),
+          TestData.restriction({ restrictionType: 'BAN', expiryDate: dateBeyondBookingLimit }),
         ],
-        { isBanned: true, numDays: 29 },
+        { isBanned: true, numDays: MAX_BOOKING_DAYS_AHEAD + 1 },
       ],
       [
-        'Multiple bans (banned)',
+        'Multiple bans (banned) - limit-exceeding long and short ban',
         [
-          TestData.restriction({ restrictionType: 'BAN', expiryDate: twentyNineDaysFromNow }),
-          TestData.restriction({ restrictionType: 'BAN', expiryDate: twoDaysFromNow }),
+          TestData.restriction({ restrictionType: 'BAN', expiryDate: dateBeyondBookingLimit }),
+          TestData.restriction({ restrictionType: 'BAN', expiryDate: dateWithinBookingLimit }),
         ],
-        { isBanned: true, numDays: 29 },
+        { isBanned: true, numDays: MAX_BOOKING_DAYS_AHEAD + 1 },
+      ],
+      [
+        'Multiple bans (banned) - short and indefinite',
+        [
+          TestData.restriction({ restrictionType: 'BAN', expiryDate: undefined }),
+          TestData.restriction({ restrictionType: 'BAN', expiryDate: dateWithinBookingLimit }),
+        ],
+        { isBanned: true },
+      ],
+      [
+        'Multiple bans (banned) - indefinite and short',
+        [
+          TestData.restriction({ restrictionType: 'BAN', expiryDate: dateWithinBookingLimit }),
+          TestData.restriction({ restrictionType: 'BAN', expiryDate: undefined }),
+        ],
+        { isBanned: true },
       ],
     ])('%s', (_: string, restrictions: Restriction[], expected: { isBanned: boolean; numDays?: number }) => {
       const banStatus = getBanStatus(restrictions)
