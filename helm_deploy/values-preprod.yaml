@@ -6,9 +6,6 @@ generic-service:
 
   ingress:
     host: manage-prison-visits-preprod.prison.service.justice.gov.uk
-    contextColour: green
-    v1_2_enabled: true
-    v0_47_enabled: false
 
   env:
     INGRESS_URL: "https://manage-prison-visits-preprod.prison.service.justice.gov.uk"
