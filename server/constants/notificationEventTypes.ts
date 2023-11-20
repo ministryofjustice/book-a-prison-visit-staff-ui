@@ -8,7 +8,7 @@ export const notificationTypes: Readonly<Record<NotificationType, string>> = {
 
 export const notificationTypeDescriptions: Readonly<Record<NotificationType, string>> = {
   NON_ASSOCIATION_EVENT: 'there are non-associations',
-  PRISONER_RELEASED_EVENT: 'the prisoner is released or moves establishment',
+  PRISONER_RELEASED_EVENT: 'the prisoner is released',
   PRISONER_RESTRICTION_CHANGE_EVENT: 'the visit type has changed',
 }
 
