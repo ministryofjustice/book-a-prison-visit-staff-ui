@@ -47,12 +47,26 @@ export interface paths {
      */
     get: operations['getVisitHistoryByReference']
   }
+  '/visits/session-template/{sessionTemplateReference}': {
+    /**
+     * Get visits for a session template reference and date
+     * @description Retrieve visits for session template reference and date
+     */
+    get: operations['getVisitsBySessionTemplate']
+  }
   '/visits/search': {
     /**
      * Get visits
      * @description Retrieve visits with optional filters, sorted by start timestamp descending
      */
     get: operations['getVisitsByFilterPageable']
+  }
+  '/visits/notification/{prisonCode}/groups': {
+    /**
+     * get future notification visit groups by prison code
+     * @description Retrieve future notification visit groups by prison code
+     */
+    get: operations['getFutureNotificationVisitGroups']
   }
   '/visits/notification/{prisonCode}/count': {
     /**
@@ -456,12 +470,33 @@ export interface components {
       eventsAudit: components['schemas']['EventAuditDto'][]
       visit: components['schemas']['VisitDto']
     }
+    VisitPreviewDto: {
+      /**
+       * @description Prisoner Number
+       * @example A1234AA
+       */
+      prisonerId: string
+      /**
+       * @description First name of the prisoner
+       * @example John
+       */
+      firstName: string
+      /**
+       * @description Last name of the prisoner
+       * @example Smith
+       */
+      lastName: string
+      /**
+       * @description Visit reference
+       * @example dp-we-rs-te
+       */
+      visitReference: string
+    }
     PageVisitDto: {
       /** Format: int32 */
       totalPages?: number
       /** Format: int64 */
       totalElements?: number
-      first?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['VisitDto'][]
@@ -471,6 +506,7 @@ export interface components {
       pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
+      first?: boolean
       last?: boolean
       empty?: boolean
     }
@@ -479,16 +515,60 @@ export interface components {
       offset?: number
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
-      pageSize?: number
-      /** Format: int32 */
       pageNumber?: number
+      /** Format: int32 */
+      pageSize?: number
       paged?: boolean
       unpaged?: boolean
     }
     SortObject: {
       empty?: boolean
-      sorted?: boolean
       unsorted?: boolean
+      sorted?: boolean
+    }
+    OrchestrationNotificationGroupDto: {
+      /**
+       * @description notification group Reference
+       * @example v9*d7*ed*7u
+       */
+      reference: string
+      /**
+       * @description notification event type
+       * @example NON_ASSOCIATION_EVENT
+       * @enum {string}
+       */
+      type: 'NON_ASSOCIATION_EVENT' | 'PRISONER_RELEASED_EVENT' | 'PRISONER_RESTRICTION_CHANGE_EVENT'
+      /** @description List of details of affected visits */
+      affectedVisits: components['schemas']['OrchestrationPrisonerVisitsNotificationDto'][]
+    }
+    /** @description List of details of affected visits */
+    OrchestrationPrisonerVisitsNotificationDto: {
+      /**
+       * @description Prisoner Number
+       * @example AF34567G
+       */
+      prisonerNumber: string
+      /**
+       * @description Booked by user name
+       * @example SMITH1
+       */
+      bookedByUserName: string
+      /**
+       * Format: date
+       * @description The date of the visit
+       * @example 2023-11-08
+       */
+      visitDate: string
+      /**
+       * @description Visit Booking Reference
+       * @example v9-d7-ed-7u
+       */
+      bookingReference: string
+      /**
+       * @description Booked by name
+       * @example John Smith
+       */
+      bookedByName: string
     }
     NotificationCountDto: {
       /** Format: int32 */
@@ -1219,6 +1299,64 @@ export interface operations {
     }
   }
   /**
+   * Get visits for a session template reference and date
+   * @description Retrieve visits for session template reference and date
+   */
+  getVisitsBySessionTemplate: {
+    parameters: {
+      query: {
+        /**
+         * @description Get visits for session date
+         * @example 2023-05-31
+         */
+        sessionDate: string
+        /**
+         * @description To filter visits by status
+         * @example BOOKED
+         */
+        "visit status'": string
+        /**
+         * @description Visit Restriction(s) - OPEN / CLOSED / UNKNOWN
+         * @example OPEN
+         */
+        visitRestrictions?: string
+      }
+      path: {
+        /**
+         * @description Session template reference
+         * @example v9-d7-ed-7u
+         */
+        sessionTemplateReference: string
+      }
+    }
+    responses: {
+      /** @description Visit details returned */
+      200: {
+        content: {
+          '*/*': components['schemas']['VisitPreviewDto'][]
+        }
+      }
+      /** @description Incorrect request to Get visits for session template */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to retrieve visits for session template */
+      403: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  /**
    * Get visits
    * @description Retrieve visits with optional filters, sorted by start timestamp descending
    */
@@ -1287,6 +1425,41 @@ export interface operations {
         }
       }
       /** @description Incorrect permissions to retrieve visits */
+      403: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  /**
+   * get future notification visit groups by prison code
+   * @description Retrieve future notification visit groups by prison code
+   */
+  getFutureNotificationVisitGroups: {
+    parameters: {
+      path: {
+        /**
+         * @description prisonCode
+         * @example CFI
+         */
+        prisonCode: string
+      }
+    }
+    responses: {
+      /** @description Retrieved future notification visit groups by prison code */
+      200: {
+        content: {
+          'application/json': components['schemas']['OrchestrationNotificationGroupDto'][]
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to access this endpoint */
       403: {
         content: {
           'application/json': components['schemas']['ErrorResponse']

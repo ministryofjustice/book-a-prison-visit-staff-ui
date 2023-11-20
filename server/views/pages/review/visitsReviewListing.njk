@@ -1,0 +1,97 @@
+{% extends "layout.njk" %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{%- from "govuk/components/tag/macro.njk" import govukTag -%}
+
+{% set pageHeaderTitle = "Visit bookings that need review" %}
+{% set pageTitle %}
+    {% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
+{% endset %}
+
+{% set backLinkHref = "/" %}
+
+{% macro arrayToList(items) %}
+  <ul class="govuk-list govuk-!-margin-bottom-0">
+    {% for item in items %}
+      <li class="govuk-!-margin-bottom-{{ "0" if loop.last else "3" }}">{{ item }}</li>
+    {% endfor %}
+  </ul>
+{% endmacro %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+
+      {% include "partials/errorSummary.njk" %}
+
+      <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+
+      {{ govukDetails({
+        summaryText: "What checks are done to create this list?",
+        html:
+        '<p>Bookings are added to this list when:</p>' +
+        '<ul class="govuk-list govuk-list--bullet" data-test="review-reasons-list">' +
+          '<li>' + notificationTypeDescriptions | join ("</li><li>") + '</li>' +
+        '</ul>' +
+        '<p>All other checks need to be done manually.</p>'
+      }) }}
+
+      {% if visitsReviewList | length %}
+
+        {% set reviewListRows = [] %}
+        {% for listItem in visitsReviewList %}
+          {% set reviewListRows = (reviewListRows.push([
+              {
+                attributes: { "data-test": "prisoner-number-" + loop.index },
+                html: arrayToList(listItem.prisonerNumbers)
+              },
+              {
+                attributes: { "data-test": "visit-date-" + loop.index },
+                html: arrayToList(listItem.visitDates)
+              },
+              {
+                attributes: { "data-test": "booked-by-" + loop.index },
+                html: arrayToList(listItem.bookedByNames)
+              },
+              {
+                attributes: { "data-test": "type-" + loop.index },
+                html: govukTag({
+                  text: notificationTypes[listItem.type],
+                  classes: 'notification-tag notification-tag--' + listItem.type | lower
+                })
+              },
+              {
+                attributes: { "data-test": "action-" + loop.index },
+                html: '<a href="/review/' + notificationTypePathSegments[listItem.type] + '/' + listItem.reference + '">View</a>'
+              }
+            ]), reviewListRows) %}
+        {% endfor %}
+
+        {{ govukTable({
+          attributes: { "data-test": "bookings-list" },
+          head: [
+            {
+              text: "Prison number"
+            },
+            {
+              text: "Visit date"
+            },
+            {
+              text: "Booked by"
+            },
+            {
+              text: "Reason"
+            },
+            {
+              text: "Action"
+            }
+          ],
+          rows: reviewListRows
+        }) }}
+
+      {% else %}
+        <p data-test="no-bookings">There are no bookings for {{ prisonName }} that need review.</p>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

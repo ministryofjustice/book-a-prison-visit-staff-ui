@@ -1,6 +1,8 @@
 import {
   Alert,
   NotificationCount,
+  NotificationGroup,
+  NotificationVisitInfo,
   PrisonerProfile,
   SessionCapacity,
   SessionSchedule,
@@ -125,6 +127,29 @@ export default class TestData {
   }: Partial<CurrentIncentive> = {}): CurrentIncentive => ({ level }) as CurrentIncentive
 
   static notificationCount = ({ count = 5 }: Partial<NotificationCount> = {}): NotificationCount => ({ count })
+
+  static notificationGroup = ({
+    reference = 'ab*cd*ef*gh',
+    type = 'NON_ASSOCIATION_EVENT',
+    affectedVisits = [
+      this.notificationVisitInfo(),
+      this.notificationVisitInfo({ bookedByName: 'User Two', bookedByUserName: 'user2', prisonerNumber: 'A5678DE' }),
+    ],
+  }: Partial<NotificationGroup> = {}): NotificationGroup => ({ reference, type, affectedVisits })
+
+  static notificationVisitInfo = ({
+    bookedByName = 'User One',
+    bookedByUserName = 'user1',
+    bookingReference = 'ab-cd-ef-gh',
+    prisonerNumber = 'A1234BC',
+    visitDate = '2023-11-01',
+  }: Partial<NotificationVisitInfo> = {}): NotificationVisitInfo => ({
+    bookedByName,
+    bookedByUserName,
+    bookingReference,
+    prisonerNumber,
+    visitDate,
+  })
 
   static offenderRestriction = ({
     restrictionId = 0,

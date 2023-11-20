@@ -7,6 +7,7 @@ import indexRoutes from '../index'
 import bookAVisitRoutes from '../bookAVisit'
 import establishmentRoutes from '../changeEstablishment'
 import prisonerRoutes from '../prisoner'
+import reviewRoutes from '../review'
 import searchRoutes from '../search'
 import timetableRoutes from '../timetable'
 import visitRoutes from '../visit'
@@ -118,6 +119,7 @@ function appSetup(
   app.use('/book-a-visit', bookAVisitRoutes(services))
   app.use('/change-establishment', establishmentRoutes(services))
   app.use('/prisoner', prisonerRoutes(services))
+  app.use('/review', reviewRoutes(services))
   app.use('/search', searchRoutes(services))
   app.use('/timetable', timetableRoutes(services))
   app.use('/visit', visitRoutes(services))

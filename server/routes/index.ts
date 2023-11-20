@@ -5,7 +5,7 @@ import { clearSession } from './visitorUtils'
 import config from '../config'
 import { Services } from '../services'
 
-export default function routes({ visitService }: Services): Router {
+export default function routes({ visitNotificationsService }: Services): Router {
   const router = Router()
   const get = (path: string | string[], handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
 
@@ -14,7 +14,7 @@ export default function routes({ visitService }: Services): Router {
     const { showReviewBookingsTile } = config.features
 
     const reviewCount = showReviewBookingsTile
-      ? (await visitService.getNotificationCount(res.locals.user.username, prisonId)).count
+      ? (await visitNotificationsService.getNotificationCount(res.locals.user.username, prisonId)).count
       : undefined
 
     res.render('pages/index', {

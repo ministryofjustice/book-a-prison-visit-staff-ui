@@ -20,6 +20,7 @@ import indexRoutes from './routes'
 import bookAVisitRoutes from './routes/bookAVisit'
 import establishmentRoutes from './routes/changeEstablishment'
 import prisonerRoutes from './routes/prisoner'
+import reviewRoutes from './routes/review'
 import searchRoutes from './routes/search'
 import timetableRoutes from './routes/timetable'
 import visitRoutes from './routes/visit'
@@ -51,6 +52,7 @@ export default function createApp(services: Services): express.Application {
   app.use('/prisoner', prisonerRoutes(services))
   app.use('/search', searchRoutes(services))
   app.use('/timetable', timetableRoutes(services))
+  app.use('/review', reviewRoutes(services))
   app.use('/visit', visitRoutes(services))
   app.use('/visits', visitsRoutes(services))
 
