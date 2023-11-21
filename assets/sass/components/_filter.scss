@@ -1,0 +1,135 @@
+.pac-filter-card {
+  position: relative;
+  background-color: govuk-colour("light-grey");
+  padding: 15px;
+  @include govuk-clearfix();
+  .govuk-heading-s {
+    margin-bottom: 5px;
+    @media (min-width: 40.0625em) {
+      margin-bottom: 10px;
+    }
+  }
+}
+
+.pac-filter-container {
+  display: inline-block;
+  float: left;
+  height: 37px;
+  margin: 10px 15px 0 0;
+  min-width: 200px;
+  @include govuk-clearfix();
+}
+
+.pac-filter-selection {
+  position: relative;
+  display: block;
+  background-color: govuk-colour("white");
+  border: 1px solid black;
+  padding: 25px 15px 0 15px;
+  top: -1px;
+  border-top: 0;
+  z-index: 9999;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.pac-selected-filters {
+  clear: both;
+  margin-top: 25px;
+}
+
+.pac-filter-tags {
+  display: block;
+}
+
+.pac-filter__tag {
+  position: relative;
+  float: left;
+  margin: 3px 15px 0 0;
+  @include govuk-clearfix();
+  z-index: 1;
+
+  &:after {
+    display: inline-block;
+  }
+}
+
+.pac-filter-button {
+  @include govuk-link-common;
+  @include govuk-link-style-default;
+  display: inline-block;
+  border: 1px solid black;
+  @include govuk-font(19);
+  padding: 5px 10px;
+  text-align: left;
+  height: 35px;
+  background-color: govuk-colour("white");
+  text-decoration: none;
+
+  &--selected {
+    @include govuk-typography-weight-bold;
+  }
+}
+
+body.js-enabled {
+  .pac-filter-button {
+    &:after {
+      display: inline-block;
+      content: "";
+      position: relative;
+      border-style: solid;
+      border-width: 3px 3px 0 0;
+      transform: rotate(135deg);
+      height: 8px;
+      width: 8px;
+      top: -2px;
+      margin-left: 10px;
+    }
+
+    &--open {
+      border-bottom: 0;
+
+      &:after {
+        top: 3px;
+        transform: rotate(-45deg);
+      }
+    }
+  }
+}
+
+.pac-filters-applied {
+  display: inline-block;
+  float: left;
+  @include govuk-clearfix();
+
+  &--container {
+    float: left;
+    margin: 10px 10px 0 0;
+    @include govuk-clearfix();
+  }
+}
+
+.pac-selected-filters--label {
+  display: inline-block;
+  float: left;
+  margin-right: 10px;
+  @include govuk-clearfix();
+  @include govuk-typography-weight-bold;
+}
+
+.pac-apply-filters-button {
+  display: inline-block;
+  padding: 5px 25px;
+  margin: 10px 0 0 0;
+}
+
+body:not(.js-enabled) {
+  .pac-selected-filters {
+    display: none !important;
+  }
+  .pac-filter-container {
+    float: none;
+    position: relative;
+    top: 0;
+  }
+}
