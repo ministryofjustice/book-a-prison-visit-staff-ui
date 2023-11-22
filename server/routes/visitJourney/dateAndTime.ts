@@ -22,14 +22,14 @@ export default class DateAndTime {
     const { prisonId } = req.session.selectedEstablishment
     const { visitSessionData } = req.session
 
-    let warningBannerText = ''
+    let bannedVisitorMessage = ''
 
     if (visitSessionData.earliestDate) {
       // numberOfDays is the number of days between the ban expiry and the current date
       const numberOfDays = differenceInDays(new Date(visitSessionData.earliestDate), new Date())
       if (numberOfDays > daysUntilVisitStart) {
         daysUntilVisitStart = numberOfDays
-        warningBannerText += 'A selected visitor is banned. Time slots during the period of the ban are not shown.'
+        bannedVisitorMessage = 'A selected visitor is banned. Time slots during the period of the ban are not shown.'
       }
     }
 
@@ -43,6 +43,7 @@ export default class DateAndTime {
 
     let matchingSlot
     let showSlotChangeMessage = false
+    let restrictionChangeMessage = ''
 
     // first time here on update journey, visitSlot.id will be ''
     if (isUpdate && visitSessionData.visitSlot?.id === '') {
@@ -65,8 +66,8 @@ export default class DateAndTime {
       showSlotChangeMessage = !matchingSlot
 
       if (visitSessionData.visitRestriction !== visitSessionData.originalVisitSlot.visitRestriction) {
-        warningBannerText += 'The visit type has changed from '
-        warningBannerText += visitSessionData.visitRestriction === 'OPEN' ? 'closed to open.' : 'open to closed.'
+        restrictionChangeMessage = 'The visit type has changed from '
+        restrictionChangeMessage += visitSessionData.visitRestriction === 'OPEN' ? 'closed to open.' : 'open to closed.'
       }
     }
 
@@ -102,7 +103,8 @@ export default class DateAndTime {
       formValues,
       slotsPresent,
       showSlotChangeMessage,
-      warningBannerText,
+      restrictionChangeMessage,
+      bannedVisitorMessage,
       originalVisitSlot,
       urlPrefix: getUrlPrefix(isUpdate, visitSessionData.visitReference),
     })

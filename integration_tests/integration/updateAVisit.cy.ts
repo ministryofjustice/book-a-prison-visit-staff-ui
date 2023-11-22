@@ -30,6 +30,7 @@ context('Update a visit', () => {
     const prisoner = TestData.prisoner()
     const { prisonerNumber: offenderNo, prisonId } = prisoner
     const prisonerDisplayName = 'Smith, John'
+    const min = '2'
 
     const visitSessions: VisitSession[] = [
       TestData.visitSession({
@@ -88,6 +89,7 @@ context('Update a visit', () => {
       offenderNo,
       prisonId,
       visitSessions,
+      min,
     })
     cy.task('stubOffenderEvents', {
       offenderNo,

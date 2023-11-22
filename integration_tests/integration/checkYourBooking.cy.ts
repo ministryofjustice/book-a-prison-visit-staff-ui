@@ -14,6 +14,7 @@ import RequestMethodPage from '../pages/requestMethod'
 context('Check visit details page', () => {
   const shortDateFormat = 'yyyy-MM-dd'
   const longDateFormat = 'EEEE d MMMM yyyy'
+  const min = '2'
 
   beforeEach(() => {
     cy.task('reset')
@@ -72,6 +73,7 @@ context('Check visit details page', () => {
       offenderNo: prisonerId,
       prisonId,
       visitSessions,
+      min,
     })
     cy.task('stubOffenderEvents', {
       offenderNo: prisonerId,

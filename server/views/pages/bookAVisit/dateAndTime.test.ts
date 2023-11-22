@@ -193,14 +193,16 @@ describe('Views - Date and time of visit', () => {
     viewContext = {
       prisonerName: 'John Smith',
       visitRestriction: 'CLOSED',
-      warningBannerText: 'The visit type has changed from open to closed.',
+      restrictionChangeMessage: 'The visit type has changed from open to closed.',
     }
     const $ = cheerio.load(compiledTemplate.render(viewContext))
 
     expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
     expect($('[data-test="visit-restriction"]').text()).toBe('Closed')
     expect($('[data-test="closed-visit-reason"]').length).toBe(0)
-    expect($('[data-test="warning-banner-text"]').text()).toContain('The visit type has changed from open to closed.')
+    expect($('[data-test="restriction-change-reason"]').text()).toContain(
+      'The visit type has changed from open to closed.',
+    )
   })
 
   describe('slot labelling', () => {

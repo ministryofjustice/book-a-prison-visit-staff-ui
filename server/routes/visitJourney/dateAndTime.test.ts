@@ -265,7 +265,7 @@ testJourneys.forEach(journey => {
           .expect(res => {
             const $ = cheerio.load(res.text)
             expect($('h1').text().trim()).toBe('Select date and time of visit')
-            expect($('[data-test="warning-banner-text"]').text().trim()).toContain(
+            expect($('[data-test="banned-visitor-reason"]').text().trim()).toContain(
               'A selected visitor is banned. Time slots during the period of the ban are not shown',
             )
           })
@@ -569,7 +569,7 @@ describe('Update journey specific warning messages', () => {
       .expect(res => {
         const $ = cheerio.load(res.text)
         expect($('[data-test="slot-change-reason"]').length).toBe(0)
-        expect($('[data-test="warning-banner-text"]').length).toBe(0)
+        expect($('[data-test="restriction-change-reason"]').length).toBe(0)
         expect($('input#1').prop('checked')).toBe(true)
       })
   })
@@ -590,7 +590,7 @@ describe('Update journey specific warning messages', () => {
       .expect(res => {
         const $ = cheerio.load(res.text)
         expect($('[data-test="slot-change-reason"]').length).toBe(0)
-        expect($('[data-test="warning-banner-text"]').length).toBe(0)
+        expect($('[data-test="restriction-change-reason"]').length).toBe(0)
         expect($('input#1').prop('checked')).toBe(true)
       })
   })
@@ -610,7 +610,7 @@ describe('Update journey specific warning messages', () => {
       .expect(res => {
         const $ = cheerio.load(res.text)
         expect($('[data-test="slot-change-reason"]').text()).toContain('A new visit time must be selected.')
-        expect($('[data-test="warning-banner-text"]').text()).toContain(
+        expect($('[data-test="restriction-change-reason"]').text()).toContain(
           'The visit type has changed from open to closed.',
         )
         expect($('input:checked').length).toBe(0)
@@ -632,7 +632,7 @@ describe('Update journey specific warning messages', () => {
       .expect(res => {
         const $ = cheerio.load(res.text)
         expect($('[data-test="slot-change-reason"]').text()).toContain('A new visit time must be selected.')
-        expect($('[data-test="warning-banner-text"]').text()).toContain(
+        expect($('[data-test="restriction-change-reason"]').text()).toContain(
           'The visit type has changed from closed to open.',
         )
         expect($('input:checked').length).toBe(0)
@@ -653,7 +653,7 @@ describe('Update journey specific warning messages', () => {
       .expect(res => {
         const $ = cheerio.load(res.text)
         expect($('[data-test="slot-change-reason"]').length).toBe(0)
-        expect($('[data-test="warning-banner-text"]').text()).toContain(
+        expect($('[data-test="restriction-change-reason"]').text()).toContain(
           'The visit type has changed from open to closed.',
         )
         expect($('input#1').prop('checked')).toBe(true)
@@ -674,7 +674,7 @@ describe('Update journey specific warning messages', () => {
       .expect(res => {
         const $ = cheerio.load(res.text)
         expect($('[data-test="slot-change-reason"]').length).toBe(0)
-        expect($('[data-test="warning-banner-text"]').text()).toContain(
+        expect($('[data-test="restriction-change-reason"]').text()).toContain(
           'The visit type has changed from closed to open.',
         )
         expect($('input#1').prop('checked')).toBe(true)

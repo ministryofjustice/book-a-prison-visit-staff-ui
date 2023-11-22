@@ -99,26 +99,46 @@
       }) }}
     {% endif %}
 
-    {% if warningBannerText %}
-      {% set warningBannerHtml %}
+    {% if restrictionChangeMessage %}
+      {% set restrictionChangeBanner %}
           {{ govukWarningText({
             classes: "govuk-!-margin-bottom-0",
-            html: '<span class="govuk-!-font-size-24">' + warningBannerText + '</span>',
+            html: '<span class="govuk-!-font-size-24">' + restrictionChangeMessage + '</span>',
             iconFallbackText: "Warning",
             attributes: {
-              "data-test": "warning-banner-text"
+              "data-test": "restriction-change-reason"
           }
         }) }}
       {% endset %}
 
       {{ mojBanner({
         classes: "govuk-!-padding-left-4",
-        html: warningBannerHtml
+        html: restrictionChangeBanner
       }) }}
 
 
     {% endif %}
     
+    {% if bannedVisitorMessage %}
+      {% set bannedVisitorBanner %}
+          {{ govukWarningText({
+            classes: "govuk-!-margin-bottom-0",
+            html: '<span class="govuk-!-font-size-24">' + bannedVisitorMessage + '</span>',
+            iconFallbackText: "Warning",
+            attributes: {
+              "data-test": "banned-visitor-reason"
+          }
+        }) }}
+      {% endset %}
+
+      {{ mojBanner({
+        classes: "govuk-!-padding-left-4",
+        html: bannedVisitorBanner
+      }) }}
+
+
+    {% endif %}
+
     {% if slotsPresent %}
 
     <form action="{{ urlPrefix }}/select-date-and-time" method="POST" novalidate>

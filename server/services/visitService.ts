@@ -13,7 +13,7 @@ import {
   Visit,
   VisitHistoryDetails,
 } from '../data/orchestrationApiTypes'
-import buildVisitorListItem from '../utils/visitorUtils'
+import { buildVisitorListItem } from '../utils/visitorUtils'
 import { getSupportTypeDescriptions } from '../routes/visitorUtils'
 import { HmppsAuthClient, OrchestrationApiClient, PrisonerContactRegistryApiClient, RestClientBuilder } from '../data'
 import AdditionalSupportService from './additionalSupportService'

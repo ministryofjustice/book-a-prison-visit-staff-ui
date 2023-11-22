@@ -7,6 +7,7 @@ import PrisonerProfileService from '../../services/prisonerProfileService'
 import PrisonerVisitorsService from '../../services/prisonerVisitorsService'
 import { getFlashFormValues } from '../visitorUtils'
 import getUrlPrefix from './visitJourneyUtils'
+// import { getBanStatus } from '../../utils/visitorUtils'
 
 export default class SelectVisitors {
   constructor(
@@ -96,7 +97,7 @@ export default class SelectVisitors {
     const closedVisitPrisoner = visitSessionData.prisoner.restrictions.some(
       restriction => restriction.restrictionType === 'CLOSED',
     )
-    // req.session.visitSessionData.earliestDate = getFunctionCalled()
+
     selectedVisitors.forEach(visitor => {
       visitor.restrictions.forEach(restriction => {
         if (restriction.restrictionType === 'BAN' && restriction.expiryDate) {
@@ -115,10 +116,6 @@ export default class SelectVisitors {
       ? res.redirect(`${urlPrefix}/visit-type`)
       : res.redirect(`${urlPrefix}/select-date-and-time`)
   }
-
-  // private getEarliestDateWithoutBans(visitors: VisitorListItem[] {
-  //   console.log(visitors)
-  // })
 
   validate(): ValidationChain {
     return body('visitors').custom((value: string, { req }) => {
