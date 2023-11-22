@@ -1,6 +1,5 @@
 import type { Request, Response } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
-import { differenceInDays } from 'date-fns'
 import { VisitSlot } from '../../@types/bapv'
 import AuditService from '../../services/auditService'
 import { getFlashFormValues, getSelectedSlot, getSlotByTimeAndRestriction } from '../visitorUtils'
@@ -24,11 +23,10 @@ export default class DateAndTime {
 
     let bannedVisitorMessage = ''
 
-    if (visitSessionData.earliestDate) {
+    if (visitSessionData.daysUntilBanExpiry) {
       // numberOfDays is the number of days between the ban expiry and the current date
-      const numberOfDays = differenceInDays(new Date(visitSessionData.earliestDate), new Date())
-      if (numberOfDays > daysUntilVisitStart) {
-        daysUntilVisitStart = numberOfDays
+      if (visitSessionData.daysUntilBanExpiry > daysUntilVisitStart) {
+        daysUntilVisitStart = visitSessionData.daysUntilBanExpiry
         bannedVisitorMessage = 'A selected visitor is banned. Time slots during the period of the ban are not shown.'
       }
     }

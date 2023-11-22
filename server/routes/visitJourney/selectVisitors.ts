@@ -1,13 +1,12 @@
 import type { Request, Response } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
-import { isBefore } from 'date-fns'
 import { VisitorListItem } from '../../@types/bapv'
 import getPrisonConfiguration from '../../constants/prisonConfiguration'
 import PrisonerProfileService from '../../services/prisonerProfileService'
 import PrisonerVisitorsService from '../../services/prisonerVisitorsService'
 import { getFlashFormValues } from '../visitorUtils'
 import getUrlPrefix from './visitJourneyUtils'
-// import { getBanStatus } from '../../utils/visitorUtils'
+import { getBanStatus } from '../../utils/visitorUtils'
 
 export default class SelectVisitors {
   constructor(
@@ -99,17 +98,14 @@ export default class SelectVisitors {
     )
 
     selectedVisitors.forEach(visitor => {
-      visitor.restrictions.forEach(restriction => {
-        if (restriction.restrictionType === 'BAN' && restriction.expiryDate) {
-          if (req.session.visitSessionData.earliestDate) {
-            if (isBefore(new Date(req.session.visitSessionData.earliestDate), new Date(restriction.expiryDate))) {
-              req.session.visitSessionData.earliestDate = restriction.expiryDate
-            }
-          } else {
-            req.session.visitSessionData.earliestDate = restriction.expiryDate
-          }
+      const visitorBans = getBanStatus(visitor.restrictions)
+      if (visitorBans && visitorBans.numDays) {
+        if (req.session.visitSessionData.daysUntilBanExpiry > visitorBans.numDays) {
+          req.session.visitSessionData.daysUntilBanExpiry = visitorBans.numDays
+        } else if (!req.session.visitSessionData.daysUntilBanExpiry) {
+          req.session.visitSessionData.daysUntilBanExpiry = visitorBans.numDays
         }
-      })
+      }
     })
 
     return !closedVisitVisitors && closedVisitPrisoner

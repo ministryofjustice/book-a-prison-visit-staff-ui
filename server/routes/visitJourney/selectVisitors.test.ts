@@ -825,7 +825,7 @@ testJourneys.forEach(journey => {
         .expect(() => {
           expect(adultVisitors.adults).toEqual([returnAdult])
           expect(visitSessionData.visitors).toEqual([returnAdult, returnChild])
-          expect(visitSessionData.earliestDate).toBe('2023-12-14')
+          expect(visitSessionData.daysUntilBanExpiry).toBe(13)
         })
     })
 

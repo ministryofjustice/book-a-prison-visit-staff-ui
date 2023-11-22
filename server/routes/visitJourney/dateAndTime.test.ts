@@ -225,8 +225,6 @@ testJourneys.forEach(journey => {
       })
 
       it('should show warning message when visitor has an expiring ban', () => {
-        const fakeDate = new Date('2023-01-01')
-        jest.useFakeTimers({ advanceTimers: true, now: new Date(fakeDate) })
         // example visitor data for a visitor ban
         visitSessionData.visitors = [
           {
@@ -249,7 +247,7 @@ testJourneys.forEach(journey => {
           },
         ]
         // this is added to the visitSessionData on the select visitors page, matches the expiry date of the visitor ban
-        visitSessionData.earliestDate = '2023-01-14'
+        visitSessionData.daysUntilBanExpiry = 3
 
         sessionApp = appWithAllRoutes({
           services: { visitSessionsService },
