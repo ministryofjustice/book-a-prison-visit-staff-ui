@@ -19,7 +19,6 @@ context('Book a visit', () => {
   const shortDateFormat = 'yyyy-MM-dd'
   const mediumDateFormat = 'd MMMM yyyy'
   const longDateFormat = 'EEEE d MMMM yyyy'
-  const min = '2'
 
   const today = new Date()
   const childDob = format(sub(today, { years: 5 }), shortDateFormat)
@@ -128,7 +127,6 @@ context('Book a visit', () => {
       offenderNo,
       prisonId,
       visitSessions,
-      min,
     })
     cy.task('stubOffenderEvents', {
       offenderNo,
@@ -299,7 +297,6 @@ context('Book a visit', () => {
       offenderNo: prisonerId,
       prisonId,
       visitSessions: [],
-      min,
     })
     cy.task('stubOffenderEvents', {
       offenderNo: prisonerId,
