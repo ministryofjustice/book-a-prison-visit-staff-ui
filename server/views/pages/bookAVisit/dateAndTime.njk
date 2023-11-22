@@ -64,16 +64,16 @@
     }) }}
 
     {% if not whereaboutsAvailable %}
-    {% set whereaboutsUnavailable %}
-      {{ govukWarningText({
-        classes: "govuk-!-margin-bottom-0",
-        html: '<span class="govuk-!-font-size-24">The prisoner schedule is unavailable.' +
-          ' <br />Check NOMIS for court appearances. Prison number: ' + offenderNo + '</span>',
-        iconFallbackText: "Warning",
-        attributes: {
-          "data-test": "whereabouts-unavailable"
-        }
-      }) }}
+      {% set whereaboutsUnavailable %}
+        {{ govukWarningText({
+          classes: "govuk-!-margin-bottom-0",
+          html: '<span class="govuk-!-font-size-24">The prisoner schedule is unavailable.' +
+            ' <br />Check NOMIS for court appearances. Prison number: ' + offenderNo + '</span>',
+          iconFallbackText: "Warning",
+          attributes: {
+            "data-test": "whereabouts-unavailable"
+          }
+        }) }}
       {% endset %}
       {{ mojBanner({
         classes: "govuk-!-padding-left-4",
@@ -99,45 +99,23 @@
       }) }}
     {% endif %}
 
-    {% if restrictionChangeMessage %}
-      {% set restrictionChangeBanner %}
+    {% for messageObject in warningMessages %}
+      {% set warningBannerText %}
           {{ govukWarningText({
             classes: "govuk-!-margin-bottom-0",
-            html: '<span class="govuk-!-font-size-24">' + restrictionChangeMessage + '</span>',
+            html: '<span class="govuk-!-font-size-24">' + messageObject.message + '</span>',
             iconFallbackText: "Warning",
             attributes: {
-              "data-test": "restriction-change-reason"
+              "data-test": messageObject.id
           }
         }) }}
       {% endset %}
 
       {{ mojBanner({
         classes: "govuk-!-padding-left-4",
-        html: restrictionChangeBanner
+        html: warningBannerText
       }) }}
-
-
-    {% endif %}
-    
-    {% if bannedVisitorMessage %}
-      {% set bannedVisitorBanner %}
-          {{ govukWarningText({
-            classes: "govuk-!-margin-bottom-0",
-            html: '<span class="govuk-!-font-size-24">' + bannedVisitorMessage + '</span>',
-            iconFallbackText: "Warning",
-            attributes: {
-              "data-test": "banned-visitor-reason"
-          }
-        }) }}
-      {% endset %}
-
-      {{ mojBanner({
-        classes: "govuk-!-padding-left-4",
-        html: bannedVisitorBanner
-      }) }}
-
-
-    {% endif %}
+    {% endfor %}
 
     {% if slotsPresent %}
 

@@ -21,13 +21,16 @@ export default class DateAndTime {
     const { prisonId } = req.session.selectedEstablishment
     const { visitSessionData } = req.session
 
-    let bannedVisitorMessage = ''
+    const warningMessages: { id: string; message: string }[] = []
 
     if (visitSessionData.daysUntilBanExpiry) {
       // numberOfDays is the number of days between the ban expiry and the current date
       if (visitSessionData.daysUntilBanExpiry > daysUntilVisitStart) {
         daysUntilVisitStart = visitSessionData.daysUntilBanExpiry
-        bannedVisitorMessage = 'A selected visitor is banned. Time slots during the period of the ban are not shown.'
+        warningMessages.push({
+          id: 'banned-visitor-reason',
+          message: 'A selected visitor is banned. Time slots during the period of the ban are not shown.',
+        })
       }
     }
 
@@ -41,7 +44,6 @@ export default class DateAndTime {
 
     let matchingSlot
     let showSlotChangeMessage = false
-    let restrictionChangeMessage = ''
 
     // first time here on update journey, visitSlot.id will be ''
     if (isUpdate && visitSessionData.visitSlot?.id === '') {
@@ -64,8 +66,13 @@ export default class DateAndTime {
       showSlotChangeMessage = !matchingSlot
 
       if (visitSessionData.visitRestriction !== visitSessionData.originalVisitSlot.visitRestriction) {
-        restrictionChangeMessage = 'The visit type has changed from '
-        restrictionChangeMessage += visitSessionData.visitRestriction === 'OPEN' ? 'closed to open.' : 'open to closed.'
+        let messageFullString = 'The visit type has changed from '
+        messageFullString += visitSessionData.visitRestriction === 'OPEN' ? 'closed to open.' : 'open to closed.'
+
+        warningMessages.push({
+          id: 'restriction-change-reason',
+          message: messageFullString,
+        })
       }
     }
 
@@ -101,8 +108,7 @@ export default class DateAndTime {
       formValues,
       slotsPresent,
       showSlotChangeMessage,
-      restrictionChangeMessage,
-      bannedVisitorMessage,
+      warningMessages,
       originalVisitSlot,
       urlPrefix: getUrlPrefix(isUpdate, visitSessionData.visitReference),
     })

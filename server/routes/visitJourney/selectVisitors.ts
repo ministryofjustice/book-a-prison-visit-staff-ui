@@ -7,6 +7,7 @@ import PrisonerVisitorsService from '../../services/prisonerVisitorsService'
 import { getFlashFormValues } from '../visitorUtils'
 import getUrlPrefix from './visitJourneyUtils'
 import { getBanStatus } from '../../utils/visitorUtils'
+import { Restriction } from '../../data/prisonerContactRegistryApiTypes'
 
 export default class SelectVisitors {
   constructor(
@@ -97,16 +98,15 @@ export default class SelectVisitors {
       restriction => restriction.restrictionType === 'CLOSED',
     )
 
-    selectedVisitors.forEach(visitor => {
-      const visitorBans = getBanStatus(visitor.restrictions)
-      if (visitorBans && visitorBans.numDays) {
-        if (req.session.visitSessionData.daysUntilBanExpiry > visitorBans.numDays) {
-          req.session.visitSessionData.daysUntilBanExpiry = visitorBans.numDays
-        } else if (!req.session.visitSessionData.daysUntilBanExpiry) {
-          req.session.visitSessionData.daysUntilBanExpiry = visitorBans.numDays
-        }
-      }
-    })
+    const allSelectedVisitorBans: Restriction[] = selectedVisitors.reduce((acc, visitor) => {
+      visitor.restrictions.forEach(restriction => {
+        acc.push(restriction)
+      })
+      return acc
+    }, [])
+
+    const banStatus = getBanStatus(allSelectedVisitorBans)
+    visitSessionData.daysUntilBanExpiry = banStatus.numDays ? banStatus.numDays : undefined
 
     return !closedVisitVisitors && closedVisitPrisoner
       ? res.redirect(`${urlPrefix}/visit-type`)
