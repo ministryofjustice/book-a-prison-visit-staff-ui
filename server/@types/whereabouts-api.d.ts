@@ -945,8 +945,8 @@ export interface components {
       first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
       last?: boolean
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     PageableObject: {
@@ -1361,8 +1361,6 @@ export interface operations {
         'start-date': string
         /** @description Return details of bookings occurring within this number of days of start-date */
         days?: number
-        /** @description Include room names in CSV */
-        'room-names'?: boolean
       }
     }
     responses: {
@@ -1874,8 +1872,6 @@ export interface operations {
         'start-date': string
         /** @description Return details of events occurring within this number of days of start-date */
         days?: number
-        /** @description Include room names in CSV */
-        'room-names'?: boolean
       }
     }
     responses: {

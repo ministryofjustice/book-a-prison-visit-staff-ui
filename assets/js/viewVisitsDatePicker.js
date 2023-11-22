@@ -8,6 +8,7 @@ if (viewAnotherDateToggle) {
     if (datePicker.classList.contains('moj-js-hidden')) {
       viewAnotherDateToggle.setAttribute('aria-expanded', 'false')
       datePicker.classList.remove('moj-js-hidden')
+      document.querySelector('.hmpps-js-datepicker-button').click()
     } else {
       viewAnotherDateToggle.setAttribute('aria-expanded', 'true')
       datePicker.classList.add('moj-js-hidden')
@@ -15,4 +16,9 @@ if (viewAnotherDateToggle) {
   }
 
   viewAnotherDateToggle.addEventListener('click', toggleDatePicker)
+
+  if (document.querySelector('.govuk-error-summary') !== null) {
+    viewAnotherDateToggle.setAttribute('aria-expanded', 'false')
+    document.querySelector('.bapv-another-date__form').classList.remove('moj-js-hidden')
+  }
 }

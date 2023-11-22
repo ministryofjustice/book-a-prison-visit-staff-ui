@@ -44,6 +44,14 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'At least one visitor must be 18 or older.',
     ],
   },
+  // Chelmsford (HMP & YOI)
+  CDI: {
+    prisonPhoneNumber: '01245 552 26',
+    selectVisitorsText: [
+      'You can add up to 3 people aged 8 and over, and 3 children under 8 years old.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
   // Cardiff (HMP & YOI)
   CFI: {
     prisonPhoneNumber: '0300 303 2301',
@@ -143,6 +151,14 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
     prisonPhoneNumber: '0300 060 6502',
     selectVisitorsText: [
       'You can add up to 3 people aged 18 and over, and any number of approved children.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
+  // Guys Marsh (HMP)
+  GMI: {
+    prisonPhoneNumber: '01747 856 586',
+    selectVisitorsText: [
+      'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
@@ -305,6 +321,14 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
     prisonPhoneNumber: '01925 805 018',
     selectVisitorsText: [
       'You can add up to 3 people aged over 18, and 5 children under 18 years old.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
+  // Winchester (HMP & YOI)
+  WCI: {
+    prisonPhoneNumber: '0345 223 5514',
+    selectVisitorsText: [
+      'You can add up to 3 people aged 10 and over, and 3 children under 10 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },

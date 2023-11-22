@@ -4,15 +4,15 @@ import HomePage from '../pages/home'
 import Page from '../pages/page'
 import VisitsByDatePage from '../pages/visitsByDate'
 
-context('View visit schedule timetable', () => {
+context('View visits by date', () => {
   const shortDateFormat = 'yyyy-MM-dd'
   const longDateFormat = 'EEEE d MMMM yyyy'
 
   const today = new Date()
-  const todayShortString = format(today, shortDateFormat)
-  const todayLongString = format(today, longDateFormat)
-  const tomorrowShortString = format(add(today, { days: 1 }), shortDateFormat)
-  const tomorrowLongString = format(add(today, { days: 1 }), longDateFormat)
+  const todayShortFormat = format(today, shortDateFormat)
+  const todayLongFormat = format(today, longDateFormat)
+  const tomorrowShortFormat = format(add(today, { days: 1 }), shortDateFormat)
+  const tomorrowLongFormat = format(add(today, { days: 1 }), longDateFormat)
 
   const prisonerNumber1 = 'A1234BC'
   const prisonerNumber2 = 'A1592EC'
@@ -41,11 +41,10 @@ context('View visit schedule timetable', () => {
     cy.signIn()
   })
 
-  it('Should show visits by date, and change view to tomorrow', () => {
-    const homePage = Page.verifyOnPage(HomePage)
+  it('should show visits by date, and change date to tomorrow using tab heading', () => {
+    let startDateTime = `${todayShortFormat}T00:00:00`
+    let endDateTime = `${todayShortFormat}T23:59:59`
 
-    let startDateTime = `${todayShortString}T00:00:00`
-    let endDateTime = `${todayShortString}T23:59:59`
     let visits = [
       TestData.visit({ reference: 'ab-cd-ef-gh', prisonerId: prisonerNumber1 }),
       TestData.visit({ reference: 'gh-ef-cd-ab', prisonerId: prisonerNumber2 }),
@@ -85,18 +84,19 @@ context('View visit schedule timetable', () => {
     let sessionCapacity = TestData.sessionCapacity()
     cy.task('stubVisitSessionCapacity', {
       prisonId,
-      sessionDate: todayShortString,
+      sessionDate: todayShortFormat,
       sessionStartTime,
       sessionEndTime,
       sessionCapacity,
     })
 
+    const homePage = Page.verifyOnPage(HomePage)
     homePage.viewVisitsTile().click()
 
     const visitsByDatePage = Page.verifyOnPage(VisitsByDatePage)
 
-    visitsByDatePage.today().contains(todayLongString)
-    visitsByDatePage.tomorrow().contains(tomorrowLongString)
+    visitsByDatePage.today().contains(todayLongFormat)
+    visitsByDatePage.tomorrow().contains(tomorrowLongFormat)
 
     visitsByDatePage.today().should('have.attr', 'aria-current', 'page')
     visitsByDatePage.tomorrow().should('not.have.attr', 'aria-current', 'page')
@@ -111,8 +111,8 @@ context('View visit schedule timetable', () => {
     visitsByDatePage.prisonerRowTwoName().contains(`${prisonersResults[1].lastName}, ${prisonersResults[1].firstName}`)
     visitsByDatePage.prisonerRowTwoNumber().contains(prisonerNumber2)
 
-    startDateTime = `${tomorrowShortString}T00:00:00`
-    endDateTime = `${tomorrowShortString}T23:59:59`
+    startDateTime = `${tomorrowShortFormat}T00:00:00`
+    endDateTime = `${tomorrowShortFormat}T23:59:59`
     visits = [
       TestData.visit({ reference: 'ab-cd-ef-gh', prisonerId: prisonerNumber1, visitRestriction: 'CLOSED' }),
       TestData.visit({ reference: 'gh-ef-cd-ab', prisonerId: prisonerNumber2 }),
@@ -141,7 +141,7 @@ context('View visit schedule timetable', () => {
     sessionCapacity = TestData.sessionCapacity({ open: 20, closed: 1 })
     cy.task('stubVisitSessionCapacity', {
       prisonId,
-      sessionDate: tomorrowShortString,
+      sessionDate: tomorrowShortFormat,
       sessionStartTime,
       sessionEndTime,
       sessionCapacity,
@@ -159,5 +159,41 @@ context('View visit schedule timetable', () => {
     visitsByDatePage.prisonerRowOneNumber().contains(prisonerNumber2)
     visitsByDatePage.prisonerRowTwoName().should('not.exist')
     visitsByDatePage.prisonerRowTwoNumber().should('not.exist')
+  })
+
+  it('should show visits by date, and change date using the date picker', () => {
+    const startDateTime = `${todayShortFormat}T00:00:00`
+    const endDateTime = `${todayShortFormat}T23:59:59`
+    cy.task('stubVisitsByDate', {
+      startDateTime,
+      endDateTime,
+      prisonId,
+      visits: [],
+    })
+
+    const homePage = Page.verifyOnPage(HomePage)
+    homePage.viewVisitsTile().click()
+
+    const visitsByDatePage = Page.verifyOnPage(VisitsByDatePage)
+    visitsByDatePage.today().contains(todayLongFormat)
+    visitsByDatePage.today().should('have.attr', 'aria-current', 'page')
+    visitsByDatePage.noResultsMessage().contains('No visit sessions on this day')
+
+    // choose another date - open picker, go to next month and choose 1st
+    const firstOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1)
+    const firstOfNextMonthShortFormat = format(firstOfNextMonth, shortDateFormat)
+    const firstOfNextMonthLongFormat = format(firstOfNextMonth, longDateFormat)
+    cy.task('stubVisitsByDate', {
+      startDateTime: `${firstOfNextMonthShortFormat}T00:00:00`,
+      endDateTime: `${firstOfNextMonthShortFormat}T23:59:59`,
+      prisonId,
+      visits: [],
+    })
+
+    visitsByDatePage.toggleChooseAnotherDatePopUp()
+    visitsByDatePage.datePickerGoToNextMonth()
+    visitsByDatePage.datePickerSelectDay(1)
+    visitsByDatePage.datePickerClickViewDate()
+    visitsByDatePage.today().contains(firstOfNextMonthLongFormat)
   })
 })

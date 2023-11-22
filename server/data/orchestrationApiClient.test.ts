@@ -664,6 +664,21 @@ describe('orchestrationApiClient', () => {
     })
   })
 
+  describe('getNotificationGroups', () => {
+    it('should return notification groups for given prison', async () => {
+      const notificationGroups = [TestData.notificationGroup()]
+
+      fakeOrchestrationApi
+        .get(`/visits/notification/${prisonId}/groups`)
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, notificationGroups)
+
+      const output = await orchestrationApiClient.getNotificationGroups(prisonId)
+
+      expect(output).toEqual(notificationGroups)
+    })
+  })
+
   describe('getVisitSessions', () => {
     it('should return an array of Visit Sessions', async () => {
       const results = [TestData.visitSession()]

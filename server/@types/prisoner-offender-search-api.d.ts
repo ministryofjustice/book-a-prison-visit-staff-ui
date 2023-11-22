@@ -4,64 +4,6 @@
  */
 
 export interface paths {
-  '/queue-admin/retry-dlq/{dlqName}': {
-    put: operations['retryDlq']
-  }
-  '/queue-admin/retry-all-dlqs': {
-    put: operations['retryAllDlqs']
-  }
-  '/queue-admin/purge-queue/{queueName}': {
-    put: operations['purgeQueue']
-  }
-  '/prisoner-index/switch-index': {
-    /**
-     * Switch index without rebuilding
-     * @description current index will be switched both indexed have to be complete, requires PRISONER_INDEX role
-     */
-    put: operations['switchIndex']
-  }
-  '/prisoner-index/queue-housekeeping': {
-    /**
-     * Performs automated housekeeping tasks such as marking builds completed
-     * @description This is an internal service which isn't exposed to the outside world. It is called from a Kubernetes CronJob named `index-housekeeping-cronjob`
-     */
-    put: operations['indexQueueHousekeeping']
-  }
-  '/prisoner-index/mark-complete': {
-    /**
-     * Mark index as complete and swap
-     * @description Swaps to the newly built index, requires PRISONER_INDEX role
-     */
-    put: operations['indexComplete']
-  }
-  '/prisoner-index/index/prisoner/{prisonerNumber}': {
-    /**
-     * Index/Refresh Data for Prisoner with specified prisoner Number
-     * @description Requires PRISONER_INDEX role
-     */
-    put: operations['indexPrisoner']
-  }
-  '/prisoner-index/cancel-index': {
-    /**
-     * Cancels a building index
-     * @description Only cancels if indexing is in progress, requires PRISONER_INDEX role
-     */
-    put: operations['cancelIndex']
-  }
-  '/prisoner-index/build-index': {
-    /**
-     * Start building a new index
-     * @description Old index is left untouched and will be maintained whilst new index is built, requires PRISONER_INDEX role
-     */
-    put: operations['buildIndex']
-  }
-  '/events/prisoner/received/{prisonerNumber}': {
-    /**
-     * Fires a domain event 'prisoner-offender-search.prisoner.received'. This is to be used in a catastrophic failure scenario when the original event was not raised
-     * @description Requires EVENTS_ADMIN role
-     */
-    put: operations['raisePrisonerReceivedEvent']
-  }
   '/restricted-patient-search/match-restricted-patients': {
     /**
      * Match prisoners by criteria
@@ -165,12 +107,6 @@ export interface paths {
      */
     post: operations['globalFindByCriteria']
   }
-  '/synthetic-monitor': {
-    get: operations['syntheticMonitor']
-  }
-  '/queue-admin/get-dlq-messages/{dlqName}': {
-    get: operations['getDlqMessages']
-  }
   '/prisoner/{id}': {
     /**
      * Get prisoner by prisoner number (AKA NOMS number)
@@ -184,35 +120,6 @@ export interface paths {
      * @description Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role
      */
     get: operations['findByPrison']
-  }
-  '/prisoner-index/reconcile-prisoner/{prisonerNumber}': {
-    /**
-     * Compare a prisoner's index with Nomis
-     * @description Existing index is compared in detail with current Nomis data for a specific prisoner,
-     *       with the index value coming first, Nomis second in the returned details. Requires ROLE_PRISONER_INDEX.
-     */
-    get: operations['reconcilePrisoner']
-  }
-  '/prisoner-index/reconcile-index': {
-    /**
-     * Start a full index comparison
-     * @description The whole existing index is compared in detail with current Nomis data, requires ROLE_PRISONER_INDEX.
-     *       Results are written as customEvents. Nothing is written where a prisoner's data matches.
-     *       Note this is a heavyweight operation, like a full index rebuild
-     */
-    get: operations['startIndexReconciliation']
-  }
-  '/prisoner-index/compare-index': {
-    get: operations['compareIndex']
-  }
-  '/prisoner-differences': {
-    /**
-     * Find all prisoner differences
-     * @description
-     *       Find all prisoner differences since a given date time.  This defaults to within the last 24 hours.
-     *       Requires PRISONER_INDEX role.
-     */
-    get: operations['prisonerDifferences']
   }
   '/prison/{prisonId}/prisoners': {
     /**
@@ -265,73 +172,30 @@ export type webhooks = Record<string, never>
 
 export interface components {
   schemas: {
-    Message: {
-      messageId?: string
-      receiptHandle?: string
-      body?: string
-      attributes?: {
-        [key: string]: string
-      }
-      messageAttributes?: {
-        [key: string]: components['schemas']['MessageAttributeValue']
-      }
-      md5OfBody?: string
-      md5OfMessageAttributes?: string
-    }
-    MessageAttributeValue: {
-      stringValue?: string
-      binaryValue?: {
-        /** Format: int32 */
-        short?: number
-        char?: string
-        /** Format: int32 */
-        int?: number
-        /** Format: int64 */
-        long?: number
-        /** Format: float */
-        float?: number
-        /** Format: double */
-        double?: number
-        direct?: boolean
-        readOnly?: boolean
-      }
-      stringListValues?: string[]
-      binaryListValues?: {
-        /** Format: int32 */
-        short?: number
-        char?: string
-        /** Format: int32 */
-        int?: number
-        /** Format: int64 */
-        long?: number
-        /** Format: float */
-        float?: number
-        /** Format: double */
-        double?: number
-        direct?: boolean
-        readOnly?: boolean
-      }[]
-      dataType?: string
-    }
-    RetryDlqResult: {
-      /** Format: int32 */
-      messagesFoundCount: number
-      messages: components['schemas']['Message'][]
-    }
-    PurgeQueueResult: {
-      /** Format: int32 */
-      messagesFoundCount: number
-    }
-    IndexStatus: {
-      id: string
-      /** @enum {string} */
-      currentIndex: 'INDEX_A' | 'INDEX_B'
-      /** @example 2021-07-05T10:35:17 */
-      startIndexTime?: string
-      /** @example 2021-07-05T10:35:17 */
-      endIndexTime?: string
-      inProgress: boolean
-      inError: boolean
+    /** @description Search Criteria for Prisoner Search */
+    RestrictedPatientSearchCriteria: {
+      /**
+       * @description Prisoner identifier, one of prisoner number, book number, booking ID or PNC
+       * @example A1234AA,
+       */
+      prisonerIdentifier?: string
+      /**
+       * @description First Name
+       * @example John
+       */
+      firstName?: string
+      /**
+       * @description Last Name
+       * @example Smith
+       */
+      lastName?: string
+      /**
+       * @description List of supporting Prison Ids to restrict the search by. Unrestricted if not supplied or null
+       * @example [
+       *   "MDI"
+       * ]
+       */
+      supportingPrisonIds?: string[]
     }
     /** @description List of parts of the body that have other marks. From REFERENCE_CODES table where DOMAIN = BODY_PART. Allowable values extracted 08/02/2023. */
     BodyPartDetail: {
@@ -392,6 +256,35 @@ export interface components {
        * @example Standard
        */
       description: string
+    }
+    PagePrisoner: {
+      /** Format: int32 */
+      totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
+      first?: boolean
+      last?: boolean
+      /** Format: int32 */
+      size?: number
+      content?: components['schemas']['Prisoner'][]
+      /** Format: int32 */
+      number?: number
+      sort?: components['schemas']['SortObject']
+      /** Format: int32 */
+      numberOfElements?: number
+      pageable?: components['schemas']['PageableObject']
+      empty?: boolean
+    }
+    PageableObject: {
+      /** Format: int64 */
+      offset?: number
+      sort?: components['schemas']['SortObject']
+      /** Format: int32 */
+      pageSize?: number
+      paged?: boolean
+      unpaged?: boolean
+      /** Format: int32 */
+      pageNumber?: number
     }
     Prisoner: {
       /**
@@ -562,12 +455,12 @@ export interface components {
        */
       mostSeriousOffence: string
       /**
-       * @description Indicates that the offender has been recalled
+       * @description Indicates that the prisoner has been recalled
        * @example false
        */
       recall?: boolean
       /**
-       * @description Indicates that the offender has an indeterminate sentence
+       * @description Indicates that the prisoner has an indeterminate sentence
        * @example true
        */
       indeterminateSentence?: boolean
@@ -707,12 +600,12 @@ export interface components {
        */
       supportingPrisonId?: string
       /**
-       * @description Which hospital the offender has been discharged to
+       * @description Which hospital the prisoner has been discharged to
        * @example HAZLWD
        */
       dischargedHospitalId?: string
       /**
-       * @description Hospital name to which the offender was discharged
+       * @description Hospital name to which the prisoner was discharged
        * @example Hazelwood House
        */
       dischargedHospitalDescription?: string
@@ -730,13 +623,13 @@ export interface components {
       currentIncentive?: components['schemas']['CurrentIncentive']
       /**
        * Format: int32
-       * @description Height in centimetres of the offender
+       * @description Height in centimetres of the prisoner
        * @example 200
        */
       heightCentimetres?: number
       /**
        * Format: int32
-       * @description Weight in kilograms of the offender
+       * @description Weight in kilograms of the prisoner
        * @example 102
        */
       weightKilograms?: number
@@ -881,84 +774,6 @@ export interface components {
        * @example White : Irish
        */
       ethnicity?: string
-    }
-    PrisonerReceivedEventDetails: {
-      /**
-       * @description reason for receive event
-       * @example TRANSFERRED
-       * @enum {string}
-       */
-      reason:
-        | 'NEW_ADMISSION'
-        | 'READMISSION'
-        | 'TRANSFERRED'
-        | 'RETURN_FROM_COURT'
-        | 'TEMPORARY_ABSENCE_RETURN'
-        | 'POST_MERGE_ADMISSION'
-      /**
-       * @description prison agency id of new prison
-       * @example WWI
-       */
-      prisonId: string
-      /**
-       * @description local date time movement happened
-       * @example 2021-07-05T10:35:17
-       */
-      occurredAt: string
-    }
-    /** @description Search Criteria for Prisoner Search */
-    RestrictedPatientSearchCriteria: {
-      /**
-       * @description Prisoner identifier, one of prisoner number, book number, booking ID or PNC
-       * @example A1234AA,
-       */
-      prisonerIdentifier?: string
-      /**
-       * @description First Name
-       * @example John
-       */
-      firstName?: string
-      /**
-       * @description Last Name
-       * @example Smith
-       */
-      lastName?: string
-      /**
-       * @description List of supporting Prison Ids to restrict the search by. Unrestricted if not supplied or null
-       * @example [
-       *   "MDI"
-       * ]
-       */
-      supportingPrisonIds?: string[]
-    }
-    PagePrisoner: {
-      /** Format: int64 */
-      totalElements?: number
-      /** Format: int32 */
-      totalPages?: number
-      first?: boolean
-      /** Format: int32 */
-      size?: number
-      content?: components['schemas']['Prisoner'][]
-      /** Format: int32 */
-      number?: number
-      sort?: components['schemas']['SortObject']
-      /** Format: int32 */
-      numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
-      last?: boolean
-      empty?: boolean
-    }
-    PageableObject: {
-      /** Format: int64 */
-      offset?: number
-      sort?: components['schemas']['SortObject']
-      /** Format: int32 */
-      pageSize?: number
-      /** Format: int32 */
-      pageNumber?: number
-      paged?: boolean
-      unpaged?: boolean
     }
     SortObject: {
       empty?: boolean
@@ -1156,11 +971,12 @@ export interface components {
       pagination: components['schemas']['PaginationRequest']
     }
     PrisonerDetailResponse: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       first?: boolean
+      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Prisoner'][]
@@ -1170,7 +986,6 @@ export interface components {
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
-      last?: boolean
       empty?: boolean
     }
     ErrorResponse: {
@@ -1404,11 +1219,12 @@ export interface components {
       pagination: components['schemas']['PaginationRequest']
     }
     PhysicalDetailResponse: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       first?: boolean
+      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Prisoner'][]
@@ -1418,7 +1234,6 @@ export interface components {
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
-      last?: boolean
       empty?: boolean
     }
     MatchRequest: {
@@ -1517,11 +1332,12 @@ export interface components {
       type: 'DEFAULT' | 'ESTABLISHMENT'
     }
     KeywordResponse: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       first?: boolean
+      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Prisoner'][]
@@ -1531,7 +1347,6 @@ export interface components {
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
-      last?: boolean
       empty?: boolean
     }
     /** @description Search Criteria for Global Prisoner Search */
@@ -1575,27 +1390,6 @@ export interface components {
        */
       includeAliases: boolean
     }
-    DlqMessage: {
-      body: {
-        [key: string]: Record<string, never>
-      }
-      messageId: string
-    }
-    GetDlqResult: {
-      /** Format: int32 */
-      messagesFoundCount: number
-      /** Format: int32 */
-      messagesReturnedCount: number
-      messages: components['schemas']['DlqMessage'][]
-    }
-    PrisonerDifferences: {
-      /** Format: uuid */
-      prisonerDifferencesId?: string
-      nomsNumber: string
-      differences: string
-      /** @example 2021-07-05T10:35:17 */
-      dateTime: string
-    }
   }
   responses: never
   parameters: never
@@ -1609,162 +1403,6 @@ export type $defs = Record<string, never>
 export type external = Record<string, never>
 
 export interface operations {
-  retryDlq: {
-    parameters: {
-      path: {
-        dlqName: string
-      }
-    }
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          '*/*': components['schemas']['RetryDlqResult']
-        }
-      }
-    }
-  }
-  retryAllDlqs: {
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          '*/*': components['schemas']['RetryDlqResult'][]
-        }
-      }
-    }
-  }
-  purgeQueue: {
-    parameters: {
-      path: {
-        queueName: string
-      }
-    }
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          '*/*': components['schemas']['PurgeQueueResult']
-        }
-      }
-    }
-  }
-  /**
-   * Switch index without rebuilding
-   * @description current index will be switched both indexed have to be complete, requires PRISONER_INDEX role
-   */
-  switchIndex: {
-    responses: {
-      /** @description Unable to switch indexes - one is marked as in progress or in error */
-      409: {
-        content: {
-          'application/json': components['schemas']['IndexStatus']
-        }
-      }
-    }
-  }
-  /**
-   * Performs automated housekeeping tasks such as marking builds completed
-   * @description This is an internal service which isn't exposed to the outside world. It is called from a Kubernetes CronJob named `index-housekeeping-cronjob`
-   */
-  indexQueueHousekeeping: {
-    responses: {
-      /** @description Unable to marked index complete as it is in error */
-      409: {
-        content: never
-      }
-    }
-  }
-  /**
-   * Mark index as complete and swap
-   * @description Swaps to the newly built index, requires PRISONER_INDEX role
-   */
-  indexComplete: {
-    parameters: {
-      query?: {
-        ignoreThreshold?: boolean
-      }
-    }
-    responses: {
-      /** @description Unable to marked index complete as it is in error */
-      409: {
-        content: {
-          'application/json': components['schemas']['IndexStatus']
-        }
-      }
-    }
-  }
-  /**
-   * Index/Refresh Data for Prisoner with specified prisoner Number
-   * @description Requires PRISONER_INDEX role
-   */
-  indexPrisoner: {
-    parameters: {
-      path: {
-        /** @example A1234AA */
-        prisonerNumber: string
-      }
-    }
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['Prisoner']
-        }
-      }
-    }
-  }
-  /**
-   * Cancels a building index
-   * @description Only cancels if indexing is in progress, requires PRISONER_INDEX role
-   */
-  cancelIndex: {
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['IndexStatus']
-        }
-      }
-    }
-  }
-  /**
-   * Start building a new index
-   * @description Old index is left untouched and will be maintained whilst new index is built, requires PRISONER_INDEX role
-   */
-  buildIndex: {
-    responses: {
-      /** @description Unable to build index - it is marked as in progress or in error */
-      409: {
-        content: {
-          'application/json': components['schemas']['IndexStatus']
-        }
-      }
-    }
-  }
-  /**
-   * Fires a domain event 'prisoner-offender-search.prisoner.received'. This is to be used in a catastrophic failure scenario when the original event was not raised
-   * @description Requires EVENTS_ADMIN role
-   */
-  raisePrisonerReceivedEvent: {
-    parameters: {
-      path: {
-        /** @example A1234AA */
-        prisonerNumber: string
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['PrisonerReceivedEventDetails']
-      }
-    }
-    responses: {
-      /** @description Accepted */
-      202: {
-        content: never
-      }
-    }
-  }
   /**
    * Match prisoners by criteria
    * @description Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role
@@ -2114,32 +1752,6 @@ export interface operations {
       }
     }
   }
-  syntheticMonitor: {
-    responses: {
-      /** @description OK */
-      200: {
-        content: never
-      }
-    }
-  }
-  getDlqMessages: {
-    parameters: {
-      query?: {
-        maxMessages?: number
-      }
-      path: {
-        dlqName: string
-      }
-    }
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          '*/*': components['schemas']['GetDlqResult']
-        }
-      }
-    }
-  }
   /**
    * Get prisoner by prisoner number (AKA NOMS number)
    * @description Requires ROLE_PRISONER_SEARCH or ROLE_VIEW_PRISONER_DATA role
@@ -2183,97 +1795,6 @@ export interface operations {
       200: {
         content: {
           'application/json': components['schemas']['PagePrisoner']
-        }
-      }
-    }
-  }
-  /**
-   * Compare a prisoner's index with Nomis
-   * @description Existing index is compared in detail with current Nomis data for a specific prisoner,
-   *       with the index value coming first, Nomis second in the returned details. Requires ROLE_PRISONER_INDEX.
-   */
-  reconcilePrisoner: {
-    parameters: {
-      path: {
-        prisonerNumber: string
-      }
-    }
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          'application/json': string
-        }
-      }
-    }
-  }
-  /**
-   * Start a full index comparison
-   * @description The whole existing index is compared in detail with current Nomis data, requires ROLE_PRISONER_INDEX.
-   *       Results are written as customEvents. Nothing is written where a prisoner's data matches.
-   *       Note this is a heavyweight operation, like a full index rebuild
-   */
-  startIndexReconciliation: {
-    responses: {
-      /** @description Accepted */
-      202: {
-        content: never
-      }
-    }
-  }
-  compareIndex: {
-    responses: {
-      /** @description Accepted */
-      202: {
-        content: never
-      }
-    }
-  }
-  /**
-   * Find all prisoner differences
-   * @description
-   *       Find all prisoner differences since a given date time.  This defaults to within the last 24 hours.
-   *       Requires PRISONER_INDEX role.
-   */
-  prisonerDifferences: {
-    parameters: {
-      query?: {
-        /**
-         * @description Report on differences that have been generated. Defaults to the last one day
-         * @example 2023-01-02T02:23:45
-         */
-        from?: string
-        to?: string
-      }
-    }
-    requestBody?: {
-      content: {
-        'application/json': components['schemas']['PrisonerDetailRequest']
-      }
-    }
-    responses: {
-      /** @description Search successfully performed */
-      200: {
-        content: {
-          'application/json': components['schemas']['PrisonerDifferences'][]
-        }
-      }
-      /** @description Incorrect information provided to perform prisoner match */
-      400: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Unauthorized to access this endpoint */
-      401: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Incorrect permissions to search for prisoner data */
-      403: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
         }
       }
     }

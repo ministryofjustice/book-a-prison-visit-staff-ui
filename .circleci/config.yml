@@ -55,7 +55,7 @@ jobs:
           name: Change to project directory and run tests
           command: |
             cd hmpps-vsip-ui-tests
-            mvn test -Dbrowser=remote-chrome -Denvironment="STAGING" -Dtest=suites.RunSmokeTest
+            mvn test -Dbrowser=remote-chrome -Denvironment="STAGING" -Dtest=suites.RunSuite
 
   acceptance_tests_develop:
     docker:
@@ -85,7 +85,7 @@ jobs:
           name: Change to project directory and run tests
           command: |
             cd hmpps-vsip-ui-tests
-            mvn test -Dbrowser=remote-chrome -Denvironment="STAGING" -Dtest=suites.RunSmokeTest
+            mvn test -Dbrowser=remote-chrome -Denvironment="STAGING" -Dtest=suites.RunSuite
 
   build:
     executor:

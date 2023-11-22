@@ -1,6 +1,7 @@
 import { OffenderRestriction } from '../data/prisonApiTypes'
 import {
   ApplicationMethodType,
+  NotificationType,
   PrisonerProfile,
   Visit,
   VisitorSupport,
@@ -144,3 +145,11 @@ export type VisitsPageSlot = {
 }
 
 export type FlashData = Record<string, string[] | Record<string, string | string[]>[]>
+
+export type VisitsReviewListItem = {
+  bookedByNames: string[]
+  prisonerNumbers: string[]
+  reference: string
+  type: NotificationType
+  visitDates: string[]
+}

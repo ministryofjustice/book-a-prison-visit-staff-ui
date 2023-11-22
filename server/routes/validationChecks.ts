@@ -5,9 +5,8 @@ export const isValidPrisonerNumber = (prisonerNo: string): boolean => {
 }
 
 export const extractPrisonerNumber = (search: string): string | false => {
-  const prisonerNoRegExp = /[A-Z][0-9]{4}[A-Z]{2}/
-  const matches = search.toUpperCase().match(prisonerNoRegExp)
-  return matches ? matches[0] : false
+  const searchTerms = search.toUpperCase().split(' ')
+  return searchTerms.find(term => isValidPrisonerNumber(term)) || false
 }
 
 export const isValidVisitReference = (reference: string): boolean => {
