@@ -7,7 +7,6 @@ import PrisonerVisitorsService from '../../services/prisonerVisitorsService'
 import { getFlashFormValues } from '../visitorUtils'
 import getUrlPrefix from './visitJourneyUtils'
 import { getBanStatus } from '../../utils/visitorUtils'
-import { Restriction } from '../../data/prisonerContactRegistryApiTypes'
 
 export default class SelectVisitors {
   constructor(
