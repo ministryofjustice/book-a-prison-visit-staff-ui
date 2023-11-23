@@ -98,12 +98,7 @@ export default class SelectVisitors {
       restriction => restriction.restrictionType === 'CLOSED',
     )
 
-    const allSelectedVisitorBans: Restriction[] = selectedVisitors.reduce((acc, visitor) => {
-      visitor.restrictions.forEach(restriction => {
-        acc.push(restriction)
-      })
-      return acc
-    }, [])
+    const allSelectedVisitorBans = selectedVisitors.flatMap(visitor => visitor.restrictions)
 
     const banStatus = getBanStatus(allSelectedVisitorBans)
     visitSessionData.daysUntilBanExpiry = banStatus.numDays ? banStatus.numDays : undefined
