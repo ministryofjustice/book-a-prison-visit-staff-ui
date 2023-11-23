@@ -1,10 +1,14 @@
+import { differenceInDays } from 'date-fns'
 import { VisitorListItem } from '../@types/bapv'
 import { Address, Contact, Restriction } from '../data/prisonerContactRegistryApiTypes'
 import { isAdult } from './utils'
 
-const visitorRestrictionsToShow = ['BAN', 'PREINF', 'RESTRICTED', 'CLOSED', 'NONCON']
+type BanStatus = { isBanned: boolean; numDays?: number }
 
-const buildVisitorListItem = (visitor: Contact): VisitorListItem => {
+const visitorRestrictionsToShow = ['BAN', 'PREINF', 'RESTRICTED', 'CLOSED', 'NONCON']
+const MAX_BOOKING_DAYS_AHEAD = 28
+
+export const buildVisitorListItem = (visitor: Contact): VisitorListItem => {
   return {
     personId: visitor.personId,
     name: `${visitor.firstName} ${visitor.lastName}`,
@@ -13,7 +17,7 @@ const buildVisitorListItem = (visitor: Contact): VisitorListItem => {
     relationshipDescription: visitor.relationshipDescription,
     address: getAddressToDisplay(visitor.addresses),
     restrictions: getRestrictionsToDisplay(visitor.restrictions),
-    banned: isBanned(visitor.restrictions),
+    banned: getBanStatus(visitor.restrictions).isBanned,
   }
 }
 
@@ -46,8 +50,27 @@ const getRestrictionsToDisplay = (restrictions: Restriction[]): Restriction[] =>
   return restrictions.filter(restriction => visitorRestrictionsToShow.includes(restriction.restrictionType))
 }
 
-const isBanned = (restrictions: Restriction[]): boolean => {
-  return !!restrictions.find(restriction => restriction.restrictionType === 'BAN')
-}
+export const getBanStatus = (restrictions: Restriction[]): BanStatus => {
+  const banned = restrictions.filter(restriction => restriction.restrictionType === 'BAN')
 
-export default buildVisitorListItem
+  if (banned.length === 0) {
+    return { isBanned: false }
+  }
+  // if there is a ban with no end date no further checks needed
+  if (banned.find(ban => ban.expiryDate === undefined)) {
+    return { isBanned: true }
+  }
+
+  // determine ban status:
+  //   numDays = when longest ban expires
+  //   isBanned = if ban expires within max booking window
+  return banned.reduce<BanStatus>(
+    (acc, { expiryDate }) => {
+      const banExpiresInDays = differenceInDays(new Date(expiryDate), new Date()) + 1
+      acc.numDays = Math.max(banExpiresInDays, acc.numDays ?? 0)
+      acc.isBanned = acc.numDays > MAX_BOOKING_DAYS_AHEAD
+      return acc
+    },
+    { isBanned: undefined },
+  )
+}

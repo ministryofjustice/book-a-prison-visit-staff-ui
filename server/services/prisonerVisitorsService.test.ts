@@ -44,7 +44,7 @@ describe('Prisoner visitor service', () => {
               restrictionType: 'BAN',
               restrictionTypeDescription: 'Banned',
               startDate: '2022-01-01',
-              expiryDate: '2022-07-31',
+              expiryDate: '2022-07-31', // ban expired so should shown as non-banned
               globalRestriction: false,
               comment: 'Ban details',
             },
@@ -197,7 +197,7 @@ describe('Prisoner visitor service', () => {
               globalRestriction: false,
             },
           ],
-          banned: true,
+          banned: false,
         },
         {
           personId: 4322,

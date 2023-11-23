@@ -1,6 +1,6 @@
 import { VisitorListItem } from '../@types/bapv'
 import { Contact } from '../data/prisonerContactRegistryApiTypes'
-import buildVisitorListItem from '../utils/visitorUtils'
+import { buildVisitorListItem } from '../utils/visitorUtils'
 import { HmppsAuthClient, PrisonerContactRegistryApiClient, RestClientBuilder } from '../data'
 
 export default class PrisonerVisitorsService {

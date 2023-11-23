@@ -224,6 +224,51 @@ testJourneys.forEach(journey => {
           })
       })
 
+      it('should show warning message when visitor has an expiring ban', () => {
+        // example visitor data for a visitor ban
+        visitSessionData.visitors = [
+          {
+            personId: 4323,
+            name: 'Ted Smith',
+            dateOfBirth: '1968-07-28',
+            adult: true,
+            relationshipDescription: 'Father',
+            address: '1st listed address',
+            restrictions: [
+              {
+                restrictionType: 'BAN',
+                restrictionTypeDescription: 'Banned',
+                startDate: '2022-01-01',
+                expiryDate: '2023-01-14',
+                comment: 'Ban details',
+              },
+            ],
+            banned: false,
+          },
+        ]
+        // this is added to the visitSessionData on the select visitors page, matches the expiry date of the visitor ban
+        visitSessionData.daysUntilBanExpiry = 3
+
+        sessionApp = appWithAllRoutes({
+          services: { visitSessionsService },
+          sessionData: {
+            visitSessionData,
+          } as SessionData,
+        })
+
+        return request(sessionApp)
+          .get(`${journey.urlPrefix}/select-date-and-time`)
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('h1').text().trim()).toBe('Select date and time of visit')
+            expect($('[data-test="banned-visitor-reason"]').text().trim()).toContain(
+              'A selected visitor is banned. Time slots during the period of the ban are not shown',
+            )
+          })
+      })
+
       it('should render the available sessions list with the slot in the session selected', () => {
         visitSessionData.visitSlot = {
           id: '3',

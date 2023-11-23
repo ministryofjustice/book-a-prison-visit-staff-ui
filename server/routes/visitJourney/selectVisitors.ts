@@ -6,6 +6,7 @@ import PrisonerProfileService from '../../services/prisonerProfileService'
 import PrisonerVisitorsService from '../../services/prisonerVisitorsService'
 import { getFlashFormValues } from '../visitorUtils'
 import getUrlPrefix from './visitJourneyUtils'
+import { getBanStatus } from '../../utils/visitorUtils'
 
 export default class SelectVisitors {
   constructor(
@@ -95,6 +96,11 @@ export default class SelectVisitors {
     const closedVisitPrisoner = visitSessionData.prisoner.restrictions.some(
       restriction => restriction.restrictionType === 'CLOSED',
     )
+
+    const allSelectedVisitorBans = selectedVisitors.flatMap(visitor => visitor.restrictions)
+
+    const banStatus = getBanStatus(allSelectedVisitorBans)
+    visitSessionData.daysUntilBanExpiry = banStatus.numDays ? banStatus.numDays : undefined
 
     return !closedVisitVisitors && closedVisitPrisoner
       ? res.redirect(`${urlPrefix}/visit-type`)

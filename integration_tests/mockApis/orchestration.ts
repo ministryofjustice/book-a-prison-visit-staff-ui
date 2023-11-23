@@ -288,15 +288,17 @@ export default {
     prisonId,
     offenderNo,
     visitSessions,
+    min = '2',
   }: {
     prisonId: string
     offenderNo: string
     visitSessions: VisitSession[]
+    min: string
   }): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',
-        url: `/orchestration/visit-sessions?prisonId=${prisonId}&prisonerId=${offenderNo}`,
+        url: `/orchestration/visit-sessions?prisonId=${prisonId}&prisonerId=${offenderNo}&min=${min}`,
       },
       response: {
         status: 200,

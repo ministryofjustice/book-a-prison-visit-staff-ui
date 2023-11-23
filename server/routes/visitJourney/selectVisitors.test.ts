@@ -531,6 +531,24 @@ testJourneys.forEach(journey => {
       const visitorList: { visitors: VisitorListItem[] } = {
         visitors: [
           {
+            personId: 4000,
+            name: 'Keith Daniels',
+            dateOfBirth: '1980-02-28',
+            adult: true,
+            relationshipDescription: 'Brother',
+            address: 'Not entered',
+            restrictions: [
+              {
+                restrictionType: 'BAN',
+                restrictionTypeDescription: 'Banned',
+                startDate: '2022-01-01',
+                expiryDate: '2023-12-14',
+                comment: 'Ban details',
+              },
+            ],
+            banned: false,
+          },
+          {
             personId: 4321,
             name: 'Jeanette Smith',
             dateOfBirth: '1986-07-28',
@@ -762,6 +780,52 @@ testJourneys.forEach(journey => {
           expect(adultVisitors.adults).toEqual(returnAdult)
           expect(visitSessionData.visitors).toEqual(returnAdult)
           expect(visitSessionData.visitRestriction).toBe('OPEN')
+        })
+    })
+
+    it('should save to session and add earliestDate to visitSessionData', () => {
+      const fakeDate = new Date('2023-12-01')
+      jest.useFakeTimers({ advanceTimers: true, now: new Date(fakeDate) })
+
+      const returnAdult: VisitorListItem = {
+        personId: 4000,
+        name: 'Keith Daniels',
+        dateOfBirth: '1980-02-28',
+        adult: true,
+        relationshipDescription: 'Brother',
+        address: 'Not entered',
+        restrictions: [
+          {
+            restrictionType: 'BAN',
+            restrictionTypeDescription: 'Banned',
+            startDate: '2022-01-01',
+            expiryDate: '2023-12-14',
+            comment: 'Ban details',
+          },
+        ],
+        banned: false,
+      }
+
+      const returnChild: VisitorListItem = {
+        personId: 4324,
+        name: 'Anne Smith',
+        dateOfBirth: '2018-03-02',
+        adult: false,
+        relationshipDescription: 'Niece',
+        address: 'Not entered',
+        restrictions: [],
+        banned: false,
+      }
+
+      return request(sessionApp)
+        .post(`${journey.urlPrefix}/select-visitors`)
+        .send('visitors=4324&visitors=4000')
+        .expect(302)
+        .expect('location', `${journey.urlPrefix}/select-date-and-time`)
+        .expect(() => {
+          expect(adultVisitors.adults).toEqual([returnAdult])
+          expect(visitSessionData.visitors).toEqual([returnAdult, returnChild])
+          expect(visitSessionData.daysUntilBanExpiry).toBe(13)
         })
     })
 

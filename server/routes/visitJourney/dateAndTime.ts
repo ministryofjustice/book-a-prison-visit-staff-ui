@@ -15,17 +15,33 @@ export default class DateAndTime {
   ) {}
 
   async get(req: Request, res: Response): Promise<void> {
+    let daysUntilVisitStart = 2
+
     const isUpdate = this.mode === 'update'
     const { prisonId } = req.session.selectedEstablishment
     const { visitSessionData } = req.session
+
+    const warningMessages: { id: string; message: string }[] = []
+
+    if (visitSessionData.daysUntilBanExpiry) {
+      // numberOfDays is the number of days between the ban expiry and the current date
+      if (visitSessionData.daysUntilBanExpiry > daysUntilVisitStart) {
+        daysUntilVisitStart = visitSessionData.daysUntilBanExpiry
+        warningMessages.push({
+          id: 'banned-visitor-reason',
+          message: 'A selected visitor is banned. Time slots during the period of the ban are not shown.',
+        })
+      }
+    }
+
     const { slotsList, whereaboutsAvailable } = await this.visitSessionsService.getVisitSessions({
       username: res.locals.user.username,
       offenderNo: visitSessionData.prisoner.offenderNo,
       visitRestriction: visitSessionData.visitRestriction,
       prisonId,
+      minNumberOfDays: daysUntilVisitStart.toString(),
     })
 
-    let restrictionChangeMessage = ''
     let matchingSlot
     let showSlotChangeMessage = false
 
@@ -50,8 +66,13 @@ export default class DateAndTime {
       showSlotChangeMessage = !matchingSlot
 
       if (visitSessionData.visitRestriction !== visitSessionData.originalVisitSlot.visitRestriction) {
-        restrictionChangeMessage = 'The visit type has changed from '
-        restrictionChangeMessage += visitSessionData.visitRestriction === 'OPEN' ? 'closed to open.' : 'open to closed.'
+        let messageFullString = 'The visit type has changed from '
+        messageFullString += visitSessionData.visitRestriction === 'OPEN' ? 'closed to open.' : 'open to closed.'
+
+        warningMessages.push({
+          id: 'restriction-change-reason',
+          message: messageFullString,
+        })
       }
     }
 
@@ -87,7 +108,7 @@ export default class DateAndTime {
       formValues,
       slotsPresent,
       showSlotChangeMessage,
-      restrictionChangeMessage,
+      warningMessages,
       originalVisitSlot,
       urlPrefix: getUrlPrefix(isUpdate, visitSessionData.visitReference),
     })

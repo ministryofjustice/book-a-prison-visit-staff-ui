@@ -193,7 +193,9 @@ describe('Views - Date and time of visit', () => {
     viewContext = {
       prisonerName: 'John Smith',
       visitRestriction: 'CLOSED',
-      restrictionChangeMessage: 'The visit type has changed from open to closed.',
+      warningMessages: [
+        { id: 'restriction-change-reason', message: 'The visit type has changed from open to closed.' },
+      ],
     }
     const $ = cheerio.load(compiledTemplate.render(viewContext))
 

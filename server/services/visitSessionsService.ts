@@ -19,16 +19,18 @@ export default class VisitSessionsService {
     offenderNo,
     prisonId,
     visitRestriction,
+    minNumberOfDays,
   }: {
     username: string
     offenderNo: string
     prisonId: string
     visitRestriction: VisitSessionData['visitRestriction']
+    minNumberOfDays: string
   }): Promise<{ slotsList: VisitSlotList; whereaboutsAvailable: boolean }> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
     const whereaboutsApiClient = this.whereaboutsApiClientFactory(token)
-    const visitSessions = await orchestrationApiClient.getVisitSessions(offenderNo, prisonId)
+    const visitSessions = await orchestrationApiClient.getVisitSessions(offenderNo, prisonId, minNumberOfDays)
 
     let earliestStartTime: Date = new Date()
     let latestEndTime: Date = new Date()
