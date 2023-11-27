@@ -932,10 +932,10 @@ export interface components {
       comments?: string
     }
     PageAttendanceHistoryDto: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['AttendanceHistoryDto'][]
@@ -945,8 +945,8 @@ export interface components {
       first?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      last?: boolean
       pageable?: components['schemas']['PageableObject']
+      last?: boolean
       empty?: boolean
     }
     PageableObject: {
@@ -957,8 +957,8 @@ export interface components {
       pageSize?: number
       /** Format: int32 */
       pageNumber?: number
-      paged?: boolean
       unpaged?: boolean
+      paged?: boolean
     }
     SortObject: {
       empty?: boolean

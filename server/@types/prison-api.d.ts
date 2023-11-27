@@ -619,11 +619,6 @@ export interface paths {
   }
   '/api/bookings/{bookingId}/appointments': {
     /**
-     * All scheduled appointments for offender.
-     * @description All scheduled appointments for offender.
-     */
-    get: operations['getBookingsBookingIdAppointments']
-    /**
      * Create appointment for offender.
      * @description Create appointment for offender.
      */
@@ -965,6 +960,10 @@ export interface paths {
   '/api/service-prisons/{serviceCode}': {
     /** Retrieve a list of prisons switched on for the service code */
     get: operations['getServicePrisons']
+  }
+  '/api/schedules/{prisonerNumber}/scheduled-transfers': {
+    /** @description <p>This endpoint uses the REPLICA database.</p> */
+    get: operations['getScheduledTransfersForPrisoner']
   }
   '/api/schedules/{agencyId}/suspended-activities-by-date-range': {
     /**
@@ -1375,14 +1374,14 @@ export interface paths {
   '/api/locations/{locationId}/inmates': {
     /**
      * List of offenders at location.
-     * @description List of offenders at location.<p>This endpoint uses the REPLICA database.</p>
+     * @description Requires role VIEW_PRISONER_DATA and a user in the token.<p>This endpoint uses the REPLICA database.</p>
      */
     get: operations['getOffendersAtLocation']
   }
   '/api/locations/description/{locationPrefix}/inmates': {
     /**
      * List of offenders at location.
-     * @description List of offenders at location.<p>This endpoint uses the REPLICA database.</p>
+     * @description Requires role VIEW_PRISONER_DATA and a user in the token.<p>This endpoint uses the REPLICA database.</p>
      */
     get: operations['getOffendersAtLocationDescription']
   }
@@ -1458,14 +1457,21 @@ export interface paths {
     get: operations['getCourtDateResults_1']
   }
   '/api/cell/{locationId}/history': {
-    /** @description <p>This endpoint uses the REPLICA database.</p> */
+    /**
+     * Get occupancy history of a location.
+     * @description Requires role MAINTAIN_CELL_MOVEMENTS.<p>This endpoint uses the REPLICA database.</p>
+     */
     get: operations['getBedAssignmentsHistory']
   }
   '/api/cell/{locationId}/attributes': {
+    /** Get details of a location. */
     get: operations['getCellAttributes']
   }
   '/api/cell/{agencyId}/history/{assignmentDate}': {
-    /** @description <p>This endpoint uses the REPLICA database.</p> */
+    /**
+     * Get occupancy of locations in a prison on a date.
+     * @description Requires agency to be in caseload or role MAINTAIN_CELL_MOVEMENTS.<p>This endpoint uses the REPLICA database.</p>
+     */
     get: operations['getBedAssignmentsHistoryByDateForAgency']
   }
   '/api/case-notes/events': {
@@ -1481,20 +1487,6 @@ export interface paths {
      * @description Offender detail.
      */
     get: operations['getOffenderBooking']
-  }
-  '/api/bookings/{bookingId}/visits': {
-    /**
-     * All scheduled visits for offender.
-     * @description All scheduled visits for offender.
-     */
-    get: operations['getBookingVisits']
-  }
-  '/api/bookings/{bookingId}/visits/today': {
-    /**
-     * Today's scheduled visits for offender.
-     * @description Today's scheduled visits for offender.
-     */
-    get: operations['getBookingVisitsForToday']
   }
   '/api/bookings/{bookingId}/visits/summary': {
     /**
@@ -1681,27 +1673,6 @@ export interface paths {
      */
     get: operations['getAssessmentByCode']
   }
-  '/api/bookings/{bookingId}/appointments/today': {
-    /**
-     * Today's scheduled appointments for offender.
-     * @description Today's scheduled appointments for offender.
-     */
-    get: operations['getBookingAppointmentsForToday']
-  }
-  '/api/bookings/{bookingId}/appointments/thisWeek': {
-    /**
-     * Scheduled appointments for offender for coming week (from current day).
-     * @description Scheduled appointments for offender for coming week (from current day).
-     */
-    get: operations['getBookingAppointmentsForThisWeek']
-  }
-  '/api/bookings/{bookingId}/appointments/nextWeek': {
-    /**
-     * Scheduled appointments for offender for following week.
-     * @description Scheduled appointments for offender for following week.
-     */
-    get: operations['getBookingAppointmentsForNextWeek']
-  }
   '/api/bookings/{bookingId}/aliases': {
     /**
      * Offender aliases.
@@ -1729,13 +1700,6 @@ export interface paths {
      * @description All scheduled activities for offender.<p>This endpoint uses the REPLICA database.</p>
      */
     get: operations['getBookingActivities']
-  }
-  '/api/bookings/{bookingId}/activities/today': {
-    /**
-     * Today's scheduled activities for offender.
-     * @description Today's scheduled activities for offender.<p>This endpoint uses the REPLICA database.</p>
-     */
-    get: operations['getBookingActivitiesForToday']
   }
   '/api/bookings/v2': {
     /**
@@ -7147,6 +7111,37 @@ export interface components {
        * @example 30
        */
       hoursPerWeek?: number
+    }
+    /** @description Prisoner Prison Schedule */
+    PrisonerPrisonSchedule: {
+      /** @description Offender number (e.g. NOMS Number) */
+      offenderNo: string
+      /** @description Offender first name */
+      firstName: string
+      /** @description Offender last name */
+      lastName: string
+      /** @description Event code */
+      event: string
+      /** @description Event type, e.g. VISIT, APP, PRISON_ACT */
+      eventType: string
+      /** @description Description of event code */
+      eventDescription: string
+      /** @description Location of the event */
+      eventLocation: string
+      /** @description The event's status. Includes 'CANC', meaning cancelled for 'VISIT' */
+      eventStatus: string
+      /** @description Comment */
+      comment: string
+      /**
+       * @description Date and time at which event starts
+       * @example 2021-07-05T10:35:17
+       */
+      startTime: string
+      /**
+       * @description Date and time at which event ends
+       * @example 2021-07-05T10:35:17
+       */
+      endTime?: string
     }
     /** @description Scheduled appointment */
     ScheduledAppointmentDto: {
@@ -15008,42 +15003,6 @@ export interface operations {
     }
   }
   /**
-   * All scheduled appointments for offender.
-   * @description All scheduled appointments for offender.
-   */
-  getBookingsBookingIdAppointments: {
-    parameters: {
-      query?: {
-        /** @description Returned appointments must be scheduled on or after this date (in YYYY-MM-DD format). */
-        fromDate?: string
-        /** @description Returned appointments must be scheduled on or before this date (in YYYY-MM-DD format). */
-        toDate?: string
-      }
-      header?: {
-        /** @description Requested offset of first record in returned collection of appointment records. */
-        'Page-Offset'?: number
-        /** @description Requested limit to number of appointment records returned. */
-        'Page-Limit'?: number
-        /** @description Comma separated list of one or more of the following fields - <b>eventDate, startTime, endTime, eventLocation</b> */
-        'Sort-Fields'?: string
-        /** @description Sort order (ASC or DESC) - defaults to ASC. */
-        'Sort-Order'?: 'ASC' | 'DESC'
-      }
-      path: {
-        /** @description The offender booking id */
-        bookingId: number
-      }
-    }
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['ScheduledEvent'][]
-        }
-      }
-    }
-  }
-  /**
    * Create appointment for offender.
    * @description Create appointment for offender.
    */
@@ -16959,6 +16918,22 @@ export interface operations {
       500: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  /** @description <p>This endpoint uses the REPLICA database.</p> */
+  getScheduledTransfersForPrisoner: {
+    parameters: {
+      path: {
+        prisonerNumber: string
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          'application/json': components['schemas']['PrisonerPrisonSchedule'][]
         }
       }
     }
@@ -19414,7 +19389,7 @@ export interface operations {
   }
   /**
    * List of offenders at location.
-   * @description List of offenders at location.<p>This endpoint uses the REPLICA database.</p>
+   * @description Requires role VIEW_PRISONER_DATA and a user in the token.<p>This endpoint uses the REPLICA database.</p>
    */
   getOffendersAtLocation: {
     parameters: {
@@ -19462,7 +19437,7 @@ export interface operations {
   }
   /**
    * List of offenders at location.
-   * @description List of offenders at location.<p>This endpoint uses the REPLICA database.</p>
+   * @description Requires role VIEW_PRISONER_DATA and a user in the token.<p>This endpoint uses the REPLICA database.</p>
    */
   getOffendersAtLocationDescription: {
     parameters: {
@@ -19936,7 +19911,10 @@ export interface operations {
       }
     }
   }
-  /** @description <p>This endpoint uses the REPLICA database.</p> */
+  /**
+   * Get occupancy history of a location.
+   * @description Requires role MAINTAIN_CELL_MOVEMENTS.<p>This endpoint uses the REPLICA database.</p>
+   */
   getBedAssignmentsHistory: {
     parameters: {
       query: {
@@ -19983,6 +19961,7 @@ export interface operations {
       }
     }
   }
+  /** Get details of a location. */
   getCellAttributes: {
     parameters: {
       path: {
@@ -20017,7 +19996,10 @@ export interface operations {
       }
     }
   }
-  /** @description <p>This endpoint uses the REPLICA database.</p> */
+  /**
+   * Get occupancy of locations in a prison on a date.
+   * @description Requires agency to be in caseload or role MAINTAIN_CELL_MOVEMENTS.<p>This endpoint uses the REPLICA database.</p>
+   */
   getBedAssignmentsHistoryByDateForAgency: {
     parameters: {
       path: {
@@ -20124,104 +20106,6 @@ export interface operations {
       200: {
         content: {
           'application/json': components['schemas']['InmateDetail']
-        }
-      }
-      /** @description Invalid request. */
-      400: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Requested resource not found. */
-      404: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Unrecoverable error occurred whilst processing request. */
-      500: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  /**
-   * All scheduled visits for offender.
-   * @description All scheduled visits for offender.
-   */
-  getBookingVisits: {
-    parameters: {
-      query?: {
-        /** @description Returned visits must be scheduled on or after this date (in YYYY-MM-DD format). */
-        fromDate?: string
-        /** @description Returned visits must be scheduled on or before this date (in YYYY-MM-DD format). */
-        toDate?: string
-      }
-      header?: {
-        /** @description Requested offset of first record in returned collection of visit records. */
-        'Page-Offset'?: number
-        /** @description Requested limit to number of visit records returned. */
-        'Page-Limit'?: number
-        /** @description Comma separated list of one or more of the following fields - <b>eventDate, startTime, endTime, eventLocation</b> */
-        'Sort-Fields'?: string
-        /** @description Sort order (ASC or DESC) - defaults to ASC. */
-        'Sort-Order'?: 'ASC' | 'DESC'
-      }
-      path: {
-        /** @description The offender booking id */
-        bookingId: number
-      }
-    }
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['ScheduledEvent'][]
-        }
-      }
-      /** @description Invalid request. */
-      400: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Requested resource not found. */
-      404: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Unrecoverable error occurred whilst processing request. */
-      500: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  /**
-   * Today's scheduled visits for offender.
-   * @description Today's scheduled visits for offender.
-   */
-  getBookingVisitsForToday: {
-    parameters: {
-      header?: {
-        /** @description Comma separated list of one or more of the following fields - <b>eventDate, startTime, endTime, eventLocation</b> */
-        'Sort-Fields'?: string
-        /** @description Sort order (ASC or DESC) - defaults to ASC. */
-        'Sort-Order'?: 'ASC' | 'DESC'
-      }
-      path: {
-        /** @description The offender booking id */
-        bookingId: number
-      }
-    }
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['ScheduledEvent'][]
         }
       }
       /** @description Invalid request. */
@@ -21342,138 +21226,6 @@ export interface operations {
     }
   }
   /**
-   * Today's scheduled appointments for offender.
-   * @description Today's scheduled appointments for offender.
-   */
-  getBookingAppointmentsForToday: {
-    parameters: {
-      header?: {
-        /** @description Comma separated list of one or more of the following fields - <b>eventDate, startTime, endTime, eventLocation</b> */
-        'Sort-Fields'?: string
-        /** @description Sort order (ASC or DESC) - defaults to ASC. */
-        'Sort-Order'?: 'ASC' | 'DESC'
-      }
-      path: {
-        /** @description The offender booking id */
-        bookingId: number
-      }
-    }
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['ScheduledEvent'][]
-        }
-      }
-      /** @description Invalid request. */
-      400: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Requested resource not found. */
-      404: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Unrecoverable error occurred whilst processing request. */
-      500: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  /**
-   * Scheduled appointments for offender for coming week (from current day).
-   * @description Scheduled appointments for offender for coming week (from current day).
-   */
-  getBookingAppointmentsForThisWeek: {
-    parameters: {
-      header?: {
-        /** @description Comma separated list of one or more of the following fields - <b>eventDate, startTime, endTime, eventLocation</b> */
-        'Sort-Fields'?: string
-        /** @description Sort order (ASC or DESC) - defaults to ASC. */
-        'Sort-Order'?: 'ASC' | 'DESC'
-      }
-      path: {
-        /** @description The offender booking id */
-        bookingId: number
-      }
-    }
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['ScheduledEvent'][]
-        }
-      }
-      /** @description Invalid request. */
-      400: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Requested resource not found. */
-      404: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Unrecoverable error occurred whilst processing request. */
-      500: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  /**
-   * Scheduled appointments for offender for following week.
-   * @description Scheduled appointments for offender for following week.
-   */
-  getBookingAppointmentsForNextWeek: {
-    parameters: {
-      header?: {
-        /** @description Comma separated list of one or more of the following fields - <b>eventDate, startTime, endTime, eventLocation</b> */
-        'Sort-Fields'?: string
-        /** @description Sort order (ASC or DESC) - defaults to ASC. */
-        'Sort-Order'?: 'ASC' | 'DESC'
-      }
-      path: {
-        /** @description The offender booking id */
-        bookingId: number
-      }
-    }
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['ScheduledEvent'][]
-        }
-      }
-      /** @description Invalid request. */
-      400: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Requested resource not found. */
-      404: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Unrecoverable error occurred whilst processing request. */
-      500: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  /**
    * Offender aliases.
    * @description Offender aliases.
    */
@@ -21644,50 +21396,6 @@ export interface operations {
         'Page-Offset'?: number
         /** @description Requested limit to number of activity records returned. */
         'Page-Limit'?: number
-        /** @description Comma separated list of one or more of the following fields - <b>eventDate, startTime, endTime, eventLocation</b> */
-        'Sort-Fields'?: string
-        /** @description Sort order (ASC or DESC) - defaults to ASC. */
-        'Sort-Order'?: 'ASC' | 'DESC'
-      }
-      path: {
-        /** @description The offender booking id */
-        bookingId: number
-      }
-    }
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['ScheduledEvent'][]
-        }
-      }
-      /** @description Invalid request. */
-      400: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Requested resource not found. */
-      404: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Unrecoverable error occurred whilst processing request. */
-      500: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  /**
-   * Today's scheduled activities for offender.
-   * @description Today's scheduled activities for offender.<p>This endpoint uses the REPLICA database.</p>
-   */
-  getBookingActivitiesForToday: {
-    parameters: {
-      header?: {
         /** @description Comma separated list of one or more of the following fields - <b>eventDate, startTime, endTime, eventLocation</b> */
         'Sort-Fields'?: string
         /** @description Sort order (ASC or DESC) - defaults to ASC. */
