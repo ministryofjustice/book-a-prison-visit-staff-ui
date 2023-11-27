@@ -153,3 +153,5 @@ export type VisitsReviewListItem = {
   type: NotificationType
   visitDates: string[]
 }
+
+export type FilterField = { id: string; label: string; items: { label: string; value: string; checked: boolean }[] }
