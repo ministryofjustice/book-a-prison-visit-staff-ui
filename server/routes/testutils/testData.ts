@@ -3,6 +3,7 @@ import {
   NotificationCount,
   NotificationGroup,
   NotificationVisitInfo,
+  PrisonDto,
   PrisonerProfile,
   SessionCapacity,
   SessionSchedule,
@@ -307,6 +308,21 @@ export default class TestData {
   } = {}): Record<string, string> => prisons
 
   static supportedPrisonIds = ({ prisonIds = ['HEI', 'BLI'] } = {}): string[] => prisonIds
+
+  static prisonDto = ({
+    code = 'BLI',
+    active = true,
+    policyNoticeDaysMax = 28,
+    policyNoticeDaysMin = 3,
+    excludeDates = [],
+  }: Partial<PrisonDto> = {}): PrisonDto =>
+    ({
+      code,
+      active,
+      policyNoticeDaysMax,
+      policyNoticeDaysMin,
+      excludeDates,
+    }) as PrisonDto
 
   static supportTypes = ({
     supportTypes = [

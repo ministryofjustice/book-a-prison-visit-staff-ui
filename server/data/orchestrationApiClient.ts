@@ -8,6 +8,7 @@ import {
   NotificationCount,
   NotificationGroup,
   PageVisitDto,
+  PrisonDto,
   PrisonerProfile,
   ReserveVisitSlotDto,
   SessionCapacity,
@@ -214,6 +215,12 @@ export default class OrchestrationApiClient {
   async getSupportedPrisonIds(): Promise<string[]> {
     return this.restClient.get({
       path: '/config/prisons/supported',
+    })
+  }
+
+  async getPrison(prisonCode: string): Promise<PrisonDto> {
+    return this.restClient.get({
+      path: `/config/prisons/prison/${prisonCode}`,
     })
   }
 

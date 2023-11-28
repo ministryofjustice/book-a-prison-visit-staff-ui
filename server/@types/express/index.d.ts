@@ -1,6 +1,5 @@
 import { SupportType } from '../../data/orchestrationApiTypes'
-import { VisitorListItem, VisitSessionData } from '../bapv'
-import { PrisonName } from '../../data/prisonRegisterApiTypes'
+import { VisitorListItem, VisitSessionData, Prison } from '../bapv'
 
 export default {}
 
@@ -14,7 +13,7 @@ declare module 'express-session' {
     adultVisitors: { adults: VisitorListItem[] }
     slotsList: VisitSlotList
     visitSessionData: VisitSessionData
-    selectedEstablishment: PrisonName
+    selectedEstablishment: Prison
   }
 }
 
