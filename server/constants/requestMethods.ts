@@ -1,18 +1,15 @@
 import { ApplicationMethodType } from '../data/orchestrationApiTypes'
 
-export const requestMethodsBooking: Readonly<Partial<Record<ApplicationMethodType, string>>> = {
-  PHONE: 'Phone call',
-  WEBSITE: 'GOV.UK',
-  EMAIL: 'Email',
-  IN_PERSON: 'In person',
-  BY_PRISONER: 'By the prisoner',
-}
-
 export const requestMethodsCancellation: Readonly<Partial<Record<ApplicationMethodType, string>>> = {
   PHONE: 'Phone call',
   WEBSITE: 'GOV.UK',
   EMAIL: 'Email',
   IN_PERSON: 'In person',
+}
+
+export const requestMethodsBooking: Readonly<Partial<Record<ApplicationMethodType, string>>> = {
+  ...requestMethodsCancellation,
+  BY_PRISONER: 'By the prisoner',
 }
 
 export const requestMethodDescriptions: Readonly<Record<ApplicationMethodType, string>> = {
