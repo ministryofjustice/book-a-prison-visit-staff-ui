@@ -345,7 +345,14 @@ export interface components {
        * @description application method
        * @enum {string}
        */
-      applicationMethodType: 'PHONE' | 'WEBSITE' | 'EMAIL' | 'IN_PERSON' | 'NOT_KNOWN' | 'NOT_APPLICABLE'
+      applicationMethodType:
+        | 'PHONE'
+        | 'WEBSITE'
+        | 'EMAIL'
+        | 'IN_PERSON'
+        | 'NOT_KNOWN'
+        | 'NOT_APPLICABLE'
+        | 'BY_PRISONER'
     }
     /**
      * @description Contact Phone Number
@@ -416,7 +423,14 @@ export interface components {
        * @description application method
        * @enum {string}
        */
-      applicationMethodType: 'PHONE' | 'WEBSITE' | 'EMAIL' | 'IN_PERSON' | 'NOT_KNOWN' | 'NOT_APPLICABLE'
+      applicationMethodType:
+        | 'PHONE'
+        | 'WEBSITE'
+        | 'EMAIL'
+        | 'IN_PERSON'
+        | 'NOT_KNOWN'
+        | 'NOT_APPLICABLE'
+        | 'BY_PRISONER'
     }
     DlqMessage: {
       body: {
@@ -450,7 +464,14 @@ export interface components {
        * @description What was the application method for this event
        * @enum {string}
        */
-      applicationMethodType: 'PHONE' | 'WEBSITE' | 'EMAIL' | 'IN_PERSON' | 'NOT_KNOWN' | 'NOT_APPLICABLE'
+      applicationMethodType:
+        | 'PHONE'
+        | 'WEBSITE'
+        | 'EMAIL'
+        | 'IN_PERSON'
+        | 'NOT_KNOWN'
+        | 'NOT_APPLICABLE'
+        | 'BY_PRISONER'
       /**
        * @description Event actioned by - user id
        * @example AB12345A
@@ -497,16 +518,16 @@ export interface components {
       totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      first?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['VisitDto'][]
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject']
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
-      first?: boolean
+      pageable?: components['schemas']['PageableObject']
       last?: boolean
       empty?: boolean
     }
@@ -515,15 +536,14 @@ export interface components {
       offset?: number
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
-      pageNumber?: number
-      /** Format: int32 */
       pageSize?: number
+      /** Format: int32 */
+      pageNumber?: number
       paged?: boolean
       unpaged?: boolean
     }
     SortObject: {
       empty?: boolean
-      unsorted?: boolean
       sorted?: boolean
     }
     OrchestrationNotificationGroupDto: {

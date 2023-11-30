@@ -943,9 +943,9 @@ export interface components {
       number?: number
       sort?: components['schemas']['SortObject']
       first?: boolean
+      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
-      last?: boolean
       pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
