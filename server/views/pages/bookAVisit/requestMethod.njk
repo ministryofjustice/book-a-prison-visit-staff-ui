@@ -15,7 +15,7 @@
       {% include "partials/errorSummary.njk" %}
     
       {% set requestMethods = [] %}
-      {% for key, text in requestMethodOptions %}
+      {% for key, text in requestMethodsBooking %}
         {% set requestMethods = (requestMethods.push(
           {
             value: key,

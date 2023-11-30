@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express'
 import logger from '../../../logger'
 import config from '../../config'
-import { requestMethodOptions } from '../../constants/requestMethods'
+import { requestMethodsBooking } from '../../constants/requestMethods'
 import AuditService from '../../services/auditService'
 import NotificationsService from '../../services/notificationsService'
 import { getSupportTypeDescriptions } from '../visitorUtils'
@@ -34,7 +34,7 @@ export default class CheckYourBooking {
       visitRestriction: visitSessionData.visitRestriction,
       visitors: visitSessionData.visitors,
       additionalSupport,
-      requestMethod: requestMethodOptions[visitSessionData.requestMethod],
+      requestMethod: requestMethodsBooking[visitSessionData.requestMethod],
       urlPrefix: getUrlPrefix(isUpdate, visitSessionData.visitReference),
     })
   }
