@@ -200,8 +200,8 @@ describe('Visit notifications service', () => {
 
       it('should filter visit review list data using applied filter - single filter, multiple values', async () => {
         const appliedFilters = {
-          bookedBy: ['user1', 'user3'],
-          type: <string[]>[],
+          bookedBy: <string[]>[],
+          type: ['NON_ASSOCIATION_EVENT', 'PRISONER_RELEASED_EVENT'],
         }
 
         const listItems: VisitsReviewListItem[] = [
@@ -228,20 +228,13 @@ describe('Visit notifications service', () => {
         expect(result.visitsReviewList).toStrictEqual(listItems)
       })
 
-      it('should filter visit review list data using applied filter - two filters', async () => {
+      it('should filter visit review list data using applied filter - two filters, with matches', async () => {
         const appliedFilters = {
-          bookedBy: ['user1'],
+          bookedBy: ['user2'],
           type: ['PRISONER_RELEASED_EVENT'],
         }
 
         const listItems: VisitsReviewListItem[] = [
-          {
-            bookedByNames: ['User One', 'User Two'],
-            prisonerNumbers: ['A1234BC', 'A5678DE'],
-            reference: 'ab*cd*ef*gh',
-            type: 'NON_ASSOCIATION_EVENT',
-            visitDates: ['1 November 2023'],
-          },
           {
             bookedByNames: ['User Two', 'User Three'],
             prisonerNumbers: ['A1234BC'],
@@ -250,6 +243,21 @@ describe('Visit notifications service', () => {
             visitDates: ['1 November 2023', '1 November 2023'],
           },
         ]
+
+        orchestrationApiClient.getNotificationGroups.mockResolvedValue(notificationGroups)
+        const result = await visitNotificationsService.getVisitsReviewList('user', prisonId, appliedFilters)
+
+        expect(orchestrationApiClient.getNotificationGroups).toHaveBeenCalledWith(prisonId)
+        expect(result.visitsReviewList).toStrictEqual(listItems)
+      })
+
+      it('should filter visit review list data using applied filter - two filters, with no matches', async () => {
+        const appliedFilters = {
+          bookedBy: ['user3'],
+          type: ['NON_ASSOCIATION_EVENT'],
+        }
+
+        const listItems: VisitsReviewListItem[] = []
 
         orchestrationApiClient.getNotificationGroups.mockResolvedValue(notificationGroups)
         const result = await visitNotificationsService.getVisitsReviewList('user', prisonId, appliedFilters)
@@ -302,6 +310,7 @@ describe('Visit notifications service', () => {
 
         expect(orchestrationApiClient.getNotificationGroups).toHaveBeenCalledWith(prisonId)
         expect(result.filters).toStrictEqual(filters)
+        expect(result.visitsReviewList.length).toBe(2)
       })
 
       it('should build list filters sorted alphabetically by label - with current user first', async () => {
@@ -332,6 +341,7 @@ describe('Visit notifications service', () => {
 
         expect(orchestrationApiClient.getNotificationGroups).toHaveBeenCalledWith(prisonId)
         expect(result.filters).toStrictEqual(filters)
+        expect(result.visitsReviewList.length).toBe(2)
       })
 
       it('should build list filters with applied values checked', async () => {
@@ -366,6 +376,43 @@ describe('Visit notifications service', () => {
 
         expect(orchestrationApiClient.getNotificationGroups).toHaveBeenCalledWith(prisonId)
         expect(result.filters).toStrictEqual(filters)
+        expect(result.visitsReviewList.length).toBe(1)
+      })
+
+      it('should discard filter values that are not in the unfiltered data', async () => {
+        const user = 'user'
+        const appliedFilters = {
+          bookedBy: ['invalid-user'],
+          type: ['INVALID_EVENT'],
+          invalid: ['invalid-filter'],
+        }
+
+        const filters: FilterField[] = [
+          {
+            id: 'bookedBy',
+            label: 'Booked by',
+            items: [
+              { label: 'User A', value: 'user2', checked: false },
+              { label: 'User B', value: 'user1', checked: false },
+              { label: 'User C', value: 'user3', checked: false },
+            ],
+          },
+          {
+            id: 'type',
+            label: 'Reason',
+            items: [
+              { label: 'Prisoner released', value: 'PRISONER_RELEASED_EVENT', checked: false },
+              { label: 'Visit type changed', value: 'PRISONER_RESTRICTION_CHANGE_EVENT', checked: false },
+            ],
+          },
+        ]
+
+        orchestrationApiClient.getNotificationGroups.mockResolvedValue(notificationGroups)
+        const result = await visitNotificationsService.getVisitsReviewList(user, prisonId, appliedFilters)
+
+        expect(orchestrationApiClient.getNotificationGroups).toHaveBeenCalledWith(prisonId)
+        expect(result.filters).toStrictEqual(filters)
+        expect(result.visitsReviewList.length).toBe(2)
       })
     })
   })

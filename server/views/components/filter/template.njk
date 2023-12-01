@@ -3,6 +3,8 @@
 <section class="pac-filter-card govuk-!-margin-bottom-6" data-test="pac-filter-card">
     <form name="pac-filter-form" id="pac-filter-form" method="post">
 
+        <input type="hidden" name="_csrf" value="{{ params.csrfToken }}">
+
         {% for hidden in params.hiddenInputs %}
             <input type="hidden" id="hidden-{{ hidden.id }}" name="{{ hidden.id }}" value="{{ hidden.value }}" />
         {% endfor %}

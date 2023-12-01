@@ -2,6 +2,7 @@
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
 {%- from "govuk/components/tag/macro.njk" import govukTag -%}
+{%- from "components/filter/macro.njk" import pacFilter -%}
 
 {% set pageHeaderTitle = "Visit bookings that need review" %}
 {% set pageTitle %}
@@ -22,8 +23,6 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
 
-      {% include "partials/errorSummary.njk" %}
-
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
 
       {{ govukDetails({
@@ -36,35 +35,41 @@
         '<p>All other checks need to be done manually.</p>'
       }) }}
 
-      {% if visitsReviewList | length %}
+      {% if isAFilterApplied or visitsReviewList | length %}
+        {{ pacFilter({
+          csrfToken: csrfToken,
+          filters: filters
+        }) }}
+      {% endif %}
 
+      {% if visitsReviewList | length %}
         {% set reviewListRows = [] %}
         {% for listItem in visitsReviewList %}
           {% set reviewListRows = (reviewListRows.push([
-              {
-                attributes: { "data-test": "prisoner-number-" + loop.index },
-                html: arrayToList(listItem.prisonerNumbers)
-              },
-              {
-                attributes: { "data-test": "visit-date-" + loop.index },
-                html: arrayToList(listItem.visitDates)
-              },
-              {
-                attributes: { "data-test": "booked-by-" + loop.index },
-                html: arrayToList(listItem.bookedByNames)
-              },
-              {
-                attributes: { "data-test": "type-" + loop.index },
-                html: govukTag({
-                  text: notificationTypes[listItem.type],
-                  classes: 'notification-tag notification-tag--' + listItem.type | lower
-                })
-              },
-              {
-                attributes: { "data-test": "action-" + loop.index },
-                html: '<a href="/review/' + notificationTypePathSegments[listItem.type] + '/' + listItem.reference + '">View</a>'
-              }
-            ]), reviewListRows) %}
+            {
+              attributes: { "data-test": "prisoner-number-" + loop.index },
+              html: arrayToList(listItem.prisonerNumbers)
+            },
+            {
+              attributes: { "data-test": "visit-date-" + loop.index },
+              html: arrayToList(listItem.visitDates)
+            },
+            {
+              attributes: { "data-test": "booked-by-" + loop.index },
+              html: arrayToList(listItem.bookedByNames)
+            },
+            {
+              attributes: { "data-test": "type-" + loop.index },
+              html: govukTag({
+                text: notificationTypes[listItem.type],
+                classes: 'notification-tag notification-tag--' + listItem.type | lower
+              })
+            },
+            {
+              attributes: { "data-test": "action-" + loop.index },
+              html: '<a href="/review/' + notificationTypePathSegments[listItem.type] + '/' + listItem.reference + '">View</a>'
+            }
+          ]), reviewListRows) %}
         {% endfor %}
 
         {{ govukTable({
@@ -89,9 +94,19 @@
           rows: reviewListRows
         }) }}
 
-      {% else %}
-        <p data-test="no-bookings">There are no bookings for {{ prisonName }} that need review.</p>
+      {% endif %}
+
+      {% if visitsReviewList | length == 0 %}
+        {% if isAFilterApplied  %}
+          <p data-test="no-bookings-for-filters">There are no bookings to review for {{ prisonName }} that match the selected filters.</p>
+        {% else %}
+          <p data-test="no-bookings">There are no bookings for {{ prisonName }} that need review.</p>
+        {% endif %}
       {% endif %}
     </div>
   </div>
+{% endblock %}
+
+{% block pageScripts %}
+  <script src="/assets/filter-component.js"></script>
 {% endblock %}

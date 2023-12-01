@@ -9,7 +9,7 @@ import {
   notificationTypePathSegments,
   notificationTypes,
 } from '../../constants/notificationEventTypes'
-import { VisitsReviewListItem } from '../../@types/bapv'
+import { FilterField, VisitsReviewListItem } from '../../@types/bapv'
 
 let app: Express
 
@@ -19,7 +19,7 @@ beforeEach(() => {
   config.features.showReviewBookingsTile = true
   app = appWithAllRoutes({ services: { visitNotificationsService } })
 
-  visitNotificationsService.getVisitsReviewList.mockResolvedValue([])
+  visitNotificationsService.getVisitsReviewList.mockResolvedValue({ filters: [], visitsReviewList: [] })
 })
 
 afterEach(() => {
@@ -27,6 +27,11 @@ afterEach(() => {
 })
 
 describe('Bookings needing review listing page', () => {
+  const noAppliedFilters = {
+    bookedBy: <string[]>[],
+    type: <string[]>[],
+  }
+
   describe('GET /review', () => {
     it('should return a 404 if the feature is not enabled', () => {
       config.features.showReviewBookingsTile = false
@@ -46,7 +51,7 @@ describe('Bookings needing review listing page', () => {
           const numNotificationTypes = Object.keys(notificationTypeDescriptions).length
           expect($('[data-test="review-reasons-list"] li').length).toBe(numNotificationTypes)
 
-          expect(visitNotificationsService.getVisitsReviewList).toHaveBeenCalledWith('user1', 'HEI')
+          expect(visitNotificationsService.getVisitsReviewList).toHaveBeenCalledWith('user1', 'HEI', noAppliedFilters)
         })
     })
 
@@ -58,13 +63,39 @@ describe('Bookings needing review listing page', () => {
           const $ = cheerio.load(res.text)
           expect($('[data-test="bookings-list"]').length).toBe(0)
           expect($('[data-test="no-bookings"]').text()).toBe('There are no bookings for Hewell (HMP) that need review.')
+          expect($('[data-test="no-bookings-for-filters"]').length).toBe(0)
 
-          expect(visitNotificationsService.getVisitsReviewList).toHaveBeenCalledWith('user1', 'HEI')
+          expect(visitNotificationsService.getVisitsReviewList).toHaveBeenCalledWith('user1', 'HEI', noAppliedFilters)
+        })
+    })
+
+    it('should display bookings review listing page with message when none to review because of selected filters', () => {
+      const filters: FilterField[] = [
+        {
+          id: 'bookedBy',
+          label: 'Booked by',
+          items: [{ label: 'User One', value: 'user1', checked: true }],
+        },
+      ]
+      visitNotificationsService.getVisitsReviewList.mockResolvedValue({ filters, visitsReviewList: [] })
+
+      return request(app)
+        .get('/review')
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('[data-test="bookings-list"]').length).toBe(0)
+          expect($('[data-test="no-bookings"]').length).toBe(0)
+          expect($('[data-test="no-bookings-for-filters"]').text()).toBe(
+            'There are no bookings to review for Hewell (HMP) that match the selected filters.',
+          )
+
+          expect(visitNotificationsService.getVisitsReviewList).toHaveBeenCalledWith('user1', 'HEI', noAppliedFilters)
         })
     })
 
     it('should display bookings review listing page with bookings that need review', () => {
-      const listItems: VisitsReviewListItem[] = [
+      const visitsReviewList: VisitsReviewListItem[] = [
         {
           bookedByNames: ['User One', 'User Two'],
           prisonerNumbers: ['A1234BC', 'A5678CD'],
@@ -80,7 +111,7 @@ describe('Bookings needing review listing page', () => {
           visitDates: ['2 November 2023', '11 November 2023'],
         },
       ]
-      visitNotificationsService.getVisitsReviewList.mockResolvedValue(listItems)
+      visitNotificationsService.getVisitsReviewList.mockResolvedValue({ filters: [], visitsReviewList })
 
       return request(app)
         .get('/review')
@@ -93,21 +124,26 @@ describe('Bookings needing review listing page', () => {
           expect($('[data-test="prisoner-number-1"]').text().trim()).toMatch(/^A1234BC\s+A5678CD$/)
           expect($('[data-test="visit-date-1"]').text().trim()).toBe('1 November 2023')
           expect($('[data-test="booked-by-1"]').text().trim()).toMatch(/^User One\s+User Two$/)
-          expect($('[data-test="type-1"]').text().trim()).toBe(notificationTypes[listItems[0].type])
+          expect($('[data-test="type-1"]').text().trim()).toBe(notificationTypes[visitsReviewList[0].type])
           expect($('[data-test="action-1"] a').attr('href')).toBe(
-            `/review/${notificationTypePathSegments[listItems[0].type]}/${listItems[0].reference}`,
+            `/review/${notificationTypePathSegments[visitsReviewList[0].type]}/${visitsReviewList[0].reference}`,
           )
 
           expect($('[data-test="prisoner-number-2"]').text().trim()).toBe('B1234CD')
           expect($('[data-test="visit-date-2"]').text().trim()).toMatch(/^2 November 2023\s+11 November 2023$/)
           expect($('[data-test="booked-by-2"]').text().trim()).toMatch(/^User Three\s+User Four$/)
-          expect($('[data-test="type-2"]').text().trim()).toBe(notificationTypes[listItems[1].type])
+          expect($('[data-test="type-2"]').text().trim()).toBe(notificationTypes[visitsReviewList[1].type])
           expect($('[data-test="action-2"] a').attr('href')).toBe(
-            `/review/${notificationTypePathSegments[listItems[1].type]}/${listItems[1].reference}`,
+            `/review/${notificationTypePathSegments[visitsReviewList[1].type]}/${visitsReviewList[1].reference}`,
           )
 
-          expect(visitNotificationsService.getVisitsReviewList).toHaveBeenCalledWith('user1', 'HEI')
+          expect($('[data-test="no-bookings"]').length).toBe(0)
+          expect($('[data-test="no-bookings-for-filters"]').length).toBe(0)
+
+          expect(visitNotificationsService.getVisitsReviewList).toHaveBeenCalledWith('user1', 'HEI', noAppliedFilters)
         })
     })
+
+    // TODO test filters
   })
 })

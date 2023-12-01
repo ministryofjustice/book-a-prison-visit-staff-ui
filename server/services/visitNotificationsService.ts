@@ -60,6 +60,18 @@ export default class VisitNotificationsService {
     ]
   }
 
+  private cleanAppliedFilters(appliedFilters: AppliedFilters, filters: FilterField[]): AppliedFilters {
+    const validUsernames = filters.find(filter => filter.id === 'bookedBy')?.items.map(item => item.value) || []
+    const validTypes = filters.find(filter => filter.id === 'type')?.items.map(item => item.value) || []
+
+    const appliedFiltersCleaned = {
+      bookedBy: appliedFilters.bookedBy.filter(user => validUsernames.includes(user)),
+      type: appliedFilters.type.filter(type => validTypes.includes(type)),
+    }
+
+    return appliedFiltersCleaned
+  }
+
   private buildVisitsReviewListItem(notificationGroup: NotificationGroup): VisitsReviewListItem {
     const bookedByNames = notificationGroup.affectedVisits.map(visit => visit.bookedByName)
 
@@ -89,12 +101,16 @@ export default class VisitNotificationsService {
     if (!Object.values(appliedFilters).flat().length) return notificationGroups
 
     return notificationGroups.filter(notificationGroup => {
-      const allBookingUsers = notificationGroup.affectedVisits.flatMap(visit => visit.bookedByUserName)
-      const isUsernameMatch = appliedFilters.bookedBy.some(user => allBookingUsers.includes(user))
+      const notificationGroupUsers = notificationGroup.affectedVisits.flatMap(visit => visit.bookedByUserName)
+      const isUsernameMatch = appliedFilters.bookedBy.length
+        ? appliedFilters.bookedBy.some(user => notificationGroupUsers.includes(user))
+        : true
 
-      const isTypeMatch = appliedFilters.type.some(type => type === notificationGroup.type)
+      const isTypeMatch = appliedFilters.type.length
+        ? appliedFilters.type.some(type => type === notificationGroup.type)
+        : true
 
-      return isUsernameMatch || isTypeMatch
+      return isUsernameMatch && isTypeMatch
     })
   }
 
@@ -107,9 +123,15 @@ export default class VisitNotificationsService {
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
     const unfilteredNotificationGroups = await orchestrationApiClient.getNotificationGroups(prisonId)
-    const filteredNotificationGroups = this.filterNotificationGroups(appliedFilters, unfilteredNotificationGroups)
 
     const filters = this.buildVisitReviewListFilters(username, unfilteredNotificationGroups, appliedFilters)
+    const appliedFiltersCleaned = this.cleanAppliedFilters(appliedFilters, filters)
+
+    const filteredNotificationGroups = this.filterNotificationGroups(
+      appliedFiltersCleaned,
+      unfilteredNotificationGroups,
+    )
+
     const visitsReviewList = filteredNotificationGroups.map(notificationGroup =>
       this.buildVisitsReviewListItem(notificationGroup),
     )
