@@ -5,7 +5,7 @@
 
     <input type="hidden" name="_csrf" value="{{ params.csrfToken }}">
 
-    <h2 class="govuk-heading-s">Filters</h2>
+    <h2 class="govuk-heading-s">Filter the list</h2>
 
     {% for filter in params.filters %}
 
@@ -53,7 +53,7 @@
       </div>
     {% endfor %}
 
-    <button type="submit" class="govuk-button bapv-apply-filters-button">Apply filters</button>
+    <button type="submit" class="govuk-button bapv-apply-filters-button">Apply</button>
 
     {%- set hasSelected = false -%}
     {% for filter in params.filters %}
@@ -67,9 +67,9 @@
     <fieldset class="govuk-fieldset bapv-selected-filters{% if not hasSelected %} moj-js-hidden{% endif %}">
       <legend class="govuk-fieldset__legend">
         <h2 class="govuk-body govuk-!-margin-bottom-0 govuk-!-font-weight-bold">
-          Applied filters
+          Selected filters
           <a href="#" id="reset-filters"
-            class="govuk-link govuk-link--no-visited-state govuk-body-s govuk-!-margin-left-2">Clear all</a>
+            class="govuk-link govuk-link--no-visited-state govuk-body-s govuk-!-margin-left-3">Clear filters</a>
         </h2>
       </legend>
       {% for filter in params.filters %}
