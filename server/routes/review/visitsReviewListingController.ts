@@ -14,7 +14,9 @@ export default class VisitsReviewListingController {
   public view(): RequestHandler {
     return async (req, res) => {
       const { prisonName } = req.session.selectedEstablishment
-      const { bookedBy = [], type = [] } = req.query as Record<string, string[]> // OK to cast this express-validator sanitises
+      // OK to cast these as express-validator sanitises to string[]
+      const bookedBy = Array.isArray(req.query.bookedBy) ? <string[]>req.query.bookedBy : []
+      const type = Array.isArray(req.query.type) ? <string[]>req.query.type : []
 
       const { filters, visitsReviewList } = await this.visitNotificationsService.getVisitsReviewList(
         res.locals.user.username,
@@ -38,7 +40,9 @@ export default class VisitsReviewListingController {
 
   public submit(): RequestHandler {
     return async (req, res) => {
-      const { bookedBy, type } = req.body
+      // OK to cast these as express-validator sanitises to string[]
+      const bookedBy = Array.isArray(req.body.bookedBy) ? <string[]>req.body.bookedBy : []
+      const type = Array.isArray(req.body.type) ? <string[]>req.body.type : []
 
       return res.redirect(
         url.format({
