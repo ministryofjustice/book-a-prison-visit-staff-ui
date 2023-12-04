@@ -1,104 +1,98 @@
-{%- set formName = params.formName or 'pacFilterForm' -%}
+{%- set formName = params.formName or 'bapvFilterForm' -%}
 
-<section class="pac-filter-card govuk-!-margin-bottom-6" data-test="pac-filter-card">
-    <form name="pac-filter-form" id="pac-filter-form" method="post">
+<section class="bapv-filter-card govuk-!-margin-bottom-6" data-test="bapv-filter-card">
+  <form name="bapv-filter-form" id="bapv-filter-form" method="post">
 
-        <input type="hidden" name="_csrf" value="{{ params.csrfToken }}">
+    <input type="hidden" name="_csrf" value="{{ params.csrfToken }}">
 
-        {% for hidden in params.hiddenInputs %}
-            <input type="hidden" id="hidden-{{ hidden.id }}" name="{{ hidden.id }}" value="{{ hidden.value }}" />
-        {% endfor %}
+    <h2 class="govuk-heading-s">Filters</h2>
 
-        <h2 class="govuk-heading-s">Filters</h2>
+    {% for filter in params.filters %}
 
-        {% for filter in params.filters %}
+      {%- set hasSelected = false -%}
+      {% for item in filter.items %}
+        {% if item.checked %}
+          {% set hasSelected = true %}
+        {% endif %}
+      {% endfor %}
 
-            {%- set hasSelected = false -%}
-            {% for item in filter.items %}
-                {% if item.checked %}
-                    {% set hasSelected = true %}
-                {% endif %}
-            {% endfor %}
+      <div class="bapv-filter-container">
+        <button id="button-{{ filter.id }}" type="button"
+          class="bapv-filter-button{% if hasSelected %} bapv-filter-button--selected{% endif %}"
+          data-controls="filter-{{ filter.id }}-selection"
+          aria-controls="filter-{{ filter.id }}-selection"
+          aria-expanded="false">{{ filter.label }}
+        </button>
 
-            <div class="pac-filter-container">
-                <button id="button-{{ filter.id }}" type="button"
-                        class="pac-filter-button{% if hasSelected %} pac-filter-button--selected{% endif %}"
-                        data-controls="filter-{{ filter.id }}-selection"
-                        aria-controls="filter-{{ filter.id }}-selection"
-                        aria-expanded="false">{{ filter.label }}
-                </button>
+        <div id="filter-{{ filter.id }}-selection" class="bapv-filter-selection moj-js-hidden">
+          <div class="govuk-form-group">
+            <fieldset class="govuk-fieldset">
+              <legend class="govuk-fieldset__legend govuk-fieldset__legend moj-js-hidden">
+                {{ filter.label }}
+              </legend>
+              <div class="govuk-checkboxes govuk-checkboxes--small">
 
-                <div id="filter-{{ filter.id }}-selection" class="pac-filter-selection moj-js-hidden">
-                    <div class="govuk-form-group">
-                        <fieldset class="govuk-fieldset">
-                            <legend class="govuk-fieldset__legend govuk-fieldset__legend moj-js-hidden">
-                                Probation
-                                record
-                            </legend>
-                            <div class="govuk-checkboxes govuk-checkboxes--small">
-
-                                {% for item in filter.items %}
-                                    <div class="govuk-checkboxes__item">
-                                        <input class="govuk-checkboxes__input pac-filter-checkbox"
-                                               id="checkbox-{{ filter.id }}-{{ loop.index }}"
-                                               name="{{ filter.id }}"
-                                               data-test="{{ item.label }}"
-                                               type="checkbox"
-                                               value="{{ item.value or item.label }}"{% if item.checked %} checked{% endif %}>
-                                        <label class="govuk-label govuk-checkboxes__label"
-                                               for="checkbox-{{ filter.id }}-{{ loop.index }}">{{ item.label }}</label>
-                                    </div>
-                                {% endfor %}
-
-                            </div>
-                        </fieldset>
-                    </div>
-                </div>
-
-            </div>
-        {% endfor %}
-
-        <button type="submit" class="govuk-button pac-apply-filters-button">Apply filters</button>
-
-        {%- set hasSelected = false -%}
-        {% for filter in params.filters %}
-            {% for item in filter.items %}
-                {% if item.checked %}
-                    {% set hasSelected = true %}
-                {% endif %}
-            {% endfor %}
-        {% endfor %}
-
-        <fieldset class="govuk-fieldset pac-selected-filters{% if not hasSelected %} moj-js-hidden{% endif %}">
-            <legend class="govuk-fieldset__legend">
-                <h2 class="govuk-body govuk-!-margin-bottom-0 govuk-!-font-weight-bold">
-                    Applied filters
-                    <a href="#" id="reset-filters"
-                       class="govuk-link govuk-link--no-visited-state govuk-body-s govuk-!-margin-left-2">Clear all</a>
-                </h2>
-            </legend>
-            {% for filter in params.filters %}
-
-                {%- set hasSelected = false -%}
                 {% for item in filter.items %}
-                    {% if item.checked %}
-                        {% set hasSelected = true %}
-                    {% endif %}
+                  <div class="govuk-checkboxes__item">
+                    <input class="govuk-checkboxes__input bapv-filter-checkbox"
+                      id="checkbox-{{ filter.id }}-{{ loop.index }}"
+                      name="{{ filter.id }}"
+                      data-test="{{ item.label }}"
+                      type="checkbox"
+                      value="{{ item.value or item.label }}"{% if item.checked %} checked{% endif %}>
+                    <label class="govuk-label govuk-checkboxes__label"
+                      for="checkbox-{{ filter.id }}-{{ loop.index }}">{{ item.label }}</label>
+                  </div>
                 {% endfor %}
-                <div id="pac-filters-applied-{{ filter.id }}"
-                     class="pac-filters-applied--container{% if not hasSelected %} moj-js-hidden{% endif %}">
-                    <label class="govuk-label govuk-!-margin-top-2 govuk-!-margin-bottom-0 pac-selected-filters--label"
-                           for="filters">
-                        {{ filter.label }}
-                    </label>
-                    {% for item in filter.items %}
-                        {% if item.checked %}
-                            <button class="moj-filter__tag pac-filter__tag" type="button" aria-label="Remove {{ item.label }}"
-                                    data-controls="checkbox-{{ filter.id }}-{{ loop.index }}">{{ item.label }}</button>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-            {% endfor %}
-        </fieldset>
-    </form>
+
+              </div>
+            </fieldset>
+          </div>
+        </div>
+
+      </div>
+    {% endfor %}
+
+    <button type="submit" class="govuk-button bapv-apply-filters-button">Apply filters</button>
+
+    {%- set hasSelected = false -%}
+    {% for filter in params.filters %}
+      {% for item in filter.items %}
+        {% if item.checked %}
+          {% set hasSelected = true %}
+        {% endif %}
+      {% endfor %}
+    {% endfor %}
+
+    <fieldset class="govuk-fieldset bapv-selected-filters{% if not hasSelected %} moj-js-hidden{% endif %}">
+      <legend class="govuk-fieldset__legend">
+        <h2 class="govuk-body govuk-!-margin-bottom-0 govuk-!-font-weight-bold">
+          Applied filters
+          <a href="#" id="reset-filters"
+            class="govuk-link govuk-link--no-visited-state govuk-body-s govuk-!-margin-left-2">Clear all</a>
+        </h2>
+      </legend>
+      {% for filter in params.filters %}
+
+      {%- set hasSelected = false -%}
+      {% for item in filter.items %}
+        {% if item.checked %}
+          {% set hasSelected = true %}
+        {% endif %}
+      {% endfor %}
+        <div id="bapv-filters-applied-{{ filter.id }}"
+          class="bapv-filters-applied--container{% if not hasSelected %} moj-js-hidden{% endif %}">
+        <label class="govuk-label govuk-!-margin-top-2 govuk-!-margin-bottom-0 bapv-selected-filters--label" for="filters">
+          {{ filter.label }}
+        </label>
+          {% for item in filter.items %}
+            {% if item.checked %}
+              <button class="moj-filter__tag bapv-filter__tag" type="button" aria-label="Remove {{ item.label }}"
+                data-controls="checkbox-{{ filter.id }}-{{ loop.index }}">{{ item.label }}</button>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endfor %}
+    </fieldset>
+  </form>
 </section>

@@ -1,4 +1,4 @@
-.pac-filter-card {
+.bapv-filter-card {
   position: relative;
   background-color: govuk-colour("light-grey");
   padding: 15px;
@@ -11,7 +11,7 @@
   }
 }
 
-.pac-filter-container {
+.bapv-filter-container {
   display: inline-block;
   float: left;
   height: 37px;
@@ -20,7 +20,7 @@
   @include govuk-clearfix();
 }
 
-.pac-filter-selection {
+.bapv-filter-selection {
   position: relative;
   display: block;
   background-color: govuk-colour("white");
@@ -33,16 +33,16 @@
   overflow-y: auto;
 }
 
-.pac-selected-filters {
+.bapv-selected-filters {
   clear: both;
   margin-top: 25px;
 }
 
-.pac-filter-tags {
+.bapv-filter-tags {
   display: block;
 }
 
-.pac-filter__tag {
+.bapv-filter__tag {
   position: relative;
   float: left;
   margin: 3px 15px 0 0;
@@ -54,7 +54,7 @@
   }
 }
 
-.pac-filter-button {
+.bapv-filter-button {
   @include govuk-link-common;
   @include govuk-link-style-default;
   display: inline-block;
@@ -72,7 +72,7 @@
 }
 
 body.js-enabled {
-  .pac-filter-button {
+  .bapv-filter-button {
     &:after {
       display: inline-block;
       content: "";
@@ -97,7 +97,7 @@ body.js-enabled {
   }
 }
 
-.pac-filters-applied {
+.bapv-filters-applied {
   display: inline-block;
   float: left;
   @include govuk-clearfix();
@@ -109,7 +109,7 @@ body.js-enabled {
   }
 }
 
-.pac-selected-filters--label {
+.bapv-selected-filters--label {
   display: inline-block;
   float: left;
   margin-right: 10px;
@@ -117,17 +117,17 @@ body.js-enabled {
   @include govuk-typography-weight-bold;
 }
 
-.pac-apply-filters-button {
+.bapv-apply-filters-button {
   display: inline-block;
   padding: 5px 25px;
   margin: 10px 0 0 0;
 }
 
 body:not(.js-enabled) {
-  .pac-selected-filters {
+  .bapv-selected-filters {
     display: none !important;
   }
-  .pac-filter-container {
+  .bapv-filter-container {
     float: none;
     position: relative;
     top: 0;

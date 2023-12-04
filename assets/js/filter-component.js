@@ -2,8 +2,8 @@
   'use strict'
 
   function resizeFilterSections() {
-    var filterButtons = document.getElementsByClassName('pac-filter-button')
-    var filterSections = document.getElementsByClassName('pac-filter-selection')
+    var filterButtons = document.getElementsByClassName('bapv-filter-button')
+    var filterSections = document.getElementsByClassName('bapv-filter-selection')
     Array.prototype.forEach.call(filterSections, function (element, index) {
       element.classList.remove('moj-js-hidden')
       filterButtons[index].style.width =
@@ -13,17 +13,17 @@
   }
 
   function configureFilterButtons() {
-    var filterButtons = document.getElementsByClassName('pac-filter-button')
+    var filterButtons = document.getElementsByClassName('bapv-filter-button')
     var main = document.getElementsByClassName('govuk-main-wrapper')
 
     function checkFiltersFocus(e) {
       var target = e.target && e.target.id.substr(e.target.id.indexOf('-') + 1)
       var relatedTarget = e.relatedTarget && e.relatedTarget.id.substr(e.relatedTarget.id.indexOf('-') + 1)
       if (!target || !relatedTarget || relatedTarget.indexOf(target) === -1) {
-        var filterSections = document.getElementsByClassName('pac-filter-selection')
+        var filterSections = document.getElementsByClassName('bapv-filter-selection')
         Array.prototype.forEach.call(filterButtons, function (element, index) {
           element.setAttribute('aria-expanded', false)
-          element.classList.remove('pac-filter-button--open')
+          element.classList.remove('bapv-filter-button--open')
           filterSections[index].classList.add('moj-js-hidden')
           element.active = false
         })
@@ -34,12 +34,12 @@
       e.stopPropagation()
       var $el = e.target
       var current = !$el.active && $el.dataset['controls']
-      var filterSections = document.getElementsByClassName('pac-filter-selection')
+      var filterSections = document.getElementsByClassName('bapv-filter-selection')
       Array.prototype.forEach.call(filterButtons, function (element, index) {
         element.setAttribute('aria-expanded', current === element.dataset['controls'])
         current === element.dataset['controls']
-          ? element.classList.add('pac-filter-button--open')
-          : element.classList.remove('pac-filter-button--open')
+          ? element.classList.add('bapv-filter-button--open')
+          : element.classList.remove('bapv-filter-button--open')
         current === filterSections[index].id
           ? filterSections[index].classList.remove('moj-js-hidden')
           : filterSections[index].classList.add('moj-js-hidden')
@@ -60,7 +60,7 @@
       element.addEventListener('click', toggleFilter)
     })
 
-    var applyFiltersButton = document.getElementsByClassName('pac-apply-filters-button')
+    var applyFiltersButton = document.getElementsByClassName('bapv-apply-filters-button')
     Array.prototype.forEach.call(applyFiltersButton, function (element) {
       element.addEventListener('focus', checkFiltersFocus)
     })
@@ -71,10 +71,10 @@
       e.stopPropagation()
       var checkbox = document.getElementById(e.target.dataset['controls'])
       checkbox.click()
-      document.getElementById('pac-filter-form').submit()
+      document.getElementById('bapv-filter-form').submit()
     }
 
-    var clearTags = document.getElementsByClassName('moj-filter__tag pac-filter__tag')
+    var clearTags = document.getElementsByClassName('moj-filter__tag bapv-filter__tag')
     Array.prototype.forEach.call(clearTags, function (element) {
       element.addEventListener('click', clearFilter)
     })
@@ -90,11 +90,11 @@
         anySelected = anySelected || element.checked
       })
       anySelected
-        ? button.classList.add('pac-filter-button--selected')
-        : button.classList.remove('pac-filter-button--selected')
+        ? button.classList.add('bapv-filter-button--selected')
+        : button.classList.remove('bapv-filter-button--selected')
     }
 
-    var checkboxes = document.getElementsByClassName('pac-filter-checkbox')
+    var checkboxes = document.getElementsByClassName('bapv-filter-checkbox')
     Array.prototype.forEach.call(checkboxes, function (element) {
       element.addEventListener('click', checkboxClick)
     })
@@ -103,8 +103,8 @@
   function configureResetButton() {
     function resetFilters(e) {
       e.stopPropagation()
-      var form = document.getElementById('pac-filter-form')
-      var checkboxes = document.getElementsByClassName('pac-filter-checkbox')
+      var form = document.getElementById('bapv-filter-form')
+      var checkboxes = document.getElementsByClassName('bapv-filter-checkbox')
       Array.prototype.forEach.call(checkboxes, function (element) {
         if (element.checked) {
           element.click()
