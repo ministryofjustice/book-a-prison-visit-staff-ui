@@ -53,7 +53,7 @@
       </div>
     {% endfor %}
 
-    <button type="submit" class="govuk-button bapv-apply-filters-button">Apply</button>
+    <button type="submit" class="govuk-button bapv-apply-filters-button" data-test="bapv-filter-apply">Apply</button>
 
     {%- set hasSelected = false -%}
     {% for filter in params.filters %}

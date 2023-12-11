@@ -81,7 +81,7 @@ describe('Bookings needing review listing page', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
 
-          expect($("[data-test='bookings-list'] tbody tr").length).toBe(2)
+          expect($('[data-test="bookings-list"] tbody tr').length).toBe(2)
 
           expect($('[data-test="prisoner-number-1"]').text().trim()).toMatch(/^A1234BC\s+A5678CD$/)
           expect($('[data-test="visit-date-1"]').text().trim()).toBe('1 November 2023')
