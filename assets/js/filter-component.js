@@ -14,7 +14,6 @@
 
   function configureFilterButtons() {
     var filterButtons = document.getElementsByClassName('bapv-filter-button')
-    var main = document.getElementsByClassName('govuk-main-wrapper')
 
     function checkFiltersFocus(e) {
       var target = e.target && e.target.id.substr(e.target.id.indexOf('-') + 1)
@@ -51,12 +50,6 @@
     }
 
     Array.prototype.forEach.call(filterButtons, function (element) {
-      element.addEventListener('focus', checkFiltersFocus)
-      element.addEventListener('blur', checkFiltersFocus)
-      element.addEventListener('click', toggleFilter)
-    })
-
-    Array.prototype.forEach.call(main, function (element) {
       element.addEventListener('click', toggleFilter)
     })
 
