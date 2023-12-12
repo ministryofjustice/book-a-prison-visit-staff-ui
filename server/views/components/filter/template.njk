@@ -1,0 +1,98 @@
+{%- set formName = params.formName or 'bapvFilterForm' -%}
+
+<section class="bapv-filter-card govuk-!-margin-bottom-6" data-test="bapv-filter-card">
+  <form name="bapv-filter-form" id="bapv-filter-form" method="post">
+
+    <input type="hidden" name="_csrf" value="{{ params.csrfToken }}">
+
+    <h2 class="govuk-heading-s">Filter the list</h2>
+
+    {% for filter in params.filters %}
+
+      {%- set hasSelected = false -%}
+      {% for item in filter.items %}
+        {% if item.checked %}
+          {% set hasSelected = true %}
+        {% endif %}
+      {% endfor %}
+
+      <div class="bapv-filter-container">
+        <button id="button-{{ filter.id }}" type="button"
+          class="bapv-filter-button{% if hasSelected %} bapv-filter-button--selected{% endif %}"
+          data-controls="filter-{{ filter.id }}-selection"
+          aria-controls="filter-{{ filter.id }}-selection"
+          aria-expanded="false">{{ filter.label }}
+        </button>
+
+        <div id="filter-{{ filter.id }}-selection" class="bapv-filter-selection moj-js-hidden">
+          <div class="govuk-form-group">
+            <fieldset class="govuk-fieldset">
+              <legend class="govuk-fieldset__legend govuk-fieldset__legend moj-js-hidden">
+                {{ filter.label }}
+              </legend>
+              <div class="govuk-checkboxes govuk-checkboxes--small">
+
+                {% for item in filter.items %}
+                  <div class="govuk-checkboxes__item">
+                    <input class="govuk-checkboxes__input bapv-filter-checkbox"
+                      id="checkbox-{{ filter.id }}-{{ loop.index }}"
+                      name="{{ filter.id }}"
+                      data-test="{{ item.label }}"
+                      type="checkbox"
+                      value="{{ item.value or item.label }}"{% if item.checked %} checked{% endif %}>
+                    <label class="govuk-label govuk-checkboxes__label"
+                      for="checkbox-{{ filter.id }}-{{ loop.index }}">{{ item.label }}</label>
+                  </div>
+                {% endfor %}
+
+              </div>
+            </fieldset>
+          </div>
+        </div>
+
+      </div>
+    {% endfor %}
+
+    <button type="submit" class="govuk-button bapv-apply-filters-button" data-test="bapv-filter-apply">Apply</button>
+
+    {%- set hasSelected = false -%}
+    {% for filter in params.filters %}
+      {% for item in filter.items %}
+        {% if item.checked %}
+          {% set hasSelected = true %}
+        {% endif %}
+      {% endfor %}
+    {% endfor %}
+
+    <fieldset class="govuk-fieldset bapv-selected-filters{% if not hasSelected %} moj-js-hidden{% endif %}">
+      <legend class="govuk-fieldset__legend">
+        <h2 class="govuk-body govuk-!-margin-bottom-0 govuk-!-font-weight-bold">
+          Selected filters
+          <a href="#" id="reset-filters"
+            class="govuk-link govuk-link--no-visited-state govuk-body-s govuk-!-margin-left-3">Clear filters</a>
+        </h2>
+      </legend>
+      {% for filter in params.filters %}
+
+      {%- set hasSelected = false -%}
+      {% for item in filter.items %}
+        {% if item.checked %}
+          {% set hasSelected = true %}
+        {% endif %}
+      {% endfor %}
+        <div id="bapv-filters-applied-{{ filter.id }}"
+          class="bapv-filters-applied--container{% if not hasSelected %} moj-js-hidden{% endif %}">
+        <label class="govuk-label govuk-!-margin-top-2 govuk-!-margin-bottom-0 bapv-selected-filters--label" for="filters">
+          {{ filter.label }}
+        </label>
+          {% for item in filter.items %}
+            {% if item.checked %}
+              <button class="moj-filter__tag bapv-filter__tag" type="button" aria-label="Remove {{ item.label }}"
+                data-controls="checkbox-{{ filter.id }}-{{ loop.index }}">{{ item.label }}</button>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endfor %}
+    </fieldset>
+  </form>
+</section>
