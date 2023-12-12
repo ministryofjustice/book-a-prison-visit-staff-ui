@@ -92,13 +92,14 @@ testJourneys.forEach(journey => {
           .expect('Content-Type', /html/)
           .expect(res => {
             const $ = cheerio.load(res.text)
-            expect($('h1').text().trim()).toBe('What method was used to make this request?')
-            expect($('input[name="method"]').length).toBe(4)
+            expect($('h1').text().trim()).toBe('How was this booking requested?')
+            expect($('input[name="method"]').length).toBe(5)
             expect($('input[name="method"]:checked').length).toBe(0)
             expect($('input[name="method"]').eq(0).prop('value')).toBe('PHONE')
             expect($('input[name="method"]').eq(1).prop('value')).toBe('WEBSITE')
             expect($('input[name="method"]').eq(2).prop('value')).toBe('EMAIL')
             expect($('input[name="method"]').eq(3).prop('value')).toBe('IN_PERSON')
+            expect($('input[name="method"]').eq(4).prop('value')).toBe('BY_PRISONER')
           })
       })
 
@@ -113,7 +114,7 @@ testJourneys.forEach(journey => {
           .expect('Content-Type', /html/)
           .expect(res => {
             const $ = cheerio.load(res.text)
-            expect($('h1').text().trim()).toBe('What method was used to make this request?')
+            expect($('h1').text().trim()).toBe('How was this booking requested?')
             expect($('#method-error').text()).toContain('No request method selected')
             expect(flashProvider).toHaveBeenCalledWith('errors')
             expect(flashProvider).toHaveBeenCalledWith('formValues')

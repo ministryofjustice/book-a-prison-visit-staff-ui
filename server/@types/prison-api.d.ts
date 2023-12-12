@@ -301,6 +301,10 @@ export interface paths {
     /** Sets imprisonment status smoke test data for this offender */
     post: operations['imprisonmentDataSetup']
   }
+  '/api/smoketest/offenders/{offenderNo}/details': {
+    /** Updates the offender details for this offender, with smoke test data */
+    post: operations['updatePrisonerDetails']
+  }
   '/api/service-prisons/{serviceCode}/prison/{prisonId}': {
     /** Activates a prison for the given service */
     post: operations['addServicePrison']
@@ -733,7 +737,6 @@ export interface paths {
      * Retrieve a single financial transaction using client unique ref.
      * @description All transaction amounts are represented as pence values.<br/>
      * Requires NOMIS_API_V1 or UNILINK role.
-     * <p>This endpoint uses the REPLICA database.</p>
      */
     get: operations['getTransactionByClientUniqueRef']
   }
@@ -750,17 +753,15 @@ export interface paths {
      * @description Returns balances for the offender’s three sub accounts (spends, savings and cash) at the specified prison.<br/>
      * All balance values are represented as pence values.<br/>
      * Requires NOMIS_API_V1 or UNILINK role.
-     * <p>This endpoint uses the REPLICA database.</p>
      */
     get: operations['getAccountBalance']
   }
   '/api/v1/prison/{prison_id}/offenders/{noms_id}/accounts/{account_code}/transactions': {
     /**
      * Retrieve an offender's financial transaction history for cash, spends or savings.
-     * @description Transactions are returned in NOMIS ordee (Descending date followed by id).<br/>
+     * @description Transactions are returned in NOMIS order (Descending date followed by id).<br/>
      * All transaction amounts are represented as pence values.<br/>
      * Requires NOMIS_API_V1 or UNILINK role.
-     * <p>This endpoint uses the REPLICA database.</p>
      */
     get: operations['getAccountTransactions']
   }
@@ -771,7 +772,6 @@ export interface paths {
      * @description Returns balances for the offender’s three sub accounts (spends, savings and cash) at the specified prison.<br/>
      * All balance values are represented as pence values.<br/>
      * Requires NOMIS_API_V1 or UNILINK role.
-     * <p>This endpoint uses the REPLICA database.</p>
      */
     get: operations['getAccountBalanceTrailingSlash']
   }
@@ -979,13 +979,6 @@ export interface paths {
      */
     get: operations['getLocationEvents']
   }
-  '/api/schedules/{agencyId}/activities-by-date-range': {
-    /**
-     * Get all Prisoner activities for given date.
-     * @description Get all Prisoner activities for given date range<p>This endpoint uses the REPLICA database.</p>
-     */
-    get: operations['getActivitiesAtAllLocationsByDateRange']
-  }
   '/api/schedules/locations/{locationId}/activities': {
     /**
      * Get all Prisoner activities for given date at location.
@@ -1063,8 +1056,8 @@ export interface paths {
      */
     get: operations['getPrisonerNumbers']
   }
-  '/api/prison/{establishmentId}/booking/latest/calculable-sentence-envelope': {
-    /** Details of the active sentence envelope, a combination of the person information, the active booking and calculable sentences at a particular establishment */
+  '/api/prison/{establishmentId}/booking/latest/paged/calculable-sentence-envelope': {
+    /** Details of the active sentence envelope, a combination of the person information, the active booking and calculable sentences at a particular establishment (paged response) */
     get: operations['getCalculableSentenceEnvelopeByEstablishment']
   }
   '/api/persons/{personId}/phones': {
@@ -1427,13 +1420,6 @@ export interface paths {
   '/api/gang/non-associations/{offenderNo}': {
     /** Returns a list of gangs for a prisoner and the gang non-associations and their members */
     get: operations['getNonAssociationGangsForPrisoner']
-  }
-  '/api/employment/prisoner/{offenderNo}': {
-    /**
-     * A list of offender employments.
-     * @description A list of offender employments.
-     */
-    get: operations['getPrisonerEmployments']
   }
   '/api/education/prisoner/{offenderNo}': {
     /**
@@ -3159,16 +3145,16 @@ export interface components {
       ltdCalculatedDate?: string
       /**
        * Format: date
-       * @description Offender's home detention curfew end date - calculated as one day before the releaseDate.
-       * @example 2019-04-01
-       */
-      homeDetentionCurfewEndDate?: string
-      /**
-       * Format: date
        * @description Top-up supervision start date for offender - calculated as licence end date + 1 day or releaseDate if licence end date not set.
        * @example 2019-04-01
        */
       topupSupervisionStartDate?: string
+      /**
+       * Format: date
+       * @description Offender's home detention curfew end date - calculated as one day before the releaseDate.
+       * @example 2019-04-01
+       */
+      homeDetentionCurfewEndDate?: string
     }
     /** @description Represents the data required for receiving a prisoner transfer */
     RequestToTransferIn: {
@@ -4380,6 +4366,12 @@ export interface components {
        * @example true
        */
       active: boolean
+    }
+    UpdatePrisonerDetails: {
+      /** @example John */
+      firstName: string
+      /** @example Smith */
+      lastName: string
     }
     /** @description Prison details */
     PrisonDetails: {
@@ -7569,6 +7561,24 @@ export interface components {
       /** @description The sentence term code, indicating if this is the term of imprisonment or license */
       code?: string
     }
+    PageCalculableSentenceEnvelope: {
+      /** Format: int64 */
+      totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
+      first?: boolean
+      last?: boolean
+      /** Format: int32 */
+      size?: number
+      content?: components['schemas']['CalculableSentenceEnvelope'][]
+      /** Format: int32 */
+      number?: number
+      sort?: components['schemas']['SortObject']
+      /** Format: int32 */
+      numberOfElements?: number
+      pageable?: components['schemas']['PageableObject']
+      empty?: boolean
+    }
     /** @description The identifiers of a person necessary for a calculation */
     Person: {
       /**
@@ -8615,16 +8625,16 @@ export interface components {
       tariffEarlyRemovalSchemeEligibilityDate?: string
       /**
        * Format: date
-       * @description Offender's home detention curfew end date - calculated as one day before the releaseDate.
-       * @example 2019-04-01
-       */
-      homeDetentionCurfewEndDate?: string
-      /**
-       * Format: date
        * @description Top-up supervision start date for offender - calculated as licence end date + 1 day or releaseDate if licence end date not set.
        * @example 2019-04-01
        */
       topupSupervisionStartDate?: string
+      /**
+       * Format: date
+       * @description Offender's home detention curfew end date - calculated as one day before the releaseDate.
+       * @example 2019-04-01
+       */
+      homeDetentionCurfewEndDate?: string
     }
     /** @description Prison Term */
     PrisonTerm: {
@@ -9968,113 +9978,6 @@ export interface components {
        * @example 15
        */
       numberOfMembers: number
-    }
-    /** @description Offender Employment */
-    Employment: {
-      /**
-       * Format: int64
-       * @description Offender booking id.
-       * @example 14
-       */
-      bookingId: number
-      /**
-       * Format: date
-       * @description Start date of employment
-       * @example 2018-02-11
-       */
-      startDate: string
-      /**
-       * Format: date
-       * @description End date of employment
-       * @example 2018-05-11
-       */
-      endDate?: string
-      /**
-       * @description The employment post type condition
-       * @example Full Time
-       */
-      postType?: string
-      /**
-       * @description The name of the employer
-       * @example Greggs
-       */
-      employerName?: string
-      /**
-       * @description The name of the supervisor in the employment
-       * @example John Smith
-       */
-      supervisorName?: string
-      /**
-       * @description Position held on job
-       * @example Supervisor
-       */
-      position?: string
-      /**
-       * @description The reason for leaving job
-       * @example End of contract
-       */
-      terminationReason?: string
-      /**
-       * @description Amount the offender was earning
-       * @example 10
-       */
-      wage?: number
-      /**
-       * @description The frequency of wage payments
-       * @example Hourly
-       */
-      wagePeriod?: string
-      /**
-       * @description The occupation name of the offender
-       * @example builder
-       */
-      occupation?: string
-      /**
-       * @description A comment about the employment
-       * @example The employment is going well
-       */
-      comment?: string
-      /**
-       * @description The employment schedule
-       * @example Fortnightly
-       */
-      schedule?: string
-      /**
-       * Format: int32
-       * @description The hours worked per week
-       * @example 32
-       */
-      hoursWeek?: number
-      /**
-       * @description Whether the employer is aware of the offender's charges
-       * @example true
-       */
-      isEmployerAware: boolean
-      /**
-       * @description Whether the employer can be contacted or not
-       * @example false
-       */
-      isEmployerContactable: boolean
-      /** @description A list of addresses associated with the employment */
-      addresses: components['schemas']['AddressDto'][]
-    }
-    PageEmployment: {
-      /** Format: int64 */
-      totalElements?: number
-      /** Format: int32 */
-      totalPages?: number
-      first?: boolean
-      last?: boolean
-      /** Format: int32 */
-      size?: number
-      content?: components['schemas']['Employment'][]
-      /** Format: int32 */
-      number?: number
-      sort?: components['schemas']['SortObject']
-      /** Format: int32 */
-      numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
-      empty?: boolean
     }
     PageEducation: {
       /** Format: int64 */
@@ -13100,6 +13003,41 @@ export interface operations {
       }
     }
   }
+  /** Updates the offender details for this offender, with smoke test data */
+  updatePrisonerDetails: {
+    parameters: {
+      path: {
+        /**
+         * @description offenderNo
+         * @example A1234AA
+         */
+        offenderNo: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdatePrisonerDetails']
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        content: never
+      }
+      /** @description Requires role ROLE_SMOKE_TEST */
+      403: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Requested resource not found. */
+      404: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
   /** Activates a prison for the given service */
   addServicePrison: {
     parameters: {
@@ -15636,7 +15574,6 @@ export interface operations {
    * Retrieve a single financial transaction using client unique ref.
    * @description All transaction amounts are represented as pence values.<br/>
    * Requires NOMIS_API_V1 or UNILINK role.
-   * <p>This endpoint uses the REPLICA database.</p>
    */
   getTransactionByClientUniqueRef: {
     parameters: {
@@ -15745,7 +15682,6 @@ export interface operations {
    * @description Returns balances for the offender’s three sub accounts (spends, savings and cash) at the specified prison.<br/>
    * All balance values are represented as pence values.<br/>
    * Requires NOMIS_API_V1 or UNILINK role.
-   * <p>This endpoint uses the REPLICA database.</p>
    */
   getAccountBalance: {
     parameters: {
@@ -15791,10 +15727,9 @@ export interface operations {
   }
   /**
    * Retrieve an offender's financial transaction history for cash, spends or savings.
-   * @description Transactions are returned in NOMIS ordee (Descending date followed by id).<br/>
+   * @description Transactions are returned in NOMIS order (Descending date followed by id).<br/>
    * All transaction amounts are represented as pence values.<br/>
    * Requires NOMIS_API_V1 or UNILINK role.
-   * <p>This endpoint uses the REPLICA database.</p>
    */
   getAccountTransactions: {
     parameters: {
@@ -15861,7 +15796,6 @@ export interface operations {
    * @description Returns balances for the offender’s three sub accounts (spends, savings and cash) at the specified prison.<br/>
    * All balance values are represented as pence values.<br/>
    * Requires NOMIS_API_V1 or UNILINK role.
-   * <p>This endpoint uses the REPLICA database.</p>
    */
   getAccountBalanceTrailingSlash: {
     parameters: {
@@ -17039,60 +16973,6 @@ export interface operations {
     }
   }
   /**
-   * Get all Prisoner activities for given date.
-   * @description Get all Prisoner activities for given date range<p>This endpoint uses the REPLICA database.</p>
-   */
-  getActivitiesAtAllLocationsByDateRange: {
-    parameters: {
-      query?: {
-        /** @description From date of whereabouts list, default today */
-        fromDate?: string
-        /** @description To Date of whereabouts list, default from date */
-        toDate?: string
-        /** @description AM, PM or ED */
-        timeSlot?: 'AM' | 'PM' | 'ED'
-        /** @description Include suspended scheduled activity - defaults to false */
-        includeSuspended?: boolean
-      }
-      header?: {
-        /** @description Comma separated list of one or more of the following fields - <b>cellLocation or lastName</b> */
-        'Sort-Fields'?: string
-        /** @description Sort order (ASC or DESC) - defaults to ASC. */
-        'Sort-Order'?: 'ASC' | 'DESC'
-      }
-      path: {
-        /** @description The prison. */
-        agencyId: string
-      }
-    }
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['PrisonerSchedule'][]
-        }
-      }
-      /** @description Invalid request. */
-      400: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Requested resource not found. */
-      404: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Unrecoverable error occurred whilst processing request. */
-      500: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  /**
    * Get all Prisoner activities for given date at location.
    * @description Get all Prisoner activities for given date at location.<p>This endpoint uses the REPLICA database.</p>
    */
@@ -17519,9 +17399,15 @@ export interface operations {
       }
     }
   }
-  /** Details of the active sentence envelope, a combination of the person information, the active booking and calculable sentences at a particular establishment */
+  /** Details of the active sentence envelope, a combination of the person information, the active booking and calculable sentences at a particular establishment (paged response) */
   getCalculableSentenceEnvelopeByEstablishment: {
     parameters: {
+      query?: {
+        /** @description The page number to retrieve of the paged results (starts at zero) */
+        page?: number
+        /** @description Requested limit of the page size (i.e. the number of bookings in response) */
+        size?: number
+      }
       path: {
         /** @description The identifier of the establishment(prison) to get the active bookings for */
         establishmentId: string
@@ -17531,7 +17417,7 @@ export interface operations {
       /** @description OK */
       200: {
         content: {
-          'application/json': components['schemas']['CalculableSentenceEnvelope'][]
+          'application/json': components['schemas']['PageCalculableSentenceEnvelope']
         }
       }
       /** @description Invalid request. */
@@ -19749,50 +19635,6 @@ export interface operations {
       200: {
         content: {
           'application/json': components['schemas']['GangMemberSummary']
-        }
-      }
-      /** @description Invalid request. */
-      400: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Requested resource not found. */
-      404: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Unrecoverable error occurred whilst processing request. */
-      500: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  /**
-   * A list of offender employments.
-   * @description A list of offender employments.
-   */
-  getPrisonerEmployments: {
-    parameters: {
-      query?: {
-        /** @description The page number of the paged results */
-        page?: number
-        /** @description Requested limit to number of results returned. */
-        size?: number
-      }
-      path: {
-        /** @description List of offender NOMS numbers. NOMS numbers have the format:<b>ANNNNAA</b> */
-        offenderNo: string
-      }
-    }
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['PageEmployment']
         }
       }
       /** @description Invalid request. */

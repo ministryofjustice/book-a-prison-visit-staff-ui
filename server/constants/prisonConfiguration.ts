@@ -178,11 +178,35 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'At least one visitor must be 18 or older.',
     ],
   },
+  // Kirkham (HMP)
+  KMI: {
+    prisonPhoneNumber: '', // intentionally blank
+    selectVisitorsText: [
+      'You can add up to 3 people aged 18 and over, and any number of children.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
   // Lancaster Farms (HMP)
   LFI: {
     prisonPhoneNumber: '01524 563 636',
     selectVisitorsText: [
       'You can add up to 3 people aged 10 and over, and 3 children under 10 years old.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
+  // Lindholme (HMP)
+  LHI: {
+    prisonPhoneNumber: '01302 524 980',
+    selectVisitorsText: [
+      'You can add up to 3 people aged 18 and over, and 6 children under 18 years old.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
+  // Lincoln (HMP & YOI)
+  LII: {
+    prisonPhoneNumber: '01522 663 172',
+    selectVisitorsText: [
+      'You can add up to 3 people aged 16 and over, and 6 children under 16 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
@@ -291,12 +315,29 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'At least one visitor must be 18 or older.',
     ],
   },
+  // Stocken (HMP)
+  SKI: {
+    prisonPhoneNumber: '01780 795 156',
+    selectVisitorsText: [
+      'You can add up to 3 people aged 16 and over - with a maximum of 5 total visitors.',
+      'At least one visitor must be 18 or older.',
+      'Contact the establishment if you would like to bring more children.',
+    ],
+  },
   // Swinfen Hall (HMP & YOI)
   SNI: {
     prisonPhoneNumber: '0300 060 6507',
     selectVisitorsText: [
       'You can add up to a total of 3 people.',
       'A total of 4 people can attend if one is under 5.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
+  // Sudbury (HMP & YOI)
+  SUI: {
+    prisonPhoneNumber: '01283 584 175',
+    selectVisitorsText: [
+      'You can add up to 3 people aged 12 and over - with a maximum of 5 total visitors.',
       'At least one visitor must be 18 or older.',
     ],
   },

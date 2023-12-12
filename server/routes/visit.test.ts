@@ -521,6 +521,7 @@ describe('GET /visit/:reference/cancel', () => {
         expect($('[data-test="administrative_error"]').attr('value')).toBe('ADMINISTRATIVE_ERROR')
         expect($('label[for="cancel-4"]').text().trim()).toBe('Administrative error')
 
+        expect($('input[name="method"]').length).toBe(4)
         expect($('input[name="method"]').eq(0).prop('value')).toBe('PHONE')
         expect($('input[name="method"]').eq(1).prop('value')).toBe('WEBSITE')
         expect($('input[name="method"]').eq(2).prop('value')).toBe('EMAIL')

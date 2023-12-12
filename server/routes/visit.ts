@@ -24,7 +24,7 @@ import sessionCheckMiddleware from '../middleware/sessionCheckMiddleware'
 import getPrisonConfiguration from '../constants/prisonConfiguration'
 import type { Services } from '../services'
 import eventAuditTypes from '../constants/eventAuditTypes'
-import { requestMethodDescriptions, requestMethodOptions } from '../constants/requestMethods'
+import { requestMethodDescriptions, requestMethodsCancellation } from '../constants/requestMethods'
 
 const A_DAY_IN_MS = 24 * 60 * 60 * 1000
 const CANCELLATION_LIMIT_DAYS = 28
@@ -315,7 +315,7 @@ export default function routes({
       errors: req.flash('errors'),
       reference,
       visitCancellationReasons,
-      requestMethodOptions,
+      requestMethodsCancellation,
       formValues: getFlashFormValues(req),
     })
   })
@@ -325,7 +325,7 @@ export default function routes({
     body('cancel', 'No answer selected').isIn(Object.keys(visitCancellationReasons)),
     body('method', 'No request method selected')
       .if(body('cancel').equals('VISITOR_CANCELLED'))
-      .isIn(Object.keys(requestMethodOptions)),
+      .isIn(Object.keys(requestMethodsCancellation)),
     body('reason', 'Enter a reason for the cancellation').trim().notEmpty(),
     async (req, res) => {
       const errors = validationResult(req)

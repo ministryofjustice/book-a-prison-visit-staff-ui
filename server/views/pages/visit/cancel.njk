@@ -19,7 +19,7 @@
         <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
         {% set requestMethods = [] %}
-        {% for key, text in requestMethodOptions %}
+        {% for key, text in requestMethodsCancellation %}
           {% set requestMethods = (requestMethods.push(
             {
               value: key,

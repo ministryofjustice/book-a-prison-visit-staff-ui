@@ -54,15 +54,24 @@ export default class NotificationsApiClient {
     prisonPhoneNumber: string
     reference: string
   }): Promise<SmsResponse> {
-    return this.notificationsApiClient.sendSms(templates.cancellationConfirmation, phoneNumber, {
-      personalisation: {
-        prison: prisonName,
-        time: visitTime,
-        date: visitDate,
-        'prison phone number': prisonPhoneNumber,
-        reference,
-      },
-    })
+    return prisonPhoneNumber !== ''
+      ? this.notificationsApiClient.sendSms(templates.cancellationConfirmation, phoneNumber, {
+          personalisation: {
+            prison: prisonName,
+            time: visitTime,
+            date: visitDate,
+            'prison phone number': prisonPhoneNumber,
+            reference,
+          },
+        })
+      : this.notificationsApiClient.sendSms(templates.cancellationConfirmationNoPrisonPhone, phoneNumber, {
+          personalisation: {
+            prison: prisonName,
+            time: visitTime,
+            date: visitDate,
+            reference,
+          },
+        })
   }
 
   async sendUpdateSms({

@@ -39,13 +39,14 @@
       {%- endif %}
     {% endset %}
 
+    {%- set slotTimeString = slot.startTimestamp | formatTime + " to " + slot.endTimestamp | formatTime -%}
     {%- set radios = (radios.push({
       value: slot.id,
-      html: '<p class="bapv-radio-paragraph"><strong>' + slot.startTimestamp | formatTime +
-        " to " + slot.endTimestamp | formatTime + "</strong><br>" + tableText + "</p>",
+      html: '<p class="bapv-radio-paragraph"><strong>' + slotTimeString + "</strong><br>" + tableText + "</p>",
       id: slot.id,
       checked: checked,
-      disabled: (doubleBooked and not checked)
+      disabled: (doubleBooked and not checked),
+      attributes: { "data-test": slot.startTimestamp | formatDate("yyyy-MM-dd") + " - " + slotTimeString }
     }), radios) %}
   {% endfor %}
 {% endmacro %}

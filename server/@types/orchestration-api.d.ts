@@ -352,7 +352,14 @@ export interface components {
        * @description application method
        * @enum {string}
        */
-      applicationMethodType: 'PHONE' | 'WEBSITE' | 'EMAIL' | 'IN_PERSON' | 'NOT_KNOWN' | 'NOT_APPLICABLE'
+      applicationMethodType:
+        | 'PHONE'
+        | 'WEBSITE'
+        | 'EMAIL'
+        | 'IN_PERSON'
+        | 'NOT_KNOWN'
+        | 'NOT_APPLICABLE'
+        | 'BY_PRISONER'
     }
     /**
      * @description Contact Phone Number
@@ -423,7 +430,14 @@ export interface components {
        * @description application method
        * @enum {string}
        */
-      applicationMethodType: 'PHONE' | 'WEBSITE' | 'EMAIL' | 'IN_PERSON' | 'NOT_KNOWN' | 'NOT_APPLICABLE'
+      applicationMethodType:
+        | 'PHONE'
+        | 'WEBSITE'
+        | 'EMAIL'
+        | 'IN_PERSON'
+        | 'NOT_KNOWN'
+        | 'NOT_APPLICABLE'
+        | 'BY_PRISONER'
     }
     DlqMessage: {
       body: {
@@ -457,7 +471,14 @@ export interface components {
        * @description What was the application method for this event
        * @enum {string}
        */
-      applicationMethodType: 'PHONE' | 'WEBSITE' | 'EMAIL' | 'IN_PERSON' | 'NOT_KNOWN' | 'NOT_APPLICABLE'
+      applicationMethodType:
+        | 'PHONE'
+        | 'WEBSITE'
+        | 'EMAIL'
+        | 'IN_PERSON'
+        | 'NOT_KNOWN'
+        | 'NOT_APPLICABLE'
+        | 'BY_PRISONER'
       /**
        * @description Event actioned by - user id
        * @example AB12345A
@@ -529,6 +550,8 @@ export interface components {
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
       pageSize?: number
+      /** Format: int32 */
+      pageNumber?: number
       paged?: boolean
       unpaged?: boolean
       /** Format: int32 */

@@ -130,6 +130,7 @@ export default {
       templates: {
         bookingConfirmation: '85904166-e539-43f5-9f51-7ba106cc61bd',
         cancellationConfirmation: '42a995f2-abbc-474b-8563-ca2995529111',
+        cancellationConfirmationNoPrisonPhone: '3103b319-267d-4265-83a6-a38e93fc2342',
         updateConfirmation: '386e83ff-5734-4d99-8279-b3eacb7cc8b8',
       },
     },

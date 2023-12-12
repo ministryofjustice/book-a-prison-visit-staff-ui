@@ -1,7 +1,8 @@
 import config from '../config'
 import NotificationsApiClient from './notificationsApiClient'
 
-const { bookingConfirmation, cancellationConfirmation, updateConfirmation } = config.apis.notifications.templates
+const { bookingConfirmation, cancellationConfirmation, cancellationConfirmationNoPrisonPhone, updateConfirmation } =
+  config.apis.notifications.templates
 const mockSendSms = jest.fn()
 
 jest.mock('notifications-node-client', () => {
@@ -51,16 +52,16 @@ describe('GOV.UK Notify client', () => {
   })
 
   describe('sendCancellationSms', () => {
-    const cancellationDetails = {
-      phoneNumber: '07123456789',
-      prisonPhoneNumber: '01234443225',
-      prisonName: 'Hewell',
-      visitTime: '10:00am',
-      visitDate: '1 August 2022',
-      reference: 'ab-cd-ef-gh',
-    }
+    it('should call notifications client sendCancellationSms() with the correct booking cancellation parameters - WITH prison phone number', async () => {
+      const cancellationDetails = {
+        phoneNumber: '07123456789',
+        prisonPhoneNumber: '01234443225',
+        prisonName: 'Hewell',
+        visitTime: '10:00am',
+        visitDate: '1 August 2022',
+        reference: 'ab-cd-ef-gh',
+      }
 
-    it('should call notifications client sendCancellationSms() with the correct booking cancellation parameters', async () => {
       await notificationsApiClient.sendCancellationSms(cancellationDetails)
 
       expect(mockSendSms).toHaveBeenCalledTimes(1)
@@ -68,6 +69,29 @@ describe('GOV.UK Notify client', () => {
         personalisation: {
           prison: cancellationDetails.prisonName,
           'prison phone number': cancellationDetails.prisonPhoneNumber,
+          time: cancellationDetails.visitTime,
+          date: cancellationDetails.visitDate,
+          reference: cancellationDetails.reference,
+        },
+      })
+    })
+
+    it('should call notifications client sendCancellationSms() with the correct booking cancellation parameters - WITHOUT prison phone number', async () => {
+      const cancellationDetails = {
+        phoneNumber: '07123456789',
+        prisonPhoneNumber: '',
+        prisonName: 'Hewell',
+        visitTime: '10:00am',
+        visitDate: '1 August 2022',
+        reference: 'ab-cd-ef-gh',
+      }
+
+      await notificationsApiClient.sendCancellationSms(cancellationDetails)
+
+      expect(mockSendSms).toHaveBeenCalledTimes(1)
+      expect(mockSendSms).toHaveBeenCalledWith(cancellationConfirmationNoPrisonPhone, cancellationDetails.phoneNumber, {
+        personalisation: {
+          prison: cancellationDetails.prisonName,
           time: cancellationDetails.visitTime,
           date: cancellationDetails.visitDate,
           reference: cancellationDetails.reference,
