@@ -29,17 +29,13 @@ parameters:
 jobs:
   acceptance_tests_main:
     docker:
-      - image: maven:3.9.5-eclipse-temurin-21-alpine
+      - image: maven:3.9.5-eclipse-temurin-21
       - image: seleniarm/standalone-chromium
         environment:
           CHROME_HEADLESS: 1
     circleci_ip_ranges: true
 
     steps:
-      - run:
-          name: Install git
-          command: |
-            apk update && apk add git
       - run:
           name: Checkout VSIP UI Tests - main
           command:
@@ -63,17 +59,13 @@ jobs:
 
   acceptance_tests_develop:
     docker:
-      - image: maven:3.9.5-eclipse-temurin-21-alpine
+      - image: maven:3.9.5-eclipse-temurin-21
       - image: seleniarm/standalone-chromium
         environment:
           CHROME_HEADLESS: 1
     circleci_ip_ranges: true
 
     steps:
-      - run:
-          name: Install git
-          command: |
-            apk update && apk add git
       - run:
           name: Checkout VSIP UI Tests - develop
           command:
