@@ -127,6 +127,13 @@ export interface paths {
      */
     get: operations['getSupportedPrisons']
   }
+  '/config/prisons/prison/{prisonCode}': {
+    /**
+     * Gets prison by given prison id/code
+     * @description Gets prison by given prison id/code
+     */
+    get: operations['getPrison']
+  }
 }
 
 export type webhooks = Record<string, never>
@@ -512,6 +519,12 @@ export interface components {
        * @example dp-we-rs-te
        */
       visitReference: string
+      /**
+       * Format: int32
+       * @description Number of visitors added to the visit
+       * @example 10
+       */
+      visitorCount: number
     }
     PageVisitDto: {
       /** Format: int32 */
@@ -525,10 +538,10 @@ export interface components {
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject']
+      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
-      last?: boolean
       empty?: boolean
     }
     PageableObject: {
@@ -545,6 +558,7 @@ export interface components {
     SortObject: {
       empty?: boolean
       sorted?: boolean
+      unsorted?: boolean
     }
     OrchestrationNotificationGroupDto: {
       /**
@@ -959,6 +973,33 @@ export interface components {
        */
       lastName?: string
     }
+    /** @description Prison dto */
+    PrisonDto: {
+      /**
+       * @description prison code
+       * @example BHI
+       */
+      code: string
+      /**
+       * @description is prison active
+       * @example true
+       */
+      active: boolean
+      /**
+       * Format: int32
+       * @description minimum number of days notice from the current date to booked a visit
+       * @example 2
+       */
+      policyNoticeDaysMin: number
+      /**
+       * Format: int32
+       * @description maximum number of days notice from the current date to booked a visit
+       * @example 28
+       */
+      policyNoticeDaysMax: number
+      /** @description exclude dates */
+      excludeDates: string[]
+    }
   }
   responses: never
   parameters: never
@@ -1334,7 +1375,7 @@ export interface operations {
          * @description To filter visits by status
          * @example BOOKED
          */
-        "visit status'": string
+        visitStatus: string
         /**
          * @description Visit Restriction(s) - OPEN / CLOSED / UNKNOWN
          * @example OPEN
@@ -1801,6 +1842,41 @@ export interface operations {
         }
       }
       /** @description Incorrect permissions to view session templates */
+      403: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  /**
+   * Gets prison by given prison id/code
+   * @description Gets prison by given prison id/code
+   */
+  getPrison: {
+    parameters: {
+      path: {
+        /**
+         * @description prison id
+         * @example BHI
+         */
+        prisonCode: string
+      }
+    }
+    responses: {
+      /** @description prison returned */
+      200: {
+        content: {
+          '*/*': components['schemas']['PrisonDto']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to get prison */
       403: {
         content: {
           'application/json': components['schemas']['ErrorResponse']

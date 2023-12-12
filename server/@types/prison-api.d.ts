@@ -70,7 +70,7 @@ export interface paths {
     put: operations['moveToCellOrReception']
   }
   '/api/offenders/{offenderNo}/discharge-to-hospital': {
-    /** *** BETA *** Discharges a prisoner to hospital, requires the RELEASE_PRISONER role */
+    /** Discharges a prisoner to hospital, requires the RELEASE_PRISONER role */
     put: operations['dischargePrisonerToHospital']
   }
   '/api/offenders/{offenderNo}/court-transfer-out': {
@@ -442,26 +442,12 @@ export interface paths {
      */
     post: operations['postOffenderAssessmentsAssessmentCode']
   }
-  '/api/offender-assessments/csra/rating': {
-    /**
-     * Retrieves CSRA ratings for multiple offenders - POST version to allow large offender lists.
-     * @description <p>This endpoint uses the REPLICA database.</p>
-     */
-    post: operations['postOffenderAssessmentsCsraRatings']
-  }
   '/api/offender-assessments/csra/list': {
     /**
      * Retrieves Offender CSRAs for multiple offenders - POST version to allow large offender lists.
      * @description <p>This endpoint uses the REPLICA database.</p>
      */
     post: operations['postOffenderAssessmentsCsraList']
-  }
-  '/api/offender-assessments/category': {
-    /**
-     * Returns Categorisation details for supplied Offenders - POST version to allow large offender lists.
-     * @description Categorisation details for all supplied Offenders using SYSTEM access<p>This endpoint uses the REPLICA database.</p>
-     */
-    post: operations['getOffenderCategorisationsSystem']
   }
   '/api/offences/unlink-from-schedule': {
     /**
@@ -497,7 +483,10 @@ export interface paths {
      * @description Returns a list of recently released or moved offender nos and the associated timestamp.
      */
     get: operations['getRecentMovementsByDate']
-    /** Create a new external movement for inactive bookings only, requires the INACTIVE_BOOKINGS role */
+    /**
+     * Create a new external movement for inactive bookings only
+     * @description requires the INACTIVE_BOOKINGS role
+     */
     post: operations['createExternalMovement']
   }
   '/api/movements/offenders': {
@@ -575,18 +564,6 @@ export interface paths {
      * @description Retrieves list of case notes grouped by type/sub-type and staff<p>This endpoint uses the REPLICA database.</p>
      */
     post: operations['getCaseNoteStaffUsageSummaryByPost']
-  }
-  '/api/bookings/{bookingId}/relationships': {
-    /**
-     * The contact details and their relationship to the offender
-     * @description The contact details and their relationship to the offender
-     */
-    get: operations['getRelationships']
-    /**
-     * Create a relationship with an offender
-     * @description Create a relationship with an offender
-     */
-    post: operations['createRelationship']
   }
   '/api/bookings/{bookingId}/prison-to-prison': {
     /**
@@ -936,6 +913,13 @@ export interface paths {
      */
     get: operations['getAllRolesForAgency']
   }
+  '/api/staff/{staffId}/{agencyId}/roles/{roleType}': {
+    /**
+     * Check if staff member has a role
+     * @description Check if staff member has a role, either KW or POM
+     */
+    get: operations['hasStaffRole']
+  }
   '/api/staff/{staffId}/emails': {
     /**
      * Returns a list of email addresses associated with this staff user
@@ -1116,7 +1100,131 @@ export interface paths {
   '/api/offenders/{offenderNo}/prison-timeline': {
     /**
      * Summary of the different periods this prisoner has been in prison.
-     * @description This is a summary of the different periods this prisoner has been in prison. It includes the dates of each period, the prison and the reason for the movement. Each booking is divided into periods of time spent in prison separated by periods when the were out either via a release or a temporary absence (periods at court are not included). The periods are ordered by date ascending, therefore the final period will be their last time in prison. For each period the prison admitted into and optionally released from will be listed. These can be different if there has been transfers in between the dates. Transfers are not listed but prisons the person was detailed at are listed in the unordered prison list
+     * @description This is a summary of the different periods this prisoner has been in prison grouped by booking.
+     *
+     * It includes the dates of each period, the prison and the reason for the movement. Each booking is divided into periods of time spent in prison separated by periods when the were out either via a release or a temporary absence (periods at court are not included).
+     *
+     * The periods are ordered by date ascending, therefore the final period will be their last time in prison. For each period the prison admitted into and optionally released from will be listed. These can be different if there has been transfers in between the dates.
+     *
+     * Transfers are also listed separately.
+     *
+     *
+     * **Example response:**
+     * #### Booking 47828A
+     * Has 2 periods of temporary absence. In the second absence they return to a different prison. They are eventually released.
+     *
+     * #### Booking 47829A
+     * The person is still is prison but has been transferred to a 2nd prison.
+     *
+     * There are a number of transfers during this booking.
+     * ```
+     * {
+     *   "prisonerNumber": "A7748DZ",
+     *   "prisonPeriod": [
+     *     {
+     *       "bookNumber": "47828A",
+     *       "bookingId": 1211013,
+     *       "entryDate": "2023-12-08T15:50:37",
+     *       "releaseDate": "2023-12-08T16:21:24",
+     *       "movementDates": [
+     *         {
+     *           "reasonInToPrison": "Imprisonment Without Option",
+     *           "dateInToPrison": "2023-12-08T15:50:37",
+     *           "inwardType": "ADM",
+     *           "reasonOutOfPrison": "Wedding/Civil Ceremony",
+     *           "dateOutOfPrison": "2023-12-08T15:53:37",
+     *           "outwardType": "TAP",
+     *           "admittedIntoPrisonId": "BMI",
+     *           "releaseFromPrisonId": "BSI"
+     *         },
+     *         {
+     *           "reasonInToPrison": "Wedding/Civil Ceremony",
+     *           "dateInToPrison": "2023-12-08T15:54:12",
+     *           "inwardType": "TAP",
+     *           "reasonOutOfPrison": "Conditional Release (CJA91) -SH Term>1YR",
+     *           "dateOutOfPrison": "2023-12-08T16:20:19",
+     *           "outwardType": "REL",
+     *           "admittedIntoPrisonId": "BSI",
+     *           "releaseFromPrisonId": "AYI"
+     *         },
+     *         {
+     *           "reasonInToPrison": "Recall From Intermittent Custody",
+     *           "dateInToPrison": "2023-12-08T16:20:45",
+     *           "inwardType": "ADM",
+     *           "reasonOutOfPrison": "Conditional Release (CJA91) -SH Term>1YR",
+     *           "dateOutOfPrison": "2023-12-08T16:21:24",
+     *           "outwardType": "REL",
+     *           "admittedIntoPrisonId": "AYI",
+     *           "releaseFromPrisonId": "AYI"
+     *         }
+     *       ],
+     *       "transfers": [
+     *         {
+     *           "dateOutOfPrison": "2023-12-08T15:51:09",
+     *           "dateInToPrison": "2023-12-08T15:52:32",
+     *           "transferReason": "Compassionate Transfer",
+     *           "fromPrisonId": "BMI",
+     *           "toPrisonId": "BSI"
+     *         },
+     *         {
+     *           "dateOutOfPrison": "2023-12-08T15:54:56",
+     *           "dateInToPrison": "2023-12-08T15:55:54",
+     *           "transferReason": "Transfer Via Court",
+     *           "fromPrisonId": "BSI",
+     *           "toPrisonId": "BRI"
+     *         },
+     *         {
+     *           "dateOutOfPrison": "2023-12-08T15:56:05",
+     *           "dateInToPrison": "2023-12-08T15:57:25",
+     *           "transferReason": "Appeals",
+     *           "fromPrisonId": "BRI",
+     *           "toPrisonId": "DAI"
+     *         },
+     *         {
+     *           "dateOutOfPrison": "2023-12-08T16:18:45",
+     *           "dateInToPrison": "2023-12-08T16:19:45",
+     *           "transferReason": "Medical",
+     *           "fromPrisonId": "DAI",
+     *           "toPrisonId": "AYI"
+     *         }
+     *       ],
+     *       "prisons": [
+     *         "BMI",
+     *         "BSI",
+     *         "BRI",
+     *         "DAI",
+     *         "AYI"
+     *       ]
+     *     },
+     *     {
+     *       "bookNumber": "47829A",
+     *       "bookingId": 1211014,
+     *       "entryDate": "2023-12-08T16:21:21",
+     *       "movementDates": [
+     *         {
+     *           "reasonInToPrison": "Imprisonment Without Option",
+     *           "dateInToPrison": "2023-12-08T16:21:21",
+     *           "inwardType": "ADM",
+     *           "admittedIntoPrisonId": "DGI"
+     *         }
+     *       ],
+     *       "transfers": [
+     *         {
+     *           "dateOutOfPrison": "2023-12-08T16:22:02",
+     *           "dateInToPrison": "2023-12-08T16:23:32",
+     *           "transferReason": "Overcrowding Draft",
+     *           "fromPrisonId": "DGI",
+     *           "toPrisonId": "BLI"
+     *         }
+     *       ],
+     *       "prisons": [
+     *         "DGI",
+     *         "BLI"
+     *       ]
+     *     }
+     *   ]
+     * }
+     * ```
      */
     get: operations['getOffenderPrisonPeriods']
   }
@@ -1252,13 +1360,6 @@ export interface paths {
      */
     get: operations['getOffenderCategorisations']
   }
-  '/api/offender-assessments/assessments': {
-    /**
-     * Returns assessment information on Offenders at a prison.
-     * @description <p>This endpoint uses the REPLICA database.</p>
-     */
-    get: operations['getAssessments']
-  }
   '/api/offender-activities/{offenderNo}/attendance-history': {
     /**
      * The activities that this offender attended over a time period.
@@ -1274,7 +1375,11 @@ export interface paths {
     get: operations['getRecentStartedActivities']
   }
   '/api/offences/code/{offenceCode}': {
-    /** Paged List of all offences where the offence code starts with the passed in offenceCode param */
+    /**
+     * Paged List of all offences where the offence code starts with the passed in offenceCode param
+     * @deprecated
+     * @description Deprecated - use https://manage-offences-api-dev.hmpps.service.justice.gov.uk/swagger-ui/index.html
+     */
     get: operations['getOffencesThatStartWith']
   }
   '/api/movements/{agencyId}/out/{isoDate}': {
@@ -1304,7 +1409,7 @@ export interface paths {
   '/api/movements/upcomingCourtAppearances': {
     /**
      * Get future court hearings for all offenders
-     * @description <p>This endpoint uses the REPLICA database.</p>
+     * @description Requires role VIEW_COURT_EVENTS.<p>This endpoint uses the REPLICA database.</p>
      */
     get: operations['getUpcomingCourtAppearances']
   }
@@ -1342,18 +1447,21 @@ export interface paths {
   '/api/movements/livingUnit/{livingUnitId}/currently-out': {
     /**
      * Information on offenders currently out.
-     * @description Information on offenders currently out.<p>This endpoint uses the REPLICA database.</p>
+     * @description Requires role ESTABLISHMENT_ROLL.<p>This endpoint uses the REPLICA database.</p>
      */
     get: operations['getOffendersCurrentlyOut']
   }
   '/api/movements/agency/{agencyId}/temporary-absences': {
-    /** Information about the set of offenders at an agency who are currently out due to temporary absence. */
+    /**
+     * Information about the set of offenders at an agency who are currently out due to temporary absence.
+     * @description Requires role ESTABLISHMENT_ROLL.
+     */
     get: operations['getTemporaryAbsences']
   }
   '/api/movements/agency/{agencyId}/currently-out': {
     /**
      * Information on offenders currently out.
-     * @description Information on offenders currently out.
+     * @description Requires role ESTABLISHMENT_ROLL.
      */
     get: operations['getOffendersCurrentlyOut_1']
   }
@@ -1399,7 +1507,7 @@ export interface paths {
   '/api/incidents/{incidentId}': {
     /**
      * Return an Incident for a given incident ID
-     * @description Requires the VIEW_PRISONER_DATA role.
+     * @description Requires the VIEW_INCIDENTS role.
      */
     get: operations['getIncident']
   }
@@ -1650,7 +1758,7 @@ export interface paths {
      * Assessment Information
      * @description Assessment Information
      */
-    get: operations['getAssessments_1']
+    get: operations['getAssessments']
   }
   '/api/bookings/{bookingId}/assessment/{assessmentCode}': {
     /**
@@ -3145,16 +3253,16 @@ export interface components {
       ltdCalculatedDate?: string
       /**
        * Format: date
-       * @description Top-up supervision start date for offender - calculated as licence end date + 1 day or releaseDate if licence end date not set.
-       * @example 2019-04-01
-       */
-      topupSupervisionStartDate?: string
-      /**
-       * Format: date
        * @description Offender's home detention curfew end date - calculated as one day before the releaseDate.
        * @example 2019-04-01
        */
       homeDetentionCurfewEndDate?: string
+      /**
+       * Format: date
+       * @description Top-up supervision start date for offender - calculated as licence end date + 1 day or releaseDate if licence end date not set.
+       * @example 2019-04-01
+       */
+      topupSupervisionStartDate?: string
     }
     /** @description Represents the data required for receiving a prisoner transfer */
     RequestToTransferIn: {
@@ -3376,12 +3484,7 @@ export interface components {
        * @description The time the release occurred, if not supplied it will be the current time. Note: Time can be in the past but not before the last movement
        * @example 2021-07-05T10:35:17
        */
-      dischargeTime: string
-      /**
-       * @description Additional comments about the release
-       * @example Prisoner was released on bail
-       */
-      commentText?: string
+      dischargeTime?: string
       /**
        * @description Supporting Prison for POM, can be null if prisoner is already in a prison, for prisoners already released this field will be ignored
        * @example MDI
@@ -5127,81 +5230,6 @@ export interface components {
       /** @description Is true, when there are no dates to be recorded in NOMIS */
       noDates?: boolean
     }
-    /** @description AssessmentRating */
-    AssessmentClassification: {
-      /**
-       * @description Offender number (e.g. NOMS Number).
-       * @example GV09876N
-       */
-      offenderNo: string
-      /**
-       * @description The current classification code. This will not have a value if np assessment has been completed
-       * @example STANDARD
-       */
-      classificationCode?: string
-      /**
-       * Format: date
-       * @description The date that the current classification was made. This will not have a value if np assessment has been completed
-       * @example 2018-02-11
-       */
-      classificationDate?: string
-    }
-    /** @description Prisoner with categorisation data */
-    OffenderCategorise: {
-      /** @description Display Prisoner Number */
-      offenderNo: string
-      /** Format: int64 */
-      bookingId: number
-      /** @description Prisoner First Name */
-      firstName: string
-      /** @description Prisoner Last Name */
-      lastName: string
-      /**
-       * Format: date
-       * @description Categorisation date if any
-       */
-      assessmentDate?: string
-      /**
-       * Format: date
-       * @description Date categorisation was approved if any
-       */
-      approvalDate?: string
-      /**
-       * Format: int32
-       * @description Sequence number within booking
-       */
-      assessmentSeq?: number
-      /**
-       * Format: int64
-       * @description assessment type
-       */
-      assessmentTypeId?: number
-      /**
-       * @description Categorisation status
-       * @enum {string}
-       */
-      assessStatus?: 'P' | 'A' | 'I'
-      /** @description Categoriser First Name */
-      categoriserFirstName?: string
-      /** @description Categoriser Last Name */
-      categoriserLastName?: string
-      /** @description Approver First Name if any */
-      approverFirstName?: string
-      /** @description Approver Last Name if any */
-      approverLastName?: string
-      /** @description Categorisation */
-      category?: string
-      /**
-       * Format: date
-       * @description Next Review Date - for recategorisations
-       */
-      nextReviewDate?: string
-      /**
-       * @description Where in the categorisation workflow the prisoner is
-       * @enum {string}
-       */
-      status: 'UNCATEGORISED' | 'AWAITING_APPROVAL'
-    }
     /** @description Categorisation details */
     CategorisationDetail: {
       /**
@@ -5776,130 +5804,6 @@ export interface components {
        * @example 2021-07-05T10:35:17
        */
       latestCaseNote: string
-    }
-    /** @description The person details and their relationship to the offender */
-    OffenderRelationship: {
-      /**
-       * Format: int64
-       * @description id of the person contact
-       */
-      personId?: number
-      /** @description unique external Id */
-      externalRef?: string
-      /** @description Surname */
-      lastName: string
-      /** @description First Name */
-      firstName: string
-      /** @description Relationship to inmate (e.g. COM or POM, etc.) */
-      relationshipType: string
-    }
-    /** @description Contact */
-    Contact: {
-      /**
-       * @description Last name of the contact
-       * @example SMITH
-       */
-      lastName: string
-      /**
-       * @description First Name
-       * @example JOHN
-       */
-      firstName: string
-      /**
-       * @description Middle Names
-       * @example MARK
-       */
-      middleName?: string
-      /**
-       * @description Contact type
-       * @example O
-       */
-      contactType: string
-      /**
-       * @description Contact type text
-       * @example Official
-       */
-      contactTypeDescription?: string
-      /**
-       * @description Relationship to prisoner
-       * @example RO
-       */
-      relationship: string
-      /**
-       * @description Relationship text
-       * @example Responsible Officer
-       */
-      relationshipDescription?: string
-      /**
-       * @description Comments
-       * @example Some additional information
-       */
-      commentText?: string
-      /**
-       * @description Is an emergency contact
-       * @example true
-       */
-      emergencyContact: boolean
-      /**
-       * @description Indicates that the contact is Next of Kin Type
-       * @example false
-       */
-      nextOfKin: boolean
-      /**
-       * Format: int64
-       * @description ID of the relationship (internal)
-       * @example 10466277
-       */
-      relationshipId?: number
-      /**
-       * Format: int64
-       * @description id of the person contact
-       * @example 5871791
-       */
-      personId?: number
-      /**
-       * @description Active indicator flag.
-       * @example true
-       */
-      activeFlag: boolean
-      /**
-       * Format: date
-       * @description Date made inactive
-       * @example 2019-01-31
-       */
-      expiryDate?: string
-      /**
-       * @description Approved Visitor
-       * @example true
-       */
-      approvedVisitorFlag: boolean
-      /**
-       * @description Can be contacted
-       * @example false
-       */
-      canBeContactedFlag: boolean
-      /**
-       * @description Aware of charges against prisoner
-       * @example true
-       */
-      awareOfChargesFlag: boolean
-      /**
-       * Format: int64
-       * @description Link to root offender ID
-       * @example 5871791
-       */
-      contactRootOffenderId?: number
-      /**
-       * Format: int64
-       * @description Offender Booking Id for this contact
-       * @example 2468081
-       */
-      bookingId: number
-      /**
-       * @description Date time the contact was created
-       * @example 2021-07-05T10:35:17
-       */
-      createDateTime: string
     }
     /** @description The prison to prison move to be scheduled for the offender booking. */
     SchedulePrisonToPrisonMove: {
@@ -7798,6 +7702,8 @@ export interface components {
       releaseDate?: string
       /** @description List of significant period of time when in prison. The time between these periods means they person was out of prison (but not including court) */
       movementDates: components['schemas']['SignificantMovement'][]
+      /** @description List of transfers during this period. Will be empty if there have been no transfers. Transfer via court or temporary absence are also included */
+      transfers: components['schemas']['TransferDetail'][]
       /** @description List of prisons the person was detained during this booking period */
       prisons: string[]
     }
@@ -7850,6 +7756,34 @@ export interface components {
        * @example MDI
        */
       releaseFromPrisonId?: string
+    }
+    /** @description A movement that is a transfer */
+    TransferDetail: {
+      /**
+       * @description Date prisoner left the original prison
+       * @example 2021-07-05T10:35:17
+       */
+      dateOutOfPrison?: string
+      /**
+       * @description Date prisoner entered the new prison. Can be absent if they have not arrived at the prison yet
+       * @example 2021-07-05T10:35:17
+       */
+      dateInToPrison?: string
+      /**
+       * @description Reason for the transfer
+       * @example Compassionate Transfer
+       */
+      transferReason?: string
+      /**
+       * @description The prison they were transferred from
+       * @example WWI
+       */
+      fromPrisonId?: string
+      /**
+       * @description The prison they were transferred to. Can be absent if they have not arrived at the prison yet
+       * @example BXI
+       */
+      toPrisonId: string
     }
     /** @description Offender restriction */
     OffenderRestriction: {
@@ -8625,16 +8559,16 @@ export interface components {
       tariffEarlyRemovalSchemeEligibilityDate?: string
       /**
        * Format: date
-       * @description Top-up supervision start date for offender - calculated as licence end date + 1 day or releaseDate if licence end date not set.
-       * @example 2019-04-01
-       */
-      topupSupervisionStartDate?: string
-      /**
-       * Format: date
        * @description Offender's home detention curfew end date - calculated as one day before the releaseDate.
        * @example 2019-04-01
        */
       homeDetentionCurfewEndDate?: string
+      /**
+       * Format: date
+       * @description Top-up supervision start date for offender - calculated as licence end date + 1 day or releaseDate if licence end date not set.
+       * @example 2019-04-01
+       */
+      topupSupervisionStartDate?: string
     }
     /** @description Prison Term */
     PrisonTerm: {
@@ -9201,6 +9135,62 @@ export interface components {
       answer?: string
       /** @description If a question has more than one answer, all but the first answer will be in this property */
       additionalAnswers?: string[]
+    }
+    /** @description Prisoner with categorisation data */
+    OffenderCategorise: {
+      /** @description Display Prisoner Number */
+      offenderNo: string
+      /** Format: int64 */
+      bookingId: number
+      /** @description Prisoner First Name */
+      firstName: string
+      /** @description Prisoner Last Name */
+      lastName: string
+      /**
+       * Format: date
+       * @description Categorisation date if any
+       */
+      assessmentDate?: string
+      /**
+       * Format: date
+       * @description Date categorisation was approved if any
+       */
+      approvalDate?: string
+      /**
+       * Format: int32
+       * @description Sequence number within booking
+       */
+      assessmentSeq?: number
+      /**
+       * Format: int64
+       * @description assessment type
+       */
+      assessmentTypeId?: number
+      /**
+       * @description Categorisation status
+       * @enum {string}
+       */
+      assessStatus?: 'P' | 'A' | 'I'
+      /** @description Categoriser First Name */
+      categoriserFirstName?: string
+      /** @description Categoriser Last Name */
+      categoriserLastName?: string
+      /** @description Approver First Name if any */
+      approverFirstName?: string
+      /** @description Approver Last Name if any */
+      approverLastName?: string
+      /** @description Categorisation */
+      category?: string
+      /**
+       * Format: date
+       * @description Next Review Date - for recategorisations
+       */
+      nextReviewDate?: string
+      /**
+       * @description Where in the categorisation workflow the prisoner is
+       * @enum {string}
+       */
+      status: 'UNCATEGORISED' | 'AWAITING_APPROVAL'
     }
     PageOffenceDto: {
       /** Format: int64 */
@@ -10494,6 +10484,114 @@ export interface components {
       /** @description Court hearings associated with the court case */
       courtHearings?: components['schemas']['CourtHearing'][]
     }
+    /** @description Contact */
+    Contact: {
+      /**
+       * @description Last name of the contact
+       * @example SMITH
+       */
+      lastName: string
+      /**
+       * @description First Name
+       * @example JOHN
+       */
+      firstName: string
+      /**
+       * @description Middle Names
+       * @example MARK
+       */
+      middleName?: string
+      /**
+       * @description Contact type
+       * @example O
+       */
+      contactType: string
+      /**
+       * @description Contact type text
+       * @example Official
+       */
+      contactTypeDescription?: string
+      /**
+       * @description Relationship to prisoner
+       * @example RO
+       */
+      relationship: string
+      /**
+       * @description Relationship text
+       * @example Responsible Officer
+       */
+      relationshipDescription?: string
+      /**
+       * @description Comments
+       * @example Some additional information
+       */
+      commentText?: string
+      /**
+       * @description Is an emergency contact
+       * @example true
+       */
+      emergencyContact: boolean
+      /**
+       * @description Indicates that the contact is Next of Kin Type
+       * @example false
+       */
+      nextOfKin: boolean
+      /**
+       * Format: int64
+       * @description ID of the relationship (internal)
+       * @example 10466277
+       */
+      relationshipId?: number
+      /**
+       * Format: int64
+       * @description id of the person contact
+       * @example 5871791
+       */
+      personId?: number
+      /**
+       * @description Active indicator flag.
+       * @example true
+       */
+      activeFlag: boolean
+      /**
+       * Format: date
+       * @description Date made inactive
+       * @example 2019-01-31
+       */
+      expiryDate?: string
+      /**
+       * @description Approved Visitor
+       * @example true
+       */
+      approvedVisitorFlag: boolean
+      /**
+       * @description Can be contacted
+       * @example false
+       */
+      canBeContactedFlag: boolean
+      /**
+       * @description Aware of charges against prisoner
+       * @example true
+       */
+      awareOfChargesFlag: boolean
+      /**
+       * Format: int64
+       * @description Link to root offender ID
+       * @example 5871791
+       */
+      contactRootOffenderId?: number
+      /**
+       * Format: int64
+       * @description Offender Booking Id for this contact
+       * @example 2468081
+       */
+      bookingId: number
+      /**
+       * @description Date time the contact was created
+       * @example 2021-07-05T10:35:17
+       */
+      createDateTime: string
+    }
     /** @description Contacts Details for offender */
     ContactDetail: {
       /** Format: int64 */
@@ -11507,7 +11605,7 @@ export interface operations {
       }
     }
   }
-  /** *** BETA *** Discharges a prisoner to hospital, requires the RELEASE_PRISONER role */
+  /** Discharges a prisoner to hospital, requires the RELEASE_PRISONER role */
   dischargePrisonerToHospital: {
     parameters: {
       path: {
@@ -14018,25 +14116,6 @@ export interface operations {
     }
   }
   /**
-   * Retrieves CSRA ratings for multiple offenders - POST version to allow large offender lists.
-   * @description <p>This endpoint uses the REPLICA database.</p>
-   */
-  postOffenderAssessmentsCsraRatings: {
-    requestBody: {
-      content: {
-        'application/json': string[]
-      }
-    }
-    responses: {
-      /** @description The current CSRA rating for each offender. */
-      200: {
-        content: {
-          'application/json': components['schemas']['AssessmentClassification'][]
-        }
-      }
-    }
-  }
-  /**
    * Retrieves Offender CSRAs for multiple offenders - POST version to allow large offender lists.
    * @description <p>This endpoint uses the REPLICA database.</p>
    */
@@ -14051,31 +14130,6 @@ export interface operations {
       200: {
         content: {
           'application/json': components['schemas']['Assessment'][]
-        }
-      }
-    }
-  }
-  /**
-   * Returns Categorisation details for supplied Offenders - POST version to allow large offender lists.
-   * @description Categorisation details for all supplied Offenders using SYSTEM access<p>This endpoint uses the REPLICA database.</p>
-   */
-  getOffenderCategorisationsSystem: {
-    parameters: {
-      query?: {
-        /** @description Only get the latest category for each booking */
-        latestOnly?: boolean
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': number[]
-      }
-    }
-    responses: {
-      /** @description The list of offenders with categorisation details is returned if categorisation record exists */
-      200: {
-        content: {
-          'application/json': components['schemas']['OffenderCategorise'][]
         }
       }
     }
@@ -14210,7 +14264,10 @@ export interface operations {
       }
     }
   }
-  /** Create a new external movement for inactive bookings only, requires the INACTIVE_BOOKINGS role */
+  /**
+   * Create a new external movement for inactive bookings only
+   * @description requires the INACTIVE_BOOKINGS role
+   */
   createExternalMovement: {
     requestBody: {
       content: {
@@ -14652,73 +14709,6 @@ export interface operations {
       200: {
         content: {
           'application/json': components['schemas']['CaseNoteStaffUsage'][]
-        }
-      }
-    }
-  }
-  /**
-   * The contact details and their relationship to the offender
-   * @description The contact details and their relationship to the offender
-   */
-  getRelationships: {
-    parameters: {
-      query?: {
-        /** @description filter by the relationship type */
-        relationshipType?: string
-      }
-      path: {
-        /** @description The offender booking id */
-        bookingId: number
-      }
-    }
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['Contact'][]
-        }
-      }
-      /** @description Invalid request. */
-      400: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Requested resource not found. */
-      404: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Unrecoverable error occurred whilst processing request. */
-      500: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  /**
-   * Create a relationship with an offender
-   * @description Create a relationship with an offender
-   */
-  createRelationship: {
-    parameters: {
-      path: {
-        /** @description The offender booking id */
-        bookingId: number
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['OffenderRelationship']
-      }
-    }
-    responses: {
-      /** @description If successful the Contact object is returned. */
-      201: {
-        content: {
-          'application/json': components['schemas']['Contact']
         }
       }
     }
@@ -16679,6 +16669,51 @@ export interface operations {
     }
   }
   /**
+   * Check if staff member has a role
+   * @description Check if staff member has a role, either KW or POM
+   */
+  hasStaffRole: {
+    parameters: {
+      path: {
+        /**
+         * @description The staff id of the staff member.
+         * @example 1111111
+         */
+        staffId: number
+        /**
+         * @description Agency Id.
+         * @example MDI
+         */
+        agencyId: string
+        /**
+         * @description Type of role
+         * @example KW
+         */
+        roleType: 'KW' | 'POM'
+      }
+    }
+    responses: {
+      /** @description Invalid request. */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Requested resource not found. */
+      404: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unrecoverable error occurred whilst processing request. */
+      500: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  /**
    * Returns a list of email addresses associated with this staff user
    * @description List of email addresses for a specified staff user
    */
@@ -17766,7 +17801,131 @@ export interface operations {
   }
   /**
    * Summary of the different periods this prisoner has been in prison.
-   * @description This is a summary of the different periods this prisoner has been in prison. It includes the dates of each period, the prison and the reason for the movement. Each booking is divided into periods of time spent in prison separated by periods when the were out either via a release or a temporary absence (periods at court are not included). The periods are ordered by date ascending, therefore the final period will be their last time in prison. For each period the prison admitted into and optionally released from will be listed. These can be different if there has been transfers in between the dates. Transfers are not listed but prisons the person was detailed at are listed in the unordered prison list
+   * @description This is a summary of the different periods this prisoner has been in prison grouped by booking.
+   *
+   * It includes the dates of each period, the prison and the reason for the movement. Each booking is divided into periods of time spent in prison separated by periods when the were out either via a release or a temporary absence (periods at court are not included).
+   *
+   * The periods are ordered by date ascending, therefore the final period will be their last time in prison. For each period the prison admitted into and optionally released from will be listed. These can be different if there has been transfers in between the dates.
+   *
+   * Transfers are also listed separately.
+   *
+   *
+   * **Example response:**
+   * #### Booking 47828A
+   * Has 2 periods of temporary absence. In the second absence they return to a different prison. They are eventually released.
+   *
+   * #### Booking 47829A
+   * The person is still is prison but has been transferred to a 2nd prison.
+   *
+   * There are a number of transfers during this booking.
+   * ```
+   * {
+   *   "prisonerNumber": "A7748DZ",
+   *   "prisonPeriod": [
+   *     {
+   *       "bookNumber": "47828A",
+   *       "bookingId": 1211013,
+   *       "entryDate": "2023-12-08T15:50:37",
+   *       "releaseDate": "2023-12-08T16:21:24",
+   *       "movementDates": [
+   *         {
+   *           "reasonInToPrison": "Imprisonment Without Option",
+   *           "dateInToPrison": "2023-12-08T15:50:37",
+   *           "inwardType": "ADM",
+   *           "reasonOutOfPrison": "Wedding/Civil Ceremony",
+   *           "dateOutOfPrison": "2023-12-08T15:53:37",
+   *           "outwardType": "TAP",
+   *           "admittedIntoPrisonId": "BMI",
+   *           "releaseFromPrisonId": "BSI"
+   *         },
+   *         {
+   *           "reasonInToPrison": "Wedding/Civil Ceremony",
+   *           "dateInToPrison": "2023-12-08T15:54:12",
+   *           "inwardType": "TAP",
+   *           "reasonOutOfPrison": "Conditional Release (CJA91) -SH Term>1YR",
+   *           "dateOutOfPrison": "2023-12-08T16:20:19",
+   *           "outwardType": "REL",
+   *           "admittedIntoPrisonId": "BSI",
+   *           "releaseFromPrisonId": "AYI"
+   *         },
+   *         {
+   *           "reasonInToPrison": "Recall From Intermittent Custody",
+   *           "dateInToPrison": "2023-12-08T16:20:45",
+   *           "inwardType": "ADM",
+   *           "reasonOutOfPrison": "Conditional Release (CJA91) -SH Term>1YR",
+   *           "dateOutOfPrison": "2023-12-08T16:21:24",
+   *           "outwardType": "REL",
+   *           "admittedIntoPrisonId": "AYI",
+   *           "releaseFromPrisonId": "AYI"
+   *         }
+   *       ],
+   *       "transfers": [
+   *         {
+   *           "dateOutOfPrison": "2023-12-08T15:51:09",
+   *           "dateInToPrison": "2023-12-08T15:52:32",
+   *           "transferReason": "Compassionate Transfer",
+   *           "fromPrisonId": "BMI",
+   *           "toPrisonId": "BSI"
+   *         },
+   *         {
+   *           "dateOutOfPrison": "2023-12-08T15:54:56",
+   *           "dateInToPrison": "2023-12-08T15:55:54",
+   *           "transferReason": "Transfer Via Court",
+   *           "fromPrisonId": "BSI",
+   *           "toPrisonId": "BRI"
+   *         },
+   *         {
+   *           "dateOutOfPrison": "2023-12-08T15:56:05",
+   *           "dateInToPrison": "2023-12-08T15:57:25",
+   *           "transferReason": "Appeals",
+   *           "fromPrisonId": "BRI",
+   *           "toPrisonId": "DAI"
+   *         },
+   *         {
+   *           "dateOutOfPrison": "2023-12-08T16:18:45",
+   *           "dateInToPrison": "2023-12-08T16:19:45",
+   *           "transferReason": "Medical",
+   *           "fromPrisonId": "DAI",
+   *           "toPrisonId": "AYI"
+   *         }
+   *       ],
+   *       "prisons": [
+   *         "BMI",
+   *         "BSI",
+   *         "BRI",
+   *         "DAI",
+   *         "AYI"
+   *       ]
+   *     },
+   *     {
+   *       "bookNumber": "47829A",
+   *       "bookingId": 1211014,
+   *       "entryDate": "2023-12-08T16:21:21",
+   *       "movementDates": [
+   *         {
+   *           "reasonInToPrison": "Imprisonment Without Option",
+   *           "dateInToPrison": "2023-12-08T16:21:21",
+   *           "inwardType": "ADM",
+   *           "admittedIntoPrisonId": "DGI"
+   *         }
+   *       ],
+   *       "transfers": [
+   *         {
+   *           "dateOutOfPrison": "2023-12-08T16:22:02",
+   *           "dateInToPrison": "2023-12-08T16:23:32",
+   *           "transferReason": "Overcrowding Draft",
+   *           "fromPrisonId": "DGI",
+   *           "toPrisonId": "BLI"
+   *         }
+   *       ],
+   *       "prisons": [
+   *         "DGI",
+   *         "BLI"
+   *       ]
+   *     }
+   *   ]
+   * }
+   * ```
    */
   getOffenderPrisonPeriods: {
     parameters: {
@@ -18564,9 +18723,18 @@ export interface operations {
   getOffenderCategorisations: {
     parameters: {
       query: {
-        /** @description Indicates which type of category information is required.<li>UNCATEGORISED: Offenders who need to be categorised,</li><li>CATEGORISED: Offenders who have an approved categorisation,</li><li>RECATEGORISATIONS: Offenders who will soon require recategorisation</li> */
+        /**
+         * @description Indicates which type of category information is required.
+         *     <li>UNCATEGORISED: Offenders who need to be categorised,</li>
+         *     <li>CATEGORISED: Offenders who have an approved categorisation,</li>
+         *     <li>RECATEGORISATIONS: Offenders who will soon require recategorisation</li>
+         */
         type: string
-        /** @description For type CATEGORISED: The past date from which categorisations are returned.<br />For type RECATEGORISATIONS: the future cutoff date: list includes all prisoners who require re-categorisation on or before this date.<br />For type UNCATEGORISED: Ignored; do not set this parameter. */
+        /**
+         * @description For type CATEGORISED: The past date from which categorisations are returned.<br />
+         * For type RECATEGORISATIONS: the future cutoff date: list includes all prisoners who require re-categorisation on or before this date.<br />
+         * For type UNCATEGORISED: Ignored; do not set this parameter.
+         */
         date?: string
       }
       path: {
@@ -18579,38 +18747,6 @@ export interface operations {
       200: {
         content: {
           'application/json': components['schemas']['OffenderCategorise'][]
-        }
-      }
-    }
-  }
-  /**
-   * Returns assessment information on Offenders at a prison.
-   * @description <p>This endpoint uses the REPLICA database.</p>
-   */
-  getAssessments: {
-    parameters: {
-      query: {
-        /** @description The required offender numbers Ids (mandatory) */
-        offenderNo: string[]
-        /** @description Returns only assessments for the current sentence if true, otherwise assessments for all previous sentences are included */
-        latestOnly?: boolean
-        /** @description Returns only active assessments if true, otherwise inactive and pending assessments are included */
-        activeOnly?: boolean
-        /** @description Returns only the last assessment per sentence if true, otherwise all assessments for the booking are included */
-        mostRecentOnly?: boolean
-      }
-    }
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['Assessment'][]
-        }
-      }
-      /** @description Invalid request - e.g. no offender numbers provided. */
-      400: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
         }
       }
     }
@@ -18688,7 +18824,11 @@ export interface operations {
       }
     }
   }
-  /** Paged List of all offences where the offence code starts with the passed in offenceCode param */
+  /**
+   * Paged List of all offences where the offence code starts with the passed in offenceCode param
+   * @deprecated
+   * @description Deprecated - use https://manage-offences-api-dev.hmpps.service.justice.gov.uk/swagger-ui/index.html
+   */
   getOffencesThatStartWith: {
     parameters: {
       query?: {
@@ -18898,7 +19038,7 @@ export interface operations {
   }
   /**
    * Get future court hearings for all offenders
-   * @description <p>This endpoint uses the REPLICA database.</p>
+   * @description Requires role VIEW_COURT_EVENTS.<p>This endpoint uses the REPLICA database.</p>
    */
   getUpcomingCourtAppearances: {
     responses: {
@@ -18942,18 +19082,6 @@ export interface operations {
       }
       /** @description Invalid agency identifiers, or from time after the to time, or a time period greater than 24 hours specified, or parameter format not correct. */
       400: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description The token presented did not contain the necessary role to access this resource. */
-      401: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description The token presented has expired. */
-      403: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
@@ -19122,7 +19250,7 @@ export interface operations {
   }
   /**
    * Information on offenders currently out.
-   * @description Information on offenders currently out.<p>This endpoint uses the REPLICA database.</p>
+   * @description Requires role ESTABLISHMENT_ROLL.<p>This endpoint uses the REPLICA database.</p>
    */
   getOffendersCurrentlyOut: {
     parameters: {
@@ -19158,7 +19286,10 @@ export interface operations {
       }
     }
   }
-  /** Information about the set of offenders at an agency who are currently out due to temporary absence. */
+  /**
+   * Information about the set of offenders at an agency who are currently out due to temporary absence.
+   * @description Requires role ESTABLISHMENT_ROLL.
+   */
   getTemporaryAbsences: {
     parameters: {
       path: {
@@ -19173,18 +19304,6 @@ export interface operations {
           'application/json': components['schemas']['OutOnTemporaryAbsenceSummary'][]
         }
       }
-      /** @description The token presented did not contain the necessary role to access this resource. */
-      401: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description The token presented has expired. */
-      403: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
       /** @description Unrecoverable error occurred whilst processing request. */
       500: {
         content: {
@@ -19195,7 +19314,7 @@ export interface operations {
   }
   /**
    * Information on offenders currently out.
-   * @description Information on offenders currently out.
+   * @description Requires role ESTABLISHMENT_ROLL.
    */
   getOffendersCurrentlyOut_1: {
     parameters: {
@@ -19509,7 +19628,7 @@ export interface operations {
   }
   /**
    * Return an Incident for a given incident ID
-   * @description Requires the VIEW_PRISONER_DATA role.
+   * @description Requires the VIEW_INCIDENTS role.
    */
   getIncident: {
     parameters: {
@@ -20993,7 +21112,7 @@ export interface operations {
    * Assessment Information
    * @description Assessment Information
    */
-  getAssessments_1: {
+  getAssessments: {
     parameters: {
       path: {
         /** @description The offender booking id */
