@@ -38,8 +38,8 @@ jobs:
     steps:
       - run:
           name: Install git
-          command:
-            RUN apt-get update && apt-get install -y git
+          command: |
+            apk update && apk add git
       - run:
           name: Checkout VSIP UI Tests - main
           command:
@@ -72,8 +72,8 @@ jobs:
     steps:
       - run:
           name: Install git
-          command:
-            RUN apt-get update && apt-get install -y git
+          command: |
+            apk update && apk add git
       - run:
           name: Checkout VSIP UI Tests - develop
           command:
