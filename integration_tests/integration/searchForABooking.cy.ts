@@ -23,7 +23,7 @@ context('Search for a booking by reference', () => {
     cy.task('stubAuthUser')
     cy.task('stubSupportedPrisonIds')
     cy.task('stubPrisonNames')
-    cy.task('stubGetPrison', { prisonCode: 'HEI' })
+    cy.task('stubGetPrison')
     cy.task('stubGetNotificationCount', {})
     cy.signIn()
   })

@@ -310,7 +310,7 @@ export default class TestData {
   static supportedPrisonIds = ({ prisonIds = ['HEI', 'BLI'] } = {}): string[] => prisonIds
 
   static prisonDto = ({
-    code = 'BLI',
+    code = 'HEI',
     active = true,
     policyNoticeDaysMax = 28,
     policyNoticeDaysMin = 3,
