@@ -29,7 +29,7 @@ parameters:
 jobs:
   acceptance_tests_main:
     docker:
-      - image: maven:3.9.5-eclipse-temurin-21-alpine
+      - image: maven:3.9.6-amazoncorretto-21-debian
       - image: seleniarm/standalone-chromium
         environment:
           CHROME_HEADLESS: 1
@@ -59,7 +59,7 @@ jobs:
 
   acceptance_tests_develop:
     docker:
-      - image: maven:3.9.5-eclipse-temurin-21-alpine
+      - image: maven:3.9.6-amazoncorretto-21-debian
       - image: seleniarm/standalone-chromium
         environment:
           CHROME_HEADLESS: 1
