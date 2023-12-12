@@ -29,7 +29,7 @@ parameters:
 jobs:
   acceptance_tests_main:
     docker:
-      - image: maven:3.8.4-jdk-11
+      - image: maven:3.9.5-eclipse-temurin-21-alpine
       - image: seleniarm/standalone-chromium
         environment:
           CHROME_HEADLESS: 1
@@ -55,11 +55,11 @@ jobs:
           name: Change to project directory and run tests
           command: |
             cd hmpps-vsip-ui-tests
-            mvn test -Dbrowser=remote-chrome -Denvironment="STAGING" -Dtest=suites.RunSuite
+            mvn test -Dbrowser=remote-chrome -Denvironment="STAGING" -Dtest=uk.gov.justice.digital.hmpps.vsip.suites.RunSuite
 
   acceptance_tests_develop:
     docker:
-      - image: maven:3.8.4-jdk-11
+      - image: maven:3.9.5-eclipse-temurin-21-alpine
       - image: seleniarm/standalone-chromium
         environment:
           CHROME_HEADLESS: 1
@@ -85,7 +85,7 @@ jobs:
           name: Change to project directory and run tests
           command: |
             cd hmpps-vsip-ui-tests
-            mvn test -Dbrowser=remote-chrome -Denvironment="STAGING" -Dtest=suites.RunSuite
+            mvn test -Dbrowser=remote-chrome -Denvironment="STAGING" -Dtest=uk.gov.justice.digital.hmpps.vsip.suites.RunSuite
 
   build:
     executor:
