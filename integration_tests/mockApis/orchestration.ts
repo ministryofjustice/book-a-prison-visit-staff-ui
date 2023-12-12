@@ -393,4 +393,17 @@ export default {
       },
     })
   },
+  stubGetPrison: ({ prisonCode }: { prisonCode: string }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        url: `/orchestration/config/prisons/prison/${prisonCode}`,
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: TestData.prisonDto,
+      },
+    })
+  },
 }

@@ -15,6 +15,7 @@ context('Date picker', () => {
     cy.task('stubAuthUser')
     cy.task('stubSupportedPrisonIds')
     cy.task('stubPrisonNames')
+    cy.task('stubGetPrison', { prisonCode: 'HEI' })
     cy.task('stubGetNotificationCount', {})
     cy.signIn()
 
