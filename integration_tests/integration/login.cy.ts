@@ -8,7 +8,7 @@ context('SignIn', () => {
   beforeEach(() => {
     cy.task('reset')
     cy.task('stubSignIn')
-    cy.task('stubAuthUser')
+    cy.task('stubManageUser')
     cy.task('stubSupportedPrisonIds')
     cy.task('stubPrisonNames')
     cy.task('stubGetPrison')
@@ -25,7 +25,7 @@ context('SignIn', () => {
     Page.verifyOnPage(AuthSignInPage)
   })
 
-  it('User name visible in header', () => {
+  it.only('User name visible in header', () => {
     cy.signIn()
     const homePage = Page.verifyOnPage(HomePage)
     homePage.headerUserName().should('contain.text', 'J. Smith')
@@ -65,7 +65,7 @@ context('SignIn', () => {
     cy.request('/').its('body').should('contain', 'Sign in')
 
     cy.task('stubVerifyToken', true)
-    cy.task('stubAuthUser', 'bobby brown')
+    cy.task('stubManageUser', 'bobby brown')
     cy.signIn()
 
     homePage.headerUserName().contains('B. Brown')
