@@ -532,13 +532,13 @@ export interface components {
       /** Format: int64 */
       totalElements?: number
       first?: boolean
+      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['VisitDto'][]
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject']
-      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
@@ -552,8 +552,8 @@ export interface components {
       pageSize?: number
       /** Format: int32 */
       pageNumber?: number
-      paged?: boolean
       unpaged?: boolean
+      paged?: boolean
     }
     SortObject: {
       empty?: boolean
@@ -571,7 +571,11 @@ export interface components {
        * @example NON_ASSOCIATION_EVENT
        * @enum {string}
        */
-      type: 'NON_ASSOCIATION_EVENT' | 'PRISONER_RELEASED_EVENT' | 'PRISONER_RESTRICTION_CHANGE_EVENT'
+      type:
+        | 'NON_ASSOCIATION_EVENT'
+        | 'PRISONER_RELEASED_EVENT'
+        | 'PRISONER_RESTRICTION_CHANGE_EVENT'
+        | 'PRISON_VISITS_BLOCKED_FOR_DATE'
       /** @description List of details of affected visits */
       affectedVisits: components['schemas']['OrchestrationPrisonerVisitsNotificationDto'][]
     }
