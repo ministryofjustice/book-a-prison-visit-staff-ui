@@ -12,4 +12,8 @@
   &--prisoner_restriction_change_event {
     @extend .govuk-tag--purple;
   }
+
+  &--prison_visits_blocked_for_date {
+    @extend .govuk-tag--turquoise
+  }
 }

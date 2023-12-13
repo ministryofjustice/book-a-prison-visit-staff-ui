@@ -96,6 +96,7 @@ describe('Visit notifications service', () => {
     describe.each([
       ['Prisoner released', 'PRISONER_RELEASED_EVENT'],
       ['Visit type changed', 'PRISONER_RESTRICTION_CHANGE_EVENT'],
+      ['Visit date blocked', 'PRISON_VISITS_BLOCKED_FOR_DATE'],
     ])('%s (%s)', (_: string, type: NotificationType) => {
       it(`should build appropriate visit review list data for a ${type} notification (single visit)`, async () => {
         const notificationGroup = TestData.notificationGroup({

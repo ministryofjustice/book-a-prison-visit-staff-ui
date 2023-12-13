@@ -34,6 +34,11 @@ context('Bookings review page', () => {
         }),
       ],
     }),
+    TestData.notificationGroup({
+      reference: 'de*fg*hi*jk',
+      type: 'PRISON_VISITS_BLOCKED_FOR_DATE',
+      affectedVisits: [TestData.notificationVisitInfo()],
+    }),
   ]
   const notificationCount = TestData.notificationCount({ count: notificationGroups.length })
 
@@ -105,6 +110,21 @@ context('Bookings review page', () => {
         'href',
         `/review/${notificationTypePathSegments[notificationGroups[2].type]}/${notificationGroups[2].reference}`,
       )
+
+    // Visits blocked for date
+    listingPage.getPrisonerNumber(4).contains(notificationGroups[3].affectedVisits[0].prisonerNumber)
+    listingPage
+      .getVisitDate(4)
+      .contains(format(new Date(notificationGroups[3].affectedVisits[0].visitDate), prettyDateFormat))
+    listingPage.getBookedBy(4).contains(notificationGroups[3].affectedVisits[0].bookedByName)
+    listingPage.getType(4).contains(notificationTypes[notificationGroups[3].type])
+    listingPage
+      .getActionLink(4)
+      .should(
+        'have.attr',
+        'href',
+        `/review/${notificationTypePathSegments[notificationGroups[3].type]}/${notificationGroups[3].reference}`,
+      )
   })
 
   it('should filter bookings review listing', () => {
@@ -115,12 +135,12 @@ context('Bookings review page', () => {
     const listingPage = Page.verifyOnPage(VisitsReviewListingPage)
 
     // All rows show when no filter selected
-    listingPage.getBookingsRows().should('have.length', 3)
+    listingPage.getBookingsRows().should('have.length', 4)
 
     // Filter by user
     listingPage.filterByUser('User One')
     listingPage.applyFilter()
-    listingPage.getBookingsRows().should('have.length', 1)
+    listingPage.getBookingsRows().should('have.length', 2)
     listingPage.removeFilter('User One')
 
     // Filter by reason
@@ -137,6 +157,6 @@ context('Bookings review page', () => {
 
     // Clear all filters
     listingPage.clearFilters()
-    listingPage.getBookingsRows().should('have.length', 3)
+    listingPage.getBookingsRows().should('have.length', 4)
   })
 })
