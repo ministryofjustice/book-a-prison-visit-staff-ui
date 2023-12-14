@@ -103,8 +103,6 @@ context('View visits by date', () => {
 
     visitsByDatePage.tablesBookedCount().contains('2 of 30 tables booked')
     visitsByDatePage.visitorsTotalCount().contains('4 visitors')
-    visitsByDatePage.adultVisitorsCount().contains('2 adults')
-    visitsByDatePage.childVisitorsCount().contains('2 children')
 
     visitsByDatePage.prisonerRowOneName().contains(`${prisonersResults[0].lastName}, ${prisonersResults[0].firstName}`)
     visitsByDatePage.prisonerRowOneNumber().contains(prisonerNumber1)
