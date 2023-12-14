@@ -15,6 +15,7 @@ context('Bookings review page', () => {
       type: 'PRISONER_RELEASED_EVENT',
       affectedVisits: [
         TestData.notificationVisitInfo({
+          bookedByUserName: 'user3',
           bookedByName: 'User Three',
           prisonerNumber: 'B1234CD',
           visitDate: '2023-12-01',
@@ -26,11 +27,17 @@ context('Bookings review page', () => {
       type: 'PRISONER_RESTRICTION_CHANGE_EVENT',
       affectedVisits: [
         TestData.notificationVisitInfo({
+          bookedByUserName: 'user4',
           bookedByName: 'User Four',
           prisonerNumber: 'C1234DE',
           visitDate: '2023-12-05',
         }),
       ],
+    }),
+    TestData.notificationGroup({
+      reference: 'de*fg*hi*jk',
+      type: 'PRISON_VISITS_BLOCKED_FOR_DATE',
+      affectedVisits: [TestData.notificationVisitInfo()],
     }),
   ]
   const notificationCount = TestData.notificationCount({ count: notificationGroups.length })
@@ -104,5 +111,53 @@ context('Bookings review page', () => {
         'href',
         `/review/${notificationTypePathSegments[notificationGroups[2].type]}/${notificationGroups[2].reference}`,
       )
+
+    // Visits blocked for date
+    listingPage.getPrisonerNumber(4).contains(notificationGroups[3].affectedVisits[0].prisonerNumber)
+    listingPage
+      .getVisitDate(4)
+      .contains(format(new Date(notificationGroups[3].affectedVisits[0].visitDate), prettyDateFormat))
+    listingPage.getBookedBy(4).contains(notificationGroups[3].affectedVisits[0].bookedByName)
+    listingPage.getType(4).contains(notificationTypes[notificationGroups[3].type])
+    listingPage
+      .getActionLink(4)
+      .should(
+        'have.attr',
+        'href',
+        `/review/${notificationTypePathSegments[notificationGroups[3].type]}/${notificationGroups[3].reference}`,
+      )
+  })
+
+  it('should filter bookings review listing', () => {
+    // Navigate to bookings review listing
+    const homePage = Page.verifyOnPage(HomePage)
+    cy.task('stubGetNotificationGroups', { notificationGroups })
+    homePage.needReviewTile().click()
+    const listingPage = Page.verifyOnPage(VisitsReviewListingPage)
+
+    // All rows show when no filter selected
+    listingPage.getBookingsRows().should('have.length', 4)
+
+    // Filter by user
+    listingPage.filterByUser('User One')
+    listingPage.applyFilter()
+    listingPage.getBookingsRows().should('have.length', 2)
+    listingPage.removeFilter('User One')
+
+    // Filter by reason
+    listingPage.filterByReason('Prisoner released')
+    listingPage.applyFilter()
+    listingPage.getBookingsRows().should('have.length', 1)
+    listingPage.removeFilter('Prisoner released')
+
+    // Filter by both
+    listingPage.filterByUser('User One')
+    listingPage.filterByReason('Visit type changed')
+    listingPage.applyFilter()
+    listingPage.getBookingsRows().should('have.length', 0)
+
+    // Clear all filters
+    listingPage.clearFilters()
+    listingPage.getBookingsRows().should('have.length', 4)
   })
 })
