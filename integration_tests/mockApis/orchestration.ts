@@ -289,7 +289,7 @@ export default {
     prisonId,
     offenderNo,
     visitSessions,
-    min = '2',
+    min = '3',
   }: {
     prisonId: string
     offenderNo: string
