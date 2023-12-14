@@ -807,7 +807,7 @@ describe('orchestrationApiClient', () => {
     })
   })
 
-  describe('getPrisonByPrisonId', () => {
+  describe('getPrison', () => {
     it('should return a PrisonDTO object', async () => {
       const results = TestData.prisonDto()
       const prisonCode = 'BLI'
