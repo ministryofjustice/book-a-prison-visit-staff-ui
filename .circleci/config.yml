@@ -55,7 +55,7 @@ jobs:
           name: Change to project directory and run tests
           command: |
             cd hmpps-vsip-ui-tests
-            mvn test -Dbrowser=remote-chrome -Denvironment="STAGING" -Dtest=uk.gov.justice.digital.hmpps.vsip.suites.RunSuite
+            mvn test -Dbrowser=chrome -Dspring.profiles.active="staging" -Dtest=uk.gov.justice.digital.hmpps.vsip.suites.RunSuite
 
   acceptance_tests_develop:
     docker:
@@ -85,7 +85,7 @@ jobs:
           name: Change to project directory and run tests
           command: |
             cd hmpps-vsip-ui-tests
-            mvn test -Dbrowser=remote-chrome -Denvironment="STAGING" -Dtest=uk.gov.justice.digital.hmpps.vsip.suites.RunSuite
+            mvn test -Dbrowser=chrome -Dspring.profiles.active="staging" -Dtest=uk.gov.justice.digital.hmpps.vsip.suites.RunSuite
 
   build:
     executor:
