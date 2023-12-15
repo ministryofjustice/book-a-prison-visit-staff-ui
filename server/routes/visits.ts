@@ -103,8 +103,8 @@ export default function routes({
         prisoner: visit.prisonNumber,
       }
     })
-    const currentPage = Number.parseInt((req.query?.page || '1') as string, 10)
-    const { pageSize } = config.apis.prisonerSearch
+    const currentPage = 1
+    const pageSize = 200
 
     let results: PrisonerDetailsItem[][] = []
     let numberOfResults = 0
@@ -140,8 +140,6 @@ export default function routes({
       }
     }
 
-    const currentPageMax = currentPage * pageSize
-    const to = numberOfResults < currentPageMax ? numberOfResults : currentPageMax
     const pageLinks = getResultsPagingLinks({
       pagesToShow: config.apis.prisonerSearch.pagesLinksToShow,
       numberOfPages,
@@ -173,8 +171,8 @@ export default function routes({
       previous,
       numberOfResults,
       pageSize,
-      from: (currentPage - 1) * pageSize + 1,
-      to,
+      from: 1,
+      to: numberOfResults,
       pageLinks: numberOfPages <= 1 ? [] : pageLinks,
       dateTabs: getDateTabs(selectedDateString, firstTabDateString, 3),
       queryParams,
