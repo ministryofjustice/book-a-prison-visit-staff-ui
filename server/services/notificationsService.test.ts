@@ -13,7 +13,7 @@ describe('Notifications service', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    jest.resetAllMocks()
   })
 
   describe('sendBookingSms', () => {

@@ -8,6 +8,9 @@ export default function populateCurrentUser(userService: UserService): RequestHa
       if (res.locals.user) {
         const user = res.locals.user && (await userService.getUser(res.locals.user.token))
         if (user) {
+          if (!user.activeCaseLoadId) {
+            user.activeCaseLoadId = await userService.getActiveCaseLoadId(res.locals.user.token)
+          }
           res.locals.user = { ...user, ...res.locals.user }
         } else {
           logger.info('No user available')

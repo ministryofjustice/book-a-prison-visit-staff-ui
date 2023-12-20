@@ -2,7 +2,7 @@ import type { Express } from 'express'
 import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
-import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
+import { appWithAllRoutes, flashProvider, user } from './testutils/appSetup'
 import * as visitorUtils from './visitorUtils'
 import TestData from './testutils/testData'
 import config from '../config'
@@ -12,6 +12,7 @@ import {
   createMockUserService,
 } from '../services/testutils/mocks'
 import { Prison } from '../@types/bapv'
+import { UserDetails } from '../services/userService'
 
 let app: Express
 
@@ -24,6 +25,9 @@ const supportedPrisons = TestData.supportedPrisons()
 beforeEach(() => {
   supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
   supportedPrisonsService.getPolicyNoticeDaysMin.mockResolvedValue(2)
+
+  userService.getUser.mockResolvedValue(user as UserDetails)
+  userService.getActiveCaseLoadId.mockResolvedValue('HEI')
 
   app = appWithAllRoutes({ services: { supportedPrisonsService } })
 })

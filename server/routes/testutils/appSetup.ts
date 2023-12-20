@@ -31,7 +31,6 @@ export const user: Express.User = {
   username: 'user1',
   displayName: 'First Last',
   active: true,
-  activeCaseLoadId: 'HEI',
   authSource: 'NOMIS',
 }
 
@@ -39,7 +38,7 @@ export const flashProvider = jest.fn()
 
 class MockUserService extends UserService {
   constructor() {
-    super(undefined, undefined, undefined)
+    super(undefined, undefined, undefined, undefined)
   }
 
   async getUser(_token: string) {
@@ -47,6 +46,10 @@ class MockUserService extends UserService {
       ...user,
       roles: [],
     } as UserDetails
+  }
+
+  async getActiveCaseLoadId(_token: string): Promise<string> {
+    return 'HEI'
   }
 
   async setActiveCaseLoad(_caseLoadId: string, _username: string) {

@@ -3,6 +3,7 @@ import TestData from '../routes/testutils/testData'
 import {
   createMockHmppsAuthClient,
   createMockManageUsersApiClient,
+  createMockNomisUserRolesApiClient,
   createMockPrisonApiClient,
 } from '../data/testutils/mocks'
 import type { User } from '../data/manageUsersApiClient'
@@ -13,6 +14,7 @@ jest.mock('../data/manageUsersApiClient')
 describe('User service', () => {
   const hmppsAuthClient = createMockHmppsAuthClient()
   const manageUsersApiClient = createMockManageUsersApiClient()
+  const nomisUserRolesApiClient = createMockNomisUserRolesApiClient()
   const prisonApiClient = createMockPrisonApiClient()
   let userService: UserService
 
@@ -21,7 +23,12 @@ describe('User service', () => {
   describe('getUser', () => {
     beforeEach(() => {
       PrisonApiClientFactory.mockReturnValue(prisonApiClient)
-      userService = new UserService(hmppsAuthClient, manageUsersApiClient, PrisonApiClientFactory)
+      userService = new UserService(
+        hmppsAuthClient,
+        manageUsersApiClient,
+        nomisUserRolesApiClient,
+        PrisonApiClientFactory,
+      )
       hmppsAuthClient.getSystemClientToken.mockResolvedValue('some token')
     })
 
@@ -48,6 +55,28 @@ describe('User service', () => {
       manageUsersApiClient.getUser.mockRejectedValue(new Error('some error'))
 
       await expect(userService.getUser(token)).rejects.toEqual(new Error('some error'))
+    })
+  })
+
+  describe('getActiveCaseLoadId', () => {
+    beforeEach(() => {
+      PrisonApiClientFactory.mockReturnValue(prisonApiClient)
+      userService = new UserService(
+        hmppsAuthClient,
+        manageUsersApiClient,
+        nomisUserRolesApiClient,
+        PrisonApiClientFactory,
+      )
+      hmppsAuthClient.getSystemClientToken.mockResolvedValue('some token')
+    })
+
+    it('should return the active case load ID for the current user', async () => {
+      const token = createUserToken([])
+      nomisUserRolesApiClient.getUser.mockResolvedValue({ username: 'user1', activeCaseloadId: 'HEI' })
+
+      const result = await userService.getActiveCaseLoadId(token)
+
+      expect(result).toStrictEqual('HEI')
     })
   })
 

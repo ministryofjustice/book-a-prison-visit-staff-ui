@@ -25,7 +25,7 @@ context('SignIn', () => {
     Page.verifyOnPage(AuthSignInPage)
   })
 
-  it.only('User name visible in header', () => {
+  it('User name visible in header', () => {
     cy.signIn()
     const homePage = Page.verifyOnPage(HomePage)
     homePage.headerUserName().should('contain.text', 'J. Smith')
