@@ -484,13 +484,42 @@ describe('/visit/:reference', () => {
 
     it('should redirect to /visit/:reference if selected establishment does not match prison for which visit booked', () => {
       app = appWithAllRoutes({
-        services: { auditService, supportedPrisonsService, visitService, visitSessionsService },
+        services: {
+          auditService,
+          prisonerSearchService,
+          prisonerVisitorsService,
+          supportedPrisonsService,
+          visitService,
+          visitSessionsService,
+        },
         sessionData: {
           selectedEstablishment: { prisonId: 'BLI', prisonName: supportedPrisons.BLI },
         } as SessionData,
       })
 
       return request(app).post('/visit/ab-cd-ef-gh').expect(302).expect('location', '/visit/ab-cd-ef-gh')
+    })
+
+    // default visit is 13 days away so using 14 days for simplicity
+    it('should redirect to /visit/:reference/update/confirm-update if visit is less days away than policy notice days', () => {
+      app = appWithAllRoutes({
+        services: {
+          auditService,
+          prisonerSearchService,
+          prisonerVisitorsService,
+          supportedPrisonsService,
+          visitService,
+          visitSessionsService,
+        },
+        sessionData: {
+          selectedEstablishment: { prisonId: 'HEI', prisonName: supportedPrisons.HEI, policyNoticeDaysMin: 14 },
+        } as SessionData,
+      })
+
+      return request(app)
+        .post('/visit/ab-cd-ef-gh')
+        .expect(302)
+        .expect('location', '/visit/ab-cd-ef-gh/update/confirm-update')
     })
 
     it('should render 400 Bad Request error for invalid visit reference', () => {
@@ -500,6 +529,35 @@ describe('/visit/:reference', () => {
         .expect('Content-Type', /html/)
         .expect(res => {
           expect(res.text).toContain('BadRequestError: Bad Request')
+        })
+    })
+  })
+
+  describe('GET /visit/:reference/update/confirm-update', () => {
+    it('should render the confirm update page', () => {
+      app = appWithAllRoutes({
+        services: {
+          auditService,
+          prisonerSearchService,
+          prisonerVisitorsService,
+          supportedPrisonsService,
+          visitService,
+          visitSessionsService,
+        },
+        sessionData: {
+          selectedEstablishment: { prisonId: 'HEI', prisonName: supportedPrisons.HEI, policyNoticeDaysMin: 4 },
+        } as SessionData,
+      })
+
+      return request(app)
+        .get(`/visit/${visit.reference}/update/confirm-update`)
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text().trim()).toContain('This visit is in less than 4 days.')
+          expect($('h1').text().trim()).toContain('Do you want to update the booking?')
+          expect($('form').attr('action')).toBe('/visit/ab-cd-ef-gh/update/confirm-update')
         })
     })
   })
