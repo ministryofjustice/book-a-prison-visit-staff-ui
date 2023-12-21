@@ -1,5 +1,6 @@
 import { Response } from 'superagent'
 
+import stubUserMe from './nomisUserRoles'
 import { stubFor } from './wiremock'
 
 const stubUser = (name: string) =>
@@ -48,7 +49,7 @@ const ping = () =>
   })
 
 export default {
-  stubManageUser: (name = 'john smith'): Promise<[Response, Response]> =>
-    Promise.all([stubUser(name), stubUserRoles()]),
+  stubManageUser: (name = 'john smith'): Promise<[Response, Response, Response]> =>
+    Promise.all([stubUser(name), stubUserRoles(), stubUserMe()]),
   stubManageUsersPing: ping,
 }
