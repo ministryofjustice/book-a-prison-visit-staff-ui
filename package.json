@@ -7,7 +7,7 @@
   "scripts": {
     "prepare": "husky install",
     "copy-views": "cp -R server/views dist/server/",
-    "compile-sass": "sass --quiet-deps --no-source-map --load-path=node_modules/govuk-frontend --load-path=node_modules/@ministryofjustice/frontend --load-path=. ./assets/sass/application.scss:./assets/stylesheets/application.css --style compressed",
+    "compile-sass": "sass --quiet-deps --no-source-map --load-path=node_modules/govuk-frontend/dist --load-path=node_modules/@ministryofjustice/frontend --load-path=. ./assets/sass/application.scss:./assets/stylesheets/application.css --style compressed",
     "watch-ts": "tsc -w",
     "watch-views": "nodemon --watch server/views -e html,njk -x npm run copy-views",
     "watch-node": "DEBUG=gov-starter-server* nodemon -r dotenv/config --watch dist/ dist/server.js | bunyan -o short",
@@ -97,7 +97,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-sqs": "^3.478.0",
-    "@ministryofjustice/frontend": "^1.8.1",
+    "@ministryofjustice/frontend": "^2.0.0-beta.1",
     "agentkeepalive": "^4.5.0",
     "applicationinsights": "^2.9.1",
     "body-parser": "^1.20.2",
@@ -111,7 +111,7 @@
     "express": "^4.18.2",
     "express-session": "^1.17.3",
     "express-validator": "^7.0.1",
-    "govuk-frontend": "^4.7.0",
+    "govuk-frontend": "^5.0.0",
     "helmet": "^7.1.0",
     "http-errors": "^2.0.0",
     "jquery": "^3.7.1",
