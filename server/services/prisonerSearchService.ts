@@ -52,10 +52,12 @@ export default class PrisonerSearchService {
       const url = visit
         ? `<a href="/prisoner/${
             prisoner.prisonerNumber
-          }/visits?${queryParams}" class="bapv-result-row">${properCaseFullName(
+          }/visits?${queryParams}" class="govuk-link--no-visited-state bapv-result-row">${properCaseFullName(
             `${prisoner.lastName}, ${prisoner.firstName}`,
           )}</a>`
-        : `<a href="/prisoner/${prisoner.prisonerNumber}?${queryParams}" class="bapv-result-row">${properCaseFullName(
+        : `<a href="/prisoner/${
+            prisoner.prisonerNumber
+          }?${queryParams}" class="govuk-link--no-visited-state bapv-result-row">${properCaseFullName(
             `${prisoner.lastName}, ${prisoner.firstName}`,
           )}</a>`
       const row: PrisonerDetailsItem[] = [
@@ -163,7 +165,7 @@ export default class PrisonerSearchService {
           },
         },
         {
-          html: `<a href="/visit/${matchingVisit.visit}?${fromQueryString}" class="bapv-result-row">View</a>`,
+          html: `<a href="/visit/${matchingVisit.visit}?${fromQueryString}" class="govuk-link--no-visited-state bapv-result-row">View</a>`,
           classes: 'govuk-!-text-align-right',
         },
       ]
