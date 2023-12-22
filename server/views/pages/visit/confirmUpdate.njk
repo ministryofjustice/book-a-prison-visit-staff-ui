@@ -41,7 +41,8 @@
                   text: "No"
                 }
               ],
-              errorMessage: errors | findError('confirmUpdate')
+              errorMessage: errors | findError('confirmUpdate'),
+              attributes: { "data-test": "confirm-update-radio" }
             }) }}
 
             {{ govukButton({
