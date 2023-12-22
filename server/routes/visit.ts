@@ -342,12 +342,12 @@ export default function routes({
 
   post('/:reference/update/confirm-update', async (req, res) => {
     const reference = getVisitReference(req)
-    const updateConfirmed = req.body.confirmUpdate
+    const { confirmUpdate } = req.body
 
-    if (updateConfirmed === 'true') {
+    if (confirmUpdate === 'yes') {
       return res.redirect(`/visit/${reference}/update/select-visitors`)
     }
-    if (updateConfirmed === 'false') {
+    if (confirmUpdate === 'no') {
       return res.redirect(`/visit/${reference}`)
     }
 
@@ -358,7 +358,7 @@ export default function routes({
         type: 'field',
         location: 'body',
       },
-    ] as unknown as []) // revisit
+    ] as unknown as [])
 
     return res.redirect(`/visit/${reference}/update/confirm-update`)
   })

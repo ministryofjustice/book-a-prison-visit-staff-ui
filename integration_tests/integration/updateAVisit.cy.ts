@@ -16,6 +16,11 @@ context('Update a visit', () => {
   const shortDateFormat = 'yyyy-MM-dd'
   const longDateFormat = 'EEEE d MMMM yyyy'
 
+  const today = new Date()
+  const prisoner = TestData.prisoner()
+  const { prisonerNumber: offenderNo, prisonId } = prisoner
+  const prisonerDisplayName = 'Smith, John'
+
   beforeEach(() => {
     cy.task('reset')
     cy.task('stubSignIn')
@@ -28,11 +33,6 @@ context('Update a visit', () => {
   })
 
   it('should complete the update a visit journey', () => {
-    const today = new Date()
-    const prisoner = TestData.prisoner()
-    const { prisonerNumber: offenderNo, prisonId } = prisoner
-    const prisonerDisplayName = 'Smith, John'
-
     const visitSessions: VisitSession[] = [
       TestData.visitSession({
         startTimestamp: format(addDays(today, 7), `${shortDateFormat}'T'10:00:00`),
@@ -198,12 +198,7 @@ context('Update a visit', () => {
     confirmationPage.mainContactNumber().contains('09876 543 321')
   })
 
-  it('should redirect to confirm update page', () => {
-    const today = new Date()
-    const prisoner = TestData.prisoner()
-    const { prisonerNumber: offenderNo } = prisoner
-    const prisonerDisplayName = 'Smith, John'
-
+  it('should redirect to confirm update page if outside booking window limit', () => {
     const visitSessions: VisitSession[] = [
       TestData.visitSession({
         startTimestamp: format(addDays(today, 1), `${shortDateFormat}'T'10:00:00`),

@@ -1,5 +1,5 @@
 {% extends "layout.njk" %}
-{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% set pageHeaderTitle = "Confirm update" %}
@@ -8,49 +8,47 @@
 {% endset %}
 
 {% block content %}
-<div class="govuk-grid-row">
+  <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        {% include "partials/errorSummary.njk" %}
-        <h1 class="govuk-heading-l">
-          This visit is in less than {{ policyNoticeDaysMin }} {{ "day" | pluralise(policyNoticeDaysMin) }}.
-          Do you want to update the booking?
-        </h1>
-        <p>
-          Changes made at this stage may require additional actions.
-          For example, if operational reports have been printed, they may need to be printed again.
-        </p>
+      {% include "partials/errorSummary.njk" %}
+      <h1 class="govuk-heading-l">
+        This visit is in less than {{ policyNoticeDaysMin }} {{ "day" | pluralise(policyNoticeDaysMin) }}.
+        Do you want to update the booking?
+      </h1>
+      <p>
+        More tasks might need to be done for changes made at this stage.
+        For example, if operational reports have been printed, they may need to be printed again.
+      </p>
     </div>
-</div>
+  </div>
 
-<div class="govuk-grid-row">
+  <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-        <form action="/visit/{{ reference }}/update/confirm-update" method="POST" novalidate>
-            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+      <form action="/visit/{{ reference }}/update/confirm-update" method="POST" novalidate>
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
-            {% from "govuk/components/radios/macro.njk" import govukRadios %}
+        {{ govukRadios({
+          name: "confirmUpdate",
+          items: [
+            {
+              value: "yes",
+              text: "Yes"
+            },
+            {
+              value: "no",
+              text: "No, go back"
+            }
+          ],
+          errorMessage: errors | findError('confirmUpdate'),
+          attributes: { "data-test": "confirm-update-radio" }
+        }) }}
 
-            {{ govukRadios({
-              name: "confirmUpdate",
-              items: [
-                {
-                  value: "true",
-                  text: "Yes"
-                },
-                {
-                  value: "false",
-                  text: "No"
-                }
-              ],
-              errorMessage: errors | findError('confirmUpdate'),
-              attributes: { "data-test": "confirm-update-radio" }
-            }) }}
-
-            {{ govukButton({
-                text: "Continue",
-                attributes: { "data-test": "submit" },
-                preventDoubleClick: true
-            }) }}
-        </form>
+        {{ govukButton({
+          text: "Continue",
+          attributes: { "data-test": "submit" },
+          preventDoubleClick: true
+        }) }}
+      </form>
     </div>
-</div>
+  </div>
 {% endblock %}

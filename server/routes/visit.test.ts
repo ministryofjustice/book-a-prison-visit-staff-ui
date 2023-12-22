@@ -283,7 +283,7 @@ describe('/visit/:reference', () => {
       app = appWithAllRoutes({
         services: { auditService, supportedPrisonsService, visitService, visitSessionsService },
         sessionData: {
-          selectedEstablishment: { prisonId: 'BLI', prisonName: supportedPrisons.BLI },
+          selectedEstablishment: { prisonId: 'BLI', prisonName: supportedPrisons.BLI, policyNoticeDaysMin: 2 },
         } as SessionData,
       })
 
@@ -484,16 +484,9 @@ describe('/visit/:reference', () => {
 
     it('should redirect to /visit/:reference if selected establishment does not match prison for which visit booked', () => {
       app = appWithAllRoutes({
-        services: {
-          auditService,
-          prisonerSearchService,
-          prisonerVisitorsService,
-          supportedPrisonsService,
-          visitService,
-          visitSessionsService,
-        },
+        services: { auditService, supportedPrisonsService, visitService, visitSessionsService },
         sessionData: {
-          selectedEstablishment: { prisonId: 'BLI', prisonName: supportedPrisons.BLI },
+          selectedEstablishment: { prisonId: 'BLI', prisonName: supportedPrisons.BLI, policyNoticeDaysMin: 2 },
         } as SessionData,
       })
 
@@ -555,9 +548,41 @@ describe('/visit/:reference', () => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
+          expect($('.govuk-back-link').attr('href')).toBe(`/visit/${visit.reference}`)
           expect($('h1').text().trim()).toContain('This visit is in less than 4 days.')
           expect($('h1').text().trim()).toContain('Do you want to update the booking?')
           expect($('form').attr('action')).toBe('/visit/ab-cd-ef-gh/update/confirm-update')
+        })
+    })
+  })
+
+  describe('POST /visit/:reference/update/confirm-update', () => {
+    it('should redirect back to the visit summary if choosing not to proceed with update', () => {
+      return request(app)
+        .post('/visit/ab-cd-ef-gh/update/confirm-update')
+        .send('confirmUpdate=no')
+        .expect(302)
+        .expect('location', '/visit/ab-cd-ef-gh')
+    })
+
+    it('should redirect to select visitors page if choosing to proceed with update', () => {
+      return request(app)
+        .post('/visit/ab-cd-ef-gh/update/confirm-update')
+        .send('confirmUpdate=yes')
+        .expect(302)
+        .expect('location', '/visit/ab-cd-ef-gh/update/select-visitors')
+    })
+
+    it('should should redirect to confirm update page with errors set if no option selected', () => {
+      return request(app)
+        .post('/visit/ab-cd-ef-gh/update/confirm-update')
+        .send('confirmUpdate=')
+        .expect(302)
+        .expect('location', '/visit/ab-cd-ef-gh/update/confirm-update')
+        .expect(() => {
+          expect(flashProvider).toHaveBeenCalledWith('errors', [
+            { location: 'body', msg: 'No option selected', path: 'confirmUpdate', type: 'field' },
+          ])
         })
     })
   })
