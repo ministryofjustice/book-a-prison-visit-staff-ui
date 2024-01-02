@@ -7,7 +7,7 @@ const stubUser = (name: string) =>
   stubFor({
     request: {
       method: 'GET',
-      urlPattern: '/manage-users-api/users/me',
+      urlPattern: '/manageUsersApi/users/me',
     },
     response: {
       status: 200,
@@ -26,7 +26,7 @@ const stubUserRoles = () =>
   stubFor({
     request: {
       method: 'GET',
-      urlPattern: '/manage-users-api/users/me/roles',
+      urlPattern: '/manageUsersApi/users/me/roles',
     },
     response: {
       status: 200,
@@ -41,7 +41,7 @@ const ping = () =>
   stubFor({
     request: {
       method: 'GET',
-      urlPattern: '/manage-users-api/health/ping',
+      urlPattern: '/manageUsersApi/health/ping',
     },
     response: {
       status: 200,
