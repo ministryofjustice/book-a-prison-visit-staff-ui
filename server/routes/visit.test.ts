@@ -112,6 +112,7 @@ describe('/visit/:reference', () => {
     prisonerVisitorsService.getVisitors.mockResolvedValue(visitors)
     supportedPrisonsService.getSupportedPrisonIds.mockResolvedValue(supportedPrisonIds)
     supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
+    supportedPrisonsService.getPolicyNoticeDaysMin.mockResolvedValue(2)
 
     visitSessionData = { prisoner: undefined }
 
