@@ -563,6 +563,9 @@ describe('/visit/:reference', () => {
         .send('confirmUpdate=no')
         .expect(302)
         .expect('location', '/visit/ab-cd-ef-gh')
+        .expect(res => {
+          expect(visitSessionData).not.toHaveProperty('overrideBookingWindow')
+        })
     })
 
     it('should redirect to select visitors page if choosing to proceed with update', () => {
@@ -571,6 +574,9 @@ describe('/visit/:reference', () => {
         .send('confirmUpdate=yes')
         .expect(302)
         .expect('location', '/visit/ab-cd-ef-gh/update/select-visitors')
+        .expect(res => {
+          expect(visitSessionData.overrideBookingWindow).toBe(true)
+        })
     })
 
     it('should should redirect to confirm update page with errors set if no option selected', () => {
@@ -580,6 +586,7 @@ describe('/visit/:reference', () => {
         .expect(302)
         .expect('location', '/visit/ab-cd-ef-gh/update/confirm-update')
         .expect(() => {
+          expect(visitSessionData).not.toHaveProperty('overrideBookingWindow')
           expect(flashProvider).toHaveBeenCalledWith('errors', [
             { location: 'body', msg: 'No option selected', path: 'confirmUpdate', type: 'field' },
           ])

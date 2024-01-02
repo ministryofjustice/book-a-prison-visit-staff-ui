@@ -2,7 +2,7 @@ import type { NextFunction, RequestHandler, Request, Response } from 'express'
 import { Router } from 'express'
 import { body, validationResult } from 'express-validator'
 import { BadRequest } from 'http-errors'
-import { differenceInDays } from 'date-fns'
+import { differenceInCalendarDays } from 'date-fns'
 import visitCancellationReasons from '../constants/visitCancellationReasons'
 import { Prisoner } from '../data/prisonerOffenderSearchTypes'
 import { CancelVisitOrchestrationDto } from '../data/orchestrationApiTypes'
@@ -195,12 +195,12 @@ export default function routes({
 
     const { policyNoticeDaysMin } = req.session.selectedEstablishment
 
-    const numberOfDays = differenceInDays(new Date(visit.startTimestamp), new Date())
-    if (numberOfDays < policyNoticeDaysMin) {
-      return res.redirect(`/visit/${reference}/update/confirm-update`)
-    }
+    const numberOfDays = differenceInCalendarDays(new Date(visit.startTimestamp), new Date())
 
-    return res.redirect(`/visit/${reference}/update/select-visitors`)
+    if (numberOfDays >= policyNoticeDaysMin) {
+      return res.redirect(`/visit/${reference}/update/select-visitors`)
+    }
+    return res.redirect(`/visit/${reference}/update/confirm-update`)
   })
 
   const selectVisitors = new SelectVisitors('update', prisonerVisitorsService, prisonerProfileService)
@@ -345,6 +345,7 @@ export default function routes({
     const { confirmUpdate } = req.body
 
     if (confirmUpdate === 'yes') {
+      req.session.visitSessionData.overrideBookingWindow = true
       return res.redirect(`/visit/${reference}/update/select-visitors`)
     }
     if (confirmUpdate === 'no') {

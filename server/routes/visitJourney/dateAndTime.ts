@@ -1,5 +1,7 @@
 import type { Request, Response } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
+import { differenceInCalendarDays, differenceInDays } from 'date-fns'
+import { setSeconds } from 'date-fns/esm'
 import { VisitSlot } from '../../@types/bapv'
 import AuditService from '../../services/auditService'
 import { getFlashFormValues, getSelectedSlot, getSlotByTimeAndRestriction } from '../visitorUtils'
@@ -15,16 +17,18 @@ export default class DateAndTime {
   ) {}
 
   async get(req: Request, res: Response): Promise<void> {
-    let daysUntilVisitStart = req.session.selectedEstablishment.policyNoticeDaysMin
-
     const isUpdate = this.mode === 'update'
     const { prisonId } = req.session.selectedEstablishment
     const { visitSessionData } = req.session
 
     const warningMessages: { id: string; message: string }[] = []
 
+    let daysUntilVisitStart =
+      isUpdate && req.session.visitSessionData?.overrideBookingWindow === true
+        ? 0
+        : req.session.selectedEstablishment.policyNoticeDaysMin
+
     if (visitSessionData.daysUntilBanExpiry) {
-      // numberOfDays is the number of days between the ban expiry and the current date
       if (visitSessionData.daysUntilBanExpiry > daysUntilVisitStart) {
         daysUntilVisitStart = visitSessionData.daysUntilBanExpiry
         warningMessages.push({
