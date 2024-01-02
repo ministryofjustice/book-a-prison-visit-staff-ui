@@ -22,4 +22,16 @@ export default {
       },
     })
   },
+
+  stubPrisonerContactRegistryPing: () => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: '/contactRegistry/health/ping',
+      },
+      response: {
+        status: 200,
+      },
+    })
+  },
 }
