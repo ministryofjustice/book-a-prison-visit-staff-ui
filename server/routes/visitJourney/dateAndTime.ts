@@ -1,7 +1,5 @@
 import type { Request, Response } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
-import { differenceInCalendarDays, differenceInDays } from 'date-fns'
-import { setSeconds } from 'date-fns/esm'
 import { VisitSlot } from '../../@types/bapv'
 import AuditService from '../../services/auditService'
 import { getFlashFormValues, getSelectedSlot, getSlotByTimeAndRestriction } from '../visitorUtils'
