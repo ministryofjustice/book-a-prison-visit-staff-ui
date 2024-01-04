@@ -25,7 +25,7 @@ describe('GET 404', () => {
         expect(res.text).toContain('If you typed the web address, check it is correct.')
         expect(res.text).toContain('If you pasted the web address, check you copied the entire address.')
         expect($('[data-test="back-to-start"]').attr('href')).toBe('/back-to-start')
-        expect(res.text).toContain('NotFoundError: Not found')
+        expect(res.text).toContain('NotFoundError: Not Found')
       })
   })
 
@@ -40,7 +40,7 @@ describe('GET 404', () => {
         expect(res.text).toContain('If you typed the web address, check it is correct.')
         expect(res.text).toContain('If you pasted the web address, check you copied the entire address.')
         expect($('[data-test="back-to-start"]').attr('href')).toBe('/back-to-start')
-        expect(res.text).not.toContain('NotFoundError: Not found')
+        expect(res.text).not.toContain('NotFoundError: Not Found')
       })
   })
 })

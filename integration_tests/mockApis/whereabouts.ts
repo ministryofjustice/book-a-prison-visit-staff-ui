@@ -26,4 +26,16 @@ export default {
       },
     })
   },
+
+  stubWhereaboutsPing: () => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: '/whereabouts/health/ping',
+      },
+      response: {
+        status: 200,
+      },
+    })
+  },
 }

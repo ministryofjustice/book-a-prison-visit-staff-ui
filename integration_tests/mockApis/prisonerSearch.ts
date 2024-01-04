@@ -84,4 +84,16 @@ export default {
       },
     })
   },
+
+  stubPrisonerSearchPing: () => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: '/offenderSearch/health/ping',
+      },
+      response: {
+        status: 200,
+      },
+    })
+  },
 }

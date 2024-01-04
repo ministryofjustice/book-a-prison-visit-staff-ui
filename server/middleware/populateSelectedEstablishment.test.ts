@@ -1,6 +1,5 @@
 import { Request, Response } from 'express'
 import { Cookie } from 'express-session'
-import type { User } from '../data/hmppsAuthClient'
 import TestData from '../routes/testutils/testData'
 import { createMockSupportedPrisonsService } from '../services/testutils/mocks'
 import populateSelectedEstablishment from './populateSelectedEstablishment'
@@ -37,7 +36,7 @@ describe('populateSelectedEstablishment', () => {
 
     res.locals = {
       selectedEstablishment: <Prison>undefined,
-      user: <User>{ activeCaseLoadId: 'HEI' },
+      user: <Express.User>{ activeCaseLoadId: 'HEI' },
     }
   })
 

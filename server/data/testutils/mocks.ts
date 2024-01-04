@@ -1,5 +1,7 @@
 import {
   HmppsAuthClient,
+  ManageUsersApiClient,
+  NomisUserRolesApiClient,
   NotificationsApiClient,
   OrchestrationApiClient,
   PrisonApiClient,
@@ -12,6 +14,11 @@ import {
 jest.mock('..')
 
 export const createMockHmppsAuthClient = () => new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
+
+export const createMockManageUsersApiClient = () => new ManageUsersApiClient() as jest.Mocked<ManageUsersApiClient>
+
+export const createMockNomisUserRolesApiClient = () =>
+  new NomisUserRolesApiClient() as jest.Mocked<NomisUserRolesApiClient>
 
 export const createMockNotificationsApiClient = () =>
   new NotificationsApiClient() as jest.Mocked<NotificationsApiClient>

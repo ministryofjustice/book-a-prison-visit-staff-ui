@@ -1,21 +1,36 @@
+import { jwtDecode } from 'jwt-decode'
 import { convertToTitleCase } from '../utils/utils'
-import type { HmppsAuthClient, PrisonApiClient, RestClientBuilder } from '../data'
+import type { User } from '../data/manageUsersApiClient'
+import ManageUsersApiClient from '../data/manageUsersApiClient'
+import type { HmppsAuthClient, NomisUserRolesApiClient, PrisonApiClient, RestClientBuilder } from '../data'
 import logger from '../../logger'
 
-interface UserDetails {
-  name: string
+export interface UserDetails extends User {
   displayName: string
+  roles: string[]
 }
 
 export default class UserService {
   constructor(
     private readonly hmppsAuthClient: HmppsAuthClient,
+    private readonly manageUsersApiClient: ManageUsersApiClient,
+    private readonly nomisUserRolesApiClient: NomisUserRolesApiClient,
     private readonly prisonApiClientFactory: RestClientBuilder<PrisonApiClient>,
   ) {}
 
   async getUser(token: string): Promise<UserDetails> {
-    const user = await this.hmppsAuthClient.getUser(token)
-    return { ...user, displayName: convertToTitleCase(user.name) }
+    const user = await this.manageUsersApiClient.getUser(token)
+    return { ...user, roles: this.getUserRoles(token), displayName: convertToTitleCase(user.name) }
+  }
+
+  getUserRoles(token: string): string[] {
+    const { authorities: roles = [] } = jwtDecode(token) as { authorities?: string[] }
+    return roles.map(role => role.substring(role.indexOf('_') + 1))
+  }
+
+  async getActiveCaseLoadId(token: string): Promise<string> {
+    const user = await this.nomisUserRolesApiClient.getUser(token)
+    return user.activeCaseloadId
   }
 
   async getUserCaseLoadIds(username: string): Promise<string[]> {

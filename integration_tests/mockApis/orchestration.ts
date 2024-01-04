@@ -407,4 +407,15 @@ export default {
       },
     })
   },
+  stubOrchestrationPing: () => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: '/orchestration/health/ping',
+      },
+      response: {
+        status: 200,
+      },
+    })
+  },
 }

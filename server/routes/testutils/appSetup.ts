@@ -1,6 +1,6 @@
 /* eslint-disable max-classes-per-file */
 import express, { Express } from 'express'
-import createError from 'http-errors'
+import { NotFound } from 'http-errors'
 import { Cookie, SessionData } from 'express-session'
 
 import indexRoutes from '../index'
@@ -19,32 +19,37 @@ import * as auth from '../../authentication/auth'
 import setUpCurrentUser from '../../middleware/setUpCurrentUser'
 import type { Services } from '../../services'
 
-import UserService from '../../services/userService'
+import UserService, { UserDetails } from '../../services/userService'
 import SupportedPrisonsService from '../../services/supportedPrisonsService'
 import { VisitorListItem, VisitSlotList, VisitSessionData } from '../../@types/bapv'
 import TestData from './testData'
 
-const user = {
-  name: 'john smith',
-  firstName: 'john',
-  lastName: 'smith',
+export const user: Express.User = {
+  name: 'FIRST LAST',
+  userId: 'id',
+  token: 'token',
   username: 'user1',
-  displayName: 'John Smith',
-  activeCaseLoadId: 'HEI',
+  displayName: 'First Last',
+  active: true,
+  authSource: 'NOMIS',
 }
 
 export const flashProvider = jest.fn()
 
 class MockUserService extends UserService {
   constructor() {
-    super(undefined, undefined)
+    super(undefined, undefined, undefined, undefined)
   }
 
-  async getUser(token: string) {
+  async getUser(_token: string) {
     return {
-      token,
       ...user,
-    }
+      roles: [],
+    } as UserDetails
+  }
+
+  async getActiveCaseLoadId(_token: string): Promise<string> {
+    return 'HEI'
   }
 
   async setActiveCaseLoad(_caseLoadId: string, _username: string) {
@@ -73,6 +78,7 @@ class MockSupportedPrisonsService extends SupportedPrisonsService {
 function appSetup(
   services: Services,
   production: boolean,
+  userSupplier: () => Express.User,
   sessionData: SessionData = {
     cookie: new Cookie(),
     returnTo: '',
@@ -91,9 +97,11 @@ function appSetup(
 
   nunjucksSetup(app)
   app.use((req, res, next) => {
-    res.locals = {}
-    res.locals.user = user
+    req.user = userSupplier()
     req.flash = flashProvider
+    res.locals = {
+      user: { ...req.user },
+    }
     req.session = {
       ...sessionData,
       regenerate: jest.fn(),
@@ -129,7 +137,8 @@ function appSetup(
   app.use('/visit', visitRoutes(services))
   app.use('/visits', visitsRoutes(services))
 
-  app.use((req, res, next) => next(createError(404, 'Not found')))
+  app.use((req, res, next) => next(new NotFound()))
+
   app.use(errorHandler(production))
 
   return app
@@ -138,12 +147,14 @@ function appSetup(
 export function appWithAllRoutes({
   production = false,
   services = {},
+  userSupplier = () => user,
   sessionData,
 }: {
   production?: boolean
   services?: Partial<Services>
+  userSupplier?: () => Express.User
   sessionData?: SessionData
 }): Express {
   auth.default.authenticationMiddleware = () => (req, res, next) => next()
-  return appSetup(services as Services, production, sessionData)
+  return appSetup(services as Services, production, userSupplier, sessionData)
 }
