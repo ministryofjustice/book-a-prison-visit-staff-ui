@@ -13,10 +13,6 @@ export default class VisitsByDatePage extends Page {
 
   visitorsTotalCount = (): PageElement => cy.get('[data-test="visit-visitors-total"]')
 
-  adultVisitorsCount = (): PageElement => cy.get('[data-test="visit-adults"]')
-
-  childVisitorsCount = (): PageElement => cy.get('[data-test="visit-children"]')
-
   prisonerRowOneName = (): PageElement => cy.get(':nth-child(1) > [data-test="prisoner-name"]')
 
   prisonerRowOneNumber = (): PageElement => cy.get(':nth-child(1) > [data-test="prisoner-number"]')

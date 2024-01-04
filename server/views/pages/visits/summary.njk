@@ -127,25 +127,15 @@
       </p>
       <p>
         <span data-test="visit-visitors-total">{{ totals.visitors }} {{ "visitor" | pluralise(totals.visitors )}}</span>
-        (<span data-test="visit-adults">{{ totals.adults }} {{ "adult" | pluralise(totals.adults) }}</span> and
-        <span data-test="visit-children">{{ totals.children }} {{ "child" | pluralise(totals.children, "children") }}</span>)
       </p>
         {% set pagination %}
           {{ mojPagination({
             results: {
               from: from,
               to: to,
-              count: numberOfResults
-            },
-            previous: {
-              text: 'Previous',
-              href: '/visits?' + queryParams + '&page=' + previous
-            } if numberOfResults > 10,
-            next: {
-              text: 'Next',
-              href: '/visits?' + queryParams + '&page=' + next
-            } if numberOfResults > 10,
-            items: pageLinks if numberOfResults > 10
+              count: numberOfResults,
+              text: "result" | pluralise(numberOfResults)
+            }
           }) }}
         {% endset %}
         {{ govukTable({
