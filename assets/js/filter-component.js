@@ -1,4 +1,4 @@
-;(function setupFilterComponent() {
+(function setupFilterComponent() {
   function resizeFilterSections() {
     const filterButtons = document.querySelectorAll('.bapv-filter-button')
     const filterSections = document.querySelectorAll('.bapv-filter-selection')
