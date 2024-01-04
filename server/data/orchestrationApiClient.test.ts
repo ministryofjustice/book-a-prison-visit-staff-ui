@@ -806,4 +806,20 @@ describe('orchestrationApiClient', () => {
       expect(output).toEqual(results)
     })
   })
+
+  describe('getPrison', () => {
+    it('should return a PrisonDTO object', async () => {
+      const results = TestData.prisonDto()
+      const prisonCode = 'BLI'
+
+      fakeOrchestrationApi
+        .get(`/config/prisons/prison/${prisonCode}`)
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, results)
+
+      const output = await orchestrationApiClient.getPrison(prisonCode)
+
+      expect(output).toEqual(results)
+    })
+  })
 })

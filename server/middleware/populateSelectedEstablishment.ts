@@ -15,12 +15,19 @@ export default function populateSelectedEstablishment(
         return res.redirect('/change-establishment')
       }
 
+      const policyNoticeDaysMin = await supportedPrisonsService.getPolicyNoticeDaysMin(
+        res.locals.user.username,
+        activeCaseLoadId,
+      )
+
       req.session.selectedEstablishment = {
         prisonId: activeCaseLoadId,
         prisonName: supportedPrisons[activeCaseLoadId],
+        policyNoticeDaysMin,
       }
     }
     res.locals.selectedEstablishment = req.session.selectedEstablishment
+
     return next()
   })
 }

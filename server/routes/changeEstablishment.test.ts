@@ -11,7 +11,7 @@ import {
   createMockSupportedPrisonsService,
   createMockUserService,
 } from '../services/testutils/mocks'
-import { PrisonName } from '../data/prisonRegisterApiTypes'
+import { Prison } from '../@types/bapv'
 
 let app: Express
 
@@ -23,6 +23,7 @@ const supportedPrisons = TestData.supportedPrisons()
 
 beforeEach(() => {
   supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
+  supportedPrisonsService.getPolicyNoticeDaysMin.mockResolvedValue(2)
 
   app = appWithAllRoutes({ services: { supportedPrisonsService } })
 })
@@ -132,12 +133,12 @@ describe('GET /change-establishment', () => {
 
 describe('POST /change-establishment', () => {
   let sessionData: SessionData
-  let selectedEstablishment: PrisonName
+  let selectedEstablishment: Prison
 
   beforeEach(() => {
     jest.spyOn(visitorUtils, 'clearSession')
 
-    selectedEstablishment = { prisonId: 'BLI', prisonName: supportedPrisons.BLI }
+    selectedEstablishment = { prisonId: 'BLI', prisonName: supportedPrisons.BLI, policyNoticeDaysMin: 2 }
     sessionData = { selectedEstablishment } as SessionData
     userService.getUserCaseLoadIds.mockResolvedValue(TestData.supportedPrisonIds())
 
@@ -182,7 +183,7 @@ describe('POST /change-establishment', () => {
   })
 
   it('should clear session, set selected establishment and redirect to home page', () => {
-    const newEstablishment: PrisonName = { prisonId: 'HEI', prisonName: supportedPrisons.HEI }
+    const newEstablishment: Prison = { prisonId: 'HEI', prisonName: supportedPrisons.HEI, policyNoticeDaysMin: 2 }
 
     return request(app)
       .post(`/change-establishment`)
@@ -203,7 +204,7 @@ describe('POST /change-establishment', () => {
   })
 
   it('should clear session, set selected establishment and redirect to / not the set referrer', () => {
-    const newEstablishment: PrisonName = { prisonId: 'HEI', prisonName: supportedPrisons.HEI }
+    const newEstablishment: Prison = { prisonId: 'HEI', prisonName: supportedPrisons.HEI, policyNoticeDaysMin: 2 }
 
     return request(app)
       .post(`/change-establishment?referrer=//search/prisoner/`)
@@ -219,7 +220,7 @@ describe('POST /change-establishment', () => {
   })
 
   it('should redirect to valid page when passed in querystring', () => {
-    const newEstablishment: PrisonName = { prisonId: 'HEI', prisonName: supportedPrisons.HEI }
+    const newEstablishment: Prison = { prisonId: 'HEI', prisonName: supportedPrisons.HEI, policyNoticeDaysMin: 2 }
 
     return request(app)
       .post(`/change-establishment?referrer=/search/prisoner/`)

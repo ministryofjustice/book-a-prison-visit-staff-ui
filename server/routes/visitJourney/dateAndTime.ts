@@ -15,7 +15,7 @@ export default class DateAndTime {
   ) {}
 
   async get(req: Request, res: Response): Promise<void> {
-    let daysUntilVisitStart = 2
+    let daysUntilVisitStart = req.session.selectedEstablishment.policyNoticeDaysMin
 
     const isUpdate = this.mode === 'update'
     const { prisonId } = req.session.selectedEstablishment

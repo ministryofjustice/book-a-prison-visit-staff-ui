@@ -4,7 +4,7 @@ import asyncMiddleware from '../middleware/asyncMiddleware'
 import { clearSession } from './visitorUtils'
 import { safeReturnUrl } from '../utils/utils'
 import type { Services, SupportedPrisonsService, UserService } from '../services'
-import { PrisonName } from '../data/prisonRegisterApiTypes'
+import { Prison } from '../@types/bapv'
 
 export default function routes({ auditService, supportedPrisonsService, userService }: Services): Router {
   const router = Router()
@@ -57,10 +57,16 @@ export default function routes({ auditService, supportedPrisonsService, userServ
 
     clearSession(req)
 
+    const policyNoticeDaysMin = await supportedPrisonsService.getPolicyNoticeDaysMin(
+      res.locals.user.username,
+      res.locals.user.activeCaseLoadId,
+    )
+
     const previousEstablishment = req.session.selectedEstablishment?.prisonId
-    const newEstablishment: PrisonName = {
+    const newEstablishment: Prison = {
       prisonId: req.body.establishment,
       prisonName: availablePrisons[req.body.establishment],
+      policyNoticeDaysMin,
     }
 
     req.session.selectedEstablishment = Object.assign(req.session.selectedEstablishment ?? {}, newEstablishment)

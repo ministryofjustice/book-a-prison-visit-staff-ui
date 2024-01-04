@@ -1,4 +1,5 @@
 import { OffenderRestriction } from '../data/prisonApiTypes'
+import { PrisonName } from '../data/prisonRegisterApiTypes'
 import {
   ApplicationMethodType,
   NotificationType,
@@ -152,6 +153,10 @@ export type VisitsReviewListItem = {
   reference: string
   type: NotificationType
   visitDates: string[]
+}
+
+export interface Prison extends PrisonName {
+  policyNoticeDaysMin: number
 }
 
 export type FilterField = { id: string; label: string; items: { label: string; value: string; checked: boolean }[] }

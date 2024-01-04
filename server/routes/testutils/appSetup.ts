@@ -64,6 +64,10 @@ class MockSupportedPrisonsService extends SupportedPrisonsService {
   async getSupportedPrisons(_username: string): Promise<Record<string, string>> {
     return TestData.supportedPrisons()
   }
+
+  async getPolicyNoticeDaysMin(_username: string, _prisonCode: string): Promise<number> {
+    return 2
+  }
 }
 
 function appSetup(

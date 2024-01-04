@@ -12,6 +12,7 @@ context('Prisoner profile page', () => {
     cy.task('stubAuthUser')
     cy.task('stubSupportedPrisonIds')
     cy.task('stubPrisonNames')
+    cy.task('stubGetPrison')
     cy.task('stubGetNotificationCount', {})
     cy.signIn()
   })

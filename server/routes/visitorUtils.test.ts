@@ -183,7 +183,7 @@ describe('clearSession', () => {
     adultVisitors: { adults: [] },
     slotsList: {},
     visitSessionData: { prisoner: undefined },
-    selectedEstablishment: { prisonId: 'HEI', prisonName: 'Hewell (HMP)' },
+    selectedEstablishment: { prisonId: 'HEI', prisonName: 'Hewell (HMP)', policyNoticeDaysMin: 2 },
   }
 
   req.session = sessionData as Session & SessionData
@@ -195,7 +195,7 @@ describe('clearSession', () => {
       returnTo: '/url',
       nowInMinutes: 123456,
       cookie: undefined,
-      selectedEstablishment: { prisonId: 'HEI', prisonName: 'Hewell (HMP)' },
+      selectedEstablishment: { prisonId: 'HEI', prisonName: 'Hewell (HMP)', policyNoticeDaysMin: 2 },
     })
   })
 })

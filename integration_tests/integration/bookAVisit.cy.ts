@@ -39,6 +39,7 @@ context('Book a visit', () => {
     cy.task('stubAuthUser')
     cy.task('stubSupportedPrisonIds')
     cy.task('stubPrisonNames')
+    cy.task('stubGetPrison')
     cy.task('stubGetNotificationCount', {})
     cy.signIn()
   })

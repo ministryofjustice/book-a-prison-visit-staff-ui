@@ -48,6 +48,7 @@ context('Bookings review page', () => {
     cy.task('stubAuthUser')
     cy.task('stubSupportedPrisonIds')
     cy.task('stubPrisonNames')
+    cy.task('stubGetPrison')
     cy.task('stubGetNotificationCount', { notificationCount })
     cy.signIn()
   })
