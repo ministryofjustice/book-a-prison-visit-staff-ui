@@ -153,6 +153,14 @@ testJourneys.forEach(journey => {
             expect($('#1').attr('disabled')).toBe('disabled')
 
             expect($('[data-test="submit"]').text().trim()).toBe('Continue')
+
+            expect(visitSessionsService.getVisitSessions).toHaveBeenCalledWith({
+              username: 'user1',
+              offenderNo: visitSessionData.prisoner.offenderNo,
+              prisonId,
+              visitRestriction: visitSessionData.visitRestriction,
+              minNumberOfDays: '2',
+            })
           })
       })
 
@@ -504,6 +512,34 @@ testJourneys.forEach(journey => {
           })
       })
     })
+  })
+})
+
+describe('Update journey override booking window', () => {
+  it('should override booking window min days to 0 if confirmation set in session', () => {
+    visitSessionsService.getVisitSessions.mockResolvedValue({
+      slotsList: {},
+      whereaboutsAvailable: false,
+    })
+
+    visitSessionData.overrideBookingWindow = true
+
+    return request(sessionApp)
+      .get('/visit/ab-cd-ef-gh/update/select-date-and-time')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('h1').text().trim()).toBe('Select date and time of visit')
+
+        expect(visitSessionsService.getVisitSessions).toHaveBeenCalledWith({
+          username: 'user1',
+          offenderNo: visitSessionData.prisoner.offenderNo,
+          prisonId,
+          visitRestriction: visitSessionData.visitRestriction,
+          minNumberOfDays: '0',
+        })
+      })
   })
 })
 
