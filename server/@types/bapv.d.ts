@@ -118,6 +118,7 @@ export type VisitSessionData = {
   visitStatus?: Visit['visitStatus']
   requestMethod?: ApplicationMethodType
   daysUntilBanExpiry?: number
+  overrideBookingWindow?: boolean
 }
 
 export type VisitInformation = {

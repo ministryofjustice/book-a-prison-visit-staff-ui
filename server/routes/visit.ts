@@ -2,6 +2,7 @@ import type { NextFunction, RequestHandler, Request, Response } from 'express'
 import { Router } from 'express'
 import { body, validationResult } from 'express-validator'
 import { BadRequest } from 'http-errors'
+import { differenceInCalendarDays } from 'date-fns'
 import visitCancellationReasons from '../constants/visitCancellationReasons'
 import { Prisoner } from '../data/prisonerOffenderSearchTypes'
 import { CancelVisitOrchestrationDto } from '../data/orchestrationApiTypes'
@@ -192,7 +193,14 @@ export default function routes({
 
     req.session.visitSessionData = Object.assign(req.session.visitSessionData ?? {}, visitSessionData)
 
-    return res.redirect(`/visit/${reference}/update/select-visitors`)
+    const { policyNoticeDaysMin } = req.session.selectedEstablishment
+
+    const numberOfDays = differenceInCalendarDays(new Date(visit.startTimestamp), new Date())
+
+    if (numberOfDays >= policyNoticeDaysMin) {
+      return res.redirect(`/visit/${reference}/update/select-visitors`)
+    }
+    return res.redirect(`/visit/${reference}/update/confirm-update`)
   })
 
   const selectVisitors = new SelectVisitors('update', prisonerVisitorsService, prisonerProfileService)
@@ -318,6 +326,42 @@ export default function routes({
       requestMethodsCancellation,
       formValues: getFlashFormValues(req),
     })
+  })
+
+  get('/:reference/update/confirm-update', async (req, res) => {
+    const reference = getVisitReference(req)
+    const { policyNoticeDaysMin } = req.session.selectedEstablishment
+
+    return res.render('pages/visit/confirmUpdate', {
+      errors: req.flash('errors'),
+      backLinkHref: `/visit/${reference}`,
+      policyNoticeDaysMin,
+      reference,
+    })
+  })
+
+  post('/:reference/update/confirm-update', async (req, res) => {
+    const reference = getVisitReference(req)
+    const { confirmUpdate } = req.body
+
+    if (confirmUpdate === 'yes') {
+      req.session.visitSessionData.overrideBookingWindow = true
+      return res.redirect(`/visit/${reference}/update/select-visitors`)
+    }
+    if (confirmUpdate === 'no') {
+      return res.redirect(`/visit/${reference}`)
+    }
+
+    req.flash('errors', [
+      {
+        msg: 'No option selected',
+        path: 'confirmUpdate',
+        type: 'field',
+        location: 'body',
+      },
+    ] as unknown as [])
+
+    return res.redirect(`/visit/${reference}/update/confirm-update`)
   })
 
   post(

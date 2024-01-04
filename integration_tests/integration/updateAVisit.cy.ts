@@ -3,6 +3,7 @@ import TestData from '../../server/routes/testutils/testData'
 import Page from '../pages/page'
 import VisitDetailsPage from '../pages/visitDetails'
 import SelectVisitorsPage from '../pages/selectVisitors'
+import ConfirmUpdatePage from '../pages/confirmUpdate'
 import { VisitSession } from '../../server/data/orchestrationApiTypes'
 import SelectVisitDateAndTime from '../pages/selectVisitDateAndTime'
 import AdditionalSupportPage from '../pages/additionalSupport'
@@ -14,6 +15,11 @@ import RequestMethodPage from '../pages/requestMethod'
 context('Update a visit', () => {
   const shortDateFormat = 'yyyy-MM-dd'
   const longDateFormat = 'EEEE d MMMM yyyy'
+
+  const today = new Date()
+  const prisoner = TestData.prisoner()
+  const { prisonerNumber: offenderNo, prisonId } = prisoner
+  const prisonerDisplayName = 'Smith, John'
 
   beforeEach(() => {
     cy.task('reset')
@@ -27,11 +33,6 @@ context('Update a visit', () => {
   })
 
   it('should complete the update a visit journey', () => {
-    const today = new Date()
-    const prisoner = TestData.prisoner()
-    const { prisonerNumber: offenderNo, prisonId } = prisoner
-    const prisonerDisplayName = 'Smith, John'
-
     const visitSessions: VisitSession[] = [
       TestData.visitSession({
         startTimestamp: format(addDays(today, 7), `${shortDateFormat}'T'10:00:00`),
@@ -195,5 +196,63 @@ context('Update a visit', () => {
     confirmationPage.additionalSupport().contains('Wheelchair ramp, Some extra help!')
     confirmationPage.mainContactName().contains('Jeanette Smith (wife of the prisoner)')
     confirmationPage.mainContactNumber().contains('09876 543 321')
+  })
+
+  it('should redirect to confirm update page if outside booking window limit', () => {
+    const visitSessions: VisitSession[] = [
+      TestData.visitSession({
+        startTimestamp: format(addDays(today, 1), `${shortDateFormat}'T'10:00:00`),
+        endTimestamp: format(addDays(today, 1), `${shortDateFormat}'T'11:00:00`),
+      }),
+      TestData.visitSession({
+        startTimestamp: format(addDays(today, 8), `${shortDateFormat}'T'13:30:00`),
+        endTimestamp: format(addDays(today, 8), `${shortDateFormat}'T'15:00:00`),
+      }),
+    ]
+
+    const originalVisit = TestData.visit({
+      startTimestamp: visitSessions[0].startTimestamp,
+      endTimestamp: visitSessions[0].endTimestamp,
+      visitors: [{ nomisPersonId: 4321, visitContact: true }],
+      visitorSupport: [],
+    })
+    const visitHistoryDetails = TestData.visitHistoryDetails({ visit: originalVisit })
+
+    const childDob = format(sub(today, { years: 5 }), shortDateFormat)
+    const contacts = [
+      TestData.contact({ personId: 4321 }),
+      TestData.contact({
+        personId: 4322,
+        firstName: 'Bob',
+        dateOfBirth: childDob,
+        relationshipCode: 'SON',
+        relationshipDescription: 'Son',
+      }),
+    ]
+
+    cy.task('stubPrisonerById', prisoner)
+    cy.task('stubVisitHistory', visitHistoryDetails)
+    cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
+    cy.task('stubAvailableSupport')
+
+    // Visit details page
+    cy.visit('/visit/ab-cd-ef-gh')
+    const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage)
+    visitDetailsPage.visitReference().contains('ab-cd-ef-gh')
+    visitDetailsPage.prisonerName().contains(prisonerDisplayName)
+
+    // Start update journey
+    cy.task('stubOffenderRestrictions', { offenderNo, offenderRestrictions: [] })
+    visitDetailsPage.updateBooking().click()
+
+    // Confirm update page - check yes
+    const confirmUpdatePage = Page.verifyOnPage(ConfirmUpdatePage)
+    confirmUpdatePage.confirmUpdateYesRadio().check()
+    confirmUpdatePage.submit().click()
+
+    // Select visitors page - existing visitor selected then add another
+    const selectVisitorsPage = Page.verifyOnPage(SelectVisitorsPage)
+    selectVisitorsPage.getVisitor(contacts[0].personId).should('be.checked')
+    selectVisitorsPage.getVisitor(contacts[1].personId).should('not.be.checked')
   })
 })

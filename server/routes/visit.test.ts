@@ -112,6 +112,7 @@ describe('/visit/:reference', () => {
     prisonerVisitorsService.getVisitors.mockResolvedValue(visitors)
     supportedPrisonsService.getSupportedPrisonIds.mockResolvedValue(supportedPrisonIds)
     supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
+    supportedPrisonsService.getPolicyNoticeDaysMin.mockResolvedValue(2)
 
     visitSessionData = { prisoner: undefined }
 
@@ -283,7 +284,7 @@ describe('/visit/:reference', () => {
       app = appWithAllRoutes({
         services: { auditService, supportedPrisonsService, visitService, visitSessionsService },
         sessionData: {
-          selectedEstablishment: { prisonId: 'BLI', prisonName: supportedPrisons.BLI },
+          selectedEstablishment: { prisonId: 'BLI', prisonName: supportedPrisons.BLI, policyNoticeDaysMin: 2 },
         } as SessionData,
       })
 
@@ -486,11 +487,33 @@ describe('/visit/:reference', () => {
       app = appWithAllRoutes({
         services: { auditService, supportedPrisonsService, visitService, visitSessionsService },
         sessionData: {
-          selectedEstablishment: { prisonId: 'BLI', prisonName: supportedPrisons.BLI },
+          selectedEstablishment: { prisonId: 'BLI', prisonName: supportedPrisons.BLI, policyNoticeDaysMin: 2 },
         } as SessionData,
       })
 
       return request(app).post('/visit/ab-cd-ef-gh').expect(302).expect('location', '/visit/ab-cd-ef-gh')
+    })
+
+    // default visit is 13 days away so using 14 days for simplicity
+    it('should redirect to /visit/:reference/update/confirm-update if visit is less days away than policy notice days', () => {
+      app = appWithAllRoutes({
+        services: {
+          auditService,
+          prisonerSearchService,
+          prisonerVisitorsService,
+          supportedPrisonsService,
+          visitService,
+          visitSessionsService,
+        },
+        sessionData: {
+          selectedEstablishment: { prisonId: 'HEI', prisonName: supportedPrisons.HEI, policyNoticeDaysMin: 14 },
+        } as SessionData,
+      })
+
+      return request(app)
+        .post('/visit/ab-cd-ef-gh')
+        .expect(302)
+        .expect('location', '/visit/ab-cd-ef-gh/update/confirm-update')
     })
 
     it('should render 400 Bad Request error for invalid visit reference', () => {
@@ -500,6 +523,74 @@ describe('/visit/:reference', () => {
         .expect('Content-Type', /html/)
         .expect(res => {
           expect(res.text).toContain('BadRequestError: Bad Request')
+        })
+    })
+  })
+
+  describe('GET /visit/:reference/update/confirm-update', () => {
+    it('should render the confirm update page', () => {
+      app = appWithAllRoutes({
+        services: {
+          auditService,
+          prisonerSearchService,
+          prisonerVisitorsService,
+          supportedPrisonsService,
+          visitService,
+          visitSessionsService,
+        },
+        sessionData: {
+          selectedEstablishment: { prisonId: 'HEI', prisonName: supportedPrisons.HEI, policyNoticeDaysMin: 4 },
+        } as SessionData,
+      })
+
+      return request(app)
+        .get(`/visit/${visit.reference}/update/confirm-update`)
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('.govuk-back-link').attr('href')).toBe(`/visit/${visit.reference}`)
+          expect($('h1').text().trim()).toContain('This visit is in less than 4 days.')
+          expect($('h1').text().trim()).toContain('Do you want to update the booking?')
+          expect($('form').attr('action')).toBe('/visit/ab-cd-ef-gh/update/confirm-update')
+        })
+    })
+  })
+
+  describe('POST /visit/:reference/update/confirm-update', () => {
+    it('should redirect back to the visit summary if choosing not to proceed with update', () => {
+      return request(app)
+        .post('/visit/ab-cd-ef-gh/update/confirm-update')
+        .send('confirmUpdate=no')
+        .expect(302)
+        .expect('location', '/visit/ab-cd-ef-gh')
+        .expect(res => {
+          expect(visitSessionData).not.toHaveProperty('overrideBookingWindow')
+        })
+    })
+
+    it('should redirect to select visitors page if choosing to proceed with update', () => {
+      return request(app)
+        .post('/visit/ab-cd-ef-gh/update/confirm-update')
+        .send('confirmUpdate=yes')
+        .expect(302)
+        .expect('location', '/visit/ab-cd-ef-gh/update/select-visitors')
+        .expect(res => {
+          expect(visitSessionData.overrideBookingWindow).toBe(true)
+        })
+    })
+
+    it('should should redirect to confirm update page with errors set if no option selected', () => {
+      return request(app)
+        .post('/visit/ab-cd-ef-gh/update/confirm-update')
+        .send('confirmUpdate=')
+        .expect(302)
+        .expect('location', '/visit/ab-cd-ef-gh/update/confirm-update')
+        .expect(() => {
+          expect(visitSessionData).not.toHaveProperty('overrideBookingWindow')
+          expect(flashProvider).toHaveBeenCalledWith('errors', [
+            { location: 'body', msg: 'No option selected', path: 'confirmUpdate', type: 'field' },
+          ])
         })
     })
   })
