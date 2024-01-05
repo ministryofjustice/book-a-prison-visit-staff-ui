@@ -59,7 +59,7 @@ export default function routes({ auditService, supportedPrisonsService, userServ
 
     const policyNoticeDaysMin = await supportedPrisonsService.getPolicyNoticeDaysMin(
       res.locals.user.username,
-      res.locals.user.activeCaseLoadId,
+      req.body.establishment,
     )
 
     const previousEstablishment = req.session.selectedEstablishment?.prisonId

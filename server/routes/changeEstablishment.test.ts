@@ -27,7 +27,7 @@ beforeEach(() => {
   supportedPrisonsService.getPolicyNoticeDaysMin.mockResolvedValue(2)
 
   userService.getUser.mockResolvedValue(user as UserDetails)
-  userService.getActiveCaseLoadId.mockResolvedValue('HEI')
+  userService.getActiveCaseLoadId.mockResolvedValue('XYZ') // assume user coming with an unsupported case load
 
   app = appWithAllRoutes({ services: { supportedPrisonsService } })
 })
@@ -164,6 +164,7 @@ describe('POST /change-establishment', () => {
           { location: 'body', msg: 'No prison selected', path: 'establishment', type: 'field', value: '' },
         ])
         expect(visitorUtils.clearSession).toHaveBeenCalledTimes(0)
+        expect(supportedPrisonsService.getPolicyNoticeDaysMin).not.toHaveBeenCalled()
         expect(auditService.changeEstablishment).toHaveBeenCalledTimes(0)
         expect(userService.setActiveCaseLoad).not.toHaveBeenCalled()
       })
@@ -181,6 +182,7 @@ describe('POST /change-establishment', () => {
           { location: 'body', msg: 'No prison selected', path: 'establishment', type: 'field', value: 'HEX' },
         ])
         expect(visitorUtils.clearSession).toHaveBeenCalledTimes(0)
+        expect(supportedPrisonsService.getPolicyNoticeDaysMin).not.toHaveBeenCalled()
         expect(auditService.changeEstablishment).toHaveBeenCalledTimes(0)
         expect(userService.setActiveCaseLoad).not.toHaveBeenCalled()
       })
@@ -197,6 +199,7 @@ describe('POST /change-establishment', () => {
       .expect(() => {
         expect(sessionData.selectedEstablishment).toStrictEqual(newEstablishment)
         expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)
+        expect(supportedPrisonsService.getPolicyNoticeDaysMin).toHaveBeenCalledWith('user1', 'HEI')
         expect(auditService.changeEstablishment).toHaveBeenCalledWith({
           previousEstablishment: 'BLI',
           newEstablishment: 'HEI',
@@ -218,6 +221,7 @@ describe('POST /change-establishment', () => {
       .expect(() => {
         expect(sessionData.selectedEstablishment).toStrictEqual(newEstablishment)
         expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)
+        expect(supportedPrisonsService.getPolicyNoticeDaysMin).toHaveBeenCalledWith('user1', 'HEI')
         expect(auditService.changeEstablishment).toHaveBeenCalledTimes(1)
         expect(userService.setActiveCaseLoad).toHaveBeenCalledWith('HEI', 'user1')
       })
@@ -234,6 +238,7 @@ describe('POST /change-establishment', () => {
       .expect(() => {
         expect(sessionData.selectedEstablishment).toStrictEqual(newEstablishment)
         expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)
+        expect(supportedPrisonsService.getPolicyNoticeDaysMin).toHaveBeenCalledWith('user1', 'HEI')
         expect(auditService.changeEstablishment).toHaveBeenCalledTimes(1)
         expect(userService.setActiveCaseLoad).toHaveBeenCalledWith('HEI', 'user1')
       })
