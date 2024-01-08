@@ -1,8 +1,8 @@
 # Stage: base image
 FROM node:20.9-bullseye-slim as base
 
-ARG BUILD_NUMBER=1_0_0
-ARG GIT_REF=not-available
+ENV BUILD_NUMBER=1_0_0
+ENV GIT_REF ${GIT_REF:-xxxxxxxxxxxxxxxxxxx}
 
 LABEL maintainer="HMPPS Digital Studio <info@digital.justice.gov.uk>"
 
@@ -36,10 +36,6 @@ RUN CYPRESS_INSTALL_BINARY=0 npm ci --no-audit
 COPY . .
 RUN npm run build
 
-RUN export BUILD_NUMBER=${BUILD_NUMBER} && \
-    export GIT_REF=${GIT_REF} && \
-    npm run record-build-info
-
 RUN npm prune --no-audit --omit=dev
 
 # Stage: copy production assets and dependencies
@@ -49,9 +45,6 @@ COPY --from=build --chown=appuser:appgroup \
         /app/package.json \
         /app/package-lock.json \
         ./
-
-COPY --from=build --chown=appuser:appgroup \
-        /app/build-info.json ./dist/build-info.json
 
 COPY --from=build --chown=appuser:appgroup \
         /app/assets ./assets

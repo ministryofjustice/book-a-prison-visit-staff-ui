@@ -18,11 +18,19 @@ import errorHandler from '../../errorHandler'
 import * as auth from '../../authentication/auth'
 import setUpCurrentUser from '../../middleware/setUpCurrentUser'
 import type { Services } from '../../services'
+import { ApplicationInfo } from '../../applicationInfo'
 
 import UserService, { UserDetails } from '../../services/userService'
 import SupportedPrisonsService from '../../services/supportedPrisonsService'
 import { VisitorListItem, VisitSlotList, VisitSessionData } from '../../@types/bapv'
 import TestData from './testData'
+
+const testAppInfo: ApplicationInfo = {
+  applicationName: 'test',
+  buildNumber: '1',
+  gitRef: 'long ref',
+  gitShortHash: 'short ref',
+}
 
 export const user: Express.User = {
   name: 'FIRST LAST',
@@ -95,7 +103,7 @@ function appSetup(
 
   app.set('view engine', 'njk')
 
-  nunjucksSetup(app)
+  nunjucksSetup(app, testAppInfo)
   app.use((req, res, next) => {
     req.user = userSupplier()
     req.flash = flashProvider

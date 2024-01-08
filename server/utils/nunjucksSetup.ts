@@ -6,10 +6,11 @@ import { format, formatDuration, intervalToDuration, isAfter, parseISO } from 'd
 import { FormError } from '../@types/bapv'
 import { properCaseFullName } from './utils'
 import config from '../config'
+import { ApplicationInfo } from '../applicationInfo'
 
 const production = process.env.NODE_ENV === 'production'
 
-export default function nunjucksSetup(app: express.Express): void {
+export default function nunjucksSetup(app: express.Express, applicationInfo: ApplicationInfo): void {
   app.set('view engine', 'njk')
 
   app.locals.asset_path = '/assets/'
@@ -19,7 +20,7 @@ export default function nunjucksSetup(app: express.Express): void {
   // Cachebusting version string
   if (production) {
     // Version only changes on reboot
-    app.locals.version = Date.now().toString()
+    app.locals.version = applicationInfo.gitShortHash
   } else {
     // Version changes every request
     app.use((req, res, next) => {

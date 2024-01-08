@@ -23,6 +23,7 @@ export const services = () => {
     prisonRegisterApiClientBuilder,
     prisonerSearchClientBuilder,
     whereaboutsApiClientBuilder,
+    applicationInfo,
   } = dataAccess()
 
   const additionalSupportService = new AdditionalSupportService(orchestrationApiClientBuilder, hmppsAuthClient)
@@ -81,6 +82,7 @@ export const services = () => {
     visitNotificationsService,
     visitService,
     visitSessionsService,
+    applicationInfo,
   }
 }
 
