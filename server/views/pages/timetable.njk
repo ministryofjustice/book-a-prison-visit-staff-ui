@@ -93,7 +93,7 @@
             {% set selected = day == selectedDate %}
             <li class="bapv-timetable-dates__date{{ ' bapv-timetable-dates__date--selected' if selected }}">
               <span>{{ day | formatDate('E') }}</span>
-                {% if not selected %}<a href="/timetable?date={{ day | formatDate('yyyy-MM-dd') }}">{% endif %}
+                {% if not selected %}<a class="govuk-link--no-visited-state" href="/timetable?date={{ day | formatDate('yyyy-MM-dd') }}">{% endif %}
                   {{ day | formatDate('d') }}<span class="govuk-visually-hidden"> {{ day | formatDate('MMMM yyyy') }}</span>
                 {% if not selected %}</a>{% endif %}
             </li>
