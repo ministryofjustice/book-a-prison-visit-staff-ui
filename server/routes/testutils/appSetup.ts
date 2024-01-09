@@ -1,4 +1,19 @@
+/* eslint-disable import/first */
 /* eslint-disable max-classes-per-file */
+// eslint-disable-next-line import/order
+import type { ApplicationInfo } from '../../applicationInfo'
+
+const testAppInfo: ApplicationInfo = {
+  applicationName: 'test',
+  buildNumber: '1',
+  gitRef: 'long ref',
+  gitShortHash: 'short ref',
+}
+
+jest.mock('../../applicationInfo', () => {
+  return jest.fn(() => testAppInfo)
+})
+
 import express, { Express } from 'express'
 import { NotFound } from 'http-errors'
 import { Cookie, SessionData } from 'express-session'
@@ -95,7 +110,7 @@ function appSetup(
 
   app.set('view engine', 'njk')
 
-  nunjucksSetup(app)
+  nunjucksSetup(app, testAppInfo)
   app.use((req, res, next) => {
     req.user = userSupplier()
     req.flash = flashProvider
