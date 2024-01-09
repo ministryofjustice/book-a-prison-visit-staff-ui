@@ -1,4 +1,19 @@
+/* eslint-disable import/first */
 /* eslint-disable max-classes-per-file */
+// eslint-disable-next-line import/order
+import type { ApplicationInfo } from '../../applicationInfo'
+
+const testAppInfo: ApplicationInfo = {
+  applicationName: 'test',
+  buildNumber: '1',
+  gitRef: 'long ref',
+  gitShortHash: 'short ref',
+}
+
+jest.mock('../../applicationInfo', () => {
+  return jest.fn(() => testAppInfo)
+})
+
 import express, { Express } from 'express'
 import { NotFound } from 'http-errors'
 import { Cookie, SessionData } from 'express-session'
@@ -18,19 +33,11 @@ import errorHandler from '../../errorHandler'
 import * as auth from '../../authentication/auth'
 import setUpCurrentUser from '../../middleware/setUpCurrentUser'
 import type { Services } from '../../services'
-import { ApplicationInfo } from '../../applicationInfo'
 
 import UserService, { UserDetails } from '../../services/userService'
 import SupportedPrisonsService from '../../services/supportedPrisonsService'
 import { VisitorListItem, VisitSlotList, VisitSessionData } from '../../@types/bapv'
 import TestData from './testData'
-
-const testAppInfo: ApplicationInfo = {
-  applicationName: 'test',
-  buildNumber: '1',
-  gitRef: 'long ref',
-  gitShortHash: 'short ref',
-}
 
 export const user: Express.User = {
   name: 'FIRST LAST',
