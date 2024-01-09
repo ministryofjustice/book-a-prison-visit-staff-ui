@@ -26,7 +26,7 @@
         {% for visit in visits %}
           {% set visitRows = (visitRows.push([
             {
-              html: '<a href="/visit/' + visit.reference + '">' + visit.reference + '</a>',
+              html: '<a class="govuk-link--no-visited-state" href="/visit/' + visit.reference + '">' + visit.reference + '</a>',
               attributes: { "data-test": "visit-reference-" + loop.index }
             },
             {

@@ -67,7 +67,7 @@
             },
             {
               attributes: { "data-test": "action-" + loop.index },
-              html: '<a href="/review/' + notificationTypePathSegments[listItem.type] + '/' + listItem.reference + '">View</a>'
+              html: '<a class="govuk-link--no-visited-state" href="/review/' + notificationTypePathSegments[listItem.type] + '/' + listItem.reference + '">View</a>'
             }
           ]), reviewListRows) %}
         {% endfor %}

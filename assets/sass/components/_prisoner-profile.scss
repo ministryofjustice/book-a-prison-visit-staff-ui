@@ -30,6 +30,7 @@
 
   color: white;
   margin-right: govuk-spacing(2);
+  max-width: unset;
 
   &--UPIU {
     background-color: govuk-colour("bright-purple");
