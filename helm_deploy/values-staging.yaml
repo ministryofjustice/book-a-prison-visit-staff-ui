@@ -20,8 +20,14 @@ generic-service:
     WHEREABOUTS_API_URL: "https://whereabouts-api-dev.service.justice.gov.uk"
     PRISON_REGISTER_API_URL: "https://prison-register-dev.hmpps.service.justice.gov.uk"
     DPS_URL: "https://digital-dev.prison.service.justice.gov.uk/"
+    APPLICATIONINSIGHTS_CONNECTION_STRING: null # disable App Insights for staging
+    SMS_NOTIFICATIONS_ENABLED: "true"
     REDIS_KEY: "bapv-staff-staging"
     FEATURE_REVIEW_BOOKINGS: "true"
+
+  namespace_secrets:
+    book-a-prison-visit-staff-ui:
+      APPINSIGHTS_INSTRUMENTATIONKEY: null # disable App Insights for staging
 
   allowlist:
     circleci-1: 3.228.39.90/32
