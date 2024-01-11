@@ -21,7 +21,6 @@ generic-service:
     WHEREABOUTS_API_URL: "https://whereabouts-api-preprod.service.justice.gov.uk"
     PRISON_REGISTER_API_URL: "https://prison-register-preprod.hmpps.service.justice.gov.uk"
     DPS_URL: "https://digital-preprod.prison.service.justice.gov.uk/"
-    SMS_NOTIFICATIONS_ENABLED: "true"
     REDIS_KEY: "bapv-staff-preprod"
     FEATURE_REVIEW_BOOKINGS: "false"
 

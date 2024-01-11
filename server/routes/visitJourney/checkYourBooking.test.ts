@@ -5,13 +5,8 @@ import * as cheerio from 'cheerio'
 import { FlashData, VisitSessionData } from '../../@types/bapv'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
 import { Visit } from '../../data/orchestrationApiTypes'
-import config from '../../config'
 import TestData from '../testutils/testData'
-import {
-  createMockAuditService,
-  createMockNotificationsService,
-  createMockVisitService,
-} from '../../services/testutils/mocks'
+import { createMockAuditService, createMockVisitService } from '../../services/testutils/mocks'
 
 let sessionApp: Express
 
@@ -164,7 +159,6 @@ testJourneys.forEach(journey => {
     })
 
     describe(`POST ${journey.urlPrefix}/check-your-booking`, () => {
-      const notificationsService = createMockNotificationsService()
       const visitService = createMockVisitService()
 
       beforeEach(() => {
@@ -181,11 +175,9 @@ testJourneys.forEach(journey => {
 
         visitService.changeReservedVisit = jest.fn().mockResolvedValue(reservedVisit)
         visitService.bookVisit = jest.fn().mockResolvedValue(bookedVisit)
-        notificationsService.sendBookingSms = jest.fn().mockResolvedValue({})
-        notificationsService.sendUpdateSms = jest.fn().mockResolvedValue({})
 
         sessionApp = appWithAllRoutes({
-          services: { auditService, notificationsService, visitService },
+          services: { auditService, visitService },
           sessionData: {
             availableSupportTypes,
             visitSessionData,
@@ -193,9 +185,7 @@ testJourneys.forEach(journey => {
         })
       })
 
-      it('should book visit, record audit event, send SMS (notifications enabled) and redirect to confirmation page', () => {
-        config.apis.notifications.enabled = true
-
+      it('should book visit, record audit event and redirect to confirmation page', () => {
         return request(sessionApp)
           .post(`${journey.urlPrefix}/check-your-booking`)
           .expect(302)
@@ -219,58 +209,10 @@ testJourneys.forEach(journey => {
               username: 'user1',
               operationId: undefined,
             })
-            expect(notificationsService[journey.isUpdate ? 'sendUpdateSms' : 'sendBookingSms']).toHaveBeenCalledTimes(1)
-            expect(notificationsService[journey.isUpdate ? 'sendUpdateSms' : 'sendBookingSms']).toHaveBeenCalledWith({
-              phoneNumber: '01234567890',
-              visitSlot: visitSessionData.visitSlot,
-              prisonName: 'Hewell (HMP)',
-              reference: visitSessionData.visitReference,
-            })
           })
       })
 
-      it('should handle SMS sending failure', () => {
-        config.apis.notifications.enabled = true
-
-        notificationsService.sendBookingSms.mockRejectedValue({})
-
-        return request(sessionApp)
-          .post(`${journey.urlPrefix}/check-your-booking`)
-          .expect(302)
-          .expect('location', `${journey.urlPrefix}/confirmation`)
-          .expect(() => {
-            expect(visitService.changeReservedVisit).toHaveBeenCalledTimes(1)
-            expect(visitService.bookVisit).toHaveBeenCalledTimes(1)
-
-            expect(visitService.cancelVisit).not.toHaveBeenCalled()
-            expect(visitSessionData.visitStatus).toBe('BOOKED')
-            expect(auditService.bookedVisit).toHaveBeenCalledTimes(1)
-            expect(notificationsService[journey.isUpdate ? 'sendUpdateSms' : 'sendBookingSms']).toHaveBeenCalledTimes(1)
-          })
-      })
-
-      it('should NOT send SMS if notifications disabled', () => {
-        config.apis.notifications.enabled = false
-
-        return request(sessionApp)
-          .post(`${journey.urlPrefix}/check-your-booking`)
-          .expect(302)
-          .expect('location', `${journey.urlPrefix}/confirmation`)
-          .expect(() => {
-            expect(visitService.changeReservedVisit).toHaveBeenCalledTimes(1)
-            expect(visitService.bookVisit).toHaveBeenCalledTimes(1)
-
-            expect(visitService.cancelVisit).not.toHaveBeenCalled()
-            expect(visitSessionData.visitStatus).toBe('BOOKED')
-            expect(auditService.bookedVisit).toHaveBeenCalledTimes(1)
-            expect(notificationsService.sendBookingSms).not.toHaveBeenCalled()
-            expect(notificationsService.sendUpdateSms).not.toHaveBeenCalled()
-          })
-      })
-
-      it('should handle booking failure, display error message and NOT record audit event nor send SMS', () => {
-        config.apis.notifications.enabled = true
-
+      it('should handle booking failure, display error message and NOT record audit event', () => {
         visitService.bookVisit.mockRejectedValue({})
 
         return request(sessionApp)
@@ -293,8 +235,6 @@ testJourneys.forEach(journey => {
             expect(visitService.cancelVisit).not.toHaveBeenCalled()
             expect(visitSessionData.visitStatus).toBe('RESERVED')
             expect(auditService.bookedVisit).not.toHaveBeenCalled()
-            expect(notificationsService.sendBookingSms).not.toHaveBeenCalled()
-            expect(notificationsService.sendUpdateSms).not.toHaveBeenCalled()
           })
       })
     })

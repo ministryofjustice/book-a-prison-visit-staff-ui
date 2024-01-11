@@ -14,7 +14,6 @@ import type { Services } from '../services'
 export default function routes({
   additionalSupportService,
   auditService,
-  notificationsService,
   prisonerProfileService,
   prisonerVisitorsService,
   visitService,
@@ -40,7 +39,7 @@ export default function routes({
   const dateAndTime = new DateAndTime('book', visitService, visitSessionsService, auditService)
   const mainContact = new MainContact('book')
   const requestMethod = new RequestMethod('book')
-  const checkYourBooking = new CheckYourBooking('book', auditService, notificationsService, visitService)
+  const checkYourBooking = new CheckYourBooking('book', auditService, visitService)
   const confirmation = new Confirmation('book')
 
   get('/select-visitors', sessionCheckMiddleware({ stage: 1 }), (req, res) => selectVisitors.get(req, res))

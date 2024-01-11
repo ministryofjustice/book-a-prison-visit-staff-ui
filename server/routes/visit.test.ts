@@ -10,7 +10,6 @@ import { clearSession } from './visitorUtils'
 import TestData from './testutils/testData'
 import {
   createMockAuditService,
-  createMockNotificationsService,
   createMockPrisonerSearchService,
   createMockPrisonerVisitorsService,
   createMockSupportedPrisonsService,
@@ -659,19 +658,16 @@ describe('GET /visit/:reference/cancel', () => {
 })
 
 describe('POST /visit/:reference/cancel', () => {
-  const notificationsService = createMockNotificationsService()
   let cancelledVisit: Visit
   beforeEach(() => {
     cancelledVisit = TestData.visit()
 
     visitService.cancelVisit = jest.fn().mockResolvedValue(cancelledVisit)
-    notificationsService.sendCancellationSms = jest.fn().mockResolvedValue({})
     supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
 
     app = appWithAllRoutes({
       services: {
         auditService,
-        notificationsService,
         prisonerSearchService,
         supportedPrisonsService,
         visitService,
@@ -679,9 +675,7 @@ describe('POST /visit/:reference/cancel', () => {
     })
   })
 
-  it('should cancel visit (default method NOT_APPLICABLE), set flash values, send SMS and redirect to confirmation page', () => {
-    config.apis.notifications.enabled = true
-
+  it('should cancel visit (default method NOT_APPLICABLE), set flash values and redirect to confirmation page', () => {
     return request(app)
       .post('/visit/ab-cd-ef-gh/cancel')
       .send('cancel=PRISONER_CANCELLED')
@@ -712,14 +706,6 @@ describe('POST /visit/:reference/cancel', () => {
           username: 'user1',
           operationId: undefined,
         })
-        expect(notificationsService.sendCancellationSms).toHaveBeenCalledTimes(1)
-        expect(notificationsService.sendCancellationSms).toHaveBeenCalledWith({
-          phoneNumber: '01234567890',
-          visitSlot: cancelledVisit.startTimestamp,
-          prisonName: 'Hewell (HMP)',
-          prisonPhoneNumber: '0300 060 6503',
-          reference: 'ab-cd-ef-gh',
-        })
       })
   })
 
@@ -744,64 +730,6 @@ describe('POST /visit/:reference/cancel', () => {
             applicationMethodType: 'EMAIL',
           },
         })
-      })
-  })
-
-  it('should send the SMS with the correct prison phone number - Bristol', () => {
-    cancelledVisit.prisonId = 'BLI'
-    config.apis.notifications.enabled = true
-
-    return request(app)
-      .post('/visit/ab-cd-ef-gh/cancel')
-      .send('cancel=PRISONER_CANCELLED')
-      .send('reason=illness')
-      .expect(302)
-      .expect('location', '/visit/cancelled')
-      .expect(() => {
-        expect(visitService.cancelVisit).toHaveBeenCalledTimes(1)
-        expect(auditService.cancelledVisit).toHaveBeenCalledTimes(1)
-        expect(notificationsService.sendCancellationSms).toHaveBeenCalledTimes(1)
-        expect(notificationsService.sendCancellationSms).toHaveBeenCalledWith({
-          phoneNumber: '01234567890',
-          visitSlot: cancelledVisit.startTimestamp,
-          prisonName: 'Bristol (HMP & YOI)',
-          prisonPhoneNumber: '0300 060 6510',
-          reference: 'ab-cd-ef-gh',
-        })
-      })
-  })
-
-  it('should NOT send Cancellation SMS if notifications disabled', () => {
-    config.apis.notifications.enabled = false
-
-    return request(app)
-      .post('/visit/ab-cd-ef-gh/cancel')
-      .send('cancel=PRISONER_CANCELLED')
-      .send('reason=illness')
-      .expect(302)
-      .expect('location', '/visit/cancelled')
-      .expect(() => {
-        expect(visitService.cancelVisit).toHaveBeenCalledTimes(1)
-        expect(auditService.cancelledVisit).toHaveBeenCalledTimes(1)
-        expect(notificationsService.sendCancellationSms).not.toHaveBeenCalled()
-      })
-  })
-
-  it('should handle SMS sending failure', () => {
-    config.apis.notifications.enabled = true
-
-    notificationsService.sendCancellationSms.mockRejectedValue({})
-
-    return request(app)
-      .post('/visit/ab-cd-ef-gh/cancel')
-      .send('cancel=PRISONER_CANCELLED')
-      .send('reason=illness')
-      .expect(302)
-      .expect('location', '/visit/cancelled')
-      .expect(() => {
-        expect(visitService.cancelVisit).toHaveBeenCalledTimes(1)
-        expect(auditService.cancelledVisit).toHaveBeenCalledTimes(1)
-        expect(notificationsService.sendCancellationSms).toHaveBeenCalledTimes(1)
       })
   })
 
