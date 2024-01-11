@@ -42,10 +42,12 @@
         {% set status = visit.outcomeStatus.split("_") %}
         {%- for visitNote in visit.visitNotes %}
           {% if visitNote.type == "VISIT_OUTCOMES" %}
-
+            
             {% set cancelledBy %}
               {% if status[0] === 'ADMINISTRATIVE' %}
                 {{- 'This visit was cancelled due to an administrative error with the booking.' -}}
+              {% elseif status[0] === 'DETAILS' %}
+                {{- 'This visit was cancelled as the details changed after booking.' -}}
               {% else %}
                 {{- 'This visit was cancelled by the ' + status[0] | lower + '.' -}}
               {% endif %}

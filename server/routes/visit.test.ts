@@ -377,6 +377,37 @@ describe('/visit/:reference', () => {
         })
     })
 
+    it('should display cancelled message - details changed after booking', () => {
+      visit.visitStatus = 'CANCELLED'
+      visit.outcomeStatus = 'DETAILS_CHANGED_AFTER_BOOKING'
+      visit.visitNotes = [{ type: 'VISIT_OUTCOMES', text: 'no longer required' }]
+      visitHistoryDetails.eventsAudit = [
+        {
+          type: 'CANCELLED_VISIT',
+          applicationMethodType: 'NOT_APPLICABLE',
+          actionedBy: 'User Three',
+          createTimestamp: '2022-01-01T11:00:00',
+        },
+      ]
+
+      return request(app)
+        .get('/visit/ab-cd-ef-gh?tab=history')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('[data-test="visit-cancelled-type"]').text()).toBe(
+            'This visit was cancelled as the details changed after booking.',
+          )
+          expect($('[data-test="visit-cancelled-reason"]').text()).toBe('Reason: no longer required')
+          expect($('[data-test="visit-event-1"]').text().trim().replace(/\s+/g, ' ')).toBe('Visit cancelled')
+          expect($('[data-test="visit-actioned-by-1"]').text().trim().replace(/\s+/g, ' ')).toBe('by User Three')
+          expect($('[data-test="visit-event-date-time-1"]').text().trim().replace(/\s+/g, ' ')).toBe(
+            'Saturday 1 January 2022 at 11am',
+          )
+        })
+    })
+
     it('should display cancelled message - visitor cancelled', () => {
       visit.visitStatus = 'CANCELLED'
       visit.outcomeStatus = 'VISITOR_CANCELLED'
@@ -605,12 +636,14 @@ describe('GET /visit/:reference/cancel', () => {
       .expect(res => {
         const $ = cheerio.load(res.text)
         expect($('h1').text().trim()).toBe('Why is this booking being cancelled?')
-        expect($('input[name="cancel"]').length).toBe(4)
+        expect($('input[name="cancel"]').length).toBe(5)
         expect($('input[name="cancel"]:checked').length).toBe(0)
         expect($('[data-test="visitor_cancelled"]').attr('value')).toBe('VISITOR_CANCELLED')
         expect($('label[for="cancel"]').text().trim()).toBe('Visitor cancelled')
+        expect($('[data-test="details_changed_after_booking"]').attr('value')).toBe('DETAILS_CHANGED_AFTER_BOOKING')
+        expect($('label[for="cancel-4"]').text().trim()).toBe('Details changed after booking')
         expect($('[data-test="administrative_error"]').attr('value')).toBe('ADMINISTRATIVE_ERROR')
-        expect($('label[for="cancel-4"]').text().trim()).toBe('Administrative error')
+        expect($('label[for="cancel-5"]').text().trim()).toBe('Administrative error')
 
         expect($('input[name="method"]').length).toBe(4)
         expect($('input[name="method"]').eq(0).prop('value')).toBe('PHONE')
