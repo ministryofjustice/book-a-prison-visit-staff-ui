@@ -1,6 +1,4 @@
 import type { Request, Response } from 'express'
-import logger from '../../../logger'
-import config from '../../config'
 import { requestMethodsBooking } from '../../constants/requestMethods'
 import AuditService from '../../services/auditService'
 import { getSupportTypeDescriptions } from '../visitorUtils'

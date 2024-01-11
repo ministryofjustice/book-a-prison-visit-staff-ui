@@ -5,7 +5,6 @@ import { SessionData } from 'express-session'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import { CancelVisitOrchestrationDto, Visit, VisitHistoryDetails } from '../data/orchestrationApiTypes'
 import { FlashData, VisitorListItem, VisitSessionData } from '../@types/bapv'
-import config from '../config'
 import { clearSession } from './visitorUtils'
 import TestData from './testutils/testData'
 import {
