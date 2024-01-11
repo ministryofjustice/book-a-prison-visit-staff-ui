@@ -75,6 +75,13 @@ export interface paths {
      */
     get: operations['getNotificationCountForPrison']
   }
+  '/visits/notification/visit/{reference}/types': {
+    /**
+     * get visit notification types by booking reference
+     * @description Retrieve visit  notification types by booking reference
+     */
+    get: operations['getNotificationTypesForBookingReference']
+  }
   '/visits/notification/count': {
     /**
      * Get notification count
@@ -298,6 +305,7 @@ export interface components {
         | 'VISITOR_FAILED_SECURITY_CHECKS'
         | 'VISIT_ORDER_CANCELLED'
         | 'SUPERSEDED_CANCELLATION'
+        | 'DETAILS_CHANGED_AFTER_BOOKING'
       /**
        * @description Visit Restriction
        * @example OPEN
@@ -391,6 +399,7 @@ export interface components {
         | 'VISITOR_FAILED_SECURITY_CHECKS'
         | 'VISIT_ORDER_CANCELLED'
         | 'SUPERSEDED_CANCELLATION'
+        | 'DETAILS_CHANGED_AFTER_BOOKING'
       /**
        * @description Outcome text
        * @example Because he got covid
@@ -467,6 +476,10 @@ export interface components {
         | 'BOOKED_VISIT'
         | 'UPDATED_VISIT'
         | 'CANCELLED_VISIT'
+        | 'NON_ASSOCIATION_EVENT'
+        | 'PRISONER_RELEASED_EVENT'
+        | 'PRISONER_RESTRICTION_CHANGE_EVENT'
+        | 'PRISON_VISITS_BLOCKED_FOR_DATE'
       /**
        * @description What was the application method for this event
        * @enum {string}
@@ -531,14 +544,14 @@ export interface components {
       totalPages?: number
       /** Format: int64 */
       totalElements?: number
-      first?: boolean
-      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['VisitDto'][]
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject']
+      first?: boolean
+      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
@@ -550,10 +563,10 @@ export interface components {
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
       pageSize?: number
-      /** Format: int32 */
-      pageNumber?: number
       unpaged?: boolean
       paged?: boolean
+      /** Format: int32 */
+      pageNumber?: number
     }
     SortObject: {
       empty?: boolean
@@ -1551,6 +1564,46 @@ export interface operations {
       200: {
         content: {
           'application/json': components['schemas']['NotificationCountDto']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to access this endpoint */
+      403: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  /**
+   * get visit notification types by booking reference
+   * @description Retrieve visit  notification types by booking reference
+   */
+  getNotificationTypesForBookingReference: {
+    parameters: {
+      path: {
+        /**
+         * @description bookingReference
+         * @example v9*d7*ed*7u
+         */
+        reference: string
+      }
+    }
+    responses: {
+      /** @description Retrieved visit  notification types by booking reference */
+      200: {
+        content: {
+          'application/json': (
+            | 'NON_ASSOCIATION_EVENT'
+            | 'PRISONER_RELEASED_EVENT'
+            | 'PRISONER_RESTRICTION_CHANGE_EVENT'
+            | 'PRISON_VISITS_BLOCKED_FOR_DATE'
+          )[]
         }
       }
       /** @description Unauthorized to access this endpoint */
