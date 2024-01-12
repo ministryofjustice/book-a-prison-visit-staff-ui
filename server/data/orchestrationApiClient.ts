@@ -16,6 +16,7 @@ import {
   SupportType,
   Visit,
   VisitHistoryDetails,
+  VisitNotificationType,
   VisitSession,
 } from './orchestrationApiTypes'
 import { VisitSessionData } from '../@types/bapv'
@@ -163,6 +164,10 @@ export default class OrchestrationApiClient {
 
   async getNotificationGroups(prisonId: string): Promise<NotificationGroup[]> {
     return this.restClient.get({ path: `/visits/notification/${prisonId}/groups` })
+  }
+
+  async getNotificationsByBookingReference(reference: string): Promise<VisitNotificationType[]> {
+    return this.restClient.get({ path: `/visits/notification/visit/${reference}/types` })
   }
 
   // orchestration-sessions-controller

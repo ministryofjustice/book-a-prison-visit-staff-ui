@@ -679,6 +679,21 @@ describe('orchestrationApiClient', () => {
     })
   })
 
+  describe('getNotificationsByBookingReference', () => {
+    it('should return notification type for given reference', async () => {
+      const notificationType = ['NON_ASSOCIATION_EVENT']
+
+      fakeOrchestrationApi
+        .get(`/visits/notification/visit/ab*cd*ef*gh/types`)
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, notificationType)
+
+      const output = await orchestrationApiClient.getNotificationsByBookingReference('ab*cd*ef*gh')
+
+      expect(output).toEqual(notificationType)
+    })
+  })
+
   describe('getVisitSessions', () => {
     it('should return an array of Visit Sessions', async () => {
       const results = [TestData.visitSession()]
