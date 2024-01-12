@@ -2,7 +2,7 @@ import TestData from '../routes/testutils/testData'
 import VisitNotificationsService from './visitNotificationsService'
 import { createMockHmppsAuthClient, createMockOrchestrationApiClient } from '../data/testutils/mocks'
 import { FilterField, VisitsReviewListItem } from '../@types/bapv'
-import { NotificationType, VisitNotificationType } from '../data/orchestrationApiTypes'
+import { NotificationType } from '../data/orchestrationApiTypes'
 
 const token = 'some token'
 const prisonId = 'HEI'
@@ -397,16 +397,15 @@ describe('Visit notifications service', () => {
     })
   })
 
-  // cant get the type to work
-  // describe.only('getVisitNotificationTypes', () => {
-  //   it('should return notification types for given reference', async () => {
-  //     const notifications: VisitNotificationType[] = ['NON_ASSOCIATION_EVENT', 'PRISONER_RELEASED_EVENT']
-  //     orchestrationApiClient.getNotificationsByBookingReference.mockResolvedValue(notifications)
+  describe('getVisitNotifications', () => {
+    it('should return notification types for given reference', async () => {
+      const notifications: NotificationType[] = ['NON_ASSOCIATION_EVENT']
+      orchestrationApiClient.getVisitNotifications.mockResolvedValue(notifications)
 
-  //     const result = await visitNotificationsService.getVisitNotificationTypes('user', 'ab*cd*ef*gh')
+      const result = await visitNotificationsService.getVisitNotifications('user', 'ab-cd-ef-gh')
 
-  //     expect(orchestrationApiClient.getNotificationsByBookingReference).toHaveBeenCalledWith('ab*cd*ef*gh')
-  //     expect(result).toStrictEqual(notifications)
-  //   })
-  // })
+      expect(orchestrationApiClient.getVisitNotifications).toHaveBeenCalledWith('ab-cd-ef-gh')
+      expect(result).toStrictEqual(notifications)
+    })
+  })
 })

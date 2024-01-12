@@ -37,10 +37,3 @@ export type NotificationGroup = components['schemas']['OrchestrationNotification
 export type NotificationVisitInfo = components['schemas']['OrchestrationPrisonerVisitsNotificationDto']
 
 export type PrisonDto = components['schemas']['PrisonDto']
-
-export type VisitNotificationType = [
-  'NON_ASSOCIATION_EVENT',
-  'PRISONER_RELEASED_EVENT',
-  'PRISONER_RESTRICTION_CHANGE_EVENT',
-  'PRISON_VISITS_BLOCKED_FOR_DATE',
-]
