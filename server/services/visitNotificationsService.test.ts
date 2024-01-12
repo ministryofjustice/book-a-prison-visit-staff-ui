@@ -77,9 +77,10 @@ describe('Visit notifications service', () => {
         })
 
         const listItem: VisitsReviewListItem = {
+          actionUrl: `/review/non-association/${notificationGroup.reference}`,
           bookedByNames: ['User One', 'User Two'],
           prisonerNumbers: ['A1234BC', 'A5678CD'],
-          actionUrl: `/review/non-association/${notificationGroup.reference}`,
+          reference: notificationGroup.reference,
           type: 'NON_ASSOCIATION_EVENT',
           visitDates: ['1 November 2023'],
         }
@@ -116,6 +117,7 @@ describe('Visit notifications service', () => {
           actionUrl: `/visit/${notificationGroup.affectedVisits[0].bookingReference}`,
           bookedByNames: ['User One'],
           prisonerNumbers: ['A1234BC'],
+          reference: notificationGroup.reference,
           type,
           visitDates: ['1 November 2023'],
         }
@@ -152,6 +154,7 @@ describe('Visit notifications service', () => {
             actionUrl: `/review/non-association/${notificationGroups[0].reference}`,
             bookedByNames: ['User One', 'User Two'],
             prisonerNumbers: ['A1234BC', 'A5678DE'],
+            reference: notificationGroups[0].reference,
             type: 'NON_ASSOCIATION_EVENT',
             visitDates: ['1 November 2023'],
           },
@@ -175,6 +178,7 @@ describe('Visit notifications service', () => {
             actionUrl: `/review/non-association/${notificationGroups[0].reference}`,
             bookedByNames: ['User One', 'User Two'],
             prisonerNumbers: ['A1234BC', 'A5678DE'],
+            reference: notificationGroups[0].reference,
             type: 'NON_ASSOCIATION_EVENT',
             visitDates: ['1 November 2023'],
           },
@@ -182,6 +186,7 @@ describe('Visit notifications service', () => {
             actionUrl: `/visit/${notificationGroups[1].affectedVisits[0].bookingReference}`,
             bookedByNames: ['User Two'],
             prisonerNumbers: ['A1234BC'],
+            reference: notificationGroups[1].reference,
             type: 'PRISONER_RELEASED_EVENT',
             visitDates: ['1 November 2023'],
           },
@@ -189,6 +194,7 @@ describe('Visit notifications service', () => {
             actionUrl: `/visit/${notificationGroups[2].affectedVisits[0].bookingReference}`,
             bookedByNames: ['User Three'],
             prisonerNumbers: ['A1234BC'],
+            reference: notificationGroups[2].reference,
             type: 'PRISONER_RELEASED_EVENT',
             visitDates: ['1 November 2023'],
           },
@@ -212,6 +218,7 @@ describe('Visit notifications service', () => {
             actionUrl: `/visit/${notificationGroups[1].affectedVisits[0].bookingReference}`,
             bookedByNames: ['User Two'],
             prisonerNumbers: ['A1234BC'],
+            reference: notificationGroups[1].reference,
             type: 'PRISONER_RELEASED_EVENT',
             visitDates: ['1 November 2023'],
           },

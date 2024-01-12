@@ -152,6 +152,7 @@ export type VisitsReviewListItem = {
   actionUrl: string
   bookedByNames: string[]
   prisonerNumbers: string[]
+  reference: string
   type: NotificationType
   visitDates: string[]
 }

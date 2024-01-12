@@ -67,7 +67,7 @@
             },
             {
               attributes: { "data-test": "action-" + loop.index },
-              html: '<a class="govuk-link--no-visited-state" href="' + listItem.actionUrl + '">View</a>'
+              html: '<a class="govuk-link--no-visited-state" href="' + listItem.actionUrl + '" data-test="' + listItem.reference + '">View</a>'
             }
           ]), reviewListRows) %}
         {% endfor %}

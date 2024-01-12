@@ -94,6 +94,7 @@ export default class VisitNotificationsService {
       actionUrl,
       bookedByNames,
       prisonerNumbers,
+      reference: notificationGroup.reference,
       type: notificationGroup.type,
       visitDates,
     }
