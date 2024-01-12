@@ -75,6 +75,11 @@ export default class VisitNotificationsService {
   private buildVisitsReviewListItem(notificationGroup: NotificationGroup): VisitsReviewListItem {
     const bookedByNames = notificationGroup.affectedVisits.map(visit => visit.bookedByName)
 
+    const actionUrl =
+      notificationGroup.type === 'NON_ASSOCIATION_EVENT'
+        ? `/review/non-association/${notificationGroup.reference}`
+        : `/visit/${notificationGroup.affectedVisits[0].bookingReference}`
+
     const prisonerNumbers =
       notificationGroup.type === 'NON_ASSOCIATION_EVENT'
         ? notificationGroup.affectedVisits.map(visit => visit.prisonerNumber)
@@ -86,9 +91,9 @@ export default class VisitNotificationsService {
         : notificationGroup.affectedVisits.map(visit => prisonerDateTimePretty(visit.visitDate))
 
     return {
+      actionUrl,
       bookedByNames,
       prisonerNumbers,
-      reference: notificationGroup.reference,
       type: notificationGroup.type,
       visitDates,
     }

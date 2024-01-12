@@ -4,11 +4,7 @@ import * as cheerio from 'cheerio'
 import { appWithAllRoutes } from '../testutils/appSetup'
 import config from '../../config'
 import { createMockVisitNotificationsService } from '../../services/testutils/mocks'
-import {
-  notificationTypeDescriptions,
-  notificationTypePathSegments,
-  notificationTypes,
-} from '../../constants/notificationEventTypes'
+import { notificationTypeDescriptions, notificationTypes } from '../../constants/notificationEventTypes'
 import { FilterField, VisitsReviewListItem } from '../../@types/bapv'
 
 let app: Express
@@ -58,18 +54,18 @@ describe('Bookings needing review listing page', () => {
     it('should display bookings review listing page with bookings that need review, with no filters applied', () => {
       const visitsReviewList: VisitsReviewListItem[] = [
         {
+          actionUrl: '/review/non-association/ab*cd*ef*gh',
           bookedByNames: ['User One', 'User Two'],
           prisonerNumbers: ['A1234BC', 'A5678CD'],
-          reference: 'ab*cd*ef*gh',
           type: 'NON_ASSOCIATION_EVENT',
           visitDates: ['1 November 2023'],
         },
         {
-          bookedByNames: ['User Three', 'User Four'],
+          actionUrl: '/visit/ab-cd-ef-gh',
+          bookedByNames: ['User Three'],
           prisonerNumbers: ['B1234CD'],
-          reference: 'bc*de*fg*gh',
           type: 'PRISONER_RELEASED_EVENT',
-          visitDates: ['2 November 2023', '11 November 2023'],
+          visitDates: ['2 November 2023'],
         },
       ]
 
@@ -87,17 +83,13 @@ describe('Bookings needing review listing page', () => {
           expect($('[data-test="visit-date-1"]').text().trim()).toBe('1 November 2023')
           expect($('[data-test="booked-by-1"]').text().trim()).toMatch(/^User One\s+User Two$/)
           expect($('[data-test="type-1"]').text().trim()).toBe(notificationTypes[visitsReviewList[0].type])
-          expect($('[data-test="action-1"] a').attr('href')).toBe(
-            `/review/${notificationTypePathSegments[visitsReviewList[0].type]}/${visitsReviewList[0].reference}`,
-          )
+          expect($('[data-test="action-1"] a').attr('href')).toBe(visitsReviewList[0].actionUrl)
 
           expect($('[data-test="prisoner-number-2"]').text().trim()).toBe('B1234CD')
-          expect($('[data-test="visit-date-2"]').text().trim()).toMatch(/^2 November 2023\s+11 November 2023$/)
-          expect($('[data-test="booked-by-2"]').text().trim()).toMatch(/^User Three\s+User Four$/)
+          expect($('[data-test="visit-date-2"]').text().trim()).toBe('2 November 2023')
+          expect($('[data-test="booked-by-2"]').text().trim()).toBe('User Three')
           expect($('[data-test="type-2"]').text().trim()).toBe(notificationTypes[visitsReviewList[1].type])
-          expect($('[data-test="action-2"] a').attr('href')).toBe(
-            `/review/${notificationTypePathSegments[visitsReviewList[1].type]}/${visitsReviewList[1].reference}`,
-          )
+          expect($('[data-test="action-2"] a').attr('href')).toBe(visitsReviewList[1].actionUrl)
 
           expect($('[data-test="no-bookings"]').length).toBe(0)
           expect($('[data-test="no-bookings-for-filters"]').length).toBe(0)

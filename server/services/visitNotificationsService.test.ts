@@ -79,7 +79,7 @@ describe('Visit notifications service', () => {
         const listItem: VisitsReviewListItem = {
           bookedByNames: ['User One', 'User Two'],
           prisonerNumbers: ['A1234BC', 'A5678CD'],
-          reference: notificationGroup.reference,
+          actionUrl: `/review/non-association/${notificationGroup.reference}`,
           type: 'NON_ASSOCIATION_EVENT',
           visitDates: ['1 November 2023'],
         }
@@ -92,13 +92,13 @@ describe('Visit notifications service', () => {
       })
     })
 
-    // these event types can have one or more affected visits
+    // these event types have one affected visit
     describe.each([
       ['Prisoner released', 'PRISONER_RELEASED_EVENT'],
       ['Visit type changed', 'PRISONER_RESTRICTION_CHANGE_EVENT'],
       ['Visit date blocked', 'PRISON_VISITS_BLOCKED_FOR_DATE'],
     ])('%s (%s)', (_: string, type: NotificationType) => {
-      it(`should build appropriate visit review list data for a ${type} notification (single visit)`, async () => {
+      it(`should build appropriate visit review list data for a ${type} notification`, async () => {
         const notificationGroup = TestData.notificationGroup({
           type,
           affectedVisits: [
@@ -113,47 +113,11 @@ describe('Visit notifications service', () => {
         })
 
         const listItem: VisitsReviewListItem = {
+          actionUrl: `/visit/${notificationGroup.affectedVisits[0].bookingReference}`,
           bookedByNames: ['User One'],
           prisonerNumbers: ['A1234BC'],
-          reference: notificationGroup.reference,
           type,
           visitDates: ['1 November 2023'],
-        }
-
-        orchestrationApiClient.getNotificationGroups.mockResolvedValue([notificationGroup])
-        const result = await visitNotificationsService.getVisitsReviewList('user', prisonId, noAppliedFilters)
-
-        expect(orchestrationApiClient.getNotificationGroups).toHaveBeenCalledWith(prisonId)
-        expect(result.visitsReviewList).toStrictEqual([listItem])
-      })
-
-      it(`should build appropriate visit review list data for a ${type} notification (multiple visit)`, async () => {
-        const notificationGroup = TestData.notificationGroup({
-          type,
-          affectedVisits: [
-            {
-              prisonerNumber: 'A1234BC',
-              bookingReference: 'ab-cd-ef-gh',
-              bookedByName: 'User One',
-              bookedByUserName: 'user1',
-              visitDate: '2023-11-01',
-            },
-            {
-              prisonerNumber: 'A1234BC',
-              bookingReference: 'bc-de-fg-hi',
-              bookedByName: 'User Two',
-              bookedByUserName: 'user2',
-              visitDate: '2023-11-10',
-            },
-          ],
-        })
-
-        const listItem: VisitsReviewListItem = {
-          bookedByNames: ['User One', 'User Two'],
-          prisonerNumbers: ['A1234BC'],
-          reference: notificationGroup.reference,
-          type,
-          visitDates: ['1 November 2023', '10 November 2023'],
         }
 
         orchestrationApiClient.getNotificationGroups.mockResolvedValue([notificationGroup])
@@ -169,10 +133,11 @@ describe('Visit notifications service', () => {
         TestData.notificationGroup(),
         TestData.notificationGroup({
           type: 'PRISONER_RELEASED_EVENT',
-          affectedVisits: [
-            TestData.notificationVisitInfo({ bookedByUserName: 'user2', bookedByName: 'User Two' }),
-            TestData.notificationVisitInfo({ bookedByUserName: 'user3', bookedByName: 'User Three' }),
-          ],
+          affectedVisits: [TestData.notificationVisitInfo({ bookedByUserName: 'user2', bookedByName: 'User Two' })],
+        }),
+        TestData.notificationGroup({
+          type: 'PRISONER_RELEASED_EVENT',
+          affectedVisits: [TestData.notificationVisitInfo({ bookedByUserName: 'user3', bookedByName: 'User Three' })],
         }),
       ]
 
@@ -184,9 +149,9 @@ describe('Visit notifications service', () => {
 
         const listItems: VisitsReviewListItem[] = [
           {
+            actionUrl: `/review/non-association/${notificationGroups[0].reference}`,
             bookedByNames: ['User One', 'User Two'],
             prisonerNumbers: ['A1234BC', 'A5678DE'],
-            reference: 'ab*cd*ef*gh',
             type: 'NON_ASSOCIATION_EVENT',
             visitDates: ['1 November 2023'],
           },
@@ -207,18 +172,25 @@ describe('Visit notifications service', () => {
 
         const listItems: VisitsReviewListItem[] = [
           {
+            actionUrl: `/review/non-association/${notificationGroups[0].reference}`,
             bookedByNames: ['User One', 'User Two'],
             prisonerNumbers: ['A1234BC', 'A5678DE'],
-            reference: 'ab*cd*ef*gh',
             type: 'NON_ASSOCIATION_EVENT',
             visitDates: ['1 November 2023'],
           },
           {
-            bookedByNames: ['User Two', 'User Three'],
+            actionUrl: `/visit/${notificationGroups[1].affectedVisits[0].bookingReference}`,
+            bookedByNames: ['User Two'],
             prisonerNumbers: ['A1234BC'],
-            reference: 'ab*cd*ef*gh',
             type: 'PRISONER_RELEASED_EVENT',
-            visitDates: ['1 November 2023', '1 November 2023'],
+            visitDates: ['1 November 2023'],
+          },
+          {
+            actionUrl: `/visit/${notificationGroups[2].affectedVisits[0].bookingReference}`,
+            bookedByNames: ['User Three'],
+            prisonerNumbers: ['A1234BC'],
+            type: 'PRISONER_RELEASED_EVENT',
+            visitDates: ['1 November 2023'],
           },
         ]
 
@@ -237,11 +209,11 @@ describe('Visit notifications service', () => {
 
         const listItems: VisitsReviewListItem[] = [
           {
-            bookedByNames: ['User Two', 'User Three'],
+            actionUrl: `/visit/${notificationGroups[1].affectedVisits[0].bookingReference}`,
+            bookedByNames: ['User Two'],
             prisonerNumbers: ['A1234BC'],
-            reference: 'ab*cd*ef*gh',
             type: 'PRISONER_RELEASED_EVENT',
-            visitDates: ['1 November 2023', '1 November 2023'],
+            visitDates: ['1 November 2023'],
           },
         ]
 
