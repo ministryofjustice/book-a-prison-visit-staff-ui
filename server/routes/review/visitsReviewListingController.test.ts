@@ -12,7 +12,7 @@ let app: Express
 const visitNotificationsService = createMockVisitNotificationsService()
 
 beforeEach(() => {
-  config.features.showReviewBookingsTile = true
+  config.features.reviewBookings = true
   app = appWithAllRoutes({ services: { visitNotificationsService } })
 
   visitNotificationsService.getVisitsReviewList.mockResolvedValue({ filters: [], visitsReviewList: [] })
@@ -30,7 +30,7 @@ describe('Bookings needing review listing page', () => {
 
   describe('GET /review', () => {
     it('should return a 404 if the feature is not enabled', () => {
-      config.features.showReviewBookingsTile = false
+      config.features.reviewBookings = false
       app = appWithAllRoutes({})
       return request(app).get('/review').expect('Content-Type', /html/).expect(404)
     })
