@@ -396,16 +396,4 @@ describe('Visit notifications service', () => {
       })
     })
   })
-
-  describe('getVisitNotifications', () => {
-    it('should return notification types for given reference', async () => {
-      const notifications: NotificationType[] = ['NON_ASSOCIATION_EVENT']
-      orchestrationApiClient.getVisitNotifications.mockResolvedValue(notifications)
-
-      const result = await visitNotificationsService.getVisitNotifications('user', 'ab-cd-ef-gh')
-
-      expect(orchestrationApiClient.getVisitNotifications).toHaveBeenCalledWith('ab-cd-ef-gh')
-      expect(result).toStrictEqual(notifications)
-    })
-  })
 })

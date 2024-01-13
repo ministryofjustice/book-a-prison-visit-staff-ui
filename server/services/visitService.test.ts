@@ -9,6 +9,7 @@ import {
 import {
   ApplicationMethodType,
   CancelVisitOrchestrationDto,
+  NotificationType,
   PageVisitDto,
   Visit,
   VisitHistoryDetails,
@@ -22,6 +23,7 @@ import {
 } from '../data/testutils/mocks'
 import { createMockAdditionalSupportService } from './testutils/mocks'
 import { Address, AddressUsage, Contact, Restriction } from '../data/prisonerContactRegistryApiTypes'
+import config from '../config'
 
 const token = 'some token'
 
@@ -439,10 +441,29 @@ describe('Visit service', () => {
         }),
       ]
 
-      it('should return full details of visit, visitors and additional support options', async () => {
+      beforeEach(() => {
+        prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue(contacts)
+        additionalSupportService.getAvailableSupportOptions.mockResolvedValue(availableSupportTypes)
+        orchestrationApiClient.getVisitHistory.mockResolvedValue(visitHistoryDetails)
+        orchestrationApiClient.getVisitNotifications.mockResolvedValue(['PRISONER_RELEASED_EVENT'])
+      })
+
+      it('should not request visit notifications if review bookings feature not enabled', async () => {
+        config.features.reviewBookings = false
+
+        const result = await visitService.getFullVisitDetails({ username: 'user', reference: 'ab-cd-ef-gh' })
+
+        expect(orchestrationApiClient.getVisitNotifications).not.toHaveBeenCalled()
+        expect(result.notifications).toStrictEqual([])
+      })
+
+      it('should return full details of visit, visitors, notifications and additional support options', async () => {
+        config.features.reviewBookings = true
+
         const expectedResult: {
           visitHistoryDetails: VisitHistoryDetails
           visitors: VisitorListItem[]
+          notifications: NotificationType[]
           additionalSupport: string[]
         } = {
           visitHistoryDetails,
@@ -469,19 +490,17 @@ describe('Visit service', () => {
               banned: false,
             },
           ],
+          notifications: ['PRISONER_RELEASED_EVENT'],
           additionalSupport: ['Wheelchair ramp', 'custom request'],
         }
-
-        prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue(contacts)
-        additionalSupportService.getAvailableSupportOptions.mockResolvedValue(availableSupportTypes)
-        orchestrationApiClient.getVisitHistory.mockResolvedValue(visitHistoryDetails)
 
         const result = await visitService.getFullVisitDetails({ username: 'user', reference: 'ab-cd-ef-gh' })
 
         expect(prisonerContactRegistryApiClient.getPrisonerSocialContacts).toHaveBeenCalledTimes(1)
         expect(additionalSupportService.getAvailableSupportOptions).toHaveBeenCalledTimes(1)
         expect(orchestrationApiClient.getVisitHistory).toHaveBeenCalledTimes(1)
-        expect(result).toEqual(expectedResult)
+        expect(orchestrationApiClient.getVisitNotifications).toHaveBeenCalledTimes(1)
+        expect(result).toStrictEqual(expectedResult)
       })
     })
 
