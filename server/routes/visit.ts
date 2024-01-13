@@ -70,7 +70,7 @@ export default function routes({
     const fromVisitSearchQuery = req.query?.query as string
     const selectedTab = req.query?.tab as string
 
-    const { visitHistoryDetails, visitors, additionalSupport } = await visitService.getFullVisitDetails({
+    const { visitHistoryDetails, visitors, notifications, additionalSupport } = await visitService.getFullVisitDetails({
       reference,
       username: res.locals.user.username,
     })
@@ -116,6 +116,7 @@ export default function routes({
       visit,
       filteredVisitHistoryDetails,
       visitors,
+      notifications,
       additionalSupport,
       fromVisitSearch,
       fromVisitSearchQuery,

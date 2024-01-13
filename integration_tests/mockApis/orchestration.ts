@@ -5,6 +5,7 @@ import {
   CancelVisitOrchestrationDto,
   NotificationCount,
   NotificationGroup,
+  NotificationType,
   PrisonDto,
   PrisonerProfile,
   SessionCapacity,
@@ -282,6 +283,25 @@ export default {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
         jsonBody: notificationGroups,
+      },
+    })
+  },
+  stubGetVisitNotifications: ({
+    reference,
+    notifications = [],
+  }: {
+    reference: string
+    notifications: NotificationType[]
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        url: `/orchestration/visits/notification/visit/${reference}/types`,
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: notifications,
       },
     })
   },
