@@ -2,7 +2,7 @@ import url from 'url'
 import { RequestHandler } from 'express'
 import { ValidationChain, check } from 'express-validator'
 import { VisitNotificationsService } from '../../services'
-import { notificationTypes, notificationTypeDescriptions } from '../../constants/notificationEventTypes'
+import { notificationTypes, notificationTypeReasons } from '../../constants/notificationEventTypes'
 
 export default class VisitsReviewListingController {
   public constructor(private readonly visitNotificationsService: VisitNotificationsService) {}
@@ -24,7 +24,7 @@ export default class VisitsReviewListingController {
 
       return res.render('pages/review/visitsReviewListing', {
         notificationTypes,
-        notificationTypeDescriptions: Object.values(notificationTypeDescriptions),
+        notificationTypeDescriptions: Object.values(notificationTypeReasons),
         prisonName,
         filters,
         visitsReviewList,

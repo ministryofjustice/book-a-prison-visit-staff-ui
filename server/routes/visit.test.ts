@@ -22,6 +22,7 @@ import {
   createMockVisitService,
   createMockVisitSessionsService,
 } from '../services/testutils/mocks'
+import { notificationTypeWarnings } from '../constants/notificationEventTypes'
 
 let app: Express
 
@@ -376,6 +377,62 @@ describe('/visit/:reference', () => {
           expect($('[data-test="cancel-visit"]').length).toBe(1)
           expect($('[data-test="update-visit"]').length).toBe(0)
         })
+    })
+
+    describe('Visit notification messages', () => {
+      it('should not display visit notification banner when no notification types set', () => {
+        return request(app)
+          .get('/visit/ab-cd-ef-gh')
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('[data-test="visit-notification"]').length).toBe(0)
+          })
+      })
+
+      it('should display a single visit notification banner when a single notification type is set', () => {
+        visitService.getFullVisitDetails.mockResolvedValue({
+          visitHistoryDetails,
+          visitors,
+          notifications: ['PRISONER_RELEASED_EVENT'],
+          additionalSupport,
+        })
+
+        return request(app)
+          .get('/visit/ab-cd-ef-gh')
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('[data-test="visit-notification"]').length).toBe(1)
+            expect($('[data-test="visit-notification"]').text()).toBe(notificationTypeWarnings.PRISONER_RELEASED_EVENT)
+          })
+      })
+
+      it('should display a two visit notification banners when two notification types are set', () => {
+        visitService.getFullVisitDetails.mockResolvedValue({
+          visitHistoryDetails,
+          visitors,
+          notifications: ['PRISONER_RELEASED_EVENT', 'PRISON_VISITS_BLOCKED_FOR_DATE'],
+          additionalSupport,
+        })
+
+        return request(app)
+          .get('/visit/ab-cd-ef-gh')
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('[data-test="visit-notification"]').length).toBe(2)
+            expect($('[data-test="visit-notification"]').eq(0).text()).toBe(
+              notificationTypeWarnings.PRISONER_RELEASED_EVENT,
+            )
+            expect($('[data-test="visit-notification"]').eq(1).text()).toBe(
+              notificationTypeWarnings.PRISON_VISITS_BLOCKED_FOR_DATE,
+            )
+          })
+      })
     })
 
     describe('Cancellation message', () => {

@@ -4,7 +4,7 @@ import * as cheerio from 'cheerio'
 import { appWithAllRoutes } from '../testutils/appSetup'
 import config from '../../config'
 import { createMockVisitNotificationsService } from '../../services/testutils/mocks'
-import { notificationTypeDescriptions, notificationTypes } from '../../constants/notificationEventTypes'
+import { notificationTypeReasons, notificationTypes } from '../../constants/notificationEventTypes'
 import { FilterField, VisitsReviewListItem } from '../../@types/bapv'
 
 let app: Express
@@ -44,7 +44,7 @@ describe('Bookings needing review listing page', () => {
           expect($('.govuk-back-link').attr('href')).toBe('/')
           expect($('h1').text()).toBe('Visit bookings that need review')
 
-          const numNotificationTypes = Object.keys(notificationTypeDescriptions).length
+          const numNotificationTypes = Object.keys(notificationTypeReasons).length
           expect($('[data-test="review-reasons-list"] li').length).toBe(numNotificationTypes)
 
           expect(visitNotificationsService.getVisitsReviewList).toHaveBeenCalledWith('user1', 'HEI', noAppliedFilters)

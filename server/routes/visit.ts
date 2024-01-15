@@ -26,6 +26,7 @@ import getPrisonConfiguration from '../constants/prisonConfiguration'
 import type { Services } from '../services'
 import eventAuditTypes from '../constants/eventAuditTypes'
 import { requestMethodDescriptions, requestMethodsCancellation } from '../constants/requestMethods'
+import { notificationTypeWarnings } from '../constants/notificationEventTypes'
 
 const A_DAY_IN_MS = 24 * 60 * 60 * 1000
 const CANCELLATION_LIMIT_DAYS = 28
@@ -117,6 +118,7 @@ export default function routes({
       filteredVisitHistoryDetails,
       visitors,
       notifications,
+      notificationTypeWarnings,
       additionalSupport,
       fromVisitSearch,
       fromVisitSearchQuery,
