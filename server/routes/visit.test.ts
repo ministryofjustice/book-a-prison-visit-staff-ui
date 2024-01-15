@@ -44,6 +44,13 @@ jest.mock('./visitorUtils', () => {
   }
 })
 
+jest.mock('../config', () => {
+  return {
+    ...jest.requireActual('../config').default,
+    features: { showReviewBookingsTile: true },
+  }
+})
+
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
   flashProvider.mockImplementation((key: keyof FlashData) => {
