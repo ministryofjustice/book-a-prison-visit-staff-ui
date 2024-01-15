@@ -179,6 +179,7 @@ export default class TestData {
     prisonName = 'HMP Hewell',
     cellLocation = '1-1-C-028',
     currentIncentive = this.currentIncentive(),
+    locationDescription = undefined,
   }: Partial<Prisoner> = {}): Prisoner =>
     ({
       prisonerNumber,
@@ -189,6 +190,7 @@ export default class TestData {
       prisonName,
       cellLocation,
       currentIncentive,
+      locationDescription,
     }) as Prisoner
 
   static prisonNames = ({

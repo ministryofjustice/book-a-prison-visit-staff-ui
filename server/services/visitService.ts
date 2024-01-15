@@ -9,6 +9,7 @@ import {
 import {
   ApplicationMethodType,
   CancelVisitOrchestrationDto,
+  NotificationType,
   Visit,
   VisitHistoryDetails,
 } from '../data/orchestrationApiTypes'
@@ -19,6 +20,7 @@ import AdditionalSupportService from './additionalSupportService'
 import logger from '../../logger'
 import { prisonerDateTimePretty, prisonerTimePretty } from '../utils/utils'
 import { getVisitSlotsFromBookedVisits } from '../utils/visitsUtils'
+import config from '../config'
 
 export default class VisitService {
   constructor(
@@ -124,13 +126,12 @@ export default class VisitService {
     return this.buildVisitInformation(visit)
   }
 
-  async getFullVisitDetails({
-    username,
-    reference,
-  }: {
-    username: string
-    reference: string
-  }): Promise<{ visitHistoryDetails: VisitHistoryDetails; visitors: VisitorListItem[]; additionalSupport: string[] }> {
+  async getFullVisitDetails({ username, reference }: { username: string; reference: string }): Promise<{
+    visitHistoryDetails: VisitHistoryDetails
+    visitors: VisitorListItem[]
+    notifications: NotificationType[]
+    additionalSupport: string[]
+  }> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
     const prisonerContactRegistryApiClient = this.prisonerContactRegistryApiClientFactory(token)
@@ -144,12 +145,16 @@ export default class VisitService {
       .filter(contact => visitorIds.includes(contact.personId))
       .map(contact => buildVisitorListItem(contact))
 
+    const notifications = config.features.reviewBookings
+      ? await orchestrationApiClient.getVisitNotifications(reference)
+      : []
+
     const additionalSupport = getSupportTypeDescriptions(
       await this.additionalSupportService.getAvailableSupportOptions(username),
       visit.visitorSupport,
     )
 
-    return { visitHistoryDetails, visitors, additionalSupport }
+    return { visitHistoryDetails, visitors, notifications, additionalSupport }
   }
 
   async getUpcomingVisits({

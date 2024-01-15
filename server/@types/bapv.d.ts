@@ -149,6 +149,7 @@ export type VisitsPageSlot = {
 export type FlashData = Record<string, string[] | Record<string, string | string[]>[]>
 
 export type VisitsReviewListItem = {
+  actionUrl: string
   bookedByNames: string[]
   prisonerNumbers: string[]
   reference: string

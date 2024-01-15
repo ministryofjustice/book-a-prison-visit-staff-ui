@@ -11,16 +11,16 @@ export default function routes({ visitNotificationsService }: Services): Router 
 
   get('/', async (req, res) => {
     const { prisonId } = req.session.selectedEstablishment
-    const { showReviewBookingsTile } = config.features
+    const { reviewBookings } = config.features
 
-    const reviewCount = showReviewBookingsTile
+    const reviewCount = reviewBookings
       ? (await visitNotificationsService.getNotificationCount(res.locals.user.username, prisonId)).count
       : undefined
 
     res.render('pages/index', {
       hidePhaseBanner: true,
       showEstablishmentSwitcher: true,
-      showReviewBookingsTile,
+      showReviewBookingsTile: reviewBookings,
       reviewCount,
     })
   })

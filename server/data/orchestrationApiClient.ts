@@ -7,6 +7,7 @@ import {
   ChangeVisitSlotRequestDto,
   NotificationCount,
   NotificationGroup,
+  NotificationType,
   PageVisitDto,
   PrisonDto,
   PrisonerProfile,
@@ -163,6 +164,10 @@ export default class OrchestrationApiClient {
 
   async getNotificationGroups(prisonId: string): Promise<NotificationGroup[]> {
     return this.restClient.get({ path: `/visits/notification/${prisonId}/groups` })
+  }
+
+  async getVisitNotifications(reference: string): Promise<NotificationType[]> {
+    return this.restClient.get({ path: `/visits/notification/visit/${reference}/types` })
   }
 
   // orchestration-sessions-controller

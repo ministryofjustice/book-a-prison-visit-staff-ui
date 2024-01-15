@@ -65,6 +65,7 @@ context('Search for a booking by reference', () => {
     cy.task('stubVisitHistory', TestData.visitHistoryDetails({ visit }))
     cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
     cy.task('stubAvailableSupport')
+    cy.task('stubGetVisitNotifications', { reference: visit.reference })
 
     searchBookingByReferenceResultsPage.visitReferenceLink().click()
 
@@ -139,6 +140,7 @@ context('Search for a booking by reference', () => {
     cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
     cy.task('stubAvailableSupport')
     cy.task('stubVisitHistory', TestData.visitHistoryDetails({ visit: upcomingVisit }))
+    cy.task('stubGetVisitNotifications', { reference: upcomingVisit.reference })
 
     upcomingVisitsPage.visitReferenceLink().click()
 

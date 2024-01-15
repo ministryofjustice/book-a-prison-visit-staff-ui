@@ -9184,6 +9184,31 @@ export interface components {
        * @example HI
        */
       classificationReviewReason?: string
+      /**
+       * @description The classification code entered to override the calculated value prior to approval
+       * @example HI
+       */
+      overridingClassificationCode?: string
+      /**
+       * @description The classification code originally calculated by NOMIS based on the answers given to the questions when carrying out the initial review
+       * @example HI
+       */
+      calculatedClassificationCode?: string
+      /**
+       * @description The classification code that has been approved
+       * @example HI
+       */
+      approvedClassificationCode?: string
+      /**
+       * @description Comment added at approval of classification code
+       * @example Comment
+       */
+      approvalComment?: string
+      /**
+       * @description The reason given for overriding the calculated classification code
+       * @example Overriding comment
+       */
+      overrideReason?: string
       /** @description Assessment questions and answers, in the order they were asked */
       questions: components['schemas']['AssessmentQuestion'][]
     }

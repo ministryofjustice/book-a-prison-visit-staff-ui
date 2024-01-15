@@ -7,7 +7,7 @@ beforeEach(() => {
 describe('Visit cancellation reasons - feature flag', () => {
   it('should return all visit cancellation reasons when review feature enabled', () => {
     jest.mock('../config', () => ({
-      features: { showReviewBookingsTile: true },
+      features: { reviewBookings: true },
     }))
 
     const visitCancellationReasons = require('./visitCancellationReasons').default
@@ -23,7 +23,7 @@ describe('Visit cancellation reasons - feature flag', () => {
 
   it('should NOT return DETAILS_CHANGED_AFTER_BOOKING when review feature disabled', () => {
     jest.mock('../config', () => ({
-      features: { showReviewBookingsTile: false },
+      features: { reviewBookings: false },
     }))
 
     const visitCancellationReasons = require('./visitCancellationReasons').default
