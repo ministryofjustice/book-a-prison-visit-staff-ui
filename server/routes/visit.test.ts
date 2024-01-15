@@ -277,6 +277,40 @@ describe('/visit/:reference', () => {
         })
     })
 
+    it('should render booking summary page correct back link when from review listing page', () => {
+      const url = '/visit/ab-cd-ef-gh?from=review'
+
+      prisonerSearchService.getPrisonerById.mockResolvedValue(prisoner)
+      visitService.getFullVisitDetails.mockResolvedValue({
+        visitHistoryDetails,
+        visitors,
+        notifications,
+        additionalSupport,
+      })
+
+      return request(app)
+        .get(url)
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text()).toBe('Visit booking details')
+          expect($('.govuk-back-link').attr('href')).toBe('/review')
+          expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
+          // prisoner details
+          expect($('[data-test="prisoner-name"]').text()).toBe('Smith, John')
+
+          expect(auditService.viewedVisitDetails).toHaveBeenCalledTimes(1)
+          expect(auditService.viewedVisitDetails).toHaveBeenCalledWith({
+            visitReference: 'ab-cd-ef-gh',
+            prisonerId: 'A1234BC',
+            prisonId: 'HEI',
+            username: 'user1',
+            operationId: undefined,
+          })
+        })
+    })
+
     it('should render full booking summary page with prisoner location showing as "Unknown" if not a supported prison', () => {
       const transferPrisoner = TestData.prisoner({ prisonId: 'TRN', prisonName: 'Transfer' })
 

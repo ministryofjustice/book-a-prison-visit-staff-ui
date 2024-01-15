@@ -62,7 +62,7 @@ describe('Bookings needing review listing page', () => {
           visitDates: ['1 November 2023'],
         },
         {
-          actionUrl: '/visit/ab-cd-ef-gh',
+          actionUrl: '/visit/ab-cd-ef-gh?from=review',
           bookedByNames: ['User Three'],
           prisonerNumbers: ['B1234CD'],
           reference: 'bc*de*fg*gh',

@@ -22,8 +22,10 @@
 {% set pageTitle = applicationName + " - " + pageHeaderTitle + " - " + visit.reference %}
 
 {% if prisoner %}
-  {% if fromVisitSearch %}
+  {% if fromPage == 'visit-search' %}
     {% set backLinkHref = "/visits?" + fromVisitSearchQuery %}
+  {% elseif fromPage == 'review' %}
+    {% set backLinkHref = "/review" %}
   {% else %}
     {% set backLinkHref = "/prisoner/" + visit.prisonerId + "/visits" %}
   {% endif %}
