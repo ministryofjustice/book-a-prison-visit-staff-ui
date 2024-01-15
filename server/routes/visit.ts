@@ -69,7 +69,6 @@ export default function routes({
     const reference = getVisitReference(req)
     const fromVisitSearch = (req.query?.from as string) === 'visit-search'
     const fromVisitSearchQuery = req.query?.query as string
-    const selectedTab = req.query?.tab as string
 
     const { visitHistoryDetails, visitors, notifications, additionalSupport } = await visitService.getFullVisitDetails({
       reference,
@@ -87,7 +86,6 @@ export default function routes({
       return res.render('pages/visit/summary', {
         visit: { reference: visit.reference },
         visitPrisonName: supportedPrisons[visit.prisonId],
-        selectedTab,
       })
     }
 
@@ -126,7 +124,6 @@ export default function routes({
       showCancel,
       eventAuditTypes,
       requestMethodDescriptions,
-      selectedTab,
     })
   })
 
