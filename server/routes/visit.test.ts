@@ -333,6 +333,31 @@ describe('/visit/:reference', () => {
         })
     })
 
+    it('should render full booking summary page with prisoner location for a RELEASED prisoner', () => {
+      const releasedPrisoner = TestData.prisoner({
+        prisonId: 'OUT',
+        locationDescription: 'Outside - released from HMP HEWELL',
+      })
+
+      prisonerSearchService.getPrisonerById.mockResolvedValue(releasedPrisoner)
+
+      return request(app)
+        .get('/visit/ab-cd-ef-gh')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text()).toBe('Visit booking details')
+          expect($('.govuk-back-link').attr('href')).toBe('/prisoner/A1234BC/visits')
+          expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
+          // prisoner details
+          expect($('[data-test="prisoner-name"]').text()).toBe('Smith, John')
+          expect($('[data-test="prisoner-number"]').text()).toBe('A1234BC')
+          expect($('[data-test="prisoner-dob"]').text()).toBe('2 April 1975')
+          expect($('[data-test="prisoner-location"]').text()).toBe(releasedPrisoner.locationDescription)
+        })
+    })
+
     it('should not show booking summary if selected establishment does not match prison for which visit booked', () => {
       app = appWithAllRoutes({
         services: { auditService, supportedPrisonsService, visitService, visitSessionsService },

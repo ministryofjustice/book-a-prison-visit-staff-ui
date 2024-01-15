@@ -450,6 +450,9 @@ function getVisitReference(req: Request): string {
 }
 
 function getPrisonerLocation(supportedPrisonIds: string[], prisoner: Prisoner) {
+  if (prisoner.prisonId === 'OUT') {
+    return prisoner.locationDescription
+  }
   return supportedPrisonIds.includes(prisoner.prisonId) ? `${prisoner.cellLocation}, ${prisoner.prisonName}` : 'Unknown'
 }
 
