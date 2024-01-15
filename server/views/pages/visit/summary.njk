@@ -22,8 +22,10 @@
 {% set pageTitle = applicationName + " - " + pageHeaderTitle + " - " + visit.reference %}
 
 {% if prisoner %}
-  {% if fromVisitSearch %}
+  {% if fromPage == 'visit-search' %}
     {% set backLinkHref = "/visits?" + fromVisitSearchQuery %}
+  {% elseif fromPage == 'review' %}
+    {% set backLinkHref = "/review" %}
   {% else %}
     {% set backLinkHref = "/prisoner/" + visit.prisonerId + "/visits" %}
   {% endif %}
@@ -51,7 +53,7 @@
               {% endif %}
             {% endset %}
 
-            {% set cancelledVisitHtml %}
+            {% set cancelledVisitBannerHtml %}
               {{ govukWarningText({
                 classes: "govuk-!-margin-bottom-0 govuk-!-padding-left-4",
                 html: '<span data-test="visit-cancelled-type">' + cancelledBy + "</span>" +
@@ -62,10 +64,27 @@
 
             {{ mojBanner({
               classes: "govuk-!-padding-left-4",
-              html: cancelledVisitHtml
+              html: cancelledVisitBannerHtml
             }) }}
 
           {% endif %}
+        {% endfor %}
+      {% endif %}
+
+      {%if notifications | length %}
+        {% for notification in notifications %}
+          {% set visitNotificationBannerHtml %}
+            {{ govukWarningText({
+              classes: "govuk-!-margin-bottom-0 govuk-!-padding-left-4",
+              html: '<span data-test="visit-notification">' + notificationTypeWarnings[notification] + "</span>",
+              iconFallbackText: "Warning"
+            }) }}
+          {% endset %}
+
+          {{ mojBanner({
+            classes: "govuk-!-padding-left-4",
+            html: visitNotificationBannerHtml
+          }) }}
         {% endfor %}
       {% endif %}
 

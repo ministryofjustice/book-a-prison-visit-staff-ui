@@ -2,6 +2,8 @@ import { format, sub, add } from 'date-fns'
 import TestData from '../../server/routes/testutils/testData'
 import Page from '../pages/page'
 import VisitDetailsPage from '../pages/visitDetails'
+import { NotificationType } from '../../server/data/orchestrationApiTypes'
+import { notificationTypeWarnings } from '../../server/constants/notificationEventTypes'
 
 context('Visit details page', () => {
   const shortDateFormat = 'yyyy-MM-dd'
@@ -15,6 +17,7 @@ context('Visit details page', () => {
     cy.task('stubPrisonNames')
     cy.task('stubGetPrison')
     cy.task('stubGetNotificationCount', {})
+    cy.task('stubGetVisitNotifications', { reference: TestData.visit().reference })
     cy.signIn()
   })
 
@@ -67,7 +70,7 @@ context('Visit details page', () => {
     visitDetailsPage.visitPhone().contains('01234 567890')
   })
 
-  it('Should show update/cancel button for future visit', () => {
+  it('Should show update/cancel button and notifications for future visit', () => {
     const today = new Date()
     const prisoner = TestData.prisoner()
     const { prisonerNumber: offenderNo } = prisoner
@@ -93,10 +96,13 @@ context('Visit details page', () => {
       }),
     ]
 
+    const notifications: NotificationType[] = ['PRISONER_RELEASED_EVENT']
+
     cy.task('stubPrisonerById', prisoner)
     cy.task('stubVisitHistory', visitHistoryDetails)
     cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
     cy.task('stubAvailableSupport')
+    cy.task('stubGetVisitNotifications', { reference: TestData.visit().reference, notifications })
     cy.visit('/visit/ab-cd-ef-gh')
 
     const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage)
@@ -104,6 +110,10 @@ context('Visit details page', () => {
     visitDetailsPage.visitReference().contains('ab-cd-ef-gh')
     visitDetailsPage.updateBooking().should('have.length', 1)
     visitDetailsPage.cancelBooking().should('have.length', 1)
+
+    // notifications
+    visitDetailsPage.visitNotification(0).contains(notificationTypeWarnings.PRISONER_RELEASED_EVENT)
+
     // Prisoner Details
     visitDetailsPage.prisonerName().contains(prisonerDisplayName)
     // Visit Details

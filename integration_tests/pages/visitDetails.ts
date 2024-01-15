@@ -11,12 +11,14 @@ export default class VisitDetailsPage extends Page {
 
   cancellationReason = (): PageElement => cy.get('[data-test="visit-cancelled-reason')
 
+  visitNotification = (index: number): PageElement => cy.get('[data-test="visit-notification').eq(index)
+
   // Buttons
   updateBooking = (): PageElement => cy.get('[data-test="update-visit"]')
 
   cancelBooking = (): PageElement => cy.get('[data-test="cancel-visit"]')
 
-  // Subnavigation
+  // Sub-navigation
 
   selectPrisonerTab = (): PageElement => cy.get('#tab_prisoner-details').click()
 

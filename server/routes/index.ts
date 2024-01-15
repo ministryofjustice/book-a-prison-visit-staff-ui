@@ -11,7 +11,7 @@ export default function routes({ visitNotificationsService }: Services): Router 
 
   get('/', async (req, res) => {
     const { prisonId } = req.session.selectedEstablishment
-    const { showReviewBookingsTile } = config.features
+    const { reviewBookings: showReviewBookingsTile } = config.features
 
     const reviewCount = showReviewBookingsTile
       ? (await visitNotificationsService.getNotificationCount(res.locals.user.username, prisonId)).count

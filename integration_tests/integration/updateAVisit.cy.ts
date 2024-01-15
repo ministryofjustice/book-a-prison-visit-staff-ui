@@ -68,6 +68,7 @@ context('Update a visit', () => {
     cy.task('stubVisitHistory', visitHistoryDetails)
     cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
     cy.task('stubAvailableSupport')
+    cy.task('stubGetVisitNotifications', { reference: visitHistoryDetails.visit.reference })
 
     // Visit details page
     cy.visit('/visit/ab-cd-ef-gh')
@@ -234,6 +235,7 @@ context('Update a visit', () => {
     cy.task('stubVisitHistory', visitHistoryDetails)
     cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
     cy.task('stubAvailableSupport')
+    cy.task('stubGetVisitNotifications', { reference: visitHistoryDetails.visit.reference })
 
     // Visit details page
     cy.visit('/visit/ab-cd-ef-gh')

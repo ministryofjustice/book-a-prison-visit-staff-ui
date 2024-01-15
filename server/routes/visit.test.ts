@@ -3,7 +3,12 @@ import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
-import { CancelVisitOrchestrationDto, Visit, VisitHistoryDetails } from '../data/orchestrationApiTypes'
+import {
+  CancelVisitOrchestrationDto,
+  NotificationType,
+  Visit,
+  VisitHistoryDetails,
+} from '../data/orchestrationApiTypes'
 import { FlashData, VisitorListItem, VisitSessionData } from '../@types/bapv'
 import config from '../config'
 import { clearSession } from './visitorUtils'
@@ -17,6 +22,7 @@ import {
   createMockVisitService,
   createMockVisitSessionsService,
 } from '../services/testutils/mocks'
+import { notificationTypeWarnings } from '../constants/notificationEventTypes'
 
 let app: Express
 
@@ -96,6 +102,8 @@ describe('/visit/:reference', () => {
     },
   ]
 
+  const notifications: NotificationType[] = []
+
   const additionalSupport = ['Wheelchair ramp', 'custom request']
 
   beforeEach(() => {
@@ -108,7 +116,12 @@ describe('/visit/:reference', () => {
     jest.useFakeTimers({ advanceTimers: true, now: new Date(fakeDate) })
 
     prisonerSearchService.getPrisonerById.mockResolvedValue(prisoner)
-    visitService.getFullVisitDetails.mockResolvedValue({ visitHistoryDetails, visitors, additionalSupport })
+    visitService.getFullVisitDetails.mockResolvedValue({
+      visitHistoryDetails,
+      visitors,
+      notifications,
+      additionalSupport,
+    })
     prisonerVisitorsService.getVisitors.mockResolvedValue(visitors)
     supportedPrisonsService.getSupportedPrisonIds.mockResolvedValue(supportedPrisonIds)
     supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
@@ -197,6 +210,7 @@ describe('/visit/:reference', () => {
       visitService.getFullVisitDetails.mockResolvedValue({
         visitHistoryDetails,
         visitors,
+        notifications,
         additionalSupport,
       })
 
@@ -233,7 +247,12 @@ describe('/visit/:reference', () => {
         '/visit/ab-cd-ef-gh?query=startDate%3D2022-05-24%26type%3DOPEN%26time%3D3pm%2Bto%2B3%253A59pm&from=visit-search'
 
       prisonerSearchService.getPrisonerById.mockResolvedValue(prisoner)
-      visitService.getFullVisitDetails.mockResolvedValue({ visitHistoryDetails, visitors, additionalSupport })
+      visitService.getFullVisitDetails.mockResolvedValue({
+        visitHistoryDetails,
+        visitors,
+        notifications,
+        additionalSupport,
+      })
 
       return request(app)
         .get(url)
@@ -243,6 +262,40 @@ describe('/visit/:reference', () => {
           const $ = cheerio.load(res.text)
           expect($('h1').text()).toBe('Visit booking details')
           expect($('.govuk-back-link').attr('href')).toBe('/visits?startDate=2022-05-24&type=OPEN&time=3pm+to+3%3A59pm')
+          expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
+          // prisoner details
+          expect($('[data-test="prisoner-name"]').text()).toBe('Smith, John')
+
+          expect(auditService.viewedVisitDetails).toHaveBeenCalledTimes(1)
+          expect(auditService.viewedVisitDetails).toHaveBeenCalledWith({
+            visitReference: 'ab-cd-ef-gh',
+            prisonerId: 'A1234BC',
+            prisonId: 'HEI',
+            username: 'user1',
+            operationId: undefined,
+          })
+        })
+    })
+
+    it('should render booking summary page correct back link when from review listing page', () => {
+      const url = '/visit/ab-cd-ef-gh?from=review'
+
+      prisonerSearchService.getPrisonerById.mockResolvedValue(prisoner)
+      visitService.getFullVisitDetails.mockResolvedValue({
+        visitHistoryDetails,
+        visitors,
+        notifications,
+        additionalSupport,
+      })
+
+      return request(app)
+        .get(url)
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text()).toBe('Visit booking details')
+          expect($('.govuk-back-link').attr('href')).toBe('/review')
           expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
           // prisoner details
           expect($('[data-test="prisoner-name"]').text()).toBe('Smith, John')
@@ -277,6 +330,31 @@ describe('/visit/:reference', () => {
           expect($('[data-test="prisoner-number"]').text()).toBe('A1234BC')
           expect($('[data-test="prisoner-dob"]').text()).toBe('2 April 1975')
           expect($('[data-test="prisoner-location"]').text()).toBe('Unknown')
+        })
+    })
+
+    it('should render full booking summary page with prisoner location for a RELEASED prisoner', () => {
+      const releasedPrisoner = TestData.prisoner({
+        prisonId: 'OUT',
+        locationDescription: 'Outside - released from HMP HEWELL',
+      })
+
+      prisonerSearchService.getPrisonerById.mockResolvedValue(releasedPrisoner)
+
+      return request(app)
+        .get('/visit/ab-cd-ef-gh')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text()).toBe('Visit booking details')
+          expect($('.govuk-back-link').attr('href')).toBe('/prisoner/A1234BC/visits')
+          expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
+          // prisoner details
+          expect($('[data-test="prisoner-name"]').text()).toBe('Smith, John')
+          expect($('[data-test="prisoner-number"]').text()).toBe('A1234BC')
+          expect($('[data-test="prisoner-dob"]').text()).toBe('2 April 1975')
+          expect($('[data-test="prisoner-location"]').text()).toBe(releasedPrisoner.locationDescription)
         })
     })
 
@@ -360,50 +438,108 @@ describe('/visit/:reference', () => {
         })
     })
 
-    it('should display cancelled message - administrative', () => {
-      visit.visitStatus = 'CANCELLED'
-      visit.outcomeStatus = 'ADMINISTRATIVE_CANCELLATION'
-      visit.visitNotes = [{ type: 'VISIT_OUTCOMES', text: 'booking error' }]
-      return request(app)
-        .get('/visit/ab-cd-ef-gh')
-        .expect(200)
-        .expect('Content-Type', /html/)
-        .expect(res => {
-          const $ = cheerio.load(res.text)
-          expect($('[data-test="visit-cancelled-type"]').text()).toBe(
-            'This visit was cancelled due to an administrative error with the booking.',
-          )
-          expect($('[data-test="visit-cancelled-reason"]').text()).toBe('Reason: booking error')
+    describe('Visit notification messages', () => {
+      it('should not display visit notification banner when no notification types set', () => {
+        return request(app)
+          .get('/visit/ab-cd-ef-gh')
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('[data-test="visit-notification"]').length).toBe(0)
+          })
+      })
+
+      it('should display a single visit notification banner when a single notification type is set', () => {
+        visitService.getFullVisitDetails.mockResolvedValue({
+          visitHistoryDetails,
+          visitors,
+          notifications: ['PRISONER_RELEASED_EVENT'],
+          additionalSupport,
         })
+
+        return request(app)
+          .get('/visit/ab-cd-ef-gh')
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('[data-test="visit-notification"]').length).toBe(1)
+            expect($('[data-test="visit-notification"]').text()).toBe(notificationTypeWarnings.PRISONER_RELEASED_EVENT)
+          })
+      })
+
+      it('should display a two visit notification banners when two notification types are set', () => {
+        visitService.getFullVisitDetails.mockResolvedValue({
+          visitHistoryDetails,
+          visitors,
+          notifications: ['PRISONER_RELEASED_EVENT', 'PRISON_VISITS_BLOCKED_FOR_DATE'],
+          additionalSupport,
+        })
+
+        return request(app)
+          .get('/visit/ab-cd-ef-gh')
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('[data-test="visit-notification"]').length).toBe(2)
+            expect($('[data-test="visit-notification"]').eq(0).text()).toBe(
+              notificationTypeWarnings.PRISONER_RELEASED_EVENT,
+            )
+            expect($('[data-test="visit-notification"]').eq(1).text()).toBe(
+              notificationTypeWarnings.PRISON_VISITS_BLOCKED_FOR_DATE,
+            )
+          })
+      })
     })
 
-    it('should display cancelled message - visitor cancelled', () => {
-      visit.visitStatus = 'CANCELLED'
-      visit.outcomeStatus = 'VISITOR_CANCELLED'
-      visit.visitNotes = [{ type: 'VISIT_OUTCOMES', text: 'no longer required' }]
-      visitHistoryDetails.eventsAudit = [
-        {
-          type: 'CANCELLED_VISIT',
-          applicationMethodType: 'NOT_APPLICABLE',
-          actionedBy: 'User Three',
-          createTimestamp: '2022-01-01T11:00:00',
-        },
-      ]
+    describe('Cancellation message', () => {
+      it('should display cancelled message - administrative', () => {
+        visit.visitStatus = 'CANCELLED'
+        visit.outcomeStatus = 'ADMINISTRATIVE_CANCELLATION'
+        visit.visitNotes = [{ type: 'VISIT_OUTCOMES', text: 'booking error' }]
+        return request(app)
+          .get('/visit/ab-cd-ef-gh')
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('[data-test="visit-cancelled-type"]').text()).toBe(
+              'This visit was cancelled due to an administrative error with the booking.',
+            )
+            expect($('[data-test="visit-cancelled-reason"]').text()).toBe('Reason: booking error')
+          })
+      })
 
-      return request(app)
-        .get('/visit/ab-cd-ef-gh?tab=history')
-        .expect(200)
-        .expect('Content-Type', /html/)
-        .expect(res => {
-          const $ = cheerio.load(res.text)
-          expect($('[data-test="visit-cancelled-type"]').text()).toBe('This visit was cancelled by the visitor.')
-          expect($('[data-test="visit-cancelled-reason"]').text()).toBe('Reason: no longer required')
-          expect($('[data-test="visit-event-1"]').text().trim().replace(/\s+/g, ' ')).toBe('Visit cancelled')
-          expect($('[data-test="visit-actioned-by-1"]').text().trim().replace(/\s+/g, ' ')).toBe('by User Three')
-          expect($('[data-test="visit-event-date-time-1"]').text().trim().replace(/\s+/g, ' ')).toBe(
-            'Saturday 1 January 2022 at 11am',
-          )
-        })
+      it('should display cancelled message - visitor cancelled', () => {
+        visit.visitStatus = 'CANCELLED'
+        visit.outcomeStatus = 'VISITOR_CANCELLED'
+        visit.visitNotes = [{ type: 'VISIT_OUTCOMES', text: 'no longer required' }]
+        visitHistoryDetails.eventsAudit = [
+          {
+            type: 'CANCELLED_VISIT',
+            applicationMethodType: 'NOT_APPLICABLE',
+            actionedBy: 'User Three',
+            createTimestamp: '2022-01-01T11:00:00',
+          },
+        ]
+
+        return request(app)
+          .get('/visit/ab-cd-ef-gh?tab=history')
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('[data-test="visit-cancelled-type"]').text()).toBe('This visit was cancelled by the visitor.')
+            expect($('[data-test="visit-cancelled-reason"]').text()).toBe('Reason: no longer required')
+            expect($('[data-test="visit-event-1"]').text().trim().replace(/\s+/g, ' ')).toBe('Visit cancelled')
+            expect($('[data-test="visit-actioned-by-1"]').text().trim().replace(/\s+/g, ' ')).toBe('by User Three')
+            expect($('[data-test="visit-event-date-time-1"]').text().trim().replace(/\s+/g, ' ')).toBe(
+              'Saturday 1 January 2022 at 11am',
+            )
+          })
+      })
     })
   })
 

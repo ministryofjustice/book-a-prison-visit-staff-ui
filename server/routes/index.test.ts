@@ -13,7 +13,7 @@ const visitNotificationsService = createMockVisitNotificationsService()
 
 beforeEach(() => {
   app = appWithAllRoutes({ services: { visitNotificationsService } })
-  config.features.showReviewBookingsTile = true
+  config.features.reviewBookings = true
 })
 
 afterEach(() => {
@@ -57,7 +57,7 @@ describe('GET /', () => {
 
   describe('Need review tile', () => {
     it('should not render the review request tile if feature disabled', () => {
-      config.features.showReviewBookingsTile = false
+      config.features.reviewBookings = false
 
       return request(app)
         .get('/')
