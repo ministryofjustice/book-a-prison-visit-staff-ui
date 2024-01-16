@@ -3,7 +3,7 @@ import TestData from '../../server/routes/testutils/testData'
 import HomePage from '../pages/home'
 import Page from '../pages/page'
 import VisitsReviewListingPage from '../pages/visitsReviewListing'
-import { notificationTypes, notificationTypePathSegments } from '../../server/constants/notificationEventTypes'
+import { notificationTypes } from '../../server/constants/notificationEventTypes'
 
 context('Bookings review page', () => {
   const prettyDateFormat = 'd MMMM yyyy'
@@ -76,11 +76,7 @@ context('Bookings review page', () => {
     listingPage.getType(1).contains(notificationTypes[notificationGroups[0].type])
     listingPage
       .getActionLink(1)
-      .should(
-        'have.attr',
-        'href',
-        `/review/${notificationTypePathSegments[notificationGroups[0].type]}/${notificationGroups[0].reference}`,
-      )
+      .should('have.attr', 'href', `/review/non-association/${notificationGroups[0].reference}`)
 
     // Prisoner released
     listingPage.getPrisonerNumber(2).contains(notificationGroups[1].affectedVisits[0].prisonerNumber)
@@ -91,11 +87,7 @@ context('Bookings review page', () => {
     listingPage.getType(2).contains(notificationTypes[notificationGroups[1].type])
     listingPage
       .getActionLink(2)
-      .should(
-        'have.attr',
-        'href',
-        `/review/${notificationTypePathSegments[notificationGroups[1].type]}/${notificationGroups[1].reference}`,
-      )
+      .should('have.attr', 'href', `/visit/${notificationGroups[1].affectedVisits[0].bookingReference}?from=review`)
 
     // Visit type changed
     listingPage.getPrisonerNumber(3).contains(notificationGroups[2].affectedVisits[0].prisonerNumber)
@@ -106,11 +98,7 @@ context('Bookings review page', () => {
     listingPage.getType(3).contains(notificationTypes[notificationGroups[2].type])
     listingPage
       .getActionLink(3)
-      .should(
-        'have.attr',
-        'href',
-        `/review/${notificationTypePathSegments[notificationGroups[2].type]}/${notificationGroups[2].reference}`,
-      )
+      .should('have.attr', 'href', `/visit/${notificationGroups[2].affectedVisits[0].bookingReference}?from=review`)
 
     // Visits blocked for date
     listingPage.getPrisonerNumber(4).contains(notificationGroups[3].affectedVisits[0].prisonerNumber)
@@ -121,11 +109,7 @@ context('Bookings review page', () => {
     listingPage.getType(4).contains(notificationTypes[notificationGroups[3].type])
     listingPage
       .getActionLink(4)
-      .should(
-        'have.attr',
-        'href',
-        `/review/${notificationTypePathSegments[notificationGroups[3].type]}/${notificationGroups[3].reference}`,
-      )
+      .should('have.attr', 'href', `/visit/${notificationGroups[3].affectedVisits[0].bookingReference}?from=review`)
   })
 
   it('should filter bookings review listing', () => {

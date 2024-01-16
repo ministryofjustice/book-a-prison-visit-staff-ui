@@ -6,6 +6,7 @@ import {
   BookingOrchestrationRequestDto,
   CancelVisitOrchestrationDto,
   ChangeVisitSlotRequestDto,
+  NotificationType,
   ReserveVisitSlotDto,
   SessionSchedule,
   Visit,
@@ -676,6 +677,21 @@ describe('orchestrationApiClient', () => {
       const output = await orchestrationApiClient.getNotificationGroups(prisonId)
 
       expect(output).toEqual(notificationGroups)
+    })
+  })
+
+  describe('getVisitNotifications', () => {
+    it('should return notifications for a given visit reference', async () => {
+      const notifications: NotificationType[] = ['NON_ASSOCIATION_EVENT']
+
+      fakeOrchestrationApi
+        .get(`/visits/notification/visit/ab-cd-ef-gh/types`)
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, notifications)
+
+      const output = await orchestrationApiClient.getVisitNotifications('ab-cd-ef-gh')
+
+      expect(output).toStrictEqual(notifications)
     })
   })
 

@@ -15,7 +15,7 @@ export default function routes(services: Services): Router {
 
   const visitsReviewListing = new VisitsReviewListingController(services.visitNotificationsService)
 
-  if (config.features.showReviewBookingsTile) {
+  if (config.features.reviewBookings) {
     getWithValidation('/', visitsReviewListing.validate(), visitsReviewListing.view())
     postWithValidation('/', visitsReviewListing.validate(), visitsReviewListing.submit())
   }

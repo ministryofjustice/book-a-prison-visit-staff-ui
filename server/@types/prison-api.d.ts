@@ -96,40 +96,40 @@ export interface paths {
   '/api/offender-assessments/category/{bookingId}/nextReviewDate/{nextReviewDate}': {
     /**
      * Update the next review date on the latest active categorisation
-     * @description Update categorisation record with new next review date.
+     * @description Update categorisation record with new next review date. Requires client role MAINTAIN_ASSESSMENTS.
      */
     put: operations['updateCategorisationNextReviewDate']
   }
   '/api/offender-assessments/category/{bookingId}/inactive': {
     /**
      * Set all active or pending (status A or P) categorisations inactive
-     * @description This endpoint should only be used with edge case categorisations.
+     * @description This endpoint should only be used with edge case categorisations. Requires client role MAINTAIN_ASSESSMENTS.
      */
     put: operations['setCategorisationInactive']
   }
   '/api/offender-assessments/category/reject': {
     /**
      * Reject a pending offender categorisation.
-     * @description Update categorisation record with rejection.
+     * @description Update categorisation record with rejection. Requires client role MAINTAIN_ASSESSMENTS or user role APPROVE_CATEGORISATION.
      */
     put: operations['rejectCategorisation']
   }
   '/api/offender-assessments/category/categorise': {
     /**
      * Update a pending offender categorisation.
-     * @description This is intended for use by the categoriser to correct any problems with a pending (in-progress) categorisation. Fields left as null will be left unchanged
+     * @description This is intended for use by the categoriser to correct any problems with a pending (in-progress) categorisation. Fields left as null will be left unchanged. Requires client role MAINTAIN_ASSESSMENTS or user role ROLE_CREATE_CATEGORISATION or ROLE_CREATE_RECATEGORISATION.
      */
     put: operations['updateCategorisation']
     /**
      * Record new offender categorisation.
-     * @description Create new categorisation record. The booking id and new sequence number is returned.
+     * @description Create new categorisation record. The booking id and new sequence number is returned. Requires client role MAINTAIN_ASSESSMENTS or user role ROLE_CREATE_CATEGORISATION or ROLE_CREATE_RECATEGORISATION.
      */
     post: operations['createCategorisation']
   }
   '/api/offender-assessments/category/approve': {
     /**
      * Approve a pending offender categorisation.
-     * @description Update categorisation record with approval.
+     * @description Update categorisation record with approval. Requires client role MAINTAIN_ASSESSMENTS or user role APPROVE_CATEGORISATION.
      */
     put: operations['approveCategorisation']
   }
@@ -359,12 +359,12 @@ export interface paths {
   '/api/prisoners': {
     /**
      * List of offenders matching specified criteria.
-     * @description List of offenders matching specified criteria.<p>This endpoint uses the REPLICA database.</p>
+     * @description List of offenders matching specified criteria. Requires GLOBAL_SEARCH role.<p>This endpoint uses the REPLICA database.</p>
      */
     get: operations['getPrisoners_1']
     /**
      * List of offenders matching specified criteria. (POST version)
-     * @description List of offenders matching specified criteria.<p>This endpoint uses the REPLICA database.</p>
+     * @description List of offenders matching specified criteria. Requires GLOBAL_SEARCH role.<p>This endpoint uses the REPLICA database.</p>
      */
     post: operations['getPrisoners']
   }
@@ -449,6 +449,13 @@ export interface paths {
      */
     post: operations['postOffenderAssessmentsCsraList']
   }
+  '/api/offender-assessments/category': {
+    /**
+     * Returns Categorisation details for supplied Offenders - POST version to allow large offender lists.
+     * @description Requires VIEW_PRISONER_DATA role<p>This endpoint uses the REPLICA database.</p>
+     */
+    post: operations['getOffenderCategorisationsSystem']
+  }
   '/api/offences/unlink-from-schedule': {
     /**
      * Unlink offence from schedule
@@ -507,11 +514,14 @@ export interface paths {
     post: operations['postKeyWorkerOffendersAllocationHistory']
   }
   '/api/images/offenders/{offenderNo}': {
-    /** Image details related to offender. */
+    /**
+     * Image details related to offender.
+     * @description Requires role VIEW_PRISONER_DATA.
+     */
     get: operations['getImagesByOffender']
     /**
      * DEV USE ONLY *** Upload a new image for a prisoner.
-     * @description Requires ROLE_IMAGE_UPLOAD.
+     * @description Requires ROLE_IMAGE_UPLOAD, write scope and a user in the token.
      */
     post: operations['putImageMultiPart']
   }
@@ -537,31 +547,26 @@ export interface paths {
   '/api/case-notes/usage': {
     /**
      * Count of case notes
-     * @description Count of case notes<p>This endpoint uses the REPLICA database.</p>
+     * @description Count of case notes. Requires role VIEW_CASE_NOTES<p>This endpoint uses the REPLICA database.</p>
      */
     get: operations['getCaseNoteUsageSummary']
     /**
      * Retrieves list of case notes grouped by type and offender
-     * @description Retrieves list of case notes grouped by type and offender<p>This endpoint uses the REPLICA database.</p>
+     * @description Retrieves list of case notes grouped by type and offender. Requires role VIEW_CASE_NOTES<p>This endpoint uses the REPLICA database.</p>
      */
     post: operations['getCaseNoteUsageSummaryByPost']
   }
   '/api/case-notes/usage-by-types': {
     /**
      * Retrieves list of case notes grouped by types, bookings and from dates
-     * @description Retrieves list of case notes grouped by type/sub and offender<p>This endpoint uses the REPLICA database.</p>
+     * @description Retrieves list of case notes grouped by type/sub and offender. Requires role VIEW_CASE_NOTES<p>This endpoint uses the REPLICA database.</p>
      */
     post: operations['getCaseNoteUsageSummaryByDates']
   }
   '/api/case-notes/staff-usage': {
     /**
-     * Count of case notes
-     * @description Count of case notes<p>This endpoint uses the REPLICA database.</p>
-     */
-    get: operations['getCaseNoteStaffUsageSummary']
-    /**
      * Retrieves list of case notes grouped by type/sub-type and staff
-     * @description Retrieves list of case notes grouped by type/sub-type and staff<p>This endpoint uses the REPLICA database.</p>
+     * @description Retrieves list of case notes grouped by type/sub-type and staff. Requires role VIEW_CASE_NOTES<p>This endpoint uses the REPLICA database.</p>
      */
     post: operations['getCaseNoteStaffUsageSummaryByPost']
   }
@@ -582,7 +587,7 @@ export interface paths {
   '/api/bookings/{bookingId}/personal-care-needs': {
     /**
      * Personal Care Needs
-     * @description Personal Care Need
+     * @description Personal Care Need. Requires booking access (via caseload) or GLOBAL_SEARCH or VIEW_PRISONER_DATA role.
      */
     get: operations['getPersonalCareNeeds_1']
     /**
@@ -1019,7 +1024,7 @@ export interface paths {
   '/api/prisoners/{offenderNo}': {
     /**
      * List of offenders globally matching the offenderNo.
-     * @description List of offenders globally matching the offenderNo, restricted by the VIEW_PRISONER_DATA or SYSTEM_USER role. Returns an empty array if no results are found or if does not have correct permissions
+     * @description List of offenders globally matching the offenderNo, Requires offender agency to be in user caseload or VIEW_PRISONER_DATA role. Returns an empty array if no results are found or if does not have correct permissions
      */
     get: operations['getPrisonersOffenderNo']
   }
@@ -1034,7 +1039,7 @@ export interface paths {
      *     results.
      *     This is an internal endpoint used by Prisoner Search to ensure that NOMIS and OpenSearch are in sync.
      *     Other services should use Prisoner Search instead to get the list of prisoners.
-     *     Requires PRISONER_INDEX role.
+     *     Requires PRISONER_INDEX or GLOBAL_SEARCH role.
      *
      * @description <p>This endpoint uses the REPLICA database.</p>
      */
@@ -1047,28 +1052,28 @@ export interface paths {
   '/api/persons/{personId}/phones': {
     /**
      * The phone numbers for person
-     * @description The phone numbers for person
+     * @description Requires role ROLE_VIEW_CONTACTS
      */
     get: operations['getPersonPhones']
   }
   '/api/persons/{personId}/identifiers': {
     /**
      * The most recent value of each type of person identifier
-     * @description The most recent value of each type of person identifier
+     * @description Requires role ROLE_VIEW_CONTACTS
      */
     get: operations['getPersonIdentifiers']
   }
   '/api/persons/{personId}/emails': {
     /**
      * The emails for person
-     * @description The emails for person
+     * @description Requires role ROLE_VIEW_CONTACTS
      */
     get: operations['getPersonEmails']
   }
   '/api/persons/{personId}/addresses': {
     /**
      * The addresses for person
-     * @description The addresses for person
+     * @description Requires role ROLE_VIEW_CONTACTS
      */
     get: operations['getPersonAddresses']
   }
@@ -1245,7 +1250,7 @@ export interface paths {
   '/api/offenders/{offenderNo}/incidents': {
     /**
      * Return a set Incidents for a given offender No.
-     * @description Can be filtered by participation type and incident type
+     * @description Can be filtered by participation type and incident type. Requires the VIEW_INCIDENTS role.
      */
     get: operations['getIncidentsByOffenderNo']
   }
@@ -1327,7 +1332,10 @@ export interface paths {
     get: operations['getSentenceAndOffenceDetails']
   }
   '/api/offender-sentences/booking/{bookingId}/sentenceTerms': {
-    /** Sentence term details for a prisoner */
+    /**
+     * Sentence term details for a prisoner
+     * @description Requires booking access (via caseload) or GLOBAL_SEARCH or VIEW_PRISONER_DATA role.
+     */
     get: operations['getOffenderSentenceTerms']
   }
   '/api/offender-sentences/booking/{bookingId}/home-detention-curfews/latest': {
@@ -1346,19 +1354,32 @@ export interface paths {
     get: operations['getOffenderCalculations']
   }
   '/api/offender-assessments/csra/{offenderNo}': {
-    /** Retrieves CSRAs for the given offender, ordered by the latest first. */
+    /**
+     * Retrieves CSRAs for the given offender, ordered by the latest first.
+     * @description Requires offender in the caseload, or GLOBAL_SEARCH or VIEW_PRISONER_DATA role.
+     */
     get: operations['getOffenderCsraAssessments']
   }
   '/api/offender-assessments/csra/{bookingId}/assessment/{assessmentSeq}': {
-    /** Retrieves details of a single CSRA assessment. */
+    /**
+     * Retrieves details of a single CSRA assessment.
+     * @description Requires offender in the caseload, or GLOBAL_SEARCH or VIEW_PRISONER_DATA role.
+     */
     get: operations['getOffenderCsraAssessment']
   }
   '/api/offender-assessments/category/{agencyId}': {
     /**
      * Returns category information on Offenders at a prison.
-     * @description <p>This endpoint uses the REPLICA database.</p>
+     * @description Requires offender in the caseload, or VIEW_ASSESSMENTS role.<p>This endpoint uses the REPLICA database.</p>
      */
     get: operations['getOffenderCategorisations']
+  }
+  '/api/offender-assessments/assessments': {
+    /**
+     * Returns assessment information on Offenders at a prison.
+     * @description Requires VIEW_PRISONER_DATA role.<p>This endpoint uses the REPLICA database.</p>
+     */
+    get: operations['getAssessments']
   }
   '/api/offender-activities/{offenderNo}/attendance-history': {
     /**
@@ -1514,14 +1535,14 @@ export interface paths {
   '/api/images/{imageId}': {
     /**
      * Image detail (with image data).
-     * @description Image detail (with image data).
+     * @description Requires role VIEW_PRISONER_DATA.
      */
     get: operations['getImage']
   }
   '/api/images/{imageId}/data': {
     /**
      * Image data (as bytes).
-     * @description Image data (as bytes).
+     * @description Requires role VIEW_PRISONER_DATA.
      */
     get: operations['getImageData']
   }
@@ -1567,13 +1588,6 @@ export interface paths {
      * @description Requires agency to be in caseload or role MAINTAIN_CELL_MOVEMENTS.<p>This endpoint uses the REPLICA database.</p>
      */
     get: operations['getBedAssignmentsHistoryByDateForAgency']
-  }
-  '/api/case-notes/events': {
-    /**
-     * Fetch all case notes of a given type since a given date
-     * @description Returns all case notes - consumed by Delius<br/>These are generated by  whenever a case note is created or amended for an offender.<br/>*Note:* An alternative call [GET /case_notes/for_delius](#case-notes-feed-fetch-case-notes-direct-get) has been created for performance reasons.<br/>Some case notes are automatically generated by the system in response to an action relating to the offender e.g. An alert being raised or a prison transfer.<br/>The note type only filters at the top note type level not the sub type.<br/>note_type can be presented multiples times in the URL to filter by multiple note types.
-     */
-    get: operations['getCaseNotesEvents']
   }
   '/api/bookings/{bookingId}': {
     /**
@@ -1637,7 +1651,7 @@ export interface paths {
   '/api/bookings/{bookingId}/reasonable-adjustments': {
     /**
      * Reasonable Adjustment Information
-     * @description Reasonable Adjustment Information
+     * @description Reasonable Adjustment Information. Requires booking access (via caseload) or GLOBAL_SEARCH or VIEW_PRISONER_DATA role.
      */
     get: operations['getReasonableAdjustments']
   }
@@ -1661,13 +1675,6 @@ export interface paths {
      * @description Offender main offence detail.
      */
     get: operations['getMainOffence_1']
-  }
-  '/api/bookings/{bookingId}/image': {
-    /**
-     * Image detail (without image data).
-     * @description Image detail (without image data).<p>This endpoint uses the REPLICA database.</p>
-     */
-    get: operations['getMainImageForBookings']
   }
   '/api/bookings/{bookingId}/image/data': {
     /**
@@ -1756,16 +1763,9 @@ export interface paths {
   '/api/bookings/{bookingId}/assessments': {
     /**
      * Assessment Information
-     * @description Assessment Information
+     * @description Assessment Information. Requires booking access (via caseload) or VIEW_ASSESSMENTS role.
      */
-    get: operations['getAssessments']
-  }
-  '/api/bookings/{bookingId}/assessment/{assessmentCode}': {
-    /**
-     * Offender assessment detail.
-     * @description Offender assessment detail.
-     */
-    get: operations['getAssessmentByCode']
+    get: operations['getAssessments_1']
   }
   '/api/bookings/{bookingId}/aliases': {
     /**
@@ -3253,16 +3253,16 @@ export interface components {
       ltdCalculatedDate?: string
       /**
        * Format: date
-       * @description Offender's home detention curfew end date - calculated as one day before the releaseDate.
-       * @example 2019-04-01
-       */
-      homeDetentionCurfewEndDate?: string
-      /**
-       * Format: date
        * @description Top-up supervision start date for offender - calculated as licence end date + 1 day or releaseDate if licence end date not set.
        * @example 2019-04-01
        */
       topupSupervisionStartDate?: string
+      /**
+       * Format: date
+       * @description Offender's home detention curfew end date - calculated as one day before the releaseDate.
+       * @example 2019-04-01
+       */
+      homeDetentionCurfewEndDate?: string
     }
     /** @description Represents the data required for receiving a prisoner transfer */
     RequestToTransferIn: {
@@ -5227,8 +5227,66 @@ export interface components {
       keyDates: components['schemas']['OffenderKeyDates']
       /** @description Comment to be associated with the sentence calculation, if not set a default comment is used */
       comment?: string
+      /** @description The reason the sentence calculation was performed, if not set the default reason is used */
+      reason?: string
       /** @description Is true, when there are no dates to be recorded in NOMIS */
       noDates?: boolean
+    }
+    /** @description Prisoner with categorisation data */
+    OffenderCategorise: {
+      /** @description Display Prisoner Number */
+      offenderNo: string
+      /** Format: int64 */
+      bookingId: number
+      /** @description Prisoner First Name */
+      firstName: string
+      /** @description Prisoner Last Name */
+      lastName: string
+      /**
+       * Format: date
+       * @description Categorisation date if any
+       */
+      assessmentDate?: string
+      /**
+       * Format: date
+       * @description Date categorisation was approved if any
+       */
+      approvalDate?: string
+      /**
+       * Format: int32
+       * @description Sequence number within booking
+       */
+      assessmentSeq?: number
+      /**
+       * Format: int64
+       * @description assessment type
+       */
+      assessmentTypeId?: number
+      /**
+       * @description Categorisation status
+       * @enum {string}
+       */
+      assessStatus?: 'P' | 'A' | 'I'
+      /** @description Categoriser First Name */
+      categoriserFirstName?: string
+      /** @description Categoriser Last Name */
+      categoriserLastName?: string
+      /** @description Approver First Name if any */
+      approverFirstName?: string
+      /** @description Approver Last Name if any */
+      approverLastName?: string
+      /** @description Categorisation */
+      category?: string
+      /**
+       * Format: date
+       * @description Next Review Date - for recategorisations
+       */
+      nextReviewDate?: string
+      /**
+       * @description Where in the categorisation workflow the prisoner is
+       * @enum {string}
+       */
+      status: 'UNCATEGORISED' | 'AWAITING_APPROVAL'
     }
     /** @description Categorisation details */
     CategorisationDetail: {
@@ -5401,6 +5459,8 @@ export interface components {
       movementTime: string
       /** @description Description of movement reason */
       movementReason: string
+      /** @description Code of movement reason */
+      movementReasonCode: string
       /** @description Comment */
       commentText?: string
     }
@@ -7745,7 +7805,7 @@ export interface components {
        * @description Type of movement out of prison
        * @enum {string}
        */
-      outwardType: 'REL' | 'TAP'
+      outwardType?: 'REL' | 'TAP'
       /**
        * @description The initial prison they entered during this period
        * @example MDI
@@ -8559,16 +8619,16 @@ export interface components {
       tariffEarlyRemovalSchemeEligibilityDate?: string
       /**
        * Format: date
-       * @description Offender's home detention curfew end date - calculated as one day before the releaseDate.
-       * @example 2019-04-01
-       */
-      homeDetentionCurfewEndDate?: string
-      /**
-       * Format: date
        * @description Top-up supervision start date for offender - calculated as licence end date + 1 day or releaseDate if licence end date not set.
        * @example 2019-04-01
        */
       topupSupervisionStartDate?: string
+      /**
+       * Format: date
+       * @description Offender's home detention curfew end date - calculated as one day before the releaseDate.
+       * @example 2019-04-01
+       */
+      homeDetentionCurfewEndDate?: string
     }
     /** @description Prison Term */
     PrisonTerm: {
@@ -9124,6 +9184,31 @@ export interface components {
        * @example HI
        */
       classificationReviewReason?: string
+      /**
+       * @description The classification code entered to override the calculated value prior to approval
+       * @example HI
+       */
+      overridingClassificationCode?: string
+      /**
+       * @description The classification code originally calculated by NOMIS based on the answers given to the questions when carrying out the initial review
+       * @example HI
+       */
+      calculatedClassificationCode?: string
+      /**
+       * @description The classification code that has been approved
+       * @example HI
+       */
+      approvedClassificationCode?: string
+      /**
+       * @description Comment added at approval of classification code
+       * @example Comment
+       */
+      approvalComment?: string
+      /**
+       * @description The reason given for overriding the calculated classification code
+       * @example Overriding comment
+       */
+      overrideReason?: string
       /** @description Assessment questions and answers, in the order they were asked */
       questions: components['schemas']['AssessmentQuestion'][]
     }
@@ -9135,62 +9220,6 @@ export interface components {
       answer?: string
       /** @description If a question has more than one answer, all but the first answer will be in this property */
       additionalAnswers?: string[]
-    }
-    /** @description Prisoner with categorisation data */
-    OffenderCategorise: {
-      /** @description Display Prisoner Number */
-      offenderNo: string
-      /** Format: int64 */
-      bookingId: number
-      /** @description Prisoner First Name */
-      firstName: string
-      /** @description Prisoner Last Name */
-      lastName: string
-      /**
-       * Format: date
-       * @description Categorisation date if any
-       */
-      assessmentDate?: string
-      /**
-       * Format: date
-       * @description Date categorisation was approved if any
-       */
-      approvalDate?: string
-      /**
-       * Format: int32
-       * @description Sequence number within booking
-       */
-      assessmentSeq?: number
-      /**
-       * Format: int64
-       * @description assessment type
-       */
-      assessmentTypeId?: number
-      /**
-       * @description Categorisation status
-       * @enum {string}
-       */
-      assessStatus?: 'P' | 'A' | 'I'
-      /** @description Categoriser First Name */
-      categoriserFirstName?: string
-      /** @description Categoriser Last Name */
-      categoriserLastName?: string
-      /** @description Approver First Name if any */
-      approverFirstName?: string
-      /** @description Approver Last Name if any */
-      approverLastName?: string
-      /** @description Categorisation */
-      category?: string
-      /**
-       * Format: date
-       * @description Next Review Date - for recategorisations
-       */
-      nextReviewDate?: string
-      /**
-       * @description Where in the categorisation workflow the prisoner is
-       * @enum {string}
-       */
-      status: 'UNCATEGORISED' | 'AWAITING_APPROVAL'
     }
     PageOffenceDto: {
       /** Format: int64 */
@@ -10174,50 +10203,6 @@ export interface components {
        * @example Listener Cell
        */
       description?: string
-    }
-    /** @description Case Note Event */
-    CaseNoteEvent: {
-      /**
-       * @description Offender Noms Id
-       * @example A1417AE
-       */
-      noms_id: string
-      /**
-       * Format: int64
-       * @description Case Note Id (unique)
-       * @example 12311312
-       */
-      id: number
-      /**
-       * @description Case Note Text
-       * @example This is some text
-       */
-      content: string
-      /**
-       * @description Date and Time of when case note contact with offender was made
-       * @example 2021-07-05T10:35:17
-       */
-      contactTimestamp: string
-      /**
-       * @description Date and Time of notification of event
-       * @example 2021-07-05T10:35:17
-       */
-      notificationTimestamp: string
-      /**
-       * @description Agency Code where Case Note was made.
-       * @example MDI
-       */
-      establishmentCode?: string
-      /**
-       * @description Case Note Type and Sub Type
-       * @example POS IEP_ENC
-       */
-      noteType: string
-      /**
-       * @description Name of staff member who created case note (lastname, firstname)
-       * @example Smith, John
-       */
-      staffName: string
     }
     /** @description Visit summary */
     VisitSummary: {
@@ -11886,7 +11871,7 @@ export interface operations {
   }
   /**
    * Update the next review date on the latest active categorisation
-   * @description Update categorisation record with new next review date.
+   * @description Update categorisation record with new next review date. Requires client role MAINTAIN_ASSESSMENTS.
    */
   updateCategorisationNextReviewDate: {
     parameters: {
@@ -11918,7 +11903,7 @@ export interface operations {
   }
   /**
    * Set all active or pending (status A or P) categorisations inactive
-   * @description This endpoint should only be used with edge case categorisations.
+   * @description This endpoint should only be used with edge case categorisations. Requires client role MAINTAIN_ASSESSMENTS.
    */
   setCategorisationInactive: {
     parameters: {
@@ -11952,7 +11937,7 @@ export interface operations {
   }
   /**
    * Reject a pending offender categorisation.
-   * @description Update categorisation record with rejection.
+   * @description Update categorisation record with rejection. Requires client role MAINTAIN_ASSESSMENTS or user role APPROVE_CATEGORISATION.
    */
   rejectCategorisation: {
     requestBody: {
@@ -11975,7 +11960,7 @@ export interface operations {
   }
   /**
    * Update a pending offender categorisation.
-   * @description This is intended for use by the categoriser to correct any problems with a pending (in-progress) categorisation. Fields left as null will be left unchanged
+   * @description This is intended for use by the categoriser to correct any problems with a pending (in-progress) categorisation. Fields left as null will be left unchanged. Requires client role MAINTAIN_ASSESSMENTS or user role ROLE_CREATE_CATEGORISATION or ROLE_CREATE_RECATEGORISATION.
    */
   updateCategorisation: {
     requestBody: {
@@ -11998,7 +11983,7 @@ export interface operations {
   }
   /**
    * Record new offender categorisation.
-   * @description Create new categorisation record. The booking id and new sequence number is returned.
+   * @description Create new categorisation record. The booking id and new sequence number is returned. Requires client role MAINTAIN_ASSESSMENTS or user role ROLE_CREATE_CATEGORISATION or ROLE_CREATE_RECATEGORISATION.
    */
   createCategorisation: {
     requestBody: {
@@ -12025,7 +12010,7 @@ export interface operations {
   }
   /**
    * Approve a pending offender categorisation.
-   * @description Update categorisation record with approval.
+   * @description Update categorisation record with approval. Requires client role MAINTAIN_ASSESSMENTS or user role APPROVE_CATEGORISATION.
    */
   approveCategorisation: {
     requestBody: {
@@ -13571,7 +13556,7 @@ export interface operations {
   }
   /**
    * List of offenders matching specified criteria.
-   * @description List of offenders matching specified criteria.<p>This endpoint uses the REPLICA database.</p>
+   * @description List of offenders matching specified criteria. Requires GLOBAL_SEARCH role.<p>This endpoint uses the REPLICA database.</p>
    */
   getPrisoners_1: {
     parameters: {
@@ -13647,7 +13632,7 @@ export interface operations {
   }
   /**
    * List of offenders matching specified criteria. (POST version)
-   * @description List of offenders matching specified criteria.<p>This endpoint uses the REPLICA database.</p>
+   * @description List of offenders matching specified criteria. Requires GLOBAL_SEARCH role.<p>This endpoint uses the REPLICA database.</p>
    */
   getPrisoners: {
     parameters: {
@@ -14135,6 +14120,31 @@ export interface operations {
     }
   }
   /**
+   * Returns Categorisation details for supplied Offenders - POST version to allow large offender lists.
+   * @description Requires VIEW_PRISONER_DATA role<p>This endpoint uses the REPLICA database.</p>
+   */
+  getOffenderCategorisationsSystem: {
+    parameters: {
+      query?: {
+        /** @description Only get the latest category for each booking */
+        latestOnly?: boolean
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': number[]
+      }
+    }
+    responses: {
+      /** @description The list of offenders with categorisation details is returned if categorisation record exists */
+      200: {
+        content: {
+          'application/json': components['schemas']['OffenderCategorise'][]
+        }
+      }
+    }
+  }
+  /**
    * Unlink offence from schedule
    * @description Requires UPDATE_OFFENCE_SCHEDULES role
    */
@@ -14376,7 +14386,10 @@ export interface operations {
       }
     }
   }
-  /** Image details related to offender. */
+  /**
+   * Image details related to offender.
+   * @description Requires role VIEW_PRISONER_DATA.
+   */
   getImagesByOffender: {
     parameters: {
       path: {
@@ -14406,7 +14419,7 @@ export interface operations {
   }
   /**
    * DEV USE ONLY *** Upload a new image for a prisoner.
-   * @description Requires ROLE_IMAGE_UPLOAD.
+   * @description Requires ROLE_IMAGE_UPLOAD, write scope and a user in the token.
    */
   putImageMultiPart: {
     parameters: {
@@ -14558,7 +14571,7 @@ export interface operations {
   }
   /**
    * Count of case notes
-   * @description Count of case notes<p>This endpoint uses the REPLICA database.</p>
+   * @description Count of case notes. Requires role VIEW_CASE_NOTES<p>This endpoint uses the REPLICA database.</p>
    */
   getCaseNoteUsageSummary: {
     parameters: {
@@ -14610,7 +14623,7 @@ export interface operations {
   }
   /**
    * Retrieves list of case notes grouped by type and offender
-   * @description Retrieves list of case notes grouped by type and offender<p>This endpoint uses the REPLICA database.</p>
+   * @description Retrieves list of case notes grouped by type and offender. Requires role VIEW_CASE_NOTES<p>This endpoint uses the REPLICA database.</p>
    */
   getCaseNoteUsageSummaryByPost: {
     requestBody: {
@@ -14629,7 +14642,7 @@ export interface operations {
   }
   /**
    * Retrieves list of case notes grouped by types, bookings and from dates
-   * @description Retrieves list of case notes grouped by type/sub and offender<p>This endpoint uses the REPLICA database.</p>
+   * @description Retrieves list of case notes grouped by type/sub and offender. Requires role VIEW_CASE_NOTES<p>This endpoint uses the REPLICA database.</p>
    */
   getCaseNoteUsageSummaryByDates: {
     requestBody: {
@@ -14647,56 +14660,8 @@ export interface operations {
     }
   }
   /**
-   * Count of case notes
-   * @description Count of case notes<p>This endpoint uses the REPLICA database.</p>
-   */
-  getCaseNoteStaffUsageSummary: {
-    parameters: {
-      query: {
-        /** @description a list of staffId numbers to use. */
-        staffId: string[]
-        /** @description Number of month to look forward (if fromDate only defined), or back (if toDate only defined). Default is 1 month */
-        numMonths?: number
-        /** @description Only case notes occurring on or after this date (in YYYY-MM-DD format) will be considered.  If not defined then the numMonth before the current date, unless a toDate is defined when it will be numMonths before toDate */
-        fromDate?: string
-        /** @description Only case notes occurring on or before this date (in YYYY-MM-DD format) will be considered. If not defined then the current date will be used, unless a fromDate is defined when it will be numMonths after fromDate */
-        toDate?: string
-        /** @description Case note type. */
-        type?: string
-        /** @description Case note sub-type. */
-        subType?: string
-      }
-    }
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['CaseNoteStaffUsage'][]
-        }
-      }
-      /** @description Invalid request. */
-      400: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Requested resource not found. */
-      404: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Unrecoverable error occurred whilst processing request. */
-      500: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  /**
    * Retrieves list of case notes grouped by type/sub-type and staff
-   * @description Retrieves list of case notes grouped by type/sub-type and staff<p>This endpoint uses the REPLICA database.</p>
+   * @description Retrieves list of case notes grouped by type/sub-type and staff. Requires role VIEW_CASE_NOTES<p>This endpoint uses the REPLICA database.</p>
    */
   getCaseNoteStaffUsageSummaryByPost: {
     requestBody: {
@@ -14801,7 +14766,7 @@ export interface operations {
   }
   /**
    * Personal Care Needs
-   * @description Personal Care Need
+   * @description Personal Care Need. Requires booking access (via caseload) or GLOBAL_SEARCH or VIEW_PRISONER_DATA role.
    */
   getPersonalCareNeeds_1: {
     parameters: {
@@ -16635,10 +16600,10 @@ export interface operations {
   getAllRolesForAgency: {
     parameters: {
       path: {
-        /** @description The staff id of the staff member. */
-        staffId: number
         /** @description Agency Id. */
         agencyId: string
+        /** @description The staff id of the staff member. */
+        staffId: number
       }
     }
     responses: {
@@ -16676,15 +16641,15 @@ export interface operations {
     parameters: {
       path: {
         /**
-         * @description The staff id of the staff member.
-         * @example 1111111
-         */
-        staffId: number
-        /**
          * @description Agency Id.
          * @example MDI
          */
         agencyId: string
+        /**
+         * @description The staff id of the staff member.
+         * @example 1111111
+         */
+        staffId: number
         /**
          * @description Type of role
          * @example KW
@@ -17332,7 +17297,7 @@ export interface operations {
   }
   /**
    * List of offenders globally matching the offenderNo.
-   * @description List of offenders globally matching the offenderNo, restricted by the VIEW_PRISONER_DATA or SYSTEM_USER role. Returns an empty array if no results are found or if does not have correct permissions
+   * @description List of offenders globally matching the offenderNo, Requires offender agency to be in user caseload or VIEW_PRISONER_DATA role. Returns an empty array if no results are found or if does not have correct permissions
    */
   getPrisonersOffenderNo: {
     parameters: {
@@ -17400,7 +17365,7 @@ export interface operations {
    *     results.
    *     This is an internal endpoint used by Prisoner Search to ensure that NOMIS and OpenSearch are in sync.
    *     Other services should use Prisoner Search instead to get the list of prisoners.
-   *     Requires PRISONER_INDEX role.
+   *     Requires PRISONER_INDEX or GLOBAL_SEARCH role.
    *
    * @description <p>This endpoint uses the REPLICA database.</p>
    */
@@ -17477,7 +17442,7 @@ export interface operations {
   }
   /**
    * The phone numbers for person
-   * @description The phone numbers for person
+   * @description Requires role ROLE_VIEW_CONTACTS
    */
   getPersonPhones: {
     parameters: {
@@ -17515,7 +17480,7 @@ export interface operations {
   }
   /**
    * The most recent value of each type of person identifier
-   * @description The most recent value of each type of person identifier
+   * @description Requires role ROLE_VIEW_CONTACTS
    */
   getPersonIdentifiers: {
     parameters: {
@@ -17553,7 +17518,7 @@ export interface operations {
   }
   /**
    * The emails for person
-   * @description The emails for person
+   * @description Requires role ROLE_VIEW_CONTACTS
    */
   getPersonEmails: {
     parameters: {
@@ -17591,7 +17556,7 @@ export interface operations {
   }
   /**
    * The addresses for person
-   * @description The addresses for person
+   * @description Requires role ROLE_VIEW_CONTACTS
    */
   getPersonAddresses: {
     parameters: {
@@ -18052,7 +18017,7 @@ export interface operations {
   }
   /**
    * Return a set Incidents for a given offender No.
-   * @description Can be filtered by participation type and incident type
+   * @description Can be filtered by participation type and incident type. Requires the VIEW_INCIDENTS role.
    */
   getIncidentsByOffenderNo: {
     parameters: {
@@ -18535,7 +18500,10 @@ export interface operations {
       }
     }
   }
-  /** Sentence term details for a prisoner */
+  /**
+   * Sentence term details for a prisoner
+   * @description Requires booking access (via caseload) or GLOBAL_SEARCH or VIEW_PRISONER_DATA role.
+   */
   getOffenderSentenceTerms: {
     parameters: {
       query?: {
@@ -18656,7 +18624,10 @@ export interface operations {
       }
     }
   }
-  /** Retrieves CSRAs for the given offender, ordered by the latest first. */
+  /**
+   * Retrieves CSRAs for the given offender, ordered by the latest first.
+   * @description Requires offender in the caseload, or GLOBAL_SEARCH or VIEW_PRISONER_DATA role.
+   */
   getOffenderCsraAssessments: {
     parameters: {
       path: {
@@ -18685,7 +18656,10 @@ export interface operations {
       }
     }
   }
-  /** Retrieves details of a single CSRA assessment. */
+  /**
+   * Retrieves details of a single CSRA assessment.
+   * @description Requires offender in the caseload, or GLOBAL_SEARCH or VIEW_PRISONER_DATA role.
+   */
   getOffenderCsraAssessment: {
     parameters: {
       path: {
@@ -18718,7 +18692,7 @@ export interface operations {
   }
   /**
    * Returns category information on Offenders at a prison.
-   * @description <p>This endpoint uses the REPLICA database.</p>
+   * @description Requires offender in the caseload, or VIEW_ASSESSMENTS role.<p>This endpoint uses the REPLICA database.</p>
    */
   getOffenderCategorisations: {
     parameters: {
@@ -18747,6 +18721,38 @@ export interface operations {
       200: {
         content: {
           'application/json': components['schemas']['OffenderCategorise'][]
+        }
+      }
+    }
+  }
+  /**
+   * Returns assessment information on Offenders at a prison.
+   * @description Requires VIEW_PRISONER_DATA role.<p>This endpoint uses the REPLICA database.</p>
+   */
+  getAssessments: {
+    parameters: {
+      query: {
+        /** @description The required offender numbers Ids (mandatory) */
+        offenderNo: string[]
+        /** @description Returns only assessments for the current sentence if true, otherwise assessments for all previous sentences are included */
+        latestOnly?: boolean
+        /** @description Returns only active assessments if true, otherwise inactive and pending assessments are included */
+        activeOnly?: boolean
+        /** @description Returns only the last assessment per sentence if true, otherwise all assessments for the booking are included */
+        mostRecentOnly?: boolean
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          'application/json': components['schemas']['Assessment'][]
+        }
+      }
+      /** @description Invalid request - e.g. no offender numbers provided. */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
         }
       }
     }
@@ -19666,7 +19672,7 @@ export interface operations {
   }
   /**
    * Image detail (with image data).
-   * @description Image detail (with image data).
+   * @description Requires role VIEW_PRISONER_DATA.
    */
   getImage: {
     parameters: {
@@ -19704,7 +19710,7 @@ export interface operations {
   }
   /**
    * Image data (as bytes).
-   * @description Image data (as bytes).
+   * @description Requires role VIEW_PRISONER_DATA.
    */
   getImageData: {
     parameters: {
@@ -19991,48 +19997,6 @@ export interface operations {
       }
       /** @description Requested resource not found. */
       404: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Unrecoverable error occurred whilst processing request. */
-      500: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  /**
-   * Fetch all case notes of a given type since a given date
-   * @description Returns all case notes - consumed by Delius<br/>These are generated by  whenever a case note is created or amended for an offender.<br/>*Note:* An alternative call [GET /case_notes/for_delius](#case-notes-feed-fetch-case-notes-direct-get) has been created for performance reasons.<br/>Some case notes are automatically generated by the system in response to an action relating to the offender e.g. An alert being raised or a prison transfer.<br/>The note type only filters at the top note type level not the sub type.<br/>note_type can be presented multiples times in the URL to filter by multiple note types.
-   */
-  getCaseNotesEvents: {
-    parameters: {
-      query: {
-        /**
-         * @description a list of types and optionally subtypes (joined with +) to search.
-         * @example ACP+ASSESSMENT
-         */
-        type: string[]
-        /** @description Only case notes occurring on or after this date and time (ISO 8601 format without timezone e.g. YYYY-MM-DDTHH:MM:SS) will be considered. */
-        createdDate: string
-        /**
-         * @description Number of events to return
-         * @example 100
-         */
-        limit: number
-      }
-    }
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['CaseNoteEvent'][]
-        }
-      }
-      /** @description Invalid request. */
-      400: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
@@ -20389,7 +20353,7 @@ export interface operations {
   }
   /**
    * Reasonable Adjustment Information
-   * @description Reasonable Adjustment Information
+   * @description Reasonable Adjustment Information. Requires booking access (via caseload) or GLOBAL_SEARCH or VIEW_PRISONER_DATA role.
    */
   getReasonableAdjustments: {
     parameters: {
@@ -20524,44 +20488,6 @@ export interface operations {
       200: {
         content: {
           'application/json': components['schemas']['OffenceDetail'][]
-        }
-      }
-      /** @description Invalid request. */
-      400: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Requested resource not found. */
-      404: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Unrecoverable error occurred whilst processing request. */
-      500: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  /**
-   * Image detail (without image data).
-   * @description Image detail (without image data).<p>This endpoint uses the REPLICA database.</p>
-   */
-  getMainImageForBookings: {
-    parameters: {
-      path: {
-        /** @description The booking id of offender */
-        bookingId: number
-      }
-    }
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['ImageDetail']
         }
       }
       /** @description Invalid request. */
@@ -21110,9 +21036,9 @@ export interface operations {
   }
   /**
    * Assessment Information
-   * @description Assessment Information
+   * @description Assessment Information. Requires booking access (via caseload) or VIEW_ASSESSMENTS role.
    */
-  getAssessments: {
+  getAssessments_1: {
     parameters: {
       path: {
         /** @description The offender booking id */
@@ -21124,46 +21050,6 @@ export interface operations {
       200: {
         content: {
           'application/json': components['schemas']['Assessment'][]
-        }
-      }
-      /** @description Invalid request. */
-      400: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Requested resource not found. */
-      404: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Unrecoverable error occurred whilst processing request. */
-      500: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  /**
-   * Offender assessment detail.
-   * @description Offender assessment detail.
-   */
-  getAssessmentByCode: {
-    parameters: {
-      path: {
-        /** @description The booking id of offender */
-        bookingId: number
-        /** @description Assessment Type Code */
-        assessmentCode: string
-      }
-    }
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['Assessment']
         }
       }
       /** @description Invalid request. */

@@ -23,6 +23,7 @@ import sessionCheckMiddleware from '../middleware/sessionCheckMiddleware'
 import type { Services } from '../services'
 import eventAuditTypes from '../constants/eventAuditTypes'
 import { requestMethodDescriptions, requestMethodsCancellation } from '../constants/requestMethods'
+import { notificationTypeWarnings } from '../constants/notificationEventTypes'
 
 const A_DAY_IN_MS = 24 * 60 * 60 * 1000
 const CANCELLATION_LIMIT_DAYS = 28
@@ -62,11 +63,10 @@ export default function routes({
 
   get('/:reference', async (req, res) => {
     const reference = getVisitReference(req)
-    const fromVisitSearch = (req.query?.from as string) === 'visit-search'
+    const fromPage = typeof req.query?.from === 'string' ? req.query.from : null
     const fromVisitSearchQuery = req.query?.query as string
-    const selectedTab = req.query?.tab as string
 
-    const { visitHistoryDetails, visitors, additionalSupport } = await visitService.getFullVisitDetails({
+    const { visitHistoryDetails, visitors, notifications, additionalSupport } = await visitService.getFullVisitDetails({
       reference,
       username: res.locals.user.username,
     })
@@ -82,7 +82,6 @@ export default function routes({
       return res.render('pages/visit/summary', {
         visit: { reference: visit.reference },
         visitPrisonName: supportedPrisons[visit.prisonId],
-        selectedTab,
       })
     }
 
@@ -112,14 +111,15 @@ export default function routes({
       visit,
       filteredVisitHistoryDetails,
       visitors,
+      notifications,
+      notificationTypeWarnings,
       additionalSupport,
-      fromVisitSearch,
+      fromPage,
       fromVisitSearchQuery,
       showUpdate,
       showCancel,
       eventAuditTypes,
       requestMethodDescriptions,
-      selectedTab,
     })
   })
 
@@ -424,6 +424,9 @@ function getVisitReference(req: Request): string {
 }
 
 function getPrisonerLocation(supportedPrisonIds: string[], prisoner: Prisoner) {
+  if (prisoner.prisonId === 'OUT') {
+    return prisoner.locationDescription
+  }
   return supportedPrisonIds.includes(prisoner.prisonId) ? `${prisoner.cellLocation}, ${prisoner.prisonName}` : 'Unknown'
 }
 

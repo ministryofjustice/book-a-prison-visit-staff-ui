@@ -22,8 +22,10 @@
 {% set pageTitle = applicationName + " - " + pageHeaderTitle + " - " + visit.reference %}
 
 {% if prisoner %}
-  {% if fromVisitSearch %}
+  {% if fromPage == 'visit-search' %}
     {% set backLinkHref = "/visits?" + fromVisitSearchQuery %}
+  {% elseif fromPage == 'review' %}
+    {% set backLinkHref = "/review" %}
   {% else %}
     {% set backLinkHref = "/prisoner/" + visit.prisonerId + "/visits" %}
   {% endif %}
@@ -42,16 +44,18 @@
         {% set status = visit.outcomeStatus.split("_") %}
         {%- for visitNote in visit.visitNotes %}
           {% if visitNote.type == "VISIT_OUTCOMES" %}
-
+            
             {% set cancelledBy %}
               {% if status[0] === 'ADMINISTRATIVE' %}
                 {{- 'This visit was cancelled due to an administrative error with the booking.' -}}
+              {% elseif status[0] === 'DETAILS' %}
+                {{- 'This visit was cancelled as the details changed after booking.' -}}
               {% else %}
                 {{- 'This visit was cancelled by the ' + status[0] | lower + '.' -}}
               {% endif %}
             {% endset %}
 
-            {% set cancelledVisitHtml %}
+            {% set cancelledVisitBannerHtml %}
               {{ govukWarningText({
                 classes: "govuk-!-margin-bottom-0 govuk-!-padding-left-4",
                 html: '<span data-test="visit-cancelled-type">' + cancelledBy + "</span>" +
@@ -62,10 +66,27 @@
 
             {{ mojBanner({
               classes: "govuk-!-padding-left-4",
-              html: cancelledVisitHtml
+              html: cancelledVisitBannerHtml
             }) }}
 
           {% endif %}
+        {% endfor %}
+      {% endif %}
+
+      {%if notifications | length %}
+        {% for notification in notifications %}
+          {% set visitNotificationBannerHtml %}
+            {{ govukWarningText({
+              classes: "govuk-!-margin-bottom-0 govuk-!-padding-left-4",
+              html: '<span data-test="visit-notification">' + notificationTypeWarnings[notification] + "</span>",
+              iconFallbackText: "Warning"
+            }) }}
+          {% endset %}
+
+          {{ mojBanner({
+            classes: "govuk-!-padding-left-4",
+            html: visitNotificationBannerHtml
+          }) }}
         {% endfor %}
       {% endif %}
 
