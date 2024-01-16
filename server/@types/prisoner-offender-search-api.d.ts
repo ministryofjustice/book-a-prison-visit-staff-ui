@@ -283,8 +283,8 @@ export interface components {
       pageSize?: number
       /** Format: int32 */
       pageNumber?: number
-      paged?: boolean
       unpaged?: boolean
+      paged?: boolean
     }
     Prisoner: {
       /**
