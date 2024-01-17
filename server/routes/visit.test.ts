@@ -190,9 +190,10 @@ describe('/visit/:reference', () => {
           // booking history - tab selected - check information displayed
           // first event
           expect($('[data-test="visit-event-1"]').text()).toBe('Needs review')
-          expect($('[data-test="visit-actioned-by-1"]').text().trim().replace(/\s+/g, ' ')).toBe('') // no actioned by on needs review event
+          expect($('[data-test="visit-actioned-by-1"]').text().trim()).toBe('') // no actioned by on needs review event
           expect($('[data-test="visit-event-date-time-1"]').text()).toBe('Saturday 1 January 2022 at 11am')
-          expect($('[data-test="visit-request-method-1"]').text()).toBe('') // no request method on needs review event
+          expect($('[data-test="visit-request-method-1"]').length).toBe(0) // no request method on needs review event
+          expect($('[data-test="visit-needs-review-description-1"]').text()).toBe('Reason: Non-association')
           // second event
           expect($('[data-test="visit-event-2"]').text()).toBe('Updated')
           expect($('[data-test="visit-actioned-by-2"]').text().trim().replace(/\s+/g, ' ')).toBe('by User Two')
