@@ -189,15 +189,20 @@ describe('/visit/:reference', () => {
           expect($('[data-test="additional-support"]').text()).toContain('Wheelchair ramp, custom request')
           // booking history - tab selected - check information displayed
           // first event
-          expect($('[data-test="visit-event-1"]').text()).toBe('Visit updated')
-          expect($('[data-test="visit-actioned-by-1"]').text().trim().replace(/\s+/g, ' ')).toBe('by User Two')
-          expect($('[data-test="visit-event-date-time-1"]').text()).toBe('Saturday 1 January 2022 at 10am')
-          expect($('[data-test="visit-request-method-1"]').text()).toBe('Email request')
+          expect($('[data-test="visit-event-1"]').text()).toBe('Needs review')
+          expect($('[data-test="visit-actioned-by-1"]').text().trim().replace(/\s+/g, ' ')).toBe('') // no actioned by on needs review event
+          expect($('[data-test="visit-event-date-time-1"]').text()).toBe('Saturday 1 January 2022 at 11am')
+          expect($('[data-test="visit-request-method-1"]').text()).toBe('') // no request method on needs review event
           // second event
-          expect($('[data-test="visit-event-2"]').text()).toBe('Visit booked')
-          expect($('[data-test="visit-actioned-by-2"]').text().trim().replace(/\s+/g, ' ')).toBe('by User One')
-          expect($('[data-test="visit-event-date-time-2"]').text()).toBe('Saturday 1 January 2022 at 9am')
-          expect($('[data-test="visit-request-method-2"]').text()).toBe('Phone call request')
+          expect($('[data-test="visit-event-2"]').text()).toBe('Updated')
+          expect($('[data-test="visit-actioned-by-2"]').text().trim().replace(/\s+/g, ' ')).toBe('by User Two')
+          expect($('[data-test="visit-event-date-time-2"]').text()).toBe('Saturday 1 January 2022 at 10am')
+          expect($('[data-test="visit-request-method-2"]').text()).toBe('Request method: Email')
+          // third event
+          expect($('[data-test="visit-event-3"]').text()).toBe('Booked')
+          expect($('[data-test="visit-actioned-by-3"]').text().trim().replace(/\s+/g, ' ')).toBe('by User One')
+          expect($('[data-test="visit-event-date-time-3"]').text()).toBe('Saturday 1 January 2022 at 9am')
+          expect($('[data-test="visit-request-method-3"]').text()).toBe('Request method: Phone call')
 
           expect(visitSessionData).toEqual({ prisoner: undefined })
 
@@ -543,7 +548,7 @@ describe('/visit/:reference', () => {
               'This visit was cancelled as the details changed after booking.',
             )
             expect($('[data-test="visit-cancelled-reason"]').text()).toBe('Reason: no longer required')
-            expect($('[data-test="visit-event-1"]').text().trim().replace(/\s+/g, ' ')).toBe('Visit cancelled')
+            expect($('[data-test="visit-event-1"]').text().trim().replace(/\s+/g, ' ')).toBe('Cancelled')
             expect($('[data-test="visit-actioned-by-1"]').text().trim().replace(/\s+/g, ' ')).toBe('by User Three')
             expect($('[data-test="visit-event-date-time-1"]').text().trim().replace(/\s+/g, ' ')).toBe(
               'Saturday 1 January 2022 at 11am',
@@ -572,7 +577,7 @@ describe('/visit/:reference', () => {
             const $ = cheerio.load(res.text)
             expect($('[data-test="visit-cancelled-type"]').text()).toBe('This visit was cancelled by the visitor.')
             expect($('[data-test="visit-cancelled-reason"]').text()).toBe('Reason: no longer required')
-            expect($('[data-test="visit-event-1"]').text().trim().replace(/\s+/g, ' ')).toBe('Visit cancelled')
+            expect($('[data-test="visit-event-1"]').text().trim().replace(/\s+/g, ' ')).toBe('Cancelled')
             expect($('[data-test="visit-actioned-by-1"]').text().trim().replace(/\s+/g, ' ')).toBe('by User Three')
             expect($('[data-test="visit-event-date-time-1"]').text().trim().replace(/\s+/g, ' ')).toBe(
               'Saturday 1 January 2022 at 11am',

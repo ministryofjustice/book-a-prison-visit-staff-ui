@@ -24,7 +24,11 @@ import RequestMethod from './visitJourney/requestMethod'
 import sessionCheckMiddleware from '../middleware/sessionCheckMiddleware'
 import getPrisonConfiguration from '../constants/prisonConfiguration'
 import type { Services } from '../services'
-import eventAuditTypes from '../constants/eventAuditTypes'
+import {
+  eventAuditTypesOriginal,
+  eventAuditTypesWithReview,
+  needsReviewDescriptions,
+} from '../constants/eventAuditTypes'
 import { requestMethodDescriptions, requestMethodsCancellation } from '../constants/requestMethods'
 import { notificationTypeWarnings } from '../constants/notificationEventTypes'
 
@@ -69,6 +73,8 @@ export default function routes({
     const reference = getVisitReference(req)
     const fromPage = typeof req.query?.from === 'string' ? req.query.from : null
     const fromVisitSearchQuery = req.query?.query as string
+
+    const eventAuditTypes = config.features.reviewBookings ? eventAuditTypesWithReview : eventAuditTypesOriginal
 
     const { visitHistoryDetails, visitors, notifications, additionalSupport } = await visitService.getFullVisitDetails({
       reference,
@@ -122,8 +128,9 @@ export default function routes({
       fromVisitSearchQuery,
       showUpdate,
       showCancel,
-      eventAuditTypes,
       requestMethodDescriptions,
+      eventAuditTypes,
+      needsReviewDescriptions: config.features.reviewBookings ? needsReviewDescriptions : null,
     })
   })
 
