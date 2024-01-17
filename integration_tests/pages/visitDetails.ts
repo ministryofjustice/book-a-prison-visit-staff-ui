@@ -77,4 +77,6 @@ export default class VisitDetailsPage extends Page {
   eventTime = (index: number): PageElement => cy.get(`[data-test="visit-event-date-time-${index}"]`)
 
   requestMethod = (index: number): PageElement => cy.get(`[data-test="visit-request-method-${index}"]`)
+
+  needsReview = (index: number): PageElement => cy.get(`[data-test="visit-needs-review-description-${index}"]`)
 }
