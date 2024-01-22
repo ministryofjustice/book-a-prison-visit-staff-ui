@@ -90,8 +90,6 @@ export default function routes({
         visitPrisonName: supportedPrisons[visit.prisonId],
       })
     }
-    console.log(filteredVisitHistoryDetails)
-    console.log(visit.visitNotes)
 
     const prisoner: Prisoner = await prisonerSearchService.getPrisonerById(visit.prisonerId, res.locals.user.username)
     const supportedPrisonIds = await supportedPrisonsService.getSupportedPrisonIds(res.locals.user.username)
