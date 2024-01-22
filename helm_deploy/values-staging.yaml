@@ -21,7 +21,6 @@ generic-service:
     PRISON_REGISTER_API_URL: "https://prison-register-dev.hmpps.service.justice.gov.uk"
     DPS_URL: "https://digital-dev.prison.service.justice.gov.uk/"
     APPLICATIONINSIGHTS_CONNECTION_STRING: null # disable App Insights for staging
-    SMS_NOTIFICATIONS_ENABLED: "true"
     REDIS_KEY: "bapv-staff-staging"
     FEATURE_REVIEW_BOOKINGS: "true"
 

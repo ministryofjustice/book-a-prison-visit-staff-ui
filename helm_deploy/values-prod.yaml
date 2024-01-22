@@ -21,7 +21,6 @@ generic-service:
     WHEREABOUTS_API_URL: "https://whereabouts-api.service.justice.gov.uk"
     PRISON_REGISTER_API_URL: "https://prison-register.hmpps.service.justice.gov.uk"
     DPS_URL: "https://digital.prison.service.justice.gov.uk/"
-    SMS_NOTIFICATIONS_ENABLED: "true"
     REDIS_KEY: "bapv-staff-prod"
     FEATURE_REVIEW_BOOKINGS: "false"
 
