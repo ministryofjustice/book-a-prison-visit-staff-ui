@@ -9,8 +9,6 @@ export default class VisitDetailsPage extends Page {
 
   cancellationType = (): PageElement => cy.get('[data-test="visit-cancelled-type')
 
-  cancellationReason = (): PageElement => cy.get('[data-test="visit-cancelled-reason')
-
   visitNotification = (index: number): PageElement => cy.get('[data-test="visit-notification').eq(index)
 
   // Buttons
@@ -79,4 +77,6 @@ export default class VisitDetailsPage extends Page {
   requestMethod = (index: number): PageElement => cy.get(`[data-test="visit-request-method-${index}"]`)
 
   needsReview = (index: number): PageElement => cy.get(`[data-test="visit-needs-review-description-${index}"]`)
+
+  cancellationReason = (): PageElement => cy.get('[data-test="visit-cancelled-reason-1')
 }

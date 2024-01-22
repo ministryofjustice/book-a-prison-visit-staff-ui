@@ -3,7 +3,7 @@ import TestData from '../../server/routes/testutils/testData'
 import Page from '../pages/page'
 import VisitDetailsPage from '../pages/visitDetails'
 import { NotificationType } from '../../server/data/orchestrationApiTypes'
-import { notificationTypeWarnings } from '../../server/constants/notificationEventTypes'
+import { notificationTypeWarnings } from '../../server/constants/notificationEvents'
 
 context('Visit details page', () => {
   const shortDateFormat = 'yyyy-MM-dd'
@@ -52,7 +52,6 @@ context('Visit details page', () => {
     visitDetailsPage.visitReference().contains('ab-cd-ef-gh')
 
     visitDetailsPage.cancellationType().contains('This visit was cancelled by the visitor.')
-    visitDetailsPage.cancellationReason().contains('Reason: Illness')
 
     visitDetailsPage.updateBooking().should('have.length', 0)
     visitDetailsPage.cancelBooking().should('have.length', 0)

@@ -24,13 +24,9 @@ import RequestMethod from './visitJourney/requestMethod'
 import sessionCheckMiddleware from '../middleware/sessionCheckMiddleware'
 import getPrisonConfiguration from '../constants/prisonConfiguration'
 import type { Services } from '../services'
-import {
-  eventAuditTypesOriginal,
-  eventAuditTypesWithReview,
-  needsReviewDescriptions,
-} from '../constants/eventAuditTypes'
+import { eventAuditTypesOriginal, eventAuditTypesWithReview } from '../constants/eventAuditTypes'
 import { requestMethodDescriptions, requestMethodsCancellation } from '../constants/requestMethods'
-import { notificationTypeWarnings } from '../constants/notificationEventTypes'
+import { notificationTypeWarnings, notificationTypes } from '../constants/notificationEvents'
 
 const A_DAY_IN_MS = 24 * 60 * 60 * 1000
 const CANCELLATION_LIMIT_DAYS = 28
@@ -94,6 +90,8 @@ export default function routes({
         visitPrisonName: supportedPrisons[visit.prisonId],
       })
     }
+    console.log(filteredVisitHistoryDetails)
+    console.log(visit.visitNotes)
 
     const prisoner: Prisoner = await prisonerSearchService.getPrisonerById(visit.prisonerId, res.locals.user.username)
     const supportedPrisonIds = await supportedPrisonsService.getSupportedPrisonIds(res.locals.user.username)
@@ -130,7 +128,7 @@ export default function routes({
       showCancel,
       requestMethodDescriptions,
       eventAuditTypes,
-      needsReviewDescriptions: config.features.reviewBookings ? needsReviewDescriptions : null,
+      notificationTypes: config.features.reviewBookings ? notificationTypes : null,
     })
   })
 

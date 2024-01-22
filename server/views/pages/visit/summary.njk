@@ -62,8 +62,7 @@
             {% set cancelledVisitBannerHtml %}
               {{ govukWarningText({
                 classes: "govuk-!-margin-bottom-0 govuk-!-padding-left-4",
-                html: '<span data-test="visit-cancelled-type">' + cancelledBy + "</span>" +
-                  '<br><span data-test="visit-cancelled-reason">Reason: ' + cancelledVisitReason + "</span>",
+                html: '<span data-test="visit-cancelled-type">' + cancelledBy + '</span>',
                 iconFallbackText: "Warning"
               }) }}
             {% endset %}
@@ -271,9 +270,12 @@
                     <p data-test="visit-request-method-{{ loop.index }}">{{ requestMethodDescriptions[event.applicationMethodType] }}</p>
                   {% elif event.type === 'CANCELLED_VISIT' %}
                     <p data-test="visit-cancelled-reason-{{ loop.index }}">Reason: {{ cancelledVisitReason }}</p>
+                    {% if event.applicationMethodType !== 'NOT_KNOWN' and event.applicationMethodType !== 'NOT_APPLICABLE' %}
+                      <p data-test="visit-cancelled-request-method-{{ loop.index }}">{{ requestMethodDescriptions[event.applicationMethodType] }}</p>
+                    {% endif %}
                   {% else %}
-                    {% if needsReviewDescriptions %}
-                      <p data-test="visit-needs-review-description-{{ loop.index }}">{{ needsReviewDescriptions[event.type] }}</p>
+                    {% if notificationTypes %}
+                      <p data-test="visit-needs-review-description-{{ loop.index }}">Reason: {{ notificationTypes[event.type] }}</p>
                     {% endif %}
                   {% endif %}
 

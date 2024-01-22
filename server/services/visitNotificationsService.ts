@@ -1,5 +1,5 @@
 import { FilterField, VisitsReviewListItem } from '../@types/bapv'
-import { notificationTypes } from '../constants/notificationEventTypes'
+import { notificationTypes } from '../constants/notificationEvents'
 import { HmppsAuthClient, OrchestrationApiClient, RestClientBuilder } from '../data'
 import { NotificationCount, NotificationGroup } from '../data/orchestrationApiTypes'
 import { prisonerDateTimePretty } from '../utils/utils'
