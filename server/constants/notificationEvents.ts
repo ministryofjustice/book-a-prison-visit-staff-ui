@@ -20,5 +20,5 @@ export const notificationTypeWarnings: Readonly<Record<NotificationType, string>
   PRISONER_RELEASED_EVENT: 'This booking should be cancelled as the prisoner has been released.',
   PRISONER_RESTRICTION_CHANGE_EVENT: 'A new visit time should be selected as the visit type has changed.',
   PRISON_VISITS_BLOCKED_FOR_DATE:
-    'A new visit time should be selected as the date is no longer available for social visits',
+    'A new visit time should be selected as the date is no longer available for social visits.',
 }
