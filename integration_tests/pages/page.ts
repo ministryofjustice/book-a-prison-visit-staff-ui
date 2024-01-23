@@ -1,3 +1,4 @@
+import type axe from 'axe-core'
 import logAccessibilityViolations from '../support/logAccessibilityViolations'
 
 export type PageElement = Cypress.Chainable<JQuery>
@@ -13,14 +14,13 @@ export default abstract class Page {
 
   constructor(
     private readonly title: string,
-    private readonly options: { axeTest?: boolean } = {
+    private readonly options: { axeTest?: boolean; axeRulesToIgnore?: string[] } = {
       axeTest: true,
     },
   ) {
     this.checkOnPage()
-
-    if (options.axeTest) {
-      this.runAxe()
+    if (options.axeTest || options.axeRulesToIgnore?.length) {
+      this.runAxe(options.axeRulesToIgnore)
     }
   }
 
@@ -28,14 +28,18 @@ export default abstract class Page {
     cy.get('h1').contains(this.title)
   }
 
-  runAxe = (): void => {
+  runAxe = (axeRulesToIgnore: string[] = []): void => {
+    const rules: axe.RuleObject = axeRulesToIgnore.reduce((acc, cur) => {
+      acc[cur] = { enabled: false }
+      return acc
+    }, {})
+
     cy.injectAxe()
     cy.checkA11y(
       null,
-      null,
+      { rules },
       logAccessibilityViolations,
-      // @TODO remove skipFailures when outstanding issues fixed!
-      true, // skipFailures
+      false, // skipFailures
     )
   }
 
