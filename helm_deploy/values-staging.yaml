@@ -21,7 +21,6 @@ generic-service:
     PRISON_REGISTER_API_URL: "https://prison-register-dev.hmpps.service.justice.gov.uk"
     DPS_URL: "https://digital-dev.prison.service.justice.gov.uk/"
     APPLICATIONINSIGHTS_CONNECTION_STRING: null # disable App Insights for staging
-    SMS_NOTIFICATIONS_ENABLED: "true"
     REDIS_KEY: "bapv-staff-staging"
     FEATURE_REVIEW_BOOKINGS: "true"
 
@@ -51,6 +50,7 @@ generic-service:
     circleci-19: 54.205.138.102/32
     circleci-20: 54.208.72.234/32
     circleci-21: 54.209.115.53/32
+    uservision: 5.181.59.114
     groups:
       - internal
       - prisons

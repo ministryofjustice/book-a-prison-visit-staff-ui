@@ -295,7 +295,7 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
   SDI: {
     prisonPhoneNumber: '0300 060 6514',
     selectVisitorsText: [
-      'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
+      'You can add up to a total of 4 people, with a maximum of 4 people aged 18 and over.',
       'At least one visitor must be 18 or older.',
     ],
   },
