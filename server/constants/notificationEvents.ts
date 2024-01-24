@@ -1,10 +1,10 @@
 import { NotificationType } from '../data/orchestrationApiTypes'
 
 export const notificationTypes: Readonly<Record<NotificationType, string>> = {
-  NON_ASSOCIATION_EVENT: 'Non–association',
+  NON_ASSOCIATION_EVENT: 'Non-association',
   PRISONER_RELEASED_EVENT: 'Prisoner released',
   PRISONER_RESTRICTION_CHANGE_EVENT: 'Visit type changed',
-  PRISON_VISITS_BLOCKED_FOR_DATE: 'No visits that day',
+  PRISON_VISITS_BLOCKED_FOR_DATE: 'Time slot removed',
 }
 
 export const notificationTypeReasons: Readonly<Record<NotificationType, string>> = {
@@ -20,5 +20,5 @@ export const notificationTypeWarnings: Readonly<Record<NotificationType, string>
   PRISONER_RELEASED_EVENT: 'This booking should be cancelled as the prisoner has been released.',
   PRISONER_RESTRICTION_CHANGE_EVENT: 'A new visit time should be selected as the visit type has changed.',
   PRISON_VISITS_BLOCKED_FOR_DATE:
-    'A new visit time should be selected as the date is no longer available for social visits',
+    'A new visit time should be selected as the date is no longer available for social visits.',
 }
