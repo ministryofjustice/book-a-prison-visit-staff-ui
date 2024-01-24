@@ -7,10 +7,11 @@ export const notificationTypes: Readonly<Record<NotificationType, string>> = {
   PRISON_VISITS_BLOCKED_FOR_DATE: 'Time slot removed',
 }
 
-export const notificationTypeReasons: Readonly<Record<NotificationType, string>> = {
-  NON_ASSOCIATION_EVENT: 'there are non-associations',
+// export const notificationTypeReasons: Readonly<Record<NotificationType, string>> = {
+export const notificationTypeReasons: Partial<Readonly<Record<NotificationType, string>>> = {
+  // NON_ASSOCIATION_EVENT: 'there are non-associations',
   PRISONER_RELEASED_EVENT: 'the prisoner is released',
-  PRISONER_RESTRICTION_CHANGE_EVENT: 'the visit type has changed',
+  // PRISONER_RESTRICTION_CHANGE_EVENT: 'the visit type has changed',
   PRISON_VISITS_BLOCKED_FOR_DATE: 'the date is no longer available for social visits',
 }
 
