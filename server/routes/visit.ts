@@ -21,9 +21,9 @@ import MainContact from './visitJourney/mainContact'
 import RequestMethod from './visitJourney/requestMethod'
 import sessionCheckMiddleware from '../middleware/sessionCheckMiddleware'
 import type { Services } from '../services'
-import eventAuditTypes from '../constants/eventAuditTypes'
+import { eventAuditTypesOriginal, eventAuditTypesWithReview } from '../constants/eventAuditTypes'
 import { requestMethodDescriptions, requestMethodsCancellation } from '../constants/requestMethods'
-import { notificationTypeWarnings } from '../constants/notificationEventTypes'
+import { notificationTypeWarnings, notificationTypes } from '../constants/notificationEvents'
 
 const A_DAY_IN_MS = 24 * 60 * 60 * 1000
 const CANCELLATION_LIMIT_DAYS = 28
@@ -65,6 +65,8 @@ export default function routes({
     const reference = getVisitReference(req)
     const fromPage = typeof req.query?.from === 'string' ? req.query.from : null
     const fromVisitSearchQuery = req.query?.query as string
+
+    const eventAuditTypes = config.features.reviewBookings ? eventAuditTypesWithReview : eventAuditTypesOriginal
 
     const { visitHistoryDetails, visitors, notifications, additionalSupport } = await visitService.getFullVisitDetails({
       reference,
@@ -118,8 +120,9 @@ export default function routes({
       fromVisitSearchQuery,
       showUpdate,
       showCancel,
-      eventAuditTypes,
       requestMethodDescriptions,
+      eventAuditTypes,
+      notificationTypes: config.features.reviewBookings ? notificationTypes : null,
     })
   })
 

@@ -3,7 +3,7 @@ import TestData from '../../server/routes/testutils/testData'
 import Page from '../pages/page'
 import VisitDetailsPage from '../pages/visitDetails'
 import { NotificationType } from '../../server/data/orchestrationApiTypes'
-import { notificationTypeWarnings } from '../../server/constants/notificationEventTypes'
+import { notificationTypeWarnings } from '../../server/constants/notificationEvents'
 
 context('Visit details page', () => {
   const shortDateFormat = 'yyyy-MM-dd'
@@ -52,7 +52,6 @@ context('Visit details page', () => {
     visitDetailsPage.visitReference().contains('ab-cd-ef-gh')
 
     visitDetailsPage.cancellationType().contains('This visit was cancelled by the visitor.')
-    visitDetailsPage.cancellationReason().contains('Reason: Illness')
 
     visitDetailsPage.updateBooking().should('have.length', 0)
     visitDetailsPage.cancelBooking().should('have.length', 0)
@@ -173,13 +172,16 @@ context('Visit details page', () => {
 
     // Select history tab
     visitDetailsPage.selectHistoryTab()
-    visitDetailsPage.actionedBy(1).contains('User Two')
-    visitDetailsPage.eventHeader(1).contains('Visit updated')
-    visitDetailsPage.eventTime(1).contains('Saturday 1 January 2022 at 10am')
-    visitDetailsPage.requestMethod(1).contains('Email request')
-    visitDetailsPage.actionedBy(2).contains('User One')
-    visitDetailsPage.eventHeader(2).contains('Visit booked')
-    visitDetailsPage.eventTime(2).contains('Saturday 1 January 2022 at 9am')
-    visitDetailsPage.requestMethod(2).contains('Phone call request')
+    visitDetailsPage.eventHeader(1).contains('Needs review')
+    visitDetailsPage.eventTime(1).contains('Saturday 1 January 2022 at 11am')
+    visitDetailsPage.needsReview(1).contains('Reason: Non-association')
+    visitDetailsPage.actionedBy(2).contains('User Two')
+    visitDetailsPage.eventHeader(2).contains('Updated')
+    visitDetailsPage.eventTime(2).contains('Saturday 1 January 2022 at 10am')
+    visitDetailsPage.requestMethod(2).contains('Request method: Email')
+    visitDetailsPage.actionedBy(3).contains('User One')
+    visitDetailsPage.eventHeader(3).contains('Booked')
+    visitDetailsPage.eventTime(3).contains('Saturday 1 January 2022 at 9am')
+    visitDetailsPage.requestMethod(3).contains('Request method: Phone call')
   })
 })

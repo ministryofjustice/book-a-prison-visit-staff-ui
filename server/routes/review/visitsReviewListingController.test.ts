@@ -4,7 +4,7 @@ import * as cheerio from 'cheerio'
 import { appWithAllRoutes } from '../testutils/appSetup'
 import config from '../../config'
 import { createMockVisitNotificationsService } from '../../services/testutils/mocks'
-import { notificationTypeReasons, notificationTypes } from '../../constants/notificationEventTypes'
+import { notificationTypeReasons, notificationTypes } from '../../constants/notificationEvents'
 import { FilterField, VisitsReviewListItem } from '../../@types/bapv'
 
 let app: Express

@@ -435,6 +435,12 @@ export default class TestData {
         actionedBy: 'User Two',
         createTimestamp: '2022-01-01T10:00:00',
       },
+      {
+        type: 'NON_ASSOCIATION_EVENT',
+        applicationMethodType: 'NOT_APPLICABLE',
+        actionedBy: '',
+        createTimestamp: '2022-01-01T11:00:00',
+      },
     ],
     visit = this.visit(),
   }: Partial<VisitHistoryDetails> = {}): VisitHistoryDetails => ({

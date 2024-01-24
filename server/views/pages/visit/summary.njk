@@ -40,10 +40,14 @@
     <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
 
     {% if prisoner %}
+    {% set cancelledVisitReason = '' %}
+
       {% if visit.visitStatus === "CANCELLED" %}
+
         {% set status = visit.outcomeStatus.split("_") %}
         {%- for visitNote in visit.visitNotes %}
           {% if visitNote.type == "VISIT_OUTCOMES" %}
+          {% set cancelledVisitReason = visitNote.text %}
             
             {% set cancelledBy %}
               {% if status[0] === 'ADMINISTRATIVE' %}
@@ -58,8 +62,7 @@
             {% set cancelledVisitBannerHtml %}
               {{ govukWarningText({
                 classes: "govuk-!-margin-bottom-0 govuk-!-padding-left-4",
-                html: '<span data-test="visit-cancelled-type">' + cancelledBy + "</span>" +
-                  '<br><span data-test="visit-cancelled-reason">Reason: ' + visitNote.text + "</span>",
+                html: '<span data-test="visit-cancelled-type">' + cancelledBy + '</span>',
                 iconFallbackText: "Warning"
               }) }}
             {% endset %}
@@ -263,7 +266,19 @@
                 </p>
 
                 <div class="moj-timeline__description">
-                  <p data-test="visit-request-method-{{ loop.index }}">{{ requestMethodDescriptions[event.applicationMethodType] }}</p>
+                  {% if event.type === 'UPDATED_VISIT' or event.type === 'BOOKED_VISIT' or event.type === 'MIGRATED_VISIT' %}
+                    <p data-test="visit-request-method-{{ loop.index }}">{{ requestMethodDescriptions[event.applicationMethodType] }}</p>
+                  {% elif event.type === 'CANCELLED_VISIT' %}
+                    <p data-test="visit-cancelled-reason-{{ loop.index }}">Reason: {{ cancelledVisitReason }}</p>
+                    {% if event.applicationMethodType !== 'NOT_KNOWN' and event.applicationMethodType !== 'NOT_APPLICABLE' %}
+                      <p data-test="visit-cancelled-request-method-{{ loop.index }}">{{ requestMethodDescriptions[event.applicationMethodType] }}</p>
+                    {% endif %}
+                  {% else %}
+                    {% if notificationTypes %}
+                      <p data-test="visit-needs-review-description-{{ loop.index }}">Reason: {{ notificationTypes[event.type] }}</p>
+                    {% endif %}
+                  {% endif %}
+
                 </div>
 
               </div>

@@ -2,7 +2,11 @@ import Page, { PageElement } from './page'
 
 export default class CancelVisitPage extends Page {
   constructor() {
-    super('Why is this booking being cancelled?')
+    super('Why is this booking being cancelled?', {
+      // Known issue with radio conditional reveal. See:
+      // https://github.com/alphagov/govuk-frontend/issues/979
+      axeRulesToIgnore: ['aria-allowed-attr'],
+    })
   }
 
   // Cancellation reason radios
