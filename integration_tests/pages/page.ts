@@ -29,6 +29,7 @@ export default abstract class Page {
   }
 
   runAxe = (axeRulesToIgnore: string[] = []): void => {
+    // If passed, build set of axe rules to ignore for a particular page class
     const rules: axe.RuleObject = axeRulesToIgnore.reduce((acc, cur) => {
       acc[cur] = { enabled: false }
       return acc
