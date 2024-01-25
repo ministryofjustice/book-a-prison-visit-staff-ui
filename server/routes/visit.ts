@@ -10,7 +10,6 @@ import asyncMiddleware from '../middleware/asyncMiddleware'
 import { isValidVisitReference } from './validationChecks'
 import { clearSession, getFlashFormValues } from './visitorUtils'
 import config from '../config'
-import logger from '../../logger'
 import { VisitSessionData, VisitSlot } from '../@types/bapv'
 import SelectVisitors from './visitJourney/selectVisitors'
 import VisitType from './visitJourney/visitType'
@@ -22,7 +21,6 @@ import Confirmation from './visitJourney/confirmation'
 import MainContact from './visitJourney/mainContact'
 import RequestMethod from './visitJourney/requestMethod'
 import sessionCheckMiddleware from '../middleware/sessionCheckMiddleware'
-import getPrisonConfiguration from '../constants/prisonConfiguration'
 import type { Services } from '../services'
 import { eventAuditTypesOriginal, eventAuditTypesWithReview } from '../constants/eventAuditTypes'
 import { requestMethodDescriptions, requestMethodsCancellation } from '../constants/requestMethods'
@@ -34,7 +32,6 @@ const CANCELLATION_LIMIT_DAYS = 28
 export default function routes({
   additionalSupportService,
   auditService,
-  notificationsService,
   prisonerProfileService,
   prisonerSearchService,
   prisonerVisitorsService,
@@ -212,7 +209,7 @@ export default function routes({
   const additionalSupport = new AdditionalSupport('update', additionalSupportService)
   const mainContact = new MainContact('update')
   const requestMethod = new RequestMethod('update')
-  const checkYourBooking = new CheckYourBooking('update', auditService, notificationsService, visitService)
+  const checkYourBooking = new CheckYourBooking('update', auditService, visitService)
   const confirmation = new Confirmation('update')
 
   get(
@@ -410,28 +407,6 @@ export default function routes({
         username: res.locals.user.username,
         operationId: res.locals.appInsightsOperationId,
       })
-
-      if (config.apis.notifications.enabled) {
-        try {
-          const phoneNumber = visit.visitContact.telephone.replace(/\s/g, '')
-
-          const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(res.locals.user.username)
-          const prisonName = supportedPrisons[visit.prisonId]
-
-          const { prisonPhoneNumber } = getPrisonConfiguration(visit.prisonId)
-
-          await notificationsService.sendCancellationSms({
-            phoneNumber,
-            visitSlot: visit.startTimestamp,
-            prisonName,
-            prisonPhoneNumber,
-            reference,
-          })
-          logger.info(`Cancellation SMS sent for ${reference}`)
-        } catch (error) {
-          logger.error(`Failed to send Cancellation SMS for ${reference}`)
-        }
-      }
 
       req.flash('startTimestamp', visit.startTimestamp)
       req.flash('endTimestamp', visit.endTimestamp)

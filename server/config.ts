@@ -137,16 +137,6 @@ export default {
       ),
       serviceName: get('AUDIT_SERVICE_NAME', 'book-a-prison-visit-staff-ui', requiredInProduction),
     },
-    notifications: {
-      enabled: get('SMS_NOTIFICATIONS_ENABLED', 'false', requiredInProduction) === 'true',
-      key: get('GOVUK_NOTIFY_API_KEY', 'abcd', requiredInProduction),
-      templates: {
-        bookingConfirmation: '85904166-e539-43f5-9f51-7ba106cc61bd',
-        cancellationConfirmation: '42a995f2-abbc-474b-8563-ca2995529111',
-        cancellationConfirmationNoPrisonPhone: '3103b319-267d-4265-83a6-a38e93fc2342',
-        updateConfirmation: '386e83ff-5734-4d99-8279-b3eacb7cc8b8',
-      },
-    },
     orchestration: {
       url: get('ORCHESTRATION_API_URL', 'http://localhost:8080', requiredInProduction),
       timeout: {

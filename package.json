@@ -116,7 +116,6 @@
     "jquery": "^3.7.1",
     "jwt-decode": "^4.0.0",
     "nocache": "^4.0.0",
-    "notifications-node-client": "^7.0.6",
     "nunjucks": "^3.2.4",
     "passport": "^0.7.0",
     "passport-oauth2": "^1.7.0",

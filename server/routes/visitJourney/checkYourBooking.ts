@@ -1,9 +1,6 @@
 import type { Request, Response } from 'express'
-import logger from '../../../logger'
-import config from '../../config'
 import { requestMethodsBooking } from '../../constants/requestMethods'
 import AuditService from '../../services/auditService'
-import NotificationsService from '../../services/notificationsService'
 import { getSupportTypeDescriptions } from '../visitorUtils'
 import getUrlPrefix from './visitJourneyUtils'
 import { VisitService } from '../../services'
@@ -12,7 +9,6 @@ export default class CheckYourBooking {
   constructor(
     private readonly mode: string,
     private readonly auditService: AuditService,
-    private readonly notificationsService: NotificationsService,
     private readonly visitService: VisitService,
   ) {}
 
@@ -77,21 +73,6 @@ export default class CheckYourBooking {
         username: res.locals.user.username,
         operationId: res.locals.appInsightsOperationId,
       })
-
-      if (config.apis.notifications.enabled) {
-        try {
-          const phoneNumber = visitSessionData.mainContact.phoneNumber.replace(/\s/g, '')
-          await this.notificationsService[`send${isUpdate ? 'Update' : 'Booking'}Sms`]({
-            phoneNumber,
-            visitSlot: visitSessionData.visitSlot,
-            prisonName: req.session.selectedEstablishment.prisonName,
-            reference: visitSessionData.visitReference,
-          })
-          logger.info(`${isUpdate ? 'Update' : 'Booking'} SMS sent for ${visitSessionData.visitReference}`)
-        } catch (error) {
-          logger.error(`Failed to send SMS for booking ${visitSessionData.visitReference}`)
-        }
-      }
     } catch (error) {
       return res.render('pages/bookAVisit/checkYourBooking', {
         errors: [
