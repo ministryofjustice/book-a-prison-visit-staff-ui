@@ -13,6 +13,8 @@ import {
   NotificationType,
   Visit,
   VisitHistoryDetails,
+  VisitPreview,
+  VisitRestriction,
 } from '../data/orchestrationApiTypes'
 import { buildVisitorListItem } from '../utils/visitorUtils'
 import { HmppsAuthClient, OrchestrationApiClient, PrisonerContactRegistryApiClient, RestClientBuilder } from '../data'
@@ -196,6 +198,23 @@ export default class VisitService {
       extendedVisitsInfo,
       slots: getVisitSlotsFromBookedVisits(extendedVisitsInfo),
     }
+  }
+
+  async getVisitsBySessionTemplate({
+    username,
+    reference,
+    sessionDate,
+    visitRestrictions,
+  }: {
+    username: string
+    reference: string
+    sessionDate: string
+    visitRestrictions: VisitRestriction
+  }): Promise<VisitPreview[]> {
+    const token = await this.hmppsAuthClient.getSystemClientToken(username)
+    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+
+    return orchestrationApiClient.getVisitsBySessionTemplate(reference, sessionDate, visitRestrictions)
   }
 
   private buildVisitInformation(visit: Visit): VisitInformation {
