@@ -1,21 +1,13 @@
 import { type RequestHandler, Router } from 'express'
-import { format } from 'date-fns'
 import { body, validationResult } from 'express-validator'
-import config from '../config'
-import { ExtendedVisitInformation, PrisonerDetailsItem, VisitsPageSlot } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
-import { getParsedDateFromQueryString, getResultsPagingLinks } from '../utils/utils'
-import { getDateTabs, getSlotsSideMenuData } from './visitsUtils'
-import { SessionCapacity, Visit } from '../data/orchestrationApiTypes'
+import { getParsedDateFromQueryString } from '../utils/utils'
+import { getDateTabs, getSelectedOrDefaultSession, getSessionsSideNav } from './visitsUtils'
 import type { Services } from '../services'
 import { getFlashFormValues } from './visitorUtils'
+import { VisitRestriction } from '../data/orchestrationApiTypes'
 
-export default function routes({
-  auditService,
-  prisonerSearchService,
-  visitService,
-  visitSessionsService,
-}: Services): Router {
+export default function routes({ auditService, visitService, visitSessionsService }: Services): Router {
   const router = Router()
 
   const get = (path: string | string[], ...handlers: RequestHandler[]) =>
@@ -32,121 +24,53 @@ export default function routes({
   get('/', async (req, res) => {
     const { prisonId } = req.session.selectedEstablishment
 
-    type VisitRestriction = Visit['visitRestriction']
-    const { type = 'OPEN', time = '', selectedDate = '', firstTabDate = '' } = req.query
-    let visitType: Visit['visitRestriction']
-    if (type === 'OPEN' || type === 'CLOSED' || type === 'UNKNOWN') {
-      visitType = type
-    } else {
-      visitType = 'OPEN'
-    }
+    const { type = 'OPEN', sessionReference = '', selectedDate = '', firstTabDate = '' } = req.query
 
     const selectedDateString = getParsedDateFromQueryString(selectedDate as string)
-    const {
-      extendedVisitsInfo,
-      slots,
-    }: {
-      extendedVisitsInfo: ExtendedVisitInformation[]
-      slots: {
-        openSlots: VisitsPageSlot[]
-        closedSlots: VisitsPageSlot[]
-        unknownSlots: VisitsPageSlot[]
-        firstSlotTime: string
-      }
-    } = await visitService.getVisitsByDate({
-      dateString: selectedDateString,
-      username: res.locals.user.username,
-      prisonId,
-    })
-
-    if (visitType === 'OPEN' && slots.openSlots.length === 0) {
-      if (slots.closedSlots.length > 0) {
-        visitType = 'CLOSED'
-      } else if (slots.unknownSlots.length > 0) {
-        visitType = 'UNKNOWN'
-      }
-    }
-
     const firstTabDateString = getParsedDateFromQueryString(firstTabDate as string)
 
-    const slotFilter = time === '' ? slots.firstSlotTime : time
-    const queryParams = new URLSearchParams({
-      type: visitType,
-      time: slotFilter as string,
-      selectedDate: selectedDateString,
-      firstTabDate: firstTabDateString,
+    const queryParamsForBackLink = new URLSearchParams({
+      query: new URLSearchParams({
+        type: type as string,
+        sessionReference: sessionReference as string,
+        selectedDate: selectedDateString,
+        firstTabDate: firstTabDateString,
+      }).toString(),
+      from: 'visit-search',
     }).toString()
 
-    const slotsNav = getSlotsSideMenuData({
-      slotType: visitType,
-      slotFilter: slotFilter as string,
-      selectedDate: selectedDateString,
-      firstTabDate: firstTabDateString,
-      ...slots,
+    const sessionSchedule = await visitSessionsService.getSessionSchedule({
+      username: res.locals.user.username,
+      prisonId,
+      date: selectedDateString,
     })
-    const selectedSlots = {
-      open: slots.openSlots.find(slot => slot.visitTime === slotFilter) ?? { adults: 0, children: 0 },
-      closed: slots.closedSlots.find(slot => slot.visitTime === slotFilter) ?? { adults: 0, children: 0 },
-      unknown: slots.unknownSlots.find(slot => slot.visitTime === slotFilter) ?? { adults: 0, children: 0 },
-    }
-    const totals = {
-      adults: selectedSlots[<Lowercase<VisitRestriction>>visitType.toLowerCase()].adults,
-      children: selectedSlots[<Lowercase<VisitRestriction>>visitType.toLowerCase()].children,
-    }
 
-    const filteredVisits = extendedVisitsInfo.filter(
-      visit => visit.visitTime === slotFilter && visit.visitRestriction === visitType,
+    const selectedSession = getSelectedOrDefaultSession(
+      sessionSchedule,
+      sessionReference as string,
+      type as VisitRestriction,
     )
-    const prisonersForVisit = filteredVisits.map(visit => {
-      return {
-        visit: visit.reference,
-        prisoner: visit.prisonNumber,
-      }
-    })
-    const currentPage = 1
-    const pageSize = 200
 
-    let results: PrisonerDetailsItem[][] = []
-    let numberOfResults = 0
-    let numberOfPages = 1
-    let next = 1
-    let previous = 1
-    let capacity: number
+    const sessionsSideNav = getSessionsSideNav(
+      sessionSchedule,
+      selectedDateString,
+      firstTabDateString,
+      selectedSession?.sessionReference,
+      selectedSession?.type,
+    )
 
-    if (prisonersForVisit.length > 0) {
-      ;({ results, numberOfResults, numberOfPages, next, previous } =
-        await prisonerSearchService.getPrisonersByPrisonerNumbers(
-          prisonersForVisit,
-          queryParams,
-          res.locals.user.username,
-          currentPage,
-        ))
+    const visits = selectedSession
+      ? await visitService.getVisitsBySessionTemplate({
+          username: res.locals.username,
+          reference: selectedSession.sessionReference,
+          sessionDate: selectedDateString,
+          visitRestrictions: selectedSession.type,
+        })
+      : []
 
-      // use first visit's details to request session capacity
-      const sessionStartTime = format(new Date(filteredVisits[0].startTimestamp), 'HH:mm:ss')
-      const sessionEndTime = format(new Date(filteredVisits[0].endTimestamp), 'HH:mm:ss')
-      const sessionCapacity: SessionCapacity = await visitSessionsService.getVisitSessionCapacity(
-        res.locals.user.username,
-        prisonId,
-        selectedDateString,
-        sessionStartTime,
-        sessionEndTime,
-      )
-      if (sessionCapacity && visitType === 'OPEN') {
-        capacity = sessionCapacity.open
-      }
-      if (sessionCapacity && visitType === 'CLOSED') {
-        capacity = sessionCapacity.closed
-      }
-    }
-
-    const pageLinks = getResultsPagingLinks({
-      pagesToShow: config.apis.prisonerSearch.pagesLinksToShow,
-      numberOfPages,
-      currentPage,
-      searchParam: queryParams,
-      searchUrl: '/visits/',
-    })
+    const visitorsTotal = visits.reduce((acc, visit) => {
+      return acc + visit.visitorCount
+    }, 0)
 
     await auditService.viewedVisits({
       viewDate: selectedDateString,
@@ -155,29 +79,17 @@ export default function routes({
       operationId: res.locals.appInsightsOperationId,
     })
 
-    const formValues = getFlashFormValues(req)
-
     return res.render('pages/visits/summary', {
-      totals: {
-        visitors: totals.adults + totals.children,
-        ...totals,
-      },
-      visitType,
-      capacity,
-      slotTime: slotFilter,
-      slotsNav,
-      results,
-      next,
-      previous,
-      numberOfResults,
-      pageSize,
-      from: 1,
-      to: numberOfResults,
-      pageLinks: numberOfPages <= 1 ? [] : pageLinks,
-      dateTabs: getDateTabs(selectedDateString, firstTabDateString, 3),
-      queryParams,
       errors: req.flash('errors'),
-      formValues,
+      formValues: getFlashFormValues(req),
+      dateTabs: getDateTabs(selectedDateString, firstTabDateString, 3),
+      selectedDateString,
+      firstTabDateString,
+      selectedSession,
+      sessionsSideNav,
+      queryParamsForBackLink,
+      visits,
+      visitorsTotal,
     })
   })
 

@@ -131,19 +131,17 @@ export type VisitInformation = {
   visitStatus: Visit['visitStatus']
 }
 
-export interface ExtendedVisitInformation extends VisitInformation {
-  startTimestamp: string
-  endTimestamp: string
-  visitRestriction: Visit['visitRestriction']
-  visitors: VisitorListItem[]
+export type VisitsPageSideNavItem = {
+  reference: string
+  times: string
+  capacity: number
+  queryParams: string
+  active: boolean
 }
 
-export type VisitsPageSlot = {
-  visitTime: string
-  visitType: string
-  sortField: string
-  adults: number
-  children: number
+export type VisitsPageSideNav = {
+  open?: VisitsPageSideNavItem[]
+  closed?: VisitsPageSideNavItem[]
 }
 
 export type FlashData = Record<string, string[] | Record<string, string | string[]>[]>
