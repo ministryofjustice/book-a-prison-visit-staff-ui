@@ -29,16 +29,6 @@ export default function routes({ auditService, visitService, visitSessionsServic
     const selectedDateString = getParsedDateFromQueryString(selectedDate as string)
     const firstTabDateString = getParsedDateFromQueryString(firstTabDate as string)
 
-    const queryParamsForBackLink = new URLSearchParams({
-      query: new URLSearchParams({
-        type: type as string,
-        sessionReference: sessionReference as string,
-        selectedDate: selectedDateString,
-        firstTabDate: firstTabDateString,
-      }).toString(),
-      from: 'visit-search',
-    }).toString()
-
     const sessionSchedule = await visitSessionsService.getSessionSchedule({
       username: res.locals.user.username,
       prisonId,
@@ -61,7 +51,7 @@ export default function routes({ auditService, visitService, visitSessionsServic
 
     const visits = selectedSession
       ? await visitService.getVisitsBySessionTemplate({
-          username: res.locals.username,
+          username: res.locals.user.username,
           reference: selectedSession.sessionReference,
           sessionDate: selectedDateString,
           visitRestrictions: selectedSession.type,
@@ -71,6 +61,16 @@ export default function routes({ auditService, visitService, visitSessionsServic
     const visitorsTotal = visits.reduce((acc, visit) => {
       return acc + visit.visitorCount
     }, 0)
+
+    const queryParamsForBackLink = new URLSearchParams({
+      query: new URLSearchParams({
+        type: selectedSession?.type,
+        sessionReference: selectedSession?.sessionReference,
+        selectedDate: selectedDateString,
+        firstTabDate: firstTabDateString,
+      }).toString(),
+      from: 'visit-search',
+    }).toString()
 
     await auditService.viewedVisits({
       viewDate: selectedDateString,
@@ -83,8 +83,6 @@ export default function routes({ auditService, visitService, visitSessionsServic
       errors: req.flash('errors'),
       formValues: getFlashFormValues(req),
       dateTabs: getDateTabs(selectedDateString, firstTabDateString, 3),
-      selectedDateString,
-      firstTabDateString,
       selectedSession,
       sessionsSideNav,
       queryParamsForBackLink,

@@ -2,9 +2,8 @@ import type { Express } from 'express'
 import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { format } from 'date-fns'
-import { SessionData } from 'express-session'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
-import { ExtendedVisitInformation, FlashData, PrisonerDetailsItem, VisitsPageSlot } from '../@types/bapv'
+import { FlashData } from '../@types/bapv'
 import TestData from './testutils/testData'
 import { getParsedDateFromQueryString } from '../utils/utils'
 import {
@@ -37,185 +36,24 @@ afterEach(() => {
 
 describe('GET /visits', () => {
   const prisonId = 'HEI'
-  let visits: {
-    extendedVisitsInfo: ExtendedVisitInformation[]
-    slots: {
-      openSlots: VisitsPageSlot[]
-      closedSlots: VisitsPageSlot[]
-      unknownSlots: VisitsPageSlot[]
-      firstSlotTime: string
-    }
-  }
-  let prisoners: {
-    results: Array<PrisonerDetailsItem[]>
-    numberOfResults: number
-    numberOfPages: number
-    next: number
-    previous: number
-  }
 
-  const todayDate = format(new Date(), 'yyyy-MM-dd')
-  const sessionCapacity = TestData.sessionCapacity()
+  const fakeDateTime = new Date('2024-02-01T09:00')
+  const today = format(fakeDateTime, 'yyyy-MM-dd')
+
+  const sessionSchedule = [TestData.sessionSchedule({ capacity: { open: 20, closed: 5 } })]
+  const visits = [TestData.visitPreview()]
 
   beforeEach(() => {
-    visits = {
-      extendedVisitsInfo: [
-        {
-          reference: 'ob-cw-lx-na',
-          prisonNumber: 'A8709DY',
-          prisonerName: '',
-          mainContact: 'UNKNOWN',
-          startTimestamp: '2022-05-23T09:00:00',
-          endTimestamp: '2022-05-23T09:29:00',
-          visitDate: '23 May 2022',
-          visitTime: '9am to 9:29am',
-          visitStatus: 'BOOKED',
-          visitRestriction: 'OPEN',
-          visitors: [
-            {
-              personId: 4729510,
-              name: 'James Smith',
-              dateOfBirth: '1983-06-17',
-              adult: true,
-              relationshipDescription: 'Brother',
-              address: 'Warren way,<br>Bootle,<br>DN5 9SD,<br>England',
-              restrictions: [],
-              banned: false,
-            },
-          ],
-        },
-        {
-          reference: 'lb-co-bn-oe',
-          prisonNumber: 'A8709DY',
-          prisonerName: '',
-          mainContact: 'Tess Bennett',
-          startTimestamp: '2022-05-23T10:00:00',
-          endTimestamp: '2022-05-23T11:00:00',
-          visitDate: '23 May 2022',
-          visitTime: '10am to 11am',
-          visitStatus: 'BOOKED',
-          visitRestriction: 'OPEN',
-          visitors: [
-            {
-              personId: 4729510,
-              name: 'James Smith',
-              dateOfBirth: '1983-06-17',
-              adult: true,
-              relationshipDescription: 'Brother',
-              address: 'Warren way,<br>Bootle,<br>DN5 9SD,<br>England',
-              restrictions: [],
-              banned: false,
-            },
-            {
-              personId: 4729570,
-              name: 'Tess Bennett',
-              adult: true,
-              relationshipDescription: 'Aunt',
-              address: 'Not entered',
-              restrictions: [],
-              banned: false,
-            },
-          ],
-        },
-        {
-          reference: 'lb-co-bn-un',
-          prisonNumber: 'A8709DY',
-          prisonerName: '',
-          mainContact: 'Tess Bennett',
-          startTimestamp: '2022-05-23T10:00:00',
-          endTimestamp: '2022-05-23T11:00:00',
-          visitDate: '23 May 2022',
-          visitTime: '10am to 11am',
-          visitStatus: 'BOOKED',
-          visitRestriction: 'UNKNOWN',
-          visitors: [
-            {
-              personId: 4729510,
-              name: 'James Smith',
-              dateOfBirth: '1983-06-17',
-              adult: true,
-              relationshipDescription: 'Brother',
-              address: 'Warren way,<br>Bootle,<br>DN5 9SD,<br>England',
-              restrictions: [],
-              banned: false,
-            },
-            {
-              personId: 4729570,
-              name: 'Tess Bennett',
-              adult: true,
-              relationshipDescription: 'Aunt',
-              address: 'Not entered',
-              restrictions: [],
-              banned: false,
-            },
-          ],
-        },
-      ],
-      slots: {
-        openSlots: [
-          {
-            visitTime: '9am to 9:29am',
-            visitType: 'OPEN',
-            sortField: '2022-05-23T09:00:00',
-            adults: 1,
-            children: 0,
-          },
-          {
-            visitTime: '10am to 11am',
-            visitType: 'OPEN',
-            sortField: '2022-05-23T10:00:00',
-            adults: 1,
-            children: 1,
-          },
-        ],
-        closedSlots: [],
-        unknownSlots: [
-          {
-            visitTime: '10am to 11am',
-            visitType: 'UNKNOWN',
-            sortField: '2022-05-23T10:00:00',
-            adults: 1,
-            children: 1,
-          },
-        ],
-        firstSlotTime: '9am to 9:29am',
-      },
-    }
-
-    prisoners = {
-      results: [
-        [
-          {
-            text: 'Rocky, Asap',
-            attributes: {
-              'data-test': 'prisoner-name',
-            },
-          },
-          {
-            text: 'A8709DY',
-            attributes: {
-              'data-test': 'prisoner-number',
-            },
-          },
-          {
-            html: '<a href="" class="bapv-result-row">View</a>',
-            classes: 'govuk-!-text-align-right',
-          },
-        ],
-      ],
-      numberOfResults: 1,
-      numberOfPages: 1,
-      next: 1,
-      previous: 1,
-    }
-
-    visitSessionsService.getVisitSessionCapacity.mockResolvedValue(sessionCapacity)
+    jest.useFakeTimers({ advanceTimers: true, now: fakeDateTime })
+    visitSessionsService.getSessionSchedule.mockResolvedValue(sessionSchedule)
+    visitService.getVisitsBySessionTemplate.mockResolvedValue(visits)
   })
 
-  it('should render visit slot summary page with prisoner list, slot details and menu for choosing other slots, with the first slot chosen by default ', () => {
-    prisonerSearchService.getPrisonersByPrisonerNumbers.mockResolvedValue(prisoners)
-    visitService.getVisitsByDate.mockResolvedValue(visits)
+  afterEach(() => {
+    jest.useRealTimers()
+  })
 
+  it('should render date tabs, side-nav and visits for default date (today)', () => {
     return request(app)
       .get('/visits')
       .expect(200)
@@ -224,16 +62,69 @@ describe('GET /visits', () => {
         const $ = cheerio.load(res.text)
         expect($('h1').text()).toBe('View visits by date')
         expect($('.govuk-back-link').attr('href')).toBe('/')
-        expect($('[data-test="visit-room"]').text()).toBe('Open')
-        expect($('[data-test="visit-time"]').text()).toBe('9am to 9:29am')
-        expect($('[data-test="visit-tables-booked"]').text().trim()).toBe(`1 of ${sessionCapacity.open} tables booked`)
-        expect($('[data-test="prisoner-number"]').text()).toBe('A8709DY')
-        expect($('[data-test="prisoner-name"]').text()).toBe('Rocky, Asap')
-        expect($('.moj-side-navigation__title').text()).toContain('Open visits')
-        expect($('.moj-side-navigation__item--active').text()).toContain('9am to 9:29am')
-        expect(auditService.viewedVisits).toHaveBeenCalledTimes(1)
+
+        // date tabs
+        expect($('.moj-sub-navigation__link').length).toBe(3)
+        expect($('.moj-sub-navigation__link').eq(0).text()).toBe('Thursday 1 February 2024')
+        expect($('.moj-sub-navigation__link').eq(0).attr('href')).toBe(
+          '/visits?selectedDate=2024-02-01&firstTabDate=2024-02-01',
+        )
+        expect($('.moj-sub-navigation__link').eq(0).attr('aria-current')).toBe('page')
+
+        expect($('.moj-sub-navigation__link').eq(1).text()).toBe('Friday 2 February 2024')
+        expect($('.moj-sub-navigation__link').eq(1).attr('href')).toBe(
+          '/visits?selectedDate=2024-02-02&firstTabDate=2024-02-01',
+        )
+        expect($('.moj-sub-navigation__link').eq(1).attr('aria-current')).toBe(undefined)
+
+        expect($('.moj-sub-navigation__link').eq(2).text()).toBe('Saturday 3 February 2024')
+        expect($('.moj-sub-navigation__link').eq(2).attr('href')).toBe(
+          '/visits?selectedDate=2024-02-03&firstTabDate=2024-02-01',
+        )
+        expect($('.moj-sub-navigation__link').eq(2).attr('aria-current')).toBe(undefined)
+
+        // side-nav
+        expect($('.moj-side-navigation h4').eq(0).text()).toBe('Open visits')
+        expect($('.moj-side-navigation ul').eq(0).find('a').text()).toBe('1:45pm to 3:45pm')
+        expect($('.moj-side-navigation ul').eq(0).find('a').first().attr('href')).toBe(
+          '/visits?type=OPEN&sessionReference=-afe.dcc.0f&selectedDate=2024-02-01&firstTabDate=2024-02-01',
+        )
+        expect($('.moj-side-navigation__item--active a').attr('href')).toBe(
+          '/visits?type=OPEN&sessionReference=-afe.dcc.0f&selectedDate=2024-02-01&firstTabDate=2024-02-01',
+        )
+
+        expect($('.moj-side-navigation h4').eq(1).text()).toBe('Closed visits')
+        expect($('.moj-side-navigation ul').eq(1).find('a').text()).toBe('1:45pm to 3:45pm')
+        expect($('.moj-side-navigation ul').eq(1).find('a').first().attr('href')).toBe(
+          '/visits?type=CLOSED&sessionReference=-afe.dcc.0f&selectedDate=2024-02-01&firstTabDate=2024-02-01',
+        )
+
+        // Visits
+        expect($('[data-test="visit-session-heading"]').text().trim()).toBe('Open visits, 1:45pm to 3:45pm')
+        expect($('[data-test="visit-tables-booked"]').text().trim()).toBe('1 of 20 tables booked')
+        expect($('[data-test="visit-visitors-total"]').text().trim()).toBe('2 visitors')
+
+        expect($('[data-test="prisoner-name"]').eq(0).text().trim()).toBe('Smith, John')
+        expect($('[data-test="prisoner-number"]').eq(0).text().trim()).toBe('A1234BC')
+        expect($('[data-test="view-visit-link"]').eq(0).attr('href')).toBe(
+          '/visit/ab-cd-ef-gh?query=type%3DOPEN%26sessionReference%3D-afe.dcc.0f%26selectedDate%3D2024-02-01%26firstTabDate%3D2024-02-01&from=visit-search',
+        )
+
+        expect($('#search-results-none').length).toBe(0)
+
+        expect(visitSessionsService.getSessionSchedule).toHaveBeenCalledWith({
+          username: 'user1',
+          prisonId,
+          date: today,
+        })
+        expect(visitService.getVisitsBySessionTemplate).toHaveBeenCalledWith({
+          username: 'user1',
+          reference: sessionSchedule[0].sessionTemplateReference,
+          sessionDate: today,
+          visitRestrictions: 'OPEN',
+        })
         expect(auditService.viewedVisits).toHaveBeenCalledWith({
-          viewDate: todayDate,
+          viewDate: today,
           prisonId,
           username: 'user1',
           operationId: undefined,
@@ -241,50 +132,51 @@ describe('GET /visits', () => {
       })
   })
 
-  it('should not show capacity if session capacity not available', () => {
-    prisonerSearchService.getPrisonersByPrisonerNumbers.mockResolvedValue(prisoners)
-    visitSessionsService.getVisitSessionCapacity.mockResolvedValue(null)
-    visitService.getVisitsByDate.mockResolvedValue(visits)
-
-    app = appWithAllRoutes({
-      services: { auditService, prisonerSearchService, visitService, visitSessionsService },
-      sessionData: { selectedEstablishment: { prisonId: 'XYZ', prisonName: 'XYZ' } } as SessionData,
-    })
-
+  it('should render date tabs, side-nav and visits for a specific date and closed session', () => {
     return request(app)
-      .get('/visits')
-      .expect(200)
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        const $ = cheerio.load(res.text)
-        expect($('h1').text()).toBe('View visits by date')
-        expect($('[data-test="visit-tables-booked"]').text().trim()).toBe('1 table booked')
-      })
-  })
-
-  it('should render visit slot summary page with prisoner list, slot details and menu for choosing other slots, with the chosen slot shown for OPEN', () => {
-    prisonerSearchService.getPrisonersByPrisonerNumbers.mockResolvedValue(prisoners)
-    visitService.getVisitsByDate.mockResolvedValue(visits)
-
-    return request(app)
-      .get('/visits?selectedDate=2022-05-23&time=10am%20to%2011am&type=OPEN')
+      .get('/visits?type=CLOSED&sessionReference=-afe.dcc.0f&selectedDate=2024-02-02&firstTabDate=2024-02-01')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
         expect($('h1').text()).toBe('View visits by date')
         expect($('.govuk-back-link').attr('href')).toBe('/')
-        expect($('[data-test="visit-room"]').text()).toBe('Open')
-        expect($('[data-test="visit-time"]').text()).toBe('10am to 11am')
-        expect($('[data-test="visit-tables-booked"]').text().trim()).toBe('1 of 30 tables booked')
-        expect($('[data-test="visit-visitors-total"]').text()).toBe('2 visitors')
-        expect($('[data-test="prisoner-number"]').text()).toBe('A8709DY')
-        expect($('[data-test="prisoner-name"]').text()).toBe('Rocky, Asap')
-        expect($('.moj-side-navigation__title').text()).toContain('Open visits')
-        expect($('.moj-side-navigation__item--active').text()).toContain('10am to 11am')
-        expect(auditService.viewedVisits).toHaveBeenCalledTimes(1)
+
+        // date tabs
+        expect($('.moj-sub-navigation__link').length).toBe(3)
+        expect($('.moj-sub-navigation__link').eq(1).attr('aria-current')).toBe('page')
+
+        // side-nav
+        expect($('.moj-side-navigation__item--active a').attr('href')).toBe(
+          '/visits?type=CLOSED&sessionReference=-afe.dcc.0f&selectedDate=2024-02-02&firstTabDate=2024-02-01',
+        )
+
+        // Visits
+        expect($('[data-test="visit-session-heading"]').text().trim()).toBe('Closed visits, 1:45pm to 3:45pm')
+        expect($('[data-test="visit-tables-booked"]').text().trim()).toBe('1 of 5 tables booked')
+        expect($('[data-test="visit-visitors-total"]').text().trim()).toBe('2 visitors')
+
+        expect($('[data-test="prisoner-name"]').eq(0).text().trim()).toBe('Smith, John')
+        expect($('[data-test="prisoner-number"]').eq(0).text().trim()).toBe('A1234BC')
+        expect($('[data-test="view-visit-link"]').eq(0).attr('href')).toBe(
+          '/visit/ab-cd-ef-gh?query=type%3DCLOSED%26sessionReference%3D-afe.dcc.0f%26selectedDate%3D2024-02-02%26firstTabDate%3D2024-02-01&from=visit-search',
+        )
+
+        expect($('#search-results-none').length).toBe(0)
+
+        expect(visitSessionsService.getSessionSchedule).toHaveBeenCalledWith({
+          username: 'user1',
+          prisonId,
+          date: '2024-02-02',
+        })
+        expect(visitService.getVisitsBySessionTemplate).toHaveBeenCalledWith({
+          username: 'user1',
+          reference: sessionSchedule[0].sessionTemplateReference,
+          sessionDate: '2024-02-02',
+          visitRestrictions: 'CLOSED',
+        })
         expect(auditService.viewedVisits).toHaveBeenCalledWith({
-          viewDate: '2022-05-23',
+          viewDate: '2024-02-02',
           prisonId,
           username: 'user1',
           operationId: undefined,
@@ -292,119 +184,47 @@ describe('GET /visits', () => {
       })
   })
 
-  it('should render visit slot summary page with prisoner list, slot details and menu for choosing other slots, with the chosen slot shown for UNKNOWN', () => {
-    prisonerSearchService.getPrisonersByPrisonerNumbers.mockResolvedValue(prisoners)
-    visitService.getVisitsByDate.mockResolvedValue(visits)
-
+  it('should render default (today) if invalid query parameters passed', () => {
     return request(app)
-      .get('/visits?selectedDate=2022-05-23&time=10am+to+11am&type=UNKNOWN')
+      .get('/visits?type=INVALID&sessionReference=REFERENCE&selectedDate=2024-99-01&firstTabDate=2024-99-01')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
         expect($('h1').text()).toBe('View visits by date')
         expect($('.govuk-back-link').attr('href')).toBe('/')
-        expect($('[data-test="visit-room"]').text()).toBe('Visit type unknown')
-        expect($('[data-test="visit-time"]').text()).toBe('10am to 11am')
-        expect($('[data-test="visit-tables-booked"]').text().trim()).toBe('1 table booked')
-        expect($('[data-test="visit-visitors-total"]').text()).toBe('2 visitors')
-        expect($('[data-test="prisoner-number"]').text()).toBe('A8709DY')
-        expect($('[data-test="prisoner-name"]').text()).toBe('Rocky, Asap')
-        expect($('.moj-side-navigation__title').text()).toContain('Visit type unknown')
-        expect($('.moj-side-navigation__item--active').text()).toContain('10am to 11am')
-        expect(auditService.viewedVisits).toHaveBeenCalledTimes(1)
-        expect(auditService.viewedVisits).toHaveBeenCalledWith({
-          viewDate: '2022-05-23',
-          prisonId,
+
+        // date tabs
+        expect($('.moj-sub-navigation__link').length).toBe(3)
+        expect($('.moj-sub-navigation__link').eq(0).text()).toBe('Thursday 1 February 2024')
+        expect($('.moj-sub-navigation__link').eq(0).attr('href')).toBe(
+          '/visits?selectedDate=2024-02-01&firstTabDate=2024-02-01',
+        )
+        expect($('.moj-sub-navigation__link').eq(0).attr('aria-current')).toBe('page')
+
+        // side-nav
+        expect($('.moj-side-navigation__item--active a').attr('href')).toBe(
+          '/visits?type=OPEN&sessionReference=-afe.dcc.0f&selectedDate=2024-02-01&firstTabDate=2024-02-01',
+        )
+
+        // Visits
+        expect($('[data-test="visit-session-heading"]').text().trim()).toBe('Open visits, 1:45pm to 3:45pm')
+        expect($('[data-test="visit-tables-booked"]').text().trim()).toBe('1 of 20 tables booked')
+        expect($('[data-test="visit-visitors-total"]').text().trim()).toBe('2 visitors')
+
+        expect(visitSessionsService.getSessionSchedule).toHaveBeenCalledWith({
           username: 'user1',
-          operationId: undefined,
-        })
-      })
-  })
-
-  it('should render visit slot summary page with prisoner list, slot details and menu for choosing other slots, with the chosen slot shown, bad date defaults to today', () => {
-    prisonerSearchService.getPrisonersByPrisonerNumbers.mockResolvedValue(prisoners)
-    visitService.getVisitsByDate.mockResolvedValue(visits)
-
-    return request(app)
-      .get('/visits?selectedDate=2022-77-23&time=10am%20to%2011am&type=OPEN')
-      .expect(200)
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        const $ = cheerio.load(res.text)
-        expect($('h1').text()).toBe('View visits by date')
-        expect($('.govuk-back-link').attr('href')).toBe('/')
-        expect($('[data-test="visit-room"]').text()).toBe('Open')
-        expect($('[data-test="visit-time"]').text()).toBe('10am to 11am')
-        expect($('[data-test="visit-tables-booked"]').text().trim()).toBe('1 of 30 tables booked')
-        expect($('[data-test="visit-visitors-total"]').text()).toBe('2 visitors')
-        expect($('[data-test="prisoner-number"]').text()).toBe('A8709DY')
-        expect($('[data-test="prisoner-name"]').text()).toBe('Rocky, Asap')
-        expect($('.moj-side-navigation__title').text()).toContain('Open visits')
-        expect($('.moj-side-navigation__item--active').text()).toContain('10am to 11am')
-        expect(auditService.viewedVisits).toHaveBeenCalledTimes(1)
-        expect(auditService.viewedVisits).toHaveBeenCalledWith({
-          viewDate: todayDate,
           prisonId,
-          username: 'user1',
-          operationId: undefined,
+          date: today,
         })
-      })
-  })
-
-  it('should render no slots message when there are no slots for a particular day', () => {
-    prisonerSearchService.getPrisonersByPrisonerNumbers.mockResolvedValue({
-      results: [],
-      numberOfResults: 0,
-      numberOfPages: 0,
-      next: 0,
-      previous: 0,
-    })
-    visitService.getVisitsByDate.mockResolvedValue({
-      extendedVisitsInfo: [],
-      slots: {
-        openSlots: [],
-        closedSlots: [],
-        unknownSlots: [],
-        firstSlotTime: '',
-      },
-    })
-
-    return request(app)
-      .get('/visits')
-      .expect(200)
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        const $ = cheerio.load(res.text)
-        expect($('h1').text()).toBe('View visits by date')
-        expect($('.govuk-back-link').attr('href')).toBe('/')
-        expect($('#search-results-none').text()).toContain('No visit sessions on this day.')
-        expect(auditService.viewedVisits).toHaveBeenCalledTimes(1)
-        expect(auditService.viewedVisits).toHaveBeenCalledWith({
-          viewDate: todayDate,
-          prisonId,
+        expect(visitService.getVisitsBySessionTemplate).toHaveBeenCalledWith({
           username: 'user1',
-          operationId: undefined,
+          reference: sessionSchedule[0].sessionTemplateReference,
+          sessionDate: today,
+          visitRestrictions: 'OPEN',
         })
-      })
-  })
-
-  it('should render no slots message when bad slot', () => {
-    prisonerSearchService.getPrisonersByPrisonerNumbers.mockResolvedValue(prisoners)
-    visitService.getVisitsByDate.mockResolvedValue(visits)
-
-    return request(app)
-      .get('/visits?selectedDate=2022-05-23&time=11am%20to%2011am&type=OPEN')
-      .expect(200)
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        const $ = cheerio.load(res.text)
-        expect($('h1').text()).toBe('View visits by date')
-        expect($('.govuk-back-link').attr('href')).toBe('/')
-        expect($('#search-results-none').text()).toContain('No visit sessions on this day.')
-        expect(auditService.viewedVisits).toHaveBeenCalledTimes(1)
         expect(auditService.viewedVisits).toHaveBeenCalledWith({
-          viewDate: '2022-05-23',
+          viewDate: today,
           prisonId,
           username: 'user1',
           operationId: undefined,

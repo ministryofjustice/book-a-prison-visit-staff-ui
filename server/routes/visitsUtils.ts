@@ -13,8 +13,8 @@ export const getDateTabs = (
   href: string
   active: boolean
 }[] => {
-  const validfirstTabDate = getParsedDateFromQueryString(firstTabDate, defaultDate)
-  const firstTabDateObject = parse(validfirstTabDate, 'yyyy-MM-dd', defaultDate)
+  const validFirstTabDate = getParsedDateFromQueryString(firstTabDate, defaultDate)
+  const firstTabDateObject = parse(validFirstTabDate, 'yyyy-MM-dd', defaultDate)
   const tabs = []
 
   for (let tab = 0; tab < numberOfTabs; tab += 1) {
@@ -22,7 +22,7 @@ export const getDateTabs = (
     const dateCheck = format(dateToUse, 'yyyy-MM-dd')
     const queryParams = new URLSearchParams({
       selectedDate: dateCheck,
-      firstTabDate: validfirstTabDate,
+      firstTabDate: validFirstTabDate,
     }).toString()
     const item = {
       text: format(dateToUse, 'EEEE d MMMM yyyy'),

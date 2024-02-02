@@ -103,7 +103,7 @@
     <div class="govuk-grid-column-three-quarters">
 
       {% if selectedSession %}
-        <h2 class="govuk-heading-m">
+        <h2 class="govuk-heading-m" data-test="visit-session-heading">
           {{ selectedSession.type | capitalize }} visits, {{ selectedSession.times }}
         </h2>
         
