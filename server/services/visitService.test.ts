@@ -338,12 +338,14 @@ describe('Visit service', () => {
 
         const result = await visitService.getVisitsBySessionTemplate({
           username: 'user',
+          prisonId,
           reference,
           sessionDate,
           visitRestrictions,
         })
 
         expect(orchestrationApiClient.getVisitsBySessionTemplate).toHaveBeenCalledWith(
+          prisonId,
           reference,
           sessionDate,
           visitRestrictions,

@@ -127,9 +127,16 @@ export interface paths {
      *       Combining multiple sub-queries gives us the ability to create complex searches using any combination of a prisoner's
      *       attributes. For example we can model nested queries such as <strong>"lastName IS Smith AND (prisonId IS MDI OR (prisonId IS OUT AND inOutStatus is OUT))"</strong>.
      *       </p>
-     *       <p>To find all attributes that can be searched for please refer to the <em>Prisoner</em> record or get them from endpoint <string>GET /attribute-search/attributes</strong>. Attributes from lists can be
+     *       <p>Please be aware that when searching lists of complex objects (e.g. aliases, alerts, tattoos) if you want to search for multiple attributes within the same object then you need
+     *       to include them in the same query. For example, to search for alias "John Smith" you should search for aliases.firstName IS "John" and aliases.lastName IS "Smith" in a single query.
+     *       If you search for them in different queries you will receive anyone with firstName John and also anyone with lastName Smith.
+     *       </p>
+     *       <p>To find all attributes that can be searched for please refer to the <em>Prisoner</em> record or get them from endpoint <strong>GET /attribute-search/attributes</strong>. Attributes from lists can be
      *       searched for with dot notation, e.g. <strong>"attribute=aliases.firstName"</strong> or <strong>"attribute=tattoos.bodyPart"</strong>.
      *       Attributes from complex objects can also be searched for with dot notation, e.g. <strong>"attribute=currentIncentive.level.code"</strong>.
+     *       </p>
+     *       <p>String attributes that contain free text will perform a <a href="https://opensearch.org/docs/latest/query-dsl/term/fuzzy/">fuzzy search</a> with conditions IS and CONTAINS.
+     *       This means that the query also matches on near misses, e.g. spelling mistakes. To find which attributes perform a fuzzy search call endpoint <strong>GET /attribute-search/attributes</strong>.
      *       </p>
      *       <p>To assist with debugging queries we publish events in App Insights. To search in App Insights Log Analytics run query:
      *       <pre>
@@ -340,7 +347,7 @@ export interface components {
        */
       supportingPrisonIds?: string[]
     }
-    /** @description List of parts of the body that have other marks. From REFERENCE_CODES table where DOMAIN = BODY_PART. Allowable values extracted 08/02/2023. */
+    /** @description List of parts of the body that have marks. This includes NOMIS physical details of type 'marks' and 'otherMarks'. If we find a comment with either 'tattoo' or 'scar' we also add to the list of tattoos or scars. From REFERENCE_CODES table where DOMAIN = BODY_PART. Allowable values extracted 08/02/2023. */
     BodyPartDetail: {
       /**
        * @description Part of the body that has the mark. From REFERENCE_CODES table where DOMAIN = BODY_PART. Allowable values extracted 08/02/2023.
@@ -405,14 +412,14 @@ export interface components {
       totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      first?: boolean
+      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Prisoner'][]
       /** Format: int32 */
       number?: number
-      sort?: components['schemas']['SortObject']
-      first?: boolean
-      last?: boolean
+      sort?: components['schemas']['SortObject'][]
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
@@ -421,13 +428,13 @@ export interface components {
     PageableObject: {
       /** Format: int64 */
       offset?: number
-      sort?: components['schemas']['SortObject']
-      paged?: boolean
-      unpaged?: boolean
+      sort?: components['schemas']['SortObject'][]
       /** Format: int32 */
       pageSize?: number
       /** Format: int32 */
       pageNumber?: number
+      unpaged?: boolean
+      paged?: boolean
     }
     Prisoner: {
       /**
@@ -863,14 +870,12 @@ export interface components {
        * @example 10
        */
       shoeSize?: number
-      /** @description List of parts of the body that have tattoos. From REFERENCE_CODES table where DOMAIN = BODY_PART. Allowable values extracted 08/02/2023. */
+      /** @description List of parts of the body that have tattoos. This includes marks and other marks whose comment contains 'tattoo'. 'From REFERENCE_CODES table where DOMAIN = BODY_PART. Allowable values extracted 08/02/2023. */
       tattoos?: components['schemas']['BodyPartDetail'][]
-      /** @description List of parts of the body that have scars. From REFERENCE_CODES table where DOMAIN = BODY_PART. Allowable values extracted 08/02/2023. */
+      /** @description List of parts of the body that have scars. This includes marks and other marks whose comment contains 'scar'. From REFERENCE_CODES table where DOMAIN = BODY_PART. Allowable values extracted 08/02/2023. */
       scars?: components['schemas']['BodyPartDetail'][]
-      /** @description List of parts of the body that have marks. From REFERENCE_CODES table where DOMAIN = BODY_PART. Allowable values extracted 08/02/2023. */
+      /** @description List of parts of the body that have marks. This includes NOMIS physical details of type 'marks' and 'otherMarks'. If we find a comment with either 'tattoo' or 'scar' we also add to the list of tattoos or scars. From REFERENCE_CODES table where DOMAIN = BODY_PART. Allowable values extracted 08/02/2023. */
       marks?: components['schemas']['BodyPartDetail'][]
-      /** @description List of parts of the body that have other marks. From REFERENCE_CODES table where DOMAIN = BODY_PART. Allowable values extracted 08/02/2023. */
-      otherMarks?: components['schemas']['BodyPartDetail'][]
     }
     /** @description Alerts */
     PrisonerAlert: {
@@ -930,9 +935,11 @@ export interface components {
       ethnicity?: string
     }
     SortObject: {
-      empty?: boolean
-      sorted?: boolean
-      unsorted?: boolean
+      direction?: string
+      nullHandling?: string
+      ascending?: boolean
+      property?: string
+      ignoreCase?: boolean
     }
     /** @description Search Criteria for Release Date Search */
     ReleaseDateSearch: {
@@ -1021,7 +1028,7 @@ export interface components {
        * @default false
        * @example false
        */
-      includeAliases: boolean
+      includeAliases?: boolean
     }
     /** @description Search Criteria for Prisoner Search */
     SearchCriteria: {
@@ -1052,7 +1059,7 @@ export interface components {
        * @default false
        * @example false
        */
-      includeAliases: boolean
+      includeAliases?: boolean
     }
     BookingIds: {
       /**
@@ -1121,7 +1128,7 @@ export interface components {
        * @default true
        * @example true
        */
-      includeAliases: boolean
+      includeAliases?: boolean
       pagination: components['schemas']['PaginationRequest']
     }
     PrisonerDetailResponse: {
@@ -1129,14 +1136,14 @@ export interface components {
       totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      first?: boolean
+      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Prisoner'][]
       /** Format: int32 */
       number?: number
-      sort?: components['schemas']['SortObject']
-      first?: boolean
-      last?: boolean
+      sort?: components['schemas']['SortObject'][]
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
@@ -1171,7 +1178,7 @@ export interface components {
        */
       moreInfo?: string
     }
-    /** @description List of body parts that have a different mark */
+    /** @description List of body parts that have scars */
     BodyPart: {
       /**
        * @description Body part that has the physical mark, searching on the description in the type BODY_PART in the REFERENCE_CODES table. Allowable values extracted 08/02/2023.
@@ -1360,8 +1367,6 @@ export interface components {
       marks?: components['schemas']['BodyPart'][]
       /** @description List of body parts that have scars */
       scars?: components['schemas']['BodyPart'][]
-      /** @description List of body parts that have a different mark */
-      otherMarks?: components['schemas']['BodyPart'][]
       /**
        * @description
        *         Whether all terms are required to match. If set to true then only matches on all fields will return a result.
@@ -1377,14 +1382,14 @@ export interface components {
       totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      first?: boolean
+      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Prisoner'][]
       /** Format: int32 */
       number?: number
-      sort?: components['schemas']['SortObject']
-      first?: boolean
-      last?: boolean
+      sort?: components['schemas']['SortObject'][]
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
@@ -1490,14 +1495,14 @@ export interface components {
       totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      first?: boolean
+      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Prisoner'][]
       /** Format: int32 */
       number?: number
-      sort?: components['schemas']['SortObject']
-      first?: boolean
-      last?: boolean
+      sort?: components['schemas']['SortObject'][]
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
@@ -1542,7 +1547,7 @@ export interface components {
        * @default false
        * @example false
        */
-      includeAliases: boolean
+      includeAliases?: boolean
     }
     /** @description A request to search for prisoners by attributes */
     AttributeSearchRequest: {
@@ -1552,7 +1557,7 @@ export interface components {
        * @example AND
        * @enum {string}
        */
-      joinType: 'AND' | 'OR'
+      joinType?: 'AND' | 'OR'
       /** @description A list of queries of type Query that will be combined with the matchers in this query */
       queries: components['schemas']['Query'][]
       pagination: components['schemas']['PaginationRequest']
@@ -1628,7 +1633,7 @@ export interface components {
            */
           type?: string
         },
-      'attribute' | 'maxInclusive' | 'minInclusive' | 'type'
+      'attribute' | 'type'
     >
     /**
      * @description A matcher for a date time attribute from the Prisoner record.
@@ -1716,7 +1721,7 @@ export interface components {
            */
           type?: string
         },
-      'attribute' | 'maxInclusive' | 'minInclusive' | 'type'
+      'attribute' | 'type'
     >
     /** @description A query to search for prisoners by attributes */
     Query: {
@@ -1726,7 +1731,7 @@ export interface components {
        * @example AND
        * @enum {string}
        */
-      joinType: 'AND' | 'OR'
+      joinType?: 'AND' | 'OR'
       /** @description Matchers that will be applied to this query */
       matchers?: (
         | components['schemas']['BooleanMatcher']
@@ -1754,6 +1759,8 @@ export interface components {
            *   IS and IS_NOT require an exact match (wildcards ? and * will not work).
            *
            *   CONTAINS checks for a partial match and respects wildcards ? (single character) and * (zero to many characters).
+           *
+           *   For IS and CONTAINS, if the attribute contains free text then the search will also perform a fuzzy match.
            *
            * @example IS
            * @enum {string}
@@ -1783,6 +1790,24 @@ export interface components {
     }
     ReferenceDataResponse: {
       data: components['schemas']['ReferenceData'][]
+    }
+    /** @description An attribute that can be searched for in a query */
+    Attribute: {
+      /**
+       * @description The name of the attribute to be used when searching
+       * @example firstName
+       */
+      name: string
+      /**
+       * @description The type of the attribute (used to determine which matcher to use)
+       * @example String
+       */
+      type: string
+      /**
+       * @description Whether the attribute search will be fuzzy. Generally applicable to String attributes containing free text such as names.
+       * @example true
+       */
+      fuzzySearch: boolean
     }
   }
   responses: never
@@ -2162,9 +2187,16 @@ export interface operations {
    *       Combining multiple sub-queries gives us the ability to create complex searches using any combination of a prisoner's
    *       attributes. For example we can model nested queries such as <strong>"lastName IS Smith AND (prisonId IS MDI OR (prisonId IS OUT AND inOutStatus is OUT))"</strong>.
    *       </p>
-   *       <p>To find all attributes that can be searched for please refer to the <em>Prisoner</em> record or get them from endpoint <string>GET /attribute-search/attributes</strong>. Attributes from lists can be
+   *       <p>Please be aware that when searching lists of complex objects (e.g. aliases, alerts, tattoos) if you want to search for multiple attributes within the same object then you need
+   *       to include them in the same query. For example, to search for alias "John Smith" you should search for aliases.firstName IS "John" and aliases.lastName IS "Smith" in a single query.
+   *       If you search for them in different queries you will receive anyone with firstName John and also anyone with lastName Smith.
+   *       </p>
+   *       <p>To find all attributes that can be searched for please refer to the <em>Prisoner</em> record or get them from endpoint <strong>GET /attribute-search/attributes</strong>. Attributes from lists can be
    *       searched for with dot notation, e.g. <strong>"attribute=aliases.firstName"</strong> or <strong>"attribute=tattoos.bodyPart"</strong>.
    *       Attributes from complex objects can also be searched for with dot notation, e.g. <strong>"attribute=currentIncentive.level.code"</strong>.
+   *       </p>
+   *       <p>String attributes that contain free text will perform a <a href="https://opensearch.org/docs/latest/query-dsl/term/fuzzy/">fuzzy search</a> with conditions IS and CONTAINS.
+   *       This means that the query also matches on near misses, e.g. spelling mistakes. To find which attributes perform a fuzzy search call endpoint <strong>GET /attribute-search/attributes</strong>.
    *       </p>
    *       <p>To assist with debugging queries we publish events in App Insights. To search in App Insights Log Analytics run query:
    *       <pre>
@@ -2336,7 +2368,6 @@ export interface operations {
           | 'marksBodyPart'
           | 'maritalStatus'
           | 'nationality'
-          | 'otherMarksBodyPart'
           | 'religion'
           | 'rightEyeColour'
           | 'scarsBodyPart'
@@ -2541,9 +2572,7 @@ export interface operations {
       /** @description Search successfully performed */
       200: {
         content: {
-          'application/json': {
-            [key: string]: string
-          }
+          'application/json': components['schemas']['Attribute'][]
         }
       }
       /** @description Unauthorized to access this endpoint */

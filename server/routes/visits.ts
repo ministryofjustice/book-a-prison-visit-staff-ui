@@ -49,6 +49,7 @@ export default function routes({ auditService, visitService, visitSessionsServic
     const visits = selectedSession
       ? await visitService.getVisitsBySessionTemplate({
           username: res.locals.user.username,
+          prisonId,
           reference: selectedSession.sessionReference,
           sessionDate: selectedDateString,
           visitRestrictions: selectedSession.type,

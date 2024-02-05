@@ -159,11 +159,13 @@ export default class VisitService {
 
   async getVisitsBySessionTemplate({
     username,
+    prisonId,
     reference,
     sessionDate,
     visitRestrictions,
   }: {
     username: string
+    prisonId: string
     reference: string
     sessionDate: string
     visitRestrictions: VisitRestriction
@@ -171,7 +173,7 @@ export default class VisitService {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
-    return orchestrationApiClient.getVisitsBySessionTemplate(reference, sessionDate, visitRestrictions)
+    return orchestrationApiClient.getVisitsBySessionTemplate(prisonId, reference, sessionDate, visitRestrictions)
   }
 
   private buildVisitInformation(visit: Visit): VisitInformation {

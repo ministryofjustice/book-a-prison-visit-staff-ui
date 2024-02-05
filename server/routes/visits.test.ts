@@ -119,6 +119,7 @@ describe('GET /visits', () => {
         })
         expect(visitService.getVisitsBySessionTemplate).toHaveBeenCalledWith({
           username: 'user1',
+          prisonId,
           reference: sessionSchedule[0].sessionTemplateReference,
           sessionDate: today,
           visitRestrictions: 'OPEN',
@@ -171,6 +172,7 @@ describe('GET /visits', () => {
         })
         expect(visitService.getVisitsBySessionTemplate).toHaveBeenCalledWith({
           username: 'user1',
+          prisonId,
           reference: sessionSchedule[0].sessionTemplateReference,
           sessionDate: '2024-02-02',
           visitRestrictions: 'CLOSED',
@@ -219,6 +221,7 @@ describe('GET /visits', () => {
         })
         expect(visitService.getVisitsBySessionTemplate).toHaveBeenCalledWith({
           username: 'user1',
+          prisonId,
           reference: sessionSchedule[0].sessionTemplateReference,
           sessionDate: today,
           visitRestrictions: 'OPEN',

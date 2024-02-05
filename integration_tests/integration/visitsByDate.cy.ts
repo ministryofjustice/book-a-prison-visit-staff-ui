@@ -57,6 +57,7 @@ context('View visits by date', () => {
     cy.task('stubSessionSchedule', { prisonId, date: todayShortFormat, sessionSchedule })
 
     cy.task('stubGetVisitsBySessionTemplate', {
+      prisonId,
       reference: sessionSchedule[0].sessionTemplateReference,
       sessionDate: todayShortFormat,
       visitRestrictions: 'OPEN',
@@ -86,6 +87,7 @@ context('View visits by date', () => {
 
     // select last closed session from side nav
     cy.task('stubGetVisitsBySessionTemplate', {
+      prisonId,
       reference: sessionSchedule[2].sessionTemplateReference,
       sessionDate: todayShortFormat,
       visitRestrictions: 'CLOSED',

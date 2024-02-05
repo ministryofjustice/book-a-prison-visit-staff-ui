@@ -165,8 +165,10 @@ describe('orchestrationApiClient', () => {
       const visitPreviews = [TestData.visitPreview()]
 
       fakeOrchestrationApi
-        .get(`/visits/session-template/${sessionTemplateReference}`)
+        .get('/visits/session-template')
         .query({
+          prisonCode: prisonId,
+          sessionTemplateReference,
           sessionDate,
           visitStatus: 'BOOKED',
           visitRestrictions,
@@ -175,6 +177,7 @@ describe('orchestrationApiClient', () => {
         .reply(200, visitPreviews)
 
       const output = await orchestrationApiClient.getVisitsBySessionTemplate(
+        prisonId,
         sessionTemplateReference,
         sessionDate,
         visitRestrictions,

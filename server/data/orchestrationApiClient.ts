@@ -82,13 +82,16 @@ export default class OrchestrationApiClient {
   }
 
   async getVisitsBySessionTemplate(
+    prisonId: string,
     reference: string,
     sessionDate: string,
     visitRestrictions: VisitRestriction,
   ): Promise<VisitPreview[]> {
     return this.restClient.get({
-      path: `/visits/session-template/${reference}`,
+      path: '/visits/session-template',
       query: new URLSearchParams({
+        prisonCode: prisonId,
+        sessionTemplateReference: reference,
         sessionDate,
         visitStatus: 'BOOKED',
         visitRestrictions,

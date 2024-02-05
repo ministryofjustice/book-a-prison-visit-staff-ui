@@ -204,11 +204,13 @@ export default {
     })
   },
   stubGetVisitsBySessionTemplate: ({
+    prisonId,
     reference,
     sessionDate,
     visitRestrictions,
     visits,
   }: {
+    prisonId: string
     reference: string
     sessionDate: string
     visitRestrictions: VisitRestriction
@@ -217,8 +219,10 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        urlPath: `/orchestration/visits/session-template/${reference}`,
+        urlPath: '/orchestration/visits/session-template',
         queryParameters: {
+          prisonCode: { equalTo: prisonId },
+          sessionTemplateReference: { equalTo: reference },
           sessionDate: { equalTo: sessionDate },
           visitRestrictions: { equalTo: visitRestrictions },
         },
