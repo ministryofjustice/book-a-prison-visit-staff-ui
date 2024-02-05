@@ -20,12 +20,7 @@ context('Date picker', () => {
     cy.task('stubGetNotificationCount', {})
     cy.signIn()
 
-    cy.task('stubVisitsByDate', {
-      visitStartDate: todayShortFormat,
-      visitEndDate: todayShortFormat,
-      prisonId,
-      visits: [],
-    })
+    cy.task('stubSessionSchedule', { prisonId, date: todayShortFormat, sessionSchedule: [] })
   })
 
   it('should navigate through a range of dates and correctly handle month and year boundaries', () => {

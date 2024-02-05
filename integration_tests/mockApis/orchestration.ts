@@ -13,6 +13,8 @@ import {
   SessionSchedule,
   Visit,
   VisitHistoryDetails,
+  VisitPreview,
+  VisitRestriction,
   VisitSession,
 } from '../../server/data/orchestrationApiTypes'
 import TestData from '../../server/routes/testutils/testData'
@@ -201,34 +203,30 @@ export default {
       },
     })
   },
-  stubVisitsByDate: ({
-    visitStartDate,
-    visitEndDate,
-    prisonId,
+  stubGetVisitsBySessionTemplate: ({
+    reference,
+    sessionDate,
+    visitRestrictions,
     visits,
   }: {
-    visitStartDate: string
-    visitEndDate: string
-    prisonId: string
-    visits: Visit
+    reference: string
+    sessionDate: string
+    visitRestrictions: VisitRestriction
+    visits: VisitPreview[]
   }): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPath: `/orchestration/visits/search`,
+        urlPath: `/orchestration/visits/session-template/${reference}`,
         queryParameters: {
-          prisonId: { equalTo: prisonId },
-          visitStartDate: { equalTo: visitStartDate },
-          visitEndDate: { equalTo: visitEndDate },
-          visitStatus: { equalTo: 'BOOKED' },
-          page: { equalTo: '0' },
-          size: { equalTo: '1000' },
+          sessionDate: { equalTo: sessionDate },
+          visitRestrictions: { equalTo: visitRestrictions },
         },
       },
       response: {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: { content: visits },
+        jsonBody: visits,
       },
     })
   },
