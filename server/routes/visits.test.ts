@@ -107,7 +107,7 @@ describe('GET /visits', () => {
         expect($('[data-test="prisoner-name"]').eq(0).text().trim()).toBe('Smith, John')
         expect($('[data-test="prisoner-number"]').eq(0).text().trim()).toBe('A1234BC')
         expect($('[data-test="view-visit-link"]').eq(0).attr('href')).toBe(
-          '/visit/ab-cd-ef-gh?query=type%3DOPEN%26sessionReference%3D-afe.dcc.0f%26selectedDate%3D2024-02-01%26firstTabDate%3D2024-02-01&from=visit-search',
+          '/visit/ab-cd-ef-gh?query=type%3DOPEN%26sessionReference%3D-afe.dcc.0f%26selectedDate%3D2024-02-01%26firstTabDate%3D2024-02-01&from=visits',
         )
 
         expect($('#search-results-none').length).toBe(0)
@@ -159,7 +159,7 @@ describe('GET /visits', () => {
         expect($('[data-test="prisoner-name"]').eq(0).text().trim()).toBe('Smith, John')
         expect($('[data-test="prisoner-number"]').eq(0).text().trim()).toBe('A1234BC')
         expect($('[data-test="view-visit-link"]').eq(0).attr('href')).toBe(
-          '/visit/ab-cd-ef-gh?query=type%3DCLOSED%26sessionReference%3D-afe.dcc.0f%26selectedDate%3D2024-02-02%26firstTabDate%3D2024-02-01&from=visit-search',
+          '/visit/ab-cd-ef-gh?query=type%3DCLOSED%26sessionReference%3D-afe.dcc.0f%26selectedDate%3D2024-02-02%26firstTabDate%3D2024-02-01&from=visits',
         )
 
         expect($('#search-results-none').length).toBe(0)

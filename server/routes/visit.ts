@@ -63,7 +63,7 @@ export default function routes({
   get('/:reference', async (req, res) => {
     const reference = getVisitReference(req)
     const fromPage = typeof req.query?.from === 'string' ? req.query.from : null
-    const fromVisitSearchQuery = req.query?.query as string
+    const fromPageQuery = typeof req.query?.query === 'string' ? req.query.query : null
 
     const { visitHistoryDetails, visitors, notifications, additionalSupport } = await visitService.getFullVisitDetails({
       reference,
@@ -114,7 +114,7 @@ export default function routes({
       notificationTypeWarnings,
       additionalSupport,
       fromPage,
-      fromVisitSearchQuery,
+      fromPageQuery,
       showUpdate,
       showCancel,
       requestMethodDescriptions,

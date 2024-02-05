@@ -66,7 +66,7 @@ export default function routes({ auditService, visitService, visitSessionsServic
         selectedDate: selectedDateString,
         firstTabDate: firstTabDateString,
       }).toString(),
-      from: 'visit-search',
+      from: 'visits',
     }).toString()
 
     await auditService.viewedVisits({
