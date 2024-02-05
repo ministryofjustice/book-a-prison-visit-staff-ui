@@ -24,10 +24,11 @@ export default function routes({ auditService, visitService, visitSessionsServic
   get('/', async (req, res) => {
     const { prisonId } = req.session.selectedEstablishment
 
-    const { type = 'OPEN', sessionReference = '', selectedDate = '', firstTabDate = '' } = req.query
+    const { type = '', sessionReference = '', selectedDate = '', firstTabDate = '' } = req.query
 
-    const selectedDateString = getParsedDateFromQueryString(selectedDate as string)
-    const firstTabDateString = getParsedDateFromQueryString(firstTabDate as string)
+    const selectedType: VisitRestriction = type === 'OPEN' || type === 'CLOSED' || type === 'UNKNOWN' ? type : 'OPEN'
+    const selectedDateString = getParsedDateFromQueryString(selectedDate.toString())
+    const firstTabDateString = getParsedDateFromQueryString(firstTabDate.toString())
 
     const sessionSchedule = await visitSessionsService.getSessionSchedule({
       username: res.locals.user.username,
@@ -35,11 +36,7 @@ export default function routes({ auditService, visitService, visitSessionsServic
       date: selectedDateString,
     })
 
-    const selectedSession = getSelectedOrDefaultSession(
-      sessionSchedule,
-      sessionReference as string,
-      type as VisitRestriction,
-    )
+    const selectedSession = getSelectedOrDefaultSession(sessionSchedule, sessionReference.toString(), selectedType)
 
     const sessionsSideNav = getSessionsSideNav(
       sessionSchedule,
