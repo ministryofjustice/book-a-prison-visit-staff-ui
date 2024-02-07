@@ -136,9 +136,8 @@ context('Book a visit', () => {
       scheduledEvents,
     })
     cy.task(
-      'stubReserveVisit',
-      TestData.visit({
-        visitStatus: 'RESERVED',
+      'stubCreateVisitApplication',
+      TestData.application({
         startTimestamp: visitSessions[0].startTimestamp,
         endTimestamp: visitSessions[0].endTimestamp,
         visitors: [{ nomisPersonId: contacts[0].personId }, { nomisPersonId: contacts[1].personId }],
@@ -187,9 +186,8 @@ context('Book a visit', () => {
 
     // Confirmation
     cy.task(
-      'stubChangeReservedSlot',
-      TestData.visit({
-        visitStatus: 'RESERVED',
+      'stubChangeVisitApplication',
+      TestData.application({
         startTimestamp: visitSessions[0].startTimestamp,
         endTimestamp: visitSessions[0].endTimestamp,
         visitors: [

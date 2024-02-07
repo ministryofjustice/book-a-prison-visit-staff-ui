@@ -81,9 +81,8 @@ context('Check visit details page', () => {
       scheduledEvents: [],
     })
     cy.task(
-      'stubReserveVisit',
-      TestData.visit({
-        visitStatus: 'RESERVED',
+      'stubCreateVisitApplication',
+      TestData.application({
         startTimestamp: visitSessions[0].startTimestamp,
         endTimestamp: visitSessions[0].endTimestamp,
         visitors: [{ nomisPersonId: contacts[0].personId }],
@@ -132,9 +131,8 @@ context('Check visit details page', () => {
     selectVisitDateAndTime.getSlotById(1).should('be.checked')
     selectVisitDateAndTime.getSlotById(2).check()
     cy.task(
-      'stubChangeReservedSlot',
-      TestData.visit({
-        visitStatus: 'RESERVED',
+      'stubChangeVisitApplication',
+      TestData.application({
         startTimestamp: visitSessions[1].startTimestamp,
         endTimestamp: visitSessions[1].endTimestamp,
         visitContact: { name: 'Jeanette Smith', telephone: '01234 567890' },
@@ -158,9 +156,8 @@ context('Check visit details page', () => {
     selectVisitorsPage.continueButton().click()
     selectVisitDateAndTime.getSlotById(2).should('be.checked')
     cy.task(
-      'stubChangeReservedSlot',
-      TestData.visit({
-        visitStatus: 'RESERVED',
+      'stubChangeVisitApplication',
+      TestData.application({
         startTimestamp: visitSessions[1].startTimestamp,
         endTimestamp: visitSessions[1].endTimestamp,
         visitContact: { name: 'Jeanette Smith', telephone: '01234 567890' },
@@ -205,9 +202,8 @@ context('Check visit details page', () => {
 
     // Confirmation
     cy.task(
-      'stubChangeReservedSlot',
-      TestData.visit({
-        visitStatus: 'RESERVED',
+      'stubChangeVisitApplication',
+      TestData.application({
         startTimestamp: visitSessions[1].startTimestamp,
         endTimestamp: visitSessions[1].endTimestamp,
         visitContact: { name: 'Jeanette Smith', telephone: '09876 543 321' },

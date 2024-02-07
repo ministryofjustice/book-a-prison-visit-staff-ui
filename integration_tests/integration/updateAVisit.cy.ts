@@ -104,8 +104,7 @@ context('Update a visit', () => {
     selectVisitDateAndTime.getSlotById(1).should('be.checked')
 
     // Select date and time - choose different time
-    const updatedVisit = TestData.visit({
-      visitStatus: 'RESERVED',
+    const updatedApplication = TestData.application({
       startTimestamp: visitSessions[1].startTimestamp,
       endTimestamp: visitSessions[1].endTimestamp,
       visitors: [
@@ -114,7 +113,10 @@ context('Update a visit', () => {
       ],
       visitorSupport: [],
     })
-    cy.task('stubChangeBookedVisit', updatedVisit)
+    cy.task('stubCreateVisitApplicationFromVisit', {
+      visitReference: visitHistoryDetails.visit.reference,
+      application: updatedApplication,
+    })
     selectVisitDateAndTime.getSlotById(2).check()
     selectVisitDateAndTime.continueButton().click()
 
@@ -155,9 +157,8 @@ context('Update a visit', () => {
 
     // Submit booking
     cy.task(
-      'stubChangeReservedSlot',
-      TestData.visit({
-        visitStatus: 'RESERVED',
+      'stubChangeVisitApplication',
+      TestData.application({
         startTimestamp: visitSessions[1].startTimestamp,
         endTimestamp: visitSessions[1].endTimestamp,
         visitContact: { name: 'Jeanette Smith', telephone: '09876 543 321' },
