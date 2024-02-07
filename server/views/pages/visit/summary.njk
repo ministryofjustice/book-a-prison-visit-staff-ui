@@ -96,7 +96,7 @@
       <ul class="bapv-item-list">
         <li> 
           <strong>Date and time</strong>
-          <span data-test="visit-date-and-time">{{ visit.startTimestamp | formatDate }}, {{ visit.startTimestamp | formatTime + " to " + visit.endTimestamp | formatTime }}</span>
+          <span data-test="visit-date-and-time">{{ visit.startTimestamp | formatDate("EEEE d MMMM yyy") }}, {{ visit.startTimestamp | formatTime + " to " + visit.endTimestamp | formatTime }}</span>
         </li>
         <li> 
           <strong>Visit type</strong>

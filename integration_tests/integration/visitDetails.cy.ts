@@ -8,6 +8,7 @@ import { notificationTypeWarnings } from '../../server/constants/notificationEve
 context('Visit details page', () => {
   const shortDateFormat = 'yyyy-MM-dd'
   const longDateFormat = 'd MMMM yyyy'
+  const dateFormatWithDay = 'EEEE d MMMM yyyy'
 
   beforeEach(() => {
     cy.task('reset')
@@ -62,7 +63,7 @@ context('Visit details page', () => {
     visitDetailsPage.prisonerDob().contains('2 April 1975')
     visitDetailsPage.prisonerLocation().contains('1-1-C-028, HMP Hewell')
     // Visit Details
-    visitDetailsPage.visitDateAndTime().contains('14 January 2022')
+    visitDetailsPage.visitDateAndTime().contains('Friday 14 January 2022')
     visitDetailsPage.visitDateAndTime().contains('10am to 11am')
     visitDetailsPage.visitType().contains('Open')
     visitDetailsPage.visitContact().contains('Smith, Jeanette')
@@ -116,7 +117,7 @@ context('Visit details page', () => {
     // Prisoner Details
     visitDetailsPage.prisonerName().contains(prisonerDisplayName)
     // Visit Details
-    visitDetailsPage.visitDateAndTime().contains(format(new Date(futureVisitDate), longDateFormat))
+    visitDetailsPage.visitDateAndTime().contains(format(new Date(futureVisitDate), dateFormatWithDay))
   })
 
   it('Should show different tabs when sub navigation is used', () => {
@@ -157,7 +158,7 @@ context('Visit details page', () => {
     // Prisoner Details
     visitDetailsPage.prisonerName().contains(prisonerDisplayName)
     // Visit Details
-    visitDetailsPage.visitDateAndTime().contains(format(new Date(futureVisitDate), longDateFormat))
+    visitDetailsPage.visitDateAndTime().contains(format(new Date(futureVisitDate), dateFormatWithDay))
 
     // Select prisoner tab
     visitDetailsPage.selectVisitorTab()
