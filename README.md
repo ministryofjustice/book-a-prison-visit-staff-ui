@@ -102,22 +102,19 @@ The same booking journey is used both for initially booking a visit and updating
 
 **Booking a new visit**
 * first time selecting date/time
-  * uses `POST /visits/slot/reserve` and gets a visit `reference` and `applicationReference` with the status `RESERVED`
+  * uses `POST /visits/application/slot/reserve` to create a visit application and gets an application `reference`
 * changing date/time (before booking)
-  * uses `PUT /visits/applicationReference/slot/change` and the visit status stays as `RESERVED`
+  * uses `PUT /visits/application/{reference}/slot/change` to modify the current application
 
 **Updating and existing visit**
 * first time selecting date/time (which will have been pre-populated with the existing slot if possible)
-  * uses `PUT /visits/{reference}/change` to initiate the change and gets a **new** `applicationReference` with a status of either: 
-    * `CHANGING` - date/time slot and open/closed the same
-    * `RESERVED` - date/time slot or open/closed have changed
+  * uses `PUT /visits/application/{bookingReference}/change` to create a new visit application from the existing visit. This gives a **new** application `Reference`
 * changing date/time (before booking)
-  * also uses `PUT /visits/{applicationReference}/slot/change` with the visit status returned being either `CHANGING` or `RESERVED`
-    depending on whether the date/time slot or open/closed have changed
+  * also uses `PUT /visits/application/{reference}/slot/change` to modify the current application
 
 In both cases, at the end of the journey there are two further calls to confirm the booking:
-1. `PUT /visits/{applicationReference}/slot/change` to set all the visit data
-2. `PUT /visits/{applicationReference}/book` to change the visit's status to `BOOKED`
+1. `PUT /visits/application/{reference}/slot/change` to update/set all the data in the current application
+2. `PUT /visits/{applicationReference}/book` to complete the application and receive a `Visit` with status `BOOKED`
 
 ## Imported types
 
