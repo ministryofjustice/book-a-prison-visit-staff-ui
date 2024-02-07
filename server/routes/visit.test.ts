@@ -166,8 +166,7 @@ describe('/visit/:reference', () => {
           expect($('.govuk-back-link').attr('href')).toBe('/prisoner/A1234BC/visits')
           expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
           // visit details
-          expect($('[data-test="visit-date-and-time"]').text()).toContain('14 January 2022')
-          expect($('[data-test="visit-date-and-time"]').text()).toContain('10am to 11am')
+          expect($('[data-test="visit-date-and-time"]').text()).toContain('Friday 14 January 2022, 10am to 11am')
           expect($('[data-test="visit-type"]').text()).toBe('Open')
           expect($('[data-test="visit-contact"]').text()).toBe('Smith, Jeanette')
           expect($('[data-test="visit-phone"]').text()).toBe('01234 567890')
