@@ -14,7 +14,7 @@ export interface paths {
   '/api/users/add/default/{caseload}': {
     /**
      * Add the NWEB caseload to specified caseload.
-     * @description Add the NWEB caseload to specified caseload.
+     * @description Requires role MAINTAIN_ACCESS_ROLES or MAINTAIN_ACCESS_ROLES_ADMIN
      */
     put: operations['addApiAccessForCaseload']
   }
@@ -178,28 +178,38 @@ export interface paths {
     put: operations['courtHearingDateAmendment']
   }
   '/api/bookings/{bookingId}/alert/{alertSeq}': {
-    /** Update an alert */
+    /**
+     * Update an alert
+     * @description Requires role UPDATE_ALERT
+     */
     put: operations['updateAlert']
   }
   '/api/bookings/{bookingId}/activities/{activityId}/attendance': {
     /**
      * Update offender attendance and pay.
-     * @description Update offender attendance and pay.
+     * @description Requires role PAY
      */
     put: operations['updateAttendance']
   }
   '/api/bookings/offenderNo/{offenderNo}/activities/{activityId}/attendance': {
+    /**
+     * Update offender attendance and pay.
+     * @description Requires role PAY
+     */
     put: operations['updateAttendance_1']
   }
   '/api/bookings/activities/attendance': {
     /**
      * Update attendance and pay for multiple bookings.
-     * @description Update offender attendance and pay.
+     * @description Requires role PAY
      */
     put: operations['updateAttendanceForMultipleBookingIds']
   }
   '/api/appointments/{appointmentId}/comment': {
-    /** Change an appointment's comment. */
+    /**
+     * Change an appointment's comment.
+     * @description Requires role GLOBAL_APPOINTMENT
+     */
     put: operations['updateAppointmentComment']
   }
   '/api/agencies/{agencyId}': {
@@ -293,7 +303,7 @@ export interface paths {
   '/api/users/list': {
     /**
      * Returns the user details for supplied usernames - POST version to allow large user lists.
-     * @description user details for supplied usernames
+     * @description Requires role STAFF_SEARCH
      */
     post: operations['getUserDetailsList']
   }
@@ -592,7 +602,7 @@ export interface paths {
     get: operations['getPersonalCareNeeds_1']
     /**
      * Personal Care Needs
-     * @description Personal Care Need
+     * @description Requires role MAINTAIN_HEALTH_PROBLEMS and scope write
      */
     post: operations['addPersonalCareNeed']
   }
@@ -606,18 +616,21 @@ export interface paths {
   '/api/bookings/{bookingId}/appointments': {
     /**
      * Create appointment for offender.
-     * @description Create appointment for offender.
+     * @description Requires role GLOBAL_APPOINTMENT, or booking is in caseload
      */
     post: operations['postBookingsBookingIdAppointments']
   }
   '/api/bookings/{bookingId}/alert': {
-    /** Create an alert */
+    /**
+     * Create an alert
+     * @description Requires role UPDATE_ALERT
+     */
     post: operations['postAlert']
   }
   '/api/bookings/offenders': {
     /**
      * Offender detail.
-     * @description Offender detail for offenders<p>This endpoint uses the REPLICA database.</p>
+     * @description Requires role VIEW_PRISONER_DATA or GLOBAL_SEARCH, or prisoners are in caseload<p>This endpoint uses the REPLICA database.</p>
      */
     post: operations['getBasicInmateDetailsForOffenders']
   }
@@ -631,14 +644,14 @@ export interface paths {
   '/api/bookings/offenderNo/personal-care-needs': {
     /**
      * Personal Care Needs  - POST version to allow for large numbers of offenders
-     * @description Personal Care Needs
+     * @description Requires role VIEW_PRISONER_DATA or GLOBAL_SEARCH
      */
     post: operations['getPersonalCareNeeds']
   }
   '/api/bookings/offenderNo/personal-care-needs/count': {
     /**
      * Personal Care Needs Counter - POST version to allow to count heath problem by type for large numbers of offenders
-     * @description Personal Care Needs
+     * @description Requires booking to be in caseload, or role GLOBAL_SEARCH or VIEW_PRISONER_DATA
      */
     post: operations['countPersonalCareNeeds']
   }
@@ -659,7 +672,7 @@ export interface paths {
   '/api/bookings/mainOffence': {
     /**
      * Get Offender main offence detail.
-     * @description Post version to allow specifying a large number of bookingIds.<p>This endpoint uses the REPLICA database.</p>
+     * @description Post version to allow specifying a large number of bookingIds. Requires role VIEW_PRISONER_DATA<p>This endpoint uses the REPLICA database.</p>
      */
     post: operations['getMainOffence']
   }
@@ -670,14 +683,14 @@ export interface paths {
   '/api/appointments': {
     /**
      * Create multiple appointments
-     * @description Create multiple appointments
+     * @description Requires bookings to be in caseload and write scope, and role BULK_APPOINTMENTS if more than 1 appointment is being created
      */
     post: operations['createAppointments']
   }
   '/api/appointments/delete': {
     /**
      * Delete multiple appointments.
-     * @description Delete multiple appointments.
+     * @description Requires role GLOBAL_APPOINTMENT and write scope
      */
     post: operations['deleteAppointments']
   }
@@ -907,42 +920,42 @@ export interface paths {
   '/api/staff/{staffId}': {
     /**
      * Staff detail.
-     * @description Staff detail.
+     * @description Security note: staff details are only available for the current user unless client has ROLE_STAFF_SEARCH.
      */
     get: operations['getStaffDetail']
   }
   '/api/staff/{staffId}/{agencyId}/roles': {
     /**
      * List of job roles for specified staff and agency Id
-     * @description List of job roles for specified staff and agency Id
+     * @description Security note: the agency must be in the current user's caseload.
      */
     get: operations['getAllRolesForAgency']
   }
   '/api/staff/{staffId}/{agencyId}/roles/{roleType}': {
     /**
      * Check if staff member has a role
-     * @description Check if staff member has a role, either KW or POM
+     * @description Check if staff member has a role, either KW or POM. Security note: the agency must be in the current user's caseload.
      */
     get: operations['hasStaffRole']
   }
   '/api/staff/{staffId}/emails': {
     /**
      * Returns a list of email addresses associated with this staff user
-     * @description List of email addresses for a specified staff user
+     * @description Security note: staff details are only available for the current user unless client has ROLE_STAFF_SEARCH.
      */
     get: operations['getStaffEmailAddresses']
   }
   '/api/staff/{staffId}/caseloads': {
     /**
      * Returns a list of caseloads associated with this staff user
-     * @description List of caseloads for a specified staff user
+     * @description Security note: staff details are only available for the current user unless client has ROLE_STAFF_SEARCH.
      */
     get: operations['getStaffCaseloads']
   }
   '/api/staff/roles/{agencyId}/role/{role}': {
     /**
      * Get staff members within agency who are currently assigned the specified role.
-     * @description Get staff members within agency who are currently assigned the specified role.<p>This endpoint uses the REPLICA database.</p>
+     * @description Get staff members within agency who are currently assigned the specified role. Security note: the agency must be in the current user's caseload.<p>This endpoint uses the REPLICA database.</p>
      */
     get: operations['getStaffByAgencyRole']
   }
@@ -1084,21 +1097,21 @@ export interface paths {
   '/api/offenders/{offenderNo}/transaction-history': {
     /**
      * Retrieve an offender's financial transaction history for cash, spends or savings.
-     * @description Transactions are returned in order of entryDate descending and sequence ascending).<br/>All transaction amounts are represented as pence values.<p>This endpoint uses the REPLICA database.</p>
+     * @description Transactions are returned in order of entryDate descending and sequence ascending).<br/>All transaction amounts are represented as pence values. Requires offender to be in caseload or role GLOBAL_SEARCH or VIEW_PRISONER_DATA<p>This endpoint uses the REPLICA database.</p>
      */
     get: operations['getTransactionsHistory']
   }
   '/api/offenders/{offenderNo}/sentences': {
     /**
      * Offender Sentence Details
-     * @description Retrieve an single offender sentence details
+     * @description Retrieve an single offender sentence details. Requires offender to be in caseload or role GLOBAL_SEARCH or VIEW_PRISONER_DATA
      */
     get: operations['getOffenderSentenceDetail']
   }
   '/api/offenders/{offenderNo}/scheduled-events': {
     /**
      * All future (scheduled) events for offender
-     * @description All future events for offender that are in a scheduled and not cancelled state.
+     * @description All future events for offender that are in a scheduled and not cancelled state. Requires offender to be in caseload or role GLOBAL_SEARCH or VIEW_PRISONER_DATA
      */
     get: operations['getScheduledEvents']
   }
@@ -1266,7 +1279,7 @@ export interface paths {
      * This endpoint will therefore also return different information from Whereabouts API as that service re-maps the NOMIS layout to include spurs etc.</p>
      * <p>If the current location is temporary (reception, court, tap, cell swap or early conditional licence) then the previous permanent location is also returned, provided
      * that the location is at the same prison and they haven't moved to a different prison in the meantime.</p>
-     * <p>Requires a relationship (via caseload) with the prisoner or VIEW_PRISONER_DATA role.</p>
+     * <p>Requires a relationship (via caseload) with the prisoner or the GLOBAL_SEARCH or VIEW_PRISONER_DATA role.</p>
      */
     get: operations['getHousingLocation']
   }
@@ -1278,7 +1291,10 @@ export interface paths {
     get: operations['getEvents']
   }
   '/api/offenders/{offenderNo}/damage-obligations': {
-    /** Return a list of damage obligations */
+    /**
+     * Return a list of damage obligations
+     * @description Requires offender to be in caseload or role GLOBAL_SEARCH or VIEW_PRISONER_DATA
+     */
     get: operations['getOffenderDamageObligations']
   }
   '/api/offenders/{offenderNo}/contacts': {
@@ -1302,6 +1318,10 @@ export interface paths {
      */
     get: operations['getLatestSentenceSummary']
   }
+  '/api/offenders/{offenderNo}/belief-history': {
+    /** Get belief history for a prisoner */
+    get: operations['getOffenderBeliefHistory']
+  }
   '/api/offenders/{offenderNo}/alerts/v2': {
     /**
      * Return a list of alerts for all booking for a given offender No.
@@ -1312,7 +1332,7 @@ export interface paths {
   '/api/offenders/{offenderNo}/addresses': {
     /**
      * Return a list of addresses for a given offender, most recent first.
-     * @description <p>This endpoint uses the REPLICA database.</p>
+     * @description Requires offender to be in caseload, or role GLOBAL_SEARCH or VIEW_PRISONER_DATA<p>This endpoint uses the REPLICA database.</p>
      */
     get: operations['getAddressesByOffenderNo']
   }
@@ -1599,21 +1619,21 @@ export interface paths {
   '/api/bookings/{bookingId}/visits/summary': {
     /**
      * The summary of the visits for the offender.
-     * @description Will return whether there are any visits and also the date of the next scheduled visit<p>This endpoint uses the REPLICA database.</p>
+     * @description Will return whether there are any visits and also the date of the next scheduled visit. Requires role VIEW_PRISONER_DATA or GLOBAL_SEARCH, or booking is in caseload<p>This endpoint uses the REPLICA database.</p>
      */
     get: operations['getBookingVisitsSummary']
   }
   '/api/bookings/{bookingId}/visits/prisons': {
     /**
      * The list of prisons for which there are visits for the specified booking.
-     * @description To be used for filtering visits by prison
+     * @description To be used for filtering visits by prison. Requires role VIEW_PRISONER_DATA or GLOBAL_SEARCH, or booking is in caseload
      */
     get: operations['getBookingVisitsPrisons']
   }
   '/api/bookings/{bookingId}/visits/next': {
     /**
      * The next visit for the offender.
-     * @description The next visit for the offender. Will return 200 with no body if no next visit is scheduled<p>This endpoint uses the REPLICA database.</p>
+     * @description The next visit for the offender. Will return 200 with no body if no next visit is scheduled. Requires role VIEW_PRISONER_DATA or GLOBAL_SEARCH, or booking is in caseload<p>This endpoint uses the REPLICA database.</p>
      */
     get: operations['getBookingVisitsNext']
   }
@@ -1633,12 +1653,16 @@ export interface paths {
      *   <li>If there is no confirmed release date for the offender, the offender release date is either the actual parole date or the home detention curfew actual date.</li>
      *   <li>If there is no confirmed release date, actual parole date or home detention curfew actual date for the offender, the release date is the later of the nonDtoReleaseDate or midTermDate value (if either or both are present)</li>
      * </ul>
+     * Requires booking to be in caseload, or role GLOBAL_SEARCH or VIEW_PRISONER_DATA
      * <p>This endpoint uses the REPLICA database.</p>
      */
     get: operations['getBookingSentenceDetail']
   }
   '/api/bookings/{bookingId}/sentenceAdjustments': {
-    /** Offender sentence adjustments. */
+    /**
+     * Offender sentence adjustments.
+     * @description Requires booking to be in caseload, or role GLOBAL_SEARCH or VIEW_PRISONER_DATA
+     */
     get: operations['getBookingSentenceAdjustments']
   }
   '/api/bookings/{bookingId}/secondary-languages': {
@@ -1658,21 +1682,21 @@ export interface paths {
   '/api/bookings/{bookingId}/property': {
     /**
      * List of active property containers
-     * @description List of active property containers
+     * @description Requires booking to be in caseload, or role VIEW_PRISONER_DATA
      */
     get: operations['getOffenderPropertyContainers']
   }
   '/api/bookings/{bookingId}/military-records': {
     /**
      * Military Records
-     * @description Military Records
+     * @description Requires booking to be in caseload, or role VIEW_PRISONER_DATA
      */
     get: operations['getMilitaryRecords_1']
   }
   '/api/bookings/{bookingId}/mainOffence': {
     /**
      * Get Offender main offence detail.
-     * @description Offender main offence detail.
+     * @description Requires booking to be in caseload, or role GLOBAL_SEARCH or VIEW_PRISONER_DATA
      */
     get: operations['getMainOffence_1']
   }
@@ -1691,34 +1715,37 @@ export interface paths {
     get: operations['getOffenderIdentifiers']
   }
   '/api/bookings/{bookingId}/fixed-term-recall': {
-    /** Gets the Fixed Term Recall details for a booking */
+    /**
+     * Gets the Fixed Term Recall details for a booking
+     * @description Requires role VIEW_PRISONER_DATA, or booking is in caseload
+     */
     get: operations['getFixedTermRecallDetails']
   }
   '/api/bookings/{bookingId}/events': {
     /**
      * All scheduled events for offender.
-     * @description All scheduled events for offender.
+     * @description Requires role VIEW_PRISONER_DATA or GLOBAL_SEARCH, or booking is in caseload
      */
     get: operations['getEvents_1']
   }
   '/api/bookings/{bookingId}/events/today': {
     /**
      * Today's scheduled events for offender.
-     * @description Today's scheduled events for offender.
+     * @description Requires role VIEW_PRISONER_DATA or GLOBAL_SEARCH, or booking is in caseload
      */
     get: operations['getEventsToday']
   }
   '/api/bookings/{bookingId}/events/thisWeek': {
     /**
      * Scheduled events for offender for coming week (from current day).
-     * @description Scheduled events for offender for coming week (from current day).
+     * @description Requires role VIEW_PRISONER_DATA or GLOBAL_SEARCH, or booking is in caseload
      */
     get: operations['getEventsThisWeek']
   }
   '/api/bookings/{bookingId}/events/nextWeek': {
     /**
      * Scheduled events for offender for following week.
-     * @description Scheduled events for offender for following week.
+     * @description Requires role VIEW_PRISONER_DATA or GLOBAL_SEARCH, or booking is in caseload
      */
     get: operations['getEventsNextWeek']
   }
@@ -1728,14 +1755,14 @@ export interface paths {
   '/api/bookings/{bookingId}/court-cases': {
     /**
      * Court Cases
-     * @description Court Cases
+     * @description Requires role VIEW_PRISONER_DATA or GLOBAL_SEARCH, or booking is in caseload
      */
     get: operations['getCourtCases']
   }
   '/api/bookings/{bookingId}/contacts': {
     /**
      * Offender contacts (e.g. next of kin).
-     * @description Offender contacts (e.g. next of kin).
+     * @description Requires role VIEW_PRISONER_DATA or GLOBAL_SEARCH, or booking is in caseload
      */
     get: operations['getContacts']
   }
@@ -1756,7 +1783,7 @@ export interface paths {
   '/api/bookings/{bookingId}/balances': {
     /**
      * Offender account balances.
-     * @description Offender account balances.
+     * @description Requires booking to be in caseload, or role GLOBAL_SEARCH or VIEW_PRISONER_DATA
      */
     get: operations['getBalances']
   }
@@ -1791,7 +1818,7 @@ export interface paths {
   '/api/bookings/{bookingId}/activities': {
     /**
      * All scheduled activities for offender.
-     * @description All scheduled activities for offender.<p>This endpoint uses the REPLICA database.</p>
+     * @description Requires booking id to be in caseload, or role VIEW_SCHEDULES<p>This endpoint uses the REPLICA database.</p>
      */
     get: operations['getBookingActivities']
   }
@@ -1845,12 +1872,12 @@ export interface paths {
   '/api/appointments/{appointmentId}': {
     /**
      * Get an appointment by id.
-     * @description Get appointment byId.
+     * @description Requires role GLOBAL_APPOINTMENT
      */
     get: operations['getAppointment']
     /**
      * Delete an appointment.
-     * @description Delete appointment.
+     * @description Requires role GLOBAL_APPOINTMENT and write scope
      */
     delete: operations['deleteAppointment']
   }
@@ -5426,13 +5453,13 @@ export interface components {
        */
       createDateTime: string
       /** @description Agency travelling from */
-      fromAgency: string
+      fromAgency?: string
       /** @description Description of the agency travelling from */
-      fromAgencyDescription: string
+      fromAgencyDescription?: string
       /** @description Agency travelling to */
-      toAgency: string
+      toAgency?: string
       /** @description Description of the agency travelling to */
-      toAgencyDescription: string
+      toAgencyDescription?: string
       /** @description City offender was received from */
       fromCity?: string
       /** @description City offender was sent to */
@@ -6074,6 +6101,12 @@ export interface components {
        * @example 2019-02-13
        */
       alertDate: string
+      /**
+       * Format: date
+       * @description Date the alert should expire
+       * @example 2099-02-13
+       */
+      expiryDate?: string
     }
     AlertCreated: {
       /** Format: int64 */
@@ -7279,10 +7312,10 @@ export interface components {
       establishmentName: string
     }
     PageString: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       first?: boolean
       last?: boolean
       /** Format: int32 */
@@ -7526,10 +7559,10 @@ export interface components {
       code?: string
     }
     PageCalculableSentenceEnvelope: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       first?: boolean
       last?: boolean
       /** Format: int32 */
@@ -7552,6 +7585,8 @@ export interface components {
       prisonerNumber: string
       /** Format: date */
       dateOfBirth: string
+      lastName: string
+      agencyId: string
       alerts: components['schemas']['Alert'][]
     }
     /** @description Sentence Adjustment values */
@@ -7747,9 +7782,13 @@ export interface components {
     }
     /** @description A period of time in prison */
     PrisonPeriod: {
-      bookNumber?: string
-      /** Format: int64 */
-      bookingId?: number
+      /** @description The book number for this booking */
+      bookNumber: string
+      /**
+       * Format: int64
+       * @description The ID of this booking
+       */
+      bookingId: number
       /**
        * @description Date they first entered prison in this booking
        * @example 2021-07-05T10:35:17
@@ -8825,6 +8864,61 @@ export interface components {
       /** @description Whether this is a life sentence. */
       lifeSentence: boolean
     }
+    Belief: {
+      /**
+       * Format: int64
+       * @description Prisoner booking id
+       * @example 1123456
+       */
+      bookingId: number
+      /**
+       * Format: int64
+       * @description Offender belief id
+       * @example 1123456
+       */
+      beliefId: number
+      /**
+       * @description Belief Code
+       * @example SCIE
+       */
+      beliefCode: string
+      /**
+       * @description Description associated with the belief code
+       * @example Scientologist
+       */
+      beliefDescription: string
+      /**
+       * Format: date
+       * @description Date the belief started
+       * @example 2024-01-01
+       */
+      startDate: string
+      /**
+       * Format: date
+       * @description Date the belief ended
+       * @example 2024-12-12
+       */
+      endDate?: string
+      /** @description Was a reason given for change of belief? */
+      changeReason?: boolean
+      /** @description Comments describing reason for change of belief */
+      comments?: string
+      /** @description First name of staff member that added belief */
+      addedByFirstName: string
+      /** @description Last name of staff member that added belief */
+      addedByLastName: string
+      /** @description First name of staff member that updated belief */
+      updatedByFirstName?: string
+      /** @description Last name of staff member that updated belief */
+      updatedByLastName?: string
+      /**
+       * Format: date
+       * @description Date belief was updated
+       */
+      updatedDate?: string
+      /** @description Verified flag */
+      verified?: boolean
+    }
     /** @description Base Sentence Calc Dates */
     BaseSentenceCalcDates: {
       /**
@@ -9222,10 +9316,10 @@ export interface components {
       additionalAnswers?: string[]
     }
     PageOffenceDto: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       first?: boolean
       last?: boolean
       /** Format: int32 */
@@ -9999,10 +10093,10 @@ export interface components {
       numberOfMembers: number
     }
     PageEducation: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       first?: boolean
       last?: boolean
       /** Format: int32 */
@@ -10215,10 +10309,10 @@ export interface components {
       hasVisits: boolean
     }
     PageVisitWithVisitors: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       first?: boolean
       last?: boolean
       /** Format: int32 */
@@ -10585,10 +10679,10 @@ export interface components {
       otherContacts: components['schemas']['Contact'][]
     }
     PageBedAssignment: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       first?: boolean
       last?: boolean
       /** Format: int32 */
@@ -10643,10 +10737,10 @@ export interface components {
       currency: string
     }
     PageAlert: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       first?: boolean
       last?: boolean
       /** Format: int32 */
@@ -10661,10 +10755,10 @@ export interface components {
       empty?: boolean
     }
     PagePrisonerBookingSummary: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       first?: boolean
       last?: boolean
       /** Format: int32 */
@@ -11017,9 +11111,7 @@ export interface operations {
     responses: {
       /** @description OK */
       200: {
-        content: {
-          'application/json': Record<string, never>
-        }
+        content: never
       }
       /** @description Invalid username or password */
       401: {
@@ -11037,7 +11129,7 @@ export interface operations {
   }
   /**
    * Add the NWEB caseload to specified caseload.
-   * @description Add the NWEB caseload to specified caseload.
+   * @description Requires role MAINTAIN_ACCESS_ROLES or MAINTAIN_ACCESS_ROLES_ADMIN
    */
   addApiAccessForCaseload: {
     parameters: {
@@ -12305,7 +12397,10 @@ export interface operations {
       }
     }
   }
-  /** Update an alert */
+  /**
+   * Update an alert
+   * @description Requires role UPDATE_ALERT
+   */
   updateAlert: {
     parameters: {
       query?: {
@@ -12362,7 +12457,7 @@ export interface operations {
   }
   /**
    * Update offender attendance and pay.
-   * @description Update offender attendance and pay.
+   * @description Requires role PAY
    */
   updateAttendance: {
     parameters: {
@@ -12428,6 +12523,10 @@ export interface operations {
       }
     }
   }
+  /**
+   * Update offender attendance and pay.
+   * @description Requires role PAY
+   */
   updateAttendance_1: {
     parameters: {
       path: {
@@ -12481,7 +12580,7 @@ export interface operations {
   }
   /**
    * Update attendance and pay for multiple bookings.
-   * @description Update offender attendance and pay.
+   * @description Requires role PAY
    */
   updateAttendanceForMultipleBookingIds: {
     requestBody: {
@@ -12520,7 +12619,10 @@ export interface operations {
       }
     }
   }
-  /** Change an appointment's comment. */
+  /**
+   * Change an appointment's comment.
+   * @description Requires role GLOBAL_APPOINTMENT
+   */
   updateAppointmentComment: {
     parameters: {
       path: {
@@ -13039,7 +13141,7 @@ export interface operations {
   }
   /**
    * Returns the user details for supplied usernames - POST version to allow large user lists.
-   * @description user details for supplied usernames
+   * @description Requires role STAFF_SEARCH
    */
   getUserDetailsList: {
     requestBody: {
@@ -14811,7 +14913,7 @@ export interface operations {
   }
   /**
    * Personal Care Needs
-   * @description Personal Care Need
+   * @description Requires role MAINTAIN_HEALTH_PROBLEMS and scope write
    */
   addPersonalCareNeed: {
     parameters: {
@@ -14897,7 +14999,7 @@ export interface operations {
   }
   /**
    * Create appointment for offender.
-   * @description Create appointment for offender.
+   * @description Requires role GLOBAL_APPOINTMENT, or booking is in caseload
    */
   postBookingsBookingIdAppointments: {
     parameters: {
@@ -14920,7 +15022,10 @@ export interface operations {
       }
     }
   }
-  /** Create an alert */
+  /**
+   * Create an alert
+   * @description Requires role UPDATE_ALERT
+   */
   postAlert: {
     parameters: {
       path: {
@@ -14962,7 +15067,7 @@ export interface operations {
   }
   /**
    * Offender detail.
-   * @description Offender detail for offenders<p>This endpoint uses the REPLICA database.</p>
+   * @description Requires role VIEW_PRISONER_DATA or GLOBAL_SEARCH, or prisoners are in caseload<p>This endpoint uses the REPLICA database.</p>
    */
   getBasicInmateDetailsForOffenders: {
     parameters: {
@@ -15030,7 +15135,7 @@ export interface operations {
   }
   /**
    * Personal Care Needs  - POST version to allow for large numbers of offenders
-   * @description Personal Care Needs
+   * @description Requires role VIEW_PRISONER_DATA or GLOBAL_SEARCH
    */
   getPersonalCareNeeds: {
     parameters: {
@@ -15076,7 +15181,7 @@ export interface operations {
   }
   /**
    * Personal Care Needs Counter - POST version to allow to count heath problem by type for large numbers of offenders
-   * @description Personal Care Needs
+   * @description Requires booking to be in caseload, or role GLOBAL_SEARCH or VIEW_PRISONER_DATA
    */
   countPersonalCareNeeds: {
     parameters: {
@@ -15176,7 +15281,7 @@ export interface operations {
   }
   /**
    * Get Offender main offence detail.
-   * @description Post version to allow specifying a large number of bookingIds.<p>This endpoint uses the REPLICA database.</p>
+   * @description Post version to allow specifying a large number of bookingIds. Requires role VIEW_PRISONER_DATA<p>This endpoint uses the REPLICA database.</p>
    */
   getMainOffence: {
     requestBody: {
@@ -15241,7 +15346,7 @@ export interface operations {
   }
   /**
    * Create multiple appointments
-   * @description Create multiple appointments
+   * @description Requires bookings to be in caseload and write scope, and role BULK_APPOINTMENTS if more than 1 appointment is being created
    */
   createAppointments: {
     requestBody: {
@@ -15260,7 +15365,7 @@ export interface operations {
   }
   /**
    * Delete multiple appointments.
-   * @description Delete multiple appointments.
+   * @description Requires role GLOBAL_APPOINTMENT and write scope
    */
   deleteAppointments: {
     requestBody: {
@@ -16557,7 +16662,7 @@ export interface operations {
   }
   /**
    * Staff detail.
-   * @description Staff detail.
+   * @description Security note: staff details are only available for the current user unless client has ROLE_STAFF_SEARCH.
    */
   getStaffDetail: {
     parameters: {
@@ -16595,7 +16700,7 @@ export interface operations {
   }
   /**
    * List of job roles for specified staff and agency Id
-   * @description List of job roles for specified staff and agency Id
+   * @description Security note: the agency must be in the current user's caseload.
    */
   getAllRolesForAgency: {
     parameters: {
@@ -16635,7 +16740,7 @@ export interface operations {
   }
   /**
    * Check if staff member has a role
-   * @description Check if staff member has a role, either KW or POM
+   * @description Check if staff member has a role, either KW or POM. Security note: the agency must be in the current user's caseload.
    */
   hasStaffRole: {
     parameters: {
@@ -16680,7 +16785,7 @@ export interface operations {
   }
   /**
    * Returns a list of email addresses associated with this staff user
-   * @description List of email addresses for a specified staff user
+   * @description Security note: staff details are only available for the current user unless client has ROLE_STAFF_SEARCH.
    */
   getStaffEmailAddresses: {
     parameters: {
@@ -16718,7 +16823,7 @@ export interface operations {
   }
   /**
    * Returns a list of caseloads associated with this staff user
-   * @description List of caseloads for a specified staff user
+   * @description Security note: staff details are only available for the current user unless client has ROLE_STAFF_SEARCH.
    */
   getStaffCaseloads: {
     parameters: {
@@ -16759,7 +16864,7 @@ export interface operations {
   }
   /**
    * Get staff members within agency who are currently assigned the specified role.
-   * @description Get staff members within agency who are currently assigned the specified role.<p>This endpoint uses the REPLICA database.</p>
+   * @description Get staff members within agency who are currently assigned the specified role. Security note: the agency must be in the current user's caseload.<p>This endpoint uses the REPLICA database.</p>
    */
   getStaffByAgencyRole: {
     parameters: {
@@ -17636,7 +17741,7 @@ export interface operations {
   }
   /**
    * Retrieve an offender's financial transaction history for cash, spends or savings.
-   * @description Transactions are returned in order of entryDate descending and sequence ascending).<br/>All transaction amounts are represented as pence values.<p>This endpoint uses the REPLICA database.</p>
+   * @description Transactions are returned in order of entryDate descending and sequence ascending).<br/>All transaction amounts are represented as pence values. Requires offender to be in caseload or role GLOBAL_SEARCH or VIEW_PRISONER_DATA<p>This endpoint uses the REPLICA database.</p>
    */
   getTransactionsHistory: {
     parameters: {
@@ -17699,7 +17804,7 @@ export interface operations {
   }
   /**
    * Offender Sentence Details
-   * @description Retrieve an single offender sentence details
+   * @description Retrieve an single offender sentence details. Requires offender to be in caseload or role GLOBAL_SEARCH or VIEW_PRISONER_DATA
    */
   getOffenderSentenceDetail: {
     parameters: {
@@ -17719,7 +17824,7 @@ export interface operations {
   }
   /**
    * All future (scheduled) events for offender
-   * @description All future events for offender that are in a scheduled and not cancelled state.
+   * @description All future events for offender that are in a scheduled and not cancelled state. Requires offender to be in caseload or role GLOBAL_SEARCH or VIEW_PRISONER_DATA
    */
   getScheduledEvents: {
     parameters: {
@@ -18079,7 +18184,7 @@ export interface operations {
    * This endpoint will therefore also return different information from Whereabouts API as that service re-maps the NOMIS layout to include spurs etc.</p>
    * <p>If the current location is temporary (reception, court, tap, cell swap or early conditional licence) then the previous permanent location is also returned, provided
    * that the location is at the same prison and they haven't moved to a different prison in the meantime.</p>
-   * <p>Requires a relationship (via caseload) with the prisoner or VIEW_PRISONER_DATA role.</p>
+   * <p>Requires a relationship (via caseload) with the prisoner or the GLOBAL_SEARCH or VIEW_PRISONER_DATA role.</p>
    */
   getHousingLocation: {
     parameters: {
@@ -18165,7 +18270,10 @@ export interface operations {
       }
     }
   }
-  /** Return a list of damage obligations */
+  /**
+   * Return a list of damage obligations
+   * @description Requires offender to be in caseload or role GLOBAL_SEARCH or VIEW_PRISONER_DATA
+   */
   getOffenderDamageObligations: {
     parameters: {
       query?: {
@@ -18338,6 +18446,44 @@ export interface operations {
       }
     }
   }
+  /** Get belief history for a prisoner */
+  getOffenderBeliefHistory: {
+    parameters: {
+      query?: {
+        bookingId?: string
+      }
+      path: {
+        /** @description The prisoner number */
+        offenderNo: string
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          'application/json': components['schemas']['Belief'][]
+        }
+      }
+      /** @description Invalid request. */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Forbidden - user not authorised to view belief history. */
+      403: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unrecoverable error occurred whilst processing request. */
+      500: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
   /**
    * Return a list of alerts for all booking for a given offender No.
    * @description System or cat tool access only
@@ -18395,7 +18541,7 @@ export interface operations {
   }
   /**
    * Return a list of addresses for a given offender, most recent first.
-   * @description <p>This endpoint uses the REPLICA database.</p>
+   * @description Requires offender to be in caseload, or role GLOBAL_SEARCH or VIEW_PRISONER_DATA<p>This endpoint uses the REPLICA database.</p>
    */
   getAddressesByOffenderNo: {
     parameters: {
@@ -20055,7 +20201,7 @@ export interface operations {
   }
   /**
    * The summary of the visits for the offender.
-   * @description Will return whether there are any visits and also the date of the next scheduled visit<p>This endpoint uses the REPLICA database.</p>
+   * @description Will return whether there are any visits and also the date of the next scheduled visit. Requires role VIEW_PRISONER_DATA or GLOBAL_SEARCH, or booking is in caseload<p>This endpoint uses the REPLICA database.</p>
    */
   getBookingVisitsSummary: {
     parameters: {
@@ -20093,7 +20239,7 @@ export interface operations {
   }
   /**
    * The list of prisons for which there are visits for the specified booking.
-   * @description To be used for filtering visits by prison
+   * @description To be used for filtering visits by prison. Requires role VIEW_PRISONER_DATA or GLOBAL_SEARCH, or booking is in caseload
    */
   getBookingVisitsPrisons: {
     parameters: {
@@ -20131,7 +20277,7 @@ export interface operations {
   }
   /**
    * The next visit for the offender.
-   * @description The next visit for the offender. Will return 200 with no body if no next visit is scheduled<p>This endpoint uses the REPLICA database.</p>
+   * @description The next visit for the offender. Will return 200 with no body if no next visit is scheduled. Requires role VIEW_PRISONER_DATA or GLOBAL_SEARCH, or booking is in caseload<p>This endpoint uses the REPLICA database.</p>
    */
   getBookingVisitsNext: {
     parameters: {
@@ -20238,6 +20384,7 @@ export interface operations {
    *   <li>If there is no confirmed release date for the offender, the offender release date is either the actual parole date or the home detention curfew actual date.</li>
    *   <li>If there is no confirmed release date, actual parole date or home detention curfew actual date for the offender, the release date is the later of the nonDtoReleaseDate or midTermDate value (if either or both are present)</li>
    * </ul>
+   * Requires booking to be in caseload, or role GLOBAL_SEARCH or VIEW_PRISONER_DATA
    * <p>This endpoint uses the REPLICA database.</p>
    */
   getBookingSentenceDetail: {
@@ -20278,7 +20425,10 @@ export interface operations {
       }
     }
   }
-  /** Offender sentence adjustments. */
+  /**
+   * Offender sentence adjustments.
+   * @description Requires booking to be in caseload, or role GLOBAL_SEARCH or VIEW_PRISONER_DATA
+   */
   getBookingSentenceAdjustments: {
     parameters: {
       path: {
@@ -20398,7 +20548,7 @@ export interface operations {
   }
   /**
    * List of active property containers
-   * @description List of active property containers
+   * @description Requires booking to be in caseload, or role VIEW_PRISONER_DATA
    */
   getOffenderPropertyContainers: {
     parameters: {
@@ -20436,7 +20586,7 @@ export interface operations {
   }
   /**
    * Military Records
-   * @description Military Records
+   * @description Requires booking to be in caseload, or role VIEW_PRISONER_DATA
    */
   getMilitaryRecords_1: {
     parameters: {
@@ -20474,7 +20624,7 @@ export interface operations {
   }
   /**
    * Get Offender main offence detail.
-   * @description Offender main offence detail.
+   * @description Requires booking to be in caseload, or role GLOBAL_SEARCH or VIEW_PRISONER_DATA
    */
   getMainOffence_1: {
     parameters: {
@@ -20591,7 +20741,10 @@ export interface operations {
       }
     }
   }
-  /** Gets the Fixed Term Recall details for a booking */
+  /**
+   * Gets the Fixed Term Recall details for a booking
+   * @description Requires role VIEW_PRISONER_DATA, or booking is in caseload
+   */
   getFixedTermRecallDetails: {
     parameters: {
       path: {
@@ -20628,7 +20781,7 @@ export interface operations {
   }
   /**
    * All scheduled events for offender.
-   * @description All scheduled events for offender.
+   * @description Requires role VIEW_PRISONER_DATA or GLOBAL_SEARCH, or booking is in caseload
    */
   getEvents_1: {
     parameters: {
@@ -20672,7 +20825,7 @@ export interface operations {
   }
   /**
    * Today's scheduled events for offender.
-   * @description Today's scheduled events for offender.
+   * @description Requires role VIEW_PRISONER_DATA or GLOBAL_SEARCH, or booking is in caseload
    */
   getEventsToday: {
     parameters: {
@@ -20710,7 +20863,7 @@ export interface operations {
   }
   /**
    * Scheduled events for offender for coming week (from current day).
-   * @description Scheduled events for offender for coming week (from current day).
+   * @description Requires role VIEW_PRISONER_DATA or GLOBAL_SEARCH, or booking is in caseload
    */
   getEventsThisWeek: {
     parameters: {
@@ -20748,7 +20901,7 @@ export interface operations {
   }
   /**
    * Scheduled events for offender for following week.
-   * @description Scheduled events for offender for following week.
+   * @description Requires role VIEW_PRISONER_DATA or GLOBAL_SEARCH, or booking is in caseload
    */
   getEventsNextWeek: {
     parameters: {
@@ -20826,7 +20979,7 @@ export interface operations {
   }
   /**
    * Court Cases
-   * @description Court Cases
+   * @description Requires role VIEW_PRISONER_DATA or GLOBAL_SEARCH, or booking is in caseload
    */
   getCourtCases: {
     parameters: {
@@ -20868,7 +21021,7 @@ export interface operations {
   }
   /**
    * Offender contacts (e.g. next of kin).
-   * @description Offender contacts (e.g. next of kin).
+   * @description Requires role VIEW_PRISONER_DATA or GLOBAL_SEARCH, or booking is in caseload
    */
   getContacts: {
     parameters: {
@@ -20998,7 +21151,7 @@ export interface operations {
   }
   /**
    * Offender account balances.
-   * @description Offender account balances.
+   * @description Requires booking to be in caseload, or role GLOBAL_SEARCH or VIEW_PRISONER_DATA
    */
   getBalances: {
     parameters: {
@@ -21228,7 +21381,7 @@ export interface operations {
   }
   /**
    * All scheduled activities for offender.
-   * @description All scheduled activities for offender.<p>This endpoint uses the REPLICA database.</p>
+   * @description Requires booking id to be in caseload, or role VIEW_SCHEDULES<p>This endpoint uses the REPLICA database.</p>
    */
   getBookingActivities: {
     parameters: {
@@ -21565,7 +21718,7 @@ export interface operations {
   }
   /**
    * Get an appointment by id.
-   * @description Get appointment byId.
+   * @description Requires role GLOBAL_APPOINTMENT
    */
   getAppointment: {
     parameters: {
@@ -21597,7 +21750,7 @@ export interface operations {
   }
   /**
    * Delete an appointment.
-   * @description Delete appointment.
+   * @description Requires role GLOBAL_APPOINTMENT and write scope
    */
   deleteAppointment: {
     parameters: {

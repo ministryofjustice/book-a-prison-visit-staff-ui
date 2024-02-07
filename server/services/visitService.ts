@@ -7,6 +7,7 @@ import {
   VisitsPageSlot,
 } from '../@types/bapv'
 import {
+  ApplicationDto,
   ApplicationMethodType,
   CancelVisitOrchestrationDto,
   NotificationType,
@@ -61,46 +62,43 @@ export default class VisitService {
     return orchestrationApiClient.cancelVisit(reference, cancelVisitDto)
   }
 
-  async changeBookedVisit({
+  async changeVisitApplication({
     username,
     visitSessionData,
   }: {
     username: string
     visitSessionData: VisitSessionData
-  }): Promise<Visit> {
+  }): Promise<ApplicationDto> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
-    const visit = await orchestrationApiClient.changeBookedVisit(visitSessionData)
-    return visit
+    return orchestrationApiClient.changeVisitApplication(visitSessionData)
   }
 
-  async changeReservedVisit({
+  async createVisitApplicationFromVisit({
     username,
     visitSessionData,
   }: {
     username: string
     visitSessionData: VisitSessionData
-  }): Promise<Visit> {
+  }): Promise<ApplicationDto> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
-    const visit = await orchestrationApiClient.changeReservedVisit(visitSessionData)
-    return visit
+    return orchestrationApiClient.createVisitApplicationFromVisit(visitSessionData)
   }
 
-  async reserveVisit({
+  async createVisitApplication({
     username,
     visitSessionData,
   }: {
     username: string
     visitSessionData: VisitSessionData
-  }): Promise<Visit> {
+  }): Promise<ApplicationDto> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
-    const reservation = await orchestrationApiClient.reserveVisit(visitSessionData)
-    return reservation
+    return orchestrationApiClient.createVisitApplication(visitSessionData)
   }
 
   async getVisit({

@@ -244,11 +244,11 @@ describe('sessionCheckMiddleware', () => {
     it('should redirect to the start page if prisonId in visitSlot does not match selected establishment', () => {
       req.session.selectedEstablishment = { prisonId: 'BLI', prisonName: supportedPrisons.BLI, policyNoticeDaysMin: 2 }
       req.session.visitSessionData = {
+        applicationReference: 'aaa-bbb-ccc',
         prisoner: prisonerData,
         visitRestriction,
         visitors: visitorsData,
         visitReference: 'ab-cd-ef-gh',
-        visitStatus: 'RESERVED',
         visitSlot: {
           id: '1',
           prisonId,
@@ -263,13 +263,13 @@ describe('sessionCheckMiddleware', () => {
       expect(mockResponse.redirect).toHaveBeenCalledWith('/?error=establishment-mismatch')
     })
 
-    it('should not reject a fully booked visit', () => {
+    it('should not reject a fully booked (zero capacity) visit', () => {
       req.session.visitSessionData = {
+        applicationReference: 'aaa-bbb-ccc',
         prisoner: prisonerData,
         visitRestriction,
         visitors: visitorsData,
         visitReference: 'ab-cd-ef-gh',
-        visitStatus: 'RESERVED',
         visitSlot: {
           id: '1',
           prisonId,
@@ -285,8 +285,8 @@ describe('sessionCheckMiddleware', () => {
     })
   })
 
-  describe('visit reference', () => {
-    it('should redirect to the prisoner profile if visit booking reference not set', () => {
+  describe('application reference', () => {
+    it('should redirect to the prisoner profile if visit application reference not set', () => {
       const testData: VisitSessionData = {
         prisoner: prisonerData,
         visitRestriction,
@@ -298,19 +298,19 @@ describe('sessionCheckMiddleware', () => {
 
       sessionCheckMiddleware({ stage: 3 })(req as Request, mockResponse as Response, next)
 
-      expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/A1234BC?error=missing-visit-reference')
+      expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/A1234BC?error=missing-application-reference')
     })
   })
 
   describe('additional support', () => {
     it('should redirect to the prisoner profile if additional support is not set', () => {
       const testData: VisitSessionData = {
+        applicationReference: 'aaa-bbb-ccc',
         prisoner: prisonerData,
         visitRestriction,
         visitSlot,
         visitors: visitorsData,
         visitReference: 'ab-cd-ef-gh',
-        visitStatus: 'RESERVED',
       }
 
       req.session.visitSessionData = testData
@@ -324,15 +324,16 @@ describe('sessionCheckMiddleware', () => {
   describe('main contact data missing', () => {
     ;[
       {
+        applicationReference: 'aaa-bbb-ccc',
         prisoner: prisonerData,
         visitRestriction,
         visitSlot,
         visitors: visitorsData,
         visitorSupport: [],
         visitReference: 'ab-cd-ef-gh',
-        visitStatus: 'RESERVED',
       } as VisitSessionData,
       {
+        applicationReference: 'aaa-bbb-ccc',
         prisoner: prisonerData,
         visitRestriction,
         visitSlot,
@@ -342,7 +343,6 @@ describe('sessionCheckMiddleware', () => {
           phoneNumber: '',
         },
         visitReference: 'ab-cd-ef-gh',
-        visitStatus: 'RESERVED',
       } as VisitSessionData,
     ].forEach((testData: VisitSessionData) => {
       it('should redirect to the prisoner profile when there is missing main contact data', () => {
@@ -358,8 +358,7 @@ describe('sessionCheckMiddleware', () => {
   describe('request method', () => {
     beforeEach(() => {
       const testData: VisitSessionData = {
-        visitReference: 'ab-cd-ef-gh',
-        visitStatus: 'RESERVED',
+        applicationReference: 'aaa-bbb-ccc',
         prisoner: prisonerData,
         visitRestriction,
         visitSlot,
@@ -403,46 +402,14 @@ describe('sessionCheckMiddleware', () => {
           contactName: 'abc',
         },
         requestMethod: 'PHONE',
+        applicationReference: 'aaa-bbb-ccc',
+        visitReference: 'ab-cd-ef-gh',
       }
 
       req.session.visitSessionData = testData
     })
 
-    it('should not redirect if visit status missing prior to selecting a visit slot', () => {
-      sessionCheckMiddleware({ stage: 2 })(req as Request, mockResponse as Response, next)
-
-      expect(mockResponse.redirect).not.toHaveBeenCalled()
-    })
-
-    it('should not redirect if visit status is RESERVED during booking journey', () => {
-      req.session.visitSessionData.visitReference = 'ab-cd-ef-gh'
-      req.session.visitSessionData.visitStatus = 'RESERVED'
-
-      sessionCheckMiddleware({ stage: 3 })(req as Request, mockResponse as Response, next)
-
-      expect(mockResponse.redirect).not.toHaveBeenCalled()
-    })
-
-    it('should not redirect if visit status is CHANGING during booking journey', () => {
-      req.session.visitSessionData.visitReference = 'ab-cd-ef-gh'
-      req.session.visitSessionData.visitStatus = 'CHANGING'
-
-      sessionCheckMiddleware({ stage: 3 })(req as Request, mockResponse as Response, next)
-
-      expect(mockResponse.redirect).not.toHaveBeenCalled()
-    })
-
-    it('should redirect to the prisoner profile if visit status is not RESERVED during booking journey', () => {
-      req.session.visitSessionData.visitReference = 'ab-cd-ef-gh'
-      req.session.visitSessionData.visitStatus = 'BOOKED'
-
-      sessionCheckMiddleware({ stage: 3 })(req as Request, mockResponse as Response, next)
-
-      expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/A1234BC?error=visit-already-booked')
-    })
-
     it('should not redirect if visit status is BOOKED at end of booking journey', () => {
-      req.session.visitSessionData.visitReference = 'ab-cd-ef-gh'
       req.session.visitSessionData.visitStatus = 'BOOKED'
 
       sessionCheckMiddleware({ stage: 7 })(req as Request, mockResponse as Response, next)
@@ -451,9 +418,6 @@ describe('sessionCheckMiddleware', () => {
     })
 
     it('should redirect to the prisoner profile if visit status is not BOOKED at end of booking journey', () => {
-      req.session.visitSessionData.visitReference = 'ab-cd-ef-gh'
-      req.session.visitSessionData.visitStatus = 'RESERVED'
-
       sessionCheckMiddleware({ stage: 7 })(req as Request, mockResponse as Response, next)
 
       expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/A1234BC?error=visit-not-booked')

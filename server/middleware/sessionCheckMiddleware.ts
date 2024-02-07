@@ -55,15 +55,15 @@ export default function sessionCheckMiddleware({ stage }: { stage: number }): Re
       return logAndRedirect(req, res, '/?error=establishment-mismatch')
     }
 
-    if (stage > 2 && !visitSessionData.visitReference) {
-      return logAndRedirect(req, res, `/prisoner/${visitSessionData.prisoner.offenderNo}?error=missing-visit-reference`)
+    if (stage > 2 && !visitSessionData.applicationReference) {
+      return logAndRedirect(
+        req,
+        res,
+        `/prisoner/${visitSessionData.prisoner.offenderNo}?error=missing-application-reference`,
+      )
     }
 
-    if (
-      stage > 2 &&
-      stage < 7 &&
-      !(visitSessionData.visitStatus === 'RESERVED' || visitSessionData.visitStatus === 'CHANGING')
-    ) {
+    if (stage > 2 && stage < 7 && !(visitSessionData.visitStatus === undefined)) {
       return logAndRedirect(req, res, `/prisoner/${visitSessionData.prisoner.offenderNo}?error=visit-already-booked`)
     }
 
