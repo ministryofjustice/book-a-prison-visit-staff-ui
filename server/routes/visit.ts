@@ -187,8 +187,6 @@ export default function routes({
         contactName: visit.visitContact.name,
       },
       visitReference: visit.reference,
-      visitStatus: visit.visitStatus,
-      requestMethod: undefined, // request method should NOT be pre-populated
     }
 
     req.session.visitSessionData = Object.assign(req.session.visitSessionData ?? {}, visitSessionData)

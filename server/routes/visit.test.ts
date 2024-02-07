@@ -602,7 +602,7 @@ describe('/visit/:reference', () => {
         .expect('location', '/visit/ab-cd-ef-gh/update/select-visitors')
         .expect(res => {
           expect(clearSession).toHaveBeenCalledTimes(1)
-          expect(visitSessionData).toEqual(<VisitSessionData>{
+          expect(visitSessionData).toStrictEqual(<VisitSessionData>{
             prisoner: {
               name: 'Smith, John',
               offenderNo: 'A1234BC',
@@ -664,7 +664,6 @@ describe('/visit/:reference', () => {
             visitorSupport: [{ type: 'WHEELCHAIR' }, { text: 'custom request', type: 'OTHER' }],
             mainContact: { contact: visitors[0], phoneNumber: '01234 567890', contactName: 'Jeanette Smith' },
             visitReference: 'ab-cd-ef-gh',
-            visitStatus: 'BOOKED',
           })
         })
     })
