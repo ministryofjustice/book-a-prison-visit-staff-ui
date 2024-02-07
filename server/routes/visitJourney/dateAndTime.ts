@@ -133,27 +133,25 @@ export default class DateAndTime {
 
     // See README ('Visit journeys – book and update') for explanation of this flow
     if (visitSessionData.applicationReference) {
-      await this.visitService.changeReservedVisit({
+      await this.visitService.changeVisitApplication({
         username: res.locals.user.username,
         visitSessionData,
       })
     } else if (isUpdate) {
-      const { applicationReference, visitStatus } = await this.visitService.changeBookedVisit({
+      const { reference } = await this.visitService.createVisitApplicationFromVisit({
         username: res.locals.user.username,
         visitSessionData,
       })
 
-      visitSessionData.applicationReference = applicationReference
-      visitSessionData.visitStatus = visitStatus
+      visitSessionData.applicationReference = reference
+      // visitSessionData.visitStatus = visitStatus
     } else {
-      const { applicationReference, reference, visitStatus } = await this.visitService.reserveVisit({
+      const { reference } = await this.visitService.createVisitApplication({
         username: res.locals.user.username,
         visitSessionData,
       })
 
-      visitSessionData.applicationReference = applicationReference
-      visitSessionData.visitReference = reference
-      visitSessionData.visitStatus = visitStatus
+      visitSessionData.applicationReference = reference
     }
 
     await this.auditService.reservedVisit({

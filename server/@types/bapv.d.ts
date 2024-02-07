@@ -114,7 +114,7 @@ export type VisitSessionData = {
     contactName?: string
   }
   applicationReference?: string
-  visitReference?: string
+  visitReference?: string // only set during an update journey; during initial booking it's unknown
   visitStatus?: Visit['visitStatus']
   requestMethod?: ApplicationMethodType
   daysUntilBanExpiry?: number

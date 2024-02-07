@@ -10,8 +10,9 @@ export type VisitHistoryDetails = components['schemas']['VisitHistoryDetailsDto'
 
 export type Visitor = components['schemas']['VisitorDto']
 
-export type ReserveVisitSlotDto = components['schemas']['ReserveVisitSlotDto']
-export type ChangeVisitSlotRequestDto = components['schemas']['ChangeVisitSlotRequestDto']
+export type ApplicationDto = components['schemas']['ApplicationDto']
+export type ChangeApplicationDto = components['schemas']['ChangeApplicationDto']
+export type CreateApplicationDto = components['schemas']['CreateApplicationDto']
 
 export type OutcomeDto = components['schemas']['OutcomeDto']
 export type CancelVisitOrchestrationDto = components['schemas']['CancelVisitOrchestrationDto']

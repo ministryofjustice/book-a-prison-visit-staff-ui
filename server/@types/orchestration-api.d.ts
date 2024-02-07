@@ -4,21 +4,21 @@
  */
 
 export interface paths {
-  '/visits/{reference}/change': {
-    /** Change a booked visit, (a starting point) */
-    put: operations['changeBookedVisit']
-  }
   '/visits/{reference}/cancel': {
     /** Cancel an existing booked visit */
     put: operations['cancelVisit']
   }
-  '/visits/{applicationReference}/slot/change': {
-    /** Change a reserved slot and associated details for a visit (before booking) */
-    put: operations['changeReservedVisitSlot']
-  }
   '/visits/{applicationReference}/book': {
     /** Book a visit (end of flow) */
     put: operations['bookAVisit']
+  }
+  '/visits/application/{reference}/slot/change': {
+    /** Change an incomplete application */
+    put: operations['changeIncompleteApplication']
+  }
+  '/visits/application/{bookingReference}/change': {
+    /** Create an application for an existing visit */
+    put: operations['createApplicationForAnExistingVisit']
   }
   '/queue-admin/retry-dlq/{dlqName}': {
     put: operations['retryDlq']
@@ -29,9 +29,9 @@ export interface paths {
   '/queue-admin/purge-queue/{queueName}': {
     put: operations['purgeQueue']
   }
-  '/visits/slot/reserve': {
-    /** Reserve a slot (date/time slot) for a visit (a starting point) */
-    post: operations['reserveVisitSlot']
+  '/visits/application/slot/reserve': {
+    /** Create an initial application and reserve a slot */
+    post: operations['createInitialApplication']
   }
   '/visits/{reference}': {
     /**
@@ -60,6 +60,13 @@ export interface paths {
      * @description Retrieve visits with optional filters, sorted by start timestamp descending
      */
     get: operations['getVisitsByFilterPageable']
+  }
+  '/visits/search/future/{prisonerId}': {
+    /**
+     * Get future visits for a prisoner
+     * @description Get future visits for given prisoner number
+     */
+    get: operations['getFutureVisitsForPrisoner']
   }
   '/visits/notification/{prisonCode}/groups': {
     /**
@@ -147,6 +154,67 @@ export type webhooks = Record<string, never>
 
 export interface components {
   schemas: {
+    CancelVisitOrchestrationDto: {
+      cancelOutcome: components['schemas']['OutcomeDto']
+      /**
+       * @description application method
+       * @enum {string}
+       */
+      applicationMethodType:
+        | 'PHONE'
+        | 'WEBSITE'
+        | 'EMAIL'
+        | 'IN_PERSON'
+        | 'NOT_KNOWN'
+        | 'NOT_APPLICABLE'
+        | 'BY_PRISONER'
+    }
+    /**
+     * @description Contact Phone Number
+     * @example 01234 567890
+     */
+    OutcomeDto: {
+      /**
+       * @description Outcome Status
+       * @example VISITOR_CANCELLED
+       * @enum {string}
+       */
+      outcomeStatus:
+        | 'ADMINISTRATIVE_CANCELLATION'
+        | 'ADMINISTRATIVE_ERROR'
+        | 'BATCH_CANCELLATION'
+        | 'CANCELLATION'
+        | 'COMPLETED_NORMALLY'
+        | 'ESTABLISHMENT_CANCELLED'
+        | 'NOT_RECORDED'
+        | 'NO_VISITING_ORDER'
+        | 'PRISONER_CANCELLED'
+        | 'PRISONER_COMPLETED_EARLY'
+        | 'PRISONER_REFUSED_TO_ATTEND'
+        | 'TERMINATED_BY_STAFF'
+        | 'VISITOR_CANCELLED'
+        | 'VISITOR_COMPLETED_EARLY'
+        | 'VISITOR_DECLINED_ENTRY'
+        | 'VISITOR_DID_NOT_ARRIVE'
+        | 'VISITOR_FAILED_SECURITY_CHECKS'
+        | 'VISIT_ORDER_CANCELLED'
+        | 'SUPERSEDED_CANCELLATION'
+        | 'DETAILS_CHANGED_AFTER_BOOKING'
+      /**
+       * @description Outcome text
+       * @example Because he got covid
+       */
+      text?: string
+    }
+    ErrorResponse: {
+      /** Format: int32 */
+      status: number
+      /** Format: int32 */
+      errorCode?: number
+      userMessage?: string
+      developerMessage?: string
+      moreInfo?: string
+    }
     /** @description Contact */
     ContactDto: {
       /**
@@ -159,77 +227,6 @@ export interface components {
        * @example 01234 567890
        */
       telephone: string
-    }
-    ReserveVisitSlotDto: {
-      /**
-       * @description Prisoner Id
-       * @example AF34567G
-       */
-      prisonerId: string
-      /**
-       * @description Session template reference
-       * @example v9d.7ed.7u
-       */
-      sessionTemplateReference: string
-      /**
-       * @description Visit Restriction
-       * @example OPEN
-       * @enum {string}
-       */
-      visitRestriction: 'OPEN' | 'CLOSED' | 'UNKNOWN'
-      /**
-       * Format: date-time
-       * @description The date and time of the visit
-       */
-      startTimestamp: string
-      /**
-       * Format: date-time
-       * @description The finishing date and time of the visit
-       */
-      endTimestamp: string
-      visitContact?: components['schemas']['ContactDto']
-      /** @description List of visitors associated with the visit */
-      visitors: components['schemas']['VisitorDto'][]
-      /** @description List of additional support associated with the visit */
-      visitorSupport?: components['schemas']['VisitorSupportDto'][]
-    }
-    /** @description Visitor */
-    VisitorDto: {
-      /**
-       * Format: int64
-       * @description Person ID (nomis) of the visitor
-       * @example 1234
-       */
-      nomisPersonId: number
-      /**
-       * @description true if visitor is the contact for the visit otherwise false
-       * @example true
-       */
-      visitContact?: boolean
-      firstName?: string
-      lastName?: string
-    }
-    /** @description Visitor support */
-    VisitorSupportDto: {
-      /**
-       * @description Support type
-       * @example OTHER
-       */
-      type: string
-      /**
-       * @description Support text description
-       * @example visually impaired assistance
-       */
-      text?: string
-    }
-    ErrorResponse: {
-      /** Format: int32 */
-      status: number
-      /** Format: int32 */
-      errorCode?: number
-      userMessage?: string
-      developerMessage?: string
-      moreInfo?: string
     }
     /** @description Visit */
     VisitDto: {
@@ -279,7 +276,7 @@ export interface components {
        * @example RESERVED
        * @enum {string}
        */
-      visitStatus: 'RESERVED' | 'CHANGING' | 'BOOKED' | 'CANCELLED'
+      visitStatus: 'BOOKED' | 'CANCELLED'
       /**
        * @description Outcome Status
        * @example VISITOR_CANCELLED
@@ -354,85 +351,34 @@ export interface components {
        */
       text: string
     }
-    CancelVisitOrchestrationDto: {
-      cancelOutcome: components['schemas']['OutcomeDto']
+    /** @description Visitor */
+    VisitorDto: {
       /**
-       * @description application method
-       * @enum {string}
+       * Format: int64
+       * @description Person ID (nomis) of the visitor
+       * @example 1234
        */
-      applicationMethodType:
-        | 'PHONE'
-        | 'WEBSITE'
-        | 'EMAIL'
-        | 'IN_PERSON'
-        | 'NOT_KNOWN'
-        | 'NOT_APPLICABLE'
-        | 'BY_PRISONER'
+      nomisPersonId: number
+      /**
+       * @description true if visitor is the contact for the visit otherwise false
+       * @example true
+       */
+      visitContact?: boolean
+      firstName?: string
+      lastName?: string
     }
-    /**
-     * @description Contact Phone Number
-     * @example 01234 567890
-     */
-    OutcomeDto: {
+    /** @description Visitor support */
+    VisitorSupportDto: {
       /**
-       * @description Outcome Status
-       * @example VISITOR_CANCELLED
-       * @enum {string}
+       * @description Support type
+       * @example OTHER
        */
-      outcomeStatus:
-        | 'ADMINISTRATIVE_CANCELLATION'
-        | 'ADMINISTRATIVE_ERROR'
-        | 'BATCH_CANCELLATION'
-        | 'CANCELLATION'
-        | 'COMPLETED_NORMALLY'
-        | 'ESTABLISHMENT_CANCELLED'
-        | 'NOT_RECORDED'
-        | 'NO_VISITING_ORDER'
-        | 'PRISONER_CANCELLED'
-        | 'PRISONER_COMPLETED_EARLY'
-        | 'PRISONER_REFUSED_TO_ATTEND'
-        | 'TERMINATED_BY_STAFF'
-        | 'VISITOR_CANCELLED'
-        | 'VISITOR_COMPLETED_EARLY'
-        | 'VISITOR_DECLINED_ENTRY'
-        | 'VISITOR_DID_NOT_ARRIVE'
-        | 'VISITOR_FAILED_SECURITY_CHECKS'
-        | 'VISIT_ORDER_CANCELLED'
-        | 'SUPERSEDED_CANCELLATION'
-        | 'DETAILS_CHANGED_AFTER_BOOKING'
+      type: string
       /**
-       * @description Outcome text
-       * @example Because he got covid
+       * @description Support text description
+       * @example visually impaired assistance
        */
       text?: string
-    }
-    ChangeVisitSlotRequestDto: {
-      /**
-       * @description Visit Restriction
-       * @example OPEN
-       * @enum {string}
-       */
-      visitRestriction?: 'OPEN' | 'CLOSED' | 'UNKNOWN'
-      /**
-       * Format: date-time
-       * @description The date and time of the visit
-       */
-      startTimestamp?: string
-      /**
-       * Format: date-time
-       * @description The finishing date and time of the visit
-       */
-      endTimestamp?: string
-      visitContact?: components['schemas']['ContactDto']
-      /** @description List of visitors associated with the visit */
-      visitors?: components['schemas']['VisitorDto'][]
-      /** @description List of additional support associated with the visit */
-      visitorSupport?: components['schemas']['VisitorSupportDto'][]
-      /**
-       * @description Session template reference
-       * @example v9d.7ed.7u
-       */
-      sessionTemplateReference: string
     }
     BookingOrchestrationRequestDto: {
       /**
@@ -447,6 +393,131 @@ export interface components {
         | 'NOT_KNOWN'
         | 'NOT_APPLICABLE'
         | 'BY_PRISONER'
+    }
+    ChangeApplicationDto: {
+      /**
+       * @description Visit Restriction
+       * @example OPEN
+       * @enum {string}
+       */
+      applicationRestriction?: 'OPEN' | 'CLOSED'
+      /**
+       * @description Session template reference
+       * @example v9d.7ed.7u
+       */
+      sessionTemplateReference: string
+      /**
+       * Format: date
+       * @description The date for the visit
+       * @example 2018-12-01
+       */
+      sessionDate: string
+      visitContact?: components['schemas']['ContactDto']
+      /** @description List of visitors associated with the visit */
+      visitors: components['schemas']['VisitorDto'][]
+      /** @description List of additional support associated with the visit */
+      visitorSupport?: components['schemas']['VisitorSupportDto'][]
+    }
+    /** @description Visit */
+    ApplicationDto: {
+      /**
+       * @description reference
+       * @example v9-d7-ed-7u
+       */
+      reference: string
+      /**
+       * @description session template Reference
+       * @example dfs-wjs-eqr
+       */
+      sessionTemplateReference?: string
+      /**
+       * @description Prisoner Id
+       * @example AF34567G
+       */
+      prisonerId: string
+      /**
+       * @description Prison Id
+       * @example MDI
+       */
+      prisonId: string
+      /**
+       * @description Visit Type
+       * @example SOCIAL
+       * @enum {string}
+       */
+      visitType: 'SOCIAL'
+      /**
+       * @description Visit Restriction
+       * @example OPEN
+       * @enum {string}
+       */
+      visitRestriction: 'OPEN' | 'CLOSED' | 'UNKNOWN'
+      /**
+       * Format: date-time
+       * @description The date and time of the visit
+       */
+      startTimestamp: string
+      /**
+       * Format: date-time
+       * @description The finishing date and time of the visit
+       */
+      endTimestamp: string
+      /** @description Visit Notes */
+      visitNotes: components['schemas']['VisitNoteDto'][]
+      visitContact?: components['schemas']['ContactDto']
+      /** @description List of visitors associated with the visit */
+      visitors: components['schemas']['VisitorDto'][]
+      /** @description List of additional support associated with the visit */
+      visitorSupport: components['schemas']['VisitorSupportDto'][]
+      /**
+       * Format: date-time
+       * @description The visit created date and time
+       */
+      createdTimestamp: string
+      /**
+       * Format: date-time
+       * @description The visit modified date and time
+       */
+      modifiedTimestamp: string
+      /**
+       * @description Is the application reserved
+       * @example true
+       */
+      reserved: boolean
+      /**
+       * @description Is the application complete
+       * @example true
+       */
+      completed: boolean
+    }
+    CreateApplicationDto: {
+      /**
+       * @description Prisoner Id
+       * @example AF34567G
+       */
+      prisonerId: string
+      /**
+       * @description Session template reference
+       * @example v9d.7ed.7u
+       */
+      sessionTemplateReference: string
+      /**
+       * Format: date
+       * @description The date for the visit
+       * @example 2018-12-01
+       */
+      sessionDate: string
+      /**
+       * @description Visit Restriction
+       * @example OPEN
+       * @enum {string}
+       */
+      applicationRestriction: 'OPEN' | 'CLOSED'
+      visitContact?: components['schemas']['ContactDto']
+      /** @description List of visitors associated with the visit */
+      visitors: components['schemas']['VisitorDto'][]
+      /** @description List of additional support associated with the visit */
+      visitorSupport?: components['schemas']['VisitorSupportDto'][]
     }
     DlqMessage: {
       body: {
@@ -544,34 +615,34 @@ export interface components {
       totalPages?: number
       /** Format: int64 */
       totalElements?: number
-      /** Format: int32 */
-      size?: number
-      content?: components['schemas']['VisitDto'][]
-      /** Format: int32 */
-      number?: number
-      sort?: components['schemas']['SortObject']
-      first?: boolean
-      last?: boolean
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
+      /** Format: int32 */
+      number?: number
+      /** Format: int32 */
+      size?: number
+      sort?: components['schemas']['SortObject']
+      content?: components['schemas']['VisitDto'][]
+      first?: boolean
+      last?: boolean
       empty?: boolean
     }
     PageableObject: {
+      paged?: boolean
+      unpaged?: boolean
+      /** Format: int32 */
+      pageNumber?: number
+      /** Format: int32 */
+      pageSize?: number
       /** Format: int64 */
       offset?: number
       sort?: components['schemas']['SortObject']
-      /** Format: int32 */
-      pageSize?: number
-      /** Format: int32 */
-      pageNumber?: number
-      paged?: boolean
-      unpaged?: boolean
     }
     SortObject: {
-      empty?: boolean
       sorted?: boolean
       unsorted?: boolean
+      empty?: boolean
     }
     OrchestrationNotificationGroupDto: {
       /**
@@ -951,7 +1022,7 @@ export interface components {
        * @example RESERVED
        * @enum {string}
        */
-      visitStatus: 'RESERVED' | 'CHANGING' | 'BOOKED' | 'CANCELLED'
+      visitStatus: 'BOOKED' | 'CANCELLED'
       /**
        * @description Visit Restriction
        * @example OPEN
@@ -1030,49 +1101,6 @@ export type $defs = Record<string, never>
 export type external = Record<string, never>
 
 export interface operations {
-  /** Change a booked visit, (a starting point) */
-  changeBookedVisit: {
-    parameters: {
-      path: {
-        /**
-         * @description reference
-         * @example v9-d7-ed-7u
-         */
-        reference: string
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['ReserveVisitSlotDto']
-      }
-    }
-    responses: {
-      /** @description Visit created */
-      201: {
-        content: {
-          '*/*': components['schemas']['VisitDto']
-        }
-      }
-      /** @description Incorrect request to change a booked visit */
-      400: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Unauthorized to access this endpoint */
-      401: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Incorrect permissions to change a booked visit */
-      403: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
   /** Cancel an existing booked visit */
   cancelVisit: {
     parameters: {
@@ -1111,55 +1139,6 @@ export interface operations {
         }
       }
       /** @description Visit not found */
-      404: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  /** Change a reserved slot and associated details for a visit (before booking) */
-  changeReservedVisitSlot: {
-    parameters: {
-      path: {
-        /**
-         * @description applicationReference
-         * @example dfs-wjs-eqr
-         */
-        applicationReference: string
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['ChangeVisitSlotRequestDto']
-      }
-    }
-    responses: {
-      /** @description Visit slot changed */
-      200: {
-        content: {
-          '*/*': components['schemas']['VisitDto']
-        }
-      }
-      /** @description Incorrect request to changed a visit slot */
-      400: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Unauthorized to access this endpoint */
-      401: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Incorrect permissions to changed a visit slot */
-      403: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Visit slot not found */
       404: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
@@ -1216,6 +1195,98 @@ export interface operations {
       }
     }
   }
+  /** Change an incomplete application */
+  changeIncompleteApplication: {
+    parameters: {
+      path: {
+        /**
+         * @description reference
+         * @example dfs-wjs-eqr
+         */
+        reference: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ChangeApplicationDto']
+      }
+    }
+    responses: {
+      /** @description Visit slot changed */
+      200: {
+        content: {
+          '*/*': components['schemas']['ApplicationDto']
+        }
+      }
+      /** @description Incorrect request to changed a visit slot */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to changed a visit slot */
+      403: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Visit slot not found */
+      404: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  /** Create an application for an existing visit */
+  createApplicationForAnExistingVisit: {
+    parameters: {
+      path: {
+        /**
+         * @description bookingReference
+         * @example v9-d7-ed-7u
+         */
+        bookingReference: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateApplicationDto']
+      }
+    }
+    responses: {
+      /** @description Visit created */
+      201: {
+        content: {
+          '*/*': components['schemas']['ApplicationDto']
+        }
+      }
+      /** @description Incorrect request to change a visit */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to change a visit */
+      403: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
   retryDlq: {
     parameters: {
       path: {
@@ -1256,18 +1327,18 @@ export interface operations {
       }
     }
   }
-  /** Reserve a slot (date/time slot) for a visit (a starting point) */
-  reserveVisitSlot: {
+  /** Create an initial application and reserve a slot */
+  createInitialApplication: {
     requestBody: {
       content: {
-        'application/json': components['schemas']['ReserveVisitSlotDto']
+        'application/json': components['schemas']['CreateApplicationDto']
       }
     }
     responses: {
       /** @description Visit slot reserved */
       201: {
         content: {
-          '*/*': components['schemas']['VisitDto']
+          '*/*': components['schemas']['ApplicationDto']
         }
       }
       /** @description Incorrect request to reserve a slot */
@@ -1452,20 +1523,15 @@ export interface operations {
          */
         prisonId?: string
         /**
-         * @description Filter results by visits that start on or after the given timestamp
-         * @example 2021-11-03T09:00:00
+         * @description Filter results by visits that start on or after the given date
+         * @example 2021-11-03
          */
-        startDateTime?: string
+        startDate?: string
         /**
-         * @description Filter results by visits that start on or before the given timestamp
-         * @example 2021-11-03T09:00:00
+         * @description Filter results by visits that start on or before the given date
+         * @example 2021-11-03
          */
-        endDateTime?: string
-        /**
-         * @description Filter results by visitor (contact id)
-         * @example 12322
-         */
-        visitorId?: number
+        endDate?: string
         /**
          * @description Filter results by visit status
          * @example BOOKED
@@ -1503,6 +1569,43 @@ export interface operations {
         }
       }
       /** @description Incorrect permissions to retrieve visits */
+      403: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  /**
+   * Get future visits for a prisoner
+   * @description Get future visits for given prisoner number
+   */
+  getFutureVisitsForPrisoner: {
+    parameters: {
+      path: {
+        prisonerId: string
+      }
+    }
+    responses: {
+      /** @description Returned future visits for a prisoner */
+      200: {
+        content: {
+          '*/*': components['schemas']['VisitDto'][]
+        }
+      }
+      /** @description Incorrect request to get future visits for a prisoner */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to get future visits for a prisoner */
       403: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
