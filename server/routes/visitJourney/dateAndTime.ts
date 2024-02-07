@@ -144,7 +144,6 @@ export default class DateAndTime {
       })
 
       visitSessionData.applicationReference = reference
-      // visitSessionData.visitStatus = visitStatus
     } else {
       const { reference } = await this.visitService.createVisitApplication({
         username: res.locals.user.username,
