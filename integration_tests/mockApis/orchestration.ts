@@ -195,7 +195,7 @@ export default {
         urlPath: '/orchestration/visits/search',
         queryParameters: {
           prisonerId: { equalTo: offenderNo },
-          startDateTime: { matches: '.*' },
+          visitStartDate: { matches: '.*' },
           visitStatus: { and: [{ contains: 'BOOKED' }, { contains: 'CANCELLED' }] },
           page: { equalTo: '0' },
           size: { equalTo: '1000' },
@@ -209,13 +209,13 @@ export default {
     })
   },
   stubVisitsByDate: ({
-    startDateTime,
-    endDateTime,
+    visitStartDate,
+    visitEndDate,
     prisonId,
     visits,
   }: {
-    startDateTime: string
-    endDateTime: string
+    visitStartDate: string
+    visitEndDate: string
     prisonId: string
     visits: Visit
   }): SuperAgentRequest => {
@@ -225,8 +225,8 @@ export default {
         urlPath: `/orchestration/visits/search`,
         queryParameters: {
           prisonId: { equalTo: prisonId },
-          startDateTime: { equalTo: startDateTime },
-          endDateTime: { equalTo: endDateTime },
+          visitStartDate: { equalTo: visitStartDate },
+          visitEndDate: { equalTo: visitEndDate },
           visitStatus: { equalTo: 'BOOKED' },
           page: { equalTo: '0' },
           size: { equalTo: '1000' },

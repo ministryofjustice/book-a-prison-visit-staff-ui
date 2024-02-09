@@ -67,7 +67,7 @@ export default class OrchestrationApiClient {
       path: '/visits/search',
       query: new URLSearchParams({
         prisonerId: offenderNo,
-        startDateTime: new Date().toISOString(),
+        visitStartDate: new Date().toISOString().split('T')[0],
         visitStatus: visitStatus.join(','),
         page: this.page,
         size: this.size,
@@ -80,8 +80,8 @@ export default class OrchestrationApiClient {
       path: '/visits/search',
       query: new URLSearchParams({
         prisonId,
-        startDateTime: `${dateString}T00:00:00`,
-        endDateTime: `${dateString}T23:59:59`,
+        visitStartDate: dateString,
+        visitEndDate: dateString,
         visitStatus: 'BOOKED',
         page: this.page,
         size: this.size,

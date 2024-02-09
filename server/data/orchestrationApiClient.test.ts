@@ -183,7 +183,7 @@ describe('orchestrationApiClient', () => {
         .get('/visits/search')
         .query({
           prisonerId: offenderNo,
-          startDateTime: timestamp,
+          visitStartDate: timestamp.split('T')[0],
           visitStatus: 'BOOKED,CANCELLED',
           page: '0',
           size: '1000',
@@ -235,8 +235,8 @@ describe('orchestrationApiClient', () => {
         .get('/visits/search')
         .query({
           prisonId: 'HEI',
-          startDateTime: `${dateString}T00:00:00`,
-          endDateTime: `${dateString}T23:59:59`,
+          visitStartDate: dateString,
+          visitEndDate: dateString,
           visitStatus: 'BOOKED',
           page: '0',
           size: '1000',
