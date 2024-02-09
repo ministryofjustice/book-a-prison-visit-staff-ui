@@ -615,34 +615,34 @@ export interface components {
       totalPages?: number
       /** Format: int64 */
       totalElements?: number
-      pageable?: components['schemas']['PageableObject']
-      /** Format: int32 */
-      numberOfElements?: number
-      /** Format: int32 */
-      number?: number
-      /** Format: int32 */
-      size?: number
-      sort?: components['schemas']['SortObject']
-      content?: components['schemas']['VisitDto'][]
       first?: boolean
       last?: boolean
+      /** Format: int32 */
+      size?: number
+      content?: components['schemas']['VisitDto'][]
+      /** Format: int32 */
+      number?: number
+      sort?: components['schemas']['SortObject']
+      /** Format: int32 */
+      numberOfElements?: number
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     PageableObject: {
-      paged?: boolean
-      unpaged?: boolean
-      /** Format: int32 */
-      pageNumber?: number
-      /** Format: int32 */
-      pageSize?: number
       /** Format: int64 */
       offset?: number
       sort?: components['schemas']['SortObject']
+      /** Format: int32 */
+      pageSize?: number
+      /** Format: int32 */
+      pageNumber?: number
+      paged?: boolean
+      unpaged?: boolean
     }
     SortObject: {
+      empty?: boolean
       sorted?: boolean
       unsorted?: boolean
-      empty?: boolean
     }
     OrchestrationNotificationGroupDto: {
       /**
@@ -1526,12 +1526,12 @@ export interface operations {
          * @description Filter results by visits that start on or after the given date
          * @example 2021-11-03
          */
-        startDate?: string
+        visitStartDate?: string
         /**
          * @description Filter results by visits that start on or before the given date
          * @example 2021-11-03
          */
-        endDate?: string
+        visitEndDate?: string
         /**
          * @description Filter results by visit status
          * @example BOOKED

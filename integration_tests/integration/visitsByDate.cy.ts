@@ -43,16 +43,13 @@ context('View visits by date', () => {
   })
 
   it('should show visits by date, and change date to tomorrow using tab heading', () => {
-    let startDateTime = `${todayShortFormat}T00:00:00`
-    let endDateTime = `${todayShortFormat}T23:59:59`
-
     let visits = [
       TestData.visit({ reference: 'ab-cd-ef-gh', prisonerId: prisonerNumber1 }),
       TestData.visit({ reference: 'gh-ef-cd-ab', prisonerId: prisonerNumber2 }),
     ]
     cy.task('stubVisitsByDate', {
-      startDateTime,
-      endDateTime,
+      visitStartDate: todayShortFormat,
+      visitEndDate: todayShortFormat,
       prisonId,
       visits,
     })
@@ -110,15 +107,13 @@ context('View visits by date', () => {
     visitsByDatePage.prisonerRowTwoName().contains(`${prisonersResults[1].lastName}, ${prisonersResults[1].firstName}`)
     visitsByDatePage.prisonerRowTwoNumber().contains(prisonerNumber2)
 
-    startDateTime = `${tomorrowShortFormat}T00:00:00`
-    endDateTime = `${tomorrowShortFormat}T23:59:59`
     visits = [
       TestData.visit({ reference: 'ab-cd-ef-gh', prisonerId: prisonerNumber1, visitRestriction: 'CLOSED' }),
       TestData.visit({ reference: 'gh-ef-cd-ab', prisonerId: prisonerNumber2 }),
     ]
     cy.task('stubVisitsByDate', {
-      startDateTime,
-      endDateTime,
+      visitStartDate: tomorrowShortFormat,
+      visitEndDate: tomorrowShortFormat,
       prisonId,
       visits,
     })
@@ -161,11 +156,9 @@ context('View visits by date', () => {
   })
 
   it('should show visits by date, and change date using the date picker', () => {
-    const startDateTime = `${todayShortFormat}T00:00:00`
-    const endDateTime = `${todayShortFormat}T23:59:59`
     cy.task('stubVisitsByDate', {
-      startDateTime,
-      endDateTime,
+      visitStartDate: todayShortFormat,
+      visitEndDate: todayShortFormat,
       prisonId,
       visits: [],
     })
@@ -183,8 +176,8 @@ context('View visits by date', () => {
     const firstOfNextMonthShortFormat = format(firstOfNextMonth, shortDateFormat)
     const firstOfNextMonthLongFormat = format(firstOfNextMonth, longDateFormat)
     cy.task('stubVisitsByDate', {
-      startDateTime: `${firstOfNextMonthShortFormat}T00:00:00`,
-      endDateTime: `${firstOfNextMonthShortFormat}T23:59:59`,
+      visitStartDate: firstOfNextMonthShortFormat,
+      visitEndDate: firstOfNextMonthShortFormat,
       prisonId,
       visits: [],
     })
