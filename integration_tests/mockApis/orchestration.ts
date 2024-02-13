@@ -182,29 +182,22 @@ export default {
       },
     })
   },
-  stubUpcomingVisits: ({
-    offenderNo,
+  stubFutureVisit: ({
+    prisonerId,
     upcomingVisits,
   }: {
-    offenderNo: string
+    prisonerId: string
     upcomingVisits: Visit[]
   }): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPath: '/orchestration/visits/search',
-        queryParameters: {
-          prisonerId: { equalTo: offenderNo },
-          visitStartDate: { matches: '.*' },
-          visitStatus: { and: [{ contains: 'BOOKED' }, { contains: 'CANCELLED' }] },
-          page: { equalTo: '0' },
-          size: { equalTo: '1000' },
-        },
+        urlPath: `/orchestration/visits/search/future/${prisonerId}`,
       },
       response: {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: { content: upcomingVisits },
+        jsonBody: upcomingVisits,
       },
     })
   },
