@@ -313,19 +313,18 @@ describe('Visit service', () => {
       })
     })
 
-    describe('getUpcomingVisits', () => {
+    describe('getFutureVisits', () => {
       it('should return an array of upcoming VisitInformation for an offender', async () => {
         const visits: Visit[] = [visit]
 
-        orchestrationApiClient.getUpcomingVisits.mockResolvedValue({ content: visits })
-        const result = await visitService.getUpcomingVisits({
+        orchestrationApiClient.getFutureVisits.mockResolvedValue(visits)
+        const result = await visitService.getFutureVisits({
           username: 'user',
-          offenderNo: 'A1234BC',
-          visitStatus: ['BOOKED'],
+          prisonerId: 'A1234BC',
         })
 
-        expect(orchestrationApiClient.getUpcomingVisits).toHaveBeenCalledTimes(1)
-        expect(orchestrationApiClient.getUpcomingVisits).toHaveBeenCalledWith('A1234BC', ['BOOKED'])
+        expect(orchestrationApiClient.getFutureVisits).toHaveBeenCalledTimes(1)
+        expect(orchestrationApiClient.getFutureVisits).toHaveBeenCalledWith('A1234BC')
         expect(result).toEqual(<VisitInformation[]>[
           {
             reference: 'ab-cd-ef-gh',
@@ -342,15 +341,14 @@ describe('Visit service', () => {
       it('should return an empty array for an offender with no upcoming visits', async () => {
         const visits: Visit[] = []
 
-        orchestrationApiClient.getUpcomingVisits.mockResolvedValue({ content: visits })
-        const result = await visitService.getUpcomingVisits({
+        orchestrationApiClient.getFutureVisits.mockResolvedValue(visits)
+        const result = await visitService.getFutureVisits({
           username: 'user',
-          offenderNo: 'A1234BC',
-          visitStatus: ['BOOKED'],
+          prisonerId: 'A1234BC',
         })
 
-        expect(orchestrationApiClient.getUpcomingVisits).toHaveBeenCalledTimes(1)
-        expect(orchestrationApiClient.getUpcomingVisits).toHaveBeenCalledWith('A1234BC', ['BOOKED'])
+        expect(orchestrationApiClient.getFutureVisits).toHaveBeenCalledTimes(1)
+        expect(orchestrationApiClient.getFutureVisits).toHaveBeenCalledWith('A1234BC')
         expect(result).toEqual([])
       })
     })

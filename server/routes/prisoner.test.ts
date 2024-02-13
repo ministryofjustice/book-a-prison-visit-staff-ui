@@ -504,7 +504,7 @@ describe('GET /prisoner/A1234BC/visits', () => {
     ]
 
     prisonerSearchService.getPrisoner.mockResolvedValue(prisoner)
-    visitService.getUpcomingVisits.mockResolvedValue(visitInfo)
+    visitService.getFutureVisits.mockResolvedValue(visitInfo)
 
     return request(app)
       .get('/prisoner/A1234BC/visits')
@@ -549,7 +549,7 @@ describe('GET /prisoner/A1234BC/visits', () => {
     ]
 
     prisonerSearchService.getPrisoner.mockResolvedValue(prisoner)
-    visitService.getUpcomingVisits.mockResolvedValue(visitInfo)
+    visitService.getFutureVisits.mockResolvedValue(visitInfo)
 
     return request(app)
       .get('/prisoner/A1234BC/visits?search=A1234BC')
@@ -574,7 +574,7 @@ describe('GET /prisoner/A1234BC/visits', () => {
 
   it('should show message and back-to-start button if prisoner has no upcoming visits', () => {
     prisonerSearchService.getPrisoner.mockResolvedValue(prisoner)
-    visitService.getUpcomingVisits.mockResolvedValue([])
+    visitService.getFutureVisits.mockResolvedValue([])
 
     return request(app)
       .get('/prisoner/A1234BC/visits')

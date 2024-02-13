@@ -62,17 +62,8 @@ export default class OrchestrationApiClient {
     return this.restClient.get({ path: `/visits/${reference}/history` })
   }
 
-  async getUpcomingVisits(offenderNo: string, visitStatus: Visit['visitStatus'][]): Promise<PageVisitDto> {
-    return this.restClient.get({
-      path: '/visits/search',
-      query: new URLSearchParams({
-        prisonerId: offenderNo,
-        visitStartDate: new Date().toISOString().split('T')[0],
-        visitStatus: visitStatus.join(','),
-        page: this.page,
-        size: this.size,
-      }).toString(),
-    })
+  async getFutureVisits(prisonerId: string): Promise<Visit[]> {
+    return this.restClient.get({ path: `/visits/search/future/${prisonerId}` })
   }
 
   async getVisitsByDate(dateString: string, prisonId: string): Promise<PageVisitDto> {
