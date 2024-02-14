@@ -144,15 +144,15 @@ describe('orchestrationApiClient', () => {
     })
   })
 
-  describe('getUpcomingVisits', () => {
+  describe('getFutureVisits', () => {
     it('should return an array of Visits', async () => {
       const timestamp = new Date().toISOString()
-      const offenderNo = 'A1234BC'
+      const prisonerId = 'A1234BC'
       const results: Visit[] = [
         {
           applicationReference: 'aaa-bbb-ccc',
           reference: 'ab-cd-ef-gh',
-          prisonerId: offenderNo,
+          prisonerId,
           prisonId: 'HEI',
           visitRoom: 'A1 L3',
           visitType: 'SOCIAL',
@@ -180,18 +180,11 @@ describe('orchestrationApiClient', () => {
       jest.useFakeTimers({ advanceTimers: true, now: new Date(timestamp) })
 
       fakeOrchestrationApi
-        .get('/visits/search')
-        .query({
-          prisonerId: offenderNo,
-          visitStartDate: timestamp.split('T')[0],
-          visitStatus: 'BOOKED,CANCELLED',
-          page: '0',
-          size: '1000',
-        })
+        .get(`/visits/search/future/${prisonerId}`)
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
-      const output = await orchestrationApiClient.getUpcomingVisits(offenderNo, ['BOOKED', 'CANCELLED'])
+      const output = await orchestrationApiClient.getFutureVisits(prisonerId)
 
       expect(output).toEqual(results)
 
