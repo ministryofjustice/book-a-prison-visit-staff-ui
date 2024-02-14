@@ -93,12 +93,22 @@ export function registerNunjucks(app?: express.Express): Environment {
       return ''
     }
 
-    const duration = intervalToDuration({ start: dob, end: today })
+    const emptyDuration = {
+      years: 0,
+      months: 0,
+      days: 0,
+      hours: 0,
+      minutes: 0,
+      seconds: 0,
+    }
+    const intervalDuration = intervalToDuration({ start: dob, end: today })
+    const duration = { ...emptyDuration, ...intervalDuration }
+
     let age = ''
-    if (duration.years < 1) {
+    if (duration.years === 0) {
       age = formatDuration(duration, { format: ['months'], zero: true })
     } else {
-      age = formatDuration(duration, { format: ['years'] })
+      age = formatDuration(duration, { format: ['years'], zero: true })
     }
 
     return `${age} old`

@@ -1,5 +1,5 @@
 import { type RequestHandler, Router } from 'express'
-import format from 'date-fns/format'
+import { format } from 'date-fns'
 import { body, validationResult } from 'express-validator'
 import config from '../config'
 import { ExtendedVisitInformation, PrisonerDetailsItem, VisitsPageSlot } from '../@types/bapv'
