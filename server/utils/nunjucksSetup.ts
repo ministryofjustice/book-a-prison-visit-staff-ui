@@ -108,7 +108,7 @@ export function registerNunjucks(app?: express.Express): Environment {
     if (duration.years < 1) {
       age = formatDuration(duration, { format: ['months'], zero: true })
     } else {
-      age = formatDuration(duration, { format: ['years'], zero: true })
+      age = formatDuration(duration, { format: ['years'] })
     }
 
     return `${age} old`
