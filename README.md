@@ -16,7 +16,8 @@ The app requires:
 * hmpps-auth - for authentication
 * redis - session store and token caching
 
-### Running the app for development
+### Running the app for development\
+
 
 To start the main services excluding the app itself: 
 
