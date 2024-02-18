@@ -58,7 +58,7 @@ context('Cancel visit journey', () => {
     visitDetailsPage.cancelBooking().click()
 
     const cancelVisitPage = Page.verifyOnPage(CancelVisitPage)
-    cancelVisitPage.establishmentCancelledRadio().click()
+    cancelVisitPage.establishmentCancelledRadio().click({ force: true })
     cancelVisitPage.enterCancellationReasonText(cancelVisitDto.cancelOutcome.text)
 
     cy.task('stubCancelVisit', { visit: visitHistoryDetails.visit, cancelVisitDto })
@@ -87,9 +87,9 @@ context('Cancel visit journey', () => {
     visitDetailsPage.cancelBooking().click()
 
     const cancelVisitPage = Page.verifyOnPage(CancelVisitPage)
-    cancelVisitPage.visitorCancelledRadio().click()
+    cancelVisitPage.visitorCancelledRadio().click({ force: true })
     cancelVisitPage.enterCancellationReasonText(cancelVisitDto.cancelOutcome.text)
-    cancelVisitPage.getRequestMethodByValue('WEBSITE').check()
+    cancelVisitPage.getRequestMethodByValue('WEBSITE').check({ force: true })
 
     cy.task('stubCancelVisit', { visit: visitHistoryDetails.visit, cancelVisitDto })
     cancelVisitPage.submit().click()

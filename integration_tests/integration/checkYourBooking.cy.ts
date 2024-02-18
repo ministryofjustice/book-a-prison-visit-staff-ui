@@ -66,7 +66,7 @@ context('Check visit details page', () => {
     cy.task('stubOffenderRestrictions', { offenderNo: prisonerId, offenderRestrictions: [] })
     prisonerProfilePage.bookAVisitButton().click()
     const selectVisitorsPage = Page.verifyOnPage(SelectVisitorsPage)
-    selectVisitorsPage.getVisitor(contacts[0].personId).check()
+    selectVisitorsPage.getVisitor(contacts[0].personId).check({ force: true })
 
     // Select date and time
     cy.task('stubVisitSessions', {
@@ -92,25 +92,25 @@ context('Check visit details page', () => {
     selectVisitorsPage.continueButton().click()
     const selectVisitDateAndTime = Page.verifyOnPage(SelectVisitDateAndTime)
     selectVisitDateAndTime.expandAllSections()
-    selectVisitDateAndTime.getSlotById(1).check()
+    selectVisitDateAndTime.getSlotById(1).check({ force: true })
 
     // Additional support
     cy.task('stubAvailableSupport')
     selectVisitDateAndTime.continueButton().click()
     const additionalSupportPage = Page.verifyOnPage(AdditionalSupportPage)
-    additionalSupportPage.additionalSupportNotRequired().check()
+    additionalSupportPage.additionalSupportNotRequired().check({ force: true })
 
     // Main contact
     additionalSupportPage.continueButton().click()
     const mainContactPage = Page.verifyOnPage(MainContactPage)
-    mainContactPage.getFirstContact().check()
+    mainContactPage.getFirstContact().check({ force: true })
     mainContactPage.enterPhoneNumber('01234 567890')
 
     // Request method
     mainContactPage.continueButton().click()
     const requestMethodPage = Page.verifyOnPage(RequestMethodPage)
     requestMethodPage.getRequestLabelByValue('PHONE').contains('Phone call')
-    requestMethodPage.getRequestMethodByValue('PHONE').check()
+    requestMethodPage.getRequestMethodByValue('PHONE').check({ force: true })
     requestMethodPage.continueButton().click()
 
     // Check visit details
@@ -130,7 +130,7 @@ context('Check visit details page', () => {
     Page.verifyOnPage(SelectVisitDateAndTime)
     selectVisitDateAndTime.expandAllSections()
     selectVisitDateAndTime.getSlotById(1).should('be.checked')
-    selectVisitDateAndTime.getSlotById(2).check()
+    selectVisitDateAndTime.getSlotById(2).check({ force: true })
     cy.task(
       'stubChangeReservedSlot',
       TestData.visit({
@@ -154,7 +154,7 @@ context('Check visit details page', () => {
     checkYourBookingPage.changeVisitors().click()
     selectVisitorsPage.getVisitor(contacts[0].personId).should('be.checked')
     selectVisitorsPage.getVisitor(contacts[1].personId).should('not.be.checked')
-    selectVisitorsPage.getVisitor(contacts[1].personId).check()
+    selectVisitorsPage.getVisitor(contacts[1].personId).check({ force: true })
     selectVisitorsPage.continueButton().click()
     selectVisitDateAndTime.getSlotById(2).should('be.checked')
     cy.task(
@@ -182,7 +182,7 @@ context('Check visit details page', () => {
     // Check details - change additional support - then proceed through journey
     checkYourBookingPage.changeAdditionalSupport().click()
     additionalSupportPage.additionalSupportNotRequired().should('be.checked')
-    additionalSupportPage.additionalSupportRequired().check()
+    additionalSupportPage.additionalSupportRequired().check({ force: true })
     additionalSupportPage.selectSupportType('WHEELCHAIR')
     additionalSupportPage.continueButton().click()
     mainContactPage.continueButton().click()
@@ -199,7 +199,7 @@ context('Check visit details page', () => {
     // Check details - change request method - then proceed through journey
     checkYourBookingPage.changeRequestMethod().click()
     requestMethodPage.getRequestLabelByValue('WEBSITE').contains('GOV.UK')
-    requestMethodPage.getRequestMethodByValue('WEBSITE').check()
+    requestMethodPage.getRequestMethodByValue('WEBSITE').check({ force: true })
     requestMethodPage.continueButton().click()
     checkYourBookingPage.requestMethod().contains('GOV.UK')
 
