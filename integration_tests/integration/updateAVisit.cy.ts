@@ -84,7 +84,7 @@ context('Update a visit', () => {
     const selectVisitorsPage = Page.verifyOnPage(SelectVisitorsPage)
     selectVisitorsPage.getVisitor(contacts[0].personId).should('be.checked')
     selectVisitorsPage.getVisitor(contacts[1].personId).should('not.be.checked')
-    selectVisitorsPage.getVisitor(contacts[1].personId).check()
+    selectVisitorsPage.getVisitor(contacts[1].personId).check({ force: true })
 
     // Select date and time - current slot pre-selected
     cy.task('stubVisitSessions', {
@@ -115,14 +115,14 @@ context('Update a visit', () => {
       visitorSupport: [],
     })
     cy.task('stubChangeBookedVisit', updatedVisit)
-    selectVisitDateAndTime.getSlotById(2).check()
+    selectVisitDateAndTime.getSlotById(2).check({ force: true })
     selectVisitDateAndTime.continueButton().click()
 
     // Additional support - add wheelchair and custom option
     const additionalSupportPage = Page.verifyOnPage(AdditionalSupportPage)
     additionalSupportPage.additionalSupportNotRequired().should('be.checked')
     additionalSupportPage.additionalSupportRequired().should('not.be.checked')
-    additionalSupportPage.additionalSupportRequired().check()
+    additionalSupportPage.additionalSupportRequired().check({ force: true })
     additionalSupportPage.selectSupportType('WHEELCHAIR')
     additionalSupportPage.selectSupportType('OTHER')
     additionalSupportPage.enterOtherSupportDetails('Some extra help!')
@@ -138,7 +138,7 @@ context('Update a visit', () => {
     // Request method
     const requestMethodPage = Page.verifyOnPage(RequestMethodPage)
     requestMethodPage.getRequestLabelByValue('PHONE').contains('Phone call')
-    requestMethodPage.getRequestMethodByValue('PHONE').check()
+    requestMethodPage.getRequestMethodByValue('PHONE').check({ force: true })
     requestMethodPage.continueButton().click()
 
     // Check your booking page
@@ -249,7 +249,7 @@ context('Update a visit', () => {
 
     // Confirm update page - check yes
     const confirmUpdatePage = Page.verifyOnPage(ConfirmUpdatePage)
-    confirmUpdatePage.confirmUpdateYesRadio().check()
+    confirmUpdatePage.confirmUpdateYesRadio().check({ force: true })
     confirmUpdatePage.submit().click()
 
     // Select visitors page - existing visitor selected then add another

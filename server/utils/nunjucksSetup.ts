@@ -94,11 +94,13 @@ export function registerNunjucks(app?: express.Express): Environment {
     }
 
     const duration = intervalToDuration({ start: dob, end: today })
+
     let age = ''
-    if (duration.years < 1) {
-      age = formatDuration(duration, { format: ['months'], zero: true })
-    } else {
+    if (duration.years) {
       age = formatDuration(duration, { format: ['years'] })
+    } else {
+      // workaround below for Duration zero/undefined change (https://github.com/date-fns/date-fns/issues/3658)
+      age = formatDuration(duration, { format: ['months'] }) || '0 months'
     }
 
     return `${age} old`

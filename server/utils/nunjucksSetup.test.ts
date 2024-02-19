@@ -131,7 +131,7 @@ describe('Nunjucks Filters', () => {
       jest.useRealTimers()
     })
     ;[
-      { input: '2025-11-15', expected: '' }, // erroneous future date of birth
+      { input: '3025-11-15', expected: '' }, // future date of birth
       { input: '2020-11-15', expected: '0 months old' },
       { input: '2020-11-14', expected: '1 month old' },
       { input: '2020-10-15', expected: '1 month old' },
