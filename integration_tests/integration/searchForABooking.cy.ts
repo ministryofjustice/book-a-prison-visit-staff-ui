@@ -126,7 +126,7 @@ context('Search for a booking by reference', () => {
     cy.task('stubPrisoner', prisoner)
     cy.task('stubPrisonerById', prisoner)
 
-    cy.task('stubFutureVisit', { prisonerId: prisoner.prisonerNumber, upcomingVisits: [upcomingVisit] })
+    cy.task('stubFutureVisits', { prisonerId: prisoner.prisonerNumber, upcomingVisits: [upcomingVisit] })
 
     searchBookingByPrisonerResultsPage.prisonerLink().click()
 

@@ -73,36 +73,8 @@ describe('orchestrationApiClient', () => {
         applicationMethodType: 'NOT_KNOWN',
       }
 
-      const result: Visit = {
-        applicationReference: 'aaa-bbb-ccc',
-        reference: 'ab-cd-ef-gh',
-        prisonerId: 'AF34567G',
-        prisonId: 'HEI',
-        visitRoom: 'A1 L3',
-        visitType: 'SOCIAL',
-        visitStatus: 'CANCELLED',
-        visitRestriction: 'OPEN',
-        startTimestamp: '2022-02-14T10:00:00',
-        endTimestamp: '2022-02-14T11:00:00',
-        visitNotes: [
-          {
-            type: 'VISIT_OUTCOMES',
-            text: 'VISITOR_CANCELLED',
-          },
-          {
-            type: 'STATUS_CHANGED_REASON',
-            text: 'cancellation reason',
-          },
-        ],
-        visitors: [
-          {
-            nomisPersonId: 1234,
-          },
-        ],
-        visitorSupport: [],
-        createdTimestamp: '2022-02-14T10:00:00',
-        modifiedTimestamp: '2022-02-14T10:05:00',
-      }
+      const result: Visit = TestData.visit()
+
       fakeOrchestrationApi
         .put(`/visits/ab-cd-ef-gh/cancel`, cancelVisitDto)
         .matchHeader('authorization', `Bearer ${token}`)
@@ -146,38 +118,8 @@ describe('orchestrationApiClient', () => {
 
   describe('getFutureVisits', () => {
     it('should return an array of Visits', async () => {
-      const timestamp = new Date().toISOString()
       const prisonerId = 'A1234BC'
-      const results: Visit[] = [
-        {
-          applicationReference: 'aaa-bbb-ccc',
-          reference: 'ab-cd-ef-gh',
-          prisonerId,
-          prisonId: 'HEI',
-          visitRoom: 'A1 L3',
-          visitType: 'SOCIAL',
-          visitStatus: 'BOOKED',
-          visitRestriction: 'OPEN',
-          startTimestamp: timestamp,
-          endTimestamp: '',
-          visitNotes: [],
-          visitors: [
-            {
-              nomisPersonId: 1234,
-            },
-          ],
-          visitorSupport: [
-            {
-              type: 'OTHER',
-              text: 'custom support details',
-            },
-          ],
-          createdTimestamp: '2022-02-14T10:00:00',
-          modifiedTimestamp: '2022-02-14T10:05:00',
-        },
-      ]
-
-      jest.useFakeTimers({ advanceTimers: true, now: new Date(timestamp) })
+      const results: Visit[] = [TestData.visit()]
 
       fakeOrchestrationApi
         .get(`/visits/search/future/${prisonerId}`)
@@ -187,42 +129,13 @@ describe('orchestrationApiClient', () => {
       const output = await orchestrationApiClient.getFutureVisits(prisonerId)
 
       expect(output).toEqual(results)
-
-      jest.useRealTimers()
     })
   })
 
   describe('getVisitsByDate', () => {
     it('should return an array of Visits', async () => {
       const dateString = '2022-05-06'
-      const results: Visit[] = [
-        {
-          applicationReference: 'aaa-bbb-ccc',
-          reference: 'ab-cd-ef-gh',
-          prisonerId: 'A1234BC',
-          prisonId: 'HEI',
-          visitRoom: 'A1 L3',
-          visitType: 'SOCIAL',
-          visitStatus: 'BOOKED',
-          visitRestriction: 'OPEN',
-          startTimestamp: `${dateString}T10:00:00`,
-          endTimestamp: '',
-          visitNotes: [],
-          visitors: [
-            {
-              nomisPersonId: 1234,
-            },
-          ],
-          visitorSupport: [
-            {
-              type: 'OTHER',
-              text: 'custom support details',
-            },
-          ],
-          createdTimestamp: '2022-02-14T10:00:00',
-          modifiedTimestamp: '2022-02-14T10:05:00',
-        },
-      ]
+      const results: Visit[] = [TestData.visit()]
 
       fakeOrchestrationApi
         .get('/visits/search')

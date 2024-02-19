@@ -182,7 +182,7 @@ export default {
       },
     })
   },
-  stubFutureVisit: ({
+  stubFutureVisits: ({
     prisonerId,
     upcomingVisits,
   }: {
