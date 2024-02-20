@@ -133,9 +133,8 @@ export function registerNunjucks(app?: express.Express): Environment {
     }
   })
 
-  // format phone number, just Unknown for now
   njkEnv.addFilter('formatTelephone', (telephoneNumber: string) => {
-    return telephoneNumber === 'UNKNOWN' ? 'Unknown' : telephoneNumber
+    return telephoneNumber === 'UNKNOWN' || telephoneNumber === undefined ? 'No phone number provided' : telephoneNumber
   })
 
   njkEnv.addFilter('pluralise', (word, count, plural = `${word}s`) => (count === 1 ? word : plural))

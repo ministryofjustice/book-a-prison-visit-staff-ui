@@ -11,12 +11,14 @@ export default class MainContactPage extends Page {
 
   getFirstContact = (): PageElement => cy.get('#contact')
 
+  phoneNumberTrueRadio = (): PageElement => cy.get('#phoneNumber')
+
   enterPhoneNumber = (number: string): void => {
-    cy.get('#phoneNumber').clear()
-    cy.get('#phoneNumber').type(number)
+    cy.get('#phoneNumberInput').clear()
+    cy.get('#phoneNumberInput').type(number)
   }
 
-  getPhoneNumber = (): PageElement => cy.get('#phoneNumber')
+  getPhoneNumber = (): PageElement => cy.get('#phoneNumberInput')
 
   continueButton = (): PageElement => cy.get('[data-test=submit]')
 }

@@ -160,7 +160,8 @@
             text: "Main contact"
         },
         value: {
-            html: '<p class="test-main-contact-name">' + contactName + '</p><p class="test-main-contact-number">' + mainContact.phoneNumber + '</p>'
+            html: '<p class="test-main-contact-name">' + contactName + '</p><p class="test-main-contact-number">' +
+                mainContact.phoneNumber | formatTelephone + '</p>'
         }
     }
 ), displayRows) %}

@@ -104,6 +104,7 @@ context('Check visit details page', () => {
     additionalSupportPage.continueButton().click()
     const mainContactPage = Page.verifyOnPage(MainContactPage)
     mainContactPage.getFirstContact().check()
+    mainContactPage.phoneNumberTrueRadio().click()
     mainContactPage.enterPhoneNumber('01234 567890')
 
     // Request method

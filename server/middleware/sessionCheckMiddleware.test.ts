@@ -339,9 +339,7 @@ describe('sessionCheckMiddleware', () => {
         visitSlot,
         visitors: visitorsData,
         visitorSupport: [],
-        mainContact: {
-          phoneNumber: '',
-        },
+        mainContact: {},
         visitReference: 'ab-cd-ef-gh',
       } as VisitSessionData,
     ].forEach((testData: VisitSessionData) => {
