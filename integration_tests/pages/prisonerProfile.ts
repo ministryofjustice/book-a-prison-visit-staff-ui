@@ -27,11 +27,11 @@ export default class PrisonerProfilePage extends Page {
 
   bookAVisitButton = (): PageElement => cy.get('[data-test="book-a-visit"]')
 
-  selectVisitingOrdersTab = (): PageElement => cy.get('#visiting-orders').click({ force: true })
+  selectVisitingOrdersTab = (): PageElement => cy.get('#tab_visiting-orders').click()
 
-  selectActiveAlertsTab = (): PageElement => cy.get('#active-alerts').click({ force: true })
+  selectActiveAlertsTab = (): PageElement => cy.get('#tab_active-alerts').click()
 
-  selectVisitsTab = (): PageElement => cy.get('#visits').click({ force: true })
+  selectVisitsTab = (): PageElement => cy.get('#tab_visits').click()
 
   visitTabVORemaining = (): PageElement => cy.get('[data-test="tab-vo-remaining"]')
 
