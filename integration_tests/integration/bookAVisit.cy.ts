@@ -120,8 +120,8 @@ context('Book a visit', () => {
       cy.contains(contacts[0].restrictions[0].restrictionTypeDescription)
       cy.contains('End date not entered')
     })
-    selectVisitorsPage.getVisitor(contacts[0].personId).check({ force: true })
-    selectVisitorsPage.getVisitor(contacts[1].personId).check({ force: true })
+    selectVisitorsPage.getVisitor(contacts[0].personId).check()
+    selectVisitorsPage.getVisitor(contacts[1].personId).check()
 
     // Select date and time
     cy.task('stubVisitSessions', {
@@ -147,13 +147,13 @@ context('Book a visit', () => {
     selectVisitorsPage.continueButton().click()
     const selectVisitDateAndTime = Page.verifyOnPage(SelectVisitDateAndTime)
     selectVisitDateAndTime.expandAllSections()
-    selectVisitDateAndTime.getSlotById(1).check({ force: true })
+    selectVisitDateAndTime.getSlotById(1).check()
 
     // Additional support
     cy.task('stubAvailableSupport')
     selectVisitDateAndTime.continueButton().click()
     const additionalSupportPage = Page.verifyOnPage(AdditionalSupportPage)
-    additionalSupportPage.additionalSupportRequired().check({ force: true })
+    additionalSupportPage.additionalSupportRequired().check()
     additionalSupportPage.selectSupportType('WHEELCHAIR')
     additionalSupportPage.selectSupportType('OTHER')
     additionalSupportPage.enterOtherSupportDetails('Some extra help!')
@@ -161,14 +161,14 @@ context('Book a visit', () => {
     // Main contact
     additionalSupportPage.continueButton().click()
     const mainContactPage = Page.verifyOnPage(MainContactPage)
-    mainContactPage.getFirstContact().check({ force: true })
+    mainContactPage.getFirstContact().check()
     mainContactPage.enterPhoneNumber('01234 567890')
 
     // Request method
     mainContactPage.continueButton().click()
     const requestMethodPage = Page.verifyOnPage(RequestMethodPage)
     requestMethodPage.getRequestLabelByValue('PHONE').contains('Phone call')
-    requestMethodPage.getRequestMethodByValue('PHONE').check({ force: true })
+    requestMethodPage.getRequestMethodByValue('PHONE').check()
     requestMethodPage.continueButton().click()
 
     // Check booking details
@@ -252,7 +252,7 @@ context('Book a visit', () => {
     prisonerProfilePage
       .voOverrideText()
       .contains('The prisoner has no available visiting orders. Select the box if a booking can still be made.')
-    prisonerProfilePage.voOverrideButton().click({ force: true })
+    prisonerProfilePage.voOverrideButton().click()
 
     const offenderRestrictions = [TestData.offenderRestriction()]
     cy.task('stubOffenderRestrictions', { offenderNo: prisonerId, offenderRestrictions })
@@ -284,8 +284,8 @@ context('Book a visit', () => {
     prisonerProfilePage.bookAVisitButton().click()
 
     const selectVisitorsPage = Page.verifyOnPage(SelectVisitorsPage)
-    selectVisitorsPage.getVisitor(contacts[0].personId).check({ force: true })
-    selectVisitorsPage.getVisitor(contacts[1].personId).check({ force: true })
+    selectVisitorsPage.getVisitor(contacts[0].personId).check()
+    selectVisitorsPage.getVisitor(contacts[1].personId).check()
     selectVisitorsPage.continueButton().click()
 
     const selectVisitTypePage = Page.verifyOnPage(SelectVisitTypePage)

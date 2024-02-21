@@ -6,7 +6,7 @@ export default class ChangeEstablishmentPage extends Page {
   }
 
   selectEstablishment = (prisonId: string): void => {
-    cy.get(`#${prisonId}`).check({ force: true })
+    cy.get(`#${prisonId}`).check()
   }
 
   continueButton = (): PageElement => cy.get('[data-test=submit]')
