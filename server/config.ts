@@ -145,6 +145,14 @@ export default {
       },
       agent: new AgentConfig(Number(get('ORCHESTRATION_API_TIMEOUT_RESPONSE', 10000))),
     },
+    frontendComponents: {
+      url: get('COMPONENT_API_URL', 'http://localhost:8082/frontend-components', requiredInProduction),
+      timeout: {
+        response: Number(get('FRONTEND_COMPONENTS_TIMEOUT_RESPONSE', 3000)),
+        deadline: Number(get('FRONTEND_COMPONENTS_TIMEOUT_DEADLINE', 3000)),
+      },
+      agent: new AgentConfig(Number(get('FRONTEND_COMPONENTS_TIMEOUT_RESPONSE', 3000))),
+    },
   },
   features: {
     reviewBookings: get('FEATURE_REVIEW_BOOKINGS', 'false', requiredInProduction) === 'true',

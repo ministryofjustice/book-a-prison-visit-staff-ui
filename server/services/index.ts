@@ -1,6 +1,7 @@
 import { dataAccess } from '../data'
 import AdditionalSupportService from './additionalSupportService'
 import AuditService from './auditService'
+import FrontendComponentsService from './frontendComponentsService'
 import PrisonerProfileService from './prisonerProfileService'
 import PrisonerSearchService from './prisonerSearchService'
 import PrisonerVisitorsService from './prisonerVisitorsService'
@@ -15,6 +16,7 @@ export const services = () => {
     hmppsAuthClient,
     manageUsersApiClient,
     nomisUserRolesApiClient,
+    frontendComponentsClientBuilder,
     orchestrationApiClientBuilder,
     prisonApiClientBuilder,
     prisonerContactRegistryApiClientBuilder,
@@ -27,6 +29,8 @@ export const services = () => {
   const additionalSupportService = new AdditionalSupportService(orchestrationApiClientBuilder, hmppsAuthClient)
 
   const auditService = new AuditService()
+
+  const frontendComponentsService = new FrontendComponentsService(frontendComponentsClientBuilder)
 
   const supportedPrisonsService = new SupportedPrisonsService(
     orchestrationApiClientBuilder,
@@ -69,6 +73,7 @@ export const services = () => {
   return {
     additionalSupportService,
     auditService,
+    frontendComponentsService,
     prisonerProfileService,
     prisonerSearchService,
     prisonerVisitorsService,

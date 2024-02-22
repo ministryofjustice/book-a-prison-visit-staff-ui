@@ -19,6 +19,7 @@ generic-service:
     PRISONER_CONTACT_REGISTRY_API_URL: "https://prisoner-contact-registry-staging.prison.service.justice.gov.uk"
     WHEREABOUTS_API_URL: "https://whereabouts-api-dev.service.justice.gov.uk"
     PRISON_REGISTER_API_URL: "https://prison-register-dev.hmpps.service.justice.gov.uk"
+    COMPONENT_API_URL: https://frontend-components-dev.hmpps.service.justice.gov.uk
     DPS_URL: "https://digital-dev.prison.service.justice.gov.uk/"
     APPLICATIONINSIGHTS_CONNECTION_STRING: null # disable App Insights for staging
     REDIS_KEY: "bapv-staff-staging"

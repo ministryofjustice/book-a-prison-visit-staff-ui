@@ -26,6 +26,7 @@ import timetableRoutes from './routes/timetable'
 import visitRoutes from './routes/visit'
 import visitsRoutes from './routes/visits'
 import type { Services } from './services'
+import getFrontendComponents from './middleware/setupFrontendComponents'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
@@ -45,6 +46,8 @@ export default function createApp(services: Services): express.Application {
   app.use(setUpCsrf())
   app.use(setUpCurrentUser(services))
   app.use(appInsightsOperationId)
+
+  app.get('*', getFrontendComponents(services))
 
   app.use('/', indexRoutes(services))
   app.use('/book-a-visit', bookAVisitRoutes(services))
