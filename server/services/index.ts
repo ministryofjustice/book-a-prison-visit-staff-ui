@@ -91,6 +91,7 @@ export type Services = ReturnType<typeof services>
 export {
   AdditionalSupportService,
   AuditService,
+  FrontendComponentsService,
   PrisonerProfileService,
   PrisonerSearchService,
   PrisonerVisitorsService,
