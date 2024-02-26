@@ -12,8 +12,10 @@ let flashData: FlashData
 let visitSessionData: VisitSessionData
 
 // run tests for booking and update journeys
-// const testJourneys = [{ urlPrefix: '/visit/ab-cd-ef-gh/update' }]
-const testJourneys = [{ urlPrefix: '/book-a-visit' }, { urlPrefix: '/visit/ab-cd-ef-gh/update' }]
+const testJourneys = [
+  { urlPrefix: '/book-a-visit', isUpdate: false },
+  { urlPrefix: '/visit/ab-cd-ef-gh/update', isUpdate: true },
+]
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
@@ -73,8 +75,9 @@ testJourneys.forEach(journey => {
           phoneNumber: '123',
           contactName: 'abc',
         },
-        visitReference: 'ab-cd-ef-gh',
-        visitStatus: 'RESERVED',
+        applicationReference: 'aaa-bbb-ccc',
+        // visit reference only known on update journey
+        visitReference: journey.isUpdate ? 'ab-cd-ef-gh' : undefined,
       }
 
       sessionApp = appWithAllRoutes({

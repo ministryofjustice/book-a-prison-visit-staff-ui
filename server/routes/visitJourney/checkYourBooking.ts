@@ -47,18 +47,19 @@ export default class CheckYourBooking {
     )
 
     try {
-      // change reserved visit to have the latest data
-      await this.visitService.changeReservedVisit({
+      // change visit application to have the latest data
+      await this.visitService.changeVisitApplication({
         username: res.locals.user.username,
         visitSessionData,
       })
-      // 'book' the visit: set it's status to BOOKED
+      // 'book' the visit: complete the visit application and get BOOKED visit
       const bookedVisit = await this.visitService.bookVisit({
         username: res.locals.user.username,
         applicationReference: visitSessionData.applicationReference,
         applicationMethod: visitSessionData.requestMethod,
       })
 
+      visitSessionData.visitReference = bookedVisit.reference
       visitSessionData.visitStatus = bookedVisit.visitStatus
 
       await this.auditService.bookedVisit({

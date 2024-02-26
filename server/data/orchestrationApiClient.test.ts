@@ -3,11 +3,12 @@ import config from '../config'
 import TestData from '../routes/testutils/testData'
 import OrchestrationApiClient from './orchestrationApiClient'
 import {
+  ApplicationDto,
   BookingOrchestrationRequestDto,
   CancelVisitOrchestrationDto,
-  ChangeVisitSlotRequestDto,
+  ChangeApplicationDto,
+  CreateApplicationDto,
   NotificationType,
-  ReserveVisitSlotDto,
   SessionSchedule,
   Visit,
 } from './orchestrationApiTypes'
@@ -34,7 +35,7 @@ describe('orchestrationApiClient', () => {
   })
 
   describe('bookVisit', () => {
-    it('should book a Visit (change status from RESERVED to BOOKED), given applicationReference', async () => {
+    it('should return a BOOKED visit, given an application reference', async () => {
       const applicationReference = 'aaa-bbb-ccc'
       const bookingOrchestrationRequestDto: BookingOrchestrationRequestDto = {
         applicationMethodType: 'NOT_KNOWN',
@@ -56,7 +57,7 @@ describe('orchestrationApiClient', () => {
         bookingOrchestrationRequestDto.applicationMethodType,
       )
 
-      expect(output).toEqual(result)
+      expect(output).toStrictEqual(result)
     })
   })
 
@@ -72,431 +73,14 @@ describe('orchestrationApiClient', () => {
         applicationMethodType: 'NOT_KNOWN',
       }
 
-      const result: Visit = {
-        applicationReference: 'aaa-bbb-ccc',
-        reference: 'ab-cd-ef-gh',
-        prisonerId: 'AF34567G',
-        prisonId: 'HEI',
-        visitRoom: 'A1 L3',
-        visitType: 'SOCIAL',
-        visitStatus: 'CANCELLED',
-        visitRestriction: 'OPEN',
-        startTimestamp: '2022-02-14T10:00:00',
-        endTimestamp: '2022-02-14T11:00:00',
-        visitNotes: [
-          {
-            type: 'VISIT_OUTCOMES',
-            text: 'VISITOR_CANCELLED',
-          },
-          {
-            type: 'STATUS_CHANGED_REASON',
-            text: 'cancellation reason',
-          },
-        ],
-        visitors: [
-          {
-            nomisPersonId: 1234,
-          },
-        ],
-        visitorSupport: [],
-        createdTimestamp: '2022-02-14T10:00:00',
-        modifiedTimestamp: '2022-02-14T10:05:00',
-      }
+      const result: Visit = TestData.visit()
+
       fakeOrchestrationApi
         .put(`/visits/ab-cd-ef-gh/cancel`, cancelVisitDto)
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, result)
 
       const output = await orchestrationApiClient.cancelVisit(reference, cancelVisitDto)
-
-      expect(output).toEqual(result)
-    })
-  })
-
-  describe('changeBookedVisit', () => {
-    it('should return the Visit with new status of RESERVED/CHANGING and new applicationReference', async () => {
-      const visitType = 'SOCIAL'
-      const sessionTemplateReference = 'v9d.7ed.7u'
-
-      const visitSessionData = <VisitSessionData>{
-        prisoner: {
-          offenderNo: 'AF34567G',
-          name: 'prisoner name',
-          dateOfBirth: '23 May 1988',
-          location: 'somewhere',
-        },
-        visitSlot: {
-          id: '1',
-          sessionTemplateReference,
-          prisonId,
-          startTimestamp: '2022-02-14T10:00:00',
-          endTimestamp: '2022-02-14T11:00:00',
-          availableTables: 1,
-          capacity: 1,
-          visitRoom: 'A1 L3',
-        },
-        visitRestriction: 'OPEN',
-        visitors: [
-          {
-            personId: 123,
-            name: 'visitor name',
-            relationshipDescription: 'relationship desc',
-            restrictions: [],
-            banned: false,
-          },
-        ],
-        visitorSupport: [],
-        mainContact: {
-          phoneNumber: '01234 567890',
-          contactName: 'John Smith',
-          contact: {
-            personId: 123,
-          },
-        },
-        applicationReference: 'aaa-bbb-ccc',
-        visitReference: 'ab-cd-ef-gh',
-        visitStatus: 'BOOKED',
-      }
-
-      const result: Visit = {
-        applicationReference: 'ddd-eee-fff',
-        reference: visitSessionData.visitReference,
-        prisonerId: visitSessionData.prisoner.offenderNo,
-        prisonId,
-        sessionTemplateReference: 'v9d.7ed.7u',
-        visitRoom: visitSessionData.visitSlot.visitRoom,
-        visitType,
-        visitStatus: 'CHANGING',
-        visitRestriction: visitSessionData.visitRestriction,
-        startTimestamp: visitSessionData.visitSlot.startTimestamp,
-        endTimestamp: visitSessionData.visitSlot.endTimestamp,
-        visitNotes: [],
-        visitContact: {
-          name: 'John Smith',
-          telephone: '01234 567890',
-        },
-        visitors: [
-          {
-            nomisPersonId: 123,
-            visitContact: true,
-          },
-        ],
-        visitorSupport: [],
-        createdTimestamp: '2022-02-14T10:00:00',
-        modifiedTimestamp: '2022-02-14T10:05:00',
-      }
-
-      fakeOrchestrationApi
-        .put(`/visits/${visitSessionData.visitReference}/change`, <ReserveVisitSlotDto>{
-          prisonerId: visitSessionData.prisoner.offenderNo,
-          sessionTemplateReference: 'v9d.7ed.7u',
-          visitRestriction: visitSessionData.visitRestriction,
-          startTimestamp: visitSessionData.visitSlot.startTimestamp,
-          endTimestamp: visitSessionData.visitSlot.endTimestamp,
-          visitContact: {
-            name: visitSessionData.mainContact.contactName,
-            telephone: visitSessionData.mainContact.phoneNumber,
-          },
-          visitors: visitSessionData.visitors.map(visitor => {
-            return {
-              nomisPersonId: visitor.personId,
-              visitContact: true,
-            }
-          }),
-          visitorSupport: visitSessionData.visitorSupport,
-        })
-        .matchHeader('authorization', `Bearer ${token}`)
-        .reply(201, result)
-
-      const output = await orchestrationApiClient.changeBookedVisit(visitSessionData)
-
-      expect(output).toEqual(result)
-    })
-  })
-
-  describe('changeReservedVisit', () => {
-    const visitType = 'SOCIAL'
-    const visitStatus = 'RESERVED'
-
-    it('should return a changed reserved Visit given full visitSessionData', async () => {
-      const result: Visit = {
-        applicationReference: 'aaa-bbb-ccc',
-        reference: 'ab-cd-ef-gh',
-        prisonerId: 'AF34567G',
-        prisonId,
-        sessionTemplateReference: 'v9d.7ed.7u',
-        visitRoom: 'A1 L3',
-        visitType,
-        visitStatus,
-        visitRestriction: 'OPEN',
-        startTimestamp: '2022-02-14T10:00:00',
-        endTimestamp: '2022-02-14T11:00:00',
-        visitNotes: [],
-        visitContact: {
-          name: 'John Smith',
-          telephone: '01234 567890',
-        },
-        visitors: [
-          {
-            nomisPersonId: 1234,
-            visitContact: false,
-          },
-        ],
-        visitorSupport: [
-          { type: 'WHEELCHAIR' },
-          { type: 'MASK_EXEMPT' },
-          {
-            type: 'OTHER',
-            text: 'custom request',
-          },
-        ],
-        createdTimestamp: '2022-02-14T10:00:00',
-        modifiedTimestamp: '2022-02-14T10:05:00',
-      }
-
-      const visitSessionData: VisitSessionData = {
-        prisoner: {
-          offenderNo: result.prisonerId,
-          name: 'prisoner name',
-          dateOfBirth: '23 May 1988',
-          location: 'somewhere',
-        },
-        visitSlot: {
-          id: '1',
-          sessionTemplateReference: 'v9d.7ed.7u',
-          prisonId,
-          startTimestamp: result.startTimestamp,
-          endTimestamp: result.endTimestamp,
-          availableTables: 1,
-          capacity: 30,
-          visitRoom: result.visitRoom,
-          visitRestriction: 'OPEN',
-        },
-        visitRestriction: 'OPEN',
-        visitors: [
-          {
-            personId: 123,
-            name: 'visitor name',
-            adult: true,
-            relationshipDescription: 'relationship desc',
-            restrictions: [
-              {
-                restrictionType: 'TEST',
-                restrictionTypeDescription: 'test type',
-                startDate: '10 May 2020',
-                expiryDate: '10 May 2022',
-                globalRestriction: false,
-                comment: 'comments',
-              },
-            ],
-            banned: false,
-          },
-        ],
-        visitorSupport: [{ type: 'WHEELCHAIR' }, { type: 'MASK_EXEMPT' }, { type: 'OTHER', text: 'custom request' }],
-        mainContact: {
-          phoneNumber: result.visitContact.telephone,
-          contactName: result.visitContact.name,
-        },
-        applicationReference: 'aaa-bbb-ccc',
-        visitReference: 'ab-cd-ef-gh',
-        visitStatus,
-      }
-      const visitContact = {
-        telephone: visitSessionData.mainContact.phoneNumber,
-        name: visitSessionData.mainContact.contactName,
-      }
-
-      fakeOrchestrationApi
-        .put('/visits/aaa-bbb-ccc/slot/change', <ChangeVisitSlotRequestDto>{
-          visitRestriction: visitSessionData.visitRestriction,
-          startTimestamp: visitSessionData.visitSlot.startTimestamp,
-          endTimestamp: visitSessionData.visitSlot.endTimestamp,
-          visitContact,
-          visitors: visitSessionData.visitors.map(visitor => {
-            return {
-              nomisPersonId: visitor.personId,
-              visitContact: false,
-            }
-          }),
-          visitorSupport: visitSessionData.visitorSupport,
-          sessionTemplateReference: visitSessionData.visitSlot.sessionTemplateReference,
-        })
-        .matchHeader('authorization', `Bearer ${token}`)
-        .reply(200, result)
-
-      const output = await orchestrationApiClient.changeReservedVisit(visitSessionData)
-
-      expect(output).toEqual(result)
-    })
-
-    it('should return an updated reserved Visit given minimal visitSessionData', async () => {
-      const result: Visit = {
-        applicationReference: 'aaa-bbb-ccc',
-        reference: 'ab-cd-ef-gh',
-        prisonerId: 'AF34567G',
-        prisonId,
-        sessionTemplateReference: 'v9d.7ed.7u',
-        visitRoom: 'A1 L3',
-        visitType,
-        visitStatus,
-        visitRestriction: 'OPEN',
-        startTimestamp: '2022-02-14T10:00:00',
-        endTimestamp: '2022-02-14T11:00:00',
-        visitNotes: [],
-        visitors: [
-          {
-            nomisPersonId: 1234,
-            visitContact: false,
-          },
-        ],
-        visitorSupport: [],
-        createdTimestamp: '2022-02-14T10:00:00',
-        modifiedTimestamp: '2022-02-14T10:05:00',
-      }
-      const visitSessionData: VisitSessionData = {
-        prisoner: {
-          offenderNo: result.prisonerId,
-          name: 'prisoner name',
-          dateOfBirth: '23 May 1988',
-          location: 'somewhere',
-        },
-        visitSlot: {
-          id: '1',
-          sessionTemplateReference: 'v9d.7ed.7u',
-          prisonId,
-          startTimestamp: result.startTimestamp,
-          endTimestamp: result.endTimestamp,
-          availableTables: 1,
-          capacity: 30,
-          visitRoom: result.visitRoom,
-          visitRestriction: 'OPEN',
-        },
-        visitRestriction: 'OPEN',
-        visitors: [
-          {
-            personId: 123,
-            name: 'visitor name',
-            adult: true,
-            relationshipDescription: 'relationship desc',
-            restrictions: [
-              {
-                restrictionType: 'TEST',
-                restrictionTypeDescription: 'test type',
-                startDate: '10 May 2020',
-                expiryDate: '10 May 2022',
-                globalRestriction: false,
-                comment: 'comments',
-              },
-            ],
-            banned: false,
-          },
-        ],
-        applicationReference: 'aaa-bbb-ccc',
-        visitReference: 'ab-cd-ef-gh',
-        visitStatus,
-      }
-
-      fakeOrchestrationApi
-        .put('/visits/aaa-bbb-ccc/slot/change', <ChangeVisitSlotRequestDto>{
-          visitRestriction: visitSessionData.visitRestriction,
-          startTimestamp: visitSessionData.visitSlot.startTimestamp,
-          endTimestamp: visitSessionData.visitSlot.endTimestamp,
-          visitContact: undefined,
-          visitors: visitSessionData.visitors.map(visitor => {
-            return {
-              nomisPersonId: visitor.personId,
-              visitContact: false,
-            }
-          }),
-          visitorSupport: undefined,
-          sessionTemplateReference: visitSessionData.visitSlot.sessionTemplateReference,
-        })
-        .matchHeader('authorization', `Bearer ${token}`)
-        .reply(200, result)
-
-      const output = await orchestrationApiClient.changeReservedVisit(visitSessionData)
-
-      expect(output).toEqual(result)
-    })
-  })
-
-  describe('reserveVisit', () => {
-    it('should return a new Visit', async () => {
-      const visitType = 'SOCIAL'
-      const visitStatus = 'RESERVED'
-      const visitRestriction = 'OPEN'
-      const startTimestamp = '2022-02-14T10:00:00'
-      const endTimestamp = '2022-02-14T11:00:00'
-      const sessionTemplateReference = 'v9d.7ed.7u'
-
-      const result: Visit = {
-        applicationReference: 'aaa-bbb-ccc',
-        reference: 'ab-cd-ef-gh',
-        prisonerId: 'AF34567G',
-        prisonId,
-        sessionTemplateReference,
-        visitRoom: 'A1 L3',
-        visitType,
-        visitStatus,
-        visitRestriction,
-        startTimestamp,
-        endTimestamp,
-        visitNotes: [],
-        visitors: [
-          {
-            nomisPersonId: 1234,
-          },
-        ],
-        visitorSupport: [],
-        createdTimestamp: '2022-02-14T10:00:00',
-        modifiedTimestamp: '2022-02-14T10:05:00',
-      }
-      const visitSessionData = <VisitSessionData>{
-        prisoner: {
-          offenderNo: result.prisonerId,
-          name: 'prisoner name',
-          dateOfBirth: '23 May 1988',
-          location: 'somewhere',
-        },
-        visitSlot: {
-          id: '1',
-          sessionTemplateReference,
-          prisonId,
-          startTimestamp,
-          endTimestamp,
-          availableTables: 1,
-          capacity: 1,
-          visitRoom: result.visitRoom,
-        },
-        visitRestriction: 'OPEN',
-        visitors: [
-          {
-            personId: 123,
-            name: 'visitor name',
-            relationshipDescription: 'rel desc',
-            restrictions: [],
-            banned: false,
-          },
-        ],
-      }
-
-      fakeOrchestrationApi
-        .post('/visits/slot/reserve', <ReserveVisitSlotDto>{
-          prisonerId: visitSessionData.prisoner.offenderNo,
-          sessionTemplateReference,
-          visitRestriction,
-          startTimestamp,
-          endTimestamp,
-          visitors: visitSessionData.visitors.map(visitor => {
-            return {
-              nomisPersonId: visitor.personId,
-            }
-          }),
-        })
-        .matchHeader('authorization', `Bearer ${token}`)
-        .reply(201, result)
-
-      const output = await orchestrationApiClient.reserveVisit(visitSessionData)
 
       expect(output).toEqual(result)
     })
@@ -532,99 +116,33 @@ describe('orchestrationApiClient', () => {
     })
   })
 
-  describe('getUpcomingVisits', () => {
+  describe('getFutureVisits', () => {
     it('should return an array of Visits', async () => {
-      const timestamp = new Date().toISOString()
-      const offenderNo = 'A1234BC'
-      const results: Visit[] = [
-        {
-          applicationReference: 'aaa-bbb-ccc',
-          reference: 'ab-cd-ef-gh',
-          prisonerId: offenderNo,
-          prisonId: 'HEI',
-          visitRoom: 'A1 L3',
-          visitType: 'SOCIAL',
-          visitStatus: 'RESERVED',
-          visitRestriction: 'OPEN',
-          startTimestamp: timestamp,
-          endTimestamp: '',
-          visitNotes: [],
-          visitors: [
-            {
-              nomisPersonId: 1234,
-            },
-          ],
-          visitorSupport: [
-            {
-              type: 'OTHER',
-              text: 'custom support details',
-            },
-          ],
-          createdTimestamp: '2022-02-14T10:00:00',
-          modifiedTimestamp: '2022-02-14T10:05:00',
-        },
-      ]
-
-      jest.useFakeTimers({ advanceTimers: true, now: new Date(timestamp) })
+      const prisonerId = 'A1234BC'
+      const results: Visit[] = [TestData.visit()]
 
       fakeOrchestrationApi
-        .get('/visits/search')
-        .query({
-          prisonerId: offenderNo,
-          startDateTime: timestamp,
-          visitStatus: 'BOOKED,CANCELLED',
-          page: '0',
-          size: '1000',
-        })
+        .get(`/visits/search/future/${prisonerId}`)
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
-      const output = await orchestrationApiClient.getUpcomingVisits(offenderNo, ['BOOKED', 'CANCELLED'])
+      const output = await orchestrationApiClient.getFutureVisits(prisonerId)
 
       expect(output).toEqual(results)
-
-      jest.useRealTimers()
     })
   })
 
   describe('getVisitsByDate', () => {
     it('should return an array of Visits', async () => {
       const dateString = '2022-05-06'
-      const results: Visit[] = [
-        {
-          applicationReference: 'aaa-bbb-ccc',
-          reference: 'ab-cd-ef-gh',
-          prisonerId: 'A1234BC',
-          prisonId: 'HEI',
-          visitRoom: 'A1 L3',
-          visitType: 'SOCIAL',
-          visitStatus: 'RESERVED',
-          visitRestriction: 'OPEN',
-          startTimestamp: `${dateString}T10:00:00`,
-          endTimestamp: '',
-          visitNotes: [],
-          visitors: [
-            {
-              nomisPersonId: 1234,
-            },
-          ],
-          visitorSupport: [
-            {
-              type: 'OTHER',
-              text: 'custom support details',
-            },
-          ],
-          createdTimestamp: '2022-02-14T10:00:00',
-          modifiedTimestamp: '2022-02-14T10:05:00',
-        },
-      ]
+      const results: Visit[] = [TestData.visit()]
 
       fakeOrchestrationApi
         .get('/visits/search')
         .query({
           prisonId: 'HEI',
-          startDateTime: `${dateString}T00:00:00`,
-          endDateTime: `${dateString}T23:59:59`,
+          visitStartDate: dateString,
+          visitEndDate: dateString,
           visitStatus: 'BOOKED',
           page: '0',
           size: '1000',
@@ -647,6 +165,147 @@ describe('orchestrationApiClient', () => {
       const output = await orchestrationApiClient.getAvailableSupportOptions()
 
       expect(output).toEqual(results)
+    })
+  })
+
+  describe('changeVisitApplication', () => {
+    it('should return a changed visit application given visit session data', async () => {
+      const visitSessionData = <VisitSessionData>{
+        visitSlot: {
+          sessionTemplateReference: 'v9d.7ed.7u',
+          startTimestamp: '2022-02-14T10:00:00',
+        },
+        visitRestriction: 'OPEN',
+        visitors: [{ personId: 123 }],
+        visitorSupport: [],
+        mainContact: {
+          phoneNumber: '01234 567890',
+          contactName: 'John Smith',
+        },
+      }
+
+      const result: Partial<ApplicationDto> = {
+        reference: 'aaa-bbb-ccc',
+      }
+
+      fakeOrchestrationApi
+        .put(`/visits/application/${visitSessionData.applicationReference}/slot/change`, <ChangeApplicationDto>{
+          applicationRestriction: visitSessionData.visitRestriction,
+          sessionTemplateReference: visitSessionData.visitSlot.sessionTemplateReference,
+          sessionDate: '2022-02-14',
+          visitContact: {
+            name: visitSessionData.mainContact.contactName,
+            telephone: visitSessionData.mainContact.phoneNumber,
+          },
+          visitors: visitSessionData.visitors.map(visitor => {
+            return {
+              nomisPersonId: visitor.personId,
+              visitContact: false,
+            }
+          }),
+          visitorSupport: visitSessionData.visitorSupport,
+        })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, result)
+
+      const output = await orchestrationApiClient.changeVisitApplication(visitSessionData)
+
+      expect(output).toStrictEqual(result)
+    })
+  })
+
+  describe('createVisitApplicationFromVisit', () => {
+    it('should return a new Visit Application from a BOOKED visit', async () => {
+      const visitSessionData = <VisitSessionData>{
+        prisoner: {
+          offenderNo: 'A1234BC',
+        },
+        visitSlot: {
+          sessionTemplateReference: 'v9d.7ed.7u',
+          startTimestamp: '2022-02-14T10:00:00',
+        },
+        visitRestriction: 'OPEN',
+        visitors: [{ personId: 123 }],
+        visitorSupport: [],
+        mainContact: {
+          phoneNumber: '01234 567890',
+          contactName: 'John Smith',
+        },
+        visitReference: 'ab-cd-ef-gh',
+      }
+
+      const result: Partial<ApplicationDto> = {
+        reference: 'aaa-bbb-ccc',
+      }
+
+      fakeOrchestrationApi
+        .put(`/visits/application/${visitSessionData.visitReference}/change`, <ChangeApplicationDto>{
+          prisonerId: visitSessionData.prisoner.offenderNo,
+          sessionTemplateReference: visitSessionData.visitSlot.sessionTemplateReference,
+          sessionDate: '2022-02-14',
+          applicationRestriction: visitSessionData.visitRestriction,
+          visitContact: {
+            name: visitSessionData.mainContact.contactName,
+            telephone: visitSessionData.mainContact.phoneNumber,
+          },
+          visitors: visitSessionData.visitors.map(visitor => {
+            return {
+              nomisPersonId: visitor.personId,
+              visitContact: false,
+            }
+          }),
+          visitorSupport: visitSessionData.visitorSupport,
+        })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, result)
+
+      const output = await orchestrationApiClient.createVisitApplicationFromVisit(visitSessionData)
+
+      expect(output).toStrictEqual(result)
+    })
+  })
+
+  describe('createVisitApplication', () => {
+    it('should return a new Visit Application', async () => {
+      const visitSessionData = <VisitSessionData>{
+        prisoner: {
+          offenderNo: 'A1234BC',
+        },
+        visitSlot: {
+          sessionTemplateReference: 'v9d.7ed.7u',
+          startTimestamp: '2022-02-14T10:00:00',
+        },
+        visitRestriction: 'OPEN',
+        visitors: [{ personId: 123 }],
+        visitorSupport: [],
+        mainContact: {
+          phoneNumber: '01234 567890',
+          contactName: 'John Smith',
+        },
+      }
+
+      const result: Partial<ApplicationDto> = {
+        reference: 'aaa-bbb-ccc',
+      }
+
+      fakeOrchestrationApi
+        .post('/visits/application/slot/reserve', <CreateApplicationDto>{
+          prisonerId: visitSessionData.prisoner.offenderNo,
+          sessionTemplateReference: visitSessionData.visitSlot.sessionTemplateReference,
+          sessionDate: '2022-02-14',
+          applicationRestriction: visitSessionData.visitRestriction,
+          visitors: visitSessionData.visitors.map(visitor => {
+            return {
+              nomisPersonId: visitor.personId,
+            }
+          }),
+        })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(201, result)
+
+      const output = await orchestrationApiClient.createVisitApplication(visitSessionData)
+
+      expect(output).toStrictEqual(result)
     })
   })
 

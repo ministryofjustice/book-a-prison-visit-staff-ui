@@ -19,11 +19,9 @@ context('Date picker', () => {
     cy.task('stubGetNotificationCount', {})
     cy.signIn()
 
-    const startDateTime = `${todayShortFormat}T00:00:00`
-    const endDateTime = `${todayShortFormat}T23:59:59`
     cy.task('stubVisitsByDate', {
-      startDateTime,
-      endDateTime,
+      visitStartDate: todayShortFormat,
+      visitEndDate: todayShortFormat,
       prisonId,
       visits: [],
     })

@@ -18,7 +18,7 @@ export default class AdditionalSupportPage extends Page {
   }
 
   selectSupportType = (type: string): void => {
-    cy.get(`[data-test=${type}]`).check({ force: true })
+    cy.get(`[data-test=${type}]`).check()
   }
 
   continueButton = (): PageElement => cy.get('[data-test=submit]')

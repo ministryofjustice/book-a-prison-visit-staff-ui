@@ -1,17 +1,18 @@
 import RestClient from './restClient'
 import config, { ApiConfig } from '../config'
 import {
+  ApplicationDto,
   ApplicationMethodType,
   BookingOrchestrationRequestDto,
   CancelVisitOrchestrationDto,
-  ChangeVisitSlotRequestDto,
+  ChangeApplicationDto,
+  CreateApplicationDto,
   NotificationCount,
   NotificationGroup,
   NotificationType,
   PageVisitDto,
   PrisonDto,
   PrisonerProfile,
-  ReserveVisitSlotDto,
   SessionCapacity,
   SessionSchedule,
   SupportType,
@@ -53,69 +54,6 @@ export default class OrchestrationApiClient {
     })
   }
 
-  async changeBookedVisit(visitSessionData: VisitSessionData): Promise<Visit> {
-    const { visitContact, mainContactId } = this.convertMainContactToVisitContact(visitSessionData.mainContact)
-
-    return this.restClient.put({
-      path: `/visits/${visitSessionData.visitReference}/change`,
-      data: <ReserveVisitSlotDto>{
-        prisonerId: visitSessionData.prisoner.offenderNo,
-        sessionTemplateReference: visitSessionData.visitSlot.sessionTemplateReference,
-        visitRestriction: visitSessionData.visitRestriction,
-        startTimestamp: visitSessionData.visitSlot.startTimestamp,
-        endTimestamp: visitSessionData.visitSlot.endTimestamp,
-        visitContact,
-        visitors: visitSessionData.visitors.map(visitor => {
-          return {
-            nomisPersonId: visitor.personId,
-            visitContact: visitor.personId === mainContactId,
-          }
-        }),
-        visitorSupport: visitSessionData.visitorSupport,
-      },
-    })
-  }
-
-  async changeReservedVisit(visitSessionData: VisitSessionData): Promise<Visit> {
-    const { visitContact, mainContactId } = this.convertMainContactToVisitContact(visitSessionData.mainContact)
-
-    return this.restClient.put({
-      path: `/visits/${visitSessionData.applicationReference}/slot/change`,
-      data: <ChangeVisitSlotRequestDto>{
-        visitRestriction: visitSessionData.visitRestriction,
-        startTimestamp: visitSessionData.visitSlot.startTimestamp,
-        endTimestamp: visitSessionData.visitSlot.endTimestamp,
-        visitContact,
-        visitors: visitSessionData.visitors.map(visitor => {
-          return {
-            nomisPersonId: visitor.personId,
-            visitContact: visitor.personId === mainContactId,
-          }
-        }),
-        visitorSupport: visitSessionData.visitorSupport,
-        sessionTemplateReference: visitSessionData.visitSlot.sessionTemplateReference,
-      },
-    })
-  }
-
-  async reserveVisit(visitSessionData: VisitSessionData): Promise<Visit> {
-    return this.restClient.post({
-      path: '/visits/slot/reserve',
-      data: <ReserveVisitSlotDto>{
-        prisonerId: visitSessionData.prisoner.offenderNo,
-        sessionTemplateReference: visitSessionData.visitSlot.sessionTemplateReference,
-        visitRestriction: visitSessionData.visitRestriction,
-        startTimestamp: visitSessionData.visitSlot.startTimestamp,
-        endTimestamp: visitSessionData.visitSlot.endTimestamp,
-        visitors: visitSessionData.visitors.map(visitor => {
-          return {
-            nomisPersonId: visitor.personId,
-          }
-        }),
-      },
-    })
-  }
-
   async getVisit(reference: string): Promise<Visit> {
     return this.restClient.get({ path: `/visits/${reference}` })
   }
@@ -124,17 +62,8 @@ export default class OrchestrationApiClient {
     return this.restClient.get({ path: `/visits/${reference}/history` })
   }
 
-  async getUpcomingVisits(offenderNo: string, visitStatus: Visit['visitStatus'][]): Promise<PageVisitDto> {
-    return this.restClient.get({
-      path: '/visits/search',
-      query: new URLSearchParams({
-        prisonerId: offenderNo,
-        startDateTime: new Date().toISOString(),
-        visitStatus: visitStatus.join(','),
-        page: this.page,
-        size: this.size,
-      }).toString(),
-    })
+  async getFutureVisits(prisonerId: string): Promise<Visit[]> {
+    return this.restClient.get({ path: `/visits/search/future/${prisonerId}` })
   }
 
   async getVisitsByDate(dateString: string, prisonId: string): Promise<PageVisitDto> {
@@ -142,8 +71,8 @@ export default class OrchestrationApiClient {
       path: '/visits/search',
       query: new URLSearchParams({
         prisonId,
-        startDateTime: `${dateString}T00:00:00`,
-        endDateTime: `${dateString}T23:59:59`,
+        visitStartDate: dateString,
+        visitEndDate: dateString,
         visitStatus: 'BOOKED',
         page: this.page,
         size: this.size,
@@ -157,7 +86,70 @@ export default class OrchestrationApiClient {
     })
   }
 
+  //  orchestration-applications-controller
+
+  async changeVisitApplication(visitSessionData: VisitSessionData): Promise<ApplicationDto> {
+    const { visitContact, mainContactId } = this.convertMainContactToVisitContact(visitSessionData.mainContact)
+
+    return this.restClient.put({
+      path: `/visits/application/${visitSessionData.applicationReference}/slot/change`,
+      data: <ChangeApplicationDto>{
+        applicationRestriction: visitSessionData.visitRestriction,
+        sessionTemplateReference: visitSessionData.visitSlot.sessionTemplateReference,
+        sessionDate: visitSessionData.visitSlot.startTimestamp.split('T')[0],
+        visitContact,
+        visitors: visitSessionData.visitors.map(visitor => {
+          return {
+            nomisPersonId: visitor.personId,
+            visitContact: visitor.personId === mainContactId,
+          }
+        }),
+        visitorSupport: visitSessionData.visitorSupport,
+      },
+    })
+  }
+
+  async createVisitApplicationFromVisit(visitSessionData: VisitSessionData): Promise<ApplicationDto> {
+    const { visitContact, mainContactId } = this.convertMainContactToVisitContact(visitSessionData.mainContact)
+
+    return this.restClient.put({
+      path: `/visits/application/${visitSessionData.visitReference}/change`,
+      data: <ChangeApplicationDto>{
+        prisonerId: visitSessionData.prisoner.offenderNo,
+        sessionTemplateReference: visitSessionData.visitSlot.sessionTemplateReference,
+        sessionDate: visitSessionData.visitSlot.startTimestamp.split('T')[0],
+        applicationRestriction: visitSessionData.visitRestriction,
+        visitContact,
+        visitors: visitSessionData.visitors.map(visitor => {
+          return {
+            nomisPersonId: visitor.personId,
+            visitContact: visitor.personId === mainContactId,
+          }
+        }),
+        visitorSupport: visitSessionData.visitorSupport,
+      },
+    })
+  }
+
+  async createVisitApplication(visitSessionData: VisitSessionData): Promise<ApplicationDto> {
+    return this.restClient.post({
+      path: '/visits/application/slot/reserve',
+      data: <CreateApplicationDto>{
+        prisonerId: visitSessionData.prisoner.offenderNo,
+        sessionTemplateReference: visitSessionData.visitSlot.sessionTemplateReference,
+        sessionDate: visitSessionData.visitSlot.startTimestamp.split('T')[0],
+        applicationRestriction: visitSessionData.visitRestriction,
+        visitors: visitSessionData.visitors.map(visitor => {
+          return {
+            nomisPersonId: visitor.personId,
+          }
+        }),
+      },
+    })
+  }
+
   // visit notification controller
+
   async getNotificationCount(prisonId: string): Promise<NotificationCount> {
     return this.restClient.get({ path: `/visits/notification/${prisonId}/count` })
   }
@@ -230,7 +222,7 @@ export default class OrchestrationApiClient {
   }
 
   private convertMainContactToVisitContact(mainContact: VisitSessionData['mainContact']): {
-    visitContact: ReserveVisitSlotDto['visitContact']
+    visitContact: ApplicationDto['visitContact']
     mainContactId: number
   } {
     const visitContact = mainContact

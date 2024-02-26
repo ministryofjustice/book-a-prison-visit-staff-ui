@@ -1,5 +1,6 @@
 import {
   Alert,
+  ApplicationDto,
   NotificationCount,
   NotificationGroup,
   NotificationVisitInfo,
@@ -71,6 +72,55 @@ export default class TestData {
       expired,
       active,
     }) as Alert
+
+  static application = ({
+    reference = 'aaa-bbb-ccc',
+    sessionTemplateReference = 'v9d.7ed.7u',
+    prisonerId = 'A1234BC',
+    prisonId = 'HEI',
+    visitType = 'SOCIAL',
+    visitRestriction = 'OPEN',
+    startTimestamp = '2022-01-14T10:00:00',
+    endTimestamp = '2022-01-14T11:00:00',
+    visitNotes = [],
+    visitContact = {
+      name: 'Jeanette Smith',
+      telephone: '01234 567890',
+    },
+    visitors = [
+      {
+        nomisPersonId: 4321,
+        visitContact: true,
+      },
+      {
+        nomisPersonId: 4322,
+        visitContact: false,
+      },
+    ],
+    visitorSupport = [],
+    createdTimestamp = '2022-01-01T09:00:00',
+    modifiedTimestamp = '2022-01-01T09:00:00',
+    reserved = true,
+    completed = false,
+  }: Partial<ApplicationDto> = {}): ApplicationDto =>
+    ({
+      reference,
+      sessionTemplateReference,
+      prisonerId,
+      prisonId,
+      visitType,
+      visitRestriction,
+      startTimestamp,
+      endTimestamp,
+      visitNotes,
+      visitContact,
+      visitors,
+      visitorSupport,
+      createdTimestamp,
+      modifiedTimestamp,
+      reserved,
+      completed,
+    }) as ApplicationDto
 
   static caseLoads = ({
     caseLoads = [

@@ -7,6 +7,7 @@ import {
   VisitsPageSlot,
 } from '../@types/bapv'
 import {
+  ApplicationDto,
   ApplicationMethodType,
   CancelVisitOrchestrationDto,
   NotificationType,
@@ -61,46 +62,43 @@ export default class VisitService {
     return orchestrationApiClient.cancelVisit(reference, cancelVisitDto)
   }
 
-  async changeBookedVisit({
+  async changeVisitApplication({
     username,
     visitSessionData,
   }: {
     username: string
     visitSessionData: VisitSessionData
-  }): Promise<Visit> {
+  }): Promise<ApplicationDto> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
-    const visit = await orchestrationApiClient.changeBookedVisit(visitSessionData)
-    return visit
+    return orchestrationApiClient.changeVisitApplication(visitSessionData)
   }
 
-  async changeReservedVisit({
+  async createVisitApplicationFromVisit({
     username,
     visitSessionData,
   }: {
     username: string
     visitSessionData: VisitSessionData
-  }): Promise<Visit> {
+  }): Promise<ApplicationDto> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
-    const visit = await orchestrationApiClient.changeReservedVisit(visitSessionData)
-    return visit
+    return orchestrationApiClient.createVisitApplicationFromVisit(visitSessionData)
   }
 
-  async reserveVisit({
+  async createVisitApplication({
     username,
     visitSessionData,
   }: {
     username: string
     visitSessionData: VisitSessionData
-  }): Promise<Visit> {
+  }): Promise<ApplicationDto> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
-    const reservation = await orchestrationApiClient.reserveVisit(visitSessionData)
-    return reservation
+    return orchestrationApiClient.createVisitApplication(visitSessionData)
   }
 
   async getVisit({
@@ -157,20 +155,18 @@ export default class VisitService {
     return { visitHistoryDetails, visitors, notifications, additionalSupport }
   }
 
-  async getUpcomingVisits({
+  async getFutureVisits({
     username,
-    offenderNo,
-    visitStatus,
+    prisonerId,
   }: {
     username: string
-    offenderNo: string
-    visitStatus: Visit['visitStatus'][]
+    prisonerId: string
   }): Promise<VisitInformation[]> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
-    logger.info(`Get upcoming visits for ${offenderNo}`)
-    const { content: visits } = await orchestrationApiClient.getUpcomingVisits(offenderNo, visitStatus)
+    logger.info(`Get upcoming visits for ${prisonerId}`)
+    const visits = await orchestrationApiClient.getFutureVisits(prisonerId)
 
     return visits.map(visit => this.buildVisitInformation(visit))
   }

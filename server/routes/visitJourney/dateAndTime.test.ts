@@ -4,7 +4,7 @@ import { SessionData } from 'express-session'
 import * as cheerio from 'cheerio'
 import { FlashData, VisitSessionData, VisitSlot, VisitSlotList } from '../../@types/bapv'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
-import { Visit } from '../../data/orchestrationApiTypes'
+import { ApplicationDto } from '../../data/orchestrationApiTypes'
 import {
   createMockAuditService,
   createMockVisitService,
@@ -55,7 +55,6 @@ beforeEach(() => {
         banned: false,
       },
     ],
-    visitReference: 'ab-cd-ef-gh',
   }
 
   sessionApp = appWithAllRoutes({
@@ -128,6 +127,9 @@ testJourneys.forEach(journey => {
     }
 
     beforeEach(() => {
+      // visit reference only known on update journey
+      visitSessionData.visitReference = journey.isUpdate ? 'ab-cd-ef-gh' : undefined
+
       visitSessionsService.getVisitSessions.mockResolvedValue({ slotsList, whereaboutsAvailable: true })
     })
 
@@ -329,23 +331,14 @@ testJourneys.forEach(journey => {
     })
 
     describe(`POST ${journey.urlPrefix}/select-date-and-time`, () => {
-      const reservedVisit: Partial<Visit> = {
-        applicationReference: 'aaa-bbb-ccc',
-        reference: 'ab-cd-ef-gh',
-        visitStatus: 'RESERVED',
-      }
-
-      // representing a BOOKED visit on update journey that has moved to status CHANGING
-      const changingVisit: Partial<Visit> = {
-        applicationReference: 'aaa-bbb-ccc',
-        reference: 'ab-cd-ef-gh',
-        visitStatus: 'CHANGING',
+      const application: Partial<ApplicationDto> = {
+        reference: 'aaa-bbb-ccc',
       }
 
       beforeEach(() => {
-        visitService.reserveVisit = jest.fn().mockResolvedValue(reservedVisit)
-        visitService.changeBookedVisit = jest.fn().mockResolvedValue(changingVisit)
-        visitService.changeReservedVisit = jest.fn()
+        visitService.createVisitApplication = jest.fn().mockResolvedValue(application)
+        visitService.createVisitApplicationFromVisit = jest.fn().mockResolvedValue(application)
+        visitService.changeVisitApplication = jest.fn()
 
         sessionApp = appWithAllRoutes({
           services: { auditService, visitService },
@@ -356,9 +349,7 @@ testJourneys.forEach(journey => {
         })
       })
 
-      it('should save to session, reserve visit and redirect to additional support page if slot selected', () => {
-        visitSessionData.visitReference = journey.isUpdate ? reservedVisit.reference : undefined
-
+      it('should save to session, create a visit application and redirect to additional support page if slot selected', () => {
         return request(sessionApp)
           .post(`${journey.urlPrefix}/select-date-and-time`)
           .send('visit-date-and-time=2')
@@ -376,21 +367,17 @@ testJourneys.forEach(journey => {
               visitRoom: 'room name',
               visitRestriction: 'OPEN',
             })
-            expect(visitSessionData.applicationReference).toEqual(reservedVisit.applicationReference)
-            expect(visitSessionData.visitReference).toEqual(reservedVisit.reference)
-            expect(visitSessionData.visitStatus).toEqual(
-              journey.isUpdate ? changingVisit.visitStatus : reservedVisit.visitStatus,
-            )
+            expect(visitSessionData.applicationReference).toEqual(application.reference)
 
-            expect(journey.isUpdate ? visitService.changeBookedVisit : visitService.reserveVisit).toHaveBeenCalledTimes(
-              1,
-            )
-            expect(visitService.changeReservedVisit).not.toHaveBeenCalled()
+            expect(
+              journey.isUpdate ? visitService.createVisitApplicationFromVisit : visitService.createVisitApplication,
+            ).toHaveBeenCalledWith({ username: 'user1', visitSessionData })
+            expect(visitService.changeVisitApplication).not.toHaveBeenCalled()
 
             expect(auditService.reservedVisit).toHaveBeenCalledTimes(1)
             expect(auditService.reservedVisit).toHaveBeenCalledWith({
-              applicationReference: reservedVisit.applicationReference,
-              visitReference: reservedVisit.reference,
+              applicationReference: application.reference,
+              visitReference: visitSessionData.visitReference,
               prisonerId: 'A1234BC',
               prisonId,
               visitorIds: ['4323'],
@@ -403,7 +390,7 @@ testJourneys.forEach(journey => {
           })
       })
 
-      it('should save new choice to session, update visit reservation and redirect to additional support page if existing session data present', () => {
+      it('should save new choice to session, update visit application and redirect to additional support page if existing session data present', () => {
         visitSessionData.visitSlot = {
           id: '1',
           sessionTemplateReference: 'v9d.7ed.7u1',
@@ -416,9 +403,7 @@ testJourneys.forEach(journey => {
           visitRestriction: 'OPEN',
         }
 
-        visitSessionData.applicationReference = reservedVisit.applicationReference
-        visitSessionData.visitReference = reservedVisit.reference
-        visitSessionData.visitStatus = journey.isUpdate ? changingVisit.visitStatus : reservedVisit.visitStatus
+        visitSessionData.applicationReference = application.reference
 
         return request(sessionApp)
           .post(`${journey.urlPrefix}/select-date-and-time`)
@@ -435,30 +420,21 @@ testJourneys.forEach(journey => {
               availableTables: 5,
               capacity: 30,
               visitRoom: 'room name',
-              // representing the RESERVED visit being handled in this session
+              // representing the visit application visit being handled in this session
               sessionConflicts: ['DOUBLE_BOOKED'],
               visitRestriction: 'OPEN',
             })
 
-            expect(visitSessionData.applicationReference).toEqual(reservedVisit.applicationReference)
-            expect(visitSessionData.visitReference).toEqual(reservedVisit.reference)
-            expect(visitSessionData.visitStatus).toEqual(
-              journey.isUpdate ? changingVisit.visitStatus : reservedVisit.visitStatus,
-            )
+            expect(visitSessionData.applicationReference).toEqual(application.reference)
 
-            expect(visitService.reserveVisit).not.toHaveBeenCalled()
-            expect(visitService.changeReservedVisit).toHaveBeenCalledTimes(1)
-            expect(visitService.changeReservedVisit.mock.calls[0][0].visitSessionData.applicationReference).toBe(
-              reservedVisit.applicationReference,
-            )
-            expect(visitService.changeReservedVisit.mock.calls[0][0].visitSessionData.visitReference).toBe(
-              reservedVisit.reference,
-            )
+            expect(visitService.createVisitApplication).not.toHaveBeenCalled()
+            expect(visitService.createVisitApplicationFromVisit).not.toHaveBeenCalled()
+            expect(visitService.changeVisitApplication).toHaveBeenCalledWith({ username: 'user1', visitSessionData })
 
             expect(auditService.reservedVisit).toHaveBeenCalledTimes(1)
             expect(auditService.reservedVisit).toHaveBeenCalledWith({
-              applicationReference: reservedVisit.applicationReference,
-              visitReference: reservedVisit.reference,
+              applicationReference: application.reference,
+              visitReference: visitSessionData.visitReference,
               prisonerId: 'A1234BC',
               prisonId,
               visitorIds: ['4323'],
@@ -522,6 +498,7 @@ describe('Update journey override booking window', () => {
       whereaboutsAvailable: false,
     })
 
+    visitSessionData.visitReference = 'ab-cd-ef-gh'
     visitSessionData.overrideBookingWindow = true
 
     return request(sessionApp)
@@ -583,6 +560,7 @@ describe('Update journey specific warning messages', () => {
 
     visitSessionsService.getVisitSessions.mockResolvedValue({ slotsList, whereaboutsAvailable: true })
 
+    visitSessionData.visitReference = 'ab-cd-ef-gh'
     visitSessionData.visitSlot = currentlyBookedSlot
     visitSessionData.originalVisitSlot = currentlyBookedSlot
   })

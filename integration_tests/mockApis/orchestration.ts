@@ -1,6 +1,7 @@
 import { SuperAgentRequest } from 'superagent'
 import { stubFor } from './wiremock'
 import {
+  ApplicationDto,
   ApplicationMethodType,
   CancelVisitOrchestrationDto,
   NotificationCount,
@@ -74,22 +75,27 @@ export default {
       },
     })
   },
-  stubChangeBookedVisit: (visit: Visit): SuperAgentRequest => {
+  stubCreateVisitApplicationFromVisit: ({
+    visitReference,
+    application,
+  }: {
+    visitReference: string
+    application: ApplicationDto
+  }): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'PUT',
-        url: `/orchestration/visits/${visit.reference}/change`,
+        url: `/orchestration/visits/application/${visitReference}/change`,
         bodyPatterns: [
           {
             equalToJson: {
-              prisonerId: visit.prisonerId,
-              sessionTemplateReference: visit.sessionTemplateReference,
-              visitRestriction: visit.visitRestriction,
-              startTimestamp: visit.startTimestamp,
-              endTimestamp: visit.endTimestamp,
-              visitContact: visit.visitContact,
-              visitors: visit.visitors,
-              visitorSupport: visit.visitorSupport,
+              prisonerId: application.prisonerId,
+              sessionTemplateReference: application.sessionTemplateReference,
+              sessionDate: application.startTimestamp.split('T')[0],
+              applicationRestriction: application.visitRestriction,
+              visitContact: application.visitContact,
+              visitors: application.visitors,
+              visitorSupport: application.visitorSupport,
             },
           },
         ],
@@ -97,25 +103,24 @@ export default {
       response: {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: visit,
+        jsonBody: application,
       },
     })
   },
-  stubChangeReservedSlot: (visit: Visit): SuperAgentRequest => {
+  stubChangeVisitApplication: (application: ApplicationDto): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'PUT',
-        url: `/orchestration/visits/${visit.applicationReference}/slot/change`,
+        url: `/orchestration/visits/application/${application.reference}/slot/change`,
         bodyPatterns: [
           {
             equalToJson: {
-              visitRestriction: visit.visitRestriction,
-              startTimestamp: visit.startTimestamp,
-              endTimestamp: visit.endTimestamp,
-              visitContact: visit.visitContact,
-              visitors: visit.visitors,
-              visitorSupport: visit.visitorSupport,
-              sessionTemplateReference: visit.sessionTemplateReference,
+              applicationRestriction: application.visitRestriction,
+              sessionTemplateReference: application.sessionTemplateReference,
+              sessionDate: application.startTimestamp.split('T')[0],
+              visitContact: application.visitContact,
+              visitors: application.visitors,
+              visitorSupport: application.visitorSupport,
             },
           },
         ],
@@ -123,24 +128,23 @@ export default {
       response: {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: visit,
+        jsonBody: application,
       },
     })
   },
-  stubReserveVisit: (visit: Visit): SuperAgentRequest => {
+  stubCreateVisitApplication: (application: ApplicationDto): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'POST',
-        url: '/orchestration/visits/slot/reserve',
+        url: '/orchestration/visits/application/slot/reserve',
         bodyPatterns: [
           {
             equalToJson: {
-              prisonerId: visit.prisonerId,
-              sessionTemplateReference: visit.sessionTemplateReference,
-              visitRestriction: visit.visitRestriction,
-              startTimestamp: visit.startTimestamp,
-              endTimestamp: visit.endTimestamp,
-              visitors: visit.visitors,
+              prisonerId: application.prisonerId,
+              sessionTemplateReference: application.sessionTemplateReference,
+              sessionDate: application.startTimestamp.split('T')[0],
+              applicationRestriction: application.visitRestriction,
+              visitors: application.visitors,
             },
           },
         ],
@@ -148,7 +152,7 @@ export default {
       response: {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: visit,
+        jsonBody: application,
       },
     })
   },
@@ -178,40 +182,33 @@ export default {
       },
     })
   },
-  stubUpcomingVisits: ({
-    offenderNo,
+  stubFutureVisits: ({
+    prisonerId,
     upcomingVisits,
   }: {
-    offenderNo: string
+    prisonerId: string
     upcomingVisits: Visit[]
   }): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPath: '/orchestration/visits/search',
-        queryParameters: {
-          prisonerId: { equalTo: offenderNo },
-          startDateTime: { matches: '.*' },
-          visitStatus: { and: [{ contains: 'BOOKED' }, { contains: 'CANCELLED' }] },
-          page: { equalTo: '0' },
-          size: { equalTo: '1000' },
-        },
+        urlPath: `/orchestration/visits/search/future/${prisonerId}`,
       },
       response: {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: { content: upcomingVisits },
+        jsonBody: upcomingVisits,
       },
     })
   },
   stubVisitsByDate: ({
-    startDateTime,
-    endDateTime,
+    visitStartDate,
+    visitEndDate,
     prisonId,
     visits,
   }: {
-    startDateTime: string
-    endDateTime: string
+    visitStartDate: string
+    visitEndDate: string
     prisonId: string
     visits: Visit
   }): SuperAgentRequest => {
@@ -221,8 +218,8 @@ export default {
         urlPath: `/orchestration/visits/search`,
         queryParameters: {
           prisonId: { equalTo: prisonId },
-          startDateTime: { equalTo: startDateTime },
-          endDateTime: { equalTo: endDateTime },
+          visitStartDate: { equalTo: visitStartDate },
+          visitEndDate: { equalTo: visitEndDate },
           visitStatus: { equalTo: 'BOOKED' },
           page: { equalTo: '0' },
           size: { equalTo: '1000' },

@@ -4,7 +4,7 @@ import { SessionData } from 'express-session'
 import * as cheerio from 'cheerio'
 import { FlashData, VisitSessionData } from '../../@types/bapv'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
-import { Visit } from '../../data/orchestrationApiTypes'
+import { ApplicationDto, Visit } from '../../data/orchestrationApiTypes'
 import TestData from '../testutils/testData'
 import { createMockAuditService, createMockVisitService } from '../../services/testutils/mocks'
 
@@ -82,8 +82,8 @@ testJourneys.forEach(journey => {
           contactName: 'abc',
         },
         applicationReference: 'aaa-bbb-ccc',
-        visitReference: 'ab-cd-ef-gh',
-        visitStatus: 'RESERVED',
+        // visit reference only known on update journey
+        visitReference: journey.isUpdate ? 'ab-cd-ef-gh' : undefined,
         requestMethod: 'PHONE',
       }
 
@@ -162,18 +162,16 @@ testJourneys.forEach(journey => {
       const visitService = createMockVisitService()
 
       beforeEach(() => {
-        const reservedVisit: Partial<Visit> = {
-          applicationReference: visitSessionData.applicationReference,
-          reference: visitSessionData.visitReference,
-          visitStatus: 'RESERVED',
+        const application: Partial<ApplicationDto> = {
+          reference: visitSessionData.applicationReference,
         }
         const bookedVisit: Partial<Visit> = {
           applicationReference: visitSessionData.applicationReference,
-          reference: visitSessionData.visitReference,
+          reference: 'ab-cd-ef-gh',
           visitStatus: 'BOOKED',
         }
 
-        visitService.changeReservedVisit = jest.fn().mockResolvedValue(reservedVisit)
+        visitService.changeVisitApplication = jest.fn().mockResolvedValue(application)
         visitService.bookVisit = jest.fn().mockResolvedValue(bookedVisit)
 
         sessionApp = appWithAllRoutes({
@@ -191,11 +189,16 @@ testJourneys.forEach(journey => {
           .expect(302)
           .expect('location', `${journey.urlPrefix}/confirmation`)
           .expect(() => {
-            expect(visitService.changeReservedVisit).toHaveBeenCalledTimes(1)
-            expect(visitService.bookVisit).toHaveBeenCalledTimes(1)
+            expect(visitService.changeVisitApplication).toHaveBeenCalledWith({ username: 'user1', visitSessionData })
+            expect(visitService.bookVisit).toHaveBeenCalledWith({
+              username: 'user1',
+              applicationReference: visitSessionData.applicationReference,
+              applicationMethod: visitSessionData.requestMethod,
+            })
 
             expect(visitService.cancelVisit).not.toHaveBeenCalled()
             expect(visitSessionData.visitStatus).toBe('BOOKED')
+            expect(visitSessionData.visitReference).toBe('ab-cd-ef-gh')
             expect(auditService.bookedVisit).toHaveBeenCalledTimes(1)
             expect(auditService.bookedVisit).toHaveBeenCalledWith({
               applicationReference: visitSessionData.applicationReference,
@@ -229,11 +232,15 @@ testJourneys.forEach(journey => {
             expect($('.test-visit-type').text()).toContain('Open')
             expect($('form').prop('action')).toBe(`${journey.urlPrefix}/check-your-booking`)
 
-            expect(visitService.changeReservedVisit).toHaveBeenCalledTimes(1)
-            expect(visitService.bookVisit).toHaveBeenCalledTimes(1)
+            expect(visitService.changeVisitApplication).toHaveBeenCalledWith({ username: 'user1', visitSessionData })
+            expect(visitService.bookVisit).toHaveBeenCalledWith({
+              username: 'user1',
+              applicationReference: visitSessionData.applicationReference,
+              applicationMethod: visitSessionData.requestMethod,
+            })
 
-            expect(visitService.cancelVisit).not.toHaveBeenCalled()
-            expect(visitSessionData.visitStatus).toBe('RESERVED')
+            expect(visitSessionData.visitStatus).not.toBe('BOOKED')
+            expect(visitSessionData.visitReference).toBe(journey.isUpdate ? 'ab-cd-ef-gh' : undefined)
             expect(auditService.bookedVisit).not.toHaveBeenCalled()
           })
       })

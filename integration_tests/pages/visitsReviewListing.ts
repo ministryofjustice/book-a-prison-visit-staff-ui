@@ -7,12 +7,12 @@ export default class VisitsReviewListingPage extends Page {
 
   filterByUser = (username: string): void => {
     cy.get('#button-bookedBy').click()
-    cy.get(`[data-test="${username}"]`).check({ force: true })
+    cy.get(`[data-test="${username}"]`).check()
   }
 
   filterByReason = (type: string): void => {
     cy.get('#button-type').click()
-    cy.get(`[data-test="${type}"]`).check({ force: true })
+    cy.get(`[data-test="${type}"]`).check()
   }
 
   applyFilter = (): void => {
