@@ -2,6 +2,7 @@ import { defineConfig } from 'cypress'
 import { resetStubs } from './integration_tests/mockApis/wiremock'
 
 import auth from './integration_tests/mockApis/auth'
+import frontendComponents from './integration_tests/mockApis/frontendComponents'
 import manageUsersApi from './integration_tests/mockApis/manageUsersApi'
 import tokenVerification from './integration_tests/mockApis/tokenVerification'
 import nomisUserRoles from './integration_tests/mockApis/nomisUserRoles'
@@ -32,6 +33,7 @@ export default defineConfig({
         ...manageUsersApi,
         ...tokenVerification,
 
+        ...frontendComponents,
         ...nomisUserRoles,
         ...orchestrationService,
         ...prisonerContactRegistry,

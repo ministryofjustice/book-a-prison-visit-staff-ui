@@ -43,6 +43,7 @@ API_CLIENT_SECRET=clientsecret
 SYSTEM_CLIENT_ID=clientid
 SYSTEM_CLIENT_SECRET=clientsecret
 
+COMPONENT_API_URL="https://frontend-components-dev.hmpps.service.justice.gov.uk"
 NOMIS_USER_ROLES_API_URL="https://nomis-user-roles-api-dev.prison.service.justice.gov.uk"
 ORCHESTRATION_API_URL="https://hmpps-manage-prison-visits-orchestration-dev.prison.service.justice.gov.uk"
 PRISONER_SEARCH_API_URL="https://prisoner-search-dev.prison.service.justice.gov.uk"
