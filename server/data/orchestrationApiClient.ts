@@ -15,7 +15,6 @@ import {
   PrisonerProfile,
   SessionCapacity,
   SessionSchedule,
-  SupportType,
   Visit,
   VisitHistoryDetails,
   VisitSession,
@@ -77,12 +76,6 @@ export default class OrchestrationApiClient {
         page: this.page,
         size: this.size,
       }).toString(),
-    })
-  }
-
-  async getAvailableSupportOptions(): Promise<SupportType[]> {
-    return this.restClient.get({
-      path: '/visit-support',
     })
   }
 

@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express'
-import { clearSession, getSupportTypeDescriptions } from '../visitorUtils'
+import { clearSession } from '../visitorUtils'
 
 export default class Confirmation {
   constructor(private readonly mode: string) {}
@@ -15,10 +15,7 @@ export default class Confirmation {
     res.locals.visitors = visitSessionData.visitors
     res.locals.mainContact = visitSessionData.mainContact
     res.locals.visitReference = visitSessionData.visitReference
-    res.locals.additionalSupport = getSupportTypeDescriptions(
-      req.session.availableSupportTypes,
-      visitSessionData.visitorSupport,
-    )
+    res.locals.additionalSupport = visitSessionData.visitorSupport.description
 
     clearSession(req)
 

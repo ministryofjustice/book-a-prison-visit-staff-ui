@@ -329,7 +329,7 @@ describe('sessionCheckMiddleware', () => {
         visitRestriction,
         visitSlot,
         visitors: visitorsData,
-        visitorSupport: [],
+        visitorSupport: { description: '' },
         visitReference: 'ab-cd-ef-gh',
       } as VisitSessionData,
       {
@@ -338,7 +338,7 @@ describe('sessionCheckMiddleware', () => {
         visitRestriction,
         visitSlot,
         visitors: visitorsData,
-        visitorSupport: [],
+        visitorSupport: { description: '' },
         mainContact: {
           phoneNumber: '',
         },
@@ -363,7 +363,7 @@ describe('sessionCheckMiddleware', () => {
         visitRestriction,
         visitSlot,
         visitors: visitorsData,
-        visitorSupport: [],
+        visitorSupport: { description: '' },
         mainContact: {
           phoneNumber: '01234567899',
           contactName: 'abc',
@@ -396,7 +396,7 @@ describe('sessionCheckMiddleware', () => {
         visitRestriction,
         visitSlot,
         visitors: visitorsData,
-        visitorSupport: [],
+        visitorSupport: { description: '' },
         mainContact: {
           phoneNumber: '01234567899',
           contactName: 'abc',

@@ -8,7 +8,6 @@ import {
   PrisonerProfile,
   SessionCapacity,
   SessionSchedule,
-  SupportType,
   Visit,
   VisitHistoryDetails,
   VisitSession,
@@ -97,7 +96,7 @@ export default class TestData {
         visitContact: false,
       },
     ],
-    visitorSupport = [],
+    visitorSupport = { description: '' },
     createdTimestamp = '2022-01-01T09:00:00',
     modifiedTimestamp = '2022-01-01T09:00:00',
     reserved = true,
@@ -376,31 +375,6 @@ export default class TestData {
       excludeDates,
     }) as PrisonDto
 
-  static supportTypes = ({
-    supportTypes = [
-      {
-        type: 'WHEELCHAIR',
-        description: 'Wheelchair ramp',
-      },
-      {
-        type: 'INDUCTION_LOOP',
-        description: 'Portable induction loop for people with hearing aids',
-      },
-      {
-        type: 'BSL_INTERPRETER',
-        description: 'British Sign Language (BSL) Interpreter',
-      },
-      {
-        type: 'MASK_EXEMPT',
-        description: 'Face covering exemption',
-      },
-      {
-        type: 'OTHER',
-        description: 'Other',
-      },
-    ] as SupportType[],
-  } = {}): SupportType[] => supportTypes
-
   static visit = ({
     applicationReference = 'aaa-bbb-ccc',
     reference = 'ab-cd-ef-gh',
@@ -438,15 +412,7 @@ export default class TestData {
         visitContact: false,
       },
     ],
-    visitorSupport = [
-      {
-        type: 'WHEELCHAIR',
-      },
-      {
-        type: 'OTHER',
-        text: 'custom request',
-      },
-    ],
+    visitorSupport = { description: 'Wheelchair ramp, Portable induction loop for people with hearing aids' },
     createdTimestamp = '2022-01-01T09:00:00',
     modifiedTimestamp = '2022-01-01T09:00:00',
   }: Partial<Visit> = {}): Visit =>

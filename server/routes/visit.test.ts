@@ -110,7 +110,7 @@ describe('/visit/:reference', () => {
 
   const notifications: NotificationType[] = []
 
-  const additionalSupport = ['Wheelchair ramp', 'custom request']
+  const additionalSupport = 'Wheelchair ramp, Portable induction loop for people with hearing aids'
 
   beforeEach(() => {
     visit = TestData.visit()
@@ -183,7 +183,9 @@ describe('/visit/:reference', () => {
           expect($('[data-test="test-visitor-dob1"]').text()).toContain('(35 years old)')
           expect($('[data-test="test-visitor-address1"]').text()).toBe('123 The Street, Coventry')
           expect($('[data-test="test-visitor-restriction1"]').text()).toContain('Closed')
-          expect($('[data-test="additional-support"]').text()).toContain('Wheelchair ramp, custom request')
+          expect($('[data-test="additional-support"]').text()).toContain(
+            'Wheelchair ramp, Portable induction loop for people with hearing aids',
+          )
           // booking history - tab selected - check information displayed
           // first event
           expect($('[data-test="visit-event-1"]').text()).toBe('Needs review')
@@ -661,7 +663,7 @@ describe('/visit/:reference', () => {
                 restrictions: [],
               },
             ],
-            visitorSupport: [{ type: 'WHEELCHAIR' }, { text: 'custom request', type: 'OTHER' }],
+            visitorSupport: { description: 'Wheelchair ramp, Portable induction loop for people with hearing aids' },
             mainContact: { contact: visitors[0], phoneNumber: '01234 567890', contactName: 'Jeanette Smith' },
             visitReference: 'ab-cd-ef-gh',
           })

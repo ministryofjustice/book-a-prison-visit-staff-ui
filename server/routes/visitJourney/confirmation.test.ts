@@ -19,8 +19,6 @@ const testJourneys = [
   { urlPrefix: '/visit/ab-cd-ef-gh/update', isUpdate: true },
 ]
 
-const availableSupportTypes = TestData.supportTypes()
-
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
   flashProvider.mockImplementation((key: keyof FlashData) => {
@@ -75,7 +73,7 @@ testJourneys.forEach(journey => {
             banned: false,
           },
         ],
-        visitorSupport: [{ type: 'WHEELCHAIR' }, { type: 'INDUCTION_LOOP' }],
+        visitorSupport: { description: 'Wheelchair ramp, Portable induction loop for people with hearing aids' },
         mainContact: {
           phoneNumber: '123',
           contactName: 'abc',
@@ -88,7 +86,6 @@ testJourneys.forEach(journey => {
 
       sessionApp = appWithAllRoutes({
         sessionData: {
-          availableSupportTypes,
           visitSessionData,
         } as SessionData,
       })
@@ -164,7 +161,7 @@ testJourneys.forEach(journey => {
               banned: false,
             },
           ],
-          visitorSupport: [],
+          visitorSupport: { description: '' },
           mainContact: {
             phoneNumber: '123',
             contactName: 'abc',
@@ -177,7 +174,6 @@ testJourneys.forEach(journey => {
 
         sessionApp = appWithAllRoutes({
           sessionData: {
-            availableSupportTypes,
             visitSessionData,
           } as SessionData,
         })

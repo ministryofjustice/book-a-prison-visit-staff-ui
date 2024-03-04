@@ -98,7 +98,6 @@ function appSetup(
     cookie: new Cookie(),
     returnTo: '',
     nowInMinutes: 0,
-    availableSupportTypes: [],
     visitorList: { visitors: [] as VisitorListItem[] },
     adultVisitors: { adults: [] as VisitorListItem[] },
     slotsList: {} as VisitSlotList,

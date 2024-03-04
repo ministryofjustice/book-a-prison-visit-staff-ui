@@ -19,45 +19,15 @@
 
             {% set otherSupportHtml %}
               {{ govukInput({
-                id: "otherSupportDetails",
-                name: "otherSupportDetails",
+                id: "additionalSupport",
+                name: "additionalSupport",
                 type: "text",
                 classes: "govuk-!-width-one-third",
                 label: {
                   text: "Provide details"
                 },
-                value: formValues.otherSupportDetails,
+                value: formValues.additionalSupport,
                 autocomplete: "off",
-                errorMessage: errors | findError('otherSupportDetails')
-              }) }}
-            {% endset -%}
-
-            {% set additionalSupport = additionalSupport or [] %}
-            {% set additionalSupportCheckboxes = [] %}
-            {% for option in availableSupportTypes %}
-              {% set additionalSupportCheckboxes = (additionalSupportCheckboxes.push(
-                {
-                  value: option.type,
-                  text: option.description,
-                  attributes: {
-                    'data-test': option.type
-                  },
-                  checked: formValues.additionalSupport and option.type in formValues.additionalSupport,
-                  conditional: { html: otherSupportHtml } if option.type == "OTHER"
-                }
-              ), additionalSupportCheckboxes) %}
-            {% endfor %}
-            {% set supportOptionsHtml %}
-              {{ govukCheckboxes({
-                idPrefix: "additionalSupport",
-                name: "additionalSupport",
-                fieldset: {
-                  legend: {
-                    text: "Select all that apply.",
-                    classes: ""
-                  }
-                },
-                items: additionalSupportCheckboxes,
                 errorMessage: errors | findError('additionalSupport')
               }) }}
             {% endset -%}
@@ -84,7 +54,7 @@
                   },
                   checked: formValues.additionalSupportRequired == "yes",
                   conditional: {
-                    html: supportOptionsHtml
+                    html: otherSupportHtml
                   }
                 },
                 {
