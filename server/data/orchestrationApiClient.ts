@@ -220,8 +220,7 @@ export default class OrchestrationApiClient {
   } {
     const visitContact = mainContact
       ? {
-          // to do - fix once backend allows no phone number
-          telephone: mainContact.phoneNumber ? mainContact.phoneNumber : 'UNKNOWN',
+          telephone: mainContact.phoneNumber,
           name: mainContact.contactName ? mainContact.contactName : mainContact.contact.name,
         }
       : undefined

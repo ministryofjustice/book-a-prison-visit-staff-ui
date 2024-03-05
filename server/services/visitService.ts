@@ -143,7 +143,7 @@ export default class VisitService {
     const notifications = config.features.reviewBookings
       ? await orchestrationApiClient.getVisitNotifications(reference)
       : []
-
+    logger.info(visit)
     const additionalSupport = visit.visitorSupport.description
 
     return { visitHistoryDetails, visitors, notifications, additionalSupport }
