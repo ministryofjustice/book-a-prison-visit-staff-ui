@@ -154,7 +154,7 @@ context('Book a visit', () => {
     selectVisitDateAndTime.continueButton().click()
     const additionalSupportPage = Page.verifyOnPage(AdditionalSupportPage)
     additionalSupportPage.additionalSupportRequired().check()
-    additionalSupportPage.enterOtherSupportDetails('Wheelchair ramp, Some extra help!')
+    additionalSupportPage.enterSupportDetails('Wheelchair ramp, Some extra help!')
 
     // Main contact
     additionalSupportPage.continueButton().click()

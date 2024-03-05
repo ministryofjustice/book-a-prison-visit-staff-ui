@@ -180,7 +180,7 @@ context('Check visit details page', () => {
     checkYourBookingPage.changeAdditionalSupport().click()
     additionalSupportPage.additionalSupportNotRequired().should('be.checked')
     additionalSupportPage.additionalSupportRequired().check()
-    additionalSupportPage.enterOtherSupportDetails('Wheelchair ramp')
+    additionalSupportPage.enterSupportDetails('Wheelchair ramp')
     additionalSupportPage.continueButton().click()
     mainContactPage.continueButton().click()
     requestMethodPage.continueButton().click()

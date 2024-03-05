@@ -125,7 +125,7 @@ context('Update a visit', () => {
     additionalSupportPage.additionalSupportNotRequired().should('be.checked')
     additionalSupportPage.additionalSupportRequired().should('not.be.checked')
     additionalSupportPage.additionalSupportRequired().check()
-    additionalSupportPage.enterOtherSupportDetails('Wheelchair ramp, Some extra help!')
+    additionalSupportPage.enterSupportDetails('Wheelchair ramp, Some extra help!')
     additionalSupportPage.continueButton().click()
 
     // Main contact - check pre-populated then change phone number
