@@ -30,7 +30,6 @@ const A_DAY_IN_MS = 24 * 60 * 60 * 1000
 const CANCELLATION_LIMIT_DAYS = 28
 
 export default function routes({
-  additionalSupportService,
   auditService,
   prisonerProfileService,
   prisonerSearchService,
@@ -204,7 +203,7 @@ export default function routes({
   const selectVisitors = new SelectVisitors('update', prisonerVisitorsService, prisonerProfileService)
   const visitType = new VisitType('update', auditService)
   const dateAndTime = new DateAndTime('update', visitService, visitSessionsService, auditService)
-  const additionalSupport = new AdditionalSupport('update', additionalSupportService)
+  const additionalSupport = new AdditionalSupport('update')
   const mainContact = new MainContact('update')
   const requestMethod = new RequestMethod('update')
   const checkYourBooking = new CheckYourBooking('update', auditService, visitService)

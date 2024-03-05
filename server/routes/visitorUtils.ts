@@ -1,7 +1,6 @@
 import type { Request } from 'express'
 import type { SessionData } from 'express-session'
 import { VisitSlot, VisitSlotList } from '../@types/bapv'
-import { SupportType, VisitorSupport } from '../data/orchestrationApiTypes'
 
 export const getSelectedSlot = (slotsList: VisitSlotList, selectedSlot: string): VisitSlot => {
   return Object.values(slotsList)
@@ -35,21 +34,8 @@ export const getFlashFormValues = (req: Request): Record<string, string | string
   return (req.flash('formValues')?.[0] as unknown as Record<string, string | string[]>) || {}
 }
 
-export const getSupportTypeDescriptions = (
-  availableSupportTypes: SupportType[],
-  visitorSupport: VisitorSupport[],
-): string[] => {
-  return visitorSupport.map(support => {
-    return support.type === 'OTHER'
-      ? support.text
-      : availableSupportTypes.find(type => type.type === support.type).description
-  })
-}
-
 export const clearSession = (req: Request): void => {
-  ;['availableSupportTypes', 'visitorList', 'adultVisitors', 'slotsList', 'visitSessionData'].forEach(
-    (sessionItem: keyof SessionData) => {
-      delete req.session[sessionItem]
-    },
-  )
+  ;['visitorList', 'adultVisitors', 'slotsList', 'visitSessionData'].forEach((sessionItem: keyof SessionData) => {
+    delete req.session[sessionItem]
+  })
 }

@@ -94,7 +94,7 @@ testJourneys.forEach(journey => {
             banned: false,
           },
         ],
-        visitorSupport: [],
+        visitorSupport: { description: '' },
         applicationReference: 'aaa-bbb-ccc',
         // visit reference only known on update journey
         visitReference: journey.isUpdate ? 'ab-cd-ef-gh' : undefined,

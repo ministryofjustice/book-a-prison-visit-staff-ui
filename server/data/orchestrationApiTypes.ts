@@ -1,7 +1,5 @@
 import { components } from '../@types/orchestration-api'
 
-export type SupportType = components['schemas']['SupportTypeDto']
-
 export type VisitorSupport = components['schemas']['VisitorSupportDto']
 
 export type PageVisitDto = components['schemas']['PageVisitDto']

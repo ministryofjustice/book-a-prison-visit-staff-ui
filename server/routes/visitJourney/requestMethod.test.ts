@@ -70,7 +70,7 @@ testJourneys.forEach(journey => {
             banned: false,
           },
         ],
-        visitorSupport: [{ type: 'WHEELCHAIR' }, { type: 'INDUCTION_LOOP' }],
+        visitorSupport: { description: 'Wheelchair ramp, Portable induction loop for people with hearing aids' },
         mainContact: {
           phoneNumber: '123',
           contactName: 'abc',

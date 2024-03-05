@@ -151,13 +151,10 @@ context('Book a visit', () => {
     selectVisitDateAndTime.getSlotById(1).check()
 
     // Additional support
-    cy.task('stubAvailableSupport')
     selectVisitDateAndTime.continueButton().click()
     const additionalSupportPage = Page.verifyOnPage(AdditionalSupportPage)
     additionalSupportPage.additionalSupportRequired().check()
-    additionalSupportPage.selectSupportType('WHEELCHAIR')
-    additionalSupportPage.selectSupportType('OTHER')
-    additionalSupportPage.enterOtherSupportDetails('Some extra help!')
+    additionalSupportPage.enterSupportDetails('Wheelchair ramp, Some extra help!')
 
     // Main contact
     additionalSupportPage.continueButton().click()
@@ -196,7 +193,7 @@ context('Book a visit', () => {
           { nomisPersonId: contacts[0].personId, visitContact: true },
           { nomisPersonId: contacts[1].personId, visitContact: false },
         ],
-        visitorSupport: [{ type: 'WHEELCHAIR' }, { type: 'OTHER', text: 'Some extra help!' }],
+        visitorSupport: { description: 'Wheelchair ramp, Some extra help!' },
         sessionTemplateReference: visitSessions[0].sessionTemplateReference,
       }),
     )
@@ -209,7 +206,7 @@ context('Book a visit', () => {
           { nomisPersonId: contacts[0].personId, visitContact: true },
           { nomisPersonId: contacts[1].personId, visitContact: false },
         ],
-        visitorSupport: [{ type: 'WHEELCHAIR' }, { type: 'OTHER', text: 'Some extra help!' }],
+        visitorSupport: { description: 'Wheelchair ramp, Some extra help!' },
       }),
       applicationMethod: 'PHONE',
     })

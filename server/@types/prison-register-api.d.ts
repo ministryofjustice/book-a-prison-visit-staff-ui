@@ -48,15 +48,6 @@ export interface paths {
     /** Remove a prison department's contact details */
     delete: operations['deletePhoneNumber']
   }
-  '/queue-admin/retry-dlq/{dlqName}': {
-    put: operations['retryDlq']
-  }
-  '/queue-admin/retry-all-dlqs': {
-    put: operations['retryAllDlqs']
-  }
-  '/queue-admin/purge-queue/{queueName}': {
-    put: operations['purgeQueue']
-  }
   '/prison-maintenance/id/{prisonId}': {
     /**
      * Update specified prison details
@@ -89,9 +80,6 @@ export interface paths {
      * @description Adds an additional Address to an existing Prison, role required is MAINTAIN_REF_DATA or MAINTAIN_PRISON_DATA
      */
     post: operations['addAddress']
-  }
-  '/queue-admin/get-dlq-messages/{dlqName}': {
-    get: operations['getDlqMessages']
   }
   '/prisons': {
     /**
@@ -174,21 +162,6 @@ export interface components {
       userMessage?: string
       developerMessage?: string
       moreInfo?: string
-    }
-    DlqMessage: {
-      body: {
-        [key: string]: Record<string, never>
-      }
-      messageId: string
-    }
-    RetryDlqResult: {
-      /** Format: int32 */
-      messagesFoundCount: number
-      messages: components['schemas']['DlqMessage'][]
-    }
-    PurgeQueueResult: {
-      /** Format: int32 */
-      messagesFoundCount: number
     }
     /** @description Prison Update Record */
     UpdatePrisonDto: {
@@ -296,7 +269,7 @@ export interface components {
       code: 'HMP' | 'YOI' | 'IRC' | 'STC' | 'YCS'
       /**
        * @description Prison type description
-       * @example Her Majesty’s Prison
+       * @example His Majesty’s Prison
        */
       description: string
     }
@@ -362,13 +335,6 @@ export interface components {
       addresses: components['schemas']['UpdateAddressDto'][]
       /** @description Set of categories for this prison */
       categories: ('A' | 'B' | 'C' | 'D')[]
-    }
-    GetDlqResult: {
-      /** Format: int32 */
-      messagesFoundCount: number
-      /** Format: int32 */
-      messagesReturnedCount: number
-      messages: components['schemas']['DlqMessage'][]
     }
     /** @description Full name of prison with id */
     PrisonNameDto: {
@@ -820,46 +786,6 @@ export interface operations {
       }
     }
   }
-  retryDlq: {
-    parameters: {
-      path: {
-        dlqName: string
-      }
-    }
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          '*/*': components['schemas']['RetryDlqResult']
-        }
-      }
-    }
-  }
-  retryAllDlqs: {
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          '*/*': components['schemas']['RetryDlqResult'][]
-        }
-      }
-    }
-  }
-  purgeQueue: {
-    parameters: {
-      path: {
-        queueName: string
-      }
-    }
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          '*/*': components['schemas']['PurgeQueueResult']
-        }
-      }
-    }
-  }
   /**
    * Update specified prison details
    * @description Updates prison information, role required is MAINTAIN_REF_DATA or MAINTAIN_PRISON_DATA
@@ -1098,24 +1024,6 @@ export interface operations {
       404: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  getDlqMessages: {
-    parameters: {
-      query?: {
-        maxMessages?: number
-      }
-      path: {
-        dlqName: string
-      }
-    }
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          '*/*': components['schemas']['GetDlqResult']
         }
       }
     }

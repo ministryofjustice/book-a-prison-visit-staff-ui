@@ -12,7 +12,6 @@ import RequestMethod from './visitJourney/requestMethod'
 import type { Services } from '../services'
 
 export default function routes({
-  additionalSupportService,
   auditService,
   prisonerProfileService,
   prisonerVisitorsService,
@@ -35,7 +34,7 @@ export default function routes({
 
   const selectVisitors = new SelectVisitors('book', prisonerVisitorsService, prisonerProfileService)
   const visitType = new VisitType('book', auditService)
-  const additionalSupport = new AdditionalSupport('book', additionalSupportService)
+  const additionalSupport = new AdditionalSupport('book')
   const dateAndTime = new DateAndTime('book', visitService, visitSessionsService, auditService)
   const mainContact = new MainContact('book')
   const requestMethod = new RequestMethod('book')

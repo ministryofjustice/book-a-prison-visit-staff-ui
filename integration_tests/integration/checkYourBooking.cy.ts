@@ -95,7 +95,6 @@ context('Check visit details page', () => {
     selectVisitDateAndTime.getSlotById(1).check()
 
     // Additional support
-    cy.task('stubAvailableSupport')
     selectVisitDateAndTime.continueButton().click()
     const additionalSupportPage = Page.verifyOnPage(AdditionalSupportPage)
     additionalSupportPage.additionalSupportNotRequired().check()
@@ -139,7 +138,7 @@ context('Check visit details page', () => {
         endTimestamp: visitSessions[1].endTimestamp,
         visitContact: { name: 'Jeanette Smith', telephone: '01234 567890' },
         visitors: [{ nomisPersonId: contacts[0].personId, visitContact: true }],
-        visitorSupport: [],
+        visitorSupport: { description: '' },
         sessionTemplateReference: visitSessions[1].sessionTemplateReference,
       }),
     )
@@ -167,7 +166,7 @@ context('Check visit details page', () => {
           { nomisPersonId: contacts[0].personId, visitContact: true },
           { nomisPersonId: contacts[1].personId, visitContact: false },
         ],
-        visitorSupport: [],
+        visitorSupport: { description: '' },
         sessionTemplateReference: visitSessions[1].sessionTemplateReference,
       }),
     )
@@ -182,7 +181,7 @@ context('Check visit details page', () => {
     checkYourBookingPage.changeAdditionalSupport().click()
     additionalSupportPage.additionalSupportNotRequired().should('be.checked')
     additionalSupportPage.additionalSupportRequired().check()
-    additionalSupportPage.selectSupportType('WHEELCHAIR')
+    additionalSupportPage.enterSupportDetails('Wheelchair ramp')
     additionalSupportPage.continueButton().click()
     mainContactPage.continueButton().click()
     requestMethodPage.continueButton().click()
@@ -213,7 +212,7 @@ context('Check visit details page', () => {
           { nomisPersonId: contacts[0].personId, visitContact: true },
           { nomisPersonId: contacts[1].personId, visitContact: false },
         ],
-        visitorSupport: [{ type: 'WHEELCHAIR' }],
+        visitorSupport: { description: 'Wheelchair ramp' },
         sessionTemplateReference: visitSessions[1].sessionTemplateReference,
       }),
     )
@@ -227,7 +226,7 @@ context('Check visit details page', () => {
           { nomisPersonId: contacts[0].personId, visitContact: true },
           { nomisPersonId: contacts[1].personId, visitContact: false },
         ],
-        visitorSupport: [{ type: 'WHEELCHAIR' }],
+        visitorSupport: { description: 'Wheelchair ramp' },
       }),
       applicationMethod: 'WEBSITE',
     })

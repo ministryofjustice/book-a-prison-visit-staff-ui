@@ -22,7 +22,6 @@ import {
   createMockOrchestrationApiClient,
   createMockPrisonerContactRegistryApiClient,
 } from '../data/testutils/mocks'
-import { createMockAdditionalSupportService } from './testutils/mocks'
 import { Address, AddressUsage, Contact, Restriction } from '../data/prisonerContactRegistryApiTypes'
 import config from '../config'
 
@@ -34,14 +33,11 @@ describe('Visit service', () => {
   const hmppsAuthClient = createMockHmppsAuthClient()
   const orchestrationApiClient = createMockOrchestrationApiClient()
   const prisonerContactRegistryApiClient = createMockPrisonerContactRegistryApiClient()
-  const additionalSupportService = createMockAdditionalSupportService()
 
   let visitService: VisitService
 
   const OrchestrationApiClientFactory = jest.fn()
   const PrisonerContactRegistryApiClientFactory = jest.fn()
-
-  const availableSupportTypes = TestData.supportTypes()
 
   beforeEach(() => {
     OrchestrationApiClientFactory.mockReturnValue(orchestrationApiClient)
@@ -50,7 +46,6 @@ describe('Visit service', () => {
     visitService = new VisitService(
       OrchestrationApiClientFactory,
       PrisonerContactRegistryApiClientFactory,
-      additionalSupportService,
       hmppsAuthClient,
     )
     hmppsAuthClient.getSystemClientToken.mockResolvedValue(token)
@@ -110,7 +105,7 @@ describe('Visit service', () => {
               nomisPersonId: 1234,
             },
           ],
-          visitorSupport: [],
+          visitorSupport: { description: '' },
           createdTimestamp: '2022-02-14T10:00:00',
           modifiedTimestamp: '2022-02-14T10:05:00',
         }
@@ -233,7 +228,7 @@ describe('Visit service', () => {
     describe('getFullVisitDetails', () => {
       const visitHistoryDetails = TestData.visitHistoryDetails({
         visit: TestData.visit({
-          visitorSupport: [{ type: 'WHEELCHAIR' }, { type: 'OTHER', text: 'custom request' }],
+          visitorSupport: { description: 'Wheelchair, custom request' },
         }),
       })
 
@@ -252,7 +247,6 @@ describe('Visit service', () => {
 
       beforeEach(() => {
         prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue(contacts)
-        additionalSupportService.getAvailableSupportOptions.mockResolvedValue(availableSupportTypes)
         orchestrationApiClient.getVisitHistory.mockResolvedValue(visitHistoryDetails)
         orchestrationApiClient.getVisitNotifications.mockResolvedValue(['PRISONER_RELEASED_EVENT'])
       })
@@ -273,7 +267,7 @@ describe('Visit service', () => {
           visitHistoryDetails: VisitHistoryDetails
           visitors: VisitorListItem[]
           notifications: NotificationType[]
-          additionalSupport: string[]
+          additionalSupport: string
         } = {
           visitHistoryDetails,
           visitors: [
@@ -300,13 +294,12 @@ describe('Visit service', () => {
             },
           ],
           notifications: ['PRISONER_RELEASED_EVENT'],
-          additionalSupport: ['Wheelchair ramp', 'custom request'],
+          additionalSupport: 'Wheelchair, custom request',
         }
 
         const result = await visitService.getFullVisitDetails({ username: 'user', reference: 'ab-cd-ef-gh' })
 
         expect(prisonerContactRegistryApiClient.getPrisonerSocialContacts).toHaveBeenCalledTimes(1)
-        expect(additionalSupportService.getAvailableSupportOptions).toHaveBeenCalledTimes(1)
         expect(orchestrationApiClient.getVisitHistory).toHaveBeenCalledTimes(1)
         expect(orchestrationApiClient.getVisitNotifications).toHaveBeenCalledTimes(1)
         expect(result).toStrictEqual(expectedResult)
@@ -407,7 +400,7 @@ describe('Visit service', () => {
                   nomisPersonId: 4729510,
                 },
               ],
-              visitorSupport: [],
+              visitorSupport: { description: '' },
               createdTimestamp: '2022-05-23T10:09:56.636334',
               modifiedTimestamp: '2022-05-23T10:09:56.64691',
             },
@@ -441,7 +434,7 @@ describe('Visit service', () => {
                   nomisPersonId: 4729510,
                 },
               ],
-              visitorSupport: [],
+              visitorSupport: { description: '' },
               createdTimestamp: '2022-05-20T15:29:04.997067',
               modifiedTimestamp: '2022-05-20T15:51:49.983108',
             },

@@ -5,7 +5,6 @@ import * as cheerio from 'cheerio'
 import { FlashData, VisitSessionData } from '../../@types/bapv'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
 import * as visitorUtils from '../visitorUtils'
-import TestData from '../testutils/testData'
 
 let sessionApp: Express
 
@@ -18,8 +17,6 @@ const testJourneys = [
   { urlPrefix: '/book-a-visit', isUpdate: false },
   { urlPrefix: '/visit/ab-cd-ef-gh/update', isUpdate: true },
 ]
-
-const availableSupportTypes = TestData.supportTypes()
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
@@ -75,7 +72,7 @@ testJourneys.forEach(journey => {
             banned: false,
           },
         ],
-        visitorSupport: [{ type: 'WHEELCHAIR' }, { type: 'INDUCTION_LOOP' }],
+        visitorSupport: { description: 'Wheelchair ramp, Portable induction loop for people with hearing aids' },
         mainContact: {
           phoneNumber: '123',
           contactName: 'abc',
@@ -88,7 +85,6 @@ testJourneys.forEach(journey => {
 
       sessionApp = appWithAllRoutes({
         sessionData: {
-          availableSupportTypes,
           visitSessionData,
         } as SessionData,
       })
@@ -164,7 +160,7 @@ testJourneys.forEach(journey => {
               banned: false,
             },
           ],
-          visitorSupport: [],
+          visitorSupport: { description: '' },
           mainContact: {
             phoneNumber: '123',
             contactName: 'abc',
@@ -177,7 +173,6 @@ testJourneys.forEach(journey => {
 
         sessionApp = appWithAllRoutes({
           sessionData: {
-            availableSupportTypes,
             visitSessionData,
           } as SessionData,
         })

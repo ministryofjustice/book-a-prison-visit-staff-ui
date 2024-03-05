@@ -178,7 +178,6 @@ describe('clearSession', () => {
     returnTo: '/url',
     nowInMinutes: 123456,
     cookie: undefined,
-    availableSupportTypes: [{ type: 'WHEELCHAIR', description: 'Wheelchair ramp' }],
     visitorList: { visitors: [] },
     adultVisitors: { adults: [] },
     slotsList: {},

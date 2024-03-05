@@ -1,37 +1,27 @@
 import { Request, Response } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
-import { SupportType, VisitorSupport } from '../../data/orchestrationApiTypes'
 import { getFlashFormValues } from '../visitorUtils'
 import getUrlPrefix from './visitJourneyUtils'
-import { AdditionalSupportService } from '../../services'
 
 export default class AdditionalSupport {
-  constructor(
-    private readonly mode: string,
-    private readonly additionalSupportService: AdditionalSupportService,
-  ) {}
+  constructor(private readonly mode: string) {}
 
   async get(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'
     const { visitSessionData } = req.session
     const formValues = getFlashFormValues(req)
 
-    if (!req.session.availableSupportTypes) {
-      req.session.availableSupportTypes = await this.additionalSupportService.getAvailableSupportOptions(
-        res.locals.user.username,
-      )
-    }
-    const { availableSupportTypes } = req.session
-
     if (!Object.keys(formValues).length && visitSessionData.visitorSupport) {
-      formValues.additionalSupportRequired = visitSessionData.visitorSupport.length ? 'yes' : 'no'
-      formValues.additionalSupport = visitSessionData.visitorSupport.map(support => support.type)
-      formValues.otherSupportDetails = visitSessionData.visitorSupport.find(support => support.type === 'OTHER')?.text
+      if (visitSessionData.visitorSupport.description.length) {
+        formValues.additionalSupportRequired = 'yes'
+        formValues.additionalSupport = visitSessionData.visitorSupport.description
+      } else {
+        formValues.additionalSupportRequired = 'no'
+      }
     }
 
     res.render('pages/bookAVisit/additionalSupport', {
       errors: req.flash('errors'),
-      availableSupportTypes,
       formValues,
       urlPrefix: getUrlPrefix(isUpdate, visitSessionData.visitReference),
     })
@@ -41,7 +31,6 @@ export default class AdditionalSupport {
     const isUpdate = this.mode === 'update'
     const { visitSessionData } = req.session
     const errors = validationResult(req)
-
     const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
 
     if (!errors.isEmpty()) {
@@ -52,51 +41,23 @@ export default class AdditionalSupport {
 
     visitSessionData.visitorSupport =
       req.body.additionalSupportRequired === 'no'
-        ? []
-        : req.body.additionalSupport.map((support: string): VisitorSupport => {
-            const supportItem: VisitorSupport = { type: support }
-            if (support === 'OTHER') {
-              supportItem.text = req.body.otherSupportDetails
-            }
-            return supportItem
-          })
+        ? { description: '' }
+        : { description: req.body.additionalSupport.toString() }
 
     return res.redirect(`${urlPrefix}/select-main-contact`)
   }
 
   validate(): ValidationChain[] {
     return [
-      body('additionalSupportRequired').custom((value: string) => {
-        if (!/^(yes|no)$/.test(value)) {
-          throw new Error('No answer selected')
-        }
-        return true
-      }),
+      body('additionalSupportRequired').isIn(['yes', 'no']).withMessage('No answer selected'),
       body('additionalSupport')
-        .toArray()
-        .custom((value: string[], { req }) => {
-          if (req.body.additionalSupportRequired === 'yes') {
-            const validSupportRequest = value.reduce((valid, supportReq) => {
-              return valid
-                ? req.session.availableSupportTypes.find((option: SupportType) => option.type === supportReq)
-                : false
-            }, true)
-            if (!value.length || !validSupportRequest) throw new Error('No request selected')
-          }
-          return true
-        }),
-      body('otherSupportDetails')
         .trim()
-        .custom((value: string, { req }) => {
-          if (
-            req.body.additionalSupportRequired === 'yes' &&
-            <string[]>req.body.additionalSupport.includes('OTHER') &&
-            (value ?? '').length === 0
-          ) {
-            throw new Error('Enter details of the request')
-          }
-          return true
-        }),
+        .if(body('additionalSupportRequired').equals('yes'))
+        .notEmpty()
+        .withMessage('Enter details of the request')
+        .bail()
+        .isLength({ min: 3, max: 512 })
+        .withMessage('Please enter at least 3 and no more than 512 characters'),
     ]
   }
 }

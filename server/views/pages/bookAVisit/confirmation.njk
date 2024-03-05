@@ -131,7 +131,7 @@
 {% endfor %}
 {% set support %}
     {% if additionalSupport | length %}
-        {{ additionalSupport | join(', ') }}
+        {{ additionalSupport }}
     {% else %}
         {{ "None." }}
     {% endif %}
