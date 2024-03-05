@@ -144,7 +144,7 @@ export default class VisitService {
       ? await orchestrationApiClient.getVisitNotifications(reference)
       : []
 
-    const additionalSupport = visit.visitorSupport.description
+    const additionalSupport = visit.visitorSupport ? visit.visitorSupport.description : ''
 
     return { visitHistoryDetails, visitors, notifications, additionalSupport }
   }
