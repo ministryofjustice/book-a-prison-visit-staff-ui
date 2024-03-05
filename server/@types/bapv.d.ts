@@ -110,7 +110,7 @@ export type VisitSessionData = {
   visitorSupport?: VisitorSupport
   mainContact?: {
     contact?: VisitorListItem
-    phoneNumber: string
+    phoneNumber?: string
     contactName?: string
   }
   applicationReference?: string

@@ -240,7 +240,7 @@ describe('/visit/:reference', () => {
           expect($('[data-test="prisoner-name"]').text()).toBe('Smith, John')
           // visit details
           expect($('[data-test="visit-contact"]').text()).toBe('Smith, Jeanette')
-          expect($('[data-test="visit-phone"]').text()).toBe('Unknown')
+          expect($('[data-test="visit-phone"]').text()).toBe('No phone number provided')
           expect($('[data-test="cancel-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/cancel')
           expect($('form').attr('action')).toBe('/visit/ab-cd-ef-gh')
 

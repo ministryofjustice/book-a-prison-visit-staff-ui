@@ -219,7 +219,7 @@ export interface components {
        * @description Contact Phone Number
        * @example 01234 567890
        */
-      telephone: string
+      telephone?: string
     }
     /** @description Visit */
     VisitDto: {
@@ -628,8 +628,8 @@ export interface components {
       pageSize?: number
       /** Format: int32 */
       pageNumber?: number
-      unpaged?: boolean
       paged?: boolean
+      unpaged?: boolean
     }
     SortObject: {
       empty?: boolean

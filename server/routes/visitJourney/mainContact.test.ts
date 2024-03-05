@@ -123,7 +123,7 @@ testJourneys.forEach(journey => {
             expect($('input[name="contact"]').eq(0).prop('value')).toBe('123')
             expect($('input[name="contact"]').eq(1).prop('value')).toBe('someoneElse')
             expect($('#someoneElseName').prop('value')).toBeFalsy()
-            expect($('#phoneNumber').prop('value')).toBeFalsy()
+            expect($('#phoneNumberInput').prop('value')).toBeFalsy()
           })
       })
 
@@ -151,7 +151,7 @@ testJourneys.forEach(journey => {
             expect($('input[name="contact"]:checked').length).toBe(1)
             expect($('input[value="123"]').prop('checked')).toBe(true)
             expect($('#someoneElseName').prop('value')).toBeFalsy()
-            expect($('#phoneNumber').prop('value')).toBe('0114 1234 567')
+            expect($('#phoneNumberInput').prop('value')).toBe('0114 1234 567')
           })
       })
 
@@ -173,14 +173,14 @@ testJourneys.forEach(journey => {
             expect($('input[name="contact"]:checked').length).toBe(1)
             expect($('input[value="someoneElse"]').prop('checked')).toBe(true)
             expect($('#someoneElseName').prop('value')).toBe('another person')
-            expect($('#phoneNumber').prop('value')).toBe('0114 1122 333')
+            expect($('#phoneNumberInput').prop('value')).toBe('0114 1122 333')
           })
       })
 
       it('should render validation errors from flash data for when no data entered', () => {
         flashData.errors = [
           { location: 'body', msg: 'No main contact selected', path: 'contact', type: 'field', value: undefined },
-          { location: 'body', msg: 'Enter a phone number', path: 'phoneNumber', type: 'field', value: undefined },
+          { location: 'body', msg: 'Enter a phone number', path: 'phoneNumberInput', type: 'field', value: undefined },
         ]
 
         return request(sessionApp)
@@ -193,9 +193,9 @@ testJourneys.forEach(journey => {
             expect($('.govuk-error-summary__body').text()).toContain('No main contact selected')
             expect($('.govuk-error-summary__body a').eq(0).attr('href')).toBe('#contact-error')
             expect($('.govuk-error-summary__body').text()).toContain('Enter a phone number')
-            expect($('.govuk-error-summary__body a').eq(1).attr('href')).toBe('#phoneNumber-error')
+            expect($('.govuk-error-summary__body a').eq(1).attr('href')).toBe('#phoneNumberInput-error')
             expect($('#contact-error').text()).toContain('No main contact selected')
-            expect($('#phoneNumber-error').text()).toContain('Enter a phone number')
+            expect($('#phoneNumberInput-error').text()).toContain('Enter a phone number')
             expect(flashProvider).toHaveBeenCalledWith('errors')
             expect(flashProvider).toHaveBeenCalledWith('formValues')
             expect(flashProvider).toHaveBeenCalledTimes(2)
@@ -211,7 +211,7 @@ testJourneys.forEach(journey => {
             type: 'field',
             value: '',
           },
-          { location: 'body', msg: 'Enter a phone number', path: 'phoneNumber', type: 'field', value: '' },
+          { location: 'body', msg: 'Enter a phone number', path: 'phoneNumberInput', type: 'field', value: '' },
         ]
 
         flashData.formValues = [{ contact: 'someoneElse' }]
@@ -222,11 +222,11 @@ testJourneys.forEach(journey => {
           .expect('Content-Type', /html/)
           .expect(res => {
             const $ = cheerio.load(res.text)
-            expect($('h1').text().trim()).toBe('Who is the main contact for this booking?')
+            expect($('h1').text().trim()).toContain('Who is the main contact for this booking?')
             expect($('.govuk-error-summary__body').text()).toContain('Enter the name of the main contact')
             expect($('.govuk-error-summary__body').text()).toContain('Enter a phone number')
             expect($('#someoneElseName-error').text()).toContain('Enter the name of the main contact')
-            expect($('#phoneNumber-error').text()).toContain('Enter a phone number')
+            expect($('#phoneNumberInput-error').text()).toContain('Enter a phone number')
             expect(flashProvider).toHaveBeenCalledWith('errors')
             expect(flashProvider).toHaveBeenCalledWith('formValues')
             expect(flashProvider).toHaveBeenCalledTimes(2)
@@ -239,7 +239,8 @@ testJourneys.forEach(journey => {
         return request(sessionApp)
           .post(`${journey.urlPrefix}/select-main-contact`)
           .send('contact=123')
-          .send('phoneNumber=+0114+1234+567+')
+          .send('phoneNumber=hasPhoneNumber')
+          .send('phoneNumberInput=+0114+1234+567+')
           .expect(302)
           .expect('location', `${journey.urlPrefix}/request-method`)
           .expect(() => {
@@ -261,7 +262,8 @@ testJourneys.forEach(journey => {
           .post(`${journey.urlPrefix}/select-main-contact`)
           .send('contact=someoneElse')
           .send('someoneElseName=++another+person++')
-          .send('phoneNumber=0114+7654+321')
+          .send('phoneNumber=hasPhoneNumber')
+          .send('phoneNumberInput=0114+7654+321')
           .expect(302)
           .expect('location', `${journey.urlPrefix}/request-method`)
           .expect(() => {
@@ -288,7 +290,8 @@ testJourneys.forEach(journey => {
           .post(`${journey.urlPrefix}/select-main-contact`)
           .send('contact=someoneElse')
           .send('someoneElseName=another+person')
-          .send('phoneNumber=0114+7654+321')
+          .send('phoneNumber=hasPhoneNumber')
+          .send('phoneNumberInput=0114+7654+321')
           .expect(302)
           .expect('location', `${journey.urlPrefix}/request-method`)
           .expect(() => {
@@ -298,7 +301,7 @@ testJourneys.forEach(journey => {
           })
       })
 
-      it('should set validation errors in flash and redirect if no main contact selected and no number entered', () => {
+      it('should set validation errors in flash and redirect if no main contact selected', () => {
         return request(sessionApp)
           .post(`${journey.urlPrefix}/select-main-contact`)
           .expect(302)
@@ -306,9 +309,8 @@ testJourneys.forEach(journey => {
           .expect(() => {
             expect(flashProvider).toHaveBeenCalledWith('errors', [
               { location: 'body', msg: 'No main contact selected', path: 'contact', type: 'field', value: undefined },
-              { location: 'body', msg: 'Enter a phone number', path: 'phoneNumber', type: 'field', value: '' },
             ])
-            expect(flashProvider).toHaveBeenCalledWith('formValues', { phoneNumber: '', someoneElseName: '' })
+            expect(flashProvider).toHaveBeenCalledWith('formValues', { phoneNumberInput: '', someoneElseName: '' })
           })
       })
 
@@ -317,7 +319,8 @@ testJourneys.forEach(journey => {
           .post(`${journey.urlPrefix}/select-main-contact`)
           .send('contact=someoneElse')
           .send('someoneElseName=')
-          .send('phoneNumber=')
+          .send('phoneNumber=hasPhoneNumber')
+          .send('phoneNumberInput=')
           .expect(302)
           .expect('location', `${journey.urlPrefix}/select-main-contact`)
           .expect(() => {
@@ -329,12 +332,13 @@ testJourneys.forEach(journey => {
                 type: 'field',
                 value: '',
               },
-              { location: 'body', msg: 'Enter a phone number', path: 'phoneNumber', type: 'field', value: '' },
+              { location: 'body', msg: 'Enter a phone number', path: 'phoneNumberInput', type: 'field', value: '' },
             ])
             expect(flashProvider).toHaveBeenCalledWith('formValues', {
               contact: 'someoneElse',
               someoneElseName: '',
-              phoneNumber: '',
+              phoneNumber: 'hasPhoneNumber',
+              phoneNumberInput: '',
             })
           })
       })
@@ -343,7 +347,8 @@ testJourneys.forEach(journey => {
         return request(sessionApp)
           .post(`${journey.urlPrefix}/select-main-contact`)
           .send('contact=non-existant')
-          .send('phoneNumber=abc123')
+          .send('phoneNumber=hasPhoneNumber')
+          .send('phoneNumberInput=abc123')
           .expect(302)
           .expect('location', `${journey.urlPrefix}/select-main-contact`)
           .expect(() => {
@@ -351,14 +356,15 @@ testJourneys.forEach(journey => {
               {
                 location: 'body',
                 msg: 'Enter a valid UK phone number, like 01632 960 001, 07700 900 982 or +44 808 157 0192',
-                path: 'phoneNumber',
+                path: 'phoneNumberInput',
                 type: 'field',
                 value: 'abc123',
               },
             ])
             expect(flashProvider).toHaveBeenCalledWith('formValues', {
               contact: 'non-existant',
-              phoneNumber: 'abc123',
+              phoneNumber: 'hasPhoneNumber',
+              phoneNumberInput: 'abc123',
               someoneElseName: '',
             })
           })

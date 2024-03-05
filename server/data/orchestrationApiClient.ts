@@ -220,12 +220,11 @@ export default class OrchestrationApiClient {
   } {
     const visitContact = mainContact
       ? {
-          telephone: mainContact.phoneNumber,
+          ...(mainContact.phoneNumber && { telephone: mainContact.phoneNumber }),
           name: mainContact.contactName ? mainContact.contactName : mainContact.contact.name,
         }
       : undefined
     const mainContactId = mainContact && mainContact.contact ? mainContact.contact.personId : null
-
     return { visitContact, mainContactId }
   }
 }

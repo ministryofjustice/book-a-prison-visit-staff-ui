@@ -16,12 +16,12 @@ export default class MainContact {
       formValues.contact = visitSessionData.mainContact.contact
         ? visitSessionData.mainContact.contact.personId.toString()
         : 'someoneElse'
-      formValues.phoneNumber = visitSessionData.mainContact.phoneNumber
+      formValues.phoneNumber = visitSessionData.mainContact.phoneNumber ? 'hasPhoneNumber' : 'noPhoneNumber'
+      formValues.phoneNumberInput = visitSessionData.mainContact.phoneNumber
       formValues.someoneElseName = visitSessionData.mainContact.contact
         ? undefined
         : visitSessionData.mainContact.contactName
     }
-
     res.render('pages/bookAVisit/mainContact', {
       errors: req.flash('errors'),
       reference: visitSessionData.visitReference ?? '',
@@ -50,7 +50,7 @@ export default class MainContact {
 
     visitSessionData.mainContact = {
       contact: selectedContact,
-      phoneNumber: req.body.phoneNumber,
+      phoneNumber: req.body.phoneNumber === 'hasPhoneNumber' ? req.body.phoneNumberInput : undefined,
       contactName: selectedContact === undefined ? req.body.someoneElseName : undefined,
     }
 
@@ -75,17 +75,17 @@ export default class MainContact {
 
           return true
         }),
-      body('phoneNumber')
+      body('phoneNumberInput')
         .trim()
-        .custom((value: string) => {
-          if (!value) {
-            throw new Error('Enter a phone number')
+        .custom((value: string, { req }) => {
+          if (req.body.phoneNumber === 'hasPhoneNumber') {
+            if (value === '') {
+              throw new Error('Enter a phone number')
+            }
+            if (!/^(?:0|\+?44)(?:\d\s?){9,10}$/.test(value)) {
+              throw new Error('Enter a valid UK phone number, like 01632 960 001, 07700 900 982 or +44 808 157 0192')
+            }
           }
-
-          if (!/^(?:0|\+?44)(?:\d\s?){9,10}$/.test(value)) {
-            throw new Error('Enter a valid UK phone number, like 01632 960 001, 07700 900 982 or +44 808 157 0192')
-          }
-
           return true
         }),
     ]
