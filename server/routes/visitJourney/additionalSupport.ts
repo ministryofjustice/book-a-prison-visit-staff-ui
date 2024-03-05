@@ -49,31 +49,15 @@ export default class AdditionalSupport {
 
   validate(): ValidationChain[] {
     return [
-      body('additionalSupportRequired').custom((value: string) => {
-        if (!/^(yes|no)$/.test(value)) {
-          throw new Error('No answer selected')
-        }
-        return true
-      }),
+      body('additionalSupportRequired').isIn(['yes', 'no']).withMessage('No answer selected'),
       body('additionalSupport')
         .trim()
-        .escape()
-        .custom((value: string, { req }) => {
-          if (req.body.additionalSupportRequired === 'yes') {
-            if ((value ?? '').length === 0) {
-              throw new Error('Enter details of the request')
-            }
-            if ((value ?? '').length < 3 || (value ?? '').length > 512) {
-              throw new Error('The additional support information must be between 3 and 512 length')
-            }
-            // if (!/^[\w!?,.-]+$/.test(value)) {
-            //   throw new Error('Please enter only letters, numbers and punctuation')
-            // }
-            return true
-          }
-
-          return true
-        }),
+        .if(body('additionalSupportRequired').equals('yes'))
+        .notEmpty()
+        .withMessage('Enter details of the request')
+        .bail()
+        .isLength({ min: 3, max: 512 })
+        .withMessage('Please enter at least 3 and no more than 512 characters'),
     ]
   }
 }
