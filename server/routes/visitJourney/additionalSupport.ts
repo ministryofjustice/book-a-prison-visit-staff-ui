@@ -55,12 +55,25 @@ export default class AdditionalSupport {
         }
         return true
       }),
-      body('additionalSupport').custom((value: string, { req }) => {
-        if (req.body.additionalSupportRequired === 'yes' && (value ?? '').length === 0) {
-          throw new Error('Enter details of the request')
-        }
-        return true
-      }),
+      body('additionalSupport')
+        .trim()
+        .escape()
+        .custom((value: string, { req }) => {
+          if (req.body.additionalSupportRequired === 'yes') {
+            if ((value ?? '').length === 0) {
+              throw new Error('Enter details of the request')
+            }
+            if ((value ?? '').length < 3 || (value ?? '').length > 512) {
+              throw new Error('The additional support information must be between 3 and 512 length')
+            }
+            // if (!/^[\w!?,.-]+$/.test(value)) {
+            //   throw new Error('Please enter only letters, numbers and punctuation')
+            // }
+            return true
+          }
+
+          return true
+        }),
     ]
   }
 }

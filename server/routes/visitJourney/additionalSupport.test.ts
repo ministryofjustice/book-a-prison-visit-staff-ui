@@ -243,7 +243,7 @@ testJourneys.forEach(journey => {
               value: undefined,
             },
           ])
-          expect(flashProvider).toHaveBeenCalledWith('formValues', {})
+          expect(flashProvider).toHaveBeenCalledWith('formValues', { additionalSupport: '' })
         })
     })
 
@@ -260,11 +260,12 @@ testJourneys.forEach(journey => {
               msg: 'Enter details of the request',
               path: 'additionalSupport',
               type: 'field',
-              value: undefined,
+              value: '',
             },
           ])
           expect(flashProvider).toHaveBeenCalledWith('formValues', {
             additionalSupportRequired: 'yes',
+            additionalSupport: '',
           })
         })
     })
@@ -284,11 +285,12 @@ testJourneys.forEach(journey => {
               msg: 'Enter details of the request',
               path: 'additionalSupport',
               type: 'field',
-              value: undefined,
+              value: '',
             },
           ])
           expect(flashProvider).toHaveBeenCalledWith('formValues', {
             additionalSupportRequired: 'yes',
+            additionalSupport: '',
           })
         })
     })

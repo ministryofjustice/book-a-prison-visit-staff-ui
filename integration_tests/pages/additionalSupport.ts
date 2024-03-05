@@ -14,11 +14,7 @@ export default class AdditionalSupportPage extends Page {
   additionalSupportNotRequired = (): PageElement => cy.get('[data-test=support-required-no]')
 
   enterOtherSupportDetails = (details: string): void => {
-    cy.get('#otherSupportDetails').type(details)
-  }
-
-  selectSupportType = (type: string): void => {
-    cy.get(`[data-test=${type}]`).check()
+    cy.get('#additionalSupport').type(details)
   }
 
   continueButton = (): PageElement => cy.get('[data-test=submit]')
