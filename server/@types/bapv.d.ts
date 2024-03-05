@@ -107,7 +107,7 @@ export type VisitSessionData = {
   originalVisitSlot?: VisitSlot
   visitRestriction?: 'OPEN' | 'CLOSED'
   visitors?: VisitorListItem[]
-  visitorSupport?: VisitorSupport[]
+  visitorSupport?: VisitorSupport
   mainContact?: {
     contact?: VisitorListItem
     phoneNumber: string

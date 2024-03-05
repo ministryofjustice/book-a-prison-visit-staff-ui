@@ -27,7 +27,7 @@
         <h2 class="govuk-heading-m">Visit details</h2>
 
         {% set additionalSupportRows %}
-        {% if additionalSupport | length %}{{ additionalSupport | join(", ") }}{% else %}None{% endif %}
+        {% if additionalSupport | length %}{{ additionalSupport }}{% else %}None{% endif %}
         {% endset %}
 
         {% set contactName %}

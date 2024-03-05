@@ -17,7 +17,6 @@ jest.mock('../../applicationInfo', () => {
 })
 
 import {
-  AdditionalSupportService,
   AuditService,
   FrontendComponentsService,
   PrisonerProfileService,
@@ -31,9 +30,6 @@ import {
 } from '..'
 
 jest.mock('..')
-
-export const createMockAdditionalSupportService = () =>
-  new AdditionalSupportService(null, null) as jest.Mocked<AdditionalSupportService>
 
 export const createMockAuditService = () => new AuditService(null) as jest.Mocked<AuditService>
 
@@ -57,7 +53,7 @@ export const createMockUserService = () => new UserService(null, null, null, nul
 export const createMockVisitNotificationsService = () =>
   new VisitNotificationsService(null, null) as jest.Mocked<VisitNotificationsService>
 
-export const createMockVisitService = () => new VisitService(null, null, null, null) as jest.Mocked<VisitService>
+export const createMockVisitService = () => new VisitService(null, null, null) as jest.Mocked<VisitService>
 
 export const createMockVisitSessionsService = () =>
   new VisitSessionsService(null, null, null) as jest.Mocked<VisitSessionsService>

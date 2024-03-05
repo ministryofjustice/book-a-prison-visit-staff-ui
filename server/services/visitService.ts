@@ -15,9 +15,7 @@ import {
   VisitHistoryDetails,
 } from '../data/orchestrationApiTypes'
 import { buildVisitorListItem } from '../utils/visitorUtils'
-import { getSupportTypeDescriptions } from '../routes/visitorUtils'
 import { HmppsAuthClient, OrchestrationApiClient, PrisonerContactRegistryApiClient, RestClientBuilder } from '../data'
-import AdditionalSupportService from './additionalSupportService'
 import logger from '../../logger'
 import { prisonerDateTimePretty, prisonerTimePretty } from '../utils/utils'
 import { getVisitSlotsFromBookedVisits } from '../utils/visitsUtils'
@@ -27,7 +25,6 @@ export default class VisitService {
   constructor(
     private readonly orchestrationApiClientFactory: RestClientBuilder<OrchestrationApiClient>,
     private readonly prisonerContactRegistryApiClientFactory: RestClientBuilder<PrisonerContactRegistryApiClient>,
-    private readonly additionalSupportService: AdditionalSupportService,
     private readonly hmppsAuthClient: HmppsAuthClient,
   ) {}
 
@@ -128,7 +125,7 @@ export default class VisitService {
     visitHistoryDetails: VisitHistoryDetails
     visitors: VisitorListItem[]
     notifications: NotificationType[]
-    additionalSupport: string[]
+    additionalSupport: string
   }> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
@@ -147,10 +144,7 @@ export default class VisitService {
       ? await orchestrationApiClient.getVisitNotifications(reference)
       : []
 
-    const additionalSupport = getSupportTypeDescriptions(
-      await this.additionalSupportService.getAvailableSupportOptions(username),
-      visit.visitorSupport,
-    )
+    const additionalSupport = visit.visitorSupport.description
 
     return { visitHistoryDetails, visitors, notifications, additionalSupport }
   }

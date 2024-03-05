@@ -156,18 +156,6 @@ describe('orchestrationApiClient', () => {
     })
   })
 
-  describe('getAvailableSupportOptions', () => {
-    it('should return an array of available support types', async () => {
-      const results = TestData.supportTypes()
-
-      fakeOrchestrationApi.get('/visit-support').matchHeader('authorization', `Bearer ${token}`).reply(200, results)
-
-      const output = await orchestrationApiClient.getAvailableSupportOptions()
-
-      expect(output).toEqual(results)
-    })
-  })
-
   describe('changeVisitApplication', () => {
     it('should return a changed visit application given visit session data', async () => {
       const visitSessionData = <VisitSessionData>{
@@ -177,7 +165,7 @@ describe('orchestrationApiClient', () => {
         },
         visitRestriction: 'OPEN',
         visitors: [{ personId: 123 }],
-        visitorSupport: [],
+        visitorSupport: { description: '' },
         mainContact: {
           phoneNumber: '01234 567890',
           contactName: 'John Smith',
@@ -226,7 +214,7 @@ describe('orchestrationApiClient', () => {
         },
         visitRestriction: 'OPEN',
         visitors: [{ personId: 123 }],
-        visitorSupport: [],
+        visitorSupport: { description: '' },
         mainContact: {
           phoneNumber: '01234 567890',
           contactName: 'John Smith',
@@ -277,7 +265,7 @@ describe('orchestrationApiClient', () => {
         },
         visitRestriction: 'OPEN',
         visitors: [{ personId: 123 }],
-        visitorSupport: [],
+        visitorSupport: { description: '' },
         mainContact: {
           phoneNumber: '01234 567890',
           contactName: 'John Smith',

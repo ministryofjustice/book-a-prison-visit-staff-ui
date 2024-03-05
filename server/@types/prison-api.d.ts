@@ -1577,6 +1577,10 @@ export interface paths {
      */
     get: operations['getPrisonerEducations']
   }
+  '/api/court/{bookingId}/next-court-event': {
+    /** Returns the next court event details (if one exists) related to the passed in booking */
+    get: operations['getNextCourtEvent']
+  }
   '/api/court-date-results/{offenderNo}': {
     /**
      * Returns details of all court dates and the result of each.
@@ -7312,10 +7316,10 @@ export interface components {
       establishmentName: string
     }
     PageString: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       first?: boolean
       last?: boolean
       /** Format: int32 */
@@ -7337,8 +7341,8 @@ export interface components {
       pageSize?: number
       /** Format: int32 */
       pageNumber?: number
-      paged?: boolean
       unpaged?: boolean
+      paged?: boolean
     }
     SortObject: {
       empty?: boolean
@@ -7559,10 +7563,10 @@ export interface components {
       code?: string
     }
     PageCalculableSentenceEnvelope: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       first?: boolean
       last?: boolean
       /** Format: int32 */
@@ -9316,10 +9320,10 @@ export interface components {
       additionalAnswers?: string[]
     }
     PageOffenceDto: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       first?: boolean
       last?: boolean
       /** Format: int32 */
@@ -10093,10 +10097,10 @@ export interface components {
       numberOfMembers: number
     }
     PageEducation: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       first?: boolean
       last?: boolean
       /** Format: int32 */
@@ -10109,6 +10113,16 @@ export interface components {
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
       empty?: boolean
+    }
+    CourtEventDetails: {
+      /** Format: int64 */
+      eventId: number
+      /** @example 2021-07-05T10:35:17 */
+      startTime: string
+      courtLocation: string
+      courtEventType: string
+      comments?: string
+      caseReference?: string
     }
     /** @description A charge linked to a court date */
     CourtDateCharge: {
@@ -10309,10 +10323,10 @@ export interface components {
       hasVisits: boolean
     }
     PageVisitWithVisitors: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       first?: boolean
       last?: boolean
       /** Format: int32 */
@@ -10679,10 +10693,10 @@ export interface components {
       otherContacts: components['schemas']['Contact'][]
     }
     PageBedAssignment: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       first?: boolean
       last?: boolean
       /** Format: int32 */
@@ -10737,10 +10751,10 @@ export interface components {
       currency: string
     }
     PageAlert: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       first?: boolean
       last?: boolean
       /** Format: int32 */
@@ -10755,10 +10769,10 @@ export interface components {
       empty?: boolean
     }
     PagePrisonerBookingSummary: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       first?: boolean
       last?: boolean
       /** Format: int32 */
@@ -19950,6 +19964,41 @@ export interface operations {
       200: {
         content: {
           'application/json': components['schemas']['PageEducation']
+        }
+      }
+      /** @description Invalid request. */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Requested resource not found. */
+      404: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unrecoverable error occurred whilst processing request. */
+      500: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  /** Returns the next court event details (if one exists) related to the passed in booking */
+  getNextCourtEvent: {
+    parameters: {
+      path: {
+        /** @description The bookingId to check court events against */
+        bookingId: number
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          'application/json': components['schemas']['CourtEventDetails']
         }
       }
       /** @description Invalid request. */

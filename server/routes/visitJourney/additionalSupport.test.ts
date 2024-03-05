@@ -5,7 +5,6 @@ import * as cheerio from 'cheerio'
 import { FlashData, VisitSessionData } from '../../@types/bapv'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
 import { VisitorSupport } from '../../data/orchestrationApiTypes'
-import TestData from '../testutils/testData'
 
 let sessionApp: Express
 
@@ -18,8 +17,6 @@ const testJourneys = [
   { urlPrefix: '/book-a-visit', isUpdate: false },
   { urlPrefix: '/visit/ab-cd-ef-gh/update', isUpdate: true },
 ]
-
-const availableSupportTypes = TestData.supportTypes()
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
@@ -71,7 +68,6 @@ testJourneys.forEach(journey => {
 
       sessionApp = appWithAllRoutes({
         sessionData: {
-          availableSupportTypes,
           visitSessionData,
         } as SessionData,
       })
@@ -92,7 +88,7 @@ testJourneys.forEach(journey => {
     })
 
     it('should render the additional support page, pre-populated with session data (for no requests)', () => {
-      visitSessionData.visitorSupport = []
+      visitSessionData.visitorSupport = { description: '' }
 
       return request(sessionApp)
         .get(`${journey.urlPrefix}/additional-support`)
@@ -107,11 +103,7 @@ testJourneys.forEach(journey => {
     })
 
     it('should render the additional support page, pre-populated with session data (multiple requests)', () => {
-      visitSessionData.visitorSupport = [
-        { type: 'WHEELCHAIR' },
-        { type: 'MASK_EXEMPT' },
-        { type: 'OTHER', text: 'custom request' },
-      ]
+      visitSessionData.visitorSupport = { description: 'Wheelchair, custom request' }
 
       return request(sessionApp)
         .get(`${journey.urlPrefix}/additional-support`)
@@ -122,12 +114,7 @@ testJourneys.forEach(journey => {
           expect($('h1').text().trim()).toBe('Is additional support needed for any of the visitors?')
           expect($('[data-test="support-required-yes"]').prop('checked')).toBe(true)
           expect($('[data-test="support-required-no"]').prop('checked')).toBe(false)
-          expect($('[data-test="WHEELCHAIR"]').prop('checked')).toBe(true)
-          expect($('[data-test="INDUCTION_LOOP"]').prop('checked')).toBe(false)
-          expect($('[data-test="BSL_INTERPRETER"]').prop('checked')).toBe(false)
-          expect($('[data-test="MASK_EXEMPT"]').prop('checked')).toBe(true)
-          expect($('[data-test="OTHER"]').prop('checked')).toBe(true)
-          expect($('#otherSupportDetails').val()).toBe('custom request')
+          expect($('#additionalSupport').val()).toBe('Wheelchair, custom request')
         })
     })
 
@@ -186,38 +173,6 @@ testJourneys.forEach(journey => {
           expect(flashProvider).toHaveBeenCalledTimes(2)
         })
     })
-
-    it('should render validation errors from flash data when other support details not provided', () => {
-      flashData.errors = [
-        {
-          value: '',
-          msg: 'Enter details of the request',
-          path: 'otherSupportDetails',
-          type: 'field',
-          location: 'body',
-        },
-      ]
-
-      flashData.formValues = [{ additionalSupportRequired: 'yes', additionalSupport: ['WHEELCHAIR', 'OTHER'] }]
-
-      return request(sessionApp)
-        .get(`${journey.urlPrefix}/additional-support`)
-        .expect(200)
-        .expect('Content-Type', /html/)
-        .expect(res => {
-          const $ = cheerio.load(res.text)
-          expect($('h1').text().trim()).toBe('Is additional support needed for any of the visitors?')
-          expect($('.govuk-error-summary__body').text()).toContain('Enter details of the request')
-          expect($('.govuk-error-summary__body a').attr('href')).toBe('#otherSupportDetails-error')
-          expect($('[data-test="support-required-yes"]').prop('checked')).toBe(true)
-          expect($('[data-test="WHEELCHAIR"]').prop('checked')).toBe(true)
-          expect($('[data-test="OTHER"]').prop('checked')).toBe(true)
-          expect($('#otherSupportDetails-error').text()).toContain('Enter details of the request')
-          expect(flashProvider).toHaveBeenCalledWith('errors')
-          expect(flashProvider).toHaveBeenCalledWith('formValues')
-          expect(flashProvider).toHaveBeenCalledTimes(2)
-        })
-    })
   })
 
   describe(`POST ${journey.urlPrefix}/additional-support`, () => {
@@ -267,7 +222,6 @@ testJourneys.forEach(journey => {
 
       sessionApp = appWithAllRoutes({
         sessionData: {
-          availableSupportTypes,
           visitSessionData,
         } as SessionData,
       })
@@ -288,34 +242,7 @@ testJourneys.forEach(journey => {
               value: undefined,
             },
           ])
-          expect(flashProvider).toHaveBeenCalledWith('formValues', {
-            additionalSupport: [],
-            otherSupportDetails: '',
-          })
-        })
-    })
-
-    it('should set validation errors in flash and redirect if invalid data supplied', () => {
-      return request(sessionApp)
-        .post(`${journey.urlPrefix}/additional-support`)
-        .send('additionalSupportRequired=xyz')
-        .expect(302)
-        .expect('location', `${journey.urlPrefix}/additional-support`)
-        .expect(() => {
-          expect(flashProvider).toHaveBeenCalledWith('errors', [
-            {
-              location: 'body',
-              msg: 'No answer selected',
-              path: 'additionalSupportRequired',
-              type: 'field',
-              value: 'xyz',
-            },
-          ])
-          expect(flashProvider).toHaveBeenCalledWith('formValues', {
-            additionalSupportRequired: 'xyz',
-            additionalSupport: [],
-            otherSupportDetails: '',
-          })
+          expect(flashProvider).toHaveBeenCalledWith('formValues', { additionalSupport: '' })
         })
     })
 
@@ -327,47 +254,27 @@ testJourneys.forEach(journey => {
         .expect('location', `${journey.urlPrefix}/additional-support`)
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledWith('errors', [
-            { location: 'body', msg: 'No request selected', path: 'additionalSupport', type: 'field', value: [] },
-          ])
-          expect(flashProvider).toHaveBeenCalledWith('formValues', {
-            additionalSupportRequired: 'yes',
-            additionalSupport: [],
-            otherSupportDetails: '',
-          })
-        })
-    })
-
-    it('should set validation errors in flash and redirect if additional support selected but invalid request selected', () => {
-      return request(sessionApp)
-        .post(`${journey.urlPrefix}/additional-support`)
-        .send('additionalSupportRequired=yes')
-        .send('additionalSupport=xyz')
-        .send('additionalSupport=WHEELCHAIR')
-        .expect(302)
-        .expect('location', `${journey.urlPrefix}/additional-support`)
-        .expect(() => {
-          expect(flashProvider).toHaveBeenCalledWith('errors', [
             {
               location: 'body',
-              msg: 'No request selected',
+              msg: 'Enter details of the request',
               path: 'additionalSupport',
               type: 'field',
-              value: ['xyz', 'WHEELCHAIR'],
+              value: '',
             },
           ])
           expect(flashProvider).toHaveBeenCalledWith('formValues', {
             additionalSupportRequired: 'yes',
-            additionalSupport: ['xyz', 'WHEELCHAIR'],
-            otherSupportDetails: '',
+            additionalSupport: '',
           })
         })
     })
 
-    it('should set validation errors in flash and redirect if other support requested but not specified', () => {
+    it('should set validation errors in flash and redirect, overriding values set in session', () => {
+      visitSessionData.visitorSupport = { description: '' }
+
       return request(sessionApp)
         .post(`${journey.urlPrefix}/additional-support`)
         .send('additionalSupportRequired=yes')
-        .send('additionalSupport=OTHER')
         .expect(302)
         .expect('location', `${journey.urlPrefix}/additional-support`)
         .expect(() => {
@@ -375,48 +282,27 @@ testJourneys.forEach(journey => {
             {
               location: 'body',
               msg: 'Enter details of the request',
-              path: 'otherSupportDetails',
+              path: 'additionalSupport',
               type: 'field',
               value: '',
             },
           ])
           expect(flashProvider).toHaveBeenCalledWith('formValues', {
             additionalSupportRequired: 'yes',
-            additionalSupport: ['OTHER'],
-            otherSupportDetails: '',
-          })
-        })
-    })
-
-    it('should set validation errors in flash and redirect, overriding values set in session', () => {
-      visitSessionData.visitorSupport = []
-
-      return request(sessionApp)
-        .post(`${journey.urlPrefix}/additional-support`)
-        .send('additionalSupportRequired=yes')
-        .expect(302)
-        .expect('location', `${journey.urlPrefix}/additional-support`)
-        .expect(() => {
-          expect(flashProvider).toHaveBeenCalledWith('errors', [
-            { location: 'body', msg: 'No request selected', path: 'additionalSupport', type: 'field', value: [] },
-          ])
-          expect(flashProvider).toHaveBeenCalledWith('formValues', {
-            additionalSupportRequired: 'yes',
-            additionalSupport: [],
-            otherSupportDetails: '',
+            additionalSupport: '',
           })
         })
     })
 
     it('should clear the session data and redirect to the select main contact page if "no" additional support radio selected and store in session', () => {
-      visitSessionData.visitorSupport = [{ type: 'BSL_INTERPRETER' }]
+      visitSessionData.visitorSupport = { description: 'BSL Required' }
       return request(sessionApp)
         .post(`${journey.urlPrefix}/additional-support`)
         .send('additionalSupportRequired=no')
         .expect(302)
         .expect('location', `${journey.urlPrefix}/select-main-contact`)
         .expect(() => {
-          expect(visitSessionData.visitorSupport.length).toBe(0)
+          expect(visitSessionData.visitorSupport.description.length).toBe(0)
         })
     })
 
@@ -424,25 +310,12 @@ testJourneys.forEach(journey => {
       return request(sessionApp)
         .post(`${journey.urlPrefix}/additional-support`)
         .send('additionalSupportRequired=yes')
-        .send('additionalSupport=WHEELCHAIR')
-        .send('additionalSupport=INDUCTION_LOOP')
-        .send('additionalSupport=BSL_INTERPRETER')
-        .send('additionalSupport=MASK_EXEMPT')
-        .send('additionalSupport=OTHER')
+        .send('additionalSupport=Wheelchair requested')
         .send('otherSupportDetails=custom-request')
         .expect(302)
         .expect('location', `${journey.urlPrefix}/select-main-contact`)
         .expect(() => {
-          expect(visitSessionData.visitorSupport).toEqual(<VisitorSupport[]>[
-            { type: 'WHEELCHAIR' },
-            { type: 'INDUCTION_LOOP' },
-            { type: 'BSL_INTERPRETER' },
-            { type: 'MASK_EXEMPT' },
-            {
-              type: 'OTHER',
-              text: 'custom-request',
-            },
-          ])
+          expect(visitSessionData.visitorSupport).toEqual(<VisitorSupport>{ description: 'Wheelchair requested' })
         })
     })
   })

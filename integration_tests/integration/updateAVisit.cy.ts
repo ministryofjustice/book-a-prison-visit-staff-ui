@@ -49,7 +49,7 @@ context('Update a visit', () => {
       startTimestamp: visitSessions[0].startTimestamp,
       endTimestamp: visitSessions[0].endTimestamp,
       visitors: [{ nomisPersonId: 4321, visitContact: true }],
-      visitorSupport: [],
+      visitorSupport: { description: '' },
     })
     const visitHistoryDetails = TestData.visitHistoryDetails({ visit: originalVisit })
 
@@ -68,7 +68,6 @@ context('Update a visit', () => {
     cy.task('stubPrisonerById', prisoner)
     cy.task('stubVisitHistory', visitHistoryDetails)
     cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
-    cy.task('stubAvailableSupport')
     cy.task('stubGetVisitNotifications', { reference: visitHistoryDetails.visit.reference })
 
     // Visit details page
@@ -112,7 +111,7 @@ context('Update a visit', () => {
         { nomisPersonId: 4321, visitContact: true },
         { nomisPersonId: 4322, visitContact: false },
       ],
-      visitorSupport: [],
+      visitorSupport: { description: '' },
     })
     cy.task('stubCreateVisitApplicationFromVisit', {
       visitReference: visitHistoryDetails.visit.reference,
@@ -126,9 +125,7 @@ context('Update a visit', () => {
     additionalSupportPage.additionalSupportNotRequired().should('be.checked')
     additionalSupportPage.additionalSupportRequired().should('not.be.checked')
     additionalSupportPage.additionalSupportRequired().check()
-    additionalSupportPage.selectSupportType('WHEELCHAIR')
-    additionalSupportPage.selectSupportType('OTHER')
-    additionalSupportPage.enterOtherSupportDetails('Some extra help!')
+    additionalSupportPage.enterSupportDetails('Wheelchair ramp, Some extra help!')
     additionalSupportPage.continueButton().click()
 
     // Main contact - check pre-populated then change phone number
@@ -167,7 +164,7 @@ context('Update a visit', () => {
           { nomisPersonId: contacts[0].personId, visitContact: true },
           { nomisPersonId: contacts[1].personId, visitContact: false },
         ],
-        visitorSupport: [{ type: 'WHEELCHAIR' }, { type: 'OTHER', text: 'Some extra help!' }],
+        visitorSupport: { description: 'Wheelchair ramp, Some extra help!' },
         sessionTemplateReference: visitSessions[1].sessionTemplateReference,
       }),
     )
@@ -180,7 +177,7 @@ context('Update a visit', () => {
           { nomisPersonId: contacts[0].personId, visitContact: true },
           { nomisPersonId: contacts[1].personId, visitContact: false },
         ],
-        visitorSupport: [{ type: 'WHEELCHAIR' }, { type: 'OTHER', text: 'Some extra help!' }],
+        visitorSupport: { description: 'Wheelchair ramp, Some extra help!' },
       }),
       applicationMethod: 'PHONE',
     })
@@ -217,7 +214,7 @@ context('Update a visit', () => {
       startTimestamp: visitSessions[0].startTimestamp,
       endTimestamp: visitSessions[0].endTimestamp,
       visitors: [{ nomisPersonId: 4321, visitContact: true }],
-      visitorSupport: [],
+      visitorSupport: { description: '' },
     })
     const visitHistoryDetails = TestData.visitHistoryDetails({ visit: originalVisit })
 
@@ -236,7 +233,6 @@ context('Update a visit', () => {
     cy.task('stubPrisonerById', prisoner)
     cy.task('stubVisitHistory', visitHistoryDetails)
     cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
-    cy.task('stubAvailableSupport')
     cy.task('stubGetVisitNotifications', { reference: visitHistoryDetails.visit.reference })
 
     // Visit details page

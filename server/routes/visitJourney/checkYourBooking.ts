@@ -1,7 +1,6 @@
 import type { Request, Response } from 'express'
 import { requestMethodsBooking } from '../../constants/requestMethods'
 import AuditService from '../../services/auditService'
-import { getSupportTypeDescriptions } from '../visitorUtils'
 import getUrlPrefix from './visitJourneyUtils'
 import { VisitService } from '../../services'
 
@@ -17,10 +16,9 @@ export default class CheckYourBooking {
     const { visitSessionData } = req.session
     const { offenderNo } = visitSessionData.prisoner
 
-    const additionalSupport = getSupportTypeDescriptions(
-      req.session.availableSupportTypes,
-      visitSessionData.visitorSupport,
-    )
+    const additionalSupport = visitSessionData.visitorSupport.description.length
+      ? visitSessionData.visitorSupport.description
+      : ''
 
     res.render('pages/bookAVisit/checkYourBooking', {
       offenderNo,
@@ -40,11 +38,6 @@ export default class CheckYourBooking {
     const { visitSessionData } = req.session
     const { prisonId } = req.session.selectedEstablishment
     const { offenderNo } = visitSessionData.prisoner
-
-    const additionalSupport = getSupportTypeDescriptions(
-      req.session.availableSupportTypes,
-      visitSessionData.visitorSupport,
-    )
 
     try {
       // change visit application to have the latest data
@@ -88,7 +81,7 @@ export default class CheckYourBooking {
         visitSlot: visitSessionData.visitSlot,
         visitRestriction: visitSessionData.visitRestriction,
         visitors: visitSessionData.visitors,
-        additionalSupport,
+        additionalSupport: visitSessionData.visitorSupport.description,
         urlPrefix: getUrlPrefix(isUpdate, visitSessionData.visitReference),
       })
     }

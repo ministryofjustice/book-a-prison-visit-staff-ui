@@ -232,19 +232,6 @@ export default {
       },
     })
   },
-  stubAvailableSupport: (): SuperAgentRequest => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        url: '/orchestration/visit-support',
-      },
-      response: {
-        status: 200,
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: TestData.supportTypes(),
-      },
-    })
-  },
   stubGetNotificationCount: ({
     prisonId = 'HEI',
     notificationCount = TestData.notificationCount(),

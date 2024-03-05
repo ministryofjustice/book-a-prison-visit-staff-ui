@@ -96,13 +96,6 @@ export interface paths {
      */
     get: operations['getNotificationCount']
   }
-  '/visit-support': {
-    /**
-     * Available Support
-     * @description Retrieve all available support types
-     */
-    get: operations['getSupportTypes']
-  }
   '/visit-sessions': {
     /**
      * Returns all visit sessions which are within the reservable time period - whether or not they are full
@@ -324,8 +317,7 @@ export interface components {
       visitContact?: components['schemas']['ContactDto']
       /** @description List of visitors associated with the visit */
       visitors?: components['schemas']['VisitorDto'][]
-      /** @description List of additional support associated with the visit */
-      visitorSupport?: components['schemas']['VisitorSupportDto'][]
+      visitorSupport?: components['schemas']['VisitorSupportDto']
       /**
        * Format: date-time
        * @description The visit created date and time
@@ -370,15 +362,10 @@ export interface components {
     /** @description Visitor support */
     VisitorSupportDto: {
       /**
-       * @description Support type
-       * @example OTHER
-       */
-      type: string
-      /**
        * @description Support text description
        * @example visually impaired assistance
        */
-      text?: string
+      description: string
     }
     BookingOrchestrationRequestDto: {
       /**
@@ -393,6 +380,14 @@ export interface components {
         | 'NOT_KNOWN'
         | 'NOT_APPLICABLE'
         | 'BY_PRISONER'
+    }
+    /** @description Visitor support */
+    ApplicationSupportDto: {
+      /**
+       * @description Support text description, if empty is given then existing support text will be removed
+       * @example visually impaired assistance
+       */
+      description: string
     }
     ChangeApplicationDto: {
       /**
@@ -415,8 +410,7 @@ export interface components {
       visitContact?: components['schemas']['ContactDto']
       /** @description List of visitors associated with the visit */
       visitors: components['schemas']['VisitorDto'][]
-      /** @description List of additional support associated with the visit */
-      visitorSupport?: components['schemas']['VisitorSupportDto'][]
+      visitorSupport?: components['schemas']['ApplicationSupportDto']
     }
     /** @description Visit */
     ApplicationDto: {
@@ -467,8 +461,7 @@ export interface components {
       visitContact?: components['schemas']['ContactDto']
       /** @description List of visitors associated with the visit */
       visitors: components['schemas']['VisitorDto'][]
-      /** @description List of additional support associated with the visit */
-      visitorSupport: components['schemas']['VisitorSupportDto'][]
+      visitorSupport?: components['schemas']['VisitorSupportDto']
       /**
        * Format: date-time
        * @description The visit created date and time
@@ -516,8 +509,7 @@ export interface components {
       visitContact?: components['schemas']['ContactDto']
       /** @description List of visitors associated with the visit */
       visitors: components['schemas']['VisitorDto'][]
-      /** @description List of additional support associated with the visit */
-      visitorSupport?: components['schemas']['VisitorSupportDto'][]
+      visitorSupport?: components['schemas']['ApplicationSupportDto']
     }
     DlqMessage: {
       body: {
@@ -636,8 +628,8 @@ export interface components {
       pageSize?: number
       /** Format: int32 */
       pageNumber?: number
-      paged?: boolean
       unpaged?: boolean
+      paged?: boolean
     }
     SortObject: {
       empty?: boolean
@@ -695,19 +687,6 @@ export interface components {
     NotificationCountDto: {
       /** Format: int32 */
       count: number
-    }
-    /** @description Support Type */
-    SupportTypeDto: {
-      /**
-       * @description Support type name
-       * @example MASK_EXEMPT
-       */
-      type: string
-      /**
-       * @description Support description
-       * @example Face covering exemption
-       */
-      description: string
     }
     /** @description Visit Session */
     VisitSessionDto: {
@@ -1743,32 +1722,6 @@ export interface operations {
       }
       /** @description Incorrect permissions to access this endpoint */
       403: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  /**
-   * Available Support
-   * @description Retrieve all available support types
-   */
-  getSupportTypes: {
-    responses: {
-      /** @description Available Support information returned */
-      200: {
-        content: {
-          '*/*': components['schemas']['SupportTypeDto'][]
-        }
-      }
-      /** @description Incorrect request to Get Available Support */
-      400: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Unauthorized to access this endpoint */
-      401: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }

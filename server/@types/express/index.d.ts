@@ -1,4 +1,3 @@
-import { SupportType } from '../../data/orchestrationApiTypes'
 import { VisitorListItem, VisitSessionData, Prison } from '../bapv'
 import { UserDetails } from '../../services/userService'
 
@@ -9,7 +8,6 @@ declare module 'express-session' {
   interface SessionData {
     returnTo: string
     nowInMinutes: number
-    availableSupportTypes: SupportType[]
     visitorList: { visitors: VisitorListItem[] }
     adultVisitors: { adults: VisitorListItem[] }
     slotsList: VisitSlotList

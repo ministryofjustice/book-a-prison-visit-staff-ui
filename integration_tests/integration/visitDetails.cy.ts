@@ -47,7 +47,6 @@ context('Visit details page', () => {
     cy.task('stubPrisonerById', prisoner)
     cy.task('stubVisitHistory', visitHistoryDetails)
     cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
-    cy.task('stubAvailableSupport')
     cy.visit('/visit/ab-cd-ef-gh')
     const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage)
 
@@ -102,7 +101,6 @@ context('Visit details page', () => {
     cy.task('stubPrisonerById', prisoner)
     cy.task('stubVisitHistory', visitHistoryDetails)
     cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
-    cy.task('stubAvailableSupport')
     cy.task('stubGetVisitNotifications', { reference: TestData.visit().reference, notifications })
     cy.visit('/visit/ab-cd-ef-gh')
 
@@ -150,7 +148,6 @@ context('Visit details page', () => {
     cy.task('stubPrisonerById', prisoner)
     cy.task('stubVisitHistory', visitHistoryDetails)
     cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
-    cy.task('stubAvailableSupport')
     cy.visit('/visit/ab-cd-ef-gh')
 
     const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage)
@@ -170,7 +167,9 @@ context('Visit details page', () => {
     visitDetailsPage.visitorDob2().contains(format(new Date(childDob), longDateFormat))
     visitDetailsPage.visitorAddress2().contains('C1 2AB')
     visitDetailsPage.visitorRestrictions2().contains('None')
-    visitDetailsPage.additionalSupport().contains('Wheelchair ramp, custom request')
+    visitDetailsPage
+      .additionalSupport()
+      .contains('Wheelchair ramp, Portable induction loop for people with hearing aids')
 
     // Select history tab
     visitDetailsPage.selectHistoryTab()
