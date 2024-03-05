@@ -5,7 +5,6 @@ import * as cheerio from 'cheerio'
 import { FlashData, VisitSessionData } from '../../@types/bapv'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
 import { ApplicationDto, Visit } from '../../data/orchestrationApiTypes'
-import TestData from '../testutils/testData'
 import { createMockAuditService, createMockVisitService } from '../../services/testutils/mocks'
 
 let sessionApp: Express

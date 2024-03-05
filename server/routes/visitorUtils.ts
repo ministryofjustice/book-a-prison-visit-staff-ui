@@ -1,7 +1,6 @@
 import type { Request } from 'express'
 import type { SessionData } from 'express-session'
 import { VisitSlot, VisitSlotList } from '../@types/bapv'
-import { VisitorSupport } from '../data/orchestrationApiTypes'
 
 export const getSelectedSlot = (slotsList: VisitSlotList, selectedSlot: string): VisitSlot => {
   return Object.values(slotsList)
