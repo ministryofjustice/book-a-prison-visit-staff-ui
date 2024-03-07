@@ -308,7 +308,20 @@ testJourneys.forEach(journey => {
           .expect('location', `${journey.urlPrefix}/select-main-contact`)
           .expect(() => {
             expect(flashProvider).toHaveBeenCalledWith('errors', [
-              { location: 'body', msg: 'No main contact selected', path: 'contact', type: 'field', value: undefined },
+              {
+                location: 'body',
+                msg: 'No main contact selected',
+                path: 'contact',
+                type: 'field',
+                value: undefined,
+              },
+              {
+                location: 'body',
+                msg: 'No answer selected',
+                path: 'phoneNumber',
+                type: 'field',
+                value: undefined,
+              },
             ])
             expect(flashProvider).toHaveBeenCalledWith('formValues', { phoneNumberInput: '', someoneElseName: '' })
           })
