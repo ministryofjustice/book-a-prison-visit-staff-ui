@@ -75,6 +75,7 @@ export default class MainContact {
 
           return true
         }),
+      body('phoneNumber').isIn(['hasPhoneNumber', 'noPhoneNumber']).withMessage('No answer selected'),
       body('phoneNumberInput')
         .trim()
         .custom((value: string, { req }) => {

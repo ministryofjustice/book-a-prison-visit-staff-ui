@@ -115,7 +115,8 @@
             },
             checked: formValues.phoneNumber == 'noPhoneNumber'
           }
-          ]
+          ],
+          errorMessage: errors | findError('phoneNumber')
         }) }}
 
         {{ govukButton({
