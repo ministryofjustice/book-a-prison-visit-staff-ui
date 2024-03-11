@@ -52,6 +52,37 @@ export default function routes({
       handlers.map(handler => asyncMiddleware(handler)),
     )
 
+  get('/:reference/clear-notifications', async (req, res) => {
+    const reference = getVisitReference(req)
+
+    return res.render('pages/visit/clearNotifications', {
+      errors: req.flash('errors'),
+      formValues: getFlashFormValues(req),
+      backLinkHref: `/visit/${reference}`,
+    })
+  })
+
+  post(
+    '/:reference/clear-notifications',
+    body('clearNotifications', 'No answer selected').isIn(['yes', 'no']),
+    body('clearReason', 'Enter a reason for not changing the booking')
+      .if(body('clearNotifications').equals('yes'))
+      .trim()
+      .notEmpty(),
+    async (req, res) => {
+      const errors = validationResult(req)
+      const reference = getVisitReference(req)
+      console.log(errors)
+      if (!errors.isEmpty()) {
+        req.flash('errors', errors.array() as [])
+        req.flash('formValues', req.body)
+        return res.redirect(`/visit/${reference}/clear-notifications`)
+      }
+
+      return res.redirect(`/visit/${reference}/clear-notifications`)
+    },
+  )
+
   get('/cancelled', async (req, res) => {
     clearSession(req)
 

@@ -1,0 +1,79 @@
+{% extends "layout.njk" %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% set pageHeaderTitle = "Are you sure the visit does not need to be updated or cancelled?" %}
+{% set pageTitle %}
+{% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
+{% endset %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        {% include "partials/errorSummary.njk" %}
+        <form action="{{ backLinkHref }}/clear-notifications" method="POST" novalidate>
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+            {% set clearReasonHtml %}
+              {{ govukInput({
+                id: "clearReason",
+                name: "clearReason",
+                type: "text",
+                classes: "govuk-!-width-one-third",
+                label: {
+                  text: "Reason"
+                },
+                value: formValues.clearReason,
+                autocomplete: "off",
+                errorMessage: errors | findError('clearReason')
+              }) }}
+            {% endset -%}
+
+            {{ govukRadios({
+              idPrefix: "clearNotifications",
+              name: "clearNotifications",
+              fieldset: {
+                legend: {
+                  text: pageHeaderTitle,
+                  isPageHeading: true,
+                  classes: "govuk-fieldset__legend--l"
+                }
+              },
+              hint: {
+                text: "Selecting 'yes' will remove the booking from the 'need review' list."
+              },
+              items: [
+                {
+                  value: "yes",
+                  text: "Yes",
+                  attributes: {
+                    'data-test': 'clear-notification-yes'
+                  },
+                  checked: formValues.clearNotifications == "yes",
+                  conditional: {
+                    html: clearReasonHtml
+                  }
+                },
+                {
+                  value: "no",
+                  text: "No",
+                  attributes: {
+                    'data-test': 'clear-notification-no'
+                  },
+                  checked: formValues.clearNotifications == "no"
+                }
+              ],
+              errorMessage: errors | findError('clearNotifications')
+            }) }}
+            
+            {{ govukButton({
+              text: "Continue",
+              attributes: { "data-test": "submit" },
+              preventDoubleClick: true
+            }) }} 
+        </form>
+    </div>
+  </div>
+{% endblock %}
