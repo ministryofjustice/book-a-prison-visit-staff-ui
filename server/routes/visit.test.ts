@@ -452,7 +452,7 @@ describe('/visit/:reference', () => {
     })
 
     describe('Visit notification messages', () => {
-      it('should not display visit notification banner when no notification types set', () => {
+      it('should not display visit notification banner or do not change button when no notification types set', () => {
         return request(app)
           .get('/visit/ab-cd-ef-gh')
           .expect(200)
@@ -460,10 +460,11 @@ describe('/visit/:reference', () => {
           .expect(res => {
             const $ = cheerio.load(res.text)
             expect($('[data-test="visit-notification"]').length).toBe(0)
+            expect($('[data-test="clear-notifications"]').length).toBe(0)
           })
       })
 
-      it('should display a single visit notification banner when a single notification type is set', () => {
+      it('should display a single visit notification banner and do not change button when a single notification type is set', () => {
         visitService.getFullVisitDetails.mockResolvedValue({
           visitHistoryDetails,
           visitors,
@@ -479,10 +480,12 @@ describe('/visit/:reference', () => {
             const $ = cheerio.load(res.text)
             expect($('[data-test="visit-notification"]').length).toBe(1)
             expect($('[data-test="visit-notification"]').text()).toBe(notificationTypeWarnings.PRISONER_RELEASED_EVENT)
+            expect($('[data-test="clear-notifications"]').length).toBe(1)
+            expect($('[data-test="clear-notifications"]').text()).toContain('Do not change')
           })
       })
 
-      it('should display a two visit notification banners when two notification types are set', () => {
+      it('should display a two visit notification banners and do not change button when two notification types are set', () => {
         visitService.getFullVisitDetails.mockResolvedValue({
           visitHistoryDetails,
           visitors,
@@ -503,6 +506,8 @@ describe('/visit/:reference', () => {
             expect($('[data-test="visit-notification"]').eq(1).text()).toBe(
               notificationTypeWarnings.PRISON_VISITS_BLOCKED_FOR_DATE,
             )
+            expect($('[data-test="clear-notifications"]').length).toBe(1)
+            expect($('[data-test="clear-notifications"]').text()).toContain('Do not change')
           })
       })
     })

@@ -72,13 +72,15 @@ export default function routes({
     async (req, res) => {
       const errors = validationResult(req)
       const reference = getVisitReference(req)
-      console.log(errors)
+
       if (!errors.isEmpty()) {
         req.flash('errors', errors.array() as [])
         req.flash('formValues', req.body)
         return res.redirect(`/visit/${reference}/clear-notifications`)
       }
 
+      // todo - api call
+      // todo - audit
       return res.redirect(`/visit/${reference}/clear-notifications`)
     },
   )

@@ -133,6 +133,15 @@
                 preventDoubleClick: true
               }) }}
             {% endif %}
+            {% if notifications | length %} 
+              {{ govukButton({
+                text: "Do not change",
+                classes: "govuk-!-margin-top-5 govuk-button--secondary",
+                href: "/visit/" + visit.reference + "/clear-notifications",
+                attributes: { "data-test": "clear-notifications" },
+                preventDoubleClick: true
+              }) }}
+            {% endif %}
           </form>
         {% endif %}
       </div>

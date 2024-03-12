@@ -16,6 +16,8 @@ export default class VisitDetailsPage extends Page {
 
   cancelBooking = (): PageElement => cy.get('[data-test="cancel-visit"]')
 
+  clearNotifications = (): PageElement => cy.get('[data-test="clear-notifications')
+
   // Sub-navigation
 
   selectPrisonerTab = (): PageElement => cy.get('#tab_prisoner-details').click()
