@@ -142,6 +142,10 @@ To download and update all the API types and tidy up the files, run:
 ./bin/update-types.sh
 ```
 
+## Maintenance page
+See the [maintenance page README](./maintenance_page/README.md) for how to turn this on/off and update the content.
+
+
 ## User audit
 To record an audit trail of user actions, events are sent to the [hmpps-audit-api](https://github.com/ministryofjustice/hmpps-audit-api) service SQS queue. Currently, the following are audited (see [auditService.ts](./server/services/auditService.ts) and [auditService.test.ts](./server/services/auditService.test.ts) for details of what is logged):
 
