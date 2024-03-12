@@ -22,6 +22,7 @@ export default class AdditionalSupport {
 
     res.render('pages/bookAVisit/additionalSupport', {
       errors: req.flash('errors'),
+      appReference: visitSessionData.applicationReference,
       formValues,
       urlPrefix: getUrlPrefix(isUpdate, visitSessionData.visitReference),
     })
