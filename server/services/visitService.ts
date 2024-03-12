@@ -19,7 +19,6 @@ import { HmppsAuthClient, OrchestrationApiClient, PrisonerContactRegistryApiClie
 import logger from '../../logger'
 import { prisonerDateTimePretty, prisonerTimePretty } from '../utils/utils'
 import { getVisitSlotsFromBookedVisits } from '../utils/visitsUtils'
-import config from '../config'
 
 export default class VisitService {
   constructor(
@@ -140,9 +139,7 @@ export default class VisitService {
       .filter(contact => visitorIds.includes(contact.personId))
       .map(contact => buildVisitorListItem(contact))
 
-    const notifications = config.features.reviewBookings
-      ? await orchestrationApiClient.getVisitNotifications(reference)
-      : []
+    const notifications = await orchestrationApiClient.getVisitNotifications(reference)
 
     const additionalSupport = visit.visitorSupport ? visit.visitorSupport.description : ''
 

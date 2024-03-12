@@ -9,7 +9,6 @@ import { CancelVisitOrchestrationDto } from '../data/orchestrationApiTypes'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import { isValidVisitReference } from './validationChecks'
 import { clearSession, getFlashFormValues } from './visitorUtils'
-import config from '../config'
 import { VisitSessionData, VisitSlot } from '../@types/bapv'
 import SelectVisitors from './visitJourney/selectVisitors'
 import VisitType from './visitJourney/visitType'
@@ -22,7 +21,7 @@ import MainContact from './visitJourney/mainContact'
 import RequestMethod from './visitJourney/requestMethod'
 import sessionCheckMiddleware from '../middleware/sessionCheckMiddleware'
 import type { Services } from '../services'
-import { eventAuditTypesOriginal, eventAuditTypesWithReview } from '../constants/eventAuditTypes'
+import { eventAuditTypesWithReview } from '../constants/eventAuditTypes'
 import { requestMethodDescriptions, requestMethodsCancellation } from '../constants/requestMethods'
 import { notificationTypeWarnings, notificationTypes } from '../constants/notificationEvents'
 
@@ -66,7 +65,7 @@ export default function routes({
     const fromPage = typeof req.query?.from === 'string' ? req.query.from : null
     const fromVisitSearchQuery = req.query?.query as string
 
-    const eventAuditTypes = config.features.reviewBookings ? eventAuditTypesWithReview : eventAuditTypesOriginal
+    const eventAuditTypes = eventAuditTypesWithReview
 
     const { visitHistoryDetails, visitors, notifications, additionalSupport } = await visitService.getFullVisitDetails({
       reference,
@@ -122,7 +121,7 @@ export default function routes({
       showCancel,
       requestMethodDescriptions,
       eventAuditTypes,
-      notificationTypes: config.features.reviewBookings ? notificationTypes : null,
+      notificationTypes,
     })
   })
 

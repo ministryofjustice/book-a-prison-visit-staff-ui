@@ -23,7 +23,7 @@ generic-service:
     COMPONENT_API_URL: https://frontend-components.hmpps.service.justice.gov.uk
     DPS_URL: "https://digital.prison.service.justice.gov.uk/"
     REDIS_KEY: "bapv-staff-prod"
-    FEATURE_REVIEW_BOOKINGS: "true"
+
 
 generic-prometheus-alerts:
   alertSeverity: digital-prison-service
