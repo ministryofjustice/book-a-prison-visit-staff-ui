@@ -48,14 +48,6 @@ jest.mock('./visitorUtils', () => {
   }
 })
 
-// mock can be removed when 'reviewBookings' feature flag is removed
-jest.mock('../config', () => {
-  return {
-    ...jest.requireActual('../config').default,
-    features: { reviewBookings: true },
-  }
-})
-
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
   flashProvider.mockImplementation((key: keyof FlashData) => {

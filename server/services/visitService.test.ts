@@ -23,7 +23,6 @@ import {
   createMockPrisonerContactRegistryApiClient,
 } from '../data/testutils/mocks'
 import { Address, AddressUsage, Contact, Restriction } from '../data/prisonerContactRegistryApiTypes'
-import config from '../config'
 
 const token = 'some token'
 
@@ -251,18 +250,7 @@ describe('Visit service', () => {
         orchestrationApiClient.getVisitNotifications.mockResolvedValue(['PRISONER_RELEASED_EVENT'])
       })
 
-      it('should not request visit notifications if review bookings feature not enabled', async () => {
-        config.features.reviewBookings = false
-
-        const result = await visitService.getFullVisitDetails({ username: 'user', reference: 'ab-cd-ef-gh' })
-
-        expect(orchestrationApiClient.getVisitNotifications).not.toHaveBeenCalled()
-        expect(result.notifications).toStrictEqual([])
-      })
-
       it('should return full details of visit, visitors, notifications and additional support options', async () => {
-        config.features.reviewBookings = true
-
         const expectedResult: {
           visitHistoryDetails: VisitHistoryDetails
           visitors: VisitorListItem[]
