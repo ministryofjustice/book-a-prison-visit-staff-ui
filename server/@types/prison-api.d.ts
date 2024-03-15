@@ -1058,7 +1058,7 @@ export interface paths {
      */
     get: operations['getPrisonerNumbers']
   }
-  '/api/prison/{establishmentId}/booking/latest/paged/calculable-sentence-envelope': {
+  '/api/prison/{agencyId}/booking/latest/paged/calculable-sentence-envelope': {
     /** Details of the active sentence envelope, a combination of the person information, the active booking and calculable sentences at a particular establishment (paged response) */
     get: operations['getCalculableSentenceEnvelopeByEstablishment']
   }
@@ -1829,7 +1829,7 @@ export interface paths {
   '/api/bookings/v2': {
     /**
      * Prisoners Booking Summary
-     * @description Returns data that is available to the users caseload privileges, at least one attribute of a prisonId, bookingId or offenderNo must be specified
+     * @description Returns data that is available to the users caseload privileges, at least one attribute of a prisonId, bookingId or offenderNo must be specified.Requires parameter(s) prisonId/bookingIds/offenderNos to be in caseload, or VIEW_PRISONER_DATA
      */
     get: operations['getPrisonerBookingsV2']
   }
@@ -1929,8 +1929,8 @@ export interface paths {
   }
   '/api/agencies/{agencyId}/eventLocationsBooked': {
     /**
-     * List of locations for agency where events (appointments, visits, activities) are being held.
-     * @description List of locations for agency where events (appointments, visits, activities) are being held.<p>This endpoint uses the REPLICA database.</p>
+     * List of location summaries for agency where events (appointments, visits, activities) are being held.
+     * @description List of location summaries for agency where events (appointments, visits, activities) are being held.<p>This endpoint uses the REPLICA database.</p>
      */
     get: operations['getAgencyEventLocationsBooked']
   }
@@ -4167,6 +4167,8 @@ export interface components {
       expiryDate?: string
       /** @description Alert comment */
       comment?: string
+      /** @description Remove expiry date */
+      removeExpiryDate?: boolean
     }
     /** @description Attendance details.  This is used to update the attendance details of an offender */
     UpdateAttendance: {
@@ -7341,8 +7343,8 @@ export interface components {
       pageSize?: number
       /** Format: int32 */
       pageNumber?: number
-      unpaged?: boolean
       paged?: boolean
+      unpaged?: boolean
     }
     SortObject: {
       empty?: boolean
@@ -10980,6 +10982,18 @@ export interface components {
       key: string
       /** @description The child groups of this group */
       children: components['schemas']['LocationGroup'][]
+    }
+    /** @description Location Summary Details */
+    LocationSummary: {
+      /**
+       * Format: int64
+       * @description Location identifier.
+       */
+      locationId: number
+      /** @description User-friendly location description. */
+      userDescription?: string
+      /** @description Location description. */
+      description: string
     }
     /** @description Agency Establishment Type */
     AgencyEstablishmentType: {
@@ -17529,7 +17543,7 @@ export interface operations {
       }
       path: {
         /** @description The identifier of the establishment(prison) to get the active bookings for */
-        establishmentId: string
+        agencyId: string
       }
     }
     responses: {
@@ -20298,10 +20312,10 @@ export interface operations {
       }
     }
     responses: {
-      /** @description Invalid request. */
-      204: {
+      /** @description Ok */
+      200: {
         content: {
-          'application/json': components['schemas']['ErrorResponse']
+          'application/json': components['schemas']['PrisonDetails'][]
         }
       }
       /** @description Invalid request. */
@@ -21484,7 +21498,7 @@ export interface operations {
   }
   /**
    * Prisoners Booking Summary
-   * @description Returns data that is available to the users caseload privileges, at least one attribute of a prisonId, bookingId or offenderNo must be specified
+   * @description Returns data that is available to the users caseload privileges, at least one attribute of a prisonId, bookingId or offenderNo must be specified.Requires parameter(s) prisonId/bookingIds/offenderNos to be in caseload, or VIEW_PRISONER_DATA
    */
   getPrisonerBookingsV2: {
     parameters: {
@@ -22070,8 +22084,8 @@ export interface operations {
     }
   }
   /**
-   * List of locations for agency where events (appointments, visits, activities) are being held.
-   * @description List of locations for agency where events (appointments, visits, activities) are being held.<p>This endpoint uses the REPLICA database.</p>
+   * List of location summaries for agency where events (appointments, visits, activities) are being held.
+   * @description List of location summaries for agency where events (appointments, visits, activities) are being held.<p>This endpoint uses the REPLICA database.</p>
    */
   getAgencyEventLocationsBooked: {
     parameters: {
@@ -22089,7 +22103,7 @@ export interface operations {
       /** @description OK */
       200: {
         content: {
-          'application/json': components['schemas']['Location'][]
+          'application/json': components['schemas']['LocationSummary'][]
         }
       }
       /** @description Invalid request. */

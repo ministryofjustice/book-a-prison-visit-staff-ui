@@ -943,7 +943,7 @@ export interface components {
       content?: components['schemas']['AttendanceHistoryDto'][]
       /** Format: int32 */
       number?: number
-      sort?: components['schemas']['SortObject']
+      sort?: components['schemas']['SortObject'][]
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
@@ -952,7 +952,7 @@ export interface components {
     PageableObject: {
       /** Format: int64 */
       offset?: number
-      sort?: components['schemas']['SortObject']
+      sort?: components['schemas']['SortObject'][]
       /** Format: int32 */
       pageSize?: number
       /** Format: int32 */
@@ -961,9 +961,11 @@ export interface components {
       unpaged?: boolean
     }
     SortObject: {
-      empty?: boolean
-      sorted?: boolean
-      unsorted?: boolean
+      direction?: string
+      nullHandling?: string
+      ascending?: boolean
+      property?: string
+      ignoreCase?: boolean
     }
     AttendanceSummary: {
       /** Format: int32 */
