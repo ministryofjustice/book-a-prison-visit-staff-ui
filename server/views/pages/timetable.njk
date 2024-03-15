@@ -8,7 +8,7 @@
 
 {% set backLinkHref = "/" %}
 
-{% macro attendees(prisonerIncentiveLevelGroupNames, prisonerCategoryGroupNames, prisonerLocationGroupNames) %}
+{% macro attendees(prisonerIncentiveLevelGroupNames, prisonerCategoryGroupNames, prisonerLocationGroupNames, areLocationGroupsInclusive) %}
     {% if prisonerLocationGroupNames | length %}
       <span>
         {% if prisonerIncentiveLevelGroupNames | length %}
@@ -18,7 +18,9 @@
           {% if prisonerIncentiveLevelGroupNames | length %},<br>{% endif %}
           {{ prisonerCategoryGroupNames | join(",<br>") | safe }}
         {% endif %}
-        {{- " in:" if prisonerIncentiveLevelGroupNames | length or prisonerCategoryGroupNames | length }}
+        {{- " in:" if (prisonerIncentiveLevelGroupNames | length or prisonerCategoryGroupNames | length) and areLocationGroupsInclusive -}}
+        {{- " except in:" if (prisonerIncentiveLevelGroupNames | length or prisonerCategoryGroupNames | length) and not areLocationGroupsInclusive -}}
+        {{- "All prisoners except:" if not (prisonerIncentiveLevelGroupNames | length or prisonerCategoryGroupNames | length) and not areLocationGroupsInclusive -}}
       </span>
       <ul class="govuk-list govuk-!-margin-bottom-0{{ " govuk-!-margin-top-2" if prisonerIncentiveLevelGroupNames | length }}">
         {% for name in prisonerLocationGroupNames %}
@@ -64,7 +66,7 @@
           attributes: { "data-test" : "schedule-capacity-" + rowNumber } 
         },
         {
-          text: attendees(schedule.prisonerIncentiveLevelGroupNames, schedule.prisonerCategoryGroupNames, schedule.prisonerLocationGroupNames),
+          text: attendees(schedule.prisonerIncentiveLevelGroupNames, schedule.prisonerCategoryGroupNames, schedule.prisonerLocationGroupNames, schedule.areLocationGroupsInclusive),
           attributes: { "data-test" : "schedule-attendees-" + rowNumber } 
         },
         {

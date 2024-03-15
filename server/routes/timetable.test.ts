@@ -156,6 +156,12 @@ describe('View visits timetable', () => {
         prisonerIncentiveLevelGroupNames: ['Super enhanced prisoners'],
       }), // Row 8
       TestData.sessionSchedule({ prisonerCategoryGroupNames: ['Category A (High Risk) prisoners'] }), // Row 9
+      TestData.sessionSchedule({ areLocationGroupsInclusive: false, prisonerLocationGroupNames: ['Group 1'] }), // Row 10
+      TestData.sessionSchedule({
+        areLocationGroupsInclusive: false,
+        prisonerIncentiveLevelGroupNames: ['Enhanced prisoners'],
+        prisonerLocationGroupNames: ['Group 1'],
+      }), // Row 11
     ]
     visitSessionsService.getSessionSchedule.mockResolvedValue(sessionSchedule)
 
@@ -202,6 +208,12 @@ describe('View visits timetable', () => {
         expect($('[data-test="schedule-end-date-8"]').text()).toBe('31 December 2025')
         // Row 9
         expect($('[data-test="schedule-attendees-9"]').text().trim()).toBe('Category A (High Risk) prisoners')
+        // Row 10
+        expect($('[data-test="schedule-attendees-10"]').text().trim()).toMatch(/All prisoners except:\s+Group 1/)
+        // Row 11
+        expect($('[data-test="schedule-attendees-11"]').text().trim()).toMatch(
+          /Enhanced prisoners except in:\s+Group 1/,
+        )
       })
   })
 })
