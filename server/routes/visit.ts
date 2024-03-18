@@ -107,7 +107,7 @@ export default function routes({
 
     let returnAddress = ''
     if (fromPage === 'visit-search') {
-      returnAddress = `/altSearch/visit/results?searchBlock1=${referenceSplit[0]}&searchBlock2=${referenceSplit[1]}&searchBlock3=${referenceSplit[2]}&searchBlock4=${referenceSplit[3]}`
+      returnAddress = `/search/visit/results?searchBlock1=${referenceSplit[0]}&searchBlock2=${referenceSplit[1]}&searchBlock3=${referenceSplit[2]}&searchBlock4=${referenceSplit[3]}`
     } else if (fromPage === 'visits-by-date') {
       returnAddress = `/visits?query=${req.query.query}`
     }

@@ -1,13 +1,13 @@
-import url from 'url'
 import { type RequestHandler, Router } from 'express'
 import { body } from 'express-validator'
-import { validatePrisonerSearch, validateVisitSearch } from './searchValidation'
-import config from '../config'
-import { getResultsPagingLinks } from '../utils/utils'
-import { VisitInformation } from '../@types/bapv'
+import url from 'url'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import type { Services } from '../services'
+import config from '../config'
+import { getResultsPagingLinks } from '../utils/utils'
+import { validatePrisonerSearch, validateVisitSearch } from './searchValidation'
 import { extractPrisonerNumber } from './validationChecks'
+import { VisitInformation } from '../@types/bapv'
 
 export default function routes({ auditService, prisonerSearchService, visitService }: Services): Router {
   const router = Router()
@@ -19,30 +19,22 @@ export default function routes({ auditService, prisonerSearchService, visitServi
       handlers.map(handler => asyncMiddleware(handler)),
     )
 
-  get(['/prisoner', '/prisoner-visit'], (req, res) => {
+  get(['/prisoner'], (req, res) => {
     const search = req?.body?.search
-
-    const isVisit = req.originalUrl.includes('-visit')
-    let establishmentHref = '/search/prisoner/'
-    if (isVisit) {
-      establishmentHref = '/search/prisoner-visit/'
-    }
 
     res.render('pages/search/prisoner', {
       search,
       visit: req.originalUrl.includes('-visit'),
       showEstablishmentSwitcher: true,
-      establishmentHref,
     })
   })
 
-  post(['/prisoner', '/prisoner-visit'], body('search').trim('. '), (req, res) => {
-    const isVisit = req.originalUrl.includes('-visit')
+  post(['/prisoner'], body('search').trim('. '), (req, res) => {
     const { search } = req.body
 
     return res.redirect(
       url.format({
-        pathname: `/search/prisoner${isVisit ? '-visit' : ''}/results`,
+        pathname: `/search/prisoner/results`,
         query: {
           ...(search && { search }),
         },
@@ -50,20 +42,21 @@ export default function routes({ auditService, prisonerSearchService, visitServi
     )
   })
 
-  get(['/prisoner/results', '/prisoner-visit/results'], async (req, res) => {
+  get(['/prisoner/results'], async (req, res) => {
     const { prisonId } = req.session.selectedEstablishment
-    const isVisit = req.originalUrl.includes('-visit')
     const search = typeof req.query.search === 'string' ? req.query.search : ''
+
     const currentPage = typeof req.query.page === 'string' ? req.query.page : ''
     const parsedPage = Number.parseInt(currentPage, 10) || 1
     const { pageSize } = config.apis.prisonerSearch
+
     const validationErrors = validatePrisonerSearch(search)
     const errors = validationErrors ? [validationErrors] : []
     const hasValidationErrors = errors.length > 0
 
     const { results, numberOfPages, numberOfResults, next, previous } = hasValidationErrors
       ? { results: 0, numberOfPages: 0, numberOfResults: 0, next: 0, previous: 0 }
-      : await prisonerSearchService.getPrisoners(search, prisonId, res.locals.user.username, parsedPage, isVisit)
+      : await prisonerSearchService.getPrisoners(search, prisonId, res.locals.user.username, parsedPage, false) // todo
 
     if (!hasValidationErrors) {
       await auditService.prisonerSearch({
@@ -82,7 +75,7 @@ export default function routes({ auditService, prisonerSearchService, visitServi
       numberOfPages,
       currentPage: parsedPage,
       searchParam: `search=${search}`,
-      searchUrl: `/search/prisoner${isVisit ? '-visit' : ''}/results`,
+      searchUrl: `/search/prisoner/results`,
     })
 
     const validPrisonerNumber = extractPrisonerNumber(search)
@@ -109,7 +102,6 @@ export default function routes({ auditService, prisonerSearchService, visitServi
       from: (parsedPage - 1) * pageSize + 1,
       to,
       pageLinks: numberOfPages <= 1 ? [] : pageLinks,
-      visit: isVisit,
       showEstablishmentSwitcher: true,
     })
   })

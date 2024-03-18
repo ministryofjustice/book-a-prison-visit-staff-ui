@@ -15,7 +15,7 @@
   {% set backLinkHref = "/search/prisoner" %}
 {% endif %}
 {% if combinedSearch %}
-  {% set backLinkHref = "/altSearch/prisoner/results?" + queryParamsForBackLink %}
+  {% set backLinkHref = "/search/prisoner/results?" + queryParamsForBackLink %}
 {% endif %}
 
 {% block content %}

@@ -182,25 +182,6 @@ export default {
       },
     })
   },
-  stubFutureVisits: ({
-    prisonerId,
-    upcomingVisits,
-  }: {
-    prisonerId: string
-    upcomingVisits: Visit[]
-  }): SuperAgentRequest => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPath: `/orchestration/visits/search/future/${prisonerId}`,
-      },
-      response: {
-        status: 200,
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: upcomingVisits,
-      },
-    })
-  },
   stubVisitsByDate: ({
     visitStartDate,
     visitEndDate,
