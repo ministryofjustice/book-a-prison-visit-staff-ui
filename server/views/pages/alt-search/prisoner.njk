@@ -1,0 +1,20 @@
+{% extends "layout.njk" %}
+
+{% set pageHeaderTitle = "Search for a prisoner" %}
+{% set pageTitle = applicationName + " - " + pageHeaderTitle %}
+{% set backLinkHref = "/" %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+    </div>
+    {% include "partials/searchForPrisonerAlt.njk" %}
+  </div>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <h2 class="govuk-heading-m govuk-!-margin-top-5">Search by booking reference</h2>
+        <p><a class="govuk-link--no-visited-state" href="/altSearch/visit">You can also search by booking reference</a></p>
+    </div>
+  </div>
+{% endblock %}

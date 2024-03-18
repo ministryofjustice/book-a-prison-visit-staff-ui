@@ -22,13 +22,14 @@
 {% set pageTitle = applicationName + " - " + pageHeaderTitle + " - " + visit.reference %}
 
 {% if prisoner %}
-  {% if fromPage == 'visit-search' %}
-    {% set backLinkHref = "/visits?" + fromVisitSearchQuery %}
+  {% if (fromPage == 'visit-search') or (fromPage == 'visits-by-date') %}
+    {% set backLinkHref = returnAddress %}
   {% elseif fromPage == 'review' %}
     {% set backLinkHref = "/review" %}
   {% else %}
-    {% set backLinkHref = "/prisoner/" + visit.prisonerId + "/visits" %}
+    {% set backLinkHref = "/prisoner/" + visit.prisonerId %}
   {% endif %}
+
 {% endif %}
 
 {% block content %}

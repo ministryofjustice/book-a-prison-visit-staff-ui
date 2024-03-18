@@ -146,7 +146,7 @@ export default class PrisonerSearchService {
     const prisonerList: Array<PrisonerDetailsItem[]> = []
     const fromQueryString = new URLSearchParams({
       query: queryStringForBackLink,
-      from: 'visit-search',
+      fromPage: 'visits-by-date',
     }).toString()
 
     content.forEach((prisoner: Prisoner) => {

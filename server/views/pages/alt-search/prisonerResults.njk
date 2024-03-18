@@ -1,0 +1,66 @@
+{% extends "layout.njk" %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "moj/components/pagination/macro.njk" import mojPagination %}
+
+{% set pageHeaderTitle = "Search for a prisoner" %}
+{% set pageTitle %}
+{% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
+{% endset %}
+{% set backLinkHref = '/altSearch/prisoner' %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {% include "partials/errorSummary.njk" %}
+      <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+    </div>
+    {% include "partials/searchForPrisonerAlt.njk" %}
+    <div class="govuk-grid-column-full govuk-!-padding-top-5">
+    {% if results | length %}
+      {% set pagination %}
+        {{ mojPagination({
+          results: {
+            from: from,
+            to: to,
+            count: numberOfResults
+          },
+          previous: {
+            text: 'Previous',
+            href: backLinkHref + '/results?search=' + search + '&page=' + previous
+          } if numberOfResults > 10,
+          next: {
+            text: 'Next',
+            href: backLinkHref + '/results?search=' + search + '&page=' + next
+          } if numberOfResults > 10,
+          items: pageLinks if numberOfResults > 10
+        }) }}
+      {% endset %}
+
+      {{ govukTable({
+          classes: "bapv-table govuk-!-margin-top-3",
+          captionClasses: "govuk-table__caption--m",
+          attributes: {
+            "id": "search-results-true"
+          },
+          head: [
+              {
+                text: "Name"
+              },
+              {
+                text: "Prison number"
+              },
+              {
+                text: "Date of birth"
+              }
+          ],
+          rows: results
+      }) }}
+
+      {{ pagination | safe }}
+    {% elif errors | length %}
+    {% else %}
+        <p class="govuk-!-margin-top-6 govuk-!-margin-bottom-6" id="search-results-none">{{ prisonerNotFoundMessage }}</p>
+    {% endif %}
+    </div>
+  </div>
+{% endblock %}

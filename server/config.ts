@@ -154,5 +154,8 @@ export default {
       agent: new AgentConfig(Number(get('FRONTEND_COMPONENTS_TIMEOUT_RESPONSE', 3000))),
     },
   },
+  features: {
+    combinedSearch: get('FEATURE_COMBINED_SEARCH', 'false', requiredInProduction) === 'true',
+  },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
 }

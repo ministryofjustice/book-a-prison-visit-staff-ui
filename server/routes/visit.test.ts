@@ -155,7 +155,7 @@ describe('/visit/:reference', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('h1').text()).toBe('Visit booking details')
-          expect($('.govuk-back-link').attr('href')).toBe('/prisoner/A1234BC/visits')
+          expect($('.govuk-back-link').attr('href')).toBe('/prisoner/A1234BC')
           expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
           // visit details
           expect($('[data-test="visit-date-and-time"]').text()).toContain('Friday 14 January 2022, 10am to 11am')
@@ -226,7 +226,7 @@ describe('/visit/:reference', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('h1').text()).toBe('Visit booking details')
-          expect($('.govuk-back-link').attr('href')).toBe('/prisoner/A1234BC/visits')
+          expect($('.govuk-back-link').attr('href')).toBe('/prisoner/A1234BC')
           expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
           // prisoner details
           expect($('[data-test="prisoner-name"]').text()).toBe('Smith, John')
@@ -247,9 +247,9 @@ describe('/visit/:reference', () => {
         })
     })
 
-    it('should render full booking summary page with visit information and prisoner tab selected with search back link when from visits', () => {
+    it('should render full booking summary page with visit information and prisoner tab selected with search back link when from visit search', () => {
       const url =
-        '/visit/ab-cd-ef-gh?query=startDate%3D2022-05-24%26type%3DOPEN%26time%3D3pm%2Bto%2B3%253A59pm&from=visit-search'
+        '/visit/ab-cd-ef-gh?query=startDate%3D2022-05-24%26type%3DOPEN%26time%3D3pm%2Bto%2B3%253A59pm&fromPage=visit-search'
 
       prisonerSearchService.getPrisonerById.mockResolvedValue(prisoner)
       visitService.getFullVisitDetails.mockResolvedValue({
@@ -266,7 +266,9 @@ describe('/visit/:reference', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('h1').text()).toBe('Visit booking details')
-          expect($('.govuk-back-link').attr('href')).toBe('/visits?startDate=2022-05-24&type=OPEN&time=3pm+to+3%3A59pm')
+          expect($('.govuk-back-link').attr('href')).toBe(
+            '/altSearch/visit/results?searchBlock1=ab&searchBlock2=cd&searchBlock3=ef&searchBlock4=gh',
+          )
           expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
           // prisoner details
           expect($('[data-test="prisoner-name"]').text()).toBe('Smith, John')
@@ -283,7 +285,7 @@ describe('/visit/:reference', () => {
     })
 
     it('should render booking summary page correct back link when from review listing page', () => {
-      const url = '/visit/ab-cd-ef-gh?from=review'
+      const url = '/visit/ab-cd-ef-gh?fromPage=review'
 
       prisonerSearchService.getPrisonerById.mockResolvedValue(prisoner)
       visitService.getFullVisitDetails.mockResolvedValue({
@@ -328,7 +330,7 @@ describe('/visit/:reference', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('h1').text()).toBe('Visit booking details')
-          expect($('.govuk-back-link').attr('href')).toBe('/prisoner/A1234BC/visits')
+          expect($('.govuk-back-link').attr('href')).toBe('/prisoner/A1234BC')
           expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
           // prisoner details
           expect($('[data-test="prisoner-name"]').text()).toBe('Smith, John')
@@ -353,7 +355,7 @@ describe('/visit/:reference', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('h1').text()).toBe('Visit booking details')
-          expect($('.govuk-back-link').attr('href')).toBe('/prisoner/A1234BC/visits')
+          expect($('.govuk-back-link').attr('href')).toBe('/prisoner/A1234BC')
           expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
           // prisoner details
           expect($('[data-test="prisoner-name"]').text()).toBe('Smith, John')

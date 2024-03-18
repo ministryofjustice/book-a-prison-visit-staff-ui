@@ -1,0 +1,86 @@
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+<div class="govuk-grid-column-full">
+    <div class="block-background">
+        <div class="govuk-!-width-one-half">
+            <form action='/altSearch/visit/' method="POST" novalidate>
+                <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+                <label class="govuk-label bapv-booking-search-label" for="searchBlock1">
+                Enter the booking reference
+                </label>
+
+                <div class="bapv-booking-search">
+                {{ govukInput({
+                    classes: "govuk-input--width-2",
+                    id: "searchBlock1",
+                    name: "searchBlock1",
+                    spellcheck: false,
+                    value: searchBlock1,
+                    autocomplete: "off",
+                    attributes: {
+                        "maxlength": "2",
+                        "aria-label": "searchBlock1"
+                    }
+                }) }}
+
+                <span>-</span>
+
+                {{ govukInput({
+                    classes: "govuk-input--width-2",
+                    id: "searchBlock2",
+                    name: "searchBlock2",
+                    spellcheck: false,
+                    value: searchBlock2,
+                    autocomplete: "off",
+                    attributes: {
+                        "maxlength": "2",
+                        "aria-label": "searchBlock2"
+                    }
+                }) }}
+
+                <span>-</span>
+
+                {{ govukInput({
+                    classes: "govuk-input--width-2",
+                    id: "searchBlock3",
+                    name: "searchBlock3",
+                    spellcheck: false,
+                    value: searchBlock3,
+                    autocomplete: "off",
+                    attributes: {
+                        "maxlength": "2",
+                        "aria-label": "searchBlock3"
+                    }
+                }) }}
+
+                <span>-</span>
+
+                {{ govukInput({
+                    classes: "govuk-input--width-2",
+                    id: "searchBlock4",
+                    name: "searchBlock4",
+                    spellcheck: false,
+                    value: searchBlock4,
+                    autocomplete: "off",
+                    attributes: {
+                        "maxlength": "2",
+                        "aria-label": "searchBlock4"
+                    }
+                }) }}
+
+                {{ govukButton({
+                    text: "Search",
+                    classes: "bapv-visit-search__button",
+                    preventDoubleClick: true,
+                    attributes: {
+                        "data-test": "search"
+                    }
+                }) }}
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>

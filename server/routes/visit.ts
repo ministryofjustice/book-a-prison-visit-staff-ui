@@ -62,8 +62,6 @@ export default function routes({
 
   get('/:reference', async (req, res) => {
     const reference = getVisitReference(req)
-    const fromPage = typeof req.query?.from === 'string' ? req.query.from : null
-    const fromVisitSearchQuery = req.query?.query as string
 
     const { visitHistoryDetails, visitors, notifications, additionalSupport } = await visitService.getFullVisitDetails({
       reference,
@@ -104,6 +102,16 @@ export default function routes({
     const showUpdate = nowTimestamp < visitStartTimestamp
     const showCancel = nowTimestamp < chosenFutureInterval
 
+    const fromPage = req.query?.fromPage as string
+    const referenceSplit = reference.split('-')
+
+    let returnAddress = ''
+    if (fromPage === 'visit-search') {
+      returnAddress = `/altSearch/visit/results?searchBlock1=${referenceSplit[0]}&searchBlock2=${referenceSplit[1]}&searchBlock3=${referenceSplit[2]}&searchBlock4=${referenceSplit[3]}`
+    } else if (fromPage === 'visits-by-date') {
+      returnAddress = `/visits?query=${req.query.query}`
+    }
+
     return res.render('pages/visit/summary', {
       prisoner,
       prisonerLocation,
@@ -114,7 +122,7 @@ export default function routes({
       notificationTypeWarnings,
       additionalSupport,
       fromPage,
-      fromVisitSearchQuery,
+      returnAddress,
       showUpdate,
       showCancel,
       requestMethodDescriptions,

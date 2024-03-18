@@ -1,0 +1,96 @@
+{% extends "layout.njk" %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "moj/components/pagination/macro.njk" import mojPagination %}
+
+{% set pageHeaderTitle = "Search for a booking" %}
+{% set pageTitle %}
+{% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
+{% endset %}
+{% set backLinkHref = "/altSearch/visit" %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {% include "partials/errorSummary.njk" %}
+      <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+    </div>
+    {% include "partials/searchForVisitAlt.njk" %}
+    <div class="govuk-grid-column-full govuk-!-padding-top-5">
+    {% if results | length %}
+      {% set pagination %}
+        {{ mojPagination({
+          results: {
+            from: from,
+            to: to,
+            count: numberOfResults
+          },
+          previous: {
+            text: 'Previous',
+            href: '/altSearch/visit/results?searchBlock1=' + searchBlock1 + '&searchBlock2=' + searchBlock2 + '&searchBlock3=' + searchBlock3 + '&searchBlock4=' + searchBlock4 + '&page=' + previous
+          } if numberOfResults > 10,
+          next: {
+            text: 'Next',
+            href: '/altSearch/visit/results?searchBlock1=' + searchBlock1 + '&searchBlock2=' + searchBlock2 + '&searchBlock3=' + searchBlock3 + '&searchBlock4=' + searchBlock4 + '&page=' + next
+          } if numberOfResults > 10,
+          items: pageLinks if numberOfResults > 10
+        }) }}
+      {% endset %}
+
+      {{ govukTable({
+          classes: "bapv-table govuk-!-margin-top-3",
+          captionClasses: "govuk-table__caption--m",
+          attributes: {
+            "id": "search-results-true"
+          },
+          head: [
+              {
+                text: "Booking reference"
+              },
+              {
+                text: "Prisoner name"
+              },
+              {
+                text: "Prison number"
+              },
+              {
+                text: "Visit status"
+              }
+          ],
+          rows: [
+            [
+              {
+                html: '<a class="govuk-link--no-visited-state" href="/visit/' + results[0].reference + '?fromPage=visit-search">' + results[0].reference + '</a>',
+                attributes: {
+                  "data-test": "visit-reference"
+                }
+              },
+              {
+                text: results[0].prisonerName | properCaseFullName,
+                attributes: {
+                  "data-test": "prisoner-name"
+                }
+              },
+              {
+                text: results[0].prisonNumber,
+                 attributes: {
+                  "data-test": "prisoner-number"
+                }
+              },
+              {
+                text: results[0].visitStatus | capitalize,
+                 attributes: {
+                  "data-test": "visit-status"
+                }
+              }
+            ]
+          ]
+      }) }}
+
+      {{ pagination | safe }}
+    {% elif errors | length %}
+    {% else %}
+        <p class="govuk-!-margin-top-6 govuk-!-margin-bottom-6" id="search-results-none">There are no results for this reference at {{ selectedEstablishment.prisonName }}.
+    {% endif %}
+    </div>
+  </div>
+{% endblock %}
