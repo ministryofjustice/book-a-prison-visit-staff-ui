@@ -29,7 +29,7 @@
       </ul>
     {% else %}
       {% if prisonerIncentiveLevelGroupNames | length %}
-        {{ prisonerIncentiveLevelGroupNames | join("<br>") | safe }}
+        {{ prisonerIncentiveLevelGroupNames | join("<br>") | safe -}}
       {% endif %}
       {% if prisonerCategoryGroupNames | length %}
         {% if prisonerIncentiveLevelGroupNames | length %},<br>{% endif %}
