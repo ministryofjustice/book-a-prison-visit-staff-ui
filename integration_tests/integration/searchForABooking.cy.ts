@@ -1,4 +1,4 @@
-import { addDays, format, sub } from 'date-fns'
+import { format, sub } from 'date-fns'
 import TestData from '../../server/routes/testutils/testData'
 import HomePage from '../pages/home'
 import Page from '../pages/page'
@@ -11,7 +11,6 @@ import PrisonerProfilePage from '../pages/prisonerProfile'
 
 context('Search for a booking by reference', () => {
   const shortDateFormat = 'yyyy-MM-dd'
-  const longDateFormat = 'd MMMM yyyy'
   const today = new Date()
   const prisoner = TestData.prisoner()
   const { prisonerNumber: offenderNo } = prisoner
@@ -81,12 +80,6 @@ context('Search for a booking by reference', () => {
   it.skip('Should search via prisonerId, than navigate to the summary page', () => {
     const homePage = Page.verifyOnPage(HomePage)
     const visit = TestData.visit()
-
-    const upcomingVisit = TestData.visit({
-      reference: 'bc-de-fg-hi',
-      startTimestamp: format(addDays(today, 7), `${shortDateFormat}'T'13:30:00`),
-      endTimestamp: format(addDays(today, 7), `${shortDateFormat}'T'14:30:00`),
-    })
 
     const childDob = format(sub(today, { years: 5 }), shortDateFormat)
     const contacts = [
