@@ -14,9 +14,6 @@
 {% else %}
   {% set backLinkHref = "/search/prisoner" %}
 {% endif %}
-{% if combinedSearch %}
-  {% set backLinkHref = "/search/prisoner/results?" + queryParamsForBackLink %}
-{% endif %}
 
 {% block content %}
   <div class="govuk-grid-row">
