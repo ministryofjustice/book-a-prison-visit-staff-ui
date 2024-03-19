@@ -405,14 +405,14 @@ export interface components {
       totalPages?: number
       /** Format: int64 */
       totalElements?: number
-      first?: boolean
-      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Prisoner'][]
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject']
+      first?: boolean
+      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
@@ -422,12 +422,12 @@ export interface components {
       /** Format: int64 */
       offset?: number
       sort?: components['schemas']['SortObject']
+      paged?: boolean
+      unpaged?: boolean
       /** Format: int32 */
       pageSize?: number
       /** Format: int32 */
       pageNumber?: number
-      paged?: boolean
-      unpaged?: boolean
     }
     Prisoner: {
       /**
@@ -1129,14 +1129,14 @@ export interface components {
       totalPages?: number
       /** Format: int64 */
       totalElements?: number
-      first?: boolean
-      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Prisoner'][]
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject']
+      first?: boolean
+      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
@@ -1377,14 +1377,14 @@ export interface components {
       totalPages?: number
       /** Format: int64 */
       totalElements?: number
-      first?: boolean
-      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Prisoner'][]
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject']
+      first?: boolean
+      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
@@ -1490,14 +1490,14 @@ export interface components {
       totalPages?: number
       /** Format: int64 */
       totalElements?: number
-      first?: boolean
-      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Prisoner'][]
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject']
+      first?: boolean
+      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
@@ -1749,13 +1749,18 @@ export interface components {
            */
           attribute?: string
           /**
-           * @description The condition to apply to the attribute
+           * @description The condition to apply to the attribute.
+           *
+           *   IS and IS_NOT require an exact match (wildcards ? and * will not work).
+           *
+           *   CONTAINS checks for a partial match and respects wildcards ? (single character) and * (zero to many characters).
+           *
            * @example IS
            * @enum {string}
            */
           condition?: 'IS' | 'IS_NOT' | 'CONTAINS'
           /**
-           * @description The search term to apply to the attribute
+           * @description The search term to apply to the attribute. Search terms are not case-sensitive.
            * @example Smith
            */
           searchTerm?: string
