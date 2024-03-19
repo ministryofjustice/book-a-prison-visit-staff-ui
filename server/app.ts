@@ -54,7 +54,6 @@ export default function createApp(services: Services): express.Application {
   app.use('/change-establishment', establishmentRoutes(services))
   app.use('/prisoner', prisonerRoutes(services))
   app.use('/search', searchRoutes(services))
-  app.use('/search', searchRoutes(services))
   app.use('/timetable', timetableRoutes(services))
   app.use('/review', reviewRoutes(services))
   app.use('/visit', visitRoutes(services))
