@@ -5,7 +5,7 @@ export default class SearchForAPrisonerPage extends Page {
     super('Search for a prisoner')
   }
 
-  searchForm = (): PageElement => cy.get('[action="/search/prisoner"]')
+  searchForm = (): PageElement => cy.get('[action="/search/prisoner/"]')
 
   searchInput = (): PageElement => cy.get('.moj-search__input')
 
