@@ -91,10 +91,10 @@ export default class OrchestrationApiClient {
       path: '/visits/session-template',
       query: new URLSearchParams({
         prisonCode: prisonId,
-        sessionTemplateReference: reference,
+        ...(reference && { sessionTemplateReference: reference }),
         sessionDate,
         visitStatus: 'BOOKED',
-        visitRestrictions,
+        ...(visitRestrictions && { visitRestrictions }),
       }).toString(),
     })
   }
