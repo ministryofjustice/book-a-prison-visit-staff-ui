@@ -1,7 +1,7 @@
 import { format, parse, add } from 'date-fns'
 import { VisitsPageSideNav, VisitsPageSideNavItem } from '../@types/bapv'
 import { getParsedDateFromQueryString, prisonerTimePretty } from '../utils/utils'
-import { SessionSchedule, VisitRestriction } from '../data/orchestrationApiTypes'
+import { SessionSchedule, VisitPreview, VisitRestriction } from '../data/orchestrationApiTypes'
 
 export const getDateTabs = (
   selectedDate: string,
@@ -88,13 +88,15 @@ export function getSelectedOrDefaultSession(
 
 export function getSessionsSideNav(
   sessionSchedule: SessionSchedule[],
+  unknownVisits: VisitPreview[],
   selectedDate: string,
   firstTabDate: string,
-  templateReference: string,
+  selectedReference: string,
   type: VisitRestriction,
 ): VisitsPageSideNav {
   const open: VisitsPageSideNavItem[] = []
   const closed: VisitsPageSideNavItem[] = []
+  const unknown: VisitsPageSideNavItem[] = []
 
   sessionSchedule.forEach(session => {
     const times = sessionTimeSlotToString(session.sessionTimeSlot)
@@ -112,7 +114,7 @@ export function getSessionsSideNav(
         times,
         capacity: session.capacity.open,
         queryParams,
-        active: templateReference === session.sessionTemplateReference && type === 'OPEN',
+        active: selectedReference === session.sessionTemplateReference && type === 'OPEN',
       })
     }
 
@@ -129,14 +131,38 @@ export function getSessionsSideNav(
         times,
         capacity: session.capacity.closed,
         queryParams,
-        active: templateReference === session.sessionTemplateReference && type === 'CLOSED',
+        active: selectedReference === session.sessionTemplateReference && type === 'CLOSED',
       })
     }
   })
 
+  // build sorted nav item(s) from de-duped times in unknown visit(s)
+  unknownVisits.forEach(visit => {
+    const timeSlotReference = `${visit.visitTimeSlot.startTime}-${visit.visitTimeSlot.endTime}`
+    const slotRefExists = unknown.some(slot => slot.reference === timeSlotReference)
+
+    if (!slotRefExists) {
+      const queryParams = new URLSearchParams({
+        type: 'UNKNOWN',
+        sessionReference: timeSlotReference,
+        selectedDate,
+        firstTabDate,
+      }).toString()
+
+      unknown.push({
+        reference: timeSlotReference,
+        times: sessionTimeSlotToString(visit.visitTimeSlot),
+        queryParams,
+        active: selectedReference === timeSlotReference && type === 'UNKNOWN',
+      })
+    }
+  })
+  unknown.sort((a, b) => a.reference.localeCompare(b.reference))
+
   return {
     ...(open.length && { open }),
     ...(closed.length && { closed }),
+    ...(unknown.length && { unknown }),
   }
 }
 
