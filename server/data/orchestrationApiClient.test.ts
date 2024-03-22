@@ -116,22 +116,6 @@ describe('orchestrationApiClient', () => {
     })
   })
 
-  describe('getFutureVisits', () => {
-    it('should return an array of Visits', async () => {
-      const prisonerId = 'A1234BC'
-      const results: Visit[] = [TestData.visit()]
-
-      fakeOrchestrationApi
-        .get(`/visits/search/future/${prisonerId}`)
-        .matchHeader('authorization', `Bearer ${token}`)
-        .reply(200, results)
-
-      const output = await orchestrationApiClient.getFutureVisits(prisonerId)
-
-      expect(output).toEqual(results)
-    })
-  })
-
   describe('getVisitsByDate', () => {
     it('should return an array of Visits', async () => {
       const dateString = '2022-05-06'

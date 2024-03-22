@@ -77,7 +77,7 @@ context('Search for a booking by reference', () => {
     visitDetailsPage.prisonerName().contains('Smith, John')
   })
 
-  it.skip('Should search via prisonerId, than navigate to the summary page', () => {
+  it('Should search via prisonerId, than navigate to the summary page', () => {
     const homePage = Page.verifyOnPage(HomePage)
     const visit = TestData.visit()
 
@@ -116,24 +116,8 @@ context('Search for a booking by reference', () => {
     searchBookingByPrisonerResultsPage.resultRow().contains(offenderNo)
     searchBookingByPrisonerResultsPage.resultRow().contains('2 April 1975')
 
-    // cy.task('stubPrisoner', prisoner)
-    // cy.task('stubPrisonerById', prisoner)
-    const alerts = [
-      TestData.alert({
-        alertType: 'U',
-        alertTypeDescription: 'COVID unit management',
-        alertCode: 'UPIU',
-        alertCodeDescription: 'Protective Isolation Unit',
-        dateCreated: '2022-01-02',
-      }),
-      TestData.alert({
-        alertType: 'X',
-        alertTypeDescription: 'Security',
-        alertCode: 'XR',
-        alertCodeDescription: 'Racist',
-        dateCreated: '2022-01-01',
-      }),
-    ]
+    cy.task('stubPrisonerById', prisoner)
+    const alerts = []
     const visitors = [
       { nomisPersonId: 4321, firstName: 'Jeanette', lastName: 'Smith' },
       { nomisPersonId: 4322, firstName: 'Bob', lastName: 'Smith' },
@@ -158,7 +142,7 @@ context('Search for a booking by reference', () => {
 
     const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage)
 
-    visitDetailsPage.visitReference().contains('bc-de-fg-hi')
+    visitDetailsPage.visitReference().contains('ab-cd-ef-gh')
     visitDetailsPage.prisonerName().contains('Smith, John')
   })
 })
