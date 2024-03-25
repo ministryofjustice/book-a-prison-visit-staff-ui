@@ -224,7 +224,36 @@ export default {
           prisonCode: { equalTo: prisonId },
           sessionTemplateReference: { equalTo: reference },
           sessionDate: { equalTo: sessionDate },
+          visitStatus: { equalTo: 'BOOKED' },
           visitRestrictions: { equalTo: visitRestrictions },
+        },
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: visits,
+      },
+    })
+  },
+  stubGetVisitsWithoutSessionTemplate: ({
+    prisonId,
+    sessionDate,
+    visits,
+  }: {
+    prisonId: string
+    sessionDate: string
+    visits: VisitPreview[]
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPath: '/orchestration/visits/session-template',
+        queryParameters: {
+          prisonCode: { equalTo: prisonId },
+          sessionTemplateReference: { absent: true },
+          sessionDate: { equalTo: sessionDate },
+          visitStatus: { equalTo: 'BOOKED' },
+          visitRestrictions: { absent: true },
         },
       },
       response: {
