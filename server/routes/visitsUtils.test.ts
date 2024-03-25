@@ -1,7 +1,7 @@
 import { VisitsPageSideNav } from '../@types/bapv'
 import { SessionSchedule, VisitPreview, VisitRestriction } from '../data/orchestrationApiTypes'
 import TestData from './testutils/testData'
-import { getDateTabs, getSelectedOrDefaultSession, getSessionsSideNav } from './visitsUtils'
+import { getDateTabs, getSelectedOrDefaultSessionTemplate, getSessionsSideNav } from './visitsUtils'
 
 describe('getDateTabs', () => {
   const todayString = '2022-05-24'
@@ -106,18 +106,17 @@ describe('getSelectedOrDefaultSession', () => {
     const sessionReference = 'reference'
     const type: VisitRestriction = 'OPEN'
 
-    const result = getSelectedOrDefaultSession(sessionSchedule, sessionReference, type)
+    const result = getSelectedOrDefaultSessionTemplate(sessionSchedule, sessionReference, type)
 
     expect(result).toBe(null)
   })
 
-  // UNKNOWN not supported yet
   it('should return null if UNKNOWN visit type selected', () => {
     const sessionSchedule: SessionSchedule[] = []
     const sessionReference = 'reference'
     const type: VisitRestriction = 'UNKNOWN'
 
-    const result = getSelectedOrDefaultSession(sessionSchedule, sessionReference, type)
+    const result = getSelectedOrDefaultSessionTemplate(sessionSchedule, sessionReference, type)
 
     expect(result).toBe(null)
   })
@@ -138,7 +137,7 @@ describe('getSelectedOrDefaultSession', () => {
     const sessionReference: string = undefined
     const type: VisitRestriction = undefined
 
-    const result = getSelectedOrDefaultSession(sessionSchedule, sessionReference, type)
+    const result = getSelectedOrDefaultSessionTemplate(sessionSchedule, sessionReference, type)
 
     expect(result).toStrictEqual({
       sessionReference: '2',
@@ -159,7 +158,7 @@ describe('getSelectedOrDefaultSession', () => {
     const sessionReference: string = undefined
     const type: VisitRestriction = undefined
 
-    const result = getSelectedOrDefaultSession(sessionSchedule, sessionReference, type)
+    const result = getSelectedOrDefaultSessionTemplate(sessionSchedule, sessionReference, type)
 
     expect(result).toStrictEqual({
       sessionReference: '1',
@@ -174,7 +173,7 @@ describe('getSelectedOrDefaultSession', () => {
     const sessionReference: string = sessionSchedule[0].sessionTemplateReference
     const type: VisitRestriction = 'OPEN'
 
-    const result = getSelectedOrDefaultSession(sessionSchedule, sessionReference, type)
+    const result = getSelectedOrDefaultSessionTemplate(sessionSchedule, sessionReference, type)
 
     expect(result).toStrictEqual({
       sessionReference: sessionSchedule[0].sessionTemplateReference,
@@ -189,7 +188,7 @@ describe('getSelectedOrDefaultSession', () => {
     const sessionReference: string = 'invalid reference'
     const type: VisitRestriction = 'OPEN'
 
-    const result = getSelectedOrDefaultSession(sessionSchedule, sessionReference, type)
+    const result = getSelectedOrDefaultSessionTemplate(sessionSchedule, sessionReference, type)
 
     expect(result).toStrictEqual({
       sessionReference: sessionSchedule[0].sessionTemplateReference,
@@ -204,7 +203,7 @@ describe('getSelectedOrDefaultSession', () => {
     const sessionReference: string = sessionSchedule[0].sessionTemplateReference
     const type: VisitRestriction = 'CLOSED'
 
-    const result = getSelectedOrDefaultSession(sessionSchedule, sessionReference, type)
+    const result = getSelectedOrDefaultSessionTemplate(sessionSchedule, sessionReference, type)
 
     expect(result).toStrictEqual({
       sessionReference: sessionSchedule[0].sessionTemplateReference,
@@ -432,6 +431,39 @@ describe('getSessionsSideNav', () => {
         firstTimeSlotReference,
         'UNKNOWN',
       )
+
+      expect(result).toStrictEqual(expectedResult)
+    })
+
+    it('should build two side nav entries and select the first by default if no open/closed sessions present and no query params set', () => {
+      const sessionSchedule: SessionSchedule[] = []
+      const firstVisitTimeSlot = { startTime: '10:00', endTime: '11:00' }
+      const firstTimeSlotReference = '10:00-11:00'
+      const secondVisitTimeSlot = { startTime: '13:45', endTime: '16:00' }
+      const secondTimeSlotReference = '13:45-16:00'
+      const unknownVisits: VisitPreview[] = [
+        TestData.visitPreview({ visitTimeSlot: secondVisitTimeSlot }),
+        TestData.visitPreview({ visitTimeSlot: firstVisitTimeSlot }),
+      ]
+
+      const expectedResult: VisitsPageSideNav = {
+        unknown: [
+          {
+            times: '10am to 11am',
+            reference: firstTimeSlotReference,
+            queryParams: `type=UNKNOWN&sessionReference=${encodeURIComponent(firstTimeSlotReference)}&selectedDate=${selectedDate}&firstTabDate=${firstTabDate}`,
+            active: true,
+          },
+          {
+            times: '1:45pm to 4pm',
+            reference: secondTimeSlotReference,
+            queryParams: `type=UNKNOWN&sessionReference=${encodeURIComponent(secondTimeSlotReference)}&selectedDate=${selectedDate}&firstTabDate=${firstTabDate}`,
+            active: false,
+          },
+        ],
+      }
+
+      const result = getSessionsSideNav(sessionSchedule, unknownVisits, selectedDate, firstTabDate, '', undefined)
 
       expect(result).toStrictEqual(expectedResult)
     })

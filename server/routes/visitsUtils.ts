@@ -36,7 +36,7 @@ export const getDateTabs = (
   return tabs
 }
 
-export function getSelectedOrDefaultSession(
+export function getSelectedOrDefaultSessionTemplate(
   sessionSchedule: SessionSchedule[],
   sessionReference: string,
   type: VisitRestriction,
@@ -158,6 +158,12 @@ export function getSessionsSideNav(
     }
   })
   unknown.sort((a, b) => a.reference.localeCompare(b.reference))
+  // default first unknown session to selected if no open/closed
+  const unknownOnly = unknown.length && !open.length && !closed.length
+  const isASelectedUnknownSession = unknown.some(u => u.active)
+  if (unknownOnly && !isASelectedUnknownSession) {
+    unknown[0].active = true
+  }
 
   return {
     ...(open.length && { open }),
