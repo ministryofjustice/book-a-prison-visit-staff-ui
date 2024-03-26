@@ -328,7 +328,7 @@ describe('Visit service', () => {
     })
 
     describe('getVisitsBySessionTemplate', () => {
-      it('should return visit previews details for given session template reference, date and restriction', async () => {
+      it('should return visit previews for given session template reference, date, prison and restriction', async () => {
         const reference = 'v9d.7ed.7u'
         const sessionDate = '2024-01-31'
         const visitRestrictions: VisitRestriction = 'OPEN'
@@ -349,6 +349,29 @@ describe('Visit service', () => {
           reference,
           sessionDate,
           visitRestrictions,
+        )
+        expect(result).toStrictEqual(visitPreviews)
+      })
+    })
+
+    describe('getVisitsWithoutSessionTemplate', () => {
+      it('should return visit previews for given date and prison (for migrated visits that have no session template)', async () => {
+        const sessionDate = '2024-01-31'
+        const visitPreviews = [TestData.visitPreview()]
+
+        orchestrationApiClient.getVisitsBySessionTemplate.mockResolvedValue(visitPreviews)
+
+        const result = await visitService.getVisitsWithoutSessionTemplate({
+          username: 'user',
+          prisonId,
+          sessionDate,
+        })
+
+        expect(orchestrationApiClient.getVisitsBySessionTemplate).toHaveBeenCalledWith(
+          prisonId,
+          undefined,
+          sessionDate,
+          undefined,
         )
         expect(result).toStrictEqual(visitPreviews)
       })

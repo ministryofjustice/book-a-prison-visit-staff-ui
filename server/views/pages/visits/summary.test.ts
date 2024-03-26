@@ -83,12 +83,12 @@ describe('Views - Visits summary', () => {
           reference: 'ref-2',
           capacity: 10,
           queryParams: 'query-2',
-          active: true,
+          active: false,
         },
       ],
     }
 
-    const selectedSession = {
+    const selectedSessionTemplate = {
       sessionReference: 'ref-1',
       type: 'OPEN',
       times: '10am to 11am',
@@ -98,7 +98,13 @@ describe('Views - Visits summary', () => {
     const visits: VisitPreview[] = []
     const visitorsTotal = 0
 
-    viewContext = { selectedSession, sessionsSideNav, queryParamsForBackLink, visits, visitorsTotal }
+    viewContext = {
+      selectedSessionTemplate,
+      sessionsSideNav,
+      queryParamsForBackLink,
+      visits,
+      visitorsTotal,
+    }
 
     const $ = cheerio.load(compiledTemplate.render(viewContext))
 
@@ -131,7 +137,7 @@ describe('Views - Visits summary', () => {
       ],
     }
 
-    const selectedSession = {
+    const selectedSessionTemplate = {
       sessionReference: 'ref-1',
       type: 'OPEN',
       times: '10am to 11am',
@@ -141,7 +147,7 @@ describe('Views - Visits summary', () => {
     const visits = [TestData.visitPreview()]
     const visitorsTotal = 2
 
-    viewContext = { selectedSession, sessionsSideNav, queryParamsForBackLink, visits, visitorsTotal }
+    viewContext = { selectedSessionTemplate, sessionsSideNav, queryParamsForBackLink, visits, visitorsTotal }
 
     const $ = cheerio.load(compiledTemplate.render(viewContext))
 

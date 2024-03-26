@@ -70,6 +70,7 @@
   </div>
   <div class="govuk-grid-row">
 
+    {% set selectedTimeSlotLabel = "" %}
     {% if sessionsSideNav | length %}
       <div class="govuk-grid-column-one-quarter">
         {# build side nav time slot nav for open/closed sections #}
@@ -77,15 +78,16 @@
         {% for heading, items in sessionsSideNav %}
           {% set sectionItems = [] %}
           {% for item in items %}
-          {% set sectionItems = (sectionItems.push({
-              text: item.times,
-              href: "/visits?" + item.queryParams,
-              active: item.active
-            }), sectionItems) %}
+            {% set sectionItems = (sectionItems.push({
+                text: item.times,
+                href: "/visits?" + item.queryParams,
+                active: item.active
+              }), sectionItems) %}
+              {% set selectedTimeSlotLabel = item.times if item.active else selectedTimeSlotLabel %}
           {% endfor %}
           {% set sessionSideNavSections = (sessionSideNavSections.push({
             heading: {
-              text: heading | capitalize + " visits",
+              text: ("all" if heading == "unknown" else heading) | capitalize + " visits",
               classes: "govuk-!-padding-top-0"
             },
             items: sectionItems
@@ -102,13 +104,13 @@
 
     <div class="govuk-grid-column-three-quarters">
 
-      {% if selectedSession %}
+      {% if sessionsSideNav | length %}
         <h2 class="govuk-heading-m" data-test="visit-session-heading">
-          {{ selectedSession.type | capitalize }} visits, {{ selectedSession.times }}
+          {{ (selectedSessionTemplate.type or "all") | capitalize }} visits, {{ selectedTimeSlotLabel }}
         </h2>
-        
+
         <p data-test="visit-tables-booked">
-          {{ visits | length }} of {{ selectedSession.capacity }} {{ "table" | pluralise(selectedSession.capacity )}} booked
+          {{ visits | length }}{{ (" of " + selectedSessionTemplate.capacity) if selectedSessionTemplate.capacity }} {{ "table" | pluralise(selectedSessionTemplate.capacity or visits | length)}} booked
         </p>
       {% else %}
         <p class="govuk-!-margin-top-0" id="search-results-none">
@@ -157,8 +159,8 @@
           ],
           rows: visitsRows
         }) }}
-      </div>
-    {% endif %}
+      {% endif %}
+    </div>
   </div>
 {% endblock %}
 

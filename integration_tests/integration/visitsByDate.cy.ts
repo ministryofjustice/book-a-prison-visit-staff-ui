@@ -64,12 +64,14 @@ context('View visits by date', () => {
       visits,
     })
 
+    cy.task('stubGetVisitsWithoutSessionTemplate', { prisonId, sessionDate: todayShortFormat, visits: [] })
+
     const homePage = Page.verifyOnPage(HomePage)
     homePage.viewVisitsTile().click()
 
     const visitsByDatePage = Page.verifyOnPage(VisitsByDatePage)
 
-    // today, default (fist) session
+    // today, default (first) session
     visitsByDatePage.dateTabsToday().contains(todayLongFormat)
     visitsByDatePage.dateTabsToday().should('have.attr', 'aria-current', 'page')
     visitsByDatePage.dateTabsTomorrow().contains(tomorrowLongFormat)
@@ -101,6 +103,7 @@ context('View visits by date', () => {
 
     // select tomorrow
     cy.task('stubSessionSchedule', { prisonId, date: tomorrowShortFormat, sessionSchedule: [] })
+    cy.task('stubGetVisitsWithoutSessionTemplate', { prisonId, sessionDate: tomorrowShortFormat, visits: [] })
     visitsByDatePage.dateTabsTomorrow().click()
 
     visitsByDatePage.dateTabsToday().should('not.have.attr', 'aria-current', 'page')
@@ -112,8 +115,55 @@ context('View visits by date', () => {
     visitsByDatePage.noResultsMessage().contains('No visit sessions on this day.')
   })
 
+  it('should show visits by date for migrated visits with no session templates', () => {
+    cy.task('stubSessionSchedule', { prisonId, date: todayShortFormat, sessionSchedule: [] })
+    const anotherVisit = TestData.visitPreview({ visitTimeSlot: { startTime: '09:00', endTime: '10:00' } })
+    cy.task('stubGetVisitsWithoutSessionTemplate', {
+      prisonId,
+      sessionDate: todayShortFormat,
+      visits: [...visits, anotherVisit],
+    })
+
+    const homePage = Page.verifyOnPage(HomePage)
+    homePage.viewVisitsTile().click()
+
+    const visitsByDatePage = Page.verifyOnPage(VisitsByDatePage)
+
+    // today, default (first) 'unknown' session
+    visitsByDatePage.dateTabsToday().contains(todayLongFormat)
+    visitsByDatePage.dateTabsToday().should('have.attr', 'aria-current', 'page')
+    visitsByDatePage.dateTabsTomorrow().contains(tomorrowLongFormat)
+
+    visitsByDatePage.activeSessionNavLink().contains('9am to 10am')
+
+    visitsByDatePage.visitSessionHeading().contains('All visits, 9am to 10am')
+    visitsByDatePage.tablesBookedCount().contains('1 table booked')
+    visitsByDatePage.visitorsTotalCount().contains('2 visitors')
+
+    visitsByDatePage.prisonerName(1).contains('Smith, John')
+    visitsByDatePage.prisonerNumber(1).contains('A1234BC')
+
+    // select the second 'unknown' visits session
+    visitsByDatePage.selectSessionNavItem(1)
+    visitsByDatePage.dateTabsToday().contains(todayLongFormat)
+    visitsByDatePage.dateTabsToday().should('have.attr', 'aria-current', 'page')
+    visitsByDatePage.dateTabsTomorrow().contains(tomorrowLongFormat)
+
+    visitsByDatePage.activeSessionNavLink().contains('1:45pm to 3:45pm')
+
+    visitsByDatePage.visitSessionHeading().contains('All visits, 1:45pm to 3:45pm')
+    visitsByDatePage.tablesBookedCount().contains('2 tables booked')
+    visitsByDatePage.visitorsTotalCount().contains('3 visitors')
+
+    visitsByDatePage.prisonerName(1).contains('Smith, John')
+    visitsByDatePage.prisonerNumber(1).contains('A1234BC')
+    visitsByDatePage.prisonerName(2).contains('Jones, Fred')
+    visitsByDatePage.prisonerNumber(2).contains('B1234CD')
+  })
+
   it('should show visits by date, and change date using the date picker', () => {
     cy.task('stubSessionSchedule', { prisonId, date: todayShortFormat, sessionSchedule: [] })
+    cy.task('stubGetVisitsWithoutSessionTemplate', { prisonId, sessionDate: todayShortFormat, visits: [] })
 
     const homePage = Page.verifyOnPage(HomePage)
     homePage.viewVisitsTile().click()
@@ -128,6 +178,7 @@ context('View visits by date', () => {
     const firstOfNextMonthShortFormat = format(firstOfNextMonth, shortDateFormat)
     const firstOfNextMonthLongFormat = format(firstOfNextMonth, longDateFormat)
     cy.task('stubSessionSchedule', { prisonId, date: firstOfNextMonthShortFormat, sessionSchedule: [] })
+    cy.task('stubGetVisitsWithoutSessionTemplate', { prisonId, sessionDate: firstOfNextMonthShortFormat, visits: [] })
 
     visitsByDatePage.toggleChooseAnotherDatePopUp()
     visitsByDatePage.datePickerGoToNextMonth()

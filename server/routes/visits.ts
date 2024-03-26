@@ -2,10 +2,10 @@ import { type RequestHandler, Router } from 'express'
 import { body, validationResult } from 'express-validator'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import { getParsedDateFromQueryString } from '../utils/utils'
-import { getDateTabs, getSelectedOrDefaultSession, getSessionsSideNav } from './visitsUtils'
+import { getDateTabs, getSelectedOrDefaultSessionTemplate, getSessionsSideNav } from './visitsUtils'
 import type { Services } from '../services'
 import { getFlashFormValues } from './visitorUtils'
-import { VisitRestriction } from '../data/orchestrationApiTypes'
+import { VisitPreview, VisitRestriction } from '../data/orchestrationApiTypes'
 
 export default function routes({ auditService, visitService, visitSessionsService }: Services): Router {
   const router = Router()
@@ -26,35 +26,62 @@ export default function routes({ auditService, visitService, visitSessionsServic
 
     const { type = '', sessionReference = '', selectedDate = '', firstTabDate = '' } = req.query
 
-    const selectedType: VisitRestriction = type === 'OPEN' || type === 'CLOSED' || type === 'UNKNOWN' ? type : 'OPEN'
+    const selectedSessionReference = sessionReference.toString()
+    const selectedType: VisitRestriction = type === 'OPEN' || type === 'CLOSED' || type === 'UNKNOWN' ? type : undefined
     const selectedDateString = getParsedDateFromQueryString(selectedDate.toString())
     const firstTabDateString = getParsedDateFromQueryString(firstTabDate.toString())
 
-    const sessionSchedule = await visitSessionsService.getSessionSchedule({
-      username: res.locals.user.username,
-      prisonId,
-      date: selectedDateString,
-    })
+    // get session schedule and any 'unknown' visits (i.e. those with no session template because migrated data)
+    const [sessionSchedule, unknownVisits] = await Promise.all([
+      visitSessionsService.getSessionSchedule({
+        username: res.locals.user.username,
+        prisonId,
+        date: selectedDateString,
+      }),
+      visitService.getVisitsWithoutSessionTemplate({
+        username: res.locals.user.username,
+        prisonId,
+        sessionDate: selectedDateString,
+      }),
+    ])
 
-    const selectedSession = getSelectedOrDefaultSession(sessionSchedule, sessionReference.toString(), selectedType)
-
-    const sessionsSideNav = getSessionsSideNav(
+    // identify if a session template in the schedule has been selected or can be defaulted
+    const selectedSessionTemplate = getSelectedOrDefaultSessionTemplate(
       sessionSchedule,
-      selectedDateString,
-      firstTabDateString,
-      selectedSession?.sessionReference,
-      selectedSession?.type,
+      selectedSessionReference,
+      selectedType,
     )
 
-    const visits = selectedSession
-      ? await visitService.getVisitsBySessionTemplate({
-          username: res.locals.user.username,
-          prisonId,
-          reference: selectedSession.sessionReference,
-          sessionDate: selectedDateString,
-          visitRestrictions: selectedSession.type,
-        })
-      : []
+    // side nav comprises sessions in schedule and those derived from 'unknown' visits
+    const sessionsSideNav = getSessionsSideNav(
+      sessionSchedule,
+      unknownVisits,
+      selectedDateString,
+      firstTabDateString,
+      selectedSessionTemplate?.sessionReference || selectedSessionReference,
+      selectedSessionTemplate?.type || selectedType,
+    )
+
+    let visits: VisitPreview[] = []
+
+    // fetch visits if a known session is selected...
+    if (selectedSessionTemplate) {
+      visits = await visitService.getVisitsBySessionTemplate({
+        username: res.locals.user.username,
+        prisonId,
+        reference: selectedSessionTemplate.sessionReference,
+        sessionDate: selectedDateString,
+        visitRestrictions: selectedSessionTemplate.type,
+      })
+    }
+
+    // ...otherwise if there are unknown visits then filter these by the selected time slot
+    const selectedTimeSlotRef = sessionsSideNav.unknown?.find(s => s.active)?.reference
+    if (!selectedSessionTemplate && selectedTimeSlotRef) {
+      visits = unknownVisits.filter(
+        visit => selectedTimeSlotRef === `${visit.visitTimeSlot.startTime}-${visit.visitTimeSlot.endTime}`,
+      )
+    }
 
     const visitorsTotal = visits.reduce((acc, visit) => {
       return acc + visit.visitorCount
@@ -62,8 +89,8 @@ export default function routes({ auditService, visitService, visitSessionsServic
 
     const queryParamsForBackLink = new URLSearchParams({
       query: new URLSearchParams({
-        type: selectedSession?.type,
-        sessionReference: selectedSession?.sessionReference,
+        type: selectedSessionTemplate?.type || 'UNKNOWN',
+        sessionReference: selectedSessionTemplate?.sessionReference || selectedTimeSlotRef,
         selectedDate: selectedDateString,
         firstTabDate: firstTabDateString,
       }).toString(),
@@ -81,7 +108,7 @@ export default function routes({ auditService, visitService, visitSessionsServic
       errors: req.flash('errors'),
       formValues: getFlashFormValues(req),
       dateTabs: getDateTabs(selectedDateString, firstTabDateString, 3),
-      selectedSession,
+      selectedSessionTemplate,
       sessionsSideNav,
       queryParamsForBackLink,
       visits,
