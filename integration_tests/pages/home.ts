@@ -11,9 +11,7 @@ export default class HomePage extends Page {
 
   changeEstablishmentLink = (): PageElement => cy.get('[data-test="change-establishment"]')
 
-  bookAVisitTile = (): PageElement => cy.get('[data-test="book-visit"]')
-
-  changeAVisitTile = (): PageElement => cy.get('[data-test="change-visit"]')
+  bookOrChangeVisitTile = (): PageElement => cy.get('[data-test="book-or-change-visit"]')
 
   needReviewTile = (): PageElement => cy.get('[data-test="need-review"]')
 

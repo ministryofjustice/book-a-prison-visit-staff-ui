@@ -6,7 +6,7 @@
 {% set pageTitle %}
 {% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
 {% endset %}
-{% set backLinkHref %}/search/prisoner{% if visit %}-visit{% endif %}{% endset %}
+{% set backLinkHref = '/search/prisoner' %}
 
 {% block content %}
   <div class="govuk-grid-row">
@@ -22,7 +22,8 @@
           results: {
             from: from,
             to: to,
-            count: numberOfResults
+            count: numberOfResults,
+            text: "result" | pluralise(numberOfResults)
           },
           previous: {
             text: 'Previous',

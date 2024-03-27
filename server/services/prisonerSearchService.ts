@@ -26,7 +26,6 @@ export default class PrisonerSearchService {
     prisonId: string,
     username: string,
     page: number,
-    visit?: boolean,
   ): Promise<{
     results: Array<PrisonerDetailsItem[]>
     numberOfResults: number
@@ -49,17 +48,7 @@ export default class PrisonerSearchService {
     const queryParams = new URLSearchParams({ search }).toString()
 
     content.forEach((prisoner: Prisoner) => {
-      const url = visit
-        ? `<a href="/prisoner/${
-            prisoner.prisonerNumber
-          }/visits?${queryParams}" class="govuk-link--no-visited-state bapv-result-row">${properCaseFullName(
-            `${prisoner.lastName}, ${prisoner.firstName}`,
-          )}</a>`
-        : `<a href="/prisoner/${
-            prisoner.prisonerNumber
-          }?${queryParams}" class="govuk-link--no-visited-state bapv-result-row">${properCaseFullName(
-            `${prisoner.lastName}, ${prisoner.firstName}`,
-          )}</a>`
+      const url = `<a href="/prisoner/${prisoner.prisonerNumber}?${queryParams}" class="govuk-link--no-visited-state bapv-result-row">${properCaseFullName(`${prisoner.lastName}, ${prisoner.firstName}`)}</a>`
       const row: PrisonerDetailsItem[] = [
         {
           html: url,

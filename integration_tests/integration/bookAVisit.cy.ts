@@ -78,7 +78,7 @@ context('Book a visit', () => {
 
     // Home page - start booking journey
     const homePage = Page.verifyOnPage(HomePage)
-    homePage.bookAVisitTile().click()
+    homePage.bookOrChangeVisitTile().click()
 
     // Search for prisoner
     cy.task('stubPrisoners', {

@@ -1,18 +1,13 @@
 import { type RequestHandler, type Request, Router } from 'express'
 import { body, validationResult } from 'express-validator'
-import { BadRequest, NotFound } from 'http-errors'
+import { BadRequest } from 'http-errors'
 import { VisitSessionData } from '../@types/bapv'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import { isValidPrisonerNumber } from './validationChecks'
 import { clearSession } from './visitorUtils'
 import type { Services } from '../services'
 
-export default function routes({
-  auditService,
-  prisonerProfileService,
-  prisonerSearchService,
-  visitService,
-}: Services): Router {
+export default function routes({ auditService, prisonerProfileService }: Services): Router {
   const router = Router()
 
   const get = (path: string, handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
@@ -76,26 +71,6 @@ export default function routes({
     req.session.visitSessionData = visitSessionData
 
     return res.redirect('/book-a-visit/select-visitors')
-  })
-
-  get('/:offenderNo/visits', async (req, res) => {
-    const offenderNo = getOffenderNo(req)
-    const { prisonId } = req.session.selectedEstablishment
-    const search = (req.query?.search as string) ?? ''
-    const queryParamsForBackLink = search !== '' ? new URLSearchParams({ search }).toString() : ''
-
-    const prisonerDetails = await prisonerSearchService.getPrisoner(offenderNo, prisonId, res.locals.user.username)
-    if (prisonerDetails === null) {
-      throw new NotFound()
-    }
-    const prisonerName = `${prisonerDetails.lastName}, ${prisonerDetails.firstName}`
-
-    const visits = await visitService.getFutureVisits({
-      username: res.locals.user.username,
-      prisonerId: offenderNo,
-    })
-
-    return res.render('pages/prisoner/visits', { offenderNo, prisonerName, visits, queryParamsForBackLink })
   })
 
   return router

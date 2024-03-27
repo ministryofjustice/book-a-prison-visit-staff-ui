@@ -9,5 +9,7 @@ export default class SearchForBookingByPrisonerPage extends Page {
     cy.get('#search').type(term)
   }
 
+  searchByReferenceLink = (): PageElement => cy.get('[data-test=search-by-reference]')
+
   continueButton = (): PageElement => cy.get('[data-test=search]')
 }

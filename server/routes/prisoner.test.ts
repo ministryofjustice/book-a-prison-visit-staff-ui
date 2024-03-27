@@ -2,14 +2,13 @@ import type { Express } from 'express'
 import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
-import { PrisonerProfilePage, VisitInformation, VisitSessionData, FlashData } from '../@types/bapv'
+import { PrisonerProfilePage, VisitSessionData, FlashData } from '../@types/bapv'
 import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
 import { clearSession } from './visitorUtils'
 import TestData from './testutils/testData'
 import {
   createMockAuditService,
   createMockPrisonerProfileService,
-  createMockPrisonerSearchService,
   createMockVisitService,
 } from '../services/testutils/mocks'
 
@@ -19,7 +18,6 @@ let flashData: FlashData
 
 const auditService = createMockAuditService()
 const prisonerProfileService = createMockPrisonerProfileService()
-const prisonerSearchService = createMockPrisonerSearchService()
 const visitService = createMockVisitService()
 
 const prisonId = 'HEI'
@@ -41,7 +39,7 @@ beforeEach(() => {
   visitSessionData = {}
 
   app = appWithAllRoutes({
-    services: { auditService, prisonerProfileService, prisonerSearchService, visitService },
+    services: { auditService, prisonerProfileService, visitService },
     sessionData: {
       visitSessionData,
     } as SessionData,
@@ -475,139 +473,5 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
           expect(res.text).toContain('BadRequestError: Bad Request')
         })
     })
-  })
-})
-
-describe('GET /prisoner/A1234BC/visits', () => {
-  const prisoner = TestData.prisoner()
-
-  it('should list upcoming visits for the prisoner with back link to new search if no search in querystring', () => {
-    const visitInfo: VisitInformation[] = [
-      {
-        reference: 'ab-cd-ef-gh',
-        prisonNumber: 'A1234BC',
-        prisonerName: '',
-        mainContact: 'John Smith',
-        visitDate: '14 February 2022',
-        visitTime: '10am to 11:15am',
-        visitStatus: 'BOOKED',
-      },
-      {
-        reference: 'gm-in-az-ma',
-        prisonNumber: 'A1234BC',
-        prisonerName: '',
-        mainContact: 'Fred Smith',
-        visitDate: '24 February 2022',
-        visitTime: '2pm to 3pm',
-        visitStatus: 'CANCELLED',
-      },
-    ]
-
-    prisonerSearchService.getPrisoner.mockResolvedValue(prisoner)
-    visitService.getFutureVisits.mockResolvedValue(visitInfo)
-
-    return request(app)
-      .get('/prisoner/A1234BC/visits')
-      .expect(200)
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        const $ = cheerio.load(res.text)
-        expect($('h1').text()).toBe('Smith, John')
-        expect($('.govuk-back-link').attr('href')).toBe('/search/prisoner-visit')
-        expect($('[data-test="prisoner-number"]').text()).toBe('A1234BC')
-        expect($('[data-test="visit-reference-1"]').text()).toBe('ab-cd-ef-gh')
-        expect($('[data-test="visit-mainContact-1"]').text()).toBe('Smith, John')
-        expect($('[data-test="visit-date-1"]').text()).toBe('14 February 2022')
-        expect($('[data-test="visit-status-1"]').text()).toBe('Booked')
-
-        expect($('[data-test="visit-reference-2"]').text()).toBe('gm-in-az-ma')
-        expect($('[data-test="visit-mainContact-2"]').text()).toBe('Smith, Fred')
-        expect($('[data-test="visit-date-2"]').text()).toBe('24 February 2022')
-        expect($('[data-test="visit-status-2"]').text()).toBe('Cancelled')
-      })
-  })
-  it('should list upcoming visits for the prisoner with back link to results if search in querystring', () => {
-    const visitInfo: VisitInformation[] = [
-      {
-        reference: 'ab-cd-ef-gh',
-        prisonNumber: 'A1234BC',
-        prisonerName: '',
-        mainContact: 'John Smith',
-        visitDate: '14 February 2022',
-        visitTime: '10am to 11:15am',
-        visitStatus: 'BOOKED',
-      },
-      {
-        reference: 'gm-in-az-ma',
-        prisonNumber: 'A1234BC',
-        prisonerName: '',
-        mainContact: 'Fred Smith',
-        visitDate: '24 February 2022',
-        visitTime: '2pm to 3pm',
-        visitStatus: 'CANCELLED',
-      },
-    ]
-
-    prisonerSearchService.getPrisoner.mockResolvedValue(prisoner)
-    visitService.getFutureVisits.mockResolvedValue(visitInfo)
-
-    return request(app)
-      .get('/prisoner/A1234BC/visits?search=A1234BC')
-      .expect(200)
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        const $ = cheerio.load(res.text)
-        expect($('h1').text()).toBe('Smith, John')
-        expect($('.govuk-back-link').attr('href')).toBe('/search/prisoner-visit/results?search=A1234BC')
-        expect($('[data-test="prisoner-number"]').text()).toBe('A1234BC')
-        expect($('[data-test="visit-reference-1"]').text()).toBe('ab-cd-ef-gh')
-        expect($('[data-test="visit-mainContact-1"]').text()).toBe('Smith, John')
-        expect($('[data-test="visit-date-1"]').text()).toBe('14 February 2022')
-        expect($('[data-test="visit-status-1"]').text()).toBe('Booked')
-
-        expect($('[data-test="visit-reference-2"]').text()).toBe('gm-in-az-ma')
-        expect($('[data-test="visit-mainContact-2"]').text()).toBe('Smith, Fred')
-        expect($('[data-test="visit-date-2"]').text()).toBe('24 February 2022')
-        expect($('[data-test="visit-status-2"]').text()).toBe('Cancelled')
-      })
-  })
-
-  it('should show message and back-to-start button if prisoner has no upcoming visits', () => {
-    prisonerSearchService.getPrisoner.mockResolvedValue(prisoner)
-    visitService.getFutureVisits.mockResolvedValue([])
-
-    return request(app)
-      .get('/prisoner/A1234BC/visits')
-      .expect(200)
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        const $ = cheerio.load(res.text)
-        expect($('h1').text()).toBe('Smith, John')
-        expect($('[data-test="prisoner-number"]').text()).toBe('A1234BC')
-        expect($('main').text()).toContain('There are no upcoming visits for this prisoner.')
-        expect($('[data-test="go-to-start"]').length).toBe(1)
-      })
-  })
-
-  it('should render 400 Bad Request error for invalid prisoner number', () => {
-    return request(app)
-      .get('/prisoner/A12--34BC/visits')
-      .expect(400)
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        expect(res.text).toContain('BadRequestError: Bad Request')
-      })
-  })
-
-  it('should render 404 Not Found error if prisoner not found', () => {
-    prisonerSearchService.getPrisoner.mockResolvedValue(null)
-
-    return request(app)
-      .get('/prisoner/A1234BC/visits')
-      .expect(404)
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        expect(res.text).toContain('NotFoundError: Not Found')
-      })
   })
 })

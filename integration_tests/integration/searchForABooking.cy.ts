@@ -1,4 +1,4 @@
-import { addDays, format, sub } from 'date-fns'
+import { format, sub } from 'date-fns'
 import TestData from '../../server/routes/testutils/testData'
 import HomePage from '../pages/home'
 import Page from '../pages/page'
@@ -7,11 +7,10 @@ import SearchForBookingByReferenceResultsPage from '../pages/searchForBookingByR
 import SearchForBookingByPrisonerPage from '../pages/searchForBookingByPrisoner'
 import SearchForBookingByPrisonerResultsPage from '../pages/searchForBookingByPrisonerResults'
 import VisitDetailsPage from '../pages/visitDetails'
-import UpcomingVisitsPage from '../pages/upcomingVisits'
+import PrisonerProfilePage from '../pages/prisonerProfile'
 
 context('Search for a booking by reference', () => {
   const shortDateFormat = 'yyyy-MM-dd'
-  const longDateFormat = 'd MMMM yyyy'
   const today = new Date()
   const prisoner = TestData.prisoner()
   const { prisonerNumber: offenderNo } = prisoner
@@ -45,7 +44,10 @@ context('Search for a booking by reference', () => {
       }),
     ]
 
-    homePage.changeAVisitTile().click()
+    homePage.bookOrChangeVisitTile().click()
+
+    const searchForBookingByPrisonerPage = Page.verifyOnPage(SearchForBookingByPrisonerPage)
+    searchForBookingByPrisonerPage.searchByReferenceLink().click()
 
     const searchForBookingByReferencePage = Page.verifyOnPage(SearchForBookingByReferencePage)
 
@@ -77,12 +79,7 @@ context('Search for a booking by reference', () => {
 
   it('Should search via prisonerId, than navigate to the summary page', () => {
     const homePage = Page.verifyOnPage(HomePage)
-
-    const upcomingVisit = TestData.visit({
-      reference: 'bc-de-fg-hi',
-      startTimestamp: format(addDays(today, 7), `${shortDateFormat}'T'13:30:00`),
-      endTimestamp: format(addDays(today, 7), `${shortDateFormat}'T'14:30:00`),
-    })
+    const visit = TestData.visit()
 
     const childDob = format(sub(today, { years: 5 }), shortDateFormat)
     const contacts = [
@@ -96,11 +93,7 @@ context('Search for a booking by reference', () => {
       }),
     ]
 
-    homePage.changeAVisitTile().click()
-
-    const searchForBookingByReferencePage = Page.verifyOnPage(SearchForBookingByReferencePage)
-
-    searchForBookingByReferencePage.searchByPrisonerLink().click()
+    homePage.bookOrChangeVisitTile().click()
 
     const searchForBookingByPrisonerPage = Page.verifyOnPage(SearchForBookingByPrisonerPage)
 
@@ -123,29 +116,33 @@ context('Search for a booking by reference', () => {
     searchBookingByPrisonerResultsPage.resultRow().contains(offenderNo)
     searchBookingByPrisonerResultsPage.resultRow().contains('2 April 1975')
 
-    cy.task('stubPrisoner', prisoner)
     cy.task('stubPrisonerById', prisoner)
+    const alerts = []
+    const visitors = [
+      { nomisPersonId: 4321, firstName: 'Jeanette', lastName: 'Smith' },
+      { nomisPersonId: 4322, firstName: 'Bob', lastName: 'Smith' },
+    ]
+    const visitSummary = TestData.visitSummary({ visitors })
+    const profile = TestData.prisonerProfile({ alerts, visits: [visitSummary] })
 
-    cy.task('stubFutureVisits', { prisonerId: prisoner.prisonerNumber, upcomingVisits: [upcomingVisit] })
+    const { prisonerId } = profile
+    const prisonId = 'HEI'
+
+    cy.task('stubPrisonerProfile', { prisonId, prisonerId, profile })
 
     searchBookingByPrisonerResultsPage.prisonerLink().click()
 
-    const upcomingVisitsPage = Page.verifyOnPage(UpcomingVisitsPage)
+    const prisonerProfilePage = Page.verifyOnPageTitle(PrisonerProfilePage, prisonerDisplayName)
 
-    upcomingVisitsPage.visitReference().contains('bc-de-fg-hi')
-    upcomingVisitsPage.mainContact().contains('Smith, Jeanette')
-    upcomingVisitsPage.visitDate().contains(format(new Date(upcomingVisit.startTimestamp), longDateFormat))
-    upcomingVisitsPage.visitStatus().contains('Booked')
-
+    cy.task('stubVisitHistory', TestData.visitHistoryDetails({ visit }))
     cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
-    cy.task('stubVisitHistory', TestData.visitHistoryDetails({ visit: upcomingVisit }))
-    cy.task('stubGetVisitNotifications', { reference: upcomingVisit.reference })
+    cy.task('stubGetVisitNotifications', { reference: visit.reference })
 
-    upcomingVisitsPage.visitReferenceLink().click()
+    prisonerProfilePage.selectFirstVisit().click()
 
     const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage)
 
-    visitDetailsPage.visitReference().contains('bc-de-fg-hi')
+    visitDetailsPage.visitReference().contains('ab-cd-ef-gh')
     visitDetailsPage.prisonerName().contains('Smith, John')
   })
 })

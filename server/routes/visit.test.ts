@@ -267,7 +267,7 @@ describe('/visit/:reference', () => {
           const $ = cheerio.load(res.text)
           expect($('h1').text()).toBe('Visit booking details')
           expect($('.govuk-back-link').attr('href')).toBe(
-            '/altSearch/visit/results?searchBlock1=ab&searchBlock2=cd&searchBlock3=ef&searchBlock4=gh',
+            '/search/visit/results?searchBlock1=ab&searchBlock2=cd&searchBlock3=ef&searchBlock4=gh',
           )
           expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
           // prisoner details
