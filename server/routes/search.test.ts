@@ -56,6 +56,7 @@ describe('Prisoner search page', () => {
             const $ = cheerio.load(res.text)
             expect(res.text).toContain('Search for a prisoner')
             expect($('[data-test="change-establishment"]').text()).toContain('Change establishment')
+            expect($('[data-test=search-by-reference]').length).toBe(1)
           })
       })
     })
@@ -80,6 +81,7 @@ describe('Prisoner search page', () => {
             const $ = cheerio.load(res.text)
             expect(res.text).toContain('Search for a prisoner')
             expect($('#search-results-none').text()).toBe('custom not found message')
+            expect($('[data-test=search-by-reference]').length).toBe(1)
             expect(auditService.prisonerSearch).toHaveBeenCalledWith({
               searchTerms: 'A1234BC',
               prisonId,
@@ -102,6 +104,7 @@ describe('Prisoner search page', () => {
             expect($('#search-results-none').text()).toBe(
               'There are no results for this name or number at Hewell (HMP).',
             )
+            expect($('[data-test=search-by-reference]').length).toBe(1)
             expect(auditService.prisonerSearch).toHaveBeenCalledWith({
               searchTerms: 'prisoner-name',
               prisonId,
@@ -130,8 +133,10 @@ describe('Prisoner search page', () => {
           .get('/search/prisoner/results?search=')
           .expect('Content-Type', /html/)
           .expect(res => {
+            const $ = cheerio.load(res.text)
             expect(res.text).toContain('Search for a prisoner')
             expect(res.text).toContain('You must enter at least 2 characters')
+            expect($('[data-test=search-by-reference]').length).toBe(1)
             expect(auditService.prisonerSearch).not.toHaveBeenCalled()
             expect(prisonerSearchService.getPrisoners).not.toHaveBeenCalled()
           })
@@ -156,8 +161,10 @@ describe('Prisoner search page', () => {
           .get('/search/prisoner/results?search=A1234BC')
           .expect('Content-Type', /html/)
           .expect(res => {
+            const $ = cheerio.load(res.text)
             expect(res.text).toContain('Search for a prisoner')
             expect(res.text).toContain('id="search-results-true"')
+            expect($('[data-test=search-by-reference]').length).toBe(0)
             expect(auditService.prisonerSearch).toHaveBeenCalledWith({
               searchTerms: 'A1234BC',
               prisonId,
@@ -195,9 +202,11 @@ describe('Prisoner search page', () => {
           .get('/search/prisoner/results?search=A1234BC')
           .expect('Content-Type', /html/)
           .expect(res => {
+            const $ = cheerio.load(res.text)
             expect(res.text).toContain('Search for a prisoner')
             expect(res.text).toContain('id="search-results-true"')
             expect(res.text).toContain('<p class="moj-pagination__results">')
+            expect($('[data-test=search-by-reference]').length).toBe(0)
             expect(auditService.prisonerSearch).toHaveBeenCalledWith({
               searchTerms: 'A1234BC',
               prisonId,
@@ -223,7 +232,7 @@ describe('Prisoner search page', () => {
       })
     })
   })
-
+  // TODO some missing tests for /search/visit to put back - including checking for data-test="search-by-prisoner"
   describe('for visit', () => {
     describe('TEST POST /search/prisoner/results?search=A1234BC.   Mac full stop test', () => {
       it('should remove full stop inserted by mac', () => {
