@@ -1581,6 +1581,10 @@ export interface paths {
     /** Returns the next court event details (if one exists) related to the passed in booking */
     get: operations['getNextCourtEvent']
   }
+  '/api/court/{bookingId}/count-active-cases': {
+    /** Returns the number of active court cases for the passed in bookingId */
+    get: operations['getCountOfActiveCourtCases']
+  }
   '/api/court-date-results/{offenderNo}': {
     /**
      * Returns details of all court dates and the result of each.
@@ -7322,14 +7326,14 @@ export interface components {
       totalElements?: number
       /** Format: int32 */
       totalPages?: number
-      first?: boolean
-      last?: boolean
       /** Format: int32 */
       size?: number
       content?: string[]
       /** Format: int32 */
       number?: number
-      sort?: components['schemas']['SortObject']
+      sort?: components['schemas']['SortObject'][]
+      first?: boolean
+      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
@@ -7338,7 +7342,7 @@ export interface components {
     PageableObject: {
       /** Format: int64 */
       offset?: number
-      sort?: components['schemas']['SortObject']
+      sort?: components['schemas']['SortObject'][]
       /** Format: int32 */
       pageSize?: number
       /** Format: int32 */
@@ -7347,9 +7351,11 @@ export interface components {
       unpaged?: boolean
     }
     SortObject: {
-      empty?: boolean
-      sorted?: boolean
-      unsorted?: boolean
+      direction?: string
+      nullHandling?: string
+      ascending?: boolean
+      property?: string
+      ignoreCase?: boolean
     }
     /** @description Sentence Adjustment values */
     BookingAdjustment: {
@@ -7569,14 +7575,14 @@ export interface components {
       totalElements?: number
       /** Format: int32 */
       totalPages?: number
-      first?: boolean
-      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['CalculableSentenceEnvelope'][]
       /** Format: int32 */
       number?: number
-      sort?: components['schemas']['SortObject']
+      sort?: components['schemas']['SortObject'][]
+      first?: boolean
+      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
@@ -8255,16 +8261,16 @@ export interface components {
        */
       code: string
       /**
-       * @description Description of the location, either from the user description if set or reference code description and code
-       * @example Wing A
-       */
-      description: string
-      /**
        * @description The type of the location - from LIVING_UNIT reference code
        * @example WING
        * @enum {string}
        */
       type?: 'BED' | 'BLK' | 'CB' | 'CELL' | 'LAND' | 'SPUR' | 'TIER' | 'WING'
+      /**
+       * @description Description of the location, either from the user description if set or reference code description and code
+       * @example Wing A
+       */
+      description: string
     }
     OffenderLocation: {
       /** @description Current housing levels or null if not currently in prison */
@@ -9083,53 +9089,172 @@ export interface components {
       mostRecentActiveBooking: boolean
       sentenceDetail?: components['schemas']['BaseSentenceCalcDates']
     }
-    /** @description Offender Sentence Calculation */
-    OffenderSentenceCalculation: {
-      /** Format: int64 */
-      bookingId?: number
-      offenderNo?: string
-      firstName?: string
-      lastName?: string
-      agencyLocationId?: string
-      /** Format: int64 */
-      offenderSentCalculationId?: number
-      /** @example 2021-07-05T10:35:17 */
-      calculationDate?: string
-      /** Format: date */
-      sentenceExpiryDate?: string
-      /** Format: date */
-      licenceExpiryDate?: string
-      /** Format: date */
-      paroleEligibilityDate?: string
-      /** Format: date */
-      homeDetCurfEligibilityDate?: string
-      /** Format: date */
-      homeDetCurfActualDate?: string
-      /** Format: date */
-      automaticReleaseDate?: string
-      /** Format: date */
-      conditionalReleaseDate?: string
-      /** Format: date */
-      nonParoleDate?: string
-      /** Format: date */
-      postRecallReleaseDate?: string
-      /** Format: date */
-      actualParolDate?: string
-      /** Format: date */
-      topupSupervisionExpiryDate?: string
-      /** Format: date */
+    /** @description Offender Calculated Key Dates */
+    OffenderCalculatedKeyDates: {
+      /**
+       * Format: date
+       * @description HDCED - date on which offender will be eligible for home detention curfew.
+       * @example 2020-02-03
+       */
+      homeDetentionCurfewEligibilityDate?: string
+      /**
+       * Format: date
+       * @description ETD - early term date for offender.
+       * @example 2020-02-03
+       */
       earlyTermDate?: string
-      /** Format: date */
+      /**
+       * Format: date
+       * @description MTD - mid term date for offender.
+       * @example 2020-02-03
+       */
       midTermDate?: string
-      /** Format: date */
+      /**
+       * Format: date
+       * @description LTD - late term date for offender.
+       * @example 2020-02-03
+       */
       lateTermDate?: string
-      /** Format: date */
+      /**
+       * Format: date
+       * @description DPRRD - Detention training order post recall release date
+       * @example 2020-02-03
+       */
+      dtoPostRecallReleaseDate?: string
+      /**
+       * Format: date
+       * @description ARD - calculated automatic (unconditional) release date for offender.
+       * @example 2020-02-03
+       */
+      automaticReleaseDate?: string
+      /**
+       * Format: date
+       * @description CRD - calculated conditional release date for offender.
+       * @example 2020-02-03
+       */
+      conditionalReleaseDate?: string
+      /**
+       * Format: date
+       * @description PED - date on which offender is eligible for parole.
+       * @example 2020-02-03
+       */
+      paroleEligibilityDate?: string
+      /**
+       * Format: date
+       * @description NPD - calculated non-parole date for offender (relating to the 1991 act).
+       * @example 2020-02-03
+       */
+      nonParoleDate?: string
+      /**
+       * Format: date
+       * @description LED - date on which offender licence expires.
+       * @example 2020-02-03
+       */
+      licenceExpiryDate?: string
+      /**
+       * Format: date
+       * @description PRRD - calculated post-recall release date for offender.
+       * @example 2020-02-03
+       */
+      postRecallReleaseDate?: string
+      /**
+       * Format: date
+       * @description SED - date on which sentence expires.
+       * @example 2020-02-03
+       */
+      sentenceExpiryDate?: string
+      /**
+       * Format: date
+       * @description TUSED - top-up supervision expiry date for offender.
+       * @example 2020-02-03
+       */
+      topupSupervisionExpiryDate?: string
+      /**
+       * Format: date
+       * @description ERSED - Early Removal Scheme Eligibility Date
+       * @example 2020-02-03
+       */
+      earlyRemovalSchemeEligibilityDate?: string
+      /**
+       * Format: date
+       * @description Effective sentence end date.
+       * @example 2020-02-03
+       */
+      effectiveSentenceEndDate: string
+      /**
+       * @description Sentence length in the format 00 years/00 months/00 days.
+       * @example 11/00/00
+       */
+      sentenceLength: string
+      /**
+       * Format: date
+       * @description HDCAD - Home Detention Curfew Approved date
+       * @example 2020-02-03
+       */
+      homeDetentionCurfewApprovedDate?: string
+      /**
+       * Format: date
+       * @description Tarrif - Tarrif date
+       * @example 2020-02-03
+       */
       tariffDate?: string
-      /** Format: date */
-      rotl?: string
-      /** Format: date */
-      ersed?: string
+      /**
+       * Format: date
+       * @description Tarrif Expiry date
+       * @example 2020-02-03
+       */
+      tariffExpiredRemovalSchemeEligibilityDate?: string
+      /**
+       * Format: date
+       * @description APD - Approved Parole date
+       * @example 2020-02-03
+       */
+      approvedParoleDate?: string
+      /**
+       * Format: date
+       * @description ROTL - Release on Temporary Licence
+       * @example 2020-02-03
+       */
+      releaseOnTemporaryLicenceDate?: string
+      /**
+       * @description Judicially imposed length in the format 00 years/00 months/00 days. Will default to 'sentenceLength'
+       * @example 11/00/00
+       */
+      judiciallyImposedSentenceLength?: string
+      /**
+       * @description Comments for the given calculation
+       * @example Calculated for new sentence
+       */
+      comment?: string
+      /**
+       * @description The reason code for the calculation
+       * @example NEW
+       */
+      reasonCode?: string
+      /**
+       * @description The date and time the calculation was recorded
+       * @example 2021-07-05T10:35:17
+       */
+      calculatedAt?: string
+    }
+    /** @description Offender Sentence Calculation Summary */
+    SentenceCalculationSummary: {
+      /** Format: int64 */
+      bookingId: number
+      offenderNo: string
+      firstName?: string
+      lastName: string
+      agencyLocationId: string
+      agencyDescription: string
+      /** Format: int64 */
+      offenderSentCalculationId: number
+      /** @example 2021-07-05T10:35:17 */
+      calculationDate: string
+      /** Format: int64 */
+      staffId?: number
       commentText?: string
+      calculationReason: string
+      calculatedByUserId: string
     }
     /** @description AssessmentSummary */
     AssessmentSummary: {
@@ -9326,14 +9451,14 @@ export interface components {
       totalElements?: number
       /** Format: int32 */
       totalPages?: number
-      first?: boolean
-      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['OffenceDto'][]
       /** Format: int32 */
       number?: number
-      sort?: components['schemas']['SortObject']
+      sort?: components['schemas']['SortObject'][]
+      first?: boolean
+      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
@@ -10103,14 +10228,14 @@ export interface components {
       totalElements?: number
       /** Format: int32 */
       totalPages?: number
-      first?: boolean
-      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Education'][]
       /** Format: int32 */
       number?: number
-      sort?: components['schemas']['SortObject']
+      sort?: components['schemas']['SortObject'][]
+      first?: boolean
+      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
@@ -10329,14 +10454,14 @@ export interface components {
       totalElements?: number
       /** Format: int32 */
       totalPages?: number
-      first?: boolean
-      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['VisitWithVisitors'][]
       /** Format: int32 */
       number?: number
-      sort?: components['schemas']['SortObject']
+      sort?: components['schemas']['SortObject'][]
+      first?: boolean
+      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
@@ -10699,14 +10824,14 @@ export interface components {
       totalElements?: number
       /** Format: int32 */
       totalPages?: number
-      first?: boolean
-      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['BedAssignment'][]
       /** Format: int32 */
       number?: number
-      sort?: components['schemas']['SortObject']
+      sort?: components['schemas']['SortObject'][]
+      first?: boolean
+      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
@@ -10757,14 +10882,14 @@ export interface components {
       totalElements?: number
       /** Format: int32 */
       totalPages?: number
-      first?: boolean
-      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Alert'][]
       /** Format: int32 */
       number?: number
-      sort?: components['schemas']['SortObject']
+      sort?: components['schemas']['SortObject'][]
+      first?: boolean
+      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
@@ -10775,14 +10900,14 @@ export interface components {
       totalElements?: number
       /** Format: int32 */
       totalPages?: number
-      first?: boolean
-      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['PrisonerBookingSummary'][]
       /** Format: int32 */
       number?: number
-      sort?: components['schemas']['SortObject']
+      sort?: components['schemas']['SortObject'][]
+      first?: boolean
+      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
@@ -14071,7 +14196,7 @@ export interface operations {
       /** @description Offender key dates found */
       200: {
         content: {
-          'application/json': components['schemas']['SentenceCalcDates']
+          'application/json': components['schemas']['OffenderCalculatedKeyDates']
         }
       }
       /** @description Invalid request. */
@@ -18769,7 +18894,7 @@ export interface operations {
       /** @description Offender calculations found */
       200: {
         content: {
-          'application/json': components['schemas']['OffenderSentenceCalculation']
+          'application/json': components['schemas']['SentenceCalculationSummary'][]
         }
       }
       /** @description Invalid request. */
@@ -20013,6 +20138,41 @@ export interface operations {
       200: {
         content: {
           'application/json': components['schemas']['CourtEventDetails']
+        }
+      }
+      /** @description Invalid request. */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Requested resource not found. */
+      404: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unrecoverable error occurred whilst processing request. */
+      500: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  /** Returns the number of active court cases for the passed in bookingId */
+  getCountOfActiveCourtCases: {
+    parameters: {
+      path: {
+        /** @description The bookingId to check court cases against */
+        bookingId: number
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          'application/json': number
         }
       }
       /** @description Invalid request. */

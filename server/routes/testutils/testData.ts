@@ -10,6 +10,7 @@ import {
   SessionSchedule,
   Visit,
   VisitHistoryDetails,
+  VisitPreview,
   VisitSession,
   VisitSummary,
 } from '../../data/orchestrationApiTypes'
@@ -324,7 +325,7 @@ export default class TestData {
     ({ open, closed }) as SessionCapacity
 
   static sessionSchedule = ({
-    sessionTemplateReference = '1',
+    sessionTemplateReference = '-afe.dcc.0f',
     sessionTimeSlot = {
       startTime: '13:45',
       endTime: '15:45',
@@ -464,6 +465,22 @@ export default class TestData {
   }: Partial<VisitHistoryDetails> = {}): VisitHistoryDetails => ({
     eventsAudit,
     visit,
+  })
+
+  static visitPreview = ({
+    prisonerId = 'A1234BC',
+    firstName = 'JOHN',
+    lastName = 'SMITH',
+    visitReference = 'ab-cd-ef-gh',
+    visitorCount = 2,
+    visitTimeSlot = { startTime: '13:45', endTime: '15:45' },
+  }: Partial<VisitPreview> = {}): VisitPreview => ({
+    prisonerId,
+    firstName,
+    lastName,
+    visitReference,
+    visitorCount,
+    visitTimeSlot,
   })
 
   static visitSession = ({

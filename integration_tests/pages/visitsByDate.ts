@@ -9,23 +9,25 @@ export default class VisitsByDatePage extends Page {
     })
   }
 
-  today = (): PageElement => cy.get(':nth-child(1) > .moj-sub-navigation__link')
+  dateTabsToday = (): PageElement => cy.get(':nth-child(1) > .moj-sub-navigation__link')
 
-  tomorrow = (): PageElement => cy.get(':nth-child(2) > .moj-sub-navigation__link')
+  dateTabsTomorrow = (): PageElement => cy.get(':nth-child(2) > .moj-sub-navigation__link')
+
+  activeSessionNavLink = (): PageElement => cy.get('.moj-side-navigation__item--active > a')
+
+  selectSessionNavItem = (index: number): void => {
+    cy.get('.moj-side-navigation__item a').eq(index).click()
+  }
+
+  visitSessionHeading = (): PageElement => cy.get('[data-test="visit-session-heading"]')
 
   tablesBookedCount = (): PageElement => cy.get('[data-test="visit-tables-booked"]')
 
   visitorsTotalCount = (): PageElement => cy.get('[data-test="visit-visitors-total"]')
 
-  prisonerRowOneName = (): PageElement => cy.get(':nth-child(1) > [data-test="prisoner-name"]')
+  prisonerName = (index: number): PageElement => cy.get(`:nth-child(${index}) > [data-test="prisoner-name"]`)
 
-  prisonerRowOneNumber = (): PageElement => cy.get(':nth-child(1) > [data-test="prisoner-number"]')
-
-  prisonerRowTwoName = (): PageElement => cy.get(':nth-child(2) > [data-test="prisoner-name"]')
-
-  prisonerRowTwoNumber = (): PageElement => cy.get(':nth-child(2) > [data-test="prisoner-number"]')
-
-  visitType = (): PageElement => cy.get('[data-test="visit-room"]')
+  prisonerNumber = (index: number): PageElement => cy.get(`:nth-child(${index}) > [data-test="prisoner-number"]`)
 
   noResultsMessage = (): PageElement => cy.get('#search-results-none')
 

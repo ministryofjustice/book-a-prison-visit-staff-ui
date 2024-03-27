@@ -2,6 +2,9 @@ import fs from 'fs'
 import * as cheerio from 'cheerio'
 import nunjucks, { Template } from 'nunjucks'
 import { registerNunjucks } from '../../../utils/nunjucksSetup'
+import TestData from '../../../routes/testutils/testData'
+import { VisitsPageSideNav } from '../../../@types/bapv'
+import { VisitPreview } from '../../../data/orchestrationApiTypes'
 
 const template = fs.readFileSync('server/views/pages/visits/summary.njk')
 
@@ -16,140 +19,146 @@ describe('Views - Visits summary', () => {
     viewContext = {}
   })
 
-  it('should display message and no table when no visits', () => {
-    viewContext = {}
+  it('should display three date tabs with one tab selected', () => {
+    const dateTabs = [
+      {
+        text: 'Friday 2 February 2024',
+        href: '/visits?selectedDate=2024-02-02&firstTabDate=2024-02-02',
+        active: true,
+      },
+      {
+        text: 'Saturday 3 February 2024',
+        href: '/visits?selectedDate=2024-02-03&firstTabDate=2024-02-02',
+        active: false,
+      },
+      {
+        text: 'Sunday 4 February 2024',
+        href: '/visits?selectedDate=2024-02-04&firstTabDate=2024-02-02',
+        active: false,
+      },
+    ]
+
+    viewContext = { dateTabs }
+
     const $ = cheerio.load(compiledTemplate.render(viewContext))
+
+    expect($('.moj-sub-navigation__link').length).toBe(3)
+    expect($('.moj-sub-navigation__link').eq(0).text()).toBe(dateTabs[0].text)
+    expect($('.moj-sub-navigation__link').eq(0).attr('href')).toBe(dateTabs[0].href)
+    expect($('.moj-sub-navigation__link').eq(0).attr('aria-current')).toBe('page')
+
+    expect($('.moj-sub-navigation__link').eq(1).text()).toBe(dateTabs[1].text)
+    expect($('.moj-sub-navigation__link').eq(1).attr('href')).toBe(dateTabs[1].href)
+    expect($('.moj-sub-navigation__link').eq(1).attr('aria-current')).toBe(undefined)
+
+    expect($('.moj-sub-navigation__link').eq(2).text()).toBe(dateTabs[2].text)
+    expect($('.moj-sub-navigation__link').eq(2).attr('href')).toBe(dateTabs[2].href)
+    expect($('.moj-sub-navigation__link').eq(2).attr('aria-current')).toBe(undefined)
+  })
+
+  it('should display message and no side-nav or table when no visits and no session schedule', () => {
+    viewContext = {}
+
+    const $ = cheerio.load(compiledTemplate.render(viewContext))
+
+    expect($('.moj-side-navigation').length).toBe(0)
     expect($('#search-results-none').text()).toContain('No visit sessions on this day.')
     expect($('.bapv-table').length).toBe(0)
   })
 
-  it('should display side menu, visit room, time, visitor and table totals and list of prisoners in visit slot', () => {
-    viewContext = {
-      totals: {
-        visitors: 11,
-        adults: 4,
-        children: 7,
-      },
-      slotsNav: [
+  it('should display side-nav and session heading when session schedule set but no visits', () => {
+    const sessionsSideNav: VisitsPageSideNav = {
+      open: [
         {
-          heading: {
-            text: 'Open visits',
-            classes: 'govuk-!-padding-top-0',
-          },
-          items: [
-            {
-              text: '10am to 11am',
-              href: '/visits?selectedDate=2022-05-23&time=10am to 11am&type=OPEN',
-              active: true,
-            },
-          ],
+          times: '10am to 11am',
+          reference: 'ref-1',
+          capacity: 20,
+          queryParams: 'query-1',
+          active: true,
         },
       ],
-      results: [
-        [
-          {
-            text: 'Rocky, Asap',
-            attributes: {
-              'data-test': 'prisoner-name',
-            },
-          },
-          {
-            text: 'A8709DY',
-            attributes: {
-              'data-test': 'prisoner-number',
-            },
-          },
-          {
-            html: '<a href="" class="bapv-result-row">View</a>',
-            classes: 'govuk-!-text-align-right',
-          },
-        ],
+      closed: [
+        {
+          times: '2pm to 3pm',
+          reference: 'ref-2',
+          capacity: 10,
+          queryParams: 'query-2',
+          active: false,
+        },
       ],
-      visitType: 'OPEN',
-      capacity: 5,
-      slotTime: '9am to 10am',
-      next: 1,
-      previous: 1,
-      numberOfResults: 2,
-      pageSize: 10,
-      from: 1,
-      to: 10,
-      pageLinks: '',
     }
+
+    const selectedSessionTemplate = {
+      sessionReference: 'ref-1',
+      type: 'OPEN',
+      times: '10am to 11am',
+      capacity: 20,
+    }
+    const queryParamsForBackLink = 'back-link-query'
+    const visits: VisitPreview[] = []
+    const visitorsTotal = 0
+
+    viewContext = {
+      selectedSessionTemplate,
+      sessionsSideNav,
+      queryParamsForBackLink,
+      visits,
+      visitorsTotal,
+    }
+
     const $ = cheerio.load(compiledTemplate.render(viewContext))
 
-    expect($('[data-test="visit-room"]').text()).toBe('Open')
-    expect($('[data-test="visit-time"]').text()).toBe('9am to 10am')
-    expect($('[data-test="visit-tables-booked"]').text().trim()).toBe('2 of 5 tables booked')
-    expect($('[data-test="visit-visitors-total"]').text()).toBe('11 visitors')
-    expect($('[data-test="prisoner-number"]').text()).toBe('A8709DY')
-    expect($('[data-test="prisoner-name"]').text()).toBe('Rocky, Asap')
-    expect($('.moj-side-navigation__title').text()).toContain('Open visits')
-    expect($('.moj-side-navigation__item--active').text()).toContain('10am to 11am')
+    expect($('.moj-side-navigation h4').eq(0).text()).toBe('Open visits')
+    expect($('.moj-side-navigation ul').eq(0).find('a').text()).toBe('10am to 11am')
+    expect($('.moj-side-navigation ul').eq(0).find('a').first().attr('href')).toBe('/visits?query-1')
+    expect($('.moj-side-navigation__item--active a').attr('href')).toBe('/visits?query-1')
+
+    expect($('.moj-side-navigation h4').eq(1).text()).toBe('Closed visits')
+    expect($('.moj-side-navigation ul').eq(1).find('a').first().text()).toBe('2pm to 3pm')
+    expect($('.moj-side-navigation ul').eq(1).find('a').first().attr('href')).toBe('/visits?query-2')
+
+    expect($('[data-test="visit-session-heading"]').text().trim()).toBe('Open visits, 10am to 11am')
+    expect($('[data-test="visit-tables-booked"]').text().trim()).toBe('0 of 20 tables booked')
+    expect($('[data-test="visit-visitors-total"]').length).toBe(0)
+
+    expect($('#search-results-none').length).toBe(0)
   })
 
-  it('should display side menu, unknown visit type, time, visitor and table totals and list of prisoners in visit slot', () => {
-    viewContext = {
-      totals: {
-        visitors: 11,
-        adults: 4,
-        children: 7,
-      },
-      slotsNav: [
+  it('should display visits table', () => {
+    const sessionsSideNav: VisitsPageSideNav = {
+      open: [
         {
-          heading: {
-            text: 'Visit type unknown',
-            classes: 'govuk-!-padding-top-0',
-          },
-          items: [
-            {
-              text: '10am to 11am',
-              href: '/visits?selectedDate=2022-05-23&time=10am to 11am&type=OPEN',
-              active: true,
-            },
-          ],
+          times: '10am to 11am',
+          reference: 'ref-1',
+          capacity: 20,
+          queryParams: 'query-1',
+          active: true,
         },
       ],
-      results: [
-        [
-          {
-            text: 'Rocky, Asap',
-            attributes: {
-              'data-test': 'prisoner-name',
-            },
-          },
-          {
-            text: 'A8709DY',
-            attributes: {
-              'data-test': 'prisoner-number',
-            },
-          },
-          {
-            html: '<a href="" class="bapv-result-row">View</a>',
-            classes: 'govuk-!-text-align-right',
-          },
-        ],
-      ],
-      visitType: 'UNKNOWN',
-      capacity: 5,
-      slotTime: '9am to 10am',
-      next: 1,
-      previous: 1,
-      numberOfResults: 2,
-      pageSize: 10,
-      from: 1,
-      to: 10,
-      pageLinks: '',
     }
+
+    const selectedSessionTemplate = {
+      sessionReference: 'ref-1',
+      type: 'OPEN',
+      times: '10am to 11am',
+      capacity: 20,
+    }
+    const queryParamsForBackLink = 'back-link-query'
+    const visits = [TestData.visitPreview()]
+    const visitorsTotal = 2
+
+    viewContext = { selectedSessionTemplate, sessionsSideNav, queryParamsForBackLink, visits, visitorsTotal }
+
     const $ = cheerio.load(compiledTemplate.render(viewContext))
 
-    expect($('[data-test="visit-room"]').text()).toBe('Visit type unknown')
-    expect($('[data-test="visit-time"]').text()).toBe('9am to 10am')
-    expect($('[data-test="visit-tables-booked"]').text().trim()).toBe('2 of 5 tables booked')
-    expect($('[data-test="visit-visitors-total"]').text()).toBe('11 visitors')
-    expect($('[data-test="prisoner-number"]').text()).toBe('A8709DY')
-    expect($('[data-test="prisoner-name"]').text()).toBe('Rocky, Asap')
-    expect($('.moj-side-navigation__title').text()).toContain('Visit type unknown')
-    expect($('.moj-side-navigation__item--active').text()).toContain('10am to 11am')
+    expect($('[data-test="visit-session-heading"]').text().trim()).toBe('Open visits, 10am to 11am')
+    expect($('[data-test="visit-tables-booked"]').text().trim()).toBe('1 of 20 tables booked')
+    expect($('[data-test="visit-visitors-total"]').text().trim()).toBe('2 visitors')
+
+    expect($('[data-test="prisoner-name"]').eq(0).text().trim()).toBe('Smith, John')
+    expect($('[data-test="prisoner-number"]').eq(0).text().trim()).toBe('A1234BC')
+    expect($('[data-test="view-visit-link"]').eq(0).attr('href')).toBe('/visit/ab-cd-ef-gh?back-link-query')
+
+    expect($('#search-results-none').length).toBe(0)
   })
 })

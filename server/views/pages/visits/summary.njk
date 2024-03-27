@@ -3,7 +3,6 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 {%- from "moj/components/side-navigation/macro.njk" import mojSideNavigation -%}
-{% from "moj/components/pagination/macro.njk" import mojPagination %}
 {%- from "moj/components/sub-navigation/macro.njk" import mojSubNavigation -%}
 {% from 'components/datepicker/macro.njk' import hmppsDatepicker %}
 
@@ -70,99 +69,99 @@
     </div>
   </div>
   <div class="govuk-grid-row">
-    {% if results | length %}
+
+    {% set selectedTimeSlotLabel = "" %}
+    {% if sessionsSideNav | length %}
       <div class="govuk-grid-column-one-quarter">
+        {# build side nav time slot nav for open/closed sections #}
+        {% set sessionSideNavSections = [] %}
+        {% for heading, items in sessionsSideNav %}
+          {% set sectionItems = [] %}
+          {% for item in items %}
+            {% set sectionItems = (sectionItems.push({
+                text: item.times,
+                href: "/visits?" + item.queryParams,
+                active: item.active
+              }), sectionItems) %}
+              {% set selectedTimeSlotLabel = item.times if item.active else selectedTimeSlotLabel %}
+          {% endfor %}
+          {% set sessionSideNavSections = (sessionSideNavSections.push({
+            heading: {
+              text: ("all" if heading == "unknown" else heading) | capitalize + " visits",
+              classes: "govuk-!-padding-top-0"
+            },
+            items: sectionItems
+          }), sessionSideNavSections) %}
+        {% endfor %}
+
         {{ mojSideNavigation({
-        label: 'Slots navigation',
-        classes: 'govuk-!-padding-top-0',
-        sections: slotsNav
-        }) }}
-      {# NOTE: VB-1186: These links currently have no functionality so are being hidden, they will be added back in as functionality is added
-
-      <h3 class="govuk-heading-s">Visitor list</h3>
-      <div class="govuk-button-group">
-        {{ govukButton({
-            text: "Download CSV",
-            preventDoubleClick: true
-        }) }}
-        {{ govukButton({
-            text: "Print",
-            classes: "govuk-button--secondary",
-            preventDoubleClick: true
+          label: 'Slots navigation',
+          classes: 'govuk-!-padding-top-0',
+          sections: sessionSideNavSections
         }) }}
       </div>
-
-      <h3 class="govuk-heading-s">Prisoner list</h3>
-      <div class="govuk-button-group">
-        {{ govukButton({
-            text: "Download CSV",
-            preventDoubleClick: true
-        }) }}
-        {{ govukButton({
-            text: "Print",
-            classes: "govuk-button--secondary",
-            preventDoubleClick: true
-        }) }}
-      </div>
-      #}
-    </div>
+    {% endif %}
 
     <div class="govuk-grid-column-three-quarters">
-      <h2 class="govuk-heading-m">
-        {% if visitType == 'UNKNOWN' %}
-        <span data-test="visit-room">Visit type unknown</span>,
-        {% else %}
-        <span data-test="visit-room">{{ visitType | capitalize }}</span> visits,
-        {% endif %}
-        <span data-test="visit-time">{{ slotTime }}</span>
-      </h2>
-      <p>
-        <span data-test="visit-tables-booked">
-        {% if capacity %}
-          {{ numberOfResults }} of {{ capacity }} {{ "table" | pluralise(capacity)}} booked
-        {% else %}
-          {{ numberOfResults }} {{ "table" | pluralise(numberOfResults)}} booked
-        {% endif %}
-        </span>
-      </p>
-      <p>
-        <span data-test="visit-visitors-total">{{ totals.visitors }} {{ "visitor" | pluralise(totals.visitors )}}</span>
-      </p>
-        {% set pagination %}
-          {{ mojPagination({
-            results: {
-              from: from,
-              to: to,
-              count: numberOfResults,
-              text: "result" | pluralise(numberOfResults)
+
+      {% if sessionsSideNav | length %}
+        <h2 class="govuk-heading-m" data-test="visit-session-heading">
+          {{ (selectedSessionTemplate.type or "all") | capitalize }} visits, {{ selectedTimeSlotLabel }}
+        </h2>
+
+        <p data-test="visit-tables-booked">
+          {{ visits | length }}{{ (" of " + selectedSessionTemplate.capacity) if selectedSessionTemplate.capacity }} {{ "table" | pluralise(selectedSessionTemplate.capacity or visits | length)}} booked
+        </p>
+      {% else %}
+        <p class="govuk-!-margin-top-0" id="search-results-none">
+          No visit sessions on this day.
+        </p>
+      {% endif %}
+
+      {% if visits | length %}
+        <p data-test="visit-visitors-total">
+          {{ visitorsTotal }} {{ "visitor" | pluralise(visitorsTotal) }}
+        </p>
+
+        {# <p>The list is ordered by booking date. The most recent booking is shown at the top of the list.</p> #}
+
+        {% set visitsRows = [] %}
+        {% for visit in visits %}
+          {% set visitsRows = (visitsRows.push([
+            {
+              text: visit.lastName | capitalize + ", " + visit.firstName | capitalize,
+              attributes: { "data-test": "prisoner-name" }
+            },
+            {
+              text: visit.prisonerId,
+              attributes: { "data-test": "prisoner-number" }
+            },
+            {
+              classes: "govuk-!-text-align-right",
+              html: '<a href="/visit/' + visit.visitReference + '?' + queryParamsForBackLink +
+                '" class="govuk-link--no-visited-state" data-test="view-visit-link">View</a>'
             }
-          }) }}
-        {% endset %}
+          ]), visitsRows) %}
+        {% endfor %}
         {{ govukTable({
           classes: "bapv-table govuk-!-margin-top-3",
           head: [
-              {
-                text: "Prisoner name"
-              },
-              {
-                text: "Prison number"
-              },
-              {
-                text: "Action",
-                classes: "govuk-!-text-align-right"
-              }
+            {
+              text: "Prisoner name"
+            },
+            {
+              text: "Prison number"
+            },
+            {
+              text: "Action",
+              classes: "govuk-!-text-align-right"
+            }
           ],
-          rows: results
+          rows: visitsRows
         }) }}
-        {{ pagination | safe }}
-      </div>
-    {% else %}
-      <div class="govuk-grid-column-full">
-        <p class="govuk-!-margin-top-0" id="search-results-none">No visit sessions on this day.</p>
-      </div>
-    {% endif %}
+      {% endif %}
+    </div>
   </div>
-
 {% endblock %}
 
 {% block pageScripts %}
