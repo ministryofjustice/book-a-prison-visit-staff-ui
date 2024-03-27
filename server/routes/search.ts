@@ -19,7 +19,7 @@ export default function routes({ auditService, prisonerSearchService, visitServi
       handlers.map(handler => asyncMiddleware(handler)),
     )
 
-  get(['/prisoner'], (req, res) => {
+  get('/prisoner', (req, res) => {
     const search = req?.body?.search
 
     res.render('pages/search/prisoner', {
@@ -29,7 +29,7 @@ export default function routes({ auditService, prisonerSearchService, visitServi
     })
   })
 
-  post(['/prisoner'], body('search').trim('. '), (req, res) => {
+  post('/prisoner', body('search').trim('. '), (req, res) => {
     const { search } = req.body
 
     return res.redirect(
@@ -42,7 +42,7 @@ export default function routes({ auditService, prisonerSearchService, visitServi
     )
   })
 
-  get(['/prisoner/results'], async (req, res) => {
+  get('/prisoner/results', async (req, res) => {
     const { prisonId } = req.session.selectedEstablishment
     const search = typeof req.query.search === 'string' ? req.query.search : ''
 
