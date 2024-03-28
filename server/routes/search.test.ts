@@ -230,12 +230,8 @@ describe('Prisoner search page', () => {
           .expect(302)
           .expect('location', '/search/prisoner/results?search=john%20smith')
       })
-    })
-  })
 
-  describe('for visit', () => {
-    describe('TEST POST /search/prisoner/results?search=A1234BC.   Mac full stop test', () => {
-      it('should remove full stop inserted by mac', () => {
+      it('should remove trailing full stop and whitespace', () => {
         // Given
         const dataToSend = {
           search: 'A1234BC. ',

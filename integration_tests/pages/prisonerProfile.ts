@@ -5,8 +5,6 @@ export default class PrisonerProfilePage extends Page {
     super(variableTitle)
   }
 
-  selectFirstVisit = (): PageElement => cy.get('[data-test="tab-visits-reference"] > a')
-
   flaggedAlerts = (): PageElement => cy.get('.flagged-alert')
 
   prisonNumber = (): PageElement => cy.get('[data-test="prison-number"]')
@@ -59,7 +57,7 @@ export default class PrisonerProfilePage extends Page {
 
   visitTabCaption = (index: number): PageElement => cy.get(`#visits caption:nth-of-type(${index})`)
 
-  visitTabReference = (): PageElement => cy.get('[data-test="tab-visits-reference"]')
+  visitTabReference = (): PageElement => cy.get('[data-test="tab-visits-reference"] a')
 
   visitTabType = (): PageElement => cy.get('[data-test="tab-visits-type"]')
 

@@ -138,7 +138,7 @@ context('Search for a booking by reference', () => {
     cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
     cy.task('stubGetVisitNotifications', { reference: visit.reference })
 
-    prisonerProfilePage.selectFirstVisit().click()
+    prisonerProfilePage.visitTabReference().eq(0).click()
 
     const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage)
 
