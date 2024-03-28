@@ -114,7 +114,7 @@ describe('Visit notifications service', () => {
         })
 
         const listItem: VisitsReviewListItem = {
-          actionUrl: `/visit/${notificationGroup.affectedVisits[0].bookingReference}?fromPage=review`,
+          actionUrl: `/visit/${notificationGroup.affectedVisits[0].bookingReference}?from=review`,
           bookedByNames: ['User One'],
           prisonerNumbers: ['A1234BC'],
           reference: notificationGroup.reference,
@@ -183,7 +183,7 @@ describe('Visit notifications service', () => {
             visitDates: ['1 November 2023'],
           },
           {
-            actionUrl: `/visit/${notificationGroups[1].affectedVisits[0].bookingReference}?fromPage=review`,
+            actionUrl: `/visit/${notificationGroups[1].affectedVisits[0].bookingReference}?from=review`,
             bookedByNames: ['User Two'],
             prisonerNumbers: ['A1234BC'],
             reference: notificationGroups[1].reference,
@@ -191,7 +191,7 @@ describe('Visit notifications service', () => {
             visitDates: ['1 November 2023'],
           },
           {
-            actionUrl: `/visit/${notificationGroups[2].affectedVisits[0].bookingReference}?fromPage=review`,
+            actionUrl: `/visit/${notificationGroups[2].affectedVisits[0].bookingReference}?from=review`,
             bookedByNames: ['User Three'],
             prisonerNumbers: ['A1234BC'],
             reference: notificationGroups[2].reference,
@@ -215,7 +215,7 @@ describe('Visit notifications service', () => {
 
         const listItems: VisitsReviewListItem[] = [
           {
-            actionUrl: `/visit/${notificationGroups[1].affectedVisits[0].bookingReference}?fromPage=review`,
+            actionUrl: `/visit/${notificationGroups[1].affectedVisits[0].bookingReference}?from=review`,
             bookedByNames: ['User Two'],
             prisonerNumbers: ['A1234BC'],
             reference: notificationGroups[1].reference,

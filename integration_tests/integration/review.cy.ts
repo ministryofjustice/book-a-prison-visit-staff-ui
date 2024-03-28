@@ -88,7 +88,7 @@ context('Bookings review page', () => {
     listingPage.getType(2).contains(notificationTypes[notificationGroups[1].type])
     listingPage
       .getActionLink(2)
-      .should('have.attr', 'href', `/visit/${notificationGroups[1].affectedVisits[0].bookingReference}?fromPage=review`)
+      .should('have.attr', 'href', `/visit/${notificationGroups[1].affectedVisits[0].bookingReference}?from=review`)
 
     // Visit type changed
     listingPage.getPrisonerNumber(3).contains(notificationGroups[2].affectedVisits[0].prisonerNumber)
@@ -99,7 +99,7 @@ context('Bookings review page', () => {
     listingPage.getType(3).contains(notificationTypes[notificationGroups[2].type])
     listingPage
       .getActionLink(3)
-      .should('have.attr', 'href', `/visit/${notificationGroups[2].affectedVisits[0].bookingReference}?fromPage=review`)
+      .should('have.attr', 'href', `/visit/${notificationGroups[2].affectedVisits[0].bookingReference}?from=review`)
 
     // Visits blocked for date
     listingPage.getPrisonerNumber(4).contains(notificationGroups[3].affectedVisits[0].prisonerNumber)
@@ -110,7 +110,7 @@ context('Bookings review page', () => {
     listingPage.getType(4).contains(notificationTypes[notificationGroups[3].type])
     listingPage
       .getActionLink(4)
-      .should('have.attr', 'href', `/visit/${notificationGroups[3].affectedVisits[0].bookingReference}?fromPage=review`)
+      .should('have.attr', 'href', `/visit/${notificationGroups[3].affectedVisits[0].bookingReference}?from=review`)
   })
 
   it('should filter bookings review listing', () => {

@@ -232,7 +232,7 @@ describe('Prisoner search page', () => {
       })
     })
   })
-  // TODO some missing tests for /search/visit to put back - including checking for data-test="search-by-prisoner"
+
   describe('for visit', () => {
     describe('TEST POST /search/prisoner/results?search=A1234BC.   Mac full stop test', () => {
       it('should remove full stop inserted by mac', () => {
@@ -271,6 +271,7 @@ describe('Booking search page', () => {
           const $ = cheerio.load(res.text)
           expect(res.text).toContain('Search for a booking')
           expect($('[data-test="change-establishment"]').text()).toContain('Change establishment')
+          expect($('[data-test=search-by-prisoner]').length).toBe(1)
         })
     })
   })
@@ -286,8 +287,10 @@ describe('Booking search page', () => {
         .get('/search/visit/results?searchBlock1=ab&searchBlock2=bc&searchBlock3=cd&searchBlock4=de')
         .expect('Content-Type', /html/)
         .expect(res => {
+          const $ = cheerio.load(res.text)
           expect(res.text).toContain('Search for a booking')
           expect(res.text).toContain('id="search-results-none"')
+          expect($('[data-test=search-by-prisoner]').length).toBe(1)
           expect(visitService.getVisit).toHaveBeenCalledWith({
             reference: 'ab-bc-cd-de',
             username: 'user1',
@@ -312,8 +315,10 @@ describe('Booking search page', () => {
         .get('/search/visit/results?searchBlock1=ab&searchBlock2=bc&searchBlock3=cd&searchBlock4=de')
         .expect('Content-Type', /html/)
         .expect(res => {
+          const $ = cheerio.load(res.text)
           expect(res.text).toContain('Search for a booking')
           expect(res.text).toContain('id="search-results-true"')
+          expect($('[data-test=search-by-prisoner]').length).toBe(0)
           expect(visitService.getVisit).toHaveBeenCalledWith({
             reference: 'ab-bc-cd-de',
             username: 'user1',
@@ -343,8 +348,10 @@ describe('Booking search page', () => {
         .get('/search/visit/results?searchBlock1=ab&searchBlock2=bc&searchBlock3=cd&searchBlock4=de')
         .expect('Content-Type', /html/)
         .expect(res => {
+          const $ = cheerio.load(res.text)
           expect(res.text).toContain('Search for a booking')
           expect(res.text).toContain('id="search-results-none"')
+          expect($('[data-test=search-by-prisoner]').length).toBe(1)
           expect(visitService.getVisit).toHaveBeenCalledWith({
             reference: 'ab-bc-cd-de',
             username: 'user1',

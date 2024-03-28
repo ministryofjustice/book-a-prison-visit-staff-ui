@@ -78,7 +78,7 @@ export default class VisitNotificationsService {
     const actionUrl =
       notificationGroup.type === 'NON_ASSOCIATION_EVENT'
         ? `/review/non-association/${notificationGroup.reference}`
-        : `/visit/${notificationGroup.affectedVisits[0].bookingReference}?fromPage=review`
+        : `/visit/${notificationGroup.affectedVisits[0].bookingReference}?from=review`
 
     const prisonerNumbers =
       notificationGroup.type === 'NON_ASSOCIATION_EVENT'

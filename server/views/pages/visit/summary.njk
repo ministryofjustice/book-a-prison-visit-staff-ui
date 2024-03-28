@@ -22,9 +22,7 @@
 {% set pageTitle = applicationName + " - " + pageHeaderTitle + " - " + visit.reference %}
 
 {% if prisoner %}
-  {% if fromPage == 'upcoming-visits' %}
-    {% set backLinkHref = "/prisoner/" + visit.prisonerId + "/visits?search=" + visit.prisonerId %}
-  {% elseif fromPage == 'visit-search' %}
+  {% if fromPage == 'visit-search' %}
     {% set backLinkHref = "/search/visit/results?" + fromPageQuery %}
   {% elseif fromPage == 'visits' %}
     {% set backLinkHref = "/visits?" + fromPageQuery %}

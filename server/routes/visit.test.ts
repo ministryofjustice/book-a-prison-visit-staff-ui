@@ -276,21 +276,6 @@ describe('/visit/:reference', () => {
           })
       })
 
-      it('should render booking summary page with correct back link when coming from visit search page', () => {
-        const url = '/visit/ab-cd-ef-gh?from=upcoming-visits'
-
-        return request(app)
-          .get(url)
-          .expect(200)
-          .expect('Content-Type', /html/)
-          .expect(res => {
-            const $ = cheerio.load(res.text)
-            expect($('h1').text()).toBe('Visit booking details')
-            expect($('.govuk-back-link').attr('href')).toBe('/prisoner/A1234BC/visits?search=A1234BC')
-            expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
-          })
-      })
-
       it('should render booking summary page with correct back link when coming from view visits by date page', () => {
         const url =
           '/visit/ab-cd-ef-gh?query=type%3DOPEN%26sessionReference%3D-afe.dcc.0f%26selectedDate%3D2024-02-01%26firstTabDate%3D2024-02-01&from=visits'

@@ -126,7 +126,7 @@ export default function routes({
   post('/:reference', async (req, res) => {
     const reference = getVisitReference(req)
 
-    // @TODO - not really using full visit details here so could request less information
+    // TODO - not really using full visit details here so could request less information
     const {
       visitHistoryDetails: { visit },
     } = await visitService.getFullVisitDetails({
