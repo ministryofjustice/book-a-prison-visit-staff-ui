@@ -287,46 +287,6 @@ describe('Visit service', () => {
       })
     })
 
-    describe('getFutureVisits', () => {
-      it('should return an array of upcoming VisitInformation for an offender', async () => {
-        const visits: Visit[] = [visit]
-
-        orchestrationApiClient.getFutureVisits.mockResolvedValue(visits)
-        const result = await visitService.getFutureVisits({
-          username: 'user',
-          prisonerId: 'A1234BC',
-        })
-
-        expect(orchestrationApiClient.getFutureVisits).toHaveBeenCalledTimes(1)
-        expect(orchestrationApiClient.getFutureVisits).toHaveBeenCalledWith('A1234BC')
-        expect(result).toEqual(<VisitInformation[]>[
-          {
-            reference: 'ab-cd-ef-gh',
-            prisonNumber: 'A1234BC',
-            prisonerName: '',
-            mainContact: 'Jeanette Smith',
-            visitDate: '14 January 2022',
-            visitTime: '10am to 11am',
-            visitStatus: 'BOOKED',
-          },
-        ])
-      })
-
-      it('should return an empty array for an offender with no upcoming visits', async () => {
-        const visits: Visit[] = []
-
-        orchestrationApiClient.getFutureVisits.mockResolvedValue(visits)
-        const result = await visitService.getFutureVisits({
-          username: 'user',
-          prisonerId: 'A1234BC',
-        })
-
-        expect(orchestrationApiClient.getFutureVisits).toHaveBeenCalledTimes(1)
-        expect(orchestrationApiClient.getFutureVisits).toHaveBeenCalledWith('A1234BC')
-        expect(result).toEqual([])
-      })
-    })
-
     describe('getVisitsBySessionTemplate', () => {
       it('should return visit previews for given session template reference, date, prison and restriction', async () => {
         const reference = 'v9d.7ed.7u'

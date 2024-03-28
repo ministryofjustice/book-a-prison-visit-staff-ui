@@ -56,6 +56,7 @@ describe('Prisoner search page', () => {
             const $ = cheerio.load(res.text)
             expect(res.text).toContain('Search for a prisoner')
             expect($('[data-test="change-establishment"]').text()).toContain('Change establishment')
+            expect($('[data-test=search-by-reference]').length).toBe(1)
           })
       })
     })
@@ -80,6 +81,7 @@ describe('Prisoner search page', () => {
             const $ = cheerio.load(res.text)
             expect(res.text).toContain('Search for a prisoner')
             expect($('#search-results-none').text()).toBe('custom not found message')
+            expect($('[data-test=search-by-reference]').length).toBe(1)
             expect(auditService.prisonerSearch).toHaveBeenCalledWith({
               searchTerms: 'A1234BC',
               prisonId,
@@ -102,6 +104,7 @@ describe('Prisoner search page', () => {
             expect($('#search-results-none').text()).toBe(
               'There are no results for this name or number at Hewell (HMP).',
             )
+            expect($('[data-test=search-by-reference]').length).toBe(1)
             expect(auditService.prisonerSearch).toHaveBeenCalledWith({
               searchTerms: 'prisoner-name',
               prisonId,
@@ -130,8 +133,10 @@ describe('Prisoner search page', () => {
           .get('/search/prisoner/results?search=')
           .expect('Content-Type', /html/)
           .expect(res => {
+            const $ = cheerio.load(res.text)
             expect(res.text).toContain('Search for a prisoner')
             expect(res.text).toContain('You must enter at least 2 characters')
+            expect($('[data-test=search-by-reference]').length).toBe(1)
             expect(auditService.prisonerSearch).not.toHaveBeenCalled()
             expect(prisonerSearchService.getPrisoners).not.toHaveBeenCalled()
           })
@@ -156,8 +161,10 @@ describe('Prisoner search page', () => {
           .get('/search/prisoner/results?search=A1234BC')
           .expect('Content-Type', /html/)
           .expect(res => {
+            const $ = cheerio.load(res.text)
             expect(res.text).toContain('Search for a prisoner')
             expect(res.text).toContain('id="search-results-true"')
+            expect($('[data-test=search-by-reference]').length).toBe(0)
             expect(auditService.prisonerSearch).toHaveBeenCalledWith({
               searchTerms: 'A1234BC',
               prisonId,
@@ -195,9 +202,11 @@ describe('Prisoner search page', () => {
           .get('/search/prisoner/results?search=A1234BC')
           .expect('Content-Type', /html/)
           .expect(res => {
+            const $ = cheerio.load(res.text)
             expect(res.text).toContain('Search for a prisoner')
             expect(res.text).toContain('id="search-results-true"')
             expect(res.text).toContain('<p class="moj-pagination__results">')
+            expect($('[data-test=search-by-reference]').length).toBe(0)
             expect(auditService.prisonerSearch).toHaveBeenCalledWith({
               searchTerms: 'A1234BC',
               prisonId,
@@ -221,159 +230,8 @@ describe('Prisoner search page', () => {
           .expect(302)
           .expect('location', '/search/prisoner/results?search=john%20smith')
       })
-    })
-  })
 
-  describe('for visit', () => {
-    describe('GET /search/prisoner-visit', () => {
-      it('should render prisoner search page', () => {
-        return request(app)
-          .get('/search/prisoner-visit')
-          .expect('Content-Type', /html/)
-          .expect(res => {
-            expect(res.text).toContain('Search for a prisoner')
-          })
-      })
-    })
-
-    describe('GET /search/prisoner-visit/results?search=A1234BC', () => {
-      it('should render prisoner results page with no results', () => {
-        getPrisonersReturnData = {
-          results: [],
-          numberOfResults: 0,
-          numberOfPages: 0,
-          next: 0,
-          previous: 0,
-        }
-
-        const mockGetPrisoners = prisonerSearchService.getPrisoners.mockResolvedValue(getPrisonersReturnData)
-
-        return request(app)
-          .get('/search/prisoner-visit/results?search=A1234BC')
-          .expect('Content-Type', /html/)
-          .expect(res => {
-            expect(res.text).toContain('Search for a prisoner')
-            expect(res.text).toContain('id="search-results-none"')
-            expect(mockGetPrisoners).toHaveBeenCalledWith('A1234BC', prisonId, 'user1', 1, true)
-          })
-      })
-    })
-
-    describe('GET /search/prisoner-visit/results?search=A1234BC', () => {
-      it('should render prisoner results page with results and no next/prev when there are less than 11 results', () => {
-        getPrisonersReturnData = {
-          results: [
-            [{ html: '<a href="/prisoner/A1234BC">Smith, John</a>' }, { html: 'A1234BC' }, { html: '2 April 1975' }],
-          ],
-          numberOfPages: 1,
-          numberOfResults: 1,
-          next: 1,
-          previous: 1,
-        }
-
-        prisonerSearchService.getPrisoners.mockResolvedValue(getPrisonersReturnData)
-
-        return request(app)
-          .get('/search/prisoner-visit/results?search=A1234BC')
-          .expect('Content-Type', /html/)
-          .expect(res => {
-            expect(res.text).toContain('Search for a prisoner')
-            expect(res.text).toContain('id="search-results-true"')
-          })
-      })
-
-      it('should render prisoner results page with results and prev/next when there are more than 10 results', () => {
-        getPrisonersReturnData = {
-          results: [
-            [{ html: '<a href="/prisoner/A1234BC">Smith, John</a>' }, { html: 'A1234BC' }, { html: '2 April 1975' }],
-            [{ html: '<a href="/prisoner/A1234BC">Smith, John</a>' }, { html: 'A1234BC' }, { html: '2 April 1975' }],
-            [{ html: '<a href="/prisoner/A1234BC">Smith, John</a>' }, { html: 'A1234BC' }, { html: '2 April 1975' }],
-            [{ html: '<a href="/prisoner/A1234BC">Smith, John</a>' }, { html: 'A1234BC' }, { html: '2 April 1975' }],
-            [{ html: '<a href="/prisoner/A1234BC">Smith, John</a>' }, { html: 'A1234BC' }, { html: '2 April 1975' }],
-            [{ html: '<a href="/prisoner/A1234BC">Smith, John</a>' }, { html: 'A1234BC' }, { html: '2 April 1975' }],
-            [{ html: '<a href="/prisoner/A1234BC">Smith, John</a>' }, { html: 'A1234BC' }, { html: '2 April 1975' }],
-            [{ html: '<a href="/prisoner/A1234BC">Smith, John</a>' }, { html: 'A1234BC' }, { html: '2 April 1975' }],
-            [{ html: '<a href="/prisoner/A1234BC">Smith, John</a>' }, { html: 'A1234BC' }, { html: '2 April 1975' }],
-            [{ html: '<a href="/prisoner/A1234BC">Smith, John</a>' }, { html: 'A1234BC' }, { html: '2 April 1975' }],
-            [{ html: '<a href="/prisoner/A1234BC">Smith, John</a>' }, { html: 'A1234BC' }, { html: '2 April 1975' }],
-          ],
-          numberOfPages: 12,
-          numberOfResults: 11,
-          next: 2,
-          previous: 1,
-        }
-
-        prisonerSearchService.getPrisoners.mockResolvedValue(getPrisonersReturnData)
-
-        return request(app)
-          .get('/search/prisoner-visit/results?search=A1234BC')
-          .expect('Content-Type', /html/)
-          .expect(res => {
-            expect(res.text).toContain('Search for a prisoner')
-            expect(res.text).toContain('id="search-results-true"')
-            expect(res.text).toContain('<p class="moj-pagination__results">')
-          })
-      })
-
-      describe('GET /search/prisoner-visit/results?search=', () => {
-        it('should render prisoner results page with no results with no search term', () => {
-          getPrisonersReturnData = {
-            results: [],
-            numberOfResults: 0,
-            numberOfPages: 0,
-            next: 0,
-            previous: 0,
-          }
-
-          prisonerSearchService.getPrisoners.mockResolvedValue(getPrisonersReturnData)
-
-          return request(app)
-            .get('/search/prisoner-visit/results?search=')
-            .expect('Content-Type', /html/)
-            .expect(res => {
-              expect(res.text).toContain('Search for a prisoner')
-              expect(res.text).toContain('You must enter at least 2 characters')
-              expect(auditService.prisonerSearch).not.toHaveBeenCalled()
-              expect(prisonerSearchService.getPrisoners).not.toHaveBeenCalled()
-            })
-        })
-      })
-    })
-
-    describe('POST /search/prisoner-visit', () => {
-      it('should redirect to search results page with search query when no search term entered', () => {
-        return request(app)
-          .post('/search/prisoner-visit')
-          .expect(302)
-          .expect('location', '/search/prisoner-visit/results')
-      })
-
-      it('should redirect to search results page with trimmed query param when search term entered', () => {
-        return request(app)
-          .post('/search/prisoner-visit')
-          .send('search= john smith ')
-          .expect(302)
-          .expect('location', '/search/prisoner-visit/results?search=john%20smith')
-      })
-    })
-
-    describe('TEST POST /search/prisoner-visit/results?search=A1234BC.  Mac full stop test', () => {
-      it('should remove full stop inserted by mac', () => {
-        // Given
-        const dataToSend = {
-          search: 'A1234BC. ',
-        }
-
-        // When
-        const result = request(app).post('/search/prisoner-visit').send(dataToSend)
-
-        // Then
-        return result.expect(302).expect('location', '/search/prisoner-visit/results?search=A1234BC')
-      })
-    })
-
-    describe('TEST POST /search/prisoner/results?search=A1234BC.   Mac full stop test', () => {
-      it('should remove full stop inserted by mac', () => {
+      it('should remove trailing full stop and whitespace', () => {
         // Given
         const dataToSend = {
           search: 'A1234BC. ',
@@ -409,6 +267,7 @@ describe('Booking search page', () => {
           const $ = cheerio.load(res.text)
           expect(res.text).toContain('Search for a booking')
           expect($('[data-test="change-establishment"]').text()).toContain('Change establishment')
+          expect($('[data-test=search-by-prisoner]').length).toBe(1)
         })
     })
   })
@@ -424,8 +283,10 @@ describe('Booking search page', () => {
         .get('/search/visit/results?searchBlock1=ab&searchBlock2=bc&searchBlock3=cd&searchBlock4=de')
         .expect('Content-Type', /html/)
         .expect(res => {
+          const $ = cheerio.load(res.text)
           expect(res.text).toContain('Search for a booking')
           expect(res.text).toContain('id="search-results-none"')
+          expect($('[data-test=search-by-prisoner]').length).toBe(1)
           expect(visitService.getVisit).toHaveBeenCalledWith({
             reference: 'ab-bc-cd-de',
             username: 'user1',
@@ -450,8 +311,10 @@ describe('Booking search page', () => {
         .get('/search/visit/results?searchBlock1=ab&searchBlock2=bc&searchBlock3=cd&searchBlock4=de')
         .expect('Content-Type', /html/)
         .expect(res => {
+          const $ = cheerio.load(res.text)
           expect(res.text).toContain('Search for a booking')
           expect(res.text).toContain('id="search-results-true"')
+          expect($('[data-test=search-by-prisoner]').length).toBe(0)
           expect(visitService.getVisit).toHaveBeenCalledWith({
             reference: 'ab-bc-cd-de',
             username: 'user1',
@@ -481,8 +344,10 @@ describe('Booking search page', () => {
         .get('/search/visit/results?searchBlock1=ab&searchBlock2=bc&searchBlock3=cd&searchBlock4=de')
         .expect('Content-Type', /html/)
         .expect(res => {
+          const $ = cheerio.load(res.text)
           expect(res.text).toContain('Search for a booking')
           expect(res.text).toContain('id="search-results-none"')
+          expect($('[data-test=search-by-prisoner]').length).toBe(1)
           expect(visitService.getVisit).toHaveBeenCalledWith({
             reference: 'ab-bc-cd-de',
             username: 'user1',

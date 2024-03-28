@@ -141,22 +141,6 @@ export default class VisitService {
     return { visitHistoryDetails, visitors, notifications, additionalSupport }
   }
 
-  async getFutureVisits({
-    username,
-    prisonerId,
-  }: {
-    username: string
-    prisonerId: string
-  }): Promise<VisitInformation[]> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
-
-    logger.info(`Get upcoming visits for ${prisonerId}`)
-    const visits = await orchestrationApiClient.getFutureVisits(prisonerId)
-
-    return visits.map(visit => this.buildVisitInformation(visit))
-  }
-
   async getVisitsBySessionTemplate({
     username,
     prisonId,

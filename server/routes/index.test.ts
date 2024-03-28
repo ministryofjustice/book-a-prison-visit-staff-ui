@@ -32,13 +32,10 @@ describe('GET /', () => {
       .expect(res => {
         const $ = cheerio.load(res.text)
 
-        expect($('.card').length).toBe(5)
+        expect($('.card').length).toBe(4)
 
-        expect($('[data-test="book-visit"] .card__link').text()).toBe('Book a visit')
-        expect($('[data-test="book-visit"] .card__link').attr('href')).toBe('/search/prisoner')
-
-        expect($('[data-test="change-visit"] .card__link').text()).toBe('Change a visit')
-        expect($('[data-test="change-visit"] .card__link').attr('href')).toBe('/search/visit')
+        expect($('[data-test="book-or-change-visit"] .card__link').text()).toBe('Book or change a visit')
+        expect($('[data-test="book-or-change-visit"] .card__link').attr('href')).toBe('/search/prisoner')
 
         expect($('[data-test="need-review"] .card__link').text()).toContain('Need review')
         expect($('[data-test="need-review"] .card__link').attr('href')).toBe('/review')

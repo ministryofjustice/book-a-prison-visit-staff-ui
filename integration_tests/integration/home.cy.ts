@@ -20,8 +20,7 @@ context('Home page', () => {
   it('should render the index page with the correct tiles', () => {
     const homePage = Page.verifyOnPage(HomePage)
 
-    homePage.bookAVisitTile().contains('Book a visit')
-    homePage.changeAVisitTile().contains('Change a visit')
+    homePage.bookOrChangeVisitTile().contains('Book or change a visit')
     homePage.needReviewTile().contains('Need review')
     homePage.needReviewBadgeCount().contains(notificationCount.count)
     homePage.viewVisitsTile().contains('View visits by date')
