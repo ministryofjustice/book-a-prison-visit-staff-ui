@@ -17,6 +17,8 @@ import {
   SessionSchedule,
   Visit,
   VisitHistoryDetails,
+  VisitPreview,
+  VisitRestriction,
   VisitSession,
 } from './orchestrationApiTypes'
 import { VisitSessionData } from '../@types/bapv'
@@ -71,6 +73,24 @@ export default class OrchestrationApiClient {
         visitStatus: 'BOOKED',
         page: this.page,
         size: this.size,
+      }).toString(),
+    })
+  }
+
+  async getVisitsBySessionTemplate(
+    prisonId: string,
+    reference: string,
+    sessionDate: string,
+    visitRestrictions: VisitRestriction,
+  ): Promise<VisitPreview[]> {
+    return this.restClient.get({
+      path: '/visits/session-template',
+      query: new URLSearchParams({
+        prisonCode: prisonId,
+        ...(reference && { sessionTemplateReference: reference }),
+        sessionDate,
+        visitStatus: 'BOOKED',
+        ...(visitRestrictions && { visitRestrictions }),
       }).toString(),
     })
   }

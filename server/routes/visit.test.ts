@@ -247,75 +247,82 @@ describe('/visit/:reference', () => {
         })
     })
 
-    it('should render full booking summary page with visit information and prisoner tab selected with search back link when from visit search', () => {
-      const url =
-        '/visit/ab-cd-ef-gh?query=startDate%3D2022-05-24%26type%3DOPEN%26time%3D3pm%2Bto%2B3%253A59pm&fromPage=visit-search'
-
-      prisonerSearchService.getPrisonerById.mockResolvedValue(prisoner)
-      visitService.getFullVisitDetails.mockResolvedValue({
-        visitHistoryDetails,
-        visitors,
-        notifications,
-        additionalSupport,
+    describe('back links', () => {
+      beforeEach(() => {
+        prisonerSearchService.getPrisonerById.mockResolvedValue(prisoner)
+        visitService.getFullVisitDetails.mockResolvedValue({
+          visitHistoryDetails,
+          visitors,
+          notifications,
+          additionalSupport,
+        })
       })
 
-      return request(app)
-        .get(url)
-        .expect(200)
-        .expect('Content-Type', /html/)
-        .expect(res => {
-          const $ = cheerio.load(res.text)
-          expect($('h1').text()).toBe('Visit booking details')
-          expect($('.govuk-back-link').attr('href')).toBe(
-            '/search/visit/results?searchBlock1=ab&searchBlock2=cd&searchBlock3=ef&searchBlock4=gh',
-          )
-          expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
-          // prisoner details
-          expect($('[data-test="prisoner-name"]').text()).toBe('Smith, John')
+      it('should render booking summary page with correct back link when coming from upcoming visits listing page', () => {
+        const url =
+          '/visit/ab-cd-ef-gh?from=visit-search&query=searchBlock1%3Dab%26searchBlock2%3Dcd%26searchBlock3%3Def%26searchBlock4%3Dgh'
 
-          expect(auditService.viewedVisitDetails).toHaveBeenCalledTimes(1)
-          expect(auditService.viewedVisitDetails).toHaveBeenCalledWith({
-            visitReference: 'ab-cd-ef-gh',
-            prisonerId: 'A1234BC',
-            prisonId: 'HEI',
-            username: 'user1',
-            operationId: undefined,
+        return request(app)
+          .get(url)
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('h1').text()).toBe('Visit booking details')
+            expect($('.govuk-back-link').attr('href')).toBe(
+              '/search/visit/results?searchBlock1=ab&searchBlock2=cd&searchBlock3=ef&searchBlock4=gh',
+            )
+            expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
           })
-        })
-    })
-
-    it('should render booking summary page correct back link when from review listing page', () => {
-      const url = '/visit/ab-cd-ef-gh?fromPage=review'
-
-      prisonerSearchService.getPrisonerById.mockResolvedValue(prisoner)
-      visitService.getFullVisitDetails.mockResolvedValue({
-        visitHistoryDetails,
-        visitors,
-        notifications,
-        additionalSupport,
       })
 
-      return request(app)
-        .get(url)
-        .expect(200)
-        .expect('Content-Type', /html/)
-        .expect(res => {
-          const $ = cheerio.load(res.text)
-          expect($('h1').text()).toBe('Visit booking details')
-          expect($('.govuk-back-link').attr('href')).toBe('/review')
-          expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
-          // prisoner details
-          expect($('[data-test="prisoner-name"]').text()).toBe('Smith, John')
+      it('should render booking summary page with correct back link when coming from visit search page', () => {
+        const url = '/visit/ab-cd-ef-gh?from=upcoming-visits'
 
-          expect(auditService.viewedVisitDetails).toHaveBeenCalledTimes(1)
-          expect(auditService.viewedVisitDetails).toHaveBeenCalledWith({
-            visitReference: 'ab-cd-ef-gh',
-            prisonerId: 'A1234BC',
-            prisonId: 'HEI',
-            username: 'user1',
-            operationId: undefined,
+        return request(app)
+          .get(url)
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('h1').text()).toBe('Visit booking details')
+            expect($('.govuk-back-link').attr('href')).toBe('/prisoner/A1234BC/visits?search=A1234BC')
+            expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
           })
-        })
+      })
+
+      it('should render booking summary page with correct back link when coming from view visits by date page', () => {
+        const url =
+          '/visit/ab-cd-ef-gh?query=type%3DOPEN%26sessionReference%3D-afe.dcc.0f%26selectedDate%3D2024-02-01%26firstTabDate%3D2024-02-01&from=visits'
+
+        return request(app)
+          .get(url)
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('h1').text()).toBe('Visit booking details')
+            expect($('.govuk-back-link').attr('href')).toBe(
+              '/visits?type=OPEN&sessionReference=-afe.dcc.0f&selectedDate=2024-02-01&firstTabDate=2024-02-01',
+            )
+            expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
+          })
+      })
+
+      it('should render booking summary page with correct back link when coming from review listing page', () => {
+        const url = '/visit/ab-cd-ef-gh?from=review'
+
+        return request(app)
+          .get(url)
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('h1').text()).toBe('Visit booking details')
+            expect($('.govuk-back-link').attr('href')).toBe('/review')
+            expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
+          })
+      })
     })
 
     it('should render full booking summary page with prisoner location showing as "Unknown" if not a supported prison', () => {

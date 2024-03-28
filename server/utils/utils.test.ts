@@ -6,12 +6,11 @@ import {
   prisonerDateTimePretty,
   properCaseFullName,
   properCase,
-  sortByTimestamp,
   safeReturnUrl,
   getParsedDateFromQueryString,
   getWeekOfDatesStartingMonday,
 } from './utils'
-import { getResultsPagingLinksTestData, sortByTimestampData } from './utils.testData'
+import getResultsPagingLinksTestData from './utils.testData'
 
 describe('Convert to title case', () => {
   it('null string', () => {
@@ -90,14 +89,6 @@ describe('properCase', () => {
   })
   it('empty string', () => {
     expect(properCase('')).toEqual('')
-  })
-})
-
-describe('Sort by timestamp', () => {
-  sortByTimestampData.forEach(testData => {
-    it(testData.description, () => {
-      expect(sortByTimestamp(testData.a, testData.b)).toEqual(testData.result)
-    })
   })
 })
 

@@ -136,7 +136,10 @@ export default function routes({ auditService, prisonerSearchService, visitServi
   })
 
   get('/visit/results', async (req, res) => {
-    const { searchBlock1, searchBlock2, searchBlock3, searchBlock4 } = req.query
+    const searchBlock1 = typeof req.query.searchBlock1 === 'string' ? req.query.searchBlock1 : ''
+    const searchBlock2 = typeof req.query.searchBlock2 === 'string' ? req.query.searchBlock2 : ''
+    const searchBlock3 = typeof req.query.searchBlock3 === 'string' ? req.query.searchBlock3 : ''
+    const searchBlock4 = typeof req.query.searchBlock4 === 'string' ? req.query.searchBlock4 : ''
     const search = `${searchBlock1}-${searchBlock2}-${searchBlock3}-${searchBlock4}`
 
     const currentPage = '1'
@@ -192,6 +195,11 @@ export default function routes({ auditService, prisonerSearchService, visitServi
       searchUrl: '/search/visit/results',
     })
 
+    const queryParamsForBackLink = new URLSearchParams({
+      query: new URLSearchParams({ searchBlock1, searchBlock2, searchBlock3, searchBlock4 }).toString(),
+      from: 'visit-search',
+    })
+
     res.render('pages/search/visitResults', {
       searchBlock1,
       searchBlock2,
@@ -207,6 +215,7 @@ export default function routes({ auditService, prisonerSearchService, visitServi
       to,
       pageLinks: numberOfPages <= 1 ? [] : pageLinks,
       showEstablishmentSwitcher: true,
+      queryParamsForBackLink,
     })
   })
 

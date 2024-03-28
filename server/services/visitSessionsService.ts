@@ -1,12 +1,11 @@
 import { format, parseISO, isAfter, isBefore, parse } from 'date-fns'
-import { VisitSlot, VisitSlotList, VisitSlotsForDay, VisitSessionData } from '../@types/bapv'
+import { VisitSlot, VisitSlotList, VisitSlotsForDay, VisitSessionData, PrisonerEvent } from '../@types/bapv'
 import { VisitSession, SessionCapacity, SessionSchedule } from '../data/orchestrationApiTypes'
 import { ScheduledEvent } from '../data/whereaboutsApiTypes'
-import { getPrisonerEvents } from '../utils/visitsUtils'
 import { HmppsAuthClient, RestClientBuilder, OrchestrationApiClient, WhereaboutsApiClient } from '../data'
 
 export default class VisitSessionsService {
-  private morningCutoff = 12
+  private morningCutOff = 12
 
   constructor(
     private readonly orchestrationApiClientFactory: RestClientBuilder<OrchestrationApiClient>,
@@ -85,7 +84,7 @@ export default class VisitSessionsService {
           visitRestriction === 'OPEN' ? visitSession.openVisitCapacity > 0 : visitSession.closedVisitCapacity > 0
         if (slotHasCapacity) {
           // Add new Slot to morning / afternoon grouping
-          if (parsedStartTimestamp.getHours() < this.morningCutoff) {
+          if (parsedStartTimestamp.getHours() < this.morningCutOff) {
             slotsForDay.slots.morning.push(newSlot)
           } else {
             slotsForDay.slots.afternoon.push(newSlot)
@@ -120,12 +119,12 @@ export default class VisitSessionsService {
         if (hasMorningSlots) {
           const timeStart = parse(`${visitSlotsforDay.date} ${year} 00:00`, 'EEEE d MMMM yyyy H:mm', new Date())
           const timeEnd = parse(`${visitSlotsforDay.date} ${year} 12:00`, 'EEEE d MMMM yyyy H:mm', new Date())
-          visitSlotsforDay.prisonerEvents.morning = getPrisonerEvents(prisonerEvents, timeStart, timeEnd)
+          visitSlotsforDay.prisonerEvents.morning = this.getPrisonerEvents(prisonerEvents, timeStart, timeEnd)
         }
         if (hasAfternoonSlots) {
           const timeStart = parse(`${visitSlotsforDay.date} ${year} 11:59`, 'EEEE d MMMM yyyy H:mm', new Date())
           const timeEnd = parse(`${visitSlotsforDay.date} ${year} 23:59`, 'EEEE d MMMM yyyy H:mm', new Date())
-          visitSlotsforDay.prisonerEvents.afternoon = getPrisonerEvents(prisonerEvents, timeStart, timeEnd)
+          visitSlotsforDay.prisonerEvents.afternoon = this.getPrisonerEvents(prisonerEvents, timeStart, timeEnd)
         }
 
         if (hasMorningSlots || hasAfternoonSlots) {
@@ -169,5 +168,21 @@ export default class VisitSessionsService {
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
     return orchestrationApiClient.getVisitSessionCapacity(prisonId, sessionDate, sessionStartTime, sessionEndTime)
+  }
+
+  private getPrisonerEvents(events: ScheduledEvent[], start: Date, end: Date): PrisonerEvent[] {
+    return events
+      .filter(event => {
+        const eventStart = parseISO(event.startTime)
+
+        return isAfter(eventStart, start) && isBefore(eventStart, end)
+      })
+      .map(event => {
+        return {
+          startTimestamp: event.startTime,
+          endTimestamp: event.endTime,
+          description: event.eventSourceDesc,
+        }
+      })
   }
 }

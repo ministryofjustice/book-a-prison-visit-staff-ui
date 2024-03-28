@@ -236,7 +236,7 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
   // Preston (HMP & YOI)
   PNI: {
     selectVisitorsText: [
-      'You can add up to 3 people aged 16 and over, and 3 children under 16 years old.',
+      'You can add up to a total of 5 people, with a maximum of 3 people aged 16 and over.',
       'At least one visitor must be 18 or older.',
     ],
   },
