@@ -2,7 +2,6 @@ import { type RequestHandler, Router } from 'express'
 
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import { clearSession } from './visitorUtils'
-import config from '../config'
 import { Services } from '../services'
 
 export default function routes({ visitNotificationsService }: Services): Router {
@@ -11,16 +10,12 @@ export default function routes({ visitNotificationsService }: Services): Router 
 
   get('/', async (req, res) => {
     const { prisonId } = req.session.selectedEstablishment
-    const { reviewBookings } = config.features
 
-    const reviewCount = reviewBookings
-      ? (await visitNotificationsService.getNotificationCount(res.locals.user.username, prisonId)).count
-      : undefined
+    const reviewCount = (await visitNotificationsService.getNotificationCount(res.locals.user.username, prisonId)).count
 
     res.render('pages/index', {
       hidePhaseBanner: true,
       showEstablishmentSwitcher: true,
-      showReviewBookingsTile: reviewBookings,
       reviewCount,
     })
   })

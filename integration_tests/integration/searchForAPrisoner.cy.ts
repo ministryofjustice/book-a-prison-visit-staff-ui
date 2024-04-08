@@ -22,7 +22,7 @@ context('Search for a prisoner', () => {
 
   it('should show Search For A Prisoner page', () => {
     const homePage = Page.verifyOnPage(HomePage)
-    homePage.bookAVisitTile().click()
+    homePage.bookOrChangeVisitTile().click()
 
     const searchForAPrisonerPage = Page.verifyOnPage(SearchForAPrisonerPage)
     searchForAPrisonerPage.backLink()
@@ -35,7 +35,7 @@ context('Search for a prisoner', () => {
       cy.task('stubPrisonerById', prisoner)
 
       const homePage = Page.verifyOnPage(HomePage)
-      homePage.bookAVisitTile().click()
+      homePage.bookOrChangeVisitTile().click()
 
       const searchForAPrisonerPage = Page.verifyOnPage(SearchForAPrisonerPage)
       searchForAPrisonerPage.searchInput().clear().type(prisonerNumber)
@@ -68,7 +68,7 @@ context('Search for a prisoner', () => {
       })
 
       const homePage = Page.verifyOnPage(HomePage)
-      homePage.bookAVisitTile().click()
+      homePage.bookOrChangeVisitTile().click()
 
       const searchForAPrisonerPage = Page.verifyOnPage(SearchForAPrisonerPage)
       searchForAPrisonerPage.searchInput().clear().type(searchTerm)
@@ -116,7 +116,7 @@ context('Search for a prisoner', () => {
       })
 
       const homePage = Page.verifyOnPage(HomePage)
-      homePage.bookAVisitTile().click()
+      homePage.bookOrChangeVisitTile().click()
 
       const searchForAPrisonerPage = Page.verifyOnPage(SearchForAPrisonerPage)
       searchForAPrisonerPage.searchInput().clear().type(searchTerm)

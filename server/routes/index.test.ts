@@ -3,7 +3,6 @@ import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { appWithAllRoutes } from './testutils/appSetup'
 import * as visitorUtils from './visitorUtils'
-import config from '../config'
 import { createMockVisitNotificationsService } from '../services/testutils/mocks'
 import TestData from './testutils/testData'
 
@@ -13,7 +12,6 @@ const visitNotificationsService = createMockVisitNotificationsService()
 
 beforeEach(() => {
   app = appWithAllRoutes({ services: { visitNotificationsService } })
-  config.features.reviewBookings = true
 })
 
 afterEach(() => {
@@ -34,13 +32,10 @@ describe('GET /', () => {
       .expect(res => {
         const $ = cheerio.load(res.text)
 
-        expect($('.card').length).toBe(5)
+        expect($('.card').length).toBe(4)
 
-        expect($('[data-test="book-visit"] .card__link').text()).toBe('Book a visit')
-        expect($('[data-test="book-visit"] .card__link').attr('href')).toBe('/search/prisoner')
-
-        expect($('[data-test="change-visit"] .card__link').text()).toBe('Change a visit')
-        expect($('[data-test="change-visit"] .card__link').attr('href')).toBe('/search/visit')
+        expect($('[data-test="book-or-change-visit"] .card__link').text()).toBe('Book or change a visit')
+        expect($('[data-test="book-or-change-visit"] .card__link').attr('href')).toBe('/search/prisoner')
 
         expect($('[data-test="need-review"] .card__link').text()).toContain('Need review')
         expect($('[data-test="need-review"] .card__link').attr('href')).toBe('/review')
@@ -56,25 +51,6 @@ describe('GET /', () => {
   })
 
   describe('Need review tile', () => {
-    it('should not render the review request tile if feature disabled', () => {
-      config.features.reviewBookings = false
-
-      return request(app)
-        .get('/')
-        .expect('Content-Type', /html/)
-        .expect(res => {
-          const $ = cheerio.load(res.text)
-          expect($('.card').length).toBe(4)
-          expect($('[data-test="book-visit"] .card__link').text()).toBe('Book a visit')
-          expect($('[data-test="change-visit"] .card__link').text()).toBe('Change a visit')
-          expect($('[data-test="need-review"]').length).toBe(0)
-          expect($('[data-test="view-visits-by-date"] .card__link').text()).toBe('View visits by date')
-          expect($('[data-test="view-timetable"] .card__link').text()).toBe('View visits timetable')
-
-          expect(visitNotificationsService.getNotificationCount).not.toHaveBeenCalled()
-        })
-    })
-
     it('should render badge with review count', () => {
       return request(app)
         .get('/')

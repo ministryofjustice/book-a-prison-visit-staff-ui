@@ -41,22 +41,4 @@ export default class PrisonerSearchClient {
       path: `/prisoner/${id}`,
     })
   }
-
-  async getPrisonersByPrisonerNumbers(
-    prisonerNumbers: string[],
-    _page = 0,
-  ): Promise<{ totalPages: number; totalElements: number; content: Prisoner[] }> {
-    const allResults: Prisoner[] = await this.restClient.post({
-      path: '/prisoner-search/prisoner-numbers',
-      data: {
-        prisonerNumbers,
-      },
-    })
-
-    return {
-      totalPages: 1,
-      totalElements: allResults.length,
-      content: allResults,
-    }
-  }
 }

@@ -84,6 +84,7 @@ testJourneys.forEach(journey => {
           expect($('.govuk-back-link').attr('href')).toBe(`${journey.urlPrefix}/select-date-and-time`)
           expect($('[data-test="support-required-yes"]').prop('checked')).toBe(false)
           expect($('[data-test="support-required-no"]').prop('checked')).toBe(false)
+          expect($('[data-test-app-ref="aaa-bbb-ccc"]').length).toBe(1)
         })
     })
 

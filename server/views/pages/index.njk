@@ -17,36 +17,25 @@
           {{ card({
             "href": "/search/prisoner",
             "clickable": "true",
-            "heading": "Book a visit",
+            "heading": "Book or change a visit",
             "description": "Make a booking for a visitor",
-            "id": "book-visit"
+            "id": "book-or-change-visit"
           }) }}
         </li>
         <li class="govuk-grid-column-one-third card-group__item">
           {{ card({
-            "href": "/search/visit",
+            "href": "/review",
             "clickable": "true",
-            "heading": "Change a visit",
-            "description": "Update or cancel a booking",
-            "id": "change-visit"
+            "heading":
+              '<span class="bapv-nowrap">Need review' +
+                '<span class="govuk-!-margin-left-2' + (" moj-notification-badge" if reviewCount > 0) + '" data-test="need-review-count">' +
+                  ((reviewCount if reviewCount < 100 else "99+") if reviewCount > 0)+
+                "</span>" +
+              "</span>",
+            "description": "Check bookings that need review",
+            "id": "need-review"
           }) }}
         </li>
-        {% if showReviewBookingsTile %}
-          <li class="govuk-grid-column-one-third card-group__item">
-            {{ card({
-              "href": "/review",
-              "clickable": "true",
-              "heading":
-                '<span class="bapv-nowrap">Need review' +
-                  '<span class="govuk-!-margin-left-2' + (" moj-notification-badge" if reviewCount > 0) + '" data-test="need-review-count">' +
-                    ((reviewCount if reviewCount < 100 else "99+") if reviewCount > 0)+
-                  "</span>" +
-                "</span>",
-              "description": "Check bookings that need review",
-              "id": "need-review"
-            }) }}
-          </li>
-        {% endif %}
         <li class="govuk-grid-column-one-third card-group__item">
           {{ card({
             "href": "/visits",

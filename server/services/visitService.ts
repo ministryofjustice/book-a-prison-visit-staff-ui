@@ -1,11 +1,5 @@
 import { NotFound } from 'http-errors'
-import {
-  ExtendedVisitInformation,
-  VisitInformation,
-  VisitSessionData,
-  VisitorListItem,
-  VisitsPageSlot,
-} from '../@types/bapv'
+import { VisitInformation, VisitSessionData, VisitorListItem } from '../@types/bapv'
 import {
   ApplicationDto,
   ApplicationMethodType,
@@ -13,13 +7,13 @@ import {
   NotificationType,
   Visit,
   VisitHistoryDetails,
+  VisitPreview,
+  VisitRestriction,
 } from '../data/orchestrationApiTypes'
 import { buildVisitorListItem } from '../utils/visitorUtils'
 import { HmppsAuthClient, OrchestrationApiClient, PrisonerContactRegistryApiClient, RestClientBuilder } from '../data'
 import logger from '../../logger'
 import { prisonerDateTimePretty, prisonerTimePretty } from '../utils/utils'
-import { getVisitSlotsFromBookedVisits } from '../utils/visitsUtils'
-import config from '../config'
 
 export default class VisitService {
   constructor(
@@ -140,65 +134,45 @@ export default class VisitService {
       .filter(contact => visitorIds.includes(contact.personId))
       .map(contact => buildVisitorListItem(contact))
 
-    const notifications = config.features.reviewBookings
-      ? await orchestrationApiClient.getVisitNotifications(reference)
-      : []
+    const notifications = await orchestrationApiClient.getVisitNotifications(reference)
 
     const additionalSupport = visit.visitorSupport ? visit.visitorSupport.description : ''
 
     return { visitHistoryDetails, visitors, notifications, additionalSupport }
   }
 
-  async getFutureVisits({
+  async getVisitsBySessionTemplate({
     username,
-    prisonerId,
+    prisonId,
+    reference,
+    sessionDate,
+    visitRestrictions,
   }: {
     username: string
-    prisonerId: string
-  }): Promise<VisitInformation[]> {
+    prisonId: string
+    reference: string
+    sessionDate: string
+    visitRestrictions: VisitRestriction
+  }): Promise<VisitPreview[]> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
-    logger.info(`Get upcoming visits for ${prisonerId}`)
-    const visits = await orchestrationApiClient.getFutureVisits(prisonerId)
-
-    return visits.map(visit => this.buildVisitInformation(visit))
+    return orchestrationApiClient.getVisitsBySessionTemplate(prisonId, reference, sessionDate, visitRestrictions)
   }
 
-  async getVisitsByDate({
+  async getVisitsWithoutSessionTemplate({
     username,
-    dateString,
     prisonId,
+    sessionDate,
   }: {
     username: string
-    dateString: string
     prisonId: string
-  }): Promise<{
-    extendedVisitsInfo: ExtendedVisitInformation[]
-    slots: {
-      openSlots: VisitsPageSlot[]
-      closedSlots: VisitsPageSlot[]
-      unknownSlots: VisitsPageSlot[]
-      firstSlotTime: string
-    }
-  }> {
+    sessionDate: string
+  }): Promise<VisitPreview[]> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
-    const prisonerContactRegistryApiClient = this.prisonerContactRegistryApiClientFactory(token)
 
-    logger.info(`Get visits for ${dateString}`)
-    const { content: visits } = await orchestrationApiClient.getVisitsByDate(dateString, prisonId)
-
-    const extendedVisitsInfo: ExtendedVisitInformation[] = await Promise.all(
-      visits.map(visit => {
-        return this.buildExtendedVisitInformation(visit, prisonerContactRegistryApiClient)
-      }),
-    )
-
-    return {
-      extendedVisitsInfo,
-      slots: getVisitSlotsFromBookedVisits(extendedVisitsInfo),
-    }
+    return orchestrationApiClient.getVisitsBySessionTemplate(prisonId, undefined, sessionDate, undefined)
   }
 
   private buildVisitInformation(visit: Visit): VisitInformation {
@@ -212,33 +186,6 @@ export default class VisitService {
       visitDate: prisonerDateTimePretty(visit.startTimestamp),
       visitTime,
       visitStatus: visit.visitStatus,
-    }
-  }
-
-  private async buildExtendedVisitInformation(
-    visit: Visit,
-    prisonerContactRegistryApiClient: PrisonerContactRegistryApiClient,
-  ): Promise<ExtendedVisitInformation> {
-    const visitTime = `${prisonerTimePretty(visit.startTimestamp)} to ${prisonerTimePretty(visit.endTimestamp)}`
-    const contacts = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(visit.prisonerId)
-    const visitorIds = visit.visitors.map(visitor => visitor.nomisPersonId)
-
-    const visitors = contacts
-      .filter(contact => visitorIds.includes(contact.personId))
-      .map(contact => buildVisitorListItem(contact))
-
-    return {
-      reference: visit.reference,
-      prisonNumber: visit.prisonerId,
-      prisonerName: '',
-      mainContact: visit.visitContact?.name,
-      startTimestamp: visit.startTimestamp,
-      endTimestamp: visit.endTimestamp,
-      visitDate: prisonerDateTimePretty(visit.startTimestamp),
-      visitTime,
-      visitStatus: visit.visitStatus,
-      visitRestriction: visit.visitRestriction,
-      visitors,
     }
   }
 }

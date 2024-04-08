@@ -47,7 +47,7 @@ export interface paths {
      */
     get: operations['getVisitHistoryByReference']
   }
-  '/visits/session-template/{sessionTemplateReference}': {
+  '/visits/session-template': {
     /**
      * Get visits for a session template reference and date
      * @description Retrieve visits for session template reference and date
@@ -574,6 +574,19 @@ export interface components {
       eventsAudit: components['schemas']['EventAuditDto'][]
       visit: components['schemas']['VisitDto']
     }
+    /** @description Timeslot for the visit */
+    SessionTimeSlotDto: {
+      /**
+       * Format: HH:mm
+       * @example 13:45
+       */
+      startTime: string
+      /**
+       * Format: HH:mm
+       * @example 13:45
+       */
+      endTime: string
+    }
     VisitPreviewDto: {
       /**
        * @description Prisoner Number
@@ -601,6 +614,7 @@ export interface components {
        * @example 10
        */
       visitorCount: number
+      visitTimeSlot: components['schemas']['SessionTimeSlotDto']
     }
     PageVisitDto: {
       /** Format: int32 */
@@ -794,6 +808,8 @@ export interface components {
        * @enum {string}
        */
       visitType: 'SOCIAL'
+      /** @description Determines behaviour of location groups. True will mean the location groups are inclusive, false means they are exclusive. */
+      areLocationGroupsInclusive: boolean
       /**
        * @description prisoner location group
        * @example Wing C
@@ -815,19 +831,6 @@ export interface components {
        * @example 1
        */
       weeklyFrequency: number
-    }
-    /** @description The time slot of the generated visit session(s) */
-    SessionTimeSlotDto: {
-      /**
-       * Format: HH:mm
-       * @example 13:45
-       */
-      startTime: string
-      /**
-       * Format: HH:mm
-       * @example 13:45
-       */
-      endTime: string
     }
     GetDlqResult: {
       /** Format: int32 */
@@ -1434,6 +1437,11 @@ export interface operations {
     parameters: {
       query: {
         /**
+         * @description Session template reference
+         * @example v9-d7-ed-7u
+         */
+        sessionTemplateReference?: string
+        /**
          * @description Get visits for session date
          * @example 2023-05-31
          */
@@ -1448,13 +1456,11 @@ export interface operations {
          * @example OPEN
          */
         visitRestrictions?: string
-      }
-      path: {
         /**
-         * @description Session template reference
-         * @example v9-d7-ed-7u
+         * @description Filter results by prison id/code
+         * @example MDI
          */
-        sessionTemplateReference: string
+        prisonCode: string
       }
     }
     responses: {

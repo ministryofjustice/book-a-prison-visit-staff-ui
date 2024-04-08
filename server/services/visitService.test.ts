@@ -1,19 +1,13 @@
 import { NotFound } from 'http-errors'
-import {
-  ExtendedVisitInformation,
-  VisitInformation,
-  VisitSessionData,
-  VisitorListItem,
-  VisitsPageSlot,
-} from '../@types/bapv'
+import { VisitInformation, VisitSessionData, VisitorListItem } from '../@types/bapv'
 import {
   ApplicationDto,
   ApplicationMethodType,
   CancelVisitOrchestrationDto,
   NotificationType,
-  PageVisitDto,
   Visit,
   VisitHistoryDetails,
+  VisitRestriction,
 } from '../data/orchestrationApiTypes'
 import TestData from '../routes/testutils/testData'
 import VisitService from './visitService'
@@ -22,8 +16,6 @@ import {
   createMockOrchestrationApiClient,
   createMockPrisonerContactRegistryApiClient,
 } from '../data/testutils/mocks'
-import { Address, AddressUsage, Contact, Restriction } from '../data/prisonerContactRegistryApiTypes'
-import config from '../config'
 
 const token = 'some token'
 
@@ -251,18 +243,7 @@ describe('Visit service', () => {
         orchestrationApiClient.getVisitNotifications.mockResolvedValue(['PRISONER_RELEASED_EVENT'])
       })
 
-      it('should not request visit notifications if review bookings feature not enabled', async () => {
-        config.features.reviewBookings = false
-
-        const result = await visitService.getFullVisitDetails({ username: 'user', reference: 'ab-cd-ef-gh' })
-
-        expect(orchestrationApiClient.getVisitNotifications).not.toHaveBeenCalled()
-        expect(result.notifications).toStrictEqual([])
-      })
-
       it('should return full details of visit, visitors, notifications and additional support options', async () => {
-        config.features.reviewBookings = true
-
         const expectedResult: {
           visitHistoryDetails: VisitHistoryDetails
           visitors: VisitorListItem[]
@@ -306,296 +287,53 @@ describe('Visit service', () => {
       })
     })
 
-    describe('getFutureVisits', () => {
-      it('should return an array of upcoming VisitInformation for an offender', async () => {
-        const visits: Visit[] = [visit]
+    describe('getVisitsBySessionTemplate', () => {
+      it('should return visit previews for given session template reference, date, prison and restriction', async () => {
+        const reference = 'v9d.7ed.7u'
+        const sessionDate = '2024-01-31'
+        const visitRestrictions: VisitRestriction = 'OPEN'
+        const visitPreviews = [TestData.visitPreview()]
 
-        orchestrationApiClient.getFutureVisits.mockResolvedValue(visits)
-        const result = await visitService.getFutureVisits({
+        orchestrationApiClient.getVisitsBySessionTemplate.mockResolvedValue(visitPreviews)
+
+        const result = await visitService.getVisitsBySessionTemplate({
           username: 'user',
-          prisonerId: 'A1234BC',
+          prisonId,
+          reference,
+          sessionDate,
+          visitRestrictions,
         })
 
-        expect(orchestrationApiClient.getFutureVisits).toHaveBeenCalledTimes(1)
-        expect(orchestrationApiClient.getFutureVisits).toHaveBeenCalledWith('A1234BC')
-        expect(result).toEqual(<VisitInformation[]>[
-          {
-            reference: 'ab-cd-ef-gh',
-            prisonNumber: 'A1234BC',
-            prisonerName: '',
-            mainContact: 'Jeanette Smith',
-            visitDate: '14 January 2022',
-            visitTime: '10am to 11am',
-            visitStatus: 'BOOKED',
-          },
-        ])
-      })
-
-      it('should return an empty array for an offender with no upcoming visits', async () => {
-        const visits: Visit[] = []
-
-        orchestrationApiClient.getFutureVisits.mockResolvedValue(visits)
-        const result = await visitService.getFutureVisits({
-          username: 'user',
-          prisonerId: 'A1234BC',
-        })
-
-        expect(orchestrationApiClient.getFutureVisits).toHaveBeenCalledTimes(1)
-        expect(orchestrationApiClient.getFutureVisits).toHaveBeenCalledWith('A1234BC')
-        expect(result).toEqual([])
+        expect(orchestrationApiClient.getVisitsBySessionTemplate).toHaveBeenCalledWith(
+          prisonId,
+          reference,
+          sessionDate,
+          visitRestrictions,
+        )
+        expect(result).toStrictEqual(visitPreviews)
       })
     })
 
-    describe('getVisitsByDate', () => {
-      it('should return empty data if no visit sessions on chosen date', async () => {
-        orchestrationApiClient.getVisitsByDate.mockResolvedValue({ content: [] })
-        prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue([])
-        const results = await visitService.getVisitsByDate({
+    describe('getVisitsWithoutSessionTemplate', () => {
+      it('should return visit previews for given date and prison (for migrated visits that have no session template)', async () => {
+        const sessionDate = '2024-01-31'
+        const visitPreviews = [TestData.visitPreview()]
+
+        orchestrationApiClient.getVisitsBySessionTemplate.mockResolvedValue(visitPreviews)
+
+        const result = await visitService.getVisitsWithoutSessionTemplate({
           username: 'user',
-          dateString: '2022-01-01',
           prisonId,
+          sessionDate,
         })
 
-        expect(orchestrationApiClient.getVisitsByDate).toHaveBeenCalledTimes(1)
-        expect(results).toEqual({
-          extendedVisitsInfo: [],
-          slots: {
-            closedSlots: [],
-            firstSlotTime: undefined,
-            openSlots: [],
-            unknownSlots: [],
-          },
-        })
-      })
-
-      it('should return visit and prisoner data when session exists', async () => {
-        const emptyAddresses: Address[] = []
-        const emptyUsages: AddressUsage[] = []
-        const emptyRestrictions: Restriction[] = []
-
-        const pagedVisit: PageVisitDto = {
-          totalPages: 1,
-          totalElements: 1,
-          size: 1,
-          content: [
-            {
-              applicationReference: 'aaa-bbb-ccc',
-              reference: 'ob-cw-lx-na',
-              prisonerId: 'A8709DY',
-              prisonId: 'HEI',
-              visitRoom: 'VISITS-VISITS-H1_6LV',
-              visitType: 'SOCIAL',
-              visitStatus: 'BOOKED',
-              outcomeStatus: 'NOT_RECORDED',
-              visitRestriction: 'OPEN',
-              startTimestamp: '2022-05-23T09:00:00',
-              endTimestamp: '2022-05-23T09:29:00',
-              visitNotes: [],
-              visitContact: {
-                name: 'UNKNOWN',
-                telephone: 'UNKNOWN',
-              },
-              visitors: [
-                {
-                  nomisPersonId: 4729510,
-                },
-              ],
-              visitorSupport: { description: '' },
-              createdTimestamp: '2022-05-23T10:09:56.636334',
-              modifiedTimestamp: '2022-05-23T10:09:56.64691',
-            },
-            {
-              applicationReference: 'aaa-bbb-ccc',
-              reference: 'lb-co-bn-oe',
-              prisonerId: 'A8709DY',
-              prisonId: 'HEI',
-              visitRoom: 'daily test room',
-              visitType: 'SOCIAL',
-              visitStatus: 'BOOKED',
-              outcomeStatus: 'ADMINISTRATIVE_ERROR',
-              visitRestriction: 'OPEN',
-              startTimestamp: '2022-05-23T10:00:00',
-              endTimestamp: '2022-05-23T11:00:00',
-              visitNotes: [
-                {
-                  type: 'VISIT_OUTCOMES',
-                  text: 'na',
-                },
-              ],
-              visitContact: {
-                name: 'Tess Bennett',
-                telephone: '0114 5555555',
-              },
-              visitors: [
-                {
-                  nomisPersonId: 4729570,
-                },
-                {
-                  nomisPersonId: 4729510,
-                },
-              ],
-              visitorSupport: { description: '' },
-              createdTimestamp: '2022-05-20T15:29:04.997067',
-              modifiedTimestamp: '2022-05-20T15:51:49.983108',
-            },
-          ],
-        }
-
-        const social: Contact[] = [
-          {
-            personId: 4729510,
-            firstName: 'James',
-            lastName: 'Smith',
-            dateOfBirth: '1983-06-17',
-            relationshipCode: 'BRO',
-            relationshipDescription: 'Brother',
-            contactType: 'S',
-            contactTypeDescription: 'Social/ Family',
-            approvedVisitor: true,
-            emergencyContact: false,
-            nextOfKin: false,
-            addresses: [
-              {
-                addressType: 'Home Address',
-                street: 'Warren way',
-                town: 'Bootle',
-                postalCode: 'DN5 9SD',
-                country: 'England',
-                primary: true,
-                noFixedAddress: false,
-                startDate: '2021-03-01',
-                phones: [
-                  {
-                    number: '0113222333',
-                    type: 'BUS',
-                  },
-                  {
-                    number: '222333',
-                    type: 'HOME',
-                  },
-                ],
-                addressUsages: emptyUsages,
-              },
-            ],
-            restrictions: emptyRestrictions,
-          },
-          {
-            personId: 4729570,
-            firstName: 'Tess',
-            lastName: 'Bennett',
-            relationshipCode: 'AUNT',
-            relationshipDescription: 'Aunt',
-            contactType: 'S',
-            contactTypeDescription: 'Social/ Family',
-            approvedVisitor: true,
-            emergencyContact: false,
-            nextOfKin: false,
-            addresses: emptyAddresses,
-            restrictions: emptyRestrictions,
-          },
-        ]
-
-        orchestrationApiClient.getVisitsByDate.mockResolvedValue(pagedVisit)
-        prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue(social)
-        const results = await visitService.getVisitsByDate({
-          username: 'user',
-          dateString: '2022-05-23',
+        expect(orchestrationApiClient.getVisitsBySessionTemplate).toHaveBeenCalledWith(
           prisonId,
-        })
-        const resultsCheck: {
-          extendedVisitsInfo: ExtendedVisitInformation[]
-          slots: {
-            openSlots: VisitsPageSlot[]
-            closedSlots: VisitsPageSlot[]
-            unknownSlots: VisitsPageSlot[]
-            firstSlotTime: string
-          }
-        } = {
-          extendedVisitsInfo: [
-            {
-              reference: 'ob-cw-lx-na',
-              prisonNumber: 'A8709DY',
-              prisonerName: '',
-              mainContact: 'UNKNOWN',
-              startTimestamp: '2022-05-23T09:00:00',
-              endTimestamp: '2022-05-23T09:29:00',
-              visitDate: '23 May 2022',
-              visitTime: '9am to 9:29am',
-              visitStatus: 'BOOKED',
-              visitRestriction: 'OPEN',
-              visitors: [
-                {
-                  personId: 4729510,
-                  name: 'James Smith',
-                  dateOfBirth: '1983-06-17',
-                  adult: true,
-                  relationshipDescription: 'Brother',
-                  address: 'Warren way,<br>Bootle,<br>DN5 9SD,<br>England',
-                  restrictions: [],
-                  banned: false,
-                },
-              ],
-            },
-            {
-              reference: 'lb-co-bn-oe',
-              prisonNumber: 'A8709DY',
-              prisonerName: '',
-              mainContact: 'Tess Bennett',
-              startTimestamp: '2022-05-23T10:00:00',
-              endTimestamp: '2022-05-23T11:00:00',
-              visitDate: '23 May 2022',
-              visitTime: '10am to 11am',
-              visitStatus: 'BOOKED',
-              visitRestriction: 'OPEN',
-              visitors: [
-                {
-                  personId: 4729510,
-                  name: 'James Smith',
-                  dateOfBirth: '1983-06-17',
-                  adult: true,
-                  relationshipDescription: 'Brother',
-                  address: 'Warren way,<br>Bootle,<br>DN5 9SD,<br>England',
-                  restrictions: [],
-                  banned: false,
-                },
-                {
-                  personId: 4729570,
-                  name: 'Tess Bennett',
-                  adult: true,
-                  relationshipDescription: 'Aunt',
-                  address: 'Not entered',
-                  restrictions: [],
-                  banned: false,
-                },
-              ],
-            },
-          ],
-          slots: {
-            openSlots: [
-              {
-                visitTime: '9am to 9:29am',
-                visitType: 'OPEN',
-                sortField: '2022-05-23T09:00:00',
-                adults: 1,
-                children: 0,
-              },
-              {
-                visitTime: '10am to 11am',
-                visitType: 'OPEN',
-                sortField: '2022-05-23T10:00:00',
-                adults: 2,
-                children: 0,
-              },
-            ],
-            closedSlots: [],
-            unknownSlots: [],
-            firstSlotTime: '9am to 9:29am',
-          },
-        }
-
-        expect(orchestrationApiClient.getVisitsByDate).toHaveBeenCalledTimes(1)
-        expect(prisonerContactRegistryApiClient.getPrisonerSocialContacts).toHaveBeenCalledTimes(2)
-        expect(results).toEqual(resultsCheck)
+          undefined,
+          sessionDate,
+          undefined,
+        )
+        expect(result).toStrictEqual(visitPreviews)
       })
     })
   })

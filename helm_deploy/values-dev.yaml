@@ -22,7 +22,6 @@ generic-service:
     COMPONENT_API_URL: https://frontend-components-dev.hmpps.service.justice.gov.uk
     DPS_URL: "https://digital-dev.prison.service.justice.gov.uk/"
     REDIS_KEY: "bapv-staff-dev"
-    FEATURE_REVIEW_BOOKINGS: "true"
 
   allowlist:
     circleci-1: 3.228.39.90/32

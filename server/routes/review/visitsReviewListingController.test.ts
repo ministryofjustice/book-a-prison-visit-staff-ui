@@ -2,7 +2,6 @@ import type { Express } from 'express'
 import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { appWithAllRoutes } from '../testutils/appSetup'
-import config from '../../config'
 import { createMockVisitNotificationsService } from '../../services/testutils/mocks'
 import { notificationTypeReasons, notificationTypes } from '../../constants/notificationEvents'
 import { FilterField, VisitsReviewListItem } from '../../@types/bapv'
@@ -12,7 +11,6 @@ let app: Express
 const visitNotificationsService = createMockVisitNotificationsService()
 
 beforeEach(() => {
-  config.features.reviewBookings = true
   app = appWithAllRoutes({ services: { visitNotificationsService } })
 
   visitNotificationsService.getVisitsReviewList.mockResolvedValue({ filters: [], visitsReviewList: [] })
@@ -29,12 +27,6 @@ describe('Bookings needing review listing page', () => {
   }
 
   describe('GET /review', () => {
-    it('should return a 404 if the feature is not enabled', () => {
-      config.features.reviewBookings = false
-      app = appWithAllRoutes({})
-      return request(app).get('/review').expect('Content-Type', /html/).expect(404)
-    })
-
     it('should display bookings review listing page', () => {
       return request(app)
         .get('/review')

@@ -13,6 +13,8 @@ import {
   SessionSchedule,
   Visit,
   VisitHistoryDetails,
+  VisitPreview,
+  VisitRestriction,
   VisitSession,
 } from '../../server/data/orchestrationApiTypes'
 import TestData from '../../server/routes/testutils/testData'
@@ -182,53 +184,63 @@ export default {
       },
     })
   },
-  stubFutureVisits: ({
-    prisonerId,
-    upcomingVisits,
-  }: {
-    prisonerId: string
-    upcomingVisits: Visit[]
-  }): SuperAgentRequest => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        urlPath: `/orchestration/visits/search/future/${prisonerId}`,
-      },
-      response: {
-        status: 200,
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: upcomingVisits,
-      },
-    })
-  },
-  stubVisitsByDate: ({
-    visitStartDate,
-    visitEndDate,
+  stubGetVisitsBySessionTemplate: ({
     prisonId,
+    reference,
+    sessionDate,
+    visitRestrictions,
     visits,
   }: {
-    visitStartDate: string
-    visitEndDate: string
     prisonId: string
-    visits: Visit
+    reference: string
+    sessionDate: string
+    visitRestrictions: VisitRestriction
+    visits: VisitPreview[]
   }): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',
-        urlPath: `/orchestration/visits/search`,
+        urlPath: '/orchestration/visits/session-template',
         queryParameters: {
-          prisonId: { equalTo: prisonId },
-          visitStartDate: { equalTo: visitStartDate },
-          visitEndDate: { equalTo: visitEndDate },
+          prisonCode: { equalTo: prisonId },
+          sessionTemplateReference: { equalTo: reference },
+          sessionDate: { equalTo: sessionDate },
           visitStatus: { equalTo: 'BOOKED' },
-          page: { equalTo: '0' },
-          size: { equalTo: '1000' },
+          visitRestrictions: { equalTo: visitRestrictions },
         },
       },
       response: {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: { content: visits },
+        jsonBody: visits,
+      },
+    })
+  },
+  stubGetVisitsWithoutSessionTemplate: ({
+    prisonId,
+    sessionDate,
+    visits,
+  }: {
+    prisonId: string
+    sessionDate: string
+    visits: VisitPreview[]
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPath: '/orchestration/visits/session-template',
+        queryParameters: {
+          prisonCode: { equalTo: prisonId },
+          sessionTemplateReference: { absent: true },
+          sessionDate: { equalTo: sessionDate },
+          visitStatus: { equalTo: 'BOOKED' },
+          visitRestrictions: { absent: true },
+        },
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: visits,
       },
     })
   },

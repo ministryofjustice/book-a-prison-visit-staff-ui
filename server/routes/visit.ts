@@ -9,7 +9,6 @@ import { CancelVisitOrchestrationDto } from '../data/orchestrationApiTypes'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import { isValidVisitReference } from './validationChecks'
 import { clearSession, getFlashFormValues } from './visitorUtils'
-import config from '../config'
 import { VisitSessionData, VisitSlot } from '../@types/bapv'
 import SelectVisitors from './visitJourney/selectVisitors'
 import VisitType from './visitJourney/visitType'
@@ -22,7 +21,7 @@ import MainContact from './visitJourney/mainContact'
 import RequestMethod from './visitJourney/requestMethod'
 import sessionCheckMiddleware from '../middleware/sessionCheckMiddleware'
 import type { Services } from '../services'
-import { eventAuditTypesOriginal, eventAuditTypesWithReview } from '../constants/eventAuditTypes'
+import eventAuditTypes from '../constants/eventAuditTypes'
 import { requestMethodDescriptions, requestMethodsCancellation } from '../constants/requestMethods'
 import { notificationTypeWarnings, notificationTypes } from '../constants/notificationEvents'
 
@@ -97,9 +96,7 @@ export default function routes({
   get('/:reference', async (req, res) => {
     const reference = getVisitReference(req)
     const fromPage = typeof req.query?.from === 'string' ? req.query.from : null
-    const fromVisitSearchQuery = req.query?.query as string
-
-    const eventAuditTypes = config.features.reviewBookings ? eventAuditTypesWithReview : eventAuditTypesOriginal
+    const fromPageQuery = typeof req.query?.query === 'string' ? req.query.query : null
 
     const { visitHistoryDetails, visitors, notifications, additionalSupport } = await visitService.getFullVisitDetails({
       reference,
@@ -150,19 +147,19 @@ export default function routes({
       notificationTypeWarnings,
       additionalSupport,
       fromPage,
-      fromVisitSearchQuery,
+      fromPageQuery,
       showUpdate,
       showCancel,
       requestMethodDescriptions,
       eventAuditTypes,
-      notificationTypes: config.features.reviewBookings ? notificationTypes : null,
+      notificationTypes,
     })
   })
 
   post('/:reference', async (req, res) => {
     const reference = getVisitReference(req)
 
-    // @TODO - not really using full visit details here so could request less information
+    // TODO - not really using full visit details here so could request less information
     const {
       visitHistoryDetails: { visit },
     } = await visitService.getFullVisitDetails({

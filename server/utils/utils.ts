@@ -127,20 +127,6 @@ export const nextPrivIepAdjustDate = (latestPrivIepAdjustDate: string): string =
 
 export const formatVisitType = (visitType: string): string => properCase(visitType)
 
-export const sortByTimestamp = (
-  a: { visitTime: string; sortField: string },
-  b: { visitTime: string; sortField: string },
-) => {
-  if (a.sortField > b.sortField) {
-    return 1
-  }
-  if (a.sortField < b.sortField) {
-    return -1
-  }
-
-  return 0
-}
-
 export function safeReturnUrl(originalUrl: string) {
   return originalUrl.length === 0 || originalUrl.indexOf('://') > 0 || originalUrl.indexOf('//') === 0
     ? '/'

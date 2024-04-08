@@ -22,7 +22,8 @@
           results: {
             from: from,
             to: to,
-            count: numberOfResults
+            count: numberOfResults,
+            text: "result" | pluralise(numberOfResults)
           },
           previous: {
             text: 'Previous',
@@ -59,7 +60,7 @@
           rows: [
             [
               {
-                html: '<a class="govuk-link--no-visited-state" href="/visit/' + results[0].reference + '">' + results[0].reference + '</a>',
+                html: '<a class="govuk-link--no-visited-state" href="/visit/' + results[0].reference + '?' + queryParamsForBackLink + '">' + results[0].reference + '</a>',
                 attributes: {
                   "data-test": "visit-reference"
                 }
@@ -93,4 +94,13 @@
     {% endif %}
     </div>
   </div>
+
+  {% if not results | length %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <h2 class="govuk-heading-m govuk-!-margin-top-5">Search by prisoner</h2>
+      <p><a class="govuk-link--no-visited-state" href="/search/prisoner" data-test="search-by-prisoner">You can also search by prisoner name or number</a></p>
+    </div>
+  </div>
+  {% endif %}
 {% endblock %}

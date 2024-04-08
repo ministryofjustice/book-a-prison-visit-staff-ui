@@ -11,6 +11,7 @@ import {
   NotificationType,
   SessionSchedule,
   Visit,
+  VisitRestriction,
 } from './orchestrationApiTypes'
 import { VisitSessionData } from '../@types/bapv'
 
@@ -116,22 +117,6 @@ describe('orchestrationApiClient', () => {
     })
   })
 
-  describe('getFutureVisits', () => {
-    it('should return an array of Visits', async () => {
-      const prisonerId = 'A1234BC'
-      const results: Visit[] = [TestData.visit()]
-
-      fakeOrchestrationApi
-        .get(`/visits/search/future/${prisonerId}`)
-        .matchHeader('authorization', `Bearer ${token}`)
-        .reply(200, results)
-
-      const output = await orchestrationApiClient.getFutureVisits(prisonerId)
-
-      expect(output).toEqual(results)
-    })
-  })
-
   describe('getVisitsByDate', () => {
     it('should return an array of Visits', async () => {
       const dateString = '2022-05-06'
@@ -153,6 +138,60 @@ describe('orchestrationApiClient', () => {
       const output = await orchestrationApiClient.getVisitsByDate(dateString, prisonId)
 
       expect(output).toEqual(results)
+    })
+  })
+
+  describe('getVisitsBySessionTemplate', () => {
+    it('should return visit previews details for given session template reference, date, prison and restriction', async () => {
+      const sessionTemplateReference = 'v9d.7ed.7u'
+      const sessionDate = '2024-01-31'
+      const visitRestrictions: VisitRestriction = 'OPEN'
+      const visitPreviews = [TestData.visitPreview()]
+
+      fakeOrchestrationApi
+        .get('/visits/session-template')
+        .query({
+          prisonCode: prisonId,
+          sessionTemplateReference,
+          sessionDate,
+          visitStatus: 'BOOKED',
+          visitRestrictions,
+        })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, visitPreviews)
+
+      const output = await orchestrationApiClient.getVisitsBySessionTemplate(
+        prisonId,
+        sessionTemplateReference,
+        sessionDate,
+        visitRestrictions,
+      )
+
+      expect(output).toStrictEqual(visitPreviews)
+    })
+
+    it('should return visit previews details when only prison and date given (for migrated visits with no session template)', async () => {
+      const sessionDate = '2024-01-31'
+      const visitPreviews = [TestData.visitPreview()]
+
+      fakeOrchestrationApi
+        .get('/visits/session-template')
+        .query({
+          prisonCode: prisonId,
+          sessionDate,
+          visitStatus: 'BOOKED',
+        })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, visitPreviews)
+
+      const output = await orchestrationApiClient.getVisitsBySessionTemplate(
+        prisonId,
+        undefined,
+        sessionDate,
+        undefined,
+      )
+
+      expect(output).toStrictEqual(visitPreviews)
     })
   })
 
