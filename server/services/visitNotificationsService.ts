@@ -19,6 +19,21 @@ export default class VisitNotificationsService {
     return orchestrationApiClient.getNotificationCount(prisonId)
   }
 
+  async ignoreNotifications({
+    username,
+    reference,
+    ignoreVisitNotificationsDto,
+  }: {
+    username: string
+    reference: string
+    ignoreVisitNotificationsDto: IgnoreVisitNotificationsDto
+  }): Promise<void> {
+    const token = await this.hmppsAuthClient.getSystemClientToken(username)
+    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+
+    await orchestrationApiClient.ignoreNotifications(reference, ignoreVisitNotificationsDto)
+  }
+
   private buildVisitReviewListFilters(
     username: string,
     notificationGroups: NotificationGroup[],
@@ -143,20 +158,5 @@ export default class VisitNotificationsService {
     )
 
     return { filters, visitsReviewList }
-  }
-
-  async ignoreNotifications({
-    username,
-    reference,
-    ignoreVisitNotificationsDto,
-  }: {
-    username: string
-    reference: string
-    ignoreVisitNotificationsDto: IgnoreVisitNotificationsDto
-  }): Promise<Visit> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
-
-    return orchestrationApiClient.ignoreNotifications(reference, ignoreVisitNotificationsDto)
   }
 }

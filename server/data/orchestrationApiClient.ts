@@ -56,13 +56,6 @@ export default class OrchestrationApiClient {
     })
   }
 
-  async ignoreNotifications(reference: string, cancelVisitDto: IgnoreVisitNotificationsDto): Promise<Visit> {
-    return this.restClient.put({
-      path: `/visits/notification/visit/${reference}/ignore`,
-      data: cancelVisitDto,
-    })
-  }
-
   async getVisit(reference: string): Promise<Visit> {
     return this.restClient.get({ path: `/visits/${reference}` })
   }
@@ -166,6 +159,9 @@ export default class OrchestrationApiClient {
   }
 
   // visit notification controller
+  async ignoreNotifications(reference: string, data: IgnoreVisitNotificationsDto): Promise<Visit> {
+    return this.restClient.put({ path: `/visits/notification/visit/${reference}/ignore`, data })
+  }
 
   async getNotificationCount(prisonId: string): Promise<NotificationCount> {
     return this.restClient.get({ path: `/visits/notification/${prisonId}/count` })

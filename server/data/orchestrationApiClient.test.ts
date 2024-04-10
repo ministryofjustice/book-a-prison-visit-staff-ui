@@ -88,28 +88,6 @@ describe('orchestrationApiClient', () => {
     })
   })
 
-  describe('ignoreNotifications', () => {
-    it('should ignore visit notification with the specified reason', async () => {
-      const reference = 'ab-cd-ef-gh'
-
-      const ignoreVisitNotificationsDto: IgnoreVisitNotificationsDto = {
-        reason: 'adjustments will be made to seating',
-        actionedBy: 'user1',
-      }
-
-      const result: Visit = TestData.visit()
-
-      fakeOrchestrationApi
-        .put(`/visits/notification/ab-cd-ef-gh/ignore`, ignoreVisitNotificationsDto)
-        .matchHeader('authorization', `Bearer ${token}`)
-        .reply(200, result)
-
-      const output = await orchestrationApiClient.ignoreNotifications(reference, ignoreVisitNotificationsDto)
-
-      expect(output).toEqual(result)
-    })
-  })
-
   describe('getVisit', () => {
     it('should return a single matching Visit for a valid reference', async () => {
       const visit = TestData.visit()
@@ -356,6 +334,28 @@ describe('orchestrationApiClient', () => {
       const output = await orchestrationApiClient.createVisitApplication(visitSessionData)
 
       expect(output).toStrictEqual(result)
+    })
+  })
+
+  describe('ignoreNotifications', () => {
+    it('should ignore visit notification with the specified reason and return visit', async () => {
+      const reference = 'ab-cd-ef-gh'
+
+      const ignoreVisitNotificationsDto: IgnoreVisitNotificationsDto = {
+        reason: 'adjustments will be made to seating',
+        actionedBy: 'user1',
+      }
+
+      const visit = { reference } as Visit
+
+      fakeOrchestrationApi
+        .put(`/visits/notification/visit/${reference}/ignore`, ignoreVisitNotificationsDto)
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, visit)
+
+      const result = await orchestrationApiClient.ignoreNotifications(reference, ignoreVisitNotificationsDto)
+
+      expect(result).toStrictEqual(visit)
     })
   })
 
