@@ -45,15 +45,17 @@ describe('Visit notifications service', () => {
         reason: 'Allow visit to go ahead',
         actionedBy: 'User 1',
       }
-      orchestrationApiClient.ignoreNotifications.mockResolvedValue()
+      const visit = { reference } as Visit
+      orchestrationApiClient.ignoreNotifications.mockResolvedValue(visit)
 
-      await visitNotificationsService.ignoreNotifications({
+      const result = await visitNotificationsService.ignoreNotifications({
         username: 'user',
         reference,
         ignoreVisitNotificationsDto,
       })
 
       expect(orchestrationApiClient.ignoreNotifications).toHaveBeenCalledWith(reference, ignoreVisitNotificationsDto)
+      expect(result).toStrictEqual(visit)
     })
   })
 

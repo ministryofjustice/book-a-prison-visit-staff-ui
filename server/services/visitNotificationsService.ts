@@ -27,11 +27,11 @@ export default class VisitNotificationsService {
     username: string
     reference: string
     ignoreVisitNotificationsDto: IgnoreVisitNotificationsDto
-  }): Promise<void> {
+  }): Promise<Visit> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
-    await orchestrationApiClient.ignoreNotifications(reference, ignoreVisitNotificationsDto)
+    return orchestrationApiClient.ignoreNotifications(reference, ignoreVisitNotificationsDto)
   }
 
   private buildVisitReviewListFilters(
