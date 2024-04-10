@@ -340,12 +340,7 @@ export interface components {
        * @example VISITOR_CONCERN
        * @enum {string}
        */
-      type:
-        | 'VISITOR_CONCERN'
-        | 'VISIT_OUTCOMES'
-        | 'VISIT_COMMENT'
-        | 'STATUS_CHANGED_REASON'
-        | 'IGNORE_VISIT_NOTIFICATIONS_REASON'
+      type: 'VISITOR_CONCERN' | 'VISIT_OUTCOMES' | 'VISIT_COMMENT' | 'STATUS_CHANGED_REASON'
       /**
        * @description Note text
        * @example Visitor is concerned that his mother in-law is coming!
@@ -578,6 +573,8 @@ export interface components {
       actionedBy?: string
       /** @description Session template used for this event */
       sessionTemplateReference?: string
+      /** @description Notes added against the event */
+      text?: string
       /**
        * Format: date-time
        * @description event creat date and time

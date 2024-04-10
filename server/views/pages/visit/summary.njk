@@ -280,15 +280,15 @@
                 <div class="moj-timeline__description">
                   {% if event.type === 'UPDATED_VISIT' or event.type === 'BOOKED_VISIT' or event.type === 'MIGRATED_VISIT' %}
                     <p data-test="visit-request-method-{{ loop.index }}">{{ requestMethodDescriptions[event.applicationMethodType] }}</p>
-                  {% elif event.type === 'CANCELLED_VISIT' %}
+                  {% elseif event.type === 'CANCELLED_VISIT' %}
                     <p data-test="visit-cancelled-reason-{{ loop.index }}">Reason: {{ cancelledVisitReason }}</p>
                     {% if event.applicationMethodType !== 'NOT_KNOWN' and event.applicationMethodType !== 'NOT_APPLICABLE' %}
                       <p data-test="visit-cancelled-request-method-{{ loop.index }}">{{ requestMethodDescriptions[event.applicationMethodType] }}</p>
                     {% endif %}
+                  {% elseif event.type === 'IGNORE_VISIT_NOTIFICATIONS_EVENT' %}
+                    <p data-test="visit-needs-review-description-{{ loop.index }}">Reason: {{ event.text }}</p>
                   {% else %}
-                    {% if notificationTypes %}
-                      <p data-test="visit-needs-review-description-{{ loop.index }}">Reason: {{ notificationTypes[event.type] }}</p>
-                    {% endif %}
+                    <p data-test="visit-needs-review-description-{{ loop.index }}">Reason: {{ notificationTypes[event.type] }}</p>
                   {% endif %}
 
                 </div>
