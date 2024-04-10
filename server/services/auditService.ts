@@ -156,7 +156,7 @@ export default class AuditService {
     })
   }
 
-  async dismissNotifications({
+  async dismissedNotifications({
     visitReference,
     prisonerId,
     prisonId,
@@ -172,7 +172,7 @@ export default class AuditService {
     operationId: string
   }) {
     return this.sendAuditMessage({
-      action: 'DISMISS_NOTIFICATIONS',
+      action: 'DISMISSED_NOTIFICATIONS',
       who: username,
       operationId,
       details: {

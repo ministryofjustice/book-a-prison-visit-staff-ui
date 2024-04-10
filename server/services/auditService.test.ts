@@ -190,6 +190,32 @@ describe('Audit service', () => {
     })
   })
 
+  it('sends a notifications dismissed audit message', async () => {
+    await auditService.dismissedNotifications({
+      visitReference: 'ab-cd-ef-gh',
+      prisonerId: 'A1234BC',
+      prisonId,
+      reason: 'Dismiss reason',
+      username: 'username',
+      operationId: 'operation-id',
+    })
+
+    expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
+    expect(sqsClientInstance.send.mock.lastCall[0]).toMatchObject({
+      input: {
+        MessageBody: JSON.stringify({
+          what: 'DISMISSED_NOTIFICATIONS',
+          when: fakeDate,
+          operationId: 'operation-id',
+          who: 'username',
+          service: 'book-a-prison-visit-staff-ui',
+          details: '{"visitReference":"ab-cd-ef-gh","prisonerId":"A1234BC","prisonId":"HEI","reason":"Dismiss reason"}',
+        }),
+        QueueUrl,
+      },
+    })
+  })
+
   it('sends a cancelled visit audit message', async () => {
     await auditService.cancelledVisit({
       visitReference: 'ab-cd-ef-gh',
