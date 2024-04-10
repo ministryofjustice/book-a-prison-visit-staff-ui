@@ -5,7 +5,7 @@ import { BadRequest } from 'http-errors'
 import { differenceInCalendarDays } from 'date-fns'
 import visitCancellationReasons from '../constants/visitCancellationReasons'
 import { Prisoner } from '../data/prisonerOffenderSearchTypes'
-import { CancelVisitOrchestrationDto } from '../data/orchestrationApiTypes'
+import { CancelVisitOrchestrationDto, IgnoreVisitNotificationsDto } from '../data/orchestrationApiTypes'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import { isValidVisitReference } from './validationChecks'
 import { clearSession, getFlashFormValues } from './visitorUtils'
@@ -20,7 +20,7 @@ import Confirmation from './visitJourney/confirmation'
 import MainContact from './visitJourney/mainContact'
 import RequestMethod from './visitJourney/requestMethod'
 import sessionCheckMiddleware from '../middleware/sessionCheckMiddleware'
-import type { Services } from '../services'
+import { type Services } from '../services'
 import eventAuditTypes from '../constants/eventAuditTypes'
 import { requestMethodDescriptions, requestMethodsCancellation } from '../constants/requestMethods'
 import { notificationTypeWarnings, notificationTypes } from '../constants/notificationEvents'
@@ -36,6 +36,7 @@ export default function routes({
   supportedPrisonsService,
   visitService,
   visitSessionsService,
+  visitNotificationsService,
 }: Services): Router {
   const router = Router()
 
@@ -77,10 +78,29 @@ export default function routes({
         req.flash('formValues', req.body)
         return res.redirect(`/visit/${reference}/clear-notifications`)
       }
+      if (req.body.clearNotifications === 'yes') {
+        const ignoreVisitNotificationsDto: IgnoreVisitNotificationsDto = {
+          reason: req.body.clearReason,
+          actionedBy: req.user.userId,
+        }
 
-      // todo - api call
-      // todo - audit
-      return res.redirect(`/visit/${reference}/clear-notifications`)
+        const visit = await visitNotificationsService.ignoreNotifications({
+          username: res.locals.user.username,
+          reference,
+          ignoreVisitNotificationsDto,
+        })
+
+        await auditService.dismissNotifications({
+          visitReference: reference,
+          prisonerId: visit.prisonerId.toString(),
+          prisonId: visit.prisonId,
+          reason: `${req.body.cancel}: ${req.body.reason}`,
+          username: res.locals.user.username,
+          operationId: res.locals.appInsightsOperationId,
+        })
+      }
+
+      return res.redirect(`/visit/${reference}`)
     },
   )
 
@@ -103,7 +123,7 @@ export default function routes({
       username: res.locals.user.username,
     })
     const { visit } = visitHistoryDetails
-
+    console.log(visitHistoryDetails.eventsAudit)
     const filteredVisitHistoryDetails = visitHistoryDetails.eventsAudit.filter(event =>
       Object.keys(eventAuditTypes).includes(event.type),
     )

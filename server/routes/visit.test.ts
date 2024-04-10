@@ -720,7 +720,7 @@ describe('/visit/:reference', () => {
           selectedEstablishment: { prisonId: 'HEI', prisonName: supportedPrisons.HEI, policyNoticeDaysMin: 4 },
         } as SessionData,
       })
-
+  
       return request(app)
         .get(`/visit/${visit.reference}/update/confirm-update`)
         .expect(200)
@@ -746,7 +746,7 @@ describe('/visit/:reference', () => {
           expect(visitSessionData).not.toHaveProperty('overrideBookingWindow')
         })
     })
-
+  
     it('should redirect to select visitors page if choosing to proceed with update', () => {
       return request(app)
         .post('/visit/ab-cd-ef-gh/update/confirm-update')
@@ -757,7 +757,7 @@ describe('/visit/:reference', () => {
           expect(visitSessionData.overrideBookingWindow).toBe(true)
         })
     })
-
+  
     it('should should redirect to confirm update page with errors set if no option selected', () => {
       return request(app)
         .post('/visit/ab-cd-ef-gh/update/confirm-update')
@@ -771,6 +771,70 @@ describe('/visit/:reference', () => {
           ])
         })
     })
+  })
+})
+
+describe.only('GET /visit/:reference/clear-notifications', () => {
+  it('should render the clear notifications page', () => {
+    return request(app)
+      .get('/visit/ab-cd-ef-gh/clear-notifications')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('h1').text().trim()).toBe('Why is this booking being cancelled?')
+        expect($('input[name="cancel"]').length).toBe(5)
+        expect($('input[name="cancel"]:checked').length).toBe(0)
+        expect($('[data-test="visitor_cancelled"]').attr('value')).toBe('VISITOR_CANCELLED')
+        expect($('label[for="cancel"]').text().trim()).toBe('Visitor cancelled')
+        expect($('[data-test="details_changed_after_booking"]').attr('value')).toBe('DETAILS_CHANGED_AFTER_BOOKING')
+        expect($('label[for="cancel-4"]').text().trim()).toBe('Details changed after booking')
+        expect($('[data-test="administrative_error"]').attr('value')).toBe('ADMINISTRATIVE_ERROR')
+        expect($('label[for="cancel-5"]').text().trim()).toBe('Administrative error')
+
+        expect($('input[name="method"]').length).toBe(4)
+        expect($('input[name="method"]').eq(0).prop('value')).toBe('PHONE')
+        expect($('input[name="method"]').eq(1).prop('value')).toBe('WEBSITE')
+        expect($('input[name="method"]').eq(2).prop('value')).toBe('EMAIL')
+        expect($('input[name="method"]').eq(3).prop('value')).toBe('IN_PERSON')
+        expect($('input[name="method"]:checked').length).toBe(0)
+
+        expect($('[data-test="cancel-booking"]').length).toBe(1)
+      })
+  })
+
+  it('should render the cancellation reasons page, showing validation errors and re-populating fields', () => {
+    flashData.errors = [
+      { msg: 'No answer selected', path: 'cancel' },
+      { msg: 'No request method selected', path: 'method' },
+      { msg: 'Enter a reason', path: 'reason' },
+    ]
+
+    flashData.formValues = [{ cancel: 'VISITOR_CANCELLED', method: 'EMAIL', reason: 'illness' }]
+
+    return request(app)
+      .get('/visit/ab-cd-ef-gh/cancel')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('h1').text().trim()).toBe('Why is this booking being cancelled?')
+
+        expect($('.govuk-error-summary__body').text()).toContain('No answer selected')
+        expect($('.govuk-error-summary__body').text()).toContain('No request method selected')
+        expect($('.govuk-error-summary__body').text()).toContain('Enter a reason')
+        expect($('.govuk-error-summary__body a').eq(0).attr('href')).toBe('#cancel-error')
+        expect($('.govuk-error-summary__body a').eq(1).attr('href')).toBe('#method-error')
+        expect($('.govuk-error-summary__body a').eq(2).attr('href')).toBe('#reason-error')
+
+        expect($('input[name="cancel"][value="VISITOR_CANCELLED"]').prop('checked')).toBe(true)
+        expect($('input[name="method"][value="EMAIL"]').prop('checked')).toBe(true)
+        expect($('input[name="reason"]').val()).toBe('illness')
+
+        expect(flashProvider).toHaveBeenCalledWith('errors')
+        expect(flashProvider).toHaveBeenCalledWith('formValues')
+        expect(flashProvider).toHaveBeenCalledTimes(2)
+      })
   })
 })
 

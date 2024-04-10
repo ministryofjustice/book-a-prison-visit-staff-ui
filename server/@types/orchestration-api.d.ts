@@ -12,6 +12,10 @@ export interface paths {
     /** Book a visit (end of flow) */
     put: operations['bookAVisit']
   }
+  '/visits/notification/visit/{reference}/ignore': {
+    /** Do not change an existing booked visit and ignore all notifications */
+    put: operations['ignoreVisitNotifications']
+  }
   '/visits/application/{reference}/slot/change': {
     /** Change an incomplete application */
     put: operations['changeIncompleteApplication']
@@ -336,7 +340,12 @@ export interface components {
        * @example VISITOR_CONCERN
        * @enum {string}
        */
-      type: 'VISITOR_CONCERN' | 'VISIT_OUTCOMES' | 'VISIT_COMMENT' | 'STATUS_CHANGED_REASON'
+      type:
+        | 'VISITOR_CONCERN'
+        | 'VISIT_OUTCOMES'
+        | 'VISIT_COMMENT'
+        | 'STATUS_CHANGED_REASON'
+        | 'IGNORE_VISIT_NOTIFICATIONS_REASON'
       /**
        * @description Note text
        * @example Visitor is concerned that his mother in-law is coming!
@@ -380,6 +389,12 @@ export interface components {
         | 'NOT_KNOWN'
         | 'NOT_APPLICABLE'
         | 'BY_PRISONER'
+    }
+    IgnoreVisitNotificationsDto: {
+      /** @description Reason why the visit's notifications can be ignored */
+      reason: string
+      /** @description Username for user who actioned this request */
+      actionedBy: string
     }
     /** @description Visitor support */
     ApplicationSupportDto: {
@@ -543,6 +558,7 @@ export interface components {
         | 'PRISONER_RELEASED_EVENT'
         | 'PRISONER_RESTRICTION_CHANGE_EVENT'
         | 'PRISON_VISITS_BLOCKED_FOR_DATE'
+        | 'IGNORE_VISIT_NOTIFICATIONS_EVENT'
       /**
        * @description What was the application method for this event
        * @enum {string}
@@ -628,7 +644,7 @@ export interface components {
       content?: components['schemas']['VisitDto'][]
       /** Format: int32 */
       number?: number
-      sort?: components['schemas']['SortObject']
+      sort?: components['schemas']['SortObject'][]
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
@@ -637,7 +653,7 @@ export interface components {
     PageableObject: {
       /** Format: int64 */
       offset?: number
-      sort?: components['schemas']['SortObject']
+      sort?: components['schemas']['SortObject'][]
       /** Format: int32 */
       pageSize?: number
       /** Format: int32 */
@@ -646,9 +662,11 @@ export interface components {
       unpaged?: boolean
     }
     SortObject: {
-      empty?: boolean
-      sorted?: boolean
-      unsorted?: boolean
+      direction?: string
+      nullHandling?: string
+      ascending?: boolean
+      property?: string
+      ignoreCase?: boolean
     }
     OrchestrationNotificationGroupDto: {
       /**
@@ -1164,6 +1182,55 @@ export interface operations {
         }
       }
       /** @description Incorrect permissions to book a visit */
+      403: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Visit not found */
+      404: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  /** Do not change an existing booked visit and ignore all notifications */
+  ignoreVisitNotifications: {
+    parameters: {
+      path: {
+        /**
+         * @description reference
+         * @example v9-d7-ed-7u
+         */
+        reference: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['IgnoreVisitNotificationsDto']
+      }
+    }
+    responses: {
+      /** @description Visit notifications cleared and reason noted. */
+      200: {
+        content: {
+          'application/json': components['schemas']['VisitDto']
+        }
+      }
+      /** @description Incorrect request to ignore visit notifications. */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to ignore visit notifications. */
       403: {
         content: {
           'application/json': components['schemas']['ErrorResponse']

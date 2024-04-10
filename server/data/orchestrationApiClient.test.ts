@@ -8,6 +8,7 @@ import {
   CancelVisitOrchestrationDto,
   ChangeApplicationDto,
   CreateApplicationDto,
+  IgnoreVisitNotificationsDto,
   NotificationType,
   SessionSchedule,
   Visit,
@@ -82,6 +83,28 @@ describe('orchestrationApiClient', () => {
         .reply(200, result)
 
       const output = await orchestrationApiClient.cancelVisit(reference, cancelVisitDto)
+
+      expect(output).toEqual(result)
+    })
+  })
+
+  describe('ignoreNotifications', () => {
+    it('should ignore visit notification with the specified reason', async () => {
+      const reference = 'ab-cd-ef-gh'
+
+      const ignoreVisitNotificationsDto: IgnoreVisitNotificationsDto = {
+        reason: 'adjustments will be made to seating',
+        actionedBy: 'user1',
+      }
+
+      const result: Visit = TestData.visit()
+
+      fakeOrchestrationApi
+        .put(`/visits/notification/ab-cd-ef-gh/ignore`, ignoreVisitNotificationsDto)
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, result)
+
+      const output = await orchestrationApiClient.ignoreNotifications(reference, ignoreVisitNotificationsDto)
 
       expect(output).toEqual(result)
     })

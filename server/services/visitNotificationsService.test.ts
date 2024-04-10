@@ -2,7 +2,7 @@ import TestData from '../routes/testutils/testData'
 import VisitNotificationsService from './visitNotificationsService'
 import { createMockHmppsAuthClient, createMockOrchestrationApiClient } from '../data/testutils/mocks'
 import { FilterField, VisitsReviewListItem } from '../@types/bapv'
-import { NotificationType } from '../data/orchestrationApiTypes'
+import { NotificationType, Visit } from '../data/orchestrationApiTypes'
 
 const token = 'some token'
 const prisonId = 'HEI'
@@ -393,6 +393,50 @@ describe('Visit notifications service', () => {
         expect(orchestrationApiClient.getNotificationGroups).toHaveBeenCalledWith(prisonId)
         expect(result.filters).toStrictEqual(filters)
         expect(result.visitsReviewList.length).toBe(2)
+      })
+    })
+
+    describe('Ignore visit notifications', () => {
+      it('should cancel a visit, giving the status code and reason', async () => {
+        const expectedResult: Visit = {
+          applicationReference: 'aaa-bbb-ccc',
+          reference: 'ab-cd-ef-gh',
+          prisonerId: 'AF34567G',
+          prisonId: 'HEI',
+          sessionTemplateReference: 'v9d.7ed.7u',
+          visitRoom: 'A1 L3',
+          visitType: 'SOCIAL',
+          visitStatus: 'BOOKED',
+          visitRestriction: 'OPEN',
+          startTimestamp: '2022-02-14T10:00:00',
+          endTimestamp: '2022-02-14T11:00:00',
+          visitNotes: [],
+          visitors: [
+            {
+              nomisPersonId: 1234,
+            },
+          ],
+          visitorSupport: { description: '' },
+          createdTimestamp: '2022-02-14T10:00:00',
+          modifiedTimestamp: '2022-02-14T10:05:00',
+        }
+        const ignoreVisitNotificationsDto = {
+          reason: 'Allow visit to go ahead',
+          actionedBy: 'User 1',
+        }
+        orchestrationApiClient.ignoreNotifications.mockResolvedValue(expectedResult)
+        const result = await visitNotificationsService.ignoreNotifications({
+          username: 'user',
+          reference: expectedResult.reference,
+          ignoreVisitNotificationsDto,
+        })
+
+        expect(orchestrationApiClient.ignoreNotifications).toHaveBeenCalledTimes(1)
+        expect(orchestrationApiClient.ignoreNotifications).toHaveBeenCalledWith(
+          expectedResult.reference,
+          ignoreVisitNotificationsDto,
+        )
+        expect(result).toEqual(expectedResult)
       })
     })
   })
