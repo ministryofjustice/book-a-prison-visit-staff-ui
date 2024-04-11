@@ -5,7 +5,7 @@ import Page from '../pages/page'
 import VisitsReviewListingPage from '../pages/visitsReviewListing'
 import { notificationTypes } from '../../server/constants/notificationEvents'
 
-context('Bookings review page', () => {
+context('Bookings review listing page', () => {
   const prettyDateFormat = 'd MMMM yyyy'
 
   const notificationGroups = [

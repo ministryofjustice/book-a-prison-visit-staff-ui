@@ -9,7 +9,7 @@ export default class VisitDetailsPage extends Page {
 
   cancellationType = (): PageElement => cy.get('[data-test="visit-cancelled-type')
 
-  visitNotification = (index: number): PageElement => cy.get('[data-test="visit-notification').eq(index)
+  visitNotification = (): PageElement => cy.get('[data-test="visit-notification')
 
   // Buttons
   updateBooking = (): PageElement => cy.get('[data-test="update-visit"]')

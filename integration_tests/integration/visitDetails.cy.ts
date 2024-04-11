@@ -113,7 +113,7 @@ context('Visit details page', () => {
     visitDetailsPage.clearNotifications().should('have.length', 1)
 
     // notifications
-    visitDetailsPage.visitNotification(0).contains(notificationTypeWarnings.PRISONER_RELEASED_EVENT)
+    visitDetailsPage.visitNotification().eq(0).contains(notificationTypeWarnings.PRISONER_RELEASED_EVENT)
 
     // Prisoner Details
     visitDetailsPage.prisonerName().contains(prisonerDisplayName)

@@ -4,6 +4,7 @@ import {
   ApplicationDto,
   ApplicationMethodType,
   CancelVisitOrchestrationDto,
+  IgnoreVisitNotificationsDto,
   NotificationCount,
   NotificationGroup,
   NotificationType,
@@ -241,6 +242,33 @@ export default {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
         jsonBody: visits,
+      },
+    })
+  },
+  stubIgnoreNotifications: ({
+    ignoreVisitNotificationsDto,
+    visit,
+  }: {
+    ignoreVisitNotificationsDto: IgnoreVisitNotificationsDto
+    visit: Visit
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'PUT',
+        url: `/orchestration/visits/notification/visit/${visit.reference}/ignore`,
+        bodyPatterns: [
+          {
+            equalToJson: {
+              reason: ignoreVisitNotificationsDto.reason,
+              actionedBy: ignoreVisitNotificationsDto.actionedBy,
+            },
+          },
+        ],
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: visit,
       },
     })
   },
