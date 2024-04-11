@@ -17,6 +17,7 @@ import {
   createMockPrisonerSearchService,
   createMockPrisonerVisitorsService,
   createMockSupportedPrisonsService,
+  createMockVisitNotificationsService,
   createMockVisitService,
   createMockVisitSessionsService,
 } from '../services/testutils/mocks'
@@ -30,6 +31,7 @@ const auditService = createMockAuditService()
 const prisonerSearchService = createMockPrisonerSearchService()
 const prisonerVisitorsService = createMockPrisonerVisitorsService()
 const supportedPrisonsService = createMockSupportedPrisonsService()
+const visitNotificationsService = createMockVisitNotificationsService()
 const visitService = createMockVisitService()
 const visitSessionsService = createMockVisitSessionsService()
 
@@ -720,7 +722,7 @@ describe('/visit/:reference', () => {
           selectedEstablishment: { prisonId: 'HEI', prisonName: supportedPrisons.HEI, policyNoticeDaysMin: 4 },
         } as SessionData,
       })
-  
+
       return request(app)
         .get(`/visit/${visit.reference}/update/confirm-update`)
         .expect(200)
@@ -746,7 +748,7 @@ describe('/visit/:reference', () => {
           expect(visitSessionData).not.toHaveProperty('overrideBookingWindow')
         })
     })
-  
+
     it('should redirect to select visitors page if choosing to proceed with update', () => {
       return request(app)
         .post('/visit/ab-cd-ef-gh/update/confirm-update')
@@ -757,7 +759,7 @@ describe('/visit/:reference', () => {
           expect(visitSessionData.overrideBookingWindow).toBe(true)
         })
     })
-  
+
     it('should should redirect to confirm update page with errors set if no option selected', () => {
       return request(app)
         .post('/visit/ab-cd-ef-gh/update/confirm-update')
@@ -774,67 +776,142 @@ describe('/visit/:reference', () => {
   })
 })
 
-describe.only('GET /visit/:reference/clear-notifications', () => {
-  it('should render the clear notifications page', () => {
-    return request(app)
-      .get('/visit/ab-cd-ef-gh/clear-notifications')
-      .expect(200)
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        const $ = cheerio.load(res.text)
-        expect($('h1').text().trim()).toBe('Why is this booking being cancelled?')
-        expect($('input[name="cancel"]').length).toBe(5)
-        expect($('input[name="cancel"]:checked').length).toBe(0)
-        expect($('[data-test="visitor_cancelled"]').attr('value')).toBe('VISITOR_CANCELLED')
-        expect($('label[for="cancel"]').text().trim()).toBe('Visitor cancelled')
-        expect($('[data-test="details_changed_after_booking"]').attr('value')).toBe('DETAILS_CHANGED_AFTER_BOOKING')
-        expect($('label[for="cancel-4"]').text().trim()).toBe('Details changed after booking')
-        expect($('[data-test="administrative_error"]').attr('value')).toBe('ADMINISTRATIVE_ERROR')
-        expect($('label[for="cancel-5"]').text().trim()).toBe('Administrative error')
+describe('Clear visit notifications', () => {
+  describe('GET /visit/:reference/clear-notifications', () => {
+    it('should render the clear notifications page', () => {
+      return request(app)
+        .get('/visit/ab-cd-ef-gh/clear-notifications')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text().trim()).toBe('Are you sure the visit does not need to be updated or cancelled?')
+          expect($('.govuk-back-link').attr('href')).toBe('/visit/ab-cd-ef-gh')
+          expect($('input[name="clearNotifications"]').length).toBe(2)
+          expect($('input[name="clearNotifications"]:checked').length).toBe(0)
+          expect($('input[name="clearReason"]').length).toBe(1)
+          expect($('input[name="clearReason"]').val()).toBe(undefined)
+          expect($('[data-test="submit"]').length).toBe(1)
+        })
+    })
 
-        expect($('input[name="method"]').length).toBe(4)
-        expect($('input[name="method"]').eq(0).prop('value')).toBe('PHONE')
-        expect($('input[name="method"]').eq(1).prop('value')).toBe('WEBSITE')
-        expect($('input[name="method"]').eq(2).prop('value')).toBe('EMAIL')
-        expect($('input[name="method"]').eq(3).prop('value')).toBe('IN_PERSON')
-        expect($('input[name="method"]:checked').length).toBe(0)
+    it('should render the clear notifications page, showing validation errors and re-populating fields', () => {
+      flashData.errors = [
+        { msg: 'No answer selected', path: 'clearNotifications' },
+        { msg: 'Enter a reason for not changing the booking', path: 'clearReason' },
+      ]
 
-        expect($('[data-test="cancel-booking"]').length).toBe(1)
-      })
+      flashData.formValues = [{ clearNotifications: 'yes', clearReason: 'some text' }]
+
+      return request(app)
+        .get('/visit/ab-cd-ef-gh/clear-notifications')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('.govuk-error-summary__body').text()).toContain('No answer selected')
+          expect($('.govuk-error-summary__body').text()).toContain('Enter a reason for not changing the booking')
+          expect($('.govuk-error-summary__body a').eq(0).attr('href')).toBe('#clearNotifications-error')
+          expect($('.govuk-error-summary__body a').eq(1).attr('href')).toBe('#clearReason-error')
+
+          expect($('input[name="clearNotifications"]:checked').val()).toBe('yes')
+          expect($('input[name="clearReason"]').val()).toBe('some text')
+
+          expect(flashProvider).toHaveBeenCalledWith('errors')
+          expect(flashProvider).toHaveBeenCalledWith('formValues')
+        })
+    })
   })
 
-  it('should render the cancellation reasons page, showing validation errors and re-populating fields', () => {
-    flashData.errors = [
-      { msg: 'No answer selected', path: 'cancel' },
-      { msg: 'No request method selected', path: 'method' },
-      { msg: 'Enter a reason', path: 'reason' },
-    ]
+  describe('POST /visit/:reference/clear-notifications', () => {
+    beforeEach(() => {
+      visitNotificationsService.ignoreNotifications.mockResolvedValue(TestData.visit())
 
-    flashData.formValues = [{ cancel: 'VISITOR_CANCELLED', method: 'EMAIL', reason: 'illness' }]
+      app = appWithAllRoutes({ services: { auditService, visitNotificationsService } })
+    })
 
-    return request(app)
-      .get('/visit/ab-cd-ef-gh/cancel')
-      .expect(200)
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        const $ = cheerio.load(res.text)
-        expect($('h1').text().trim()).toBe('Why is this booking being cancelled?')
+    it('should clear visit notifications and redirect to the booking summary page if YES and reason given', () => {
+      return request(app)
+        .post('/visit/ab-cd-ef-gh/clear-notifications')
+        .send('clearNotifications=yes')
+        .send('clearReason=reason')
+        .expect(302)
+        .expect('location', '/visit/ab-cd-ef-gh')
+        .expect(() => {
+          expect(flashProvider).not.toHaveBeenCalled()
 
-        expect($('.govuk-error-summary__body').text()).toContain('No answer selected')
-        expect($('.govuk-error-summary__body').text()).toContain('No request method selected')
-        expect($('.govuk-error-summary__body').text()).toContain('Enter a reason')
-        expect($('.govuk-error-summary__body a').eq(0).attr('href')).toBe('#cancel-error')
-        expect($('.govuk-error-summary__body a').eq(1).attr('href')).toBe('#method-error')
-        expect($('.govuk-error-summary__body a').eq(2).attr('href')).toBe('#reason-error')
+          expect(visitNotificationsService.ignoreNotifications).toHaveBeenCalledWith({
+            username: 'user1',
+            reference: 'ab-cd-ef-gh',
+            ignoreVisitNotificationsDto: { reason: 'reason', actionedBy: 'user1' },
+          })
 
-        expect($('input[name="cancel"][value="VISITOR_CANCELLED"]').prop('checked')).toBe(true)
-        expect($('input[name="method"][value="EMAIL"]').prop('checked')).toBe(true)
-        expect($('input[name="reason"]').val()).toBe('illness')
+          expect(auditService.dismissedNotifications).toHaveBeenCalledWith({
+            visitReference: 'ab-cd-ef-gh',
+            prisonerId: 'A1234BC',
+            prisonId: 'HEI',
+            reason: 'reason',
+            username: 'user1',
+            operationId: undefined,
+          })
+        })
+    })
 
-        expect(flashProvider).toHaveBeenCalledWith('errors')
-        expect(flashProvider).toHaveBeenCalledWith('formValues')
-        expect(flashProvider).toHaveBeenCalledTimes(2)
-      })
+    it('should NOT clear visit notifications and redirect to the booking summary page if NO selected', () => {
+      return request(app)
+        .post('/visit/ab-cd-ef-gh/clear-notifications')
+        .send('clearNotifications=no')
+        .expect(302)
+        .expect('location', '/visit/ab-cd-ef-gh')
+        .expect(() => {
+          expect(flashProvider).not.toHaveBeenCalled()
+          expect(visitNotificationsService.ignoreNotifications).not.toHaveBeenCalled()
+          expect(auditService.dismissedNotifications).not.toHaveBeenCalled()
+        })
+    })
+
+    it('should set validation errors in flash and redirect to self if no reason selected', () => {
+      return request(app)
+        .post('/visit/ab-cd-ef-gh/clear-notifications')
+        .expect(302)
+        .expect('location', '/visit/ab-cd-ef-gh/clear-notifications')
+        .expect(() => {
+          expect(flashProvider).toHaveBeenCalledWith('errors', [
+            {
+              location: 'body',
+              msg: 'No answer selected',
+              path: 'clearNotifications',
+              type: 'field',
+              value: undefined,
+            },
+          ])
+          expect(flashProvider).toHaveBeenCalledWith('formValues', {})
+          expect(visitNotificationsService.ignoreNotifications).not.toHaveBeenCalled()
+          expect(auditService.dismissedNotifications).not.toHaveBeenCalled()
+        })
+    })
+
+    it('should set validation errors in flash and redirect to self if YES selected and no reason given', () => {
+      return request(app)
+        .post('/visit/ab-cd-ef-gh/clear-notifications')
+        .send('clearNotifications=yes')
+        .expect(302)
+        .expect('location', '/visit/ab-cd-ef-gh/clear-notifications')
+        .expect(() => {
+          expect(flashProvider).toHaveBeenCalledWith('errors', [
+            {
+              location: 'body',
+              msg: 'Enter a reason for not changing the booking',
+              path: 'clearReason',
+              type: 'field',
+              value: '',
+            },
+          ])
+          expect(flashProvider).toHaveBeenCalledWith('formValues', { clearNotifications: 'yes', clearReason: '' })
+          expect(visitNotificationsService.ignoreNotifications).not.toHaveBeenCalled()
+          expect(auditService.dismissedNotifications).not.toHaveBeenCalled()
+        })
+    })
   })
 })
 
