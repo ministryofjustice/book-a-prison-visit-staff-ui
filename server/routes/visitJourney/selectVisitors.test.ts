@@ -6,7 +6,12 @@ import { FlashData, VisitorListItem, VisitSessionData } from '../../@types/bapv'
 import { OffenderRestriction } from '../../data/prisonApiTypes'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
 import { Restriction } from '../../data/prisonerContactRegistryApiTypes'
-import { createMockPrisonerProfileService, createMockPrisonerVisitorsService } from '../../services/testutils/mocks'
+import {
+  createMockPrisonerProfileService,
+  createMockPrisonerVisitorsService,
+  createMockSupportedPrisonsService,
+} from '../../services/testutils/mocks'
+import TestData from '../testutils/testData'
 
 let sessionApp: Express
 
@@ -14,6 +19,7 @@ let flashData: FlashData
 
 const prisonerVisitorsService = createMockPrisonerVisitorsService()
 const prisonerProfileService = createMockPrisonerProfileService()
+const supportedPrisonsService = createMockSupportedPrisonsService()
 
 let visitSessionData: VisitSessionData
 
@@ -527,105 +533,105 @@ testJourneys.forEach(journey => {
     const adultVisitors: { adults: VisitorListItem[] } = { adults: [] }
     const visitReference = 'ab-cd-ef-gh'
 
-    beforeEach(() => {
-      const visitorList: { visitors: VisitorListItem[] } = {
-        visitors: [
-          {
-            personId: 4000,
-            name: 'Keith Daniels',
-            dateOfBirth: '1980-02-28',
-            adult: true,
-            relationshipDescription: 'Brother',
-            address: 'Not entered',
-            restrictions: [
-              {
-                restrictionType: 'BAN',
-                restrictionTypeDescription: 'Banned',
-                startDate: '2022-01-01',
-                expiryDate: '2023-12-14',
-                comment: 'Ban details',
-              },
-            ],
-            banned: false,
-          },
-          {
-            personId: 4321,
-            name: 'Jeanette Smith',
-            dateOfBirth: '1986-07-28',
-            adult: true,
-            relationshipDescription: 'Sister',
-            address:
-              'Premises,<br>Flat 23B,<br>123 The Street,<br>Springfield,<br>Coventry,<br>West Midlands,<br>C1 2AB,<br>England',
-            restrictions: [
-              {
-                restrictionType: 'BAN',
-                restrictionTypeDescription: 'Banned',
-                startDate: '2022-01-01',
-                expiryDate: '2022-07-31',
-                comment: 'Ban details',
-              },
-            ],
-            banned: true,
-          },
-          {
-            personId: 4322,
-            name: 'Bob Smith',
-            dateOfBirth: '1986-07-28',
-            adult: true,
-            relationshipDescription: 'Brother',
-            address: '1st listed address',
-            restrictions: [],
-            banned: false,
-          },
-          {
-            personId: 4323,
-            name: 'Ted Smith',
-            dateOfBirth: '1968-07-28',
-            adult: true,
-            relationshipDescription: 'Father',
-            address: '1st listed address',
-            restrictions: [],
-            banned: false,
-          },
-          {
-            personId: 4324,
-            name: 'Anne Smith',
-            dateOfBirth: '2018-03-02',
-            adult: false,
-            relationshipDescription: 'Niece',
-            address: 'Not entered',
-            restrictions: [],
-            banned: false,
-          },
-          {
-            personId: 4325,
-            name: 'Bill Smith',
-            dateOfBirth: '2018-03-02',
-            adult: false,
-            relationshipDescription: 'Nephew',
-            address: 'Not entered',
-            restrictions: [],
-            banned: false,
-          },
-          {
-            personId: 4326,
-            name: 'John Jones',
-            dateOfBirth: '1978-05-25',
-            adult: true,
-            relationshipDescription: 'Friend',
-            address: 'Not entered',
-            restrictions: [
-              {
-                restrictionType: 'CLOSED',
-                restrictionTypeDescription: 'Closed',
-                startDate: '2022-01-01',
-              },
-            ],
-            banned: false,
-          },
-        ],
-      }
+    const visitorList: { visitors: VisitorListItem[] } = {
+      visitors: [
+        {
+          personId: 4000,
+          name: 'Keith Daniels',
+          dateOfBirth: '1980-02-28',
+          adult: true,
+          relationshipDescription: 'Brother',
+          address: 'Not entered',
+          restrictions: [
+            {
+              restrictionType: 'BAN',
+              restrictionTypeDescription: 'Banned',
+              startDate: '2022-01-01',
+              expiryDate: '2023-12-14',
+              comment: 'Ban details',
+            },
+          ],
+          banned: false,
+        },
+        {
+          personId: 4321,
+          name: 'Jeanette Smith',
+          dateOfBirth: '1986-07-28',
+          adult: true,
+          relationshipDescription: 'Sister',
+          address:
+            'Premises,<br>Flat 23B,<br>123 The Street,<br>Springfield,<br>Coventry,<br>West Midlands,<br>C1 2AB,<br>England',
+          restrictions: [
+            {
+              restrictionType: 'BAN',
+              restrictionTypeDescription: 'Banned',
+              startDate: '2022-01-01',
+              expiryDate: '2022-07-31',
+              comment: 'Ban details',
+            },
+          ],
+          banned: true,
+        },
+        {
+          personId: 4322,
+          name: 'Bob Smith',
+          dateOfBirth: '1986-07-28',
+          adult: true,
+          relationshipDescription: 'Brother',
+          address: '1st listed address',
+          restrictions: [],
+          banned: false,
+        },
+        {
+          personId: 4323,
+          name: 'Ted Smith',
+          dateOfBirth: '1968-07-28',
+          adult: true,
+          relationshipDescription: 'Father',
+          address: '1st listed address',
+          restrictions: [],
+          banned: false,
+        },
+        {
+          personId: 4324,
+          name: 'Anne Smith',
+          dateOfBirth: '2018-03-02',
+          adult: false,
+          relationshipDescription: 'Niece',
+          address: 'Not entered',
+          restrictions: [],
+          banned: false,
+        },
+        {
+          personId: 4325,
+          name: 'Bill Smith',
+          dateOfBirth: '2018-03-02',
+          adult: false,
+          relationshipDescription: 'Nephew',
+          address: 'Not entered',
+          restrictions: [],
+          banned: false,
+        },
+        {
+          personId: 4326,
+          name: 'John Jones',
+          dateOfBirth: '1978-05-25',
+          adult: true,
+          relationshipDescription: 'Friend',
+          address: 'Not entered',
+          restrictions: [
+            {
+              restrictionType: 'CLOSED',
+              restrictionTypeDescription: 'Closed',
+              startDate: '2022-01-01',
+            },
+          ],
+          banned: false,
+        },
+      ],
+    }
 
+    beforeEach(() => {
       visitSessionData = {
         prisoner: {
           name: 'prisoner name',
@@ -969,26 +975,66 @@ testJourneys.forEach(journey => {
         })
     })
 
-    it('should set validation errors in flash and redirect if more than 10 visitors are selected', () => {
-      const tooManyVisitorIds = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11']
+    describe('Maximum total number of visitors', () => {
+      it('should allow up to the maximum configured number of visitors', () => {
+        const maxTotalVisitors = 2
+        const visitors = ['4322', '4323']
 
-      return request(sessionApp)
-        .post(`${journey.urlPrefix}/select-visitors`)
-        .send(`visitors=${tooManyVisitorIds.join('&visitors=')}`)
-        .expect(302)
-        .expect('location', `${journey.urlPrefix}/select-visitors`)
-        .expect(() => {
-          expect(flashProvider).toHaveBeenCalledWith('errors', [
-            {
-              location: 'body',
-              msg: 'Select no more than 10 visitors',
-              path: 'visitors',
-              type: 'field',
-              value: tooManyVisitorIds,
-            },
-          ])
-          expect(flashProvider).toHaveBeenCalledWith('formValues', { visitors: tooManyVisitorIds })
+        supportedPrisonsService.getSupportedPrisons.mockResolvedValue(TestData.supportedPrisons())
+        supportedPrisonsService.getPrisonConfig.mockResolvedValue({ maxTotalVisitors, policyNoticeDaysMin: 2 })
+
+        sessionApp = appWithAllRoutes({
+          services: { prisonerProfileService, prisonerVisitorsService, supportedPrisonsService },
+          sessionData: {
+            adultVisitors,
+            visitorList,
+            visitSessionData,
+          } as SessionData,
         })
+
+        return request(sessionApp)
+          .post(`${journey.urlPrefix}/select-visitors`)
+          .send({ visitors })
+          .expect(302)
+          .expect('location', `${journey.urlPrefix}/select-date-and-time`)
+          .expect(() => {
+            expect(visitSessionData.visitors.length).toEqual(2)
+          })
+      })
+
+      it('should set validation errors in flash and redirect if more than the maximum configured visitors are selected', () => {
+        const maxTotalVisitors = 2
+        const visitors = ['4322', '4323', '4324']
+
+        supportedPrisonsService.getSupportedPrisons.mockResolvedValue(TestData.supportedPrisons())
+        supportedPrisonsService.getPrisonConfig.mockResolvedValue({ maxTotalVisitors, policyNoticeDaysMin: 2 })
+
+        sessionApp = appWithAllRoutes({
+          services: { prisonerProfileService, prisonerVisitorsService, supportedPrisonsService },
+          sessionData: {
+            adultVisitors,
+            visitorList,
+            visitSessionData,
+          } as SessionData,
+        })
+        return request(sessionApp)
+          .post(`${journey.urlPrefix}/select-visitors`)
+          .send({ visitors })
+          .expect(302)
+          .expect('location', `${journey.urlPrefix}/select-visitors`)
+          .expect(() => {
+            expect(flashProvider).toHaveBeenCalledWith('errors', [
+              {
+                location: 'body',
+                msg: `Select no more than ${maxTotalVisitors} visitors`,
+                path: 'visitors',
+                type: 'field',
+                value: visitors,
+              },
+            ])
+            expect(flashProvider).toHaveBeenCalledWith('formValues', { visitors })
+          })
+      })
     })
   })
 })

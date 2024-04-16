@@ -115,8 +115,9 @@ export default class SelectVisitors {
         throw new Error('No visitors selected')
       }
 
-      if (selected.length > 10) {
-        throw new Error('Select no more than 10 visitors')
+      const { maxTotalVisitors } = req.session.selectedEstablishment
+      if (selected.length > maxTotalVisitors) {
+        throw new Error(`Select no more than ${maxTotalVisitors} visitors`)
       }
 
       const selectedAndBanned = req.session.visitorList.visitors.filter((visitor: VisitorListItem) => {
