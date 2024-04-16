@@ -85,8 +85,11 @@ class MockSupportedPrisonsService extends SupportedPrisonsService {
     return TestData.supportedPrisons()
   }
 
-  async getPolicyNoticeDaysMin(_username: string, _prisonCode: string): Promise<number> {
-    return 2
+  async getPrisonConfig(
+    _username: string,
+    _prisonCode: string,
+  ): Promise<{ maxTotalVisitors: number; policyNoticeDaysMin: number }> {
+    return { maxTotalVisitors: 6, policyNoticeDaysMin: 2 }
   }
 }
 
