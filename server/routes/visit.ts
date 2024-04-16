@@ -5,7 +5,7 @@ import { BadRequest } from 'http-errors'
 import { differenceInCalendarDays } from 'date-fns'
 import visitCancellationReasons from '../constants/visitCancellationReasons'
 import { Prisoner } from '../data/prisonerOffenderSearchTypes'
-import { CancelVisitOrchestrationDto } from '../data/orchestrationApiTypes'
+import { CancelVisitOrchestrationDto, IgnoreVisitNotificationsDto } from '../data/orchestrationApiTypes'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import { isValidVisitReference } from './validationChecks'
 import { clearSession, getFlashFormValues } from './visitorUtils'
@@ -20,7 +20,7 @@ import Confirmation from './visitJourney/confirmation'
 import MainContact from './visitJourney/mainContact'
 import RequestMethod from './visitJourney/requestMethod'
 import sessionCheckMiddleware from '../middleware/sessionCheckMiddleware'
-import type { Services } from '../services'
+import { type Services } from '../services'
 import eventAuditTypes from '../constants/eventAuditTypes'
 import { requestMethodDescriptions, requestMethodsCancellation } from '../constants/requestMethods'
 import { notificationTypeWarnings, notificationTypes } from '../constants/notificationEvents'
@@ -36,6 +36,7 @@ export default function routes({
   supportedPrisonsService,
   visitService,
   visitSessionsService,
+  visitNotificationsService,
 }: Services): Router {
   const router = Router()
 
@@ -70,7 +71,6 @@ export default function routes({
       username: res.locals.user.username,
     })
     const { visit } = visitHistoryDetails
-
     const filteredVisitHistoryDetails = visitHistoryDetails.eventsAudit.filter(event =>
       Object.keys(eventAuditTypes).includes(event.type),
     )
@@ -196,6 +196,62 @@ export default function routes({
     }
     return res.redirect(`/visit/${reference}/update/confirm-update`)
   })
+
+  get('/:reference/clear-notifications', async (req, res) => {
+    const reference = getVisitReference(req)
+
+    return res.render('pages/visit/clearNotifications', {
+      errors: req.flash('errors'),
+      formValues: getFlashFormValues(req),
+      backLinkHref: `/visit/${reference}`,
+    })
+  })
+
+  post(
+    '/:reference/clear-notifications',
+    body('clearNotifications', 'No answer selected').isIn(['yes', 'no']),
+    body('clearReason')
+      .if(body('clearNotifications').equals('yes'))
+      .trim()
+      .notEmpty()
+      .withMessage('Enter a reason for not changing the booking')
+      .isLength({ max: 512 })
+      .withMessage('Reason must be 512 characters or less'),
+    async (req, res) => {
+      const errors = validationResult(req)
+      const reference = getVisitReference(req)
+
+      if (!errors.isEmpty()) {
+        req.flash('errors', errors.array() as [])
+        req.flash('formValues', req.body)
+        return res.redirect(`/visit/${reference}/clear-notifications`)
+      }
+
+      if (req.body.clearNotifications === 'yes') {
+        const ignoreVisitNotificationsDto: IgnoreVisitNotificationsDto = {
+          reason: req.body.clearReason,
+          actionedBy: res.locals.user.username,
+        }
+
+        const visit = await visitNotificationsService.ignoreNotifications({
+          username: res.locals.user.username,
+          reference,
+          ignoreVisitNotificationsDto,
+        })
+
+        await auditService.dismissedNotifications({
+          visitReference: reference,
+          prisonerId: visit.prisonerId.toString(),
+          prisonId: visit.prisonId,
+          reason: ignoreVisitNotificationsDto.reason,
+          username: ignoreVisitNotificationsDto.actionedBy,
+          operationId: res.locals.appInsightsOperationId,
+        })
+      }
+
+      return res.redirect(`/visit/${reference}`)
+    },
+  )
 
   const selectVisitors = new SelectVisitors('update', prisonerVisitorsService, prisonerProfileService)
   const visitType = new VisitType('update', auditService)
@@ -364,7 +420,12 @@ export default function routes({
     body('method', 'No request method selected')
       .if(body('cancel').equals('VISITOR_CANCELLED'))
       .isIn(Object.keys(requestMethodsCancellation)),
-    body('reason', 'Enter a reason for the cancellation').trim().notEmpty(),
+    body('reason')
+      .trim()
+      .notEmpty()
+      .withMessage('Enter a reason for the cancellation')
+      .isLength({ max: 512 })
+      .withMessage('Reason must be 512 characters or less'),
     async (req, res) => {
       const errors = validationResult(req)
       const reference = getVisitReference(req)

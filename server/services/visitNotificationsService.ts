@@ -1,7 +1,7 @@
 import { FilterField, VisitsReviewListItem } from '../@types/bapv'
 import { notificationTypes } from '../constants/notificationEvents'
 import { HmppsAuthClient, OrchestrationApiClient, RestClientBuilder } from '../data'
-import { NotificationCount, NotificationGroup } from '../data/orchestrationApiTypes'
+import { IgnoreVisitNotificationsDto, NotificationCount, NotificationGroup, Visit } from '../data/orchestrationApiTypes'
 import { prisonerDateTimePretty } from '../utils/utils'
 
 type AppliedFilters = Record<'bookedBy' | 'type', string[]>
@@ -17,6 +17,21 @@ export default class VisitNotificationsService {
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
     return orchestrationApiClient.getNotificationCount(prisonId)
+  }
+
+  async ignoreNotifications({
+    username,
+    reference,
+    ignoreVisitNotificationsDto,
+  }: {
+    username: string
+    reference: string
+    ignoreVisitNotificationsDto: IgnoreVisitNotificationsDto
+  }): Promise<Visit> {
+    const token = await this.hmppsAuthClient.getSystemClientToken(username)
+    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+
+    return orchestrationApiClient.ignoreNotifications(reference, ignoreVisitNotificationsDto)
   }
 
   private buildVisitReviewListFilters(

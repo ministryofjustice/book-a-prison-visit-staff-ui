@@ -7,6 +7,7 @@ import {
   CancelVisitOrchestrationDto,
   ChangeApplicationDto,
   CreateApplicationDto,
+  IgnoreVisitNotificationsDto,
   NotificationCount,
   NotificationGroup,
   NotificationType,
@@ -158,6 +159,9 @@ export default class OrchestrationApiClient {
   }
 
   // visit notification controller
+  async ignoreNotifications(reference: string, data: IgnoreVisitNotificationsDto): Promise<Visit> {
+    return this.restClient.put({ path: `/visits/notification/visit/${reference}/ignore`, data })
+  }
 
   async getNotificationCount(prisonId: string): Promise<NotificationCount> {
     return this.restClient.get({ path: `/visits/notification/${prisonId}/count` })

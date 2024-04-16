@@ -16,6 +16,7 @@ export type CreateApplicationDto = components['schemas']['CreateApplicationDto']
 
 export type OutcomeDto = components['schemas']['OutcomeDto']
 export type CancelVisitOrchestrationDto = components['schemas']['CancelVisitOrchestrationDto']
+export type IgnoreVisitNotificationsDto = components['schemas']['IgnoreVisitNotificationsDto']
 
 export type ApplicationMethodType = components['schemas']['BookingOrchestrationRequestDto']['applicationMethodType']
 export type BookingOrchestrationRequestDto = components['schemas']['BookingOrchestrationRequestDto']

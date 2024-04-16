@@ -156,6 +156,34 @@ export default class AuditService {
     })
   }
 
+  async dismissedNotifications({
+    visitReference,
+    prisonerId,
+    prisonId,
+    reason,
+    username,
+    operationId,
+  }: {
+    visitReference: string
+    prisonerId: string
+    prisonId: string
+    reason: string
+    username: string
+    operationId: string
+  }) {
+    return this.sendAuditMessage({
+      action: 'DISMISSED_NOTIFICATIONS',
+      who: username,
+      operationId,
+      details: {
+        visitReference,
+        prisonerId,
+        prisonId,
+        reason,
+      },
+    })
+  }
+
   async cancelledVisit({
     visitReference,
     prisonerId,

@@ -2,7 +2,7 @@ import TestData from '../routes/testutils/testData'
 import VisitNotificationsService from './visitNotificationsService'
 import { createMockHmppsAuthClient, createMockOrchestrationApiClient } from '../data/testutils/mocks'
 import { FilterField, VisitsReviewListItem } from '../@types/bapv'
-import { NotificationType } from '../data/orchestrationApiTypes'
+import { NotificationType, Visit } from '../data/orchestrationApiTypes'
 
 const token = 'some token'
 const prisonId = 'HEI'
@@ -35,6 +35,27 @@ describe('Visit notifications service', () => {
 
       expect(orchestrationApiClient.getNotificationCount).toHaveBeenCalledWith(prisonId)
       expect(result).toStrictEqual(notificationCount)
+    })
+  })
+
+  describe('ignoreNotifications', () => {
+    it('should ignore notifications for specified visit and set given reason', async () => {
+      const reference = 'ab-cd-ef-gh'
+      const ignoreVisitNotificationsDto = {
+        reason: 'Allow visit to go ahead',
+        actionedBy: 'User 1',
+      }
+      const visit = { reference } as Visit
+      orchestrationApiClient.ignoreNotifications.mockResolvedValue(visit)
+
+      const result = await visitNotificationsService.ignoreNotifications({
+        username: 'user',
+        reference,
+        ignoreVisitNotificationsDto,
+      })
+
+      expect(orchestrationApiClient.ignoreNotifications).toHaveBeenCalledWith(reference, ignoreVisitNotificationsDto)
+      expect(result).toStrictEqual(visit)
     })
   })
 
