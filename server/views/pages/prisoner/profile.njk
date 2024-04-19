@@ -152,7 +152,7 @@
                 attributes: { "data-test": "tab-visits-location" }
               },
               {
-                html: visit.startTimestamp | formatDate + '<br>' +
+                html: visit.startTimestamp | formatDate("EEEE d MMMM yyy") + '<br>' +
                   visit.startTimestamp | formatTime + ' - ' + visit.endTimestamp | formatTime,
                 attributes: { "data-test": "tab-visits-date-and-time" }
               },

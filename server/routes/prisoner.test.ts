@@ -212,7 +212,7 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
             'Hewell (HMP)',
           )
           expect($('.prisoner-profile-visits:nth-child(1) [data-test="tab-visits-date-and-time"]').eq(0).html()).toBe(
-            '2 March 2023<br>10am - 11am',
+            'Thursday 2 March 2023<br>10am - 11am',
           )
           expect($('.prisoner-profile-visits:nth-child(1) [data-test="tab-visits-visitors"]').eq(0).html()).toBe(
             'Jeanette Smith<br>Bob Smith',
