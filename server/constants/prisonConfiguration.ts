@@ -340,6 +340,13 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'At least one visitor must be 18 or older.',
     ],
   },
+  // Whitemoor (HMP)
+  WRI: {
+    selectVisitorsText: [
+      'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
   // Wandsworth (HMP & YOI)
   WWI: {
     selectVisitorsText: [
