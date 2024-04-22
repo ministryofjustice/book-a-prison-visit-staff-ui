@@ -10,6 +10,7 @@ import {
   CreateApplicationDto,
   IgnoreVisitNotificationsDto,
   NotificationType,
+  PageVisitDto,
   SessionSchedule,
   Visit,
   VisitRestriction,
@@ -118,27 +119,49 @@ describe('orchestrationApiClient', () => {
     })
   })
 
-  describe('getVisitsByDate', () => {
-    it('should return an array of Visits', async () => {
-      const dateString = '2022-05-06'
-      const results: Visit[] = [TestData.visit()]
+  describe('dateHasVisits', () => {
+    const dateString = '2022-05-06'
+    const query = {
+      prisonId: 'HEI',
+      visitStartDate: dateString,
+      visitEndDate: dateString,
+      visitStatus: 'BOOKED',
+      page: '0',
+      size: '1',
+    }
+
+    it('should return true if there are any BOOKED visits on a date', async () => {
+      const results: PageVisitDto = {
+        content: [TestData.visit()],
+        totalElements: 1,
+      }
 
       fakeOrchestrationApi
         .get('/visits/search')
-        .query({
-          prisonId: 'HEI',
-          visitStartDate: dateString,
-          visitEndDate: dateString,
-          visitStatus: 'BOOKED',
-          page: '0',
-          size: '1000',
-        })
+        .query(query)
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
-      const output = await orchestrationApiClient.getVisitsByDate(dateString, prisonId)
+      const output = await orchestrationApiClient.dateHasVisits(dateString, prisonId)
 
-      expect(output).toEqual(results)
+      expect(output).toBe(true)
+    })
+
+    it('should return false if there are no BOOKED visits on a date', async () => {
+      const results: PageVisitDto = {
+        content: [],
+        totalElements: 0,
+      }
+
+      fakeOrchestrationApi
+        .get('/visits/search')
+        .query(query)
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, results)
+
+      const output = await orchestrationApiClient.dateHasVisits(dateString, prisonId)
+
+      expect(output).toBe(false)
     })
   })
 

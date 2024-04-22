@@ -336,5 +336,15 @@ describe('Visit service', () => {
         expect(result).toStrictEqual(visitPreviews)
       })
     })
+
+    describe('dateHasVisits', () => {
+      it('should return true if there are any BOOKED visits on a date', async () => {
+        const date = '2024-04-22'
+        orchestrationApiClient.dateHasVisits.mockResolvedValue(true)
+        const result = await visitService.dateHasVisits({ username: 'user', prisonId, date })
+        expect(result).toBe(true)
+        expect(orchestrationApiClient.dateHasVisits).toHaveBeenCalledWith(date, prisonId)
+      })
+    })
   })
 })

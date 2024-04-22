@@ -33,11 +33,6 @@ export default class OrchestrationApiClient {
     this.restClient = new RestClient('orchestrationApiClient', config.apis.orchestration as ApiConfig, token)
   }
 
-  // Workaround for pagination, mentioned in comments - VB-1760
-  private page = '0'
-
-  private size = '1000'
-
   // orchestration-visits-controller
 
   async bookVisit(applicationReference: string, applicationMethod: ApplicationMethodType): Promise<Visit> {
@@ -64,18 +59,20 @@ export default class OrchestrationApiClient {
     return this.restClient.get({ path: `/visits/${reference}/history` })
   }
 
-  async getVisitsByDate(dateString: string, prisonId: string): Promise<PageVisitDto> {
-    return this.restClient.get({
+  async dateHasVisits(date: string, prisonId: string): Promise<boolean> {
+    const pageVisitDto: PageVisitDto = await this.restClient.get({
       path: '/visits/search',
       query: new URLSearchParams({
         prisonId,
-        visitStartDate: dateString,
-        visitEndDate: dateString,
+        visitStartDate: date,
+        visitEndDate: date,
         visitStatus: 'BOOKED',
-        page: this.page,
-        size: this.size,
+        page: '0',
+        size: '1',
       }).toString(),
     })
+
+    return pageVisitDto.totalElements >= 1
   }
 
   async getVisitsBySessionTemplate(
