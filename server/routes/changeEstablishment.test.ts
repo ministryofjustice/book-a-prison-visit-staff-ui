@@ -24,7 +24,7 @@ const supportedPrisons = TestData.supportedPrisons()
 
 beforeEach(() => {
   supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
-  supportedPrisonsService.getPolicyNoticeDaysMin.mockResolvedValue(2)
+  supportedPrisonsService.getPrisonConfig.mockResolvedValue({ maxTotalVisitors: 6, policyNoticeDaysMin: 2 })
 
   userService.getUser.mockResolvedValue(user as UserDetails)
   userService.getActiveCaseLoadId.mockResolvedValue('XYZ') // assume user coming with an unsupported case load
@@ -142,7 +142,12 @@ describe('POST /change-establishment', () => {
   beforeEach(() => {
     jest.spyOn(visitorUtils, 'clearSession')
 
-    selectedEstablishment = { prisonId: 'BLI', prisonName: supportedPrisons.BLI, policyNoticeDaysMin: 2 }
+    selectedEstablishment = {
+      prisonId: 'BLI',
+      prisonName: supportedPrisons.BLI,
+      maxTotalVisitors: 6,
+      policyNoticeDaysMin: 2,
+    }
     sessionData = { selectedEstablishment } as SessionData
     userService.getUserCaseLoadIds.mockResolvedValue(TestData.supportedPrisonIds())
 
@@ -164,7 +169,7 @@ describe('POST /change-establishment', () => {
           { location: 'body', msg: 'No prison selected', path: 'establishment', type: 'field', value: '' },
         ])
         expect(visitorUtils.clearSession).toHaveBeenCalledTimes(0)
-        expect(supportedPrisonsService.getPolicyNoticeDaysMin).not.toHaveBeenCalled()
+        expect(supportedPrisonsService.getPrisonConfig).not.toHaveBeenCalled()
         expect(auditService.changeEstablishment).toHaveBeenCalledTimes(0)
         expect(userService.setActiveCaseLoad).not.toHaveBeenCalled()
       })
@@ -182,14 +187,19 @@ describe('POST /change-establishment', () => {
           { location: 'body', msg: 'No prison selected', path: 'establishment', type: 'field', value: 'HEX' },
         ])
         expect(visitorUtils.clearSession).toHaveBeenCalledTimes(0)
-        expect(supportedPrisonsService.getPolicyNoticeDaysMin).not.toHaveBeenCalled()
+        expect(supportedPrisonsService.getPrisonConfig).not.toHaveBeenCalled()
         expect(auditService.changeEstablishment).toHaveBeenCalledTimes(0)
         expect(userService.setActiveCaseLoad).not.toHaveBeenCalled()
       })
   })
 
   it('should clear session, set selected establishment and redirect to home page', () => {
-    const newEstablishment: Prison = { prisonId: 'HEI', prisonName: supportedPrisons.HEI, policyNoticeDaysMin: 2 }
+    const newEstablishment: Prison = {
+      prisonId: 'HEI',
+      prisonName: supportedPrisons.HEI,
+      maxTotalVisitors: 6,
+      policyNoticeDaysMin: 2,
+    }
 
     return request(app)
       .post(`/change-establishment`)
@@ -199,7 +209,7 @@ describe('POST /change-establishment', () => {
       .expect(() => {
         expect(sessionData.selectedEstablishment).toStrictEqual(newEstablishment)
         expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)
-        expect(supportedPrisonsService.getPolicyNoticeDaysMin).toHaveBeenCalledWith('user1', 'HEI')
+        expect(supportedPrisonsService.getPrisonConfig).toHaveBeenCalledWith('user1', 'HEI')
         expect(auditService.changeEstablishment).toHaveBeenCalledWith({
           previousEstablishment: 'BLI',
           newEstablishment: 'HEI',
@@ -211,7 +221,12 @@ describe('POST /change-establishment', () => {
   })
 
   it('should clear session, set selected establishment and redirect to / not the set referrer', () => {
-    const newEstablishment: Prison = { prisonId: 'HEI', prisonName: supportedPrisons.HEI, policyNoticeDaysMin: 2 }
+    const newEstablishment: Prison = {
+      prisonId: 'HEI',
+      prisonName: supportedPrisons.HEI,
+      maxTotalVisitors: 6,
+      policyNoticeDaysMin: 2,
+    }
 
     return request(app)
       .post(`/change-establishment?referrer=//search/prisoner/`)
@@ -221,14 +236,19 @@ describe('POST /change-establishment', () => {
       .expect(() => {
         expect(sessionData.selectedEstablishment).toStrictEqual(newEstablishment)
         expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)
-        expect(supportedPrisonsService.getPolicyNoticeDaysMin).toHaveBeenCalledWith('user1', 'HEI')
+        expect(supportedPrisonsService.getPrisonConfig).toHaveBeenCalledWith('user1', 'HEI')
         expect(auditService.changeEstablishment).toHaveBeenCalledTimes(1)
         expect(userService.setActiveCaseLoad).toHaveBeenCalledWith('HEI', 'user1')
       })
   })
 
   it('should redirect to valid page when passed in querystring', () => {
-    const newEstablishment: Prison = { prisonId: 'HEI', prisonName: supportedPrisons.HEI, policyNoticeDaysMin: 2 }
+    const newEstablishment: Prison = {
+      prisonId: 'HEI',
+      prisonName: supportedPrisons.HEI,
+      maxTotalVisitors: 6,
+      policyNoticeDaysMin: 2,
+    }
 
     return request(app)
       .post(`/change-establishment?referrer=/search/prisoner/`)
@@ -238,7 +258,7 @@ describe('POST /change-establishment', () => {
       .expect(() => {
         expect(sessionData.selectedEstablishment).toStrictEqual(newEstablishment)
         expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)
-        expect(supportedPrisonsService.getPolicyNoticeDaysMin).toHaveBeenCalledWith('user1', 'HEI')
+        expect(supportedPrisonsService.getPrisonConfig).toHaveBeenCalledWith('user1', 'HEI')
         expect(auditService.changeEstablishment).toHaveBeenCalledTimes(1)
         expect(userService.setActiveCaseLoad).toHaveBeenCalledWith('HEI', 'user1')
       })

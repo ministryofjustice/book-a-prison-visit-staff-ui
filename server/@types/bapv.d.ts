@@ -158,6 +158,7 @@ export type VisitsReviewListItem = {
 
 export interface Prison extends PrisonName {
   policyNoticeDaysMin: number
+  maxTotalVisitors: number
 }
 
 export type FilterField = { id: string; label: string; items: { label: string; value: string; checked: boolean }[] }

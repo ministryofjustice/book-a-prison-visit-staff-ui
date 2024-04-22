@@ -36,11 +36,14 @@ export default class SupportedPrisonsService {
     return orchestrationApiClient.getSupportedPrisonIds()
   }
 
-  async getPolicyNoticeDaysMin(username: string, prisonCode: string): Promise<number> {
+  async getPrisonConfig(
+    username: string,
+    prisonCode: string,
+  ): Promise<{ maxTotalVisitors: number; policyNoticeDaysMin: number }> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
-    const { policyNoticeDaysMin } = await orchestrationApiClient.getPrison(prisonCode)
-    return policyNoticeDaysMin
+    const { policyNoticeDaysMin, maxTotalVisitors } = await orchestrationApiClient.getPrison(prisonCode)
+    return { maxTotalVisitors, policyNoticeDaysMin }
   }
 
   private async refreshPrisonNames(username: string): Promise<void> {

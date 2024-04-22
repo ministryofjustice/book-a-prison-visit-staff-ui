@@ -9,7 +9,7 @@ const supportedPrisonsService = createMockSupportedPrisonsService()
 
 const supportedPrisons = TestData.supportedPrisons()
 supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
-supportedPrisonsService.getPolicyNoticeDaysMin.mockResolvedValue(2)
+supportedPrisonsService.getPrisonConfig.mockResolvedValue({ maxTotalVisitors: 6, policyNoticeDaysMin: 2 })
 
 let req: Request
 const res = {
@@ -36,7 +36,7 @@ describe('populateSelectedEstablishment', () => {
 
     res.locals = {
       selectedEstablishment: <Prison>undefined,
-      user: <Express.User>{ activeCaseLoadId: 'HEI' },
+      user: <Express.User>{ activeCaseLoadId: 'HEI', username: 'user1' },
     }
   })
 
@@ -51,14 +51,15 @@ describe('populateSelectedEstablishment', () => {
       const expectedEstablishment: Prison = {
         prisonId: 'BLI',
         prisonName: supportedPrisons.BLI,
+        maxTotalVisitors: 6,
         policyNoticeDaysMin: 2,
       }
 
       await populateSelectedEstablishment(supportedPrisonsService)(req, res, next)
       await new Promise(process.nextTick)
 
-      expect(supportedPrisonsService.getSupportedPrisons).toHaveBeenCalledTimes(1)
-      expect(supportedPrisonsService.getPolicyNoticeDaysMin).toHaveBeenCalledTimes(1)
+      expect(supportedPrisonsService.getSupportedPrisons).toHaveBeenCalledWith('user1')
+      expect(supportedPrisonsService.getPrisonConfig).toHaveBeenCalledWith('user1', 'BLI')
       expect(req.session.selectedEstablishment).toStrictEqual(expectedEstablishment)
       expect(res.locals.selectedEstablishment).toStrictEqual(expectedEstablishment)
       expect(next).toHaveBeenCalled()
@@ -69,7 +70,7 @@ describe('populateSelectedEstablishment', () => {
 
       await populateSelectedEstablishment(supportedPrisonsService)(req, res, next)
 
-      expect(supportedPrisonsService.getSupportedPrisons).toHaveBeenCalledTimes(1)
+      expect(supportedPrisonsService.getSupportedPrisons).toHaveBeenCalledWith('user1')
       expect(res.redirect).toHaveBeenCalledWith('/change-establishment')
       expect(req.session.selectedEstablishment).toBe(undefined)
       expect(res.locals.selectedEstablishment).toBe(undefined)
@@ -81,7 +82,7 @@ describe('populateSelectedEstablishment', () => {
 
       await populateSelectedEstablishment(supportedPrisonsService)(req, res, next)
 
-      expect(supportedPrisonsService.getSupportedPrisons).toHaveBeenCalledTimes(1)
+      expect(supportedPrisonsService.getSupportedPrisons).toHaveBeenCalledWith('user1')
       expect(req.session.selectedEstablishment).toBe(undefined)
       expect(res.locals.selectedEstablishment).toBe(undefined)
       expect(res.redirect).toHaveBeenCalledWith('/change-establishment')
@@ -103,7 +104,12 @@ describe('populateSelectedEstablishment', () => {
 
   describe('when establishment already set in session', () => {
     it('should populate res.locals with selected establishment without prisons lookup', async () => {
-      req.session.selectedEstablishment = { prisonId: 'HEI', prisonName: supportedPrisons.HEI, policyNoticeDaysMin: 2 }
+      req.session.selectedEstablishment = {
+        prisonId: 'HEI',
+        prisonName: supportedPrisons.HEI,
+        maxTotalVisitors: 6,
+        policyNoticeDaysMin: 2,
+      }
 
       await populateSelectedEstablishment(supportedPrisonsService)(req, res, next)
 
@@ -114,7 +120,12 @@ describe('populateSelectedEstablishment', () => {
 
     it('should populate res.locals with already selected establishment without prisons lookup if active caseload changes', async () => {
       res.locals.user.activeCaseLoadId = 'BLI'
-      req.session.selectedEstablishment = { prisonId: 'HEI', prisonName: supportedPrisons.HEI, policyNoticeDaysMin: 2 }
+      req.session.selectedEstablishment = {
+        prisonId: 'HEI',
+        prisonName: supportedPrisons.HEI,
+        maxTotalVisitors: 6,
+        policyNoticeDaysMin: 2,
+      }
 
       await populateSelectedEstablishment(supportedPrisonsService)(req, res, next)
 
@@ -126,7 +137,12 @@ describe('populateSelectedEstablishment', () => {
     it('should make no changes and not redirect if request path is /change-establishment', async () => {
       req.path = '/change-establishment'
       res.locals.user.activeCaseLoadId = 'BLI'
-      req.session.selectedEstablishment = { prisonId: 'HEI', prisonName: supportedPrisons.HEI, policyNoticeDaysMin: 2 }
+      req.session.selectedEstablishment = {
+        prisonId: 'HEI',
+        prisonName: supportedPrisons.HEI,
+        maxTotalVisitors: 6,
+        policyNoticeDaysMin: 2,
+      }
 
       await populateSelectedEstablishment(supportedPrisonsService)(req, res, next)
 

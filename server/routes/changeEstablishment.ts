@@ -57,7 +57,7 @@ export default function routes({ auditService, supportedPrisonsService, userServ
 
     clearSession(req)
 
-    const policyNoticeDaysMin = await supportedPrisonsService.getPolicyNoticeDaysMin(
+    const { maxTotalVisitors, policyNoticeDaysMin } = await supportedPrisonsService.getPrisonConfig(
       res.locals.user.username,
       req.body.establishment,
     )
@@ -66,6 +66,7 @@ export default function routes({ auditService, supportedPrisonsService, userServ
     const newEstablishment: Prison = {
       prisonId: req.body.establishment,
       prisonName: availablePrisons[req.body.establishment],
+      maxTotalVisitors,
       policyNoticeDaysMin,
     }
 
