@@ -104,6 +104,11 @@ export default function routes({
     const showUpdate = nowTimestamp < visitStartTimestamp
     const showCancel = nowTimestamp < chosenFutureInterval
 
+    const filteredNotifications = notifications.filter(
+      notification => notification !== 'PRISON_VISITS_BLOCKED_FOR_DATE',
+    )
+    const showDoNotChange = filteredNotifications.length > 0
+
     return res.render('pages/visit/summary', {
       prisoner,
       prisonerLocation,
@@ -117,6 +122,7 @@ export default function routes({
       fromPageQuery,
       showUpdate,
       showCancel,
+      showDoNotChange,
       requestMethodDescriptions,
       eventAuditTypes,
       notificationTypes,
