@@ -96,11 +96,7 @@ context('Prisoner profile page', () => {
       .should('have.attr', 'href', `/visit/${profile.visits[0].reference}`)
     prisonerProfilePage.visitTabType().eq(0).contains('Social')
     prisonerProfilePage.visitTabLocation().eq(0).contains('Hewell (HMP)')
-    prisonerProfilePage
-      .visitTabDateAndTime()
-      .eq(0)
-      .contains(format(new Date(profile.visits[0].startTimestamp), prettyDateFormat))
-      .contains('10am - 11am')
+    prisonerProfilePage.visitTabDateAndTime().eq(0).contains('Friday 14 January 2022').contains('10am - 11am')
     prisonerProfilePage
       .visitTabVisitors()
       .eq(0)
