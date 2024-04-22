@@ -23,7 +23,7 @@ context('Review a visit', () => {
       createTimestamp: '2024-04-11T09:00:00',
     },
     {
-      type: 'PRISON_VISITS_BLOCKED_FOR_DATE',
+      type: 'NON_ASSOCIATION_EVENT',
       applicationMethodType: 'NOT_APPLICABLE',
       createTimestamp: '2024-04-11T10:00:00',
     },
@@ -56,13 +56,13 @@ context('Review a visit', () => {
     cy.task('stubVisitHistory', visitHistoryDetails)
     cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
 
-    const notifications: NotificationType[] = ['PRISON_VISITS_BLOCKED_FOR_DATE']
+    const notifications: NotificationType[] = ['NON_ASSOCIATION_EVENT']
     cy.task('stubGetVisitNotifications', { reference: visitHistoryDetails.visit.reference, notifications })
 
     // Start on booking summary page and chose 'Do not change' button
     cy.visit('/visit/ab-cd-ef-gh')
     const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage)
-    visitDetailsPage.visitNotification().eq(0).contains(notificationTypeWarnings.PRISON_VISITS_BLOCKED_FOR_DATE)
+    visitDetailsPage.visitNotification().eq(0).contains(notificationTypeWarnings.NON_ASSOCIATION_EVENT)
     visitDetailsPage.clearNotifications().click()
 
     // Clear notifications page - select Yes and give a reason

@@ -452,6 +452,28 @@ describe('/visit/:reference', () => {
           })
       })
 
+      it('should display a single visit notification banner and NOT the do not change button when only a blocked date notification set', () => {
+        visitService.getFullVisitDetails.mockResolvedValue({
+          visitHistoryDetails,
+          visitors,
+          notifications: ['PRISON_VISITS_BLOCKED_FOR_DATE'],
+          additionalSupport,
+        })
+
+        return request(app)
+          .get('/visit/ab-cd-ef-gh')
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('[data-test="visit-notification"]').length).toBe(1)
+            expect($('[data-test="visit-notification"]').text()).toBe(
+              notificationTypeWarnings.PRISON_VISITS_BLOCKED_FOR_DATE,
+            )
+            expect($('[data-test="clear-notifications"]').length).toBe(0)
+          })
+      })
+
       it('should display a single visit notification banner and do not change button when a single notification type is set', () => {
         visitService.getFullVisitDetails.mockResolvedValue({
           visitHistoryDetails,
