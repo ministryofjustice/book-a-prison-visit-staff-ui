@@ -11,7 +11,6 @@ import {
   NotificationCount,
   NotificationGroup,
   NotificationType,
-  PageVisitDto,
   PrisonDto,
   PrisonerProfile,
   SessionCapacity,
@@ -57,22 +56,6 @@ export default class OrchestrationApiClient {
 
   async getVisitHistory(reference: string): Promise<VisitHistoryDetails> {
     return this.restClient.get({ path: `/visits/${reference}/history` })
-  }
-
-  async dateHasVisits(date: string, prisonId: string): Promise<boolean> {
-    const pageVisitDto: PageVisitDto = await this.restClient.get({
-      path: '/visits/search',
-      query: new URLSearchParams({
-        prisonId,
-        visitStartDate: date,
-        visitEndDate: date,
-        visitStatus: 'BOOKED',
-        page: '0',
-        size: '1',
-      }).toString(),
-    })
-
-    return pageVisitDto.totalElements >= 1
   }
 
   async getVisitsBySessionTemplate(

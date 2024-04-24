@@ -10,6 +10,7 @@ import { VisitPreview, VisitRestriction } from '../data/orchestrationApiTypes'
 export default function routes({
   auditService,
   supportedPrisonsService,
+  visitNotificationsService,
   visitService,
   visitSessionsService,
 }: Services): Router {
@@ -92,9 +93,9 @@ export default function routes({
     const isAnExcludeDate =
       visits.length === 0 &&
       (await supportedPrisonsService.isAnExcludeDate(res.locals.user.username, prisonId, selectedDateString))
-    const isAnExcludeDateWithVisits =
+    const isAnExcludeDateWithVisitReviews =
       isAnExcludeDate &&
-      (await visitService.dateHasVisits({ username: res.locals.user.username, prisonId, date: selectedDateString }))
+      (await visitNotificationsService.dateHasNotifications(res.locals.user.username, prisonId, selectedDateString))
 
     const visitorsTotal = visits.reduce((acc, visit) => {
       return acc + visit.visitorCount
@@ -127,7 +128,7 @@ export default function routes({
       visits,
       visitorsTotal,
       isAnExcludeDate,
-      isAnExcludeDateWithVisits,
+      isAnExcludeDateWithVisitReviews,
     })
   })
 

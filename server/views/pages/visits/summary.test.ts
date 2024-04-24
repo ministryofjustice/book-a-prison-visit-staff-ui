@@ -125,7 +125,7 @@ describe('Views - Visits summary', () => {
   })
 
   it('should display appropriate message for an exclude date with no visits', () => {
-    viewContext = { visits: [], isAnExcludeDate: true, isAnExcludeDateWithVisits: false }
+    viewContext = { visits: [], isAnExcludeDate: true, isAnExcludeDateWithVisitReviews: false }
 
     const $ = cheerio.load(compiledTemplate.render(viewContext))
 
@@ -137,7 +137,7 @@ describe('Views - Visits summary', () => {
   })
 
   it('should display appropriate message for an exclude date with visits that need review', () => {
-    viewContext = { visits: [], isAnExcludeDate: true, isAnExcludeDateWithVisits: true }
+    viewContext = { visits: [], isAnExcludeDate: true, isAnExcludeDateWithVisitReviews: true }
 
     const $ = cheerio.load(compiledTemplate.render(viewContext))
 

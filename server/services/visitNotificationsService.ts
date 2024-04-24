@@ -19,6 +19,17 @@ export default class VisitNotificationsService {
     return orchestrationApiClient.getNotificationCount(prisonId)
   }
 
+  async dateHasNotifications(username: string, prisonId: string, date: string): Promise<boolean> {
+    const token = await this.hmppsAuthClient.getSystemClientToken(username)
+    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+
+    const notificationGroups = await orchestrationApiClient.getNotificationGroups(prisonId)
+
+    return notificationGroups.some(notificationGroup =>
+      notificationGroup.affectedVisits.some(visit => visit.visitDate === date),
+    )
+  }
+
   async ignoreNotifications({
     username,
     reference,

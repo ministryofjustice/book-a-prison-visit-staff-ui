@@ -10,6 +10,7 @@ import {
   createMockAuditService,
   createMockPrisonerSearchService,
   createMockSupportedPrisonsService,
+  createMockVisitNotificationsService,
   createMockVisitService,
   createMockVisitSessionsService,
 } from '../services/testutils/mocks'
@@ -21,6 +22,7 @@ let flashData: FlashData
 const auditService = createMockAuditService()
 const prisonerSearchService = createMockPrisonerSearchService()
 const supportedPrisonsService = createMockSupportedPrisonsService()
+const visitNotificationsService = createMockVisitNotificationsService()
 const visitService = createMockVisitService()
 const visitSessionsService = createMockVisitSessionsService()
 
@@ -33,9 +35,17 @@ beforeEach(() => {
   supportedPrisonsService.getSupportedPrisons.mockResolvedValue(TestData.supportedPrisons())
   supportedPrisonsService.getPrisonConfig.mockResolvedValue({ maxTotalVisitors: 6, policyNoticeDaysMin: 2 })
   supportedPrisonsService.isAnExcludeDate.mockResolvedValue(false)
+  visitNotificationsService.dateHasNotifications.mockResolvedValue(false)
 
   app = appWithAllRoutes({
-    services: { auditService, prisonerSearchService, supportedPrisonsService, visitService, visitSessionsService },
+    services: {
+      auditService,
+      prisonerSearchService,
+      supportedPrisonsService,
+      visitNotificationsService,
+      visitService,
+      visitSessionsService,
+    },
   })
 })
 
@@ -127,7 +137,7 @@ describe('GET /visits', () => {
           expect($('[data-test="no-visits-message"]').length).toBe(0)
 
           expect(supportedPrisonsService.isAnExcludeDate).not.toHaveBeenCalled()
-          expect(visitService.dateHasVisits).not.toHaveBeenCalled()
+          expect(visitNotificationsService.dateHasNotifications).not.toHaveBeenCalled()
           expect(visitSessionsService.getSessionSchedule).toHaveBeenCalledWith({
             username: 'user1',
             prisonId,
@@ -187,7 +197,7 @@ describe('GET /visits', () => {
           expect($('[data-test="no-visits-message"]').length).toBe(0)
 
           expect(supportedPrisonsService.isAnExcludeDate).not.toHaveBeenCalled()
-          expect(visitService.dateHasVisits).not.toHaveBeenCalled()
+          expect(visitNotificationsService.dateHasNotifications).not.toHaveBeenCalled()
           expect(visitSessionsService.getSessionSchedule).toHaveBeenCalledWith({
             username: 'user1',
             prisonId,
@@ -243,7 +253,7 @@ describe('GET /visits', () => {
           expect($('[data-test="visit-visitors-total"]').text().trim()).toBe('2 visitors')
 
           expect(supportedPrisonsService.isAnExcludeDate).not.toHaveBeenCalled()
-          expect(visitService.dateHasVisits).not.toHaveBeenCalled()
+          expect(visitNotificationsService.dateHasNotifications).not.toHaveBeenCalled()
           expect(visitSessionsService.getSessionSchedule).toHaveBeenCalledWith({
             username: 'user1',
             prisonId,
@@ -332,7 +342,7 @@ describe('GET /visits', () => {
           expect($('[data-test="no-visits-message"]').length).toBe(0)
 
           expect(supportedPrisonsService.isAnExcludeDate).not.toHaveBeenCalled()
-          expect(visitService.dateHasVisits).not.toHaveBeenCalled()
+          expect(visitNotificationsService.dateHasNotifications).not.toHaveBeenCalled()
           expect(visitSessionsService.getSessionSchedule).toHaveBeenCalledWith({
             username: 'user1',
             prisonId,
@@ -386,7 +396,7 @@ describe('GET /visits', () => {
           expect($('[data-test="no-visits-message"]').length).toBe(0)
 
           expect(supportedPrisonsService.isAnExcludeDate).not.toHaveBeenCalled()
-          expect(visitService.dateHasVisits).not.toHaveBeenCalled()
+          expect(visitNotificationsService.dateHasNotifications).not.toHaveBeenCalled()
           expect(visitSessionsService.getSessionSchedule).toHaveBeenCalledWith({
             username: 'user1',
             prisonId,
@@ -475,7 +485,7 @@ describe('GET /visits', () => {
           expect($('[data-test="no-visits-message"]').length).toBe(0)
 
           expect(supportedPrisonsService.isAnExcludeDate).toHaveBeenCalledWith('user1', 'HEI', '2024-02-01')
-          expect(visitService.dateHasVisits).not.toHaveBeenCalled()
+          expect(visitNotificationsService.dateHasNotifications).not.toHaveBeenCalled()
           expect(visitSessionsService.getSessionSchedule).toHaveBeenCalledWith({
             username: 'user1',
             prisonId,
@@ -512,7 +522,7 @@ describe('GET /visits', () => {
 
     it('should show appropriate message if there is no schedule nor visits and it is an excluded date', () => {
       supportedPrisonsService.isAnExcludeDate.mockResolvedValue(true)
-      visitService.dateHasVisits.mockResolvedValue(false)
+      visitNotificationsService.dateHasNotifications.mockResolvedValue(false)
 
       return request(app)
         .get('/visits')
@@ -527,17 +537,13 @@ describe('GET /visits', () => {
           )
 
           expect(supportedPrisonsService.isAnExcludeDate).toHaveBeenCalledWith('user1', 'HEI', '2024-02-01')
-          expect(visitService.dateHasVisits).toHaveBeenCalledWith({
-            username: 'user1',
-            prisonId: 'HEI',
-            date: '2024-02-01',
-          })
+          expect(visitNotificationsService.dateHasNotifications).toHaveBeenCalledWith('user1', 'HEI', '2024-02-01')
         })
     })
 
     it('should show appropriate message if it is an excluded date and there are visits to review', () => {
       supportedPrisonsService.isAnExcludeDate.mockResolvedValue(true)
-      visitService.dateHasVisits.mockResolvedValue(true)
+      visitNotificationsService.dateHasNotifications.mockResolvedValue(true)
 
       return request(app)
         .get('/visits')
@@ -553,11 +559,7 @@ describe('GET /visits', () => {
           expect($('[data-test="no-visits-message"] a').prop('href')).toBe('/review')
 
           expect(supportedPrisonsService.isAnExcludeDate).toHaveBeenCalledWith('user1', 'HEI', '2024-02-01')
-          expect(visitService.dateHasVisits).toHaveBeenCalledWith({
-            username: 'user1',
-            prisonId: 'HEI',
-            date: '2024-02-01',
-          })
+          expect(visitNotificationsService.dateHasNotifications).toHaveBeenCalledWith('user1', 'HEI', '2024-02-01')
         })
     })
   })

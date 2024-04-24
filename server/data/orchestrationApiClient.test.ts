@@ -10,7 +10,6 @@ import {
   CreateApplicationDto,
   IgnoreVisitNotificationsDto,
   NotificationType,
-  PageVisitDto,
   SessionSchedule,
   Visit,
   VisitRestriction,
@@ -116,52 +115,6 @@ describe('orchestrationApiClient', () => {
       const output = await orchestrationApiClient.getVisitHistory(visitHistoryDetails.visit.reference)
 
       expect(output).toEqual(visitHistoryDetails)
-    })
-  })
-
-  describe('dateHasVisits', () => {
-    const dateString = '2022-05-06'
-    const query = {
-      prisonId: 'HEI',
-      visitStartDate: dateString,
-      visitEndDate: dateString,
-      visitStatus: 'BOOKED',
-      page: '0',
-      size: '1',
-    }
-
-    it('should return true if there are any BOOKED visits on a date', async () => {
-      const results: PageVisitDto = {
-        content: [TestData.visit()],
-        totalElements: 1,
-      }
-
-      fakeOrchestrationApi
-        .get('/visits/search')
-        .query(query)
-        .matchHeader('authorization', `Bearer ${token}`)
-        .reply(200, results)
-
-      const output = await orchestrationApiClient.dateHasVisits(dateString, prisonId)
-
-      expect(output).toBe(true)
-    })
-
-    it('should return false if there are no BOOKED visits on a date', async () => {
-      const results: PageVisitDto = {
-        content: [],
-        totalElements: 0,
-      }
-
-      fakeOrchestrationApi
-        .get('/visits/search')
-        .query(query)
-        .matchHeader('authorization', `Bearer ${token}`)
-        .reply(200, results)
-
-      const output = await orchestrationApiClient.dateHasVisits(dateString, prisonId)
-
-      expect(output).toBe(false)
     })
   })
 
