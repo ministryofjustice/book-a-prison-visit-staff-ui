@@ -89,11 +89,11 @@ export default function routes({
       )
     }
 
-    // if no visits, check if this is an exclude date - and whether there any visits 'hidden' by this
+    // if no visits, check if this is an exclude date - and if so are there any notifications
     const isAnExcludeDate =
       visits.length === 0 &&
       (await supportedPrisonsService.isAnExcludeDate(res.locals.user.username, prisonId, selectedDateString))
-    const isAnExcludeDateWithVisitReviews =
+    const isAnExcludeDateWithVisitNotifications =
       isAnExcludeDate &&
       (await visitNotificationsService.dateHasNotifications(res.locals.user.username, prisonId, selectedDateString))
 
@@ -128,7 +128,7 @@ export default function routes({
       visits,
       visitorsTotal,
       isAnExcludeDate,
-      isAnExcludeDateWithVisitReviews,
+      isAnExcludeDateWithVisitNotifications,
     })
   })
 

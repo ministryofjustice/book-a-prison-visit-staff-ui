@@ -125,7 +125,7 @@ describe('Views - Visits summary', () => {
   })
 
   it('should display appropriate message for an exclude date with no visits', () => {
-    viewContext = { visits: [], isAnExcludeDate: true, isAnExcludeDateWithVisitReviews: false }
+    viewContext = { visits: [], isAnExcludeDate: true, isAnExcludeDateWithVisitNotifications: false }
 
     const $ = cheerio.load(compiledTemplate.render(viewContext))
 
@@ -141,7 +141,7 @@ describe('Views - Visits summary', () => {
       queryParamsForBackLink: 'back-link-params',
       visits: [],
       isAnExcludeDate: true,
-      isAnExcludeDateWithVisitReviews: true,
+      isAnExcludeDateWithVisitNotifications: true,
     }
 
     const $ = cheerio.load(compiledTemplate.render(viewContext))
