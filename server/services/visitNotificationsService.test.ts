@@ -38,6 +38,35 @@ describe('Visit notifications service', () => {
     })
   })
 
+  describe('dateHasNotifications', () => {
+    const date = '2024-04-24'
+
+    const notificationGroupOnDate = TestData.notificationGroup({
+      type: 'PRISON_VISITS_BLOCKED_FOR_DATE',
+      affectedVisits: [TestData.notificationVisitInfo({ visitDate: date })],
+    })
+    const notificationGroupDifferentDate = TestData.notificationGroup()
+
+    beforeEach(() => {
+      orchestrationApiClient.getNotificationGroups.mockResolvedValue([
+        notificationGroupDifferentDate,
+        notificationGroupOnDate,
+      ])
+    })
+
+    it('should return true if a given date has any visit notifications', async () => {
+      const result = await visitNotificationsService.dateHasNotifications('user', prisonId, date)
+      expect(orchestrationApiClient.getNotificationGroups).toHaveBeenCalledWith(prisonId)
+      expect(result).toBe(true)
+    })
+
+    it('should return false if a given date has no visit notifications', async () => {
+      const result = await visitNotificationsService.dateHasNotifications('user', prisonId, '2024-04-01')
+      expect(orchestrationApiClient.getNotificationGroups).toHaveBeenCalledWith(prisonId)
+      expect(result).toBe(false)
+    })
+  })
+
   describe('ignoreNotifications', () => {
     it('should ignore notifications for specified visit and set given reason', async () => {
       const reference = 'ab-cd-ef-gh'

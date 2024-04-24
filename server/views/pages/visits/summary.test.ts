@@ -62,7 +62,7 @@ describe('Views - Visits summary', () => {
     const $ = cheerio.load(compiledTemplate.render(viewContext))
 
     expect($('.moj-side-navigation').length).toBe(0)
-    expect($('#search-results-none').text()).toContain('No visit sessions on this day.')
+    expect($('[data-test="no-visits-message"]').text()).toContain('No visit sessions on this day.')
     expect($('.bapv-table').length).toBe(0)
   })
 
@@ -121,7 +121,37 @@ describe('Views - Visits summary', () => {
     expect($('[data-test="visit-tables-booked"]').text().trim()).toBe('0 of 20 tables booked')
     expect($('[data-test="visit-visitors-total"]').length).toBe(0)
 
-    expect($('#search-results-none').length).toBe(0)
+    expect($('[data-test="no-visits-message"]').length).toBe(0)
+  })
+
+  it('should display appropriate message for an exclude date with no visits', () => {
+    viewContext = { visits: [], isAnExcludeDate: true, isAnExcludeDateWithVisitNotifications: false }
+
+    const $ = cheerio.load(compiledTemplate.render(viewContext))
+
+    expect($('.moj-side-navigation').length).toBe(0)
+    expect($('[data-test="no-visits-message"]').text()).toContain(
+      'This date has been blocked for social visits. There are no existing bookings to cancel.',
+    )
+    expect($('.bapv-table').length).toBe(0)
+  })
+
+  it('should display appropriate message for an exclude date with visits that need review', () => {
+    viewContext = {
+      queryParamsForBackLink: 'back-link-params',
+      visits: [],
+      isAnExcludeDate: true,
+      isAnExcludeDateWithVisitNotifications: true,
+    }
+
+    const $ = cheerio.load(compiledTemplate.render(viewContext))
+
+    expect($('.moj-side-navigation').length).toBe(0)
+    expect($('[data-test="no-visits-message"]').text()).toContain(
+      'This date has been blocked for social visits. There are existing bookings that need review.',
+    )
+    expect($('[data-test="no-visits-message"] a').prop('href')).toBe('/review?back-link-params')
+    expect($('.bapv-table').length).toBe(0)
   })
 
   it('should display visits table', () => {
@@ -159,6 +189,6 @@ describe('Views - Visits summary', () => {
     expect($('[data-test="prisoner-number"]').eq(0).text().trim()).toBe('A1234BC')
     expect($('[data-test="view-visit-link"]').eq(0).attr('href')).toBe('/visit/ab-cd-ef-gh?back-link-query')
 
-    expect($('#search-results-none').length).toBe(0)
+    expect($('[data-test="no-visits-message"]').length).toBe(0)
   })
 })
