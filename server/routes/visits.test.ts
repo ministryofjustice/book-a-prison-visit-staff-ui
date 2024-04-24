@@ -9,6 +9,8 @@ import { getParsedDateFromQueryString } from '../utils/utils'
 import {
   createMockAuditService,
   createMockPrisonerSearchService,
+  createMockSupportedPrisonsService,
+  createMockVisitNotificationsService,
   createMockVisitService,
   createMockVisitSessionsService,
 } from '../services/testutils/mocks'
@@ -19,6 +21,8 @@ let flashData: FlashData
 
 const auditService = createMockAuditService()
 const prisonerSearchService = createMockPrisonerSearchService()
+const supportedPrisonsService = createMockSupportedPrisonsService()
+const visitNotificationsService = createMockVisitNotificationsService()
 const visitService = createMockVisitService()
 const visitSessionsService = createMockVisitSessionsService()
 
@@ -27,7 +31,22 @@ beforeEach(() => {
   flashProvider.mockImplementation((key: keyof FlashData) => {
     return flashData[key]
   })
-  app = appWithAllRoutes({ services: { auditService, prisonerSearchService, visitService, visitSessionsService } })
+
+  supportedPrisonsService.getSupportedPrisons.mockResolvedValue(TestData.supportedPrisons())
+  supportedPrisonsService.getPrisonConfig.mockResolvedValue({ maxTotalVisitors: 6, policyNoticeDaysMin: 2 })
+  supportedPrisonsService.isAnExcludeDate.mockResolvedValue(false)
+  visitNotificationsService.dateHasNotifications.mockResolvedValue(false)
+
+  app = appWithAllRoutes({
+    services: {
+      auditService,
+      prisonerSearchService,
+      supportedPrisonsService,
+      visitNotificationsService,
+      visitService,
+      visitSessionsService,
+    },
+  })
 })
 
 afterEach(() => {
@@ -115,8 +134,10 @@ describe('GET /visits', () => {
             '/visit/ab-cd-ef-gh?query=type%3DOPEN%26sessionReference%3D-afe.dcc.0f%26selectedDate%3D2024-02-01%26firstTabDate%3D2024-02-01&from=visits',
           )
 
-          expect($('#search-results-none').length).toBe(0)
+          expect($('[data-test="no-visits-message"]').length).toBe(0)
 
+          expect(supportedPrisonsService.isAnExcludeDate).not.toHaveBeenCalled()
+          expect(visitNotificationsService.dateHasNotifications).not.toHaveBeenCalled()
           expect(visitSessionsService.getSessionSchedule).toHaveBeenCalledWith({
             username: 'user1',
             prisonId,
@@ -173,8 +194,10 @@ describe('GET /visits', () => {
             '/visit/ab-cd-ef-gh?query=type%3DCLOSED%26sessionReference%3D-afe.dcc.0f%26selectedDate%3D2024-02-02%26firstTabDate%3D2024-02-01&from=visits',
           )
 
-          expect($('#search-results-none').length).toBe(0)
+          expect($('[data-test="no-visits-message"]').length).toBe(0)
 
+          expect(supportedPrisonsService.isAnExcludeDate).not.toHaveBeenCalled()
+          expect(visitNotificationsService.dateHasNotifications).not.toHaveBeenCalled()
           expect(visitSessionsService.getSessionSchedule).toHaveBeenCalledWith({
             username: 'user1',
             prisonId,
@@ -229,6 +252,8 @@ describe('GET /visits', () => {
           expect($('[data-test="visit-tables-booked"]').text().trim()).toBe('1 of 20 tables booked')
           expect($('[data-test="visit-visitors-total"]').text().trim()).toBe('2 visitors')
 
+          expect(supportedPrisonsService.isAnExcludeDate).not.toHaveBeenCalled()
+          expect(visitNotificationsService.dateHasNotifications).not.toHaveBeenCalled()
           expect(visitSessionsService.getSessionSchedule).toHaveBeenCalledWith({
             username: 'user1',
             prisonId,
@@ -314,8 +339,10 @@ describe('GET /visits', () => {
             '/visit/ab-cd-ef-gh?query=type%3DUNKNOWN%26sessionReference%3D13%253A45-15%253A45%26selectedDate%3D2024-02-01%26firstTabDate%3D2024-02-01&from=visits',
           )
 
-          expect($('#search-results-none').length).toBe(0)
+          expect($('[data-test="no-visits-message"]').length).toBe(0)
 
+          expect(supportedPrisonsService.isAnExcludeDate).not.toHaveBeenCalled()
+          expect(visitNotificationsService.dateHasNotifications).not.toHaveBeenCalled()
           expect(visitSessionsService.getSessionSchedule).toHaveBeenCalledWith({
             username: 'user1',
             prisonId,
@@ -366,8 +393,10 @@ describe('GET /visits', () => {
             '/visit/ab-cd-ef-gh?query=type%3DUNKNOWN%26sessionReference%3D13%253A45-15%253A45%26selectedDate%3D2024-02-02%26firstTabDate%3D2024-02-01&from=visits',
           )
 
-          expect($('#search-results-none').length).toBe(0)
+          expect($('[data-test="no-visits-message"]').length).toBe(0)
 
+          expect(supportedPrisonsService.isAnExcludeDate).not.toHaveBeenCalled()
+          expect(visitNotificationsService.dateHasNotifications).not.toHaveBeenCalled()
           expect(visitSessionsService.getSessionSchedule).toHaveBeenCalledWith({
             username: 'user1',
             prisonId,
@@ -453,8 +482,10 @@ describe('GET /visits', () => {
           expect($('[data-test="visit-tables-booked"]').text().trim()).toBe('0 of 20 tables booked')
           expect($('[data-test="visit-visitors-total"]').length).toBe(0)
 
-          expect($('#search-results-none').length).toBe(0)
+          expect($('[data-test="no-visits-message"]').length).toBe(0)
 
+          expect(supportedPrisonsService.isAnExcludeDate).toHaveBeenCalledWith('user1', 'HEI', '2024-02-01')
+          expect(visitNotificationsService.dateHasNotifications).not.toHaveBeenCalled()
           expect(visitSessionsService.getSessionSchedule).toHaveBeenCalledWith({
             username: 'user1',
             prisonId,
@@ -478,6 +509,59 @@ describe('GET /visits', () => {
             username: 'user1',
             operationId: undefined,
           })
+        })
+    })
+  })
+
+  describe('excluded dates', () => {
+    beforeEach(() => {
+      visitSessionsService.getSessionSchedule.mockResolvedValue([])
+      visitService.getVisitsBySessionTemplate.mockResolvedValue([])
+      visitService.getVisitsWithoutSessionTemplate.mockResolvedValue([])
+    })
+
+    it('should show appropriate message if there is no schedule nor visits and it is an excluded date', () => {
+      supportedPrisonsService.isAnExcludeDate.mockResolvedValue(true)
+      visitNotificationsService.dateHasNotifications.mockResolvedValue(false)
+
+      return request(app)
+        .get('/visits')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text()).toBe('View visits by date')
+
+          expect($('[data-test="no-visits-message"]').text().trim()).toBe(
+            'This date has been blocked for social visits. There are no existing bookings to cancel.',
+          )
+
+          expect(supportedPrisonsService.isAnExcludeDate).toHaveBeenCalledWith('user1', 'HEI', '2024-02-01')
+          expect(visitNotificationsService.dateHasNotifications).toHaveBeenCalledWith('user1', 'HEI', '2024-02-01')
+        })
+    })
+
+    it('should show appropriate message if it is an excluded date and there are visits to review', () => {
+      supportedPrisonsService.isAnExcludeDate.mockResolvedValue(true)
+      visitNotificationsService.dateHasNotifications.mockResolvedValue(true)
+
+      return request(app)
+        .get('/visits')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text()).toBe('View visits by date')
+
+          expect($('[data-test="no-visits-message"]').text().trim()).toBe(
+            'This date has been blocked for social visits. There are existing bookings that need review.',
+          )
+          expect($('[data-test="no-visits-message"] a').prop('href')).toBe(
+            '/review?query=type%3DUNKNOWN%26sessionReference%3DNONE%26selectedDate%3D2024-02-01%26firstTabDate%3D2024-02-01&from=visits',
+          )
+
+          expect(supportedPrisonsService.isAnExcludeDate).toHaveBeenCalledWith('user1', 'HEI', '2024-02-01')
+          expect(visitNotificationsService.dateHasNotifications).toHaveBeenCalledWith('user1', 'HEI', '2024-02-01')
         })
     })
   })

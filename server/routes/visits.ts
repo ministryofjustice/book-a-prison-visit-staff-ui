@@ -7,7 +7,13 @@ import type { Services } from '../services'
 import { getFlashFormValues } from './visitorUtils'
 import { VisitPreview, VisitRestriction } from '../data/orchestrationApiTypes'
 
-export default function routes({ auditService, visitService, visitSessionsService }: Services): Router {
+export default function routes({
+  auditService,
+  supportedPrisonsService,
+  visitNotificationsService,
+  visitService,
+  visitSessionsService,
+}: Services): Router {
   const router = Router()
 
   const get = (path: string | string[], ...handlers: RequestHandler[]) =>
@@ -83,6 +89,14 @@ export default function routes({ auditService, visitService, visitSessionsServic
       )
     }
 
+    // if no visits, check if this is an exclude date - and if so are there any notifications
+    const isAnExcludeDate =
+      visits.length === 0 &&
+      (await supportedPrisonsService.isAnExcludeDate(res.locals.user.username, prisonId, selectedDateString))
+    const isAnExcludeDateWithVisitNotifications =
+      isAnExcludeDate &&
+      (await visitNotificationsService.dateHasNotifications(res.locals.user.username, prisonId, selectedDateString))
+
     const visitorsTotal = visits.reduce((acc, visit) => {
       return acc + visit.visitorCount
     }, 0)
@@ -90,7 +104,7 @@ export default function routes({ auditService, visitService, visitSessionsServic
     const queryParamsForBackLink = new URLSearchParams({
       query: new URLSearchParams({
         type: selectedSessionTemplate?.type || 'UNKNOWN',
-        sessionReference: selectedSessionTemplate?.sessionReference || selectedTimeSlotRef,
+        sessionReference: selectedSessionTemplate?.sessionReference || selectedTimeSlotRef || 'NONE',
         selectedDate: selectedDateString,
         firstTabDate: firstTabDateString,
       }).toString(),
@@ -113,6 +127,8 @@ export default function routes({ auditService, visitService, visitSessionsServic
       queryParamsForBackLink,
       visits,
       visitorsTotal,
+      isAnExcludeDate,
+      isAnExcludeDateWithVisitNotifications,
     })
   })
 

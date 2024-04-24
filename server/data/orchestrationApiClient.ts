@@ -11,7 +11,6 @@ import {
   NotificationCount,
   NotificationGroup,
   NotificationType,
-  PageVisitDto,
   PrisonDto,
   PrisonerProfile,
   SessionCapacity,
@@ -32,11 +31,6 @@ export default class OrchestrationApiClient {
   constructor(token: string) {
     this.restClient = new RestClient('orchestrationApiClient', config.apis.orchestration as ApiConfig, token)
   }
-
-  // Workaround for pagination, mentioned in comments - VB-1760
-  private page = '0'
-
-  private size = '1000'
 
   // orchestration-visits-controller
 
@@ -62,20 +56,6 @@ export default class OrchestrationApiClient {
 
   async getVisitHistory(reference: string): Promise<VisitHistoryDetails> {
     return this.restClient.get({ path: `/visits/${reference}/history` })
-  }
-
-  async getVisitsByDate(dateString: string, prisonId: string): Promise<PageVisitDto> {
-    return this.restClient.get({
-      path: '/visits/search',
-      query: new URLSearchParams({
-        prisonId,
-        visitStartDate: dateString,
-        visitEndDate: dateString,
-        visitStatus: 'BOOKED',
-        page: this.page,
-        size: this.size,
-      }).toString(),
-    })
   }
 
   async getVisitsBySessionTemplate(

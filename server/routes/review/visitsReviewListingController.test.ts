@@ -133,6 +133,17 @@ describe('Bookings needing review listing page', () => {
           })
         })
     })
+
+    it('should display correct back link when coming from Visits by date page', () => {
+      return request(app)
+        .get('/review?query=back-link-params&from=visits')
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('.govuk-back-link').attr('href')).toBe('/visits?back-link-params')
+          expect($('h1').text()).toBe('Visit bookings that need review')
+        })
+    })
   })
 
   describe('POST /review', () => {

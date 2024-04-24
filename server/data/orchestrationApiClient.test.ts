@@ -118,30 +118,6 @@ describe('orchestrationApiClient', () => {
     })
   })
 
-  describe('getVisitsByDate', () => {
-    it('should return an array of Visits', async () => {
-      const dateString = '2022-05-06'
-      const results: Visit[] = [TestData.visit()]
-
-      fakeOrchestrationApi
-        .get('/visits/search')
-        .query({
-          prisonId: 'HEI',
-          visitStartDate: dateString,
-          visitEndDate: dateString,
-          visitStatus: 'BOOKED',
-          page: '0',
-          size: '1000',
-        })
-        .matchHeader('authorization', `Bearer ${token}`)
-        .reply(200, results)
-
-      const output = await orchestrationApiClient.getVisitsByDate(dateString, prisonId)
-
-      expect(output).toEqual(results)
-    })
-  })
-
   describe('getVisitsBySessionTemplate', () => {
     it('should return visit previews details for given session template reference, date, prison and restriction', async () => {
       const sessionTemplateReference = 'v9d.7ed.7u'
