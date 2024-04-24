@@ -29,7 +29,7 @@ export default class VisitsByDatePage extends Page {
 
   prisonerNumber = (index: number): PageElement => cy.get(`:nth-child(${index}) > [data-test="prisoner-number"]`)
 
-  noResultsMessage = (): PageElement => cy.get('#search-results-none')
+  noResultsMessage = (): PageElement => cy.get('[data-test="no-visits-message"]')
 
   // another date form
   toggleChooseAnotherDatePopUp = (): void => {

@@ -7,7 +7,12 @@ import type { Services } from '../services'
 import { getFlashFormValues } from './visitorUtils'
 import { VisitPreview, VisitRestriction } from '../data/orchestrationApiTypes'
 
-export default function routes({ auditService, visitService, visitSessionsService }: Services): Router {
+export default function routes({
+  auditService,
+  supportedPrisonsService,
+  visitService,
+  visitSessionsService,
+}: Services): Router {
   const router = Router()
 
   const get = (path: string | string[], ...handlers: RequestHandler[]) =>
@@ -83,6 +88,14 @@ export default function routes({ auditService, visitService, visitSessionsServic
       )
     }
 
+    // if no visits, check if this is an exclude date - and whether there any visits 'hidden' by this
+    const isAnExcludeDate =
+      visits.length === 0 &&
+      (await supportedPrisonsService.isAnExcludeDate(res.locals.user.username, prisonId, selectedDateString))
+    const isAnExcludeDateWithVisits =
+      isAnExcludeDate &&
+      (await visitService.dateHasVisits({ username: res.locals.user.username, prisonId, date: selectedDateString }))
+
     const visitorsTotal = visits.reduce((acc, visit) => {
       return acc + visit.visitorCount
     }, 0)
@@ -113,6 +126,8 @@ export default function routes({ auditService, visitService, visitSessionsServic
       queryParamsForBackLink,
       visits,
       visitorsTotal,
+      isAnExcludeDate,
+      isAnExcludeDateWithVisits,
     })
   })
 
