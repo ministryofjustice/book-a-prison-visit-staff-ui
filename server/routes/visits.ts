@@ -104,7 +104,7 @@ export default function routes({
     const queryParamsForBackLink = new URLSearchParams({
       query: new URLSearchParams({
         type: selectedSessionTemplate?.type || 'UNKNOWN',
-        sessionReference: selectedSessionTemplate?.sessionReference || selectedTimeSlotRef,
+        sessionReference: selectedSessionTemplate?.sessionReference || selectedTimeSlotRef || 'NONE',
         selectedDate: selectedDateString,
         firstTabDate: firstTabDateString,
       }).toString(),

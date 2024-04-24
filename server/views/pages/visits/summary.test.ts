@@ -137,7 +137,12 @@ describe('Views - Visits summary', () => {
   })
 
   it('should display appropriate message for an exclude date with visits that need review', () => {
-    viewContext = { visits: [], isAnExcludeDate: true, isAnExcludeDateWithVisitReviews: true }
+    viewContext = {
+      queryParamsForBackLink: 'back-link-params',
+      visits: [],
+      isAnExcludeDate: true,
+      isAnExcludeDateWithVisitReviews: true,
+    }
 
     const $ = cheerio.load(compiledTemplate.render(viewContext))
 
@@ -145,7 +150,7 @@ describe('Views - Visits summary', () => {
     expect($('[data-test="no-visits-message"]').text()).toContain(
       'This date has been blocked for social visits. There are existing bookings that need review.',
     )
-    expect($('[data-test="no-visits-message"] a').prop('href')).toBe('/review')
+    expect($('[data-test="no-visits-message"] a').prop('href')).toBe('/review?back-link-params')
     expect($('.bapv-table').length).toBe(0)
   })
 

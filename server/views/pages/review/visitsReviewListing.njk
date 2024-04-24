@@ -9,7 +9,11 @@
     {% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
 {% endset %}
 
-{% set backLinkHref = "/" %}
+{% if fromPage == "visits" %}
+  {% set backLinkHref = "/visits?" + fromPageQuery %}
+{% else %}
+  {% set backLinkHref = "/" %}
+{% endif %}
 
 {% macro arrayToList(items) %}
   <ul class="govuk-list govuk-!-margin-bottom-0">
