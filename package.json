@@ -120,7 +120,7 @@
     "passport": "^0.7.0",
     "passport-oauth2": "^1.8.0",
     "redis": "^4.6.13",
-    "superagent": "^8.1.2",
+    "superagent": "^9.0.1",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
@@ -173,7 +173,7 @@
     "prettier": "^3.2.5",
     "prettier-plugin-jinja-template": "^1.3.3",
     "sass": "^1.75.0",
-    "supertest": "^6.3.4",
+    "supertest": "^7.0.0",
     "ts-jest": "^29.1.2",
     "typescript": "^5.4.5"
   }
