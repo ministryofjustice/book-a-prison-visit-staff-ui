@@ -204,7 +204,7 @@ export default class OrchestrationApiClient {
 
   async getSupportedPrisonIds(): Promise<string[]> {
     return this.restClient.get({
-      path: '/config/prisons/supported',
+      path: '/config/prisons/user-type/STAFF/supported',
     })
   }
 

@@ -429,7 +429,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        url: '/orchestration/config/prisons/supported',
+        url: '/orchestration/config/prisons/user-type/STAFF/supported',
       },
       response: {
         status: 200,

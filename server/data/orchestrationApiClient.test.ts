@@ -498,7 +498,7 @@ describe('orchestrationApiClient', () => {
       const results = ['HEI', 'BLI']
 
       fakeOrchestrationApi
-        .get('/config/prisons/supported')
+        .get('/config/prisons/user-type/STAFF/supported')
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
