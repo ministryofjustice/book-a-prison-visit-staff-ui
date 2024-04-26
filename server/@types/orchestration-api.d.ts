@@ -412,6 +412,8 @@ export interface components {
         | 'NOT_KNOWN'
         | 'NOT_APPLICABLE'
         | 'BY_PRISONER'
+      /** @description allow over booking method */
+      allowOverBooking: boolean
     }
     IgnoreVisitNotificationsDto: {
       /** @description Reason why the visit's notifications can be ignored */
@@ -676,17 +678,17 @@ export interface components {
       totalPages?: number
       /** Format: int64 */
       totalElements?: number
-      first?: boolean
-      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['VisitDto'][]
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject'][]
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
+      first?: boolean
+      last?: boolean
       empty?: boolean
     }
     PageableObject: {
@@ -694,11 +696,11 @@ export interface components {
       offset?: number
       sort?: components['schemas']['SortObject'][]
       /** Format: int32 */
+      pageNumber?: number
+      /** Format: int32 */
       pageSize?: number
       paged?: boolean
       unpaged?: boolean
-      /** Format: int32 */
-      pageNumber?: number
     }
     SortObject: {
       direction?: string

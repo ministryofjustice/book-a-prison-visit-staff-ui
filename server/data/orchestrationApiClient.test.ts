@@ -41,6 +41,7 @@ describe('orchestrationApiClient', () => {
       const applicationReference = 'aaa-bbb-ccc'
       const bookingOrchestrationRequestDto: BookingOrchestrationRequestDto = {
         applicationMethodType: 'NOT_KNOWN',
+        allowOverBooking: true,
       }
 
       const result: Partial<Visit> = {

@@ -36,6 +36,7 @@ export default {
           {
             equalToJson: {
               applicationMethodType: applicationMethod,
+              allowOverBooking: true,
             },
           },
         ],

@@ -39,6 +39,7 @@ export default class OrchestrationApiClient {
       path: `/visits/${applicationReference}/book`,
       data: <BookingOrchestrationRequestDto>{
         applicationMethodType: applicationMethod,
+        allowOverBooking: true,
       },
     })
   }
