@@ -431,7 +431,7 @@ export interface components {
     }
     ChangeApplicationDto: {
       /**
-       * @description Visit Restriction
+       * @description Session Restriction
        * @example OPEN
        * @enum {string}
        */
@@ -451,6 +451,8 @@ export interface components {
       /** @description List of visitors associated with the visit */
       visitors: components['schemas']['VisitorDto'][]
       visitorSupport?: components['schemas']['ApplicationSupportDto']
+      /** @description allow over booking */
+      allowOverBooking: boolean
     }
     /** @description Visit */
     ApplicationDto: {
@@ -522,6 +524,12 @@ export interface components {
        * @example true
        */
       completed: boolean
+      /**
+       * @description User type
+       * @example STAFF
+       * @enum {string}
+       */
+      userType: 'STAFF' | 'PUBLIC'
     }
     CreateApplicationDto: {
       /**
@@ -541,7 +549,7 @@ export interface components {
        */
       sessionDate: string
       /**
-       * @description Visit Restriction
+       * @description Session Restriction
        * @example OPEN
        * @enum {string}
        */
@@ -550,6 +558,19 @@ export interface components {
       /** @description List of visitors associated with the visit */
       visitors: components['schemas']['VisitorDto'][]
       visitorSupport?: components['schemas']['ApplicationSupportDto']
+      /**
+       * @description User type
+       * @example STAFF
+       * @enum {string}
+       */
+      userType: 'STAFF' | 'PUBLIC'
+      /**
+       * @description actioned by (Booker reference - if PUBLIC user type Or User Name - if staff user type)
+       * @example asd-asd-asd or STAFF_USER
+       */
+      actionedBy: string
+      /** @description allow over booking */
+      allowOverBooking: boolean
     }
     DlqMessage: {
       body: {
@@ -695,12 +716,12 @@ export interface components {
       /** Format: int64 */
       offset?: number
       sort?: components['schemas']['SortObject'][]
+      paged?: boolean
+      unpaged?: boolean
       /** Format: int32 */
       pageNumber?: number
       /** Format: int32 */
       pageSize?: number
-      paged?: boolean
-      unpaged?: boolean
     }
     SortObject: {
       direction?: string
@@ -2143,10 +2164,10 @@ export interface operations {
          */
         prisonerId: string
         /**
-         * @description Filter sessions by Visit restriction
+         * @description Filter sessions by session restriction - OPEN or CLOSED
          * @example CLOSED
          */
-        visitRestriction: 'OPEN' | 'CLOSED' | 'UNKNOWN'
+        sessionRestriction: 'OPEN' | 'CLOSED'
         /**
          * @description Override the default minimum number of days notice from the current date
          * @example 2

@@ -96,16 +96,17 @@ export default class OrchestrationApiClient {
           }
         }),
         visitorSupport: visitSessionData.visitorSupport,
+        allowOverBooking: true,
       },
     })
   }
 
-  async createVisitApplicationFromVisit(visitSessionData: VisitSessionData): Promise<ApplicationDto> {
+  async createVisitApplicationFromVisit(visitSessionData: VisitSessionData, username: string): Promise<ApplicationDto> {
     const { visitContact, mainContactId } = this.convertMainContactToVisitContact(visitSessionData.mainContact)
 
     return this.restClient.put({
       path: `/visits/application/${visitSessionData.visitReference}/change`,
-      data: <ChangeApplicationDto>{
+      data: <CreateApplicationDto>{
         prisonerId: visitSessionData.prisoner.offenderNo,
         sessionTemplateReference: visitSessionData.visitSlot.sessionTemplateReference,
         sessionDate: visitSessionData.visitSlot.startTimestamp.split('T')[0],
@@ -118,11 +119,14 @@ export default class OrchestrationApiClient {
           }
         }),
         visitorSupport: visitSessionData.visitorSupport,
+        userType: 'STAFF',
+        actionedBy: username,
+        allowOverBooking: true,
       },
     })
   }
 
-  async createVisitApplication(visitSessionData: VisitSessionData): Promise<ApplicationDto> {
+  async createVisitApplication(visitSessionData: VisitSessionData, username: string): Promise<ApplicationDto> {
     return this.restClient.post({
       path: '/visits/application/slot/reserve',
       data: <CreateApplicationDto>{
@@ -135,6 +139,9 @@ export default class OrchestrationApiClient {
             nomisPersonId: visitor.personId,
           }
         }),
+        userType: 'STAFF',
+        actionedBy: username,
+        allowOverBooking: true,
       },
     })
   }

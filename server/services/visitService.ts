@@ -76,7 +76,7 @@ export default class VisitService {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
-    return orchestrationApiClient.createVisitApplicationFromVisit(visitSessionData)
+    return orchestrationApiClient.createVisitApplicationFromVisit(visitSessionData, username)
   }
 
   async createVisitApplication({
@@ -89,7 +89,7 @@ export default class VisitService {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
-    return orchestrationApiClient.createVisitApplication(visitSessionData)
+    return orchestrationApiClient.createVisitApplication(visitSessionData, username)
   }
 
   async getVisit({
