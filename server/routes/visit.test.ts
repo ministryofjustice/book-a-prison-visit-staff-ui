@@ -685,6 +685,22 @@ describe('/visit/:reference', () => {
         })
     })
 
+    it('should set up sessionData with no visitorSupport and redirect to select visitors page', () => {
+      visit.applicationReference = undefined
+      visit.visitorSupport = undefined
+
+      return request(app)
+        .post('/visit/ab-cd-ef-gh')
+        .expect(302)
+        .expect('location', '/visit/ab-cd-ef-gh/update/select-visitors')
+        .expect(res => {
+          expect(clearSession).toHaveBeenCalledTimes(1)
+          expect(visitSessionData.visitorSupport).toStrictEqual(<VisitSessionData['visitorSupport']>{
+            description: '',
+          })
+        })
+    })
+
     it('should redirect to /visit/:reference if selected establishment does not match prison for which visit booked', () => {
       app = appWithAllRoutes({
         services: { auditService, supportedPrisonsService, visitService, visitSessionsService },
