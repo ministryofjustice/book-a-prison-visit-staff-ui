@@ -76,9 +76,8 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
   // Durham (HMP & YOI)
   DMI: {
     selectVisitorsText: [
-      'You can add up to 3 people aged 12 and over, and 3 children under 12 years old.',
+      'You can add up to 3 people aged 9 and over, and 3 children under 9 years old.',
       'At least one visitor must be 18 or older.',
-      'Contact HMP Durham if you would like to bring more than 3 children.',
     ],
   },
   // Downview (HMP & YOI)
