@@ -501,8 +501,8 @@ testJourneys.forEach(journey => {
           .expect('Content-Type', /html/)
           .expect(res => {
             const $ = cheerio.load(res.text)
-            expect($('[data-test="visitor-information-1"]').text()).toContain('You can add up to 3 people aged 18 and over. Children can also be added to the visit.')
-            expect($('[data-test="visitor-information-2"]').text()).toContain('must be 18 or older')
+            expect($('[data-test="visitor-information-1"]').text()).toContain('You can add up to 3 people aged 18 and over.')
+            expect($('[data-test="visitor-information-2"]').text()).toContain('Contact HMP Bristol')
           })
       })
 
