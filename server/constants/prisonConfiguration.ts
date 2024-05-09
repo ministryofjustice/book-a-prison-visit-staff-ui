@@ -17,10 +17,17 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'At least one visitor must be 18 or older.',
     ],
   },
+  // Bedford (HMP & YOI)
+  BFI: {
+    selectVisitorsText: [
+      'You can add up to 2 people aged 18 and over, and 5 children under 18 years old.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
   // Bristol (HMP & YOI)
   BLI: {
     selectVisitorsText: [
-      'Add up to 3 adults (aged 18 or older). Children can also be added to the visit.',
+      'You can add up to 3 people aged 18 and over. Children can also be added to the visit.',
       'Contact HMP Bristol when the total number of visitors (adults and children) is more than 3.',
     ],
   },

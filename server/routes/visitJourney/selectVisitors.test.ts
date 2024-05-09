@@ -12,6 +12,7 @@ import {
   createMockSupportedPrisonsService,
 } from '../../services/testutils/mocks'
 import TestData from '../testutils/testData'
+import getPrisonConfiguration from '../../constants/prisonConfiguration'
 
 let sessionApp: Express
 
@@ -474,18 +475,23 @@ testJourneys.forEach(journey => {
 
     describe(`Display prison specific content for each prison`, () => {
       it('should display prison specific content for Hewell', () => {
+        const expectedText = getPrisonConfiguration('HEI').selectVisitorsText
+
         return request(sessionApp)
           .get(`${journey.urlPrefix}/select-visitors`)
           .expect(200)
           .expect('Content-Type', /html/)
           .expect(res => {
             const $ = cheerio.load(res.text)
-            expect($('[data-test="visitor-information-1"]').text()).toContain('Add up to 3 people')
-            expect($('[data-test="visitor-information-2"]').text()).toContain('must be 18 or older')
+            expect($('[data-test^="visitor-information"]').length).toBe(expectedText.length)
+            expect($('[data-test="visitor-information-1"]').text()).toBe(expectedText[0])
+            expect($('[data-test="visitor-information-2"]').text()).toBe(expectedText[1])
           })
       })
 
       it('should display prison specific content for Bristol', () => {
+        const expectedText = getPrisonConfiguration('BLI').selectVisitorsText
+
         sessionApp = appWithAllRoutes({
           services: { prisonerProfileService, prisonerVisitorsService },
           sessionData: {
@@ -501,8 +507,9 @@ testJourneys.forEach(journey => {
           .expect('Content-Type', /html/)
           .expect(res => {
             const $ = cheerio.load(res.text)
-            expect($('[data-test="visitor-information-1"]').text()).toContain('Add up to 3 adults')
-            expect($('[data-test="visitor-information-2"]').text()).toContain('Contact HMP Bristol')
+            expect($('[data-test^="visitor-information"]').length).toBe(expectedText.length)
+            expect($('[data-test="visitor-information-1"]').text()).toBe(expectedText[0])
+            expect($('[data-test="visitor-information-2"]').text()).toBe(expectedText[1])
           })
       })
 
@@ -522,8 +529,7 @@ testJourneys.forEach(journey => {
           .expect('Content-Type', /html/)
           .expect(res => {
             const $ = cheerio.load(res.text)
-            expect($('[data-test="visitor-information-1"]').length).toBe(0)
-            expect($('[data-test="visitor-information-2"]').length).toBe(0)
+            expect($('[data-test^="visitor-information"]').length).toBe(0)
           })
       })
     })
