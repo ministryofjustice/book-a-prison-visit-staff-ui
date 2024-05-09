@@ -365,6 +365,7 @@ export default class TestData {
 
   static prisonDto = ({
     code = 'HEI',
+    prisonName = 'Hewell (HMP)',
     active = true,
     policyNoticeDaysMax = 28,
     policyNoticeDaysMin = 3,
@@ -376,6 +377,7 @@ export default class TestData {
   }: Partial<PrisonDto> = {}): PrisonDto =>
     ({
       code,
+      prisonName,
       active,
       policyNoticeDaysMax,
       policyNoticeDaysMin,

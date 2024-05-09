@@ -716,12 +716,12 @@ export interface components {
       /** Format: int64 */
       offset?: number
       sort?: components['schemas']['SortObject'][]
+      /** Format: int32 */
+      pageSize?: number
       paged?: boolean
       unpaged?: boolean
       /** Format: int32 */
       pageNumber?: number
-      /** Format: int32 */
-      pageSize?: number
     }
     SortObject: {
       direction?: string
@@ -1194,6 +1194,11 @@ export interface components {
        * @example BHI
        */
       code: string
+      /**
+       * @description prison name
+       * @example HMP Hewell
+       */
+      prisonName: string
       /**
        * @description is prison active
        * @example true
@@ -2164,20 +2169,10 @@ export interface operations {
          */
         prisonerId: string
         /**
-         * @description Filter sessions by session restriction - OPEN or CLOSED
+         * @description Filter sessions by session restriction - OPEN or CLOSED, if prisoner has CLOSED it will use that
          * @example CLOSED
          */
         sessionRestriction: 'OPEN' | 'CLOSED'
-        /**
-         * @description Override the default minimum number of days notice from the current date
-         * @example 2
-         */
-        min?: number
-        /**
-         * @description Override the default maximum number of days to book-ahead from the current date
-         * @example 28
-         */
-        max?: number
       }
     }
     responses: {

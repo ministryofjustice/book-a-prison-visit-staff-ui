@@ -18,6 +18,10 @@ export interface paths {
      */
     put: operations['addApiAccessForCaseload']
   }
+  '/api/smoketest/offenders/{offenderNo}/status': {
+    /** Sets the status for this offender to IN if it currently OUT, with smoke test data */
+    put: operations['offenderStatusSetup']
+  }
   '/api/smoketest/offenders/{offenderNo}/release': {
     /** Releases this offender, with smoke test data */
     put: operations['releasePrisoner']
@@ -168,6 +172,7 @@ export interface paths {
     put: operations['moveToCellSwap']
   }
   '/api/bookings/{bookingId}/living-unit/{internalLocationDescription}': {
+    /** Move Offender to another cell or reception */
     put: operations['moveToCell']
   }
   '/api/bookings/{bookingId}/court-hearings/{hearingId}/hearing-date': {
@@ -306,10 +311,6 @@ export interface paths {
      * @description Requires role STAFF_SEARCH
      */
     post: operations['getUserDetailsList']
-  }
-  '/api/smoketest/offenders/{offenderNo}/imprisonment-status': {
-    /** Sets imprisonment status smoke test data for this offender */
-    post: operations['imprisonmentDataSetup']
   }
   '/api/smoketest/offenders/{offenderNo}/details': {
     /** Updates the offender details for this offender, with smoke test data */
@@ -1052,11 +1053,18 @@ export interface paths {
      *     results.
      *     This is an internal endpoint used by Prisoner Search to ensure that NOMIS and OpenSearch are in sync.
      *     Other services should use Prisoner Search instead to get the list of prisoners.
-     *     Requires PRISONER_INDEX or GLOBAL_SEARCH role.
+     *     Requires PRISONER_INDEX or GLOBAL_SEARCH or ROLE_PRISON_API__CORE_PERSON__NUMBERS__RO role.
      *
      * @description <p>This endpoint uses the REPLICA database.</p>
      */
     get: operations['getPrisonerNumbers']
+  }
+  '/api/prisoner-search/offenders/{offenderNo}': {
+    /**
+     * Returns details required by Prisoner Search for the given offender number.
+     * @description This endpoint is dedicated to returning the details required by Prisoner Search so the role and endpoint are not for general use. If you're thinking of calling this endpoint try calling Prisoner Search instead.
+     */
+    get: operations['getPrisonerDetails']
   }
   '/api/prison/{agencyId}/booking/latest/paged/calculable-sentence-envelope': {
     /** Details of the active sentence envelope, a combination of the person information, the active booking and calculable sentences at a particular establishment (paged response) */
@@ -1366,6 +1374,20 @@ export interface paths {
     /** Offender fine payments for a prisoner */
     get: operations['getOffenderFinePayments']
   }
+  '/api/offender-dates/sentence-calculation/{offenderSentCalcId}': {
+    /**
+     * Get the key dates for an offender.
+     * @description Requires RELEASE_DATES_CALCULATOR
+     */
+    get: operations['getOffenderKeyDatesForOffenderSentCalcId']
+  }
+  '/api/offender-dates/latest-tused/{nomsId}': {
+    /**
+     * Get the latest TUSED data for an offender. If the offender has had a previous TUSED recorded on a previous booking this will return the latest one
+     * @description Requires RELEASE_DATES_CALCULATOR
+     */
+    get: operations['getOffenderLatestTused']
+  }
   '/api/offender-dates/calculations/{nomsId}': {
     /**
      * Get the key dates for an offender.
@@ -1466,7 +1488,7 @@ export interface paths {
      * Current establishment rollcount numbers.
      * @description Current establishment rollcount numbers.<p>This endpoint uses the REPLICA database.</p>
      */
-    get: operations['getRollcount']
+    get: operations['getRollCount']
   }
   '/api/movements/rollcount/{agencyId}/movements': {
     /**
@@ -2304,6 +2326,11 @@ export interface components {
     /** @description Alias */
     Alias: {
       /**
+       * @description Title of offender alias
+       * @example Mr
+       */
+      title?: string
+      /**
        * @description First name of offender alias
        * @example Mike
        */
@@ -2351,6 +2378,12 @@ export interface components {
        * @example 2019-02-15
        */
       createDate?: string
+      /**
+       * Format: int64
+       * @description Offender ID
+       * @example 543548
+       */
+      offenderId: number
     }
     /** @description Assessment */
     Assessment: {
@@ -2712,6 +2745,12 @@ export interface components {
        * @example 100
        */
       caseId?: number
+      /**
+       * Format: int32
+       * @description Offence Severity Ranking
+       * @example 100
+       */
+      offenceSeverityRanking?: number
     }
     /** @description Offender Identifier */
     OffenderIdentifier: {
@@ -2757,6 +2796,12 @@ export interface components {
        * @example 2021-07-05T10:35:17
        */
       whenCreated?: string
+      /**
+       * Format: int64
+       * @description Offender ID
+       * @example 234547
+       */
+      offenderId?: number
     }
     /** @description Offender Sentence terms details for booking id */
     OffenderSentenceTerms: {
@@ -4004,6 +4049,11 @@ export interface components {
        */
       primary: boolean
       /**
+       * @description Mail Address
+       * @example false
+       */
+      mail: boolean
+      /**
        * @description No Fixed Address
        * @example false
        */
@@ -4222,6 +4272,11 @@ export interface components {
       outcomeComment?: string
       /** @description set of booking and activity ids */
       bookingActivities: components['schemas']['BookingActivity'][]
+    }
+    /** @description The comment. May be empty or null */
+    UpdateComment: {
+      comment?: string
+      commentOrNull?: string
     }
     /** @description Update Agency Request */
     RequestToUpdateAgency: {
@@ -7326,14 +7381,14 @@ export interface components {
       totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      first?: boolean
+      last?: boolean
       /** Format: int32 */
       size?: number
       content?: string[]
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject'][]
-      first?: boolean
-      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
@@ -7345,10 +7400,10 @@ export interface components {
       sort?: components['schemas']['SortObject'][]
       /** Format: int32 */
       pageSize?: number
-      /** Format: int32 */
-      pageNumber?: number
       paged?: boolean
       unpaged?: boolean
+      /** Format: int32 */
+      pageNumber?: number
     }
     SortObject: {
       direction?: string
@@ -7356,6 +7411,147 @@ export interface components {
       ascending?: boolean
       property?: string
       ignoreCase?: boolean
+    }
+    /** @description Prisoner details required by Prisoner Search */
+    PrisonerSearchDetails: {
+      /**
+       * @description Prisoner Number a.k.a NOMS number, offender number
+       * @example A1234AA
+       */
+      offenderNo: string
+      /**
+       * Format: int64
+       * @description Offender Id
+       * @example 678673
+       */
+      offenderId?: number
+      /**
+       * Format: int64
+       * @description Booking Id of the active booking
+       * @example 432132
+       */
+      bookingId?: number
+      /** @description Booking Number of the active booking */
+      bookingNo?: string
+      /** @description Title */
+      title?: string
+      /** @description First Name */
+      firstName: string
+      /** @description Middle Name(s) */
+      middleName?: string
+      /** @description Last Name */
+      lastName: string
+      /**
+       * Format: date
+       * @description Date of Birth of prisoner
+       * @example 1970-03-15
+       */
+      dateOfBirth: string
+      /**
+       * @description Prison ID
+       * @example MDI
+       */
+      agencyId?: string
+      /** @description List of alert details for the active booking */
+      alerts?: components['schemas']['Alert'][]
+      assignedLivingUnit?: components['schemas']['AssignedLivingUnit']
+      /** @description Religion of the prisoner */
+      religion?: string
+      physicalAttributes?: components['schemas']['PhysicalAttributes']
+      /** @description List of physical characteristics */
+      physicalCharacteristics?: components['schemas']['PhysicalCharacteristic'][]
+      /** @description List of profile information */
+      profileInformation?: components['schemas']['ProfileInformation'][]
+      /** @description List of physical marks */
+      physicalMarks?: components['schemas']['PhysicalMark'][]
+      /** @description CSRA (Latest assessment with cellSharing=true from list of assessments) */
+      csra?: string
+      /** @description Category code (from list of assessments) */
+      categoryCode?: string
+      /**
+       * @description In/Out Status
+       * @example IN, OUT, TRN
+       */
+      inOutStatus?: string
+      /** @description Prisoner Identifiers */
+      identifiers?: components['schemas']['OffenderIdentifier'][]
+      /** @description Prisoner Identifiers including those from aliases */
+      allIdentifiers?: components['schemas']['OffenderIdentifier'][]
+      sentenceDetail?: components['schemas']['SentenceCalcDates']
+      /** @description Most serious offence */
+      mostSeriousOffence?: string
+      /** @description Currently serving an indeterminate sentence? */
+      indeterminateSentence?: boolean
+      /** @description Aliases */
+      aliases?: components['schemas']['Alias'][]
+      /**
+       * @description Status of prisoner
+       * @example ACTIVE IN, ACTIVE OUT, INACTIVE OUT, INACTIVE TRN
+       */
+      status?: string
+      /**
+       * @description Last Movement Type Code of prisoner. Note: Reference Data from MOVE_TYPE Domain
+       * @example TAP, CRT, TRN, ADM, REL
+       */
+      lastMovementTypeCode?: string
+      /**
+       * @description Last Movement Reason of prisoner. Note: Reference Data from MOVE_RSN Domain
+       * @example CA
+       */
+      lastMovementReasonCode?: string
+      /**
+       * @description Legal Status
+       * @example REMAND
+       * @enum {string}
+       */
+      legalStatus?:
+        | 'RECALL'
+        | 'DEAD'
+        | 'INDETERMINATE_SENTENCE'
+        | 'SENTENCED'
+        | 'CONVICTED_UNSENTENCED'
+        | 'CIVIL_PRISONER'
+        | 'IMMIGRATION_DETAINEE'
+        | 'REMAND'
+        | 'UNKNOWN'
+        | 'OTHER'
+      /**
+       * @description Recall
+       * @example true
+       */
+      recall?: boolean
+      /**
+       * @description The prisoner's imprisonment status
+       * @example LIFE
+       */
+      imprisonmentStatus?: string
+      /**
+       * @description The prisoner's imprisonment status description
+       * @example Serving Life Imprisonment
+       */
+      imprisonmentStatusDescription?: string
+      /**
+       * Format: date
+       * @description Date prisoner was received into the prison.
+       * @example 1980-01-01
+       */
+      receptionDate?: string
+      /**
+       * @description current prison or outside with last movement information.
+       * @example Outside - released from Leeds
+       */
+      locationDescription?: string
+      /**
+       * @description the current prison id or the last prison before release
+       * @example MDI
+       */
+      latestLocationId?: string
+      /** @description Prisoner Addresses */
+      addresses?: components['schemas']['AddressDto'][]
+      /** @description Prisoner Phone Numbers */
+      phones?: components['schemas']['Telephone'][]
+      /** @description Prisoner Email Addresses */
+      emailAddresses?: components['schemas']['Email'][]
     }
     /** @description Sentence Adjustment values */
     BookingAdjustment: {
@@ -7575,14 +7771,14 @@ export interface components {
       totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      first?: boolean
+      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['CalculableSentenceEnvelope'][]
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject'][]
-      first?: boolean
-      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
@@ -8261,16 +8457,16 @@ export interface components {
        */
       code: string
       /**
+       * @description Description of the location, either from the user description if set or reference code description and code
+       * @example Wing A
+       */
+      description: string
+      /**
        * @description The type of the location - from LIVING_UNIT reference code
        * @example WING
        * @enum {string}
        */
       type?: 'BED' | 'BLK' | 'CB' | 'CELL' | 'LAND' | 'SPUR' | 'TIER' | 'WING'
-      /**
-       * @description Description of the location, either from the user description if set or reference code description and code
-       * @example Wing A
-       */
-      description: string
     }
     OffenderLocation: {
       /** @description Current housing levels or null if not currently in prison */
@@ -9237,6 +9433,15 @@ export interface components {
        */
       calculatedAt?: string
     }
+    /** @description Latest TUSED dates and associated info for offender */
+    LatestTusedData: {
+      /** Format: date */
+      latestTused?: string
+      /** Format: date */
+      latestOverrideTused?: string
+      comment?: string
+      offenderNo?: string
+    }
     /** @description Offender Sentence Calculation Summary */
     SentenceCalculationSummary: {
       /** Format: int64 */
@@ -9451,14 +9656,14 @@ export interface components {
       totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      first?: boolean
+      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['OffenceDto'][]
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject'][]
-      first?: boolean
-      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
@@ -9970,8 +10175,23 @@ export interface components {
        * @description Id of location
        */
       livingUnitId: number
-      /** @description Wing, houseblock etc. name */
+      /**
+       * @description Unique code for this location
+       * @example MDI-1-1-001
+       */
+      fullLocationPath: string
+      /**
+       * @description Unique code for this location within the prison
+       * @example 1-1-001
+       */
+      locationCode: string
+      /** @description Wing, House block name or landing code or cell code */
       livingUnitDesc: string
+      /**
+       * Format: int64
+       * @description Location Id of the parent location. This will be NULL for top level locations (e.g. Wings)
+       */
+      parentLocationId: number
       /**
        * Format: int32
        * @description No of residential prisoners
@@ -10228,14 +10448,14 @@ export interface components {
       totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      first?: boolean
+      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Education'][]
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject'][]
-      first?: boolean
-      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
@@ -10454,14 +10674,14 @@ export interface components {
       totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      first?: boolean
+      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['VisitWithVisitors'][]
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject'][]
-      first?: boolean
-      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
@@ -10824,14 +11044,14 @@ export interface components {
       totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      first?: boolean
+      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['BedAssignment'][]
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject'][]
-      first?: boolean
-      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
@@ -10882,14 +11102,14 @@ export interface components {
       totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      first?: boolean
+      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Alert'][]
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject'][]
-      first?: boolean
-      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
@@ -10900,14 +11120,14 @@ export interface components {
       totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      first?: boolean
+      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['PrisonerBookingSummary'][]
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject'][]
-      first?: boolean
-      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
@@ -11302,6 +11522,36 @@ export interface operations {
       201: {
         content: {
           'application/json': components['schemas']['CaseloadUpdate']
+        }
+      }
+    }
+  }
+  /** Sets the status for this offender to IN if it currently OUT, with smoke test data */
+  offenderStatusSetup: {
+    parameters: {
+      path: {
+        /**
+         * @description offenderNo
+         * @example A1234AA
+         */
+        offenderNo: string
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        content: never
+      }
+      /** @description Requires role ROLE_SMOKE_TEST */
+      403: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Requested resource not found. */
+      404: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
         }
       }
     }
@@ -12451,6 +12701,7 @@ export interface operations {
       }
     }
   }
+  /** Move Offender to another cell or reception */
   moveToCell: {
     parameters: {
       query: {
@@ -12464,6 +12715,11 @@ export interface operations {
          * @example 2020-03-24T12:13:40
          */
         dateTime?: string
+        /**
+         * @description Whether to timeout if locked
+         * @example true
+         */
+        lockTimeout?: boolean
       }
       path: {
         /**
@@ -12493,6 +12749,12 @@ export interface operations {
       }
       /** @description Requested resource not found. */
       404: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Record in use for this booking id (possibly in P-Nomis). */
+      423: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
@@ -12785,7 +13047,7 @@ export interface operations {
     }
     requestBody?: {
       content: {
-        'text/plain': string
+        'application/json': components['schemas']['UpdateComment']
       }
     }
     responses: {
@@ -13307,36 +13569,6 @@ export interface operations {
       200: {
         content: {
           'application/json': components['schemas']['UserDetail'][]
-        }
-      }
-    }
-  }
-  /** Sets imprisonment status smoke test data for this offender */
-  imprisonmentDataSetup: {
-    parameters: {
-      path: {
-        /**
-         * @description offenderNo
-         * @example A1234AA
-         */
-        offenderNo: string
-      }
-    }
-    responses: {
-      /** @description OK */
-      200: {
-        content: never
-      }
-      /** @description Requires role ROLE_SMOKE_TEST */
-      403: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Requested resource not found. */
-      404: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
         }
       }
     }
@@ -17623,7 +17855,7 @@ export interface operations {
    *     results.
    *     This is an internal endpoint used by Prisoner Search to ensure that NOMIS and OpenSearch are in sync.
    *     Other services should use Prisoner Search instead to get the list of prisoners.
-   *     Requires PRISONER_INDEX or GLOBAL_SEARCH role.
+   *     Requires PRISONER_INDEX or GLOBAL_SEARCH or ROLE_PRISON_API__CORE_PERSON__NUMBERS__RO role.
    *
    * @description <p>This endpoint uses the REPLICA database.</p>
    */
@@ -17651,6 +17883,47 @@ export interface operations {
       }
       /** @description Unrecoverable error occurred whilst processing request. */
       500: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  /**
+   * Returns details required by Prisoner Search for the given offender number.
+   * @description This endpoint is dedicated to returning the details required by Prisoner Search so the role and endpoint are not for general use. If you're thinking of calling this endpoint try calling Prisoner Search instead.
+   */
+  getPrisonerDetails: {
+    parameters: {
+      path: {
+        /**
+         * @description offenderNo
+         * @example A1234AA
+         */
+        offenderNo: string
+      }
+    }
+    responses: {
+      /** @description OK */
+      200: {
+        content: {
+          'application/json': components['schemas']['PrisonerSearchDetails']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Requires role ROLE_PRISONER_INDEX */
+      403: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Requested resource not found. */
+      404: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
@@ -17853,10 +18126,6 @@ export interface operations {
   /** Full details about the current state of an offender */
   getOffender_1: {
     parameters: {
-      header?: {
-        /** @description Version of Offender details, default is 1.0, Beta is version 1.1_beta and is WIP (do not use in production) */
-        version?: string
-      }
       path: {
         /**
          * @description The offenderNo of offender
@@ -18883,6 +19152,94 @@ export interface operations {
    * Get the key dates for an offender.
    * @description Requires RELEASE_DATES_CALCULATOR
    */
+  getOffenderKeyDatesForOffenderSentCalcId: {
+    parameters: {
+      path: {
+        /** @description The Offender Sent Calc Id id of offender */
+        offenderSentCalcId: number
+      }
+    }
+    responses: {
+      /** @description Offender key dates found */
+      200: {
+        content: {
+          'application/json': components['schemas']['OffenderCalculatedKeyDates']
+        }
+      }
+      /** @description Invalid request. */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Forbidden - user not authorised to get an offender's calculated dates */
+      403: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Requested resource not found. */
+      404: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unrecoverable error occurred whilst processing request. */
+      500: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  /**
+   * Get the latest TUSED data for an offender. If the offender has had a previous TUSED recorded on a previous booking this will return the latest one
+   * @description Requires RELEASE_DATES_CALCULATOR
+   */
+  getOffenderLatestTused: {
+    parameters: {
+      path: {
+        /** @description The nomis id of the offender */
+        nomsId: string
+      }
+    }
+    responses: {
+      /** @description TUSED data found for offender */
+      200: {
+        content: {
+          'application/json': components['schemas']['LatestTusedData']
+        }
+      }
+      /** @description Invalid request. */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Forbidden - user not authorised to access latest TUSED information for offender */
+      403: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Requested resource not found. */
+      404: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unrecoverable error occurred whilst processing request. */
+      500: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  /**
+   * Get the key dates for an offender.
+   * @description Requires RELEASE_DATES_CALCULATOR
+   */
   getOffenderCalculations: {
     parameters: {
       path: {
@@ -19403,11 +19760,17 @@ export interface operations {
    * Current establishment rollcount numbers.
    * @description Current establishment rollcount numbers.<p>This endpoint uses the REPLICA database.</p>
    */
-  getRollcount: {
+  getRollCount: {
     parameters: {
       query?: {
         /** @description If false return data for prisoners in cell locations, if true return unassigned prisoners, i.e. those in non-cell locations. */
         unassigned?: boolean
+        /** @description When specified, it will also all locations directly below this location, this should be used, when displaying cell lists for a specified landing. */
+        parentLocationId?: number
+        /** @description Show cell roll count summary along with Wings and Landings */
+        showCells?: boolean
+        /** @description Only show the wings and not the landings and cells (this is the default) */
+        wingOnly?: boolean
       }
       path: {
         /** @description The prison id */
