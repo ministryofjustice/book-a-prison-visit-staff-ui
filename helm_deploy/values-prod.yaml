@@ -16,7 +16,7 @@ generic-service:
     NOMIS_USER_ROLES_API_URL: "https://nomis-user.aks-live-1.studio-hosting.service.justice.gov.uk"
     ORCHESTRATION_API_URL: "https://hmpps-manage-prison-visits-orchestration.prison.service.justice.gov.uk"
     PRISONER_SEARCH_API_URL: "https://prisoner-search.prison.service.justice.gov.uk"
-    PRISON_API_URL: "https://api.prison.service.justice.gov.uk"
+    PRISON_API_URL: "https://prison-api.prison.service.justice.gov.uk"
     PRISONER_CONTACT_REGISTRY_API_URL: "https://prisoner-contact-registry.prison.service.justice.gov.uk"
     WHEREABOUTS_API_URL: "https://whereabouts-api.service.justice.gov.uk"
     PRISON_REGISTER_API_URL: "https://prison-register.hmpps.service.justice.gov.uk"
