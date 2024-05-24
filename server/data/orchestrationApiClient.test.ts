@@ -41,6 +41,7 @@ describe('orchestrationApiClient', () => {
       const applicationReference = 'aaa-bbb-ccc'
       const bookingOrchestrationRequestDto: BookingOrchestrationRequestDto = {
         applicationMethodType: 'NOT_KNOWN',
+        allowOverBooking: true,
       }
 
       const result: Partial<Visit> = {
@@ -208,6 +209,7 @@ describe('orchestrationApiClient', () => {
             }
           }),
           visitorSupport: visitSessionData.visitorSupport,
+          allowOverBooking: true,
         })
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, result)
@@ -243,7 +245,7 @@ describe('orchestrationApiClient', () => {
       }
 
       fakeOrchestrationApi
-        .put(`/visits/application/${visitSessionData.visitReference}/change`, <ChangeApplicationDto>{
+        .put(`/visits/application/${visitSessionData.visitReference}/change`, <CreateApplicationDto>{
           prisonerId: visitSessionData.prisoner.offenderNo,
           sessionTemplateReference: visitSessionData.visitSlot.sessionTemplateReference,
           sessionDate: '2022-02-14',
@@ -259,11 +261,14 @@ describe('orchestrationApiClient', () => {
             }
           }),
           visitorSupport: visitSessionData.visitorSupport,
+          userType: 'STAFF',
+          actionedBy: 'user1',
+          allowOverBooking: true,
         })
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, result)
 
-      const output = await orchestrationApiClient.createVisitApplicationFromVisit(visitSessionData)
+      const output = await orchestrationApiClient.createVisitApplicationFromVisit(visitSessionData, 'user1')
 
       expect(output).toStrictEqual(result)
     })
@@ -303,11 +308,14 @@ describe('orchestrationApiClient', () => {
               nomisPersonId: visitor.personId,
             }
           }),
+          userType: 'STAFF',
+          actionedBy: 'user1',
+          allowOverBooking: true,
         })
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(201, result)
 
-      const output = await orchestrationApiClient.createVisitApplication(visitSessionData)
+      const output = await orchestrationApiClient.createVisitApplication(visitSessionData, 'user1')
 
       expect(output).toStrictEqual(result)
     })
@@ -498,7 +506,7 @@ describe('orchestrationApiClient', () => {
       const results = ['HEI', 'BLI']
 
       fakeOrchestrationApi
-        .get('/config/prisons/supported')
+        .get('/config/prisons/user-type/STAFF/supported')
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 

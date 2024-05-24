@@ -36,6 +36,7 @@ export default {
           {
             equalToJson: {
               applicationMethodType: applicationMethod,
+              allowOverBooking: true,
             },
           },
         ],
@@ -99,6 +100,9 @@ export default {
               visitContact: application.visitContact,
               visitors: application.visitors,
               visitorSupport: application.visitorSupport,
+              userType: 'STAFF',
+              actionedBy: 'USER1',
+              allowOverBooking: true,
             },
           },
         ],
@@ -124,6 +128,7 @@ export default {
               visitContact: application.visitContact,
               visitors: application.visitors,
               visitorSupport: application.visitorSupport,
+              allowOverBooking: true,
             },
           },
         ],
@@ -148,6 +153,9 @@ export default {
               sessionDate: application.startTimestamp.split('T')[0],
               applicationRestriction: application.visitRestriction,
               visitors: application.visitors,
+              userType: 'STAFF',
+              actionedBy: 'USER1',
+              allowOverBooking: true,
             },
           },
         ],
@@ -429,7 +437,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        url: '/orchestration/config/prisons/supported',
+        url: '/orchestration/config/prisons/user-type/STAFF/supported',
       },
       response: {
         status: 200,

@@ -67,6 +67,13 @@ export interface paths {
      */
     delete: operations['deleteAddress']
   }
+  '/prisons/prisonsByIds': {
+    /**
+     * Get prisons by IDs
+     * @description Get prisons based on their IDs
+     */
+    post: operations['getPrisonsByIds']
+  }
   '/prison-maintenance': {
     /**
      * Adds a new prison
@@ -305,6 +312,10 @@ export interface components {
        * @example England
        */
       country: string
+    }
+    PrisonRequest: {
+      /** @description List of prison ids */
+      prisonIds: string[]
     }
     /** @description Prison Insert Record */
     InsertPrisonDto: {
@@ -935,6 +946,25 @@ export interface operations {
       404: {
         content: {
           'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  /**
+   * Get prisons by IDs
+   * @description Get prisons based on their IDs
+   */
+  getPrisonsByIds: {
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['PrisonRequest']
+      }
+    }
+    responses: {
+      /** @description Successful operation */
+      200: {
+        content: {
+          'application/json': components['schemas']['PrisonDto'][]
         }
       }
     }

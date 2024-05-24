@@ -182,7 +182,7 @@ export default function routes({
       originalVisitSlot: visitSlot,
       visitRestriction,
       visitors: currentVisitors,
-      visitorSupport: visit.visitorSupport,
+      visitorSupport: visit.visitorSupport ?? { description: '' },
       mainContact: {
         contact: mainContact,
         phoneNumber: visit.visitContact.telephone,

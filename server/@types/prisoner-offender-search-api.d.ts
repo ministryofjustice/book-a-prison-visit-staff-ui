@@ -116,27 +116,36 @@ export interface paths {
   }
   '/attribute-search': {
     /**
-     * *** WIP - DO NOT USE!!! *** Search for prisoners by attributes
+     * *** BETA *** Search for prisoners by attributes
      * @description <p>This endpoint allows you to create queries over all attributes from the <em>Prisoner</em> record. Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.</p>
      *       <p>The request contains a list of queries to search on one or more attributes using a list of matchers. For example attribute "lastName""
      *       requires a <em>StringMatcher</em> so we can query on <strong>"lastName IS Smith"</strong>. Other type matchers include <em>IntMatcher</em>, <em>BooleanMatcher</em>,
-     *       <em>DateMatcher</em> and <em>DateTimeMatcher</em>. We have the facility to easily create additional matchers as required, for example
-     *       we may end up with a PNCMatcher that handles any format of PNC number.
+     *       <em>DateMatcher</em> and <em>DateTimeMatcher</em>.
      *       </p>
      *       <p>Each query can also contain a list of sub-queries. Each sub-query can be considered as a separate query in brackets.
      *       Combining multiple sub-queries gives us the ability to create complex searches using any combination of a prisoner's
-     *       attributes. For example we can model nested queries such as <strong>"lastName IS Smith AND (prisonId IS MDI OR (prisonId IS OUT AND inOutStatus is OUT))"</strong>.
+     *       attributes. For example we can model nested queries such as <strong>"lastName IS Smith AND (prisonId IS MDI OR (prisonId IS OUT AND lastPrisonId IS MDI))"</strong>.
      *       </p>
-     *       <p>Please be aware that when searching lists of complex objects (e.g. aliases, alerts, tattoos) if you want to search for multiple attributes within the same object then you need
-     *       to include them in the same query. For example, to search for alias "John Smith" you should search for aliases.firstName IS "John" and aliases.lastName IS "Smith" in a single query.
-     *       If you search for them in different queries you will receive anyone with firstName John and also anyone with lastName Smith.
-     *       </p>
-     *       <p>To find all attributes that can be searched for please refer to the <em>Prisoner</em> record or get them from endpoint <strong>GET /attribute-search/attributes</strong>. Attributes from lists can be
+     *       <p>To find all attributes that can be searched for please refer to the <em>Prisoner</em> record or get them from endpoint <a target="_blank" href="/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config#/Attribute search/getAttributes"><strong>GET /attribute-search/attributes</strong></a>. Attributes from lists can be
      *       searched for with dot notation, e.g. <strong>"attribute=aliases.firstName"</strong> or <strong>"attribute=tattoos.bodyPart"</strong>.
      *       Attributes from complex objects can also be searched for with dot notation, e.g. <strong>"attribute=currentIncentive.level.code"</strong>.
      *       </p>
-     *       <p>String attributes that contain free text will perform a <a href="https://opensearch.org/docs/latest/query-dsl/term/fuzzy/">fuzzy search</a> with conditions IS and CONTAINS.
-     *       This means that the query also matches on near misses, e.g. spelling mistakes. To find which attributes perform a fuzzy search call endpoint <strong>GET /attribute-search/attributes</strong>.
+     *       <p>Note that when searching lists of complex objects (e.g. aliases, alerts, tattoos) if you want to search for multiple attributes within the same object then you need
+     *       to include them in the same query. For example, to search for alias "John Smith" you should search for <strong>aliases.firstName IS "John"</strong> and <strong>aliases.lastName IS "Smith"</strong> using string matchers in the same query.
+     *       If you search for them in different queries you will receive anyone with firstName John and also anyone with lastName Smith.
+     *       </p>
+     *       <p>Many attributes contain reference data restricted to a fixed list of values. For example, attribute "inOutStatus" only contains values "IN", "OUT" and "TRN".
+     *       To find which attributes use reference data and to fetch the possible attribute values see the endpoint <a target="_blank" href="/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config#/Reference data/referenceData"><strong>GET /reference-data/{attribute}</strong></a>.
+     *       </p>
+     *       <p>String attributes support advanced search techniques such as <a href="https://opensearch.org/docs/latest/query-dsl/term/fuzzy/">fuzzy search</a> matching and <a href="https://opensearch.org/docs/latest/query-dsl/term/wildcard/">wildcard search</a>. All String searches are case-insensitive.
+     *       <ul>
+     *         <li>IS and IS_NOT require an exact match (wildcards ? and * will not work). E.g. If religion is "Christian" then <strong>"religion IS Christian"</strong> will match but <strong>"religion IS Christ*"</strong> will not.</li>
+     *         <li>For IS and CONTAINS some attributes support fuzzy matching e.g. they allow spelling mistakes. Call endpoint <strong>GET /attribute-search/attributes</strong> to see which attributes support fuzzy matching. E.g. If firstName is "Jonathan" then <strong>"firstName IS Johnathon"</strong> or <strong>"firstName CONTAINS Johnathon"</strong> will match.</li>
+     *         <li>CONTAINS without wildcards (? and *) for a non-fuzzy attribute looks for the exact search term anywhere in the attribute value. E.g. If religion is "Christian" then <strong>"religion CONTAINS ist"</strong> will match.</li>
+     *         <li>CONTAINS with wildcards ? (single character) and/or * (zero to many characters) perform a wildcard search which must match the entire attribute value. E.g. If firstName is "Jonathan" then <strong>"firstName CONTAINS Jon*"</strong> will match but <strong>"firstName CONTAINS nath*"</strong> will not.</li>
+     *         <li>STARTSWITH checks only the prefix of the attribute value and does not support fuzzy matching or wildcards. E.g.If firstName is "Jonathan" then <strong>"firstName STARTSWITH Jon"</strong> will match but <strong>"firstName STARTSWITH Jon*"</strong> will not.</li>
+     *         <li>IN checks that the attribute value is any of the list of Strings provided in the search term. The search term should be a comma separated list of Strings to search, E.g. "searchValue1,searchValue2,searchValue3". This only matches exactly - no fuzzy search, wildcards or case-insensitive search is supported by OpenSearch. E.g.If firstName is "Jonathan" then <strong>"firstName IN 'Jonathan,Bob,Chris'"</strong> will match but <strong>"firstName IN 'Adrian,Bob,Chris'"</strong> will not.</li>
+     *       </ul>
      *       </p>
      *       <p>To assist with debugging queries we publish events in App Insights. To search in App Insights Log Analytics run query:
      *       <pre>
@@ -170,6 +179,36 @@ export interface paths {
      *                   "attribute": "heightCentimetres",
      *                   "minValue": 150,
      *                   "maxValue": 180
+     *                 }
+     *               ]
+     *             }
+     *           ]
+     *         }
+     *       </pre>
+     *       <br/>
+     *       <h4>Search for all prisoners in a list of cells in Moorland</h4>
+     *       Query: <strong>"prisonId = "MDI" AND cellLocation IN (1-2-001, 1-3-014, 3-1-020)</strong>
+     *       <br/>
+     *       JSON request:
+     *       <br/>
+     *       <pre>
+     *         {
+     *           "joinType": "AND",
+     *           "queries": [
+     *             {
+     *               "joinType": "AND",
+     *               "matchers": [
+     *                 {
+     *                   "type": "String",
+     *                   "attribute": "prisonId",
+     *                   "condition": "IS",
+     *                   "searchTerm": "MDI"
+     *                 },
+     *                 {
+     *                   "type": "String",
+     *                   "attribute": "cellLocation",
+     *                   "condition": "IN",
+     *                   "searchTerm": "1-2-001,1-3-014,3-1-020"
      *                 }
      *               ]
      *             }
@@ -251,6 +290,16 @@ export interface paths {
      */
     get: operations['referenceData']
   }
+  '/reference-data/alerts/types': {
+    /**
+     * *** BETA *** Alerts reference data
+     * @description BETA endpoint - alerts reference data returned reflects the data assigned to prisoners
+     *       rather than all the possible values.  Only to be used for searching existing data purposes.
+     *       This method will also cache all reference data results for an hour and any new data will only appear after an hour.
+     *       Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.
+     */
+    get: operations['alertsReferenceData']
+  }
   '/prisoner/{id}': {
     /**
      * Get prisoner by prisoner number (AKA NOMS number)
@@ -311,7 +360,7 @@ export interface paths {
   }
   '/attribute-search/attributes': {
     /**
-     * *** WIP - DO NOT USE!!! *** Retrieve all attributes supported by the attribute search
+     * *** BETA *** Retrieve all attributes supported by the attribute search
      * @description Returns all attributes that can be passed into the attribute search including their type.
      */
     get: operations['getAttributes']
@@ -346,6 +395,30 @@ export interface components {
        * ]
        */
       supportingPrisonIds?: string[]
+    }
+    /** @description Addresses */
+    Address: {
+      /**
+       * @description The full address on a single line
+       * @example 1 Main Street, Crookes, Sheffield, South Yorkshire, S10 1BP, England
+       */
+      fullAddress: string
+      /**
+       * @description The postal code
+       * @example S10 1BP
+       */
+      postalCode?: string
+      /**
+       * Format: date
+       * @description The date the address became active according to NOMIS
+       * @example 2020-07-17
+       */
+      startDate?: string
+      /**
+       * @description Whether the address is currently marked as the primary address
+       * @example true
+       */
+      primaryAddress: boolean
     }
     /** @description List of parts of the body that have marks. This includes NOMIS physical details of type 'marks' and 'otherMarks'. If we find a comment with either 'tattoo' or 'scar' we also add to the list of tattoos or scars. From REFERENCE_CODES table where DOMAIN = BODY_PART. Allowable values extracted 08/02/2023. */
     BodyPartDetail: {
@@ -433,8 +506,8 @@ export interface components {
       pageSize?: number
       /** Format: int32 */
       pageNumber?: number
-      unpaged?: boolean
       paged?: boolean
+      unpaged?: boolean
     }
     Prisoner: {
       /**
@@ -472,6 +545,11 @@ export interface components {
        * @example 38412A
        */
       bookNumber?: string
+      /**
+       * @description Title
+       * @example Ms
+       */
+      title?: string
       /**
        * @description First Name
        * @example Robert
@@ -876,6 +954,8 @@ export interface components {
       scars?: components['schemas']['BodyPartDetail'][]
       /** @description List of parts of the body that have marks. This includes NOMIS physical details of type 'marks' and 'otherMarks'. If we find a comment with either 'tattoo' or 'scar' we also add to the list of tattoos or scars. From REFERENCE_CODES table where DOMAIN = BODY_PART. Allowable values extracted 08/02/2023. */
       marks?: components['schemas']['BodyPartDetail'][]
+      /** @description Addresses */
+      addresses?: components['schemas']['Address'][]
     }
     /** @description Alerts */
     PrisonerAlert: {
@@ -902,6 +982,11 @@ export interface components {
     }
     /** @description Aliases Names and Details */
     PrisonerAlias: {
+      /**
+       * @description Title
+       * @example Ms
+       */
+      title?: string
       /**
        * @description First Name
        * @example Robert
@@ -1754,18 +1839,26 @@ export interface components {
            */
           attribute?: string
           /**
-           * @description The condition to apply to the attribute.
+           * @description The condition to apply to the attribute value.
+           *
+           *   All String searches are case-insensitive.
            *
            *   IS and IS_NOT require an exact match (wildcards ? and * will not work).
            *
-           *   CONTAINS checks for a partial match and respects wildcards ? (single character) and * (zero to many characters).
+           *   For IS and CONTAINS some attributes support fuzzy matching e.g. they allow spelling mistakes. Call endpoint `/attribute-search/attributes` to see which attributes support fuzzy matching.
            *
-           *   For IS and CONTAINS, if the attribute contains free text then the search will also perform a fuzzy match.
+           *   CONTAINS without wildcards (? and *) for a non-fuzzy attribute looks for the exact search term anywhere in the attribute value.
+           *
+           *   CONTAINS with wildcards ? (single character) and * (zero to many characters) perform a wildcard match which must match the entire attribute value.
+           *
+           *   STARTSWITH checks only the prefix of the attribute value and does not support fuzzy matching or wildcards.
+           *
+           *   IN checks a list of values for an exact match and does not support fuzzy matching, wildcards or case insensitive searching.
            *
            * @example IS
            * @enum {string}
            */
-          condition?: 'IS' | 'IS_NOT' | 'CONTAINS'
+          condition?: 'IS' | 'IS_NOT' | 'CONTAINS' | 'STARTSWITH' | 'IN'
           /**
            * @description The search term to apply to the attribute. Search terms are not case-sensitive.
            * @example Smith
@@ -2176,27 +2269,36 @@ export interface operations {
     }
   }
   /**
-   * *** WIP - DO NOT USE!!! *** Search for prisoners by attributes
+   * *** BETA *** Search for prisoners by attributes
    * @description <p>This endpoint allows you to create queries over all attributes from the <em>Prisoner</em> record. Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.</p>
    *       <p>The request contains a list of queries to search on one or more attributes using a list of matchers. For example attribute "lastName""
    *       requires a <em>StringMatcher</em> so we can query on <strong>"lastName IS Smith"</strong>. Other type matchers include <em>IntMatcher</em>, <em>BooleanMatcher</em>,
-   *       <em>DateMatcher</em> and <em>DateTimeMatcher</em>. We have the facility to easily create additional matchers as required, for example
-   *       we may end up with a PNCMatcher that handles any format of PNC number.
+   *       <em>DateMatcher</em> and <em>DateTimeMatcher</em>.
    *       </p>
    *       <p>Each query can also contain a list of sub-queries. Each sub-query can be considered as a separate query in brackets.
    *       Combining multiple sub-queries gives us the ability to create complex searches using any combination of a prisoner's
-   *       attributes. For example we can model nested queries such as <strong>"lastName IS Smith AND (prisonId IS MDI OR (prisonId IS OUT AND inOutStatus is OUT))"</strong>.
+   *       attributes. For example we can model nested queries such as <strong>"lastName IS Smith AND (prisonId IS MDI OR (prisonId IS OUT AND lastPrisonId IS MDI))"</strong>.
    *       </p>
-   *       <p>Please be aware that when searching lists of complex objects (e.g. aliases, alerts, tattoos) if you want to search for multiple attributes within the same object then you need
-   *       to include them in the same query. For example, to search for alias "John Smith" you should search for aliases.firstName IS "John" and aliases.lastName IS "Smith" in a single query.
-   *       If you search for them in different queries you will receive anyone with firstName John and also anyone with lastName Smith.
-   *       </p>
-   *       <p>To find all attributes that can be searched for please refer to the <em>Prisoner</em> record or get them from endpoint <strong>GET /attribute-search/attributes</strong>. Attributes from lists can be
+   *       <p>To find all attributes that can be searched for please refer to the <em>Prisoner</em> record or get them from endpoint <a target="_blank" href="/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config#/Attribute search/getAttributes"><strong>GET /attribute-search/attributes</strong></a>. Attributes from lists can be
    *       searched for with dot notation, e.g. <strong>"attribute=aliases.firstName"</strong> or <strong>"attribute=tattoos.bodyPart"</strong>.
    *       Attributes from complex objects can also be searched for with dot notation, e.g. <strong>"attribute=currentIncentive.level.code"</strong>.
    *       </p>
-   *       <p>String attributes that contain free text will perform a <a href="https://opensearch.org/docs/latest/query-dsl/term/fuzzy/">fuzzy search</a> with conditions IS and CONTAINS.
-   *       This means that the query also matches on near misses, e.g. spelling mistakes. To find which attributes perform a fuzzy search call endpoint <strong>GET /attribute-search/attributes</strong>.
+   *       <p>Note that when searching lists of complex objects (e.g. aliases, alerts, tattoos) if you want to search for multiple attributes within the same object then you need
+   *       to include them in the same query. For example, to search for alias "John Smith" you should search for <strong>aliases.firstName IS "John"</strong> and <strong>aliases.lastName IS "Smith"</strong> using string matchers in the same query.
+   *       If you search for them in different queries you will receive anyone with firstName John and also anyone with lastName Smith.
+   *       </p>
+   *       <p>Many attributes contain reference data restricted to a fixed list of values. For example, attribute "inOutStatus" only contains values "IN", "OUT" and "TRN".
+   *       To find which attributes use reference data and to fetch the possible attribute values see the endpoint <a target="_blank" href="/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config#/Reference data/referenceData"><strong>GET /reference-data/{attribute}</strong></a>.
+   *       </p>
+   *       <p>String attributes support advanced search techniques such as <a href="https://opensearch.org/docs/latest/query-dsl/term/fuzzy/">fuzzy search</a> matching and <a href="https://opensearch.org/docs/latest/query-dsl/term/wildcard/">wildcard search</a>. All String searches are case-insensitive.
+   *       <ul>
+   *         <li>IS and IS_NOT require an exact match (wildcards ? and * will not work). E.g. If religion is "Christian" then <strong>"religion IS Christian"</strong> will match but <strong>"religion IS Christ*"</strong> will not.</li>
+   *         <li>For IS and CONTAINS some attributes support fuzzy matching e.g. they allow spelling mistakes. Call endpoint <strong>GET /attribute-search/attributes</strong> to see which attributes support fuzzy matching. E.g. If firstName is "Jonathan" then <strong>"firstName IS Johnathon"</strong> or <strong>"firstName CONTAINS Johnathon"</strong> will match.</li>
+   *         <li>CONTAINS without wildcards (? and *) for a non-fuzzy attribute looks for the exact search term anywhere in the attribute value. E.g. If religion is "Christian" then <strong>"religion CONTAINS ist"</strong> will match.</li>
+   *         <li>CONTAINS with wildcards ? (single character) and/or * (zero to many characters) perform a wildcard search which must match the entire attribute value. E.g. If firstName is "Jonathan" then <strong>"firstName CONTAINS Jon*"</strong> will match but <strong>"firstName CONTAINS nath*"</strong> will not.</li>
+   *         <li>STARTSWITH checks only the prefix of the attribute value and does not support fuzzy matching or wildcards. E.g.If firstName is "Jonathan" then <strong>"firstName STARTSWITH Jon"</strong> will match but <strong>"firstName STARTSWITH Jon*"</strong> will not.</li>
+   *         <li>IN checks that the attribute value is any of the list of Strings provided in the search term. The search term should be a comma separated list of Strings to search, E.g. "searchValue1,searchValue2,searchValue3". This only matches exactly - no fuzzy search, wildcards or case-insensitive search is supported by OpenSearch. E.g.If firstName is "Jonathan" then <strong>"firstName IN 'Jonathan,Bob,Chris'"</strong> will match but <strong>"firstName IN 'Adrian,Bob,Chris'"</strong> will not.</li>
+   *       </ul>
    *       </p>
    *       <p>To assist with debugging queries we publish events in App Insights. To search in App Insights Log Analytics run query:
    *       <pre>
@@ -2230,6 +2332,36 @@ export interface operations {
    *                   "attribute": "heightCentimetres",
    *                   "minValue": 150,
    *                   "maxValue": 180
+   *                 }
+   *               ]
+   *             }
+   *           ]
+   *         }
+   *       </pre>
+   *       <br/>
+   *       <h4>Search for all prisoners in a list of cells in Moorland</h4>
+   *       Query: <strong>"prisonId = "MDI" AND cellLocation IN (1-2-001, 1-3-014, 3-1-020)</strong>
+   *       <br/>
+   *       JSON request:
+   *       <br/>
+   *       <pre>
+   *         {
+   *           "joinType": "AND",
+   *           "queries": [
+   *             {
+   *               "joinType": "AND",
+   *               "matchers": [
+   *                 {
+   *                   "type": "String",
+   *                   "attribute": "prisonId",
+   *                   "condition": "IS",
+   *                   "searchTerm": "MDI"
+   *                 },
+   *                 {
+   *                   "type": "String",
+   *                   "attribute": "cellLocation",
+   *                   "condition": "IN",
+   *                   "searchTerm": "1-2-001,1-3-014,3-1-020"
    *                 }
    *               ]
    *             }
@@ -2374,9 +2506,45 @@ export interface operations {
           | 'shapeOfFace'
           | 'status'
           | 'tattoosBodyPart'
+          | 'title'
           | 'youthOffender'
       }
     }
+    responses: {
+      /** @description Reference data search successfully performed */
+      200: {
+        content: {
+          'application/json': components['schemas']['ReferenceDataResponse']
+        }
+      }
+      /** @description Reference data search for attribute that isn't mapped */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to retrieve reference data */
+      403: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  /**
+   * *** BETA *** Alerts reference data
+   * @description BETA endpoint - alerts reference data returned reflects the data assigned to prisoners
+   *       rather than all the possible values.  Only to be used for searching existing data purposes.
+   *       This method will also cache all reference data results for an hour and any new data will only appear after an hour.
+   *       Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.
+   */
+  alertsReferenceData: {
     responses: {
       /** @description Reference data search successfully performed */
       200: {
@@ -2564,7 +2732,7 @@ export interface operations {
     }
   }
   /**
-   * *** WIP - DO NOT USE!!! *** Retrieve all attributes supported by the attribute search
+   * *** BETA *** Retrieve all attributes supported by the attribute search
    * @description Returns all attributes that can be passed into the attribute search including their type.
    */
   getAttributes: {

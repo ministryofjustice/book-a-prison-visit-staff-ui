@@ -49,7 +49,7 @@ describe('Visit service', () => {
 
   describe('Visit booking, update and cancellation', () => {
     describe('bookVisit', () => {
-      it('should book a visit (change status from RESERVED to BOOKED)', async () => {
+      it('should book a visit (complete an application so it is a visit)', async () => {
         const applicationReference = 'aaa-bbb-ccc'
         const applicationMethod: ApplicationMethodType = 'NOT_KNOWN'
 
@@ -158,7 +158,7 @@ describe('Visit service', () => {
         orchestrationApiClient.createVisitApplicationFromVisit.mockResolvedValue(application)
         const result = await visitService.createVisitApplicationFromVisit({ username: 'user', visitSessionData })
 
-        expect(orchestrationApiClient.createVisitApplicationFromVisit).toHaveBeenCalledWith(visitSessionData)
+        expect(orchestrationApiClient.createVisitApplicationFromVisit).toHaveBeenCalledWith(visitSessionData, 'user')
         expect(result).toStrictEqual(application)
       })
     })
@@ -176,7 +176,7 @@ describe('Visit service', () => {
         orchestrationApiClient.createVisitApplication.mockResolvedValue(application)
         const result = await visitService.createVisitApplication({ username: 'user', visitSessionData })
 
-        expect(orchestrationApiClient.createVisitApplication).toHaveBeenCalledWith(visitSessionData)
+        expect(orchestrationApiClient.createVisitApplication).toHaveBeenCalledWith(visitSessionData, 'user')
         expect(result).toStrictEqual(application)
       })
     })
