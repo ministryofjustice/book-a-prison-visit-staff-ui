@@ -48,7 +48,11 @@ export default {
     expiryMinutes: Number(get('WEB_SESSION_TIMEOUT_IN_MINUTES', 120)),
   },
   dpsHome: get('DPS_URL', 'https://digital-dev.prison.service.justice.gov.uk/', requiredInProduction),
-  dpsPrisoner: get('DPS_URL', 'https://prisoner-dev.digital.prison.service.justice.gov.uk/', requiredInProduction),
+  dpsPrisoner: get(
+    'DPS_PRISONER_URL',
+    'https://prisoner-dev.digital.prison.service.justice.gov.uk/',
+    requiredInProduction,
+  ),
   apis: {
     hmppsAuth: {
       url: get('HMPPS_AUTH_URL', 'http://localhost:9090/auth', requiredInProduction),
