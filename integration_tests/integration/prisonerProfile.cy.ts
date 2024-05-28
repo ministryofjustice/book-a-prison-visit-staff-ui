@@ -106,5 +106,12 @@ context('Prisoner profile page', () => {
       })
     prisonerProfilePage.visitTabVisitStatus().eq(0).contains('Booked')
     prisonerProfilePage.visitTabViewFullHistory().contains('View full visits history')
+    prisonerProfilePage
+      .visitTabViewFullHistory()
+      .should(
+        'have.attr',
+        'href',
+        'https://prisoner-dev.digital.prison.service.justice.gov.uk/prisoner/A1234BC/visits-details',
+      )
   })
 })

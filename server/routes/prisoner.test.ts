@@ -226,6 +226,9 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
           expect($('.prisoner-profile-visits:nth-child(3) [data-test="tab-visits-reference"]').length).toBe(1)
 
           expect($('[data-test="view-dps-profile"]').text().trim()).toBe('View full visits history')
+          expect($('[data-test="view-dps-profile"]').attr('href')).toBe(
+            'https://prisoner-dev.digital.prison.service.justice.gov.uk/prisoner/A1234BC/visits-details',
+          )
         })
     })
 
