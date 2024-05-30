@@ -262,10 +262,7 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
   },
   // Send (HMP)
   SDI: {
-    selectVisitorsText: [
-      'You can add up to a total of 4 people.',
-      'At least one visitor must be 18 or older.',
-    ],
+    selectVisitorsText: ['You can add up to a total of 4 people.', 'At least one visitor must be 18 or older.'],
   },
   // Stafford (HMP)
   SFI: {
