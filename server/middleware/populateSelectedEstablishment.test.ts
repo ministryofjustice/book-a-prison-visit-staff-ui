@@ -90,7 +90,7 @@ describe('populateSelectedEstablishment', () => {
     })
 
     it('should make no changes and not redirect if request path is /change-establishment', async () => {
-      req.path = '/change-establishment'
+      ;(req.path as string) = '/change-establishment'
 
       await populateSelectedEstablishment(supportedPrisonsService)(req, res, next)
 
@@ -135,7 +135,7 @@ describe('populateSelectedEstablishment', () => {
     })
 
     it('should make no changes and not redirect if request path is /change-establishment', async () => {
-      req.path = '/change-establishment'
+      ;(req.path as string) = '/change-establishment'
       res.locals.user.activeCaseLoadId = 'BLI'
       req.session.selectedEstablishment = {
         prisonId: 'HEI',
