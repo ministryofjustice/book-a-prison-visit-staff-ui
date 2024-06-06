@@ -189,7 +189,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-        <form action="{{ urlPrefix }}/check-your-booking" method="POST" novalidate>
+        <form action="{{ urlPrefix }}/check-your-booking" class="disable-button-on-submit" method="POST" novalidate>
             <input type="hidden" name="_csrf" value="{{ csrfToken }}">
             {{ govukButton({
                 text: "Submit booking",
@@ -199,4 +199,12 @@
         </form>
     </div>
 </div>
+{% endblock %}
+
+{% block pageScripts %}
+  <script nonce="{{ cspNonce }}">
+    document.querySelector('.disable-button-on-submit').addEventListener('submit', e => {
+        e.target.querySelector('button[type=submit]').setAttribute('disabled', 'disabled')
+      })
+  </script>
 {% endblock %}
