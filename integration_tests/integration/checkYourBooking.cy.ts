@@ -231,7 +231,7 @@ context('Check visit details page', () => {
       applicationMethod: 'WEBSITE',
     })
 
-    checkYourBookingPage.bookButton().click()
+    checkYourBookingPage.submitBooking()
     const confirmationPage = Page.verifyOnPageTitle(ConfirmationPage, 'Booking confirmed')
     confirmationPage.bookingReference().contains(TestData.visit().reference)
     confirmationPage.prisonerName().contains(prisonerDisplayName)

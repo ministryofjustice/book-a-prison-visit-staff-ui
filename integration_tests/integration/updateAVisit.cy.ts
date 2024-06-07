@@ -181,7 +181,7 @@ context('Update a visit', () => {
       }),
       applicationMethod: 'PHONE',
     })
-    checkYourBookingPage.bookButton().click()
+    checkYourBookingPage.submitBooking()
 
     // Confirmation page
     const confirmationPage = Page.verifyOnPageTitle(ConfirmationPage, 'Booking updated')
