@@ -4,6 +4,8 @@ import { SessionData } from 'express-session'
 import * as cheerio from 'cheerio'
 import { FlashData, VisitorListItem, VisitSessionData } from '../../@types/bapv'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
+import { createMockVisitService } from '../../services/testutils/mocks'
+import { ApplicationDto } from '../../data/orchestrationApiTypes'
 
 let sessionApp: Express
 
@@ -235,7 +237,25 @@ testJourneys.forEach(journey => {
     })
 
     describe(`POST ${journey.urlPrefix}/select-main-contact`, () => {
-      it('should redirect to request method page and store in session if contact selected and phone number entered', () => {
+      const visitService = createMockVisitService()
+
+      beforeEach(() => {
+        const application: Partial<ApplicationDto> = {
+          reference: visitSessionData.applicationReference,
+        }
+
+        visitService.changeVisitApplication = jest.fn().mockResolvedValue(application)
+
+        sessionApp = appWithAllRoutes({
+          services: { visitService },
+          sessionData: {
+            visitorList,
+            visitSessionData,
+          } as SessionData,
+        })
+      })
+
+      it('should store contact data in session (named contact & phone number) and update the application then redirect to request method page', () => {
         return request(sessionApp)
           .post(`${journey.urlPrefix}/select-main-contact`)
           .send('contact=123')
@@ -254,10 +274,12 @@ testJourneys.forEach(journey => {
             })
             expect(visitSessionData.mainContact.phoneNumber).toBe('0114 1234 567')
             expect(visitSessionData.mainContact.contactName).toBe(undefined)
+
+            expect(visitService.changeVisitApplication).toHaveBeenCalledWith({ username: 'user1', visitSessionData })
           })
       })
 
-      it('should redirect to request method page and store in session if other contact named and phone number entered', () => {
+      it('should store contact data in session (other contact & phone number) and update the application then redirect to request method page', () => {
         return request(sessionApp)
           .post(`${journey.urlPrefix}/select-main-contact`)
           .send('contact=someoneElse')
@@ -270,6 +292,8 @@ testJourneys.forEach(journey => {
             expect(visitSessionData.mainContact.contact).toBe(undefined)
             expect(visitSessionData.mainContact.contactName).toBe('another person')
             expect(visitSessionData.mainContact.phoneNumber).toBe('0114 7654 321')
+
+            expect(visitService.changeVisitApplication).toHaveBeenCalledWith({ username: 'user1', visitSessionData })
           })
       })
 
@@ -298,6 +322,8 @@ testJourneys.forEach(journey => {
             expect(visitSessionData.mainContact.contact).toBe(undefined)
             expect(visitSessionData.mainContact.contactName).toBe('another person')
             expect(visitSessionData.mainContact.phoneNumber).toBe('0114 7654 321')
+
+            expect(visitService.changeVisitApplication).toHaveBeenCalledWith({ username: 'user1', visitSessionData })
           })
       })
 
@@ -324,6 +350,8 @@ testJourneys.forEach(journey => {
               },
             ])
             expect(flashProvider).toHaveBeenCalledWith('formValues', { phoneNumberInput: '', someoneElseName: '' })
+
+            expect(visitService.changeVisitApplication).not.toHaveBeenCalled()
           })
       })
 
@@ -353,6 +381,8 @@ testJourneys.forEach(journey => {
               phoneNumber: 'hasPhoneNumber',
               phoneNumberInput: '',
             })
+
+            expect(visitService.changeVisitApplication).not.toHaveBeenCalled()
           })
       })
 
@@ -380,6 +410,8 @@ testJourneys.forEach(journey => {
               phoneNumberInput: 'abc123',
               someoneElseName: '',
             })
+
+            expect(visitService.changeVisitApplication).not.toHaveBeenCalled()
           })
       })
     })
