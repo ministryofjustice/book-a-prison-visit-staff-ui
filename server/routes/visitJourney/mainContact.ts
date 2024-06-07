@@ -3,9 +3,13 @@ import { body, ValidationChain, validationResult } from 'express-validator'
 import { VisitorListItem } from '../../@types/bapv'
 import { getFlashFormValues } from '../visitorUtils'
 import getUrlPrefix from './visitJourneyUtils'
+import { VisitService } from '../../services'
 
 export default class MainContact {
-  constructor(private readonly mode: string) {}
+  constructor(
+    private readonly mode: string,
+    private readonly visitService: VisitService,
+  ) {}
 
   async get(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'
@@ -53,6 +57,12 @@ export default class MainContact {
       phoneNumber: req.body.phoneNumber === 'hasPhoneNumber' ? req.body.phoneNumberInput : undefined,
       contactName: selectedContact === undefined ? req.body.someoneElseName : undefined,
     }
+
+    // update visit application to have the latest data
+    await this.visitService.changeVisitApplication({
+      username: res.locals.user.username,
+      visitSessionData,
+    })
 
     return res.redirect(`${urlPrefix}/request-method`)
   }

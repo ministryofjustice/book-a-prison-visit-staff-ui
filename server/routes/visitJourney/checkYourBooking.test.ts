@@ -4,7 +4,7 @@ import { SessionData } from 'express-session'
 import * as cheerio from 'cheerio'
 import { FlashData, VisitSessionData } from '../../@types/bapv'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
-import { ApplicationDto, Visit } from '../../data/orchestrationApiTypes'
+import { Visit } from '../../data/orchestrationApiTypes'
 import { createMockAuditService, createMockVisitService } from '../../services/testutils/mocks'
 
 let sessionApp: Express
@@ -158,16 +158,12 @@ testJourneys.forEach(journey => {
       const visitService = createMockVisitService()
 
       beforeEach(() => {
-        const application: Partial<ApplicationDto> = {
-          reference: visitSessionData.applicationReference,
-        }
         const bookedVisit: Partial<Visit> = {
           applicationReference: visitSessionData.applicationReference,
           reference: 'ab-cd-ef-gh',
           visitStatus: 'BOOKED',
         }
 
-        visitService.changeVisitApplication = jest.fn().mockResolvedValue(application)
         visitService.bookVisit = jest.fn().mockResolvedValue(bookedVisit)
 
         sessionApp = appWithAllRoutes({
@@ -184,7 +180,6 @@ testJourneys.forEach(journey => {
           .expect(302)
           .expect('location', `${journey.urlPrefix}/confirmation`)
           .expect(() => {
-            expect(visitService.changeVisitApplication).toHaveBeenCalledWith({ username: 'user1', visitSessionData })
             expect(visitService.bookVisit).toHaveBeenCalledWith({
               username: 'user1',
               applicationReference: visitSessionData.applicationReference,
@@ -227,7 +222,6 @@ testJourneys.forEach(journey => {
             expect($('.test-visit-type').text()).toContain('Open')
             expect($('form').prop('action')).toBe(`${journey.urlPrefix}/check-your-booking`)
 
-            expect(visitService.changeVisitApplication).toHaveBeenCalledWith({ username: 'user1', visitSessionData })
             expect(visitService.bookVisit).toHaveBeenCalledWith({
               username: 'user1',
               applicationReference: visitSessionData.applicationReference,

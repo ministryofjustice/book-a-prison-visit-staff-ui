@@ -133,6 +133,20 @@ context('Update a visit', () => {
     mainContactPage.getFirstContact().should('be.checked')
     mainContactPage.getPhoneNumber().should('have.value', originalVisit.visitContact.telephone)
     mainContactPage.enterPhoneNumber('09876 543 321')
+    cy.task(
+      'stubChangeVisitApplication',
+      TestData.application({
+        startTimestamp: visitSessions[1].startTimestamp,
+        endTimestamp: visitSessions[1].endTimestamp,
+        visitContact: { name: 'Jeanette Smith', telephone: '09876 543 321' },
+        visitors: [
+          { nomisPersonId: contacts[0].personId, visitContact: true },
+          { nomisPersonId: contacts[1].personId, visitContact: false },
+        ],
+        visitorSupport: { description: 'Wheelchair ramp, Some extra help!' },
+        sessionTemplateReference: visitSessions[1].sessionTemplateReference,
+      }),
+    )
     mainContactPage.continueButton().click()
 
     // Request method
@@ -154,20 +168,6 @@ context('Update a visit', () => {
     checkYourBookingPage.requestMethod().contains('Phone call')
 
     // Submit booking
-    cy.task(
-      'stubChangeVisitApplication',
-      TestData.application({
-        startTimestamp: visitSessions[1].startTimestamp,
-        endTimestamp: visitSessions[1].endTimestamp,
-        visitContact: { name: 'Jeanette Smith', telephone: '09876 543 321' },
-        visitors: [
-          { nomisPersonId: contacts[0].personId, visitContact: true },
-          { nomisPersonId: contacts[1].personId, visitContact: false },
-        ],
-        visitorSupport: { description: 'Wheelchair ramp, Some extra help!' },
-        sessionTemplateReference: visitSessions[1].sessionTemplateReference,
-      }),
-    )
     cy.task('stubBookVisit', {
       visit: TestData.visit({
         visitStatus: 'BOOKED',

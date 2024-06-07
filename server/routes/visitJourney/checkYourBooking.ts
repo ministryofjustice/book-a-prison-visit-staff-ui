@@ -40,11 +40,6 @@ export default class CheckYourBooking {
     const { offenderNo } = visitSessionData.prisoner
 
     try {
-      // change visit application to have the latest data
-      await this.visitService.changeVisitApplication({
-        username: res.locals.user.username,
-        visitSessionData,
-      })
       // 'book' the visit: complete the visit application and get BOOKED visit
       const bookedVisit = await this.visitService.bookVisit({
         username: res.locals.user.username,

@@ -36,7 +36,7 @@ export default function routes({
   const visitType = new VisitType('book', auditService)
   const additionalSupport = new AdditionalSupport('book')
   const dateAndTime = new DateAndTime('book', visitService, visitSessionsService, auditService)
-  const mainContact = new MainContact('book')
+  const mainContact = new MainContact('book', visitService)
   const requestMethod = new RequestMethod('book')
   const checkYourBooking = new CheckYourBooking('book', auditService, visitService)
   const confirmation = new Confirmation('book')

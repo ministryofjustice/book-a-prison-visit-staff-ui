@@ -162,6 +162,19 @@ context('Book a visit', () => {
     mainContactPage.getFirstContact().check()
     mainContactPage.phoneNumberTrueRadio().click()
     mainContactPage.enterPhoneNumber('01234 567890')
+    cy.task(
+      'stubChangeVisitApplication',
+      TestData.application({
+        startTimestamp: visitSessions[0].startTimestamp,
+        endTimestamp: visitSessions[0].endTimestamp,
+        visitors: [
+          { nomisPersonId: contacts[0].personId, visitContact: true },
+          { nomisPersonId: contacts[1].personId, visitContact: false },
+        ],
+        visitorSupport: { description: 'Wheelchair ramp, Some extra help!' },
+        sessionTemplateReference: visitSessions[0].sessionTemplateReference,
+      }),
+    )
 
     // Request method
     mainContactPage.continueButton().click()
@@ -184,19 +197,6 @@ context('Book a visit', () => {
     checkYourBookingPage.requestMethod().contains('Phone call')
 
     // Confirmation
-    cy.task(
-      'stubChangeVisitApplication',
-      TestData.application({
-        startTimestamp: visitSessions[0].startTimestamp,
-        endTimestamp: visitSessions[0].endTimestamp,
-        visitors: [
-          { nomisPersonId: contacts[0].personId, visitContact: true },
-          { nomisPersonId: contacts[1].personId, visitContact: false },
-        ],
-        visitorSupport: { description: 'Wheelchair ramp, Some extra help!' },
-        sessionTemplateReference: visitSessions[0].sessionTemplateReference,
-      }),
-    )
     cy.task('stubBookVisit', {
       visit: TestData.visit({
         visitStatus: 'BOOKED',

@@ -263,7 +263,7 @@ export default function routes({
   const visitType = new VisitType('update', auditService)
   const dateAndTime = new DateAndTime('update', visitService, visitSessionsService, auditService)
   const additionalSupport = new AdditionalSupport('update')
-  const mainContact = new MainContact('update')
+  const mainContact = new MainContact('update', visitService)
   const requestMethod = new RequestMethod('update')
   const checkYourBooking = new CheckYourBooking('update', auditService, visitService)
   const confirmation = new Confirmation('update')

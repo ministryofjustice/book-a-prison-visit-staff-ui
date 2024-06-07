@@ -105,6 +105,17 @@ context('Check visit details page', () => {
     mainContactPage.getFirstContact().check()
     mainContactPage.phoneNumberTrueRadio().click()
     mainContactPage.enterPhoneNumber('01234 567890')
+    cy.task(
+      'stubChangeVisitApplication',
+      TestData.application({
+        startTimestamp: visitSessions[0].startTimestamp,
+        endTimestamp: visitSessions[0].endTimestamp,
+        visitContact: { name: 'Jeanette Smith', telephone: '01234 567890' },
+        visitors: [{ nomisPersonId: contacts[0].personId, visitContact: true }],
+        visitorSupport: { description: '' },
+        sessionTemplateReference: visitSessions[0].sessionTemplateReference,
+      }),
+    )
 
     // Request method
     mainContactPage.continueButton().click()
@@ -183,6 +194,20 @@ context('Check visit details page', () => {
     additionalSupportPage.additionalSupportRequired().check()
     additionalSupportPage.enterSupportDetails('Wheelchair ramp')
     additionalSupportPage.continueButton().click()
+    cy.task(
+      'stubChangeVisitApplication',
+      TestData.application({
+        startTimestamp: visitSessions[1].startTimestamp,
+        endTimestamp: visitSessions[1].endTimestamp,
+        visitContact: { name: 'Jeanette Smith', telephone: '01234 567890' },
+        visitors: [
+          { nomisPersonId: contacts[0].personId, visitContact: true },
+          { nomisPersonId: contacts[1].personId, visitContact: false },
+        ],
+        visitorSupport: { description: 'Wheelchair ramp' },
+        sessionTemplateReference: visitSessions[1].sessionTemplateReference,
+      }),
+    )
     mainContactPage.continueButton().click()
     requestMethodPage.continueButton().click()
     checkYourBookingPage.additionalSupport().contains('Wheelchair ramp')
@@ -190,18 +215,6 @@ context('Check visit details page', () => {
     // Check details - change main contact number - then proceed through journey
     checkYourBookingPage.changeMainContact().click()
     mainContactPage.enterPhoneNumber('09876 543 321')
-    mainContactPage.continueButton().click()
-    requestMethodPage.continueButton().click()
-    checkYourBookingPage.mainContactNumber().contains('09876 543 321')
-
-    // Check details - change request method - then proceed through journey
-    checkYourBookingPage.changeRequestMethod().click()
-    requestMethodPage.getRequestLabelByValue('WEBSITE').contains('GOV.UK')
-    requestMethodPage.getRequestMethodByValue('WEBSITE').check()
-    requestMethodPage.continueButton().click()
-    checkYourBookingPage.requestMethod().contains('GOV.UK')
-
-    // Confirmation
     cy.task(
       'stubChangeVisitApplication',
       TestData.application({
@@ -216,6 +229,18 @@ context('Check visit details page', () => {
         sessionTemplateReference: visitSessions[1].sessionTemplateReference,
       }),
     )
+    mainContactPage.continueButton().click()
+    requestMethodPage.continueButton().click()
+    checkYourBookingPage.mainContactNumber().contains('09876 543 321')
+
+    // Check details - change request method - then proceed through journey
+    checkYourBookingPage.changeRequestMethod().click()
+    requestMethodPage.getRequestLabelByValue('WEBSITE').contains('GOV.UK')
+    requestMethodPage.getRequestMethodByValue('WEBSITE').check()
+    requestMethodPage.continueButton().click()
+    checkYourBookingPage.requestMethod().contains('GOV.UK')
+
+    // Confirmation
     cy.task('stubBookVisit', {
       visit: TestData.visit({
         visitStatus: 'BOOKED',
