@@ -17,7 +17,8 @@
 {% macro buildSlotsRadioItems(slotsList, radios) %}
   {% for slot in slotsList %}
 
-    {%- set doubleBooked = slot.id != originalVisitSlot.id and (slot.sessionConflicts and "DOUBLE_BOOKED" in slot.sessionConflicts) %}
+    {# // TODO remove DOUBLE_BOOKED when VB-3956 released #}
+    {%- set doubleBooked = slot.id != originalVisitSlot.id and (slot.sessionConflicts and ("DOUBLE_BOOKED" in slot.sessionConflicts or "DOUBLE_BOOKING_OR_RESERVATION" in slot.sessionConflicts)) %}
     {%- set checked = true if formValues['visit-date-and-time'] and formValues['visit-date-and-time'] == slot.id else false %}
 
     {%- set tableText %}
