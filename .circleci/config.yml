@@ -262,11 +262,6 @@ workflows:
             - integration_test
             - build_docker
 
-      - request-staging-approval:
-          <<: *main_branch
-          type: approval
-          requires:
-           - deploy_dev
       - hmpps/deploy_env:
           name: deploy_staging
           env: "staging"
@@ -274,7 +269,7 @@ workflows:
             - hmpps-common-vars
             - book-a-prison-visit-staff-ui-stage
           requires:
-            - request-staging-approval
+            - deploy_dev
 
       - request-acceptance-tests-main-approval:
           <<: *main_branch
