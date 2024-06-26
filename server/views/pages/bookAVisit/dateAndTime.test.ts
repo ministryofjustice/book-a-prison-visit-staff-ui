@@ -3,7 +3,6 @@ import * as cheerio from 'cheerio'
 import nunjucks, { Template } from 'nunjucks'
 import { registerNunjucks } from '../../../utils/nunjucksSetup'
 import { VisitSlot, VisitSlotList } from '../../../@types/bapv'
-import { VisitSession } from '../../../data/orchestrationApiTypes'
 
 const template = fs.readFileSync('server/views/pages/bookAVisit/dateAndTime.njk')
 
@@ -77,7 +76,7 @@ describe('Views - Date and time of visit', () => {
                   capacity: 30,
                   visitRoom: 'room name',
                   // representing a pre-existing visit that is BOOKED
-                  sessionConflicts: ['DOUBLE_BOOKING_OR_RESERVATION'] as unknown as VisitSession['sessionConflicts'], // TODO remove cast when VB-3956 released
+                  sessionConflicts: ['DOUBLE_BOOKING_OR_RESERVATION'],
                   visitRestriction: 'OPEN',
                 },
               ],
@@ -102,7 +101,7 @@ describe('Views - Date and time of visit', () => {
                   capacity: 30,
                   visitRoom: 'room name',
                   // representing the RESERVED visit being handled in this session
-                  sessionConflicts: ['DOUBLE_BOOKED'], // TODO update to DOUBLE_BOOKING_OR_RESERVATION when VB-3956 released
+                  sessionConflicts: ['DOUBLE_BOOKING_OR_RESERVATION'],
                   visitRestriction: 'OPEN',
                 },
               ],
