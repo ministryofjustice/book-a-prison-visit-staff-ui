@@ -4,7 +4,7 @@ import { SessionData } from 'express-session'
 import * as cheerio from 'cheerio'
 import { FlashData, VisitSessionData, VisitSlot, VisitSlotList } from '../../@types/bapv'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
-import { ApplicationDto, VisitSession } from '../../data/orchestrationApiTypes'
+import { ApplicationDto } from '../../data/orchestrationApiTypes'
 import {
   createMockAuditService,
   createMockVisitService,
@@ -91,7 +91,7 @@ testJourneys.forEach(journey => {
                 capacity: 30,
                 visitRoom: 'room name',
                 // representing a pre-existing visit that is BOOKED
-                sessionConflicts: ['DOUBLE_BOOKING_OR_RESERVATION'] as unknown as VisitSession['sessionConflicts'], // TODO remove cast when VB-3956 released
+                sessionConflicts: ['DOUBLE_BOOKING_OR_RESERVATION'],
                 visitRestriction: 'OPEN',
               },
               {
@@ -117,7 +117,7 @@ testJourneys.forEach(journey => {
                 capacity: 30,
                 visitRoom: 'room name',
                 // representing the RESERVED visit being handled in this session
-                sessionConflicts: ['DOUBLE_BOOKED'], // TODO update to DOUBLE_BOOKING_OR_RESERVATION when VB-3956 released
+                sessionConflicts: ['DOUBLE_BOOKING_OR_RESERVATION'],
                 visitRestriction: 'OPEN',
               },
             ],
@@ -421,7 +421,7 @@ testJourneys.forEach(journey => {
               capacity: 30,
               visitRoom: 'room name',
               // representing the visit application visit being handled in this session
-              sessionConflicts: ['DOUBLE_BOOKED'], // TODO update to DOUBLE_BOOKING_OR_RESERVATION when VB-3956 released
+              sessionConflicts: ['DOUBLE_BOOKING_OR_RESERVATION'],
               visitRestriction: 'OPEN',
             })
 
