@@ -38,7 +38,8 @@ context('Visit details page', () => {
     visitHistoryDetails.eventsAudit[2] = {
       type: 'UPDATED_VISIT',
       applicationMethodType: 'NOT_KNOWN',
-      actionedBy: 'User Two',
+      actionedByFullName: 'User Two',
+      userType: 'STAFF',
       createTimestamp: '2022-01-01T10:00:00',
     }
 
