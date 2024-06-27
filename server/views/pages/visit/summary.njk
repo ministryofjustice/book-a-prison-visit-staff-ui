@@ -270,7 +270,7 @@
 
                 <div class="moj-timeline__header">
                   <h2 data-test="visit-event-{{ loop.index }}" class="moj-timeline__title">{{ eventAuditTypes[event.type]}}</h2>
-                  <p data-test="visit-actioned-by-{{ loop.index }}" class="moj-timeline__byline">{{ actionedByUser(event.actionedBy) }}</p>
+                  <p data-test="visit-actioned-by-{{ loop.index }}" class="moj-timeline__byline">{{ actionedByUser(event.actionedByFullName) }}</p>
                 </div>
 
                 <p class="moj-timeline__date">

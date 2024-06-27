@@ -19,12 +19,15 @@ context('Review a visit', () => {
     {
       type: 'BOOKED_VISIT',
       applicationMethodType: 'PHONE',
-      actionedBy: 'User One',
+      actionedByFullName: 'User One',
+      userType: 'STAFF',
       createTimestamp: '2024-04-11T09:00:00',
     },
     {
       type: 'NON_ASSOCIATION_EVENT',
       applicationMethodType: 'NOT_APPLICABLE',
+      actionedByFullName: '',
+      userType: 'SYSTEM',
       createTimestamp: '2024-04-11T10:00:00',
     },
   ]
@@ -83,7 +86,8 @@ context('Review a visit', () => {
           type: 'IGNORE_VISIT_NOTIFICATIONS_EVENT',
           applicationMethodType: 'NOT_APPLICABLE',
           text: 'some reason',
-          actionedBy: 'User One',
+          actionedByFullName: 'User One',
+          userType: 'STAFF',
           createTimestamp: '2024-04-11T11:00:00',
         },
       ],

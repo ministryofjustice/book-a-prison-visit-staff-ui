@@ -138,6 +138,27 @@ export interface paths {
   '/queue-admin/get-dlq-messages/{dlqName}': {
     get: operations['getDlqMessages']
   }
+  '/public/booker/{bookerReference}/visits/cancelled': {
+    /**
+     * Get public cancelled visits by booker reference
+     * @description Get public cancelled visits by booker reference
+     */
+    get: operations['getCancelledPublicVisitsByBookerReference']
+  }
+  '/public/booker/{bookerReference}/visits/booked/past': {
+    /**
+     * Get public past visits by booker reference
+     * @description Get public past visits by booker reference
+     */
+    get: operations['getPastPublicBookedVisitsByBookerReference']
+  }
+  '/public/booker/{bookerReference}/visits/booked/future': {
+    /**
+     * Get future public booked visits by booker reference
+     * @description Get future public booked visits by booker reference
+     */
+    get: operations['getFuturePublicBookedVisitsByBookerReference']
+  }
   '/public/booker/{bookerReference}/permitted/prisoners': {
     /**
      * Get permitted prisoners associated with a booker.
@@ -400,6 +421,8 @@ export interface components {
       description: string
     }
     BookingOrchestrationRequestDto: {
+      /** @description Username or Identifier for user who actioned this request */
+      actionedBy: string
       /**
        * @description application method
        * @enum {string}
@@ -529,7 +552,7 @@ export interface components {
        * @example STAFF
        * @enum {string}
        */
-      userType: 'STAFF' | 'PUBLIC'
+      userType: 'STAFF' | 'PUBLIC' | 'SYSTEM'
     }
     CreateApplicationDto: {
       /**
@@ -563,7 +586,7 @@ export interface components {
        * @example STAFF
        * @enum {string}
        */
-      userType: 'STAFF' | 'PUBLIC'
+      userType: 'STAFF' | 'PUBLIC' | 'SYSTEM'
       /**
        * @description actioned by (Booker reference - if PUBLIC user type Or User Name - if staff user type)
        * @example asd-asd-asd or STAFF_USER
@@ -595,7 +618,7 @@ export interface components {
       value: string
     }
     /** @description Event Audit */
-    EventAuditDto: {
+    EventAuditOrchestrationDto: {
       /**
        * @description The type of event
        * @enum {string}
@@ -625,10 +648,16 @@ export interface components {
         | 'NOT_APPLICABLE'
         | 'BY_PRISONER'
       /**
-       * @description Event actioned by - user id
-       * @example AB12345A
+       * @description Actioned by full name
+       * @example Aled Evans
        */
-      actionedBy?: string
+      actionedByFullName?: string
+      /**
+       * @description User type
+       * @example STAFF
+       * @enum {string}
+       */
+      userType: 'STAFF' | 'PUBLIC' | 'SYSTEM'
       /** @description Session template used for this event */
       sessionTemplateReference?: string
       /** @description Notes added against the event */
@@ -642,7 +671,7 @@ export interface components {
     /** @description Visit */
     VisitHistoryDetailsDto: {
       /** @description The visit details */
-      eventsAudit: components['schemas']['EventAuditDto'][]
+      eventsAudit: components['schemas']['EventAuditOrchestrationDto'][]
       visit: components['schemas']['VisitDto']
     }
     /** @description Timeslot for the visit */
@@ -688,18 +717,18 @@ export interface components {
       visitTimeSlot: components['schemas']['SessionTimeSlotDto']
     }
     PageVisitDto: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       first?: boolean
       last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['VisitDto'][]
+      sort?: components['schemas']['SortObject'][]
       /** Format: int32 */
       number?: number
-      sort?: components['schemas']['SortObject'][]
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
@@ -709,11 +738,11 @@ export interface components {
       /** Format: int64 */
       offset?: number
       sort?: components['schemas']['SortObject'][]
-      /** Format: int32 */
-      pageSize?: number
       paged?: boolean
       /** Format: int32 */
       pageNumber?: number
+      /** Format: int32 */
+      pageSize?: number
       unpaged?: boolean
     }
     SortObject: {
@@ -1251,7 +1280,7 @@ export interface components {
        * @example STAFF
        * @enum {string}
        */
-      userType: 'STAFF' | 'PUBLIC'
+      userType: 'STAFF' | 'PUBLIC' | 'SYSTEM'
       /**
        * @description is prison user client active
        * @example true
@@ -2225,6 +2254,129 @@ export interface operations {
       200: {
         content: {
           '*/*': components['schemas']['GetDlqResult']
+        }
+      }
+    }
+  }
+  /**
+   * Get public cancelled visits by booker reference
+   * @description Get public cancelled visits by booker reference
+   */
+  getCancelledPublicVisitsByBookerReference: {
+    parameters: {
+      path: {
+        /**
+         * @description bookerReference
+         * @example asd-aed-vhj
+         */
+        bookerReference: string
+      }
+    }
+    responses: {
+      /** @description cancelled public visits returned */
+      200: {
+        content: {
+          '*/*': components['schemas']['VisitDto'][]
+        }
+      }
+      /** @description Incorrect request to get cancelled public visits by booker reference */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions */
+      403: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  /**
+   * Get public past visits by booker reference
+   * @description Get public past visits by booker reference
+   */
+  getPastPublicBookedVisitsByBookerReference: {
+    parameters: {
+      path: {
+        /**
+         * @description bookerReference
+         * @example asd-aed-vhj
+         */
+        bookerReference: string
+      }
+    }
+    responses: {
+      /** @description past public visits returned */
+      200: {
+        content: {
+          '*/*': components['schemas']['VisitDto'][]
+        }
+      }
+      /** @description Incorrect request to get past public visits by booker reference */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions */
+      403: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  /**
+   * Get future public booked visits by booker reference
+   * @description Get future public booked visits by booker reference
+   */
+  getFuturePublicBookedVisitsByBookerReference: {
+    parameters: {
+      path: {
+        /**
+         * @description bookerReference
+         * @example asd-aed-vhj
+         */
+        bookerReference: string
+      }
+    }
+    responses: {
+      /** @description Future public booked visits returned */
+      200: {
+        content: {
+          '*/*': components['schemas']['VisitDto'][]
+        }
+      }
+      /** @description Incorrect request to get future booked visits by booker reference */
+      400: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions */
+      403: {
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
         }
       }
     }

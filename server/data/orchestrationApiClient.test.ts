@@ -42,6 +42,7 @@ describe('orchestrationApiClient', () => {
       const bookingOrchestrationRequestDto: BookingOrchestrationRequestDto = {
         applicationMethodType: 'NOT_KNOWN',
         allowOverBooking: true,
+        actionedBy: 'user1',
       }
 
       const result: Partial<Visit> = {
@@ -58,6 +59,7 @@ describe('orchestrationApiClient', () => {
       const output = await orchestrationApiClient.bookVisit(
         applicationReference,
         bookingOrchestrationRequestDto.applicationMethodType,
+        'user1',
       )
 
       expect(output).toStrictEqual(result)

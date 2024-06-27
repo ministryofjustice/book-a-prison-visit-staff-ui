@@ -531,7 +531,8 @@ describe('/visit/:reference', () => {
           {
             type: 'CANCELLED_VISIT',
             applicationMethodType: 'NOT_APPLICABLE',
-            actionedBy: 'User Three',
+            actionedByFullName: 'User Three',
+            userType: 'STAFF',
             createTimestamp: '2022-01-01T11:00:00',
           },
         ]
@@ -556,7 +557,8 @@ describe('/visit/:reference', () => {
           {
             type: 'CANCELLED_VISIT',
             applicationMethodType: 'NOT_APPLICABLE',
-            actionedBy: 'User Three',
+            actionedByFullName: 'User Three',
+            userType: 'STAFF',
             createTimestamp: '2022-01-01T11:00:00',
           },
         ]
@@ -587,7 +589,8 @@ describe('/visit/:reference', () => {
           {
             type: 'CANCELLED_VISIT',
             applicationMethodType: 'NOT_APPLICABLE',
-            actionedBy: 'User Three',
+            actionedByFullName: 'User Three',
+            userType: 'STAFF',
             createTimestamp: '2022-01-01T11:00:00',
           },
         ]

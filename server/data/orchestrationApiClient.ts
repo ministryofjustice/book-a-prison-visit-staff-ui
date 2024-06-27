@@ -34,12 +34,17 @@ export default class OrchestrationApiClient {
 
   // orchestration-visits-controller
 
-  async bookVisit(applicationReference: string, applicationMethod: ApplicationMethodType): Promise<Visit> {
+  async bookVisit(
+    applicationReference: string,
+    applicationMethod: ApplicationMethodType,
+    username: string,
+  ): Promise<Visit> {
     return this.restClient.put({
       path: `/visits/${applicationReference}/book`,
       data: <BookingOrchestrationRequestDto>{
         applicationMethodType: applicationMethod,
         allowOverBooking: true,
+        actionedBy: username,
       },
     })
   }

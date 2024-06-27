@@ -254,6 +254,7 @@ context('Check visit details page', () => {
         visitorSupport: { description: 'Wheelchair ramp' },
       }),
       applicationMethod: 'WEBSITE',
+      username: 'USER1',
     })
 
     checkYourBookingPage.submitBooking()

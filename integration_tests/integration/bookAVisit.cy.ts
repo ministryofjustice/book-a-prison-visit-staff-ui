@@ -209,6 +209,7 @@ context('Book a visit', () => {
         visitorSupport: { description: 'Wheelchair ramp, Some extra help!' },
       }),
       applicationMethod: 'PHONE',
+      username: 'USER1',
     })
 
     checkYourBookingPage.submitBooking()
