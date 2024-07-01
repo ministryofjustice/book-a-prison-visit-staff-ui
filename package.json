@@ -134,7 +134,7 @@
     "@types/http-errors": "^2.0.4",
     "@types/jest": "^29.5.12",
     "@types/jsonwebtoken": "^9.0.6",
-    "@types/node": "^20.14.8",
+    "@types/node": "^20.14.9",
     "@types/nunjucks": "^3.2.6",
     "@types/passport": "^1.0.16",
     "@types/passport-oauth2": "^1.4.17",
@@ -165,7 +165,7 @@
     "jest-junit": "^16.0.0",
     "jsonwebtoken": "^9.0.2",
     "lint-staged": "^15.2.7",
-    "mocha": "10.5.0",
+    "mocha": "10.5.2",
     "mocha-junit-reporter": "^2.2.1",
     "nock": "^13.5.4",
     "nodemon": "^3.1.4",
@@ -175,6 +175,6 @@
     "sass": "^1.77.6",
     "supertest": "^7.0.0",
     "ts-jest": "^29.1.5",
-    "typescript": "^5.5.2"
+    "typescript": "^5.5.3"
   }
 }
