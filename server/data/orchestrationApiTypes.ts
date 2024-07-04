@@ -31,7 +31,7 @@ export type Alert = components['schemas']['AlertDto']
 export type PrisonerProfile = components['schemas']['PrisonerProfileDto']
 export type VisitSummary = components['schemas']['VisitSummaryDto']
 
-export type EventAuditType = components['schemas']['EventAuditDto']['type']
+export type EventAuditType = components['schemas']['EventAuditOrchestrationDto']['type']
 
 export type NotificationCount = components['schemas']['NotificationCountDto']
 export type NotificationType = components['schemas']['OrchestrationNotificationGroupDto']['type']

@@ -34,7 +34,7 @@ export default class VisitService {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
-    const visit = await orchestrationApiClient.bookVisit(applicationReference, applicationMethod)
+    const visit = await orchestrationApiClient.bookVisit(applicationReference, applicationMethod, username)
     return visit
   }
 
