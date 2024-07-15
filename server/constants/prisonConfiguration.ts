@@ -41,7 +41,7 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
   // Bure (HMP)
   BRI: {
     selectVisitorsText: [
-      'You can add up to 3 people aged 18 and over, and 5 children under 18 years old. ',
+      'You can add up to 3 people aged 18 and over, and 5 children under 18 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },  
