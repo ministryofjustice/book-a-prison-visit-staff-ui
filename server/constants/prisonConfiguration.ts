@@ -168,6 +168,13 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'At least one visitor must be 18 or older.',
     ],
   },
+  // Highpoint (HMP)
+  HPI: {
+    selectVisitorsText: [
+      'You can add up to 3 people aged 18 and over, and 5 children under 18 years old.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
   // Kirkham (HMP)
   KMI: {
     selectVisitorsText: [
