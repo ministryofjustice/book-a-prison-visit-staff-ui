@@ -211,6 +211,13 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'Contact the establishment if you would like to bring more than 3 children.',
     ],
   },
+  // Littlehey (HMP)
+  LTI: {
+    selectVisitorsText: [
+      'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
   // Moorland (HMP & YOI)
   MDI: {
     selectVisitorsText: [
