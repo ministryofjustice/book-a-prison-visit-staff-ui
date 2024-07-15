@@ -267,6 +267,13 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'At least one visitor must be 18 or older.',
     ],
   },
+  // Pentonville (HMP & YOI)
+  PVI: {
+    selectVisitorsText: [
+      'You can add up to a total of 5 people, with a maximum of 3 people aged 18 and over.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
   // Rochester (HMP & YOI)
   RCI: {
     selectVisitorsText: [
