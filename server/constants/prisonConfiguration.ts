@@ -38,6 +38,13 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'At least one visitor must be 18 or older.',
     ],
   },
+  // Bure (HMP)
+  BRI: {
+    selectVisitorsText: [
+      'You can add up to 3 people aged 18 and over, and 5 children under 18 years old. ',
+      'At least one visitor must be 18 or older.',
+    ],
+  },  
   // Brinsford (HMP & YOI)
   BSI: {
     selectVisitorsText: [
