@@ -34,7 +34,14 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
   // Bullingdon (HMP & YOI)
   BNI: {
     selectVisitorsText: [
-      'You can add up to 3 people aged 18 and over, and 3 children under 18 years old. ',
+      'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
+  // Bure (HMP)
+  BRI: {
+    selectVisitorsText: [
+      'You can add up to 3 people aged 18 and over, and 5 children under 18 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
@@ -161,6 +168,13 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'At least one visitor must be 18 or older.',
     ],
   },
+  // Highpoint (HMP)
+  HPI: {
+    selectVisitorsText: [
+      'You can add up to 3 people aged 18 and over, and 5 children under 18 years old.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
   // Kirkham (HMP)
   KMI: {
     selectVisitorsText: [
@@ -195,6 +209,13 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
       'At least one visitor must be 18 or older.',
       'Contact the establishment if you would like to bring more than 3 children.',
+    ],
+  },
+  // Littlehey (HMP)
+  LTI: {
+    selectVisitorsText: [
+      'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
+      'At least one visitor must be 18 or older.',
     ],
   },
   // Moorland (HMP & YOI)
@@ -243,6 +264,13 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
   PNI: {
     selectVisitorsText: [
       'You can add up to a total of 5 people, with a maximum of 3 people aged 16 and over.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
+  // Pentonville (HMP & YOI)
+  PVI: {
+    selectVisitorsText: [
+      'You can add up to a total of 5 people, with a maximum of 3 people aged 18 and over.',
       'At least one visitor must be 18 or older.',
     ],
   },
