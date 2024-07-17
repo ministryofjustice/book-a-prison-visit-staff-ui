@@ -278,7 +278,13 @@
                 </p>
 
                 <div class="moj-timeline__description">
-                  {% if event.type === 'UPDATED_VISIT' or event.type === 'BOOKED_VISIT' or event.type === 'MIGRATED_VISIT' %}
+                  {% if event.type === 'BOOKED_VISIT' %}
+                    {% if event.userType === 'PUBLIC' and event.applicationMethodType === 'WEBSITE' %}
+                      <p data-test="visit-request-method-{{ loop.index }}">Method: GOV.UK booking</p>
+                    {% else %}
+                      <p data-test="visit-request-method-{{ loop.index }}">{{ requestMethodDescriptions[event.applicationMethodType] }}</p>
+                    {% endif %}
+                  {% elseif event.type === 'UPDATED_VISIT' or event.type === 'MIGRATED_VISIT' %}
                     <p data-test="visit-request-method-{{ loop.index }}">{{ requestMethodDescriptions[event.applicationMethodType] }}</p>
                   {% elseif event.type === 'CANCELLED_VISIT' %}
                     <p data-test="visit-cancelled-reason-{{ loop.index }}">Reason: {{ cancelledVisitReason }}</p>

@@ -135,6 +135,8 @@ context('Visit details page', () => {
         endTimestamp: `${futureVisitDate}T14:00:00`,
       }),
     })
+    visitHistoryDetails.eventsAudit[0].userType = 'PUBLIC'
+    visitHistoryDetails.eventsAudit[0].applicationMethodType = 'WEBSITE'
 
     const childDob = format(sub(today, { years: 5 }), shortDateFormat)
     const contacts = [
@@ -182,10 +184,10 @@ context('Visit details page', () => {
     visitDetailsPage.actionedBy(2).contains('User Two')
     visitDetailsPage.eventHeader(2).contains('Updated')
     visitDetailsPage.eventTime(2).contains('Saturday 1 January 2022 at 10am')
-    visitDetailsPage.requestMethod(2).contains('Request method: Email')
+    visitDetailsPage.requestMethod(2).contains('Method: Email request')
     visitDetailsPage.actionedBy(3).contains('User One')
     visitDetailsPage.eventHeader(3).contains('Booked')
     visitDetailsPage.eventTime(3).contains('Saturday 1 January 2022 at 9am')
-    visitDetailsPage.requestMethod(3).contains('Request method: Phone call')
+    visitDetailsPage.requestMethod(3).contains('Method: GOV.UK booking')
   })
 })
