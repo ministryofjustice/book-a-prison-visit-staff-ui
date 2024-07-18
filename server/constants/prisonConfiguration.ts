@@ -157,7 +157,7 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
   // Hewell (HMP)
   HEI: {
     selectVisitorsText: [
-      'Add up to 3 people aged 10 and over, and 4 children under 10 years old.',
+      'Add up to 3 people aged 13 and over, and 3 children under 13 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
