@@ -5,6 +5,12 @@
 
 export interface paths {
   '/secure/prisons/id/{prisonId}/videolink-conferencing-centre/email-address': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * Get a prison's Videolink Conferencing Centre email address
      * @deprecated
@@ -15,13 +21,24 @@ export interface paths {
      * @deprecated
      */
     put: operations['putEmailAddressForVideolinkConferencingCentre']
+    post?: never
     /**
      * Remove a prison's Videolink Conferencing Centre email address
      * @deprecated
      */
     delete: operations['deleteEmailAddressForVideolinkConferencingCentre']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/secure/prisons/id/{prisonId}/offender-management-unit/email-address': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * Get a prison's Offender Management Unit email address
      * @deprecated
@@ -32,13 +49,24 @@ export interface paths {
      * @deprecated
      */
     put: operations['putEmailAddressForOffenderManagementUnit']
+    post?: never
     /**
      * Remove a prison's Offender Management Unit email address
      * @deprecated
      */
     delete: operations['deleteEmailAddressForOffenderManagementUnit']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/secure/prisons/id/{prisonId}/department/contact-details': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /** Get a prison department's contact details */
     get: operations['getContactDetails']
     /** Change a prison department's contact details */
@@ -47,94 +75,251 @@ export interface paths {
     post: operations['createContactDetails']
     /** Remove a prison department's contact details */
     delete: operations['deletePhoneNumber']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/prison-maintenance/id/{prisonId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
     /**
      * Update specified prison details
      * @description Updates prison information, role required is MAINTAIN_REF_DATA or MAINTAIN_PRISON_DATA
      */
     put: operations['updatePrison']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/prison-maintenance/id/{prisonId}/address/{addressId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
     /**
      * Update specified address details
      * @description Updates address information, role required is MAINTAIN_REF_DATA or MAINTAIN_PRISON_DATA
      */
     put: operations['updateAddress']
+    post?: never
     /**
      * Delete specified address for specified Prison
      * @description Deletes address information for a Prison, role required is MAINTAIN_REF_DATA or MAINTAIN_PRISON_DATA
      */
     delete: operations['deleteAddress']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/prisons/prisonsByIds': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
     /**
      * Get prisons by IDs
      * @description Get prisons based on their IDs
      */
     post: operations['getPrisonsByIds']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/prison-maintenance': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
     /**
      * Adds a new prison
      * @description Adds new prison information, role required is MAINTAIN_REF_DATA or MAINTAIN_PRISON_DATA
      */
     post: operations['insertPrison']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/prison-maintenance/id/{prisonId}/address': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
     /**
      * Add Address to existing Prison
      * @description Adds an additional Address to an existing Prison, role required is MAINTAIN_REF_DATA or MAINTAIN_PRISON_DATA
      */
     post: operations['addAddress']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/prisons': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * Get all prisons
      * @description All prisons
      */
     get: operations['getPrisons']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/prisons/search': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * Get prisons from active and text search
      * @description All prisons
      */
     get: operations['getPrisonsBySearchFilter']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/prisons/names': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * Get prison names
      * @description prison id and full name
      */
     get: operations['getPrisonNames']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/prisons/id/{prisonId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * Get specified prison
      * @description Information on a specific prison
      */
     get: operations['getPrisonFromId']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/prisons/id/{prisonId}/address/{addressId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * Get specified prison
      * @description Information on a specific prison address
      */
     get: operations['getAddressFromId']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/gp/prison/{prisonId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /** Get GP practice code about specified prison */
     get: operations['getPrisonFromId_1']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/gp/practice/{gpPracticeCode}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /** Get specified prison from GP practice code */
     get: operations['getPrisonFromGpPrescriber']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
 }
-
 export type webhooks = Record<string, never>
-
 export interface components {
   schemas: {
     /** @description Contact information for a prison department */
@@ -367,18 +552,12 @@ export interface components {
   headers: never
   pathItems: never
 }
-
 export type $defs = Record<string, never>
-
-export type external = Record<string, never>
-
 export interface operations {
-  /**
-   * Get a prison's Videolink Conferencing Centre email address
-   * @deprecated
-   */
   getEmailForVideoConferencingCentre: {
     parameters: {
+      query?: never
+      header?: never
       path: {
         /**
          * @description Prison ID
@@ -386,34 +565,43 @@ export interface operations {
          */
         prisonId: string
       }
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description Returns the email address */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'text/plain': unknown
         }
       }
       /** @description Client error - invalid prisonId or similar */
       400: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'text/plain': string
         }
       }
       /** @description The prison does not have a Videolink Conferencing Centre email address */
       404: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'text/plain': string
         }
       }
     }
   }
-  /**
-   * Set or change a prison's Videolink Conferencing Centre email address
-   * @deprecated
-   */
   putEmailAddressForVideolinkConferencingCentre: {
     parameters: {
+      query?: never
+      header?: never
       path: {
         /**
          * @description Prison ID
@@ -421,6 +609,7 @@ export interface operations {
          */
         prisonId: string
       }
+      cookie?: never
     }
     requestBody: {
       content: {
@@ -430,28 +619,38 @@ export interface operations {
     responses: {
       /** @description The email address was created */
       201: {
-        content: never
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description The email address was updated */
       204: {
-        content: never
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Client error - invalid prisonId, email address or similar */
       400: {
-        content: never
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description No prison found for the supplied prison id */
       404: {
-        content: never
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
     }
   }
-  /**
-   * Remove a prison's Videolink Conferencing Centre email address
-   * @deprecated
-   */
   deleteEmailAddressForVideolinkConferencingCentre: {
     parameters: {
+      query?: never
+      header?: never
       path: {
         /**
          * @description Prison ID
@@ -459,24 +658,30 @@ export interface operations {
          */
         prisonId: string
       }
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description The email address was removed */
       204: {
-        content: never
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Client error - invalid prisonId or similar */
       400: {
-        content: never
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
     }
   }
-  /**
-   * Get a prison's Offender Management Unit email address
-   * @deprecated
-   */
   getEmailForOffenderManagementUnit: {
     parameters: {
+      query?: never
+      header?: never
       path: {
         /**
          * @description Prison ID
@@ -484,34 +689,43 @@ export interface operations {
          */
         prisonId: string
       }
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description Returns the email address */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'text/plain': unknown
         }
       }
       /** @description Client error - invalid prisonId or similar */
       400: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'text/plain': string
         }
       }
       /** @description The prison does not have a Offender Management Unit email address */
       404: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'text/plain': string
         }
       }
     }
   }
-  /**
-   * Set or change a prison's Offender Management Unit email address
-   * @deprecated
-   */
   putEmailAddressForOffenderManagementUnit: {
     parameters: {
+      query?: never
+      header?: never
       path: {
         /**
          * @description Prison ID
@@ -519,6 +733,7 @@ export interface operations {
          */
         prisonId: string
       }
+      cookie?: never
     }
     requestBody: {
       content: {
@@ -528,28 +743,38 @@ export interface operations {
     responses: {
       /** @description The email address was created */
       201: {
-        content: never
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description The email address was updated */
       204: {
-        content: never
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Client error - invalid prisonId, email address, media type or similar */
       400: {
-        content: never
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description No prison found for the supplied prison id */
       404: {
-        content: never
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
     }
   }
-  /**
-   * Remove a prison's Offender Management Unit email address
-   * @deprecated
-   */
   deleteEmailAddressForOffenderManagementUnit: {
     parameters: {
+      query?: never
+      header?: never
       path: {
         /**
          * @description Prison ID
@@ -557,19 +782,26 @@ export interface operations {
          */
         prisonId: string
       }
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description The email address was removed */
       204: {
-        content: never
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Client error - invalid prisonId or similar */
       400: {
-        content: never
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
     }
   }
-  /** Get a prison department's contact details */
   getContactDetails: {
     parameters: {
       query: {
@@ -579,6 +811,7 @@ export interface operations {
          */
         departmentType: string
       }
+      header?: never
       path: {
         /**
          * @description Prison ID
@@ -586,29 +819,39 @@ export interface operations {
          */
         prisonId: string
       }
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description Returns the departments contact details */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ContactDetailsDto']
         }
       }
       /** @description Client error - invalid prisonId or similar */
       400: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description The prison does not have contact details for this department */
       404: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
     }
   }
-  /** Change a prison department's contact details */
   updateContactDetails: {
     parameters: {
       query?: {
@@ -618,6 +861,7 @@ export interface operations {
          */
         removeIfNull?: string
       }
+      header?: never
       path: {
         /**
          * @description Prison ID
@@ -625,6 +869,7 @@ export interface operations {
          */
         prisonId: string
       }
+      cookie?: never
     }
     requestBody: {
       content: {
@@ -634,27 +879,37 @@ export interface operations {
     responses: {
       /** @description The Contact details have been updated */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ContactDetailsDto']
         }
       }
       /** @description Client error - invalid prisonId, contact details, media type or similar */
       400: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description The given prison or contact details for this prison cannot be found. */
       404: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
     }
   }
-  /** Create a prison department's contact details */
   createContactDetails: {
     parameters: {
+      query?: never
+      header?: never
       path: {
         /**
          * @description Prison ID
@@ -662,6 +917,7 @@ export interface operations {
          */
         prisonId: string
       }
+      cookie?: never
     }
     requestBody: {
       content: {
@@ -671,25 +927,33 @@ export interface operations {
     responses: {
       /** @description Contact details have been created */
       201: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ContactDetailsDto']
         }
       }
       /** @description Client error - invalid prisonId, contact details, media type or similar */
       400: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description The prison does not exist */
       404: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
     }
   }
-  /** Remove a prison department's contact details */
   deletePhoneNumber: {
     parameters: {
       query: {
@@ -699,6 +963,7 @@ export interface operations {
          */
         departmentType: string
       }
+      header?: never
       path: {
         /**
          * @description Prison ID
@@ -706,10 +971,15 @@ export interface operations {
          */
         prisonId: string
       }
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description The contact details were removed */
       204: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json':
             | '100 CONTINUE'
@@ -785,24 +1055,28 @@ export interface operations {
       }
       /** @description Client error - invalid prisonId or similar */
       400: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description The contact details for this prison cannot be found. */
       404: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
     }
   }
-  /**
-   * Update specified prison details
-   * @description Updates prison information, role required is MAINTAIN_REF_DATA or MAINTAIN_PRISON_DATA
-   */
   updatePrison: {
     parameters: {
+      query?: never
+      header?: never
       path: {
         /**
          * @description Prison Id
@@ -810,6 +1084,7 @@ export interface operations {
          */
         prisonId: string
       }
+      cookie?: never
     }
     requestBody: {
       content: {
@@ -819,42 +1094,55 @@ export interface operations {
     responses: {
       /** @description Prison Information Updated */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['PrisonDto']
         }
       }
       /** @description Information request to update prison */
       400: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Unauthorized to access this endpoint */
       401: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Incorrect permissions to make prison update */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Prison ID not found */
       404: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
     }
   }
-  /**
-   * Update specified address details
-   * @description Updates address information, role required is MAINTAIN_REF_DATA or MAINTAIN_PRISON_DATA
-   */
   updateAddress: {
     parameters: {
+      query?: never
+      header?: never
       path: {
         /**
          * @description Prison Id
@@ -867,6 +1155,7 @@ export interface operations {
          */
         addressId: string
       }
+      cookie?: never
     }
     requestBody: {
       content: {
@@ -876,42 +1165,55 @@ export interface operations {
     responses: {
       /** @description Address Information Updated */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['AddressDto']
         }
       }
       /** @description Bad Information request to update address */
       400: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Unauthorized to access this endpoint */
       401: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Incorrect permissions to make address update */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Address Id not found */
       404: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
     }
   }
-  /**
-   * Delete specified address for specified Prison
-   * @description Deletes address information for a Prison, role required is MAINTAIN_REF_DATA or MAINTAIN_PRISON_DATA
-   */
   deleteAddress: {
     parameters: {
+      query?: never
+      header?: never
       path: {
         /**
          * @description Prison Id
@@ -924,37 +1226,53 @@ export interface operations {
          */
         addressId: string
       }
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description Address Information Deleted */
       200: {
-        content: never
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Unauthorized to access this endpoint */
       401: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Incorrect permissions to make address update */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Address Id not found */
       404: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
     }
   }
-  /**
-   * Get prisons by IDs
-   * @description Get prisons based on their IDs
-   */
   getPrisonsByIds: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     requestBody: {
       content: {
         'application/json': components['schemas']['PrisonRequest']
@@ -963,17 +1281,22 @@ export interface operations {
     responses: {
       /** @description Successful operation */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['PrisonDto'][]
         }
       }
     }
   }
-  /**
-   * Adds a new prison
-   * @description Adds new prison information, role required is MAINTAIN_REF_DATA or MAINTAIN_PRISON_DATA
-   */
   insertPrison: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     requestBody: {
       content: {
         'application/json': components['schemas']['InsertPrisonDto']
@@ -982,36 +1305,46 @@ export interface operations {
     responses: {
       /** @description Prison Information Inserted */
       201: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['PrisonDto']
         }
       }
       /** @description Information request to add prison */
       400: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Unauthorized to access this endpoint */
       401: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Incorrect permissions to make prison insert */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
     }
   }
-  /**
-   * Add Address to existing Prison
-   * @description Adds an additional Address to an existing Prison, role required is MAINTAIN_REF_DATA or MAINTAIN_PRISON_DATA
-   */
   addAddress: {
     parameters: {
+      query?: never
+      header?: never
       path: {
         /**
          * @description Prison Id
@@ -1019,6 +1352,7 @@ export interface operations {
          */
         prisonId: string
       }
+      cookie?: never
     }
     requestBody: {
       content: {
@@ -1028,54 +1362,71 @@ export interface operations {
     responses: {
       /** @description New Address added to Prison */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['AddressDto']
         }
       }
       /** @description Bad Information request to update address */
       400: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Unauthorized to access this endpoint */
       401: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Incorrect permissions to add Prison address */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Prison Id not found */
       404: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
     }
   }
-  /**
-   * Get all prisons
-   * @description All prisons
-   */
   getPrisons: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
     responses: {
       /** @description Successful Operation */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['PrisonDto'][]
         }
       }
     }
   }
-  /**
-   * Get prisons from active and text search
-   * @description All prisons
-   */
   getPrisonsBySearchFilter: {
     parameters: {
       query?: {
@@ -1100,36 +1451,47 @@ export interface operations {
          */
         prisonTypeCodes?: ('HMP' | 'YOI' | 'IRC' | 'STC' | 'YCS')[]
       }
+      header?: never
+      path?: never
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description Successful Operation */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['PrisonDto'][]
         }
       }
     }
   }
-  /**
-   * Get prison names
-   * @description prison id and full name
-   */
   getPrisonNames: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
     responses: {
       /** @description Successful Operation */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['PrisonNameDto'][]
         }
       }
     }
   }
-  /**
-   * Get specified prison
-   * @description Information on a specific prison
-   */
   getPrisonFromId: {
     parameters: {
+      query?: never
+      header?: never
       path: {
         /**
          * @description Prison ID
@@ -1137,22 +1499,25 @@ export interface operations {
          */
         prisonId: string
       }
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description Successful Operation */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['PrisonDto']
         }
       }
     }
   }
-  /**
-   * Get specified prison
-   * @description Information on a specific prison address
-   */
   getAddressFromId: {
     parameters: {
+      query?: never
+      header?: never
       path: {
         /**
          * @description Prison ID
@@ -1165,19 +1530,25 @@ export interface operations {
          */
         addressId: string
       }
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description Successful Operation */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['AddressDto']
         }
       }
     }
   }
-  /** Get GP practice code about specified prison */
   getPrisonFromId_1: {
     parameters: {
+      query?: never
+      header?: never
       path: {
         /**
          * @description Prison ID
@@ -1185,25 +1556,34 @@ export interface operations {
          */
         prisonId: string
       }
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description Bad request.  Wrong format for prison_id. */
       400: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Prison not found. */
       404: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
     }
   }
-  /** Get specified prison from GP practice code */
   getPrisonFromGpPrescriber: {
     parameters: {
+      query?: never
+      header?: never
       path: {
         /**
          * @description GP Practice Code
@@ -1211,16 +1591,24 @@ export interface operations {
          */
         gpPracticeCode: string
       }
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description Bad request.  Wrong format for GP practice code. */
       400: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description No prison linked to the GP practice code. */
       404: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }

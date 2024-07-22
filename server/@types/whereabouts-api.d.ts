@@ -5,19 +5,77 @@
 
 export interface paths {
   '/queue-admin/retry-dlq/{dlqName}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
     put: operations['retryDlq']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/queue-admin/retry-all-dlqs': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
     put: operations['retryAllDlqs']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/queue-admin/purge-queue/{queueName}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
     put: operations['purgeQueue']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/court/video-link-bookings/{videoLinkBookingId}/comment': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
     /** @description Update the comment for a Video Link Booking */
     put: operations['updateVideoLinkBookingComment']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/court/video-link-bookings/{videoBookingId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * A video Link Booking
      * @description Return a video Link Booking
@@ -25,277 +83,749 @@ export interface paths {
     get: operations['getVideoLinkBooking']
     /** @description Update a Video Link Booking */
     put: operations['updateVideoLinkBooking']
+    post?: never
     /** @description Delete a Video Link Booking */
     delete: operations['deleteVideoLinkBooking']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/attendance/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
     /**
      * Updates existing attendance information
      * @description Updates the attendance record, posts attendance details back up to PNOMIS. IEP warnings are triggered when certain absence reasons are used.
      */
     put: operations['putAttendance']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/court/video-link-bookings': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * Video Link Bookings
      * @description Return details of Video Link Bookings in CSV format. Restrict the response to bookings with a main start time within 'days' of start-date.
      */
     get: operations['getVideoLinkBookingsByStartDate']
+    put?: never
     /** @description Create a Video Link Booking */
     post: operations['createVideoLinkBooking']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/court/video-link-bookings/date/{date}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
     /** @description Return all video link bookings for the specified date and prisons, optionally filtering by court. */
     post: operations['getVideoLinkBookingsBySearchDetails']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/court/video-link-booking-check': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
     /** @description Check that a potential video link booking, described by the supplied specification, can be made.  If not then return information about some alternatives. */
     post: operations['findAvailableVideoLinkBookingOptions']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/court/video-link-appointments': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
     /**
      * Video link appointments
      * @description Return video link appointments
      */
     post: operations['getVideoLinkAppointments']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/cell/make-cell-move': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
     /** @description Make a cell move for an offender. Triggers the creation of a MOVED_CELL case note. */
     post: operations['makeCellMove']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/attendances': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
     /**
      * Create new attendance records for multiple offenders (This endpoint does not trigger IEP warnings)
      * @description Stores new attendance record for multiple offenders, posts attendance details back up to PNOMIS
      */
     post: operations['postAttendances']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/attendances/{prison}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * Request attendance details
      * @description Returns set of attendance details for set of booking ids
      */
     get: operations['getAttendanceForBookings']
+    put?: never
     /**
      * Request attendance details
      * @description Returns set of attendance details for set of booking ids
      */
     post: operations['getAttendanceForBookingsByPost']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/attendances/{prison}/attendance-over-date-range': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
     /**
      * Request attendance details
      * @description Returns set of attendance details for set of booking ids
      */
     post: operations['getAttendanceForBookingsOverDateRangeByPost']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/attendance': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
     /**
      * Create new attendance
      * @description Stores new attendance record, posts attendance details back up to PNOMIS. IEP warnings are triggered when certain absence reasons are used.
      */
     post: operations['postAttendance']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/appointment': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
     /**
      * createAppointment
      * @description Create an appointment
      */
     post: operations['createAppointment']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/video-link-rooms/{agencyId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * getVideoLinkBookingRooms
+     * @deprecated
      * @description List of all the Video Link Booking rooms in the prison.
      */
     get: operations['getVideoLinkBookingRooms']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/queue-admin/get-dlq-messages/{dlqName}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     get: operations['getDlqMessages']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/locations/{agencyId}/{group}/location-prefix': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * getLocationPrefixFromGroup
+     * @deprecated
      * @description Get location prefix by group
      */
     get: operations['getLocationPrefixFromGroup']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/locations/groups/{agencyId}/{name}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * getLocationGroup
+     * @deprecated
      * @description List of cell locations by group at agency location.
      */
     get: operations['getLocationGroup']
-  }
-  '/locations/cellsWithCapacity/{agencyId}/{group}': {
-    /**
-     * getCellsWithCapacityForGroup
-     * @description List of cells by group at agency location which have capacity.
-     */
-    get: operations['getCellsWithCapacityForGroup']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/events/{offenderNo}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * getEvents
      * @description All scheduled events for offender.  This endpoint filters out cancelled events.
      */
     get: operations['getEvents']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/events/video-link-booking-events': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * Video Link Booking Events
      * @description Return details of Video Link Booking Events (Create, Update, Delete) in CSV format. Restrict the response to events occurring within 'days' of start-date.
      */
     get: operations['getVideoLinkBookingEvents']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/court/hearing-type': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * Return all court hearing types
      * @description Get court hearing types
      */
     get: operations['getCourtHearingTypes']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/court/courts': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * All courts
      * @description Return information about all courts.
      */
     get: operations['getCourts']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/court/courts/{courtId}/email': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * Court email address
      * @description Return information about email address.
      */
     get: operations['getEmailByCourtId']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/court/court-hearing-types': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * All court hearing types
      * @description Return a list of all court hearing types.
      */
     get: operations['getCourtHearingTypes_1']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/court/all-courts': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * Return all court locations
      * @description All court locations
      */
     get: operations['getCourtNames']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/cell/cell-move-reason/booking/{bookingId}/bed-assignment-sequence/{bedAssignmentId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /** @description Return cell move reason */
     get: operations['getCellMoveReason']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/attendances/{prison}/{event-location}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * Request attendance details
      * @description Returns set of attendance details
      */
     get: operations['getAttendanceForEventLocation']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/attendances/{prison}/unaccounted-for': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * Request unaccounted for prisoners
      * @description Return a set of prisoners that haven't attended a scheduled activity
      */
     get: operations['getPrisonersUnaccountedFor']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/attendances/{prison}/absences': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * Request absences details
      * @description Returns set of attendance details for attendances with an absent reason
      */
     get: operations['getAbsences']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/attendances/{prison}/absences-for-scheduled-activities/{absentReason}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * Request absences
      * @description Return a set of absences for all offenders that have scheduled activity
      */
     get: operations['getAbsencesForReason']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/attendances/offender/{offenderNo}/unacceptable-absences': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * Request unacceptable absence details
      * @description Returns unacceptable absence attendance details for an offender
      */
     get: operations['getAttendanceDetailsForOffender']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/attendances/offender/{offenderNo}/unacceptable-absence-count': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /** @description Return counts of unacceptable absences and totals over time for an offender */
     get: operations['getAttendanceSummary']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/attendances/changes': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /** @description Return all changes relating to an attendance */
     get: operations['getAttendanceChanges']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/attendance-statistics/{prison}/over-date-range': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * Request attendance statistics
      * @description Request attendance statistics
      */
     get: operations['getAttendanceForEventLocation_1']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/appointments/{agencyId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * getAppointments
      * @description List of appointments for the given agency that match the search criteria.
      */
     get: operations['getAppointments']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/appointment/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * getAppointment
      * @description Return appointment details
      */
     get: operations['getAppointment']
+    put?: never
+    post?: never
     /**
      * deleteAppointment
      * @description Delete an appointment
      */
     delete: operations['deleteAppointment']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/agencies/{agencyId}/locations/whereabouts': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * getWhereabouts
+     * @deprecated
      * @description Whereabouts details (e.g. whether enabled) for prison.
      */
     get: operations['getWhereabouts']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/agencies/{agencyId}/locations/groups': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * getAvailableLocationGroups
+     * @deprecated
      * @description List of all available Location Groups at agency.
      */
     get: operations['getAvailableLocationGroups']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/absence-reasons': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     get: operations['reasons']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/appointment/recurring/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
     /**
      * deleteRecurringAppointmentSequence
      * @description Delete the whole sequence of a recurring appointment
      */
     delete: operations['deleteRecurringAppointmentSequence']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
 }
-
 export type webhooks = Record<string, never>
-
 export interface components {
   schemas: {
-    DlqMessage: {
-      body: {
-        [key: string]: Record<string, never>
-      }
-      messageId: string
-    }
     RetryDlqResult: {
       /** Format: int32 */
       messagesFoundCount: number
-      messages: components['schemas']['DlqMessage'][]
     }
     PurgeQueueResult: {
       /** Format: int32 */
@@ -697,6 +1227,12 @@ export interface components {
       locationId: number
       description: string
     }
+    DlqMessage: {
+      body: {
+        [key: string]: Record<string, never> | undefined
+      }
+      messageId: string
+    }
     GetDlqResult: {
       /** Format: int32 */
       messagesFoundCount: number
@@ -720,21 +1256,6 @@ export interface components {
       operationalCapacity: number
       userDescription?: string
       internalLocationCode: string
-    }
-    CellAttribute: {
-      code: string
-      description: string
-    }
-    CellWithAttributes: {
-      /** Format: int64 */
-      id: number
-      description: string
-      /** Format: int32 */
-      noOfOccupants: number
-      /** Format: int32 */
-      capacity: number
-      userDescription?: string
-      attributes: components['schemas']['CellAttribute'][]
     }
     ScheduledEventDto: {
       /** Format: int64 */
@@ -955,9 +1476,9 @@ export interface components {
       sort?: components['schemas']['SortObject'][]
       /** Format: int32 */
       pageSize?: number
+      paged?: boolean
       /** Format: int32 */
       pageNumber?: number
-      paged?: boolean
       unpaged?: boolean
     }
     SortObject: {
@@ -1195,21 +1716,24 @@ export interface components {
   headers: never
   pathItems: never
 }
-
 export type $defs = Record<string, never>
-
-export type external = Record<string, never>
-
 export interface operations {
   retryDlq: {
     parameters: {
+      query?: never
+      header?: never
       path: {
         dlqName: string
       }
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           '*/*': components['schemas']['RetryDlqResult']
         }
@@ -1217,9 +1741,19 @@ export interface operations {
     }
   }
   retryAllDlqs: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           '*/*': components['schemas']['RetryDlqResult'][]
         }
@@ -1228,26 +1762,35 @@ export interface operations {
   }
   purgeQueue: {
     parameters: {
+      query?: never
+      header?: never
       path: {
         queueName: string
       }
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           '*/*': components['schemas']['PurgeQueueResult']
         }
       }
     }
   }
-  /** @description Update the comment for a Video Link Booking */
   updateVideoLinkBookingComment: {
     parameters: {
+      query?: never
+      header?: never
       path: {
         /** @description Video link booking id */
         videoLinkBookingId: number
       }
+      cookie?: never
     }
     requestBody?: {
       content: {
@@ -1257,37 +1800,45 @@ export interface operations {
     responses: {
       /** @description No Content */
       204: {
-        content: never
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
     }
   }
-  /**
-   * A video Link Booking
-   * @description Return a video Link Booking
-   */
   getVideoLinkBooking: {
     parameters: {
+      query?: never
+      header?: never
       path: {
         /** @description Video link booking id */
         videoBookingId: number
       }
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['VideoLinkBookingResponse']
         }
       }
     }
   }
-  /** @description Update a Video Link Booking */
   updateVideoLinkBooking: {
     parameters: {
+      query?: never
+      header?: never
       path: {
         /** @description Video link booking id */
         videoBookingId: number
       }
+      cookie?: never
     }
     requestBody?: {
       content: {
@@ -1297,34 +1848,42 @@ export interface operations {
     responses: {
       /** @description No Content */
       204: {
-        content: never
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
     }
   }
-  /** @description Delete a Video Link Booking */
   deleteVideoLinkBooking: {
     parameters: {
+      query?: never
+      header?: never
       path: {
         /** @description Video link booking id */
         videoBookingId: number
       }
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description No Content */
       204: {
-        content: never
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
     }
   }
-  /**
-   * Updates existing attendance information
-   * @description Updates the attendance record, posts attendance details back up to PNOMIS. IEP warnings are triggered when certain absence reasons are used.
-   */
   putAttendance: {
     parameters: {
+      query?: never
+      header?: never
       path: {
         id: number
       }
+      cookie?: never
     }
     requestBody: {
       content: {
@@ -1334,28 +1893,33 @@ export interface operations {
     responses: {
       /** @description Invalid request. */
       400: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Requested resource not found. */
       404: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': Record<string, never>
         }
       }
       /** @description Unrecoverable error occurred whilst processing request. */
       500: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
     }
   }
-  /**
-   * Video Link Bookings
-   * @description Return details of Video Link Bookings in CSV format. Restrict the response to bookings with a main start time within 'days' of start-date.
-   */
   getVideoLinkBookingsByStartDate: {
     parameters: {
       query: {
@@ -1364,18 +1928,31 @@ export interface operations {
         /** @description Return details of bookings occurring within this number of days of start-date */
         days?: number
       }
+      header?: never
+      path?: never
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
+          'application/json': string
           'text/csv': string
         }
       }
     }
   }
-  /** @description Create a Video Link Booking */
   createVideoLinkBooking: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     requestBody: {
       content: {
         'application/json': components['schemas']['VideoLinkBookingSpecification']
@@ -1384,19 +1961,24 @@ export interface operations {
     responses: {
       /** @description Created */
       201: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': number
         }
       }
     }
   }
-  /** @description Return all video link bookings for the specified date and prisons, optionally filtering by court. */
   getVideoLinkBookingsBySearchDetails: {
     parameters: {
+      query?: never
+      header?: never
       path: {
         /** @description Return video link bookings for this date only. ISO-8601 date format */
         date: string
       }
+      cookie?: never
     }
     requestBody: {
       content: {
@@ -1406,14 +1988,22 @@ export interface operations {
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['VideoLinkBookingResponse'][]
         }
       }
     }
   }
-  /** @description Check that a potential video link booking, described by the supplied specification, can be made.  If not then return information about some alternatives. */
   findAvailableVideoLinkBookingOptions: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     requestBody: {
       content: {
         'application/json': components['schemas']['VideoLinkBookingSearchSpecification']
@@ -1422,17 +2012,22 @@ export interface operations {
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['VideoLinkBookingOptions']
         }
       }
     }
   }
-  /**
-   * Video link appointments
-   * @description Return video link appointments
-   */
   getVideoLinkAppointments: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     requestBody: {
       content: {
         'application/json': number[]
@@ -1441,14 +2036,24 @@ export interface operations {
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['VideoLinkAppointmentsResponse']
         }
       }
     }
   }
-  /** @description Make a cell move for an offender. Triggers the creation of a MOVED_CELL case note. */
   makeCellMove: {
+    parameters: {
+      query?: {
+        lockTimeout?: boolean
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
     requestBody: {
       content: {
         'application/json': components['schemas']['CellMoveDetails']
@@ -1457,35 +2062,49 @@ export interface operations {
     responses: {
       /** @description Created */
       201: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['CellMoveResponse']
         }
       }
       /** @description Invalid request. */
       400: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['CellMoveResponse']
         }
       }
       /** @description Requested resource not found. */
       404: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Unrecoverable error occurred whilst processing request. */
       500: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
     }
   }
-  /**
-   * Create new attendance records for multiple offenders (This endpoint does not trigger IEP warnings)
-   * @description Stores new attendance record for multiple offenders, posts attendance details back up to PNOMIS
-   */
   postAttendances: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     requestBody: {
       content: {
         'application/json': components['schemas']['AttendancesDto']
@@ -1494,16 +2113,15 @@ export interface operations {
     responses: {
       /** @description Created */
       201: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['AttendancesResponse']
         }
       }
     }
   }
-  /**
-   * Request attendance details
-   * @description Returns set of attendance details for set of booking ids
-   */
   getAttendanceForBookings: {
     parameters: {
       query: {
@@ -1514,24 +2132,26 @@ export interface operations {
         /** @description Booking ids (bookings=1&bookings=2) */
         bookings: number[]
       }
+      header?: never
       path: {
         /** @description Prison id (LEI) */
         prison: string
       }
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['AttendancesResponse']
         }
       }
     }
   }
-  /**
-   * Request attendance details
-   * @description Returns set of attendance details for set of booking ids
-   */
   getAttendanceForBookingsByPost: {
     parameters: {
       query: {
@@ -1540,10 +2160,12 @@ export interface operations {
         /** @description Time period */
         period: 'AM' | 'PM' | 'ED'
       }
+      header?: never
       path: {
         /** @description Prison id (LEI) */
         prison: string
       }
+      cookie?: never
     }
     requestBody: {
       content: {
@@ -1553,16 +2175,15 @@ export interface operations {
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['AttendancesResponse']
         }
       }
     }
   }
-  /**
-   * Request attendance details
-   * @description Returns set of attendance details for set of booking ids
-   */
   getAttendanceForBookingsOverDateRangeByPost: {
     parameters: {
       query: {
@@ -1573,10 +2194,12 @@ export interface operations {
         /** @description Time period. Leave blank for AM + PM */
         period?: 'AM' | 'PM' | 'ED'
       }
+      header?: never
       path: {
         /** @description Prison id (LEI) */
         prison: string
       }
+      cookie?: never
     }
     requestBody: {
       content: {
@@ -1586,17 +2209,22 @@ export interface operations {
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['AttendancesResponse']
         }
       }
     }
   }
-  /**
-   * Create new attendance
-   * @description Stores new attendance record, posts attendance details back up to PNOMIS. IEP warnings are triggered when certain absence reasons are used.
-   */
   postAttendance: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     requestBody: {
       content: {
         'application/json': components['schemas']['CreateAttendanceDto']
@@ -1605,41 +2233,58 @@ export interface operations {
     responses: {
       /** @description Created */
       201: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['AttendanceDto']
         }
       }
       /** @description Invalid request. */
       400: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Requested resource not found. */
       404: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Conflict creating an attendance. */
       406: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Unrecoverable error occurred whilst processing request. */
       500: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
     }
   }
-  /**
-   * createAppointment
-   * @description Create an appointment
-   */
   createAppointment: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     requestBody: {
       content: {
         'application/json': components['schemas']['CreateAppointmentSpecification']
@@ -1648,38 +2293,50 @@ export interface operations {
     responses: {
       /** @description Created */
       201: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['CreatedAppointmentDetailsDto'][]
         }
       }
       /** @description Bad request */
       400: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['CreatedAppointmentDetailsDto'][]
         }
       }
       /** @description Unrecoverable error occurred whilst processing request. */
       500: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
     }
   }
-  /**
-   * getVideoLinkBookingRooms
-   * @description List of all the Video Link Booking rooms in the prison.
-   */
   getVideoLinkBookingRooms: {
     parameters: {
+      query?: never
+      header?: never
       path: {
         /** @description The prison */
         agencyId: string
       }
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['LocationIdAndDescription'][]
         }
@@ -1691,25 +2348,29 @@ export interface operations {
       query?: {
         maxMessages?: number
       }
+      header?: never
       path: {
         dlqName: string
       }
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           '*/*': components['schemas']['GetDlqResult']
         }
       }
     }
   }
-  /**
-   * getLocationPrefixFromGroup
-   * @description Get location prefix by group
-   */
   getLocationPrefixFromGroup: {
     parameters: {
+      query?: never
+      header?: never
       path: {
         /** @description The prison */
         agencyId: string
@@ -1719,116 +2380,91 @@ export interface operations {
          */
         group: string
       }
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description Invalid request. */
       400: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Requested resource not found. */
       404: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Unrecoverable error occurred whilst processing request. */
       500: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
     }
   }
-  /**
-   * getLocationGroup
-   * @description List of cell locations by group at agency location.
-   */
   getLocationGroup: {
     parameters: {
+      query?: never
+      header?: never
       path: {
         /** @description The prison */
         agencyId: string
         /** @description The group name */
         name: string
       }
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['Location'][]
         }
       }
       /** @description Invalid request. */
       400: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['Location'][]
         }
       }
       /** @description Requested resource not found. */
       404: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['Location'][]
         }
       }
       /** @description Unrecoverable error occurred whilst processing request. */
       500: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['Location'][]
         }
       }
     }
   }
-  /**
-   * getCellsWithCapacityForGroup
-   * @description List of cells by group at agency location which have capacity.
-   */
-  getCellsWithCapacityForGroup: {
-    parameters: {
-      query?: {
-        /** @description Cell attribute */
-        attribute?: string
-      }
-      path: {
-        /** @description The prison */
-        agencyId: string
-        /** @description The group name */
-        group: string
-      }
-    }
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          'application/json': components['schemas']['CellWithAttributes'][]
-        }
-      }
-      /** @description Invalid request. */
-      400: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Requested resource not found. */
-      404: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Unrecoverable error occurred whilst processing request. */
-      500: {
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  /**
-   * getEvents
-   * @description All scheduled events for offender.  This endpoint filters out cancelled events.
-   */
   getEvents: {
     parameters: {
       query?: {
@@ -1837,36 +2473,44 @@ export interface operations {
         /** @description Returned events must be scheduled on or before this date (in YYYY-MM-DD format).  This date must be on or after the fromDate. */
         toDate?: string
       }
+      header?: never
       path: {
         /** @example A1234AA */
         offenderNo: string
       }
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description Invalid request. */
       400: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ScheduledEventDto'][]
         }
       }
       /** @description Requested resource not found. */
       404: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ScheduledEventDto'][]
         }
       }
       /** @description Unrecoverable error occurred whilst processing request. */
       500: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ScheduledEventDto'][]
         }
       }
     }
   }
-  /**
-   * Video Link Booking Events
-   * @description Return details of Video Link Booking Events (Create, Update, Delete) in CSV format. Restrict the response to events occurring within 'days' of start-date.
-   */
   getVideoLinkBookingEvents: {
     parameters: {
       query: {
@@ -1875,24 +2519,37 @@ export interface operations {
         /** @description Return details of events occurring within this number of days of start-date */
         days?: number
       }
+      header?: never
+      path?: never
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'text/csv': string
         }
       }
     }
   }
-  /**
-   * Return all court hearing types
-   * @description Get court hearing types
-   */
   getCourtHearingTypes: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': (
             | 'APPEAL'
@@ -1925,48 +2582,63 @@ export interface operations {
       }
     }
   }
-  /**
-   * All courts
-   * @description Return information about all courts.
-   */
   getCourts: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['Court'][]
         }
       }
     }
   }
-  /**
-   * Court email address
-   * @description Return information about email address.
-   */
   getEmailByCourtId: {
     parameters: {
+      query?: never
+      header?: never
       path: {
         /** @description Court id */
         courtId: string
       }
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['CourtEmailDto']
         }
       }
     }
   }
-  /**
-   * All court hearing types
-   * @description Return a list of all court hearing types.
-   */
   getCourtHearingTypes_1: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': (
             | 'APPEAL'
@@ -1999,53 +2671,67 @@ export interface operations {
       }
     }
   }
-  /**
-   * Return all court locations
-   * @description All court locations
-   */
   getCourtNames: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['CourtLocationsResponse']
         }
       }
     }
   }
-  /** @description Return cell move reason */
   getCellMoveReason: {
     parameters: {
+      query?: never
+      header?: never
       path: {
         bookingId: number
         bedAssignmentId: number
       }
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description Invalid request. */
       400: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['CellMoveReasonResponse']
         }
       }
       /** @description Requested resource not found. */
       404: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Unrecoverable error occurred whilst processing request. */
       500: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
     }
   }
-  /**
-   * Request attendance details
-   * @description Returns set of attendance details
-   */
   getAttendanceForEventLocation: {
     parameters: {
       query: {
@@ -2054,26 +2740,28 @@ export interface operations {
         /** @description Time period */
         period: 'AM' | 'PM' | 'ED'
       }
+      header?: never
       path: {
         /** @description Prison id (LEI) */
         prison: string
         /** @description Location id of event */
         'event-location': number
       }
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['AttendancesResponse']
         }
       }
     }
   }
-  /**
-   * Request unaccounted for prisoners
-   * @description Return a set of prisoners that haven't attended a scheduled activity
-   */
   getPrisonersUnaccountedFor: {
     parameters: {
       query: {
@@ -2082,24 +2770,26 @@ export interface operations {
         /** @description Time period */
         period: 'AM' | 'PM' | 'ED'
       }
+      header?: never
       path: {
         /** @description Prison id (LEI) */
         prison: string
       }
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ScheduledResponse']
         }
       }
     }
   }
-  /**
-   * Request absences details
-   * @description Returns set of attendance details for attendances with an absent reason
-   */
   getAbsences: {
     parameters: {
       query: {
@@ -2108,24 +2798,26 @@ export interface operations {
         /** @description Time period */
         period: 'AM' | 'PM' | 'ED'
       }
+      header?: never
       path: {
         /** @description Prison id (LEI) */
         prison: string
       }
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['AttendancesResponse']
         }
       }
     }
   }
-  /**
-   * Request absences
-   * @description Return a set of absences for all offenders that have scheduled activity
-   */
   getAbsencesForReason: {
     parameters: {
       query: {
@@ -2136,6 +2828,7 @@ export interface operations {
         /** @description Time period */
         period?: 'AM' | 'PM' | 'ED'
       }
+      header?: never
       path: {
         /** @description Prison id (LEI) */
         prison: string
@@ -2152,20 +2845,21 @@ export interface operations {
           | 'Refused'
           | 'RefusedIncentiveLevelWarning'
       }
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['AbsencesResponse']
         }
       }
     }
   }
-  /**
-   * Request unacceptable absence details
-   * @description Returns unacceptable absence attendance details for an offender
-   */
   getAttendanceDetailsForOffender: {
     parameters: {
       query: {
@@ -2175,21 +2869,26 @@ export interface operations {
         toDate: string
         pageable: components['schemas']['Pageable']
       }
+      header?: never
       path: {
         /** @description offender or Prison number or Noms id */
         offenderNo: string
       }
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['PageAttendanceHistoryDto']
         }
       }
     }
   }
-  /** @description Return counts of unacceptable absences and totals over time for an offender */
   getAttendanceSummary: {
     parameters: {
       query: {
@@ -2198,21 +2897,26 @@ export interface operations {
         /** @description End date of range to summarise in format YYYY-MM-DD */
         toDate: string
       }
+      header?: never
       path: {
         /** @description offender or Prison number or Noms id */
         offenderNo: string
       }
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['AttendanceSummary']
         }
       }
     }
   }
-  /** @description Return all changes relating to an attendance */
   getAttendanceChanges: {
     parameters: {
       query: {
@@ -2221,20 +2925,23 @@ export interface operations {
         /** @description Date and Time of the change in format YYYY-MM-DDT:09:45 */
         toDateTime?: string
       }
+      header?: never
+      path?: never
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['AttendanceChangesResponse']
         }
       }
     }
   }
-  /**
-   * Request attendance statistics
-   * @description Request attendance statistics
-   */
   getAttendanceForEventLocation_1: {
     parameters: {
       query: {
@@ -2245,24 +2952,26 @@ export interface operations {
         /** @description To date of event in format YYYY-MM-DD */
         toDate: string
       }
+      header?: never
       path: {
         /** @description Prison id (LEI) */
         prison: string
       }
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['Stats']
         }
       }
     }
   }
-  /**
-   * getAppointments
-   * @description List of appointments for the given agency that match the search criteria.
-   */
   getAppointments: {
     parameters: {
       query: {
@@ -2278,158 +2987,209 @@ export interface operations {
         /** @description Location id */
         locationId?: number
       }
+      header?: never
       path: {
         /** @description The agency Id */
         agencyId: string
       }
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['AppointmentSearchDto'][]
         }
       }
       /** @description Invalid request. */
       400: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Unrecoverable error occurred whilst processing request. */
       500: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
     }
   }
-  /**
-   * getAppointment
-   * @description Return appointment details
-   */
   getAppointment: {
     parameters: {
+      query?: never
+      header?: never
       path: {
         id: number
       }
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['AppointmentDetailsDto']
         }
       }
       /** @description Appointment not found. */
       404: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Unrecoverable error occurred whilst processing request. */
       500: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
     }
   }
-  /**
-   * deleteAppointment
-   * @description Delete an appointment
-   */
   deleteAppointment: {
     parameters: {
+      query?: never
+      header?: never
       path: {
         id: number
       }
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description Appointment not found. */
       404: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Unrecoverable error occurred whilst processing request. */
       500: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
     }
   }
-  /**
-   * getWhereabouts
-   * @description Whereabouts details (e.g. whether enabled) for prison.
-   */
   getWhereabouts: {
     parameters: {
+      query?: never
+      header?: never
       path: {
         /** @description The prison */
         agencyId: string
       }
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['WhereaboutsConfig']
         }
       }
       /** @description Invalid request. */
       400: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['WhereaboutsConfig']
         }
       }
       /** @description Requested resource not found. */
       404: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['WhereaboutsConfig']
         }
       }
       /** @description Unrecoverable error occurred whilst processing request. */
       500: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['WhereaboutsConfig']
         }
       }
     }
   }
-  /**
-   * getAvailableLocationGroups
-   * @description List of all available Location Groups at agency.
-   */
   getAvailableLocationGroups: {
     parameters: {
+      query?: never
+      header?: never
       path: {
         /** @description The prison */
         agencyId: string
       }
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['LocationGroup'][]
         }
       }
       /** @description Invalid request. */
       400: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Requested resource not found. */
       404: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Unrecoverable error occurred whilst processing request. */
       500: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
@@ -2437,35 +3197,51 @@ export interface operations {
     }
   }
   reasons: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['AbsentReasonsDto']
         }
       }
     }
   }
-  /**
-   * deleteRecurringAppointmentSequence
-   * @description Delete the whole sequence of a recurring appointment
-   */
   deleteRecurringAppointmentSequence: {
     parameters: {
+      query?: never
+      header?: never
       path: {
         /** @description The id of the recurring appointment sequence. */
         id: number
       }
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description Recurring appointment sequence not found. */
       404: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Unrecoverable error occurred whilst processing request. */
       500: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
