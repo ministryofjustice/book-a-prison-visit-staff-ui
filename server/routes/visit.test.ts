@@ -191,12 +191,12 @@ describe('/visit/:reference', () => {
           expect($('[data-test="visit-event-2"]').text()).toBe('Updated')
           expect($('[data-test="visit-actioned-by-2"]').text().trim().replace(/\s+/g, ' ')).toBe('by User Two')
           expect($('[data-test="visit-event-date-time-2"]').text()).toBe('Saturday 1 January 2022 at 10am')
-          expect($('[data-test="visit-request-method-2"]').text()).toBe('Request method: Email')
+          expect($('[data-test="visit-request-method-2"]').text()).toBe('Method: Email request')
           // third event
           expect($('[data-test="visit-event-3"]').text()).toBe('Booked')
           expect($('[data-test="visit-actioned-by-3"]').text().trim().replace(/\s+/g, ' ')).toBe('by User One')
           expect($('[data-test="visit-event-date-time-3"]').text()).toBe('Saturday 1 January 2022 at 9am')
-          expect($('[data-test="visit-request-method-3"]').text()).toBe('Request method: Phone call')
+          expect($('[data-test="visit-request-method-3"]').text()).toBe('Method: Phone booking')
 
           expect(visitSessionData).toEqual({ prisoner: undefined })
 
