@@ -130,7 +130,7 @@ export default class SelectVisitors {
       const adults = req.session.visitorList.visitors
         .filter((visitor: VisitorListItem) => selected.includes(visitor.personId.toString()))
         .reduce((count: number, visitor: VisitorListItem) => {
-          return visitor.adult ?? true ? count + 1 : count
+          return (visitor.adult ?? true) ? count + 1 : count
         }, 0)
 
       if (adults === 0) {
