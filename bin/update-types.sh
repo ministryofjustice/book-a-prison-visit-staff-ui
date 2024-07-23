@@ -40,10 +40,11 @@ echo $APIS | jq -c '.apis[]' | while read API; do
 
   npx openapi-typescript $API_URL --output "./server/@types/$API_NAME.d.ts"
 
-  echo "..tidying up..."
-  sed -i '' 's/^export interface external {}$/\/\/ eslint-disable-next-line @typescript-eslint\/no-empty-interface\n&/'  "./server/@types/$API_NAME.d.ts"
-  npx eslint  "./server/@types/$API_NAME.d.ts" --fix
+  npx prettier "./server/@types/$API_NAME.d.ts" --write
+  npx eslint "./server/@types/$API_NAME.d.ts" --fix
+
 done
 
-echo "\nNow running type check:"
+echo "\nNow running lint and type check:"
+npm run lint
 npm run typecheck

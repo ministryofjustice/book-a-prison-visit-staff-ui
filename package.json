@@ -169,7 +169,7 @@
     "mocha-junit-reporter": "^2.2.1",
     "nock": "^13.5.4",
     "nodemon": "^3.1.4",
-    "openapi-typescript": "^6.7.6",
+    "openapi-typescript": "^7.1.0",
     "prettier": "^3.3.3",
     "prettier-plugin-jinja-template": "^1.4.1",
     "sass": "^1.77.8",

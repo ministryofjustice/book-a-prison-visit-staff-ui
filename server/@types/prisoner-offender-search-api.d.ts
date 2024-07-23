@@ -3,372 +3,625 @@
  * Do not make direct changes to the file.
  */
 
-/** WithRequired type helpers */
-type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] }
-
 export interface paths {
   '/restricted-patient-search/match-restricted-patients': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
     /**
      * Match prisoners by criteria
      * @description Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role
      */
     post: operations['findByCriteria']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/prisoner-search/release-date-by-prison': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
     /**
      * Match prisoners who have a release date within a range, and optionally by prison
      * @description Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role
      */
     post: operations['findByReleaseDateAndPrison']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/prisoner-search/prisoner-numbers': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
     /**
      * Match prisoners by a list of prisoner numbers
-     * @description Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role
+     * @description Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role or PRISONER_SEARCH__PRISONER__RO
      */
     post: operations['findByNumbers']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/prisoner-search/possible-matches': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
     /**
      * Search for possible matches by criteria
      * @description Search by prison number, PNC number, and/or name and date of birth, returning collated results by order of search.
-     *        This will also search aliases for possible matches.
-     *        Use when there is manual input, e.g. a user can select the correct match from search results.
-     *        Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.
+     *            This will also search aliases for possible matches.
+     *            Use when there is manual input, e.g. a user can select the correct match from search results.
+     *            Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.
+     *
      */
     post: operations['findPossibleMatchesBySearchCriteria']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/prisoner-search/match': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
     /**
      * Match prisoners by criteria, to search across a list of specific prisons use /match-prisoners
      * @deprecated
      * @description Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role
      */
     post: operations['findByCriteria_1']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/prisoner-search/match-prisoners': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
     /**
      * Match prisoners by criteria
      * @description Search by prisoner identifier or name and returning results for the criteria matched first.
-     *         Typically used when the matching data is of high quality where the first match is expected to be a near perfect match.
-     *         Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.
+     *             Typically used when the matching data is of high quality where the first match is expected to be a near perfect match.
+     *             Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.
+     *
      */
     post: operations['findByCriteria_2']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/prisoner-search/booking-ids': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
     /**
      * Match prisoners by a list of booking ids
      * @description Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role
      */
     post: operations['findByIds']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/prisoner-detail': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
     /**
      * Find prisoners by exact or wildcard terms for specified fields and return a paginated result set
      * @description Search terms and identifiers can be provided in either or mixed case and are converted to the appropriate case.
-     *       This endpoint will find both exact values (full term matched) or wildcards supporting the '*' and '?' symbols.
-     *       The '*' symbol will match any number of characters e.g. firstName='J*' will match 'John', 'Jane', and 'James'.
-     *       The '?' symbol will match any letter substituted at that position. e.g. firstName='t?ny' will match 'Tony' and 'Tiny'
-     *       Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.
+     *           This endpoint will find both exact values (full term matched) or wildcards supporting the '*' and '?' symbols.
+     *           The '*' symbol will match any number of characters e.g. firstName='J*' will match 'John', 'Jane', and 'James'.
+     *           The '?' symbol will match any letter substituted at that position. e.g. firstName='t?ny' will match 'Tony' and 'Tiny'
+     *           Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.
+     *
      */
     post: operations['prisonerDetailSearch']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/physical-detail': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
     /**
      * *** BETA *** Physical details search for prisoners within a prison / group of prisons - returns a paginated result set
      * @description BETA endpoint - subject to change. Search by physical details.
-     *       If a cell location is provided then only one prison can be supplied, otherwise multiple prisons are allowed.
-     *       If lenient is set to false (default) then all supplied physical details must match in order for results to be returned.
-     *       If lenient is set to true then at least one physical detail must match.
-     *       Searches will return results for partial string matches, so searching for an ethnicity of white will return all
-     *       prisoners with ethnicity of White: Eng./Welsh/Scot./N.Irish/British, White: Irish etc.
-     *       Results are ordered so that prisoners that match the most criteria are returned first, then secondary order is by
-     *       prisoner number.
-     *       Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.
+     *           If a cell location is provided then only one prison can be supplied, otherwise multiple prisons are allowed.
+     *           If lenient is set to false (default) then all supplied physical details must match in order for results to be returned.
+     *           If lenient is set to true then at least one physical detail must match.
+     *           Searches will return results for partial string matches, so searching for an ethnicity of white will return all
+     *           prisoners with ethnicity of White: Eng./Welsh/Scot./N.Irish/British, White: Irish etc.
+     *           Results are ordered so that prisoners that match the most criteria are returned first, then secondary order is by
+     *           prisoner number.
+     *           Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.
+     *
      */
     post: operations['prisonerDetailSearch_1']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/match-prisoners': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
     /**
      * Match for an prisoner by criteria
      * @description This is a more lenient version to other match endpoints that includes alias and fuzzy date of birth matching.
-     *        It will return the best group of matching prisoners based on the request
-     *        Specify the request criteria to match against.
-     *        Role required is ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH.
+     *            It will return the best group of matching prisoners based on the request
+     *            Specify the request criteria to match against.
+     *            Role required is ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH.
+     *
      */
     post: operations['matchPrisoners']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/keyword': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
     /**
      * Search for prisoners by keyword or identifiers within a list of prisons and return a paginated result set
      * @description Words and identifiers can be provided in either or mixed case and will be matched against all indexed text and keyword fields.
-     *       Identifiers within the [and, or, not, exact] terms are detected and converted to the appropriate case.
-     *       Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.
+     *           Identifiers within the [and, or, not, exact] terms are detected and converted to the appropriate case.
+     *           Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.
+     *
      */
     post: operations['keywordSearch']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/global-search': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
     /**
      * Match prisoners by criteria
-     * @description Requires ROLE_GLOBAL_SEARCH role or ROLE_PRISONER_SEARCH role
+     * @description Requires ROLE_GLOBAL_SEARCH role or ROLE_PRISONER_SEARCH role or PRISONER_SEARCH__PRISONER__RO
      */
     post: operations['globalFindByCriteria']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/attribute-search': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
     /**
      * *** BETA *** Search for prisoners by attributes
      * @description <p>This endpoint allows you to create queries over all attributes from the <em>Prisoner</em> record. Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.</p>
-     *       <p>The request contains a list of queries to search on one or more attributes using a list of matchers. For example attribute "lastName""
-     *       requires a <em>StringMatcher</em> so we can query on <strong>"lastName IS Smith"</strong>. Other type matchers include <em>IntMatcher</em>, <em>BooleanMatcher</em>,
-     *       <em>DateMatcher</em> and <em>DateTimeMatcher</em>.
-     *       </p>
-     *       <p>Each query can also contain a list of sub-queries. Each sub-query can be considered as a separate query in brackets.
-     *       Combining multiple sub-queries gives us the ability to create complex searches using any combination of a prisoner's
-     *       attributes. For example we can model nested queries such as <strong>"lastName IS Smith AND (prisonId IS MDI OR (prisonId IS OUT AND lastPrisonId IS MDI))"</strong>.
-     *       </p>
-     *       <p>To find all attributes that can be searched for please refer to the <em>Prisoner</em> record or get them from endpoint <a target="_blank" href="/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config#/Attribute search/getAttributes"><strong>GET /attribute-search/attributes</strong></a>. Attributes from lists can be
-     *       searched for with dot notation, e.g. <strong>"attribute=aliases.firstName"</strong> or <strong>"attribute=tattoos.bodyPart"</strong>.
-     *       Attributes from complex objects can also be searched for with dot notation, e.g. <strong>"attribute=currentIncentive.level.code"</strong>.
-     *       </p>
-     *       <p>Note that when searching lists of complex objects (e.g. aliases, alerts, tattoos) if you want to search for multiple attributes within the same object then you need
-     *       to include them in the same query. For example, to search for alias "John Smith" you should search for <strong>aliases.firstName IS "John"</strong> and <strong>aliases.lastName IS "Smith"</strong> using string matchers in the same query.
-     *       If you search for them in different queries you will receive anyone with firstName John and also anyone with lastName Smith.
-     *       </p>
-     *       <p>Many attributes contain reference data restricted to a fixed list of values. For example, attribute "inOutStatus" only contains values "IN", "OUT" and "TRN".
-     *       To find which attributes use reference data and to fetch the possible attribute values see the endpoint <a target="_blank" href="/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config#/Reference data/referenceData"><strong>GET /reference-data/{attribute}</strong></a>.
-     *       </p>
-     *       <p>String attributes support advanced search techniques such as <a href="https://opensearch.org/docs/latest/query-dsl/term/fuzzy/">fuzzy search</a> matching and <a href="https://opensearch.org/docs/latest/query-dsl/term/wildcard/">wildcard search</a>. All String searches are case-insensitive.
-     *       <ul>
-     *         <li>IS and IS_NOT require an exact match (wildcards ? and * will not work). E.g. If religion is "Christian" then <strong>"religion IS Christian"</strong> will match but <strong>"religion IS Christ*"</strong> will not.</li>
-     *         <li>For IS and CONTAINS some attributes support fuzzy matching e.g. they allow spelling mistakes. Call endpoint <strong>GET /attribute-search/attributes</strong> to see which attributes support fuzzy matching. E.g. If firstName is "Jonathan" then <strong>"firstName IS Johnathon"</strong> or <strong>"firstName CONTAINS Johnathon"</strong> will match.</li>
-     *         <li>CONTAINS without wildcards (? and *) for a non-fuzzy attribute looks for the exact search term anywhere in the attribute value. E.g. If religion is "Christian" then <strong>"religion CONTAINS ist"</strong> will match.</li>
-     *         <li>CONTAINS with wildcards ? (single character) and/or * (zero to many characters) perform a wildcard search which must match the entire attribute value. E.g. If firstName is "Jonathan" then <strong>"firstName CONTAINS Jon*"</strong> will match but <strong>"firstName CONTAINS nath*"</strong> will not.</li>
-     *         <li>STARTSWITH checks only the prefix of the attribute value and does not support fuzzy matching or wildcards. E.g.If firstName is "Jonathan" then <strong>"firstName STARTSWITH Jon"</strong> will match but <strong>"firstName STARTSWITH Jon*"</strong> will not.</li>
-     *         <li>IN checks that the attribute value is any of the list of Strings provided in the search term. The search term should be a comma separated list of Strings to search, E.g. "searchValue1,searchValue2,searchValue3". This only matches exactly - no fuzzy search, wildcards or case-insensitive search is supported by OpenSearch. E.g.If firstName is "Jonathan" then <strong>"firstName IN 'Jonathan,Bob,Chris'"</strong> will match but <strong>"firstName IN 'Adrian,Bob,Chris'"</strong> will not.</li>
-     *       </ul>
-     *       </p>
-     *       <p>To assist with debugging queries we publish events in App Insights. To search in App Insights Log Analytics run query:
-     *       <pre>
-     *         AppEvents
-     *         | where Name == 'POSAttributeSearch'
-     *       </pre>
-     *       </p>
-     *       <h3>Example Requests</h3>
-     *       <p>Note that the default "joinType" is "AND" so it could be omitted from the examples below (but is included for clarity).</p>
-     *       <h4>Search for all prisoners in Moorland with a height between 150 and 180cm</h4>
-     *       <br/>
-     *       Query: <strong>"prisonId = "MDI" AND (heightCentimetres >= 150 AND heightCentimetres <= 180)"</strong>
-     *       <br/>
-     *       JSON request:
-     *       <br/>
-     *       <pre>
-     *         {
-     *           "joinType": "AND",
-     *           "queries": [
+     *           <p>The request contains a list of queries to search on one or more attributes using a list of matchers. For example attribute "lastName""
+     *           requires a <em>StringMatcher</em> so we can query on <strong>"lastName IS Smith"</strong>. Other type matchers include <em>IntMatcher</em>, <em>BooleanMatcher</em>,
+     *           <em>DateMatcher</em> and <em>DateTimeMatcher</em>.
+     *           </p>
+     *           <p>Each query can also contain a list of sub-queries. Each sub-query can be considered as a separate query in brackets.
+     *           Combining multiple sub-queries gives us the ability to create complex searches using any combination of a prisoner's
+     *           attributes. For example we can model nested queries such as <strong>"lastName IS Smith AND (prisonId IS MDI OR (prisonId IS OUT AND lastPrisonId IS MDI))"</strong>.
+     *           </p>
+     *           <p>To find all attributes that can be searched for please refer to the <em>Prisoner</em> record or get them from endpoint <a target="_blank" href="/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config#/Attribute search/getAttributes"><strong>GET /attribute-search/attributes</strong></a>. Attributes from lists can be
+     *           searched for with dot notation, e.g. <strong>"attribute=aliases.firstName"</strong> or <strong>"attribute=tattoos.bodyPart"</strong>.
+     *           Attributes from complex objects can also be searched for with dot notation, e.g. <strong>"attribute=currentIncentive.level.code"</strong>.
+     *           </p>
+     *           <p>Note that when searching lists of complex objects (e.g. aliases, alerts, tattoos) if you want to search for multiple attributes within the same object then you need
+     *           to include them in the same query. For example, to search for alias "John Smith" you should search for <strong>aliases.firstName IS "John"</strong> and <strong>aliases.lastName IS "Smith"</strong> using string matchers in the same query.
+     *           If you search for them in different queries you will receive anyone with firstName John and also anyone with lastName Smith.
+     *           </p>
+     *           <p>Many attributes contain reference data restricted to a fixed list of values. For example, attribute "inOutStatus" only contains values "IN", "OUT" and "TRN".
+     *           To find which attributes use reference data and to fetch the possible attribute values see the endpoint <a target="_blank" href="/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config#/Reference data/referenceData"><strong>GET /reference-data/{attribute}</strong></a>.
+     *           </p>
+     *           <p>String attributes support advanced search techniques such as <a href="https://opensearch.org/docs/latest/query-dsl/term/fuzzy/">fuzzy search</a> matching and <a href="https://opensearch.org/docs/latest/query-dsl/term/wildcard/">wildcard search</a>. All String searches are case-insensitive.
+     *           <ul>
+     *             <li>IS and IS_NOT require an exact match (wildcards ? and * will not work). E.g. If religion is "Christian" then <strong>"religion IS Christian"</strong> will match but <strong>"religion IS Christ*"</strong> will not.</li>
+     *             <li>For IS and CONTAINS some attributes support fuzzy matching e.g. they allow spelling mistakes. Call endpoint <strong>GET /attribute-search/attributes</strong> to see which attributes support fuzzy matching. E.g. If firstName is "Jonathan" then <strong>"firstName IS Johnathon"</strong> or <strong>"firstName CONTAINS Johnathon"</strong> will match.</li>
+     *             <li>CONTAINS without wildcards (? and *) for a non-fuzzy attribute looks for the exact search term anywhere in the attribute value. E.g. If religion is "Christian" then <strong>"religion CONTAINS ist"</strong> will match.</li>
+     *             <li>CONTAINS with wildcards ? (single character) and/or * (zero to many characters) perform a wildcard search which must match the entire attribute value. E.g. If firstName is "Jonathan" then <strong>"firstName CONTAINS Jon*"</strong> will match but <strong>"firstName CONTAINS nath*"</strong> will not.</li>
+     *             <li>STARTSWITH checks only the prefix of the attribute value and does not support fuzzy matching or wildcards. E.g.If firstName is "Jonathan" then <strong>"firstName STARTSWITH Jon"</strong> will match but <strong>"firstName STARTSWITH Jon*"</strong> will not.</li>
+     *             <li>IN checks that the attribute value is any of the list of Strings provided in the search term. The search term should be a comma separated list of Strings to search, E.g. "searchValue1,searchValue2,searchValue3". This only matches exactly - no fuzzy search, wildcards or case-insensitive search is supported by OpenSearch. E.g.If firstName is "Jonathan" then <strong>"firstName IN 'Jonathan,Bob,Chris'"</strong> will match but <strong>"firstName IN 'Adrian,Bob,Chris'"</strong> will not.</li>
+     *           </ul>
+     *           </p>
+     *           <p>To assist with debugging queries we publish events in App Insights. To search in App Insights Log Analytics run query:
+     *           <pre>
+     *             AppEvents
+     *             | where Name == 'POSAttributeSearch'
+     *           </pre>
+     *           </p>
+     *           <h3>Example Requests</h3>
+     *           <p>Note that the default "joinType" is "AND" so it could be omitted from the examples below (but is included for clarity).</p>
+     *           <h4>Search for all prisoners in Moorland with a height between 150 and 180cm</h4>
+     *           <br/>
+     *           Query: <strong>"prisonId = "MDI" AND (heightCentimetres >= 150 AND heightCentimetres <= 180)"</strong>
+     *           <br/>
+     *           JSON request:
+     *           <br/>
+     *           <pre>
      *             {
      *               "joinType": "AND",
-     *               "matchers": [
-     *                 {
-     *                   "type": "String",
-     *                   "attribute": "prisonId",
-     *                   "condition": "IS",
-     *                   "searchTerm": "MDI"
-     *                 },
-     *                 {
-     *                   "type": "Int",
-     *                   "attribute": "heightCentimetres",
-     *                   "minValue": 150,
-     *                   "maxValue": 180
-     *                 }
-     *               ]
-     *             }
-     *           ]
-     *         }
-     *       </pre>
-     *       <br/>
-     *       <h4>Search for all prisoners in a list of cells in Moorland</h4>
-     *       Query: <strong>"prisonId = "MDI" AND cellLocation IN (1-2-001, 1-3-014, 3-1-020)</strong>
-     *       <br/>
-     *       JSON request:
-     *       <br/>
-     *       <pre>
-     *         {
-     *           "joinType": "AND",
-     *           "queries": [
-     *             {
-     *               "joinType": "AND",
-     *               "matchers": [
-     *                 {
-     *                   "type": "String",
-     *                   "attribute": "prisonId",
-     *                   "condition": "IS",
-     *                   "searchTerm": "MDI"
-     *                 },
-     *                 {
-     *                   "type": "String",
-     *                   "attribute": "cellLocation",
-     *                   "condition": "IN",
-     *                   "searchTerm": "1-2-001,1-3-014,3-1-020"
-     *                 }
-     *               ]
-     *             }
-     *           ]
-     *         }
-     *       </pre>
-     *       <br/>
-     *       <h4>Search for all prisoners received since 1st Jan 2024 with a dragon tattoo on either their arm or shoulder</h4>
-     *       <br/>
-     *       Query: <strong>"(receptionDate >= 2024-01-01) AND ((tattoos.bodyPart = "arm" AND tattoos.comment CONTAINS "dragon" ) OR (tattoos.bodyPart = "shoulder" AND tattoos.comment CONTAINS "dragon"))"</strong>
-     *       <br/>
-     *       JSON request:
-     *       <br/>
-     *       <pre>
-     *         {
-     *           "joinType": "AND",
-     *           "queries": [
-     *             {
-     *               "matchers": [
-     *                 {
-     *                   "type": "Date",
-     *                   "attribute": "receptionDate",
-     *                   "minValue": "2024-01-01"
-     *                 }
-     *               ]
-     *             },
-     *             {
-     *               "joinType": "OR",
-     *               "subQueries": [
+     *               "queries": [
      *                 {
      *                   "joinType": "AND",
      *                   "matchers": [
      *                     {
      *                       "type": "String",
-     *                       "attribute": "tattoos.bodyPart",
+     *                       "attribute": "prisonId",
      *                       "condition": "IS",
-     *                       "searchTerm": "arm"
+     *                       "searchTerm": "MDI"
      *                     },
      *                     {
-     *                       "type": "String",
-     *                       "attribute": "tattoos.comment",
-     *                       "condition": "CONTAINS",
-     *                       "searchTerm": "dragon"
-     *                     }
-     *                   ]
-     *                 },
-     *                 {
-     *                   "joinType": "AND",
-     *                   "matchers": [
-     *                     {
-     *                       "type": "String",
-     *                       "attribute": "tattoos.bodyPart",
-     *                       "condition": "IS",
-     *                       "searchTerm": "shoulder"
-     *                     },
-     *                     {
-     *                       "type": "String",
-     *                       "attribute": "tattoos.comment",
-     *                       "condition": "CONTAINS",
-     *                       "searchTerm": "dragon"
+     *                       "type": "Int",
+     *                       "attribute": "heightCentimetres",
+     *                       "minValue": 150,
+     *                       "maxValue": 180
      *                     }
      *                   ]
      *                 }
      *               ]
      *             }
-     *           ]
-     *         }
-     *       </pre>
+     *           </pre>
+     *           <br/>
+     *           <h4>Search for all prisoners in a list of cells in Moorland</h4>
+     *           Query: <strong>"prisonId = "MDI" AND cellLocation IN (1-2-001, 1-3-014, 3-1-020)</strong>
+     *           <br/>
+     *           JSON request:
+     *           <br/>
+     *           <pre>
+     *             {
+     *               "joinType": "AND",
+     *               "queries": [
+     *                 {
+     *                   "joinType": "AND",
+     *                   "matchers": [
+     *                     {
+     *                       "type": "String",
+     *                       "attribute": "prisonId",
+     *                       "condition": "IS",
+     *                       "searchTerm": "MDI"
+     *                     },
+     *                     {
+     *                       "type": "String",
+     *                       "attribute": "cellLocation",
+     *                       "condition": "IN",
+     *                       "searchTerm": "1-2-001,1-3-014,3-1-020"
+     *                     }
+     *                   ]
+     *                 }
+     *               ]
+     *             }
+     *           </pre>
+     *           <br/>
+     *           <h4>Search for all prisoners received since 1st Jan 2024 with a dragon tattoo on either their arm or shoulder</h4>
+     *           <br/>
+     *           Query: <strong>"(receptionDate >= 2024-01-01) AND ((tattoos.bodyPart = "arm" AND tattoos.comment CONTAINS "dragon" ) OR (tattoos.bodyPart = "shoulder" AND tattoos.comment CONTAINS "dragon"))"</strong>
+     *           <br/>
+     *           JSON request:
+     *           <br/>
+     *           <pre>
+     *             {
+     *               "joinType": "AND",
+     *               "queries": [
+     *                 {
+     *                   "matchers": [
+     *                     {
+     *                       "type": "Date",
+     *                       "attribute": "receptionDate",
+     *                       "minValue": "2024-01-01"
+     *                     }
+     *                   ]
+     *                 },
+     *                 {
+     *                   "joinType": "OR",
+     *                   "subQueries": [
+     *                     {
+     *                       "joinType": "AND",
+     *                       "matchers": [
+     *                         {
+     *                           "type": "String",
+     *                           "attribute": "tattoos.bodyPart",
+     *                           "condition": "IS",
+     *                           "searchTerm": "arm"
+     *                         },
+     *                         {
+     *                           "type": "String",
+     *                           "attribute": "tattoos.comment",
+     *                           "condition": "CONTAINS",
+     *                           "searchTerm": "dragon"
+     *                         }
+     *                       ]
+     *                     },
+     *                     {
+     *                       "joinType": "AND",
+     *                       "matchers": [
+     *                         {
+     *                           "type": "String",
+     *                           "attribute": "tattoos.bodyPart",
+     *                           "condition": "IS",
+     *                           "searchTerm": "shoulder"
+     *                         },
+     *                         {
+     *                           "type": "String",
+     *                           "attribute": "tattoos.comment",
+     *                           "condition": "CONTAINS",
+     *                           "searchTerm": "dragon"
+     *                         }
+     *                       ]
+     *                     }
+     *                   ]
+     *                 }
+     *               ]
+     *             }
+     *           </pre>
+     *
      */
     post: operations['attributeSearch']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/reference-data/{attribute}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * *** BETA *** Reference data search
      * @description BETA endpoint - reference data returned reflects the data assigned to prisoners
-     *       rather than all the possible values.  Only to be used for searching existing data purposes.
-     *       This method will also cache all reference data results for an hour and any new data will only appear after an hour.
-     *       Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.
+     *           rather than all the possible values.  Only to be used for searching existing data purposes.
+     *           This method will also cache all reference data results for an hour and any new data will only appear after an hour.
+     *           Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.
+     *
      */
     get: operations['referenceData']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/reference-data/alerts/types': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * *** BETA *** Alerts reference data
      * @description BETA endpoint - alerts reference data returned reflects the data assigned to prisoners
-     *       rather than all the possible values.  Only to be used for searching existing data purposes.
-     *       This method will also cache all reference data results for an hour and any new data will only appear after an hour.
-     *       Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.
+     *           rather than all the possible values.  Only to be used for searching existing data purposes.
+     *           This method will also cache all reference data results for an hour and any new data will only appear after an hour.
+     *           Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.
+     *
      */
     get: operations['alertsReferenceData']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/prisoner/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * Get prisoner by prisoner number (AKA NOMS number)
-     * @description Requires ROLE_PRISONER_SEARCH or ROLE_VIEW_PRISONER_DATA role
+     * @description Requires  ROLE_PRISONER_SEARCH or ROLE_VIEW_PRISONER_DATA role or PRISONER_SEARCH__PRISONER__RO
      */
     get: operations['findByPrisonNumber']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/prisoner-search/prison/{prisonId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * Get all prisoners in a prison, including restricted patients supported by a POM
      * @description Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role
      */
     get: operations['findByPrison']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/prison/{prisonId}/prisoners': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * Search for prisoners within a particular prison establishment
      * @description This search is optimised for clients that have a simple search term typically containing the prisoner's name
-     *       or prisoner number. The user typically is certain the prisoner is within the establishment and knows key information
-     *       about the prisoner.
+     *           or prisoner number. The user typically is certain the prisoner is within the establishment and knows key information
+     *           about the prisoner.
      *
-     *       Requires ROLE_PRISONER_IN_PRISON_SEARCH or ROLE_PRISONER_SEARCH role.
+     *           Requires ROLE_PRISONER_IN_PRISON_SEARCH or ROLE_PRISONER_SEARCH role.
      *
-     *       Sort fields supported are: firstName, lastName, prisonerNumber, dateOfBirth, cellLocation e.g "sort=firstName,lastName,desc"
+     *           Sort fields supported are: firstName, lastName, prisonerNumber, dateOfBirth, cellLocation e.g "sort=firstName,lastName,desc"
      *
-     *       Examples:
+     *           Examples:
      *
-     *       "/prison/BXI/prisoners?term=John&sort=firstName,lastName,desc&page=2&size=20"
-     *       This will return all people in HMP Brixton whose first or last names begins with JOHN.
-     *       Results will be ordered by firstName, lastName descending.
-     *       Page 3 will be returned with a maximum of 20 results per page.
+     *           "/prison/BXI/prisoners?term=John&sort=firstName,lastName,desc&page=2&size=20"
+     *           This will return all people in HMP Brixton whose first or last names begins with JOHN.
+     *           Results will be ordered by firstName, lastName descending.
+     *           Page 3 will be returned with a maximum of 20 results per page.
      *
-     *       "/prison/WWI/prisoners?sort=cellLocation"
-     *       This will return all people in HMP Wandsworth.
-     *       Results will be ordered by cell location ascending.
-     *       Page 1 will be returned with a maximum of 10 results per page.
+     *           "/prison/WWI/prisoners?sort=cellLocation"
+     *           This will return all people in HMP Wandsworth.
+     *           Results will be ordered by cell location ascending.
+     *           Page 1 will be returned with a maximum of 10 results per page.
      *
-     *       "/prison/WWI/prisoners?cellLocationPrefix=WWI-2&term=smith"
-     *       "/prison/WWI/prisoners?cellLocationPrefix=2&term=smith"
-     *       This will return all people in HMP Wandsworth block 2 whose name starts with SMITH.
+     *           "/prison/WWI/prisoners?cellLocationPrefix=WWI-2&term=smith"
+     *           "/prison/WWI/prisoners?cellLocationPrefix=2&term=smith"
+     *           This will return all people in HMP Wandsworth block 2 whose name starts with SMITH.
      *
-     *       "/prison/WWI/prisoners?cellLocationPrefix=2-A-3-001"
-     *       This will return all people in HMP Wandsworth cell WWI-2-A-3-001
+     *           "/prison/WWI/prisoners?cellLocationPrefix=2-A-3-001"
+     *           This will return all people in HMP Wandsworth cell WWI-2-A-3-001
      *
-     *       "/prison/WWI/prisoners?term=A1234KJ"
-     *       "/prison/WWI/prisoners?term=A1234KJ bananas"
-     *       This will return the single prisoner with prisoner number A1234KJ in HMP Wandsworth.
-     *       An empty page will be returned if not found.
+     *           "/prison/WWI/prisoners?term=A1234KJ"
+     *           "/prison/WWI/prisoners?term=A1234KJ bananas"
+     *           This will return the single prisoner with prisoner number A1234KJ in HMP Wandsworth.
+     *           An empty page will be returned if not found.
      *
-     *       "/prison/WWI/prisoners?term=A J&fromDob=1956-01-01&toDob=2000-01-02"
-     *       This will return all people in HMP Wandsworth. Born on or after 1956-01-01 and on or before 2000-01-02,
-     *       whose name begins with A J, e.g Alan Jones born on 1956-01-01.
+     *           "/prison/WWI/prisoners?term=A J&fromDob=1956-01-01&toDob=2000-01-02"
+     *           This will return all people in HMP Wandsworth. Born on or after 1956-01-01 and on or before 2000-01-02,
+     *           whose name begins with A J, e.g Alan Jones born on 1956-01-01.
      *
-     *       "/prison/WWI/prisoners?alerts=TACT&alerts=PEEP"
-     *       This will return all people in HMP Wandsworth. With the alerts TACT or PEEP.
+     *           "/prison/WWI/prisoners?alerts=TACT&alerts=PEEP"
+     *           This will return all people in HMP Wandsworth. With the alerts TACT or PEEP.
+     *
+     *
      */
     get: operations['search']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
   '/attribute-search/attributes': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     /**
      * *** BETA *** Retrieve all attributes supported by the attribute search
      * @description Returns all attributes that can be passed into the attribute search including their type.
      */
     get: operations['getAttributes']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
   }
 }
-
 export type webhooks = Record<string, never>
-
 export interface components {
   schemas: {
     /** @description Search Criteria for Prisoner Search */
@@ -391,8 +644,8 @@ export interface components {
       /**
        * @description List of supporting Prison Ids to restrict the search by. Unrestricted if not supplied or null
        * @example [
-       *   "MDI"
-       * ]
+       *       "MDI"
+       *     ]
        */
       supportingPrisonIds?: string[]
     }
@@ -419,6 +672,8 @@ export interface components {
        * @example true
        */
       primaryAddress: boolean
+      /** @description Phone numbers linked to the address. Note the phone number contains only numbers, no whitespace. Therefore searching on 'addresses.phoneNumbers.number' should not pass any non-numeric characters. */
+      phoneNumbers?: components['schemas']['PhoneNumber'][]
     }
     /** @description List of parts of the body that have marks. This includes NOMIS physical details of type 'marks' and 'otherMarks'. If we find a comment with either 'tattoo' or 'scar' we also add to the list of tattoos or scars. From REFERENCE_CODES table where DOMAIN = BODY_PART. Allowable values extracted 08/02/2023. */
     BodyPartDetail: {
@@ -467,6 +722,40 @@ export interface components {
        */
       nextReviewDate: string
     }
+    /** @description Email addresses */
+    EmailAddress: {
+      /**
+       * @description The email address
+       * @example john.smith@gmail.com
+       */
+      email: string
+    }
+    /** @description All identifiers for the prisoner including those recorded against aliases. Currently supports only PNC, CRO, NINO and DL. */
+    Identifier: {
+      /**
+       * @description The type of identifier
+       * @example PNC, CRO, DL, NINO
+       */
+      type: string
+      /**
+       * @description The identifier value
+       * @example 12/394773H
+       */
+      value: string
+      /**
+       * Format: date
+       * @description The date the identifier was issued according to NOMIS
+       * @example 2020-07-17
+       */
+      issuedDate?: string
+      /** @description Free text entered into NOMIS when the identifier was recorded. */
+      issuedAuthorityText?: string
+      /**
+       * @description The date/time the identifier was created in the system
+       * @example 2021-07-05T10:35:17
+       */
+      createdDateTime: string
+    }
     /** @description Incentive level */
     IncentiveLevel: {
       /**
@@ -479,6 +768,32 @@ export interface components {
        * @example Standard
        */
       description: string
+    }
+    /** @description All historical convicted offences */
+    Offence: {
+      /**
+       * @description The statue code
+       * @example TH68
+       */
+      statuteCode: string
+      /**
+       * @description The offence code
+       * @example TH68010
+       */
+      offenceCode: string
+      /**
+       * @description The offence description
+       * @example Theft from a shop
+       */
+      offenceDescription: string
+      /**
+       * Format: date
+       * @description The date of the offence
+       * @example 2024-05-23
+       */
+      offenceDate?: string
+      /** @description Indicates this offence is for the latest NOMIS booking */
+      latestBooking: boolean
     }
     PagePrisoner: {
       /** Format: int32 */
@@ -504,10 +819,23 @@ export interface components {
       sort?: components['schemas']['SortObject'][]
       /** Format: int32 */
       pageSize?: number
+      paged?: boolean
       /** Format: int32 */
       pageNumber?: number
-      paged?: boolean
       unpaged?: boolean
+    }
+    /** @description Telephone numbers. Note that the number will contain only numeric characters [0-9] (including no break between area code and number). Therefore if searching on 'phoneNumbers.number' you should not pass any non-numeric characters. */
+    PhoneNumber: {
+      /**
+       * @description The type of the phone number
+       * @example HOME, MOB
+       */
+      type: string
+      /**
+       * @description The phone number. Numeric characters only (no whitespace).
+       * @example 01141234567
+       */
+      number: string
     }
     Prisoner: {
       /**
@@ -956,6 +1284,14 @@ export interface components {
       marks?: components['schemas']['BodyPartDetail'][]
       /** @description Addresses */
       addresses?: components['schemas']['Address'][]
+      /** @description Email addresses */
+      emailAddresses?: components['schemas']['EmailAddress'][]
+      /** @description Telephone numbers. Note that the number will contain only numeric characters [0-9] (including no break between area code and number). Therefore if searching on 'phoneNumbers.number' you should not pass any non-numeric characters. */
+      phoneNumbers?: components['schemas']['PhoneNumber'][]
+      /** @description All identifiers for the prisoner including those recorded against aliases. Currently supports only PNC, CRO, NINO and DL. */
+      identifiers?: components['schemas']['Identifier'][]
+      /** @description All historical convicted offences */
+      allConvictedOffences?: components['schemas']['Offence'][]
     }
     /** @description Alerts */
     PrisonerAlert: {
@@ -1043,8 +1379,8 @@ export interface components {
       /**
        * @description List of Prison Ids (can include OUT and TRN) to restrict the search by. Unrestricted if not supplied or null
        * @example [
-       *   "MDI"
-       * ]
+       *       "MDI"
+       *     ]
        */
       prisonIds?: string[]
     }
@@ -1052,8 +1388,8 @@ export interface components {
       /**
        * @description List of prisoner numbers to search by
        * @example [
-       *   "A1234AA"
-       * ]
+       *       "A1234AA"
+       *     ]
        */
       prisonerNumbers: string[]
     }
@@ -1113,7 +1449,7 @@ export interface components {
        * @default false
        * @example false
        */
-      includeAliases?: boolean
+      includeAliases: boolean
     }
     /** @description Search Criteria for Prisoner Search */
     SearchCriteria: {
@@ -1135,8 +1471,8 @@ export interface components {
       /**
        * @description List of Prison Ids (can include OUT and TRN) to restrict the search by. Unrestricted if not supplied or null
        * @example [
-       *   "MDI"
-       * ]
+       *       "MDI"
+       *     ]
        */
       prisonIds?: string[]
       /**
@@ -1144,16 +1480,16 @@ export interface components {
        * @default false
        * @example false
        */
-      includeAliases?: boolean
+      includeAliases: boolean
     }
     BookingIds: {
       /**
        * @description List of bookingIds to search by
        * @example [
-       *   1,
-       *   2,
-       *   3
-       * ]
+       *       1,
+       *       2,
+       *       3
+       *     ]
        */
       bookingIds: number[]
     }
@@ -1213,7 +1549,7 @@ export interface components {
        * @default true
        * @example true
        */
-      includeAliases?: boolean
+      includeAliases: boolean
       pagination: components['schemas']['PaginationRequest']
     }
     PrisonerDetailResponse: {
@@ -1454,9 +1790,9 @@ export interface components {
       scars?: components['schemas']['BodyPart'][]
       /**
        * @description
-       *         Whether all terms are required to match. If set to true then only matches on all fields will return a result.
-       *         If set to false then matches will return a higher score than non matches, but all will be returned.
-       *         Prison and cell location will always be required to match.
+       *             Whether all terms are required to match. If set to true then only matches on all fields will return a result.
+       *             If set to false then matches will return a higher score than non matches, but all will be returned.
+       *             Prison and cell location will always be required to match.
        * @example false
        */
       lenient: boolean
@@ -1563,9 +1899,9 @@ export interface components {
       /**
        * @description List of prison codes to filter results
        * @example [
-       *   "LEI",
-       *   "MDI"
-       * ]
+       *       "LEI",
+       *       "MDI"
+       *     ]
        */
       prisonIds: string[]
       pagination: components['schemas']['PaginationRequest']
@@ -1632,7 +1968,7 @@ export interface components {
        * @default false
        * @example false
        */
-      includeAliases?: boolean
+      includeAliases: boolean
     }
     /** @description A request to search for prisoners by attributes */
     AttributeSearchRequest: {
@@ -1642,172 +1978,181 @@ export interface components {
        * @example AND
        * @enum {string}
        */
-      joinType?: 'AND' | 'OR'
+      joinType: 'AND' | 'OR'
       /** @description A list of queries of type Query that will be combined with the matchers in this query */
       queries: components['schemas']['Query'][]
       pagination: components['schemas']['PaginationRequest']
     }
     /** @description A matcher for a boolean attribute from the Prisoner record */
-    BooleanMatcher: WithRequired<
-      {
-        type: 'BooleanMatcher'
-      } & Omit<components['schemas']['TypeMatcherObject'], 'type'> & {
-          /**
-           * @description The attribute to match
-           * @example recall
-           */
-          attribute?: string
-          /**
-           * @description Whether the attribute must be true or false
-           * @example true
-           */
-          condition?: boolean
-          /**
-           * @description Must be Boolean
-           * @example Boolean
-           */
-          type?: string
-        },
-      'attribute' | 'condition' | 'type'
-    >
-    /**
-     * @description A matcher for a date attribute from the Prisoner record.
+    BooleanMatcher: {
+      type: 'BooleanMatcher'
+    } & (Omit<WithRequired<components['schemas']['Matcher'], 'type'>, 'type'> & {
+      /**
+       * @description The attribute to match
+       * @example recall
+       */
+      attribute: string
+      /**
+       * @description Whether the attribute must be true or false
+       * @example true
+       */
+      condition: boolean
+      /**
+       * @description Must be Boolean
+       * @example Boolean
+       */
+      type: string
+    })
+    /** @description A matcher for a date attribute from the Prisoner record.
      *
-     *   For a between clause use both min value and max value. By default the range is inclusive, but can be adjusted with minInclusive and maxInclusive.
+     *       For a between clause use both min value and max value. By default the range is inclusive, but can be adjusted with minInclusive and maxInclusive.
      *
-     *   For <= enter only a max value, and for < set max inclusive to false.
+     *       For <= enter only a max value, and for < set max inclusive to false.
      *
-     *   For >= enter only a min value, and for > set min inclusive to false.
+     *       For >= enter only a min value, and for > set min inclusive to false.
      *
-     *   For equals enter the same date in both the min value and max value and leave min/max inclusive as true.
-     */
-    DateMatcher: WithRequired<
-      {
-        type: 'DateMatcher'
-      } & Omit<components['schemas']['TypeMatcherObject'], 'type'> & {
-          /**
-           * @description The attribute to match
-           * @example releaseDate
-           */
-          attribute?: string
-          /**
-           * Format: date
-           * @description The minimum value to match
-           * @example 2024-01-01
-           */
-          minValue?: string
-          /**
-           * @description Whether the minimum value is inclusive or exclusive
-           * @default true
-           */
-          minInclusive?: boolean
-          /**
-           * Format: date
-           * @description The maximum value to match
-           * @example 2024-01-31
-           */
-          maxValue?: string
-          /**
-           * @description Whether the maximum value is inclusive or exclusive
-           * @default true
-           */
-          maxInclusive?: boolean
-          /**
-           * @description Must be Date
-           * @example Date
-           */
-          type?: string
-        },
-      'attribute' | 'type'
-    >
-    /**
-     * @description A matcher for a date time attribute from the Prisoner record.
+     *       For equals enter the same date in both the min value and max value and leave min/max inclusive as true.
+     *        */
+    DateMatcher: {
+      type: 'DateMatcher'
+    } & (Omit<WithRequired<components['schemas']['Matcher'], 'type'>, 'type'> & {
+      /**
+       * @description The attribute to match
+       * @example releaseDate
+       */
+      attribute: string
+      /**
+       * Format: date
+       * @description The minimum value to match
+       * @example 2024-01-01
+       */
+      minValue?: string
+      /**
+       * @description Whether the minimum value is inclusive or exclusive
+       * @default true
+       */
+      minInclusive: boolean
+      /**
+       * Format: date
+       * @description The maximum value to match
+       * @example 2024-01-31
+       */
+      maxValue?: string
+      /**
+       * @description Whether the maximum value is inclusive or exclusive
+       * @default true
+       */
+      maxInclusive: boolean
+      /**
+       * @description Must be Date
+       * @example Date
+       */
+      type: string
+    })
+    /** @description A matcher for a date time attribute from the Prisoner record.
      *
-     *   For a between clause use both the min and max values.
+     *       For a between clause use both the min and max values.
      *
-     *   For < enter only the max value.
+     *       For < enter only the max value.
      *
-     *   For > enter only the min value.
-     */
-    DateTimeMatcher: WithRequired<
-      {
-        type: 'DateTimeMatcher'
-      } & Omit<components['schemas']['TypeMatcherObject'], 'type'> & {
-          /**
-           * @description The attribute to search on
-           * @example currentIncentive.dateTime
-           */
-          attribute?: string
-          /**
-           * Format: date-time
-           * @description The minimum value to match
-           * @example 2024-01-01T09:00:00Z
-           */
-          minValue?: string
-          /**
-           * Format: date-time
-           * @description The maximum value to match
-           * @example 2024-01-31T21:00:00Z
-           */
-          maxValue?: string
-          /**
-           * @description Must be DateTime
-           * @example DateTime
-           */
-          type?: string
-        },
-      'attribute' | 'type'
-    >
-    /**
-     * @description A matcher for an integer attribute from the Prisoner record.
+     *       For > enter only the min value.
+     *      */
+    DateTimeMatcher: {
+      type: 'DateTimeMatcher'
+    } & (Omit<WithRequired<components['schemas']['Matcher'], 'type'>, 'type'> & {
+      /**
+       * @description The attribute to search on
+       * @example currentIncentive.dateTime
+       */
+      attribute: string
+      /**
+       * Format: date-time
+       * @description The minimum value to match
+       * @example 2024-01-01T09:00:00Z
+       */
+      minValue?: string
+      /**
+       * Format: date-time
+       * @description The maximum value to match
+       * @example 2024-01-31T21:00:00Z
+       */
+      maxValue?: string
+      /**
+       * @description Must be DateTime
+       * @example DateTime
+       */
+      type: string
+    })
+    /** @description A matcher for an integer attribute from the Prisoner record.
      *
-     *   For a between clause use both min value and max value. By default the range is inclusive, but can be adjusted with minInclusive and maxInclusive.
+     *       For a between clause use both min value and max value. By default the range is inclusive, but can be adjusted with minInclusive and maxInclusive.
      *
-     *   For <= enter only a max value, and for < set max inclusive to false.
+     *       For <= enter only a max value, and for < set max inclusive to false.
      *
-     *   For >= enter only a min value, and for > set min inclusive to false.
+     *       For >= enter only a min value, and for > set min inclusive to false.
      *
-     *   For equals enter the same integer in both the min value and max value and leave min/max inclusive as true.
-     */
-    IntMatcher: WithRequired<
-      {
-        type: 'IntMatcher'
-      } & Omit<components['schemas']['TypeMatcherObject'], 'type'> & {
-          /**
-           * @description The attribute to match on
-           * @example heightCentimetres
-           */
-          attribute?: string
-          /**
-           * Format: int32
-           * @description The minimum value to match on
-           * @example 150
-           */
-          minValue?: number
-          /**
-           * @description Whether the minimum value is inclusive
-           * @default true
-           */
-          minInclusive?: boolean
-          /**
-           * Format: int32
-           * @description The maximum value to match on
-           * @example 180
-           */
-          maxValue?: number
-          /**
-           * @description Whether the maximum value is inclusive
-           * @default true
-           */
-          maxInclusive?: boolean
-          /**
-           * @description Must be Int
-           * @example Int
-           */
-          type?: string
-        },
-      'attribute' | 'type'
-    >
+     *       For equals enter the same integer in both the min value and max value and leave min/max inclusive as true.
+     *        */
+    IntMatcher: {
+      type: 'IntMatcher'
+    } & (Omit<WithRequired<components['schemas']['Matcher'], 'type'>, 'type'> & {
+      /**
+       * @description The attribute to match on
+       * @example heightCentimetres
+       */
+      attribute: string
+      /**
+       * Format: int32
+       * @description The minimum value to match on
+       * @example 150
+       */
+      minValue?: number
+      /**
+       * @description Whether the minimum value is inclusive
+       * @default true
+       */
+      minInclusive: boolean
+      /**
+       * Format: int32
+       * @description The maximum value to match on
+       * @example 180
+       */
+      maxValue?: number
+      /**
+       * @description Whether the maximum value is inclusive
+       * @default true
+       */
+      maxInclusive: boolean
+      /**
+       * @description Must be Int
+       * @example Int
+       */
+      type: string
+    })
+    /** @description Matchers that will be applied to this query */
+    Matcher: {
+      type: string
+    }
+    /** @description A matcher for PNC numbers.
+     *
+     *         This is required because PNC numbers come in various formats with 2/4 long years and with/without leading zeroes.
+     *
+     *         This matcher will find the matching PNC regardless of which format is used.
+     *        */
+    PncMatcher: {
+      type: 'PncMatcher'
+    } & (Omit<WithRequired<components['schemas']['Matcher'], 'type'>, 'type'> & {
+      /**
+       * @description The PNC number match
+       * @example 24/123456H
+       */
+      pncNumber: string
+      /**
+       * @description Must be PNC
+       * @example PNC
+       */
+      type: string
+    })
     /** @description A query to search for prisoners by attributes */
     Query: {
       /**
@@ -1816,67 +2161,60 @@ export interface components {
        * @example AND
        * @enum {string}
        */
-      joinType?: 'AND' | 'OR'
+      joinType: 'AND' | 'OR'
       /** @description Matchers that will be applied to this query */
       matchers?: (
         | components['schemas']['BooleanMatcher']
         | components['schemas']['DateMatcher']
         | components['schemas']['DateTimeMatcher']
         | components['schemas']['IntMatcher']
+        | components['schemas']['PncMatcher']
         | components['schemas']['StringMatcher']
       )[]
       /** @description A list of sub-queries of type Query that will be combined with the matchers in this query */
       subQueries?: components['schemas']['Query'][]
     }
     /** @description A matcher for a string attribute from the prisoner record */
-    StringMatcher: WithRequired<
-      {
-        type: 'StringMatcher'
-      } & Omit<components['schemas']['TypeMatcherObject'], 'type'> & {
-          /**
-           * @description The attribute to match on
-           * @example aliases.lastName
-           */
-          attribute?: string
-          /**
-           * @description The condition to apply to the attribute value.
-           *
-           *   All String searches are case-insensitive.
-           *
-           *   IS and IS_NOT require an exact match (wildcards ? and * will not work).
-           *
-           *   For IS and CONTAINS some attributes support fuzzy matching e.g. they allow spelling mistakes. Call endpoint `/attribute-search/attributes` to see which attributes support fuzzy matching.
-           *
-           *   CONTAINS without wildcards (? and *) for a non-fuzzy attribute looks for the exact search term anywhere in the attribute value.
-           *
-           *   CONTAINS with wildcards ? (single character) and * (zero to many characters) perform a wildcard match which must match the entire attribute value.
-           *
-           *   STARTSWITH checks only the prefix of the attribute value and does not support fuzzy matching or wildcards.
-           *
-           *   IN checks a list of values for an exact match and does not support fuzzy matching, wildcards or case insensitive searching.
-           *
-           * @example IS
-           * @enum {string}
-           */
-          condition?: 'IS' | 'IS_NOT' | 'CONTAINS' | 'STARTSWITH' | 'IN'
-          /**
-           * @description The search term to apply to the attribute. Search terms are not case-sensitive.
-           * @example Smith
-           */
-          searchTerm?: string
-          /**
-           * @description Must be String
-           * @example String
-           */
-          type?: string
-        },
-      'attribute' | 'condition' | 'searchTerm' | 'type'
-    >
-    /** @description Matchers that will be applied to this query */
-    TypeMatcherObject: {
-      type: string
+    StringMatcher: {
+      type: 'StringMatcher'
+    } & (Omit<WithRequired<components['schemas']['Matcher'], 'type'>, 'type'> & {
+      /**
+       * @description The attribute to match on
+       * @example aliases.lastName
+       */
       attribute: string
-    }
+      /**
+       * @description The condition to apply to the attribute value.
+       *
+       *       All String searches are case-insensitive.
+       *
+       *       IS and IS_NOT require an exact match (wildcards ? and * will not work).
+       *
+       *       For IS and CONTAINS some attributes support fuzzy matching e.g. they allow spelling mistakes. Call endpoint `/attribute-search/attributes` to see which attributes support fuzzy matching.
+       *
+       *       CONTAINS without wildcards (? and *) for a non-fuzzy attribute looks for the exact search term anywhere in the attribute value.
+       *
+       *       CONTAINS with wildcards ? (single character) and * (zero to many characters) perform a wildcard match which must match the entire attribute value.
+       *
+       *       STARTSWITH checks only the prefix of the attribute value and does not support fuzzy matching or wildcards.
+       *
+       *       IN checks a list of values for an exact match and does not support fuzzy matching, wildcards or case insensitive searching.
+       *
+       * @example IS
+       * @enum {string}
+       */
+      condition: 'IS' | 'IS_NOT' | 'CONTAINS' | 'STARTSWITH' | 'IN'
+      /**
+       * @description The search term to apply to the attribute. Search terms are not case-sensitive.
+       * @example Smith
+       */
+      searchTerm: string
+      /**
+       * @description Must be String
+       * @example String
+       */
+      type: string
+    })
     ReferenceData: {
       value: string
       label: string
@@ -1909,16 +2247,8 @@ export interface components {
   headers: never
   pathItems: never
 }
-
 export type $defs = Record<string, never>
-
-export type external = Record<string, never>
-
 export interface operations {
-  /**
-   * Match prisoners by criteria
-   * @description Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role
-   */
   findByCriteria: {
     parameters: {
       query?: {
@@ -1929,6 +2259,9 @@ export interface operations {
         /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
         sort?: string[]
       }
+      header?: never
+      path?: never
+      cookie?: never
     }
     requestBody: {
       content: {
@@ -1938,16 +2271,15 @@ export interface operations {
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['PagePrisoner']
         }
       }
     }
   }
-  /**
-   * Match prisoners who have a release date within a range, and optionally by prison
-   * @description Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role
-   */
   findByReleaseDateAndPrison: {
     parameters: {
       query?: {
@@ -1958,6 +2290,9 @@ export interface operations {
         /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
         sort?: string[]
       }
+      header?: never
+      path?: never
+      cookie?: never
     }
     requestBody: {
       content: {
@@ -1967,17 +2302,22 @@ export interface operations {
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['PagePrisoner']
         }
       }
     }
   }
-  /**
-   * Match prisoners by a list of prisoner numbers
-   * @description Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role
-   */
   findByNumbers: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     requestBody: {
       content: {
         'application/json': components['schemas']['PrisonerNumbers']
@@ -1986,20 +2326,22 @@ export interface operations {
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['Prisoner'][]
         }
       }
     }
   }
-  /**
-   * Search for possible matches by criteria
-   * @description Search by prison number, PNC number, and/or name and date of birth, returning collated results by order of search.
-   *        This will also search aliases for possible matches.
-   *        Use when there is manual input, e.g. a user can select the correct match from search results.
-   *        Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.
-   */
   findPossibleMatchesBySearchCriteria: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     requestBody: {
       content: {
         'application/json': components['schemas']['PossibleMatchCriteria']
@@ -2008,18 +2350,22 @@ export interface operations {
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['Prisoner'][]
         }
       }
     }
   }
-  /**
-   * Match prisoners by criteria, to search across a list of specific prisons use /match-prisoners
-   * @deprecated
-   * @description Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role
-   */
   findByCriteria_1: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     requestBody: {
       content: {
         'application/json': components['schemas']['PrisonSearch']
@@ -2028,19 +2374,22 @@ export interface operations {
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['Prisoner'][]
         }
       }
     }
   }
-  /**
-   * Match prisoners by criteria
-   * @description Search by prisoner identifier or name and returning results for the criteria matched first.
-   *         Typically used when the matching data is of high quality where the first match is expected to be a near perfect match.
-   *         Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.
-   */
   findByCriteria_2: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     requestBody: {
       content: {
         'application/json': components['schemas']['SearchCriteria']
@@ -2049,17 +2398,22 @@ export interface operations {
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['Prisoner'][]
         }
       }
     }
   }
-  /**
-   * Match prisoners by a list of booking ids
-   * @description Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role
-   */
   findByIds: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     requestBody: {
       content: {
         'application/json': components['schemas']['BookingIds']
@@ -2068,21 +2422,22 @@ export interface operations {
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['Prisoner'][]
         }
       }
     }
   }
-  /**
-   * Find prisoners by exact or wildcard terms for specified fields and return a paginated result set
-   * @description Search terms and identifiers can be provided in either or mixed case and are converted to the appropriate case.
-   *       This endpoint will find both exact values (full term matched) or wildcards supporting the '*' and '?' symbols.
-   *       The '*' symbol will match any number of characters e.g. firstName='J*' will match 'John', 'Jane', and 'James'.
-   *       The '?' symbol will match any letter substituted at that position. e.g. firstName='t?ny' will match 'Tony' and 'Tiny'
-   *       Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.
-   */
   prisonerDetailSearch: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     requestBody: {
       content: {
         'application/json': components['schemas']['PrisonerDetailRequest']
@@ -2091,43 +2446,49 @@ export interface operations {
     responses: {
       /** @description Search successfully performed */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['PrisonerDetailResponse']
         }
       }
       /** @description Incorrect information provided to perform prisoner match */
       400: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Unauthorized to access this endpoint */
       401: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Incorrect permissions to search for prisoner data */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
     }
   }
-  /**
-   * *** BETA *** Physical details search for prisoners within a prison / group of prisons - returns a paginated result set
-   * @description BETA endpoint - subject to change. Search by physical details.
-   *       If a cell location is provided then only one prison can be supplied, otherwise multiple prisons are allowed.
-   *       If lenient is set to false (default) then all supplied physical details must match in order for results to be returned.
-   *       If lenient is set to true then at least one physical detail must match.
-   *       Searches will return results for partial string matches, so searching for an ethnicity of white will return all
-   *       prisoners with ethnicity of White: Eng./Welsh/Scot./N.Irish/British, White: Irish etc.
-   *       Results are ordered so that prisoners that match the most criteria are returned first, then secondary order is by
-   *       prisoner number.
-   *       Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.
-   */
   prisonerDetailSearch_1: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     requestBody: {
       content: {
         'application/json': components['schemas']['PhysicalDetailRequest']
@@ -2136,38 +2497,49 @@ export interface operations {
     responses: {
       /** @description Search successfully performed */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['PhysicalDetailResponse']
         }
       }
       /** @description Incorrect information provided to perform prisoner match */
       400: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Unauthorized to access this endpoint */
       401: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Incorrect permissions to search for prisoner data */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
     }
   }
-  /**
-   * Match for an prisoner by criteria
-   * @description This is a more lenient version to other match endpoints that includes alias and fuzzy date of birth matching.
-   *        It will return the best group of matching prisoners based on the request
-   *        Specify the request criteria to match against.
-   *        Role required is ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH.
-   */
   matchPrisoners: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     requestBody: {
       content: {
         'application/json': components['schemas']['MatchRequest']
@@ -2176,37 +2548,49 @@ export interface operations {
     responses: {
       /** @description Search successfully performed */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['PrisonerMatches']
         }
       }
       /** @description Incorrect information provided to perform prisoner match */
       400: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Unauthorized to access this endpoint */
       401: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Incorrect permissions to search for prisoner data */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
     }
   }
-  /**
-   * Search for prisoners by keyword or identifiers within a list of prisons and return a paginated result set
-   * @description Words and identifiers can be provided in either or mixed case and will be matched against all indexed text and keyword fields.
-   *       Identifiers within the [and, or, not, exact] terms are detected and converted to the appropriate case.
-   *       Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.
-   */
   keywordSearch: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
     requestBody: {
       content: {
         'application/json': components['schemas']['KeywordRequest']
@@ -2215,34 +2599,42 @@ export interface operations {
     responses: {
       /** @description Search successfully performed */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['KeywordResponse']
         }
       }
       /** @description Incorrect information provided to perform prisoner match */
       400: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Unauthorized to access this endpoint */
       401: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Incorrect permissions to search for prisoner data */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
     }
   }
-  /**
-   * Match prisoners by criteria
-   * @description Requires ROLE_GLOBAL_SEARCH role or ROLE_PRISONER_SEARCH role
-   */
   globalFindByCriteria: {
     parameters: {
       query?: {
@@ -2253,6 +2645,9 @@ export interface operations {
         /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
         sort?: string[]
       }
+      header?: never
+      path?: never
+      cookie?: never
     }
     requestBody: {
       content: {
@@ -2262,175 +2657,15 @@ export interface operations {
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['PagePrisoner']
         }
       }
     }
   }
-  /**
-   * *** BETA *** Search for prisoners by attributes
-   * @description <p>This endpoint allows you to create queries over all attributes from the <em>Prisoner</em> record. Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.</p>
-   *       <p>The request contains a list of queries to search on one or more attributes using a list of matchers. For example attribute "lastName""
-   *       requires a <em>StringMatcher</em> so we can query on <strong>"lastName IS Smith"</strong>. Other type matchers include <em>IntMatcher</em>, <em>BooleanMatcher</em>,
-   *       <em>DateMatcher</em> and <em>DateTimeMatcher</em>.
-   *       </p>
-   *       <p>Each query can also contain a list of sub-queries. Each sub-query can be considered as a separate query in brackets.
-   *       Combining multiple sub-queries gives us the ability to create complex searches using any combination of a prisoner's
-   *       attributes. For example we can model nested queries such as <strong>"lastName IS Smith AND (prisonId IS MDI OR (prisonId IS OUT AND lastPrisonId IS MDI))"</strong>.
-   *       </p>
-   *       <p>To find all attributes that can be searched for please refer to the <em>Prisoner</em> record or get them from endpoint <a target="_blank" href="/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config#/Attribute search/getAttributes"><strong>GET /attribute-search/attributes</strong></a>. Attributes from lists can be
-   *       searched for with dot notation, e.g. <strong>"attribute=aliases.firstName"</strong> or <strong>"attribute=tattoos.bodyPart"</strong>.
-   *       Attributes from complex objects can also be searched for with dot notation, e.g. <strong>"attribute=currentIncentive.level.code"</strong>.
-   *       </p>
-   *       <p>Note that when searching lists of complex objects (e.g. aliases, alerts, tattoos) if you want to search for multiple attributes within the same object then you need
-   *       to include them in the same query. For example, to search for alias "John Smith" you should search for <strong>aliases.firstName IS "John"</strong> and <strong>aliases.lastName IS "Smith"</strong> using string matchers in the same query.
-   *       If you search for them in different queries you will receive anyone with firstName John and also anyone with lastName Smith.
-   *       </p>
-   *       <p>Many attributes contain reference data restricted to a fixed list of values. For example, attribute "inOutStatus" only contains values "IN", "OUT" and "TRN".
-   *       To find which attributes use reference data and to fetch the possible attribute values see the endpoint <a target="_blank" href="/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config#/Reference data/referenceData"><strong>GET /reference-data/{attribute}</strong></a>.
-   *       </p>
-   *       <p>String attributes support advanced search techniques such as <a href="https://opensearch.org/docs/latest/query-dsl/term/fuzzy/">fuzzy search</a> matching and <a href="https://opensearch.org/docs/latest/query-dsl/term/wildcard/">wildcard search</a>. All String searches are case-insensitive.
-   *       <ul>
-   *         <li>IS and IS_NOT require an exact match (wildcards ? and * will not work). E.g. If religion is "Christian" then <strong>"religion IS Christian"</strong> will match but <strong>"religion IS Christ*"</strong> will not.</li>
-   *         <li>For IS and CONTAINS some attributes support fuzzy matching e.g. they allow spelling mistakes. Call endpoint <strong>GET /attribute-search/attributes</strong> to see which attributes support fuzzy matching. E.g. If firstName is "Jonathan" then <strong>"firstName IS Johnathon"</strong> or <strong>"firstName CONTAINS Johnathon"</strong> will match.</li>
-   *         <li>CONTAINS without wildcards (? and *) for a non-fuzzy attribute looks for the exact search term anywhere in the attribute value. E.g. If religion is "Christian" then <strong>"religion CONTAINS ist"</strong> will match.</li>
-   *         <li>CONTAINS with wildcards ? (single character) and/or * (zero to many characters) perform a wildcard search which must match the entire attribute value. E.g. If firstName is "Jonathan" then <strong>"firstName CONTAINS Jon*"</strong> will match but <strong>"firstName CONTAINS nath*"</strong> will not.</li>
-   *         <li>STARTSWITH checks only the prefix of the attribute value and does not support fuzzy matching or wildcards. E.g.If firstName is "Jonathan" then <strong>"firstName STARTSWITH Jon"</strong> will match but <strong>"firstName STARTSWITH Jon*"</strong> will not.</li>
-   *         <li>IN checks that the attribute value is any of the list of Strings provided in the search term. The search term should be a comma separated list of Strings to search, E.g. "searchValue1,searchValue2,searchValue3". This only matches exactly - no fuzzy search, wildcards or case-insensitive search is supported by OpenSearch. E.g.If firstName is "Jonathan" then <strong>"firstName IN 'Jonathan,Bob,Chris'"</strong> will match but <strong>"firstName IN 'Adrian,Bob,Chris'"</strong> will not.</li>
-   *       </ul>
-   *       </p>
-   *       <p>To assist with debugging queries we publish events in App Insights. To search in App Insights Log Analytics run query:
-   *       <pre>
-   *         AppEvents
-   *         | where Name == 'POSAttributeSearch'
-   *       </pre>
-   *       </p>
-   *       <h3>Example Requests</h3>
-   *       <p>Note that the default "joinType" is "AND" so it could be omitted from the examples below (but is included for clarity).</p>
-   *       <h4>Search for all prisoners in Moorland with a height between 150 and 180cm</h4>
-   *       <br/>
-   *       Query: <strong>"prisonId = "MDI" AND (heightCentimetres >= 150 AND heightCentimetres <= 180)"</strong>
-   *       <br/>
-   *       JSON request:
-   *       <br/>
-   *       <pre>
-   *         {
-   *           "joinType": "AND",
-   *           "queries": [
-   *             {
-   *               "joinType": "AND",
-   *               "matchers": [
-   *                 {
-   *                   "type": "String",
-   *                   "attribute": "prisonId",
-   *                   "condition": "IS",
-   *                   "searchTerm": "MDI"
-   *                 },
-   *                 {
-   *                   "type": "Int",
-   *                   "attribute": "heightCentimetres",
-   *                   "minValue": 150,
-   *                   "maxValue": 180
-   *                 }
-   *               ]
-   *             }
-   *           ]
-   *         }
-   *       </pre>
-   *       <br/>
-   *       <h4>Search for all prisoners in a list of cells in Moorland</h4>
-   *       Query: <strong>"prisonId = "MDI" AND cellLocation IN (1-2-001, 1-3-014, 3-1-020)</strong>
-   *       <br/>
-   *       JSON request:
-   *       <br/>
-   *       <pre>
-   *         {
-   *           "joinType": "AND",
-   *           "queries": [
-   *             {
-   *               "joinType": "AND",
-   *               "matchers": [
-   *                 {
-   *                   "type": "String",
-   *                   "attribute": "prisonId",
-   *                   "condition": "IS",
-   *                   "searchTerm": "MDI"
-   *                 },
-   *                 {
-   *                   "type": "String",
-   *                   "attribute": "cellLocation",
-   *                   "condition": "IN",
-   *                   "searchTerm": "1-2-001,1-3-014,3-1-020"
-   *                 }
-   *               ]
-   *             }
-   *           ]
-   *         }
-   *       </pre>
-   *       <br/>
-   *       <h4>Search for all prisoners received since 1st Jan 2024 with a dragon tattoo on either their arm or shoulder</h4>
-   *       <br/>
-   *       Query: <strong>"(receptionDate >= 2024-01-01) AND ((tattoos.bodyPart = "arm" AND tattoos.comment CONTAINS "dragon" ) OR (tattoos.bodyPart = "shoulder" AND tattoos.comment CONTAINS "dragon"))"</strong>
-   *       <br/>
-   *       JSON request:
-   *       <br/>
-   *       <pre>
-   *         {
-   *           "joinType": "AND",
-   *           "queries": [
-   *             {
-   *               "matchers": [
-   *                 {
-   *                   "type": "Date",
-   *                   "attribute": "receptionDate",
-   *                   "minValue": "2024-01-01"
-   *                 }
-   *               ]
-   *             },
-   *             {
-   *               "joinType": "OR",
-   *               "subQueries": [
-   *                 {
-   *                   "joinType": "AND",
-   *                   "matchers": [
-   *                     {
-   *                       "type": "String",
-   *                       "attribute": "tattoos.bodyPart",
-   *                       "condition": "IS",
-   *                       "searchTerm": "arm"
-   *                     },
-   *                     {
-   *                       "type": "String",
-   *                       "attribute": "tattoos.comment",
-   *                       "condition": "CONTAINS",
-   *                       "searchTerm": "dragon"
-   *                     }
-   *                   ]
-   *                 },
-   *                 {
-   *                   "joinType": "AND",
-   *                   "matchers": [
-   *                     {
-   *                       "type": "String",
-   *                       "attribute": "tattoos.bodyPart",
-   *                       "condition": "IS",
-   *                       "searchTerm": "shoulder"
-   *                     },
-   *                     {
-   *                       "type": "String",
-   *                       "attribute": "tattoos.comment",
-   *                       "condition": "CONTAINS",
-   *                       "searchTerm": "dragon"
-   *                     }
-   *                   ]
-   *                 }
-   *               ]
-   *             }
-   *           ]
-   *         }
-   *       </pre>
-   */
   attributeSearch: {
     parameters: {
       query?: {
@@ -2441,6 +2676,9 @@ export interface operations {
         /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
         sort?: string[]
       }
+      header?: never
+      path?: never
+      cookie?: never
     }
     requestBody: {
       content: {
@@ -2450,39 +2688,46 @@ export interface operations {
     responses: {
       /** @description Search successfully performed */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['PagePrisoner']
         }
       }
       /** @description Incorrect information provided to perform an attribute search */
       400: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Unauthorized to access this endpoint */
       401: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Incorrect permissions to this endpoint */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
     }
   }
-  /**
-   * *** BETA *** Reference data search
-   * @description BETA endpoint - reference data returned reflects the data assigned to prisoners
-   *       rather than all the possible values.  Only to be used for searching existing data purposes.
-   *       This method will also cache all reference data results for an hour and any new data will only appear after an hour.
-   *       Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.
-   */
   referenceData: {
     parameters: {
+      query?: never
+      header?: never
       path: {
         attribute:
           | 'build'
@@ -2509,92 +2754,117 @@ export interface operations {
           | 'title'
           | 'youthOffender'
       }
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description Reference data search successfully performed */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ReferenceDataResponse']
         }
       }
       /** @description Reference data search for attribute that isn't mapped */
       400: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Unauthorized to access this endpoint */
       401: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Incorrect permissions to retrieve reference data */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
     }
   }
-  /**
-   * *** BETA *** Alerts reference data
-   * @description BETA endpoint - alerts reference data returned reflects the data assigned to prisoners
-   *       rather than all the possible values.  Only to be used for searching existing data purposes.
-   *       This method will also cache all reference data results for an hour and any new data will only appear after an hour.
-   *       Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.
-   */
   alertsReferenceData: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
     responses: {
       /** @description Reference data search successfully performed */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ReferenceDataResponse']
         }
       }
       /** @description Reference data search for attribute that isn't mapped */
       400: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Unauthorized to access this endpoint */
       401: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Incorrect permissions to retrieve reference data */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
     }
   }
-  /**
-   * Get prisoner by prisoner number (AKA NOMS number)
-   * @description Requires ROLE_PRISONER_SEARCH or ROLE_VIEW_PRISONER_DATA role
-   */
   findByPrisonNumber: {
     parameters: {
+      query?: never
+      header?: never
       path: {
         id: string
       }
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           '*/*': components['schemas']['Prisoner']
         }
       }
     }
   }
-  /**
-   * Get all prisoners in a prison, including restricted patients supported by a POM
-   * @description Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role
-   */
   findByPrison: {
     parameters: {
       query?: {
@@ -2606,60 +2876,25 @@ export interface operations {
         /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
         sort?: string[]
       }
+      header?: never
       path: {
         prisonId: string
       }
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['PagePrisoner']
         }
       }
     }
   }
-  /**
-   * Search for prisoners within a particular prison establishment
-   * @description This search is optimised for clients that have a simple search term typically containing the prisoner's name
-   *       or prisoner number. The user typically is certain the prisoner is within the establishment and knows key information
-   *       about the prisoner.
-   *
-   *       Requires ROLE_PRISONER_IN_PRISON_SEARCH or ROLE_PRISONER_SEARCH role.
-   *
-   *       Sort fields supported are: firstName, lastName, prisonerNumber, dateOfBirth, cellLocation e.g "sort=firstName,lastName,desc"
-   *
-   *       Examples:
-   *
-   *       "/prison/BXI/prisoners?term=John&sort=firstName,lastName,desc&page=2&size=20"
-   *       This will return all people in HMP Brixton whose first or last names begins with JOHN.
-   *       Results will be ordered by firstName, lastName descending.
-   *       Page 3 will be returned with a maximum of 20 results per page.
-   *
-   *       "/prison/WWI/prisoners?sort=cellLocation"
-   *       This will return all people in HMP Wandsworth.
-   *       Results will be ordered by cell location ascending.
-   *       Page 1 will be returned with a maximum of 10 results per page.
-   *
-   *       "/prison/WWI/prisoners?cellLocationPrefix=WWI-2&term=smith"
-   *       "/prison/WWI/prisoners?cellLocationPrefix=2&term=smith"
-   *       This will return all people in HMP Wandsworth block 2 whose name starts with SMITH.
-   *
-   *       "/prison/WWI/prisoners?cellLocationPrefix=2-A-3-001"
-   *       This will return all people in HMP Wandsworth cell WWI-2-A-3-001
-   *
-   *       "/prison/WWI/prisoners?term=A1234KJ"
-   *       "/prison/WWI/prisoners?term=A1234KJ bananas"
-   *       This will return the single prisoner with prisoner number A1234KJ in HMP Wandsworth.
-   *       An empty page will be returned if not found.
-   *
-   *       "/prison/WWI/prisoners?term=A J&fromDob=1956-01-01&toDob=2000-01-02"
-   *       This will return all people in HMP Wandsworth. Born on or after 1956-01-01 and on or before 2000-01-02,
-   *       whose name begins with A J, e.g Alan Jones born on 1956-01-01.
-   *
-   *       "/prison/WWI/prisoners?alerts=TACT&alerts=PEEP"
-   *       This will return all people in HMP Wandsworth. With the alerts TACT or PEEP.
-   */
   search: {
     parameters: {
       query?: {
@@ -2700,61 +2935,91 @@ export interface operations {
         /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
         sort?: string[]
       }
+      header?: never
       path: {
         prisonId: string
       }
+      cookie?: never
     }
+    requestBody?: never
     responses: {
       /** @description Search successfully performed */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['PagePrisoner']
         }
       }
       /** @description Incorrect information provided to perform prisoner match */
       400: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Unauthorized to access this endpoint */
       401: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Incorrect permissions to search for prisoner data */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
     }
   }
-  /**
-   * *** BETA *** Retrieve all attributes supported by the attribute search
-   * @description Returns all attributes that can be passed into the attribute search including their type.
-   */
   getAttributes: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
     responses: {
       /** @description Search successfully performed */
       200: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['Attribute'][]
         }
       }
       /** @description Unauthorized to access this endpoint */
       401: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
       /** @description Incorrect permissions to this endpoint */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
         content: {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
     }
   }
+}
+type WithRequired<T, K extends keyof T> = T & {
+  [P in K]-?: T[P]
 }
