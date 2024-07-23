@@ -39,7 +39,11 @@ echo $APIS | jq -c '.apis[]' | while read API; do
   echo "\nProcessing $API_NAME..."
 
   npx openapi-typescript $API_URL --output "./server/@types/$API_NAME.d.ts"
+
+  npx eslint "./server/@types/$API_NAME.d.ts" --fix
+
 done
 
-echo "\nNow running type check:"
+echo "\nNow running lint and type check:"
+npm run lint
 npm run typecheck
