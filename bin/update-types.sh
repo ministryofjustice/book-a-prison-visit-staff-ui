@@ -40,6 +40,7 @@ echo $APIS | jq -c '.apis[]' | while read API; do
 
   npx openapi-typescript $API_URL --output "./server/@types/$API_NAME.d.ts"
 
+  npx prettier "./server/@types/$API_NAME.d.ts" --write
   npx eslint "./server/@types/$API_NAME.d.ts" --fix
 
 done
