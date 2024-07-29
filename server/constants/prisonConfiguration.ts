@@ -124,7 +124,9 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
   },
   // Eastwood Park (HMP & YOI)
   EWI: {
-    selectVisitorsText: ['You can add up to 3 people.', 'At least one visitor must be 18 or older.'],
+    selectVisitorsText: [
+      'You can add up to 3 people.', 
+      'At least one visitor must be 18 or older.'],
   },
   // Foston Hall (HMP & YOI)
   FHI: {
@@ -154,10 +156,17 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'At least one visitor must be 18 or older.',
     ],
   },
+  // Hollesley Bay (HMP & YOI)
+  HBI: {
+    selectVisitorsText: [
+      'You can add up to a total of 6 people, with a maximum of 3 people aged 18 and over.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
   // Hewell (HMP)
   HEI: {
     selectVisitorsText: [
-      'Add up to 3 people aged 13 and over, and 3 children under 13 years old.',
+      'You can add up to 3 people aged 13 and over, and 3 children under 13 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
@@ -250,6 +259,13 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
   NSI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 16 and over, and 3 children under 16 years old.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
+  // Norwich (HMP & YOI)
+  NWI: {
+    selectVisitorsText: [
+      'You can add up to 3 people aged 18 and over, and any number of children.',
       'At least one visitor must be 18 or older.',
     ],
   },
@@ -354,6 +370,13 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
   WCI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 10 and over, and 3 children under 10 years old.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
+  // Warren Hill (HMP & YOI)
+  WII: {
+    selectVisitorsText: [
+      'You can add up to 3 people aged 18 and over, and 5 children under 18 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
