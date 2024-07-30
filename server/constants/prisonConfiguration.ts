@@ -125,7 +125,7 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
   // Eastwood Park (HMP & YOI)
   EWI: {
     selectVisitorsText: [
-      'You can add up to 3 people.', 
+      'You can add up to 3 people.',
       'At least one visitor must be 18 or older.'],
   },
   // Foston Hall (HMP & YOI)
