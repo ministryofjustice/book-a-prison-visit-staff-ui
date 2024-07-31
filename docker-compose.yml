@@ -2,7 +2,7 @@ version: '3.1'
 services:
 
   redis-bapv:
-    image: 'redis:7.2'
+    image: 'redis:7.4'
     networks:
       - hmpps
     container_name: redis-bapv
