@@ -310,22 +310,16 @@ workflows:
           requires:
             - request-acceptance-tests-main-approval
 
-      - acceptance_tests_public_ui_main:
-          requires:
-            - request-acceptance-tests-public-approval
-          context: visits-public-e2e-tests
-          filters:
-            branches:
-              only:
-                - main
       - request-acceptance-tests-public-approval:
+          <<: *main_branch
           type: approval
           requires:
             - deploy_staging
-          filters:
-            branches:
-              only:
-                - main
+      - acceptance_tests_public_ui_main:
+          <<: *main_branch
+          context: visits-public-e2e-tests
+          requires:
+            - request-acceptance-tests-public-approval
 
       - request-preprod-approval:
           <<: *main_branch
