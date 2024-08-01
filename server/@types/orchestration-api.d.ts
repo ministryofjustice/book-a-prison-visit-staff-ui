@@ -2880,6 +2880,11 @@ export interface operations {
          * @example 28
          */
         max?: number
+        /**
+         * @description Username for the user making the request. Used to exclude user's pending applications from session capacity count. Optional, ignored if not passed in.
+         * @example user-1
+         */
+        username?: string
       }
       header?: never
       path?: never
@@ -3065,6 +3070,11 @@ export interface operations {
         excludedApplicationReference?: string
         /** @description Advances the available visits slots sought from date by n days. Defaults to 0 if not passed. */
         advanceFromDateByDays?: number
+        /**
+         * @description Username for the user making the request. Used to exclude user's pending applications from session capacity count. Optional, ignored if not passed in.
+         * @example user-1
+         */
+        username?: string
       }
       header?: never
       path?: never
