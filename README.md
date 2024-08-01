@@ -83,7 +83,6 @@ Or run tests with the cypress UI:
 
 `npm run int-test-ui`
 
-
 ### Dependency Checks
 
 The template project has implemented some scheduled checks to ensure that key dependencies are kept up to date.
