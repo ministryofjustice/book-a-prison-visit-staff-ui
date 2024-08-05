@@ -344,17 +344,19 @@ export default {
     prisonId,
     offenderNo,
     visitSessions,
+    username = 'USER1',
     min = '3',
   }: {
     prisonId: string
     offenderNo: string
     visitSessions: VisitSession[]
+    username: string
     min: string
   }): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',
-        url: `/orchestration/visit-sessions?prisonId=${prisonId}&prisonerId=${offenderNo}&min=${min}`,
+        url: `/orchestration/visit-sessions?prisonId=${prisonId}&prisonerId=${offenderNo}&min=${min}&username=${username}`,
       },
       response: {
         status: 200,
