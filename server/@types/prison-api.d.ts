@@ -7670,9 +7670,14 @@ export interface components {
       /**
        * @description Court Type.  Reference domain is JURISDICTION
        * @example CC
-       * @enum {string}
+       * @enum {string|null}
        */
-      courtType?: 'CACD' | 'CB' | 'CC' | 'CO' | 'DCM' | 'GCM' | 'IMM' | 'MC' | 'OTHER' | 'YC'
+      courtType?: 'CACD' | 'CB' | 'CC' | 'CO' | 'DCM' | 'GCM' | 'IMM' | 'MC' | 'OTHER' | 'YC' | null
+      /**
+       * @description Court Type description.  Reference domain is JURISDICTION. Not always present for all end points
+       * @example Crown Court
+       */
+      courtTypeDescription?: string | null
       /**
        * Format: date
        * @description Date agency became inactive
@@ -10919,10 +10924,10 @@ export interface components {
       sort?: components['schemas']['SortObject'][]
       /** Format: int32 */
       pageSize?: number
-      unpaged?: boolean
       paged?: boolean
       /** Format: int32 */
       pageNumber?: number
+      unpaged?: boolean
     }
     SortObject: {
       direction?: string
@@ -26506,6 +26511,7 @@ export interface operations {
         }
         content: {
           'image/jpeg': string
+          'application/json': string
         }
       }
       /** @description Requested resource not found. */
@@ -26515,6 +26521,7 @@ export interface operations {
         }
         content: {
           'image/jpeg': string
+          'application/json': string
         }
       }
       /** @description Unrecoverable error occurred whilst processing request. */
@@ -26524,6 +26531,7 @@ export interface operations {
         }
         content: {
           'image/jpeg': string
+          'application/json': string
         }
       }
     }
@@ -27628,6 +27636,7 @@ export interface operations {
         }
         content: {
           'image/jpeg': string
+          'application/json': string
         }
       }
       /** @description Requested resource not found. */
@@ -27637,6 +27646,7 @@ export interface operations {
         }
         content: {
           'image/jpeg': string
+          'application/json': string
         }
       }
       /** @description Unrecoverable error occurred whilst processing request. */
@@ -27646,6 +27656,7 @@ export interface operations {
         }
         content: {
           'image/jpeg': string
+          'application/json': string
         }
       }
     }
@@ -28878,6 +28889,7 @@ export interface operations {
         }
         content: {
           'image/jpeg': string
+          'application/json': string
         }
       }
       /** @description Requested resource not found. */
@@ -28887,6 +28899,7 @@ export interface operations {
         }
         content: {
           'image/jpeg': string
+          'application/json': string
         }
       }
       /** @description Unrecoverable error occurred whilst processing request. */
@@ -28896,6 +28909,7 @@ export interface operations {
         }
         content: {
           'image/jpeg': string
+          'application/json': string
         }
       }
     }

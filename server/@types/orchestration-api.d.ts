@@ -1061,6 +1061,7 @@ export interface components {
         | 'CANCELLED_VISIT'
         | 'NON_ASSOCIATION_EVENT'
         | 'PRISONER_RELEASED_EVENT'
+        | 'PRISONER_RECEIVED_EVENT'
         | 'PRISONER_RESTRICTION_CHANGE_EVENT'
         | 'PRISON_VISITS_BLOCKED_FOR_DATE'
         | 'IGNORE_VISIT_NOTIFICATIONS_EVENT'
@@ -1152,26 +1153,26 @@ export interface components {
       totalElements?: number
       first?: boolean
       last?: boolean
-      /** Format: int32 */
-      size?: number
-      content?: components['schemas']['VisitDto'][]
-      /** Format: int32 */
-      number?: number
       sort?: components['schemas']['SortObject'][]
       /** Format: int32 */
-      numberOfElements?: number
+      size?: number
+      /** Format: int32 */
+      number?: number
+      content?: components['schemas']['VisitDto'][]
       pageable?: components['schemas']['PageableObject']
+      /** Format: int32 */
+      numberOfElements?: number
       empty?: boolean
     }
     PageableObject: {
+      sort?: components['schemas']['SortObject'][]
       /** Format: int64 */
       offset?: number
-      sort?: components['schemas']['SortObject'][]
-      /** Format: int32 */
-      pageSize?: number
       paged?: boolean
       /** Format: int32 */
       pageNumber?: number
+      /** Format: int32 */
+      pageSize?: number
       unpaged?: boolean
     }
     SortObject: {
@@ -1197,6 +1198,9 @@ export interface components {
         | 'PRISONER_RELEASED_EVENT'
         | 'PRISONER_RESTRICTION_CHANGE_EVENT'
         | 'PRISON_VISITS_BLOCKED_FOR_DATE'
+        | 'PRISONER_RECEIVED_EVENT'
+        | 'PRISONER_ALERTS_UPDATED_EVENT'
+        | 'PERSON_RESTRICTION_UPSERTED_EVENT'
       /** @description List of details of affected visits */
       affectedVisits: components['schemas']['OrchestrationPrisonerVisitsNotificationDto'][]
     }
@@ -2796,6 +2800,9 @@ export interface operations {
             | 'PRISONER_RELEASED_EVENT'
             | 'PRISONER_RESTRICTION_CHANGE_EVENT'
             | 'PRISON_VISITS_BLOCKED_FOR_DATE'
+            | 'PRISONER_RECEIVED_EVENT'
+            | 'PRISONER_ALERTS_UPDATED_EVENT'
+            | 'PERSON_RESTRICTION_UPSERTED_EVENT'
           )[]
         }
       }

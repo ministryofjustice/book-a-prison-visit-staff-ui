@@ -61,6 +61,14 @@ describe('Bookings needing review listing page', () => {
           type: 'PRISONER_RELEASED_EVENT',
           visitDates: ['2 November 2023'],
         },
+        {
+          actionUrl: '/visit/ij-kl-mn-op?from=review',
+          bookedByNames: ['User Four'],
+          prisonerNumbers: ['C1234EF'],
+          reference: 'ij*kl*mn*op',
+          type: 'PRISONER_RECEIVED_EVENT',
+          visitDates: ['3 November 2023'],
+        },
       ]
 
       visitNotificationsService.getVisitsReviewList.mockResolvedValue({ filters: [], visitsReviewList })
@@ -71,7 +79,7 @@ describe('Bookings needing review listing page', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
 
-          expect($('[data-test="bookings-list"] tbody tr').length).toBe(2)
+          expect($('[data-test="bookings-list"] tbody tr').length).toBe(3)
 
           expect($('[data-test="prisoner-number-1"]').text().trim()).toMatch(/^A1234BC\s+A5678CD$/)
           expect($('[data-test="visit-date-1"]').text().trim()).toBe('1 November 2023')
@@ -84,6 +92,12 @@ describe('Bookings needing review listing page', () => {
           expect($('[data-test="booked-by-2"]').text().trim()).toBe('User Three')
           expect($('[data-test="type-2"]').text().trim()).toBe(notificationTypes[visitsReviewList[1].type])
           expect($('[data-test="action-2"] a').attr('href')).toBe(visitsReviewList[1].actionUrl)
+
+          expect($('[data-test="prisoner-number-3"]').text().trim()).toBe('C1234EF')
+          expect($('[data-test="visit-date-3"]').text().trim()).toBe('3 November 2023')
+          expect($('[data-test="booked-by-3"]').text().trim()).toBe('User Four')
+          expect($('[data-test="type-3"]').text().trim()).toBe(notificationTypes[visitsReviewList[2].type])
+          expect($('[data-test="action-3"] a').attr('href')).toBe(visitsReviewList[2].actionUrl)
 
           expect($('[data-test="no-bookings"]').length).toBe(0)
           expect($('[data-test="no-bookings-for-filters"]').length).toBe(0)
