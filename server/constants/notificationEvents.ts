@@ -5,7 +5,7 @@ export const notificationTypes: Readonly<Record<NotificationType, string>> = {
   PRISONER_RELEASED_EVENT: 'Prisoner released',
   PRISONER_RESTRICTION_CHANGE_EVENT: 'Visit type changed',
   PRISON_VISITS_BLOCKED_FOR_DATE: 'Time slot removed',
-  PRISONER_RECEIVED_EVENT: 'Prisoner transfered',
+  PRISONER_RECEIVED_EVENT: 'Prisoner transferred',
   PRISONER_ALERTS_UPDATED_EVENT: 'TODO - Prisoner alerts updated',
   PERSON_RESTRICTION_UPSERTED_EVENT: 'TODO - Restriction change',
 }

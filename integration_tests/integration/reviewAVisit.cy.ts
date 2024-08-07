@@ -103,7 +103,7 @@ context('Review a visit', () => {
     visitDetailsPage.needsReview(1).contains('some reason')
   })
 
-  it('should show prisoner transfered banner and needs review in history details', () => {
+  it('should show prisoner transferred banner and needs review in history details', () => {
     const eventsAudit: VisitHistoryDetails['eventsAudit'] = [
       {
         type: 'BOOKED_VISIT',
