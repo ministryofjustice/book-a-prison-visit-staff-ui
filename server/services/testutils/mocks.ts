@@ -10,6 +10,8 @@ const testAppInfo: ApplicationInfo = {
   buildNumber: '1',
   gitRef: 'long ref',
   gitShortHash: 'short ref',
+  branchName: 'main',
+  activeAgencies: ['***'],
 }
 
 jest.mock('../../applicationInfo', () => {
