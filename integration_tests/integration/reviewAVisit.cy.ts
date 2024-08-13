@@ -17,6 +17,23 @@ context('Review a visit', () => {
   const futureVisitDate = format(add(today, { months: 1 }), shortDateFormat)
   const contacts = [TestData.contact({ personId: 4321 })]
 
+  const eventsAudit: VisitHistoryDetails['eventsAudit'] = [
+    {
+      type: 'BOOKED_VISIT',
+      applicationMethodType: 'PHONE',
+      actionedByFullName: 'User One',
+      userType: 'STAFF',
+      createTimestamp: '2024-04-11T09:00:00',
+    },
+    {
+      type: 'NON_ASSOCIATION_EVENT',
+      applicationMethodType: 'NOT_APPLICABLE',
+      actionedByFullName: '',
+      userType: 'SYSTEM',
+      createTimestamp: '2024-04-11T10:00:00',
+    },
+  ]
+
   beforeEach(() => {
     cy.task('reset')
     cy.task('stubSignIn')
@@ -30,22 +47,6 @@ context('Review a visit', () => {
   })
 
   it('should dismiss notifications when a visit is marked as not needing to be updated or cancelled', () => {
-    const eventsAudit: VisitHistoryDetails['eventsAudit'] = [
-      {
-        type: 'BOOKED_VISIT',
-        applicationMethodType: 'PHONE',
-        actionedByFullName: 'User One',
-        userType: 'STAFF',
-        createTimestamp: '2024-04-11T09:00:00',
-      },
-      {
-        type: 'NON_ASSOCIATION_EVENT',
-        applicationMethodType: 'NOT_APPLICABLE',
-        actionedByFullName: '',
-        userType: 'SYSTEM',
-        createTimestamp: '2024-04-11T10:00:00',
-      },
-    ]
     const visitHistoryDetails = TestData.visitHistoryDetails({
       eventsAudit,
       visit: TestData.visit({
@@ -104,22 +105,8 @@ context('Review a visit', () => {
   })
 
   it('should show prisoner transferred banner and needs review in history details', () => {
-    const eventsAudit: VisitHistoryDetails['eventsAudit'] = [
-      {
-        type: 'BOOKED_VISIT',
-        applicationMethodType: 'PHONE',
-        actionedByFullName: 'User One',
-        userType: 'STAFF',
-        createTimestamp: '2024-04-11T09:00:00',
-      },
-      {
-        type: 'PRISONER_RECEIVED_EVENT',
-        applicationMethodType: 'NOT_APPLICABLE',
-        actionedByFullName: '',
-        userType: 'SYSTEM',
-        createTimestamp: '2024-04-11T10:00:00',
-      },
-    ]
+    eventsAudit[1].type = 'PRISONER_RECEIVED_EVENT'
+
     const visitHistoryDetails = TestData.visitHistoryDetails({
       eventsAudit,
       visit: TestData.visit({
@@ -144,22 +131,8 @@ context('Review a visit', () => {
   })
 
   it('should show prisoner released banner and needs review in history details', () => {
-    const eventsAudit: VisitHistoryDetails['eventsAudit'] = [
-      {
-        type: 'BOOKED_VISIT',
-        applicationMethodType: 'PHONE',
-        actionedByFullName: 'User One',
-        userType: 'STAFF',
-        createTimestamp: '2024-04-11T09:00:00',
-      },
-      {
-        type: 'PRISONER_RELEASED_EVENT',
-        applicationMethodType: 'NOT_APPLICABLE',
-        actionedByFullName: '',
-        userType: 'SYSTEM',
-        createTimestamp: '2024-04-11T10:00:00',
-      },
-    ]
+    eventsAudit[1].type = 'PRISONER_RELEASED_EVENT'
+
     const visitHistoryDetails = TestData.visitHistoryDetails({
       eventsAudit,
       visit: TestData.visit({
