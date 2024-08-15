@@ -4,7 +4,7 @@
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 {%- from "moj/components/side-navigation/macro.njk" import mojSideNavigation -%}
 {%- from "moj/components/sub-navigation/macro.njk" import mojSubNavigation -%}
-{% from 'components/datepicker/macro.njk' import hmppsDatepicker %}
+{%- from "moj/components/date-picker/macro.njk" import mojDatePicker -%}
 
 {% set pageHeaderTitle = "View visits by date" %}
 {% set pageTitle %}
@@ -43,7 +43,7 @@
           <div class="bapv-another-date__form moj-js-hidden">
             <form action="" method="POST" novalidate>
               <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-                {{ hmppsDatepicker({
+                {{ mojDatePicker({
                   id: "date",
                   name: "date",
                   label: {
@@ -51,7 +51,7 @@
                     classes: "govuk-label--s"
                   },
                   hint: {
-                    text: "For example, 31/03/2022"
+                    text: "For example, 31/3/2022"
                   },
                   errorMessage: errors | findError('date'),
                   classes: 'hmpps-datepicker--fixed-width',
