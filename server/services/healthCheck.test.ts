@@ -8,6 +8,8 @@ describe('Healthcheck', () => {
     buildNumber: '1',
     gitRef: 'long ref',
     gitShortHash: 'short ref',
+    branchName: 'main',
+    activeAgencies: ['***'],
   }
   it('Healthcheck reports healthy', done => {
     const successfulChecks = [successfulCheck('check1'), successfulCheck('check2')]

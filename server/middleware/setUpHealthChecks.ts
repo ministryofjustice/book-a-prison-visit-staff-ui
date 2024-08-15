@@ -21,5 +21,20 @@ export default function setUpHealthChecks(applicationInfo: ApplicationInfo): Rou
     }),
   )
 
+  router.get('/info', (req, res) => {
+    res.json({
+      git: {
+        branch: applicationInfo.branchName,
+      },
+      build: {
+        artifact: applicationInfo.applicationName,
+        version: applicationInfo.buildNumber,
+        name: applicationInfo.applicationName,
+      },
+      productId: applicationInfo.productId,
+      activeAgencies: applicationInfo.activeAgencies,
+    })
+  })
+
   return router
 }
