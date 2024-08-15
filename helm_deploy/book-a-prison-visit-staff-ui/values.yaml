@@ -30,6 +30,8 @@ generic-service:
     TOKEN_VERIFICATION_ENABLED: "true"
     APPLICATIONINSIGHTS_CONNECTION_STRING: "InstrumentationKey=$(APPINSIGHTS_INSTRUMENTATIONKEY);IngestionEndpoint=https://northeurope-0.in.applicationinsights.azure.com/;LiveEndpoint=https://northeurope.livediagnostics.monitor.azure.com/"
     AUDIT_SERVICE_NAME: "book-a-prison-visit-staff-ui"
+    ACTIVE_AGENCIES: "HEI, BLI, CFI, WWI, PNI, EWI, BNI, LNI, FHI, ESI, BSI, AGI, DHI, NHI, SDI, SHI, WNI, FSI, RCI, SFI, STI, SNI, EEI, CLI, DWI, EHI, DAI, MDI, MTI, NSI, AYI, LFI, ONI, RNI, TCI, SWI, CDI, GMI, WCI, LII, SUI, LHI, SKI, WLI, HLI, MHI, FNI, WRI, DMI, BFI, PVI, HPI, LTI, BRI, NWI, WII, HBI"
+    
 
   # Pre-existing kubernetes secrets to load as environment variables in the deployment.
   # namespace_secrets:
