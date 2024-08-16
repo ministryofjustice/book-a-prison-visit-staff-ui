@@ -1063,8 +1063,10 @@ export interface components {
         | 'PRISONER_RELEASED_EVENT'
         | 'PRISONER_RECEIVED_EVENT'
         | 'PRISONER_RESTRICTION_CHANGE_EVENT'
+        | 'PRISONER_ALERTS_UPDATED_EVENT'
         | 'PRISON_VISITS_BLOCKED_FOR_DATE'
         | 'IGNORE_VISIT_NOTIFICATIONS_EVENT'
+        | 'PERSON_RESTRICTION_UPSERTED_EVENT'
       /**
        * @description What was the application method for this event
        * @enum {string}
@@ -1151,23 +1153,23 @@ export interface components {
       totalPages?: number
       /** Format: int64 */
       totalElements?: number
-      first?: boolean
-      last?: boolean
-      sort?: components['schemas']['SortObject'][]
       /** Format: int32 */
       size?: number
+      first?: boolean
+      last?: boolean
+      content?: components['schemas']['VisitDto'][]
       /** Format: int32 */
       number?: number
-      content?: components['schemas']['VisitDto'][]
+      sort?: components['schemas']['SortObject'][]
       pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
       empty?: boolean
     }
     PageableObject: {
-      sort?: components['schemas']['SortObject'][]
       /** Format: int64 */
       offset?: number
+      sort?: components['schemas']['SortObject'][]
       paged?: boolean
       /** Format: int32 */
       pageNumber?: number
@@ -1592,7 +1594,7 @@ export interface components {
        */
       dateOfBirth?: string
     }
-    /** @description Alert */
+    /** @description AlertDto returned from orchestration, made of fields from AlertResponseDto from Alerts API call */
     AlertDto: {
       /**
        * @description Alert Type
@@ -1631,11 +1633,6 @@ export interface components {
        * @example 2020-08-20
        */
       dateExpires?: string
-      /**
-       * @description True / False based on presence of expiry date
-       * @example true
-       */
-      expired: boolean
       /**
        * @description True / False based on alert status
        * @example false
