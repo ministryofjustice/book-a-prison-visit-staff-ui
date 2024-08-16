@@ -14,6 +14,10 @@
   }
 
   &--prison_visits_blocked_for_date {
-    @extend .govuk-tag--turquoise
+    @extend .govuk-tag--turquoise;
+  }
+
+  &--prisoner_received_event {
+    @extend .govuk-tag--yellow;
   }
 }
