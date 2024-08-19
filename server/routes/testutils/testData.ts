@@ -58,7 +58,6 @@ export default class TestData {
     comment = 'Alert comment',
     dateCreated = '2023-01-02',
     dateExpires = undefined,
-    expired = false,
     active = true,
   }: Partial<Alert> = {}): Alert =>
     ({
@@ -69,7 +68,6 @@ export default class TestData {
       comment,
       dateCreated,
       dateExpires,
-      expired,
       active,
     }) as Alert
 
