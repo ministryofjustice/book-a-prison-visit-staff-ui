@@ -1,5 +1,5 @@
 import { type RequestHandler, Router } from 'express'
-import { body, validationResult } from 'express-validator'
+import { body, validationResult, oneOf } from 'express-validator'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import { getParsedDateFromQueryString } from '../utils/utils'
 import { getDateTabs, getSelectedOrDefaultSessionTemplate, getSessionsSideNav } from './visitsUtils'
@@ -132,8 +132,20 @@ export default function routes({
     })
   })
 
+  // New datepicker will return 1/1/2024 - 11/1/2024 - 1/11/2024 - 11/11/2024
+  // Previously only returned 2 digits, 01/01/2024 etc
   post('/', async (req, res) => {
-    await body('date').isDate({ format: 'DD/MM/YYYY', strictMode: true }).withMessage('Enter a valid date').run(req)
+    await oneOf(
+      [
+        body('date').isDate({ format: 'D/M/YYYY' }),
+        body('date').isDate({ format: 'DD/M/YYYY' }),
+        body('date').isDate({ format: 'D/MM/YYYY' }),
+        body('date').isDate({ format: 'DD/MM/YYYY' }),
+      ],
+      {
+        message: 'Enter a valid date',
+      },
+    ).run(req)
 
     const errors = validationResult(req)
     if (!errors.isEmpty()) {

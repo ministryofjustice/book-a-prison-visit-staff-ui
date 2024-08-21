@@ -38,36 +38,35 @@ export default class VisitsByDatePage extends Page {
 
   // Date picker
   datePickerEnterDate = (date: string): void => {
-    cy.get('.js-datepicker-cancel').click({ force: true })
-    cy.get('.hmpps-js-datepicker-input').clear()
-    cy.get('.hmpps-js-datepicker-input').type(`${date}{enter}`)
+    cy.get('.moj-js-datepicker-input').clear()
+    cy.get('.moj-js-datepicker-input').type(`${date}{enter}`)
     this.datePickerToggleCalendar()
   }
 
-  datePickerGetEnteredDate = (): PageElement => cy.get('.hmpps-js-datepicker-input')
+  datePickerGetEnteredDate = (): PageElement => cy.get('.moj-js-datepicker-input')
 
   datePickerToggleCalendar = (): void => {
-    cy.get('.hmpps-js-datepicker-button').click()
-  }
-
-  datePickerGoToPreviousYear = (): void => {
-    cy.get('[data-button="button-datepicker-prevyear"]').click()
+    cy.get('.moj-js-datepicker-toggle').click()
   }
 
   datePickerGoToPreviousMonth = (): void => {
-    cy.get('[data-button="button-datepicker-prevmonth"]').click()
+    cy.get('.moj-js-datepicker-prev-month').click()
+  }
+
+  datePickerGoToPreviousYear = (): void => {
+    cy.get('.moj-js-datepicker-prev-year').click()
   }
 
   datePickerGoToNextMonth = (): void => {
-    cy.get('[data-button="button-datepicker-nextmonth"]').click()
+    cy.get('.moj-js-datepicker-next-month').click()
   }
 
   datePickerGoToNextYear = (): void => {
-    cy.get('[data-button="button-datepicker-nextyear"]').click()
+    cy.get('.moj-js-datepicker-next-year').click()
   }
 
   datePickerSelectDay = (day: number) => {
-    cy.get('button[data-form="date-select"]:visible')
+    cy.get('.moj-datepicker__calendar-day:visible')
       .contains(new RegExp(`^${day}$`))
       .click()
   }
