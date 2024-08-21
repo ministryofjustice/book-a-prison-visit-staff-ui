@@ -6,14 +6,16 @@ export default {
   stubPrisonerSocialContacts: ({
     offenderNo,
     contacts,
+    approvedVisitorsOnly = 'true',
   }: {
     offenderNo: string
     contacts: Contact[]
+    approvedVisitorsOnly: string
   }): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',
-        url: `/contactRegistry/prisoners/${offenderNo}/contacts?type=S`,
+        url: `/contactRegistry/prisoners/${offenderNo}/contacts/social?approvedVisitorsOnly=${approvedVisitorsOnly}&hasDateOfBirth=false&withAddress=false`,
       },
       response: {
         status: 200,

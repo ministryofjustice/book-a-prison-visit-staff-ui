@@ -86,14 +86,16 @@ describe('prisonerContactRegistryApiClient', () => {
       ]
 
       fakePrisonerContactRegistryApi
-        .get(`/prisoners/${offenderNo}/contacts`)
+        .get(`/prisoners/${offenderNo}/contacts/social`)
         .query({
-          type: 'S',
+          approvedVisitorsOnly: 'true',
+          hasDateOfBirth: 'false',
+          withAddress: 'false',
         })
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
-      const output = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(offenderNo)
+      const output = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(true, offenderNo)
 
       expect(output).toEqual(results)
     })
@@ -102,9 +104,11 @@ describe('prisonerContactRegistryApiClient', () => {
       const offenderNo = 'A1234BC'
 
       fakePrisonerContactRegistryApi
-        .get(`/prisoners/${offenderNo}/contacts`)
+        .get(`/prisoners/${offenderNo}/contacts/social`)
         .query({
-          type: 'S',
+          approvedVisitorsOnly: 'true',
+          hasDateOfBirth: 'false',
+          withAddress: 'false',
         })
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(404, {
@@ -114,7 +118,7 @@ describe('prisonerContactRegistryApiClient', () => {
           developerMessage: 'string',
         })
 
-      const output = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(offenderNo)
+      const output = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(true, offenderNo)
 
       expect(output).toEqual([])
     })

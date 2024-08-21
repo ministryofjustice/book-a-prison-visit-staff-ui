@@ -127,7 +127,7 @@ export default class VisitService {
 
     const visitHistoryDetails = await orchestrationApiClient.getVisitHistory(reference)
     const { visit } = visitHistoryDetails
-    const contacts = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(visit.prisonerId)
+    const contacts = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(false, visit.prisonerId)
     const visitorIds = visit.visitors.map(visitor => visitor.nomisPersonId)
 
     const visitors = contacts

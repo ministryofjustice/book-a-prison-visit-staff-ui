@@ -14,14 +14,16 @@ export default class PrisonerContactRegistryApiClient {
     )
   }
 
-  async getPrisonerSocialContacts(offenderNo: string): Promise<Contact[]> {
+  async getPrisonerSocialContacts(approvedVisitorsOnly: boolean, offenderNo: string): Promise<Contact[]> {
     let socialContacts: Contact[] = []
 
     try {
       socialContacts = await this.restClient.get({
-        path: `/prisoners/${offenderNo}/contacts`,
+        path: `/prisoners/${offenderNo}/contacts/social`,
         query: new URLSearchParams({
-          type: 'S',
+          approvedVisitorsOnly: approvedVisitorsOnly.toString(),
+          hasDateOfBirth: 'false',
+          withAddress: 'false',
         }).toString(),
       })
     } catch (e) {
