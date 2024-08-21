@@ -5,7 +5,6 @@ import { isAdult } from './utils'
 
 type BanStatus = { isBanned: boolean; numDays?: number }
 
-const visitorRestrictionsToShow = ['BAN', 'PREINF', 'RESTRICTED', 'CLOSED', 'NONCON']
 const MAX_BOOKING_DAYS_AHEAD = 28
 
 export const buildVisitorListItem = (visitor: Contact): VisitorListItem => {
@@ -16,7 +15,7 @@ export const buildVisitorListItem = (visitor: Contact): VisitorListItem => {
     adult: visitor.dateOfBirth ? isAdult(visitor.dateOfBirth) : true,
     relationshipDescription: visitor.relationshipDescription,
     address: getAddressToDisplay(visitor.addresses),
-    restrictions: getRestrictionsToDisplay(visitor.restrictions),
+    restrictions: visitor.restrictions,
     banned: getBanStatus(visitor.restrictions).isBanned,
   }
 }
@@ -44,10 +43,6 @@ const getFormattedAddress = (address: Address): string => {
     .join(',<br>')
 
   return formattedAddress
-}
-
-const getRestrictionsToDisplay = (restrictions: Restriction[]): Restriction[] => {
-  return restrictions.filter(restriction => visitorRestrictionsToShow.includes(restriction.restrictionType))
 }
 
 export const getBanStatus = (restrictions: Restriction[]): BanStatus => {

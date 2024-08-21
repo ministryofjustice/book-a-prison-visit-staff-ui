@@ -66,13 +66,6 @@ describe('Prisoner visitor service', () => {
               startDate: '2022-01-04',
               globalRestriction: false,
             },
-            {
-              restrictionType: 'DIHCON',
-              restrictionTypeDescription: 'Disability Health Concerns',
-              startDate: '2022-01-05',
-              globalRestriction: false,
-              comment: 'This restriction should not display',
-            },
           ],
           addresses: [
             {
@@ -125,19 +118,6 @@ describe('Prisoner visitor service', () => {
               addressUsages: [],
             },
           ],
-        },
-        {
-          personId: 4323,
-          firstName: 'John',
-          lastName: 'Jones',
-          relationshipCode: 'FRI',
-          relationshipDescription: 'Friend',
-          contactType: 'S',
-          approvedVisitor: false, // should not show in visitor list
-          emergencyContact: false,
-          nextOfKin: false,
-          restrictions: [],
-          addresses: [],
         },
         {
           personId: 4324,

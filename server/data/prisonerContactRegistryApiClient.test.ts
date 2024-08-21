@@ -95,7 +95,7 @@ describe('prisonerContactRegistryApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
-      const output = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(offenderNo)
+      const output = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(true, offenderNo)
 
       expect(output).toEqual(results)
     })
@@ -118,7 +118,7 @@ describe('prisonerContactRegistryApiClient', () => {
           developerMessage: 'string',
         })
 
-      const output = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(offenderNo)
+      const output = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(true, offenderNo)
 
       expect(output).toEqual([])
     })
