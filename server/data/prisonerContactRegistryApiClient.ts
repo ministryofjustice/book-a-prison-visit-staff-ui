@@ -23,7 +23,7 @@ export default class PrisonerContactRegistryApiClient {
         query: new URLSearchParams({
           approvedVisitorsOnly: approvedVisitorsOnly.toString(),
           hasDateOfBirth: 'false',
-          withAddress: 'false',
+          withAddress: 'true',
         }).toString(),
       })
     } catch (e) {
