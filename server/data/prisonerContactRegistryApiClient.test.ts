@@ -90,7 +90,7 @@ describe('prisonerContactRegistryApiClient', () => {
         .query({
           approvedVisitorsOnly: 'true',
           hasDateOfBirth: 'false',
-          withAddress: 'false',
+          withAddress: 'true',
         })
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
@@ -108,7 +108,7 @@ describe('prisonerContactRegistryApiClient', () => {
         .query({
           approvedVisitorsOnly: 'true',
           hasDateOfBirth: 'false',
-          withAddress: 'false',
+          withAddress: 'true',
         })
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(404, {
