@@ -19,9 +19,11 @@ export default class PrisonerContactRegistryApiClient {
 
     try {
       socialContacts = await this.restClient.get({
-        path: `/prisoners/${offenderNo}/contacts`,
+        path: `/prisoners/${offenderNo}/contacts/social`,
         query: new URLSearchParams({
-          type: 'S',
+          approvedVisitorsOnly: 'true',
+          hasDateOfBirth: 'false',
+          withAddress: 'false',
         }).toString(),
       })
     } catch (e) {
