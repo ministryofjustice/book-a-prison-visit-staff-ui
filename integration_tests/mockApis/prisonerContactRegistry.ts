@@ -15,7 +15,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        url: `/contactRegistry/prisoners/${offenderNo}/contacts/social?approvedVisitorsOnly=${approvedVisitorsOnly}&hasDateOfBirth=false&withAddress=false`,
+        url: `/contactRegistry/prisoners/${offenderNo}/contacts/social?approvedVisitorsOnly=${approvedVisitorsOnly}&hasDateOfBirth=false&withAddress=true`,
       },
       response: {
         status: 200,
