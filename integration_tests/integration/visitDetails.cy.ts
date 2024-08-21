@@ -47,7 +47,7 @@ context('Visit details page', () => {
 
     cy.task('stubPrisonerById', prisoner)
     cy.task('stubVisitHistory', visitHistoryDetails)
-    cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
+    cy.task('stubPrisonerSocialContacts', { offenderNo, contacts, approvedVisitorsOnly: 'false' })
     cy.visit('/visit/ab-cd-ef-gh')
     const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage)
 
@@ -102,7 +102,7 @@ context('Visit details page', () => {
 
     cy.task('stubPrisonerById', prisoner)
     cy.task('stubVisitHistory', visitHistoryDetails)
-    cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
+    cy.task('stubPrisonerSocialContacts', { offenderNo, contacts, approvedVisitorsOnly: 'false' })
     cy.task('stubGetVisitNotifications', { reference: TestData.visit().reference, notifications })
     cy.visit('/visit/ab-cd-ef-gh')
 
@@ -152,7 +152,7 @@ context('Visit details page', () => {
 
     cy.task('stubPrisonerById', prisoner)
     cy.task('stubVisitHistory', visitHistoryDetails)
-    cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
+    cy.task('stubPrisonerSocialContacts', { offenderNo, contacts, approvedVisitorsOnly: 'false' })
     cy.visit('/visit/ab-cd-ef-gh')
 
     const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage)

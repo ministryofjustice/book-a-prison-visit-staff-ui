@@ -66,7 +66,7 @@ context('Search for a booking by reference', () => {
     searchBookingByReferenceResultsPage.visitStatus().contains('Booked')
 
     cy.task('stubVisitHistory', TestData.visitHistoryDetails({ visit }))
-    cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
+    cy.task('stubPrisonerSocialContacts', { offenderNo, contacts, approvedVisitorsOnly: 'false' })
     cy.task('stubGetVisitNotifications', { reference: visit.reference })
 
     searchBookingByReferenceResultsPage.visitReferenceLink().click()
@@ -135,7 +135,7 @@ context('Search for a booking by reference', () => {
     const prisonerProfilePage = Page.verifyOnPageTitle(PrisonerProfilePage, prisonerDisplayName)
 
     cy.task('stubVisitHistory', TestData.visitHistoryDetails({ visit }))
-    cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
+    cy.task('stubPrisonerSocialContacts', { offenderNo, contacts, approvedVisitorsOnly: 'false' })
     cy.task('stubGetVisitNotifications', { reference: visit.reference })
 
     prisonerProfilePage.visitTabReference().eq(0).click()
