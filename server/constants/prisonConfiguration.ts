@@ -3,214 +3,228 @@ type PrisonConfiguration = {
 }
 
 const prisonConfiguration: Record<string, PrisonConfiguration> = {
-  // Askham Grange (HMP & YOI)
+  // Askham Grange
   AGI: {
     selectVisitorsText: [
       'You can add up to 4 people aged 18 and over, and 4 children under 18 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Aylesbury (HMYOI)
+  // Aylesbury
   AYI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 16 and over, and 3 children under 16 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Bedford (HMP & YOI)
+  // Bedford
   BFI: {
     selectVisitorsText: [
       'You can add up to 2 people aged 18 and over, and 5 children under 18 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Bristol (HMP & YOI)
+  // Bristol
   BLI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 18 and over. Children can also be added to the visit.',
       'Contact HMP Bristol when the total number of visitors (adults and children) is more than 3.',
     ],
   },
-  // Bullingdon (HMP & YOI)
+  // Bullingdon
   BNI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Bure (HMP)
+  // Bure
   BRI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 18 and over, and 5 children under 18 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Brinsford (HMP & YOI)
+  // Brinsford
   BSI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 10 and over, and 3 children under 10 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Chelmsford (HMP & YOI)
+  // Chelmsford
   CDI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 8 and over, and 3 children under 8 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Cardiff (HMP & YOI)
+  // Cardiff
   CFI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 16 and over, and 3 children under 16 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Coldingley (HMP)
+  // Coldingley
   CLI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 16 and over, and any number of children related to the prisoner.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Dartmoor (HMP)
+  // Dartmoor
   DAI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Drake Hall (HMP & YOI)
+  // Drake Hall
   DHI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 17 and over, and 4 children under 17 years old. ',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Durham (HMP & YOI)
+  // Durham
   DMI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 10 and over, and 3 children under 10 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Downview (HMP & YOI)
+  // Downview
   DWI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Erlestoke (HMP & YOI)
+  // Erlestoke
   EEI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Standford Hill (HMP & YOI)
+  // Standford Hill
   EHI: {
     selectVisitorsText: [
       'You can add up to 4 people aged 18 and over, and any number of children related to the prisoner.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // East Sutton Park (HMP & YOI)
+  // East Sutton Park
   ESI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Eastwood Park (HMP & YOI)
+  // Eastwood Park
   EWI: {
     selectVisitorsText: ['You can add up to 3 people.', 'At least one visitor must be 18 or older.'],
   },
-  // Foston Hall (HMP & YOI)
+  // Elmley
+  EYI: {
+    selectVisitorsText: [
+      'You can add up to 3 people aged 18 and over, and any number of children.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
+  // Ford
+  FDI: {
+    selectVisitorsText: [
+      'You can add up to 3 people aged 18 and over, and 5 children under 18 years old.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
+  // Foston Hall
   FHI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Full Sutton (HMP)
+  // Full Sutton
   FNI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Featherstone (HMP)
+  // Featherstone
   FSI: {
     selectVisitorsText: [
-      'You can add up to 3 people aged 18 and over, and any number of approved children.',
+      'You can add up to 3 people aged 18 and over, and any number of children.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Guys Marsh (HMP)
+  // Guys Marsh
   GMI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Hollesley Bay (HMP & YOI)
+  // Hollesley Bay
   HBI: {
     selectVisitorsText: [
       'You can add up to a total of 6 people, with a maximum of 3 people aged 18 and over.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Hewell (HMP)
+  // Hewell
   HEI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 13 and over, and 3 children under 13 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Hull (HMP & YOI)
+  // Hull
   HLI: {
     selectVisitorsText: [
       'You can add up to 4 people aged 16 and over, and any number of children.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Highpoint (HMP)
+  // Highpoint
   HPI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 18 and over, and 4 children under 18 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Kirkham (HMP)
+  // Kirkham
   KMI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 18 and over, and any number of children.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Lancaster Farms (HMP)
+  // Lancaster Farms
   LFI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 10 and over, and 3 children under 10 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Lindholme (HMP)
+  // Lindholme
   LHI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 18 and over, and 6 children under 18 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Lincoln (HMP & YOI)
+  // Lincoln
   LII: {
     selectVisitorsText: [
       'You can add up to 3 people aged 16 and over, and 6 children under 16 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Low Newton (HMP & YOI)
+  // Low Newton
   LNI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
@@ -218,109 +232,130 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'Contact the establishment if you would like to bring more than 3 children.',
     ],
   },
-  // Littlehey (HMP)
+  // Littlehey
   LTI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Moorland (HMP & YOI)
+  // Lewes
+  LWI: {
+    selectVisitorsText: [
+      'You can add up to 3 people aged 18 and over, and any number of children.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
+  // Moorland
   MDI: {
     selectVisitorsText: [
       'You can add up to a total of 5 people, with a maximum of 3 people aged 18 and over.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Morton Hall (HMP)
+  // Morton Hall
   MHI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // The Mount (HMP)
+  // Maidstone
+  MSI: {
+    selectVisitorsText: [
+      'You can add up to 3 people aged 12 and over, and any number of children.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
+  // The Mount
   MTI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // New Hall (HMP & YOI)
+  // New Hall
   NHI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // North Sea Camp (HMP)
+  // Nottingham
+  NMI: {
+    selectVisitorsText: [
+      'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
+      'At least one visitor must be 18 or older.',
+    ],
+  },
+  // North Sea Camp
   NSI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 16 and over, and 3 children under 16 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Norwich (HMP & YOI)
+  // Norwich
   NWI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 18 and over, and any number of children.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Onley (HMP)
+  // Onley
   ONI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 18 and over with no more than 6 children per visit.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Preston (HMP & YOI)
+  // Preston
   PNI: {
     selectVisitorsText: [
       'You can add up to a total of 5 people, with a maximum of 3 people aged 16 and over.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Pentonville (HMP & YOI)
+  // Pentonville
   PVI: {
     selectVisitorsText: [
       'You can add up to a total of 5 people, with a maximum of 3 people aged 18 and over.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Rochester (HMP & YOI)
+  // Rochester
   RCI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 16 and over, and 3 children under 16 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Ranby (HMP)
+  // Ranby
   RNI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 18 and over, and any number of children.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Send (HMP)
+  // Send
   SDI: {
     selectVisitorsText: ['You can add up to a total of 4 people.', 'At least one visitor must be 18 or older.'],
   },
-  // Stafford (HMP)
+  // Stafford
   SFI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Stoke Heath (HMP & YOI)
+  // Stoke Heath
   SHI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Stocken (HMP)
+  // Stocken
   SKI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 16 and over - with a maximum of 5 total visitors.',
@@ -328,7 +363,7 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'Contact the establishment if you would like to bring more children.',
     ],
   },
-  // Swinfen Hall (HMP & YOI)
+  // Swinfen Hall
   SNI: {
     selectVisitorsText: [
       'You can add up to a total of 3 people.',
@@ -336,70 +371,70 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Sudbury (HMP & YOI)
+  // Sudbury
   SUI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 12 and over - with a maximum of 5 total visitors.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Styal (HMP & YOI)
+  // Styal
   STI: {
     selectVisitorsText: [
       'You can add up to a total of 5 people, with a maximum of 3 people aged 18 and over.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Swansea (HMP & YOI)
+  // Swansea
   SWI: {
     selectVisitorsText: [
       'You can add up to 3 people aged over 18, and 3 children under 18 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Thorn Cross (HMP & YOI)
+  // Thorn Cross
   TCI: {
     selectVisitorsText: [
       'You can add up to 3 people aged over 18, and 5 children under 18 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Winchester (HMP & YOI)
+  // Winchester
   WCI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 10 and over, and 3 children under 10 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Warren Hill (HMP & YOI)
+  // Warren Hill
   WII: {
     selectVisitorsText: [
       'You can add up to 3 people aged 18 and over, and 5 children under 18 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Wayland (HMP)
+  // Wayland
   WLI: {
     selectVisitorsText: [
       'You can add up to 3 people aged over 18, and 4 children under 18 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Werrington (HMYOI)
+  // Werrington
   WNI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 15 and over, and 3 children under 15 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Whitemoor (HMP)
+  // Whitemoor
   WRI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
       'At least one visitor must be 18 or older.',
     ],
   },
-  // Wandsworth (HMP & YOI)
+  // Wandsworth
   WWI: {
     selectVisitorsText: [
       'You can add up to 3 people aged 18 and over, and 3 children under 18 years old.',
