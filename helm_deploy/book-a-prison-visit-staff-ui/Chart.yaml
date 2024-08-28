@@ -5,7 +5,7 @@ name: book-a-prison-visit-staff-ui
 version: 0.2.1
 dependencies:
   - name: generic-service
-    version: "3.4"
+    version: "3.5"
     repository: https://ministryofjustice.github.io/hmpps-helm-charts
   - name: generic-prometheus-alerts
     version: "1.9"
