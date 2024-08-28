@@ -208,7 +208,7 @@ export default class OrchestrationApiClient {
         path: '/visit-sessions/capacity',
         query: new URLSearchParams({ prisonId, sessionDate, sessionStartTime, sessionEndTime }).toString(),
       })
-    } catch (error) {
+    } catch {
       return null
     }
   }
