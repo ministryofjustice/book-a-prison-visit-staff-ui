@@ -62,7 +62,7 @@ export default class CheckYourBooking {
         username: res.locals.user.username,
         operationId: res.locals.appInsightsOperationId,
       })
-    } catch (error) {
+    } catch {
       return res.render('pages/bookAVisit/checkYourBooking', {
         errors: [
           {

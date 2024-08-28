@@ -103,7 +103,7 @@ export default class VisitSessionsService {
         format(earliestStartTime, 'yyyy-MM-dd'),
         format(latestEndTime, 'yyyy-MM-dd'),
       )
-    } catch (error) {
+    } catch {
       whereaboutsAvailable = false
     }
 
