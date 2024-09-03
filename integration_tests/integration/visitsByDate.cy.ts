@@ -180,13 +180,7 @@ context('View visits by date', () => {
     cy.task('stubSessionSchedule', { prisonId, date: firstOfNextMonthShortFormat, sessionSchedule: [] })
     cy.task('stubGetVisitsWithoutSessionTemplate', { prisonId, sessionDate: firstOfNextMonthShortFormat, visits: [] })
 
-    // Error raised when pressing initial 'toggleChooseAnotherDatePopUp' although it works as intended
-    // Not sure why its raising the error, this stops is from pausing integration tests
-    Cypress.on('uncaught:exception', () => {
-      return false
-    })
     visitsByDatePage.toggleChooseAnotherDatePopUp()
-    visitsByDatePage.datePickerToggleCalendar()
     visitsByDatePage.datePickerGoToNextMonth()
     visitsByDatePage.datePickerSelectDay(1)
     visitsByDatePage.datePickerClickViewDate()

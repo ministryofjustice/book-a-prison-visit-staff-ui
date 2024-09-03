@@ -25,12 +25,6 @@ context('Date picker', () => {
   })
 
   it('should navigate through a range of dates and correctly handle month and year boundaries', () => {
-    // Error raised when pressing initial 'toggleChooseAnotherDatePopUp' although it works as intended
-    // Not sure why its raising the error, this stops is from pausing integration tests
-    Cypress.on('uncaught:exception', () => {
-      return false
-    })
-
     const homePage = Page.verifyOnPage(HomePage)
     homePage.viewVisitsTile().click()
     const visitsByDatePage = Page.verifyOnPage(VisitsByDatePage)
