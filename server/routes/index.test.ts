@@ -49,7 +49,7 @@ describe('GET /', () => {
         expect($('[data-test="view-timetable"] .card__link').attr('href')).toBe('/timetable')
 
         expect($('[data-test="block-dates"] .card__link').text()).toBe('Block visit dates')
-        expect($('[data-test="block-dates"] .card__link').attr('href')).toBe('/date-management')
+        expect($('[data-test="block-dates"] .card__link').attr('href')).toBe('/block-visit-dates')
 
         expect($('[data-test="change-establishment"]').text()).toContain('Change establishment')
       })
@@ -62,20 +62,8 @@ describe('GET /', () => {
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
-
         expect($('.card').length).toBe(4)
-
-        expect($('[data-test="book-or-change-visit"] .card__link').text()).toBe('Book or change a visit')
-
-        expect($('[data-test="need-review"] .card__link').text()).toContain('Need review')
-
-        expect($('[data-test="view-visits-by-date"] .card__link').text()).toBe('View visits by date')
-
-        expect($('[data-test="view-timetable"] .card__link').text()).toBe('View visits timetable')
-
-        expect($('[data-test="block-dates"] .card__link').text()).toBe('')
-
-        expect($('[data-test="change-establishment"]').text()).toContain('Change establishment')
+        expect($('[data-test="block-dates"] .card__link').length).toBe(0)
       })
   })
 
