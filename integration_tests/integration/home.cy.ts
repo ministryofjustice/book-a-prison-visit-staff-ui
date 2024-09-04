@@ -25,5 +25,6 @@ context('Home page', () => {
     homePage.needReviewBadgeCount().contains(notificationCount.count)
     homePage.viewVisitsTile().contains('View visits by date')
     homePage.viewTimetableTile().contains('View visits timetable')
+    homePage.blockedDatesTile().contains('Block visit dates')
   })
 })

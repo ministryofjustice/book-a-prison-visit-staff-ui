@@ -25,6 +25,9 @@ generic-service:
     APPLICATIONINSIGHTS_CONNECTION_STRING: null # disable App Insights for staging
     REDIS_KEY: "bapv-staff-staging"
 
+    FEATURE_SESSION_MANAGEMENT: "true"
+
+
   namespace_secrets:
     book-a-prison-visit-staff-ui:
       APPINSIGHTS_INSTRUMENTATIONKEY: null # disable App Insights for staging
