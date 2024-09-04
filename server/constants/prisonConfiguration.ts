@@ -124,7 +124,10 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
   },
   // Eastwood Park
   EWI: {
-    selectVisitorsText: ['You can add up to 3 people.', 'At least one visitor must be 18 or older.'],
+    selectVisitorsText: [
+      'You can add up to 3 people aged 18 and over, and any number of children.',
+      'At least one visitor must be 18 or older.',
+    ],
   },
   // Elmley
   EYI: {
