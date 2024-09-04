@@ -5,6 +5,7 @@ import { appWithAllRoutes } from './testutils/appSetup'
 import * as visitorUtils from './visitorUtils'
 import { createMockVisitNotificationsService } from '../services/testutils/mocks'
 import TestData from './testutils/testData'
+import config from '../config'
 
 let app: Express
 
@@ -26,13 +27,14 @@ describe('GET /', () => {
   })
 
   it('should render the home page cards and change establishment link', () => {
+    config.features.sessionManagement = true
     return request(app)
       .get('/')
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
 
-        expect($('.card').length).toBe(4)
+        expect($('.card').length).toBe(5)
 
         expect($('[data-test="book-or-change-visit"] .card__link').text()).toBe('Book or change a visit')
         expect($('[data-test="book-or-change-visit"] .card__link').attr('href')).toBe('/search/prisoner')
@@ -46,7 +48,22 @@ describe('GET /', () => {
         expect($('[data-test="view-timetable"] .card__link').text()).toBe('View visits timetable')
         expect($('[data-test="view-timetable"] .card__link').attr('href')).toBe('/timetable')
 
+        expect($('[data-test="block-dates"] .card__link').text()).toBe('Block visit dates')
+        expect($('[data-test="block-dates"] .card__link').attr('href')).toBe('/block-visit-dates')
+
         expect($('[data-test="change-establishment"]').text()).toContain('Change establishment')
+      })
+  })
+
+  it('should not render the block-dates card if feature is disabled', () => {
+    config.features.sessionManagement = false
+    return request(app)
+      .get('/')
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('.card').length).toBe(4)
+        expect($('[data-test="block-dates"] .card__link').length).toBe(0)
       })
   })
 

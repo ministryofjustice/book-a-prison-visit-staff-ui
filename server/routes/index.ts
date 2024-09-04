@@ -3,6 +3,7 @@ import { type RequestHandler, Router } from 'express'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import { clearSession } from './visitorUtils'
 import { Services } from '../services'
+import config from '../config'
 
 export default function routes({ visitNotificationsService }: Services): Router {
   const router = Router()
@@ -16,6 +17,7 @@ export default function routes({ visitNotificationsService }: Services): Router 
     res.render('pages/index', {
       hidePhaseBanner: true,
       showEstablishmentSwitcher: true,
+      showFeatureSessionManagement: config.features.sessionManagement,
       reviewCount,
     })
   })

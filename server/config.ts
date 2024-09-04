@@ -163,4 +163,7 @@ export default {
     },
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
+  features: {
+    sessionManagement: get('FEATURE_SESSION_MANAGEMENT', 'false', requiredInProduction) === 'true',
+  },
 }
