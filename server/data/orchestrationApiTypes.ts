@@ -39,3 +39,5 @@ export type NotificationGroup = components['schemas']['OrchestrationNotification
 export type NotificationVisitInfo = components['schemas']['OrchestrationPrisonerVisitsNotificationDto']
 
 export type PrisonDto = components['schemas']['PrisonDto']
+
+export type PrisonExcludeDateDto = components['schemas']['PrisonExcludeDateDto']
