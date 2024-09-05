@@ -38,6 +38,7 @@ export default class VisitsByDatePage extends Page {
 
   // Date picker
   datePickerEnterDate = (date: string): void => {
+    cy.get('.moj-js-datepicker-cancel').click({ force: true })
     cy.get('.moj-js-datepicker-input').clear()
     cy.get('.moj-js-datepicker-input').type(`${date}{enter}`)
     this.datePickerToggleCalendar()

@@ -8,7 +8,7 @@ if (viewAnotherDateToggle) {
     if (datePicker.classList.contains('moj-js-hidden')) {
       viewAnotherDateToggle.setAttribute('aria-expanded', 'false')
       datePicker.classList.remove('moj-js-hidden')
-      document.querySelector('.hmpps-js-datepicker-button').click()
+      document.querySelector('.moj-js-datepicker-toggle').click()
     } else {
       viewAnotherDateToggle.setAttribute('aria-expanded', 'true')
       datePicker.classList.add('moj-js-hidden')
