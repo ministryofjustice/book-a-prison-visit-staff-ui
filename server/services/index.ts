@@ -1,5 +1,6 @@
 import { dataAccess } from '../data'
 import AuditService from './auditService'
+import BlockedDatesService from './blockedDatesService'
 import FrontendComponentsService from './frontendComponentsService'
 import PrisonerProfileService from './prisonerProfileService'
 import PrisonerSearchService from './prisonerSearchService'
@@ -26,6 +27,8 @@ export const services = () => {
   } = dataAccess()
 
   const auditService = new AuditService()
+
+  const blockedDatesService = new BlockedDatesService()
 
   const frontendComponentsService = new FrontendComponentsService(frontendComponentsClientBuilder)
 
@@ -68,6 +71,7 @@ export const services = () => {
 
   return {
     auditService,
+    blockedDatesService,
     frontendComponentsService,
     prisonerProfileService,
     prisonerSearchService,
@@ -85,6 +89,7 @@ export type Services = ReturnType<typeof services>
 
 export {
   AuditService,
+  BlockedDatesService,
   FrontendComponentsService,
   PrisonerProfileService,
   PrisonerSearchService,
