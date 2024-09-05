@@ -16,7 +16,7 @@
 
       {% if visitCount %}
         <p>
-          There are {{ visitCount }} existing {{ "booking" | pluralise(visitCount) }} for this date.
+          There {{ "is" | pluralise(visitCount, "are") }} {{ visitCount }} existing {{ "booking" | pluralise(visitCount) }} for this date.
         </p>
         <p>
           These will be shown on the ‘Need review’ page to be rescheduled or cancelled.
