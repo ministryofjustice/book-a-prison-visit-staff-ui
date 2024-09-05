@@ -168,6 +168,9 @@ export default class OrchestrationApiClient {
     return this.restClient.get({ path: `/visits/notification/visit/${reference}/types` })
   }
 
+  // orchestration-prisons-exclude-date-controller
+  // TODO put exclude-date calls here
+
   // orchestration-sessions-controller
 
   async getVisitSessions(

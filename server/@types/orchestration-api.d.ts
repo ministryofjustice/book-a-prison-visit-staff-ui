@@ -157,6 +157,46 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/config/prisons/prison/{prisonCode}/exclude-date/remove': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /**
+     * Remove exclude date for a given prison
+     * @description Remove exclude date for a given prison
+     */
+    put: operations['removeExcludeDateForPrison']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/config/prisons/prison/{prisonCode}/exclude-date/add': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /**
+     * Add exclude date for a given prison
+     * @description Add exclude date for a given prison
+     */
+    put: operations['addExcludeDateForPrison']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/visits/application/slot/reserve': {
     parameters: {
       query?: never
@@ -434,6 +474,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/visit-sessions/available/restriction': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Returns the restriction type of available sessions
+     * @description Returns the restriction of available sessions given a prisoner and optionally a list of visitors [OPEN / CLOSED]
+     */
+    get: operations['getSessionRestrictionType']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/queue-admin/get-dlq-messages/{dlqName}': {
     parameters: {
       query?: never
@@ -602,6 +662,46 @@ export interface paths {
      * @description Gets prison by given prison id/code
      */
     get: operations['getPrison']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/config/prisons/prison/{prisonCode}/exclude-date/past': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get all past exclude dates for a given prison
+     * @description Get all past exclude dates for a given prison
+     */
+    get: operations['getPastExcludeDatesForPrison']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/config/prisons/prison/{prisonCode}/exclude-date/future': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get all current or future exclude dates for a given prison
+     * @description Get current or future exclude dates for a given prison
+     */
+    get: operations['getFutureExcludeDatesForPrison']
     put?: never
     post?: never
     delete?: never
@@ -1046,6 +1146,17 @@ export interface components {
       /** @description This value is the booker reference and should be used to acquire booker information */
       value: string
     }
+    /** @description Prison exclude date */
+    PrisonExcludeDateDto: {
+      /**
+       * Format: date
+       * @description exclude date
+       * @example 2026-02-12
+       */
+      excludeDate: string
+      /** @description full name of user who added the exclude date or username if full name is not available. */
+      actionedBy: string
+    }
     /** @description Event Audit */
     EventAuditOrchestrationDto: {
       /**
@@ -1067,6 +1178,7 @@ export interface components {
         | 'PRISON_VISITS_BLOCKED_FOR_DATE'
         | 'IGNORE_VISIT_NOTIFICATIONS_EVENT'
         | 'PERSON_RESTRICTION_UPSERTED_EVENT'
+        | 'VISITOR_RESTRICTION_UPSERTED_EVENT'
       /**
        * @description What was the application method for this event
        * @enum {string}
@@ -1149,32 +1261,32 @@ export interface components {
       visitTimeSlot: components['schemas']['SessionTimeSlotDto']
     }
     PageVisitDto: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
       /** Format: int32 */
-      size?: number
+      totalPages?: number
       first?: boolean
       last?: boolean
+      /** Format: int32 */
+      size?: number
       content?: components['schemas']['VisitDto'][]
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject'][]
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     PageableObject: {
       /** Format: int64 */
       offset?: number
       sort?: components['schemas']['SortObject'][]
+      /** Format: int32 */
+      pageSize?: number
       paged?: boolean
       /** Format: int32 */
       pageNumber?: number
-      /** Format: int32 */
-      pageSize?: number
       unpaged?: boolean
     }
     SortObject: {
@@ -1203,6 +1315,7 @@ export interface components {
         | 'PRISONER_RECEIVED_EVENT'
         | 'PRISONER_ALERTS_UPDATED_EVENT'
         | 'PERSON_RESTRICTION_UPSERTED_EVENT'
+        | 'VISITOR_RESTRICTION_UPSERTED_EVENT'
       /** @description List of details of affected visits */
       affectedVisits: components['schemas']['OrchestrationPrisonerVisitsNotificationDto'][]
     }
@@ -1390,9 +1503,18 @@ export interface components {
        */
       sessionRestriction: 'OPEN' | 'CLOSED'
     }
+    /** @description Visit Session restriction type */
+    AvailableVisitSessionRestrictionDto: {
+      /**
+       * @description Session Restriction
+       * @example OPEN
+       * @enum {string}
+       */
+      sessionRestriction: 'OPEN' | 'CLOSED'
+    }
     DlqMessage: {
       body: {
-        [key: string]: Record<string, never> | undefined
+        [key: string]: Record<string, never>
       }
       messageId: string
     }
@@ -2311,6 +2433,138 @@ export interface operations {
       }
     }
   }
+  removeExcludeDateForPrison: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /**
+         * @description prison code
+         * @example HEI
+         */
+        prisonCode: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['PrisonExcludeDateDto']
+      }
+    }
+    responses: {
+      /** @description Exclude dates successfully removed */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PrisonExcludeDateDto'][]
+        }
+      }
+      /** @description Incorrect request to remove exclude date */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to add exclude dates */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Prison not found on visit-scheduler */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  addExcludeDateForPrison: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /**
+         * @description prison code
+         * @example HEI
+         */
+        prisonCode: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['PrisonExcludeDateDto']
+      }
+    }
+    responses: {
+      /** @description Exclude dates successfully added */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PrisonExcludeDateDto'][]
+        }
+      }
+      /** @description Incorrect request to add exclude date */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to add exclude dates */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Prison not found on visit-scheduler */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
   createInitialApplication: {
     parameters: {
       query?: never
@@ -2800,6 +3054,7 @@ export interface operations {
             | 'PRISONER_RECEIVED_EVENT'
             | 'PRISONER_ALERTS_UPDATED_EVENT'
             | 'PERSON_RESTRICTION_UPSERTED_EVENT'
+            | 'VISITOR_RESTRICTION_UPSERTED_EVENT'
           )[]
         }
       }
@@ -3096,6 +3351,55 @@ export interface operations {
         }
       }
       /** @description Incorrect request to Get visit sessions  */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  getSessionRestrictionType: {
+    parameters: {
+      query: {
+        /**
+         * @description Filter results by prisoner id
+         * @example A12345DC
+         */
+        prisonerId: string
+        /**
+         * @description List of visitors who require visit sessions
+         * @example 4729510,4729220
+         */
+        visitors?: number[]
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Available visit session restriction returned */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          '*/*': components['schemas']['AvailableVisitSessionRestrictionDto']
+        }
+      }
+      /** @description Incorrect request to Get available visit session restriction */
       400: {
         headers: {
           [name: string]: unknown
@@ -3543,6 +3847,112 @@ export interface operations {
       }
       /** @description Incorrect permissions to get prison */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  getPastExcludeDatesForPrison: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /**
+         * @description prison code
+         * @example HEI
+         */
+        prisonCode: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Exclude dates successfully returned */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PrisonExcludeDateDto'][]
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to view exclude dates */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Prison not found on visit-scheduler */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  getFutureExcludeDatesForPrison: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /**
+         * @description prison code
+         * @example HEI
+         */
+        prisonCode: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Exclude dates successfully returned */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PrisonExcludeDateDto'][]
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to view exclude dates */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Prison not found on visit-scheduler */
+      404: {
         headers: {
           [name: string]: unknown
         }

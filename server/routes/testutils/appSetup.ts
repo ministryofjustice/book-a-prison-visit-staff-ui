@@ -22,6 +22,7 @@ import { Cookie, SessionData } from 'express-session'
 
 import indexRoutes from '../index'
 import bookAVisitRoutes from '../bookAVisit'
+import blockVisitDatesRoutes from '../blockVisitDates'
 import establishmentRoutes from '../changeEstablishment'
 import prisonerRoutes from '../prisoner'
 import reviewRoutes from '../review'
@@ -148,6 +149,7 @@ function appSetup(
 
   app.use('/', indexRoutes(services))
   app.use('/book-a-visit', bookAVisitRoutes(services))
+  app.use('/block-visit-dates', blockVisitDatesRoutes(services))
   app.use('/change-establishment', establishmentRoutes(services))
   app.use('/prisoner', prisonerRoutes(services))
   app.use('/review', reviewRoutes(services))
