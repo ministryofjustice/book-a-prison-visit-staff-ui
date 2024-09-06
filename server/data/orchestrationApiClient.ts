@@ -186,8 +186,15 @@ export default class OrchestrationApiClient {
   }
 
   // orchestration-prisons-exclude-date-controller
-  async getFutureExcludeDates(prisonCode: string): Promise<PrisonExcludeDateDto[]> {
-    return this.restClient.get({ path: `/config/prisons/prison/${prisonCode}/exclude-date/future` })
+  async blockVisitDate(prisonId: string, date: string, username: string): Promise<void> {
+    await this.restClient.put({
+      path: `/config/prisons/prison/${prisonId}/exclude-date/add`,
+      data: <PrisonExcludeDateDto>{ excludeDate: date, actionedBy: username },
+    })
+  }
+
+  async getFutureExcludeDates(prisonId: string): Promise<PrisonExcludeDateDto[]> {
+    return this.restClient.get({ path: `/config/prisons/prison/${prisonId}/exclude-date/future` })
   }
 
   // orchestration-sessions-controller
@@ -249,9 +256,9 @@ export default class OrchestrationApiClient {
     })
   }
 
-  async getPrison(prisonCode: string): Promise<PrisonDto> {
+  async getPrison(prisonId: string): Promise<PrisonDto> {
     return this.restClient.get({
-      path: `/config/prisons/prison/${prisonCode}`,
+      path: `/config/prisons/prison/${prisonId}`,
     })
   }
 
