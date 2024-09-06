@@ -13,6 +13,7 @@ import {
   NotificationType,
   PrisonDto,
   PrisonerProfile,
+  PrisonExcludeDateDto,
   SessionCapacity,
   SessionSchedule,
   Visit,
@@ -169,7 +170,9 @@ export default class OrchestrationApiClient {
   }
 
   // orchestration-prisons-exclude-date-controller
-  // TODO put exclude-date calls here
+  async getFutureExcludeDates(prisonCode: string): Promise<PrisonExcludeDateDto[]> {
+    return this.restClient.get({ path: `/config/prisons/prison/${prisonCode}/exclude-date/future` })
+  }
 
   // orchestration-sessions-controller
 

@@ -390,6 +390,21 @@ describe('orchestrationApiClient', () => {
     })
   })
 
+  describe('getFutureExcludeDates', () => {
+    it('should return future exclude dates for given prison', async () => {
+      const results = [TestData.prisonExcludeDateDto()]
+      const prisonCode = 'HEI'
+      fakeOrchestrationApi
+        .get(`/config/prisons/prison/${prisonCode}/exclude-date/future`)
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, results)
+
+      const output = await orchestrationApiClient.getFutureExcludeDates(prisonCode)
+
+      expect(output).toStrictEqual(results)
+    })
+  })
+
   describe('getVisitSessions', () => {
     it('should return an array of Visit Sessions', async () => {
       const results = [TestData.visitSession()]

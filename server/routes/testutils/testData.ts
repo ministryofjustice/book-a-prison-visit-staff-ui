@@ -6,6 +6,7 @@ import {
   NotificationVisitInfo,
   PrisonDto,
   PrisonerProfile,
+  PrisonExcludeDateDto,
   SessionCapacity,
   SessionSchedule,
   Visit,
@@ -216,6 +217,14 @@ export default class TestData {
     startDate,
     expiryDate,
     active,
+  })
+
+  static prisonExcludeDateDto = ({
+    excludeDate = '2024-12-12',
+    actionedBy = 'User one',
+  }: Partial<PrisonExcludeDateDto> = {}): PrisonExcludeDateDto => ({
+    excludeDate,
+    actionedBy,
   })
 
   static prisoner = ({
