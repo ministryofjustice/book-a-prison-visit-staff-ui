@@ -10,6 +10,7 @@ import {
   CreateApplicationDto,
   IgnoreVisitNotificationsDto,
   NotificationType,
+  PageVisitDto,
   SessionSchedule,
   Visit,
   VisitRestriction,
@@ -172,6 +173,31 @@ describe('orchestrationApiClient', () => {
       )
 
       expect(output).toStrictEqual(visitPreviews)
+    })
+  })
+
+  describe('getBookedVisitCountByDate', () => {
+    it('should return booked visit count for given prison and date', async () => {
+      const results: PageVisitDto = {
+        totalElements: 2,
+      }
+
+      fakeOrchestrationApi
+        .get(`/visits/search`)
+        .query({
+          prisonId: 'HEI',
+          visitStartDate: '2022-05-23',
+          visitEndDate: '2022-05-23',
+          visitStatus: 'BOOKED',
+          page: '0',
+          size: '1',
+        })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, results)
+
+      const output = await orchestrationApiClient.getBookedVisitCountByDate('HEI', '2022-05-23')
+
+      expect(output).toBe(2)
     })
   })
 

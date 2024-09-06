@@ -6,6 +6,8 @@ import config from '../../config'
 
 let app: Express
 
+const url = '/block-visit-dates'
+
 beforeEach(() => {
   jest.replaceProperty(config, 'features', { sessionManagement: true })
   app = appWithAllRoutes({})
@@ -19,15 +21,15 @@ describe('Feature flag', () => {
   it('should return a 404 if feature not enabled', () => {
     jest.replaceProperty(config, 'features', { sessionManagement: false })
     app = appWithAllRoutes({})
-    return request(app).get('/block-visit-dates').expect(404)
+    return request(app).get(url).expect(404)
   })
 })
 
 describe('Block visit dates listing page', () => {
-  describe('GET /block-visit-dates', () => {
+  describe(`GET ${url}`, () => {
     it('should display block visit dates page', () => {
       return request(app)
-        .get('/block-visit-dates')
+        .get(url)
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
