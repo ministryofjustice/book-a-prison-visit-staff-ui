@@ -36,7 +36,8 @@ jest.mock('..')
 
 export const createMockAuditService = () => new AuditService(null) as jest.Mocked<AuditService>
 
-export const createMockBlockedDatesService = () => new BlockedDatesService() as jest.Mocked<BlockedDatesService>
+export const createMockBlockedDatesService = () =>
+  new BlockedDatesService(null, null) as jest.Mocked<BlockedDatesService>
 
 export const createMockFrontendComponentsService = () =>
   new FrontendComponentsService(null) as jest.Mocked<FrontendComponentsService>

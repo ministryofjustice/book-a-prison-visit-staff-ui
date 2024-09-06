@@ -28,7 +28,7 @@ export const services = () => {
 
   const auditService = new AuditService()
 
-  const blockedDatesService = new BlockedDatesService()
+  const blockedDatesService = new BlockedDatesService(orchestrationApiClientBuilder, hmppsAuthClient)
 
   const frontendComponentsService = new FrontendComponentsService(frontendComponentsClientBuilder)
 

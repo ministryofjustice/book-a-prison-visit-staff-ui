@@ -1,1 +1,87 @@
-<h1>Block visit dates</h1>
+{% extends "layout.njk" %}
+{%- from "moj/components/date-picker/macro.njk" import mojDatePicker -%}
+{%- from "govuk/components/table/macro.njk" import govukTable -%}
+{%- from "govuk/components/button/macro.njk" import govukButton -%}
+
+{% set pageHeaderTitle = "Block visit dates" %}
+{% set pageTitle = applicationName + " - " + pageHeaderTitle %}
+{% set backLinkHref = "/" %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+
+      <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+
+      <p>Blocking a date will stop new bookings being made for this date.</p>
+      <p>Any existing bookings for a blocked date will be moved to the ‘Need review’ page to be rescheduled or cancelled.</p>
+
+    </div>
+  </div>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-third">
+
+      <h2 class="govuk-heading-m govuk-!-margin-top-5">Block a new date</h2>
+
+      <form action="/block-visit-dates" method="POST" novalidate>
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+        {{ mojDatePicker({
+          id: "date",
+          name: "date",
+          label: {
+            text: "Enter a date",
+            classes: "govuk-label--s"
+          },
+          hint: {
+            text: "For example, 31/3/2024"
+          },
+          errorMessage: errors | findError('date'),
+          classes: 'hmpps-datepicker--fixed-width',
+          value: formValues.date
+        }) }}
+        {{ govukButton({
+          text: "Continue",
+          preventDoubleClick: true,
+          attributes: { "data-test": "submit" }
+        }) }}
+      </form>
+    </div>
+  </div>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% set displayRows = [] %}
+
+      {% for blockedDate in blockedDates %}
+        {% set displayRows = (displayRows.push([
+          {
+            text: blockedDate.excludeDate | formatDate("EEEE d MMMM yyyy"),
+            attributes: { "data-test": "blocked-date-" + loop.index }
+          },
+          {
+            text: 'Unknown' if blockedDate.actionedBy === 'NOT_KNOWN' else blockedDate.actionedBy ,
+            attributes: { "data-test": "blocked-by-" + loop.index }
+          },
+          {
+            html: '<a class="govuk-link--no-visited-state" href="/unblock">Unblock</a>',
+            attributes: { "data-test": "unblock-date-" + loop.index }
+          }
+        ]), displayRows) %}
+      {% endfor %}
+
+      {{ govukTable({
+        head: [
+          {
+            text: "Date"
+          },
+          {
+            text: "Blocked by"
+          },
+          {
+            text: "Action"
+          }
+        ],
+        rows: displayRows
+      }) }}
+    </div>
+  </div>
+{% endblock %}

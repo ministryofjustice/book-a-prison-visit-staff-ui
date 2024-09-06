@@ -10,6 +10,7 @@ import {
   NotificationType,
   PrisonDto,
   PrisonerProfile,
+  PrisonExcludeDateDto,
   SessionCapacity,
   SessionSchedule,
   Visit,
@@ -472,6 +473,25 @@ export default {
       },
       response: {
         status: 200,
+      },
+    })
+  },
+  stubGetFutureExcludeDates: ({
+    prisonId,
+    prisonExcludeDates = [TestData.prisonExcludeDateDto()],
+  }: {
+    prisonId: string
+    prisonExcludeDates: PrisonExcludeDateDto[]
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        url: `/orchestration/config/prisons/prison/${prisonId}/exclude-date/future`,
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: prisonExcludeDates,
       },
     })
   },

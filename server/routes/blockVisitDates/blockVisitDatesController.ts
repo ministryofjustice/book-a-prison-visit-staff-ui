@@ -1,11 +1,20 @@
 import { RequestHandler } from 'express'
+import { BlockedDatesService } from '../../services'
 
 export default class BlockVisitDatesController {
-  public constructor() {}
+  public constructor(private readonly blockedDatesService: BlockedDatesService) {}
 
   public view(): RequestHandler {
     return async (req, res) => {
-      res.render('pages/blockVisitDates/blockVisitDates')
+      const blockedDates = await this.blockedDatesService.getFutureExcludeDates(
+        req.session.selectedEstablishment.prisonId,
+        res.locals.user.username,
+      )
+
+      res.render('pages/blockVisitDates/blockVisitDates', {
+        blockedDates,
+        showEstablishmentSwitcher: true,
+      })
     }
   }
 }
