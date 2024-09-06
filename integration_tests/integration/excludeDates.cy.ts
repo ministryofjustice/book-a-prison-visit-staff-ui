@@ -3,7 +3,7 @@ import Page from '../pages/page'
 import BlockedVisitPage from '../pages/blockedVisits'
 import TestData from '../../server/routes/testutils/testData'
 
-context('Exclude dates', () => {
+context('Block dates', () => {
   beforeEach(() => {
     cy.task('reset')
     cy.task('stubSignIn')
@@ -16,7 +16,7 @@ context('Exclude dates', () => {
     cy.signIn()
   })
 
-  it('Should load exclude dates page, and display excluded date', () => {
+  it('Should load block dates page, and display blocked dates', () => {
     cy.task('stubUserCaseloads', TestData.caseLoads())
     cy.task('stubSetActiveCaseLoad', 'HEI')
     cy.task('stubGetNotificationCount', { prisonId: 'HEI' })
@@ -28,7 +28,7 @@ context('Exclude dates', () => {
     homePage.blockedDatesTile().click()
 
     const blockedVisitPage = Page.verifyOnPage(BlockedVisitPage)
-    blockedVisitPage.excludeDate(1).contains('Thursday 12 December 2024')
+    blockedVisitPage.blockedDate(1).contains('Thursday 12 December 2024')
     blockedVisitPage.blockedBy(1).contains('User one')
     blockedVisitPage.unblockLink(1).should('have.attr', 'href', `/unblock`)
   })

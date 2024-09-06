@@ -5,7 +5,7 @@ export default class BlockedVisitPage extends Page {
     super('Block visit dates')
   }
 
-  excludeDate = (index: number): PageElement => cy.get(`[data-test="exclude-date-${index}`)
+  blockedDate = (index: number): PageElement => cy.get(`[data-test="blocked-date-${index}`)
 
   blockedBy = (index: number): PageElement => cy.get(`[data-test="blocked-by-${index}`)
 

@@ -513,14 +513,14 @@ describe('GET /visits', () => {
     })
   })
 
-  describe('excluded dates', () => {
+  describe('blocked dates', () => {
     beforeEach(() => {
       visitSessionsService.getSessionSchedule.mockResolvedValue([])
       visitService.getVisitsBySessionTemplate.mockResolvedValue([])
       visitService.getVisitsWithoutSessionTemplate.mockResolvedValue([])
     })
 
-    it('should show appropriate message if there is no schedule nor visits and it is an excluded date', () => {
+    it('should show appropriate message if there is no schedule nor visits and it is a blocked date', () => {
       supportedPrisonsService.isAnExcludeDate.mockResolvedValue(true)
       visitNotificationsService.dateHasNotifications.mockResolvedValue(false)
 

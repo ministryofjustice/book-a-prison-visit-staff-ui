@@ -41,7 +41,7 @@ describe('Block visit dates listing page', () => {
           const $ = cheerio.load(res.text)
           expect($('.govuk-back-link').attr('href')).toBe('/')
           expect($('h1').text()).toBe('Block visit dates')
-          expect($('[data-test="exclude-date-1"]').text()).toBe(`Thursday 12 December 2024`)
+          expect($('[data-test="blocked-date-1"]').text()).toBe(`Thursday 12 December 2024`)
           expect($('[data-test="blocked-by-1"]').text()).toBe(`User one`)
           expect($('[data-test="unblock-date-1"] a').attr('href')).toBe(`/unblock`)
         })

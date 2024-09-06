@@ -51,11 +51,11 @@
     <div class="govuk-grid-column-full">
       {% set displayRows = [] %}
 
-      {% for blockedDate in excludeDates %}
+      {% for blockedDate in blockedDates %}
         {% set displayRows = (displayRows.push([
           {
             text: blockedDate.excludeDate | formatDate("EEEE d MMMM yyyy"),
-            attributes: { "data-test": "exclude-date-" + loop.index }
+            attributes: { "data-test": "blocked-date-" + loop.index }
           },
           {
             text: 'Unknown' if blockedDate.actionedBy === 'NOT_KNOWN' else blockedDate.actionedBy ,
