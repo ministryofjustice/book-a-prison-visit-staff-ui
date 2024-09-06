@@ -7,6 +7,8 @@
   {% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
 {% endset %}
 
+{% set backLinkHref = '/block-visit-dates' %}
+
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
@@ -15,14 +17,14 @@
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
 
       {% if visitCount %}
-        <p>
+        <p data-test="existing-bookings">
           There {{ "is" | pluralise(visitCount, "are") }} {{ visitCount }} existing {{ "booking" | pluralise(visitCount) }} for this date.
         </p>
         <p>
           These will be shown on the ‘Need review’ page to be rescheduled or cancelled.
         </p>
       {% else %}
-        <p>There are no existing bookings for this date.</p>
+        <p data-test="no-existing-bookings">There are no existing bookings for this date.</p>
       {% endif %}
 
       <form action="/block-visit-dates/block-new-date" method="POST" novalidate>
