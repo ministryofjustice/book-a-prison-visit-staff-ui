@@ -10,6 +10,7 @@ let app: Express
 
 const blockedDatesService = createMockBlockedDatesService()
 const prisonExcludeDate = TestData.prisonExcludeDateDto()
+const url = '/block-visit-dates'
 
 beforeEach(() => {
   config.features.sessionManagement = true
@@ -22,11 +23,19 @@ afterEach(() => {
   jest.resetAllMocks()
 })
 
-describe('Block visit dates page', () => {
-  describe('GET /block-visit-dates', () => {
+describe('Feature flag', () => {
+  it('should return a 404 if feature not enabled', () => {
+    jest.replaceProperty(config, 'features', { sessionManagement: false })
+    app = appWithAllRoutes({})
+    return request(app).get(url).expect(404)
+  })
+})
+
+describe('Block visit dates listing page', () => {
+  describe(`GET ${url}`, () => {
     it('should display block visit dates page', () => {
       return request(app)
-        .get('/block-visit-dates')
+        .get(url)
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)

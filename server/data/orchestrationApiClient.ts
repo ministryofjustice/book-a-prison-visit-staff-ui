@@ -11,6 +11,7 @@ import {
   NotificationCount,
   NotificationGroup,
   NotificationType,
+  PageVisitDto,
   PrisonDto,
   PrisonerProfile,
   PrisonExcludeDateDto,
@@ -81,6 +82,21 @@ export default class OrchestrationApiClient {
         ...(visitRestrictions && { visitRestrictions }),
       }).toString(),
     })
+  }
+
+  async getBookedVisitCountByDate(prisonId: string, date: string): Promise<number> {
+    const visits = await this.restClient.get<PageVisitDto>({
+      path: `/visits/search`,
+      query: new URLSearchParams({
+        prisonId,
+        visitStartDate: date,
+        visitEndDate: date,
+        visitStatus: 'BOOKED',
+        page: '0',
+        size: '1',
+      }).toString(),
+    })
+    return visits.totalElements ?? 0
   }
 
   //  orchestration-applications-controller

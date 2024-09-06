@@ -13,6 +13,7 @@ declare module 'express-session' {
     slotsList: VisitSlotList
     visitSessionData: VisitSessionData
     selectedEstablishment: Prison
+    visitBlockDate?: string
   }
 }
 

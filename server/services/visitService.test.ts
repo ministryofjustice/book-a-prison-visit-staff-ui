@@ -336,5 +336,22 @@ describe('Visit service', () => {
         expect(result).toStrictEqual(visitPreviews)
       })
     })
+
+    describe('getBookedVisitCountByDate', () => {
+      it('should return booked visit count for given date', async () => {
+        const date = '2024-01-31'
+
+        orchestrationApiClient.getBookedVisitCountByDate.mockResolvedValue(2)
+
+        const result = await visitService.getBookedVisitCountByDate({
+          username: 'user',
+          prisonId,
+          date,
+        })
+
+        expect(orchestrationApiClient.getBookedVisitCountByDate).toHaveBeenCalledWith(prisonId, date)
+        expect(result).toBe(2)
+      })
+    })
   })
 })
