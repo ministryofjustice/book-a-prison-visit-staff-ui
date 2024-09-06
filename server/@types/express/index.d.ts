@@ -28,6 +28,9 @@ export declare global {
       verified?: boolean
       id: string
       logout(done: (err: unknown) => void): void
+
+      flash(type: 'errors'): ValidationError[]
+      flash(type: 'errors', message: ValidationError[]): number
     }
 
     interface Locals {
