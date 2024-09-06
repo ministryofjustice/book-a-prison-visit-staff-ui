@@ -2,13 +2,16 @@ import type { Express } from 'express'
 import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
-import { appWithAllRoutes } from '../testutils/appSetup'
-import { createMockVisitService } from '../../services/testutils/mocks'
+import { FieldValidationError } from 'express-validator'
+import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
+import { createMockBlockedDatesService, createMockVisitService } from '../../services/testutils/mocks'
 import config from '../../config'
+import { FlashData } from '../../@types/bapv'
 
 let app: Express
 let sessionData: SessionData
 
+const blockedDatesService = createMockBlockedDatesService()
 const visitService = createMockVisitService()
 
 const url = '/block-visit-dates/block-new-date'
@@ -17,7 +20,7 @@ beforeEach(() => {
   jest.replaceProperty(config, 'features', { sessionManagement: true })
 
   sessionData = {} as SessionData
-  app = appWithAllRoutes({ services: { visitService }, sessionData })
+  app = appWithAllRoutes({ services: { blockedDatesService, visitService }, sessionData })
 })
 
 afterEach(() => {
@@ -93,5 +96,76 @@ describe('Block new visit date', () => {
           expect($('[data-test=no-existing-bookings]').text()).toBe('There are no existing bookings for this date.')
         })
     })
+  })
+
+  describe(`POST ${url}`, () => {
+    let flashData: FlashData
+
+    beforeEach(() => {
+      flashData = { errors: [], formValues: [] }
+      flashProvider.mockImplementation((key: keyof FlashData) => {
+        return flashData[key]
+      })
+    })
+
+    it('should redirect to blocked dates listing page if no new block date in session', () => {
+      return request(app).post(url).expect(302).expect('location', '/block-visit-dates')
+    })
+
+    it('should block date set in session and redirect to blocked dates listing page if block confirmed', () => {
+      sessionData.visitBlockDate = '2024-09-06'
+      blockedDatesService.blockVisitDate.mockResolvedValue()
+
+      return request(app)
+        .post(url)
+        .send({ confirmBlockDate: 'yes' })
+        .expect(302)
+        .expect('location', '/block-visit-dates')
+        .expect(() => {
+          expect(blockedDatesService.blockVisitDate).toHaveBeenCalledWith('user1', 'HEI', sessionData.visitBlockDate)
+          expect(flashProvider).not.toHaveBeenCalled()
+          // TODO check flash message set
+        })
+    })
+
+    it('should not block date, and redirect to blocked dates listing page if block not confirmed', () => {
+      sessionData.visitBlockDate = '2024-09-06'
+
+      return request(app)
+        .post(url)
+        .send({ confirmBlockDate: 'no' })
+        .expect(302)
+        .expect('location', '/block-visit-dates')
+        .expect(() => {
+          expect(blockedDatesService.blockVisitDate).not.toHaveBeenCalled()
+          expect(flashProvider).not.toHaveBeenCalled()
+          // TODO check flash message not set
+        })
+    })
+
+    it('should set form validation errors and redirect to same page', () => {
+      sessionData.visitBlockDate = '2024-09-06'
+
+      const expectedValidationError: FieldValidationError = {
+        location: 'body',
+        msg: 'No answer selected',
+        path: 'confirmBlockDate',
+        type: 'field',
+        value: 'invalid',
+      }
+
+      return request(app)
+        .post(url)
+        .send({ confirmBlockDate: 'invalid' })
+        .expect(302)
+        .expect('location', '/block-visit-dates/block-new-date')
+        .expect(() => {
+          expect(blockedDatesService.blockVisitDate).not.toHaveBeenCalled()
+          expect(flashProvider).toHaveBeenCalledWith('errors', [expectedValidationError])
+          // TODO check flash message not set
+        })
+    })
+
+    // TODO add test for handling API errors and setting message
   })
 })

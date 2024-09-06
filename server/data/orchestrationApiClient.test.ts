@@ -11,6 +11,7 @@ import {
   IgnoreVisitNotificationsDto,
   NotificationType,
   PageVisitDto,
+  PrisonExcludeDateDto,
   SessionSchedule,
   Visit,
   VisitRestriction,
@@ -416,16 +417,35 @@ describe('orchestrationApiClient', () => {
     })
   })
 
+  describe('blockVisitDate', () => {
+    it('should block a visit date for given prison and send username', async () => {
+      const date = '2024-09-06'
+      const user = 'user'
+
+      fakeOrchestrationApi
+        .put(`/config/prisons/prison/${prisonId}/exclude-date/add`, <PrisonExcludeDateDto>{
+          excludeDate: date,
+          actionedBy: user,
+        })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200)
+
+      await orchestrationApiClient.blockVisitDate(prisonId, date, user)
+
+      expect(fakeOrchestrationApi.isDone()).toBe(true)
+    })
+  })
+
   describe('getFutureExcludeDates', () => {
     it('should return future exclude dates for given prison', async () => {
       const results = [TestData.prisonExcludeDateDto()]
-      const prisonCode = 'HEI'
+
       fakeOrchestrationApi
-        .get(`/config/prisons/prison/${prisonCode}/exclude-date/future`)
+        .get(`/config/prisons/prison/${prisonId}/exclude-date/future`)
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
-      const output = await orchestrationApiClient.getFutureExcludeDates(prisonCode)
+      const output = await orchestrationApiClient.getFutureExcludeDates(prisonId)
 
       expect(output).toStrictEqual(results)
     })
@@ -561,16 +581,15 @@ describe('orchestrationApiClient', () => {
   })
 
   describe('getPrison', () => {
-    it('should return a PrisonDTO object', async () => {
+    it('should return a PrisonDto object', async () => {
       const results = TestData.prisonDto()
-      const prisonCode = 'BLI'
 
       fakeOrchestrationApi
-        .get(`/config/prisons/prison/${prisonCode}`)
+        .get(`/config/prisons/prison/${prisonId}`)
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
-      const output = await orchestrationApiClient.getPrison(prisonCode)
+      const output = await orchestrationApiClient.getPrison(prisonId)
 
       expect(output).toEqual(results)
     })

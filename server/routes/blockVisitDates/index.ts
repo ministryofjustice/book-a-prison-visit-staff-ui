@@ -15,7 +15,7 @@ export default function routes(services: Services): Router {
     router.post(path, ...validationChain, asyncMiddleware(handler))
 
   const blockVisitDatesController = new BlockVisitDatesController(services.blockedDatesService)
-  const blockNewDateController = new BlockNewDateController(services.visitService)
+  const blockNewDateController = new BlockNewDateController(services.visitService, services.blockedDatesService)
 
   // serve 404 for any route if feature flag not set
   if (!config.features.sessionManagement) {

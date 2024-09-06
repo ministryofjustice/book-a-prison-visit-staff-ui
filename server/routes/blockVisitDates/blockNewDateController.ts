@@ -1,9 +1,13 @@
 import { RequestHandler } from 'express'
 import { body, matchedData, ValidationChain, validationResult } from 'express-validator'
-import { VisitService } from '../../services'
+import { BlockedDatesService, VisitService } from '../../services'
+import logger from '../../../logger'
 
 export default class BlockNewDateController {
-  public constructor(private readonly visitService: VisitService) {}
+  public constructor(
+    private readonly visitService: VisitService,
+    private readonly blockedDatesService: BlockedDatesService,
+  ) {}
 
   public view(): RequestHandler {
     return async (req, res) => {
@@ -30,6 +34,11 @@ export default class BlockNewDateController {
 
   public submit(): RequestHandler {
     return async (req, res) => {
+      const { visitBlockDate } = req.session
+      if (!visitBlockDate) {
+        return res.redirect('/block-visit-dates')
+      }
+
       const errors = validationResult(req)
       if (!errors.isEmpty()) {
         req.flash('errors', errors.array())
@@ -39,9 +48,17 @@ export default class BlockNewDateController {
       const { confirmBlockDate } = matchedData<{ confirmBlockDate: 'yes' | 'no' }>(req)
 
       if (confirmBlockDate === 'yes') {
-        // TODO actually block date
+        const { prisonId } = req.session.selectedEstablishment
+        try {
+          await this.blockedDatesService.blockVisitDate(res.locals.user.username, prisonId, visitBlockDate)
+        } catch (error) {
+          // TODO set flash message with error
+          logger.error(error, `Could not block visit date ${visitBlockDate} for ${res.locals.user.username}`)
+        }
+        // TODO set flash message with success
       }
 
+      delete req.session.visitBlockDate
       return res.redirect('/block-visit-dates')
     }
   }
