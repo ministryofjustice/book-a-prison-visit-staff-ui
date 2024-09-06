@@ -3,7 +3,7 @@ import Page from '../pages/page'
 import BlockedVisitPage from '../pages/blockedVisits'
 import TestData from '../../server/routes/testutils/testData'
 
-context('Change establishment', () => {
+context('Exclude dates', () => {
   beforeEach(() => {
     cy.task('reset')
     cy.task('stubSignIn')
@@ -16,8 +16,7 @@ context('Change establishment', () => {
     cy.signIn()
   })
 
-  // Check current establishment, change establishment and check again
-  it('Should change establishment and redirect to home page', () => {
+  it('Should load exclude dates page, and display excluded date', () => {
     cy.task('stubUserCaseloads', TestData.caseLoads())
     cy.task('stubSetActiveCaseLoad', 'HEI')
     cy.task('stubGetNotificationCount', { prisonId: 'HEI' })
