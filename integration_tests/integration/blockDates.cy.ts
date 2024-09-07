@@ -21,7 +21,7 @@ context('Block dates', () => {
     cy.task('stubSetActiveCaseLoad', 'HEI')
     cy.task('stubGetNotificationCount', { prisonId: 'HEI' })
 
-    cy.task('stubGetFutureExcludeDates', { prisonId: 'HEI' })
+    cy.task('stubGetFutureBlockedDates', { prisonId: 'HEI' })
 
     const homePage = Page.verifyOnPage(HomePage)
 

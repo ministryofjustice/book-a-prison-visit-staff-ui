@@ -6,7 +6,7 @@ export default class BlockVisitDatesController {
 
   public view(): RequestHandler {
     return async (req, res) => {
-      const blockedDates = await this.blockedDatesService.getFutureExcludeDates(
+      const blockedDates = await this.blockedDatesService.getFutureBlockedDates(
         req.session.selectedEstablishment.prisonId,
         res.locals.user.username,
       )

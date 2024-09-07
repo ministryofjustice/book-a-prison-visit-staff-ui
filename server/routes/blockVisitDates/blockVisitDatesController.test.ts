@@ -9,14 +9,14 @@ import config from '../../config'
 let app: Express
 
 const blockedDatesService = createMockBlockedDatesService()
-const prisonExcludeDate = TestData.prisonExcludeDateDto()
+const prisonExcludeDateDto = TestData.prisonExcludeDateDto()
 const url = '/block-visit-dates'
 
 beforeEach(() => {
   config.features.sessionManagement = true
   app = appWithAllRoutes({ services: { blockedDatesService } })
 
-  blockedDatesService.getFutureExcludeDates.mockResolvedValue([prisonExcludeDate])
+  blockedDatesService.getFutureBlockedDates.mockResolvedValue([prisonExcludeDateDto])
 })
 
 afterEach(() => {
