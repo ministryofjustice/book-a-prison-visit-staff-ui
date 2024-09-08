@@ -15,11 +15,12 @@ const blockedDatesService = createMockBlockedDatesService()
 const visitService = createMockVisitService()
 
 const url = '/block-visit-dates/block-new-date'
+const visitBlockDate = '2024-09-06'
 
 beforeEach(() => {
   jest.replaceProperty(config, 'features', { sessionManagement: true })
 
-  sessionData = {} as SessionData
+  sessionData = { visitBlockDate } as SessionData
   app = appWithAllRoutes({ services: { blockedDatesService, visitService }, sessionData })
 })
 
@@ -38,11 +39,11 @@ describe('Feature flag', () => {
 describe('Block new visit date', () => {
   describe(`GET ${url}`, () => {
     it('should redirect to blocked dates listing page if no new block date in session', () => {
+      sessionData.visitBlockDate = undefined
       return request(app).get(url).expect(302).expect('location', '/block-visit-dates')
     })
 
     it('should display block new date page - with one existing booking', () => {
-      sessionData.visitBlockDate = '2024-09-06'
       visitService.getBookedVisitCountByDate.mockResolvedValue(1)
 
       return request(app)
@@ -70,7 +71,6 @@ describe('Block new visit date', () => {
     })
 
     it('should display block new date page - with multiple existing bookings', () => {
-      sessionData.visitBlockDate = '2024-09-06'
       visitService.getBookedVisitCountByDate.mockResolvedValue(2)
 
       return request(app)
@@ -84,7 +84,6 @@ describe('Block new visit date', () => {
     })
 
     it('should display block new date page - with no existing bookings', () => {
-      sessionData.visitBlockDate = '2024-09-06'
       visitService.getBookedVisitCountByDate.mockResolvedValue(0)
 
       return request(app)
@@ -109,11 +108,11 @@ describe('Block new visit date', () => {
     })
 
     it('should redirect to blocked dates listing page if no new block date in session', () => {
+      sessionData.visitBlockDate = undefined
       return request(app).post(url).expect(302).expect('location', '/block-visit-dates')
     })
 
-    it('should block date set in session and redirect to blocked dates listing page if block confirmed', () => {
-      sessionData.visitBlockDate = '2024-09-06'
+    it('should block date set, remove date from session, and redirect to blocked dates listing page if block confirmed', () => {
       blockedDatesService.blockVisitDate.mockResolvedValue()
 
       return request(app)
@@ -122,15 +121,14 @@ describe('Block new visit date', () => {
         .expect(302)
         .expect('location', '/block-visit-dates')
         .expect(() => {
-          expect(blockedDatesService.blockVisitDate).toHaveBeenCalledWith('user1', 'HEI', sessionData.visitBlockDate)
+          expect(blockedDatesService.blockVisitDate).toHaveBeenCalledWith('user1', 'HEI', visitBlockDate)
           expect(flashProvider).not.toHaveBeenCalled()
           // TODO check flash message set
+          expect(sessionData.visitBlockDate).toBe(undefined)
         })
     })
 
     it('should not block date, and redirect to blocked dates listing page if block not confirmed', () => {
-      sessionData.visitBlockDate = '2024-09-06'
-
       return request(app)
         .post(url)
         .send({ confirmBlockDate: 'no' })
@@ -144,8 +142,6 @@ describe('Block new visit date', () => {
     })
 
     it('should set form validation errors and redirect to same page', () => {
-      sessionData.visitBlockDate = '2024-09-06'
-
       const expectedValidationError: FieldValidationError = {
         location: 'body',
         msg: 'No answer selected',
