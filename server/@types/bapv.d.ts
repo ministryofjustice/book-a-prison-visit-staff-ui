@@ -145,7 +145,7 @@ export type VisitsPageSideNav = {
   unknown?: VisitsPageSideNavItem[] // for visits with no session template (old, migrated data)
 }
 
-export type FlashData = Record<string, string[] | Record<string, string | string[]>[]>
+export type FlashData = Record<string, string | string[] | Record<string, string | string[]>[]>
 
 export type VisitsReviewListItem = {
   actionUrl: string

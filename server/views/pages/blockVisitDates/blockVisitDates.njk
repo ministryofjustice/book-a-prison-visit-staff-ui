@@ -2,6 +2,7 @@
 {%- from "moj/components/date-picker/macro.njk" import mojDatePicker -%}
 {%- from "govuk/components/table/macro.njk" import govukTable -%}
 {%- from "govuk/components/button/macro.njk" import govukButton -%}
+{%- from "moj/components/banner/macro.njk" import mojBanner -%}
 
 {% set pageHeaderTitle = "Block visit dates" %}
   {% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
@@ -10,6 +11,14 @@
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
+
+      {% if message | length %}
+        {{ mojBanner({
+          type: 'success',
+          text: message,
+          iconFallbackText: 'Success'
+        }) }}
+      {% endif %}
 
       {% include "partials/errorSummary.njk" %}
 

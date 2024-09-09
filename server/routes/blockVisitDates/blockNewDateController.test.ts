@@ -99,6 +99,7 @@ describe('Block new visit date', () => {
 
   describe(`POST ${url}`, () => {
     let flashData: FlashData
+    const blockedDateSuccessMessage = 'Visits are blocked for Friday 6 September 2024.'
 
     beforeEach(() => {
       flashData = { errors: [], formValues: [] }
@@ -122,8 +123,8 @@ describe('Block new visit date', () => {
         .expect('location', '/block-visit-dates')
         .expect(() => {
           expect(blockedDatesService.blockVisitDate).toHaveBeenCalledWith('user1', 'HEI', visitBlockDate)
-          expect(flashProvider).not.toHaveBeenCalled()
-          // TODO check flash message set
+          expect(flashProvider).toHaveBeenCalledTimes(1)
+          expect(flashProvider).toHaveBeenCalledWith('message', blockedDateSuccessMessage)
           expect(sessionData.visitBlockDate).toBe(undefined)
         })
     })
@@ -137,7 +138,6 @@ describe('Block new visit date', () => {
         .expect(() => {
           expect(blockedDatesService.blockVisitDate).not.toHaveBeenCalled()
           expect(flashProvider).not.toHaveBeenCalled()
-          // TODO check flash message not set
         })
     })
 
@@ -158,10 +158,8 @@ describe('Block new visit date', () => {
         .expect(() => {
           expect(blockedDatesService.blockVisitDate).not.toHaveBeenCalled()
           expect(flashProvider).toHaveBeenCalledWith('errors', [expectedValidationError])
-          // TODO check flash message not set
+          expect(flashProvider).toHaveBeenCalledTimes(1)
         })
     })
-
-    // TODO add test for handling API errors and setting message
   })
 })
