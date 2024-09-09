@@ -193,7 +193,7 @@ export default class OrchestrationApiClient {
     })
   }
 
-  async getFutureExcludeDates(prisonId: string): Promise<PrisonExcludeDateDto[]> {
+  async getFutureBlockedDates(prisonId: string): Promise<PrisonExcludeDateDto[]> {
     return this.restClient.get({ path: `/config/prisons/prison/${prisonId}/exclude-date/future` })
   }
 

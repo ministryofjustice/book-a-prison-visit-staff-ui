@@ -476,7 +476,7 @@ export default {
       },
     })
   },
-  stubGetFutureExcludeDates: ({
+  stubGetFutureBlockedDates: ({
     prisonId,
     prisonExcludeDates = [TestData.prisonExcludeDateDto()],
   }: {

@@ -13,7 +13,7 @@ declare module 'express-session' {
     slotsList: VisitSlotList
     visitSessionData: VisitSessionData
     selectedEstablishment: Prison
-    visitBlockDate?: string
+    visitBlockDate?: string // format YYYY-MM-DD
   }
 }
 
@@ -31,6 +31,8 @@ export declare global {
 
       flash(type: 'errors'): ValidationError[]
       flash(type: 'errors', message: ValidationError[]): number
+      flash(type: 'formValues'): Record<string, string | string[] | number[]>[]
+      flash(type: 'formValues', message: Record<string, string | string[] | number[]>): number
     }
 
     interface Locals {

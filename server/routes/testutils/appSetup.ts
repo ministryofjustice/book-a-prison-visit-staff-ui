@@ -18,7 +18,7 @@ jest.mock('../../applicationInfo', () => {
 
 import express, { Express } from 'express'
 import { NotFound } from 'http-errors'
-import { Cookie, SessionData } from 'express-session'
+import { Session, SessionData } from 'express-session'
 
 import indexRoutes from '../index'
 import bookAVisitRoutes from '../bookAVisit'
@@ -39,7 +39,6 @@ import type { Services } from '../../services'
 
 import UserService, { UserDetails } from '../../services/userService'
 import SupportedPrisonsService from '../../services/supportedPrisonsService'
-import { VisitorListItem, VisitSlotList, VisitSessionData } from '../../@types/bapv'
 import TestData from './testData'
 
 export const user: Express.User = {
@@ -100,16 +99,7 @@ function appSetup(
   services: Services,
   production: boolean,
   userSupplier: () => Express.User,
-  sessionData: SessionData = {
-    cookie: new Cookie(),
-    returnTo: '',
-    nowInMinutes: 0,
-    visitorList: { visitors: [] as VisitorListItem[] },
-    adultVisitors: { adults: [] as VisitorListItem[] },
-    slotsList: {} as VisitSlotList,
-    visitSessionData: {} as VisitSessionData,
-    selectedEstablishment: undefined,
-  },
+  sessionData: SessionData,
 ): Express {
   const app = express()
 
@@ -122,16 +112,7 @@ function appSetup(
     res.locals = {
       user: { ...req.user },
     }
-    req.session = {
-      ...sessionData,
-      regenerate: jest.fn(),
-      destroy: jest.fn(),
-      reload: jest.fn(),
-      id: 'sessionId',
-      resetMaxAge: jest.fn(),
-      save: jest.fn(),
-      touch: jest.fn(),
-    }
+    req.session = sessionData as Session & Partial<SessionData>
     next()
   })
   app.use(express.json())
@@ -169,7 +150,7 @@ export function appWithAllRoutes({
   production = false,
   services = {},
   userSupplier = () => user,
-  sessionData,
+  sessionData = {} as SessionData,
 }: {
   production?: boolean
   services?: Partial<Services>
