@@ -4,12 +4,14 @@
 {%- from "govuk/components/button/macro.njk" import govukButton -%}
 
 {% set pageHeaderTitle = "Block visit dates" %}
-{% set pageTitle = applicationName + " - " + pageHeaderTitle %}
+  {% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
 {% set backLinkHref = "/" %}
 
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
+
+      {% include "partials/errorSummary.njk" %}
 
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
 
@@ -24,8 +26,6 @@
   <form action="/block-visit-dates" method="POST" novalidate>
     <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
-    {# TODO configure date picker for min start date #}
-    {# TODO configure date picker for excluded dates #}
     {{ mojDatePicker({
       id: "date",
       name: "date",
@@ -36,8 +36,10 @@
       hint: {
         text: "For example, 31/3/2024"
       },
-      errorMessage: errors | findError('date'),
-      value: formValues.date
+      value: formValues.date | formatDate('d/M/yyyy'),
+      minDate: datePickerMinDate,
+      excludedDates: datePickerExcludedDates,
+      errorMessage: errors | findError('date')
     }) }}
 
     {{ govukButton({
@@ -68,22 +70,28 @@
         ]), displayRows) %}
       {% endfor %}
 
-      {{ govukTable({
-        caption: "Blocked dates",
-        captionClasses: "govuk-table__caption--m",
-        head: [
-          {
-            text: "Date"
-          },
-          {
-            text: "Blocked by"
-          },
-          {
-            text: "Action"
-          }
-        ],
-        rows: displayRows
-      }) }}
+      {% if blockedDates | length %}
+        {{ govukTable({
+          caption: "Blocked dates",
+          captionClasses: "govuk-table__caption--m",
+          head: [
+            {
+              text: "Date"
+            },
+            {
+              text: "Blocked by"
+            },
+            {
+              text: "Action"
+            }
+          ],
+          rows: displayRows,
+          attributes: { "data-test": "blocked-dates-table" }
+        }) }}
+      {% else %}
+        <h2 class="govuk-heading-m">Blocked dates</h2>
+        <p data-test="no-blocked-dates">There are no upcoming blocked dates for this prison.</p>
+      {% endif %}
     </div>
   </div>
 {% endblock %}

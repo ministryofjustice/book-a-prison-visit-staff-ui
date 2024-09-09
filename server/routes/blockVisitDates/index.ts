@@ -23,6 +23,7 @@ export default function routes(services: Services): Router {
   }
 
   get('/', blockVisitDatesController.view())
+  postWithValidation('/', blockVisitDatesController.validate(), blockVisitDatesController.submit())
 
   get('/block-new-date', blockNewDateController.view())
   postWithValidation('/block-new-date', blockNewDateController.validate(), blockNewDateController.submit())

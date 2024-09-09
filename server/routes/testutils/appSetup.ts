@@ -39,7 +39,6 @@ import type { Services } from '../../services'
 
 import UserService, { UserDetails } from '../../services/userService'
 import SupportedPrisonsService from '../../services/supportedPrisonsService'
-import { VisitorListItem, VisitSlotList, VisitSessionData } from '../../@types/bapv'
 import TestData from './testData'
 
 export const user: Express.User = {
