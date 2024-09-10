@@ -291,6 +291,19 @@
   white-space: nowrap;
 }
 
+.bapv-link-button, .bapv-link-button:active, .bapv-link-button:hover {
+  background: none;
+  box-shadow: none;
+  color: $govuk-link-colour;
+  margin: 0;
+  padding: 0;
+  top: unset;
+  text-align: left;
+  @include govuk-link-common;
+  @include govuk-link-style-default;
+}
+
+// TODO fix below - added for Visits by date but affecting other input fields
 .govuk-input__wrapper {
   width: 215px;
   margin-bottom: 24px;

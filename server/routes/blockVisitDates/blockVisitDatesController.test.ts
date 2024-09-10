@@ -67,11 +67,11 @@ describe('Block visit dates listing page', () => {
           expect($('input[name=date]').val()).toBeFalsy()
 
           expect($('[data-test="blocked-date-1"]').text()).toBe(format(blockedDate1.excludeDate, 'EEEE d MMMM yyyy'))
-          expect($('[data-test="blocked-by-1"]').text()).toBe(`User one`)
-          expect($('[data-test="unblock-date-1"] a').attr('href')).toBe(`/unblock`)
+          expect($('[data-test="blocked-by-1"]').text()).toBe('User one')
+          expect($('[data-test="unblock-date-1"]').text().trim()).toBe('Unblock')
           expect($('[data-test="blocked-date-2"]').text()).toBe(format(blockedDate2.excludeDate, 'EEEE d MMMM yyyy'))
-          expect($('[data-test="blocked-by-2"]').text()).toBe(`User one`)
-          expect($('[data-test="unblock-date-2"] a').attr('href')).toBe(`/unblock`)
+          expect($('[data-test="blocked-by-2"]').text()).toBe('User one')
+          expect($('[data-test="unblock-date-2"]').text().trim()).toBe('Unblock')
 
           expect($('[data-test=no-blocked-dates]').length).toBe(0)
         })
