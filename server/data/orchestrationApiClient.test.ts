@@ -417,6 +417,25 @@ describe('orchestrationApiClient', () => {
     })
   })
 
+  describe('unblockVisitDate', () => {
+    it('should unblock a visit date for given prison and send username', async () => {
+      const date = '2024-09-06'
+      const user = 'user'
+
+      fakeOrchestrationApi
+        .put(`/config/prisons/prison/${prisonId}/exclude-date/remove`, <PrisonExcludeDateDto>{
+          excludeDate: date,
+          actionedBy: user,
+        })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200)
+
+      await orchestrationApiClient.unblockVisitDate(prisonId, date, user)
+
+      expect(fakeOrchestrationApi.isDone()).toBe(true)
+    })
+  })
+
   describe('blockVisitDate', () => {
     it('should block a visit date for given prison and send username', async () => {
       const date = '2024-09-06'

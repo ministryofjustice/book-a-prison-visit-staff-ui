@@ -36,6 +36,17 @@ describe('Blocked dates service', () => {
     })
   })
 
+  describe('unblockVisitDate', () => {
+    it('should unblock a visit date for given prison and send username', async () => {
+      const date = '2024-09-06'
+      orchestrationApiClient.unblockVisitDate.mockResolvedValue()
+
+      await blockedDatesService.unblockVisitDate(username, prisonId, date)
+
+      expect(orchestrationApiClient.unblockVisitDate).toHaveBeenCalledWith(prisonId, date, username)
+    })
+  })
+
   describe('getFutureBlockedDates', () => {
     it('should return future blocked dates for given prison', async () => {
       const prisonExcludeDateDto = TestData.prisonExcludeDateDto()
