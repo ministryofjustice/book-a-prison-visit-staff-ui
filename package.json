@@ -146,7 +146,7 @@
     "audit-ci": "^7.1.0",
     "axe-core": "^4.10.0",
     "cheerio": "^1.0.0",
-    "concurrently": "^8.2.2",
+    "concurrently": "^9.0.0",
     "cypress": "^13.14.0",
     "cypress-axe": "^1.5.0",
     "cypress-multi-reporters": "^1.6.4",
