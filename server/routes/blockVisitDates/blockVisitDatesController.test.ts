@@ -3,7 +3,7 @@ import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
 import { FieldValidationError } from 'express-validator'
-import { addDays, format, startOfYesterday, subDays } from 'date-fns'
+import { addDays, addWeeks, format, startOfYesterday, subDays } from 'date-fns'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
 import { createMockBlockedDatesService } from '../../services/testutils/mocks'
 import TestData from '../testutils/testData'
@@ -43,10 +43,10 @@ describe('Block visit dates listing page', () => {
 
     it('should display block visit dates page with a blocked dates listed', () => {
       const today = new Date()
-      const yesterday = subDays(today, 1)
       const tomorrow = addDays(today, 1)
-      const blockedDate1 = TestData.prisonExcludeDateDto({ excludeDate: format(today, 'yyyy-MM-dd') })
-      const blockedDate2 = TestData.prisonExcludeDateDto({ excludeDate: format(tomorrow, 'yyyy-MM-dd') })
+      const nextWeek = addWeeks(today, 1)
+      const blockedDate1 = TestData.prisonExcludeDateDto({ excludeDate: format(tomorrow, 'yyyy-MM-dd') })
+      const blockedDate2 = TestData.prisonExcludeDateDto({ excludeDate: format(nextWeek, 'yyyy-MM-dd') })
 
       blockedDatesService.getFutureBlockedDates.mockResolvedValue([blockedDate1, blockedDate2])
 
@@ -60,9 +60,9 @@ describe('Block visit dates listing page', () => {
 
           expect($('.moj-banner__message').length).toBe(0)
 
-          expect($('.moj-datepicker').attr('data-min-date')).toBe(format(yesterday, 'dd/MM/yyyy'))
+          expect($('.moj-datepicker').attr('data-min-date')).toBe(format(today, 'dd/MM/yyyy'))
           expect($('.moj-datepicker').attr('data-excluded-dates')).toBe(
-            `${format(today, 'dd/MM/yyyy')} ${format(tomorrow, 'dd/MM/yyyy')}`,
+            `${format(tomorrow, 'dd/MM/yyyy')} ${format(nextWeek, 'dd/MM/yyyy')}`,
           )
           expect($('input[name=date]').val()).toBeFalsy()
 

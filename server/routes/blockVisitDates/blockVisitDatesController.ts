@@ -13,7 +13,7 @@ export default class BlockVisitDatesController {
         res.locals.user.username,
       )
 
-      const datePickerMinDate = format(startOfYesterday(), 'dd/MM/yyyy')
+      const datePickerMinDate = format(new Date(), 'dd/MM/yyyy')
       const datePickerExcludedDates = blockedDates.map(date => format(date.excludeDate, 'dd/MM/yyyy')).join(' ')
 
       res.render('pages/blockVisitDates/blockVisitDates', {
