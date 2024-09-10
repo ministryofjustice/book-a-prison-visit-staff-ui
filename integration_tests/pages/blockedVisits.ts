@@ -9,5 +9,5 @@ export default class BlockedVisitPage extends Page {
 
   blockedBy = (index: number): PageElement => cy.get(`[data-test="blocked-by-${index}`)
 
-  unblockLink = (index: number): PageElement => cy.get(`[data-test="unblock-date-${index}"] a`)
+  unblockLink = (index: number): PageElement => cy.get(`[data-test="unblock-date-${index}"]`)
 }
