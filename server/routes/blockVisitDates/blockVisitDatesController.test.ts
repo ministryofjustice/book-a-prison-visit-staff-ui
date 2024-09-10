@@ -58,6 +58,8 @@ describe('Block visit dates listing page', () => {
           expect($('.govuk-back-link').attr('href')).toBe('/')
           expect($('h1').text()).toBe('Block visit dates')
 
+          expect($('.moj-banner__message').length).toBe(0)
+
           expect($('.moj-datepicker').attr('data-min-date')).toBe(format(yesterday, 'dd/MM/yyyy'))
           expect($('.moj-datepicker').attr('data-excluded-dates')).toBe(
             `${format(today, 'dd/MM/yyyy')} ${format(tomorrow, 'dd/MM/yyyy')}`,
@@ -83,11 +85,27 @@ describe('Block visit dates listing page', () => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('.govuk-back-link').attr('href')).toBe('/')
           expect($('h1').text()).toBe('Block visit dates')
 
           expect($('[data-test=blocked-dates-table]').length).toBe(0)
           expect($('[data-test=no-blocked-dates]').length).toBe(1)
+        })
+    })
+
+    it('should render success message', () => {
+      const blockedDateSuccessMessage = 'Visits are blocked for Friday 6 September 2024.'
+      flashData = { message: blockedDateSuccessMessage }
+
+      blockedDatesService.getFutureBlockedDates.mockResolvedValue([])
+
+      return request(app)
+        .get(url)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text()).toBe('Block visit dates')
+
+          expect($('.moj-banner__message').text()).toBe(blockedDateSuccessMessage)
         })
     })
 
@@ -109,7 +127,6 @@ describe('Block visit dates listing page', () => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('.govuk-back-link').attr('href')).toBe('/')
           expect($('h1').text()).toBe('Block visit dates')
 
           expect($('.govuk-error-summary a[href="#date-error"]').text()).toBe(validationError.msg)

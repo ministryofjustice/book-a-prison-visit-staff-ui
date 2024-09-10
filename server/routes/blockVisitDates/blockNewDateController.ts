@@ -1,5 +1,6 @@
 import { RequestHandler } from 'express'
 import { body, matchedData, ValidationChain, validationResult } from 'express-validator'
+import { format } from 'date-fns'
 import { BlockedDatesService, VisitService } from '../../services'
 import logger from '../../../logger'
 
@@ -51,11 +52,10 @@ export default class BlockNewDateController {
         const { prisonId } = req.session.selectedEstablishment
         try {
           await this.blockedDatesService.blockVisitDate(res.locals.user.username, prisonId, visitBlockDate)
+          req.flash('message', `Visits are blocked for ${format(visitBlockDate, 'EEEE d MMMM yyyy')}.`)
         } catch (error) {
-          // TODO set flash message with error
           logger.error(error, `Could not block visit date ${visitBlockDate} for ${res.locals.user.username}`)
         }
-        // TODO set flash message with success
       }
 
       delete req.session.visitBlockDate
