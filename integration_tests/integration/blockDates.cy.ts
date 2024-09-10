@@ -30,6 +30,6 @@ context('Block dates', () => {
     const blockedVisitPage = Page.verifyOnPage(BlockedVisitPage)
     blockedVisitPage.blockedDate(1).contains('Thursday 12 December 2024')
     blockedVisitPage.blockedBy(1).contains('User one')
-    blockedVisitPage.unblockLink(1).should('have.attr', 'href', `/unblock`)
+    blockedVisitPage.unblockLink(1).contains('Unblock')
   })
 })

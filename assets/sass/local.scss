@@ -196,10 +196,10 @@
 .bapv-another-date__form {
   text-align: left;
   position: absolute;
-  max-width: 290px;
+  max-width: 345px;
   right: 0;
   top: 49px;
-  width: 290px;
+  width: 345px;
   background-color: $govuk-body-background-colour;
   z-index: 10;
   background-color: govuk-colour("light-grey");
@@ -218,7 +218,7 @@
   }
 
   .govuk-button {
-    margin-bottom: 26px;
+    margin-bottom: 2px;
   }
 
   .govuk-form-group {
@@ -291,7 +291,14 @@
   white-space: nowrap;
 }
 
-.govuk-input__wrapper {
-  width: 215px;
-  margin-bottom: 24px;
+.bapv-link-button, .bapv-link-button:active, .bapv-link-button:hover {
+  background: none;
+  box-shadow: none;
+  color: $govuk-link-colour;
+  margin: 0;
+  padding: 0;
+  top: unset;
+  text-align: left;
+  @include govuk-link-common;
+  @include govuk-link-style-default;
 }

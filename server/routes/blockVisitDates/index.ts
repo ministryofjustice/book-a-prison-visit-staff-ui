@@ -6,6 +6,7 @@ import asyncMiddleware from '../../middleware/asyncMiddleware'
 import BlockVisitDatesController from './blockVisitDatesController'
 import config from '../../config'
 import BlockNewDateController from './blockNewDateController'
+import UnblockVisitDateController from './unblockVisitDateController'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -16,6 +17,7 @@ export default function routes(services: Services): Router {
 
   const blockVisitDatesController = new BlockVisitDatesController(services.blockedDatesService)
   const blockNewDateController = new BlockNewDateController(services.visitService, services.blockedDatesService)
+  const unblockVisitDateController = new UnblockVisitDateController(services.blockedDatesService)
 
   // serve 404 for any route if feature flag not set
   if (!config.features.sessionManagement) {
@@ -27,6 +29,8 @@ export default function routes(services: Services): Router {
 
   get('/block-new-date', blockNewDateController.view())
   postWithValidation('/block-new-date', blockNewDateController.validate(), blockNewDateController.submit())
+
+  postWithValidation('/unblock-date', unblockVisitDateController.validate(), unblockVisitDateController.submit())
 
   return router
 }

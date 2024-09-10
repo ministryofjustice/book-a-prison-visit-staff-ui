@@ -99,7 +99,6 @@ describe('Block new visit date', () => {
 
   describe(`POST ${url}`, () => {
     let flashData: FlashData
-    const blockedDateSuccessMessage = 'Visits are blocked for Friday 6 September 2024.'
 
     beforeEach(() => {
       flashData = { errors: [], formValues: [] }
@@ -115,6 +114,7 @@ describe('Block new visit date', () => {
 
     it('should block date set, remove date from session, and redirect to blocked dates listing page if block confirmed', () => {
       blockedDatesService.blockVisitDate.mockResolvedValue()
+      const blockedDateSuccessMessage = 'Visits are blocked for Friday 6 September 2024.'
 
       return request(app)
         .post(url)

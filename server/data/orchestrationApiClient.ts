@@ -186,6 +186,13 @@ export default class OrchestrationApiClient {
   }
 
   // orchestration-prisons-exclude-date-controller
+  async unblockVisitDate(prisonId: string, date: string, username: string): Promise<void> {
+    await this.restClient.put({
+      path: `/config/prisons/prison/${prisonId}/exclude-date/remove`,
+      data: <PrisonExcludeDateDto>{ excludeDate: date, actionedBy: username },
+    })
+  }
+
   async blockVisitDate(prisonId: string, date: string, username: string): Promise<void> {
     await this.restClient.put({
       path: `/config/prisons/prison/${prisonId}/exclude-date/add`,

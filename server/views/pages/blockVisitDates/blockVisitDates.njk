@@ -14,9 +14,9 @@
 
       {% if message | length %}
         {{ mojBanner({
-          type: 'success',
+          type: "success",
           text: message,
-          iconFallbackText: 'Success'
+          iconFallbackText: "Success"
         }) }}
       {% endif %}
 
@@ -45,14 +45,15 @@
       hint: {
         text: "For example, 31/3/2024"
       },
-      value: formValues.date | formatDate('d/M/yyyy'),
+      value: formValues.date | formatDate("d/M/yyyy"),
       minDate: datePickerMinDate,
       excludedDates: datePickerExcludedDates,
-      errorMessage: errors | findError('date')
+      errorMessage: errors | findError("date")
     }) }}
 
     {{ govukButton({
       text: "Continue",
+      classes: "govuk-!-margin-bottom-7",
       preventDoubleClick: true,
       attributes: { "data-test": "submit" }
     }) }}
@@ -63,18 +64,31 @@
       {% set displayRows = [] %}
 
       {% for blockedDate in blockedDates %}
+
+        {%- set unblockButtonHtml -%}
+          <form action="/block-visit-dates/unblock-date" method="POST" novalidate>
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+            <input type="hidden" name="date" value="{{ blockedDate.excludeDate }}">
+            {{ govukButton({
+              text: "Unblock",
+              classes: "bapv-link-button",
+              preventDoubleClick: true,
+              attributes: { "data-test": "unblock-date-" + loop.index }
+            }) }}
+          </form>
+        {%- endset %}
+
         {% set displayRows = (displayRows.push([
           {
             text: blockedDate.excludeDate | formatDate("EEEE d MMMM yyyy"),
             attributes: { "data-test": "blocked-date-" + loop.index }
           },
           {
-            text: 'Unknown' if blockedDate.actionedBy === 'NOT_KNOWN' else blockedDate.actionedBy ,
+            text: "Unknown" if blockedDate.actionedBy === "NOT_KNOWN" else blockedDate.actionedBy ,
             attributes: { "data-test": "blocked-by-" + loop.index }
           },
           {
-            html: '<a class="govuk-link--no-visited-state" href="/unblock">Unblock</a>',
-            attributes: { "data-test": "unblock-date-" + loop.index }
+            html: unblockButtonHtml
           }
         ]), displayRows) %}
       {% endfor %}
