@@ -344,6 +344,50 @@ export default class AuditService {
     })
   }
 
+  async blockedVisitDate({
+    prisonId,
+    date,
+    username,
+    operationId,
+  }: {
+    prisonId: string
+    date: string
+    username: string
+    operationId: string
+  }) {
+    return this.sendAuditMessage({
+      action: 'BLOCKED_VISIT_DATE',
+      who: username,
+      operationId,
+      details: {
+        prisonId,
+        date,
+      },
+    })
+  }
+
+  async unblockedVisitDate({
+    prisonId,
+    date,
+    username,
+    operationId,
+  }: {
+    prisonId: string
+    date: string
+    username: string
+    operationId: string
+  }) {
+    return this.sendAuditMessage({
+      action: 'UNBLOCKED_VISIT_DATE',
+      who: username,
+      operationId,
+      details: {
+        prisonId,
+        date,
+      },
+    })
+  }
+
   async sendAuditMessage({
     action,
     who,

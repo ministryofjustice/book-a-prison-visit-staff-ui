@@ -378,4 +378,52 @@ describe('Audit service', () => {
       },
     })
   })
+
+  it('sends a visit date blocked message', async () => {
+    await auditService.blockedVisitDate({
+      prisonId,
+      date: '2024-09-06',
+      username: 'username',
+      operationId: 'operation-id',
+    })
+
+    expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
+    expect(sqsClientInstance.send.mock.lastCall[0]).toMatchObject({
+      input: {
+        MessageBody: JSON.stringify({
+          what: 'BLOCKED_VISIT_DATE',
+          when: fakeDate,
+          operationId: 'operation-id',
+          who: 'username',
+          service: 'book-a-prison-visit-staff-ui',
+          details: '{"prisonId":"HEI","date":"2024-09-06"}',
+        }),
+        QueueUrl,
+      },
+    })
+  })
+
+  it('sends a visit date unblocked message', async () => {
+    await auditService.unblockedVisitDate({
+      prisonId,
+      date: '2024-09-06',
+      username: 'username',
+      operationId: 'operation-id',
+    })
+
+    expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
+    expect(sqsClientInstance.send.mock.lastCall[0]).toMatchObject({
+      input: {
+        MessageBody: JSON.stringify({
+          what: 'UNBLOCKED_VISIT_DATE',
+          when: fakeDate,
+          operationId: 'operation-id',
+          who: 'username',
+          service: 'book-a-prison-visit-staff-ui',
+          details: '{"prisonId":"HEI","date":"2024-09-06"}',
+        }),
+        QueueUrl,
+      },
+    })
+  })
 })

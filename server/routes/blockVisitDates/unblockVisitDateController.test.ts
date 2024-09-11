@@ -1,12 +1,13 @@
 import type { Express } from 'express'
 import request from 'supertest'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
-import { createMockBlockedDatesService } from '../../services/testutils/mocks'
+import { createMockAuditService, createMockBlockedDatesService } from '../../services/testutils/mocks'
 import config from '../../config'
 import { FlashData } from '../../@types/bapv'
 
 let app: Express
 
+const auditService = createMockAuditService()
 const blockedDatesService = createMockBlockedDatesService()
 
 const url = '/block-visit-dates/unblock-date'
@@ -15,7 +16,7 @@ const unblockDate = '2024-09-06'
 beforeEach(() => {
   jest.replaceProperty(config, 'features', { sessionManagement: true })
 
-  app = appWithAllRoutes({ services: { blockedDatesService } })
+  app = appWithAllRoutes({ services: { auditService, blockedDatesService } })
 })
 
 afterEach(() => {
@@ -52,6 +53,12 @@ describe('Unblock visit date', () => {
         .expect('location', '/block-visit-dates')
         .expect(() => {
           expect(blockedDatesService.unblockVisitDate).toHaveBeenCalledWith('user1', 'HEI', unblockDate)
+          expect(auditService.unblockedVisitDate).toHaveBeenCalledWith({
+            prisonId: 'HEI',
+            date: unblockDate,
+            username: 'user1',
+            operationId: undefined,
+          })
           expect(flashProvider).toHaveBeenCalledWith('message', unblockedDateSuccessMessage)
           expect(flashProvider).toHaveBeenCalledTimes(1)
         })
@@ -65,6 +72,7 @@ describe('Unblock visit date', () => {
         .expect('location', '/block-visit-dates')
         .expect(() => {
           expect(blockedDatesService.unblockVisitDate).not.toHaveBeenCalled()
+          expect(auditService.unblockedVisitDate).not.toHaveBeenCalled()
           expect(flashProvider).not.toHaveBeenCalled()
         })
     })
