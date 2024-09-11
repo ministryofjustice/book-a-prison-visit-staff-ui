@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express'
 import { body, matchedData, Meta, ValidationChain, validationResult } from 'express-validator'
-import { format, startOfYesterday } from 'date-fns'
+import { format, parse, startOfYesterday } from 'date-fns'
 import { BlockedDatesService } from '../../services'
 
 export default class BlockVisitDatesController {
@@ -33,7 +33,8 @@ export default class BlockVisitDatesController {
       const errors = validationResult(req)
       if (!errors.isEmpty()) {
         req.flash('errors', errors.array())
-        req.flash('formValues', matchedData(req, { onlyValidData: false }))
+        const { rawDate } = matchedData<{ rawDate: string }>(req)
+        req.flash('formValues', { date: rawDate })
         return res.redirect('/block-visit-dates')
       }
 
@@ -46,18 +47,18 @@ export default class BlockVisitDatesController {
 
   public validate(): ValidationChain[] {
     return [
+      // store pre-sanitised user-entered value as rawDate to show in field validation error
+      body('rawDate').customSanitizer((_value, { req }) => (typeof req.body?.date === 'string' ? req.body.date : '')),
       body('date', 'Enter a valid date')
-        .notEmpty()
+        .trim()
+        // reformat to year-month-day (used by API)
+        .customSanitizer((value: string) => {
+          const date = parse(value, 'd/M/yyyy', new Date())
+          return date.toString() !== 'Invalid Date' ? format(date, 'yyyy-MM-dd') : ''
+        })
+        .isDate()
         .bail()
-        // reformat raw input from day/month/year to year-month-day
-        .customSanitizer((date: string) => date.split('/').reverse().join('-'))
-        // convert to a Date
-        .toDate()
-        .isISO8601()
-        .bail()
-        // reformat to date string
-        .customSanitizer((date: Date) => format(date, 'yyyy-MM-dd'))
-        // date cannot be in past
+        // must be a future date
         .isAfter({ comparisonDate: format(startOfYesterday(), 'yyyy-MM-dd') })
         .withMessage('The date must be in the future')
         .bail()

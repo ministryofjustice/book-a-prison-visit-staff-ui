@@ -5,7 +5,9 @@
 {%- from "moj/components/banner/macro.njk" import mojBanner -%}
 
 {% set pageHeaderTitle = "Block visit dates" %}
+{% set pageTitle %}
   {% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
+{% endset %}
 {% set backLinkHref = "/" %}
 
 {% block content %}
@@ -45,7 +47,7 @@
       hint: {
         text: "For example, 31/3/2024"
       },
-      value: formValues.date | formatDate("d/M/yyyy"),
+      value: formValues.date,
       minDate: datePickerMinDate,
       excludedDates: datePickerExcludedDates,
       errorMessage: errors | findError("date")
