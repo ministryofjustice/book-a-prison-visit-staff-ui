@@ -3,7 +3,7 @@ import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
 import { FieldValidationError } from 'express-validator'
-import { addDays, format, startOfYesterday, subDays } from 'date-fns'
+import { addDays, addWeeks, format, startOfYesterday } from 'date-fns'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
 import { createMockBlockedDatesService } from '../../services/testutils/mocks'
 import TestData from '../testutils/testData'
@@ -43,10 +43,10 @@ describe('Block visit dates listing page', () => {
 
     it('should display block visit dates page with a blocked dates listed', () => {
       const today = new Date()
-      const yesterday = subDays(today, 1)
       const tomorrow = addDays(today, 1)
-      const blockedDate1 = TestData.prisonExcludeDateDto({ excludeDate: format(today, 'yyyy-MM-dd') })
-      const blockedDate2 = TestData.prisonExcludeDateDto({ excludeDate: format(tomorrow, 'yyyy-MM-dd') })
+      const nextWeek = addWeeks(today, 1)
+      const blockedDate1 = TestData.prisonExcludeDateDto({ excludeDate: format(tomorrow, 'yyyy-MM-dd') })
+      const blockedDate2 = TestData.prisonExcludeDateDto({ excludeDate: format(nextWeek, 'yyyy-MM-dd') })
 
       blockedDatesService.getFutureBlockedDates.mockResolvedValue([blockedDate1, blockedDate2])
 
@@ -60,9 +60,9 @@ describe('Block visit dates listing page', () => {
 
           expect($('.moj-banner__message').length).toBe(0)
 
-          expect($('.moj-datepicker').attr('data-min-date')).toBe(format(yesterday, 'dd/MM/yyyy'))
+          expect($('.moj-datepicker').attr('data-min-date')).toBe(format(today, 'dd/MM/yyyy'))
           expect($('.moj-datepicker').attr('data-excluded-dates')).toBe(
-            `${format(today, 'dd/MM/yyyy')} ${format(tomorrow, 'dd/MM/yyyy')}`,
+            `${format(tomorrow, 'dd/MM/yyyy')} ${format(nextWeek, 'dd/MM/yyyy')}`,
           )
           expect($('input[name=date]').val()).toBeFalsy()
 
@@ -114,10 +114,10 @@ describe('Block visit dates listing page', () => {
         type: 'field',
         location: 'body',
         path: 'date',
-        value: '2000-02-01',
+        value: '1/2/2000',
         msg: 'The date must be in the future',
       }
-      const formValues = { date: '2000-02-01' }
+      const formValues = { date: '1/2/2000' }
       flashData = { errors: [validationError], formValues: [formValues] }
 
       blockedDatesService.getFutureBlockedDates.mockResolvedValue([])
@@ -166,52 +166,39 @@ describe('Block visit dates listing page', () => {
         })
     })
 
-    it('should set error and redirect back to listing page when no date entered', () => {
-      const expectedValidationError: FieldValidationError = {
-        location: 'body',
-        msg: 'Enter a valid date',
-        path: 'date',
-        type: 'field',
-        value: undefined,
-      }
+    describe('should set error and redirect back to listing page for an invalid date', () => {
+      it.each([
+        ['undefined', undefined, ''],
+        ['empty string', ' ', ' '],
+        ['text', 'NOT A DATE', 'NOT A DATE'],
+        ['partial date', '1/2', '1/2'],
+        ['wrong format y/m/d', '2000/2/1', '2000/2/1'],
+        ['wrong format m/d/y', '1/13/2000', '1/13/2000'],
+        ['non-existant date', '31/2/2000', '31/2/2000'],
+      ])('%s', (_: string, input: string, expected: string) => {
+        const expectedValidationError: FieldValidationError = {
+          location: 'body',
+          msg: 'Enter a valid date',
+          path: 'date',
+          type: 'field',
+          value: '',
+        }
 
-      return request(app)
-        .post(url)
-        .expect(302)
-        .expect('location', '/block-visit-dates')
-        .expect(() => {
-          expect(blockedDatesService.getFutureBlockedDates).not.toHaveBeenCalled()
-          expect(sessionData.visitBlockDate).toBe(undefined)
-          expect(flashProvider).toHaveBeenCalledWith('errors', [expectedValidationError])
-          expect(flashProvider).toHaveBeenCalledWith('formValues', { date: undefined })
-        })
+        return request(app)
+          .post(url)
+          .send({ date: input })
+          .expect(302)
+          .expect('location', '/block-visit-dates')
+          .expect(() => {
+            expect(blockedDatesService.getFutureBlockedDates).not.toHaveBeenCalled()
+            expect(sessionData.visitBlockDate).toBe(undefined)
+            expect(flashProvider).toHaveBeenCalledWith('errors', [expectedValidationError])
+            expect(flashProvider).toHaveBeenCalledWith('formValues', { date: expected })
+          })
+      })
     })
 
-    it('should set error and redirect back to listing page when an invalid date entered', () => {
-      const inputDate = 'INVALID'
-
-      const expectedValidationError: FieldValidationError = {
-        location: 'body',
-        msg: 'Enter a valid date',
-        path: 'date',
-        type: 'field',
-        value: null,
-      }
-
-      return request(app)
-        .post(url)
-        .send({ date: inputDate })
-        .expect(302)
-        .expect('location', '/block-visit-dates')
-        .expect(() => {
-          expect(blockedDatesService.getFutureBlockedDates).not.toHaveBeenCalled()
-          expect(sessionData.visitBlockDate).toBe(undefined)
-          expect(flashProvider).toHaveBeenCalledWith('errors', [expectedValidationError])
-          expect(flashProvider).toHaveBeenCalledWith('formValues', { date: null })
-        })
-    })
-
-    it('should set error and redirect back to listing page when a date in the past is entered', () => {
+    it('should set error and redirect back to listing page for a date in the past', () => {
       const yesterday = startOfYesterday()
       const inputDate = format(yesterday, datePickerDateFormat)
       const expectedOutputDate = format(yesterday, expectedDateFormat)
@@ -233,7 +220,7 @@ describe('Block visit dates listing page', () => {
           expect(blockedDatesService.getFutureBlockedDates).not.toHaveBeenCalled()
           expect(sessionData.visitBlockDate).toBe(undefined)
           expect(flashProvider).toHaveBeenCalledWith('errors', [expectedValidationError])
-          expect(flashProvider).toHaveBeenCalledWith('formValues', { date: expectedOutputDate })
+          expect(flashProvider).toHaveBeenCalledWith('formValues', { date: inputDate })
         })
     })
 
@@ -262,7 +249,7 @@ describe('Block visit dates listing page', () => {
           expect(blockedDatesService.getFutureBlockedDates).toHaveBeenCalledWith('HEI', 'user1')
           expect(sessionData.visitBlockDate).toBe(undefined)
           expect(flashProvider).toHaveBeenCalledWith('errors', [expectedValidationError])
-          expect(flashProvider).toHaveBeenCalledWith('formValues', { date: expectedOutputDate })
+          expect(flashProvider).toHaveBeenCalledWith('formValues', { date: inputDate })
         })
     })
   })
