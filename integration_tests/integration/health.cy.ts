@@ -12,6 +12,9 @@ context('Healthcheck', () => {
       cy.task('stubWhereaboutsPing')
       cy.task('stubPrisonRegisterPing')
       cy.task('stubOrchestrationPing')
+
+      cy.task('stubAuthToken')
+      cy.task('stubSupportedPrisonIds')
     })
 
     it('Health check page is visible', () => {
@@ -27,7 +30,14 @@ context('Healthcheck', () => {
     })
 
     it('Info contains activeAgencies array', () => {
-      cy.request('/info').its('body.activeAgencies').should('be.an', 'array')
+      cy.request('/info')
+        .its('body.activeAgencies')
+        .should('be.an', 'array')
+        .should('have.length', '2')
+        .then(activeAgencies => {
+          cy.wrap(activeAgencies).its(0).should('equal', 'HEI')
+          cy.wrap(activeAgencies).its(1).should('equal', 'BLI')
+        })
     })
   })
 

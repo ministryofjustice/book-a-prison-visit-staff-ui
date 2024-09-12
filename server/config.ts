@@ -34,7 +34,6 @@ export default {
   productId: get('PRODUCT_ID', 'UNASSIGNED', requiredInProduction),
   gitRef: get('GIT_REF', 'xxxxxxxxxxxxxxxxxxx', requiredInProduction),
   branchName: get('GIT_BRANCH', 'xxxxxxxxxxxxxxxxxxx', requiredInProduction),
-  activeAgencies: get('ACTIVE_AGENCIES', '', requiredInProduction),
   production,
   https: production,
   staticResourceCacheDuration: '1h',
