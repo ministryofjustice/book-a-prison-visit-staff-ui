@@ -33,44 +33,44 @@ context('Date picker', () => {
     visitsByDatePage.toggleChooseAnotherDatePopUp()
 
     // go to date, move back a month then select same day number
-    visitsByDatePage.datePickerEnterDate('5/10/2023')
-    visitsByDatePage.datePickerGoToPreviousMonth()
-    visitsByDatePage.datePickerSelectDay(5)
-    visitsByDatePage.datePickerGetEnteredDate().should('have.value', '5/9/2023')
+    visitsByDatePage.datePicker.enterDate('5/10/2023')
+    visitsByDatePage.datePicker.goToPreviousMonth()
+    visitsByDatePage.datePicker.selectDay(5)
+    visitsByDatePage.datePicker.getEnteredDate().should('have.value', '5/9/2023')
 
     // go to date, move back a month then select same day number
-    visitsByDatePage.datePickerEnterDate('5/10/2023')
-    visitsByDatePage.datePickerGoToNextMonth()
-    visitsByDatePage.datePickerSelectDay(5)
-    visitsByDatePage.datePickerGetEnteredDate().should('have.value', '5/11/2023')
+    visitsByDatePage.datePicker.enterDate('5/10/2023')
+    visitsByDatePage.datePicker.goToNextMonth()
+    visitsByDatePage.datePicker.selectDay(5)
+    visitsByDatePage.datePicker.getEnteredDate().should('have.value', '5/11/2023')
 
     // go to date on 31st, move back to a month with 30 days; select 1st and should be previous month
-    visitsByDatePage.datePickerEnterDate('31/10/2023')
-    visitsByDatePage.datePickerGoToPreviousMonth()
-    visitsByDatePage.datePickerSelectDay(1)
-    visitsByDatePage.datePickerGetEnteredDate().should('have.value', '1/9/2023')
+    visitsByDatePage.datePicker.enterDate('31/10/2023')
+    visitsByDatePage.datePicker.goToPreviousMonth()
+    visitsByDatePage.datePicker.selectDay(1)
+    visitsByDatePage.datePicker.getEnteredDate().should('have.value', '1/9/2023')
 
     // go to date on 31st, move forward to a month with 30 days; select 1st and should be next month
-    visitsByDatePage.datePickerEnterDate('31/10/2023')
-    visitsByDatePage.datePickerGoToNextMonth()
-    visitsByDatePage.datePickerSelectDay(1)
-    visitsByDatePage.datePickerGetEnteredDate().should('have.value', '1/11/2023')
+    visitsByDatePage.datePicker.enterDate('31/10/2023')
+    visitsByDatePage.datePicker.goToNextMonth()
+    visitsByDatePage.datePicker.selectDay(1)
+    visitsByDatePage.datePicker.getEnteredDate().should('have.value', '1/11/2023')
 
     // handle leap year - when moving back a year
-    visitsByDatePage.datePickerEnterDate('29/2/2024')
-    visitsByDatePage.datePickerGoToPreviousYear()
-    visitsByDatePage.datePickerSelectDay(1)
-    visitsByDatePage.datePickerGetEnteredDate().should('have.value', '1/2/2023')
+    visitsByDatePage.datePicker.enterDate('29/2/2024')
+    visitsByDatePage.datePicker.goToPreviousYear()
+    visitsByDatePage.datePicker.selectDay(1)
+    visitsByDatePage.datePicker.getEnteredDate().should('have.value', '1/2/2023')
 
     // handle leap year - when moving forward a year
-    visitsByDatePage.datePickerEnterDate('29/2/2024')
-    visitsByDatePage.datePickerGoToNextYear()
-    visitsByDatePage.datePickerSelectDay(1)
-    visitsByDatePage.datePickerGetEnteredDate().should('have.value', '1/2/2025')
+    visitsByDatePage.datePicker.enterDate('29/2/2024')
+    visitsByDatePage.datePicker.goToNextYear()
+    visitsByDatePage.datePicker.selectDay(1)
+    visitsByDatePage.datePicker.getEnteredDate().should('have.value', '1/2/2025')
 
     // handle months where the 1st is a Sunday (i.e not truncate this date)
-    visitsByDatePage.datePickerEnterDate('1/10/2023')
-    visitsByDatePage.datePickerSelectDay(1)
-    visitsByDatePage.datePickerGetEnteredDate().should('have.value', '1/10/2023')
+    visitsByDatePage.datePicker.enterDate('1/10/2023')
+    visitsByDatePage.datePicker.selectDay(1)
+    visitsByDatePage.datePicker.getEnteredDate().should('have.value', '1/10/2023')
   })
 })
