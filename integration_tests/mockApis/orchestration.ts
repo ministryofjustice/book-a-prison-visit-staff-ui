@@ -257,6 +257,37 @@ export default {
       },
     })
   },
+
+  stubGetBookedVisitCountByDate: ({
+    prisonId = 'HEI',
+    date,
+    count = 0,
+  }: {
+    prisonId: string
+    date: string
+    count: number
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPath: '/orchestration/visits/search',
+        queryParameters: {
+          prisonId: { equalTo: prisonId },
+          visitStartDate: { equalTo: date },
+          visitEndDate: { equalTo: date },
+          visitStatus: { equalTo: 'BOOKED' },
+          page: { equalTo: '0' },
+          size: { equalTo: '1' },
+        },
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: { totalElements: count },
+      },
+    })
+  },
+
   stubIgnoreNotifications: ({
     ignoreVisitNotificationsDto,
     visit,
@@ -341,6 +372,87 @@ export default {
       },
     })
   },
+
+  stubUnblockVisitDate: ({
+    prisonId = 'HEI',
+    date,
+    username = 'USER1',
+  }: {
+    prisonId: string
+    date: string
+    username: string
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'PUT',
+        url: `/orchestration/config/prisons/prison/${prisonId}/exclude-date/remove`,
+        bodyPatterns: [
+          {
+            equalToJson: {
+              excludeDate: date,
+              actionedBy: username,
+            },
+          },
+        ],
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: [],
+      },
+    })
+  },
+
+  stubBlockVisitDate: ({
+    prisonId = 'HEI',
+    date,
+    username = 'USER1',
+  }: {
+    prisonId: string
+    date: string
+    username: string
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'PUT',
+        url: `/orchestration/config/prisons/prison/${prisonId}/exclude-date/add`,
+        bodyPatterns: [
+          {
+            equalToJson: {
+              excludeDate: date,
+              actionedBy: username,
+            },
+          },
+        ],
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: [],
+      },
+    })
+  },
+
+  stubGetFutureBlockedDates: ({
+    prisonId = 'HEI',
+    blockedDates = [],
+  }: {
+    prisonId: string
+    blockedDates: PrisonExcludeDateDto[]
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        url: `/orchestration/config/prisons/prison/${prisonId}/exclude-date/future`,
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: blockedDates,
+      },
+    })
+  },
+
   stubVisitSessions: ({
     prisonId,
     offenderNo,
@@ -473,25 +585,6 @@ export default {
       },
       response: {
         status: 200,
-      },
-    })
-  },
-  stubGetFutureBlockedDates: ({
-    prisonId,
-    prisonExcludeDates = [TestData.prisonExcludeDateDto()],
-  }: {
-    prisonId: string
-    prisonExcludeDates: PrisonExcludeDateDto[]
-  }): SuperAgentRequest => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        url: `/orchestration/config/prisons/prison/${prisonId}/exclude-date/future`,
-      },
-      response: {
-        status: 200,
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: prisonExcludeDates,
       },
     })
   },
