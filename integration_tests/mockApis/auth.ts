@@ -121,6 +121,7 @@ const token = (role: string) =>
 export default {
   getSignInUrl,
   stubAuthPing: ping,
+  stubAuthToken: token,
   stubSignIn: (role: string): Promise<[Response, Response, Response, Response, Response, Response]> =>
     Promise.all([favicon(), redirect(), signOut(), manageDetails(), token(role), tokenVerification.stubVerifyToken()]),
 }

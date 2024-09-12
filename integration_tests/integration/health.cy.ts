@@ -12,6 +12,8 @@ context('Healthcheck', () => {
       cy.task('stubWhereaboutsPing')
       cy.task('stubPrisonRegisterPing')
       cy.task('stubOrchestrationPing')
+
+      cy.task('stubAuthToken')
       cy.task('stubSupportedPrisonIds')
     })
 
