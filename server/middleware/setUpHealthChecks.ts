@@ -32,7 +32,7 @@ export default function setUpHealthChecks(applicationInfo: ApplicationInfo): Rou
         name: applicationInfo.applicationName,
       },
       productId: applicationInfo.productId,
-      activeAgencies: applicationInfo.activeAgencies,
+      activeAgencies: [],
     })
   })
 

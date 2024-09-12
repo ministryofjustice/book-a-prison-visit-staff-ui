@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import config from './config'
 
-const { buildNumber, gitRef, productId, branchName, activeAgencies } = config
+const { buildNumber, gitRef, productId, branchName } = config
 
 export type ApplicationInfo = {
   applicationName: string
@@ -11,7 +11,6 @@ export type ApplicationInfo = {
   gitShortHash: string
   productId?: string
   branchName: string
-  activeAgencies: Array<string>
 }
 
 export default (): ApplicationInfo => {
@@ -24,6 +23,5 @@ export default (): ApplicationInfo => {
     gitShortHash: gitRef.substring(0, 7),
     productId,
     branchName,
-    activeAgencies: activeAgencies.split(',').map(agencyCode => agencyCode.trim()),
   }
 }

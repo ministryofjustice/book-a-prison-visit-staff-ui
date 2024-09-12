@@ -27,6 +27,7 @@ context('Healthcheck', () => {
     })
 
     it('Info contains activeAgencies array', () => {
+      // TODO this should test the actual agencies
       cy.request('/info').its('body.activeAgencies').should('be.an', 'array')
     })
   })
