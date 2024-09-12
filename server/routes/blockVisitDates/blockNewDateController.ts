@@ -1,13 +1,14 @@
 import { RequestHandler } from 'express'
 import { body, matchedData, ValidationChain, validationResult } from 'express-validator'
 import { format } from 'date-fns'
-import { BlockedDatesService, VisitService } from '../../services'
+import { AuditService, BlockedDatesService, VisitService } from '../../services'
 import logger from '../../../logger'
 
 export default class BlockNewDateController {
   public constructor(
-    private readonly visitService: VisitService,
+    private readonly auditService: AuditService,
     private readonly blockedDatesService: BlockedDatesService,
+    private readonly visitService: VisitService,
   ) {}
 
   public view(): RequestHandler {
@@ -53,6 +54,13 @@ export default class BlockNewDateController {
         try {
           await this.blockedDatesService.blockVisitDate(res.locals.user.username, prisonId, visitBlockDate)
           req.flash('message', `Visits are blocked for ${format(visitBlockDate, 'EEEE d MMMM yyyy')}.`)
+
+          await this.auditService.blockedVisitDate({
+            prisonId,
+            date: visitBlockDate,
+            username: res.locals.user.username,
+            operationId: res.locals.appInsightsOperationId,
+          })
         } catch (error) {
           logger.error(error, `Could not block visit date ${visitBlockDate} for ${res.locals.user.username}`)
         }

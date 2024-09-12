@@ -4,13 +4,18 @@ import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
 import { FieldValidationError } from 'express-validator'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
-import { createMockBlockedDatesService, createMockVisitService } from '../../services/testutils/mocks'
+import {
+  createMockAuditService,
+  createMockBlockedDatesService,
+  createMockVisitService,
+} from '../../services/testutils/mocks'
 import config from '../../config'
 import { FlashData } from '../../@types/bapv'
 
 let app: Express
 let sessionData: SessionData
 
+const auditService = createMockAuditService()
 const blockedDatesService = createMockBlockedDatesService()
 const visitService = createMockVisitService()
 
@@ -21,7 +26,7 @@ beforeEach(() => {
   jest.replaceProperty(config, 'features', { sessionManagement: true })
 
   sessionData = { visitBlockDate } as SessionData
-  app = appWithAllRoutes({ services: { blockedDatesService, visitService }, sessionData })
+  app = appWithAllRoutes({ services: { auditService, blockedDatesService, visitService }, sessionData })
 })
 
 afterEach(() => {
@@ -123,6 +128,12 @@ describe('Block new visit date', () => {
         .expect('location', '/block-visit-dates')
         .expect(() => {
           expect(blockedDatesService.blockVisitDate).toHaveBeenCalledWith('user1', 'HEI', visitBlockDate)
+          expect(auditService.blockedVisitDate).toHaveBeenCalledWith({
+            prisonId: 'HEI',
+            date: visitBlockDate,
+            username: 'user1',
+            operationId: undefined,
+          })
           expect(flashProvider).toHaveBeenCalledTimes(1)
           expect(flashProvider).toHaveBeenCalledWith('message', blockedDateSuccessMessage)
           expect(sessionData.visitBlockDate).toBe(undefined)
@@ -137,6 +148,7 @@ describe('Block new visit date', () => {
         .expect('location', '/block-visit-dates')
         .expect(() => {
           expect(blockedDatesService.blockVisitDate).not.toHaveBeenCalled()
+          expect(auditService.blockedVisitDate).not.toHaveBeenCalled()
           expect(flashProvider).not.toHaveBeenCalled()
         })
     })
@@ -157,6 +169,7 @@ describe('Block new visit date', () => {
         .expect('location', '/block-visit-dates/block-new-date')
         .expect(() => {
           expect(blockedDatesService.blockVisitDate).not.toHaveBeenCalled()
+          expect(auditService.blockedVisitDate).not.toHaveBeenCalled()
           expect(flashProvider).toHaveBeenCalledWith('errors', [expectedValidationError])
           expect(flashProvider).toHaveBeenCalledTimes(1)
         })
