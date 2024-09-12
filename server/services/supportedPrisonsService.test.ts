@@ -40,6 +40,18 @@ describe('Supported prisons service', () => {
     jest.resetAllMocks()
   })
 
+  describe('getActiveAgencies', () => {
+    it('should return an array of supported prison IDs (without requiring a username)', async () => {
+      orchestrationApiClient.getSupportedPrisonIds.mockResolvedValue(supportedPrisonIds)
+
+      const results = await supportedPrisonsService.getActiveAgencies()
+
+      expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith(undefined)
+      expect(orchestrationApiClient.getSupportedPrisonIds).toHaveBeenCalledTimes(1)
+      expect(results).toStrictEqual(supportedPrisonIds)
+    })
+  })
+
   describe('getSupportedPrisons', () => {
     it('should return an object with key/values of supported prison IDs and names', async () => {
       orchestrationApiClient.getSupportedPrisonIds.mockResolvedValue(supportedPrisonIds)
@@ -102,6 +114,7 @@ describe('Supported prisons service', () => {
 
       const results = await supportedPrisonsService.getSupportedPrisonIds('user')
 
+      expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user')
       expect(orchestrationApiClient.getSupportedPrisonIds).toHaveBeenCalledTimes(1)
       expect(results).toStrictEqual(supportedPrisonIds)
     })

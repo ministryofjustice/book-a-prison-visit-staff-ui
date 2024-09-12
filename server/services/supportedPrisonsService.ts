@@ -14,6 +14,10 @@ export default class SupportedPrisonsService {
 
   private lastUpdated = 0
 
+  async getActiveAgencies(): Promise<string[]> {
+    return this.getSupportedPrisonIds(undefined)
+  }
+
   async getSupportedPrisons(username: string): Promise<Record<string, string>> {
     await this.refreshPrisonNames(username)
     const supportedPrisonIds = await this.getSupportedPrisonIds(username)
