@@ -59,26 +59,26 @@ describe('Blocked dates service', () => {
     })
   })
 
-  describe('isExcludedDate', () => {
-    it('should return future blocked dates for given prison', async () => {
+  describe('isBlockedDate', () => {
+    it('should return true for given date if exclude date found', async () => {
       const prisonExcludeDateDto = TestData.prisonExcludeDateDto()
       const excludedDate = prisonExcludeDateDto.excludeDate
-      orchestrationApiClient.isExcludedDate.mockResolvedValue([prisonExcludeDateDto])
+      orchestrationApiClient.isBlockedDate.mockResolvedValue([prisonExcludeDateDto])
 
-      const result = await blockedDatesService.isExcludedDate(prisonId, excludedDate, username)
+      const result = await blockedDatesService.isBlockedDate(prisonId, excludedDate, username)
 
-      expect(orchestrationApiClient.isExcludedDate).toHaveBeenCalledWith(prisonId, excludedDate)
+      expect(orchestrationApiClient.isBlockedDate).toHaveBeenCalledWith(prisonId, excludedDate)
       expect(result).toStrictEqual(true)
     })
 
-    it('should return future blocked dates for given prison', async () => {
+    it('should return false for given date if no exclude date found', async () => {
       const prisonExcludeDateDto = TestData.prisonExcludeDateDto()
       const excludedDate = prisonExcludeDateDto.excludeDate
-      orchestrationApiClient.isExcludedDate.mockResolvedValue(null)
+      orchestrationApiClient.isBlockedDate.mockResolvedValue(null)
 
-      const result = await blockedDatesService.isExcludedDate(prisonId, excludedDate, username)
+      const result = await blockedDatesService.isBlockedDate(prisonId, excludedDate, username)
 
-      expect(orchestrationApiClient.isExcludedDate).toHaveBeenCalledWith(prisonId, excludedDate)
+      expect(orchestrationApiClient.isBlockedDate).toHaveBeenCalledWith(prisonId, excludedDate)
       expect(result).toStrictEqual(false)
     })
   })

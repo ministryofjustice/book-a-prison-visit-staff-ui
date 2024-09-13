@@ -470,7 +470,7 @@ describe('orchestrationApiClient', () => {
     })
   })
 
-  describe('isExcludedDate', () => {
+  describe('isBlockedDate', () => {
     it('should return excludeDateDto if exclude date found for passed date', async () => {
       const results = [TestData.prisonExcludeDateDto()]
       const excludedDate = results[0].excludeDate
@@ -480,7 +480,7 @@ describe('orchestrationApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
-      const output = await orchestrationApiClient.isExcludedDate(prisonId, excludedDate)
+      const output = await orchestrationApiClient.isBlockedDate(prisonId, excludedDate)
 
       expect(output).toStrictEqual(results)
     })

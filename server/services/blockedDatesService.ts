@@ -25,11 +25,11 @@ export default class BlockedDatesService {
     return orchestrationApiClient.getFutureBlockedDates(prisonId)
   }
 
-  async isExcludedDate(prisonId: string, excludedDate: string, username: string): Promise<boolean> {
+  async isBlockedDate(prisonId: string, excludedDate: string, username: string): Promise<boolean> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
-    const results = await orchestrationApiClient.isExcludedDate(prisonId, excludedDate)
+    const results = await orchestrationApiClient.isBlockedDate(prisonId, excludedDate)
     return !!results
   }
 }
