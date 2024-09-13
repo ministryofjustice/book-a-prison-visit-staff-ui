@@ -1,12 +1,17 @@
+import DatePickerComponent from '../components/datePicker'
 import Page, { PageElement } from './page'
 
 export default class VisitsByDatePage extends Page {
+  datePicker: DatePickerComponent
+
   constructor() {
     super('View visits by date', {
       // Known issue with MoJ Side navigation component when using section headers. See:
       // https://design-patterns.service.justice.gov.uk/components/side-navigation/
       axeRulesToIgnore: ['heading-order'],
     })
+
+    this.datePicker = new DatePickerComponent()
   }
 
   dateTabsToday = (): PageElement => cy.get(':nth-child(1) > .moj-sub-navigation__link')
@@ -36,43 +41,7 @@ export default class VisitsByDatePage extends Page {
     cy.get('[data-test="another-date-button"]').click()
   }
 
-  // Date picker
-  datePickerEnterDate = (date: string): void => {
-    cy.get('.moj-js-datepicker-cancel').click({ force: true })
-    cy.get('.moj-js-datepicker-input').clear()
-    cy.get('.moj-js-datepicker-input').type(`${date}{enter}`)
-    this.datePickerToggleCalendar()
-  }
-
-  datePickerGetEnteredDate = (): PageElement => cy.get('.moj-js-datepicker-input')
-
-  datePickerToggleCalendar = (): void => {
-    cy.get('.moj-js-datepicker-toggle').click()
-  }
-
-  datePickerGoToPreviousMonth = (): void => {
-    cy.get('.moj-js-datepicker-prev-month').click()
-  }
-
-  datePickerGoToPreviousYear = (): void => {
-    cy.get('.moj-js-datepicker-prev-year').click()
-  }
-
-  datePickerGoToNextMonth = (): void => {
-    cy.get('.moj-js-datepicker-next-month').click()
-  }
-
-  datePickerGoToNextYear = (): void => {
-    cy.get('.moj-js-datepicker-next-year').click()
-  }
-
-  datePickerSelectDay = (day: number) => {
-    cy.get('.moj-datepicker__calendar-day:visible')
-      .contains(new RegExp(`^${day}$`))
-      .click()
-  }
-
-  datePickerClickViewDate = (): void => {
+  viewSelectedDate = (): void => {
     cy.get('[data-test="submit"]').click()
   }
 }

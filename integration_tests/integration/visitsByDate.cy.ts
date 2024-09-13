@@ -181,9 +181,9 @@ context('View visits by date', () => {
     cy.task('stubGetVisitsWithoutSessionTemplate', { prisonId, sessionDate: firstOfNextMonthShortFormat, visits: [] })
 
     visitsByDatePage.toggleChooseAnotherDatePopUp()
-    visitsByDatePage.datePickerGoToNextMonth()
-    visitsByDatePage.datePickerSelectDay(1)
-    visitsByDatePage.datePickerClickViewDate()
+    visitsByDatePage.datePicker.goToNextMonth()
+    visitsByDatePage.datePicker.selectDay(1)
+    visitsByDatePage.viewSelectedDate()
     visitsByDatePage.dateTabsToday().contains(firstOfNextMonthLongFormat)
     visitsByDatePage.noResultsMessage().contains('No visit sessions on this day')
   })
