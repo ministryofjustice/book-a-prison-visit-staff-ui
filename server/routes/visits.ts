@@ -9,7 +9,7 @@ import { VisitPreview, VisitRestriction } from '../data/orchestrationApiTypes'
 
 export default function routes({
   auditService,
-  supportedPrisonsService,
+  blockedDatesService,
   visitNotificationsService,
   visitService,
   visitSessionsService,
@@ -29,6 +29,7 @@ export default function routes({
 
   get('/', async (req, res) => {
     const { prisonId } = req.session.selectedEstablishment
+    const { username } = res.locals.user
 
     const { type = '', sessionReference = '', selectedDate = '', firstTabDate = '' } = req.query
 
@@ -40,12 +41,12 @@ export default function routes({
     // get session schedule and any 'unknown' visits (i.e. those with no session template because migrated data)
     const [sessionSchedule, unknownVisits] = await Promise.all([
       visitSessionsService.getSessionSchedule({
-        username: res.locals.user.username,
+        username,
         prisonId,
         date: selectedDateString,
       }),
       visitService.getVisitsWithoutSessionTemplate({
-        username: res.locals.user.username,
+        username,
         prisonId,
         sessionDate: selectedDateString,
       }),
@@ -73,7 +74,7 @@ export default function routes({
     // fetch visits if a known session is selected...
     if (selectedSessionTemplate) {
       visits = await visitService.getVisitsBySessionTemplate({
-        username: res.locals.user.username,
+        username,
         prisonId,
         reference: selectedSessionTemplate.sessionReference,
         sessionDate: selectedDateString,
@@ -91,11 +92,9 @@ export default function routes({
 
     // if no visits, check if this is an exclude date - and if so are there any notifications
     const isAnExcludeDate =
-      visits.length === 0 &&
-      (await supportedPrisonsService.isAnExcludeDate(res.locals.user.username, prisonId, selectedDateString))
+      visits.length === 0 && (await blockedDatesService.isExcludedDate(prisonId, selectedDateString, username))
     const isAnExcludeDateWithVisitNotifications =
-      isAnExcludeDate &&
-      (await visitNotificationsService.dateHasNotifications(res.locals.user.username, prisonId, selectedDateString))
+      isAnExcludeDate && (await visitNotificationsService.dateHasNotifications(username, prisonId, selectedDateString))
 
     const visitorsTotal = visits.reduce((acc, visit) => {
       return acc + visit.visitorCount
@@ -114,7 +113,7 @@ export default function routes({
     await auditService.viewedVisits({
       viewDate: selectedDateString,
       prisonId,
-      username: res.locals.user.username,
+      username,
       operationId: res.locals.appInsightsOperationId,
     })
 

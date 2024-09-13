@@ -50,6 +50,7 @@ context('View visits by date', () => {
     cy.task('stubPrisonNames')
     cy.task('stubGetPrison')
     cy.task('stubGetNotificationCount', {})
+    cy.task('stubGetNotificationGroups', {})
     cy.signIn()
   })
 
@@ -65,6 +66,7 @@ context('View visits by date', () => {
     })
 
     cy.task('stubGetVisitsWithoutSessionTemplate', { prisonId, sessionDate: todayShortFormat, visits: [] })
+    cy.task('stubIsExcludedDate', { prisonId, excludeDate: todayShortFormat })
 
     const homePage = Page.verifyOnPage(HomePage)
     homePage.viewVisitsTile().click()
@@ -104,6 +106,8 @@ context('View visits by date', () => {
     // select tomorrow
     cy.task('stubSessionSchedule', { prisonId, date: tomorrowShortFormat, sessionSchedule: [] })
     cy.task('stubGetVisitsWithoutSessionTemplate', { prisonId, sessionDate: tomorrowShortFormat, visits: [] })
+    cy.task('stubIsExcludedDate', { prisonId, excludeDate: tomorrowShortFormat, prisonExcludeDates: null })
+
     visitsByDatePage.dateTabsTomorrow().click()
 
     visitsByDatePage.dateTabsToday().should('not.have.attr', 'aria-current', 'page')
@@ -164,6 +168,7 @@ context('View visits by date', () => {
   it('should show visits by date, and change date using the date picker', () => {
     cy.task('stubSessionSchedule', { prisonId, date: todayShortFormat, sessionSchedule: [] })
     cy.task('stubGetVisitsWithoutSessionTemplate', { prisonId, sessionDate: todayShortFormat, visits: [] })
+    cy.task('stubIsExcludedDate', { prisonId, excludeDate: todayShortFormat, prisonExcludeDates: null })
 
     const homePage = Page.verifyOnPage(HomePage)
     homePage.viewVisitsTile().click()
@@ -179,6 +184,7 @@ context('View visits by date', () => {
     const firstOfNextMonthLongFormat = format(firstOfNextMonth, longDateFormat)
     cy.task('stubSessionSchedule', { prisonId, date: firstOfNextMonthShortFormat, sessionSchedule: [] })
     cy.task('stubGetVisitsWithoutSessionTemplate', { prisonId, sessionDate: firstOfNextMonthShortFormat, visits: [] })
+    cy.task('stubIsExcludedDate', { prisonId, excludeDate: firstOfNextMonthShortFormat, prisonExcludeDates: null })
 
     visitsByDatePage.toggleChooseAnotherDatePopUp()
     visitsByDatePage.datePickerGoToNextMonth()

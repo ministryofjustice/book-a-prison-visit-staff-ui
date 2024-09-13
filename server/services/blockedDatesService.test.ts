@@ -58,4 +58,28 @@ describe('Blocked dates service', () => {
       expect(result).toStrictEqual([prisonExcludeDateDto])
     })
   })
+
+  describe('isExcludedDate', () => {
+    it('should return future blocked dates for given prison', async () => {
+      const prisonExcludeDateDto = TestData.prisonExcludeDateDto()
+      const excludedDate = prisonExcludeDateDto.excludeDate
+      orchestrationApiClient.isExcludedDate.mockResolvedValue([prisonExcludeDateDto])
+
+      const result = await blockedDatesService.isExcludedDate(prisonId, excludedDate, username)
+
+      expect(orchestrationApiClient.isExcludedDate).toHaveBeenCalledWith(prisonId, excludedDate)
+      expect(result).toStrictEqual(true)
+    })
+
+    it('should return future blocked dates for given prison', async () => {
+      const prisonExcludeDateDto = TestData.prisonExcludeDateDto()
+      const excludedDate = prisonExcludeDateDto.excludeDate
+      orchestrationApiClient.isExcludedDate.mockResolvedValue(null)
+
+      const result = await blockedDatesService.isExcludedDate(prisonId, excludedDate, username)
+
+      expect(orchestrationApiClient.isExcludedDate).toHaveBeenCalledWith(prisonId, excludedDate)
+      expect(result).toStrictEqual(false)
+    })
+  })
 })

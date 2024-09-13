@@ -670,6 +670,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/config/prisons/prison/{prisonCode}/exclude-date/{excludeDate}/isExcluded': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Endpoint to check if the date passed has been excluded for visits by the prison
+     * @description Returns true if the date passed has been excluded for visits by the prison, false otherwise.
+     */
+    get: operations['isDateExcludedForPrisonVisits']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/config/prisons/prison/{prisonCode}/exclude-date/past': {
     parameters: {
       query?: never
@@ -1282,12 +1302,12 @@ export interface components {
       /** Format: int64 */
       offset?: number
       sort?: components['schemas']['SortObject'][]
-      /** Format: int32 */
-      pageSize?: number
+      unpaged?: boolean
       paged?: boolean
       /** Format: int32 */
       pageNumber?: number
-      unpaged?: boolean
+      /** Format: int32 */
+      pageSize?: number
     }
     SortObject: {
       direction?: string
@@ -3847,6 +3867,64 @@ export interface operations {
       }
       /** @description Incorrect permissions to get prison */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  isDateExcludedForPrisonVisits: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /**
+         * @description prison code
+         * @example HEI
+         */
+        prisonCode: string
+        /**
+         * @description date to be checked if excluded by prison for visits
+         * @example 2024-12-26
+         */
+        excludeDate: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful response if the date is excluded for visits at the prison */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PrisonExcludeDateDto'][]
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to check if date excluded */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Prison not found on visit-scheduler */
+      404: {
         headers: {
           [name: string]: unknown
         }
