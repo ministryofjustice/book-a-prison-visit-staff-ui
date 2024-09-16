@@ -25,7 +25,7 @@ generic-service:
     DPS_PRISONER_URL: "https://prisoner-preprod.digital.prison.service.justice.gov.uk/"
 
     REDIS_KEY: "bapv-staff-preprod"
-    FEATURE_SESSION_MANAGEMENT: "false"
+    FEATURE_SESSION_MANAGEMENT: "true"
 
 
 generic-prometheus-alerts:
