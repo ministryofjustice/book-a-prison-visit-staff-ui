@@ -8,6 +8,7 @@ import {
   ChangeApplicationDto,
   CreateApplicationDto,
   IgnoreVisitNotificationsDto,
+  IsExcludeDateDto,
   NotificationCount,
   NotificationGroup,
   NotificationType,
@@ -204,8 +205,11 @@ export default class OrchestrationApiClient {
     return this.restClient.get({ path: `/config/prisons/prison/${prisonId}/exclude-date/future` })
   }
 
-  async isBlockedDate(prisonCode: string, excludeDate: string): Promise<PrisonExcludeDateDto[]> {
-    return this.restClient.get({ path: `/config/prisons/prison/${prisonCode}/exclude-date/${excludeDate}/isExcluded` })
+  async isBlockedDate(prisonCode: string, excludeDate: string): Promise<boolean> {
+    const { isExcluded } = await this.restClient.get<IsExcludeDateDto>({
+      path: `/config/prisons/prison/${prisonCode}/exclude-date/${excludeDate}/isExcluded`,
+    })
+    return isExcluded
   }
 
   // orchestration-sessions-controller

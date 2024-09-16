@@ -1,6 +1,7 @@
 import {
   Alert,
   ApplicationDto,
+  IsExcludeDateDto,
   NotificationCount,
   NotificationGroup,
   NotificationVisitInfo,
@@ -225,6 +226,14 @@ export default class TestData {
   }: Partial<PrisonExcludeDateDto> = {}): PrisonExcludeDateDto => ({
     excludeDate,
     actionedBy,
+  })
+
+  static isExcludeDateDto = ({
+    isExcluded = true,
+    excluded = true,
+  }: Partial<IsExcludeDateDto> = {}): IsExcludeDateDto => ({
+    isExcluded,
+    excluded,
   })
 
   static prisoner = ({

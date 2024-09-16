@@ -29,7 +29,6 @@ export default class BlockedDatesService {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
-    const results = await orchestrationApiClient.isBlockedDate(prisonId, excludedDate)
-    return !!results
+    return orchestrationApiClient.isBlockedDate(prisonId, excludedDate)
   }
 }

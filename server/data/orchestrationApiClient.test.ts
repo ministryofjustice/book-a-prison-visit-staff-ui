@@ -472,8 +472,8 @@ describe('orchestrationApiClient', () => {
 
   describe('isBlockedDate', () => {
     it('should return excludeDateDto if exclude date found for passed date', async () => {
-      const results = [TestData.prisonExcludeDateDto()]
-      const excludedDate = results[0].excludeDate
+      const results = TestData.isExcludeDateDto()
+      const excludedDate = '2024-12-12'
 
       fakeOrchestrationApi
         .get(`/config/prisons/prison/${prisonId}/exclude-date/${excludedDate}/isExcluded`)
@@ -482,7 +482,7 @@ describe('orchestrationApiClient', () => {
 
       const output = await orchestrationApiClient.isBlockedDate(prisonId, excludedDate)
 
-      expect(output).toStrictEqual(results)
+      expect(output).toStrictEqual(true)
     })
   })
 

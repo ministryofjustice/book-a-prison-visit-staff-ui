@@ -63,7 +63,7 @@ describe('Blocked dates service', () => {
     it('should return true for given date if exclude date found', async () => {
       const prisonExcludeDateDto = TestData.prisonExcludeDateDto()
       const excludedDate = prisonExcludeDateDto.excludeDate
-      orchestrationApiClient.isBlockedDate.mockResolvedValue([prisonExcludeDateDto])
+      orchestrationApiClient.isBlockedDate.mockResolvedValue(true)
 
       const result = await blockedDatesService.isBlockedDate(prisonId, excludedDate, username)
 
@@ -74,7 +74,7 @@ describe('Blocked dates service', () => {
     it('should return false for given date if no exclude date found', async () => {
       const prisonExcludeDateDto = TestData.prisonExcludeDateDto()
       const excludedDate = prisonExcludeDateDto.excludeDate
-      orchestrationApiClient.isBlockedDate.mockResolvedValue(null)
+      orchestrationApiClient.isBlockedDate.mockResolvedValue(false)
 
       const result = await blockedDatesService.isBlockedDate(prisonId, excludedDate, username)
 
