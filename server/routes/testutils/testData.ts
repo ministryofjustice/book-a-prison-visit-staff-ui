@@ -228,14 +228,6 @@ export default class TestData {
     actionedBy,
   })
 
-  static isExcludeDateDto = ({
-    isExcluded = true,
-    excluded = true,
-  }: Partial<IsExcludeDateDto> = {}): IsExcludeDateDto => ({
-    isExcluded,
-    excluded,
-  })
-
   static prisoner = ({
     prisonerNumber = 'A1234BC',
     firstName = 'JOHN',

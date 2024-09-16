@@ -471,8 +471,8 @@ describe('orchestrationApiClient', () => {
   })
 
   describe('isBlockedDate', () => {
-    it('should return excludeDateDto if exclude date found for passed date', async () => {
-      const results = TestData.isExcludeDateDto()
+    it('should return boolean indicating whether given date is a blocked', async () => {
+      const results = { isExcluded: true }
       const excludedDate = '2024-12-12'
 
       fakeOrchestrationApi
