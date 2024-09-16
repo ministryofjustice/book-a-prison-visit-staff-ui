@@ -1,7 +1,6 @@
 import {
   Alert,
   ApplicationDto,
-  IsExcludeDateDto,
   NotificationCount,
   NotificationGroup,
   NotificationVisitInfo,
