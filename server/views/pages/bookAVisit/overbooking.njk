@@ -13,7 +13,7 @@
 
       <p>
         <span data-test="bookings-count">{{ bookingsCount }}</span> of
-        <span data-test="max-capacity">{{ maxCapacity }}</span> tables are booked for
+        <span data-test="max-capacity">{{ maxCapacity }}</span> {{ "table" | pluralise(maxCapacity) }} are booked for
         <span data-test="visit-start-time">{{ visitStartTime }}</span> to
         <span data-test="visit-end-time">{{ visitEndTime }}</span> on 
         <span data-test="visit-date">{{ visitStartTime | formatDate("EEEE d MMMM") }}</span>.
