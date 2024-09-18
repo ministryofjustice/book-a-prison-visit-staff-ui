@@ -1,0 +1,50 @@
+{% extends "../../partials/layout.njk" %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+
+{% set pageTitle = "This time slot is fully booked" %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+
+      <h2 class="govuk-heading-l">
+        This time slot is fully booked. Are you sure you want to continue?
+      </h2>
+
+      <p>
+        <span data-test="bookings-count">{{ bookingsCount }}</span> of
+        <span data-test="max-capacity">{{ maxCapacity }}</span> {{ "table" | pluralise(maxCapacity) }} are booked for
+        <span data-test="visit-start-time">{{ visitStartTime }}</span> to
+        <span data-test="visit-end-time">{{ visitEndTime }}</span> on 
+        <span data-test="visit-date">{{ visitStartTime | formatDate("EEEE d MMMM") }}</span>.
+      </p>
+
+      {{ govukRadios({
+        name: "confirmOverbooking",
+        items: [
+          {
+            value: "yes",
+            text: "Yes, book for this timeslot"
+          },
+          {
+            value: "no",
+            text: "No, choose a new date and time"
+          }
+        ],
+        errorMessage: errors | findError('confirmOverbooking'),
+        attributes: { "data-test": "overbooking-confirm" }
+      }) }}
+
+      {{ govukButton({
+        text: "Continue",
+        classes: "govuk-button--secondary",
+        href: 'TODO',
+        preventDoubleClick: true,
+        attributes: {
+          "data-test": "overbooking-continue"
+        }
+      }) }}
+
+    </div>
+  </div>
+{% endblock %}
