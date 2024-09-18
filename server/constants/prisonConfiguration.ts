@@ -361,7 +361,7 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
   // Stocken
   SKI: {
     selectVisitorsText: [
-      'You can add up to 3 people aged 16 and over - with a maximum of 5 total visitors.',
+      'You can add up to 3 people aged 16 and over - with a maximum of 8 total visitors.',
       'At least one visitor must be 18 or older.',
       'Contact the establishment if you would like to bring more children.',
     ],
