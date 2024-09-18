@@ -453,6 +453,28 @@ export default {
     })
   },
 
+  stubIsBlockedDate: ({
+    prisonId,
+    excludeDate,
+    prisonExcludeDates = [TestData.prisonExcludeDateDto()],
+  }: {
+    prisonId: string
+    excludeDate: string
+    prisonExcludeDates: PrisonExcludeDateDto[]
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        url: `/orchestration/config/prisons/prison/${prisonId}/exclude-date/${excludeDate}/isExcluded`,
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: prisonExcludeDates,
+      },
+    })
+  },
+
   stubVisitSessions: ({
     prisonId,
     offenderNo,

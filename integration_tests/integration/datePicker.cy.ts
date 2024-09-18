@@ -18,6 +18,7 @@ context('Date picker', () => {
     cy.task('stubPrisonNames')
     cy.task('stubGetPrison')
     cy.task('stubGetNotificationCount', {})
+    cy.task('stubGetNotificationGroups', {})
     cy.signIn()
 
     cy.task('stubSessionSchedule', { prisonId, date: todayShortFormat, sessionSchedule: [] })
@@ -26,6 +27,7 @@ context('Date picker', () => {
 
   it('should navigate through a range of dates and correctly handle month and year boundaries', () => {
     const homePage = Page.verifyOnPage(HomePage)
+    cy.task('stubIsBlockedDate', { prisonId, excludeDate: todayShortFormat, prisonExcludeDates: [] })
     homePage.viewVisitsTile().click()
     const visitsByDatePage = Page.verifyOnPage(VisitsByDatePage)
 
