@@ -3,7 +3,6 @@ import express, { Router } from 'express'
 import healthcheck from '../services/healthCheck'
 import type { ApplicationInfo } from '../applicationInfo'
 import { SupportedPrisonsService } from '../services'
-import logger from '../../logger'
 
 export default function setUpHealthChecks(
   applicationInfo: ApplicationInfo,
@@ -27,26 +26,24 @@ export default function setUpHealthChecks(
   )
 
   router.get('/info', async (req, res) => {
-    let activeAgencies: string[]
     try {
-      activeAgencies = await supportedPrisonsService.getActiveAgencies()
-    } catch (error) {
-      logger.error(error, 'Error retrieving activeAgencies')
-      activeAgencies = []
-    }
+      const activeAgencies = await supportedPrisonsService.getActiveAgencies()
 
-    res.json({
-      git: {
-        branch: applicationInfo.branchName,
-      },
-      build: {
-        artifact: applicationInfo.applicationName,
-        version: applicationInfo.buildNumber,
-        name: applicationInfo.applicationName,
-      },
-      productId: applicationInfo.productId,
-      activeAgencies,
-    })
+      res.json({
+        git: {
+          branch: applicationInfo.branchName,
+        },
+        build: {
+          artifact: applicationInfo.applicationName,
+          version: applicationInfo.buildNumber,
+          name: applicationInfo.applicationName,
+        },
+        productId: applicationInfo.productId,
+        activeAgencies,
+      })
+    } catch {
+      res.status(503).send()
+    }
   })
 
   return router
