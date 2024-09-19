@@ -14,7 +14,6 @@ context('Healthcheck', () => {
       cy.task('stubOrchestrationPing')
 
       cy.task('stubAuthToken')
-      cy.task('stubSupportedPrisonIds')
     })
 
     it('Health check page is visible', () => {
@@ -25,11 +24,9 @@ context('Healthcheck', () => {
       cy.request('/ping').its('body.status').should('equal', 'UP')
     })
 
-    it('Info is visible', () => {
-      cy.request('/info').its('body').should('exist')
-    })
+    it('Info is visible and should contain activeAgencies', () => {
+      cy.task('stubSupportedPrisonIds')
 
-    it('Info contains activeAgencies array', () => {
       cy.request('/info')
         .its('body.activeAgencies')
         .should('be.an', 'array')
@@ -38,6 +35,15 @@ context('Healthcheck', () => {
           cy.wrap(activeAgencies).its(0).should('equal', 'HEI')
           cy.wrap(activeAgencies).its(1).should('equal', 'BLI')
         })
+    })
+
+    it('Info returns 503 Service unavailable if there is an error getting activeAgencies', () => {
+      cy.task('stubSupportedPrisonIdsError')
+
+      cy.request({ url: '/info', method: 'GET', failOnStatusCode: false }).then(response => {
+        expect(response.status).to.equal(503)
+        expect(response.body).to.equal('')
+      })
     })
   })
 

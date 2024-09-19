@@ -586,6 +586,18 @@ export default {
       },
     })
   },
+  stubSupportedPrisonIdsError: (): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        url: '/orchestration/config/prisons/user-type/STAFF/supported',
+      },
+      response: {
+        status: 500,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+      },
+    })
+  },
   stubGetPrison: (prison: PrisonDto = TestData.prisonDto()): SuperAgentRequest => {
     return stubFor({
       request: {
