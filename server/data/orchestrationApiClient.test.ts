@@ -470,6 +470,22 @@ describe('orchestrationApiClient', () => {
     })
   })
 
+  describe('isBlockedDate', () => {
+    it('should return boolean indicating whether given date is a blocked', async () => {
+      const results = { isExcluded: true }
+      const excludedDate = '2024-12-12'
+
+      fakeOrchestrationApi
+        .get(`/config/prisons/prison/${prisonId}/exclude-date/${excludedDate}/isExcluded`)
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, results)
+
+      const output = await orchestrationApiClient.isBlockedDate(prisonId, excludedDate)
+
+      expect(output).toStrictEqual(true)
+    })
+  })
+
   describe('getVisitSessions', () => {
     it('should return an array of Visit Sessions', async () => {
       const results = [TestData.visitSession()]

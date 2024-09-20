@@ -58,4 +58,24 @@ describe('Blocked dates service', () => {
       expect(result).toStrictEqual([prisonExcludeDateDto])
     })
   })
+
+  describe('isBlockedDate', () => {
+    it('should return boolean indicating whether given date is a blocked date', async () => {
+      const date = '2000-02-01'
+      orchestrationApiClient.isBlockedDate.mockResolvedValue(true)
+      const result = await blockedDatesService.isBlockedDate(prisonId, date, username)
+      expect(orchestrationApiClient.isBlockedDate).toHaveBeenCalledWith(prisonId, date)
+      expect(result).toBe(true)
+    })
+
+    it('should return false for given date if no exclude date found', async () => {
+      const date = '2000-02-01'
+      orchestrationApiClient.isBlockedDate.mockResolvedValue(false)
+
+      const result = await blockedDatesService.isBlockedDate(prisonId, date, username)
+
+      expect(orchestrationApiClient.isBlockedDate).toHaveBeenCalledWith(prisonId, date)
+      expect(result).toStrictEqual(false)
+    })
+  })
 })
