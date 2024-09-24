@@ -84,7 +84,7 @@
           {% set visitNotificationBannerHtml %}
             {{ govukWarningText({
               classes: "govuk-!-margin-bottom-0 govuk-!-padding-left-4",
-              html: '<span data-test="visit-notification">' + notificationTypeWarnings[notification] + "</span>",
+              html: '<span data-test="visit-notification">' + (notificationTypeWarnings[notification] | default(notification)) + "</span>",
               iconFallbackText: "Warning"
             }) }}
           {% endset %}

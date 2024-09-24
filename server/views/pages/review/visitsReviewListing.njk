@@ -65,7 +65,7 @@
             {
               attributes: { "data-test": "type-" + loop.index },
               html: govukTag({
-                text: notificationTypes[listItem.type],
+                text: notificationTypes[listItem.type] | default(listItem.type),
                 classes: 'notification-tag notification-tag--' + listItem.type | lower
               })
             },
