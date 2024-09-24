@@ -2,7 +2,7 @@ import TestData from '../routes/testutils/testData'
 import VisitNotificationsService from './visitNotificationsService'
 import { createMockHmppsAuthClient, createMockOrchestrationApiClient } from '../data/testutils/mocks'
 import { FilterField, VisitsReviewListItem } from '../@types/bapv'
-import { NotificationType, Visit } from '../data/orchestrationApiTypes'
+import { NotificationGroup, NotificationType, Visit } from '../data/orchestrationApiTypes'
 
 const token = 'some token'
 const prisonId = 'HEI'
@@ -372,6 +372,36 @@ describe('Visit notifications service', () => {
         expect(orchestrationApiClient.getNotificationGroups).toHaveBeenCalledWith(prisonId)
         expect(result.filters).toStrictEqual(filters)
         expect(result.visitsReviewList.length).toBe(2)
+      })
+
+      it('should build list filters and handle an unknown event type', async () => {
+        const notificationGroupsWithUnknown = [
+          TestData.notificationGroup({
+            type: 'UNKNOWN_EVENT_TYPE' as NotificationGroup['type'],
+            affectedVisits: [TestData.notificationVisitInfo({ bookedByUserName: 'user1', bookedByName: 'User B' })],
+          }),
+        ]
+        const user = 'user'
+
+        const filters: FilterField[] = [
+          {
+            id: 'bookedBy',
+            label: 'Booked by',
+            items: [{ label: 'User B', value: 'user1', checked: false }],
+          },
+          {
+            id: 'type',
+            label: 'Reason',
+            items: [{ label: 'UNKNOWN_EVENT_TYPE', value: 'UNKNOWN_EVENT_TYPE', checked: false }],
+          },
+        ]
+
+        orchestrationApiClient.getNotificationGroups.mockResolvedValue(notificationGroupsWithUnknown)
+        const result = await visitNotificationsService.getVisitsReviewList(user, prisonId, noAppliedFilters)
+
+        expect(orchestrationApiClient.getNotificationGroups).toHaveBeenCalledWith(prisonId)
+        expect(result.filters).toStrictEqual(filters)
+        expect(result.visitsReviewList.length).toBe(1)
       })
 
       it('should build list filters with applied values checked', async () => {
