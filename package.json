@@ -96,7 +96,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-sqs": "^3.654.0",
-    "@ministryofjustice/frontend": "^2.2.1",
+    "@ministryofjustice/frontend": "^2.2.2",
     "agentkeepalive": "^4.5.0",
     "applicationinsights": "^2.9.6",
     "bunyan": "^1.8.15",
@@ -167,7 +167,7 @@
     "mocha": "10.7.3",
     "mocha-junit-reporter": "^2.2.1",
     "nock": "^13.5.5",
-    "nodemon": "^3.1.5",
+    "nodemon": "^3.1.6",
     "openapi-typescript": "^7.4.0",
     "prettier": "^3.3.3",
     "prettier-plugin-jinja-template": "^1.5.0",
