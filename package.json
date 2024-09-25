@@ -119,8 +119,7 @@
     "passport": "^0.7.0",
     "passport-oauth2": "^1.8.0",
     "redis": "^4.7.0",
-    "superagent": "^10.1.0",
-    "uuid": "^10.0.0"
+    "superagent": "^10.1.0"
   },
   "devDependencies": {
     "@aws-sdk/types": "^3.654.0",
@@ -139,7 +138,6 @@
     "@types/passport-oauth2": "^1.4.17",
     "@types/superagent": "^8.1.9",
     "@types/supertest": "^6.0.2",
-    "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^8.6.0",
     "@typescript-eslint/parser": "^8.6.0",
     "audit-ci": "^7.1.0",
