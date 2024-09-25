@@ -252,7 +252,7 @@ const prisonConfiguration: Record<string, PrisonConfiguration> = {
   // Moorland
   MDI: {
     selectVisitorsText: [
-      'You can add up to a total of 5 people, with a maximum of 3 people aged 18 and over.',
+      'You can add up to a total of 8 people, with a maximum of 3 people aged 18 and over.',
       'At least one visitor must be 18 or older.',
     ],
   },
