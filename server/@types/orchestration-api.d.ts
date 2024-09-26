@@ -1984,8 +1984,6 @@ export interface components {
        * @description Age of adults in years
        */
       adultAgeYears: number
-      /** @description exclude dates */
-      excludeDates: string[]
       /** @description prison user client */
       clients: components['schemas']['PrisonUserClientDto'][]
     }

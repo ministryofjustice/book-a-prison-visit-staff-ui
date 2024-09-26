@@ -50,13 +50,6 @@ export default class SupportedPrisonsService {
     return { maxTotalVisitors, policyNoticeDaysMin }
   }
 
-  async isAnExcludeDate(username: string, prisonCode: string, date: string): Promise<boolean> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
-    const { excludeDates } = await orchestrationApiClient.getPrison(prisonCode)
-    return excludeDates.includes(date)
-  }
-
   private async refreshPrisonNames(username: string): Promise<void> {
     if (this.lastUpdated <= Date.now() - A_DAY_IN_MS) {
       const token = await this.hmppsAuthClient.getSystemClientToken(username)
