@@ -9,7 +9,6 @@ import {
   createMockBlockedDatesService,
   createMockVisitService,
 } from '../../services/testutils/mocks'
-import config from '../../config'
 import { FlashData } from '../../@types/bapv'
 
 let app: Express
@@ -23,22 +22,12 @@ const url = '/block-visit-dates/block-new-date'
 const visitBlockDate = '2024-09-06'
 
 beforeEach(() => {
-  jest.replaceProperty(config, 'features', { sessionManagement: true })
-
   sessionData = { visitBlockDate } as SessionData
   app = appWithAllRoutes({ services: { auditService, blockedDatesService, visitService }, sessionData })
 })
 
 afterEach(() => {
   jest.resetAllMocks()
-})
-
-describe('Feature flag', () => {
-  it('should return a 404 if feature not enabled', () => {
-    jest.replaceProperty(config, 'features', { sessionManagement: false })
-    app = appWithAllRoutes({})
-    return request(app).get(url).expect(404)
-  })
 })
 
 describe('Block new visit date', () => {

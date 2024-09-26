@@ -2,7 +2,6 @@ import type { Express } from 'express'
 import request from 'supertest'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
 import { createMockAuditService, createMockBlockedDatesService } from '../../services/testutils/mocks'
-import config from '../../config'
 import { FlashData } from '../../@types/bapv'
 
 let app: Express
@@ -14,21 +13,11 @@ const url = '/block-visit-dates/unblock-date'
 const unblockDate = '2024-09-06'
 
 beforeEach(() => {
-  jest.replaceProperty(config, 'features', { sessionManagement: true })
-
   app = appWithAllRoutes({ services: { auditService, blockedDatesService } })
 })
 
 afterEach(() => {
   jest.resetAllMocks()
-})
-
-describe('Feature flag', () => {
-  it('should return a 404 if feature not enabled', () => {
-    jest.replaceProperty(config, 'features', { sessionManagement: false })
-    app = appWithAllRoutes({})
-    return request(app).get(url).expect(404)
-  })
 })
 
 describe('Unblock visit date', () => {
