@@ -12,6 +12,7 @@
       <h1 class="govuk-heading-l bapv-index-header">{{ govukTag({
         text: "Beta"
       }) }}<span>{{ pageHeaderTitle }}</span></h1>
+
       <ul class="govuk-grid-row card-group">
         <li class="govuk-grid-column-one-third card-group__item">
           {{ card({
@@ -22,6 +23,7 @@
             "id": "book-or-change-visit"
           }) }}
         </li>
+
         <li class="govuk-grid-column-one-third card-group__item">
           {{ card({
             "href": "/review",
@@ -36,6 +38,7 @@
             "id": "need-review"
           }) }}
         </li>
+
         <li class="govuk-grid-column-one-third card-group__item">
           {{ card({
             "href": "/visits",
@@ -45,6 +48,7 @@
             "id": "view-visits-by-date"
           }) }}
         </li>
+
         <li class="govuk-grid-column-one-third card-group__item">
           {{ card({
             "href": "/timetable",
@@ -54,8 +58,8 @@
             "id": "view-timetable"
           }) }}
         </li>
-        {% if showFeatureSessionManagement %}
-          <li class="govuk-grid-column-one-third card-group__item">
+
+        <li class="govuk-grid-column-one-third card-group__item">
           {{ card({
             "href": "/block-visit-dates",
             "clickable": "true",
@@ -63,8 +67,7 @@
             "description": "Block or unblock dates for social visits",
             "id": "block-dates"
           }) }}
-        {% endif %}
-      </li>
+        </li>
       </ul>
     </div>
   </div>

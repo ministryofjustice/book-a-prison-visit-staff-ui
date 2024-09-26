@@ -7,7 +7,6 @@ import { addDays, addWeeks, format, startOfYesterday } from 'date-fns'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
 import { createMockBlockedDatesService } from '../../services/testutils/mocks'
 import TestData from '../testutils/testData'
-import config from '../../config'
 import { FlashData } from '../../@types/bapv'
 
 let app: Express
@@ -18,20 +17,11 @@ const blockedDatesService = createMockBlockedDatesService()
 const url = '/block-visit-dates'
 
 beforeEach(() => {
-  jest.replaceProperty(config, 'features', { sessionManagement: true })
   app = appWithAllRoutes({ services: { blockedDatesService } })
 })
 
 afterEach(() => {
   jest.resetAllMocks()
-})
-
-describe('Feature flag', () => {
-  it('should return a 404 if feature not enabled', () => {
-    jest.replaceProperty(config, 'features', { sessionManagement: false })
-    app = appWithAllRoutes({})
-    return request(app).get(url).expect(404)
-  })
 })
 
 describe('Block visit dates listing page', () => {
