@@ -84,30 +84,6 @@ describe('Supported prisons service', () => {
     })
   })
 
-  describe('isAnExcludeDate', () => {
-    const excludeDate = '2024-04-22'
-    const notAnExcludeDate = '2024-04-23'
-    const prisonDtoWithExcludeDate = TestData.prisonDto({ excludeDates: [excludeDate] })
-
-    it('should return true if the given date is an exclude date for the given prison', async () => {
-      orchestrationApiClient.getPrison.mockResolvedValue(prisonDtoWithExcludeDate)
-
-      const results = await supportedPrisonsService.isAnExcludeDate('user', 'HEI', excludeDate)
-
-      expect(orchestrationApiClient.getPrison).toHaveBeenCalledWith('HEI')
-      expect(results).toBe(true)
-    })
-
-    it('should return false if the given date is not an exclude date for the given prison', async () => {
-      orchestrationApiClient.getPrison.mockResolvedValue(prisonDtoWithExcludeDate)
-
-      const results = await supportedPrisonsService.isAnExcludeDate('user', 'HEI', notAnExcludeDate)
-
-      expect(orchestrationApiClient.getPrison).toHaveBeenCalledWith('HEI')
-      expect(results).toBe(false)
-    })
-  })
-
   describe('getSupportedPrisonIds', () => {
     it('should return an array of supported prison IDs', async () => {
       orchestrationApiClient.getSupportedPrisonIds.mockResolvedValue(supportedPrisonIds)
