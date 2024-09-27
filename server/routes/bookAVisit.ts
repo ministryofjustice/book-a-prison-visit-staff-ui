@@ -77,7 +77,6 @@ export default function routes({
   post('/check-your-booking', sessionCheckMiddleware({ stage: 6 }), (req, res) => checkYourBooking.post(req, res))
 
   get('/confirm-overbooking', sessionCheckMiddleware({ stage: 6 }), (req, res) => overbooking.viewFromConfirm(req, res))
-  post('/confirm-overbooking', sessionCheckMiddleware({ stage: 6 }), (req, res) => checkYourBooking.post(req, res))
 
   get('/confirmation', sessionCheckMiddleware({ stage: 7 }), (req, res) => confirmation.get(req, res))
 

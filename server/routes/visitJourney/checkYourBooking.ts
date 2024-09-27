@@ -43,12 +43,12 @@ export default class CheckYourBooking {
 
     const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
 
-    let { allowOverBooking } = req.session
-
-    if (req.body.confirmOverbooking === 'yes') {
-      allowOverBooking = true
-    } else if (req.body.confirmOverbooking === 'no') {
-      return res.redirect(`${urlPrefix}/select-date-and-time`)
+    const { confirmOverBooking } = req.body // this will be set if we have come from overbooking confirmation page
+    if (confirmOverBooking === 'no') {
+      return res.redirect(`${urlPrefix}/select-date-and-time`) // i.e. return early if we're going to
+    }
+    if (confirmOverBooking === 'yes') {
+      visitSessionData.allowOverBooking = true
     }
 
     try {
@@ -57,7 +57,7 @@ export default class CheckYourBooking {
         username: res.locals.user.username,
         applicationReference: visitSessionData.applicationReference,
         applicationMethod: visitSessionData.requestMethod,
-        allowOverBooking,
+        allowOverBooking: visitSessionData.allowOverBooking,
       })
 
       visitSessionData.visitReference = bookedVisit.reference

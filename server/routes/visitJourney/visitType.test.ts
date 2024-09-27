@@ -32,6 +32,7 @@ testJourneys.forEach(journey => {
   describe(`Select visit type: ${journey.urlPrefix}/visit-type`, () => {
     beforeEach(() => {
       visitSessionData = {
+        allowOverBooking: false,
         prisoner: {
           name: 'prisoner name',
           offenderNo: 'A1234BC',

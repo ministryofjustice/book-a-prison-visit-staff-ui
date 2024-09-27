@@ -40,7 +40,7 @@ describe('Visit sessions service', () => {
   })
 
   describe('getSingleVisitSession', () => {
-    it('should return an array of scheduled sessions for the specified prison and date', async () => {
+    it('should return requested VisitSession', async () => {
       const visitSession: VisitSession = TestData.visitSession()
       const sessionDate = visitSession.startTimestamp.split('T')[0]
 

@@ -27,6 +27,7 @@ testJourneys.forEach(journey => {
   describe(`${journey.urlPrefix}/confirm-overbooking`, () => {
     beforeEach(() => {
       visitSessionData = {
+        allowOverBooking: false,
         prisoner: {
           name: 'prisoner name',
           offenderNo: 'A1234BC',

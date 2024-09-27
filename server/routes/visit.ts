@@ -173,6 +173,7 @@ export default function routes({
       visitRestriction,
     }
     const visitSessionData: VisitSessionData = {
+      allowOverBooking: false,
       prisoner: {
         name: properCaseFullName(`${prisoner.lastName}, ${prisoner.firstName}`),
         offenderNo: prisoner.prisonerNumber,
@@ -372,12 +373,6 @@ export default function routes({
     checkVisitReferenceMiddleware,
     sessionCheckMiddleware({ stage: 6 }),
     (req, res) => overbooking.viewFromConfirm(req, res),
-  )
-  post(
-    '/:reference/update/confirm-overbooking',
-    checkVisitReferenceMiddleware,
-    sessionCheckMiddleware({ stage: 6 }),
-    (req, res) => checkYourBooking.post(req, res),
   )
 
   get(

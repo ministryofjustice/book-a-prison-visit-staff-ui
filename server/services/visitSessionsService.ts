@@ -3,7 +3,6 @@ import { VisitSlot, VisitSlotList, VisitSlotsForDay, VisitSessionData, PrisonerE
 import { VisitSession, SessionCapacity, SessionSchedule } from '../data/orchestrationApiTypes'
 import { ScheduledEvent } from '../data/whereaboutsApiTypes'
 import { HmppsAuthClient, RestClientBuilder, OrchestrationApiClient, WhereaboutsApiClient } from '../data'
-import TestData from '../routes/testutils/testData'
 
 export default class VisitSessionsService {
   private morningCutOff = 12

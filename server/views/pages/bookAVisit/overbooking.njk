@@ -19,7 +19,7 @@
         <span data-test="visit-end-time">{{ visitSession.endTimestamp | formatTime }}</span> on 
         <span data-test="visit-date">{{ visitSession.startTimestamp | formatDate("EEEE d MMMM") }}</span>.
       </p>
-      <form action="{{ urlPrefix }}/confirm-overbooking" method="POST" novalidate>
+      <form action="{{ urlPrefix }}/check-your-booking" method="POST" novalidate>
         <input type="hidden" name="_csrf" value="{{ csrfToken }}">
         {{ govukRadios({
           name: "confirmOverbooking",
@@ -34,7 +34,7 @@
             }
           ],
           errorMessage: errors | findError('confirmOverbooking'),
-          attributes: { "data-test": "overbooking-confirm" }
+          attributes: { "data-test": "confirm-overbooking" }
         }) }}
 
         {{ govukButton({

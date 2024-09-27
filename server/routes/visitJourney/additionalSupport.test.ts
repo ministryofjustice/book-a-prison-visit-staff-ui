@@ -33,6 +33,7 @@ testJourneys.forEach(journey => {
   describe(`GET ${journey.urlPrefix}/additional-support`, () => {
     beforeEach(() => {
       visitSessionData = {
+        allowOverBooking: false,
         prisoner: {
           name: 'prisoner name',
           offenderNo: 'A1234BC',
@@ -179,6 +180,7 @@ testJourneys.forEach(journey => {
   describe(`POST ${journey.urlPrefix}/additional-support`, () => {
     beforeEach(() => {
       visitSessionData = {
+        allowOverBooking: false,
         prisoner: {
           name: 'prisoner name',
           offenderNo: 'A1234BC',

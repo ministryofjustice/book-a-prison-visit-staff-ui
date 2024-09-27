@@ -42,9 +42,9 @@ describe('orchestrationApiClient', () => {
     it('should return a BOOKED visit, given an application reference', async () => {
       const applicationReference = 'aaa-bbb-ccc'
       const bookingOrchestrationRequestDto: BookingOrchestrationRequestDto = {
+        actionedBy: 'user1',
         applicationMethodType: 'NOT_KNOWN',
         allowOverBooking: false,
-        actionedBy: 'user1',
       }
 
       const result: Partial<Visit> = {

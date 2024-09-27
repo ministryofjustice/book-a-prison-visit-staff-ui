@@ -13,7 +13,6 @@ declare module 'express-session' {
     slotsList: VisitSlotList
     visitSessionData: VisitSessionData
     selectedEstablishment: Prison
-    allowOverBooking?: boolean
     visitBlockDate?: string // format YYYY-MM-DD
   }
 }

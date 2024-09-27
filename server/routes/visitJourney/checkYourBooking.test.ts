@@ -4,8 +4,9 @@ import { SessionData } from 'express-session'
 import * as cheerio from 'cheerio'
 import { FlashData, VisitSessionData } from '../../@types/bapv'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
-import { Visit } from '../../data/orchestrationApiTypes'
+import { ApplicationValidationErrorResponse, Visit } from '../../data/orchestrationApiTypes'
 import { createMockAuditService, createMockVisitService } from '../../services/testutils/mocks'
+import { SanitisedError } from '../../sanitisedError'
 
 let sessionApp: Express
 
@@ -35,6 +36,7 @@ testJourneys.forEach(journey => {
   describe(`${journey.urlPrefix}/check-your-booking`, () => {
     beforeEach(() => {
       visitSessionData = {
+        allowOverBooking: false,
         prisoner: {
           name: 'prisoner name',
           offenderNo: 'A1234BC',
@@ -184,6 +186,7 @@ testJourneys.forEach(journey => {
               username: 'user1',
               applicationReference: visitSessionData.applicationReference,
               applicationMethod: visitSessionData.requestMethod,
+              allowOverBooking: false,
             })
 
             expect(visitService.cancelVisit).not.toHaveBeenCalled()
@@ -226,12 +229,38 @@ testJourneys.forEach(journey => {
               username: 'user1',
               applicationReference: visitSessionData.applicationReference,
               applicationMethod: visitSessionData.requestMethod,
+              allowOverBooking: false,
             })
 
             expect(visitSessionData.visitStatus).not.toBe('BOOKED')
             expect(visitSessionData.visitReference).toBe(journey.isUpdate ? 'ab-cd-ef-gh' : undefined)
             expect(auditService.bookedVisit).not.toHaveBeenCalled()
           })
+      })
+
+      describe('Handle API errors', () => {
+        describe('HTTP 422 Response', () => {
+          it('should redirect to confirm overbooking page if no_slot_capacity 422 received', () => {
+            const error: SanitisedError<ApplicationValidationErrorResponse> = {
+              name: 'Error',
+              status: 422,
+              message: 'Unprocessable Entity',
+              stack: 'Error: Unprocessable Entity',
+              data: { status: 422, validationErrors: ['APPLICATION_INVALID_NO_SLOT_CAPACITY'] },
+            }
+            visitService.bookVisit.mockRejectedValue(error)
+
+            return request(sessionApp)
+              .post(`${journey.urlPrefix}/check-your-booking`)
+              .expect(302)
+              .expect('location', `${journey.urlPrefix}/confirm-overbooking`)
+              .expect(() => {
+                expect(visitSessionData.visitStatus).not.toBe('BOOKED')
+                expect(visitSessionData.visitReference).toBe(journey.isUpdate ? 'ab-cd-ef-gh' : undefined)
+                expect(auditService.bookedVisit).not.toHaveBeenCalled()
+              })
+          })
+        })
       })
     })
   })
