@@ -4,7 +4,6 @@ import asyncMiddleware from '../middleware/asyncMiddleware'
 import { clearSession } from './visitorUtils'
 import { safeReturnUrl } from '../utils/utils'
 import type { Services, SupportedPrisonsService, UserService } from '../services'
-import { Prison } from '../@types/bapv'
 
 export default function routes({ auditService, supportedPrisonsService, userService }: Services): Router {
   const router = Router()
@@ -57,23 +56,13 @@ export default function routes({ auditService, supportedPrisonsService, userServ
 
     clearSession(req)
 
-    const { maxTotalVisitors, policyNoticeDaysMin } = await supportedPrisonsService.getPrisonConfig(
-      res.locals.user.username,
-      req.body.establishment,
-    )
+    const previousEstablishment = req.session.selectedEstablishment
+    const newEstablishment = await supportedPrisonsService.getPrison(res.locals.user.username, req.body.establishment)
 
-    const previousEstablishment = req.session.selectedEstablishment?.prisonId
-    const newEstablishment: Prison = {
-      prisonId: req.body.establishment,
-      prisonName: availablePrisons[req.body.establishment],
-      maxTotalVisitors,
-      policyNoticeDaysMin,
-    }
-
-    req.session.selectedEstablishment = Object.assign(req.session.selectedEstablishment ?? {}, newEstablishment)
+    req.session.selectedEstablishment = newEstablishment
 
     await auditService.changeEstablishment({
-      previousEstablishment,
+      previousEstablishment: previousEstablishment?.prisonId,
       newEstablishment: newEstablishment.prisonId,
       username: res.locals.user.username,
       operationId: res.locals.appInsightsOperationId,

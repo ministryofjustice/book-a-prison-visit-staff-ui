@@ -1,3 +1,4 @@
+import { Prison } from '../@types/bapv'
 import { HmppsAuthClient, OrchestrationApiClient, PrisonRegisterApiClient, RestClientBuilder } from '../data'
 import { PrisonName } from '../data/prisonRegisterApiTypes'
 
@@ -40,14 +41,10 @@ export default class SupportedPrisonsService {
     return orchestrationApiClient.getSupportedPrisonIds()
   }
 
-  async getPrisonConfig(
-    username: string,
-    prisonCode: string,
-  ): Promise<{ maxTotalVisitors: number; policyNoticeDaysMin: number }> {
+  async getPrison(username: string, prisonId: string): Promise<Prison> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
-    const { policyNoticeDaysMin, maxTotalVisitors } = await orchestrationApiClient.getPrison(prisonCode)
-    return { maxTotalVisitors, policyNoticeDaysMin }
+    return orchestrationApiClient.getPrison(prisonId)
   }
 
   private async refreshPrisonNames(username: string): Promise<void> {

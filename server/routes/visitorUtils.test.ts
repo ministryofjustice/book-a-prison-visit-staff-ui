@@ -2,6 +2,7 @@ import { Request } from 'express'
 import { Session, SessionData } from 'express-session'
 import { VisitSlot, VisitSlotList } from '../@types/bapv'
 import { clearSession, getFlashFormValues, getSelectedSlot, getSlotByTimeAndRestriction } from './visitorUtils'
+import TestData from './testutils/testData'
 
 const prisonId = 'HEI'
 
@@ -182,7 +183,7 @@ describe('clearSession', () => {
     adultVisitors: { adults: [] },
     slotsList: {},
     visitSessionData: { prisoner: undefined },
-    selectedEstablishment: { prisonId: 'HEI', prisonName: 'Hewell (HMP)', maxTotalVisitors: 6, policyNoticeDaysMin: 2 },
+    selectedEstablishment: TestData.prison(),
   }
 
   req.session = sessionData as Session & SessionData
@@ -194,12 +195,7 @@ describe('clearSession', () => {
       returnTo: '/url',
       nowInMinutes: 123456,
       cookie: undefined,
-      selectedEstablishment: {
-        prisonId: 'HEI',
-        prisonName: 'Hewell (HMP)',
-        maxTotalVisitors: 6,
-        policyNoticeDaysMin: 2,
-      },
+      selectedEstablishment: TestData.prison(),
     })
   })
 })

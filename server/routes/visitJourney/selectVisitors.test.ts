@@ -987,7 +987,7 @@ testJourneys.forEach(journey => {
         const visitors = ['4322', '4323']
 
         supportedPrisonsService.getSupportedPrisons.mockResolvedValue(TestData.supportedPrisons())
-        supportedPrisonsService.getPrisonConfig.mockResolvedValue({ maxTotalVisitors, policyNoticeDaysMin: 2 })
+        supportedPrisonsService.getPrison.mockResolvedValue(TestData.prison({ maxTotalVisitors }))
 
         sessionApp = appWithAllRoutes({
           services: { prisonerProfileService, prisonerVisitorsService, supportedPrisonsService },
@@ -1013,7 +1013,7 @@ testJourneys.forEach(journey => {
         const visitors = ['4322', '4323', '4324']
 
         supportedPrisonsService.getSupportedPrisons.mockResolvedValue(TestData.supportedPrisons())
-        supportedPrisonsService.getPrisonConfig.mockResolvedValue({ maxTotalVisitors, policyNoticeDaysMin: 2 })
+        supportedPrisonsService.getPrison.mockResolvedValue(TestData.prison({ maxTotalVisitors }))
 
         sessionApp = appWithAllRoutes({
           services: { prisonerProfileService, prisonerVisitorsService, supportedPrisonsService },

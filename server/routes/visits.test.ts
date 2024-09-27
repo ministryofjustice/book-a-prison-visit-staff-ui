@@ -35,7 +35,7 @@ beforeEach(() => {
   })
 
   supportedPrisonsService.getSupportedPrisons.mockResolvedValue(TestData.supportedPrisons())
-  supportedPrisonsService.getPrisonConfig.mockResolvedValue({ maxTotalVisitors: 6, policyNoticeDaysMin: 2 })
+  supportedPrisonsService.getPrison.mockResolvedValue(TestData.prison())
   blockedDatesService.isBlockedDate.mockResolvedValue(false)
   visitNotificationsService.dateHasNotifications.mockResolvedValue(false)
 
