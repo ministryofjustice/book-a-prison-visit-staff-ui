@@ -3,6 +3,7 @@ import { VisitSlot, VisitSlotList, VisitSlotsForDay, VisitSessionData, PrisonerE
 import { VisitSession, SessionCapacity, SessionSchedule } from '../data/orchestrationApiTypes'
 import { ScheduledEvent } from '../data/whereaboutsApiTypes'
 import { HmppsAuthClient, RestClientBuilder, OrchestrationApiClient, WhereaboutsApiClient } from '../data'
+import TestData from '../routes/testutils/testData'
 
 export default class VisitSessionsService {
   private morningCutOff = 12
@@ -12,6 +13,23 @@ export default class VisitSessionsService {
     private readonly whereaboutsApiClientFactory: RestClientBuilder<WhereaboutsApiClient>,
     private readonly hmppsAuthClient: HmppsAuthClient,
   ) {}
+
+  async getSingleVisitSession({
+    prisonCode,
+    sessionDate,
+    sessionTemplateReference,
+    username,
+  }: {
+    prisonCode: string
+    sessionDate: string
+    sessionTemplateReference: string
+    username: string
+  }): Promise<VisitSession> {
+    const token = await this.hmppsAuthClient.getSystemClientToken(username)
+    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+
+    return orchestrationApiClient.getSingleVisitSession(prisonCode, sessionDate, sessionTemplateReference)
+  }
 
   async getVisitSessions({
     offenderNo,

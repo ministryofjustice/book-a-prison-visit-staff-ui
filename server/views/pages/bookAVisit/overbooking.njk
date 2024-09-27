@@ -1,5 +1,6 @@
-{% extends "../../partials/layout.njk" %}
+{% extends "layout.njk" %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% set pageTitle = "This time slot is fully booked" %}
 
@@ -14,36 +15,34 @@
       <p>
         <span data-test="bookings-count">{{ bookingsCount }}</span> of
         <span data-test="max-capacity">{{ maxCapacity }}</span> {{ "table" | pluralise(maxCapacity) }} are booked for
-        <span data-test="visit-start-time">{{ visitStartTime }}</span> to
-        <span data-test="visit-end-time">{{ visitEndTime }}</span> on 
-        <span data-test="visit-date">{{ visitStartTime | formatDate("EEEE d MMMM") }}</span>.
+        <span data-test="visit-start-time">{{ visitSession.startTimestamp | formatTime }}</span> to
+        <span data-test="visit-end-time">{{ visitSession.endTimestamp | formatTime }}</span> on 
+        <span data-test="visit-date">{{ visitSession.startTimestamp | formatDate("EEEE d MMMM") }}</span>.
       </p>
+      <form action="{{ urlPrefix }}/confirm-overbooking" method="POST" novalidate>
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+        {{ govukRadios({
+          name: "confirmOverbooking",
+          items: [
+            {
+              value: "yes",
+              text: "Yes, book for this timeslot"
+            },
+            {
+              value: "no",
+              text: "No, choose a new date and time"
+            }
+          ],
+          errorMessage: errors | findError('confirmOverbooking'),
+          attributes: { "data-test": "overbooking-confirm" }
+        }) }}
 
-      {{ govukRadios({
-        name: "confirmOverbooking",
-        items: [
-          {
-            value: "yes",
-            text: "Yes, book for this timeslot"
-          },
-          {
-            value: "no",
-            text: "No, choose a new date and time"
-          }
-        ],
-        errorMessage: errors | findError('confirmOverbooking'),
-        attributes: { "data-test": "overbooking-confirm" }
-      }) }}
-
-      {{ govukButton({
-        text: "Continue",
-        classes: "govuk-button--secondary",
-        href: 'TODO',
-        preventDoubleClick: true,
-        attributes: {
-          "data-test": "overbooking-continue"
-        }
-      }) }}
+        {{ govukButton({
+          text: "Continue",
+          attributes: { "data-test": "submit" },
+          preventDoubleClick: true
+        }) }} 
+      </form>
 
     </div>
   </div>

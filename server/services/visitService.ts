@@ -26,15 +26,22 @@ export default class VisitService {
     username,
     applicationReference,
     applicationMethod,
+    allowOverBooking,
   }: {
     username: string
     applicationReference: string
     applicationMethod: ApplicationMethodType
+    allowOverBooking: boolean
   }): Promise<Visit> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
-    const visit = await orchestrationApiClient.bookVisit(applicationReference, applicationMethod, username)
+    const visit = await orchestrationApiClient.bookVisit(
+      applicationReference,
+      applicationMethod,
+      allowOverBooking,
+      username,
+    )
     return visit
   }
 

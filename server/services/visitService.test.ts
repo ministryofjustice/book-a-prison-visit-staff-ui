@@ -60,10 +60,20 @@ describe('Visit service', () => {
         }
 
         orchestrationApiClient.bookVisit.mockResolvedValue(visit as Visit)
-        const result = await visitService.bookVisit({ username: 'user1', applicationReference, applicationMethod })
+        const result = await visitService.bookVisit({
+          username: 'user1',
+          applicationReference,
+          applicationMethod,
+          allowOverBooking: false,
+        })
 
         expect(orchestrationApiClient.bookVisit).toHaveBeenCalledTimes(1)
-        expect(orchestrationApiClient.bookVisit).toHaveBeenCalledWith(applicationReference, applicationMethod, 'user1')
+        expect(orchestrationApiClient.bookVisit).toHaveBeenCalledWith(
+          applicationReference,
+          applicationMethod,
+          false,
+          'user1',
+        )
         expect(result).toStrictEqual(visit)
       })
     })

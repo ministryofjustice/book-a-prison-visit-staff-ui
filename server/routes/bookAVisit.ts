@@ -5,6 +5,7 @@ import SelectVisitors from './visitJourney/selectVisitors'
 import VisitType from './visitJourney/visitType'
 import DateAndTime from './visitJourney/dateAndTime'
 import CheckYourBooking from './visitJourney/checkYourBooking'
+import Overbooking from './visitJourney/overbooking'
 import Confirmation from './visitJourney/confirmation'
 import AdditionalSupport from './visitJourney/additionalSupport'
 import MainContact from './visitJourney/mainContact'
@@ -39,6 +40,7 @@ export default function routes({
   const mainContact = new MainContact('book', visitService)
   const requestMethod = new RequestMethod('book')
   const checkYourBooking = new CheckYourBooking('book', auditService, visitService)
+  const overbooking = new Overbooking('book', visitSessionsService)
   const confirmation = new Confirmation('book')
 
   get('/select-visitors', sessionCheckMiddleware({ stage: 1 }), (req, res) => selectVisitors.get(req, res))
@@ -73,6 +75,9 @@ export default function routes({
 
   get('/check-your-booking', sessionCheckMiddleware({ stage: 6 }), (req, res) => checkYourBooking.get(req, res))
   post('/check-your-booking', sessionCheckMiddleware({ stage: 6 }), (req, res) => checkYourBooking.post(req, res))
+
+  get('/confirm-overbooking', sessionCheckMiddleware({ stage: 6 }), (req, res) => overbooking.viewFromConfirm(req, res))
+  post('/confirm-overbooking', sessionCheckMiddleware({ stage: 6 }), (req, res) => checkYourBooking.post(req, res))
 
   get('/confirmation', sessionCheckMiddleware({ stage: 7 }), (req, res) => confirmation.get(req, res))
 

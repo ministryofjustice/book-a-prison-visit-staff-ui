@@ -39,6 +39,29 @@ describe('Visit sessions service', () => {
     jest.resetAllMocks()
   })
 
+  describe('getSingleVisitSession', () => {
+    it('should return an array of scheduled sessions for the specified prison and date', async () => {
+      const visitSession: VisitSession = TestData.visitSession()
+      const sessionDate = visitSession.startTimestamp.split('T')[0]
+
+      orchestrationApiClient.getSingleVisitSession.mockResolvedValue(visitSession)
+
+      const results = await visitSessionsService.getSingleVisitSession({
+        prisonCode: 'HEI',
+        sessionDate,
+        sessionTemplateReference: visitSession.sessionTemplateReference,
+        username: 'user1',
+      })
+
+      expect(orchestrationApiClient.getSingleVisitSession).toHaveBeenCalledWith(
+        'HEI',
+        sessionDate,
+        visitSession.sessionTemplateReference,
+      )
+      expect(results).toEqual(visitSession)
+    })
+  })
+
   describe('getVisitSessions', () => {
     it('Should return empty object if no visit sessions', async () => {
       orchestrationApiClient.getVisitSessions.mockResolvedValue([])

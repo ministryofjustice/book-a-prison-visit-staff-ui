@@ -43,3 +43,5 @@ export type PrisonDto = components['schemas']['PrisonDto']
 export type PrisonExcludeDateDto = components['schemas']['PrisonExcludeDateDto']
 
 export type IsExcludeDateDto = components['schemas']['IsExcludeDateDto']
+
+export type ApplicationValidationErrorResponse = components['schemas']['ApplicationValidationErrorResponse']
