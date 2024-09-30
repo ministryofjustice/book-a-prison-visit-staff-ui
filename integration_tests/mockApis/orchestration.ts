@@ -480,7 +480,7 @@ export default {
     offenderNo,
     visitSessions,
     username = 'USER1',
-    min = '3',
+    min = '2',
   }: {
     prisonId: string
     offenderNo: string
