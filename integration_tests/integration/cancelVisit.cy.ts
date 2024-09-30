@@ -38,7 +38,7 @@ context('Cancel visit journey', () => {
 
     cy.task('stubPrisonerById', prisoner)
     cy.task('stubVisitHistory', visitHistoryDetails)
-    cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
+    cy.task('stubPrisonerSocialContacts', { offenderNo, contacts, approvedVisitorsOnly: false })
     cy.task('stubGetVisitNotifications', { reference: visitHistoryDetails.visit.reference })
   })
 
