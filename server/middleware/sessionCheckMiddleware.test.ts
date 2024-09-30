@@ -62,12 +62,7 @@ describe('sessionCheckMiddleware', () => {
         save: jest.fn(),
         touch: jest.fn(),
         cookie: new Cookie(),
-        selectedEstablishment: {
-          prisonId,
-          prisonName: supportedPrisons[prisonId],
-          maxTotalVisitors: 6,
-          policyNoticeDaysMin: 2,
-        },
+        selectedEstablishment: TestData.prison(),
       },
     }
     mockResponse = {
@@ -82,12 +77,10 @@ describe('sessionCheckMiddleware', () => {
   })
 
   it('should redirect to the start page if prisonId in originalVisitSlot (set for update journey) does not match selected establishment', () => {
-    req.session.selectedEstablishment = {
+    req.session.selectedEstablishment = TestData.prison({
       prisonId: 'BLI',
       prisonName: supportedPrisons.BLI,
-      maxTotalVisitors: 6,
-      policyNoticeDaysMin: 2,
-    }
+    })
     req.session.visitSessionData = { originalVisitSlot: visitSlot } as VisitSessionData
 
     sessionCheckMiddleware({ stage: 1 })(req as Request, mockResponse as Response, next)
@@ -252,12 +245,10 @@ describe('sessionCheckMiddleware', () => {
     })
 
     it('should redirect to the start page if prisonId in visitSlot does not match selected establishment', () => {
-      req.session.selectedEstablishment = {
+      req.session.selectedEstablishment = TestData.prison({
         prisonId: 'BLI',
         prisonName: supportedPrisons.BLI,
-        maxTotalVisitors: 6,
-        policyNoticeDaysMin: 2,
-      }
+      })
       req.session.visitSessionData = {
         applicationReference: 'aaa-bbb-ccc',
         prisoner: prisonerData,

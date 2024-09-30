@@ -37,6 +37,7 @@ const visitSessionsService = createMockVisitSessionsService()
 
 let visitSessionData: VisitSessionData
 
+const prison = TestData.prison()
 const supportedPrisons = TestData.supportedPrisons()
 const supportedPrisonIds = TestData.supportedPrisonIds()
 
@@ -125,7 +126,7 @@ describe('/visit/:reference', () => {
     prisonerVisitorsService.getVisitors.mockResolvedValue(visitors)
     supportedPrisonsService.getSupportedPrisonIds.mockResolvedValue(supportedPrisonIds)
     supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
-    supportedPrisonsService.getPrisonConfig.mockResolvedValue({ maxTotalVisitors: 6, policyNoticeDaysMin: 2 })
+    supportedPrisonsService.getPrison.mockResolvedValue(prison)
 
     visitSessionData = { prisoner: undefined }
 
@@ -363,7 +364,7 @@ describe('/visit/:reference', () => {
       app = appWithAllRoutes({
         services: { auditService, supportedPrisonsService, visitService, visitSessionsService },
         sessionData: {
-          selectedEstablishment: { prisonId: 'BLI', prisonName: supportedPrisons.BLI, policyNoticeDaysMin: 2 },
+          selectedEstablishment: TestData.prison({ prisonId: 'BLI', prisonName: supportedPrisons.BLI }),
         } as SessionData,
       })
 
@@ -708,7 +709,7 @@ describe('/visit/:reference', () => {
       app = appWithAllRoutes({
         services: { auditService, supportedPrisonsService, visitService, visitSessionsService },
         sessionData: {
-          selectedEstablishment: { prisonId: 'BLI', prisonName: supportedPrisons.BLI, policyNoticeDaysMin: 2 },
+          selectedEstablishment: TestData.prison({ prisonId: 'BLI', prisonName: supportedPrisons.BLI }),
         } as SessionData,
       })
 
@@ -727,7 +728,7 @@ describe('/visit/:reference', () => {
           visitSessionsService,
         },
         sessionData: {
-          selectedEstablishment: { prisonId: 'HEI', prisonName: supportedPrisons.HEI, policyNoticeDaysMin: 14 },
+          selectedEstablishment: { ...prison, policyNoticeDaysMin: 14 },
         } as SessionData,
       })
 
@@ -760,7 +761,7 @@ describe('/visit/:reference', () => {
           visitSessionsService,
         },
         sessionData: {
-          selectedEstablishment: { prisonId: 'HEI', prisonName: supportedPrisons.HEI, policyNoticeDaysMin: 4 },
+          selectedEstablishment: { ...prison, policyNoticeDaysMin: 4 },
         } as SessionData,
       })
 
@@ -1027,7 +1028,7 @@ describe('POST /visit/:reference/cancel', () => {
 
     visitService.cancelVisit = jest.fn().mockResolvedValue(cancelledVisit)
     supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
-    supportedPrisonsService.getPrisonConfig.mockResolvedValue({ maxTotalVisitors: 6, policyNoticeDaysMin: 2 })
+    supportedPrisonsService.getPrison.mockResolvedValue(prison)
 
     app = appWithAllRoutes({
       services: {

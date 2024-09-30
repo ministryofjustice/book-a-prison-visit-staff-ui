@@ -21,7 +21,6 @@ describe('Supported prisons service', () => {
   const prisonNames = TestData.prisonNames()
   const supportedPrisons = TestData.supportedPrisons()
   const supportedPrisonIds = TestData.supportedPrisonIds()
-  const prisonDto = TestData.prisonDto()
 
   beforeEach(() => {
     OrchestrationApiClientFactory.mockReturnValue(orchestrationApiClient)
@@ -70,17 +69,16 @@ describe('Supported prisons service', () => {
     })
   })
 
-  describe('getPrisonConfig', () => {
-    it('should return some prison config values (maxTotalVisitors, policyNoticeDaysMin) when called with a prison ID', async () => {
-      orchestrationApiClient.getPrison.mockResolvedValue(prisonDto)
+  describe('getPrison', () => {
+    const prison = TestData.prison()
 
-      const results = await supportedPrisonsService.getPrisonConfig('user', 'HEI')
+    it('should return a Prison for given prison ID', async () => {
+      orchestrationApiClient.getPrison.mockResolvedValue(prison)
+
+      const results = await supportedPrisonsService.getPrison('user', 'HEI')
 
       expect(orchestrationApiClient.getPrison).toHaveBeenCalledWith('HEI')
-      expect(results).toStrictEqual({
-        maxTotalVisitors: prisonDto.maxTotalVisitors,
-        policyNoticeDaysMin: prisonDto.policyNoticeDaysMin,
-      })
+      expect(results).toStrictEqual(prison)
     })
   })
 

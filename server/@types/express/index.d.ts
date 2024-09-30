@@ -1,4 +1,4 @@
-import { VisitorListItem, VisitSessionData, Prison } from '../bapv'
+import { Prison, VisitorListItem, VisitSessionData } from '../bapv'
 import { UserDetails } from '../../services/userService'
 
 export default {}
