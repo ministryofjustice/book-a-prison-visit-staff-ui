@@ -42,9 +42,9 @@ describe('orchestrationApiClient', () => {
     it('should return a BOOKED visit, given an application reference', async () => {
       const applicationReference = 'aaa-bbb-ccc'
       const bookingOrchestrationRequestDto: BookingOrchestrationRequestDto = {
-        applicationMethodType: 'NOT_KNOWN',
-        allowOverBooking: true,
         actionedBy: 'user1',
+        applicationMethodType: 'NOT_KNOWN',
+        allowOverBooking: false,
       }
 
       const result: Partial<Visit> = {
@@ -61,6 +61,7 @@ describe('orchestrationApiClient', () => {
       const output = await orchestrationApiClient.bookVisit(
         applicationReference,
         bookingOrchestrationRequestDto.applicationMethodType,
+        false,
         'user1',
       )
 
@@ -483,6 +484,31 @@ describe('orchestrationApiClient', () => {
       const output = await orchestrationApiClient.isBlockedDate(prisonId, excludedDate)
 
       expect(output).toStrictEqual(true)
+    })
+  })
+
+  describe('getSingleVisitSession', () => {
+    it('should return a single Visit Session', async () => {
+      const results = TestData.visitSession()
+
+      const sessionDate = results.startTimestamp.split('T')[0]
+      fakeOrchestrationApi
+        .get('/visit-sessions/session')
+        .query({
+          prisonCode: results.prisonId,
+          sessionDate,
+          sessionTemplateReference: results.sessionTemplateReference,
+        })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, results)
+
+      const output = await orchestrationApiClient.getSingleVisitSession(
+        results.prisonId,
+        sessionDate,
+        results.sessionTemplateReference,
+      )
+
+      expect(output).toEqual(results)
     })
   })
 

@@ -34,6 +34,7 @@ testJourneys.forEach(journey => {
       jest.spyOn(visitorUtils, 'clearSession')
 
       visitSessionData = {
+        allowOverBooking: false,
         prisoner: {
           name: 'prisoner name',
           offenderNo: 'A1234BC',
@@ -122,6 +123,7 @@ testJourneys.forEach(journey => {
         jest.spyOn(visitorUtils, 'clearSession')
 
         visitSessionData = {
+          allowOverBooking: false,
           prisoner: {
             name: 'prisoner name',
             offenderNo: 'A1234BC',

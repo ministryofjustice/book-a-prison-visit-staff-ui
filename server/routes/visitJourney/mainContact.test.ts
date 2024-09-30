@@ -68,6 +68,7 @@ testJourneys.forEach(journey => {
 
     beforeEach(() => {
       visitSessionData = {
+        allowOverBooking: false,
         prisoner: {
           name: 'prisoner name',
           offenderNo: 'A1234BC',

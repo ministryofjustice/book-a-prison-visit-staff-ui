@@ -13,6 +13,23 @@ export default class VisitSessionsService {
     private readonly hmppsAuthClient: HmppsAuthClient,
   ) {}
 
+  async getSingleVisitSession({
+    prisonCode,
+    sessionDate,
+    sessionTemplateReference,
+    username,
+  }: {
+    prisonCode: string
+    sessionDate: string
+    sessionTemplateReference: string
+    username: string
+  }): Promise<VisitSession> {
+    const token = await this.hmppsAuthClient.getSystemClientToken(username)
+    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+
+    return orchestrationApiClient.getSingleVisitSession(prisonCode, sessionDate, sessionTemplateReference)
+  }
+
   async getVisitSessions({
     offenderNo,
     prisonId,

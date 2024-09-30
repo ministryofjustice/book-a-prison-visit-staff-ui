@@ -181,7 +181,7 @@ describe('clearSession', () => {
     visitorList: { visitors: [] },
     adultVisitors: { adults: [] },
     slotsList: {},
-    visitSessionData: { prisoner: undefined },
+    visitSessionData: { allowOverBooking: false, prisoner: undefined },
     selectedEstablishment: { prisonId: 'HEI', prisonName: 'Hewell (HMP)', maxTotalVisitors: 6, policyNoticeDaysMin: 2 },
   }
 

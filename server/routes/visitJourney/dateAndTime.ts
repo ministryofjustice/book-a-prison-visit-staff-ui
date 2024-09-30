@@ -99,6 +99,8 @@ export default class DateAndTime {
 
     req.session.slotsList = slotsList
 
+    visitSessionData.allowOverBooking = false // intentionally reset when returning to date and time page
+
     res.render('pages/bookAVisit/dateAndTime', {
       errors: req.flash('errors'),
       visitRestriction: visitSessionData.visitRestriction,

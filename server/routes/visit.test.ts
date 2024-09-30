@@ -127,7 +127,7 @@ describe('/visit/:reference', () => {
     supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
     supportedPrisonsService.getPrisonConfig.mockResolvedValue({ maxTotalVisitors: 6, policyNoticeDaysMin: 2 })
 
-    visitSessionData = { prisoner: undefined }
+    visitSessionData = { allowOverBooking: false, prisoner: undefined }
 
     app = appWithAllRoutes({
       services: {
@@ -198,7 +198,7 @@ describe('/visit/:reference', () => {
           expect($('[data-test="visit-event-date-time-3"]').text()).toBe('Saturday 1 January 2022 at 9am')
           expect($('[data-test="visit-request-method-3"]').text()).toBe('Method: Phone booking')
 
-          expect(visitSessionData).toEqual({ prisoner: undefined })
+          expect(visitSessionData).toEqual({ allowOverBooking: false, prisoner: undefined })
 
           expect(auditService.viewedVisitDetails).toHaveBeenCalledTimes(1)
           expect(auditService.viewedVisitDetails).toHaveBeenCalledWith({
@@ -623,6 +623,7 @@ describe('/visit/:reference', () => {
         .expect(res => {
           expect(clearSession).toHaveBeenCalledTimes(1)
           expect(visitSessionData).toStrictEqual(<VisitSessionData>{
+            allowOverBooking: false,
             prisoner: {
               name: 'Smith, John',
               offenderNo: 'A1234BC',
