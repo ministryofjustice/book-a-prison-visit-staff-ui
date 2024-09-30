@@ -379,7 +379,7 @@ export default class TestData {
     policyNoticeDaysMin = 2,
     maxTotalVisitors = 6,
     maxAdultVisitors = 3,
-    maxChildVisitors = 3,
+    maxChildVisitors = 4,
     adultAgeYears = 18,
   }: Partial<Prison> = {}): Prison =>
     ({
@@ -399,10 +399,10 @@ export default class TestData {
     prisonName = 'Hewell (HMP)',
     active = true,
     policyNoticeDaysMax = 28,
-    policyNoticeDaysMin = 3,
+    policyNoticeDaysMin = 2,
     maxTotalVisitors = 6,
     maxAdultVisitors = 3,
-    maxChildVisitors = 3,
+    maxChildVisitors = 4,
     adultAgeYears = 18,
   }: Partial<PrisonDto> = {}): PrisonDto =>
     ({

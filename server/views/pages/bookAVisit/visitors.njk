@@ -142,9 +142,21 @@
       </p>
       {% endif %}
 
-      {% for textItem in selectVisitorsText %}
-        <p data-test="visitor-information-{{ loop.index }}">{{ textItem }}</p>
-      {% endfor %}
+        <p>
+          Up to <span data-test="visitors-max-total">{{ selectedEstablishment.maxTotalVisitors }} {{ "person" | pluralise(selectedEstablishment.maxTotalVisitors, "people") }}</span>
+          can visit someone at <span data-test="prison-name">{{ selectedEstablishment.prisonName }}</span>. This includes:
+        </p>
+        <ul class="govuk-list govuk-list--bullet">
+          <li>
+            <span data-test="visitors-max-adults">{{ selectedEstablishment.maxAdultVisitors }} {{ "person" | pluralise(selectedEstablishment.maxAdultVisitors, "people") }}</span>
+            <span data-test="visitors-adult-age">{{ selectedEstablishment.adultAgeYears }} {{ "year" | pluralise(selectedEstablishment.adultAgeYears) }}</span> old or older
+          </li>
+          <li>
+            <span data-test="visitors-max-children">{{ selectedEstablishment.maxChildVisitors }} {{ "person" | pluralise(selectedEstablishment.maxChildVisitors, "people") }}</span> under
+            <span data-test="visitors-adult-age">{{ selectedEstablishment.adultAgeYears }} {{ "year" | pluralise(selectedEstablishment.adultAgeYears) }}</span> old
+          </li>
+        </ul>
+        <p>At least one visitor must be 18 years or older.</p>
 
       <form action="{{ urlPrefix }}/select-visitors" method="POST" novalidate>
         <input type="hidden" name="_csrf" value="{{ csrfToken }}">

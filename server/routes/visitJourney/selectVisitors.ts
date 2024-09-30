@@ -1,7 +1,6 @@
 import type { Request, Response } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
 import { VisitorListItem } from '../../@types/bapv'
-import getPrisonConfiguration from '../../constants/prisonConfiguration'
 import PrisonerProfileService from '../../services/prisonerProfileService'
 import PrisonerVisitorsService from '../../services/prisonerVisitorsService'
 import { getFlashFormValues } from '../visitorUtils'
@@ -32,7 +31,6 @@ export default class SelectVisitors {
     const restrictions = await this.prisonerProfileService.getRestrictions(offenderNo, res.locals.user.username)
     visitSessionData.prisoner.restrictions = restrictions
 
-    const { selectVisitorsText } = getPrisonConfiguration(req.session.selectedEstablishment.prisonId)
     const formValues = getFlashFormValues(req)
     if (!Object.keys(formValues).length && visitSessionData.visitors) {
       formValues.visitors = visitSessionData.visitors.map(visitor => visitor.personId.toString())
@@ -48,7 +46,6 @@ export default class SelectVisitors {
       atLeastOneAdult,
       eligibleVisitors,
       restrictions,
-      selectVisitorsText,
       formValues,
       urlPrefix: getUrlPrefix(isUpdate, visitSessionData.visitReference),
       backLink: returnAddress,
