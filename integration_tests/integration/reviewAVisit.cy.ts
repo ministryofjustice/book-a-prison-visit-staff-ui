@@ -58,7 +58,7 @@ context('Review a visit', () => {
     })
     cy.task('stubPrisonerById', prisoner)
     cy.task('stubVisitHistory', visitHistoryDetails)
-    cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
+    cy.task('stubPrisonerSocialContacts', { offenderNo, contacts, approvedVisitorsOnly: false })
 
     const notifications: NotificationType[] = ['NON_ASSOCIATION_EVENT']
     cy.task('stubGetVisitNotifications', { reference: visitHistoryDetails.visit.reference, notifications })
@@ -118,7 +118,7 @@ context('Review a visit', () => {
     })
     cy.task('stubPrisonerById', prisoner)
     cy.task('stubVisitHistory', visitHistoryDetails)
-    cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
+    cy.task('stubPrisonerSocialContacts', { offenderNo, contacts, approvedVisitorsOnly: false })
 
     const notifications: NotificationType[] = ['PRISONER_RECEIVED_EVENT']
     cy.task('stubGetVisitNotifications', { reference: visitHistoryDetails.visit.reference, notifications })
@@ -144,7 +144,7 @@ context('Review a visit', () => {
     })
     cy.task('stubPrisonerById', prisoner)
     cy.task('stubVisitHistory', visitHistoryDetails)
-    cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
+    cy.task('stubPrisonerSocialContacts', { offenderNo, contacts, approvedVisitorsOnly: false })
 
     const notifications: NotificationType[] = ['PRISONER_RELEASED_EVENT']
     cy.task('stubGetVisitNotifications', { reference: visitHistoryDetails.visit.reference, notifications })

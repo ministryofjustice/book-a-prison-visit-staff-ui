@@ -11,12 +11,13 @@ import {
   IgnoreVisitNotificationsDto,
   NotificationType,
   PageVisitDto,
+  PrisonDto,
   PrisonExcludeDateDto,
   SessionSchedule,
   Visit,
   VisitRestriction,
 } from './orchestrationApiTypes'
-import { VisitSessionData } from '../@types/bapv'
+import { Prison, VisitSessionData } from '../@types/bapv'
 
 describe('orchestrationApiClient', () => {
   let fakeOrchestrationApi: nock.Scope
@@ -616,17 +617,18 @@ describe('orchestrationApiClient', () => {
   })
 
   describe('getPrison', () => {
-    it('should return a PrisonDto object', async () => {
-      const results = TestData.prisonDto()
+    it('should return a Prison object (mapped from received PrisonDto)', async () => {
+      const receivedPrisonDto = { code: 'HEI', prisonName: 'Hewell (HMP)' } as PrisonDto
+      const expectedPrison = { prisonId: 'HEI', prisonName: 'Hewell (HMP)' } as Prison
 
       fakeOrchestrationApi
         .get(`/config/prisons/prison/${prisonId}`)
         .matchHeader('authorization', `Bearer ${token}`)
-        .reply(200, results)
+        .reply(200, receivedPrisonDto)
 
       const output = await orchestrationApiClient.getPrison(prisonId)
 
-      expect(output).toEqual(results)
+      expect(output).toStrictEqual(expectedPrison)
     })
   })
 })
