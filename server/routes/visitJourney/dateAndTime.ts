@@ -132,7 +132,6 @@ export default class DateAndTime {
     }
 
     visitSessionData.visitSlot = getSelectedSlot(req.session.slotsList, req.body['visit-date-and-time'])
-    /// /////////////////////////////////
 
     // If 'available tables is less than or equal to zero
     // Then no capacity was originally displayed, so show overbooking page
