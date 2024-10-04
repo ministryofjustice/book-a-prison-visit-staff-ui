@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
-import { VisitSessionData, VisitSlot } from '../../@types/bapv'
+import { VisitSlot } from '../../@types/bapv'
 import AuditService from '../../services/auditService'
 import { getFlashFormValues, getSelectedSlot, getSlotByTimeAndRestriction } from '../visitorUtils'
 import getUrlPrefix from './visitJourneyUtils'
