@@ -121,6 +121,17 @@ testJourneys.forEach(journey => {
                 sessionConflicts: ['DOUBLE_BOOKING_OR_RESERVATION'],
                 visitRestriction: 'OPEN',
               },
+              {
+                id: '4',
+                sessionTemplateReference: 'a1b.2cd.3e4',
+                prisonId,
+                startTimestamp: '2022-02-14T15:30:00',
+                endTimestamp: '2022-02-14T16:35:00',
+                availableTables: 0, // used for confirm overbooking page (no available tables)
+                capacity: 5,
+                visitRoom: 'room name',
+                visitRestriction: 'OPEN',
+              },
             ],
           },
         },
@@ -148,7 +159,7 @@ testJourneys.forEach(journey => {
             expect($('[data-test="visit-restriction"]').text()).toBe('Open')
             expect($('[data-test="closed-visit-reason"]').length).toBe(0)
             expect($('[data-test="whereabouts-unavailable"]').length).toBe(0)
-            expect($('input[name="visit-date-and-time"]').length).toBe(3)
+            expect($('input[name="visit-date-and-time"]').length).toBe(4)
             expect($('input[name="visit-date-and-time"]:checked').length).toBe(0)
             expect($('.govuk-accordion__section--expanded').length).toBe(0)
 
@@ -301,7 +312,7 @@ testJourneys.forEach(journey => {
             const $ = cheerio.load(res.text)
             expect($('h1').text().trim()).toBe('Select date and time of visit')
             expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
-            expect($('input[name="visit-date-and-time"]').length).toBe(3)
+            expect($('input[name="visit-date-and-time"]').length).toBe(4)
             expect($('.govuk-accordion__section--expanded').length).toBe(1)
             expect($('.govuk-accordion__section--expanded #3').length).toBe(1)
             expect($('input#3').prop('checked')).toBe(true)
@@ -486,6 +497,34 @@ testJourneys.forEach(journey => {
             ])
             expect(flashProvider).toHaveBeenCalledWith('formValues', { 'visit-date-and-time': '100' })
             expect(auditService.reservedVisit).not.toHaveBeenCalled()
+          })
+      })
+
+      it('should re-direct to overbooking page if session has no available slots', () => {
+        return request(sessionApp)
+          .post(`${journey.urlPrefix}/select-date-and-time`)
+          .send('visit-date-and-time=4')
+          .expect(302)
+          .expect('location', `${journey.urlPrefix}/select-date-and-time/overbooking`)
+          .expect(() => {
+            expect(visitSessionData.visitSlot).toEqual(<VisitSlot>{
+              id: '4',
+              sessionTemplateReference: 'a1b.2cd.3e4',
+              prisonId,
+              startTimestamp: '2022-02-14T15:30:00',
+              endTimestamp: '2022-02-14T16:35:00',
+              availableTables: 0,
+              capacity: 5,
+              visitRoom: 'room name',
+              visitRestriction: 'OPEN',
+            })
+            expect(visitSessionData.applicationReference).not.toBeDefined()
+
+            expect(
+              journey.isUpdate ? visitService.createVisitApplicationFromVisit : visitService.createVisitApplication,
+            ).toHaveBeenCalledTimes(0)
+            expect(visitService.changeVisitApplication).toHaveBeenCalledTimes(0)
+            expect(auditService.reservedVisit).toHaveBeenCalledTimes(0)
           })
       })
     })

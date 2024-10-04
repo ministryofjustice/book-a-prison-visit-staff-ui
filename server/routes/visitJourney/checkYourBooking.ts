@@ -1,4 +1,5 @@
 import type { Request, Response } from 'express'
+import { validationResult } from 'express-validator'
 import { requestMethodsBooking } from '../../constants/requestMethods'
 import AuditService from '../../services/auditService'
 import getUrlPrefix from './visitJourneyUtils'
@@ -51,6 +52,12 @@ export default class CheckYourBooking {
       visitSessionData.allowOverBooking = true
     }
 
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      req.flash('errors', errors.array() as [])
+      return res.redirect(`${urlPrefix}/check-your-booking/overbooking`)
+    }
+
     try {
       // 'book' the visit: complete the visit application and get BOOKED visit
       const bookedVisit = await this.visitService.bookVisit({
@@ -81,7 +88,7 @@ export default class CheckYourBooking {
           (error as SanitisedError<ApplicationValidationErrorResponse>)?.data?.validationErrors ?? []
 
         if (validationErrors.includes('APPLICATION_INVALID_NO_SLOT_CAPACITY')) {
-          return res.redirect(`${urlPrefix}/confirm-overbooking`)
+          return res.redirect(`${urlPrefix}/check-your-booking/overbooking`)
         }
       }
 

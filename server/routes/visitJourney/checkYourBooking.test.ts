@@ -208,6 +208,24 @@ testJourneys.forEach(journey => {
           })
       })
 
+      it('should set validation errors in flash and redirect if no overbooking option selected', () => {
+        return request(sessionApp)
+          .post(`${journey.urlPrefix}/check-your-booking/overbooking`)
+          .expect(302)
+          .expect('location', `${journey.urlPrefix}/check-your-booking/overbooking`)
+          .expect(() => {
+            expect(flashProvider).toHaveBeenCalledWith('errors', [
+              {
+                location: 'body',
+                msg: 'No answer selected',
+                path: 'confirmOverBooking',
+                type: 'field',
+                value: undefined,
+              },
+            ])
+          })
+      })
+
       describe('Handle API errors', () => {
         describe('HTTP 422 Response', () => {
           it('should redirect to confirm overbooking page if no_slot_capacity 422 received', () => {
@@ -223,7 +241,7 @@ testJourneys.forEach(journey => {
             return request(sessionApp)
               .post(`${journey.urlPrefix}/check-your-booking`)
               .expect(302)
-              .expect('location', `${journey.urlPrefix}/confirm-overbooking`)
+              .expect('location', `${journey.urlPrefix}/check-your-booking/overbooking`)
               .expect(() => {
                 expect(visitSessionData.visitStatus).not.toBe('BOOKED')
                 expect(visitSessionData.visitReference).toBe(journey.isUpdate ? 'ab-cd-ef-gh' : undefined)

@@ -58,6 +58,13 @@ export default function routes({
     dateAndTime.post(req, res),
   )
 
+  get('/select-date-and-time/overbooking', sessionCheckMiddleware({ stage: 2 }), (req, res) =>
+    overbooking.viewFromDateTime(req, res),
+  )
+  post('/select-date-and-time/overbooking', sessionCheckMiddleware({ stage: 2 }), overbooking.validate(), (req, res) =>
+    dateAndTime.postOverbookings(req, res),
+  )
+
   get('/additional-support', sessionCheckMiddleware({ stage: 3 }), (req, res) => additionalSupport.get(req, res))
   post('/additional-support', sessionCheckMiddleware({ stage: 3 }), ...additionalSupport.validate(), (req, res) =>
     additionalSupport.post(req, res),
@@ -76,7 +83,12 @@ export default function routes({
   get('/check-your-booking', sessionCheckMiddleware({ stage: 6 }), (req, res) => checkYourBooking.get(req, res))
   post('/check-your-booking', sessionCheckMiddleware({ stage: 6 }), (req, res) => checkYourBooking.post(req, res))
 
-  get('/confirm-overbooking', sessionCheckMiddleware({ stage: 6 }), (req, res) => overbooking.viewFromConfirm(req, res))
+  get('/check-your-booking/overbooking', sessionCheckMiddleware({ stage: 6 }), (req, res) =>
+    overbooking.viewFromCheckBooking(req, res),
+  )
+  post('/check-your-booking/overbooking', sessionCheckMiddleware({ stage: 6 }), overbooking.validate(), (req, res) =>
+    checkYourBooking.post(req, res),
+  )
 
   get('/confirmation', sessionCheckMiddleware({ stage: 7 }), (req, res) => confirmation.get(req, res))
 

@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
-import { VisitSlot } from '../../@types/bapv'
+import { VisitSessionData, VisitSlot } from '../../@types/bapv'
 import AuditService from '../../services/auditService'
 import { getFlashFormValues, getSelectedSlot, getSlotByTimeAndRestriction } from '../visitorUtils'
 import getUrlPrefix from './visitJourneyUtils'
@@ -132,6 +132,47 @@ export default class DateAndTime {
     }
 
     visitSessionData.visitSlot = getSelectedSlot(req.session.slotsList, req.body['visit-date-and-time'])
+    /// /////////////////////////////////
+
+    // If 'available tables is less than or equal to zero
+    // Then no capacity was originally displayed, so show overbooking page
+    if (visitSessionData.visitSlot.availableTables <= 0) {
+      return res.redirect(`${urlPrefix}/select-date-and-time/overbooking`)
+    }
+
+    await this.reserveOrChangeApplication(req, res)
+
+    return res.redirect(`${urlPrefix}/additional-support`)
+  }
+
+  async postOverbookings(req: Request, res: Response): Promise<void> {
+    const isUpdate = this.mode === 'update'
+    const { visitSessionData } = req.session
+    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
+    const errors = validationResult(req)
+
+    const { confirmOverBooking } = req.body // this will be set if we have come from overbooking confirmation page
+    if (confirmOverBooking === 'no') {
+      delete visitSessionData.visitSlot
+      return res.redirect(`${urlPrefix}/select-date-and-time`) // i.e. return early if we're going to
+    }
+    if (confirmOverBooking === 'yes') {
+      visitSessionData.allowOverBooking = true
+    }
+
+    if (!errors.isEmpty()) {
+      req.flash('errors', errors.array() as [])
+      return res.redirect(`${urlPrefix}/select-date-and-time/overbooking`)
+    }
+
+    await this.reserveOrChangeApplication(req, res)
+
+    return res.redirect(`${urlPrefix}/additional-support`)
+  }
+
+  private async reserveOrChangeApplication(req: Request, res: Response): Promise<void> {
+    const { visitSessionData } = req.session
+    const isUpdate = this.mode === 'update'
 
     // See README ('Visit journeys – book and update') for explanation of this flow
     if (visitSessionData.applicationReference) {
@@ -167,8 +208,6 @@ export default class DateAndTime {
       username: res.locals.user.username,
       operationId: res.locals.appInsightsOperationId,
     })
-
-    return res.redirect(`${urlPrefix}/additional-support`)
   }
 
   validate(): ValidationChain {
