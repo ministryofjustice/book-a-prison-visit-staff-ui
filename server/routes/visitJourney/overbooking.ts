@@ -1,4 +1,5 @@
 import type { Request, Response } from 'express'
+import { body, ValidationChain, validationResult } from 'express-validator'
 import getUrlPrefix from './visitJourneyUtils'
 import { VisitSessionsService } from '../../services'
 
@@ -8,11 +9,41 @@ export default class Overbooking {
     private readonly visitSessionsService: VisitSessionsService,
   ) {}
 
-  async viewFromConfirm(req: Request, res: Response): Promise<void> {
+  async viewFromSelectDateTime(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'
     const { visitSessionData } = req.session
 
     const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
+
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      req.flash('errors', errors.array() as [])
+      return res.redirect(`${urlPrefix}/select-date-and-time/overbooking`)
+    }
+
+    const maxCapacity = visitSessionData.visitSlot.capacity
+    const bookingsCount = maxCapacity - visitSessionData.visitSlot.availableTables
+
+    return res.render('pages/bookAVisit/overbooking', {
+      errors: req.flash('errors'),
+      bookingsCount,
+      maxCapacity,
+      visitSession: visitSessionData.visitSlot,
+      formAction: `${urlPrefix}/select-date-and-time/overbooking`,
+    })
+  }
+
+  async viewFromCheckBooking(req: Request, res: Response): Promise<void> {
+    const isUpdate = this.mode === 'update'
+    const { visitSessionData } = req.session
+
+    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
+
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      req.flash('errors', errors.array() as [])
+      return res.redirect(`${urlPrefix}/check-your-booking/overbooking`)
+    }
 
     const visitSession = await this.visitSessionsService.getSingleVisitSession({
       prisonCode: visitSessionData.visitSlot.prisonId,
@@ -31,11 +62,16 @@ export default class Overbooking {
         ? visitSession.openVisitCapacity
         : visitSession.closedVisitCapacity
 
-    res.render('pages/bookAVisit/overbooking', {
+    return res.render('pages/bookAVisit/overbooking', {
+      errors: req.flash('errors'),
       bookingsCount,
       maxCapacity,
       visitSession,
-      urlPrefix,
+      formAction: `${urlPrefix}/check-your-booking/overbooking`,
     })
+  }
+
+  validate(): ValidationChain {
+    return body('confirmOverBooking').isIn(['yes', 'no']).withMessage('No answer selected')
   }
 }

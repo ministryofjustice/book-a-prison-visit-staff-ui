@@ -314,6 +314,21 @@ export default function routes({
   )
 
   get(
+    '/:reference/update/select-date-and-time/overbooking',
+    checkVisitReferenceMiddleware,
+    sessionCheckMiddleware({ stage: 2 }),
+    (req, res) => overbooking.viewFromSelectDateTime(req, res),
+  )
+
+  post(
+    '/:reference/update/select-date-and-time/overbooking',
+    checkVisitReferenceMiddleware,
+    sessionCheckMiddleware({ stage: 2 }),
+    overbooking.validate(),
+    (req, res) => dateAndTime.postOverbookings(req, res),
+  )
+
+  get(
     '/:reference/update/additional-support',
     checkVisitReferenceMiddleware,
     sessionCheckMiddleware({ stage: 3 }),
@@ -369,10 +384,18 @@ export default function routes({
   )
 
   get(
-    '/:reference/update/confirm-overbooking',
+    '/:reference/update/check-your-booking/overbooking',
     checkVisitReferenceMiddleware,
     sessionCheckMiddleware({ stage: 6 }),
-    (req, res) => overbooking.viewFromConfirm(req, res),
+    (req, res) => overbooking.viewFromCheckBooking(req, res),
+  )
+
+  post(
+    '/:reference/update/check-your-booking/overbooking',
+    checkVisitReferenceMiddleware,
+    sessionCheckMiddleware({ stage: 6 }),
+    overbooking.validate(),
+    (req, res) => overbooking.viewFromCheckBooking(req, res),
   )
 
   get(
