@@ -12,7 +12,6 @@ import {
   createMockSupportedPrisonsService,
 } from '../../services/testutils/mocks'
 import TestData from '../testutils/testData'
-import getPrisonConfiguration from '../../constants/prisonConfiguration'
 
 let sessionApp: Express
 
@@ -474,65 +473,20 @@ testJourneys.forEach(journey => {
         })
     })
 
-    describe(`Display prison specific content for each prison`, () => {
-      it('should display prison specific content for Hewell', () => {
-        const expectedText = getPrisonConfiguration('HEI').selectVisitorsText
-
-        return request(sessionApp)
-          .get(`${journey.urlPrefix}/select-visitors`)
-          .expect(200)
-          .expect('Content-Type', /html/)
-          .expect(res => {
-            const $ = cheerio.load(res.text)
-            expect($('[data-test^="visitor-information"]').length).toBe(expectedText.length)
-            expect($('[data-test="visitor-information-1"]').text()).toBe(expectedText[0])
-            expect($('[data-test="visitor-information-2"]').text()).toBe(expectedText[1])
-          })
-      })
-
-      it('should display prison specific content for Bristol', () => {
-        const expectedText = getPrisonConfiguration('BLI').selectVisitorsText
-
-        sessionApp = appWithAllRoutes({
-          services: { prisonerProfileService, prisonerVisitorsService },
-          sessionData: {
-            selectedEstablishment: { prisonId: 'BLI', prisonName: '' },
-            visitorList,
-            visitSessionData,
-          } as SessionData,
+    it('should display prison specific visitor allowances for the selected establishment', () => {
+      return request(sessionApp)
+        .get(`${journey.urlPrefix}/select-visitors`)
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('[data-test=visitors-max-total]').text()).toBe('6 people')
+          expect($('[data-test=prison-name]').text()).toBe('Hewell (HMP)')
+          expect($('[data-test=visitors-max-adults]').text()).toBe('3 people')
+          expect($('[data-test=visitors-max-children]').text()).toBe('4 people')
+          expect($('[data-test=visitors-adult-age]').eq(0).text()).toBe('18 years')
+          expect($('[data-test=visitors-adult-age]').eq(1).text()).toBe('18 years')
         })
-
-        return request(sessionApp)
-          .get(`${journey.urlPrefix}/select-visitors`)
-          .expect(200)
-          .expect('Content-Type', /html/)
-          .expect(res => {
-            const $ = cheerio.load(res.text)
-            expect($('[data-test^="visitor-information"]').length).toBe(expectedText.length)
-            expect($('[data-test="visitor-information-1"]').text()).toBe(expectedText[0])
-            expect($('[data-test="visitor-information-2"]').text()).toBe(expectedText[1])
-          })
-      })
-
-      it('should display no prison specific content for a prison that is not configured', () => {
-        sessionApp = appWithAllRoutes({
-          services: { prisonerProfileService, prisonerVisitorsService },
-          sessionData: {
-            selectedEstablishment: { prisonId: 'XYZ', prisonName: '' },
-            visitorList,
-            visitSessionData,
-          } as SessionData,
-        })
-
-        return request(sessionApp)
-          .get(`${journey.urlPrefix}/select-visitors`)
-          .expect(200)
-          .expect('Content-Type', /html/)
-          .expect(res => {
-            const $ = cheerio.load(res.text)
-            expect($('[data-test^="visitor-information"]').length).toBe(0)
-          })
-      })
     })
   })
 
@@ -989,7 +943,7 @@ testJourneys.forEach(journey => {
         const visitors = ['4322', '4323']
 
         supportedPrisonsService.getSupportedPrisons.mockResolvedValue(TestData.supportedPrisons())
-        supportedPrisonsService.getPrisonConfig.mockResolvedValue({ maxTotalVisitors, policyNoticeDaysMin: 2 })
+        supportedPrisonsService.getPrison.mockResolvedValue(TestData.prison({ maxTotalVisitors }))
 
         sessionApp = appWithAllRoutes({
           services: { prisonerProfileService, prisonerVisitorsService, supportedPrisonsService },
@@ -1015,7 +969,7 @@ testJourneys.forEach(journey => {
         const visitors = ['4322', '4323', '4324']
 
         supportedPrisonsService.getSupportedPrisons.mockResolvedValue(TestData.supportedPrisons())
-        supportedPrisonsService.getPrisonConfig.mockResolvedValue({ maxTotalVisitors, policyNoticeDaysMin: 2 })
+        supportedPrisonsService.getPrison.mockResolvedValue(TestData.prison({ maxTotalVisitors }))
 
         sessionApp = appWithAllRoutes({
           services: { prisonerProfileService, prisonerVisitorsService, supportedPrisonsService },

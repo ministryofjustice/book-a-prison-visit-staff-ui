@@ -69,7 +69,9 @@ export default class VisitNotificationsService {
     notificationGroups.forEach(notificationGroup =>
       type.set(notificationGroup.type, notificationTypes[notificationGroup.type]),
     )
-    type.forEach((label, value) => typeFilterItems.push({ label, value, checked: appliedFilters.type.includes(value) }))
+    type.forEach((label, value) =>
+      typeFilterItems.push({ label: label ?? value, value, checked: appliedFilters.type.includes(value) }),
+    )
     typeFilterItems.sort((a, b) => a.label.localeCompare(b.label))
 
     return [

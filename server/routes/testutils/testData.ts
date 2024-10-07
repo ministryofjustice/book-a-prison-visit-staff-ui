@@ -20,6 +20,7 @@ import { CurrentIncentive, Prisoner } from '../../data/prisonerOffenderSearchTyp
 import { Address, Contact, Restriction } from '../../data/prisonerContactRegistryApiTypes'
 import { ScheduledEvent } from '../../data/whereaboutsApiTypes'
 import { PrisonName } from '../../data/prisonRegisterApiTypes'
+import { Prison } from '../../@types/bapv'
 
 export default class TestData {
   static address = ({
@@ -370,17 +371,39 @@ export default class TestData {
 
   static supportedPrisonIds = ({ prisonIds = ['HEI', 'BLI'] } = {}): string[] => prisonIds
 
+  static prison = ({
+    prisonId = 'HEI',
+    prisonName = 'Hewell (HMP)',
+    active = true,
+    policyNoticeDaysMax = 28,
+    policyNoticeDaysMin = 2,
+    maxTotalVisitors = 6,
+    maxAdultVisitors = 3,
+    maxChildVisitors = 4,
+    adultAgeYears = 18,
+  }: Partial<Prison> = {}): Prison =>
+    ({
+      prisonId,
+      prisonName,
+      active,
+      policyNoticeDaysMax,
+      policyNoticeDaysMin,
+      maxTotalVisitors,
+      maxAdultVisitors,
+      maxChildVisitors,
+      adultAgeYears,
+    }) as Prison
+
   static prisonDto = ({
     code = 'HEI',
     prisonName = 'Hewell (HMP)',
     active = true,
     policyNoticeDaysMax = 28,
-    policyNoticeDaysMin = 3,
+    policyNoticeDaysMin = 2,
     maxTotalVisitors = 6,
     maxAdultVisitors = 3,
-    maxChildVisitors = 3,
+    maxChildVisitors = 4,
     adultAgeYears = 18,
-    excludeDates = [],
   }: Partial<PrisonDto> = {}): PrisonDto =>
     ({
       code,
@@ -392,7 +415,6 @@ export default class TestData {
       maxAdultVisitors,
       maxChildVisitors,
       adultAgeYears,
-      excludeDates,
     }) as PrisonDto
 
   static visit = ({

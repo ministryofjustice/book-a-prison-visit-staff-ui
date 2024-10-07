@@ -1,10 +1,8 @@
 import { RequestHandler, Router } from 'express'
-import createHttpError from 'http-errors'
 import { ValidationChain } from 'express-validator'
 import { Services } from '../../services'
 import asyncMiddleware from '../../middleware/asyncMiddleware'
 import BlockVisitDatesController from './blockVisitDatesController'
-import config from '../../config'
 import BlockNewDateController from './blockNewDateController'
 import UnblockVisitDateController from './unblockVisitDateController'
 
@@ -22,11 +20,6 @@ export default function routes(services: Services): Router {
     services.visitService,
   )
   const unblockVisitDateController = new UnblockVisitDateController(services.auditService, services.blockedDatesService)
-
-  // serve 404 for any route if feature flag not set
-  if (!config.features.sessionManagement) {
-    router.use((req, res, next) => next(createHttpError(404)))
-  }
 
   get('/', blockVisitDatesController.view())
   postWithValidation('/', blockVisitDatesController.validate(), blockVisitDatesController.submit())

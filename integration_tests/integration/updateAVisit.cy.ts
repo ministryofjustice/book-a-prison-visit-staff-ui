@@ -67,7 +67,7 @@ context('Update a visit', () => {
 
     cy.task('stubPrisonerById', prisoner)
     cy.task('stubVisitHistory', visitHistoryDetails)
-    cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
+    cy.task('stubPrisonerSocialContacts', { offenderNo, contacts, approvedVisitorsOnly: false })
     cy.task('stubGetVisitNotifications', { reference: visitHistoryDetails.visit.reference })
 
     // Visit details page
@@ -77,6 +77,7 @@ context('Update a visit', () => {
     visitDetailsPage.prisonerName().contains(prisonerDisplayName)
 
     // Start update journey
+    cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
     cy.task('stubOffenderRestrictions', { offenderNo, offenderRestrictions: [] })
     visitDetailsPage.updateBooking().click()
 
@@ -233,7 +234,7 @@ context('Update a visit', () => {
 
     cy.task('stubPrisonerById', prisoner)
     cy.task('stubVisitHistory', visitHistoryDetails)
-    cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
+    cy.task('stubPrisonerSocialContacts', { offenderNo, contacts, approvedVisitorsOnly: false })
     cy.task('stubGetVisitNotifications', { reference: visitHistoryDetails.visit.reference })
 
     // Visit details page
@@ -243,6 +244,7 @@ context('Update a visit', () => {
     visitDetailsPage.prisonerName().contains(prisonerDisplayName)
 
     // Start update journey
+    cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
     cy.task('stubOffenderRestrictions', { offenderNo, offenderRestrictions: [] })
     visitDetailsPage.updateBooking().click()
 

@@ -24,7 +24,7 @@ import {
   VisitRestriction,
   VisitSession,
 } from './orchestrationApiTypes'
-import { VisitSessionData } from '../@types/bapv'
+import { Prison, VisitSessionData } from '../@types/bapv'
 
 export default class OrchestrationApiClient {
   private restClient: RestClient
@@ -287,10 +287,12 @@ export default class OrchestrationApiClient {
     })
   }
 
-  async getPrison(prisonId: string): Promise<PrisonDto> {
-    return this.restClient.get({
-      path: `/config/prisons/prison/${prisonId}`,
+  async getPrison(id: string): Promise<Prison> {
+    // rename 'code' to 'prisonId' for consistency
+    const { code: prisonId, ...prisonDto } = await this.restClient.get<PrisonDto>({
+      path: `/config/prisons/prison/${id}`,
     })
+    return { prisonId, ...prisonDto }
   }
 
   private convertMainContactToVisitContact(mainContact: VisitSessionData['mainContact']): {

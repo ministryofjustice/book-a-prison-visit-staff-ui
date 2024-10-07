@@ -15,17 +15,9 @@ export default function populateSelectedEstablishment(
         return res.redirect('/change-establishment')
       }
 
-      const { maxTotalVisitors, policyNoticeDaysMin } = await supportedPrisonsService.getPrisonConfig(
-        res.locals.user.username,
-        activeCaseLoadId,
-      )
+      const prison = await supportedPrisonsService.getPrison(res.locals.user.username, activeCaseLoadId)
 
-      req.session.selectedEstablishment = {
-        prisonId: activeCaseLoadId,
-        prisonName: supportedPrisons[activeCaseLoadId],
-        maxTotalVisitors,
-        policyNoticeDaysMin,
-      }
+      req.session.selectedEstablishment = prison
     }
     res.locals.selectedEstablishment = req.session.selectedEstablishment
 

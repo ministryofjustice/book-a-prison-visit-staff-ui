@@ -29,7 +29,7 @@ context('Change establishment', () => {
 
     const changeEstablishmentPage = Page.verifyOnPage(ChangeEstablishmentPage)
     changeEstablishmentPage.selectEstablishment('BLI')
-    cy.task('stubGetPrison', TestData.prisonDto({ code: 'BLI' }))
+    cy.task('stubGetPrison', TestData.prisonDto({ code: 'BLI', prisonName: 'Bristol (HMP & YOI)' }))
     changeEstablishmentPage.continueButton().click()
 
     homePage = Page.verifyOnPage(HomePage)

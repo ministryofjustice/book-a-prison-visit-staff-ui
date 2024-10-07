@@ -2,7 +2,7 @@ import Page, { PageElement } from './page'
 
 export default class ConfirmUpdatePage extends Page {
   constructor() {
-    super('This visit is in less than 3 days. Do you want to update the booking?')
+    super('This visit is in less than 2 days. Do you want to update the booking?')
   }
 
   // Cancellation reason radios

@@ -39,6 +39,7 @@ import type { Services } from '../../services'
 import UserService, { UserDetails } from '../../services/userService'
 import SupportedPrisonsService from '../../services/supportedPrisonsService'
 import TestData from './testData'
+import { Prison } from '../../@types/bapv'
 
 export const user: Express.User = {
   name: 'FIRST LAST',
@@ -86,11 +87,8 @@ class MockSupportedPrisonsService extends SupportedPrisonsService {
     return TestData.supportedPrisons()
   }
 
-  async getPrisonConfig(
-    _username: string,
-    _prisonCode: string,
-  ): Promise<{ maxTotalVisitors: number; policyNoticeDaysMin: number }> {
-    return { maxTotalVisitors: 6, policyNoticeDaysMin: 2 }
+  async getPrison(_username: string, _prisonCode: string): Promise<Prison> {
+    return TestData.prison()
   }
 }
 

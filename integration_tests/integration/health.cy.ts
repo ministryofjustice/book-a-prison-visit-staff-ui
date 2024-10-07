@@ -51,7 +51,15 @@ context('Healthcheck', () => {
     it('Reports correctly when token verification down', () => {
       cy.task('reset')
       cy.task('stubAuthPing')
+      cy.task('stubManageUsersPing')
       cy.task('stubTokenVerificationPing', 500)
+      cy.task('stubNomisUserRolesPing')
+      cy.task('stubPrisonerSearchPing')
+      cy.task('stubPrisonApiPing')
+      cy.task('stubPrisonerContactRegistryPing')
+      cy.task('stubWhereaboutsPing')
+      cy.task('stubPrisonRegisterPing')
+      cy.task('stubOrchestrationPing')
 
       cy.request({ url: '/health', method: 'GET', failOnStatusCode: false }).then(response => {
         expect(response.body.checks.hmppsAuth).to.equal('OK')
