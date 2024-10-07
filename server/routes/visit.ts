@@ -317,7 +317,7 @@ export default function routes({
     '/:reference/update/select-date-and-time/overbooking',
     checkVisitReferenceMiddleware,
     sessionCheckMiddleware({ stage: 2 }),
-    (req, res) => overbooking.viewFromDateTime(req, res),
+    (req, res) => overbooking.viewFromSelectDateTime(req, res),
   )
 
   post(

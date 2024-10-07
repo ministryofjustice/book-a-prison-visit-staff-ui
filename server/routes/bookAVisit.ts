@@ -59,7 +59,7 @@ export default function routes({
   )
 
   get('/select-date-and-time/overbooking', sessionCheckMiddleware({ stage: 2 }), (req, res) =>
-    overbooking.viewFromDateTime(req, res),
+    overbooking.viewFromSelectDateTime(req, res),
   )
   post('/select-date-and-time/overbooking', sessionCheckMiddleware({ stage: 2 }), overbooking.validate(), (req, res) =>
     dateAndTime.postOverbookings(req, res),

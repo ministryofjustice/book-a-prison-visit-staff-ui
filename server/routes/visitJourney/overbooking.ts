@@ -9,7 +9,7 @@ export default class Overbooking {
     private readonly visitSessionsService: VisitSessionsService,
   ) {}
 
-  async viewFromDateTime(req: Request, res: Response): Promise<void> {
+  async viewFromSelectDateTime(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'
     const { visitSessionData } = req.session
 

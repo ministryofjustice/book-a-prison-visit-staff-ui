@@ -24,7 +24,7 @@ let visitSessionData: VisitSessionData
 
 // run tests for booking and update journeys
 const testJourneys = [
-  // { urlPrefix: '/book-a-visit', isUpdate: false },
+  { urlPrefix: '/book-a-visit', isUpdate: false },
   { urlPrefix: '/visit/ab-cd-ef-gh/update', isUpdate: true },
 ]
 
