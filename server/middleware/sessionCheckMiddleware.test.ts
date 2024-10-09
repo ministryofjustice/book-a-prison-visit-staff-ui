@@ -101,6 +101,7 @@ describe('sessionCheckMiddleware', () => {
     it('should not redirect if visit reference in URL matches that in visitSessionData', () => {
       req.params.reference = 'ab-cd-ef-gh'
       req.session.visitSessionData = {
+        allowOverBooking: false,
         prisoner: {
           name: 'abc',
           offenderNo: 'A1234BC',
@@ -116,23 +117,27 @@ describe('sessionCheckMiddleware', () => {
     })
   })
 
-  describe('prisoner data missing', () => {
+  describe('prisoner and allowOverBooking data missing', () => {
     ;[
       {
+        allowOverBooking: {},
         prisoner: {},
       },
       {
+        allowOverBooking: false,
         prisoner: {
           name: 'abc',
         },
       },
       {
+        allowOverBooking: false,
         prisoner: {
           name: 'abc',
           offenderNo: 'A1234BC',
         },
       },
       {
+        allowOverBooking: false,
         prisoner: {
           name: 'abc',
           offenderNo: 'A1234BC',
@@ -151,6 +156,7 @@ describe('sessionCheckMiddleware', () => {
 
     it('should not redirect when there are no bits of missing prisoner data at stage 1', () => {
       req.session.visitSessionData = {
+        allowOverBooking: false,
         prisoner: {
           name: 'abc',
           offenderNo: 'A1234BC',
@@ -168,13 +174,16 @@ describe('sessionCheckMiddleware', () => {
   describe('visitors and visit restriction data missing', () => {
     ;[
       {
+        allowOverBooking: false,
         prisoner: prisonerData,
       },
       {
+        allowOverBooking: false,
         prisoner: prisonerData,
         visitRestriction,
       },
       {
+        allowOverBooking: false,
         prisoner: prisonerData,
         visitRestriction,
         visitors: [],
@@ -193,11 +202,13 @@ describe('sessionCheckMiddleware', () => {
   describe('visit data missing', () => {
     ;[
       {
+        allowOverBooking: false,
         prisoner: prisonerData,
         visitRestriction,
         visitors: visitorsData,
       },
       {
+        allowOverBooking: false,
         prisoner: prisonerData,
         visitRestriction,
         visitors: visitorsData,
@@ -206,6 +217,7 @@ describe('sessionCheckMiddleware', () => {
         } as VisitSlot,
       },
       {
+        allowOverBooking: false,
         prisoner: prisonerData,
         visitRestriction,
         visitors: visitorsData,
@@ -215,6 +227,7 @@ describe('sessionCheckMiddleware', () => {
         } as VisitSlot,
       },
       {
+        allowOverBooking: false,
         prisoner: prisonerData,
         visitRestriction,
         visitors: visitorsData,
@@ -225,6 +238,7 @@ describe('sessionCheckMiddleware', () => {
         } as VisitSlot,
       },
       {
+        allowOverBooking: false,
         prisoner: prisonerData,
         visitRestriction,
         visitors: visitorsData,
@@ -250,6 +264,7 @@ describe('sessionCheckMiddleware', () => {
         prisonName: supportedPrisons.BLI,
       })
       req.session.visitSessionData = {
+        allowOverBooking: false,
         applicationReference: 'aaa-bbb-ccc',
         prisoner: prisonerData,
         visitRestriction,
@@ -271,6 +286,7 @@ describe('sessionCheckMiddleware', () => {
 
     it('should not reject a fully booked (zero capacity) visit', () => {
       req.session.visitSessionData = {
+        allowOverBooking: false,
         applicationReference: 'aaa-bbb-ccc',
         prisoner: prisonerData,
         visitRestriction,
@@ -294,6 +310,7 @@ describe('sessionCheckMiddleware', () => {
   describe('application reference', () => {
     it('should redirect to the prisoner profile if visit application reference not set', () => {
       const testData: VisitSessionData = {
+        allowOverBooking: false,
         prisoner: prisonerData,
         visitRestriction,
         visitSlot,
@@ -311,6 +328,7 @@ describe('sessionCheckMiddleware', () => {
   describe('additional support', () => {
     it('should redirect to the prisoner profile if additional support is not set', () => {
       const testData: VisitSessionData = {
+        allowOverBooking: false,
         applicationReference: 'aaa-bbb-ccc',
         prisoner: prisonerData,
         visitRestriction,
@@ -330,6 +348,7 @@ describe('sessionCheckMiddleware', () => {
   describe('main contact data missing', () => {
     ;[
       {
+        allowOverBooking: false,
         applicationReference: 'aaa-bbb-ccc',
         prisoner: prisonerData,
         visitRestriction,
@@ -339,6 +358,7 @@ describe('sessionCheckMiddleware', () => {
         visitReference: 'ab-cd-ef-gh',
       } as VisitSessionData,
       {
+        allowOverBooking: false,
         applicationReference: 'aaa-bbb-ccc',
         prisoner: prisonerData,
         visitRestriction,
@@ -364,6 +384,7 @@ describe('sessionCheckMiddleware', () => {
   describe('request method', () => {
     beforeEach(() => {
       const testData: VisitSessionData = {
+        allowOverBooking: false,
         applicationReference: 'aaa-bbb-ccc',
         prisoner: prisonerData,
         visitRestriction,
@@ -398,6 +419,7 @@ describe('sessionCheckMiddleware', () => {
   describe('check visit status', () => {
     beforeEach(() => {
       const testData: VisitSessionData = {
+        allowOverBooking: false,
         prisoner: prisonerData,
         visitRestriction,
         visitSlot,

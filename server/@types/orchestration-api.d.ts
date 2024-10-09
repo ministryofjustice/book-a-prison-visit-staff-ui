@@ -414,6 +414,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/visit-sessions/session': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Returns a single VSIP session
+     * @description Returns a single VSIP session
+     */
+    get: operations['getVisitSession']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/visit-sessions/schedule': {
     parameters: {
       query?: never
@@ -1199,6 +1219,7 @@ export interface components {
         | 'IGNORE_VISIT_NOTIFICATIONS_EVENT'
         | 'PERSON_RESTRICTION_UPSERTED_EVENT'
         | 'VISITOR_RESTRICTION_UPSERTED_EVENT'
+        | 'VISITOR_UNAPPROVED_EVENT'
       /**
        * @description What was the application method for this event
        * @enum {string}
@@ -1281,27 +1302,27 @@ export interface components {
       visitTimeSlot: components['schemas']['SessionTimeSlotDto']
     }
     PageVisitDto: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
       /** Format: int32 */
-      number?: number
+      totalPages?: number
       sort?: components['schemas']['SortObject'][]
       /** Format: int32 */
-      size?: number
+      number?: number
       first?: boolean
       last?: boolean
+      /** Format: int32 */
+      size?: number
       content?: components['schemas']['VisitDto'][]
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     PageableObject: {
+      sort?: components['schemas']['SortObject'][]
       /** Format: int64 */
       offset?: number
-      sort?: components['schemas']['SortObject'][]
       paged?: boolean
       /** Format: int32 */
       pageNumber?: number
@@ -1336,6 +1357,7 @@ export interface components {
         | 'PRISONER_ALERTS_UPDATED_EVENT'
         | 'PERSON_RESTRICTION_UPSERTED_EVENT'
         | 'VISITOR_RESTRICTION_UPSERTED_EVENT'
+        | 'VISITOR_UNAPPROVED_EVENT'
       /** @description List of details of affected visits */
       affectedVisits: components['schemas']['OrchestrationPrisonerVisitsNotificationDto'][]
     }
@@ -1735,6 +1757,23 @@ export interface components {
        * @example 2000-01-31
        */
       dateOfBirth?: string
+      /** @description Relevant visitor restrictions that impact visits or empty list if none */
+      visitorRestrictions: components['schemas']['VisitorRestrictionDto'][]
+    }
+    /** @description Visitor restriction */
+    VisitorRestrictionDto: {
+      /**
+       * @description Restriction Type
+       * @example BAN
+       * @enum {string}
+       */
+      restrictionType: 'BAN'
+      /**
+       * Format: date
+       * @description Restriction Expiry
+       * @example 2029-12-31
+       */
+      expiryDate?: string
     }
     /** @description AlertDto returned from orchestration, made of fields from AlertResponseDto from Alerts API call */
     AlertDto: {
@@ -3217,6 +3256,7 @@ export interface operations {
             | 'PRISONER_ALERTS_UPDATED_EVENT'
             | 'PERSON_RESTRICTION_UPSERTED_EVENT'
             | 'VISITOR_RESTRICTION_UPSERTED_EVENT'
+            | 'VISITOR_UNAPPROVED_EVENT'
           )[]
         }
       }
@@ -3333,6 +3373,69 @@ export interface operations {
       }
       /** @description Unauthorized to access this endpoint */
       401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  getVisitSession: {
+    parameters: {
+      query: {
+        /**
+         * @description Prison code
+         * @example MDI
+         */
+        prisonCode: string
+        /**
+         * @description Session date
+         * @example 2020-11-01
+         */
+        sessionDate: string
+        /**
+         * @description Session template reference
+         * @example xye-fjc-abc
+         */
+        sessionTemplateReference: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description the session was found and returned */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          '*/*': components['schemas']['VisitSessionDto']
+        }
+      }
+      /** @description Incorrect request */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Session not found */
+      404: {
         headers: {
           [name: string]: unknown
         }
@@ -3489,8 +3592,12 @@ export interface operations {
          * @example dfs-wjs-eqr
          */
         excludedApplicationReference?: string
-        /** @description Advances the available visits slots sought from date by n days. Defaults to 0 if not passed. */
-        advanceFromDateByDays?: number
+        /** @description For PVB only. Allows service to advance the opening session slot booking window by n days on top of any other overrides. Defaults to 0 if not passed. */
+        pvbAdvanceFromDateByDays?: number
+        /** @description minimum override in days for opening session slot booking window, E.g. 2 will set min booking window to today + 2 days */
+        fromDateOverride?: number
+        /** @description maximum override in days for closing session slot booking window, E.g. 28 will set max booking window to today + 28 days */
+        toDateOverride?: number
         /**
          * @description Username for the user making the request. Used to exclude user's pending applications from session capacity count. Optional, ignored if not passed in.
          * @example user-1

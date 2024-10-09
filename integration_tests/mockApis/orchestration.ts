@@ -26,10 +26,12 @@ export default {
     visit,
     applicationMethod,
     username,
+    allowOverBooking = false,
   }: {
     visit: Visit
     applicationMethod: ApplicationMethodType
     username: string
+    allowOverBooking: boolean
   }): SuperAgentRequest => {
     return stubFor({
       request: {
@@ -39,7 +41,7 @@ export default {
           {
             equalToJson: {
               applicationMethodType: applicationMethod,
-              allowOverBooking: true,
+              allowOverBooking,
               actionedBy: username,
             },
           },

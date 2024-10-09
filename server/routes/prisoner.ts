@@ -59,7 +59,10 @@ export default function routes({ auditService, prisonerProfileService }: Service
     }
 
     clearSession(req)
-    const visitSessionData: VisitSessionData = req.session.visitSessionData ?? { prisoner: undefined }
+    const visitSessionData: VisitSessionData = req.session.visitSessionData ?? {
+      prisoner: undefined,
+      allowOverBooking: false,
+    }
 
     visitSessionData.prisoner = {
       name: prisonerDetails.name,

@@ -4,8 +4,9 @@ import { SessionData } from 'express-session'
 import * as cheerio from 'cheerio'
 import { FlashData, VisitSessionData } from '../../@types/bapv'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
-import { Visit } from '../../data/orchestrationApiTypes'
+import { ApplicationValidationErrorResponse, Visit } from '../../data/orchestrationApiTypes'
 import { createMockAuditService, createMockVisitService } from '../../services/testutils/mocks'
+import { SanitisedError } from '../../sanitisedError'
 
 let sessionApp: Express
 
@@ -35,6 +36,7 @@ testJourneys.forEach(journey => {
   describe(`${journey.urlPrefix}/check-your-booking`, () => {
     beforeEach(() => {
       visitSessionData = {
+        allowOverBooking: false,
         prisoner: {
           name: 'prisoner name',
           offenderNo: 'A1234BC',
@@ -184,6 +186,7 @@ testJourneys.forEach(journey => {
               username: 'user1',
               applicationReference: visitSessionData.applicationReference,
               applicationMethod: visitSessionData.requestMethod,
+              allowOverBooking: false,
             })
 
             expect(visitService.cancelVisit).not.toHaveBeenCalled()
@@ -205,33 +208,77 @@ testJourneys.forEach(journey => {
           })
       })
 
-      it('should handle booking failure, display error message and NOT record audit event', () => {
-        visitService.bookVisit.mockRejectedValue({})
-
+      it('should set validation errors in flash and redirect if no overbooking option selected', () => {
         return request(sessionApp)
-          .post(`${journey.urlPrefix}/check-your-booking`)
-          .expect(200)
-          .expect('Content-Type', /html/)
-          .expect(res => {
-            const $ = cheerio.load(res.text)
-            expect($('h1').text().trim()).toBe('Check the visit details before booking')
-            expect($('.govuk-error-summary__body').text()).toContain('Failed to book this visit')
-            expect($('.test-prisoner-name').text()).toContain('prisoner name')
-            expect($('.test-visit-date').text()).toContain('Saturday 12 March 2022')
-            expect($('.test-visit-time').text()).toContain('9:30am to 10:30am')
-            expect($('.test-visit-type').text()).toContain('Open')
-            expect($('form').prop('action')).toBe(`${journey.urlPrefix}/check-your-booking`)
-
-            expect(visitService.bookVisit).toHaveBeenCalledWith({
-              username: 'user1',
-              applicationReference: visitSessionData.applicationReference,
-              applicationMethod: visitSessionData.requestMethod,
-            })
-
-            expect(visitSessionData.visitStatus).not.toBe('BOOKED')
-            expect(visitSessionData.visitReference).toBe(journey.isUpdate ? 'ab-cd-ef-gh' : undefined)
-            expect(auditService.bookedVisit).not.toHaveBeenCalled()
+          .post(`${journey.urlPrefix}/check-your-booking/overbooking`)
+          .expect(302)
+          .expect('location', `${journey.urlPrefix}/check-your-booking/overbooking`)
+          .expect(() => {
+            expect(flashProvider).toHaveBeenCalledWith('errors', [
+              {
+                location: 'body',
+                msg: 'No answer selected',
+                path: 'confirmOverBooking',
+                type: 'field',
+                value: undefined,
+              },
+            ])
           })
+      })
+
+      describe('Handle API errors', () => {
+        describe('HTTP 422 Response', () => {
+          it('should redirect to confirm overbooking page if no_slot_capacity 422 received', () => {
+            const error: SanitisedError<ApplicationValidationErrorResponse> = {
+              name: 'Error',
+              status: 422,
+              message: 'Unprocessable Entity',
+              stack: 'Error: Unprocessable Entity',
+              data: { status: 422, validationErrors: ['APPLICATION_INVALID_NO_SLOT_CAPACITY'] },
+            }
+            visitService.bookVisit.mockRejectedValue(error)
+
+            return request(sessionApp)
+              .post(`${journey.urlPrefix}/check-your-booking`)
+              .expect(302)
+              .expect('location', `${journey.urlPrefix}/check-your-booking/overbooking`)
+              .expect(() => {
+                expect(visitSessionData.visitStatus).not.toBe('BOOKED')
+                expect(visitSessionData.visitReference).toBe(journey.isUpdate ? 'ab-cd-ef-gh' : undefined)
+                expect(auditService.bookedVisit).not.toHaveBeenCalled()
+              })
+          })
+        })
+
+        it('should handle booking failure, display error message and NOT record audit event', () => {
+          visitService.bookVisit.mockRejectedValue({})
+
+          return request(sessionApp)
+            .post(`${journey.urlPrefix}/check-your-booking`)
+            .expect(200)
+            .expect('Content-Type', /html/)
+            .expect(res => {
+              const $ = cheerio.load(res.text)
+              expect($('h1').text().trim()).toBe('Check the visit details before booking')
+              expect($('.govuk-error-summary__body').text()).toContain('Failed to book this visit')
+              expect($('.test-prisoner-name').text()).toContain('prisoner name')
+              expect($('.test-visit-date').text()).toContain('Saturday 12 March 2022')
+              expect($('.test-visit-time').text()).toContain('9:30am to 10:30am')
+              expect($('.test-visit-type').text()).toContain('Open')
+              expect($('form').prop('action')).toBe(`${journey.urlPrefix}/check-your-booking`)
+
+              expect(visitService.bookVisit).toHaveBeenCalledWith({
+                username: 'user1',
+                applicationReference: visitSessionData.applicationReference,
+                applicationMethod: visitSessionData.requestMethod,
+                allowOverBooking: false,
+              })
+
+              expect(visitSessionData.visitStatus).not.toBe('BOOKED')
+              expect(visitSessionData.visitReference).toBe(journey.isUpdate ? 'ab-cd-ef-gh' : undefined)
+              expect(auditService.bookedVisit).not.toHaveBeenCalled()
+            })
+        })
       })
     })
   })

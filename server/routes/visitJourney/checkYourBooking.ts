@@ -1,8 +1,11 @@
 import type { Request, Response } from 'express'
+import { validationResult } from 'express-validator'
 import { requestMethodsBooking } from '../../constants/requestMethods'
 import AuditService from '../../services/auditService'
 import getUrlPrefix from './visitJourneyUtils'
 import { VisitService } from '../../services'
+import { ApplicationValidationErrorResponse } from '../../data/orchestrationApiTypes'
+import { SanitisedError } from '../../sanitisedError'
 
 export default class CheckYourBooking {
   constructor(
@@ -39,12 +42,29 @@ export default class CheckYourBooking {
     const { prisonId } = req.session.selectedEstablishment
     const { offenderNo } = visitSessionData.prisoner
 
+    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
+
+    const { confirmOverBooking } = req.body // this will be set if we have come from overbooking confirmation page
+    if (confirmOverBooking === 'no') {
+      return res.redirect(`${urlPrefix}/select-date-and-time`) // i.e. return early if we're going to
+    }
+    if (confirmOverBooking === 'yes') {
+      visitSessionData.allowOverBooking = true
+    }
+
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      req.flash('errors', errors.array() as [])
+      return res.redirect(`${urlPrefix}/check-your-booking/overbooking`)
+    }
+
     try {
       // 'book' the visit: complete the visit application and get BOOKED visit
       const bookedVisit = await this.visitService.bookVisit({
         username: res.locals.user.username,
         applicationReference: visitSessionData.applicationReference,
         applicationMethod: visitSessionData.requestMethod,
+        allowOverBooking: visitSessionData.allowOverBooking,
       })
 
       visitSessionData.visitReference = bookedVisit.reference
@@ -62,7 +82,16 @@ export default class CheckYourBooking {
         username: res.locals.user.username,
         operationId: res.locals.appInsightsOperationId,
       })
-    } catch {
+    } catch (error) {
+      if (error.status === 422) {
+        const validationErrors =
+          (error as SanitisedError<ApplicationValidationErrorResponse>)?.data?.validationErrors ?? []
+
+        if (validationErrors.includes('APPLICATION_INVALID_NO_SLOT_CAPACITY')) {
+          return res.redirect(`${urlPrefix}/check-your-booking/overbooking`)
+        }
+      }
+
       return res.render('pages/bookAVisit/checkYourBooking', {
         errors: [
           {
@@ -77,11 +106,10 @@ export default class CheckYourBooking {
         visitRestriction: visitSessionData.visitRestriction,
         visitors: visitSessionData.visitors,
         additionalSupport: visitSessionData.visitorSupport.description,
-        urlPrefix: getUrlPrefix(isUpdate, visitSessionData.visitReference),
+        urlPrefix,
       })
     }
 
-    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
     return res.redirect(`${urlPrefix}/confirmation`)
   }
 }

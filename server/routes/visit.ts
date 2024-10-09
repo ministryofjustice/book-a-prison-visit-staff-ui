@@ -24,6 +24,7 @@ import { type Services } from '../services'
 import eventAuditTypes from '../constants/eventAuditTypes'
 import { requestMethodDescriptions, requestMethodsCancellation } from '../constants/requestMethods'
 import { notificationTypeWarnings, notificationTypes } from '../constants/notificationEvents'
+import Overbooking from './visitJourney/overbooking'
 
 const A_DAY_IN_MS = 24 * 60 * 60 * 1000
 const CANCELLATION_LIMIT_DAYS = 28
@@ -172,6 +173,7 @@ export default function routes({
       visitRestriction,
     }
     const visitSessionData: VisitSessionData = {
+      allowOverBooking: false,
       prisoner: {
         name: properCaseFullName(`${prisoner.lastName}, ${prisoner.firstName}`),
         offenderNo: prisoner.prisonerNumber,
@@ -266,6 +268,7 @@ export default function routes({
   const mainContact = new MainContact('update', visitService)
   const requestMethod = new RequestMethod('update')
   const checkYourBooking = new CheckYourBooking('update', auditService, visitService)
+  const overbooking = new Overbooking('update', visitSessionsService)
   const confirmation = new Confirmation('update')
 
   get(
@@ -308,6 +311,21 @@ export default function routes({
     sessionCheckMiddleware({ stage: 2 }),
     dateAndTime.validate(),
     (req, res) => dateAndTime.post(req, res),
+  )
+
+  get(
+    '/:reference/update/select-date-and-time/overbooking',
+    checkVisitReferenceMiddleware,
+    sessionCheckMiddleware({ stage: 2 }),
+    (req, res) => overbooking.viewFromSelectDateTime(req, res),
+  )
+
+  post(
+    '/:reference/update/select-date-and-time/overbooking',
+    checkVisitReferenceMiddleware,
+    sessionCheckMiddleware({ stage: 2 }),
+    overbooking.validate(),
+    (req, res) => dateAndTime.postOverbookings(req, res),
   )
 
   get(
@@ -363,6 +381,21 @@ export default function routes({
     checkVisitReferenceMiddleware,
     sessionCheckMiddleware({ stage: 6 }),
     (req, res) => checkYourBooking.post(req, res),
+  )
+
+  get(
+    '/:reference/update/check-your-booking/overbooking',
+    checkVisitReferenceMiddleware,
+    sessionCheckMiddleware({ stage: 6 }),
+    (req, res) => overbooking.viewFromCheckBooking(req, res),
+  )
+
+  post(
+    '/:reference/update/check-your-booking/overbooking',
+    checkVisitReferenceMiddleware,
+    sessionCheckMiddleware({ stage: 6 }),
+    overbooking.validate(),
+    (req, res) => overbooking.viewFromCheckBooking(req, res),
   )
 
   get(

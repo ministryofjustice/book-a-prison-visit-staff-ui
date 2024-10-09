@@ -40,13 +40,14 @@ export default class OrchestrationApiClient {
   async bookVisit(
     applicationReference: string,
     applicationMethod: ApplicationMethodType,
+    allowOverBooking: boolean,
     username: string,
   ): Promise<Visit> {
     return this.restClient.put({
       path: `/visits/${applicationReference}/book`,
       data: <BookingOrchestrationRequestDto>{
         applicationMethodType: applicationMethod,
-        allowOverBooking: true,
+        allowOverBooking,
         actionedBy: username,
       },
     })
@@ -213,6 +214,21 @@ export default class OrchestrationApiClient {
   }
 
   // orchestration-sessions-controller
+
+  async getSingleVisitSession(
+    prisonCode: string,
+    sessionDate: string,
+    sessionTemplateReference: string,
+  ): Promise<VisitSession> {
+    return this.restClient.get({
+      path: '/visit-sessions/session',
+      query: new URLSearchParams({
+        prisonCode,
+        sessionDate,
+        sessionTemplateReference,
+      }).toString(),
+    })
+  }
 
   async getVisitSessions(
     offenderNo: string,

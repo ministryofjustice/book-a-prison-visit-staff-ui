@@ -1,0 +1,51 @@
+{% extends "layout.njk" %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% set pageTitle = "This time slot is fully booked" %}
+{% set backLinkHref = formAction %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+
+      {% include "partials/errorSummary.njk" %}
+      <h1 class="govuk-heading-l">
+        This time slot is fully booked. Are you sure you want to continue?
+      </h1>
+
+      <p>
+        <span data-test="bookings-count">{{ bookingsCount }}</span> of
+        <span data-test="max-capacity">{{ maxCapacity }}</span> {{ "table" | pluralise(maxCapacity) }} are booked for
+        <span data-test="visit-start-time">{{ visitSession.startTimestamp | formatTime }}</span> to
+        <span data-test="visit-end-time">{{ visitSession.endTimestamp | formatTime }}</span> on 
+        <span data-test="visit-date">{{ visitSession.startTimestamp | formatDate("EEEE d MMMM") }}</span>.
+      </p>
+      <form action="{{ formAction }}" method="POST" novalidate>
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+        {{ govukRadios({
+          name: "confirmOverBooking",
+          items: [
+            {
+              value: "yes",
+              text: "Yes, book for this timeslot"
+            },
+            {
+              value: "no",
+              text: "No, choose a new date and time"
+            }
+          ],
+          errorMessage: errors | findError('confirmOverBooking'),
+          attributes: { "data-test": "confirm-overbooking" }
+        }) }}
+
+        {{ govukButton({
+          text: "Continue",
+          attributes: { "data-test": "submit" },
+          preventDoubleClick: true
+        }) }} 
+      </form>
+
+    </div>
+  </div>
+{% endblock %}

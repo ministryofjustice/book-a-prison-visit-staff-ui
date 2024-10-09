@@ -182,7 +182,7 @@ describe('clearSession', () => {
     visitorList: { visitors: [] },
     adultVisitors: { adults: [] },
     slotsList: {},
-    visitSessionData: { prisoner: undefined },
+    visitSessionData: { allowOverBooking: false, prisoner: undefined },
     selectedEstablishment: TestData.prison(),
   }
 

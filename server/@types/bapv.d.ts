@@ -96,6 +96,7 @@ export type FormError = {
 }
 
 export type VisitSessionData = {
+  allowOverBooking: boolean
   prisoner: {
     name: string
     offenderNo: string
