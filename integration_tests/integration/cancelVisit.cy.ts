@@ -5,6 +5,7 @@ import VisitDetailsPage from '../pages/visitDetails'
 import CancelVisitPage from '../pages/cancelVisit'
 import VisitCancelledPage from '../pages/visitCancelled'
 import HomePage from '../pages/home'
+import { CancelVisitOrchestrationDto } from '../../server/data/orchestrationApiTypes'
 
 context('Cancel visit journey', () => {
   const shortDateFormat = 'yyyy-MM-dd'
@@ -42,13 +43,14 @@ context('Cancel visit journey', () => {
     cy.task('stubGetVisitNotifications', { reference: visitHistoryDetails.visit.reference })
   })
 
-  it('Should cancel a visit', () => {
-    const cancelVisitDto = {
+  it('should cancel a visit', () => {
+    const cancelVisitDto: CancelVisitOrchestrationDto = {
       cancelOutcome: {
         outcomeStatus: 'ESTABLISHMENT_CANCELLED',
         text: 'Overbooking error',
       },
       applicationMethodType: 'NOT_APPLICABLE',
+      actionedBy: 'USER1',
     }
 
     cy.visit('/visit/ab-cd-ef-gh')
@@ -71,13 +73,14 @@ context('Cancel visit journey', () => {
     Page.verifyOnPage(HomePage)
   })
 
-  it('Should cancel a visit with request method captured when VISITOR_CANCELLED', () => {
-    const cancelVisitDto = {
+  it('should cancel a visit with request method captured when VISITOR_CANCELLED', () => {
+    const cancelVisitDto: CancelVisitOrchestrationDto = {
       cancelOutcome: {
         outcomeStatus: 'VISITOR_CANCELLED',
         text: 'Illness',
       },
       applicationMethodType: 'WEBSITE',
+      actionedBy: 'USER1',
     }
 
     cy.visit('/visit/ab-cd-ef-gh')

@@ -768,6 +768,8 @@ export interface components {
         | 'NOT_KNOWN'
         | 'NOT_APPLICABLE'
         | 'BY_PRISONER'
+      /** @description Username for user who actioned this request */
+      actionedBy: string
     }
     /**
      * @description Contact Phone Number
@@ -1306,29 +1308,29 @@ export interface components {
       totalElements?: number
       /** Format: int32 */
       totalPages?: number
-      sort?: components['schemas']['SortObject'][]
-      /** Format: int32 */
-      number?: number
-      first?: boolean
-      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['VisitDto'][]
       /** Format: int32 */
+      number?: number
+      sort?: components['schemas']['SortObject'][]
+      /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
+      first?: boolean
+      last?: boolean
       empty?: boolean
     }
     PageableObject: {
-      sort?: components['schemas']['SortObject'][]
       /** Format: int64 */
       offset?: number
+      sort?: components['schemas']['SortObject'][]
+      unpaged?: boolean
       paged?: boolean
       /** Format: int32 */
       pageNumber?: number
       /** Format: int32 */
       pageSize?: number
-      unpaged?: boolean
     }
     SortObject: {
       direction?: string
@@ -2023,6 +2025,15 @@ export interface components {
        * @description Age of adults in years
        */
       adultAgeYears: number
+      /**
+       * @description Contact email address of prison
+       * @example example@example.com
+       */
+      emailAddress?: string
+      /** @description Contact number of prison */
+      phoneNumber?: string
+      /** @description Web address of prison */
+      webAddress?: string
       /** @description prison user client */
       clients: components['schemas']['PrisonUserClientDto'][]
     }

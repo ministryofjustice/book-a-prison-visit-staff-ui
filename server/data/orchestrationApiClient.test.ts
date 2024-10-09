@@ -80,6 +80,7 @@ describe('orchestrationApiClient', () => {
           text: 'cancellation reason',
         },
         applicationMethodType: 'NOT_KNOWN',
+        actionedBy: 'user1',
       }
 
       const result: Visit = TestData.visit()

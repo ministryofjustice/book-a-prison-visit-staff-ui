@@ -73,6 +73,7 @@ export default {
                 text: cancelVisitDto.cancelOutcome.text,
               },
               applicationMethodType: cancelVisitDto.applicationMethodType,
+              actionedBy: cancelVisitDto.actionedBy,
             },
             ignoreArrayOrder: true,
           },
