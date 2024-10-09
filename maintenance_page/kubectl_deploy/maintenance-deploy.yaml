@@ -14,6 +14,13 @@ spec:
     spec:
       containers:
       - name: maintenance-page-staff
-        image:  ministryofjustice/vsip-maintenance:0.1.0
+        image:  ministryofjustice/vsip-maintenance:0.1.1
         ports:
         - containerPort: 8080
+
+        securityContext:
+          capabilities:
+            drop: ["ALL"]
+          allowPrivilegeEscalation: false
+          seccompProfile:
+            type: RuntimeDefault
