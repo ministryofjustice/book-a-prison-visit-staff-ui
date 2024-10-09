@@ -118,6 +118,7 @@ describe('Visit service', () => {
             text: 'cancellation reason',
           },
           applicationMethodType: 'NOT_KNOWN',
+          actionedBy: 'user1',
         }
 
         orchestrationApiClient.cancelVisit.mockResolvedValue(expectedResult)
@@ -129,7 +130,7 @@ describe('Visit service', () => {
 
         expect(orchestrationApiClient.cancelVisit).toHaveBeenCalledTimes(1)
         expect(orchestrationApiClient.cancelVisit).toHaveBeenCalledWith(expectedResult.reference, cancelVisitDto)
-        expect(result).toEqual(expectedResult)
+        expect(result).toStrictEqual(expectedResult)
       })
     })
 
