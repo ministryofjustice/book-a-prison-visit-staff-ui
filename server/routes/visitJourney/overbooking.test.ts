@@ -96,6 +96,7 @@ testJourneys.forEach(journey => {
           .expect(res => {
             const $ = cheerio.load(res.text)
             expect($('h1').text().trim()).toBe('This time slot is fully booked. Are you sure you want to continue?')
+            expect($('.govuk-back-link').attr('href')).toBe(`${journey.urlPrefix}/select-date-and-time`)
             expect($('form').prop('action')).toBe(`${journey.urlPrefix}/select-date-and-time/overbooking`)
             expect($('[data-test=bookings-count]').text().trim()).toBe(
               (visitSessionData.visitSlot.capacity - visitSessionData.visitSlot.availableTables).toString(),
@@ -124,7 +125,8 @@ testJourneys.forEach(journey => {
           .expect(res => {
             const $ = cheerio.load(res.text)
             expect($('h1').text().trim()).toBe('This time slot is fully booked. Are you sure you want to continue?')
-            expect($('.govuk-back-link').attr('href')).toBe(`${journey.urlPrefix}/select-date-and-time/overbooking`)
+            expect($('.govuk-back-link').attr('href')).toBe(`${journey.urlPrefix}/select-date-and-time`)
+            expect($('form').prop('action')).toBe(`${journey.urlPrefix}/select-date-and-time/overbooking`)
             expect($('.govuk-error-summary__body').text()).toContain('No answer selected')
             expect($('.govuk-error-summary__body a').attr('href')).toBe('#confirmOverBooking-error')
             expect($('#confirmOverBooking-error').text()).toContain('No answer selected')
@@ -314,6 +316,7 @@ testJourneys.forEach(journey => {
           .expect(res => {
             const $ = cheerio.load(res.text)
             expect($('h1').text().trim()).toBe('This time slot is fully booked. Are you sure you want to continue?')
+            expect($('.govuk-back-link').attr('href')).toBe(`${journey.urlPrefix}/check-your-booking`)
             expect($('form').prop('action')).toBe(`${journey.urlPrefix}/check-your-booking/overbooking`)
             expect($('[data-test=bookings-count]').text().trim()).toBe(visitSession.openVisitBookedCount.toString())
             expect($('[data-test=max-capacity]').text().trim()).toBe(visitSession.openVisitCapacity.toString())
@@ -334,6 +337,7 @@ testJourneys.forEach(journey => {
           .expect(res => {
             const $ = cheerio.load(res.text)
             expect($('h1').text().trim()).toBe('This time slot is fully booked. Are you sure you want to continue?')
+            expect($('.govuk-back-link').attr('href')).toBe(`${journey.urlPrefix}/check-your-booking`)
             expect($('form').prop('action')).toBe(`${journey.urlPrefix}/check-your-booking/overbooking`)
             expect($('[data-test=bookings-count]').text().trim()).toBe(visitSession.closedVisitBookedCount.toString())
             expect($('[data-test=max-capacity]').text().trim()).toBe(visitSession.closedVisitCapacity.toString())
@@ -362,7 +366,8 @@ testJourneys.forEach(journey => {
           .expect(res => {
             const $ = cheerio.load(res.text)
             expect($('h1').text().trim()).toBe('This time slot is fully booked. Are you sure you want to continue?')
-            expect($('.govuk-back-link').attr('href')).toBe(`${journey.urlPrefix}/check-your-booking/overbooking`)
+            expect($('.govuk-back-link').attr('href')).toBe(`${journey.urlPrefix}/check-your-booking`)
+            expect($('form').prop('action')).toBe(`${journey.urlPrefix}/check-your-booking/overbooking`)
             expect($('.govuk-error-summary__body').text()).toContain('No answer selected')
             expect($('.govuk-error-summary__body a').attr('href')).toBe('#confirmOverBooking-error')
             expect($('#confirmOverBooking-error').text()).toContain('No answer selected')
