@@ -440,7 +440,7 @@ describe('/visit/:reference', () => {
         })
     })
 
-    describe('Visit notification messages', () => {
+    describe('Visit notification messages and actions', () => {
       it('should not display visit notification banner or do not change button when no notification types set', () => {
         return request(app)
           .get('/visit/ab-cd-ef-gh')
@@ -496,7 +496,7 @@ describe('/visit/:reference', () => {
           })
       })
 
-      it('should display a two visit notification banners and do not change button when two notification types are set', () => {
+      it('should display two visit notification banners and do not change button when two notification types are set', () => {
         visitService.getFullVisitDetails.mockResolvedValue({
           visitHistoryDetails,
           visitors,
@@ -519,6 +519,60 @@ describe('/visit/:reference', () => {
             )
             expect($('[data-test="clear-notifications"]').length).toBe(1)
             expect($('[data-test="clear-notifications"]').text()).toContain('Do not change')
+          })
+      })
+
+      it('should not show the Update button if the visit has a prisoner released notification', () => {
+        visitService.getFullVisitDetails.mockResolvedValue({
+          visitHistoryDetails,
+          visitors,
+          notifications: ['PRISONER_RELEASED_EVENT', 'PRISON_VISITS_BLOCKED_FOR_DATE'],
+          additionalSupport,
+        })
+
+        return request(app)
+          .get('/visit/ab-cd-ef-gh')
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('[data-test="update-visit"]').length).toBeFalsy()
+          })
+      })
+
+      it('should not show the Update button if the visit has a prisoner transferred notification', () => {
+        visitService.getFullVisitDetails.mockResolvedValue({
+          visitHistoryDetails,
+          visitors,
+          notifications: ['PRISONER_RECEIVED_EVENT', 'PRISON_VISITS_BLOCKED_FOR_DATE'],
+          additionalSupport,
+        })
+
+        return request(app)
+          .get('/visit/ab-cd-ef-gh')
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('[data-test="update-visit"]').length).toBeFalsy()
+          })
+      })
+
+      it('should show the Update button if the visit has other notifications', () => {
+        visitService.getFullVisitDetails.mockResolvedValue({
+          visitHistoryDetails,
+          visitors,
+          notifications: ['PRISON_VISITS_BLOCKED_FOR_DATE'],
+          additionalSupport,
+        })
+
+        return request(app)
+          .get('/visit/ab-cd-ef-gh')
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('[data-test="update-visit"]').length).toBeTruthy()
           })
       })
     })
