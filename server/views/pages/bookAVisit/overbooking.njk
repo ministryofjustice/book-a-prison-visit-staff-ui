@@ -3,7 +3,6 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% set pageTitle = "This time slot is fully booked" %}
-{% set backLinkHref = formAction %}
 
 {% block content %}
   <div class="govuk-grid-row">
@@ -21,7 +20,7 @@
         <span data-test="visit-end-time">{{ visitSession.endTimestamp | formatTime }}</span> on 
         <span data-test="visit-date">{{ visitSession.startTimestamp | formatDate("EEEE d MMMM") }}</span>.
       </p>
-      <form action="{{ formAction }}" method="POST" novalidate>
+      <form action="{{ backLinkHref }}/overbooking" method="POST" novalidate>
         <input type="hidden" name="_csrf" value="{{ csrfToken }}">
         {{ govukRadios({
           name: "confirmOverBooking",

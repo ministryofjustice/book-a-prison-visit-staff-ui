@@ -30,6 +30,7 @@ export default class Overbooking {
       maxCapacity,
       visitSession: visitSessionData.visitSlot,
       formAction: `${urlPrefix}/select-date-and-time/overbooking`,
+      backLinkHref: `${urlPrefix}/select-date-and-time`,
     })
   }
 
@@ -67,7 +68,7 @@ export default class Overbooking {
       bookingsCount,
       maxCapacity,
       visitSession,
-      formAction: `${urlPrefix}/check-your-booking/overbooking`,
+      backLinkHref: `${urlPrefix}/check-your-booking`,
     })
   }
 
