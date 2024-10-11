@@ -2,7 +2,10 @@
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
-{% set pageTitle = "This time slot is fully booked" %}
+{% set pageHeaderTitle = "This time slot is fully booked" %}
+{% set pageTitle %}
+{% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
+{% endset %}
 
 {% block content %}
   <div class="govuk-grid-row">
