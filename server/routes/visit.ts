@@ -5,7 +5,11 @@ import { BadRequest } from 'http-errors'
 import { differenceInCalendarDays } from 'date-fns'
 import visitCancellationReasons from '../constants/visitCancellationReasons'
 import { Prisoner } from '../data/prisonerOffenderSearchTypes'
-import { CancelVisitOrchestrationDto, IgnoreVisitNotificationsDto } from '../data/orchestrationApiTypes'
+import {
+  CancelVisitOrchestrationDto,
+  IgnoreVisitNotificationsDto,
+  NotificationType,
+} from '../data/orchestrationApiTypes'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import { isValidVisitReference } from './validationChecks'
 import { clearSession, getFlashFormValues } from './visitorUtils'
@@ -28,6 +32,7 @@ import Overbooking from './visitJourney/overbooking'
 
 const A_DAY_IN_MS = 24 * 60 * 60 * 1000
 const CANCELLATION_LIMIT_DAYS = 28
+const NO_UPDATE_NOTIFICATION_TYPES: NotificationType[] = ['PRISONER_RECEIVED_EVENT', 'PRISONER_RELEASED_EVENT']
 
 export default function routes({
   auditService,
@@ -102,7 +107,9 @@ export default function routes({
     const visitStartTimestamp = new Date(visit.startTimestamp)
     const chosenFutureInterval = new Date(visitStartTimestamp.getTime() + A_DAY_IN_MS * CANCELLATION_LIMIT_DAYS)
 
-    const showUpdate = nowTimestamp < visitStartTimestamp
+    const showUpdate =
+      nowTimestamp < visitStartTimestamp &&
+      !notifications.some(notification => NO_UPDATE_NOTIFICATION_TYPES.includes(notification))
     const showCancel = nowTimestamp < chosenFutureInterval
 
     const filteredNotifications = notifications.filter(

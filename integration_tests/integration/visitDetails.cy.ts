@@ -23,7 +23,7 @@ context('Visit details page', () => {
     cy.signIn()
   })
 
-  it('Should display all visit information, past visit', () => {
+  it('should display all visit information, past visit', () => {
     const prisoner = TestData.prisoner()
     const { prisonerNumber: offenderNo } = prisoner
     const prisonerDisplayName = 'Smith, John'
@@ -72,7 +72,7 @@ context('Visit details page', () => {
     visitDetailsPage.visitPhone().contains('01234 567890')
   })
 
-  it('Should show update/cancel button and notifications for future visit', () => {
+  it('should show update and cancel buttons, and notifications for future visit (date blocked)', () => {
     const today = new Date()
     const prisoner = TestData.prisoner()
     const { prisonerNumber: offenderNo } = prisoner
@@ -98,7 +98,7 @@ context('Visit details page', () => {
       }),
     ]
 
-    const notifications: NotificationType[] = ['PRISONER_RELEASED_EVENT']
+    const notifications: NotificationType[] = ['PRISON_VISITS_BLOCKED_FOR_DATE']
 
     cy.task('stubPrisonerById', prisoner)
     cy.task('stubVisitHistory', visitHistoryDetails)
@@ -111,10 +111,10 @@ context('Visit details page', () => {
     visitDetailsPage.visitReference().contains('ab-cd-ef-gh')
     visitDetailsPage.updateBooking().should('have.length', 1)
     visitDetailsPage.cancelBooking().should('have.length', 1)
-    visitDetailsPage.clearNotifications().should('have.length', 1)
+    visitDetailsPage.clearNotifications().should('have.length', 0)
 
     // notifications
-    visitDetailsPage.visitNotification().eq(0).contains(notificationTypeWarnings.PRISONER_RELEASED_EVENT)
+    visitDetailsPage.visitNotification().eq(0).contains(notificationTypeWarnings.PRISON_VISITS_BLOCKED_FOR_DATE)
 
     // Prisoner Details
     visitDetailsPage.prisonerName().contains(prisonerDisplayName)
@@ -122,7 +122,57 @@ context('Visit details page', () => {
     visitDetailsPage.visitDateAndTime().contains(format(new Date(futureVisitDate), dateFormatWithDay))
   })
 
-  it('Should show different tabs when sub navigation is used', () => {
+  it('should show cancel and do not change buttons, and notifications for future visit (prisoner transferred)', () => {
+    const today = new Date()
+    const prisoner = TestData.prisoner()
+    const { prisonerNumber: offenderNo } = prisoner
+    const prisonerDisplayName = 'Smith, John'
+
+    const futureVisitDate = format(add(today, { months: 1 }), shortDateFormat)
+    const visitHistoryDetails = TestData.visitHistoryDetails({
+      visit: TestData.visit({
+        startTimestamp: `${futureVisitDate}T12:00:00`,
+        endTimestamp: `${futureVisitDate}T14:00:00`,
+      }),
+    })
+
+    const childDob = format(sub(today, { years: 5 }), shortDateFormat)
+    const contacts = [
+      TestData.contact({ personId: 4321 }),
+      TestData.contact({
+        personId: 4322,
+        firstName: 'Bob',
+        dateOfBirth: childDob,
+        relationshipCode: 'SON',
+        relationshipDescription: 'Son',
+      }),
+    ]
+
+    const notifications: NotificationType[] = ['PRISONER_RECEIVED_EVENT']
+
+    cy.task('stubPrisonerById', prisoner)
+    cy.task('stubVisitHistory', visitHistoryDetails)
+    cy.task('stubPrisonerSocialContacts', { offenderNo, contacts, approvedVisitorsOnly: 'false' })
+    cy.task('stubGetVisitNotifications', { reference: TestData.visit().reference, notifications })
+    cy.visit('/visit/ab-cd-ef-gh')
+
+    const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage)
+
+    visitDetailsPage.visitReference().contains('ab-cd-ef-gh')
+    visitDetailsPage.updateBooking().should('have.length', 0)
+    visitDetailsPage.cancelBooking().should('have.length', 1)
+    visitDetailsPage.clearNotifications().should('have.length', 1)
+
+    // notifications
+    visitDetailsPage.visitNotification().eq(0).contains(notificationTypeWarnings.PRISONER_RECEIVED_EVENT)
+
+    // Prisoner Details
+    visitDetailsPage.prisonerName().contains(prisonerDisplayName)
+    // Visit Details
+    visitDetailsPage.visitDateAndTime().contains(format(new Date(futureVisitDate), dateFormatWithDay))
+  })
+
+  it('should show different tabs when sub navigation is used', () => {
     const today = new Date()
     const prisoner = TestData.prisoner()
     const { prisonerNumber: offenderNo } = prisoner
