@@ -39,11 +39,7 @@
 {% endblock %}
 
 {% block footer %}
-  {% if feComponents.footer %}
-    {{ feComponents.footer | safe }}
-  {% else %}
-    {% include "partials/footer.njk" %}
-  {% endif %}
+  {% include "partials/footer.njk" %}
 {% endblock %}
 
 {% block bodyEnd %}

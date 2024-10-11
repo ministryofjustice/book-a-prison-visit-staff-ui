@@ -1,7 +1,6 @@
 import { dataAccess } from '../data'
 import AuditService from './auditService'
 import BlockedDatesService from './blockedDatesService'
-import FrontendComponentsService from './frontendComponentsService'
 import PrisonerProfileService from './prisonerProfileService'
 import PrisonerSearchService from './prisonerSearchService'
 import PrisonerVisitorsService from './prisonerVisitorsService'
@@ -16,7 +15,6 @@ export const services = () => {
     hmppsAuthClient,
     manageUsersApiClient,
     nomisUserRolesApiClient,
-    frontendComponentsClientBuilder,
     orchestrationApiClientBuilder,
     prisonApiClientBuilder,
     prisonerContactRegistryApiClientBuilder,
@@ -29,8 +27,6 @@ export const services = () => {
   const auditService = new AuditService()
 
   const blockedDatesService = new BlockedDatesService(orchestrationApiClientBuilder, hmppsAuthClient)
-
-  const frontendComponentsService = new FrontendComponentsService(frontendComponentsClientBuilder)
 
   const supportedPrisonsService = new SupportedPrisonsService(
     orchestrationApiClientBuilder,
@@ -72,7 +68,6 @@ export const services = () => {
   return {
     auditService,
     blockedDatesService,
-    frontendComponentsService,
     prisonerProfileService,
     prisonerSearchService,
     prisonerVisitorsService,
@@ -90,7 +85,6 @@ export type Services = ReturnType<typeof services>
 export {
   AuditService,
   BlockedDatesService,
-  FrontendComponentsService,
   PrisonerProfileService,
   PrisonerSearchService,
   PrisonerVisitorsService,

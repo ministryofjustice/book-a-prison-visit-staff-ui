@@ -7,7 +7,6 @@ context('Change establishment', () => {
   beforeEach(() => {
     cy.task('reset')
     cy.task('stubSignIn')
-    cy.task('stubFrontendComponents')
     cy.task('stubManageUser')
     cy.task('stubSupportedPrisonIds')
     cy.task('stubPrisonNames')

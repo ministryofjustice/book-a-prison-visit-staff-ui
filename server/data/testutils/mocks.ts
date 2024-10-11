@@ -18,7 +18,6 @@ jest.mock('../../applicationInfo', () => {
 })
 
 import {
-  FrontendComponentsClient,
   HmppsAuthClient,
   ManageUsersApiClient,
   NomisUserRolesApiClient,
@@ -31,9 +30,6 @@ import {
 } from '..'
 
 jest.mock('..')
-export const createMockFrontendComponentsClient = () =>
-  new FrontendComponentsClient(null) as jest.Mocked<FrontendComponentsClient>
-
 export const createMockHmppsAuthClient = () => new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
 
 export const createMockManageUsersApiClient = () => new ManageUsersApiClient() as jest.Mocked<ManageUsersApiClient>
