@@ -12,7 +12,6 @@ import {
   isOriginalVisitSlot,
 } from './utils'
 import getResultsPagingLinksTestData from './utils.testData'
-import TestData from '../routes/testutils/testData'
 
 describe('Convert to title case', () => {
   it('null string', () => {

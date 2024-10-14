@@ -10,7 +10,7 @@ import {
   addWeeks,
   subWeeks,
 } from 'date-fns'
-import { VisitSessionData, VisitSlot } from '../@types/bapv'
+import { VisitSlot } from '../@types/bapv'
 
 export const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
