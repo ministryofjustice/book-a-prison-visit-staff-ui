@@ -9,8 +9,10 @@ import {
   safeReturnUrl,
   getParsedDateFromQueryString,
   getWeekOfDatesStartingMonday,
+  isOriginalVisitSlot,
 } from './utils'
 import getResultsPagingLinksTestData from './utils.testData'
+import TestData from '../routes/testutils/testData'
 
 describe('Convert to title case', () => {
   it('null string', () => {
@@ -168,6 +170,75 @@ describe('getWeekOfDatesStartingMonday', () => {
       weekOfDates: [],
       previousWeek: '',
       nextWeek: '',
+    })
+  })
+})
+
+describe('isOriginalVisitSlot', () => {
+  ;[
+    {
+      // Matches
+      sessionSlot: {
+        sessionTemplateReference: 'ab-cd-ef-gh',
+        startTimestamp: '2020-01-01T10:00:00',
+      },
+      originalVisitSlot: {
+        sessionTemplateReference: 'ab-cd-ef-gh',
+        startTimestamp: '2020-01-01T10:00:00',
+      },
+      expected: true,
+    },
+    {
+      // Incorrect sessionTemplateReference
+      sessionSlot: {
+        sessionTemplateReference: 'gh-ef-cd-ab',
+        startTimestamp: '2020-01-01T10:00:00',
+      },
+      originalVisitSlot: {
+        sessionTemplateReference: 'ab-cd-ef-gh',
+        startTimestamp: '2020-01-01T10:00:00',
+      },
+      expected: false,
+    },
+    {
+      // Incorrect startTimestamp(time)
+      sessionSlot: {
+        sessionTemplateReference: 'ab-cd-ef-gh',
+        startTimestamp: '2020-01-01T14:00:00',
+      },
+      originalVisitSlot: {
+        sessionTemplateReference: 'ab-cd-ef-gh',
+        startTimestamp: '2020-01-01T10:00:00',
+      },
+      expected: false,
+    },
+    {
+      // Incorrect startTimestamp(date)
+      sessionSlot: {
+        sessionTemplateReference: 'ab-cd-ef-gh',
+        startTimestamp: '2021-01-01T10:00:00',
+      },
+      originalVisitSlot: {
+        sessionTemplateReference: 'ab-cd-ef-gh',
+        startTimestamp: '2020-01-01T10:00:00',
+      },
+      expected: false,
+    },
+    {
+      // Incorrect sessionTemplateReference and startTimestamp
+      sessionSlot: {
+        sessionTemplateReference: 'gh-ef-cd-ab',
+        startTimestamp: '2021-01-01T10:00:00',
+      },
+      originalVisitSlot: {
+        sessionTemplateReference: 'ab-cd-ef-gh',
+        startTimestamp: '2020-01-01T10:00:00',
+      },
+      expected: false,
+    },
+  ].forEach(testData => {
+    it(`should output ${testData.expected} when supplied with ${testData.sessionSlot.sessionTemplateReference} ${testData.sessionSlot.startTimestamp} and ${testData.originalVisitSlot.sessionTemplateReference} ${testData.originalVisitSlot.startTimestamp}`, () => {
+      expect(isOriginalVisitSlot(testData.sessionSlot, testData.originalVisitSlot)).toBe(testData.expected)
     })
   })
 })
