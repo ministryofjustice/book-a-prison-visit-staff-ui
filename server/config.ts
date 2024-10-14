@@ -49,7 +49,7 @@ export default {
     secret: get('SESSION_SECRET', 'app-insecure-default-session', requiredInProduction),
     expiryMinutes: Number(get('WEB_SESSION_TIMEOUT_IN_MINUTES', 120)),
   },
-  dpsHome: get('DPS_URL', 'https://digital-dev.prison.service.justice.gov.uk/', requiredInProduction),
+  dpsHome: get('DPS_URL', 'https://dps-dev.prison.service.justice.gov.uk/', requiredInProduction),
   dpsPrisoner: get(
     'DPS_PRISONER_URL',
     'https://prisoner-dev.digital.prison.service.justice.gov.uk/',
@@ -151,14 +151,6 @@ export default {
         deadline: Number(get('ORCHESTRATION_API_TIMEOUT_DEADLINE', 10000)),
       },
       agent: new AgentConfig(Number(get('ORCHESTRATION_API_TIMEOUT_RESPONSE', 10000))),
-    },
-    frontendComponents: {
-      url: get('COMPONENT_API_URL', 'http://localhost:8082/frontend-components', requiredInProduction),
-      timeout: {
-        response: Number(get('FRONTEND_COMPONENTS_TIMEOUT_RESPONSE', 3000)),
-        deadline: Number(get('FRONTEND_COMPONENTS_TIMEOUT_DEADLINE', 3000)),
-      },
-      agent: new AgentConfig(Number(get('FRONTEND_COMPONENTS_TIMEOUT_RESPONSE', 3000))),
     },
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),

@@ -20,7 +20,6 @@ jest.mock('../../applicationInfo', () => {
 import {
   AuditService,
   BlockedDatesService,
-  FrontendComponentsService,
   PrisonerProfileService,
   PrisonerSearchService,
   PrisonerVisitorsService,
@@ -37,9 +36,6 @@ export const createMockAuditService = () => new AuditService(null) as jest.Mocke
 
 export const createMockBlockedDatesService = () =>
   new BlockedDatesService(null, null) as jest.Mocked<BlockedDatesService>
-
-export const createMockFrontendComponentsService = () =>
-  new FrontendComponentsService(null) as jest.Mocked<FrontendComponentsService>
 
 export const createMockPrisonerProfileService = () =>
   new PrisonerProfileService(null, null, null) as jest.Mocked<PrisonerProfileService>

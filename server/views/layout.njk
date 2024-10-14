@@ -5,22 +5,19 @@
   <link href="/assets/stylesheets/application.css?{{ version }}" rel="stylesheet"/>
   <script src="/assets/js/jquery.min.js"></script> 
 
-  {% if feComponents.jsIncludes %}
-    {% for js in feComponents.jsIncludes %}
-      <script src="{{ js }}" nonce="{{ cspNonce }}"></script>
-    {% endfor %}
-  {% endif %}
+  {% for js in feComponents.jsIncludes %}
+    <script src="{{ js }}" nonce="{{ cspNonce }}"></script>
+  {% endfor %}
 
-  {% if feComponents.cssIncludes %}
-    {% for css in feComponents.cssIncludes %}
-      <link href="{{ css }}" nonce="{{ cspNonce }}" rel="stylesheet" />
-    {% endfor %}
-  {% endif %}
+  {% for css in feComponents.cssIncludes %}
+    <link href="{{ css }}" nonce="{{ cspNonce }}" rel="stylesheet" />
+  {% endfor %}
 {% endblock %}
 
 {% block pageTitle %}{{pageTitle | default(applicationName)}}{% endblock %}
 
 {% block header %}
+  {# TODO {{ feComponents.header | safe }} #}
   {% include "partials/header.njk" %}
 {% endblock %}
 
@@ -39,11 +36,7 @@
 {% endblock %}
 
 {% block footer %}
-  {% if feComponents.footer %}
     {{ feComponents.footer | safe }}
-  {% else %}
-    {% include "partials/footer.njk" %}
-  {% endif %}
 {% endblock %}
 
 {% block bodyEnd %}
