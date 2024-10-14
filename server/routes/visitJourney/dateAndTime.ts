@@ -5,6 +5,7 @@ import AuditService from '../../services/auditService'
 import { getFlashFormValues, getSelectedSlot, getSlotByTimeAndRestriction } from '../visitorUtils'
 import getUrlPrefix from './visitJourneyUtils'
 import { VisitService, VisitSessionsService } from '../../services'
+import { isSameVisitSlot } from '../../utils/utils'
 
 export default class DateAndTime {
   constructor(
@@ -133,10 +134,17 @@ export default class DateAndTime {
 
     visitSessionData.visitSlot = getSelectedSlot(req.session.slotsList, req.body['visit-date-and-time'])
 
+    const isOriginalSlot = isUpdate
+      ? isSameVisitSlot(visitSessionData.visitSlot, visitSessionData.originalVisitSlot)
+      : false
+
     // If 'available tables is less than or equal to zero
-    // Then no capacity was originally displayed, so show overbooking page
     if (visitSessionData.visitSlot.availableTables <= 0) {
-      return res.redirect(`${urlPrefix}/select-date-and-time/overbooking`)
+      // If on update journey, and not the original slot OR is not update journey
+      if ((isUpdate && !isOriginalSlot) || !isUpdate) {
+        // show overbooking page
+        return res.redirect(`${urlPrefix}/select-date-and-time/overbooking`)
+      }
     }
 
     await this.reserveOrChangeApplication(req, res)

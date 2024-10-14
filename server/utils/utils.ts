@@ -10,6 +10,7 @@ import {
   addWeeks,
   subWeeks,
 } from 'date-fns'
+import { VisitSlot } from '../@types/bapv'
 
 export const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
@@ -156,4 +157,12 @@ export const getWeekOfDatesStartingMonday = (
   const nextWeek = format(addWeeks(weekStartDate, 1), dateFormat)
 
   return { weekOfDates, previousWeek, nextWeek }
+}
+
+export const isSameVisitSlot = (visitSlot: VisitSlot, originalVisitSlot: VisitSlot): boolean => {
+  const isMatchingTemplateReference = visitSlot.sessionTemplateReference === originalVisitSlot.sessionTemplateReference
+
+  const isMatchingStartTimestamp = visitSlot.startTimestamp === originalVisitSlot.startTimestamp
+
+  return isMatchingTemplateReference && isMatchingStartTimestamp
 }

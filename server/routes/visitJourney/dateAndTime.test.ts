@@ -29,6 +29,58 @@ const testJourneys = [
   { urlPrefix: '/visit/ab-cd-ef-gh/update', isUpdate: true },
 ]
 
+const visitSlot1: VisitSlot = {
+  id: '1',
+  sessionTemplateReference: 'v9d.7ed.7u1',
+  prisonId,
+  startTimestamp: '2022-02-14T10:00:00',
+  endTimestamp: '2022-02-14T11:00:00',
+  availableTables: 15,
+  capacity: 30,
+  visitRoom: 'room name',
+  // representing a pre-existing visit that is BOOKED
+  sessionConflicts: ['DOUBLE_BOOKING_OR_RESERVATION'],
+  visitRestriction: 'OPEN',
+}
+
+const visitSlot2: VisitSlot = {
+  id: '2',
+  sessionTemplateReference: 'v9d.7ed.7u2',
+  prisonId,
+  startTimestamp: '2022-02-14T11:59:00',
+  endTimestamp: '2022-02-14T12:59:00',
+  availableTables: 1,
+  capacity: 30,
+  visitRoom: 'room name',
+  visitRestriction: 'OPEN',
+}
+
+const visitSlot3: VisitSlot = {
+  id: '3',
+  sessionTemplateReference: 'v9d.7ed.7u3',
+  prisonId,
+  startTimestamp: '2022-02-14T12:00:00',
+  endTimestamp: '2022-02-14T13:05:00',
+  availableTables: 5,
+  capacity: 30,
+  visitRoom: 'room name',
+  // representing the RESERVED visit being handled in this session
+  sessionConflicts: ['DOUBLE_BOOKING_OR_RESERVATION'],
+  visitRestriction: 'OPEN',
+}
+
+const visitSlot4: VisitSlot = {
+  id: '4',
+  sessionTemplateReference: 'a1b.2cd.3e4',
+  prisonId,
+  startTimestamp: '2022-02-14T15:30:00',
+  endTimestamp: '2022-02-14T16:35:00',
+  availableTables: 0, // used for confirm overbooking page (no available tables)
+  capacity: 5,
+  visitRoom: 'room name',
+  visitRestriction: 'OPEN',
+}
+
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
   flashProvider.mockImplementation((key: keyof FlashData) => {
@@ -81,58 +133,8 @@ testJourneys.forEach(journey => {
             afternoon: [],
           },
           slots: {
-            morning: [
-              {
-                id: '1',
-                sessionTemplateReference: 'v9d.7ed.7u1',
-                prisonId,
-                startTimestamp: '2022-02-14T10:00:00',
-                endTimestamp: '2022-02-14T11:00:00',
-                availableTables: 15,
-                capacity: 30,
-                visitRoom: 'room name',
-                // representing a pre-existing visit that is BOOKED
-                sessionConflicts: ['DOUBLE_BOOKING_OR_RESERVATION'],
-                visitRestriction: 'OPEN',
-              },
-              {
-                id: '2',
-                sessionTemplateReference: 'v9d.7ed.7u2',
-                prisonId,
-                startTimestamp: '2022-02-14T11:59:00',
-                endTimestamp: '2022-02-14T12:59:00',
-                availableTables: 1,
-                capacity: 30,
-                visitRoom: 'room name',
-                visitRestriction: 'OPEN',
-              },
-            ],
-            afternoon: [
-              {
-                id: '3',
-                sessionTemplateReference: 'v9d.7ed.7u3',
-                prisonId,
-                startTimestamp: '2022-02-14T12:00:00',
-                endTimestamp: '2022-02-14T13:05:00',
-                availableTables: 5,
-                capacity: 30,
-                visitRoom: 'room name',
-                // representing the RESERVED visit being handled in this session
-                sessionConflicts: ['DOUBLE_BOOKING_OR_RESERVATION'],
-                visitRestriction: 'OPEN',
-              },
-              {
-                id: '4',
-                sessionTemplateReference: 'a1b.2cd.3e4',
-                prisonId,
-                startTimestamp: '2022-02-14T15:30:00',
-                endTimestamp: '2022-02-14T16:35:00',
-                availableTables: 0, // used for confirm overbooking page (no available tables)
-                capacity: 5,
-                visitRoom: 'room name',
-                visitRestriction: 'OPEN',
-              },
-            ],
+            morning: [visitSlot1, visitSlot2],
+            afternoon: [visitSlot3, visitSlot4],
           },
         },
       ],
@@ -141,12 +143,15 @@ testJourneys.forEach(journey => {
     beforeEach(() => {
       // visit reference only known on update journey
       visitSessionData.visitReference = journey.isUpdate ? 'ab-cd-ef-gh' : undefined
+      visitSessionData.originalVisitSlot = journey.isUpdate ? visitSlot1 : undefined
 
       visitSessionsService.getVisitSessions.mockResolvedValue({ slotsList, whereaboutsAvailable: true })
     })
 
     describe(`GET ${journey.urlPrefix}/select-date-and-time`, () => {
       it('should render the available sessions list with none selected', () => {
+        visitSessionData.originalVisitSlot = journey.isUpdate ? visitSlot2 : undefined
+
         return request(sessionApp)
           .get(`${journey.urlPrefix}/select-date-and-time`)
           .expect(200)
@@ -403,18 +408,6 @@ testJourneys.forEach(journey => {
       })
 
       it('should save new choice to session, update visit application and redirect to additional support page if existing session data present', () => {
-        visitSessionData.visitSlot = {
-          id: '1',
-          sessionTemplateReference: 'v9d.7ed.7u1',
-          prisonId,
-          startTimestamp: '2022-02-14T10:00:00',
-          endTimestamp: '2022-02-14T11:00:00',
-          availableTables: 15,
-          capacity: 30,
-          visitRoom: 'room name',
-          visitRestriction: 'OPEN',
-        }
-
         visitSessionData.applicationReference = application.reference
 
         return request(sessionApp)
@@ -629,7 +622,7 @@ describe('Update journey specific warning messages', () => {
   it('should select original slot with no messages if no restriction change and original time available (even if overbooked)', () => {
     currentlyBookedSlot.visitRestriction = 'OPEN'
 
-    // Allowing over-booing is OK because the original visit (being updated) is one of the already-booked spaces
+    // Allowing over-booking is OK because the original visit (being updated) is one of the already-booked spaces
     currentlyAvailableSlots[0].availableTables = -1
     currentlyAvailableSlots[0].visitRestriction = 'OPEN'
 
