@@ -2,6 +2,7 @@ import type { Router } from 'express'
 import express from 'express'
 import passport from 'passport'
 import flash from 'connect-flash'
+import dpsComponents from '@ministryofjustice/hmpps-connect-dps-components'
 import config from '../config'
 import auth from '../authentication/auth'
 
@@ -14,7 +15,7 @@ export default function setUpAuth(): Router {
   router.use(passport.session())
   router.use(flash())
 
-  router.get('/autherror', (req, res) => {
+  router.get('/autherror', dpsComponents.getPageComponents({ dpsUrl: config.dpsHome }), (req, res) => {
     res.status(401)
     return res.render('pages/autherror')
   })

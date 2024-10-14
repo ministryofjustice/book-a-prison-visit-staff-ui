@@ -7,6 +7,9 @@ $govuk-page-width: $moj-page-width;
 @import 'govuk/all';
 @import 'moj/all';
 
+@import 'node_modules/@ministryofjustice/hmpps-connect-dps-components/dist/assets/footer';
+// TODO enable: @import 'node_modules/@ministryofjustice/hmpps-connect-dps-components/dist/assets/header-bar';
+
 @import './components/header-bar';
 @import './components/card';
 @import './components/block-background';

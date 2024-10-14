@@ -97,6 +97,7 @@
   "dependencies": {
     "@aws-sdk/client-sqs": "^3.658.0",
     "@ministryofjustice/frontend": "^2.2.3",
+    "@ministryofjustice/hmpps-connect-dps-components": "^1.2.0",
     "agentkeepalive": "^4.5.0",
     "applicationinsights": "^2.9.6",
     "bunyan": "^1.8.15",
