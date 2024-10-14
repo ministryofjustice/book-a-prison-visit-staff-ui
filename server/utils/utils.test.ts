@@ -9,9 +9,10 @@ import {
   safeReturnUrl,
   getParsedDateFromQueryString,
   getWeekOfDatesStartingMonday,
-  isOriginalVisitSlot,
+  isSameVisitSlot,
 } from './utils'
 import getResultsPagingLinksTestData from './utils.testData'
+import { VisitSlot } from '../@types/bapv'
 
 describe('Convert to title case', () => {
   it('null string', () => {
@@ -173,7 +174,7 @@ describe('getWeekOfDatesStartingMonday', () => {
   })
 })
 
-describe('isOriginalVisitSlot', () => {
+describe('isSameVisitSlot', () => {
   ;[
     {
       // Matches
@@ -237,7 +238,9 @@ describe('isOriginalVisitSlot', () => {
     },
   ].forEach(testData => {
     it(`should output ${testData.expected} when supplied with ${testData.sessionSlot.sessionTemplateReference} ${testData.sessionSlot.startTimestamp} and ${testData.originalVisitSlot.sessionTemplateReference} ${testData.originalVisitSlot.startTimestamp}`, () => {
-      expect(isOriginalVisitSlot(testData.sessionSlot, testData.originalVisitSlot)).toBe(testData.expected)
+      expect(isSameVisitSlot(testData.sessionSlot as VisitSlot, testData.originalVisitSlot as VisitSlot)).toBe(
+        testData.expected,
+      )
     })
   })
 })

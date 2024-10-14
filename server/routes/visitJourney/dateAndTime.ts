@@ -5,7 +5,7 @@ import AuditService from '../../services/auditService'
 import { getFlashFormValues, getSelectedSlot, getSlotByTimeAndRestriction } from '../visitorUtils'
 import getUrlPrefix from './visitJourneyUtils'
 import { VisitService, VisitSessionsService } from '../../services'
-import { isOriginalVisitSlot } from '../../utils/utils'
+import { isSameVisitSlot } from '../../utils/utils'
 
 export default class DateAndTime {
   constructor(
@@ -135,7 +135,7 @@ export default class DateAndTime {
     visitSessionData.visitSlot = getSelectedSlot(req.session.slotsList, req.body['visit-date-and-time'])
 
     const isOriginalSlot = isUpdate
-      ? isOriginalVisitSlot(visitSessionData.visitSlot, visitSessionData.originalVisitSlot)
+      ? isSameVisitSlot(visitSessionData.visitSlot, visitSessionData.originalVisitSlot)
       : false
 
     // If 'available tables is less than or equal to zero

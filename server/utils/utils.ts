@@ -159,7 +159,7 @@ export const getWeekOfDatesStartingMonday = (
   return { weekOfDates, previousWeek, nextWeek }
 }
 
-export const isOriginalVisitSlot = (visitSlot: Partial<VisitSlot>, originalVisitSlot: Partial<VisitSlot>): boolean => {
+export const isSameVisitSlot = (visitSlot: VisitSlot, originalVisitSlot: VisitSlot): boolean => {
   const isMatchingTemplateReference = visitSlot.sessionTemplateReference === originalVisitSlot.sessionTemplateReference
 
   const isMatchingStartTimestamp = visitSlot.startTimestamp === originalVisitSlot.startTimestamp
