@@ -58,7 +58,7 @@ export const flashProvider = jest.fn()
 // TODO review this class
 class MockUserService extends UserService {
   constructor() {
-    super(undefined, undefined, undefined)
+    super(undefined, undefined)
   }
 
   async getActiveCaseLoadId(_token: string): Promise<string> {

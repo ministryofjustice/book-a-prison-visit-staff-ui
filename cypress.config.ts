@@ -3,7 +3,6 @@ import { resetStubs } from './integration_tests/mockApis/wiremock'
 
 import auth from './integration_tests/mockApis/auth'
 import tokenVerification from './integration_tests/mockApis/tokenVerification'
-import nomisUserRoles from './integration_tests/mockApis/nomisUserRoles'
 import orchestrationService from './integration_tests/mockApis/orchestration'
 import prisonerContactRegistry from './integration_tests/mockApis/prisonerContactRegistry'
 import whereaboutsOffenderEvents from './integration_tests/mockApis/whereabouts'
@@ -30,7 +29,6 @@ export default defineConfig({
         ...auth,
         ...tokenVerification,
 
-        ...nomisUserRoles,
         ...orchestrationService,
         ...prisonerContactRegistry,
         ...prisonApi,

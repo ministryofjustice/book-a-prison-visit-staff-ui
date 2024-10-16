@@ -26,7 +26,7 @@ beforeEach(() => {
   supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
   supportedPrisonsService.getPrison.mockResolvedValue(prison)
 
-  userService.getActiveCaseLoadId.mockResolvedValue('XYZ') // assume user coming with an unsupported case load
+  // userService.getActiveCaseLoadId.mockResolvedValue('XYZ') // assume user coming with an unsupported case load
 
   app = appWithAllRoutes({ services: { supportedPrisonsService } })
 })

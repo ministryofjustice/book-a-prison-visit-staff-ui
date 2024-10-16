@@ -1,18 +1,12 @@
-import type { HmppsAuthClient, NomisUserRolesApiClient, PrisonApiClient, RestClientBuilder } from '../data'
+import type { HmppsAuthClient, PrisonApiClient, RestClientBuilder } from '../data'
 import logger from '../../logger'
 
 // TODO review and probably remove class
 export default class UserService {
   constructor(
     private readonly hmppsAuthClient: HmppsAuthClient,
-    private readonly nomisUserRolesApiClient: NomisUserRolesApiClient,
     private readonly prisonApiClientFactory: RestClientBuilder<PrisonApiClient>,
   ) {}
-
-  async getActiveCaseLoadId(token: string): Promise<string> {
-    const user = await this.nomisUserRolesApiClient.getUser(token)
-    return user.activeCaseloadId
-  }
 
   async getUserCaseLoadIds(username: string): Promise<string[]> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
