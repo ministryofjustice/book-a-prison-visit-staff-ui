@@ -8,7 +8,6 @@ context('SignIn', () => {
   beforeEach(() => {
     cy.task('reset')
     cy.task('stubSignIn')
-    cy.task('stubManageUser')
     cy.task('stubSupportedPrisonIds')
     cy.task('stubPrisonNames')
     cy.task('stubGetPrison')
@@ -65,14 +64,14 @@ context('SignIn', () => {
     cy.request('/').its('body').should('contain', 'Sign in')
 
     cy.task('stubVerifyToken', true)
-    cy.task('stubManageUser', 'bobby brown')
+    cy.task('stubSignIn', { name: 'bobby brown' })
     cy.signIn()
 
     homePage.headerUserName().contains('B. Brown')
   })
 
   it('User without required role is directed to Authorisation Error page', () => {
-    cy.task('stubSignIn', 'SOME_OTHER_ROLE')
+    cy.task('stubSignIn', { roles: ['SOME_OTHER_ROLE'] })
     cy.signIn({ failOnStatusCode: false })
     const authorisationErrorPage = Page.verifyOnPage(AuthorisationErrorPage)
     authorisationErrorPage.message().contains('You are not authorised to use this application')

@@ -13,7 +13,6 @@ import VisitSessionsService from './visitSessionsService'
 export const services = () => {
   const {
     hmppsAuthClient,
-    manageUsersApiClient,
     nomisUserRolesApiClient,
     orchestrationApiClientBuilder,
     prisonApiClientBuilder,
@@ -46,7 +45,6 @@ export const services = () => {
 
   const userService = new UserService(
     hmppsAuthClient,
-    manageUsersApiClient,
     nomisUserRolesApiClient,
     prisonApiClientBuilder,
   )

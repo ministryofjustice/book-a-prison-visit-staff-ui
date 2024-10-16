@@ -1,32 +1,13 @@
-import { jwtDecode } from 'jwt-decode'
-import { convertToTitleCase } from '../utils/utils'
-import type { User } from '../data/manageUsersApiClient'
-import ManageUsersApiClient from '../data/manageUsersApiClient'
 import type { HmppsAuthClient, NomisUserRolesApiClient, PrisonApiClient, RestClientBuilder } from '../data'
 import logger from '../../logger'
 
-export interface UserDetails extends User {
-  displayName: string
-  roles: string[]
-}
-
+// TODO review and probably remove class
 export default class UserService {
   constructor(
     private readonly hmppsAuthClient: HmppsAuthClient,
-    private readonly manageUsersApiClient: ManageUsersApiClient,
     private readonly nomisUserRolesApiClient: NomisUserRolesApiClient,
     private readonly prisonApiClientFactory: RestClientBuilder<PrisonApiClient>,
   ) {}
-
-  async getUser(token: string): Promise<UserDetails> {
-    const user = await this.manageUsersApiClient.getUser(token)
-    return { ...user, roles: this.getUserRoles(token), displayName: convertToTitleCase(user.name) }
-  }
-
-  getUserRoles(token: string): string[] {
-    const { authorities: roles = [] } = jwtDecode(token) as { authorities?: string[] }
-    return roles.map(role => role.substring(role.indexOf('_') + 1))
-  }
 
   async getActiveCaseLoadId(token: string): Promise<string> {
     const user = await this.nomisUserRolesApiClient.getUser(token)

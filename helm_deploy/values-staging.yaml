@@ -10,7 +10,6 @@ generic-service:
     INGRESS_URL: "https://manage-prison-visits-staging.prison.service.justice.gov.uk"
     HMPPS_AUTH_URL: "https://sign-in-dev.hmpps.service.justice.gov.uk/auth"
     NOMIS_AUTH_URL: "https://sign-in-dev.hmpps.service.justice.gov.uk/auth"
-    MANAGE_USERS_API_URL: "https://manage-users-api-dev.hmpps.service.justice.gov.uk"
     NOMIS_USER_ROLES_API_URL: "https://nomis-user-roles-api-dev.prison.service.justice.gov.uk"
     TOKEN_VERIFICATION_API_URL: "https://token-verification-api-dev.prison.service.justice.gov.uk"
     ORCHESTRATION_API_URL: "https://hmpps-manage-prison-visits-orchestration-staging.prison.service.justice.gov.uk"

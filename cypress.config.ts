@@ -2,7 +2,6 @@ import { defineConfig } from 'cypress'
 import { resetStubs } from './integration_tests/mockApis/wiremock'
 
 import auth from './integration_tests/mockApis/auth'
-import manageUsersApi from './integration_tests/mockApis/manageUsersApi'
 import tokenVerification from './integration_tests/mockApis/tokenVerification'
 import nomisUserRoles from './integration_tests/mockApis/nomisUserRoles'
 import orchestrationService from './integration_tests/mockApis/orchestration'
@@ -29,7 +28,6 @@ export default defineConfig({
       on('task', {
         reset: resetStubs,
         ...auth,
-        ...manageUsersApi,
         ...tokenVerification,
 
         ...nomisUserRoles,

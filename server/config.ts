@@ -69,14 +69,6 @@ export default {
       systemClientId: get('SYSTEM_CLIENT_ID', 'clientid', requiredInProduction),
       systemClientSecret: get('SYSTEM_CLIENT_SECRET', 'clientsecret', requiredInProduction),
     },
-    manageUsersApi: {
-      url: get('MANAGE_USERS_API_URL', 'http://localhost:9091', requiredInProduction),
-      timeout: {
-        response: Number(get('MANAGE_USERS_API_TIMEOUT_RESPONSE', 10000)),
-        deadline: Number(get('MANAGE_USERS_API_TIMEOUT_DEADLINE', 10000)),
-      },
-      agent: new AgentConfig(Number(get('MANAGE_USERS_API_TIMEOUT_RESPONSE', 10000))),
-    },
     nomisUserRolesApi: {
       url: get('NOMIS_USER_ROLES_API_URL', 'http://localhost:9091', requiredInProduction),
       timeout: {

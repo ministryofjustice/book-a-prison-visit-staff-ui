@@ -34,7 +34,6 @@ REDIS_HOST=localhost
 HMPPS_AUTH_URL=https://sign-in-dev.hmpps.service.justice.gov.uk/auth
 HMPPS_AUTH_EXTERNAL_URL=https://sign-in-dev.hmpps.service.justice.gov.uk/auth
 NOMIS_AUTH_URL=https://sign-in-dev.hmpps.service.justice.gov.uk/auth
-MANAGE_USERS_API_URL=https://manage-users-api-dev.hmpps.service.justice.gov.uk
 NODE_ENV=development
 
 # Use credentials from the dev namespace for API and SYSTEM client

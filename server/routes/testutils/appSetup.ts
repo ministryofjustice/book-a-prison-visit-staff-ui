@@ -36,33 +36,29 @@ import * as auth from '../../authentication/auth'
 import setUpCurrentUser from '../../middleware/setUpCurrentUser'
 import type { Services } from '../../services'
 
-import UserService, { UserDetails } from '../../services/userService'
+import UserService from '../../services/userService'
 import SupportedPrisonsService from '../../services/supportedPrisonsService'
 import TestData from './testData'
 import { Prison } from '../../@types/bapv'
+import { HmppsUser } from '../../interfaces/hmppsUser'
 
-export const user: Express.User = {
+export const user: HmppsUser = {
   name: 'FIRST LAST',
   userId: 'id',
   token: 'token',
   username: 'user1',
   displayName: 'First Last',
-  active: true,
-  authSource: 'NOMIS',
+  authSource: 'nomis',
+  staffId: 1234,
+  userRoles: [],
 }
 
 export const flashProvider = jest.fn()
 
+// TODO review this class
 class MockUserService extends UserService {
   constructor() {
-    super(undefined, undefined, undefined, undefined)
-  }
-
-  async getUser(_token: string) {
-    return {
-      ...user,
-      roles: [],
-    } as UserDetails
+    super(undefined, undefined, undefined)
   }
 
   async getActiveCaseLoadId(_token: string): Promise<string> {
@@ -95,7 +91,7 @@ class MockSupportedPrisonsService extends SupportedPrisonsService {
 function appSetup(
   services: Services,
   production: boolean,
-  userSupplier: () => Express.User,
+  userSupplier: () => HmppsUser,
   sessionData: SessionData,
 ): Express {
   const app = express()
@@ -104,10 +100,10 @@ function appSetup(
 
   nunjucksSetup(app, testAppInfo)
   app.use((req, res, next) => {
-    req.user = userSupplier()
+    req.user = userSupplier() as Express.User
     req.flash = flashProvider
     res.locals = {
-      user: { ...req.user },
+      user: { ...req.user } as HmppsUser,
     }
     req.session = sessionData as Session & Partial<SessionData>
     next()
@@ -151,7 +147,7 @@ export function appWithAllRoutes({
 }: {
   production?: boolean
   services?: Partial<Services>
-  userSupplier?: () => Express.User
+  userSupplier?: () => HmppsUser
   sessionData?: SessionData
 }): Express {
   auth.default.authenticationMiddleware = () => (req, res, next) => next()
