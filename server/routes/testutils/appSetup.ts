@@ -33,7 +33,7 @@ import visitsRoutes from '../visits'
 import nunjucksSetup from '../../utils/nunjucksSetup'
 import errorHandler from '../../errorHandler'
 import * as auth from '../../authentication/auth'
-import setUpCurrentUser from '../../middleware/setUpCurrentUser'
+import populateSelectedEstablishment from '../../middleware/populateSelectedEstablishment'
 import type { Services } from '../../services'
 
 import UserService from '../../services/userService'
@@ -120,7 +120,7 @@ function appSetup(
     // eslint-disable-next-line no-param-reassign
     services.supportedPrisonsService = new MockSupportedPrisonsService()
   }
-  app.use(setUpCurrentUser(services))
+  app.use(populateSelectedEstablishment(services))
 
   app.use('/', indexRoutes(services))
   app.use('/book-a-visit', bookAVisitRoutes(services))

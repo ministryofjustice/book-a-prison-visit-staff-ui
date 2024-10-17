@@ -12,6 +12,7 @@ import setUpCsrf from './middleware/setUpCsrf'
 import setUpAuthentication from './middleware/setUpAuthentication'
 import setUpCurrentUser from './middleware/setUpCurrentUser'
 import setUpHealthChecks from './middleware/setUpHealthChecks'
+import populateSelectedEstablishment from './middleware/populateSelectedEstablishment'
 import setUpStaticResources from './middleware/setUpStaticResources'
 import setUpWebRequestParsing from './middleware/setupRequestParsing'
 import setUpWebSecurity from './middleware/setUpWebSecurity'
@@ -55,7 +56,8 @@ export default function createApp(services: Services): express.Application {
       includeMeta: true,
     }),
   )
-  app.use(setUpCurrentUser(services))
+  app.use(setUpCurrentUser())
+  app.use(populateSelectedEstablishment(services))
   app.use(appInsightsOperationId)
 
   app.use('/', indexRoutes(services))
