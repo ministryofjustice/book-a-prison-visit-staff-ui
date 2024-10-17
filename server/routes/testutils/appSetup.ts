@@ -18,6 +18,7 @@ jest.mock('../../applicationInfo', () => {
 import express, { Express } from 'express'
 import { NotFound } from 'http-errors'
 import { Session, SessionData } from 'express-session'
+import CaseLoad from '@ministryofjustice/hmpps-connect-dps-components/dist/types/CaseLoad'
 
 import indexRoutes from '../index'
 import bookAVisitRoutes from '../bookAVisit'
@@ -40,9 +41,9 @@ import UserService from '../../services/userService'
 import SupportedPrisonsService from '../../services/supportedPrisonsService'
 import TestData from './testData'
 import { Prison } from '../../@types/bapv'
-import { HmppsUser } from '../../interfaces/hmppsUser'
+import { PrisonUser } from '../../interfaces/hmppsUser'
 
-export const user: HmppsUser = {
+export const user: PrisonUser = {
   name: 'FIRST LAST',
   userId: 'id',
   token: 'token',
@@ -51,6 +52,8 @@ export const user: HmppsUser = {
   authSource: 'nomis',
   staffId: 1234,
   userRoles: [],
+  activeCaseLoadId: 'HEI',
+  caseLoads: [{ caseLoadId: 'HEI', currentlyActive: true } as CaseLoad],
 }
 
 export const flashProvider = jest.fn()
@@ -91,7 +94,7 @@ class MockSupportedPrisonsService extends SupportedPrisonsService {
 function appSetup(
   services: Services,
   production: boolean,
-  userSupplier: () => HmppsUser,
+  userSupplier: () => PrisonUser,
   sessionData: SessionData,
 ): Express {
   const app = express()
@@ -103,7 +106,7 @@ function appSetup(
     req.user = userSupplier() as Express.User
     req.flash = flashProvider
     res.locals = {
-      user: { ...req.user } as HmppsUser,
+      user: { ...req.user } as PrisonUser,
     }
     req.session = sessionData as Session & Partial<SessionData>
     next()
@@ -147,7 +150,7 @@ export function appWithAllRoutes({
 }: {
   production?: boolean
   services?: Partial<Services>
-  userSupplier?: () => HmppsUser
+  userSupplier?: () => PrisonUser
   sessionData?: SessionData
 }): Express {
   auth.default.authenticationMiddleware = () => (req, res, next) => next()

@@ -1,4 +1,5 @@
-import { HmppsUser } from '../../interfaces/hmppsUser'
+import HeaderFooterMeta from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterMeta'
+import { PrisonUser } from '../../interfaces/hmppsUser'
 import { Prison, VisitorListItem, VisitSessionData } from '../bapv'
 
 export declare module 'express-session' {
@@ -35,7 +36,8 @@ export declare global {
     }
 
     interface Locals {
-      user: HmppsUser
+      user: PrisonUser
+      feComponentsMeta?: HeaderFooterMeta
     }
   }
 }

@@ -47,17 +47,16 @@ export default function createApp(services: Services): express.Application {
   app.use(setUpAuthentication())
   app.use(authorisationMiddleware(['ROLE_MANAGE_PRISON_VISITS']))
   app.use(setUpCsrf())
-  app.use(setUpCurrentUser(services))
-  app.use(appInsightsOperationId)
-
   app.get(
     '*',
     dpsComponents.getPageComponents({
       dpsUrl: config.dpsHome,
       logger,
-      // TODO includeMeta: true,
+      includeMeta: true,
     }),
   )
+  app.use(setUpCurrentUser(services))
+  app.use(appInsightsOperationId)
 
   app.use('/', indexRoutes(services))
   app.use('/book-a-visit', bookAVisitRoutes(services))

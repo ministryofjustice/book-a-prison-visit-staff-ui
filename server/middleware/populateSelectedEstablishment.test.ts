@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import TestData from '../routes/testutils/testData'
 import { createMockSupportedPrisonsService } from '../services/testutils/mocks'
 import populateSelectedEstablishment from './populateSelectedEstablishment'
+import { user } from '../routes/testutils/appSetup'
 
 const supportedPrisonsService = createMockSupportedPrisonsService()
 
@@ -20,7 +21,7 @@ describe('populateSelectedEstablishment', () => {
 
     res.locals = {
       selectedEstablishment: undefined,
-      user: <Express.User>{ activeCaseLoadId: 'HEI', username: 'user1' },
+      user,
     }
 
     supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)

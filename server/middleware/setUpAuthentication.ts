@@ -5,7 +5,7 @@ import flash from 'connect-flash'
 import dpsComponents from '@ministryofjustice/hmpps-connect-dps-components'
 import config from '../config'
 import auth from '../authentication/auth'
-import { HmppsUser } from '../interfaces/hmppsUser'
+import { PrisonUser } from '../interfaces/hmppsUser'
 
 const router = express.Router()
 
@@ -47,7 +47,7 @@ export default function setUpAuth(): Router {
   })
 
   router.use((req, res, next) => {
-    res.locals.user = req.user as HmppsUser
+    res.locals.user = req.user as PrisonUser
     next()
   })
 

@@ -1,3 +1,5 @@
+import CaseLoad from '@ministryofjustice/hmpps-connect-dps-components/dist/types/CaseLoad'
+
 export type AuthSource = 'nomis' | 'delius' | 'external' | 'azuread'
 
 /**
@@ -24,6 +26,8 @@ export interface BaseUser {
 export interface PrisonUser extends BaseUser {
   authSource: 'nomis'
   staffId: number
+  activeCaseLoadId: string
+  caseLoads: CaseLoad[] // TODO can be removed if we no longer show list of possible case loads
 }
 
 /**
