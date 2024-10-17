@@ -62,10 +62,6 @@ class MockUserService extends UserService {
     super(undefined, undefined)
   }
 
-  async getActiveCaseLoadId(_token: string): Promise<string> {
-    return 'HEI'
-  }
-
   async setActiveCaseLoad(_caseLoadId: string, _username: string) {
     return Promise.resolve()
   }
