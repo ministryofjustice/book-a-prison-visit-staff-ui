@@ -33,40 +33,33 @@ import visitsRoutes from '../visits'
 import nunjucksSetup from '../../utils/nunjucksSetup'
 import errorHandler from '../../errorHandler'
 import * as auth from '../../authentication/auth'
-import setUpCurrentUser from '../../middleware/setUpCurrentUser'
+import populateSelectedEstablishment from '../../middleware/populateSelectedEstablishment'
 import type { Services } from '../../services'
 
-import UserService, { UserDetails } from '../../services/userService'
+import UserService from '../../services/userService'
 import SupportedPrisonsService from '../../services/supportedPrisonsService'
 import TestData from './testData'
 import { Prison } from '../../@types/bapv'
+import { PrisonUser } from '../../interfaces/hmppsUser'
 
-export const user: Express.User = {
+export const user: PrisonUser = {
   name: 'FIRST LAST',
   userId: 'id',
   token: 'token',
   username: 'user1',
   displayName: 'First Last',
-  active: true,
-  authSource: 'NOMIS',
+  authSource: 'nomis',
+  staffId: 1234,
+  userRoles: [],
+  activeCaseLoadId: 'HEI',
 }
 
 export const flashProvider = jest.fn()
 
+// TODO review this class
 class MockUserService extends UserService {
   constructor() {
-    super(undefined, undefined, undefined, undefined)
-  }
-
-  async getUser(_token: string) {
-    return {
-      ...user,
-      roles: [],
-    } as UserDetails
-  }
-
-  async getActiveCaseLoadId(_token: string): Promise<string> {
-    return 'HEI'
+    super(undefined, undefined)
   }
 
   async setActiveCaseLoad(_caseLoadId: string, _username: string) {
@@ -95,7 +88,7 @@ class MockSupportedPrisonsService extends SupportedPrisonsService {
 function appSetup(
   services: Services,
   production: boolean,
-  userSupplier: () => Express.User,
+  userSupplier: () => PrisonUser,
   sessionData: SessionData,
 ): Express {
   const app = express()
@@ -104,10 +97,10 @@ function appSetup(
 
   nunjucksSetup(app, testAppInfo)
   app.use((req, res, next) => {
-    req.user = userSupplier()
+    req.user = userSupplier() as Express.User
     req.flash = flashProvider
     res.locals = {
-      user: { ...req.user },
+      user: { ...req.user } as PrisonUser,
     }
     req.session = sessionData as Session & Partial<SessionData>
     next()
@@ -123,7 +116,7 @@ function appSetup(
     // eslint-disable-next-line no-param-reassign
     services.supportedPrisonsService = new MockSupportedPrisonsService()
   }
-  app.use(setUpCurrentUser(services))
+  app.use(populateSelectedEstablishment(services))
 
   app.use('/', indexRoutes(services))
   app.use('/book-a-visit', bookAVisitRoutes(services))
@@ -151,7 +144,7 @@ export function appWithAllRoutes({
 }: {
   production?: boolean
   services?: Partial<Services>
-  userSupplier?: () => Express.User
+  userSupplier?: () => PrisonUser
   sessionData?: SessionData
 }): Express {
   auth.default.authenticationMiddleware = () => (req, res, next) => next()

@@ -29,7 +29,6 @@ context('Cancel visit journey', () => {
   beforeEach(() => {
     cy.task('reset')
     cy.task('stubSignIn')
-    cy.task('stubManageUser')
     cy.task('stubSupportedPrisonIds')
     cy.task('stubPrisonNames')
     cy.task('stubGetPrison')

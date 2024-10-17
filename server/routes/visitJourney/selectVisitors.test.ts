@@ -38,6 +38,7 @@ beforeEach(() => {
 
 afterEach(() => {
   jest.resetAllMocks()
+  jest.useRealTimers()
 })
 
 testJourneys.forEach(journey => {
@@ -593,6 +594,8 @@ testJourneys.forEach(journey => {
     }
 
     beforeEach(() => {
+      adultVisitors.adults = []
+
       visitSessionData = {
         allowOverBooking: false,
         prisoner: {
@@ -752,8 +755,8 @@ testJourneys.forEach(journey => {
     })
 
     it('should save to session and add earliestDate to visitSessionData', () => {
-      const fakeDate = new Date('2023-12-01')
-      jest.useFakeTimers({ advanceTimers: true, now: new Date(fakeDate) })
+      const fakeDateTime = new Date('2023-12-01T09:00')
+      jest.useFakeTimers({ advanceTimers: true, now: new Date(fakeDateTime) })
 
       const returnAdult: VisitorListItem = {
         personId: 4000,

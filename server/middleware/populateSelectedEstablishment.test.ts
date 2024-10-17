@@ -2,8 +2,11 @@ import { Request, Response } from 'express'
 import TestData from '../routes/testutils/testData'
 import { createMockSupportedPrisonsService } from '../services/testutils/mocks'
 import populateSelectedEstablishment from './populateSelectedEstablishment'
+import { user } from '../routes/testutils/appSetup'
+import { Services } from '../services'
 
 const supportedPrisonsService = createMockSupportedPrisonsService()
+const services = { supportedPrisonsService } as unknown as Services
 
 const supportedPrisons = TestData.supportedPrisons()
 
@@ -20,7 +23,7 @@ describe('populateSelectedEstablishment', () => {
 
     res.locals = {
       selectedEstablishment: undefined,
-      user: <Express.User>{ activeCaseLoadId: 'HEI', username: 'user1' },
+      user,
     }
 
     supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
@@ -36,7 +39,7 @@ describe('populateSelectedEstablishment', () => {
       const prison = TestData.prison({ prisonId: 'BLI', prisonName: 'Bristol (HMP)' })
       supportedPrisonsService.getPrison.mockResolvedValue(prison)
 
-      await populateSelectedEstablishment(supportedPrisonsService)(req, res, next)
+      await populateSelectedEstablishment(services)(req, res, next)
       await new Promise(process.nextTick)
 
       expect(supportedPrisonsService.getSupportedPrisons).toHaveBeenCalledWith('user1')
@@ -49,7 +52,7 @@ describe('populateSelectedEstablishment', () => {
     it('should redirect to /change-establishment if no establishment set and active caseload is not a supported prison', async () => {
       res.locals.user.activeCaseLoadId = 'XYZ'
 
-      await populateSelectedEstablishment(supportedPrisonsService)(req, res, next)
+      await populateSelectedEstablishment(services)(req, res, next)
 
       expect(supportedPrisonsService.getSupportedPrisons).toHaveBeenCalledWith('user1')
       expect(res.redirect).toHaveBeenCalledWith('/change-establishment')
@@ -61,7 +64,7 @@ describe('populateSelectedEstablishment', () => {
     it('should redirect to /change-establishment if no establishment set and active caseload is not set', async () => {
       res.locals.user.activeCaseLoadId = undefined
 
-      await populateSelectedEstablishment(supportedPrisonsService)(req, res, next)
+      await populateSelectedEstablishment(services)(req, res, next)
 
       expect(supportedPrisonsService.getSupportedPrisons).toHaveBeenCalledWith('user1')
       expect(req.session.selectedEstablishment).toBe(undefined)
@@ -73,7 +76,7 @@ describe('populateSelectedEstablishment', () => {
     it('should make no changes and not redirect if request path is /change-establishment', async () => {
       ;(req.path as string) = '/change-establishment'
 
-      await populateSelectedEstablishment(supportedPrisonsService)(req, res, next)
+      await populateSelectedEstablishment(services)(req, res, next)
 
       expect(supportedPrisonsService.getSupportedPrisons).toHaveBeenCalledTimes(0)
       expect(req.session.selectedEstablishment).toBe(undefined)
@@ -87,7 +90,7 @@ describe('populateSelectedEstablishment', () => {
     it('should populate res.locals with selected establishment without prisons lookup', async () => {
       req.session.selectedEstablishment = TestData.prison()
 
-      await populateSelectedEstablishment(supportedPrisonsService)(req, res, next)
+      await populateSelectedEstablishment(services)(req, res, next)
 
       expect(supportedPrisonsService.getSupportedPrisons).not.toHaveBeenCalled()
       expect(res.locals.selectedEstablishment).toStrictEqual(req.session.selectedEstablishment)
@@ -98,7 +101,7 @@ describe('populateSelectedEstablishment', () => {
       res.locals.user.activeCaseLoadId = 'BLI'
       req.session.selectedEstablishment = TestData.prison({ prisonId: 'BLI', prisonName: 'Bristol (HMP)' })
 
-      await populateSelectedEstablishment(supportedPrisonsService)(req, res, next)
+      await populateSelectedEstablishment(services)(req, res, next)
 
       expect(supportedPrisonsService.getSupportedPrisons).not.toHaveBeenCalled()
       expect(res.locals.selectedEstablishment).toStrictEqual(req.session.selectedEstablishment)
@@ -110,7 +113,7 @@ describe('populateSelectedEstablishment', () => {
       res.locals.user.activeCaseLoadId = 'BLI'
       req.session.selectedEstablishment = TestData.prison()
 
-      await populateSelectedEstablishment(supportedPrisonsService)(req, res, next)
+      await populateSelectedEstablishment(services)(req, res, next)
 
       expect(supportedPrisonsService.getSupportedPrisons).not.toHaveBeenCalled()
       expect(res.locals.selectedEstablishment).toStrictEqual(req.session.selectedEstablishment)
