@@ -31,7 +31,6 @@ export default function populateCurrentUser(): RequestHandler {
       if (res.locals.feComponentsMeta) {
         const { feComponentsMeta } = res.locals
         res.locals.user.activeCaseLoadId = feComponentsMeta.activeCaseLoad.caseLoadId
-        res.locals.user.caseLoads = feComponentsMeta.caseLoads
       }
 
       next()

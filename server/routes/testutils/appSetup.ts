@@ -18,7 +18,6 @@ jest.mock('../../applicationInfo', () => {
 import express, { Express } from 'express'
 import { NotFound } from 'http-errors'
 import { Session, SessionData } from 'express-session'
-import CaseLoad from '@ministryofjustice/hmpps-connect-dps-components/dist/types/CaseLoad'
 
 import indexRoutes from '../index'
 import bookAVisitRoutes from '../bookAVisit'
@@ -53,7 +52,6 @@ export const user: PrisonUser = {
   staffId: 1234,
   userRoles: [],
   activeCaseLoadId: 'HEI',
-  caseLoads: [{ caseLoadId: 'HEI', currentlyActive: true } as CaseLoad],
 }
 
 export const flashProvider = jest.fn()
