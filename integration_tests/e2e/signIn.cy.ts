@@ -39,6 +39,7 @@ context('SignIn', () => {
 
   it('User can manage their details', () => {
     cy.signIn()
+    cy.task('stubAuthManageDetails')
     const homePage = Page.verifyOnPage(HomePage)
 
     homePage.manageDetails().get('a').invoke('removeAttr', 'target')
@@ -60,11 +61,12 @@ context('SignIn', () => {
     const homePage = Page.verifyOnPage(HomePage)
     cy.task('stubVerifyToken', false)
 
-    // can't do a visit here as cypress requires only one domain
-    cy.request('/').its('body').should('contain', 'Sign in')
+    cy.visit('/')
+    Page.verifyOnPage(AuthSignInPage)
 
     cy.task('stubVerifyToken', true)
-    cy.task('stubSignIn', { name: 'bobby brown' })
+    cy.task('stubSignIn', { name: 'bobby brown', roles: ['ROLE_MANAGE_PRISON_VISITS'] })
+
     cy.signIn()
 
     homePage.headerUserName().contains('B. Brown')

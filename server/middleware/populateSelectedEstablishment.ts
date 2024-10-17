@@ -9,6 +9,8 @@ export default function populateSelectedEstablishment({ supportedPrisonsService 
 
       const { activeCaseLoadId } = res.locals.user
 
+      // TODO need to handle BOTH selectedEstablishment and activeCaseLoadId not being set
+
       if (!supportedPrisons[activeCaseLoadId]) {
         return res.redirect('/change-establishment')
       }
