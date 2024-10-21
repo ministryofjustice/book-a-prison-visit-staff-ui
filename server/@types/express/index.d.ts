@@ -1,9 +1,8 @@
+import HeaderFooterMeta from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterMeta'
+import { PrisonUser } from '../../interfaces/hmppsUser'
 import { Prison, VisitorListItem, VisitSessionData } from '../bapv'
-import { UserDetails } from '../../services/userService'
 
-export default {}
-
-declare module 'express-session' {
+export declare module 'express-session' {
   // Declare that the session will potentially contain these additional fields
   interface SessionData {
     returnTo: string
@@ -19,7 +18,8 @@ declare module 'express-session' {
 
 export declare global {
   namespace Express {
-    interface User extends Partial<UserDetails> {
+    interface User {
+      username: string
       token: string
       authSource: string
     }
@@ -36,7 +36,8 @@ export declare global {
     }
 
     interface Locals {
-      user: Express.User
+      user: PrisonUser
+      feComponentsMeta?: HeaderFooterMeta
     }
   }
 }

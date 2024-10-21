@@ -3,13 +3,22 @@ import { Response } from 'superagent'
 
 import { stubFor, getMatchingRequests } from './wiremock'
 import tokenVerification from './tokenVerification'
+import stubComponents from './componentApi'
 
-const createToken = (role: string) => {
+interface UserToken {
+  name?: string
+  roles?: string[]
+}
+
+const createToken = (userToken: UserToken) => {
+  // authorities in the session are always prefixed by ROLE.
+  const authorities = userToken.roles?.map(role => (role.startsWith('ROLE_') ? role : `ROLE_${role}`)) || []
   const payload = {
+    name: userToken.name || 'john smith',
     user_name: 'USER1',
     scope: ['read'],
     auth_source: 'nomis',
-    authorities: [role ?? 'ROLE_MANAGE_PRISON_VISITS'],
+    authorities,
     jti: '83b50a10-cca6-41db-985f-e87efb303ddb',
     client_id: 'clientid',
   }
@@ -61,7 +70,7 @@ const redirect = () =>
         'Content-Type': 'text/html',
         Location: 'http://localhost:3007/sign-in/callback?code=codexxxx&state=stateyyyy',
       },
-      body: '<html><body>SignIn page<h1>Sign in</h1></body></html>',
+      body: '<html><body>Sign in page<h1>Sign in</h1></body></html>',
     },
   })
 
@@ -76,7 +85,7 @@ const signOut = () =>
       headers: {
         'Content-Type': 'text/html',
       },
-      body: '<html><body>SignIn page<h1>Sign in</h1></body></html>',
+      body: '<html><body>Sign in page<h1>Sign in</h1></body></html>',
     },
   })
 
@@ -95,7 +104,7 @@ const manageDetails = () =>
     },
   })
 
-const token = (role: string) =>
+const token = (userToken: UserToken) =>
   stubFor({
     request: {
       method: 'POST',
@@ -108,7 +117,7 @@ const token = (role: string) =>
         Location: 'http://localhost:3007/sign-in/callback?code=codexxxx&state=stateyyyy',
       },
       jsonBody: {
-        access_token: createToken(role),
+        access_token: createToken(userToken),
         token_type: 'bearer',
         user_name: 'USER1',
         expires_in: 599,
@@ -122,6 +131,16 @@ export default {
   getSignInUrl,
   stubAuthPing: ping,
   stubAuthToken: token,
-  stubSignIn: (role: string): Promise<[Response, Response, Response, Response, Response, Response]> =>
-    Promise.all([favicon(), redirect(), signOut(), manageDetails(), token(role), tokenVerification.stubVerifyToken()]),
+  stubAuthManageDetails: manageDetails,
+  stubSignIn: (
+    userToken: UserToken = { roles: ['ROLE_MANAGE_PRISON_VISITS'] },
+  ): Promise<[Response, Response, Response, Response, Response, Response]> =>
+    Promise.all([
+      favicon(),
+      redirect(),
+      signOut(),
+      token(userToken),
+      tokenVerification.stubVerifyToken(),
+      stubComponents(),
+    ]),
 }
