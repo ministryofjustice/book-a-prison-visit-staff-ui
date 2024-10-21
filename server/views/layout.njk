@@ -17,8 +17,7 @@
 {% block pageTitle %}{{pageTitle | default(applicationName)}}{% endblock %}
 
 {% block header %}
-  {# TODO {{ feComponents.header | safe }} #}
-  {% include "partials/header.njk" %}
+  {{ feComponents.header | safe }}
 {% endblock %}
 
 {% block bodyStart %}
@@ -36,7 +35,7 @@
 {% endblock %}
 
 {% block footer %}
-    {{ feComponents.footer | safe }}
+  {{ feComponents.footer | safe }}
 {% endblock %}
 
 {% block bodyEnd %}

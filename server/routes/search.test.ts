@@ -55,7 +55,6 @@ describe('Prisoner search page', () => {
           .expect(res => {
             const $ = cheerio.load(res.text)
             expect(res.text).toContain('Search for a prisoner')
-            expect($('[data-test="change-establishment"]').text()).toContain('Change establishment')
             expect($('[data-test=search-by-reference]').length).toBe(1)
           })
       })
@@ -266,7 +265,6 @@ describe('Booking search page', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect(res.text).toContain('Search for a booking')
-          expect($('[data-test="change-establishment"]').text()).toContain('Change establishment')
           expect($('[data-test=search-by-prisoner]').length).toBe(1)
         })
     })
