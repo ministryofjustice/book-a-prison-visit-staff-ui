@@ -119,7 +119,7 @@ describe('populateSelectedEstablishment', () => {
 
       expect(supportedPrisonsService.getSupportedPrisons).not.toHaveBeenCalled()
       expect(res.locals.user.activeCaseLoadId).toBe('BLI')
-      expect(res.locals.selectedEstablishment).toBe(undefined)
+      expect(res.locals.selectedEstablishment).toBe(req.session.selectedEstablishment)
       expect(next).toHaveBeenCalled()
     })
   })

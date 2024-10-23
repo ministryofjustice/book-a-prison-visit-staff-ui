@@ -3,7 +3,7 @@ import request from 'supertest'
 import * as cheerio from 'cheerio'
 import createError from 'http-errors'
 import { SessionData } from 'express-session'
-import { appWithAllRoutes } from './testutils/appSetup'
+import { appWithAllRoutes, user } from './testutils/appSetup'
 import { PrisonerDetailsItem, VisitInformation } from '../@types/bapv'
 import TestData from './testutils/testData'
 import {
@@ -334,6 +334,7 @@ describe('Booking search page', () => {
       })
 
       app = appWithAllRoutes({
+        userSupplier: () => ({ ...user, activeCaseLoadId: 'XYZ' }),
         services: { auditService, prisonerSearchService, visitService },
         sessionData: { selectedEstablishment: { prisonId: 'XYZ' } } as SessionData,
       })

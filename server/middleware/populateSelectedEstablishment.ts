@@ -6,6 +6,7 @@ import logger from '../../logger'
 export default function populateSelectedEstablishment({ supportedPrisonsService }: Services): RequestHandler {
   return asyncMiddleware(async (req, res, next) => {
     if (req.path === '/change-establishment') {
+      res.locals.selectedEstablishment = req.session.selectedEstablishment
       return next()
     }
 
