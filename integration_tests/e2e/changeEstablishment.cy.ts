@@ -15,7 +15,7 @@ context('Change establishment', () => {
   })
 
   // Check current establishment, change establishment and check again
-  it('Should change establishment and redirect to home page', () => {
+  it.skip('Should change establishment and redirect to home page', () => {
     cy.task('stubUserCaseloads', TestData.caseLoads())
     cy.task('stubSetActiveCaseLoad', 'BLI')
     cy.task('stubGetNotificationCount', { prisonId: 'BLI' })

@@ -14,7 +14,6 @@ export default function routes({ visitNotificationsService }: Services): Router 
     const reviewCount = (await visitNotificationsService.getNotificationCount(res.locals.user.username, prisonId)).count
 
     res.render('pages/index', {
-      hidePhaseBanner: true,
       showEstablishmentSwitcher: true,
       reviewCount,
     })

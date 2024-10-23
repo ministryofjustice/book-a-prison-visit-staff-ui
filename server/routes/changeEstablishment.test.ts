@@ -2,7 +2,7 @@ import type { Express } from 'express'
 import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
-import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
+import { appWithAllRoutes, flashProvider, user } from './testutils/appSetup'
 import * as visitorUtils from './visitorUtils'
 import TestData from './testutils/testData'
 import config from '../config'
@@ -95,6 +95,7 @@ describe('GET /change-establishment', () => {
 
   it('should render select establishment page, with current establishment selected', () => {
     app = appWithAllRoutes({
+      userSupplier: () => ({ ...user, activeCaseLoadId: 'BLI' }),
       services: { supportedPrisonsService },
       sessionData: {
         selectedEstablishment: TestData.prison({ prisonId: 'BLI', prisonName: supportedPrisons.BLI }),
