@@ -29,7 +29,6 @@ export default class BlockNewDateController {
         errors: req.flash('errors'),
         visitBlockDate,
         visitCount,
-        showEstablishmentSwitcher: true,
       })
     }
   }
