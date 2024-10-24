@@ -15,7 +15,7 @@ import {
   VisitSession,
   VisitSummary,
 } from '../../data/orchestrationApiTypes'
-import { CaseLoad, OffenderRestriction } from '../../data/prisonApiTypes'
+import { OffenderRestriction } from '../../data/prisonApiTypes'
 import { CurrentIncentive, Prisoner } from '../../data/prisonerOffenderSearchTypes'
 import { Address, Contact, Restriction } from '../../data/prisonerContactRegistryApiTypes'
 import { ScheduledEvent } from '../../data/whereaboutsApiTypes'
@@ -121,25 +121,6 @@ export default class TestData {
       reserved,
       completed,
     }) as ApplicationDto
-
-  static caseLoads = ({
-    caseLoads = [
-      {
-        caseLoadId: 'BLI',
-        description: 'Bristol (HMP)',
-        type: 'INST',
-        caseloadFunction: 'GENERAL',
-        currentlyActive: false,
-      },
-      {
-        caseLoadId: 'HEI',
-        description: 'Hewell (HMP)',
-        type: 'INST',
-        caseloadFunction: 'GENERAL',
-        currentlyActive: true,
-      },
-    ] as CaseLoad[],
-  } = {}): CaseLoad[] => caseLoads
 
   static contact = ({
     personId = 4321,
