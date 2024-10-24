@@ -94,6 +94,20 @@ describe('Supported prisons service', () => {
     })
   })
 
+  describe('isSupportedPrison', () => {
+    it('should return true if given prisonId is a supported prison', async () => {
+      orchestrationApiClient.getSupportedPrisonIds.mockResolvedValue(supportedPrisonIds)
+      const result = await supportedPrisonsService.isSupportedPrison('user', 'HEI')
+      expect(result).toBe(true)
+    })
+
+    it('should return false if given prisonId is not a supported prison', async () => {
+      orchestrationApiClient.getSupportedPrisonIds.mockResolvedValue(supportedPrisonIds)
+      const result = await supportedPrisonsService.isSupportedPrison('user', 'XYZ')
+      expect(result).toBe(false)
+    })
+  })
+
   describe('API response caching', () => {
     beforeEach(() => {
       orchestrationApiClient.getSupportedPrisonIds.mockResolvedValue(supportedPrisonIds)
