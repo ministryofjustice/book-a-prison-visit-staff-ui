@@ -30,54 +30,6 @@ describe('Audit service', () => {
     jest.clearAllMocks()
   })
 
-  it('sends a change establishment message', async () => {
-    await auditService.changeEstablishment({
-      previousEstablishment: 'HEI',
-      newEstablishment: 'BLI',
-      username: 'username',
-      operationId: 'operation-id',
-    })
-
-    expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
-    expect(sqsClientInstance.send.mock.lastCall[0]).toMatchObject({
-      input: {
-        MessageBody: JSON.stringify({
-          what: 'CHANGE_ESTABLISHMENT',
-          when: fakeDate,
-          operationId: 'operation-id',
-          who: 'username',
-          service: 'book-a-prison-visit-staff-ui',
-          details: '{"previousEstablishment":"HEI","newEstablishment":"BLI"}',
-        }),
-        QueueUrl,
-      },
-    })
-  })
-
-  it('sends a change establishment message, with undefined (not valid in JSON) converted to null', async () => {
-    await auditService.changeEstablishment({
-      previousEstablishment: undefined,
-      newEstablishment: 'BLI',
-      username: 'username',
-      operationId: 'operation-id',
-    })
-
-    expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
-    expect(sqsClientInstance.send.mock.lastCall[0]).toMatchObject({
-      input: {
-        MessageBody: JSON.stringify({
-          what: 'CHANGE_ESTABLISHMENT',
-          when: fakeDate,
-          operationId: 'operation-id',
-          who: 'username',
-          service: 'book-a-prison-visit-staff-ui',
-          details: '{"previousEstablishment":null,"newEstablishment":"BLI"}',
-        }),
-        QueueUrl,
-      },
-    })
-  })
-
   it('sends a prisoner search audit message', async () => {
     await auditService.prisonerSearch({
       searchTerms: 'Smith',

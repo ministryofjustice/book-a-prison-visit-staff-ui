@@ -22,7 +22,6 @@ import { Session, SessionData } from 'express-session'
 import indexRoutes from '../index'
 import bookAVisitRoutes from '../bookAVisit'
 import blockVisitDatesRoutes from '../blockVisitDates'
-import establishmentRoutes from '../changeEstablishment'
 import prisonerRoutes from '../prisoner'
 import reviewRoutes from '../review'
 import searchRoutes from '../search'
@@ -36,7 +35,6 @@ import * as auth from '../../authentication/auth'
 import populateSelectedEstablishment from '../../middleware/populateSelectedEstablishment'
 import type { Services } from '../../services'
 
-import UserService from '../../services/userService'
 import SupportedPrisonsService from '../../services/supportedPrisonsService'
 import TestData from './testData'
 import { Prison } from '../../@types/bapv'
@@ -55,21 +53,6 @@ export const user: PrisonUser = {
 }
 
 export const flashProvider = jest.fn()
-
-// TODO review this class
-class MockUserService extends UserService {
-  constructor() {
-    super(undefined, undefined)
-  }
-
-  async setActiveCaseLoad(_caseLoadId: string, _username: string) {
-    return Promise.resolve()
-  }
-
-  async getUserCaseLoadIds(_username: string): Promise<string[]> {
-    return TestData.supportedPrisonIds()
-  }
-}
 
 class MockSupportedPrisonsService extends SupportedPrisonsService {
   constructor() {
@@ -108,20 +91,11 @@ function appSetup(
   app.use(express.json())
   app.use(express.urlencoded({ extended: true }))
 
-  if (services.userService === undefined) {
-    // eslint-disable-next-line no-param-reassign
-    services.userService = new MockUserService()
-  }
-  if (services.supportedPrisonsService === undefined) {
-    // eslint-disable-next-line no-param-reassign
-    services.supportedPrisonsService = new MockSupportedPrisonsService()
-  }
-  app.use(populateSelectedEstablishment(services))
+  app.use(populateSelectedEstablishment({ supportedPrisonsService: new MockSupportedPrisonsService(), ...services }))
 
   app.use('/', indexRoutes(services))
   app.use('/book-a-visit', bookAVisitRoutes(services))
   app.use('/block-visit-dates', blockVisitDatesRoutes(services))
-  app.use('/change-establishment', establishmentRoutes(services))
   app.use('/prisoner', prisonerRoutes(services))
   app.use('/review', reviewRoutes(services))
   app.use('/search', searchRoutes(services))

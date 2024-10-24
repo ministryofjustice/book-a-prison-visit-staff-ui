@@ -5,7 +5,7 @@ import logger from '../../logger'
 
 export default function populateSelectedEstablishment({ supportedPrisonsService }: Services): RequestHandler {
   return asyncMiddleware(async (req, res, next) => {
-    if (req.path === '/change-establishment') {
+    if (req.path === '/establishment-not-supported') {
       res.locals.selectedEstablishment = req.session.selectedEstablishment
       return next()
     }
@@ -25,7 +25,7 @@ export default function populateSelectedEstablishment({ supportedPrisonsService 
       const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(res.locals.user.username)
 
       if (!supportedPrisons[activeCaseLoadId]) {
-        return res.redirect('/change-establishment')
+        return res.redirect('/establishment-not-supported')
       }
 
       const prison = await supportedPrisonsService.getPrison(res.locals.user.username, activeCaseLoadId)
