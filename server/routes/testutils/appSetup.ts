@@ -18,10 +18,12 @@ jest.mock('../../applicationInfo', () => {
 import express, { Express } from 'express'
 import { NotFound } from 'http-errors'
 import { Session, SessionData } from 'express-session'
+import HeaderFooterMeta from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterMeta'
 
 import indexRoutes from '../index'
 import bookAVisitRoutes from '../bookAVisit'
 import blockVisitDatesRoutes from '../blockVisitDates'
+import establishmentNotSupportedRoutes from '../establishmentNotSupported'
 import prisonerRoutes from '../prisoner'
 import reviewRoutes from '../review'
 import searchRoutes from '../search'
@@ -73,6 +75,7 @@ function appSetup(
   production: boolean,
   userSupplier: () => PrisonUser,
   sessionData: SessionData,
+  feComponentsMeta: HeaderFooterMeta,
 ): Express {
   const app = express()
 
@@ -84,6 +87,7 @@ function appSetup(
     req.flash = flashProvider
     res.locals = {
       user: { ...req.user } as PrisonUser,
+      feComponentsMeta,
     }
     req.session = sessionData as Session & Partial<SessionData>
     next()
@@ -96,6 +100,7 @@ function appSetup(
   app.use('/', indexRoutes(services))
   app.use('/book-a-visit', bookAVisitRoutes(services))
   app.use('/block-visit-dates', blockVisitDatesRoutes(services))
+  app.use('/establishment-not-supported', establishmentNotSupportedRoutes(services))
   app.use('/prisoner', prisonerRoutes(services))
   app.use('/review', reviewRoutes(services))
   app.use('/search', searchRoutes(services))
@@ -115,12 +120,14 @@ export function appWithAllRoutes({
   services = {},
   userSupplier = () => user,
   sessionData = {} as SessionData,
+  feComponentsMeta = undefined as HeaderFooterMeta,
 }: {
   production?: boolean
   services?: Partial<Services>
   userSupplier?: () => PrisonUser
   sessionData?: SessionData
+  feComponentsMeta?: HeaderFooterMeta
 }): Express {
   auth.default.authenticationMiddleware = () => (req, res, next) => next()
-  return appSetup(services as Services, production, userSupplier, sessionData)
+  return appSetup(services as Services, production, userSupplier, sessionData, feComponentsMeta)
 }
