@@ -1,20 +1,14 @@
-import CaseLoad from '@ministryofjustice/hmpps-connect-dps-components/dist/types/CaseLoad'
 import Component from '@ministryofjustice/hmpps-connect-dps-components/dist/types/Component'
 import HeaderFooterMeta from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterMeta'
 import { stubFor } from './wiremock'
 import { convertToTitleCase, initialiseName } from '../../server/utils/utils'
+import TestData from '../../server/routes/testutils/testData'
 
-const caseload: CaseLoad = {
-  caseLoadId: 'HEI',
-  description: 'Hewell (HMP)',
-  type: 'INST',
-  caseloadFunction: 'GENERAL',
-  currentlyActive: true,
-}
+const caseLoad = TestData.caseLoad()
 
 const meta: HeaderFooterMeta = {
-  activeCaseLoad: caseload,
-  caseLoads: [caseload],
+  activeCaseLoad: caseLoad,
+  caseLoads: [caseLoad],
   services: [],
 }
 

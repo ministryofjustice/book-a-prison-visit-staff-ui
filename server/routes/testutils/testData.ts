@@ -1,3 +1,4 @@
+import CaseLoad from '@ministryofjustice/hmpps-connect-dps-components/dist/types/CaseLoad'
 import {
   Alert,
   ApplicationDto,
@@ -121,6 +122,14 @@ export default class TestData {
       reserved,
       completed,
     }) as ApplicationDto
+
+  static caseLoad = ({
+    caseLoadId = 'HEI',
+    description = 'Hewell (HMP)',
+    type = 'INST',
+    caseloadFunction = 'GENERAL',
+    currentlyActive = true,
+  }: Partial<CaseLoad> = {}): CaseLoad => ({ caseLoadId, description, type, caseloadFunction, currentlyActive })
 
   static contact = ({
     personId = 4321,
