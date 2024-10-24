@@ -294,3 +294,15 @@
   @include govuk-link-common;
   @include govuk-link-style-default;
 }
+
+.env--STAGING [data-qa=connect-dps-common-environment-tag] {
+  padding-left: 0;
+  visibility: hidden;
+
+  &::before {
+    content: "STAGING";
+    visibility: visible;
+    @extend .govuk-tag;
+    @extend .govuk-tag--orange;
+  }
+}
