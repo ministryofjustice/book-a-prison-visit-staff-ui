@@ -38,11 +38,6 @@
   }
 }
 
-.bapv-change-details-link {
-  @include govuk-font($size: 19, $weight: 'normal');
-  text-align: right;
-}
-
 .bapv-prisoner-event {
   padding: govuk-spacing(2);
   background-color: rgba(86, 148, 202, 0.25);
@@ -223,14 +218,6 @@
 
   .govuk-form-group {
     margin-bottom: 0;
-  }
-}
-
-#change-hint {
-  margin-bottom: govuk-spacing(6);
-
-  &  > h1 {
-    margin-bottom: govuk-spacing(3);
   }
 }
 
