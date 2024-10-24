@@ -1,7 +1,6 @@
 import HomePage from '../pages/home'
 import AuthSignInPage from '../pages/authSignIn'
 import Page from '../pages/page'
-import AuthManageDetailsPage from '../pages/authManageDetails'
 import AuthorisationErrorPage from '../pages/authorisationError'
 
 context('SignIn', () => {
@@ -35,16 +34,6 @@ context('SignIn', () => {
     const homePage = Page.verifyOnPage(HomePage)
     homePage.signOut().click()
     Page.verifyOnPage(AuthSignInPage)
-  })
-
-  it('User can manage their details', () => {
-    cy.signIn()
-    cy.task('stubAuthManageDetails')
-    const homePage = Page.verifyOnPage(HomePage)
-
-    homePage.manageDetails().get('a').invoke('removeAttr', 'target')
-    homePage.manageDetails().click()
-    Page.verifyOnPage(AuthManageDetailsPage)
   })
 
   it('Token verification failure takes user to sign in page', () => {

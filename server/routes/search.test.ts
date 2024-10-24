@@ -3,7 +3,7 @@ import request from 'supertest'
 import * as cheerio from 'cheerio'
 import createError from 'http-errors'
 import { SessionData } from 'express-session'
-import { appWithAllRoutes } from './testutils/appSetup'
+import { appWithAllRoutes, user } from './testutils/appSetup'
 import { PrisonerDetailsItem, VisitInformation } from '../@types/bapv'
 import TestData from './testutils/testData'
 import {
@@ -55,7 +55,6 @@ describe('Prisoner search page', () => {
           .expect(res => {
             const $ = cheerio.load(res.text)
             expect(res.text).toContain('Search for a prisoner')
-            expect($('[data-test="change-establishment"]').text()).toContain('Change establishment')
             expect($('[data-test=search-by-reference]').length).toBe(1)
           })
       })
@@ -266,7 +265,6 @@ describe('Booking search page', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect(res.text).toContain('Search for a booking')
-          expect($('[data-test="change-establishment"]').text()).toContain('Change establishment')
           expect($('[data-test=search-by-prisoner]').length).toBe(1)
         })
     })
@@ -336,6 +334,7 @@ describe('Booking search page', () => {
       })
 
       app = appWithAllRoutes({
+        userSupplier: () => ({ ...user, activeCaseLoadId: 'XYZ' }),
         services: { auditService, prisonerSearchService, visitService },
         sessionData: { selectedEstablishment: { prisonId: 'XYZ' } } as SessionData,
       })

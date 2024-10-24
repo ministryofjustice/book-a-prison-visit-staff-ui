@@ -89,21 +89,6 @@ const signOut = () =>
     },
   })
 
-const manageDetails = () =>
-  stubFor({
-    request: {
-      method: 'GET',
-      urlPattern: '/auth/account-details.*',
-    },
-    response: {
-      status: 200,
-      headers: {
-        'Content-Type': 'text/html',
-      },
-      body: '<html><body><h1>Your account details</h1></body></html>',
-    },
-  })
-
 const token = (userToken: UserToken) =>
   stubFor({
     request: {
@@ -131,7 +116,6 @@ export default {
   getSignInUrl,
   stubAuthPing: ping,
   stubAuthToken: token,
-  stubAuthManageDetails: manageDetails,
   stubSignIn: (
     userToken: UserToken = { roles: ['ROLE_MANAGE_PRISON_VISITS'] },
   ): Promise<[Response, Response, Response, Response, Response, Response]> =>
@@ -141,6 +125,6 @@ export default {
       signOut(),
       token(userToken),
       tokenVerification.stubVerifyToken(),
-      stubComponents(),
+      stubComponents(userToken.name || 'john smith'),
     ]),
 }

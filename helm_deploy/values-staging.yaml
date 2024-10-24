@@ -22,6 +22,7 @@ generic-service:
     DPS_PRISONER_URL: "https://prisoner-dev.digital.prison.service.justice.gov.uk/"
     APPLICATIONINSIGHTS_CONNECTION_STRING: null # disable App Insights for staging
     REDIS_KEY: "bapv-staff-staging"
+    ENVIRONMENT_NAME: STAGING
 
   namespace_secrets:
     book-a-prison-visit-staff-ui:

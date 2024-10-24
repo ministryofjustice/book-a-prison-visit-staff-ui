@@ -31,7 +31,8 @@
   {% else %}
     {% set backLinkHref = "/prisoner/" + visit.prisonerId %}
   {% endif %}
-
+{% else %}
+  {% set backLinkHref = "/" %}
 {% endif %}
 
 {% block content %}

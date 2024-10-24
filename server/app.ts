@@ -21,7 +21,6 @@ import setUpWebSession from './middleware/setUpWebSession'
 import indexRoutes from './routes'
 import bookAVisitRoutes from './routes/bookAVisit'
 import blockVisitDatesRoutes from './routes/blockVisitDates'
-import establishmentRoutes from './routes/changeEstablishment'
 import prisonerRoutes from './routes/prisoner'
 import reviewRoutes from './routes/review'
 import searchRoutes from './routes/search'
@@ -63,7 +62,6 @@ export default function createApp(services: Services): express.Application {
   app.use('/', indexRoutes(services))
   app.use('/book-a-visit', bookAVisitRoutes(services))
   app.use('/block-visit-dates', blockVisitDatesRoutes(services))
-  app.use('/change-establishment', establishmentRoutes(services))
   app.use('/prisoner', prisonerRoutes(services))
   app.use('/search', searchRoutes(services))
   app.use('/timetable', timetableRoutes(services))

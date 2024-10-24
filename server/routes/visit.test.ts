@@ -2,7 +2,7 @@ import type { Express } from 'express'
 import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
-import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
+import { appWithAllRoutes, flashProvider, user } from './testutils/appSetup'
 import {
   CancelVisitOrchestrationDto,
   NotificationType,
@@ -362,6 +362,7 @@ describe('/visit/:reference', () => {
 
     it('should not show booking summary if selected establishment does not match prison for which visit booked', () => {
       app = appWithAllRoutes({
+        userSupplier: () => ({ ...user, activeCaseLoadId: 'BLI' }),
         services: { auditService, supportedPrisonsService, visitService, visitSessionsService },
         sessionData: {
           selectedEstablishment: TestData.prison({ prisonId: 'BLI', prisonName: supportedPrisons.BLI }),
@@ -375,7 +376,7 @@ describe('/visit/:reference', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('h1').text()).toBe('Visit booking details')
-          expect($('.govuk-back-link').length).toBe(0)
+          expect($('.govuk-back-link').attr('href')).toBe('/')
           expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
 
           expect(res.text).toContain(`This booking is not for ${supportedPrisons.BLI.replace(/&/g, '&amp;')}`)
@@ -762,6 +763,7 @@ describe('/visit/:reference', () => {
 
     it('should redirect to /visit/:reference if selected establishment does not match prison for which visit booked', () => {
       app = appWithAllRoutes({
+        userSupplier: () => ({ ...user, activeCaseLoadId: 'BLI' }),
         services: { auditService, supportedPrisonsService, visitService, visitSessionsService },
         sessionData: {
           selectedEstablishment: TestData.prison({ prisonId: 'BLI', prisonName: supportedPrisons.BLI }),

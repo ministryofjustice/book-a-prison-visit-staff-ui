@@ -102,26 +102,6 @@ describe('Nunjucks Filters', () => {
     })
   })
 
-  describe('initialiseName', () => {
-    it('should return null if full name is not provided', () => {
-      viewContext = {}
-      const nunjucksString = '{{ fullName | initialiseName }}'
-      compiledTemplate = nunjucks.compile(nunjucksString, njkEnv)
-      const $ = cheerio.load(compiledTemplate.render(viewContext))
-      expect($('body').text()).toBe('')
-    })
-
-    it('should return formatted name', () => {
-      viewContext = {
-        fullName: 'Joe Bloggs',
-      }
-      const nunjucksString = '{{ fullName | initialiseName }}'
-      compiledTemplate = nunjucks.compile(nunjucksString, njkEnv)
-      const $ = cheerio.load(compiledTemplate.render(viewContext))
-      expect($('body').text()).toBe('J. Bloggs')
-    })
-  })
-
   describe('displayAge', () => {
     beforeAll(() => {
       const fakeDate = new Date('2020-12-14T12:00:00')
