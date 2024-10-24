@@ -1,6 +1,8 @@
 {% extends "govuk/template.njk" %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 
+{% set bodyClasses = ("env--" + environmentName) if environmentName %}
+
 {% block head %}
   <link href="/assets/stylesheets/application.css?{{ version }}" rel="stylesheet"/>
   <script src="/assets/js/jquery.min.js"></script> 
