@@ -56,13 +56,14 @@ export const user: PrisonUser = {
 
 export const flashProvider = jest.fn()
 
+// TODO is this still needed?
 class MockSupportedPrisonsService extends SupportedPrisonsService {
   constructor() {
-    super(undefined, undefined, undefined)
+    super(undefined, undefined)
   }
 
-  async getSupportedPrisons(_username: string): Promise<Record<string, string>> {
-    return TestData.supportedPrisons()
+  async isSupportedPrison(_username: string, _prisonId: string): Promise<boolean> {
+    return true
   }
 
   async getPrison(_username: string, _prisonCode: string): Promise<Prison> {

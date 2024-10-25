@@ -82,11 +82,11 @@ export default function routes({
     )
 
     if (visit.prisonId !== req.session.selectedEstablishment.prisonId) {
-      const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(res.locals.user.username)
+      const visitPrison = await supportedPrisonsService.getPrison(res.locals.user.username, visit.prisonId)
 
       return res.render('pages/visit/summary', {
         visit: { reference: visit.reference },
-        visitPrisonName: supportedPrisons[visit.prisonId],
+        visitPrisonName: visitPrison.prisonName,
       })
     }
 

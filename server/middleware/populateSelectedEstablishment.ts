@@ -1,19 +1,24 @@
 import type { RequestHandler } from 'express'
-import asyncMiddleware from './asyncMiddleware'
 import { Services } from '../services'
 import logger from '../../logger'
+import asyncMiddleware from './asyncMiddleware'
 
 export default function populateSelectedEstablishment({ supportedPrisonsService }: Services): RequestHandler {
   return asyncMiddleware(async (req, res, next) => {
     if (req.path === '/establishment-not-supported') {
-      res.locals.selectedEstablishment = req.session.selectedEstablishment
       return next()
     }
 
     const { selectedEstablishment } = req.session
     const { activeCaseLoadId } = res.locals.user
+    const establishmentAndCaseLoadMatch = selectedEstablishment?.prisonId === activeCaseLoadId
 
-    if (selectedEstablishment && activeCaseLoadId && selectedEstablishment.prisonId !== activeCaseLoadId) {
+    if (establishmentAndCaseLoadMatch || (selectedEstablishment && !activeCaseLoadId)) {
+      res.locals.selectedEstablishment = selectedEstablishment
+      return next()
+    }
+
+    if (selectedEstablishment && activeCaseLoadId) {
       logger.info(
         `Redirecting to start: active case load (${activeCaseLoadId}) does not match selected establishment (${selectedEstablishment.prisonId}) for user (${res.locals.user.username})`,
       )
@@ -21,20 +26,18 @@ export default function populateSelectedEstablishment({ supportedPrisonsService 
       return res.redirect('/back-to-start')
     }
 
-    if (selectedEstablishment === undefined) {
-      const supportedPrisons = await supportedPrisonsService.getSupportedPrisons(res.locals.user.username)
-
-      if (!supportedPrisons[activeCaseLoadId]) {
-        return res.redirect('/establishment-not-supported')
-      }
-
-      const prison = await supportedPrisonsService.getPrison(res.locals.user.username, activeCaseLoadId)
-
-      req.session.selectedEstablishment = prison
+    if (
+      activeCaseLoadId &&
+      (await supportedPrisonsService.isSupportedPrison(res.locals.user.username, activeCaseLoadId))
+    ) {
+      req.session.selectedEstablishment = await supportedPrisonsService.getPrison(
+        res.locals.user.username,
+        activeCaseLoadId,
+      )
+      res.locals.selectedEstablishment = req.session.selectedEstablishment
+      return next()
     }
 
-    res.locals.selectedEstablishment = req.session.selectedEstablishment
-
-    return next()
+    return res.redirect('/establishment-not-supported')
   })
 }
