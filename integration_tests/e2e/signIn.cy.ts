@@ -54,7 +54,7 @@ context('SignIn', () => {
     Page.verifyOnPage(AuthSignInPage)
 
     cy.task('stubVerifyToken', true)
-    cy.task('stubSignIn', { name: 'bobby brown', roles: ['ROLE_MANAGE_PRISON_VISITS'] })
+    cy.task('stubSignIn', { userToken: { name: 'bobby brown', roles: ['ROLE_MANAGE_PRISON_VISITS'] } })
 
     cy.signIn()
 
@@ -62,7 +62,7 @@ context('SignIn', () => {
   })
 
   it('User without required role is directed to Authorisation Error page', () => {
-    cy.task('stubSignIn', { roles: ['SOME_OTHER_ROLE'] })
+    cy.task('stubSignIn', { userToken: { roles: ['SOME_OTHER_ROLE'] } })
     cy.signIn({ failOnStatusCode: false })
     const authorisationErrorPage = Page.verifyOnPage(AuthorisationErrorPage)
     authorisationErrorPage.message().contains('You are not authorised to use this application')

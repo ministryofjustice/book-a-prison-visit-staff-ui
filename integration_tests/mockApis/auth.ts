@@ -1,9 +1,11 @@
 import jwt from 'jsonwebtoken'
 import { Response } from 'superagent'
 
+import CaseLoad from '@ministryofjustice/hmpps-connect-dps-components/dist/types/CaseLoad'
 import { stubFor, getMatchingRequests } from './wiremock'
 import tokenVerification from './tokenVerification'
 import stubComponents from './componentApi'
+import TestData from '../../server/routes/testutils/testData'
 
 interface UserToken {
   name?: string
@@ -116,15 +118,19 @@ export default {
   getSignInUrl,
   stubAuthPing: ping,
   stubAuthToken: token,
-  stubSignIn: (
-    userToken: UserToken = { roles: ['ROLE_MANAGE_PRISON_VISITS'] },
-  ): Promise<[Response, Response, Response, Response, Response, Response]> =>
+  stubSignIn: ({
+    userToken = { roles: ['ROLE_MANAGE_PRISON_VISITS'] },
+    caseLoad = TestData.caseLoad(),
+  }: {
+    userToken?: UserToken
+    caseLoad?: CaseLoad
+  } = {}): Promise<[Response, Response, Response, Response, Response, Response]> =>
     Promise.all([
       favicon(),
       redirect(),
       signOut(),
       token(userToken),
       tokenVerification.stubVerifyToken(),
-      stubComponents(userToken.name || 'john smith'),
+      stubComponents({ username: userToken.name || 'john smith', caseLoad }),
     ]),
 }

@@ -19,6 +19,7 @@ export default class SupportedPrisonsService {
     return this.getSupportedPrisonIds(undefined)
   }
 
+  // TODO can probably now be removed, along with prison register dependency?
   async getSupportedPrisons(username: string): Promise<Record<string, string>> {
     await this.refreshPrisonNames(username)
     const supportedPrisonIds = await this.getSupportedPrisonIds(username)
@@ -39,6 +40,10 @@ export default class SupportedPrisonsService {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
     return orchestrationApiClient.getSupportedPrisonIds()
+  }
+
+  async isSupportedPrison(username: string, prisonId: string): Promise<boolean> {
+    return (await this.getSupportedPrisonIds(username)).includes(prisonId)
   }
 
   async getPrison(username: string, prisonId: string): Promise<Prison> {

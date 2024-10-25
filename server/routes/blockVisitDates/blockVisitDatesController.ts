@@ -23,7 +23,6 @@ export default class BlockVisitDatesController {
         blockedDates,
         datePickerMinDate,
         datePickerExcludedDates,
-        showEstablishmentSwitcher: true,
       })
     }
   }
