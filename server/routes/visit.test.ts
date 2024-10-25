@@ -38,7 +38,6 @@ const visitSessionsService = createMockVisitSessionsService()
 let visitSessionData: VisitSessionData
 
 const prison = TestData.prison()
-const supportedPrisons = TestData.supportedPrisons()
 const supportedPrisonIds = TestData.supportedPrisonIds()
 
 jest.mock('./visitorUtils', () => {
@@ -125,7 +124,7 @@ describe('/visit/:reference', () => {
     })
     prisonerVisitorsService.getVisitors.mockResolvedValue(visitors)
     supportedPrisonsService.getSupportedPrisonIds.mockResolvedValue(supportedPrisonIds)
-    supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
+    supportedPrisonsService.isSupportedPrison.mockResolvedValue(true)
     supportedPrisonsService.getPrison.mockResolvedValue(prison)
 
     visitSessionData = { allowOverBooking: false, prisoner: undefined }
@@ -361,11 +360,13 @@ describe('/visit/:reference', () => {
     })
 
     it('should not show booking summary if selected establishment does not match prison for which visit booked', () => {
+      const otherPrison = TestData.prison({ prisonId: 'BLI', prisonName: 'Bristol (HMP)' })
+
       app = appWithAllRoutes({
-        userSupplier: () => ({ ...user, activeCaseLoadId: 'BLI' }),
+        userSupplier: () => ({ ...user, activeCaseLoadId: otherPrison.prisonId }),
         services: { auditService, supportedPrisonsService, visitService, visitSessionsService },
         sessionData: {
-          selectedEstablishment: TestData.prison({ prisonId: 'BLI', prisonName: supportedPrisons.BLI }),
+          selectedEstablishment: otherPrison,
         } as SessionData,
       })
 
@@ -379,8 +380,8 @@ describe('/visit/:reference', () => {
           expect($('.govuk-back-link').attr('href')).toBe('/')
           expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
 
-          expect(res.text).toContain(`This booking is not for ${supportedPrisons.BLI.replace(/&/g, '&amp;')}`)
-          expect(res.text).toContain(`change the establishment to ${supportedPrisons[visit.prisonId]}`)
+          expect(res.text).toContain(`This booking is not for ${otherPrison.prisonName}`)
+          expect(res.text).toContain(`change the establishment to ${prison.prisonName}`)
 
           expect(auditService.viewedVisitDetails).not.toHaveBeenCalled()
         })
@@ -762,11 +763,13 @@ describe('/visit/:reference', () => {
     })
 
     it('should redirect to /visit/:reference if selected establishment does not match prison for which visit booked', () => {
+      const otherPrison = TestData.prison({ prisonId: 'BLI', prisonName: 'Bristol (HMP)' })
+
       app = appWithAllRoutes({
-        userSupplier: () => ({ ...user, activeCaseLoadId: 'BLI' }),
+        userSupplier: () => ({ ...user, activeCaseLoadId: otherPrison.prisonId }),
         services: { auditService, supportedPrisonsService, visitService, visitSessionsService },
         sessionData: {
-          selectedEstablishment: TestData.prison({ prisonId: 'BLI', prisonName: supportedPrisons.BLI }),
+          selectedEstablishment: otherPrison,
         } as SessionData,
       })
 
@@ -1084,7 +1087,7 @@ describe('POST /visit/:reference/cancel', () => {
     cancelledVisit = TestData.visit()
 
     visitService.cancelVisit = jest.fn().mockResolvedValue(cancelledVisit)
-    supportedPrisonsService.getSupportedPrisons.mockResolvedValue(supportedPrisons)
+    supportedPrisonsService.isSupportedPrison.mockResolvedValue(true)
     supportedPrisonsService.getPrison.mockResolvedValue(prison)
 
     app = appWithAllRoutes({

@@ -112,14 +112,6 @@ export default {
       },
       agent: new AgentConfig(Number(get('WHEREABOUTS_API_TIMEOUT_RESPONSE', 10000))),
     },
-    prisonRegister: {
-      url: get('PRISON_REGISTER_API_URL', 'http://localhost:8080', requiredInProduction),
-      timeout: {
-        response: Number(get('PRISON_REGISTER_API_URL_TIMEOUT_RESPONSE', 10000)),
-        deadline: Number(get('PRISON_REGISTER_API_URL_TIMEOUT_DEADLINE', 10000)),
-      },
-      agent: new AgentConfig(Number(get('PRISON_REGISTER_API_URL_TIMEOUT_RESPONSE', 10000))),
-    },
     audit: {
       queueUrl: get(
         'AUDIT_SQS_QUEUE_URL',
