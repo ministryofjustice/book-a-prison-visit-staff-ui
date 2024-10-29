@@ -51,7 +51,6 @@ const apiChecks = [
     `${config.apis.prisonerContactRegistry.url}/health/ping`,
     config.apis.prisonerContactRegistry.agent,
   ),
-  service('prisonRegister', `${config.apis.prisonRegister.url}/health/ping`, config.apis.prisonRegister.agent),
   service('prisonerSearch', `${config.apis.prisonerSearch.url}/health/ping`, config.apis.prisonerSearch.agent),
   service('whereabouts', `${config.apis.whereabouts.url}/health/ping`, config.apis.whereabouts.agent),
   ...(config.apis.tokenVerification.enabled

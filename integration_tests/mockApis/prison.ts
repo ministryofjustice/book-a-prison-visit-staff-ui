@@ -1,6 +1,6 @@
 import { SuperAgentRequest } from 'superagent'
 import { stubFor } from './wiremock'
-import { OffenderRestriction, OffenderRestrictions, CaseLoad } from '../../server/data/prisonApiTypes'
+import { OffenderRestriction, OffenderRestrictions } from '../../server/data/prisonApiTypes'
 
 export default {
   stubOffenderRestrictions: ({
@@ -22,39 +22,6 @@ export default {
           bookingId: 12345,
           offenderRestrictions,
         },
-      },
-    })
-  },
-  stubSetActiveCaseLoad: (caseLoadId: string): SuperAgentRequest => {
-    return stubFor({
-      request: {
-        method: 'PUT',
-        url: `/prison/api/users/me/activeCaseLoad`,
-        bodyPatterns: [
-          {
-            equalToJson: {
-              caseLoadId,
-            },
-          },
-        ],
-      },
-      response: {
-        status: 200,
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: {},
-      },
-    })
-  },
-  stubUserCaseloads: (caseLoads: CaseLoad[]): SuperAgentRequest => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        url: `/prison/api/users/me/caseLoads`,
-      },
-      response: {
-        status: 200,
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: caseLoads,
       },
     })
   },

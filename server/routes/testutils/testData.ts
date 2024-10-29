@@ -1,3 +1,4 @@
+import CaseLoad from '@ministryofjustice/hmpps-connect-dps-components/dist/types/CaseLoad'
 import {
   Alert,
   ApplicationDto,
@@ -15,11 +16,10 @@ import {
   VisitSession,
   VisitSummary,
 } from '../../data/orchestrationApiTypes'
-import { CaseLoad, OffenderRestriction } from '../../data/prisonApiTypes'
+import { OffenderRestriction } from '../../data/prisonApiTypes'
 import { CurrentIncentive, Prisoner } from '../../data/prisonerOffenderSearchTypes'
 import { Address, Contact, Restriction } from '../../data/prisonerContactRegistryApiTypes'
 import { ScheduledEvent } from '../../data/whereaboutsApiTypes'
-import { PrisonName } from '../../data/prisonRegisterApiTypes'
 import { Prison } from '../../@types/bapv'
 
 export default class TestData {
@@ -122,24 +122,13 @@ export default class TestData {
       completed,
     }) as ApplicationDto
 
-  static caseLoads = ({
-    caseLoads = [
-      {
-        caseLoadId: 'BLI',
-        description: 'Bristol (HMP)',
-        type: 'INST',
-        caseloadFunction: 'GENERAL',
-        currentlyActive: false,
-      },
-      {
-        caseLoadId: 'HEI',
-        description: 'Hewell (HMP)',
-        type: 'INST',
-        caseloadFunction: 'GENERAL',
-        currentlyActive: true,
-      },
-    ] as CaseLoad[],
-  } = {}): CaseLoad[] => caseLoads
+  static caseLoad = ({
+    caseLoadId = 'HEI',
+    description = 'Hewell (HMP)',
+    type = 'INST',
+    caseloadFunction = 'GENERAL',
+    currentlyActive = true,
+  }: Partial<CaseLoad> = {}): CaseLoad => ({ caseLoadId, description, type, caseloadFunction, currentlyActive })
 
   static contact = ({
     personId = 4321,
@@ -251,19 +240,6 @@ export default class TestData {
       locationDescription,
     }) as Prisoner
 
-  static prisonNames = ({
-    prisons = [
-      {
-        prisonId: 'HEI',
-        prisonName: 'Hewell (HMP)',
-      },
-      {
-        prisonId: 'BLI',
-        prisonName: 'Bristol (HMP & YOI)',
-      },
-    ] as PrisonName[],
-  } = {}): PrisonName[] => prisons
-
   static prisonerProfile = ({
     prisonerId = 'A1234BC',
     prisonId = 'HEI',
@@ -361,13 +337,6 @@ export default class TestData {
     weeklyFrequency,
     visitType,
   })
-
-  static supportedPrisons = ({
-    prisons = <Record<string, string>>{
-      HEI: 'Hewell (HMP)',
-      BLI: 'Bristol (HMP & YOI)',
-    },
-  } = {}): Record<string, string> => prisons
 
   static supportedPrisonIds = ({ prisonIds = ['HEI', 'BLI'] } = {}): string[] => prisonIds
 

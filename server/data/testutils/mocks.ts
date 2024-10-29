@@ -23,7 +23,6 @@ import {
   PrisonApiClient,
   PrisonerContactRegistryApiClient,
   PrisonerSearchClient,
-  PrisonRegisterApiClient,
   WhereaboutsApiClient,
 } from '..'
 
@@ -39,8 +38,5 @@ export const createMockPrisonerContactRegistryApiClient = () =>
   new PrisonerContactRegistryApiClient(null) as jest.Mocked<PrisonerContactRegistryApiClient>
 
 export const createMockPrisonerSearchClient = () => new PrisonerSearchClient(null) as jest.Mocked<PrisonerSearchClient>
-
-export const createMockPrisonRegisterApiClient = () =>
-  new PrisonRegisterApiClient(null) as jest.Mocked<PrisonRegisterApiClient>
 
 export const createMockWhereaboutsApiClient = () => new WhereaboutsApiClient(null) as jest.Mocked<WhereaboutsApiClient>

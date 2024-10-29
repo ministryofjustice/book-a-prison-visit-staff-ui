@@ -15,7 +15,6 @@ import OrchestrationApiClient from './orchestrationApiClient'
 import PrisonApiClient from './prisonApiClient'
 import PrisonerContactRegistryApiClient from './prisonerContactRegistryApiClient'
 import PrisonerSearchClient from './prisonerSearchClient'
-import PrisonRegisterApiClient from './prisonRegisterApiClient'
 import { createRedisClient } from './redisClient'
 import TokenStore from './tokenStore'
 import WhereaboutsApiClient from './whereaboutsApiClient'
@@ -33,8 +32,6 @@ export const dataAccess = () => ({
     new PrisonerContactRegistryApiClient(token)) as RestClientBuilder<PrisonerContactRegistryApiClient>,
   prisonerSearchClientBuilder: ((token: string) =>
     new PrisonerSearchClient(token)) as RestClientBuilder<PrisonerSearchClient>,
-  prisonRegisterApiClientBuilder: ((token: string) =>
-    new PrisonRegisterApiClient(token)) as RestClientBuilder<PrisonRegisterApiClient>,
   whereaboutsApiClientBuilder: ((token: string) =>
     new WhereaboutsApiClient(token)) as RestClientBuilder<WhereaboutsApiClient>,
 })
@@ -47,7 +44,6 @@ export {
   PrisonApiClient,
   PrisonerContactRegistryApiClient,
   PrisonerSearchClient,
-  PrisonRegisterApiClient,
   RestClientBuilder,
   WhereaboutsApiClient,
 }

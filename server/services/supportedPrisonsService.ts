@@ -1,38 +1,14 @@
 import { Prison } from '../@types/bapv'
-import { HmppsAuthClient, OrchestrationApiClient, PrisonRegisterApiClient, RestClientBuilder } from '../data'
-import { PrisonName } from '../data/prisonRegisterApiTypes'
-
-const A_DAY_IN_MS = 24 * 60 * 60 * 1000
+import { HmppsAuthClient, OrchestrationApiClient, RestClientBuilder } from '../data'
 
 export default class SupportedPrisonsService {
   constructor(
     private readonly orchestrationApiClientFactory: RestClientBuilder<OrchestrationApiClient>,
-    private readonly prisonRegisterApiClientFactory: RestClientBuilder<PrisonRegisterApiClient>,
     private readonly hmppsAuthClient: HmppsAuthClient,
   ) {}
 
-  private prisonNames: PrisonName[]
-
-  private lastUpdated = 0
-
   async getActiveAgencies(): Promise<string[]> {
     return this.getSupportedPrisonIds(undefined)
-  }
-
-  async getSupportedPrisons(username: string): Promise<Record<string, string>> {
-    await this.refreshPrisonNames(username)
-    const supportedPrisonIds = await this.getSupportedPrisonIds(username)
-
-    const supportedPrisons: Record<string, string> = {}
-
-    supportedPrisonIds.forEach(prisonId => {
-      const supportedPrison = this.prisonNames.find(prison => prison.prisonId === prisonId)
-      if (supportedPrison) {
-        supportedPrisons[supportedPrison.prisonId] = supportedPrison.prisonName
-      }
-    })
-
-    return supportedPrisons
   }
 
   async getSupportedPrisonIds(username: string): Promise<string[]> {
@@ -41,20 +17,13 @@ export default class SupportedPrisonsService {
     return orchestrationApiClient.getSupportedPrisonIds()
   }
 
+  async isSupportedPrison(username: string, prisonId: string): Promise<boolean> {
+    return (await this.getSupportedPrisonIds(username)).includes(prisonId)
+  }
+
   async getPrison(username: string, prisonId: string): Promise<Prison> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
     return orchestrationApiClient.getPrison(prisonId)
-  }
-
-  private async refreshPrisonNames(username: string): Promise<void> {
-    if (this.lastUpdated <= Date.now() - A_DAY_IN_MS) {
-      const token = await this.hmppsAuthClient.getSystemClientToken(username)
-      const prisonRegisterApiClient = this.prisonRegisterApiClientFactory(token)
-      this.prisonNames = (await prisonRegisterApiClient.getPrisonNames()).map(prison => {
-        return { prisonId: prison.prisonId, prisonName: prison.prisonName }
-      })
-      this.lastUpdated = Date.now()
-    }
   }
 }

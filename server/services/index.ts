@@ -5,7 +5,6 @@ import PrisonerProfileService from './prisonerProfileService'
 import PrisonerSearchService from './prisonerSearchService'
 import PrisonerVisitorsService from './prisonerVisitorsService'
 import SupportedPrisonsService from './supportedPrisonsService'
-import UserService from './userService'
 import VisitNotificationsService from './visitNotificationsService'
 import VisitService from './visitService'
 import VisitSessionsService from './visitSessionsService'
@@ -16,7 +15,6 @@ export const services = () => {
     orchestrationApiClientBuilder,
     prisonApiClientBuilder,
     prisonerContactRegistryApiClientBuilder,
-    prisonRegisterApiClientBuilder,
     prisonerSearchClientBuilder,
     whereaboutsApiClientBuilder,
     applicationInfo,
@@ -26,11 +24,7 @@ export const services = () => {
 
   const blockedDatesService = new BlockedDatesService(orchestrationApiClientBuilder, hmppsAuthClient)
 
-  const supportedPrisonsService = new SupportedPrisonsService(
-    orchestrationApiClientBuilder,
-    prisonRegisterApiClientBuilder,
-    hmppsAuthClient,
-  )
+  const supportedPrisonsService = new SupportedPrisonsService(orchestrationApiClientBuilder, hmppsAuthClient)
 
   const prisonerProfileService = new PrisonerProfileService(
     orchestrationApiClientBuilder,
@@ -41,8 +35,6 @@ export const services = () => {
   const prisonerSearchService = new PrisonerSearchService(prisonerSearchClientBuilder, hmppsAuthClient)
 
   const prisonerVisitorsService = new PrisonerVisitorsService(prisonerContactRegistryApiClientBuilder, hmppsAuthClient)
-
-  const userService = new UserService(hmppsAuthClient, prisonApiClientBuilder)
 
   const visitNotificationsService = new VisitNotificationsService(orchestrationApiClientBuilder, hmppsAuthClient)
 
@@ -65,7 +57,6 @@ export const services = () => {
     prisonerSearchService,
     prisonerVisitorsService,
     supportedPrisonsService,
-    userService,
     visitNotificationsService,
     visitService,
     visitSessionsService,
@@ -82,7 +73,6 @@ export {
   PrisonerSearchService,
   PrisonerVisitorsService,
   SupportedPrisonsService,
-  UserService,
   VisitNotificationsService,
   VisitService,
   VisitSessionsService,

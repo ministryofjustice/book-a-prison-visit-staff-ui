@@ -2,7 +2,6 @@ import nock from 'nock'
 import config from '../config'
 import PrisonApiClient from './prisonApiClient'
 import { OffenderRestrictions } from './prisonApiTypes'
-import TestData from '../routes/testutils/testData'
 
 describe('prisonApiClient', () => {
   let fakePrisonApi: nock.Scope
@@ -52,33 +51,6 @@ describe('prisonApiClient', () => {
       const output = await prisonApiClient.getOffenderRestrictions(offenderNo)
 
       expect(output).toEqual(results)
-    })
-  })
-
-  describe('getUserCaseLoads', () => {
-    it('should return available caseloads for current user', async () => {
-      const results = TestData.caseLoads()
-
-      fakePrisonApi.get('/api/users/me/caseLoads').matchHeader('authorization', `Bearer ${token}`).reply(200, results)
-
-      const output = await prisonApiClient.getUserCaseLoads()
-
-      expect(output).toEqual(results)
-    })
-  })
-
-  describe('setActiveCaseLoad', () => {
-    it('should set active case load for current user', async () => {
-      const caseLoadId = 'HEI'
-
-      fakePrisonApi
-        .put('/api/users/me/activeCaseLoad', { caseLoadId })
-        .matchHeader('authorization', `Bearer ${token}`)
-        .reply(200, {})
-
-      const output = await prisonApiClient.setActiveCaseLoad('HEI')
-
-      expect(output).toEqual({})
     })
   })
 })
