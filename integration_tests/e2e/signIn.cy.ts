@@ -1,7 +1,6 @@
 import HomePage from '../pages/home'
 import AuthSignInPage from '../pages/authSignIn'
 import Page from '../pages/page'
-import AuthManageDetailsPage from '../pages/authManageDetails'
 import AuthorisationErrorPage from '../pages/authorisationError'
 
 context('SignIn', () => {
@@ -9,7 +8,6 @@ context('SignIn', () => {
     cy.task('reset')
     cy.task('stubSignIn')
     cy.task('stubSupportedPrisonIds')
-    cy.task('stubPrisonNames')
     cy.task('stubGetPrison')
     cy.task('stubGetNotificationCount', {})
   })
@@ -37,16 +35,6 @@ context('SignIn', () => {
     Page.verifyOnPage(AuthSignInPage)
   })
 
-  it('User can manage their details', () => {
-    cy.signIn()
-    cy.task('stubAuthManageDetails')
-    const homePage = Page.verifyOnPage(HomePage)
-
-    homePage.manageDetails().get('a').invoke('removeAttr', 'target')
-    homePage.manageDetails().click()
-    Page.verifyOnPage(AuthManageDetailsPage)
-  })
-
   it('Token verification failure takes user to sign in page', () => {
     cy.signIn()
     Page.verifyOnPage(HomePage)
@@ -65,7 +53,7 @@ context('SignIn', () => {
     Page.verifyOnPage(AuthSignInPage)
 
     cy.task('stubVerifyToken', true)
-    cy.task('stubSignIn', { name: 'bobby brown', roles: ['ROLE_MANAGE_PRISON_VISITS'] })
+    cy.task('stubSignIn', { userToken: { name: 'bobby brown', roles: ['ROLE_MANAGE_PRISON_VISITS'] } })
 
     cy.signIn()
 
@@ -73,7 +61,7 @@ context('SignIn', () => {
   })
 
   it('User without required role is directed to Authorisation Error page', () => {
-    cy.task('stubSignIn', { roles: ['SOME_OTHER_ROLE'] })
+    cy.task('stubSignIn', { userToken: { roles: ['SOME_OTHER_ROLE'] } })
     cy.signIn({ failOnStatusCode: false })
     const authorisationErrorPage = Page.verifyOnPage(AuthorisationErrorPage)
     authorisationErrorPage.message().contains('You are not authorised to use this application')

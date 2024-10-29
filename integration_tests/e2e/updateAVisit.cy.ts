@@ -25,7 +25,6 @@ context('Update a visit', () => {
     cy.task('reset')
     cy.task('stubSignIn')
     cy.task('stubSupportedPrisonIds')
-    cy.task('stubPrisonNames')
     cy.task('stubGetPrison')
     cy.task('stubGetNotificationCount', {})
     cy.signIn()

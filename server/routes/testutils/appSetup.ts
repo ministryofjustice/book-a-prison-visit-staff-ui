@@ -18,11 +18,12 @@ jest.mock('../../applicationInfo', () => {
 import express, { Express } from 'express'
 import { NotFound } from 'http-errors'
 import { Session, SessionData } from 'express-session'
+import HeaderFooterMeta from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterMeta'
 
 import indexRoutes from '../index'
 import bookAVisitRoutes from '../bookAVisit'
 import blockVisitDatesRoutes from '../blockVisitDates'
-import establishmentRoutes from '../changeEstablishment'
+import establishmentNotSupportedRoutes from '../establishmentNotSupported'
 import prisonerRoutes from '../prisoner'
 import reviewRoutes from '../review'
 import searchRoutes from '../search'
@@ -36,7 +37,6 @@ import * as auth from '../../authentication/auth'
 import populateSelectedEstablishment from '../../middleware/populateSelectedEstablishment'
 import type { Services } from '../../services'
 
-import UserService from '../../services/userService'
 import SupportedPrisonsService from '../../services/supportedPrisonsService'
 import TestData from './testData'
 import { Prison } from '../../@types/bapv'
@@ -56,28 +56,14 @@ export const user: PrisonUser = {
 
 export const flashProvider = jest.fn()
 
-// TODO review this class
-class MockUserService extends UserService {
+// TODO is this still needed?
+class MockSupportedPrisonsService extends SupportedPrisonsService {
   constructor() {
     super(undefined, undefined)
   }
 
-  async setActiveCaseLoad(_caseLoadId: string, _username: string) {
-    return Promise.resolve()
-  }
-
-  async getUserCaseLoadIds(_username: string): Promise<string[]> {
-    return TestData.supportedPrisonIds()
-  }
-}
-
-class MockSupportedPrisonsService extends SupportedPrisonsService {
-  constructor() {
-    super(undefined, undefined, undefined)
-  }
-
-  async getSupportedPrisons(_username: string): Promise<Record<string, string>> {
-    return TestData.supportedPrisons()
+  async isSupportedPrison(_username: string, _prisonId: string): Promise<boolean> {
+    return true
   }
 
   async getPrison(_username: string, _prisonCode: string): Promise<Prison> {
@@ -90,6 +76,7 @@ function appSetup(
   production: boolean,
   userSupplier: () => PrisonUser,
   sessionData: SessionData,
+  feComponentsMeta: HeaderFooterMeta,
 ): Express {
   const app = express()
 
@@ -101,6 +88,7 @@ function appSetup(
     req.flash = flashProvider
     res.locals = {
       user: { ...req.user } as PrisonUser,
+      feComponentsMeta,
     }
     req.session = sessionData as Session & Partial<SessionData>
     next()
@@ -108,20 +96,12 @@ function appSetup(
   app.use(express.json())
   app.use(express.urlencoded({ extended: true }))
 
-  if (services.userService === undefined) {
-    // eslint-disable-next-line no-param-reassign
-    services.userService = new MockUserService()
-  }
-  if (services.supportedPrisonsService === undefined) {
-    // eslint-disable-next-line no-param-reassign
-    services.supportedPrisonsService = new MockSupportedPrisonsService()
-  }
-  app.use(populateSelectedEstablishment(services))
+  app.use(populateSelectedEstablishment({ supportedPrisonsService: new MockSupportedPrisonsService(), ...services }))
 
   app.use('/', indexRoutes(services))
   app.use('/book-a-visit', bookAVisitRoutes(services))
   app.use('/block-visit-dates', blockVisitDatesRoutes(services))
-  app.use('/change-establishment', establishmentRoutes(services))
+  app.use('/establishment-not-supported', establishmentNotSupportedRoutes(services))
   app.use('/prisoner', prisonerRoutes(services))
   app.use('/review', reviewRoutes(services))
   app.use('/search', searchRoutes(services))
@@ -141,12 +121,14 @@ export function appWithAllRoutes({
   services = {},
   userSupplier = () => user,
   sessionData = {} as SessionData,
+  feComponentsMeta = undefined as HeaderFooterMeta,
 }: {
   production?: boolean
   services?: Partial<Services>
   userSupplier?: () => PrisonUser
   sessionData?: SessionData
+  feComponentsMeta?: HeaderFooterMeta
 }): Express {
   auth.default.authenticationMiddleware = () => (req, res, next) => next()
-  return appSetup(services as Services, production, userSupplier, sessionData)
+  return appSetup(services as Services, production, userSupplier, sessionData, feComponentsMeta)
 }

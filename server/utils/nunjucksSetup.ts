@@ -4,7 +4,7 @@ import nunjucks, { Environment } from 'nunjucks'
 import express from 'express'
 import { format, formatDuration, intervalToDuration, isAfter, parseISO } from 'date-fns'
 import { FormError } from '../@types/bapv'
-import { properCaseFullName } from './utils'
+import { initialiseName, properCaseFullName } from './utils'
 import config from '../config'
 import { ApplicationInfo } from '../applicationInfo'
 
@@ -15,6 +15,7 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
 
   app.locals.asset_path = '/assets/'
   app.locals.applicationName = 'Manage prison visits'
+  app.locals.environmentName = config.environmentName
   app.locals.dpsHome = config.dpsHome
   app.locals.dpsPrisoner = config.dpsPrisoner
 
@@ -51,14 +52,7 @@ export function registerNunjucks(app?: express.Express): Environment {
     },
   )
 
-  njkEnv.addFilter('initialiseName', (fullName: string) => {
-    // this check is for the authError page
-    if (!fullName) {
-      return null
-    }
-    const array = fullName.split(' ')
-    return `${array[0][0]}. ${array.reverse()[0]}`
-  })
+  njkEnv.addFilter('initialiseName', initialiseName)
 
   njkEnv.addFilter('formatLastNameFirst', (fullName: string, properCase = true) => {
     // this check is for the authError page

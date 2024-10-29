@@ -5,7 +5,6 @@ import sessionCheckMiddleware from './sessionCheckMiddleware'
 import TestData from '../routes/testutils/testData'
 
 const prisonId = 'HEI'
-const supportedPrisons = TestData.supportedPrisons()
 
 const prisonerData: VisitSessionData['prisoner'] = {
   name: 'abc',
@@ -79,7 +78,7 @@ describe('sessionCheckMiddleware', () => {
   it('should redirect to the start page if prisonId in originalVisitSlot (set for update journey) does not match selected establishment', () => {
     req.session.selectedEstablishment = TestData.prison({
       prisonId: 'BLI',
-      prisonName: supportedPrisons.BLI,
+      prisonName: 'Bristol (HMP)',
     })
     req.session.visitSessionData = { originalVisitSlot: visitSlot } as VisitSessionData
 
@@ -261,7 +260,7 @@ describe('sessionCheckMiddleware', () => {
     it('should redirect to the start page if prisonId in visitSlot does not match selected establishment', () => {
       req.session.selectedEstablishment = TestData.prison({
         prisonId: 'BLI',
-        prisonName: supportedPrisons.BLI,
+        prisonName: 'Bristol (HMP)',
       })
       req.session.visitSessionData = {
         allowOverBooking: false,

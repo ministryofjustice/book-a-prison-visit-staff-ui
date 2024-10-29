@@ -9,7 +9,6 @@ import prisonerContactRegistry from './integration_tests/mockApis/prisonerContac
 import whereaboutsOffenderEvents from './integration_tests/mockApis/whereabouts'
 import prisonApi from './integration_tests/mockApis/prison'
 import prisonerSearch from './integration_tests/mockApis/prisonerSearch'
-import prisonRegister from './integration_tests/mockApis/prisonRegister'
 
 export default defineConfig({
   chromeWebSecurity: false,
@@ -35,7 +34,6 @@ export default defineConfig({
         ...prisonerContactRegistry,
         ...prisonApi,
         ...prisonerSearch,
-        ...prisonRegister,
         ...whereaboutsOffenderEvents,
 
         // Log message to console

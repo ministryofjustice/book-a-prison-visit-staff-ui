@@ -8,8 +8,6 @@ import TestData from './testutils/testData'
 import { getParsedDateFromQueryString } from '../utils/utils'
 import {
   createMockAuditService,
-  createMockPrisonerSearchService,
-  createMockSupportedPrisonsService,
   createMockBlockedDatesService,
   createMockVisitNotificationsService,
   createMockVisitService,
@@ -21,8 +19,6 @@ let app: Express
 let flashData: FlashData
 
 const auditService = createMockAuditService()
-const prisonerSearchService = createMockPrisonerSearchService()
-const supportedPrisonsService = createMockSupportedPrisonsService()
 const blockedDatesService = createMockBlockedDatesService()
 const visitNotificationsService = createMockVisitNotificationsService()
 const visitService = createMockVisitService()
@@ -34,16 +30,12 @@ beforeEach(() => {
     return flashData[key]
   })
 
-  supportedPrisonsService.getSupportedPrisons.mockResolvedValue(TestData.supportedPrisons())
-  supportedPrisonsService.getPrison.mockResolvedValue(TestData.prison())
   blockedDatesService.isBlockedDate.mockResolvedValue(false)
   visitNotificationsService.dateHasNotifications.mockResolvedValue(false)
 
   app = appWithAllRoutes({
     services: {
       auditService,
-      prisonerSearchService,
-      supportedPrisonsService,
       blockedDatesService,
       visitNotificationsService,
       visitService,

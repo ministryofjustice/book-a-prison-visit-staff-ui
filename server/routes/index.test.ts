@@ -25,7 +25,7 @@ describe('GET /', () => {
     visitNotificationsService.getNotificationCount.mockResolvedValue(notificationCount)
   })
 
-  it('should render the home page cards and change establishment link', () => {
+  it('should render the home page cards', () => {
     return request(app)
       .get('/')
       .expect('Content-Type', /html/)
@@ -48,8 +48,6 @@ describe('GET /', () => {
 
         expect($('[data-test="block-dates"] .card__link').text()).toBe('Block visit dates')
         expect($('[data-test="block-dates"] .card__link').attr('href')).toBe('/block-visit-dates')
-
-        expect($('[data-test="change-establishment"]').text()).toContain('Change establishment')
       })
   })
 

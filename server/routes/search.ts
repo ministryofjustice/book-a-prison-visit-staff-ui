@@ -25,7 +25,6 @@ export default function routes({ auditService, prisonerSearchService, visitServi
     res.render('pages/search/prisoner', {
       search,
       visit: req.originalUrl.includes('-visit'),
-      showEstablishmentSwitcher: true,
     })
   })
 
@@ -102,7 +101,6 @@ export default function routes({ auditService, prisonerSearchService, visitServi
       from: (parsedPage - 1) * pageSize + 1,
       to,
       pageLinks: numberOfPages <= 1 ? [] : pageLinks,
-      showEstablishmentSwitcher: true,
     })
   })
 
@@ -117,7 +115,6 @@ export default function routes({ auditService, prisonerSearchService, visitServi
       searchBlock2,
       searchBlock3,
       searchBlock4,
-      showEstablishmentSwitcher: true,
       establishmentHref: '/search/visit',
     })
   })
@@ -214,7 +211,6 @@ export default function routes({ auditService, prisonerSearchService, visitServi
       from: (parsedPage - 1) * pageSize + 1,
       to,
       pageLinks: numberOfPages <= 1 ? [] : pageLinks,
-      showEstablishmentSwitcher: true,
       queryParamsForBackLink,
     })
   })
