@@ -28,10 +28,9 @@ export default function populateCurrentUser(): RequestHandler {
         res.locals.user.staffId = parseInt(userId, 10) || undefined
       }
 
-      if (res.locals.feComponentsMeta) {
-        const { feComponentsMeta } = res.locals
-        res.locals.user.activeCaseLoadId = feComponentsMeta.activeCaseLoad.caseLoadId
-      }
+      // feComponentsMeta only populated on GET requests, so fall back to already selected establishment
+      res.locals.user.activeCaseLoadId =
+        res.locals.feComponentsMeta?.activeCaseLoad.caseLoadId ?? req.session.selectedEstablishment?.prisonId
 
       next()
     } catch (error) {

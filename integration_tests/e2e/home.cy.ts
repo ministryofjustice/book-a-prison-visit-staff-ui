@@ -9,7 +9,6 @@ context('Home page', () => {
     cy.task('reset')
     cy.task('stubSignIn')
     cy.task('stubSupportedPrisonIds')
-    cy.task('stubPrisonNames')
     cy.task('stubGetPrison')
     cy.task('stubGetNotificationCount', { notificationCount })
     cy.signIn()

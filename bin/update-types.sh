@@ -14,10 +14,6 @@ APIS='{
       "url": "https://prison-api-dev.prison.service.justice.gov.uk/v3/api-docs"
     },
     {
-      "api": "prison-register-api",
-      "url": "https://prison-register-dev.hmpps.service.justice.gov.uk/v3/api-docs"
-    },
-    {
       "api": "prisoner-contact-registry-api",
       "url": "https://prisoner-contact-registry-dev.prison.service.justice.gov.uk/v3/api-docs"
     },
