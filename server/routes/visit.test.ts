@@ -606,6 +606,30 @@ describe('/visit/:reference', () => {
           })
       })
 
+      it('should display cancelled message - booker cancelled', () => {
+        visit.visitStatus = 'CANCELLED'
+        visit.outcomeStatus = 'BOOKER_CANCELLED'
+        visit.visitNotes = [] // empty visit notes, as no comment from a booker lead cancellation
+        visitHistoryDetails.eventsAudit = [
+          {
+            type: 'CANCELLED_VISIT',
+            applicationMethodType: 'NOT_APPLICABLE',
+            actionedByFullName: 'User Three',
+            userType: 'STAFF',
+            createTimestamp: '2022-01-01T11:00:00',
+          },
+        ]
+        return request(app)
+          .get('/visit/ab-cd-ef-gh')
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('[data-test="visit-cancelled-type"]').text()).toBe('This visit was cancelled by the visitor.')
+            expect($('[data-test="visit-cancelled-reason-1"]').text()).toBe('')
+          })
+      })
+
       it('should display cancelled message - details changed after booking', () => {
         visit.visitStatus = 'CANCELLED'
         visit.outcomeStatus = 'DETAILS_CHANGED_AFTER_BOOKING'

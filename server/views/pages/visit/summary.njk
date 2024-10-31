@@ -47,35 +47,37 @@
     {% set cancelledVisitReason = '' %}
 
       {% if visit.visitStatus === "CANCELLED" %}
-
+      
         {% set status = visit.outcomeStatus.split("_") %}
+
+        {% set cancelledBy %}
+          {% if status[0] === 'ADMINISTRATIVE' %}
+            {{- 'This visit was cancelled due to an administrative error with the booking.' -}}
+          {% elseif status[0] === 'DETAILS' %}
+            {{- 'This visit was cancelled as the details changed after booking.' -}}
+          {% elseif status[0] === 'BOOKER' %}
+            {{- 'This visit was cancelled by the visitor.' -}}
+          {% else %}
+            {{- 'This visit was cancelled by the ' + status[0] | lower + '.' -}}
+          {% endif %}
+        {% endset %}
+
+        {% set cancelledVisitBannerHtml %}
+          {{ govukWarningText({
+            classes: "govuk-!-margin-bottom-0 govuk-!-padding-left-4",
+            html: '<span data-test="visit-cancelled-type">' + cancelledBy + '</span>',
+            iconFallbackText: "Warning"
+          }) }}
+        {% endset %}
+
+        {{ mojBanner({
+          classes: "govuk-!-padding-left-4",
+          html: cancelledVisitBannerHtml
+        }) }}
+
         {%- for visitNote in visit.visitNotes %}
           {% if visitNote.type == "VISIT_OUTCOMES" %}
-          {% set cancelledVisitReason = visitNote.text %}
-            
-            {% set cancelledBy %}
-              {% if status[0] === 'ADMINISTRATIVE' %}
-                {{- 'This visit was cancelled due to an administrative error with the booking.' -}}
-              {% elseif status[0] === 'DETAILS' %}
-                {{- 'This visit was cancelled as the details changed after booking.' -}}
-              {% else %}
-                {{- 'This visit was cancelled by the ' + status[0] | lower + '.' -}}
-              {% endif %}
-            {% endset %}
-
-            {% set cancelledVisitBannerHtml %}
-              {{ govukWarningText({
-                classes: "govuk-!-margin-bottom-0 govuk-!-padding-left-4",
-                html: '<span data-test="visit-cancelled-type">' + cancelledBy + '</span>',
-                iconFallbackText: "Warning"
-              }) }}
-            {% endset %}
-
-            {{ mojBanner({
-              classes: "govuk-!-padding-left-4",
-              html: cancelledVisitBannerHtml
-            }) }}
-
+            {% set cancelledVisitReason = visitNote.text %}
           {% endif %}
         {% endfor %}
       {% endif %}
@@ -288,7 +290,9 @@
                   {% elseif event.type === 'UPDATED_VISIT' or event.type === 'MIGRATED_VISIT' %}
                     <p data-test="visit-request-method-{{ loop.index }}">{{ requestMethodDescriptions[event.applicationMethodType] }}</p>
                   {% elseif event.type === 'CANCELLED_VISIT' %}
-                    <p data-test="visit-cancelled-reason-{{ loop.index }}">Reason: {{ cancelledVisitReason }}</p>
+                    {% if cancelledVisitReason !== '' %}
+                      <p data-test="visit-cancelled-reason-{{ loop.index }}">Reason: {{ cancelledVisitReason }}</p>
+                    {% endif %}
                     {% if event.applicationMethodType !== 'NOT_KNOWN' and event.applicationMethodType !== 'NOT_APPLICABLE' %}
                       <p data-test="visit-cancelled-request-method-{{ loop.index }}">{{ requestMethodDescriptions[event.applicationMethodType] }}</p>
                     {% endif %}
