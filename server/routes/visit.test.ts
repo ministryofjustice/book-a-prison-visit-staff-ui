@@ -613,9 +613,9 @@ describe('/visit/:reference', () => {
         visitHistoryDetails.eventsAudit = [
           {
             type: 'CANCELLED_VISIT',
-            applicationMethodType: 'NOT_APPLICABLE',
-            actionedByFullName: 'User Three',
-            userType: 'STAFF',
+            applicationMethodType: 'WEBSITE',
+            actionedByFullName: 'aaaa-bbbb-cccc', // booker reference - this is displayed
+            userType: 'PUBLIC',
             createTimestamp: '2022-01-01T11:00:00',
           },
         ]
@@ -625,8 +625,10 @@ describe('/visit/:reference', () => {
           .expect('Content-Type', /html/)
           .expect(res => {
             const $ = cheerio.load(res.text)
+            expect($('[data-test="visit-actioned-by-1"]').text()).toContain('by aaaa-bbbb-cccc')
             expect($('[data-test="visit-cancelled-type"]').text()).toBe('This visit was cancelled by the visitor.')
-            expect($('[data-test="visit-cancelled-reason-1"]').text()).toBe('')
+            expect($('[data-test="visit-cancelled-reason-1"]').text()).toBe('') // no cancelled reason given on public cancellations
+            expect($('[data-test="visit-cancelled-request-method-1"]').text()).toBe('Method: GOV.UK cancellation')
           })
       })
 

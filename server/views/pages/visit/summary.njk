@@ -294,7 +294,11 @@
                       <p data-test="visit-cancelled-reason-{{ loop.index }}">Reason: {{ cancelledVisitReason }}</p>
                     {% endif %}
                     {% if event.applicationMethodType !== 'NOT_KNOWN' and event.applicationMethodType !== 'NOT_APPLICABLE' %}
-                      <p data-test="visit-cancelled-request-method-{{ loop.index }}">{{ requestMethodDescriptions[event.applicationMethodType] }}</p>
+                      {% if event.userType ==='PUBLIC' and event.applicationMethodType === 'WEBSITE' %}
+                        <p data-test="visit-cancelled-request-method-{{ loop.index }}">Method: GOV.UK cancellation</p>
+                      {% else %}
+                        <p data-test="visit-cancelled-request-method-{{ loop.index }}">{{ requestMethodDescriptions[event.applicationMethodType] }}</p>
+                      {% endif %}
                     {% endif %}
                   {% elseif event.type === 'IGNORE_VISIT_NOTIFICATIONS_EVENT' %}
                     <p data-test="visit-needs-review-description-{{ loop.index }}">Reason: {{ event.text }}</p>
