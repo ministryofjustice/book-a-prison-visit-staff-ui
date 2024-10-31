@@ -47,7 +47,7 @@
     {% set cancelledVisitReason = '' %}
 
       {% if visit.visitStatus === "CANCELLED" %}
-      
+
         {% set status = visit.outcomeStatus.split("_") %}
 
         {% set cancelledBy %}
