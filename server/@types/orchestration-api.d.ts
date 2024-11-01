@@ -770,6 +770,12 @@ export interface components {
         | 'BY_PRISONER'
       /** @description Username for user who actioned this request */
       actionedBy: string
+      /**
+       * @description User type
+       * @example STAFF
+       * @enum {string}
+       */
+      userType: 'STAFF' | 'PUBLIC' | 'SYSTEM'
     }
     /**
      * @description Contact Phone Number
@@ -1329,10 +1335,10 @@ export interface components {
       sort?: components['schemas']['SortObject'][]
       /** Format: int32 */
       pageSize?: number
+      unpaged?: boolean
       paged?: boolean
       /** Format: int32 */
       pageNumber?: number
-      unpaged?: boolean
     }
     SortObject: {
       direction?: string

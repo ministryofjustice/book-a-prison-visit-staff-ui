@@ -1145,6 +1145,7 @@ describe('POST /visit/:reference/cancel', () => {
             },
             applicationMethodType: 'NOT_APPLICABLE',
             actionedBy: 'user1',
+            userType: 'STAFF',
           },
         })
         expect(flashProvider).toHaveBeenCalledWith('startTimestamp', cancelledVisit.startTimestamp)
@@ -1181,6 +1182,7 @@ describe('POST /visit/:reference/cancel', () => {
             },
             applicationMethodType: 'EMAIL',
             actionedBy: 'user1',
+            userType: 'STAFF',
           },
         })
       })
