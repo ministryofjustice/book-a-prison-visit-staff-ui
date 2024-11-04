@@ -1282,7 +1282,7 @@ describe('GET /visit/cancelled', () => {
         const $ = cheerio.load(res.text)
         expect($('h1').text().trim()).toBe('Booking cancelled')
         expect($('[data-test="visit-details"]').text().trim()).toBe('10:15am to 11am on Wednesday 9 February 2022')
-        expect($('[data-test="go-to-start"]').length).toBe(1)
+        expect($('[data-test="go-to-home"]').length).toBe(1)
 
         expect(clearSession).toHaveBeenCalledTimes(1)
       })

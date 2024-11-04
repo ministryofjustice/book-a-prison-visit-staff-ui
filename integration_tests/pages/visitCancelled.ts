@@ -7,5 +7,5 @@ export default class VisitCancelledPage extends Page {
 
   visitDetails = (): PageElement => cy.get('[data-test="visit-details"]')
 
-  homeButton = (): PageElement => cy.get('[data-test="go-to-start"]')
+  homeButton = (): PageElement => cy.get('[data-test="go-to-home"]')
 }
