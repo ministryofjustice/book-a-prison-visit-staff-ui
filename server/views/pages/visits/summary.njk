@@ -149,13 +149,22 @@
           ]), visitsRows) %}
         {% endfor %}
         {{ govukTable({
+          attributes: {
+            "data-module": "moj-sortable-table"
+          },
           classes: "bapv-table govuk-!-margin-top-3",
           head: [
             {
-              text: "Prisoner name"
+              text: "Prisoner name",
+              attributes: {
+                "aria-sort": "none"
+              }
             },
             {
-              text: "Prison number"
+              text: "Prison number",
+              attributes: {
+                "aria-sort": "none"
+              }
             },
             {
               text: "Action",
