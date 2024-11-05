@@ -293,3 +293,8 @@
     @extend .govuk-tag--orange;
   }
 }
+
+// fix colour on MoJ sortable table for non-sortable headings
+[data-module=moj-sortable-table] th {
+  color: #005ea5;
+}
