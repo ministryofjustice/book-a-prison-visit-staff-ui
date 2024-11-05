@@ -123,8 +123,9 @@ describe('GET /visits', () => {
           expect($('[data-test="visit-tables-booked"]').text().trim()).toBe('1 of 20 tables booked')
           expect($('[data-test="visit-visitors-total"]').text().trim()).toBe('2 visitors')
 
-          expect($('[data-test="prisoner-name"]').eq(0).text().trim()).toBe('Smith, John')
-          expect($('[data-test="prisoner-number"]').eq(0).text().trim()).toBe('A1234BC')
+          expect($('[data-test="prisoner-name"]').eq(0).text()).toBe('Smith, John')
+          expect($('[data-test="prisoner-number"]').eq(0).text()).toBe('A1234BC')
+          expect($('[data-test="booked-on"]').eq(0).text()).toBe('1 January at 9am')
           expect($('[data-test="view-visit-link"]').eq(0).attr('href')).toBe(
             '/visit/ab-cd-ef-gh?query=type%3DOPEN%26sessionReference%3D-afe.dcc.0f%26selectedDate%3D2024-02-01%26firstTabDate%3D2024-02-01&from=visits',
           )
@@ -183,8 +184,9 @@ describe('GET /visits', () => {
           expect($('[data-test="visit-tables-booked"]').text().trim()).toBe('1 of 5 tables booked')
           expect($('[data-test="visit-visitors-total"]').text().trim()).toBe('2 visitors')
 
-          expect($('[data-test="prisoner-name"]').eq(0).text().trim()).toBe('Smith, John')
-          expect($('[data-test="prisoner-number"]').eq(0).text().trim()).toBe('A1234BC')
+          expect($('[data-test="prisoner-name"]').eq(0).text()).toBe('Smith, John')
+          expect($('[data-test="prisoner-number"]').eq(0).text()).toBe('A1234BC')
+          expect($('[data-test="booked-on"]').eq(0).text()).toBe('1 January at 9am')
           expect($('[data-test="view-visit-link"]').eq(0).attr('href')).toBe(
             '/visit/ab-cd-ef-gh?query=type%3DCLOSED%26sessionReference%3D-afe.dcc.0f%26selectedDate%3D2024-02-02%26firstTabDate%3D2024-02-01&from=visits',
           )
@@ -328,8 +330,9 @@ describe('GET /visits', () => {
           expect($('[data-test="visit-tables-booked"]').text().trim()).toBe('1 table booked')
           expect($('[data-test="visit-visitors-total"]').text().trim()).toBe('2 visitors')
 
-          expect($('[data-test="prisoner-name"]').eq(0).text().trim()).toBe('Smith, John')
-          expect($('[data-test="prisoner-number"]').eq(0).text().trim()).toBe('A1234BC')
+          expect($('[data-test="prisoner-name"]').eq(0).text()).toBe('Smith, John')
+          expect($('[data-test="prisoner-number"]').eq(0).text()).toBe('A1234BC')
+          expect($('[data-test="booked-on"]').eq(0).text()).toBe('1 January at 9am')
           expect($('[data-test="view-visit-link"]').eq(0).attr('href')).toBe(
             '/visit/ab-cd-ef-gh?query=type%3DUNKNOWN%26sessionReference%3D13%253A45-15%253A45%26selectedDate%3D2024-02-01%26firstTabDate%3D2024-02-01&from=visits',
           )
@@ -382,8 +385,9 @@ describe('GET /visits', () => {
           expect($('[data-test="visit-tables-booked"]').text().trim()).toBe('1 table booked')
           expect($('[data-test="visit-visitors-total"]').text().trim()).toBe('2 visitors')
 
-          expect($('[data-test="prisoner-name"]').eq(0).text().trim()).toBe('Smith, John')
-          expect($('[data-test="prisoner-number"]').eq(0).text().trim()).toBe('A1234BC')
+          expect($('[data-test="prisoner-name"]').eq(0).text()).toBe('Smith, John')
+          expect($('[data-test="prisoner-number"]').eq(0).text()).toBe('A1234BC')
+          expect($('[data-test="booked-on"]').eq(0).text()).toBe('1 January at 9am')
           expect($('[data-test="view-visit-link"]').eq(0).attr('href')).toBe(
             '/visit/ab-cd-ef-gh?query=type%3DUNKNOWN%26sessionReference%3D13%253A45-15%253A45%26selectedDate%3D2024-02-02%26firstTabDate%3D2024-02-01&from=visits',
           )

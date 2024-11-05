@@ -128,8 +128,6 @@
           {{ visitorsTotal }} {{ "visitor" | pluralise(visitorsTotal) }}
         </p>
 
-        {# <p>The list is ordered by booking date. The most recent booking is shown at the top of the list.</p> #}
-
         {% set visitsRows = [] %}
         {% for visit in visits %}
           {% set visitsRows = (visitsRows.push([
@@ -140,6 +138,14 @@
             {
               text: visit.prisonerId,
               attributes: { "data-test": "prisoner-number" }
+            },
+            {
+              text: visit.firstBookedDateTime | formatDate("d MMMM") +
+                " at " + visit.firstBookedDateTime | formatTime,
+              attributes: {
+                "data-test": "booked-on",
+                "data-sort-value": visit.firstBookedDateTime | formatDate("t")
+              }
             },
             {
               classes: "govuk-!-text-align-right",
@@ -164,6 +170,12 @@
               text: "Prison number",
               attributes: {
                 "aria-sort": "none"
+              }
+            },
+            {
+              text: "Booked on",
+              attributes: {
+                "aria-sort": "descending"
               }
             },
             {
