@@ -626,7 +626,7 @@ describe('/visit/:reference', () => {
           .expect(res => {
             const $ = cheerio.load(res.text)
             expect($('[data-test="visit-actioned-by-1"]').text()).toContain('by aaaa-bbbb-cccc')
-            expect($('[data-test="visit-cancelled-type"]').text()).toBe('This visit was cancelled by the visitor.')
+            expect($('[data-test="visit-cancelled-type"]').text()).toBe('This visit was cancelled by a visitor.')
             expect($('[data-test="visit-cancelled-reason-1"]').text()).toBe('') // no cancelled reason given on public cancellations
             expect($('[data-test="visit-cancelled-request-method-1"]').text()).toBe('Method: GOV.UK cancellation')
           })
@@ -684,7 +684,7 @@ describe('/visit/:reference', () => {
           .expect('Content-Type', /html/)
           .expect(res => {
             const $ = cheerio.load(res.text)
-            expect($('[data-test="visit-cancelled-type"]').text()).toBe('This visit was cancelled by the visitor.')
+            expect($('[data-test="visit-cancelled-type"]').text()).toBe('This visit was cancelled by a visitor.')
             expect($('[data-test="visit-event-1"]').text().trim().replace(/\s+/g, ' ')).toBe('Cancelled')
             expect($('[data-test="visit-actioned-by-1"]').text().trim().replace(/\s+/g, ' ')).toBe('by User Three')
             expect($('[data-test="visit-event-date-time-1"]').text().trim().replace(/\s+/g, ' ')).toBe(

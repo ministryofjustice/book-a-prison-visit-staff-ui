@@ -50,7 +50,7 @@ context('Visit details page', () => {
 
     visitDetailsPage.visitReference().contains('ab-cd-ef-gh')
 
-    visitDetailsPage.cancellationType().contains('This visit was cancelled by the visitor.')
+    visitDetailsPage.cancellationType().contains('This visit was cancelled by a visitor.')
 
     visitDetailsPage.updateBooking().should('have.length', 0)
     visitDetailsPage.cancelBooking().should('have.length', 0)
