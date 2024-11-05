@@ -802,6 +802,7 @@ export interface components {
         | 'VISIT_ORDER_CANCELLED'
         | 'SUPERSEDED_CANCELLATION'
         | 'DETAILS_CHANGED_AFTER_BOOKING'
+        | 'BOOKER_CANCELLED'
       /**
        * @description Outcome text
        * @example Because he got covid
@@ -904,6 +905,7 @@ export interface components {
         | 'VISIT_ORDER_CANCELLED'
         | 'SUPERSEDED_CANCELLATION'
         | 'DETAILS_CHANGED_AFTER_BOOKING'
+        | 'BOOKER_CANCELLED'
       /**
        * @description Visit Restriction
        * @example OPEN
@@ -936,6 +938,11 @@ export interface components {
        * @description The visit modified date and time
        */
       modifiedTimestamp: string
+      /**
+       * Format: date-time
+       * @description Date the visit was first booked or migrated
+       */
+      firstBookedDateTime?: string
     }
     /** @description VisitNote */
     VisitNoteDto: {
@@ -1302,21 +1309,26 @@ export interface components {
        */
       visitorCount: number
       visitTimeSlot: components['schemas']['SessionTimeSlotDto']
+      /**
+       * Format: date-time
+       * @description Date the visit was first booked or migrated
+       */
+      firstBookedDateTime?: string
     }
     PageVisitDto: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['VisitDto'][]
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject'][]
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
       first?: boolean
       last?: boolean
       empty?: boolean
@@ -1325,12 +1337,12 @@ export interface components {
       /** Format: int64 */
       offset?: number
       sort?: components['schemas']['SortObject'][]
-      unpaged?: boolean
       paged?: boolean
       /** Format: int32 */
       pageNumber?: number
       /** Format: int32 */
       pageSize?: number
+      unpaged?: boolean
     }
     SortObject: {
       direction?: string
@@ -1582,6 +1594,16 @@ export interface components {
        */
       prisonerId: string
       /**
+       * @description Prisoner first name
+       * @example James
+       */
+      prisonerFirstName?: string
+      /**
+       * @description Prisoner last name
+       * @example Smith
+       */
+      prisonerLastName?: string
+      /**
        * @description Prison Id
        * @example MDI
        */
@@ -1618,6 +1640,7 @@ export interface components {
         | 'VISIT_ORDER_CANCELLED'
         | 'SUPERSEDED_CANCELLATION'
         | 'DETAILS_CHANGED_AFTER_BOOKING'
+        | 'BOOKER_CANCELLED'
       /**
        * Format: date-time
        * @description The date and time of the visit
