@@ -55,8 +55,8 @@
             {{- 'This visit was cancelled due to an administrative error with the booking.' -}}
           {% elseif status[0] === 'DETAILS' %}
             {{- 'This visit was cancelled as the details changed after booking.' -}}
-          {% elseif status[0] === 'BOOKER' %}
-            {{- 'This visit was cancelled by the visitor.' -}}
+          {% elseif status[0] === 'BOOKER' or status[0] === 'VISITOR' %}
+            {{- 'This visit was cancelled by a visitor.' -}}
           {% else %}
             {{- 'This visit was cancelled by the ' + status[0] | lower + '.' -}}
           {% endif %}
