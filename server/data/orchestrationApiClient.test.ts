@@ -81,6 +81,7 @@ describe('orchestrationApiClient', () => {
         },
         applicationMethodType: 'NOT_KNOWN',
         actionedBy: 'user1',
+        userType: 'STAFF',
       }
 
       const result: Visit = TestData.visit()

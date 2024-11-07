@@ -74,6 +74,7 @@ export default {
               },
               applicationMethodType: cancelVisitDto.applicationMethodType,
               actionedBy: cancelVisitDto.actionedBy,
+              userType: cancelVisitDto.userType,
             },
             ignoreArrayOrder: true,
           },
