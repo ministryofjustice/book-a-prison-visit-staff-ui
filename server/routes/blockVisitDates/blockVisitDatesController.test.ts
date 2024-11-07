@@ -35,8 +35,8 @@ describe('Block visit dates listing page', () => {
       const today = new Date()
       const tomorrow = addDays(today, 1)
       const nextWeek = addWeeks(today, 1)
-      const blockedDate1 = TestData.prisonExcludeDateDto({ excludeDate: format(tomorrow, 'yyyy-MM-dd') })
-      const blockedDate2 = TestData.prisonExcludeDateDto({ excludeDate: format(nextWeek, 'yyyy-MM-dd') })
+      const blockedDate1 = TestData.excludeDateDto({ excludeDate: format(tomorrow, 'yyyy-MM-dd') })
+      const blockedDate2 = TestData.excludeDateDto({ excludeDate: format(nextWeek, 'yyyy-MM-dd') })
 
       blockedDatesService.getFutureBlockedDates.mockResolvedValue([blockedDate1, blockedDate2])
 
@@ -219,7 +219,7 @@ describe('Block visit dates listing page', () => {
       const expectedOutputDate = format(today, expectedDateFormat)
 
       blockedDatesService.getFutureBlockedDates.mockResolvedValue([
-        TestData.prisonExcludeDateDto({ excludeDate: expectedOutputDate }),
+        TestData.excludeDateDto({ excludeDate: expectedOutputDate }),
       ])
 
       const expectedValidationError: FieldValidationError = {

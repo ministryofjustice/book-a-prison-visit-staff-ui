@@ -7,7 +7,7 @@ import {
   NotificationVisitInfo,
   PrisonDto,
   PrisonerProfile,
-  PrisonExcludeDateDto,
+  ExcludeDateDto,
   SessionCapacity,
   SessionSchedule,
   Visit,
@@ -166,6 +166,14 @@ export default class TestData {
     },
   }: Partial<CurrentIncentive> = {}): CurrentIncentive => ({ level }) as CurrentIncentive
 
+  static excludeDateDto = ({
+    excludeDate = '2024-12-12',
+    actionedBy = 'User one',
+  }: Partial<ExcludeDateDto> = {}): ExcludeDateDto => ({
+    excludeDate,
+    actionedBy,
+  })
+
   static notificationCount = ({ count = 5 }: Partial<NotificationCount> = {}): NotificationCount => ({ count })
 
   static notificationGroup = ({
@@ -207,14 +215,6 @@ export default class TestData {
     startDate,
     expiryDate,
     active,
-  })
-
-  static prisonExcludeDateDto = ({
-    excludeDate = '2024-12-12',
-    actionedBy = 'User one',
-  }: Partial<PrisonExcludeDateDto> = {}): PrisonExcludeDateDto => ({
-    excludeDate,
-    actionedBy,
   })
 
   static prisoner = ({

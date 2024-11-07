@@ -103,7 +103,7 @@ context('View visits by date', () => {
     // select tomorrow
     cy.task('stubSessionSchedule', { prisonId, date: tomorrowShortFormat, sessionSchedule: [] })
     cy.task('stubGetVisitsWithoutSessionTemplate', { prisonId, sessionDate: tomorrowShortFormat, visits: [] })
-    cy.task('stubIsBlockedDate', { prisonId, excludeDate: tomorrowShortFormat, prisonExcludeDates: null })
+    cy.task('stubIsBlockedDate', { prisonId, excludeDate: tomorrowShortFormat, excludeDates: null })
 
     visitsByDatePage.dateTabsTomorrow().click()
 
@@ -165,7 +165,7 @@ context('View visits by date', () => {
   it('should show visits by date, and change date using the date picker', () => {
     cy.task('stubSessionSchedule', { prisonId, date: todayShortFormat, sessionSchedule: [] })
     cy.task('stubGetVisitsWithoutSessionTemplate', { prisonId, sessionDate: todayShortFormat, visits: [] })
-    cy.task('stubIsBlockedDate', { prisonId, excludeDate: todayShortFormat, prisonExcludeDates: null })
+    cy.task('stubIsBlockedDate', { prisonId, excludeDate: todayShortFormat, excludeDates: null })
 
     const homePage = Page.verifyOnPage(HomePage)
     homePage.viewVisitsTile().click()
@@ -181,7 +181,7 @@ context('View visits by date', () => {
     const firstOfNextMonthLongFormat = format(firstOfNextMonth, longDateFormat)
     cy.task('stubSessionSchedule', { prisonId, date: firstOfNextMonthShortFormat, sessionSchedule: [] })
     cy.task('stubGetVisitsWithoutSessionTemplate', { prisonId, sessionDate: firstOfNextMonthShortFormat, visits: [] })
-    cy.task('stubIsBlockedDate', { prisonId, excludeDate: firstOfNextMonthShortFormat, prisonExcludeDates: null })
+    cy.task('stubIsBlockedDate', { prisonId, excludeDate: firstOfNextMonthShortFormat, excludeDates: null })
 
     visitsByDatePage.toggleChooseAnotherDatePopUp()
     visitsByDatePage.datePicker.goToNextMonth()
