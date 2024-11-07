@@ -1,5 +1,5 @@
 import { HmppsAuthClient, OrchestrationApiClient, RestClientBuilder } from '../data'
-import { PrisonExcludeDateDto } from '../data/orchestrationApiTypes'
+import { ExcludeDateDto } from '../data/orchestrationApiTypes'
 
 export default class BlockedDatesService {
   constructor(
@@ -19,7 +19,7 @@ export default class BlockedDatesService {
     await orchestrationApiClient.unblockVisitDate(prisonId, date, username)
   }
 
-  async getFutureBlockedDates(prisonId: string, username: string): Promise<PrisonExcludeDateDto[]> {
+  async getFutureBlockedDates(prisonId: string, username: string): Promise<ExcludeDateDto[]> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
     return orchestrationApiClient.getFutureBlockedDates(prisonId)

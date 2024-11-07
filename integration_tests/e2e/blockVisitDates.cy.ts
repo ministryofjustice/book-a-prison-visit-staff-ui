@@ -48,7 +48,7 @@ context('Block visit dates', () => {
     // select Yes and confirm
     cy.task('stubBlockVisitDate', { date: firstOfNextMonthShort })
     cy.task('stubGetFutureBlockedDates', {
-      blockedDates: [TestData.prisonExcludeDateDto({ excludeDate: firstOfNextMonthShort })],
+      blockedDates: [TestData.excludeDateDto({ excludeDate: firstOfNextMonthShort })],
     })
     blockVisitDateConfirmationPage.selectYes()
     blockVisitDateConfirmationPage.continue()
@@ -63,7 +63,7 @@ context('Block visit dates', () => {
 
   it('should go to block dates listing page and unblock a date', () => {
     cy.task('stubGetFutureBlockedDates', {
-      blockedDates: [TestData.prisonExcludeDateDto({ excludeDate: firstOfNextMonthShort })],
+      blockedDates: [TestData.excludeDateDto({ excludeDate: firstOfNextMonthShort })],
     })
 
     const homePage = Page.verifyOnPage(HomePage)
