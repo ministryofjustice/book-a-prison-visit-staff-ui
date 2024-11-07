@@ -15,7 +15,7 @@ import {
   PageVisitDto,
   PrisonDto,
   PrisonerProfile,
-  PrisonExcludeDateDto,
+  ExcludeDateDto,
   SessionCapacity,
   SessionSchedule,
   Visit,
@@ -191,18 +191,18 @@ export default class OrchestrationApiClient {
   async unblockVisitDate(prisonId: string, date: string, username: string): Promise<void> {
     await this.restClient.put({
       path: `/config/prisons/prison/${prisonId}/exclude-date/remove`,
-      data: <PrisonExcludeDateDto>{ excludeDate: date, actionedBy: username },
+      data: <ExcludeDateDto>{ excludeDate: date, actionedBy: username },
     })
   }
 
   async blockVisitDate(prisonId: string, date: string, username: string): Promise<void> {
     await this.restClient.put({
       path: `/config/prisons/prison/${prisonId}/exclude-date/add`,
-      data: <PrisonExcludeDateDto>{ excludeDate: date, actionedBy: username },
+      data: <ExcludeDateDto>{ excludeDate: date, actionedBy: username },
     })
   }
 
-  async getFutureBlockedDates(prisonId: string): Promise<PrisonExcludeDateDto[]> {
+  async getFutureBlockedDates(prisonId: string): Promise<ExcludeDateDto[]> {
     return this.restClient.get({ path: `/config/prisons/prison/${prisonId}/exclude-date/future` })
   }
 

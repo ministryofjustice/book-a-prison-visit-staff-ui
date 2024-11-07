@@ -4,13 +4,13 @@ import {
   ApplicationDto,
   ApplicationMethodType,
   CancelVisitOrchestrationDto,
+  ExcludeDateDto,
   IgnoreVisitNotificationsDto,
   NotificationCount,
   NotificationGroup,
   NotificationType,
   PrisonDto,
   PrisonerProfile,
-  PrisonExcludeDateDto,
   SessionCapacity,
   SessionSchedule,
   Visit,
@@ -74,6 +74,7 @@ export default {
               },
               applicationMethodType: cancelVisitDto.applicationMethodType,
               actionedBy: cancelVisitDto.actionedBy,
+              userType: cancelVisitDto.userType,
             },
             ignoreArrayOrder: true,
           },
@@ -441,7 +442,7 @@ export default {
     blockedDates = [],
   }: {
     prisonId: string
-    blockedDates: PrisonExcludeDateDto[]
+    blockedDates: ExcludeDateDto[]
   }): SuperAgentRequest => {
     return stubFor({
       request: {
@@ -459,11 +460,11 @@ export default {
   stubIsBlockedDate: ({
     prisonId,
     excludeDate,
-    prisonExcludeDates = [TestData.prisonExcludeDateDto()],
+    excludeDates = [TestData.excludeDateDto()],
   }: {
     prisonId: string
     excludeDate: string
-    prisonExcludeDates: PrisonExcludeDateDto[]
+    excludeDates: ExcludeDateDto[]
   }): SuperAgentRequest => {
     return stubFor({
       request: {
@@ -473,7 +474,7 @@ export default {
       response: {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: prisonExcludeDates,
+        jsonBody: excludeDates,
       },
     })
   },

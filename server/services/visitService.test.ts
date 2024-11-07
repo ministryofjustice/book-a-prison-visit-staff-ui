@@ -119,6 +119,7 @@ describe('Visit service', () => {
           },
           applicationMethodType: 'NOT_KNOWN',
           actionedBy: 'user1',
+          userType: 'STAFF',
         }
 
         orchestrationApiClient.cancelVisit.mockResolvedValue(expectedResult)

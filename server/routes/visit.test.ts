@@ -606,6 +606,32 @@ describe('/visit/:reference', () => {
           })
       })
 
+      it('should display cancelled message - booker cancelled', () => {
+        visit.visitStatus = 'CANCELLED'
+        visit.outcomeStatus = 'BOOKER_CANCELLED'
+        visit.visitNotes = [] // empty visit notes, as no comment from a booker lead cancellation
+        visitHistoryDetails.eventsAudit = [
+          {
+            type: 'CANCELLED_VISIT',
+            applicationMethodType: 'WEBSITE',
+            actionedByFullName: 'aaaa-bbbb-cccc', // booker reference - this is displayed
+            userType: 'PUBLIC',
+            createTimestamp: '2022-01-01T11:00:00',
+          },
+        ]
+        return request(app)
+          .get('/visit/ab-cd-ef-gh')
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('[data-test="visit-actioned-by-1"]').text()).toContain('by aaaa-bbbb-cccc')
+            expect($('[data-test="visit-cancelled-type"]').text()).toBe('This visit was cancelled by a visitor.')
+            expect($('[data-test="visit-cancelled-reason-1"]').text()).toBe('') // no cancelled reason given on public cancellations
+            expect($('[data-test="visit-cancelled-request-method-1"]').text()).toBe('Method: GOV.UK cancellation')
+          })
+      })
+
       it('should display cancelled message - details changed after booking', () => {
         visit.visitStatus = 'CANCELLED'
         visit.outcomeStatus = 'DETAILS_CHANGED_AFTER_BOOKING'
@@ -658,7 +684,7 @@ describe('/visit/:reference', () => {
           .expect('Content-Type', /html/)
           .expect(res => {
             const $ = cheerio.load(res.text)
-            expect($('[data-test="visit-cancelled-type"]').text()).toBe('This visit was cancelled by the visitor.')
+            expect($('[data-test="visit-cancelled-type"]').text()).toBe('This visit was cancelled by a visitor.')
             expect($('[data-test="visit-event-1"]').text().trim().replace(/\s+/g, ' ')).toBe('Cancelled')
             expect($('[data-test="visit-actioned-by-1"]').text().trim().replace(/\s+/g, ' ')).toBe('by User Three')
             expect($('[data-test="visit-event-date-time-1"]').text().trim().replace(/\s+/g, ' ')).toBe(
@@ -1119,6 +1145,7 @@ describe('POST /visit/:reference/cancel', () => {
             },
             applicationMethodType: 'NOT_APPLICABLE',
             actionedBy: 'user1',
+            userType: 'STAFF',
           },
         })
         expect(flashProvider).toHaveBeenCalledWith('startTimestamp', cancelledVisit.startTimestamp)
@@ -1155,6 +1182,7 @@ describe('POST /visit/:reference/cancel', () => {
             },
             applicationMethodType: 'EMAIL',
             actionedBy: 'user1',
+            userType: 'STAFF',
           },
         })
       })
@@ -1254,7 +1282,7 @@ describe('GET /visit/cancelled', () => {
         const $ = cheerio.load(res.text)
         expect($('h1').text().trim()).toBe('Booking cancelled')
         expect($('[data-test="visit-details"]').text().trim()).toBe('10:15am to 11am on Wednesday 9 February 2022')
-        expect($('[data-test="go-to-start"]').length).toBe(1)
+        expect($('[data-test="go-to-home"]').length).toBe(1)
 
         expect(clearSession).toHaveBeenCalledTimes(1)
       })

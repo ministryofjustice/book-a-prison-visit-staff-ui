@@ -30,7 +30,7 @@
     "clean": "rm -rf dist build node_modules stylesheets"
   },
   "engines": {
-    "node": "^20",
+    "node": "^22",
     "npm": "^10"
   },
   "jest": {
@@ -96,7 +96,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-sqs": "^3.670.0",
-    "@ministryofjustice/frontend": "^3.0.1",
+    "@ministryofjustice/frontend": "^3.0.2",
     "@ministryofjustice/hmpps-connect-dps-components": "^1.2.0",
     "agentkeepalive": "^4.5.0",
     "applicationinsights": "^2.9.6",

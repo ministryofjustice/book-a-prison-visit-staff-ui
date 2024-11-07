@@ -12,7 +12,7 @@ import {
   NotificationType,
   PageVisitDto,
   PrisonDto,
-  PrisonExcludeDateDto,
+  ExcludeDateDto,
   SessionSchedule,
   Visit,
   VisitRestriction,
@@ -81,6 +81,7 @@ describe('orchestrationApiClient', () => {
         },
         applicationMethodType: 'NOT_KNOWN',
         actionedBy: 'user1',
+        userType: 'STAFF',
       }
 
       const result: Visit = TestData.visit()
@@ -426,7 +427,7 @@ describe('orchestrationApiClient', () => {
       const user = 'user'
 
       fakeOrchestrationApi
-        .put(`/config/prisons/prison/${prisonId}/exclude-date/remove`, <PrisonExcludeDateDto>{
+        .put(`/config/prisons/prison/${prisonId}/exclude-date/remove`, <ExcludeDateDto>{
           excludeDate: date,
           actionedBy: user,
         })
@@ -445,7 +446,7 @@ describe('orchestrationApiClient', () => {
       const user = 'user'
 
       fakeOrchestrationApi
-        .put(`/config/prisons/prison/${prisonId}/exclude-date/add`, <PrisonExcludeDateDto>{
+        .put(`/config/prisons/prison/${prisonId}/exclude-date/add`, <ExcludeDateDto>{
           excludeDate: date,
           actionedBy: user,
         })
@@ -460,7 +461,7 @@ describe('orchestrationApiClient', () => {
 
   describe('getFutureBlockedDates', () => {
     it('should return future blocked dates for given prison', async () => {
-      const results = [TestData.prisonExcludeDateDto()]
+      const results = [TestData.excludeDateDto()]
 
       fakeOrchestrationApi
         .get(`/config/prisons/prison/${prisonId}/exclude-date/future`)

@@ -24,7 +24,7 @@ context('Date picker', () => {
 
   it('should navigate through a range of dates and correctly handle month and year boundaries', () => {
     const homePage = Page.verifyOnPage(HomePage)
-    cy.task('stubIsBlockedDate', { prisonId, excludeDate: todayShortFormat, prisonExcludeDates: [] })
+    cy.task('stubIsBlockedDate', { prisonId, excludeDate: todayShortFormat, excludeDates: [] })
     homePage.viewVisitsTile().click()
     const visitsByDatePage = Page.verifyOnPage(VisitsByDatePage)
 

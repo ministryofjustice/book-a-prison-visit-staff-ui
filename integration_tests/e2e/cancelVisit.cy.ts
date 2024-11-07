@@ -48,6 +48,7 @@ context('Cancel visit journey', () => {
       },
       applicationMethodType: 'NOT_APPLICABLE',
       actionedBy: 'USER1',
+      userType: 'STAFF',
     }
 
     cy.visit('/visit/ab-cd-ef-gh')
@@ -78,6 +79,7 @@ context('Cancel visit journey', () => {
       },
       applicationMethodType: 'WEBSITE',
       actionedBy: 'USER1',
+      userType: 'STAFF',
     }
 
     cy.visit('/visit/ab-cd-ef-gh')

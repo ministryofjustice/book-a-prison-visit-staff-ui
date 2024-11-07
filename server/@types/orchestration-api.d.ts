@@ -157,6 +157,46 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/config/sessions/session/{sessionTemplateReference}/exclude-date/remove': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /**
+     * Remove exclude date for a given session template
+     * @description Remove exclude date for a given session template
+     */
+    put: operations['removeExcludeDateForSessionTemplate']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/config/sessions/session/{sessionTemplateReference}/exclude-date/add': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /**
+     * Add exclude date for a given session template
+     * @description Add exclude date for a given session template
+     */
+    put: operations['addExcludeDateForSessionTemplate']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/config/prisons/prison/{prisonCode}/exclude-date/remove': {
     parameters: {
       query?: never
@@ -650,6 +690,66 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/config/sessions/session/{sessionTemplateReference}/exclude-date/{excludeDate}/isExcluded': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Endpoint to check if the date passed has been excluded for visits for the session template
+     * @description Returns true if the date passed has been excluded for visits for the session template, false otherwise.
+     */
+    get: operations['isDateExcludedForSessionTemplateVisits']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/config/sessions/session/{sessionTemplateReference}/exclude-date/past': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get all past exclude dates for a given session template
+     * @description Get all past exclude dates for a given session template
+     */
+    get: operations['getPastExcludeDatesForSessionTemplate']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/config/sessions/session/{sessionTemplateReference}/exclude-date/future': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get all current or future exclude dates for a given session template
+     * @description Get current or future exclude dates for a given session template
+     */
+    get: operations['getFutureExcludeDatesForSessionTemplate']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/config/prisons/user-type/{type}/supported': {
     parameters: {
       query?: never
@@ -770,6 +870,12 @@ export interface components {
         | 'BY_PRISONER'
       /** @description Username for user who actioned this request */
       actionedBy: string
+      /**
+       * @description User type
+       * @example STAFF
+       * @enum {string}
+       */
+      userType: 'STAFF' | 'PUBLIC' | 'SYSTEM'
     }
     /**
      * @description Contact Phone Number
@@ -1196,7 +1302,7 @@ export interface components {
       value: string
     }
     /** @description Prison exclude date */
-    PrisonExcludeDateDto: {
+    ExcludeDateDto: {
       /**
        * Format: date
        * @description exclude date
@@ -1313,35 +1419,35 @@ export interface components {
        * Format: date-time
        * @description Date the visit was first booked or migrated
        */
-      firstBookedDateTime?: string
+      firstBookedDateTime: string
     }
     PageVisitDto: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
+      first?: boolean
+      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['VisitDto'][]
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject'][]
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
-      first?: boolean
-      last?: boolean
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     PageableObject: {
       /** Format: int64 */
       offset?: number
       sort?: components['schemas']['SortObject'][]
+      /** Format: int32 */
+      pageSize?: number
       paged?: boolean
       /** Format: int32 */
       pageNumber?: number
-      /** Format: int32 */
-      pageSize?: number
       unpaged?: boolean
     }
     SortObject: {
@@ -1999,6 +2105,12 @@ export interface components {
        */
       lastName?: string
     }
+    /** @description Is the date passed excluded */
+    IsExcludeDateDto: {
+      /** @description True if the date is excluded, false if not excluded by prison for visits. */
+      isExcluded: boolean
+      excluded?: boolean
+    }
     /** @description Prison dto */
     PrisonDto: {
       /**
@@ -2073,12 +2185,6 @@ export interface components {
        * @example true
        */
       active: boolean
-    }
-    /** @description Is the date passed excluded */
-    IsExcludeDateDto: {
-      /** @description True if the date is excluded, false if not excluded by prison for visits. */
-      isExcluded: boolean
-      excluded?: boolean
     }
   }
   responses: never
@@ -2530,6 +2636,276 @@ export interface operations {
       }
     }
   }
+  removeExcludeDateForSessionTemplate: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /**
+         * @description session template reference
+         * @example aaa-bbb-ccc
+         */
+        sessionTemplateReference: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ExcludeDateDto']
+      }
+    }
+    responses: {
+      /** @description Exclude dates successfully removed */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          '*/*':
+            | '100 CONTINUE'
+            | '101 SWITCHING_PROTOCOLS'
+            | '102 PROCESSING'
+            | '103 EARLY_HINTS'
+            | '103 CHECKPOINT'
+            | '200 OK'
+            | '201 CREATED'
+            | '202 ACCEPTED'
+            | '203 NON_AUTHORITATIVE_INFORMATION'
+            | '204 NO_CONTENT'
+            | '205 RESET_CONTENT'
+            | '206 PARTIAL_CONTENT'
+            | '207 MULTI_STATUS'
+            | '208 ALREADY_REPORTED'
+            | '226 IM_USED'
+            | '300 MULTIPLE_CHOICES'
+            | '301 MOVED_PERMANENTLY'
+            | '302 FOUND'
+            | '302 MOVED_TEMPORARILY'
+            | '303 SEE_OTHER'
+            | '304 NOT_MODIFIED'
+            | '305 USE_PROXY'
+            | '307 TEMPORARY_REDIRECT'
+            | '308 PERMANENT_REDIRECT'
+            | '400 BAD_REQUEST'
+            | '401 UNAUTHORIZED'
+            | '402 PAYMENT_REQUIRED'
+            | '403 FORBIDDEN'
+            | '404 NOT_FOUND'
+            | '405 METHOD_NOT_ALLOWED'
+            | '406 NOT_ACCEPTABLE'
+            | '407 PROXY_AUTHENTICATION_REQUIRED'
+            | '408 REQUEST_TIMEOUT'
+            | '409 CONFLICT'
+            | '410 GONE'
+            | '411 LENGTH_REQUIRED'
+            | '412 PRECONDITION_FAILED'
+            | '413 PAYLOAD_TOO_LARGE'
+            | '413 REQUEST_ENTITY_TOO_LARGE'
+            | '414 URI_TOO_LONG'
+            | '414 REQUEST_URI_TOO_LONG'
+            | '415 UNSUPPORTED_MEDIA_TYPE'
+            | '416 REQUESTED_RANGE_NOT_SATISFIABLE'
+            | '417 EXPECTATION_FAILED'
+            | '418 I_AM_A_TEAPOT'
+            | '419 INSUFFICIENT_SPACE_ON_RESOURCE'
+            | '420 METHOD_FAILURE'
+            | '421 DESTINATION_LOCKED'
+            | '422 UNPROCESSABLE_ENTITY'
+            | '423 LOCKED'
+            | '424 FAILED_DEPENDENCY'
+            | '425 TOO_EARLY'
+            | '426 UPGRADE_REQUIRED'
+            | '428 PRECONDITION_REQUIRED'
+            | '429 TOO_MANY_REQUESTS'
+            | '431 REQUEST_HEADER_FIELDS_TOO_LARGE'
+            | '451 UNAVAILABLE_FOR_LEGAL_REASONS'
+            | '500 INTERNAL_SERVER_ERROR'
+            | '501 NOT_IMPLEMENTED'
+            | '502 BAD_GATEWAY'
+            | '503 SERVICE_UNAVAILABLE'
+            | '504 GATEWAY_TIMEOUT'
+            | '505 HTTP_VERSION_NOT_SUPPORTED'
+            | '506 VARIANT_ALSO_NEGOTIATES'
+            | '507 INSUFFICIENT_STORAGE'
+            | '508 LOOP_DETECTED'
+            | '509 BANDWIDTH_LIMIT_EXCEEDED'
+            | '510 NOT_EXTENDED'
+            | '511 NETWORK_AUTHENTICATION_REQUIRED'
+        }
+      }
+      /** @description Incorrect request to remove exclude date */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to add exclude dates */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Session Template not found on visit-scheduler */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  addExcludeDateForSessionTemplate: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /**
+         * @description session template reference
+         * @example aaa-bbb-ccc
+         */
+        sessionTemplateReference: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ExcludeDateDto']
+      }
+    }
+    responses: {
+      /** @description Exclude dates successfully added */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          '*/*':
+            | '100 CONTINUE'
+            | '101 SWITCHING_PROTOCOLS'
+            | '102 PROCESSING'
+            | '103 EARLY_HINTS'
+            | '103 CHECKPOINT'
+            | '200 OK'
+            | '201 CREATED'
+            | '202 ACCEPTED'
+            | '203 NON_AUTHORITATIVE_INFORMATION'
+            | '204 NO_CONTENT'
+            | '205 RESET_CONTENT'
+            | '206 PARTIAL_CONTENT'
+            | '207 MULTI_STATUS'
+            | '208 ALREADY_REPORTED'
+            | '226 IM_USED'
+            | '300 MULTIPLE_CHOICES'
+            | '301 MOVED_PERMANENTLY'
+            | '302 FOUND'
+            | '302 MOVED_TEMPORARILY'
+            | '303 SEE_OTHER'
+            | '304 NOT_MODIFIED'
+            | '305 USE_PROXY'
+            | '307 TEMPORARY_REDIRECT'
+            | '308 PERMANENT_REDIRECT'
+            | '400 BAD_REQUEST'
+            | '401 UNAUTHORIZED'
+            | '402 PAYMENT_REQUIRED'
+            | '403 FORBIDDEN'
+            | '404 NOT_FOUND'
+            | '405 METHOD_NOT_ALLOWED'
+            | '406 NOT_ACCEPTABLE'
+            | '407 PROXY_AUTHENTICATION_REQUIRED'
+            | '408 REQUEST_TIMEOUT'
+            | '409 CONFLICT'
+            | '410 GONE'
+            | '411 LENGTH_REQUIRED'
+            | '412 PRECONDITION_FAILED'
+            | '413 PAYLOAD_TOO_LARGE'
+            | '413 REQUEST_ENTITY_TOO_LARGE'
+            | '414 URI_TOO_LONG'
+            | '414 REQUEST_URI_TOO_LONG'
+            | '415 UNSUPPORTED_MEDIA_TYPE'
+            | '416 REQUESTED_RANGE_NOT_SATISFIABLE'
+            | '417 EXPECTATION_FAILED'
+            | '418 I_AM_A_TEAPOT'
+            | '419 INSUFFICIENT_SPACE_ON_RESOURCE'
+            | '420 METHOD_FAILURE'
+            | '421 DESTINATION_LOCKED'
+            | '422 UNPROCESSABLE_ENTITY'
+            | '423 LOCKED'
+            | '424 FAILED_DEPENDENCY'
+            | '425 TOO_EARLY'
+            | '426 UPGRADE_REQUIRED'
+            | '428 PRECONDITION_REQUIRED'
+            | '429 TOO_MANY_REQUESTS'
+            | '431 REQUEST_HEADER_FIELDS_TOO_LARGE'
+            | '451 UNAVAILABLE_FOR_LEGAL_REASONS'
+            | '500 INTERNAL_SERVER_ERROR'
+            | '501 NOT_IMPLEMENTED'
+            | '502 BAD_GATEWAY'
+            | '503 SERVICE_UNAVAILABLE'
+            | '504 GATEWAY_TIMEOUT'
+            | '505 HTTP_VERSION_NOT_SUPPORTED'
+            | '506 VARIANT_ALSO_NEGOTIATES'
+            | '507 INSUFFICIENT_STORAGE'
+            | '508 LOOP_DETECTED'
+            | '509 BANDWIDTH_LIMIT_EXCEEDED'
+            | '510 NOT_EXTENDED'
+            | '511 NETWORK_AUTHENTICATION_REQUIRED'
+        }
+      }
+      /** @description Incorrect request to add exclude date */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to add exclude dates */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Session template not found on visit-scheduler */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
   removeExcludeDateForPrison: {
     parameters: {
       query?: never
@@ -2545,7 +2921,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['PrisonExcludeDateDto']
+        'application/json': components['schemas']['ExcludeDateDto']
       }
     }
     responses: {
@@ -2680,7 +3056,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['PrisonExcludeDateDto']
+        'application/json': components['schemas']['ExcludeDateDto']
       }
     }
     responses: {
@@ -4071,6 +4447,170 @@ export interface operations {
       }
     }
   }
+  isDateExcludedForSessionTemplateVisits: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /**
+         * @description session template reference
+         * @example aaa-bbb-ccc
+         */
+        sessionTemplateReference: string
+        /**
+         * @description date to be checked if excluded for session template
+         * @example 2024-12-26
+         */
+        excludeDate: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful response if the date is excluded for the session template */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['IsExcludeDateDto']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to check if date excluded */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Session template not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  getPastExcludeDatesForSessionTemplate: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /**
+         * @description session template reference
+         * @example aaa-bbb-ccc
+         */
+        sessionTemplateReference: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Exclude dates successfully returned */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ExcludeDateDto'][]
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to view exclude dates */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Session template not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  getFutureExcludeDatesForSessionTemplate: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /**
+         * @description session template reference
+         * @example aaa-bbb-ccc
+         */
+        sessionTemplateReference: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Exclude dates successfully returned */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ExcludeDateDto'][]
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to view exclude dates */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Session template not found on visit-scheduler */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
   getSupportedPrisons: {
     parameters: {
       query?: never
@@ -4238,7 +4778,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['PrisonExcludeDateDto'][]
+          'application/json': components['schemas']['ExcludeDateDto'][]
         }
       }
       /** @description Unauthorized to access this endpoint */
@@ -4291,7 +4831,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['PrisonExcludeDateDto'][]
+          'application/json': components['schemas']['ExcludeDateDto'][]
         }
       }
       /** @description Unauthorized to access this endpoint */

@@ -40,7 +40,7 @@ export type NotificationVisitInfo = components['schemas']['OrchestrationPrisoner
 
 export type PrisonDto = components['schemas']['PrisonDto']
 
-export type PrisonExcludeDateDto = components['schemas']['PrisonExcludeDateDto']
+export type ExcludeDateDto = components['schemas']['ExcludeDateDto']
 
 export type IsExcludeDateDto = components['schemas']['IsExcludeDateDto']
 
