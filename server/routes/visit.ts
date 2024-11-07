@@ -493,6 +493,7 @@ export default function routes({
         },
         applicationMethodType,
         actionedBy: res.locals.user.username,
+        userType: 'STAFF',
       }
 
       const visit = await visitService.cancelVisit({

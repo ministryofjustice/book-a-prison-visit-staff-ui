@@ -770,6 +770,12 @@ export interface components {
         | 'BY_PRISONER'
       /** @description Username for user who actioned this request */
       actionedBy: string
+      /**
+       * @description User type
+       * @example STAFF
+       * @enum {string}
+       */
+      userType: 'STAFF' | 'PUBLIC' | 'SYSTEM'
     }
     /**
      * @description Contact Phone Number
@@ -802,6 +808,7 @@ export interface components {
         | 'VISIT_ORDER_CANCELLED'
         | 'SUPERSEDED_CANCELLATION'
         | 'DETAILS_CHANGED_AFTER_BOOKING'
+        | 'BOOKER_CANCELLED'
       /**
        * @description Outcome text
        * @example Because he got covid
@@ -904,6 +911,7 @@ export interface components {
         | 'VISIT_ORDER_CANCELLED'
         | 'SUPERSEDED_CANCELLATION'
         | 'DETAILS_CHANGED_AFTER_BOOKING'
+        | 'BOOKER_CANCELLED'
       /**
        * @description Visit Restriction
        * @example OPEN
@@ -1308,6 +1316,8 @@ export interface components {
       totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      first?: boolean
+      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['VisitDto'][]
@@ -1317,20 +1327,18 @@ export interface components {
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
-      first?: boolean
-      last?: boolean
       empty?: boolean
     }
     PageableObject: {
       /** Format: int64 */
       offset?: number
       sort?: components['schemas']['SortObject'][]
+      /** Format: int32 */
+      pageSize?: number
       unpaged?: boolean
       paged?: boolean
       /** Format: int32 */
       pageNumber?: number
-      /** Format: int32 */
-      pageSize?: number
     }
     SortObject: {
       direction?: string
@@ -1582,6 +1590,16 @@ export interface components {
        */
       prisonerId: string
       /**
+       * @description Prisoner first name
+       * @example James
+       */
+      prisonerFirstName?: string
+      /**
+       * @description Prisoner last name
+       * @example Smith
+       */
+      prisonerLastName?: string
+      /**
        * @description Prison Id
        * @example MDI
        */
@@ -1618,6 +1636,7 @@ export interface components {
         | 'VISIT_ORDER_CANCELLED'
         | 'SUPERSEDED_CANCELLATION'
         | 'DETAILS_CHANGED_AFTER_BOOKING'
+        | 'BOOKER_CANCELLED'
       /**
        * Format: date-time
        * @description The date and time of the visit
