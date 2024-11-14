@@ -185,8 +185,9 @@ describe('Views - Visits summary', () => {
     expect($('[data-test="visit-tables-booked"]').text().trim()).toBe('1 of 20 tables booked')
     expect($('[data-test="visit-visitors-total"]').text().trim()).toBe('2 visitors')
 
-    expect($('[data-test="prisoner-name"]').eq(0).text().trim()).toBe('Smith, John')
-    expect($('[data-test="prisoner-number"]').eq(0).text().trim()).toBe('A1234BC')
+    expect($('[data-test="prisoner-name"]').eq(0).text()).toBe('Smith, John')
+    expect($('[data-test="prisoner-number"]').eq(0).text()).toBe('A1234BC')
+    expect($('[data-test="booked-on"]').eq(0).text()).toBe('1 January at 9am')
     expect($('[data-test="view-visit-link"]').eq(0).attr('href')).toBe('/visit/ab-cd-ef-gh?back-link-query')
 
     expect($('[data-test="no-visits-message"]').length).toBe(0)

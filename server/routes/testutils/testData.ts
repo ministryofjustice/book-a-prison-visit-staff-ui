@@ -485,6 +485,7 @@ export default class TestData {
     visitReference = 'ab-cd-ef-gh',
     visitorCount = 2,
     visitTimeSlot = { startTime: '13:45', endTime: '15:45' },
+    firstBookedDateTime = '2022-01-01T09:00:00',
   }: Partial<VisitPreview> = {}): VisitPreview => ({
     prisonerId,
     firstName,
@@ -492,6 +493,7 @@ export default class TestData {
     visitReference,
     visitorCount,
     visitTimeSlot,
+    firstBookedDateTime,
   })
 
   static visitSession = ({

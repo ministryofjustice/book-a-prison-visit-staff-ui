@@ -30,9 +30,13 @@ export default class VisitsByDatePage extends Page {
 
   visitorsTotalCount = (): PageElement => cy.get('[data-test="visit-visitors-total"]')
 
+  bookedOnHeader = (): PageElement => cy.get('[data-test="header-booked-on"] > button')
+
   prisonerName = (index: number): PageElement => cy.get(`:nth-child(${index}) > [data-test="prisoner-name"]`)
 
   prisonerNumber = (index: number): PageElement => cy.get(`:nth-child(${index}) > [data-test="prisoner-number"]`)
+
+  bookedOn = (index: number): PageElement => cy.get(`:nth-child(${index}) > [data-test="booked-on"]`)
 
   noResultsMessage = (): PageElement => cy.get('[data-test="no-visits-message"]')
 

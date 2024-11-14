@@ -31,13 +31,14 @@ context('View visits by date', () => {
   ]
 
   const visits = [
-    TestData.visitPreview(),
+    TestData.visitPreview({ firstBookedDateTime: '2022-01-02T14:30:00' }),
     TestData.visitPreview({
       prisonerId: 'B1234CD',
       firstName: 'FRED',
       lastName: 'JONES',
       visitReference: 'bc-de-ef-gh',
       visitorCount: 1,
+      firstBookedDateTime: '2022-01-01T09:00:00',
     }),
   ]
 
@@ -81,10 +82,24 @@ context('View visits by date', () => {
     visitsByDatePage.tablesBookedCount().contains('2 of 40 tables booked')
     visitsByDatePage.visitorsTotalCount().contains('3 visitors')
 
+    // visits with default sort (last booked first)
     visitsByDatePage.prisonerName(1).contains('Smith, John')
     visitsByDatePage.prisonerNumber(1).contains('A1234BC')
+    visitsByDatePage.bookedOn(1).contains('2 January at 2:30pm')
     visitsByDatePage.prisonerName(2).contains('Jones, Fred')
     visitsByDatePage.prisonerNumber(2).contains('B1234CD')
+    visitsByDatePage.bookedOn(2).contains('1 January at 9am')
+
+    // Click 'Booked on' header to sort and show first booked first
+    visitsByDatePage.bookedOnHeader().click()
+
+    // Visits should be re-ordered
+    visitsByDatePage.prisonerName(1).contains('Jones, Fred')
+    visitsByDatePage.prisonerNumber(1).contains('B1234CD')
+    visitsByDatePage.bookedOn(1).contains('1 January at 9am')
+    visitsByDatePage.prisonerName(2).contains('Smith, John')
+    visitsByDatePage.prisonerNumber(2).contains('A1234BC')
+    visitsByDatePage.bookedOn(2).contains('2 January at 2:30pm')
 
     // select last closed session from side nav
     cy.task('stubGetVisitsBySessionTemplate', {
@@ -143,6 +158,7 @@ context('View visits by date', () => {
 
     visitsByDatePage.prisonerName(1).contains('Smith, John')
     visitsByDatePage.prisonerNumber(1).contains('A1234BC')
+    visitsByDatePage.bookedOn(1).contains('1 January at 9am')
 
     // select the second 'unknown' visits session
     visitsByDatePage.selectSessionNavItem(1)
@@ -158,8 +174,10 @@ context('View visits by date', () => {
 
     visitsByDatePage.prisonerName(1).contains('Smith, John')
     visitsByDatePage.prisonerNumber(1).contains('A1234BC')
+    visitsByDatePage.bookedOn(1).contains('2 January at 2:30pm')
     visitsByDatePage.prisonerName(2).contains('Jones, Fred')
     visitsByDatePage.prisonerNumber(2).contains('B1234CD')
+    visitsByDatePage.bookedOn(2).contains('1 January at 9am')
   })
 
   it('should show visits by date, and change date using the date picker', () => {

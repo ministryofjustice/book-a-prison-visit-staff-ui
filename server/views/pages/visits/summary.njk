@@ -128,8 +128,6 @@
           {{ visitorsTotal }} {{ "visitor" | pluralise(visitorsTotal) }}
         </p>
 
-        {# <p>The list is ordered by booking date. The most recent booking is shown at the top of the list.</p> #}
-
         {% set visitsRows = [] %}
         {% for visit in visits %}
           {% set visitsRows = (visitsRows.push([
@@ -142,6 +140,14 @@
               attributes: { "data-test": "prisoner-number" }
             },
             {
+              text: visit.firstBookedDateTime | formatDate("d MMMM") +
+                " at " + visit.firstBookedDateTime | formatTime,
+              attributes: {
+                "data-test": "booked-on",
+                "data-sort-value": visit.firstBookedDateTime | formatDate("t")
+              }
+            },
+            {
               classes: "govuk-!-text-align-right",
               html: '<a href="/visit/' + visit.visitReference + '?' + queryParamsForBackLink +
                 '" class="govuk-link--no-visited-state" data-test="view-visit-link">View</a>'
@@ -149,13 +155,29 @@
           ]), visitsRows) %}
         {% endfor %}
         {{ govukTable({
+          attributes: {
+            "data-module": "moj-sortable-table"
+          },
           classes: "bapv-table govuk-!-margin-top-3",
           head: [
             {
-              text: "Prisoner name"
+              text: "Prisoner name",
+              attributes: {
+                "aria-sort": "none"
+              }
             },
             {
-              text: "Prison number"
+              text: "Prison number",
+              attributes: {
+                "aria-sort": "none"
+              }
+            },
+            {
+              text: "Booked on",
+              attributes: {
+                "aria-sort": "descending",
+                "data-test": "header-booked-on"
+              }
             },
             {
               text: "Action",
