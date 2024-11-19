@@ -112,10 +112,24 @@
           <strong>Main contact</strong>
           <span data-test="visit-contact">{{ visit.visitContact.name | formatLastNameFirst(false) }}</span>
         </li>
-        <li>
-          <strong>Phone number</strong>
-          <span data-test="visit-phone">{{ visit.visitContact.telephone | formatTelephone }}</span>
-        </li>
+        {% if visit.visitContact.telephone %}
+          <li>
+            <strong>Phone number</strong>
+            <span data-test="visit-phone">{{ visit.visitContact.telephone }}</span>
+          </li>
+        {% endif %}
+        {% if visit.visitContact.email %}
+          <li>
+            <strong>Email address</strong>
+            <span data-test="visit-email">{{ visit.visitContact.email }}</span>
+          </li>
+        {% endif %}
+        {% if not visit.visitContact.telephone and not visit.visitContact.email %}
+          <li>
+            <strong>Contact details</strong>
+            <span data-test="visit-no-contact-details">No contact details provided</span>
+          </li>
+        {% endif %}
       </ul>
 
       <div class="govuk-button-group">

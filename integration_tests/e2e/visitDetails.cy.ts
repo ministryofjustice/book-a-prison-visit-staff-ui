@@ -67,6 +67,7 @@ context('Visit details page', () => {
     visitDetailsPage.visitType().contains('Open')
     visitDetailsPage.visitContact().contains('Smith, Jeanette')
     visitDetailsPage.visitPhone().contains('01234 567890')
+    visitDetailsPage.visitEmail().contains('visitor@example.com')
   })
 
   it('should show update and cancel buttons, and notifications for future visit (date blocked)', () => {

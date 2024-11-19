@@ -164,6 +164,7 @@ describe('/visit/:reference', () => {
           expect($('[data-test="visit-type"]').text()).toBe('Open')
           expect($('[data-test="visit-contact"]').text()).toBe('Smith, Jeanette')
           expect($('[data-test="visit-phone"]').text()).toBe('01234 567890')
+          expect($('[data-test="visit-email"]').text()).toBe('visitor@example.com')
           expect($('[data-test="cancel-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/cancel')
           expect($('form').attr('action')).toBe('/visit/ab-cd-ef-gh')
           // prisoner details
@@ -211,15 +212,9 @@ describe('/visit/:reference', () => {
         })
     })
 
-    it('should render full booking summary page with visit information and prisoner tab selected, with default back link, formatting unknown contact telephone correctly', () => {
-      visitHistoryDetails.visit.visitContact.telephone = 'UNKNOWN'
-      prisonerSearchService.getPrisonerById.mockResolvedValue(prisoner)
-      visitService.getFullVisitDetails.mockResolvedValue({
-        visitHistoryDetails,
-        visitors,
-        notifications,
-        additionalSupport,
-      })
+    it('should render full booking summary page and show no contact details message', () => {
+      visit.visitContact.telephone = undefined
+      visit.visitContact.email = undefined
 
       return request(app)
         .get('/visit/ab-cd-ef-gh')
@@ -227,25 +222,9 @@ describe('/visit/:reference', () => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('h1').text()).toBe('Visit booking details')
-          expect($('.govuk-back-link').attr('href')).toBe('/prisoner/A1234BC')
-          expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
-          // prisoner details
-          expect($('[data-test="prisoner-name"]').text()).toBe('Smith, John')
-          // visit details
-          expect($('[data-test="visit-contact"]').text()).toBe('Smith, Jeanette')
-          expect($('[data-test="visit-phone"]').text()).toBe('No phone number provided')
-          expect($('[data-test="cancel-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/cancel')
-          expect($('form').attr('action')).toBe('/visit/ab-cd-ef-gh')
-
-          expect(auditService.viewedVisitDetails).toHaveBeenCalledTimes(1)
-          expect(auditService.viewedVisitDetails).toHaveBeenCalledWith({
-            visitReference: 'ab-cd-ef-gh',
-            prisonerId: 'A1234BC',
-            prisonId: 'HEI',
-            username: 'user1',
-            operationId: undefined,
-          })
+          expect($('[data-test="visit-phone"]').length).toBe(0)
+          expect($('[data-test="visit-email"]').length).toBe(0)
+          expect($('[data-test="visit-no-contact-details"]').text()).toBe('No contact details provided')
         })
     })
 
