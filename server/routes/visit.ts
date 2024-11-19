@@ -195,6 +195,7 @@ export default function routes({
       mainContact: {
         contact: mainContact,
         phoneNumber: visit.visitContact.telephone,
+        email: visit.visitContact.email,
         contactName: visit.visitContact.name,
       },
       visitReference: visit.reference,

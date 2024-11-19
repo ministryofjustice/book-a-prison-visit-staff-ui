@@ -111,6 +111,7 @@ context('Update a visit', () => {
       ],
       visitorSupport: { description: '' },
     })
+    updatedApplication.visitContact.email = 'visitor@example.com' // (may be present if visit originated in public servivce)
     cy.task('stubCreateVisitApplicationFromVisit', {
       visitReference: visitHistoryDetails.visit.reference,
       application: updatedApplication,
@@ -136,7 +137,7 @@ context('Update a visit', () => {
       TestData.application({
         startTimestamp: visitSessions[1].startTimestamp,
         endTimestamp: visitSessions[1].endTimestamp,
-        visitContact: { name: 'Jeanette Smith', telephone: '09876 543 321' },
+        visitContact: { name: 'Jeanette Smith', telephone: '09876 543 321', email: 'visitor@example.com' },
         visitors: [
           { nomisPersonId: contacts[0].personId, visitContact: true },
           { nomisPersonId: contacts[1].personId, visitContact: false },

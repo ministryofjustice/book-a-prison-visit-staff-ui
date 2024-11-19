@@ -302,6 +302,7 @@ export default class OrchestrationApiClient {
     const visitContact = mainContact
       ? {
           ...(mainContact.phoneNumber && { telephone: mainContact.phoneNumber }),
+          ...(mainContact.email && { email: mainContact.email }),
           name: mainContact.contactName ? mainContact.contactName : mainContact.contact.name,
         }
       : undefined

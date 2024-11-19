@@ -218,6 +218,7 @@ describe('orchestrationApiClient', () => {
         visitorSupport: { description: '' },
         mainContact: {
           phoneNumber: '01234 567890',
+          email: 'visitor@example.com',
           contactName: 'John Smith',
         },
       }
@@ -234,6 +235,7 @@ describe('orchestrationApiClient', () => {
           visitContact: {
             name: visitSessionData.mainContact.contactName,
             telephone: visitSessionData.mainContact.phoneNumber,
+            email: visitSessionData.mainContact.email,
           },
           visitors: visitSessionData.visitors.map(visitor => {
             return {
@@ -268,6 +270,7 @@ describe('orchestrationApiClient', () => {
         visitorSupport: { description: '' },
         mainContact: {
           phoneNumber: '01234 567890',
+          email: 'visitor@example.com',
           contactName: 'John Smith',
         },
         visitReference: 'ab-cd-ef-gh',
@@ -286,6 +289,7 @@ describe('orchestrationApiClient', () => {
           visitContact: {
             name: visitSessionData.mainContact.contactName,
             telephone: visitSessionData.mainContact.phoneNumber,
+            email: visitSessionData.mainContact.email,
           },
           visitors: visitSessionData.visitors.map(visitor => {
             return {

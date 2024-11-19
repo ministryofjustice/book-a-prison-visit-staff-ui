@@ -86,7 +86,6 @@ export default class TestData {
     visitContact = {
       name: 'Jeanette Smith',
       telephone: '01234 567890',
-      email: 'visitor@example.com',
     },
     visitors = [
       {

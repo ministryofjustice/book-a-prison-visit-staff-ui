@@ -745,7 +745,12 @@ describe('/visit/:reference', () => {
               },
             ],
             visitorSupport: { description: 'Wheelchair ramp, Portable induction loop for people with hearing aids' },
-            mainContact: { contact: visitors[0], phoneNumber: '01234 567890', contactName: 'Jeanette Smith' },
+            mainContact: {
+              contact: visitors[0],
+              phoneNumber: '01234 567890',
+              email: 'visitor@example.com',
+              contactName: 'Jeanette Smith',
+            },
             visitReference: 'ab-cd-ef-gh',
           })
         })
