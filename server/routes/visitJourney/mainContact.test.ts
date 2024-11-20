@@ -274,6 +274,7 @@ testJourneys.forEach(journey => {
               banned: false,
             })
             expect(visitSessionData.mainContact.phoneNumber).toBe('0114 1234 567')
+            expect(visitSessionData.mainContact.email).toBeUndefined()
             expect(visitSessionData.mainContact.contactName).toBe(undefined)
 
             expect(visitService.changeVisitApplication).toHaveBeenCalledWith({ username: 'user1', visitSessionData })
@@ -292,6 +293,7 @@ testJourneys.forEach(journey => {
           .expect(() => {
             expect(visitSessionData.mainContact.contact).toBe(undefined)
             expect(visitSessionData.mainContact.contactName).toBe('another person')
+            expect(visitSessionData.mainContact.email).toBeUndefined()
             expect(visitSessionData.mainContact.phoneNumber).toBe('0114 7654 321')
 
             expect(visitService.changeVisitApplication).toHaveBeenCalledWith({ username: 'user1', visitSessionData })
@@ -309,6 +311,7 @@ testJourneys.forEach(journey => {
             banned: false,
           },
           phoneNumber: '0114 1234 567',
+          email: 'visitor@example.com',
           contactName: undefined,
         }
         return request(sessionApp)
@@ -323,6 +326,7 @@ testJourneys.forEach(journey => {
             expect(visitSessionData.mainContact.contact).toBe(undefined)
             expect(visitSessionData.mainContact.contactName).toBe('another person')
             expect(visitSessionData.mainContact.phoneNumber).toBe('0114 7654 321')
+            expect(visitSessionData.mainContact.email).toBe('visitor@example.com')
 
             expect(visitService.changeVisitApplication).toHaveBeenCalledWith({ username: 'user1', visitSessionData })
           })

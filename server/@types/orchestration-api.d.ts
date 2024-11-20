@@ -935,6 +935,11 @@ export interface components {
        * @example 01234 567890
        */
       telephone?: string
+      /**
+       * @description Contact Email Address
+       * @example email@example.com
+       */
+      email?: string
     }
     /** @description Visit */
     VisitDto: {

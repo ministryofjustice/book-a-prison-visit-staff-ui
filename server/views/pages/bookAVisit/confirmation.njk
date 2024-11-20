@@ -161,7 +161,7 @@
         },
         value: {
             html: '<p class="test-main-contact-name">' + contactName + '</p><p class="test-main-contact-number">' +
-                mainContact.phoneNumber | formatTelephone + '</p>'
+                mainContact.phoneNumber | d("No phone number provided", true) | escape + '</p>'
         }
     }
 ), displayRows) %}

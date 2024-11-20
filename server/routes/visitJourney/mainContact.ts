@@ -52,9 +52,13 @@ export default class MainContact {
       (visitor: VisitorListItem) => req.body.contact === visitor.personId.toString(),
     )
 
+    // email not collected in this service but need to preserve it as it may have been entered in public service
+    const email = visitSessionData.mainContact?.email
+
     visitSessionData.mainContact = {
       contact: selectedContact,
       phoneNumber: req.body.phoneNumber === 'hasPhoneNumber' ? req.body.phoneNumberInput : undefined,
+      email,
       contactName: selectedContact === undefined ? req.body.someoneElseName : undefined,
     }
 

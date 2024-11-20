@@ -44,6 +44,8 @@ export default class VisitDetailsPage extends Page {
 
   visitPhone = (): PageElement => cy.get('[data-test="visit-phone"]')
 
+  visitEmail = (): PageElement => cy.get('[data-test="visit-email"]')
+
   // Visitor Details-1
   visitorName1 = (): PageElement => cy.get('[data-test="test-visitor-name1"]')
 

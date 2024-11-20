@@ -112,6 +112,7 @@ export type VisitSessionData = {
   mainContact?: {
     contact?: VisitorListItem
     phoneNumber?: string
+    email?: string
     contactName?: string
   }
   applicationReference?: string
