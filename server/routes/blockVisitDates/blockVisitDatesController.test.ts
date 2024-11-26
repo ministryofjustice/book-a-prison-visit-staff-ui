@@ -45,7 +45,7 @@ describe('Block visit dates listing page', () => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('.govuk-back-link').attr('href')).toBe('/')
+          expect($('.govuk-breadcrumbs li').length).toBe(2)
           expect($('h1').text()).toBe('Block visit dates')
 
           expect($('.moj-banner__message').length).toBe(0)
