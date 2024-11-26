@@ -5,6 +5,7 @@ import { appWithAllRoutes } from './testutils/appSetup'
 import * as visitorUtils from './visitorUtils'
 import { createMockVisitNotificationsService } from '../services/testutils/mocks'
 import TestData from './testutils/testData'
+import config from '../config'
 
 let app: Express
 
@@ -31,6 +32,10 @@ describe('GET /', () => {
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
+
+        expect($('.govuk-breadcrumbs li').length).toBe(1)
+        expect($('.govuk-breadcrumbs li:first a').text()).toBe('Digital Prison Services')
+        expect($('.govuk-breadcrumbs li:first a').attr('href')).toBe(config.dpsHome)
 
         expect($('.card').length).toBe(5)
 
