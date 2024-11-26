@@ -150,7 +150,7 @@ describe('Views - Visits summary', () => {
     expect($('[data-test="no-visits-message"]').text()).toContain(
       'This date has been blocked for social visits. There are existing bookings that need review.',
     )
-    expect($('[data-test="no-visits-message"] a').prop('href')).toBe('/review?back-link-params')
+    expect($('[data-test="no-visits-message"] a').prop('href')).toBe('/review')
     expect($('.bapv-table').length).toBe(0)
   })
 

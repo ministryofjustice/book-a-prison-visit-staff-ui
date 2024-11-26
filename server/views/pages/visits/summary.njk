@@ -114,7 +114,7 @@
       {% else %}
         <p class="govuk-!-margin-top-0" data-test="no-visits-message">
           {% if isAnExcludeDateWithVisitNotifications %}
-            This date has been blocked for social visits. There are existing bookings that <a href="/review?{{ queryParamsForBackLink }}" class="govuk-link--no-visited-state">need review</a>.
+            This date has been blocked for social visits. There are existing bookings that <a href="/review" class="govuk-link--no-visited-state">need review</a>.
           {% elseif isAnExcludeDate %}
             This date has been blocked for social visits. There are no existing bookings to cancel.
           {% else %}

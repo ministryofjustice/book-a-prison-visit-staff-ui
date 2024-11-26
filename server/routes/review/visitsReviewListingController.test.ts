@@ -33,7 +33,7 @@ describe('Bookings needing review listing page', () => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('.govuk-back-link').attr('href')).toBe('/')
+          expect($('.govuk-breadcrumbs li').length).toBe(2)
           expect($('h1').text()).toBe('Visit bookings that need review')
 
           const numNotificationTypes = Object.keys(notificationTypeReasons).length
@@ -145,17 +145,6 @@ describe('Bookings needing review listing page', () => {
             bookedBy: ['user1'],
             type: ['NON_ASSOCIATION'],
           })
-        })
-    })
-
-    it('should display correct back link when coming from Visits by date page', () => {
-      return request(app)
-        .get('/review?query=back-link-params&from=visits')
-        .expect('Content-Type', /html/)
-        .expect(res => {
-          const $ = cheerio.load(res.text)
-          expect($('.govuk-back-link').attr('href')).toBe('/visits?back-link-params')
-          expect($('h1').text()).toBe('Visit bookings that need review')
         })
     })
   })

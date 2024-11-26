@@ -9,8 +9,6 @@ export default class VisitsReviewListingController {
 
   public view(): RequestHandler {
     return async (req, res) => {
-      const fromPage = typeof req.query?.from === 'string' ? req.query.from : null
-      const fromPageQuery = typeof req.query?.query === 'string' ? req.query.query : null
       const { prisonName } = req.session.selectedEstablishment
       // OK to cast these as express-validator sanitises to string[]
       const bookedBy = Array.isArray(req.query.bookedBy) ? <string[]>req.query.bookedBy : []
@@ -31,8 +29,6 @@ export default class VisitsReviewListingController {
         filters,
         visitsReviewList,
         isAFilterApplied,
-        fromPage,
-        fromPageQuery,
       })
     }
   }

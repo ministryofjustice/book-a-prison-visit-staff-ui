@@ -1,4 +1,5 @@
 {% extends "layout.njk" %}
+{% from "partials/breadcrumbs.njk" import breadcrumbs with context %}
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
 {%- from "govuk/components/tag/macro.njk" import govukTag -%}
@@ -9,11 +10,9 @@
     {% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
 {% endset %}
 
-{% if fromPage == "visits" %}
-  {% set backLinkHref = "/visits?" + fromPageQuery %}
-{% else %}
-  {% set backLinkHref = "/" %}
-{% endif %}
+{% block beforeContent %}
+  {{ breadcrumbs() }}
+{% endblock %}
 
 {% macro arrayToList(items) %}
   <ul class="govuk-list govuk-!-margin-bottom-0">

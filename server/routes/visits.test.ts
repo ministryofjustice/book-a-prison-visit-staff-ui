@@ -556,9 +556,7 @@ describe('GET /visits', () => {
           expect($('[data-test="no-visits-message"]').text().trim()).toBe(
             'This date has been blocked for social visits. There are existing bookings that need review.',
           )
-          expect($('[data-test="no-visits-message"] a').prop('href')).toBe(
-            '/review?query=type%3DUNKNOWN%26sessionReference%3DNONE%26selectedDate%3D2024-02-01%26firstTabDate%3D2024-02-01&from=visits',
-          )
+          expect($('[data-test="no-visits-message"] a').prop('href')).toBe('/review')
 
           expect(blockedDatesService.isBlockedDate).toHaveBeenCalledWith('HEI', '2024-02-01', 'user1')
           expect(visitNotificationsService.dateHasNotifications).toHaveBeenCalledWith('user1', 'HEI', '2024-02-01')
