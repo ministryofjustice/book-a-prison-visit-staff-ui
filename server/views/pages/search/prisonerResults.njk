@@ -31,11 +31,11 @@
           },
           previous: {
             text: 'Previous',
-            href: backLinkHref + '/results?search=' + search + '&page=' + previous
+            href: '/search/prisoner/results?search=' + search + '&page=' + previous
           } if numberOfResults > 10,
           next: {
             text: 'Next',
-            href: backLinkHref + '/results?search=' + search + '&page=' + next
+            href: '/search/prisoner/results?search=' + search + '&page=' + next
           } if numberOfResults > 10,
           items: pageLinks if numberOfResults > 10
         }) }}
