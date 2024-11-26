@@ -22,7 +22,6 @@ context('Search for a prisoner', () => {
     homePage.bookOrChangeVisitTile().click()
 
     const searchForAPrisonerPage = Page.verifyOnPage(SearchForAPrisonerPage)
-    searchForAPrisonerPage.backLink()
     searchForAPrisonerPage.searchForm()
   })
 

@@ -45,6 +45,4 @@ export default abstract class Page {
   }
 
   signOut = (): PageElement => cy.get('[data-qa=signOut]')
-
-  backLink = (): PageElement => cy.get('[class="govuk-back-link"]')
 }
