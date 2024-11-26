@@ -14,7 +14,7 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   app.set('view engine', 'njk')
 
   app.locals.asset_path = '/assets/'
-  app.locals.applicationName = 'Manage prison visits'
+  app.locals.applicationName = config.applicationName
   app.locals.environmentName = config.environmentName
   app.locals.dpsHome = config.dpsHome
   app.locals.dpsPrisoner = config.dpsPrisoner
