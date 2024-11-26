@@ -79,8 +79,8 @@ describe('GET /visits', () => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
+          expect($('.govuk-breadcrumbs li').length).toBe(2)
           expect($('h1').text()).toBe('View visits by date')
-          expect($('.govuk-back-link').attr('href')).toBe('/')
 
           // date tabs
           expect($('.moj-sub-navigation__link').length).toBe(3)
@@ -168,7 +168,6 @@ describe('GET /visits', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('h1').text()).toBe('View visits by date')
-          expect($('.govuk-back-link').attr('href')).toBe('/')
 
           // date tabs
           expect($('.moj-sub-navigation__link').length).toBe(3)
@@ -229,7 +228,6 @@ describe('GET /visits', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('h1').text()).toBe('View visits by date')
-          expect($('.govuk-back-link').attr('href')).toBe('/')
 
           // date tabs
           expect($('.moj-sub-navigation__link').length).toBe(3)
@@ -293,7 +291,6 @@ describe('GET /visits', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('h1').text()).toBe('View visits by date')
-          expect($('.govuk-back-link').attr('href')).toBe('/')
 
           // date tabs
           expect($('.moj-sub-navigation__link').length).toBe(3)
@@ -369,7 +366,6 @@ describe('GET /visits', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('h1').text()).toBe('View visits by date')
-          expect($('.govuk-back-link').attr('href')).toBe('/')
 
           // date tabs
           expect($('.moj-sub-navigation__link').length).toBe(3)
@@ -433,7 +429,6 @@ describe('GET /visits', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('h1').text()).toBe('View visits by date')
-          expect($('.govuk-back-link').attr('href')).toBe('/')
 
           // date tabs
           expect($('.moj-sub-navigation__link').length).toBe(3)
