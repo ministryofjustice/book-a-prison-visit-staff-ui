@@ -32,6 +32,7 @@ describe('View visits timetable', () => {
       .expect(res => {
         const $ = cheerio.load(res.text)
 
+        expect($('.govuk-breadcrumbs li').length).toBe(2)
         expect($('h1').text()).toBe('Visits timetable')
 
         expect($('#selected-date').text()).toBe('Tuesday 27 December 2022')

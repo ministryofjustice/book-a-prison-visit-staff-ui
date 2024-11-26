@@ -1,4 +1,5 @@
 {% extends "layout.njk" %}
+{% from "partials/breadcrumbs.njk" import breadcrumbs with context %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
 
 {% set pageHeaderTitle = "Visits timetable" %}
@@ -6,7 +7,9 @@
 {% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
 {% endset %}
 
-{% set backLinkHref = "/" %}
+{% block beforeContent %}
+  {{ breadcrumbs() }}
+{% endblock %}
 
 {% macro attendees(prisonerIncentiveLevelGroupNames, prisonerCategoryGroupNames, prisonerLocationGroupNames, areLocationGroupsInclusive) %}
     {% if prisonerLocationGroupNames | length %}
