@@ -5,7 +5,6 @@ import { appWithAllRoutes } from './testutils/appSetup'
 import * as visitorUtils from './visitorUtils'
 import { createMockVisitNotificationsService } from '../services/testutils/mocks'
 import TestData from './testutils/testData'
-import config from '../config'
 
 let app: Express
 
