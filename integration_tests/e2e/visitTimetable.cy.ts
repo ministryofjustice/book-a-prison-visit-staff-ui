@@ -55,7 +55,6 @@ context('View visit schedule timetable', () => {
 
     // Visit timetable page
     const visitTimetablePage = Page.verifyOnPage(VisitTimetablePage)
-    visitTimetablePage.backLink().should('have.attr', 'href', '/')
     visitTimetablePage.checkSelectedDate(today)
 
     visitTimetablePage.scheduleTime(0).contains('10am to 11:30am')
@@ -112,7 +111,6 @@ context('View visit schedule timetable', () => {
 
     // Visit timetable page
     const visitTimetablePage = Page.verifyOnPage(VisitTimetablePage)
-    visitTimetablePage.backLink().should('have.attr', 'href', '/')
     visitTimetablePage.checkSelectedDate(today)
     visitTimetablePage.emptySchedule().contains('No visit sessions on this day.')
 

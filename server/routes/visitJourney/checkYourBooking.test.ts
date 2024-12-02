@@ -101,6 +101,7 @@ testJourneys.forEach(journey => {
           .expect('Content-Type', /html/)
           .expect(res => {
             const $ = cheerio.load(res.text)
+            expect($('.govuk-back-link').attr('href')).toBe(`${journey.urlPrefix}/request-method`)
             expect($('h1').text().trim()).toBe('Check the visit details before booking')
             expect($('.test-prisoner-name').text()).toContain('prisoner name')
             expect($('.test-visit-date').text()).toContain('Saturday 12 March 2022')

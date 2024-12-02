@@ -1,8 +1,12 @@
 {% extends "layout.njk" %}
+{% from "partials/breadcrumbs.njk" import breadcrumbs with context %}
 
 {% set pageHeaderTitle = "Search for a prisoner" %}
 {% set pageTitle = applicationName + " - " + pageHeaderTitle %}
-{% set backLinkHref = "/" %}
+
+{% block beforeContent %}
+  {{ breadcrumbs() }}
+{% endblock %}
 
 {% block content %}
   <div class="govuk-grid-row">

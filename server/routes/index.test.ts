@@ -32,6 +32,8 @@ describe('GET /', () => {
       .expect(res => {
         const $ = cheerio.load(res.text)
 
+        expect($('.govuk-breadcrumbs li').length).toBe(1)
+
         expect($('.card').length).toBe(5)
 
         expect($('[data-test="book-or-change-visit"] .card__link').text()).toBe('Book or change a visit')

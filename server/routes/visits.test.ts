@@ -79,8 +79,8 @@ describe('GET /visits', () => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
+          expect($('.govuk-breadcrumbs li').length).toBe(2)
           expect($('h1').text()).toBe('View visits by date')
-          expect($('.govuk-back-link').attr('href')).toBe('/')
 
           // date tabs
           expect($('.moj-sub-navigation__link').length).toBe(3)
@@ -168,7 +168,6 @@ describe('GET /visits', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('h1').text()).toBe('View visits by date')
-          expect($('.govuk-back-link').attr('href')).toBe('/')
 
           // date tabs
           expect($('.moj-sub-navigation__link').length).toBe(3)
@@ -229,7 +228,6 @@ describe('GET /visits', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('h1').text()).toBe('View visits by date')
-          expect($('.govuk-back-link').attr('href')).toBe('/')
 
           // date tabs
           expect($('.moj-sub-navigation__link').length).toBe(3)
@@ -293,7 +291,6 @@ describe('GET /visits', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('h1').text()).toBe('View visits by date')
-          expect($('.govuk-back-link').attr('href')).toBe('/')
 
           // date tabs
           expect($('.moj-sub-navigation__link').length).toBe(3)
@@ -369,7 +366,6 @@ describe('GET /visits', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('h1').text()).toBe('View visits by date')
-          expect($('.govuk-back-link').attr('href')).toBe('/')
 
           // date tabs
           expect($('.moj-sub-navigation__link').length).toBe(3)
@@ -433,7 +429,6 @@ describe('GET /visits', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('h1').text()).toBe('View visits by date')
-          expect($('.govuk-back-link').attr('href')).toBe('/')
 
           // date tabs
           expect($('.moj-sub-navigation__link').length).toBe(3)
@@ -556,9 +551,7 @@ describe('GET /visits', () => {
           expect($('[data-test="no-visits-message"]').text().trim()).toBe(
             'This date has been blocked for social visits. There are existing bookings that need review.',
           )
-          expect($('[data-test="no-visits-message"] a').prop('href')).toBe(
-            '/review?query=type%3DUNKNOWN%26sessionReference%3DNONE%26selectedDate%3D2024-02-01%26firstTabDate%3D2024-02-01&from=visits',
-          )
+          expect($('[data-test="no-visits-message"] a').prop('href')).toBe('/review')
 
           expect(blockedDatesService.isBlockedDate).toHaveBeenCalledWith('HEI', '2024-02-01', 'user1')
           expect(visitNotificationsService.dateHasNotifications).toHaveBeenCalledWith('user1', 'HEI', '2024-02-01')

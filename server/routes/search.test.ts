@@ -54,6 +54,7 @@ describe('Prisoner search page', () => {
           .expect('Content-Type', /html/)
           .expect(res => {
             const $ = cheerio.load(res.text)
+            expect($('.govuk-breadcrumbs li').length).toBe(2)
             expect(res.text).toContain('Search for a prisoner')
             expect($('[data-test=search-by-reference]').length).toBe(1)
           })
@@ -78,6 +79,7 @@ describe('Prisoner search page', () => {
           .expect('Content-Type', /html/)
           .expect(res => {
             const $ = cheerio.load(res.text)
+            expect($('.govuk-breadcrumbs li').length).toBe(2)
             expect(res.text).toContain('Search for a prisoner')
             expect($('#search-results-none').text()).toBe('custom not found message')
             expect($('[data-test=search-by-reference]').length).toBe(1)
@@ -264,6 +266,7 @@ describe('Booking search page', () => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
+          expect($('.govuk-breadcrumbs li').length).toBe(2)
           expect(res.text).toContain('Search for a booking')
           expect($('[data-test=search-by-prisoner]').length).toBe(1)
         })
@@ -310,6 +313,7 @@ describe('Booking search page', () => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
+          expect($('.govuk-breadcrumbs li').length).toBe(2)
           expect(res.text).toContain('Search for a booking')
           expect(res.text).toContain('id="search-results-true"')
           expect($('[data-test=search-by-prisoner]').length).toBe(0)
