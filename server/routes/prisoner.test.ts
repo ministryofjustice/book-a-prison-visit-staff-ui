@@ -126,6 +126,9 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
           expect($('[data-test="tab-pvo-last-date"]').text()).toBe('1 December 2021')
           expect($('[data-test="tab-pvo-next-date"]').text()).toBe('1 January 2022')
           expect($('.govuk-back-link').attr('href')).toBe('/search/prisoner')
+          expect($('[data-test="all-alerts-link"]').attr('href')).toBe(
+            'https://prisoner-dev.digital.prison.service.justice.gov.uk/prisoner/A1234BC/alerts/active',
+          )
 
           expect($('#active-alerts').text()).toContain('Racist')
 
