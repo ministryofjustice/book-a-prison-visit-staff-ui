@@ -210,6 +210,8 @@
 
     {% set alertsTab %}
       <h2 class="govuk-heading-m">Active alerts</h2>
+      <p>This page shows alerts that are relevant for social visits. You can also <a class="govuk-link--no-visited-state" href="{{ prisonerDpsAlertsUrl }}" target="_blank" data-test="all-alerts-link">view all alerts</a>.</p>
+
       {% if activeAlerts | length %}
 
         {# Build rows for alerts table #}
