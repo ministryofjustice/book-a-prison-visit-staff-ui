@@ -43,11 +43,7 @@ export default function routes({ auditService, prisonerProfileService }: Service
     const offenderNo = getOffenderNo(req)
     const { prisonId } = req.session.selectedEstablishment
 
-    const { prisonerDetails, restrictions, activeAlerts } = await prisonerProfileService.getProfile(
-      prisonId,
-      offenderNo,
-      res.locals.user.username,
-    )
+    const { prisonerDetails } = await prisonerProfileService.getProfile(prisonId, offenderNo, res.locals.user.username)
 
     if (prisonerDetails.visitBalances?.remainingVo <= 0 && prisonerDetails.visitBalances?.remainingPvo <= 0) {
       await body('vo-override').equals('override').withMessage('Select the box to book a prison visit').run(req)
@@ -77,8 +73,6 @@ export default function routes({ auditService, prisonerProfileService }: Service
       offenderNo,
       dateOfBirth: prisonerDetails.dateOfBirth,
       location: prisonerDetails.cellLocation ? `${prisonerDetails.cellLocation}, ${prisonerDetails.prisonName}` : '',
-      activeAlerts,
-      restrictions,
     }
 
     req.session.visitSessionData = visitSessionData
