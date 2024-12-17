@@ -58,7 +58,7 @@ export default class VisitSessionsService {
 
         // Month grouping for slots, e.g. 'February 2022'
         const slotMonth = format(parsedStartTimestamp, 'MMMM yyyy')
-        if (!slotList[slotMonth]) slotList[slotMonth] = [] // eslint-disable-line no-param-reassign
+        if (!slotList[slotMonth]) slotList[slotMonth] = []
 
         // Slots for the day, e.g. 'Monday 14 February'
         const slotDate = format(parsedStartTimestamp, 'EEEE d MMMM')
