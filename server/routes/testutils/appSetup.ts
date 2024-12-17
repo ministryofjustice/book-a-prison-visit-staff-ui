@@ -1,5 +1,4 @@
 /* eslint-disable import/first */
-/* eslint-disable max-classes-per-file */
 // eslint-disable-next-line import/order
 import type { ApplicationInfo } from '../../applicationInfo'
 
