@@ -1,15 +1,16 @@
 const expandableComments = document.querySelectorAll('.bapv-expandable-comment')
+const FUL_COMMENT_EXPANDED_CLASS = 'bapv-expandable-comment__full-comment--expanded'
 
 expandableComments.forEach(expandableComment => {
-  expandableComment.querySelector('.bapv-expandable-comment__show').addEventListener('click', () => {
-    expandableComment
-      .querySelector('.bapv-expandable-comment__full-comment')
-      .classList.add('bapv-expandable-comment__full-comment--expanded')
+  const showFullCommentButton = expandableComment.querySelector('.bapv-expandable-comment__show')
+  const hideFullCommentButton = expandableComment.querySelector('.bapv-expandable-comment__hide')
+  const fullCommentText = expandableComment.querySelector('.bapv-expandable-comment__full-comment')
+
+  showFullCommentButton.addEventListener('click', () => {
+      fullCommentText.classList.add(FUL_COMMENT_EXPANDED_CLASS)
   })
 
-  expandableComment.querySelector('.bapv-expandable-comment__hide').addEventListener('click', () => {
-    expandableComment
-      .querySelector('.bapv-expandable-comment__full-comment')
-      .classList.remove('bapv-expandable-comment__full-comment--expanded')
+  hideFullCommentButton.addEventListener('click', () => {
+    fullCommentText.classList.remove(FUL_COMMENT_EXPANDED_CLASS)
   })
 })
