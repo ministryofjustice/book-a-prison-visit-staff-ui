@@ -65,19 +65,27 @@
   max-width: unset;
   padding: 8px 8px;
 
-  &--R {
-    border-color: govuk-colour("red")
-  }
-
-  &--C {
+  &--C { // Child
     border-color: govuk-colour("bright-purple");
   }
 
-  &--S {
+  &--O { // Other
+    border-color: govuk-colour("pink");
+  }
+
+  &--R { // Risk
+    border-color: govuk-colour("red")
+  }
+
+  &--S { // Sexual
     border-color: govuk-colour("purple");
   }
 
-  &--U {
+  &--V { // Vulnerability
     border-color: govuk-colour("light-blue");
+  }
+
+  &--X { // Security
+    border-color: govuk-colour("dark-blue");
   }
 }
