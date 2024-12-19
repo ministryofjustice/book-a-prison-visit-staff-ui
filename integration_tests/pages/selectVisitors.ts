@@ -5,17 +5,23 @@ export default class SelectVisitorsPage extends Page {
     super('Select visitors from the prisoner’s approved visitor list')
   }
 
-  getPrisonerRestrictionType = (index: number): PageElement => cy.get(`.test-restrictions-type${index}`)
+  getPrisonerRestrictionType = (index: number): PageElement => cy.get(`[data-test=test-restrictions-type${index}]`)
 
-  getPrisonerRestrictionComment = (index: number): PageElement => cy.get(`.test-restrictions-comment${index}`)
+  getPrisonerRestrictionComment = (index: number): PageElement =>
+    cy.get(`[data-test=test-restrictions-comment${index}]`)
 
-  getPrisonerRestrictionEndDate = (index: number): PageElement => cy.get(`.test-restrictions-end-date${index}`)
+  getPrisonerRestrictionEndDate = (index: number): PageElement =>
+    cy.get(`[data-test=test-restrictions-end-date${index}]`)
 
-  getPrisonerAlertType = (index: number): PageElement => cy.get(`.test-alert-type${index}`)
+  getPrisonerAlertType = (index: number): PageElement => cy.get(`[data-test=test-alert-type${index}]`)
 
-  getPrisonerAlertComment = (index: number): PageElement => cy.get(`.test-alert-comment${index}`)
+  getPrisonerAlertComment = (index: number): PageElement => cy.get(`[data-test=test-alert-comment${index}]`)
 
-  getPrisonerAlertEndDate = (index: number): PageElement => cy.get(`.test-alert-end-date${index}`)
+  getPrisonerAlertEndDate = (index: number): PageElement => cy.get(`[data-test=test-alert-end-date${index}]`)
+
+  showFullCommentLink = (): PageElement => cy.get('[data-test=show-full-comment]')
+
+  closeFullCommentLink = (): PageElement => cy.get('[data-test=close-full-comment]')
 
   getVisitor = (visitorId: number): PageElement => cy.get(`#visitor-${visitorId}`)
 

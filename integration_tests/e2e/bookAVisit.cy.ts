@@ -100,7 +100,7 @@ context('Book a visit', () => {
           alertTypeDescription: 'COVID unit management',
           alertCode: 'UPIU',
           alertCodeDescription: 'Protective Isolation Unit',
-          comment: 'Alert comment',
+          comment: 'Alert comment \n This part is hidden by default',
           dateCreated: '2023-01-02',
           dateExpires: undefined,
           active: true,
@@ -124,7 +124,15 @@ context('Book a visit', () => {
     selectVisitorsPage.getPrisonerRestrictionComment(1).contains(offenderRestrictions[0].comment)
     selectVisitorsPage.getPrisonerRestrictionEndDate(1).contains('No end date')
     selectVisitorsPage.getPrisonerAlertType(1).contains('COVID unit management')
+
     selectVisitorsPage.getPrisonerAlertComment(1).contains('Alert comment')
+    selectVisitorsPage.showFullCommentLink().contains('See full comment')
+    selectVisitorsPage.showFullCommentLink().click()
+    selectVisitorsPage.getPrisonerAlertComment(1).contains('This part is hidden by default')
+    selectVisitorsPage.closeFullCommentLink().contains('Close full comment')
+    selectVisitorsPage.closeFullCommentLink().click()
+    selectVisitorsPage.getPrisonerAlertComment(1).contains('Alert comment')
+
     selectVisitorsPage.getPrisonerAlertEndDate(1).contains('No end date')
     selectVisitorsPage.getVisitorRestrictions(contacts[0].personId).within(() => {
       cy.contains(contacts[0].restrictions[0].restrictionTypeDescription)

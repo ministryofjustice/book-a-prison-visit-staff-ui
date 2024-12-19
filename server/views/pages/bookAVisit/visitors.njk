@@ -74,15 +74,16 @@
           {% set restrictionExpiryDate %}{% if restriction.expiryDate %}{{ restriction.expiryDate | formatDate }}{% else %}No end date{% endif %}{% endset %}
           {%- set prisonerRestrictions = (prisonerRestrictions.push([
             {
-              html: '<span class="test-restrictions-type' + loop.index + ' govuk-tag restriction-tag restriction-tag--' + restriction.restrictionType + '">' + restriction.restrictionTypeDescription + '</span>'
+              html: '<span data-test="test-restrictions-type' + loop.index + '" class="govuk-tag restriction-tag restriction-tag--' + restriction.restrictionType + '">' + restriction.restrictionTypeDescription + '</span>'
             },
             {
               text: restriction.comment,
-              classes: "bapv-force-overflow test-restrictions-comment" + loop.index
+              classes: "bapv-force-overflow",
+              attributes: { "data-test":"test-restrictions-comment" + loop.index }
             },
             {
               text: restrictionExpiryDate,
-              classes: "test-restrictions-end-date" + loop.index
+              attributes: { "data-test":"test-restrictions-end-date" + loop.index }
             }
           ]), prisonerRestrictions) %}
         {% endfor %}
@@ -92,15 +93,15 @@
           {% set alertExpiryDate %}{% if alert.dateExpires %}{{ alert.dateExpires | formatDate }}{% else %}No end date{% endif %}{% endset %}
           {%- set prisonerAlerts = (prisonerAlerts.push([
             {
-              html: '<span class="test-alert-type' + loop.index + ' govuk-tag alert-tag alert-tag--' + alert.alertType + '">' + alert.alertTypeDescription + '</span>'
+              html: '<span data-test="test-alert-type' + loop.index + '" class="govuk-tag alert-tag alert-tag--' + alert.alertType + '">' + alert.alertTypeDescription + '</span>'
             },
             {
               html: bapvExpandableComment({ text: alert.comment }),
-              classes: "test-alert-comment" + loop.index
+              attributes: { "data-test":"test-alert-comment" + loop.index }
             },
             {
               text: alertExpiryDate,
-              classes: "test-alert-end-date" + loop.index
+              attributes: { "data-test":"test-alert-end-date" + loop.index }
             }
           ]), prisonerAlerts) %}
         {% endfor %}
