@@ -4,6 +4,7 @@
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {%- from "moj/components/banner/macro.njk" import mojBanner -%}
 {% from "components/visitors.njk" import visitorDateOfBirth, visitorRestrictions %}
+{%- from "components/expandableComment/macro.njk" import bapvExpandableComment -%}
 
 {% set pageHeaderTitle = "Select visitors from the prisoner’s approved visitor list" %}
 {% set pageTitle %}
@@ -94,8 +95,8 @@
               html: '<span class="test-alert-type' + loop.index + ' govuk-tag alert-tag alert-tag--' + alert.alertType + '">' + alert.alertTypeDescription + '</span>'
             },
             {
-              text: alert.comment,
-              classes: "bapv-force-overflow test-alert-comment" + loop.index
+              html: bapvExpandableComment({ text: alert.comment }),
+              classes: "test-alert-comment" + loop.index
             },
             {
               text: alertExpiryDate,
@@ -238,4 +239,8 @@
     {% endif %}
     </div>
   </div>
+{% endblock %}
+
+{% block pageScripts %}
+  <script src="/assets/components/expandableComment.js"></script>
 {% endblock %}
