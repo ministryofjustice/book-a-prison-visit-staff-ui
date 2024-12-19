@@ -3,7 +3,6 @@ import request from 'supertest'
 import { SessionData } from 'express-session'
 import * as cheerio from 'cheerio'
 import { FlashData, VisitorListItem, VisitSessionData } from '../../@types/bapv'
-import { OffenderRestriction } from '../../data/prisonApiTypes'
 import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
 import { Restriction } from '../../data/prisonerContactRegistryApiTypes'
 import {
@@ -46,7 +45,8 @@ testJourneys.forEach(journey => {
     const visitorList: { visitors: VisitorListItem[] } = { visitors: [] }
 
     let returnData: VisitorListItem[]
-    let restrictions: OffenderRestriction[]
+    const restrictions = [TestData.offenderRestriction({ expiryDate: '2022-03-15' })]
+    const alerts = [TestData.alert({ dateExpires: '2022-03-15' })]
 
     beforeAll(() => {
       returnData = [
@@ -105,18 +105,6 @@ testJourneys.forEach(journey => {
           banned: false,
         },
       ]
-
-      restrictions = [
-        {
-          restrictionId: 0,
-          comment: 'string',
-          restrictionType: 'BAN',
-          restrictionTypeDescription: 'Banned',
-          startDate: '2022-03-15',
-          expiryDate: '2022-03-15',
-          active: true,
-        },
-      ]
     })
 
     beforeEach(() => {
@@ -127,13 +115,14 @@ testJourneys.forEach(journey => {
           offenderNo: 'A1234BC',
           dateOfBirth: '25 May 1988',
           location: 'location place',
+          activeAlerts: [],
+          restrictions: [],
         },
         visitRestriction: 'OPEN',
         visitReference: 'ab-cd-ef-gh',
       }
 
       prisonerVisitorsService.getVisitors.mockResolvedValue(returnData)
-      prisonerProfileService.getRestrictions.mockResolvedValue(restrictions)
 
       sessionApp = appWithAllRoutes({
         services: { prisonerProfileService, prisonerVisitorsService },
@@ -144,34 +133,27 @@ testJourneys.forEach(journey => {
       })
     })
 
-    it('should render the prisoner restrictions when they are present', () => {
+    it('should render the prisoner restrictions and alerts when they are present', () => {
+      visitSessionData.prisoner.restrictions = restrictions
+      visitSessionData.prisoner.activeAlerts = alerts
       return request(sessionApp)
         .get(`${journey.urlPrefix}/select-visitors`)
         .expect(200)
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('.test-restrictions-type1').text().trim()).toBe('Banned')
-          expect($('.test-restrictions-comment1').text().trim()).toBe('string')
-          expect($('.test-restrictions-start-date1').text().trim()).toBe('15 March 2022')
+          expect($('.test-restrictions-type1').text().trim()).toBe('Restricted')
+          expect($('.test-restrictions-comment1').text().trim()).toBe('Details about this restriction')
           expect($('.test-restrictions-end-date1').text().trim()).toBe('15 March 2022')
-          expect(visitSessionData.prisoner.restrictions).toEqual(restrictions)
+          expect($('.test-alert-type1').text().trim()).toBe('COVID unit management')
+          expect($('.test-alert-comment1').text().trim()).toBe('Alert comment')
+          expect($('.test-alert-end-date1').text().trim()).toBe('15 March 2022')
         })
     })
 
-    it('should render the prisoner restrictions when they are present, displaying a message if dates are not set', () => {
-      restrictions = [
-        {
-          restrictionId: 0,
-          comment: 'string',
-          restrictionType: 'BAN',
-          restrictionTypeDescription: 'Banned',
-          startDate: '',
-          expiryDate: '',
-          active: true,
-        },
-      ]
-      prisonerProfileService.getRestrictions.mockResolvedValue(restrictions)
+    it('should render the prisoner restrictions and alerts when they are present, displaying a message if dates are not set', () => {
+      visitSessionData.prisoner.restrictions = [TestData.offenderRestriction()]
+      visitSessionData.prisoner.activeAlerts = [TestData.alert()]
 
       sessionApp = appWithAllRoutes({
         services: { prisonerProfileService, prisonerVisitorsService },
@@ -187,17 +169,16 @@ testJourneys.forEach(journey => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('.test-restrictions-type1').text().trim()).toBe('Banned')
-          expect($('.test-restrictions-comment1').text().trim()).toBe('string')
-          expect($('.test-restrictions-start-date1').text().trim()).toBe('Not entered')
-          expect($('.test-restrictions-end-date1').text().trim()).toBe('Not entered')
-          expect(visitSessionData.prisoner.restrictions).toEqual(restrictions)
+          expect($('.test-restrictions-type1').text().trim()).toBe('Restricted')
+          expect($('.test-restrictions-comment1').text().trim()).toBe('Details about this restriction')
+          expect($('.test-restrictions-end-date1').text().trim()).toBe('No end date')
+          expect($('.test-alert-type1').text().trim()).toBe('COVID unit management')
+          expect($('.test-alert-comment1').text().trim()).toBe('Alert comment')
+          expect($('.test-alert-end-date1').text().trim()).toBe('No end date')
         })
     })
 
-    it('should display a message when there are no prisoner restrictions', () => {
-      prisonerProfileService.getRestrictions.mockResolvedValue([])
-
+    it('should display a message when there are no prisoner restrictions or alerts', () => {
       sessionApp = appWithAllRoutes({
         services: { prisonerProfileService, prisonerVisitorsService },
         sessionData: {
@@ -215,9 +196,10 @@ testJourneys.forEach(journey => {
           expect($('.test-no-prisoner-restrictions').text()).toBe('')
           expect($('.test-restrictions-type1').text()).toBe('')
           expect($('.test-restrictions-comment1').text().trim()).toBe('')
-          expect($('.test-restrictions-start-date1').text().trim()).toBe('')
           expect($('.test-restrictions-end-date1').text().trim()).toBe('')
-          expect(visitSessionData.prisoner.restrictions).toEqual([])
+          expect($('.test-alert-type1').text()).toBe('')
+          expect($('.test-alert-comment1').text().trim()).toBe('')
+          expect($('.test-alert-end-date1').text().trim()).toBe('')
         })
     })
 
@@ -229,7 +211,6 @@ testJourneys.forEach(journey => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('h1').text().trim()).toBe('Select visitors from the prisoner’s approved visitor list')
-          expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
 
           expect($('#visitor-4321').length).toBe(1)
           expect($('#visitor-4321').prop('disabled')).toBe(true)
@@ -256,7 +237,6 @@ testJourneys.forEach(journey => {
           expect($('[data-test="submit"]').text().trim()).toBe('Continue')
 
           expect(visitorList.visitors).toEqual(returnData)
-          expect(visitSessionData.prisoner.restrictions).toEqual(restrictions)
         })
     })
 
@@ -281,7 +261,6 @@ testJourneys.forEach(journey => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('h1').text().trim()).toBe('Select visitors from the prisoner’s approved visitor list')
-          expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
           expect($('input[name="visitors"]').length).toBe(3)
           expect($('#visitor-4321').prop('checked')).toBe(false)
           expect($('#visitor-4322').prop('checked')).toBe(true)
@@ -321,7 +300,6 @@ testJourneys.forEach(journey => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('h1').text().trim()).toBe('Select visitors from the prisoner’s approved visitor list')
-          expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
           expect($('input[name="visitors"]').length).toBe(3)
           expect($('#visitor-4321').prop('checked')).toBe(false)
           expect($('#visitor-4322').prop('checked')).toBe(true)
@@ -342,7 +320,6 @@ testJourneys.forEach(journey => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('h1').text().trim()).toBe('Select visitors from the prisoner’s approved visitor list')
-          expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
           expect($('.govuk-error-summary__body').text()).toContain('No visitors selected')
           expect($('.govuk-error-summary__body a').attr('href')).toBe('#visitors-error')
           expect($('#visitors-error').text()).toContain('No visitors selected')
@@ -362,7 +339,6 @@ testJourneys.forEach(journey => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('h1').text().trim()).toBe('Select visitors from the prisoner’s approved visitor list')
-          expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
           expect($('input[name="visitors"]').length).toBe(0)
           expect($('#main-content').text()).toContain('There are no approved visitors for this prisoner.')
           expect($('[data-test="submit"]').length).toBe(0)
@@ -391,7 +367,6 @@ testJourneys.forEach(journey => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('h1').text().trim()).toBe('Select visitors from the prisoner’s approved visitor list')
-          expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
           expect($('input[name="visitors"]').length).toBe(1)
           expect($('[data-test="submit"]').length).toBe(0)
           expect($('[data-test="back-to-start"]').length).toBe(1)
@@ -433,7 +408,6 @@ testJourneys.forEach(journey => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('h1').text().trim()).toBe('Select visitors from the prisoner’s approved visitor list')
-          expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
           expect($('input[name="visitors"]').length).toBe(2)
           expect($('[data-test="submit"]').length).toBe(1)
           expect($('[data-test="back-to-start"]').length).toBe(0)
@@ -463,7 +437,6 @@ testJourneys.forEach(journey => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('h1').text().trim()).toBe('Select visitors from the prisoner’s approved visitor list')
-          expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
           expect($('input[name="visitors"]').length).toBe(1)
           expect($('[data-test="submit"]').length).toBe(0)
           expect($('[data-test="back-to-start"]').length).toBe(1)

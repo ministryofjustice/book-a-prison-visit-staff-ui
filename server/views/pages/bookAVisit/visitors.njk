@@ -62,15 +62,15 @@
 
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
 
-      <p><strong>Prisoner name:</strong> <span data-test="prisoner-name">{{ prisonerName }}</span></p>
+      <p>Review restrictions and alerts before selecting visitors.</p>
 
-      {% if restrictions | length %}
-      <div class="prisoner-restrictions">
-        <h2 class="govuk-heading-m">Prisoner's active restrictions</h2>
+      <p>This page shows alerts that are relevant for social visits. You can also <a class="govuk-link--no-visited-state" href="{{ prisonerDpsAlertsUrl }}" target="_blank" data-test="all-alerts-link">view all alerts</a>.</p>
+
+      {% if restrictions | length or activeAlerts | length %}
+        <h2 class="govuk-heading-m" data-test="prisoner-name">{{ prisonerName }} active restrictions and alerts</h2>
         {% set prisonerRestrictions = [] %}
         {% for restriction in restrictions %}
-          {% set restrictionStartDate %}{% if restriction.startDate %}{{ restriction.startDate | formatDate }}{% else %}Not entered{% endif %}{% endset %}
-          {% set restrictionExpiryDate %}{% if restriction.expiryDate %}{{ restriction.expiryDate | formatDate }}{% else %}Not entered{% endif %}{% endset %}
+          {% set restrictionExpiryDate %}{% if restriction.expiryDate %}{{ restriction.expiryDate | formatDate }}{% else %}No end date{% endif %}{% endset %}
           {%- set prisonerRestrictions = (prisonerRestrictions.push([
             {
               html: '<span class="test-restrictions-type' + loop.index + ' govuk-tag restriction-tag restriction-tag--' + restriction.restrictionType + '">' + restriction.restrictionTypeDescription + '</span>'
@@ -80,34 +80,65 @@
               classes: "bapv-force-overflow test-restrictions-comment" + loop.index
             },
             {
-              text: restrictionStartDate,
-              classes: "test-restrictions-start-date" + loop.index
-            },
-            {
               text: restrictionExpiryDate,
               classes: "test-restrictions-end-date" + loop.index
             }
           ]), prisonerRestrictions) %}
         {% endfor %}
+
+        {% set prisonerAlerts = [] %}
+        {% for alert in activeAlerts %}
+          {% set alertExpiryDate %}{% if alert.dateExpires %}{{ alert.dateExpires | formatDate }}{% else %}No end date{% endif %}{% endset %}
+          {%- set prisonerAlerts = (prisonerAlerts.push([
+            {
+              html: '<span class="test-alert-type' + loop.index + ' govuk-tag alert-tag alert-tag--' + alert.alertType + '">' + alert.alertTypeDescription + '</span>'
+            },
+            {
+              text: alert.comment,
+              classes: "bapv-force-overflow test-alert-comment" + loop.index
+            },
+            {
+              text: alertExpiryDate,
+              classes: "test-alert-end-date" + loop.index
+            }
+          ]), prisonerAlerts) %}
+        {% endfor %}
+        {% if restrictions | length %}
+          {{ govukTable({
+            classes: 'bapv-table-no-bottom-border fix-width-alert-restriction',
+            head: [
+              {
+                text: "Type of restriction"
+              },
+              {
+                text: "Comments"
+              },
+              {
+                text: "Date to"
+              }
+            ],
+            rows: prisonerRestrictions
+          }) }}
+        {% endif %}
+
+        {% if activeAlerts | length %}
         {{ govukTable({
-          classes: 'bapv-table-no-bottom-border',
+          classes: 'bapv-table-no-bottom-border fix-width-alert-restriction',
           head: [
             {
-              text: "Type of restriction"
+              text: "Type of alert"
             },
             {
               text: "Comments"
             },
             {
-              text: "Date from"
-            },
-            {
               text: "Date to"
             }
           ],
-          rows: prisonerRestrictions
+          rows: prisonerAlerts
         }) }}
-      </div>
+        {% endif %}
+
       {% endif %}
 
       {% set noVisitorsText %}

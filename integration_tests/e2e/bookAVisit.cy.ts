@@ -94,7 +94,20 @@ context('Book a visit', () => {
     const searchForAPrisonerResultsPage = Page.verifyOnPage(SearchForAPrisonerResultsPage)
     searchForAPrisonerResultsPage.resultRows().should('have.length', 1)
 
-    const profile = TestData.prisonerProfile()
+    const profile = TestData.prisonerProfile({
+      alerts: [
+        {
+          alertType: 'U',
+          alertTypeDescription: 'COVID unit management',
+          alertCode: 'UPIU',
+          alertCodeDescription: 'Protective Isolation Unit',
+          comment: 'Alert comment',
+          dateCreated: '2023-01-02',
+          dateExpires: undefined,
+          active: true,
+        },
+      ],
+    })
 
     const { prisonerId } = profile
     // Prisoner profile page
@@ -110,10 +123,10 @@ context('Book a visit', () => {
     const selectVisitorsPage = Page.verifyOnPage(SelectVisitorsPage)
     selectVisitorsPage.getPrisonerRestrictionType(1).contains(offenderRestrictions[0].restrictionTypeDescription)
     selectVisitorsPage.getPrisonerRestrictionComment(1).contains(offenderRestrictions[0].comment)
-    selectVisitorsPage
-      .getPrisonerRestrictionStartDate(1)
-      .contains(format(new Date(offenderRestrictions[0].startDate), mediumDateFormat))
-    selectVisitorsPage.getPrisonerRestrictionEndDate(1).contains('Not entered')
+    selectVisitorsPage.getPrisonerRestrictionEndDate(1).contains('No end date')
+    selectVisitorsPage.getPrisonerAlertType(1).contains('COVID unit management')
+    selectVisitorsPage.getPrisonerAlertComment(1).contains('Alert comment')
+    selectVisitorsPage.getPrisonerAlertEndDate(1).contains('No end date')
     selectVisitorsPage.getVisitorRestrictions(contacts[0].personId).within(() => {
       cy.contains(contacts[0].restrictions[0].restrictionTypeDescription)
       cy.contains('End date not entered')

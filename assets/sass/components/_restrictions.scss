@@ -52,3 +52,32 @@
   margin-bottom: govuk-spacing(5);
   padding: govuk-spacing(5) govuk-spacing(5) 0;
 }
+
+.alert-tag {
+  align-items: center;
+  background-color: #fff;
+  border-radius: 5px;
+  border: 3px solid;
+  color: #000;
+  font-size: 14pt;
+  line-height: 1;
+  margin-right: 0;
+  max-width: unset;
+  padding: 8px 8px;
+
+  &--R {
+    border-color: govuk-colour("red")
+  }
+
+  &--C {
+    border-color: govuk-colour("bright-purple");
+  }
+
+  &--S {
+    border-color: govuk-colour("purple");
+  }
+
+  &--U {
+    border-color: govuk-colour("light-blue");
+  }
+}

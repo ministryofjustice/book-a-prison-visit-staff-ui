@@ -5,17 +5,17 @@ export default class SelectVisitorsPage extends Page {
     super('Select visitors from the prisoner’s approved visitor list')
   }
 
-  getPrisonerRestrictionType = (index: number): PageElement =>
-    cy.get(`.prisoner-restrictions .test-restrictions-type${index}`)
+  getPrisonerRestrictionType = (index: number): PageElement => cy.get(`.test-restrictions-type${index}`)
 
-  getPrisonerRestrictionComment = (index: number): PageElement =>
-    cy.get(`.prisoner-restrictions .test-restrictions-comment${index}`)
+  getPrisonerRestrictionComment = (index: number): PageElement => cy.get(`.test-restrictions-comment${index}`)
 
-  getPrisonerRestrictionStartDate = (index: number): PageElement =>
-    cy.get(`.prisoner-restrictions .test-restrictions-start-date${index}`)
+  getPrisonerRestrictionEndDate = (index: number): PageElement => cy.get(`.test-restrictions-end-date${index}`)
 
-  getPrisonerRestrictionEndDate = (index: number): PageElement =>
-    cy.get(`.prisoner-restrictions .test-restrictions-end-date${index}`)
+  getPrisonerAlertType = (index: number): PageElement => cy.get(`.test-alert-type${index}`)
+
+  getPrisonerAlertComment = (index: number): PageElement => cy.get(`.test-alert-comment${index}`)
+
+  getPrisonerAlertEndDate = (index: number): PageElement => cy.get(`.test-alert-end-date${index}`)
 
   getVisitor = (visitorId: number): PageElement => cy.get(`#visitor-${visitorId}`)
 

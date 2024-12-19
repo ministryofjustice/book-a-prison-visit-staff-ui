@@ -299,3 +299,12 @@
 [data-module=moj-sortable-table] th {
   color: #005ea5;
 }
+
+.fix-width-alert-restriction .govuk-table__row {
+  th:first-child {
+    width: 20%!important;
+  }
+  th:last-child {
+    width: 20%!important;
+  }
+}

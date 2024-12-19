@@ -36,7 +36,6 @@ const NO_UPDATE_NOTIFICATION_TYPES: NotificationType[] = ['PRISONER_RECEIVED_EVE
 
 export default function routes({
   auditService,
-  prisonerProfileService,
   prisonerSearchService,
   prisonerVisitorsService,
   supportedPrisonsService,
@@ -269,7 +268,7 @@ export default function routes({
     },
   )
 
-  const selectVisitors = new SelectVisitors('update', prisonerVisitorsService, prisonerProfileService)
+  const selectVisitors = new SelectVisitors('update', prisonerVisitorsService)
   const visitType = new VisitType('update', auditService)
   const dateAndTime = new DateAndTime('update', visitService, visitSessionsService, auditService)
   const additionalSupport = new AdditionalSupport('update')
