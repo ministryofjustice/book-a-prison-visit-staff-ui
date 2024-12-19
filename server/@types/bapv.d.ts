@@ -102,6 +102,7 @@ export type VisitSessionData = {
     offenderNo: string
     dateOfBirth: string
     location: string
+    activeAlerts?: Alert[]
     restrictions?: OffenderRestriction[]
   }
   visitSlot?: VisitSlot
