@@ -17,7 +17,6 @@ import RequestMethodPage from '../pages/requestMethod'
 
 context('Book a visit', () => {
   const shortDateFormat = 'yyyy-MM-dd'
-  const mediumDateFormat = 'd MMMM yyyy'
   const longDateFormat = 'EEEE d MMMM yyyy'
 
   const today = new Date()
