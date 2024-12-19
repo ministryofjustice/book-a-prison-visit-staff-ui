@@ -14,7 +14,6 @@ import type { Services } from '../services'
 
 export default function routes({
   auditService,
-  prisonerProfileService,
   prisonerVisitorsService,
   visitService,
   visitSessionsService,
@@ -33,7 +32,7 @@ export default function routes({
       handlers.map(handler => asyncMiddleware(handler)),
     )
 
-  const selectVisitors = new SelectVisitors('book', prisonerVisitorsService, prisonerProfileService)
+  const selectVisitors = new SelectVisitors('book', prisonerVisitorsService)
   const visitType = new VisitType('book', auditService)
   const additionalSupport = new AdditionalSupport('book')
   const dateAndTime = new DateAndTime('book', visitService, visitSessionsService, auditService)
