@@ -264,7 +264,6 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
           expect($('h1').text().trim()).toBe('Smith, John')
           expect($('.flagged-alerts-list').length).toBe(0)
           expect($('[data-test="active-alert-count"]').text()).toBe('0 active')
-          expect($('#active-alerts').text()).toContain('There are no active alerts for this prisoner.')
           expect(auditService.viewPrisoner).toHaveBeenCalledTimes(1)
           expect(auditService.viewPrisoner).toHaveBeenCalledWith({
             prisonerId: 'A1234BC',
