@@ -54,15 +54,12 @@
 }
 
 .alert-tag {
-  align-items: center;
-  background-color: #fff;
+  background-color: govuk-colour("white");
   border-radius: 5px;
   border: 3px solid;
-  color: #000;
+  color: govuk-colour("black");
   font-size: 14pt;
-  line-height: 1;
   margin-right: 0;
-  max-width: unset;
   padding: 8px 8px;
 
   &--C { // Child

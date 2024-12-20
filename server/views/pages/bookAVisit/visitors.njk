@@ -75,16 +75,16 @@
           {% set restrictionExpiryDate %}{% if restriction.expiryDate %}{{ restriction.expiryDate | formatDate }}{% else %}No end date{% endif %}{% endset %}
           {%- set prisonerRestrictions = (prisonerRestrictions.push([
             {
-              html: '<span data-test="test-restrictions-type' + loop.index + '" class="govuk-tag restriction-tag restriction-tag--' + restriction.restrictionType + '">' + restriction.restrictionTypeDescription + '</span>'
+              html: '<span data-test="restrictions-type' + loop.index + '" class="govuk-tag restriction-tag restriction-tag--' + restriction.restrictionType + '">' + restriction.restrictionTypeDescription + '</span>'
             },
             {
               text: restriction.comment,
               classes: "bapv-force-overflow",
-              attributes: { "data-test":"test-restrictions-comment" + loop.index }
+              attributes: { "data-test":"restrictions-comment" + loop.index }
             },
             {
               text: restrictionExpiryDate,
-              attributes: { "data-test":"test-restrictions-end-date" + loop.index }
+              attributes: { "data-test":"restrictions-end-date" + loop.index }
             }
           ]), prisonerRestrictions) %}
         {% endfor %}
@@ -94,15 +94,15 @@
           {% set alertExpiryDate %}{% if alert.dateExpires %}{{ alert.dateExpires | formatDate }}{% else %}No end date{% endif %}{% endset %}
           {%- set prisonerAlerts = (prisonerAlerts.push([
             {
-              html: '<span data-test="test-alert-type' + loop.index + '" class="govuk-tag alert-tag alert-tag--' + alert.alertType + '">' + alert.alertCodeDescription + '</span>'
+              html: '<span data-test="alert-type' + loop.index + '" class="govuk-tag alert-tag alert-tag--' + alert.alertType + '">' + alert.alertCodeDescription + '</span>'
             },
             {
               html: bapvExpandableComment({ text: alert.comment }),
-              attributes: { "data-test":"test-alert-comment" + loop.index }
+              attributes: { "data-test":"alert-comment" + loop.index }
             },
             {
               text: alertExpiryDate,
-              attributes: { "data-test":"test-alert-end-date" + loop.index }
+              attributes: { "data-test":"alert-end-date" + loop.index }
             }
           ]), prisonerAlerts) %}
         {% endfor %}
@@ -223,13 +223,16 @@
         </div>
 
         {% if eligibleVisitors === true %}
+
+        <div class="govuk-button-group">
           {{ govukButton({
             text: "Continue",
             attributes: { "data-test": "submit" },
             preventDoubleClick: true
           }) }}
 
-          <a href="/back-to-start" class="line-height-a-tag govuk-!-padding-left-4 govuk-link--no-visited-state">Start again</a>
+          <a href="/back-to-start" class="govuk-link govuk-link--no-visited-state">Start again</a>
+        </div>
         {% else %}
           {% include "partials/backToStartButton.njk" %}
         {% endif %}

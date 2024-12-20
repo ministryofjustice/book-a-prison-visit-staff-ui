@@ -91,9 +91,10 @@ export default function routes({
       })
     }
 
-    const prisoner: Prisoner = await prisonerSearchService.getPrisonerById(visit.prisonerId, username)
-    const supportedPrisonIds = await supportedPrisonsService.getSupportedPrisonIds(username)
-
+    const [prisoner, supportedPrisonIds] = await Promise.all([
+      prisonerSearchService.getPrisonerById(visit.prisonerId, username),
+      supportedPrisonsService.getSupportedPrisonIds(username),
+    ])
     const prisonerLocation = getPrisonerLocation(supportedPrisonIds, prisoner)
 
     await auditService.viewedVisitDetails({
@@ -153,9 +154,10 @@ export default function routes({
       return res.redirect(`/visit/${visit.reference}`)
     }
 
-    const prisoner: Prisoner = await prisonerSearchService.getPrisonerById(visit.prisonerId, username)
-    const supportedPrisonIds = await supportedPrisonsService.getSupportedPrisonIds(username)
-
+    const [prisoner, supportedPrisonIds] = await Promise.all([
+      prisonerSearchService.getPrisonerById(visit.prisonerId, username),
+      supportedPrisonsService.getSupportedPrisonIds(username),
+    ])
     const prisonerLocation = getPrisonerLocation(supportedPrisonIds, prisoner)
 
     const visitorIds = visit.visitors.flatMap(visitor => visitor.nomisPersonId)
@@ -168,9 +170,10 @@ export default function routes({
     // clean then load session
     clearSession(req)
 
-    const { activeAlerts } = await prisonerProfileService.getProfile(visit.prisonId, visit.prisonerId, username)
-    const restrictions = await prisonerProfileService.getRestrictions(visit.prisonerId, username)
-
+    const [{ activeAlerts }, restrictions] = await Promise.all([
+      prisonerProfileService.getProfile(visit.prisonId, visit.prisonerId, username),
+      prisonerProfileService.getRestrictions(visit.prisonerId, username),
+    ])
     const visitRestriction =
       visit.visitRestriction === 'OPEN' || visit.visitRestriction === 'CLOSED' ? visit.visitRestriction : undefined
     const visitSlot: VisitSlot = {
