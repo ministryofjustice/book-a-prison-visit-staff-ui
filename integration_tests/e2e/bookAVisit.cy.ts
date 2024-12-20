@@ -123,7 +123,7 @@ context('Book a visit', () => {
     selectVisitorsPage.getPrisonerRestrictionType(1).contains(offenderRestrictions[0].restrictionTypeDescription)
     selectVisitorsPage.getPrisonerRestrictionComment(1).contains(offenderRestrictions[0].comment)
     selectVisitorsPage.getPrisonerRestrictionEndDate(1).contains('No end date')
-    selectVisitorsPage.getPrisonerAlertType(1).contains('COVID unit management')
+    selectVisitorsPage.getPrisonerAlertType(1).contains('Protective Isolation Unit')
 
     selectVisitorsPage.getPrisonerAlertComment(1).contains('Alert comment')
     selectVisitorsPage.showFullCommentLink().contains('See full comment')

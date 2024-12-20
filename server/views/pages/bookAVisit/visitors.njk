@@ -6,7 +6,7 @@
 {% from "components/visitors.njk" import visitorDateOfBirth, visitorRestrictions %}
 {%- from "components/expandableComment/macro.njk" import bapvExpandableComment -%}
 
-{% set pageHeaderTitle = "Select visitors from the prisoner’s approved visitor list" %}
+{% set pageHeaderTitle = "Select visitors" %}
 {% set pageTitle %}
 {% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
 {% endset %}
@@ -63,12 +63,13 @@
 
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
 
+      <h2 class="govuk-heading-m" data-test="prisoner-name">{{ prisonerName }} active restrictions and alerts</h2>
+
       <p>Review restrictions and alerts before selecting visitors.</p>
 
       <p>This page shows alerts that are relevant for social visits. You can also <a class="govuk-link--no-visited-state" href="{{ prisonerDpsAlertsUrl }}" target="_blank" data-test="all-alerts-link">view all alerts</a>.</p>
 
       {% if restrictions | length or activeAlerts | length %}
-        <h2 class="govuk-heading-m" data-test="prisoner-name">{{ prisonerName }} active restrictions and alerts</h2>
         {% set prisonerRestrictions = [] %}
         {% for restriction in restrictions %}
           {% set restrictionExpiryDate %}{% if restriction.expiryDate %}{{ restriction.expiryDate | formatDate }}{% else %}No end date{% endif %}{% endset %}
@@ -93,7 +94,7 @@
           {% set alertExpiryDate %}{% if alert.dateExpires %}{{ alert.dateExpires | formatDate }}{% else %}No end date{% endif %}{% endset %}
           {%- set prisonerAlerts = (prisonerAlerts.push([
             {
-              html: '<span data-test="test-alert-type' + loop.index + '" class="govuk-tag alert-tag alert-tag--' + alert.alertType + '">' + alert.alertTypeDescription + '</span>'
+              html: '<span data-test="test-alert-type' + loop.index + '" class="govuk-tag alert-tag alert-tag--' + alert.alertType + '">' + alert.alertCodeDescription + '</span>'
             },
             {
               html: bapvExpandableComment({ text: alert.comment }),
@@ -116,7 +117,7 @@
                 text: "Comments"
               },
               {
-                text: "Date to"
+                text: "End date"
               }
             ],
             rows: prisonerRestrictions
@@ -134,7 +135,7 @@
               text: "Comments"
             },
             {
-              text: "Date to"
+              text: "End date"
             }
           ],
           rows: prisonerAlerts
@@ -227,6 +228,8 @@
             attributes: { "data-test": "submit" },
             preventDoubleClick: true
           }) }}
+
+          <a href="/back-to-start" class="line-height-a-tag govuk-!-padding-left-4 govuk-link--no-visited-state">Start again</a>
         {% else %}
           {% include "partials/backToStartButton.njk" %}
         {% endif %}
