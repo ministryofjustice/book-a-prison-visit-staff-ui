@@ -6,9 +6,6 @@
 {%- from "moj/components/banner/macro.njk" import mojBanner -%}
 
 {% set pageHeaderTitle = "Block visit dates" %}
-{% set pageTitle %}
-  {% if errors | length %}Error: {% endif %}{{ pageHeaderTitle }} - {{ applicationName }}
-{% endset %}
 
 {% block beforeContent %}
   {{ breadcrumbs() }}

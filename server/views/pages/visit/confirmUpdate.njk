@@ -3,9 +3,6 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% set pageHeaderTitle = "Confirm update" %}
-{% set pageTitle %}
-  {% if errors | length %}Error: {% endif %}{{ pageHeaderTitle }} - {{ applicationName }}
-{% endset %}
 
 {% block content %}
   <div class="govuk-grid-row">

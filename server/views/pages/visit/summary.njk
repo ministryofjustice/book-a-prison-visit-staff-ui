@@ -18,8 +18,7 @@
   {% endif %}
 {% endmacro %}
 
-{% set pageHeaderTitle = "Visit booking details" %}
-{% set pageTitle = pageHeaderTitle + " (" + visit.reference + ") - " + applicationName %}
+{% set pageHeaderTitle = "Visit booking details (" + visit.reference + ")" %}
 
 {% if prisoner %}
   {% if fromPage == "visit-search" %}
@@ -41,7 +40,7 @@
 
     <p class="bapv-secondary-text govuk-!-margin-bottom-0">Booking reference: <span data-test="reference">{{ visit.reference }}</span></p>
 
-    <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+    <h1 class="govuk-heading-l">Visit booking details</h1>
 
     {% if prisoner %}
     {% set cancelledVisitReason = '' %}

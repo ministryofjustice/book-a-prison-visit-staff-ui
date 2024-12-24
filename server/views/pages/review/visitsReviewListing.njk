@@ -6,9 +6,6 @@
 {%- from "components/filter/macro.njk" import bapvFilter -%}
 
 {% set pageHeaderTitle = "Visit bookings that need review" %}
-{% set pageTitle %}
-  {% if errors | length %}Error: {% endif %}{{ pageHeaderTitle }} - {{ applicationName }}
-{% endset %}
 
 {% block beforeContent %}
   {{ breadcrumbs() }}

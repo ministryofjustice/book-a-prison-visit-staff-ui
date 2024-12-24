@@ -5,9 +5,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% set pageHeaderTitle = "Is additional support needed for any of the visitors?" %}
-{% set pageTitle %}
-  {% if errors | length %}Error: {% endif %}{{ pageHeaderTitle }} - {{ applicationName }}
-{% endset %}
+
 {% set backLinkHref = urlPrefix + "/select-date-and-time" %}
 
 {% block content %}

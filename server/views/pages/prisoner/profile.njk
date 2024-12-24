@@ -7,7 +7,7 @@
 {%- from "moj/components/banner/macro.njk" import mojBanner -%}
 
 {% set pageHeaderTitle = prisonerDetails.name %}
-{% set pageTitle = pageHeaderTitle + " - " + applicationName %}
+
 {% set query = '?' + queryParamsForBackLink if queryParamsForBackLink != '' %}
 {% if queryParamsForBackLink %}
   {% set backLinkHref = "/search/prisoner/results?" + queryParamsForBackLink %}

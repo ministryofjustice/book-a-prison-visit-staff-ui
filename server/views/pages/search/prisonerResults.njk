@@ -4,9 +4,6 @@
 {% from "moj/components/pagination/macro.njk" import mojPagination %}
 
 {% set pageHeaderTitle = "Search for a prisoner" %}
-{% set pageTitle %}
-  {% if errors | length %}Error: {% endif %}{{ pageHeaderTitle }} - {{ applicationName }}
-{% endset %}
 
 {% block beforeContent %}
   {{ breadcrumbs() }}

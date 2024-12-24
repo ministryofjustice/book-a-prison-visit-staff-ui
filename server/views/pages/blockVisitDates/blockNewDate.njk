@@ -3,9 +3,6 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% set pageHeaderTitle = "Are you sure you want to block visits on " + visitBlockDate | formatDate('EEEE d MMMM yyyy') + "?" %}
-{% set pageTitle %}
-  {% if errors | length %}Error: {% endif %}{{ pageHeaderTitle }} - {{ applicationName }}
-{% endset %}
 
 {% set backLinkHref = '/block-visit-dates' %}
 

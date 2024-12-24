@@ -6,9 +6,7 @@
 {% from "components/visitors.njk" import visitorDateOfBirth, visitorRestrictions %}
 
 {% set pageHeaderTitle = "Select visitors from the prisoner’s approved visitor list" %}
-{% set pageTitle %}
-  {% if errors | length %}Error: {% endif %}{{ pageHeaderTitle }} - {{ applicationName }}
-{% endset %}
+
 {% set backLinkHref = backLink %}
 
 {% set visitors = [] %}

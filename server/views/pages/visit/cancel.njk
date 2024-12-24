@@ -4,9 +4,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% set pageHeaderTitle = "Why is this booking being cancelled?" %}
-{% set pageTitle %}
-  {% if errors | length %}Error: {% endif %}{{ pageHeaderTitle }} - {{ applicationName }}
-{% endset %}
+
 {% set backLinkHref = "/visit/" + reference %}
 
 {% block content %}

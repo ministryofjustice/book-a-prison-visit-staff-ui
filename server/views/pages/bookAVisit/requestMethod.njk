@@ -4,9 +4,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% set pageHeaderTitle = "How was this booking requested?" %}
-{% set pageTitle %}
-  {% if errors | length %}Error: {% endif %}{{ pageHeaderTitle }} - {{ applicationName }}
-{% endset %}
+
 {% set backLinkHref = urlPrefix + "/select-main-contact" %}
 
 {% block content %}

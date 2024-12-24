@@ -9,9 +9,7 @@
 {%- from "moj/components/banner/macro.njk" import mojBanner -%}
 
 {% set pageHeaderTitle = "Select date and time of visit" %}
-{% set pageTitle %}
-  {% if errors | length %}Error: {% endif %}{{ pageHeaderTitle }} - {{ applicationName }}
-{% endset %}
+
 {% set backLinkHref = urlPrefix + "/select-visitors" %}
 
 {% macro buildSlotsRadioItems(slotsList, radios) %}
