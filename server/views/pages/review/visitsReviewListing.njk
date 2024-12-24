@@ -7,7 +7,7 @@
 
 {% set pageHeaderTitle = "Visit bookings that need review" %}
 {% set pageTitle %}
-    {% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
+  {% if errors | length %}Error: {% endif %}{{ pageHeaderTitle }} - {{ applicationName }}
 {% endset %}
 
 {% block beforeContent %}

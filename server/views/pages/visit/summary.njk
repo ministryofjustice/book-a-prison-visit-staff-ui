@@ -19,7 +19,7 @@
 {% endmacro %}
 
 {% set pageHeaderTitle = "Visit booking details" %}
-{% set pageTitle = applicationName + " - " + pageHeaderTitle + " - " + visit.reference %}
+{% set pageTitle = pageHeaderTitle + " - " + applicationName + " - " + visit.reference %}
 
 {% if prisoner %}
   {% if fromPage == "visit-search" %}

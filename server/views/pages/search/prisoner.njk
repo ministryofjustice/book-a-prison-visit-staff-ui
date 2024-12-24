@@ -2,7 +2,7 @@
 {% from "partials/breadcrumbs.njk" import breadcrumbs with context %}
 
 {% set pageHeaderTitle = "Search for a prisoner" %}
-{% set pageTitle = applicationName + " - " + pageHeaderTitle %}
+{% set pageTitle = pageHeaderTitle + " - " + applicationName %}
 
 {% block beforeContent %}
   {{ breadcrumbs() }}
