@@ -17,9 +17,9 @@
 {% endblock %}
 
 {% block pageTitle -%}
-  {%- if errors | length -%}Error: {% endif %}
-  {% if pageHeaderTitle %}{{ pageHeaderTitle }} - {% endif %}
-  {{ applicationName }} - DPS
+  {%- if errors | length %}Error: {% endif %}
+  {%- if pageHeaderTitle %}{{ pageHeaderTitle }} - {% endif %}
+  {{- applicationName }} - DPS
 {%- endblock %}
 
 {% block header %}
