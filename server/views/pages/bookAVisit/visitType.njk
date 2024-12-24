@@ -7,9 +7,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% set pageHeaderTitle = "Check the prisoner's closed visit restrictions" %}
-{% set pageTitle %}
-{% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
-{% endset %}
+
 {% set backLinkHref = urlPrefix + "/select-visitors" %}
 
 {% block content %}

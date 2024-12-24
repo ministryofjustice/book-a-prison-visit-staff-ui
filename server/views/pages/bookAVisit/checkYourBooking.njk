@@ -3,210 +3,207 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% set pageHeaderTitle = "Check the visit details before booking" %}
-{% set pageTitle %}
-{% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
-{% endset %}
 
 {% set backLinkHref = urlPrefix + "/request-method" %}
 
 {% block content %}
-<div class="govuk-grid-row">
+  <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-        {% include "partials/errorSummary.njk" %}
-        <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
-        <p>A booking reference will be provided once the booking is confirmed.</p>
+      {% include "partials/errorSummary.njk" %}
+      <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+      <p>A booking reference will be provided once the booking is confirmed.</p>
     </div>
-</div>
+  </div>
 
-<div class="govuk-grid-row">
+  <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-        <p><span class="govuk-!-font-weight-bold">Prisoner name:</span> <span class="test-prisoner-name">{{ prisoner.name }}</span></p>
+      <p><span class="govuk-!-font-weight-bold">Prisoner name:</span> <span class="test-prisoner-name">{{ prisoner.name }}</span></p>
     </div>
-</div>
+  </div>
 
-<div class="govuk-grid-row">
+  <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <h2 class="govuk-heading-m">Visit details</h2>
+      <h2 class="govuk-heading-m">Visit details</h2>
 
-        {% set additionalSupportRows %}
+      {% set additionalSupportRows %}
         {% if additionalSupport | length %}{{ additionalSupport }}{% else %}None{% endif %}
-        {% endset %}
+      {% endset %}
 
-        {% set contactName %}
+      {% set contactName %}
         {% if mainContact.contactName %}
-        {{ mainContact.contactName | safe }}
+          {{ mainContact.contactName | safe }}
         {% else %}
-        {{ mainContact.contact.name | safe + " (" + (mainContact.contact.relationshipDescription | lower) + " of the prisoner)" }}
+          {{ mainContact.contact.name | safe + " (" + (mainContact.contact.relationshipDescription | lower) + " of the prisoner)" }}
         {% endif %}
-        {% endset %}
+      {% endset %}
 
-        {% set displayRows = [
-            {
-                key: {
-                    text: "Date"
-                },
-                value: {
-                    text: visitSlot.startTimestamp | formatDate("EEEE d MMMM yyyy"),
-                    classes: "test-visit-date"
-                },
-                actions: {
-                    items: [
-                        {
-                            href: urlPrefix + "/select-date-and-time",
-                            text: "Change",
-                            classes: "govuk-link--no-visited-state",
-                            visuallyHiddenText: "date",
-                            attributes: { "data-test": "change-date" }
-                        }
-                    ]
-                }
-            },
-            {
-                key: {
-                    text: "Time"
-                },
-                value: {
-                    text: visitSlot.startTimestamp | formatTime + " to " + visitSlot.endTimestamp | formatTime,
-                    classes: "test-visit-time"
-                },
-                actions: {
-                    items: [
-                        {
-                            href: urlPrefix + "/select-date-and-time",
-                            text: "Change",
-                            classes: "govuk-link--no-visited-state",
-                            visuallyHiddenText: "time",
-                            attributes: { "data-test": "change-time" }
-                        }
-                    ]
-                }
-            },
-            {
-                key: {
-                    text: "Visit type"
-                },
-                value: {
-                    text: visitRestriction | capitalize,
-                    classes: "test-visit-type"
-                }
-            }
-        ] %}
+      {% set displayRows = [
+        {
+          key: {
+            text: "Date"
+          },
+          value: {
+            text: visitSlot.startTimestamp | formatDate("EEEE d MMMM yyyy"),
+            classes: "test-visit-date"
+          },
+          actions: {
+            items: [
+              {
+                href: urlPrefix + "/select-date-and-time",
+                text: "Change",
+                classes: "govuk-link--no-visited-state",
+                visuallyHiddenText: "date",
+                attributes: { "data-test": "change-date" }
+              }
+            ]
+          }
+        },
+        {
+          key: {
+            text: "Time"
+          },
+          value: {
+            text: visitSlot.startTimestamp | formatTime + " to " + visitSlot.endTimestamp | formatTime,
+            classes: "test-visit-time"
+          },
+          actions: {
+            items: [
+              {
+                href: urlPrefix + "/select-date-and-time",
+                text: "Change",
+                classes: "govuk-link--no-visited-state",
+                visuallyHiddenText: "time",
+                attributes: { "data-test": "change-time" }
+              }
+            ]
+          }
+        },
+        {
+          key: {
+            text: "Visit type"
+          },
+          value: {
+            text: visitRestriction | capitalize,
+            classes: "test-visit-type"
+          }
+        }
+      ] %}
 
-        {%- for visitor in visitors %}
-            {% set displayRows = (displayRows.push(
+      {%- for visitor in visitors %}
+        {% set displayRows = (displayRows.push(
+          {
+            key: {
+              text: 'Visitor ' + loop.index
+            },
+            value: {
+              html: '<p><span class="test-visitor-name' + loop.index + '">' + visitor.name | safe+ " (" + (visitor.relationshipDescription | lower) + ' of the prisoner)</span><br><span class="test-visitor-address' + loop.index + '">' + visitor.address | replace("<br>", " ") + "</span>"
+            },
+            actions: {
+              items: [
                 {
-                    key: {
-                        text: 'Visitor ' + loop.index
-                    },
-                    value: {
-                        html: '<p><span class="test-visitor-name' + loop.index + '">' + visitor.name | safe+ " (" + (visitor.relationshipDescription | lower) + ' of the prisoner)</span><br><span class="test-visitor-address' + loop.index + '">' + visitor.address | replace("<br>", " ") + "</span>"
-                    },
-                    actions: {
-                        items: [
-                            {
-                                href: urlPrefix + "/select-visitors",
-                                text: "Change",
-                                classes: "govuk-link--no-visited-state",
-                                visuallyHiddenText: "visitors",
-                                attributes: { "data-test": "change-visitors" }
-                            }
-                        ]
-                    }
+                  href: urlPrefix + "/select-visitors",
+                  text: "Change",
+                  classes: "govuk-link--no-visited-state",
+                  visuallyHiddenText: "visitors",
+                  attributes: { "data-test": "change-visitors" }
                 }
-            ), displayRows) %}
-        {% endfor %}
-
-        {% set displayRows = (displayRows.push(
-            {
-                key: {
-                    text: "Additional support requests"
-                },
-                value: {
-                    html: '<p class="test-additional-support">' + additionalSupportRows + '</p>'
-                },
-                actions: {
-                    items: [
-                        {
-                            href: urlPrefix + "/additional-support",
-                            text: "Change",
-                            classes: "govuk-link--no-visited-state",
-                            visuallyHiddenText: "additional support requests",
-                            attributes: { "data-test": "change-additional-support" }
-                        }
-                    ]
-                }
+              ]
             }
+          }
         ), displayRows) %}
+      {% endfor %}
 
-        {% set displayRows = (displayRows.push(
-            {
-                key: {
-                    text: "Main contact"
-                },
-                value: {
-                    html: '<p><span class="test-main-contact-name">' + contactName + '</span><br><span class="test-main-contact-number">' +
-                        mainContact.phoneNumber | d("No phone number provided", true) | escape + "</span></p>"
-                },
-                actions: {
-                    items: [
-                        {
-                            href: urlPrefix + "/select-main-contact",
-                            text: "Change",
-                            classes: "govuk-link--no-visited-state",
-                            visuallyHiddenText: "main contact",
-                            attributes: { "data-test": "change-main-contact" }
-                        }
-                    ]
-                }
-            }
-        ), displayRows) %}
+      {% set displayRows = (displayRows.push(
+        {
+          key: {
+            text: "Additional support requests"
+          },
+          value: {
+            html: '<p class="test-additional-support">' + additionalSupportRows + '</p>'
+          },
+          actions: {
+            items: [
+              {
+                href: urlPrefix + "/additional-support",
+                text: "Change",
+                classes: "govuk-link--no-visited-state",
+                visuallyHiddenText: "additional support requests",
+                attributes: { "data-test": "change-additional-support" }
+              }
+            ]
+          }
+        }
+      ), displayRows) %}
 
-        {% set displayRows = (displayRows.push(
-            {
-                key: {
-                    text: "Request method"
-                },
-                value: {
-                    html: '<p class="test-request-method">' + requestMethod + '</p>'
-                },
-                actions: {
-                    items: [
-                        {
-                            href: urlPrefix + "/request-method",
-                            text: "Change",
-                            classes: "govuk-link--no-visited-state",
-                            visuallyHiddenText: "request method",
-                            attributes: { "data-test": "change-request-method" }
-                        }
-                    ]
-                }
-            }
-        ), displayRows) %}
+      {% set displayRows = (displayRows.push(
+        {
+          key: {
+            text: "Main contact"
+          },
+          value: {
+            html: '<p><span class="test-main-contact-name">' + contactName + '</span><br><span class="test-main-contact-number">' +
+              mainContact.phoneNumber | d("No phone number provided", true) | escape + "</span></p>"
+          },
+          actions: {
+            items: [
+              {
+                href: urlPrefix + "/select-main-contact",
+                text: "Change",
+                classes: "govuk-link--no-visited-state",
+                visuallyHiddenText: "main contact",
+                attributes: { "data-test": "change-main-contact" }
+              }
+            ]
+          }
+        }
+      ), displayRows) %}
 
-        {{ govukSummaryList({
-            rows: displayRows
-        }) }}
+      {% set displayRows = (displayRows.push(
+        {
+          key: {
+            text: "Request method"
+          },
+          value: {
+            html: '<p class="test-request-method">' + requestMethod + '</p>'
+          },
+          actions: {
+            items: [
+              {
+                href: urlPrefix + "/request-method",
+                text: "Change",
+                classes: "govuk-link--no-visited-state",
+                visuallyHiddenText: "request method",
+                attributes: { "data-test": "change-request-method" }
+              }
+            ]
+          }
+        }
+      ), displayRows) %}
+
+      {{ govukSummaryList({
+        rows: displayRows
+      }) }}
     </div>
-</div>
+  </div>
 
-<div class="govuk-grid-row">
+  <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-        <form action="{{ urlPrefix }}/check-your-booking" class="disable-button-on-submit" method="POST" novalidate>
-            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-            {{ govukButton({
-                text: "Submit booking",
-                attributes: { "data-test": "submit" },
-                preventDoubleClick: true
-            }) }}
-        </form>
+      <form action="{{ urlPrefix }}/check-your-booking" class="disable-button-on-submit" method="POST" novalidate>
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+        {{ govukButton({
+          text: "Submit booking",
+          attributes: { "data-test": "submit" },
+          preventDoubleClick: true
+        }) }}
+      </form>
     </div>
-</div>
+  </div>
 {% endblock %}
 
 {% block pageScripts %}
   <script nonce="{{ cspNonce }}">
     document.querySelector('.disable-button-on-submit').addEventListener('submit', e => {
-        e.target.querySelector('button[type=submit]').setAttribute('disabled', 'disabled')
-      })
+      e.target.querySelector('button[type=submit]').setAttribute('disabled', 'disabled')
+    })
   </script>
 {% endblock %}

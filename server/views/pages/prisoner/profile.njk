@@ -7,7 +7,7 @@
 {%- from "moj/components/banner/macro.njk" import mojBanner -%}
 
 {% set pageHeaderTitle = prisonerDetails.name %}
-{% set pageTitle = applicationName + " - " + pageHeaderTitle %}
+
 {% set query = '?' + queryParamsForBackLink if queryParamsForBackLink != '' %}
 {% if queryParamsForBackLink %}
   {% set backLinkHref = "/search/prisoner/results?" + queryParamsForBackLink %}
@@ -24,16 +24,16 @@
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
 
       {% if flaggedAlerts.length %}
-      <ul class="flagged-alerts-list">
-        {% for alert in flaggedAlerts %}
-        <li>
-          {{ govukTag({
-            text: alert.alertCodeDescription,
-            classes: "flagged-alert flagged-alert--" + alert.alertCode
-          }) }}
-        </li>
-        {% endfor %}
-      </ul>
+        <ul class="flagged-alerts-list">
+          {% for alert in flaggedAlerts %}
+            <li>
+              {{ govukTag({
+                text: alert.alertCodeDescription,
+                classes: "flagged-alert flagged-alert--" + alert.alertCode
+              }) }}
+            </li>
+          {% endfor %}
+        </ul>
       {% endif %}
 
       <ul class="prisoner-profile-summary">
