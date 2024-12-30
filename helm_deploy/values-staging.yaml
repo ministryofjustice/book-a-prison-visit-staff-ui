@@ -34,4 +34,4 @@ generic-service:
       - circleci
 
 generic-prometheus-alerts:
-  alertSeverity: digital-prison-service-dev
+  alertSeverity: visits-alerts-nonprod
