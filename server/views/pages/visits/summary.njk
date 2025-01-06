@@ -8,9 +8,6 @@
 {%- from "moj/components/date-picker/macro.njk" import mojDatePicker -%}
 
 {% set pageHeaderTitle = "View visits by date" %}
-{% set pageTitle %}
-  {% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
-{% endset %}
 
 {% block beforeContent %}
   {{ breadcrumbs() }}

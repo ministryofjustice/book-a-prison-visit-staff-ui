@@ -6,10 +6,8 @@
 {% from "components/visitors.njk" import visitorDateOfBirth, visitorRestrictions %}
 {%- from "components/expandableComment/macro.njk" import bapvExpandableComment -%}
 
-{% set pageHeaderTitle = "Select visitors" %}
-{% set pageTitle %}
-{% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
-{% endset %}
+{% set pageHeaderTitle = "Select visitors from the prisoner’s approved visitor list" %}
+
 {% set backLinkHref = backLink %}
 
 {% set visitors = [] %}
@@ -20,7 +18,7 @@
   {% set checkbox -%}
   <div class="govuk-checkboxes__item">
     <input class="govuk-checkboxes__input" id="visitor-{{ visitor.personId }}" name="visitors" type="checkbox" value="{{ visitor.personId }}"
-    {{- " checked" if formValues.visitors and visitor.personId | string in formValues.visitors }}{{ " disabled" if visitor.banned or not eligibleVisitors }}>
+      {{- " checked" if formValues.visitors and visitor.personId | string in formValues.visitors }}{{ " disabled" if visitor.banned or not eligibleVisitors }}>
     <label class="govuk-label govuk-checkboxes__label" for="visitor-{{ visitor.personId }}">
       <span class="govuk-visually-hidden">Select {{ visitor.name }}</span>
     </label>

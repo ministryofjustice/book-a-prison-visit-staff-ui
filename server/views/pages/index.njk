@@ -3,9 +3,6 @@
 {% from "components/card/card.njk" import card %}
 {%- from "govuk/components/tag/macro.njk" import govukTag -%}
 
-{% set pageHeaderTitle = "Manage prison visits" %}
-{% set pageTitle = applicationName + " - " + pageHeaderTitle %}
-
 {% block beforeContent %}
   {{ breadcrumbs(false) }}
 {% endblock %}
@@ -14,7 +11,7 @@
 
   <div class="govuk-body">
     <div class="govuk-width-container">
-      <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+      <h1 class="govuk-heading-l">{{ applicationName }}</h1>
 
       <ul class="govuk-grid-row card-group">
         <li class="govuk-grid-column-one-third card-group__item">

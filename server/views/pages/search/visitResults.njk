@@ -4,9 +4,6 @@
 {% from "moj/components/pagination/macro.njk" import mojPagination %}
 
 {% set pageHeaderTitle = "Search for a booking" %}
-{% set pageTitle %}
-{% if errors | length %}Error: {% endif %}{{ applicationName }} - {{ pageHeaderTitle }}
-{% endset %}
 
 {% block beforeContent %}
   {{ breadcrumbs() }}
