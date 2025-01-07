@@ -43,6 +43,7 @@ export default {
               applicationMethodType: applicationMethod,
               allowOverBooking,
               actionedBy: username,
+              userType: 'STAFF',
             },
           },
         ],

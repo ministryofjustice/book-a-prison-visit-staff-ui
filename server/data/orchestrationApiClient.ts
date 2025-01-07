@@ -49,6 +49,7 @@ export default class OrchestrationApiClient {
         applicationMethodType: applicationMethod,
         allowOverBooking,
         actionedBy: username,
+        userType: 'STAFF',
       },
     })
   }
