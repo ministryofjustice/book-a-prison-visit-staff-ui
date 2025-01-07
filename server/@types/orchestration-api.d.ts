@@ -650,6 +650,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/public/booker/{bookerReference}/permitted/prisoners/{prisonerId}/validate': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Validates prisoner associated with a booker
+     * @description Validates prisoner associated with a booker
+     */
+    get: operations['validatePrisoner']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/public/booker/{bookerReference}/permitted/prisoners/{prisonerId}/permitted/visitors': {
     parameters: {
       query?: never
@@ -1126,6 +1146,11 @@ export interface components {
         | 'BY_PRISONER'
       /** @description allow over booking method */
       allowOverBooking: boolean
+      /**
+       * @description User type for user who actioned this request
+       * @enum {string}
+       */
+      userType: 'STAFF' | 'PUBLIC' | 'SYSTEM'
     }
     IgnoreVisitNotificationsDto: {
       /** @description Reason why the visit's notifications can be ignored */
@@ -1379,6 +1404,16 @@ export interface components {
       eventsAudit: components['schemas']['EventAuditOrchestrationDto'][]
       visit: components['schemas']['VisitDto']
     }
+    /**
+     * @description To filter visits by status
+     * @example BOOKED
+     */
+    visitStatus: ('BOOKED' | 'CANCELLED')[]
+    /**
+     * @description Visit Restriction(s) - OPEN / CLOSED / UNKNOWN
+     * @example OPEN
+     */
+    visitRestrictions: ('OPEN' | 'CLOSED' | 'UNKNOWN')[]
     /** @description Timeslot for the visit */
     SessionTimeSlotDto: {
       /**
@@ -1431,36 +1466,34 @@ export interface components {
       totalElements?: number
       /** Format: int32 */
       totalPages?: number
-      first?: boolean
-      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['VisitDto'][]
       /** Format: int32 */
       number?: number
-      sort?: components['schemas']['SortObject'][]
+      sort?: components['schemas']['SortObject']
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
+      first?: boolean
+      last?: boolean
       empty?: boolean
     }
     PageableObject: {
       /** Format: int64 */
       offset?: number
-      sort?: components['schemas']['SortObject'][]
-      /** Format: int32 */
-      pageSize?: number
+      sort?: components['schemas']['SortObject']
       paged?: boolean
       /** Format: int32 */
       pageNumber?: number
+      /** Format: int32 */
+      pageSize?: number
       unpaged?: boolean
     }
     SortObject: {
-      direction?: string
-      nullHandling?: string
-      ascending?: boolean
-      property?: string
-      ignoreCase?: boolean
+      empty?: boolean
+      sorted?: boolean
+      unsorted?: boolean
     }
     OrchestrationNotificationGroupDto: {
       /**
@@ -1800,6 +1833,7 @@ export interface components {
        * @example 2024-08-01
        */
       nextAvailableVoDate: string
+      registeredPrison: components['schemas']['RegisteredPrisonDto']
     }
     /** @description Incentive level */
     CurrentIncentive: {
@@ -1868,6 +1902,33 @@ export interface components {
        */
       cellLocation?: string
       currentIncentive?: components['schemas']['CurrentIncentive']
+    }
+    /** @description Current prison code for the prison that the booker registered the prisoner with */
+    RegisteredPrisonDto: {
+      /**
+       * @description prison code
+       * @example MDI
+       */
+      prisonCode: string
+      /**
+       * @description prison name
+       * @example MDI
+       */
+      prisonName: string
+    }
+    BookerPrisonerValidationErrorResponse: {
+      /** Format: int32 */
+      status: number
+      /** Format: int32 */
+      errorCode?: number
+      userMessage?: string
+      developerMessage?: string
+      /** @enum {string} */
+      validationError:
+        | 'PRISONER_RELEASED'
+        | 'PRISONER_TRANSFERRED_SUPPORTED_PRISON'
+        | 'PRISONER_TRANSFERRED_UNSUPPORTED_PRISON'
+        | 'REGISTERED_PRISON_NOT_SUPPORTED'
     }
     /** @description A visitor for a prisoner */
     VisitorInfoDto: {
@@ -3365,12 +3426,12 @@ export interface operations {
          * @description To filter visits by status
          * @example BOOKED
          */
-        visitStatus: string
+        visitStatus: components['schemas']['visitStatus']
         /**
          * @description Visit Restriction(s) - OPEN / CLOSED / UNKNOWN
          * @example OPEN
          */
-        visitRestrictions?: string
+        visitRestrictions?: components['schemas']['visitRestrictions']
         /**
          * @description Filter results by prison id/code
          * @example MDI
@@ -4339,6 +4400,58 @@ export interface operations {
       }
     }
   }
+  validatePrisoner: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        bookerReference: string
+        /**
+         * @description Prisoner Id for whom visitors need to be returned.
+         * @example A12345DC
+         */
+        prisonerId: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Validation passed */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Incorrect request to validate prisoner associated with a booker */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions for this action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Prisoner validation failed */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['BookerPrisonerValidationErrorResponse']
+        }
+      }
+    }
+  }
   getPermittedVisitorsForPrisoner: {
     parameters: {
       query?: never
@@ -4625,7 +4738,7 @@ export interface operations {
          * @description type
          * @example STAFF
          */
-        type: string
+        type: 'STAFF' | 'PUBLIC' | 'SYSTEM'
       }
       cookie?: never
     }

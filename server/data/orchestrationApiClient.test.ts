@@ -46,6 +46,7 @@ describe('orchestrationApiClient', () => {
         actionedBy: 'user1',
         applicationMethodType: 'NOT_KNOWN',
         allowOverBooking: false,
+        userType: 'STAFF',
       }
 
       const result: Partial<Visit> = {
