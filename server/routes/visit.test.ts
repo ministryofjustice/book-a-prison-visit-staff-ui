@@ -173,11 +173,11 @@ describe('/visit/:reference', () => {
           expect($('[data-test="prisoner-dob"]').text()).toBe('2 April 1975')
           expect($('[data-test="prisoner-location"]').text()).toBe('1-1-C-028, HMP Hewell')
           // visitor details - tab selected - check information displayed
-          expect($('[data-test="test-visitor-name1"]').text()).toBe('Jeanette Smith (sister of the prisoner)')
-          expect($('[data-test="test-visitor-dob1"]').text()).toContain('28 July 1986')
-          expect($('[data-test="test-visitor-dob1"]').text()).toContain('(35 years old)')
-          expect($('[data-test="test-visitor-address1"]').text()).toBe('123 The Street, Coventry')
-          expect($('[data-test="test-visitor-restriction1"]').text()).toContain('Closed')
+          expect($('[data-test="visitor-name1"]').text()).toBe('Jeanette Smith (sister of the prisoner)')
+          expect($('[data-test="visitor-dob1"]').text()).toContain('28 July 1986')
+          expect($('[data-test="visitor-dob1"]').text()).toContain('(35 years old)')
+          expect($('[data-test="visitor-address1"]').text()).toBe('123 The Street, Coventry')
+          expect($('[data-test="visitor-restriction1"]').text()).toContain('Closed')
           expect($('[data-test="additional-support"]').text()).toContain(
             'Wheelchair ramp, Portable induction loop for people with hearing aids',
           )

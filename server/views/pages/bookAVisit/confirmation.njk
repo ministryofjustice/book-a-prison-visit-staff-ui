@@ -120,7 +120,7 @@
           text: "Visitor " + loop.index
         },
         value: {
-          html: '<p><span class="test-visitor-name' + loop.index + '">' + visitor.name | safe+ " (" + (visitor.relationshipDescription | lower) + ' of the prisoner)</span><br><span class="test-visitor-address' + loop.index + '">' + visitor.address | replace("<br>", " ") + "</span>"
+          html: '<p><span class="test-visitor-name' + loop.index + '">' + visitor.name + " (" + (visitor.relationshipDescription | lower) + ' of the prisoner)</span><br><span class="test-visitor-address' + loop.index + '">' + visitor.address | replace("<br>", " ") + "</span>"
         }
       }
     ), displayRows) %}
@@ -145,9 +145,9 @@
 
   {% set contactName %}
     {% if mainContact.contactName %}
-      {{ mainContact.contactName | safe }}
+      {{ mainContact.contactName }}
     {% else %}
-      {{ mainContact.contact.name | safe + " (" + (mainContact.contact.relationshipDescription | lower) + " of the prisoner)" }}
+      {{ mainContact.contact.name + " (" + (mainContact.contact.relationshipDescription | lower) + " of the prisoner)" }}
     {% endif %}
   {% endset %}
   {% set displayRows = (displayRows.push(
