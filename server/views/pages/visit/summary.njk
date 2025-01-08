@@ -222,7 +222,7 @@
                   text: 'Name'
                 },
                 value: {
-                  html: '<span data-test="test-visitor-name' + loop.index + '">' + visitor.name | safe + ' (' + (visitor.relationshipDescription | lower) + ' of the prisoner)</span>'
+                  html: '<span data-test="visitor-name' + loop.index + '">' + visitor.name + ' (' + (visitor.relationshipDescription | lower) + ' of the prisoner)</span>'
                 }
               },
               {
@@ -230,7 +230,7 @@
                   text: 'Date of birth'
                 },
                 value: {
-                  html: '<span data-test="test-visitor-dob' + loop.index + '">' + visitorDateOfBirth(visitor) + '</span>'
+                  html: '<span data-test="visitor-dob' + loop.index + '">' + visitorDateOfBirth(visitor) + '</span>'
                 }
               },
               {
@@ -238,7 +238,7 @@
                   text: 'Address '
                 },
                 value: {
-                  html: '<span data-test="test-visitor-address' + loop.index + '">' + (visitor.address | replace("<br>", " ")) + '</span>'
+                  html: '<span data-test="visitor-address' + loop.index + '">' + (visitor.address | replace("<br>", " ")) + '</span>'
                 }
               },
               {
@@ -246,7 +246,7 @@
                   text: 'Restrictions '
                 },
                 value: {
-                  html: '<span data-test="test-visitor-restriction' + loop.index + '">' + visitorRestrictions(visitor) + '</span>'
+                  html: '<span data-test="visitor-restriction' + loop.index + '">' + visitorRestrictions(visitor) + '</span>'
                 }
               }
 
