@@ -24,4 +24,4 @@ generic-service:
     REDIS_KEY: "bapv-staff-prod"
 
 generic-prometheus-alerts:
-  alertSeverity: digital-prison-service
+  alertSeverity: visits-alerts
