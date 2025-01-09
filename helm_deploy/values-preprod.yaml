@@ -7,6 +7,9 @@ generic-service:
   ingress:
     host: manage-prison-visits-preprod.prison.service.justice.gov.uk
 
+  scheduledDowntime:
+    enabled: true
+
   env:
     INGRESS_URL: "https://manage-prison-visits-preprod.prison.service.justice.gov.uk"
     HMPPS_AUTH_URL: "https://sign-in-preprod.hmpps.service.justice.gov.uk/auth"
@@ -25,4 +28,4 @@ generic-service:
 
 generic-prometheus-alerts:
   alertSeverity: visits-alerts-nonprod
-
+  businessHoursOnly: true
