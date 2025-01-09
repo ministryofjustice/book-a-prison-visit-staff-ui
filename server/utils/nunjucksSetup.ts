@@ -131,5 +131,17 @@ export function registerNunjucks(app?: express.Express): Environment {
 
   njkEnv.addFilter('pluralise', (word, count, plural = `${word}s`) => (count === 1 ? word : plural))
 
+  // split string on first newline (if present), returning trimmed [firstLine, remainingText]
+  njkEnv.addFilter('splitOnNewline', (rawComment: string): [string, string] => {
+    if (typeof rawComment !== 'string') {
+      return ['', '']
+    }
+
+    const comment = rawComment.trim()
+    const [firstLine, ...rest] = comment.split(/(\n)/)
+
+    return [firstLine, rest.join('').trim()]
+  })
+
   return njkEnv
 }

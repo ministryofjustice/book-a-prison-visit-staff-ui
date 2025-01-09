@@ -53,18 +53,19 @@ afterEach(() => {
 describe('/prisoner/:offenderNo - Prisoner profile', () => {
   let prisonerProfile: PrisonerProfilePage
 
+  const restriction = TestData.offenderRestriction()
+  const alert = TestData.alert({
+    alertType: 'X',
+    alertTypeDescription: 'Security',
+    alertCode: 'XR',
+    alertCodeDescription: 'Racist',
+    dateCreated: '2022-01-01',
+    dateExpires: '2022-01-02',
+  })
+
   beforeEach(() => {
     prisonerProfile = {
-      activeAlerts: [
-        TestData.alert({
-          alertType: 'X',
-          alertTypeDescription: 'Security',
-          alertCode: 'XR',
-          alertCodeDescription: 'Racist',
-          dateCreated: '2022-01-01',
-          dateExpires: '2022-01-02',
-        }),
-      ],
+      activeAlerts: [alert],
       activeAlertCount: 1,
       flaggedAlerts: [TestData.alert({ alertCode: 'UPIU', alertCodeDescription: 'Protective Isolation Unit' })],
       visitsByMonth: new Map(),
@@ -369,6 +370,7 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
 
   describe('POST /prisoner/A1234BC', () => {
     it('should set up visitSessionData and redirect to select visitors page', () => {
+      prisonerProfileService.getRestrictions.mockResolvedValue([restriction])
       return request(app)
         .post('/prisoner/A1234BC')
         .expect(302)
@@ -376,14 +378,18 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
         .expect(res => {
           expect(prisonerProfileService.getProfile).toHaveBeenCalledTimes(1)
           expect(prisonerProfileService.getProfile).toHaveBeenCalledWith(prisonId, 'A1234BC', 'user1')
+          expect(prisonerProfileService.getRestrictions).toHaveBeenCalledTimes(1)
+          expect(prisonerProfileService.getRestrictions).toHaveBeenCalledWith('A1234BC', 'user1')
           expect(auditService.overrodeZeroVO).not.toHaveBeenCalled()
           expect(clearSession).toHaveBeenCalledTimes(1)
-          expect(visitSessionData).toEqual(<VisitSessionData>{
+          expect(visitSessionData).toStrictEqual(<VisitSessionData>{
             prisoner: {
               name: 'Smith, John',
               offenderNo: 'A1234BC',
               dateOfBirth: '2 April 1975',
               location: '1-1-C-028, Hewell (HMP)',
+              activeAlerts: [alert],
+              restrictions: [restriction],
             },
           })
         })
@@ -400,6 +406,8 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
         .expect(res => {
           expect(prisonerProfileService.getProfile).toHaveBeenCalledTimes(1)
           expect(prisonerProfileService.getProfile).toHaveBeenCalledWith(prisonId, 'A1234BC', 'user1')
+          expect(prisonerProfileService.getRestrictions).toHaveBeenCalledTimes(1)
+          expect(prisonerProfileService.getRestrictions).toHaveBeenCalledWith('A1234BC', 'user1')
           expect(auditService.overrodeZeroVO).toHaveBeenCalledTimes(1)
           expect(auditService.overrodeZeroVO).toHaveBeenCalledWith({
             prisonerId: 'A1234BC',
@@ -413,6 +421,16 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
               offenderNo: 'A1234BC',
               dateOfBirth: '2 April 1975',
               location: '1-1-C-028, Hewell (HMP)',
+              activeAlerts: [
+                TestData.alert({
+                  alertType: 'X',
+                  alertTypeDescription: 'Security',
+                  alertCode: 'XR',
+                  alertCodeDescription: 'Racist',
+                  dateCreated: '2022-01-01',
+                  dateExpires: '2022-01-02',
+                }),
+              ],
             },
           })
         })
@@ -433,6 +451,8 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
         .expect(res => {
           expect(prisonerProfileService.getProfile).toHaveBeenCalledTimes(1)
           expect(prisonerProfileService.getProfile).toHaveBeenCalledWith(prisonId, 'A1234BC', 'user1')
+          expect(prisonerProfileService.getRestrictions).toHaveBeenCalledTimes(1)
+          expect(prisonerProfileService.getRestrictions).toHaveBeenCalledWith('A1234BC', 'user1')
           expect(auditService.overrodeZeroVO).not.toHaveBeenCalled()
           expect(visitSessionData).toEqual(<VisitSessionData>{
             prisoner: {
@@ -440,6 +460,16 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
               offenderNo: 'A1234BC',
               dateOfBirth: '2 April 1975',
               location: '1-1-C-028, Hewell (HMP)',
+              activeAlerts: [
+                TestData.alert({
+                  alertType: 'X',
+                  alertTypeDescription: 'Security',
+                  alertCode: 'XR',
+                  alertCodeDescription: 'Racist',
+                  dateCreated: '2022-01-01',
+                  dateExpires: '2022-01-02',
+                }),
+              ],
             },
           })
         })
@@ -455,6 +485,8 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
         .expect(res => {
           expect(prisonerProfileService.getProfile).toHaveBeenCalledTimes(1)
           expect(prisonerProfileService.getProfile).toHaveBeenCalledWith(prisonId, 'A1234BC', 'user1')
+          expect(prisonerProfileService.getRestrictions).toHaveBeenCalledTimes(1)
+          expect(prisonerProfileService.getRestrictions).toHaveBeenCalledWith('A1234BC', 'user1')
           expect(auditService.overrodeZeroVO).not.toHaveBeenCalled()
           expect(visitSessionData).toEqual({})
           expect(flashProvider).toHaveBeenCalledWith('errors', [

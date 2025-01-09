@@ -45,6 +45,8 @@ export default class PrisonerProfilePage extends Page {
 
   visitTabPVONextAdjustment = (): PageElement => cy.get('[data-test="tab-pvo-next-date"]')
 
+  alertsLink = (): PageElement => cy.get('[data-test="all-alerts-link"]')
+
   alertsTabType = (): PageElement => cy.get('[data-test="tab-alerts-type-desc"]')
 
   alertsTabCode = (): PageElement => cy.get('[data-test="tab-alerts-code-desc"]')

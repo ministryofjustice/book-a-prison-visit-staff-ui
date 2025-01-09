@@ -71,10 +71,11 @@ export default function routes({
     const reference = getVisitReference(req)
     const fromPage = typeof req.query?.from === 'string' ? req.query.from : null
     const fromPageQuery = typeof req.query?.query === 'string' ? req.query.query : null
+    const { username } = res.locals.user
 
     const { visitHistoryDetails, visitors, notifications, additionalSupport } = await visitService.getFullVisitDetails({
       reference,
-      username: res.locals.user.username,
+      username,
     })
     const { visit } = visitHistoryDetails
     const filteredVisitHistoryDetails = visitHistoryDetails.eventsAudit.filter(event =>
@@ -82,7 +83,7 @@ export default function routes({
     )
 
     if (visit.prisonId !== req.session.selectedEstablishment.prisonId) {
-      const visitPrison = await supportedPrisonsService.getPrison(res.locals.user.username, visit.prisonId)
+      const visitPrison = await supportedPrisonsService.getPrison(username, visit.prisonId)
 
       return res.render('pages/visit/summary', {
         visit: { reference: visit.reference },
@@ -90,16 +91,17 @@ export default function routes({
       })
     }
 
-    const prisoner: Prisoner = await prisonerSearchService.getPrisonerById(visit.prisonerId, res.locals.user.username)
-    const supportedPrisonIds = await supportedPrisonsService.getSupportedPrisonIds(res.locals.user.username)
-
+    const [prisoner, supportedPrisonIds] = await Promise.all([
+      prisonerSearchService.getPrisonerById(visit.prisonerId, username),
+      supportedPrisonsService.getSupportedPrisonIds(username),
+    ])
     const prisonerLocation = getPrisonerLocation(supportedPrisonIds, prisoner)
 
     await auditService.viewedVisitDetails({
       visitReference: reference,
       prisonerId: visit.prisonerId,
       prisonId: visit.prisonId,
-      username: res.locals.user.username,
+      username,
       operationId: res.locals.appInsightsOperationId,
     })
 
@@ -139,33 +141,39 @@ export default function routes({
 
   post('/:reference', async (req, res) => {
     const reference = getVisitReference(req)
-
+    const { username } = res.locals.user
     // TODO - not really using full visit details here so could request less information
     const {
       visitHistoryDetails: { visit },
     } = await visitService.getFullVisitDetails({
       reference,
-      username: res.locals.user.username,
+      username,
     })
 
     if (visit.prisonId !== req.session.selectedEstablishment.prisonId) {
       return res.redirect(`/visit/${visit.reference}`)
     }
 
-    const prisoner: Prisoner = await prisonerSearchService.getPrisonerById(visit.prisonerId, res.locals.user.username)
-    const supportedPrisonIds = await supportedPrisonsService.getSupportedPrisonIds(res.locals.user.username)
-
+    const [prisoner, supportedPrisonIds] = await Promise.all([
+      prisonerSearchService.getPrisonerById(visit.prisonerId, username),
+      supportedPrisonsService.getSupportedPrisonIds(username),
+    ])
     const prisonerLocation = getPrisonerLocation(supportedPrisonIds, prisoner)
 
     const visitorIds = visit.visitors.flatMap(visitor => visitor.nomisPersonId)
     const mainContactVisitor = visit.visitors.find(visitor => visitor.visitContact)
     const mainContactId = mainContactVisitor ? mainContactVisitor.nomisPersonId : null
-    const visitorList = await prisonerVisitorsService.getVisitors(visit.prisonerId, res.locals.user.username)
+    const visitorList = await prisonerVisitorsService.getVisitors(visit.prisonerId, username)
     const currentVisitors = visitorList.filter(visitor => visitorIds.includes(visitor.personId))
     const mainContact = currentVisitors.find(visitor => visitor.personId === mainContactId)
 
     // clean then load session
     clearSession(req)
+
+    const [{ activeAlerts }, restrictions] = await Promise.all([
+      prisonerProfileService.getProfile(visit.prisonId, visit.prisonerId, username),
+      prisonerProfileService.getRestrictions(visit.prisonerId, username),
+    ])
     const visitRestriction =
       visit.visitRestriction === 'OPEN' || visit.visitRestriction === 'CLOSED' ? visit.visitRestriction : undefined
     const visitSlot: VisitSlot = {
@@ -186,6 +194,8 @@ export default function routes({
         offenderNo: prisoner.prisonerNumber,
         dateOfBirth: prisoner.dateOfBirth,
         location: prisonerLocation,
+        activeAlerts,
+        restrictions,
       },
       visitSlot,
       originalVisitSlot: visitSlot,
@@ -236,6 +246,7 @@ export default function routes({
     async (req, res) => {
       const errors = validationResult(req)
       const reference = getVisitReference(req)
+      const { username } = res.locals.user
 
       if (!errors.isEmpty()) {
         req.flash('errors', errors.array() as [])
@@ -246,11 +257,11 @@ export default function routes({
       if (req.body.clearNotifications === 'yes') {
         const ignoreVisitNotificationsDto: IgnoreVisitNotificationsDto = {
           reason: req.body.clearReason,
-          actionedBy: res.locals.user.username,
+          actionedBy: username,
         }
 
         const visit = await visitNotificationsService.ignoreNotifications({
-          username: res.locals.user.username,
+          username,
           reference,
           ignoreVisitNotificationsDto,
         })
@@ -269,7 +280,7 @@ export default function routes({
     },
   )
 
-  const selectVisitors = new SelectVisitors('update', prisonerVisitorsService, prisonerProfileService)
+  const selectVisitors = new SelectVisitors('update', prisonerVisitorsService)
   const visitType = new VisitType('update', auditService)
   const dateAndTime = new DateAndTime('update', visitService, visitSessionsService, auditService)
   const additionalSupport = new AdditionalSupport('update')
@@ -476,6 +487,7 @@ export default function routes({
     async (req, res) => {
       const errors = validationResult(req)
       const reference = getVisitReference(req)
+      const { username } = res.locals.user
 
       if (!errors.isEmpty()) {
         req.flash('errors', errors.array() as [])
@@ -493,12 +505,12 @@ export default function routes({
           text,
         },
         applicationMethodType,
-        actionedBy: res.locals.user.username,
+        actionedBy: username,
         userType: 'STAFF',
       }
 
       const visit = await visitService.cancelVisit({
-        username: res.locals.user.username,
+        username,
         reference,
         cancelVisitDto,
       })
@@ -508,7 +520,7 @@ export default function routes({
         prisonerId: visit.prisonerId.toString(),
         prisonId: visit.prisonId,
         reason: `${req.body.cancel}: ${req.body.reason}`,
-        username: res.locals.user.username,
+        username,
         operationId: res.locals.appInsightsOperationId,
       })
 
