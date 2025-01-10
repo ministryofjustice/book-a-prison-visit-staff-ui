@@ -27,7 +27,7 @@ import reviewRoutes from './routes/review'
 import searchRoutes from './routes/search'
 import timetableRoutes from './routes/timetable'
 import visitRoutes from './routes/visit'
-import visitsRoutes from './routes/visits'
+import visitsByDateRoutes from './routes/visitsByDate'
 import type { Services } from './services'
 import config from './config'
 import logger from '../logger'
@@ -69,7 +69,7 @@ export default function createApp(services: Services): express.Application {
   app.use('/timetable', timetableRoutes(services))
   app.use('/review', reviewRoutes(services))
   app.use('/visit', visitRoutes(services))
-  app.use('/visits', visitsRoutes(services))
+  app.use('/visits', visitsByDateRoutes(services))
 
   app.use((req, res, next) => next(createError(404, 'Not found')))
   app.use(errorHandler(process.env.NODE_ENV === 'production'))
