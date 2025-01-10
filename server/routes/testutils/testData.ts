@@ -325,6 +325,7 @@ export default class TestData {
     prisonerIncentiveLevelGroupNames = [],
     weeklyFrequency = 1,
     visitType = 'SOCIAL',
+    visitRoom = 'Visits hall',
   }: Partial<SessionSchedule> = {}): SessionSchedule => ({
     sessionTemplateReference,
     sessionTimeSlot,
@@ -336,6 +337,7 @@ export default class TestData {
     prisonerIncentiveLevelGroupNames,
     weeklyFrequency,
     visitType,
+    visitRoom,
   })
 
   static supportedPrisonIds = ({ prisonIds = ['HEI', 'BLI'] } = {}): string[] => prisonIds
@@ -487,6 +489,7 @@ export default class TestData {
     visitorCount = 2,
     visitTimeSlot = { startTime: '13:45', endTime: '15:45' },
     firstBookedDateTime = '2022-01-01T09:00:00',
+    visitRestriction = 'OPEN',
   }: Partial<VisitPreview> = {}): VisitPreview => ({
     prisonerId,
     firstName,
@@ -495,6 +498,7 @@ export default class TestData {
     visitorCount,
     visitTimeSlot,
     firstBookedDateTime,
+    visitRestriction,
   })
 
   static visitSession = ({

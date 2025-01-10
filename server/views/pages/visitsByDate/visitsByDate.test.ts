@@ -6,9 +6,9 @@ import TestData from '../../../routes/testutils/testData'
 import { VisitsPageSideNav } from '../../../@types/bapv'
 import { VisitPreview } from '../../../data/orchestrationApiTypes'
 
-const template = fs.readFileSync('server/views/pages/visits/summary.njk')
+const template = fs.readFileSync('server/views/pages/visitsByDate/visitsByDate.njk')
 
-describe('Views - Visits summary', () => {
+describe('Views - Visits by date', () => {
   let compiledTemplate: Template
   let viewContext: Record<string, unknown>
 

@@ -28,7 +28,7 @@ import reviewRoutes from '../review'
 import searchRoutes from '../search'
 import timetableRoutes from '../timetable'
 import visitRoutes from '../visit'
-import visitsRoutes from '../visits'
+import visitsRoutes from '../visitsByDate'
 
 import nunjucksSetup from '../../utils/nunjucksSetup'
 import errorHandler from '../../errorHandler'

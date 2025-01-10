@@ -1460,12 +1460,20 @@ export interface components {
        * @description Date the visit was first booked or migrated
        */
       firstBookedDateTime: string
+      /**
+       * @description Visit Restriction
+       * @example OPEN
+       * @enum {string}
+       */
+      visitRestriction: 'OPEN' | 'CLOSED' | 'UNKNOWN'
     }
     PageVisitDto: {
       /** Format: int64 */
       totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      first?: boolean
+      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['VisitDto'][]
@@ -1475,19 +1483,17 @@ export interface components {
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
-      first?: boolean
-      last?: boolean
       empty?: boolean
     }
     PageableObject: {
       /** Format: int64 */
       offset?: number
       sort?: components['schemas']['SortObject']
+      /** Format: int32 */
+      pageSize?: number
       paged?: boolean
       /** Format: int32 */
       pageNumber?: number
-      /** Format: int32 */
-      pageSize?: number
       unpaged?: boolean
     }
     SortObject: {
@@ -1681,6 +1687,11 @@ export interface components {
        * @example 1
        */
       weeklyFrequency: number
+      /**
+       * @description visit room name
+       * @example Visits Room
+       */
+      visitRoom: string
     }
     /** @description Visit Session */
     AvailableVisitSessionDto: {
