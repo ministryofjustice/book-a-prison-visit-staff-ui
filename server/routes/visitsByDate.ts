@@ -117,7 +117,7 @@ export default function routes({
       operationId: res.locals.appInsightsOperationId,
     })
 
-    return res.render('pages/visits/visitsByDate', {
+    return res.render('pages/visitsByDate/visitsByDate', {
       errors: req.flash('errors'),
       formValues: getFlashFormValues(req),
       dateTabs: getDateTabs(selectedDateString, firstTabDateString, 3),
