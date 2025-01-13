@@ -218,37 +218,34 @@ describe('getSessionsSideNav', () => {
   const selectedDate = '2024-01-29'
   const firstTabDate = '2024-01-29'
 
-  describe('open & closed visits (these have a session template)', () => {
+  describe('visits with a session template', () => {
     it('should handle empty session schedule', () => {
       const sessionSchedule: SessionSchedule[] = []
       const unknownVisits: VisitPreview[] = []
-      const expectedResult: VisitsPageSideNav = {}
+      const expectedResult: VisitsPageSideNav = new Map()
 
-      const result = getSessionsSideNav(sessionSchedule, unknownVisits, selectedDate, firstTabDate, '', 'OPEN')
+      const result = getSessionsSideNav(sessionSchedule, unknownVisits, selectedDate, firstTabDate, '')
 
       expect(result).toStrictEqual(expectedResult)
     })
 
-    it('should build side nav data for an open only session', () => {
-      const sessionSchedule = [
-        TestData.sessionSchedule({
-          capacity: { open: 20, closed: 0 },
-          sessionTimeSlot: { startTime: '10:00', endTime: '14:30' },
-        }),
-      ]
+    it('should build side nav data for a single session - single visit room', () => {
+      const sessionSchedule = [TestData.sessionSchedule()]
       const unknownVisits: VisitPreview[] = []
 
-      const expectedResult: VisitsPageSideNav = {
-        open: [
-          {
-            times: '10am to 2:30pm',
-            reference: sessionSchedule[0].sessionTemplateReference,
-            capacity: 20,
-            queryParams: `type=OPEN&sessionReference=${sessionSchedule[0].sessionTemplateReference}&selectedDate=${selectedDate}&firstTabDate=${firstTabDate}`,
-            active: true,
-          },
+      const expectedResult: VisitsPageSideNav = new Map([
+        [
+          'Visits hall',
+          [
+            {
+              times: '1:45pm to 3:45pm',
+              reference: sessionSchedule[0].sessionTemplateReference,
+              queryParams: `sessionReference=${sessionSchedule[0].sessionTemplateReference}&selectedDate=${selectedDate}&firstTabDate=${firstTabDate}`,
+              active: true,
+            },
+          ],
         ],
-      }
+      ])
 
       const result = getSessionsSideNav(
         sessionSchedule,
@@ -256,106 +253,63 @@ describe('getSessionsSideNav', () => {
         selectedDate,
         firstTabDate,
         sessionSchedule[0].sessionTemplateReference,
-        'OPEN',
       )
 
       expect(result).toStrictEqual(expectedResult)
     })
 
-    it('should build side nav data for a closed only session', () => {
+    it('should build side nav data for multiple sessions - two visit rooms', () => {
       const sessionSchedule = [
+        TestData.sessionSchedule({ sessionTemplateReference: 'a' }),
         TestData.sessionSchedule({
-          capacity: { open: 0, closed: 20 },
-          sessionTimeSlot: { startTime: '10:00', endTime: '14:30' },
+          sessionTemplateReference: 'b',
+          sessionTimeSlot: { startTime: '16:00', endTime: '17:00' },
+        }),
+        TestData.sessionSchedule({
+          sessionTemplateReference: 'c',
+          sessionTimeSlot: { startTime: '09:00', endTime: '10:00' },
+          visitRoom: 'Visits hall 2',
         }),
       ]
       const unknownVisits: VisitPreview[] = []
 
-      const expectedResult: VisitsPageSideNav = {
-        closed: [
-          {
-            times: '10am to 2:30pm',
-            reference: sessionSchedule[0].sessionTemplateReference,
-            capacity: 20,
-            queryParams: `type=CLOSED&sessionReference=${sessionSchedule[0].sessionTemplateReference}&selectedDate=${selectedDate}&firstTabDate=${firstTabDate}`,
-            active: true,
-          },
+      const expectedResult: VisitsPageSideNav = new Map([
+        [
+          'Visits hall',
+          [
+            {
+              times: '1:45pm to 3:45pm',
+              reference: sessionSchedule[0].sessionTemplateReference,
+              queryParams: `sessionReference=${sessionSchedule[0].sessionTemplateReference}&selectedDate=${selectedDate}&firstTabDate=${firstTabDate}`,
+              active: false,
+            },
+            {
+              times: '4pm to 5pm',
+              reference: sessionSchedule[1].sessionTemplateReference,
+              queryParams: `sessionReference=${sessionSchedule[1].sessionTemplateReference}&selectedDate=${selectedDate}&firstTabDate=${firstTabDate}`,
+              active: false,
+            },
+          ],
         ],
-      }
+        [
+          'Visits hall 2',
+          [
+            {
+              times: '9am to 10am',
+              reference: sessionSchedule[2].sessionTemplateReference,
+              queryParams: `sessionReference=${sessionSchedule[2].sessionTemplateReference}&selectedDate=${selectedDate}&firstTabDate=${firstTabDate}`,
+              active: true,
+            },
+          ],
+        ],
+      ])
 
       const result = getSessionsSideNav(
         sessionSchedule,
         unknownVisits,
         selectedDate,
         firstTabDate,
-        sessionSchedule[0].sessionTemplateReference,
-        'CLOSED',
-      )
-
-      expect(result).toStrictEqual(expectedResult)
-    })
-
-    it('should build side nav data for mixed open and closed sessions', () => {
-      const sessionSchedule = [
-        TestData.sessionSchedule({
-          capacity: { open: 20, closed: 0 },
-          sessionTimeSlot: { startTime: '10:00', endTime: '14:30' },
-        }),
-        TestData.sessionSchedule({
-          sessionTemplateReference: '-bfe.dcc.0f',
-          capacity: { open: 15, closed: 10 },
-          sessionTimeSlot: { startTime: '15:00', endTime: '16:00' },
-        }),
-        TestData.sessionSchedule({
-          sessionTemplateReference: '-cfe.dcc.0f',
-          capacity: { open: 0, closed: 5 },
-          sessionTimeSlot: { startTime: '16:30', endTime: '18:00' },
-        }),
-      ]
-      const unknownVisits: VisitPreview[] = []
-
-      const expectedResult: VisitsPageSideNav = {
-        open: [
-          {
-            times: '10am to 2:30pm',
-            reference: sessionSchedule[0].sessionTemplateReference,
-            capacity: 20,
-            queryParams: `type=OPEN&sessionReference=${sessionSchedule[0].sessionTemplateReference}&selectedDate=${selectedDate}&firstTabDate=${firstTabDate}`,
-            active: false,
-          },
-          {
-            times: '3pm to 4pm',
-            reference: sessionSchedule[1].sessionTemplateReference,
-            capacity: 15,
-            queryParams: `type=OPEN&sessionReference=${sessionSchedule[1].sessionTemplateReference}&selectedDate=${selectedDate}&firstTabDate=${firstTabDate}`,
-            active: false,
-          },
-        ],
-        closed: [
-          {
-            times: '3pm to 4pm',
-            reference: sessionSchedule[1].sessionTemplateReference,
-            capacity: 10,
-            queryParams: `type=CLOSED&sessionReference=${sessionSchedule[1].sessionTemplateReference}&selectedDate=${selectedDate}&firstTabDate=${firstTabDate}`,
-            active: true,
-          },
-          {
-            times: '4:30pm to 6pm',
-            reference: sessionSchedule[2].sessionTemplateReference,
-            capacity: 5,
-            queryParams: `type=CLOSED&sessionReference=${sessionSchedule[2].sessionTemplateReference}&selectedDate=${selectedDate}&firstTabDate=${firstTabDate}`,
-            active: false,
-          },
-        ],
-      }
-
-      const result = getSessionsSideNav(
-        sessionSchedule,
-        unknownVisits,
-        selectedDate,
-        firstTabDate,
-        sessionSchedule[1].sessionTemplateReference,
-        'CLOSED',
+        sessionSchedule[2].sessionTemplateReference,
       )
 
       expect(result).toStrictEqual(expectedResult)
@@ -372,25 +326,21 @@ describe('getSessionsSideNav', () => {
         TestData.visitPreview({ visitTimeSlot }),
       ]
 
-      const expectedResult: VisitsPageSideNav = {
-        unknown: [
-          {
-            times: '1:45pm to 4pm',
-            reference: timeSlotReference,
-            queryParams: `type=UNKNOWN&sessionReference=${encodeURIComponent(timeSlotReference)}&selectedDate=${selectedDate}&firstTabDate=${firstTabDate}`,
-            active: true,
-          },
+      const expectedResult: VisitsPageSideNav = new Map([
+        [
+          'All visits',
+          [
+            {
+              times: '1:45pm to 4pm',
+              reference: timeSlotReference,
+              queryParams: `sessionReference=${encodeURIComponent(timeSlotReference)}&selectedDate=${selectedDate}&firstTabDate=${firstTabDate}`,
+              active: true,
+            },
+          ],
         ],
-      }
+      ])
 
-      const result = getSessionsSideNav(
-        sessionSchedule,
-        unknownVisits,
-        selectedDate,
-        firstTabDate,
-        timeSlotReference,
-        'UNKNOWN',
-      )
+      const result = getSessionsSideNav(sessionSchedule, unknownVisits, selectedDate, firstTabDate, timeSlotReference)
 
       expect(result).toStrictEqual(expectedResult)
     })
@@ -406,22 +356,25 @@ describe('getSessionsSideNav', () => {
         TestData.visitPreview({ visitTimeSlot: firstVisitTimeSlot }),
       ]
 
-      const expectedResult: VisitsPageSideNav = {
-        unknown: [
-          {
-            times: '10am to 11am',
-            reference: firstTimeSlotReference,
-            queryParams: `type=UNKNOWN&sessionReference=${encodeURIComponent(firstTimeSlotReference)}&selectedDate=${selectedDate}&firstTabDate=${firstTabDate}`,
-            active: true,
-          },
-          {
-            times: '1:45pm to 4pm',
-            reference: secondTimeSlotReference,
-            queryParams: `type=UNKNOWN&sessionReference=${encodeURIComponent(secondTimeSlotReference)}&selectedDate=${selectedDate}&firstTabDate=${firstTabDate}`,
-            active: false,
-          },
+      const expectedResult: VisitsPageSideNav = new Map([
+        [
+          'All visits',
+          [
+            {
+              times: '10am to 11am',
+              reference: firstTimeSlotReference,
+              queryParams: `sessionReference=${encodeURIComponent(firstTimeSlotReference)}&selectedDate=${selectedDate}&firstTabDate=${firstTabDate}`,
+              active: true,
+            },
+            {
+              times: '1:45pm to 4pm',
+              reference: secondTimeSlotReference,
+              queryParams: `sessionReference=${encodeURIComponent(secondTimeSlotReference)}&selectedDate=${selectedDate}&firstTabDate=${firstTabDate}`,
+              active: false,
+            },
+          ],
         ],
-      }
+      ])
 
       const result = getSessionsSideNav(
         sessionSchedule,
@@ -429,13 +382,12 @@ describe('getSessionsSideNav', () => {
         selectedDate,
         firstTabDate,
         firstTimeSlotReference,
-        'UNKNOWN',
       )
 
       expect(result).toStrictEqual(expectedResult)
     })
 
-    it('should build two side nav entries and select the first by default if no open/closed sessions present and no query params set', () => {
+    it('should build two side nav entries and select the first by default if no other sessions present and no query params set', () => {
       const sessionSchedule: SessionSchedule[] = []
       const firstVisitTimeSlot = { startTime: '10:00', endTime: '11:00' }
       const firstTimeSlotReference = '10:00-11:00'
@@ -446,24 +398,27 @@ describe('getSessionsSideNav', () => {
         TestData.visitPreview({ visitTimeSlot: firstVisitTimeSlot }),
       ]
 
-      const expectedResult: VisitsPageSideNav = {
-        unknown: [
-          {
-            times: '10am to 11am',
-            reference: firstTimeSlotReference,
-            queryParams: `type=UNKNOWN&sessionReference=${encodeURIComponent(firstTimeSlotReference)}&selectedDate=${selectedDate}&firstTabDate=${firstTabDate}`,
-            active: true,
-          },
-          {
-            times: '1:45pm to 4pm',
-            reference: secondTimeSlotReference,
-            queryParams: `type=UNKNOWN&sessionReference=${encodeURIComponent(secondTimeSlotReference)}&selectedDate=${selectedDate}&firstTabDate=${firstTabDate}`,
-            active: false,
-          },
+      const expectedResult: VisitsPageSideNav = new Map([
+        [
+          'All visits',
+          [
+            {
+              times: '10am to 11am',
+              reference: firstTimeSlotReference,
+              queryParams: `sessionReference=${encodeURIComponent(firstTimeSlotReference)}&selectedDate=${selectedDate}&firstTabDate=${firstTabDate}`,
+              active: true,
+            },
+            {
+              times: '1:45pm to 4pm',
+              reference: secondTimeSlotReference,
+              queryParams: `sessionReference=${encodeURIComponent(secondTimeSlotReference)}&selectedDate=${selectedDate}&firstTabDate=${firstTabDate}`,
+              active: false,
+            },
+          ],
         ],
-      }
+      ])
 
-      const result = getSessionsSideNav(sessionSchedule, unknownVisits, selectedDate, firstTabDate, '', undefined)
+      const result = getSessionsSideNav(sessionSchedule, unknownVisits, selectedDate, firstTabDate, '')
 
       expect(result).toStrictEqual(expectedResult)
     })
