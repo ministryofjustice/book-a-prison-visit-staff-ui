@@ -141,7 +141,7 @@
             text: "Main contact"
           },
           value: {
-            html: '<p><span class="test-main-contact-name">' + contactName + '</span><br><span class="test-main-contact-number">' +
+            html: '<p><span class="test-main-contact-name">' + contactName | escape+ '</span><br><span class="test-main-contact-number">' +
               mainContact.phoneNumber | d("No phone number provided", true) | escape + "</span></p>"
           },
           actions: {

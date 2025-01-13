@@ -120,7 +120,7 @@
           text: "Visitor " + loop.index
         },
         value: {
-          html: '<p><span class="test-visitor-name' + loop.index + '">' + visitor.name + " (" + (visitor.relationshipDescription | lower) + ' of the prisoner)</span><br><span class="test-visitor-address' + loop.index + '">' + visitor.address | replace("<br>", " ") + "</span>"
+          html: '<p><span class="test-visitor-name' + loop.index + '">' + visitor.name | escape + " (" + (visitor.relationshipDescription | lower) + ' of the prisoner)</span><br><span class="test-visitor-address' + loop.index + '">' + visitor.address | replace("<br>", " ") + "</span>"
         }
       }
     ), displayRows) %}
@@ -138,7 +138,7 @@
         text: "Additional support requests"
       },
       value: {
-        html: '<p class="test-additional-support">' + support + '</p>'
+        html: '<p class="test-additional-support">' + support | escape + '</p>'
       }
     }
   ), displayRows) %}
@@ -156,7 +156,7 @@
         text: "Main contact"
       },
       value: {
-        html: '<p class="test-main-contact-name">' + contactName + '</p><p class="test-main-contact-number">' +
+        html: '<p class="test-main-contact-name">' + contactName | escape + '</p><p class="test-main-contact-number">' +
           mainContact.phoneNumber | d("No phone number provided", true) | escape + '</p>'
       }
     }
