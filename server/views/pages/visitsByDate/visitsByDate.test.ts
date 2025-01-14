@@ -5,6 +5,7 @@ import { registerNunjucks } from '../../../utils/nunjucksSetup'
 import TestData from '../../../routes/testutils/testData'
 import { VisitsPageSideNav } from '../../../@types/bapv'
 import { VisitPreview } from '../../../data/orchestrationApiTypes'
+import { type getSelectedOrDefaultSessionTemplate } from '../../../routes/visitsUtils'
 
 const template = fs.readFileSync('server/views/pages/visitsByDate/visitsByDate.njk')
 
@@ -67,28 +68,34 @@ describe('Views - Visits by date', () => {
   })
 
   it('should display side-nav and session heading when session schedule set but no visits', () => {
-    const sessionsSideNav: VisitsPageSideNav = {
-      open: [
-        {
-          times: '10am to 11am',
-          reference: 'ref-1',
-          capacity: 20,
-          queryParams: 'query-1',
-          active: true,
-        },
+    const sessionsSideNav: VisitsPageSideNav = new Map([
+      [
+        'Visits hall',
+        [
+          {
+            times: '10am to 11am',
+            reference: 'ref-1',
+            capacity: 20,
+            queryParams: 'query-1',
+            active: true,
+          },
+        ],
       ],
-      closed: [
-        {
-          times: '2pm to 3pm',
-          reference: 'ref-2',
-          capacity: 10,
-          queryParams: 'query-2',
-          active: false,
-        },
+      [
+        'Visits hall 2',
+        [
+          {
+            times: '2pm to 3pm',
+            reference: 'ref-2',
+            capacity: 10,
+            queryParams: 'query-2',
+            active: false,
+          },
+        ],
       ],
-    }
+    ])
 
-    const selectedSessionTemplate = {
+    const selectedSessionTemplate: ReturnType<typeof getSelectedOrDefaultSessionTemplate> = {
       sessionReference: 'ref-1',
       type: 'OPEN',
       times: '10am to 11am',
@@ -108,12 +115,12 @@ describe('Views - Visits by date', () => {
 
     const $ = cheerio.load(compiledTemplate.render(viewContext))
 
-    expect($('.moj-side-navigation h4').eq(0).text()).toBe('Open visits')
+    expect($('.moj-side-navigation h4').eq(0).text()).toBe('Visits hall')
     expect($('.moj-side-navigation ul').eq(0).find('a').text()).toBe('10am to 11am')
     expect($('.moj-side-navigation ul').eq(0).find('a').first().attr('href')).toBe('/visits?query-1')
     expect($('.moj-side-navigation__item--active a').attr('href')).toBe('/visits?query-1')
 
-    expect($('.moj-side-navigation h4').eq(1).text()).toBe('Closed visits')
+    expect($('.moj-side-navigation h4').eq(1).text()).toBe('Visits hall 2')
     expect($('.moj-side-navigation ul').eq(1).find('a').first().text()).toBe('2pm to 3pm')
     expect($('.moj-side-navigation ul').eq(1).find('a').first().attr('href')).toBe('/visits?query-2')
 
@@ -155,19 +162,22 @@ describe('Views - Visits by date', () => {
   })
 
   it('should display visits table', () => {
-    const sessionsSideNav: VisitsPageSideNav = {
-      open: [
-        {
-          times: '10am to 11am',
-          reference: 'ref-1',
-          capacity: 20,
-          queryParams: 'query-1',
-          active: true,
-        },
+    const sessionsSideNav: VisitsPageSideNav = new Map([
+      [
+        'Visits hall',
+        [
+          {
+            times: '10am to 11am',
+            reference: 'ref-1',
+            capacity: 20,
+            queryParams: 'query-1',
+            active: true,
+          },
+        ],
       ],
-    }
+    ])
 
-    const selectedSessionTemplate = {
+    const selectedSessionTemplate: ReturnType<typeof getSelectedOrDefaultSessionTemplate> = {
       sessionReference: 'ref-1',
       type: 'OPEN',
       times: '10am to 11am',

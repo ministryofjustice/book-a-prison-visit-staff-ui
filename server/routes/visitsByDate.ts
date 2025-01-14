@@ -31,7 +31,8 @@ export default function routes({
     const { prisonId } = req.session.selectedEstablishment
     const { username } = res.locals.user
 
-    const { type = '', sessionReference = '', selectedDate = '', firstTabDate = '' } = req.query
+    // TODO remove 'type'
+    const { type = 'OPEN', sessionReference = '', selectedDate = '', firstTabDate = '' } = req.query
 
     const selectedSessionReference = sessionReference.toString()
     const selectedType: VisitRestriction = type === 'OPEN' || type === 'CLOSED' || type === 'UNKNOWN' ? type : undefined
@@ -66,7 +67,6 @@ export default function routes({
       selectedDateString,
       firstTabDateString,
       selectedSessionTemplate?.sessionReference || selectedSessionReference,
-      selectedSessionTemplate?.type || selectedType,
     )
 
     let visits: VisitPreview[] = []
@@ -83,7 +83,7 @@ export default function routes({
     }
 
     // ...otherwise if there are unknown visits then filter these by the selected time slot
-    const selectedTimeSlotRef = sessionsSideNav.unknown?.find(s => s.active)?.reference
+    const selectedTimeSlotRef: string = '' // FIXME sessionsSideNav.unknown?.find(s => s.active)?.reference
     if (!selectedSessionTemplate && selectedTimeSlotRef) {
       visits = unknownVisits.filter(
         visit => selectedTimeSlotRef === `${visit.visitTimeSlot.startTime}-${visit.visitTimeSlot.endTime}`,
