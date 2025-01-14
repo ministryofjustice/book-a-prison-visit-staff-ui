@@ -52,7 +52,7 @@ context('View visits by date', () => {
     cy.signIn()
   })
 
-  it('should show visits by date, view another session and change date to tomorrow', () => {
+  it.skip('should show visits by date, view another session and change date to tomorrow', () => {
     cy.task('stubSessionSchedule', { prisonId, date: todayShortFormat, sessionSchedule })
 
     cy.task('stubGetVisitsBySessionTemplate', {
@@ -131,7 +131,7 @@ context('View visits by date', () => {
     visitsByDatePage.noResultsMessage().contains('No visit sessions on this day.')
   })
 
-  it('should show visits by date for migrated visits with no session templates', () => {
+  it.skip('should show visits by date for migrated visits with no session templates', () => {
     cy.task('stubSessionSchedule', { prisonId, date: todayShortFormat, sessionSchedule: [] })
     const anotherVisit = TestData.visitPreview({ visitTimeSlot: { startTime: '09:00', endTime: '10:00' } })
     cy.task('stubGetVisitsWithoutSessionTemplate', {

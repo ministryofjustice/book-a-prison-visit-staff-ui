@@ -72,7 +72,7 @@
     {% set selectedTimeSlotLabel = "" %}
     {% if sessionsSideNav | length %}
       <div class="govuk-grid-column-one-quarter">
-        {# build side nav time slot nav for open/closed sections #}
+        {# build side nav time slot nav for each visit room #}
         {% set sessionSideNavSections = [] %}
         {% for heading, items in sessionsSideNav %}
           {% set sectionItems = [] %}
@@ -86,7 +86,7 @@
           {% endfor %}
           {% set sessionSideNavSections = (sessionSideNavSections.push({
             heading: {
-              text: ("all" if heading == "unknown" else heading) | capitalize + " visits",
+              text: heading,
               classes: "govuk-!-padding-top-0"
             },
             items: sectionItems
