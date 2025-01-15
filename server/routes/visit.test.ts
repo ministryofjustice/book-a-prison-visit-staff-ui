@@ -9,11 +9,12 @@ import {
   Visit,
   VisitHistoryDetails,
 } from '../data/orchestrationApiTypes'
-import { FlashData, VisitorListItem, VisitSessionData } from '../@types/bapv'
+import { FlashData, PrisonerProfilePage, VisitorListItem, VisitSessionData } from '../@types/bapv'
 import { clearSession } from './visitorUtils'
 import TestData from './testutils/testData'
 import {
   createMockAuditService,
+  createMockPrisonerProfileService,
   createMockPrisonerSearchService,
   createMockPrisonerVisitorsService,
   createMockSupportedPrisonsService,
@@ -28,6 +29,7 @@ let app: Express
 let flashData: FlashData
 
 const auditService = createMockAuditService()
+const prisonerProfileService = createMockPrisonerProfileService()
 const prisonerSearchService = createMockPrisonerSearchService()
 const prisonerVisitorsService = createMockPrisonerVisitorsService()
 const supportedPrisonsService = createMockSupportedPrisonsService()
@@ -56,7 +58,13 @@ beforeEach(() => {
     return flashData[key]
   })
   app = appWithAllRoutes({
-    services: { auditService, prisonerSearchService, prisonerVisitorsService, visitSessionsService },
+    services: {
+      auditService,
+      prisonerProfileService,
+      prisonerSearchService,
+      prisonerVisitorsService,
+      visitSessionsService,
+    },
   })
 })
 
@@ -132,6 +140,7 @@ describe('/visit/:reference', () => {
     app = appWithAllRoutes({
       services: {
         auditService,
+        prisonerProfileService,
         prisonerSearchService,
         prisonerVisitorsService,
         supportedPrisonsService,
@@ -173,11 +182,11 @@ describe('/visit/:reference', () => {
           expect($('[data-test="prisoner-dob"]').text()).toBe('2 April 1975')
           expect($('[data-test="prisoner-location"]').text()).toBe('1-1-C-028, HMP Hewell')
           // visitor details - tab selected - check information displayed
-          expect($('[data-test="test-visitor-name1"]').text()).toBe('Jeanette Smith (sister of the prisoner)')
-          expect($('[data-test="test-visitor-dob1"]').text()).toContain('28 July 1986')
-          expect($('[data-test="test-visitor-dob1"]').text()).toContain('(35 years old)')
-          expect($('[data-test="test-visitor-address1"]').text()).toBe('123 The Street, Coventry')
-          expect($('[data-test="test-visitor-restriction1"]').text()).toContain('Closed')
+          expect($('[data-test="visitor-name1"]').text()).toBe('Jeanette Smith (sister of the prisoner)')
+          expect($('[data-test="visitor-dob1"]').text()).toContain('28 July 1986')
+          expect($('[data-test="visitor-dob1"]').text()).toContain('(35 years old)')
+          expect($('[data-test="visitor-address1"]').text()).toBe('123 The Street, Coventry')
+          expect($('[data-test="visitor-restriction1"]').text()).toContain('Closed')
           expect($('[data-test="additional-support"]').text()).toContain(
             'Wheelchair ramp, Portable induction loop for people with hearing aids',
           )
@@ -676,6 +685,44 @@ describe('/visit/:reference', () => {
   })
 
   describe('POST /visit/:reference', () => {
+    const restriction = TestData.offenderRestriction()
+    const alert = TestData.alert({
+      alertType: 'X',
+      alertTypeDescription: 'Security',
+      alertCode: 'XR',
+      alertCodeDescription: 'Racist',
+      dateCreated: '2022-01-01',
+      dateExpires: '2022-01-02',
+    })
+    beforeEach(() => {
+      const prisonerProfile: PrisonerProfilePage = {
+        activeAlerts: [alert],
+        activeAlertCount: 1,
+        flaggedAlerts: [],
+        visitsByMonth: new Map(),
+        prisonerDetails: {
+          prisonerId: 'A1234BC',
+          name: 'Smith, John',
+          dateOfBirth: '2 April 1975',
+          cellLocation: '1-1-C-028',
+          prisonName: 'Hewell (HMP)',
+          convictedStatus: 'Convicted',
+          category: 'Cat C',
+          incentiveLevel: 'Standard',
+          visitBalances: {
+            remainingVo: 1,
+            remainingPvo: 0,
+            latestIepAdjustDate: '21 April 2021',
+            latestPrivIepAdjustDate: '1 December 2021',
+            nextIepAdjustDate: '5 May 2021',
+            nextPrivIepAdjustDate: '1 January 2022',
+          },
+        },
+      }
+      prisonerProfileService.getProfile.mockResolvedValue(prisonerProfile)
+      prisonerProfileService.getRestrictions.mockResolvedValue([restriction])
+    })
+
     it('should set up sessionData and redirect to select visitors page', () => {
       visit.applicationReference = undefined
       return request(app)
@@ -684,6 +731,10 @@ describe('/visit/:reference', () => {
         .expect('location', '/visit/ab-cd-ef-gh/update/select-visitors')
         .expect(res => {
           expect(clearSession).toHaveBeenCalledTimes(1)
+          expect(prisonerProfileService.getProfile).toHaveBeenCalledTimes(1)
+          expect(prisonerProfileService.getProfile).toHaveBeenCalledWith('HEI', 'A1234BC', 'user1')
+          expect(prisonerProfileService.getRestrictions).toHaveBeenCalledTimes(1)
+          expect(prisonerProfileService.getRestrictions).toHaveBeenCalledWith('A1234BC', 'user1')
           expect(visitSessionData).toStrictEqual(<VisitSessionData>{
             allowOverBooking: false,
             prisoner: {
@@ -691,6 +742,8 @@ describe('/visit/:reference', () => {
               offenderNo: 'A1234BC',
               dateOfBirth: '1975-04-02',
               location: '1-1-C-028, HMP Hewell',
+              activeAlerts: [alert],
+              restrictions: [restriction],
             },
             visitSlot: {
               id: '',
@@ -791,6 +844,7 @@ describe('/visit/:reference', () => {
       app = appWithAllRoutes({
         services: {
           auditService,
+          prisonerProfileService,
           prisonerSearchService,
           prisonerVisitorsService,
           supportedPrisonsService,

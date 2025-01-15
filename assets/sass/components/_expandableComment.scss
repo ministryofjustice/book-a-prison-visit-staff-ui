@@ -1,0 +1,19 @@
+.bapv-expandable-comment__full-comment,
+.bapv-expandable-comment__show:has(+ .bapv-expandable-comment__full-comment--expanded),
+.bapv-expandable-comment__hide {
+  display: none;
+}
+
+.bapv-expandable-comment__full-comment {
+  margin-top: 1lh;
+}
+
+.bapv-expandable-comment__full-comment--expanded,
+.bapv-expandable-comment__full-comment--expanded + .bapv-expandable-comment__hide {
+  display: block;
+}
+
+.bapv-expandable-comment__show,
+.bapv-expandable-comment__hide {
+  line-height: 2;
+}

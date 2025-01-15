@@ -1,0 +1,33 @@
+{%- from "govuk/components/button/macro.njk" import govukButton -%}
+
+{% set splitText = params.text | splitOnNewline %}
+{% set firstLine = splitText[0] %}
+{% set remainingText = splitText[1] %}
+
+{% if remainingText | length %}
+  <div class="bapv-expandable-comment">
+    <div class="bapv-force-overflow bapv-expandable-comment__first-line">
+      {{- firstLine -}}
+    </div>
+
+    {{ govukButton({
+      text: "See full comment",
+      classes: "bapv-link-button bapv-expandable-comment__show",
+      type: "button",
+      attributes: { "data-test": "show-full-comment" }
+    }) }}
+
+    <div class="bapv-force-overflow bapv-expandable-comment__full-comment">
+      {{- remainingText -}}
+    </div>
+
+    {{ govukButton({
+      text: "Close full comment",
+      classes: "bapv-link-button bapv-expandable-comment__hide",
+      type: "button",
+      attributes: { "data-test": "close-full-comment" }
+    }) }}
+  </div>
+{% else %}
+  <span class="bapv-force-overflow">{{- params.text -}}</span>
+{% endif %}
