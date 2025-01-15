@@ -71,7 +71,7 @@ testJourneys.forEach(journey => {
                 comment: 'comment',
               },
             ],
-            address: '123 Street,<br>Test Town,<br>S1 2QZ',
+            address: '123 Street,\nTest Town,\nS1 2QZ',
             banned: false,
           },
         ],

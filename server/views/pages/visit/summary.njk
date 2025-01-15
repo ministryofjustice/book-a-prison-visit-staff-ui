@@ -238,7 +238,7 @@
                   text: 'Address '
                 },
                 value: {
-                  html: '<span data-test="visitor-address' + loop.index + '">' + (visitor.address | replace("<br>", " ")) + '</span>'
+                  html: '<span data-test="visitor-address' + loop.index + '">' + (visitor.address | escape | replace("\n", " ")) + '</span>'
                 }
               },
               {

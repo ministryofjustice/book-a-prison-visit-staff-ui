@@ -41,7 +41,7 @@
       attributes: { "data-test": "visitor-relation-" + visitor.personId }
     },
     {
-      html: visitor.address,
+      html: visitor.address | escape,
       classes: "bapv-force-overflow",
       attributes: { "data-test": "visitor-address-" + visitor.personId }
     },
