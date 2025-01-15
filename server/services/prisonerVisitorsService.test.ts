@@ -147,8 +147,7 @@ describe('Prisoner visitor service', () => {
           dateOfBirth: '1986-07-28',
           adult: true,
           relationshipDescription: 'Sister',
-          address:
-            'Premises,<br>Flat 23B,<br>123 The Street,<br>Springfield,<br>Coventry,<br>West Midlands,<br>C1 2AB,<br>England',
+          address: 'Premises,\nFlat 23B,\n123 The Street,\nSpringfield,\nCoventry,\nWest Midlands,\nC1 2AB,\nEngland',
           restrictions: [
             {
               restrictionType: 'BAN',

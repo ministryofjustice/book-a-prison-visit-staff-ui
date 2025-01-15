@@ -135,7 +135,7 @@
 
             {% set visitorNames = [] %}
             {% for visitor in visit.visitors %}
-              {% set visitorNames = (visitorNames.push(visitor.firstName + ' ' + visitor.lastName), visitorNames) %}
+              {% set visitorNames = (visitorNames.push((visitor.firstName + ' ' + visitor.lastName) | escape), visitorNames) %}
             {% endfor %}
 
             {% set visitRows = (visitRows.push([
