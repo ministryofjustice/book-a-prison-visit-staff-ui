@@ -174,7 +174,7 @@
                   text: "Name"
                 },
                 value: {
-                  html: "<span data-test='prisoner-name'>" + (prisoner.firstName + ' ' + prisoner.lastName) | formatLastNameFirst + "</span>"
+                  html: "<span data-test='prisoner-name'>" + (prisoner.firstName + ' ' + prisoner.lastName) | formatLastNameFirst | escape+ "</span>"
                 }
               },
               {
