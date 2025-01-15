@@ -18,7 +18,7 @@ describe('Expandable comment component', () => {
   it('should handle missing input', () => {
     compiledTemplate = nunjucks.compile(templateString, njkEnv)
     const $ = cheerio.load(compiledTemplate.render(viewContext))
-    expect($('body').html()).toBe('')
+    expect($('body span').html()).toBe('')
   })
 
   it('should trim input and not render additional markup if no newline within the text', () => {
@@ -27,7 +27,7 @@ describe('Expandable comment component', () => {
     }
     compiledTemplate = nunjucks.compile(templateString, njkEnv)
     const $ = cheerio.load(compiledTemplate.render(viewContext))
-    expect($('body').html().trim()).toBe('a string with no newline in the text')
+    expect($('body span').html().trim()).toBe('a string with no newline in the text')
   })
 
   it('should split on first newline and add expandable comment markup', () => {
