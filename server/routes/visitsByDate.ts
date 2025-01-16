@@ -2,7 +2,7 @@ import { type RequestHandler, Router } from 'express'
 import { body, validationResult, oneOf } from 'express-validator'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import { getParsedDateFromQueryString } from '../utils/utils'
-import { getDateTabs, getSelectedOrDefaultSessionTemplate, getSessionsSideNav } from './visitsUtils'
+import { getDateTabs, getSelectedOrDefaultSessionSchedule, getSessionsSideNav } from './visitsUtils'
 import type { Services } from '../services'
 import { getFlashFormValues } from './visitorUtils'
 import { VisitPreview, VisitRestriction } from '../data/orchestrationApiTypes'
@@ -31,15 +31,13 @@ export default function routes({
     const { prisonId } = req.session.selectedEstablishment
     const { username } = res.locals.user
 
-    // TODO remove 'type'
-    const { type = 'OPEN', sessionReference = '', selectedDate = '', firstTabDate = '' } = req.query
+    const { sessionReference = '', selectedDate = '', firstTabDate = '' } = req.query
 
     const selectedSessionReference = sessionReference.toString()
-    const selectedType: VisitRestriction = type === 'OPEN' || type === 'CLOSED' || type === 'UNKNOWN' ? type : undefined
     const selectedDateString = getParsedDateFromQueryString(selectedDate.toString())
     const firstTabDateString = getParsedDateFromQueryString(firstTabDate.toString())
 
-    // get session schedule and any 'unknown' visits (i.e. those with no session template because migrated data)
+    // get selected date's session schedule and any 'unknown' visits (migrated data with no session template)
     const [sessionSchedule, unknownVisits] = await Promise.all([
       visitSessionsService.getSessionSchedule({
         username,
@@ -53,12 +51,8 @@ export default function routes({
       }),
     ])
 
-    // identify if a session template in the schedule has been selected or can be defaulted
-    const selectedSessionTemplate = getSelectedOrDefaultSessionTemplate(
-      sessionSchedule,
-      selectedSessionReference,
-      selectedType,
-    )
+    // identify if a session schedule has been selected or can be defaulted
+    const selectedSessionSchedule = getSelectedOrDefaultSessionSchedule(sessionSchedule, selectedSessionReference)
 
     // side nav comprises sessions in schedule and those derived from 'unknown' visits
     const sessionsSideNav = getSessionsSideNav(
@@ -66,44 +60,55 @@ export default function routes({
       unknownVisits,
       selectedDateString,
       firstTabDateString,
-      selectedSessionTemplate?.sessionReference || selectedSessionReference,
+      selectedSessionSchedule?.sessionTemplateReference || selectedSessionReference,
     )
 
-    let visits: VisitPreview[] = []
+    // data structure for any possible set of visits
+    const visits: Record<VisitRestriction, { capacity: number; numVisitors: number; visits: VisitPreview[] }> = {
+      CLOSED: { capacity: undefined, numVisitors: 0, visits: [] },
+      OPEN: { capacity: undefined, numVisitors: 0, visits: [] },
+      UNKNOWN: { capacity: undefined, numVisitors: 0, visits: [] },
+    }
 
-    // fetch visits if a known session is selected...
-    if (selectedSessionTemplate) {
-      visits = await visitService.getVisitsBySessionTemplate({
+    // fetch visits if a known session is selected and split into open/closed
+    if (selectedSessionSchedule) {
+      const openAndClosedVisits = await visitService.getVisitsBySessionTemplate({
         username,
         prisonId,
-        reference: selectedSessionTemplate.sessionReference,
+        reference: selectedSessionSchedule.sessionTemplateReference,
         sessionDate: selectedDateString,
-        visitRestrictions: selectedSessionTemplate.type,
+      })
+
+      openAndClosedVisits.forEach(visit => {
+        visits[visit.visitRestriction].visits.push(visit)
+        visits[visit.visitRestriction].numVisitors += visit.visitorCount
+      })
+
+      visits.CLOSED.capacity = selectedSessionSchedule.capacity.closed
+      visits.OPEN.capacity = selectedSessionSchedule.capacity.open
+    }
+
+    // if there are unknown visits, filter these by the selected time slot reference
+    const selectedTimeSlotRef = sessionsSideNav.get('All visits')?.find(s => s.active)?.reference
+    if (!selectedSessionSchedule && selectedTimeSlotRef) {
+      unknownVisits.forEach(visit => {
+        if (`${visit.visitTimeSlot.startTime}-${visit.visitTimeSlot.endTime}` === selectedTimeSlotRef) {
+          visits.UNKNOWN.visits.push(visit)
+          visits.UNKNOWN.numVisitors += visit.visitorCount
+        }
       })
     }
 
-    // ...otherwise if there are unknown visits then filter these by the selected time slot
-    const selectedTimeSlotRef: string = '' // FIXME sessionsSideNav.unknown?.find(s => s.active)?.reference
-    if (!selectedSessionTemplate && selectedTimeSlotRef) {
-      visits = unknownVisits.filter(
-        visit => selectedTimeSlotRef === `${visit.visitTimeSlot.startTime}-${visit.visitTimeSlot.endTime}`,
-      )
-    }
-
     // if no visits, check if this is an exclude date - and if so are there any notifications
+    const areNoVisits = !Object.keys(visits).some((visitType: keyof typeof visits) => visits[visitType].visits.length)
     const isAnExcludeDate =
-      visits.length === 0 && (await blockedDatesService.isBlockedDate(prisonId, selectedDateString, username))
+      areNoVisits && (await blockedDatesService.isBlockedDate(prisonId, selectedDateString, username))
     const isAnExcludeDateWithVisitNotifications =
       isAnExcludeDate && (await visitNotificationsService.dateHasNotifications(username, prisonId, selectedDateString))
 
-    const visitorsTotal = visits.reduce((acc, visit) => {
-      return acc + visit.visitorCount
-    }, 0)
-
     const queryParamsForBackLink = new URLSearchParams({
       query: new URLSearchParams({
-        type: selectedSessionTemplate?.type || 'UNKNOWN',
-        sessionReference: selectedSessionTemplate?.sessionReference || selectedTimeSlotRef || 'NONE',
+        sessionReference: selectedSessionSchedule?.sessionTemplateReference || selectedTimeSlotRef || 'NONE',
         selectedDate: selectedDateString,
         firstTabDate: firstTabDateString,
       }).toString(),
@@ -121,11 +126,10 @@ export default function routes({
       errors: req.flash('errors'),
       formValues: getFlashFormValues(req),
       dateTabs: getDateTabs(selectedDateString, firstTabDateString, 3),
-      selectedSessionTemplate,
+      selectedSessionSchedule,
       sessionsSideNav,
       queryParamsForBackLink,
       visits,
-      visitorsTotal,
       isAnExcludeDate,
       isAnExcludeDateWithVisitNotifications,
     })

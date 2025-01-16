@@ -8,7 +8,6 @@ import {
   Visit,
   VisitHistoryDetails,
   VisitPreview,
-  VisitRestriction,
 } from '../data/orchestrationApiTypes'
 import { buildVisitorListItem } from '../utils/visitorUtils'
 import { HmppsAuthClient, OrchestrationApiClient, PrisonerContactRegistryApiClient, RestClientBuilder } from '../data'
@@ -153,18 +152,16 @@ export default class VisitService {
     prisonId,
     reference,
     sessionDate,
-    visitRestrictions,
   }: {
     username: string
     prisonId: string
     reference: string
     sessionDate: string
-    visitRestrictions: VisitRestriction
   }): Promise<VisitPreview[]> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
-    return orchestrationApiClient.getVisitsBySessionTemplate(prisonId, reference, sessionDate, visitRestrictions)
+    return orchestrationApiClient.getVisitsBySessionTemplate(prisonId, reference, sessionDate, ['OPEN', 'CLOSED'])
   }
 
   async getVisitsWithoutSessionTemplate({

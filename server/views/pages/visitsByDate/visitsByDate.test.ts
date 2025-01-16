@@ -5,7 +5,7 @@ import { registerNunjucks } from '../../../utils/nunjucksSetup'
 import TestData from '../../../routes/testutils/testData'
 import { VisitsPageSideNav } from '../../../@types/bapv'
 import { VisitPreview } from '../../../data/orchestrationApiTypes'
-import { type getSelectedOrDefaultSessionTemplate } from '../../../routes/visitsUtils'
+import { type getSelectedOrDefaultSessionSchedule } from '../../../routes/visitsUtils'
 
 const template = fs.readFileSync('server/views/pages/visitsByDate/visitsByDate.njk')
 
@@ -95,7 +95,7 @@ describe('Views - Visits by date', () => {
       ],
     ])
 
-    const selectedSessionTemplate: ReturnType<typeof getSelectedOrDefaultSessionTemplate> = {
+    const selectedSessionTemplate: ReturnType<typeof getSelectedOrDefaultSessionSchedule> = {
       sessionReference: 'ref-1',
       type: 'OPEN',
       times: '10am to 11am',
@@ -177,7 +177,7 @@ describe('Views - Visits by date', () => {
       ],
     ])
 
-    const selectedSessionTemplate: ReturnType<typeof getSelectedOrDefaultSessionTemplate> = {
+    const selectedSessionTemplate: ReturnType<typeof getSelectedOrDefaultSessionSchedule> = {
       sessionReference: 'ref-1',
       type: 'OPEN',
       times: '10am to 11am',

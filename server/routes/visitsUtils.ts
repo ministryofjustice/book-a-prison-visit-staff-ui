@@ -1,7 +1,7 @@
 import { format, parse, add } from 'date-fns'
 import { VisitsPageSideNav, VisitsPageSideNavItem } from '../@types/bapv'
 import { getParsedDateFromQueryString, prisonerTimePretty } from '../utils/utils'
-import { SessionSchedule, VisitPreview, VisitRestriction } from '../data/orchestrationApiTypes'
+import { SessionSchedule, VisitPreview } from '../data/orchestrationApiTypes'
 
 export const getDateTabs = (
   selectedDate: string,
@@ -36,54 +36,17 @@ export const getDateTabs = (
   return tabs
 }
 
-export function getSelectedOrDefaultSessionTemplate(
+export function getSelectedOrDefaultSessionSchedule(
   sessionSchedule: SessionSchedule[],
   sessionReference: string,
-  type: VisitRestriction,
-): { sessionReference: string; type: VisitRestriction; times: string; capacity: number } | null {
-  if (type === 'UNKNOWN') {
+): SessionSchedule {
+  if (!sessionSchedule.length) {
     return null
   }
 
-  // it's the selected session if reference, type (open/closed) match and a capacity is set
-  const selectedSession = sessionSchedule.find(
-    schedule =>
-      schedule.sessionTemplateReference === sessionReference &&
-      schedule.capacity[<Lowercase<typeof type>>type.toLowerCase()] > 0,
-  )
-  if (selectedSession) {
-    return {
-      sessionReference: selectedSession.sessionTemplateReference,
-      type,
-      times: sessionTimeSlotToString(selectedSession.sessionTimeSlot),
-      capacity: selectedSession.capacity[<Lowercase<typeof type>>type.toLowerCase()],
-    }
-  }
+  const selectedSessionSchedule = sessionSchedule.find(session => session.sessionTemplateReference === sessionReference)
 
-  // default session is first open one in schedule with capacity...
-  const defaultOpenSession = sessionSchedule.find(schedule => schedule.capacity.open > 0)
-  if (defaultOpenSession) {
-    return {
-      sessionReference: defaultOpenSession.sessionTemplateReference,
-      type: 'OPEN',
-      times: sessionTimeSlotToString(defaultOpenSession.sessionTimeSlot),
-      capacity: defaultOpenSession.capacity.open,
-    }
-  }
-
-  // ...or else the first closed with capacity
-  const defaultClosedSession = sessionSchedule.find(schedule => schedule.capacity.closed > 0)
-  if (defaultClosedSession) {
-    return {
-      sessionReference: defaultClosedSession.sessionTemplateReference,
-      type: 'CLOSED',
-      times: sessionTimeSlotToString(defaultClosedSession.sessionTimeSlot),
-      capacity: defaultClosedSession.capacity.closed,
-    }
-  }
-
-  // there are no sessions
-  return null
+  return selectedSessionSchedule ?? sessionSchedule[0]
 }
 
 export function getSessionsSideNav(

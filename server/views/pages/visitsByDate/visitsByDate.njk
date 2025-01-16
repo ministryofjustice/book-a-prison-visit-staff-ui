@@ -13,10 +13,86 @@
   {{ breadcrumbs() }}
 {% endblock %}
 
+{% macro renderVisitsSection(visitsSection, type) %}
+  {% if visitsSection.capacity %}
+    <h3 class="govuk-heading-m">{{ "all" if type == "unknown" else type | capitalize }} visits</h3>
+    <p data-test="visit-tables-booked-{{ type}}">
+      {{ visitsSection.visits | length }}{{ (" of " + visitsSection.capacity) if visitsSection.capacity }} {{ "table" | pluralise(visitsSection.capacity or visitsSection.visits | length)}} booked
+    </p>
+
+    {% if visitsSection.visits | length %}
+      <p data-test="visit-visitors-total-{{ type}}">
+        {{ visitsSection.numVisitors }} {{ "visitor" | pluralise(visitsSection.numVisitors) }}
+      </p>
+
+      {% set visitsRows = [] %}
+      {% for visit in visitsSection.visits %}
+        {% set visitsRows = (visitsRows.push([
+          {
+            text: visit.lastName | capitalize + ", " + visit.firstName | capitalize,
+            attributes: { "data-test": "prisoner-name" }
+          },
+          {
+            text: visit.prisonerId,
+            attributes: { "data-test": "prisoner-number" }
+          },
+          {
+            text: visit.firstBookedDateTime | formatDate("d MMMM") +
+              " at " + visit.firstBookedDateTime | formatTime,
+            attributes: {
+              "data-test": "booked-on",
+              "data-sort-value": visit.firstBookedDateTime | formatDate("t")
+            }
+          },
+          {
+            classes: "govuk-!-text-align-right",
+            html: '<a href="/visit/' + visit.visitReference + '?' + queryParamsForBackLink +
+              '" class="govuk-link--no-visited-state" data-test="view-visit-link">View</a>'
+          }
+        ]), visitsRows) %}
+      {% endfor %}
+
+        {{ govukTable({
+          attributes: {
+            "data-module": "moj-sortable-table",
+            "data-test": type + "-visits"
+          },
+          classes: "bapv-table govuk-!-margin-top-3",
+          head: [
+            {
+              text: "Prisoner name",
+              attributes: {
+                "aria-sort": "none"
+              }
+            },
+            {
+              text: "Prison number",
+              attributes: {
+                "aria-sort": "none"
+              }
+            },
+            {
+              text: "Booked on",
+              attributes: {
+                "aria-sort": "descending",
+                "data-test": "header-booked-on"
+              }
+            },
+            {
+              text: "Action",
+              classes: "govuk-!-text-align-right"
+            }
+          ],
+          rows: visitsRows
+        }) }}
+    {% endif %}
+  {% endif %}
+{% endmacro %}
+
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-      <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+      <h1 class="govuk-heading-xl">{{ pageHeaderTitle }}</h1>
       {% include "partials/errorSummary.njk" %}
     </div>
   </div>
@@ -78,11 +154,11 @@
           {% set sectionItems = [] %}
           {% for item in items %}
             {% set sectionItems = (sectionItems.push({
-                text: item.times,
+                html: item.times + '<span class="govuk-visually-hidden"> - ' + heading | escape + '</span>',
                 href: "/visits?" + item.queryParams,
                 active: item.active
               }), sectionItems) %}
-              {% set selectedTimeSlotLabel = item.times if item.active else selectedTimeSlotLabel %}
+            {% set selectedTimeSlotLabel = item.times if item.active else selectedTimeSlotLabel %}
           {% endfor %}
           {% set sessionSideNavSections = (sessionSideNavSections.push({
             heading: {
@@ -102,15 +178,16 @@
     {% endif %}
 
     <div class="govuk-grid-column-three-quarters">
-
       {% if sessionsSideNav | length %}
-        <h2 class="govuk-heading-m" data-test="visit-session-heading">
-          {{ (selectedSessionTemplate.type or "all") | capitalize }} visits, {{ selectedTimeSlotLabel }}
-        </h2>
+        {% if selectedSessionSchedule %}
+          <span class="govuk-caption-l">{{ selectedSessionSchedule.visitRoom }}</span>
+        {% endif %}
+        <h2 class="govuk-heading-l">Visits from {{ selectedTimeSlotLabel }}</h2>
 
-        <p data-test="visit-tables-booked">
-          {{ visits | length }}{{ (" of " + selectedSessionTemplate.capacity) if selectedSessionTemplate.capacity }} {{ "table" | pluralise(selectedSessionTemplate.capacity or visits | length)}} booked
-        </p>
+        {{ renderVisitsSection(visits.CLOSED, 'closed') }}
+        {{ renderVisitsSection(visits.OPEN, 'open') }}
+        {{ renderVisitsSection(visits.UNKNOWN, 'unknown') }}
+
       {% else %}
         <p class="govuk-!-margin-top-0" data-test="no-visits-message">
           {% if isAnExcludeDateWithVisitNotifications %}
@@ -121,71 +198,6 @@
             No visit sessions on this day.
           {% endif %}
         </p>
-      {% endif %}
-
-      {% if visits | length %}
-        <p data-test="visit-visitors-total">
-          {{ visitorsTotal }} {{ "visitor" | pluralise(visitorsTotal) }}
-        </p>
-
-        {% set visitsRows = [] %}
-        {% for visit in visits %}
-          {% set visitsRows = (visitsRows.push([
-            {
-              text: visit.lastName | capitalize + ", " + visit.firstName | capitalize,
-              attributes: { "data-test": "prisoner-name" }
-            },
-            {
-              text: visit.prisonerId,
-              attributes: { "data-test": "prisoner-number" }
-            },
-            {
-              text: visit.firstBookedDateTime | formatDate("d MMMM") +
-                " at " + visit.firstBookedDateTime | formatTime,
-              attributes: {
-                "data-test": "booked-on",
-                "data-sort-value": visit.firstBookedDateTime | formatDate("t")
-              }
-            },
-            {
-              classes: "govuk-!-text-align-right",
-              html: '<a href="/visit/' + visit.visitReference + '?' + queryParamsForBackLink +
-                '" class="govuk-link--no-visited-state" data-test="view-visit-link">View</a>'
-            }
-          ]), visitsRows) %}
-        {% endfor %}
-        {{ govukTable({
-          attributes: {
-            "data-module": "moj-sortable-table"
-          },
-          classes: "bapv-table govuk-!-margin-top-3",
-          head: [
-            {
-              text: "Prisoner name",
-              attributes: {
-                "aria-sort": "none"
-              }
-            },
-            {
-              text: "Prison number",
-              attributes: {
-                "aria-sort": "none"
-              }
-            },
-            {
-              text: "Booked on",
-              attributes: {
-                "aria-sort": "descending",
-                "data-test": "header-booked-on"
-              }
-            },
-            {
-              text: "Action",
-              classes: "govuk-!-text-align-right"
-            }
-          ],
-          rows: visitsRows
-        }) }}
       {% endif %}
     </div>
   </div>
