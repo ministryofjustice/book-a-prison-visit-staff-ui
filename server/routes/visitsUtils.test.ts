@@ -1,7 +1,7 @@
 import { VisitsPageSideNav } from '../@types/bapv'
-import { SessionSchedule, VisitPreview, VisitRestriction } from '../data/orchestrationApiTypes'
+import { SessionSchedule, VisitPreview } from '../data/orchestrationApiTypes'
 import TestData from './testutils/testData'
-import { getDateTabs, getSelectedOrDefaultSessionTemplate, getSessionsSideNav } from './visitsUtils'
+import { getDateTabs, getSelectedOrDefaultSessionSchedule, getSessionsSideNav } from './visitsUtils'
 
 describe('getDateTabs', () => {
   const todayString = '2022-05-24'
@@ -100,116 +100,68 @@ describe('getDateTabs', () => {
   })
 })
 
-describe('getSelectedOrDefaultSession', () => {
-  it('should return null if session schedule empty', () => {
-    const sessionSchedule: SessionSchedule[] = []
-    const sessionReference = 'reference'
-    const type: VisitRestriction = 'OPEN'
+describe('getSelectedOrDefaultSessionSchedule', () => {
+  const sessionSchedule: SessionSchedule[] = [
+    TestData.sessionSchedule({
+      sessionTemplateReference: '1',
+      sessionTimeSlot: { startTime: '09:00', endTime: '10:30' },
+      capacity: { open: 0, closed: 5 },
+    }),
+    TestData.sessionSchedule({
+      sessionTemplateReference: '2',
+      sessionTimeSlot: { startTime: '14:00', endTime: '16:30' },
+      capacity: { open: 10, closed: 3 },
+    }),
+  ]
+  describe('with unknown visits not present', () => {
+    it('should return null if session schedule empty', () => {
+      const result = getSelectedOrDefaultSessionSchedule([], '', [])
+      expect(result).toBe(null)
+    })
 
-    const result = getSelectedOrDefaultSessionTemplate(sessionSchedule, sessionReference, type)
+    it('should default to the first session schedule', () => {
+      const sessionReference: string = undefined
+      const result = getSelectedOrDefaultSessionSchedule(sessionSchedule, sessionReference, [])
+      expect(result).toStrictEqual(sessionSchedule[0])
+    })
 
-    expect(result).toBe(null)
+    it('should return selected session schedule if present', () => {
+      const sessionReference: string = sessionSchedule[1].sessionTemplateReference
+      const result = getSelectedOrDefaultSessionSchedule(sessionSchedule, sessionReference, [])
+      expect(result).toStrictEqual(sessionSchedule[1])
+    })
+
+    it('should return default if invalid session reference given', () => {
+      const sessionReference: string = 'invalid reference'
+      const result = getSelectedOrDefaultSessionSchedule(sessionSchedule, sessionReference, [])
+      expect(result).toStrictEqual(sessionSchedule[0])
+    })
   })
 
-  it('should return null if UNKNOWN visit type selected', () => {
-    const sessionSchedule: SessionSchedule[] = []
-    const sessionReference = 'reference'
-    const type: VisitRestriction = 'UNKNOWN'
-
-    const result = getSelectedOrDefaultSessionTemplate(sessionSchedule, sessionReference, type)
-
-    expect(result).toBe(null)
-  })
-
-  it('should default to the first session with capacity (open)', () => {
-    const sessionSchedule: SessionSchedule[] = [
-      TestData.sessionSchedule({
-        sessionTemplateReference: '1',
-        sessionTimeSlot: { startTime: '09:00', endTime: '10:30' },
-        capacity: { open: 0, closed: 5 },
-      }),
-      TestData.sessionSchedule({
-        sessionTemplateReference: '2',
-        sessionTimeSlot: { startTime: '14:00', endTime: '16:30' },
-        capacity: { open: 10, closed: 3 },
-      }),
+  describe('with unknown visits present', () => {
+    const unknownVisits = [
+      TestData.visitPreview({ visitTimeSlot: { startTime: '09:00', endTime: '10:00' } }),
+      TestData.visitPreview({ visitTimeSlot: { startTime: '10:00', endTime: '11:00' } }),
     ]
-    const sessionReference: string = undefined
-    const type: VisitRestriction = undefined
 
-    const result = getSelectedOrDefaultSessionTemplate(sessionSchedule, sessionReference, type)
-
-    expect(result).toStrictEqual({
-      sessionReference: '2',
-      type: 'OPEN',
-      times: '2pm to 4:30pm',
-      capacity: 10,
+    it('should return null if reference matches an unknown visit time slot - empty session schedule', () => {
+      const result = getSelectedOrDefaultSessionSchedule([], '09:00-10:00', unknownVisits)
+      expect(result).toBe(null)
     })
-  })
 
-  it('should default to the first session with capacity (no open; only closed)', () => {
-    const sessionSchedule: SessionSchedule[] = [
-      TestData.sessionSchedule({
-        sessionTemplateReference: '1',
-        sessionTimeSlot: { startTime: '09:00', endTime: '10:30' },
-        capacity: { open: 0, closed: 5 },
-      }),
-    ]
-    const sessionReference: string = undefined
-    const type: VisitRestriction = undefined
-
-    const result = getSelectedOrDefaultSessionTemplate(sessionSchedule, sessionReference, type)
-
-    expect(result).toStrictEqual({
-      sessionReference: '1',
-      type: 'CLOSED',
-      times: '9am to 10:30am',
-      capacity: 5,
+    it('should return null if reference does not match an unknown visit time slot - empty session schedule', () => {
+      const result = getSelectedOrDefaultSessionSchedule([], 'invalid-time-slot', unknownVisits)
+      expect(result).toBe(null)
     })
-  })
 
-  it('should return selected session and type if present', () => {
-    const sessionSchedule: SessionSchedule[] = [TestData.sessionSchedule()]
-    const sessionReference: string = sessionSchedule[0].sessionTemplateReference
-    const type: VisitRestriction = 'OPEN'
-
-    const result = getSelectedOrDefaultSessionTemplate(sessionSchedule, sessionReference, type)
-
-    expect(result).toStrictEqual({
-      sessionReference: sessionSchedule[0].sessionTemplateReference,
-      type: 'OPEN',
-      times: '1:45pm to 3:45pm',
-      capacity: 40,
+    it('should return null if reference matches an unknown visit time slot - with a session schedule', () => {
+      const result = getSelectedOrDefaultSessionSchedule(sessionSchedule, '09:00-10:00', unknownVisits)
+      expect(result).toBe(null)
     })
-  })
 
-  it('should return default if invalid session selected', () => {
-    const sessionSchedule: SessionSchedule[] = [TestData.sessionSchedule()]
-    const sessionReference: string = 'invalid reference'
-    const type: VisitRestriction = 'OPEN'
-
-    const result = getSelectedOrDefaultSessionTemplate(sessionSchedule, sessionReference, type)
-
-    expect(result).toStrictEqual({
-      sessionReference: sessionSchedule[0].sessionTemplateReference,
-      type: 'OPEN',
-      times: '1:45pm to 3:45pm',
-      capacity: 40,
-    })
-  })
-
-  it('should return default if invalid type (because of zero capacity) selected', () => {
-    const sessionSchedule: SessionSchedule[] = [TestData.sessionSchedule()]
-    const sessionReference: string = sessionSchedule[0].sessionTemplateReference
-    const type: VisitRestriction = 'CLOSED'
-
-    const result = getSelectedOrDefaultSessionTemplate(sessionSchedule, sessionReference, type)
-
-    expect(result).toStrictEqual({
-      sessionReference: sessionSchedule[0].sessionTemplateReference,
-      type: 'OPEN',
-      times: '1:45pm to 3:45pm',
-      capacity: 40,
+    it('should return to default of first session schedule if reference does not match an unknown visit time slot - with a session schedule', () => {
+      const result = getSelectedOrDefaultSessionSchedule(sessionSchedule, 'invalid-time-slot', unknownVisits)
+      expect(result).toStrictEqual(sessionSchedule[0])
     })
   })
 })

@@ -303,7 +303,7 @@ describe('Visit service', () => {
       it('should return visit previews for given session template reference, date, prison and restriction', async () => {
         const reference = 'v9d.7ed.7u'
         const sessionDate = '2024-01-31'
-        const visitRestrictions: VisitRestriction = 'OPEN'
+        const visitRestrictions: VisitRestriction[] = ['OPEN', 'CLOSED']
         const visitPreviews = [TestData.visitPreview()]
 
         orchestrationApiClient.getVisitsBySessionTemplate.mockResolvedValue(visitPreviews)
@@ -313,7 +313,6 @@ describe('Visit service', () => {
           prisonId,
           reference,
           sessionDate,
-          visitRestrictions,
         })
 
         expect(orchestrationApiClient.getVisitsBySessionTemplate).toHaveBeenCalledWith(

@@ -129,10 +129,10 @@ describe('orchestrationApiClient', () => {
   })
 
   describe('getVisitsBySessionTemplate', () => {
-    it('should return visit previews details for given session template reference, date, prison and restriction', async () => {
+    it('should return visit previews details for given session template reference, date, and prison', async () => {
       const sessionTemplateReference = 'v9d.7ed.7u'
       const sessionDate = '2024-01-31'
-      const visitRestrictions: VisitRestriction = 'OPEN'
+      const visitRestrictions: VisitRestriction[] = ['OPEN', 'CLOSED']
       const visitPreviews = [TestData.visitPreview()]
 
       fakeOrchestrationApi
@@ -142,7 +142,7 @@ describe('orchestrationApiClient', () => {
           sessionTemplateReference,
           sessionDate,
           visitStatus: 'BOOKED',
-          visitRestrictions,
+          visitRestrictions: visitRestrictions.join(','),
         })
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, visitPreviews)
