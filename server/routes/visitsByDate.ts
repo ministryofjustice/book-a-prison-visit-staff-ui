@@ -37,8 +37,8 @@ export default function routes({
     const selectedDateString = getParsedDateFromQueryString(selectedDate.toString())
     const firstTabDateString = getParsedDateFromQueryString(firstTabDate.toString())
 
-    // get selected date's session schedule and any 'unknown' visits (migrated data with no session template)
-    const [sessionSchedule, unknownVisits] = await Promise.all([
+    // get selected day's session schedules and any 'unknown' visits (migrated data with no session template)
+    const [sessionSchedulesForDay, unknownVisits] = await Promise.all([
       visitSessionsService.getSessionSchedule({
         username,
         prisonId,
@@ -52,30 +52,30 @@ export default function routes({
     ])
 
     // identify if a session schedule has been selected or can be defaulted
-    const selectedSessionSchedule = getSelectedOrDefaultSessionSchedule(sessionSchedule, selectedSessionReference)
+    const sessionSchedule = getSelectedOrDefaultSessionSchedule(sessionSchedulesForDay, selectedSessionReference)
 
     // side nav comprises sessions in schedule and those derived from 'unknown' visits
     const sessionsSideNav = getSessionsSideNav(
-      sessionSchedule,
+      sessionSchedulesForDay,
       unknownVisits,
       selectedDateString,
       firstTabDateString,
-      selectedSessionSchedule?.sessionTemplateReference || selectedSessionReference,
+      selectedSessionReference || sessionSchedule?.sessionTemplateReference,
     )
 
     // data structure for any possible set of visits
-    const visits: Record<VisitRestriction, { capacity: number; numVisitors: number; visits: VisitPreview[] }> = {
-      CLOSED: { capacity: undefined, numVisitors: 0, visits: [] },
-      OPEN: { capacity: undefined, numVisitors: 0, visits: [] },
-      UNKNOWN: { capacity: undefined, numVisitors: 0, visits: [] },
+    const visits: Record<VisitRestriction, { numVisitors: number; visits: VisitPreview[] }> = {
+      CLOSED: { numVisitors: 0, visits: [] },
+      OPEN: { numVisitors: 0, visits: [] },
+      UNKNOWN: { numVisitors: 0, visits: [] },
     }
 
     // fetch visits if a known session is selected and split into open/closed
-    if (selectedSessionSchedule) {
+    if (sessionSchedule) {
       const openAndClosedVisits = await visitService.getVisitsBySessionTemplate({
         username,
         prisonId,
-        reference: selectedSessionSchedule.sessionTemplateReference,
+        reference: sessionSchedule.sessionTemplateReference,
         sessionDate: selectedDateString,
       })
 
@@ -83,14 +83,11 @@ export default function routes({
         visits[visit.visitRestriction].visits.push(visit)
         visits[visit.visitRestriction].numVisitors += visit.visitorCount
       })
-
-      visits.CLOSED.capacity = selectedSessionSchedule.capacity.closed
-      visits.OPEN.capacity = selectedSessionSchedule.capacity.open
     }
 
     // if there are unknown visits, filter these by the selected time slot reference
     const selectedTimeSlotRef = sessionsSideNav.get('All visits')?.find(s => s.active)?.reference
-    if (!selectedSessionSchedule && selectedTimeSlotRef) {
+    if (selectedTimeSlotRef) {
       unknownVisits.forEach(visit => {
         if (`${visit.visitTimeSlot.startTime}-${visit.visitTimeSlot.endTime}` === selectedTimeSlotRef) {
           visits.UNKNOWN.visits.push(visit)
@@ -108,7 +105,7 @@ export default function routes({
 
     const queryParamsForBackLink = new URLSearchParams({
       query: new URLSearchParams({
-        sessionReference: selectedSessionSchedule?.sessionTemplateReference || selectedTimeSlotRef || 'NONE',
+        sessionReference: sessionSchedule?.sessionTemplateReference || selectedTimeSlotRef || 'NONE',
         selectedDate: selectedDateString,
         firstTabDate: firstTabDateString,
       }).toString(),
@@ -126,7 +123,7 @@ export default function routes({
       errors: req.flash('errors'),
       formValues: getFlashFormValues(req),
       dateTabs: getDateTabs(selectedDateString, firstTabDateString, 3),
-      selectedSessionSchedule,
+      sessionSchedule,
       sessionsSideNav,
       queryParamsForBackLink,
       visits,

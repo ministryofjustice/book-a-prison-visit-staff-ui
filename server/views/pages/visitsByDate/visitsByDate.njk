@@ -13,11 +13,14 @@
   {{ breadcrumbs() }}
 {% endblock %}
 
-{% macro renderVisitsSection(visitsSection, type) %}
-  {% if visitsSection.capacity %}
-    <h3 class="govuk-heading-m">{{ "all" if type == "unknown" else type | capitalize }} visits</h3>
+{% macro renderVisitsSection(type) %}
+  {% set visitsSection = visits[type | upper] %}
+  {% set capacity = sessionSchedule.capacity[type] %}
+
+  {% if capacity or (visitsSection.visits | length) %}
+    <h3 class="govuk-heading-m govuk-!-margin-top-7">{{ ("all" if type == "unknown" else type) | capitalize }} visits</h3>
     <p data-test="visit-tables-booked-{{ type}}">
-      {{ visitsSection.visits | length }}{{ (" of " + visitsSection.capacity) if visitsSection.capacity }} {{ "table" | pluralise(visitsSection.capacity or visitsSection.visits | length)}} booked
+      {{ visitsSection.visits | length }}{{ (" of " + capacity) if capacity }} {{ "table" | pluralise(capacity or visitsSection.visits | length)}} booked
     </p>
 
     {% if visitsSection.visits | length %}
@@ -57,7 +60,7 @@
             "data-module": "moj-sortable-table",
             "data-test": type + "-visits"
           },
-          classes: "bapv-table govuk-!-margin-top-3",
+          classes: "bapv-table govuk-!-margin-top-3 govuk-!-margin-bottom-9",
           head: [
             {
               text: "Prisoner name",
@@ -179,14 +182,14 @@
 
     <div class="govuk-grid-column-three-quarters">
       {% if sessionsSideNav | length %}
-        {% if selectedSessionSchedule %}
-          <span class="govuk-caption-l">{{ selectedSessionSchedule.visitRoom }}</span>
+        {% if sessionSchedule %}
+          <span class="govuk-caption-l" data-test="visit-room-caption">{{ sessionSchedule.visitRoom }}</span>
         {% endif %}
         <h2 class="govuk-heading-l">Visits from {{ selectedTimeSlotLabel }}</h2>
 
-        {{ renderVisitsSection(visits.CLOSED, 'closed') }}
-        {{ renderVisitsSection(visits.OPEN, 'open') }}
-        {{ renderVisitsSection(visits.UNKNOWN, 'unknown') }}
+        {{ renderVisitsSection('closed') }}
+        {{ renderVisitsSection('open') }}
+        {{ renderVisitsSection('unknown') }}
 
       {% else %}
         <p class="govuk-!-margin-top-0" data-test="no-visits-message">
