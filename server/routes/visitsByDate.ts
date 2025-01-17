@@ -52,7 +52,11 @@ export default function routes({
     ])
 
     // identify if a session schedule has been selected or can be defaulted
-    const sessionSchedule = getSelectedOrDefaultSessionSchedule(sessionSchedulesForDay, selectedSessionReference)
+    const sessionSchedule = getSelectedOrDefaultSessionSchedule(
+      sessionSchedulesForDay,
+      selectedSessionReference,
+      unknownVisits,
+    )
 
     // side nav comprises sessions in schedule and those derived from 'unknown' visits
     const sessionsSideNav = getSessionsSideNav(
@@ -60,7 +64,7 @@ export default function routes({
       unknownVisits,
       selectedDateString,
       firstTabDateString,
-      selectedSessionReference || sessionSchedule?.sessionTemplateReference,
+      sessionSchedule?.sessionTemplateReference || selectedSessionReference,
     )
 
     // data structure for any possible set of visits

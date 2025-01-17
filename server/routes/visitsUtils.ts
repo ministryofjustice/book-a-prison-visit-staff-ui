@@ -39,8 +39,13 @@ export const getDateTabs = (
 export function getSelectedOrDefaultSessionSchedule(
   sessionSchedule: SessionSchedule[],
   sessionReference: string,
+  unknownVisits: VisitPreview[],
 ): SessionSchedule {
-  if (!sessionSchedule.length) {
+  const isValidUnknownVisitTimeSlot = unknownVisits.some(
+    visit => `${visit.visitTimeSlot.startTime}-${visit.visitTimeSlot.endTime}` === sessionReference,
+  )
+
+  if (!sessionSchedule.length || isValidUnknownVisitTimeSlot) {
     return null
   }
 

@@ -113,28 +113,56 @@ describe('getSelectedOrDefaultSessionSchedule', () => {
       capacity: { open: 10, closed: 3 },
     }),
   ]
+  describe('with unknown visits not present', () => {
+    it('should return null if session schedule empty', () => {
+      const result = getSelectedOrDefaultSessionSchedule([], '', [])
+      expect(result).toBe(null)
+    })
 
-  it('should return null if session schedule empty', () => {
-    const result = getSelectedOrDefaultSessionSchedule([], '')
-    expect(result).toBe(null)
+    it('should default to the first session schedule', () => {
+      const sessionReference: string = undefined
+      const result = getSelectedOrDefaultSessionSchedule(sessionSchedule, sessionReference, [])
+      expect(result).toStrictEqual(sessionSchedule[0])
+    })
+
+    it('should return selected session schedule if present', () => {
+      const sessionReference: string = sessionSchedule[1].sessionTemplateReference
+      const result = getSelectedOrDefaultSessionSchedule(sessionSchedule, sessionReference, [])
+      expect(result).toStrictEqual(sessionSchedule[1])
+    })
+
+    it('should return default if invalid session reference given', () => {
+      const sessionReference: string = 'invalid reference'
+      const result = getSelectedOrDefaultSessionSchedule(sessionSchedule, sessionReference, [])
+      expect(result).toStrictEqual(sessionSchedule[0])
+    })
   })
 
-  it('should default to the first session schedule', () => {
-    const sessionReference: string = undefined
-    const result = getSelectedOrDefaultSessionSchedule(sessionSchedule, sessionReference)
-    expect(result).toStrictEqual(sessionSchedule[0])
-  })
+  describe('with unknown visits present', () => {
+    const unknownVisits = [
+      TestData.visitPreview({ visitTimeSlot: { startTime: '09:00', endTime: '10:00' } }),
+      TestData.visitPreview({ visitTimeSlot: { startTime: '10:00', endTime: '11:00' } }),
+    ]
 
-  it('should return selected session schedule if present', () => {
-    const sessionReference: string = sessionSchedule[1].sessionTemplateReference
-    const result = getSelectedOrDefaultSessionSchedule(sessionSchedule, sessionReference)
-    expect(result).toStrictEqual(sessionSchedule[1])
-  })
+    it('should return null if reference matches an unknown visit time slot - empty session schedule', () => {
+      const result = getSelectedOrDefaultSessionSchedule([], '09:00-10:00', unknownVisits)
+      expect(result).toBe(null)
+    })
 
-  it('should return default if invalid session reference given', () => {
-    const sessionReference: string = 'invalid reference'
-    const result = getSelectedOrDefaultSessionSchedule(sessionSchedule, sessionReference)
-    expect(result).toStrictEqual(sessionSchedule[0])
+    it('should return null if reference does not match an unknown visit time slot - empty session schedule', () => {
+      const result = getSelectedOrDefaultSessionSchedule([], 'invalid-time-slot', unknownVisits)
+      expect(result).toBe(null)
+    })
+
+    it('should return null if reference matches an unknown visit time slot - with a session schedule', () => {
+      const result = getSelectedOrDefaultSessionSchedule(sessionSchedule, '09:00-10:00', unknownVisits)
+      expect(result).toBe(null)
+    })
+
+    it('should return to default of first session schedule if reference does not match an unknown visit time slot - with a session schedule', () => {
+      const result = getSelectedOrDefaultSessionSchedule(sessionSchedule, 'invalid-time-slot', unknownVisits)
+      expect(result).toStrictEqual(sessionSchedule[0])
+    })
   })
 })
 

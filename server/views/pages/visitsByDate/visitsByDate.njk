@@ -18,14 +18,17 @@
   {% set capacity = sessionSchedule.capacity[type] %}
 
   {% if capacity or (visitsSection.visits | length) %}
-    <h3 class="govuk-heading-m govuk-!-margin-top-7">{{ ("all" if type == "unknown" else type) | capitalize }} visits</h3>
+    <h3 class="govuk-heading-m govuk-!-margin-top-7" data-test="visit-section-heading-{{ type }}">
+      {{- ("all" if type == "unknown" else type) | capitalize }} visits
+    </h3>
+
     <p data-test="visit-tables-booked-{{ type}}">
       {{ visitsSection.visits | length }}{{ (" of " + capacity) if capacity }} {{ "table" | pluralise(capacity or visitsSection.visits | length)}} booked
     </p>
 
     {% if visitsSection.visits | length %}
       <p data-test="visit-visitors-total-{{ type}}">
-        {{ visitsSection.numVisitors }} {{ "visitor" | pluralise(visitsSection.numVisitors) }}
+        {{- visitsSection.numVisitors }} {{ "visitor" | pluralise(visitsSection.numVisitors) -}}
       </p>
 
       {% set visitsRows = [] %}
@@ -58,7 +61,7 @@
         {{ govukTable({
           attributes: {
             "data-module": "moj-sortable-table",
-            "data-test": type + "-visits"
+            "data-test": "visits-" + type
           },
           classes: "bapv-table govuk-!-margin-top-3 govuk-!-margin-bottom-9",
           head: [
