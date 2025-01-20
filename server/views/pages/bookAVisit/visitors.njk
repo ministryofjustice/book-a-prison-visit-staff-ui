@@ -4,8 +4,9 @@
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {%- from "moj/components/banner/macro.njk" import mojBanner -%}
 {% from "components/visitors.njk" import visitorDateOfBirth, visitorRestrictions %}
+{%- from "components/expandableComment/macro.njk" import bapvExpandableComment -%}
 
-{% set pageHeaderTitle = "Select visitors from the prisoner’s approved visitor list" %}
+{% set pageHeaderTitle = "Select visitors" %}
 
 {% set backLinkHref = backLink %}
 
@@ -60,149 +61,178 @@
 
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
 
-      <p><strong>Prisoner name:</strong> <span data-test="prisoner-name">{{ prisonerName }}</span></p>
+      {% if atLeastOneAdult === true and eligibleVisitors === true %}
 
-      {% if restrictions | length %}
-      <div class="prisoner-restrictions">
-        <h2 class="govuk-heading-m">Prisoner's active restrictions</h2>
-        {% set prisonerRestrictions = [] %}
-        {% for restriction in restrictions %}
-          {% set restrictionStartDate %}{% if restriction.startDate %}{{ restriction.startDate | formatDate }}{% else %}Not entered{% endif %}{% endset %}
-          {% set restrictionExpiryDate %}{% if restriction.expiryDate %}{{ restriction.expiryDate | formatDate }}{% else %}Not entered{% endif %}{% endset %}
-          {%- set prisonerRestrictions = (prisonerRestrictions.push([
-            {
-              html: '<span class="test-restrictions-type' + loop.index + ' govuk-tag restriction-tag restriction-tag--' + restriction.restrictionType + '">' + restriction.restrictionTypeDescription + '</span>'
-            },
-            {
-              text: restriction.comment,
-              classes: "bapv-force-overflow test-restrictions-comment" + loop.index
-            },
-            {
-              text: restrictionStartDate,
-              classes: "test-restrictions-start-date" + loop.index
-            },
-            {
-              text: restrictionExpiryDate,
-              classes: "test-restrictions-end-date" + loop.index
-            }
-          ]), prisonerRestrictions) %}
-        {% endfor %}
-        {{ govukTable({
-          classes: 'bapv-table-no-bottom-border',
-          head: [
-            {
-              text: "Type of restriction"
-            },
-            {
-              text: "Comments"
-            },
-            {
-              text: "Date from"
-            },
-            {
-              text: "Date to"
-            }
-          ],
-          rows: prisonerRestrictions
-        }) }}
-      </div>
-      {% endif %}
+        <h2 class="govuk-heading-m" data-test="prisoner-name">{{ prisonerName }} active restrictions and alerts</h2>
 
-      {% set noVisitorsText %}
-        {% if atLeastOneAdult === false %}
-          {{ 'approved' }}
-        {% elif atLeastOneAdult === true and eligibleVisitors === false %}
-          {{ 'permitted' }}
-        {% endif %}
-      {% endset %}
-      {% if noVisitorsText !== '' %}
-        {% set noVisitorsHtml %}
-          {{ govukWarningText({
-            classes: "govuk-!-margin-bottom-0",
-            html: '<span class="govuk-!-font-size-24">There are no' + noVisitorsText + 'visitors over 18 for this prisoner. A booking cannot be made at this time.</span>',
-            iconFallbackText: "Warning",
-            attributes: {
-              "data-test": "no-suitable-visitors"
-            }
+        <p>Review restrictions and alerts before selecting visitors.</p>
+
+        <p>This page shows alerts that are relevant for social visits. You can also <a class="govuk-link--no-visited-state" href="{{ prisonerDpsAlertsUrl }}" target="_blank" data-test="all-alerts-link">view all alerts</a>.</p>
+
+        {% if restrictions | length or activeAlerts | length %}
+          {% set prisonerRestrictions = [] %}
+          {% for restriction in restrictions %}
+            {% set restrictionExpiryDate %}{% if restriction.expiryDate %}{{ restriction.expiryDate | formatDate }}{% else %}No end date{% endif %}{% endset %}
+            {%- set prisonerRestrictions = (prisonerRestrictions.push([
+              {
+                html: '<span data-test="restrictions-type' + loop.index + '" class="govuk-tag restriction-tag restriction-tag--' + restriction.restrictionType + '">' + restriction.restrictionTypeDescription + '</span>'
+              },
+              {
+                text: restriction.comment,
+                classes: "bapv-force-overflow",
+                attributes: { "data-test":"restrictions-comment" + loop.index }
+              },
+              {
+                text: restrictionExpiryDate,
+                attributes: { "data-test":"restrictions-end-date" + loop.index }
+              }
+            ]), prisonerRestrictions) %}
+          {% endfor %}
+
+          {% set prisonerAlerts = [] %}
+          {% for alert in activeAlerts %}
+            {% set alertExpiryDate %}{% if alert.dateExpires %}{{ alert.dateExpires | formatDate }}{% else %}No end date{% endif %}{% endset %}
+            {%- set prisonerAlerts = (prisonerAlerts.push([
+              {
+                html: '<span data-test="alert-type' + loop.index + '" class="govuk-tag alert-tag alert-tag--' + alert.alertType + '">' + alert.alertCodeDescription + '</span>'
+              },
+              {
+                html: bapvExpandableComment({ text: alert.comment }),
+                attributes: { "data-test":"alert-comment" + loop.index }
+              },
+              {
+                text: alertExpiryDate,
+                attributes: { "data-test":"alert-end-date" + loop.index }
+              }
+            ]), prisonerAlerts) %}
+          {% endfor %}
+          {% if restrictions | length %}
+            {{ govukTable({
+              classes: 'bapv-table-no-bottom-border fix-width-alert-restriction',
+              head: [
+                {
+                  text: "Type of restriction"
+                },
+                {
+                  text: "Comments"
+                },
+                {
+                  text: "End date"
+                }
+              ],
+              rows: prisonerRestrictions
+            }) }}
+          {% endif %}
+
+          {% if activeAlerts | length %}
+          {{ govukTable({
+            classes: 'bapv-table-no-bottom-border fix-width-alert-restriction',
+            head: [
+              {
+                text: "Type of alert"
+              },
+              {
+                text: "Comments"
+              },
+              {
+                text: "End date"
+              }
+            ],
+            rows: prisonerAlerts
           }) }}
-        {% endset %}
-        {{ mojBanner({
-          classes: "govuk-!-padding-left-4" ,
-          html: noVisitorsHtml
-        }) }}
+          {% endif %}
+
+        {% endif %}
+
       {% endif %}
 
       <h2 class="govuk-heading-m">Approved visitor list</h2>
       {% if visitors | length %}
-      {% if errors | length %}
-      <p id="visitors-error" class="govuk-error-message">
-        <span class="govuk-visually-hidden">Error:</span> {{ errors[0].msg }}
-      </p>
-      {% endif %}
 
-        <p>
-          Up to <span data-test="visitors-max-total">{{ selectedEstablishment.maxTotalVisitors }} {{ "person" | pluralise(selectedEstablishment.maxTotalVisitors, "people") }}</span>
-          can visit someone at <span data-test="prison-name">{{ selectedEstablishment.prisonName }}</span>. This includes:
-        </p>
-        <ul class="govuk-list govuk-list--bullet">
-          <li>
-            <span data-test="visitors-max-adults">{{ selectedEstablishment.maxAdultVisitors }} {{ "person" | pluralise(selectedEstablishment.maxAdultVisitors, "people") }}</span>
-            <span data-test="visitors-adult-age">{{ selectedEstablishment.adultAgeYears }} {{ "year" | pluralise(selectedEstablishment.adultAgeYears) }}</span> old or older
-          </li>
-          <li>
-            <span data-test="visitors-max-children">{{ selectedEstablishment.maxChildVisitors }} {{ "person" | pluralise(selectedEstablishment.maxChildVisitors, "people") }}</span> under
-            <span data-test="visitors-adult-age">{{ selectedEstablishment.adultAgeYears }} {{ "year" | pluralise(selectedEstablishment.adultAgeYears) }}</span> old
-          </li>
-        </ul>
-        <p>At least one visitor must be 18 years or older.</p>
-
-      <form action="{{ urlPrefix }}/select-visitors" method="POST" novalidate>
-        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-
-        <div class="govuk-form-group{% if errors | length %} govuk-form-group--error{% endif %}">
-        {{ govukTable({
-          head: [
-            {
-              text: "Add to visit"
-            },
-            {
-              text: "Name"
-            },
-            {
-              text: "Date of birth"
-            },
-            {
-              text: "Relationship to prisoner"
-            },
-            {
-              text: "Address"
-            },
-            {
-              html: "Restrictions",
-              classes: "govuk-!-width-one-quarter"
-            }
-          ],
-          rows: visitors
-        }) }}
-        </div>
-
-        {% if eligibleVisitors === true %}
-          {{ govukButton({
-            text: "Continue",
-            attributes: { "data-test": "submit" },
-            preventDoubleClick: true
-          }) }}
-        {% else %}
-          {% include "partials/backToStartButton.njk" %}
+        {% if errors | length %}
+          <p id="visitors-error" class="govuk-error-message">
+            <span class="govuk-visually-hidden">Error:</span> {{ errors[0].msg }}
+          </p>
         {% endif %}
+    
+        {% if atLeastOneAdult === false %}
+          <p data-test="no-suitable-visitors">There are no approved visitors 18 years old or older for this prisoner. A booking cannot be made at this time.</p>
+        {% elif atLeastOneAdult === true and eligibleVisitors === false %}
+          <p data-test="no-suitable-visitors">There are no visitors 18 years old or older who are not currently banned. A booking cannot be made at this time.</p>
+        {% else %}
 
-      </form>
-    {% else %}
-    <p>There are no approved visitors for this prisoner. A booking cannot be made at this time.</p>
+          <p>
+            Up to <span data-test="visitors-max-total">{{ selectedEstablishment.maxTotalVisitors }} {{ "person" | pluralise(selectedEstablishment.maxTotalVisitors, "people") }}</span>
+            can visit someone at <span data-test="prison-name">{{ selectedEstablishment.prisonName }}</span>. This includes:
+          </p>
+          <ul class="govuk-list govuk-list--bullet">
+            <li>
+              <span data-test="visitors-max-adults">{{ selectedEstablishment.maxAdultVisitors }} {{ "person" | pluralise(selectedEstablishment.maxAdultVisitors, "people") }}</span>
+              <span data-test="visitors-adult-age">{{ selectedEstablishment.adultAgeYears }} {{ "year" | pluralise(selectedEstablishment.adultAgeYears) }}</span> old or older
+            </li>
+            <li>
+              <span data-test="visitors-max-children">{{ selectedEstablishment.maxChildVisitors }} {{ "person" | pluralise(selectedEstablishment.maxChildVisitors, "people") }}</span> under
+              <span data-test="visitors-adult-age">{{ selectedEstablishment.adultAgeYears }} {{ "year" | pluralise(selectedEstablishment.adultAgeYears) }}</span> old
+            </li>
+          </ul>
+          <p>At least one visitor must be 18 years or older.</p>
+        {% endif %}
+      
+        <form action="{{ urlPrefix }}/select-visitors" method="POST" novalidate>
+          <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
-    {% include "partials/backToStartButton.njk" %}
+          <div class="govuk-form-group{% if errors | length %} govuk-form-group--error{% endif %}">
+          {{ govukTable({
+            head: [
+              {
+                text: "Add to visit"
+              },
+              {
+                text: "Name"
+              },
+              {
+                text: "Date of birth"
+              },
+              {
+                text: "Relationship to prisoner"
+              },
+              {
+                text: "Address"
+              },
+              {
+                html: "Restrictions",
+                classes: "govuk-!-width-one-quarter"
+              }
+            ],
+            rows: visitors
+          }) }}
+          </div>
 
-    {% endif %}
+          {% if eligibleVisitors === true %}
+
+          <div class="govuk-button-group">
+            {{ govukButton({
+              text: "Continue",
+              attributes: { "data-test": "submit" },
+              preventDoubleClick: true
+            }) }}
+
+            <a href="/back-to-start" class="govuk-link govuk-link--no-visited-state">Start again</a>
+          </div>
+          {% else %}
+            {% include "partials/backToStartButton.njk" %}
+          {% endif %}
+
+        </form>
+      {% else %}
+        <p data-test="no-suitable-visitors">There are no approved visitors for this prisoner. A booking cannot be made at this time.</p>
+
+        {% include "partials/backToStartButton.njk" %}
+      {% endif %}
     </div>
   </div>
+{% endblock %}
+
+{% block pageScripts %}
+  <script src="/assets/components/expandableComment.js"></script>
 {% endblock %}

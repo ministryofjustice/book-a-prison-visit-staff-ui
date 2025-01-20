@@ -275,4 +275,37 @@ describe('Nunjucks Filters', () => {
       })
     })
   })
+
+  describe('splitOnNewline', () => {
+    it('should handle null or undefined', () => {
+      const expectedResult = ['', '']
+
+      expect(njkEnv.getFilter('splitOnNewline')(null)).toStrictEqual(expectedResult)
+      expect(njkEnv.getFilter('splitOnNewline')(undefined)).toStrictEqual(expectedResult)
+    })
+
+    it('should handle a string with no newline', () => {
+      const input = 'a string with no newline '
+      const expectedResult = ['a string with no newline', '']
+
+      const result = njkEnv.getFilter('splitOnNewline')(input)
+      expect(result).toStrictEqual(expectedResult)
+    })
+
+    it('should trim and ignore leading or trailing newlines or whitespace', () => {
+      const input = ' \r\n a string with leading and trailing whitespace\n '
+      const expectedResult = ['a string with leading and trailing whitespace', '']
+
+      const result = njkEnv.getFilter('splitOnNewline')(input)
+      expect(result).toStrictEqual(expectedResult)
+    })
+
+    it('should split on first non-leading newline and keep subsequent newlines', () => {
+      const input = ' \n line one\n\nline two\n\nline three \n\n '
+      const expectedResult = ['line one', 'line two\n\nline three']
+
+      const result = njkEnv.getFilter('splitOnNewline')(input)
+      expect(result).toStrictEqual(expectedResult)
+    })
+  })
 })
