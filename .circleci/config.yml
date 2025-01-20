@@ -2,6 +2,7 @@ main_branch: &main_branch
   filters:
     branches:
       only: main
+
 feature_branch: &feature_branch
   filters:
     branches:
@@ -34,11 +35,10 @@ jobs:
         environment:
           CHROME_HEADLESS: 1
     circleci_ip_ranges: true
-
     steps:
       - run:
           name: Checkout VSIP UI Tests
-          command:
+          command: |
             git clone https://github.com/ministryofjustice/hmpps-vsip-ui-tests.git
       - run:
           name: get git status
@@ -56,6 +56,40 @@ jobs:
           command: |
             cd hmpps-vsip-ui-tests
             mvn test -Dbrowser=remote-chrome -Dspring.profiles.active="staging" -Dtest=uk.gov.justice.digital.hmpps.vsip.suites.RunSuite
+
+  acceptance_tests_staff_playwright-e2e:
+    docker:
+      - image: mcr.microsoft.com/playwright:v1.47.2-jammy
+    circleci_ip_ranges: true
+    steps:
+      - run:
+          name: Checkout VSIP Staff UI Playwright E2E Tests
+          command: git clone https://github.com/ministryofjustice/hmpps-book-a-prison-visit-staff-e2e-tests.git
+      - run:
+          name: get git status
+          command: |
+            cd hmpps-book-a-prison-visit-staff-e2e-tests
+            git checkout main
+            git pull
+            git status
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Install Dependencies
+          command: |
+            cd hmpps-book-a-prison-visit-staff-e2e-tests
+            npm ci --no-audit
+      - run:
+          name: Run Playwright Tests
+          command: |
+            cd hmpps-book-a-prison-visit-staff-e2e-tests
+            npm run test:ci
+      - store_test_results:
+          path: /root/project/hmpps-book-a-prison-visit-staff-e2e-tests/results.xml
+      - store_artifacts:
+          path: /root/project/hmpps-book-a-prison-visit-staff-e2e-tests/playwright-report/index.html
+      - store_artifacts:
+          path: /root/project/hmpps-book-a-prison-visit-staff-e2e-tests/test-results
 
   build:
     executor:
@@ -76,7 +110,7 @@ jobs:
       - run:
           command: |
             npm run build
-      - run: # Run linter after build because the integration test code depend on compiled typescript...
+      - run: # Run linter after build because the integration test code depends on compiled typescript...
           name: Linter check
           command: npm run lint
       - persist_to_workspace:
@@ -206,6 +240,17 @@ workflows:
           requires:
             - request-acceptance-tests-preview-approval
 
+      - request-acceptance-tests-preview-staff-playwright-approval:
+          <<: *feature_branch
+          type: approval
+          requires:
+            - deploy_staging_preview
+      - acceptance_tests_staff_playwright-e2e:
+          <<: *feature_branch
+          requires:
+            - request-acceptance-tests-preview-staff-playwright-approval
+          context: playwright-book-a-prison-visit-staff-e2e-ui-tests-staging
+
       - request-preprod-preview-approval:
           <<: *feature_branch
           type: approval
@@ -251,11 +296,22 @@ workflows:
           requires:
             - request-acceptance-tests-approval
 
+      - request-acceptance-tests-staff-playwright-approval:
+          <<: *main_branch
+          type: approval
+          requires:
+            - deploy_staging
+      - acceptance_tests_staff_playwright-e2e:
+          <<: *main_branch
+          requires:
+            - request-acceptance-tests-staff-playwright-approval
+          context: playwright-book-a-prison-visit-staff-e2e-ui-tests-staging
+
       - request-preprod-approval:
           <<: *main_branch
           type: approval
           requires:
-           - deploy_staging
+            - deploy_staging
       - hmpps/deploy_env:
           name: deploy_preprod
           env: "preprod"
