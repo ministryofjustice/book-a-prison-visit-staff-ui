@@ -61,55 +61,75 @@
 
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
 
-      <h2 class="govuk-heading-m" data-test="prisoner-name">{{ prisonerName }} active restrictions and alerts</h2>
+      {% if atLeastOneAdult === true and eligibleVisitors === true %}
 
-      <p>Review restrictions and alerts before selecting visitors.</p>
+        <h2 class="govuk-heading-m" data-test="prisoner-name">{{ prisonerName }} active restrictions and alerts</h2>
 
-      <p>This page shows alerts that are relevant for social visits. You can also <a class="govuk-link--no-visited-state" href="{{ prisonerDpsAlertsUrl }}" target="_blank" data-test="all-alerts-link">view all alerts</a>.</p>
+        <p>Review restrictions and alerts before selecting visitors.</p>
 
-      {% if restrictions | length or activeAlerts | length %}
-        {% set prisonerRestrictions = [] %}
-        {% for restriction in restrictions %}
-          {% set restrictionExpiryDate %}{% if restriction.expiryDate %}{{ restriction.expiryDate | formatDate }}{% else %}No end date{% endif %}{% endset %}
-          {%- set prisonerRestrictions = (prisonerRestrictions.push([
-            {
-              html: '<span data-test="restrictions-type' + loop.index + '" class="govuk-tag restriction-tag restriction-tag--' + restriction.restrictionType + '">' + restriction.restrictionTypeDescription + '</span>'
-            },
-            {
-              text: restriction.comment,
-              classes: "bapv-force-overflow",
-              attributes: { "data-test":"restrictions-comment" + loop.index }
-            },
-            {
-              text: restrictionExpiryDate,
-              attributes: { "data-test":"restrictions-end-date" + loop.index }
-            }
-          ]), prisonerRestrictions) %}
-        {% endfor %}
+        <p>This page shows alerts that are relevant for social visits. You can also <a class="govuk-link--no-visited-state" href="{{ prisonerDpsAlertsUrl }}" target="_blank" data-test="all-alerts-link">view all alerts</a>.</p>
 
-        {% set prisonerAlerts = [] %}
-        {% for alert in activeAlerts %}
-          {% set alertExpiryDate %}{% if alert.dateExpires %}{{ alert.dateExpires | formatDate }}{% else %}No end date{% endif %}{% endset %}
-          {%- set prisonerAlerts = (prisonerAlerts.push([
-            {
-              html: '<span data-test="alert-type' + loop.index + '" class="govuk-tag alert-tag alert-tag--' + alert.alertType + '">' + alert.alertCodeDescription + '</span>'
-            },
-            {
-              html: bapvExpandableComment({ text: alert.comment }),
-              attributes: { "data-test":"alert-comment" + loop.index }
-            },
-            {
-              text: alertExpiryDate,
-              attributes: { "data-test":"alert-end-date" + loop.index }
-            }
-          ]), prisonerAlerts) %}
-        {% endfor %}
-        {% if restrictions | length %}
+        {% if restrictions | length or activeAlerts | length %}
+          {% set prisonerRestrictions = [] %}
+          {% for restriction in restrictions %}
+            {% set restrictionExpiryDate %}{% if restriction.expiryDate %}{{ restriction.expiryDate | formatDate }}{% else %}No end date{% endif %}{% endset %}
+            {%- set prisonerRestrictions = (prisonerRestrictions.push([
+              {
+                html: '<span data-test="restrictions-type' + loop.index + '" class="govuk-tag restriction-tag restriction-tag--' + restriction.restrictionType + '">' + restriction.restrictionTypeDescription + '</span>'
+              },
+              {
+                text: restriction.comment,
+                classes: "bapv-force-overflow",
+                attributes: { "data-test":"restrictions-comment" + loop.index }
+              },
+              {
+                text: restrictionExpiryDate,
+                attributes: { "data-test":"restrictions-end-date" + loop.index }
+              }
+            ]), prisonerRestrictions) %}
+          {% endfor %}
+
+          {% set prisonerAlerts = [] %}
+          {% for alert in activeAlerts %}
+            {% set alertExpiryDate %}{% if alert.dateExpires %}{{ alert.dateExpires | formatDate }}{% else %}No end date{% endif %}{% endset %}
+            {%- set prisonerAlerts = (prisonerAlerts.push([
+              {
+                html: '<span data-test="alert-type' + loop.index + '" class="govuk-tag alert-tag alert-tag--' + alert.alertType + '">' + alert.alertCodeDescription + '</span>'
+              },
+              {
+                html: bapvExpandableComment({ text: alert.comment }),
+                attributes: { "data-test":"alert-comment" + loop.index }
+              },
+              {
+                text: alertExpiryDate,
+                attributes: { "data-test":"alert-end-date" + loop.index }
+              }
+            ]), prisonerAlerts) %}
+          {% endfor %}
+          {% if restrictions | length %}
+            {{ govukTable({
+              classes: 'bapv-table-no-bottom-border fix-width-alert-restriction',
+              head: [
+                {
+                  text: "Type of restriction"
+                },
+                {
+                  text: "Comments"
+                },
+                {
+                  text: "End date"
+                }
+              ],
+              rows: prisonerRestrictions
+            }) }}
+          {% endif %}
+
+          {% if activeAlerts | length %}
           {{ govukTable({
             classes: 'bapv-table-no-bottom-border fix-width-alert-restriction',
             head: [
               {
-                text: "Type of restriction"
+                text: "Type of alert"
               },
               {
                 text: "Comments"
@@ -118,26 +138,10 @@
                 text: "End date"
               }
             ],
-            rows: prisonerRestrictions
+            rows: prisonerAlerts
           }) }}
-        {% endif %}
+          {% endif %}
 
-        {% if activeAlerts | length %}
-        {{ govukTable({
-          classes: 'bapv-table-no-bottom-border fix-width-alert-restriction',
-          head: [
-            {
-              text: "Type of alert"
-            },
-            {
-              text: "Comments"
-            },
-            {
-              text: "End date"
-            }
-          ],
-          rows: prisonerAlerts
-        }) }}
         {% endif %}
 
       {% endif %}
