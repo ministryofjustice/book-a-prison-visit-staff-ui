@@ -74,6 +74,13 @@ context('Prisoner profile page', () => {
 
     // Active alerts tab
     prisonerProfilePage.selectActiveAlertsTab()
+    prisonerProfilePage
+      .alertsLink()
+      .should(
+        'have.attr',
+        'href',
+        'https://prisoner-dev.digital.prison.service.justice.gov.uk/prisoner/A1234BC/alerts/active',
+      )
     prisonerProfilePage.alertsTabType().eq(0).contains('COVID unit management (U)')
     prisonerProfilePage.alertsTabCode().eq(0).contains('UPIU')
     prisonerProfilePage.alertsTabComment().eq(0).contains('Alert comment')
