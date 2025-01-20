@@ -142,106 +142,89 @@
 
       {% endif %}
 
-      {% set noVisitorsText %}
-        {% if atLeastOneAdult === false %}
-          {{ 'approved' }}
-        {% elif atLeastOneAdult === true and eligibleVisitors === false %}
-          {{ 'permitted' }}
-        {% endif %}
-      {% endset %}
-      {% if noVisitorsText !== '' %}
-        {% set noVisitorsHtml %}
-          {{ govukWarningText({
-            classes: "govuk-!-margin-bottom-0",
-            html: '<span class="govuk-!-font-size-24">There are no' + noVisitorsText + 'visitors over 18 for this prisoner. A booking cannot be made at this time.</span>',
-            iconFallbackText: "Warning",
-            attributes: {
-              "data-test": "no-suitable-visitors"
-            }
-          }) }}
-        {% endset %}
-        {{ mojBanner({
-          classes: "govuk-!-padding-left-4" ,
-          html: noVisitorsHtml
-        }) }}
-      {% endif %}
-
       <h2 class="govuk-heading-m">Approved visitor list</h2>
       {% if visitors | length %}
-      {% if errors | length %}
-      <p id="visitors-error" class="govuk-error-message">
-        <span class="govuk-visually-hidden">Error:</span> {{ errors[0].msg }}
-      </p>
-      {% endif %}
 
-        <p>
-          Up to <span data-test="visitors-max-total">{{ selectedEstablishment.maxTotalVisitors }} {{ "person" | pluralise(selectedEstablishment.maxTotalVisitors, "people") }}</span>
-          can visit someone at <span data-test="prison-name">{{ selectedEstablishment.prisonName }}</span>. This includes:
-        </p>
-        <ul class="govuk-list govuk-list--bullet">
-          <li>
-            <span data-test="visitors-max-adults">{{ selectedEstablishment.maxAdultVisitors }} {{ "person" | pluralise(selectedEstablishment.maxAdultVisitors, "people") }}</span>
-            <span data-test="visitors-adult-age">{{ selectedEstablishment.adultAgeYears }} {{ "year" | pluralise(selectedEstablishment.adultAgeYears) }}</span> old or older
-          </li>
-          <li>
-            <span data-test="visitors-max-children">{{ selectedEstablishment.maxChildVisitors }} {{ "person" | pluralise(selectedEstablishment.maxChildVisitors, "people") }}</span> under
-            <span data-test="visitors-adult-age">{{ selectedEstablishment.adultAgeYears }} {{ "year" | pluralise(selectedEstablishment.adultAgeYears) }}</span> old
-          </li>
-        </ul>
-        <p>At least one visitor must be 18 years or older.</p>
-
-      <form action="{{ urlPrefix }}/select-visitors" method="POST" novalidate>
-        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-
-        <div class="govuk-form-group{% if errors | length %} govuk-form-group--error{% endif %}">
-        {{ govukTable({
-          head: [
-            {
-              text: "Add to visit"
-            },
-            {
-              text: "Name"
-            },
-            {
-              text: "Date of birth"
-            },
-            {
-              text: "Relationship to prisoner"
-            },
-            {
-              text: "Address"
-            },
-            {
-              html: "Restrictions",
-              classes: "govuk-!-width-one-quarter"
-            }
-          ],
-          rows: visitors
-        }) }}
-        </div>
-
-        {% if eligibleVisitors === true %}
-
-        <div class="govuk-button-group">
-          {{ govukButton({
-            text: "Continue",
-            attributes: { "data-test": "submit" },
-            preventDoubleClick: true
-          }) }}
-
-          <a href="/back-to-start" class="govuk-link govuk-link--no-visited-state">Start again</a>
-        </div>
-        {% else %}
-          {% include "partials/backToStartButton.njk" %}
+        {% if errors | length %}
+          <p id="visitors-error" class="govuk-error-message">
+            <span class="govuk-visually-hidden">Error:</span> {{ errors[0].msg }}
+          </p>
         {% endif %}
+    
+        {% if atLeastOneAdult === false %}
+          <p data-test="no-suitable-visitors">There are no approved visitors 18 years old or older for this prisoner. A booking cannot be made at this time.</p>
+        {% elif atLeastOneAdult === true and eligibleVisitors === false %}
+          <p data-test="no-suitable-visitors">There are no visitors 18 years old or older who are not currently banned. A booking cannot be made at this time.</p>
+        {% else %}
 
-      </form>
-    {% else %}
-    <p>There are no approved visitors for this prisoner. A booking cannot be made at this time.</p>
+          <p>
+            Up to <span data-test="visitors-max-total">{{ selectedEstablishment.maxTotalVisitors }} {{ "person" | pluralise(selectedEstablishment.maxTotalVisitors, "people") }}</span>
+            can visit someone at <span data-test="prison-name">{{ selectedEstablishment.prisonName }}</span>. This includes:
+          </p>
+          <ul class="govuk-list govuk-list--bullet">
+            <li>
+              <span data-test="visitors-max-adults">{{ selectedEstablishment.maxAdultVisitors }} {{ "person" | pluralise(selectedEstablishment.maxAdultVisitors, "people") }}</span>
+              <span data-test="visitors-adult-age">{{ selectedEstablishment.adultAgeYears }} {{ "year" | pluralise(selectedEstablishment.adultAgeYears) }}</span> old or older
+            </li>
+            <li>
+              <span data-test="visitors-max-children">{{ selectedEstablishment.maxChildVisitors }} {{ "person" | pluralise(selectedEstablishment.maxChildVisitors, "people") }}</span> under
+              <span data-test="visitors-adult-age">{{ selectedEstablishment.adultAgeYears }} {{ "year" | pluralise(selectedEstablishment.adultAgeYears) }}</span> old
+            </li>
+          </ul>
+          <p>At least one visitor must be 18 years or older.</p>
+        {% endif %}
+      
+        <form action="{{ urlPrefix }}/select-visitors" method="POST" novalidate>
+          <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
-    {% include "partials/backToStartButton.njk" %}
+          <div class="govuk-form-group{% if errors | length %} govuk-form-group--error{% endif %}">
+          {{ govukTable({
+            head: [
+              {
+                text: "Add to visit"
+              },
+              {
+                text: "Name"
+              },
+              {
+                text: "Date of birth"
+              },
+              {
+                text: "Relationship to prisoner"
+              },
+              {
+                text: "Address"
+              },
+              {
+                html: "Restrictions",
+                classes: "govuk-!-width-one-quarter"
+              }
+            ],
+            rows: visitors
+          }) }}
+          </div>
 
-    {% endif %}
+          {% if eligibleVisitors === true %}
+
+          <div class="govuk-button-group">
+            {{ govukButton({
+              text: "Continue",
+              attributes: { "data-test": "submit" },
+              preventDoubleClick: true
+            }) }}
+
+            <a href="/back-to-start" class="govuk-link govuk-link--no-visited-state">Start again</a>
+          </div>
+          {% else %}
+            {% include "partials/backToStartButton.njk" %}
+          {% endif %}
+
+        </form>
+      {% else %}
+        <p data-test="no-suitable-visitors">There are no approved visitors for this prisoner. A booking cannot be made at this time.</p>
+
+        {% include "partials/backToStartButton.njk" %}
+      {% endif %}
     </div>
   </div>
 {% endblock %}
