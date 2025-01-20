@@ -43,7 +43,7 @@ testJourneys.forEach(journey => {
     const restrictions = [TestData.offenderRestriction({ expiryDate: '2022-03-15' })]
     const alerts = [TestData.alert({ dateExpires: '2022-03-15' })]
 
-    beforeAll(() => {
+    beforeEach(() => {
       returnData = [
         {
           personId: 4321,
@@ -100,9 +100,7 @@ testJourneys.forEach(journey => {
           banned: false,
         },
       ]
-    })
 
-    beforeEach(() => {
       visitSessionData = {
         allowOverBooking: false,
         prisoner: {
@@ -126,22 +124,6 @@ testJourneys.forEach(journey => {
           visitSessionData,
         } as SessionData,
       })
-    })
-
-    it('should display prison specific visitor allowances for the selected establishment', () => {
-      return request(sessionApp)
-        .get(`${journey.urlPrefix}/select-visitors`)
-        .expect(200)
-        .expect('Content-Type', /html/)
-        .expect(res => {
-          const $ = cheerio.load(res.text)
-          expect($('[data-test=visitors-max-total]').text()).toBe('6 people')
-          expect($('[data-test=prison-name]').text()).toBe('Hewell (HMP)')
-          expect($('[data-test=visitors-max-adults]').text()).toBe('3 people')
-          expect($('[data-test=visitors-max-children]').text()).toBe('4 people')
-          expect($('[data-test=visitors-adult-age]').eq(0).text()).toBe('18 years')
-          expect($('[data-test=visitors-adult-age]').eq(1).text()).toBe('18 years')
-        })
     })
 
     it('should render the prisoner restrictions and alerts when they are present', () => {
@@ -457,6 +439,22 @@ testJourneys.forEach(journey => {
           expect($('[data-test="no-suitable-visitors"]').text().replace(/\s+/g, ' ')).toContain(
             'There are no visitors 18 years old or older who are not currently banned. A booking cannot be made at this time.',
           )
+        })
+    })
+
+    it('should display prison specific visitor allowances for the selected establishment', () => {
+      return request(sessionApp)
+        .get(`${journey.urlPrefix}/select-visitors`)
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('[data-test=visitors-max-total]').text()).toBe('6 people')
+          expect($('[data-test=prison-name]').text()).toBe('Hewell (HMP)')
+          expect($('[data-test=visitors-max-adults]').text()).toBe('3 people')
+          expect($('[data-test=visitors-max-children]').text()).toBe('4 people')
+          expect($('[data-test=visitors-adult-age]').eq(0).text()).toBe('18 years')
+          expect($('[data-test=visitors-adult-age]').eq(1).text()).toBe('18 years')
         })
     })
   })
