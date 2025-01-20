@@ -1,17 +1,16 @@
 import type { Request, Response } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
 import { VisitorListItem } from '../../@types/bapv'
-import PrisonerProfileService from '../../services/prisonerProfileService'
 import PrisonerVisitorsService from '../../services/prisonerVisitorsService'
 import { getFlashFormValues } from '../visitorUtils'
 import getUrlPrefix from './visitJourneyUtils'
 import { getBanStatus } from '../../utils/visitorUtils'
+import config from '../../config'
 
 export default class SelectVisitors {
   constructor(
     private readonly mode: string,
     private readonly prisonerVisitorsService: PrisonerVisitorsService,
-    private readonly prisonerProfileService: PrisonerProfileService,
   ) {}
 
   async get(req: Request, res: Response): Promise<void> {
@@ -28,8 +27,7 @@ export default class SelectVisitors {
     const atLeastOneAdult = visitorList.some(visitor => visitor.adult === true)
     const eligibleVisitors = visitorList.some(visitor => visitor.banned === false && visitor.adult === true)
 
-    const restrictions = await this.prisonerProfileService.getRestrictions(offenderNo, res.locals.user.username)
-    visitSessionData.prisoner.restrictions = restrictions
+    const { restrictions, activeAlerts } = visitSessionData.prisoner
 
     const formValues = getFlashFormValues(req)
     if (!Object.keys(formValues).length && visitSessionData.visitors) {
@@ -38,6 +36,8 @@ export default class SelectVisitors {
 
     const returnAddress = isUpdate ? `/visit/${visitSessionData.visitReference}` : `/prisoner/${offenderNo}`
 
+    const prisonerDpsAlertsUrl = `${config.dpsPrisoner}prisoner/${offenderNo}/alerts/active`
+
     res.render('pages/bookAVisit/visitors', {
       errors: req.flash('errors'),
       offenderNo: visitSessionData.prisoner.offenderNo,
@@ -45,8 +45,10 @@ export default class SelectVisitors {
       visitorList,
       atLeastOneAdult,
       eligibleVisitors,
+      activeAlerts,
       restrictions,
       formValues,
+      prisonerDpsAlertsUrl,
       urlPrefix: getUrlPrefix(isUpdate, visitSessionData.visitReference),
       backLink: returnAddress,
     })

@@ -21,6 +21,21 @@ context('Update a visit', () => {
   const { prisonerNumber: offenderNo, prisonId } = prisoner
   const prisonerDisplayName = 'Smith, John'
 
+  const profile = TestData.prisonerProfile({
+    alerts: [
+      {
+        alertType: 'U',
+        alertTypeDescription: 'COVID unit management',
+        alertCode: 'UPIU',
+        alertCodeDescription: 'Protective Isolation Unit',
+        comment: 'Alert comment',
+        dateCreated: '2023-01-02',
+        dateExpires: undefined,
+        active: true,
+      },
+    ],
+  })
+
   beforeEach(() => {
     cy.task('reset')
     cy.task('stubSignIn')
@@ -76,6 +91,8 @@ context('Update a visit', () => {
     // Start update journey
     cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
     cy.task('stubOffenderRestrictions', { offenderNo, offenderRestrictions: [] })
+    cy.task('stubPrisonerProfile', { prisonId, prisonerId: offenderNo, profile })
+
     visitDetailsPage.updateBooking().click()
 
     // Select visitors page - existing visitor selected then add another
@@ -244,6 +261,7 @@ context('Update a visit', () => {
     // Start update journey
     cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
     cy.task('stubOffenderRestrictions', { offenderNo, offenderRestrictions: [] })
+    cy.task('stubPrisonerProfile', { prisonId, prisonerId: offenderNo, profile })
     visitDetailsPage.updateBooking().click()
 
     // Confirm update page - check yes

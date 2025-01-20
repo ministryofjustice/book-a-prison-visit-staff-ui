@@ -47,26 +47,26 @@ export default class VisitDetailsPage extends Page {
   visitEmail = (): PageElement => cy.get('[data-test="visit-email"]')
 
   // Visitor Details-1
-  visitorName1 = (): PageElement => cy.get('[data-test="test-visitor-name1"]')
+  visitorName1 = (): PageElement => cy.get('[data-test="visitor-name1"]')
 
-  visitorDob1 = (): PageElement => cy.get('[data-test="test-visitor-dob1"]')
+  visitorDob1 = (): PageElement => cy.get('[data-test="visitor-dob1"]')
 
-  visitorRelationship1 = (): PageElement => cy.get('[data-test="test-visitor-relationship1"]')
+  visitorRelationship1 = (): PageElement => cy.get('[data-test="visitor-relationship1"]')
 
-  visitorAddress1 = (): PageElement => cy.get('[data-test="test-visitor-address1"]')
+  visitorAddress1 = (): PageElement => cy.get('[data-test="visitor-address1"]')
 
-  visitorRestrictions1 = (): PageElement => cy.get('[data-test="test-visitor-restrictions1"]')
+  visitorRestrictions1 = (): PageElement => cy.get('[data-test="visitor-restrictions1"]')
 
   // Visitor Details-2
-  visitorName2 = (): PageElement => cy.get('[data-test="test-visitor-name2"]')
+  visitorName2 = (): PageElement => cy.get('[data-test="visitor-name2"]')
 
-  visitorDob2 = (): PageElement => cy.get('[data-test="test-visitor-dob2"]')
+  visitorDob2 = (): PageElement => cy.get('[data-test="visitor-dob2"]')
 
-  visitorRelationship2 = (): PageElement => cy.get('[data-test="test-visitor-relationship2"]')
+  visitorRelationship2 = (): PageElement => cy.get('[data-test="visitor-relationship2"]')
 
-  visitorAddress2 = (): PageElement => cy.get('[data-test="test-visitor-address2"]')
+  visitorAddress2 = (): PageElement => cy.get('[data-test="visitor-address2"]')
 
-  visitorRestrictions2 = (): PageElement => cy.get('[data-test="test-visitor-restriction2"]')
+  visitorRestrictions2 = (): PageElement => cy.get('[data-test="visitor-restriction2"]')
 
   // Additional Information
   additionalSupport = (): PageElement => cy.get('[data-test=additional-support]')
