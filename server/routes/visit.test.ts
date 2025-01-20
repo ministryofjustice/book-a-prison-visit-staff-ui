@@ -87,7 +87,7 @@ describe('/visit/:reference', () => {
       dateOfBirth: '1986-07-28',
       adult: true,
       relationshipDescription: 'Sister',
-      address: '123 The Street,<br>Coventry',
+      address: '123 The Street,\nCoventry',
       restrictions: [
         {
           restrictionType: 'CLOSED',
@@ -770,7 +770,7 @@ describe('/visit/:reference', () => {
             visitRestriction: 'OPEN',
             visitors: [
               {
-                address: '123 The Street,<br>Coventry',
+                address: '123 The Street,\nCoventry',
                 adult: true,
                 banned: false,
                 dateOfBirth: '1986-07-28',

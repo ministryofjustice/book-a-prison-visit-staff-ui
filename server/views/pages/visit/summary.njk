@@ -174,7 +174,7 @@
                   text: "Name"
                 },
                 value: {
-                  html: "<span data-test='prisoner-name'>" + (prisoner.firstName + ' ' + prisoner.lastName) | formatLastNameFirst + "</span>"
+                  html: "<span data-test='prisoner-name'>" + (prisoner.firstName + ' ' + prisoner.lastName) | formatLastNameFirst | escape + "</span>"
                 }
               },
               {
@@ -182,7 +182,7 @@
                   text: "Prison number"
                 },
                 value: {
-                  html: "<span data-test='prisoner-number'>" + prisoner.prisonerNumber + "</span>"
+                  html: "<span data-test='prisoner-number'>" + prisoner.prisonerNumber | escape + "</span>"
                 }
               },
               {
@@ -198,7 +198,7 @@
                   text: "Location"
                 },
                 value: {
-                  html: "<span data-test='prisoner-location'>" + prisonerLocation + "</span>"
+                  html: "<span data-test='prisoner-location'>" + prisonerLocation | escape + "</span>"
                 }
               }
             ]
@@ -222,7 +222,7 @@
                   text: 'Name'
                 },
                 value: {
-                  html: '<span data-test="visitor-name' + loop.index + '">' + visitor.name | safe + ' (' + (visitor.relationshipDescription | lower) + ' of the prisoner)</span>'
+                  html: '<span data-test="visitor-name' + loop.index + '">' + visitor.name | escape + ' (' + (visitor.relationshipDescription | lower) + ' of the prisoner)</span>'
                 }
               },
               {
@@ -238,7 +238,7 @@
                   text: 'Address '
                 },
                 value: {
-                  html: '<span data-test="visitor-address' + loop.index + '">' + (visitor.address | replace("<br>", " ")) + '</span>'
+                  html: '<span data-test="visitor-address' + loop.index + '">' + (visitor.address | escape | replace("\n", " ")) + '</span>'
                 }
               },
               {
@@ -267,7 +267,7 @@
                   text: "Additional support"
                 },
                 value: {
-                  html: '<span data-test="additional-support">' + (additionalSupport  if additionalSupport | length else "None") + '</span>'
+                  html: '<span data-test="additional-support">' + (additionalSupport | escape if additionalSupport | length else "None") + '</span>'
                 }
               }
             ]

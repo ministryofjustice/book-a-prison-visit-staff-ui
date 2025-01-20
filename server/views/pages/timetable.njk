@@ -12,11 +12,11 @@
     {% if prisonerLocationGroupNames | length %}
       <span>
         {% if prisonerIncentiveLevelGroupNames | length %}
-          {{ prisonerIncentiveLevelGroupNames | join("<br>") | safe -}}
+          {{ prisonerIncentiveLevelGroupNames | join("\n") | escape | nl2br | safe -}}
         {% endif %}
         {% if prisonerCategoryGroupNames | length %}
           {% if prisonerIncentiveLevelGroupNames | length %},<br>{% endif %}
-          {{ prisonerCategoryGroupNames | join(",<br>") | safe }}
+          {{ prisonerCategoryGroupNames | join(",\n") | escape | nl2br | safe -}}
         {% endif %}
         {{- " in:" if (prisonerIncentiveLevelGroupNames | length or prisonerCategoryGroupNames | length) and areLocationGroupsInclusive -}}
         {{- " except in:" if (prisonerIncentiveLevelGroupNames | length or prisonerCategoryGroupNames | length) and not areLocationGroupsInclusive -}}
@@ -29,11 +29,11 @@
       </ul>
     {% else %}
       {% if prisonerIncentiveLevelGroupNames | length %}
-        {{ prisonerIncentiveLevelGroupNames | join("<br>") | safe -}}
+        {{ prisonerIncentiveLevelGroupNames | join("\n") | escape | nl2br | safe -}}
       {% endif %}
       {% if prisonerCategoryGroupNames | length %}
         {% if prisonerIncentiveLevelGroupNames | length %},<br>{% endif %}
-        {{ prisonerCategoryGroupNames | join("<br>") | safe }}
+        {{ prisonerCategoryGroupNames | join(",\n") | escape | nl2br | safe -}}
       {% endif %}
       {{ "All prisoners" if not prisonerIncentiveLevelGroupNames | length and not prisonerCategoryGroupNames | length }}
   {% endif %}

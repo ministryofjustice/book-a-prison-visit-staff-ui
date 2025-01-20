@@ -40,7 +40,7 @@ const getFormattedAddress = (address: Address): string => {
     address.country,
   ]
     .filter(value => value)
-    .join(',<br>')
+    .join(',\n')
 
   return formattedAddress
 }

@@ -7,7 +7,7 @@ expandableComments.forEach(expandableComment => {
   const fullCommentText = expandableComment.querySelector('.bapv-expandable-comment__full-comment')
 
   showFullCommentButton.addEventListener('click', () => {
-      fullCommentText.classList.add(FUL_COMMENT_EXPANDED_CLASS)
+    fullCommentText.classList.add(FUL_COMMENT_EXPANDED_CLASS)
   })
 
   hideFullCommentButton.addEventListener('click', () => {

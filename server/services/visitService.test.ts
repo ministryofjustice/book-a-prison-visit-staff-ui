@@ -271,7 +271,7 @@ describe('Visit service', () => {
               adult: true,
               relationshipDescription: 'Wife',
               address:
-                'Premises,<br>Flat 23B,<br>123 The Street,<br>Springfield,<br>Coventry,<br>West Midlands,<br>C1 2AB,<br>England',
+                'Premises,\nFlat 23B,\n123 The Street,\nSpringfield,\nCoventry,\nWest Midlands,\nC1 2AB,\nEngland',
               restrictions: contacts[0].restrictions,
               banned: false,
             },
