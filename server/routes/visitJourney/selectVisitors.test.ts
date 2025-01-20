@@ -221,7 +221,7 @@ testJourneys.forEach(journey => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('h1').text().trim()).toBe('Select visitors from the prisoner’s approved visitor list')
+          expect($('h1').text().trim()).toBe('Select visitors')
 
           expect($('#visitor-4321').length).toBe(1)
           expect($('#visitor-4321').prop('disabled')).toBe(true)
@@ -271,7 +271,7 @@ testJourneys.forEach(journey => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('h1').text().trim()).toBe('Select visitors from the prisoner’s approved visitor list')
+          expect($('h1').text().trim()).toBe('Select visitors')
           expect($('input[name="visitors"]').length).toBe(3)
           expect($('#visitor-4321').prop('checked')).toBe(false)
           expect($('#visitor-4322').prop('checked')).toBe(true)
@@ -310,7 +310,7 @@ testJourneys.forEach(journey => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('h1').text().trim()).toBe('Select visitors from the prisoner’s approved visitor list')
+          expect($('h1').text().trim()).toBe('Select visitors')
           expect($('input[name="visitors"]').length).toBe(3)
           expect($('#visitor-4321').prop('checked')).toBe(false)
           expect($('#visitor-4322').prop('checked')).toBe(true)
@@ -330,7 +330,7 @@ testJourneys.forEach(journey => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('h1').text().trim()).toBe('Select visitors from the prisoner’s approved visitor list')
+          expect($('h1').text().trim()).toBe('Select visitors')
           expect($('.govuk-error-summary__body').text()).toContain('No visitors selected')
           expect($('.govuk-error-summary__body a').attr('href')).toBe('#visitors-error')
           expect($('#visitors-error').text()).toContain('No visitors selected')
@@ -349,7 +349,7 @@ testJourneys.forEach(journey => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('h1').text().trim()).toBe('Select visitors from the prisoner’s approved visitor list')
+          expect($('h1').text().trim()).toBe('Select visitors')
           expect($('input[name="visitors"]').length).toBe(0)
           expect($('[data-test="no-suitable-visitors"]').text()).toContain(
             'There are no approved visitors for this prisoner. A booking cannot be made at this time.',
@@ -379,7 +379,7 @@ testJourneys.forEach(journey => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('h1').text().trim()).toBe('Select visitors from the prisoner’s approved visitor list')
+          expect($('h1').text().trim()).toBe('Select visitors')
           expect($('input[name="visitors"]').length).toBe(1)
           expect($('[data-test="submit"]').length).toBe(0)
           expect($('[data-test="back-to-start"]').length).toBe(1)
@@ -420,7 +420,7 @@ testJourneys.forEach(journey => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('h1').text().trim()).toBe('Select visitors from the prisoner’s approved visitor list')
+          expect($('h1').text().trim()).toBe('Select visitors')
           expect($('input[name="visitors"]').length).toBe(2)
           expect($('[data-test="submit"]').length).toBe(1)
           expect($('[data-test="back-to-start"]').length).toBe(0)
@@ -449,7 +449,7 @@ testJourneys.forEach(journey => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('h1').text().trim()).toBe('Select visitors from the prisoner’s approved visitor list')
+          expect($('h1').text().trim()).toBe('Select visitors')
           expect($('input[name="visitors"]').length).toBe(1)
           expect($('[data-test="submit"]').length).toBe(0)
           expect($('[data-test="back-to-start"]').length).toBe(1)
