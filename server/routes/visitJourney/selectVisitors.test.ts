@@ -351,7 +351,9 @@ testJourneys.forEach(journey => {
           const $ = cheerio.load(res.text)
           expect($('h1').text().trim()).toBe('Select visitors from the prisoner’s approved visitor list')
           expect($('input[name="visitors"]').length).toBe(0)
-          expect($('#main-content').text()).toContain('There are no approved visitors for this prisoner.')
+          expect($('[data-test="no-suitable-visitors"]').text()).toContain(
+            'There are no approved visitors for this prisoner. A booking cannot be made at this time.',
+          )
           expect($('[data-test="submit"]').length).toBe(0)
           expect($('[data-test="back-to-start"]').length).toBe(1)
         })
