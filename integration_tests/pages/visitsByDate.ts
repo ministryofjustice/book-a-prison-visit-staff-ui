@@ -24,11 +24,13 @@ export default class VisitsByDatePage extends Page {
     cy.get('.moj-side-navigation__item a').eq(index).click()
   }
 
-  visitSessionHeading = (): PageElement => cy.get('[data-test="visit-session-heading"]')
+  visitSessionHeading = (): PageElement => cy.get('[data-test=visit-session-heading]')
 
-  tablesBookedCount = (): PageElement => cy.get('[data-test="visit-tables-booked"]')
+  visitSectionHeading = (type: string): PageElement => cy.get(`[data-test="visit-section-heading-${type}"]`)
 
-  visitorsTotalCount = (): PageElement => cy.get('[data-test="visit-visitors-total"]')
+  tablesBookedCount = (type: string): PageElement => cy.get(`[data-test="visit-tables-booked-${type}"]`)
+
+  visitorsTotalCount = (type: string): PageElement => cy.get(`[data-test="visit-visitors-total-${type}"]`)
 
   bookedOnHeader = (): PageElement => cy.get('[data-test="header-booked-on"] > button')
 
