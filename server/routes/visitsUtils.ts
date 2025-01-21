@@ -61,7 +61,7 @@ export function getSessionsSideNav(
   firstTabDate: string,
   selectedReference: string,
 ): VisitsPageSideNav {
-  const sessionsSideNav: VisitsPageSideNav = new Map()
+  let sessionsSideNav: VisitsPageSideNav = new Map()
 
   sessionSchedule.forEach(session => {
     if (!sessionsSideNav.has(session.visitRoom)) {
@@ -84,6 +84,9 @@ export function getSessionsSideNav(
       active: selectedReference === session.sessionTemplateReference,
     })
   })
+
+  // sort alphabetically by room name heading
+  sessionsSideNav = new Map([...sessionsSideNav].sort((a, b) => a[0].localeCompare(b[0])))
 
   if (!unknownVisits.length) {
     return sessionsSideNav
