@@ -16,7 +16,6 @@ import {
   Visit,
   VisitHistoryDetails,
   VisitPreview,
-  VisitRestriction,
   VisitSession,
 } from '../../server/data/orchestrationApiTypes'
 import TestData from '../../server/routes/testutils/testData'
@@ -206,13 +205,11 @@ export default {
     prisonId,
     reference,
     sessionDate,
-    visitRestrictions,
     visits,
   }: {
     prisonId: string
     reference: string
     sessionDate: string
-    visitRestrictions: VisitRestriction
     visits: VisitPreview[]
   }): SuperAgentRequest => {
     return stubFor({
@@ -224,7 +221,7 @@ export default {
           sessionTemplateReference: { equalTo: reference },
           sessionDate: { equalTo: sessionDate },
           visitStatus: { equalTo: 'BOOKED' },
-          visitRestrictions: { equalTo: visitRestrictions },
+          visitRestrictions: { equalTo: 'OPEN,CLOSED' },
         },
       },
       response: {
