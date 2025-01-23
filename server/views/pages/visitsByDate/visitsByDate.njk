@@ -188,7 +188,7 @@
         {% if sessionSchedule %}
           <span class="govuk-caption-l" data-test="visit-room-caption">{{ sessionSchedule.visitRoom }}</span>
         {% endif %}
-        <h2 class="govuk-heading-l" data-test="visit-session-heading">Visits from {{ selectedTimeSlotLabel }}</h2>
+        <h2 class="govuk-heading-xl" data-test="visit-session-heading">Visits from {{ selectedTimeSlotLabel }}</h2>
 
         {{ renderVisitsSection('closed') }}
         {{ renderVisitsSection('open') }}
