@@ -1,7 +1,7 @@
 import { format, parse, add } from 'date-fns'
 import { VisitsPageSideNav, VisitsPageSideNavItem } from '../@types/bapv'
 import { getParsedDateFromQueryString, prisonerTimePretty } from '../utils/utils'
-import { SessionSchedule, VisitPreview, VisitRestriction } from '../data/orchestrationApiTypes'
+import { SessionSchedule, VisitPreview } from '../data/orchestrationApiTypes'
 
 export const getDateTabs = (
   selectedDate: string,
@@ -36,54 +36,22 @@ export const getDateTabs = (
   return tabs
 }
 
-export function getSelectedOrDefaultSessionTemplate(
+export function getSelectedOrDefaultSessionSchedule(
   sessionSchedule: SessionSchedule[],
   sessionReference: string,
-  type: VisitRestriction,
-): { sessionReference: string; type: VisitRestriction; times: string; capacity: number } | null {
-  if (type === 'UNKNOWN') {
+  unknownVisits: VisitPreview[],
+): SessionSchedule {
+  const isValidUnknownVisitTimeSlot = unknownVisits.some(
+    visit => `${visit.visitTimeSlot.startTime}-${visit.visitTimeSlot.endTime}` === sessionReference,
+  )
+
+  if (!sessionSchedule.length || isValidUnknownVisitTimeSlot) {
     return null
   }
 
-  // it's the selected session if reference, type (open/closed) match and a capacity is set
-  const selectedSession = sessionSchedule.find(
-    schedule =>
-      schedule.sessionTemplateReference === sessionReference &&
-      schedule.capacity[<Lowercase<typeof type>>type.toLowerCase()] > 0,
-  )
-  if (selectedSession) {
-    return {
-      sessionReference: selectedSession.sessionTemplateReference,
-      type,
-      times: sessionTimeSlotToString(selectedSession.sessionTimeSlot),
-      capacity: selectedSession.capacity[<Lowercase<typeof type>>type.toLowerCase()],
-    }
-  }
+  const selectedSessionSchedule = sessionSchedule.find(session => session.sessionTemplateReference === sessionReference)
 
-  // default session is first open one in schedule with capacity...
-  const defaultOpenSession = sessionSchedule.find(schedule => schedule.capacity.open > 0)
-  if (defaultOpenSession) {
-    return {
-      sessionReference: defaultOpenSession.sessionTemplateReference,
-      type: 'OPEN',
-      times: sessionTimeSlotToString(defaultOpenSession.sessionTimeSlot),
-      capacity: defaultOpenSession.capacity.open,
-    }
-  }
-
-  // ...or else the first closed with capacity
-  const defaultClosedSession = sessionSchedule.find(schedule => schedule.capacity.closed > 0)
-  if (defaultClosedSession) {
-    return {
-      sessionReference: defaultClosedSession.sessionTemplateReference,
-      type: 'CLOSED',
-      times: sessionTimeSlotToString(defaultClosedSession.sessionTimeSlot),
-      capacity: defaultClosedSession.capacity.closed,
-    }
-  }
-
-  // there are no sessions
-  return null
+  return selectedSessionSchedule ?? sessionSchedule[0]
 }
 
 export function getSessionsSideNav(
@@ -92,84 +60,73 @@ export function getSessionsSideNav(
   selectedDate: string,
   firstTabDate: string,
   selectedReference: string,
-  type: VisitRestriction,
 ): VisitsPageSideNav {
-  const open: VisitsPageSideNavItem[] = []
-  const closed: VisitsPageSideNavItem[] = []
-  const unknown: VisitsPageSideNavItem[] = []
+  let sessionsSideNav: VisitsPageSideNav = new Map()
 
   sessionSchedule.forEach(session => {
+    if (!sessionsSideNav.has(session.visitRoom)) {
+      sessionsSideNav.set(session.visitRoom, [])
+    }
+    const sideNavForRoom = sessionsSideNav.get(session.visitRoom)
+
     const times = sessionTimeSlotToString(session.sessionTimeSlot)
 
-    if (session.capacity.open > 0) {
-      const queryParams = new URLSearchParams({
-        type: 'OPEN',
-        sessionReference: session.sessionTemplateReference,
-        selectedDate,
-        firstTabDate,
-      }).toString()
+    const queryParams = new URLSearchParams({
+      sessionReference: session.sessionTemplateReference,
+      selectedDate,
+      firstTabDate,
+    }).toString()
 
-      open.push({
-        reference: session.sessionTemplateReference,
-        times,
-        capacity: session.capacity.open,
-        queryParams,
-        active: selectedReference === session.sessionTemplateReference && type === 'OPEN',
-      })
-    }
-
-    if (session.capacity.closed > 0) {
-      const queryParams = new URLSearchParams({
-        type: 'CLOSED',
-        sessionReference: session.sessionTemplateReference,
-        selectedDate,
-        firstTabDate,
-      }).toString()
-
-      closed.push({
-        reference: session.sessionTemplateReference,
-        times,
-        capacity: session.capacity.closed,
-        queryParams,
-        active: selectedReference === session.sessionTemplateReference && type === 'CLOSED',
-      })
-    }
+    sideNavForRoom.push({
+      times,
+      reference: session.sessionTemplateReference,
+      queryParams,
+      active: selectedReference === session.sessionTemplateReference,
+    })
   })
 
+  // sort alphabetically by room name heading
+  sessionsSideNav = new Map([...sessionsSideNav].sort((a, b) => a[0].localeCompare(b[0])))
+
+  if (!unknownVisits.length) {
+    return sessionsSideNav
+  }
+
   // build sorted nav item(s) from de-duped times in unknown visit(s)
+  const unknownVisitsNavItems: VisitsPageSideNavItem[] = []
+
   unknownVisits.forEach(visit => {
     const timeSlotReference = `${visit.visitTimeSlot.startTime}-${visit.visitTimeSlot.endTime}`
-    const slotRefExists = unknown.some(slot => slot.reference === timeSlotReference)
+    const slotRefExists = unknownVisitsNavItems.some(slot => slot.reference === timeSlotReference)
 
     if (!slotRefExists) {
       const queryParams = new URLSearchParams({
-        type: 'UNKNOWN',
         sessionReference: timeSlotReference,
         selectedDate,
         firstTabDate,
       }).toString()
 
-      unknown.push({
+      unknownVisitsNavItems.push({
         reference: timeSlotReference,
         times: sessionTimeSlotToString(visit.visitTimeSlot),
         queryParams,
-        active: selectedReference === timeSlotReference && type === 'UNKNOWN',
+        active: selectedReference === timeSlotReference,
       })
     }
   })
-  unknown.sort((a, b) => a.reference.localeCompare(b.reference))
+
+  unknownVisitsNavItems.sort((a, b) => a.reference.localeCompare(b.reference))
+
   // default first unknown session to selected if no open/closed
-  const unknownOnly = unknown.length && !open.length && !closed.length
-  const isASelectedUnknownSession = unknown.some(u => u.active)
+  const unknownOnly = sessionsSideNav.size === 0
+  const isASelectedUnknownSession = unknownVisitsNavItems.some(u => u.active)
   if (unknownOnly && !isASelectedUnknownSession) {
-    unknown[0].active = true
+    unknownVisitsNavItems[0].active = true
   }
 
-  return {
-    ...(open.length && { open }),
-    ...(closed.length && { closed }),
-    ...(unknown.length && { unknown }),
-  }
+  sessionsSideNav.set('All visits', unknownVisitsNavItems)
+
+  return sessionsSideNav
 }
 
 function sessionTimeSlotToString(sessionTimeSlot: SessionSchedule['sessionTimeSlot']): string {

@@ -22,11 +22,13 @@ context('View visits by date', () => {
       sessionTemplateReference: '-bfe.dcc.0f',
       sessionTimeSlot: { startTime: '10:00', endTime: '11:00' },
       capacity: { open: 20, closed: 5 },
+      visitRoom: 'Visits hall 2',
     }),
     TestData.sessionSchedule({
       sessionTemplateReference: '-cfe.dcc.0f',
       sessionTimeSlot: { startTime: '13:00', endTime: '14:00' },
       capacity: { open: 0, closed: 10 },
+      visitRoom: 'Visits hall 2',
     }),
   ]
 
@@ -59,7 +61,6 @@ context('View visits by date', () => {
       prisonId,
       reference: sessionSchedule[0].sessionTemplateReference,
       sessionDate: todayShortFormat,
-      visitRestrictions: 'OPEN',
       visits,
     })
 
@@ -78,9 +79,10 @@ context('View visits by date', () => {
 
     visitsByDatePage.activeSessionNavLink().contains('1:45pm to 3:45pm')
 
-    visitsByDatePage.visitSessionHeading().contains('Open visits, 1:45pm to 3:45pm')
-    visitsByDatePage.tablesBookedCount().contains('2 of 40 tables booked')
-    visitsByDatePage.visitorsTotalCount().contains('3 visitors')
+    visitsByDatePage.visitSessionHeading().contains('Visits from 1:45pm to 3:45pm')
+    visitsByDatePage.visitSectionHeading('open').contains('Open visits')
+    visitsByDatePage.tablesBookedCount('open').contains('2 of 40 tables booked')
+    visitsByDatePage.visitorsTotalCount('open').contains('3 visitors')
 
     // visits with default sort (last booked first)
     visitsByDatePage.prisonerName(1).contains('Smith, John')
@@ -101,19 +103,19 @@ context('View visits by date', () => {
     visitsByDatePage.prisonerNumber(2).contains('A1234BC')
     visitsByDatePage.bookedOn(2).contains('2 January at 2:30pm')
 
-    // select last closed session from side nav
+    // select last session from side nav
     cy.task('stubGetVisitsBySessionTemplate', {
       prisonId,
       reference: sessionSchedule[2].sessionTemplateReference,
       sessionDate: todayShortFormat,
-      visitRestrictions: 'CLOSED',
       visits: [],
     })
-    visitsByDatePage.selectSessionNavItem(3)
+    visitsByDatePage.selectSessionNavItem(2)
 
-    visitsByDatePage.visitSessionHeading().contains('Closed visits, 1pm to 2pm')
-    visitsByDatePage.tablesBookedCount().contains('0 of 10 tables booked')
-    visitsByDatePage.visitorsTotalCount().should('not.exist')
+    visitsByDatePage.visitSessionHeading().contains('Visits from 1pm to 2pm')
+    visitsByDatePage.visitSectionHeading('closed').contains('Closed visits')
+    visitsByDatePage.tablesBookedCount('closed').contains('0 of 10 tables booked')
+    visitsByDatePage.visitorsTotalCount('closed').should('not.exist')
 
     // select tomorrow
     cy.task('stubSessionSchedule', { prisonId, date: tomorrowShortFormat, sessionSchedule: [] })
@@ -126,8 +128,12 @@ context('View visits by date', () => {
     visitsByDatePage.dateTabsTomorrow().should('have.attr', 'aria-current', 'page')
 
     visitsByDatePage.visitSessionHeading().should('not.exist')
-    visitsByDatePage.tablesBookedCount().should('not.exist')
-    visitsByDatePage.visitorsTotalCount().should('not.exist')
+    visitsByDatePage.visitSectionHeading('open').should('not.exist')
+    visitsByDatePage.visitSectionHeading('closed').should('not.exist')
+    visitsByDatePage.tablesBookedCount('open').should('not.exist')
+    visitsByDatePage.tablesBookedCount('closed').should('not.exist')
+    visitsByDatePage.visitorsTotalCount('open').should('not.exist')
+    visitsByDatePage.visitorsTotalCount('closed').should('not.exist')
     visitsByDatePage.noResultsMessage().contains('No visit sessions on this day.')
   })
 
@@ -152,9 +158,10 @@ context('View visits by date', () => {
 
     visitsByDatePage.activeSessionNavLink().contains('9am to 10am')
 
-    visitsByDatePage.visitSessionHeading().contains('All visits, 9am to 10am')
-    visitsByDatePage.tablesBookedCount().contains('1 table booked')
-    visitsByDatePage.visitorsTotalCount().contains('2 visitors')
+    visitsByDatePage.visitSessionHeading().contains('Visits from 9am to 10am')
+    visitsByDatePage.visitSectionHeading('unknown').contains('All visits')
+    visitsByDatePage.tablesBookedCount('unknown').contains('1 table booked')
+    visitsByDatePage.visitorsTotalCount('unknown').contains('2 visitors')
 
     visitsByDatePage.prisonerName(1).contains('Smith, John')
     visitsByDatePage.prisonerNumber(1).contains('A1234BC')
@@ -168,9 +175,10 @@ context('View visits by date', () => {
 
     visitsByDatePage.activeSessionNavLink().contains('1:45pm to 3:45pm')
 
-    visitsByDatePage.visitSessionHeading().contains('All visits, 1:45pm to 3:45pm')
-    visitsByDatePage.tablesBookedCount().contains('2 tables booked')
-    visitsByDatePage.visitorsTotalCount().contains('3 visitors')
+    visitsByDatePage.visitSessionHeading().contains('Visits from 1:45pm to 3:45pm')
+    visitsByDatePage.visitSectionHeading('unknown').contains('All visits')
+    visitsByDatePage.tablesBookedCount('unknown').contains('2 tables booked')
+    visitsByDatePage.visitorsTotalCount('unknown').contains('3 visitors')
 
     visitsByDatePage.prisonerName(1).contains('Smith, John')
     visitsByDatePage.prisonerNumber(1).contains('A1234BC')

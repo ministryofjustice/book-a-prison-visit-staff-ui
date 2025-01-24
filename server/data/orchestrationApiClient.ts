@@ -73,7 +73,7 @@ export default class OrchestrationApiClient {
     prisonId: string,
     reference: string,
     sessionDate: string,
-    visitRestrictions: VisitRestriction,
+    visitRestrictions: VisitRestriction[],
   ): Promise<VisitPreview[]> {
     return this.restClient.get({
       path: '/visits/session-template',

@@ -137,16 +137,11 @@ export type VisitInformation = {
 export type VisitsPageSideNavItem = {
   reference: string
   times: string
-  capacity?: number // optional to cater for 'unknown' visits with no session template
   queryParams: string
   active: boolean
 }
 
-export type VisitsPageSideNav = {
-  open?: VisitsPageSideNavItem[]
-  closed?: VisitsPageSideNavItem[]
-  unknown?: VisitsPageSideNavItem[] // for visits with no session template (old, migrated data)
-}
+export type VisitsPageSideNav = Map<string, VisitsPageSideNavItem[]>
 
 export type FlashData = Record<string, string | string[] | Record<string, string | string[]>[]>
 
