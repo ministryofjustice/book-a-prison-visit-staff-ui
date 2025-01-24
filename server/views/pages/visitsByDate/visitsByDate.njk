@@ -18,7 +18,7 @@
   {% set capacity = sessionSchedule.capacity[type] %}
 
   {% if capacity or (visitsSection.visits | length) %}
-    <h3 class="govuk-heading-m govuk-!-margin-top-7" data-test="visit-section-heading-{{ type }}">
+    <h3 class="govuk-heading-s govuk-!-margin-top-7" data-test="visit-section-heading-{{ type }}">
       {{- ("all" if type == "unknown" else type) | capitalize }} visits
     </h3>
 
@@ -98,7 +98,7 @@
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-      <h1 class="govuk-heading-xl">{{ pageHeaderTitle }}</h1>
+      <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
       {% include "partials/errorSummary.njk" %}
     </div>
   </div>
@@ -186,9 +186,9 @@
     <div class="govuk-grid-column-three-quarters">
       {% if sessionsSideNav | length %}
         {% if sessionSchedule %}
-          <span class="govuk-caption-l" data-test="visit-room-caption">{{ sessionSchedule.visitRoom }}</span>
+          <span class="govuk-caption-m" data-test="visit-room-caption">{{ sessionSchedule.visitRoom }}</span>
         {% endif %}
-        <h2 class="govuk-heading-l" data-test="visit-session-heading">Visits from {{ selectedTimeSlotLabel }}</h2>
+        <h2 class="govuk-heading-m" data-test="visit-session-heading">Visits from {{ selectedTimeSlotLabel }}</h2>
 
         {{ renderVisitsSection('closed') }}
         {{ renderVisitsSection('open') }}
