@@ -54,7 +54,7 @@
     <div class="govuk-grid-column-full">
       {% include "partials/errorSummary.njk" %}
 
-      <h1 class="govuk-heading-xl">{{ pageHeaderTitle }}</h1>
+      <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
 
       <p class="bapv-extraspacing bapv-date-time-information"><strong>Prisoner name:</strong> <span data-test="prisoner-name">{{ prisonerName }}</span> <strong>Location:</strong> <span data-test="visit-location">{{ location }}</span> <strong>Visit type:</strong> <span data-test="visit-restriction">{{ visitRestriction | capitalize }}</span></p>
       {{ govukDetails({
