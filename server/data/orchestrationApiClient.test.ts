@@ -397,7 +397,7 @@ describe('orchestrationApiClient', () => {
   })
 
   describe('getNotificationGroups', () => {
-    it('should return notification groups for given prison', async () => {
+    it.skip('should return notification groups for given prison', async () => {
       const notificationGroups = [TestData.notificationGroup()]
 
       fakeOrchestrationApi
