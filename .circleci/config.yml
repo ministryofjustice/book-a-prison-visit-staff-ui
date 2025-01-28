@@ -21,7 +21,7 @@ parameters:
 
   releases-slack-channel:
     type: string
-    default: visits-alerts
+    default: visits-releases
 
   node-version:
     type: string
