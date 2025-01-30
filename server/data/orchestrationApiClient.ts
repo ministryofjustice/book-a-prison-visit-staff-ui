@@ -181,7 +181,13 @@ export default class OrchestrationApiClient {
   }
 
   async getNotificationGroups(prisonId: string): Promise<NotificationGroup[]> {
-    return this.restClient.get({ path: `/visits/notification/${prisonId}/groups` })
+    const { enabledNotifications } = config.features.notificationTypes
+
+    const notificationGroups = await this.restClient.get<NotificationGroup[]>({
+      path: `/visits/notification/${prisonId}/groups`,
+    })
+
+    return notificationGroups.filter(notification => enabledNotifications.includes(notification.type))
   }
 
   async getVisitNotifications(reference: string): Promise<NotificationType[]> {

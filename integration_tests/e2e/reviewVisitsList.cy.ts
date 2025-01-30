@@ -9,7 +9,6 @@ context('Bookings review listing page', () => {
   const prettyDateFormat = 'd MMMM yyyy'
 
   const notificationGroups = [
-    TestData.notificationGroup(),
     TestData.notificationGroup({
       reference: 'bc*de*fg*hi',
       type: 'PRISONER_RELEASED_EVENT',
@@ -19,18 +18,6 @@ context('Bookings review listing page', () => {
           bookedByName: 'User Three',
           prisonerNumber: 'B1234CD',
           visitDate: '2023-12-01',
-        }),
-      ],
-    }),
-    TestData.notificationGroup({
-      reference: 'cd*ef*gh*ij',
-      type: 'PRISONER_RESTRICTION_CHANGE_EVENT',
-      affectedVisits: [
-        TestData.notificationVisitInfo({
-          bookedByUserName: 'user4',
-          bookedByName: 'User Four',
-          prisonerNumber: 'C1234DE',
-          visitDate: '2023-12-05',
         }),
       ],
     }),
@@ -63,20 +50,18 @@ context('Bookings review listing page', () => {
     homePage.needReviewTile().click()
     const listingPage = Page.verifyOnPage(VisitsReviewListingPage)
 
-    // Non-association
+    // Prisoner released
     listingPage.getPrisonerNumber(1).contains(notificationGroups[0].affectedVisits[0].prisonerNumber)
-    listingPage.getPrisonerNumber(1).contains(notificationGroups[0].affectedVisits[1].prisonerNumber)
     listingPage
       .getVisitDate(1)
       .contains(format(new Date(notificationGroups[0].affectedVisits[0].visitDate), prettyDateFormat))
     listingPage.getBookedBy(1).contains(notificationGroups[0].affectedVisits[0].bookedByName)
-    listingPage.getBookedBy(1).contains(notificationGroups[0].affectedVisits[1].bookedByName)
     listingPage.getType(1).contains(notificationTypes[notificationGroups[0].type])
     listingPage
       .getActionLink(1)
-      .should('have.attr', 'href', `/review/non-association/${notificationGroups[0].reference}`)
+      .should('have.attr', 'href', `/visit/${notificationGroups[0].affectedVisits[0].bookingReference}?from=review`)
 
-    // Prisoner released
+    // Visits blocked for date
     listingPage.getPrisonerNumber(2).contains(notificationGroups[1].affectedVisits[0].prisonerNumber)
     listingPage
       .getVisitDate(2)
@@ -86,28 +71,6 @@ context('Bookings review listing page', () => {
     listingPage
       .getActionLink(2)
       .should('have.attr', 'href', `/visit/${notificationGroups[1].affectedVisits[0].bookingReference}?from=review`)
-
-    // Visit type changed
-    listingPage.getPrisonerNumber(3).contains(notificationGroups[2].affectedVisits[0].prisonerNumber)
-    listingPage
-      .getVisitDate(3)
-      .contains(format(new Date(notificationGroups[2].affectedVisits[0].visitDate), prettyDateFormat))
-    listingPage.getBookedBy(3).contains(notificationGroups[2].affectedVisits[0].bookedByName)
-    listingPage.getType(3).contains(notificationTypes[notificationGroups[2].type])
-    listingPage
-      .getActionLink(3)
-      .should('have.attr', 'href', `/visit/${notificationGroups[2].affectedVisits[0].bookingReference}?from=review`)
-
-    // Visits blocked for date
-    listingPage.getPrisonerNumber(4).contains(notificationGroups[3].affectedVisits[0].prisonerNumber)
-    listingPage
-      .getVisitDate(4)
-      .contains(format(new Date(notificationGroups[3].affectedVisits[0].visitDate), prettyDateFormat))
-    listingPage.getBookedBy(4).contains(notificationGroups[3].affectedVisits[0].bookedByName)
-    listingPage.getType(4).contains(notificationTypes[notificationGroups[3].type])
-    listingPage
-      .getActionLink(4)
-      .should('have.attr', 'href', `/visit/${notificationGroups[3].affectedVisits[0].bookingReference}?from=review`)
   })
 
   it('should filter bookings review listing', () => {
@@ -118,12 +81,12 @@ context('Bookings review listing page', () => {
     const listingPage = Page.verifyOnPage(VisitsReviewListingPage)
 
     // All rows show when no filter selected
-    listingPage.getBookingsRows().should('have.length', 4)
+    listingPage.getBookingsRows().should('have.length', 2)
 
     // Filter by user
     listingPage.filterByUser('User One')
     listingPage.applyFilter()
-    listingPage.getBookingsRows().should('have.length', 2)
+    listingPage.getBookingsRows().should('have.length', 1)
     listingPage.removeFilter('User One')
 
     // Filter by reason
@@ -134,12 +97,12 @@ context('Bookings review listing page', () => {
 
     // Filter by both
     listingPage.filterByUser('User One')
-    listingPage.filterByReason('Visit type changed')
+    listingPage.filterByReason('Prisoner released')
     listingPage.applyFilter()
     listingPage.getBookingsRows().should('have.length', 0)
 
     // Clear all filters
     listingPage.clearFilters()
-    listingPage.getBookingsRows().should('have.length', 4)
+    listingPage.getBookingsRows().should('have.length', 2)
   })
 })

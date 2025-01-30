@@ -1,3 +1,5 @@
+import { NotificationType } from './data/orchestrationApiTypes'
+
 const production = process.env.NODE_ENV === 'production'
 
 function get<T>(name: string, fallback: T, options = { requireInProduction: false }): T | string {
@@ -128,6 +130,16 @@ export default {
         deadline: Number(get('ORCHESTRATION_API_TIMEOUT_DEADLINE', 10000)),
       },
       agent: new AgentConfig(Number(get('ORCHESTRATION_API_TIMEOUT_RESPONSE', 10000))),
+    },
+  },
+  features: {
+    notificationTypes: {
+      enabledNotifications: <NotificationType[]>(
+        get(
+          'FEATURE_ENABLED_NOTIFICATION_TYPES',
+          'PRISONER_RELEASED_EVENT,PRISONER_RECEIVED_EVENT,PRISON_VISITS_BLOCKED_FOR_DATE',
+        ).split(',')
+      ),
     },
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),

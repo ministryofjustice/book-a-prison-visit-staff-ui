@@ -397,17 +397,50 @@ describe('orchestrationApiClient', () => {
   })
 
   describe('getNotificationGroups', () => {
-    it('should return notification groups for given prison', async () => {
-      const notificationGroups = [TestData.notificationGroup()]
+    const rawNotificationGroups = [
+      TestData.notificationGroup({ type: 'NON_ASSOCIATION_EVENT' }),
+      TestData.notificationGroup({ type: 'PRISONER_RELEASED_EVENT' }),
+      TestData.notificationGroup({ type: 'PRISON_VISITS_BLOCKED_FOR_DATE' }),
+    ]
+
+    afterEach(() => {
+      jest.resetAllMocks()
+    })
+
+    it('should return filtered notification groups for given prison - no types allowed', async () => {
+      jest.replaceProperty(config, 'features', {
+        notificationTypes: { enabledNotifications: [] },
+      })
 
       fakeOrchestrationApi
         .get(`/visits/notification/${prisonId}/groups`)
         .matchHeader('authorization', `Bearer ${token}`)
-        .reply(200, notificationGroups)
+        .reply(200, rawNotificationGroups)
 
       const output = await orchestrationApiClient.getNotificationGroups(prisonId)
 
-      expect(output).toEqual(notificationGroups)
+      expect(output).toEqual([])
+    })
+
+    it('should return filtered notification groups for given prison - some types allowed', async () => {
+      jest.replaceProperty(config, 'features', {
+        notificationTypes: {
+          enabledNotifications: [
+            'PRISONER_RELEASED_EVENT',
+            'PRISONER_RESTRICTION_CHANGE_EVENT',
+            'PRISON_VISITS_BLOCKED_FOR_DATE',
+          ],
+        },
+      })
+
+      fakeOrchestrationApi
+        .get(`/visits/notification/${prisonId}/groups`)
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, rawNotificationGroups)
+
+      const output = await orchestrationApiClient.getNotificationGroups(prisonId)
+
+      expect(output).toEqual([rawNotificationGroups[1], rawNotificationGroups[2]])
     })
   })
 
