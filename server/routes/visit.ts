@@ -5,11 +5,7 @@ import { BadRequest } from 'http-errors'
 import { differenceInCalendarDays } from 'date-fns'
 import visitCancellationReasons from '../constants/visitCancellationReasons'
 import { Prisoner } from '../data/prisonerOffenderSearchTypes'
-import {
-  CancelVisitOrchestrationDto,
-  IgnoreVisitNotificationsDto,
-  NotificationType,
-} from '../data/orchestrationApiTypes'
+import { CancelVisitOrchestrationDto, IgnoreVisitNotificationsDto } from '../data/orchestrationApiTypes'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import { isValidVisitReference } from './validationChecks'
 import { clearSession, getFlashFormValues } from './visitorUtils'
@@ -25,14 +21,8 @@ import MainContact from './visitJourney/mainContact'
 import RequestMethod from './visitJourney/requestMethod'
 import sessionCheckMiddleware from '../middleware/sessionCheckMiddleware'
 import { type Services } from '../services'
-import eventAuditTypes from '../constants/eventAuditTypes'
-import { requestMethodDescriptions, requestMethodsCancellation } from '../constants/requestMethods'
-import { notificationTypeWarnings, notificationTypes } from '../constants/notificationEvents'
+import { requestMethodsCancellation } from '../constants/requestMethods'
 import Overbooking from './visitJourney/overbooking'
-
-const A_DAY_IN_MS = 24 * 60 * 60 * 1000
-const CANCELLATION_LIMIT_DAYS = 28
-const NO_UPDATE_NOTIFICATION_TYPES: NotificationType[] = ['PRISONER_RECEIVED_EVENT', 'PRISONER_RELEASED_EVENT']
 
 export default function routes({
   auditService,
@@ -64,78 +54,6 @@ export default function routes({
     return res.render('pages/visit/cancelConfirmation', {
       startTimestamp: req.flash('startTimestamp')?.[0],
       endTimestamp: req.flash('endTimestamp')?.[0],
-    })
-  })
-
-  get('/:reference', async (req, res) => {
-    const reference = getVisitReference(req)
-    const fromPage = typeof req.query?.from === 'string' ? req.query.from : null
-    const fromPageQuery = typeof req.query?.query === 'string' ? req.query.query : null
-    const { username } = res.locals.user
-
-    const { visitHistoryDetails, visitors, notifications, additionalSupport } = await visitService.getFullVisitDetails({
-      reference,
-      username,
-    })
-    const { visit } = visitHistoryDetails
-    const filteredVisitHistoryDetails = visitHistoryDetails.eventsAudit.filter(event =>
-      Object.keys(eventAuditTypes).includes(event.type),
-    )
-
-    if (visit.prisonId !== req.session.selectedEstablishment.prisonId) {
-      const visitPrison = await supportedPrisonsService.getPrison(username, visit.prisonId)
-
-      return res.render('pages/visit/summary', {
-        visit: { reference: visit.reference },
-        visitPrisonName: visitPrison.prisonName,
-      })
-    }
-
-    const [prisoner, supportedPrisonIds] = await Promise.all([
-      prisonerSearchService.getPrisonerById(visit.prisonerId, username),
-      supportedPrisonsService.getSupportedPrisonIds(username),
-    ])
-    const prisonerLocation = getPrisonerLocation(supportedPrisonIds, prisoner)
-
-    await auditService.viewedVisitDetails({
-      visitReference: reference,
-      prisonerId: visit.prisonerId,
-      prisonId: visit.prisonId,
-      username,
-      operationId: res.locals.appInsightsOperationId,
-    })
-
-    const nowTimestamp = new Date()
-    const visitStartTimestamp = new Date(visit.startTimestamp)
-    const chosenFutureInterval = new Date(visitStartTimestamp.getTime() + A_DAY_IN_MS * CANCELLATION_LIMIT_DAYS)
-
-    const showUpdate =
-      nowTimestamp < visitStartTimestamp &&
-      !notifications.some(notification => NO_UPDATE_NOTIFICATION_TYPES.includes(notification))
-    const showCancel = nowTimestamp < chosenFutureInterval
-
-    const filteredNotifications = notifications.filter(
-      notification => notification !== 'PRISON_VISITS_BLOCKED_FOR_DATE',
-    )
-    const showDoNotChange = filteredNotifications.length > 0
-
-    return res.render('pages/visit/summary', {
-      prisoner,
-      prisonerLocation,
-      visit,
-      filteredVisitHistoryDetails,
-      visitors,
-      notifications,
-      notificationTypeWarnings,
-      additionalSupport,
-      fromPage,
-      fromPageQuery,
-      showUpdate,
-      showCancel,
-      showDoNotChange,
-      requestMethodDescriptions,
-      eventAuditTypes,
-      notificationTypes,
     })
   })
 

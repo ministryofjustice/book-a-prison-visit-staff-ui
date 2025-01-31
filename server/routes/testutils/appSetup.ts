@@ -27,6 +27,7 @@ import prisonerRoutes from '../prisoner'
 import reviewRoutes from '../review'
 import searchRoutes from '../search'
 import timetableRoutes from '../timetable'
+import visitRoutesNew from '../visit/index'
 import visitRoutes from '../visit'
 import visitsRoutes from '../visitsByDate'
 
@@ -106,6 +107,7 @@ function appSetup(
   app.use('/search', searchRoutes(services))
   app.use('/timetable', timetableRoutes(services))
   app.use('/visit', visitRoutes(services))
+  app.use('/visit', visitRoutesNew(services))
   app.use('/visits', visitsRoutes(services))
 
   app.use((req, res, next) => next(new NotFound()))
