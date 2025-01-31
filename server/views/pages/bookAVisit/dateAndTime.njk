@@ -33,7 +33,7 @@
         <br>
         {{ slot.capacity + (slot.availableTables | abs) }} of {{ slot.capacity}} {{ "table" | pluralise(slot.capacity) }} booked
       {%- else -%}
-        {{ slot.availableTables }} {{ "table" | pluralise(slot.availableTables) }} available
+        {{ slot.availableTables }} {{ "table" | pluralise(slot.availableTables) }} available of {{ slot.capacity }} {{ "table" | pluralise(slot.capacity) }}
       {%- endif %}
     {% endset %}
 
