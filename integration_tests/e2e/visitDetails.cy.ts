@@ -228,7 +228,7 @@ context('Visit details page', () => {
     visitDetailsPage.selectHistoryTab()
     visitDetailsPage.eventHeader(1).contains('Needs review')
     visitDetailsPage.eventTime(1).contains('Saturday 1 January 2022 at 11am')
-    visitDetailsPage.needsReview(1).contains('Reason: Non-association')
+    visitDetailsPage.needsReview(1).contains('Reason: Time slot removed')
     visitDetailsPage.actionedBy(2).contains('User Two')
     visitDetailsPage.eventHeader(2).contains('Updated')
     visitDetailsPage.eventTime(2).contains('Saturday 1 January 2022 at 10am')

@@ -26,7 +26,7 @@ context('Review a visit', () => {
       createTimestamp: '2024-04-11T09:00:00',
     },
     {
-      type: 'NON_ASSOCIATION_EVENT',
+      type: 'PRISONER_RECEIVED_EVENT',
       applicationMethodType: 'NOT_APPLICABLE',
       actionedByFullName: '',
       userType: 'SYSTEM',
@@ -57,14 +57,14 @@ context('Review a visit', () => {
     cy.task('stubVisitHistory', visitHistoryDetails)
     cy.task('stubPrisonerSocialContacts', { offenderNo, contacts, approvedVisitorsOnly: false })
 
-    const notifications: NotificationType[] = ['NON_ASSOCIATION_EVENT']
+    const notifications: NotificationType[] = ['PRISONER_RECEIVED_EVENT']
     cy.task('stubGetVisitNotifications', { reference: visitHistoryDetails.visit.reference, notifications })
 
     // Start on booking summary page and chose 'Do not change' button
     cy.visit('/visit/ab-cd-ef-gh')
     const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage)
-    visitDetailsPage.visitNotification().eq(0).contains(notificationTypeWarnings.NON_ASSOCIATION_EVENT)
-    visitDetailsPage.needsReview(1).contains(notificationTypes.NON_ASSOCIATION_EVENT)
+    visitDetailsPage.visitNotification().eq(0).contains(notificationTypeWarnings.PRISONER_RECEIVED_EVENT)
+    visitDetailsPage.needsReview(1).contains(notificationTypes.PRISONER_RECEIVED_EVENT)
     visitDetailsPage.clearNotifications().click()
 
     // Clear notifications page - select Yes and give a reason
