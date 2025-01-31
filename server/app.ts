@@ -26,6 +26,7 @@ import prisonerRoutes from './routes/prisoner'
 import reviewRoutes from './routes/review'
 import searchRoutes from './routes/search'
 import timetableRoutes from './routes/timetable'
+import visitRoutesNew from './routes/visit/index'
 import visitRoutes from './routes/visit'
 import visitsByDateRoutes from './routes/visitsByDate'
 import type { Services } from './services'
@@ -69,6 +70,7 @@ export default function createApp(services: Services): express.Application {
   app.use('/timetable', timetableRoutes(services))
   app.use('/review', reviewRoutes(services))
   app.use('/visit', visitRoutes(services))
+  app.use('/visit', visitRoutesNew(services)) // TODO rationalise/refactor visit routes
   app.use('/visits', visitsByDateRoutes(services))
 
   app.use((req, res, next) => next(createError(404, 'Not found')))
