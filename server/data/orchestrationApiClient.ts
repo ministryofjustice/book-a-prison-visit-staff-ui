@@ -191,7 +191,13 @@ export default class OrchestrationApiClient {
   }
 
   async getVisitNotifications(reference: string): Promise<NotificationType[]> {
-    return this.restClient.get({ path: `/visits/notification/visit/${reference}/types` })
+    const { enabledNotifications } = config.features.notificationTypes
+
+    const notifications = await this.restClient.get<NotificationType[]>({
+      path: `/visits/notification/visit/${reference}/types`,
+    })
+
+    return notifications.filter(notification => enabledNotifications.includes(notification))
   }
 
   // orchestration-prisons-exclude-date-controller

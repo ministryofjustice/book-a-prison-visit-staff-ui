@@ -468,7 +468,7 @@ export default class TestData {
         createTimestamp: '2022-01-01T10:00:00',
       },
       {
-        type: 'NON_ASSOCIATION_EVENT',
+        type: 'PRISON_VISITS_BLOCKED_FOR_DATE',
         applicationMethodType: 'NOT_APPLICABLE',
         actionedByFullName: '',
         userType: 'SYSTEM',

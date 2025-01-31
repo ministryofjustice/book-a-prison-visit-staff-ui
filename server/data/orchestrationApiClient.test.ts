@@ -445,8 +445,12 @@ describe('orchestrationApiClient', () => {
   })
 
   describe('getVisitNotifications', () => {
-    it('should return notifications for a given visit reference', async () => {
-      const notifications: NotificationType[] = ['NON_ASSOCIATION_EVENT']
+    it('should return filtered notifications for a given visit reference', async () => {
+      const notifications: NotificationType[] = [
+        'NON_ASSOCIATION_EVENT', // should be filtered
+        'PRISONER_RELEASED_EVENT',
+        'PRISON_VISITS_BLOCKED_FOR_DATE',
+      ]
 
       fakeOrchestrationApi
         .get(`/visits/notification/visit/ab-cd-ef-gh/types`)
@@ -455,7 +459,7 @@ describe('orchestrationApiClient', () => {
 
       const output = await orchestrationApiClient.getVisitNotifications('ab-cd-ef-gh')
 
-      expect(output).toStrictEqual(notifications)
+      expect(output).toStrictEqual([notifications[1], notifications[2]])
     })
   })
 
