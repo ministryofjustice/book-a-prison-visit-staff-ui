@@ -162,9 +162,9 @@ describe('Views - Date and time of visit', () => {
     expect($('#slots-month-February2022-heading-1').text().trim()).toBe('Monday 14 February')
     expect($('#slots-month-February2022-content-1 h3').eq(0).text()).toBe('Morning')
     expect($('label[for="1"]').text()).toContain('10am to 11am')
-    expect($('label[for="1"]').text()).toContain('15 tables available')
+    expect($('label[for="1"]').text()).toContain('15 tables available of 30 tables')
     expect($('label[for="2"]').text()).toContain('11:59am to 12:59pm')
-    expect($('label[for="2"]').text()).toContain('1 table available')
+    expect($('label[for="2"]').text()).toContain('1 table available of 30 tables')
     expect($('label[for="3"]').text()).toContain('12pm to 1:05pm')
     expect($('label[for="3"]').text()).toContain('Prisoner has a visit')
     expect($('#3').attr('disabled')).toBe('disabled')
@@ -252,7 +252,7 @@ describe('Views - Date and time of visit', () => {
 
       expect($('#1').prop('checked')).toBe(false)
       expect($('label[for="1"]').text()).toContain('10am to 11am')
-      expect($('label[for="1"]').text()).toContain('15 tables available')
+      expect($('label[for="1"]').text()).toContain('15 tables available of 30 tables')
     })
 
     it('should correctly label currently reserved slot when booking a visit', () => {
