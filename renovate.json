@@ -2,8 +2,9 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["github>ministryofjustice/hmpps-renovate-config:node"],
   "prBodyTemplate": "{{{table}}}{{{notes}}}{{{warnings}}}{{{controls}}}",
+  "prCreation": "immediate",
   "dependencyDashboard": true,
-  "schedule": ["every weekend"],
+  "schedule": ["* 18-23,0-7 * * *", "* * * * 0,6"],
   "packageRules": [
     {
       "matchManagers": ["npm"],
