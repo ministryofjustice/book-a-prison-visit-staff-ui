@@ -186,17 +186,19 @@ export default class TestData {
   }: Partial<NotificationGroup> = {}): NotificationGroup => ({ reference, type, affectedVisits })
 
   static notificationVisitInfo = ({
-    bookedByName = 'User One',
-    bookedByUserName = 'user1',
-    bookingReference = 'ab-cd-ef-gh',
     prisonerNumber = 'A1234BC',
+    bookedByUserName = 'user1',
     visitDate = '2023-11-01',
+    bookingReference = 'ab-cd-ef-gh',
+    bookedByName = 'User One',
+    notificationEventAttributes = [],
   }: Partial<NotificationVisitInfo> = {}): NotificationVisitInfo => ({
-    bookedByName,
-    bookedByUserName,
-    bookingReference,
     prisonerNumber,
+    bookedByUserName,
     visitDate,
+    bookingReference,
+    bookedByName,
+    notificationEventAttributes,
   })
 
   static offenderRestriction = ({

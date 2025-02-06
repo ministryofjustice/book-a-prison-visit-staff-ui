@@ -414,26 +414,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/visits/notification/count': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Get notification count
-     * @description Retrieve notification count by visit reference
-     */
-    get: operations['getNotificationCount']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/visit-sessions': {
     parameters: {
       query?: never
@@ -1468,10 +1448,10 @@ export interface components {
       visitRestriction: 'OPEN' | 'CLOSED' | 'UNKNOWN'
     }
     PageVisitDto: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       first?: boolean
       last?: boolean
       /** Format: int32 */
@@ -1491,9 +1471,9 @@ export interface components {
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
       pageSize?: number
-      paged?: boolean
       /** Format: int32 */
       pageNumber?: number
+      paged?: boolean
       unpaged?: boolean
     }
     SortObject: {
@@ -1553,6 +1533,22 @@ export interface components {
        * @example John Smith
        */
       bookedByName: string
+      /** @description A list of all notification attributes for a given visit */
+      notificationEventAttributes: components['schemas']['VisitNotificationEventAttributeDto'][]
+    }
+    /** @description A list of all notification attributes for a given visit */
+    VisitNotificationEventAttributeDto: {
+      /**
+       * @description Name of the attribute associated with the notification event
+       * @example VISITOR_RESTRICTION
+       * @enum {string}
+       */
+      attributeName: 'VISITOR_RESTRICTION' | 'VISITOR_ID'
+      /**
+       * @description Value of the attribute associated with the notification event
+       * @example BAN
+       */
+      attributeValue: string
     }
     NotificationCountDto: {
       /** Format: int32 */
@@ -3671,7 +3667,20 @@ export interface operations {
   }
   getNotificationCountForPrison: {
     parameters: {
-      query?: never
+      query?: {
+        /** @description list of notificationEventTypes */
+        types?: (
+          | 'NON_ASSOCIATION_EVENT'
+          | 'PRISONER_RELEASED_EVENT'
+          | 'PRISONER_RESTRICTION_CHANGE_EVENT'
+          | 'PRISON_VISITS_BLOCKED_FOR_DATE'
+          | 'PRISONER_RECEIVED_EVENT'
+          | 'PRISONER_ALERTS_UPDATED_EVENT'
+          | 'PERSON_RESTRICTION_UPSERTED_EVENT'
+          | 'VISITOR_RESTRICTION_UPSERTED_EVENT'
+          | 'VISITOR_UNAPPROVED_EVENT'
+        )[]
+      }
       header?: never
       path: {
         /**
@@ -3745,44 +3754,6 @@ export interface operations {
             | 'VISITOR_RESTRICTION_UPSERTED_EVENT'
             | 'VISITOR_UNAPPROVED_EVENT'
           )[]
-        }
-      }
-      /** @description Unauthorized to access this endpoint */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Incorrect permissions to access this endpoint */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  getNotificationCount: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Retrieve notification count */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['NotificationCountDto']
         }
       }
       /** @description Unauthorized to access this endpoint */
