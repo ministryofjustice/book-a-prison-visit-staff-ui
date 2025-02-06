@@ -327,7 +327,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        url: `/orchestration/visits/notification/${prisonId}/count`,
+        urlPattern: `/orchestration/visits/notification/${prisonId}/count\\?types=.*`,
       },
       response: {
         status: 200,

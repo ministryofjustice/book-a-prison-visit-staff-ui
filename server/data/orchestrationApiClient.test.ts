@@ -382,11 +382,13 @@ describe('orchestrationApiClient', () => {
   })
 
   describe('getNotificationCount', () => {
-    it('should return notification count for given prison', async () => {
+    it('should return notification count for given prison for enabled notification types', async () => {
       const notificationCount = TestData.notificationCount()
+      const { enabledNotifications } = config.features.notificationTypes
 
       fakeOrchestrationApi
         .get(`/visits/notification/${prisonId}/count`)
+        .query(new URLSearchParams({ types: enabledNotifications }))
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, notificationCount)
 
@@ -411,6 +413,7 @@ describe('orchestrationApiClient', () => {
       jest.replaceProperty(config, 'features', {
         notificationTypes: { enabledNotifications: [] },
       })
+      orchestrationApiClient = new OrchestrationApiClient(token)
 
       fakeOrchestrationApi
         .get(`/visits/notification/${prisonId}/groups`)
@@ -432,6 +435,7 @@ describe('orchestrationApiClient', () => {
           ],
         },
       })
+      orchestrationApiClient = new OrchestrationApiClient(token)
 
       fakeOrchestrationApi
         .get(`/visits/notification/${prisonId}/groups`)
