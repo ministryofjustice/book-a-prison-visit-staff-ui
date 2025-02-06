@@ -31,6 +31,8 @@ export default class OrchestrationApiClient {
 
   private visitType = 'SOCIAL'
 
+  private enabledNotifications = config.features.notificationTypes.enabledNotifications
+
   constructor(token: string) {
     this.restClient = new RestClient('orchestrationApiClient', config.apis.orchestration as ApiConfig, token)
   }
@@ -177,27 +179,26 @@ export default class OrchestrationApiClient {
   }
 
   async getNotificationCount(prisonId: string): Promise<NotificationCount> {
-    return this.restClient.get({ path: `/visits/notification/${prisonId}/count` })
+    return this.restClient.get({
+      path: `/visits/notification/${prisonId}/count`,
+      query: new URLSearchParams({ types: this.enabledNotifications }).toString(),
+    })
   }
 
   async getNotificationGroups(prisonId: string): Promise<NotificationGroup[]> {
-    const { enabledNotifications } = config.features.notificationTypes
-
     const notificationGroups = await this.restClient.get<NotificationGroup[]>({
       path: `/visits/notification/${prisonId}/groups`,
     })
 
-    return notificationGroups.filter(notification => enabledNotifications.includes(notification.type))
+    return notificationGroups.filter(notification => this.enabledNotifications.includes(notification.type))
   }
 
   async getVisitNotifications(reference: string): Promise<NotificationType[]> {
-    const { enabledNotifications } = config.features.notificationTypes
-
     const notifications = await this.restClient.get<NotificationType[]>({
       path: `/visits/notification/visit/${reference}/types`,
     })
 
-    return notifications.filter(notification => enabledNotifications.includes(notification))
+    return notifications.filter(notification => this.enabledNotifications.includes(notification))
   }
 
   // orchestration-prisons-exclude-date-controller

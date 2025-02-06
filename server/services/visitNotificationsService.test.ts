@@ -115,6 +115,7 @@ describe('Visit notifications service', () => {
               bookedByName: 'User One',
               bookedByUserName: 'user1',
               visitDate: '2023-11-01',
+              notificationEventAttributes: [],
             },
             {
               prisonerNumber: 'A5678CD',
@@ -122,6 +123,7 @@ describe('Visit notifications service', () => {
               bookedByName: 'User Two',
               bookedByUserName: 'user2',
               visitDate: '2023-11-01',
+              notificationEventAttributes: [],
             },
           ],
         })
@@ -159,6 +161,7 @@ describe('Visit notifications service', () => {
               bookedByName: 'User One',
               bookedByUserName: 'user1',
               visitDate: '2023-11-01',
+              notificationEventAttributes: [],
             },
           ],
         })
