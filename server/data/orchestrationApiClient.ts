@@ -23,6 +23,7 @@ import {
   VisitPreview,
   VisitRestriction,
   VisitSession,
+  EventAuditType,
 } from './orchestrationApiTypes'
 import { Prison, VisitSessionData } from '../@types/bapv'
 
@@ -32,6 +33,17 @@ export default class OrchestrationApiClient {
   private visitType = 'SOCIAL'
 
   private enabledNotifications = config.features.notificationTypes.enabledNotifications
+
+  private enabledVisitHistoryEvents: EventAuditType[] = [
+    'RESERVED_VISIT',
+    'CHANGING_VISIT',
+    'MIGRATED_VISIT',
+    'BOOKED_VISIT',
+    'UPDATED_VISIT',
+    'CANCELLED_VISIT',
+    'IGNORE_VISIT_NOTIFICATIONS_EVENT',
+    ...this.enabledNotifications,
+  ]
 
   constructor(token: string) {
     this.restClient = new RestClient('orchestrationApiClient', config.apis.orchestration as ApiConfig, token)
@@ -68,7 +80,14 @@ export default class OrchestrationApiClient {
   }
 
   async getVisitHistory(reference: string): Promise<VisitHistoryDetails> {
-    return this.restClient.get({ path: `/visits/${reference}/history` })
+    const { eventsAudit, visit } = await this.restClient.get<VisitHistoryDetails>({
+      path: `/visits/${reference}/history`,
+    })
+
+    return {
+      eventsAudit: eventsAudit.filter(event => this.enabledVisitHistoryEvents.includes(event.type)),
+      visit,
+    }
   }
 
   async getVisitsBySessionTemplate(

@@ -115,16 +115,26 @@ describe('orchestrationApiClient', () => {
 
   describe('getVisitHistory', () => {
     it('should return visit history details for requested visit', async () => {
-      const visitHistoryDetails = TestData.visitHistoryDetails()
+      const rawVisitHistoryDetails = TestData.visitHistoryDetails()
+      // add an audit event that should be filtered
+      rawVisitHistoryDetails.eventsAudit.push({
+        type: 'PERSON_RESTRICTION_UPSERTED_EVENT',
+        applicationMethodType: 'NOT_KNOWN',
+        actionedByFullName: null,
+        userType: 'SYSTEM',
+        createTimestamp: '2022-01-01T09:00:00',
+      })
+
+      const filteredVisitHistoryDetails = TestData.visitHistoryDetails()
 
       fakeOrchestrationApi
-        .get(`/visits/${visitHistoryDetails.visit.reference}/history`)
+        .get(`/visits/${rawVisitHistoryDetails.visit.reference}/history`)
         .matchHeader('authorization', `Bearer ${token}`)
-        .reply(200, visitHistoryDetails)
+        .reply(200, rawVisitHistoryDetails)
 
-      const output = await orchestrationApiClient.getVisitHistory(visitHistoryDetails.visit.reference)
+      const output = await orchestrationApiClient.getVisitHistory(rawVisitHistoryDetails.visit.reference)
 
-      expect(output).toEqual(visitHistoryDetails)
+      expect(output).toEqual(filteredVisitHistoryDetails)
     })
   })
 
