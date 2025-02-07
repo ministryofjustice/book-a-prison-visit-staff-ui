@@ -321,6 +321,7 @@ workflows:
           <<: *main_branch
           type: approval
           requires:
+            - deploy_dev
             - deploy_staging
       - hmpps/deploy_env:
           name: deploy_preprod
