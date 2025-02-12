@@ -13,6 +13,7 @@ import {
   createMockVisitService,
 } from '../../services/testutils/mocks'
 import { notificationTypeWarnings } from '../../constants/notificationEvents'
+import { MojTimelineItem } from '../../services/visitService'
 
 let app: Express
 
@@ -37,6 +38,30 @@ describe('Visit details page', () => {
 
   let visit: Visit
   let visitHistoryDetails: VisitHistoryDetails
+
+  const visitEventsTimeline: MojTimelineItem[] = [
+    {
+      label: { text: 'Needs review' },
+      text: `Reason: Time slot removed`,
+      datetime: { timestamp: '2022-01-01T11:00:00', type: 'datetime' },
+      byline: null,
+      attributes: { 'data-test': 'timeline-entry-0' },
+    },
+    {
+      label: { text: 'Updated' },
+      text: `Method: Email request`,
+      datetime: { timestamp: '2022-01-01T10:00:00', type: 'datetime' },
+      byline: { text: 'User Two' },
+      attributes: { 'data-test': 'timeline-entry-1' },
+    },
+    {
+      label: { text: 'Booked' },
+      text: `Method: Phone booking`,
+      datetime: { timestamp: '2022-01-01T09:00:00', type: 'datetime' },
+      byline: { text: 'User One' },
+      attributes: { 'data-test': 'timeline-entry-2' },
+    },
+  ]
 
   const visitors: VisitorListItem[] = [
     {
@@ -88,6 +113,7 @@ describe('Visit details page', () => {
       notifications,
       additionalSupport,
     })
+    visitService.getVisitEventsTimeline.mockReturnValue(visitEventsTimeline)
     supportedPrisonsService.getSupportedPrisonIds.mockResolvedValue(supportedPrisonIds)
     supportedPrisonsService.isSupportedPrison.mockResolvedValue(true)
     supportedPrisonsService.getPrison.mockResolvedValue(prison)
@@ -146,21 +172,26 @@ describe('Visit details page', () => {
           )
           // booking history - tab selected - check information displayed
           // first event
-          expect($('[data-test="visit-event-1"]').text()).toBe('Needs review')
-          expect($('[data-test="visit-actioned-by-1"]').text().trim()).toBe('') // no actioned by on needs review event
-          expect($('[data-test="visit-event-date-time-1"]').text()).toBe('Saturday 1 January 2022 at 11am')
-          expect($('[data-test="visit-request-method-1"]').length).toBe(0) // no request method on needs review event
-          expect($('[data-test="visit-needs-review-description-1"]').text()).toBe('Reason: Time slot removed')
+          expect($('[data-test="timeline-entry-0"] .moj-timeline__title').text()).toBe('Needs review')
+          expect($('[data-test="timeline-entry-0"] .moj-timeline__byline').text().trim().replace(/\s+/g, ' ')).toBe('')
+          expect($('[data-test="timeline-entry-0"] time').text()).toBe('Saturday 1 January 2022 at 11am')
+          expect($('[data-test="timeline-entry-0"] .moj-timeline__description').text()).toBe(
+            'Reason: Time slot removed',
+          )
           // second event
-          expect($('[data-test="visit-event-2"]').text()).toBe('Updated')
-          expect($('[data-test="visit-actioned-by-2"]').text().trim().replace(/\s+/g, ' ')).toBe('by User Two')
-          expect($('[data-test="visit-event-date-time-2"]').text()).toBe('Saturday 1 January 2022 at 10am')
-          expect($('[data-test="visit-request-method-2"]').text()).toBe('Method: Email request')
+          expect($('[data-test="timeline-entry-1"] .moj-timeline__title').text()).toBe('Updated')
+          expect($('[data-test="timeline-entry-1"] .moj-timeline__byline').text().trim().replace(/\s+/g, ' ')).toBe(
+            'by User Two',
+          )
+          expect($('[data-test="timeline-entry-1"] time').text()).toBe('Saturday 1 January 2022 at 10am')
+          expect($('[data-test="timeline-entry-1"] .moj-timeline__description').text()).toBe('Method: Email request')
           // third event
-          expect($('[data-test="visit-event-3"]').text()).toBe('Booked')
-          expect($('[data-test="visit-actioned-by-3"]').text().trim().replace(/\s+/g, ' ')).toBe('by User One')
-          expect($('[data-test="visit-event-date-time-3"]').text()).toBe('Saturday 1 January 2022 at 9am')
-          expect($('[data-test="visit-request-method-3"]').text()).toBe('Method: Phone booking')
+          expect($('[data-test="timeline-entry-2"] .moj-timeline__title').text()).toBe('Booked')
+          expect($('[data-test="timeline-entry-2"] .moj-timeline__byline').text().trim().replace(/\s+/g, ' ')).toBe(
+            'by User One',
+          )
+          expect($('[data-test="timeline-entry-2"] time').text()).toBe('Saturday 1 January 2022 at 9am')
+          expect($('[data-test="timeline-entry-2"] .moj-timeline__description').text()).toBe('Method: Phone booking')
 
           expect(visitSessionData).toEqual({ allowOverBooking: false, prisoner: undefined })
 
@@ -517,122 +548,6 @@ describe('Visit details page', () => {
           .expect(res => {
             const $ = cheerio.load(res.text)
             expect($('[data-test="update-visit"]').length).toBeTruthy()
-          })
-      })
-    })
-
-    describe('Cancellation message', () => {
-      it('should display cancelled message - administrative', () => {
-        visit.visitStatus = 'CANCELLED'
-        visit.outcomeStatus = 'ADMINISTRATIVE_CANCELLATION'
-        visit.visitNotes = [{ type: 'VISIT_OUTCOMES', text: 'booking error' }]
-        visitHistoryDetails.eventsAudit = [
-          {
-            type: 'CANCELLED_VISIT',
-            applicationMethodType: 'NOT_APPLICABLE',
-            actionedByFullName: 'User Three',
-            userType: 'STAFF',
-            createTimestamp: '2022-01-01T11:00:00',
-          },
-        ]
-        return request(app)
-          .get('/visit/ab-cd-ef-gh')
-          .expect(200)
-          .expect('Content-Type', /html/)
-          .expect(res => {
-            const $ = cheerio.load(res.text)
-            expect($('[data-test="visit-cancelled-type"]').text()).toBe(
-              'This visit was cancelled due to an administrative error with the booking.',
-            )
-            expect($('[data-test="visit-cancelled-reason-1"]').text()).toBe('Reason: booking error')
-          })
-      })
-
-      it('should display cancelled message - booker cancelled', () => {
-        visit.visitStatus = 'CANCELLED'
-        visit.outcomeStatus = 'BOOKER_CANCELLED'
-        visit.visitNotes = [] // empty visit notes, as no comment from a booker lead cancellation
-        visitHistoryDetails.eventsAudit = [
-          {
-            type: 'CANCELLED_VISIT',
-            applicationMethodType: 'WEBSITE',
-            actionedByFullName: 'aaaa-bbbb-cccc', // booker reference - this is displayed
-            userType: 'PUBLIC',
-            createTimestamp: '2022-01-01T11:00:00',
-          },
-        ]
-        return request(app)
-          .get('/visit/ab-cd-ef-gh')
-          .expect(200)
-          .expect('Content-Type', /html/)
-          .expect(res => {
-            const $ = cheerio.load(res.text)
-            expect($('[data-test="visit-actioned-by-1"]').text()).toContain('by aaaa-bbbb-cccc')
-            expect($('[data-test="visit-cancelled-type"]').text()).toBe('This visit was cancelled by a visitor.')
-            expect($('[data-test="visit-cancelled-reason-1"]').text()).toBe('') // no cancelled reason given on public cancellations
-            expect($('[data-test="visit-cancelled-request-method-1"]').text()).toBe('Method: GOV.UK cancellation')
-          })
-      })
-
-      it('should display cancelled message - details changed after booking', () => {
-        visit.visitStatus = 'CANCELLED'
-        visit.outcomeStatus = 'DETAILS_CHANGED_AFTER_BOOKING'
-        visit.visitNotes = [{ type: 'VISIT_OUTCOMES', text: 'no longer required' }]
-        visitHistoryDetails.eventsAudit = [
-          {
-            type: 'CANCELLED_VISIT',
-            applicationMethodType: 'NOT_APPLICABLE',
-            actionedByFullName: 'User Three',
-            userType: 'STAFF',
-            createTimestamp: '2022-01-01T11:00:00',
-          },
-        ]
-
-        return request(app)
-          .get('/visit/ab-cd-ef-gh?tab=history')
-          .expect(200)
-          .expect('Content-Type', /html/)
-          .expect(res => {
-            const $ = cheerio.load(res.text)
-            expect($('[data-test="visit-cancelled-type"]').text()).toBe(
-              'This visit was cancelled as the details changed after booking.',
-            )
-            expect($('[data-test="visit-event-1"]').text().trim().replace(/\s+/g, ' ')).toBe('Cancelled')
-            expect($('[data-test="visit-actioned-by-1"]').text().trim().replace(/\s+/g, ' ')).toBe('by User Three')
-            expect($('[data-test="visit-event-date-time-1"]').text().trim().replace(/\s+/g, ' ')).toBe(
-              'Saturday 1 January 2022 at 11am',
-            )
-            expect($('[data-test="visit-cancelled-reason-1"]').text()).toBe('Reason: no longer required')
-          })
-      })
-
-      it('should display cancelled message - visitor cancelled', () => {
-        visit.visitStatus = 'CANCELLED'
-        visit.outcomeStatus = 'VISITOR_CANCELLED'
-        visit.visitNotes = [{ type: 'VISIT_OUTCOMES', text: 'no longer required' }]
-        visitHistoryDetails.eventsAudit = [
-          {
-            type: 'CANCELLED_VISIT',
-            applicationMethodType: 'NOT_APPLICABLE',
-            actionedByFullName: 'User Three',
-            userType: 'STAFF',
-            createTimestamp: '2022-01-01T11:00:00',
-          },
-        ]
-
-        return request(app)
-          .get('/visit/ab-cd-ef-gh?tab=history')
-          .expect(200)
-          .expect('Content-Type', /html/)
-          .expect(res => {
-            const $ = cheerio.load(res.text)
-            expect($('[data-test="visit-cancelled-type"]').text()).toBe('This visit was cancelled by a visitor.')
-            expect($('[data-test="visit-event-1"]').text().trim().replace(/\s+/g, ' ')).toBe('Cancelled')
-            expect($('[data-test="visit-actioned-by-1"]').text().trim().replace(/\s+/g, ' ')).toBe('by User Three')
-            expect($('[data-test="visit-event-date-time-1"]').text().trim().replace(/\s+/g, ' ')).toBe(
-              'Saturday 1 January 2022 at 11am',
-            )
-            expect($('[data-test="visit-cancelled-reason-1"]').text()).toBe('Reason: no longer required')
           })
       })
     })

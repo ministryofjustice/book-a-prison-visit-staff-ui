@@ -143,5 +143,11 @@ export function registerNunjucks(app?: express.Express): Environment {
     return [firstLine, rest.join('').trim()]
   })
 
+  // required for MOJ Timeline component, replaces their chosen styling with our design choices
+  njkEnv.addFilter('mojDate', (timestamp: string) => {
+    const dateFormat = "EEEE d MMMM yyyy 'at' h:mmaaa"
+    return timestamp ? format(parseISO(timestamp), dateFormat).replace(':00', '') : null
+  })
+
   return njkEnv
 }

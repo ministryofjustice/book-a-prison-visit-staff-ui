@@ -279,53 +279,9 @@
 
       {% set historyHtml %}
 
-        {% if filteredVisitHistoryDetails %}
-          <div class="moj-timeline {{ 'hide-timeline' if filteredVisitHistoryDetails.length === 1 }}">
-            {% for event in filteredVisitHistoryDetails | reverse %}
-              <div class="moj-timeline__item">
-
-                <div class="moj-timeline__header">
-                  <h2 data-test="visit-event-{{ loop.index }}" class="moj-timeline__title">{{ eventAuditTypes[event.type]}}</h2>
-                  <p data-test="visit-actioned-by-{{ loop.index }}" class="moj-timeline__byline">{{ actionedByUser(event.actionedByFullName) }}</p>
-                </div>
-
-                <p class="moj-timeline__date">
-                  <time data-test="visit-event-date-time-{{ loop.index }}" datetime="{{ event.createTimestamp }}">{{ event.createTimestamp | formatDate('EEEE d MMMM yyyy') }} at {{ event.createTimestamp | formatTime }}</time>
-                </p>
-
-                <div class="moj-timeline__description">
-                  {% if event.type === 'BOOKED_VISIT' %}
-                    {% if event.userType === 'PUBLIC' and event.applicationMethodType === 'WEBSITE' %}
-                      <p data-test="visit-request-method-{{ loop.index }}">Method: GOV.UK booking</p>
-                    {% else %}
-                      <p data-test="visit-request-method-{{ loop.index }}">{{ requestMethodDescriptions[event.applicationMethodType] }}</p>
-                    {% endif %}
-                  {% elseif event.type === 'UPDATED_VISIT' or event.type === 'MIGRATED_VISIT' %}
-                    <p data-test="visit-request-method-{{ loop.index }}">{{ requestMethodDescriptions[event.applicationMethodType] }}</p>
-                  {% elseif event.type === 'CANCELLED_VISIT' %}
-                    {% if cancelledVisitReason !== '' %}
-                      <p data-test="visit-cancelled-reason-{{ loop.index }}">Reason: {{ cancelledVisitReason }}</p>
-                    {% endif %}
-                    {% if event.applicationMethodType !== 'NOT_KNOWN' and event.applicationMethodType !== 'NOT_APPLICABLE' %}
-                      {% if event.userType ==='PUBLIC' and event.applicationMethodType === 'WEBSITE' %}
-                        <p data-test="visit-cancelled-request-method-{{ loop.index }}">Method: GOV.UK cancellation</p>
-                      {% else %}
-                        <p data-test="visit-cancelled-request-method-{{ loop.index }}">{{ requestMethodDescriptions[event.applicationMethodType] }}</p>
-                      {% endif %}
-                    {% endif %}
-                  {% elseif event.type === 'IGNORE_VISIT_NOTIFICATIONS_EVENT' %}
-                    <p data-test="visit-needs-review-description-{{ loop.index }}">Reason: {{ event.text }}</p>
-                  {% else %}
-                    <p data-test="visit-needs-review-description-{{ loop.index }}">Reason: {{ notificationTypes[event.type] }}</p>
-                  {% endif %}
-
-                </div>
-
-              </div>
-            {% endfor %}
-          </div>
-
-        {% endif %}
+        {{ mojTimeline({
+          items: eventsTimeline
+        }) }}
 
       {% endset %}
 

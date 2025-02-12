@@ -4,13 +4,14 @@ import {
   ApplicationDto,
   ApplicationMethodType,
   CancelVisitOrchestrationDto,
+  EventAudit,
   NotificationType,
   Visit,
   VisitHistoryDetails,
   VisitRestriction,
 } from '../data/orchestrationApiTypes'
 import TestData from '../routes/testutils/testData'
-import VisitService from './visitService'
+import VisitService, { MojTimelineItem } from './visitService'
 import {
   createMockHmppsAuthClient,
   createMockOrchestrationApiClient,
@@ -195,7 +196,7 @@ describe('Visit service', () => {
   })
 
   describe('Get Visit(s)', () => {
-    const visit = TestData.visit()
+    let visit = TestData.visit()
 
     describe('getVisit', () => {
       it('should return VisitInformation given a visit reference and matching prisonId', async () => {
@@ -362,6 +363,311 @@ describe('Visit service', () => {
 
         expect(orchestrationApiClient.getBookedVisitCountByDate).toHaveBeenCalledWith(prisonId, date)
         expect(result).toBe(2)
+      })
+    })
+
+    describe('getVisitEventsTimeline', () => {
+      beforeEach(() => {
+        visit = TestData.visit()
+      })
+
+      it('should return an empty array of timeline items if no event audit items found', () => {
+        const eventAudit: EventAudit[] = []
+        const expecteTimeline: MojTimelineItem[] = []
+        const timeline = visitService.getVisitEventsTimeline(eventAudit, visit)
+        expect(timeline).toStrictEqual(expecteTimeline)
+      })
+
+      it('should filter events and flip eventAudit order', () => {
+        const eventAudit: EventAudit[] = [
+          {
+            type: 'RESERVED_VISIT',
+            applicationMethodType: 'NOT_APPLICABLE',
+            actionedByFullName: null,
+            userType: 'SYSTEM',
+            createTimestamp: '2022-01-01T08:55:00',
+          },
+          {
+            type: 'BOOKED_VISIT',
+            applicationMethodType: 'WEBSITE',
+            actionedByFullName: '',
+            userType: 'PUBLIC',
+            createTimestamp: '2022-01-01T09:00:00',
+          },
+          {
+            type: 'UPDATED_VISIT',
+            applicationMethodType: 'BY_PRISONER',
+            actionedByFullName: 'User One',
+            userType: 'STAFF',
+            createTimestamp: '2022-01-01T10:00:00',
+          },
+        ]
+
+        const expectedTimeline: MojTimelineItem[] = [
+          {
+            label: { text: 'Updated' },
+            text: 'Method: Prisoner request',
+            datetime: { timestamp: '2022-01-01T10:00:00', type: 'datetime' },
+            byline: { text: 'User One' },
+            attributes: { 'data-test': 'timeline-entry-0' },
+          },
+          {
+            label: { text: 'Booked' },
+            text: 'Method: GOV.UK booking',
+            datetime: { timestamp: '2022-01-01T09:00:00', type: 'datetime' },
+            byline: null,
+            attributes: { 'data-test': 'timeline-entry-1' },
+          },
+        ]
+
+        const timeline = visitService.getVisitEventsTimeline(eventAudit, visit)
+
+        expect(timeline).toStrictEqual(expectedTimeline)
+      })
+
+      it('should return a timeline with an event for "Booked" - prisoner request', () => {
+        const eventAudit: EventAudit[] = [
+          {
+            type: 'BOOKED_VISIT',
+            applicationMethodType: 'BY_PRISONER',
+            actionedByFullName: 'User One',
+            userType: 'STAFF',
+            createTimestamp: '2022-01-01T09:00:00',
+          },
+        ]
+
+        const expectedTimeline: MojTimelineItem[] = [
+          {
+            label: { text: 'Booked' },
+            text: 'Method: Prisoner request',
+            datetime: { timestamp: '2022-01-01T09:00:00', type: 'datetime' },
+            byline: { text: 'User One' },
+            attributes: { 'data-test': 'timeline-entry-0' },
+          },
+        ]
+
+        const timeline = visitService.getVisitEventsTimeline(eventAudit, visit)
+
+        expect(timeline).toStrictEqual(expectedTimeline)
+      })
+
+      it('should return a timeline with an event for "Booked" - GOV.UK Booking', () => {
+        const eventAudit: EventAudit[] = [
+          {
+            type: 'BOOKED_VISIT',
+            applicationMethodType: 'WEBSITE',
+            actionedByFullName: '',
+            userType: 'PUBLIC',
+            createTimestamp: '2022-01-01T09:00:00',
+          },
+        ]
+
+        const expectedTimeline: MojTimelineItem[] = [
+          {
+            label: { text: 'Booked' },
+            text: 'Method: GOV.UK booking',
+            datetime: { timestamp: '2022-01-01T09:00:00', type: 'datetime' },
+            byline: null,
+            attributes: { 'data-test': 'timeline-entry-0' },
+          },
+        ]
+
+        const timeline = visitService.getVisitEventsTimeline(eventAudit, visit)
+
+        expect(timeline).toStrictEqual(expectedTimeline)
+      })
+
+      it('should return a timeline with an event for "Updated" - prisoner request', () => {
+        const eventAudit: EventAudit[] = [
+          {
+            type: 'UPDATED_VISIT',
+            applicationMethodType: 'BY_PRISONER',
+            actionedByFullName: 'User One',
+            userType: 'STAFF',
+            createTimestamp: '2022-01-01T09:00:00',
+          },
+        ]
+
+        const expectedTimeline: MojTimelineItem[] = [
+          {
+            label: { text: 'Updated' },
+            text: 'Method: Prisoner request',
+            datetime: { timestamp: '2022-01-01T09:00:00', type: 'datetime' },
+            byline: { text: 'User One' },
+            attributes: { 'data-test': 'timeline-entry-0' },
+          },
+        ]
+
+        const timeline = visitService.getVisitEventsTimeline(eventAudit, visit)
+
+        expect(timeline).toStrictEqual(expectedTimeline)
+      })
+
+      it('should return a timeline with an event for "Updated" - GOV.UK Booking', () => {
+        const eventAudit: EventAudit[] = [
+          {
+            type: 'UPDATED_VISIT',
+            applicationMethodType: 'WEBSITE',
+            actionedByFullName: '',
+            userType: 'PUBLIC',
+            createTimestamp: '2022-01-01T09:00:00',
+          },
+        ]
+
+        const expectedTimeline: MojTimelineItem[] = [
+          {
+            label: { text: 'Updated' },
+            text: 'Method: GOV.UK booking',
+            datetime: { timestamp: '2022-01-01T09:00:00', type: 'datetime' },
+            byline: null,
+            attributes: { 'data-test': 'timeline-entry-0' },
+          },
+        ]
+
+        const timeline = visitService.getVisitEventsTimeline(eventAudit, visit)
+
+        expect(timeline).toStrictEqual(expectedTimeline)
+      })
+
+      it('should return a timeline with an event for "Cancelled" - Reason: /free text/', () => {
+        visit.visitStatus = 'CANCELLED'
+        visit.visitNotes = [
+          {
+            type: 'VISIT_OUTCOMES',
+            text: 'Cancelled due to illness',
+          },
+        ]
+
+        const eventAudit: EventAudit[] = [
+          {
+            type: 'CANCELLED_VISIT',
+            applicationMethodType: 'WEBSITE',
+            actionedByFullName: 'User One',
+            userType: 'PUBLIC',
+            createTimestamp: '2022-01-01T09:00:00',
+          },
+        ]
+
+        const expectedTimeline: MojTimelineItem[] = [
+          {
+            label: { text: 'Cancelled' },
+            text: `Reason: ${visit.visitNotes[0].text}`,
+            datetime: { timestamp: '2022-01-01T09:00:00', type: 'datetime' },
+            byline: { text: 'User One' },
+            attributes: { 'data-test': 'timeline-entry-0' },
+          },
+        ]
+
+        const timeline = visitService.getVisitEventsTimeline(eventAudit, visit)
+
+        expect(timeline).toStrictEqual(expectedTimeline)
+      })
+
+      it('should return a timeline with an event for "Cancelled" - Method: GOV.UK Cancellation', () => {
+        visit.visitStatus = 'CANCELLED'
+        const eventAudit: EventAudit[] = [
+          {
+            type: 'CANCELLED_VISIT',
+            applicationMethodType: 'WEBSITE',
+            actionedByFullName: 'User One',
+            userType: 'PUBLIC',
+            createTimestamp: '2022-01-01T09:00:00',
+          },
+        ]
+
+        const expectedTimeline: MojTimelineItem[] = [
+          {
+            label: { text: 'Cancelled' },
+            text: 'Method: GOV.UK cancellation',
+            datetime: { timestamp: '2022-01-01T09:00:00', type: 'datetime' },
+            byline: { text: 'User One' },
+            attributes: { 'data-test': 'timeline-entry-0' },
+          },
+        ]
+
+        const timeline = visitService.getVisitEventsTimeline(eventAudit, visit)
+
+        expect(timeline).toStrictEqual(expectedTimeline)
+      })
+
+      it('should return a timeline with an event for "Cancelled" - Method: Prisoner request', () => {
+        visit.visitStatus = 'CANCELLED'
+        const eventAudit: EventAudit[] = [
+          {
+            type: 'CANCELLED_VISIT',
+            applicationMethodType: 'BY_PRISONER',
+            actionedByFullName: 'User One',
+            userType: 'STAFF',
+            createTimestamp: '2022-01-01T09:00:00',
+          },
+        ]
+
+        const expectedTimeline: MojTimelineItem[] = [
+          {
+            label: { text: 'Cancelled' },
+            text: 'Method: Prisoner request',
+            datetime: { timestamp: '2022-01-01T09:00:00', type: 'datetime' },
+            byline: { text: 'User One' },
+            attributes: { 'data-test': 'timeline-entry-0' },
+          },
+        ]
+
+        const timeline = visitService.getVisitEventsTimeline(eventAudit, visit)
+
+        expect(timeline).toStrictEqual(expectedTimeline)
+      })
+
+      it('should return a timeline with an event for "No change required" - Reason: /free text/', () => {
+        const eventAudit: EventAudit[] = [
+          {
+            type: 'IGNORE_VISIT_NOTIFICATIONS_EVENT',
+            applicationMethodType: 'NOT_APPLICABLE',
+            actionedByFullName: 'User One',
+            userType: 'STAFF',
+            createTimestamp: '2022-01-01T09:00:00',
+            text: 'Prisoner returning',
+          },
+        ]
+
+        const expectedTimeline: MojTimelineItem[] = [
+          {
+            label: { text: 'No change required' },
+            text: `Reason: ${eventAudit[0].text}`,
+            datetime: { timestamp: '2022-01-01T09:00:00', type: 'datetime' },
+            byline: { text: 'User One' },
+            attributes: { 'data-test': 'timeline-entry-0' },
+          },
+        ]
+
+        const timeline = visitService.getVisitEventsTimeline(eventAudit, visit)
+
+        expect(timeline).toStrictEqual(expectedTimeline)
+      })
+
+      it('should return a timeline with an event for "Needs review" - Reason: prisoner transfered', () => {
+        const eventAudit: EventAudit[] = [
+          {
+            type: 'PRISONER_RECEIVED_EVENT',
+            applicationMethodType: 'NOT_APPLICABLE',
+            actionedByFullName: null,
+            userType: 'SYSTEM',
+            createTimestamp: '2022-01-01T09:00:00',
+          },
+        ]
+
+        const expectedTimeline: MojTimelineItem[] = [
+          {
+            label: { text: 'Needs review' },
+            text: `Reason: Prisoner transferred`,
+            datetime: { timestamp: '2022-01-01T09:00:00', type: 'datetime' },
+            byline: null,
+            attributes: { 'data-test': 'timeline-entry-0' },
+          },
+        ]
+
+        const timeline = visitService.getVisitEventsTimeline(eventAudit, visit)
+
+        expect(timeline).toStrictEqual(expectedTimeline)
       })
     })
   })
