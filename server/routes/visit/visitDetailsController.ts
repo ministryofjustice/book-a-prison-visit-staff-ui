@@ -36,9 +36,6 @@ export default class VisitDetailsController {
           username,
         })
       const { visit } = visitHistoryDetails
-      const filteredVisitHistoryDetails = visitHistoryDetails.eventsAudit.filter(event =>
-        Object.keys(eventAuditTypes).includes(event.type),
-      )
 
       if (visit.prisonId !== req.session.selectedEstablishment.prisonId) {
         const visitPrison = await this.supportedPrisonsService.getPrison(username, visit.prisonId)
@@ -79,11 +76,12 @@ export default class VisitDetailsController {
       )
       const showDoNotChange = filteredNotifications.length > 0
 
+      const eventsTimeline = this.visitService.getVisitEventsTimeline(visitHistoryDetails.eventsAudit, visit)
+
       return res.render('pages/visit/visitDetails', {
         prisoner,
         prisonerLocation,
         visit,
-        filteredVisitHistoryDetails,
         visitors,
         notifications,
         notificationTypeWarnings,
@@ -96,6 +94,7 @@ export default class VisitDetailsController {
         requestMethodDescriptions,
         eventAuditTypes,
         notificationTypes,
+        eventsTimeline,
       })
     }
   }

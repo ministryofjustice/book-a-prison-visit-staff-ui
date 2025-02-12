@@ -308,4 +308,28 @@ describe('Nunjucks Filters', () => {
       expect(result).toStrictEqual(expectedResult)
     })
   })
+
+  // implemented own mojDate filter, as chosen a specific return format
+  describe('mojDate', () => {
+    it('should handle null or undefined', () => {
+      expect(njkEnv.getFilter('mojDate')(null)).toStrictEqual(null)
+      expect(njkEnv.getFilter('mojDate')(undefined)).toStrictEqual(null)
+    })
+
+    it('should correctly format date and time', () => {
+      const input = '2024-12-20T13:32:00.000Z'
+      const expectedResult = 'Friday 20 December 2024 at 1:32pm'
+
+      const result = njkEnv.getFilter('mojDate')(input)
+      expect(result).toStrictEqual(expectedResult)
+    })
+
+    it('should correctly format date and time, and remove :00', () => {
+      const input = '2024-12-25T17:00:00.000Z'
+      const expectedResult = 'Wednesday 25 December 2024 at 5pm'
+
+      const result = njkEnv.getFilter('mojDate')(input)
+      expect(result).toStrictEqual(expectedResult)
+    })
+  })
 })
