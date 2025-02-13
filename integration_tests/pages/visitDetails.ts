@@ -72,15 +72,12 @@ export default class VisitDetailsPage extends Page {
   additionalSupport = (): PageElement => cy.get('[data-test=additional-support]')
 
   // Visit history
-  eventHeader = (index: number): PageElement => cy.get(`[data-test="visit-event-${index}"]`)
+  eventHeader = (index: number): PageElement => cy.get(`[data-test="timeline-entry-${index}"] .moj-timeline__title`)
 
-  actionedBy = (index: number): PageElement => cy.get(`[data-test="visit-actioned-by-${index}"]`)
+  actionedBy = (index: number): PageElement => cy.get(`[data-test="timeline-entry-${index}"] .moj-timeline__byline`)
 
-  eventTime = (index: number): PageElement => cy.get(`[data-test="visit-event-date-time-${index}"]`)
+  eventTime = (index: number): PageElement => cy.get(`[data-test="timeline-entry-${index}"] time`)
 
-  requestMethod = (index: number): PageElement => cy.get(`[data-test="visit-request-method-${index}"]`)
-
-  needsReview = (index: number): PageElement => cy.get(`[data-test="visit-needs-review-description-${index}"]`)
-
-  cancellationReason = (): PageElement => cy.get('[data-test="visit-cancelled-reason-1')
+  eventDescription = (index: number): PageElement =>
+    cy.get(`[data-test="timeline-entry-${index}"] .moj-timeline__description`)
 }
