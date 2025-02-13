@@ -64,7 +64,7 @@ context('Review a visit', () => {
     cy.visit('/visit/ab-cd-ef-gh')
     const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage)
     visitDetailsPage.visitNotification().eq(0).contains(notificationTypeWarnings.PRISONER_RECEIVED_EVENT)
-    visitDetailsPage.needsReview(1).contains(notificationTypes.PRISONER_RECEIVED_EVENT)
+    visitDetailsPage.eventDescription(0).contains(notificationTypes.PRISONER_RECEIVED_EVENT)
     visitDetailsPage.clearNotifications().click()
 
     // Clear notifications page - select Yes and give a reason
@@ -95,10 +95,10 @@ context('Review a visit', () => {
     clearNotificationsPage.submit()
     visitDetailsPage.visitNotification().should('not.exist')
     visitDetailsPage.selectHistoryTab()
-    visitDetailsPage.eventHeader(1).contains(eventAuditTypes.IGNORE_VISIT_NOTIFICATIONS_EVENT)
-    visitDetailsPage.actionedBy(1).contains('User One')
-    visitDetailsPage.eventTime(1).contains('Thursday 11 April 2024 at 11am')
-    visitDetailsPage.needsReview(1).contains('some reason')
+    visitDetailsPage.eventHeader(0).contains(eventAuditTypes.IGNORE_VISIT_NOTIFICATIONS_EVENT)
+    visitDetailsPage.actionedBy(0).contains('User One')
+    visitDetailsPage.eventTime(0).contains('Thursday 11 April 2024 at 11am')
+    visitDetailsPage.eventDescription(0).contains('some reason')
   })
 
   it('should show prisoner transferred banner and needs review in history details', () => {
@@ -124,7 +124,7 @@ context('Review a visit', () => {
     cy.visit('/visit/ab-cd-ef-gh')
     const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage)
     visitDetailsPage.visitNotification().eq(0).contains(notificationTypeWarnings.PRISONER_RECEIVED_EVENT)
-    visitDetailsPage.needsReview(1).contains(notificationTypes.PRISONER_RECEIVED_EVENT)
+    visitDetailsPage.eventDescription(0).contains(notificationTypes.PRISONER_RECEIVED_EVENT)
   })
 
   it('should show prisoner released banner and needs review in history details', () => {
@@ -150,6 +150,6 @@ context('Review a visit', () => {
     cy.visit('/visit/ab-cd-ef-gh')
     const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage)
     visitDetailsPage.visitNotification().eq(0).contains(notificationTypeWarnings.PRISONER_RELEASED_EVENT)
-    visitDetailsPage.needsReview(1).contains(notificationTypes.PRISONER_RELEASED_EVENT)
+    visitDetailsPage.eventDescription(0).contains(notificationTypes.PRISONER_RELEASED_EVENT)
   })
 })

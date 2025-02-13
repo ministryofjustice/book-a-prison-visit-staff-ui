@@ -303,7 +303,7 @@ describe('Visit notifications service', () => {
     describe('Visits review list filter fields', () => {
       const notificationGroups = [
         TestData.notificationGroup({
-          type: 'PRISONER_RESTRICTION_CHANGE_EVENT',
+          type: 'PRISONER_RECEIVED_EVENT',
           affectedVisits: [TestData.notificationVisitInfo({ bookedByUserName: 'user3', bookedByName: 'User C' })],
         }),
         TestData.notificationGroup({
@@ -333,7 +333,7 @@ describe('Visit notifications service', () => {
             label: 'Reason',
             items: [
               { label: 'Prisoner released', value: 'PRISONER_RELEASED_EVENT', checked: false },
-              { label: 'Visit type changed', value: 'PRISONER_RESTRICTION_CHANGE_EVENT', checked: false },
+              { label: 'Prisoner transferred', value: 'PRISONER_RECEIVED_EVENT', checked: false },
             ],
           },
         ]
@@ -364,7 +364,7 @@ describe('Visit notifications service', () => {
             label: 'Reason',
             items: [
               { label: 'Prisoner released', value: 'PRISONER_RELEASED_EVENT', checked: false },
-              { label: 'Visit type changed', value: 'PRISONER_RESTRICTION_CHANGE_EVENT', checked: false },
+              { label: 'Prisoner transferred', value: 'PRISONER_RECEIVED_EVENT', checked: false },
             ],
           },
         ]
@@ -429,7 +429,7 @@ describe('Visit notifications service', () => {
             label: 'Reason',
             items: [
               { label: 'Prisoner released', value: 'PRISONER_RELEASED_EVENT', checked: true },
-              { label: 'Visit type changed', value: 'PRISONER_RESTRICTION_CHANGE_EVENT', checked: false },
+              { label: 'Prisoner transferred', value: 'PRISONER_RECEIVED_EVENT', checked: false },
             ],
           },
         ]
@@ -465,7 +465,7 @@ describe('Visit notifications service', () => {
             label: 'Reason',
             items: [
               { label: 'Prisoner released', value: 'PRISONER_RELEASED_EVENT', checked: false },
-              { label: 'Visit type changed', value: 'PRISONER_RESTRICTION_CHANGE_EVENT', checked: false },
+              { label: 'Prisoner transferred', value: 'PRISONER_RECEIVED_EVENT', checked: false },
             ],
           },
         ]
