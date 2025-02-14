@@ -71,40 +71,6 @@
   margin-bottom: govuk-spacing(3);
 }
 
-.bapv-secondary-text {
-  color: $govuk-secondary-text-colour;
-}
-
-.bapv-item-list {
-  @extend %govuk-list;
-
-  li {
-    display: flex;
-    gap: govuk-spacing(4);
-    margin-bottom: govuk-spacing(5);
-  }
-  
-  strong {
-    flex-basis: 15%;
-    flex-shrink: 0;
-  }
-}
-
-.bapv-item-list--horizontal {
-  @extend %govuk-list;
-  display: flex;
-  flex-wrap: nowrap;
-  gap: govuk-spacing(4) 2%;
-
-  li {
-    flex-grow: 1;
-  }
-
-  strong {
-    display: block;
-    margin-bottom: govuk-spacing(3);
-  }
-}
 
 .bapv-info-panel {
   background-color: govuk-colour("blue");
