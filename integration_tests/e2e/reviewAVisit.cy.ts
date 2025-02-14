@@ -94,7 +94,6 @@ context('Review a visit', () => {
     })
     clearNotificationsPage.submit()
     visitDetailsPage.visitNotification().should('not.exist')
-    visitDetailsPage.selectHistoryTab()
     visitDetailsPage.eventHeader(0).contains(eventAuditTypes.IGNORE_VISIT_NOTIFICATIONS_EVENT)
     visitDetailsPage.actionedBy(0).contains('User One')
     visitDetailsPage.eventTime(0).contains('Thursday 11 April 2024 at 11am')
