@@ -279,6 +279,15 @@
     @include govuk-font($size: 19);
     margin: 0;
   }
+
+  & .moj-timeline__title {
+    @include govuk-font-size($size: 24);
+    margin-right: govuk-spacing(1);
+  }
+
+  & .moj-timeline__date {
+    @include govuk-font-size($size: 19);
+  }
 }
 
 .bapv-visit-details__summary {
@@ -301,4 +310,3 @@
   color:  $govuk-secondary-text-colour;
   margin-left: govuk-spacing(4);
 }
-
