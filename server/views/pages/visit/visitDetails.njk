@@ -29,8 +29,6 @@
     <h1 class="govuk-heading-xl">Visit booking details</h1>
 
     {% if prisoner %}
-    {% set cancelledVisitReason = '' %}
-
       {% if visit.visitStatus === "CANCELLED" %}
 
         {% set status = visit.outcomeStatus.split("_") %}
@@ -59,12 +57,6 @@
           classes: "govuk-!-padding-left-4",
           html: cancelledVisitBannerHtml
         }) }}
-
-        {%- for visitNote in visit.visitNotes %}
-          {% if visitNote.type == "VISIT_OUTCOMES" %}
-            {% set cancelledVisitReason = visitNote.text %}
-          {% endif %}
-        {% endfor %}
       {% endif %}
 
       {%if notifications | length %}
