@@ -228,15 +228,6 @@
   @include govuk-font($size: 24, $weight: "bold");
 }
 
-.hide-timeline {
-  &:before {
-    background-color: $govuk-body-background-colour!important;
-  }
-  .moj-timeline__item:before {
-    background-color: $govuk-body-background-colour!important;
-  }
-}
-
 .bapv-nowrap {
   white-space: nowrap;
 }
@@ -274,5 +265,40 @@
   th:first-child, th:last-child {
     width: 20%;
   }
+}
+
+.bapv-visit-details {
+  & dl {
+    display: grid;
+    grid-template-columns: max-content auto;
+    gap: govuk-spacing(2) govuk-spacing(6);
+    margin-top: 0;
+  }
+
+  & dt, dd {
+    @include govuk-font($size: 19);
+    margin: 0;
+  }
+}
+
+.bapv-visit-details__summary {
+  & li, & dt {
+    @include govuk-typography-weight-bold;
+  }
+
+  & li {
+    @include govuk-font-size($size: 24);
+  }
+}
+
+.bapv-visit-details__person-details {
+  & dd {
+    margin-left: govuk-spacing(3);
+  }
+}
+
+.bapv-visit-details__restriction-dates {
+  color:  $govuk-secondary-text-colour;
+  margin-left: govuk-spacing(4);
 }
 
