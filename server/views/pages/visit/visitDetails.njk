@@ -163,7 +163,7 @@
               (<span data-test="prisoner-number">{{ prisoner.prisonerNumber }}</span>)
             </span>
           </h3>
-          <dl class="bapv-visit-details__person-details">
+          <dl>
             <dt>Location</dt>
             <dd data-test="prisoner-location">{{ prisonerLocation }}</dd>
 
@@ -195,13 +195,14 @@
 
             {% set visitorIndex = loop.index %}
             {% for restriction in visitor.restrictions %}
-              <p>
-                <span class="govuk-tag restriction-tag restriction-tag--{{ restriction.restrictionType }}"
-                  data-test="visitor-{{ visitorIndex }}-restriction-{{ loop.index }}">
-                  {{- restriction.restrictionTypeDescription -}}
+              <p class="bapv-visit-details__restriction">
+                <span>
+                  <span class="govuk-tag restriction-tag restriction-tag--{{ restriction.restrictionType }}"
+                    data-test="visitor-{{ visitorIndex }}-restriction-{{ loop.index }}">
+                    {{- restriction.restrictionTypeDescription -}}
+                  </span>
                 </span>
-                <span class="bapv-visit-details__restriction-dates">
-                  From <span data-test="visitor-{{ visitorIndex }}-restriction-{{ loop.index }}-start">{{ restriction.startDate | formatDate }}</span>
+                <span class="bapv-visit-details__restriction-dates">From <span data-test="visitor-{{ visitorIndex }}-restriction-{{ loop.index }}-start">{{ restriction.startDate | formatDate }}</span>
                   {%- if restriction.expiryDate %} to {% else %}.{% endif %}
                   <span data-test="visitor-{{ visitorIndex }}-restriction-{{ loop.index }}-end">
                     {%- if restriction.expiryDate %}{{ restriction.expiryDate | formatDate }}{% else %}End date not entered{% endif -%}
