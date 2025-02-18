@@ -19,7 +19,6 @@ context('Update a visit', () => {
   const today = new Date()
   const prisoner = TestData.prisoner()
   const { prisonerNumber: offenderNo, prisonId } = prisoner
-  const prisonerDisplayName = 'Smith, John'
 
   const profile = TestData.prisonerProfile({
     alerts: [
@@ -86,7 +85,7 @@ context('Update a visit', () => {
     cy.visit('/visit/ab-cd-ef-gh')
     const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage)
     visitDetailsPage.visitReference().contains('ab-cd-ef-gh')
-    visitDetailsPage.prisonerName().contains(prisonerDisplayName)
+    visitDetailsPage.prisonerName().contains('John Smith')
 
     // Start update journey
     cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
@@ -203,7 +202,7 @@ context('Update a visit', () => {
     // Confirmation page
     const confirmationPage = Page.verifyOnPageTitle(ConfirmationPage, 'Booking updated')
     confirmationPage.bookingReference().contains(TestData.visit().reference)
-    confirmationPage.prisonerName().contains(prisonerDisplayName)
+    confirmationPage.prisonerName().contains('Smith, John')
     confirmationPage.prisonerNumber().contains(offenderNo)
     confirmationPage.visitDate().contains(format(new Date(visitSessions[1].startTimestamp), longDateFormat))
     confirmationPage.visitTime().contains('1:30pm to 3pm')
@@ -256,7 +255,7 @@ context('Update a visit', () => {
     cy.visit('/visit/ab-cd-ef-gh')
     const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage)
     visitDetailsPage.visitReference().contains('ab-cd-ef-gh')
-    visitDetailsPage.prisonerName().contains(prisonerDisplayName)
+    visitDetailsPage.prisonerName().contains('John Smith')
 
     // Start update journey
     cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })

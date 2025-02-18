@@ -14,7 +14,6 @@ context('Search for a booking by reference', () => {
   const today = new Date()
   const prisoner = TestData.prisoner()
   const { prisonerNumber: offenderNo } = prisoner
-  const prisonerDisplayName = 'Smith, John'
 
   beforeEach(() => {
     cy.task('reset')
@@ -58,7 +57,7 @@ context('Search for a booking by reference', () => {
     const searchBookingByReferenceResultsPage = Page.verifyOnPage(SearchForBookingByReferenceResultsPage)
 
     searchBookingByReferenceResultsPage.visitReference().contains('ab-cd-ef-gh')
-    searchBookingByReferenceResultsPage.prisonerName().contains(prisonerDisplayName)
+    searchBookingByReferenceResultsPage.prisonerName().contains('Smith, John')
     searchBookingByReferenceResultsPage.prisonerNumber().contains(offenderNo)
     searchBookingByReferenceResultsPage.visitStatus().contains('Booked')
 
@@ -71,7 +70,7 @@ context('Search for a booking by reference', () => {
     const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage)
 
     visitDetailsPage.visitReference().contains('ab-cd-ef-gh')
-    visitDetailsPage.prisonerName().contains('Smith, John')
+    visitDetailsPage.prisonerName().contains('John Smith')
   })
 
   it('Should search via prisonerId, than navigate to the summary page', () => {
@@ -109,7 +108,7 @@ context('Search for a booking by reference', () => {
 
     const searchBookingByPrisonerResultsPage = Page.verifyOnPage(SearchForBookingByPrisonerResultsPage)
 
-    searchBookingByPrisonerResultsPage.resultRow().contains(prisonerDisplayName)
+    searchBookingByPrisonerResultsPage.resultRow().contains('Smith, John')
     searchBookingByPrisonerResultsPage.resultRow().contains(offenderNo)
     searchBookingByPrisonerResultsPage.resultRow().contains('2 April 1975')
 
@@ -129,7 +128,7 @@ context('Search for a booking by reference', () => {
 
     searchBookingByPrisonerResultsPage.prisonerLink().click()
 
-    const prisonerProfilePage = Page.verifyOnPageTitle(PrisonerProfilePage, prisonerDisplayName)
+    const prisonerProfilePage = Page.verifyOnPageTitle(PrisonerProfilePage, 'Smith, John')
 
     cy.task('stubVisitHistory', TestData.visitHistoryDetails({ visit }))
     cy.task('stubPrisonerSocialContacts', { offenderNo, contacts, approvedVisitorsOnly: 'false' })
@@ -140,6 +139,6 @@ context('Search for a booking by reference', () => {
     const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage)
 
     visitDetailsPage.visitReference().contains('ab-cd-ef-gh')
-    visitDetailsPage.prisonerName().contains('Smith, John')
+    visitDetailsPage.prisonerName().contains('John Smith')
   })
 })
