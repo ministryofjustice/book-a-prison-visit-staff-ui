@@ -5,38 +5,17 @@ export default class VisitDetailsPage extends Page {
     super('Visit booking details')
   }
 
-  visitReference = (): PageElement => cy.get('[data-test=reference]')
-
+  // Notifications
   cancellationType = (): PageElement => cy.get('[data-test="visit-cancelled-type')
 
   visitNotification = (): PageElement => cy.get('[data-test="visit-notification')
 
-  // Buttons
-  updateBooking = (): PageElement => cy.get('[data-test="update-visit"]')
-
-  cancelBooking = (): PageElement => cy.get('[data-test="cancel-visit"]')
-
-  clearNotifications = (): PageElement => cy.get('[data-test="clear-notifications')
-
-  // Sub-navigation
-
-  selectPrisonerTab = (): PageElement => cy.get('#tab_prisoner-details').click()
-
-  selectVisitorTab = (): PageElement => cy.get('#tab_visitors').click()
-
-  selectHistoryTab = (): PageElement => cy.get('#tab_history').click()
-
-  // Prisoner Details
-  prisonerName = (): PageElement => cy.get('[data-test="prisoner-name"]')
-
-  prisonerNumber = (): PageElement => cy.get('[data-test="prisoner-number"]')
-
-  prisonerDob = (): PageElement => cy.get('[data-test="prisoner-dob"]')
-
-  prisonerLocation = (): PageElement => cy.get('[data-test="prisoner-location"]')
-
   // Visit Details
-  visitDateAndTime = (): PageElement => cy.get('[data-test="visit-date-and-time"]')
+  visitDate = (): PageElement => cy.get('[data-test="visit-date"]')
+
+  visitTime = (): PageElement => cy.get('[data-test="visit-time"]')
+
+  visitRoom = (): PageElement => cy.get('[data-test="visit-room"]')
 
   visitType = (): PageElement => cy.get('[data-test="visit-type"]')
 
@@ -46,30 +25,35 @@ export default class VisitDetailsPage extends Page {
 
   visitEmail = (): PageElement => cy.get('[data-test="visit-email"]')
 
-  // Visitor Details-1
-  visitorName1 = (): PageElement => cy.get('[data-test="visitor-name1"]')
+  visitReference = (): PageElement => cy.get('[data-test=reference]')
 
-  visitorDob1 = (): PageElement => cy.get('[data-test="visitor-dob1"]')
-
-  visitorRelationship1 = (): PageElement => cy.get('[data-test="visitor-relationship1"]')
-
-  visitorAddress1 = (): PageElement => cy.get('[data-test="visitor-address1"]')
-
-  visitorRestrictions1 = (): PageElement => cy.get('[data-test="visitor-restrictions1"]')
-
-  // Visitor Details-2
-  visitorName2 = (): PageElement => cy.get('[data-test="visitor-name2"]')
-
-  visitorDob2 = (): PageElement => cy.get('[data-test="visitor-dob2"]')
-
-  visitorRelationship2 = (): PageElement => cy.get('[data-test="visitor-relationship2"]')
-
-  visitorAddress2 = (): PageElement => cy.get('[data-test="visitor-address2"]')
-
-  visitorRestrictions2 = (): PageElement => cy.get('[data-test="visitor-restriction2"]')
-
-  // Additional Information
   additionalSupport = (): PageElement => cy.get('[data-test=additional-support]')
+
+  // Prisoner Details
+  prisonerName = (): PageElement => cy.get('[data-test="prisoner-name"]')
+
+  prisonerNumber = (): PageElement => cy.get('[data-test="prisoner-number"]')
+
+  prisonerLocation = (): PageElement => cy.get('[data-test="prisoner-location"]')
+
+  prisonerDob = (): PageElement => cy.get('[data-test="prisoner-dob"]')
+
+  prisonerAge = (): PageElement => cy.get('[data-test="prisoner-age"]')
+
+  // Buttons
+  updateBooking = (): PageElement => cy.get('[data-test="update-visit"]')
+
+  cancelBooking = (): PageElement => cy.get('[data-test="cancel-visit"]')
+
+  clearNotifications = (): PageElement => cy.get('[data-test="clear-notifications')
+
+  // Visitor Details-1
+  visitorName = (index: number): PageElement => cy.get(`[data-test="visitor-name-${index}"]`)
+
+  visitorRelation = (index: number): PageElement => cy.get(`[data-test="visitor-relation-${index}"]`)
+
+  visitorRestriction = (visitorIndex: number, index: number): PageElement =>
+    cy.get(`[data-test="visitor-${visitorIndex}-restriction-${index}"]`)
 
   // Visit history
   eventHeader = (index: number): PageElement => cy.get(`[data-test="timeline-entry-${index}"] .moj-timeline__title`)
