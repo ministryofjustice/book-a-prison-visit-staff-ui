@@ -77,6 +77,7 @@ describe('Visit details page', () => {
           restrictionTypeDescription: 'Closed',
           startDate: '2022-01-03',
           globalRestriction: false,
+          comment: 'closed comment text',
         },
       ],
       banned: false,
@@ -147,30 +148,37 @@ describe('Visit details page', () => {
           const $ = cheerio.load(res.text)
           expect($('h1').text()).toBe('Visit booking details')
           expect($('.govuk-back-link').attr('href')).toBe('/prisoner/A1234BC')
-          expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
           // visit details
-          expect($('[data-test="visit-date-and-time"]').text()).toContain('Friday 14 January 2022, 10am to 11am')
-          expect($('[data-test="visit-type"]').text()).toBe('Open')
-          expect($('[data-test="visit-contact"]').text()).toBe('Smith, Jeanette')
+          expect($('[data-test="visit-date"]').text()).toContain('Friday 14 January 2022')
+          expect($('[data-test="visit-time"]').text()).toContain('10am to 11am')
+          expect($('[data-test="visit-room"]').text()).toContain('Visit room 1')
+          expect($('[data-test="visit-type"]').text()).toBe('Open visit')
+          expect($('[data-test="visit-contact"]').text()).toBe('Jeanette Smith')
           expect($('[data-test="visit-phone"]').text()).toBe('01234 567890')
           expect($('[data-test="visit-email"]').text()).toBe('visitor@example.com')
-          expect($('[data-test="cancel-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/cancel')
-          expect($('form').attr('action')).toBe('/visit/ab-cd-ef-gh')
-          // prisoner details
-          expect($('[data-test="prisoner-name"]').text()).toBe('Smith, John')
-          expect($('[data-test="prisoner-number"]').text()).toBe('A1234BC')
-          expect($('[data-test="prisoner-dob"]').text()).toBe('2 April 1975')
-          expect($('[data-test="prisoner-location"]').text()).toBe('1-1-C-028, HMP Hewell')
-          // visitor details - tab selected - check information displayed
-          expect($('[data-test="visitor-name1"]').text()).toBe('Jeanette Smith (sister of the prisoner)')
-          expect($('[data-test="visitor-dob1"]').text()).toContain('28 July 1986')
-          expect($('[data-test="visitor-dob1"]').text()).toContain('(35 years old)')
-          expect($('[data-test="visitor-address1"]').text()).toBe('123 The Street, Coventry')
-          expect($('[data-test="visitor-restriction1"]').text()).toContain('Closed')
+          expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
           expect($('[data-test="additional-support"]').text()).toContain(
             'Wheelchair ramp, Portable induction loop for people with hearing aids',
           )
-          // booking history - tab selected - check information displayed
+          // actions
+          expect($('[data-test="cancel-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/cancel')
+          expect($('form').attr('action')).toBe('/visit/ab-cd-ef-gh')
+          // prisoner details
+          expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
+          expect($('[data-test="prisoner-number"]').text()).toBe('A1234BC')
+          expect($('[data-test="prisoner-location"]').text()).toBe('1-1-C-028, HMP Hewell')
+          expect($('[data-test="prisoner-dob"]').text()).toBe('2 April 1975')
+          expect($('[data-test="prisoner-age"]').text()).toBe('46 years old')
+          // visitor details
+          expect($('[data-test="visitor-name-1"]').text()).toBe('Jeanette Smith')
+          expect($('[data-test="visitor-relation-1"]').text()).toBe('sister')
+          expect($('[data-test="visitor-dob-1"]').text()).toBe('28 July 1986')
+          expect($('[data-test="visitor-age-1"]').text()).toBe('35 years old')
+          expect($('[data-test="visitor-address-1"]').text()).toBe('123 The Street,\nCoventry')
+          expect($('[data-test="visitor-1-restriction-1"]').text()).toContain('Closed')
+          expect($('[data-test="visitor-1-restriction-text-1"]').text()).toContain('closed comment text')
+
+          // booking history
           // first event
           expect($('[data-test="timeline-entry-0"] .moj-timeline__title').text()).toBe('Needs review')
           expect($('[data-test="timeline-entry-0"] .moj-timeline__byline').text().trim().replace(/\s+/g, ' ')).toBe('')
@@ -300,9 +308,10 @@ describe('Visit details page', () => {
           expect($('.govuk-back-link').attr('href')).toBe('/prisoner/A1234BC')
           expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
           // prisoner details
-          expect($('[data-test="prisoner-name"]').text()).toBe('Smith, John')
+          expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
           expect($('[data-test="prisoner-number"]').text()).toBe('A1234BC')
           expect($('[data-test="prisoner-dob"]').text()).toBe('2 April 1975')
+          expect($('[data-test="prisoner-age"]').text()).toBe('46 years old')
           expect($('[data-test="prisoner-location"]').text()).toBe('Unknown')
         })
     })
@@ -325,9 +334,10 @@ describe('Visit details page', () => {
           expect($('.govuk-back-link').attr('href')).toBe('/prisoner/A1234BC')
           expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
           // prisoner details
-          expect($('[data-test="prisoner-name"]').text()).toBe('Smith, John')
+          expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
           expect($('[data-test="prisoner-number"]').text()).toBe('A1234BC')
           expect($('[data-test="prisoner-dob"]').text()).toBe('2 April 1975')
+          expect($('[data-test="prisoner-age"]').text()).toBe('46 years old')
           expect($('[data-test="prisoner-location"]').text()).toBe(releasedPrisoner.locationDescription)
         })
     })
