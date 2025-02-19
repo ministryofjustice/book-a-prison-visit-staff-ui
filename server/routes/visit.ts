@@ -3,9 +3,8 @@ import { Router } from 'express'
 import { body, validationResult } from 'express-validator'
 import { BadRequest } from 'http-errors'
 import { differenceInCalendarDays } from 'date-fns'
-import visitCancellationReasons from '../constants/visitCancellationReasons'
 import { Prisoner } from '../data/prisonerOffenderSearchTypes'
-import { CancelVisitOrchestrationDto, IgnoreVisitNotificationsDto } from '../data/orchestrationApiTypes'
+import { IgnoreVisitNotificationsDto } from '../data/orchestrationApiTypes'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import { isValidVisitReference } from './validationChecks'
 import { clearSession, getFlashFormValues } from './visitorUtils'
@@ -21,7 +20,6 @@ import MainContact from './visitJourney/mainContact'
 import RequestMethod from './visitJourney/requestMethod'
 import sessionCheckMiddleware from '../middleware/sessionCheckMiddleware'
 import { type Services } from '../services'
-import { requestMethodsCancellation } from '../constants/requestMethods'
 import Overbooking from './visitJourney/overbooking'
 
 export default function routes({
@@ -47,15 +45,6 @@ export default function routes({
       path,
       handlers.map(handler => asyncMiddleware(handler)),
     )
-
-  get('/cancelled', async (req, res) => {
-    clearSession(req)
-
-    return res.render('pages/visit/cancelConfirmation', {
-      startTimestamp: req.flash('startTimestamp')?.[0],
-      endTimestamp: req.flash('endTimestamp')?.[0],
-    })
-  })
 
   post('/:reference', async (req, res) => {
     const reference = getVisitReference(req)
@@ -342,18 +331,6 @@ export default function routes({
     (req, res) => confirmation.get(req, res),
   )
 
-  get('/:reference/cancel', async (req, res) => {
-    const reference = getVisitReference(req)
-
-    return res.render('pages/visit/cancel', {
-      errors: req.flash('errors'),
-      reference,
-      visitCancellationReasons,
-      requestMethodsCancellation,
-      formValues: getFlashFormValues(req),
-    })
-  })
-
   get('/:reference/update/confirm-update', async (req, res) => {
     const reference = getVisitReference(req)
     const { policyNoticeDaysMin } = req.session.selectedEstablishment
@@ -389,65 +366,6 @@ export default function routes({
 
     return res.redirect(`/visit/${reference}/update/confirm-update`)
   })
-
-  post(
-    '/:reference/cancel',
-    body('cancel', 'No answer selected').isIn(Object.keys(visitCancellationReasons)),
-    body('method', 'No request method selected')
-      .if(body('cancel').equals('VISITOR_CANCELLED'))
-      .isIn(Object.keys(requestMethodsCancellation)),
-    body('reason')
-      .trim()
-      .notEmpty()
-      .withMessage('Enter a reason for the cancellation')
-      .isLength({ max: 512 })
-      .withMessage('Reason must be 512 characters or less'),
-    async (req, res) => {
-      const errors = validationResult(req)
-      const reference = getVisitReference(req)
-      const { username } = res.locals.user
-
-      if (!errors.isEmpty()) {
-        req.flash('errors', errors.array() as [])
-        req.flash('formValues', req.body)
-        return res.redirect(`/visit/${reference}/cancel`)
-      }
-
-      const outcomeStatus = req.body.cancel
-      const text = req.body.reason
-      const applicationMethodType = outcomeStatus === 'VISITOR_CANCELLED' ? req.body.method : 'NOT_APPLICABLE'
-
-      const cancelVisitDto: CancelVisitOrchestrationDto = {
-        cancelOutcome: {
-          outcomeStatus,
-          text,
-        },
-        applicationMethodType,
-        actionedBy: username,
-        userType: 'STAFF',
-      }
-
-      const visit = await visitService.cancelVisit({
-        username,
-        reference,
-        cancelVisitDto,
-      })
-
-      await auditService.cancelledVisit({
-        visitReference: reference,
-        prisonerId: visit.prisonerId.toString(),
-        prisonId: visit.prisonId,
-        reason: `${req.body.cancel}: ${req.body.reason}`,
-        username,
-        operationId: res.locals.appInsightsOperationId,
-      })
-
-      req.flash('startTimestamp', visit.startTimestamp)
-      req.flash('endTimestamp', visit.endTimestamp)
-
-      return res.redirect('/visit/cancelled')
-    },
-  )
 
   return router
 }
