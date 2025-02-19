@@ -5,11 +5,7 @@ import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
 import { CancelVisitOrchestrationDto, Visit } from '../../data/orchestrationApiTypes'
 import { FlashData, VisitSessionData } from '../../@types/bapv'
 import TestData from '../testutils/testData'
-import {
-  createMockAuditService,
-  createMockVisitService,
-  createMockPrisonerSearchService,
-} from '../../services/testutils/mocks'
+import { createMockAuditService, createMockVisitService } from '../../services/testutils/mocks'
 import { clearSession } from '../visitorUtils'
 
 let app: Express
@@ -17,7 +13,6 @@ let app: Express
 let flashData: FlashData
 
 const auditService = createMockAuditService()
-const prisonerSearchService = createMockPrisonerSearchService()
 const visitService = createMockVisitService()
 
 let visitSessionData: VisitSessionData
@@ -142,7 +137,6 @@ describe('POST /visit/:reference/cancel', () => {
     app = appWithAllRoutes({
       services: {
         auditService,
-        prisonerSearchService,
         visitService,
       },
     })
