@@ -43,13 +43,13 @@ afterEach(() => {
   jest.resetAllMocks()
 })
 
-describe('GET /visit/cancelled', () => {
+describe('GET /visit/:reference/cancelled', () => {
   it('should render the booking cancelled page with details of the visit', () => {
     flashData.startTimestamp = ['2022-02-09T10:15:00']
     flashData.endTimestamp = ['2022-02-09T11:00:00']
 
     return request(app)
-      .get('/visit/cancelled')
+      .get('/visit/ab-cd-ef-gh/cancelled')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -148,7 +148,7 @@ describe('POST /visit/:reference/cancel', () => {
       .send('cancel=PRISONER_CANCELLED')
       .send('reason=++illness++')
       .expect(302)
-      .expect('location', '/visit/cancelled')
+      .expect('location', '/visit/ab-cd-ef-gh/cancelled')
       .expect(() => {
         expect(visitService.cancelVisit).toHaveBeenCalledTimes(1)
         expect(visitService.cancelVisit).toHaveBeenCalledWith({
@@ -185,7 +185,7 @@ describe('POST /visit/:reference/cancel', () => {
       .send('method=EMAIL')
       .send('reason=++illness++')
       .expect(302)
-      .expect('location', '/visit/cancelled')
+      .expect('location', '/visit/ab-cd-ef-gh/cancelled')
       .expect(() => {
         expect(visitService.cancelVisit).toHaveBeenCalledTimes(1)
         expect(visitService.cancelVisit).toHaveBeenCalledWith({

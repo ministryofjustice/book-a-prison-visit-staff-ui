@@ -1,12 +1,10 @@
 import { RequestHandler } from 'express'
-import { BadRequest } from 'http-errors'
 import { AuditService, PrisonerSearchService, SupportedPrisonsService, VisitService } from '../../services'
 import eventAuditTypes from '../../constants/eventAuditTypes'
 import { Prisoner } from '../../data/prisonerOffenderSearchTypes'
 import { NotificationType } from '../../data/orchestrationApiTypes'
 import { notificationTypes, notificationTypeWarnings } from '../../constants/notificationEvents'
 import { requestMethodDescriptions } from '../../constants/requestMethods'
-import { isValidVisitReference } from '../validationChecks'
 
 export default class VisitDetailsController {
   private readonly A_DAY_IN_MS = 24 * 60 * 60 * 1000
@@ -28,9 +26,6 @@ export default class VisitDetailsController {
   public view(): RequestHandler {
     return async (req, res) => {
       const { reference } = req.params
-      if (!isValidVisitReference(reference)) {
-        throw new BadRequest()
-      }
 
       const fromPage = typeof req.query?.from === 'string' ? req.query.from : null
       const fromPageQuery = typeof req.query?.query === 'string' ? req.query.query : null

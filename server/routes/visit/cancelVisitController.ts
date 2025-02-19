@@ -1,11 +1,9 @@
-import { RequestHandler, Request } from 'express'
-import { BadRequest } from 'http-errors'
+import { RequestHandler } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
 import { AuditService, VisitService } from '../../services'
 import { CancelVisitOrchestrationDto } from '../../data/orchestrationApiTypes'
 import { requestMethodsCancellation } from '../../constants/requestMethods'
 import { clearSession, getFlashFormValues } from '../visitorUtils'
-import { isValidVisitReference } from '../validationChecks'
 import visitCancellationReasons from '../../constants/visitCancellationReasons'
 
 export default class CancelVisitController {
@@ -27,7 +25,7 @@ export default class CancelVisitController {
 
   public showCancellationReasons(): RequestHandler {
     return async (req, res) => {
-      const reference = getVisitReference(req)
+      const { reference } = req.params
 
       return res.render('pages/visit/cancel', {
         errors: req.flash('errors'),
@@ -41,7 +39,7 @@ export default class CancelVisitController {
 
   public cancelVisit(): RequestHandler {
     return async (req, res) => {
-      const reference = getVisitReference(req)
+      const { reference } = req.params
 
       const errors = validationResult(req)
       const { username } = res.locals.user
@@ -84,7 +82,7 @@ export default class CancelVisitController {
       req.flash('startTimestamp', visit.startTimestamp)
       req.flash('endTimestamp', visit.endTimestamp)
 
-      return res.redirect('/visit/cancelled')
+      return res.redirect(`/visit/${reference}/cancelled`)
     }
   }
 
@@ -102,13 +100,4 @@ export default class CancelVisitController {
         .withMessage('Reason must be 512 characters or less'),
     ]
   }
-}
-
-function getVisitReference(req: Request): string {
-  const { reference } = req.params
-
-  if (!isValidVisitReference(reference)) {
-    throw new BadRequest()
-  }
-  return reference
 }
