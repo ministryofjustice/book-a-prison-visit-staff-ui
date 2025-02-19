@@ -1,23 +1,17 @@
 import { RequestHandler, Router } from 'express'
-import { BadRequest } from 'http-errors'
+import { ValidationChain } from 'express-validator'
 import { Services } from '../../services'
 import asyncMiddleware from '../../middleware/asyncMiddleware'
 import VisitDetailsController from './visitDetailsController'
-import { isValidVisitReference } from '../validationChecks'
+import CancelVisitController from './cancelVisitController'
 
 export default function routes(services: Services): Router {
   const router = Router()
 
   const get = (path: string | string[], handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
 
-  // middleware to ensure valid visit reference
-  router.use('/:reference', (req, res, next) => {
-    const { reference } = req.params
-    if (!isValidVisitReference(reference)) {
-      throw new BadRequest()
-    }
-    next()
-  })
+  const postWithValidation = (path: string | string[], validationChain: ValidationChain[], handler: RequestHandler) =>
+    router.post(path, ...validationChain, asyncMiddleware(handler))
 
   const visitDetails = new VisitDetailsController(
     services.auditService,
@@ -26,7 +20,14 @@ export default function routes(services: Services): Router {
     services.visitService,
   )
 
+  const cancelVisit = new CancelVisitController(services.auditService, services.visitService)
+
+  get('/cancelled', cancelVisit.cancelConfirmation())
+
   get('/:reference', visitDetails.view())
+
+  get('/:reference/cancel', cancelVisit.showCancellationReasons())
+  postWithValidation('/:reference/cancel', cancelVisit.validate(), cancelVisit.cancelVisit())
 
   return router
 }
