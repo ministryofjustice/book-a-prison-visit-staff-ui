@@ -1,13 +1,11 @@
 import type { NextFunction, RequestHandler, Request, Response } from 'express'
 import { Router } from 'express'
-import { body, validationResult } from 'express-validator'
 import { BadRequest } from 'http-errors'
 import { differenceInCalendarDays } from 'date-fns'
 import { Prisoner } from '../data/prisonerOffenderSearchTypes'
-import { IgnoreVisitNotificationsDto } from '../data/orchestrationApiTypes'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import { isValidVisitReference } from './validationChecks'
-import { clearSession, getFlashFormValues } from './visitorUtils'
+import { clearSession } from './visitorUtils'
 import { VisitSessionData, VisitSlot } from '../@types/bapv'
 import SelectVisitors from './visitJourney/selectVisitors'
 import VisitType from './visitJourney/visitType'
@@ -30,7 +28,6 @@ export default function routes({
   supportedPrisonsService,
   visitService,
   visitSessionsService,
-  visitNotificationsService,
 }: Services): Router {
   const router = Router()
 
@@ -129,63 +126,6 @@ export default function routes({
     }
     return res.redirect(`/visit/${reference}/update/confirm-update`)
   })
-
-  get('/:reference/clear-notifications', async (req, res) => {
-    const reference = getVisitReference(req)
-
-    return res.render('pages/visit/clearNotifications', {
-      errors: req.flash('errors'),
-      formValues: getFlashFormValues(req),
-      backLinkHref: `/visit/${reference}`,
-    })
-  })
-
-  post(
-    '/:reference/clear-notifications',
-    body('clearNotifications', 'No answer selected').isIn(['yes', 'no']),
-    body('clearReason')
-      .if(body('clearNotifications').equals('yes'))
-      .trim()
-      .notEmpty()
-      .withMessage('Enter a reason for not changing the booking')
-      .isLength({ max: 512 })
-      .withMessage('Reason must be 512 characters or less'),
-    async (req, res) => {
-      const errors = validationResult(req)
-      const reference = getVisitReference(req)
-      const { username } = res.locals.user
-
-      if (!errors.isEmpty()) {
-        req.flash('errors', errors.array() as [])
-        req.flash('formValues', req.body)
-        return res.redirect(`/visit/${reference}/clear-notifications`)
-      }
-
-      if (req.body.clearNotifications === 'yes') {
-        const ignoreVisitNotificationsDto: IgnoreVisitNotificationsDto = {
-          reason: req.body.clearReason,
-          actionedBy: username,
-        }
-
-        const visit = await visitNotificationsService.ignoreNotifications({
-          username,
-          reference,
-          ignoreVisitNotificationsDto,
-        })
-
-        await auditService.dismissedNotifications({
-          visitReference: reference,
-          prisonerId: visit.prisonerId.toString(),
-          prisonId: visit.prisonId,
-          reason: ignoreVisitNotificationsDto.reason,
-          username: ignoreVisitNotificationsDto.actionedBy,
-          operationId: res.locals.appInsightsOperationId,
-        })
-      }
-
-      return res.redirect(`/visit/${reference}`)
-    },
-  )
 
   const selectVisitors = new SelectVisitors('update', prisonerVisitorsService)
   const visitType = new VisitType('update', auditService)
