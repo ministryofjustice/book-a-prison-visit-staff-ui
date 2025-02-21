@@ -13,7 +13,6 @@ import {
   createMockPrisonerSearchService,
   createMockPrisonerVisitorsService,
   createMockSupportedPrisonsService,
-  createMockVisitNotificationsService,
   createMockVisitService,
   createMockVisitSessionsService,
 } from '../services/testutils/mocks'
@@ -27,7 +26,6 @@ const prisonerProfileService = createMockPrisonerProfileService()
 const prisonerSearchService = createMockPrisonerSearchService()
 const prisonerVisitorsService = createMockPrisonerVisitorsService()
 const supportedPrisonsService = createMockSupportedPrisonsService()
-const visitNotificationsService = createMockVisitNotificationsService()
 const visitService = createMockVisitService()
 const visitSessionsService = createMockVisitSessionsService()
 
