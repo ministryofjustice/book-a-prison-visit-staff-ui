@@ -20,12 +20,11 @@
   {% set backLinkHref = "/" %}
 {% endif %}
 
+{% set mainClasses = "bapv-visit-details" %}
+
 {% block content %}
-<div class="govuk-grid-row bapv-visit-details">
+<div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
-
-    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
-
     <h1 class="govuk-heading-xl">Visit booking details</h1>
 
     {% if prisoner %}
@@ -91,7 +90,7 @@
         </div>
 
         <div class="govuk-grid-column-one-half">
-          <dl>
+          <dl class="govuk-list">
             <dt>Main contact</dt>
             <dd data-test="visit-contact">{{ visit.visitContact.name }}</dd>
             
@@ -156,14 +155,14 @@
 
       <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-          <h2 class="govuk-heading-l">Prisoner</h2>
-          <h3 class="govuk-heading-m">
+          <h2 class="govuk-heading-l bapv-heading">Prisoner</h2>
+          <h3 class="govuk-heading-m bapv-heading">
             <span data-test="prisoner-name">{{ (prisoner.firstName + " " + prisoner.lastName) | properCaseFullName }}</span>
             <span class="govuk-body" >
               (<span data-test="prisoner-number">{{ prisoner.prisonerNumber }}</span>)
             </span>
           </h3>
-          <dl>
+          <dl class="govuk-list">
             <dt>Location</dt>
             <dd data-test="prisoner-location">{{ prisonerLocation }}</dd>
 
@@ -174,15 +173,15 @@
             </dd>
           </dl>
 
-          <h2 class="govuk-heading-l">Visitors</h2>
+          <h2 class="govuk-heading-l bapv-heading">Visitors</h2>
           {% for visitor in visitors %}
-            <h3 class="govuk-heading-m">
+            <h3 class="govuk-heading-m bapv-heading">
               <span data-test="visitor-name-{{ loop.index }}">{{ visitor.name }}</span>
               <span>
                 (<span data-test="visitor-relation-{{ loop.index }}">{{ visitor.relationshipDescription | lower }}</span>)
               </span>
             </h3>
-            <dl class="bapv-visit-details__person-details">
+            <dl class="govuk-list bapv-visit-details__person-details">
               <dt>Date of birth</dt>
               <dd>
                 <span data-test="visitor-dob-{{ loop.index }}">{{ visitor.dateOfBirth | formatDate }}</span>
@@ -215,7 +214,7 @@
             {% endfor %}
           {% endfor %}
 
-          <h2 class="govuk-heading-l">Booking history</h2>
+          <h2 class="govuk-heading-l bapv-heading">Booking history</h2>
           {{ mojTimeline({
             headingLevel: 3,
             items: eventsTimeline
