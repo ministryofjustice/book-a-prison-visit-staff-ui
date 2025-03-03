@@ -8,7 +8,7 @@ export default class VisitDetailsPage extends Page {
   // Notifications
   cancellationType = (): PageElement => cy.get('[data-test="visit-cancelled-type')
 
-  visitNotification = (): PageElement => cy.get('[data-test="visit-notification')
+  visitNotifications = (): PageElement => cy.get('[data-test="visit-notifications')
 
   // Visit Details
   visitDate = (): PageElement => cy.get('[data-test="visit-date"]')
