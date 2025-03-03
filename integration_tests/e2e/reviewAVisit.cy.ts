@@ -63,7 +63,7 @@ context('Review a visit', () => {
     // Start on booking summary page and chose 'Do not change' button
     cy.visit('/visit/ab-cd-ef-gh')
     const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage)
-    visitDetailsPage.visitNotification().eq(0).contains(notificationTypeWarnings.PRISONER_RECEIVED_EVENT)
+    visitDetailsPage.visitNotifications().eq(0).contains(notificationTypeWarnings.PRISONER_RECEIVED_EVENT)
     visitDetailsPage.eventDescription(0).contains(notificationTypes.PRISONER_RECEIVED_EVENT)
     visitDetailsPage.clearNotifications().click()
 
@@ -93,7 +93,7 @@ context('Review a visit', () => {
       visit: visitHistoryDetails.visit,
     })
     clearNotificationsPage.submit()
-    visitDetailsPage.visitNotification().should('not.exist')
+    visitDetailsPage.visitNotifications().should('not.exist')
     visitDetailsPage.eventHeader(0).contains(eventAuditTypes.IGNORE_VISIT_NOTIFICATIONS_EVENT)
     visitDetailsPage.actionedBy(0).contains('User One')
     visitDetailsPage.eventTime(0).contains('Thursday 11 April 2024 at 11am')
@@ -122,7 +122,7 @@ context('Review a visit', () => {
     // Start on booking summary page and chose 'Do not change' button
     cy.visit('/visit/ab-cd-ef-gh')
     const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage)
-    visitDetailsPage.visitNotification().eq(0).contains(notificationTypeWarnings.PRISONER_RECEIVED_EVENT)
+    visitDetailsPage.visitNotifications().eq(0).contains(notificationTypeWarnings.PRISONER_RECEIVED_EVENT)
     visitDetailsPage.eventDescription(0).contains(notificationTypes.PRISONER_RECEIVED_EVENT)
   })
 
@@ -148,7 +148,7 @@ context('Review a visit', () => {
     // Start on booking summary page and chose 'Do not change' button
     cy.visit('/visit/ab-cd-ef-gh')
     const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage)
-    visitDetailsPage.visitNotification().eq(0).contains(notificationTypeWarnings.PRISONER_RELEASED_EVENT)
+    visitDetailsPage.visitNotifications().eq(0).contains(notificationTypeWarnings.PRISONER_RELEASED_EVENT)
     visitDetailsPage.eventDescription(0).contains(notificationTypes.PRISONER_RELEASED_EVENT)
   })
 })
