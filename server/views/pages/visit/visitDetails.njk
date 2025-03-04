@@ -25,8 +25,6 @@
 {% block content %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
-    <h1 class="govuk-heading-xl">Visit booking details</h1>
-
     {% if prisoner %}
       {% if visit.visitStatus === "CANCELLED" %}
 
@@ -74,6 +72,8 @@
           }) }}
         {% endfor %}
       {% endif %}
+
+      <h1 class="govuk-heading-xl">Visit booking details</h1>
 
       <div class="govuk-grid-row bapv-visit-details__summary">
         <div class="govuk-grid-column-one-half">
@@ -155,7 +155,7 @@
 
       <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-          <h2 class="govuk-heading-l bapv-heading">Prisoner</h2>
+          <h2 class="govuk-heading-l bapv-heading govuk-!-padding-top-3">Prisoner</h2>
           <h3 class="govuk-heading-m bapv-heading">
             <span data-test="prisoner-name">{{ (prisoner.firstName + " " + prisoner.lastName) | properCaseFullName }}</span>
             <span class="govuk-body" >
@@ -223,6 +223,7 @@
       </div>
 
     {% else %}
+      <h1 class="govuk-heading-l">Visit booking details</h1>
       <p>Booking reference: <span data-test="reference">{{ visit.reference }}</span></p>
       <p>This booking is not for {{ selectedEstablishment.prisonName }}.</p>
       <p>To view the booking, change the establishment to {{ visitPrisonName }} and search for it by the booking reference.</p>

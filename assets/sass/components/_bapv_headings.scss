@@ -14,18 +14,15 @@
 }
 
 // Increase top padding after paragraphs and lists
-p + .govuk-heading-l.bapv-heading,
-.govuk-list + .govuk-heading-l.bapv-heading {
+:is(p, .govuk-list) + .govuk-heading-l.bapv-heading {
   @include govuk-responsive-padding(6, "top");
 }
 
-p + .govuk-heading-m.bapv-heading,
-.govuk-list + .govuk-heading-m.bapv-heading {
+:is(p, .govuk-list) + .govuk-heading-m.bapv-heading {
   @include govuk-responsive-padding(5, "top");
 }
 
-p + .govuk-heading-s.bapv-heading,
-.govuk-list + .govuk-heading-s.bapv-heading {
+:is(p, .govuk-list) + .govuk-heading-s.bapv-heading {
   @include govuk-responsive-padding(4, "top");
 }
 
