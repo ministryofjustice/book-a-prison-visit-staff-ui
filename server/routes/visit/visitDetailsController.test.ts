@@ -433,12 +433,12 @@ describe('Visit details page', () => {
           .expect('Content-Type', /html/)
           .expect(res => {
             const $ = cheerio.load(res.text)
-            expect($('[data-test="visit-notifications"]').length).toBe(0)
+            expect($('[data-test="visit-notification"]').length).toBe(0)
             expect($('[data-test="clear-notifications"]').length).toBe(0)
           })
       })
 
-      it('should display a single visit notification and NOT the do not change button when only a blocked date notification set', () => {
+      it('should display a single visit notification banner and NOT the do not change button when only a blocked date notification set', () => {
         visitService.getFullVisitDetails.mockResolvedValue({
           visitHistoryDetails,
           visitors,
@@ -452,15 +452,15 @@ describe('Visit details page', () => {
           .expect('Content-Type', /html/)
           .expect(res => {
             const $ = cheerio.load(res.text)
-            expect($('[data-test="visit-notifications"]').length).toBe(1)
-            expect($('[data-test="visit-notifications"] li').eq(0).text().trim()).toBe(
+            expect($('[data-test="visit-notification"]').length).toBe(1)
+            expect($('[data-test="visit-notification"]').text()).toBe(
               notificationTypeWarnings.PRISON_VISITS_BLOCKED_FOR_DATE,
             )
             expect($('[data-test="clear-notifications"]').length).toBe(0)
           })
       })
 
-      it('should display a single visit notification and do not change button when a single notification type is set', () => {
+      it('should display a single visit notification banner and do not change button when a single notification type is set', () => {
         visitService.getFullVisitDetails.mockResolvedValue({
           visitHistoryDetails,
           visitors,
@@ -474,16 +474,14 @@ describe('Visit details page', () => {
           .expect('Content-Type', /html/)
           .expect(res => {
             const $ = cheerio.load(res.text)
-            expect($('[data-test="visit-notifications"]').length).toBe(1)
-            expect($('[data-test="visit-notifications"] li').eq(0).text().trim()).toBe(
-              notificationTypeWarnings.PRISONER_RELEASED_EVENT,
-            )
+            expect($('[data-test="visit-notification"]').length).toBe(1)
+            expect($('[data-test="visit-notification"]').text()).toBe(notificationTypeWarnings.PRISONER_RELEASED_EVENT)
             expect($('[data-test="clear-notifications"]').length).toBe(1)
             expect($('[data-test="clear-notifications"]').text()).toContain('Do not change')
           })
       })
 
-      it('should display two visit notifications and do not change button when two notification types are set', () => {
+      it('should display two visit notification banners and do not change button when two notification types are set', () => {
         visitService.getFullVisitDetails.mockResolvedValue({
           visitHistoryDetails,
           visitors,
@@ -497,11 +495,11 @@ describe('Visit details page', () => {
           .expect('Content-Type', /html/)
           .expect(res => {
             const $ = cheerio.load(res.text)
-            expect($('[data-test="visit-notifications"] li').length).toBe(2)
-            expect($('[data-test="visit-notifications"] li').eq(0).text().trim()).toBe(
+            expect($('[data-test="visit-notification"]').length).toBe(2)
+            expect($('[data-test="visit-notification"]').eq(0).text()).toBe(
               notificationTypeWarnings.PRISONER_RELEASED_EVENT,
             )
-            expect($('[data-test="visit-notifications"] li').eq(1).text().trim()).toBe(
+            expect($('[data-test="visit-notification"]').eq(1).text()).toBe(
               notificationTypeWarnings.PRISON_VISITS_BLOCKED_FOR_DATE,
             )
             expect($('[data-test="clear-notifications"]').length).toBe(1)

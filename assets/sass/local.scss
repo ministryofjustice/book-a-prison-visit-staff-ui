@@ -267,15 +267,6 @@
   }
 }
 
-.bapv-warning.govuk-error-summary {
-  border-color: $bapv-warning;
-
-  & li, a {
-    color: $bapv-warning;
-    font-weight: $govuk-font-weight-bold;
-  }
-}
-
 .bapv-visit-details {
   & dl, & .bapv-visit-details__restriction {
     display: grid;
