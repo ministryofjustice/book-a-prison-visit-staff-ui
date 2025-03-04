@@ -141,7 +141,7 @@ context('Visit details page', () => {
     visitDetailsPage.clearNotifications().should('have.length', 0)
 
     // notifications
-    visitDetailsPage.visitNotifications().eq(0).contains(notificationTypeWarnings.PRISON_VISITS_BLOCKED_FOR_DATE)
+    visitDetailsPage.visitNotification().eq(0).contains(notificationTypeWarnings.PRISON_VISITS_BLOCKED_FOR_DATE)
 
     // Prisoner Details
     visitDetailsPage.prisonerName().contains(prisonerDisplayName)
@@ -191,7 +191,7 @@ context('Visit details page', () => {
     visitDetailsPage.clearNotifications().should('have.length', 1)
 
     // notifications
-    visitDetailsPage.visitNotifications().eq(0).contains(notificationTypeWarnings.PRISONER_RECEIVED_EVENT)
+    visitDetailsPage.visitNotification().eq(0).contains(notificationTypeWarnings.PRISONER_RECEIVED_EVENT)
 
     // Prisoner Details
     visitDetailsPage.prisonerName().contains(prisonerDisplayName)

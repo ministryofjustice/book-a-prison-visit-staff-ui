@@ -1,6 +1,5 @@
 {% extends "layout.njk" %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
-{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {%-from "moj/components/banner/macro.njk" import mojBanner %}
 {%- from "moj/components/timeline/macro.njk" import mojTimeline -%}
@@ -23,27 +22,14 @@
 
 {% set mainClasses = "bapv-visit-details" %}
 
-{% set notificationsList = [] %}
-{% for notification in notifications %}
-  {% set notificationsList = (notificationsList.push({
-    text: notificationTypeWarnings[notification] | default(notification)
-  }), notificationsList) %}
-{% endfor %}
-
 {% block content %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
+    <h1 class="govuk-heading-xl">Visit booking details</h1>
+
     {% if prisoner %}
-
-      {{ govukErrorSummary({
-        titleText: "This visit needs review",
-        classes: "govuk-!-width-two-thirds bapv-warning",
-        disableAutoFocus: "true",
-        attributes: { "data-test": "visit-notifications" },
-        errorList: notificationsList
-      }) if notificationsList | length }}
-
       {% if visit.visitStatus === "CANCELLED" %}
+
         {% set status = visit.outcomeStatus.split("_") %}
 
         {% set cancelledBy %}
@@ -67,12 +53,27 @@
         {% endset %}
 
         {{ mojBanner({
-          classes: "govuk-!-width-two-thirds govuk-!-padding-left-4",
+          classes: "govuk-!-padding-left-4",
           html: cancelledVisitBannerHtml
         }) }}
       {% endif %}
 
-      <h1 class="govuk-heading-xl">Visit booking details</h1>
+      {%if notifications | length %}
+        {% for notification in notifications %}
+          {% set visitNotificationBannerHtml %}
+            {{ govukWarningText({
+              classes: "govuk-!-margin-bottom-0 govuk-!-padding-left-4",
+              html: '<span data-test="visit-notification">' + (notificationTypeWarnings[notification] | default(notification)) + "</span>",
+              iconFallbackText: "Warning"
+            }) }}
+          {% endset %}
+
+          {{ mojBanner({
+            classes: "govuk-!-padding-left-4",
+            html: visitNotificationBannerHtml
+          }) }}
+        {% endfor %}
+      {% endif %}
 
       <div class="govuk-grid-row bapv-visit-details__summary">
         <div class="govuk-grid-column-one-half">
@@ -222,7 +223,6 @@
       </div>
 
     {% else %}
-      <h1 class="govuk-heading-l">Visit booking details</h1>
       <p>Booking reference: <span data-test="reference">{{ visit.reference }}</span></p>
       <p>This booking is not for {{ selectedEstablishment.prisonName }}.</p>
       <p>To view the booking, change the establishment to {{ visitPrisonName }} and search for it by the booking reference.</p>
