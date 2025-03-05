@@ -67,15 +67,15 @@ export default class VisitDetailsController {
         visitStartTimestamp.getTime() + this.A_DAY_IN_MS * this.CANCELLATION_LIMIT_DAYS,
       )
 
-      const showUpdate =
+      const showUpdateButton =
         nowTimestamp < visitStartTimestamp &&
         !notifications.some(notification => this.NO_UPDATE_NOTIFICATION_TYPES.includes(notification))
-      const showCancel = nowTimestamp < chosenFutureInterval
+      const showCancelButton = nowTimestamp < chosenFutureInterval
 
       const filteredNotifications = notifications.filter(
         notification => notification !== 'PRISON_VISITS_BLOCKED_FOR_DATE',
       )
-      const showDoNotChange = filteredNotifications.length > 0
+      const showDoNotChangeButton = filteredNotifications.length > 0
 
       const eventsTimeline = this.visitService.getVisitEventsTimeline(visitHistoryDetails.eventsAudit, visit)
 
@@ -89,9 +89,9 @@ export default class VisitDetailsController {
         additionalSupport,
         fromPage,
         fromPageQuery,
-        showUpdate,
-        showCancel,
-        showDoNotChange,
+        showUpdateButton,
+        showCancelButton,
+        showDoNotChangeButton,
         requestMethodDescriptions,
         eventAuditTypes,
         notificationTypes,
