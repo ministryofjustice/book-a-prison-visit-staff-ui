@@ -21,6 +21,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/visits/{applicationReference}/update': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Update an existing visit */
+    put: operations['updateAVisit']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/visits/{applicationReference}/book': {
     parameters: {
       query?: never
@@ -294,6 +311,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/visits/{reference}/detailed': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get a detailed summary of the visit including prisoner, visitor, event audit and notification event details
+     * @description Retrieve a detailed summary of the visit given a visit reference
+     */
+    get: operations['getVisitFullDetailsByReference']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/visits/session-template': {
     parameters: {
       query?: never
@@ -406,6 +443,26 @@ export interface paths {
      * @description Retrieve visit  notification types by booking reference
      */
     get: operations['getNotificationTypesForBookingReference']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/visits/notification/visit/{reference}/events': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * get visit notification events by booking reference
+     * @description Retrieve visit  notification events by booking reference
+     */
+    get: operations['getNotificationEventsForBookingReference']
     put?: never
     post?: never
     delete?: never
@@ -855,6 +912,7 @@ export type webhooks = Record<string, never>
 export interface components {
   schemas: {
     CancelVisitOrchestrationDto: {
+      /** @description Outcome - status and text */
       cancelOutcome: components['schemas']['OutcomeDto']
       /**
        * @description application method
@@ -1026,32 +1084,39 @@ export interface components {
       /**
        * Format: date-time
        * @description The date and time of the visit
+       * @example 2018-12-01T13:45:00
        */
       startTimestamp: string
       /**
        * Format: date-time
        * @description The finishing date and time of the visit
+       * @example 2018-12-01T13:45:00
        */
       endTimestamp: string
       /** @description Visit Notes */
       visitNotes?: components['schemas']['VisitNoteDto'][]
+      /** @description Contact associated with the visit */
       visitContact?: components['schemas']['ContactDto']
       /** @description List of visitors associated with the visit */
       visitors?: components['schemas']['VisitorDto'][]
+      /** @description Additional support associated with the visit */
       visitorSupport?: components['schemas']['VisitorSupportDto']
       /**
        * Format: date-time
        * @description The visit created date and time
+       * @example 2018-12-01T13:45:00
        */
       createdTimestamp: string
       /**
        * Format: date-time
        * @description The visit modified date and time
+       * @example 2018-12-01T13:45:00
        */
       modifiedTimestamp: string
       /**
        * Format: date-time
        * @description Date the visit was first booked or migrated
+       * @example 2018-12-01T13:45:00
        */
       firstBookedDateTime?: string
     }
@@ -1164,9 +1229,11 @@ export interface components {
        * @example 2018-12-01
        */
       sessionDate: string
+      /** @description Contact associated with the visit */
       visitContact?: components['schemas']['ContactDto']
       /** @description List of visitors associated with the visit */
       visitors: components['schemas']['VisitorDto'][]
+      /** @description additional support associated with the visit, if null support will not be updated */
       visitorSupport?: components['schemas']['ApplicationSupportDto']
       /** @description allow over booking */
       allowOverBooking: boolean
@@ -1208,27 +1275,33 @@ export interface components {
       /**
        * Format: date-time
        * @description The date and time of the visit
+       * @example 2018-12-01T13:45:00
        */
       startTimestamp: string
       /**
        * Format: date-time
        * @description The finishing date and time of the visit
+       * @example 2018-12-01T13:45:00
        */
       endTimestamp: string
       /** @description Visit Notes */
       visitNotes: components['schemas']['VisitNoteDto'][]
+      /** @description Contact associated with the visit */
       visitContact?: components['schemas']['ContactDto']
       /** @description List of visitors associated with the visit */
       visitors: components['schemas']['VisitorDto'][]
+      /** @description Additional support associated with the application */
       visitorSupport?: components['schemas']['VisitorSupportDto']
       /**
        * Format: date-time
        * @description The visit created date and time
+       * @example 2018-12-01T13:45:00
        */
       createdTimestamp: string
       /**
        * Format: date-time
        * @description The visit modified date and time
+       * @example 2018-12-01T13:45:00
        */
       modifiedTimestamp: string
       /**
@@ -1271,9 +1344,11 @@ export interface components {
        * @enum {string}
        */
       applicationRestriction: 'OPEN' | 'CLOSED'
+      /** @description Contact associated with the visit */
       visitContact?: components['schemas']['ContactDto']
       /** @description List of visitors associated with the visit */
       visitors: components['schemas']['VisitorDto'][]
+      /** @description additional support associated with the visit, if null support will not be updated */
       visitorSupport?: components['schemas']['ApplicationSupportDto']
       /**
        * @description User type
@@ -1316,7 +1391,7 @@ export interface components {
       /**
        * Format: date
        * @description exclude date
-       * @example 2026-02-12
+       * @example 2024-26-12
        */
       excludeDate: string
       /** @description full name of user who added the exclude date or username if full name is not available. */
@@ -1341,10 +1416,15 @@ export interface components {
         | 'PRISONER_RESTRICTION_CHANGE_EVENT'
         | 'PRISONER_ALERTS_UPDATED_EVENT'
         | 'PRISON_VISITS_BLOCKED_FOR_DATE'
+        | 'SESSION_VISITS_BLOCKED_FOR_DATE'
         | 'IGNORE_VISIT_NOTIFICATIONS_EVENT'
         | 'PERSON_RESTRICTION_UPSERTED_EVENT'
         | 'VISITOR_RESTRICTION_UPSERTED_EVENT'
         | 'VISITOR_UNAPPROVED_EVENT'
+        | 'UPDATED_NON_ASSOCIATION_VISIT_EVENT'
+        | 'CANCELLED_NON_ASSOCIATION_VISIT_EVENT'
+        | 'IGNORED_NON_ASSOCIATION_VISIT_NOTIFICATIONS_EVENT'
+        | 'PAIRED_VISIT_CANCELLED_IGNORED_OR_UPDATED_EVENT'
       /**
        * @description What was the application method for this event
        * @enum {string}
@@ -1375,6 +1455,7 @@ export interface components {
       /**
        * Format: date-time
        * @description event creat date and time
+       * @example 2018-12-01T13:45:00
        */
       createTimestamp: string
     }
@@ -1382,7 +1463,484 @@ export interface components {
     VisitHistoryDetailsDto: {
       /** @description The visit details */
       eventsAudit: components['schemas']['EventAuditOrchestrationDto'][]
+      /** @description The visit details */
       visit: components['schemas']['VisitDto']
+    }
+    /** @description Actioned By */
+    ActionedByDto: {
+      /**
+       * @description booker reference
+       * @example asd-aed-vhj
+       */
+      bookerReference?: string
+      /**
+       * @description User Name
+       * @example AS/ALED
+       */
+      userName?: string
+      /**
+       * @description User type
+       * @example STAFF
+       * @enum {string}
+       */
+      userType: 'STAFF' | 'PUBLIC' | 'SYSTEM'
+    }
+    /** @description An address */
+    AddressDto: {
+      /**
+       * @description Address Type
+       * @example BUS
+       */
+      addressType?: string
+      /**
+       * @description Flat
+       * @example 3B
+       */
+      flat?: string
+      /**
+       * @description Premise
+       * @example Liverpool Prison
+       */
+      premise?: string
+      /**
+       * @description Street
+       * @example Slinn Street
+       */
+      street?: string
+      /**
+       * @description Locality
+       * @example Brincliffe
+       */
+      locality?: string
+      /**
+       * @description Town/City
+       * @example Liverpool
+       */
+      town?: string
+      /**
+       * @description Postal Code
+       * @example LI1 5TH
+       */
+      postalCode?: string
+      /**
+       * @description County
+       * @example HEREFORD
+       */
+      county?: string
+      /**
+       * @description Country
+       * @example ENG
+       */
+      country?: string
+      /**
+       * @description Additional Information
+       * @example This is a comment text
+       */
+      comment?: string
+      /**
+       * @description Primary Address
+       * @example Y
+       */
+      primary: boolean
+      /**
+       * @description No Fixed Address
+       * @example N
+       */
+      noFixedAddress: boolean
+      /**
+       * Format: date
+       * @description Date Added
+       * @example 2000-10-31
+       */
+      startDate?: string
+      /**
+       * Format: date
+       * @description Date ended
+       * @example 2000-10-31
+       */
+      endDate?: string
+      /** @description The phone number associated with the address */
+      phones: components['schemas']['TelephoneDto'][]
+      /** @description The address usages/types */
+      addressUsages: components['schemas']['AddressUsageDto'][]
+    }
+    /** @description An Offender's address usage */
+    AddressUsageDto: {
+      /**
+       * @description The address usages
+       * @example HDC
+       */
+      addressUsage?: string
+      /**
+       * @description The address usages description
+       * @example HDC Address
+       */
+      addressUsageDescription?: string
+      /**
+       * @description Active Flag
+       * @example true
+       */
+      activeFlag?: boolean
+    }
+    /** @description AlertDto returned from orchestration, made of fields from AlertResponseDto from Alerts API call */
+    AlertDto: {
+      /**
+       * @description Alert Type
+       * @example X
+       */
+      alertType: string
+      /**
+       * @description Alert Type Description
+       * @example Security
+       */
+      alertTypeDescription: string
+      /**
+       * @description Alert Code
+       * @example XER
+       */
+      alertCode: string
+      /**
+       * @description Alert Code Description
+       * @example Escape Risk
+       */
+      alertCodeDescription: string
+      /**
+       * @description Alert comments
+       * @example Profession lock pick.
+       */
+      comment?: string
+      /**
+       * Format: date
+       * @description Date of the alert, which might differ to the date it was created
+       * @example 2019-08-20
+       */
+      dateCreated: string
+      /**
+       * Format: date
+       * @description Date the alert expires
+       * @example 2020-08-20
+       */
+      dateExpires?: string
+      /**
+       * @description True / False based on alert status
+       * @example false
+       */
+      active: boolean
+    }
+    /** @description Event Audit */
+    EventAuditDto: {
+      /**
+       * @description The type of event
+       * @enum {string}
+       */
+      type:
+        | 'RESERVED_VISIT'
+        | 'CHANGING_VISIT'
+        | 'MIGRATED_VISIT'
+        | 'BOOKED_VISIT'
+        | 'UPDATED_VISIT'
+        | 'CANCELLED_VISIT'
+        | 'NON_ASSOCIATION_EVENT'
+        | 'PRISONER_RELEASED_EVENT'
+        | 'PRISONER_RECEIVED_EVENT'
+        | 'PRISONER_RESTRICTION_CHANGE_EVENT'
+        | 'PRISONER_ALERTS_UPDATED_EVENT'
+        | 'PRISON_VISITS_BLOCKED_FOR_DATE'
+        | 'SESSION_VISITS_BLOCKED_FOR_DATE'
+        | 'IGNORE_VISIT_NOTIFICATIONS_EVENT'
+        | 'PERSON_RESTRICTION_UPSERTED_EVENT'
+        | 'VISITOR_RESTRICTION_UPSERTED_EVENT'
+        | 'VISITOR_UNAPPROVED_EVENT'
+        | 'UPDATED_NON_ASSOCIATION_VISIT_EVENT'
+        | 'CANCELLED_NON_ASSOCIATION_VISIT_EVENT'
+        | 'IGNORED_NON_ASSOCIATION_VISIT_NOTIFICATIONS_EVENT'
+        | 'PAIRED_VISIT_CANCELLED_IGNORED_OR_UPDATED_EVENT'
+      /**
+       * @description What was the application method for this event
+       * @enum {string}
+       */
+      applicationMethodType:
+        | 'PHONE'
+        | 'WEBSITE'
+        | 'EMAIL'
+        | 'IN_PERSON'
+        | 'NOT_KNOWN'
+        | 'NOT_APPLICABLE'
+        | 'BY_PRISONER'
+      /** @description Event actioned by information */
+      actionedBy: components['schemas']['ActionedByDto']
+      /** @description Session template used for this event */
+      sessionTemplateReference?: string
+      /** @description Notes added against the event */
+      text?: string
+      /**
+       * Format: date-time
+       * @description event creat date and time
+       * @example 2018-12-01T13:45:00
+       */
+      createTimestamp: string
+    }
+    /** @description Offender restriction */
+    OffenderRestrictionDto: {
+      /**
+       * Format: int64
+       * @description restriction id
+       */
+      restrictionId: number
+      /** @description Restriction comment text */
+      comment?: string
+      /** @description code of restriction type */
+      restrictionType: string
+      /** @description description of restriction type */
+      restrictionTypeDescription: string
+      /**
+       * Format: date
+       * @description Date from which the restrictions applies
+       * @example 1980-01-01
+       */
+      startDate: string
+      /**
+       * Format: date
+       * @description Date restriction applies to, or indefinitely if null
+       * @example 1980-01-01
+       */
+      expiryDate?: string
+      /** @description true if restriction is within the start date and optional expiry date range */
+      active: boolean
+    }
+    /** @description Prison Information */
+    PrisonRegisterPrisonDto: {
+      /**
+       * @description Prison ID
+       * @example MDI
+       */
+      prisonId: string
+      /**
+       * @description Name of the prison
+       * @example Moorland HMP
+       */
+      prisonName: string
+      /** @description Whether the prison is still active */
+      active: boolean
+    }
+    PrisonerDetailsDto: {
+      /**
+       * @description Prisoner Number
+       * @example A1234AA
+       */
+      prisonerNumber: string
+      /**
+       * @description First Name
+       * @example Robert
+       */
+      firstName: string
+      /**
+       * @description Last name
+       * @example Larsen
+       */
+      lastName: string
+      /**
+       * Format: date
+       * @description Date of Birth
+       * @example 1975-04-02
+       */
+      dateOfBirth: string
+      /**
+       * @description Prison ID
+       * @example MDI
+       */
+      prisonId?: string
+      /**
+       * @description In prison cell location
+       * @example A-1-002
+       */
+      cellLocation?: string
+      /**
+       * @description current prison or outside with last movement information.
+       * @example Outside - released from Leeds
+       */
+      locationDescription?: string
+      /** @description Prisoner alerts */
+      prisonerAlerts: components['schemas']['AlertDto'][]
+      /** @description Prisoner restrictions */
+      prisonerRestrictions: components['schemas']['OffenderRestrictionDto'][]
+    }
+    /** @description A contact for a prisoner */
+    RestrictionDto: {
+      /**
+       * @description Restriction Type Code
+       * @example 123
+       */
+      restrictionType: string
+      /**
+       * @description Description of Restriction Type
+       * @example 123
+       */
+      restrictionTypeDescription: string
+      /**
+       * Format: date
+       * @description Date from which the restriction applies
+       * @example 2000-10-31
+       */
+      startDate: string
+      /**
+       * Format: date
+       * @description Restriction Expiry
+       * @example 2000-10-31
+       */
+      expiryDate?: string
+      /** @description True if applied globally to the contact or False if applied in the context of a visit */
+      globalRestriction: boolean
+      /**
+       * @description Additional Information
+       * @example This is a comment text
+       */
+      comment?: string
+    }
+    /** @description Telephone Details */
+    TelephoneDto: {
+      /**
+       * @description Telephone number
+       * @example 0114 2345678
+       */
+      number: string
+      /**
+       * @description Telephone type
+       * @example TEL
+       */
+      type: string
+      /**
+       * @description Telephone extension number
+       * @example 123
+       */
+      ext?: string
+    }
+    VisitBookingDetailsDto: {
+      /**
+       * @description Visit Reference
+       * @example v9-d7-ed-7u
+       */
+      reference: string
+      /**
+       * @description Visit Room
+       * @example Visits Main Hall
+       */
+      visitRoom: string
+      /**
+       * @description Visit Type
+       * @example SOCIAL
+       * @enum {string}
+       */
+      visitType: 'SOCIAL'
+      /**
+       * @description Visit Status
+       * @example RESERVED
+       * @enum {string}
+       */
+      visitStatus: 'BOOKED' | 'CANCELLED'
+      /**
+       * @description Visit Restriction
+       * @example OPEN
+       * @enum {string}
+       */
+      visitRestriction: 'OPEN' | 'CLOSED' | 'UNKNOWN'
+      /**
+       * Format: date-time
+       * @description The date and time of the visit
+       * @example 2018-12-01T13:45:00
+       */
+      startTimestamp: string
+      /**
+       * Format: date-time
+       * @description The finishing date and time of the visit
+       * @example 2018-12-01T13:45:00
+       */
+      endTimestamp: string
+      /** @description Contact associated with the visit */
+      visitContact?: components['schemas']['ContactDto']
+      /** @description Additional support associated with the visit */
+      visitorSupport?: components['schemas']['VisitorSupportDto']
+      /** @description Prison code and name */
+      prison: components['schemas']['PrisonRegisterPrisonDto']
+      /** @description Prisoner details */
+      prisoner: components['schemas']['PrisonerDetailsDto']
+      /** @description Prisoner details */
+      visitors: components['schemas']['VisitorDetailsDto'][]
+      events: components['schemas']['EventAuditDto'][]
+      notifications: components['schemas']['VisitNotificationDto'][]
+    }
+    /** @description Visit notification details */
+    VisitNotificationDto: {
+      /**
+       * @description notification event type
+       * @enum {string}
+       */
+      type:
+        | 'NON_ASSOCIATION_EVENT'
+        | 'PRISONER_RELEASED_EVENT'
+        | 'PRISONER_RESTRICTION_CHANGE_EVENT'
+        | 'PRISON_VISITS_BLOCKED_FOR_DATE'
+        | 'SESSION_VISITS_BLOCKED_FOR_DATE'
+        | 'PRISONER_RECEIVED_EVENT'
+        | 'PRISONER_ALERTS_UPDATED_EVENT'
+        | 'PERSON_RESTRICTION_UPSERTED_EVENT'
+        | 'VISITOR_RESTRICTION_UPSERTED_EVENT'
+        | 'VISITOR_UNAPPROVED_EVENT'
+      /**
+       * Format: date-time
+       * @description notification created at
+       * @example 2018-12-01T13:45:00
+       */
+      createdDateTime: string
+      /** @description notification additional data */
+      additionalData: components['schemas']['VisitNotificationEventAttributeDto'][]
+    }
+    VisitNotificationEventAttributeDto: {
+      /**
+       * @description Name of the attribute associated with the notification event
+       * @example VISITOR_RESTRICTION
+       * @enum {string}
+       */
+      attributeName: 'VISITOR_RESTRICTION' | 'VISITOR_ID'
+      /**
+       * @description Value of the attribute associated with the notification event
+       * @example BAN
+       */
+      attributeValue: string
+    }
+    /** @description Visitor details */
+    VisitorDetailsDto: {
+      /**
+       * Format: int64
+       * @description Identifier for this contact (Person in NOMIS)
+       * @example 5871791
+       */
+      personId?: number
+      /**
+       * @description First name
+       * @example John
+       */
+      firstName: string
+      /**
+       * @description Last name
+       * @example Smith
+       */
+      lastName: string
+      /**
+       * Format: date
+       * @description Date of birth
+       * @example 1980-01-28
+       */
+      dateOfBirth?: string
+      /**
+       * @description Description of relationship to Prisoner
+       * @example Responsible Officer
+       */
+      relationshipDescription?: string
+      /** @description List of restrictions associated with the contact */
+      restrictions: components['schemas']['RestrictionDto'][]
+      /** @description List of addresses associated with the contact */
+      primaryAddress?: components['schemas']['AddressDto']
     }
     /**
      * @description To filter visits by status
@@ -1394,16 +1952,17 @@ export interface components {
      * @example OPEN
      */
     visitRestrictions: ('OPEN' | 'CLOSED' | 'UNKNOWN')[]
-    /** @description Timeslot for the visit */
     SessionTimeSlotDto: {
       /**
        * Format: HH:mm
-       * @example 13:45
+       * @description The start time of the generated visit session(s)
+       * @example 10:30
        */
       startTime: string
       /**
        * Format: HH:mm
-       * @example 13:45
+       * @description The end time of the generated visit session(s)
+       * @example 11:30
        */
       endTime: string
     }
@@ -1434,10 +1993,12 @@ export interface components {
        * @example 10
        */
       visitorCount: number
+      /** @description Timeslot for the visit */
       visitTimeSlot: components['schemas']['SessionTimeSlotDto']
       /**
        * Format: date-time
        * @description Date the visit was first booked or migrated
+       * @example 2018-12-01T13:45:00
        */
       firstBookedDateTime: string
       /**
@@ -1448,10 +2009,10 @@ export interface components {
       visitRestriction: 'OPEN' | 'CLOSED' | 'UNKNOWN'
     }
     PageVisitDto: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       first?: boolean
       last?: boolean
       /** Format: int32 */
@@ -1469,12 +2030,12 @@ export interface components {
       /** Format: int64 */
       offset?: number
       sort?: components['schemas']['SortObject']
+      unpaged?: boolean
       /** Format: int32 */
       pageSize?: number
+      paged?: boolean
       /** Format: int32 */
       pageNumber?: number
-      paged?: boolean
-      unpaged?: boolean
     }
     SortObject: {
       empty?: boolean
@@ -1497,6 +2058,7 @@ export interface components {
         | 'PRISONER_RELEASED_EVENT'
         | 'PRISONER_RESTRICTION_CHANGE_EVENT'
         | 'PRISON_VISITS_BLOCKED_FOR_DATE'
+        | 'SESSION_VISITS_BLOCKED_FOR_DATE'
         | 'PRISONER_RECEIVED_EVENT'
         | 'PRISONER_ALERTS_UPDATED_EVENT'
         | 'PERSON_RESTRICTION_UPSERTED_EVENT'
@@ -1505,7 +2067,6 @@ export interface components {
       /** @description List of details of affected visits */
       affectedVisits: components['schemas']['OrchestrationPrisonerVisitsNotificationDto'][]
     }
-    /** @description List of details of affected visits */
     OrchestrationPrisonerVisitsNotificationDto: {
       /**
        * @description Prisoner Number
@@ -1536,23 +2097,40 @@ export interface components {
       /** @description A list of all notification attributes for a given visit */
       notificationEventAttributes: components['schemas']['VisitNotificationEventAttributeDto'][]
     }
-    /** @description A list of all notification attributes for a given visit */
-    VisitNotificationEventAttributeDto: {
-      /**
-       * @description Name of the attribute associated with the notification event
-       * @example VISITOR_RESTRICTION
-       * @enum {string}
-       */
-      attributeName: 'VISITOR_RESTRICTION' | 'VISITOR_ID'
-      /**
-       * @description Value of the attribute associated with the notification event
-       * @example BAN
-       */
-      attributeValue: string
-    }
     NotificationCountDto: {
       /** Format: int32 */
       count: number
+    }
+    /** @description Visit notification event details. */
+    VisitNotificationEventDto: {
+      /**
+       * @description Notification Event Type
+       * @enum {string}
+       */
+      type:
+        | 'NON_ASSOCIATION_EVENT'
+        | 'PRISONER_RELEASED_EVENT'
+        | 'PRISONER_RESTRICTION_CHANGE_EVENT'
+        | 'PRISON_VISITS_BLOCKED_FOR_DATE'
+        | 'SESSION_VISITS_BLOCKED_FOR_DATE'
+        | 'PRISONER_RECEIVED_EVENT'
+        | 'PRISONER_ALERTS_UPDATED_EVENT'
+        | 'PERSON_RESTRICTION_UPSERTED_EVENT'
+        | 'VISITOR_RESTRICTION_UPSERTED_EVENT'
+        | 'VISITOR_UNAPPROVED_EVENT'
+      /**
+       * @description Notification Event Reference
+       * @example aa-bb-cc-dd
+       */
+      notificationEventReference: string
+      /**
+       * Format: date-time
+       * @description Created date and time
+       * @example 2018-12-01T13:45:00
+       */
+      createdDateTime: string
+      /** @description Additional data, empty list if no additional data associated */
+      additionalData: components['schemas']['VisitNotificationEventAttributeDto'][]
     }
     /** @description Visit Session */
     VisitSessionDto: {
@@ -1604,11 +2182,13 @@ export interface components {
       /**
        * Format: date-time
        * @description The start timestamp for this visit session
+       * @example 2020-11-01T12:00:00
        */
       startTimestamp: string
       /**
        * Format: date-time
        * @description The end timestamp for this visit session
+       * @example 2020-11-01T14:30:00
        */
       endTimestamp: string
       /** @description Session conflicts */
@@ -1629,7 +2209,6 @@ export interface components {
        */
       open: number
     }
-    /** @description Validity period for the session template */
     SessionDateRangeDto: {
       /**
        * Format: date
@@ -1651,8 +2230,11 @@ export interface components {
        * @example v9d.7ed.7u
        */
       sessionTemplateReference: string
+      /** @description The time slot of the generated visit session(s) */
       sessionTimeSlot: components['schemas']['SessionTimeSlotDto']
+      /** @description Validity period for the session template */
       sessionDateRange: components['schemas']['SessionDateRangeDto']
+      /** @description The capacity for the session */
       capacity: components['schemas']['SessionCapacityDto']
       /**
        * @description visit type
@@ -1702,6 +2284,7 @@ export interface components {
        * @example v9d.7ed.7u
        */
       sessionTemplateReference: string
+      /** @description Session time slot */
       sessionTimeSlot: components['schemas']['SessionTimeSlotDto']
       /**
        * @description Session Restriction
@@ -1795,16 +2378,20 @@ export interface components {
       /**
        * Format: date-time
        * @description The date and time of the visit
+       * @example 2018-12-01T13:45:00
        */
       startTimestamp: string
       /**
        * Format: date-time
        * @description The finishing date and time of the visit
+       * @example 2018-12-01T13:45:00
        */
       endTimestamp: string
+      /** @description Contact associated with the visit */
       visitContact: components['schemas']['ContactDto']
       /** @description List of visitors associated with the visit */
       visitors: components['schemas']['OrchestrationVisitorDto'][]
+      /** @description Additional support associated with the visit */
       visitorSupport?: components['schemas']['VisitorSupportDto']
     }
     /** @description Visitor */
@@ -1827,6 +2414,7 @@ export interface components {
       lastName?: string
     }
     BookerPrisonerInfoDto: {
+      /** @description Prisoner Details */
       prisoner: components['schemas']['PrisonerDto']
       /**
        * Format: int32
@@ -1840,14 +2428,21 @@ export interface components {
        * @example 2024-08-01
        */
       nextAvailableVoDate: string
+      /** @description Current prison code for the prison that the booker registered the prisoner with */
       registeredPrison: components['schemas']['RegisteredPrisonDto']
+      /**
+       * @description Convicted status of prisoner
+       * @enum {string}
+       */
+      convictedStatus?: 'Convicted' | 'Remand'
     }
-    /** @description Incentive level */
     CurrentIncentive: {
+      /** @description Incentive level */
       level: components['schemas']['IncentiveLevel']
       /**
        * Format: date-time
        * @description Date time of the incentive
+       * @example 2022-11-10T15:47:24
        */
       dateTime: string
       /**
@@ -1857,7 +2452,6 @@ export interface components {
        */
       nextReviewDate: string
     }
-    /** @description Incentive level */
     IncentiveLevel: {
       /**
        * @description code
@@ -1870,7 +2464,6 @@ export interface components {
        */
       description: string
     }
-    /** @description Prisoner Details */
     PrisonerDto: {
       /**
        * @description Prisoner Number
@@ -1908,9 +2501,14 @@ export interface components {
        * @example A-1-002
        */
       cellLocation?: string
+      /** @description Incentive level */
       currentIncentive?: components['schemas']['CurrentIncentive']
+      /**
+       * @description current prison or outside with last movement information.
+       * @example Outside - released from Leeds
+       */
+      locationDescription?: string
     }
-    /** @description Current prison code for the prison that the booker registered the prisoner with */
     RegisteredPrisonDto: {
       /**
        * @description prison code
@@ -1979,51 +2577,6 @@ export interface components {
        */
       expiryDate?: string
     }
-    /** @description AlertDto returned from orchestration, made of fields from AlertResponseDto from Alerts API call */
-    AlertDto: {
-      /**
-       * @description Alert Type
-       * @example X
-       */
-      alertType: string
-      /**
-       * @description Alert Type Description
-       * @example Security
-       */
-      alertTypeDescription: string
-      /**
-       * @description Alert Code
-       * @example XER
-       */
-      alertCode: string
-      /**
-       * @description Alert Code Description
-       * @example Escape Risk
-       */
-      alertCodeDescription: string
-      /**
-       * @description Alert comments
-       * @example Profession lock pick.
-       */
-      comment?: string
-      /**
-       * Format: date
-       * @description Date of the alert, which might differ to the date it was created
-       * @example 2019-08-20
-       */
-      dateCreated: string
-      /**
-       * Format: date
-       * @description Date the alert expires
-       * @example 2020-08-20
-       */
-      dateExpires?: string
-      /**
-       * @description True / False based on alert status
-       * @example false
-       */
-      active: boolean
-    }
     PrisonerProfileDto: {
       /**
        * @description Prisoner Number
@@ -2079,6 +2632,7 @@ export interface components {
       incentiveLevel?: string
       /** @description Alert */
       alerts?: components['schemas']['AlertDto'][]
+      /** @description Balances of visit orders and privilege visit orders */
       visitBalances?: components['schemas']['VisitBalancesDto']
       /** @description Past and future visits for the prisoner based on configured duration. */
       visits: components['schemas']['VisitSummaryDto'][]
@@ -2149,11 +2703,13 @@ export interface components {
       /**
        * Format: date-time
        * @description The date and time of the visit
+       * @example 2018-12-01T13:45:00
        */
       startTimestamp: string
       /**
        * Format: date-time
        * @description The finishing date and time of the visit
+       * @example 2018-12-01T13:45:00
        */
       endTimestamp: string
       /** @description List of visitors associated with the visit */
@@ -2326,6 +2882,81 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  updateAVisit: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /**
+         * @description applicationReference
+         * @example dfs-wjs-eqr
+         */
+        applicationReference: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['BookingOrchestrationRequestDto']
+      }
+    }
+    responses: {
+      /** @description Visit updated */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          '*/*': components['schemas']['VisitDto']
+        }
+      }
+      /** @description Incorrect request to update a visit */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to update a visit */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Visit not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Application validation failed */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ApplicationValidationErrorResponse']
         }
       }
     }
@@ -3416,6 +4047,64 @@ export interface operations {
       }
     }
   }
+  getVisitFullDetailsByReference: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        reference: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Detailed visit summary returned */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          '*/*': components['schemas']['VisitBookingDetailsDto']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions retrieve a detailed visit summary */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Visit not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Failed to get a detailed visit summary */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
   getVisitsBySessionTemplate: {
     parameters: {
       query: {
@@ -3674,6 +4363,7 @@ export interface operations {
           | 'PRISONER_RELEASED_EVENT'
           | 'PRISONER_RESTRICTION_CHANGE_EVENT'
           | 'PRISON_VISITS_BLOCKED_FOR_DATE'
+          | 'SESSION_VISITS_BLOCKED_FOR_DATE'
           | 'PRISONER_RECEIVED_EVENT'
           | 'PRISONER_ALERTS_UPDATED_EVENT'
           | 'PERSON_RESTRICTION_UPSERTED_EVENT'
@@ -3748,12 +4438,57 @@ export interface operations {
             | 'PRISONER_RELEASED_EVENT'
             | 'PRISONER_RESTRICTION_CHANGE_EVENT'
             | 'PRISON_VISITS_BLOCKED_FOR_DATE'
+            | 'SESSION_VISITS_BLOCKED_FOR_DATE'
             | 'PRISONER_RECEIVED_EVENT'
             | 'PRISONER_ALERTS_UPDATED_EVENT'
             | 'PERSON_RESTRICTION_UPSERTED_EVENT'
             | 'VISITOR_RESTRICTION_UPSERTED_EVENT'
             | 'VISITOR_UNAPPROVED_EVENT'
           )[]
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to access this endpoint */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  getNotificationEventsForBookingReference: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /**
+         * @description bookingReference
+         * @example v9*d7*ed*7u
+         */
+        reference: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Retrieved visit  notification events by booking reference */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['VisitNotificationEventDto'][]
         }
       }
       /** @description Unauthorized to access this endpoint */
