@@ -300,6 +300,18 @@ describe('Visit service', () => {
       })
     })
 
+    describe('getVisitDetailed', () => {
+      it('should return visit details given a visit reference', async () => {
+        const visitDetails = TestData.visitBookingDetailsDto()
+        orchestrationApiClient.getVisitDetailed.mockResolvedValue(visitDetails)
+
+        const result = await visitService.getVisitDetailed({ username: 'user', reference: 'ab-cd-ef-gh' })
+
+        expect(orchestrationApiClient.getVisitDetailed).toHaveBeenCalledWith('ab-cd-ef-gh')
+        expect(result).toStrictEqual(visitDetails)
+      })
+    })
+
     describe('getVisitsBySessionTemplate', () => {
       it('should return visit previews for given session template reference, date, prison and restriction', async () => {
         const reference = 'v9d.7ed.7u'

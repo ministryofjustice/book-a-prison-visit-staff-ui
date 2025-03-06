@@ -138,6 +138,31 @@ describe('orchestrationApiClient', () => {
     })
   })
 
+  describe('getVisitDetailed', () => {
+    it('should return full visit details for requested visit with filtered notification events', async () => {
+      const rawVisitBookingDetailsDto = TestData.visitBookingDetailsDto()
+
+      // add an audit event that should be filtered
+      rawVisitBookingDetailsDto.events.push({
+        type: 'PERSON_RESTRICTION_UPSERTED_EVENT',
+        applicationMethodType: 'NOT_KNOWN',
+        actionedBy: null,
+        createTimestamp: '2022-01-01T09:00:00',
+      })
+
+      const filteredVisitBookingDetailsDto = TestData.visitBookingDetailsDto()
+
+      fakeOrchestrationApi
+        .get(`/visits/${rawVisitBookingDetailsDto.reference}/detailed`)
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, rawVisitBookingDetailsDto)
+
+      const output = await orchestrationApiClient.getVisitDetailed(rawVisitBookingDetailsDto.reference)
+
+      expect(output).toEqual(filteredVisitBookingDetailsDto)
+    })
+  })
+
   describe('getVisitsBySessionTemplate', () => {
     it('should return visit previews details for given session template reference, date, and prison', async () => {
       const sessionTemplateReference = 'v9d.7ed.7u'

@@ -7,6 +7,7 @@ import {
   EventAudit,
   NotificationType,
   Visit,
+  VisitBookingDetailsDto,
   VisitHistoryDetails,
   VisitPreview,
 } from '../data/orchestrationApiTypes'
@@ -161,6 +162,19 @@ export default class VisitService {
     const additionalSupport = visit.visitorSupport ? visit.visitorSupport.description : ''
 
     return { visitHistoryDetails, visitors, notifications, additionalSupport }
+  }
+
+  async getVisitDetailed({
+    username,
+    reference,
+  }: {
+    username: string
+    reference: string
+  }): Promise<VisitBookingDetailsDto> {
+    const token = await this.hmppsAuthClient.getSystemClientToken(username)
+    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+
+    return orchestrationApiClient.getVisitDetailed(reference)
   }
 
   async getVisitsBySessionTemplate({
