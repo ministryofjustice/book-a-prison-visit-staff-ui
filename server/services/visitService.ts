@@ -246,7 +246,11 @@ export default class VisitService {
         }
       } else if (type === 'IGNORE_VISIT_NOTIFICATIONS_EVENT') {
         descriptionContent = `Reason: ${event.text}`
-      } else if (type !== 'RESERVED_VISIT' && type !== 'CHANGING_VISIT') {
+      } else if (
+        type === 'PRISONER_RELEASED_EVENT' ||
+        type === 'PRISON_VISITS_BLOCKED_FOR_DATE' ||
+        type === 'PRISONER_RECEIVED_EVENT'
+      ) {
         // only added to assist type for next line
         descriptionContent = `Reason: ${notificationTypes[type]}`
       }
