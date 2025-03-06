@@ -15,6 +15,7 @@ import {
   VisitPreview,
   VisitSession,
   VisitSummary,
+  VisitBookingDetailsDto,
 } from '../../data/orchestrationApiTypes'
 import { OffenderRestriction } from '../../data/prisonApiTypes'
 import { CurrentIncentive, Prisoner } from '../../data/prisonerOffenderSearchTypes'
@@ -452,6 +453,83 @@ export default class TestData {
       createdTimestamp,
       modifiedTimestamp,
     }) as Visit
+
+  static visitBookingDetailsDto = ({
+    reference = 'ab-cd-ef-gh',
+    visitRoom = 'Visit room 1',
+    visitType = 'SOCIAL',
+    visitStatus = 'BOOKED',
+    visitRestriction = 'OPEN',
+    startTimestamp = '2022-01-14T10:00:00',
+    endTimestamp = '2022-01-14T11:00:00',
+    prison = {
+      prisonId: 'HEI',
+      prisonName: 'Hewell (HMP)',
+      active: true,
+    },
+    prisoner = {
+      prisonerNumber: 'A1234BC',
+      firstName: 'JOHN',
+      lastName: 'SMITH',
+      dateOfBirth: '1975-04-02',
+      prisonId: 'HEI',
+      cellLocation: '1-1-C-028',
+      locationDescription: undefined,
+      prisonerAlerts: [],
+      prisonerRestrictions: [],
+    },
+    visitors = [
+      {
+        personId: 4321,
+        firstName: 'Jeanette',
+        lastName: 'Smith',
+        dateOfBirth: '1986-07-28',
+        relationshipDescription: 'WIFE',
+        restrictions: [],
+        primaryAddress: {
+          flat: '23B',
+          premise: 'Premises',
+          street: '123 The Street',
+          locality: 'Springfield',
+          town: 'Coventry',
+          postalCode: 'C1 2AB',
+          county: 'West Midlands',
+          country: 'England',
+          primary: true,
+          noFixedAddress: false,
+          phones: [],
+          addressUsages: [],
+        },
+      },
+    ],
+    events = [
+      {
+        type: 'BOOKED_VISIT',
+        applicationMethodType: 'PHONE',
+        actionedBy: {
+          bookerReference: null,
+          userName: 'user1',
+          // FullName: 'User One',
+          userType: 'STAFF',
+        },
+        createTimestamp: '2022-01-01T09:00:00',
+      },
+    ],
+    notifications = [],
+  }: Partial<VisitBookingDetailsDto> = {}): VisitBookingDetailsDto => ({
+    reference,
+    visitRoom,
+    visitType,
+    visitStatus,
+    visitRestriction,
+    startTimestamp,
+    endTimestamp,
+    prison,
+    prisoner,
+    visitors,
+    events,
+    notifications,
+  })
 
   static visitHistoryDetails = ({
     eventsAudit = [
