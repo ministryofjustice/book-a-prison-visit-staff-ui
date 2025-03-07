@@ -25,7 +25,7 @@
 {% block content %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
-    {% if prisoner %}
+    {% if showVisitDetails %}
       {% if visitDetails.visitStatus === "CANCELLED" %}
 
         {% set status = visitDetails.outcomeStatus.split("_") %}
@@ -56,12 +56,12 @@
         }) }}
       {% endif %}
 
-      {%if notifications | length %}
-        {% for notification in notifications %}
+      {%if visitDetails.notifications | length %}
+        {% for notification in visitDetails.notifications %}
           {% set visitNotificationBannerHtml %}
             {{ govukWarningText({
               classes: "govuk-!-margin-bottom-0 govuk-!-padding-left-4",
-              html: '<span data-test="visit-notification">' + (notificationTypeWarnings[notification] | default(notification)) + "</span>",
+              html: '<span data-test="visit-notification">' + (notificationTypeWarnings[notification.type] | default(notification.type)) + "</span>",
               iconFallbackText: "Warning"
             }) }}
           {% endset %}
@@ -96,7 +96,7 @@
             
             <dt>Contact details</dt>
             <dd>
-              {%- if visit.visitContact.telephone -%}
+              {%- if visitDetails.visitContact.telephone -%}
                 <span data-test="visit-phone">{{ visitDetails.visitContact.telephone }}</span>
               {%- endif -%}
               {%- if visitDetails.visitContact.email -%}
@@ -164,7 +164,7 @@
           </h3>
           <dl class="govuk-list">
             <dt>Location</dt>
-            <dd data-test="prisoner-location">{{ prisonerLocation }}</dd> {# TODO location needs processing#}
+            <dd data-test="prisoner-location">{{ prisonerLocation }}</dd>
 
             <dt>Date of birth</dt>
             <dd>
@@ -224,9 +224,9 @@
 
     {% else %}
       <h1 class="govuk-heading-l">Visit booking details</h1>
-      <p>Booking reference: <span data-test="reference">{{ visit.reference }}</span></p>
+      <p>Booking reference: <span data-test="reference">{{ visitDetails.reference }}</span></p>
       <p>This booking is not for {{ selectedEstablishment.prisonName }}.</p>
-      <p>To view the booking, change the establishment to {{ visitPrisonName }} and search for it by the booking reference.</p>
+      <p>To view the booking, change the establishment to {{ visitDetails.prison.prisonName }} and search for it by the booking reference.</p>
     {% endif %}
 
   </div>
