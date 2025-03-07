@@ -7,6 +7,8 @@ import { FormError } from '../@types/bapv'
 import { initialiseName, properCaseFullName } from './utils'
 import config from '../config'
 import { ApplicationInfo } from '../applicationInfo'
+import { Address } from '../data/prisonerContactRegistryApiTypes'
+import { getFormattedAddress } from './visitorUtils'
 
 const production = process.env.NODE_ENV === 'production'
 
@@ -147,6 +149,10 @@ export function registerNunjucks(app?: express.Express): Environment {
   njkEnv.addFilter('mojDate', (timestamp: string) => {
     const dateFormat = "EEEE d MMMM yyyy 'at' h:mmaaa"
     return timestamp ? format(parseISO(timestamp), dateFormat).replace(':00', '') : null
+  })
+
+  njkEnv.addFilter('formatAddress', (address: Address, noAddressText = 'Not entered') => {
+    return address ? getFormattedAddress(address) : noAddressText
   })
 
   return njkEnv
