@@ -17,7 +17,6 @@ export default function routes(services: Services): Router {
 
   const visitDetails = new VisitDetailsController(
     services.auditService,
-    services.prisonerSearchService,
     services.supportedPrisonsService,
     services.visitService,
   )

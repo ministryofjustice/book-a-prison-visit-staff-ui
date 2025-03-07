@@ -224,7 +224,7 @@ export default class VisitService {
     return orchestrationApiClient.getBookedVisitCountByDate(prisonId, date)
   }
 
-  getVisitEventsTimeline(rawEventsAudit: EventAudit[], visit: Visit): MojTimelineItem[] {
+  getVisitEventsTimeline(rawEventsAudit: EventAudit[], visit: VisitBookingDetailsDto): MojTimelineItem[] {
     const eventsAudit = rawEventsAudit.filter(event => Object.keys(eventAuditTypes).includes(event.type)).reverse()
 
     let cancelledVisitReason = ''
