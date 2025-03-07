@@ -1827,17 +1827,38 @@ export interface components {
        */
       visitRoom: string
       /**
-       * @description Visit Type
-       * @example SOCIAL
-       * @enum {string}
-       */
-      visitType: 'SOCIAL'
-      /**
        * @description Visit Status
        * @example RESERVED
        * @enum {string}
        */
       visitStatus: 'BOOKED' | 'CANCELLED'
+      /**
+       * @description Outcome Status
+       * @example VISITOR_CANCELLED
+       * @enum {string}
+       */
+      outcomeStatus?:
+        | 'ADMINISTRATIVE_CANCELLATION'
+        | 'ADMINISTRATIVE_ERROR'
+        | 'BATCH_CANCELLATION'
+        | 'CANCELLATION'
+        | 'COMPLETED_NORMALLY'
+        | 'ESTABLISHMENT_CANCELLED'
+        | 'NOT_RECORDED'
+        | 'NO_VISITING_ORDER'
+        | 'PRISONER_CANCELLED'
+        | 'PRISONER_COMPLETED_EARLY'
+        | 'PRISONER_REFUSED_TO_ATTEND'
+        | 'TERMINATED_BY_STAFF'
+        | 'VISITOR_CANCELLED'
+        | 'VISITOR_COMPLETED_EARLY'
+        | 'VISITOR_DECLINED_ENTRY'
+        | 'VISITOR_DID_NOT_ARRIVE'
+        | 'VISITOR_FAILED_SECURITY_CHECKS'
+        | 'VISIT_ORDER_CANCELLED'
+        | 'SUPERSEDED_CANCELLATION'
+        | 'DETAILS_CHANGED_AFTER_BOOKING'
+        | 'BOOKER_CANCELLED'
       /**
        * @description Visit Restriction
        * @example OPEN
@@ -1856,6 +1877,8 @@ export interface components {
        * @example 2018-12-01T13:45:00
        */
       endTimestamp: string
+      /** @description Visit Notes */
+      visitNotes?: components['schemas']['VisitNoteDto'][]
       /** @description Contact associated with the visit */
       visitContact?: components['schemas']['ContactDto']
       /** @description Additional support associated with the visit */
@@ -2009,33 +2032,33 @@ export interface components {
       visitRestriction: 'OPEN' | 'CLOSED' | 'UNKNOWN'
     }
     PageVisitDto: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
-      first?: boolean
-      last?: boolean
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['VisitDto'][]
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject']
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
+      first?: boolean
+      last?: boolean
       empty?: boolean
     }
     PageableObject: {
       /** Format: int64 */
       offset?: number
       sort?: components['schemas']['SortObject']
-      unpaged?: boolean
-      /** Format: int32 */
-      pageSize?: number
       paged?: boolean
       /** Format: int32 */
       pageNumber?: number
+      /** Format: int32 */
+      pageSize?: number
+      unpaged?: boolean
     }
     SortObject: {
       empty?: boolean

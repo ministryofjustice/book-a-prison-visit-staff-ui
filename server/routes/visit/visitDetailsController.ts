@@ -31,6 +31,8 @@ export default class VisitDetailsController {
       const fromPageQuery = typeof req.query?.query === 'string' ? req.query.query : null
       const { username } = res.locals.user
 
+      const visitDetails = await this.visitService.getVisitDetailed({ username, reference })
+
       const { visitHistoryDetails, visitors, notifications, additionalSupport } =
         await this.visitService.getFullVisitDetails({
           reference,
@@ -96,6 +98,7 @@ export default class VisitDetailsController {
         eventAuditTypes,
         notificationTypes,
         eventsTimeline,
+        visitDetails,
       })
     }
   }
