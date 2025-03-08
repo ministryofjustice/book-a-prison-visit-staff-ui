@@ -142,7 +142,7 @@
     "@typescript-eslint/eslint-plugin": "^8.26.0",
     "@typescript-eslint/parser": "^8.26.0",
     "audit-ci": "^7.1.0",
-    "axe-core": "^4.10.2",
+    "axe-core": "^4.10.3",
     "cheerio": "^1.0.0",
     "concurrently": "^9.1.2",
     "cypress": "^14.1.0",
