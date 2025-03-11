@@ -1,6 +1,5 @@
 import type { Express } from 'express'
 import request from 'supertest'
-import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
 import { appWithAllRoutes, flashProvider, user } from './testutils/appSetup'
 import { NotificationType, Visit, VisitHistoryDetails } from '../data/orchestrationApiTypes'
