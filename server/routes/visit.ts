@@ -271,42 +271,6 @@ export default function routes({
     (req, res) => confirmation.get(req, res),
   )
 
-  get('/:reference/update/confirm-update', async (req, res) => {
-    const reference = getVisitReference(req)
-    const { policyNoticeDaysMin } = req.session.selectedEstablishment
-
-    return res.render('pages/visit/confirmUpdate', {
-      errors: req.flash('errors'),
-      backLinkHref: `/visit/${reference}`,
-      policyNoticeDaysMin,
-      reference,
-    })
-  })
-
-  post('/:reference/update/confirm-update', async (req, res) => {
-    const reference = getVisitReference(req)
-    const { confirmUpdate } = req.body
-
-    if (confirmUpdate === 'yes') {
-      req.session.visitSessionData.overrideBookingWindow = true
-      return res.redirect(`/visit/${reference}/update/select-visitors`)
-    }
-    if (confirmUpdate === 'no') {
-      return res.redirect(`/visit/${reference}`)
-    }
-
-    req.flash('errors', [
-      {
-        msg: 'No option selected',
-        path: 'confirmUpdate',
-        type: 'field',
-        location: 'body',
-      },
-    ] as unknown as [])
-
-    return res.redirect(`/visit/${reference}/update/confirm-update`)
-  })
-
   return router
 }
 
