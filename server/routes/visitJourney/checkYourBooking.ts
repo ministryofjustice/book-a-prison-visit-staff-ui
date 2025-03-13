@@ -92,12 +92,12 @@ export default class CheckYourBooking {
         }
         if (validationErrors.includes('APPLICATION_INVALID_NON_ASSOCIATION_VISITS')) {
           visitSessionData.validationError = 'APPLICATION_INVALID_NON_ASSOCIATION_VISITS'
+          return res.redirect(`${urlPrefix}/select-date-and-time`)
         }
         if (validationErrors.includes('APPLICATION_INVALID_VISIT_ALREADY_BOOKED')) {
           visitSessionData.validationError = 'APPLICATION_INVALID_VISIT_ALREADY_BOOKED'
+          return res.redirect(`${urlPrefix}/select-date-and-time`)
         }
-
-        return res.redirect(`${urlPrefix}/select-date-and-time`) // both 'other' validation errors redirect to date and time page
       }
 
       return res.render('pages/bookAVisit/checkYourBooking', {
