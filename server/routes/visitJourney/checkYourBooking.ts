@@ -90,6 +90,14 @@ export default class CheckYourBooking {
         if (validationErrors.includes('APPLICATION_INVALID_NO_SLOT_CAPACITY')) {
           return res.redirect(`${urlPrefix}/check-your-booking/overbooking`)
         }
+        if (validationErrors.includes('APPLICATION_INVALID_NON_ASSOCIATION_VISITS')) {
+          visitSessionData.validationError = 'APPLICATION_INVALID_NON_ASSOCIATION_VISITS'
+        }
+        if (validationErrors.includes('APPLICATION_INVALID_VISIT_ALREADY_BOOKED')) {
+          visitSessionData.validationError = 'APPLICATION_INVALID_VISIT_ALREADY_BOOKED'
+        }
+
+        return res.redirect(`${urlPrefix}/select-date-and-time`) // both 'other' validation errors redirect to date and time page
       }
 
       return res.render('pages/bookAVisit/checkYourBooking', {

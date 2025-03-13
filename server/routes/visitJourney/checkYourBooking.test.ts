@@ -251,6 +251,50 @@ testJourneys.forEach(journey => {
           })
         })
 
+        it('should redirect to date and time page if non_association_visits 422 received', () => {
+          const error: SanitisedError<ApplicationValidationErrorResponse> = {
+            name: 'Error',
+            status: 422,
+            message: 'Unprocessable Entity',
+            stack: 'Error: Unprocessable Entity',
+            data: { status: 422, validationErrors: ['APPLICATION_INVALID_NON_ASSOCIATION_VISITS'] },
+          }
+          visitService.bookVisit.mockRejectedValue(error)
+
+          return request(sessionApp)
+            .post(`${journey.urlPrefix}/check-your-booking`)
+            .expect(302)
+            .expect('location', `${journey.urlPrefix}/select-date-and-time`)
+            .expect(() => {
+              expect(visitSessionData.visitStatus).not.toBe('BOOKED')
+              expect(visitSessionData.visitReference).toBe(journey.isUpdate ? 'ab-cd-ef-gh' : undefined)
+              expect(visitSessionData.validationError).toBe(error.data.validationErrors[0])
+              expect(auditService.bookedVisit).not.toHaveBeenCalled()
+            })
+        })
+
+        it('should redirect to date and time page if visit_already_booked 422 received', () => {
+          const error: SanitisedError<ApplicationValidationErrorResponse> = {
+            name: 'Error',
+            status: 422,
+            message: 'Unprocessable Entity',
+            stack: 'Error: Unprocessable Entity',
+            data: { status: 422, validationErrors: ['APPLICATION_INVALID_VISIT_ALREADY_BOOKED'] },
+          }
+          visitService.bookVisit.mockRejectedValue(error)
+
+          return request(sessionApp)
+            .post(`${journey.urlPrefix}/check-your-booking`)
+            .expect(302)
+            .expect('location', `${journey.urlPrefix}/select-date-and-time`)
+            .expect(() => {
+              expect(visitSessionData.visitStatus).not.toBe('BOOKED')
+              expect(visitSessionData.visitReference).toBe(journey.isUpdate ? 'ab-cd-ef-gh' : undefined)
+              expect(visitSessionData.validationError).toBe(error.data.validationErrors[0])
+              expect(auditService.bookedVisit).not.toHaveBeenCalled()
+            })
+        })
+
         it('should handle booking failure, display error message and NOT record audit event', () => {
           visitService.bookVisit.mockRejectedValue({})
 
