@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express'
-import { AuditService, SupportedPrisonsService, VisitService } from '../../services'
+import { AuditService, VisitService } from '../../services'
 import { NotificationType, VisitBookingDetailsDto } from '../../data/orchestrationApiTypes'
 import { notificationTypeWarnings } from '../../constants/notificationEvents'
 
@@ -15,7 +15,6 @@ export default class VisitDetailsController {
 
   public constructor(
     private readonly auditService: AuditService,
-    private readonly supportedPrisonsService: SupportedPrisonsService,
     private readonly visitService: VisitService,
   ) {}
 
@@ -29,19 +28,7 @@ export default class VisitDetailsController {
 
       const visitDetails = await this.visitService.getVisitDetailed({ username, reference })
 
-      const { visitHistoryDetails } = await this.visitService.getFullVisitDetails({ reference, username })
-
-      const supportedPrisonIds = await this.supportedPrisonsService.getSupportedPrisonIds(username)
-
-      const prisonerLocation = getPrisonerLocation(supportedPrisonIds, visitDetails)
-
-      await this.auditService.viewedVisitDetails({
-        visitReference: reference,
-        prisonerId: visitDetails.prisoner.prisonerNumber,
-        prisonId: visitDetails.prison.prisonId,
-        username,
-        operationId: res.locals.appInsightsOperationId,
-      })
+      const prisonerLocation = getPrisonerLocation(visitDetails)
 
       const nowTimestamp = new Date()
       const visitStartTimestamp = new Date(visitDetails.startTimestamp)
@@ -59,9 +46,21 @@ export default class VisitDetailsController {
       )
       const showDoNotChangeButton = filteredNotifications.length > 0
 
-      const eventsTimeline = this.visitService.getVisitEventsTimeline(visitHistoryDetails.eventsAudit, visitDetails)
+      const eventsTimeline = this.visitService.getVisitEventsTimeline({
+        events: visitDetails.events,
+        visitStatus: visitDetails.visitStatus,
+        visitNotes: visitDetails.visitNotes,
+      })
 
       const showVisitDetails = req.session.selectedEstablishment.prisonId === visitDetails.prison.prisonId
+
+      await this.auditService.viewedVisitDetails({
+        visitReference: reference,
+        prisonerId: visitDetails.prisoner.prisonerNumber,
+        prisonId: visitDetails.prison.prisonId,
+        username,
+        operationId: res.locals.appInsightsOperationId,
+      })
 
       return res.render('pages/visit/visitDetails', {
         fromPage,
@@ -83,13 +82,15 @@ export default class VisitDetailsController {
   }
 }
 
-// TODO duplicated from visit.ts - need to review
-function getPrisonerLocation(supportedPrisonIds: string[], visitDetails: VisitBookingDetailsDto) {
+// TODO remove/refactor
+function getPrisonerLocation(visitDetails: VisitBookingDetailsDto) {
   if (visitDetails.prisoner.prisonId === 'OUT') {
     return visitDetails.prisoner.locationDescription
   }
-  // FIXME should use PRISONER'S prison name return supportedPrisonIds.includes(visitDetails.prisoner.prisonId) ? `${visitDetails.prisoner.cellLocation}, ${prisoner.prisonName}` : 'Unknown'
-  return supportedPrisonIds.includes(visitDetails.prisoner.prisonId)
-    ? `${visitDetails.prisoner.cellLocation}, ${visitDetails.prison.prisonName}`
-    : 'Unknown'
+
+  if (visitDetails.prisoner.prisonId === 'TRN') {
+    return 'Unknown'
+  }
+
+  return `${visitDetails.prisoner.cellLocation}, ${visitDetails.prisoner.prisonName}`
 }

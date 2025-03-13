@@ -1397,7 +1397,7 @@ export interface components {
       /** @description full name of user who added the exclude date or username if full name is not available. */
       actionedBy: string
     }
-    /** @description Event Audit */
+    /** @description Event Audit with actioned by user's full name populated */
     EventAuditOrchestrationDto: {
       /**
        * @description The type of event
@@ -1448,8 +1448,6 @@ export interface components {
        * @enum {string}
        */
       userType: 'STAFF' | 'PUBLIC' | 'SYSTEM'
-      /** @description Session template used for this event  */
-      sessionTemplateReference?: string
       /** @description Notes added against the event */
       text?: string
       /**
@@ -1465,25 +1463,6 @@ export interface components {
       eventsAudit: components['schemas']['EventAuditOrchestrationDto'][]
       /** @description The visit details */
       visit: components['schemas']['VisitDto']
-    }
-    /** @description Actioned By */
-    ActionedByDto: {
-      /**
-       * @description booker reference
-       * @example asd-aed-vhj
-       */
-      bookerReference?: string
-      /**
-       * @description User Name
-       * @example AS/ALED
-       */
-      userName?: string
-      /**
-       * @description User type
-       * @example STAFF
-       * @enum {string}
-       */
-      userType: 'STAFF' | 'PUBLIC' | 'SYSTEM'
     }
     /** @description An address */
     AddressDto: {
@@ -1627,59 +1606,6 @@ export interface components {
        */
       active: boolean
     }
-    /** @description Event Audit */
-    EventAuditDto: {
-      /**
-       * @description The type of event
-       * @enum {string}
-       */
-      type:
-        | 'RESERVED_VISIT'
-        | 'CHANGING_VISIT'
-        | 'MIGRATED_VISIT'
-        | 'BOOKED_VISIT'
-        | 'UPDATED_VISIT'
-        | 'CANCELLED_VISIT'
-        | 'NON_ASSOCIATION_EVENT'
-        | 'PRISONER_RELEASED_EVENT'
-        | 'PRISONER_RECEIVED_EVENT'
-        | 'PRISONER_RESTRICTION_CHANGE_EVENT'
-        | 'PRISONER_ALERTS_UPDATED_EVENT'
-        | 'PRISON_VISITS_BLOCKED_FOR_DATE'
-        | 'SESSION_VISITS_BLOCKED_FOR_DATE'
-        | 'IGNORE_VISIT_NOTIFICATIONS_EVENT'
-        | 'PERSON_RESTRICTION_UPSERTED_EVENT'
-        | 'VISITOR_RESTRICTION_UPSERTED_EVENT'
-        | 'VISITOR_UNAPPROVED_EVENT'
-        | 'UPDATED_NON_ASSOCIATION_VISIT_EVENT'
-        | 'CANCELLED_NON_ASSOCIATION_VISIT_EVENT'
-        | 'IGNORED_NON_ASSOCIATION_VISIT_NOTIFICATIONS_EVENT'
-        | 'PAIRED_VISIT_CANCELLED_IGNORED_OR_UPDATED_EVENT'
-      /**
-       * @description What was the application method for this event
-       * @enum {string}
-       */
-      applicationMethodType:
-        | 'PHONE'
-        | 'WEBSITE'
-        | 'EMAIL'
-        | 'IN_PERSON'
-        | 'NOT_KNOWN'
-        | 'NOT_APPLICABLE'
-        | 'BY_PRISONER'
-      /** @description Event actioned by information */
-      actionedBy: components['schemas']['ActionedByDto']
-      /** @description Session template used for this event */
-      sessionTemplateReference?: string
-      /** @description Notes added against the event */
-      text?: string
-      /**
-       * Format: date-time
-       * @description event creat date and time
-       * @example 2018-12-01T13:45:00
-       */
-      createTimestamp: string
-    }
     /** @description Offender restriction */
     OffenderRestrictionDto: {
       /**
@@ -1750,6 +1676,11 @@ export interface components {
        * @example MDI
        */
       prisonId?: string
+      /**
+       * @description Prison Name
+       * @example HMP Leeds
+       */
+      prisonName?: string
       /**
        * @description In prison cell location
        * @example A-1-002
@@ -1889,7 +1820,7 @@ export interface components {
       prisoner: components['schemas']['PrisonerDetailsDto']
       /** @description Prisoner details */
       visitors: components['schemas']['VisitorDetailsDto'][]
-      events: components['schemas']['EventAuditDto'][]
+      events: components['schemas']['EventAuditOrchestrationDto'][]
       notifications: components['schemas']['VisitNotificationDto'][]
     }
     /** @description Visit notification details */
@@ -2053,17 +1984,17 @@ export interface components {
       /** Format: int64 */
       offset?: number
       sort?: components['schemas']['SortObject']
+      unpaged?: boolean
       paged?: boolean
       /** Format: int32 */
       pageNumber?: number
       /** Format: int32 */
       pageSize?: number
-      unpaged?: boolean
     }
     SortObject: {
       empty?: boolean
-      sorted?: boolean
       unsorted?: boolean
+      sorted?: boolean
     }
     OrchestrationNotificationGroupDto: {
       /**

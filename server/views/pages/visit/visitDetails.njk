@@ -6,7 +6,7 @@
 
 {% set pageHeaderTitle = "Visit booking details (" + visitDetails.reference + ")" %}
 
-{% if prisoner %}
+{% if showVisitDetails %}
   {% if fromPage == "visit-search" %}
     {% set backLinkHref = "/search/visit/results?" + fromPageQuery %}
   {% elseif fromPage == "visits" %}
@@ -204,7 +204,7 @@
                 <span class="bapv-visit-details__restriction-dates">From <span data-test="visitor-{{ visitorIndex }}-restriction-{{ loop.index }}-start">{{ restriction.startDate | formatDate }}</span>
                   {%- if restriction.expiryDate %} to {% else %}.{% endif %}
                   <span data-test="visitor-{{ visitorIndex }}-restriction-{{ loop.index }}-end">
-                    {%- if restriction.expiryDate %}{{ restriction.expiryDate | formatDate }}{% else %}End date not entered{% endif -%}
+                    {{- restriction.expiryDate | formatDate | default("End date not entered", true) -}}
                   </span>.
                 </span>
               </p>

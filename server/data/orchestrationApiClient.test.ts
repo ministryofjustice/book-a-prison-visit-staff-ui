@@ -146,7 +146,8 @@ describe('orchestrationApiClient', () => {
       rawVisitBookingDetailsDto.events.push({
         type: 'PERSON_RESTRICTION_UPSERTED_EVENT',
         applicationMethodType: 'NOT_KNOWN',
-        actionedBy: null,
+        actionedByFullName: null,
+        userType: 'SYSTEM',
         createTimestamp: '2022-01-01T09:00:00',
       })
 
