@@ -246,6 +246,7 @@ testJourneys.forEach(journey => {
               .expect(() => {
                 expect(visitSessionData.visitStatus).not.toBe('BOOKED')
                 expect(visitSessionData.visitReference).toBe(journey.isUpdate ? 'ab-cd-ef-gh' : undefined)
+                expect(visitSessionData.validationError).toBe(error.data.validationErrors[0])
                 expect(auditService.bookedVisit).not.toHaveBeenCalled()
               })
           })

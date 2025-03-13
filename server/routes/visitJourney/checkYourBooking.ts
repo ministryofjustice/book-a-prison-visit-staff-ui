@@ -88,6 +88,7 @@ export default class CheckYourBooking {
           (error as SanitisedError<ApplicationValidationErrorResponse>)?.data?.validationErrors ?? []
 
         if (validationErrors.includes('APPLICATION_INVALID_NO_SLOT_CAPACITY')) {
+          visitSessionData.validationError = 'APPLICATION_INVALID_NO_SLOT_CAPACITY'
           return res.redirect(`${urlPrefix}/check-your-booking/overbooking`)
         }
         if (validationErrors.includes('APPLICATION_INVALID_NON_ASSOCIATION_VISITS')) {
