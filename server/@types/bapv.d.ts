@@ -1,6 +1,7 @@
 import { OffenderRestriction } from '../data/prisonApiTypes'
 import {
   ApplicationMethodType,
+  ApplicationValidationErrorResponse,
   NotificationType,
   PrisonDto,
   PrisonerProfile,
@@ -122,6 +123,7 @@ export type VisitSessionData = {
   requestMethod?: ApplicationMethodType
   daysUntilBanExpiry?: number
   overrideBookingWindow?: boolean
+  validationError?: ApplicationValidationErrorResponse['validationErrors'][number]
 }
 
 export type VisitInformation = {
