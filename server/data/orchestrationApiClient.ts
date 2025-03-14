@@ -97,6 +97,9 @@ export default class OrchestrationApiClient {
     })
 
     visitDetails.events = visitDetails.events.filter(event => this.enabledVisitHistoryEvents.includes(event.type))
+    visitDetails.notifications = visitDetails.notifications.filter(notification =>
+      this.enabledNotifications.includes(notification.type),
+    )
     return visitDetails
   }
 
