@@ -151,6 +151,13 @@ describe('orchestrationApiClient', () => {
         createTimestamp: '2022-01-01T09:00:00',
       })
 
+      // add a notification that should be filtered
+      rawVisitBookingDetailsDto.notifications.push({
+        type: 'NON_ASSOCIATION_EVENT',
+        createdDateTime: '',
+        additionalData: [],
+      })
+
       const filteredVisitBookingDetailsDto = TestData.visitBookingDetailsDto()
 
       fakeOrchestrationApi
