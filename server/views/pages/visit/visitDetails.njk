@@ -3,6 +3,7 @@
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {%-from "moj/components/banner/macro.njk" import mojBanner %}
 {%- from "moj/components/timeline/macro.njk" import mojTimeline -%}
+{%- from "components/expandableComment/macro.njk" import bapvExpandableComment -%}
 
 {% set pageHeaderTitle = "Visit booking details (" + visitDetails.reference + ")" %}
 
@@ -173,6 +174,60 @@
             </dd>
           </dl>
 
+          {% if visitDetails.prisoner.prisonerRestrictions %}
+            <h4 class="govuk-heading-s bapv-heading">Restrictions</h4>
+            {% for restriction in visitDetails.prisoner.prisonerRestrictions %}
+              <p class="bapv-visit-details__restriction">
+                <span>
+                  <span class="govuk-tag restriction-tag restriction-tag--{{ restriction.restrictionType }}"
+                    data-test="prisoner-restriction-{{ loop.index }}">
+                    {{- restriction.restrictionTypeDescription -}}
+                  </span>
+                </span>
+                <span class="bapv-visit-details__restriction-dates">From <span data-test="prisoner-restriction-{{ loop.index }}-start">{{ restriction.startDate | formatDate }}</span>
+                  {%- if restriction.expiryDate %} to {% else %}.{% endif %}
+                  <span data-test="prisoner-restriction-{{ loop.index }}-end">
+                    {{- restriction.expiryDate | formatDate | default("End date not entered", true) -}}
+                  </span>.
+                </span>
+              </p>
+              {% if restriction.comment %}
+                <div class="govuk-body" data-test="prisoner-restriction-text-{{ loop.index }}">
+                  {{- bapvExpandableComment({ text: restriction.comment }) -}}
+                </div>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+
+          {% if visitDetails.prisoner.prisonerAlerts %}
+            <h4 class="govuk-heading-s bapv-heading">Alerts</h4>
+            <p>
+              This page shows alerts that are relevant for social visits. You can also
+              <a class="govuk-link--no-visited-state" href="{{ prisonerDpsAlertsUrl }}" target="_blank" data-test="all-alerts-link">view all alerts</a>.
+            </p>
+            {% for alert in visitDetails.prisoner.prisonerAlerts %}
+              <p class="bapv-visit-details__restriction">
+                <span>
+                  <span class="govuk-tag alert-tag alert-tag--{{ alert.alertType }}"
+                    data-test="prisoner-alert-{{ loop.index }}">
+                    {{- alert.alertTypeDescription -}}
+                  </span>
+                </span>
+                <span class="bapv-visit-details__restriction-dates">From <span data-test="prisoner-alert-{{ loop.index }}-start">{{ alert.dateCreated | formatDate }}</span>
+                  {%- if alert.dateExpires %} to {% else %}.{% endif %}
+                  <span data-test="prisoner-alert-{{ loop.index }}-end">
+                    {{- alert.dateExpires | formatDate | default("End date not entered", true) -}}
+                  </span>.
+                </span>
+              </p>
+              {% if alert.comment %}
+                <div class="govuk-body" data-test="prisoner-alert-text-{{ loop.index }}">
+                  {{- bapvExpandableComment({ text: alert.comment }) -}}
+                </div>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+
           <h2 class="govuk-heading-l bapv-heading">Visitors</h2>
           {% for visitor in visitDetails.visitors %}
             <h3 class="govuk-heading-m bapv-heading">
@@ -233,4 +288,8 @@
 </div>
 
 
+{% endblock %}
+
+{% block pageScripts %}
+  <script src="/assets/components/expandableComment.js"></script>
 {% endblock %}

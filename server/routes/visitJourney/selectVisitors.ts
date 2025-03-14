@@ -5,7 +5,7 @@ import PrisonerVisitorsService from '../../services/prisonerVisitorsService'
 import { getFlashFormValues } from '../visitorUtils'
 import getUrlPrefix from './visitJourneyUtils'
 import { getBanStatus } from '../../utils/visitorUtils'
-import config from '../../config'
+import { getDpsPrisonerAlertsUrl } from '../../utils/utils'
 
 export default class SelectVisitors {
   constructor(
@@ -36,8 +36,6 @@ export default class SelectVisitors {
 
     const returnAddress = isUpdate ? `/visit/${visitSessionData.visitReference}` : `/prisoner/${offenderNo}`
 
-    const prisonerDpsAlertsUrl = `${config.dpsPrisoner}prisoner/${offenderNo}/alerts/active`
-
     res.render('pages/bookAVisit/visitors', {
       errors: req.flash('errors'),
       offenderNo: visitSessionData.prisoner.offenderNo,
@@ -48,7 +46,7 @@ export default class SelectVisitors {
       activeAlerts,
       restrictions,
       formValues,
-      prisonerDpsAlertsUrl,
+      prisonerDpsAlertsUrl: getDpsPrisonerAlertsUrl(offenderNo),
       urlPrefix: getUrlPrefix(isUpdate, visitSessionData.visitReference),
       backLink: returnAddress,
     })
