@@ -42,10 +42,9 @@ context('Prisoner profile page', () => {
     const profile = TestData.prisonerProfile({ alerts, visits: [visitSummary] })
 
     const { prisonerId } = profile
-    const prisonId = 'HEI'
 
     // Prisoner profile page
-    cy.task('stubPrisonerProfile', { prisonId, prisonerId, profile })
+    cy.task('stubPrisonerProfile', profile)
 
     // Go to prisoner profile page
     cy.visit(`/prisoner/${prisonerId}`)

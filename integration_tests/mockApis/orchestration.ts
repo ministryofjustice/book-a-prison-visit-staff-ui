@@ -14,6 +14,7 @@ import {
   SessionCapacity,
   SessionSchedule,
   Visit,
+  VisitBookingDetailsDto,
   VisitHistoryDetails,
   VisitPreview,
   VisitSession,
@@ -198,6 +199,19 @@ export default {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
         jsonBody: visitHistoryDetails,
+      },
+    })
+  },
+  stubGetVisitDetailed: (visitDetails: VisitBookingDetailsDto): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        url: `/orchestration/visits/${visitDetails.reference}/detailed`,
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: visitDetails,
       },
     })
   },
@@ -554,19 +568,11 @@ export default {
       },
     })
   },
-  stubPrisonerProfile: ({
-    prisonId,
-    prisonerId,
-    profile,
-  }: {
-    prisonId: string
-    prisonerId: string
-    profile: PrisonerProfile
-  }): SuperAgentRequest => {
+  stubPrisonerProfile: (profile: PrisonerProfile): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',
-        url: `/orchestration/prisoner/${prisonId}/${prisonerId}/profile`,
+        url: `/orchestration/prisoner/${profile.prisonId}/${profile.prisonerId}/profile`,
       },
       response: {
         status: 200,
