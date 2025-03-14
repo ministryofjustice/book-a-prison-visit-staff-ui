@@ -25,8 +25,8 @@ context('Check visit details page', () => {
   })
 
   it('should complete the book a visit journey and change details before booking', () => {
-    const prisonerProfile = TestData.prisonerProfile()
-    const { prisonerId, prisonId } = prisonerProfile
+    const profile = TestData.prisonerProfile()
+    const { prisonerId, prisonId } = profile
     const prisonerDisplayName = 'Smith, John'
 
     const today = new Date()
@@ -55,7 +55,7 @@ context('Check visit details page', () => {
 
     // Start - Prisoner profile page
     cy.task('stubPrisonerSocialContacts', { offenderNo: prisonerId, contacts })
-    cy.task('stubPrisonerProfile', { prisonId, prisonerId, profile: prisonerProfile })
+    cy.task('stubPrisonerProfile', profile)
     cy.visit(`/prisoner/${prisonerId}`)
 
     const prisonerProfilePage = Page.verifyOnPageTitle(PrisonerProfilePage, prisonerDisplayName)

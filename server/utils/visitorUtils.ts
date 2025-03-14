@@ -27,7 +27,8 @@ const getAddressToDisplay = (addresses: Address[]): string => {
   return getFormattedAddress(primaryAddress || addresses[0])
 }
 
-const getFormattedAddress = (address: Address): string => {
+// TODO add test for this?
+export const getFormattedAddress = (address: Address): string => {
   const flat = address.flat && `Flat ${address.flat}`
   const formattedAddress = [
     address.premise,

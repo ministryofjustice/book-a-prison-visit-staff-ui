@@ -108,9 +108,8 @@ context('Book a visit', () => {
       ],
     })
 
-    const { prisonerId } = profile
     // Prisoner profile page
-    cy.task('stubPrisonerProfile', { prisonId, prisonerId, profile })
+    cy.task('stubPrisonerProfile', profile)
     searchForAPrisonerResultsPage.firstResultLink().contains(prisonerDisplayName).click()
     const prisonerProfilePage = Page.verifyOnPageTitle(PrisonerProfilePage, prisonerDisplayName)
 
@@ -255,11 +254,11 @@ context('Book a visit', () => {
         latestPrivIepAdjustDate: '2021-12-01',
       },
     })
-    const { prisonerId, prisonId } = profile
+    const { prisonerId } = profile
 
     // Prisoner profile page
     cy.task('stubPrisonerSocialContacts', { offenderNo: prisonerId, contacts: [] })
-    cy.task('stubPrisonerProfile', { prisonId, prisonerId, profile })
+    cy.task('stubPrisonerProfile', profile)
 
     cy.visit(`/prisoner/${prisonerId}`)
 
@@ -284,7 +283,7 @@ context('Book a visit', () => {
 
     // Prisoner profile page
     cy.task('stubPrisonerSocialContacts', { offenderNo: prisonerId, contacts })
-    cy.task('stubPrisonerProfile', { prisonId, prisonerId, profile })
+    cy.task('stubPrisonerProfile', profile)
 
     cy.visit(`/prisoner/${prisonerId}`)
 

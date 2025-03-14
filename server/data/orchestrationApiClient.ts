@@ -24,6 +24,7 @@ import {
   VisitRestriction,
   VisitSession,
   EventAuditType,
+  VisitBookingDetailsDto,
 } from './orchestrationApiTypes'
 import { Prison, VisitSessionData } from '../@types/bapv'
 
@@ -88,6 +89,15 @@ export default class OrchestrationApiClient {
       eventsAudit: eventsAudit.filter(event => this.enabledVisitHistoryEvents.includes(event.type)),
       visit,
     }
+  }
+
+  async getVisitDetailed(reference: string): Promise<VisitBookingDetailsDto> {
+    const visitDetails = await this.restClient.get<VisitBookingDetailsDto>({
+      path: `/visits/${reference}/detailed`,
+    })
+
+    visitDetails.events = visitDetails.events.filter(event => this.enabledVisitHistoryEvents.includes(event.type))
+    return visitDetails
   }
 
   async getVisitsBySessionTemplate(

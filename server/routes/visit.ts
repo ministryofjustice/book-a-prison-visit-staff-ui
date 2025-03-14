@@ -62,7 +62,7 @@ export default function routes({
       prisonerSearchService.getPrisonerById(visit.prisonerId, username),
       supportedPrisonsService.getSupportedPrisonIds(username),
     ])
-    const prisonerLocation = getPrisonerLocation(supportedPrisonIds, prisoner)
+    const prisonerLocation = getPrisonerLocation(supportedPrisonIds, prisoner) // TODO does this actually get used?
 
     const visitorIds = visit.visitors.flatMap(visitor => visitor.nomisPersonId)
     const mainContactVisitor = visit.visitors.find(visitor => visitor.visitContact)

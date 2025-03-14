@@ -7,6 +7,7 @@ import {
   EventAudit,
   NotificationType,
   Visit,
+  VisitBookingDetailsDto,
   VisitHistoryDetails,
   VisitPreview,
 } from '../data/orchestrationApiTypes'
@@ -163,6 +164,19 @@ export default class VisitService {
     return { visitHistoryDetails, visitors, notifications, additionalSupport }
   }
 
+  async getVisitDetailed({
+    username,
+    reference,
+  }: {
+    username: string
+    reference: string
+  }): Promise<VisitBookingDetailsDto> {
+    const token = await this.hmppsAuthClient.getSystemClientToken(username)
+    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+
+    return orchestrationApiClient.getVisitDetailed(reference)
+  }
+
   async getVisitsBySessionTemplate({
     username,
     prisonId,
@@ -210,19 +224,27 @@ export default class VisitService {
     return orchestrationApiClient.getBookedVisitCountByDate(prisonId, date)
   }
 
-  getVisitEventsTimeline(rawEventsAudit: EventAudit[], visit: Visit): MojTimelineItem[] {
-    const eventsAudit = rawEventsAudit.filter(event => Object.keys(eventAuditTypes).includes(event.type)).reverse()
+  getVisitEventsTimeline({
+    events,
+    visitStatus,
+    visitNotes,
+  }: {
+    events: EventAudit[]
+    visitStatus: VisitBookingDetailsDto['visitStatus']
+    visitNotes: VisitBookingDetailsDto['visitNotes']
+  }): MojTimelineItem[] {
+    const filteredEvents = events.filter(event => Object.keys(eventAuditTypes).includes(event.type)).reverse()
 
     let cancelledVisitReason = ''
-    if (visit.visitStatus === 'CANCELLED') {
-      visit.visitNotes.forEach(note => {
+    if (visitStatus === 'CANCELLED') {
+      visitNotes.forEach(note => {
         if (note.type === 'VISIT_OUTCOMES') {
           cancelledVisitReason = note.text
         }
       })
     }
 
-    return eventsAudit.map((event, index) => {
+    return filteredEvents.map((event, index) => {
       const label = eventAuditTypes[event.type]
 
       let descriptionContent = ''
@@ -246,7 +268,11 @@ export default class VisitService {
         }
       } else if (type === 'IGNORE_VISIT_NOTIFICATIONS_EVENT') {
         descriptionContent = `Reason: ${event.text}`
-      } else if (type !== 'RESERVED_VISIT' && type !== 'CHANGING_VISIT') {
+      } else if (
+        type === 'PRISONER_RELEASED_EVENT' ||
+        type === 'PRISON_VISITS_BLOCKED_FOR_DATE' ||
+        type === 'PRISONER_RECEIVED_EVENT'
+      ) {
         // only added to assist type for next line
         descriptionContent = `Reason: ${notificationTypes[type]}`
       }

@@ -12,19 +12,16 @@ context('Cancel visit journey', () => {
   const longDateFormat = 'd MMMM yyyy'
 
   const today = new Date()
-  const prisoner = TestData.prisoner()
-  const { prisonerNumber: offenderNo } = prisoner
 
   const futureVisitDate = format(add(today, { months: 1 }), shortDateFormat)
-  const visitHistoryDetails = TestData.visitHistoryDetails({
-    visit: TestData.visit({
-      startTimestamp: `${futureVisitDate}T12:00:00`,
-      endTimestamp: `${futureVisitDate}T14:00:00`,
-      createdTimestamp: '2022-02-14T10:00:00',
-      visitors: [{ nomisPersonId: 4321 }],
-    }),
+  const visitDetails = TestData.visitBookingDetailsDto({
+    startTimestamp: `${futureVisitDate}T12:00:00`,
+    endTimestamp: `${futureVisitDate}T14:00:00`,
   })
-  const contacts = [TestData.contact({ personId: 4321 })]
+  const visit = TestData.visit({
+    startTimestamp: `${futureVisitDate}T12:00:00`,
+    endTimestamp: `${futureVisitDate}T14:00:00`,
+  })
 
   beforeEach(() => {
     cy.task('reset')
@@ -34,10 +31,7 @@ context('Cancel visit journey', () => {
     cy.task('stubGetNotificationCount', {})
     cy.signIn()
 
-    cy.task('stubPrisonerById', prisoner)
-    cy.task('stubVisitHistory', visitHistoryDetails)
-    cy.task('stubPrisonerSocialContacts', { offenderNo, contacts, approvedVisitorsOnly: false })
-    cy.task('stubGetVisitNotifications', { reference: visitHistoryDetails.visit.reference })
+    cy.task('stubGetVisitDetailed', visitDetails)
   })
 
   it('should cancel a visit', () => {
@@ -61,7 +55,7 @@ context('Cancel visit journey', () => {
     cancelVisitPage.establishmentCancelledRadio().click()
     cancelVisitPage.enterCancellationReasonText(cancelVisitDto.cancelOutcome.text)
 
-    cy.task('stubCancelVisit', { visit: visitHistoryDetails.visit, cancelVisitDto })
+    cy.task('stubCancelVisit', { visit, cancelVisitDto })
     cancelVisitPage.submit().click()
 
     const visitCancelledPage = Page.verifyOnPage(VisitCancelledPage)
@@ -93,7 +87,7 @@ context('Cancel visit journey', () => {
     cancelVisitPage.enterCancellationReasonText(cancelVisitDto.cancelOutcome.text)
     cancelVisitPage.getRequestMethodByValue('WEBSITE').check()
 
-    cy.task('stubCancelVisit', { visit: visitHistoryDetails.visit, cancelVisitDto })
+    cy.task('stubCancelVisit', { visit, cancelVisitDto })
     cancelVisitPage.submit().click()
 
     const visitCancelledPage = Page.verifyOnPage(VisitCancelledPage)

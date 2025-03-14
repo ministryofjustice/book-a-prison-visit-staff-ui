@@ -4,7 +4,6 @@ import {
   ApplicationDto,
   ApplicationMethodType,
   CancelVisitOrchestrationDto,
-  EventAudit,
   NotificationType,
   Visit,
   VisitHistoryDetails,
@@ -196,7 +195,7 @@ describe('Visit service', () => {
   })
 
   describe('Get Visit(s)', () => {
-    let visit = TestData.visit()
+    const visit = TestData.visit()
 
     describe('getVisit', () => {
       it('should return VisitInformation given a visit reference and matching prisonId', async () => {
@@ -300,6 +299,18 @@ describe('Visit service', () => {
       })
     })
 
+    describe('getVisitDetailed', () => {
+      it('should return visit details given a visit reference', async () => {
+        const visitDetails = TestData.visitBookingDetailsDto()
+        orchestrationApiClient.getVisitDetailed.mockResolvedValue(visitDetails)
+
+        const result = await visitService.getVisitDetailed({ username: 'user', reference: 'ab-cd-ef-gh' })
+
+        expect(orchestrationApiClient.getVisitDetailed).toHaveBeenCalledWith('ab-cd-ef-gh')
+        expect(result).toStrictEqual(visitDetails)
+      })
+    })
+
     describe('getVisitsBySessionTemplate', () => {
       it('should return visit previews for given session template reference, date, prison and restriction', async () => {
         const reference = 'v9d.7ed.7u'
@@ -365,310 +376,315 @@ describe('Visit service', () => {
         expect(result).toBe(2)
       })
     })
+  })
+  describe('getVisitEventsTimeline', () => {
+    type GetVisitEventsTimelineParams = Parameters<typeof visitService.getVisitEventsTimeline>[0]
+    let params: GetVisitEventsTimelineParams
 
-    describe('getVisitEventsTimeline', () => {
-      beforeEach(() => {
-        visit = TestData.visit()
-      })
+    beforeEach(() => {
+      params = {
+        events: [],
+        visitStatus: 'BOOKED',
+        visitNotes: [],
+      }
+    })
 
-      it('should return an empty array of timeline items if no event audit items found', () => {
-        const eventAudit: EventAudit[] = []
-        const expecteTimeline: MojTimelineItem[] = []
-        const timeline = visitService.getVisitEventsTimeline(eventAudit, visit)
-        expect(timeline).toStrictEqual(expecteTimeline)
-      })
+    it('should return an empty array of timeline items if no event audit items found', () => {
+      const expectedTimeline: MojTimelineItem[] = []
+      const timeline = visitService.getVisitEventsTimeline(params)
+      expect(timeline).toStrictEqual(expectedTimeline)
+    })
 
-      it('should filter events and flip eventAudit order', () => {
-        const eventAudit: EventAudit[] = [
-          {
-            type: 'RESERVED_VISIT',
-            applicationMethodType: 'NOT_APPLICABLE',
-            actionedByFullName: null,
-            userType: 'SYSTEM',
-            createTimestamp: '2022-01-01T08:55:00',
-          },
-          {
-            type: 'BOOKED_VISIT',
-            applicationMethodType: 'WEBSITE',
-            actionedByFullName: '',
-            userType: 'PUBLIC',
-            createTimestamp: '2022-01-01T09:00:00',
-          },
-          {
-            type: 'UPDATED_VISIT',
-            applicationMethodType: 'BY_PRISONER',
-            actionedByFullName: 'User One',
-            userType: 'STAFF',
-            createTimestamp: '2022-01-01T10:00:00',
-          },
-        ]
+    it('should filter events and flip eventAudit order', () => {
+      params.events = [
+        {
+          type: 'RESERVED_VISIT',
+          applicationMethodType: 'NOT_APPLICABLE',
+          actionedByFullName: null,
+          userType: 'SYSTEM',
+          createTimestamp: '2022-01-01T08:55:00',
+        },
+        {
+          type: 'BOOKED_VISIT',
+          applicationMethodType: 'WEBSITE',
+          actionedByFullName: '',
+          userType: 'PUBLIC',
+          createTimestamp: '2022-01-01T09:00:00',
+        },
+        {
+          type: 'UPDATED_VISIT',
+          applicationMethodType: 'BY_PRISONER',
+          actionedByFullName: 'User One',
+          userType: 'STAFF',
+          createTimestamp: '2022-01-01T10:00:00',
+        },
+      ]
 
-        const expectedTimeline: MojTimelineItem[] = [
-          {
-            label: { text: 'Updated' },
-            text: 'Method: Prisoner request',
-            datetime: { timestamp: '2022-01-01T10:00:00', type: 'datetime' },
-            byline: { text: 'User One' },
-            attributes: { 'data-test': 'timeline-entry-0' },
-          },
-          {
-            label: { text: 'Booked' },
-            text: 'Method: GOV.UK booking',
-            datetime: { timestamp: '2022-01-01T09:00:00', type: 'datetime' },
-            byline: null,
-            attributes: { 'data-test': 'timeline-entry-1' },
-          },
-        ]
+      const expectedTimeline: MojTimelineItem[] = [
+        {
+          label: { text: 'Updated' },
+          text: 'Method: Prisoner request',
+          datetime: { timestamp: '2022-01-01T10:00:00', type: 'datetime' },
+          byline: { text: 'User One' },
+          attributes: { 'data-test': 'timeline-entry-0' },
+        },
+        {
+          label: { text: 'Booked' },
+          text: 'Method: GOV.UK booking',
+          datetime: { timestamp: '2022-01-01T09:00:00', type: 'datetime' },
+          byline: null,
+          attributes: { 'data-test': 'timeline-entry-1' },
+        },
+      ]
 
-        const timeline = visitService.getVisitEventsTimeline(eventAudit, visit)
+      const timeline = visitService.getVisitEventsTimeline(params)
 
-        expect(timeline).toStrictEqual(expectedTimeline)
-      })
+      expect(timeline).toStrictEqual(expectedTimeline)
+    })
 
-      it('should return a timeline with an event for "Booked" - prisoner request', () => {
-        const eventAudit: EventAudit[] = [
-          {
-            type: 'BOOKED_VISIT',
-            applicationMethodType: 'BY_PRISONER',
-            actionedByFullName: 'User One',
-            userType: 'STAFF',
-            createTimestamp: '2022-01-01T09:00:00',
-          },
-        ]
+    it('should return a timeline with an event for "Booked" - prisoner request', () => {
+      params.events = [
+        {
+          type: 'BOOKED_VISIT',
+          applicationMethodType: 'BY_PRISONER',
+          actionedByFullName: 'User One',
+          userType: 'STAFF',
+          createTimestamp: '2022-01-01T09:00:00',
+        },
+      ]
 
-        const expectedTimeline: MojTimelineItem[] = [
-          {
-            label: { text: 'Booked' },
-            text: 'Method: Prisoner request',
-            datetime: { timestamp: '2022-01-01T09:00:00', type: 'datetime' },
-            byline: { text: 'User One' },
-            attributes: { 'data-test': 'timeline-entry-0' },
-          },
-        ]
+      const expectedTimeline: MojTimelineItem[] = [
+        {
+          label: { text: 'Booked' },
+          text: 'Method: Prisoner request',
+          datetime: { timestamp: '2022-01-01T09:00:00', type: 'datetime' },
+          byline: { text: 'User One' },
+          attributes: { 'data-test': 'timeline-entry-0' },
+        },
+      ]
 
-        const timeline = visitService.getVisitEventsTimeline(eventAudit, visit)
+      const timeline = visitService.getVisitEventsTimeline(params)
 
-        expect(timeline).toStrictEqual(expectedTimeline)
-      })
+      expect(timeline).toStrictEqual(expectedTimeline)
+    })
 
-      it('should return a timeline with an event for "Booked" - GOV.UK Booking', () => {
-        const eventAudit: EventAudit[] = [
-          {
-            type: 'BOOKED_VISIT',
-            applicationMethodType: 'WEBSITE',
-            actionedByFullName: '',
-            userType: 'PUBLIC',
-            createTimestamp: '2022-01-01T09:00:00',
-          },
-        ]
+    it('should return a timeline with an event for "Booked" - GOV.UK Booking', () => {
+      params.events = [
+        {
+          type: 'BOOKED_VISIT',
+          applicationMethodType: 'WEBSITE',
+          actionedByFullName: '',
+          userType: 'PUBLIC',
+          createTimestamp: '2022-01-01T09:00:00',
+        },
+      ]
 
-        const expectedTimeline: MojTimelineItem[] = [
-          {
-            label: { text: 'Booked' },
-            text: 'Method: GOV.UK booking',
-            datetime: { timestamp: '2022-01-01T09:00:00', type: 'datetime' },
-            byline: null,
-            attributes: { 'data-test': 'timeline-entry-0' },
-          },
-        ]
+      const expectedTimeline: MojTimelineItem[] = [
+        {
+          label: { text: 'Booked' },
+          text: 'Method: GOV.UK booking',
+          datetime: { timestamp: '2022-01-01T09:00:00', type: 'datetime' },
+          byline: null,
+          attributes: { 'data-test': 'timeline-entry-0' },
+        },
+      ]
 
-        const timeline = visitService.getVisitEventsTimeline(eventAudit, visit)
+      const timeline = visitService.getVisitEventsTimeline(params)
 
-        expect(timeline).toStrictEqual(expectedTimeline)
-      })
+      expect(timeline).toStrictEqual(expectedTimeline)
+    })
 
-      it('should return a timeline with an event for "Updated" - prisoner request', () => {
-        const eventAudit: EventAudit[] = [
-          {
-            type: 'UPDATED_VISIT',
-            applicationMethodType: 'BY_PRISONER',
-            actionedByFullName: 'User One',
-            userType: 'STAFF',
-            createTimestamp: '2022-01-01T09:00:00',
-          },
-        ]
+    it('should return a timeline with an event for "Updated" - prisoner request', () => {
+      params.events = [
+        {
+          type: 'UPDATED_VISIT',
+          applicationMethodType: 'BY_PRISONER',
+          actionedByFullName: 'User One',
+          userType: 'STAFF',
+          createTimestamp: '2022-01-01T09:00:00',
+        },
+      ]
 
-        const expectedTimeline: MojTimelineItem[] = [
-          {
-            label: { text: 'Updated' },
-            text: 'Method: Prisoner request',
-            datetime: { timestamp: '2022-01-01T09:00:00', type: 'datetime' },
-            byline: { text: 'User One' },
-            attributes: { 'data-test': 'timeline-entry-0' },
-          },
-        ]
+      const expectedTimeline: MojTimelineItem[] = [
+        {
+          label: { text: 'Updated' },
+          text: 'Method: Prisoner request',
+          datetime: { timestamp: '2022-01-01T09:00:00', type: 'datetime' },
+          byline: { text: 'User One' },
+          attributes: { 'data-test': 'timeline-entry-0' },
+        },
+      ]
 
-        const timeline = visitService.getVisitEventsTimeline(eventAudit, visit)
+      const timeline = visitService.getVisitEventsTimeline(params)
 
-        expect(timeline).toStrictEqual(expectedTimeline)
-      })
+      expect(timeline).toStrictEqual(expectedTimeline)
+    })
 
-      it('should return a timeline with an event for "Updated" - GOV.UK Booking', () => {
-        const eventAudit: EventAudit[] = [
-          {
-            type: 'UPDATED_VISIT',
-            applicationMethodType: 'WEBSITE',
-            actionedByFullName: '',
-            userType: 'PUBLIC',
-            createTimestamp: '2022-01-01T09:00:00',
-          },
-        ]
+    it('should return a timeline with an event for "Updated" - GOV.UK Booking', () => {
+      params.events = [
+        {
+          type: 'UPDATED_VISIT',
+          applicationMethodType: 'WEBSITE',
+          actionedByFullName: '',
+          userType: 'PUBLIC',
+          createTimestamp: '2022-01-01T09:00:00',
+        },
+      ]
 
-        const expectedTimeline: MojTimelineItem[] = [
-          {
-            label: { text: 'Updated' },
-            text: 'Method: GOV.UK booking',
-            datetime: { timestamp: '2022-01-01T09:00:00', type: 'datetime' },
-            byline: null,
-            attributes: { 'data-test': 'timeline-entry-0' },
-          },
-        ]
+      const expectedTimeline: MojTimelineItem[] = [
+        {
+          label: { text: 'Updated' },
+          text: 'Method: GOV.UK booking',
+          datetime: { timestamp: '2022-01-01T09:00:00', type: 'datetime' },
+          byline: null,
+          attributes: { 'data-test': 'timeline-entry-0' },
+        },
+      ]
 
-        const timeline = visitService.getVisitEventsTimeline(eventAudit, visit)
+      const timeline = visitService.getVisitEventsTimeline(params)
 
-        expect(timeline).toStrictEqual(expectedTimeline)
-      })
+      expect(timeline).toStrictEqual(expectedTimeline)
+    })
 
-      it('should return a timeline with an event for "Cancelled" - Reason: /free text/', () => {
-        visit.visitStatus = 'CANCELLED'
-        visit.visitNotes = [
-          {
-            type: 'VISIT_OUTCOMES',
-            text: 'Cancelled due to illness',
-          },
-        ]
+    it('should return a timeline with an event for "Cancelled" - Reason: /free text/', () => {
+      params.visitStatus = 'CANCELLED'
+      params.visitNotes = [
+        {
+          type: 'VISIT_OUTCOMES',
+          text: 'Cancelled due to illness',
+        },
+      ]
 
-        const eventAudit: EventAudit[] = [
-          {
-            type: 'CANCELLED_VISIT',
-            applicationMethodType: 'WEBSITE',
-            actionedByFullName: 'User One',
-            userType: 'PUBLIC',
-            createTimestamp: '2022-01-01T09:00:00',
-          },
-        ]
+      params.events = [
+        {
+          type: 'CANCELLED_VISIT',
+          applicationMethodType: 'WEBSITE',
+          actionedByFullName: 'User One',
+          userType: 'PUBLIC',
+          createTimestamp: '2022-01-01T09:00:00',
+        },
+      ]
 
-        const expectedTimeline: MojTimelineItem[] = [
-          {
-            label: { text: 'Cancelled' },
-            text: `Reason: ${visit.visitNotes[0].text}`,
-            datetime: { timestamp: '2022-01-01T09:00:00', type: 'datetime' },
-            byline: { text: 'User One' },
-            attributes: { 'data-test': 'timeline-entry-0' },
-          },
-        ]
+      const expectedTimeline: MojTimelineItem[] = [
+        {
+          label: { text: 'Cancelled' },
+          text: `Reason: ${params.visitNotes[0].text}`,
+          datetime: { timestamp: '2022-01-01T09:00:00', type: 'datetime' },
+          byline: { text: 'User One' },
+          attributes: { 'data-test': 'timeline-entry-0' },
+        },
+      ]
 
-        const timeline = visitService.getVisitEventsTimeline(eventAudit, visit)
+      const timeline = visitService.getVisitEventsTimeline(params)
 
-        expect(timeline).toStrictEqual(expectedTimeline)
-      })
+      expect(timeline).toStrictEqual(expectedTimeline)
+    })
 
-      it('should return a timeline with an event for "Cancelled" - Method: GOV.UK Cancellation', () => {
-        visit.visitStatus = 'CANCELLED'
-        const eventAudit: EventAudit[] = [
-          {
-            type: 'CANCELLED_VISIT',
-            applicationMethodType: 'WEBSITE',
-            actionedByFullName: 'User One',
-            userType: 'PUBLIC',
-            createTimestamp: '2022-01-01T09:00:00',
-          },
-        ]
+    it('should return a timeline with an event for "Cancelled" - Method: GOV.UK Cancellation', () => {
+      params.visitStatus = 'CANCELLED'
+      params.events = [
+        {
+          type: 'CANCELLED_VISIT',
+          applicationMethodType: 'WEBSITE',
+          actionedByFullName: 'User One',
+          userType: 'PUBLIC',
+          createTimestamp: '2022-01-01T09:00:00',
+        },
+      ]
 
-        const expectedTimeline: MojTimelineItem[] = [
-          {
-            label: { text: 'Cancelled' },
-            text: 'Method: GOV.UK cancellation',
-            datetime: { timestamp: '2022-01-01T09:00:00', type: 'datetime' },
-            byline: { text: 'User One' },
-            attributes: { 'data-test': 'timeline-entry-0' },
-          },
-        ]
+      const expectedTimeline: MojTimelineItem[] = [
+        {
+          label: { text: 'Cancelled' },
+          text: 'Method: GOV.UK cancellation',
+          datetime: { timestamp: '2022-01-01T09:00:00', type: 'datetime' },
+          byline: { text: 'User One' },
+          attributes: { 'data-test': 'timeline-entry-0' },
+        },
+      ]
 
-        const timeline = visitService.getVisitEventsTimeline(eventAudit, visit)
+      const timeline = visitService.getVisitEventsTimeline(params)
 
-        expect(timeline).toStrictEqual(expectedTimeline)
-      })
+      expect(timeline).toStrictEqual(expectedTimeline)
+    })
 
-      it('should return a timeline with an event for "Cancelled" - Method: Prisoner request', () => {
-        visit.visitStatus = 'CANCELLED'
-        const eventAudit: EventAudit[] = [
-          {
-            type: 'CANCELLED_VISIT',
-            applicationMethodType: 'BY_PRISONER',
-            actionedByFullName: 'User One',
-            userType: 'STAFF',
-            createTimestamp: '2022-01-01T09:00:00',
-          },
-        ]
+    it('should return a timeline with an event for "Cancelled" - Method: Prisoner request', () => {
+      params.visitStatus = 'CANCELLED'
+      params.events = [
+        {
+          type: 'CANCELLED_VISIT',
+          applicationMethodType: 'BY_PRISONER',
+          actionedByFullName: 'User One',
+          userType: 'STAFF',
+          createTimestamp: '2022-01-01T09:00:00',
+        },
+      ]
 
-        const expectedTimeline: MojTimelineItem[] = [
-          {
-            label: { text: 'Cancelled' },
-            text: 'Method: Prisoner request',
-            datetime: { timestamp: '2022-01-01T09:00:00', type: 'datetime' },
-            byline: { text: 'User One' },
-            attributes: { 'data-test': 'timeline-entry-0' },
-          },
-        ]
+      const expectedTimeline: MojTimelineItem[] = [
+        {
+          label: { text: 'Cancelled' },
+          text: 'Method: Prisoner request',
+          datetime: { timestamp: '2022-01-01T09:00:00', type: 'datetime' },
+          byline: { text: 'User One' },
+          attributes: { 'data-test': 'timeline-entry-0' },
+        },
+      ]
 
-        const timeline = visitService.getVisitEventsTimeline(eventAudit, visit)
+      const timeline = visitService.getVisitEventsTimeline(params)
 
-        expect(timeline).toStrictEqual(expectedTimeline)
-      })
+      expect(timeline).toStrictEqual(expectedTimeline)
+    })
 
-      it('should return a timeline with an event for "No change required" - Reason: /free text/', () => {
-        const eventAudit: EventAudit[] = [
-          {
-            type: 'IGNORE_VISIT_NOTIFICATIONS_EVENT',
-            applicationMethodType: 'NOT_APPLICABLE',
-            actionedByFullName: 'User One',
-            userType: 'STAFF',
-            createTimestamp: '2022-01-01T09:00:00',
-            text: 'Prisoner returning',
-          },
-        ]
+    it('should return a timeline with an event for "No change required" - Reason: /free text/', () => {
+      params.events = [
+        {
+          type: 'IGNORE_VISIT_NOTIFICATIONS_EVENT',
+          applicationMethodType: 'NOT_APPLICABLE',
+          actionedByFullName: 'User One',
+          userType: 'STAFF',
+          createTimestamp: '2022-01-01T09:00:00',
+          text: 'Prisoner returning',
+        },
+      ]
 
-        const expectedTimeline: MojTimelineItem[] = [
-          {
-            label: { text: 'No change required' },
-            text: `Reason: ${eventAudit[0].text}`,
-            datetime: { timestamp: '2022-01-01T09:00:00', type: 'datetime' },
-            byline: { text: 'User One' },
-            attributes: { 'data-test': 'timeline-entry-0' },
-          },
-        ]
+      const expectedTimeline: MojTimelineItem[] = [
+        {
+          label: { text: 'No change required' },
+          text: `Reason: ${params.events[0].text}`,
+          datetime: { timestamp: '2022-01-01T09:00:00', type: 'datetime' },
+          byline: { text: 'User One' },
+          attributes: { 'data-test': 'timeline-entry-0' },
+        },
+      ]
 
-        const timeline = visitService.getVisitEventsTimeline(eventAudit, visit)
+      const timeline = visitService.getVisitEventsTimeline(params)
 
-        expect(timeline).toStrictEqual(expectedTimeline)
-      })
+      expect(timeline).toStrictEqual(expectedTimeline)
+    })
 
-      it('should return a timeline with an event for "Needs review" - Reason: prisoner transfered', () => {
-        const eventAudit: EventAudit[] = [
-          {
-            type: 'PRISONER_RECEIVED_EVENT',
-            applicationMethodType: 'NOT_APPLICABLE',
-            actionedByFullName: null,
-            userType: 'SYSTEM',
-            createTimestamp: '2022-01-01T09:00:00',
-          },
-        ]
+    it('should return a timeline with an event for "Needs review" - Reason: prisoner transfered', () => {
+      params.events = [
+        {
+          type: 'PRISONER_RECEIVED_EVENT',
+          applicationMethodType: 'NOT_APPLICABLE',
+          actionedByFullName: null,
+          userType: 'SYSTEM',
+          createTimestamp: '2022-01-01T09:00:00',
+        },
+      ]
 
-        const expectedTimeline: MojTimelineItem[] = [
-          {
-            label: { text: 'Needs review' },
-            text: `Reason: Prisoner transferred`,
-            datetime: { timestamp: '2022-01-01T09:00:00', type: 'datetime' },
-            byline: null,
-            attributes: { 'data-test': 'timeline-entry-0' },
-          },
-        ]
+      const expectedTimeline: MojTimelineItem[] = [
+        {
+          label: { text: 'Needs review' },
+          text: `Reason: Prisoner transferred`,
+          datetime: { timestamp: '2022-01-01T09:00:00', type: 'datetime' },
+          byline: null,
+          attributes: { 'data-test': 'timeline-entry-0' },
+        },
+      ]
 
-        const timeline = visitService.getVisitEventsTimeline(eventAudit, visit)
+      const timeline = visitService.getVisitEventsTimeline(params)
 
-        expect(timeline).toStrictEqual(expectedTimeline)
-      })
+      expect(timeline).toStrictEqual(expectedTimeline)
     })
   })
 })
