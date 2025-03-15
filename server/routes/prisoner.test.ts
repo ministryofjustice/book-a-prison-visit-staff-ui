@@ -386,7 +386,6 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
             prisoner: {
               name: 'Smith, John',
               offenderNo: 'A1234BC',
-              dateOfBirth: '2 April 1975',
               location: '1-1-C-028, Hewell (HMP)',
               activeAlerts: [alert],
               restrictions: [restriction],
@@ -419,7 +418,6 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
             prisoner: {
               name: 'Smith, John',
               offenderNo: 'A1234BC',
-              dateOfBirth: '2 April 1975',
               location: '1-1-C-028, Hewell (HMP)',
               activeAlerts: [
                 TestData.alert({
@@ -440,7 +438,6 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
       visitSessionData.prisoner = {
         name: 'Someone, Else',
         offenderNo: 'C4321BA',
-        dateOfBirth: '5 May 1980',
         location: 'a cell, HMP Prison',
       }
 
@@ -458,7 +455,6 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
             prisoner: {
               name: 'Smith, John',
               offenderNo: 'A1234BC',
-              dateOfBirth: '2 April 1975',
               location: '1-1-C-028, Hewell (HMP)',
               activeAlerts: [
                 TestData.alert({

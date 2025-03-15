@@ -100,7 +100,7 @@ export type VisitSessionData = {
   prisoner: {
     name: string
     offenderNo: string
-    dateOfBirth: string
+    // dateOfBirth: string
     location: string
     activeAlerts?: Alert[]
     restrictions?: OffenderRestriction[]

@@ -75,7 +75,6 @@ export default function routes({ auditService, prisonerProfileService }: Service
     visitSessionData.prisoner = {
       name: prisonerDetails.name,
       offenderNo,
-      dateOfBirth: prisonerDetails.dateOfBirth,
       location: prisonerDetails.cellLocation ? `${prisonerDetails.cellLocation}, ${prisonerDetails.prisonName}` : '',
       activeAlerts,
       restrictions,

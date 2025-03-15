@@ -201,7 +201,6 @@ describe('/visit/:reference', () => {
             prisoner: {
               name: 'Smith, John',
               offenderNo: 'A1234BC',
-              dateOfBirth: '1975-04-02',
               location: '1-1-C-028, HMP Hewell',
               activeAlerts: [alert],
               restrictions: [restriction],
