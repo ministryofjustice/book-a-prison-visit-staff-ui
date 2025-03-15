@@ -141,7 +141,6 @@ export default class VisitService {
   async getFullVisitDetails({ username, reference }: { username: string; reference: string }): Promise<{
     visitHistoryDetails: VisitHistoryDetails
     visitors: VisitorListItem[]
-    notifications: NotificationType[]
     additionalSupport: string
   }> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
@@ -157,11 +156,9 @@ export default class VisitService {
       .filter(contact => visitorIds.includes(contact.personId))
       .map(contact => buildVisitorListItem(contact))
 
-    const notifications = await orchestrationApiClient.getVisitNotifications(reference)
-
     const additionalSupport = visit.visitorSupport ? visit.visitorSupport.description : ''
 
-    return { visitHistoryDetails, visitors, notifications, additionalSupport }
+    return { visitHistoryDetails, visitors, additionalSupport }
   }
 
   async getVisitDetailed({

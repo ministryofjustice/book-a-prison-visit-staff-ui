@@ -4,7 +4,6 @@ import {
   ApplicationDto,
   ApplicationMethodType,
   CancelVisitOrchestrationDto,
-  NotificationType,
   Visit,
   VisitHistoryDetails,
   VisitRestriction,
@@ -252,14 +251,12 @@ describe('Visit service', () => {
       beforeEach(() => {
         prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue(contacts)
         orchestrationApiClient.getVisitHistory.mockResolvedValue(visitHistoryDetails)
-        orchestrationApiClient.getVisitNotifications.mockResolvedValue(['PRISONER_RELEASED_EVENT'])
       })
 
       it('should return full details of visit, visitors, notifications and additional support options', async () => {
         const expectedResult: {
           visitHistoryDetails: VisitHistoryDetails
           visitors: VisitorListItem[]
-          notifications: NotificationType[]
           additionalSupport: string
         } = {
           visitHistoryDetails,
@@ -286,7 +283,6 @@ describe('Visit service', () => {
               banned: false,
             },
           ],
-          notifications: ['PRISONER_RELEASED_EVENT'],
           additionalSupport: 'Wheelchair, custom request',
         }
 
@@ -294,7 +290,6 @@ describe('Visit service', () => {
 
         expect(prisonerContactRegistryApiClient.getPrisonerSocialContacts).toHaveBeenCalledTimes(1)
         expect(orchestrationApiClient.getVisitHistory).toHaveBeenCalledTimes(1)
-        expect(orchestrationApiClient.getVisitNotifications).toHaveBeenCalledTimes(1)
         expect(result).toStrictEqual(expectedResult)
       })
     })
