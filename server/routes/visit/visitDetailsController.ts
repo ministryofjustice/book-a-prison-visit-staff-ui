@@ -2,6 +2,7 @@ import { RequestHandler } from 'express'
 import { AuditService, VisitService } from '../../services'
 import { NotificationType, VisitBookingDetailsDto } from '../../data/orchestrationApiTypes'
 import { notificationTypeWarnings } from '../../constants/notificationEvents'
+import { getDpsPrisonerAlertsUrl } from '../../utils/utils'
 
 export default class VisitDetailsController {
   private readonly A_DAY_IN_MS = 24 * 60 * 60 * 1000
@@ -76,6 +77,7 @@ export default class VisitDetailsController {
 
         prisonerLocation,
         showVisitDetails,
+        prisonerDpsAlertsUrl: getDpsPrisonerAlertsUrl(visitDetails.prisoner.prisonerNumber),
         visitDetails,
       })
     }

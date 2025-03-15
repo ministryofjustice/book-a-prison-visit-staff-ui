@@ -11,6 +11,7 @@ import {
   subWeeks,
 } from 'date-fns'
 import { VisitSlot } from '../@types/bapv'
+import config from '../config'
 
 export const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
@@ -173,4 +174,8 @@ export const initialiseName = (fullName?: string): string | null => {
 
   const array = fullName.split(' ')
   return `${array[0][0]}. ${array.reverse()[0]}`
+}
+
+export const getDpsPrisonerAlertsUrl = (offenderNo: string): string => {
+  return `${config.dpsPrisoner}prisoner/${offenderNo}/alerts/active`
 }
