@@ -1811,7 +1811,7 @@ export interface components {
       /** @description Visit Notes */
       visitNotes?: components['schemas']['VisitNoteDto'][]
       /** @description Contact associated with the visit */
-      visitContact?: components['schemas']['ContactDto']
+      visitContact?: components['schemas']['VisitContactDto']
       /** @description Additional support associated with the visit */
       visitorSupport?: components['schemas']['VisitorSupportDto']
       /** @description Prison code and name */
@@ -1822,6 +1822,30 @@ export interface components {
       visitors: components['schemas']['VisitorDetailsDto'][]
       events: components['schemas']['EventAuditOrchestrationDto'][]
       notifications: components['schemas']['VisitNotificationDto'][]
+    }
+    /** @description Visit notification details */
+    VisitContactDto: {
+      /**
+       * Format: int64
+       * @description Main contact ID associated with the visit
+       * @example 1234
+       */
+      visitContactId?: number
+      /**
+       * @description Contact Name
+       * @example John Smith
+       */
+      name: string
+      /**
+       * @description Contact Phone Number
+       * @example 01234 567890
+       */
+      telephone?: string
+      /**
+       * @description Contact Email Address
+       * @example email@example.com
+       */
+      email?: string
     }
     /** @description Visit notification details */
     VisitNotificationDto: {
@@ -1963,38 +1987,38 @@ export interface components {
       visitRestriction: 'OPEN' | 'CLOSED' | 'UNKNOWN'
     }
     PageVisitDto: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
+      first?: boolean
+      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['VisitDto'][]
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject']
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
-      first?: boolean
-      last?: boolean
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     PageableObject: {
       /** Format: int64 */
       offset?: number
       sort?: components['schemas']['SortObject']
-      unpaged?: boolean
+      /** Format: int32 */
+      pageSize?: number
       paged?: boolean
       /** Format: int32 */
       pageNumber?: number
-      /** Format: int32 */
-      pageSize?: number
+      unpaged?: boolean
     }
     SortObject: {
       empty?: boolean
-      unsorted?: boolean
       sorted?: boolean
+      unsorted?: boolean
     }
     OrchestrationNotificationGroupDto: {
       /**

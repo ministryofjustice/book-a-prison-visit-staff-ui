@@ -464,6 +464,7 @@ export default class TestData {
     endTimestamp = '2022-01-14T11:00:00',
     visitNotes = [],
     visitContact = {
+      visitContactId: 4321,
       name: 'Jeanette Smith',
       telephone: '01234 567890',
       email: 'visitor@example.com',

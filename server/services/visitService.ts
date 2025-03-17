@@ -5,7 +5,6 @@ import {
   ApplicationMethodType,
   CancelVisitOrchestrationDto,
   EventAudit,
-  NotificationType,
   Visit,
   VisitBookingDetailsDto,
   VisitHistoryDetails,

@@ -11,7 +11,6 @@ import {
   IsExcludeDateDto,
   NotificationCount,
   NotificationGroup,
-  NotificationType,
   PageVisitDto,
   PrisonDto,
   PrisonerProfile,
