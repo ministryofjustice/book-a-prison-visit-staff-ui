@@ -9,7 +9,6 @@ import {
   ChangeApplicationDto,
   CreateApplicationDto,
   IgnoreVisitNotificationsDto,
-  NotificationType,
   PageVisitDto,
   PrisonDto,
   ExcludeDateDto,
@@ -488,25 +487,6 @@ describe('orchestrationApiClient', () => {
       const output = await orchestrationApiClient.getNotificationGroups(prisonId)
 
       expect(output).toEqual([rawNotificationGroups[1], rawNotificationGroups[2]])
-    })
-  })
-
-  describe('getVisitNotifications', () => {
-    it('should return filtered notifications for a given visit reference', async () => {
-      const notifications: NotificationType[] = [
-        'NON_ASSOCIATION_EVENT', // should be filtered
-        'PRISONER_RELEASED_EVENT',
-        'PRISON_VISITS_BLOCKED_FOR_DATE',
-      ]
-
-      fakeOrchestrationApi
-        .get(`/visits/notification/visit/ab-cd-ef-gh/types`)
-        .matchHeader('authorization', `Bearer ${token}`)
-        .reply(200, notifications)
-
-      const output = await orchestrationApiClient.getVisitNotifications('ab-cd-ef-gh')
-
-      expect(output).toStrictEqual([notifications[1], notifications[2]])
     })
   })
 

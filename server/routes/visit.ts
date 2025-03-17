@@ -96,7 +96,6 @@ export default function routes({
       prisoner: {
         name: properCaseFullName(`${prisoner.lastName}, ${prisoner.firstName}`),
         offenderNo: prisoner.prisonerNumber,
-        dateOfBirth: prisoner.dateOfBirth,
         location: prisonerLocation,
         activeAlerts,
         restrictions,

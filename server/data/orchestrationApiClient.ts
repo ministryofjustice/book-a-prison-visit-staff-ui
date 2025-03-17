@@ -11,7 +11,6 @@ import {
   IsExcludeDateDto,
   NotificationCount,
   NotificationGroup,
-  NotificationType,
   PageVisitDto,
   PrisonDto,
   PrisonerProfile,
@@ -223,14 +222,6 @@ export default class OrchestrationApiClient {
     })
 
     return notificationGroups.filter(notification => this.enabledNotifications.includes(notification.type))
-  }
-
-  async getVisitNotifications(reference: string): Promise<NotificationType[]> {
-    const notifications = await this.restClient.get<NotificationType[]>({
-      path: `/visits/notification/visit/${reference}/types`,
-    })
-
-    return notifications.filter(notification => this.enabledNotifications.includes(notification))
   }
 
   // orchestration-prisons-exclude-date-controller

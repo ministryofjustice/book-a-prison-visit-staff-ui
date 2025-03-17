@@ -2,7 +2,7 @@ import type { Express } from 'express'
 import request from 'supertest'
 import { SessionData } from 'express-session'
 import { appWithAllRoutes, flashProvider, user } from './testutils/appSetup'
-import { NotificationType, Visit, VisitHistoryDetails } from '../data/orchestrationApiTypes'
+import { Visit, VisitHistoryDetails } from '../data/orchestrationApiTypes'
 import { FlashData, PrisonerProfilePage, VisitorListItem, VisitSessionData } from '../@types/bapv'
 import { clearSession } from './visitorUtils'
 import TestData from './testutils/testData'
@@ -101,8 +101,6 @@ describe('/visit/:reference', () => {
     },
   ]
 
-  const notifications: NotificationType[] = []
-
   const additionalSupport = 'Wheelchair ramp, Portable induction loop for people with hearing aids'
 
   beforeEach(() => {
@@ -118,7 +116,6 @@ describe('/visit/:reference', () => {
     visitService.getFullVisitDetails.mockResolvedValue({
       visitHistoryDetails,
       visitors,
-      notifications,
       additionalSupport,
     })
     prisonerVisitorsService.getVisitors.mockResolvedValue(visitors)
@@ -204,7 +201,6 @@ describe('/visit/:reference', () => {
             prisoner: {
               name: 'Smith, John',
               offenderNo: 'A1234BC',
-              dateOfBirth: '1975-04-02',
               location: '1-1-C-028, HMP Hewell',
               activeAlerts: [alert],
               restrictions: [restriction],

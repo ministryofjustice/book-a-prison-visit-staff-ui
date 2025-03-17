@@ -79,7 +79,6 @@ context('Update a visit', () => {
     cy.task('stubPrisonerById', prisoner)
     cy.task('stubVisitHistory', visitHistoryDetails) // TODO remove when visit update no longer uses this endpoint
     cy.task('stubPrisonerSocialContacts', { offenderNo, contacts, approvedVisitorsOnly: false })
-    cy.task('stubGetVisitNotifications', { reference: visitHistoryDetails.visit.reference })
     cy.task(
       'stubGetVisitDetailed',
       TestData.visitBookingDetailsDto({
@@ -257,7 +256,6 @@ context('Update a visit', () => {
     cy.task('stubPrisonerById', prisoner)
     cy.task('stubVisitHistory', visitHistoryDetails)
     cy.task('stubPrisonerSocialContacts', { offenderNo, contacts, approvedVisitorsOnly: false })
-    cy.task('stubGetVisitNotifications', { reference: visitHistoryDetails.visit.reference })
     cy.task(
       'stubGetVisitDetailed',
       TestData.visitBookingDetailsDto({
