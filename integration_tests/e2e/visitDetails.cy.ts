@@ -14,7 +14,6 @@ context('Visit details page', () => {
     cy.task('stubSupportedPrisonIds')
     cy.task('stubGetPrison')
     cy.task('stubGetNotificationCount', {})
-    cy.task('stubGetVisitNotifications', { reference: TestData.visit().reference })
     cy.signIn()
   })
 

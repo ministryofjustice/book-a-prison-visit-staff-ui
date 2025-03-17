@@ -9,7 +9,6 @@ const prisonId = 'HEI'
 const prisonerData: VisitSessionData['prisoner'] = {
   name: 'abc',
   offenderNo: 'A1234BC',
-  dateOfBirth: '12 May 1977',
   location: 'abc',
 }
 const visitorsData: VisitSessionData['visitors'] = [
@@ -104,7 +103,6 @@ describe('sessionCheckMiddleware', () => {
         prisoner: {
           name: 'abc',
           offenderNo: 'A1234BC',
-          dateOfBirth: '12 May 1977',
           location: 'abc',
         },
         visitReference: 'ab-cd-ef-gh',
@@ -140,7 +138,6 @@ describe('sessionCheckMiddleware', () => {
         prisoner: {
           name: 'abc',
           offenderNo: 'A1234BC',
-          dateOfBirth: '12 May 1977',
         },
       },
     ].forEach((testData: VisitSessionData) => {
@@ -159,7 +156,6 @@ describe('sessionCheckMiddleware', () => {
         prisoner: {
           name: 'abc',
           offenderNo: 'A1234BC',
-          dateOfBirth: '12 May 1977',
           location: 'abc',
         },
       }

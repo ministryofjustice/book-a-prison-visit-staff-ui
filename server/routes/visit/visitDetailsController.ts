@@ -1,7 +1,8 @@
 import { RequestHandler } from 'express'
 import { AuditService, VisitService } from '../../services'
-import { NotificationType, VisitBookingDetailsDto } from '../../data/orchestrationApiTypes'
+import { NotificationType } from '../../data/orchestrationApiTypes'
 import { notificationTypeWarnings } from '../../constants/notificationEvents'
+import { getPrisonerLocation } from './visitUtils'
 
 export default class VisitDetailsController {
   private readonly A_DAY_IN_MS = 24 * 60 * 60 * 1000
@@ -27,8 +28,14 @@ export default class VisitDetailsController {
       const { username } = res.locals.user
 
       const visitDetails = await this.visitService.getVisitDetailed({ username, reference })
+      const { prison, prisoner } = visitDetails
 
-      const prisonerLocation = getPrisonerLocation(visitDetails)
+      const prisonerLocation = getPrisonerLocation({
+        prisonId: prisoner.prisonId,
+        prisonName: prisoner.prisonName,
+        cellLocation: prisoner.cellLocation,
+        locationDescription: prisoner.locationDescription,
+      })
 
       const nowTimestamp = new Date()
       const visitStartTimestamp = new Date(visitDetails.startTimestamp)
@@ -52,12 +59,12 @@ export default class VisitDetailsController {
         visitNotes: visitDetails.visitNotes,
       })
 
-      const showVisitDetails = req.session.selectedEstablishment.prisonId === visitDetails.prison.prisonId
+      const showVisitDetails = req.session.selectedEstablishment.prisonId === prison.prisonId
 
       await this.auditService.viewedVisitDetails({
         visitReference: reference,
-        prisonerId: visitDetails.prisoner.prisonerNumber,
-        prisonId: visitDetails.prison.prisonId,
+        prisonerId: prisoner.prisonerNumber,
+        prisonId: prison.prisonId,
         username,
         operationId: res.locals.appInsightsOperationId,
       })
@@ -80,17 +87,4 @@ export default class VisitDetailsController {
       })
     }
   }
-}
-
-// TODO remove/refactor
-function getPrisonerLocation(visitDetails: VisitBookingDetailsDto) {
-  if (visitDetails.prisoner.prisonId === 'OUT') {
-    return visitDetails.prisoner.locationDescription
-  }
-
-  if (visitDetails.prisoner.prisonId === 'TRN') {
-    return 'Unknown'
-  }
-
-  return `${visitDetails.prisoner.cellLocation}, ${visitDetails.prisoner.prisonName}`
 }
