@@ -73,6 +73,17 @@ describe('Visit details page', () => {
           expect($('[data-test="prisoner-location"]').text()).toBe('1-1-C-028, Hewell (HMP)')
           expect($('[data-test="prisoner-dob"]').text()).toBe('2 April 1975')
           expect($('[data-test="prisoner-age"]').text()).toBe('46 years old')
+          expect($('[data-test="prisoner-restriction-1"]').text()).toContain('Restricted')
+          expect($('[data-test="prisoner-restriction-1-start"]').text()).toContain('15 March 2022')
+          expect($('[data-test="prisoner-restriction-1-end"]').text()).toContain('End date not entered')
+          expect($('[data-test="prisoner-restriction-1-text"]').text()).toContain('Details about this restriction')
+          expect($('[data-test="all-alerts-link"]').attr('href')).toBe(
+            'https://prisoner-dev.digital.prison.service.justice.gov.uk/prisoner/A1234BC/alerts/active',
+          )
+          expect($('[data-test="prisoner-alert-1"]').text()).toContain('COVID unit management')
+          expect($('[data-test="prisoner-alert-1-start"]').text()).toContain('2 January 2023')
+          expect($('[data-test="prisoner-alert-1-end"]').text()).toContain('End date not entered')
+          expect($('[data-test="prisoner-alert-1-text"]').text()).toContain('Alert comment')
           // visitor details
           expect($('[data-test="visitor-name-1"]').text()).toBe('Jeanette Smith')
           expect($('[data-test="visitor-relation-1"]').text()).toBe('wife')
@@ -82,7 +93,7 @@ describe('Visit details page', () => {
           expect($('[data-test="visitor-1-restriction-1"]').text()).toContain('Closed')
           expect($('[data-test="visitor-1-restriction-1-start"]').text()).toContain('11 January 2022')
           expect($('[data-test="visitor-1-restriction-1-end"]').text()).toContain('13 February 2023')
-          expect($('[data-test="visitor-1-restriction-text-1"]').text()).toContain('closed comment text')
+          expect($('[data-test="visitor-1-restriction-1-text"]').text()).toContain('closed comment text')
 
           // booking history
           expect($('[data-test="timeline-entry-0"] .moj-timeline__title').text()).toBe('Booked')

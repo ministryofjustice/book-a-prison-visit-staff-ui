@@ -57,6 +57,8 @@ context('Visit details page', () => {
     visitDetailsPage.prisonerNumber().contains('A1234BC')
     visitDetailsPage.prisonerLocation().contains('1-1-C-028, Hewell (HMP)')
     visitDetailsPage.prisonerDob().contains('2 April 1975')
+    visitDetailsPage.prisonerRestriction(1).contains('Restricted')
+    visitDetailsPage.prisonerAlert(1).contains('COVID unit management')
 
     // visitor details
     visitDetailsPage.visitorName(1).contains('Jeanette Smith')

@@ -192,7 +192,7 @@
                 </span>
               </p>
               {% if restriction.comment %}
-                <div class="govuk-body" data-test="prisoner-restriction-text-{{ loop.index }}">
+                <div class="govuk-body" data-test="prisoner-restriction-{{ loop.index }}-text">
                   {{- bapvExpandableComment({ text: restriction.comment }) -}}
                 </div>
               {% endif %}
@@ -221,7 +221,7 @@
                 </span>
               </p>
               {% if alert.comment %}
-                <div class="govuk-body" data-test="prisoner-alert-text-{{ loop.index }}">
+                <div class="govuk-body" data-test="prisoner-alert-{{ loop.index }}-text">
                   {{- bapvExpandableComment({ text: alert.comment }) -}}
                 </div>
               {% endif %}
@@ -264,7 +264,7 @@
                 </span>
               </p>
               {% if restriction.comment %}
-                <p class="bapv-force-overflow" data-test="visitor-{{ visitorIndex }}-restriction-text-{{ loop.index }}">{{ restriction.comment }}</p>
+                <p class="bapv-force-overflow" data-test="visitor-{{ visitorIndex }}-restriction-{{ loop.index }}-text">{{ restriction.comment }}</p>
               {% endif %}
             {% endfor %}
           {% endfor %}
