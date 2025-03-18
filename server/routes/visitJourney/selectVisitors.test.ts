@@ -136,6 +136,9 @@ testJourneys.forEach(journey => {
           expect($('[data-test=restrictions-type1]').text().trim()).toBe('Restricted')
           expect($('[data-test=restrictions-comment1]').text().trim()).toBe('Details about this restriction')
           expect($('[data-test=restrictions-end-date1]').text().trim()).toBe('15 March 2022')
+          expect($('[data-test="all-alerts-link"]').attr('href')).toBe(
+            'https://prisoner-dev.digital.prison.service.justice.gov.uk/prisoner/A1234BC/alerts/active',
+          )
           expect($('[data-test=alert-type1]').text().trim()).toBe('Protective Isolation Unit')
           expect($('[data-test=alert-comment1]').text().trim()).toBe('Alert comment')
           expect($('[data-test=alert-end-date1]').text().trim()).toBe('15 March 2022')

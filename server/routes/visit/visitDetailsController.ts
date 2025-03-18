@@ -2,6 +2,7 @@ import { RequestHandler } from 'express'
 import { AuditService, VisitService } from '../../services'
 import { NotificationType } from '../../data/orchestrationApiTypes'
 import { notificationTypeWarnings } from '../../constants/notificationEvents'
+import { getDpsPrisonerAlertsUrl } from '../../utils/utils'
 import { getPrisonerLocation } from './visitUtils'
 
 export default class VisitDetailsController {
@@ -83,6 +84,7 @@ export default class VisitDetailsController {
 
         prisonerLocation,
         showVisitDetails,
+        prisonerDpsAlertsUrl: getDpsPrisonerAlertsUrl(visitDetails.prisoner.prisonerNumber),
         visitDetails,
       })
     }

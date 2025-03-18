@@ -6,7 +6,7 @@ import asyncMiddleware from '../middleware/asyncMiddleware'
 import { isValidPrisonerNumber } from './validationChecks'
 import { clearSession } from './visitorUtils'
 import type { Services } from '../services'
-import config from '../config'
+import { getDpsPrisonerAlertsUrl } from '../utils/utils'
 
 export default function routes({ auditService, prisonerProfileService }: Services): Router {
   const router = Router()
@@ -29,13 +29,11 @@ export default function routes({ auditService, prisonerProfileService }: Service
       operationId: res.locals.appInsightsOperationId,
     })
 
-    const prisonerDpsAlertsUrl = `${config.dpsPrisoner}prisoner/${prisonerId}/alerts/active`
-
     return res.render('pages/prisoner/profile', {
       errors: req.flash('errors'),
       ...prisonerProfile,
       queryParamsForBackLink,
-      prisonerDpsAlertsUrl,
+      prisonerDpsAlertsUrl: getDpsPrisonerAlertsUrl(prisonerId),
     })
   })
 

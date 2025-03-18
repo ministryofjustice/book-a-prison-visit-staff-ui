@@ -484,8 +484,8 @@ export default class TestData {
       prisonName: 'Hewell (HMP)',
       cellLocation: '1-1-C-028',
       locationDescription: undefined,
-      prisonerAlerts: [],
-      prisonerRestrictions: [],
+      prisonerAlerts: [this.alert()],
+      prisonerRestrictions: [this.offenderRestriction()],
     },
     visitors = [
       {
