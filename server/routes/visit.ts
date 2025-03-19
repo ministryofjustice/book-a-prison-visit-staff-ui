@@ -9,7 +9,7 @@ import { clearSession } from './visitorUtils'
 import { VisitSessionData, VisitSlot } from '../@types/bapv'
 import SelectVisitors from './visitJourney/selectVisitors'
 import VisitType from './visitJourney/visitType'
-import { properCaseFullName } from '../utils/utils'
+import { properCaseFullName, sortItemsByDateAsc } from '../utils/utils'
 import DateAndTime from './visitJourney/dateAndTime'
 import AdditionalSupport from './visitJourney/additionalSupport'
 import CheckYourBooking from './visitJourney/checkYourBooking'
@@ -19,6 +19,8 @@ import RequestMethod from './visitJourney/requestMethod'
 import sessionCheckMiddleware from '../middleware/sessionCheckMiddleware'
 import { type Services } from '../services'
 import Overbooking from './visitJourney/overbooking'
+import { Alert } from '../data/orchestrationApiTypes'
+import { OffenderRestriction } from '../data/prisonApiTypes'
 
 export default function routes({
   auditService,
@@ -78,6 +80,10 @@ export default function routes({
       prisonerProfileService.getProfile(visit.prisonId, visit.prisonerId, username),
       prisonerProfileService.getRestrictions(visit.prisonerId, username),
     ])
+
+    sortItemsByDateAsc<Alert, 'dateExpires'>(activeAlerts, 'dateExpires')
+    sortItemsByDateAsc<OffenderRestriction, 'expiryDate'>(restrictions, 'expiryDate')
+
     const visitRestriction =
       visit.visitRestriction === 'OPEN' || visit.visitRestriction === 'CLOSED' ? visit.visitRestriction : undefined
     const visitSlot: VisitSlot = {
