@@ -200,6 +200,7 @@
   display: flex;
   justify-content: space-between;
   max-width: 600px;
+  margin-top: govuk-spacing(4);
 }
 
 .bapv-timetable-dates__date {
@@ -270,7 +271,7 @@
 .bapv-visit-details {
   & dl, & .bapv-visit-details__restriction {
     display: grid;
-    grid-template-columns: 22% auto;
+    grid-template-columns: minmax(150px, 22%) auto;
     gap: govuk-spacing(2) govuk-spacing(3);
   }
 

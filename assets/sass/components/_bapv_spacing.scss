@@ -1,0 +1,44 @@
+// Customisations to default spacing
+
+// Headings
+
+ // Decrease bottom margin
+ .govuk-heading-l {
+  @include govuk-responsive-margin(4, "bottom");
+}
+
+.govuk-heading-m {
+  @include govuk-responsive-margin(3, "bottom");
+}
+
+.govuk-heading-s {
+  @include govuk-responsive-margin(3, "bottom");
+}
+
+// Increase top padding if content above in container (unless immediate sibling heading)
+.govuk-heading-l:not(:first-child, .govuk-heading-xl + .govuk-heading-l) {
+  @include govuk-responsive-padding(6, "top");
+}
+
+.govuk-heading-m:not(:first-child, .govuk-heading-l + .govuk-heading-m) {
+  @include govuk-responsive-padding(5, "top");
+}
+
+.govuk-heading-s:not(:first-child, .govuk-heading-m + .govuk-heading-s) {
+  @include govuk-responsive-padding(4, "top");
+}
+
+// Decrease bottom margin for list headings
+.govuk-heading-l:has(+ .govuk-list),
+.govuk-heading-m:has(+ .govuk-list),
+.govuk-heading-s:has(+ .govuk-list) {
+  @include govuk-responsive-margin(1, "bottom");
+}
+
+
+// Buttons
+
+// Add top margin to buttons following paragraph or list
+:is(p, .govuk-list) + .govuk-button {
+  @include govuk-responsive-margin(2, "top");
+}
