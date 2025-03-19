@@ -187,14 +187,12 @@
                 <span class="bapv-visit-details__restriction-dates">From <span data-test="prisoner-restriction-{{ loop.index }}-start">{{ restriction.startDate | formatDate }}</span>
                   {%- if restriction.expiryDate %} to {% else %}.{% endif %}
                   <span data-test="prisoner-restriction-{{ loop.index }}-end">
-                    {{- restriction.expiryDate | formatDate | default("End date not entered", true) -}}
+                    {{- restriction.expiryDate | formatDate | default("No end date", true) -}}
                   </span>.
                 </span>
               </p>
               {% if restriction.comment %}
-                <div class="govuk-body" data-test="prisoner-restriction-{{ loop.index }}-text">
-                  {{- bapvExpandableComment({ text: restriction.comment }) -}}
-                </div>
+                <p data-test="prisoner-restriction-{{ loop.index }}-text">{{ restriction.comment }}</p>
               {% endif %}
             {% endfor %}
           {% endif %}
@@ -216,7 +214,7 @@
                 <span class="bapv-visit-details__restriction-dates">From <span data-test="prisoner-alert-{{ loop.index }}-start">{{ alert.dateCreated | formatDate }}</span>
                   {%- if alert.dateExpires %} to {% else %}.{% endif %}
                   <span data-test="prisoner-alert-{{ loop.index }}-end">
-                    {{- alert.dateExpires | formatDate | default("End date not entered", true) -}}
+                    {{- alert.dateExpires | formatDate | default("No end date", true) -}}
                   </span>.
                 </span>
               </p>
@@ -259,7 +257,7 @@
                 <span class="bapv-visit-details__restriction-dates">From <span data-test="visitor-{{ visitorIndex }}-restriction-{{ loop.index }}-start">{{ restriction.startDate | formatDate }}</span>
                   {%- if restriction.expiryDate %} to {% else %}.{% endif %}
                   <span data-test="visitor-{{ visitorIndex }}-restriction-{{ loop.index }}-end">
-                    {{- restriction.expiryDate | formatDate | default("End date not entered", true) -}}
+                    {{- restriction.expiryDate | formatDate | default("No end date", true) -}}
                   </span>.
                 </span>
               </p>
