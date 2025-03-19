@@ -156,8 +156,8 @@
 
       <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-          <h2 class="govuk-heading-l bapv-heading govuk-!-padding-top-3">Prisoner</h2>
-          <h3 class="govuk-heading-m bapv-heading">
+          <h2 class="govuk-heading-l govuk-!-padding-top-3">Prisoner</h2>
+          <h3 class="govuk-heading-m">
             <span data-test="prisoner-name">{{ (visitDetails.prisoner.firstName + " " + visitDetails.prisoner.lastName) | properCaseFullName }}</span>
             <span class="govuk-body" >
               (<span data-test="prisoner-number">{{ visitDetails.prisoner.prisonerNumber }}</span>)
@@ -175,7 +175,7 @@
           </dl>
 
           {% if visitDetails.prisoner.prisonerRestrictions | length %}
-            <h4 class="govuk-heading-s bapv-heading">Restrictions</h4>
+            <h4 class="govuk-heading-s">Restrictions</h4>
             {% for restriction in visitDetails.prisoner.prisonerRestrictions %}
               <p class="bapv-visit-details__restriction">
                 <span>
@@ -200,7 +200,7 @@
           {% endif %}
 
           {% if visitDetails.prisoner.prisonerAlerts | length %}
-            <h4 class="govuk-heading-s bapv-heading">Alerts</h4>
+            <h4 class="govuk-heading-s">Alerts</h4>
             <p>
               This page shows alerts that are relevant for social visits. You can also
               <a class="govuk-link--no-visited-state" href="{{ prisonerDpsAlertsUrl }}" target="_blank" data-test="all-alerts-link">view all alerts</a>.
@@ -228,9 +228,9 @@
             {% endfor %}
           {% endif %}
 
-          <h2 class="govuk-heading-l bapv-heading">Visitors</h2>
+          <h2 class="govuk-heading-l">Visitors</h2>
           {% for visitor in visitDetails.visitors %}
-            <h3 class="govuk-heading-m bapv-heading">
+            <h3 class="govuk-heading-m">
               <span data-test="visitor-name-{{ loop.index }}">{{ visitor.firstName }} {{ visitor.lastName }}</span>
               <span>
                 (<span data-test="visitor-relation-{{ loop.index }}">{{ visitor.relationshipDescription | lower }}</span>)
@@ -269,7 +269,7 @@
             {% endfor %}
           {% endfor %}
 
-          <h2 class="govuk-heading-l bapv-heading">Booking history</h2>
+          <h2 class="govuk-heading-l">Booking history</h2>
           {{ mojTimeline({
             headingLevel: 3,
             items: eventsTimeline
