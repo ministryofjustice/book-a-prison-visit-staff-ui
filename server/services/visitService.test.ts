@@ -15,6 +15,7 @@ import {
   createMockOrchestrationApiClient,
   createMockPrisonerContactRegistryApiClient,
 } from '../data/testutils/mocks'
+import * as utils from '../utils/utils'
 
 const token = 'some token'
 
@@ -295,14 +296,19 @@ describe('Visit service', () => {
     })
 
     describe('getVisitDetailed', () => {
-      it('should return visit details given a visit reference', async () => {
+      it('should return visit details given a visit reference, with alerts and restrictions sorted', async () => {
         const visitDetails = TestData.visitBookingDetailsDto()
         orchestrationApiClient.getVisitDetailed.mockResolvedValue(visitDetails)
 
+        const sortItemsSpy = jest.spyOn(utils, 'sortItemsByDateAsc')
         const result = await visitService.getVisitDetailed({ username: 'user', reference: 'ab-cd-ef-gh' })
 
         expect(orchestrationApiClient.getVisitDetailed).toHaveBeenCalledWith('ab-cd-ef-gh')
         expect(result).toStrictEqual(visitDetails)
+        expect(sortItemsSpy).toHaveBeenNthCalledWith(1, visitDetails.prisoner.prisonerAlerts, 'dateExpires')
+        expect(sortItemsSpy).toHaveBeenNthCalledWith(2, visitDetails.prisoner.prisonerRestrictions, 'expiryDate')
+
+        jest.restoreAllMocks()
       })
     })
 
