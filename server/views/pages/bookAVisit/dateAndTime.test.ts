@@ -50,7 +50,7 @@ describe('Views - Date and time of visit', () => {
                   endTimestamp: '2022-02-14T11:00:00',
                   availableTables: 15,
                   capacity: 30,
-                  visitRoom: 'room name',
+                  visitRoom: 'Main visit hall',
                   visitRestriction: 'OPEN',
                 },
                 {
@@ -61,7 +61,7 @@ describe('Views - Date and time of visit', () => {
                   endTimestamp: '2022-02-14T12:59:00',
                   availableTables: 1,
                   capacity: 30,
-                  visitRoom: 'room name',
+                  visitRoom: 'Main visit hall',
                   visitRestriction: 'OPEN',
                 },
               ],
@@ -74,7 +74,7 @@ describe('Views - Date and time of visit', () => {
                   endTimestamp: '2022-02-14T13:05:00',
                   availableTables: 5,
                   capacity: 30,
-                  visitRoom: 'room name',
+                  visitRoom: 'Main visit hall',
                   // representing a pre-existing visit that is BOOKED
                   sessionConflicts: ['DOUBLE_BOOKING_OR_RESERVATION'],
                   visitRestriction: 'OPEN',
@@ -99,7 +99,7 @@ describe('Views - Date and time of visit', () => {
                   endTimestamp: '2022-02-15T17:00:00',
                   availableTables: 12,
                   capacity: 30,
-                  visitRoom: 'room name',
+                  visitRoom: 'Main visit hall',
                   // representing the RESERVED visit being handled in this session
                   sessionConflicts: ['DOUBLE_BOOKING_OR_RESERVATION'],
                   visitRestriction: 'OPEN',
@@ -125,7 +125,7 @@ describe('Views - Date and time of visit', () => {
                   endTimestamp: '2022-03-01T10:30:00',
                   availableTables: 0, // fully booked
                   capacity: 30,
-                  visitRoom: 'room name',
+                  visitRoom: 'Other visit hall',
                   visitRestriction: 'OPEN',
                 },
                 {
@@ -135,7 +135,7 @@ describe('Views - Date and time of visit', () => {
                   endTimestamp: '2022-03-01T11:30:00',
                   availableTables: -2, // overbooked
                   capacity: 1,
-                  visitRoom: 'room name',
+                  visitRoom: 'Other visit hall',
                   visitRestriction: 'OPEN',
                 },
               ],
@@ -162,10 +162,13 @@ describe('Views - Date and time of visit', () => {
     expect($('#slots-month-February2022-heading-1').text().trim()).toBe('Monday 14 February')
     expect($('#slots-month-February2022-content-1 h3').eq(0).text()).toBe('Morning')
     expect($('label[for="1"]').text()).toContain('10am to 11am')
-    expect($('label[for="1"]').text()).toContain('15 tables available of 30 tables')
+    expect($('label[for="1"]').text()).toContain('Main visit hall')
+    expect($('label[for="1"]').text()).toContain('15 tables available')
     expect($('label[for="2"]').text()).toContain('11:59am to 12:59pm')
-    expect($('label[for="2"]').text()).toContain('1 table available of 30 tables')
+    expect($('label[for="2"]').text()).toContain('Main visit hall')
+    expect($('label[for="2"]').text()).toContain('1 table available')
     expect($('label[for="3"]').text()).toContain('12pm to 1:05pm')
+    expect($('label[for="3"]').text()).toContain('Main visit hall')
     expect($('label[for="3"]').text()).toContain('Prisoner has a visit')
     expect($('#3').attr('disabled')).toBe('disabled')
     expect($('#slots-month-February2022-content-1 .bapv-afternoon-slots > h3').text()).toBe('Afternoon')
@@ -179,10 +182,12 @@ describe('Views - Date and time of visit', () => {
     expect($('#slots-month-March2022-content-1 .bapv-morning-slots > h3').text()).toBe('Morning')
     expect($('#slots-month-March2022-content-1 .bapv-afternoon-slots > h3').eq(1).length).toBe(0) // no afternoon slots
     expect($('label[for="5"]').text()).toContain('9:30am to 10:30am')
+    expect($('label[for="5"]').text()).toContain('Other visit hall')
     expect($('label[for="5"] .govuk-tag--red').text()).toContain('Fully booked')
     expect($('label[for="5"]').text()).toContain('30 of 30 tables booked')
     // correctly display overbooking
     expect($('label[for="6"]').text()).toContain('10:30am to 11:30am')
+    expect($('label[for="6"]').text()).toContain('Other visit hall')
     expect($('label[for="6"] .govuk-tag--red').text()).toContain('Fully booked')
     expect($('label[for="6"]').text()).toContain('3 of 1 table booked')
 
@@ -252,7 +257,7 @@ describe('Views - Date and time of visit', () => {
 
       expect($('#1').prop('checked')).toBe(false)
       expect($('label[for="1"]').text()).toContain('10am to 11am')
-      expect($('label[for="1"]').text()).toContain('15 tables available of 30 tables')
+      expect($('label[for="1"]').text()).toContain('15 tables available')
     })
 
     it('should correctly label currently reserved slot when booking a visit', () => {
