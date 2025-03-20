@@ -99,6 +99,12 @@ export default class OrchestrationApiClient {
     visitDetails.notifications = visitDetails.notifications.filter(notification =>
       this.enabledNotifications.includes(notification.type),
     )
+
+    if (!config.features.showPrisonerAlertsRestrictions) {
+      visitDetails.prisoner.prisonerAlerts = []
+      visitDetails.prisoner.prisonerRestrictions = []
+    }
+
     return visitDetails
   }
 
