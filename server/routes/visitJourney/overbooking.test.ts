@@ -295,6 +295,7 @@ testJourneys.forEach(journey => {
         // visit reference only known on update journey
         visitReference: journey.isUpdate ? 'ab-cd-ef-gh' : undefined,
         requestMethod: 'BY_PRISONER',
+        validationError: 'APPLICATION_INVALID_NO_SLOT_CAPACITY',
       }
 
       sessionApp = appWithAllRoutes({
@@ -323,6 +324,8 @@ testJourneys.forEach(journey => {
             expect($('[data-test=visit-start-time]').text().trim()).toBe('10am')
             expect($('[data-test=visit-end-time]').text().trim()).toBe('11am')
             expect($('[data-test=visit-date]').text().trim()).toBe('Friday 14 January')
+            expect($('.moj-alert__content h2').text()).toContain('Another person has booked the last table.')
+            expect($('.moj-alert').text()).toContain('Select whether to book for this time or choose a new visit time.')
           })
       })
 

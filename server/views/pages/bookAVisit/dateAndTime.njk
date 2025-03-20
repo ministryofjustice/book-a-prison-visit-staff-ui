@@ -7,6 +7,7 @@
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 {%- from "govuk/components/tag/macro.njk" import govukTag -%}
 {%- from "moj/components/banner/macro.njk" import mojBanner -%}
+{%- from "moj/components/alert/macro.njk" import mojAlert -%}
 
 {% set pageHeaderTitle = "Select date and time of visit" %}
 
@@ -53,6 +54,16 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
       {% include "partials/errorSummary.njk" %}
+
+      {% if validationMessage !== '' %}
+        {{ mojAlert({
+          variant: "error",
+          title: validationMessage,
+          showTitleAsHeading: true,
+          dismissible: false,
+          html: '<p data-test="validation-text">Select a new visit time.</p>'
+        }) }}
+      {% endif %}
 
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
 

@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
+import { format, parseISO } from 'date-fns'
 import { VisitSlot } from '../../@types/bapv'
 import AuditService from '../../services/auditService'
 import { getFlashFormValues, getSelectedSlot, getSlotByTimeAndRestriction } from '../visitorUtils'
@@ -19,6 +20,7 @@ export default class DateAndTime {
     const isUpdate = this.mode === 'update'
     const { prisonId } = req.session.selectedEstablishment
     const { visitSessionData } = req.session
+    const prisonerName = visitSessionData.prisoner.name
 
     const warningMessages: { id: string; message: string }[] = []
 
@@ -102,10 +104,20 @@ export default class DateAndTime {
 
     visitSessionData.allowOverBooking = false // intentionally reset when returning to date and time page
 
+    const { validationError } = visitSessionData
+
+    let validationMessage = ''
+    if (validationError === 'APPLICATION_INVALID_NON_ASSOCIATION_VISITS') {
+      validationMessage = `${prisonerName} now has a non-association on ${format(visitSessionData.visitSlot.startTimestamp, 'd MMMM')}.`
+    } else if (validationError === 'APPLICATION_INVALID_VISIT_ALREADY_BOOKED') {
+      validationMessage = `${prisonerName} now has another visit at ${format(parseISO(visitSessionData.visitSlot.startTimestamp), 'h:mmaaa').replace(':00', '')} on ${format(visitSessionData.visitSlot.startTimestamp, 'd MMMM')}.`
+    }
+
     res.render('pages/bookAVisit/dateAndTime', {
       errors: req.flash('errors'),
+      validationMessage,
       visitRestriction: visitSessionData.visitRestriction,
-      prisonerName: visitSessionData.prisoner.name,
+      prisonerName,
       offenderNo: visitSessionData.prisoner.offenderNo,
       location: visitSessionData.prisoner.location,
       whereaboutsAvailable,
