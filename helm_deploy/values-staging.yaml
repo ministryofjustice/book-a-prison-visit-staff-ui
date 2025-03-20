@@ -26,6 +26,8 @@ generic-service:
     REDIS_KEY: "bapv-staff-staging"
     ENVIRONMENT_NAME: STAGING
 
+    SHOW_VISIT_DETAILS_PRISONER_ALERTS_RESTRICTIONS: "true"
+
   namespace_secrets:
     book-a-prison-visit-staff-ui:
       APPINSIGHTS_INSTRUMENTATIONKEY: null # disable App Insights for staging
