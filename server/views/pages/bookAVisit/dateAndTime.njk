@@ -28,19 +28,21 @@
       {%- elseif slot.availableTables <= 0 -%}
         {{ govukTag({
           text: "Fully booked",
-          classes: "govuk-tag--red"
+          classes: "govuk-tag--red govuk-!-margin-top-1 govuk-!-margin-bottom-1"
         })}}
         <br>
         {{ slot.capacity + (slot.availableTables | abs) }} of {{ slot.capacity}} {{ "table" | pluralise(slot.capacity) }} booked
       {%- else -%}
-        {{ slot.availableTables }} {{ "table" | pluralise(slot.availableTables) }} available of {{ slot.capacity }} {{ "table" | pluralise(slot.capacity) }}
+        <span class="bapv-secondary-text">
+          {{ slot.availableTables }} {{ "table" | pluralise(slot.availableTables) }} available
+        </span>
       {%- endif %}
     {% endset %}
 
     {%- set slotTimeString = slot.startTimestamp | formatTime + " to " + slot.endTimestamp | formatTime -%}
     {%- set radios = (radios.push({
       value: slot.id,
-      html: '<p class="bapv-radio-paragraph"><strong>' + slotTimeString + "</strong><br>" + tableText + "</p>",
+      html: '<p class="bapv-radio-paragraph"><strong>' + slotTimeString + "</strong><br>" + slot.visitRoom + "<br>" + tableText + "</p>",
       id: slot.id,
       checked: checked,
       disabled: (doubleBooked and not checked),
