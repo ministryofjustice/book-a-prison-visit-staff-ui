@@ -462,6 +462,7 @@ export default class TestData {
     visitRestriction = 'OPEN',
     startTimestamp = '2022-01-14T10:00:00',
     endTimestamp = '2022-01-14T11:00:00',
+    sessionTemplateReference = 'v9d.7ed.7u',
     visitNotes = [],
     visitContact = {
       visitContactId: 4321,
@@ -532,6 +533,7 @@ export default class TestData {
     visitRestriction,
     startTimestamp,
     endTimestamp,
+    sessionTemplateReference,
     visitNotes,
     visitContact,
     visitorSupport,
