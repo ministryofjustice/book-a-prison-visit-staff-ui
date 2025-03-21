@@ -1,3 +1,4 @@
+import { VisitBookingDetailsDto } from '../../data/orchestrationApiTypes'
 import { getPrisonerLocation } from './visitUtils'
 
 describe('Visit utils', () => {
@@ -8,7 +9,7 @@ describe('Visit utils', () => {
         prisonName: 'Hewell (HMP)',
         cellLocation: '1-1-C-028',
         locationDescription: '',
-      })
+      } as VisitBookingDetailsDto['prisoner'])
 
       expect(prisonerLocation).toBe('1-1-C-028, Hewell (HMP)')
     })
@@ -19,7 +20,7 @@ describe('Visit utils', () => {
         prisonName: '',
         cellLocation: '',
         locationDescription: '',
-      })
+      } as VisitBookingDetailsDto['prisoner'])
 
       expect(prisonerLocation).toBe('Unknown')
     })
@@ -30,7 +31,7 @@ describe('Visit utils', () => {
         prisonName: '',
         cellLocation: '',
         locationDescription: 'Outside - released from Hewell (HMP)',
-      })
+      } as VisitBookingDetailsDto['prisoner'])
 
       expect(prisonerLocation).toBe('Outside - released from Hewell (HMP)')
     })
