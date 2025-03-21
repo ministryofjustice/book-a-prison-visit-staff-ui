@@ -88,7 +88,16 @@ export default class CheckYourBooking {
           (error as SanitisedError<ApplicationValidationErrorResponse>)?.data?.validationErrors ?? []
 
         if (validationErrors.includes('APPLICATION_INVALID_NO_SLOT_CAPACITY')) {
+          visitSessionData.validationError = 'APPLICATION_INVALID_NO_SLOT_CAPACITY'
           return res.redirect(`${urlPrefix}/check-your-booking/overbooking`)
+        }
+        if (validationErrors.includes('APPLICATION_INVALID_NON_ASSOCIATION_VISITS')) {
+          visitSessionData.validationError = 'APPLICATION_INVALID_NON_ASSOCIATION_VISITS'
+          return res.redirect(`${urlPrefix}/select-date-and-time`)
+        }
+        if (validationErrors.includes('APPLICATION_INVALID_VISIT_ALREADY_BOOKED')) {
+          visitSessionData.validationError = 'APPLICATION_INVALID_VISIT_ALREADY_BOOKED'
+          return res.redirect(`${urlPrefix}/select-date-and-time`)
         }
       }
 

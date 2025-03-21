@@ -1,6 +1,7 @@
 {% extends "layout.njk" %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{%- from "moj/components/alert/macro.njk" import mojAlert -%}
 
 {% set pageHeaderTitle = "This time slot is fully booked" %}
 
@@ -9,6 +10,17 @@
     <div class="govuk-grid-column-full">
 
       {% include "partials/errorSummary.njk" %}
+
+      {% if validationMessage !== '' %}
+        {{ mojAlert({
+          variant: "warning",
+          title: validationMessage,
+          showTitleAsHeading: true,
+          dismissible: false,
+          html: '<p data-test="validation-text">Select whether to book for this time or choose a new visit time.</p>'
+        }) }}
+      {% endif %}
+
       <h1 class="govuk-heading-l">
         This time slot is fully booked. Are you sure you want to continue?
       </h1>

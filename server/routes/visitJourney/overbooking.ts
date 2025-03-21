@@ -62,8 +62,15 @@ export default class Overbooking {
         ? visitSession.openVisitCapacity
         : visitSession.closedVisitCapacity
 
+    const { validationError } = visitSessionData
+    let validationMessage = ''
+    if (validationError === 'APPLICATION_INVALID_NO_SLOT_CAPACITY') {
+      validationMessage = `Another person has booked the last table.`
+    }
+
     return res.render('pages/bookAVisit/overbooking', {
       errors: req.flash('errors'),
+      validationMessage,
       bookingsCount,
       maxCapacity,
       visitSession,
