@@ -9,6 +9,7 @@ import {
   createMockPrisonApiClient,
   createMockPrisonerSearchClient,
 } from '../data/testutils/mocks'
+import * as utils from '../utils/utils'
 
 const token = 'some token'
 
@@ -48,10 +49,10 @@ describe('Prisoner profile service', () => {
     it('should retrieve and process data for prisoner profile', async () => {
       const prisonerProfile = TestData.prisonerProfile()
       orchestrationApiClient.getPrisonerProfile.mockResolvedValue(prisonerProfile)
+      const sortItemsSpy = jest.spyOn(utils, 'sortItemsByDateAsc')
 
       const prisonerProfilePage: PrisonerProfilePage = {
-        activeAlerts: [],
-        activeAlertCount: 0,
+        alerts: [],
         flaggedAlerts: [],
         visitsByMonth: new Map(),
         prisonerDetails: {
@@ -78,9 +79,11 @@ describe('Prisoner profile service', () => {
 
       expect(OrchestrationApiClientFactory).toHaveBeenCalledWith(token)
       expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user')
-      expect(orchestrationApiClient.getPrisonerProfile).toHaveBeenCalledTimes(1)
-
+      expect(orchestrationApiClient.getPrisonerProfile).toHaveBeenCalledWith(prisonId, prisonerId)
       expect(results).toEqual(prisonerProfilePage)
+      expect(sortItemsSpy).toHaveBeenCalledWith(prisonerProfilePage.alerts, 'dateExpires')
+
+      sortItemsSpy.mockRestore()
     })
 
     it('should return visit balances as null if prisoner is on REMAND', async () => {
@@ -91,8 +94,7 @@ describe('Prisoner profile service', () => {
 
       expect(OrchestrationApiClientFactory).toHaveBeenCalledWith(token)
       expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user')
-      expect(orchestrationApiClient.getPrisonerProfile).toHaveBeenCalledTimes(1)
-
+      expect(orchestrationApiClient.getPrisonerProfile).toHaveBeenCalledWith(prisonId, prisonerId)
       expect(results.prisonerDetails.visitBalances).toBeNull()
     })
 
@@ -126,9 +128,7 @@ describe('Prisoner profile service', () => {
       )
     })
 
-    it('should filter active alerts and those to be flagged', async () => {
-      const inactiveAlert = TestData.alert({ active: false })
-
+    it('should filter alerts to be flagged', async () => {
       const alertsToFlag = [
         TestData.alert({ alertCode: 'UPIU' }),
         TestData.alert({ alertCode: 'RCDR' }),
@@ -137,10 +137,10 @@ describe('Prisoner profile service', () => {
       const alertNotToFlag = TestData.alert({ alertCode: 'XR' })
 
       const prisonerProfile = TestData.prisonerProfile({
-        alerts: [inactiveAlert, alertNotToFlag, ...alertsToFlag],
+        alerts: [alertNotToFlag, ...alertsToFlag],
       })
 
-      prisonerProfile.alerts = [inactiveAlert, alertNotToFlag, ...alertsToFlag]
+      prisonerProfile.alerts = [alertNotToFlag, ...alertsToFlag]
 
       orchestrationApiClient.getPrisonerProfile.mockResolvedValue(prisonerProfile)
 
@@ -148,10 +148,9 @@ describe('Prisoner profile service', () => {
 
       expect(OrchestrationApiClientFactory).toHaveBeenCalledWith(token)
       expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user')
-      expect(orchestrationApiClient.getPrisonerProfile).toHaveBeenCalledTimes(1)
+      expect(orchestrationApiClient.getPrisonerProfile).toHaveBeenCalledWith(prisonId, prisonerId)
 
-      expect(results.activeAlerts).toStrictEqual([alertNotToFlag, ...alertsToFlag])
-      expect(results.activeAlertCount).toBe(4)
+      expect(results.alerts).toStrictEqual([alertNotToFlag, ...alertsToFlag])
       expect(results.flaggedAlerts).toStrictEqual(alertsToFlag)
     })
   })

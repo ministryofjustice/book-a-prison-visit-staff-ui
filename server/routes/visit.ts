@@ -76,12 +76,12 @@ export default function routes({
     // clean then load session
     clearSession(req)
 
-    const [{ activeAlerts }, restrictions] = await Promise.all([
+    const [{ alerts }, restrictions] = await Promise.all([
       prisonerProfileService.getProfile(visit.prisonId, visit.prisonerId, username),
       prisonerProfileService.getRestrictions(visit.prisonerId, username),
     ])
 
-    sortItemsByDateAsc<Alert, 'dateExpires'>(activeAlerts, 'dateExpires')
+    sortItemsByDateAsc<Alert, 'dateExpires'>(alerts, 'dateExpires')
     sortItemsByDateAsc<OffenderRestriction, 'expiryDate'>(restrictions, 'expiryDate')
 
     const visitRestriction =
@@ -103,7 +103,7 @@ export default function routes({
         name: properCaseFullName(`${prisoner.lastName}, ${prisoner.firstName}`),
         offenderNo: prisoner.prisonerNumber,
         location: prisonerLocation,
-        activeAlerts,
+        alerts,
         restrictions,
       },
       visitSlot,

@@ -65,8 +65,7 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
 
   beforeEach(() => {
     prisonerProfile = {
-      activeAlerts: [alert],
-      activeAlertCount: 1,
+      alerts: [alert],
       flaggedAlerts: [TestData.alert({ alertCode: 'UPIU', alertCodeDescription: 'Protective Isolation Unit' })],
       visitsByMonth: new Map(),
       prisonerDetails: {
@@ -253,8 +252,7 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
 
     it('should render the prisoner profile page for offender number A1234BC without active alerts if there are none', () => {
       prisonerProfile.flaggedAlerts = []
-      prisonerProfile.activeAlerts = []
-      prisonerProfile.activeAlertCount = 0
+      prisonerProfile.alerts = []
 
       return request(app)
         .get('/prisoner/A1234BC')
@@ -387,7 +385,7 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
               name: 'Smith, John',
               offenderNo: 'A1234BC',
               location: '1-1-C-028, Hewell (HMP)',
-              activeAlerts: [alert],
+              alerts: [alert],
               restrictions: [restriction],
             },
           })
@@ -419,7 +417,7 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
               name: 'Smith, John',
               offenderNo: 'A1234BC',
               location: '1-1-C-028, Hewell (HMP)',
-              activeAlerts: [
+              alerts: [
                 TestData.alert({
                   alertType: 'X',
                   alertTypeDescription: 'Security',
@@ -456,7 +454,7 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
               name: 'Smith, John',
               offenderNo: 'A1234BC',
               location: '1-1-C-028, Hewell (HMP)',
-              activeAlerts: [
+              alerts: [
                 TestData.alert({
                   alertType: 'X',
                   alertTypeDescription: 'Security',
