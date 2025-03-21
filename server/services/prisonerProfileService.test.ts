@@ -9,6 +9,7 @@ import {
   createMockPrisonApiClient,
   createMockPrisonerSearchClient,
 } from '../data/testutils/mocks'
+import * as utils from '../utils/utils'
 
 const token = 'some token'
 
@@ -48,6 +49,7 @@ describe('Prisoner profile service', () => {
     it('should retrieve and process data for prisoner profile', async () => {
       const prisonerProfile = TestData.prisonerProfile()
       orchestrationApiClient.getPrisonerProfile.mockResolvedValue(prisonerProfile)
+      const sortItemsSpy = jest.spyOn(utils, 'sortItemsByDateAsc')
 
       const prisonerProfilePage: PrisonerProfilePage = {
         alerts: [],
@@ -77,9 +79,11 @@ describe('Prisoner profile service', () => {
 
       expect(OrchestrationApiClientFactory).toHaveBeenCalledWith(token)
       expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user')
-      expect(orchestrationApiClient.getPrisonerProfile).toHaveBeenCalledTimes(1)
-
+      expect(orchestrationApiClient.getPrisonerProfile).toHaveBeenCalledWith(prisonId, prisonerId)
       expect(results).toEqual(prisonerProfilePage)
+      expect(sortItemsSpy).toHaveBeenCalledWith(prisonerProfilePage.alerts, 'dateExpires')
+
+      sortItemsSpy.mockRestore()
     })
 
     it('should return visit balances as null if prisoner is on REMAND', async () => {
@@ -90,8 +94,7 @@ describe('Prisoner profile service', () => {
 
       expect(OrchestrationApiClientFactory).toHaveBeenCalledWith(token)
       expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user')
-      expect(orchestrationApiClient.getPrisonerProfile).toHaveBeenCalledTimes(1)
-
+      expect(orchestrationApiClient.getPrisonerProfile).toHaveBeenCalledWith(prisonId, prisonerId)
       expect(results.prisonerDetails.visitBalances).toBeNull()
     })
 
@@ -145,7 +148,7 @@ describe('Prisoner profile service', () => {
 
       expect(OrchestrationApiClientFactory).toHaveBeenCalledWith(token)
       expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user')
-      expect(orchestrationApiClient.getPrisonerProfile).toHaveBeenCalledTimes(1)
+      expect(orchestrationApiClient.getPrisonerProfile).toHaveBeenCalledWith(prisonId, prisonerId)
 
       expect(results.alerts).toStrictEqual([alertNotToFlag, ...alertsToFlag])
       expect(results.flaggedAlerts).toStrictEqual(alertsToFlag)

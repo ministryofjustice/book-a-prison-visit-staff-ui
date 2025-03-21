@@ -308,7 +308,7 @@ describe('Visit service', () => {
         expect(sortItemsSpy).toHaveBeenNthCalledWith(1, visitDetails.prisoner.prisonerAlerts, 'dateExpires')
         expect(sortItemsSpy).toHaveBeenNthCalledWith(2, visitDetails.prisoner.prisonerRestrictions, 'expiryDate')
 
-        jest.restoreAllMocks()
+        sortItemsSpy.mockRestore()
       })
     })
 
