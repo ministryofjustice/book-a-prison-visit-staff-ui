@@ -184,12 +184,10 @@ describe('Views - Date and time of visit', () => {
     expect($('label[for="5"]').text()).toContain('9:30am to 10:30am')
     expect($('label[for="5"]').text()).toContain('Other visit hall')
     expect($('label[for="5"] .govuk-tag--red').text()).toContain('Fully booked')
-    expect($('label[for="5"]').text()).toContain('30 of 30 tables booked')
     // correctly display overbooking
     expect($('label[for="6"]').text()).toContain('10:30am to 11:30am')
     expect($('label[for="6"]').text()).toContain('Other visit hall')
     expect($('label[for="6"] .govuk-tag--red').text()).toContain('Fully booked')
-    expect($('label[for="6"]').text()).toContain('3 of 1 table booked')
 
     expect($('[data-test="submit"]').text().trim()).toBe('Continue')
   })

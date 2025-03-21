@@ -28,10 +28,8 @@
       {%- elseif slot.availableTables <= 0 -%}
         {{ govukTag({
           text: "Fully booked",
-          classes: "govuk-tag--red govuk-!-margin-top-1 govuk-!-margin-bottom-1"
+          classes: "govuk-tag--red govuk-!-margin-top-1"
         })}}
-        <br>
-        {{ slot.capacity + (slot.availableTables | abs) }} of {{ slot.capacity}} {{ "table" | pluralise(slot.capacity) }} booked
       {%- else -%}
         <span class="bapv-secondary-text">
           {{ slot.availableTables }} {{ "table" | pluralise(slot.availableTables) }} available
