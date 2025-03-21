@@ -69,7 +69,7 @@
 
         <p>This page shows alerts that are relevant for social visits. You can also <a class="govuk-link--no-visited-state" href="{{ prisonerDpsAlertsUrl }}" target="_blank" data-test="all-alerts-link">view all alerts</a>.</p>
 
-        {% if restrictions | length or activeAlerts | length %}
+        {% if restrictions | length or alerts | length %}
           {% set prisonerRestrictions = [] %}
           {% for restriction in restrictions %}
             {% set restrictionExpiryDate %}{% if restriction.expiryDate %}{{ restriction.expiryDate | formatDate }}{% else %}No end date{% endif %}{% endset %}
@@ -90,7 +90,7 @@
           {% endfor %}
 
           {% set prisonerAlerts = [] %}
-          {% for alert in activeAlerts %}
+          {% for alert in alerts %}
             {% set alertExpiryDate %}{% if alert.dateExpires %}{{ alert.dateExpires | formatDate }}{% else %}No end date{% endif %}{% endset %}
             {%- set prisonerAlerts = (prisonerAlerts.push([
               {
@@ -124,7 +124,7 @@
             }) }}
           {% endif %}
 
-          {% if activeAlerts | length %}
+          {% if alerts | length %}
           {{ govukTable({
             classes: 'bapv-table-no-bottom-border fix-width-alert-restriction',
             head: [

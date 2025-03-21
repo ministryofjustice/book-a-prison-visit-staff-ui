@@ -157,8 +157,7 @@ describe('/visit/:reference', () => {
     })
     beforeEach(() => {
       const prisonerProfile: PrisonerProfilePage = {
-        activeAlerts: [alert],
-        activeAlertCount: 1,
+        alerts: [alert],
         flaggedAlerts: [],
         visitsByMonth: new Map(),
         prisonerDetails: {
@@ -202,7 +201,7 @@ describe('/visit/:reference', () => {
               name: 'Smith, John',
               offenderNo: 'A1234BC',
               location: '1-1-C-028, HMP Hewell',
-              activeAlerts: [alert],
+              alerts: [alert],
               restrictions: [restriction],
             },
             visitSlot: {

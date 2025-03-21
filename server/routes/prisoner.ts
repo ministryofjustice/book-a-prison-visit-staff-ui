@@ -42,7 +42,7 @@ export default function routes({ auditService, prisonerProfileService }: Service
     const { prisonId } = req.session.selectedEstablishment
     const { username } = res.locals.user
 
-    const [{ prisonerDetails, activeAlerts }, restrictions] = await Promise.all([
+    const [{ prisonerDetails, alerts }, restrictions] = await Promise.all([
       prisonerProfileService.getProfile(prisonId, offenderNo, username),
       prisonerProfileService.getRestrictions(offenderNo, username),
     ])
@@ -74,7 +74,7 @@ export default function routes({ auditService, prisonerProfileService }: Service
       name: prisonerDetails.name,
       offenderNo,
       location: prisonerDetails.cellLocation ? `${prisonerDetails.cellLocation}, ${prisonerDetails.prisonName}` : '',
-      activeAlerts,
+      alerts,
       restrictions,
     }
 

@@ -106,7 +106,7 @@ testJourneys.forEach(journey => {
           name: 'John Smith',
           offenderNo: 'A1234BC',
           location: 'location place',
-          activeAlerts: [],
+          alerts: [],
           restrictions: [],
         },
         visitRestriction: 'OPEN',
@@ -126,7 +126,7 @@ testJourneys.forEach(journey => {
 
     it('should render the prisoner restrictions and alerts when they are present', () => {
       visitSessionData.prisoner.restrictions = restrictions
-      visitSessionData.prisoner.activeAlerts = alerts
+      visitSessionData.prisoner.alerts = alerts
       return request(sessionApp)
         .get(`${journey.urlPrefix}/select-visitors`)
         .expect(200)
@@ -147,7 +147,7 @@ testJourneys.forEach(journey => {
 
     it('should render the prisoner restrictions and alerts when they are present, displaying a message if dates are not set', () => {
       visitSessionData.prisoner.restrictions = [TestData.offenderRestriction()]
-      visitSessionData.prisoner.activeAlerts = [TestData.alert()]
+      visitSessionData.prisoner.alerts = [TestData.alert()]
 
       sessionApp = appWithAllRoutes({
         services: { prisonerVisitorsService },

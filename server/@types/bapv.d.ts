@@ -31,8 +31,7 @@ export type VisitorListItem = {
 }
 
 export type PrisonerProfilePage = {
-  activeAlerts: Alert[]
-  activeAlertCount: number
+  alerts: Alert[]
   flaggedAlerts: Alert[]
   prisonerDetails: {
     prisonerId: string
@@ -101,7 +100,7 @@ export type VisitSessionData = {
     name: string
     offenderNo: string
     location: string
-    activeAlerts?: Alert[]
+    alerts?: Alert[]
     restrictions?: OffenderRestriction[]
   }
   visitSlot?: VisitSlot

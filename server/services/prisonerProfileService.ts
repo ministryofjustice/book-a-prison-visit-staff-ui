@@ -19,10 +19,8 @@ export default class PrisonerProfileService {
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
     const prisonerProfile = await orchestrationApiClient.getPrisonerProfile(prisonId, prisonerId)
 
-    const alerts = prisonerProfile.alerts || []
-    const activeAlerts: Alert[] = alerts.filter(alert => alert.active)
-    const activeAlertCount = activeAlerts.length
-    const flaggedAlerts: Alert[] = activeAlerts.filter(alert => this.alertCodesToFlag.includes(alert.alertCode))
+    const { alerts } = prisonerProfile
+    const flaggedAlerts: Alert[] = alerts.filter(alert => this.alertCodesToFlag.includes(alert.alertCode))
 
     const visitsByMonth: PrisonerProfilePage['visitsByMonth'] = new Map()
     const now = new Date()
@@ -72,8 +70,7 @@ export default class PrisonerProfileService {
     }
 
     return {
-      activeAlerts,
-      activeAlertCount,
+      alerts,
       flaggedAlerts,
       prisonerDetails,
       visitsByMonth,

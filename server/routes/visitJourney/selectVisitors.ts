@@ -27,7 +27,7 @@ export default class SelectVisitors {
     const atLeastOneAdult = visitorList.some(visitor => visitor.adult === true)
     const eligibleVisitors = visitorList.some(visitor => visitor.banned === false && visitor.adult === true)
 
-    const { restrictions, activeAlerts } = visitSessionData.prisoner
+    const { restrictions, alerts } = visitSessionData.prisoner
 
     const formValues = getFlashFormValues(req)
     if (!Object.keys(formValues).length && visitSessionData.visitors) {
@@ -43,7 +43,7 @@ export default class SelectVisitors {
       visitorList,
       atLeastOneAdult,
       eligibleVisitors,
-      activeAlerts,
+      alerts,
       restrictions,
       formValues,
       prisonerDpsAlertsUrl: getDpsPrisonerAlertsUrl(offenderNo),

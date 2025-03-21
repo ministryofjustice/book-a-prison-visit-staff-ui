@@ -50,8 +50,7 @@ describe('Prisoner profile service', () => {
       orchestrationApiClient.getPrisonerProfile.mockResolvedValue(prisonerProfile)
 
       const prisonerProfilePage: PrisonerProfilePage = {
-        activeAlerts: [],
-        activeAlertCount: 0,
+        alerts: [],
         flaggedAlerts: [],
         visitsByMonth: new Map(),
         prisonerDetails: {
@@ -126,9 +125,7 @@ describe('Prisoner profile service', () => {
       )
     })
 
-    it('should filter active alerts and those to be flagged', async () => {
-      const inactiveAlert = TestData.alert({ active: false })
-
+    it('should filter alerts to be flagged', async () => {
       const alertsToFlag = [
         TestData.alert({ alertCode: 'UPIU' }),
         TestData.alert({ alertCode: 'RCDR' }),
@@ -137,10 +134,10 @@ describe('Prisoner profile service', () => {
       const alertNotToFlag = TestData.alert({ alertCode: 'XR' })
 
       const prisonerProfile = TestData.prisonerProfile({
-        alerts: [inactiveAlert, alertNotToFlag, ...alertsToFlag],
+        alerts: [alertNotToFlag, ...alertsToFlag],
       })
 
-      prisonerProfile.alerts = [inactiveAlert, alertNotToFlag, ...alertsToFlag]
+      prisonerProfile.alerts = [alertNotToFlag, ...alertsToFlag]
 
       orchestrationApiClient.getPrisonerProfile.mockResolvedValue(prisonerProfile)
 
@@ -150,8 +147,7 @@ describe('Prisoner profile service', () => {
       expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user')
       expect(orchestrationApiClient.getPrisonerProfile).toHaveBeenCalledTimes(1)
 
-      expect(results.activeAlerts).toStrictEqual([alertNotToFlag, ...alertsToFlag])
-      expect(results.activeAlertCount).toBe(4)
+      expect(results.alerts).toStrictEqual([alertNotToFlag, ...alertsToFlag])
       expect(results.flaggedAlerts).toStrictEqual(alertsToFlag)
     })
   })
