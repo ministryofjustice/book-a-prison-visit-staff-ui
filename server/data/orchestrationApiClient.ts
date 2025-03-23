@@ -346,10 +346,10 @@ export default class OrchestrationApiClient {
       ? {
           ...(mainContact.phoneNumber && { telephone: mainContact.phoneNumber }),
           ...(mainContact.email && { email: mainContact.email }),
-          name: mainContact.contactName ? mainContact.contactName : mainContact.contact.name,
+          name: mainContact.contactName,
         }
       : undefined
-    const mainContactId = mainContact && mainContact.contact ? mainContact.contact.personId : null
+    const mainContactId = mainContact.contactId ?? null
     return { visitContact, mainContactId }
   }
 }

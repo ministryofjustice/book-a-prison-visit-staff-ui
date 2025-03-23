@@ -131,14 +131,7 @@ testJourneys.forEach(journey => {
 
       it('should render the main contact page, pre-populated with session data for contact choice and phone number', () => {
         visitSessionData.mainContact = {
-          contact: {
-            personId: 123,
-            name: 'name last',
-            adult: true,
-            relationshipDescription: 'relate',
-            restrictions: [],
-            banned: false,
-          },
+          contactId: 123,
           phoneNumber: '0114 1234 567',
         }
 
@@ -159,7 +152,7 @@ testJourneys.forEach(journey => {
 
       it('should render the main contact page, pre-populated with session data for custom contact name and phone number', () => {
         visitSessionData.mainContact = {
-          contact: undefined,
+          contactId: undefined,
           contactName: 'another person',
           phoneNumber: '0114 1122 333',
         }
@@ -264,17 +257,10 @@ testJourneys.forEach(journey => {
           .expect(302)
           .expect('location', `${journey.urlPrefix}/request-method`)
           .expect(() => {
-            expect(visitSessionData.mainContact.contact).toEqual({
-              personId: 123,
-              name: 'name last',
-              adult: true,
-              relationshipDescription: 'relate',
-              restrictions: [],
-              banned: false,
-            })
+            expect(visitSessionData.mainContact.contactId).toBe(123)
             expect(visitSessionData.mainContact.phoneNumber).toBe('0114 1234 567')
             expect(visitSessionData.mainContact.email).toBeUndefined()
-            expect(visitSessionData.mainContact.contactName).toBe(undefined)
+            expect(visitSessionData.mainContact.contactName).toBe('name last')
 
             expect(visitService.changeVisitApplication).toHaveBeenCalledWith({ username: 'user1', visitSessionData })
           })
@@ -290,7 +276,7 @@ testJourneys.forEach(journey => {
           .expect(302)
           .expect('location', `${journey.urlPrefix}/request-method`)
           .expect(() => {
-            expect(visitSessionData.mainContact.contact).toBe(undefined)
+            expect(visitSessionData.mainContact.contactId).toBe(undefined)
             expect(visitSessionData.mainContact.contactName).toBe('another person')
             expect(visitSessionData.mainContact.email).toBeUndefined()
             expect(visitSessionData.mainContact.phoneNumber).toBe('0114 7654 321')
@@ -301,14 +287,7 @@ testJourneys.forEach(journey => {
 
       it('should save new choice to session and redirect to request method page if existing session data present', () => {
         visitSessionData.mainContact = {
-          contact: {
-            personId: 123,
-            name: 'name last',
-            adult: true,
-            relationshipDescription: 'relate',
-            restrictions: [],
-            banned: false,
-          },
+          contactId: 123,
           phoneNumber: '0114 1234 567',
           email: 'visitor@example.com',
           contactName: undefined,
@@ -322,7 +301,7 @@ testJourneys.forEach(journey => {
           .expect(302)
           .expect('location', `${journey.urlPrefix}/request-method`)
           .expect(() => {
-            expect(visitSessionData.mainContact.contact).toBe(undefined)
+            expect(visitSessionData.mainContact.contactId).toBe(undefined)
             expect(visitSessionData.mainContact.contactName).toBe('another person')
             expect(visitSessionData.mainContact.phoneNumber).toBe('0114 7654 321')
             expect(visitSessionData.mainContact.email).toBe('visitor@example.com')

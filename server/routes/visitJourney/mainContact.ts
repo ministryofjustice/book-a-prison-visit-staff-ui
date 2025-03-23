@@ -17,12 +17,12 @@ export default class MainContact {
     const formValues = getFlashFormValues(req)
 
     if (!Object.keys(formValues).length && visitSessionData.mainContact) {
-      formValues.contact = visitSessionData.mainContact.contact
-        ? visitSessionData.mainContact.contact.personId.toString()
+      formValues.contact = visitSessionData.mainContact.contactId
+        ? visitSessionData.mainContact.contactId.toString()
         : 'someoneElse'
       formValues.phoneNumber = visitSessionData.mainContact.phoneNumber ? 'hasPhoneNumber' : 'noPhoneNumber'
       formValues.phoneNumberInput = visitSessionData.mainContact.phoneNumber
-      formValues.someoneElseName = visitSessionData.mainContact.contact
+      formValues.someoneElseName = visitSessionData.mainContact.contactId
         ? undefined
         : visitSessionData.mainContact.contactName
     }
@@ -56,10 +56,10 @@ export default class MainContact {
     const email = visitSessionData.mainContact?.email
 
     visitSessionData.mainContact = {
-      contact: selectedContact,
+      contactId: selectedContact?.personId,
       phoneNumber: req.body.phoneNumber === 'hasPhoneNumber' ? req.body.phoneNumberInput : undefined,
       email,
-      contactName: selectedContact === undefined ? req.body.someoneElseName : undefined,
+      contactName: selectedContact?.name ?? req.body.someoneElseName,
     }
 
     // update visit application to have the latest data

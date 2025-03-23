@@ -109,7 +109,7 @@ export type VisitSessionData = {
   visitors?: VisitorListItem[]
   visitorSupport?: VisitorSupport
   mainContact?: {
-    contact?: VisitorListItem
+    contactId?: number
     phoneNumber?: string
     email?: string
     contactName?: string

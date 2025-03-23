@@ -77,7 +77,7 @@ export default function sessionCheckMiddleware({ stage }: { stage: number }): Re
     if (
       stage > 4 &&
       (!visitSessionData.mainContact ||
-        (!visitSessionData.mainContact.contact && !visitSessionData.mainContact.contactName))
+        (!visitSessionData.mainContact.contactId && !visitSessionData.mainContact.contactName))
     ) {
       return logAndRedirect(req, res, `/prisoner/${visitSessionData.prisoner.offenderNo}?error=missing-main-contact`)
     }
