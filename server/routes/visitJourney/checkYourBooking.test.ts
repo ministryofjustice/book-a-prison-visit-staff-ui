@@ -79,6 +79,7 @@ testJourneys.forEach(journey => {
         mainContact: {
           phoneNumber: '0123 456 7890',
           contactName: 'abc',
+          relationshipDescription: 'WIFE',
         },
         applicationReference: 'aaa-bbb-ccc',
         // visit reference only known on update journey
@@ -119,7 +120,7 @@ testJourneys.forEach(journey => {
             expect($('[data-test="change-additional-support"]').attr('href')).toBe(
               `${journey.urlPrefix}/additional-support`,
             )
-            expect($('.test-main-contact-name').text()).toContain('abc')
+            expect($('.test-main-contact-name').text()).toBe('abc (wife of the prisoner)')
             expect($('.test-main-contact-number').text()).toContain('0123 456 7890')
             expect($('[data-test="change-main-contact"]').attr('href')).toBe(`${journey.urlPrefix}/select-main-contact`)
             expect($('form').prop('action')).toBe(`${journey.urlPrefix}/check-your-booking`)
@@ -149,7 +150,7 @@ testJourneys.forEach(journey => {
             expect($('[data-test="change-additional-support"]').attr('href')).toBe(
               `${journey.urlPrefix}/additional-support`,
             )
-            expect($('.test-main-contact-name').text()).toContain('abc')
+            expect($('.test-main-contact-name').text()).toBe('abc (wife of the prisoner)')
             expect($('.test-main-contact-number').text()).toContain('0123 456 7890')
             expect($('[data-test="change-main-contact"]').attr('href')).toBe(`${journey.urlPrefix}/select-main-contact`)
             expect($('form').prop('action')).toBe(`${journey.urlPrefix}/check-your-booking`)

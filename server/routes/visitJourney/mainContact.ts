@@ -57,6 +57,7 @@ export default class MainContact {
 
     visitSessionData.mainContact = {
       contactId: selectedContact?.personId,
+      relationshipDescription: selectedContact?.relationshipDescription,
       phoneNumber: req.body.phoneNumber === 'hasPhoneNumber' ? req.body.phoneNumberInput : undefined,
       email,
       contactName: selectedContact?.name ?? req.body.someoneElseName,

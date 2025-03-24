@@ -77,6 +77,7 @@ testJourneys.forEach(journey => {
         mainContact: {
           phoneNumber: '123',
           contactName: 'abc',
+          relationshipDescription: 'WIFE',
         },
         applicationReference: 'aaa-bbb-ccc',
         visitReference: 'ab-cd-ef-gh',
@@ -110,7 +111,7 @@ testJourneys.forEach(journey => {
           expect($('.test-additional-support').text()).toContain(
             'Wheelchair ramp, Portable induction loop for people with hearing aids',
           )
-          expect($('.test-main-contact-name').text()).toContain('abc')
+          expect($('.test-main-contact-name').text()).toBe('abc (wife of the prisoner)')
           expect($('.test-main-contact-number').text()).toContain('123')
           expect($('.test-booking-reference').text()).toContain('ab-cd-ef-gh')
 

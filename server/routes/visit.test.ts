@@ -91,6 +91,7 @@ describe('POST /visit/:reference', () => {
           visitorSupport: { description: 'Wheelchair ramp' },
           mainContact: {
             contactId: 4321,
+            relationshipDescription: 'WIFE',
             phoneNumber: '01234 567890',
             email: 'visitor@example.com',
             contactName: 'Jeanette Smith',

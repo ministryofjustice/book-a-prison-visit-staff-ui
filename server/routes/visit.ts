@@ -70,6 +70,18 @@ export default function routes({
       visitRestriction,
     }
 
+    const relationshipDescription = visitDetails.visitors.find(
+      visitor => visitor.personId === visitDetails.visitContact.visitContactId,
+    )?.relationshipDescription
+
+    const mainContact = {
+      contactId: visitDetails.visitContact.visitContactId,
+      relationshipDescription,
+      phoneNumber: visitDetails.visitContact.telephone,
+      email: visitDetails.visitContact.email,
+      contactName: visitDetails.visitContact.name,
+    }
+
     const visitSessionData: VisitSessionData = {
       allowOverBooking: false,
       prisoner: {
@@ -84,12 +96,7 @@ export default function routes({
       visitRestriction,
       visitorIds: visitDetails.visitors.map(visitor => visitor.personId),
       visitorSupport: visitDetails.visitorSupport ?? { description: '' },
-      mainContact: {
-        contactId: visitDetails.visitContact.visitContactId,
-        phoneNumber: visitDetails.visitContact.telephone,
-        email: visitDetails.visitContact.email,
-        contactName: visitDetails.visitContact.name,
-      },
+      mainContact,
       visitReference: visitDetails.reference,
     }
 

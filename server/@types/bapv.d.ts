@@ -111,6 +111,7 @@ export type VisitSessionData = {
   visitorSupport?: VisitorSupport
   mainContact?: {
     contactId?: number
+    relationshipDescription?: string
     phoneNumber?: string
     email?: string
     contactName?: string

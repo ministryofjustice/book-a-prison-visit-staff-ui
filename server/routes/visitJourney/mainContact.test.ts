@@ -259,6 +259,7 @@ testJourneys.forEach(journey => {
           .expect('location', `${journey.urlPrefix}/request-method`)
           .expect(() => {
             expect(visitSessionData.mainContact.contactId).toBe(123)
+            expect(visitSessionData.mainContact.relationshipDescription).toBe('relate')
             expect(visitSessionData.mainContact.phoneNumber).toBe('0114 1234 567')
             expect(visitSessionData.mainContact.email).toBeUndefined()
             expect(visitSessionData.mainContact.contactName).toBe('name last')
@@ -278,6 +279,7 @@ testJourneys.forEach(journey => {
           .expect('location', `${journey.urlPrefix}/request-method`)
           .expect(() => {
             expect(visitSessionData.mainContact.contactId).toBe(undefined)
+            expect(visitSessionData.mainContact.relationshipDescription).toBe(undefined)
             expect(visitSessionData.mainContact.contactName).toBe('another person')
             expect(visitSessionData.mainContact.email).toBeUndefined()
             expect(visitSessionData.mainContact.phoneNumber).toBe('0114 7654 321')
@@ -289,6 +291,7 @@ testJourneys.forEach(journey => {
       it('should save new choice to session and redirect to request method page if existing session data present', () => {
         visitSessionData.mainContact = {
           contactId: 123,
+          relationshipDescription: 'SISTER',
           phoneNumber: '0114 1234 567',
           email: 'visitor@example.com',
           contactName: undefined,
@@ -303,6 +306,7 @@ testJourneys.forEach(journey => {
           .expect('location', `${journey.urlPrefix}/request-method`)
           .expect(() => {
             expect(visitSessionData.mainContact.contactId).toBe(undefined)
+            expect(visitSessionData.mainContact.relationshipDescription).toBe(undefined)
             expect(visitSessionData.mainContact.contactName).toBe('another person')
             expect(visitSessionData.mainContact.phoneNumber).toBe('0114 7654 321')
             expect(visitSessionData.mainContact.email).toBe('visitor@example.com')
