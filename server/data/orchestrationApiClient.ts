@@ -18,7 +18,6 @@ import {
   SessionCapacity,
   SessionSchedule,
   Visit,
-  VisitHistoryDetails,
   VisitPreview,
   VisitRestriction,
   VisitSession,
@@ -77,17 +76,6 @@ export default class OrchestrationApiClient {
 
   async getVisit(reference: string): Promise<Visit> {
     return this.restClient.get({ path: `/visits/${reference}` })
-  }
-
-  async getVisitHistory(reference: string): Promise<VisitHistoryDetails> {
-    const { eventsAudit, visit } = await this.restClient.get<VisitHistoryDetails>({
-      path: `/visits/${reference}/history`,
-    })
-
-    return {
-      eventsAudit: eventsAudit.filter(event => this.enabledVisitHistoryEvents.includes(event.type)),
-      visit,
-    }
   }
 
   async getVisitDetailed(reference: string): Promise<VisitBookingDetailsDto> {

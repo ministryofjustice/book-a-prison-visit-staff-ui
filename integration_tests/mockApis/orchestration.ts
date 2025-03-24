@@ -14,7 +14,6 @@ import {
   SessionSchedule,
   Visit,
   VisitBookingDetailsDto,
-  VisitHistoryDetails,
   VisitPreview,
   VisitSession,
 } from '../../server/data/orchestrationApiTypes'
@@ -185,19 +184,6 @@ export default {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
         jsonBody: visit,
-      },
-    })
-  },
-  stubVisitHistory: (visitHistoryDetails: VisitHistoryDetails): SuperAgentRequest => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        url: `/orchestration/visits/${visitHistoryDetails.visit.reference}/history`,
-      },
-      response: {
-        status: 200,
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: visitHistoryDetails,
       },
     })
   },

@@ -1,5 +1,5 @@
 import { NotFound } from 'http-errors'
-import { VisitInformation, VisitSessionData, VisitorListItem } from '../@types/bapv'
+import { VisitInformation, VisitSessionData } from '../@types/bapv'
 import {
   Alert,
   ApplicationDto,
@@ -8,11 +8,9 @@ import {
   EventAudit,
   Visit,
   VisitBookingDetailsDto,
-  VisitHistoryDetails,
   VisitPreview,
 } from '../data/orchestrationApiTypes'
-import { buildVisitorListItem } from '../utils/visitorUtils'
-import { HmppsAuthClient, OrchestrationApiClient, PrisonerContactRegistryApiClient, RestClientBuilder } from '../data'
+import { HmppsAuthClient, OrchestrationApiClient, RestClientBuilder } from '../data'
 import logger from '../../logger'
 import { prisonerDateTimePretty, prisonerTimePretty, sortItemsByDateAsc } from '../utils/utils'
 import eventAuditTypes from '../constants/eventAuditTypes'
@@ -35,7 +33,6 @@ export type MojTimelineItem = {
 export default class VisitService {
   constructor(
     private readonly orchestrationApiClientFactory: RestClientBuilder<OrchestrationApiClient>,
-    private readonly prisonerContactRegistryApiClientFactory: RestClientBuilder<PrisonerContactRegistryApiClient>,
     private readonly hmppsAuthClient: HmppsAuthClient,
   ) {}
 
@@ -137,29 +134,6 @@ export default class VisitService {
     }
 
     return this.buildVisitInformation(visit)
-  }
-
-  async getFullVisitDetails({ username, reference }: { username: string; reference: string }): Promise<{
-    visitHistoryDetails: VisitHistoryDetails
-    visitors: VisitorListItem[]
-    additionalSupport: string
-  }> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
-    const prisonerContactRegistryApiClient = this.prisonerContactRegistryApiClientFactory(token)
-
-    const visitHistoryDetails = await orchestrationApiClient.getVisitHistory(reference)
-    const { visit } = visitHistoryDetails
-    const contacts = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(false, visit.prisonerId)
-    const visitorIds = visit.visitors.map(visitor => visitor.nomisPersonId)
-
-    const visitors = contacts
-      .filter(contact => visitorIds.includes(contact.personId))
-      .map(contact => buildVisitorListItem(contact))
-
-    const additionalSupport = visit.visitorSupport ? visit.visitorSupport.description : ''
-
-    return { visitHistoryDetails, visitors, additionalSupport }
   }
 
   async getVisitDetailed({

@@ -5,7 +5,6 @@ export type VisitorSupport = components['schemas']['VisitorSupportDto']
 export type PageVisitDto = components['schemas']['PageVisitDto']
 export type Visit = components['schemas']['VisitDto']
 export type VisitBookingDetailsDto = components['schemas']['VisitBookingDetailsDto']
-export type VisitHistoryDetails = components['schemas']['VisitHistoryDetailsDto'] // TODO remove
 export type VisitRestriction = Visit['visitRestriction']
 export type VisitPreview = components['schemas']['VisitPreviewDto']
 

@@ -11,7 +11,6 @@ import {
   SessionCapacity,
   SessionSchedule,
   Visit,
-  VisitHistoryDetails,
   VisitPreview,
   VisitSession,
   VisitSummary,
@@ -542,36 +541,6 @@ export default class TestData {
     visitors,
     events,
     notifications,
-  })
-
-  static visitHistoryDetails = ({
-    eventsAudit = [
-      {
-        type: 'BOOKED_VISIT',
-        applicationMethodType: 'PHONE',
-        actionedByFullName: 'User One',
-        userType: 'STAFF',
-        createTimestamp: '2022-01-01T09:00:00',
-      },
-      {
-        type: 'UPDATED_VISIT',
-        applicationMethodType: 'EMAIL',
-        actionedByFullName: 'User Two',
-        userType: 'STAFF',
-        createTimestamp: '2022-01-01T10:00:00',
-      },
-      {
-        type: 'PRISON_VISITS_BLOCKED_FOR_DATE',
-        applicationMethodType: 'NOT_APPLICABLE',
-        actionedByFullName: '',
-        userType: 'SYSTEM',
-        createTimestamp: '2022-01-01T11:00:00',
-      },
-    ],
-    visit = this.visit(),
-  }: Partial<VisitHistoryDetails> = {}): VisitHistoryDetails => ({
-    eventsAudit,
-    visit,
   })
 
   static visitPreview = ({
