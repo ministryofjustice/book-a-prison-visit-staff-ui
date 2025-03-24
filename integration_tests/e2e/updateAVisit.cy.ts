@@ -77,9 +77,16 @@ context('Update a visit', () => {
     ]
 
     cy.task('stubPrisonerById', prisoner)
-    cy.task('stubVisitHistory', visitHistoryDetails)
+    cy.task('stubVisitHistory', visitHistoryDetails) // TODO remove when visit update no longer uses this endpoint
     cy.task('stubPrisonerSocialContacts', { offenderNo, contacts, approvedVisitorsOnly: false })
-    cy.task('stubGetVisitNotifications', { reference: visitHistoryDetails.visit.reference })
+    cy.task(
+      'stubGetVisitDetailed',
+      TestData.visitBookingDetailsDto({
+        startTimestamp: originalVisit.startTimestamp,
+        endTimestamp: originalVisit.endTimestamp,
+        visitors: [contacts[0]],
+      }),
+    )
 
     // Visit details page
     cy.visit('/visit/ab-cd-ef-gh')
@@ -90,7 +97,7 @@ context('Update a visit', () => {
     // Start update journey
     cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
     cy.task('stubOffenderRestrictions', { offenderNo, offenderRestrictions: [] })
-    cy.task('stubPrisonerProfile', { prisonId, prisonerId: offenderNo, profile })
+    cy.task('stubPrisonerProfile', profile)
 
     visitDetailsPage.updateBooking().click()
 
@@ -249,7 +256,14 @@ context('Update a visit', () => {
     cy.task('stubPrisonerById', prisoner)
     cy.task('stubVisitHistory', visitHistoryDetails)
     cy.task('stubPrisonerSocialContacts', { offenderNo, contacts, approvedVisitorsOnly: false })
-    cy.task('stubGetVisitNotifications', { reference: visitHistoryDetails.visit.reference })
+    cy.task(
+      'stubGetVisitDetailed',
+      TestData.visitBookingDetailsDto({
+        startTimestamp: originalVisit.startTimestamp,
+        endTimestamp: originalVisit.endTimestamp,
+        visitors: [contacts[0]],
+      }),
+    )
 
     // Visit details page
     cy.visit('/visit/ab-cd-ef-gh')
@@ -260,7 +274,7 @@ context('Update a visit', () => {
     // Start update journey
     cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
     cy.task('stubOffenderRestrictions', { offenderNo, offenderRestrictions: [] })
-    cy.task('stubPrisonerProfile', { prisonId, prisonerId: offenderNo, profile })
+    cy.task('stubPrisonerProfile', profile)
     visitDetailsPage.updateBooking().click()
 
     // Confirm update page - check yes

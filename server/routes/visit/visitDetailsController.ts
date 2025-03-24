@@ -1,10 +1,9 @@
 import { RequestHandler } from 'express'
-import { AuditService, PrisonerSearchService, SupportedPrisonsService, VisitService } from '../../services'
-import eventAuditTypes from '../../constants/eventAuditTypes'
-import { Prisoner } from '../../data/prisonerOffenderSearchTypes'
+import { AuditService, VisitService } from '../../services'
 import { NotificationType } from '../../data/orchestrationApiTypes'
-import { notificationTypes, notificationTypeWarnings } from '../../constants/notificationEvents'
-import { requestMethodDescriptions } from '../../constants/requestMethods'
+import { notificationTypeWarnings } from '../../constants/notificationEvents'
+import { getDpsPrisonerAlertsUrl } from '../../utils/utils'
+import { getPrisonerLocation } from './visitUtils'
 
 export default class VisitDetailsController {
   private readonly A_DAY_IN_MS = 24 * 60 * 60 * 1000
@@ -18,8 +17,6 @@ export default class VisitDetailsController {
 
   public constructor(
     private readonly auditService: AuditService,
-    private readonly prisonerSearchService: PrisonerSearchService,
-    private readonly supportedPrisonsService: SupportedPrisonsService,
     private readonly visitService: VisitService,
   ) {}
 
@@ -31,80 +28,65 @@ export default class VisitDetailsController {
       const fromPageQuery = typeof req.query?.query === 'string' ? req.query.query : null
       const { username } = res.locals.user
 
-      const { visitHistoryDetails, visitors, notifications, additionalSupport } =
-        await this.visitService.getFullVisitDetails({
-          reference,
-          username,
-        })
-      const { visit } = visitHistoryDetails
+      const visitDetails = await this.visitService.getVisitDetailed({ username, reference })
+      const { prison, prisoner } = visitDetails
 
-      if (visit.prisonId !== req.session.selectedEstablishment.prisonId) {
-        const visitPrison = await this.supportedPrisonsService.getPrison(username, visit.prisonId)
-
-        return res.render('pages/visit/visitDetails', {
-          visit: { reference: visit.reference },
-          visitPrisonName: visitPrison.prisonName,
-        })
-      }
-
-      const [prisoner, supportedPrisonIds] = await Promise.all([
-        this.prisonerSearchService.getPrisonerById(visit.prisonerId, username),
-        this.supportedPrisonsService.getSupportedPrisonIds(username),
-      ])
-      const prisonerLocation = getPrisonerLocation(supportedPrisonIds, prisoner)
-
-      await this.auditService.viewedVisitDetails({
-        visitReference: reference,
-        prisonerId: visit.prisonerId,
-        prisonId: visit.prisonId,
-        username,
-        operationId: res.locals.appInsightsOperationId,
+      const prisonerLocation = getPrisonerLocation({
+        prisonId: prisoner.prisonId,
+        prisonName: prisoner.prisonName,
+        cellLocation: prisoner.cellLocation,
+        locationDescription: prisoner.locationDescription,
       })
 
       const nowTimestamp = new Date()
-      const visitStartTimestamp = new Date(visit.startTimestamp)
+      const visitStartTimestamp = new Date(visitDetails.startTimestamp)
       const chosenFutureInterval = new Date(
         visitStartTimestamp.getTime() + this.A_DAY_IN_MS * this.CANCELLATION_LIMIT_DAYS,
       )
 
       const showUpdateButton =
         nowTimestamp < visitStartTimestamp &&
-        !notifications.some(notification => this.NO_UPDATE_NOTIFICATION_TYPES.includes(notification))
+        !visitDetails.notifications.some(notification => this.NO_UPDATE_NOTIFICATION_TYPES.includes(notification.type))
       const showCancelButton = nowTimestamp < chosenFutureInterval
 
-      const filteredNotifications = notifications.filter(
-        notification => notification !== 'PRISON_VISITS_BLOCKED_FOR_DATE',
+      const filteredNotifications = visitDetails.notifications.filter(
+        notification => notification.type !== 'PRISON_VISITS_BLOCKED_FOR_DATE',
       )
       const showDoNotChangeButton = filteredNotifications.length > 0
 
-      const eventsTimeline = this.visitService.getVisitEventsTimeline(visitHistoryDetails.eventsAudit, visit)
+      const eventsTimeline = this.visitService.getVisitEventsTimeline({
+        events: visitDetails.events,
+        visitStatus: visitDetails.visitStatus,
+        visitNotes: visitDetails.visitNotes,
+      })
+
+      const showVisitDetails = req.session.selectedEstablishment.prisonId === prison.prisonId
+
+      await this.auditService.viewedVisitDetails({
+        visitReference: reference,
+        prisonerId: prisoner.prisonerNumber,
+        prisonId: prison.prisonId,
+        username,
+        operationId: res.locals.appInsightsOperationId,
+      })
 
       return res.render('pages/visit/visitDetails', {
-        prisoner,
-        prisonerLocation,
-        visit,
-        visitors,
-        notifications,
-        notificationTypeWarnings,
-        additionalSupport,
         fromPage,
         fromPageQuery,
+
         showUpdateButton,
         showCancelButton,
         showDoNotChangeButton,
-        requestMethodDescriptions,
-        eventAuditTypes,
-        notificationTypes,
+
+        notificationTypeWarnings,
+
         eventsTimeline,
+
+        prisonerLocation,
+        showVisitDetails,
+        prisonerDpsAlertsUrl: getDpsPrisonerAlertsUrl(visitDetails.prisoner.prisonerNumber),
+        visitDetails,
       })
     }
   }
-}
-
-// TODO duplicated from visit.ts - need to review
-function getPrisonerLocation(supportedPrisonIds: string[], prisoner: Prisoner) {
-  if (prisoner.prisonId === 'OUT') {
-    return prisoner.locationDescription
-  }
-  return supportedPrisonIds.includes(prisoner.prisonId) ? `${prisoner.cellLocation}, ${prisoner.prisonName}` : 'Unknown'
 }

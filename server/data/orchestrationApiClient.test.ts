@@ -9,7 +9,6 @@ import {
   ChangeApplicationDto,
   CreateApplicationDto,
   IgnoreVisitNotificationsDto,
-  NotificationType,
   PageVisitDto,
   PrisonDto,
   ExcludeDateDto,
@@ -135,6 +134,67 @@ describe('orchestrationApiClient', () => {
       const output = await orchestrationApiClient.getVisitHistory(rawVisitHistoryDetails.visit.reference)
 
       expect(output).toEqual(filteredVisitHistoryDetails)
+    })
+  })
+
+  describe('getVisitDetailed', () => {
+    afterEach(() => {
+      jest.restoreAllMocks()
+    })
+
+    it('should return full visit details for requested visit with filtered notification events', async () => {
+      jest.replaceProperty(config, 'features', {
+        ...config.features,
+        showPrisonerAlertsRestrictions: true,
+      })
+
+      const rawVisitBookingDetailsDto = TestData.visitBookingDetailsDto()
+
+      // add an audit event that should be filtered
+      rawVisitBookingDetailsDto.events.push({
+        type: 'PERSON_RESTRICTION_UPSERTED_EVENT',
+        applicationMethodType: 'NOT_KNOWN',
+        actionedByFullName: null,
+        userType: 'SYSTEM',
+        createTimestamp: '2022-01-01T09:00:00',
+      })
+
+      // add a notification that should be filtered
+      rawVisitBookingDetailsDto.notifications.push({
+        type: 'NON_ASSOCIATION_EVENT',
+        createdDateTime: '',
+        additionalData: [],
+      })
+
+      const filteredVisitBookingDetailsDto = TestData.visitBookingDetailsDto()
+
+      fakeOrchestrationApi
+        .get(`/visits/${rawVisitBookingDetailsDto.reference}/detailed`)
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, rawVisitBookingDetailsDto)
+
+      const output = await orchestrationApiClient.getVisitDetailed(rawVisitBookingDetailsDto.reference)
+
+      expect(output).toEqual(filteredVisitBookingDetailsDto)
+    })
+
+    it('should return visit details without prisoner alerts/restrictions if SHOW_VISIT_DETAILS_PRISONER_ALERTS_RESTRICTIONS not enabled', async () => {
+      jest.replaceProperty(config, 'features', {
+        ...config.features,
+        showPrisonerAlertsRestrictions: false,
+      })
+
+      const visitDetails = TestData.visitBookingDetailsDto()
+
+      fakeOrchestrationApi
+        .get(`/visits/${visitDetails.reference}/detailed`)
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, visitDetails)
+
+      const output = await orchestrationApiClient.getVisitDetailed(visitDetails.reference)
+
+      expect(output.prisoner.prisonerAlerts).toStrictEqual([])
+      expect(output.prisoner.prisonerRestrictions).toStrictEqual([])
     })
   })
 
@@ -416,11 +476,12 @@ describe('orchestrationApiClient', () => {
     ]
 
     afterEach(() => {
-      jest.resetAllMocks()
+      jest.restoreAllMocks()
     })
 
     it('should return filtered notification groups for given prison - no types allowed', async () => {
       jest.replaceProperty(config, 'features', {
+        ...config.features,
         notificationTypes: { enabledNotifications: [] },
       })
       orchestrationApiClient = new OrchestrationApiClient(token)
@@ -437,6 +498,7 @@ describe('orchestrationApiClient', () => {
 
     it('should return filtered notification groups for given prison - some types allowed', async () => {
       jest.replaceProperty(config, 'features', {
+        ...config.features,
         notificationTypes: {
           enabledNotifications: [
             'PRISONER_RELEASED_EVENT',
@@ -455,25 +517,6 @@ describe('orchestrationApiClient', () => {
       const output = await orchestrationApiClient.getNotificationGroups(prisonId)
 
       expect(output).toEqual([rawNotificationGroups[1], rawNotificationGroups[2]])
-    })
-  })
-
-  describe('getVisitNotifications', () => {
-    it('should return filtered notifications for a given visit reference', async () => {
-      const notifications: NotificationType[] = [
-        'NON_ASSOCIATION_EVENT', // should be filtered
-        'PRISONER_RELEASED_EVENT',
-        'PRISON_VISITS_BLOCKED_FOR_DATE',
-      ]
-
-      fakeOrchestrationApi
-        .get(`/visits/notification/visit/ab-cd-ef-gh/types`)
-        .matchHeader('authorization', `Bearer ${token}`)
-        .reply(200, notifications)
-
-      const output = await orchestrationApiClient.getVisitNotifications('ab-cd-ef-gh')
-
-      expect(output).toStrictEqual([notifications[1], notifications[2]])
     })
   })
 

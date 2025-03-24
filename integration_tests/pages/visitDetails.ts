@@ -40,6 +40,10 @@ export default class VisitDetailsPage extends Page {
 
   prisonerAge = (): PageElement => cy.get('[data-test="prisoner-age"]')
 
+  prisonerRestriction = (index: number): PageElement => cy.get(`[data-test="prisoner-restriction-${index}"]`)
+
+  prisonerAlert = (index: number): PageElement => cy.get(`[data-test="prisoner-alert-${index}"]`)
+
   // Buttons
   updateBooking = (): PageElement => cy.get('[data-test="update-visit"]')
 

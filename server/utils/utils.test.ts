@@ -11,6 +11,7 @@ import {
   getWeekOfDatesStartingMonday,
   isSameVisitSlot,
   initialiseName,
+  sortItemsByDateAsc,
 } from './utils'
 import getResultsPagingLinksTestData from './utils.testData'
 import { VisitSlot } from '../@types/bapv'
@@ -242,5 +243,25 @@ describe('initialise name', () => {
     ['Double barrelled', 'Robert-John Smith-Jones-Wilson', 'R. Smith-Jones-Wilson'],
   ])('%s initialiseName(%s, %s)', (_: string, a: string, expected: string) => {
     expect(initialiseName(a)).toEqual(expected)
+  })
+})
+
+describe('sortItemsByDateAsc', () => {
+  type Item = { date: string }
+
+  it('should sort objects in place by ascending date order, given object type and field containing date strings', () => {
+    const firstDate: Item = { date: '2025-01-01' }
+    const nextDate: Item = { date: '2025-02-01' }
+    const lastDate: Item = { date: '2025-03-01' }
+    const emptyDate: Item = { date: '' }
+    const invalidDate: Item = { date: 'not a date' }
+    const undefinedDate: Item = { date: undefined }
+    const wrongTypeDate = { date: [1] } as unknown as Item
+
+    const items: Item[] = [emptyDate, invalidDate, undefinedDate, wrongTypeDate, lastDate, nextDate, firstDate]
+
+    const result = sortItemsByDateAsc<Item, 'date'>(items, 'date')
+
+    expect(result).toStrictEqual([firstDate, nextDate, lastDate, emptyDate, invalidDate, undefinedDate, wrongTypeDate])
   })
 })

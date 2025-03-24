@@ -1,7 +1,13 @@
 import { NotFound } from 'http-errors'
 import { format, isBefore } from 'date-fns'
 import { PrisonerProfilePage } from '../@types/bapv'
-import { nextIepAdjustDate, nextPrivIepAdjustDate, prisonerDateTimePretty, properCaseFullName } from '../utils/utils'
+import {
+  nextIepAdjustDate,
+  nextPrivIepAdjustDate,
+  prisonerDateTimePretty,
+  properCaseFullName,
+  sortItemsByDateAsc,
+} from '../utils/utils'
 import { Alert, OffenderRestriction } from '../data/prisonApiTypes'
 import { HmppsAuthClient, OrchestrationApiClient, PrisonApiClient, RestClientBuilder } from '../data'
 
@@ -19,10 +25,9 @@ export default class PrisonerProfileService {
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
     const prisonerProfile = await orchestrationApiClient.getPrisonerProfile(prisonId, prisonerId)
 
-    const alerts = prisonerProfile.alerts || []
-    const activeAlerts: Alert[] = alerts.filter(alert => alert.active)
-    const activeAlertCount = activeAlerts.length
-    const flaggedAlerts: Alert[] = activeAlerts.filter(alert => this.alertCodesToFlag.includes(alert.alertCode))
+    const { alerts } = prisonerProfile
+    sortItemsByDateAsc<Alert, 'dateExpires'>(alerts, 'dateExpires')
+    const flaggedAlerts: Alert[] = alerts.filter(alert => this.alertCodesToFlag.includes(alert.alertCode))
 
     const visitsByMonth: PrisonerProfilePage['visitsByMonth'] = new Map()
     const now = new Date()
@@ -72,8 +77,7 @@ export default class PrisonerProfileService {
     }
 
     return {
-      activeAlerts,
-      activeAlertCount,
+      alerts,
       flaggedAlerts,
       prisonerDetails,
       visitsByMonth,

@@ -6,7 +6,7 @@ import asyncMiddleware from '../middleware/asyncMiddleware'
 import { isValidPrisonerNumber } from './validationChecks'
 import { clearSession } from './visitorUtils'
 import type { Services } from '../services'
-import config from '../config'
+import { getDpsPrisonerAlertsUrl } from '../utils/utils'
 
 export default function routes({ auditService, prisonerProfileService }: Services): Router {
   const router = Router()
@@ -29,13 +29,11 @@ export default function routes({ auditService, prisonerProfileService }: Service
       operationId: res.locals.appInsightsOperationId,
     })
 
-    const prisonerDpsAlertsUrl = `${config.dpsPrisoner}prisoner/${prisonerId}/alerts/active`
-
     return res.render('pages/prisoner/profile', {
       errors: req.flash('errors'),
       ...prisonerProfile,
       queryParamsForBackLink,
-      prisonerDpsAlertsUrl,
+      prisonerDpsAlertsUrl: getDpsPrisonerAlertsUrl(prisonerId),
     })
   })
 
@@ -44,7 +42,7 @@ export default function routes({ auditService, prisonerProfileService }: Service
     const { prisonId } = req.session.selectedEstablishment
     const { username } = res.locals.user
 
-    const [{ prisonerDetails, activeAlerts }, restrictions] = await Promise.all([
+    const [{ prisonerDetails, alerts }, restrictions] = await Promise.all([
       prisonerProfileService.getProfile(prisonId, offenderNo, username),
       prisonerProfileService.getRestrictions(offenderNo, username),
     ])
@@ -75,9 +73,8 @@ export default function routes({ auditService, prisonerProfileService }: Service
     visitSessionData.prisoner = {
       name: prisonerDetails.name,
       offenderNo,
-      dateOfBirth: prisonerDetails.dateOfBirth,
       location: prisonerDetails.cellLocation ? `${prisonerDetails.cellLocation}, ${prisonerDetails.prisonName}` : '',
-      activeAlerts,
+      alerts,
       restrictions,
     }
 

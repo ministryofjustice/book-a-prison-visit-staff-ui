@@ -15,6 +15,7 @@ import {
   VisitPreview,
   VisitSession,
   VisitSummary,
+  VisitBookingDetailsDto,
 } from '../../data/orchestrationApiTypes'
 import { OffenderRestriction } from '../../data/prisonApiTypes'
 import { CurrentIncentive, Prisoner } from '../../data/prisonerOffenderSearchTypes'
@@ -452,6 +453,94 @@ export default class TestData {
       createdTimestamp,
       modifiedTimestamp,
     }) as Visit
+
+  static visitBookingDetailsDto = ({
+    reference = 'ab-cd-ef-gh',
+    visitRoom = 'Visit room 1',
+    visitStatus = 'BOOKED',
+    outcomeStatus = null,
+    visitRestriction = 'OPEN',
+    startTimestamp = '2022-01-14T10:00:00',
+    endTimestamp = '2022-01-14T11:00:00',
+    visitNotes = [],
+    visitContact = {
+      visitContactId: 4321,
+      name: 'Jeanette Smith',
+      telephone: '01234 567890',
+      email: 'visitor@example.com',
+    },
+    visitorSupport = { description: 'Wheelchair ramp' },
+    prison = {
+      prisonId: 'HEI',
+      prisonName: 'Hewell (HMP)',
+      active: true,
+    },
+    prisoner = {
+      prisonerNumber: 'A1234BC',
+      firstName: 'JOHN',
+      lastName: 'SMITH',
+      dateOfBirth: '1975-04-02',
+      prisonId: 'HEI',
+      prisonName: 'Hewell (HMP)',
+      cellLocation: '1-1-C-028',
+      locationDescription: undefined,
+      prisonerAlerts: [this.alert()],
+      prisonerRestrictions: [this.offenderRestriction()],
+    },
+    visitors = [
+      {
+        personId: 4321,
+        firstName: 'Jeanette',
+        lastName: 'Smith',
+        dateOfBirth: '1986-07-28',
+        relationshipDescription: 'WIFE',
+        restrictions: [
+          {
+            restrictionType: 'CLOSED',
+            restrictionTypeDescription: 'Closed',
+            globalRestriction: false,
+            startDate: '2022-01-11',
+            expiryDate: '2023-02-13',
+            comment: 'closed comment text',
+          },
+        ],
+        primaryAddress: {
+          street: '123 The Street',
+          town: 'Coventry',
+          primary: true,
+          noFixedAddress: false,
+          phones: [],
+          addressUsages: [],
+        },
+      },
+    ],
+    events = [
+      {
+        type: 'BOOKED_VISIT',
+        applicationMethodType: 'PHONE',
+        actionedByFullName: 'User One',
+        userType: 'STAFF',
+        createTimestamp: '2022-01-01T09:00:00',
+      },
+    ],
+    notifications = [],
+  }: Partial<VisitBookingDetailsDto> = {}): VisitBookingDetailsDto => ({
+    reference,
+    visitRoom,
+    visitStatus,
+    outcomeStatus,
+    visitRestriction,
+    startTimestamp,
+    endTimestamp,
+    visitNotes,
+    visitContact,
+    visitorSupport,
+    prison,
+    prisoner,
+    visitors,
+    events,
+    notifications,
+  })
 
   static visitHistoryDetails = ({
     eventsAudit = [

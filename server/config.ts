@@ -141,6 +141,7 @@ export default {
         ).split(',')
       ),
     },
+    showPrisonerAlertsRestrictions: get('SHOW_VISIT_DETAILS_PRISONER_ALERTS_RESTRICTIONS', 'false') === 'true',
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
   environmentName: get('ENVIRONMENT_NAME', ''),

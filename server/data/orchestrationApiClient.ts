@@ -11,7 +11,6 @@ import {
   IsExcludeDateDto,
   NotificationCount,
   NotificationGroup,
-  NotificationType,
   PageVisitDto,
   PrisonDto,
   PrisonerProfile,
@@ -24,6 +23,7 @@ import {
   VisitRestriction,
   VisitSession,
   EventAuditType,
+  VisitBookingDetailsDto,
 } from './orchestrationApiTypes'
 import { Prison, VisitSessionData } from '../@types/bapv'
 
@@ -88,6 +88,24 @@ export default class OrchestrationApiClient {
       eventsAudit: eventsAudit.filter(event => this.enabledVisitHistoryEvents.includes(event.type)),
       visit,
     }
+  }
+
+  async getVisitDetailed(reference: string): Promise<VisitBookingDetailsDto> {
+    const visitDetails = await this.restClient.get<VisitBookingDetailsDto>({
+      path: `/visits/${reference}/detailed`,
+    })
+
+    visitDetails.events = visitDetails.events.filter(event => this.enabledVisitHistoryEvents.includes(event.type))
+    visitDetails.notifications = visitDetails.notifications.filter(notification =>
+      this.enabledNotifications.includes(notification.type),
+    )
+
+    if (!config.features.showPrisonerAlertsRestrictions) {
+      visitDetails.prisoner.prisonerAlerts = []
+      visitDetails.prisoner.prisonerRestrictions = []
+    }
+
+    return visitDetails
   }
 
   async getVisitsBySessionTemplate(
@@ -210,14 +228,6 @@ export default class OrchestrationApiClient {
     })
 
     return notificationGroups.filter(notification => this.enabledNotifications.includes(notification.type))
-  }
-
-  async getVisitNotifications(reference: string): Promise<NotificationType[]> {
-    const notifications = await this.restClient.get<NotificationType[]>({
-      path: `/visits/notification/visit/${reference}/types`,
-    })
-
-    return notifications.filter(notification => this.enabledNotifications.includes(notification))
   }
 
   // orchestration-prisons-exclude-date-controller

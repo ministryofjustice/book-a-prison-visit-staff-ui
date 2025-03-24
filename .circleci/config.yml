@@ -28,35 +28,6 @@ parameters:
     default: 22.14-browsers
 
 jobs:
-  acceptance_tests:
-    docker:
-      - image: maven:3.9.5-eclipse-temurin-21
-      - image: seleniarm/standalone-chromium
-        environment:
-          CHROME_HEADLESS: 1
-    circleci_ip_ranges: true
-    steps:
-      - run:
-          name: Checkout VSIP UI Tests
-          command: |
-            git clone https://github.com/ministryofjustice/hmpps-vsip-ui-tests.git
-      - run:
-          name: get git status
-          command: |
-            cd hmpps-vsip-ui-tests
-            git checkout main
-            git status
-      - run:
-          name: Change to project directory then clean install
-          command: |
-            cd hmpps-vsip-ui-tests
-            mvn -f pom.xml clean install -Dmaven.test.skip=true
-      - run:
-          name: Change to project directory and run tests
-          command: |
-            cd hmpps-vsip-ui-tests
-            mvn test -Dbrowser=remote-chrome -Dspring.profiles.active="staging" -Dtest=uk.gov.justice.digital.hmpps.vsip.suites.RunSuite
-
   acceptance_tests_staff_playwright-e2e:
     docker:
       - image: mcr.microsoft.com/playwright:v1.51.0-jammy
@@ -233,16 +204,6 @@ workflows:
           requires:
             - request-staging-preview-approval
 
-      - request-acceptance-tests-preview-approval:
-          <<: *feature_branch
-          type: approval
-          requires:
-            - deploy_staging_preview
-      - acceptance_tests:
-          <<: *feature_branch
-          requires:
-            - request-acceptance-tests-preview-approval
-
       - request-acceptance-tests-preview-staff-playwright-approval:
           <<: *feature_branch
           type: approval
@@ -295,16 +256,6 @@ workflows:
             - unit_test
             - integration_test
             - build_docker
-
-      - request-acceptance-tests-approval:
-          <<: *main_branch
-          type: approval
-          requires:
-            - deploy_staging
-      - acceptance_tests:
-          <<: *main_branch
-          requires:
-            - request-acceptance-tests-approval
 
       - request-acceptance-tests-staff-playwright-approval:
           <<: *main_branch

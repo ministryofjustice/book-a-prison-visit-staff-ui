@@ -37,7 +37,6 @@ testJourneys.forEach(journey => {
         prisoner: {
           name: 'prisoner name',
           offenderNo: 'A1234BC',
-          dateOfBirth: '25 May 1988',
           location: 'location place',
         },
         visitRestriction: 'OPEN',
@@ -184,7 +183,6 @@ testJourneys.forEach(journey => {
         prisoner: {
           name: 'prisoner name',
           offenderNo: 'A1234BC',
-          dateOfBirth: '25 May 1988',
           location: 'location place',
         },
         visitRestriction: 'OPEN',

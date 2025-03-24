@@ -11,6 +11,7 @@ import {
   subWeeks,
 } from 'date-fns'
 import { VisitSlot } from '../@types/bapv'
+import config from '../config'
 
 export const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
@@ -173,4 +174,24 @@ export const initialiseName = (fullName?: string): string | null => {
 
   const array = fullName.split(' ')
   return `${array[0][0]}. ${array.reverse()[0]}`
+}
+
+export const getDpsPrisonerAlertsUrl = (offenderNo: string): string => {
+  return `${config.dpsPrisoner}prisoner/${offenderNo}/alerts/active`
+}
+
+export const sortItemsByDateAsc = <Type, Key extends keyof Type>(items: Type[], dateField: Key): Type[] => {
+  return items.sort((a, b) => {
+    const dateA = typeof a[dateField] === 'string' ? new Date(a[dateField]).getTime() : NaN
+    const dateB = typeof b[dateField] === 'string' ? new Date(b[dateField]).getTime() : NaN
+
+    // both dates invalid: preserve order
+    if (Number.isNaN(dateA) && Number.isNaN(dateB)) return 0
+    // one date invalid: put at the end
+    if (Number.isNaN(dateA)) return 1
+    if (Number.isNaN(dateB)) return -1
+
+    // both dates valid: sort ascending
+    return dateA - dateB
+  })
 }

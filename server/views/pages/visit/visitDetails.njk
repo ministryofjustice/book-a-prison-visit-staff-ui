@@ -3,10 +3,11 @@
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {%-from "moj/components/banner/macro.njk" import mojBanner %}
 {%- from "moj/components/timeline/macro.njk" import mojTimeline -%}
+{%- from "components/expandableComment/macro.njk" import bapvExpandableComment -%}
 
-{% set pageHeaderTitle = "Visit booking details (" + visit.reference + ")" %}
+{% set pageHeaderTitle = "Visit booking details (" + visitDetails.reference + ")" %}
 
-{% if prisoner %}
+{% if showVisitDetails %}
   {% if fromPage == "visit-search" %}
     {% set backLinkHref = "/search/visit/results?" + fromPageQuery %}
   {% elseif fromPage == "visits" %}
@@ -14,7 +15,7 @@
   {% elseif fromPage == "review" %}
     {% set backLinkHref = "/review" %}
   {% else %}
-    {% set backLinkHref = "/prisoner/" + visit.prisonerId %}
+    {% set backLinkHref = "/prisoner/" + visitDetails.prisoner.prisonerNumber %}
   {% endif %}
 {% else %}
   {% set backLinkHref = "/" %}
@@ -25,10 +26,10 @@
 {% block content %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
-    {% if prisoner %}
-      {% if visit.visitStatus === "CANCELLED" %}
+    {% if showVisitDetails %}
+      {% if visitDetails.visitStatus === "CANCELLED" %}
 
-        {% set status = visit.outcomeStatus.split("_") %}
+        {% set status = visitDetails.outcomeStatus.split("_") %}
 
         {% set cancelledBy %}
           {% if status[0] === 'ADMINISTRATIVE' %}
@@ -56,12 +57,12 @@
         }) }}
       {% endif %}
 
-      {%if notifications | length %}
-        {% for notification in notifications %}
+      {%if visitDetails.notifications | length %}
+        {% for notification in visitDetails.notifications %}
           {% set visitNotificationBannerHtml %}
             {{ govukWarningText({
               classes: "govuk-!-margin-bottom-0 govuk-!-padding-left-4",
-              html: '<span data-test="visit-notification">' + (notificationTypeWarnings[notification] | default(notification)) + "</span>",
+              html: '<span data-test="visit-notification">' + (notificationTypeWarnings[notification.type] | default(notification.type)) + "</span>",
               iconFallbackText: "Warning"
             }) }}
           {% endset %}
@@ -78,48 +79,48 @@
       <div class="govuk-grid-row bapv-visit-details__summary">
         <div class="govuk-grid-column-one-half">
           <ul class="govuk-list govuk-list--spaced">
-            <li data-test="visit-date">{{ visit.startTimestamp | formatDate("EEEE d MMMM yyyy") }}</li>
+            <li data-test="visit-date">{{ visitDetails.startTimestamp | formatDate("EEEE d MMMM yyyy") }}</li>
 
             <li>
-              <span data-test="visit-time">{{ visit.startTimestamp | formatTime + " to " + visit.endTimestamp | formatTime }}</span> –
-              <span data-test="visit-room">{{ visit.visitRoom }}</span>
+              <span data-test="visit-time">{{ visitDetails.startTimestamp | formatTime + " to " + visitDetails.endTimestamp | formatTime }}</span> –
+              <span data-test="visit-room">{{ visitDetails.visitRoom }}</span>
             </li>
 
-            <li data-test="visit-type">{{ visit.visitRestriction | capitalize }} visit</li>
+            <li data-test="visit-type">{{ visitDetails.visitRestriction | capitalize }} visit</li>
           </ul>
         </div>
 
         <div class="govuk-grid-column-one-half">
           <dl class="govuk-list">
             <dt>Main contact</dt>
-            <dd data-test="visit-contact">{{ visit.visitContact.name }}</dd>
+            <dd data-test="visit-contact">{{ visitDetails.visitContact.name }}</dd>
             
             <dt>Contact details</dt>
             <dd>
-              {%- if visit.visitContact.telephone -%}
-                <span data-test="visit-phone">{{ visit.visitContact.telephone }}</span>
+              {%- if visitDetails.visitContact.telephone -%}
+                <span data-test="visit-phone">{{ visitDetails.visitContact.telephone }}</span>
               {%- endif -%}
-              {%- if visit.visitContact.email -%}
-                {%- if visit.visitContact.telephone %}<br>{% endif %}
-                <span data-test="visit-email">{{ visit.visitContact.email }}</span>
+              {%- if visitDetails.visitContact.email -%}
+                {%- if visitDetails.visitContact.telephone %}<br>{% endif %}
+                <span data-test="visit-email">{{ visitDetails.visitContact.email }}</span>
               {%- endif -%}
-              {%- if not visit.visitContact.telephone and not visit.visitContact.email -%}
+              {%- if not visitDetails.visitContact.telephone and not visitDetails.visitContact.email -%}
                 <span data-test="visit-no-contact-details">No contact details provided</span>
               {%- endif -%}
             </dd>
 
             <dt>Booking reference</dt>
-            <dd data-test="reference">{{ visit.reference }}</dd>
+            <dd data-test="reference">{{ visitDetails.reference }}</dd>
 
             <dt>Additional support</dt>
-            <dd data-test="additional-support">{{ additionalSupport | default("None", true) }}</dd>
+            <dd data-test="additional-support">{{ visitDetails.visitorSupport.description | default("None", true) }}</dd>
           </dl>
         </div>
       </div>
 
       <div class="govuk-button-group">
-        {% if visit.visitStatus === 'BOOKED' %}
-          <form action="/visit/{{ visit.reference }}" method="POST" novalidate>
+        {% if visitDetails.visitStatus === 'BOOKED' %}
+          <form action="/visit/{{ visitDetails.reference }}" method="POST" novalidate>
             <input type="hidden" name="_csrf" value="{{ csrfToken }}">
             {% if showUpdateButton %}
               {{ govukButton({
@@ -133,7 +134,7 @@
               {{ govukButton({
                 text: "Cancel booking",
                 classes: "govuk-!-margin-top-5 govuk-button--secondary",
-                href: "/visit/" + visit.reference + "/cancel",
+                href: "/visit/" + visitDetails.reference + "/cancel",
                 attributes: { "data-test": "cancel-visit" },
                 preventDoubleClick: true
               }) }}
@@ -142,7 +143,7 @@
               {{ govukButton({
                 text: "Do not change",
                 classes: "govuk-!-margin-top-5 govuk-button--secondary",
-                href: "/visit/" + visit.reference + "/clear-notifications",
+                href: "/visit/" + visitDetails.reference + "/clear-notifications",
                 attributes: { "data-test": "clear-notifications" },
                 preventDoubleClick: true
               }) }}
@@ -155,11 +156,11 @@
 
       <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-          <h2 class="govuk-heading-l bapv-heading govuk-!-padding-top-3">Prisoner</h2>
-          <h3 class="govuk-heading-m bapv-heading">
-            <span data-test="prisoner-name">{{ (prisoner.firstName + " " + prisoner.lastName) | properCaseFullName }}</span>
+          <h2 class="govuk-heading-l govuk-!-padding-top-3">Prisoner</h2>
+          <h3 class="govuk-heading-m">
+            <span data-test="prisoner-name">{{ (visitDetails.prisoner.firstName + " " + visitDetails.prisoner.lastName) | properCaseFullName }}</span>
             <span class="govuk-body" >
-              (<span data-test="prisoner-number">{{ prisoner.prisonerNumber }}</span>)
+              (<span data-test="prisoner-number">{{ visitDetails.prisoner.prisonerNumber }}</span>)
             </span>
           </h3>
           <dl class="govuk-list">
@@ -168,15 +169,67 @@
 
             <dt>Date of birth</dt>
             <dd>
-              <span data-test="prisoner-dob">{{ prisoner.dateOfBirth | formatDate }}</span>
-              (<span data-test="prisoner-age">{{ prisoner.dateOfBirth | displayAge }}</span>)
+              <span data-test="prisoner-dob">{{ visitDetails.prisoner.dateOfBirth | formatDate }}</span>
+              (<span data-test="prisoner-age">{{ visitDetails.prisoner.dateOfBirth | displayAge }}</span>)
             </dd>
           </dl>
 
-          <h2 class="govuk-heading-l bapv-heading">Visitors</h2>
-          {% for visitor in visitors %}
-            <h3 class="govuk-heading-m bapv-heading">
-              <span data-test="visitor-name-{{ loop.index }}">{{ visitor.name }}</span>
+          {% if visitDetails.prisoner.prisonerRestrictions | length %}
+            <h4 class="govuk-heading-s">Restrictions</h4>
+            {% for restriction in visitDetails.prisoner.prisonerRestrictions %}
+              <p class="bapv-visit-details__restriction">
+                <span>
+                  <span class="govuk-tag restriction-tag restriction-tag--{{ restriction.restrictionType }}"
+                    data-test="prisoner-restriction-{{ loop.index }}">
+                    {{- restriction.restrictionTypeDescription -}}
+                  </span>
+                </span>
+                <span class="bapv-visit-details__restriction-dates">From <span data-test="prisoner-restriction-{{ loop.index }}-start">{{ restriction.startDate | formatDate }}</span>
+                  {%- if restriction.expiryDate %} to {% else %}.{% endif %}
+                  <span data-test="prisoner-restriction-{{ loop.index }}-end">
+                    {{- restriction.expiryDate | formatDate | default("No end date", true) -}}
+                  </span>.
+                </span>
+              </p>
+              {% if restriction.comment %}
+                <p data-test="prisoner-restriction-{{ loop.index }}-text">{{ restriction.comment }}</p>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+
+          {% if visitDetails.prisoner.prisonerAlerts | length %}
+            <h4 class="govuk-heading-s">Alerts</h4>
+            <p>
+              This page shows alerts that are relevant for social visits. You can also
+              <a class="govuk-link--no-visited-state" href="{{ prisonerDpsAlertsUrl }}" target="_blank" data-test="all-alerts-link">view all alerts</a>.
+            </p>
+            {% for alert in visitDetails.prisoner.prisonerAlerts %}
+              <p class="bapv-visit-details__restriction">
+                <span>
+                  <span class="govuk-tag alert-tag alert-tag--{{ alert.alertType }}"
+                    data-test="prisoner-alert-{{ loop.index }}">
+                    {{- alert.alertTypeDescription -}}
+                  </span>
+                </span>
+                <span class="bapv-visit-details__restriction-dates">From <span data-test="prisoner-alert-{{ loop.index }}-start">{{ alert.dateCreated | formatDate }}</span>
+                  {%- if alert.dateExpires %} to {% else %}.{% endif %}
+                  <span data-test="prisoner-alert-{{ loop.index }}-end">
+                    {{- alert.dateExpires | formatDate | default("No end date", true) -}}
+                  </span>.
+                </span>
+              </p>
+              {% if alert.comment %}
+                <div class="govuk-body" data-test="prisoner-alert-{{ loop.index }}-text">
+                  {{- bapvExpandableComment({ text: alert.comment }) -}}
+                </div>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+
+          <h2 class="govuk-heading-l">Visitors</h2>
+          {% for visitor in visitDetails.visitors %}
+            <h3 class="govuk-heading-m">
+              <span data-test="visitor-name-{{ loop.index }}">{{ visitor.firstName }} {{ visitor.lastName }}</span>
               <span>
                 (<span data-test="visitor-relation-{{ loop.index }}">{{ visitor.relationshipDescription | lower }}</span>)
               </span>
@@ -189,7 +242,7 @@
               </dd>
 
               <dt>Address</dt>
-              <dd data-test="visitor-address-{{ loop.index }}">{{ visitor.address }}</dd>
+              <dd data-test="visitor-address-{{ loop.index }}">{{ visitor.primaryAddress | formatAddress }}</dd>
             </dl>
 
             {% set visitorIndex = loop.index %}
@@ -204,17 +257,17 @@
                 <span class="bapv-visit-details__restriction-dates">From <span data-test="visitor-{{ visitorIndex }}-restriction-{{ loop.index }}-start">{{ restriction.startDate | formatDate }}</span>
                   {%- if restriction.expiryDate %} to {% else %}.{% endif %}
                   <span data-test="visitor-{{ visitorIndex }}-restriction-{{ loop.index }}-end">
-                    {%- if restriction.expiryDate %}{{ restriction.expiryDate | formatDate }}{% else %}End date not entered{% endif -%}
+                    {{- restriction.expiryDate | formatDate | default("No end date", true) -}}
                   </span>.
                 </span>
               </p>
               {% if restriction.comment %}
-                <p class="bapv-force-overflow" data-test="visitor-{{ visitorIndex }}-restriction-text-{{ loop.index }}">{{ restriction.comment }}</p>
+                <p class="bapv-force-overflow" data-test="visitor-{{ visitorIndex }}-restriction-{{ loop.index }}-text">{{ restriction.comment }}</p>
               {% endif %}
             {% endfor %}
           {% endfor %}
 
-          <h2 class="govuk-heading-l bapv-heading">Booking history</h2>
+          <h2 class="govuk-heading-l">Booking history</h2>
           {{ mojTimeline({
             headingLevel: 3,
             items: eventsTimeline
@@ -224,13 +277,17 @@
 
     {% else %}
       <h1 class="govuk-heading-l">Visit booking details</h1>
-      <p>Booking reference: <span data-test="reference">{{ visit.reference }}</span></p>
+      <p>Booking reference: <span data-test="reference">{{ visitDetails.reference }}</span></p>
       <p>This booking is not for {{ selectedEstablishment.prisonName }}.</p>
-      <p>To view the booking, change the establishment to {{ visitPrisonName }} and search for it by the booking reference.</p>
+      <p>To view the booking, change the establishment to {{ visitDetails.prison.prisonName }} and search for it by the booking reference.</p>
     {% endif %}
 
   </div>
 </div>
 
 
+{% endblock %}
+
+{% block pageScripts %}
+  <script src="/assets/components/expandableComment.js"></script>
 {% endblock %}

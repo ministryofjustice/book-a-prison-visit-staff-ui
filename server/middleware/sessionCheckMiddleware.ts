@@ -27,7 +27,6 @@ export default function sessionCheckMiddleware({ stage }: { stage: number }): Re
       !visitSessionData.prisoner ||
       !visitSessionData.prisoner.name ||
       !isValidPrisonerNumber(visitSessionData.prisoner.offenderNo || '') ||
-      !visitSessionData.prisoner.dateOfBirth ||
       !visitSessionData.prisoner.location
     ) {
       return logAndRedirect(req, res, '/search/prisoner/?error=missing-prisoner')
