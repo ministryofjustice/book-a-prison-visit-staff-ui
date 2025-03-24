@@ -1,7 +1,6 @@
 import { OffenderRestriction } from '../data/prisonApiTypes'
 import {
   ApplicationMethodType,
-  ApplicationValidationErrorResponse,
   NotificationType,
   PrisonDto,
   PrisonerProfile,
@@ -123,7 +122,18 @@ export type VisitSessionData = {
   requestMethod?: ApplicationMethodType
   daysUntilBanExpiry?: number
   overrideBookingWindow?: boolean
-  validationError?: ApplicationValidationErrorResponse['validationErrors'][number]
+  validationError?: {
+    title: string
+    message: string
+    type: string
+  }
+}
+
+export type MojAlert = {
+  title: string
+  text: string
+  variant: 'warning' | 'error' | 'information' | 'success'
+  showTitleAsHeading: boolean
 }
 
 export type VisitInformation = {
@@ -145,7 +155,7 @@ export type VisitsPageSideNavItem = {
 
 export type VisitsPageSideNav = Map<string, VisitsPageSideNavItem[]>
 
-export type FlashData = Record<string, string | string[] | Record<string, string | string[]>[]>
+export type FlashData = Record<string, string | string[] | Record<string, string | string[]>[] | MojAlert>
 
 export type VisitsReviewListItem = {
   actionUrl: string

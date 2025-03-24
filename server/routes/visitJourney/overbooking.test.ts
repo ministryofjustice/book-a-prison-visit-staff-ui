@@ -81,7 +81,7 @@ testJourneys.forEach(journey => {
       // visit reference only known on update journey
       visitSessionData.visitReference = journey.isUpdate ? 'ab-cd-ef-gh' : undefined
 
-      flashData = { errors: [], formValues: [] }
+      flashData = { errors: [], formValues: [], messages: undefined }
       flashProvider.mockImplementation((key: keyof FlashData) => {
         return flashData[key]
       })
@@ -241,7 +241,7 @@ testJourneys.forEach(journey => {
 
   describe(`${journey.urlPrefix}/check-your-booking/overbooking`, () => {
     beforeEach(() => {
-      flashData = { errors: [], formValues: [] }
+      flashData = { errors: [], formValues: [], messages: undefined }
       flashProvider.mockImplementation((key: keyof FlashData) => {
         return flashData[key]
       })
@@ -295,7 +295,6 @@ testJourneys.forEach(journey => {
         // visit reference only known on update journey
         visitReference: journey.isUpdate ? 'ab-cd-ef-gh' : undefined,
         requestMethod: 'BY_PRISONER',
-        validationError: 'APPLICATION_INVALID_NO_SLOT_CAPACITY',
       }
 
       sessionApp = appWithAllRoutes({
@@ -310,6 +309,12 @@ testJourneys.forEach(journey => {
       it('should render the confirm overbooking page with all session information (Open)', () => {
         const visitSession = TestData.visitSession({ openVisitBookedCount: 20, openVisitCapacity: 20 })
         visitSessionsService.getSingleVisitSession.mockResolvedValue(visitSession)
+        flashData.messages = {
+          text: 'Select whether to book for this time or choose a new visit time.',
+          showTitleAsHeading: true,
+          title: 'Another person has booked the last table.',
+          variant: 'warning',
+        }
         return request(sessionApp)
           .get(`${journey.urlPrefix}/check-your-booking/overbooking`)
           .expect(200)
@@ -375,7 +380,8 @@ testJourneys.forEach(journey => {
             expect($('.govuk-error-summary__body a').attr('href')).toBe('#confirmOverBooking-error')
             expect($('#confirmOverBooking-error').text()).toContain('No answer selected')
             expect(flashProvider).toHaveBeenCalledWith('errors')
-            expect(flashProvider).toHaveBeenCalledTimes(1)
+            expect(flashProvider).toHaveBeenCalledWith('messages')
+            expect(flashProvider).toHaveBeenCalledTimes(2)
           })
       })
     })

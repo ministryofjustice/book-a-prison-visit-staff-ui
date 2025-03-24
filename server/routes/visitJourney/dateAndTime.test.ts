@@ -82,7 +82,7 @@ const visitSlot4: VisitSlot = {
 }
 
 beforeEach(() => {
-  flashData = { errors: [], formValues: [] }
+  flashData = { errors: [], formValues: [], messages: undefined }
   flashProvider.mockImplementation((key: keyof FlashData) => {
     return flashData[key]
   })
@@ -342,30 +342,18 @@ testJourneys.forEach(journey => {
             expect($('.govuk-error-summary__body a').attr('href')).toBe('#visit-date-and-time-error')
             expect(flashProvider).toHaveBeenCalledWith('errors')
             expect(flashProvider).toHaveBeenCalledWith('formValues')
-            expect(flashProvider).toHaveBeenCalledTimes(2)
+            expect(flashProvider).toHaveBeenCalledWith('messages')
+            expect(flashProvider).toHaveBeenCalledTimes(3)
           })
       })
 
       it('should render error from 422 errors - non association', () => {
-        visitSessionData.validationError = 'APPLICATION_INVALID_NON_ASSOCIATION_VISITS'
-        visitSessionData.visitSlot = {
-          id: '3',
-          sessionTemplateReference: 'v9d.7ed.7u3',
-          prisonId,
-          startTimestamp: '2022-02-14T12:00:00',
-          endTimestamp: '2022-02-14T13:05:00',
-          availableTables: 5,
-          capacity: 30,
-          visitRoom: 'room name',
-          visitRestriction: 'OPEN',
+        flashData.messages = {
+          text: 'Select whether to book for this time or choose a new visit time.',
+          showTitleAsHeading: true,
+          title: 'Another person has booked the last table.',
+          variant: 'warning',
         }
-
-        sessionApp = appWithAllRoutes({
-          services: { visitSessionsService },
-          sessionData: {
-            visitSessionData,
-          } as SessionData,
-        })
 
         return request(sessionApp)
           .get(`${journey.urlPrefix}/select-date-and-time`)
@@ -375,44 +363,8 @@ testJourneys.forEach(journey => {
             const $ = cheerio.load(res.text)
             expect($('h1').text().trim()).toBe('Select date and time of visit')
             expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
-            expect($('.moj-alert__content h2').text()).toContain('John Smith now has a non-association on 14 February.')
-            expect($('.moj-alert').text()).toContain('Select a new visit time.')
-          })
-      })
-
-      it('should render error from 422 errors - visit already booked', () => {
-        visitSessionData.validationError = 'APPLICATION_INVALID_VISIT_ALREADY_BOOKED'
-        visitSessionData.visitSlot = {
-          id: '3',
-          sessionTemplateReference: 'v9d.7ed.7u3',
-          prisonId,
-          startTimestamp: '2022-02-14T12:00:00',
-          endTimestamp: '2022-02-14T13:05:00',
-          availableTables: 5,
-          capacity: 30,
-          visitRoom: 'room name',
-          visitRestriction: 'OPEN',
-        }
-
-        sessionApp = appWithAllRoutes({
-          services: { visitSessionsService },
-          sessionData: {
-            visitSessionData,
-          } as SessionData,
-        })
-
-        return request(sessionApp)
-          .get(`${journey.urlPrefix}/select-date-and-time`)
-          .expect(200)
-          .expect('Content-Type', /html/)
-          .expect(res => {
-            const $ = cheerio.load(res.text)
-            expect($('h1').text().trim()).toBe('Select date and time of visit')
-            expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
-            expect($('.moj-alert__content h2').text()).toContain(
-              'John Smith now has another visit at 12pm on 14 February.',
-            )
-            expect($('.moj-alert').text()).toContain('Select a new visit time.')
+            expect($('.moj-alert__content h2').text()).toContain('Another person has booked the last table.')
+            expect($('.moj-alert').text()).toContain('Select whether to book for this time or choose a new visit time.')
           })
       })
     })

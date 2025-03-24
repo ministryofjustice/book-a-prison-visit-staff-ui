@@ -1,6 +1,53 @@
+import { format } from 'date-fns'
+import { MojAlert } from '../../@types/bapv'
+import { ApplicationValidationErrorResponse } from '../../data/orchestrationApiTypes'
+import { prisonerTimePretty } from '../../utils/utils'
+
 // return URL prefix for either visit booking or visit update journey
-const getUrlPrefix = (isUpdate: boolean, visitReference: string) => {
+export const getUrlPrefix = (isUpdate: boolean, visitReference: string) => {
   return isUpdate ? `/visit/${visitReference}/update` : '/book-a-visit'
+}
+
+export function validationErrorsMojAlert(
+  prisonerName: string,
+  visitStartTimestamp: string,
+  validationErrors: ApplicationValidationErrorResponse['validationErrors'],
+): { mojAlert: MojAlert; url: string } {
+  if (validationErrors.includes('APPLICATION_INVALID_NON_ASSOCIATION_VISITS')) {
+    return {
+      mojAlert: {
+        title: `${prisonerName} now has a non-association on ${format(visitStartTimestamp, 'd MMMM')}.`,
+        text: 'Select a new visit time.',
+        variant: 'error',
+        showTitleAsHeading: true,
+      },
+      url: `select-date-and-time`,
+    }
+  }
+  if (validationErrors.includes('APPLICATION_INVALID_VISIT_ALREADY_BOOKED')) {
+    return {
+      mojAlert: {
+        title: `${prisonerName} now has another visit at ${prisonerTimePretty(visitStartTimestamp)}.`,
+        text: 'Select a new visit time.',
+        variant: 'error',
+        showTitleAsHeading: true,
+      },
+      url: `select-date-and-time`,
+    }
+  }
+  if (validationErrors.includes('APPLICATION_INVALID_NO_SLOT_CAPACITY')) {
+    return {
+      mojAlert: {
+        title: 'Another person has booked the last table.',
+        text: 'Select whether to book for this time or choose a new visit time.',
+        variant: 'warning',
+        showTitleAsHeading: true,
+      },
+      url: `check-your-booking/overbooking`,
+    }
+  }
+
+  return null
 }
 
 export default getUrlPrefix

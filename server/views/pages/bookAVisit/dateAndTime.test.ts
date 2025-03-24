@@ -207,6 +207,21 @@ describe('Views - Date and time of visit', () => {
     )
   })
 
+  it('should display 422 validation error - MojAlert', () => {
+    viewContext = {
+      validationAlert: {
+        text: 'Select whether to book for this time or choose a new visit time.',
+        showTitleAsHeading: true,
+        title: 'Another person has booked the last table.',
+        variant: 'warning',
+      },
+    }
+    const $ = cheerio.load(compiledTemplate.render(viewContext))
+
+    expect($('.moj-alert__content h2').text()).toContain('Another person has booked the last table.')
+    expect($('.moj-alert').text()).toContain('Select whether to book for this time or choose a new visit time.')
+  })
+
   describe('slot labelling', () => {
     beforeEach(() => {
       viewContext = {

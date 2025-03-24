@@ -2,7 +2,7 @@ import type { Request, Response } from 'express'
 import { validationResult } from 'express-validator'
 import { requestMethodsBooking } from '../../constants/requestMethods'
 import AuditService from '../../services/auditService'
-import getUrlPrefix from './visitJourneyUtils'
+import { getUrlPrefix, validationErrorsMojAlert } from './visitJourneyUtils'
 import { VisitService } from '../../services'
 import { ApplicationValidationErrorResponse } from '../../data/orchestrationApiTypes'
 import { SanitisedError } from '../../sanitisedError'
@@ -87,17 +87,14 @@ export default class CheckYourBooking {
         const validationErrors =
           (error as SanitisedError<ApplicationValidationErrorResponse>)?.data?.validationErrors ?? []
 
-        if (validationErrors.includes('APPLICATION_INVALID_NO_SLOT_CAPACITY')) {
-          visitSessionData.validationError = 'APPLICATION_INVALID_NO_SLOT_CAPACITY'
-          return res.redirect(`${urlPrefix}/check-your-booking/overbooking`)
-        }
-        if (validationErrors.includes('APPLICATION_INVALID_NON_ASSOCIATION_VISITS')) {
-          visitSessionData.validationError = 'APPLICATION_INVALID_NON_ASSOCIATION_VISITS'
-          return res.redirect(`${urlPrefix}/select-date-and-time`)
-        }
-        if (validationErrors.includes('APPLICATION_INVALID_VISIT_ALREADY_BOOKED')) {
-          visitSessionData.validationError = 'APPLICATION_INVALID_VISIT_ALREADY_BOOKED'
-          return res.redirect(`${urlPrefix}/select-date-and-time`)
+        const { mojAlert, url } = validationErrorsMojAlert(
+          visitSessionData.prisoner.name,
+          visitSessionData.visitSlot.startTimestamp,
+          validationErrors,
+        )
+        if (mojAlert) {
+          req.flash('messages', mojAlert)
+          return res.redirect(`${urlPrefix}/${url}`)
         }
       }
 

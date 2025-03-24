@@ -11,14 +11,8 @@
 
       {% include "partials/errorSummary.njk" %}
 
-      {% if validationMessage !== '' %}
-        {{ mojAlert({
-          variant: "warning",
-          title: validationMessage,
-          showTitleAsHeading: true,
-          dismissible: false,
-          html: '<p data-test="validation-text">Select whether to book for this time or choose a new visit time.</p>'
-        }) }}
+      {% if validationAlert %}
+        {{ mojAlert(validationAlert) }}
       {% endif %}
 
       <h1 class="govuk-heading-l">

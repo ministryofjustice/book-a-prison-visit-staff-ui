@@ -228,7 +228,7 @@ testJourneys.forEach(journey => {
       })
 
       describe('Handle API errors', () => {
-        describe('HTTP 422 Response', () => {
+        describe('HTTP 422 Validation error response', () => {
           it('should redirect to confirm overbooking page if no_slot_capacity 422 received', () => {
             const error: SanitisedError<ApplicationValidationErrorResponse> = {
               name: 'Error',
@@ -246,84 +246,15 @@ testJourneys.forEach(journey => {
               .expect(() => {
                 expect(visitSessionData.visitStatus).not.toBe('BOOKED')
                 expect(visitSessionData.visitReference).toBe(journey.isUpdate ? 'ab-cd-ef-gh' : undefined)
-                expect(visitSessionData.validationError).toBe(error.data.validationErrors[0])
+                expect(flashProvider).toHaveBeenCalledWith('messages', {
+                  text: 'Select whether to book for this time or choose a new visit time.',
+                  showTitleAsHeading: true,
+                  title: 'Another person has booked the last table.',
+                  variant: 'warning',
+                })
                 expect(auditService.bookedVisit).not.toHaveBeenCalled()
               })
           })
-        })
-
-        it('should redirect to date and time page if non_association_visits 422 received', () => {
-          const error: SanitisedError<ApplicationValidationErrorResponse> = {
-            name: 'Error',
-            status: 422,
-            message: 'Unprocessable Entity',
-            stack: 'Error: Unprocessable Entity',
-            data: { status: 422, validationErrors: ['APPLICATION_INVALID_NON_ASSOCIATION_VISITS'] },
-          }
-          visitService.bookVisit.mockRejectedValue(error)
-
-          return request(sessionApp)
-            .post(`${journey.urlPrefix}/check-your-booking`)
-            .expect(302)
-            .expect('location', `${journey.urlPrefix}/select-date-and-time`)
-            .expect(() => {
-              expect(visitSessionData.visitStatus).not.toBe('BOOKED')
-              expect(visitSessionData.visitReference).toBe(journey.isUpdate ? 'ab-cd-ef-gh' : undefined)
-              expect(visitSessionData.validationError).toBe(error.data.validationErrors[0])
-              expect(auditService.bookedVisit).not.toHaveBeenCalled()
-            })
-        })
-
-        it('should redirect to date and time page if visit_already_booked 422 received', () => {
-          const error: SanitisedError<ApplicationValidationErrorResponse> = {
-            name: 'Error',
-            status: 422,
-            message: 'Unprocessable Entity',
-            stack: 'Error: Unprocessable Entity',
-            data: { status: 422, validationErrors: ['APPLICATION_INVALID_VISIT_ALREADY_BOOKED'] },
-          }
-          visitService.bookVisit.mockRejectedValue(error)
-
-          return request(sessionApp)
-            .post(`${journey.urlPrefix}/check-your-booking`)
-            .expect(302)
-            .expect('location', `${journey.urlPrefix}/select-date-and-time`)
-            .expect(() => {
-              expect(visitSessionData.visitStatus).not.toBe('BOOKED')
-              expect(visitSessionData.visitReference).toBe(journey.isUpdate ? 'ab-cd-ef-gh' : undefined)
-              expect(visitSessionData.validationError).toBe(error.data.validationErrors[0])
-              expect(auditService.bookedVisit).not.toHaveBeenCalled()
-            })
-        })
-
-        it('should handle booking failure, display error message and NOT record audit event', () => {
-          visitService.bookVisit.mockRejectedValue({})
-
-          return request(sessionApp)
-            .post(`${journey.urlPrefix}/check-your-booking`)
-            .expect(200)
-            .expect('Content-Type', /html/)
-            .expect(res => {
-              const $ = cheerio.load(res.text)
-              expect($('h1').text().trim()).toBe('Check the visit details before booking')
-              expect($('.govuk-error-summary__body').text()).toContain('Failed to book this visit')
-              expect($('.test-prisoner-name').text()).toContain('prisoner name')
-              expect($('.test-visit-date').text()).toContain('Saturday 12 March 2022')
-              expect($('.test-visit-time').text()).toContain('9:30am to 10:30am')
-              expect($('.test-visit-type').text()).toContain('Open')
-              expect($('form').prop('action')).toBe(`${journey.urlPrefix}/check-your-booking`)
-
-              expect(visitService.bookVisit).toHaveBeenCalledWith({
-                username: 'user1',
-                applicationReference: visitSessionData.applicationReference,
-                applicationMethod: visitSessionData.requestMethod,
-                allowOverBooking: false,
-              })
-
-              expect(visitSessionData.visitStatus).not.toBe('BOOKED')
-              expect(visitSessionData.visitReference).toBe(journey.isUpdate ? 'ab-cd-ef-gh' : undefined)
-              expect(auditService.bookedVisit).not.toHaveBeenCalled()
-            })
         })
       })
     })

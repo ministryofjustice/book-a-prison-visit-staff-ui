@@ -1,6 +1,6 @@
 import HeaderFooterMeta from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterMeta'
 import { PrisonUser } from '../../interfaces/hmppsUser'
-import { Prison, VisitorListItem, VisitSessionData } from '../bapv'
+import { MojAlert, Prison, VisitorListItem, VisitSessionData } from '../bapv'
 
 export declare module 'express-session' {
   // Declare that the session will potentially contain these additional fields
@@ -33,6 +33,8 @@ export declare global {
       flash(type: 'errors', message: ValidationError[]): number
       flash(type: 'formValues'): Record<string, string | string[] | number[]>[]
       flash(type: 'formValues', message: Record<string, string | string[] | number[]>): number
+      flash(type: 'messages'): MojAlert
+      flash(type: 'messages', message: MojAlert): number
     }
 
     interface Locals {
