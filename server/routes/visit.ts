@@ -2,14 +2,13 @@ import type { NextFunction, RequestHandler, Request, Response } from 'express'
 import { Router } from 'express'
 import { BadRequest } from 'http-errors'
 import { differenceInCalendarDays } from 'date-fns'
-import { Prisoner } from '../data/prisonerOffenderSearchTypes'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import { isValidVisitReference } from './validationChecks'
 import { clearSession } from './visitorUtils'
 import { VisitSessionData, VisitSlot } from '../@types/bapv'
 import SelectVisitors from './visitJourney/selectVisitors'
 import VisitType from './visitJourney/visitType'
-import { properCaseFullName, sortItemsByDateAsc } from '../utils/utils'
+import { properCaseFullName } from '../utils/utils'
 import DateAndTime from './visitJourney/dateAndTime'
 import AdditionalSupport from './visitJourney/additionalSupport'
 import CheckYourBooking from './visitJourney/checkYourBooking'
@@ -19,15 +18,11 @@ import RequestMethod from './visitJourney/requestMethod'
 import sessionCheckMiddleware from '../middleware/sessionCheckMiddleware'
 import { type Services } from '../services'
 import Overbooking from './visitJourney/overbooking'
-import { Alert } from '../data/orchestrationApiTypes'
-import { OffenderRestriction } from '../data/prisonApiTypes'
+import { getPrisonerLocation } from './visit/visitUtils'
 
 export default function routes({
   auditService,
-  prisonerProfileService,
-  prisonerSearchService,
   prisonerVisitorsService,
-  supportedPrisonsService,
   visitService,
   visitSessionsService,
 }: Services): Router {
@@ -48,83 +43,61 @@ export default function routes({
   post('/:reference', async (req, res) => {
     const reference = getVisitReference(req)
     const { username } = res.locals.user
-    // TODO - not really using full visit details here so could request less information
-    const {
-      visitHistoryDetails: { visit },
-    } = await visitService.getFullVisitDetails({
-      reference,
-      username,
-    })
 
-    if (visit.prisonId !== req.session.selectedEstablishment.prisonId) {
-      return res.redirect(`/visit/${visit.reference}`)
+    const visitDetails = await visitService.getVisitDetailed({ username, reference })
+    const { prison, prisoner } = visitDetails
+
+    const prisonerInVisitPrison = prison.prisonId === prisoner.prisonId
+    const visitInSelectedEstablishment = prison.prisonId === req.session.selectedEstablishment.prisonId
+    if (!prisonerInVisitPrison || !visitInSelectedEstablishment) {
+      return res.redirect(`/visit/${visitDetails.reference}`)
     }
 
-    const [prisoner, supportedPrisonIds] = await Promise.all([
-      prisonerSearchService.getPrisonerById(visit.prisonerId, username),
-      supportedPrisonsService.getSupportedPrisonIds(username),
-    ])
-    const prisonerLocation = getPrisonerLocation(supportedPrisonIds, prisoner) // TODO does this actually get used?
-
-    const visitorIds = visit.visitors.flatMap(visitor => visitor.nomisPersonId)
-    const mainContactVisitor = visit.visitors.find(visitor => visitor.visitContact)
-    const mainContactId = mainContactVisitor ? mainContactVisitor.nomisPersonId : null
-    const visitorList = await prisonerVisitorsService.getVisitors(visit.prisonerId, username)
-    const currentVisitors = visitorList.filter(visitor => visitorIds.includes(visitor.personId))
-    const mainContact = currentVisitors.find(visitor => visitor.personId === mainContactId)
-
-    // clean then load session
+    // clean session then pre-populate with visit to update
     clearSession(req)
 
-    const [{ alerts }, restrictions] = await Promise.all([
-      prisonerProfileService.getProfile(visit.prisonId, visit.prisonerId, username),
-      prisonerProfileService.getRestrictions(visit.prisonerId, username),
-    ])
+    const visitRestriction = visitDetails.visitRestriction === 'UNKNOWN' ? undefined : visitDetails.visitRestriction
 
-    sortItemsByDateAsc<Alert, 'dateExpires'>(alerts, 'dateExpires')
-    sortItemsByDateAsc<OffenderRestriction, 'expiryDate'>(restrictions, 'expiryDate')
-
-    const visitRestriction =
-      visit.visitRestriction === 'OPEN' || visit.visitRestriction === 'CLOSED' ? visit.visitRestriction : undefined
     const visitSlot: VisitSlot = {
       id: '',
-      sessionTemplateReference: visit.sessionTemplateReference,
-      prisonId: visit.prisonId,
-      startTimestamp: visit.startTimestamp,
-      endTimestamp: visit.endTimestamp,
+      sessionTemplateReference: visitDetails.sessionTemplateReference,
+      prisonId: prison.prisonId,
+      startTimestamp: visitDetails.startTimestamp,
+      endTimestamp: visitDetails.endTimestamp,
       availableTables: 0,
       capacity: undefined,
-      visitRoom: visit.visitRoom,
+      visitRoom: visitDetails.visitRoom,
       visitRestriction,
     }
+
     const visitSessionData: VisitSessionData = {
       allowOverBooking: false,
       prisoner: {
         name: properCaseFullName(`${prisoner.lastName}, ${prisoner.firstName}`),
         offenderNo: prisoner.prisonerNumber,
-        location: prisonerLocation,
-        alerts,
-        restrictions,
+        location: getPrisonerLocation(prisoner),
+        alerts: prisoner.prisonerAlerts,
+        restrictions: prisoner.prisonerRestrictions,
       },
       visitSlot,
       originalVisitSlot: visitSlot,
       visitRestriction,
-      visitors: currentVisitors,
-      visitorSupport: visit.visitorSupport ?? { description: '' },
+      visitorIds: visitDetails.visitors.map(visitor => visitor.personId),
+      visitorSupport: visitDetails.visitorSupport ?? { description: '' },
       mainContact: {
-        contact: mainContact,
-        phoneNumber: visit.visitContact.telephone,
-        email: visit.visitContact.email,
-        contactName: visit.visitContact.name,
+        contactId: visitDetails.visitContact.visitContactId,
+        phoneNumber: visitDetails.visitContact.telephone,
+        email: visitDetails.visitContact.email,
+        contactName: visitDetails.visitContact.name,
       },
-      visitReference: visit.reference,
+      visitReference: visitDetails.reference,
     }
 
     req.session.visitSessionData = Object.assign(req.session.visitSessionData ?? {}, visitSessionData)
 
     const { policyNoticeDaysMin } = req.session.selectedEstablishment
 
-    const numberOfDays = differenceInCalendarDays(new Date(visit.startTimestamp), new Date())
+    const numberOfDays = differenceInCalendarDays(new Date(visitDetails.startTimestamp), new Date())
 
     if (numberOfDays >= policyNoticeDaysMin) {
       return res.redirect(`/visit/${reference}/update/select-visitors`)
@@ -286,13 +259,6 @@ function getVisitReference(req: Request): string {
     throw new BadRequest()
   }
   return reference
-}
-
-function getPrisonerLocation(supportedPrisonIds: string[], prisoner: Prisoner) {
-  if (prisoner.prisonId === 'OUT') {
-    return prisoner.locationDescription
-  }
-  return supportedPrisonIds.includes(prisoner.prisonId) ? `${prisoner.cellLocation}, ${prisoner.prisonName}` : 'Unknown'
 }
 
 const checkVisitReferenceMiddleware = (req: Request, res: Response, next: NextFunction): void => {
