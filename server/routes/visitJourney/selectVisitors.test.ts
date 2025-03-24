@@ -235,18 +235,7 @@ testJourneys.forEach(journey => {
     })
 
     it('should render the approved visitor list for offender number A1234BC with those in session (single) selected', () => {
-      visitSessionData.visitors = [
-        {
-          address: '1st listed address',
-          dateOfBirth: undefined,
-          adult: true,
-          name: 'Bob Smith',
-          personId: 4322,
-          relationshipDescription: 'Brother',
-          restrictions: [],
-          banned: false,
-        },
-      ]
+      visitSessionData.visitorIds = [4322]
 
       return request(sessionApp)
         .get(`${journey.urlPrefix}/select-visitors`)
@@ -264,28 +253,7 @@ testJourneys.forEach(journey => {
     })
 
     it('should render the approved visitor list for offender number A1234BC with those in session (multiple) selected', () => {
-      visitSessionData.visitors = [
-        {
-          address: '1st listed address',
-          dateOfBirth: undefined,
-          adult: true,
-          name: 'Bob Smith',
-          personId: 4322,
-          relationshipDescription: 'Brother',
-          restrictions: [],
-          banned: false,
-        },
-        {
-          address: 'Not entered',
-          adult: false,
-          dateOfBirth: '2018-03-02',
-          name: 'Anne Smith',
-          personId: 4324,
-          relationshipDescription: 'Niece',
-          restrictions: [],
-          banned: false,
-        },
-      ]
+      visitSessionData.visitorIds = [4322, 4324]
 
       return request(sessionApp)
         .get(`${journey.urlPrefix}/select-visitors`)
@@ -606,6 +574,7 @@ testJourneys.forEach(journey => {
         .expect('location', `${journey.urlPrefix}/select-date-and-time`)
         .expect(() => {
           expect(adultVisitors.adults).toEqual(returnAdult)
+          expect(visitSessionData.visitorIds).toEqual([4322])
           expect(visitSessionData.visitors).toEqual(returnAdult)
           expect(visitSessionData.visitRestriction).toBe('OPEN')
         })
@@ -638,6 +607,7 @@ testJourneys.forEach(journey => {
         .expect('location', `${journey.urlPrefix}/select-date-and-time`)
         .expect(() => {
           expect(adultVisitors.adults).toEqual(returnAdult)
+          expect(visitSessionData.visitorIds).toEqual([4326])
           expect(visitSessionData.visitors).toEqual(returnAdult)
           expect(visitSessionData.visitRestriction).toBe('CLOSED')
         })
@@ -680,6 +650,7 @@ testJourneys.forEach(journey => {
         .expect('location', `${journey.urlPrefix}/select-date-and-time`)
         .expect(() => {
           expect(adultVisitors.adults).toEqual(returnAdult)
+          expect(visitSessionData.visitorIds).toEqual([4326])
           expect(visitSessionData.visitors).toEqual(returnAdult)
           expect(visitSessionData.visitRestriction).toBe('CLOSED')
         })
@@ -716,6 +687,7 @@ testJourneys.forEach(journey => {
         .expect('location', `${journey.urlPrefix}/visit-type`)
         .expect(() => {
           expect(adultVisitors.adults).toEqual(returnAdult)
+          expect(visitSessionData.visitorIds).toEqual([4322])
           expect(visitSessionData.visitors).toEqual(returnAdult)
           expect(visitSessionData.visitRestriction).toBe('OPEN')
         })
@@ -762,6 +734,7 @@ testJourneys.forEach(journey => {
         .expect('location', `${journey.urlPrefix}/select-date-and-time`)
         .expect(() => {
           expect(adultVisitors.adults).toEqual([returnAdult])
+          expect(visitSessionData.visitorIds).toEqual([4324, 4000])
           expect(visitSessionData.visitors).toEqual([returnAdult, returnChild])
           expect(visitSessionData.daysUntilBanExpiry).toBe(13)
         })
@@ -797,6 +770,7 @@ testJourneys.forEach(journey => {
         .expect('location', `${journey.urlPrefix}/select-date-and-time`)
         .expect(() => {
           expect(adultVisitors.adults).toEqual([returnAdult])
+          expect(visitSessionData.visitorIds).toEqual([4322, 4324])
           expect(visitSessionData.visitors).toEqual([returnAdult, returnChild])
           expect(visitSessionData.visitRestriction).toBe('OPEN')
         })
@@ -847,6 +821,7 @@ testJourneys.forEach(journey => {
         .expect('location', `${journey.urlPrefix}/select-date-and-time`)
         .expect(() => {
           expect(adultVisitors.adults).toEqual([returnAdult])
+          expect(visitSessionData.visitorIds).toEqual([4323])
           expect(visitSessionData.visitors).toEqual([returnAdult])
           expect(visitSessionData.visitRestriction).toBe('OPEN')
         })
@@ -930,6 +905,7 @@ testJourneys.forEach(journey => {
           .expect(302)
           .expect('location', `${journey.urlPrefix}/select-date-and-time`)
           .expect(() => {
+            expect(visitSessionData.visitorIds.length).toEqual(2)
             expect(visitSessionData.visitors.length).toEqual(2)
           })
       })

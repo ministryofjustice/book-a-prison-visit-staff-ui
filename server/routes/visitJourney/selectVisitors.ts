@@ -30,8 +30,8 @@ export default class SelectVisitors {
     const { restrictions, alerts } = visitSessionData.prisoner
 
     const formValues = getFlashFormValues(req)
-    if (!Object.keys(formValues).length && visitSessionData.visitors) {
-      formValues.visitors = visitSessionData.visitors.map(visitor => visitor.personId.toString())
+    if (!Object.keys(formValues).length && visitSessionData.visitorIds) {
+      formValues.visitors = visitSessionData.visitorIds.map(id => id.toString())
     }
 
     const returnAddress = isUpdate ? `/visit/${visitSessionData.visitReference}` : `/prisoner/${offenderNo}`
@@ -77,6 +77,7 @@ export default class SelectVisitors {
 
       return adultVisitors
     }, [])
+    visitSessionData.visitorIds = selectedIds.map(id => parseInt(id, 10))
     visitSessionData.visitors = selectedVisitors
 
     if (!req.session.adultVisitors) {

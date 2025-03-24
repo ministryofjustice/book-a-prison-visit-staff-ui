@@ -34,7 +34,7 @@ export default function sessionCheckMiddleware({ stage }: { stage: number }): Re
 
     if (
       stage > 1 &&
-      (!visitSessionData.visitors || visitSessionData.visitors.length === 0 || !visitSessionData.visitRestriction)
+      (!visitSessionData.visitorIds?.length || !visitSessionData.visitors?.length || !visitSessionData.visitRestriction)
     ) {
       return logAndRedirect(req, res, `/prisoner/${visitSessionData.prisoner.offenderNo}?error=missing-visitors`)
     }

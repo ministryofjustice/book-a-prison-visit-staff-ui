@@ -11,6 +11,7 @@ const prisonerData: VisitSessionData['prisoner'] = {
   offenderNo: 'A1234BC',
   location: 'abc',
 }
+const visitorIds = [123]
 const visitorsData: VisitSessionData['visitors'] = [
   {
     personId: 123,
@@ -200,12 +201,14 @@ describe('sessionCheckMiddleware', () => {
         allowOverBooking: false,
         prisoner: prisonerData,
         visitRestriction,
+        visitorIds,
         visitors: visitorsData,
       },
       {
         allowOverBooking: false,
         prisoner: prisonerData,
         visitRestriction,
+        visitorIds,
         visitors: visitorsData,
         visit: {
           id: '1',
@@ -215,6 +218,7 @@ describe('sessionCheckMiddleware', () => {
         allowOverBooking: false,
         prisoner: prisonerData,
         visitRestriction,
+        visitorIds,
         visitors: visitorsData,
         visit: {
           id: '1',
@@ -225,6 +229,7 @@ describe('sessionCheckMiddleware', () => {
         allowOverBooking: false,
         prisoner: prisonerData,
         visitRestriction,
+        visitorIds,
         visitors: visitorsData,
         visit: {
           id: '1',
@@ -236,6 +241,7 @@ describe('sessionCheckMiddleware', () => {
         allowOverBooking: false,
         prisoner: prisonerData,
         visitRestriction,
+        visitorIds,
         visitors: visitorsData,
         visit: {
           id: '1',
@@ -263,6 +269,7 @@ describe('sessionCheckMiddleware', () => {
         applicationReference: 'aaa-bbb-ccc',
         prisoner: prisonerData,
         visitRestriction,
+        visitorIds,
         visitors: visitorsData,
         visitReference: 'ab-cd-ef-gh',
         visitSlot: {
@@ -285,6 +292,7 @@ describe('sessionCheckMiddleware', () => {
         applicationReference: 'aaa-bbb-ccc',
         prisoner: prisonerData,
         visitRestriction,
+        visitorIds,
         visitors: visitorsData,
         visitReference: 'ab-cd-ef-gh',
         visitSlot: {
@@ -309,6 +317,7 @@ describe('sessionCheckMiddleware', () => {
         prisoner: prisonerData,
         visitRestriction,
         visitSlot,
+        visitorIds,
         visitors: visitorsData,
       }
 
@@ -328,6 +337,7 @@ describe('sessionCheckMiddleware', () => {
         prisoner: prisonerData,
         visitRestriction,
         visitSlot,
+        visitorIds,
         visitors: visitorsData,
         visitReference: 'ab-cd-ef-gh',
       }
@@ -348,6 +358,7 @@ describe('sessionCheckMiddleware', () => {
         prisoner: prisonerData,
         visitRestriction,
         visitSlot,
+        visitorIds,
         visitors: visitorsData,
         visitorSupport: { description: '' },
         visitReference: 'ab-cd-ef-gh',
@@ -358,6 +369,7 @@ describe('sessionCheckMiddleware', () => {
         prisoner: prisonerData,
         visitRestriction,
         visitSlot,
+        visitorIds,
         visitors: visitorsData,
         visitorSupport: { description: '' },
         mainContact: {
@@ -384,6 +396,7 @@ describe('sessionCheckMiddleware', () => {
         prisoner: prisonerData,
         visitRestriction,
         visitSlot,
+        visitorIds,
         visitors: visitorsData,
         visitorSupport: { description: '' },
         mainContact: {
@@ -418,6 +431,7 @@ describe('sessionCheckMiddleware', () => {
         prisoner: prisonerData,
         visitRestriction,
         visitSlot,
+        visitorIds,
         visitors: visitorsData,
         visitorSupport: { description: '' },
         mainContact: {

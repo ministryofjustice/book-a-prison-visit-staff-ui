@@ -51,6 +51,7 @@ testJourneys.forEach(journey => {
           visitRoom: 'room name',
           visitRestriction: 'OPEN',
         },
+        visitorIds: [123],
         visitors: [
           {
             personId: 123,
@@ -197,6 +198,7 @@ testJourneys.forEach(journey => {
           visitRoom: 'room name',
           visitRestriction: 'OPEN',
         },
+        visitorIds: [123],
         visitors: [
           {
             personId: 123,
