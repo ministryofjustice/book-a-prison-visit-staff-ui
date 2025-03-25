@@ -80,7 +80,7 @@ describe('Visit details page', () => {
           expect($('[data-test="all-alerts-link"]').attr('href')).toBe(
             'https://prisoner-dev.digital.prison.service.justice.gov.uk/prisoner/A1234BC/alerts/active',
           )
-          expect($('[data-test="prisoner-alert-1"]').text()).toContain('COVID unit management')
+          expect($('[data-test="prisoner-alert-1"]').text()).toContain('Protective Isolation Unit')
           expect($('[data-test="prisoner-alert-1-start"]').text()).toContain('2 January 2023')
           expect($('[data-test="prisoner-alert-1-end"]').text()).toContain('No end date')
           expect($('[data-test="prisoner-alert-1-text"]').text()).toContain('Alert comment')
