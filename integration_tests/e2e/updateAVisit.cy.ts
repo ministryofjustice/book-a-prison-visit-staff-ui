@@ -20,21 +20,6 @@ context('Update a visit', () => {
   const prisoner = TestData.prisoner()
   const { prisonerNumber: offenderNo, prisonId } = prisoner
 
-  const profile = TestData.prisonerProfile({
-    alerts: [
-      {
-        alertType: 'U',
-        alertTypeDescription: 'COVID unit management',
-        alertCode: 'UPIU',
-        alertCodeDescription: 'Protective Isolation Unit',
-        comment: 'Alert comment',
-        dateCreated: '2023-01-02',
-        dateExpires: undefined,
-        active: true,
-      },
-    ],
-  })
-
   beforeEach(() => {
     cy.task('reset')
     cy.task('stubSignIn')
@@ -56,13 +41,11 @@ context('Update a visit', () => {
       }),
     ]
 
-    const originalVisit = TestData.visit({
+    const originalVisit = TestData.visitBookingDetailsDto({
       startTimestamp: visitSessions[0].startTimestamp,
       endTimestamp: visitSessions[0].endTimestamp,
-      visitors: [{ nomisPersonId: 4321, visitContact: true }],
-      visitorSupport: { description: '' },
+      visitorSupport: null,
     })
-    const visitHistoryDetails = TestData.visitHistoryDetails({ visit: originalVisit })
 
     const childDob = format(sub(today, { years: 5 }), shortDateFormat)
     const contacts = [
@@ -76,15 +59,13 @@ context('Update a visit', () => {
       }),
     ]
 
-    cy.task('stubPrisonerById', prisoner)
-    cy.task('stubVisitHistory', visitHistoryDetails) // TODO remove when visit update no longer uses this endpoint
-    cy.task('stubPrisonerSocialContacts', { offenderNo, contacts, approvedVisitorsOnly: false })
     cy.task(
       'stubGetVisitDetailed',
       TestData.visitBookingDetailsDto({
         startTimestamp: originalVisit.startTimestamp,
         endTimestamp: originalVisit.endTimestamp,
         visitors: [contacts[0]],
+        visitorSupport: originalVisit.visitorSupport,
       }),
     )
 
@@ -96,9 +77,6 @@ context('Update a visit', () => {
 
     // Start update journey
     cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
-    cy.task('stubOffenderRestrictions', { offenderNo, offenderRestrictions: [] })
-    cy.task('stubPrisonerProfile', profile)
-
     visitDetailsPage.updateBooking().click()
 
     // Select visitors page - existing visitor selected then add another
@@ -136,13 +114,13 @@ context('Update a visit', () => {
     })
     updatedApplication.visitContact.email = 'visitor@example.com' // (may be present if visit originated in public servivce)
     cy.task('stubCreateVisitApplicationFromVisit', {
-      visitReference: visitHistoryDetails.visit.reference,
+      visitReference: originalVisit.reference,
       application: updatedApplication,
     })
     selectVisitDateAndTime.getSlotById(2).check()
     selectVisitDateAndTime.continueButton().click()
 
-    // Additional support - add wheelchair and custom option
+    // Additional support - add details
     const additionalSupportPage = Page.verifyOnPage(AdditionalSupportPage)
     additionalSupportPage.additionalSupportNotRequired().should('be.checked')
     additionalSupportPage.additionalSupportRequired().should('not.be.checked')
@@ -233,13 +211,11 @@ context('Update a visit', () => {
       }),
     ]
 
-    const originalVisit = TestData.visit({
+    const originalVisit = TestData.visitBookingDetailsDto({
       startTimestamp: visitSessions[0].startTimestamp,
       endTimestamp: visitSessions[0].endTimestamp,
-      visitors: [{ nomisPersonId: 4321, visitContact: true }],
-      visitorSupport: { description: '' },
+      visitorSupport: null,
     })
-    const visitHistoryDetails = TestData.visitHistoryDetails({ visit: originalVisit })
 
     const childDob = format(sub(today, { years: 5 }), shortDateFormat)
     const contacts = [
@@ -253,17 +229,8 @@ context('Update a visit', () => {
       }),
     ]
 
-    cy.task('stubPrisonerById', prisoner)
-    cy.task('stubVisitHistory', visitHistoryDetails)
     cy.task('stubPrisonerSocialContacts', { offenderNo, contacts, approvedVisitorsOnly: false })
-    cy.task(
-      'stubGetVisitDetailed',
-      TestData.visitBookingDetailsDto({
-        startTimestamp: originalVisit.startTimestamp,
-        endTimestamp: originalVisit.endTimestamp,
-        visitors: [contacts[0]],
-      }),
-    )
+    cy.task('stubGetVisitDetailed', originalVisit)
 
     // Visit details page
     cy.visit('/visit/ab-cd-ef-gh')
@@ -273,8 +240,6 @@ context('Update a visit', () => {
 
     // Start update journey
     cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
-    cy.task('stubOffenderRestrictions', { offenderNo, offenderRestrictions: [] })
-    cy.task('stubPrisonerProfile', profile)
     visitDetailsPage.updateBooking().click()
 
     // Confirm update page - check yes

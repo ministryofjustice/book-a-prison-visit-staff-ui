@@ -1,20 +1,15 @@
 import { NotFound } from 'http-errors'
-import { VisitInformation, VisitSessionData, VisitorListItem } from '../@types/bapv'
+import { VisitInformation, VisitSessionData } from '../@types/bapv'
 import {
   ApplicationDto,
   ApplicationMethodType,
   CancelVisitOrchestrationDto,
   Visit,
-  VisitHistoryDetails,
   VisitRestriction,
 } from '../data/orchestrationApiTypes'
 import TestData from '../routes/testutils/testData'
 import VisitService, { MojTimelineItem } from './visitService'
-import {
-  createMockHmppsAuthClient,
-  createMockOrchestrationApiClient,
-  createMockPrisonerContactRegistryApiClient,
-} from '../data/testutils/mocks'
+import { createMockHmppsAuthClient, createMockOrchestrationApiClient } from '../data/testutils/mocks'
 import * as utils from '../utils/utils'
 
 const token = 'some token'
@@ -24,22 +19,15 @@ const prisonId = 'HEI'
 describe('Visit service', () => {
   const hmppsAuthClient = createMockHmppsAuthClient()
   const orchestrationApiClient = createMockOrchestrationApiClient()
-  const prisonerContactRegistryApiClient = createMockPrisonerContactRegistryApiClient()
 
   let visitService: VisitService
 
   const OrchestrationApiClientFactory = jest.fn()
-  const PrisonerContactRegistryApiClientFactory = jest.fn()
 
   beforeEach(() => {
     OrchestrationApiClientFactory.mockReturnValue(orchestrationApiClient)
-    PrisonerContactRegistryApiClientFactory.mockReturnValue(prisonerContactRegistryApiClient)
 
-    visitService = new VisitService(
-      OrchestrationApiClientFactory,
-      PrisonerContactRegistryApiClientFactory,
-      hmppsAuthClient,
-    )
+    visitService = new VisitService(OrchestrationApiClientFactory, hmppsAuthClient)
     hmppsAuthClient.getSystemClientToken.mockResolvedValue(token)
   })
 
@@ -226,72 +214,6 @@ describe('Visit service', () => {
 
           expect(orchestrationApiClient.getVisit).toHaveBeenCalledTimes(1)
         }).rejects.toBeInstanceOf(NotFound)
-      })
-    })
-
-    describe('getFullVisitDetails', () => {
-      const visitHistoryDetails = TestData.visitHistoryDetails({
-        visit: TestData.visit({
-          visitorSupport: { description: 'Wheelchair, custom request' },
-        }),
-      })
-
-      const childDateOfBirth = `${new Date().getFullYear() - 4}-03-02`
-      const contacts = [
-        TestData.contact({}),
-        TestData.contact({
-          personId: 4322,
-          firstName: 'Anne',
-          dateOfBirth: childDateOfBirth,
-          relationshipCode: 'NIE',
-          relationshipDescription: 'Niece',
-          addresses: [],
-        }),
-      ]
-
-      beforeEach(() => {
-        prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue(contacts)
-        orchestrationApiClient.getVisitHistory.mockResolvedValue(visitHistoryDetails)
-      })
-
-      it('should return full details of visit, visitors, notifications and additional support options', async () => {
-        const expectedResult: {
-          visitHistoryDetails: VisitHistoryDetails
-          visitors: VisitorListItem[]
-          additionalSupport: string
-        } = {
-          visitHistoryDetails,
-          visitors: [
-            {
-              personId: 4321,
-              name: 'Jeanette Smith',
-              dateOfBirth: '1986-07-28',
-              adult: true,
-              relationshipDescription: 'Wife',
-              address:
-                'Premises,\nFlat 23B,\n123 The Street,\nSpringfield,\nCoventry,\nWest Midlands,\nC1 2AB,\nEngland',
-              restrictions: contacts[0].restrictions,
-              banned: false,
-            },
-            {
-              personId: 4322,
-              name: 'Anne Smith',
-              dateOfBirth: childDateOfBirth,
-              adult: false,
-              relationshipDescription: 'Niece',
-              address: 'Not entered',
-              restrictions: [],
-              banned: false,
-            },
-          ],
-          additionalSupport: 'Wheelchair, custom request',
-        }
-
-        const result = await visitService.getFullVisitDetails({ username: 'user', reference: 'ab-cd-ef-gh' })
-
-        expect(prisonerContactRegistryApiClient.getPrisonerSocialContacts).toHaveBeenCalledTimes(1)
-        expect(orchestrationApiClient.getVisitHistory).toHaveBeenCalledTimes(1)
-        expect(result).toStrictEqual(expectedResult)
       })
     })
 

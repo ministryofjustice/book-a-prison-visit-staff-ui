@@ -1808,6 +1808,11 @@ export interface components {
        * @example 2018-12-01T13:45:00
        */
       endTimestamp: string
+      /**
+       * @description Session Template Reference
+       * @example v9d.7ed.7u
+       */
+      sessionTemplateReference?: string
       /** @description Visit Notes */
       visitNotes?: components['schemas']['VisitNoteDto'][]
       /** @description Contact associated with the visit */
@@ -1917,7 +1922,7 @@ export interface components {
       relationshipDescription?: string
       /** @description List of restrictions associated with the contact */
       restrictions: components['schemas']['RestrictionDto'][]
-      /** @description List of addresses associated with the contact */
+      /** @description Primary address for the contact or the first address if no primary address available, null if address list is empty */
       primaryAddress?: components['schemas']['AddressDto']
     }
     /**
@@ -1991,8 +1996,6 @@ export interface components {
       totalElements?: number
       /** Format: int32 */
       totalPages?: number
-      first?: boolean
-      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['VisitDto'][]
@@ -2002,17 +2005,19 @@ export interface components {
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
+      first?: boolean
+      last?: boolean
       empty?: boolean
     }
     PageableObject: {
       /** Format: int64 */
       offset?: number
       sort?: components['schemas']['SortObject']
-      /** Format: int32 */
-      pageSize?: number
       paged?: boolean
       /** Format: int32 */
       pageNumber?: number
+      /** Format: int32 */
+      pageSize?: number
       unpaged?: boolean
     }
     SortObject: {
@@ -2408,11 +2413,6 @@ export interface components {
       nextAvailableVoDate: string
       /** @description Current prison code for the prison that the booker registered the prisoner with */
       registeredPrison: components['schemas']['RegisteredPrisonDto']
-      /**
-       * @description Convicted status of prisoner
-       * @enum {string}
-       */
-      convictedStatus?: 'Convicted' | 'Remand'
     }
     CurrentIncentive: {
       /** @description Incentive level */
@@ -2486,6 +2486,12 @@ export interface components {
        * @example Outside - released from Leeds
        */
       locationDescription?: string
+      /**
+       * @description Convicted Status
+       * @example Convicted
+       * @enum {string}
+       */
+      convictedStatus?: 'Convicted' | 'Remand'
     }
     RegisteredPrisonDto: {
       /**

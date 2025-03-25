@@ -44,11 +44,7 @@ export const services = () => {
     hmppsAuthClient,
   )
 
-  const visitService = new VisitService(
-    orchestrationApiClientBuilder,
-    prisonerContactRegistryApiClientBuilder,
-    hmppsAuthClient,
-  )
+  const visitService = new VisitService(orchestrationApiClientBuilder, hmppsAuthClient)
 
   return {
     auditService,
