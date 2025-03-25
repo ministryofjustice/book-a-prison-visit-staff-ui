@@ -49,6 +49,7 @@ testJourneys.forEach(journey => {
           ],
         },
         visitRestriction: 'OPEN',
+        visitorIds: [4322],
         visitors: [
           {
             address: '1st listed address',

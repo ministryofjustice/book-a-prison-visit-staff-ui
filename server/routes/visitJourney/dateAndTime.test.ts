@@ -95,6 +95,7 @@ beforeEach(() => {
       location: 'location place',
     },
     visitRestriction: 'OPEN',
+    visitorIds: [4323],
     visitors: [
       {
         personId: 4323,

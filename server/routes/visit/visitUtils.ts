@@ -1,22 +1,14 @@
+import { VisitBookingDetailsDto } from '../../data/orchestrationApiTypes'
+
 // eslint-disable-next-line import/prefer-default-export
-export const getPrisonerLocation = ({
-  prisonId,
-  prisonName,
-  cellLocation,
-  locationDescription,
-}: {
-  prisonId: string
-  prisonName: string
-  cellLocation: string
-  locationDescription: string
-}) => {
-  if (prisonId === 'OUT') {
-    return locationDescription
+export const getPrisonerLocation = (prisoner: VisitBookingDetailsDto['prisoner']) => {
+  if (prisoner.prisonId === 'OUT') {
+    return prisoner.locationDescription
   }
 
-  if (prisonId === 'TRN') {
+  if (prisoner.prisonId === 'TRN') {
     return 'Unknown'
   }
 
-  return `${cellLocation}, ${prisonName}`
+  return `${prisoner.cellLocation}, ${prisoner.prisonName}`
 }

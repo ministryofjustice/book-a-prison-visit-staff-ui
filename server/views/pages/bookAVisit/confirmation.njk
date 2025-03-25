@@ -143,13 +143,11 @@
     }
   ), displayRows) %}
 
-  {% set contactName %}
-    {% if mainContact.contactName %}
-      {{ mainContact.contactName }}
-    {% else %}
-      {{ mainContact.contact.name + " (" + (mainContact.contact.relationshipDescription | lower) + " of the prisoner)" }}
-    {% endif %}
-  {% endset %}
+  {% set contactName -%}
+    {{- mainContact.contactName }}
+    {%- if mainContact.relationshipDescription %} ({{ mainContact.relationshipDescription | lower}} of the prisoner){% endif %}
+  {%- endset %}
+
   {% set displayRows = (displayRows.push(
     {
       key: {

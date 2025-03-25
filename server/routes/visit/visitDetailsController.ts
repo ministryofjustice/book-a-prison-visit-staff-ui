@@ -31,12 +31,7 @@ export default class VisitDetailsController {
       const visitDetails = await this.visitService.getVisitDetailed({ username, reference })
       const { prison, prisoner } = visitDetails
 
-      const prisonerLocation = getPrisonerLocation({
-        prisonId: prisoner.prisonId,
-        prisonName: prisoner.prisonName,
-        cellLocation: prisoner.cellLocation,
-        locationDescription: prisoner.locationDescription,
-      })
+      const prisonerLocation = getPrisonerLocation(prisoner)
 
       const nowTimestamp = new Date()
       const visitStartTimestamp = new Date(visitDetails.startTimestamp)
