@@ -3,6 +3,7 @@ import * as cheerio from 'cheerio'
 import nunjucks, { Template } from 'nunjucks'
 import { registerNunjucks } from '../../../utils/nunjucksSetup'
 import { VisitSlot, VisitSlotList } from '../../../@types/bapv'
+import TestData from '../../../routes/testutils/testData'
 
 const template = fs.readFileSync('server/views/pages/bookAVisit/dateAndTime.njk')
 
@@ -212,14 +213,7 @@ describe('Views - Date and time of visit', () => {
 
   it('should display 422 validation error - MojAlert', () => {
     viewContext = {
-      validationAlert: [
-        {
-          text: 'Select whether to book for this time or choose a new visit time.',
-          showTitleAsHeading: true,
-          title: 'Another person has booked the last table.',
-          variant: 'warning',
-        },
-      ],
+      validationAlert: [TestData.mojAlert()],
     }
     const $ = cheerio.load(compiledTemplate.render(viewContext))
 

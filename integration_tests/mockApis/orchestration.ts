@@ -55,16 +55,16 @@ export default {
     })
   },
   stubBookVisitValidationFailed: ({
-    visit,
+    applicationReference,
     validationErrors = ['APPLICATION_INVALID_NON_ASSOCIATION_VISITS'],
   }: {
-    visit: Visit
+    applicationReference: string
     validationErrors: ApplicationValidationErrorResponse['validationErrors'][number][]
   }): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'PUT',
-        url: `/orchestration/visits/${visit.applicationReference}/book`,
+        url: `/orchestration/visits/${applicationReference}/book`,
       },
       response: {
         status: 422,

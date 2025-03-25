@@ -40,7 +40,7 @@ describe('validationErrorsMojAlert', () => {
     expect(mojAlert).toStrictEqual({
       text: 'Select a new visit time.',
       showTitleAsHeading: true,
-      title: 'Smith, John now has another visit at 9:30am.',
+      title: 'Smith, John now has another visit at 9:30am on 12 March.',
       variant: 'error',
     })
     expect(url).toBe('select-date-and-time')

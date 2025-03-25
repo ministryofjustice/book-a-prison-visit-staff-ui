@@ -372,16 +372,7 @@ context('Check visit details page', () => {
     checkYourBookingPage.visitDate().contains(format(new Date(visitSessions[0].startTimestamp), longDateFormat))
 
     cy.task('stubBookVisitValidationFailed', {
-      visit: TestData.visit({
-        startTimestamp: visitSessions[1].startTimestamp,
-        endTimestamp: visitSessions[1].endTimestamp,
-        visitContact: { name: 'Jeanette Smith', telephone: '09876 543 321' },
-        visitors: [
-          { nomisPersonId: contacts[0].personId, visitContact: true },
-          { nomisPersonId: contacts[1].personId, visitContact: false },
-        ],
-        visitorSupport: { description: 'Wheelchair ramp' },
-      }),
+      applicationReference: TestData.visit().applicationReference,
     })
 
     checkYourBookingPage.submitBooking()

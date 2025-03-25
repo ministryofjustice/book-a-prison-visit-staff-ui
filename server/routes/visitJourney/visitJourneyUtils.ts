@@ -8,11 +8,11 @@ export const getUrlPrefix = (isUpdate: boolean, visitReference: string) => {
   return isUpdate ? `/visit/${visitReference}/update` : '/book-a-visit'
 }
 
-export function validationErrorsMojAlert(
+export const validationErrorsMojAlert = (
   prisonerName: string,
   visitStartTimestamp: string,
   validationErrors: ApplicationValidationErrorResponse['validationErrors'],
-): { mojAlert: MojAlert; url: string } {
+): { mojAlert: MojAlert; url: string } => {
   if (validationErrors.includes('APPLICATION_INVALID_NON_ASSOCIATION_VISITS')) {
     return {
       mojAlert: {
@@ -27,7 +27,7 @@ export function validationErrorsMojAlert(
   if (validationErrors.includes('APPLICATION_INVALID_VISIT_ALREADY_BOOKED')) {
     return {
       mojAlert: {
-        title: `${prisonerName} now has another visit at ${prisonerTimePretty(visitStartTimestamp)}.`,
+        title: `${prisonerName} now has another visit at ${prisonerTimePretty(visitStartTimestamp)} on ${format(visitStartTimestamp, 'd MMMM')}.`,
         text: 'Select a new visit time.',
         variant: 'error',
         showTitleAsHeading: true,
@@ -49,5 +49,3 @@ export function validationErrorsMojAlert(
 
   return null
 }
-
-export default getUrlPrefix
