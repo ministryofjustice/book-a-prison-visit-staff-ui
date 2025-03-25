@@ -21,7 +21,7 @@ import { OffenderRestriction } from '../../data/prisonApiTypes'
 import { CurrentIncentive, Prisoner } from '../../data/prisonerOffenderSearchTypes'
 import { Address, Contact, Restriction } from '../../data/prisonerContactRegistryApiTypes'
 import { ScheduledEvent } from '../../data/whereaboutsApiTypes'
-import { Prison } from '../../@types/bapv'
+import { MojAlert, Prison } from '../../@types/bapv'
 
 export default class TestData {
   static address = ({
@@ -173,6 +173,18 @@ export default class TestData {
   }: Partial<ExcludeDateDto> = {}): ExcludeDateDto => ({
     excludeDate,
     actionedBy,
+  })
+
+  static mojAlert = ({
+    text = 'Select whether to book for this time or choose a new visit time.',
+    showTitleAsHeading = true,
+    title = 'Another person has booked the last table.',
+    variant = 'warning',
+  }: Partial<MojAlert> = {}): MojAlert => ({
+    text,
+    showTitleAsHeading,
+    title,
+    variant,
   })
 
   static notificationCount = ({ count = 5 }: Partial<NotificationCount> = {}): NotificationCount => ({ count })

@@ -153,7 +153,7 @@ export type VisitsPageSideNavItem = {
 
 export type VisitsPageSideNav = Map<string, VisitsPageSideNavItem[]>
 
-export type FlashData = Record<string, string | string[] | Record<string, string | string[]>[] | MojAlert>
+export type FlashData = Record<string, string | string[] | Record<string, string | string[]>[] | MojAlert[]>
 
 export type VisitsReviewListItem = {
   actionUrl: string

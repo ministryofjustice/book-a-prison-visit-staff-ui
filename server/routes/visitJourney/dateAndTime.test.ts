@@ -10,6 +10,7 @@ import {
   createMockVisitService,
   createMockVisitSessionsService,
 } from '../../services/testutils/mocks'
+import TestData from '../testutils/testData'
 
 let sessionApp: Express
 
@@ -82,7 +83,7 @@ const visitSlot4: VisitSlot = {
 }
 
 beforeEach(() => {
-  flashData = { errors: [], formValues: [], messages: undefined }
+  flashData = { errors: [], formValues: [], messages: [] }
   flashProvider.mockImplementation((key: keyof FlashData) => {
     return flashData[key]
   })
@@ -347,12 +348,7 @@ testJourneys.forEach(journey => {
       })
 
       it('should render error from 422 errors - non association', () => {
-        flashData.messages = {
-          text: 'Select whether to book for this time or choose a new visit time.',
-          showTitleAsHeading: true,
-          title: 'Another person has booked the last table.',
-          variant: 'warning',
-        }
+        flashData.messages = [TestData.mojAlert()]
 
         return request(sessionApp)
           .get(`${journey.urlPrefix}/select-date-and-time`)

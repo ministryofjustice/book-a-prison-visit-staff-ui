@@ -268,4 +268,127 @@ context('Check visit details page', () => {
     confirmationPage.mainContactName().contains('Jeanette Smith (wife of the prisoner)')
     confirmationPage.mainContactNumber().contains('09876 543 321')
   })
+
+  it('should display validation error message after failing to submit booking', () => {
+    const profile = TestData.prisonerProfile()
+    const { prisonerId, prisonId } = profile
+    const prisonerDisplayName = 'Smith, John'
+
+    const today = new Date()
+    const childDob = format(sub(today, { years: 5 }), shortDateFormat)
+    const contacts = [
+      TestData.contact(),
+      TestData.contact({
+        personId: 4322,
+        firstName: 'Bob',
+        dateOfBirth: childDob,
+        relationshipCode: 'SON',
+        relationshipDescription: 'Son',
+      }),
+    ]
+
+    const visitSessions: VisitSession[] = [
+      TestData.visitSession({
+        startTimestamp: format(addDays(today, 7), `${shortDateFormat}'T'10:00:00`),
+        endTimestamp: format(addDays(today, 7), `${shortDateFormat}'T'11:00:00`),
+      }),
+      TestData.visitSession({
+        startTimestamp: format(addDays(today, 8), `${shortDateFormat}'T'13:30:00`),
+        endTimestamp: format(addDays(today, 8), `${shortDateFormat}'T'15:00:00`),
+      }),
+    ]
+
+    // Start - Prisoner profile page
+    cy.task('stubPrisonerSocialContacts', { offenderNo: prisonerId, contacts })
+    cy.task('stubPrisonerProfile', profile)
+    cy.visit(`/prisoner/${prisonerId}`)
+
+    const prisonerProfilePage = Page.verifyOnPageTitle(PrisonerProfilePage, prisonerDisplayName)
+
+    // Select visitors - first of two
+    cy.task('stubOffenderRestrictions', { offenderNo: prisonerId, offenderRestrictions: [] })
+    prisonerProfilePage.bookAVisitButton().click()
+    const selectVisitorsPage = Page.verifyOnPage(SelectVisitorsPage)
+    selectVisitorsPage.getVisitor(contacts[0].personId).check()
+
+    // Select date and time
+    cy.task('stubVisitSessions', {
+      offenderNo: prisonerId,
+      prisonId,
+      visitSessions,
+    })
+    cy.task('stubOffenderEvents', {
+      offenderNo: prisonerId,
+      fromDate: format(today, shortDateFormat),
+      toDate: format(addDays(today, 8), shortDateFormat),
+      scheduledEvents: [],
+    })
+    cy.task(
+      'stubCreateVisitApplication',
+      TestData.application({
+        startTimestamp: visitSessions[0].startTimestamp,
+        endTimestamp: visitSessions[0].endTimestamp,
+        visitors: [{ nomisPersonId: contacts[0].personId }],
+      }),
+    )
+    selectVisitorsPage.continueButton().click()
+    const selectVisitDateAndTime = Page.verifyOnPage(SelectVisitDateAndTime)
+    selectVisitDateAndTime.expandAllSections()
+    selectVisitDateAndTime.getSlotById(1).check()
+
+    // Additional support
+    selectVisitDateAndTime.continueButton().click()
+    const additionalSupportPage = Page.verifyOnPage(AdditionalSupportPage)
+    additionalSupportPage.additionalSupportNotRequired().check()
+
+    // Main contact
+    additionalSupportPage.continueButton().click()
+    const mainContactPage = Page.verifyOnPage(MainContactPage)
+    mainContactPage.getFirstContact().check()
+    mainContactPage.phoneNumberTrueRadio().click()
+    mainContactPage.enterPhoneNumber('01234 567890')
+    cy.task(
+      'stubChangeVisitApplication',
+      TestData.application({
+        startTimestamp: visitSessions[0].startTimestamp,
+        endTimestamp: visitSessions[0].endTimestamp,
+        visitContact: { name: 'Jeanette Smith', telephone: '01234 567890' },
+        visitors: [{ nomisPersonId: contacts[0].personId, visitContact: true }],
+        visitorSupport: { description: '' },
+        sessionTemplateReference: visitSessions[0].sessionTemplateReference,
+      }),
+    )
+
+    // Request method
+    mainContactPage.continueButton().click()
+    const requestMethodPage = Page.verifyOnPage(RequestMethodPage)
+    requestMethodPage.getRequestLabelByValue('PHONE').contains('Phone call')
+    requestMethodPage.getRequestMethodByValue('PHONE').check()
+    requestMethodPage.continueButton().click()
+
+    // Check visit details
+    const checkYourBookingPage = Page.verifyOnPage(CheckYourBookingPage)
+    checkYourBookingPage.prisonerName().contains(prisonerDisplayName)
+    checkYourBookingPage.visitDate().contains(format(new Date(visitSessions[0].startTimestamp), longDateFormat))
+
+    cy.task('stubBookVisitValidationFailed', {
+      visit: TestData.visit({
+        startTimestamp: visitSessions[1].startTimestamp,
+        endTimestamp: visitSessions[1].endTimestamp,
+        visitContact: { name: 'Jeanette Smith', telephone: '09876 543 321' },
+        visitors: [
+          { nomisPersonId: contacts[0].personId, visitContact: true },
+          { nomisPersonId: contacts[1].personId, visitContact: false },
+        ],
+        visitorSupport: { description: 'Wheelchair ramp' },
+      }),
+    })
+
+    checkYourBookingPage.submitBooking()
+
+    // Check alert on select date and time page
+    Page.verifyOnPage(SelectVisitDateAndTime)
+    selectVisitDateAndTime.mojAlertTitle().contains('Smith, John now has a non-association on 1 April.')
+    selectVisitDateAndTime.mojAlertBody().contains('Select a new visit time.')
+  })
 })

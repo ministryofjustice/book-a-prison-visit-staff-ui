@@ -33,7 +33,7 @@ export declare global {
       flash(type: 'errors', message: ValidationError[]): number
       flash(type: 'formValues'): Record<string, string | string[] | number[]>[]
       flash(type: 'formValues', message: Record<string, string | string[] | number[]>): number
-      flash(type: 'messages'): MojAlert
+      flash(type: 'messages'): MojAlert[]
       flash(type: 'messages', message: MojAlert): number
     }
 

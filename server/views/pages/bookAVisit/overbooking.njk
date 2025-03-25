@@ -11,8 +11,8 @@
 
       {% include "partials/errorSummary.njk" %}
 
-      {% if validationAlert %}
-        {{ mojAlert(validationAlert) }}
+      {% if validationAlert | length %}
+        {{ mojAlert(validationAlert[0]) }}
       {% endif %}
 
       <h1 class="govuk-heading-l">

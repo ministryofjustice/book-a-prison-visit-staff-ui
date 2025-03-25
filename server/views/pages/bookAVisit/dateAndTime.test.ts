@@ -212,12 +212,14 @@ describe('Views - Date and time of visit', () => {
 
   it('should display 422 validation error - MojAlert', () => {
     viewContext = {
-      validationAlert: {
-        text: 'Select whether to book for this time or choose a new visit time.',
-        showTitleAsHeading: true,
-        title: 'Another person has booked the last table.',
-        variant: 'warning',
-      },
+      validationAlert: [
+        {
+          text: 'Select whether to book for this time or choose a new visit time.',
+          showTitleAsHeading: true,
+          title: 'Another person has booked the last table.',
+          variant: 'warning',
+        },
+      ],
     }
     const $ = cheerio.load(compiledTemplate.render(viewContext))
 

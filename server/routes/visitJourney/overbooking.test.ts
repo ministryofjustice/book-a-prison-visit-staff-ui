@@ -80,7 +80,7 @@ testJourneys.forEach(journey => {
       // visit reference only known on update journey
       visitSessionData.visitReference = journey.isUpdate ? 'ab-cd-ef-gh' : undefined
 
-      flashData = { errors: [], formValues: [], messages: undefined }
+      flashData = { errors: [], formValues: [], messages: [] }
       flashProvider.mockImplementation((key: keyof FlashData) => {
         return flashData[key]
       })
@@ -142,7 +142,7 @@ testJourneys.forEach(journey => {
       const prisonId = 'HEI'
 
       beforeEach(() => {
-        flashData = { errors: [], formValues: [] }
+        flashData = { errors: [], formValues: [], messages: [] }
         flashProvider.mockImplementation((key: keyof FlashData) => {
           return flashData[key]
         })
@@ -240,7 +240,7 @@ testJourneys.forEach(journey => {
 
   describe(`${journey.urlPrefix}/check-your-booking/overbooking`, () => {
     beforeEach(() => {
-      flashData = { errors: [], formValues: [], messages: undefined }
+      flashData = { errors: [], formValues: [], messages: [] }
       flashProvider.mockImplementation((key: keyof FlashData) => {
         return flashData[key]
       })
@@ -307,12 +307,8 @@ testJourneys.forEach(journey => {
       it('should render the confirm overbooking page with all session information (Open)', () => {
         const visitSession = TestData.visitSession({ openVisitBookedCount: 20, openVisitCapacity: 20 })
         visitSessionsService.getSingleVisitSession.mockResolvedValue(visitSession)
-        flashData.messages = {
-          text: 'Select whether to book for this time or choose a new visit time.',
-          showTitleAsHeading: true,
-          title: 'Another person has booked the last table.',
-          variant: 'warning',
-        }
+        flashData.messages = [TestData.mojAlert()]
+
         return request(sessionApp)
           .get(`${journey.urlPrefix}/check-your-booking/overbooking`)
           .expect(200)

@@ -92,6 +92,7 @@ export default class CheckYourBooking {
           visitSessionData.visitSlot.startTimestamp,
           validationErrors,
         )
+
         if (mojAlert) {
           req.flash('messages', mojAlert)
           return res.redirect(`${urlPrefix}/${url}`)
