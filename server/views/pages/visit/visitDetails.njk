@@ -208,7 +208,7 @@
                 <span>
                   <span class="govuk-tag alert-tag alert-tag--{{ alert.alertType }}"
                     data-test="prisoner-alert-{{ loop.index }}">
-                    {{- alert.alertTypeDescription -}}
+                    {{- alert.alertCodeDescription -}}
                   </span>
                 </span>
                 <span class="bapv-visit-details__restriction-dates">From <span data-test="prisoner-alert-{{ loop.index }}-start">{{ alert.dateCreated | formatDate }}</span>
