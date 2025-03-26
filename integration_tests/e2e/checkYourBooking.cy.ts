@@ -14,6 +14,35 @@ import RequestMethodPage from '../pages/requestMethod'
 context('Check visit details page', () => {
   const shortDateFormat = 'yyyy-MM-dd'
   const longDateFormat = 'EEEE d MMMM yyyy'
+  const dayMonthFormat = 'd MMMM'
+
+  const profile = TestData.prisonerProfile()
+  const { prisonerId, prisonId } = profile
+  const prisonerDisplayName = 'Smith, John'
+
+  const today = new Date()
+  const childDob = format(sub(today, { years: 5 }), shortDateFormat)
+  const contacts = [
+    TestData.contact(),
+    TestData.contact({
+      personId: 4322,
+      firstName: 'Bob',
+      dateOfBirth: childDob,
+      relationshipCode: 'SON',
+      relationshipDescription: 'Son',
+    }),
+  ]
+
+  const visitSessions: VisitSession[] = [
+    TestData.visitSession({
+      startTimestamp: format(addDays(today, 7), `${shortDateFormat}'T'10:00:00`),
+      endTimestamp: format(addDays(today, 7), `${shortDateFormat}'T'11:00:00`),
+    }),
+    TestData.visitSession({
+      startTimestamp: format(addDays(today, 8), `${shortDateFormat}'T'13:30:00`),
+      endTimestamp: format(addDays(today, 8), `${shortDateFormat}'T'15:00:00`),
+    }),
+  ]
 
   beforeEach(() => {
     cy.task('reset')
@@ -25,34 +54,6 @@ context('Check visit details page', () => {
   })
 
   it('should complete the book a visit journey and change details before booking', () => {
-    const profile = TestData.prisonerProfile()
-    const { prisonerId, prisonId } = profile
-    const prisonerDisplayName = 'Smith, John'
-
-    const today = new Date()
-    const childDob = format(sub(today, { years: 5 }), shortDateFormat)
-    const contacts = [
-      TestData.contact(),
-      TestData.contact({
-        personId: 4322,
-        firstName: 'Bob',
-        dateOfBirth: childDob,
-        relationshipCode: 'SON',
-        relationshipDescription: 'Son',
-      }),
-    ]
-
-    const visitSessions: VisitSession[] = [
-      TestData.visitSession({
-        startTimestamp: format(addDays(today, 7), `${shortDateFormat}'T'10:00:00`),
-        endTimestamp: format(addDays(today, 7), `${shortDateFormat}'T'11:00:00`),
-      }),
-      TestData.visitSession({
-        startTimestamp: format(addDays(today, 8), `${shortDateFormat}'T'13:30:00`),
-        endTimestamp: format(addDays(today, 8), `${shortDateFormat}'T'15:00:00`),
-      }),
-    ]
-
     // Start - Prisoner profile page
     cy.task('stubPrisonerSocialContacts', { offenderNo: prisonerId, contacts })
     cy.task('stubPrisonerProfile', profile)
@@ -270,34 +271,6 @@ context('Check visit details page', () => {
   })
 
   it('should display validation error message after failing to submit booking', () => {
-    const profile = TestData.prisonerProfile()
-    const { prisonerId, prisonId } = profile
-    const prisonerDisplayName = 'Smith, John'
-
-    const today = new Date()
-    const childDob = format(sub(today, { years: 5 }), shortDateFormat)
-    const contacts = [
-      TestData.contact(),
-      TestData.contact({
-        personId: 4322,
-        firstName: 'Bob',
-        dateOfBirth: childDob,
-        relationshipCode: 'SON',
-        relationshipDescription: 'Son',
-      }),
-    ]
-
-    const visitSessions: VisitSession[] = [
-      TestData.visitSession({
-        startTimestamp: format(addDays(today, 7), `${shortDateFormat}'T'10:00:00`),
-        endTimestamp: format(addDays(today, 7), `${shortDateFormat}'T'11:00:00`),
-      }),
-      TestData.visitSession({
-        startTimestamp: format(addDays(today, 8), `${shortDateFormat}'T'13:30:00`),
-        endTimestamp: format(addDays(today, 8), `${shortDateFormat}'T'15:00:00`),
-      }),
-    ]
-
     // Start - Prisoner profile page
     cy.task('stubPrisonerSocialContacts', { offenderNo: prisonerId, contacts })
     cy.task('stubPrisonerProfile', profile)
@@ -379,7 +352,11 @@ context('Check visit details page', () => {
 
     // Check alert on select date and time page
     Page.verifyOnPage(SelectVisitDateAndTime)
-    selectVisitDateAndTime.mojAlertTitle().contains('Smith, John now has a non-association on 1 April.')
+    selectVisitDateAndTime
+      .mojAlertTitle()
+      .contains(
+        `Smith, John now has a non-association on ${format(new Date(visitSessions[0].startTimestamp), dayMonthFormat)}.`,
+      )
     selectVisitDateAndTime.mojAlertBody().contains('Select a new visit time.')
   })
 })
