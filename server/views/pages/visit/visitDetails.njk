@@ -174,7 +174,7 @@
             </dd>
           </dl>
 
-          {% if visitDetails.prisoner.prisonerRestrictions | length %}
+          {% if features.showPrisonerAlertsRestrictions and visitDetails.prisoner.prisonerRestrictions | length %}
             <h4 class="govuk-heading-s">Restrictions</h4>
             {% for restriction in visitDetails.prisoner.prisonerRestrictions %}
               <p class="bapv-visit-details__restriction">
@@ -197,7 +197,7 @@
             {% endfor %}
           {% endif %}
 
-          {% if visitDetails.prisoner.prisonerAlerts | length %}
+          {% if features.showPrisonerAlertsRestrictions and visitDetails.prisoner.prisonerAlerts | length %}
             <h4 class="govuk-heading-s">Alerts</h4>
             <p>
               This page shows alerts that are relevant for social visits. You can also
