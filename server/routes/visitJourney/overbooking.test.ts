@@ -81,7 +81,7 @@ testJourneys.forEach(journey => {
       // visit reference only known on update journey
       visitSessionData.visitReference = journey.isUpdate ? 'ab-cd-ef-gh' : undefined
 
-      flashData = { errors: [], formValues: [] }
+      flashData = { errors: [], formValues: [], messages: [] }
       flashProvider.mockImplementation((key: keyof FlashData) => {
         return flashData[key]
       })
@@ -143,7 +143,7 @@ testJourneys.forEach(journey => {
       const prisonId = 'HEI'
 
       beforeEach(() => {
-        flashData = { errors: [], formValues: [] }
+        flashData = { errors: [], formValues: [], messages: [] }
         flashProvider.mockImplementation((key: keyof FlashData) => {
           return flashData[key]
         })
@@ -241,7 +241,7 @@ testJourneys.forEach(journey => {
 
   describe(`${journey.urlPrefix}/check-your-booking/overbooking`, () => {
     beforeEach(() => {
-      flashData = { errors: [], formValues: [] }
+      flashData = { errors: [], formValues: [], messages: [] }
       flashProvider.mockImplementation((key: keyof FlashData) => {
         return flashData[key]
       })
@@ -309,6 +309,8 @@ testJourneys.forEach(journey => {
       it('should render the confirm overbooking page with all session information (Open)', () => {
         const visitSession = TestData.visitSession({ openVisitBookedCount: 20, openVisitCapacity: 20 })
         visitSessionsService.getSingleVisitSession.mockResolvedValue(visitSession)
+        flashData.messages = [TestData.mojAlert()]
+
         return request(sessionApp)
           .get(`${journey.urlPrefix}/check-your-booking/overbooking`)
           .expect(200)
@@ -323,6 +325,8 @@ testJourneys.forEach(journey => {
             expect($('[data-test=visit-start-time]').text().trim()).toBe('10am')
             expect($('[data-test=visit-end-time]').text().trim()).toBe('11am')
             expect($('[data-test=visit-date]').text().trim()).toBe('Friday 14 January')
+            expect($('.moj-alert__content h2').text()).toContain('Another person has booked the last table.')
+            expect($('.moj-alert').text()).toContain('Select whether to book for this time or choose a new visit time.')
           })
       })
 
@@ -372,7 +376,8 @@ testJourneys.forEach(journey => {
             expect($('.govuk-error-summary__body a').attr('href')).toBe('#confirmOverBooking-error')
             expect($('#confirmOverBooking-error').text()).toContain('No answer selected')
             expect(flashProvider).toHaveBeenCalledWith('errors')
-            expect(flashProvider).toHaveBeenCalledTimes(1)
+            expect(flashProvider).toHaveBeenCalledWith('messages')
+            expect(flashProvider).toHaveBeenCalledTimes(2)
           })
       })
     })

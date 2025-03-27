@@ -3,6 +3,7 @@ import { stubFor } from './wiremock'
 import {
   ApplicationDto,
   ApplicationMethodType,
+  ApplicationValidationErrorResponse,
   CancelVisitOrchestrationDto,
   ExcludeDateDto,
   IgnoreVisitNotificationsDto,
@@ -50,6 +51,31 @@ export default {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
         jsonBody: visit,
+      },
+    })
+  },
+  stubBookVisitValidationFailed: ({
+    applicationReference,
+    validationErrors = ['APPLICATION_INVALID_NON_ASSOCIATION_VISITS'],
+  }: {
+    applicationReference: string
+    validationErrors: ApplicationValidationErrorResponse['validationErrors'][number][]
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'PUT',
+        url: `/orchestration/visits/${applicationReference}/book`,
+      },
+      response: {
+        status: 422,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: {
+          status: 422,
+          errorCode: null,
+          userMessage: 'Prisoner validation failed',
+          developerMessage: null,
+          validationErrors,
+        },
       },
     })
   },

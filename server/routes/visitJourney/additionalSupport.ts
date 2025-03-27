@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
 import { getFlashFormValues } from '../visitorUtils'
-import getUrlPrefix from './visitJourneyUtils'
+import { getUrlPrefix } from './visitJourneyUtils'
 
 export default class AdditionalSupport {
   constructor(private readonly mode: string) {}

@@ -3,7 +3,7 @@ import { body, ValidationChain, validationResult } from 'express-validator'
 import { VisitSlot } from '../../@types/bapv'
 import AuditService from '../../services/auditService'
 import { getFlashFormValues, getSelectedSlot, getSlotByTimeAndRestriction } from '../visitorUtils'
-import getUrlPrefix from './visitJourneyUtils'
+import { getUrlPrefix } from './visitJourneyUtils'
 import { VisitService, VisitSessionsService } from '../../services'
 import { isSameVisitSlot } from '../../utils/utils'
 
@@ -19,6 +19,7 @@ export default class DateAndTime {
     const isUpdate = this.mode === 'update'
     const { prisonId } = req.session.selectedEstablishment
     const { visitSessionData } = req.session
+    const prisonerName = visitSessionData.prisoner.name
 
     const warningMessages: { id: string; message: string }[] = []
 
@@ -104,8 +105,9 @@ export default class DateAndTime {
 
     res.render('pages/bookAVisit/dateAndTime', {
       errors: req.flash('errors'),
+      validationAlert: req.flash('messages'),
       visitRestriction: visitSessionData.visitRestriction,
-      prisonerName: visitSessionData.prisoner.name,
+      prisonerName,
       offenderNo: visitSessionData.prisoner.offenderNo,
       location: visitSessionData.prisoner.location,
       whereaboutsAvailable,

@@ -7,6 +7,7 @@
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 {%- from "govuk/components/tag/macro.njk" import govukTag -%}
 {%- from "moj/components/banner/macro.njk" import mojBanner -%}
+{%- from "moj/components/alert/macro.njk" import mojAlert -%}
 
 {% set pageHeaderTitle = "Select date and time of visit" %}
 
@@ -51,6 +52,13 @@
 
 {% block content %}
   <div class="govuk-grid-row">
+
+    <div class="govuk-grid-column-two-thirds">
+      {% if validationAlert | length %}
+        {{ mojAlert(validationAlert[0]) }}
+      {% endif %}
+    </div>
+
     <div class="govuk-grid-column-full">
       {% include "partials/errorSummary.njk" %}
 

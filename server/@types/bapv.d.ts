@@ -124,6 +124,13 @@ export type VisitSessionData = {
   overrideBookingWindow?: boolean
 }
 
+export type MojAlert = {
+  title: string
+  text: string
+  variant: 'warning' | 'error' | 'information' | 'success'
+  showTitleAsHeading: boolean
+}
+
 export type VisitInformation = {
   reference: string
   prisonNumber: string
@@ -143,7 +150,7 @@ export type VisitsPageSideNavItem = {
 
 export type VisitsPageSideNav = Map<string, VisitsPageSideNavItem[]>
 
-export type FlashData = Record<string, string | string[] | Record<string, string | string[]>[]>
+export type FlashData = Record<string, string | string[] | Record<string, string | string[]>[] | MojAlert[]>
 
 export type VisitsReviewListItem = {
   actionUrl: string
