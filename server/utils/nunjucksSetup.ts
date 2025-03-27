@@ -20,6 +20,7 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   app.locals.environmentName = config.environmentName
   app.locals.dpsHome = config.dpsHome
   app.locals.dpsPrisoner = config.dpsPrisoner
+  app.locals.features = config.features
 
   // Cachebusting version string
   if (production) {

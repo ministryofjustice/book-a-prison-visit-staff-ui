@@ -113,16 +113,7 @@ describe('orchestrationApiClient', () => {
   })
 
   describe('getVisitDetailed', () => {
-    afterEach(() => {
-      jest.restoreAllMocks()
-    })
-
     it('should return full visit details for requested visit with filtered notification events', async () => {
-      jest.replaceProperty(config, 'features', {
-        ...config.features,
-        showPrisonerAlertsRestrictions: true,
-      })
-
       const rawVisitBookingDetailsDto = TestData.visitBookingDetailsDto()
 
       // add an audit event that should be filtered
@@ -151,25 +142,6 @@ describe('orchestrationApiClient', () => {
       const output = await orchestrationApiClient.getVisitDetailed(rawVisitBookingDetailsDto.reference)
 
       expect(output).toEqual(filteredVisitBookingDetailsDto)
-    })
-
-    it('should return visit details without prisoner alerts/restrictions if SHOW_VISIT_DETAILS_PRISONER_ALERTS_RESTRICTIONS not enabled', async () => {
-      jest.replaceProperty(config, 'features', {
-        ...config.features,
-        showPrisonerAlertsRestrictions: false,
-      })
-
-      const visitDetails = TestData.visitBookingDetailsDto()
-
-      fakeOrchestrationApi
-        .get(`/visits/${visitDetails.reference}/detailed`)
-        .matchHeader('authorization', `Bearer ${token}`)
-        .reply(200, visitDetails)
-
-      const output = await orchestrationApiClient.getVisitDetailed(visitDetails.reference)
-
-      expect(output.prisoner.prisonerAlerts).toStrictEqual([])
-      expect(output.prisoner.prisonerRestrictions).toStrictEqual([])
     })
   })
 
