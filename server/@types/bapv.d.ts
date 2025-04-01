@@ -35,7 +35,8 @@ export type PrisonerProfilePage = {
   flaggedAlerts: Alert[]
   prisonerDetails: {
     prisonerId: string
-    name: string
+    firstName: string
+    lastName: string
     dateOfBirth: string
     cellLocation: string
     prisonName: string
@@ -97,7 +98,8 @@ export type FormError = {
 export type VisitSessionData = {
   allowOverBooking: boolean
   prisoner: {
-    name: string
+    firstName: string
+    lastName: string
     offenderNo: string
     location: string
     alerts?: Alert[]

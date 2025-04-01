@@ -19,7 +19,6 @@ export default class DateAndTime {
     const isUpdate = this.mode === 'update'
     const { prisonId } = req.session.selectedEstablishment
     const { visitSessionData } = req.session
-    const prisonerName = visitSessionData.prisoner.name
 
     const warningMessages: { id: string; message: string }[] = []
 
@@ -107,7 +106,7 @@ export default class DateAndTime {
       errors: req.flash('errors'),
       validationAlert: req.flash('messages'),
       visitRestriction: visitSessionData.visitRestriction,
-      prisonerName,
+      prisonerName: `${visitSessionData.prisoner.firstName} ${visitSessionData.prisoner.lastName}`,
       offenderNo: visitSessionData.prisoner.offenderNo,
       location: visitSessionData.prisoner.location,
       whereaboutsAvailable,

@@ -8,7 +8,6 @@ import { clearSession } from './visitorUtils'
 import { VisitSessionData, VisitSlot } from '../@types/bapv'
 import SelectVisitors from './visitJourney/selectVisitors'
 import VisitType from './visitJourney/visitType'
-import { properCaseFullName } from '../utils/utils'
 import DateAndTime from './visitJourney/dateAndTime'
 import AdditionalSupport from './visitJourney/additionalSupport'
 import CheckYourBooking from './visitJourney/checkYourBooking'
@@ -85,7 +84,8 @@ export default function routes({
     const visitSessionData: VisitSessionData = {
       allowOverBooking: false,
       prisoner: {
-        name: properCaseFullName(`${prisoner.lastName}, ${prisoner.firstName}`),
+        firstName: prisoner.firstName,
+        lastName: prisoner.lastName,
         offenderNo: prisoner.prisonerNumber,
         location: getPrisonerLocation(prisoner),
         alerts: prisoner.prisonerAlerts,
