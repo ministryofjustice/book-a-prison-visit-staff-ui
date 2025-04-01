@@ -18,6 +18,7 @@ import sessionCheckMiddleware from '../middleware/sessionCheckMiddleware'
 import { type Services } from '../services'
 import Overbooking from './visitJourney/overbooking'
 import { getPrisonerLocation } from './visit/visitUtils'
+import { convertToTitleCase } from '../utils/utils'
 
 export default function routes({
   auditService,
@@ -84,8 +85,8 @@ export default function routes({
     const visitSessionData: VisitSessionData = {
       allowOverBooking: false,
       prisoner: {
-        firstName: prisoner.firstName,
-        lastName: prisoner.lastName,
+        firstName: convertToTitleCase(prisoner.firstName),
+        lastName: convertToTitleCase(prisoner.lastName),
         offenderNo: prisoner.prisonerNumber,
         location: getPrisonerLocation(prisoner),
         alerts: prisoner.prisonerAlerts,

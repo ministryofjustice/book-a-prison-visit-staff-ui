@@ -489,8 +489,8 @@ export default class TestData {
     },
     prisoner = {
       prisonerNumber: 'A1234BC',
-      firstName: 'John',
-      lastName: 'Smith',
+      firstName: 'JOHN',
+      lastName: 'SMITH',
       dateOfBirth: '1975-04-02',
       prisonId: 'HEI',
       prisonName: 'Hewell (HMP)',

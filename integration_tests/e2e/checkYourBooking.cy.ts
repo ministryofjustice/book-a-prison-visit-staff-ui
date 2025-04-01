@@ -18,7 +18,6 @@ context('Check visit details page', () => {
 
   const profile = TestData.prisonerProfile()
   const { prisonerId, prisonId } = profile
-  const prisonerDisplayName = 'Smith, John'
 
   const today = new Date()
   const childDob = format(sub(today, { years: 5 }), shortDateFormat)
@@ -59,7 +58,7 @@ context('Check visit details page', () => {
     cy.task('stubPrisonerProfile', profile)
     cy.visit(`/prisoner/${prisonerId}`)
 
-    const prisonerProfilePage = Page.verifyOnPageTitle(PrisonerProfilePage, prisonerDisplayName)
+    const prisonerProfilePage = Page.verifyOnPageTitle(PrisonerProfilePage, 'Smith, John')
 
     // Select visitors - first of two
     cy.task('stubOffenderRestrictions', { offenderNo: prisonerId, offenderRestrictions: [] })
@@ -124,7 +123,7 @@ context('Check visit details page', () => {
 
     // Check visit details
     const checkYourBookingPage = Page.verifyOnPage(CheckYourBookingPage)
-    checkYourBookingPage.prisonerName().contains(prisonerDisplayName)
+    checkYourBookingPage.prisonerName().contains('John Smith')
     checkYourBookingPage.visitDate().contains(format(new Date(visitSessions[0].startTimestamp), longDateFormat))
     checkYourBookingPage.visitTime().contains('10am to 11am')
     checkYourBookingPage.visitType().contains('Open')
@@ -258,7 +257,7 @@ context('Check visit details page', () => {
     checkYourBookingPage.submitBooking()
     const confirmationPage = Page.verifyOnPageTitle(ConfirmationPage, 'Booking confirmed')
     confirmationPage.bookingReference().contains(TestData.visit().reference)
-    confirmationPage.prisonerName().contains(prisonerDisplayName)
+    confirmationPage.prisonerName().contains('John Smith')
     confirmationPage.prisonerNumber().contains(prisonerId)
     confirmationPage.visitDate().contains(format(new Date(visitSessions[1].startTimestamp), longDateFormat))
     confirmationPage.visitTime().contains('1:30pm to 3pm')
@@ -276,7 +275,7 @@ context('Check visit details page', () => {
     cy.task('stubPrisonerProfile', profile)
     cy.visit(`/prisoner/${prisonerId}`)
 
-    const prisonerProfilePage = Page.verifyOnPageTitle(PrisonerProfilePage, prisonerDisplayName)
+    const prisonerProfilePage = Page.verifyOnPageTitle(PrisonerProfilePage, 'Smith, John')
 
     // Select visitors - first of two
     cy.task('stubOffenderRestrictions', { offenderNo: prisonerId, offenderRestrictions: [] })
@@ -341,7 +340,7 @@ context('Check visit details page', () => {
 
     // Check visit details
     const checkYourBookingPage = Page.verifyOnPage(CheckYourBookingPage)
-    checkYourBookingPage.prisonerName().contains(prisonerDisplayName)
+    checkYourBookingPage.prisonerName().contains('John Smith')
     checkYourBookingPage.visitDate().contains(format(new Date(visitSessions[0].startTimestamp), longDateFormat))
 
     cy.task('stubBookVisitValidationFailed', {
@@ -355,7 +354,7 @@ context('Check visit details page', () => {
     selectVisitDateAndTime
       .mojAlertTitle()
       .contains(
-        `Smith, John now has a non-association on ${format(new Date(visitSessions[0].startTimestamp), dayMonthFormat)}.`,
+        `John Smith now has a non-association on ${format(new Date(visitSessions[0].startTimestamp), dayMonthFormat)}.`,
       )
     selectVisitDateAndTime.mojAlertBody().contains('Select a new visit time.')
   })
