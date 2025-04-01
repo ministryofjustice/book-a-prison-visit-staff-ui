@@ -18,6 +18,7 @@ export default class CheckYourBooking {
     const isUpdate = this.mode === 'update'
     const { visitSessionData } = req.session
     const { offenderNo } = visitSessionData.prisoner
+    const prisonerName = `${visitSessionData.prisoner.firstName} ${visitSessionData.prisoner.lastName}`
 
     const additionalSupport = visitSessionData.visitorSupport.description.length
       ? visitSessionData.visitorSupport.description
@@ -27,6 +28,7 @@ export default class CheckYourBooking {
       offenderNo,
       mainContact: visitSessionData.mainContact,
       prisoner: visitSessionData.prisoner,
+      prisonerName,
       visitSlot: visitSessionData.visitSlot,
       visitRestriction: visitSessionData.visitRestriction,
       visitors: visitSessionData.visitors,
@@ -41,6 +43,7 @@ export default class CheckYourBooking {
     const { visitSessionData } = req.session
     const { prisonId } = req.session.selectedEstablishment
     const { offenderNo } = visitSessionData.prisoner
+    const prisonerName = `${visitSessionData.prisoner.firstName} ${visitSessionData.prisoner.lastName}`
 
     const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
 
@@ -88,7 +91,7 @@ export default class CheckYourBooking {
           (error as SanitisedError<ApplicationValidationErrorResponse>)?.data?.validationErrors ?? []
 
         const { mojAlert, url } = validationErrorsMojAlert(
-          visitSessionData.prisoner.name,
+          prisonerName,
           visitSessionData.visitSlot.startTimestamp,
           validationErrors,
         )
@@ -109,6 +112,7 @@ export default class CheckYourBooking {
         offenderNo,
         mainContact: visitSessionData.mainContact,
         prisoner: visitSessionData.prisoner,
+        prisonerName,
         visitSlot: visitSessionData.visitSlot,
         visitRestriction: visitSessionData.visitRestriction,
         visitors: visitSessionData.visitors,

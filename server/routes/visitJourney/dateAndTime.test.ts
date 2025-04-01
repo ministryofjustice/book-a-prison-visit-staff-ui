@@ -91,7 +91,8 @@ beforeEach(() => {
   visitSessionData = {
     allowOverBooking: false,
     prisoner: {
-      name: 'John Smith',
+      firstName: 'John',
+      lastName: 'Smith',
       offenderNo: 'A1234BC',
       location: 'location place',
     },

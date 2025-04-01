@@ -25,7 +25,8 @@ export default function sessionCheckMiddleware({ stage }: { stage: number }): Re
 
     if (
       !visitSessionData.prisoner ||
-      !visitSessionData.prisoner.name ||
+      !visitSessionData.prisoner.firstName ||
+      !visitSessionData.prisoner.lastName ||
       !isValidPrisonerNumber(visitSessionData.prisoner.offenderNo || '') ||
       !visitSessionData.prisoner.location
     ) {
