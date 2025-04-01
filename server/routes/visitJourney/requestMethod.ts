@@ -2,7 +2,7 @@ import type { Request, Response } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
 import { requestMethodsBooking } from '../../constants/requestMethods'
 import { getFlashFormValues } from '../visitorUtils'
-import getUrlPrefix from './visitJourneyUtils'
+import { getUrlPrefix } from './visitJourneyUtils'
 
 export default class RequestMethod {
   constructor(private readonly mode: string) {}

@@ -58,7 +58,8 @@ describe('POST /visit/:reference', () => {
         expect(visitSessionData).toStrictEqual(<VisitSessionData>{
           allowOverBooking: false,
           prisoner: {
-            name: 'Smith, John',
+            firstName: 'John',
+            lastName: 'Smith',
             offenderNo: 'A1234BC',
             location: '1-1-C-028, Hewell (HMP)',
             alerts: visitDetails.prisoner.prisonerAlerts,

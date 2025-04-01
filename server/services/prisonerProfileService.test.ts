@@ -57,7 +57,8 @@ describe('Prisoner profile service', () => {
         visitsByMonth: new Map(),
         prisonerDetails: {
           prisonerId: 'A1234BC',
-          name: 'Smith, John',
+          firstName: 'John',
+          lastName: 'Smith',
           dateOfBirth: '2 April 1975',
           cellLocation: '1-1-C-028',
           prisonName: 'Hewell (HMP)',

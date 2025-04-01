@@ -187,7 +187,7 @@ context('Update a visit', () => {
     // Confirmation page
     const confirmationPage = Page.verifyOnPageTitle(ConfirmationPage, 'Booking updated')
     confirmationPage.bookingReference().contains(TestData.visit().reference)
-    confirmationPage.prisonerName().contains('Smith, John')
+    confirmationPage.prisonerName().contains('John Smith')
     confirmationPage.prisonerNumber().contains(offenderNo)
     confirmationPage.visitDate().contains(format(new Date(visitSessions[1].startTimestamp), longDateFormat))
     confirmationPage.visitTime().contains('1:30pm to 3pm')

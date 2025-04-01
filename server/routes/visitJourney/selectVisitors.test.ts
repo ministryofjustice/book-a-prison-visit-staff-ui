@@ -103,7 +103,8 @@ testJourneys.forEach(journey => {
       visitSessionData = {
         allowOverBooking: false,
         prisoner: {
-          name: 'John Smith',
+          firstName: 'John',
+          lastName: 'Smith',
           offenderNo: 'A1234BC',
           location: 'location place',
           alerts: [],
@@ -133,6 +134,7 @@ testJourneys.forEach(journey => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
+          expect($('[data-test="prisoner-name"]').text()).toContain('John Smith')
           expect($('[data-test=restrictions-type1]').text().trim()).toBe('Restricted')
           expect($('[data-test=restrictions-comment1]').text().trim()).toBe('Details about this restriction')
           expect($('[data-test=restrictions-end-date1]').text().trim()).toBe('15 March 2022')
@@ -187,6 +189,7 @@ testJourneys.forEach(journey => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
+          expect($('[data-test="prisoner-name"]').text()).toContain('John Smith')
           expect($('[data-test=no-prisoner-restrictions]').text()).toBe('')
           expect($('[data-test=restrictions-type1]').text()).toBe('')
           expect($('[data-test=restrictions-comment1]').text().trim()).toBe('')
@@ -206,6 +209,7 @@ testJourneys.forEach(journey => {
           const $ = cheerio.load(res.text)
           expect($('h1').text().trim()).toBe('Select visitors')
 
+          expect($('[data-test="prisoner-name"]').text()).toContain('John Smith')
           expect($('#visitor-4321').length).toBe(1)
           expect($('#visitor-4321').prop('disabled')).toBe(true)
           expect($('[data-test="visitor-name-4321"]').text()).toBe('Jeanette Smith')
@@ -535,7 +539,8 @@ testJourneys.forEach(journey => {
       visitSessionData = {
         allowOverBooking: false,
         prisoner: {
-          name: 'prisoner name',
+          firstName: 'prisoner',
+          lastName: 'name',
           offenderNo: 'A1234BC',
           location: 'location place',
           restrictions: [],

@@ -159,7 +159,7 @@ export default function routes({ auditService, prisonerSearchService, visitServi
           visit.prisonNumber,
           res.locals.user.username,
         )
-        visit.prisonerName = `${prisonerDetails.lastName}, ${prisonerDetails.firstName}`
+        visit.prisonerName = `${prisonerDetails.firstName} ${prisonerDetails.lastName}`
       } catch (e) {
         if (e?.status === 404) {
           noResults = true

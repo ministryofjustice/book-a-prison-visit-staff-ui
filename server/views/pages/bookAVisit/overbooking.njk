@@ -1,14 +1,23 @@
 {% extends "layout.njk" %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{%- from "moj/components/alert/macro.njk" import mojAlert -%}
 
 {% set pageHeaderTitle = "This time slot is fully booked" %}
 
 {% block content %}
   <div class="govuk-grid-row">
+
+    <div class="govuk-grid-column-two-thirds">
+      {% if validationAlert | length %}
+        {{ mojAlert(validationAlert[0]) }}
+      {% endif %}
+    </div>
+
     <div class="govuk-grid-column-full">
 
       {% include "partials/errorSummary.njk" %}
+
       <h1 class="govuk-heading-l">
         This time slot is fully booked. Are you sure you want to continue?
       </h1>

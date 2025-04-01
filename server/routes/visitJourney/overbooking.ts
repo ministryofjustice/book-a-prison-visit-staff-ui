@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
-import getUrlPrefix from './visitJourneyUtils'
+import { getUrlPrefix } from './visitJourneyUtils'
 import { VisitSessionsService } from '../../services'
 
 export default class Overbooking {
@@ -64,6 +64,7 @@ export default class Overbooking {
 
     return res.render('pages/bookAVisit/overbooking', {
       errors: req.flash('errors'),
+      validationAlert: req.flash('messages'),
       bookingsCount,
       maxCapacity,
       visitSession,

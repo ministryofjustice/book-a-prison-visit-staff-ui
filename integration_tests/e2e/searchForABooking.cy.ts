@@ -40,7 +40,7 @@ context('Search for a booking by reference', () => {
     const searchBookingByReferenceResultsPage = Page.verifyOnPage(SearchForBookingByReferenceResultsPage)
 
     searchBookingByReferenceResultsPage.visitReference().contains('ab-cd-ef-gh')
-    searchBookingByReferenceResultsPage.prisonerName().contains('Smith, John')
+    searchBookingByReferenceResultsPage.prisonerName().contains('John Smith')
     searchBookingByReferenceResultsPage.prisonerNumber().contains(offenderNo)
     searchBookingByReferenceResultsPage.visitStatus().contains('Booked')
 

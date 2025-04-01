@@ -35,7 +35,8 @@ export type PrisonerProfilePage = {
   flaggedAlerts: Alert[]
   prisonerDetails: {
     prisonerId: string
-    name: string
+    firstName: string
+    lastName: string
     dateOfBirth: string
     cellLocation: string
     prisonName: string
@@ -97,7 +98,8 @@ export type FormError = {
 export type VisitSessionData = {
   allowOverBooking: boolean
   prisoner: {
-    name: string
+    firstName: string
+    lastName: string
     offenderNo: string
     location: string
     alerts?: Alert[]
@@ -124,6 +126,13 @@ export type VisitSessionData = {
   overrideBookingWindow?: boolean
 }
 
+export type MojAlert = {
+  title: string
+  text: string
+  variant: 'warning' | 'error' | 'information' | 'success'
+  showTitleAsHeading: boolean
+}
+
 export type VisitInformation = {
   reference: string
   prisonNumber: string
@@ -143,7 +152,7 @@ export type VisitsPageSideNavItem = {
 
 export type VisitsPageSideNav = Map<string, VisitsPageSideNavItem[]>
 
-export type FlashData = Record<string, string | string[] | Record<string, string | string[]>[]>
+export type FlashData = Record<string, string | string[] | Record<string, string | string[]>[] | MojAlert[]>
 
 export type VisitsReviewListItem = {
   actionUrl: string

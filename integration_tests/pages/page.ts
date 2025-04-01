@@ -45,4 +45,8 @@ export default abstract class Page {
   }
 
   signOut = (): PageElement => cy.get('[data-qa=signOut]')
+
+  mojAlertTitle = (): PageElement => cy.get('.moj-alert__content h2')
+
+  mojAlertBody = (): PageElement => cy.get('.moj-alert__content')
 }

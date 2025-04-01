@@ -6,7 +6,7 @@
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {%- from "moj/components/banner/macro.njk" import mojBanner -%}
 
-{% set pageHeaderTitle = prisonerDetails.name %}
+{% set pageHeaderTitle = prisonerName %}
 
 {% set query = '?' + queryParamsForBackLink if queryParamsForBackLink != '' %}
 {% if queryParamsForBackLink %}

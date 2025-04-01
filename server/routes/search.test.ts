@@ -252,7 +252,7 @@ describe('Booking search page', () => {
   getVisit = {
     reference: 'as-sd-df-fg',
     prisonNumber: 'A1234BC',
-    prisonerName: 'Smith, Ted',
+    prisonerName: 'Ted Smith',
     mainContact: 'Jon Smith',
     visitDate: '12 Nov 2021',
     visitTime: '1pm -2pm',
@@ -317,6 +317,7 @@ describe('Booking search page', () => {
           expect(res.text).toContain('Search for a booking')
           expect(res.text).toContain('id="search-results-true"')
           expect($('[data-test=search-by-prisoner]').length).toBe(0)
+          expect($('[data-test=prisoner-name]').text()).toBe('John Smith')
           expect(visitService.getVisit).toHaveBeenCalledWith({
             reference: 'ab-bc-cd-de',
             username: 'user1',
