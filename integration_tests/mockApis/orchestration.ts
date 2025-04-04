@@ -53,6 +53,39 @@ export default {
       },
     })
   },
+  stubUpdateVisit: ({
+    visit,
+    applicationMethod,
+    username,
+    allowOverBooking = false,
+  }: {
+    visit: Visit
+    applicationMethod: ApplicationMethodType
+    username: string
+    allowOverBooking: boolean
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'PUT',
+        url: `/orchestration/visits/${visit.applicationReference}/update`,
+        bodyPatterns: [
+          {
+            equalToJson: {
+              applicationMethodType: applicationMethod,
+              allowOverBooking,
+              actionedBy: username,
+              userType: 'STAFF',
+            },
+          },
+        ],
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: visit,
+      },
+    })
+  },
   stubCancelVisit: ({
     visit,
     cancelVisitDto,

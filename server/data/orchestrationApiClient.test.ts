@@ -70,6 +70,38 @@ describe('orchestrationApiClient', () => {
     })
   })
 
+  describe('updateVisit', () => {
+    it('should return a BOOKED visit, given an application reference', async () => {
+      const applicationReference = 'aaa-bbb-ccc'
+      const bookingOrchestrationRequestDto: BookingOrchestrationRequestDto = {
+        actionedBy: 'user1',
+        applicationMethodType: 'NOT_KNOWN',
+        allowOverBooking: false,
+        userType: 'STAFF',
+      }
+
+      const result: Partial<Visit> = {
+        applicationReference,
+        reference: 'ab-cd-ef-gh',
+        visitStatus: 'BOOKED',
+      }
+
+      fakeOrchestrationApi
+        .put(`/visits/${applicationReference}/update`, bookingOrchestrationRequestDto)
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, result)
+
+      const output = await orchestrationApiClient.updateVisit(
+        applicationReference,
+        bookingOrchestrationRequestDto.applicationMethodType,
+        false,
+        'user1',
+      )
+
+      expect(output).toStrictEqual(result)
+    })
+  })
+
   describe('cancelVisit', () => {
     it('should cancel visit with the specified outcome', async () => {
       const reference = 'ab-cd-ef-gh'

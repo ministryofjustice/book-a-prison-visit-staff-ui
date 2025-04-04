@@ -60,12 +60,19 @@ export default class CheckYourBooking {
 
     try {
       // 'book' the visit: complete the visit application and get BOOKED visit
-      const bookedVisit = await this.visitService.bookVisit({
-        username: res.locals.user.username,
-        applicationReference: visitSessionData.applicationReference,
-        applicationMethod: visitSessionData.requestMethod,
-        allowOverBooking: visitSessionData.allowOverBooking,
-      })
+      const bookedVisit = isUpdate
+        ? await this.visitService.updateVisit({
+            username: res.locals.user.username,
+            applicationReference: visitSessionData.applicationReference,
+            applicationMethod: visitSessionData.requestMethod,
+            allowOverBooking: visitSessionData.allowOverBooking,
+          })
+        : await this.visitService.bookVisit({
+            username: res.locals.user.username,
+            applicationReference: visitSessionData.applicationReference,
+            applicationMethod: visitSessionData.requestMethod,
+            allowOverBooking: visitSessionData.allowOverBooking,
+          })
 
       visitSessionData.visitReference = bookedVisit.reference
       visitSessionData.visitStatus = bookedVisit.visitStatus
