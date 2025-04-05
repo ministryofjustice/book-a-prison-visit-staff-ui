@@ -133,14 +133,14 @@
     "@types/http-errors": "^2.0.4",
     "@types/jest": "^29.5.14",
     "@types/jsonwebtoken": "^9.0.9",
-    "@types/node": "^22.13.14",
+    "@types/node": "^22.13.17",
     "@types/nunjucks": "^3.2.6",
     "@types/passport": "^1.0.17",
     "@types/passport-oauth2": "^1.4.17",
     "@types/superagent": "^8.1.9",
     "@types/supertest": "^6.0.3",
-    "@typescript-eslint/eslint-plugin": "^8.28.0",
-    "@typescript-eslint/parser": "^8.28.0",
+    "@typescript-eslint/eslint-plugin": "^8.29.0",
+    "@typescript-eslint/parser": "^8.29.0",
     "audit-ci": "^7.1.0",
     "axe-core": "^4.10.3",
     "cheerio": "^1.0.0",
@@ -162,9 +162,9 @@
     "openapi-typescript": "^7.6.1",
     "prettier": "^3.5.3",
     "prettier-plugin-jinja-template": "^2.0.0",
-    "sass": "^1.86.0",
+    "sass": "^1.86.1",
     "supertest": "^7.1.0",
-    "ts-jest": "^29.3.0",
-    "typescript": "^5.8.2"
+    "ts-jest": "^29.3.1",
+    "typescript": "^5.8.3"
   }
 }
