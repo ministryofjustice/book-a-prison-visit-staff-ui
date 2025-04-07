@@ -3,7 +3,7 @@ import { body, ValidationChain, validationResult } from 'express-validator'
 import { VisitorListItem } from '../../@types/bapv'
 import PrisonerVisitorsService from '../../services/prisonerVisitorsService'
 import { getFlashFormValues } from '../visitorUtils'
-import getUrlPrefix from './visitJourneyUtils'
+import { getUrlPrefix } from './visitJourneyUtils'
 import { getBanStatus } from '../../utils/visitorUtils'
 import { getDpsPrisonerAlertsUrl } from '../../utils/utils'
 
@@ -39,7 +39,7 @@ export default class SelectVisitors {
     res.render('pages/bookAVisit/visitors', {
       errors: req.flash('errors'),
       offenderNo: visitSessionData.prisoner.offenderNo,
-      prisonerName: visitSessionData.prisoner.name,
+      prisonerName: `${visitSessionData.prisoner.firstName} ${visitSessionData.prisoner.lastName}`,
       visitorList,
       atLeastOneAdult,
       eligibleVisitors,

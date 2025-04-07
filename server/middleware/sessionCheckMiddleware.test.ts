@@ -7,7 +7,8 @@ import TestData from '../routes/testutils/testData'
 const prisonId = 'HEI'
 
 const prisonerData: VisitSessionData['prisoner'] = {
-  name: 'abc',
+  firstName: 'prisoner',
+  lastName: 'name',
   offenderNo: 'A1234BC',
   location: 'abc',
 }
@@ -102,7 +103,8 @@ describe('sessionCheckMiddleware', () => {
       req.session.visitSessionData = {
         allowOverBooking: false,
         prisoner: {
-          name: 'abc',
+          firstName: 'prisoner',
+          lastName: 'name',
           offenderNo: 'A1234BC',
           location: 'abc',
         },
@@ -124,20 +126,23 @@ describe('sessionCheckMiddleware', () => {
       {
         allowOverBooking: false,
         prisoner: {
-          name: 'abc',
+          firstName: 'prisoner',
+          lastName: 'name',
         },
       },
       {
         allowOverBooking: false,
         prisoner: {
-          name: 'abc',
+          firstName: 'prisoner',
+          lastName: 'name',
           offenderNo: 'A1234BC',
         },
       },
       {
         allowOverBooking: false,
         prisoner: {
-          name: 'abc',
+          firstName: 'prisoner',
+          lastName: 'name',
           offenderNo: 'A1234BC',
         },
       },
@@ -155,7 +160,8 @@ describe('sessionCheckMiddleware', () => {
       req.session.visitSessionData = {
         allowOverBooking: false,
         prisoner: {
-          name: 'abc',
+          firstName: 'prisoner',
+          lastName: 'name',
           offenderNo: 'A1234BC',
           location: 'abc',
         },

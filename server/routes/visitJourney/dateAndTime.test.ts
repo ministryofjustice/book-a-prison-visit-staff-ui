@@ -10,6 +10,7 @@ import {
   createMockVisitService,
   createMockVisitSessionsService,
 } from '../../services/testutils/mocks'
+import TestData from '../testutils/testData'
 
 let sessionApp: Express
 
@@ -82,7 +83,7 @@ const visitSlot4: VisitSlot = {
 }
 
 beforeEach(() => {
-  flashData = { errors: [], formValues: [] }
+  flashData = { errors: [], formValues: [], messages: [] }
   flashProvider.mockImplementation((key: keyof FlashData) => {
     return flashData[key]
   })
@@ -90,7 +91,8 @@ beforeEach(() => {
   visitSessionData = {
     allowOverBooking: false,
     prisoner: {
-      name: 'John Smith',
+      firstName: 'John',
+      lastName: 'Smith',
       offenderNo: 'A1234BC',
       location: 'location place',
     },
@@ -342,7 +344,24 @@ testJourneys.forEach(journey => {
             expect($('.govuk-error-summary__body a').attr('href')).toBe('#visit-date-and-time-error')
             expect(flashProvider).toHaveBeenCalledWith('errors')
             expect(flashProvider).toHaveBeenCalledWith('formValues')
-            expect(flashProvider).toHaveBeenCalledTimes(2)
+            expect(flashProvider).toHaveBeenCalledWith('messages')
+            expect(flashProvider).toHaveBeenCalledTimes(3)
+          })
+      })
+
+      it('should render error from 422 errors - non association', () => {
+        flashData.messages = [TestData.mojAlert()]
+
+        return request(sessionApp)
+          .get(`${journey.urlPrefix}/select-date-and-time`)
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('h1').text().trim()).toBe('Select date and time of visit')
+            expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
+            expect($('.moj-alert__content h2').text()).toContain('Another person has booked the last table.')
+            expect($('.moj-alert').text()).toContain('Select whether to book for this time or choose a new visit time.')
           })
       })
     })

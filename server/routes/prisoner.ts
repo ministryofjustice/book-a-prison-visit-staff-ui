@@ -32,6 +32,7 @@ export default function routes({ auditService, prisonerProfileService }: Service
     return res.render('pages/prisoner/profile', {
       errors: req.flash('errors'),
       ...prisonerProfile,
+      prisonerName: `${prisonerProfile.prisonerDetails.lastName}, ${prisonerProfile.prisonerDetails.firstName}`,
       queryParamsForBackLink,
       prisonerDpsAlertsUrl: getDpsPrisonerAlertsUrl(prisonerId),
     })
@@ -71,7 +72,8 @@ export default function routes({ auditService, prisonerProfileService }: Service
     }
 
     visitSessionData.prisoner = {
-      name: prisonerDetails.name,
+      firstName: prisonerDetails.firstName,
+      lastName: prisonerDetails.lastName,
       offenderNo,
       location: prisonerDetails.cellLocation ? `${prisonerDetails.cellLocation}, ${prisonerDetails.prisonName}` : '',
       alerts,

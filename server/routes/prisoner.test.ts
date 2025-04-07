@@ -70,7 +70,8 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
       visitsByMonth: new Map(),
       prisonerDetails: {
         prisonerId: 'A1234BC',
-        name: 'Smith, John',
+        firstName: 'John',
+        lastName: 'Smith',
         dateOfBirth: '2 April 1975',
         cellLocation: '1-1-C-028',
         prisonName: 'Hewell (HMP)',
@@ -382,7 +383,8 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
           expect(clearSession).toHaveBeenCalledTimes(1)
           expect(visitSessionData).toStrictEqual(<VisitSessionData>{
             prisoner: {
-              name: 'Smith, John',
+              firstName: 'John',
+              lastName: 'Smith',
               offenderNo: 'A1234BC',
               location: '1-1-C-028, Hewell (HMP)',
               alerts: [alert],
@@ -414,7 +416,8 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
           expect(clearSession).toHaveBeenCalledTimes(1)
           expect(visitSessionData).toEqual(<VisitSessionData>{
             prisoner: {
-              name: 'Smith, John',
+              firstName: 'John',
+              lastName: 'Smith',
               offenderNo: 'A1234BC',
               location: '1-1-C-028, Hewell (HMP)',
               alerts: [
@@ -434,7 +437,8 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
 
     it('should replace existing visitSessionData and redirect to select visitors page', () => {
       visitSessionData.prisoner = {
-        name: 'Someone, Else',
+        firstName: 'other',
+        lastName: 'prisoner',
         offenderNo: 'C4321BA',
         location: 'a cell, HMP Prison',
       }
@@ -451,7 +455,8 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
           expect(auditService.overrodeZeroVO).not.toHaveBeenCalled()
           expect(visitSessionData).toEqual(<VisitSessionData>{
             prisoner: {
-              name: 'Smith, John',
+              firstName: 'John',
+              lastName: 'Smith',
               offenderNo: 'A1234BC',
               location: '1-1-C-028, Hewell (HMP)',
               alerts: [
