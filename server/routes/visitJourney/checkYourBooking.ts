@@ -2,7 +2,7 @@ import type { Request, Response } from 'express'
 import { validationResult } from 'express-validator'
 import { requestMethodsBooking } from '../../constants/requestMethods'
 import AuditService from '../../services/auditService'
-import getUrlPrefix from './visitJourneyUtils'
+import { getUrlPrefix, validationErrorsMojAlert } from './visitJourneyUtils'
 import { VisitService } from '../../services'
 import { ApplicationValidationErrorResponse } from '../../data/orchestrationApiTypes'
 import { SanitisedError } from '../../sanitisedError'
@@ -18,6 +18,7 @@ export default class CheckYourBooking {
     const isUpdate = this.mode === 'update'
     const { visitSessionData } = req.session
     const { offenderNo } = visitSessionData.prisoner
+    const prisonerName = `${visitSessionData.prisoner.firstName} ${visitSessionData.prisoner.lastName}`
 
     const additionalSupport = visitSessionData.visitorSupport.description.length
       ? visitSessionData.visitorSupport.description
@@ -27,6 +28,7 @@ export default class CheckYourBooking {
       offenderNo,
       mainContact: visitSessionData.mainContact,
       prisoner: visitSessionData.prisoner,
+      prisonerName,
       visitSlot: visitSessionData.visitSlot,
       visitRestriction: visitSessionData.visitRestriction,
       visitors: visitSessionData.visitors,
@@ -41,6 +43,7 @@ export default class CheckYourBooking {
     const { visitSessionData } = req.session
     const { prisonId } = req.session.selectedEstablishment
     const { offenderNo } = visitSessionData.prisoner
+    const prisonerName = `${visitSessionData.prisoner.firstName} ${visitSessionData.prisoner.lastName}`
 
     const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
 
@@ -87,8 +90,15 @@ export default class CheckYourBooking {
         const validationErrors =
           (error as SanitisedError<ApplicationValidationErrorResponse>)?.data?.validationErrors ?? []
 
-        if (validationErrors.includes('APPLICATION_INVALID_NO_SLOT_CAPACITY')) {
-          return res.redirect(`${urlPrefix}/check-your-booking/overbooking`)
+        const { mojAlert, url } = validationErrorsMojAlert(
+          prisonerName,
+          visitSessionData.visitSlot.startTimestamp,
+          validationErrors,
+        )
+
+        if (mojAlert) {
+          req.flash('messages', mojAlert)
+          return res.redirect(`${urlPrefix}/${url}`)
         }
       }
 
@@ -102,6 +112,7 @@ export default class CheckYourBooking {
         offenderNo,
         mainContact: visitSessionData.mainContact,
         prisoner: visitSessionData.prisoner,
+        prisonerName,
         visitSlot: visitSessionData.visitSlot,
         visitRestriction: visitSessionData.visitRestriction,
         visitors: visitSessionData.visitors,

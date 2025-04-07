@@ -2,10 +2,10 @@ import { NotFound } from 'http-errors'
 import { format, isBefore } from 'date-fns'
 import { PrisonerProfilePage } from '../@types/bapv'
 import {
+  convertToTitleCase,
   nextIepAdjustDate,
   nextPrivIepAdjustDate,
   prisonerDateTimePretty,
-  properCaseFullName,
   sortItemsByDateAsc,
 } from '../utils/utils'
 import { Alert, OffenderRestriction } from '../data/prisonApiTypes'
@@ -54,7 +54,8 @@ export default class PrisonerProfileService {
 
     const prisonerDetails: PrisonerProfilePage['prisonerDetails'] = {
       prisonerId,
-      name: properCaseFullName(`${prisonerProfile.lastName}, ${prisonerProfile.firstName}`),
+      firstName: convertToTitleCase(prisonerProfile.firstName),
+      lastName: convertToTitleCase(prisonerProfile.lastName),
       dateOfBirth: prisonerDateTimePretty(prisonerProfile.dateOfBirth),
       cellLocation: prisonerProfile.cellLocation,
       prisonName: prisonerProfile.prisonName,

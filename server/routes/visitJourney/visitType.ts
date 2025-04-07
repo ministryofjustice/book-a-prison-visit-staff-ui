@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
 import AuditService from '../../services/auditService'
-import getUrlPrefix from './visitJourneyUtils'
+import { getUrlPrefix } from './visitJourneyUtils'
 
 export default class VisitType {
   constructor(
