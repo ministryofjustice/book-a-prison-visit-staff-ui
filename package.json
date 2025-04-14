@@ -96,7 +96,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-sqs": "^3.787.0",
-    "@ministryofjustice/frontend": "^4.0.2",
+    "@ministryofjustice/frontend": "^5.1.2",
     "@ministryofjustice/hmpps-connect-dps-components": "^1.3.1",
     "agentkeepalive": "^4.6.0",
     "applicationinsights": "^2.9.6",
