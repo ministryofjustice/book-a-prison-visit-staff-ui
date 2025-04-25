@@ -349,7 +349,7 @@ export default class OrchestrationApiClient {
           name: mainContact.contactName,
         }
       : undefined
-    const mainContactId = mainContact.contactId ?? null
+    const mainContactId = mainContact?.contactId ?? null
     return { visitContact, mainContactId }
   }
 }

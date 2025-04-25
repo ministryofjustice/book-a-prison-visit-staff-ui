@@ -2,7 +2,7 @@ import type { Request, Response } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
 import { VisitorListItem } from '../../@types/bapv'
 import { getFlashFormValues } from '../visitorUtils'
-import getUrlPrefix from './visitJourneyUtils'
+import { getUrlPrefix } from './visitJourneyUtils'
 import { VisitService } from '../../services'
 
 export default class MainContact {

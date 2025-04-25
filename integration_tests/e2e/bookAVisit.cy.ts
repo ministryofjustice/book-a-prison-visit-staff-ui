@@ -44,7 +44,6 @@ context('Book a visit', () => {
   it('should complete the book a visit journey', () => {
     const prisoner = TestData.prisoner()
     const { prisonId, prisonerNumber: offenderNo } = prisoner
-    const prisonerDisplayName = 'Smith, John'
 
     const visitSessions: VisitSession[] = [
       TestData.visitSession({
@@ -110,8 +109,8 @@ context('Book a visit', () => {
 
     // Prisoner profile page
     cy.task('stubPrisonerProfile', profile)
-    searchForAPrisonerResultsPage.firstResultLink().contains(prisonerDisplayName).click()
-    const prisonerProfilePage = Page.verifyOnPageTitle(PrisonerProfilePage, prisonerDisplayName)
+    searchForAPrisonerResultsPage.firstResultLink().contains('Smith, John').click()
+    const prisonerProfilePage = Page.verifyOnPageTitle(PrisonerProfilePage, 'Smith, John')
 
     // Select visitors
     cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
@@ -201,7 +200,7 @@ context('Book a visit', () => {
 
     // Check booking details
     const checkYourBookingPage = Page.verifyOnPage(CheckYourBookingPage)
-    checkYourBookingPage.prisonerName().contains(prisonerDisplayName)
+    checkYourBookingPage.prisonerName().contains('John Smith')
     checkYourBookingPage.visitDate().contains(format(new Date(visitSessions[0].startTimestamp), longDateFormat))
     checkYourBookingPage.visitTime().contains('10am to 11am')
     checkYourBookingPage.visitType().contains('Open')
@@ -231,7 +230,7 @@ context('Book a visit', () => {
     checkYourBookingPage.submitBooking()
     const confirmationPage = Page.verifyOnPageTitle(ConfirmationPage, 'Booking confirmed')
     confirmationPage.bookingReference().contains(TestData.visit().reference)
-    confirmationPage.prisonerName().contains(prisonerDisplayName)
+    confirmationPage.prisonerName().contains('John Smith')
     confirmationPage.prisonerNumber().contains(offenderNo)
     confirmationPage.visitDate().contains(format(new Date(visitSessions[0].startTimestamp), longDateFormat))
     confirmationPage.visitTime().contains('10am to 11am')
