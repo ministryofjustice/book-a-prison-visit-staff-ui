@@ -162,12 +162,54 @@ testJourneys.forEach(journey => {
       const visitService = createMockVisitService()
 
       beforeEach(() => {
+        const bookedVisit: Partial<Visit> = {
+          applicationReference: visitSessionData.applicationReference,
+          reference: 'ab-cd-ef-gh',
+          visitStatus: 'BOOKED',
+        }
+
+        visitService.bookVisit = jest.fn().mockResolvedValue(bookedVisit)
+        visitService.updateVisit = jest.fn().mockResolvedValue(bookedVisit)
+
         sessionApp = appWithAllRoutes({
           services: { auditService, visitService },
           sessionData: {
             visitSessionData,
           } as SessionData,
         })
+      })
+
+      it('should book visit, record audit event and redirect to confirmation page', () => {
+        return request(sessionApp)
+          .post(`${journey.urlPrefix}/check-your-booking`)
+          .expect(302)
+          .expect('location', `${journey.urlPrefix}/confirmation`)
+          .expect(() => {
+            expect(journey.isUpdate ? visitService.updateVisit : visitService.bookVisit).toHaveBeenCalledWith({
+              username: 'user1',
+              applicationReference: visitSessionData.applicationReference,
+              applicationMethod: visitSessionData.requestMethod,
+              allowOverBooking: false,
+            })
+            expect(journey.isUpdate ? visitService.bookVisit : visitService.updateVisit).not.toHaveBeenCalled()
+
+            expect(visitService.cancelVisit).not.toHaveBeenCalled()
+            expect(visitSessionData.visitStatus).toBe('BOOKED')
+            expect(visitSessionData.visitReference).toBe('ab-cd-ef-gh')
+            expect(auditService.bookedVisit).toHaveBeenCalledTimes(1)
+            expect(auditService.bookedVisit).toHaveBeenCalledWith({
+              applicationReference: visitSessionData.applicationReference,
+              visitReference: visitSessionData.visitReference,
+              prisonerId: visitSessionData.prisoner.offenderNo,
+              prisonId: 'HEI',
+              visitorIds: [visitSessionData.visitors[0].personId.toString()],
+              startTimestamp: '2022-03-12T09:30:00',
+              endTimestamp: '2022-03-12T10:30:00',
+              visitRestriction: 'OPEN',
+              username: 'user1',
+              operationId: undefined,
+            })
+          })
       })
 
       it('should set validation errors in flash and redirect if no overbooking option selected', () => {
@@ -212,279 +254,38 @@ testJourneys.forEach(journey => {
               })
           })
         })
+
+        it('should handle booking failure, display error message and NOT record audit event', () => {
+          visitService.bookVisit.mockRejectedValue({})
+          visitService.updateVisit.mockRejectedValue({})
+
+          return request(sessionApp)
+            .post(`${journey.urlPrefix}/check-your-booking`)
+            .expect(200)
+            .expect('Content-Type', /html/)
+            .expect(res => {
+              const $ = cheerio.load(res.text)
+              expect($('h1').text().trim()).toBe('Check the visit details before booking')
+              expect($('.govuk-error-summary__body').text()).toContain('Failed to book this visit')
+              expect($('.test-prisoner-name').text()).toContain('prisoner name')
+              expect($('.test-visit-date').text()).toContain('Saturday 12 March 2022')
+              expect($('.test-visit-time').text()).toContain('9:30am to 10:30am')
+              expect($('.test-visit-type').text()).toContain('Open')
+              expect($('form').prop('action')).toBe(`${journey.urlPrefix}/check-your-booking`)
+              expect(visitSessionData.visitStatus).not.toBe('BOOKED')
+              expect(visitSessionData.visitReference).toBe(journey.isUpdate ? 'ab-cd-ef-gh' : undefined)
+              expect(auditService.bookedVisit).not.toHaveBeenCalled()
+
+              expect(journey.isUpdate ? visitService.updateVisit : visitService.bookVisit).toHaveBeenCalledWith({
+                username: 'user1',
+                applicationReference: visitSessionData.applicationReference,
+                applicationMethod: visitSessionData.requestMethod,
+                allowOverBooking: false,
+              })
+              expect(journey.isUpdate ? visitService.bookVisit : visitService.updateVisit).not.toHaveBeenCalled()
+            })
+        })
       })
     })
-  })
-})
-
-describe(`POST /book-a-visit/check-your-booking`, () => {
-  const visitService = createMockVisitService()
-
-  beforeEach(() => {
-    visitSessionData = {
-      allowOverBooking: false,
-      prisoner: {
-        name: 'prisoner name',
-        offenderNo: 'A1234BC',
-        location: 'location place',
-      },
-      visitRestriction: 'OPEN',
-      visitSlot: {
-        id: '1',
-        sessionTemplateReference: 'v9d.7ed.7u',
-        prisonId: 'HEI',
-        startTimestamp: '2022-03-12T09:30:00',
-        endTimestamp: '2022-03-12T10:30:00',
-        availableTables: 1,
-        capacity: 30,
-        visitRoom: 'room name',
-        visitRestriction: 'OPEN',
-      },
-      visitorIds: [123],
-      visitors: [
-        {
-          personId: 123,
-          name: 'name last',
-          adult: true,
-          relationshipDescription: 'relate',
-          restrictions: [
-            {
-              restrictionType: 'AVS',
-              restrictionTypeDescription: 'AVS desc',
-              startDate: '123',
-              expiryDate: '456',
-              globalRestriction: false,
-              comment: 'comment',
-            },
-          ],
-          address: '123 Street,\nTest Town,\nS1 2QZ',
-          banned: false,
-        },
-      ],
-      visitorSupport: { description: 'Wheelchair ramp, Portable induction loop for people with hearing aids' },
-      mainContact: {
-        phoneNumber: '0123 456 7890',
-        contactName: 'abc',
-        relationshipDescription: 'WIFE',
-      },
-      applicationReference: 'aaa-bbb-ccc',
-      // visit reference only known on update journey
-      visitReference: undefined,
-      requestMethod: 'PHONE',
-    }
-
-    const bookedVisit: Partial<Visit> = {
-      applicationReference: visitSessionData.applicationReference,
-      reference: 'ab-cd-ef-gh',
-      visitStatus: 'BOOKED',
-    }
-
-    visitService.bookVisit = jest.fn().mockResolvedValue(bookedVisit)
-
-    sessionApp = appWithAllRoutes({
-      services: { auditService, visitService },
-      sessionData: {
-        visitSessionData,
-      } as SessionData,
-    })
-  })
-
-  it('should book visit, record audit event and redirect to confirmation page', () => {
-    return request(sessionApp)
-      .post(`/book-a-visit/check-your-booking`)
-      .expect(302)
-      .expect('location', `/book-a-visit/confirmation`)
-      .expect(() => {
-        expect(visitService.bookVisit).toHaveBeenCalledWith({
-          username: 'user1',
-          applicationReference: visitSessionData.applicationReference,
-          applicationMethod: visitSessionData.requestMethod,
-          allowOverBooking: false,
-        })
-        expect(visitService.updateVisit).not.toHaveBeenCalled()
-
-        expect(visitService.cancelVisit).not.toHaveBeenCalled()
-        expect(visitSessionData.visitStatus).toBe('BOOKED')
-        expect(visitSessionData.visitReference).toBe('ab-cd-ef-gh')
-        expect(auditService.bookedVisit).toHaveBeenCalledTimes(1)
-        expect(auditService.bookedVisit).toHaveBeenCalledWith({
-          applicationReference: visitSessionData.applicationReference,
-          visitReference: visitSessionData.visitReference,
-          prisonerId: visitSessionData.prisoner.offenderNo,
-          prisonId: 'HEI',
-          visitorIds: [visitSessionData.visitors[0].personId.toString()],
-          startTimestamp: '2022-03-12T09:30:00',
-          endTimestamp: '2022-03-12T10:30:00',
-          visitRestriction: 'OPEN',
-          username: 'user1',
-          operationId: undefined,
-        })
-      })
-  })
-
-  it('should handle booking failure, display error message and NOT record audit event', () => {
-    visitService.bookVisit.mockRejectedValue({})
-
-    return request(sessionApp)
-      .post(`/book-a-visit/check-your-booking`)
-      .expect(200)
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        const $ = cheerio.load(res.text)
-        expect($('h1').text().trim()).toBe('Check the visit details before booking')
-        expect($('.govuk-error-summary__body').text()).toContain('Failed to book this visit')
-        expect($('.test-prisoner-name').text()).toContain('prisoner name')
-        expect($('.test-visit-date').text()).toContain('Saturday 12 March 2022')
-        expect($('.test-visit-time').text()).toContain('9:30am to 10:30am')
-        expect($('.test-visit-type').text()).toContain('Open')
-        expect($('form').prop('action')).toBe(`/book-a-visit/check-your-booking`)
-        expect(visitSessionData.visitStatus).not.toBe('BOOKED')
-        expect(visitSessionData.visitReference).toBe(undefined)
-        expect(auditService.bookedVisit).not.toHaveBeenCalled()
-
-        expect(visitService.bookVisit).toHaveBeenCalledWith({
-          username: 'user1',
-          applicationReference: visitSessionData.applicationReference,
-          applicationMethod: visitSessionData.requestMethod,
-          allowOverBooking: false,
-        })
-        expect(visitService.updateVisit).not.toHaveBeenCalled()
-      })
-  })
-})
-
-describe(`POST /visit/ab-cd-ef-gh/update/check-your-booking`, () => {
-  const visitService = createMockVisitService()
-
-  beforeEach(() => {
-    visitSessionData = {
-      allowOverBooking: false,
-      prisoner: {
-        name: 'prisoner name',
-        offenderNo: 'A1234BC',
-        location: 'location place',
-      },
-      visitRestriction: 'OPEN',
-      visitSlot: {
-        id: '1',
-        sessionTemplateReference: 'v9d.7ed.7u',
-        prisonId: 'HEI',
-        startTimestamp: '2022-03-12T09:30:00',
-        endTimestamp: '2022-03-12T10:30:00',
-        availableTables: 1,
-        capacity: 30,
-        visitRoom: 'room name',
-        visitRestriction: 'OPEN',
-      },
-      visitorIds: [123],
-      visitors: [
-        {
-          personId: 123,
-          name: 'name last',
-          adult: true,
-          relationshipDescription: 'relate',
-          restrictions: [
-            {
-              restrictionType: 'AVS',
-              restrictionTypeDescription: 'AVS desc',
-              startDate: '123',
-              expiryDate: '456',
-              globalRestriction: false,
-              comment: 'comment',
-            },
-          ],
-          address: '123 Street,\nTest Town,\nS1 2QZ',
-          banned: false,
-        },
-      ],
-      visitorSupport: { description: 'Wheelchair ramp, Portable induction loop for people with hearing aids' },
-      mainContact: {
-        phoneNumber: '0123 456 7890',
-        contactName: 'abc',
-        relationshipDescription: 'WIFE',
-      },
-      applicationReference: 'aaa-bbb-ccc',
-      // visit reference only known on update journey
-      visitReference: 'ab-cd-ef-gh',
-      requestMethod: 'PHONE',
-    }
-
-    const bookedVisit: Partial<Visit> = {
-      applicationReference: visitSessionData.applicationReference,
-      reference: 'ab-cd-ef-gh',
-      visitStatus: 'BOOKED',
-    }
-
-    visitService.updateVisit = jest.fn().mockResolvedValue(bookedVisit)
-
-    sessionApp = appWithAllRoutes({
-      services: { auditService, visitService },
-      sessionData: {
-        visitSessionData,
-      } as SessionData,
-    })
-  })
-
-  it('should book visit, record audit event and redirect to confirmation page', () => {
-    return request(sessionApp)
-      .post(`/visit/ab-cd-ef-gh/update/check-your-booking`)
-      .expect(302)
-      .expect('location', `/visit/ab-cd-ef-gh/update/confirmation`)
-      .expect(() => {
-        expect(visitService.updateVisit).toHaveBeenCalledWith({
-          username: 'user1',
-          applicationReference: visitSessionData.applicationReference,
-          applicationMethod: visitSessionData.requestMethod,
-          allowOverBooking: false,
-        })
-        expect(visitService.bookVisit).not.toHaveBeenCalled()
-
-        expect(visitService.cancelVisit).not.toHaveBeenCalled()
-        expect(visitSessionData.visitStatus).toBe('BOOKED')
-        expect(visitSessionData.visitReference).toBe('ab-cd-ef-gh')
-        expect(auditService.bookedVisit).toHaveBeenCalledTimes(1)
-        expect(auditService.bookedVisit).toHaveBeenCalledWith({
-          applicationReference: visitSessionData.applicationReference,
-          visitReference: visitSessionData.visitReference,
-          prisonerId: visitSessionData.prisoner.offenderNo,
-          prisonId: 'HEI',
-          visitorIds: [visitSessionData.visitors[0].personId.toString()],
-          startTimestamp: '2022-03-12T09:30:00',
-          endTimestamp: '2022-03-12T10:30:00',
-          visitRestriction: 'OPEN',
-          username: 'user1',
-          operationId: undefined,
-        })
-      })
-  })
-
-  it('should handle booking failure, display error message and NOT record audit event', () => {
-    visitService.updateVisit.mockRejectedValue({})
-
-    return request(sessionApp)
-      .post(`/visit/ab-cd-ef-gh/update/check-your-booking`)
-      .expect(200)
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        const $ = cheerio.load(res.text)
-        expect($('h1').text().trim()).toBe('Check the visit details before booking')
-        expect($('.govuk-error-summary__body').text()).toContain('Failed to book this visit')
-        expect($('.test-prisoner-name').text()).toContain('prisoner name')
-        expect($('.test-visit-date').text()).toContain('Saturday 12 March 2022')
-        expect($('.test-visit-time').text()).toContain('9:30am to 10:30am')
-        expect($('.test-visit-type').text()).toContain('Open')
-        expect($('form').prop('action')).toBe(`/visit/ab-cd-ef-gh/update/check-your-booking`)
-        expect(visitSessionData.visitStatus).not.toBe('BOOKED')
-        expect(visitSessionData.visitReference).toBe('ab-cd-ef-gh')
-        expect(auditService.bookedVisit).not.toHaveBeenCalled()
-
-        expect(visitService.updateVisit).toHaveBeenCalledWith({
-          username: 'user1',
-          applicationReference: visitSessionData.applicationReference,
-          applicationMethod: visitSessionData.requestMethod,
-          allowOverBooking: false,
-        })
-        expect(visitService.bookVisit).not.toHaveBeenCalled()
-      })
   })
 })
