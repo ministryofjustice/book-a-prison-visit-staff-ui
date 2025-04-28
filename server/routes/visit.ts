@@ -1,11 +1,8 @@
 import type { NextFunction, RequestHandler, Request, Response } from 'express'
 import { Router } from 'express'
 import { BadRequest } from 'http-errors'
-import { differenceInCalendarDays } from 'date-fns'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import { isValidVisitReference } from './validationChecks'
-import { clearSession } from './visitorUtils'
-import { VisitSessionData, VisitSlot } from '../@types/bapv'
 import SelectVisitors from './visitJourney/selectVisitors'
 import VisitType from './visitJourney/visitType'
 import DateAndTime from './visitJourney/dateAndTime'
@@ -17,8 +14,6 @@ import RequestMethod from './visitJourney/requestMethod'
 import sessionCheckMiddleware from '../middleware/sessionCheckMiddleware'
 import { type Services } from '../services'
 import Overbooking from './visitJourney/overbooking'
-import { getPrisonerLocation } from './visit/visitUtils'
-import { convertToTitleCase } from '../utils/utils'
 
 export default function routes({
   auditService,
@@ -39,79 +34,6 @@ export default function routes({
       path,
       handlers.map(handler => asyncMiddleware(handler)),
     )
-
-  post('/:reference', async (req, res) => {
-    const reference = getVisitReference(req)
-    const { username } = res.locals.user
-
-    const visitDetails = await visitService.getVisitDetailed({ username, reference })
-    const { prison, prisoner } = visitDetails
-
-    const prisonerInVisitPrison = prison.prisonId === prisoner.prisonId
-    const visitInSelectedEstablishment = prison.prisonId === req.session.selectedEstablishment.prisonId
-    if (!prisonerInVisitPrison || !visitInSelectedEstablishment) {
-      return res.redirect(`/visit/${visitDetails.reference}`)
-    }
-
-    // clean session then pre-populate with visit to update
-    clearSession(req)
-
-    const visitRestriction = visitDetails.visitRestriction === 'UNKNOWN' ? undefined : visitDetails.visitRestriction
-
-    const visitSlot: VisitSlot = {
-      id: '',
-      sessionTemplateReference: visitDetails.sessionTemplateReference,
-      prisonId: prison.prisonId,
-      startTimestamp: visitDetails.startTimestamp,
-      endTimestamp: visitDetails.endTimestamp,
-      availableTables: 0,
-      capacity: undefined,
-      visitRoom: visitDetails.visitRoom,
-      visitRestriction,
-    }
-
-    const relationshipDescription = visitDetails.visitors.find(
-      visitor => visitor.personId === visitDetails.visitContact.visitContactId,
-    )?.relationshipDescription
-
-    const mainContact = {
-      contactId: visitDetails.visitContact.visitContactId,
-      relationshipDescription,
-      phoneNumber: visitDetails.visitContact.telephone,
-      email: visitDetails.visitContact.email,
-      contactName: visitDetails.visitContact.name,
-    }
-
-    const visitSessionData: VisitSessionData = {
-      allowOverBooking: false,
-      prisoner: {
-        firstName: convertToTitleCase(prisoner.firstName),
-        lastName: convertToTitleCase(prisoner.lastName),
-        offenderNo: prisoner.prisonerNumber,
-        location: getPrisonerLocation(prisoner),
-        alerts: prisoner.prisonerAlerts,
-        restrictions: prisoner.prisonerRestrictions,
-      },
-      visitSlot,
-      originalVisitSlot: visitSlot,
-      visitRestriction,
-      visitorIds: visitDetails.visitors.map(visitor => visitor.personId),
-      visitorSupport: visitDetails.visitorSupport ?? { description: '' },
-      mainContact,
-      visitReference: visitDetails.reference,
-    }
-
-    req.session.visitSessionData = Object.assign(req.session.visitSessionData ?? {}, visitSessionData)
-
-    const { policyNoticeDaysMin } = req.session.selectedEstablishment
-
-    const numberOfDays = differenceInCalendarDays(new Date(visitDetails.startTimestamp), new Date())
-
-    if (numberOfDays >= policyNoticeDaysMin) {
-      return res.redirect(`/visit/${reference}/update/select-visitors`)
-    }
-    return res.redirect(`/visit/${reference}/update/confirm-update`)
-  })
 
   const selectVisitors = new SelectVisitors('update', prisonerVisitorsService)
   const visitType = new VisitType('update', auditService)
@@ -258,15 +180,6 @@ export default function routes({
   )
 
   return router
-}
-
-function getVisitReference(req: Request): string {
-  const { reference } = req.params
-
-  if (!isValidVisitReference(reference)) {
-    throw new BadRequest()
-  }
-  return reference
 }
 
 const checkVisitReferenceMiddleware = (req: Request, res: Response, next: NextFunction): void => {
