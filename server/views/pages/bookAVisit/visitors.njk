@@ -13,6 +13,8 @@
 {% set visitors = [] %}
 {% set noVisitorsText = '' %}
 
+{% set alertDpsContent = "You can also <a class='govuk-link--no-visited-state' href='" + prisonerDpsAlertsUrl + "' target='_blank' data-test='all-alerts-link'>view all alerts (opens in new tab)</a>." %}
+
 {% for visitor in visitorList %}
 
   {% set checkbox -%}
@@ -132,7 +134,7 @@
 
           {% if alerts | length %}
 
-            <p data-test="alert-description">This tables shows alerts that are relevant for social visits. You can also <a class="govuk-link--no-visited-state" href="{{ prisonerDpsAlertsUrl }}" target="_blank" data-test="all-alerts-link">view all alerts (opens in new tab)</a>.</p>
+            <p data-test="alert-description">This tables shows alerts that are relevant for social visits. {{ alertDpsContent | safe }}</p>
 
             {{ govukTable({
               classes: 'bapv-table-no-bottom-border fix-width-alert-restriction',
@@ -151,13 +153,13 @@
             }) }}
           {% else %}
             {# if no alerts, show this under the alert header #}
-            <p data-test="alert-description">You can also <a class="govuk-link--no-visited-state" href="{{ prisonerDpsAlertsUrl }}" target="_blank" data-test="all-alerts-link">view all alerts (opens in new tab)</a>.</p>
+            <p data-test="alert-description">{{ alertDpsContent | safe }}</p>
           {% endif %}
 
         {% else %}
           {# if no restrictions or alerts, show this text #}
           <p data-test="prisoner-name">{{ prisonerName }} does not have any restrictions or alerts that are relevant for social visits</p>
-          <p data-test="alert-description">You can also <a class="govuk-link--no-visited-state" href="{{ prisonerDpsAlertsUrl }}" target="_blank" data-test="all-alerts-link">view all alerts (opens in new tab)</a>.</p>
+          <p data-test="alert-description">{{ alertDpsContent | safe }}</p>
 
         {% endif %}
 

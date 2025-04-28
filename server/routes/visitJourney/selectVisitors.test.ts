@@ -140,13 +140,13 @@ testJourneys.forEach(journey => {
           expect($('[data-test=alert-description]').text()).toBe(
             'This tables shows alerts that are relevant for social visits. You can also view all alerts (opens in new tab).',
           )
+          expect($('[data-test="all-alerts-link"]').attr('href')).toBe(
+            'https://prisoner-dev.digital.prison.service.justice.gov.uk/prisoner/A1234BC/alerts/active',
+          )
           expect($('[data-test=restriction-description]').text()).toBe('')
           expect($('[data-test=restrictions-type1]').text().trim()).toBe('Restricted')
           expect($('[data-test=restrictions-comment1]').text().trim()).toBe('Details about this restriction')
           expect($('[data-test=restrictions-end-date1]').text().trim()).toBe('15 March 2022')
-          expect($('[data-test="all-alerts-link"]').attr('href')).toBe(
-            'https://prisoner-dev.digital.prison.service.justice.gov.uk/prisoner/A1234BC/alerts/active',
-          )
           expect($('[data-test=alert-type1]').text().trim()).toBe('Protective Isolation Unit')
           expect($('[data-test=alert-comment1]').text().trim()).toBe('Alert comment')
           expect($('[data-test=alert-end-date1]').text().trim()).toBe('15 March 2022')
@@ -201,6 +201,9 @@ testJourneys.forEach(journey => {
           expect($('[data-test=alert-description]').text()).toBe(
             'This tables shows alerts that are relevant for social visits. You can also view all alerts (opens in new tab).',
           )
+          expect($('[data-test="all-alerts-link"]').attr('href')).toBe(
+            'https://prisoner-dev.digital.prison.service.justice.gov.uk/prisoner/A1234BC/alerts/active',
+          )
           expect($('[data-test=restrictions-type1]').text().trim()).toBe('')
           expect($('[data-test=restrictions-comment1]').text().trim()).toBe('')
           expect($('[data-test=restrictions-end-date1]').text().trim()).toBe('')
@@ -228,6 +231,9 @@ testJourneys.forEach(journey => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('[data-test=alert-description]').text()).toBe('You can also view all alerts (opens in new tab).')
+          expect($('[data-test="all-alerts-link"]').attr('href')).toBe(
+            'https://prisoner-dev.digital.prison.service.justice.gov.uk/prisoner/A1234BC/alerts/active',
+          )
           expect($('[data-test=restriction-description]').text()).toBe('')
           expect($('[data-test=restrictions-type1]').text().trim()).toBe('Restricted')
           expect($('[data-test=restrictions-comment1]').text().trim()).toBe('Details about this restriction')
@@ -257,6 +263,9 @@ testJourneys.forEach(journey => {
             'John Smith does not have any restrictions or alerts that are relevant for social visits',
           )
           expect($('[data-test=alert-description]').text()).toBe('You can also view all alerts (opens in new tab).')
+          expect($('[data-test="all-alerts-link"]').attr('href')).toBe(
+            'https://prisoner-dev.digital.prison.service.justice.gov.uk/prisoner/A1234BC/alerts/active',
+          )
           expect($('[data-test=restrictions-type1]').text()).toBe('')
           expect($('[data-test=restrictions-comment1]').text().trim()).toBe('')
           expect($('[data-test=restrictions-end-date1]').text().trim()).toBe('')
