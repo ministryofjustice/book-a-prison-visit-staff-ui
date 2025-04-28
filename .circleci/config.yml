@@ -131,13 +131,16 @@ jobs:
           name: Run wiremock
           command: java -jar wiremock.jar --port 9091
           background: true
+      - hmpps/wait_till_ready:
+          # Wait for wiremock to start
+          port: 9091
       - run:
           name: Run the node app.
           command: npm run start-feature
           background: true
-      - run:
-          name: Wait for node app to start
-          command: sleep 5
+      - hmpps/wait_till_ready:
+          # Wait for node app to start
+          port: 3007
       - run:
           name: integration tests
           command: npm run int-test
