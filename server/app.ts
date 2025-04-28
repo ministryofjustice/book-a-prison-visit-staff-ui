@@ -19,7 +19,7 @@ import setUpWebSecurity from './middleware/setUpWebSecurity'
 import setUpWebSession from './middleware/setUpWebSession'
 
 import indexRoutes from './routes'
-import bookAVisitRoutes from './routes/bookAVisit'
+import bookAVisitRoutes from './routes/visitJourney/book'
 import blockVisitDatesRoutes from './routes/blockVisitDates'
 import establishmentNotSupportedRoutes from './routes/establishmentNotSupported'
 import prisonerRoutes from './routes/prisoner'

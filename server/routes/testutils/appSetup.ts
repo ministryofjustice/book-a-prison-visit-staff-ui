@@ -20,7 +20,7 @@ import { Session, SessionData } from 'express-session'
 import HeaderFooterMeta from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterMeta'
 
 import indexRoutes from '../index'
-import bookAVisitRoutes from '../bookAVisit'
+import bookAVisitRoutes from '../visitJourney/book'
 import blockVisitDatesRoutes from '../blockVisitDates'
 import establishmentNotSupportedRoutes from '../establishmentNotSupported'
 import prisonerRoutes from '../prisoner'
