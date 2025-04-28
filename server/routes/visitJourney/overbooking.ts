@@ -13,7 +13,7 @@ export default class Overbooking {
     const isUpdate = this.mode === 'update'
     const { visitSessionData } = req.session
 
-    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
+    const urlPrefix = getUrlPrefix(isUpdate)
 
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
@@ -37,7 +37,7 @@ export default class Overbooking {
     const isUpdate = this.mode === 'update'
     const { visitSessionData } = req.session
 
-    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
+    const urlPrefix = getUrlPrefix(isUpdate)
 
     const errors = validationResult(req)
     if (!errors.isEmpty()) {

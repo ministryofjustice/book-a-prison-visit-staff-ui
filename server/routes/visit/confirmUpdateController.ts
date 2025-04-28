@@ -26,7 +26,7 @@ export default class ConfirmUpdateController {
 
       if (confirmUpdate === 'yes') {
         req.session.visitSessionData.overrideBookingWindow = true
-        return res.redirect(`/visit/${reference}/update/select-visitors`)
+        return res.redirect('/update-a-visit/select-visitors')
       }
       if (confirmUpdate === 'no') {
         return res.redirect(`/visit/${reference}`)
@@ -41,7 +41,7 @@ export default class ConfirmUpdateController {
         },
       ] as unknown as [])
 
-      return res.redirect(`/visit/${reference}/update/confirm-update`)
+      return res.redirect(`/visit/${reference}/confirm-update`)
     }
   }
 }

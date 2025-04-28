@@ -20,7 +20,7 @@ export default class VisitType {
       errors: req.flash('errors'),
       restrictions: closedRestrictions,
       visitors: visitSessionData.visitors,
-      urlPrefix: getUrlPrefix(isUpdate, visitSessionData.visitReference),
+      urlPrefix: getUrlPrefix(isUpdate),
     })
   }
 
@@ -29,7 +29,7 @@ export default class VisitType {
     const { visitSessionData } = req.session
     const errors = validationResult(req)
 
-    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
+    const urlPrefix = getUrlPrefix(isUpdate)
 
     if (!errors.isEmpty()) {
       req.flash('errors', errors.array() as [])

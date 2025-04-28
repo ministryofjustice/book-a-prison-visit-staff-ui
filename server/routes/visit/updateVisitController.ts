@@ -78,9 +78,9 @@ export default class UpdateVisitController {
       const numberOfDays = differenceInCalendarDays(new Date(visitDetails.startTimestamp), new Date())
 
       if (numberOfDays >= policyNoticeDaysMin) {
-        return res.redirect(`/visit/${reference}/update/select-visitors`)
+        return res.redirect('/update-a-visit/select-visitors')
       }
-      return res.redirect(`/visit/${reference}/update/confirm-update`)
+      return res.redirect(`/visit/${reference}/confirm-update`)
     }
   }
 }

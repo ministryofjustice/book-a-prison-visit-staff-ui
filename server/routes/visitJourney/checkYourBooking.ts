@@ -34,7 +34,7 @@ export default class CheckYourBooking {
       visitors: visitSessionData.visitors,
       additionalSupport,
       requestMethod: requestMethodsBooking[visitSessionData.requestMethod],
-      urlPrefix: getUrlPrefix(isUpdate, visitSessionData.visitReference),
+      urlPrefix: getUrlPrefix(isUpdate),
     })
   }
 
@@ -45,7 +45,7 @@ export default class CheckYourBooking {
     const { offenderNo } = visitSessionData.prisoner
     const prisonerName = `${visitSessionData.prisoner.firstName} ${visitSessionData.prisoner.lastName}`
 
-    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
+    const urlPrefix = getUrlPrefix(isUpdate)
 
     const { confirmOverBooking } = req.body // this will be set if we have come from overbooking confirmation page
     if (confirmOverBooking === 'no') {

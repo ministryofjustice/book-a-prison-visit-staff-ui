@@ -52,7 +52,7 @@ describe('Start a visit update journey', () => {
       return request(app)
         .post('/visit/ab-cd-ef-gh')
         .expect(302)
-        .expect('location', '/visit/ab-cd-ef-gh/update/select-visitors')
+        .expect('location', '/update-a-visit/select-visitors')
         .expect(res => {
           expect(clearSession).toHaveBeenCalledTimes(1)
           expect(visitService.getVisitDetailed).toHaveBeenCalledWith({ username: 'user1', reference: 'ab-cd-ef-gh' })
@@ -109,7 +109,7 @@ describe('Start a visit update journey', () => {
       return request(app)
         .post('/visit/ab-cd-ef-gh')
         .expect(302)
-        .expect('location', '/visit/ab-cd-ef-gh/update/select-visitors')
+        .expect('location', '/update-a-visit/select-visitors')
         .expect(res => {
           expect(clearSession).toHaveBeenCalledTimes(1)
           expect(visitSessionData.visitorSupport).toStrictEqual(<VisitSessionData['visitorSupport']>{
@@ -133,7 +133,7 @@ describe('Start a visit update journey', () => {
     })
 
     // default visit is 13 days away so using 14 days for simplicity
-    it('should redirect to /visit/:reference/update/confirm-update if visit is less days away than policy notice days', () => {
+    it('should redirect to /visit/:reference/confirm-update if visit is less days away than policy notice days', () => {
       app = appWithAllRoutes({
         services: {
           visitService,
@@ -143,10 +143,7 @@ describe('Start a visit update journey', () => {
         } as SessionData,
       })
 
-      return request(app)
-        .post('/visit/ab-cd-ef-gh')
-        .expect(302)
-        .expect('location', '/visit/ab-cd-ef-gh/update/confirm-update')
+      return request(app).post('/visit/ab-cd-ef-gh').expect(302).expect('location', '/visit/ab-cd-ef-gh/confirm-update')
     })
 
     it('should render 400 Bad Request error for invalid visit reference', () => {

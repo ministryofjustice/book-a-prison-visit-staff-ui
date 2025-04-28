@@ -21,13 +21,13 @@ import HeaderFooterMeta from '@ministryofjustice/hmpps-connect-dps-components/di
 
 import indexRoutes from '../index'
 import bookAVisitRoutes from '../visitJourney/book'
+import updateAVisitRoutes from '../visitJourney/update'
 import blockVisitDatesRoutes from '../blockVisitDates'
 import establishmentNotSupportedRoutes from '../establishmentNotSupported'
 import prisonerRoutes from '../prisoner'
 import reviewRoutes from '../review'
 import searchRoutes from '../search'
 import timetableRoutes from '../timetable'
-import visitRoutesNew from '../visit/index'
 import visitRoutes from '../visit'
 import visitsRoutes from '../visitsByDate'
 
@@ -100,6 +100,7 @@ function appSetup(
 
   app.use('/', indexRoutes(services))
   app.use('/book-a-visit', bookAVisitRoutes(services))
+  app.use('/update-a-visit', updateAVisitRoutes(services))
   app.use('/block-visit-dates', blockVisitDatesRoutes(services))
   app.use('/establishment-not-supported', establishmentNotSupportedRoutes(services))
   app.use('/prisoner', prisonerRoutes(services))
@@ -107,7 +108,6 @@ function appSetup(
   app.use('/search', searchRoutes(services))
   app.use('/timetable', timetableRoutes(services))
   app.use('/visit', visitRoutes(services))
-  app.use('/visit', visitRoutesNew(services))
   app.use('/visits', visitsRoutes(services))
 
   app.use((req, res, next) => next(new NotFound()))

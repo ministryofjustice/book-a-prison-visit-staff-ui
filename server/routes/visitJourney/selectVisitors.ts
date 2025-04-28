@@ -47,7 +47,7 @@ export default class SelectVisitors {
       restrictions,
       formValues,
       prisonerDpsAlertsUrl: getDpsPrisonerAlertsUrl(offenderNo),
-      urlPrefix: getUrlPrefix(isUpdate, visitSessionData.visitReference),
+      urlPrefix: getUrlPrefix(isUpdate),
       backLink: returnAddress,
     })
   }
@@ -57,7 +57,7 @@ export default class SelectVisitors {
     const { visitSessionData } = req.session
     const errors = validationResult(req)
 
-    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
+    const urlPrefix = getUrlPrefix(isUpdate)
 
     if (!errors.isEmpty()) {
       req.flash('errors', errors.array() as [])

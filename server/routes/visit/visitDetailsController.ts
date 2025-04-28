@@ -23,7 +23,6 @@ export default class VisitDetailsController {
   public view(): RequestHandler {
     return async (req, res) => {
       const { reference } = req.params
-
       const fromPage = typeof req.query?.from === 'string' ? req.query.from : null
       const fromPageQuery = typeof req.query?.query === 'string' ? req.query.query : null
       const { username } = res.locals.user

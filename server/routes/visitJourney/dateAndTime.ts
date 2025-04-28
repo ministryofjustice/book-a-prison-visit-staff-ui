@@ -116,7 +116,7 @@ export default class DateAndTime {
       showSlotChangeMessage,
       warningMessages,
       originalVisitSlot,
-      urlPrefix: getUrlPrefix(isUpdate, visitSessionData.visitReference),
+      urlPrefix: getUrlPrefix(isUpdate),
     })
   }
 
@@ -125,7 +125,7 @@ export default class DateAndTime {
     const { visitSessionData } = req.session
     const errors = validationResult(req)
 
-    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
+    const urlPrefix = getUrlPrefix(isUpdate)
 
     if (!errors.isEmpty()) {
       req.flash('errors', errors.array() as [])
@@ -156,7 +156,7 @@ export default class DateAndTime {
   async postOverbookings(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'
     const { visitSessionData } = req.session
-    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
+    const urlPrefix = getUrlPrefix(isUpdate)
     const errors = validationResult(req)
 
     const { confirmOverBooking } = req.body // this will be set if we have come from overbooking confirmation page

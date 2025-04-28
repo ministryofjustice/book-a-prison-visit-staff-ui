@@ -15,7 +15,7 @@ const auditService = createMockAuditService()
 let visitSessionData: VisitSessionData
 
 // run tests for booking and update journeys
-const testJourneys = [{ urlPrefix: '/book-a-visit' }, { urlPrefix: '/visit/ab-cd-ef-gh/update' }]
+const testJourneys = [{ urlPrefix: '/book-a-visit' }, { urlPrefix: '/update-a-visit' }]
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
