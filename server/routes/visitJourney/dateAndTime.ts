@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
-import { VisitSlot } from '../../@types/bapv'
+import { BookOrUpdate, VisitSlot } from '../../@types/bapv'
 import AuditService from '../../services/auditService'
 import { getFlashFormValues, getSelectedSlot, getSlotByTimeAndRestriction } from '../visitorUtils'
 import { getUrlPrefix } from './visitJourneyUtils'
@@ -9,7 +9,7 @@ import { isSameVisitSlot } from '../../utils/utils'
 
 export default class DateAndTime {
   constructor(
-    private readonly mode: string,
+    private readonly mode: BookOrUpdate,
     private readonly visitService: VisitService,
     private readonly visitSessionsService: VisitSessionsService,
     private readonly auditService: AuditService,

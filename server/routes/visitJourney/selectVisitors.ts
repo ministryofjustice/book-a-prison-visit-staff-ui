@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
-import { VisitorListItem } from '../../@types/bapv'
+import { BookOrUpdate, VisitorListItem } from '../../@types/bapv'
 import PrisonerVisitorsService from '../../services/prisonerVisitorsService'
 import { getFlashFormValues } from '../visitorUtils'
 import { getUrlPrefix } from './visitJourneyUtils'
@@ -9,7 +9,7 @@ import { getDpsPrisonerAlertsUrl } from '../../utils/utils'
 
 export default class SelectVisitors {
   constructor(
-    private readonly mode: string,
+    private readonly mode: BookOrUpdate,
     private readonly prisonerVisitorsService: PrisonerVisitorsService,
   ) {}
 

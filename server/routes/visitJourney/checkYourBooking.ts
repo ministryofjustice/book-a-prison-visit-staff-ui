@@ -6,10 +6,11 @@ import { getUrlPrefix, validationErrorsMojAlert } from './visitJourneyUtils'
 import { VisitService } from '../../services'
 import { ApplicationValidationErrorResponse } from '../../data/orchestrationApiTypes'
 import { SanitisedError } from '../../sanitisedError'
+import { BookOrUpdate } from '../../@types/bapv'
 
 export default class CheckYourBooking {
   constructor(
-    private readonly mode: string,
+    private readonly mode: BookOrUpdate,
     private readonly auditService: AuditService,
     private readonly visitService: VisitService,
   ) {}

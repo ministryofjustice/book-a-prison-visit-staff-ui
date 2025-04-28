@@ -1,13 +1,13 @@
 import type { Request, Response } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
-import { VisitorListItem } from '../../@types/bapv'
+import { BookOrUpdate, VisitorListItem } from '../../@types/bapv'
 import { getFlashFormValues } from '../visitorUtils'
 import { getUrlPrefix } from './visitJourneyUtils'
 import { VisitService } from '../../services'
 
 export default class MainContact {
   constructor(
-    private readonly mode: string,
+    private readonly mode: BookOrUpdate,
     private readonly visitService: VisitService,
   ) {}
 

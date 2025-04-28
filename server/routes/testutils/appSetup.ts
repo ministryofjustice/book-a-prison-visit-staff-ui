@@ -20,8 +20,7 @@ import { Session, SessionData } from 'express-session'
 import HeaderFooterMeta from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterMeta'
 
 import indexRoutes from '../index'
-import bookAVisitRoutes from '../visitJourney/book'
-import updateAVisitRoutes from '../visitJourney/update'
+import visitJourneyRoutes from '../visitJourney'
 import blockVisitDatesRoutes from '../blockVisitDates'
 import establishmentNotSupportedRoutes from '../establishmentNotSupported'
 import prisonerRoutes from '../prisoner'
@@ -99,8 +98,8 @@ function appSetup(
   app.use(populateSelectedEstablishment({ supportedPrisonsService: new MockSupportedPrisonsService(), ...services }))
 
   app.use('/', indexRoutes(services))
-  app.use('/book-a-visit', bookAVisitRoutes(services))
-  app.use('/update-a-visit', updateAVisitRoutes(services))
+  app.use('/book-a-visit', visitJourneyRoutes(services, 'book'))
+  app.use('/update-a-visit', visitJourneyRoutes(services, 'update'))
   app.use('/block-visit-dates', blockVisitDatesRoutes(services))
   app.use('/establishment-not-supported', establishmentNotSupportedRoutes(services))
   app.use('/prisoner', prisonerRoutes(services))
