@@ -104,15 +104,20 @@ The same booking journey is used both for initially booking a visit and updating
 * changing date/time (before booking)
   * uses `PUT /visits/application/{reference}/slot/change` to modify the current application
 
-**Updating and existing visit**
+**Updating an existing visit**
 * first time selecting date/time (which will have been pre-populated with the existing slot if possible)
   * uses `PUT /visits/application/{bookingReference}/change` to create a new visit application from the existing visit. This gives a **new** application `Reference`
 * changing date/time (before booking)
   * also uses `PUT /visits/application/{reference}/slot/change` to modify the current application
 
-In both cases, at the end of the journey there are two further calls to confirm the booking:
-1. `PUT /visits/application/{reference}/slot/change` to update/set all the data in the current application
-2. `PUT /visits/{applicationReference}/book` to complete the application and receive a `Visit` with status `BOOKED`
+In both cases, near the end of the journey (main contact page) there is a further call to update the booking details:
+* `PUT /visits/application/{reference}/slot/change` to update/set all the data in the current application
+
+Finally:
+* At the end of a booking journey:
+  * `PUT /visits/{applicationReference}/book` to complete the application and receive a `Visit` with status `BOOKED`
+* At the end of an update journey:
+  * `PUT /visits/{applicationReference}/update` to complete the application and receive a `Visit` with status `BOOKED`
 
 ## Imported types
 

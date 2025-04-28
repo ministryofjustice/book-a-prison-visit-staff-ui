@@ -5,7 +5,6 @@
 
 {% block head %}
   <link href="/assets/stylesheets/application.css?{{ version }}" rel="stylesheet"/>
-  <script src="/assets/js/jquery.min.js"></script> 
 
   {% for js in feComponents.jsIncludes %}
     <script src="{{ js }}" nonce="{{ cspNonce }}"></script>
@@ -47,9 +46,7 @@
 {% block bodyEnd %}
   {# Run JavaScript at end of the
   <body>, to avoid blocking the initial render. #}
-  <script type="module" src="/assets/govukFrontendInit.js"></script>
-  <script src="/assets/moj/all.js"></script>
-  <script src="/assets/mojFrontendInit.js"></script>
+  <script type="module" src="/assets/index.js"></script>
   {# Javascript block for individual pages #}
   {% block pageScripts %}
   {% endblock %}

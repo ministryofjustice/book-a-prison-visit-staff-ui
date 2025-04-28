@@ -59,6 +59,29 @@ export default class VisitService {
     return visit
   }
 
+  async updateVisit({
+    username,
+    applicationReference,
+    applicationMethod,
+    allowOverBooking,
+  }: {
+    username: string
+    applicationReference: string
+    applicationMethod: ApplicationMethodType
+    allowOverBooking: boolean
+  }): Promise<Visit> {
+    const token = await this.hmppsAuthClient.getSystemClientToken(username)
+    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+
+    const visit = await orchestrationApiClient.updateVisit(
+      applicationReference,
+      applicationMethod,
+      allowOverBooking,
+      username,
+    )
+    return visit
+  }
+
   async cancelVisit({
     username,
     reference,

@@ -67,6 +67,23 @@ export default class OrchestrationApiClient {
     })
   }
 
+  async updateVisit(
+    applicationReference: string,
+    applicationMethod: ApplicationMethodType,
+    allowOverBooking: boolean,
+    username: string,
+  ): Promise<Visit> {
+    return this.restClient.put({
+      path: `/visits/${applicationReference}/update`,
+      data: <BookingOrchestrationRequestDto>{
+        applicationMethodType: applicationMethod,
+        allowOverBooking,
+        actionedBy: username,
+        userType: 'STAFF',
+      },
+    })
+  }
+
   async cancelVisit(reference: string, cancelVisitDto: CancelVisitOrchestrationDto): Promise<Visit> {
     return this.restClient.put({
       path: `/visits/${reference}/cancel`,
@@ -332,7 +349,7 @@ export default class OrchestrationApiClient {
           name: mainContact.contactName,
         }
       : undefined
-    const mainContactId = mainContact.contactId ?? null
+    const mainContactId = mainContact?.contactId ?? null
     return { visitContact, mainContactId }
   }
 }

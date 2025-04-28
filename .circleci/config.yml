@@ -25,7 +25,7 @@ parameters:
 
   node-version:
     type: string
-    default: 22.14-browsers
+    default: 22.15-browsers
 
 jobs:
   acceptance_tests_staff_playwright-e2e:
@@ -125,11 +125,8 @@ jobs:
       - restore_cache:
           key: dependency-cache-{{ checksum "package-lock.json" }}
       - run:
-          name: Get wiremock (latest version)
-          command: |
-            LATEST_WIREMOCK_VERSION=$(curl --silent https://repo1.maven.org/maven2/org/wiremock/wiremock-standalone/maven-metadata.xml | sed -n 's/[[:space:]]*<latest>\(.*\)<\/latest>/\1/p')
-            echo "Wiremock latest version is: $LATEST_WIREMOCK_VERSION"
-            curl -o wiremock.jar "https://repo1.maven.org/maven2/org/wiremock/wiremock-standalone/$LATEST_WIREMOCK_VERSION/wiremock-standalone-$LATEST_WIREMOCK_VERSION.jar"
+          name: Get wiremock
+          command: curl -o wiremock.jar https://repo1.maven.org/maven2/org/wiremock/wiremock-standalone/3.9.2/wiremock-standalone-3.9.2.jar
       - run:
           name: Run wiremock
           command: java -jar wiremock.jar --port 9091

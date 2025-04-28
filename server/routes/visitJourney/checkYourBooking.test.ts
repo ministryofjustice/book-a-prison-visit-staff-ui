@@ -170,6 +170,7 @@ testJourneys.forEach(journey => {
         }
 
         visitService.bookVisit = jest.fn().mockResolvedValue(bookedVisit)
+        visitService.updateVisit = jest.fn().mockResolvedValue(bookedVisit)
 
         sessionApp = appWithAllRoutes({
           services: { auditService, visitService },
@@ -185,12 +186,13 @@ testJourneys.forEach(journey => {
           .expect(302)
           .expect('location', `${journey.urlPrefix}/confirmation`)
           .expect(() => {
-            expect(visitService.bookVisit).toHaveBeenCalledWith({
+            expect(journey.isUpdate ? visitService.updateVisit : visitService.bookVisit).toHaveBeenCalledWith({
               username: 'user1',
               applicationReference: visitSessionData.applicationReference,
               applicationMethod: visitSessionData.requestMethod,
               allowOverBooking: false,
             })
+            expect(journey.isUpdate ? visitService.bookVisit : visitService.updateVisit).not.toHaveBeenCalled()
 
             expect(visitService.cancelVisit).not.toHaveBeenCalled()
             expect(visitSessionData.visitStatus).toBe('BOOKED')
@@ -232,6 +234,7 @@ testJourneys.forEach(journey => {
       describe('Handle API errors', () => {
         it('should handle booking failure, display error message and NOT record audit event', () => {
           visitService.bookVisit.mockRejectedValue({})
+          visitService.updateVisit.mockRejectedValue({})
 
           return request(sessionApp)
             .post(`${journey.urlPrefix}/check-your-booking`)
@@ -246,17 +249,17 @@ testJourneys.forEach(journey => {
               expect($('.test-visit-time').text()).toContain('9:30am to 10:30am')
               expect($('.test-visit-type').text()).toContain('Open')
               expect($('form').prop('action')).toBe(`${journey.urlPrefix}/check-your-booking`)
+              expect(visitSessionData.visitStatus).not.toBe('BOOKED')
+              expect(visitSessionData.visitReference).toBe(journey.isUpdate ? 'ab-cd-ef-gh' : undefined)
+              expect(auditService.bookedVisit).not.toHaveBeenCalled()
 
-              expect(visitService.bookVisit).toHaveBeenCalledWith({
+              expect(journey.isUpdate ? visitService.updateVisit : visitService.bookVisit).toHaveBeenCalledWith({
                 username: 'user1',
                 applicationReference: visitSessionData.applicationReference,
                 applicationMethod: visitSessionData.requestMethod,
                 allowOverBooking: false,
               })
-
-              expect(visitSessionData.visitStatus).not.toBe('BOOKED')
-              expect(visitSessionData.visitReference).toBe(journey.isUpdate ? 'ab-cd-ef-gh' : undefined)
-              expect(auditService.bookedVisit).not.toHaveBeenCalled()
+              expect(journey.isUpdate ? visitService.bookVisit : visitService.updateVisit).not.toHaveBeenCalled()
             })
         })
 
@@ -270,6 +273,7 @@ testJourneys.forEach(journey => {
               data: { status: 422, validationErrors: ['APPLICATION_INVALID_NO_SLOT_CAPACITY'] },
             }
             visitService.bookVisit.mockRejectedValue(error)
+            visitService.updateVisit.mockRejectedValue(error)
 
             return request(sessionApp)
               .post(`${journey.urlPrefix}/check-your-booking`)

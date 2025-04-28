@@ -168,7 +168,7 @@ context('Update a visit', () => {
     checkYourBookingPage.requestMethod().contains('Phone call')
 
     // Submit booking
-    cy.task('stubBookVisit', {
+    cy.task('stubUpdateVisit', {
       visit: TestData.visit({
         visitStatus: 'BOOKED',
         startTimestamp: visitSessions[1].startTimestamp,
