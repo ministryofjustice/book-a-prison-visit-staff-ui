@@ -13,7 +13,9 @@
 {% set visitors = [] %}
 {% set noVisitorsText = '' %}
 
-{% set alertDpsContent = "You can also <a class='govuk-link--no-visited-state' href='" + prisonerDpsAlertsUrl + "' target='_blank' data-test='all-alerts-link'>view all alerts (opens in new tab)</a>." %}
+{% set alertDpsContent -%}
+You can also <a class="govuk-link--no-visited-state" href="{{ prisonerDpsAlertsUrl }}" target="_blank" data-test="all-alerts-link">view all alerts (opens in new tab)</a>.
+{%- endset %}
 
 {% for visitor in visitorList %}
 
@@ -133,8 +135,8 @@
           <h2 class="govuk-heading-m">Alerts</h2>
 
           {% if alerts | length %}
-
-            <p data-test="alert-description">This tables shows alerts that are relevant for social visits. {{ alertDpsContent | safe }}</p>
+            
+            <p data-test="alert-description">This table shows alerts that are relevant for social visits. {{ alertDpsContent | safe }}</p>
 
             {{ govukTable({
               classes: 'bapv-table-no-bottom-border fix-width-alert-restriction',
@@ -158,7 +160,7 @@
 
         {% else %}
           {# if no restrictions or alerts, show this text #}
-          <p data-test="prisoner-name">{{ prisonerName }} does not have any restrictions or alerts that are relevant for social visits</p>
+          <p data-test="prisoner-name">{{ prisonerName }} does not have any restrictions or alerts that are relevant for social visits.</p>
           <p data-test="alert-description">{{ alertDpsContent | safe }}</p>
 
         {% endif %}
