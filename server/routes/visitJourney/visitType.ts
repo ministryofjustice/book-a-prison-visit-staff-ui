@@ -2,10 +2,11 @@ import type { Request, Response } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
 import AuditService from '../../services/auditService'
 import { getUrlPrefix } from './visitJourneyUtils'
+import { BookOrUpdate } from '../../@types/bapv'
 
 export default class VisitType {
   constructor(
-    private readonly mode: string,
+    private readonly mode: BookOrUpdate,
     private readonly auditService: AuditService,
   ) {}
 
@@ -20,7 +21,7 @@ export default class VisitType {
       errors: req.flash('errors'),
       restrictions: closedRestrictions,
       visitors: visitSessionData.visitors,
-      urlPrefix: getUrlPrefix(isUpdate, visitSessionData.visitReference),
+      urlPrefix: getUrlPrefix(isUpdate),
     })
   }
 
@@ -29,7 +30,7 @@ export default class VisitType {
     const { visitSessionData } = req.session
     const errors = validationResult(req)
 
-    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
+    const urlPrefix = getUrlPrefix(isUpdate)
 
     if (!errors.isEmpty()) {
       req.flash('errors', errors.array() as [])

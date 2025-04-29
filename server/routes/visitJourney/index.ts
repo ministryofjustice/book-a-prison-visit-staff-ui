@@ -1,23 +1,22 @@
 import { type RequestHandler, Router } from 'express'
-import sessionCheckMiddleware from '../middleware/sessionCheckMiddleware'
-import asyncMiddleware from '../middleware/asyncMiddleware'
-import SelectVisitors from './visitJourney/selectVisitors'
-import VisitType from './visitJourney/visitType'
-import DateAndTime from './visitJourney/dateAndTime'
-import CheckYourBooking from './visitJourney/checkYourBooking'
-import Overbooking from './visitJourney/overbooking'
-import Confirmation from './visitJourney/confirmation'
-import AdditionalSupport from './visitJourney/additionalSupport'
-import MainContact from './visitJourney/mainContact'
-import RequestMethod from './visitJourney/requestMethod'
-import type { Services } from '../services'
+import sessionCheckMiddleware from '../../middleware/sessionCheckMiddleware'
+import asyncMiddleware from '../../middleware/asyncMiddleware'
+import SelectVisitors from './selectVisitors'
+import VisitType from './visitType'
+import DateAndTime from './dateAndTime'
+import CheckYourBooking from './checkYourBooking'
+import Overbooking from './overbooking'
+import Confirmation from './confirmation'
+import AdditionalSupport from './additionalSupport'
+import MainContact from './mainContact'
+import RequestMethod from './requestMethod'
+import type { Services } from '../../services'
+import { BookOrUpdate } from '../../@types/bapv'
 
-export default function routes({
-  auditService,
-  prisonerVisitorsService,
-  visitService,
-  visitSessionsService,
-}: Services): Router {
+export default function routes(
+  { auditService, prisonerVisitorsService, visitService, visitSessionsService }: Services,
+  bookOrUpdate: BookOrUpdate,
+): Router {
   const router = Router()
 
   const get = (path: string, ...handlers: RequestHandler[]) =>
@@ -32,15 +31,15 @@ export default function routes({
       handlers.map(handler => asyncMiddleware(handler)),
     )
 
-  const selectVisitors = new SelectVisitors('book', prisonerVisitorsService)
-  const visitType = new VisitType('book', auditService)
-  const additionalSupport = new AdditionalSupport('book')
-  const dateAndTime = new DateAndTime('book', visitService, visitSessionsService, auditService)
-  const mainContact = new MainContact('book', visitService)
-  const requestMethod = new RequestMethod('book')
-  const checkYourBooking = new CheckYourBooking('book', auditService, visitService)
-  const overbooking = new Overbooking('book', visitSessionsService)
-  const confirmation = new Confirmation('book')
+  const selectVisitors = new SelectVisitors(bookOrUpdate, prisonerVisitorsService)
+  const visitType = new VisitType(bookOrUpdate, auditService)
+  const additionalSupport = new AdditionalSupport(bookOrUpdate)
+  const dateAndTime = new DateAndTime(bookOrUpdate, visitService, visitSessionsService, auditService)
+  const mainContact = new MainContact(bookOrUpdate, visitService)
+  const requestMethod = new RequestMethod(bookOrUpdate)
+  const checkYourBooking = new CheckYourBooking(bookOrUpdate, auditService, visitService)
+  const overbooking = new Overbooking(bookOrUpdate, visitSessionsService)
+  const confirmation = new Confirmation(bookOrUpdate)
 
   get('/select-visitors', sessionCheckMiddleware({ stage: 1 }), (req, res) => selectVisitors.get(req, res))
   post('/select-visitors', sessionCheckMiddleware({ stage: 1 }), selectVisitors.validate(), (req, res) =>

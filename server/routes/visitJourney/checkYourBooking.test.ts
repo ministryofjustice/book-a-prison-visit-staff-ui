@@ -18,7 +18,7 @@ let visitSessionData: VisitSessionData
 
 const testJourneys = [
   { urlPrefix: '/book-a-visit', isUpdate: false },
-  { urlPrefix: '/visit/ab-cd-ef-gh/update', isUpdate: true },
+  { urlPrefix: '/update-a-visit', isUpdate: true },
 ]
 
 beforeEach(() => {

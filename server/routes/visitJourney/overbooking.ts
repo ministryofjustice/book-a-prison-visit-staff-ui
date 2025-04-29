@@ -2,10 +2,11 @@ import type { Request, Response } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
 import { getUrlPrefix } from './visitJourneyUtils'
 import { VisitSessionsService } from '../../services'
+import { BookOrUpdate } from '../../@types/bapv'
 
 export default class Overbooking {
   constructor(
-    private readonly mode: string,
+    private readonly mode: BookOrUpdate,
     private readonly visitSessionsService: VisitSessionsService,
   ) {}
 
@@ -13,7 +14,7 @@ export default class Overbooking {
     const isUpdate = this.mode === 'update'
     const { visitSessionData } = req.session
 
-    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
+    const urlPrefix = getUrlPrefix(isUpdate)
 
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
@@ -37,7 +38,7 @@ export default class Overbooking {
     const isUpdate = this.mode === 'update'
     const { visitSessionData } = req.session
 
-    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
+    const urlPrefix = getUrlPrefix(isUpdate)
 
     const errors = validationResult(req)
     if (!errors.isEmpty()) {

@@ -20,7 +20,7 @@ export default class RequestMethod {
       errors: req.flash('errors'),
       formValues,
       requestMethodsBooking,
-      urlPrefix: getUrlPrefix(isUpdate, visitSessionData.visitReference),
+      urlPrefix: getUrlPrefix(isUpdate),
     })
   }
 
@@ -28,7 +28,7 @@ export default class RequestMethod {
     const isUpdate = this.mode === 'update'
     const { visitSessionData } = req.session
 
-    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
+    const urlPrefix = getUrlPrefix(isUpdate)
 
     const errors = validationResult(req)
     if (!errors.isEmpty()) {

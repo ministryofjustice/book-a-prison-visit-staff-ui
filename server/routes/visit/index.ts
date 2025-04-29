@@ -24,8 +24,7 @@ export default function routes(services: Services): Router {
   const confirmUpdate = new ConfirmUpdateController()
   const updateVisit = new UpdateVisitController(services.visitService)
 
-  // middleware to ensure valid visit reference
-  // happens at this level to stop duplication
+  // middleware to ensure valid visit reference for all /visit/:reference routes
   router.use('/:reference', (req, res, next) => {
     const { reference } = req.params
     if (!isValidVisitReference(reference)) {
@@ -49,8 +48,8 @@ export default function routes(services: Services): Router {
     clearNotifications.clearNotifications(),
   )
 
-  get('/:reference/update/confirm-update', confirmUpdate.viewConfirmUpdate())
-  post('/:reference/update/confirm-update', confirmUpdate.submitConfirmUpdate())
+  get('/:reference/confirm-update', confirmUpdate.viewConfirmUpdate())
+  post('/:reference/confirm-update', confirmUpdate.submitConfirmUpdate())
 
   return router
 }
