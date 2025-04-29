@@ -138,7 +138,7 @@ testJourneys.forEach(journey => {
             "Review John Smith's restrictions and alerts before selecting visitors.",
           )
           expect($('[data-test=alert-description]').text()).toBe(
-            'This table shows alerts that are relevant for social visits. You can also view all alerts (opens in new tab).',
+            'This table shows alerts that are relevant for social visits. You can also view all alerts (opens in a new tab).',
           )
           expect($('[data-test="all-alerts-link"]').attr('href')).toBe(
             'https://prisoner-dev.digital.prison.service.justice.gov.uk/prisoner/A1234BC/alerts/active',
@@ -199,7 +199,7 @@ testJourneys.forEach(journey => {
           const $ = cheerio.load(res.text)
           expect($('[data-test=restriction-description]').text()).toBe('There are no restrictions to review.')
           expect($('[data-test=alert-description]').text()).toBe(
-            'This table shows alerts that are relevant for social visits. You can also view all alerts (opens in new tab).',
+            'This table shows alerts that are relevant for social visits. You can also view all alerts (opens in a new tab).',
           )
           expect($('[data-test="all-alerts-link"]').attr('href')).toBe(
             'https://prisoner-dev.digital.prison.service.justice.gov.uk/prisoner/A1234BC/alerts/active',
@@ -230,7 +230,7 @@ testJourneys.forEach(journey => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('[data-test=alert-description]').text()).toBe('You can also view all alerts (opens in new tab).')
+          expect($('[data-test=alert-description]').text()).toBe('You can also view all alerts (opens in a new tab).')
           expect($('[data-test="all-alerts-link"]').attr('href')).toBe(
             'https://prisoner-dev.digital.prison.service.justice.gov.uk/prisoner/A1234BC/alerts/active',
           )
@@ -262,7 +262,7 @@ testJourneys.forEach(journey => {
           expect($('[data-test="prisoner-name"]').text()).toBe(
             'John Smith does not have any restrictions or alerts that are relevant for social visits.',
           )
-          expect($('[data-test=alert-description]').text()).toBe('You can also view all alerts (opens in new tab).')
+          expect($('[data-test=alert-description]').text()).toBe('You can also view all alerts (opens in a new tab).')
           expect($('[data-test="all-alerts-link"]').attr('href')).toBe(
             'https://prisoner-dev.digital.prison.service.justice.gov.uk/prisoner/A1234BC/alerts/active',
           )
