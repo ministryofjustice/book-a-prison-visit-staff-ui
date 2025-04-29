@@ -13,6 +13,10 @@
 {% set visitors = [] %}
 {% set noVisitorsText = '' %}
 
+{% set alertDpsContent -%}
+You can also <a class="govuk-link--no-visited-state" href="{{ prisonerDpsAlertsUrl }}" target="_blank" data-test="all-alerts-link">view all alerts (opens in a new tab)</a>.
+{%- endset %}
+
 {% for visitor in visitorList %}
 
   {% set checkbox -%}
@@ -63,13 +67,10 @@
 
       {% if atLeastOneAdult === true and eligibleVisitors === true %}
 
-        <h2 class="govuk-heading-m" data-test="prisoner-name">{{ prisonerName }} active restrictions and alerts</h2>
-
-        <p>Review restrictions and alerts before selecting visitors.</p>
-
-        <p>This page shows alerts that are relevant for social visits. You can also <a class="govuk-link--no-visited-state" href="{{ prisonerDpsAlertsUrl }}" target="_blank" data-test="all-alerts-link">view all alerts</a>.</p>
-
         {% if restrictions | length or alerts | length %}
+
+          <p data-test="prisoner-name">Review {{ prisonerName }}'s restrictions and alerts before selecting visitors.</p>
+
           {% set prisonerRestrictions = [] %}
           {% for restriction in restrictions %}
             {% set restrictionExpiryDate %}{% if restriction.expiryDate %}{{ restriction.expiryDate | formatDate }}{% else %}No end date{% endif %}{% endset %}
@@ -106,7 +107,11 @@
               }
             ]), prisonerAlerts) %}
           {% endfor %}
+
+          <h2 class="govuk-heading-m">Restrictions</h2>
+
           {% if restrictions | length %}
+
             {{ govukTable({
               classes: 'bapv-table-no-bottom-border fix-width-alert-restriction',
               head: [
@@ -122,25 +127,41 @@
               ],
               rows: prisonerRestrictions
             }) }}
+          {% else %}
+            {# if no restrictions, show this under the restriction header #}
+            <p data-test="restriction-description">There are no restrictions to review.</p>
           {% endif %}
+          
+          <h2 class="govuk-heading-m">Alerts</h2>
 
           {% if alerts | length %}
-          {{ govukTable({
-            classes: 'bapv-table-no-bottom-border fix-width-alert-restriction',
-            head: [
-              {
-                text: "Type of alert"
-              },
-              {
-                text: "Comments"
-              },
-              {
-                text: "End date"
-              }
-            ],
-            rows: prisonerAlerts
-          }) }}
+            
+            <p data-test="alert-description">This table shows alerts that are relevant for social visits. {{ alertDpsContent | safe }}</p>
+
+            {{ govukTable({
+              classes: 'bapv-table-no-bottom-border fix-width-alert-restriction',
+              head: [
+                {
+                  text: "Type of alert"
+                },
+                {
+                  text: "Comments"
+                },
+                {
+                  text: "End date"
+                }
+              ],
+              rows: prisonerAlerts
+            }) }}
+          {% else %}
+            {# if no alerts, show this under the alert header #}
+            <p data-test="alert-description">{{ alertDpsContent | safe }}</p>
           {% endif %}
+
+        {% else %}
+          {# if no restrictions or alerts, show this text #}
+          <p data-test="prisoner-name">{{ prisonerName }} does not have any restrictions or alerts that are relevant for social visits.</p>
+          <p data-test="alert-description">{{ alertDpsContent | safe }}</p>
 
         {% endif %}
 

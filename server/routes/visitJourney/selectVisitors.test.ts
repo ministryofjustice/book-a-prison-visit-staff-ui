@@ -134,13 +134,19 @@ testJourneys.forEach(journey => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('[data-test="prisoner-name"]').text()).toContain('John Smith')
-          expect($('[data-test=restrictions-type1]').text().trim()).toBe('Restricted')
-          expect($('[data-test=restrictions-comment1]').text().trim()).toBe('Details about this restriction')
-          expect($('[data-test=restrictions-end-date1]').text().trim()).toBe('15 March 2022')
+          expect($('[data-test="prisoner-name"]').text()).toBe(
+            "Review John Smith's restrictions and alerts before selecting visitors.",
+          )
+          expect($('[data-test=alert-description]').text()).toBe(
+            'This table shows alerts that are relevant for social visits. You can also view all alerts (opens in a new tab).',
+          )
           expect($('[data-test="all-alerts-link"]').attr('href')).toBe(
             'https://prisoner-dev.digital.prison.service.justice.gov.uk/prisoner/A1234BC/alerts/active',
           )
+          expect($('[data-test=restriction-description]').text()).toBe('')
+          expect($('[data-test=restrictions-type1]').text().trim()).toBe('Restricted')
+          expect($('[data-test=restrictions-comment1]').text().trim()).toBe('Details about this restriction')
+          expect($('[data-test=restrictions-end-date1]').text().trim()).toBe('15 March 2022')
           expect($('[data-test=alert-type1]').text().trim()).toBe('Protective Isolation Unit')
           expect($('[data-test=alert-comment1]').text().trim()).toBe('Alert comment')
           expect($('[data-test=alert-end-date1]').text().trim()).toBe('15 March 2022')
@@ -174,6 +180,70 @@ testJourneys.forEach(journey => {
         })
     })
 
+    it('should display a message when there are no prisoner restrictions', () => {
+      visitSessionData.prisoner.alerts = [TestData.alert()]
+
+      sessionApp = appWithAllRoutes({
+        services: { prisonerVisitorsService },
+        sessionData: {
+          visitorList,
+          visitSessionData,
+        } as SessionData,
+      })
+
+      return request(sessionApp)
+        .get(`${journey.urlPrefix}/select-visitors`)
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('[data-test=restriction-description]').text()).toBe('There are no restrictions to review.')
+          expect($('[data-test=alert-description]').text()).toBe(
+            'This table shows alerts that are relevant for social visits. You can also view all alerts (opens in a new tab).',
+          )
+          expect($('[data-test="all-alerts-link"]').attr('href')).toBe(
+            'https://prisoner-dev.digital.prison.service.justice.gov.uk/prisoner/A1234BC/alerts/active',
+          )
+          expect($('[data-test=restrictions-type1]').text().trim()).toBe('')
+          expect($('[data-test=restrictions-comment1]').text().trim()).toBe('')
+          expect($('[data-test=restrictions-end-date1]').text().trim()).toBe('')
+          expect($('[data-test=alert-type1]').text().trim()).toBe('Protective Isolation Unit')
+          expect($('[data-test=alert-comment1]').text().trim()).toBe('Alert comment')
+          expect($('[data-test=alert-end-date1]').text().trim()).toBe('No end date')
+        })
+    })
+
+    it('should display a message when there are no prisoner alerts', () => {
+      visitSessionData.prisoner.restrictions = [TestData.offenderRestriction()]
+
+      sessionApp = appWithAllRoutes({
+        services: { prisonerVisitorsService },
+        sessionData: {
+          visitorList,
+          visitSessionData,
+        } as SessionData,
+      })
+
+      return request(sessionApp)
+        .get(`${journey.urlPrefix}/select-visitors`)
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('[data-test=alert-description]').text()).toBe('You can also view all alerts (opens in a new tab).')
+          expect($('[data-test="all-alerts-link"]').attr('href')).toBe(
+            'https://prisoner-dev.digital.prison.service.justice.gov.uk/prisoner/A1234BC/alerts/active',
+          )
+          expect($('[data-test=restriction-description]').text()).toBe('')
+          expect($('[data-test=restrictions-type1]').text().trim()).toBe('Restricted')
+          expect($('[data-test=restrictions-comment1]').text().trim()).toBe('Details about this restriction')
+          expect($('[data-test=restrictions-end-date1]').text().trim()).toBe('No end date')
+          expect($('[data-test=alert-type1]').text().trim()).toBe('')
+          expect($('[data-test=alert-comment1]').text().trim()).toBe('')
+          expect($('[data-test=alert-end-date1]').text().trim()).toBe('')
+        })
+    })
+
     it('should display a message when there are no prisoner restrictions or alerts', () => {
       sessionApp = appWithAllRoutes({
         services: { prisonerVisitorsService },
@@ -189,8 +259,13 @@ testJourneys.forEach(journey => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('[data-test="prisoner-name"]').text()).toContain('John Smith')
-          expect($('[data-test=no-prisoner-restrictions]').text()).toBe('')
+          expect($('[data-test="prisoner-name"]').text()).toBe(
+            'John Smith does not have any restrictions or alerts that are relevant for social visits.',
+          )
+          expect($('[data-test=alert-description]').text()).toBe('You can also view all alerts (opens in a new tab).')
+          expect($('[data-test="all-alerts-link"]').attr('href')).toBe(
+            'https://prisoner-dev.digital.prison.service.justice.gov.uk/prisoner/A1234BC/alerts/active',
+          )
           expect($('[data-test=restrictions-type1]').text()).toBe('')
           expect($('[data-test=restrictions-comment1]').text().trim()).toBe('')
           expect($('[data-test=restrictions-end-date1]').text().trim()).toBe('')
