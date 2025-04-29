@@ -19,14 +19,13 @@ import setUpWebSecurity from './middleware/setUpWebSecurity'
 import setUpWebSession from './middleware/setUpWebSession'
 
 import indexRoutes from './routes'
-import bookAVisitRoutes from './routes/bookAVisit'
+import visitJourneyRoutes from './routes/visitJourney'
 import blockVisitDatesRoutes from './routes/blockVisitDates'
 import establishmentNotSupportedRoutes from './routes/establishmentNotSupported'
 import prisonerRoutes from './routes/prisoner'
 import reviewRoutes from './routes/review'
 import searchRoutes from './routes/search'
 import timetableRoutes from './routes/timetable'
-import visitRoutesNew from './routes/visit/index'
 import visitRoutes from './routes/visit'
 import visitsByDateRoutes from './routes/visitsByDate'
 import type { Services } from './services'
@@ -62,7 +61,8 @@ export default function createApp(services: Services): express.Application {
   app.use(appInsightsOperationId)
 
   app.use('/', indexRoutes(services))
-  app.use('/book-a-visit', bookAVisitRoutes(services))
+  app.use('/book-a-visit', visitJourneyRoutes(services, 'book'))
+  app.use('/update-a-visit', visitJourneyRoutes(services, 'update'))
   app.use('/block-visit-dates', blockVisitDatesRoutes(services))
   app.use('/establishment-not-supported', establishmentNotSupportedRoutes(services))
   app.use('/prisoner', prisonerRoutes(services))
@@ -70,7 +70,6 @@ export default function createApp(services: Services): express.Application {
   app.use('/timetable', timetableRoutes(services))
   app.use('/review', reviewRoutes(services))
   app.use('/visit', visitRoutes(services))
-  app.use('/visit', visitRoutesNew(services)) // TODO rationalise/refactor visit routes
   app.use('/visits', visitsByDateRoutes(services))
 
   app.use((req, res, next) => next(createError(404, 'Not found')))

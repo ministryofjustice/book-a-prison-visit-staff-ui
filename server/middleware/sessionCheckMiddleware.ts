@@ -6,7 +6,6 @@ export default function sessionCheckMiddleware({ stage }: { stage: number }): Re
   return (req, res, next) => {
     const { selectedEstablishment } = req.session
     const { visitSessionData } = req.session
-    const { reference } = req.params
 
     if (!visitSessionData) {
       return logAndRedirect(req, res, '/search/prisoner/?error=missing-session')
@@ -17,10 +16,6 @@ export default function sessionCheckMiddleware({ stage }: { stage: number }): Re
       visitSessionData.originalVisitSlot.prisonId !== selectedEstablishment.prisonId
     ) {
       return logAndRedirect(req, res, '/?error=establishment-mismatch')
-    }
-
-    if (reference && visitSessionData.visitReference !== reference) {
-      return logAndRedirect(req, res, '/?error=reference-mismatch')
     }
 
     if (

@@ -21,7 +21,7 @@
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-      <form action="/visit/{{ reference }}/update/confirm-update" method="POST" novalidate>
+      <form action="/visit/{{ reference }}/confirm-update" method="POST" novalidate>
         <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
         {{ govukRadios({

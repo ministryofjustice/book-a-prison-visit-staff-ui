@@ -24,7 +24,7 @@ export default class AdditionalSupport {
       errors: req.flash('errors'),
       appReference: visitSessionData.applicationReference,
       formValues,
-      urlPrefix: getUrlPrefix(isUpdate, visitSessionData.visitReference),
+      urlPrefix: getUrlPrefix(isUpdate),
     })
   }
 
@@ -32,7 +32,7 @@ export default class AdditionalSupport {
     const isUpdate = this.mode === 'update'
     const { visitSessionData } = req.session
     const errors = validationResult(req)
-    const urlPrefix = getUrlPrefix(isUpdate, visitSessionData.visitReference)
+    const urlPrefix = getUrlPrefix(isUpdate)
 
     if (!errors.isEmpty()) {
       req.flash('errors', errors.array() as [])

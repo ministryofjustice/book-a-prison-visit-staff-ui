@@ -4,8 +4,8 @@ import { ApplicationValidationErrorResponse } from '../../data/orchestrationApiT
 import { prisonerTimePretty } from '../../utils/utils'
 
 // return URL prefix for either visit booking or visit update journey
-export const getUrlPrefix = (isUpdate: boolean, visitReference: string) => {
-  return isUpdate ? `/visit/${visitReference}/update` : '/book-a-visit'
+export const getUrlPrefix = (isUpdate: boolean) => {
+  return isUpdate ? '/update-a-visit' : '/book-a-visit'
 }
 
 export const validationErrorsMojAlert = (

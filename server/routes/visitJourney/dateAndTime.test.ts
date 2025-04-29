@@ -27,7 +27,7 @@ const prisonId = 'HEI'
 // run tests for booking and update journeys
 const testJourneys = [
   { urlPrefix: '/book-a-visit', isUpdate: false },
-  { urlPrefix: '/visit/ab-cd-ef-gh/update', isUpdate: true },
+  { urlPrefix: '/update-a-visit', isUpdate: true },
 ]
 
 const visitSlot1: VisitSlot = {
@@ -554,7 +554,7 @@ describe('Update journey override booking window', () => {
     visitSessionData.overrideBookingWindow = true
 
     return request(sessionApp)
-      .get('/visit/ab-cd-ef-gh/update/select-date-and-time')
+      .get('/update-a-visit/select-date-and-time')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -627,7 +627,7 @@ describe('Update journey specific warning messages', () => {
     visitSessionData.visitRestriction = 'OPEN'
 
     return request(sessionApp)
-      .get('/visit/ab-cd-ef-gh/update/select-date-and-time')
+      .get('/update-a-visit/select-date-and-time')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -648,7 +648,7 @@ describe('Update journey specific warning messages', () => {
     visitSessionData.visitRestriction = 'OPEN'
 
     return request(sessionApp)
-      .get('/visit/ab-cd-ef-gh/update/select-date-and-time')
+      .get('/update-a-visit/select-date-and-time')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -668,7 +668,7 @@ describe('Update journey specific warning messages', () => {
     visitSessionData.visitRestriction = 'CLOSED'
 
     return request(sessionApp)
-      .get('/visit/ab-cd-ef-gh/update/select-date-and-time')
+      .get('/update-a-visit/select-date-and-time')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -690,7 +690,7 @@ describe('Update journey specific warning messages', () => {
     visitSessionData.visitRestriction = 'OPEN'
 
     return request(sessionApp)
-      .get('/visit/ab-cd-ef-gh/update/select-date-and-time')
+      .get('/update-a-visit/select-date-and-time')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -711,7 +711,7 @@ describe('Update journey specific warning messages', () => {
     visitSessionData.visitRestriction = 'CLOSED'
 
     return request(sessionApp)
-      .get('/visit/ab-cd-ef-gh/update/select-date-and-time')
+      .get('/update-a-visit/select-date-and-time')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
@@ -732,7 +732,7 @@ describe('Update journey specific warning messages', () => {
     visitSessionData.visitRestriction = 'OPEN'
 
     return request(sessionApp)
-      .get('/visit/ab-cd-ef-gh/update/select-date-and-time')
+      .get('/update-a-visit/select-date-and-time')
       .expect(200)
       .expect('Content-Type', /html/)
       .expect(res => {
