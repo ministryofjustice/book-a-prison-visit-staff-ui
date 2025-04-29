@@ -8,6 +8,7 @@ import CancelVisitController from './cancelVisitController'
 import { isValidVisitReference } from '../validationChecks'
 import ClearNotificationsController from './clearNotificationsController'
 import ConfirmUpdateController from './confirmUpdateController'
+import UpdateVisitController from './updateVisitController'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -21,6 +22,7 @@ export default function routes(services: Services): Router {
   const cancelVisit = new CancelVisitController(services.auditService, services.visitService)
   const clearNotifications = new ClearNotificationsController(services.auditService, services.visitNotificationsService)
   const confirmUpdate = new ConfirmUpdateController()
+  const updateVisit = new UpdateVisitController(services.visitService)
 
   // middleware to ensure valid visit reference
   // happens at this level to stop duplication
@@ -33,6 +35,7 @@ export default function routes(services: Services): Router {
   })
 
   get('/:reference', visitDetails.view())
+  post('/:reference', updateVisit.startVisitUpdate())
 
   get('/:reference/cancel', cancelVisit.showCancellationReasons())
   postWithValidation('/:reference/cancel', cancelVisit.validate(), cancelVisit.cancelVisit())
