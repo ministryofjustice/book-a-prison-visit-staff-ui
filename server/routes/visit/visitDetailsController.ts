@@ -13,30 +13,11 @@ export default class VisitDetailsController {
   public view(): RequestHandler {
     return async (req, res) => {
       const { reference } = req.params
-
-      const fromPage = typeof req.query?.from === 'string' ? req.query.from : null
-      const fromPageQuery = typeof req.query?.query === 'string' ? req.query.query : null
+      const { selectedEstablishment } = req.session
       const { username } = res.locals.user
 
       const visitDetails = await this.visitService.getVisitDetailed({ username, reference })
       const { prison, prisoner } = visitDetails
-
-      const prisonerLocation = getPrisonerLocation(prisoner)
-
-      const eventsTimeline = this.visitService.getVisitEventsTimeline({
-        events: visitDetails.events,
-        visitStatus: visitDetails.visitStatus,
-        visitNotes: visitDetails.visitNotes,
-      })
-
-      // TODO leave early and render a different template?
-      const showVisitDetails = req.session.selectedEstablishment.prisonId === prison.prisonId
-
-      const availableVisitActions = getAvailableVisitActions({
-        visitStatus: visitDetails.visitStatus,
-        startTimestamp: visitDetails.startTimestamp,
-        notifications: visitDetails.notifications,
-      })
 
       await this.auditService.viewedVisitDetails({
         visitReference: reference,
@@ -46,19 +27,36 @@ export default class VisitDetailsController {
         operationId: res.locals.appInsightsOperationId,
       })
 
+      if (selectedEstablishment.prisonId !== prison.prisonId) {
+        return res.render('pages/visit/visitDetailsWrongEstablishment', { prison, reference, selectedEstablishment })
+      }
+
+      const availableVisitActions = getAvailableVisitActions({
+        visitStatus: visitDetails.visitStatus,
+        startTimestamp: visitDetails.startTimestamp,
+        notifications: visitDetails.notifications,
+      })
+
+      const eventsTimeline = this.visitService.getVisitEventsTimeline({
+        events: visitDetails.events,
+        visitStatus: visitDetails.visitStatus,
+        visitNotes: visitDetails.visitNotes,
+      })
+
+      const fromPage = typeof req.query?.from === 'string' ? req.query.from : null
+      const fromPageQuery = typeof req.query?.query === 'string' ? req.query.query : null
+
+      const prisonerDpsAlertsUrl = getDpsPrisonerAlertsUrl(visitDetails.prisoner.prisonerNumber)
+      const prisonerLocation = getPrisonerLocation(prisoner)
+
       return res.render('pages/visit/visitDetails', {
+        availableVisitActions,
+        eventsTimeline,
         fromPage,
         fromPageQuery,
-
-        availableVisitActions,
-
         notificationTypeWarnings,
-
-        eventsTimeline,
-
+        prisonerDpsAlertsUrl,
         prisonerLocation,
-        showVisitDetails,
-        prisonerDpsAlertsUrl: getDpsPrisonerAlertsUrl(visitDetails.prisoner.prisonerNumber),
         visitDetails,
       })
     }
