@@ -1,9 +1,8 @@
-import { NotificationType, VisitBookingDetailsDto } from '../../data/orchestrationApiTypes'
+import config from '../../config'
+import { VisitBookingDetailsDto } from '../../data/orchestrationApiTypes'
 
-// TODO move these to config?
 const A_DAY_IN_MS = 24 * 60 * 60 * 1000
-const CANCELLATION_LIMIT_DAYS = 28
-const NO_UPDATE_NOTIFICATION_TYPES: NotificationType[] = ['PRISONER_RECEIVED_EVENT', 'PRISONER_RELEASED_EVENT']
+const CANCELLATION_LIMIT_MS = config.visit.cancellationLimitDays * A_DAY_IN_MS
 
 export const getPrisonerLocation = (prisoner: VisitBookingDetailsDto['prisoner']) => {
   if (prisoner.prisonId === 'OUT') {
@@ -16,6 +15,8 @@ export const getPrisonerLocation = (prisoner: VisitBookingDetailsDto['prisoner']
 
   return `${prisoner.cellLocation}, ${prisoner.prisonName}`
 }
+
+export type AvailableVisitActions = ReturnType<typeof getAvailableVisitActions>
 
 export const getAvailableVisitActions = ({
   visitStatus,
@@ -35,21 +36,28 @@ export const getAvailableVisitActions = ({
   const now = new Date()
   const visitStartTime = new Date(startTimestamp)
 
-  const noUpdate = notifications.some(notification => NO_UPDATE_NOTIFICATION_TYPES.includes(notification.type))
+  // update
+  const hasUpdateBlockingNotifications = notifications.some(
+    notification => notification.type === 'PRISONER_RECEIVED_EVENT' || notification.type === 'PRISONER_RELEASED_EVENT',
+  )
 
-  if (now < visitStartTime && !noUpdate) {
+  if (!hasUpdateBlockingNotifications && now < visitStartTime) {
     availableVisitActions.update = true
   }
 
-  const latestCancellationTime = new Date(visitStartTime.getTime() + A_DAY_IN_MS * CANCELLATION_LIMIT_DAYS)
+  // cancel
+  const latestCancellationTime = new Date(visitStartTime.getTime() + CANCELLATION_LIMIT_MS)
+
   if (now < latestCancellationTime) {
     availableVisitActions.cancel = true
   }
 
-  const clearableNotifications = notifications.filter(
-    notification => notification.type !== 'PRISON_VISITS_BLOCKED_FOR_DATE',
+  // do not change
+  const hasBlockedDateNotification = notifications.some(
+    notification => notification.type === 'PRISON_VISITS_BLOCKED_FOR_DATE',
   )
-  if (clearableNotifications.length > 0) {
+
+  if (!hasBlockedDateNotification && notifications.length > 0) {
     availableVisitActions.clearNotifications = true
   }
 

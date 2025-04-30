@@ -114,7 +114,7 @@
     </div>
 
     {# Visit actions #}
-    <div class="govuk-button-group">
+    <div class="govuk-button-group" data-test="visit-actions">
       <form action="/visit/{{ visitDetails.reference }}" method="POST" novalidate>
         <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 

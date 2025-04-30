@@ -132,6 +132,10 @@ export default {
       agent: new AgentConfig(Number(get('ORCHESTRATION_API_TIMEOUT_RESPONSE', 10000))),
     },
   },
+  visit: {
+    // Max number of days AFTER a visit that it can be marked CANCELLED
+    cancellationLimitDays: Number(get('CANCELLATION_LIMIT_DAYS', 28)),
+  },
   features: {
     notificationTypes: {
       enabledNotifications: <NotificationType[]>(

@@ -9,11 +9,21 @@ import { createMockAuditService, createMockVisitService } from '../../services/t
 import { notificationTypeWarnings } from '../../constants/notificationEvents'
 import { MojTimelineItem } from '../../services/visitService'
 import config from '../../config'
+import { AvailableVisitActions } from './visitUtils'
 
 let app: Express
 
 const auditService = createMockAuditService()
 const visitService = createMockVisitService()
+
+let availableVisitActions: AvailableVisitActions
+jest.mock('./visitUtils', () => {
+  const visitUtils = jest.requireActual('./visitUtils')
+  return {
+    ...visitUtils,
+    getAvailableVisitActions: () => availableVisitActions,
+  }
+})
 
 afterEach(() => {
   jest.resetAllMocks()
@@ -38,6 +48,8 @@ describe('Visit details page', () => {
       ...config.features,
       showPrisonerAlertsRestrictions: true,
     })
+
+    availableVisitActions = { update: false, cancel: false, clearNotifications: false }
 
     visitDetails = TestData.visitBookingDetailsDto()
 
@@ -97,9 +109,8 @@ describe('Visit details page', () => {
           expect($('[data-test="visit-email"]').text()).toBe('visitor@example.com')
           expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
           expect($('[data-test="additional-support"]').text()).toContain('Wheelchair ramp')
-          // actions
-          expect($('[data-test=update-visit]').parent('form[method=post]').attr('action')).toBe('/visit/ab-cd-ef-gh')
-          expect($('[data-test="cancel-visit"]').attr('href')).toBe('/visit/ab-cd-ef-gh/cancel')
+          // actions form
+          expect($('[data-test=visit-actions] form').attr('action')).toBe('/visit/ab-cd-ef-gh')
           // prisoner details
           expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
           expect($('[data-test="prisoner-number"]').text()).toBe('A1234BC')
@@ -279,53 +290,42 @@ describe('Visit details page', () => {
       })
     })
 
-    describe('Visit notification messages and actions', () => {
-      it('should not display update and cancel buttons if visit is cancelled', () => {
-        visitDetails.visitStatus = 'CANCELLED'
-        visitDetails.outcomeStatus = 'ADMINISTRATIVE_CANCELLATION'
-        visitDetails.visitNotes = [{ type: 'VISIT_OUTCOMES', text: 'booking error' }]
+    describe('Visit action buttons', () => {
+      it('should render no buttons if no available actions', () => {
         return request(app)
           .get('/visit/ab-cd-ef-gh')
           .expect(200)
           .expect('Content-Type', /html/)
           .expect(res => {
             const $ = cheerio.load(res.text)
-            expect($('[data-test="cancel-visit"]').length).toBe(0)
-            expect($('[data-test="update-visit"]').length).toBe(0)
+            expect($('[data-test=update-visit]').length).toBe(0)
+            expect($('[data-test=cancel-visit]').length).toBe(0)
+            expect($('[data-test=clear-notifications]').length).toBe(0)
           })
       })
 
-      it('should not display update and cancel buttons if start date has passed by 29 days', () => {
-        const visitDate = new Date(visitDetails.startTimestamp)
-        const testDate = visitDate.setDate(visitDate.getDate() + 29)
-        jest.useFakeTimers({ advanceTimers: true, now: testDate })
+      it('should render all buttons if all actions available', () => {
+        availableVisitActions = { update: true, cancel: true, clearNotifications: true }
+
         return request(app)
           .get('/visit/ab-cd-ef-gh')
           .expect(200)
           .expect('Content-Type', /html/)
           .expect(res => {
             const $ = cheerio.load(res.text)
-            expect($('[data-test="cancel-visit"]').length).toBe(0)
-            expect($('[data-test="update-visit"]').length).toBe(0)
+            expect($('[data-test=update-visit]').text().trim()).toBe('Update booking')
+
+            expect($('[data-test=cancel-visit]').text().trim()).toBe('Cancel booking')
+            expect($('[data-test=cancel-visit]').attr('href')).toBe('/visit/ab-cd-ef-gh/cancel')
+
+            expect($('[data-test=clear-notifications]').text().trim()).toBe('Do not change')
+            expect($('[data-test=clear-notifications]').attr('href')).toBe('/visit/ab-cd-ef-gh/clear-notifications')
           })
       })
+    })
 
-      it('should display cancel and not the update button if start date has passed by 27 days', () => {
-        const visitDate = new Date(visitDetails.startTimestamp)
-        const testDate = visitDate.setDate(visitDate.getDate() + 27)
-        jest.useFakeTimers({ advanceTimers: true, now: testDate })
-        return request(app)
-          .get('/visit/ab-cd-ef-gh')
-          .expect(200)
-          .expect('Content-Type', /html/)
-          .expect(res => {
-            const $ = cheerio.load(res.text)
-            expect($('[data-test="cancel-visit"]').length).toBe(1)
-            expect($('[data-test="update-visit"]').length).toBe(0)
-          })
-      })
-
-      it('should not display visit notification banner or do not change button when no notification types set', () => {
+    describe('Visit notification messages', () => {
+      it('should not display visit notification banner when no notification types set', () => {
         return request(app)
           .get('/visit/ab-cd-ef-gh')
           .expect(200)
@@ -333,11 +333,10 @@ describe('Visit details page', () => {
           .expect(res => {
             const $ = cheerio.load(res.text)
             expect($('[data-test="visit-notification"]').length).toBe(0)
-            expect($('[data-test="clear-notifications"]').length).toBe(0)
           })
       })
 
-      it('should display a single visit notification banner and NOT the do not change button when only a blocked date notification set', () => {
+      it('should display a single visit notification banner when only a blocked date notification set', () => {
         visitDetails.notifications = [
           { type: 'PRISON_VISITS_BLOCKED_FOR_DATE', createdDateTime: '', additionalData: [] },
         ]
@@ -352,11 +351,10 @@ describe('Visit details page', () => {
             expect($('[data-test="visit-notification"]').text()).toBe(
               notificationTypeWarnings.PRISON_VISITS_BLOCKED_FOR_DATE,
             )
-            expect($('[data-test="clear-notifications"]').length).toBe(0)
           })
       })
 
-      it('should display a single visit notification banner and do not change button when a single notification type is set', () => {
+      it('should display a single visit notification banner when a single notification type is set', () => {
         visitDetails.notifications = [{ type: 'PRISONER_RELEASED_EVENT', createdDateTime: '', additionalData: [] }]
 
         return request(app)
@@ -367,12 +365,10 @@ describe('Visit details page', () => {
             const $ = cheerio.load(res.text)
             expect($('[data-test="visit-notification"]').length).toBe(1)
             expect($('[data-test="visit-notification"]').text()).toBe(notificationTypeWarnings.PRISONER_RELEASED_EVENT)
-            expect($('[data-test="clear-notifications"]').length).toBe(1)
-            expect($('[data-test="clear-notifications"]').text()).toContain('Do not change')
           })
       })
 
-      it('should display two visit notification banners and do not change button when two notification types are set', () => {
+      it('should display two visit notification banners when two notification types are set', () => {
         visitDetails.notifications = [
           { type: 'PRISONER_RELEASED_EVENT', createdDateTime: '', additionalData: [] },
           { type: 'PRISON_VISITS_BLOCKED_FOR_DATE', createdDateTime: '', additionalData: [] },
@@ -391,55 +387,6 @@ describe('Visit details page', () => {
             expect($('[data-test="visit-notification"]').eq(1).text()).toBe(
               notificationTypeWarnings.PRISON_VISITS_BLOCKED_FOR_DATE,
             )
-            expect($('[data-test="clear-notifications"]').length).toBe(1)
-            expect($('[data-test="clear-notifications"]').text()).toContain('Do not change')
-          })
-      })
-
-      it('should not show the Update button if the visit has a prisoner released notification', () => {
-        visitDetails.notifications = [
-          { type: 'PRISONER_RELEASED_EVENT', createdDateTime: '', additionalData: [] },
-          { type: 'PRISON_VISITS_BLOCKED_FOR_DATE', createdDateTime: '', additionalData: [] },
-        ]
-
-        return request(app)
-          .get('/visit/ab-cd-ef-gh')
-          .expect(200)
-          .expect('Content-Type', /html/)
-          .expect(res => {
-            const $ = cheerio.load(res.text)
-            expect($('[data-test="update-visit"]').length).toBeFalsy()
-          })
-      })
-
-      it('should not show the Update button if the visit has a prisoner transferred notification', () => {
-        visitDetails.notifications = [
-          { type: 'PRISONER_RECEIVED_EVENT', createdDateTime: '', additionalData: [] },
-          { type: 'PRISON_VISITS_BLOCKED_FOR_DATE', createdDateTime: '', additionalData: [] },
-        ]
-
-        return request(app)
-          .get('/visit/ab-cd-ef-gh')
-          .expect(200)
-          .expect('Content-Type', /html/)
-          .expect(res => {
-            const $ = cheerio.load(res.text)
-            expect($('[data-test="update-visit"]').length).toBeFalsy()
-          })
-      })
-
-      it('should show the Update button if the visit has other notifications', () => {
-        visitDetails.notifications = [
-          { type: 'PRISON_VISITS_BLOCKED_FOR_DATE', createdDateTime: '', additionalData: [] },
-        ]
-
-        return request(app)
-          .get('/visit/ab-cd-ef-gh')
-          .expect(200)
-          .expect('Content-Type', /html/)
-          .expect(res => {
-            const $ = cheerio.load(res.text)
-            expect($('[data-test="update-visit"]').length).toBeTruthy()
           })
       })
     })
