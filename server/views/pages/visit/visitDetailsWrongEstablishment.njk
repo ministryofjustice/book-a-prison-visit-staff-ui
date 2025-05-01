@@ -1,0 +1,16 @@
+{% extends "layout.njk" %}
+
+{% set pageHeaderTitle = "Visit booking details (" + reference + ")" %}
+
+{% set backLinkHref = "/" %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+    <h1 class="govuk-heading-l">Visit booking details</h1>
+    <p>Booking reference: <span data-test="reference">{{ reference }}</span></p>
+    <p>This booking is not for {{ selectedEstablishment.prisonName }}.</p>
+    <p>To view the booking, change the establishment to {{ prison.prisonName }} and search for it by the booking reference.</p>
+  </div>
+</div>
+{% endblock %}

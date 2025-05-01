@@ -36,9 +36,7 @@ import * as auth from '../../authentication/auth'
 import populateSelectedEstablishment from '../../middleware/populateSelectedEstablishment'
 import type { Services } from '../../services'
 
-import SupportedPrisonsService from '../../services/supportedPrisonsService'
 import TestData from './testData'
-import { Prison } from '../../@types/bapv'
 import { PrisonUser } from '../../interfaces/hmppsUser'
 
 export const user: PrisonUser = {
@@ -54,21 +52,6 @@ export const user: PrisonUser = {
 }
 
 export const flashProvider = jest.fn()
-
-// TODO is this still needed?
-class MockSupportedPrisonsService extends SupportedPrisonsService {
-  constructor() {
-    super(undefined, undefined)
-  }
-
-  async isSupportedPrison(_username: string, _prisonId: string): Promise<boolean> {
-    return true
-  }
-
-  async getPrison(_username: string, _prisonCode: string): Promise<Prison> {
-    return TestData.prison()
-  }
-}
 
 function appSetup(
   services: Services,
@@ -89,13 +72,21 @@ function appSetup(
       user: { ...req.user } as PrisonUser,
       feComponentsMeta,
     }
+
+    // set default 'selectedEstablishment' unless explicitly set with corresponding service for 'populateSelectedEstablishment()'
+    if (!sessionData.selectedEstablishment && !services.supportedPrisonsService) {
+      // eslint-disable-next-line no-param-reassign
+      sessionData.selectedEstablishment = TestData.prison()
+    }
+
     req.session = sessionData as Session & Partial<SessionData>
+
     next()
   })
   app.use(express.json())
   app.use(express.urlencoded({ extended: true }))
 
-  app.use(populateSelectedEstablishment({ supportedPrisonsService: new MockSupportedPrisonsService(), ...services }))
+  app.use(populateSelectedEstablishment(services))
 
   app.use('/', indexRoutes(services))
   app.use('/book-a-visit', visitJourneyRoutes(services, 'book'))
