@@ -9,7 +9,6 @@ import {
   createMockPrisonApiClient,
   createMockPrisonerSearchClient,
 } from '../data/testutils/mocks'
-import * as utils from '../utils/utils'
 
 const token = 'some token'
 
@@ -49,7 +48,6 @@ describe('Prisoner profile service', () => {
     it('should retrieve and process data for prisoner profile', async () => {
       const prisonerProfile = TestData.prisonerProfile()
       orchestrationApiClient.getPrisonerProfile.mockResolvedValue(prisonerProfile)
-      const sortItemsSpy = jest.spyOn(utils, 'sortItemsByDateAsc')
 
       const prisonerProfilePage: PrisonerProfilePage = {
         alerts: [],
@@ -82,9 +80,6 @@ describe('Prisoner profile service', () => {
       expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user')
       expect(orchestrationApiClient.getPrisonerProfile).toHaveBeenCalledWith(prisonId, prisonerId)
       expect(results).toEqual(prisonerProfilePage)
-      expect(sortItemsSpy).toHaveBeenCalledWith(prisonerProfilePage.alerts, 'dateExpires')
-
-      sortItemsSpy.mockRestore()
     })
 
     it('should return visit balances as null if prisoner is on REMAND', async () => {

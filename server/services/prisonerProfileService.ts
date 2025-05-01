@@ -1,13 +1,7 @@
 import { NotFound } from 'http-errors'
 import { format, isBefore } from 'date-fns'
 import { PrisonerProfilePage } from '../@types/bapv'
-import {
-  convertToTitleCase,
-  nextIepAdjustDate,
-  nextPrivIepAdjustDate,
-  prisonerDateTimePretty,
-  sortItemsByDateAsc,
-} from '../utils/utils'
+import { convertToTitleCase, nextIepAdjustDate, nextPrivIepAdjustDate, prisonerDateTimePretty } from '../utils/utils'
 import { Alert, OffenderRestriction } from '../data/prisonApiTypes'
 import { HmppsAuthClient, OrchestrationApiClient, PrisonApiClient, RestClientBuilder } from '../data'
 
@@ -26,7 +20,6 @@ export default class PrisonerProfileService {
     const prisonerProfile = await orchestrationApiClient.getPrisonerProfile(prisonId, prisonerId)
 
     const { alerts } = prisonerProfile
-    sortItemsByDateAsc<Alert, 'dateExpires'>(alerts, 'dateExpires')
     const flaggedAlerts: Alert[] = alerts.filter(alert => this.alertCodesToFlag.includes(alert.alertCode))
 
     const visitsByMonth: PrisonerProfilePage['visitsByMonth'] = new Map()
