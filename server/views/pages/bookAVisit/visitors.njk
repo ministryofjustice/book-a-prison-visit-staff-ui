@@ -92,7 +92,7 @@ You can also <a class="govuk-link--no-visited-state" href="{{ prisonerDpsAlertsU
 
           {% set prisonerAlerts = [] %}
           {% for alert in alerts %}
-            {% set alertExpiryDate %}{% if alert.dateExpires %}{{ alert.dateExpires | formatDate }}{% else %}No end date{% endif %}{% endset %}
+            {% set alertExpiryDate %}{% if alert.expiryDate %}{{ alert.expiryDate | formatDate }}{% else %}No end date{% endif %}{% endset %}
             {%- set prisonerAlerts = (prisonerAlerts.push([
               {
                 html: '<span data-test="alert-type' + loop.index + '" class="govuk-tag alert-tag alert-tag--' + alert.alertType + '">' + alert.alertCodeDescription + '</span>'

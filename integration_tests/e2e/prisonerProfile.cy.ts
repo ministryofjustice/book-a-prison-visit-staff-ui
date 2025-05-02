@@ -24,14 +24,14 @@ context('Prisoner profile page', () => {
         alertTypeDescription: 'COVID unit management',
         alertCode: 'UPIU',
         alertCodeDescription: 'Protective Isolation Unit',
-        dateCreated: '2022-01-02',
+        startDate: '2022-01-02',
       }),
       TestData.alert({
         alertType: 'X',
         alertTypeDescription: 'Security',
         alertCode: 'XR',
         alertCodeDescription: 'Racist',
-        dateCreated: '2022-01-01',
+        startDate: '2022-01-01',
       }),
     ]
     const visitors = [
@@ -84,10 +84,10 @@ context('Prisoner profile page', () => {
     prisonerProfilePage.alertsTabCode().eq(0).contains('UPIU')
     prisonerProfilePage.alertsTabComment().eq(0).contains('Alert comment')
     prisonerProfilePage
-      .alertsTabCreated()
+      .alertsTabStart()
       .eq(0)
       .contains(format(new Date('01-02-2022'), prettyDateFormat))
-    prisonerProfilePage.alertsTabExpires().eq(0).contains('Not entered')
+    prisonerProfilePage.alertsTabEnd().eq(0).contains('Not entered')
 
     // Visits tab
     prisonerProfilePage.selectVisitsTab()

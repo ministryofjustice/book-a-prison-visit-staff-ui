@@ -15,6 +15,7 @@ import {
   SessionSchedule,
   Visit,
   VisitRestriction,
+  AlertDtoRaw,
 } from './orchestrationApiTypes'
 import { Prison, VisitSessionData } from '../@types/bapv'
 
@@ -694,7 +695,27 @@ describe('orchestrationApiClient', () => {
 
   describe('getPrisonerProfile', () => {
     it('should return prisoner profile page for selected prisoner', async () => {
-      const prisonerProfile = TestData.prisonerProfile()
+      const alertsBefore = [
+        {
+          dateCreated: '2000-02-01',
+        } as AlertDtoRaw,
+        {
+          startDate: '2000-02-02',
+          expiryDate: '2000-02-03',
+        } as AlertDtoRaw,
+      ]
+      const alertsAfter = [
+        {
+          dateCreated: '2000-02-01',
+          startDate: '2000-02-01',
+          expiryDate: null,
+        } as AlertDtoRaw,
+        {
+          startDate: '2000-02-02',
+          expiryDate: '2000-02-03',
+        } as AlertDtoRaw,
+      ]
+      const prisonerProfile = TestData.prisonerProfile({ alerts: alertsBefore })
 
       fakeOrchestrationApi
         .get(`/prisoner/${prisonId}/${prisonerProfile.prisonerId}/profile`)
@@ -703,7 +724,7 @@ describe('orchestrationApiClient', () => {
 
       const output = await orchestrationApiClient.getPrisonerProfile(prisonId, prisonerProfile.prisonerId)
 
-      expect(output).toEqual(prisonerProfile)
+      expect(output).toStrictEqual(TestData.prisonerProfile({ alerts: alertsAfter }))
     })
   })
 

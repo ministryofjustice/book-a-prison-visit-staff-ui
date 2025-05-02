@@ -170,7 +170,7 @@ export default class VisitService {
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
     const visitDetails = await orchestrationApiClient.getVisitDetailed(reference)
-    sortItemsByDateAsc<Alert, 'dateExpires'>(visitDetails.prisoner.prisonerAlerts, 'dateExpires')
+    sortItemsByDateAsc<Alert, 'expiryDate'>(visitDetails.prisoner.prisonerAlerts, 'expiryDate')
     sortItemsByDateAsc<OffenderRestriction, 'expiryDate'>(visitDetails.prisoner.prisonerRestrictions, 'expiryDate')
 
     return visitDetails

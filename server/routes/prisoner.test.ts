@@ -59,8 +59,8 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
     alertTypeDescription: 'Security',
     alertCode: 'XR',
     alertCodeDescription: 'Racist',
-    dateCreated: '2022-01-01',
-    dateExpires: '2022-01-02',
+    startDate: '2022-01-01',
+    expiryDate: '2022-01-02',
   })
 
   beforeEach(() => {
@@ -426,8 +426,8 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
                   alertTypeDescription: 'Security',
                   alertCode: 'XR',
                   alertCodeDescription: 'Racist',
-                  dateCreated: '2022-01-01',
-                  dateExpires: '2022-01-02',
+                  startDate: '2022-01-01',
+                  expiryDate: '2022-01-02',
                 }),
               ],
             },
@@ -465,8 +465,8 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
                   alertTypeDescription: 'Security',
                   alertCode: 'XR',
                   alertCodeDescription: 'Racist',
-                  dateCreated: '2022-01-01',
-                  dateExpires: '2022-01-02',
+                  startDate: '2022-01-01',
+                  expiryDate: '2022-01-02',
                 }),
               ],
             },
