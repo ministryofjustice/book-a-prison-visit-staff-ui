@@ -41,7 +41,7 @@ testJourneys.forEach(journey => {
 
     let returnData: VisitorListItem[]
     const restrictions = [TestData.offenderRestriction({ expiryDate: '2022-03-15' })]
-    const alerts = [TestData.alert({ dateExpires: '2022-03-15' })]
+    const alerts = [TestData.alert({ expiryDate: '2022-03-15' })]
 
     beforeEach(() => {
       returnData = [

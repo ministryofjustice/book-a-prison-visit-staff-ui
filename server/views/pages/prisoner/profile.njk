@@ -232,12 +232,12 @@
               attributes: { "data-test": "tab-alerts-comment" }
             },
             {
-              html: alert.dateCreated | formatDate("d'&nbsp;'MMMM yyyy") if alert.dateCreated else "Not entered",
-              attributes: { "data-test": "tab-alerts-created" }
+              html: alert.startDate | formatDate("d'&nbsp;'MMMM yyyy") if alert.startDate else "Not entered",
+              attributes: { "data-test": "tab-alerts-start" }
             },
             {
-              text: alert.dateExpires | formatDate if alert.dateExpires else "Not entered",
-              attributes: { "data-test": "tab-alerts-expires" }
+              text: alert.expiryDate | formatDate if alert.expiryDate else "Not entered",
+              attributes: { "data-test": "tab-alerts-end" }
             }
           ]), alertRows) %}
         {% endfor %}

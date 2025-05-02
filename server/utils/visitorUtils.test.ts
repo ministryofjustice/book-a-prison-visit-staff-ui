@@ -33,7 +33,7 @@ describe('visitorUtils', () => {
       ['No BAN restrictions', [TestData.restriction({ restrictionType: 'CLOSED' })], { isBanned: false }],
       [
         'Single ban with no end date',
-        [TestData.restriction({ restrictionType: 'BAN', expiryDate: undefined })],
+        [TestData.restriction({ restrictionType: 'BAN', expiryDate: null })],
         { isBanned: true },
       ],
       [
@@ -86,7 +86,7 @@ describe('visitorUtils', () => {
       [
         'Multiple bans (banned) - short and indefinite',
         [
-          TestData.restriction({ restrictionType: 'BAN', expiryDate: undefined }),
+          TestData.restriction({ restrictionType: 'BAN', expiryDate: null }),
           TestData.restriction({ restrictionType: 'BAN', expiryDate: dateWithinBookingLimit }),
         ],
         { isBanned: true },
@@ -95,7 +95,7 @@ describe('visitorUtils', () => {
         'Multiple bans (banned) - indefinite and short',
         [
           TestData.restriction({ restrictionType: 'BAN', expiryDate: dateWithinBookingLimit }),
-          TestData.restriction({ restrictionType: 'BAN', expiryDate: undefined }),
+          TestData.restriction({ restrictionType: 'BAN', expiryDate: null }),
         ],
         { isBanned: true },
       ],

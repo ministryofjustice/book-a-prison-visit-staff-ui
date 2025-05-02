@@ -58,8 +58,9 @@ export default class TestData {
     alertCode = 'UPIU',
     alertCodeDescription = 'Protective Isolation Unit',
     comment = 'Alert comment',
-    dateCreated = '2023-01-02',
-    dateExpires = undefined,
+    startDate = '2023-01-02',
+    expiryDate = null,
+    updatedDate = null,
     active = true,
   }: Partial<Alert> = {}): Alert =>
     ({
@@ -68,8 +69,9 @@ export default class TestData {
       alertCode,
       alertCodeDescription,
       comment,
-      dateCreated,
-      dateExpires,
+      startDate,
+      expiryDate,
+      updatedDate,
       active,
     }) as Alert
 
@@ -295,7 +297,7 @@ export default class TestData {
     restrictionType = 'NONCON',
     restrictionTypeDescription = 'Non-Contact Visit',
     startDate = '2023-02-01',
-    expiryDate = undefined,
+    expiryDate = null,
     globalRestriction = true,
     comment = 'Restriction test comment',
   }: Partial<Restriction> = {}): Restriction => ({

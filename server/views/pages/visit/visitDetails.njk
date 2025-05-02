@@ -203,10 +203,10 @@
                   {{- alert.alertCodeDescription -}}
                 </span>
               </span>
-              <span class="bapv-visit-details__restriction-dates">From <span data-test="prisoner-alert-{{ loop.index }}-start">{{ alert.dateCreated | formatDate }}</span>
-                {%- if alert.dateExpires %} to {% else %}.{% endif %}
+              <span class="bapv-visit-details__restriction-dates">From <span data-test="prisoner-alert-{{ loop.index }}-start">{{ alert.startDate | formatDate }}</span>
+                {%- if alert.expiryDate %} to {% else %}.{% endif %}
                 <span data-test="prisoner-alert-{{ loop.index }}-end">
-                  {{- alert.dateExpires | formatDate | default("No end date", true) -}}
+                  {{- alert.expiryDate | formatDate | default("No end date", true) -}}
                 </span>.
               </span>
             </p>

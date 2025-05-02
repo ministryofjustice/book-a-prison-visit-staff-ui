@@ -53,7 +53,7 @@ export const getBanStatus = (restrictions: Restriction[]): BanStatus => {
     return { isBanned: false }
   }
   // if there is a ban with no end date no further checks needed
-  if (banned.find(ban => ban.expiryDate === undefined)) {
+  if (banned.find(ban => ban.expiryDate === null)) {
     return { isBanned: true }
   }
 

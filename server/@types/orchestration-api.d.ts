@@ -271,6 +271,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/public/booker/{bookerReference}/permitted/prisoners/register': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Register prisoner to a booker
+     * @description Register prisoner to a booker
+     */
+    post: operations['registerPrisoner']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/visits/{reference}': {
     parameters: {
       query?: never
@@ -283,26 +303,6 @@ export interface paths {
      * @description Retrieve a BOOKED or CANCELLED visit by visit reference
      */
     get: operations['getVisitsByReference']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/visits/{reference}/history': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Get visit history
-     * @description Retrieve visit history by visit reference
-     */
-    get: operations['getVisitHistoryByReference']
     put?: never
     post?: never
     delete?: never
@@ -431,38 +431,15 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/visits/notification/visit/{reference}/types': {
+  '/visits/external-system/{clientReference}': {
     parameters: {
       query?: never
       header?: never
       path?: never
       cookie?: never
     }
-    /**
-     * get visit notification types by booking reference
-     * @description Retrieve visit  notification types by booking reference
-     */
-    get: operations['getNotificationTypesForBookingReference']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/visits/notification/visit/{reference}/events': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * get visit notification events by booking reference
-     * @description Retrieve visit  notification events by booking reference
-     */
-    get: operations['getNotificationEventsForBookingReference']
+    /** Get visit reference from given client reference */
+    get: operations['getVisitReferenceByClientReference']
     put?: never
     post?: never
     delete?: never
@@ -827,6 +804,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/config/prisons/user-type/{type}/supported/detailed': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get supported prisons with detailed prison details by user type
+     * @description Get all supported prisons with detailed prison details by user type
+     */
+    get: operations['getSupportedPrisonDetails']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/config/prisons/prison/{prisonCode}': {
     parameters: {
       query?: never
@@ -933,7 +930,7 @@ export interface components {
        * @example STAFF
        * @enum {string}
        */
-      userType: 'STAFF' | 'PUBLIC' | 'SYSTEM'
+      userType: 'STAFF' | 'PUBLIC' | 'SYSTEM' | 'PRISONER'
     }
     /**
      * @description Contact Phone Number
@@ -1119,6 +1116,20 @@ export interface components {
        * @example 2018-12-01T13:45:00
        */
       firstBookedDateTime?: string
+      /** @description External system details associated with the visit */
+      visitExternalSystemDetails?: components['schemas']['VisitExternalSystemDetails']
+    }
+    VisitExternalSystemDetails: {
+      /**
+       * @description Client name
+       * @example client_name
+       */
+      clientName?: string
+      /**
+       * @description Client visit reference
+       * @example Reference ID in the client system
+       */
+      clientVisitReference?: string
     }
     /** @description VisitNote */
     VisitNoteDto: {
@@ -1195,7 +1206,7 @@ export interface components {
        * @description User type for user who actioned this request
        * @enum {string}
        */
-      userType: 'STAFF' | 'PUBLIC' | 'SYSTEM'
+      userType: 'STAFF' | 'PUBLIC' | 'SYSTEM' | 'PRISONER'
     }
     IgnoreVisitNotificationsDto: {
       /** @description Reason why the visit's notifications can be ignored */
@@ -1319,7 +1330,7 @@ export interface components {
        * @example STAFF
        * @enum {string}
        */
-      userType: 'STAFF' | 'PUBLIC' | 'SYSTEM'
+      userType: 'STAFF' | 'PUBLIC' | 'SYSTEM' | 'PRISONER'
     }
     CreateApplicationDto: {
       /**
@@ -1355,7 +1366,7 @@ export interface components {
        * @example STAFF
        * @enum {string}
        */
-      userType: 'STAFF' | 'PUBLIC' | 'SYSTEM'
+      userType: 'STAFF' | 'PUBLIC' | 'SYSTEM' | 'PRISONER'
       /**
        * @description actioned by (Booker reference - if PUBLIC user type Or User Name - if staff user type)
        * @example asd-asd-asd or STAFF_USER
@@ -1397,72 +1408,34 @@ export interface components {
       /** @description full name of user who added the exclude date or username if full name is not available. */
       actionedBy: string
     }
-    /** @description Event Audit with actioned by user's full name populated */
-    EventAuditOrchestrationDto: {
+    /** @description Details to register a prisoner to a booker. */
+    RegisterPrisonerForBookerDto: {
       /**
-       * @description The type of event
-       * @enum {string}
+       * @description Prisoner Id
+       * @example A1234AA
        */
-      type:
-        | 'RESERVED_VISIT'
-        | 'CHANGING_VISIT'
-        | 'MIGRATED_VISIT'
-        | 'BOOKED_VISIT'
-        | 'UPDATED_VISIT'
-        | 'CANCELLED_VISIT'
-        | 'NON_ASSOCIATION_EVENT'
-        | 'PRISONER_RELEASED_EVENT'
-        | 'PRISONER_RECEIVED_EVENT'
-        | 'PRISONER_RESTRICTION_CHANGE_EVENT'
-        | 'PRISONER_ALERTS_UPDATED_EVENT'
-        | 'PRISON_VISITS_BLOCKED_FOR_DATE'
-        | 'SESSION_VISITS_BLOCKED_FOR_DATE'
-        | 'IGNORE_VISIT_NOTIFICATIONS_EVENT'
-        | 'PERSON_RESTRICTION_UPSERTED_EVENT'
-        | 'VISITOR_RESTRICTION_UPSERTED_EVENT'
-        | 'VISITOR_UNAPPROVED_EVENT'
-        | 'UPDATED_NON_ASSOCIATION_VISIT_EVENT'
-        | 'CANCELLED_NON_ASSOCIATION_VISIT_EVENT'
-        | 'IGNORED_NON_ASSOCIATION_VISIT_NOTIFICATIONS_EVENT'
-        | 'PAIRED_VISIT_CANCELLED_IGNORED_OR_UPDATED_EVENT'
+      prisonerId: string
       /**
-       * @description What was the application method for this event
-       * @enum {string}
+       * @description Prisoner first name
+       * @example James
        */
-      applicationMethodType:
-        | 'PHONE'
-        | 'WEBSITE'
-        | 'EMAIL'
-        | 'IN_PERSON'
-        | 'NOT_KNOWN'
-        | 'NOT_APPLICABLE'
-        | 'BY_PRISONER'
+      prisonerFirstName: string
       /**
-       * @description Actioned by full name
-       * @example Aled Evans
+       * @description Prisoner last name
+       * @example Smith
        */
-      actionedByFullName?: string
+      prisonerLastName: string
       /**
-       * @description User type
-       * @example STAFF
-       * @enum {string}
+       * Format: date
+       * @description Prisoner date of birth
+       * @example 1960-01-30
        */
-      userType: 'STAFF' | 'PUBLIC' | 'SYSTEM'
-      /** @description Notes added against the event */
-      text?: string
+      prisonerDateOfBirth: string
       /**
-       * Format: date-time
-       * @description event creat date and time
-       * @example 2018-12-01T13:45:00
+       * @description Prison Id
+       * @example MDI
        */
-      createTimestamp: string
-    }
-    /** @description Visit */
-    VisitHistoryDetailsDto: {
-      /** @description The visit details */
-      eventsAudit: components['schemas']['EventAuditOrchestrationDto'][]
-      /** @description The visit details */
-      visit: components['schemas']['VisitDto']
+      prisonId: string
     }
     /** @description An address */
     AddressDto: {
@@ -1593,18 +1566,84 @@ export interface components {
        * @description Date of the alert, which might differ to the date it was created
        * @example 2019-08-20
        */
-      dateCreated: string
+      startDate: string
       /**
        * Format: date
        * @description Date the alert expires
        * @example 2020-08-20
        */
-      dateExpires?: string
+      expiryDate?: string
+      /**
+       * Format: date
+       * @description Date the alert was last updated.
+       * @example 2020-08-20
+       */
+      updatedDate?: string
       /**
        * @description True / False based on alert status
        * @example false
        */
       active: boolean
+    }
+    /** @description Event Audit with actioned by user's full name populated */
+    EventAuditOrchestrationDto: {
+      /**
+       * @description The type of event
+       * @enum {string}
+       */
+      type:
+        | 'RESERVED_VISIT'
+        | 'CHANGING_VISIT'
+        | 'MIGRATED_VISIT'
+        | 'BOOKED_VISIT'
+        | 'UPDATED_VISIT'
+        | 'CANCELLED_VISIT'
+        | 'NON_ASSOCIATION_EVENT'
+        | 'PRISONER_RELEASED_EVENT'
+        | 'PRISONER_RECEIVED_EVENT'
+        | 'PRISONER_RESTRICTION_CHANGE_EVENT'
+        | 'PRISONER_ALERTS_UPDATED_EVENT'
+        | 'PRISON_VISITS_BLOCKED_FOR_DATE'
+        | 'SESSION_VISITS_BLOCKED_FOR_DATE'
+        | 'IGNORE_VISIT_NOTIFICATIONS_EVENT'
+        | 'PERSON_RESTRICTION_UPSERTED_EVENT'
+        | 'VISITOR_RESTRICTION_UPSERTED_EVENT'
+        | 'VISITOR_UNAPPROVED_EVENT'
+        | 'UPDATED_NON_ASSOCIATION_VISIT_EVENT'
+        | 'CANCELLED_NON_ASSOCIATION_VISIT_EVENT'
+        | 'IGNORED_NON_ASSOCIATION_VISIT_NOTIFICATIONS_EVENT'
+        | 'PAIRED_VISIT_CANCELLED_IGNORED_OR_UPDATED_EVENT'
+      /**
+       * @description What was the application method for this event
+       * @enum {string}
+       */
+      applicationMethodType:
+        | 'PHONE'
+        | 'WEBSITE'
+        | 'EMAIL'
+        | 'IN_PERSON'
+        | 'NOT_KNOWN'
+        | 'NOT_APPLICABLE'
+        | 'BY_PRISONER'
+      /**
+       * @description Actioned by full name
+       * @example Aled Evans
+       */
+      actionedByFullName?: string
+      /**
+       * @description User type
+       * @example STAFF
+       * @enum {string}
+       */
+      userType: 'STAFF' | 'PUBLIC' | 'SYSTEM' | 'PRISONER'
+      /** @description Notes added against the event */
+      text?: string
+      /**
+       * Format: date-time
+       * @description event creat date and time
+       * @example 2018-12-01T13:45:00
+       */
+      createTimestamp: string
     }
     /** @description Offender restriction */
     OffenderRestrictionDto: {
@@ -1937,13 +1976,11 @@ export interface components {
     visitRestrictions: ('OPEN' | 'CLOSED' | 'UNKNOWN')[]
     SessionTimeSlotDto: {
       /**
-       * Format: HH:mm
        * @description The start time of the generated visit session(s)
        * @example 10:30
        */
       startTime: string
       /**
-       * Format: HH:mm
        * @description The end time of the generated visit session(s)
        * @example 11:30
        */
@@ -1992,19 +2029,19 @@ export interface components {
       visitRestriction: 'OPEN' | 'CLOSED' | 'UNKNOWN'
     }
     PageVisitDto: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['VisitDto'][]
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject']
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
       first?: boolean
       last?: boolean
       empty?: boolean
@@ -2083,37 +2120,6 @@ export interface components {
     NotificationCountDto: {
       /** Format: int32 */
       count: number
-    }
-    /** @description Visit notification event details. */
-    VisitNotificationEventDto: {
-      /**
-       * @description Notification Event Type
-       * @enum {string}
-       */
-      type:
-        | 'NON_ASSOCIATION_EVENT'
-        | 'PRISONER_RELEASED_EVENT'
-        | 'PRISONER_RESTRICTION_CHANGE_EVENT'
-        | 'PRISON_VISITS_BLOCKED_FOR_DATE'
-        | 'SESSION_VISITS_BLOCKED_FOR_DATE'
-        | 'PRISONER_RECEIVED_EVENT'
-        | 'PRISONER_ALERTS_UPDATED_EVENT'
-        | 'PERSON_RESTRICTION_UPSERTED_EVENT'
-        | 'VISITOR_RESTRICTION_UPSERTED_EVENT'
-        | 'VISITOR_UNAPPROVED_EVENT'
-      /**
-       * @description Notification Event Reference
-       * @example aa-bb-cc-dd
-       */
-      notificationEventReference: string
-      /**
-       * Format: date-time
-       * @description Created date and time
-       * @example 2018-12-01T13:45:00
-       */
-      createdDateTime: string
-      /** @description Additional data, empty list if no additional data associated */
-      additionalData: components['schemas']['VisitNotificationEventAttributeDto'][]
     }
     /** @description Visit Session */
     VisitSessionDto: {
@@ -2620,6 +2626,8 @@ export interface components {
       visitBalances?: components['schemas']['VisitBalancesDto']
       /** @description Past and future visits for the prisoner based on configured duration. */
       visits: components['schemas']['VisitSummaryDto'][]
+      /** @description Prisoner restrictions */
+      prisonerRestrictions: components['schemas']['OffenderRestrictionDto'][]
     }
     /** @description Balances of visit orders and privilege visit orders */
     VisitBalancesDto: {
@@ -2792,7 +2800,7 @@ export interface components {
        * @example STAFF
        * @enum {string}
        */
-      userType: 'STAFF' | 'PUBLIC' | 'SYSTEM'
+      userType: 'STAFF' | 'PUBLIC' | 'SYSTEM' | 'PRISONER'
       /**
        * @description is prison user client active
        * @example true
@@ -3915,6 +3923,57 @@ export interface operations {
       }
     }
   }
+  registerPrisoner: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        bookerReference: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RegisterPrisonerForBookerDto']
+      }
+    }
+    responses: {
+      /** @description Registration successful */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Incorrect request to register a prisoner to a booker */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions for this action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Prisoner registration failed */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': 'FAILED_REGISTRATION'
+        }
+      }
+    }
+  }
   getVisitsByReference: {
     parameters: {
       query?: never
@@ -3964,64 +4023,6 @@ export interface operations {
       }
       /** @description Incorrect request to Get visits for prisoner */
       500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  getVisitHistoryByReference: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        reference: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Visit History Information Returned */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          '*/*': components['schemas']['VisitHistoryDetailsDto']
-        }
-      }
-      /** @description Incorrect request to Get visit history */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Unauthorized to access this endpoint */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Incorrect permissions retrieve visit history */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Visit not found */
-      404: {
         headers: {
           [name: string]: unknown
         }
@@ -4396,39 +4397,28 @@ export interface operations {
       }
     }
   }
-  getNotificationTypesForBookingReference: {
+  getVisitReferenceByClientReference: {
     parameters: {
       query?: never
       header?: never
       path: {
         /**
-         * @description bookingReference
-         * @example v9*d7*ed*7u
+         * @description clientReference
+         * @example AABDC234
          */
-        reference: string
+        clientReference: string
       }
       cookie?: never
     }
     requestBody?: never
     responses: {
-      /** @description Retrieved visit  notification types by booking reference */
+      /** @description Visit reference returned */
       200: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          'application/json': (
-            | 'NON_ASSOCIATION_EVENT'
-            | 'PRISONER_RELEASED_EVENT'
-            | 'PRISONER_RESTRICTION_CHANGE_EVENT'
-            | 'PRISON_VISITS_BLOCKED_FOR_DATE'
-            | 'SESSION_VISITS_BLOCKED_FOR_DATE'
-            | 'PRISONER_RECEIVED_EVENT'
-            | 'PRISONER_ALERTS_UPDATED_EVENT'
-            | 'PERSON_RESTRICTION_UPSERTED_EVENT'
-            | 'VISITOR_RESTRICTION_UPSERTED_EVENT'
-            | 'VISITOR_UNAPPROVED_EVENT'
-          )[]
+          '*/*': string[]
         }
       }
       /** @description Unauthorized to access this endpoint */
@@ -4440,7 +4430,7 @@ export interface operations {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
-      /** @description Incorrect permissions to access this endpoint */
+      /** @description Incorrect permissions retrieve a visit reference by client reference */
       403: {
         headers: {
           [name: string]: unknown
@@ -4449,34 +4439,8 @@ export interface operations {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
-    }
-  }
-  getNotificationEventsForBookingReference: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /**
-         * @description bookingReference
-         * @example v9*d7*ed*7u
-         */
-        reference: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Retrieved visit  notification events by booking reference */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['VisitNotificationEventDto'][]
-        }
-      }
-      /** @description Unauthorized to access this endpoint */
-      401: {
+      /** @description Failed to get a visit reference by client reference */
+      404: {
         headers: {
           [name: string]: unknown
         }
@@ -4484,8 +4448,8 @@ export interface operations {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
-      /** @description Incorrect permissions to access this endpoint */
-      403: {
+      /** @description Failed to get a visit reference by client reference */
+      500: {
         headers: {
           [name: string]: unknown
         }
@@ -5439,7 +5403,7 @@ export interface operations {
          * @description type
          * @example STAFF
          */
-        type: 'STAFF' | 'PUBLIC' | 'SYSTEM'
+        type: 'STAFF' | 'PUBLIC' | 'SYSTEM' | 'PRISONER'
       }
       cookie?: never
     }
@@ -5464,6 +5428,50 @@ export interface operations {
         }
       }
       /** @description Incorrect permissions to view session templates */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  getSupportedPrisonDetails: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /**
+         * @description type
+         * @example STAFF
+         */
+        type: 'STAFF' | 'PUBLIC' | 'SYSTEM' | 'PRISONER'
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Supported prisons returned */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          '*/*': components['schemas']['PrisonRegisterPrisonDto'][]
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to get supported prison details */
       403: {
         headers: {
           [name: string]: unknown

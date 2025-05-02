@@ -227,7 +227,7 @@ describe('Visit service', () => {
 
         expect(orchestrationApiClient.getVisitDetailed).toHaveBeenCalledWith('ab-cd-ef-gh')
         expect(result).toStrictEqual(visitDetails)
-        expect(sortItemsSpy).toHaveBeenNthCalledWith(1, visitDetails.prisoner.prisonerAlerts, 'dateExpires')
+        expect(sortItemsSpy).toHaveBeenNthCalledWith(1, visitDetails.prisoner.prisonerAlerts, 'expiryDate')
         expect(sortItemsSpy).toHaveBeenNthCalledWith(2, visitDetails.prisoner.prisonerRestrictions, 'expiryDate')
 
         sortItemsSpy.mockRestore()

@@ -27,6 +27,11 @@ export type SessionSchedule = components['schemas']['SessionScheduleDto']
 export type VisitSession = components['schemas']['VisitSessionDto']
 
 export type Alert = components['schemas']['AlertDto']
+// TODO remove when property rename API change deployed
+export interface AlertDtoRaw extends Alert {
+  dateCreated: string
+  dateExpires: string
+}
 
 export type PrisonerProfile = components['schemas']['PrisonerProfileDto']
 export type VisitSummary = components['schemas']['VisitSummaryDto']
