@@ -71,6 +71,7 @@
 
     <h1 class="govuk-heading-xl">Visit booking details</h1>
 
+    {# Visit summary #}
     <div class="govuk-grid-row bapv-visit-details__summary">
       <div class="govuk-grid-column-one-half">
         <ul class="govuk-list govuk-list--spaced">
@@ -147,7 +148,9 @@
     <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
 
     <div class="govuk-grid-row">
-      <div class="govuk-grid-column-two-thirds">
+      <div class="govuk-grid-column-full">
+
+        {# Prisoner #}
         <h2 class="govuk-heading-l govuk-!-padding-top-3">Prisoner</h2>
         <h3 class="govuk-heading-m">
           <span data-test="prisoner-name">{{ (visitDetails.prisoner.firstName + " " + visitDetails.prisoner.lastName) | properCaseFullName }}</span>
@@ -166,58 +169,69 @@
           </dd>
         </dl>
 
+        {# Restrictions #}
         {% if features.showPrisonerAlertsRestrictions and visitDetails.prisoner.prisonerRestrictions | length %}
           <h4 class="govuk-heading-s">Restrictions</h4>
-          {% for restriction in visitDetails.prisoner.prisonerRestrictions %}
-            <p class="bapv-visit-details__restriction">
-              <span>
+          <div class="bapv-visit-details__restrictions">
+            {% for restriction in visitDetails.prisoner.prisonerRestrictions %}
+              <p>
                 <span class="govuk-tag restriction-tag restriction-tag--{{ restriction.restrictionType }}"
                   data-test="prisoner-restriction-{{ loop.index }}">
                   {{- restriction.restrictionTypeDescription -}}
                 </span>
-              </span>
-              <span class="bapv-visit-details__restriction-dates">From <span data-test="prisoner-restriction-{{ loop.index }}-start">{{ restriction.startDate | formatDate }}</span>
-                {%- if restriction.expiryDate %} to {% else %}.{% endif %}
+              </p>
+
+              <p class="bapv-force-overflow" data-test="prisoner-restriction-{{ loop.index }}-comment">
+                {{- restriction.comment -}}
+              </p>
+
+              <p class="bapv-visit-details__restriction-dates">
+                Start: <span data-test="prisoner-restriction-{{ loop.index }}-start">{{ restriction.startDate | formatDate('d/M/yyyy') }}</span>
+                <br>
                 <span data-test="prisoner-restriction-{{ loop.index }}-end">
-                  {{- restriction.expiryDate | formatDate | default("No end date", true) -}}
-                </span>.
-              </span>
-            </p>
-            {% if restriction.comment %}
-              <p data-test="prisoner-restriction-{{ loop.index }}-text">{{ restriction.comment }}</p>
-            {% endif %}
-          {% endfor %}
+                  {%- if restriction.expiryDate %}Ends: {{ restriction.expiryDate | formatDate('d/M/yyyy') }}{% else %}No end date{% endif -%}
+                </span>
+              </p>
+            {% endfor %}
+          </div>
         {% endif %}
 
+        {# Alerts #}
         {% if features.showPrisonerAlertsRestrictions and visitDetails.prisoner.prisonerAlerts | length %}
           <h4 class="govuk-heading-s">Alerts</h4>
           <p>
             This page shows alerts that are relevant for social visits. You can also
             <a class="govuk-link--no-visited-state" href="{{ prisonerDpsAlertsUrl }}" target="_blank" data-test="all-alerts-link">view all alerts</a>.
           </p>
-          {% for alert in visitDetails.prisoner.prisonerAlerts %}
-            <p class="bapv-visit-details__restriction">
-              <span>
+          <div class="bapv-visit-details__alerts">
+            {% for alert in visitDetails.prisoner.prisonerAlerts %}
+              <p>
                 <span class="govuk-tag alert-tag alert-tag--{{ alert.alertType }}"
                   data-test="prisoner-alert-{{ loop.index }}">
                   {{- alert.alertCodeDescription -}}
                 </span>
-              </span>
-              <span class="bapv-visit-details__restriction-dates">From <span data-test="prisoner-alert-{{ loop.index }}-start">{{ alert.startDate | formatDate }}</span>
-                {%- if alert.expiryDate %} to {% else %}.{% endif %}
-                <span data-test="prisoner-alert-{{ loop.index }}-end">
-                  {{- alert.expiryDate | formatDate | default("No end date", true) -}}
-                </span>.
-              </span>
-            </p>
-            {% if alert.comment %}
-              <div class="govuk-body" data-test="prisoner-alert-{{ loop.index }}-text">
+              </p>
+
+              <div class="govuk-body" data-test="prisoner-alert-{{ loop.index }}-comment">
                 {{- bapvExpandableComment({ text: alert.comment }) -}}
               </div>
-            {% endif %}
-          {% endfor %}
+
+              <p class="bapv-visit-details__alert-dates">
+                {% if alert.updatedDate -%}
+                  Updated: <span data-test="prisoner-alert-{{ loop.index }}-updated">{{ alert.updatedDate | formatDate('d/M/yyyy') }}</span>
+                  <br>
+                {%- endif -%}
+                Start: <span data-test="prisoner-alert-{{ loop.index }}-start">{{ alert.startDate | formatDate('d/M/yyyy') }}</span>
+                <br>
+                <span data-test="prisoner-alert-{{ loop.index }}-end">
+                  {%- if alert.expiryDate %}Ends: {{ alert.expiryDate | formatDate('d/M/yyyy') }}{% else %}No end date{% endif -%}
+                </span>
+              </p>
+            {% endfor %}
+          </div>
         {% endif %}
 
+        {# Visitors #}
         <h2 class="govuk-heading-l">Visitors</h2>
         {% for visitor in visitDetails.visitors %}
           <h3 class="govuk-heading-m">
@@ -237,28 +251,34 @@
             <dd data-test="visitor-address-{{ loop.index }}">{{ visitor.primaryAddress | formatAddress }}</dd>
           </dl>
 
-          {% set visitorIndex = loop.index %}
-          {% for restriction in visitor.restrictions %}
-            <p class="bapv-visit-details__restriction">
-              <span>
-                <span class="govuk-tag restriction-tag restriction-tag--{{ restriction.restrictionType }}"
-                  data-test="visitor-{{ visitorIndex }}-restriction-{{ loop.index }}">
-                  {{- restriction.restrictionTypeDescription -}}
-                </span>
-              </span>
-              <span class="bapv-visit-details__restriction-dates">From <span data-test="visitor-{{ visitorIndex }}-restriction-{{ loop.index }}-start">{{ restriction.startDate | formatDate }}</span>
-                {%- if restriction.expiryDate %} to {% else %}.{% endif %}
-                <span data-test="visitor-{{ visitorIndex }}-restriction-{{ loop.index }}-end">
-                  {{- restriction.expiryDate | formatDate | default("No end date", true) -}}
-                </span>.
-              </span>
-            </p>
-            {% if restriction.comment %}
-              <p class="bapv-force-overflow" data-test="visitor-{{ visitorIndex }}-restriction-{{ loop.index }}-text">{{ restriction.comment }}</p>
-            {% endif %}
-          {% endfor %}
+          {% if visitor.restrictions | length %}
+            <div class="bapv-visit-details__restrictions govuk-!-margin-top-6">
+              {% set visitorIndex = loop.index %}
+              {% for restriction in visitor.restrictions %}
+                <p>
+                  <span class="govuk-tag restriction-tag restriction-tag--{{ restriction.restrictionType }}"
+                    data-test="visitor-{{ visitorIndex }}-restriction-{{ loop.index }}">
+                    {{- restriction.restrictionTypeDescription -}}
+                  </span>
+                </p>
+
+                <p class="bapv-force-overflow" data-test="visitor-{{ visitorIndex }}-restriction-{{ loop.index }}-comment">
+                  {{- restriction.comment -}}
+                </p>
+
+                <p class="bapv-visit-details__restriction-dates">
+                  Start: <span data-test="visitor-{{ visitorIndex }}-restriction-{{ loop.index }}-start">{{ restriction.startDate | formatDate('d/M/yyyy') }}</span>
+                  <br>
+                  <span data-test="visitor-{{ visitorIndex }}-restriction-{{ loop.index }}-end">
+                    {%- if restriction.expiryDate %}Ends: {{ restriction.expiryDate | formatDate('d/M/yyyy') -}}{% else %}No end date{% endif -%}
+                  </span>
+                </p>
+              {% endfor %}
+            </div>
+          {% endif %}
         {% endfor %}
 
+        {# Booking history #}
         <h2 class="govuk-heading-l">Booking history</h2>
         {{ mojTimeline({
           headingLevel: 3,

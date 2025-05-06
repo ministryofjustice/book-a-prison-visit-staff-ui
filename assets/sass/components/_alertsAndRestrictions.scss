@@ -7,8 +7,9 @@
 }
 
 .restriction-tag {
-  margin-top: govuk-spacing(-1);
+  margin-top: 0;
   max-width: unset;
+  padding: 6px 10px;
 
   &--CHILD {
     @extend .govuk-tag--grey;
@@ -60,7 +61,8 @@
   color: govuk-colour("black");
   font-size: 14pt;
   margin-right: 0;
-  padding: 8px 8px;
+  max-width: unset;
+  padding: 2px 8px;
 
   &--C { // Child
     border-color: govuk-colour("bright-purple");

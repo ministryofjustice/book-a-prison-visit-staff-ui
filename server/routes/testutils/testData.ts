@@ -60,7 +60,7 @@ export default class TestData {
     comment = 'Alert comment',
     startDate = '2023-01-02',
     expiryDate = null,
-    updatedDate = null,
+    updatedDate = '2023-03-01',
     active = true,
   }: Partial<Alert> = {}): Alert =>
     ({
