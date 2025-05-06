@@ -12,7 +12,6 @@ buildAppInsightsClient(applicationInfo)
 
 import HmppsAuthClient from './hmppsAuthClient'
 import OrchestrationApiClient from './orchestrationApiClient'
-import PrisonApiClient from './prisonApiClient'
 import PrisonerContactRegistryApiClient from './prisonerContactRegistryApiClient'
 import PrisonerSearchClient from './prisonerSearchClient'
 import { createRedisClient } from './redisClient'
@@ -27,7 +26,6 @@ export const dataAccess = () => ({
 
   orchestrationApiClientBuilder: ((token: string) =>
     new OrchestrationApiClient(token)) as RestClientBuilder<OrchestrationApiClient>,
-  prisonApiClientBuilder: ((token: string) => new PrisonApiClient(token)) as RestClientBuilder<PrisonApiClient>,
   prisonerContactRegistryApiClientBuilder: ((token: string) =>
     new PrisonerContactRegistryApiClient(token)) as RestClientBuilder<PrisonerContactRegistryApiClient>,
   prisonerSearchClientBuilder: ((token: string) =>
@@ -41,7 +39,6 @@ export type DataAccess = ReturnType<typeof dataAccess>
 export {
   HmppsAuthClient,
   OrchestrationApiClient,
-  PrisonApiClient,
   PrisonerContactRegistryApiClient,
   PrisonerSearchClient,
   RestClientBuilder,
