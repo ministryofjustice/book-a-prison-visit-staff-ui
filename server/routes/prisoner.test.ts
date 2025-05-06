@@ -67,6 +67,7 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
     prisonerProfile = {
       alerts: [alert],
       flaggedAlerts: [TestData.alert({ alertCode: 'UPIU', alertCodeDescription: 'Protective Isolation Unit' })],
+      restrictions: [restriction],
       visitsByMonth: new Map(),
       prisonerDetails: {
         prisonerId: 'A1234BC',
@@ -369,7 +370,6 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
 
   describe('POST /prisoner/A1234BC', () => {
     it('should set up visitSessionData and redirect to select visitors page', () => {
-      prisonerProfileService.getRestrictions.mockResolvedValue([restriction])
       return request(app)
         .post('/prisoner/A1234BC')
         .expect(302)
@@ -377,8 +377,6 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
         .expect(res => {
           expect(prisonerProfileService.getProfile).toHaveBeenCalledTimes(1)
           expect(prisonerProfileService.getProfile).toHaveBeenCalledWith(prisonId, 'A1234BC', 'user1')
-          expect(prisonerProfileService.getRestrictions).toHaveBeenCalledTimes(1)
-          expect(prisonerProfileService.getRestrictions).toHaveBeenCalledWith('A1234BC', 'user1')
           expect(auditService.overrodeZeroVO).not.toHaveBeenCalled()
           expect(clearSession).toHaveBeenCalledTimes(1)
           expect(visitSessionData).toStrictEqual(<VisitSessionData>{
@@ -405,8 +403,6 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
         .expect(res => {
           expect(prisonerProfileService.getProfile).toHaveBeenCalledTimes(1)
           expect(prisonerProfileService.getProfile).toHaveBeenCalledWith(prisonId, 'A1234BC', 'user1')
-          expect(prisonerProfileService.getRestrictions).toHaveBeenCalledTimes(1)
-          expect(prisonerProfileService.getRestrictions).toHaveBeenCalledWith('A1234BC', 'user1')
           expect(auditService.overrodeZeroVO).toHaveBeenCalledTimes(1)
           expect(auditService.overrodeZeroVO).toHaveBeenCalledWith({
             prisonerId: 'A1234BC',
@@ -414,22 +410,14 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
             operationId: undefined,
           })
           expect(clearSession).toHaveBeenCalledTimes(1)
-          expect(visitSessionData).toEqual(<VisitSessionData>{
+          expect(visitSessionData).toStrictEqual(<VisitSessionData>{
             prisoner: {
               firstName: 'John',
               lastName: 'Smith',
               offenderNo: 'A1234BC',
               location: '1-1-C-028, Hewell (HMP)',
-              alerts: [
-                TestData.alert({
-                  alertType: 'X',
-                  alertTypeDescription: 'Security',
-                  alertCode: 'XR',
-                  alertCodeDescription: 'Racist',
-                  startDate: '2022-01-01',
-                  expiryDate: '2022-01-02',
-                }),
-              ],
+              alerts: [alert],
+              restrictions: [restriction],
             },
           })
         })
@@ -450,25 +438,15 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
         .expect(res => {
           expect(prisonerProfileService.getProfile).toHaveBeenCalledTimes(1)
           expect(prisonerProfileService.getProfile).toHaveBeenCalledWith(prisonId, 'A1234BC', 'user1')
-          expect(prisonerProfileService.getRestrictions).toHaveBeenCalledTimes(1)
-          expect(prisonerProfileService.getRestrictions).toHaveBeenCalledWith('A1234BC', 'user1')
           expect(auditService.overrodeZeroVO).not.toHaveBeenCalled()
-          expect(visitSessionData).toEqual(<VisitSessionData>{
+          expect(visitSessionData).toStrictEqual(<VisitSessionData>{
             prisoner: {
               firstName: 'John',
               lastName: 'Smith',
               offenderNo: 'A1234BC',
               location: '1-1-C-028, Hewell (HMP)',
-              alerts: [
-                TestData.alert({
-                  alertType: 'X',
-                  alertTypeDescription: 'Security',
-                  alertCode: 'XR',
-                  alertCodeDescription: 'Racist',
-                  startDate: '2022-01-01',
-                  expiryDate: '2022-01-02',
-                }),
-              ],
+              alerts: [alert],
+              restrictions: [restriction],
             },
           })
         })
@@ -484,8 +462,6 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
         .expect(res => {
           expect(prisonerProfileService.getProfile).toHaveBeenCalledTimes(1)
           expect(prisonerProfileService.getProfile).toHaveBeenCalledWith(prisonId, 'A1234BC', 'user1')
-          expect(prisonerProfileService.getRestrictions).toHaveBeenCalledTimes(1)
-          expect(prisonerProfileService.getRestrictions).toHaveBeenCalledWith('A1234BC', 'user1')
           expect(auditService.overrodeZeroVO).not.toHaveBeenCalled()
           expect(visitSessionData).toEqual({})
           expect(flashProvider).toHaveBeenCalledWith('errors', [

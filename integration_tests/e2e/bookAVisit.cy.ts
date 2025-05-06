@@ -92,6 +92,7 @@ context('Book a visit', () => {
     const searchForAPrisonerResultsPage = Page.verifyOnPage(SearchForAPrisonerResultsPage)
     searchForAPrisonerResultsPage.resultRows().should('have.length', 1)
 
+    const prisonerRestrictions = [TestData.offenderRestriction()]
     const profile = TestData.prisonerProfile({
       alerts: [
         {
@@ -105,6 +106,7 @@ context('Book a visit', () => {
           active: true,
         },
       ],
+      prisonerRestrictions,
     })
 
     // Prisoner profile page
@@ -114,12 +116,10 @@ context('Book a visit', () => {
 
     // Select visitors
     cy.task('stubPrisonerSocialContacts', { offenderNo, contacts })
-    const offenderRestrictions = [TestData.offenderRestriction()]
-    cy.task('stubOffenderRestrictions', { offenderNo, offenderRestrictions })
     prisonerProfilePage.bookAVisitButton().click()
     const selectVisitorsPage = Page.verifyOnPage(SelectVisitorsPage)
-    selectVisitorsPage.getPrisonerRestrictionType(1).contains(offenderRestrictions[0].restrictionTypeDescription)
-    selectVisitorsPage.getPrisonerRestrictionComment(1).contains(offenderRestrictions[0].comment)
+    selectVisitorsPage.getPrisonerRestrictionType(1).contains(prisonerRestrictions[0].restrictionTypeDescription)
+    selectVisitorsPage.getPrisonerRestrictionComment(1).contains(prisonerRestrictions[0].comment)
     selectVisitorsPage.getPrisonerRestrictionEndDate(1).contains('No end date')
     selectVisitorsPage.getPrisonerAlertType(1).contains('Protective Isolation Unit')
 
@@ -245,6 +245,7 @@ context('Book a visit', () => {
 
   it('should allow VO balance override', () => {
     const prisonerDisplayName = 'Smith, John'
+    const prisonerRestrictions = [TestData.offenderRestriction()]
     const profile = TestData.prisonerProfile({
       visitBalances: {
         remainingVo: 0,
@@ -252,6 +253,7 @@ context('Book a visit', () => {
         latestIepAdjustDate: '2021-04-21',
         latestPrivIepAdjustDate: '2021-12-01',
       },
+      prisonerRestrictions,
     })
     const { prisonerId } = profile
 
@@ -269,15 +271,20 @@ context('Book a visit', () => {
       .contains('The prisoner has no available visiting orders. Select the box if a booking can still be made.')
     prisonerProfilePage.voOverrideButton().click()
 
-    const offenderRestrictions = [TestData.offenderRestriction()]
-    cy.task('stubOffenderRestrictions', { offenderNo: prisonerId, offenderRestrictions })
     prisonerProfilePage.bookAVisitButton().click()
     Page.verifyOnPage(SelectVisitorsPage)
   })
 
   it('should prompt for visit type selection for prisoner with closed restriction', () => {
     const prisonerDisplayName = 'Smith, John'
-    const profile = TestData.prisonerProfile({})
+    const prisonerRestrictions = [
+      TestData.offenderRestriction({
+        restrictionType: 'CLOSED',
+        restrictionTypeDescription: 'Closed',
+        startDate: '2022-01-03',
+      }),
+    ]
+    const profile = TestData.prisonerProfile({ prisonerRestrictions })
     const { prisonerId, prisonId } = profile
 
     // Prisoner profile page
@@ -287,15 +294,6 @@ context('Book a visit', () => {
     cy.visit(`/prisoner/${prisonerId}`)
 
     const prisonerProfilePage = Page.verifyOnPageTitle(PrisonerProfilePage, prisonerDisplayName)
-
-    const offenderRestrictions = [
-      TestData.offenderRestriction({
-        restrictionType: 'CLOSED',
-        restrictionTypeDescription: 'Closed',
-        startDate: '2022-01-03',
-      }),
-    ]
-    cy.task('stubOffenderRestrictions', { offenderNo: prisonerId, offenderRestrictions })
     prisonerProfilePage.bookAVisitButton().click()
 
     const selectVisitorsPage = Page.verifyOnPage(SelectVisitorsPage)

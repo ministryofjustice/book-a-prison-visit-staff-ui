@@ -15,8 +15,8 @@ import {
   VisitSession,
   VisitSummary,
   VisitBookingDetailsDto,
+  OffenderRestriction,
 } from '../../data/orchestrationApiTypes'
-import { OffenderRestriction } from '../../data/prisonApiTypes'
 import { CurrentIncentive, Prisoner } from '../../data/prisonerOffenderSearchTypes'
 import { Address, Contact, Restriction } from '../../data/prisonerContactRegistryApiTypes'
 import { ScheduledEvent } from '../../data/whereaboutsApiTypes'
@@ -268,6 +268,7 @@ export default class TestData {
     convictedStatus = 'Convicted',
     incentiveLevel = 'Standard',
     alerts = [],
+    prisonerRestrictions = [],
     visitBalances = {
       remainingVo: 1,
       remainingPvo: 2,
@@ -288,6 +289,7 @@ export default class TestData {
       convictedStatus,
       incentiveLevel,
       alerts,
+      prisonerRestrictions,
       visitBalances,
       visits,
     }) as PrisonerProfile

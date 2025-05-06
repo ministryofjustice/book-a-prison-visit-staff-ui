@@ -1,12 +1,10 @@
 import { addMonths, format, subMonths } from 'date-fns'
 import PrisonerProfileService from './prisonerProfileService'
-import { OffenderRestrictions } from '../data/prisonApiTypes'
 import { PrisonerProfilePage } from '../@types/bapv'
 import TestData from '../routes/testutils/testData'
 import {
   createMockHmppsAuthClient,
   createMockOrchestrationApiClient,
-  createMockPrisonApiClient,
   createMockPrisonerSearchClient,
 } from '../data/testutils/mocks'
 
@@ -15,13 +13,11 @@ const token = 'some token'
 describe('Prisoner profile service', () => {
   const hmppsAuthClient = createMockHmppsAuthClient()
   const orchestrationApiClient = createMockOrchestrationApiClient()
-  const prisonApiClient = createMockPrisonApiClient()
   const prisonerSearchClient = createMockPrisonerSearchClient()
 
   let prisonerProfileService: PrisonerProfileService
 
   const OrchestrationApiClientFactory = jest.fn()
-  const PrisonApiClientFactory = jest.fn()
   const PrisonerSearchClientFactory = jest.fn()
 
   const prisonerId = 'A1234BC'
@@ -29,14 +25,9 @@ describe('Prisoner profile service', () => {
 
   beforeEach(() => {
     OrchestrationApiClientFactory.mockReturnValue(orchestrationApiClient)
-    PrisonApiClientFactory.mockReturnValue(prisonApiClient)
     PrisonerSearchClientFactory.mockReturnValue(prisonerSearchClient)
 
-    prisonerProfileService = new PrisonerProfileService(
-      OrchestrationApiClientFactory,
-      PrisonApiClientFactory,
-      hmppsAuthClient,
-    )
+    prisonerProfileService = new PrisonerProfileService(OrchestrationApiClientFactory, hmppsAuthClient)
     hmppsAuthClient.getSystemClientToken.mockResolvedValue(token)
   })
 
@@ -52,6 +43,7 @@ describe('Prisoner profile service', () => {
       const prisonerProfilePage: PrisonerProfilePage = {
         alerts: [],
         flaggedAlerts: [],
+        restrictions: [],
         visitsByMonth: new Map(),
         prisonerDetails: {
           prisonerId: 'A1234BC',
@@ -79,7 +71,7 @@ describe('Prisoner profile service', () => {
       expect(OrchestrationApiClientFactory).toHaveBeenCalledWith(token)
       expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user')
       expect(orchestrationApiClient.getPrisonerProfile).toHaveBeenCalledWith(prisonId, prisonerId)
-      expect(results).toEqual(prisonerProfilePage)
+      expect(results).toStrictEqual(prisonerProfilePage)
     })
 
     it('should return visit balances as null if prisoner is on REMAND', async () => {
@@ -148,43 +140,6 @@ describe('Prisoner profile service', () => {
 
       expect(results.alerts).toStrictEqual([alertNotToFlag, ...alertsToFlag])
       expect(results.flaggedAlerts).toStrictEqual(alertsToFlag)
-    })
-  })
-
-  describe('getRestrictions', () => {
-    const offenderNo = 'A1234BC'
-    it('Retrieves and passes through the offender restrictions', async () => {
-      const restrictions = <OffenderRestrictions>{
-        bookingId: 12345,
-        offenderRestrictions: [
-          {
-            restrictionId: 0,
-            comment: 'string',
-            restrictionType: 'string',
-            restrictionTypeDescription: 'string',
-            startDate: '2022-03-15',
-            expiryDate: '2022-03-15',
-            active: true,
-          },
-        ],
-      }
-
-      prisonApiClient.getOffenderRestrictions.mockResolvedValue(restrictions)
-
-      const results = await prisonerProfileService.getRestrictions(offenderNo, 'user')
-
-      expect(prisonApiClient.getOffenderRestrictions).toHaveBeenCalledTimes(1)
-      expect(results).toEqual([
-        {
-          restrictionId: 0,
-          comment: 'string',
-          restrictionType: 'string',
-          restrictionTypeDescription: 'string',
-          startDate: '2022-03-15',
-          expiryDate: '2022-03-15',
-          active: true,
-        },
-      ])
     })
   })
 })

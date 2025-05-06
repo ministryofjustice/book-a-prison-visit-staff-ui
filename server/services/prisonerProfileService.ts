@@ -1,16 +1,14 @@
-import { NotFound } from 'http-errors'
 import { format, isBefore } from 'date-fns'
 import { PrisonerProfilePage } from '../@types/bapv'
 import { convertToTitleCase, nextIepAdjustDate, nextPrivIepAdjustDate, prisonerDateTimePretty } from '../utils/utils'
-import { Alert, OffenderRestriction } from '../data/prisonApiTypes'
-import { HmppsAuthClient, OrchestrationApiClient, PrisonApiClient, RestClientBuilder } from '../data'
+import { Alert } from '../data/orchestrationApiTypes'
+import { HmppsAuthClient, OrchestrationApiClient, RestClientBuilder } from '../data'
 
 export default class PrisonerProfileService {
   private alertCodesToFlag = ['UPIU', 'RCDR', 'URCU']
 
   constructor(
     private readonly orchestrationApiClientFactory: RestClientBuilder<OrchestrationApiClient>,
-    private readonly prisonApiClientFactory: RestClientBuilder<PrisonApiClient>,
     private readonly hmppsAuthClient: HmppsAuthClient,
   ) {}
 
@@ -19,7 +17,7 @@ export default class PrisonerProfileService {
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
     const prisonerProfile = await orchestrationApiClient.getPrisonerProfile(prisonId, prisonerId)
 
-    const { alerts } = prisonerProfile
+    const { alerts, prisonerRestrictions } = prisonerProfile
     const flaggedAlerts: Alert[] = alerts.filter(alert => this.alertCodesToFlag.includes(alert.alertCode))
 
     const visitsByMonth: PrisonerProfilePage['visitsByMonth'] = new Map()
@@ -73,20 +71,9 @@ export default class PrisonerProfileService {
     return {
       alerts,
       flaggedAlerts,
+      restrictions: prisonerRestrictions,
       prisonerDetails,
       visitsByMonth,
     }
-  }
-
-  async getRestrictions(offenderNo: string, username: string): Promise<OffenderRestriction[]> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const prisonApiClient = this.prisonApiClientFactory(token)
-    const restrictions = await prisonApiClient.getOffenderRestrictions(offenderNo)
-
-    if (!restrictions.bookingId) throw new NotFound()
-
-    const { offenderRestrictions } = restrictions
-
-    return offenderRestrictions
   }
 }
