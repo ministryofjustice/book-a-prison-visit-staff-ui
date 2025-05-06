@@ -273,10 +273,10 @@
 }
 
 .bapv-visit-details {
-  & dl, & .bapv-visit-details__restriction {
+  & dl {
     display: grid;
-    grid-template-columns: minmax(150px, 22%) auto;
-    gap: govuk-spacing(2) govuk-spacing(3);
+    grid-template-columns: 17% auto;
+    gap: govuk-spacing(2) govuk-spacing(4);
   }
 
   & dd {
@@ -298,9 +298,16 @@
   }
 }
 
-.bapv-visit-details__restriction-dates {
+.bapv-visit-details__alerts, .bapv-visit-details__restrictions {
+  display: grid;
+  grid-template-columns: 17% auto 17%;
+  gap: govuk-spacing(1) govuk-spacing(4);
+}
+
+.bapv-visit-details__alert-dates, .bapv-visit-details__restriction-dates {
   color:  $govuk-secondary-text-colour;
 }
+
 
 .bapv-visit-details {
   & .moj-timeline__title {

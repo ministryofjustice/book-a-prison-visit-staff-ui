@@ -10,7 +10,6 @@ import {
 import TestData from '../routes/testutils/testData'
 import VisitService, { MojTimelineItem } from './visitService'
 import { createMockHmppsAuthClient, createMockOrchestrationApiClient } from '../data/testutils/mocks'
-import * as utils from '../utils/utils'
 
 const token = 'some token'
 
@@ -222,15 +221,10 @@ describe('Visit service', () => {
         const visitDetails = TestData.visitBookingDetailsDto()
         orchestrationApiClient.getVisitDetailed.mockResolvedValue(visitDetails)
 
-        const sortItemsSpy = jest.spyOn(utils, 'sortItemsByDateAsc')
         const result = await visitService.getVisitDetailed({ username: 'user', reference: 'ab-cd-ef-gh' })
 
         expect(orchestrationApiClient.getVisitDetailed).toHaveBeenCalledWith('ab-cd-ef-gh')
         expect(result).toStrictEqual(visitDetails)
-        expect(sortItemsSpy).toHaveBeenNthCalledWith(1, visitDetails.prisoner.prisonerAlerts, 'expiryDate')
-        expect(sortItemsSpy).toHaveBeenNthCalledWith(2, visitDetails.prisoner.prisonerRestrictions, 'expiryDate')
-
-        sortItemsSpy.mockRestore()
       })
     })
 

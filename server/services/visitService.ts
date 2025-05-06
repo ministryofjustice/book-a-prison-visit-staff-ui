@@ -1,7 +1,6 @@
 import { NotFound } from 'http-errors'
 import { VisitInformation, VisitSessionData } from '../@types/bapv'
 import {
-  Alert,
   ApplicationDto,
   ApplicationMethodType,
   CancelVisitOrchestrationDto,
@@ -12,11 +11,10 @@ import {
 } from '../data/orchestrationApiTypes'
 import { HmppsAuthClient, OrchestrationApiClient, RestClientBuilder } from '../data'
 import logger from '../../logger'
-import { prisonerDateTimePretty, prisonerTimePretty, sortItemsByDateAsc } from '../utils/utils'
+import { prisonerDateTimePretty, prisonerTimePretty } from '../utils/utils'
 import eventAuditTypes from '../constants/eventAuditTypes'
 import { requestMethodDescriptions } from '../constants/requestMethods'
 import { notificationTypes } from '../constants/notificationEvents'
-import { OffenderRestriction } from '../data/prisonApiTypes'
 
 export type MojTimelineItem = {
   label: { text: string }
@@ -169,11 +167,7 @@ export default class VisitService {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
-    const visitDetails = await orchestrationApiClient.getVisitDetailed(reference)
-    sortItemsByDateAsc<Alert, 'expiryDate'>(visitDetails.prisoner.prisonerAlerts, 'expiryDate')
-    sortItemsByDateAsc<OffenderRestriction, 'expiryDate'>(visitDetails.prisoner.prisonerRestrictions, 'expiryDate')
-
-    return visitDetails
+    return orchestrationApiClient.getVisitDetailed(reference)
   }
 
   async getVisitsBySessionTemplate({

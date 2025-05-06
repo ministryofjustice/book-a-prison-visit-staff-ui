@@ -8,7 +8,6 @@ import TestData from '../testutils/testData'
 import { createMockAuditService, createMockVisitService } from '../../services/testutils/mocks'
 import { notificationTypeWarnings } from '../../constants/notificationEvents'
 import { MojTimelineItem } from '../../services/visitService'
-import config from '../../config'
 import { AvailableVisitActions } from './visitUtils'
 
 let app: Express
@@ -44,11 +43,6 @@ describe('Visit details page', () => {
   ]
 
   beforeEach(() => {
-    jest.replaceProperty(config, 'features', {
-      ...config.features,
-      showPrisonerAlertsRestrictions: true,
-    })
-
     availableVisitActions = { update: false, cancel: false, clearNotifications: false }
 
     visitDetails = TestData.visitBookingDetailsDto()
@@ -63,33 +57,6 @@ describe('Visit details page', () => {
   })
 
   describe('GET /visit/:reference', () => {
-    it('should NOT show prisoner alerts and restrictions if feature disabled', () => {
-      jest.replaceProperty(config, 'features', {
-        ...config.features,
-        showPrisonerAlertsRestrictions: false,
-      })
-
-      app = appWithAllRoutes({ services: { auditService, visitService } })
-
-      return request(app)
-        .get('/visit/ab-cd-ef-gh')
-        .expect(200)
-        .expect('Content-Type', /html/)
-        .expect(res => {
-          const $ = cheerio.load(res.text)
-          expect($('h1').text()).toBe('Visit booking details')
-
-          // prisoner details
-          expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
-          expect($('[data-test="prisoner-number"]').text()).toBe('A1234BC')
-          expect($('[data-test="prisoner-location"]').text()).toBe('1-1-C-028, Hewell (HMP)')
-          expect($('[data-test="prisoner-dob"]').text()).toBe('2 April 1975')
-          expect($('[data-test="prisoner-age"]').text()).toBe('46 years old')
-          expect($('[data-test="prisoner-restriction-1"]').length).toBe(0)
-          expect($('[data-test="prisoner-alert-1"]').length).toBe(0)
-        })
-    })
-
     it('should render full visit booking summary page', () => {
       return request(app)
         .get('/visit/ab-cd-ef-gh')
@@ -118,16 +85,17 @@ describe('Visit details page', () => {
           expect($('[data-test="prisoner-dob"]').text()).toBe('2 April 1975')
           expect($('[data-test="prisoner-age"]').text()).toBe('46 years old')
           expect($('[data-test="prisoner-restriction-1"]').text()).toContain('Restricted')
-          expect($('[data-test="prisoner-restriction-1-start"]').text()).toContain('15 March 2022')
+          expect($('[data-test="prisoner-restriction-1-start"]').text()).toContain('15/3/2022')
           expect($('[data-test="prisoner-restriction-1-end"]').text()).toContain('No end date')
-          expect($('[data-test="prisoner-restriction-1-text"]').text()).toContain('Details about this restriction')
+          expect($('[data-test="prisoner-restriction-1-comment"]').text()).toContain('Details about this restriction')
           expect($('[data-test="all-alerts-link"]').attr('href')).toBe(
             'https://prisoner-dev.digital.prison.service.justice.gov.uk/prisoner/A1234BC/alerts/active',
           )
           expect($('[data-test="prisoner-alert-1"]').text()).toContain('Protective Isolation Unit')
-          expect($('[data-test="prisoner-alert-1-start"]').text()).toContain('2 January 2023')
+          expect($('[data-test="prisoner-alert-1-updated"]').text()).toContain('1/3/2023')
+          expect($('[data-test="prisoner-alert-1-start"]').text()).toContain('2/1/2023')
           expect($('[data-test="prisoner-alert-1-end"]').text()).toContain('No end date')
-          expect($('[data-test="prisoner-alert-1-text"]').text()).toContain('Alert comment')
+          expect($('[data-test="prisoner-alert-1-comment"]').text()).toContain('Alert comment')
           // visitor details
           expect($('[data-test="visitor-name-1"]').text()).toBe('Jeanette Smith')
           expect($('[data-test="visitor-relation-1"]').text()).toBe('wife')
@@ -135,9 +103,9 @@ describe('Visit details page', () => {
           expect($('[data-test="visitor-age-1"]').text()).toBe('35 years old')
           expect($('[data-test="visitor-address-1"]').text()).toBe('123 The Street,\nCoventry')
           expect($('[data-test="visitor-1-restriction-1"]').text()).toContain('Closed')
-          expect($('[data-test="visitor-1-restriction-1-start"]').text()).toContain('11 January 2022')
-          expect($('[data-test="visitor-1-restriction-1-end"]').text()).toContain('13 February 2023')
-          expect($('[data-test="visitor-1-restriction-1-text"]').text()).toContain('closed comment text')
+          expect($('[data-test="visitor-1-restriction-1-start"]').text()).toContain('11/1/2022')
+          expect($('[data-test="visitor-1-restriction-1-end"]').text()).toContain('13/2/2023')
+          expect($('[data-test="visitor-1-restriction-1-comment"]').text()).toContain('closed comment text')
 
           // booking history
           expect($('[data-test="timeline-entry-0"] .moj-timeline__title').text()).toBe('Booked')

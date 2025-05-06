@@ -23,8 +23,6 @@ import {
   VisitSession,
   EventAuditType,
   VisitBookingDetailsDto,
-  AlertDtoRaw,
-  Alert,
 } from './orchestrationApiTypes'
 import { Prison, VisitSessionData } from '../@types/bapv'
 
@@ -106,8 +104,6 @@ export default class OrchestrationApiClient {
     visitDetails.notifications = visitDetails.notifications.filter(notification =>
       this.enabledNotifications.includes(notification.type),
     )
-
-    visitDetails.prisoner.prisonerAlerts = this.remapAlertsDates(visitDetails.prisoner.prisonerAlerts)
 
     return visitDetails
   }
@@ -323,9 +319,7 @@ export default class OrchestrationApiClient {
   // prisoner-profile-controller
 
   async getPrisonerProfile(prisonId: string, prisonerId: string): Promise<PrisonerProfile> {
-    const profile = await this.restClient.get<PrisonerProfile>({ path: `/prisoner/${prisonId}/${prisonerId}/profile` })
-    profile.alerts = this.remapAlertsDates(profile.alerts)
-    return profile
+    return this.restClient.get<PrisonerProfile>({ path: `/prisoner/${prisonId}/${prisonerId}/profile` })
   }
 
   // orchestration-prisons-config-controller
@@ -357,16 +351,5 @@ export default class OrchestrationApiClient {
       : undefined
     const mainContactId = mainContact?.contactId ?? null
     return { visitContact, mainContactId }
-  }
-
-  // TODO remove when property rename API change deployed
-  private remapAlertsDates(alerts: Alert[]): Alert[] {
-    return alerts.map((alert: AlertDtoRaw) => {
-      return {
-        ...alert,
-        startDate: alert.startDate ?? (alert.dateCreated || null),
-        expiryDate: alert.expiryDate ?? (alert.dateExpires || null),
-      }
-    })
   }
 }
