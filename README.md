@@ -45,7 +45,6 @@ SYSTEM_CLIENT_SECRET=clientsecret
 COMPONENT_API_URL="https://frontend-components-dev.hmpps.service.justice.gov.uk"
 ORCHESTRATION_API_URL="https://hmpps-manage-prison-visits-orchestration-dev.prison.service.justice.gov.uk"
 PRISONER_SEARCH_API_URL="https://prisoner-search-dev.prison.service.justice.gov.uk"
-PRISON_API_URL="https://prison-api-dev.prison.service.justice.gov.uk"
 PRISONER_CONTACT_REGISTRY_API_URL="https://prisoner-contact-registry-dev.prison.service.justice.gov.uk"
 WHEREABOUTS_API_URL="https://whereabouts-api-dev.service.justice.gov.uk"
 ```
@@ -121,7 +120,7 @@ Finally:
 
 ## Imported types
 
-Some TypeScript types are imported via the Open API (Swagger) docs, e.g. from the Visits Orchestration Service, Prisoner Contact Registry, Prison API, etc.
+Some TypeScript types are imported via the Open API (Swagger) docs, e.g. from the Visits Orchestration Service, Prisoner Contact Registry, etc.
 
 These are stored in [`./server/@types/`](./server/@types/), for example [`./server/@types/orchestration-api.d.ts`](./server/@types/orchestration-api.d.ts). There are also some corresponding files such as [`./server/data/orchestrationApiTypes.ts`](./server/data/orchestrationApiTypes.ts) that contain the particular imported types that are actually used in the project.
 
