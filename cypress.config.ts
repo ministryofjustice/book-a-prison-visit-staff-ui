@@ -7,7 +7,6 @@ import componentApi from './integration_tests/mockApis/componentApi'
 import orchestrationService from './integration_tests/mockApis/orchestration'
 import prisonerContactRegistry from './integration_tests/mockApis/prisonerContactRegistry'
 import whereaboutsOffenderEvents from './integration_tests/mockApis/whereabouts'
-import prisonApi from './integration_tests/mockApis/prison'
 import prisonerSearch from './integration_tests/mockApis/prisonerSearch'
 
 export default defineConfig({
@@ -32,7 +31,6 @@ export default defineConfig({
         ...componentApi,
         ...orchestrationService,
         ...prisonerContactRegistry,
-        ...prisonApi,
         ...prisonerSearch,
         ...whereaboutsOffenderEvents,
 

@@ -43,10 +43,11 @@ export default function routes({ auditService, prisonerProfileService }: Service
     const { prisonId } = req.session.selectedEstablishment
     const { username } = res.locals.user
 
-    const [{ prisonerDetails, alerts }, restrictions] = await Promise.all([
-      prisonerProfileService.getProfile(prisonId, offenderNo, username),
-      prisonerProfileService.getRestrictions(offenderNo, username),
-    ])
+    const { prisonerDetails, alerts, restrictions } = await prisonerProfileService.getProfile(
+      prisonId,
+      offenderNo,
+      username,
+    )
 
     if (prisonerDetails.visitBalances?.remainingVo <= 0 && prisonerDetails.visitBalances?.remainingPvo <= 0) {
       await body('vo-override').equals('override').withMessage('Select the box to book a prison visit').run(req)

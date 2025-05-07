@@ -1,7 +1,8 @@
-import { OffenderRestriction } from '../data/prisonApiTypes'
 import {
+  Alert,
   ApplicationMethodType,
   NotificationType,
+  OffenderRestriction,
   PrisonDto,
   PrisonerProfile,
   Visit,
@@ -33,6 +34,7 @@ export type VisitorListItem = {
 export type PrisonerProfilePage = {
   alerts: Alert[]
   flaggedAlerts: Alert[]
+  restrictions: OffenderRestriction[]
   prisonerDetails: {
     prisonerId: string
     firstName: string

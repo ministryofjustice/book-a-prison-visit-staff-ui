@@ -91,14 +91,6 @@ export default {
       pageSize: 10,
       pagesLinksToShow: 3,
     },
-    prison: {
-      url: get('PRISON_API_URL', 'http://localhost:8080', requiredInProduction),
-      timeout: {
-        response: Number(get('PRISONER_DETAILS_API_TIMEOUT_RESPONSE', 10000)),
-        deadline: Number(get('PRISONER_DETAILS_API_TIMEOUT_DEADLINE', 10000)),
-      },
-      agent: new AgentConfig(Number(get('PRISONER_DETAILS_API_TIMEOUT_RESPONSE', 10000))),
-    },
     prisonerContactRegistry: {
       url: get('PRISONER_CONTACT_REGISTRY_API_URL', 'http://localhost:8080', requiredInProduction),
       timeout: {

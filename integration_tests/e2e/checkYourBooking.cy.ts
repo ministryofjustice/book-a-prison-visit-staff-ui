@@ -61,7 +61,6 @@ context('Check visit details page', () => {
     const prisonerProfilePage = Page.verifyOnPageTitle(PrisonerProfilePage, 'Smith, John')
 
     // Select visitors - first of two
-    cy.task('stubOffenderRestrictions', { offenderNo: prisonerId, offenderRestrictions: [] })
     prisonerProfilePage.bookAVisitButton().click()
     const selectVisitorsPage = Page.verifyOnPage(SelectVisitorsPage)
     selectVisitorsPage.getVisitor(contacts[0].personId).check()
@@ -278,7 +277,6 @@ context('Check visit details page', () => {
     const prisonerProfilePage = Page.verifyOnPageTitle(PrisonerProfilePage, 'Smith, John')
 
     // Select visitors - first of two
-    cy.task('stubOffenderRestrictions', { offenderNo: prisonerId, offenderRestrictions: [] })
     prisonerProfilePage.bookAVisitButton().click()
     const selectVisitorsPage = Page.verifyOnPage(SelectVisitorsPage)
     selectVisitorsPage.getVisitor(contacts[0].personId).check()

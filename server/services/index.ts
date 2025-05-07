@@ -13,7 +13,6 @@ export const services = () => {
   const {
     hmppsAuthClient,
     orchestrationApiClientBuilder,
-    prisonApiClientBuilder,
     prisonerContactRegistryApiClientBuilder,
     prisonerSearchClientBuilder,
     whereaboutsApiClientBuilder,
@@ -26,11 +25,7 @@ export const services = () => {
 
   const supportedPrisonsService = new SupportedPrisonsService(orchestrationApiClientBuilder, hmppsAuthClient)
 
-  const prisonerProfileService = new PrisonerProfileService(
-    orchestrationApiClientBuilder,
-    prisonApiClientBuilder,
-    hmppsAuthClient,
-  )
+  const prisonerProfileService = new PrisonerProfileService(orchestrationApiClientBuilder, hmppsAuthClient)
 
   const prisonerSearchService = new PrisonerSearchService(prisonerSearchClientBuilder, hmppsAuthClient)
 
