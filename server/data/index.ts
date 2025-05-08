@@ -18,7 +18,7 @@ import { createRedisClient } from './redisClient'
 import TokenStore from './tokenStore'
 import WhereaboutsApiClient from './whereaboutsApiClient'
 
-type RestClientBuilder<T> = (token: string) => T
+export type RestClientBuilder<T> = (token: string) => T
 
 export const dataAccess = () => ({
   applicationInfo,
@@ -41,6 +41,5 @@ export {
   OrchestrationApiClient,
   PrisonerContactRegistryApiClient,
   PrisonerSearchClient,
-  RestClientBuilder,
   WhereaboutsApiClient,
 }
