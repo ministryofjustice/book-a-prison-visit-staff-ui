@@ -1,6 +1,7 @@
 {
   "compileOnSave": true,
   "compilerOptions": {
+    "isolatedModules": true,
     "target": "es2018",
     "module": "commonjs",
     "moduleResolution": "node",
