@@ -37,10 +37,7 @@
     "preset": "ts-jest",
     "transform": {
       "^.+\\.tsx?$": [
-        "ts-jest",
-        {
-          "isolatedModules": true
-        }
+        "ts-jest"
       ]
     },
     "collectCoverageFrom": [
