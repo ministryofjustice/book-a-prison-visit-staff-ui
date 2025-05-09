@@ -1,13 +1,12 @@
 import type { Express } from 'express'
 import request from 'supertest'
 import * as cheerio from 'cheerio'
-import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
-import { FlashData } from '../../@types/bapv'
+import { FieldValidationError } from 'express-validator'
+import { appWithAllRoutes, FlashData, flashProvider } from '../testutils/appSetup'
 import TestData from '../testutils/testData'
 import { createMockAuditService, createMockVisitNotificationsService } from '../../services/testutils/mocks'
 
 let app: Express
-
 let flashData: FlashData
 
 const auditService = createMockAuditService()
@@ -15,9 +14,7 @@ const visitNotificationsService = createMockVisitNotificationsService()
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
-  flashProvider.mockImplementation((key: keyof FlashData) => {
-    return flashData[key]
-  })
+  flashProvider.mockImplementation((key: keyof FlashData) => flashData[key])
   app = appWithAllRoutes({
     services: {
       auditService,
@@ -50,7 +47,7 @@ describe('Clear visit notifications', () => {
     })
 
     it('should render the clear notifications page, showing validation errors and re-populating fields', () => {
-      flashData.errors = [
+      flashData.errors = <FieldValidationError[]>[
         { msg: 'No answer selected', path: 'clearNotifications' },
         { msg: 'Enter a reason for not changing the booking', path: 'clearReason' },
       ]

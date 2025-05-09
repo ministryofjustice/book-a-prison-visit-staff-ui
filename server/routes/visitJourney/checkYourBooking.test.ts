@@ -2,14 +2,13 @@ import type { Express } from 'express'
 import request from 'supertest'
 import { SessionData } from 'express-session'
 import * as cheerio from 'cheerio'
-import { FlashData, VisitSessionData } from '../../@types/bapv'
-import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
+import { VisitSessionData } from '../../@types/bapv'
+import { appWithAllRoutes, FlashData, flashProvider } from '../testutils/appSetup'
 import { ApplicationValidationErrorResponse, Visit } from '../../data/orchestrationApiTypes'
 import { createMockAuditService, createMockVisitService } from '../../services/testutils/mocks'
 import { SanitisedError } from '../../sanitisedError'
 
 let sessionApp: Express
-
 let flashData: FlashData
 
 const auditService = createMockAuditService()
@@ -23,9 +22,7 @@ const testJourneys = [
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
-  flashProvider.mockImplementation((key: keyof FlashData) => {
-    return flashData[key]
-  })
+  flashProvider.mockImplementation((key: keyof FlashData) => flashData[key])
 })
 
 afterEach(() => {

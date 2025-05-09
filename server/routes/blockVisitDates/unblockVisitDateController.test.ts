@@ -1,8 +1,8 @@
 import type { Express } from 'express'
 import request from 'supertest'
-import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
+import { appWithAllRoutes, FlashData, flashProvider } from '../testutils/appSetup'
 import { createMockAuditService, createMockBlockedDatesService } from '../../services/testutils/mocks'
-import { FlashData } from '../../@types/bapv'
+import { MoJAlert } from '../../@types/bapv'
 
 let app: Express
 
@@ -33,7 +33,11 @@ describe('Unblock visit date', () => {
 
     it('should unblock the date, set success message and redirect to blocked dates listing page', () => {
       blockedDatesService.unblockVisitDate.mockResolvedValue()
-      const unblockedDateSuccessMessage = 'Visits are unblocked for Friday 6 September 2024.'
+      const unblockedDateSuccessMessage: MoJAlert = {
+        variant: 'success',
+        title: 'Date unblocked for visits',
+        text: 'Visits are unblocked for Friday 6 September 2024.',
+      }
 
       return request(app)
         .post(url)
@@ -48,7 +52,7 @@ describe('Unblock visit date', () => {
             username: 'user1',
             operationId: undefined,
           })
-          expect(flashProvider).toHaveBeenCalledWith('message', unblockedDateSuccessMessage)
+          expect(flashProvider).toHaveBeenCalledWith('messages', unblockedDateSuccessMessage)
           expect(flashProvider).toHaveBeenCalledTimes(1)
         })
     })

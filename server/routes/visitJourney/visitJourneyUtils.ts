@@ -1,7 +1,7 @@
 import { format } from 'date-fns'
-import { MojAlert } from '../../@types/bapv'
 import { ApplicationValidationErrorResponse } from '../../data/orchestrationApiTypes'
 import { prisonerTimePretty } from '../../utils/utils'
+import { MoJAlert } from '../../@types/bapv'
 
 // return URL prefix for either visit booking or visit update journey
 export const getUrlPrefix = (isUpdate: boolean) => {
@@ -12,7 +12,7 @@ export const validationErrorsMojAlert = (
   prisonerName: string,
   visitStartTimestamp: string,
   validationErrors: ApplicationValidationErrorResponse['validationErrors'],
-): { mojAlert: MojAlert; url: string } => {
+): { mojAlert: MoJAlert; url: string } => {
   if (validationErrors.includes('APPLICATION_INVALID_NON_ASSOCIATION_VISITS')) {
     return {
       mojAlert: {

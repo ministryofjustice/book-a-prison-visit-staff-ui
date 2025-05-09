@@ -2,8 +2,8 @@ import type { Express } from 'express'
 import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
-import { PrisonerProfilePage, VisitSessionData, FlashData } from '../@types/bapv'
-import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
+import { PrisonerProfilePage, VisitSessionData } from '../@types/bapv'
+import { appWithAllRoutes, FlashData, flashProvider } from './testutils/appSetup'
 import { clearSession } from './visitorUtils'
 import TestData from './testutils/testData'
 import {
@@ -13,7 +13,6 @@ import {
 } from '../services/testutils/mocks'
 
 let app: Express
-
 let flashData: FlashData
 
 const auditService = createMockAuditService()
@@ -32,9 +31,7 @@ jest.mock('./visitorUtils', () => ({
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
-  flashProvider.mockImplementation((key: keyof FlashData) => {
-    return flashData[key]
-  })
+  flashProvider.mockImplementation((key: keyof FlashData) => flashData[key])
 
   visitSessionData = {}
 

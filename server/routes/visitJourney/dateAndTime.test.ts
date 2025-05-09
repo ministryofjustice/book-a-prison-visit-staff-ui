@@ -2,8 +2,8 @@ import type { Express } from 'express'
 import request from 'supertest'
 import { SessionData } from 'express-session'
 import * as cheerio from 'cheerio'
-import { FlashData, VisitSessionData, VisitSlot, VisitSlotList } from '../../@types/bapv'
-import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
+import { VisitSessionData, VisitSlot, VisitSlotList } from '../../@types/bapv'
+import { appWithAllRoutes, FlashData, flashProvider } from '../testutils/appSetup'
 import { ApplicationDto } from '../../data/orchestrationApiTypes'
 import {
   createMockAuditService,
@@ -13,7 +13,6 @@ import {
 import TestData from '../testutils/testData'
 
 let sessionApp: Express
-
 let flashData: FlashData
 
 const auditService = createMockAuditService()
@@ -84,9 +83,7 @@ const visitSlot4: VisitSlot = {
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [], messages: [] }
-  flashProvider.mockImplementation((key: keyof FlashData) => {
-    return flashData[key]
-  })
+  flashProvider.mockImplementation((key: keyof FlashData) => flashData[key])
 
   visitSessionData = {
     allowOverBooking: false,
