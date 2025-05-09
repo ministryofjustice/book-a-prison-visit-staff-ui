@@ -1,7 +1,7 @@
 import HeaderFooterMeta from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterMeta'
 import { ValidationError } from 'express-validator'
 import { PrisonUser } from '../../interfaces/hmppsUser'
-import { FlashFormValues, MojAlert, Prison, VisitorListItem, VisitSessionData } from '../bapv'
+import { CancelledVisitInfo, FlashFormValues, MojAlert, Prison, VisitorListItem, VisitSessionData } from '../bapv'
 
 export declare module 'express-session' {
   // Declare that the session will potentially contain these additional fields
@@ -14,6 +14,7 @@ export declare module 'express-session' {
     visitSessionData: VisitSessionData
     selectedEstablishment: Prison
     visitBlockDate?: string // format YYYY-MM-DD
+    cancelledVisitInfo?: CancelledVisitInfo
   }
 }
 

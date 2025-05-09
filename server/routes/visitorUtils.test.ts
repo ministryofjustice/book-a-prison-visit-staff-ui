@@ -184,6 +184,7 @@ describe('clearSession', () => {
     slotsList: {},
     visitSessionData: { allowOverBooking: false, prisoner: undefined },
     selectedEstablishment: TestData.prison(),
+    cancelledVisitInfo: { startTimestamp: '', endTimestamp: '' },
   }
 
   req.session = sessionData as Session & SessionData

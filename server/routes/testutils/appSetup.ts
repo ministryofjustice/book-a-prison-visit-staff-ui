@@ -56,8 +56,6 @@ export type FlashData = {
   errors?: ValidationError[]
   formValues?: FlashFormValues[]
   messages?: MoJAlert[]
-  // FIXME below needed for cancel visit route; remove when this is updated to store in req.session
-  [key: string]: string[] | ValidationError[] | FlashFormValues[] | MoJAlert[] | undefined
 }
 
 export const flashProvider = jest.fn()

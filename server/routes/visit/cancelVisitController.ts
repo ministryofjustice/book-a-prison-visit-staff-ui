@@ -3,7 +3,7 @@ import { body, ValidationChain, validationResult } from 'express-validator'
 import { AuditService, VisitService } from '../../services'
 import { CancelVisitOrchestrationDto } from '../../data/orchestrationApiTypes'
 import { requestMethodsCancellation } from '../../constants/requestMethods'
-import { clearSession, getFlashFormValues } from '../visitorUtils'
+import { getFlashFormValues } from '../visitorUtils'
 import visitCancellationReasons from '../../constants/visitCancellationReasons'
 
 export default class CancelVisitController {
@@ -14,12 +14,13 @@ export default class CancelVisitController {
 
   public cancelConfirmation(): RequestHandler {
     return async (req, res) => {
-      clearSession(req)
+      const { cancelledVisitInfo } = req.session
 
-      return res.render('pages/visit/cancelConfirmation', {
-        startTimestamp: req.flash('startTimestamp')?.[0],
-        endTimestamp: req.flash('endTimestamp')?.[0],
-      })
+      if (!cancelledVisitInfo) {
+        return res.redirect('/back-to-start')
+      }
+
+      return res.render('pages/visit/cancelConfirmation', { ...cancelledVisitInfo })
     }
   }
 
@@ -79,8 +80,7 @@ export default class CancelVisitController {
         operationId: res.locals.appInsightsOperationId,
       })
 
-      req.flash('startTimestamp', visit.startTimestamp)
-      req.flash('endTimestamp', visit.endTimestamp)
+      req.session.cancelledVisitInfo = { startTimestamp: visit.startTimestamp, endTimestamp: visit.endTimestamp }
 
       return res.redirect(`/visit/${reference}/cancelled`)
     }
