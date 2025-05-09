@@ -2,8 +2,7 @@ import type { Express } from 'express'
 import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { format } from 'date-fns'
-import { appWithAllRoutes, flashProvider } from './testutils/appSetup'
-import { FlashData } from '../@types/bapv'
+import { appWithAllRoutes, FlashData, flashProvider } from './testutils/appSetup'
 import TestData from './testutils/testData'
 import { getParsedDateFromQueryString } from '../utils/utils'
 import {
@@ -15,7 +14,6 @@ import {
 } from '../services/testutils/mocks'
 
 let app: Express
-
 let flashData: FlashData
 
 const auditService = createMockAuditService()
@@ -26,9 +24,7 @@ const visitSessionsService = createMockVisitSessionsService()
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
-  flashProvider.mockImplementation((key: keyof FlashData) => {
-    return flashData[key]
-  })
+  flashProvider.mockImplementation((key: keyof FlashData) => flashData[key])
 
   blockedDatesService.isBlockedDate.mockResolvedValue(false)
   visitNotificationsService.dateHasNotifications.mockResolvedValue(false)

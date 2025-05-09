@@ -11,6 +11,10 @@ import {
   VisitSummary,
 } from '../data/orchestrationApiTypes'
 
+type TextOrHtml = { text: string; html?: never } | { text?: never; html: string }
+
+export type FlashFormValues = Record<string, unknown>
+
 export type PrisonerDetailsItem = {
   html?: string
   text?: string
@@ -89,14 +93,6 @@ export type VisitSlotList = {
   [key: string]: VisitSlotsForDay[] // keyed on month value, e.g. 'February 2022'
 }
 
-export type FormError = {
-  value: string
-  msg: string
-  path: string
-  type: string
-  location: string
-}
-
 export type VisitSessionData = {
   allowOverBooking: boolean
   prisoner: {
@@ -128,12 +124,11 @@ export type VisitSessionData = {
   overrideBookingWindow?: boolean
 }
 
-export type MojAlert = {
+export type MoJAlert = {
+  variant: 'information' | 'success' | 'warning' | 'error'
   title: string
-  text: string
-  variant: 'warning' | 'error' | 'information' | 'success'
-  showTitleAsHeading: boolean
-}
+  showTitleAsHeading?: boolean
+} & TextOrHtml
 
 export type VisitInformation = {
   reference: string
@@ -153,8 +148,6 @@ export type VisitsPageSideNavItem = {
 }
 
 export type VisitsPageSideNav = Map<string, VisitsPageSideNavItem[]>
-
-export type FlashData = Record<string, string | string[] | Record<string, string | string[]>[] | MojAlert[]>
 
 export type VisitsReviewListItem = {
   actionUrl: string

@@ -2,8 +2,8 @@ import type { Express } from 'express'
 import request from 'supertest'
 import { SessionData } from 'express-session'
 import * as cheerio from 'cheerio'
-import { FlashData, VisitSessionData, VisitSlot } from '../../@types/bapv'
-import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
+import { VisitSessionData, VisitSlot } from '../../@types/bapv'
+import { appWithAllRoutes, FlashData, flashProvider } from '../testutils/appSetup'
 import {
   createMockAuditService,
   createMockVisitSessionsService,
@@ -13,7 +13,6 @@ import TestData from '../testutils/testData'
 import { ApplicationDto } from '../../data/orchestrationApiTypes'
 
 let sessionApp: Express
-
 let flashData: FlashData
 
 const auditService = createMockAuditService()

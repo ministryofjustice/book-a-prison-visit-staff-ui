@@ -22,7 +22,12 @@ export default class UnblockVisitDateController {
 
       try {
         await this.blockedDatesService.unblockVisitDate(res.locals.user.username, prisonId, date)
-        req.flash('message', `Visits are unblocked for ${format(date, 'EEEE d MMMM yyyy')}.`)
+
+        req.flash('messages', {
+          variant: 'success',
+          title: 'Date unblocked for visits',
+          text: `Visits are unblocked for ${format(date, 'EEEE d MMMM yyyy')}.`,
+        })
 
         await this.auditService.unblockedVisitDate({
           prisonId,

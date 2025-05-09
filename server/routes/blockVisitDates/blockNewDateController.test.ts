@@ -3,13 +3,13 @@ import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
 import { FieldValidationError } from 'express-validator'
-import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
+import { appWithAllRoutes, FlashData, flashProvider } from '../testutils/appSetup'
 import {
   createMockAuditService,
   createMockBlockedDatesService,
   createMockVisitService,
 } from '../../services/testutils/mocks'
-import { FlashData } from '../../@types/bapv'
+import { MoJAlert } from '../../@types/bapv'
 
 let app: Express
 let sessionData: SessionData
@@ -108,7 +108,11 @@ describe('Block new visit date', () => {
 
     it('should block date set, remove date from session, and redirect to blocked dates listing page if block confirmed', () => {
       blockedDatesService.blockVisitDate.mockResolvedValue()
-      const blockedDateSuccessMessage = 'Visits are blocked for Friday 6 September 2024.'
+      const blockedDateSuccessMessage: MoJAlert = {
+        variant: 'success',
+        title: 'Date blocked for visits',
+        text: 'Visits are blocked for Friday 6 September 2024.',
+      }
 
       return request(app)
         .post(url)
@@ -124,7 +128,7 @@ describe('Block new visit date', () => {
             operationId: undefined,
           })
           expect(flashProvider).toHaveBeenCalledTimes(1)
-          expect(flashProvider).toHaveBeenCalledWith('message', blockedDateSuccessMessage)
+          expect(flashProvider).toHaveBeenCalledWith('messages', blockedDateSuccessMessage)
           expect(sessionData.visitBlockDate).toBe(undefined)
         })
     })

@@ -19,7 +19,7 @@ export default class BlockVisitDatesController {
       res.render('pages/blockVisitDates/blockVisitDates', {
         errors: req.flash('errors'),
         formValues: req.flash('formValues')?.[0],
-        message: req.flash('message'),
+        message: req.flash('messages')?.[0],
         blockedDates,
         datePickerMinDate,
         datePickerExcludedDates,

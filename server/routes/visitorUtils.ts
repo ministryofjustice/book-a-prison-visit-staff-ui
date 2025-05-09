@@ -1,6 +1,6 @@
 import type { Request } from 'express'
 import type { SessionData } from 'express-session'
-import { VisitSlot, VisitSlotList } from '../@types/bapv'
+import { FlashFormValues, VisitSlot, VisitSlotList } from '../@types/bapv'
 
 export const getSelectedSlot = (slotsList: VisitSlotList, selectedSlot: string): VisitSlot => {
   return Object.values(slotsList)
@@ -30,8 +30,8 @@ export const getSlotByTimeAndRestriction = (
     )
 }
 
-export const getFlashFormValues = (req: Request): Record<string, string | string[]> => {
-  return (req.flash('formValues')?.[0] as unknown as Record<string, string | string[]>) || {}
+export const getFlashFormValues = (req: Request): FlashFormValues => {
+  return req.flash('formValues')?.[0] || {}
 }
 
 export const clearSession = (req: Request): void => {

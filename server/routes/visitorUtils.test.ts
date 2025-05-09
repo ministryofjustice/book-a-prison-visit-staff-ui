@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import { Session, SessionData } from 'express-session'
-import { VisitSlot, VisitSlotList } from '../@types/bapv'
+import { FlashFormValues, VisitSlot, VisitSlotList } from '../@types/bapv'
 import { clearSession, getFlashFormValues, getSelectedSlot, getSlotByTimeAndRestriction } from './visitorUtils'
 import TestData from './testutils/testData'
 
@@ -150,7 +150,7 @@ describe('getSlotByTimeAndRestriction', () => {
 })
 
 describe('getFlashFormValues', () => {
-  let returnValue: Record<string, string | string[]>[]
+  let returnValue: FlashFormValues[]
 
   const req = {
     flash: jest.fn(() => {

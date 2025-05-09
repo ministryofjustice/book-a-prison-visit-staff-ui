@@ -2,12 +2,11 @@ import type { Express } from 'express'
 import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
-import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
-import { FlashData, VisitSessionData } from '../../@types/bapv'
+import { appWithAllRoutes, FlashData, flashProvider } from '../testutils/appSetup'
+import { VisitSessionData } from '../../@types/bapv'
 import TestData from '../testutils/testData'
 
 let app: Express
-
 let flashData: FlashData
 
 const prison = TestData.prison()
@@ -15,9 +14,7 @@ let visitSessionData: VisitSessionData
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
-  flashProvider.mockImplementation((key: keyof FlashData) => {
-    return flashData[key]
-  })
+  flashProvider.mockImplementation((key: keyof FlashData) => flashData[key])
   app = appWithAllRoutes({
     services: {},
 

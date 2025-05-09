@@ -52,7 +52,12 @@ export default class BlockNewDateController {
         const { prisonId } = req.session.selectedEstablishment
         try {
           await this.blockedDatesService.blockVisitDate(res.locals.user.username, prisonId, visitBlockDate)
-          req.flash('message', `Visits are blocked for ${format(visitBlockDate, 'EEEE d MMMM yyyy')}.`)
+
+          req.flash('messages', {
+            variant: 'success',
+            title: 'Date blocked for visits',
+            text: `Visits are blocked for ${format(visitBlockDate, 'EEEE d MMMM yyyy')}.`,
+          })
 
           await this.auditService.blockedVisitDate({
             prisonId,

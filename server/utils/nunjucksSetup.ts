@@ -3,7 +3,7 @@ import path from 'path'
 import nunjucks, { Environment } from 'nunjucks'
 import express from 'express'
 import { format, formatDuration, intervalToDuration, isAfter, parseISO } from 'date-fns'
-import { FormError } from '../@types/bapv'
+import { FieldValidationError } from 'express-validator'
 import { initialiseName, properCaseFullName } from './utils'
 import config from '../config'
 import { ApplicationInfo } from '../applicationInfo'
@@ -121,9 +121,9 @@ export function registerNunjucks(app?: express.Express): Environment {
   })
 
   // find specific error and return errorMessage for field validation
-  njkEnv.addFilter('findError', (errors, formFieldId) => {
+  njkEnv.addFilter('findError', (errors: FieldValidationError[], formFieldId) => {
     if (!errors || !formFieldId) return null
-    const errorForMessage = errors.find((error: FormError) => error.path === formFieldId)
+    const errorForMessage = errors.find(error => error.path === formFieldId)
 
     if (errorForMessage === undefined) return null
 

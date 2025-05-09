@@ -17,6 +17,7 @@ jest.mock('../../applicationInfo', () => {
 import express, { Express } from 'express'
 import { NotFound } from 'http-errors'
 import { Session, SessionData } from 'express-session'
+import { ValidationError } from 'express-validator'
 import HeaderFooterMeta from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterMeta'
 
 import indexRoutes from '../index'
@@ -35,7 +36,7 @@ import errorHandler from '../../errorHandler'
 import * as auth from '../../authentication/auth'
 import populateSelectedEstablishment from '../../middleware/populateSelectedEstablishment'
 import type { Services } from '../../services'
-
+import { FlashFormValues, MoJAlert } from '../../@types/bapv'
 import TestData from './testData'
 import { PrisonUser } from '../../interfaces/hmppsUser'
 
@@ -49,6 +50,14 @@ export const user: PrisonUser = {
   staffId: 1234,
   userRoles: [],
   activeCaseLoadId: 'HEI',
+}
+
+export type FlashData = {
+  errors?: ValidationError[]
+  formValues?: FlashFormValues[]
+  messages?: MoJAlert[]
+  // FIXME below needed for cancel visit route; remove when this is updated to store in req.session
+  [key: string]: string[] | ValidationError[] | FlashFormValues[] | MoJAlert[] | undefined
 }
 
 export const flashProvider = jest.fn()

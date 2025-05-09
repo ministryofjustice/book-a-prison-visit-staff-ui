@@ -1,15 +1,15 @@
 import type { Express } from 'express'
 import request from 'supertest'
 import * as cheerio from 'cheerio'
-import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
+import { FieldValidationError } from 'express-validator'
+import { appWithAllRoutes, FlashData, flashProvider } from '../testutils/appSetup'
 import { CancelVisitOrchestrationDto, Visit } from '../../data/orchestrationApiTypes'
-import { FlashData, VisitSessionData } from '../../@types/bapv'
+import { VisitSessionData } from '../../@types/bapv'
 import TestData from '../testutils/testData'
 import { createMockAuditService, createMockVisitService } from '../../services/testutils/mocks'
 import { clearSession } from '../visitorUtils'
 
 let app: Express
-
 let flashData: FlashData
 
 const auditService = createMockAuditService()
@@ -29,9 +29,7 @@ jest.mock('../visitorUtils', () => {
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
-  flashProvider.mockImplementation((key: keyof FlashData) => {
-    return flashData[key]
-  })
+  flashProvider.mockImplementation((key: keyof FlashData) => flashData[key])
   app = appWithAllRoutes({
     services: {
       auditService,
@@ -93,7 +91,7 @@ describe('GET /visit/:reference/cancel', () => {
   })
 
   it('should render the cancellation reasons page, showing validation errors and re-populating fields', () => {
-    flashData.errors = [
+    flashData.errors = <FieldValidationError[]>[
       { msg: 'No answer selected', path: 'cancel' },
       { msg: 'No request method selected', path: 'method' },
       { msg: 'Enter a reason', path: 'reason' },

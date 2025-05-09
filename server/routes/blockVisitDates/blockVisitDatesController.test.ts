@@ -4,10 +4,9 @@ import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
 import { FieldValidationError } from 'express-validator'
 import { addDays, addWeeks, format, startOfYesterday } from 'date-fns'
-import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
+import { appWithAllRoutes, FlashData, flashProvider } from '../testutils/appSetup'
 import { createMockBlockedDatesService } from '../../services/testutils/mocks'
 import TestData from '../testutils/testData'
-import { FlashData } from '../../@types/bapv'
 
 let app: Express
 let flashData: FlashData
@@ -83,8 +82,8 @@ describe('Block visit dates listing page', () => {
     })
 
     it('should render success message', () => {
-      const blockedDateSuccessMessage = 'Visits are blocked for Friday 6 September 2024.'
-      flashData = { message: blockedDateSuccessMessage }
+      const alert = TestData.mojAlert({ showTitleAsHeading: false })
+      flashData = { messages: [alert] }
 
       blockedDatesService.getFutureBlockedDates.mockResolvedValue([])
 
@@ -95,7 +94,7 @@ describe('Block visit dates listing page', () => {
           const $ = cheerio.load(res.text)
           expect($('h1').text()).toBe('Block visit dates')
 
-          expect($('.moj-banner__message').text()).toBe(blockedDateSuccessMessage)
+          expect($('.moj-alert__content').text()).toBe(alert.text)
         })
     })
 
