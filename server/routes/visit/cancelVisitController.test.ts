@@ -2,38 +2,31 @@ import type { Express } from 'express'
 import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { FieldValidationError } from 'express-validator'
+import { SessionData } from 'express-session'
 import { appWithAllRoutes, FlashData, flashProvider } from '../testutils/appSetup'
 import { CancelVisitOrchestrationDto, Visit } from '../../data/orchestrationApiTypes'
-import { VisitSessionData } from '../../@types/bapv'
+import { CancelledVisitInfo } from '../../@types/bapv'
 import TestData from '../testutils/testData'
 import { createMockAuditService, createMockVisitService } from '../../services/testutils/mocks'
-import { clearSession } from '../visitorUtils'
 
 let app: Express
 let flashData: FlashData
+let sessionData: SessionData
 
 const auditService = createMockAuditService()
 const visitService = createMockVisitService()
 
-let visitSessionData: VisitSessionData
-
-jest.mock('../visitorUtils', () => {
-  const visitorUtils = jest.requireActual('../visitorUtils')
-  return {
-    ...visitorUtils,
-    clearSession: jest.fn((req: Express.Request) => {
-      req.session.visitSessionData = visitSessionData as VisitSessionData
-    }),
-  }
-})
-
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
   flashProvider.mockImplementation((key: keyof FlashData) => flashData[key])
+
+  sessionData = <SessionData>{}
+
   app = appWithAllRoutes({
     services: {
       auditService,
     },
+    sessionData,
   })
 })
 
@@ -42,9 +35,11 @@ afterEach(() => {
 })
 
 describe('GET /visit/:reference/cancelled', () => {
-  it('should render the booking cancelled page with details of the visit', () => {
-    flashData.startTimestamp = ['2022-02-09T10:15:00']
-    flashData.endTimestamp = ['2022-02-09T11:00:00']
+  it('should render the booking cancelled page with details of the visit retrieved from session', () => {
+    sessionData.cancelledVisitInfo = {
+      startTimestamp: '2022-02-09T10:15:00',
+      endTimestamp: '2022-02-09T11:00:00',
+    }
 
     return request(app)
       .get('/visit/ab-cd-ef-gh/cancelled')
@@ -55,9 +50,11 @@ describe('GET /visit/:reference/cancelled', () => {
         expect($('h1').text().trim()).toBe('Booking cancelled')
         expect($('[data-test="visit-details"]').text().trim()).toBe('10:15am to 11am on Wednesday 9 February 2022')
         expect($('[data-test="go-to-home"]').length).toBe(1)
-
-        expect(clearSession).toHaveBeenCalledTimes(1)
       })
+  })
+
+  it('should redirect back to start if no cancelled visit details in session', () => {
+    return request(app).get('/visit/ab-cd-ef-gh/cancelled').expect(302).expect('Location', '/back-to-start')
   })
 })
 
@@ -127,7 +124,9 @@ describe('GET /visit/:reference/cancel', () => {
 
 describe('POST /visit/:reference/cancel', () => {
   let cancelledVisit: Visit
+
   beforeEach(() => {
+    sessionData = <SessionData>{}
     cancelledVisit = TestData.visit()
 
     visitService.cancelVisit = jest.fn().mockResolvedValue(cancelledVisit)
@@ -137,6 +136,7 @@ describe('POST /visit/:reference/cancel', () => {
         auditService,
         visitService,
       },
+      sessionData,
     })
   })
 
@@ -162,8 +162,6 @@ describe('POST /visit/:reference/cancel', () => {
             userType: 'STAFF',
           },
         })
-        expect(flashProvider).toHaveBeenCalledWith('startTimestamp', cancelledVisit.startTimestamp)
-        expect(flashProvider).toHaveBeenCalledWith('endTimestamp', cancelledVisit.endTimestamp)
         expect(auditService.cancelledVisit).toHaveBeenCalledTimes(1)
         expect(auditService.cancelledVisit).toHaveBeenCalledWith({
           visitReference: 'ab-cd-ef-gh',
@@ -172,6 +170,10 @@ describe('POST /visit/:reference/cancel', () => {
           reason: 'PRISONER_CANCELLED: illness',
           username: 'user1',
           operationId: undefined,
+        })
+        expect(sessionData.cancelledVisitInfo).toStrictEqual<CancelledVisitInfo>({
+          startTimestamp: cancelledVisit.startTimestamp,
+          endTimestamp: cancelledVisit.endTimestamp,
         })
       })
   })
@@ -220,6 +222,7 @@ describe('POST /visit/:reference/cancel', () => {
         ])
         expect(flashProvider).toHaveBeenCalledWith('formValues', { reason: '' })
         expect(auditService.cancelledVisit).not.toHaveBeenCalled()
+        expect(sessionData.cancelledVisitInfo).toBeUndefined()
       })
   })
 
@@ -236,6 +239,7 @@ describe('POST /visit/:reference/cancel', () => {
         ])
         expect(flashProvider).toHaveBeenCalledWith('formValues', { cancel: 'VISITOR_CANCELLED', reason: 'illness' })
         expect(auditService.cancelledVisit).not.toHaveBeenCalled()
+        expect(sessionData.cancelledVisitInfo).toBeUndefined()
       })
   })
 
@@ -260,6 +264,7 @@ describe('POST /visit/:reference/cancel', () => {
           reason: '',
         })
         expect(auditService.cancelledVisit).not.toHaveBeenCalled()
+        expect(sessionData.cancelledVisitInfo).toBeUndefined()
       })
   })
 
@@ -279,6 +284,7 @@ describe('POST /visit/:reference/cancel', () => {
           reason: 'illness',
         })
         expect(auditService.cancelledVisit).not.toHaveBeenCalled()
+        expect(sessionData.cancelledVisitInfo).toBeUndefined()
       })
   })
 })

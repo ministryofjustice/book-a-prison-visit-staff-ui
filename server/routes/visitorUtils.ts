@@ -35,7 +35,9 @@ export const getFlashFormValues = (req: Request): FlashFormValues => {
 }
 
 export const clearSession = (req: Request): void => {
-  ;['visitorList', 'adultVisitors', 'slotsList', 'visitSessionData'].forEach((sessionItem: keyof SessionData) => {
-    delete req.session[sessionItem]
-  })
+  ;['visitorList', 'adultVisitors', 'slotsList', 'visitSessionData', 'cancelledVisitInfo'].forEach(
+    (sessionItem: keyof SessionData) => {
+      delete req.session[sessionItem]
+    },
+  )
 }
