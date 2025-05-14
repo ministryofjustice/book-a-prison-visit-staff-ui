@@ -35,7 +35,7 @@ context('Visit details page', () => {
     cy.visit('/visit/ab-cd-ef-gh')
     const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage)
 
-    visitDetailsPage.cancellationType().contains('This visit was cancelled by a visitor.')
+    visitDetailsPage.visitMessage(0).contains('This visit was cancelled by a visitor.')
 
     // visit Details
     visitDetailsPage.visitDate().contains('Friday 14 January 2022')

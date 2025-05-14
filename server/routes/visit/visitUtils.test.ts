@@ -1,5 +1,16 @@
+import { MoJAlert } from '../../@types/bapv'
+import { visitCancellationAlerts } from '../../constants/visitCancellation'
 import { VisitBookingDetailsDto } from '../../data/orchestrationApiTypes'
-import { AvailableVisitActions, getAvailableVisitActions, getPrisonerLocation } from './visitUtils'
+import {
+  getPrisonerLocation,
+  getAvailableVisitActions,
+  AvailableVisitActions,
+  getVisitCancelledAlert,
+} from './visitUtils'
+
+beforeEach(() => {
+  jest.restoreAllMocks()
+})
 
 describe('Visit utils', () => {
   describe('getPrisonerLocation', () => {
@@ -119,6 +130,30 @@ describe('Visit utils', () => {
             { type: 'PRISON_VISITS_BLOCKED_FOR_DATE' },
           ] as VisitBookingDetailsDto['notifications']
           expect(getAvailableVisitActions(params).clearNotifications).toBe(false)
+        })
+      })
+    })
+  })
+
+  describe('getVisitCancelledAlert', () => {
+    it('should return undefined for a BOOKED visit', () => {
+      expect(
+        getVisitCancelledAlert({ visitStatus: 'BOOKED', outcomeStatus: 'ADMINISTRATIVE_CANCELLATION' }),
+      ).toBeUndefined()
+    })
+
+    describe('CANCELLED visit', () => {
+      it.each([
+        ['An expected outcomeStatus value', 'BOOKER_CANCELLED', visitCancellationAlerts.BOOKER_CANCELLED],
+        ['Fallback to default', '** ANY OTHER STATUS **', visitCancellationAlerts.default],
+        ['Handle empty string', '', visitCancellationAlerts.default],
+        ['Handle undefined', undefined, visitCancellationAlerts.default],
+      ])("%s: '%s' => %s", (_: string, outcomeStatus: VisitBookingDetailsDto['outcomeStatus'], expected: string) => {
+        expect(getVisitCancelledAlert({ visitStatus: 'CANCELLED', outcomeStatus })).toStrictEqual<MoJAlert>({
+          variant: 'information',
+          title: 'Visit cancelled',
+          showTitleAsHeading: true,
+          text: expected,
         })
       })
     })

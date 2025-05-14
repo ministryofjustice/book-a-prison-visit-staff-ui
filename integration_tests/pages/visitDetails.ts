@@ -5,9 +5,10 @@ export default class VisitDetailsPage extends Page {
     super('Visit booking details')
   }
 
-  // Notifications
-  cancellationType = (): PageElement => cy.get('[data-test="visit-cancelled-type')
+  // Messages
+  visitMessage = (index: number): PageElement => cy.get('.moj-alert').eq(index)
 
+  // Notifications
   visitNotification = (): PageElement => cy.get('[data-test="visit-notification')
 
   // Visit Details

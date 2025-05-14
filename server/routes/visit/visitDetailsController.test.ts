@@ -9,6 +9,7 @@ import { createMockAuditService, createMockVisitService } from '../../services/t
 import { notificationTypeWarnings } from '../../constants/notificationEvents'
 import { MojTimelineItem } from '../../services/visitService'
 import { AvailableVisitActions } from './visitUtils'
+import { MoJAlert } from '../../@types/bapv'
 
 let app: Express
 
@@ -16,11 +17,13 @@ const auditService = createMockAuditService()
 const visitService = createMockVisitService()
 
 let availableVisitActions: AvailableVisitActions
+let visitCancelledAlert: MoJAlert
 jest.mock('./visitUtils', () => {
   const visitUtils = jest.requireActual('./visitUtils')
   return {
     ...visitUtils,
     getAvailableVisitActions: () => availableVisitActions,
+    getVisitCancelledAlert: () => visitCancelledAlert,
   }
 })
 
@@ -44,6 +47,7 @@ describe('Visit details page', () => {
 
   beforeEach(() => {
     availableVisitActions = { update: false, cancel: false, clearNotifications: false }
+    visitCancelledAlert = undefined
 
     visitDetails = TestData.visitBookingDetailsDto()
 
@@ -66,6 +70,8 @@ describe('Visit details page', () => {
           const $ = cheerio.load(res.text)
           expect($('h1').text()).toBe('Visit booking details')
           expect($('.govuk-back-link').attr('href')).toBe('/prisoner/A1234BC')
+          // messages
+          expect($('.moj-alert').length).toBe(0)
           // visit details
           expect($('[data-test="visit-date"]').text()).toContain('Friday 14 January 2022')
           expect($('[data-test="visit-time"]').text()).toContain('10am to 11am')
@@ -254,6 +260,23 @@ describe('Visit details page', () => {
             expect($('h1').text()).toBe('Visit booking details')
             expect($('.govuk-back-link').attr('href')).toBe('/review')
             expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
+          })
+      })
+    })
+
+    describe('Visit alert messages', () => {
+      it('should render visit alert messages', () => {
+        visitCancelledAlert = TestData.mojAlert()
+
+        return request(app)
+          .get('/visit/ab-cd-ef-gh')
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('.moj-alert').length).toBe(1)
+            expect($('.moj-alert').eq(0).text()).toContain(visitCancelledAlert.title)
+            expect($('.moj-alert').eq(0).text()).toContain(visitCancelledAlert.text)
           })
       })
     })
