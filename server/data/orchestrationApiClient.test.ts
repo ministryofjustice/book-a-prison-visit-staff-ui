@@ -604,6 +604,7 @@ describe('orchestrationApiClient', () => {
           prisonerId: 'A1234BC',
           username: 'user1',
           min: '2',
+          userType: 'STAFF',
         })
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)

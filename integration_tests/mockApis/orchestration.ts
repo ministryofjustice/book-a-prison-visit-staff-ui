@@ -532,7 +532,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        url: `/orchestration/visit-sessions?prisonId=${prisonId}&prisonerId=${offenderNo}&min=${min}&username=${username}`,
+        url: `/orchestration/visit-sessions?prisonId=${prisonId}&prisonerId=${offenderNo}&min=${min}&username=${username}&userType=PUBLIC`,
       },
       response: {
         status: 200,
