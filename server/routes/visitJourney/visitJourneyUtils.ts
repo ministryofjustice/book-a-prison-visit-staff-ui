@@ -8,11 +8,12 @@ export const getUrlPrefix = (isUpdate: boolean) => {
   return isUpdate ? '/update-a-visit' : '/book-a-visit'
 }
 
-export const validationErrorsMojAlert = (
+// return a SINGLE Alert if 422 error code is in a prioritised set of handled values
+export const validationErrorsToMoJAlert = (
   prisonerName: string,
   visitStartTimestamp: string,
   validationErrors: ApplicationValidationErrorResponse['validationErrors'],
-): { mojAlert: MoJAlert; url: string } => {
+): { mojAlert: MoJAlert; url: string } | undefined => {
   if (validationErrors.includes('APPLICATION_INVALID_NON_ASSOCIATION_VISITS')) {
     return {
       mojAlert: {
@@ -24,6 +25,7 @@ export const validationErrorsMojAlert = (
       url: `select-date-and-time`,
     }
   }
+
   if (validationErrors.includes('APPLICATION_INVALID_VISIT_ALREADY_BOOKED')) {
     return {
       mojAlert: {
@@ -35,6 +37,7 @@ export const validationErrorsMojAlert = (
       url: `select-date-and-time`,
     }
   }
+
   if (validationErrors.includes('APPLICATION_INVALID_NO_SLOT_CAPACITY')) {
     return {
       mojAlert: {
@@ -47,5 +50,5 @@ export const validationErrorsMojAlert = (
     }
   }
 
-  return null
+  return undefined
 }
