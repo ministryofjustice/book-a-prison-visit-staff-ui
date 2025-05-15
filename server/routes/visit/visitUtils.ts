@@ -1,5 +1,6 @@
 import { MoJAlert } from '../../@types/bapv'
 import config from '../../config'
+import { notificationTypeAlerts } from '../../constants/notifications'
 import { visitCancellationAlerts } from '../../constants/visitCancellation'
 import { VisitBookingDetailsDto } from '../../data/orchestrationApiTypes'
 
@@ -83,4 +84,16 @@ export const getVisitCancelledAlert = ({
     showTitleAsHeading: true,
     text: visitCancellationAlerts[outcomeStatus] ?? visitCancellationAlerts.default,
   }
+}
+
+export const getVisitNotificationsAlerts = (notifications: VisitBookingDetailsDto['notifications']): MoJAlert[] => {
+  const alerts = <MoJAlert[]>[]
+
+  notifications.forEach(notification => {
+    if (notificationTypeAlerts[notification.type]) {
+      alerts.push(notificationTypeAlerts[notification.type])
+    }
+  })
+
+  return alerts
 }

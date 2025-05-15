@@ -21,35 +21,14 @@
 {% set mainClasses = "bapv-visit-details" %}
 
 {% block content %}
-{# Messages #}
-{% if messages | length %}
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
-      {%- for message in messages %}
-        {{ mojAlert(message) }}
-      {% endfor -%}
-    </div>
-  </div>
-{% endif %}
-
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
 
-    {%if visitDetails.notifications | length %}
-      {% for notification in visitDetails.notifications %}
-        {% set visitNotificationBannerHtml %}
-          {{ govukWarningText({
-            classes: "govuk-!-margin-bottom-0 govuk-!-padding-left-4",
-            html: '<span data-test="visit-notification">' + (notificationTypeWarnings[notification.type] | default(notification.type)) + "</span>",
-            iconFallbackText: "Warning"
-          }) }}
-        {% endset %}
-
-        {{ mojBanner({
-          classes: "govuk-!-padding-left-4",
-          html: visitNotificationBannerHtml
-        }) }}
-      {% endfor %}
+    {# Messages #}
+    {% if messages | length %}
+      {%- for message in messages %}
+        {{ mojAlert(message) }}
+      {% endfor -%}
     {% endif %}
 
     <h1 class="govuk-heading-xl">Visit booking details</h1>
@@ -271,8 +250,6 @@
     </div>
   </div>
 </div>
-
-
 {% endblock %}
 
 {% block pageScripts %}

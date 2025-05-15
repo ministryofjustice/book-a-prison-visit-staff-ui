@@ -1,4 +1,5 @@
 import { MoJAlert } from '../../@types/bapv'
+import { notificationTypeAlerts } from '../../constants/notifications'
 import { visitCancellationAlerts } from '../../constants/visitCancellation'
 import { VisitBookingDetailsDto } from '../../data/orchestrationApiTypes'
 import {
@@ -6,6 +7,7 @@ import {
   getAvailableVisitActions,
   AvailableVisitActions,
   getVisitCancelledAlert,
+  getVisitNotificationsAlerts,
 } from './visitUtils'
 
 beforeEach(() => {
@@ -144,18 +146,47 @@ describe('Visit utils', () => {
 
     describe('CANCELLED visit', () => {
       it.each([
-        ['An expected outcomeStatus value', 'BOOKER_CANCELLED', visitCancellationAlerts.BOOKER_CANCELLED],
-        ['Fallback to default', '** ANY OTHER STATUS **', visitCancellationAlerts.default],
-        ['Handle empty string', '', visitCancellationAlerts.default],
-        ['Handle undefined', undefined, visitCancellationAlerts.default],
-      ])("%s: '%s' => %s", (_: string, outcomeStatus: VisitBookingDetailsDto['outcomeStatus'], expected: string) => {
-        expect(getVisitCancelledAlert({ visitStatus: 'CANCELLED', outcomeStatus })).toStrictEqual<MoJAlert>({
-          variant: 'information',
-          title: 'Visit cancelled',
-          showTitleAsHeading: true,
-          text: expected,
-        })
-      })
+        ['an expected outcomeStatus value', 'BOOKER_CANCELLED', visitCancellationAlerts.BOOKER_CANCELLED],
+        ['fallback to default', '** ANY OTHER STATUS **', visitCancellationAlerts.default],
+        ['handle empty string', '', visitCancellationAlerts.default],
+        ['handle undefined', undefined, visitCancellationAlerts.default],
+      ])(
+        "should handle %s: '%s' => %s",
+        (_: string, outcomeStatus: VisitBookingDetailsDto['outcomeStatus'], expected: string) => {
+          expect(getVisitCancelledAlert({ visitStatus: 'CANCELLED', outcomeStatus })).toStrictEqual<MoJAlert>({
+            variant: 'information',
+            title: 'Visit cancelled',
+            showTitleAsHeading: true,
+            text: expected,
+          })
+        },
+      )
     })
+  })
+
+  describe('getVisitNotificationsAlerts', () => {
+    it.each([
+      [
+        'an expected notification type',
+        [{ type: 'PRISONER_RELEASED_EVENT' }],
+        [notificationTypeAlerts.PRISONER_RELEASED_EVENT],
+      ],
+      [
+        'multiple expected notifications',
+        [{ type: 'PRISONER_RELEASED_EVENT' }, { type: 'PRISON_VISITS_BLOCKED_FOR_DATE' }],
+        [notificationTypeAlerts.PRISONER_RELEASED_EVENT, notificationTypeAlerts.PRISON_VISITS_BLOCKED_FOR_DATE],
+      ],
+      [
+        'an unexpected notification type',
+        [{ type: 'PRISONER_RELEASED_EVENT' }, { type: '** SOME OTHER TYPE **' }],
+        [notificationTypeAlerts.PRISONER_RELEASED_EVENT],
+      ],
+      ['no notifications', [], []],
+    ])(
+      'should handle %s',
+      (_: string, notifications: VisitBookingDetailsDto['notifications'], expected: MoJAlert[]) => {
+        expect(getVisitNotificationsAlerts(notifications)).toStrictEqual(expected)
+      },
+    )
   })
 })

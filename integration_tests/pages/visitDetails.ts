@@ -5,11 +5,8 @@ export default class VisitDetailsPage extends Page {
     super('Visit booking details')
   }
 
-  // Messages
-  visitMessage = (index: number): PageElement => cy.get('.moj-alert').eq(index)
-
-  // Notifications
-  visitNotification = (): PageElement => cy.get('[data-test="visit-notification')
+  // Messages (MoJ Alerts)
+  visitMessages = (): PageElement => cy.get('.moj-alert')
 
   // Visit Details
   visitDate = (): PageElement => cy.get('[data-test="visit-date"]')

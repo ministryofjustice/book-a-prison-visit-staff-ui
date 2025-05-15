@@ -2,7 +2,7 @@ import { format, add } from 'date-fns'
 import TestData from '../../server/routes/testutils/testData'
 import Page from '../pages/page'
 import VisitDetailsPage from '../pages/visitDetails'
-import { notificationTypeWarnings } from '../../server/constants/notifications'
+import { notificationTypeAlerts } from '../../server/constants/notifications'
 
 context('Visit details page', () => {
   const shortDateFormat = 'yyyy-MM-dd'
@@ -35,7 +35,7 @@ context('Visit details page', () => {
     cy.visit('/visit/ab-cd-ef-gh')
     const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage)
 
-    visitDetailsPage.visitMessage(0).contains('This visit was cancelled by a visitor.')
+    visitDetailsPage.visitMessages().eq(0).contains('This visit was cancelled by a visitor.')
 
     // visit Details
     visitDetailsPage.visitDate().contains('Friday 14 January 2022')
@@ -98,8 +98,8 @@ context('Visit details page', () => {
     visitDetailsPage.cancelBooking().should('have.length', 1)
     visitDetailsPage.clearNotifications().should('have.length', 0)
 
-    // notifications
-    visitDetailsPage.visitNotification().eq(0).contains(notificationTypeWarnings.PRISON_VISITS_BLOCKED_FOR_DATE)
+    // Messages
+    visitDetailsPage.visitMessages().eq(0).contains(notificationTypeAlerts.PRISON_VISITS_BLOCKED_FOR_DATE.title)
 
     // Prisoner Details
     visitDetailsPage.prisonerName().contains('John Smith')
@@ -128,8 +128,8 @@ context('Visit details page', () => {
     visitDetailsPage.cancelBooking().should('have.length', 1)
     visitDetailsPage.clearNotifications().should('have.length', 1)
 
-    // notifications
-    visitDetailsPage.visitNotification().eq(0).contains(notificationTypeWarnings.PRISONER_RECEIVED_EVENT)
+    // Messages
+    visitDetailsPage.visitMessages().eq(0).contains(notificationTypeAlerts.PRISONER_RECEIVED_EVENT.title)
 
     // Prisoner Details
     visitDetailsPage.prisonerName().contains('John Smith')

@@ -1,8 +1,12 @@
 import { RequestHandler } from 'express'
 import { AuditService, VisitService } from '../../services'
-import { notificationTypeWarnings } from '../../constants/notifications'
 import { getDpsPrisonerAlertsUrl } from '../../utils/utils'
-import { getAvailableVisitActions, getPrisonerLocation, getVisitCancelledAlert } from './visitUtils'
+import {
+  getAvailableVisitActions,
+  getPrisonerLocation,
+  getVisitCancelledAlert,
+  getVisitNotificationsAlerts,
+} from './visitUtils'
 import { MoJAlert } from '../../@types/bapv'
 
 export default class VisitDetailsController {
@@ -37,7 +41,9 @@ export default class VisitDetailsController {
         outcomeStatus: visitDetails.outcomeStatus,
       })
 
-      const messages: MoJAlert[] = [].concat(visitCancelledAlert ?? [])
+      const messages: MoJAlert[] = visitCancelledAlert
+        ? [visitCancelledAlert]
+        : getVisitNotificationsAlerts(visitDetails.notifications)
 
       const availableVisitActions = getAvailableVisitActions({
         visitStatus: visitDetails.visitStatus,
@@ -63,7 +69,6 @@ export default class VisitDetailsController {
         fromPage,
         fromPageQuery,
         messages,
-        notificationTypeWarnings,
         prisonerDpsAlertsUrl,
         prisonerLocation,
         visitDetails,
