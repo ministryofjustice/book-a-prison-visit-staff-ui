@@ -25,11 +25,9 @@
   <div class="govuk-grid-column-full">
 
     {# Messages #}
-    {% if messages | length %}
-      {%- for message in messages %}
-        {{ mojAlert(message) }}
-      {% endfor -%}
-    {% endif %}
+    {% for message in messages %}
+      {{ mojAlert(message) }}
+    {% endfor %}
 
     <h1 class="govuk-heading-xl">Visit booking details</h1>
 
