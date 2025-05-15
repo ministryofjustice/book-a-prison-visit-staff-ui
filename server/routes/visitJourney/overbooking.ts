@@ -65,7 +65,7 @@ export default class Overbooking {
 
     return res.render('pages/bookAVisit/overbooking', {
       errors: req.flash('errors'),
-      validationAlert: req.flash('messages'),
+      message: req.flash('messages')?.[0],
       bookingsCount,
       maxCapacity,
       visitSession,
