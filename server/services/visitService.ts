@@ -12,9 +12,9 @@ import {
 import { HmppsAuthClient, OrchestrationApiClient, RestClientBuilder } from '../data'
 import logger from '../../logger'
 import { prisonerDateTimePretty, prisonerTimePretty } from '../utils/utils'
-import eventAuditTypes from '../constants/eventAuditTypes'
+import eventAuditTypes from '../constants/eventAudit'
 import { requestMethodDescriptions } from '../constants/requestMethods'
-import { notificationTypes } from '../constants/notificationEvents'
+import { notificationTypes } from '../constants/notifications'
 
 export type MojTimelineItem = {
   label: { text: string }

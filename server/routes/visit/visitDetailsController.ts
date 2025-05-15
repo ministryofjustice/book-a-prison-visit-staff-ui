@@ -1,8 +1,13 @@
 import { RequestHandler } from 'express'
 import { AuditService, VisitService } from '../../services'
-import { notificationTypeWarnings } from '../../constants/notificationEvents'
 import { getDpsPrisonerAlertsUrl } from '../../utils/utils'
-import { getAvailableVisitActions, getPrisonerLocation } from './visitUtils'
+import {
+  getAvailableVisitActions,
+  getPrisonerLocation,
+  getVisitCancelledAlert,
+  getVisitNotificationsAlerts,
+} from './visitUtils'
+import { MoJAlert } from '../../@types/bapv'
 
 export default class VisitDetailsController {
   public constructor(
@@ -31,6 +36,15 @@ export default class VisitDetailsController {
         return res.render('pages/visit/visitDetailsWrongEstablishment', { prison, reference, selectedEstablishment })
       }
 
+      const visitCancelledAlert = getVisitCancelledAlert({
+        visitStatus: visitDetails.visitStatus,
+        outcomeStatus: visitDetails.outcomeStatus,
+      })
+
+      const messages: MoJAlert[] = visitCancelledAlert
+        ? [visitCancelledAlert]
+        : getVisitNotificationsAlerts(visitDetails.notifications)
+
       const availableVisitActions = getAvailableVisitActions({
         visitStatus: visitDetails.visitStatus,
         startTimestamp: visitDetails.startTimestamp,
@@ -54,7 +68,7 @@ export default class VisitDetailsController {
         eventsTimeline,
         fromPage,
         fromPageQuery,
-        notificationTypeWarnings,
+        messages,
         prisonerDpsAlertsUrl,
         prisonerLocation,
         visitDetails,

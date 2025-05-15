@@ -2,6 +2,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {%-from "moj/components/banner/macro.njk" import mojBanner %}
+{%- from "moj/components/alert/macro.njk" import mojAlert -%}
 {%- from "moj/components/timeline/macro.njk" import mojTimeline -%}
 {%- from "components/expandableComment/macro.njk" import bapvExpandableComment -%}
 
@@ -22,52 +23,11 @@
 {% block content %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
-    {% if visitDetails.visitStatus === "CANCELLED" %}
 
-      {% set status = visitDetails.outcomeStatus.split("_") %}
-
-      {% set cancelledBy %}
-        {% if status[0] === 'ADMINISTRATIVE' %}
-          {{- 'This visit was cancelled due to an administrative error with the booking.' -}}
-        {% elseif status[0] === 'DETAILS' %}
-          {{- 'This visit was cancelled as the details changed after booking.' -}}
-        {% elseif status[0] === 'BOOKER' or status[0] === 'VISITOR' %}
-          {{- 'This visit was cancelled by a visitor.' -}}
-        {% else %}
-          {{- 'This visit was cancelled by the ' + status[0] | lower + '.' -}}
-        {% endif %}
-      {% endset %}
-
-      {% set cancelledVisitBannerHtml %}
-        {{ govukWarningText({
-          classes: "govuk-!-margin-bottom-0 govuk-!-padding-left-4",
-          html: '<span data-test="visit-cancelled-type">' + cancelledBy + '</span>',
-          iconFallbackText: "Warning"
-        }) }}
-      {% endset %}
-
-      {{ mojBanner({
-        classes: "govuk-!-padding-left-4",
-        html: cancelledVisitBannerHtml
-      }) }}
-    {% endif %}
-
-    {%if visitDetails.notifications | length %}
-      {% for notification in visitDetails.notifications %}
-        {% set visitNotificationBannerHtml %}
-          {{ govukWarningText({
-            classes: "govuk-!-margin-bottom-0 govuk-!-padding-left-4",
-            html: '<span data-test="visit-notification">' + (notificationTypeWarnings[notification.type] | default(notification.type)) + "</span>",
-            iconFallbackText: "Warning"
-          }) }}
-        {% endset %}
-
-        {{ mojBanner({
-          classes: "govuk-!-padding-left-4",
-          html: visitNotificationBannerHtml
-        }) }}
-      {% endfor %}
-    {% endif %}
+    {# Messages #}
+    {% for message in messages %}
+      {{ mojAlert(message) }}
+    {% endfor %}
 
     <h1 class="govuk-heading-xl">Visit booking details</h1>
 
@@ -288,8 +248,6 @@
     </div>
   </div>
 </div>
-
-
 {% endblock %}
 
 {% block pageScripts %}

@@ -1,4 +1,7 @@
+import { MoJAlert } from '../../@types/bapv'
 import config from '../../config'
+import { notificationTypeAlerts } from '../../constants/notifications'
+import { visitCancellationAlerts } from '../../constants/visitCancellation'
 import { VisitBookingDetailsDto } from '../../data/orchestrationApiTypes'
 
 const A_DAY_IN_MS = 24 * 60 * 60 * 1000
@@ -62,4 +65,35 @@ export const getAvailableVisitActions = ({
   }
 
   return availableVisitActions
+}
+
+export const getVisitCancelledAlert = ({
+  visitStatus,
+  outcomeStatus,
+}: {
+  visitStatus: VisitBookingDetailsDto['visitStatus']
+  outcomeStatus: VisitBookingDetailsDto['outcomeStatus']
+}): MoJAlert | undefined => {
+  if (visitStatus !== 'CANCELLED') {
+    return undefined
+  }
+
+  return {
+    variant: 'information',
+    title: 'Visit cancelled',
+    showTitleAsHeading: true,
+    text: visitCancellationAlerts[outcomeStatus] ?? visitCancellationAlerts.default,
+  }
+}
+
+export const getVisitNotificationsAlerts = (notifications: VisitBookingDetailsDto['notifications']): MoJAlert[] => {
+  const alerts = <MoJAlert[]>[]
+
+  notifications.forEach(notification => {
+    if (notificationTypeAlerts[notification.type]) {
+      alerts.push(notificationTypeAlerts[notification.type])
+    }
+  })
+
+  return alerts
 }

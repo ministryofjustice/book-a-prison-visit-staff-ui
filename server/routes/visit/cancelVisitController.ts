@@ -4,7 +4,7 @@ import { AuditService, VisitService } from '../../services'
 import { CancelVisitOrchestrationDto } from '../../data/orchestrationApiTypes'
 import { requestMethodsCancellation } from '../../constants/requestMethods'
 import { getFlashFormValues } from '../visitorUtils'
-import visitCancellationReasons from '../../constants/visitCancellationReasons'
+import { visitCancellationReasons } from '../../constants/visitCancellation'
 
 export default class CancelVisitController {
   public constructor(
