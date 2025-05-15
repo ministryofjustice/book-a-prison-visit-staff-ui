@@ -3,8 +3,8 @@ import TestData from '../../server/routes/testutils/testData'
 import Page from '../pages/page'
 import VisitDetailsPage from '../pages/visitDetails'
 import ClearNotificationsPage from '../pages/clearNotifications'
-import eventAuditTypes from '../../server/constants/eventAuditTypes'
-import { notificationTypes, notificationTypeWarnings } from '../../server/constants/notificationEvents'
+import eventAuditTypes from '../../server/constants/eventAudit'
+import { notificationTypes, notificationTypeWarnings } from '../../server/constants/notifications'
 
 context('Review a visit', () => {
   const shortDateFormat = 'yyyy-MM-dd'

@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express'
 import { AuditService, VisitService } from '../../services'
-import { notificationTypeWarnings } from '../../constants/notificationEvents'
+import { notificationTypeWarnings } from '../../constants/notifications'
 import { getDpsPrisonerAlertsUrl } from '../../utils/utils'
 import { getAvailableVisitActions, getPrisonerLocation, getVisitCancelledAlert } from './visitUtils'
 import { MoJAlert } from '../../@types/bapv'

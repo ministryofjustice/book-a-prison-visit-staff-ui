@@ -3,7 +3,7 @@ import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { appWithAllRoutes } from '../testutils/appSetup'
 import { createMockVisitNotificationsService } from '../../services/testutils/mocks'
-import { notificationTypeReasons, notificationTypes } from '../../constants/notificationEvents'
+import { notificationTypeReasons, notificationTypes } from '../../constants/notifications'
 import { FilterField, VisitsReviewListItem } from '../../@types/bapv'
 
 let app: Express

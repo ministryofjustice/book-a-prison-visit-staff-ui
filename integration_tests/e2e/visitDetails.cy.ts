@@ -2,7 +2,7 @@ import { format, add } from 'date-fns'
 import TestData from '../../server/routes/testutils/testData'
 import Page from '../pages/page'
 import VisitDetailsPage from '../pages/visitDetails'
-import { notificationTypeWarnings } from '../../server/constants/notificationEvents'
+import { notificationTypeWarnings } from '../../server/constants/notifications'
 
 context('Visit details page', () => {
   const shortDateFormat = 'yyyy-MM-dd'

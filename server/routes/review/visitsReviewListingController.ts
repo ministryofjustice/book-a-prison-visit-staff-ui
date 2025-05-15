@@ -2,7 +2,7 @@ import url from 'url'
 import { RequestHandler } from 'express'
 import { ValidationChain, check } from 'express-validator'
 import { VisitNotificationsService } from '../../services'
-import { notificationTypes, notificationTypeReasons } from '../../constants/notificationEvents'
+import { notificationTypes, notificationTypeReasons } from '../../constants/notifications'
 
 export default class VisitsReviewListingController {
   public constructor(private readonly visitNotificationsService: VisitNotificationsService) {}
