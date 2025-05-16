@@ -193,27 +193,9 @@ describe('Views - Date and time of visit', () => {
     expect($('[data-test="submit"]').text().trim()).toBe('Continue')
   })
 
-  it('should display restriction change message', () => {
-    viewContext = {
-      prisonerName: 'John Smith',
-      visitRestriction: 'CLOSED',
-      warningMessages: [
-        { id: 'restriction-change-reason', message: 'The visit type has changed from open to closed.' },
-      ],
-    }
-    const $ = cheerio.load(compiledTemplate.render(viewContext))
-
-    expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
-    expect($('[data-test="visit-restriction"]').text()).toBe('Closed')
-    expect($('[data-test="closed-visit-reason"]').length).toBe(0)
-    expect($('[data-test="restriction-change-reason"]').text()).toContain(
-      'The visit type has changed from open to closed.',
-    )
-  })
-
   it('should display 422 validation error - MojAlert', () => {
     viewContext = {
-      validationAlert: [TestData.mojAlert()],
+      messages: [TestData.mojAlert()],
     }
     const $ = cheerio.load(compiledTemplate.render(viewContext))
 

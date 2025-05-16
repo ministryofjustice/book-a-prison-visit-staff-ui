@@ -157,6 +157,7 @@ testJourneys.forEach(journey => {
           .expect('Content-Type', /html/)
           .expect(res => {
             const $ = cheerio.load(res.text)
+            expect($('.moj-alert').length).toBe(0)
             expect($('h1').text().trim()).toBe('Select date and time of visit')
             expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
             expect($('[data-test="visit-location"]').text()).toBe('location place')
@@ -177,7 +178,7 @@ testJourneys.forEach(journey => {
               offenderNo: visitSessionData.prisoner.offenderNo,
               prisonId,
               visitRestriction: visitSessionData.visitRestriction,
-              minNumberOfDays: '2',
+              minNumberOfDays: 2,
             })
           })
       })
@@ -250,30 +251,8 @@ testJourneys.forEach(journey => {
           })
       })
 
-      it('should show warning message when visitor has an expiring ban', () => {
-        // example visitor data for a visitor ban
-        visitSessionData.visitors = [
-          {
-            personId: 4323,
-            name: 'Ted Smith',
-            dateOfBirth: '1968-07-28',
-            adult: true,
-            relationshipDescription: 'Father',
-            address: '1st listed address',
-            restrictions: [
-              {
-                restrictionType: 'BAN',
-                restrictionTypeDescription: 'Banned',
-                startDate: '2022-01-01',
-                expiryDate: '2023-01-14',
-                comment: 'Ban details',
-              },
-            ],
-            banned: false,
-          },
-        ]
-        // this is added to the visitSessionData on the select visitors page, matches the expiry date of the visitor ban
-        visitSessionData.daysUntilBanExpiry = 3
+      it('should show warning message when visitor ban days set in session is greater than default min booking days', () => {
+        visitSessionData.daysUntilBanExpiry = 3 // default minimum booking ahead days is 2
 
         sessionApp = appWithAllRoutes({
           services: { visitSessionsService },
@@ -288,10 +267,9 @@ testJourneys.forEach(journey => {
           .expect('Content-Type', /html/)
           .expect(res => {
             const $ = cheerio.load(res.text)
-            expect($('h1').text().trim()).toBe('Select date and time of visit')
-            expect($('[data-test="banned-visitor-reason"]').text().trim()).toContain(
-              'A selected visitor is banned. Time slots during the period of the ban are not shown',
-            )
+            expect($('.moj-alert').length).toBe(1)
+            expect($('.moj-alert').eq(0).text()).toContain('A selected visitor is banned')
+            expect($('.moj-alert').eq(0).text()).toContain('Visit times during the period of the ban are not shown.')
           })
       })
 
@@ -542,28 +520,21 @@ testJourneys.forEach(journey => {
 
 describe('Update journey override booking window', () => {
   it('should override booking window min days to 0 if confirmation set in session', () => {
-    visitSessionsService.getVisitSessions.mockResolvedValue({
-      slotsList: {},
-      whereaboutsAvailable: false,
-    })
+    visitSessionsService.getVisitSessions.mockResolvedValue({ slotsList: {}, whereaboutsAvailable: true })
 
-    visitSessionData.visitReference = 'ab-cd-ef-gh'
     visitSessionData.overrideBookingWindow = true
 
     return request(sessionApp)
       .get('/update-a-visit/select-date-and-time')
       .expect(200)
       .expect('Content-Type', /html/)
-      .expect(res => {
-        const $ = cheerio.load(res.text)
-        expect($('h1').text().trim()).toBe('Select date and time of visit')
-
+      .expect(() => {
         expect(visitSessionsService.getVisitSessions).toHaveBeenCalledWith({
           username: 'user1',
           offenderNo: visitSessionData.prisoner.offenderNo,
           prisonId,
           visitRestriction: visitSessionData.visitRestriction,
-          minNumberOfDays: '0',
+          minNumberOfDays: 0,
         })
       })
   })
@@ -629,8 +600,7 @@ describe('Update journey specific warning messages', () => {
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
-        expect($('[data-test="slot-change-reason"]').length).toBe(0)
-        expect($('[data-test="restriction-change-reason"]').length).toBe(0)
+        expect($('moj-alert').length).toBe(0)
         expect($('input#1').prop('checked')).toBe(true)
       })
   })
@@ -650,18 +620,15 @@ describe('Update journey specific warning messages', () => {
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
-        expect($('[data-test="slot-change-reason"]').length).toBe(0)
-        expect($('[data-test="restriction-change-reason"]').length).toBe(0)
+        expect($('moj-alert').length).toBe(0)
         expect($('input#1').prop('checked')).toBe(true)
       })
   })
 
   it('should show two messages with no slot selected when visit has changed from open to closed and original time slot unavailable', () => {
     currentlyBookedSlot.visitRestriction = 'OPEN'
-
     currentlyAvailableSlots[0].startTimestamp = '2022-10-17T09:01:00'
     currentlyAvailableSlots[0].visitRestriction = 'CLOSED'
-
     visitSessionData.visitRestriction = 'CLOSED'
 
     return request(sessionApp)
@@ -670,20 +637,22 @@ describe('Update journey specific warning messages', () => {
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
-        expect($('[data-test="slot-change-reason"]').text()).toContain('A new visit time must be selected.')
-        expect($('[data-test="restriction-change-reason"]').text()).toContain(
-          'The visit type has changed from open to closed.',
-        )
+        expect($('.moj-alert').length).toBe(2)
+
+        expect($('.moj-alert').eq(0).text()).toContain('The prisoner’s information has changed')
+        expect($('.moj-alert').eq(0).text()).toContain('Select a new visit time.')
+
+        expect($('.moj-alert').eq(1).text()).toContain('open to closed')
+        expect($('.moj-alert').eq(1).text()).toContain('Select a new visit time.')
+
         expect($('input:checked').length).toBe(0)
       })
   })
 
   it('should show two messages with no slot selected when visit has changed from closed to open and original time slot unavailable', () => {
     currentlyBookedSlot.visitRestriction = 'CLOSED'
-
     currentlyAvailableSlots[0].startTimestamp = '2022-10-17T09:01:00'
     currentlyAvailableSlots[0].visitRestriction = 'OPEN'
-
     visitSessionData.visitRestriction = 'OPEN'
 
     return request(sessionApp)
@@ -692,19 +661,21 @@ describe('Update journey specific warning messages', () => {
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
-        expect($('[data-test="slot-change-reason"]').text()).toContain('A new visit time must be selected.')
-        expect($('[data-test="restriction-change-reason"]').text()).toContain(
-          'The visit type has changed from closed to open.',
-        )
+        expect($('.moj-alert').length).toBe(2)
+
+        expect($('.moj-alert').eq(0).text()).toContain('The prisoner’s information has changed')
+        expect($('.moj-alert').eq(0).text()).toContain('Select a new visit time.')
+
+        expect($('.moj-alert').eq(1).text()).toContain('closed to open')
+        expect($('.moj-alert').eq(1).text()).toContain('Select a new visit time.')
+
         expect($('input:checked').length).toBe(0)
       })
   })
 
   it('should show one message with original slot selected when visit has changed from open to closed and original time slot available', () => {
     currentlyBookedSlot.visitRestriction = 'OPEN'
-
     currentlyAvailableSlots[0].visitRestriction = 'CLOSED'
-
     visitSessionData.visitRestriction = 'CLOSED'
 
     return request(sessionApp)
@@ -713,19 +684,16 @@ describe('Update journey specific warning messages', () => {
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
-        expect($('[data-test="slot-change-reason"]').length).toBe(0)
-        expect($('[data-test="restriction-change-reason"]').text()).toContain(
-          'The visit type has changed from open to closed.',
-        )
+        expect($('.moj-alert').length).toBe(1)
+        expect($('.moj-alert').eq(0).text()).toContain('open to closed')
+        expect($('.moj-alert').eq(0).text()).toContain('Select a new visit time.')
         expect($('input#1').prop('checked')).toBe(true)
       })
   })
 
   it('should show one message with original slot selected when visit has changed from closed to open and original time slot available', () => {
     currentlyBookedSlot.visitRestriction = 'CLOSED'
-
     currentlyAvailableSlots[0].visitRestriction = 'OPEN'
-
     visitSessionData.visitRestriction = 'OPEN'
 
     return request(sessionApp)
@@ -734,10 +702,9 @@ describe('Update journey specific warning messages', () => {
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
-        expect($('[data-test="slot-change-reason"]').length).toBe(0)
-        expect($('[data-test="restriction-change-reason"]').text()).toContain(
-          'The visit type has changed from closed to open.',
-        )
+        expect($('.moj-alert').length).toBe(1)
+        expect($('.moj-alert').eq(0).text()).toContain('closed to open')
+        expect($('.moj-alert').eq(0).text()).toContain('Select a new visit time.')
         expect($('input#1').prop('checked')).toBe(true)
       })
   })
