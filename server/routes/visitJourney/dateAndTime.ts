@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
-import { BookOrUpdate, VisitSlot } from '../../@types/bapv'
+import { BookOrUpdate, MoJAlert, VisitSlot } from '../../@types/bapv'
 import AuditService from '../../services/auditService'
 import { getFlashFormValues, getSelectedSlot, getSlotByTimeAndRestriction } from '../visitorUtils'
 import { getUrlPrefix } from './visitJourneyUtils'
@@ -20,21 +20,23 @@ export default class DateAndTime {
     const { prisonId } = req.session.selectedEstablishment
     const { visitSessionData } = req.session
 
-    const warningMessages: { id: string; message: string }[] = []
+    const messages: MoJAlert[] = req.flash('messages')
 
-    let daysUntilVisitStart =
-      isUpdate && req.session.visitSessionData?.overrideBookingWindow === true
-        ? 0
-        : req.session.selectedEstablishment.policyNoticeDaysMin
+    // calculate min booking window and any override or bans in place
+    const policyNoticeDaysMin = visitSessionData.overrideBookingWindow
+      ? 0
+      : req.session.selectedEstablishment.policyNoticeDaysMin
 
-    if (visitSessionData.daysUntilBanExpiry) {
-      if (visitSessionData.daysUntilBanExpiry > daysUntilVisitStart) {
-        daysUntilVisitStart = visitSessionData.daysUntilBanExpiry
-        warningMessages.push({
-          id: 'banned-visitor-reason',
-          message: 'A selected visitor is banned. Time slots during the period of the ban are not shown.',
-        })
-      }
+    const isBanActive = visitSessionData.daysUntilBanExpiry > policyNoticeDaysMin
+    const minNumberOfDays = isBanActive ? visitSessionData.daysUntilBanExpiry : policyNoticeDaysMin
+
+    if (isBanActive) {
+      messages.push({
+        variant: 'information',
+        title: 'A selected visitor is banned',
+        showTitleAsHeading: true,
+        text: 'Visit times during the period of the ban are not shown.',
+      })
     }
 
     const { slotsList, whereaboutsAvailable } = await this.visitSessionsService.getVisitSessions({
@@ -42,15 +44,12 @@ export default class DateAndTime {
       offenderNo: visitSessionData.prisoner.offenderNo,
       visitRestriction: visitSessionData.visitRestriction,
       prisonId,
-      minNumberOfDays: daysUntilVisitStart.toString(),
+      minNumberOfDays,
     })
-
-    let matchingSlot
-    let showSlotChangeMessage = false
 
     // first time here on update journey, visitSlot.id will be ''
     if (isUpdate && visitSessionData.visitSlot?.id === '') {
-      matchingSlot = getSlotByTimeAndRestriction(
+      const matchingSlot = getSlotByTimeAndRestriction(
         slotsList,
         visitSessionData.visitSlot.startTimestamp,
         visitSessionData.visitSlot.endTimestamp,
@@ -65,31 +64,37 @@ export default class DateAndTime {
         visitSessionData.visitSlot.id = matchingSlot.id
       }
 
-      // if no matching slot, set showSlotChangeMessage = true
-      showSlotChangeMessage = !matchingSlot
+      if (!matchingSlot) {
+        messages.push({
+          variant: 'error',
+          title: 'The prisoner’s information has changed',
+          showTitleAsHeading: true,
+          text: 'Select a new visit time.',
+        })
+      }
 
       if (visitSessionData.visitRestriction !== visitSessionData.originalVisitSlot.visitRestriction) {
-        let messageFullString = 'The visit type has changed from '
-        messageFullString += visitSessionData.visitRestriction === 'OPEN' ? 'closed to open.' : 'open to closed.'
+        const restrictionChange = visitSessionData.visitRestriction === 'OPEN' ? 'closed to open.' : 'open to closed.'
 
-        warningMessages.push({
-          id: 'restriction-change-reason',
-          message: messageFullString,
+        messages.push({
+          variant: 'error',
+          title: `The visit type has changed from ${restrictionChange}`,
+          showTitleAsHeading: true,
+          text: 'Select a new visit time.',
         })
       }
     }
 
-    let originalVisitSlot
-    if (isUpdate && visitSessionData.originalVisitSlot) {
-      // matching on original time but session's current visit restriction to ensure
-      // originally selected time slot is available for re-selection even if restriction changes
-      originalVisitSlot = getSlotByTimeAndRestriction(
-        slotsList,
-        visitSessionData.originalVisitSlot.startTimestamp,
-        visitSessionData.originalVisitSlot.endTimestamp,
-        visitSessionData.visitRestriction,
-      )
-    }
+    // matching on original time but session's current visit restriction to ensure
+    // originally selected time slot is available for re-selection even if restriction changes
+    const originalVisitSlot = visitSessionData.originalVisitSlot
+      ? getSlotByTimeAndRestriction(
+          slotsList,
+          visitSessionData.originalVisitSlot.startTimestamp,
+          visitSessionData.originalVisitSlot.endTimestamp,
+          visitSessionData.visitRestriction,
+        )
+      : undefined
 
     const formValues = getFlashFormValues(req)
     if (!Object.keys(formValues).length && visitSessionData.visitSlot?.id) {
@@ -104,7 +109,7 @@ export default class DateAndTime {
 
     res.render('pages/bookAVisit/dateAndTime', {
       errors: req.flash('errors'),
-      validationAlert: req.flash('messages'),
+      messages,
       visitRestriction: visitSessionData.visitRestriction,
       prisonerName: `${visitSessionData.prisoner.firstName} ${visitSessionData.prisoner.lastName}`,
       offenderNo: visitSessionData.prisoner.offenderNo,
@@ -113,8 +118,6 @@ export default class DateAndTime {
       slotsList,
       formValues,
       slotsPresent,
-      showSlotChangeMessage,
-      warningMessages,
       originalVisitSlot,
       urlPrefix: getUrlPrefix(isUpdate),
     })

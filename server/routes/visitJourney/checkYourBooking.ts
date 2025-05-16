@@ -2,7 +2,7 @@ import type { Request, Response } from 'express'
 import { validationResult } from 'express-validator'
 import { requestMethodsBooking } from '../../constants/requestMethods'
 import AuditService from '../../services/auditService'
-import { getUrlPrefix, validationErrorsMojAlert } from './visitJourneyUtils'
+import { getUrlPrefix, validationErrorsToMoJAlert } from './visitJourneyUtils'
 import { VisitService } from '../../services'
 import { ApplicationValidationErrorResponse } from '../../data/orchestrationApiTypes'
 import { SanitisedError } from '../../sanitisedError'
@@ -98,7 +98,7 @@ export default class CheckYourBooking {
         const validationErrors =
           (error as SanitisedError<ApplicationValidationErrorResponse>)?.data?.validationErrors ?? []
 
-        const { mojAlert, url } = validationErrorsMojAlert(
+        const { mojAlert, url } = validationErrorsToMoJAlert(
           prisonerName,
           visitSessionData.visitSlot.startTimestamp,
           validationErrors,

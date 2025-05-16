@@ -41,7 +41,7 @@ export default class VisitSessionsService {
     offenderNo: string
     prisonId: string
     visitRestriction: VisitSessionData['visitRestriction']
-    minNumberOfDays: string
+    minNumberOfDays: number
   }): Promise<{ slotsList: VisitSlotList; whereaboutsAvailable: boolean }> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)

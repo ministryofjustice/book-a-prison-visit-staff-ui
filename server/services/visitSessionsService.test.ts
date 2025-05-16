@@ -71,11 +71,11 @@ describe('Visit sessions service', () => {
         offenderNo: 'A1234BC',
         prisonId,
         visitRestriction: 'OPEN',
-        minNumberOfDays: '2',
+        minNumberOfDays: 2,
       })
 
       expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
-      expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId, 'user', '2')
+      expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId, 'user', 2)
       expect(results).toEqual({ slotsList: {}, whereaboutsAvailable: true })
     })
 
@@ -124,11 +124,11 @@ describe('Visit sessions service', () => {
           offenderNo: 'A1234BC',
           prisonId,
           visitRestriction: 'OPEN',
-          minNumberOfDays: '2',
+          minNumberOfDays: 2,
         })
 
         expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
-        expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId, 'user', '2')
+        expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId, 'user', 2)
         expect(whereaboutsApiClient.getEvents).toHaveBeenCalledTimes(1)
         expect(results).toEqual(<{ slotsList: VisitSlotList; whereaboutsAvailable: boolean }>{
           slotsList: {
@@ -191,11 +191,11 @@ describe('Visit sessions service', () => {
           offenderNo: 'A1234BC',
           prisonId,
           visitRestriction: 'OPEN',
-          minNumberOfDays: '2',
+          minNumberOfDays: 2,
         })
 
         expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
-        expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId, 'user', '2')
+        expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId, 'user', 2)
         expect(whereaboutsApiClient.getEvents).toHaveBeenCalledTimes(1)
         expect(results).toEqual(<{ slotsList: VisitSlotList; whereaboutsAvailable: boolean }>{
           slotsList: {
@@ -236,11 +236,11 @@ describe('Visit sessions service', () => {
           offenderNo: 'A1234BC',
           prisonId,
           visitRestriction: 'OPEN',
-          minNumberOfDays: '2',
+          minNumberOfDays: 2,
         })
 
         expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
-        expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId, 'user', '2')
+        expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId, 'user', 2)
         expect(whereaboutsApiClient.getEvents).toHaveBeenCalledTimes(1)
         expect(results).toEqual(<{ slotsList: VisitSlotList; whereaboutsAvailable: boolean }>{
           slotsList: {
@@ -298,11 +298,11 @@ describe('Visit sessions service', () => {
         offenderNo: 'A1234BC',
         prisonId,
         visitRestriction: 'CLOSED',
-        minNumberOfDays: '2',
+        minNumberOfDays: 2,
       })
 
       expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
-      expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId, 'user', '2')
+      expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId, 'user', 2)
       expect(results).toEqual(<{ slotsList: VisitSlotList; whereaboutsAvailable: boolean }>{
         slotsList: {
           'February 2022': [
@@ -406,11 +406,11 @@ describe('Visit sessions service', () => {
         offenderNo: 'A1234BC',
         prisonId,
         visitRestriction: 'OPEN',
-        minNumberOfDays: '2',
+        minNumberOfDays: 2,
       })
 
       expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
-      expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId, 'user', '2')
+      expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId, 'user', 2)
       expect(results).toEqual(<{ slotsList: VisitSlotList; whereaboutsAvailable: boolean }>{
         slotsList: {
           'February 2022': [
@@ -549,11 +549,11 @@ describe('Visit sessions service', () => {
         offenderNo: 'A1234BC',
         prisonId,
         visitRestriction: 'OPEN',
-        minNumberOfDays: '2',
+        minNumberOfDays: 2,
       })
 
       expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
-      expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId, 'user', '2')
+      expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId, 'user', 2)
       expect(results).toEqual(<{ slotsList: VisitSlotList; whereaboutsAvailable: boolean }>{
         slotsList: {
           'February 2022': [
@@ -621,11 +621,11 @@ describe('Visit sessions service', () => {
         offenderNo: 'A1234BC',
         prisonId,
         visitRestriction: 'CLOSED',
-        minNumberOfDays: '2',
+        minNumberOfDays: 2,
       })
 
       expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
-      expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId, 'user', '2')
+      expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId, 'user', 2)
       expect(results).toEqual(<{ slotsList: VisitSlotList; whereaboutsAvailable: boolean }>{
         slotsList: {
           'February 2022': [

@@ -1,4 +1,4 @@
-import { getUrlPrefix, validationErrorsMojAlert } from './visitJourneyUtils'
+import { getUrlPrefix, validationErrorsToMoJAlert } from './visitJourneyUtils'
 import { ApplicationValidationErrorResponse } from '../../data/orchestrationApiTypes'
 
 describe('getUrlPrefix', () => {
@@ -10,16 +10,16 @@ describe('getUrlPrefix', () => {
   })
 })
 
-describe('validationErrorsMojAlert', () => {
+describe('validationErrorToMoJAlert', () => {
   const prisonerName = 'Smith, John'
   const visitStartTimestamp = '2022-03-12T09:30:00'
 
-  it('should return a MojAlert item from 422 error `APPLICATION_INVALID_NON_ASSOCIATION_VISITS`', () => {
+  it('should return an MoJAlert for 422 error APPLICATION_INVALID_NON_ASSOCIATION_VISITS', () => {
     const validationErrors: ApplicationValidationErrorResponse['validationErrors'] = [
       'APPLICATION_INVALID_NON_ASSOCIATION_VISITS',
     ]
 
-    const { mojAlert, url } = validationErrorsMojAlert(prisonerName, visitStartTimestamp, validationErrors)
+    const { mojAlert, url } = validationErrorsToMoJAlert(prisonerName, visitStartTimestamp, validationErrors)
 
     expect(mojAlert).toStrictEqual({
       text: 'Select a new visit time.',
@@ -30,12 +30,12 @@ describe('validationErrorsMojAlert', () => {
     expect(url).toBe('select-date-and-time')
   })
 
-  it('should return a MojAlert item from 422 error `APPLICATION_INVALID_VISIT_ALREADY_BOOKED`', () => {
+  it('should return an MoJAlert for 422 error APPLICATION_INVALID_VISIT_ALREADY_BOOKED', () => {
     const validationErrors: ApplicationValidationErrorResponse['validationErrors'] = [
       'APPLICATION_INVALID_VISIT_ALREADY_BOOKED',
     ]
 
-    const { mojAlert, url } = validationErrorsMojAlert(prisonerName, visitStartTimestamp, validationErrors)
+    const { mojAlert, url } = validationErrorsToMoJAlert(prisonerName, visitStartTimestamp, validationErrors)
 
     expect(mojAlert).toStrictEqual({
       text: 'Select a new visit time.',
@@ -46,12 +46,12 @@ describe('validationErrorsMojAlert', () => {
     expect(url).toBe('select-date-and-time')
   })
 
-  it('should return a MojAlert item from 422 error `APPLICATION_INVALID_NO_SLOT_CAPACITY`', () => {
+  it('should return an MoJAlert for 422 error APPLICATION_INVALID_NO_SLOT_CAPACITY', () => {
     const validationErrors: ApplicationValidationErrorResponse['validationErrors'] = [
       'APPLICATION_INVALID_NO_SLOT_CAPACITY',
     ]
 
-    const { mojAlert, url } = validationErrorsMojAlert(prisonerName, visitStartTimestamp, validationErrors)
+    const { mojAlert, url } = validationErrorsToMoJAlert(prisonerName, visitStartTimestamp, validationErrors)
 
     expect(mojAlert).toStrictEqual({
       text: 'Select whether to book for this time or choose a new visit time.',
@@ -60,5 +60,24 @@ describe('validationErrorsMojAlert', () => {
       variant: 'warning',
     })
     expect(url).toBe('check-your-booking/overbooking')
+  })
+
+  it('should return a single, prioritised MoJAlert for multiple 422 errors', () => {
+    const validationErrors: ApplicationValidationErrorResponse['validationErrors'] = [
+      'APPLICATION_INVALID_NO_SLOT_CAPACITY',
+      'APPLICATION_INVALID_NON_ASSOCIATION_VISITS',
+    ]
+
+    const { mojAlert } = validationErrorsToMoJAlert(prisonerName, visitStartTimestamp, validationErrors)
+
+    expect(mojAlert.title).toContain('non-association')
+  })
+
+  it('should return undefined for an unhandled 422 error code', () => {
+    const validationErrors = [
+      '*** UNHANDLED_ERROR***',
+    ] as unknown as ApplicationValidationErrorResponse['validationErrors']
+
+    expect(validationErrorsToMoJAlert(prisonerName, visitStartTimestamp, validationErrors)).toBeUndefined()
   })
 })
