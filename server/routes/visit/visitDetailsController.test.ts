@@ -6,9 +6,10 @@ import { appWithAllRoutes, user } from '../testutils/appSetup'
 import { VisitBookingDetailsDto } from '../../data/orchestrationApiTypes'
 import TestData from '../testutils/testData'
 import { createMockAuditService, createMockVisitService } from '../../services/testutils/mocks'
-import { notificationTypeWarnings } from '../../constants/notificationEvents'
 import { MojTimelineItem } from '../../services/visitService'
 import { AvailableVisitActions } from './visitUtils'
+import { MoJAlert } from '../../@types/bapv'
+import { notificationTypeAlerts } from '../../constants/notifications'
 
 let app: Express
 
@@ -16,11 +17,15 @@ const auditService = createMockAuditService()
 const visitService = createMockVisitService()
 
 let availableVisitActions: AvailableVisitActions
+let visitCancelledAlert: MoJAlert
+let visitNotificationAlerts: MoJAlert[]
 jest.mock('./visitUtils', () => {
   const visitUtils = jest.requireActual('./visitUtils')
   return {
     ...visitUtils,
     getAvailableVisitActions: () => availableVisitActions,
+    getVisitCancelledAlert: () => visitCancelledAlert,
+    getVisitNotificationsAlerts: () => visitNotificationAlerts,
   }
 })
 
@@ -44,6 +49,8 @@ describe('Visit details page', () => {
 
   beforeEach(() => {
     availableVisitActions = { update: false, cancel: false, clearNotifications: false }
+    visitCancelledAlert = undefined
+    visitNotificationAlerts = []
 
     visitDetails = TestData.visitBookingDetailsDto()
 
@@ -66,6 +73,8 @@ describe('Visit details page', () => {
           const $ = cheerio.load(res.text)
           expect($('h1').text()).toBe('Visit booking details')
           expect($('.govuk-back-link').attr('href')).toBe('/prisoner/A1234BC')
+          // messages
+          expect($('.moj-alert').length).toBe(0)
           // visit details
           expect($('[data-test="visit-date"]').text()).toContain('Friday 14 January 2022')
           expect($('[data-test="visit-time"]').text()).toContain('10am to 11am')
@@ -258,6 +267,47 @@ describe('Visit details page', () => {
       })
     })
 
+    describe('Visit alert messages', () => {
+      it('should render visit cancellation alert and NOT any notification alerts', () => {
+        visitCancelledAlert = TestData.mojAlert()
+        // below should not show because the visit is cancelled
+        visitNotificationAlerts = [notificationTypeAlerts.PRISONER_RELEASED_EVENT]
+
+        return request(app)
+          .get('/visit/ab-cd-ef-gh')
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('.moj-alert').length).toBe(1)
+            expect($('.moj-alert').eq(0).text()).toContain(visitCancelledAlert.title)
+            expect($('.moj-alert').eq(0).text()).toContain(visitCancelledAlert.text)
+          })
+      })
+
+      it('should render visit notification alerts', () => {
+        visitNotificationAlerts = [
+          notificationTypeAlerts.PRISONER_RELEASED_EVENT,
+          notificationTypeAlerts.PRISON_VISITS_BLOCKED_FOR_DATE,
+        ]
+
+        return request(app)
+          .get('/visit/ab-cd-ef-gh')
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('.moj-alert').length).toBe(2)
+
+            expect($('.moj-alert').eq(0).text()).toContain(notificationTypeAlerts.PRISONER_RELEASED_EVENT.title)
+            expect($('.moj-alert').eq(0).text()).toContain(notificationTypeAlerts.PRISONER_RELEASED_EVENT.text)
+
+            expect($('.moj-alert').eq(1).text()).toContain(notificationTypeAlerts.PRISON_VISITS_BLOCKED_FOR_DATE.title)
+            expect($('.moj-alert').eq(1).text()).toContain(notificationTypeAlerts.PRISON_VISITS_BLOCKED_FOR_DATE.text)
+          })
+      })
+    })
+
     describe('Visit action buttons', () => {
       it('should render no buttons if no available actions', () => {
         return request(app)
@@ -288,73 +338,6 @@ describe('Visit details page', () => {
 
             expect($('[data-test=clear-notifications]').text().trim()).toBe('Do not change')
             expect($('[data-test=clear-notifications]').attr('href')).toBe('/visit/ab-cd-ef-gh/clear-notifications')
-          })
-      })
-    })
-
-    describe('Visit notification messages', () => {
-      it('should not display visit notification banner when no notification types set', () => {
-        return request(app)
-          .get('/visit/ab-cd-ef-gh')
-          .expect(200)
-          .expect('Content-Type', /html/)
-          .expect(res => {
-            const $ = cheerio.load(res.text)
-            expect($('[data-test="visit-notification"]').length).toBe(0)
-          })
-      })
-
-      it('should display a single visit notification banner when only a blocked date notification set', () => {
-        visitDetails.notifications = [
-          { type: 'PRISON_VISITS_BLOCKED_FOR_DATE', createdDateTime: '', additionalData: [] },
-        ]
-
-        return request(app)
-          .get('/visit/ab-cd-ef-gh')
-          .expect(200)
-          .expect('Content-Type', /html/)
-          .expect(res => {
-            const $ = cheerio.load(res.text)
-            expect($('[data-test="visit-notification"]').length).toBe(1)
-            expect($('[data-test="visit-notification"]').text()).toBe(
-              notificationTypeWarnings.PRISON_VISITS_BLOCKED_FOR_DATE,
-            )
-          })
-      })
-
-      it('should display a single visit notification banner when a single notification type is set', () => {
-        visitDetails.notifications = [{ type: 'PRISONER_RELEASED_EVENT', createdDateTime: '', additionalData: [] }]
-
-        return request(app)
-          .get('/visit/ab-cd-ef-gh')
-          .expect(200)
-          .expect('Content-Type', /html/)
-          .expect(res => {
-            const $ = cheerio.load(res.text)
-            expect($('[data-test="visit-notification"]').length).toBe(1)
-            expect($('[data-test="visit-notification"]').text()).toBe(notificationTypeWarnings.PRISONER_RELEASED_EVENT)
-          })
-      })
-
-      it('should display two visit notification banners when two notification types are set', () => {
-        visitDetails.notifications = [
-          { type: 'PRISONER_RELEASED_EVENT', createdDateTime: '', additionalData: [] },
-          { type: 'PRISON_VISITS_BLOCKED_FOR_DATE', createdDateTime: '', additionalData: [] },
-        ]
-
-        return request(app)
-          .get('/visit/ab-cd-ef-gh')
-          .expect(200)
-          .expect('Content-Type', /html/)
-          .expect(res => {
-            const $ = cheerio.load(res.text)
-            expect($('[data-test="visit-notification"]').length).toBe(2)
-            expect($('[data-test="visit-notification"]').eq(0).text()).toBe(
-              notificationTypeWarnings.PRISONER_RELEASED_EVENT,
-            )
-            expect($('[data-test="visit-notification"]').eq(1).text()).toBe(
-              notificationTypeWarnings.PRISON_VISITS_BLOCKED_FOR_DATE,
-            )
           })
       })
     })

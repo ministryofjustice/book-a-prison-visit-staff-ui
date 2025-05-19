@@ -47,7 +47,7 @@ describe('Block visit dates listing page', () => {
           expect($('.govuk-breadcrumbs li').length).toBe(2)
           expect($('h1').text()).toBe('Block visit dates')
 
-          expect($('.moj-banner__message').length).toBe(0)
+          expect($('.moj-alert').length).toBe(0)
 
           expect($('.moj-datepicker').attr('data-min-date')).toBe(format(today, 'dd/MM/yyyy'))
           expect($('.moj-datepicker').attr('data-excluded-dates')).toBe(

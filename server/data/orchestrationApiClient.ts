@@ -277,14 +277,14 @@ export default class OrchestrationApiClient {
     offenderNo: string,
     prisonId: string,
     username: string,
-    minNumberOfDays?: string,
+    minNumberOfDays?: number,
   ): Promise<VisitSession[]> {
     return this.restClient.get({
       path: '/visit-sessions',
       query: new URLSearchParams({
         prisonId,
         prisonerId: offenderNo,
-        min: minNumberOfDays,
+        min: minNumberOfDays.toString(),
         username,
         userType: 'STAFF',
       }).toString(),

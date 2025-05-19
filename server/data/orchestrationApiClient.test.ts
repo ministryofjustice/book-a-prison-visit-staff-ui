@@ -609,7 +609,7 @@ describe('orchestrationApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
-      const output = await orchestrationApiClient.getVisitSessions('A1234BC', prisonId, 'user1', '2')
+      const output = await orchestrationApiClient.getVisitSessions('A1234BC', prisonId, 'user1', 2)
 
       expect(output).toEqual(results)
     })

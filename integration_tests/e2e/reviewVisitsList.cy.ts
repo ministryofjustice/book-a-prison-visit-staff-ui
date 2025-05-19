@@ -3,7 +3,7 @@ import TestData from '../../server/routes/testutils/testData'
 import HomePage from '../pages/home'
 import Page from '../pages/page'
 import VisitsReviewListingPage from '../pages/visitsReviewListing'
-import { notificationTypes } from '../../server/constants/notificationEvents'
+import { notificationTypes } from '../../server/constants/notifications'
 
 context('Bookings review listing page', () => {
   const prettyDateFormat = 'd MMMM yyyy'
