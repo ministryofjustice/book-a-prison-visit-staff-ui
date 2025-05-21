@@ -1,5 +1,4 @@
 import { VisitorListItem } from '../@types/bapv'
-import { Contact } from '../data/prisonerContactRegistryApiTypes'
 import { buildVisitorListItem } from '../utils/visitorUtils'
 import { HmppsAuthClient, PrisonerContactRegistryApiClient, RestClientBuilder } from '../data'
 
@@ -13,13 +12,10 @@ export default class PrisonerVisitorsService {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const prisonerContactRegistryApiClient = this.prisonerContactRegistryApiClientFactory(token)
 
-    const allSocialContacts: Contact[] = await prisonerContactRegistryApiClient.getPrisonerSocialContacts(
-      true,
-      offenderNo,
-    )
+    const socialContacts = await prisonerContactRegistryApiClient.getPrisonersApprovedSocialContacts(offenderNo)
 
     const visitorList: VisitorListItem[] = []
-    allSocialContacts.forEach(contact => {
+    socialContacts.forEach(contact => {
       visitorList.push(buildVisitorListItem(contact))
     })
 

@@ -139,11 +139,11 @@ describe('Prisoner visitor service', () => {
         },
       ]
 
-      prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue(contacts)
+      prisonerContactRegistryApiClient.getPrisonersApprovedSocialContacts.mockResolvedValue(contacts)
 
       const results = await prisonerVisitorsService.getVisitors(offenderNo, 'user')
 
-      expect(prisonerContactRegistryApiClient.getPrisonerSocialContacts).toHaveBeenCalledTimes(1)
+      expect(prisonerContactRegistryApiClient.getPrisonersApprovedSocialContacts).toHaveBeenCalledWith(offenderNo)
       expect(results).toEqual([
         {
           personId: 4321,
@@ -210,10 +210,10 @@ describe('Prisoner visitor service', () => {
     })
 
     it('should handle prisoner having no contacts', async () => {
-      prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue([])
+      prisonerContactRegistryApiClient.getPrisonersApprovedSocialContacts.mockResolvedValue([])
 
       const results = await prisonerVisitorsService.getVisitors(offenderNo, 'user')
-      expect(prisonerContactRegistryApiClient.getPrisonerSocialContacts).toHaveBeenCalledTimes(1)
+      expect(prisonerContactRegistryApiClient.getPrisonersApprovedSocialContacts).toHaveBeenCalledWith(offenderNo)
       expect(results).toEqual([])
     })
   })
