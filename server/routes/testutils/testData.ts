@@ -305,6 +305,7 @@ export default class TestData {
 
   // Visitor restrictions
   static restriction = ({
+    restrictionId = 1,
     restrictionType = 'NONCON',
     restrictionTypeDescription = 'Non-Contact Visit',
     startDate = '2023-02-01',
@@ -312,6 +313,7 @@ export default class TestData {
     globalRestriction = true,
     comment = 'Restriction test comment',
   }: Partial<Restriction> = {}): Restriction => ({
+    restrictionId,
     restrictionType,
     restrictionTypeDescription,
     startDate,
@@ -521,6 +523,7 @@ export default class TestData {
         relationshipDescription: 'WIFE',
         restrictions: [
           {
+            restrictionId: 1,
             restrictionType: 'CLOSED',
             restrictionTypeDescription: 'Closed',
             globalRestriction: false,

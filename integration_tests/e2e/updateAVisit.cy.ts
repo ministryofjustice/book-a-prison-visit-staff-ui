@@ -229,7 +229,6 @@ context('Update a visit', () => {
       }),
     ]
 
-    cy.task('stubPrisonerSocialContacts', { offenderNo, contacts, approvedVisitorsOnly: false })
     cy.task('stubGetVisitDetailed', originalVisit)
 
     // Visit details page

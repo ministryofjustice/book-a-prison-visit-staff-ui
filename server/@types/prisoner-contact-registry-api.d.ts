@@ -4,6 +4,86 @@
  */
 
 export interface paths {
+  '/v2/prisoners/{prisonerId}/contacts/social': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get Prisoners Social Contacts
+     * @description Returns details of a prisoner's social contacts
+     */
+    get: operations['getPrisonerSocialContacts']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/prisoners/{prisonerId}/contacts/social/approved': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get Prisoners Social Contacts that are approved
+     * @description Returns details of a prisoner's social contacts that have been approved.
+     */
+    get: operations['getPrisonersSocialContactsApproved']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/prisoners/{prisonerId}/contacts/social/approved/restrictions/closed': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get status on any visitors having closed restrictions
+     * @description Returns a boolean true/false for a given list of visitors if any closed restrictions are found
+     */
+    get: operations['getClosedRestrictionStatusForPrisonerVisitors']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/prisoners/{prisonerId}/contacts/social/approved/restrictions/banned/dateRange': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get an updated date range for visitors if a visitor with ban restriction is found, else returns original date
+     * @description Returns an updated date range for visitors if one is found with an active ban restriction. If not, it returns the original date range
+     */
+    get: operations['getUpdatedDateRangeForPrisonerVisitorsIfFoundWithBanRestrictions']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/prisoners/{prisonerId}/contacts': {
     parameters: {
       query?: never
@@ -13,6 +93,7 @@ export interface paths {
     }
     /**
      * Get Prisoner Contact
+     * @deprecated
      * @description Returns details of a prisoner contacts
      */
     get: operations['getPrisonerContact']
@@ -33,9 +114,10 @@ export interface paths {
     }
     /**
      * Get Prisoners Social Contacts
+     * @deprecated
      * @description Returns details of a prisoner's social contacts
      */
-    get: operations['getPrisonerSocialContacts']
+    get: operations['getPrisonerSocialContacts_1']
     put?: never
     post?: never
     delete?: never
@@ -74,9 +156,10 @@ export interface paths {
     }
     /**
      * Get status on any visitors having closed restrictions
+     * @deprecated
      * @description Returns a boolean true/false for a given list of visitors if any closed restrictions are found
      */
-    get: operations['getClosedRestrictionStatusForPrisonerVisitors']
+    get: operations['getClosedRestrictionStatusForPrisonerVisitors_1']
     put?: never
     post?: never
     delete?: never
@@ -94,9 +177,10 @@ export interface paths {
     }
     /**
      * Get an updated date range for visitors if a visitor with ban restriction is found, else returns original date
+     * @deprecated
      * @description Returns an updated date range for visitors if one is found with an active ban restriction. If not, it returns the original date range
      */
-    get: operations['getUpdatedDateRangeForPrisonerVisitorsIfFoundWithBanRestrictions']
+    get: operations['getUpdatedDateRangeForPrisonerVisitorsIfFoundWithBanRestrictions_1']
     put?: never
     post?: never
     delete?: never
@@ -282,6 +366,12 @@ export interface components {
     /** @description A contact for a prisoner */
     RestrictionDto: {
       /**
+       * Format: int32
+       * @description Restriction ID
+       * @example 123
+       */
+      restrictionId: number
+      /**
        * @description Restriction Type Code
        * @example 123
        */
@@ -356,6 +446,298 @@ export interface components {
 }
 export type $defs = Record<string, never>
 export interface operations {
+  getPrisonerSocialContacts: {
+    parameters: {
+      query?: {
+        /**
+         * @description Defaults to false. By default when false, returns all contacts with or without a DOB. If true, returns only contacts with a DOB.
+         * @example false
+         */
+        hasDateOfBirth?: boolean
+        /**
+         * @description by default returns addresses for all contacts, set to false if contact addresses not needed.
+         * @example false
+         */
+        withAddress?: boolean
+      }
+      header?: never
+      path: {
+        /**
+         * @description Prisoner Identifier (NOMIS Offender No)
+         * @example A1234AA
+         */
+        prisonerId: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Prisoner Social Contacts Information Returned */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ContactDto'][]
+        }
+      }
+      /** @description Incorrect request to retrieve prisoner's approved social contacts */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to retrieve prisoner's approved social contacts */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Prisoner not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  getPrisonersSocialContactsApproved: {
+    parameters: {
+      query?: {
+        /**
+         * @description Defaults to false. By default when false, returns all contacts with or without a DOB. If true, returns only contacts with a DOB.
+         * @example false
+         */
+        hasDateOfBirth?: boolean
+        /**
+         * @description by default returns addresses for all contacts, set to false if contact addresses not needed.
+         * @example false
+         */
+        withAddress?: boolean
+      }
+      header?: never
+      path: {
+        /**
+         * @description Prisoner Identifier (NOMIS Offender No)
+         * @example A1234AA
+         */
+        prisonerId: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Prisoner Approved Social Contacts Information Returned */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ContactDto'][]
+        }
+      }
+      /** @description Incorrect request to retrieve prisoner's approved social contacts */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to retrieve prisoner's approved social contacts */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Prisoner not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  getClosedRestrictionStatusForPrisonerVisitors: {
+    parameters: {
+      query: {
+        /**
+         * @description Ids of prisoner visitors
+         * @example 9147510, 8431201
+         */
+        visitors: number[]
+      }
+      header?: never
+      path: {
+        /**
+         * @description Prisoner Identifier (NOMIS Offender No)
+         * @example A1234AA
+         */
+        prisonerId: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Returned status on visitor closed restrictions successfully */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HasClosedRestrictionDto']
+        }
+      }
+      /** @description Incorrect request to Get status of visitors closed restrictions */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to Get status of visitors closed restrictions */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Prisoner or Visitor */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  getUpdatedDateRangeForPrisonerVisitorsIfFoundWithBanRestrictions: {
+    parameters: {
+      query: {
+        /**
+         * @description Ids of prisoner visitors
+         * @example 9147510, 8431201
+         */
+        visitors: number[]
+        /**
+         * @description Start date range
+         * @example 2024-03-15
+         */
+        fromDate: string
+        /**
+         * @description To date range
+         * @example 2024-03-31
+         */
+        toDate: string
+      }
+      header?: never
+      path: {
+        /**
+         * @description Prisoner Identifier (NOMIS Offender No)
+         * @example A1234AA
+         */
+        prisonerId: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Date range returned (original or adjusted) */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['DateRangeDto']
+        }
+      }
+      /** @description Incorrect request to Get date range for prisoner visitors */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to Get date range for prisoner visitors */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Prisoner, Visitor or Date range not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
   getPrisonerContact: {
     parameters: {
       query?: {
@@ -434,7 +816,7 @@ export interface operations {
       }
     }
   }
-  getPrisonerSocialContacts: {
+  getPrisonerSocialContacts_1: {
     parameters: {
       query?: {
         /**
@@ -605,7 +987,7 @@ export interface operations {
       }
     }
   }
-  getClosedRestrictionStatusForPrisonerVisitors: {
+  getClosedRestrictionStatusForPrisonerVisitors_1: {
     parameters: {
       query: {
         /**
@@ -673,7 +1055,7 @@ export interface operations {
       }
     }
   }
-  getUpdatedDateRangeForPrisonerVisitorsIfFoundWithBanRestrictions: {
+  getUpdatedDateRangeForPrisonerVisitorsIfFoundWithBanRestrictions_1: {
     parameters: {
       query: {
         /**

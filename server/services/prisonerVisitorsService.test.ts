@@ -41,6 +41,7 @@ describe('Prisoner visitor service', () => {
           nextOfKin: false,
           restrictions: [
             {
+              restrictionId: 1,
               restrictionType: 'BAN',
               restrictionTypeDescription: 'Banned',
               startDate: '2022-01-01',
@@ -49,18 +50,21 @@ describe('Prisoner visitor service', () => {
               comment: 'Ban details',
             },
             {
+              restrictionId: 2,
               restrictionType: 'RESTRICTED',
               restrictionTypeDescription: 'Restricted',
               startDate: '2022-01-02',
               globalRestriction: false,
             },
             {
+              restrictionId: 3,
               restrictionType: 'CLOSED',
               restrictionTypeDescription: 'Closed',
               startDate: '2022-01-03',
               globalRestriction: false,
             },
             {
+              restrictionId: 4,
               restrictionType: 'NONCON',
               restrictionTypeDescription: 'Non-Contact Visit',
               startDate: '2022-01-04',
@@ -135,11 +139,11 @@ describe('Prisoner visitor service', () => {
         },
       ]
 
-      prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue(contacts)
+      prisonerContactRegistryApiClient.getPrisonersApprovedSocialContacts.mockResolvedValue(contacts)
 
       const results = await prisonerVisitorsService.getVisitors(offenderNo, 'user')
 
-      expect(prisonerContactRegistryApiClient.getPrisonerSocialContacts).toHaveBeenCalledTimes(1)
+      expect(prisonerContactRegistryApiClient.getPrisonersApprovedSocialContacts).toHaveBeenCalledWith(offenderNo)
       expect(results).toEqual([
         {
           personId: 4321,
@@ -150,6 +154,7 @@ describe('Prisoner visitor service', () => {
           address: 'Premises,\nFlat 23B,\n123 The Street,\nSpringfield,\nCoventry,\nWest Midlands,\nC1 2AB,\nEngland',
           restrictions: [
             {
+              restrictionId: 1,
               restrictionType: 'BAN',
               restrictionTypeDescription: 'Banned',
               startDate: '2022-01-01',
@@ -158,18 +163,21 @@ describe('Prisoner visitor service', () => {
               comment: 'Ban details',
             },
             {
+              restrictionId: 2,
               restrictionType: 'RESTRICTED',
               restrictionTypeDescription: 'Restricted',
               startDate: '2022-01-02',
               globalRestriction: false,
             },
             {
+              restrictionId: 3,
               restrictionType: 'CLOSED',
               restrictionTypeDescription: 'Closed',
               startDate: '2022-01-03',
               globalRestriction: false,
             },
             {
+              restrictionId: 4,
               restrictionType: 'NONCON',
               restrictionTypeDescription: 'Non-Contact Visit',
               startDate: '2022-01-04',
@@ -202,10 +210,10 @@ describe('Prisoner visitor service', () => {
     })
 
     it('should handle prisoner having no contacts', async () => {
-      prisonerContactRegistryApiClient.getPrisonerSocialContacts.mockResolvedValue([])
+      prisonerContactRegistryApiClient.getPrisonersApprovedSocialContacts.mockResolvedValue([])
 
       const results = await prisonerVisitorsService.getVisitors(offenderNo, 'user')
-      expect(prisonerContactRegistryApiClient.getPrisonerSocialContacts).toHaveBeenCalledTimes(1)
+      expect(prisonerContactRegistryApiClient.getPrisonersApprovedSocialContacts).toHaveBeenCalledWith(offenderNo)
       expect(results).toEqual([])
     })
   })
