@@ -41,6 +41,7 @@ describe('prisonerContactRegistryApiClient', () => {
           nextOfKin: true,
           restrictions: [
             {
+              restrictionId: 1,
               restrictionType: '123',
               restrictionTypeDescription: '123',
               startDate: '2000-10-31',

@@ -1491,12 +1491,12 @@ export interface components {
       comment?: string
       /**
        * @description Primary Address
-       * @example Y
+       * @example false
        */
       primary: boolean
       /**
        * @description No Fixed Address
-       * @example N
+       * @example false
        */
       noFixedAddress: boolean
       /**
@@ -1738,6 +1738,12 @@ export interface components {
     /** @description A contact for a prisoner */
     RestrictionDto: {
       /**
+       * Format: int32
+       * @description Restriction Id
+       * @example 123
+       */
+      restrictionId: number
+      /**
        * @description Restriction Type Code
        * @example 123
        */
@@ -1923,7 +1929,7 @@ export interface components {
        * @example VISITOR_RESTRICTION
        * @enum {string}
        */
-      attributeName: 'VISITOR_RESTRICTION' | 'VISITOR_ID'
+      attributeName: 'VISITOR_RESTRICTION' | 'VISITOR_RESTRICTION_ID' | 'VISITOR_ID' | 'PAIRED_VISIT'
       /**
        * @description Value of the attribute associated with the notification event
        * @example BAN
@@ -1976,11 +1982,13 @@ export interface components {
     visitRestrictions: ('OPEN' | 'CLOSED' | 'UNKNOWN')[]
     SessionTimeSlotDto: {
       /**
+       * Format: HH:mm
        * @description The start time of the generated visit session(s)
        * @example 10:30
        */
       startTime: string
       /**
+       * Format: HH:mm
        * @description The end time of the generated visit session(s)
        * @example 11:30
        */
@@ -2029,10 +2037,12 @@ export interface components {
       visitRestriction: 'OPEN' | 'CLOSED' | 'UNKNOWN'
     }
     PageVisitDto: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
+      first?: boolean
+      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['VisitDto'][]
@@ -2042,20 +2052,18 @@ export interface components {
       pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
-      first?: boolean
-      last?: boolean
       empty?: boolean
     }
     PageableObject: {
       /** Format: int64 */
       offset?: number
       sort?: components['schemas']['SortObject']
+      unpaged?: boolean
       paged?: boolean
       /** Format: int32 */
       pageNumber?: number
       /** Format: int32 */
       pageSize?: number
-      unpaged?: boolean
     }
     SortObject: {
       empty?: boolean
@@ -2293,7 +2301,7 @@ export interface components {
     }
     DlqMessage: {
       body: {
-        [key: string]: Record<string, never>
+        [key: string]: unknown
       }
       messageId: string
     }
@@ -4487,6 +4495,11 @@ export interface operations {
          * @example user-1
          */
         username?: string
+        /**
+         * @description user type for the session
+         * @example STAFF
+         */
+        userType?: 'STAFF' | 'PUBLIC' | 'SYSTEM' | 'PRISONER'
       }
       header?: never
       path?: never
@@ -4744,6 +4757,11 @@ export interface operations {
          * @example user-1
          */
         username?: string
+        /**
+         * @description user type for the session
+         * @example PUBLIC
+         */
+        userType?: 'STAFF' | 'PUBLIC' | 'SYSTEM' | 'PRISONER'
       }
       header?: never
       path?: never
@@ -5415,6 +5433,10 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
+          /** @example [
+           *       "HEI",
+           *       "MDI"
+           *     ] */
           'application/json': string[]
         }
       }
