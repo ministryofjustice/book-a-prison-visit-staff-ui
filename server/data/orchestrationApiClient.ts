@@ -286,6 +286,7 @@ export default class OrchestrationApiClient {
         prisonerId: offenderNo,
         min: minNumberOfDays.toString(),
         username,
+        userType: 'STAFF',
       }).toString(),
     })
   }
