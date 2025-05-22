@@ -99,6 +99,7 @@ describe('Start a visit update journey', () => {
               contactName: 'Jeanette Smith',
             },
             visitReference: 'ab-cd-ef-gh',
+            publicBooker: false,
           })
         })
     })

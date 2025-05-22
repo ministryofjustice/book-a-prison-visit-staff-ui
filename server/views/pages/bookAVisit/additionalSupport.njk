@@ -1,8 +1,10 @@
 {% extends "layout.njk" %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
-{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+
 
 {% set pageHeaderTitle = "Is additional support needed for any of the visitors?" %}
 
@@ -12,17 +14,38 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
       {% include "partials/errorSummary.njk" %}
+
+      <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+
+      <p>For example, a wheelchair ramp, an induction loop or an interpreter.</p>
+
+      {% if publicBooker %}
+        {{ govukWarningText({
+          text: "The booker can view this comment on GOV.UK. Comments also appear on the operational reports that are printed from NOMIS.",
+          iconFallbackText: "Warning",
+          classes: "govuk-!-width-two-thirds",
+          attributes: { "data-test": "warning-text" }
+        }) }}
+      {% else %}
+        <p data-test="warning-text">Comments appear on the operational reports that are printed from NOMIS.</p>
+      {% endif %}
+      
       <form action="{{ urlPrefix }}/additional-support" method="POST" novalidate>
         <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
         {% set otherSupportHtml %}
-          {{ govukInput({
+          {{ govukCharacterCount({
             id: "additionalSupport",
             name: "additionalSupport",
+            maxlength: 200,
             type: "text",
-            classes: "govuk-!-width-one-third",
+            classes: "govuk-!-width-two-thirds",
             label: {
-              text: "Provide details"
+              text: "Provide details about the request",
+              classes: "govuk-visually-hidden"
+            },
+            hint: {
+              text: "Provide details about the request"
             },
             value: formValues.additionalSupport,
             autocomplete: "off",
@@ -33,16 +56,6 @@
         {{ govukRadios({
           idPrefix: "additionalSupportRequired",
           name: "additionalSupportRequired",
-          fieldset: {
-            legend: {
-              text: pageHeaderTitle,
-              isPageHeading: true,
-              classes: "govuk-fieldset__legend--l"
-            }
-          },
-          hint: {
-            text: "For example, a wheelchair ramp, an induction loop or an interpreter."
-          },
           items: [
             {
               value: "yes",

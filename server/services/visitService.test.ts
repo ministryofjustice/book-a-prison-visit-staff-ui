@@ -294,6 +294,7 @@ describe('Visit service', () => {
       })
     })
   })
+
   describe('getVisitEventsTimeline', () => {
     type GetVisitEventsTimelineParams = Parameters<typeof visitService.getVisitEventsTimeline>[0]
     let params: GetVisitEventsTimelineParams

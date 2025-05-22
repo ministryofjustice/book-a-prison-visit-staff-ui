@@ -25,6 +25,7 @@ export default class AdditionalSupport {
       appReference: visitSessionData.applicationReference,
       formValues,
       urlPrefix: getUrlPrefix(isUpdate),
+      publicBooker: visitSessionData.publicBooker,
     })
   }
 
@@ -57,8 +58,8 @@ export default class AdditionalSupport {
         .notEmpty()
         .withMessage('Enter details of the request')
         .bail()
-        .isLength({ min: 3, max: 512 })
-        .withMessage('Please enter at least 3 and no more than 512 characters'),
+        .isLength({ min: 3, max: 200 })
+        .withMessage('Please enter at least 3 and no more than 200 characters'),
     ]
   }
 }

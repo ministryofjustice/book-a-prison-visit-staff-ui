@@ -2,7 +2,7 @@ import { MoJAlert } from '../../@types/bapv'
 import config from '../../config'
 import { notificationTypeAlerts } from '../../constants/notifications'
 import { visitCancellationAlerts } from '../../constants/visitCancellation'
-import { VisitBookingDetailsDto } from '../../data/orchestrationApiTypes'
+import { EventAudit, VisitBookingDetailsDto } from '../../data/orchestrationApiTypes'
 
 const A_DAY_IN_MS = 24 * 60 * 60 * 1000
 const CANCELLATION_LIMIT_MS = config.visit.cancellationLimitDays * A_DAY_IN_MS
@@ -96,4 +96,9 @@ export const getVisitNotificationsAlerts = (notifications: VisitBookingDetailsDt
   })
 
   return alerts
+}
+
+export const isPublicBooking = (events: EventAudit[]): boolean => {
+  const visitBookedEvent = events.find(event => event.type === 'BOOKED_VISIT')
+  return visitBookedEvent?.userType === 'PUBLIC'
 }
