@@ -25,6 +25,7 @@ export default class AdditionalSupport {
       appReference: visitSessionData.applicationReference,
       formValues,
       urlPrefix: getUrlPrefix(isUpdate),
+      publicBooker: visitSessionData.publicBooker,
     })
   }
 

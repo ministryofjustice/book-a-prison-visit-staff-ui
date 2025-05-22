@@ -4,7 +4,7 @@ import { VisitService } from '../../services'
 import { clearSession } from '../visitorUtils'
 import { VisitSessionData, VisitSlot } from '../../@types/bapv'
 import { convertToTitleCase } from '../../utils/utils'
-import { getPrisonerLocation } from './visitUtils'
+import { getPrisonerLocation, isPublicBooking } from './visitUtils'
 
 export default class UpdateVisitController {
   public constructor(private readonly visitService: VisitService) {}
@@ -27,8 +27,6 @@ export default class UpdateVisitController {
       clearSession(req)
 
       const visitRestriction = visitDetails.visitRestriction === 'UNKNOWN' ? undefined : visitDetails.visitRestriction
-
-      const publicBooker = this.visitService.getPublicBookerStatus(visitDetails.events)
 
       const visitSlot: VisitSlot = {
         id: '',
@@ -71,7 +69,7 @@ export default class UpdateVisitController {
         visitorSupport: visitDetails.visitorSupport ?? { description: '' },
         mainContact,
         visitReference: visitDetails.reference,
-        publicBooker,
+        publicBooker: isPublicBooking(visitDetails.events),
       }
 
       req.session.visitSessionData = Object.assign(req.session.visitSessionData ?? {}, visitSessionData)

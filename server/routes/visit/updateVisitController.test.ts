@@ -32,7 +32,6 @@ beforeEach(() => {
   visitDetails = TestData.visitBookingDetailsDto()
   visitSessionData = {} as VisitSessionData
   visitService.getVisitDetailed.mockResolvedValue(visitDetails)
-  visitService.getPublicBookerStatus.mockReturnValue(false)
 
   app = appWithAllRoutes({
     services: { visitService },

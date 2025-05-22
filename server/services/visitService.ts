@@ -291,11 +291,6 @@ export default class VisitService {
     })
   }
 
-  getPublicBookerStatus(events: EventAudit[]): boolean {
-    const visitBookedEvent = events.find(event => event.type === 'BOOKED_VISIT')
-    return visitBookedEvent?.userType === 'PUBLIC'
-  }
-
   private buildVisitInformation(visit: Visit): VisitInformation {
     const visitTime = `${prisonerTimePretty(visit.startTimestamp)} to ${prisonerTimePretty(visit.endTimestamp)}`
 

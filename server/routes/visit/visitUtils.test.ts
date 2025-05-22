@@ -1,13 +1,14 @@
 import { MoJAlert } from '../../@types/bapv'
 import { notificationTypeAlerts } from '../../constants/notifications'
 import { visitCancellationAlerts } from '../../constants/visitCancellation'
-import { VisitBookingDetailsDto } from '../../data/orchestrationApiTypes'
+import { EventAudit, VisitBookingDetailsDto } from '../../data/orchestrationApiTypes'
 import {
   getPrisonerLocation,
   getAvailableVisitActions,
   AvailableVisitActions,
   getVisitCancelledAlert,
   getVisitNotificationsAlerts,
+  isPublicBooking,
 } from './visitUtils'
 
 beforeEach(() => {
@@ -188,5 +189,40 @@ describe('Visit utils', () => {
         expect(getVisitNotificationsAlerts(notifications)).toStrictEqual(expected)
       },
     )
+  })
+
+  describe('isPublicBooking', () => {
+    const events: EventAudit[] = [
+      {
+        applicationMethodType: 'NOT_KNOWN',
+        createTimestamp: '2022-01-01T09:00:00',
+        type: 'UPDATED_VISIT',
+        userType: 'STAFF',
+      },
+    ]
+
+    it('should return true if visit booked event is from public user type', () => {
+      events[0].type = 'BOOKED_VISIT'
+      events[0].userType = 'PUBLIC'
+
+      const publicBooker = isPublicBooking(events)
+      expect(publicBooker).toStrictEqual(true)
+    })
+
+    it('should return false if visit booked event is from staff user type', () => {
+      events[0].type = 'BOOKED_VISIT'
+      events[0].userType = 'STAFF'
+
+      const publicBooker = isPublicBooking(events)
+      expect(publicBooker).toStrictEqual(false)
+    })
+
+    it('should return false if no visit booked event is present', () => {
+      events[0].type = 'UPDATED_VISIT'
+      events[0].userType = 'PUBLIC'
+
+      const publicBooker = isPublicBooking(events)
+      expect(publicBooker).toStrictEqual(false)
+    })
   })
 })

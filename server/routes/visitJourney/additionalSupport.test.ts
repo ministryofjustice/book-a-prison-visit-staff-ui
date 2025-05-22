@@ -63,6 +63,7 @@ testJourneys.forEach(journey => {
         applicationReference: 'aaa-bbb-ccc',
         // visit reference only known on update journey
         visitReference: journey.isUpdate ? 'ab-cd-ef-gh' : undefined,
+        publicBooker: false,
       }
 
       sessionApp = appWithAllRoutes({
@@ -102,6 +103,22 @@ testJourneys.forEach(journey => {
           expect($('h1').text().trim()).toBe('Is additional support needed for any of the visitors?')
           expect($('[data-test="support-required-yes"]').prop('checked')).toBe(false)
           expect($('[data-test="support-required-no"]').prop('checked')).toBe(true)
+        })
+    })
+
+    it('should render the additional support page, pre-populated with session data (for no requests)', () => {
+      visitSessionData.publicBooker = true
+
+      return request(sessionApp)
+        .get(`${journey.urlPrefix}/additional-support`)
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text().trim()).toBe('Is additional support needed for any of the visitors?')
+          expect($('[data-test="warning-text"]').text()).toContain(
+            'The booker can view this comment on GOV.UK. Comments also appear on the operational reports that are printed from NOMIS.',
+          )
         })
     })
 

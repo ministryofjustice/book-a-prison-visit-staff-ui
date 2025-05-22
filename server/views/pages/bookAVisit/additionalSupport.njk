@@ -21,7 +21,7 @@
 
       {% if publicBooker %}
         {{ govukWarningText({
-          text: "The booker can view this comment on GOV.UK.  Comments also appear on the operational reports that are printed from NOMIS.",
+          text: "The booker can view this comment on GOV.UK. Comments also appear on the operational reports that are printed from NOMIS.",
           iconFallbackText: "Warning",
           classes: "govuk-!-width-two-thirds",
           attributes: { "data-test": "warning-text" }
@@ -41,6 +41,10 @@
             type: "text",
             classes: "govuk-!-width-two-thirds",
             label: {
+              text: "Provide details about the request",
+              classes: "govuk-visually-hidden"
+            },
+            hint: {
               text: "Provide details about the request"
             },
             value: formValues.additionalSupport,

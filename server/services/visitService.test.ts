@@ -4,7 +4,6 @@ import {
   ApplicationDto,
   ApplicationMethodType,
   CancelVisitOrchestrationDto,
-  EventAudit,
   Visit,
   VisitRestriction,
 } from '../data/orchestrationApiTypes'
@@ -296,84 +295,6 @@ describe('Visit service', () => {
     })
   })
 
-  describe('getPublicBookerStatus', () => {
-    let events: EventAudit[]
-
-    it('should return true if visit booked event is from public user type', () => {
-      events = [
-        {
-          applicationMethodType: 'IN_PERSON',
-          createTimestamp: '2022-01-01T09:00:00',
-          type: 'UPDATED_VISIT',
-          userType: 'STAFF',
-        },
-        {
-          applicationMethodType: 'WEBSITE',
-          createTimestamp: '2022-01-01T09:00:00',
-          type: 'BOOKED_VISIT',
-          userType: 'PUBLIC',
-        },
-      ]
-      const publicBooker = visitService.getPublicBookerStatus(events)
-      expect(publicBooker).toStrictEqual(true)
-    })
-
-    it('should return false if visit booked event is from staff user type', () => {
-      events = [
-        {
-          applicationMethodType: 'WEBSITE',
-          createTimestamp: '2022-01-01T09:00:00',
-          type: 'BOOKED_VISIT',
-          userType: 'STAFF',
-        },
-      ]
-
-      const publicBooker = visitService.getPublicBookerStatus(events)
-      expect(publicBooker).toStrictEqual(false)
-    })
-
-    it('should return false if visit booked event is from system user type', () => {
-      events = [
-        {
-          applicationMethodType: 'WEBSITE',
-          createTimestamp: '2022-01-01T09:00:00',
-          type: 'BOOKED_VISIT',
-          userType: 'SYSTEM',
-        },
-      ]
-
-      const publicBooker = visitService.getPublicBookerStatus(events)
-      expect(publicBooker).toStrictEqual(false)
-    })
-
-    it('should return false if visit booked event is from prisoner user type', () => {
-      events = [
-        {
-          applicationMethodType: 'WEBSITE',
-          createTimestamp: '2022-01-01T09:00:00',
-          type: 'BOOKED_VISIT',
-          userType: 'PRISONER',
-        },
-      ]
-
-      const publicBooker = visitService.getPublicBookerStatus(events)
-      expect(publicBooker).toStrictEqual(false)
-    })
-
-    it('should return false if no visit booked event is present', () => {
-      events = [
-        {
-          applicationMethodType: 'WEBSITE',
-          createTimestamp: '2022-01-01T09:00:00',
-          type: 'UPDATED_VISIT',
-          userType: 'STAFF',
-        },
-      ]
-
-      const publicBooker = visitService.getPublicBookerStatus(events)
-      expect(publicBooker).toStrictEqual(false)
-    })
-  })
   describe('getVisitEventsTimeline', () => {
     type GetVisitEventsTimelineParams = Parameters<typeof visitService.getVisitEventsTimeline>[0]
     let params: GetVisitEventsTimelineParams
