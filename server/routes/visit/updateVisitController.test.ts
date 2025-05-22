@@ -32,6 +32,7 @@ beforeEach(() => {
   visitDetails = TestData.visitBookingDetailsDto()
   visitSessionData = {} as VisitSessionData
   visitService.getVisitDetailed.mockResolvedValue(visitDetails)
+  visitService.getPublicBookerStatus.mockReturnValue(false)
 
   app = appWithAllRoutes({
     services: { visitService },
@@ -99,6 +100,7 @@ describe('Start a visit update journey', () => {
               contactName: 'Jeanette Smith',
             },
             visitReference: 'ab-cd-ef-gh',
+            publicBooker: false,
           })
         })
     })

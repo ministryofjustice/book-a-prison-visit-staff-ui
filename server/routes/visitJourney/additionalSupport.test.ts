@@ -84,6 +84,9 @@ testJourneys.forEach(journey => {
           expect($('[data-test="support-required-yes"]').prop('checked')).toBe(false)
           expect($('[data-test="support-required-no"]').prop('checked')).toBe(false)
           expect($('[data-test-app-ref="aaa-bbb-ccc"]').length).toBe(1)
+          expect($('[data-test="warning-text"]').text()).toBe(
+            'Comments appear on the operational reports that are printed from NOMIS.',
+          )
         })
     })
 

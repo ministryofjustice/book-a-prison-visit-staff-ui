@@ -122,6 +122,7 @@ export type VisitSessionData = {
   requestMethod?: ApplicationMethodType
   daysUntilBanExpiry?: number
   overrideBookingWindow?: boolean
+  publicBooker?: boolean
 }
 
 export type MoJAlert = {

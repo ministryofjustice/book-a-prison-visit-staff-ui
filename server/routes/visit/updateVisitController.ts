@@ -28,6 +28,8 @@ export default class UpdateVisitController {
 
       const visitRestriction = visitDetails.visitRestriction === 'UNKNOWN' ? undefined : visitDetails.visitRestriction
 
+      const publicBooker = this.visitService.getPublicBookerStatus(visitDetails.events)
+
       const visitSlot: VisitSlot = {
         id: '',
         sessionTemplateReference: visitDetails.sessionTemplateReference,
@@ -69,6 +71,7 @@ export default class UpdateVisitController {
         visitorSupport: visitDetails.visitorSupport ?? { description: '' },
         mainContact,
         visitReference: visitDetails.reference,
+        publicBooker,
       }
 
       req.session.visitSessionData = Object.assign(req.session.visitSessionData ?? {}, visitSessionData)
