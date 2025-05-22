@@ -6,7 +6,7 @@ import { appWithAllRoutes, user } from '../testutils/appSetup'
 import { VisitBookingDetailsDto } from '../../data/orchestrationApiTypes'
 import TestData from '../testutils/testData'
 import { createMockAuditService, createMockVisitService } from '../../services/testutils/mocks'
-import { MojTimelineItem } from '../../services/visitService'
+import { MojTimelineItem } from './visitEventsTimelineBuilder'
 import { AvailableVisitActions } from './visitUtils'
 import { MoJAlert } from '../../@types/bapv'
 import { notificationTypeAlerts } from '../../constants/notifications'
@@ -19,6 +19,15 @@ const visitService = createMockVisitService()
 let availableVisitActions: AvailableVisitActions
 let visitCancelledAlert: MoJAlert
 let visitNotificationAlerts: MoJAlert[]
+let visitEventsTimeline: MojTimelineItem[]
+
+jest.mock('./visitEventsTimelineBuilder', () => {
+  return {
+    __esModule: true,
+    default: jest.fn(() => visitEventsTimeline),
+  }
+})
+
 jest.mock('./visitUtils', () => {
   const visitUtils = jest.requireActual('./visitUtils')
   return {
@@ -37,7 +46,7 @@ afterEach(() => {
 describe('Visit details page', () => {
   let visitDetails: VisitBookingDetailsDto
 
-  const visitEventsTimeline: MojTimelineItem[] = [
+  visitEventsTimeline = [
     {
       label: { text: 'Booked' },
       text: `Method: Phone booking`,
@@ -58,7 +67,6 @@ describe('Visit details page', () => {
     jest.useFakeTimers({ advanceTimers: true, now: new Date(fakeDate) })
 
     visitService.getVisitDetailed.mockResolvedValue(visitDetails)
-    visitService.getVisitEventsTimeline.mockReturnValue(visitEventsTimeline)
 
     app = appWithAllRoutes({ services: { auditService, visitService } })
   })

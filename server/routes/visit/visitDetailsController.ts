@@ -8,6 +8,7 @@ import {
   getVisitNotificationsAlerts,
 } from './visitUtils'
 import { MoJAlert } from '../../@types/bapv'
+import visitEventsTimelineBuilder from './visitEventsTimelineBuilder'
 
 export default class VisitDetailsController {
   public constructor(
@@ -51,9 +52,8 @@ export default class VisitDetailsController {
         notifications: visitDetails.notifications,
       })
 
-      const eventsTimeline = this.visitService.getVisitEventsTimeline({
+      const eventsTimeline = visitEventsTimelineBuilder({
         events: visitDetails.events,
-        visitStatus: visitDetails.visitStatus,
         visitNotes: visitDetails.visitNotes,
       })
 

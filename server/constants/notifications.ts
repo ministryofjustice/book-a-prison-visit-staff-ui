@@ -1,7 +1,7 @@
 import { MoJAlert } from '../@types/bapv'
 import { NotificationType } from '../data/orchestrationApiTypes'
 
-// used on visits to review listing page
+// used on visits to review listing page and visit details timeline
 export const notificationTypes: Partial<Record<NotificationType, string>> = {
   PRISONER_RELEASED_EVENT: 'Prisoner released',
   PRISON_VISITS_BLOCKED_FOR_DATE: 'Time slot removed',
