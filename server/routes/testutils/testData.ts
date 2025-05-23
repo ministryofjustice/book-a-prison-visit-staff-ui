@@ -205,11 +205,8 @@ export default class TestData {
   // data with notification types processed
   static notificationGroup = ({
     reference = 'ab*cd*ef*gh',
-    type = 'NON_ASSOCIATION_EVENT',
-    affectedVisits = [
-      this.notificationVisitInfo(),
-      this.notificationVisitInfo({ bookedByName: 'User Two', bookedByUserName: 'user2', prisonerNumber: 'A5678DE' }),
-    ],
+    type = 'PRISONER_RELEASED_EVENT',
+    affectedVisits = [this.notificationVisitInfo()],
   }: Partial<NotificationGroup> = {}): NotificationGroup => ({ reference, type, affectedVisits })
 
   // raw data with types as returned from API
