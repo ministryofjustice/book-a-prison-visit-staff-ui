@@ -7,33 +7,36 @@ import {
   CancelVisitOrchestrationDto,
   ChangeApplicationDto,
   CreateApplicationDto,
+  EventAuditType,
+  EventAuditTypeRaw,
+  ExcludeDateDto,
   IgnoreVisitNotificationsDto,
   IsExcludeDateDto,
   NotificationCount,
   NotificationGroup,
+  NotificationGroupRaw,
+  NotificationType,
+  NotificationTypeRaw,
   PageVisitDto,
   PrisonDto,
   PrisonerProfile,
-  ExcludeDateDto,
   SessionCapacity,
   SessionSchedule,
   Visit,
+  VisitBookingDetails,
+  VisitBookingDetailsRaw,
   VisitPreview,
   VisitRestriction,
   VisitSession,
-  EventAuditType,
-  VisitBookingDetailsDto,
 } from './orchestrationApiTypes'
 import { Prison, VisitSessionData } from '../@types/bapv'
 
 export default class OrchestrationApiClient {
   private restClient: RestClient
 
-  private visitType = 'SOCIAL'
+  private enabledRawNotifications = config.features.notificationTypes.enabledRawNotifications
 
-  private enabledNotifications = config.features.notificationTypes.enabledNotifications
-
-  private enabledVisitHistoryEvents: EventAuditType[] = [
+  private enabledRawEvents: EventAuditTypeRaw[] = [
     'RESERVED_VISIT',
     'CHANGING_VISIT',
     'MIGRATED_VISIT',
@@ -41,7 +44,7 @@ export default class OrchestrationApiClient {
     'UPDATED_VISIT',
     'CANCELLED_VISIT',
     'IGNORE_VISIT_NOTIFICATIONS_EVENT',
-    ...this.enabledNotifications,
+    ...this.enabledRawNotifications,
   ]
 
   constructor(token: string) {
@@ -95,17 +98,33 @@ export default class OrchestrationApiClient {
     return this.restClient.get({ path: `/visits/${reference}` })
   }
 
-  async getVisitDetailed(reference: string): Promise<VisitBookingDetailsDto> {
-    const visitDetails = await this.restClient.get<VisitBookingDetailsDto>({
+  async getVisitDetailed(reference: string): Promise<VisitBookingDetails> {
+    const visitDetails = await this.restClient.get<VisitBookingDetailsRaw>({
       path: `/visits/${reference}/detailed`,
     })
 
-    visitDetails.events = visitDetails.events.filter(event => this.enabledVisitHistoryEvents.includes(event.type))
-    visitDetails.notifications = visitDetails.notifications.filter(notification =>
-      this.enabledNotifications.includes(notification.type),
-    )
+    // Remove unsupported event and notification types and standardise types
+    return {
+      ...visitDetails,
 
-    return visitDetails
+      events: visitDetails.events
+        .filter(event => this.enabledRawEvents.includes(event.type))
+        .map(event => {
+          return {
+            ...event,
+            type: this.getStandardisedType<EventAuditType>(event.type),
+          }
+        }),
+
+      notifications: visitDetails.notifications
+        .filter(notification => this.enabledRawNotifications.includes(notification.type))
+        .map(notification => {
+          return {
+            ...notification,
+            type: this.getStandardisedType<NotificationType>(notification.type),
+          }
+        }),
+    }
   }
 
   async getVisitsBySessionTemplate(
@@ -218,16 +237,24 @@ export default class OrchestrationApiClient {
   async getNotificationCount(prisonId: string): Promise<NotificationCount> {
     return this.restClient.get({
       path: `/visits/notification/${prisonId}/count`,
-      query: new URLSearchParams({ types: this.enabledNotifications }).toString(),
+      query: new URLSearchParams({ types: this.enabledRawNotifications }).toString(),
     })
   }
 
   async getNotificationGroups(prisonId: string): Promise<NotificationGroup[]> {
-    const notificationGroups = await this.restClient.get<NotificationGroup[]>({
+    const notificationGroups = await this.restClient.get<NotificationGroupRaw[]>({
       path: `/visits/notification/${prisonId}/groups`,
     })
 
-    return notificationGroups.filter(notification => this.enabledNotifications.includes(notification.type))
+    // Remove unsupported notification types and standardise types
+    return notificationGroups
+      .filter(notification => this.enabledRawNotifications.includes(notification.type))
+      .map(notification => {
+        return {
+          ...notification,
+          type: this.getStandardisedType<NotificationType>(notification.type),
+        }
+      })
   }
 
   // orchestration-prisons-exclude-date-controller
@@ -352,5 +379,16 @@ export default class OrchestrationApiClient {
       : undefined
     const mainContactId = mainContact?.contactId ?? null
     return { visitContact, mainContactId }
+  }
+
+  // Process event or notification types to convert local/global visitor restrictions to single custom value
+  private getStandardisedType<Type extends EventAuditType | NotificationType>(
+    type: Type extends EventAuditType ? EventAuditTypeRaw : NotificationTypeRaw,
+  ): Type {
+    return (
+      type === 'PERSON_RESTRICTION_UPSERTED_EVENT' || type === 'VISITOR_RESTRICTION_UPSERTED_EVENT'
+        ? 'VISITOR_RESTRICTION'
+        : type
+    ) as Type
   }
 }

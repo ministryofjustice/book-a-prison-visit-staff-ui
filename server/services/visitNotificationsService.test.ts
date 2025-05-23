@@ -185,7 +185,17 @@ describe('Visit notifications service', () => {
 
     describe('Visits review list filtering', () => {
       const notificationGroups = [
-        TestData.notificationGroup(),
+        TestData.notificationGroup({
+          type: 'NON_ASSOCIATION_EVENT',
+          affectedVisits: [
+            TestData.notificationVisitInfo(),
+            TestData.notificationVisitInfo({
+              bookedByUserName: 'user2',
+              bookedByName: 'User Two',
+              prisonerNumber: 'A5678DE',
+            }),
+          ],
+        }),
         TestData.notificationGroup({
           type: 'PRISONER_RELEASED_EVENT',
           affectedVisits: [TestData.notificationVisitInfo({ bookedByUserName: 'user2', bookedByName: 'User Two' })],

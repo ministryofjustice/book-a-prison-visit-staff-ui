@@ -18,7 +18,7 @@ context('Visit details page', () => {
   })
 
   it('should display all visit information for a past visit', () => {
-    const visitDetails = TestData.visitBookingDetailsDto({
+    const visitDetails = TestData.visitBookingDetailsRaw({
       visitStatus: 'CANCELLED',
       outcomeStatus: 'VISITOR_CANCELLED',
       visitNotes: [{ type: 'VISIT_OUTCOMES', text: 'Illness' }],
@@ -83,7 +83,7 @@ context('Visit details page', () => {
 
     cy.task(
       'stubGetVisitDetailed',
-      TestData.visitBookingDetailsDto({
+      TestData.visitBookingDetailsRaw({
         startTimestamp: `${futureVisitDate}T12:00:00`,
         endTimestamp: `${futureVisitDate}T14:00:00`,
         notifications: [{ type: 'PRISON_VISITS_BLOCKED_FOR_DATE', createdDateTime: '', additionalData: [] }],
@@ -113,7 +113,7 @@ context('Visit details page', () => {
 
     cy.task(
       'stubGetVisitDetailed',
-      TestData.visitBookingDetailsDto({
+      TestData.visitBookingDetailsRaw({
         startTimestamp: `${futureVisitDate}T12:00:00`,
         endTimestamp: `${futureVisitDate}T14:00:00`,
         notifications: [{ type: 'PRISONER_RECEIVED_EVENT', createdDateTime: '', additionalData: [] }],

@@ -14,7 +14,7 @@ context('Cancel visit journey', () => {
   const today = new Date()
 
   const futureVisitDate = format(add(today, { months: 1 }), shortDateFormat)
-  const visitDetails = TestData.visitBookingDetailsDto({
+  const visitDetails = TestData.visitBookingDetailsRaw({
     startTimestamp: `${futureVisitDate}T12:00:00`,
     endTimestamp: `${futureVisitDate}T14:00:00`,
   })

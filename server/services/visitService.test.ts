@@ -218,7 +218,7 @@ describe('Visit service', () => {
 
     describe('getVisitDetailed', () => {
       it('should return visit details given a visit reference, with alerts and restrictions sorted', async () => {
-        const visitDetails = TestData.visitBookingDetailsDto()
+        const visitDetails = TestData.visitBookingDetails()
         orchestrationApiClient.getVisitDetailed.mockResolvedValue(visitDetails)
 
         const result = await visitService.getVisitDetailed({ username: 'user', reference: 'ab-cd-ef-gh' })

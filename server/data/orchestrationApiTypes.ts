@@ -1,10 +1,19 @@
 import { components } from '../@types/orchestration-api'
 
+// Visitor restrictions can be 2 types (local/global). Raw API values are processed in the data layer
+// and replaced with the VISITOR_RESTRICTION value for use within the application
+type VISITOR_RESTRICTION = 'VISITOR_RESTRICTION'
+
 export type VisitorSupport = components['schemas']['VisitorSupportDto']
 
 export type PageVisitDto = components['schemas']['PageVisitDto']
 export type Visit = components['schemas']['VisitDto']
-export type VisitBookingDetailsDto = components['schemas']['VisitBookingDetailsDto']
+export type VisitBookingDetailsRaw = components['schemas']['VisitBookingDetailsDto']
+// Replace raw event and notifications 'type' ones that have VISITOR_RESTRICTION
+export type VisitBookingDetails = Omit<components['schemas']['VisitBookingDetailsDto'], 'events' | 'notifications'> & {
+  events: EventAudit[]
+  notifications: (Omit<components['schemas']['VisitNotificationDto'], 'type'> & { type: NotificationType })[]
+}
 export type VisitRestriction = Visit['visitRestriction']
 export type VisitPreview = components['schemas']['VisitPreviewDto']
 
@@ -32,12 +41,22 @@ export type OffenderRestriction = components['schemas']['OffenderRestrictionDto'
 export type PrisonerProfile = components['schemas']['PrisonerProfileDto']
 export type VisitSummary = components['schemas']['VisitSummaryDto']
 
-export type EventAudit = components['schemas']['EventAuditOrchestrationDto']
-export type EventAuditType = components['schemas']['EventAuditOrchestrationDto']['type']
+// Raw local/global visitor restrictions mapped to VISITOR_RESTRICTION as described above
+export type EventAuditTypeRaw = components['schemas']['EventAuditOrchestrationDto']['type']
+export type EventAuditType =
+  | Exclude<EventAuditTypeRaw, 'PERSON_RESTRICTION_UPSERTED_EVENT' | 'VISITOR_RESTRICTION_UPSERTED_EVENT'>
+  | VISITOR_RESTRICTION
+export type EventAuditRaw = components['schemas']['EventAuditOrchestrationDto']
+export type EventAudit = Omit<EventAuditRaw, 'type'> & { type: EventAuditType }
 
+// Raw local/global visitor restrictions mapped to VISITOR_RESTRICTION as described above
 export type NotificationCount = components['schemas']['NotificationCountDto']
-export type NotificationType = components['schemas']['OrchestrationNotificationGroupDto']['type']
-export type NotificationGroup = components['schemas']['OrchestrationNotificationGroupDto']
+export type NotificationTypeRaw = components['schemas']['OrchestrationNotificationGroupDto']['type']
+export type NotificationType =
+  | Exclude<NotificationTypeRaw, 'PERSON_RESTRICTION_UPSERTED_EVENT' | 'VISITOR_RESTRICTION_UPSERTED_EVENT'>
+  | VISITOR_RESTRICTION
+export type NotificationGroupRaw = components['schemas']['OrchestrationNotificationGroupDto']
+export type NotificationGroup = Omit<NotificationGroupRaw, 'type'> & { type: NotificationType }
 export type NotificationVisitInfo = components['schemas']['OrchestrationPrisonerVisitsNotificationDto']
 
 export type PrisonDto = components['schemas']['PrisonDto']

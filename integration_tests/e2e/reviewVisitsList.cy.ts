@@ -9,7 +9,7 @@ context('Bookings review listing page', () => {
   const prettyDateFormat = 'd MMMM yyyy'
 
   const notificationGroups = [
-    TestData.notificationGroup({
+    TestData.notificationGroupRaw({
       reference: 'bc*de*fg*hi',
       type: 'PRISONER_RELEASED_EVENT',
       affectedVisits: [
@@ -21,7 +21,7 @@ context('Bookings review listing page', () => {
         }),
       ],
     }),
-    TestData.notificationGroup({
+    TestData.notificationGroupRaw({
       reference: 'de*fg*hi*jk',
       type: 'PRISON_VISITS_BLOCKED_FOR_DATE',
       affectedVisits: [TestData.notificationVisitInfo()],

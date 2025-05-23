@@ -1,7 +1,7 @@
 import { MoJAlert } from '../../@types/bapv'
 import { notificationTypeAlerts } from '../../constants/notifications'
 import { visitCancellationAlerts } from '../../constants/visitCancellation'
-import { EventAudit, VisitBookingDetailsDto } from '../../data/orchestrationApiTypes'
+import { EventAudit, VisitBookingDetails } from '../../data/orchestrationApiTypes'
 import {
   getPrisonerLocation,
   getAvailableVisitActions,
@@ -23,7 +23,7 @@ describe('Visit utils', () => {
         prisonName: 'Hewell (HMP)',
         cellLocation: '1-1-C-028',
         locationDescription: '',
-      } as VisitBookingDetailsDto['prisoner'])
+      } as VisitBookingDetails['prisoner'])
 
       expect(prisonerLocation).toBe('1-1-C-028, Hewell (HMP)')
     })
@@ -34,7 +34,7 @@ describe('Visit utils', () => {
         prisonName: '',
         cellLocation: '',
         locationDescription: '',
-      } as VisitBookingDetailsDto['prisoner'])
+      } as VisitBookingDetails['prisoner'])
 
       expect(prisonerLocation).toBe('Unknown')
     })
@@ -45,7 +45,7 @@ describe('Visit utils', () => {
         prisonName: '',
         cellLocation: '',
         locationDescription: 'Outside - released from Hewell (HMP)',
-      } as VisitBookingDetailsDto['prisoner'])
+      } as VisitBookingDetails['prisoner'])
 
       expect(prisonerLocation).toBe('Outside - released from Hewell (HMP)')
     })
@@ -89,13 +89,13 @@ describe('Visit utils', () => {
 
         it('should set update to false if before start time but prisoner has been released', () => {
           jest.useFakeTimers({ now: new Date('2025-04-01T08:59:59') })
-          params.notifications = [{ type: 'PRISONER_RELEASED_EVENT' }] as VisitBookingDetailsDto['notifications']
+          params.notifications = [{ type: 'PRISONER_RELEASED_EVENT' }] as VisitBookingDetails['notifications']
           expect(getAvailableVisitActions(params).update).toBe(false)
         })
 
         it('should set update to false if before start time but prisoner has been transferred', () => {
           jest.useFakeTimers({ now: new Date('2025-04-01T08:59:59') })
-          params.notifications = [{ type: 'PRISONER_RECEIVED_EVENT' }] as VisitBookingDetailsDto['notifications']
+          params.notifications = [{ type: 'PRISONER_RECEIVED_EVENT' }] as VisitBookingDetails['notifications']
           expect(getAvailableVisitActions(params).update).toBe(false)
         })
       })
@@ -123,7 +123,7 @@ describe('Visit utils', () => {
         })
 
         it('should set clearNotifications to true if a visit notification is set', () => {
-          params.notifications = [{ type: 'NON_ASSOCIATION_EVENT' }] as VisitBookingDetailsDto['notifications']
+          params.notifications = [{ type: 'NON_ASSOCIATION_EVENT' }] as VisitBookingDetails['notifications']
           expect(getAvailableVisitActions(params).clearNotifications).toBe(true)
         })
 
@@ -131,7 +131,7 @@ describe('Visit utils', () => {
           params.notifications = [
             { type: 'NON_ASSOCIATION_EVENT' },
             { type: 'PRISON_VISITS_BLOCKED_FOR_DATE' },
-          ] as VisitBookingDetailsDto['notifications']
+          ] as VisitBookingDetails['notifications']
           expect(getAvailableVisitActions(params).clearNotifications).toBe(false)
         })
       })
@@ -153,7 +153,7 @@ describe('Visit utils', () => {
         ['handle undefined', undefined, visitCancellationAlerts.default],
       ])(
         "should handle %s: '%s' => %s",
-        (_: string, outcomeStatus: VisitBookingDetailsDto['outcomeStatus'], expected: string) => {
+        (_: string, outcomeStatus: VisitBookingDetails['outcomeStatus'], expected: string) => {
           expect(getVisitCancelledAlert({ visitStatus: 'CANCELLED', outcomeStatus })).toStrictEqual<MoJAlert>({
             variant: 'information',
             title: 'Visit cancelled',
@@ -183,12 +183,9 @@ describe('Visit utils', () => {
         [notificationTypeAlerts.PRISONER_RELEASED_EVENT],
       ],
       ['no notifications', [], []],
-    ])(
-      'should handle %s',
-      (_: string, notifications: VisitBookingDetailsDto['notifications'], expected: MoJAlert[]) => {
-        expect(getVisitNotificationsAlerts(notifications)).toStrictEqual(expected)
-      },
-    )
+    ])('should handle %s', (_: string, notifications: VisitBookingDetails['notifications'], expected: MoJAlert[]) => {
+      expect(getVisitNotificationsAlerts(notifications)).toStrictEqual(expected)
+    })
   })
 
   describe('isPublicBooking', () => {
