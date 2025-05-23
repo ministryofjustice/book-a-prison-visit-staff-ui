@@ -1,4 +1,4 @@
-import { NotificationType } from './data/orchestrationApiTypes'
+import { NotificationTypeRaw } from './data/orchestrationApiTypes'
 
 const production = process.env.NODE_ENV === 'production'
 
@@ -130,10 +130,10 @@ export default {
   },
   features: {
     notificationTypes: {
-      enabledNotifications: <NotificationType[]>(
+      enabledRawNotifications: <NotificationTypeRaw[]>(
         get(
-          'FEATURE_ENABLED_NOTIFICATION_TYPES',
-          'PRISONER_RELEASED_EVENT,PRISONER_RECEIVED_EVENT,PRISON_VISITS_BLOCKED_FOR_DATE',
+          'FEATURE_ENABLED_RAW_NOTIFICATION_TYPES',
+          'PRISONER_RECEIVED_EVENT,PRISONER_RELEASED_EVENT,PRISON_VISITS_BLOCKED_FOR_DATE',
         ).split(',')
       ),
     },

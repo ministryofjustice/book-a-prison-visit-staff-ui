@@ -2,12 +2,12 @@ import { MoJAlert } from '../../@types/bapv'
 import config from '../../config'
 import { notificationTypeAlerts } from '../../constants/notifications'
 import { visitCancellationAlerts } from '../../constants/visitCancellation'
-import { EventAudit, VisitBookingDetailsDto } from '../../data/orchestrationApiTypes'
+import { EventAudit, VisitBookingDetails } from '../../data/orchestrationApiTypes'
 
 const A_DAY_IN_MS = 24 * 60 * 60 * 1000
 const CANCELLATION_LIMIT_MS = config.visit.cancellationLimitDays * A_DAY_IN_MS
 
-export const getPrisonerLocation = (prisoner: VisitBookingDetailsDto['prisoner']) => {
+export const getPrisonerLocation = (prisoner: VisitBookingDetails['prisoner']) => {
   if (prisoner.prisonId === 'OUT') {
     return prisoner.locationDescription
   }
@@ -26,9 +26,9 @@ export const getAvailableVisitActions = ({
   startTimestamp,
   notifications,
 }: {
-  visitStatus: VisitBookingDetailsDto['visitStatus']
-  startTimestamp: VisitBookingDetailsDto['startTimestamp']
-  notifications: VisitBookingDetailsDto['notifications']
+  visitStatus: VisitBookingDetails['visitStatus']
+  startTimestamp: VisitBookingDetails['startTimestamp']
+  notifications: VisitBookingDetails['notifications']
 }): { update: boolean; cancel: boolean; clearNotifications: boolean } => {
   const availableVisitActions = { update: false, cancel: false, clearNotifications: false }
 
@@ -71,8 +71,8 @@ export const getVisitCancelledAlert = ({
   visitStatus,
   outcomeStatus,
 }: {
-  visitStatus: VisitBookingDetailsDto['visitStatus']
-  outcomeStatus: VisitBookingDetailsDto['outcomeStatus']
+  visitStatus: VisitBookingDetails['visitStatus']
+  outcomeStatus: VisitBookingDetails['outcomeStatus']
 }): MoJAlert | undefined => {
   if (visitStatus !== 'CANCELLED') {
     return undefined
@@ -86,7 +86,7 @@ export const getVisitCancelledAlert = ({
   }
 }
 
-export const getVisitNotificationsAlerts = (notifications: VisitBookingDetailsDto['notifications']): MoJAlert[] => {
+export const getVisitNotificationsAlerts = (notifications: VisitBookingDetails['notifications']): MoJAlert[] => {
   const alerts = <MoJAlert[]>[]
 
   notifications.forEach(notification => {

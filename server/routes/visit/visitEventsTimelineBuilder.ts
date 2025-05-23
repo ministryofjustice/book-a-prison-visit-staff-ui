@@ -1,7 +1,7 @@
 import eventAuditTypes from '../../constants/eventAudit'
 import { notificationTypes } from '../../constants/notifications'
 import { requestMethodDescriptions } from '../../constants/requestMethods'
-import { EventAudit, VisitBookingDetailsDto } from '../../data/orchestrationApiTypes'
+import { EventAudit, VisitBookingDetails } from '../../data/orchestrationApiTypes'
 
 export type MojTimelineItem = {
   label: { text: string }
@@ -19,7 +19,7 @@ export default ({
   visitNotes,
 }: {
   events: EventAudit[]
-  visitNotes: VisitBookingDetailsDto['visitNotes']
+  visitNotes: VisitBookingDetails['visitNotes']
 }): MojTimelineItem[] => {
   return events
     .filter(event => event.type in eventAuditTypes)
@@ -76,7 +76,7 @@ const isPublicBooking = (event: EventAudit): boolean =>
   event.userType === 'PUBLIC' && event.applicationMethodType === 'WEBSITE'
 
 // Get user-entered cancellation reason, if set
-const getCancellationReason = (visitNotes: VisitBookingDetailsDto['visitNotes']): string | undefined => {
+const getCancellationReason = (visitNotes: VisitBookingDetails['visitNotes']): string | undefined => {
   const reason = visitNotes.find(note => note.type === 'VISIT_OUTCOMES')?.text
   return reason ? `Reason: ${reason}` : undefined
 }

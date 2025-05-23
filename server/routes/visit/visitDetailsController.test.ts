@@ -3,7 +3,7 @@ import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
 import { appWithAllRoutes, user } from '../testutils/appSetup'
-import { VisitBookingDetailsDto } from '../../data/orchestrationApiTypes'
+import { VisitBookingDetails } from '../../data/orchestrationApiTypes'
 import TestData from '../testutils/testData'
 import { createMockAuditService, createMockVisitService } from '../../services/testutils/mocks'
 import { MojTimelineItem } from './visitEventsTimelineBuilder'
@@ -44,7 +44,7 @@ afterEach(() => {
 })
 
 describe('Visit details page', () => {
-  let visitDetails: VisitBookingDetailsDto
+  let visitDetails: VisitBookingDetails
 
   visitEventsTimeline = [
     {
@@ -61,7 +61,7 @@ describe('Visit details page', () => {
     visitCancelledAlert = undefined
     visitNotificationAlerts = []
 
-    visitDetails = TestData.visitBookingDetailsDto()
+    visitDetails = TestData.visitBookingDetails()
 
     const fakeDate = new Date('2022-01-01')
     jest.useFakeTimers({ advanceTimers: true, now: new Date(fakeDate) })

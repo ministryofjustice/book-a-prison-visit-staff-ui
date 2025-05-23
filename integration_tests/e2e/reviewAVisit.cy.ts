@@ -21,7 +21,7 @@ context('Review a visit', () => {
   })
 
   it('should dismiss notifications when a visit is marked as not needing to be updated or cancelled', () => {
-    const visitDetails = TestData.visitBookingDetailsDto({
+    const visitDetails = TestData.visitBookingDetailsRaw({
       startTimestamp: `${futureVisitDate}T12:00:00`,
       endTimestamp: `${futureVisitDate}T14:00:00`,
       events: [
@@ -65,7 +65,7 @@ context('Review a visit', () => {
     clearNotificationsPage.enterReason('some reason')
 
     // Submit and should be returned to booking summary with notification gone and timeline updated
-    const visitDetailsUpdated = TestData.visitBookingDetailsDto({
+    const visitDetailsUpdated = TestData.visitBookingDetailsRaw({
       ...visitDetails,
       notifications: [],
       events: [

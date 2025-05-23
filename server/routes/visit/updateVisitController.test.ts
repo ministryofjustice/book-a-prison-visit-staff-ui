@@ -2,7 +2,7 @@ import type { Express } from 'express'
 import request from 'supertest'
 import { SessionData } from 'express-session'
 import { appWithAllRoutes, user } from '../testutils/appSetup'
-import { VisitBookingDetailsDto } from '../../data/orchestrationApiTypes'
+import { VisitBookingDetails } from '../../data/orchestrationApiTypes'
 import { VisitSessionData } from '../../@types/bapv'
 import { clearSession } from '../visitorUtils'
 import TestData from '../testutils/testData'
@@ -12,7 +12,7 @@ let app: Express
 
 const visitService = createMockVisitService()
 
-let visitDetails: VisitBookingDetailsDto
+let visitDetails: VisitBookingDetails
 let visitSessionData: VisitSessionData
 
 jest.mock('../visitorUtils', () => {
@@ -29,7 +29,7 @@ beforeEach(() => {
   const fakeDate = new Date('2022-01-01')
   jest.useFakeTimers({ advanceTimers: true, now: new Date(fakeDate) })
 
-  visitDetails = TestData.visitBookingDetailsDto()
+  visitDetails = TestData.visitBookingDetails()
   visitSessionData = {} as VisitSessionData
   visitService.getVisitDetailed.mockResolvedValue(visitDetails)
 

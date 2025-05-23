@@ -41,7 +41,7 @@ context('Update a visit', () => {
       }),
     ]
 
-    const originalVisit = TestData.visitBookingDetailsDto({
+    const originalVisit = TestData.visitBookingDetailsRaw({
       startTimestamp: visitSessions[0].startTimestamp,
       endTimestamp: visitSessions[0].endTimestamp,
       visitorSupport: null,
@@ -61,7 +61,7 @@ context('Update a visit', () => {
 
     cy.task(
       'stubGetVisitDetailed',
-      TestData.visitBookingDetailsDto({
+      TestData.visitBookingDetailsRaw({
         startTimestamp: originalVisit.startTimestamp,
         endTimestamp: originalVisit.endTimestamp,
         visitors: [contacts[0]],
@@ -211,7 +211,7 @@ context('Update a visit', () => {
       }),
     ]
 
-    const originalVisit = TestData.visitBookingDetailsDto({
+    const originalVisit = TestData.visitBookingDetailsRaw({
       startTimestamp: visitSessions[0].startTimestamp,
       endTimestamp: visitSessions[0].endTimestamp,
       visitorSupport: null,

@@ -5,7 +5,7 @@ import {
   ApplicationMethodType,
   CancelVisitOrchestrationDto,
   Visit,
-  VisitBookingDetailsDto,
+  VisitBookingDetails,
   VisitPreview,
 } from '../data/orchestrationApiTypes'
 import { HmppsAuthClient, OrchestrationApiClient, RestClientBuilder } from '../data'
@@ -147,7 +147,7 @@ export default class VisitService {
   }: {
     username: string
     reference: string
-  }): Promise<VisitBookingDetailsDto> {
+  }): Promise<VisitBookingDetails> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 

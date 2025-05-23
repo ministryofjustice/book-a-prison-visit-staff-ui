@@ -2,20 +2,23 @@ import CaseLoad from '@ministryofjustice/hmpps-connect-dps-components/dist/types
 import {
   Alert,
   ApplicationDto,
+  ExcludeDateDto,
   NotificationCount,
   NotificationGroup,
+  NotificationGroupRaw,
+  NotificationTypeRaw,
   NotificationVisitInfo,
+  OffenderRestriction,
   PrisonDto,
   PrisonerProfile,
-  ExcludeDateDto,
   SessionCapacity,
   SessionSchedule,
   Visit,
+  VisitBookingDetails,
+  VisitBookingDetailsRaw,
   VisitPreview,
   VisitSession,
   VisitSummary,
-  VisitBookingDetailsDto,
-  OffenderRestriction,
 } from '../../data/orchestrationApiTypes'
 import { CurrentIncentive, Prisoner } from '../../data/prisonerOffenderSearchTypes'
 import { Address, Contact, Restriction } from '../../data/prisonerContactRegistryApiTypes'
@@ -199,6 +202,7 @@ export default class TestData {
 
   static notificationCount = ({ count = 5 }: Partial<NotificationCount> = {}): NotificationCount => ({ count })
 
+  // data with notification types processed
   static notificationGroup = ({
     reference = 'ab*cd*ef*gh',
     type = 'NON_ASSOCIATION_EVENT',
@@ -207,6 +211,13 @@ export default class TestData {
       this.notificationVisitInfo({ bookedByName: 'User Two', bookedByUserName: 'user2', prisonerNumber: 'A5678DE' }),
     ],
   }: Partial<NotificationGroup> = {}): NotificationGroup => ({ reference, type, affectedVisits })
+
+  // raw data with types as returned from API
+  static notificationGroupRaw = ({
+    reference = this.notificationGroup().reference,
+    type = this.notificationGroup().type as NotificationTypeRaw,
+    affectedVisits = this.notificationGroup().affectedVisits,
+  }: Partial<NotificationGroupRaw> = {}): NotificationGroupRaw => ({ reference, type, affectedVisits })
 
   static notificationVisitInfo = ({
     prisonerNumber = 'A1234BC',
@@ -480,7 +491,8 @@ export default class TestData {
       modifiedTimestamp,
     }) as Visit
 
-  static visitBookingDetailsDto = ({
+  // data with event/notification types processed
+  static visitBookingDetails = ({
     reference = 'ab-cd-ef-gh',
     visitRoom = 'Visit room 1',
     visitStatus = 'BOOKED',
@@ -552,7 +564,44 @@ export default class TestData {
       },
     ],
     notifications = [],
-  }: Partial<VisitBookingDetailsDto> = {}): VisitBookingDetailsDto => ({
+  }: Partial<VisitBookingDetails> = {}): VisitBookingDetails => ({
+    reference,
+    visitRoom,
+    visitStatus,
+    outcomeStatus,
+    visitRestriction,
+    startTimestamp,
+    endTimestamp,
+    sessionTemplateReference,
+    visitNotes,
+    visitContact,
+    visitorSupport,
+    prison,
+    prisoner,
+    visitors,
+    events,
+    notifications,
+  })
+
+  // raw data as returned from API
+  static visitBookingDetailsRaw = ({
+    reference = this.visitBookingDetails().reference,
+    visitRoom = this.visitBookingDetails().visitRoom,
+    visitStatus = this.visitBookingDetails().visitStatus,
+    outcomeStatus = this.visitBookingDetails().outcomeStatus,
+    visitRestriction = this.visitBookingDetails().visitRestriction,
+    startTimestamp = this.visitBookingDetails().startTimestamp,
+    endTimestamp = this.visitBookingDetails().endTimestamp,
+    sessionTemplateReference = this.visitBookingDetails().sessionTemplateReference,
+    visitNotes = this.visitBookingDetails().visitNotes,
+    visitContact = this.visitBookingDetails().visitContact,
+    visitorSupport = this.visitBookingDetails().visitorSupport,
+    prison = this.visitBookingDetails().prison,
+    prisoner = this.visitBookingDetails().prisoner,
+    visitors = this.visitBookingDetails().visitors,
+    events = this.visitBookingDetails().events as VisitBookingDetailsRaw['events'],
+    notifications = this.visitBookingDetails().notifications as VisitBookingDetailsRaw['notifications'],
+  }: Partial<VisitBookingDetailsRaw> = {}): VisitBookingDetailsRaw => ({
     reference,
     visitRoom,
     visitStatus,

@@ -8,13 +8,13 @@ import {
   ExcludeDateDto,
   IgnoreVisitNotificationsDto,
   NotificationCount,
-  NotificationGroup,
+  NotificationGroupRaw,
   PrisonDto,
   PrisonerProfile,
   SessionCapacity,
   SessionSchedule,
   Visit,
-  VisitBookingDetailsDto,
+  VisitBookingDetailsRaw,
   VisitPreview,
   VisitSession,
 } from '../../server/data/orchestrationApiTypes'
@@ -246,7 +246,7 @@ export default {
       },
     })
   },
-  stubGetVisitDetailed: (visitDetails: VisitBookingDetailsDto): SuperAgentRequest => {
+  stubGetVisitDetailed: (visitDetails: VisitBookingDetailsRaw): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',
@@ -396,10 +396,10 @@ export default {
   },
   stubGetNotificationGroups: ({
     prisonId = 'HEI',
-    notificationGroups = [TestData.notificationGroup()],
+    notificationGroups = [TestData.notificationGroupRaw()],
   }: {
     prisonId: string
-    notificationGroups: NotificationGroup[]
+    notificationGroups: NotificationGroupRaw[]
   }): SuperAgentRequest => {
     return stubFor({
       request: {
