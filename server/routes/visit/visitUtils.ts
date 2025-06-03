@@ -87,13 +87,47 @@ export const getVisitCancelledAlert = ({
 }
 
 export const getVisitNotificationsAlerts = (notifications: VisitBookingDetails['notifications']): MoJAlert[] => {
-  const alerts = <MoJAlert[]>[]
-
+  // split notifications into those that should be a single alert and those to be grouped into one alert
+  const singleNotifications: VisitBookingDetails['notifications'] = []
+  const groupedNotifications: VisitBookingDetails['notifications'] = []
   notifications.forEach(notification => {
+    if (notification.type === 'VISITOR_RESTRICTION') {
+      groupedNotifications.push(notification)
+    } else {
+      singleNotifications.push(notification)
+    }
+  })
+
+  if (!singleNotifications.length && !groupedNotifications.length) {
+    return []
+  }
+
+  const alerts = []
+
+  singleNotifications.forEach(notification => {
     if (notificationTypeAlerts[notification.type]) {
       alerts.push(notificationTypeAlerts[notification.type])
     }
   })
+
+  if (groupedNotifications.length) {
+    const visitorRestrictionIds = groupedNotifications.map(
+      notification =>
+        notification.additionalData.find(item => item.attributeName === 'VISITOR_RESTRICTION_ID')?.attributeValue ?? '',
+    )
+
+    alerts.push({
+      variant: 'warning',
+      title: 'This visit needs review',
+      showTitleAsHeading: true,
+      html: `<ul class="govuk-list">${visitorRestrictionIds
+        .map(
+          id =>
+            `<li><a class="govuk-body govuk-!-font-weight-bold" href="#visitor-restriction-${id}">A restriction has been added or updated</a></li>`,
+        )
+        .join('')}</ul>`,
+    } as MoJAlert)
+  }
 
   return alerts
 }
