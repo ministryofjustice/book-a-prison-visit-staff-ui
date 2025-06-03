@@ -121,11 +121,9 @@ export const getVisitNotificationsAlerts = (notifications: VisitBookingDetails['
       title: 'This visit needs review',
       showTitleAsHeading: true,
       html: `<ul class="govuk-list">${visitorRestrictionIds
-        .map(
-          id =>
-            `<li><a class="govuk-body govuk-!-font-weight-bold" href="#visitor-restriction-${id}">A restriction has been added or updated</a></li>`,
-        )
+        .map(id => `<li><a href="#visitor-restriction-${id}">A restriction has been added or updated</a></li>`)
         .join('')}</ul>`,
+      classes: 'notifications-summary-alert',
     } as MoJAlert)
   }
 

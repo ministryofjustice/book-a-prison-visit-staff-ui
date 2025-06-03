@@ -284,6 +284,12 @@
   }
 }
 
+.bapv-visit-details {
+  & .notifications-summary-alert a {
+    font-weight: $govuk-font-weight-bold;
+  }
+}
+
 .bapv-visit-details__summary {
   & dl {
     grid-template-columns: max-content auto;

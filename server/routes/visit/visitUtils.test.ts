@@ -206,8 +206,9 @@ describe('Visit utils', () => {
               showTitleAsHeading: true,
               html:
                 '<ul class="govuk-list">' +
-                '<li><a class="govuk-body govuk-!-font-weight-bold" href="#visitor-restriction-1">A restriction has been added or updated</a></li>' +
+                '<li><a href="#visitor-restriction-1">A restriction has been added or updated</a></li>' +
                 '</ul>',
+              classes: 'notifications-summary-alert',
             },
           ] as MoJAlert[],
         ],
@@ -231,9 +232,10 @@ describe('Visit utils', () => {
               showTitleAsHeading: true,
               html:
                 '<ul class="govuk-list">' +
-                '<li><a class="govuk-body govuk-!-font-weight-bold" href="#visitor-restriction-1">A restriction has been added or updated</a></li>' +
-                '<li><a class="govuk-body govuk-!-font-weight-bold" href="#visitor-restriction-2">A restriction has been added or updated</a></li>' +
+                '<li><a href="#visitor-restriction-1">A restriction has been added or updated</a></li>' +
+                '<li><a href="#visitor-restriction-2">A restriction has been added or updated</a></li>' +
                 '</ul>',
+              classes: 'notifications-summary-alert',
             },
           ],
         ],
@@ -266,9 +268,10 @@ describe('Visit utils', () => {
             showTitleAsHeading: true,
             html:
               '<ul class="govuk-list">' +
-              '<li><a class="govuk-body govuk-!-font-weight-bold" href="#visitor-restriction-1">A restriction has been added or updated</a></li>' +
-              '<li><a class="govuk-body govuk-!-font-weight-bold" href="#visitor-restriction-2">A restriction has been added or updated</a></li>' +
+              '<li><a href="#visitor-restriction-1">A restriction has been added or updated</a></li>' +
+              '<li><a href="#visitor-restriction-2">A restriction has been added or updated</a></li>' +
               '</ul>',
+            classes: 'notifications-summary-alert',
           } as MoJAlert,
         ])
       })
