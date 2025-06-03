@@ -111,23 +111,37 @@ export const getVisitNotificationsAlerts = (notifications: VisitBookingDetails['
   })
 
   if (groupedNotifications.length) {
-    const visitorRestrictionIds = groupedNotifications.map(
-      notification =>
-        notification.additionalData.find(item => item.attributeName === 'VISITOR_RESTRICTION_ID')?.attributeValue ?? '',
-    )
+    const visitorRestrictionIds = getVisitorRestrictionIdsFromNotifications(groupedNotifications)
+
+    const restrictionListItems = visitorRestrictionIds
+      .map(id => `<li><a href="#visitor-restriction-${id}">A restriction has been added or updated</a></li>`)
+      .join('')
 
     alerts.push({
       variant: 'warning',
       title: 'This visit needs review',
       showTitleAsHeading: true,
-      html: `<ul class="govuk-list">${visitorRestrictionIds
-        .map(id => `<li><a href="#visitor-restriction-${id}">A restriction has been added or updated</a></li>`)
-        .join('')}</ul>`,
+      html: `<ul class="govuk-list">${restrictionListItems}</ul>`,
       classes: 'notifications-summary-alert',
     } as MoJAlert)
   }
 
   return alerts
+}
+
+export const getVisitorRestrictionIdsFromNotifications = (
+  notifications: VisitBookingDetails['notifications'],
+): number[] => {
+  const restrictionIds = new Set<number>() // only want unique IDs
+  notifications
+    .filter(notification => notification.type === 'VISITOR_RESTRICTION')
+    .forEach(notification => {
+      const id = notification.additionalData.find(
+        data => data.attributeName === 'VISITOR_RESTRICTION_ID',
+      ).attributeValue
+      restrictionIds.add(parseInt(id, 10))
+    })
+  return Array.from(restrictionIds)
 }
 
 export const isPublicBooking = (events: EventAudit[]): boolean => {

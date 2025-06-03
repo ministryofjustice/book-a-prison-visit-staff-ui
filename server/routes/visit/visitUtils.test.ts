@@ -9,6 +9,7 @@ import {
   getVisitCancelledAlert,
   getVisitNotificationsAlerts,
   isPublicBooking,
+  getVisitorRestrictionIdsFromNotifications,
 } from './visitUtils'
 
 beforeEach(() => {
@@ -220,6 +221,11 @@ describe('Visit utils', () => {
               type: 'VISITOR_RESTRICTION',
               additionalData: [{ attributeName: 'VISITOR_RESTRICTION_ID', attributeValue: '1' }],
             },
+            // a duplicate VISITOR_RESTRICTION_ID - should be ignored
+            {
+              type: 'VISITOR_RESTRICTION',
+              additionalData: [{ attributeName: 'VISITOR_RESTRICTION_ID', attributeValue: '1' }],
+            },
             {
               type: 'VISITOR_RESTRICTION',
               additionalData: [{ attributeName: 'VISITOR_RESTRICTION_ID', attributeValue: '2' }],
@@ -275,6 +281,30 @@ describe('Visit utils', () => {
           } as MoJAlert,
         ])
       })
+    })
+  })
+
+  describe('getVisitorRestrictionIdsFromNotifications', () => {
+    it('should extract unique visitor restriction IDs if present from list of visit notifications', () => {
+      const notifications = <VisitBookingDetails['notifications']>[
+        // should be ignored as not a VISITOR_RESTRICTION
+        { type: 'PRISONER_RELEASED_EVENT' },
+        {
+          type: 'VISITOR_RESTRICTION',
+          additionalData: [{ attributeName: 'VISITOR_RESTRICTION_ID', attributeValue: '1' }],
+        },
+        // a duplicate VISITOR_RESTRICTION_ID - should be ignored
+        {
+          type: 'VISITOR_RESTRICTION',
+          additionalData: [{ attributeName: 'VISITOR_RESTRICTION_ID', attributeValue: '1' }],
+        },
+        {
+          type: 'VISITOR_RESTRICTION',
+          additionalData: [{ attributeName: 'VISITOR_RESTRICTION_ID', attributeValue: '2' }],
+        },
+      ]
+
+      expect(getVisitorRestrictionIdsFromNotifications(notifications)).toStrictEqual([1, 2])
     })
   })
 
