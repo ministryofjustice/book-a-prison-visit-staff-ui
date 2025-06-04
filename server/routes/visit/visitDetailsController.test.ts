@@ -7,7 +7,7 @@ import { VisitBookingDetails } from '../../data/orchestrationApiTypes'
 import TestData from '../testutils/testData'
 import { createMockAuditService, createMockVisitService } from '../../services/testutils/mocks'
 import { MojTimelineItem } from './visitEventsTimelineBuilder'
-import { AvailableVisitActions, getVisitorRestrictionIdsToFlag } from './visitUtils'
+import { AvailableVisitActions } from './visitUtils'
 import { MoJAlert } from '../../@types/bapv'
 import { notificationTypeAlerts } from '../../constants/notifications'
 
