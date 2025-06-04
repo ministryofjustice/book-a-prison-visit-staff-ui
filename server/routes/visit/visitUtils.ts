@@ -134,10 +134,8 @@ export const getVisitorRestrictionIdsToFlag = (notifications: VisitBookingDetail
   notifications
     .filter(notification => notification.type === 'VISITOR_RESTRICTION')
     .forEach(notification => {
-      const id = notification.additionalData.find(
-        data => data.attributeName === 'VISITOR_RESTRICTION_ID',
-      ).attributeValue
-      restrictionIds.add(parseInt(id, 10))
+      const restrictionData = notification.additionalData.find(data => data.attributeName === 'VISITOR_RESTRICTION_ID')
+      restrictionIds.add(parseInt(restrictionData?.attributeValue, 10))
     })
   return Array.from(restrictionIds)
 }
