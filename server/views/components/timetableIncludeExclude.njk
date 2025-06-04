@@ -52,7 +52,27 @@
     {% elif areIncentiveGroupsInclusive === false and areLocationGroupsInclusive === false %} {# If exclude, exclude #}
       All prisoners except prisoners on [incentive] and prisoners in [location]
     {% endif %}
+
+  {% elif prisonerCategoryGroupNames | length %} {# if category is present #}
+    {% if areCategoryGroupsInclusive %} {# if include #}
+      [category] prisoners
+    {% elif areCategoryGroupsInclusive === false %} {# if exclude #}
+      All prisoners except [category] prisoners
+    {% endif %}
     
+  {% elif prisonerIncentiveLevelGroupNames | length %} {# if incentive is present #}
+    {% if areIncentiveGroupsInclusive %} {# if include #}
+      Prisoners on [incentive]
+    {% elif areIncentiveGroupsInclusive === false %} {# if exclude #}
+      All prisoners except prisoners on [incentive]
+
+  {% elif prisonerLocationGroupNames | length %} {# if location is present #}
+    {% if areLocationGroupsInclusive %} {# if include #}
+      Prisoners in [location]
+    {% elif areLocationGroupsInclusive === false %} {# if exclude #}
+      All prisoners except prisoners in [location]
+    {% endif %}
+
   {% endif %}
 {% endmacro %}
 

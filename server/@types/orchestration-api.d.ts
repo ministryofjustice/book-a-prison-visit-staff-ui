@@ -2041,29 +2041,29 @@ export interface components {
       totalElements?: number
       /** Format: int32 */
       totalPages?: number
-      first?: boolean
-      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['VisitDto'][]
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject']
-      pageable?: components['schemas']['PageableObject']
+      first?: boolean
+      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     PageableObject: {
       /** Format: int64 */
       offset?: number
       sort?: components['schemas']['SortObject']
-      unpaged?: boolean
+      /** Format: int32 */
+      pageSize?: number
       paged?: boolean
       /** Format: int32 */
       pageNumber?: number
-      /** Format: int32 */
-      pageSize?: number
+      unpaged?: boolean
     }
     SortObject: {
       empty?: boolean
@@ -2246,11 +2246,15 @@ export interface components {
        * @example Wing C
        */
       prisonerLocationGroupNames: string[]
+      /** @description Determines behaviour of category groups. True will mean the category groups are inclusive, false means they are exclusive. */
+      areCategoryGroupsInclusive: boolean
       /**
        * @description prisoner category groups
        * @example Category A Prisoners
        */
       prisonerCategoryGroupNames: string[]
+      /** @description Determines behaviour of incentive groups. True will mean the incentive groups are inclusive, false means they are exclusive. */
+      areIncentiveGroupsInclusive: boolean
       /**
        * @description prisoner incentive level groups
        * @example Enhanced Incentive Level Prisoners
