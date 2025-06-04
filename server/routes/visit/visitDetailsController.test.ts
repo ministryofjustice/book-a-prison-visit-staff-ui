@@ -7,7 +7,7 @@ import { VisitBookingDetails } from '../../data/orchestrationApiTypes'
 import TestData from '../testutils/testData'
 import { createMockAuditService, createMockVisitService } from '../../services/testutils/mocks'
 import { MojTimelineItem } from './visitEventsTimelineBuilder'
-import { AvailableVisitActions } from './visitUtils'
+import { AvailableVisitActions, getVisitorRestrictionIdsToFlag } from './visitUtils'
 import { MoJAlert } from '../../@types/bapv'
 import { notificationTypeAlerts } from '../../constants/notifications'
 
@@ -20,6 +20,7 @@ let availableVisitActions: AvailableVisitActions
 let visitCancelledAlert: MoJAlert
 let visitNotificationAlerts: MoJAlert[]
 let visitEventsTimeline: MojTimelineItem[]
+let visitorRestrictionIdsToFlag: number[]
 
 jest.mock('./visitEventsTimelineBuilder', () => {
   return {
@@ -35,6 +36,7 @@ jest.mock('./visitUtils', () => {
     getAvailableVisitActions: () => availableVisitActions,
     getVisitCancelledAlert: () => visitCancelledAlert,
     getVisitNotificationsAlerts: () => visitNotificationAlerts,
+    getVisitorRestrictionIdsToFlag: () => visitorRestrictionIdsToFlag,
   }
 })
 
@@ -60,6 +62,7 @@ describe('Visit details page', () => {
     availableVisitActions = { update: false, cancel: false, clearNotifications: false }
     visitCancelledAlert = undefined
     visitNotificationAlerts = []
+    visitorRestrictionIdsToFlag = []
 
     visitDetails = TestData.visitBookingDetails()
 
@@ -346,6 +349,32 @@ describe('Visit details page', () => {
 
             expect($('[data-test=clear-notifications]').text().trim()).toBe('Do not change')
             expect($('[data-test=clear-notifications]').attr('href')).toBe('/visit/ab-cd-ef-gh/clear-notifications')
+          })
+      })
+    })
+
+    describe('Flag visitor restriction changes', () => {
+      it('should flag a visitor restriction', () => {
+        visitDetails.visitors[0].restrictions = [
+          TestData.restriction({ restrictionId: 1 }),
+          TestData.restriction({ restrictionId: 2 }),
+        ]
+
+        visitorRestrictionIdsToFlag = [2]
+
+        return request(app)
+          .get('/visit/ab-cd-ef-gh')
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('[data-test=visitor-1-restriction-1]').length).toBe(1)
+            expect($('[data-test=visitor-1-restriction-2]').length).toBe(1)
+
+            expect($('.bapv-visit-details__restriction--flagged').length).toBe(1)
+            expect($('.bapv-visit-details__restriction--flagged').text()).toBe(
+              'This restriction has been added or updated',
+            )
           })
       })
     })

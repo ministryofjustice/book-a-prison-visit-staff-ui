@@ -111,7 +111,7 @@ export const getVisitNotificationsAlerts = (notifications: VisitBookingDetails['
   })
 
   if (groupedNotifications.length) {
-    const visitorRestrictionIds = getVisitorRestrictionIdsFromNotifications(groupedNotifications)
+    const visitorRestrictionIds = getVisitorRestrictionIdsToFlag(groupedNotifications)
 
     const restrictionListItems = visitorRestrictionIds
       .map(id => `<li><a href="#visitor-restriction-${id}">A restriction has been added or updated</a></li>`)
@@ -129,9 +129,7 @@ export const getVisitNotificationsAlerts = (notifications: VisitBookingDetails['
   return alerts
 }
 
-export const getVisitorRestrictionIdsFromNotifications = (
-  notifications: VisitBookingDetails['notifications'],
-): number[] => {
+export const getVisitorRestrictionIdsToFlag = (notifications: VisitBookingDetails['notifications']): number[] => {
   const restrictionIds = new Set<number>() // only want unique IDs
   notifications
     .filter(notification => notification.type === 'VISITOR_RESTRICTION')

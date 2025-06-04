@@ -9,7 +9,7 @@ import {
   getVisitCancelledAlert,
   getVisitNotificationsAlerts,
   isPublicBooking,
-  getVisitorRestrictionIdsFromNotifications,
+  getVisitorRestrictionIdsToFlag,
 } from './visitUtils'
 
 beforeEach(() => {
@@ -284,7 +284,7 @@ describe('Visit utils', () => {
     })
   })
 
-  describe('getVisitorRestrictionIdsFromNotifications', () => {
+  describe('getVisitorRestrictionIdsToFlag', () => {
     it('should extract unique visitor restriction IDs if present from list of visit notifications', () => {
       const notifications = <VisitBookingDetails['notifications']>[
         // should be ignored as not a VISITOR_RESTRICTION
@@ -304,7 +304,7 @@ describe('Visit utils', () => {
         },
       ]
 
-      expect(getVisitorRestrictionIdsFromNotifications(notifications)).toStrictEqual([1, 2])
+      expect(getVisitorRestrictionIdsToFlag(notifications)).toStrictEqual([1, 2])
     })
   })
 
