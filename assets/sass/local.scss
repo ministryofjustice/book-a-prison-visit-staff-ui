@@ -307,7 +307,28 @@
 .bapv-visit-details__alerts, .bapv-visit-details__restrictions {
   display: grid;
   grid-template-columns: 17% auto 17%;
-  gap: govuk-spacing(1) govuk-spacing(4);
+  gap: govuk-spacing(4) govuk-spacing(4);
+
+  & p {
+    margin-bottom: 0;
+  }
+}
+
+.bapv-visit-details__person-details + .bapv-visit-details__restrictions {
+  margin-top: govuk-spacing(6);
+}
+
+p.bapv-visit-details__restriction--flagged {
+    &, & + p {
+      border-left: $govuk-border-width solid $moj-warning-colour;
+      padding-left: govuk-spacing(3);
+    }
+
+    color: $moj-warning-colour;
+    font-weight: $govuk-font-weight-bold;
+    grid-column-start: span 3;
+    margin-bottom: govuk-spacing(-4);
+    padding-bottom: govuk-spacing(3);
 }
 
 .bapv-visit-details__alert-dates, .bapv-visit-details__restriction-dates {
