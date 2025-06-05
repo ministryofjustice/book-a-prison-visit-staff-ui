@@ -6,6 +6,7 @@ import {
   getPrisonerLocation,
   getVisitCancelledAlert,
   getVisitNotificationsAlerts,
+  getVisitorRestrictionIdsToFlag,
 } from './visitUtils'
 import { MoJAlert } from '../../@types/bapv'
 import visitEventsTimelineBuilder from './visitEventsTimelineBuilder'
@@ -52,6 +53,8 @@ export default class VisitDetailsController {
         notifications: visitDetails.notifications,
       })
 
+      const flaggedVisitorRestrictionIds = getVisitorRestrictionIdsToFlag(visitDetails.notifications)
+
       const eventsTimeline = visitEventsTimelineBuilder({
         events: visitDetails.events,
         visitNotes: visitDetails.visitNotes,
@@ -72,6 +75,7 @@ export default class VisitDetailsController {
         prisonerDpsAlertsUrl,
         prisonerLocation,
         visitDetails,
+        flaggedVisitorRestrictionIds,
       })
     }
   }

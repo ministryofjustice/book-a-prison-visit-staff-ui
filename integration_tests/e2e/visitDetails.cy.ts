@@ -136,4 +136,66 @@ context('Visit details page', () => {
     // Visit Details
     visitDetailsPage.visitDate().contains(format(new Date(futureVisitDate), dateFormatWithDay))
   })
+
+  it('should show alert and flag restrictions when visitor restrictions changed', () => {
+    const today = new Date()
+    const futureVisitDate = format(add(today, { months: 1 }), shortDateFormat)
+
+    const visitDetails = TestData.visitBookingDetailsRaw({
+      startTimestamp: `${futureVisitDate}T12:00:00`,
+      endTimestamp: `${futureVisitDate}T14:00:00`,
+      visitors: [
+        TestData.contact({
+          restrictions: [
+            TestData.restriction({ restrictionId: 1, comment: 'Restriction 1' }),
+            TestData.restriction({ restrictionId: 2, comment: 'Restriction 2' }),
+            TestData.restriction({ restrictionId: 3, comment: 'Restriction 3' }),
+          ],
+        }),
+      ],
+      notifications: [
+        {
+          type: 'PERSON_RESTRICTION_UPSERTED_EVENT',
+          createdDateTime: '',
+          additionalData: [{ attributeName: 'VISITOR_RESTRICTION_ID', attributeValue: '1' }],
+        },
+        {
+          type: 'VISITOR_RESTRICTION_UPSERTED_EVENT',
+          createdDateTime: '',
+          additionalData: [{ attributeName: 'VISITOR_RESTRICTION_ID', attributeValue: '3' }],
+        },
+      ],
+    })
+
+    cy.task('stubGetVisitDetailed', visitDetails)
+
+    cy.visit('/visit/ab-cd-ef-gh')
+    const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage)
+
+    // Messages - alert component
+    visitDetailsPage
+      .visitMessages()
+      .eq(0)
+      .within(() => {
+        cy.contains('This visit needs review')
+        cy.get('a')
+          .eq(0)
+          .should('have.attr', 'href', '#visitor-restriction-1')
+          .contains('A restriction has been added or updated')
+        cy.get('a')
+          .eq(1)
+          .should('have.attr', 'href', '#visitor-restriction-3')
+          .contains('A restriction has been added or updated')
+      })
+
+    // Visitor restrictions
+    cy.get('#visitor-restriction-1').contains('This restriction has been added or updated')
+    visitDetailsPage.visitorRestriction(1, 1).parent().next().contains('Restriction 1')
+
+    cy.get('#visitor-restriction-2').should('not.exist')
+    visitDetailsPage.visitorRestriction(1, 2).parent().next().contains('Restriction 2')
+
+    cy.get('#visitor-restriction-3').contains('This restriction has been added or updated')
+    visitDetailsPage.visitorRestriction(1, 3).parent().next().contains('Restriction 3')
+  })
 })

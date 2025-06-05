@@ -23,6 +23,8 @@ generic-service:
     DPS_PRISONER_URL: "https://prisoner-preprod.digital.prison.service.justice.gov.uk/"
     REDIS_KEY: "bapv-staff-preprod"
 
+    FEATURE_ENABLED_RAW_NOTIFICATION_TYPES: "PRISONER_RECEIVED_EVENT,PRISONER_RELEASED_EVENT,PERSON_RESTRICTION_UPSERTED_EVENT,PRISON_VISITS_BLOCKED_FOR_DATE,VISITOR_RESTRICTION_UPSERTED_EVENT"
+
 generic-prometheus-alerts:
   alertSeverity: visits-alerts-nonprod
   businessHoursOnly: true
