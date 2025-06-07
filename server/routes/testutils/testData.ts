@@ -16,6 +16,10 @@ import {
   Visit,
   VisitBookingDetails,
   VisitBookingDetailsRaw,
+  VisitNotificationEvent,
+  VisitNotificationEventRaw,
+  VisitNotifications,
+  VisitNotificationsRaw,
   VisitPreview,
   VisitSession,
   VisitSummary,
@@ -618,6 +622,66 @@ export default class TestData {
     prisoner,
     visitors,
     events,
+    notifications,
+  })
+
+  static visitNotificationEvent = ({
+    type = 'VISITOR_RESTRICTION',
+    notificationEventReference = 'qr*ub*ze*sb',
+    createdDateTime = '2025-06-02T17:30:00',
+    additionalData = [
+      { attributeName: 'VISITOR_ID', attributeValue: '4321' },
+      { attributeName: 'VISITOR_RESTRICTION', attributeValue: 'PREINF' },
+      { attributeName: 'VISITOR_RESTRICTION_ID', attributeValue: '1' },
+    ],
+  }: Partial<VisitNotificationEvent> = {}): VisitNotificationEvent => ({
+    type,
+    notificationEventReference,
+    createdDateTime,
+    additionalData,
+  })
+
+  static visitNotificationEventRaw = ({
+    type = 'VISITOR_RESTRICTION_UPSERTED_EVENT',
+    notificationEventReference = this.visitNotificationEvent().notificationEventReference,
+    createdDateTime = this.visitNotificationEvent().createdDateTime,
+    additionalData = this.visitNotificationEvent().additionalData,
+  }: Partial<VisitNotificationEventRaw> = {}): VisitNotificationEventRaw => ({
+    type,
+    notificationEventReference,
+    createdDateTime,
+    additionalData,
+  })
+
+  static visitNotifications = ({
+    visitReference = 'ab-cd-ef-gh',
+    prisonerNumber = 'A1234BC',
+    bookedByUserName = 'user1',
+    bookedByName = 'User One',
+    visitDate = '2025-07-01',
+    notifications = [this.visitNotificationEvent()],
+  }: Partial<VisitNotifications> = {}): VisitNotifications => ({
+    visitReference,
+    prisonerNumber,
+    bookedByUserName,
+    bookedByName,
+    visitDate,
+    notifications,
+  })
+
+  static visitNotificationsRaw = ({
+    visitReference = this.visitNotifications().visitReference,
+    prisonerNumber = this.visitNotifications().prisonerNumber,
+    bookedByUserName = this.visitNotifications().bookedByUserName,
+    bookedByName = this.visitNotifications().bookedByName,
+    visitDate = this.visitNotifications().visitDate,
+    notifications = [this.visitNotificationEventRaw()],
+  }: Partial<VisitNotificationsRaw> = {}): VisitNotificationsRaw => ({
+    visitReference,
+    prisonerNumber,
+    bookedByUserName,
+    bookedByName,
+    visitDate,
     notifications,
   })
 
