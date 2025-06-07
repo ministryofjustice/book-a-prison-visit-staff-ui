@@ -487,7 +487,7 @@ describe('orchestrationApiClient', () => {
   })
 
   describe('getVisitNotifications', () => {
-    it('should return standardised future visit notifications for given prison and enabled types', async () => {
+    it('should return future visits with standardised notifications for given prison and enabled types', async () => {
       const { enabledRawNotifications } = config.features.notificationTypes
 
       const visitNotificationsRaw = [

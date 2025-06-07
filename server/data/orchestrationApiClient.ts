@@ -263,6 +263,7 @@ export default class OrchestrationApiClient {
     })
   }
 
+  // TODO remove: endpoint deprecated
   async getNotificationGroups(prisonId: string): Promise<NotificationGroup[]> {
     const notificationGroups = await this.restClient.get<NotificationGroupRaw[]>({
       path: `/visits/notification/${prisonId}/groups`,

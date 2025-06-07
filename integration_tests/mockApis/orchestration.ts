@@ -15,6 +15,7 @@ import {
   SessionSchedule,
   Visit,
   VisitBookingDetailsRaw,
+  VisitNotificationsRaw,
   VisitPreview,
   VisitSession,
 } from '../../server/data/orchestrationApiTypes'
@@ -394,6 +395,28 @@ export default {
       },
     })
   },
+
+  stubGetVisitNotifications: ({
+    prisonId = 'HEI',
+    visitNotifications = [TestData.visitNotificationsRaw()],
+  }: {
+    prisonId: string
+    visitNotifications: VisitNotificationsRaw[]
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: `/orchestration/visits/notification/${prisonId}/visits\\?types=.*`,
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: visitNotifications,
+      },
+    })
+  },
+
+  // TODO remove: endpoint deprecated
   stubGetNotificationGroups: ({
     prisonId = 'HEI',
     notificationGroups = [TestData.notificationGroupRaw()],
