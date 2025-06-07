@@ -106,7 +106,7 @@ export default class TestData {
     createdTimestamp = '2022-01-01T09:00:00',
     modifiedTimestamp = '2022-01-01T09:00:00',
     reserved = true,
-    completed = false,
+    applicationStatus = 'IN_PROGRESS',
   }: Partial<ApplicationDto> = {}): ApplicationDto =>
     ({
       reference,
@@ -124,7 +124,7 @@ export default class TestData {
       createdTimestamp,
       modifiedTimestamp,
       reserved,
-      completed,
+      applicationStatus,
     }) as ApplicationDto
 
   static caseLoad = ({
@@ -358,7 +358,9 @@ export default class TestData {
     capacity = { closed: 0, open: 40 },
     areLocationGroupsInclusive = true,
     prisonerLocationGroupNames = [],
+    areCategoryGroupsInclusive = true,
     prisonerCategoryGroupNames = [],
+    areIncentiveGroupsInclusive = true,
     prisonerIncentiveLevelGroupNames = [],
     weeklyFrequency = 1,
     visitType = 'SOCIAL',
@@ -370,7 +372,9 @@ export default class TestData {
     capacity,
     areLocationGroupsInclusive,
     prisonerLocationGroupNames,
+    areCategoryGroupsInclusive,
     prisonerCategoryGroupNames,
+    areIncentiveGroupsInclusive,
     prisonerIncentiveLevelGroupNames,
     weeklyFrequency,
     visitType,

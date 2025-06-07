@@ -391,6 +391,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/visits/notification/{prisonCode}/visits': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * get future visits with notifications by prison code
+     * @description Retrieve future visits that have a notification event attribute associated, empty response if no future visits with notifications found.
+     */
+    get: operations['getFutureNotificationVisits']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/visits/notification/{prisonCode}/groups': {
     parameters: {
       query?: never
@@ -400,6 +420,7 @@ export interface paths {
     }
     /**
      * get future notification visit groups by prison code
+     * @deprecated
      * @description Retrieve future notification visit groups by prison code
      */
     get: operations['getFutureNotificationVisitGroups']
@@ -1321,10 +1342,11 @@ export interface components {
        */
       reserved: boolean
       /**
-       * @description Is the application complete
-       * @example true
+       * @description Status of the application
+       * @example IN_PROGRESS
+       * @enum {string}
        */
-      completed: boolean
+      applicationStatus: 'IN_PROGRESS' | 'ACCEPTED'
       /**
        * @description User type
        * @example STAFF
@@ -2049,26 +2071,87 @@ export interface components {
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject']
-      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
+      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     PageableObject: {
       /** Format: int64 */
       offset?: number
       sort?: components['schemas']['SortObject']
-      unpaged?: boolean
+      /** Format: int32 */
+      pageSize?: number
       paged?: boolean
       /** Format: int32 */
       pageNumber?: number
-      /** Format: int32 */
-      pageSize?: number
+      unpaged?: boolean
     }
     SortObject: {
       empty?: boolean
       sorted?: boolean
       unsorted?: boolean
+    }
+    OrchestrationVisitNotificationsDto: {
+      /**
+       * @description Visit Booking Reference
+       * @example v9-d7-ed-7u
+       */
+      visitReference: string
+      /**
+       * @description Prisoner Number
+       * @example AF34567G
+       */
+      prisonerNumber: string
+      /**
+       * @description username of the last user to book the visit
+       * @example SMITH1
+       */
+      bookedByUserName: string
+      /**
+       * Format: date
+       * @description The date of the visit
+       * @example 2023-11-08
+       */
+      visitDate: string
+      /**
+       * @description Booked by name
+       * @example John Smith
+       */
+      bookedByName: string
+      /** @description A list of filtered notifications for a visit */
+      notifications: components['schemas']['VisitNotificationEventDto'][]
+    }
+    /** @description Visit notification event details. */
+    VisitNotificationEventDto: {
+      /**
+       * @description Notification Event Type
+       * @enum {string}
+       */
+      type:
+        | 'NON_ASSOCIATION_EVENT'
+        | 'PRISONER_RELEASED_EVENT'
+        | 'PRISONER_RESTRICTION_CHANGE_EVENT'
+        | 'PRISON_VISITS_BLOCKED_FOR_DATE'
+        | 'SESSION_VISITS_BLOCKED_FOR_DATE'
+        | 'PRISONER_RECEIVED_EVENT'
+        | 'PRISONER_ALERTS_UPDATED_EVENT'
+        | 'PERSON_RESTRICTION_UPSERTED_EVENT'
+        | 'VISITOR_RESTRICTION_UPSERTED_EVENT'
+        | 'VISITOR_UNAPPROVED_EVENT'
+      /**
+       * @description Notification Event Reference
+       * @example aa-bb-cc-dd
+       */
+      notificationEventReference: string
+      /**
+       * Format: date-time
+       * @description Created date and time
+       * @example 2018-12-01T13:45:00
+       */
+      createdDateTime: string
+      /** @description Additional data, empty list if no additional data associated */
+      additionalData: components['schemas']['VisitNotificationEventAttributeDto'][]
     }
     OrchestrationNotificationGroupDto: {
       /**
@@ -2246,11 +2329,15 @@ export interface components {
        * @example Wing C
        */
       prisonerLocationGroupNames: string[]
+      /** @description Determines behaviour of category groups. True will mean the category groups are inclusive, false means they are exclusive. */
+      areCategoryGroupsInclusive: boolean
       /**
        * @description prisoner category groups
        * @example Category A Prisoners
        */
       prisonerCategoryGroupNames: string[]
+      /** @description Determines behaviour of incentive groups. True will mean the incentive groups are inclusive, false means they are exclusive. */
+      areIncentiveGroupsInclusive: boolean
       /**
        * @description prisoner incentive level groups
        * @example Enhanced Incentive Level Prisoners
@@ -4293,6 +4380,64 @@ export interface operations {
         }
       }
       /** @description Incorrect permissions to get future visits for a prisoner */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  getFutureNotificationVisits: {
+    parameters: {
+      query?: {
+        /** @description list of notificationEventTypes */
+        types?: (
+          | 'NON_ASSOCIATION_EVENT'
+          | 'PRISONER_RELEASED_EVENT'
+          | 'PRISONER_RESTRICTION_CHANGE_EVENT'
+          | 'PRISON_VISITS_BLOCKED_FOR_DATE'
+          | 'SESSION_VISITS_BLOCKED_FOR_DATE'
+          | 'PRISONER_RECEIVED_EVENT'
+          | 'PRISONER_ALERTS_UPDATED_EVENT'
+          | 'PERSON_RESTRICTION_UPSERTED_EVENT'
+          | 'VISITOR_RESTRICTION_UPSERTED_EVENT'
+          | 'VISITOR_UNAPPROVED_EVENT'
+        )[]
+      }
+      header?: never
+      path: {
+        /**
+         * @description prisonCode
+         * @example CFI
+         */
+        prisonCode: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Retrieved future visits with notifications by prison code */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['OrchestrationVisitNotificationsDto'][]
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to access this endpoint */
       403: {
         headers: {
           [name: string]: unknown
