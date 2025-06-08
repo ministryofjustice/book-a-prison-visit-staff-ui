@@ -11,13 +11,39 @@
   {{ breadcrumbs() }}
 {% endblock %}
 
-{% macro arrayToList(items) %}
-  <ul class="govuk-list govuk-!-margin-bottom-0">
-    {% for item in items %}
-      <li class="govuk-!-margin-bottom-{{ "0" if loop.last else "3" }}">{{ item }}</li>
-    {% endfor %}
-  </ul>
-{% endmacro %}
+{% set reviewListRows = [] %}
+{% for listItem in visitsReviewList %}
+  {% set notifications %}
+    <ul class="govuk-list">
+      {% for notification in listItem.notifications -%}
+        <li class="govuk-!-margin-bottom-3">{{ govukTag({ text: notification.value, classes: "notification-tag notification-tag--" + notification.key | lower }) }}</li>
+      {%- endfor %}
+    </ul>
+  {% endset %}
+
+  {% set reviewListRows = (reviewListRows.push([
+    {
+      attributes: { "data-test": "prisoner-number-" + loop.index },
+      text: listItem.prisonerNumber
+    },
+    {
+      attributes: { "data-test": "visit-date-" + loop.index },
+      text: listItem.visitDate | formatDate
+    },
+    {
+      attributes: { "data-test": "booked-by-" + loop.index },
+      text: listItem.bookedByName
+    },
+    {
+      attributes: { "data-test": "type-" + loop.index },
+      html: notifications
+    },
+    {
+      attributes: { "data-test": "action-" + loop.index },
+      html: '<a class="govuk-link--no-visited-state" href="/visit/' + listItem.visitReference + '" >View</a>'
+    }
+  ]), reviewListRows) %}
+{% endfor %}
 
 {% block content %}
   <div class="govuk-grid-row">
@@ -43,34 +69,6 @@
       {% endif %}
 
       {% if visitsReviewList | length %}
-        {% set reviewListRows = [] %}
-        {% for listItem in visitsReviewList %}
-          {% set reviewListRows = (reviewListRows.push([
-            {
-              attributes: { "data-test": "prisoner-number-" + loop.index },
-              html: arrayToList(listItem.prisonerNumbers)
-            },
-            {
-              attributes: { "data-test": "visit-date-" + loop.index },
-              html: arrayToList(listItem.visitDates)
-            },
-            {
-              attributes: { "data-test": "booked-by-" + loop.index },
-              html: arrayToList(listItem.bookedByNames)
-            },
-            {
-              attributes: { "data-test": "type-" + loop.index },
-              html: govukTag({
-                text: notificationTypes[listItem.type] | default(listItem.type),
-                classes: 'notification-tag notification-tag--' + listItem.type | lower
-              })
-            },
-            {
-              attributes: { "data-test": "action-" + loop.index },
-              html: '<a class="govuk-link--no-visited-state" href="' + listItem.actionUrl + '" data-test="' + listItem.reference + '">View</a>'
-            }
-          ]), reviewListRows) %}
-        {% endfor %}
 
         {{ govukTable({
           attributes: { "data-test": "bookings-list" },
@@ -94,14 +92,14 @@
           rows: reviewListRows
         }) }}
 
-      {% endif %}
+      {% else %}
 
-      {% if visitsReviewList | length == 0 %}
         {% if isAFilterApplied  %}
           <p data-test="no-bookings-for-filters">There are no bookings to review for {{ prisonName }} that match the selected filters.</p>
         {% else %}
           <p data-test="no-bookings">There are no bookings for {{ prisonName }} that need review.</p>
         {% endif %}
+
       {% endif %}
     </div>
   </div>

@@ -1,7 +1,8 @@
 import { FilterField } from '../../@types/bapv'
+import { notificationTypes } from '../../constants/notifications'
 import { NotificationType } from '../../data/orchestrationApiTypes'
 import TestData from '../testutils/testData'
-import { getVisitNotificationFilters } from './reviewUtils'
+import { buildVisitsToReviewList, getVisitNotificationFilters, VisitToReviewListItem } from './reviewUtils'
 
 describe('Visits to review utils', () => {
   describe('getVisitNotificationFilters() - build filter fields for visit notifications', () => {
@@ -50,6 +51,7 @@ describe('Visits to review utils', () => {
       ]
 
       const result = getVisitNotificationFilters({ visitNotifications, username, appliedFilters })
+
       expect(result).toStrictEqual(expectedFilters)
     })
 
@@ -78,6 +80,7 @@ describe('Visits to review utils', () => {
       ]
 
       const result = getVisitNotificationFilters({ visitNotifications, username, appliedFilters })
+
       expect(result).toStrictEqual(expectedFilters)
     })
 
@@ -111,6 +114,7 @@ describe('Visits to review utils', () => {
         username,
         appliedFilters,
       })
+
       expect(result).toStrictEqual(expectedFilters)
     })
 
@@ -146,6 +150,7 @@ describe('Visits to review utils', () => {
         username,
         appliedFilters,
       })
+
       expect(result).toStrictEqual(expectedFilters)
     })
 
@@ -182,7 +187,81 @@ describe('Visits to review utils', () => {
         username,
         appliedFilters,
       })
+
       expect(result).toStrictEqual(expectedFilters)
+    })
+  })
+
+  describe('buildVisitsToReviewList - visits to review table rows', () => {
+    it('should build a review list item - with single notification', () => {
+      const visitNotification = TestData.visitNotifications({
+        notifications: [TestData.visitNotificationEvent({ type: 'PRISON_VISITS_BLOCKED_FOR_DATE' })],
+      })
+
+      const expectedReviewListItem: VisitToReviewListItem = {
+        bookedByName: visitNotification.bookedByName,
+        prisonerNumber: visitNotification.prisonerNumber,
+        visitReference: visitNotification.visitReference,
+        notifications: [
+          { key: 'PRISON_VISITS_BLOCKED_FOR_DATE', value: notificationTypes.PRISON_VISITS_BLOCKED_FOR_DATE },
+        ],
+        visitDate: visitNotification.visitDate,
+      }
+
+      const result = buildVisitsToReviewList([visitNotification])
+
+      expect(result).toStrictEqual([expectedReviewListItem])
+    })
+
+    it('should build a review list item - with two notifications, sorted alphabetically', () => {
+      const visitNotification = TestData.visitNotifications({
+        notifications: [
+          TestData.visitNotificationEvent({ type: 'PRISONER_RECEIVED_EVENT' }),
+          TestData.visitNotificationEvent({ type: 'PRISONER_RELEASED_EVENT' }),
+        ],
+      })
+
+      const expectedReviewListItem: VisitToReviewListItem = {
+        bookedByName: visitNotification.bookedByName,
+        prisonerNumber: visitNotification.prisonerNumber,
+        visitReference: visitNotification.visitReference,
+        notifications: [
+          { key: 'PRISONER_RELEASED_EVENT', value: notificationTypes.PRISONER_RELEASED_EVENT }, // Prisoner released
+          { key: 'PRISONER_RECEIVED_EVENT', value: notificationTypes.PRISONER_RECEIVED_EVENT }, // Prisoner transferred
+        ],
+        visitDate: visitNotification.visitDate,
+      }
+
+      const result = buildVisitsToReviewList([visitNotification])
+
+      expect(result).toStrictEqual([expectedReviewListItem])
+    })
+
+    it('should build a review list item - with multiple notifications, sorted alphabetically, with duplicates removed', () => {
+      const visitNotification = TestData.visitNotifications({
+        notifications: [
+          TestData.visitNotificationEvent({ type: 'PRISONER_RECEIVED_EVENT' }),
+          TestData.visitNotificationEvent({ type: 'VISITOR_RESTRICTION' }),
+          TestData.visitNotificationEvent({ type: 'VISITOR_RESTRICTION' }), // duplicate; should be removed
+          TestData.visitNotificationEvent({ type: 'UNEXPECTED_TYPE' as NotificationType }),
+        ],
+      })
+
+      const expectedReviewListItem: VisitToReviewListItem = {
+        bookedByName: visitNotification.bookedByName,
+        prisonerNumber: visitNotification.prisonerNumber,
+        visitReference: visitNotification.visitReference,
+        notifications: [
+          { key: 'PRISONER_RECEIVED_EVENT', value: notificationTypes.PRISONER_RECEIVED_EVENT }, // Prisoner transferred
+          { key: 'UNEXPECTED_TYPE' as NotificationType, value: 'UNEXPECTED_TYPE' }, // UNEXPECTED_TYPE
+          { key: 'VISITOR_RESTRICTION', value: notificationTypes.VISITOR_RESTRICTION }, // Visitor restriction
+        ],
+        visitDate: visitNotification.visitDate,
+      }
+
+      const result = buildVisitsToReviewList([visitNotification])
+
+      expect(result).toStrictEqual([expectedReviewListItem])
     })
   })
 })

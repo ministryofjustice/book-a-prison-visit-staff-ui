@@ -4,7 +4,14 @@ import { NotificationType, VisitNotifications } from '../../data/orchestrationAp
 
 type AppliedFilters = Record<'bookedBy' | 'type', string[]>
 
-// eslint-disable-next-line import/prefer-default-export
+export type VisitToReviewListItem = {
+  bookedByName: string
+  prisonerNumber: string
+  visitReference: string
+  notifications: { key: NotificationType; value: string }[]
+  visitDate: string
+}
+
 export const getVisitNotificationFilters = ({
   visitNotifications,
   username,
@@ -42,4 +49,27 @@ export const getVisitNotificationFilters = ({
     { id: 'bookedBy', label: 'Booked by', items: bookedByItems },
     { id: 'type', label: 'Reason', items: typeItems },
   ]
+}
+
+export const buildVisitsToReviewList = (visitNotifications: VisitNotifications[]): VisitToReviewListItem[] => {
+  return visitNotifications.map(visitNotification => {
+    const uniqueNotifications = new Map<NotificationType, string>()
+    visitNotification.notifications.forEach(notification =>
+      uniqueNotifications.set(notification.type, notificationTypes[notification.type] || notification.type),
+    )
+
+    const notifications = Array.from(uniqueNotifications).map(notification => {
+      return { key: notification[0], value: notification[1] }
+    })
+
+    notifications.sort((a, b) => a.value.localeCompare(b.value))
+
+    return {
+      bookedByName: visitNotification.bookedByName,
+      prisonerNumber: visitNotification.prisonerNumber,
+      visitReference: visitNotification.visitReference,
+      notifications,
+      visitDate: visitNotification.visitDate,
+    }
+  })
 }
