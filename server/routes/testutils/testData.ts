@@ -106,7 +106,7 @@ export default class TestData {
     createdTimestamp = '2022-01-01T09:00:00',
     modifiedTimestamp = '2022-01-01T09:00:00',
     reserved = true,
-    applicationStatus = 'ACCEPTED',
+    applicationStatus = 'IN_PROGRESS',
   }: Partial<ApplicationDto> = {}): ApplicationDto =>
     ({
       reference,
