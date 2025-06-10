@@ -1,16 +1,8 @@
 .notification-tag {
   text-transform: unset;
 
-  &--non_association_event {
-    @extend .govuk-tag--orange;
-  }
-
   &--prisoner_released_event {
     @extend .govuk-tag--pink;
-  }
-
-  &--prisoner_restriction_change_event {
-    @extend .govuk-tag--purple;
   }
 
   &--prison_visits_blocked_for_date {
@@ -19,5 +11,9 @@
 
   &--prisoner_received_event {
     @extend .govuk-tag--yellow;
+  }
+
+  &--visitor_restriction {
+    @extend .govuk-tag--orange;
   }
 }

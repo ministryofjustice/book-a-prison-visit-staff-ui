@@ -209,10 +209,16 @@
             <dd data-test="visitor-address-{{ loop.index }}">{{ visitor.primaryAddress | formatAddress }}</dd>
           </dl>
 
+          {# Visitor restrictions #}
           {% if visitor.restrictions | length %}
-            <div class="bapv-visit-details__restrictions govuk-!-margin-top-6">
-              {% set visitorIndex = loop.index %}
+            {% set visitorIndex = loop.index %}
+            <div class="bapv-visit-details__restrictions">
               {% for restriction in visitor.restrictions %}
+
+                {% if restriction.restrictionId in flaggedVisitorRestrictionIds %}
+                  <p class="bapv-visit-details__restriction--flagged" id="visitor-restriction-{{ restriction.restrictionId }}">This restriction has been added or updated</p>
+                {% endif %}
+
                 <p>
                   <span class="govuk-tag restriction-tag restriction-tag--{{ restriction.restrictionType }}"
                     data-test="visitor-{{ visitorIndex }}-restriction-{{ loop.index }}">
