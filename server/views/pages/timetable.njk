@@ -8,46 +8,33 @@
   {{ breadcrumbs() }}
 {% endblock %}
 
-{% macro scheduleRowByType(scheduleRows, schedule, type) %}
-  {% if schedule.capacity[type] !== 0 %}
-    {% set rowNumber = scheduleRows | length %}
-
-      {% set frequency -%}
-        {% if schedule.sessionDateRange.validToDate and schedule.sessionDateRange.validFromDate === schedule.sessionDateRange.validToDate -%}
-          One off
-        {%- else %}
-          {{- "Every week" if schedule.weeklyFrequency === 1 else "Every " + schedule.weeklyFrequency + " weeks" -}}
-        {% endif %}
-      {%- endset %}
-    
-      {% set scheduleRows = (scheduleRows.push([
-        {
-          text: (selectedDate + 'T' + schedule.sessionTimeSlot.startTime) | formatTime +
-          ' to ' + (selectedDate + 'T' + schedule.sessionTimeSlot.endTime) | formatTime,
-          attributes: { "data-test" : "schedule-time-" + rowNumber } 
-        },
-        {
-          text: type | capitalize,
-          attributes: { "data-test" : "schedule-type-" + rowNumber } 
-        },
-        {
-          text: schedule.capacity[type] + ' tables',
-          attributes: { "data-test" : "schedule-capacity-" + rowNumber } 
-        },
-        {
-          text: attendees(schedule.prisonerCategoryGroupNames, schedule.prisonerIncentiveLevelGroupNames, schedule.prisonerLocationGroupNames, schedule.areCategoryGroupsInclusive, schedule.areIncentiveGroupsInclusive, schedule.areLocationGroupsInclusive),
-          attributes: { "data-test" : "schedule-attendees-" + rowNumber } 
-        },
-        {
-          text: frequency,
-          attributes: { "data-test" : "schedule-frequency-" + rowNumber } 
-        },
-        {
-          text: schedule.sessionDateRange.validToDate | formatDate or 'Not entered' ,
-          attributes: { "data-test" : "schedule-end-date-" + rowNumber } 
-        }
-    ]), scheduleRows) %}
-  {% endif %}
+{% macro timetableRowBuilder(timetableRows, timetableItem, rowNumber) %}
+  {% set timetableRows = (timetableRows.push([
+    {
+      text: timetableItem.time,
+      attributes: { "data-test" : "schedule-time-" + rowNumber } 
+    },
+    {
+      text: timetableItem.type,
+      attributes: { "data-test" : "schedule-type-" + rowNumber } 
+    },
+    {
+      text: timetableItem.capacity,
+      attributes: { "data-test" : "schedule-capacity-" + rowNumber } 
+    },
+    {
+      text: timetableItem.groupNames,
+      attributes: { "data-test" : "schedule-attendees-" + rowNumber } 
+    },
+    {
+      text: timetableItem.frequency,
+      attributes: { "data-test" : "schedule-frequency-" + rowNumber } 
+    },
+    {
+      text: timetableItem.validToDate,
+      attributes: { "data-test" : "schedule-end-date-" + rowNumber } 
+    }
+  ]), timetableRows) %}
 {% endmacro %}
 
 {% block content %}
@@ -87,10 +74,9 @@
     <div class="govuk-grid-column-full">
       {% if schedules | length %}
 
-        {% set scheduleRows = [] %}
-        {% for schedule in schedules %}
-          {{ scheduleRowByType(scheduleRows, schedule, 'open')}}
-          {{ scheduleRowByType(scheduleRows, schedule, 'closed')}}
+        {% set timetableRows = [] %}
+        {% for timetableItem in timetableItems %}
+          {{ timetableRowBuilder(timetableRows, timetableItem, loop.index)}}
         {% endfor %}
         {{ govukTable({
           classes: 'bapv-table-no-bottom-border',
@@ -114,7 +100,7 @@
               text: "End date"
             }
           ],
-          rows: scheduleRows
+          rows: timetableRows
         }) }}
 
         {% else %}

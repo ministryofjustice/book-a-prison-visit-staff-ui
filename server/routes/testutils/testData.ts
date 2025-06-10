@@ -106,7 +106,7 @@ export default class TestData {
     createdTimestamp = '2022-01-01T09:00:00',
     modifiedTimestamp = '2022-01-01T09:00:00',
     reserved = true,
-    completed = false,
+    applicationStatus = 'ACCEPTED',
   }: Partial<ApplicationDto> = {}): ApplicationDto =>
     ({
       reference,
@@ -124,7 +124,7 @@ export default class TestData {
       createdTimestamp,
       modifiedTimestamp,
       reserved,
-      completed,
+      applicationStatus,
     }) as ApplicationDto
 
   static caseLoad = ({

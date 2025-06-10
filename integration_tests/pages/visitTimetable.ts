@@ -23,17 +23,17 @@ export default class VisitTimetablePage extends Page {
     cy.get('[data-test="next-week"]').click()
   }
 
-  scheduleTime = (row: number): PageElement => cy.get(`[data-test="schedule-time-${row}"]`)
+  scheduleTime = (row: number): PageElement => cy.get(`[data-test="schedule-time-${row + 1}"]`)
 
-  scheduleType = (row: number): PageElement => cy.get(`[data-test="schedule-type-${row}"]`)
+  scheduleType = (row: number): PageElement => cy.get(`[data-test="schedule-type-${row + 1}"]`)
 
-  scheduleCapacity = (row: number): PageElement => cy.get(`[data-test="schedule-capacity-${row}"]`)
+  scheduleCapacity = (row: number): PageElement => cy.get(`[data-test="schedule-capacity-${row + 1}"]`)
 
-  scheduleAttendees = (row: number): PageElement => cy.get(`[data-test="schedule-attendees-${row}"]`)
+  scheduleAttendees = (row: number): PageElement => cy.get(`[data-test="schedule-attendees-${row + 1}"]`)
 
-  scheduleFrequency = (row: number): PageElement => cy.get(`[data-test="schedule-frequency-${row}"]`)
+  scheduleFrequency = (row: number): PageElement => cy.get(`[data-test="schedule-frequency-${row + 1}"]`)
 
-  scheduleEndDate = (row: number): PageElement => cy.get(`[data-test="schedule-end-date-${row}"]`)
+  scheduleEndDate = (row: number): PageElement => cy.get(`[data-test="schedule-end-date-${row + 1}"]`)
 
   emptySchedule = (): PageElement => cy.get('[data-test="empty-schedule"]')
 

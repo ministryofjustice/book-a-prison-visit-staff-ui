@@ -2,6 +2,7 @@ import { type RequestHandler, Router } from 'express'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import type { Services } from '../services'
 import { getParsedDateFromQueryString, getWeekOfDatesStartingMonday } from '../utils/utils'
+import timetableItemBuilder from './timetableItemBuilder'
 
 export default function routes({ visitSessionsService }: Services): Router {
   const router = Router()
@@ -22,8 +23,11 @@ export default function routes({ visitSessionsService }: Services): Router {
       date: selectedDate,
     })
 
+    const timetableItems = timetableItemBuilder({ schedules, selectedDate })
+
     res.render('pages/timetable', {
       schedules,
+      timetableItems,
       selectedDate,
       weekOfDates,
       previousWeek,
