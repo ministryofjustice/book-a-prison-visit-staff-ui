@@ -2,7 +2,7 @@ import { FilterField } from '../../@types/bapv'
 import { notificationTypes } from '../../constants/notifications'
 import { NotificationType, VisitNotifications } from '../../data/orchestrationApiTypes'
 
-type AppliedFilters = Record<'bookedBy' | 'type', string[]>
+export type AppliedFilters = Record<'bookedBy' | 'type', string[]>
 
 export type VisitToReviewListItem = {
   bookedByName: string
@@ -42,13 +42,45 @@ export const getVisitNotificationFilters = ({
   )
 
   // sort field labels alphabetically (with current user at top, if present)
-  bookedByItems.sort((a, b) => (b.value === username ? 1 : a.label.localeCompare(b.label)))
+  bookedByItems.sort((a, b) => {
+    if (a.value === username) return -1
+    if (b.value === username) return 1
+    return a.label.localeCompare(b.label)
+  })
   typeItems.sort((a, b) => a.label.localeCompare(b.label))
 
   return [
     { id: 'bookedBy', label: 'Booked by', items: bookedByItems },
     { id: 'type', label: 'Reason', items: typeItems },
   ]
+}
+
+export const filterVisitNotifications = ({
+  appliedFilters,
+  visitNotifications,
+}: {
+  appliedFilters: AppliedFilters
+  visitNotifications: VisitNotifications[]
+}): VisitNotifications[] => {
+  const { bookedBy, type } = appliedFilters
+
+  if (!bookedBy.length && !type.length) {
+    return visitNotifications
+  }
+
+  return visitNotifications.filter(visitNotification => {
+    const isUserNameMatch = bookedBy.includes(visitNotification.bookedByUserName)
+
+    const isNotificationTypeMatch = visitNotification.notifications.some(notification =>
+      type.includes(notification.type),
+    )
+
+    const bothFiltersApplied = bookedBy.length && type.length
+    const matchesBothFilters = isUserNameMatch && isNotificationTypeMatch
+    const matchesOneFilter = isUserNameMatch || isNotificationTypeMatch
+
+    return bothFiltersApplied ? matchesBothFilters : matchesOneFilter
+  })
 }
 
 export const buildVisitsToReviewList = (visitNotifications: VisitNotifications[]): VisitToReviewListItem[] => {

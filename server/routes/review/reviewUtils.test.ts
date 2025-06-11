@@ -2,10 +2,16 @@ import { FilterField } from '../../@types/bapv'
 import { notificationTypes } from '../../constants/notifications'
 import { NotificationType } from '../../data/orchestrationApiTypes'
 import TestData from '../testutils/testData'
-import { buildVisitsToReviewList, getVisitNotificationFilters, VisitToReviewListItem } from './reviewUtils'
+import {
+  AppliedFilters,
+  buildVisitsToReviewList,
+  filterVisitNotifications,
+  getVisitNotificationFilters,
+  VisitToReviewListItem,
+} from './reviewUtils'
 
 describe('Visits to review utils', () => {
-  describe('getVisitNotificationFilters() - build filter fields for visit notifications', () => {
+  describe('getVisitNotificationFilters - build filter fields for visit notifications', () => {
     const visitNotifications = [
       TestData.visitNotifications({
         bookedByUserName: 'user3',
@@ -28,7 +34,7 @@ describe('Visits to review utils', () => {
 
     it('should build list filters sorted alphabetically by label - when current user not in list', async () => {
       const username = 'a-different-user'
-      const appliedFilters = { bookedBy: <string[]>[], type: <string[]>[] }
+      const appliedFilters: AppliedFilters = { bookedBy: [], type: [] }
 
       const expectedFilters: FilterField[] = [
         {
@@ -57,7 +63,7 @@ describe('Visits to review utils', () => {
 
     it('should build list filters sorted alphabetically by label - with current user first', async () => {
       const username = 'user3'
-      const appliedFilters = { bookedBy: <string[]>[], type: <string[]>[] }
+      const appliedFilters: AppliedFilters = { bookedBy: [], type: [] }
 
       const expectedFilters: FilterField[] = [
         {
@@ -86,7 +92,7 @@ describe('Visits to review utils', () => {
 
     it('should build list filters and handle an unknown event type', async () => {
       const username = 'user'
-      const appliedFilters = { bookedBy: <string[]>[], type: <string[]>[] }
+      const appliedFilters: AppliedFilters = { bookedBy: [], type: [] }
 
       const visitNotificationsWithUnknown = [
         TestData.visitNotifications({
@@ -189,6 +195,86 @@ describe('Visits to review utils', () => {
       })
 
       expect(result).toStrictEqual(expectedFilters)
+    })
+  })
+
+  describe('filterVisitNotifications - filter visit notifications based on applied filters', () => {
+    it('should allow all visits if no filters applied', () => {
+      const visitNotifications = [TestData.visitNotifications()]
+      const appliedFilters: AppliedFilters = { bookedBy: [], type: [] }
+
+      const result = filterVisitNotifications({ appliedFilters, visitNotifications })
+
+      expect(result).toStrictEqual(visitNotifications)
+    })
+
+    it('should filter visits by user', () => {
+      const visitNotifications = [
+        TestData.visitNotifications({ bookedByUserName: 'user1' }),
+        TestData.visitNotifications({ bookedByUserName: 'user2' }),
+        TestData.visitNotifications({ bookedByUserName: 'user3' }),
+      ]
+      const appliedFilters: AppliedFilters = { bookedBy: ['user1', 'user3'], type: [] }
+
+      const result = filterVisitNotifications({ appliedFilters, visitNotifications })
+
+      expect(result).toStrictEqual([visitNotifications[0], visitNotifications[2]])
+    })
+
+    it('should filter visits by notification type', () => {
+      const visitNotifications = [
+        TestData.visitNotifications({
+          notifications: [
+            TestData.visitNotificationEvent({ type: 'PRISONER_RECEIVED_EVENT' }),
+            TestData.visitNotificationEvent({ type: 'PRISONER_RELEASED_EVENT' }),
+          ],
+        }),
+
+        TestData.visitNotifications({
+          notifications: [TestData.visitNotificationEvent({ type: 'PRISON_VISITS_BLOCKED_FOR_DATE' })],
+        }),
+
+        TestData.visitNotifications({
+          notifications: [
+            TestData.visitNotificationEvent({ type: 'PRISON_VISITS_BLOCKED_FOR_DATE' }),
+            TestData.visitNotificationEvent({ type: 'VISITOR_RESTRICTION' }),
+          ],
+        }),
+      ]
+
+      const appliedFilters: AppliedFilters = { bookedBy: [], type: ['PRISONER_RECEIVED_EVENT', 'VISITOR_RESTRICTION'] }
+
+      const result = filterVisitNotifications({ appliedFilters, visitNotifications })
+
+      expect(result).toStrictEqual([visitNotifications[0], visitNotifications[2]])
+    })
+
+    it('should filter visits by both user and notification type', () => {
+      const visitNotifications = [
+        TestData.visitNotifications({
+          bookedByUserName: 'user1',
+          notifications: [TestData.visitNotificationEvent({ type: 'PRISONER_RECEIVED_EVENT' })],
+        }),
+
+        TestData.visitNotifications({
+          bookedByUserName: 'user2',
+          notifications: [
+            TestData.visitNotificationEvent({ type: 'PRISON_VISITS_BLOCKED_FOR_DATE' }),
+            TestData.visitNotificationEvent({ type: 'VISITOR_RESTRICTION' }),
+          ],
+        }),
+
+        TestData.visitNotifications({
+          bookedByUserName: 'user3',
+          notifications: [TestData.visitNotificationEvent({ type: 'PRISON_VISITS_BLOCKED_FOR_DATE' })],
+        }),
+      ]
+
+      const appliedFilters: AppliedFilters = { bookedBy: ['user2'], type: ['PRISON_VISITS_BLOCKED_FOR_DATE'] }
+
+      const result = filterVisitNotifications({ appliedFilters, visitNotifications })
+
+      expect(result).toStrictEqual([visitNotifications[1]])
     })
   })
 
