@@ -29,14 +29,14 @@ context('View visit schedule timetable', () => {
           startTime: '10:00',
           endTime: '11:30',
         },
-        prisonerIncentiveLevelGroupNames: ['Enhanced prisoners'],
+        prisonerIncentiveLevelGroupNames: ['Enhanced'],
         capacity: { open: 20, closed: 5 }, // will generate 2 session rows
         prisonerLocationGroupNames: ['Group 1', 'Group 2'],
         weeklyFrequency: 2,
       }),
       TestData.sessionSchedule(),
       TestData.sessionSchedule({
-        prisonerCategoryGroupNames: ['Category A (High Risk) prisoners'],
+        prisonerCategoryGroupNames: ['Category A (High Risk)'],
         sessionDateRange: { validFromDate: '2023-02-01', validToDate: format(futureEndDate, shortDateFormat) },
         weeklyFrequency: 3,
       }),
@@ -57,36 +57,36 @@ context('View visit schedule timetable', () => {
     const visitTimetablePage = Page.verifyOnPage(VisitTimetablePage)
     visitTimetablePage.checkSelectedDate(today)
 
-    visitTimetablePage.scheduleTime(0).contains('10am to 11:30am')
-    visitTimetablePage.scheduleType(0).contains('Open')
-    visitTimetablePage.scheduleCapacity(0).contains('20 tables')
-    visitTimetablePage.scheduleAttendees(0).contains('Prisoners on Enhanced prisoners in Group 1 and Group 2')
-    visitTimetablePage.scheduleFrequency(0).contains('Every 2 weeks')
-    visitTimetablePage.scheduleEndDate(0).contains('Not entered')
-
     visitTimetablePage.scheduleTime(1).contains('10am to 11:30am')
-    visitTimetablePage.scheduleType(1).contains('Closed')
-    visitTimetablePage.scheduleCapacity(1).contains('5 tables')
-    visitTimetablePage.scheduleAttendees(1).contains('Prisoners on Enhanced prisoners in Group 1 and Group 2')
+    visitTimetablePage.scheduleType(1).contains('Open')
+    visitTimetablePage.scheduleCapacity(1).contains('20 tables')
+    visitTimetablePage.scheduleAttendees(1).contains('Prisoners on Enhanced in Group 1 and Group 2')
     visitTimetablePage.scheduleFrequency(1).contains('Every 2 weeks')
     visitTimetablePage.scheduleEndDate(1).contains('Not entered')
 
-    visitTimetablePage.scheduleTime(2).contains('1:45pm to 3:45pm')
-    visitTimetablePage.scheduleType(2).contains('Open')
-    visitTimetablePage.scheduleCapacity(2).contains('40 tables')
-    visitTimetablePage.scheduleAttendees(2).contains('All prisoners')
-    visitTimetablePage.scheduleFrequency(2).contains('Every week')
+    visitTimetablePage.scheduleTime(2).contains('10am to 11:30am')
+    visitTimetablePage.scheduleType(2).contains('Closed')
+    visitTimetablePage.scheduleCapacity(2).contains('5 tables')
+    visitTimetablePage.scheduleAttendees(2).contains('Prisoners on Enhanced in Group 1 and Group 2')
+    visitTimetablePage.scheduleFrequency(2).contains('Every 2 weeks')
     visitTimetablePage.scheduleEndDate(2).contains('Not entered')
 
     visitTimetablePage.scheduleTime(3).contains('1:45pm to 3:45pm')
     visitTimetablePage.scheduleType(3).contains('Open')
     visitTimetablePage.scheduleCapacity(3).contains('40 tables')
-    visitTimetablePage.scheduleAttendees(3).contains('Category A (High Risk) prisoners')
-    visitTimetablePage.scheduleFrequency(3).contains('Every 3 weeks')
-    visitTimetablePage.scheduleEndDate(3).contains(format(futureEndDate, mediumDateFormat))
+    visitTimetablePage.scheduleAttendees(3).contains('All prisoners')
+    visitTimetablePage.scheduleFrequency(3).contains('Every week')
+    visitTimetablePage.scheduleEndDate(3).contains('Not entered')
 
-    visitTimetablePage.scheduleFrequency(4).contains('One off')
-    visitTimetablePage.scheduleEndDate(4).contains(format(today, mediumDateFormat))
+    visitTimetablePage.scheduleTime(4).contains('1:45pm to 3:45pm')
+    visitTimetablePage.scheduleType(4).contains('Open')
+    visitTimetablePage.scheduleCapacity(4).contains('40 tables')
+    visitTimetablePage.scheduleAttendees(4).contains('Category A (High Risk)')
+    visitTimetablePage.scheduleFrequency(4).contains('Every 3 weeks')
+    visitTimetablePage.scheduleEndDate(4).contains(format(futureEndDate, mediumDateFormat))
+
+    visitTimetablePage.scheduleFrequency(5).contains('One off')
+    visitTimetablePage.scheduleEndDate(5).contains(format(today, mediumDateFormat))
 
     visitTimetablePage
       .requestChangeLink()

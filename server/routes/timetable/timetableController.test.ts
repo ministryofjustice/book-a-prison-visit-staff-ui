@@ -1,9 +1,9 @@
 import type { Express } from 'express'
 import request from 'supertest'
 import * as cheerio from 'cheerio'
-import { appWithAllRoutes } from './testutils/appSetup'
-import TestData from './testutils/testData'
-import { createMockVisitSessionsService } from '../services/testutils/mocks'
+import { appWithAllRoutes } from '../testutils/appSetup'
+import TestData from '../testutils/testData'
+import { createMockVisitSessionsService } from '../../services/testutils/mocks'
 
 let app: Express
 
@@ -152,7 +152,7 @@ describe('View visits timetable', () => {
         const $ = cheerio.load(res.text)
 
         expect($('h1').text()).toBe('Visits timetable')
-        // Row 0
+        // Row 1
         expect($('[data-test="schedule-time-1"]').text()).toBe('1:45pm to 3:45pm')
         expect($('[data-test="schedule-type-1"]').text()).toBe('Open')
         expect($('[data-test="schedule-capacity-1"]').text()).toBe('11 tables')
@@ -161,7 +161,7 @@ describe('View visits timetable', () => {
         )
         expect($('[data-test="schedule-frequency-1"]').text()).toBe('Every 3 weeks')
         expect($('[data-test="schedule-end-date-1"]').text()).toBe('31 December 2025')
-        // Row 1
+        // Row 2
         expect($('[data-test="schedule-time-2"]').text()).toBe('1:45pm to 3:45pm')
         expect($('[data-test="schedule-type-2"]').text()).toBe('Closed')
         expect($('[data-test="schedule-capacity-2"]').text()).toBe('22 tables')
