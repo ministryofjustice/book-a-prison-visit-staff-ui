@@ -4,7 +4,7 @@ import { prisonerTimePretty } from '../utils/utils'
 
 export type TimetableItem = {
   time: string
-  type: string
+  type: 'Open' | 'Closed'
   capacity: string
   attendees: string
   frequency: string
