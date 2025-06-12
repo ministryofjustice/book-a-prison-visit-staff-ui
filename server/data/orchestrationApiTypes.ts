@@ -62,10 +62,6 @@ export type VisitNotificationsRaw = components['schemas']['OrchestrationVisitNot
 export type VisitNotifications = Omit<VisitNotificationsRaw, 'notifications'> & {
   notifications: (Omit<VisitNotificationEventRaw, 'type'> & { type: NotificationType })[]
 }
-// TODO review below when deprecated notification groups endpoint removed
-export type NotificationGroupRaw = components['schemas']['OrchestrationNotificationGroupDto']
-export type NotificationGroup = Omit<NotificationGroupRaw, 'type'> & { type: NotificationType }
-export type NotificationVisitInfo = components['schemas']['OrchestrationPrisonerVisitsNotificationDto']
 
 export type PrisonDto = components['schemas']['PrisonDto']
 

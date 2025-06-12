@@ -14,9 +14,11 @@
 {% set reviewListRows = [] %}
 {% for listItem in visitsReviewList %}
   {% set notifications %}
-    <ul class="govuk-list">
+    <ul class="govuk-list govuk-!-margin-bottom-1">
       {% for notification in listItem.notifications -%}
-        <li class="govuk-!-margin-bottom-3">{{ govukTag({ text: notification.value, classes: "notification-tag notification-tag--" + notification.key | lower }) }}</li>
+        <li class="{{ "govuk-!-margin-bottom-3" if not loop.last }}">
+          {{- govukTag({ text: notification.value, classes: "notification-tag notification-tag--" + notification.key | lower }) -}}
+        </li>
       {%- endfor %}
     </ul>
   {% endset %}

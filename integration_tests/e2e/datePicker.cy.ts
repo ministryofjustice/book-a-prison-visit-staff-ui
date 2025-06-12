@@ -15,7 +15,6 @@ context('Date picker', () => {
     cy.task('stubSupportedPrisonIds')
     cy.task('stubGetPrison')
     cy.task('stubGetNotificationCount', {})
-    cy.task('stubGetNotificationGroups', {})
     cy.signIn()
 
     cy.task('stubSessionSchedule', { prisonId, date: todayShortFormat, sessionSchedule: [] })

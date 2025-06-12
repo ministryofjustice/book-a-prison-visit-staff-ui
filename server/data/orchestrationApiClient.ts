@@ -13,8 +13,6 @@ import {
   IgnoreVisitNotificationsDto,
   IsExcludeDateDto,
   NotificationCount,
-  NotificationGroup,
-  NotificationGroupRaw,
   NotificationType,
   NotificationTypeRaw,
   PageVisitDto,
@@ -261,23 +259,6 @@ export default class OrchestrationApiClient {
         }),
       }
     })
-  }
-
-  // TODO remove: endpoint deprecated
-  async getNotificationGroups(prisonId: string): Promise<NotificationGroup[]> {
-    const notificationGroups = await this.restClient.get<NotificationGroupRaw[]>({
-      path: `/visits/notification/${prisonId}/groups`,
-    })
-
-    // Remove unsupported notification types and standardise types
-    return notificationGroups
-      .filter(notification => this.enabledRawNotifications.includes(notification.type))
-      .map(notification => {
-        return {
-          ...notification,
-          type: this.getStandardisedType<NotificationType>(notification.type),
-        }
-      })
   }
 
   // orchestration-prisons-exclude-date-controller

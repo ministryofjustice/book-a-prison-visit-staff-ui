@@ -8,7 +8,6 @@ import {
   ExcludeDateDto,
   IgnoreVisitNotificationsDto,
   NotificationCount,
-  NotificationGroupRaw,
   PrisonDto,
   PrisonerProfile,
   SessionCapacity,
@@ -412,27 +411,6 @@ export default {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
         jsonBody: visitNotifications,
-      },
-    })
-  },
-
-  // TODO remove: endpoint deprecated
-  stubGetNotificationGroups: ({
-    prisonId = 'HEI',
-    notificationGroups = [TestData.notificationGroupRaw()],
-  }: {
-    prisonId: string
-    notificationGroups: NotificationGroupRaw[]
-  }): SuperAgentRequest => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        url: `/orchestration/visits/notification/${prisonId}/groups`,
-      },
-      response: {
-        status: 200,
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: notificationGroups,
       },
     })
   },
