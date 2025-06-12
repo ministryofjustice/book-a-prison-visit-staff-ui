@@ -6,9 +6,9 @@ export type TimetableItem = {
   time: string
   type: string
   capacity: string
-  groupNames: string
+  attendees: string
   frequency: string
-  validToDate: string
+  endDate: string
 }
 // Builds timetable rows, using all session schedules for the selected date
 export default ({
@@ -23,7 +23,7 @@ export default ({
   schedules.forEach(schedule => {
     const time = `${prisonerTimePretty(`${selectedDate}T${schedule.sessionTimeSlot.startTime}`)} to ${prisonerTimePretty(`${selectedDate}T${schedule.sessionTimeSlot.endTime}`)}`
 
-    const validToDate = schedule.sessionDateRange.validToDate
+    const endDate = schedule.sessionDateRange.validToDate
       ? format(parseISO(schedule.sessionDateRange.validToDate), dateFormat)
       : 'Not entered'
 
@@ -42,9 +42,9 @@ export default ({
         time,
         type: 'Open',
         capacity: `${schedule.capacity.open} tables`,
-        groupNames: attendees(schedule),
+        attendees: buildAttendeesText(schedule),
         frequency,
-        validToDate,
+        endDate,
       })
     }
 
@@ -53,9 +53,9 @@ export default ({
         time,
         type: 'Closed',
         capacity: `${schedule.capacity.closed} tables`,
-        groupNames: attendees(schedule),
+        attendees: buildAttendeesText(schedule),
         frequency,
-        validToDate,
+        endDate,
       })
     }
   })
@@ -64,7 +64,7 @@ export default ({
 }
 
 // Takes all group names for particular type, and joins together
-const mergedGroupNames = (groupNames: string[]): string => {
+const mergeGroupNames = (groupNames: string[]): string => {
   let nameString = ''
   groupNames.forEach((name, index) => {
     if (index === 0) {
@@ -79,7 +79,7 @@ const mergedGroupNames = (groupNames: string[]): string => {
 }
 
 // Function to build description of groups included/excluded from this particular session
-const attendees = ({
+const buildAttendeesText = ({
   prisonerCategoryGroupNames,
   prisonerIncentiveLevelGroupNames,
   prisonerLocationGroupNames,
@@ -95,9 +95,9 @@ const attendees = ({
     return 'All prisoners'
   }
 
-  const categoryNames = mergedGroupNames(prisonerCategoryGroupNames)
-  const incentiveNames = mergedGroupNames(prisonerIncentiveLevelGroupNames)
-  const locationNames = mergedGroupNames(prisonerLocationGroupNames)
+  const categoryNames = mergeGroupNames(prisonerCategoryGroupNames)
+  const incentiveNames = mergeGroupNames(prisonerIncentiveLevelGroupNames)
+  const locationNames = mergeGroupNames(prisonerLocationGroupNames)
 
   if (categoryNames && incentiveNames && locationNames) {
     if (areCategoryGroupsInclusive && areIncentiveGroupsInclusive && areLocationGroupsInclusive) {

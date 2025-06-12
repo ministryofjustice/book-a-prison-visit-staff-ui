@@ -31,9 +31,9 @@ describe('timetableItemBuilder - Build timetable rows from visit schedules', () 
         time: '1:45pm to 3:45pm',
         type: 'Open',
         capacity: '40 tables',
-        groupNames: 'All prisoners',
+        attendees: 'All prisoners',
         frequency: 'Every week',
-        validToDate: 'Not entered',
+        endDate: 'Not entered',
       },
     ]
     const timetable = timetableItemBuilder(params)
@@ -53,9 +53,9 @@ describe('timetableItemBuilder - Build timetable rows from visit schedules', () 
         time: '1:45pm to 3:45pm',
         type: 'Open',
         capacity: '40 tables',
-        groupNames: 'Category 1 prisoners on Incentive 1 and Incentive 2 in Location 1, Location 2 and Location 3',
+        attendees: 'Category 1 prisoners on Incentive 1 and Incentive 2 in Location 1, Location 2 and Location 3',
         frequency: 'Every week',
-        validToDate: 'Not entered',
+        endDate: 'Not entered',
       },
     ]
     const timetable = timetableItemBuilder(params)
@@ -81,23 +81,23 @@ describe('timetableItemBuilder - Build timetable rows from visit schedules', () 
       time: '1:45pm to 3:45pm',
       type: 'Open',
       capacity: '40 tables',
-      groupNames: 'All prisoners',
+      attendees: 'All prisoners',
     }
     const expectedTimetable: TimetableItem[] = [
       {
         ...otherTimetableInformation,
         frequency: 'One off',
-        validToDate: '5 May 2025',
+        endDate: '5 May 2025',
       },
       {
         ...otherTimetableInformation,
         frequency: 'Every week',
-        validToDate: 'Not entered',
+        endDate: 'Not entered',
       },
       {
         ...otherTimetableInformation,
         frequency: 'Every 2 weeks',
-        validToDate: 'Not entered',
+        endDate: 'Not entered',
       },
     ]
     const timetable = timetableItemBuilder(params)
@@ -115,9 +115,9 @@ describe('timetableItemBuilder - Build timetable rows from visit schedules', () 
     ]
     const otherTimetableInformation = {
       time: '1:45pm to 3:45pm',
-      groupNames: 'All prisoners',
+      attendees: 'All prisoners',
       frequency: 'Every week',
-      validToDate: 'Not entered',
+      endDate: 'Not entered',
     }
     const expectedTimetable: TimetableItem[] = [
       {
@@ -190,36 +190,36 @@ describe('timetableItemBuilder - Build timetable rows from visit schedules', () 
       type: 'Open',
       capacity: '40 tables',
       frequency: 'Every week',
-      validToDate: 'Not entered',
+      endDate: 'Not entered',
     }
     const expectedTimetable: TimetableItem[] = [
       {
         ...otherTimetableInformation,
-        groupNames: 'All prisoners except Category prisoners, prisoners on Incentive and prisoners in Location',
+        attendees: 'All prisoners except Category prisoners, prisoners on Incentive and prisoners in Location',
       },
       {
         ...otherTimetableInformation,
-        groupNames: 'Category prisoners except prisoners on Incentive and prisoners in Location',
+        attendees: 'Category prisoners except prisoners on Incentive and prisoners in Location',
       },
       {
         ...otherTimetableInformation,
-        groupNames: 'Category prisoners in Location except prisoners on Incentive',
+        attendees: 'Category prisoners in Location except prisoners on Incentive',
       },
       {
         ...otherTimetableInformation,
-        groupNames: 'Prisoners on Incentive except Category prisoners and prisoners in Location',
+        attendees: 'Prisoners on Incentive except Category prisoners and prisoners in Location',
       },
       {
         ...otherTimetableInformation,
-        groupNames: 'Prisoners on Incentive in Location except Category prisoners',
+        attendees: 'Prisoners on Incentive in Location except Category prisoners',
       },
       {
         ...otherTimetableInformation,
-        groupNames: 'Category prisoners on Incentive except prisoners in Location',
+        attendees: 'Category prisoners on Incentive except prisoners in Location',
       },
       {
         ...otherTimetableInformation,
-        groupNames: 'Category prisoners on Incentive in Location',
+        attendees: 'Category prisoners on Incentive in Location',
       },
     ]
     const timetable = timetableItemBuilder(params)
@@ -262,24 +262,24 @@ describe('timetableItemBuilder - Build timetable rows from visit schedules', () 
       type: 'Open',
       capacity: '40 tables',
       frequency: 'Every week',
-      validToDate: 'Not entered',
+      endDate: 'Not entered',
     }
     const expectedTimetable: TimetableItem[] = [
       {
         ...otherTimetableInformation,
-        groupNames: 'Category prisoners on Incentive',
+        attendees: 'Category prisoners on Incentive',
       },
       {
         ...otherTimetableInformation,
-        groupNames: 'Category prisoners except prisoners on Incentive',
+        attendees: 'Category prisoners except prisoners on Incentive',
       },
       {
         ...otherTimetableInformation,
-        groupNames: 'Prisoners on Incentive except Category prisoners',
+        attendees: 'Prisoners on Incentive except Category prisoners',
       },
       {
         ...otherTimetableInformation,
-        groupNames: 'All prisoners except Category prisoners and prisoners on Incentive',
+        attendees: 'All prisoners except Category prisoners and prisoners on Incentive',
       },
     ]
     const timetable = timetableItemBuilder(params)
@@ -319,24 +319,24 @@ describe('timetableItemBuilder - Build timetable rows from visit schedules', () 
       type: 'Open',
       capacity: '40 tables',
       frequency: 'Every week',
-      validToDate: 'Not entered',
+      endDate: 'Not entered',
     }
     const expectedTimetable: TimetableItem[] = [
       {
         ...otherTimetableInformation,
-        groupNames: 'Category prisoners in Location',
+        attendees: 'Category prisoners in Location',
       },
       {
         ...otherTimetableInformation,
-        groupNames: 'Category prisoners except prisoners in Location',
+        attendees: 'Category prisoners except prisoners in Location',
       },
       {
         ...otherTimetableInformation,
-        groupNames: 'Prisoners in Location except Category prisoners',
+        attendees: 'Prisoners in Location except Category prisoners',
       },
       {
         ...otherTimetableInformation,
-        groupNames: 'All prisoners except Category prisoners and prisoners in Location',
+        attendees: 'All prisoners except Category prisoners and prisoners in Location',
       },
     ]
     const timetable = timetableItemBuilder(params)
@@ -376,24 +376,24 @@ describe('timetableItemBuilder - Build timetable rows from visit schedules', () 
       type: 'Open',
       capacity: '40 tables',
       frequency: 'Every week',
-      validToDate: 'Not entered',
+      endDate: 'Not entered',
     }
     const expectedTimetable: TimetableItem[] = [
       {
         ...otherTimetableInformation,
-        groupNames: 'Prisoners on Incentive in Location',
+        attendees: 'Prisoners on Incentive in Location',
       },
       {
         ...otherTimetableInformation,
-        groupNames: 'Prisoners on Incentive except prisoners in Location',
+        attendees: 'Prisoners on Incentive except prisoners in Location',
       },
       {
         ...otherTimetableInformation,
-        groupNames: 'Prisoners in Location except prisoners on Incentive',
+        attendees: 'Prisoners in Location except prisoners on Incentive',
       },
       {
         ...otherTimetableInformation,
-        groupNames: 'All prisoners except prisoners on Incentive and prisoners in Location',
+        attendees: 'All prisoners except prisoners on Incentive and prisoners in Location',
       },
     ]
     const timetable = timetableItemBuilder(params)
@@ -444,32 +444,32 @@ describe('timetableItemBuilder - Build timetable rows from visit schedules', () 
       type: 'Open',
       capacity: '40 tables',
       frequency: 'Every week',
-      validToDate: 'Not entered',
+      endDate: 'Not entered',
     }
     const expectedTimetable: TimetableItem[] = [
       {
         ...otherTimetableInformation,
-        groupNames: 'Category prisoners',
+        attendees: 'Category prisoners',
       },
       {
         ...otherTimetableInformation,
-        groupNames: 'All prisoners except Category prisoners',
+        attendees: 'All prisoners except Category prisoners',
       },
       {
         ...otherTimetableInformation,
-        groupNames: 'Prisoners on Incentive',
+        attendees: 'Prisoners on Incentive',
       },
       {
         ...otherTimetableInformation,
-        groupNames: 'All prisoners except prisoners on Incentive',
+        attendees: 'All prisoners except prisoners on Incentive',
       },
       {
         ...otherTimetableInformation,
-        groupNames: 'Prisoners in Location',
+        attendees: 'Prisoners in Location',
       },
       {
         ...otherTimetableInformation,
-        groupNames: 'All prisoners except prisoners in Location',
+        attendees: 'All prisoners except prisoners in Location',
       },
     ]
     const timetable = timetableItemBuilder(params)
