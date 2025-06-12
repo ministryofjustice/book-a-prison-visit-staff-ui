@@ -35,7 +35,7 @@ export default class VisitsReviewListingPage extends Page {
 
   getBookedBy = (row: number): PageElement => cy.get(`[data-test="booked-by-${row}"]`)
 
-  getType = (row: number): PageElement => cy.get(`[data-test="type-${row}"]`)
+  getTypes = (row: number): PageElement => cy.get(`[data-test="type-${row}"]`)
 
   getActionLink = (row: number): PageElement => cy.get(`[data-test="action-${row}"] a`)
 }

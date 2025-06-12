@@ -25,6 +25,8 @@ import {
   Visit,
   VisitBookingDetails,
   VisitBookingDetailsRaw,
+  VisitNotifications,
+  VisitNotificationsRaw,
   VisitPreview,
   VisitRestriction,
   VisitSession,
@@ -241,6 +243,27 @@ export default class OrchestrationApiClient {
     })
   }
 
+  async getVisitNotifications(prisonId: string): Promise<VisitNotifications[]> {
+    const visits = await this.restClient.get<VisitNotificationsRaw[]>({
+      path: `/visits/notification/${prisonId}/visits`,
+      query: new URLSearchParams({ types: this.enabledRawNotifications }).toString(),
+    })
+
+    // return visit notifications with 'type' standardised
+    return visits.map(visit => {
+      return {
+        ...visit,
+        notifications: visit.notifications.map(notification => {
+          return {
+            ...notification,
+            type: this.getStandardisedType<NotificationType>(notification.type),
+          }
+        }),
+      }
+    })
+  }
+
+  // TODO remove: endpoint deprecated
   async getNotificationGroups(prisonId: string): Promise<NotificationGroup[]> {
     const notificationGroups = await this.restClient.get<NotificationGroupRaw[]>({
       path: `/visits/notification/${prisonId}/groups`,

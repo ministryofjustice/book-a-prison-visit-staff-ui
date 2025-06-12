@@ -38,6 +38,17 @@ describe('Visit notifications service', () => {
     })
   })
 
+  describe('getVisitNotifications', () => {
+    it('should return future visits with notifications for given prison', async () => {
+      const visitNotifications = [TestData.visitNotifications()]
+      orchestrationApiClient.getVisitNotifications.mockResolvedValue(visitNotifications)
+
+      const result = await visitNotificationsService.getVisitNotifications({ username: 'user', prisonId })
+
+      expect(result).toStrictEqual(visitNotifications)
+    })
+  })
+
   describe('dateHasNotifications', () => {
     const date = '2024-04-24'
 

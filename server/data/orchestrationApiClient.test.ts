@@ -19,6 +19,8 @@ import {
   Visit,
   VisitBookingDetails,
   VisitBookingDetailsRaw,
+  VisitNotificationEvent,
+  VisitNotificationEventRaw,
   VisitRestriction,
 } from './orchestrationApiTypes'
 import { Prison, VisitSessionData } from '../@types/bapv'
@@ -481,6 +483,44 @@ describe('orchestrationApiClient', () => {
       const output = await orchestrationApiClient.getNotificationCount(prisonId)
 
       expect(output).toEqual(notificationCount)
+    })
+  })
+
+  describe('getVisitNotifications', () => {
+    it('should return future visits with standardised notifications for given prison and enabled types', async () => {
+      const { enabledRawNotifications } = config.features.notificationTypes
+
+      const visitNotificationsRaw = [
+        TestData.visitNotificationsRaw({
+          notifications: [
+            { type: 'PRISONER_RELEASED_EVENT' },
+            // these notifications should be converted to VISITOR_RESTRICTION
+            { type: 'PERSON_RESTRICTION_UPSERTED_EVENT' },
+            { type: 'VISITOR_RESTRICTION_UPSERTED_EVENT' },
+          ] as VisitNotificationEventRaw[],
+        }),
+      ]
+
+      const expectedVisitNotifications = [
+        TestData.visitNotifications({
+          notifications: [
+            { type: 'PRISONER_RELEASED_EVENT' },
+            // these notifications should be converted to VISITOR_RESTRICTION
+            { type: 'VISITOR_RESTRICTION' },
+            { type: 'VISITOR_RESTRICTION' },
+          ] as VisitNotificationEvent[],
+        }),
+      ]
+
+      fakeOrchestrationApi
+        .get(`/visits/notification/${prisonId}/visits`)
+        .query(new URLSearchParams({ types: enabledRawNotifications }))
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, visitNotificationsRaw)
+
+      const result = await orchestrationApiClient.getVisitNotifications(prisonId)
+
+      expect(result).toStrictEqual(expectedVisitNotifications)
     })
   })
 
