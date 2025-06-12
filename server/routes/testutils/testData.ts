@@ -4,10 +4,6 @@ import {
   ApplicationDto,
   ExcludeDateDto,
   NotificationCount,
-  NotificationGroup,
-  NotificationGroupRaw,
-  NotificationTypeRaw,
-  NotificationVisitInfo,
   OffenderRestriction,
   PrisonDto,
   PrisonerProfile,
@@ -205,36 +201,6 @@ export default class TestData {
         }
 
   static notificationCount = ({ count = 5 }: Partial<NotificationCount> = {}): NotificationCount => ({ count })
-
-  // data with notification types processed
-  static notificationGroup = ({
-    reference = 'ab*cd*ef*gh',
-    type = 'PRISONER_RELEASED_EVENT',
-    affectedVisits = [this.notificationVisitInfo()],
-  }: Partial<NotificationGroup> = {}): NotificationGroup => ({ reference, type, affectedVisits })
-
-  // raw data with types as returned from API
-  static notificationGroupRaw = ({
-    reference = this.notificationGroup().reference,
-    type = this.notificationGroup().type as NotificationTypeRaw,
-    affectedVisits = this.notificationGroup().affectedVisits,
-  }: Partial<NotificationGroupRaw> = {}): NotificationGroupRaw => ({ reference, type, affectedVisits })
-
-  static notificationVisitInfo = ({
-    prisonerNumber = 'A1234BC',
-    bookedByUserName = 'user1',
-    visitDate = '2023-11-01',
-    bookingReference = 'ab-cd-ef-gh',
-    bookedByName = 'User One',
-    notificationEventAttributes = [],
-  }: Partial<NotificationVisitInfo> = {}): NotificationVisitInfo => ({
-    prisonerNumber,
-    bookedByUserName,
-    visitDate,
-    bookingReference,
-    bookedByName,
-    notificationEventAttributes,
-  })
 
   static offenderRestriction = ({
     restrictionId = 0,
@@ -625,6 +591,7 @@ export default class TestData {
     notifications,
   })
 
+  // data with notification types processed
   static visitNotificationEvent = ({
     type = 'VISITOR_RESTRICTION',
     notificationEventReference = 'qr*ub*ze*sb',
@@ -641,6 +608,7 @@ export default class TestData {
     additionalData,
   })
 
+  // raw data with types as returned from API
   static visitNotificationEventRaw = ({
     type = 'VISITOR_RESTRICTION_UPSERTED_EVENT',
     notificationEventReference = this.visitNotificationEvent().notificationEventReference,
@@ -653,6 +621,7 @@ export default class TestData {
     additionalData,
   })
 
+  // data with notification types processed
   static visitNotifications = ({
     visitReference = 'ab-cd-ef-gh',
     prisonerNumber = 'A1234BC',
@@ -669,6 +638,7 @@ export default class TestData {
     notifications,
   })
 
+  // raw data with types as returned from API
   static visitNotificationsRaw = ({
     visitReference = this.visitNotifications().visitReference,
     prisonerNumber = this.visitNotifications().prisonerNumber,

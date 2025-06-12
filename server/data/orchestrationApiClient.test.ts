@@ -11,8 +11,6 @@ import {
   EventAuditRaw,
   ExcludeDateDto,
   IgnoreVisitNotificationsDto,
-  NotificationGroup,
-  NotificationGroupRaw,
   PageVisitDto,
   PrisonDto,
   SessionSchedule,
@@ -521,55 +519,6 @@ describe('orchestrationApiClient', () => {
       const result = await orchestrationApiClient.getVisitNotifications(prisonId)
 
       expect(result).toStrictEqual(expectedVisitNotifications)
-    })
-  })
-
-  describe('getNotificationGroups', () => {
-    beforeEach(() => {
-      // set enabled raw notification types: others should be filtered
-      jest.replaceProperty(config, 'features', {
-        ...config.features,
-        notificationTypes: {
-          enabledRawNotifications: [
-            'PRISONER_RELEASED_EVENT',
-            'PERSON_RESTRICTION_UPSERTED_EVENT',
-            'VISITOR_RESTRICTION_UPSERTED_EVENT',
-          ],
-        },
-      })
-
-      orchestrationApiClient = new OrchestrationApiClient(token)
-    })
-
-    afterEach(() => {
-      jest.restoreAllMocks()
-    })
-
-    it('should return notification groups with types filtered and processed', async () => {
-      const rawNotificationGroups: NotificationGroupRaw[] = [
-        // this unsupported notification should be filtered
-        TestData.notificationGroupRaw({ type: 'NON_ASSOCIATION_EVENT' }),
-        // this supported notification should pass through
-        TestData.notificationGroupRaw({ type: 'PRISONER_RELEASED_EVENT' }),
-        // these notifications should be converted to VISITOR_RESTRICTION
-        TestData.notificationGroupRaw({ type: 'PERSON_RESTRICTION_UPSERTED_EVENT' }),
-        TestData.notificationGroupRaw({ type: 'VISITOR_RESTRICTION_UPSERTED_EVENT' }),
-      ]
-
-      const expectedNotificationGroups: NotificationGroup[] = [
-        TestData.notificationGroup({ type: 'PRISONER_RELEASED_EVENT' }),
-        TestData.notificationGroup({ type: 'VISITOR_RESTRICTION' }),
-        TestData.notificationGroup({ type: 'VISITOR_RESTRICTION' }),
-      ]
-
-      fakeOrchestrationApi
-        .get(`/visits/notification/${prisonId}/groups`)
-        .matchHeader('authorization', `Bearer ${token}`)
-        .reply(200, rawNotificationGroups)
-
-      const result = await orchestrationApiClient.getNotificationGroups(prisonId)
-
-      expect(result).toStrictEqual(expectedNotificationGroups)
     })
   })
 
