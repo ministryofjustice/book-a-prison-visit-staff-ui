@@ -61,10 +61,17 @@ export default ({
 
 // Takes all group names for particular type, and joins together
 const mergeGroupNames = (groupNames: string[]): string => {
-  if (groupNames.length === 0) return ''
-  if (groupNames.length === 1) return groupNames[0]
-  if (groupNames.length === 2) return `${groupNames[0]} and ${groupNames[1]}`
-  return `${groupNames.slice(0, -1).join(', ')} and ${groupNames[groupNames.length - 1]}`
+  if (groupNames.length === 0) {
+    return ''
+  }
+  if (groupNames.length === 1) {
+    return groupNames[0]
+  }
+
+  const lastItem = groupNames.pop()
+  const joined = groupNames.join(',')
+
+  return `${joined} and ${lastItem}`
 }
 
 // Function to build description of groups included/excluded from this particular session
