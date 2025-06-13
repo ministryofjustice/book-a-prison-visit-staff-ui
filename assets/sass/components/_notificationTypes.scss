@@ -1,5 +1,5 @@
 .notification-tag {
-  text-transform: unset;
+  white-space: nowrap;
 
   &--prisoner_released_event {
     @extend .govuk-tag--pink;
