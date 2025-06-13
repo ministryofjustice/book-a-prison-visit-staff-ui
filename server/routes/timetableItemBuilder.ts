@@ -21,19 +21,15 @@ export default ({
   const dateFormat = 'd MMMM yyyy'
   const timetableItems: TimetableItem[] = []
   schedules.forEach(schedule => {
-    const time = `${prisonerTimePretty(`${selectedDate}T${schedule.sessionTimeSlot.startTime}`)} to ${prisonerTimePretty(`${selectedDate}T${schedule.sessionTimeSlot.endTime}`)}`
+    const { validToDate, validFromDate } = schedule.sessionDateRange
+    const { startTime, endTime } = schedule.sessionTimeSlot
 
-    const endDate = schedule.sessionDateRange.validToDate
-      ? format(parseISO(schedule.sessionDateRange.validToDate), dateFormat)
-      : 'Not entered'
+    const time = `${prisonerTimePretty(`${selectedDate}T${startTime}`)} to ${prisonerTimePretty(`${selectedDate}T${endTime}`)}`
 
-    let frequency = ''
-    if (
-      schedule.sessionDateRange.validToDate &&
-      schedule.sessionDateRange.validFromDate === schedule.sessionDateRange.validToDate
-    ) {
-      frequency = 'One off'
-    } else {
+    const endDate = validToDate ? format(parseISO(validToDate), dateFormat) : 'Not entered'
+
+    let frequency = 'One off'
+    if (validFromDate !== validToDate) {
       frequency = schedule.weeklyFrequency === 1 ? 'Every week' : `Every ${schedule.weeklyFrequency} weeks`
     }
 
@@ -65,17 +61,10 @@ export default ({
 
 // Takes all group names for particular type, and joins together
 const mergeGroupNames = (groupNames: string[]): string => {
-  let nameString = ''
-  groupNames.forEach((name, index) => {
-    if (index === 0) {
-      nameString = name
-    } else if (index === groupNames.length - 1) {
-      nameString = `${nameString} and ${name}`
-    } else {
-      nameString = `${nameString}, ${name}`
-    }
-  })
-  return nameString
+  if (groupNames.length === 0) return ''
+  if (groupNames.length === 1) return groupNames[0]
+  if (groupNames.length === 2) return `${groupNames[0]} and ${groupNames[1]}`
+  return `${groupNames.slice(0, -1).join(', ')} and ${groupNames[groupNames.length - 1]}`
 }
 
 // Function to build description of groups included/excluded from this particular session

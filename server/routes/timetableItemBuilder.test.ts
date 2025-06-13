@@ -77,13 +77,13 @@ describe('timetableItemBuilder - Build timetable rows from visit schedules', () 
         weeklyFrequency: 2,
       }),
     ]
-    const otherTimetableInformation: Partial<TimetableItem> = {
+    const otherTimetableInformation = {
       time: '1:45pm to 3:45pm',
       type: 'Open',
       capacity: '40 tables',
       attendees: 'All prisoners',
-    }
-    const expectedTimetable: Partial<TimetableItem>[] = [
+    } as const
+    const expectedTimetable: TimetableItem[] = [
       {
         ...otherTimetableInformation,
         frequency: 'One off',
@@ -185,14 +185,14 @@ describe('timetableItemBuilder - Build timetable rows from visit schedules', () 
         areLocationGroupsInclusive: true,
       }),
     ]
-    const otherTimetableInformation: Partial<TimetableItem> = {
+    const otherTimetableInformation = {
       time: '1:45pm to 3:45pm',
       type: 'Open',
       capacity: '40 tables',
       frequency: 'Every week',
       endDate: 'Not entered',
-    }
-    const expectedTimetable: Partial<TimetableItem>[] = [
+    } as const
+    const expectedTimetable: TimetableItem[] = [
       {
         ...otherTimetableInformation,
         attendees: 'All prisoners except Category prisoners, prisoners on Incentive and prisoners in Location',
@@ -257,14 +257,14 @@ describe('timetableItemBuilder - Build timetable rows from visit schedules', () 
         areIncentiveGroupsInclusive: false,
       }),
     ]
-    const otherTimetableInformation: Partial<TimetableItem> = {
+    const otherTimetableInformation = {
       time: '1:45pm to 3:45pm',
       type: 'Open',
       capacity: '40 tables',
       frequency: 'Every week',
       endDate: 'Not entered',
-    }
-    const expectedTimetable: Partial<TimetableItem>[] = [
+    } as const
+    const expectedTimetable: TimetableItem[] = [
       {
         ...otherTimetableInformation,
         attendees: 'Category prisoners on Incentive',
@@ -314,14 +314,14 @@ describe('timetableItemBuilder - Build timetable rows from visit schedules', () 
         areLocationGroupsInclusive: false,
       }),
     ]
-    const otherTimetableInformation: Partial<TimetableItem> = {
+    const otherTimetableInformation = {
       time: '1:45pm to 3:45pm',
       type: 'Open',
       capacity: '40 tables',
       frequency: 'Every week',
       endDate: 'Not entered',
-    }
-    const expectedTimetable: Partial<TimetableItem>[] = [
+    } as const
+    const expectedTimetable: TimetableItem[] = [
       {
         ...otherTimetableInformation,
         attendees: 'Category prisoners in Location',
@@ -371,14 +371,14 @@ describe('timetableItemBuilder - Build timetable rows from visit schedules', () 
         areLocationGroupsInclusive: false,
       }),
     ]
-    const otherTimetableInformation: Partial<TimetableItem> = {
+    const otherTimetableInformation = {
       time: '1:45pm to 3:45pm',
       type: 'Open',
       capacity: '40 tables',
       frequency: 'Every week',
       endDate: 'Not entered',
-    }
-    const expectedTimetable: Partial<TimetableItem>[] = [
+    } as const
+    const expectedTimetable: TimetableItem[] = [
       {
         ...otherTimetableInformation,
         attendees: 'Prisoners on Incentive in Location',
@@ -439,14 +439,14 @@ describe('timetableItemBuilder - Build timetable rows from visit schedules', () 
         areLocationGroupsInclusive: false,
       }),
     ]
-    const otherTimetableInformation: Partial<TimetableItem> = {
+    const otherTimetableInformation = {
       time: '1:45pm to 3:45pm',
       type: 'Open',
       capacity: '40 tables',
       frequency: 'Every week',
       endDate: 'Not entered',
-    }
-    const expectedTimetable: Partial<TimetableItem>[] = [
+    } as const
+    const expectedTimetable: TimetableItem[] = [
       {
         ...otherTimetableInformation,
         attendees: 'Category prisoners',
