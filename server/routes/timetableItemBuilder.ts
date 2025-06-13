@@ -69,7 +69,7 @@ const mergeGroupNames = (groupNames: string[]): string => {
   }
 
   const lastItem = groupNames.pop()
-  const joined = groupNames.join(',')
+  const joined = groupNames.join(', ')
 
   return `${joined} and ${lastItem}`
 }
