@@ -11,14 +11,14 @@ import {
   EventAuditRaw,
   ExcludeDateDto,
   IgnoreVisitNotificationsDto,
-  NotificationGroup,
-  NotificationGroupRaw,
   PageVisitDto,
   PrisonDto,
   SessionSchedule,
   Visit,
   VisitBookingDetails,
   VisitBookingDetailsRaw,
+  VisitNotificationEvent,
+  VisitNotificationEventRaw,
   VisitRestriction,
 } from './orchestrationApiTypes'
 import { Prison, VisitSessionData } from '../@types/bapv'
@@ -484,52 +484,41 @@ describe('orchestrationApiClient', () => {
     })
   })
 
-  describe('getNotificationGroups', () => {
-    beforeEach(() => {
-      // set enabled raw notification types: others should be filtered
-      jest.replaceProperty(config, 'features', {
-        ...config.features,
-        notificationTypes: {
-          enabledRawNotifications: [
-            'PRISONER_RELEASED_EVENT',
-            'PERSON_RESTRICTION_UPSERTED_EVENT',
-            'VISITOR_RESTRICTION_UPSERTED_EVENT',
-          ],
-        },
-      })
+  describe('getVisitNotifications', () => {
+    it('should return future visits with standardised notifications for given prison and enabled types', async () => {
+      const { enabledRawNotifications } = config.features.notificationTypes
 
-      orchestrationApiClient = new OrchestrationApiClient(token)
-    })
-
-    afterEach(() => {
-      jest.restoreAllMocks()
-    })
-
-    it('should return notification groups with types filtered and processed', async () => {
-      const rawNotificationGroups: NotificationGroupRaw[] = [
-        // this unsupported notification should be filtered
-        TestData.notificationGroupRaw({ type: 'NON_ASSOCIATION_EVENT' }),
-        // this supported notification should pass through
-        TestData.notificationGroupRaw({ type: 'PRISONER_RELEASED_EVENT' }),
-        // these notifications should be converted to VISITOR_RESTRICTION
-        TestData.notificationGroupRaw({ type: 'PERSON_RESTRICTION_UPSERTED_EVENT' }),
-        TestData.notificationGroupRaw({ type: 'VISITOR_RESTRICTION_UPSERTED_EVENT' }),
+      const visitNotificationsRaw = [
+        TestData.visitNotificationsRaw({
+          notifications: [
+            { type: 'PRISONER_RELEASED_EVENT' },
+            // these notifications should be converted to VISITOR_RESTRICTION
+            { type: 'PERSON_RESTRICTION_UPSERTED_EVENT' },
+            { type: 'VISITOR_RESTRICTION_UPSERTED_EVENT' },
+          ] as VisitNotificationEventRaw[],
+        }),
       ]
 
-      const expectedNotificationGroups: NotificationGroup[] = [
-        TestData.notificationGroup({ type: 'PRISONER_RELEASED_EVENT' }),
-        TestData.notificationGroup({ type: 'VISITOR_RESTRICTION' }),
-        TestData.notificationGroup({ type: 'VISITOR_RESTRICTION' }),
+      const expectedVisitNotifications = [
+        TestData.visitNotifications({
+          notifications: [
+            { type: 'PRISONER_RELEASED_EVENT' },
+            // these notifications should be converted to VISITOR_RESTRICTION
+            { type: 'VISITOR_RESTRICTION' },
+            { type: 'VISITOR_RESTRICTION' },
+          ] as VisitNotificationEvent[],
+        }),
       ]
 
       fakeOrchestrationApi
-        .get(`/visits/notification/${prisonId}/groups`)
+        .get(`/visits/notification/${prisonId}/visits`)
+        .query(new URLSearchParams({ types: enabledRawNotifications }))
         .matchHeader('authorization', `Bearer ${token}`)
-        .reply(200, rawNotificationGroups)
+        .reply(200, visitNotificationsRaw)
 
-      const result = await orchestrationApiClient.getNotificationGroups(prisonId)
+      const result = await orchestrationApiClient.getVisitNotifications(prisonId)
 
-      expect(result).toStrictEqual(expectedNotificationGroups)
+      expect(result).toStrictEqual(expectedVisitNotifications)
     })
   })
 

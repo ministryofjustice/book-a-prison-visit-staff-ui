@@ -164,7 +164,15 @@ export interface Prison extends Omit<PrisonDto, 'code'> {
   prisonId: string
 }
 
-export type FilterField = { id: string; label: string; items: { label: string; value: string; checked: boolean }[] }
+export type FilterField = {
+  id: string
+  label: string
+  items: {
+    label: string
+    value: string
+    checked: boolean
+  }[]
+}
 
 export type BookOrUpdate = 'book' | 'update'
 

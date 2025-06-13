@@ -9,10 +9,11 @@ export type VisitorSupport = components['schemas']['VisitorSupportDto']
 export type PageVisitDto = components['schemas']['PageVisitDto']
 export type Visit = components['schemas']['VisitDto']
 export type VisitBookingDetailsRaw = components['schemas']['VisitBookingDetailsDto']
+type VisitNotificationDto = components['schemas']['VisitNotificationDto']
 // Replace raw event and notifications 'type' ones that have VISITOR_RESTRICTION
-export type VisitBookingDetails = Omit<components['schemas']['VisitBookingDetailsDto'], 'events' | 'notifications'> & {
+export type VisitBookingDetails = Omit<VisitBookingDetailsRaw, 'events' | 'notifications'> & {
   events: EventAudit[]
-  notifications: (Omit<components['schemas']['VisitNotificationDto'], 'type'> & { type: NotificationType })[]
+  notifications: (Omit<VisitNotificationDto, 'type'> & { type: NotificationType })[]
 }
 export type VisitRestriction = Visit['visitRestriction']
 export type VisitPreview = components['schemas']['VisitPreviewDto']
@@ -42,22 +43,25 @@ export type PrisonerProfile = components['schemas']['PrisonerProfileDto']
 export type VisitSummary = components['schemas']['VisitSummaryDto']
 
 // Raw local/global visitor restrictions mapped to VISITOR_RESTRICTION as described above
-export type EventAuditTypeRaw = components['schemas']['EventAuditOrchestrationDto']['type']
+export type EventAuditRaw = components['schemas']['EventAuditOrchestrationDto']
+export type EventAuditTypeRaw = EventAuditRaw['type']
 export type EventAuditType =
   | Exclude<EventAuditTypeRaw, 'PERSON_RESTRICTION_UPSERTED_EVENT' | 'VISITOR_RESTRICTION_UPSERTED_EVENT'>
   | VISITOR_RESTRICTION
-export type EventAuditRaw = components['schemas']['EventAuditOrchestrationDto']
 export type EventAudit = Omit<EventAuditRaw, 'type'> & { type: EventAuditType }
 
 // Raw local/global visitor restrictions mapped to VISITOR_RESTRICTION as described above
 export type NotificationCount = components['schemas']['NotificationCountDto']
-export type NotificationTypeRaw = components['schemas']['OrchestrationNotificationGroupDto']['type']
+export type VisitNotificationEventRaw = components['schemas']['VisitNotificationEventDto']
+export type NotificationTypeRaw = VisitNotificationEventRaw['type']
 export type NotificationType =
   | Exclude<NotificationTypeRaw, 'PERSON_RESTRICTION_UPSERTED_EVENT' | 'VISITOR_RESTRICTION_UPSERTED_EVENT'>
   | VISITOR_RESTRICTION
-export type NotificationGroupRaw = components['schemas']['OrchestrationNotificationGroupDto']
-export type NotificationGroup = Omit<NotificationGroupRaw, 'type'> & { type: NotificationType }
-export type NotificationVisitInfo = components['schemas']['OrchestrationPrisonerVisitsNotificationDto']
+export type VisitNotificationEvent = Omit<VisitNotificationEventRaw, 'type'> & { type: NotificationType }
+export type VisitNotificationsRaw = components['schemas']['OrchestrationVisitNotificationsDto']
+export type VisitNotifications = Omit<VisitNotificationsRaw, 'notifications'> & {
+  notifications: (Omit<VisitNotificationEventRaw, 'type'> & { type: NotificationType })[]
+}
 
 export type PrisonDto = components['schemas']['PrisonDto']
 

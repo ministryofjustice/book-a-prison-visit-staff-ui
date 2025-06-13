@@ -50,7 +50,6 @@ context('View visits by date', () => {
     cy.task('stubSupportedPrisonIds')
     cy.task('stubGetPrison')
     cy.task('stubGetNotificationCount', {})
-    cy.task('stubGetNotificationGroups', {})
     cy.signIn()
   })
 

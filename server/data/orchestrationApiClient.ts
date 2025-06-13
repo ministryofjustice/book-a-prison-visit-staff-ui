@@ -13,8 +13,6 @@ import {
   IgnoreVisitNotificationsDto,
   IsExcludeDateDto,
   NotificationCount,
-  NotificationGroup,
-  NotificationGroupRaw,
   NotificationType,
   NotificationTypeRaw,
   PageVisitDto,
@@ -25,6 +23,8 @@ import {
   Visit,
   VisitBookingDetails,
   VisitBookingDetailsRaw,
+  VisitNotifications,
+  VisitNotificationsRaw,
   VisitPreview,
   VisitRestriction,
   VisitSession,
@@ -241,20 +241,24 @@ export default class OrchestrationApiClient {
     })
   }
 
-  async getNotificationGroups(prisonId: string): Promise<NotificationGroup[]> {
-    const notificationGroups = await this.restClient.get<NotificationGroupRaw[]>({
-      path: `/visits/notification/${prisonId}/groups`,
+  async getVisitNotifications(prisonId: string): Promise<VisitNotifications[]> {
+    const visits = await this.restClient.get<VisitNotificationsRaw[]>({
+      path: `/visits/notification/${prisonId}/visits`,
+      query: new URLSearchParams({ types: this.enabledRawNotifications }).toString(),
     })
 
-    // Remove unsupported notification types and standardise types
-    return notificationGroups
-      .filter(notification => this.enabledRawNotifications.includes(notification.type))
-      .map(notification => {
-        return {
-          ...notification,
-          type: this.getStandardisedType<NotificationType>(notification.type),
-        }
-      })
+    // return visit notifications with 'type' standardised
+    return visits.map(visit => {
+      return {
+        ...visit,
+        notifications: visit.notifications.map(notification => {
+          return {
+            ...notification,
+            type: this.getStandardisedType<NotificationType>(notification.type),
+          }
+        }),
+      }
+    })
   }
 
   // orchestration-prisons-exclude-date-controller
