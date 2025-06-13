@@ -1,6 +1,6 @@
 import { format, parseISO } from 'date-fns'
-import { SessionSchedule } from '../data/orchestrationApiTypes'
-import { prisonerTimePretty } from '../utils/utils'
+import { SessionSchedule } from '../../data/orchestrationApiTypes'
+import { prisonerTimePretty } from '../../utils/utils'
 
 export type TimetableItem = {
   time: string
@@ -33,25 +33,24 @@ export default ({
       frequency = schedule.weeklyFrequency === 1 ? 'Every week' : `Every ${schedule.weeklyFrequency} weeks`
     }
 
+    const otherTimetableInformation = {
+      time,
+      attendees: buildAttendeesText(schedule),
+      frequency,
+      endDate,
+    }
     if (schedule.capacity.open !== 0) {
       timetableItems.push({
-        time,
+        ...otherTimetableInformation,
         type: 'Open',
         capacity: `${schedule.capacity.open} tables`,
-        attendees: buildAttendeesText(schedule),
-        frequency,
-        endDate,
       })
     }
-
     if (schedule.capacity.closed !== 0) {
       timetableItems.push({
-        time,
+        ...otherTimetableInformation,
         type: 'Closed',
         capacity: `${schedule.capacity.closed} tables`,
-        attendees: buildAttendeesText(schedule),
-        frequency,
-        endDate,
       })
     }
   })

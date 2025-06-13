@@ -1,7 +1,7 @@
 import { type RequestHandler } from 'express'
 import { VisitSessionsService } from '../../services'
 import { getParsedDateFromQueryString, getWeekOfDatesStartingMonday } from '../../utils/utils'
-import timetableItemBuilder from '../timetableItemBuilder'
+import timetableItemBuilder from './timetableItemBuilder'
 
 export default class TimetableController {
   public constructor(private readonly visitSessionsService: VisitSessionsService) {}

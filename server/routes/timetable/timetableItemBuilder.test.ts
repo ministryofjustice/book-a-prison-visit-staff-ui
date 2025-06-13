@@ -1,4 +1,4 @@
-import TestData from './testutils/testData'
+import TestData from '../testutils/testData'
 import timetableItemBuilder, { TimetableItem } from './timetableItemBuilder'
 
 describe('timetableItemBuilder - Build timetable rows from visit schedules', () => {
