@@ -1,7 +1,6 @@
-import { type RequestHandler, Router } from 'express'
+import { Router } from 'express'
 import { body } from 'express-validator'
 import url from 'url'
-import asyncMiddleware from '../middleware/asyncMiddleware'
 import type { Services } from '../services'
 import config from '../config'
 import { getResultsPagingLinks } from '../utils/utils'
@@ -12,14 +11,7 @@ import { VisitInformation } from '../@types/bapv'
 export default function routes({ auditService, prisonerSearchService, visitService }: Services): Router {
   const router = Router()
 
-  const get = (path: string | string[], handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
-  const post = (path: string | string[], ...handlers: RequestHandler[]) =>
-    router.post(
-      path,
-      handlers.map(handler => asyncMiddleware(handler)),
-    )
-
-  get('/prisoner', (req, res) => {
+  router.get('/prisoner', (req, res) => {
     const search = req?.body?.search
 
     res.render('pages/search/prisoner', {
@@ -28,7 +20,7 @@ export default function routes({ auditService, prisonerSearchService, visitServi
     })
   })
 
-  post('/prisoner', body('search').trim('. '), (req, res) => {
+  router.post('/prisoner', body('search').trim('. '), (req, res) => {
     const { search } = req.body
 
     return res.redirect(
@@ -41,7 +33,7 @@ export default function routes({ auditService, prisonerSearchService, visitServi
     )
   })
 
-  get('/prisoner/results', async (req, res) => {
+  router.get('/prisoner/results', async (req, res) => {
     const { prisonId } = req.session.selectedEstablishment
     const search = typeof req.query.search === 'string' ? req.query.search : ''
 
@@ -104,7 +96,7 @@ export default function routes({ auditService, prisonerSearchService, visitServi
     })
   })
 
-  get('/visit', (req, res) => {
+  router.get('/visit', (req, res) => {
     const searchBlock1 = req?.body?.searchBlock1
     const searchBlock2 = req?.body?.searchBlock2
     const searchBlock3 = req?.body?.searchBlock3
@@ -119,7 +111,7 @@ export default function routes({ auditService, prisonerSearchService, visitServi
     })
   })
 
-  post('/visit', (req, res) => {
+  router.post('/visit', (req, res) => {
     const { searchBlock1, searchBlock2, searchBlock3, searchBlock4 } = req.body
 
     return res.redirect(
@@ -132,7 +124,7 @@ export default function routes({ auditService, prisonerSearchService, visitServi
     )
   })
 
-  get('/visit/results', async (req, res) => {
+  router.get('/visit/results', async (req, res) => {
     const searchBlock1 = typeof req.query.searchBlock1 === 'string' ? req.query.searchBlock1 : ''
     const searchBlock2 = typeof req.query.searchBlock2 === 'string' ? req.query.searchBlock2 : ''
     const searchBlock3 = typeof req.query.searchBlock3 === 'string' ? req.query.searchBlock3 : ''

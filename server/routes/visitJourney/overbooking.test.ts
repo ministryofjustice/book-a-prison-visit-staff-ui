@@ -162,7 +162,7 @@ testJourneys.forEach(journey => {
       it('should make reservation when yes is selected on overbooking page, then go to additional support', () => {
         return request(sessionApp)
           .post(`${journey.urlPrefix}/select-date-and-time/overbooking`)
-          .send('confirmOverBooking=yes')
+          .send({ confirmOverBooking: 'yes' })
           .expect(302)
           .expect('location', `${journey.urlPrefix}/additional-support`)
           .expect(() => {
@@ -202,7 +202,7 @@ testJourneys.forEach(journey => {
       it('should not make reservation when no is selected on overbooking page, then redirect to date and time', () => {
         return request(sessionApp)
           .post(`${journey.urlPrefix}/select-date-and-time/overbooking`)
-          .send('confirmOverBooking=no')
+          .send({ confirmOverBooking: 'no' })
           .expect(302)
           .expect('location', `${journey.urlPrefix}/select-date-and-time`)
           .expect(() => {
@@ -222,6 +222,7 @@ testJourneys.forEach(journey => {
       it('should set validation errors in flash and redirect if no overbooking option selected', () => {
         return request(sessionApp)
           .post(`${journey.urlPrefix}/select-date-and-time/overbooking`)
+          .send({})
           .expect(302)
           .expect('location', `${journey.urlPrefix}/select-date-and-time/overbooking`)
           .expect(() => {

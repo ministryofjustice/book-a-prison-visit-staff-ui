@@ -84,8 +84,7 @@ describe('Clear visit notifications', () => {
     it('should clear visit notifications and redirect to the booking summary page if YES and reason given', () => {
       return request(app)
         .post('/visit/ab-cd-ef-gh/clear-notifications')
-        .send('clearNotifications=yes')
-        .send('clearReason=reason')
+        .send({ clearNotifications: 'yes', clearReason: 'reason' })
         .expect(302)
         .expect('location', '/visit/ab-cd-ef-gh')
         .expect(() => {
@@ -111,7 +110,7 @@ describe('Clear visit notifications', () => {
     it('should NOT clear visit notifications and redirect to the booking summary page if NO selected', () => {
       return request(app)
         .post('/visit/ab-cd-ef-gh/clear-notifications')
-        .send('clearNotifications=no')
+        .send({ clearNotifications: 'no', clearReason: '' })
         .expect(302)
         .expect('location', '/visit/ab-cd-ef-gh')
         .expect(() => {
@@ -124,6 +123,7 @@ describe('Clear visit notifications', () => {
     it('should set validation errors in flash and redirect to self if no reason selected', () => {
       return request(app)
         .post('/visit/ab-cd-ef-gh/clear-notifications')
+        .send({})
         .expect(302)
         .expect('location', '/visit/ab-cd-ef-gh/clear-notifications')
         .expect(() => {
@@ -145,7 +145,7 @@ describe('Clear visit notifications', () => {
     it('should set validation errors in flash and redirect to self if YES selected and no reason given', () => {
       return request(app)
         .post('/visit/ab-cd-ef-gh/clear-notifications')
-        .send('clearNotifications=yes')
+        .send({ clearNotifications: 'yes', clearReason: '' })
         .expect(302)
         .expect('location', '/visit/ab-cd-ef-gh/clear-notifications')
         .expect(() => {

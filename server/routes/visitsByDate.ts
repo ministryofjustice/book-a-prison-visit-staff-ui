@@ -1,6 +1,5 @@
-import { type RequestHandler, Router } from 'express'
+import { Router } from 'express'
 import { body, validationResult, oneOf } from 'express-validator'
-import asyncMiddleware from '../middleware/asyncMiddleware'
 import { getParsedDateFromQueryString } from '../utils/utils'
 import { getDateTabs, getSelectedOrDefaultSessionSchedule, getSessionsSideNav } from './visitsUtils'
 import type { Services } from '../services'
@@ -16,18 +15,7 @@ export default function routes({
 }: Services): Router {
   const router = Router()
 
-  const get = (path: string | string[], ...handlers: RequestHandler[]) =>
-    router.get(
-      path,
-      handlers.map(handler => asyncMiddleware(handler)),
-    )
-  const post = (path: string | string[], ...handlers: RequestHandler[]) =>
-    router.post(
-      path,
-      handlers.map(handler => asyncMiddleware(handler)),
-    )
-
-  get('/', async (req, res) => {
+  router.get('/', async (req, res) => {
     const { prisonId } = req.session.selectedEstablishment
     const { username } = res.locals.user
 
@@ -138,7 +126,7 @@ export default function routes({
 
   // New datepicker will return 1/1/2024 - 11/1/2024 - 1/11/2024 - 11/11/2024
   // Previously only returned 2 digits, 01/01/2024 etc
-  post('/', async (req, res) => {
+  router.post('/', async (req, res) => {
     await oneOf(
       [
         body('date').isDate({ format: 'D/M/YYYY' }),

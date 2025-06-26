@@ -363,7 +363,7 @@ testJourneys.forEach(journey => {
       it('should save to session, create a visit application and redirect to additional support page if slot selected', () => {
         return request(sessionApp)
           .post(`${journey.urlPrefix}/select-date-and-time`)
-          .send('visit-date-and-time=2')
+          .send({ 'visit-date-and-time': '2' })
           .expect(302)
           .expect('location', `${journey.urlPrefix}/additional-support`)
           .expect(() => {
@@ -406,7 +406,7 @@ testJourneys.forEach(journey => {
 
         return request(sessionApp)
           .post(`${journey.urlPrefix}/select-date-and-time`)
-          .send('visit-date-and-time=3')
+          .send({ 'visit-date-and-time': '3' })
           .expect(302)
           .expect('location', `${journey.urlPrefix}/additional-support`)
           .expect(() => {
@@ -449,6 +449,7 @@ testJourneys.forEach(journey => {
       it('should should set validation errors in flash and redirect if no slot selected', () => {
         return request(sessionApp)
           .post(`${journey.urlPrefix}/select-date-and-time`)
+          .send({})
           .expect(302)
           .expect('location', `${journey.urlPrefix}/select-date-and-time`)
           .expect(() => {
@@ -469,7 +470,7 @@ testJourneys.forEach(journey => {
       it('should should set validation errors in flash and redirect if invalid slot selected', () => {
         return request(sessionApp)
           .post(`${journey.urlPrefix}/select-date-and-time`)
-          .send('visit-date-and-time=100')
+          .send({ 'visit-date-and-time': '100' })
           .expect(302)
           .expect('location', `${journey.urlPrefix}/select-date-and-time`)
           .expect(() => {
@@ -490,7 +491,7 @@ testJourneys.forEach(journey => {
       it('should re-direct to overbooking page if session has no available slots', () => {
         return request(sessionApp)
           .post(`${journey.urlPrefix}/select-date-and-time`)
-          .send('visit-date-and-time=4')
+          .send({ 'visit-date-and-time': '4' })
           .expect(302)
           .expect('location', `${journey.urlPrefix}/select-date-and-time/overbooking`)
           .expect(() => {

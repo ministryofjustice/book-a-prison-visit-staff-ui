@@ -1,8 +1,7 @@
-import { type RequestHandler, type Request, Router } from 'express'
+import { type Request, Router } from 'express'
 import { body, validationResult } from 'express-validator'
 import { BadRequest } from 'http-errors'
 import { VisitSessionData } from '../@types/bapv'
-import asyncMiddleware from '../middleware/asyncMiddleware'
 import { isValidPrisonerNumber } from './validationChecks'
 import { clearSession } from './visitorUtils'
 import type { Services } from '../services'
@@ -11,10 +10,7 @@ import { getDpsPrisonerAlertsUrl } from '../utils/utils'
 export default function routes({ auditService, prisonerProfileService }: Services): Router {
   const router = Router()
 
-  const get = (path: string, handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
-  const post = (path: string, handler: RequestHandler) => router.post(path, asyncMiddleware(handler))
-
-  get('/:offenderNo', async (req, res) => {
+  router.get('/:offenderNo', async (req, res) => {
     const prisonerId = getOffenderNo(req)
     const { prisonId } = req.session.selectedEstablishment
     const search = (req.query?.search as string) ?? ''
@@ -38,7 +34,7 @@ export default function routes({ auditService, prisonerProfileService }: Service
     })
   })
 
-  post('/:offenderNo', async (req, res) => {
+  router.post('/:offenderNo', async (req, res) => {
     const offenderNo = getOffenderNo(req)
     const { prisonId } = req.session.selectedEstablishment
     const { username } = res.locals.user

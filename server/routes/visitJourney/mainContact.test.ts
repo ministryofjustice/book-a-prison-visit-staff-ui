@@ -250,9 +250,7 @@ testJourneys.forEach(journey => {
       it('should store contact data in session (named contact & phone number) and update the application then redirect to request method page', () => {
         return request(sessionApp)
           .post(`${journey.urlPrefix}/select-main-contact`)
-          .send('contact=123')
-          .send('phoneNumber=hasPhoneNumber')
-          .send('phoneNumberInput=+0114+1234+567+')
+          .send({ contact: '123', phoneNumber: 'hasPhoneNumber', phoneNumberInput: ' 0114 1234 567 ' })
           .expect(302)
           .expect('location', `${journey.urlPrefix}/request-method`)
           .expect(() => {
@@ -269,10 +267,12 @@ testJourneys.forEach(journey => {
       it('should store contact data in session (other contact & phone number) and update the application then redirect to request method page', () => {
         return request(sessionApp)
           .post(`${journey.urlPrefix}/select-main-contact`)
-          .send('contact=someoneElse')
-          .send('someoneElseName=++another+person++')
-          .send('phoneNumber=hasPhoneNumber')
-          .send('phoneNumberInput=0114+7654+321')
+          .send({
+            contact: 'someoneElse',
+            someoneElseName: '  another person  ',
+            phoneNumber: 'hasPhoneNumber',
+            phoneNumberInput: '0114 7654 321',
+          })
           .expect(302)
           .expect('location', `${journey.urlPrefix}/request-method`)
           .expect(() => {
@@ -296,10 +296,12 @@ testJourneys.forEach(journey => {
         }
         return request(sessionApp)
           .post(`${journey.urlPrefix}/select-main-contact`)
-          .send('contact=someoneElse')
-          .send('someoneElseName=another+person')
-          .send('phoneNumber=hasPhoneNumber')
-          .send('phoneNumberInput=0114+7654+321')
+          .send({
+            contact: 'someoneElse',
+            someoneElseName: '  another person  ',
+            phoneNumber: 'hasPhoneNumber',
+            phoneNumberInput: '0114 7654 321',
+          })
           .expect(302)
           .expect('location', `${journey.urlPrefix}/request-method`)
           .expect(() => {
@@ -316,6 +318,7 @@ testJourneys.forEach(journey => {
       it('should set validation errors in flash and redirect if no main contact selected', () => {
         return request(sessionApp)
           .post(`${journey.urlPrefix}/select-main-contact`)
+          .send({})
           .expect(302)
           .expect('location', `${journey.urlPrefix}/select-main-contact`)
           .expect(() => {
@@ -344,10 +347,12 @@ testJourneys.forEach(journey => {
       it('should set validation errors in flash and redirect if someone else selected but no name entered', () => {
         return request(sessionApp)
           .post(`${journey.urlPrefix}/select-main-contact`)
-          .send('contact=someoneElse')
-          .send('someoneElseName=')
-          .send('phoneNumber=hasPhoneNumber')
-          .send('phoneNumberInput=')
+          .send({
+            contact: 'someoneElse',
+            someoneElseName: '',
+            phoneNumber: 'hasPhoneNumber',
+            phoneNumberInput: '',
+          })
           .expect(302)
           .expect('location', `${journey.urlPrefix}/select-main-contact`)
           .expect(() => {
@@ -375,9 +380,11 @@ testJourneys.forEach(journey => {
       it('should set validation errors in flash and redirect if invalid data entered', () => {
         return request(sessionApp)
           .post(`${journey.urlPrefix}/select-main-contact`)
-          .send('contact=non-existant')
-          .send('phoneNumber=hasPhoneNumber')
-          .send('phoneNumberInput=abc123')
+          .send({
+            contact: 'non-existant',
+            phoneNumber: 'hasPhoneNumber',
+            phoneNumberInput: 'abc123',
+          })
           .expect(302)
           .expect('location', `${journey.urlPrefix}/select-main-contact`)
           .expect(() => {

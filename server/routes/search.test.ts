@@ -221,13 +221,13 @@ describe('Prisoner search page', () => {
 
     describe('POST /search/prisoner', () => {
       it('should redirect to search results page with search query when no search term entered', () => {
-        return request(app).post('/search/prisoner').expect(302).expect('location', '/search/prisoner/results')
+        return request(app).post('/search/prisoner').send({}).expect(302).expect('location', '/search/prisoner/results')
       })
 
       it('should redirect to search results page with trimmed query param when search term entered', () => {
         return request(app)
           .post('/search/prisoner')
-          .send('search= john smith ')
+          .send({ search: ' john smith ' })
           .expect(302)
           .expect('location', '/search/prisoner/results?search=john%20smith')
       })

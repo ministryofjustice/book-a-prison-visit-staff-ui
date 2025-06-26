@@ -29,14 +29,14 @@
 {% endblock %}
 
 {% block beforeContent %}
-  <div role="navigation">
-    {% if backLinkHref %}
+  {% if backLinkHref %}
+    <div role="navigation">
       {{ govukBackLink({
         text: "Back",
         href: backLinkHref
       }) }}
-    {% endif %}
-  </div>
+    </div>
+  {% endif %}
 {% endblock %}
 
 {% block footer %}
