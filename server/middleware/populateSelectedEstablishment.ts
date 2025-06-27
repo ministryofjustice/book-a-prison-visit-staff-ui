@@ -1,10 +1,9 @@
 import type { RequestHandler } from 'express'
 import { Services } from '../services'
 import logger from '../../logger'
-import asyncMiddleware from './asyncMiddleware'
 
 export default function populateSelectedEstablishment({ supportedPrisonsService }: Services): RequestHandler {
-  return asyncMiddleware(async (req, res, next) => {
+  return async (req, res, next) => {
     if (req.path === '/establishment-not-supported') {
       return next()
     }
@@ -39,5 +38,5 @@ export default function populateSelectedEstablishment({ supportedPrisonsService 
     }
 
     return res.redirect('/establishment-not-supported')
-  })
+  }
 }

@@ -1,8 +1,6 @@
-import { RequestHandler, Router } from 'express'
-import { ValidationChain } from 'express-validator'
+import { Router } from 'express'
 import { BadRequest } from 'http-errors'
 import { Services } from '../../services'
-import asyncMiddleware from '../../middleware/asyncMiddleware'
 import VisitDetailsController from './visitDetailsController'
 import CancelVisitController from './cancelVisitController'
 import { isValidVisitReference } from '../validationChecks'
@@ -12,11 +10,6 @@ import UpdateVisitController from './updateVisitController'
 
 export default function routes(services: Services): Router {
   const router = Router()
-
-  const get = (path: string | string[], handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
-  const post = (path: string, handler: RequestHandler) => router.post(path, asyncMiddleware(handler))
-  const postWithValidation = (path: string | string[], validationChain: ValidationChain[], handler: RequestHandler) =>
-    router.post(path, ...validationChain, asyncMiddleware(handler))
 
   const visitDetails = new VisitDetailsController(services.auditService, services.visitService)
   const cancelVisit = new CancelVisitController(services.auditService, services.visitService)
@@ -33,23 +26,19 @@ export default function routes(services: Services): Router {
     next()
   })
 
-  get('/:reference', visitDetails.view())
-  post('/:reference', updateVisit.startVisitUpdate())
+  router.get('/:reference', visitDetails.view())
+  router.post('/:reference', updateVisit.startVisitUpdate())
 
-  get('/:reference/cancel', cancelVisit.showCancellationReasons())
-  postWithValidation('/:reference/cancel', cancelVisit.validate(), cancelVisit.cancelVisit())
+  router.get('/:reference/cancel', cancelVisit.showCancellationReasons())
+  router.post('/:reference/cancel', cancelVisit.validate(), cancelVisit.cancelVisit())
 
-  get('/:reference/cancelled', cancelVisit.cancelConfirmation())
+  router.get('/:reference/cancelled', cancelVisit.cancelConfirmation())
 
-  get('/:reference/clear-notifications', clearNotifications.view())
-  postWithValidation(
-    '/:reference/clear-notifications',
-    clearNotifications.validate(),
-    clearNotifications.clearNotifications(),
-  )
+  router.get('/:reference/clear-notifications', clearNotifications.view())
+  router.post('/:reference/clear-notifications', clearNotifications.validate(), clearNotifications.clearNotifications())
 
-  get('/:reference/confirm-update', confirmUpdate.viewConfirmUpdate())
-  post('/:reference/confirm-update', confirmUpdate.submitConfirmUpdate())
+  router.get('/:reference/confirm-update', confirmUpdate.viewConfirmUpdate())
+  router.post('/:reference/confirm-update', confirmUpdate.submitConfirmUpdate())
 
   return router
 }

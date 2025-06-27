@@ -646,7 +646,7 @@ testJourneys.forEach(journey => {
 
       return request(sessionApp)
         .post(`${journey.urlPrefix}/select-visitors`)
-        .send('visitors=4322')
+        .send({ visitors: '4322' })
         .expect(302)
         .expect('location', `${journey.urlPrefix}/select-date-and-time`)
         .expect(() => {
@@ -679,7 +679,7 @@ testJourneys.forEach(journey => {
 
       return request(sessionApp)
         .post(`${journey.urlPrefix}/select-visitors`)
-        .send('visitors=4326')
+        .send({ visitors: '4326' })
         .expect(302)
         .expect('location', `${journey.urlPrefix}/select-date-and-time`)
         .expect(() => {
@@ -722,7 +722,7 @@ testJourneys.forEach(journey => {
 
       return request(sessionApp)
         .post(`${journey.urlPrefix}/select-visitors`)
-        .send('visitors=4326')
+        .send({ visitors: '4326' })
         .expect(302)
         .expect('location', `${journey.urlPrefix}/select-date-and-time`)
         .expect(() => {
@@ -759,7 +759,7 @@ testJourneys.forEach(journey => {
 
       return request(sessionApp)
         .post(`${journey.urlPrefix}/select-visitors`)
-        .send('visitors=4322')
+        .send({ visitors: '4322' })
         .expect(302)
         .expect('location', `${journey.urlPrefix}/visit-type`)
         .expect(() => {
@@ -806,7 +806,7 @@ testJourneys.forEach(journey => {
 
       return request(sessionApp)
         .post(`${journey.urlPrefix}/select-visitors`)
-        .send('visitors=4324&visitors=4000')
+        .send({ visitors: ['4324', '4000'] })
         .expect(302)
         .expect('location', `${journey.urlPrefix}/select-date-and-time`)
         .expect(() => {
@@ -842,7 +842,7 @@ testJourneys.forEach(journey => {
 
       return request(sessionApp)
         .post(`${journey.urlPrefix}/select-visitors`)
-        .send('visitors=4322&visitors=4324')
+        .send({ visitors: ['4322', '4324'] })
         .expect(302)
         .expect('location', `${journey.urlPrefix}/select-date-and-time`)
         .expect(() => {
@@ -893,7 +893,7 @@ testJourneys.forEach(journey => {
 
       return request(sessionApp)
         .post(`${journey.urlPrefix}/select-visitors`)
-        .send('visitors=4323')
+        .send({ visitors: '4323' })
         .expect(302)
         .expect('location', `${journey.urlPrefix}/select-date-and-time`)
         .expect(() => {
@@ -907,7 +907,7 @@ testJourneys.forEach(journey => {
     it('should should set validation errors in flash and redirect if invalid visitor selected', () => {
       return request(sessionApp)
         .post(`${journey.urlPrefix}/select-visitors`)
-        .send('visitors=1234')
+        .send({ visitors: '1234' })
         .expect(302)
         .expect('location', `${journey.urlPrefix}/select-visitors`)
         .expect(() => {
@@ -921,7 +921,7 @@ testJourneys.forEach(journey => {
     it('should should set validation errors in flash and redirect if banned is visitor selected', () => {
       return request(sessionApp)
         .post(`${journey.urlPrefix}/select-visitors`)
-        .send('visitors=4321')
+        .send({ visitors: '4321' })
         .expect(302)
         .expect('location', `${journey.urlPrefix}/select-visitors`)
         .expect(() => {
@@ -935,6 +935,7 @@ testJourneys.forEach(journey => {
     it('should set validation errors in flash and redirect if no visitors are selected', () => {
       return request(sessionApp)
         .post(`${journey.urlPrefix}/select-visitors`)
+        .send({})
         .expect(302)
         .expect('location', `${journey.urlPrefix}/select-visitors`)
         .expect(() => {

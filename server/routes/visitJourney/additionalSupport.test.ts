@@ -252,6 +252,7 @@ testJourneys.forEach(journey => {
     it('should set validation errors in flash and redirect if additional support question not answered', () => {
       return request(sessionApp)
         .post(`${journey.urlPrefix}/additional-support`)
+        .send({})
         .expect(302)
         .expect('location', `${journey.urlPrefix}/additional-support`)
         .expect(() => {
@@ -271,7 +272,7 @@ testJourneys.forEach(journey => {
     it('should set validation errors in flash and redirect if additional support selected but no request selected', () => {
       return request(sessionApp)
         .post(`${journey.urlPrefix}/additional-support`)
-        .send('additionalSupportRequired=yes')
+        .send({ additionalSupportRequired: 'yes' })
         .expect(302)
         .expect('location', `${journey.urlPrefix}/additional-support`)
         .expect(() => {
@@ -296,7 +297,7 @@ testJourneys.forEach(journey => {
 
       return request(sessionApp)
         .post(`${journey.urlPrefix}/additional-support`)
-        .send('additionalSupportRequired=yes')
+        .send({ additionalSupportRequired: 'yes' })
         .expect(302)
         .expect('location', `${journey.urlPrefix}/additional-support`)
         .expect(() => {
@@ -320,7 +321,7 @@ testJourneys.forEach(journey => {
       visitSessionData.visitorSupport = { description: 'BSL Required' }
       return request(sessionApp)
         .post(`${journey.urlPrefix}/additional-support`)
-        .send('additionalSupportRequired=no')
+        .send({ additionalSupportRequired: 'no' })
         .expect(302)
         .expect('location', `${journey.urlPrefix}/select-main-contact`)
         .expect(() => {
@@ -331,9 +332,11 @@ testJourneys.forEach(journey => {
     it('should redirect to the select main contact page when support requests chosen and store in session', () => {
       return request(sessionApp)
         .post(`${journey.urlPrefix}/additional-support`)
-        .send('additionalSupportRequired=yes')
-        .send('additionalSupport=Wheelchair requested')
-        .send('otherSupportDetails=custom-request')
+        .send({
+          additionalSupportRequired: 'yes',
+          additionalSupport: 'Wheelchair requested',
+          otherSupportDetails: 'custom-request',
+        })
         .expect(302)
         .expect('location', `${journey.urlPrefix}/select-main-contact`)
         .expect(() => {

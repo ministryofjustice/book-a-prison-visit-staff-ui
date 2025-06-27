@@ -48,7 +48,7 @@ export default class CheckYourBooking {
 
     const urlPrefix = getUrlPrefix(isUpdate)
 
-    const { confirmOverBooking } = req.body // this will be set if we have come from overbooking confirmation page
+    const confirmOverBooking = req.body?.confirmOverBooking ?? '' // this will be set if we have come from overbooking confirmation page
     if (confirmOverBooking === 'no') {
       return res.redirect(`${urlPrefix}/select-date-and-time`) // i.e. return early if we're going to
     }

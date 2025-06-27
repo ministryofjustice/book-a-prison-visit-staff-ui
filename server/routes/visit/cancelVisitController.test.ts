@@ -143,8 +143,7 @@ describe('POST /visit/:reference/cancel', () => {
   it('should cancel visit (default method NOT_APPLICABLE), set flash values and redirect to confirmation page', () => {
     return request(app)
       .post('/visit/ab-cd-ef-gh/cancel')
-      .send('cancel=PRISONER_CANCELLED')
-      .send('reason=++illness++')
+      .send({ cancel: 'PRISONER_CANCELLED', reason: '  illness  ' })
       .expect(302)
       .expect('location', '/visit/ab-cd-ef-gh/cancelled')
       .expect(() => {
@@ -181,9 +180,7 @@ describe('POST /visit/:reference/cancel', () => {
   it('should capture the request method if VISITOR_CANCELLED', () => {
     return request(app)
       .post('/visit/ab-cd-ef-gh/cancel')
-      .send('cancel=VISITOR_CANCELLED')
-      .send('method=EMAIL')
-      .send('reason=++illness++')
+      .send({ cancel: 'VISITOR_CANCELLED', method: 'EMAIL', reason: '  illness  ' })
       .expect(302)
       .expect('location', '/visit/ab-cd-ef-gh/cancelled')
       .expect(() => {
@@ -207,6 +204,7 @@ describe('POST /visit/:reference/cancel', () => {
   it('should set validation errors in flash and redirect if no reason selected', () => {
     return request(app)
       .post('/visit/ab-cd-ef-gh/cancel')
+      .send({})
       .expect(302)
       .expect('location', '/visit/ab-cd-ef-gh/cancel')
       .expect(() => {
@@ -229,8 +227,7 @@ describe('POST /visit/:reference/cancel', () => {
   it('should set validation errors in flash and redirect if VISITOR_CANCELLED and no method selected', () => {
     return request(app)
       .post('/visit/ab-cd-ef-gh/cancel')
-      .send('cancel=VISITOR_CANCELLED')
-      .send('reason=illness')
+      .send({ cancel: 'VISITOR_CANCELLED', reason: 'illness' })
       .expect(302)
       .expect('location', '/visit/ab-cd-ef-gh/cancel')
       .expect(() => {
@@ -246,7 +243,7 @@ describe('POST /visit/:reference/cancel', () => {
   it('should set validation errors in flash and redirect if no reason text entered', () => {
     return request(app)
       .post('/visit/ab-cd-ef-gh/cancel')
-      .send('cancel=PRISONER_CANCELLED')
+      .send({ cancel: 'PRISONER_CANCELLED' })
       .expect(302)
       .expect('location', '/visit/ab-cd-ef-gh/cancel')
       .expect(() => {
@@ -271,8 +268,7 @@ describe('POST /visit/:reference/cancel', () => {
   it('should set validation errors in flash and redirect if invalid data entered', () => {
     return request(app)
       .post('/visit/ab-cd-ef-gh/cancel')
-      .send('cancel=INVALID_VALUE')
-      .send('reason=illness')
+      .send({ cancel: 'INVALID_VALUE', reason: 'illness' })
       .expect(302)
       .expect('location', '/visit/ab-cd-ef-gh/cancel')
       .expect(() => {
