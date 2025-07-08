@@ -138,7 +138,7 @@ describe('Visit sessions service', () => {
                 prisonerEvents: {
                   morning: [
                     {
-                      description: 'eventSourceDesc',
+                      description: 'Activity - eventSourceDesc',
                       endTimestamp: '2022-02-14T11:00:00',
                       startTimestamp: '2022-02-14T10:00:00',
                     },

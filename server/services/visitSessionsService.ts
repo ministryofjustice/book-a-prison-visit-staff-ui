@@ -198,8 +198,20 @@ export default class VisitSessionsService {
         return {
           startTimestamp: event.startTime,
           endTimestamp: event.endTime,
-          description: event.eventSourceDesc,
+          description: this.getEventDescription(event),
         }
       })
+  }
+
+  private getEventDescription(event: ScheduledEvent): string {
+    if (event.eventType === 'APP') {
+      return `Appointment - ${event.eventSubTypeDesc}`
+    }
+
+    if (event.eventType === 'VISIT') {
+      return `Visit - ${event.eventSourceDesc}`
+    }
+
+    return `Activity - ${event.eventSourceDesc}`
   }
 }
