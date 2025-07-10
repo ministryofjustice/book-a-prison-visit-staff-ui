@@ -119,8 +119,7 @@ describe('Visit details page', () => {
           // visitor details
           expect($('[data-test="visitor-name-1"]').text()).toBe('Jeanette Smith')
           expect($('[data-test="visitor-relation-1"]').text()).toBe('wife')
-          expect($('[data-test="visitor-dob-1"]').text()).toBe('28 July 1986')
-          expect($('[data-test="visitor-age-1"]').text()).toBe('35 years old')
+          expect($('[data-test="visitor-dob-1"]').text()).toMatch(/28 July 1986\s+\(35 years old\)/)
           expect($('[data-test="visitor-address-1"]').text()).toBe('123 The Street,\nCoventry')
           expect($('[data-test="visitor-1-restriction-1"]').text()).toContain('Closed')
           expect($('[data-test="visitor-1-restriction-1-start"]').text()).toContain('11/1/2022')
