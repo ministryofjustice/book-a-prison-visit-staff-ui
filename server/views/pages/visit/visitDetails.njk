@@ -3,6 +3,7 @@
 {%- from "moj/components/alert/macro.njk" import mojAlert -%}
 {%- from "moj/components/timeline/macro.njk" import mojTimeline -%}
 {%- from "components/expandableComment/macro.njk" import bapvExpandableComment -%}
+{% from "components/visitors.njk" import visitorDateOfBirth %}
 
 {% set pageHeaderTitle = "Visit booking details (" + visitDetails.reference + ")" %}
 
@@ -200,9 +201,8 @@
           </h3>
           <dl class="govuk-list bapv-visit-details__person-details">
             <dt>Date of birth</dt>
-            <dd>
-              <span data-test="visitor-dob-{{ loop.index }}">{{ visitor.dateOfBirth | formatDate }}</span>
-              (<span data-test="visitor-age-{{ loop.index }}">{{ visitor.dateOfBirth | displayAge }}</span>)
+            <dd data-test="visitor-dob-{{ loop.index }}">
+              {{- visitorDateOfBirth(visitor) -}}
             </dd>
 
             <dt>Address</dt>
