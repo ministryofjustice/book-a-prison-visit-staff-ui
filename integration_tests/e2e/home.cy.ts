@@ -18,10 +18,10 @@ context('Home page', () => {
     const homePage = Page.verifyOnPage(HomePage)
 
     homePage.bookOrChangeVisitTile().contains('Book or change a visit')
-    homePage.needReviewTile().contains('Need review')
+    homePage.needReviewTile().contains('Visits that need review')
     homePage.needReviewBadgeCount().contains(notificationCount.count)
     homePage.viewVisitsTile().contains('View visits by date')
-    homePage.viewTimetableTile().contains('View visits timetable')
+    homePage.viewTimetableTile().contains('Visits timetable')
     homePage.blockDatesTile().contains('Block visit dates')
   })
 })

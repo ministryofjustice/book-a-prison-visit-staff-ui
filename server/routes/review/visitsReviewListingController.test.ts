@@ -29,7 +29,7 @@ describe('Bookings needing review listing page', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('.govuk-breadcrumbs li').length).toBe(2)
-          expect($('h1').text()).toBe('Visit bookings that need review')
+          expect($('h1').text()).toBe('Visits that need review')
 
           const numNotificationTypes = Object.keys(notificationTypeReasons).length
           expect($('[data-test="review-reasons-list"] li').length).toBe(numNotificationTypes)

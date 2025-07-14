@@ -13,13 +13,15 @@
     <div class="govuk-grid-column-full">
       <h1 class="govuk-heading-l">{{ applicationName }}</h1>
 
+      <h2 class="govuk-heading-m govuk-!-margin-top-7">Bookings</h2>
+
       <ul class="govuk-grid-row card-group">
         <li class="govuk-grid-column-one-third card-group__item">
           {{ card({
             "href": "/search/prisoner",
             "clickable": "true",
             "heading": "Book or change a visit",
-            "description": "Make a booking for a visitor",
+            "description": "Create, update or cancel a booking",
             "id": "book-or-change-visit"
           }) }}
         </li>
@@ -29,12 +31,12 @@
             "href": "/review",
             "clickable": "true",
             "heading":
-              '<span class="bapv-nowrap">Need review' +
+              '<span class="bapv-nowrap">Visits that need review' +
                 '<span class="govuk-!-margin-left-2' + (" moj-notification-badge" if reviewCount > 0) + '" data-test="need-review-count">' +
                   ((reviewCount if reviewCount < 100 else "99+") if reviewCount > 0)+
                 "</span>" +
               "</span>",
-            "description": "Check bookings that need review",
+            "description": "Review visits where details have changed since approval",
             "id": "need-review"
           }) }}
         </li>
@@ -48,12 +50,16 @@
             "id": "view-visits-by-date"
           }) }}
         </li>
+      </ul>
 
+      <h2 class="govuk-heading-m govuk-!-margin-top-5">Admin</h2>
+
+      <ul class="govuk-grid-row card-group">
         <li class="govuk-grid-column-one-third card-group__item">
           {{ card({
             "href": "/timetable",
             "clickable": "true",
-            "heading": "View visits timetable",
+            "heading": "Visits timetable",
             "description": "Check and request changes to the social visits timetable",
             "id": "view-timetable"
           }) }}

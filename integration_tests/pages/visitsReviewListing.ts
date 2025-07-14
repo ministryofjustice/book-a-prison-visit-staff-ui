@@ -2,7 +2,7 @@ import Page, { PageElement } from './page'
 
 export default class VisitsReviewListingPage extends Page {
   constructor() {
-    super('Visit bookings that need review')
+    super('Visits that need review')
   }
 
   filterByUser = (username: string): void => {
