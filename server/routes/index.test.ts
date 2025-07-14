@@ -39,13 +39,13 @@ describe('GET /', () => {
         expect($('[data-test="book-or-change-visit"] .card__link').text()).toBe('Book or change a visit')
         expect($('[data-test="book-or-change-visit"] .card__link').attr('href')).toBe('/search/prisoner')
 
-        expect($('[data-test="need-review"] .card__link').text()).toContain('Need review')
+        expect($('[data-test="need-review"] .card__link').text()).toContain('Visits that need review')
         expect($('[data-test="need-review"] .card__link').attr('href')).toBe('/review')
 
         expect($('[data-test="view-visits-by-date"] .card__link').text()).toBe('View visits by date')
         expect($('[data-test="view-visits-by-date"] .card__link').attr('href')).toBe('/visits')
 
-        expect($('[data-test="view-timetable"] .card__link').text()).toBe('View visits timetable')
+        expect($('[data-test="view-timetable"] .card__link').text()).toBe('Visits timetable')
         expect($('[data-test="view-timetable"] .card__link').attr('href')).toBe('/timetable')
 
         expect($('[data-test="block-dates"] .card__link').text()).toBe('Block visit dates')

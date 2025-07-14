@@ -39,7 +39,7 @@ context('Bookings review listing page', () => {
     const homePage = Page.verifyOnPage(HomePage)
 
     // 'Need review' tile and count
-    homePage.needReviewTile().contains('Need review')
+    homePage.needReviewTile().contains('Visits that need review')
     homePage.needReviewBadgeCount().contains(notificationCount.count)
 
     // booking review listing page
