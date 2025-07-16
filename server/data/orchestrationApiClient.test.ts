@@ -19,6 +19,7 @@ import {
   VisitBookingDetailsRaw,
   VisitNotificationEvent,
   VisitNotificationEventRaw,
+  VisitRequestsCountDto,
   VisitRestriction,
 } from './orchestrationApiTypes'
 import { Prison, VisitSessionData } from '../@types/bapv'
@@ -588,6 +589,21 @@ describe('orchestrationApiClient', () => {
       const output = await orchestrationApiClient.isBlockedDate(prisonId, excludedDate)
 
       expect(output).toStrictEqual(true)
+    })
+  })
+
+  describe('getVisitRequestCount', () => {
+    it('should count of visit requests for given prison', async () => {
+      const count: VisitRequestsCountDto = { count: 1 }
+
+      fakeOrchestrationApi
+        .get(`/visits/requests/${prisonId}/count`)
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, count)
+
+      const output = await orchestrationApiClient.getVisitRequestCount(prisonId)
+
+      expect(output).toStrictEqual(count)
     })
   })
 

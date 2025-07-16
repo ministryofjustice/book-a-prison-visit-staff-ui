@@ -17,6 +17,7 @@ import {
   VisitNotifications,
   VisitNotificationsRaw,
   VisitPreview,
+  VisitRequestsCountDto,
   VisitSession,
   VisitSummary,
 } from '../../data/orchestrationApiTypes'
@@ -354,15 +355,16 @@ export default class TestData {
   static supportedPrisonIds = ({ prisonIds = ['HEI', 'BLI'] } = {}): string[] => prisonIds
 
   static prison = ({
-    prisonId = 'HEI',
-    prisonName = 'Hewell (HMP)',
-    active = true,
-    policyNoticeDaysMax = 28,
-    policyNoticeDaysMin = 2,
-    maxTotalVisitors = 6,
-    maxAdultVisitors = 3,
-    maxChildVisitors = 4,
-    adultAgeYears = 18,
+    prisonId = this.prisonDto().code,
+    prisonName = this.prisonDto().prisonName,
+    active = this.prisonDto().active,
+    policyNoticeDaysMax = this.prisonDto().policyNoticeDaysMax,
+    policyNoticeDaysMin = this.prisonDto().policyNoticeDaysMin,
+    maxTotalVisitors = this.prisonDto().maxTotalVisitors,
+    maxAdultVisitors = this.prisonDto().maxAdultVisitors,
+    maxChildVisitors = this.prisonDto().maxChildVisitors,
+    adultAgeYears = this.prisonDto().adultAgeYears,
+    clients = this.prisonDto().clients,
   }: Partial<Prison> = {}): Prison =>
     ({
       prisonId,
@@ -374,6 +376,7 @@ export default class TestData {
       maxAdultVisitors,
       maxChildVisitors,
       adultAgeYears,
+      clients,
     }) as Prison
 
   static prisonDto = ({
@@ -386,6 +389,7 @@ export default class TestData {
     maxAdultVisitors = 3,
     maxChildVisitors = 4,
     adultAgeYears = 18,
+    clients = [{ userType: 'STAFF', active: true }],
   }: Partial<PrisonDto> = {}): PrisonDto =>
     ({
       code,
@@ -397,6 +401,7 @@ export default class TestData {
       maxAdultVisitors,
       maxChildVisitors,
       adultAgeYears,
+      clients,
     }) as PrisonDto
 
   static visit = ({
@@ -678,6 +683,8 @@ export default class TestData {
     firstBookedDateTime,
     visitRestriction,
   })
+
+  static visitRequestCount = ({ count = 3 }: Partial<VisitRequestsCountDto> = {}): VisitRequestsCountDto => ({ count })
 
   static visitSession = ({
     sessionTemplateReference = 'v9d.7ed.7u',

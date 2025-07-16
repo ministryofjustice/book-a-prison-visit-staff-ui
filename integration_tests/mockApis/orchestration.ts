@@ -16,6 +16,7 @@ import {
   VisitBookingDetailsRaw,
   VisitNotificationsRaw,
   VisitPreview,
+  VisitRequestsCountDto,
   VisitSession,
 } from '../../server/data/orchestrationApiTypes'
 import TestData from '../../server/routes/testutils/testData'
@@ -513,6 +514,26 @@ export default {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
         jsonBody: excludeDates,
+      },
+    })
+  },
+
+  stubVisitRequestCount: ({
+    prisonId,
+    count = TestData.visitRequestCount(),
+  }: {
+    prisonId: string
+    count: VisitRequestsCountDto
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        url: `/orchestration/visits/requests/${prisonId}/count`,
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: count,
       },
     })
   },
