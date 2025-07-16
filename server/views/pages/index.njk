@@ -7,6 +7,12 @@
   {{ breadcrumbs(false) }}
 {% endblock %}
 
+{% macro notificationCountBadge(count, dataTestAttr) -%}
+  <span class="govuk-!-margin-left-2 {{" moj-notification-badge" if count > 0 }}" data-test="{{ dataTestAttr}}">
+    {{- (count if count < 100 else "99+") if count > 0 -}}
+  </span>
+{%- endmacro %}
+
 {% block content %}
 
   <div class="govuk-grid-row">
@@ -26,15 +32,29 @@
           }) }}
         </li>
 
+        {% if showRequestedVisitsTile %}
+          <li class="govuk-grid-column-one-third card-group__item">
+            {{ card({
+              "href": "/requested-visits",
+              "clickable": "true",
+              "heading":
+                '<span class="bapv-nowrap">Requested visits' +
+                  notificationCountBadge(requestCount, "visit-request-count") +
+                  "</span>" +
+                "</span>",
+              "description": "Check requests from online bookers",
+              "id": "visit-requests"
+            }) }}
+          </li>
+        {% endif %}
+
         <li class="govuk-grid-column-one-third card-group__item">
           {{ card({
             "href": "/review",
             "clickable": "true",
             "heading":
               '<span class="bapv-nowrap">Visits that need review' +
-                '<span class="govuk-!-margin-left-2' + (" moj-notification-badge" if reviewCount > 0) + '" data-test="need-review-count">' +
-                  ((reviewCount if reviewCount < 100 else "99+") if reviewCount > 0)+
-                "</span>" +
+                notificationCountBadge(reviewCount, "need-review-count") +
               "</span>",
             "description": "Review visits where details have changed since approval",
             "id": "need-review"
