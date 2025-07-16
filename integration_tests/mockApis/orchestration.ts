@@ -519,7 +519,7 @@ export default {
   },
 
   stubVisitRequestCount: ({
-    prisonId,
+    prisonId = 'HEI',
     count = TestData.visitRequestCount(),
   }: {
     prisonId: string

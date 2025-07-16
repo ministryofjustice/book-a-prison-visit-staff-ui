@@ -11,6 +11,10 @@ export default class HomePage extends Page {
 
   bookOrChangeVisitTile = (): PageElement => cy.get('[data-test="book-or-change-visit"]')
 
+  visitRequestsTile = (): PageElement => cy.get('[data-test="visit-requests"]')
+
+  visitRequestsBadgeCount = (): PageElement => cy.get('[data-test="visit-request-count"]')
+
   needReviewTile = (): PageElement => cy.get('[data-test="need-review"]')
 
   needReviewBadgeCount = (): PageElement => cy.get('[data-test="need-review-count"]')
