@@ -137,6 +137,7 @@ export default {
         ).split(',')
       ),
     },
+    visitRequest: get('FEATURE_VISIT_REQUEST', 'false') === 'true',
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
   environmentName: get('ENVIRONMENT_NAME', ''),
