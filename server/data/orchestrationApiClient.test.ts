@@ -23,6 +23,7 @@ import {
   VisitRestriction,
 } from './orchestrationApiTypes'
 import { Prison, VisitSessionData } from '../@types/bapv'
+import { setFeature } from './testutils/mockFeature'
 
 describe('orchestrationApiClient', () => {
   let fakeOrchestrationApi: nock.Scope
@@ -153,22 +154,19 @@ describe('orchestrationApiClient', () => {
   describe('getVisitDetailed', () => {
     beforeEach(() => {
       // set enabled raw notification types: others should be filtered
-      jest.replaceProperty(config, 'features', {
-        ...config.features,
-        notificationTypes: {
-          enabledRawNotifications: [
-            'PRISONER_RELEASED_EVENT',
-            'PERSON_RESTRICTION_UPSERTED_EVENT',
-            'VISITOR_RESTRICTION_UPSERTED_EVENT',
-          ],
-        },
+      setFeature('notificationTypes', {
+        enabledRawNotifications: [
+          'PRISONER_RELEASED_EVENT',
+          'PERSON_RESTRICTION_UPSERTED_EVENT',
+          'VISITOR_RESTRICTION_UPSERTED_EVENT',
+        ],
       })
 
       orchestrationApiClient = new OrchestrationApiClient(token)
     })
 
     afterEach(() => {
-      jest.restoreAllMocks()
+      // jest.restoreAllMocks()
     })
 
     it('should return visit details with events and notifications filtered and processed', async () => {
