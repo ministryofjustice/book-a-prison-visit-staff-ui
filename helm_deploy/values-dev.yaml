@@ -22,6 +22,7 @@ generic-service:
     DPS_PRISONER_URL: "https://prisoner-dev.digital.prison.service.justice.gov.uk/"
     REDIS_KEY: "bapv-staff-dev"
 
+    FEATURE_VISIT_REQUEST: "true"
 
   allowlist:
     groups:

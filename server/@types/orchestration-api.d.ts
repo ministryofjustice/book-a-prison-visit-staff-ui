@@ -391,6 +391,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/visits/requests/{prisonCode}/count': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get count of visit requests for a prison
+     * @description Returns an Int count for how many visit requests are open for a prison
+     */
+    get: operations['getVisitRequestsCountForPrison']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/visits/notification/{prisonCode}/visits': {
     parameters: {
       query?: never
@@ -403,27 +423,6 @@ export interface paths {
      * @description Retrieve future visits that have a notification event attribute associated, empty response if no future visits with notifications found.
      */
     get: operations['getFutureNotificationVisits']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/visits/notification/{prisonCode}/groups': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * get future notification visit groups by prison code
-     * @deprecated
-     * @description Retrieve future notification visit groups by prison code
-     */
-    get: operations['getFutureNotificationVisitGroups']
     put?: never
     post?: never
     delete?: never
@@ -529,6 +528,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/visit-sessions/public/available': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Returns available visit sessions with sessions marked for review for a specified prisoner and visitors combination for the date range passed in.
+     * @description Returns available visit sessions with sessions marked for review for a specified prisoner and visitors combination for the date range passed in. Marks sessions for review if prisoner alerts / restrictions or visitor restrictions are found. Used by Visits Public only, not PVB
+     */
+    get: operations['getAvailableVisitSessions']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/visit-sessions/capacity': {
     parameters: {
       query?: never
@@ -560,7 +579,7 @@ export interface paths {
      * Returns only available visit sessions for a specified prisoner by restriction and within the reservable time period
      * @description Returns only available visit sessions for a specified prisoner by restriction and within the reservable time period
      */
-    get: operations['getAvailableVisitSessions']
+    get: operations['getAvailableVisitSessions_1']
     put?: never
     post?: never
     delete?: never
@@ -1065,7 +1084,20 @@ export interface components {
        * @example RESERVED
        * @enum {string}
        */
-      visitStatus: 'BOOKED' | 'CANCELLED'
+      visitStatus: 'BOOKED' | 'CANCELLED' | 'REQUESTED' | 'REJECTED' | 'AUTO_REJECTED' | 'WITHDRAWN'
+      /**
+       * @description Visit Sub Status
+       * @example AUTO_APPROVED
+       * @enum {string}
+       */
+      visitSubStatus:
+        | 'APPROVED'
+        | 'AUTO_APPROVED'
+        | 'REQUESTED'
+        | 'REJECTED'
+        | 'AUTO_REJECTED'
+        | 'WITHDRAWN'
+        | 'CANCELLED'
       /**
        * @description Outcome Status
        * @example VISITOR_CANCELLED
@@ -1228,6 +1260,8 @@ export interface components {
        * @enum {string}
        */
       userType: 'STAFF' | 'PUBLIC' | 'SYSTEM' | 'PRISONER'
+      /** @description flag to determine if visit should be a request or instant booking */
+      isRequestBooking?: boolean
     }
     IgnoreVisitNotificationsDto: {
       /** @description Reason why the visit's notifications can be ignored */
@@ -1829,7 +1863,20 @@ export interface components {
        * @example RESERVED
        * @enum {string}
        */
-      visitStatus: 'BOOKED' | 'CANCELLED'
+      visitStatus: 'BOOKED' | 'CANCELLED' | 'REQUESTED' | 'REJECTED' | 'AUTO_REJECTED' | 'WITHDRAWN'
+      /**
+       * @description Visit Sub Status
+       * @example AUTO_APPROVED
+       * @enum {string}
+       */
+      visitSubStatus:
+        | 'APPROVED'
+        | 'AUTO_APPROVED'
+        | 'REQUESTED'
+        | 'REJECTED'
+        | 'AUTO_REJECTED'
+        | 'WITHDRAWN'
+        | 'CANCELLED'
       /**
        * @description Outcome Status
        * @example VISITOR_CANCELLED
@@ -1996,7 +2043,7 @@ export interface components {
      * @description To filter visits by status
      * @example BOOKED
      */
-    visitStatus: ('BOOKED' | 'CANCELLED')[]
+    visitStatus: ('BOOKED' | 'CANCELLED' | 'REQUESTED' | 'REJECTED' | 'AUTO_REJECTED' | 'WITHDRAWN')[]
     /**
      * @description Visit Restriction(s) - OPEN / CLOSED / UNKNOWN
      * @example OPEN
@@ -2092,6 +2139,10 @@ export interface components {
       sorted?: boolean
       unsorted?: boolean
     }
+    VisitRequestsCountDto: {
+      /** Format: int32 */
+      count: number
+    }
     OrchestrationVisitNotificationsDto: {
       /**
        * @description Visit Booking Reference
@@ -2152,61 +2203,6 @@ export interface components {
       createdDateTime: string
       /** @description Additional data, empty list if no additional data associated */
       additionalData: components['schemas']['VisitNotificationEventAttributeDto'][]
-    }
-    OrchestrationNotificationGroupDto: {
-      /**
-       * @description notification group Reference
-       * @example v9*d7*ed*7u
-       */
-      reference: string
-      /**
-       * @description notification event type
-       * @example NON_ASSOCIATION_EVENT
-       * @enum {string}
-       */
-      type:
-        | 'NON_ASSOCIATION_EVENT'
-        | 'PRISONER_RELEASED_EVENT'
-        | 'PRISONER_RESTRICTION_CHANGE_EVENT'
-        | 'PRISON_VISITS_BLOCKED_FOR_DATE'
-        | 'SESSION_VISITS_BLOCKED_FOR_DATE'
-        | 'PRISONER_RECEIVED_EVENT'
-        | 'PRISONER_ALERTS_UPDATED_EVENT'
-        | 'PERSON_RESTRICTION_UPSERTED_EVENT'
-        | 'VISITOR_RESTRICTION_UPSERTED_EVENT'
-        | 'VISITOR_UNAPPROVED_EVENT'
-      /** @description List of details of affected visits */
-      affectedVisits: components['schemas']['OrchestrationPrisonerVisitsNotificationDto'][]
-    }
-    OrchestrationPrisonerVisitsNotificationDto: {
-      /**
-       * @description Prisoner Number
-       * @example AF34567G
-       */
-      prisonerNumber: string
-      /**
-       * @description Booked by user name
-       * @example SMITH1
-       */
-      bookedByUserName: string
-      /**
-       * Format: date
-       * @description The date of the visit
-       * @example 2023-11-08
-       */
-      visitDate: string
-      /**
-       * @description Visit Booking Reference
-       * @example v9-d7-ed-7u
-       */
-      bookingReference: string
-      /**
-       * @description Booked by name
-       * @example John Smith
-       */
-      bookedByName: string
-      /** @description A list of all notification attributes for a given visit */
-      notificationEventAttributes: components['schemas']['VisitNotificationEventAttributeDto'][]
     }
     NotificationCountDto: {
       /** Format: int32 */
@@ -2376,6 +2372,11 @@ export interface components {
        * @enum {string}
        */
       sessionRestriction: 'OPEN' | 'CLOSED'
+      /**
+       * @description Does session need review, defaults to false
+       * @example true
+       */
+      sessionForReview: boolean
     }
     /** @description Visit Session restriction type */
     AvailableVisitSessionRestrictionDto: {
@@ -2431,7 +2432,20 @@ export interface components {
        * @example BOOKED
        * @enum {string}
        */
-      visitStatus: 'BOOKED' | 'CANCELLED'
+      visitStatus: 'BOOKED' | 'CANCELLED' | 'REQUESTED' | 'REJECTED' | 'AUTO_REJECTED' | 'WITHDRAWN'
+      /**
+       * @description Visit Sub Status
+       * @example AUTO_APPROVED
+       * @enum {string}
+       */
+      visitSubStatus:
+        | 'APPROVED'
+        | 'AUTO_APPROVED'
+        | 'REQUESTED'
+        | 'REJECTED'
+        | 'AUTO_REJECTED'
+        | 'WITHDRAWN'
+        | 'CANCELLED'
       /**
        * @description Outcome Status
        * @example VISITOR_CANCELLED
@@ -2780,7 +2794,7 @@ export interface components {
        * @example RESERVED
        * @enum {string}
        */
-      visitStatus: 'BOOKED' | 'CANCELLED'
+      visitStatus: 'BOOKED' | 'CANCELLED' | 'REQUESTED' | 'REJECTED' | 'AUTO_REJECTED' | 'WITHDRAWN'
       /**
        * @description Visit Restriction
        * @example OPEN
@@ -4390,6 +4404,50 @@ export interface operations {
       }
     }
   }
+  getVisitRequestsCountForPrison: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /**
+         * @description prisonCode
+         * @example CFI
+         */
+        prisonCode: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successfully retrieve count of visit requests for a prison */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['VisitRequestsCountDto']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to access this endpoint */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
   getFutureNotificationVisits: {
     parameters: {
       query?: {
@@ -4426,50 +4484,6 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['OrchestrationVisitNotificationsDto'][]
-        }
-      }
-      /** @description Unauthorized to access this endpoint */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Incorrect permissions to access this endpoint */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  getFutureNotificationVisitGroups: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /**
-         * @description prisonCode
-         * @example CFI
-         */
-        prisonCode: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Retrieved future notification visit groups by prison code */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['OrchestrationNotificationGroupDto'][]
         }
       }
       /** @description Unauthorized to access this endpoint */
@@ -4793,6 +4807,75 @@ export interface operations {
       }
     }
   }
+  getAvailableVisitSessions: {
+    parameters: {
+      query: {
+        /**
+         * @description Query by NOMIS Prison Identifier
+         * @example MDI
+         */
+        prisonId: string
+        /**
+         * @description Filter results by prisoner id
+         * @example A12345DC
+         */
+        prisonerId: string
+        /**
+         * @description List of visitors who require visit sessions
+         * @example 4729510,4729220
+         */
+        visitors?: number[]
+        /**
+         * @description The current application reference to be excluded from capacity count and double booking
+         * @example dfs-wjs-eqr
+         */
+        excludedApplicationReference?: string
+        /**
+         * @description Username for the user making the request. Used to exclude user's pending applications from session capacity count. Optional, ignored if not passed in.
+         * @example user-1
+         */
+        username?: string
+        /**
+         * @description user type for the session
+         * @example PUBLIC
+         */
+        userType?: 'STAFF' | 'PUBLIC' | 'SYSTEM' | 'PRISONER'
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Visit session information returned */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          '*/*': components['schemas']['AvailableVisitSessionDto'][]
+        }
+      }
+      /** @description Incorrect request to Get visit sessions  */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
   getSessionCapacity: {
     parameters: {
       query: {
@@ -4861,7 +4944,7 @@ export interface operations {
       }
     }
   }
-  getAvailableVisitSessions: {
+  getAvailableVisitSessions_1: {
     parameters: {
       query: {
         /**

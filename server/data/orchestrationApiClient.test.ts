@@ -19,9 +19,11 @@ import {
   VisitBookingDetailsRaw,
   VisitNotificationEvent,
   VisitNotificationEventRaw,
+  VisitRequestsCountDto,
   VisitRestriction,
 } from './orchestrationApiTypes'
 import { Prison, VisitSessionData } from '../@types/bapv'
+import { setFeature } from './testutils/mockFeature'
 
 describe('orchestrationApiClient', () => {
   let fakeOrchestrationApi: nock.Scope
@@ -152,22 +154,15 @@ describe('orchestrationApiClient', () => {
   describe('getVisitDetailed', () => {
     beforeEach(() => {
       // set enabled raw notification types: others should be filtered
-      jest.replaceProperty(config, 'features', {
-        ...config.features,
-        notificationTypes: {
-          enabledRawNotifications: [
-            'PRISONER_RELEASED_EVENT',
-            'PERSON_RESTRICTION_UPSERTED_EVENT',
-            'VISITOR_RESTRICTION_UPSERTED_EVENT',
-          ],
-        },
+      setFeature('notificationTypes', {
+        enabledRawNotifications: [
+          'PRISONER_RELEASED_EVENT',
+          'PERSON_RESTRICTION_UPSERTED_EVENT',
+          'VISITOR_RESTRICTION_UPSERTED_EVENT',
+        ],
       })
 
       orchestrationApiClient = new OrchestrationApiClient(token)
-    })
-
-    afterEach(() => {
-      jest.restoreAllMocks()
     })
 
     it('should return visit details with events and notifications filtered and processed', async () => {
@@ -588,6 +583,21 @@ describe('orchestrationApiClient', () => {
       const output = await orchestrationApiClient.isBlockedDate(prisonId, excludedDate)
 
       expect(output).toStrictEqual(true)
+    })
+  })
+
+  describe('getVisitRequestCount', () => {
+    it('should count of visit requests for given prison', async () => {
+      const count: VisitRequestsCountDto = { count: 1 }
+
+      fakeOrchestrationApi
+        .get(`/visits/requests/${prisonId}/count`)
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, count)
+
+      const output = await orchestrationApiClient.getVisitRequestCount(prisonId)
+
+      expect(output).toStrictEqual(count)
     })
   })
 

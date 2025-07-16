@@ -69,4 +69,6 @@ export type ExcludeDateDto = components['schemas']['ExcludeDateDto']
 
 export type IsExcludeDateDto = components['schemas']['IsExcludeDateDto']
 
+export type VisitRequestsCountDto = components['schemas']['VisitRequestsCountDto']
+
 export type ApplicationValidationErrorResponse = components['schemas']['ApplicationValidationErrorResponse']
