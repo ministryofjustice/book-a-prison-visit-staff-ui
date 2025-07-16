@@ -76,6 +76,7 @@ describe('Visit service', () => {
           visitRoom: 'A1 L3',
           visitType: 'SOCIAL',
           visitStatus: 'CANCELLED',
+          visitSubStatus: 'CANCELLED',
           visitRestriction: 'OPEN',
           startTimestamp: '2022-02-14T10:00:00',
           endTimestamp: '2022-02-14T11:00:00',
