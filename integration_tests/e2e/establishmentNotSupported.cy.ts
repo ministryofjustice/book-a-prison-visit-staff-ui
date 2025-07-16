@@ -2,7 +2,7 @@ import TestData from '../../server/routes/testutils/testData'
 import EstablishmentNotSupportedPage from '../pages/establishmentNotSupported'
 import HomePage from '../pages/home'
 import Page from '../pages/page'
-import SearchForAPrisonerPage from '../pages/searchForAPrisoner'
+import SearchForAPrisonerPage from '../pages/search/searchForAPrisoner'
 
 context('Establishment not supported', () => {
   beforeEach(() => {
