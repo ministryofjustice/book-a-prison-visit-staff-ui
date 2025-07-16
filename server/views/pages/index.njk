@@ -8,9 +8,11 @@
 {% endblock %}
 
 {% macro notificationCountBadge(count, dataTestAttr) -%}
-  <span class="govuk-!-margin-left-2 {{" moj-notification-badge" if count > 0 }}" data-test="{{ dataTestAttr}}">
-    {{- (count if count < 100 else "99+") if count > 0 -}}
-  </span>
+  {% if count > 0 -%}
+    <span class="govuk-!-margin-left-2 moj-notification-badge" data-test="{{ dataTestAttr}}">
+      {{- count if count < 100 else "99+" -}}
+    </span>
+  {%- endif %}
 {%- endmacro %}
 
 {% block content %}
