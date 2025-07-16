@@ -165,10 +165,6 @@ describe('orchestrationApiClient', () => {
       orchestrationApiClient = new OrchestrationApiClient(token)
     })
 
-    afterEach(() => {
-      // jest.restoreAllMocks()
-    })
-
     it('should return visit details with events and notifications filtered and processed', async () => {
       const visitBookingDetailsRaw = TestData.visitBookingDetailsRaw({
         events: [
