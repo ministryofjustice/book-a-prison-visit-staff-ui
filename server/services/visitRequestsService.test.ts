@@ -25,6 +25,18 @@ describe('Visit requests service', () => {
   })
 
   describe('getVisitRequestCount', () => {
+    it('should return visit request summaries for given prison', async () => {
+      const visitRequests = [TestData.visitRequestSummary()]
+      orchestrationApiClient.getVisitRequests.mockResolvedValue(visitRequests)
+
+      const result = await visitRequestsService.getVisitRequests('user', prisonId)
+
+      expect(orchestrationApiClient.getVisitRequests).toHaveBeenCalledWith(prisonId)
+      expect(result).toStrictEqual(visitRequests)
+    })
+  })
+
+  describe('getVisitRequestCount', () => {
     it('should return visit request count for given prison', async () => {
       const visitRequestCount = TestData.visitRequestCount()
       orchestrationApiClient.getVisitRequestCount.mockResolvedValue(visitRequestCount)
