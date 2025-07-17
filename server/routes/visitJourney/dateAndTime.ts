@@ -25,7 +25,7 @@ export default class DateAndTime {
     // calculate min booking window and any override or bans in place
     const policyNoticeDaysMin = visitSessionData.overrideBookingWindow
       ? 0
-      : req.session.selectedEstablishment.policyNoticeDaysMin
+      : req.session.selectedEstablishment.policyNoticeDaysMin + 1 // ensure 'full' min days
 
     const isBanActive = visitSessionData.daysUntilBanExpiry > policyNoticeDaysMin
     const minNumberOfDays = isBanActive ? visitSessionData.daysUntilBanExpiry : policyNoticeDaysMin
