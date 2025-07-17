@@ -11,6 +11,8 @@
   {% set backLinkHref = "/search/visit/results?" + fromPageQuery %}
 {% elseif fromPage == "visits" %}
   {% set backLinkHref = "/visits?" + fromPageQuery %}
+{% elseif fromPage == "request" %}
+  {% set backLinkHref = "/requested-visits" %}
 {% elseif fromPage == "review" %}
   {% set backLinkHref = "/review" %}
 {% else %}
