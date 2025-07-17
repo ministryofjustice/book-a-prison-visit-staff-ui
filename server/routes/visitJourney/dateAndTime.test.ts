@@ -178,7 +178,7 @@ testJourneys.forEach(journey => {
               offenderNo: visitSessionData.prisoner.offenderNo,
               prisonId,
               visitRestriction: visitSessionData.visitRestriction,
-              minNumberOfDays: 2,
+              minNumberOfDays: 3,
             })
           })
       })
@@ -252,7 +252,7 @@ testJourneys.forEach(journey => {
       })
 
       it('should show warning message when visitor ban days set in session is greater than default min booking days', () => {
-        visitSessionData.daysUntilBanExpiry = 3 // default minimum booking ahead days is 2
+        visitSessionData.daysUntilBanExpiry = 4 // default minimum booking ahead days is 3 (2 + 1 - to ensure 'full' days)
 
         sessionApp = appWithAllRoutes({
           services: { visitSessionsService },
