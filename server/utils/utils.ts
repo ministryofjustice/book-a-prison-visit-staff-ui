@@ -10,6 +10,7 @@ import {
   addWeeks,
   subWeeks,
 } from 'date-fns'
+import parsePhoneNumber from 'libphonenumber-js/mobile'
 import { VisitSlot } from '../@types/bapv'
 import config from '../config'
 
@@ -178,4 +179,8 @@ export const initialiseName = (fullName?: string): string | null => {
 
 export const getDpsPrisonerAlertsUrl = (offenderNo: string): string => {
   return `${config.dpsPrisoner}prisoner/${offenderNo}/alerts/active`
+}
+
+export const isMobilePhoneNumber = (phoneNumber: string): boolean => {
+  return parsePhoneNumber(phoneNumber ?? '', 'GB')?.getType() === 'MOBILE'
 }

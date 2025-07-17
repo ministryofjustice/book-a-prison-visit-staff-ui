@@ -179,4 +179,6 @@ export type BookOrUpdate = 'book' | 'update'
 export type CancelledVisitInfo = {
   startTimestamp: string
   endTimestamp: string
+  hasEmailAddress: boolean
+  hasMobileNumber: boolean
 }

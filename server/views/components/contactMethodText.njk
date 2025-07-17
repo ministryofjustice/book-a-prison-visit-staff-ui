@@ -1,0 +1,9 @@
+{% macro contactMethodText(hasEmailAddress, hasMobileNumber) %}
+  {%- if hasEmailAddress and hasMobileNumber -%}
+    The main contact will get an email and a text message to confirm the updated booking. This will include the booking reference.
+  {%- elif hasEmailAddress -%}
+    The main contact will get an email to confirm the updated booking. This will include the booking reference.
+  {%- elif hasMobileNumber -%}
+    The main contact will get a text message to confirm the updated booking. This will include the booking reference.
+  {%- endif -%}
+{% endmacro %}

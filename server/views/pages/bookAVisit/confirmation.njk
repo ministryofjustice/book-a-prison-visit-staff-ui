@@ -2,6 +2,7 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/panel/macro.njk" import govukPanel %}
+{% from "components/contactMethodText.njk" import contactMethodText %}
 
 {% if isUpdate %}
   {% set pageHeaderTitle = "Booking updated" %}
@@ -26,7 +27,7 @@
       {% if isUpdate %}
         <h2 class="govuk-heading-m govuk-!-margin-top-6">What happens next</h2>
         <p>The visit booking has been updated.</p>
-        <p>The main contact will get a text message to confirm the updated booking. This will include the booking reference.</p>
+        <p>{{ contactMethodText(hasEmailAddress, hasMobileNumber) }}</p>
       {% else %}
         <h2 class="govuk-heading-m govuk-!-margin-top-6">What to do next</h2>
         <p>Let the caller know:</p>

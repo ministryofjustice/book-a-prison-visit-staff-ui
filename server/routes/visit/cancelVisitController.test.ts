@@ -39,6 +39,8 @@ describe('GET /visit/:reference/cancelled', () => {
     sessionData.cancelledVisitInfo = {
       startTimestamp: '2022-02-09T10:15:00',
       endTimestamp: '2022-02-09T11:00:00',
+      hasEmailAddress: true,
+      hasMobileNumber: true,
     }
 
     return request(app)
@@ -173,6 +175,8 @@ describe('POST /visit/:reference/cancel', () => {
         expect(sessionData.cancelledVisitInfo).toStrictEqual<CancelledVisitInfo>({
           startTimestamp: cancelledVisit.startTimestamp,
           endTimestamp: cancelledVisit.endTimestamp,
+          hasEmailAddress: true,
+          hasMobileNumber: false,
         })
       })
   })
