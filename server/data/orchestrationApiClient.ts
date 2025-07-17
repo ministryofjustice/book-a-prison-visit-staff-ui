@@ -27,6 +27,7 @@ import {
   VisitNotificationsRaw,
   VisitPreview,
   VisitRequestsCountDto,
+  VisitRequestSummary,
   VisitRestriction,
   VisitSession,
 } from './orchestrationApiTypes'
@@ -289,6 +290,10 @@ export default class OrchestrationApiClient {
   }
 
   // visit requests controller
+
+  async getVisitRequests(prisonCode: string): Promise<VisitRequestSummary[]> {
+    return this.restClient.get({ path: `/visits/requests/${prisonCode}` })
+  }
 
   async getVisitRequestCount(prisonCode: string): Promise<VisitRequestsCountDto> {
     return this.restClient.get({ path: `/visits/requests/${prisonCode}/count` })

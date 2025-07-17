@@ -18,6 +18,7 @@ import {
   VisitNotificationsRaw,
   VisitPreview,
   VisitRequestsCountDto,
+  VisitRequestSummary,
   VisitSession,
   VisitSummary,
 } from '../../data/orchestrationApiTypes'
@@ -685,6 +686,24 @@ export default class TestData {
   })
 
   static visitRequestCount = ({ count = 3 }: Partial<VisitRequestsCountDto> = {}): VisitRequestsCountDto => ({ count })
+
+  static visitRequestSummary = ({
+    visitReference = 'ab-cd-ef-gh',
+    visitDate = '2025-07-10',
+    requestedOnDate = '2025-07-01',
+    prisonerFirstName = 'JOHN',
+    prisonerLastName = 'SMITH',
+    prisonNumber = 'A1234BC',
+    mainContact = 'Jeanette Smith',
+  }: Partial<VisitRequestSummary> = {}): VisitRequestSummary => ({
+    visitReference,
+    visitDate,
+    requestedOnDate,
+    prisonerFirstName,
+    prisonerLastName,
+    prisonNumber,
+    mainContact,
+  })
 
   static visitSession = ({
     sessionTemplateReference = 'v9d.7ed.7u',
