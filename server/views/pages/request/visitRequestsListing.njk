@@ -1,0 +1,124 @@
+{% extends "layout.njk" %}
+{% from "partials/breadcrumbs.njk" import breadcrumbs with context %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% set pageHeaderTitle = "Requested visits" %}
+
+{% block beforeContent %}
+  {{ breadcrumbs() }}
+{% endblock %}
+
+{% set requestListRows = [] %}
+{% for visitRequest in visitRequests %}
+  {% set prisonerName = (visitRequest.prisonerFirstName + " " + visitRequest.prisonerLastName) | properCaseFullName %}
+
+  {% set requestListRows = (requestListRows.push([
+    {
+      attributes: {
+        "data-test": "visit-date-" + loop.index,
+        "data-sort-value": visitRequest.visitDate | formatDate("t")
+       },
+      text: visitRequest.visitDate | formatDate('d/M/yyyy')
+    },
+    {
+      attributes: {
+        "data-test": "visit-requested-date-" + loop.index,
+        "data-sort-value": visitRequest.requestedOnDate | formatDate("t")
+      },
+      text: visitRequest.requestedOnDate | formatDate('d/M/yyyy')
+    },
+    {
+      attributes: { "data-test": "prisoner-name-" + loop.index },
+      text: prisonerName
+    },
+    {
+      attributes: { "data-test": "prison-number-" + loop.index },
+      html: visitRequest.prisonNumber
+    },
+    {
+      attributes: { "data-test": "main-contact-" + loop.index },
+      html: visitRequest.mainContact
+    },
+    {
+      attributes: { "data-test": "action-" + loop.index },
+      html: '<a class="govuk-link--no-visited-state" href="/visit/' + visitRequest.visitReference + '?from=request" >' +
+        'View<span class="govuk-visually-hidden"> request to visit ' + (prisonerName | escape) + '</span></a>'
+    }
+  ]), requestListRows) %}
+{% endfor %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+
+      <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+
+      <p>
+        These requests by online bookers need to be manually checked due to alerts and restrictions.
+      </p>
+
+      <p>
+        They have been automatically checked to make sure:
+      </p>
+      <ul class="govuk-list govuk-list--bullet">
+        <li>visitors are on the prisoner’s approved visitor list</li>
+        <li>the date and time is suitable for the prisoner</li>
+        <li>there are no non-associations for the prisoner</li>
+      </ul>
+
+      <p>
+        The visit time has been reserved for these requests. It will be released if the request is rejected.
+      </p>
+
+      <p>
+        Requests need to be checked at least
+        <span data-test="check-before-days">{{ checkBeforeDays }} {{ "day" | pluralise(checkBeforeDays) }}</span>
+        before the visit date. If not, they will be automatically rejected.
+      </p>
+
+      <hr class="govuk-section-break govuk-section-break--l">
+
+      {% if visitRequests | length %}
+
+        {{ govukTable({
+          attributes: {
+            "data-module": "moj-sortable-table",
+            "data-test": "visit-requests"
+          },
+          head: [
+            {
+              text: "Visit date",
+              attributes: { "aria-sort": "ascending" }
+            },
+            {
+              text: "Requested on",
+              attributes: { "aria-sort": "none" }
+            },
+            {
+              text: "Prisoner name",
+              attributes: { "aria-sort": "none" }
+            },
+            {
+              text: "Prison number",
+              attributes: { "aria-sort": "none" }
+            },
+            {
+              text: "Main contact",
+              attributes: { "aria-sort": "none" }
+            },
+            {
+              text: "Action"
+            }
+          ],
+          rows: requestListRows
+        }) }}
+
+      {% else %}
+
+        <p data-test="no-visit-requests" class="govuk-!-font-weight-bold">
+          There are no visit requests for {{ prisonName }} that need to be checked.
+        </p>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}
