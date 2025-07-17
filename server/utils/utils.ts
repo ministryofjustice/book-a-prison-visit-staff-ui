@@ -10,6 +10,7 @@ import {
   addWeeks,
   subWeeks,
 } from 'date-fns'
+// eslint-disable-next-line import/no-named-as-default
 import parsePhoneNumber from 'libphonenumber-js/mobile'
 import { VisitSlot } from '../@types/bapv'
 import config from '../config'
