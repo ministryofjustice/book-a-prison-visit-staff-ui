@@ -17,6 +17,7 @@ import {
   VisitNotificationsRaw,
   VisitPreview,
   VisitRequestsCountDto,
+  VisitRequestSummary,
   VisitSession,
 } from '../../server/data/orchestrationApiTypes'
 import TestData from '../../server/routes/testutils/testData'
@@ -518,12 +519,32 @@ export default {
     })
   },
 
-  stubVisitRequestCount: ({
+  stubGetVisitRequests: ({
     prisonId = 'HEI',
-    count = TestData.visitRequestCount(),
+    visitRequests = [TestData.visitRequestSummary()],
   }: {
     prisonId: string
-    count: VisitRequestsCountDto
+    visitRequests: VisitRequestSummary[]
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        url: `/orchestration/visits/requests/${prisonId}`,
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: visitRequests,
+      },
+    })
+  },
+
+  stubGetVisitRequestCount: ({
+    prisonId = 'HEI',
+    visitRequestCount = TestData.visitRequestCount(),
+  }: {
+    prisonId: string
+    visitRequestCount: VisitRequestsCountDto
   }): SuperAgentRequest => {
     return stubFor({
       request: {
@@ -533,7 +554,7 @@ export default {
       response: {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: count,
+        jsonBody: visitRequestCount,
       },
     })
   },
