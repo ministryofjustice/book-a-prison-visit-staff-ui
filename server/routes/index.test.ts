@@ -4,7 +4,7 @@ import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
 import { appWithAllRoutes } from './testutils/appSetup'
 import * as visitorUtils from './visitorUtils'
-import { createMockVisitNotificationsService } from '../services/testutils/mocks'
+import { createMockVisitNotificationsService, createMockVisitRequestsService } from '../services/testutils/mocks'
 import TestData from './testutils/testData'
 import { Prison } from '../@types/bapv'
 import { setFeature } from '../data/testutils/mockFeature'
@@ -20,6 +20,7 @@ describe('GET /', () => {
   let selectedEstablishment: Prison
 
   const visitNotificationsService = createMockVisitNotificationsService()
+  const visitRequestsService = createMockVisitRequestsService()
   let visitRequestCount = TestData.visitRequestCount()
   let notificationCount = TestData.notificationCount()
 
@@ -29,9 +30,9 @@ describe('GET /', () => {
     selectedEstablishment = TestData.prison()
     sessionData = { selectedEstablishment } as SessionData
 
-    app = appWithAllRoutes({ services: { visitNotificationsService }, sessionData })
+    app = appWithAllRoutes({ services: { visitNotificationsService, visitRequestsService }, sessionData })
 
-    visitNotificationsService.getVisitRequestCount.mockResolvedValue(visitRequestCount)
+    visitRequestsService.getVisitRequestCount.mockResolvedValue(visitRequestCount)
     visitNotificationsService.getNotificationCount.mockResolvedValue(notificationCount)
   })
 
@@ -61,7 +62,7 @@ describe('GET /', () => {
         expect($('[data-test="block-dates"] .card__link').text()).toBe('Block visit dates')
         expect($('[data-test="block-dates"] .card__link').attr('href')).toBe('/block-visit-dates')
 
-        expect(visitNotificationsService.getVisitRequestCount).not.toHaveBeenCalled()
+        expect(visitRequestsService.getVisitRequestCount).not.toHaveBeenCalled()
         expect(visitNotificationsService.getNotificationCount).toHaveBeenCalledWith(
           'user1',
           selectedEstablishment.prisonId,
@@ -83,7 +84,7 @@ describe('GET /', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('[data-test="visit-request-count"]').text()).toBe(visitRequestCount.count.toString())
-          expect(visitNotificationsService.getVisitRequestCount).toHaveBeenCalledWith(
+          expect(visitRequestsService.getVisitRequestCount).toHaveBeenCalledWith(
             'user1',
             selectedEstablishment.prisonId,
           )
@@ -92,7 +93,7 @@ describe('GET /', () => {
 
     it('should not render badge if visit request count is zero', () => {
       visitRequestCount = TestData.visitRequestCount({ count: 0 })
-      visitNotificationsService.getVisitRequestCount.mockResolvedValue(visitRequestCount)
+      visitRequestsService.getVisitRequestCount.mockResolvedValue(visitRequestCount)
 
       return request(app)
         .get('/')
@@ -105,7 +106,7 @@ describe('GET /', () => {
 
     it('should render badge with value of "99+" if review count is greater than 99', () => {
       visitRequestCount = TestData.visitRequestCount({ count: 100 })
-      visitNotificationsService.getVisitRequestCount.mockResolvedValue(visitRequestCount)
+      visitRequestsService.getVisitRequestCount.mockResolvedValue(visitRequestCount)
 
       return request(app)
         .get('/')
