@@ -25,6 +25,7 @@ import visitJourneyRoutes from '../visitJourney'
 import blockVisitDatesRoutes from '../blockVisitDates'
 import establishmentNotSupportedRoutes from '../establishmentNotSupported'
 import prisonerRoutes from '../prisoner/prisoner'
+import requestRoutes from '../request'
 import reviewRoutes from '../review'
 import searchRoutes from '../search/search'
 import timetableRoutes from '../timetable'
@@ -101,6 +102,7 @@ function appSetup(
   app.use('/block-visit-dates', blockVisitDatesRoutes(services))
   app.use('/establishment-not-supported', establishmentNotSupportedRoutes(services))
   app.use('/prisoner', prisonerRoutes(services))
+  app.use('/requested-visits', requestRoutes(services))
   app.use('/review', reviewRoutes(services))
   app.use('/search', searchRoutes(services))
   app.use('/timetable', timetableRoutes(services))

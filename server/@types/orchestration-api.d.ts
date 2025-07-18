@@ -391,6 +391,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/visits/requests/{prisonCode}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get all visit requests for a prison
+     * @description Retrieve a list of visit requests for a prison
+     */
+    get: operations['getVisitRequestsForPrison']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/visits/requests/{prisonCode}/count': {
     parameters: {
       query?: never
@@ -2129,15 +2149,37 @@ export interface components {
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
       pageSize?: number
-      paged?: boolean
       /** Format: int32 */
       pageNumber?: number
+      paged?: boolean
       unpaged?: boolean
     }
     SortObject: {
       empty?: boolean
       sorted?: boolean
       unsorted?: boolean
+    }
+    OrchestrationVisitRequestSummaryDto: {
+      /** @description Visit reference */
+      visitReference: string
+      /**
+       * Format: date
+       * @description Visit date
+       */
+      visitDate: string
+      /**
+       * Format: date
+       * @description Date the visit request was made
+       */
+      requestedOnDate: string
+      /** @description First name of the prisoner who is being visited */
+      prisonerFirstName: string
+      /** @description Last name of the prisoner who is being visited */
+      prisonerLastName: string
+      /** @description ID of the prisoner who is being visited */
+      prisonNumber: string
+      /** @description Name of the main contact for the visit request */
+      mainContact?: string
     }
     VisitRequestsCountDto: {
       /** Format: int32 */
@@ -4394,6 +4436,50 @@ export interface operations {
         }
       }
       /** @description Incorrect permissions to get future visits for a prisoner */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  getVisitRequestsForPrison: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /**
+         * @description prisonCode
+         * @example CFI
+         */
+        prisonCode: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successfully retrieved all visit requests for a prison */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['OrchestrationVisitRequestSummaryDto'][]
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to access this endpoint */
       403: {
         headers: {
           [name: string]: unknown

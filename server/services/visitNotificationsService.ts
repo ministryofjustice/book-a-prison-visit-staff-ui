@@ -4,7 +4,6 @@ import {
   NotificationCount,
   Visit,
   VisitNotifications,
-  VisitRequestsCountDto,
 } from '../data/orchestrationApiTypes'
 
 export default class VisitNotificationsService {
@@ -18,13 +17,6 @@ export default class VisitNotificationsService {
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
     return orchestrationApiClient.getNotificationCount(prisonId)
-  }
-
-  async getVisitRequestCount(username: string, prisonId: string): Promise<VisitRequestsCountDto> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
-
-    return orchestrationApiClient.getVisitRequestCount(prisonId)
   }
 
   async getVisitNotifications({

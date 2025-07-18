@@ -25,6 +25,7 @@ import {
   PrisonerVisitorsService,
   SupportedPrisonsService,
   VisitNotificationsService,
+  VisitRequestsService,
   VisitService,
   VisitSessionsService,
 } from '..'
@@ -50,6 +51,9 @@ export const createMockSupportedPrisonsService = () =>
 
 export const createMockVisitNotificationsService = () =>
   new VisitNotificationsService(null, null) as jest.Mocked<VisitNotificationsService>
+
+export const createMockVisitRequestsService = () =>
+  new VisitRequestsService(null, null) as jest.Mocked<VisitRequestsService>
 
 export const createMockVisitService = () => new VisitService(null, null) as jest.Mocked<VisitService>
 

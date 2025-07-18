@@ -261,6 +261,21 @@ describe('Visit details page', () => {
           })
       })
 
+      it('should set correct back link when arriving from request listing page', () => {
+        const url = '/visit/ab-cd-ef-gh?from=request'
+
+        return request(app)
+          .get(url)
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('h1').text()).toBe('Visit booking details')
+            expect($('.govuk-back-link').attr('href')).toBe('/requested-visits')
+            expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
+          })
+      })
+
       it('should set correct back link when arriving from review listing page', () => {
         const url = '/visit/ab-cd-ef-gh?from=review'
 

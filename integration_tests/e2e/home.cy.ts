@@ -38,7 +38,7 @@ context('Home page', () => {
 
   it('should render the index page with the correct tiles (inc visit requests) - PUBLIC prison', () => {
     cy.task('stubGetPrison', prisonStaffAndPublic)
-    cy.task('stubVisitRequestCount', { visitRequestCount })
+    cy.task('stubGetVisitRequestCount', { visitRequestCount })
     cy.task('stubGetNotificationCount', { notificationCount })
     cy.signIn()
 

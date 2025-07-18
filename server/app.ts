@@ -23,6 +23,7 @@ import visitJourneyRoutes from './routes/visitJourney'
 import blockVisitDatesRoutes from './routes/blockVisitDates'
 import establishmentNotSupportedRoutes from './routes/establishmentNotSupported'
 import prisonerRoutes from './routes/prisoner/prisoner'
+import requestRoutes from './routes/request'
 import reviewRoutes from './routes/review'
 import searchRoutes from './routes/search/search'
 import timetableRoutes from './routes/timetable'
@@ -68,6 +69,7 @@ export default function createApp(services: Services): express.Application {
   app.use('/prisoner', prisonerRoutes(services))
   app.use('/search', searchRoutes(services))
   app.use('/timetable', timetableRoutes(services))
+  app.use('/requested-visits', requestRoutes(services))
   app.use('/review', reviewRoutes(services))
   app.use('/visit', visitRoutes(services))
   app.use('/visits', visitsByDateRoutes(services))
