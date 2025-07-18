@@ -1,0 +1,9 @@
+{% macro contactMethodText(hasEmailAddress, hasMobileNumber) %}
+  {%- if hasEmailAddress and hasMobileNumber -%}
+    an email and a text message
+  {%- elif hasEmailAddress -%}
+    an email
+  {%- elif hasMobileNumber -%}
+    a text message
+  {%- endif -%}
+{% endmacro %}

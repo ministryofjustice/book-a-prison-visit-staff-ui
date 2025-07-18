@@ -184,7 +184,12 @@ describe('clearSession', () => {
     slotsList: {},
     visitSessionData: { allowOverBooking: false, prisoner: undefined },
     selectedEstablishment: TestData.prison(),
-    cancelledVisitInfo: { startTimestamp: '', endTimestamp: '' },
+    cancelledVisitInfo: {
+      startTimestamp: '',
+      endTimestamp: '',
+      hasEmailAddress: undefined,
+      hasMobileNumber: undefined,
+    },
   }
 
   req.session = sessionData as Session & SessionData

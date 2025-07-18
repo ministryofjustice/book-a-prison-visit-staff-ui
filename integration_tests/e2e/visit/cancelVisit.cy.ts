@@ -21,6 +21,11 @@ context('Cancel visit journey', () => {
   const visit = TestData.visit({
     startTimestamp: `${futureVisitDate}T12:00:00`,
     endTimestamp: `${futureVisitDate}T14:00:00`,
+    visitContact: {
+      name: 'Jeanette Smith',
+      telephone: '07771 123456',
+      email: 'visitor@example.com',
+    },
   })
 
   beforeEach(() => {
@@ -60,6 +65,11 @@ context('Cancel visit journey', () => {
 
     const visitCancelledPage = Page.verifyOnPage(VisitCancelledPage)
     visitCancelledPage.visitDetails().contains(format(new Date(futureVisitDate), longDateFormat))
+    visitCancelledPage
+      .contactMethodText()
+      .contains(
+        'The main contact for this visit will get an email and a text message to confirm it has been cancelled.',
+      )
     visitCancelledPage.homeButton().click()
 
     Page.verifyOnPage(HomePage)
