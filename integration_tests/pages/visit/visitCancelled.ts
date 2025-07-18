@@ -8,4 +8,6 @@ export default class VisitCancelledPage extends Page {
   visitDetails = (): PageElement => cy.get('[data-test="visit-details"]')
 
   homeButton = (): PageElement => cy.get('[data-test="back-to-start"]')
+
+  contactMethodText = (): PageElement => cy.get('[data-test="contact-method-text"]')
 }

@@ -19,7 +19,9 @@
         <span data-test="visit-details">{{ startTimestamp | formatTime }} to {{ endTimestamp | formatTime }} on {{ startTimestamp | formatDate('EEEE d MMMM yyyy') }}</span>
         has been cancelled.</p>
     {% endif %}
-    <p>{{ contactMethodText(hasEmailAddress, hasMobileNumber) }}</p>
+    {% if hasEmailAddress or hasMobileNumber %}
+      <p data-test="contact-method-text">The main contact for this visit will get {{ contactMethodText(hasEmailAddress, hasMobileNumber) }} to confirm it has been cancelled.</p>
+    {% endif %}
     {% include "partials/backToStartButton.njk" %}
   </div>
 </div>

@@ -73,7 +73,7 @@ testJourneys.forEach(journey => {
         ],
         visitorSupport: { description: 'Wheelchair ramp, Portable induction loop for people with hearing aids' },
         mainContact: {
-          phoneNumber: '123',
+          phoneNumber: '07771123456',
           contactName: 'abc',
           relationshipDescription: 'WIFE',
         },
@@ -110,8 +110,13 @@ testJourneys.forEach(journey => {
             'Wheelchair ramp, Portable induction loop for people with hearing aids',
           )
           expect($('.test-main-contact-name').text()).toBe('abc (wife of the prisoner)')
-          expect($('.test-main-contact-number').text()).toContain('123')
+          expect($('.test-main-contact-number').text()).toContain('07771123456')
           expect($('.test-booking-reference').text()).toContain('ab-cd-ef-gh')
+          expect($('[data-test=contact-method-text]').text()).toContain(
+            journey.isUpdate
+              ? 'The main contact will get a text message to confirm the updated booking. This will include the booking reference.'
+              : '',
+          )
 
           expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)
         })
@@ -164,7 +169,7 @@ testJourneys.forEach(journey => {
           ],
           visitorSupport: { description: '' },
           mainContact: {
-            phoneNumber: '123',
+            email: 'test@test.net',
             contactName: 'abc',
           },
           applicationReference: 'aaa-bbb-ccc',
@@ -198,8 +203,13 @@ testJourneys.forEach(journey => {
             expect($('.test-visitor-name1').text()).toContain('name last (relate of the prisoner)')
             expect($('.test-additional-support').text()).toContain('None.')
             expect($('.test-main-contact-name').text()).toContain('abc')
-            expect($('.test-main-contact-number').text()).toContain('123')
+            expect($('.test-main-contact-number').text()).toContain('No phone number provided')
             expect($('.test-booking-reference').text()).toContain('ab-cd-ef-gh')
+            expect($('[data-test=contact-method-text]').text()).toContain(
+              journey.isUpdate
+                ? 'The main contact will get an email to confirm the updated booking. This will include the booking reference.'
+                : '',
+            )
 
             expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)
           })

@@ -36,9 +36,7 @@ describe('contactMethodText(hasEmailAddress, hasMobileNumber) macro', () => {
     const nunjucksString = '{{ contactMethodText(hasEmailAddress, hasMobileNumber)  }}'
     compiledTemplate = nunjucks.compile(nunjucksBaseString + nunjucksString, njkEnv)
     const $ = cheerio.load(compiledTemplate.render(viewContext))
-    expect($.text()).toBe(
-      'The main contact will get an email and a text message to confirm the updated booking. This will include the booking reference.',
-    )
+    expect($.text()).toBe('an email and a text message')
   })
 
   it('should output only email', () => {
@@ -49,9 +47,7 @@ describe('contactMethodText(hasEmailAddress, hasMobileNumber) macro', () => {
     const nunjucksString = '{{ contactMethodText(hasEmailAddress, hasMobileNumber)  }}'
     compiledTemplate = nunjucks.compile(nunjucksBaseString + nunjucksString, njkEnv)
     const $ = cheerio.load(compiledTemplate.render(viewContext))
-    expect($.text()).toBe(
-      'The main contact will get an email to confirm the updated booking. This will include the booking reference.',
-    )
+    expect($.text()).toBe('an email')
   })
 
   it('should output only text message', () => {
@@ -62,8 +58,6 @@ describe('contactMethodText(hasEmailAddress, hasMobileNumber) macro', () => {
     const nunjucksString = '{{ contactMethodText(hasEmailAddress, hasMobileNumber)  }}'
     compiledTemplate = nunjucks.compile(nunjucksBaseString + nunjucksString, njkEnv)
     const $ = cheerio.load(compiledTemplate.render(viewContext))
-    expect($.text()).toBe(
-      'The main contact will get a text message to confirm the updated booking. This will include the booking reference.',
-    )
+    expect($.text()).toBe('a text message')
   })
 })

@@ -27,7 +27,9 @@
       {% if isUpdate %}
         <h2 class="govuk-heading-m govuk-!-margin-top-6">What happens next</h2>
         <p>The visit booking has been updated.</p>
-        <p>{{ contactMethodText(hasEmailAddress, hasMobileNumber) }}</p>
+        {% if hasEmailAddress or hasMobileNumber %}
+          <p data-test="contact-method-text">The main contact will get {{ contactMethodText(hasEmailAddress, hasMobileNumber) }} to confirm the updated booking. This will include the booking reference.</p>
+        {% endif %}
       {% else %}
         <h2 class="govuk-heading-m govuk-!-margin-top-6">What to do next</h2>
         <p>Let the caller know:</p>
