@@ -26,7 +26,7 @@ jest.mock('../visitorUtils', () => {
 })
 
 beforeEach(() => {
-  const fakeDate = new Date('2022-01-01')
+  const fakeDate = new Date('2022-01-01T08:00:00')
   jest.useFakeTimers({ advanceTimers: true, now: new Date(fakeDate) })
 
   visitDetails = TestData.visitBookingDetails()
@@ -133,16 +133,10 @@ describe('Start a visit update journey', () => {
       return request(app).post('/visit/ab-cd-ef-gh').expect(302).expect('location', '/visit/ab-cd-ef-gh')
     })
 
-    // default visit is 13 days away so using 14 days for simplicity
-    it('should redirect to /visit/:reference/confirm-update if visit is less days away than policy notice days', () => {
-      app = appWithAllRoutes({
-        services: {
-          visitService,
-        },
-        sessionData: {
-          selectedEstablishment: TestData.prison({ policyNoticeDaysMin: 14 }),
-        } as SessionData,
-      })
+    it('should redirect to /visit/:reference/confirm-update if visit is within minimum booking window days', () => {
+      // fake test date is 2022-01-01 and default min booking window days is 2
+      // so visit on 3rd or sooner triggers update confirmation
+      visitDetails.startTimestamp = '2022-01-03T10:00:00'
 
       return request(app).post('/visit/ab-cd-ef-gh').expect(302).expect('location', '/visit/ab-cd-ef-gh/confirm-update')
     })
