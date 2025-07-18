@@ -5,7 +5,7 @@ import { Services } from '../services'
 import { Prison } from '../@types/bapv'
 import config from '../config'
 
-export default function routes({ visitNotificationsService }: Services): Router {
+export default function routes({ visitNotificationsService, visitRequestsService }: Services): Router {
   const router = Router()
 
   router.get('/', async (req, res) => {
@@ -14,7 +14,7 @@ export default function routes({ visitNotificationsService }: Services): Router 
 
     const showRequestedVisitsTile = config.features.visitRequest && isPrisonEnabledForPublic(prison)
     const requestCount = showRequestedVisitsTile
-      ? (await visitNotificationsService.getVisitRequestCount(username, prison.prisonId)).count
+      ? (await visitRequestsService.getVisitRequestCount(username, prison.prisonId)).count
       : null
 
     const reviewCount = (await visitNotificationsService.getNotificationCount(username, prison.prisonId)).count

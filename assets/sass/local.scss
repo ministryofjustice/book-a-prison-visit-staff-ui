@@ -266,6 +266,12 @@
   color: #005ea5;
 }
 
+[data-module=moj-sortable-table] {
+  & th:last-child, & td:last-child {
+  text-align: right;
+  }
+}
+
 .fix-width-alert-restriction .govuk-table__row {
   th:first-child, th:last-child {
     width: 20%;
