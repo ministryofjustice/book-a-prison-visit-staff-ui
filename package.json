@@ -116,7 +116,7 @@
     "passport": "^0.7.0",
     "passport-oauth2": "^1.8.0",
     "redis": "^5.6.0",
-    "superagent": "^10.2.1"
+    "superagent": "^10.2.2"
   },
   "devDependencies": {
     "@aws-sdk/types": "^3.840.0",
