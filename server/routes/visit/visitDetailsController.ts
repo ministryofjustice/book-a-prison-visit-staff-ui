@@ -7,7 +7,6 @@ import {
   getVisitAlerts,
   getVisitorRestrictionIdsToFlag,
 } from './visitUtils'
-import { MoJAlert } from '../../@types/bapv'
 import visitEventsTimelineBuilder from './visitEventsTimelineBuilder'
 
 export default class VisitDetailsController {
