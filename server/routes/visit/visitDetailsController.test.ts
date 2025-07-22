@@ -144,6 +144,19 @@ describe('Visit details page', () => {
         })
     })
 
+    it('should render visit request title for a visit request', () => {
+      visitDetails.visitSubStatus = 'REQUESTED'
+
+      return request(app)
+        .get('/visit/ab-cd-ef-gh')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text()).toBe('Visit request details')
+        })
+    })
+
     it('should handle no visit contact details', () => {
       visitDetails.visitContact.telephone = undefined
       visitDetails.visitContact.email = undefined
