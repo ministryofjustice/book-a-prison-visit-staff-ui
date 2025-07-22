@@ -2,14 +2,14 @@ import { MoJAlert } from '../../@types/bapv'
 import { notificationTypeAlerts } from '../../constants/notifications'
 import { visitCancellationAlerts } from '../../constants/visitCancellation'
 import { EventAudit, VisitBookingDetails } from '../../data/orchestrationApiTypes'
+import TestData from '../testutils/testData'
 import {
   getPrisonerLocation,
   getAvailableVisitActions,
   AvailableVisitActions,
-  getVisitCancelledAlert,
-  getVisitNotificationsAlerts,
   isPublicBooking,
   getVisitorRestrictionIdsToFlag,
+  getVisitAlerts,
 } from './visitUtils'
 
 beforeEach(() => {
@@ -139,89 +139,147 @@ describe('Visit utils', () => {
     })
   })
 
-  describe('getVisitCancelledAlert', () => {
-    it('should return undefined for a BOOKED visit', () => {
-      expect(
-        getVisitCancelledAlert({ visitStatus: 'BOOKED', outcomeStatus: 'ADMINISTRATIVE_CANCELLATION' }),
-      ).toBeUndefined()
-    })
+  describe('getVisitAlerts', () => {
+    describe('Visit CANCELLED', () => {
+      it('should return no alert if visitStatus **not** CANCELLED', () => {
+        const visitDetails = TestData.visitBookingDetails({
+          visitStatus: 'BOOKED',
+          outcomeStatus: 'ADMINISTRATIVE_CANCELLATION',
+        })
+        expect(getVisitAlerts(visitDetails)).toStrictEqual([])
+      })
 
-    describe('CANCELLED visit', () => {
-      it.each([
-        ['an expected outcomeStatus value', 'BOOKER_CANCELLED', visitCancellationAlerts.BOOKER_CANCELLED],
-        ['fallback to default', '** ANY OTHER STATUS **', visitCancellationAlerts.default],
-        ['handle empty string', '', visitCancellationAlerts.default],
-        ['handle undefined', undefined, visitCancellationAlerts.default],
-      ])(
-        "should handle %s: '%s' => %s",
-        (_: string, outcomeStatus: VisitBookingDetails['outcomeStatus'], expected: string) => {
-          expect(getVisitCancelledAlert({ visitStatus: 'CANCELLED', outcomeStatus })).toStrictEqual<MoJAlert>({
-            variant: 'information',
-            title: 'Visit cancelled',
-            showTitleAsHeading: true,
-            text: expected,
-          })
-        },
-      )
-    })
-  })
-
-  describe('getVisitNotificationsAlerts', () => {
-    describe('Single notification(s) => single alert(s)', () => {
-      it.each([
-        [
-          'an expected notification type',
-          [{ type: 'PRISONER_RELEASED_EVENT' }],
-          [notificationTypeAlerts.PRISONER_RELEASED_EVENT],
-        ],
-        [
-          'multiple expected notifications',
-          [{ type: 'PRISONER_RELEASED_EVENT' }, { type: 'PRISON_VISITS_BLOCKED_FOR_DATE' }],
-          [notificationTypeAlerts.PRISONER_RELEASED_EVENT, notificationTypeAlerts.PRISON_VISITS_BLOCKED_FOR_DATE],
-        ],
-        [
-          'an unexpected notification type',
-          [{ type: 'PRISONER_RELEASED_EVENT' }, { type: '** SOME OTHER TYPE **' }],
-          [notificationTypeAlerts.PRISONER_RELEASED_EVENT],
-        ],
-        ['no notifications', [], []],
-      ])('should handle %s', (_: string, notifications: VisitBookingDetails['notifications'], expected: MoJAlert[]) => {
-        expect(getVisitNotificationsAlerts(notifications)).toStrictEqual(expected)
+      describe('cancellation reasons', () => {
+        it.each([
+          ['an expected outcomeStatus value', 'BOOKER_CANCELLED', visitCancellationAlerts.BOOKER_CANCELLED],
+          ['fallback to default', '** ANY OTHER STATUS **', visitCancellationAlerts.default],
+          ['handle empty string', '', visitCancellationAlerts.default],
+          ['handle undefined', undefined, visitCancellationAlerts.default],
+        ])(
+          "should handle %s: '%s' => %s",
+          (_: string, outcomeStatus: VisitBookingDetails['outcomeStatus'], expected: string) => {
+            const visitDetails = TestData.visitBookingDetails({ visitStatus: 'CANCELLED', outcomeStatus })
+            expect(getVisitAlerts(visitDetails)).toStrictEqual<MoJAlert[]>([
+              {
+                variant: 'information',
+                title: 'Visit cancelled',
+                showTitleAsHeading: true,
+                text: expected,
+              },
+            ])
+          },
+        )
       })
     })
 
-    describe('Visitor restriction notification(s) => single alert with grouped restrictions', () => {
-      it.each([
-        [
-          'a single visitor restriction notification',
+    describe('Visit request', () => {
+      it('should return no alert if visit is *not* in REQUESTED state', () => {
+        const visitDetails = TestData.visitBookingDetails({ visitSubStatus: 'APPROVED' })
+        expect(getVisitAlerts(visitDetails)).toStrictEqual([])
+      })
+
+      it('should return alert component for a REQUESTED visit', () => {
+        const visitDetails = TestData.visitBookingDetails({ visitSubStatus: 'REQUESTED' })
+        expect(getVisitAlerts(visitDetails)[0].title).toBe('This request needs to be reviewed')
+      })
+    })
+
+    describe('Visit notifications', () => {
+      describe('Single notification(s) => single alert(s)', () => {
+        it.each([
           [
-            {
-              type: 'VISITOR_RESTRICTION',
-              additionalData: [{ attributeName: 'VISITOR_RESTRICTION_ID', attributeValue: '1' }],
-            },
+            'an expected notification type',
+            [{ type: 'PRISONER_RELEASED_EVENT' }],
+            [notificationTypeAlerts.PRISONER_RELEASED_EVENT],
           ],
           [
-            {
-              variant: 'warning',
-              title: 'This visit needs review',
-              showTitleAsHeading: true,
-              html:
-                '<ul class="govuk-list">' +
-                '<li><a href="#visitor-restriction-1">A restriction has been added or updated</a></li>' +
-                '</ul>',
-              classes: 'notifications-summary-alert',
-            },
-          ] as MoJAlert[],
-        ],
-
-        [
-          'two visitor restriction notifications',
+            'multiple expected notifications',
+            [{ type: 'PRISONER_RELEASED_EVENT' }, { type: 'PRISON_VISITS_BLOCKED_FOR_DATE' }],
+            [notificationTypeAlerts.PRISONER_RELEASED_EVENT, notificationTypeAlerts.PRISON_VISITS_BLOCKED_FOR_DATE],
+          ],
           [
-            {
-              type: 'VISITOR_RESTRICTION',
-              additionalData: [{ attributeName: 'VISITOR_RESTRICTION_ID', attributeValue: '1' }],
-            },
-            // a duplicate VISITOR_RESTRICTION_ID - should be ignored
+            'an unexpected notification type',
+            [{ type: 'PRISONER_RELEASED_EVENT' }, { type: '** SOME OTHER TYPE **' }],
+            [notificationTypeAlerts.PRISONER_RELEASED_EVENT],
+          ],
+          ['no notifications', [], []],
+        ])(
+          'should handle %s',
+          (_: string, notifications: VisitBookingDetails['notifications'], expected: MoJAlert[]) => {
+            const visitDetails = TestData.visitBookingDetails({ notifications })
+            expect(getVisitAlerts(visitDetails)).toStrictEqual(expected)
+          },
+        )
+      })
+
+      describe('Visitor restriction notification(s) => single alert with grouped restrictions', () => {
+        it.each([
+          [
+            'a single visitor restriction notification',
+            [
+              {
+                type: 'VISITOR_RESTRICTION',
+                additionalData: [{ attributeName: 'VISITOR_RESTRICTION_ID', attributeValue: '1' }],
+              },
+            ],
+            [
+              {
+                variant: 'warning',
+                title: 'This visit needs review',
+                showTitleAsHeading: true,
+                html:
+                  '<ul class="govuk-list">' +
+                  '<li><a href="#visitor-restriction-1">A restriction has been added or updated</a></li>' +
+                  '</ul>',
+                classes: 'notifications-summary-alert',
+              },
+            ] as MoJAlert[],
+          ],
+
+          [
+            'two visitor restriction notifications',
+            [
+              {
+                type: 'VISITOR_RESTRICTION',
+                additionalData: [{ attributeName: 'VISITOR_RESTRICTION_ID', attributeValue: '1' }],
+              },
+              // a duplicate VISITOR_RESTRICTION_ID - should be ignored
+              {
+                type: 'VISITOR_RESTRICTION',
+                additionalData: [{ attributeName: 'VISITOR_RESTRICTION_ID', attributeValue: '1' }],
+              },
+              {
+                type: 'VISITOR_RESTRICTION',
+                additionalData: [{ attributeName: 'VISITOR_RESTRICTION_ID', attributeValue: '2' }],
+              },
+            ],
+            [
+              {
+                variant: 'warning',
+                title: 'This visit needs review',
+                showTitleAsHeading: true,
+                html:
+                  '<ul class="govuk-list">' +
+                  '<li><a href="#visitor-restriction-1">A restriction has been added or updated</a></li>' +
+                  '<li><a href="#visitor-restriction-2">A restriction has been added or updated</a></li>' +
+                  '</ul>',
+                classes: 'notifications-summary-alert',
+              },
+            ],
+          ],
+        ])(
+          'should handle %s',
+          (_: string, notifications: VisitBookingDetails['notifications'], expected: MoJAlert[]) => {
+            const visitDetails = TestData.visitBookingDetails({ notifications })
+            expect(getVisitAlerts(visitDetails)).toStrictEqual(expected)
+          },
+        )
+      })
+
+      describe('Mixed single/grouped notifications', () => {
+        it('should handle a mix of notifications: one single and two to group as one', () => {
+          const notifications = [
+            { type: 'PRISONER_RELEASED_EVENT' },
             {
               type: 'VISITOR_RESTRICTION',
               additionalData: [{ attributeName: 'VISITOR_RESTRICTION_ID', attributeValue: '1' }],
@@ -230,8 +288,13 @@ describe('Visit utils', () => {
               type: 'VISITOR_RESTRICTION',
               additionalData: [{ attributeName: 'VISITOR_RESTRICTION_ID', attributeValue: '2' }],
             },
-          ],
-          [
+          ] as VisitBookingDetails['notifications']
+
+          const visitDetails = TestData.visitBookingDetails({ notifications })
+          const result = getVisitAlerts(visitDetails)
+
+          expect(result).toStrictEqual<MoJAlert[]>([
+            notificationTypeAlerts.PRISONER_RELEASED_EVENT,
             {
               variant: 'warning',
               title: 'This visit needs review',
@@ -242,44 +305,9 @@ describe('Visit utils', () => {
                 '<li><a href="#visitor-restriction-2">A restriction has been added or updated</a></li>' +
                 '</ul>',
               classes: 'notifications-summary-alert',
-            },
-          ],
-        ],
-      ])('should handle %s', (_: string, notifications: VisitBookingDetails['notifications'], expected: MoJAlert[]) => {
-        expect(getVisitNotificationsAlerts(notifications)).toStrictEqual(expected)
-      })
-    })
-
-    describe('Mixed single/grouped notifications', () => {
-      it('should handle a mix of notifications: one single and two to group as one', () => {
-        const notifications = [
-          { type: 'PRISONER_RELEASED_EVENT' },
-          {
-            type: 'VISITOR_RESTRICTION',
-            additionalData: [{ attributeName: 'VISITOR_RESTRICTION_ID', attributeValue: '1' }],
-          },
-          {
-            type: 'VISITOR_RESTRICTION',
-            additionalData: [{ attributeName: 'VISITOR_RESTRICTION_ID', attributeValue: '2' }],
-          },
-        ] as VisitBookingDetails['notifications']
-
-        const result = getVisitNotificationsAlerts(notifications)
-
-        expect(result).toStrictEqual<MoJAlert[]>([
-          notificationTypeAlerts.PRISONER_RELEASED_EVENT,
-          {
-            variant: 'warning',
-            title: 'This visit needs review',
-            showTitleAsHeading: true,
-            html:
-              '<ul class="govuk-list">' +
-              '<li><a href="#visitor-restriction-1">A restriction has been added or updated</a></li>' +
-              '<li><a href="#visitor-restriction-2">A restriction has been added or updated</a></li>' +
-              '</ul>',
-            classes: 'notifications-summary-alert',
-          } as MoJAlert,
-        ])
+            } as MoJAlert,
+          ])
+        })
       })
     })
   })

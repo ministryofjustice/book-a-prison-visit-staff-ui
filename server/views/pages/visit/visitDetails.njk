@@ -5,7 +5,7 @@
 {%- from "components/expandableComment/macro.njk" import bapvExpandableComment -%}
 {% from "components/visitors.njk" import visitorDateOfBirth %}
 
-{% set pageHeaderTitle = "Visit booking details (" + visitDetails.reference + ")" %}
+{% set pageHeaderTitle = "Visit request details" if visitDetails.visitSubStatus == "REQUESTED" else "Visit booking details" %}
 
 {% if fromPage == "visit-search" %}
   {% set backLinkHref = "/search/visit/results?" + fromPageQuery %}
@@ -30,7 +30,7 @@
       {{ mojAlert(message) }}
     {% endfor %}
 
-    <h1 class="govuk-heading-xl">Visit booking details</h1>
+    <h1 class="govuk-heading-xl">{{ pageHeaderTitle }}</h1>
 
     {# Visit summary #}
     <div class="govuk-grid-row bapv-visit-details__summary">

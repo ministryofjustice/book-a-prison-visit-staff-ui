@@ -4,11 +4,9 @@ import { getDpsPrisonerAlertsUrl } from '../../utils/utils'
 import {
   getAvailableVisitActions,
   getPrisonerLocation,
-  getVisitCancelledAlert,
-  getVisitNotificationsAlerts,
+  getVisitAlerts,
   getVisitorRestrictionIdsToFlag,
 } from './visitUtils'
-import { MoJAlert } from '../../@types/bapv'
 import visitEventsTimelineBuilder from './visitEventsTimelineBuilder'
 
 export default class VisitDetailsController {
@@ -38,14 +36,7 @@ export default class VisitDetailsController {
         return res.render('pages/visit/visitDetailsWrongEstablishment', { prison, reference, selectedEstablishment })
       }
 
-      const visitCancelledAlert = getVisitCancelledAlert({
-        visitStatus: visitDetails.visitStatus,
-        outcomeStatus: visitDetails.outcomeStatus,
-      })
-
-      const messages: MoJAlert[] = visitCancelledAlert
-        ? [visitCancelledAlert]
-        : getVisitNotificationsAlerts(visitDetails.notifications)
+      const messages = getVisitAlerts(visitDetails)
 
       const availableVisitActions = getAvailableVisitActions({
         visitStatus: visitDetails.visitStatus,
