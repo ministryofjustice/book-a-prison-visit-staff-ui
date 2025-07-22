@@ -11,6 +11,7 @@ import {
   getWeekOfDatesStartingMonday,
   isSameVisitSlot,
   initialiseName,
+  isMobilePhoneNumber,
 } from './utils'
 import getResultsPagingLinksTestData from './utils.testData'
 import { VisitSlot } from '../@types/bapv'
@@ -242,5 +243,19 @@ describe('initialise name', () => {
     ['Double barrelled', 'Robert-John Smith-Jones-Wilson', 'R. Smith-Jones-Wilson'],
   ])('%s initialiseName(%s, %s)', (_: string, a: string, expected: string) => {
     expect(initialiseName(a)).toEqual(expected)
+  })
+})
+
+describe('isMobilePhoneNumber', () => {
+  it.each([
+    ['non-mobile number', '01234567890', false],
+    ['valid mobile number', '07712000000', true],
+    ['valid mobile number (with spaces)', '07712 000 000', true],
+    ['valid mobile number (with int. code)', '+447712 000000', true],
+    ['empty string', '', false],
+    ['invalid string', 'not a number', false],
+    ['undefined number', undefined, false],
+  ])('%s - %s - %s', (_: string, number: string, expected: boolean) => {
+    expect(isMobilePhoneNumber(number)).toBe(expected)
   })
 })

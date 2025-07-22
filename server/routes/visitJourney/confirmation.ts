@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express'
 import { clearSession } from '../visitorUtils'
+import { isMobilePhoneNumber } from '../../utils/utils'
 
 export default class Confirmation {
   constructor(private readonly mode: string) {}
@@ -16,6 +17,8 @@ export default class Confirmation {
     res.locals.mainContact = visitSessionData.mainContact
     res.locals.visitReference = visitSessionData.visitReference
     res.locals.additionalSupport = visitSessionData.visitorSupport.description
+    res.locals.hasMobileNumber = isMobilePhoneNumber(visitSessionData.mainContact.phoneNumber)
+    res.locals.hasEmailAddress = !!visitSessionData.mainContact.email?.length
 
     clearSession(req)
 

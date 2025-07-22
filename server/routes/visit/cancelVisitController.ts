@@ -5,6 +5,7 @@ import { CancelVisitOrchestrationDto } from '../../data/orchestrationApiTypes'
 import { requestMethodsCancellation } from '../../constants/requestMethods'
 import { getFlashFormValues } from '../visitorUtils'
 import { visitCancellationReasons } from '../../constants/visitCancellation'
+import { isMobilePhoneNumber } from '../../utils/utils'
 
 export default class CancelVisitController {
   public constructor(
@@ -80,7 +81,12 @@ export default class CancelVisitController {
         operationId: res.locals.appInsightsOperationId,
       })
 
-      req.session.cancelledVisitInfo = { startTimestamp: visit.startTimestamp, endTimestamp: visit.endTimestamp }
+      req.session.cancelledVisitInfo = {
+        startTimestamp: visit.startTimestamp,
+        endTimestamp: visit.endTimestamp,
+        hasEmailAddress: !!visit.visitContact.email?.length,
+        hasMobileNumber: isMobilePhoneNumber(visit.visitContact.telephone),
+      }
 
       return res.redirect(`/visit/${reference}/cancelled`)
     }
