@@ -67,7 +67,7 @@ export const getAvailableVisitActions = ({
   return availableVisitActions
 }
 
-export const getVisitCancelledAlert = ({
+const getVisitCancelledAlert = ({
   visitStatus,
   outcomeStatus,
 }: {
@@ -86,7 +86,24 @@ export const getVisitCancelledAlert = ({
   }
 }
 
-export const getVisitNotificationsAlerts = (notifications: VisitBookingDetails['notifications']): MoJAlert[] => {
+const getVisitSubStatusAlert = ({
+  visitSubStatus,
+}: {
+  visitSubStatus: VisitBookingDetails['visitSubStatus']
+}): MoJAlert | undefined => {
+  if (visitSubStatus !== 'REQUESTED') {
+    return undefined
+  }
+
+  return {
+    variant: 'warning',
+    title: 'This request needs to be reviewed',
+    showTitleAsHeading: true,
+    text: 'Check alerts and restrictions.',
+  }
+}
+
+const getVisitNotificationsAlerts = (notifications: VisitBookingDetails['notifications']): MoJAlert[] => {
   // split notifications into those that should be a single alert and those to be grouped into one alert
   const singleNotifications: VisitBookingDetails['notifications'] = []
   const groupedNotifications: VisitBookingDetails['notifications'] = []
@@ -127,6 +144,21 @@ export const getVisitNotificationsAlerts = (notifications: VisitBookingDetails['
   }
 
   return alerts
+}
+
+export const getVisitAlerts = (visitDetails: VisitBookingDetails): MoJAlert[] => {
+  const visitCancelledAlert = getVisitCancelledAlert({
+    visitStatus: visitDetails.visitStatus,
+    outcomeStatus: visitDetails.outcomeStatus,
+  })
+  const visitSubStatusAlert = getVisitSubStatusAlert({ visitSubStatus: visitDetails.visitSubStatus })
+  const visitNotificationsAlerts = getVisitNotificationsAlerts(visitDetails.notifications)
+
+  return [
+    ...(visitCancelledAlert ? [visitCancelledAlert] : []),
+    ...(visitSubStatusAlert ? [visitSubStatusAlert] : []),
+    ...visitNotificationsAlerts,
+  ]
 }
 
 export const getVisitorRestrictionIdsToFlag = (notifications: VisitBookingDetails['notifications']): number[] => {

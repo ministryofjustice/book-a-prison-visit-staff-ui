@@ -9,7 +9,6 @@ import { createMockAuditService, createMockVisitService } from '../../services/t
 import { MojTimelineItem } from './visitEventsTimelineBuilder'
 import { AvailableVisitActions } from './visitUtils'
 import { MoJAlert } from '../../@types/bapv'
-import { notificationTypeAlerts } from '../../constants/notifications'
 
 let app: Express
 
@@ -17,8 +16,7 @@ const auditService = createMockAuditService()
 const visitService = createMockVisitService()
 
 let availableVisitActions: AvailableVisitActions
-let visitCancelledAlert: MoJAlert
-let visitNotificationAlerts: MoJAlert[]
+let visitAlerts: MoJAlert[]
 let visitEventsTimeline: MojTimelineItem[]
 let visitorRestrictionIdsToFlag: number[]
 
@@ -34,8 +32,7 @@ jest.mock('./visitUtils', () => {
   return {
     ...visitUtils,
     getAvailableVisitActions: () => availableVisitActions,
-    getVisitCancelledAlert: () => visitCancelledAlert,
-    getVisitNotificationsAlerts: () => visitNotificationAlerts,
+    getVisitAlerts: () => visitAlerts,
     getVisitorRestrictionIdsToFlag: () => visitorRestrictionIdsToFlag,
   }
 })
@@ -60,8 +57,7 @@ describe('Visit details page', () => {
 
   beforeEach(() => {
     availableVisitActions = { update: false, cancel: false, clearNotifications: false }
-    visitCancelledAlert = undefined
-    visitNotificationAlerts = []
+    visitAlerts = []
     visitorRestrictionIdsToFlag = []
 
     visitDetails = TestData.visitBookingDetails()
@@ -306,10 +302,8 @@ describe('Visit details page', () => {
     })
 
     describe('Visit alert messages', () => {
-      it('should render visit cancellation alert and NOT any notification alerts', () => {
-        visitCancelledAlert = TestData.mojAlert()
-        // below should not show because the visit is cancelled
-        visitNotificationAlerts = [notificationTypeAlerts.PRISONER_RELEASED_EVENT]
+      it('should render visit alert messages', () => {
+        visitAlerts = [TestData.mojAlert({ title: 'alert title', text: 'alert text' })]
 
         return request(app)
           .get('/visit/ab-cd-ef-gh')
@@ -318,30 +312,9 @@ describe('Visit details page', () => {
           .expect(res => {
             const $ = cheerio.load(res.text)
             expect($('.moj-alert').length).toBe(1)
-            expect($('.moj-alert').eq(0).text()).toContain(visitCancelledAlert.title)
-            expect($('.moj-alert').eq(0).text()).toContain(visitCancelledAlert.text)
-          })
-      })
 
-      it('should render visit notification alerts', () => {
-        visitNotificationAlerts = [
-          notificationTypeAlerts.PRISONER_RELEASED_EVENT,
-          notificationTypeAlerts.PRISON_VISITS_BLOCKED_FOR_DATE,
-        ]
-
-        return request(app)
-          .get('/visit/ab-cd-ef-gh')
-          .expect(200)
-          .expect('Content-Type', /html/)
-          .expect(res => {
-            const $ = cheerio.load(res.text)
-            expect($('.moj-alert').length).toBe(2)
-
-            expect($('.moj-alert').eq(0).text()).toContain(notificationTypeAlerts.PRISONER_RELEASED_EVENT.title)
-            expect($('.moj-alert').eq(0).text()).toContain(notificationTypeAlerts.PRISONER_RELEASED_EVENT.text)
-
-            expect($('.moj-alert').eq(1).text()).toContain(notificationTypeAlerts.PRISON_VISITS_BLOCKED_FOR_DATE.title)
-            expect($('.moj-alert').eq(1).text()).toContain(notificationTypeAlerts.PRISON_VISITS_BLOCKED_FOR_DATE.text)
+            expect($('.moj-alert').eq(0).text()).toContain('alert title')
+            expect($('.moj-alert').eq(0).text()).toContain('alert text')
           })
       })
     })
