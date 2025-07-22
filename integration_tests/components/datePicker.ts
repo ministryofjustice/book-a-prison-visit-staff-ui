@@ -4,7 +4,7 @@ export default class DatePickerComponent {
   enterDate = (date: string): void => {
     cy.get('.moj-js-datepicker-cancel').click({ force: true })
     cy.get('.moj-js-datepicker-input').clear()
-    cy.get('.moj-js-datepicker-input').type(`${date}{enter}`)
+    cy.get('.moj-js-datepicker-input').type(`${date}`)
     this.datePickerToggleCalendar()
   }
 
