@@ -8,10 +8,6 @@ export default abstract class Page {
     return new constructor(options)
   }
 
-  static verifyOnPageTitle = <T>(constructor: new (string) => T, title?: string): T => {
-    return new constructor(title)
-  }
-
   protected constructor(
     private readonly title: string,
     private readonly options: { axeTest?: boolean; axeRulesToIgnore?: string[] } = {

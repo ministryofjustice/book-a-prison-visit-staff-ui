@@ -58,7 +58,7 @@ context('Check visit details page', () => {
     cy.task('stubPrisonerProfile', profile)
     cy.visit(`/prisoner/${prisonerId}`)
 
-    const prisonerProfilePage = Page.verifyOnPageTitle(PrisonerProfilePage, 'Smith, John')
+    const prisonerProfilePage = Page.verifyOnPage(PrisonerProfilePage, { title: 'Smith, John' })
 
     // Select visitors - first of two
     prisonerProfilePage.bookAVisitButton().click()
@@ -254,7 +254,7 @@ context('Check visit details page', () => {
     })
 
     checkYourBookingPage.submitBooking()
-    const confirmationPage = Page.verifyOnPageTitle(ConfirmationPage, 'Booking confirmed')
+    const confirmationPage = Page.verifyOnPage(ConfirmationPage, { title: 'Booking confirmed' })
     confirmationPage.bookingReference().contains(TestData.visit().reference)
     confirmationPage.prisonerName().contains('John Smith')
     confirmationPage.prisonerNumber().contains(prisonerId)
@@ -274,7 +274,7 @@ context('Check visit details page', () => {
     cy.task('stubPrisonerProfile', profile)
     cy.visit(`/prisoner/${prisonerId}`)
 
-    const prisonerProfilePage = Page.verifyOnPageTitle(PrisonerProfilePage, 'Smith, John')
+    const prisonerProfilePage = Page.verifyOnPage(PrisonerProfilePage, { title: 'Smith, John' })
 
     // Select visitors - first of two
     prisonerProfilePage.bookAVisitButton().click()

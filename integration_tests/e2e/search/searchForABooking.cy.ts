@@ -76,7 +76,7 @@ context('Search for a booking by reference', () => {
     cy.task('stubPrisonerProfile', TestData.prisonerProfile({ visits: [TestData.visitSummary()] }))
     searchBookingByPrisonerResultsPage.prisonerLink().click()
 
-    const prisonerProfilePage = Page.verifyOnPageTitle(PrisonerProfilePage, 'Smith, John')
+    const prisonerProfilePage = Page.verifyOnPage(PrisonerProfilePage, { title: 'Smith, John' })
     cy.task('stubGetVisitDetailed', TestData.visitBookingDetailsRaw())
     prisonerProfilePage.visitTabReference().eq(0).click()
 

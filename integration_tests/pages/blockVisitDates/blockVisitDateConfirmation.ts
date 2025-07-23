@@ -1,7 +1,7 @@
 import Page from '../page'
 
 export default class BlockVisitDateConfirmationPage extends Page {
-  constructor(date: string) {
+  constructor({ date }: { date: string }) {
     super(`Are you sure you want to block visits on ${date}?`)
   }
 

@@ -40,10 +40,9 @@ context('Block visit dates', () => {
     // Continue to Are you sure page
     cy.task('stubGetBookedVisitCountByDate', { date: firstOfNextMonthShort })
     blockedVisitPage.continue()
-    const blockVisitDateConfirmationPage = Page.verifyOnPageTitle(
-      BlockVisitDateConfirmationPage,
-      format(firstOfNextMonth, longDateFormat),
-    )
+    const blockVisitDateConfirmationPage = Page.verifyOnPage(BlockVisitDateConfirmationPage, {
+      date: format(firstOfNextMonth, longDateFormat),
+    })
 
     // select Yes and confirm
     cy.task('stubBlockVisitDate', { date: firstOfNextMonthShort })
