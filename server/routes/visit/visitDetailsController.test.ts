@@ -93,7 +93,7 @@ describe('Visit details page', () => {
           expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
           expect($('[data-test="additional-support"]').text()).toContain('Wheelchair ramp')
           // actions forms
-          expect($('[data-test=visit-actions] form').attr('action')).toBe('/visit/ab-cd-ef-gh/update')
+          expect($('[data-test=visit-actions]').length).toBe(0)
           expect($('[data-test=visit-request-actions]').length).toBe(0)
           // prisoner details
           expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
@@ -343,6 +343,8 @@ describe('Visit details page', () => {
           .expect('Content-Type', /html/)
           .expect(res => {
             const $ = cheerio.load(res.text)
+            expect($('[data-test=visit-actions] form').attr('action')).toBe('/visit/ab-cd-ef-gh/update')
+
             expect($('[data-test=update-visit]').text().trim()).toBe('Update booking')
 
             expect($('[data-test=cancel-visit]').text().trim()).toBe('Cancel booking')
