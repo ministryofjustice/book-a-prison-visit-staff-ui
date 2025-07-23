@@ -24,6 +24,32 @@ describe('Visit requests service', () => {
     jest.resetAllMocks()
   })
 
+  describe('rejectVisitRequest', () => {
+    it('should reject a visit request', async () => {
+      const reference = 'ab-cd-ef-gh'
+      const visitRequestResponse = TestData.visitRequestResponse()
+      orchestrationApiClient.rejectVisitRequest.mockResolvedValue(visitRequestResponse)
+
+      const result = await visitRequestsService.rejectVisitRequest('user', reference)
+
+      expect(orchestrationApiClient.rejectVisitRequest).toHaveBeenCalledWith({ username: 'user', reference })
+      expect(result).toStrictEqual(visitRequestResponse)
+    })
+  })
+
+  describe('approveVisitRequest', () => {
+    it('should approve a visit request', async () => {
+      const reference = 'ab-cd-ef-gh'
+      const visitRequestResponse = TestData.visitRequestResponse()
+      orchestrationApiClient.approveVisitRequest.mockResolvedValue(visitRequestResponse)
+
+      const result = await visitRequestsService.approveVisitRequest('user', reference)
+
+      expect(orchestrationApiClient.approveVisitRequest).toHaveBeenCalledWith({ username: 'user', reference })
+      expect(result).toStrictEqual(visitRequestResponse)
+    })
+  })
+
   describe('getVisitRequestCount', () => {
     it('should return visit request summaries for given prison', async () => {
       const visitRequests = [TestData.visitRequestSummary()]
