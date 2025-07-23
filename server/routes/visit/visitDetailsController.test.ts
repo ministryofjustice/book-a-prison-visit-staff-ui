@@ -56,7 +56,7 @@ describe('Visit details page', () => {
   ]
 
   beforeEach(() => {
-    availableVisitActions = { update: false, cancel: false, clearNotifications: false }
+    availableVisitActions = { update: false, cancel: false, clearNotifications: false, processRequest: false }
     visitAlerts = []
     visitorRestrictionIdsToFlag = []
 
@@ -92,8 +92,9 @@ describe('Visit details page', () => {
           expect($('[data-test="visit-email"]').text()).toBe('visitor@example.com')
           expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
           expect($('[data-test="additional-support"]').text()).toContain('Wheelchair ramp')
-          // actions form
-          expect($('[data-test=visit-actions] form').attr('action')).toBe('/visit/ab-cd-ef-gh')
+          // actions forms
+          expect($('[data-test=visit-actions] form').attr('action')).toBe('/visit/ab-cd-ef-gh/update')
+          expect($('[data-test=visit-request-actions]').length).toBe(0)
           // prisoner details
           expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
           expect($('[data-test="prisoner-number"]').text()).toBe('A1234BC')
@@ -333,8 +334,8 @@ describe('Visit details page', () => {
           })
       })
 
-      it('should render all buttons if all actions available', () => {
-        availableVisitActions = { update: true, cancel: true, clearNotifications: true }
+      it('should render all buttons if all visit actions available', () => {
+        availableVisitActions = { update: true, cancel: true, clearNotifications: true, processRequest: false }
 
         return request(app)
           .get('/visit/ab-cd-ef-gh')
@@ -349,6 +350,31 @@ describe('Visit details page', () => {
 
             expect($('[data-test=clear-notifications]').text().trim()).toBe('Do not change')
             expect($('[data-test=clear-notifications]').attr('href')).toBe('/visit/ab-cd-ef-gh/clear-notifications')
+          })
+      })
+
+      it('should render approve and reject buttons if all visit request actions enabled', () => {
+        availableVisitActions = { update: false, cancel: false, clearNotifications: false, processRequest: true }
+
+        return request(app)
+          .get('/visit/ab-cd-ef-gh')
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('[data-test=update-visit]').length).toBe(0)
+            expect($('[data-test=cancel-visit]').length).toBe(0)
+            expect($('[data-test=clear-notifications]').length).toBe(0)
+
+            expect($('[data-test=approve-visit-request]').text().trim()).toBe('Approve request')
+            expect($('[data-test=approve-visit-request]').parent('form').attr('action')).toBe(
+              '/visit/ab-cd-ef-gh/request/approve',
+            )
+
+            expect($('[data-test=reject-visit-request]').text().trim()).toBe('Reject request')
+            expect($('[data-test=reject-visit-request]').parent('form').attr('action')).toBe(
+              '/visit/ab-cd-ef-gh/request/reject',
+            )
           })
       })
     })

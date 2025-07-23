@@ -23,14 +23,26 @@ export type AvailableVisitActions = ReturnType<typeof getAvailableVisitActions>
 
 export const getAvailableVisitActions = ({
   visitStatus,
+  visitSubStatus,
   startTimestamp,
   notifications,
 }: {
   visitStatus: VisitBookingDetails['visitStatus']
+  visitSubStatus: VisitBookingDetails['visitSubStatus']
   startTimestamp: VisitBookingDetails['startTimestamp']
   notifications: VisitBookingDetails['notifications']
-}): { update: boolean; cancel: boolean; clearNotifications: boolean } => {
-  const availableVisitActions = { update: false, cancel: false, clearNotifications: false }
+}): { update: boolean; cancel: boolean; clearNotifications: boolean; processRequest: boolean } => {
+  const availableVisitActions = {
+    update: false,
+    cancel: false,
+    clearNotifications: false,
+    processRequest: false,
+  }
+
+  if (visitSubStatus === 'REQUESTED') {
+    availableVisitActions.processRequest = true
+    return availableVisitActions
+  }
 
   if (visitStatus !== 'BOOKED') {
     return availableVisitActions

@@ -57,11 +57,24 @@ describe('Visit utils', () => {
     let params: Parameters<typeof getAvailableVisitActions>[number]
 
     beforeEach(() => {
-      params = { visitStatus: 'BOOKED', startTimestamp, notifications: [] }
+      params = { visitStatus: 'BOOKED', visitSubStatus: 'AUTO_APPROVED', startTimestamp, notifications: [] }
     })
 
     afterAll(() => {
       jest.useRealTimers()
+    })
+
+    describe('REQUESTED visit', () => {
+      it('should enable only "processRequest" action if visit REQUESTED', () => {
+        params.visitSubStatus = 'REQUESTED'
+
+        expect(getAvailableVisitActions(params)).toStrictEqual<AvailableVisitActions>({
+          update: false,
+          cancel: false,
+          clearNotifications: false,
+          processRequest: true,
+        })
+      })
     })
 
     describe('CANCELLED visit', () => {
@@ -72,6 +85,7 @@ describe('Visit utils', () => {
           update: false,
           cancel: false,
           clearNotifications: false,
+          processRequest: false,
         })
       })
     })

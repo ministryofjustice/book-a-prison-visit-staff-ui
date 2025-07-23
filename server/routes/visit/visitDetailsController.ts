@@ -40,6 +40,7 @@ export default class VisitDetailsController {
 
       const availableVisitActions = getAvailableVisitActions({
         visitStatus: visitDetails.visitStatus,
+        visitSubStatus: visitDetails.visitSubStatus,
         startTimestamp: visitDetails.startTimestamp,
         notifications: visitDetails.notifications,
       })

@@ -27,7 +27,7 @@ export default function routes(services: Services): Router {
   })
 
   router.get('/:reference', visitDetails.view())
-  router.post('/:reference', updateVisit.startVisitUpdate())
+  router.post('/:reference/update', updateVisit.startVisitUpdate())
 
   router.get('/:reference/cancel', cancelVisit.showCancellationReasons())
   router.post('/:reference/cancel', cancelVisit.validate(), cancelVisit.cancelVisit())

@@ -47,10 +47,10 @@ afterEach(() => {
 })
 
 describe('Start a visit update journey', () => {
-  describe('POST /visit/:reference', () => {
+  describe('POST /visit/:reference/update', () => {
     it('should populate visitSessionData for update journey and redirect to select visitors page', () => {
       return request(app)
-        .post('/visit/ab-cd-ef-gh')
+        .post('/visit/ab-cd-ef-gh/update')
         .expect(302)
         .expect('location', '/update-a-visit/select-visitors')
         .expect(res => {
@@ -108,7 +108,7 @@ describe('Start a visit update journey', () => {
       visitDetails.visitorSupport = undefined
 
       return request(app)
-        .post('/visit/ab-cd-ef-gh')
+        .post('/visit/ab-cd-ef-gh/update')
         .expect(302)
         .expect('location', '/update-a-visit/select-visitors')
         .expect(res => {
@@ -130,7 +130,7 @@ describe('Start a visit update journey', () => {
         } as SessionData,
       })
 
-      return request(app).post('/visit/ab-cd-ef-gh').expect(302).expect('location', '/visit/ab-cd-ef-gh')
+      return request(app).post('/visit/ab-cd-ef-gh/update').expect(302).expect('location', '/visit/ab-cd-ef-gh')
     })
 
     it('should redirect to /visit/:reference/confirm-update if visit is within minimum booking window days', () => {
@@ -138,12 +138,15 @@ describe('Start a visit update journey', () => {
       // so visit on 3rd or sooner triggers update confirmation
       visitDetails.startTimestamp = '2022-01-03T10:00:00'
 
-      return request(app).post('/visit/ab-cd-ef-gh').expect(302).expect('location', '/visit/ab-cd-ef-gh/confirm-update')
+      return request(app)
+        .post('/visit/ab-cd-ef-gh/update')
+        .expect(302)
+        .expect('location', '/visit/ab-cd-ef-gh/confirm-update')
     })
 
     it('should render 400 Bad Request error for invalid visit reference', () => {
       return request(app)
-        .post('/visit/12-34-56-78')
+        .post('/visit/12-34-56-78/update')
         .expect(400)
         .expect('Content-Type', /html/)
         .expect(res => {
