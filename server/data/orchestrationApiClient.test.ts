@@ -4,6 +4,7 @@ import TestData from '../routes/testutils/testData'
 import OrchestrationApiClient from './orchestrationApiClient'
 import {
   ApplicationDto,
+  ApproveVisitRequestBodyDto,
   BookingOrchestrationRequestDto,
   CancelVisitOrchestrationDto,
   ChangeApplicationDto,
@@ -13,6 +14,7 @@ import {
   IgnoreVisitNotificationsDto,
   PageVisitDto,
   PrisonDto,
+  RejectVisitRequestBodyDto,
   SessionSchedule,
   Visit,
   VisitBookingDetails,
@@ -583,6 +585,44 @@ describe('orchestrationApiClient', () => {
       const output = await orchestrationApiClient.isBlockedDate(prisonId, excludedDate)
 
       expect(output).toStrictEqual(true)
+    })
+  })
+
+  describe('rejectVisitRequest', () => {
+    it('should reject a visit request', async () => {
+      const reference = 'ab-cd-ef-gh'
+      const visitRequestResponse = TestData.visitRequestResponse()
+
+      fakeOrchestrationApi
+        .put(`/visits/requests/${reference}/reject`, <RejectVisitRequestBodyDto>{
+          visitReference: reference,
+          actionedBy: 'user1',
+        })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, visitRequestResponse)
+
+      expect(await orchestrationApiClient.rejectVisitRequest({ reference, username: 'user1' })).toStrictEqual(
+        visitRequestResponse,
+      )
+    })
+  })
+
+  describe('approveVisitRequest', () => {
+    it('should approve a visit request', async () => {
+      const reference = 'ab-cd-ef-gh'
+      const visitRequestResponse = TestData.visitRequestResponse()
+
+      fakeOrchestrationApi
+        .put(`/visits/requests/${reference}/approve`, <ApproveVisitRequestBodyDto>{
+          visitReference: reference,
+          actionedBy: 'user1',
+        })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, visitRequestResponse)
+
+      expect(await orchestrationApiClient.approveVisitRequest({ reference, username: 'user1' })).toStrictEqual(
+        visitRequestResponse,
+      )
     })
   })
 
