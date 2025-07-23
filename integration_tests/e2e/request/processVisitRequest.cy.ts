@@ -61,7 +61,7 @@ context('Process a visit Request', () => {
     })
     cy.task('stubGetVisitDetailed', visitDetails)
     visitRequestsListingPage.getAction(1).click()
-    const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage, 'request')
+    const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage, { visitType: 'request' })
     visitDetailsPage.getMessages().eq(0).contains('This request needs to be reviewed')
     visitDetailsPage.visitDate().contains('Friday 14 January 2022')
     visitDetailsPage.visitReference().contains('ab-cd-ef-gh')

@@ -33,7 +33,7 @@ context('Visit details page', () => {
     cy.task('stubGetVisitDetailed', visitDetails)
 
     cy.visit('/visit/ab-cd-ef-gh')
-    const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage, 'booking')
+    const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage, { visitType: 'booking' })
 
     visitDetailsPage.getMessages().eq(0).contains('This visit was cancelled by a visitor.')
 
@@ -92,7 +92,7 @@ context('Visit details page', () => {
 
     cy.visit('/visit/ab-cd-ef-gh')
 
-    const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage, 'booking')
+    const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage, { visitType: 'booking' })
     visitDetailsPage.visitReference().contains('ab-cd-ef-gh')
     visitDetailsPage.updateBooking().should('have.length', 1)
     visitDetailsPage.cancelBooking().should('have.length', 1)
@@ -122,7 +122,7 @@ context('Visit details page', () => {
 
     cy.visit('/visit/ab-cd-ef-gh')
 
-    const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage, 'booking')
+    const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage, { visitType: 'booking' })
     visitDetailsPage.visitReference().contains('ab-cd-ef-gh')
     visitDetailsPage.updateBooking().should('have.length', 0)
     visitDetailsPage.cancelBooking().should('have.length', 1)
@@ -170,7 +170,7 @@ context('Visit details page', () => {
     cy.task('stubGetVisitDetailed', visitDetails)
 
     cy.visit('/visit/ab-cd-ef-gh')
-    const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage, 'booking')
+    const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage, { visitType: 'booking' })
 
     // Messages - alert component
     visitDetailsPage

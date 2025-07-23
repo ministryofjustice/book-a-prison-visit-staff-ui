@@ -50,7 +50,7 @@ context('Review a visit', () => {
 
     // Start on booking summary page and chose 'Do not change' button
     cy.visit('/visit/ab-cd-ef-gh')
-    const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage, 'booking')
+    const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage, { visitType: 'booking' })
     visitDetailsPage.getMessages().eq(0).contains(notificationTypeAlerts.PRISONER_RECEIVED_EVENT.title)
     visitDetailsPage.eventDescription(0).contains(notificationTypes.PRISONER_RECEIVED_EVENT)
     visitDetailsPage.clearNotifications().click()

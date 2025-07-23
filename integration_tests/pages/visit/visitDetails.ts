@@ -1,8 +1,8 @@
 import Page, { PageElement } from '../page'
 
 export default class VisitDetailsPage extends Page {
-  constructor(type: 'booking' | 'request') {
-    super(type === 'booking' ? 'Visit booking details' : 'Visit request details')
+  constructor({ visitType }: { visitType: 'booking' | 'request' }) {
+    super(visitType === 'booking' ? 'Visit booking details' : 'Visit request details')
   }
 
   // Visit Details
