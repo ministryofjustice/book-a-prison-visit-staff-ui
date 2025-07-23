@@ -55,6 +55,46 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/visits/requests/{reference}/reject': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /**
+     * Reject a visit request
+     * @description Endpoint to reject a visit request by visit reference
+     */
+    put: operations['rejectVisitRequestByReference']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/visits/requests/{reference}/approve': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /**
+     * Approve a visit request
+     * @description Endpoint to approve a visit request by visit reference
+     */
+    put: operations['approveVisitRequestByReference']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/visits/notification/visit/{reference}/ignore': {
     parameters: {
       query?: never
@@ -1283,6 +1323,26 @@ export interface components {
       /** @description flag to determine if visit should be a request or instant booking */
       isRequestBooking?: boolean
     }
+    RejectVisitRequestBodyDto: {
+      /** @description Reference of the visit for rejection */
+      visitReference: string
+      /** @description Username for user who actioned this request */
+      actionedBy: string
+    }
+    OrchestrationApproveRejectVisitRequestResponseDto: {
+      /** @description Reference of the approved visit */
+      visitReference: string
+      /** @description First name of the prisoner being visited */
+      prisonerFirstName: string
+      /** @description Last name of the prisoner being visited */
+      prisonerLastName: string
+    }
+    ApproveVisitRequestBodyDto: {
+      /** @description Reference of the visit for approval */
+      visitReference: string
+      /** @description Username for user who actioned this request */
+      actionedBy: string
+    }
     IgnoreVisitNotificationsDto: {
       /** @description Reason why the visit's notifications can be ignored */
       reason: string
@@ -1674,6 +1734,8 @@ export interface components {
         | 'BOOKED_VISIT'
         | 'UPDATED_VISIT'
         | 'CANCELLED_VISIT'
+        | 'REQUESTED_VISIT'
+        | 'REQUESTED_VISIT_APPROVED'
         | 'NON_ASSOCIATION_EVENT'
         | 'PRISONER_RELEASED_EVENT'
         | 'PRISONER_RECEIVED_EVENT'
@@ -1761,8 +1823,6 @@ export interface components {
        * @example Moorland HMP
        */
       prisonName: string
-      /** @description Whether the prison is still active */
-      active: boolean
     }
     PrisonerDetailsDto: {
       /**
@@ -2149,9 +2209,9 @@ export interface components {
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
       pageSize?: number
+      paged?: boolean
       /** Format: int32 */
       pageNumber?: number
-      paged?: boolean
       unpaged?: boolean
     }
     SortObject: {
@@ -3175,6 +3235,114 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['ApplicationValidationErrorResponse']
+        }
+      }
+    }
+  }
+  rejectVisitRequestByReference: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description visit reference */
+        reference: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RejectVisitRequestBodyDto']
+      }
+    }
+    responses: {
+      /** @description Successfully rejected visit request */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['OrchestrationApproveRejectVisitRequestResponseDto']
+        }
+      }
+      /** @description Incorrect request to reject visit request by reference (not found or not in correct sub status) */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to access this endpoint */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  approveVisitRequestByReference: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description visit reference */
+        reference: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ApproveVisitRequestBodyDto']
+      }
+    }
+    responses: {
+      /** @description Successfully approved visit request */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['OrchestrationApproveRejectVisitRequestResponseDto']
+        }
+      }
+      /** @description Incorrect request to approve visit request by reference (not found or not in correct sub status) */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to access this endpoint */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
         }
       }
     }

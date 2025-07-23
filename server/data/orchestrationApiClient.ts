@@ -45,6 +45,7 @@ export default class OrchestrationApiClient {
     'BOOKED_VISIT',
     'UPDATED_VISIT',
     'CANCELLED_VISIT',
+    'REQUESTED_VISIT',
     'IGNORE_VISIT_NOTIFICATIONS_EVENT',
     ...this.enabledRawNotifications,
   ]

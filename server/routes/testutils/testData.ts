@@ -490,7 +490,6 @@ export default class TestData {
     prison = {
       prisonId: 'HEI',
       prisonName: 'Hewell (HMP)',
-      active: true,
     },
     prisoner = {
       prisonerNumber: 'A1234BC',

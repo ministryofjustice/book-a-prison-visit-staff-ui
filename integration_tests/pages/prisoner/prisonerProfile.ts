@@ -1,8 +1,8 @@
 import Page, { PageElement } from '../page'
 
 export default class PrisonerProfilePage extends Page {
-  constructor(variableTitle: string) {
-    super(variableTitle)
+  constructor({ title }: { title: string }) {
+    super(title)
   }
 
   flaggedAlerts = (): PageElement => cy.get('.flagged-alert')

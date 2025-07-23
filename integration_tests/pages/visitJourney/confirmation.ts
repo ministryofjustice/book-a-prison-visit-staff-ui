@@ -1,8 +1,8 @@
 import Page, { PageElement } from '../page'
 
 export default class ConfirmationPage extends Page {
-  constructor(variableTitle: string) {
-    super(variableTitle)
+  constructor({ title }: { title: string }) {
+    super(title)
 
     cy.get('[data-test=go-to-home]').contains('Go to manage prison visits').should('have.attr', 'href', '/')
   }

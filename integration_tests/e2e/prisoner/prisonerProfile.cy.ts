@@ -48,7 +48,7 @@ context('Prisoner profile page', () => {
 
     // Go to prisoner profile page
     cy.visit(`/prisoner/${prisonerId}`)
-    const prisonerProfilePage = Page.verifyOnPageTitle(PrisonerProfilePage, prisonerDisplayName)
+    const prisonerProfilePage = Page.verifyOnPage(PrisonerProfilePage, { title: prisonerDisplayName })
 
     // Prisoner details
     prisonerProfilePage.flaggedAlerts().eq(0).contains('Protective Isolation Unit')

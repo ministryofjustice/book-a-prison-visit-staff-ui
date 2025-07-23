@@ -14,7 +14,7 @@ context('Establishment not supported', () => {
     cy.task('stubSupportedPrisonIds')
     cy.signIn()
 
-    Page.verifyOnPageTitle(EstablishmentNotSupportedPage, 'XYZ (HMP) does not use this service')
+    Page.verifyOnPage(EstablishmentNotSupportedPage, { title: 'XYZ (HMP) does not use this service' })
   })
 
   it('should redirect to establishment not supported page if case load changes from supported to unsupported', () => {
@@ -39,6 +39,6 @@ context('Establishment not supported', () => {
     searchForAPrisonerPage.searchButton().click()
 
     // Redirected to establishment not supported page
-    Page.verifyOnPageTitle(EstablishmentNotSupportedPage, 'XYZ (HMP) does not use this service')
+    Page.verifyOnPage(EstablishmentNotSupportedPage, { title: 'XYZ (HMP) does not use this service' })
   })
 })

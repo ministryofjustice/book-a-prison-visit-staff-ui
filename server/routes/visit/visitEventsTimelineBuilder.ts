@@ -53,6 +53,10 @@ export default ({
             : (getCancellationReason(visitNotes) ?? requestMethodDescriptions[event.applicationMethodType])
           break
 
+        case 'REQUESTED_VISIT':
+          timelineItem.text = 'Method: GOV.UK'
+          break
+
         default:
           timelineItem.text = isANotificationType(event.type) ? `Reason: ${notificationTypes[event.type]}` : ''
       }

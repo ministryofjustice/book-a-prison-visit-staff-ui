@@ -71,7 +71,7 @@ context('Update a visit', () => {
 
     // Visit details page
     cy.visit('/visit/ab-cd-ef-gh')
-    const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage)
+    const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage, { visitType: 'booking' })
     visitDetailsPage.visitReference().contains('ab-cd-ef-gh')
     visitDetailsPage.prisonerName().contains('John Smith')
 
@@ -185,7 +185,7 @@ context('Update a visit', () => {
     checkYourBookingPage.submitBooking()
 
     // Confirmation page
-    const confirmationPage = Page.verifyOnPageTitle(ConfirmationPage, 'Booking updated')
+    const confirmationPage = Page.verifyOnPage(ConfirmationPage, { title: 'Booking updated' })
     confirmationPage.bookingReference().contains(TestData.visit().reference)
     confirmationPage.prisonerName().contains('John Smith')
     confirmationPage.prisonerNumber().contains(offenderNo)
@@ -233,7 +233,7 @@ context('Update a visit', () => {
 
     // Visit details page
     cy.visit('/visit/ab-cd-ef-gh')
-    const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage)
+    const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage, { visitType: 'booking' })
     visitDetailsPage.visitReference().contains('ab-cd-ef-gh')
     visitDetailsPage.prisonerName().contains('John Smith')
 

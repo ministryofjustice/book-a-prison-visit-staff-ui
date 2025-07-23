@@ -9,8 +9,6 @@ export default class BlockVisitDatesPage extends Page {
     this.datePicker = new DatePickerComponent()
   }
 
-  getMessage = (): PageElement => cy.get('.moj-alert__content')
-
   continue = (): void => {
     cy.get('[data-test="submit"]').click()
   }

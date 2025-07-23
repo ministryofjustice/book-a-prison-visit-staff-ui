@@ -4,23 +4,19 @@ import logAccessibilityViolations from '../support/logAccessibilityViolations'
 export type PageElement = Cypress.Chainable<JQuery>
 
 export default abstract class Page {
-  static verifyOnPage<T>(constructor: new () => T): T {
-    return new constructor()
+  static verifyOnPage<T, Options>(constructor: new (options: Options) => T, options?: Options): T {
+    return new constructor(options)
   }
 
-  static verifyOnPageTitle = <T>(constructor: new (string) => T, title?: string): T => {
-    return new constructor(title)
-  }
-
-  constructor(
+  protected constructor(
     private readonly title: string,
     private readonly options: { axeTest?: boolean; axeRulesToIgnore?: string[] } = {
       axeTest: true,
     },
   ) {
     this.checkOnPage()
-    if (options.axeTest || options.axeRulesToIgnore?.length) {
-      this.runAxe(options.axeRulesToIgnore)
+    if (this.options.axeTest || this.options.axeRulesToIgnore?.length) {
+      this.runAxe(this.options.axeRulesToIgnore)
     }
   }
 
@@ -46,7 +42,8 @@ export default abstract class Page {
 
   signOut = (): PageElement => cy.get('[data-qa=signOut]')
 
-  mojAlertTitle = (): PageElement => cy.get('.moj-alert__content h2')
+  // Messages (MoJ Alerts)
+  getMessages = (): PageElement => cy.get('.moj-alert')
 
   mojAlertBody = (): PageElement => cy.get('.moj-alert__content')
 }
