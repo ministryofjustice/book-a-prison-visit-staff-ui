@@ -50,8 +50,8 @@ context('Review a visit', () => {
 
     // Start on booking summary page and chose 'Do not change' button
     cy.visit('/visit/ab-cd-ef-gh')
-    const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage)
-    visitDetailsPage.visitMessages().eq(0).contains(notificationTypeAlerts.PRISONER_RECEIVED_EVENT.title)
+    const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage, 'booking')
+    visitDetailsPage.getMessages().eq(0).contains(notificationTypeAlerts.PRISONER_RECEIVED_EVENT.title)
     visitDetailsPage.eventDescription(0).contains(notificationTypes.PRISONER_RECEIVED_EVENT)
     visitDetailsPage.clearNotifications().click()
 
@@ -83,7 +83,7 @@ context('Review a visit', () => {
     cy.task('stubGetVisitDetailed', visitDetailsUpdated)
 
     clearNotificationsPage.submit()
-    visitDetailsPage.visitMessages().should('not.exist')
+    visitDetailsPage.getMessages().should('not.exist')
     visitDetailsPage.eventHeader(0).contains(eventAuditTypes.IGNORE_VISIT_NOTIFICATIONS_EVENT)
     visitDetailsPage.actionedBy(0).contains('User One')
     visitDetailsPage.eventTime(0).contains('Thursday 11 April 2024 at 11am')

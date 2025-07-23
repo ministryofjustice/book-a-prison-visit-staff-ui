@@ -350,7 +350,8 @@ context('Check visit details page', () => {
     // Check alert on select date and time page
     Page.verifyOnPage(SelectVisitDateAndTime)
     selectVisitDateAndTime
-      .mojAlertTitle()
+      .getMessages()
+      .eq(0)
       .contains(
         `John Smith now has a non-association on ${format(new Date(visitSessions[0].startTimestamp), dayMonthFormat)}.`,
       )

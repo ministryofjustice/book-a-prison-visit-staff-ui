@@ -1,12 +1,9 @@
 import Page, { PageElement } from '../page'
 
 export default class VisitDetailsPage extends Page {
-  constructor() {
-    super('Visit booking details')
+  constructor(type: 'booking' | 'request') {
+    super(type === 'booking' ? 'Visit booking details' : 'Visit request details')
   }
-
-  // Messages (MoJ Alerts)
-  visitMessages = (): PageElement => cy.get('.moj-alert')
 
   // Visit Details
   visitDate = (): PageElement => cy.get('[data-test="visit-date"]')

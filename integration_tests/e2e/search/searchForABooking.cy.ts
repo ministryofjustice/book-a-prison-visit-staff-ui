@@ -47,7 +47,7 @@ context('Search for a booking by reference', () => {
     cy.task('stubGetVisitDetailed', TestData.visitBookingDetailsRaw())
     searchBookingByReferenceResultsPage.visitReferenceLink().click()
 
-    const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage)
+    const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage, 'booking')
     visitDetailsPage.visitReference().contains('ab-cd-ef-gh')
     visitDetailsPage.prisonerName().contains('John Smith')
   })
@@ -80,7 +80,7 @@ context('Search for a booking by reference', () => {
     cy.task('stubGetVisitDetailed', TestData.visitBookingDetailsRaw())
     prisonerProfilePage.visitTabReference().eq(0).click()
 
-    const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage)
+    const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage, 'booking')
     visitDetailsPage.visitReference().contains('ab-cd-ef-gh')
     visitDetailsPage.prisonerName().contains('John Smith')
   })

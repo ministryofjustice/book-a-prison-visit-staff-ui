@@ -33,9 +33,9 @@ context('Visit details page', () => {
     cy.task('stubGetVisitDetailed', visitDetails)
 
     cy.visit('/visit/ab-cd-ef-gh')
-    const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage)
+    const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage, 'booking')
 
-    visitDetailsPage.visitMessages().eq(0).contains('This visit was cancelled by a visitor.')
+    visitDetailsPage.getMessages().eq(0).contains('This visit was cancelled by a visitor.')
 
     // visit Details
     visitDetailsPage.visitDate().contains('Friday 14 January 2022')
@@ -92,14 +92,14 @@ context('Visit details page', () => {
 
     cy.visit('/visit/ab-cd-ef-gh')
 
-    const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage)
+    const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage, 'booking')
     visitDetailsPage.visitReference().contains('ab-cd-ef-gh')
     visitDetailsPage.updateBooking().should('have.length', 1)
     visitDetailsPage.cancelBooking().should('have.length', 1)
     visitDetailsPage.clearNotifications().should('have.length', 0)
 
     // Messages
-    visitDetailsPage.visitMessages().eq(0).contains(notificationTypeAlerts.PRISON_VISITS_BLOCKED_FOR_DATE.title)
+    visitDetailsPage.getMessages().eq(0).contains(notificationTypeAlerts.PRISON_VISITS_BLOCKED_FOR_DATE.title)
 
     // Prisoner Details
     visitDetailsPage.prisonerName().contains('John Smith')
@@ -122,14 +122,14 @@ context('Visit details page', () => {
 
     cy.visit('/visit/ab-cd-ef-gh')
 
-    const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage)
+    const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage, 'booking')
     visitDetailsPage.visitReference().contains('ab-cd-ef-gh')
     visitDetailsPage.updateBooking().should('have.length', 0)
     visitDetailsPage.cancelBooking().should('have.length', 1)
     visitDetailsPage.clearNotifications().should('have.length', 1)
 
     // Messages
-    visitDetailsPage.visitMessages().eq(0).contains(notificationTypeAlerts.PRISONER_RECEIVED_EVENT.title)
+    visitDetailsPage.getMessages().eq(0).contains(notificationTypeAlerts.PRISONER_RECEIVED_EVENT.title)
 
     // Prisoner Details
     visitDetailsPage.prisonerName().contains('John Smith')
@@ -170,11 +170,11 @@ context('Visit details page', () => {
     cy.task('stubGetVisitDetailed', visitDetails)
 
     cy.visit('/visit/ab-cd-ef-gh')
-    const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage)
+    const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage, 'booking')
 
     // Messages - alert component
     visitDetailsPage
-      .visitMessages()
+      .getMessages()
       .eq(0)
       .within(() => {
         cy.contains('This visit needs review')

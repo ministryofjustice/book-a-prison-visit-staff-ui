@@ -2,8 +2,9 @@ import TestData from '../../../server/routes/testutils/testData'
 import HomePage from '../../pages/home'
 import Page from '../../pages/page'
 import VisitRequestsListingPage from '../../pages/request/visitRequestsListing'
+import VisitDetailsPage from '../../pages/visit/visitDetails'
 
-context('Requested visits listing page', () => {
+context('Process a visit Request', () => {
   const prisonStaffAndPublic = TestData.prisonDto({
     clients: [
       { userType: 'STAFF', active: true },
@@ -18,7 +19,7 @@ context('Requested visits listing page', () => {
     cy.task('stubGetPrison', prisonStaffAndPublic)
   })
 
-  it('should navigate to the requested visits listing page', () => {
+  it('should navigate to a visit request via the requested visits listing page', () => {
     const visitRequest = TestData.visitRequestSummary()
 
     cy.task('stubGetVisitRequestCount', { visitRequestCount: TestData.visitRequestCount({ count: 1 }) })
@@ -44,5 +45,28 @@ context('Requested visits listing page', () => {
       .getAction(1)
       .contains('View')
       .should('have.attr', 'href', '/visit/ab-cd-ef-gh?from=request')
+
+    // View visit request
+    const visitDetails = TestData.visitBookingDetailsRaw({
+      visitSubStatus: 'REQUESTED',
+      events: [
+        {
+          type: 'REQUESTED_VISIT',
+          applicationMethodType: 'WEBSITE',
+          actionedByFullName: null,
+          userType: 'PUBLIC',
+          createTimestamp: '2022-01-01T09:00:00',
+        },
+      ],
+    })
+    cy.task('stubGetVisitDetailed', visitDetails)
+    visitRequestsListingPage.getAction(1).click()
+    const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage, 'request')
+    visitDetailsPage.getMessages().eq(0).contains('This request needs to be reviewed')
+    visitDetailsPage.visitDate().contains('Friday 14 January 2022')
+    visitDetailsPage.visitReference().contains('ab-cd-ef-gh')
+    visitDetailsPage.eventHeader(0).contains('Requested')
+
+    // TODO continue to test APPROVE / REJECT visit - when implemented
   })
 })

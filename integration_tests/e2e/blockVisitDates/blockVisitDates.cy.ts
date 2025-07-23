@@ -55,7 +55,7 @@ context('Block visit dates', () => {
 
     // back to listings page and see success message and new blocked date
     blockedVisitPage.checkOnPage()
-    blockedVisitPage.getMessage().contains(`Visits are blocked for ${firstOfNextMonthLong}.`)
+    blockedVisitPage.getMessages().eq(0).contains(`Visits are blocked for ${firstOfNextMonthLong}.`)
     blockedVisitPage.blockedDate(1).contains(firstOfNextMonthLong)
     blockedVisitPage.blockedBy(1).contains('User one')
     blockedVisitPage.unblockLink(1).contains('Unblock')
@@ -82,7 +82,7 @@ context('Block visit dates', () => {
 
     // back to listings page and see success message and no blocked dates
     blockedVisitPage.checkOnPage()
-    blockedVisitPage.getMessage().contains(`Visits are unblocked for ${firstOfNextMonthLong}.`)
+    blockedVisitPage.getMessages().eq(0).contains(`Visits are unblocked for ${firstOfNextMonthLong}.`)
     blockedVisitPage.noBlockedDates().contains('no upcoming blocked dates')
   })
 })
