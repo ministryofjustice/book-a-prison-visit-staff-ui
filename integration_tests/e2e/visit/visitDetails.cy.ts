@@ -20,6 +20,7 @@ context('Visit details page', () => {
   it('should display all visit information for a past visit', () => {
     const visitDetails = TestData.visitBookingDetailsRaw({
       visitStatus: 'CANCELLED',
+      visitSubStatus: 'CANCELLED',
       outcomeStatus: 'VISITOR_CANCELLED',
       visitNotes: [{ type: 'VISIT_OUTCOMES', text: 'Illness' }],
     })
