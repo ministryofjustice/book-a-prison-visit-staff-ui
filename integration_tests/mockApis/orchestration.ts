@@ -16,6 +16,7 @@ import {
   VisitBookingDetailsRaw,
   VisitNotificationsRaw,
   VisitPreview,
+  VisitRequestResponse,
   VisitRequestsCountDto,
   VisitRequestSummary,
   VisitSession,
@@ -515,6 +516,66 @@ export default {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
         jsonBody: excludeDates,
+      },
+    })
+  },
+
+  stubRejectVisitRequest: ({
+    reference,
+    username,
+    visitRequestResponse,
+  }: {
+    reference: string
+    username: string
+    visitRequestResponse: VisitRequestResponse
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'PUT',
+        url: `/orchestration/visits/requests/${reference}/reject`,
+        bodyPatterns: [
+          {
+            equalToJson: {
+              visitReference: reference,
+              actionedBy: username,
+            },
+          },
+        ],
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: visitRequestResponse,
+      },
+    })
+  },
+
+  stubApproveVisitRequest: ({
+    reference,
+    username,
+    visitRequestResponse,
+  }: {
+    reference: string
+    username: string
+    visitRequestResponse: VisitRequestResponse
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'PUT',
+        url: `/orchestration/visits/requests/${reference}/approve`,
+        bodyPatterns: [
+          {
+            equalToJson: {
+              visitReference: reference,
+              actionedBy: username,
+            },
+          },
+        ],
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: visitRequestResponse,
       },
     })
   },

@@ -1,12 +1,13 @@
 import type { Express } from 'express'
 import request from 'supertest'
 import * as cheerio from 'cheerio'
-import { appWithAllRoutes } from '../testutils/appSetup'
+import { appWithAllRoutes, FlashData, flashProvider } from '../testutils/appSetup'
 import { createMockVisitRequestsService } from '../../services/testutils/mocks'
 import TestData from '../testutils/testData'
 import { setFeature } from '../../data/testutils/mockFeature'
 
 let app: Express
+let flashData: FlashData
 
 afterEach(() => {
   jest.resetAllMocks()
@@ -17,6 +18,10 @@ describe('GET /requested-visits - Requested visits listing', () => {
 
   beforeEach(() => {
     setFeature('visitRequest', true)
+
+    flashData = {}
+    flashProvider.mockImplementation((key: keyof FlashData) => flashData[key])
+
     app = appWithAllRoutes({ services: { visitRequestsService } })
   })
 
@@ -36,6 +41,7 @@ describe('GET /requested-visits - Requested visits listing', () => {
       .expect(res => {
         const $ = cheerio.load(res.text)
         expect($('.govuk-breadcrumbs li').length).toBe(2)
+        expect($('.moj-alert').length).toBe(0)
         expect($('h1').text()).toBe('Requested visits')
         expect($('[data-test=check-before-days]').text()).toBe('2 days')
 
@@ -70,6 +76,22 @@ describe('GET /requested-visits - Requested visits listing', () => {
         expect($('[data-test=no-visit-requests]').length).toBe(1)
 
         expect(visitRequestsService.getVisitRequests).toHaveBeenCalledWith('user1', 'HEI')
+      })
+  })
+
+  it('should show messages set in flash (approve / reject confirmation)', () => {
+    visitRequestsService.getVisitRequests.mockResolvedValue([])
+    const message = TestData.mojAlert()
+    flashData.messages = [message]
+
+    return request(app)
+      .get('/requested-visits')
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('.moj-alert').text()).toContain(message.title)
+        expect($('.moj-alert').text()).toContain(message.text)
+        expect($('h1').text()).toBe('Requested visits')
       })
   })
 })

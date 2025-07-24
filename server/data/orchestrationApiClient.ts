@@ -3,6 +3,7 @@ import config, { ApiConfig } from '../config'
 import {
   ApplicationDto,
   ApplicationMethodType,
+  ApproveVisitRequestBodyDto,
   BookingOrchestrationRequestDto,
   CancelVisitOrchestrationDto,
   ChangeApplicationDto,
@@ -18,6 +19,7 @@ import {
   PageVisitDto,
   PrisonDto,
   PrisonerProfile,
+  RejectVisitRequestBodyDto,
   SessionCapacity,
   SessionSchedule,
   Visit,
@@ -26,6 +28,7 @@ import {
   VisitNotifications,
   VisitNotificationsRaw,
   VisitPreview,
+  VisitRequestResponse,
   VisitRequestsCountDto,
   VisitRequestSummary,
   VisitRestriction,
@@ -291,6 +294,32 @@ export default class OrchestrationApiClient {
   }
 
   // visit requests controller
+
+  async rejectVisitRequest({
+    reference,
+    username,
+  }: {
+    reference: string
+    username: string
+  }): Promise<VisitRequestResponse> {
+    return this.restClient.put({
+      path: `/visits/requests/${reference}/reject`,
+      data: <RejectVisitRequestBodyDto>{ visitReference: reference, actionedBy: username },
+    })
+  }
+
+  async approveVisitRequest({
+    reference,
+    username,
+  }: {
+    reference: string
+    username: string
+  }): Promise<VisitRequestResponse> {
+    return this.restClient.put({
+      path: `/visits/requests/${reference}/approve`,
+      data: <ApproveVisitRequestBodyDto>{ visitReference: reference, actionedBy: username },
+    })
+  }
 
   async getVisitRequests(prisonCode: string): Promise<VisitRequestSummary[]> {
     return this.restClient.get({ path: `/visits/requests/${prisonCode}` })

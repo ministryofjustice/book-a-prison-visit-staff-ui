@@ -76,35 +76,37 @@
     </div>
 
     {# Visit actions #}
-    <div class="govuk-button-group" data-test="visit-actions">
-      <form action="/visit/{{ visitDetails.reference }}/update" method="POST" novalidate>
-        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+    {% if availableVisitActions.update or availableVisitActions.cancel or availableVisitActions.clearNotifications %}
+      <div class="govuk-button-group" data-test="visit-actions">
+        <form action="/visit/{{ visitDetails.reference }}/update" method="POST" novalidate>
+          <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
-        {{ govukButton({
-          text: "Update booking",
-          classes: "govuk-!-margin-top-5",
-          attributes: { "data-test": "update-visit" },
-          preventDoubleClick: true
-        }) if availableVisitActions.update }}
+          {{ govukButton({
+            text: "Update booking",
+            classes: "govuk-!-margin-top-5",
+            attributes: { "data-test": "update-visit" },
+            preventDoubleClick: true
+          }) if availableVisitActions.update }}
 
-        {{ govukButton({
-          text: "Cancel booking",
-          classes: "govuk-!-margin-top-5 govuk-button--secondary",
-          href: "/visit/" + visitDetails.reference + "/cancel",
-          attributes: { "data-test": "cancel-visit" },
-          preventDoubleClick: true
-        }) if availableVisitActions.cancel }}
+          {{ govukButton({
+            text: "Cancel booking",
+            classes: "govuk-!-margin-top-5 govuk-button--secondary",
+            href: "/visit/" + visitDetails.reference + "/cancel",
+            attributes: { "data-test": "cancel-visit" },
+            preventDoubleClick: true
+          }) if availableVisitActions.cancel }}
 
-        {{ govukButton({
-          text: "Do not change",
-          classes: "govuk-!-margin-top-5 govuk-button--secondary",
-          href: "/visit/" + visitDetails.reference + "/clear-notifications",
-          attributes: { "data-test": "clear-notifications" },
-          preventDoubleClick: true
-        }) if availableVisitActions.clearNotifications }}
+          {{ govukButton({
+            text: "Do not change",
+            classes: "govuk-!-margin-top-5 govuk-button--secondary",
+            href: "/visit/" + visitDetails.reference + "/clear-notifications",
+            attributes: { "data-test": "clear-notifications" },
+            preventDoubleClick: true
+          }) if availableVisitActions.clearNotifications }}
 
-      </form>
-    </div>
+        </form>
+      </div>
+    {% endif %}
 
     {# Visit request actions #}
     {% if availableVisitActions.processRequest %}

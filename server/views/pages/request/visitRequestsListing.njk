@@ -1,6 +1,7 @@
 {% extends "layout.njk" %}
 {% from "partials/breadcrumbs.njk" import breadcrumbs with context %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
+{%- from "moj/components/alert/macro.njk" import mojAlert -%}
 
 {% set pageHeaderTitle = "Requested visits" %}
 
@@ -50,6 +51,11 @@
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
+
+      {# Messages #}
+      {% for message in messages %}
+        {{ mojAlert(message) }}
+      {% endfor %}
 
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
 

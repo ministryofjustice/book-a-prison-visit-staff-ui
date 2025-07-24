@@ -17,6 +17,7 @@ import {
   VisitNotifications,
   VisitNotificationsRaw,
   VisitPreview,
+  VisitRequestResponse,
   VisitRequestsCountDto,
   VisitRequestSummary,
   VisitSession,
@@ -682,6 +683,16 @@ export default class TestData {
     visitTimeSlot,
     firstBookedDateTime,
     visitRestriction,
+  })
+
+  static visitRequestResponse = ({
+    visitReference = 'ab-cd-ef-gh',
+    prisonerFirstName = 'JOHN',
+    prisonerLastName = 'SMITH',
+  }: Partial<VisitRequestResponse> = {}): VisitRequestResponse => ({
+    visitReference,
+    prisonerFirstName,
+    prisonerLastName,
   })
 
   static visitRequestCount = ({ count = 3 }: Partial<VisitRequestsCountDto> = {}): VisitRequestsCountDto => ({ count })
