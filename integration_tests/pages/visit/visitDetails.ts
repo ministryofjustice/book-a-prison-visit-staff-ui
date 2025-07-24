@@ -46,6 +46,10 @@ export default class VisitDetailsPage extends Page {
 
   clearNotifications = (): PageElement => cy.get('[data-test="clear-notifications')
 
+  approveRequest = (): PageElement => cy.get('[data-test="approve-visit-request')
+
+  rejectRequest = (): PageElement => cy.get('[data-test="reject-visit-request')
+
   // Visitor Details-1
   visitorName = (index: number): PageElement => cy.get(`[data-test="visitor-name-${index}"]`)
 

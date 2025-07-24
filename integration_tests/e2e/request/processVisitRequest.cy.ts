@@ -12,20 +12,20 @@ context('Process a visit Request', () => {
     ],
   })
 
+  const visitRequest = TestData.visitRequestSummary()
+
   beforeEach(() => {
     cy.task('reset')
     cy.task('stubSignIn')
     cy.task('stubSupportedPrisonIds')
     cy.task('stubGetPrison', prisonStaffAndPublic)
-  })
-
-  it('should navigate to a visit request via the requested visits listing page', () => {
-    const visitRequest = TestData.visitRequestSummary()
 
     cy.task('stubGetVisitRequestCount', { visitRequestCount: TestData.visitRequestCount({ count: 1 }) })
     cy.task('stubGetNotificationCount', { notificationCount: TestData.notificationCount({ count: 0 }) })
     cy.signIn()
+  })
 
+  it('should navigate to a visit request via the requested visits listing page and approve', () => {
     // 'Requested visits' tile and count
     const homePage = Page.verifyOnPage(HomePage)
     homePage.visitRequestsBadgeCount().contains('1')
@@ -67,6 +67,68 @@ context('Process a visit Request', () => {
     visitDetailsPage.visitReference().contains('ab-cd-ef-gh')
     visitDetailsPage.eventHeader(0).contains('Requested')
 
-    // TODO continue to test APPROVE / REJECT visit - when implemented
+    // Approve visit request
+    cy.task('stubGetVisitRequests', { visitRequests: [] })
+    const visitRequestResponse = TestData.visitRequestResponse()
+    cy.task('stubApproveVisitRequest', {
+      reference: visitRequest.visitReference,
+      username: 'USER1',
+      visitRequestResponse,
+    })
+    visitDetailsPage.approveRequest().click()
+
+    // Returned to requested visits page, with success message and empty list
+    visitRequestsListingPage.checkOnPage()
+    visitRequestsListingPage
+      .getMessages()
+      .eq(0)
+      .contains('You approved the request and booked the visit with John Smith')
+    visitRequestsListingPage.getNoRequestsMessage().contains('no visit requests')
+  })
+
+  it('should navigate to a visit request via the requested visits listing page and reject', () => {
+    // 'Requested visits' tile and count
+    const homePage = Page.verifyOnPage(HomePage)
+    homePage.visitRequestsBadgeCount().contains('1')
+
+    // Go to requested visits page
+    cy.task('stubGetVisitRequests', { visitRequests: [visitRequest] })
+    homePage.visitRequestsTile().click()
+
+    // Requested visits page
+    const visitRequestsListingPage = Page.verifyOnPage(VisitRequestsListingPage)
+
+    // View visit request
+    const visitDetails = TestData.visitBookingDetailsRaw({
+      visitSubStatus: 'REQUESTED',
+      events: [
+        {
+          type: 'REQUESTED_VISIT',
+          applicationMethodType: 'WEBSITE',
+          actionedByFullName: null,
+          userType: 'PUBLIC',
+          createTimestamp: '2022-01-01T09:00:00',
+        },
+      ],
+    })
+    cy.task('stubGetVisitDetailed', visitDetails)
+    visitRequestsListingPage.getAction(1).click()
+    const visitDetailsPage = Page.verifyOnPage(VisitDetailsPage, { visitType: 'request' })
+    visitDetailsPage.getMessages().eq(0).contains('This request needs to be reviewed')
+
+    // Reject visit request
+    cy.task('stubGetVisitRequests', { visitRequests: [] })
+    const visitRequestResponse = TestData.visitRequestResponse()
+    cy.task('stubRejectVisitRequest', {
+      reference: visitRequest.visitReference,
+      username: 'USER1',
+      visitRequestResponse,
+    })
+    visitDetailsPage.rejectRequest().click()
+
+    // Returned to requested visits page, with success message and empty list
+    visitRequestsListingPage.checkOnPage()
+    visitRequestsListingPage.getMessages().eq(0).contains('You rejected the request to visit John Smith')
+    visitRequestsListingPage.getNoRequestsMessage().contains('no visit requests')
   })
 })
