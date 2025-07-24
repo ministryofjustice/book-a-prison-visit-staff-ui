@@ -7,6 +7,7 @@ import { isValidVisitReference } from '../validationChecks'
 import ClearNotificationsController from './clearNotificationsController'
 import ConfirmUpdateController from './confirmUpdateController'
 import UpdateVisitController from './updateVisitController'
+import ProcessVisitRequestController from './processVisitRequestController'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -16,6 +17,7 @@ export default function routes(services: Services): Router {
   const clearNotifications = new ClearNotificationsController(services.auditService, services.visitNotificationsService)
   const confirmUpdate = new ConfirmUpdateController()
   const updateVisit = new UpdateVisitController(services.visitService)
+  const processVisitRequest = new ProcessVisitRequestController(services.visitRequestsService, services.visitService)
 
   // middleware to ensure valid visit reference for all /visit/:reference routes
   router.use('/:reference', (req, res, next) => {
@@ -39,6 +41,9 @@ export default function routes(services: Services): Router {
 
   router.get('/:reference/confirm-update', confirmUpdate.viewConfirmUpdate())
   router.post('/:reference/confirm-update', confirmUpdate.submitConfirmUpdate())
+
+  router.post('/:reference/request/approve', processVisitRequest.processRequest('approve'))
+  router.post('/:reference/request/reject', processVisitRequest.processRequest('reject'))
 
   return router
 }
