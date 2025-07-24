@@ -274,6 +274,58 @@ describe('visitEventsTimelineBuilder - Build MoJ Timeline items from visit event
     expect(timeline).toStrictEqual(expectedTimeline)
   })
 
+  it('should return a timeline with an event for Request "Approved - Method: GOV.UK', () => {
+    params.events = [
+      {
+        type: 'REQUESTED_VISIT_APPROVED',
+        applicationMethodType: 'WEBSITE',
+        actionedByFullName: 'User One',
+        userType: 'STAFF',
+        createTimestamp: '2022-01-01T09:00:00',
+      },
+    ]
+
+    const expectedTimeline: MojTimelineItem[] = [
+      {
+        label: { text: 'Approved' },
+        text: 'Method: GOV.UK',
+        datetime: { timestamp: '2022-01-01T09:00:00', type: 'datetime' },
+        byline: { text: 'User One' },
+        attributes: { 'data-test': 'timeline-entry-0' },
+      },
+    ]
+
+    const timeline = visitEventsTimelineBuilder(params)
+
+    expect(timeline).toStrictEqual(expectedTimeline)
+  })
+
+  it('should return a timeline with an event for Request "Rejected - Method: GOV.UK', () => {
+    params.events = [
+      {
+        type: 'REQUESTED_VISIT_REJECTED',
+        applicationMethodType: 'WEBSITE',
+        actionedByFullName: 'User One',
+        userType: 'STAFF',
+        createTimestamp: '2022-01-01T09:00:00',
+      },
+    ]
+
+    const expectedTimeline: MojTimelineItem[] = [
+      {
+        label: { text: 'Rejected' },
+        text: 'Method: GOV.UK',
+        datetime: { timestamp: '2022-01-01T09:00:00', type: 'datetime' },
+        byline: { text: 'User One' },
+        attributes: { 'data-test': 'timeline-entry-0' },
+      },
+    ]
+
+    const timeline = visitEventsTimelineBuilder(params)
+
+    expect(timeline).toStrictEqual(expectedTimeline)
+  })
+
   it('should return a timeline with an event for "No change required" - Reason: /free text/', () => {
     params.events = [
       {

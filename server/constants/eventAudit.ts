@@ -5,6 +5,8 @@ const eventAuditTypes: Partial<Record<EventAuditType, string>> = {
   UPDATED_VISIT: 'Updated',
   CANCELLED_VISIT: 'Cancelled',
   REQUESTED_VISIT: 'Requested',
+  REQUESTED_VISIT_APPROVED: 'Approved',
+  REQUESTED_VISIT_REJECTED: 'Rejected',
   MIGRATED_VISIT: 'Migrated',
   NON_ASSOCIATION_EVENT: 'Needs review',
   PRISONER_RECEIVED_EVENT: 'Needs review',

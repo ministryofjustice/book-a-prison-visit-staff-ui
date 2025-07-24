@@ -158,6 +158,7 @@ describe('Visit utils', () => {
       it('should return no alert if visitStatus **not** CANCELLED', () => {
         const visitDetails = TestData.visitBookingDetails({
           visitStatus: 'BOOKED',
+          visitSubStatus: 'AUTO_APPROVED',
           outcomeStatus: 'ADMINISTRATIVE_CANCELLATION',
         })
         expect(getVisitAlerts(visitDetails)).toStrictEqual([])
@@ -172,7 +173,11 @@ describe('Visit utils', () => {
         ])(
           "should handle %s: '%s' => %s",
           (_: string, outcomeStatus: VisitBookingDetails['outcomeStatus'], expected: string) => {
-            const visitDetails = TestData.visitBookingDetails({ visitStatus: 'CANCELLED', outcomeStatus })
+            const visitDetails = TestData.visitBookingDetails({
+              visitStatus: 'CANCELLED',
+              visitSubStatus: 'CANCELLED',
+              outcomeStatus,
+            })
             expect(getVisitAlerts(visitDetails)).toStrictEqual<MoJAlert[]>([
               {
                 variant: 'information',
@@ -183,6 +188,34 @@ describe('Visit utils', () => {
             ])
           },
         )
+      })
+    })
+
+    describe('Visit request REJECTED', () => {
+      it('should return an alert if visit request is REJECTED', () => {
+        const visitDetails = TestData.visitBookingDetails({
+          visitStatus: 'CANCELLED',
+          visitSubStatus: 'REJECTED',
+          outcomeStatus: 'ESTABLISHMENT_CANCELLED',
+          events: [
+            {
+              type: 'REQUESTED_VISIT_REJECTED',
+              applicationMethodType: 'WEBSITE',
+              actionedByFullName: 'User One',
+              userType: 'STAFF',
+              createTimestamp: '',
+            },
+          ],
+        })
+
+        expect(getVisitAlerts(visitDetails)).toStrictEqual<MoJAlert[]>([
+          {
+            variant: 'information',
+            title: 'Request rejected',
+            showTitleAsHeading: true,
+            text: 'This visit request was rejected by User One',
+          },
+        ])
       })
     })
 

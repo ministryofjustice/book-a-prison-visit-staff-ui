@@ -54,6 +54,8 @@ export default ({
           break
 
         case 'REQUESTED_VISIT':
+        case 'REQUESTED_VISIT_APPROVED':
+        case 'REQUESTED_VISIT_REJECTED':
           timelineItem.text = 'Method: GOV.UK'
           break
 

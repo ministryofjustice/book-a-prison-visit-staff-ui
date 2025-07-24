@@ -81,12 +81,14 @@ export const getAvailableVisitActions = ({
 
 const getVisitCancelledAlert = ({
   visitStatus,
+  visitSubStatus,
   outcomeStatus,
 }: {
   visitStatus: VisitBookingDetails['visitStatus']
+  visitSubStatus: VisitBookingDetails['visitSubStatus']
   outcomeStatus: VisitBookingDetails['outcomeStatus']
 }): MoJAlert | undefined => {
-  if (visitStatus !== 'CANCELLED') {
+  if (visitStatus !== 'CANCELLED' || visitSubStatus !== 'CANCELLED') {
     return undefined
   }
 
@@ -98,21 +100,36 @@ const getVisitCancelledAlert = ({
   }
 }
 
-const getVisitSubStatusAlert = ({
+const getVisitRequestAlert = ({
+  visitStatus,
   visitSubStatus,
+  events,
 }: {
+  visitStatus: VisitBookingDetails['visitStatus']
   visitSubStatus: VisitBookingDetails['visitSubStatus']
+  events: VisitBookingDetails['events']
 }): MoJAlert | undefined => {
-  if (visitSubStatus !== 'REQUESTED') {
-    return undefined
+  if (visitSubStatus === 'REQUESTED') {
+    return {
+      variant: 'warning',
+      title: 'This request needs to be reviewed',
+      showTitleAsHeading: true,
+      text: 'Check alerts and restrictions.',
+    }
   }
 
-  return {
-    variant: 'warning',
-    title: 'This request needs to be reviewed',
-    showTitleAsHeading: true,
-    text: 'Check alerts and restrictions.',
+  if (visitStatus === 'CANCELLED' && visitSubStatus === 'REJECTED') {
+    const username = events.find(event => event.type === 'REQUESTED_VISIT_REJECTED')?.actionedByFullName
+
+    return {
+      variant: 'information',
+      title: 'Request rejected',
+      showTitleAsHeading: true,
+      text: `This visit request was rejected by ${username}`,
+    }
   }
+
+  return undefined
 }
 
 const getVisitNotificationsAlerts = (notifications: VisitBookingDetails['notifications']): MoJAlert[] => {
@@ -159,16 +176,23 @@ const getVisitNotificationsAlerts = (notifications: VisitBookingDetails['notific
 }
 
 export const getVisitAlerts = (visitDetails: VisitBookingDetails): MoJAlert[] => {
+  const { visitStatus, visitSubStatus, outcomeStatus, events, notifications } = visitDetails
+
   const visitCancelledAlert = getVisitCancelledAlert({
-    visitStatus: visitDetails.visitStatus,
-    outcomeStatus: visitDetails.outcomeStatus,
+    visitStatus,
+    visitSubStatus,
+    outcomeStatus,
   })
-  const visitSubStatusAlert = getVisitSubStatusAlert({ visitSubStatus: visitDetails.visitSubStatus })
-  const visitNotificationsAlerts = getVisitNotificationsAlerts(visitDetails.notifications)
+  const visitRequestAlert = getVisitRequestAlert({
+    visitStatus,
+    visitSubStatus,
+    events,
+  })
+  const visitNotificationsAlerts = getVisitNotificationsAlerts(notifications)
 
   return [
     ...(visitCancelledAlert ? [visitCancelledAlert] : []),
-    ...(visitSubStatusAlert ? [visitSubStatusAlert] : []),
+    ...(visitRequestAlert ? [visitRequestAlert] : []),
     ...visitNotificationsAlerts,
   ]
 }
