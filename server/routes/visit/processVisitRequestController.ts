@@ -63,7 +63,7 @@ export default class ProcessVisitRequestController {
 
     const message: MoJAlert = {
       variant: 'information',
-      title: `The visit to ${prisonerName} has already been `,
+      title: `The visit to ${prisonerName} has already been`,
       showTitleAsHeading: true,
       html:
         'The main contact has been notified. ' +
@@ -72,12 +72,12 @@ export default class ProcessVisitRequestController {
 
     const { visitSubStatus } = visitDetails
     if (visitSubStatus === 'APPROVED' || visitSubStatus === 'AUTO_APPROVED') {
-      message.title += 'approved'
+      message.title = `${message.title} approved`
       return message
     }
 
     if (visitSubStatus === 'REJECTED' || visitSubStatus === 'AUTO_REJECTED') {
-      message.title += 'rejected'
+      message.title = `${message.title} rejected`
       return message
     }
 

@@ -76,7 +76,7 @@
     </div>
 
     {# Visit actions #}
-    {%if availableVisitActions.update or availableVisitActions.cancel or availableVisitActions.clearNotifications %}
+    {% if availableVisitActions.update or availableVisitActions.cancel or availableVisitActions.clearNotifications %}
       <div class="govuk-button-group" data-test="visit-actions">
         <form action="/visit/{{ visitDetails.reference }}/update" method="POST" novalidate>
           <input type="hidden" name="_csrf" value="{{ csrfToken }}">
