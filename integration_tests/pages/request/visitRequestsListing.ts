@@ -16,4 +16,6 @@ export default class VisitRequestsListingPage extends Page {
   getMainContact = (row: number): PageElement => cy.get(`[data-test="main-contact-${row}"]`)
 
   getAction = (row: number): PageElement => cy.get(`[data-test="action-${row}"] a`)
+
+  getNoRequestsMessage = (): PageElement => cy.get('[data-test="no-visit-requests"]')
 }
