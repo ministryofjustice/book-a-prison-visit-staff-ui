@@ -1736,6 +1736,7 @@ export interface components {
         | 'CANCELLED_VISIT'
         | 'REQUESTED_VISIT'
         | 'REQUESTED_VISIT_APPROVED'
+        | 'REQUESTED_VISIT_REJECTED'
         | 'NON_ASSOCIATION_EVENT'
         | 'PRISONER_RELEASED_EVENT'
         | 'PRISONER_RECEIVED_EVENT'
