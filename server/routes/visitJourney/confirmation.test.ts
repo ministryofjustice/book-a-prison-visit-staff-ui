@@ -114,7 +114,7 @@ testJourneys.forEach(journey => {
           expect($('.test-booking-reference').text()).toContain('ab-cd-ef-gh')
           expect($('[data-test=contact-method-text]').text()).toBe(
             journey.isUpdate
-              ? 'The main contact will get a text message to confirm the updated booking. This will include the booking reference.'
+              ? 'The main contact will get a text message to confirm the updated booking. This will include the visit reference.'
               : '',
           )
 
@@ -207,7 +207,7 @@ testJourneys.forEach(journey => {
             expect($('.test-booking-reference').text()).toContain('ab-cd-ef-gh')
             expect($('[data-test=contact-method-text]').text()).toBe(
               journey.isUpdate
-                ? 'The main contact will get an email to confirm the updated booking. This will include the booking reference.'
+                ? 'The main contact will get an email to confirm the updated booking. This will include the visit reference.'
                 : '',
             )
 

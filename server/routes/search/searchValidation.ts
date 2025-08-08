@@ -15,12 +15,12 @@ const errors: { [key: string]: Error } = {
   INVALID_VISIT_QUERY: {
     path: 'searchBlock1',
     type: 'field',
-    msg: 'Booking reference must only include lower case letters',
+    msg: 'Visit reference must only include lower case letters',
   },
   SHORT_VISIT_QUERY: {
     path: 'searchBlock1',
     type: 'field',
-    msg: 'Booking reference must be 8 characters',
+    msg: 'Visit reference must be 8 characters',
   },
 }
 
