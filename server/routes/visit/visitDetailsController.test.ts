@@ -216,10 +216,10 @@ describe('Visit details page', () => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('h1').text()).toBe('Visit booking details')
+          expect($('h1').text()).toBe('Visit details')
           expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
 
-          expect(res.text).toContain(`This booking is not for ${otherPrison.prisonName}`)
+          expect(res.text).toContain(`This visit is not for ${otherPrison.prisonName}`)
           expect(res.text).toContain(`change the establishment to ${visitDetails.prison.prisonName}`)
         })
     })
