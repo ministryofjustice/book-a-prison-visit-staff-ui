@@ -125,10 +125,10 @@ describe('Views - Visits by date', () => {
     expect($('[data-test=visit-room-caption]').text()).toBe('Visits hall')
     expect($('h2').text()).toBe('Visits from 10am to 11am')
     expect($('[data-test=visit-section-heading-closed]').text().trim()).toBe('Closed visits')
-    expect($('[data-test=visit-tables-booked-closed]').text().trim()).toBe('0 of 5 tables booked')
+    expect($('[data-test=visit-tables-booked-closed]').text().trim()).toBe('0 of 5 tables reserved')
     expect($('[data-test=visit-visitors-total-closed]').length).toBe(0)
     expect($('[data-test=visit-section-heading-open]').text().trim()).toBe('Open visits')
-    expect($('[data-test=visit-tables-booked-open]').text().trim()).toBe('0 of 20 tables booked')
+    expect($('[data-test=visit-tables-booked-open]').text().trim()).toBe('0 of 20 tables reserved')
     expect($('[data-test=visit-visitors-total-open]').length).toBe(0)
 
     expect($('[data-test="no-visits-message"]').length).toBe(0)
@@ -195,11 +195,12 @@ describe('Views - Visits by date', () => {
     const $ = cheerio.load(compiledTemplate.render(viewContext))
 
     expect($('[data-test=visit-section-heading-open]').text().trim()).toBe('Open visits')
-    expect($('[data-test=visit-tables-booked-open]').text().trim()).toBe('1 of 40 tables booked')
+    expect($('[data-test=visit-tables-booked-open]').text().trim()).toBe('1 of 40 tables reserved')
     expect($('[data-test=visit-visitors-total-open]').text()).toBe('2 visitors')
 
     expect($('[data-test=visits-open] [data-test="prisoner-name"]').eq(0).text()).toBe('Smith, John')
     expect($('[data-test=visits-open] [data-test="prisoner-number"]').eq(0).text()).toBe('A1234BC')
+    expect($('[data-test=visits-open] [data-test="visit-status"]').eq(0).text()).toBe('Booked')
     expect($('[data-test=visits-open] [data-test="booked-on"]').eq(0).text()).toBe('1 January at 9am')
     expect($('[data-test=visits-open] [data-test="view-visit-link"]').eq(0).attr('href')).toBe(
       '/visit/ab-cd-ef-gh?back-link-query',

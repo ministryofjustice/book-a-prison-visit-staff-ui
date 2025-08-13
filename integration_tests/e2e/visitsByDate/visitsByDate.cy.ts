@@ -81,7 +81,7 @@ context('View visits by date', () => {
 
     visitsByDatePage.visitSessionHeading().contains('Visits from 1:45pm to 3:45pm')
     visitsByDatePage.visitSectionHeading('open').contains('Open visits')
-    visitsByDatePage.tablesBookedCount('open').contains('2 of 40 tables booked')
+    visitsByDatePage.tablesBookedCount('open').contains('2 of 40 tables reserved')
     visitsByDatePage.visitorsTotalCount('open').contains('3 visitors')
 
     // visits with default sort (last booked first)
@@ -118,7 +118,7 @@ context('View visits by date', () => {
 
     visitsByDatePage.visitSessionHeading().contains('Visits from 1pm to 2pm')
     visitsByDatePage.visitSectionHeading('closed').contains('Closed visits')
-    visitsByDatePage.tablesBookedCount('closed').contains('0 of 10 tables booked')
+    visitsByDatePage.tablesBookedCount('closed').contains('0 of 10 tables reserved')
     visitsByDatePage.visitorsTotalCount('closed').should('not.exist')
 
     // select tomorrow
@@ -164,7 +164,7 @@ context('View visits by date', () => {
 
     visitsByDatePage.visitSessionHeading().contains('Visits from 9am to 10am')
     visitsByDatePage.visitSectionHeading('unknown').contains('All visits')
-    visitsByDatePage.tablesBookedCount('unknown').contains('1 table booked')
+    visitsByDatePage.tablesBookedCount('unknown').contains('1 table reserved')
     visitsByDatePage.visitorsTotalCount('unknown').contains('2 visitors')
 
     visitsByDatePage.prisonerName(1).contains('Smith, John')
@@ -182,7 +182,7 @@ context('View visits by date', () => {
 
     visitsByDatePage.visitSessionHeading().contains('Visits from 1:45pm to 3:45pm')
     visitsByDatePage.visitSectionHeading('unknown').contains('All visits')
-    visitsByDatePage.tablesBookedCount('unknown').contains('2 tables booked')
+    visitsByDatePage.tablesBookedCount('unknown').contains('2 tables reserved')
     visitsByDatePage.visitorsTotalCount('unknown').contains('3 visitors')
 
     visitsByDatePage.prisonerName(1).contains('Smith, John')

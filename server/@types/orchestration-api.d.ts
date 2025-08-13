@@ -2186,6 +2186,11 @@ export interface components {
        */
       visitRestriction: 'OPEN' | 'CLOSED' | 'UNKNOWN'
       /**
+       * @description Visit status
+       * @example BOOKED
+       */
+      visitStatus: string
+      /**
        * @description Visit sub status
        * @example REQUESTED
        */

@@ -674,7 +674,8 @@ export default class TestData {
     visitTimeSlot = { startTime: '13:45', endTime: '15:45' },
     firstBookedDateTime = '2022-01-01T09:00:00',
     visitRestriction = 'OPEN',
-    visitSubStatus = 'BOOKED',
+    visitStatus = 'BOOKED',
+    visitSubStatus = 'APPROVED',
   }: Partial<VisitPreview> = {}): VisitPreview => ({
     prisonerId,
     firstName,
@@ -684,6 +685,7 @@ export default class TestData {
     visitTimeSlot,
     firstBookedDateTime,
     visitRestriction,
+    visitStatus,
     visitSubStatus,
   })
 

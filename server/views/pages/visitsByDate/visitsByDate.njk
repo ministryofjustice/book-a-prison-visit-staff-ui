@@ -23,7 +23,7 @@
     </h3>
 
     <p data-test="visit-tables-booked-{{ type}}">
-      {{ visitsSection.visits | length }}{{ (" of " + capacity) if capacity }} {{ "table" | pluralise(capacity or visitsSection.visits | length)}} booked
+      {{ visitsSection.visits | length }}{{ (" of " + capacity) if capacity }} {{ "table" | pluralise(capacity or visitsSection.visits | length)}} reserved
     </p>
 
     {% if visitsSection.visits | length %}
@@ -33,6 +33,7 @@
 
       {% set visitsRows = [] %}
       {% for visit in visitsSection.visits %}
+        {% set visitStatus = visit.visitSubStatus if (visit.visitSubStatus == "REQUESTED") else "BOOKED" %}
         {% set visitsRows = (visitsRows.push([
           {
             text: visit.lastName | capitalize + ", " + visit.firstName | capitalize,
@@ -51,7 +52,7 @@
             }
           },
           {
-            text: visit.visitSubStatus | properCase,
+            text: visitStatus | properCase,
             attributes: { "data-test": "visit-status" }
           },
           {
