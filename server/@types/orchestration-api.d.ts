@@ -2185,6 +2185,11 @@ export interface components {
        * @enum {string}
        */
       visitRestriction: 'OPEN' | 'CLOSED' | 'UNKNOWN'
+      /**
+       * @description Visit sub status
+       * @example REQUESTED
+       */
+      visitSubStatus: string
     }
     PageVisitDto: {
       /** Format: int64 */

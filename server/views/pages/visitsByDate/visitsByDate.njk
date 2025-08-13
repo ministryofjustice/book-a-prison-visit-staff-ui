@@ -51,6 +51,10 @@
             }
           },
           {
+            text: visit.visitSubStatus,
+            attributes: { "data-test": "visit-status" }
+          },
+          {
             classes: "govuk-!-text-align-right",
             html: '<a href="/visit/' + visit.visitReference + '?' + queryParamsForBackLink +
               '" class="govuk-link--no-visited-state" data-test="view-visit-link">View</a>'
@@ -78,10 +82,16 @@
               }
             },
             {
-              text: "Booked on",
+              text: "Requested on",
               attributes: {
                 "aria-sort": "descending",
                 "data-test": "header-booked-on"
+              }
+            },
+            {
+              text: "Visit status",
+              attributes: {
+                "aria-sort": "none"
               }
             },
             {
