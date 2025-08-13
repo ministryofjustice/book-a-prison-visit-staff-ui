@@ -4,7 +4,7 @@ import nunjucks, { Environment } from 'nunjucks'
 import express from 'express'
 import { format, formatDuration, intervalToDuration, isAfter, parseISO } from 'date-fns'
 import { FieldValidationError } from 'express-validator'
-import { initialiseName, properCaseFullName } from './utils'
+import { initialiseName, properCase, properCaseFullName } from './utils'
 import config from '../config'
 import { ApplicationInfo } from '../applicationInfo'
 import { Address } from '../data/prisonerContactRegistryApiTypes'
@@ -57,7 +57,9 @@ export function registerNunjucks(app?: express.Express): Environment {
 
   njkEnv.addFilter('initialiseName', initialiseName)
 
-  njkEnv.addFilter('formatLastNameFirst', (fullName: string, properCase = true) => {
+  njkEnv.addFilter('properCase', properCase)
+
+  njkEnv.addFilter('formatLastNameFirst', (fullName: string, useProperCase = true) => {
     // this check is for the authError page
     if (!fullName) {
       return null
@@ -65,7 +67,7 @@ export function registerNunjucks(app?: express.Express): Environment {
 
     const array = fullName.split(' ')
 
-    if (properCase) {
+    if (useProperCase) {
       return array.length === 1
         ? properCaseFullName(array[0])
         : `${properCaseFullName(array.at(-1))}, ${properCaseFullName(array[0])}`
