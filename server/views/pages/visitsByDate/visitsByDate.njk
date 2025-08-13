@@ -33,7 +33,7 @@
 
       {% set visitsRows = [] %}
       {% for visit in visitsSection.visits %}
-        {% set visitStatus = visit.visitSubStatus if (visit.visitSubStatus == "REQUESTED") else "BOOKED" %}
+        {% set visitStatus = "REQUESTED" if (visit.visitSubStatus == "REQUESTED") else "BOOKED" %}
         {% set visitsRows = (visitsRows.push([
           {
             text: visit.lastName | capitalize + ", " + visit.firstName | capitalize,
