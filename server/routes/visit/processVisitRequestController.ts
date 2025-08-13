@@ -16,6 +16,7 @@ export default class ProcessVisitRequestController {
     return async (req, res, next) => {
       const { reference } = req.params
       const { username } = res.locals.user
+      const fromVisits = req.body?.fromVisits === 'true'
 
       try {
         const visitRequestResponse =
@@ -25,7 +26,7 @@ export default class ProcessVisitRequestController {
 
         req.flash('messages', this.getSuccessMessage(action, visitRequestResponse))
 
-        return res.redirect('/requested-visits')
+        return res.redirect(fromVisits ? '/visits' : '/requested-visits')
       } catch (error) {
         // HTTP 400 Bad Request means a visit not in REQUESTED state (i.e. already approved or rejected)
         if (error.status === 400) {

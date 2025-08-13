@@ -115,6 +115,7 @@ export default function routes({
 
     return res.render('pages/visitsByDate/visitsByDate', {
       errors: req.flash('errors'),
+      messages: req.flash('messages'),
       formValues: getFlashFormValues(req),
       dateTabs: getDateTabs(selectedDateString, firstTabDateString, 3),
       sessionSchedule,

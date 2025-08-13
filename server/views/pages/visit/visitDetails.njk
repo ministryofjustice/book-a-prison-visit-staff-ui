@@ -113,6 +113,7 @@
       <div class="govuk-button-group" data-test="visit-request-actions">
         <form action="/visit/{{ visitDetails.reference }}/request/approve" method="POST" novalidate>
           <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+          {% if fromPage == "visits" %}<input type="hidden" name="fromVisits" value="true">{% endif %}
           {{ govukButton({
             text: "Approve request",
             classes: "govuk-!-margin-top-5 govuk-button--secondary",
@@ -123,6 +124,7 @@
 
         <form action="/visit/{{ visitDetails.reference }}/request/reject" method="POST" novalidate>
           <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+          {% if fromPage == "visits" %}<input type="hidden" name="fromVisits" value="true">{% endif %}
           {{ govukButton({
             text: "Reject request",
             classes: "govuk-!-margin-top-5 govuk-!-margin-left-6 govuk-button--secondary",
