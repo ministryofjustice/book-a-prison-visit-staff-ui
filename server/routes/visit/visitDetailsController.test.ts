@@ -154,6 +154,20 @@ describe('Visit details page', () => {
         })
     })
 
+    it('should render hidden fromVisit field for a visit request when coming from visits page', () => {
+      availableVisitActions = { update: false, cancel: false, clearNotifications: false, processRequest: true }
+      visitDetails.visitSubStatus = 'REQUESTED'
+
+      return request(app)
+        .get('/visit/ab-cd-ef-gh?from=visits')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('[data-test="from-visits-page"]').val()).toBe('true')
+        })
+    })
+
     it('should handle no visit contact details', () => {
       visitDetails.visitContact.telephone = undefined
       visitDetails.visitContact.email = undefined

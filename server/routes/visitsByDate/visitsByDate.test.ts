@@ -159,6 +159,30 @@ describe('GET /visits - Visits by date page', () => {
         })
     })
 
+    it('should render display alert if returning from approve/reject', () => {
+      flashData = {
+        errors: [],
+        formValues: [],
+        messages: [
+          {
+            variant: 'success',
+            title: 'title',
+            text: '',
+          },
+        ],
+      }
+      flashProvider.mockImplementation((key: keyof FlashData) => flashData[key])
+
+      return request(app)
+        .get('/visits')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('.moj-alert').length).toBe(1)
+        })
+    })
+
     it('should render date tabs, side-nav and visits for a specific date and session', () => {
       return request(app)
         .get('/visits?sessionReference=-afe.dcc.0f&selectedDate=2024-02-02&firstTabDate=2024-02-01')
