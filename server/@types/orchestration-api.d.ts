@@ -2234,15 +2234,15 @@ export interface components {
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
       pageSize?: number
+      paged?: boolean
       /** Format: int32 */
       pageNumber?: number
-      paged?: boolean
       unpaged?: boolean
     }
     SortObject: {
       empty?: boolean
-      unsorted?: boolean
       sorted?: boolean
+      unsorted?: boolean
     }
     OrchestrationVisitRequestSummaryDto: {
       /** @description Visit reference */
@@ -2925,9 +2925,17 @@ export interface components {
       visitStatus: 'BOOKED' | 'CANCELLED'
       /**
        * @description Visit Sub Status
-       * @example RESERVED
+       * @example APPROVED
+       * @enum {string}
        */
-      visitSubStatus: string
+      visitSubStatus:
+        | 'APPROVED'
+        | 'AUTO_APPROVED'
+        | 'REQUESTED'
+        | 'REJECTED'
+        | 'AUTO_REJECTED'
+        | 'WITHDRAWN'
+        | 'CANCELLED'
       /**
        * @description Visit Restriction
        * @example OPEN
