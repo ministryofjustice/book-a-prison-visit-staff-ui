@@ -175,22 +175,30 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
       const upcomingVisit = TestData.visitSummary({
         startTimestamp: '2023-03-02T10:00',
         endTimestamp: '2023-03-02T11:00',
+        visitSubStatus: 'AUTO_APPROVED',
+        visitors,
+      })
+      const approvedVisit = TestData.visitSummary({
+        startTimestamp: '2023-03-02T10:00',
+        endTimestamp: '2023-03-02T11:00',
+        visitSubStatus: 'APPROVED',
         visitors,
       })
       const pastVisit = TestData.visitSummary({
         startTimestamp: '2023-02-03T10:00',
         endTimestamp: '2023-02-03T11:00',
+        visitSubStatus: 'AUTO_APPROVED',
         visitors,
       })
       const cancelledVisit = TestData.visitSummary({
         startTimestamp: '2023-02-03T10:00',
         endTimestamp: '2023-02-03T11:00',
-        visitStatus: 'CANCELLED',
+        visitSubStatus: 'CANCELLED',
         visitors,
       })
 
       prisonerProfile.visitsByMonth = new Map([
-        ['March 2023', { upcomingCount: 1, pastCount: 0, visits: [upcomingVisit] }],
+        ['March 2023', { upcomingCount: 2, pastCount: 0, visits: [upcomingVisit, approvedVisit] }],
         ['February 2023', { upcomingCount: 0, pastCount: 1, visits: [pastVisit, cancelledVisit] }],
         ['January 2023', { upcomingCount: 0, pastCount: 0, visits: [cancelledVisit] }],
       ])
@@ -202,8 +210,8 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('h1').text().trim()).toBe('Smith, John')
-          expect($('.prisoner-profile-visits:nth-child(1) caption').text()).toBe('March 2023 (1 upcoming visit)')
-          expect($('.prisoner-profile-visits:nth-child(1) [data-test="tab-visits-reference"]').length).toBe(1)
+          expect($('.prisoner-profile-visits:nth-child(1) caption').text()).toBe('March 2023 (2 upcoming visits)')
+          expect($('.prisoner-profile-visits:nth-child(1) [data-test="tab-visits-reference"]').length).toBe(2)
           expect($('.prisoner-profile-visits:nth-child(1) [data-test="tab-visits-reference"]').eq(0).text()).toBe(
             upcomingVisit.reference,
           )

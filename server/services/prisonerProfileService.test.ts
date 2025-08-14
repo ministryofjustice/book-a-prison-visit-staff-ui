@@ -86,7 +86,7 @@ describe('Prisoner profile service', () => {
       expect(results.prisonerDetails.visitBalances).toBeNull()
     })
 
-    it('should group upcoming and past visits by month, with totals for BOOKED only', async () => {
+    it('should group upcoming and past visits by month, with totals for APPROVED, AUTO_APPROVED and REQUESTED only', async () => {
       const today = new Date()
       const nextMonth = new Date(addMonths(today, 1))
       const previousMonth = new Date(subMonths(today, 1))
@@ -96,12 +96,18 @@ describe('Prisoner profile service', () => {
       const upcomingVisit = TestData.visitSummary({ startTimestamp: nextMonth.toISOString() })
       const pastVisit = TestData.visitSummary({ startTimestamp: previousMonth.toISOString() })
       const cancelledVisit = TestData.visitSummary({
-        visitStatus: 'CANCELLED',
+        visitStatus: 'BOOKED',
+        visitSubStatus: 'CANCELLED',
+        startTimestamp: previousMonth.toISOString(),
+      })
+      const approvedVisit = TestData.visitSummary({
+        visitStatus: 'BOOKED',
+        visitSubStatus: 'APPROVED',
         startTimestamp: previousMonth.toISOString(),
       })
 
       const prisonerProfile = TestData.prisonerProfile({
-        visits: [upcomingVisit, pastVisit, cancelledVisit],
+        visits: [upcomingVisit, pastVisit, cancelledVisit, approvedVisit],
       })
 
       orchestrationApiClient.getPrisonerProfile.mockResolvedValue(prisonerProfile)
@@ -111,7 +117,7 @@ describe('Prisoner profile service', () => {
       expect(results.visitsByMonth).toEqual(
         new Map([
           [nextMonthKey, { upcomingCount: 1, pastCount: 0, visits: [upcomingVisit] }],
-          [previousMonthKey, { upcomingCount: 0, pastCount: 1, visits: [pastVisit, cancelledVisit] }],
+          [previousMonthKey, { upcomingCount: 0, pastCount: 2, visits: [pastVisit, cancelledVisit, approvedVisit] }],
         ]),
       )
     })

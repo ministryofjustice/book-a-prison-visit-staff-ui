@@ -2919,10 +2919,15 @@ export interface components {
       visitType: 'SOCIAL'
       /**
        * @description Visit Status
-       * @example RESERVED
+       * @example BOOKED
        * @enum {string}
        */
       visitStatus: 'BOOKED' | 'CANCELLED'
+      /**
+       * @description Visit Sub Status
+       * @example RESERVED
+       */
+      visitSubStatus: string
       /**
        * @description Visit Restriction
        * @example OPEN
