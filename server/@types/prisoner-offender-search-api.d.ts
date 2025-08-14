@@ -283,7 +283,7 @@ export interface paths {
     get?: never
     put?: never
     /**
-     * *** BETA *** Search for prisoners by attributes
+     * Search for prisoners by attributes
      * @description <p>This endpoint allows you to create queries over all attributes from the <em>Prisoner</em> record. Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.</p>
      *           <p>The request contains a list of queries to search on one or more attributes using a list of matchers. For example attribute "lastName""
      *           requires a <em>StringMatcher</em> so we can query on <strong>"lastName IS Smith"</strong>. Other type matchers include <em>IntMatcher</em>, <em>BooleanMatcher</em>,
@@ -304,10 +304,10 @@ export interface paths {
      *           <p>Many attributes contain reference data restricted to a fixed list of values. For example, attribute "inOutStatus" only contains values "IN", "OUT" and "TRN".
      *           To find which attributes use reference data and to fetch the possible attribute values see the endpoint <a target="_blank" href="/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config#/Reference data/referenceData"><strong>GET /reference-data/{attribute}</strong></a>.
      *           </p>
-     *           <p>String attributes support advanced search techniques such as <a href="https://opensearch.org/docs/latest/query-dsl/term/fuzzy/">fuzzy search</a> matching and <a href="https://opensearch.org/docs/latest/query-dsl/term/wildcard/">wildcard search</a>. All String searches are case-insensitive.
+     *           <p>String attributes support advanced search techniques such as <a href="https://opensearch.org/docs/latest/query-dsl/term/fuzzy/">fuzzy search</a> matching and <a href="https://opensearch.org/docs/latest/query-dsl/term/wildcard/">wildcard search</a>. All String searches are case-insensitive (except for IS with fuzzy matching which is not supported by OpenSearch).
      *           <ul>
      *             <li>IS and IS_NOT require an exact match (wildcards ? and * will not work). E.g. If religion is "Christian" then <strong>"religion IS Christian"</strong> will match but <strong>"religion IS Christ*"</strong> will not.</li>
-     *             <li>For IS and CONTAINS some attributes support fuzzy matching e.g. they allow spelling mistakes. Call endpoint <strong>GET /attribute-search/attributes</strong> to see which attributes support fuzzy matching. E.g. If firstName is "Jonathan" then <strong>"firstName IS Johnathon"</strong> or <strong>"firstName CONTAINS Johnathon"</strong> will match.</li>
+     *             <li>For IS and CONTAINS some attributes support fuzzy matching e.g. they allow spelling mistakes. Call endpoint <strong>GET /attribute-search/attributes</strong> to see which attributes support fuzzy matching. E.g. If firstName is "Jonathan" then <strong>"firstName IS Johnathon"</strong> or <strong>"firstName CONTAINS Johnathon"</strong> will match. Note that fuzzy matches for IS are case sensitive but for CONTAINS they are case insensitive.</li>
      *             <li>CONTAINS without wildcards (? and *) for a non-fuzzy attribute looks for the exact search term anywhere in the attribute value. E.g. If religion is "Christian" then <strong>"religion CONTAINS ist"</strong> will match.</li>
      *             <li>CONTAINS with wildcards ? (single character) and/or * (zero to many characters) perform a wildcard search which must match the entire attribute value. E.g. If firstName is "Jonathan" then <strong>"firstName CONTAINS Jon*"</strong> will match but <strong>"firstName CONTAINS nath*"</strong> will not.</li>
      *             <li>STARTSWITH checks only the prefix of the attribute value and does not support fuzzy matching or wildcards. E.g.If firstName is "Jonathan" then <strong>"firstName STARTSWITH Jon"</strong> will match but <strong>"firstName STARTSWITH Jon*"</strong> will not.</li>
@@ -453,6 +453,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/response-fields': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get all available response fields
+     * @description This exists for developers to find all available values for responseFields parameters. Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role
+     */
+    get: operations['responseFields']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/reference-data/{attribute}': {
     parameters: {
       query?: never
@@ -541,6 +561,57 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/prisoner-location/scroll/{scroll-id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get the next page of prisoners.
+     * @description To be used in conjunction with /prisoner-location/all. Uses the scroll id to get the next page of
+     *           prisoners.  Calls should be repeated until a
+     *           `null` scroll id is then returned, indicating that no more data is available.  Each call will return the scroll id,
+     *           which should be used for the next call, rather than re-using the original scroll id.
+     *           Note that the OpenSearch scroll will expire after 5 minutes, so if no calls are made during that time then the
+     *           scroll id will be invalid.
+     *           Requires PRISONER_SEARCH__PRISONER_LOCATION__RO role.
+     */
+    get: operations['scroll']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/prisoner-location/all': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get all prisoners.  This will return the first page of results and a scroll id to retrieve the next page
+     * @description To be used in conjunction with /prisoner-location/scroll/{scroll-id}.
+     *           This endpoint will return the first page of results (10,000 per page) and also a scroll id.
+     *           This scroll id can then be used to make subsequent calls to return the data.
+     *           It is required that this call will then be followed by calls to the /scroll/{scroll-id} endpoint to retrieve all
+     *           the rest of the data, since it opens an OpenSearch scroll that will be cleared when no more data is available.
+     *           Requires PRISONER_SEARCH__PRISONER_LOCATION__RO role.
+     */
+    get: operations['findAll']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/prison/{prisonId}/prisoners': {
     parameters: {
       query?: never
@@ -608,7 +679,7 @@ export interface paths {
       cookie?: never
     }
     /**
-     * *** BETA *** Retrieve all attributes supported by the attribute search
+     * Retrieve all attributes supported by the attribute search
      * @description Returns all attributes that can be passed into the attribute search including their type.
      */
     get: operations['getAttributes']
@@ -649,13 +720,12 @@ export interface components {
        */
       supportingPrisonIds?: string[]
     }
-    /** @description Addresses */
     Address: {
       /**
-       * @description The full address on a single line
-       * @example 1 Main Street, Crookes, Sheffield, South Yorkshire, S10 1BP, England
+       * @description The full address on a single line.  No fixed address records will have the fullAddress set to 'No fixed address'. Will never be null.
+       * @example 1
        */
-      fullAddress: string
+      fullAddress?: string
       /**
        * @description The postal code
        * @example S10 1BP
@@ -663,19 +733,23 @@ export interface components {
       postalCode?: string
       /**
        * Format: date
-       * @description The date the address became active according to NOMIS
+       * @description The date the address became active according to NOMIS. Will never be null.
        * @example 2020-07-17
        */
       startDate?: string
       /**
-       * @description Whether the address is currently marked as the primary address
+       * @description Whether the address is currently marked as the primary address. Will never be null.
        * @example true
        */
-      primaryAddress: boolean
+      primaryAddress?: boolean
+      /**
+       * @description No fixed address. This address record is only ever returned if it is also the primary address, otherwise it is ignored. Will never be null.
+       * @example true
+       */
+      noFixedAddress?: boolean
       /** @description Phone numbers linked to the address. Note the phone number contains only numbers, no whitespace. Therefore searching on 'addresses.phoneNumbers.number' should not pass any non-numeric characters. */
       phoneNumbers?: components['schemas']['PhoneNumber'][]
     }
-    /** @description List of parts of the body that have marks. This includes NOMIS physical details of type 'marks' and 'otherMarks'. If we find a comment with either 'tattoo' or 'scar' we also add to the list of tattoos or scars. From REFERENCE_CODES table where DOMAIN = BODY_PART. Allowable values extracted 08/02/2023. */
     BodyPartDetail: {
       /**
        * @description Part of the body that has the mark. From REFERENCE_CODES table where DOMAIN = BODY_PART. Allowable values extracted 08/02/2023.
@@ -707,12 +781,13 @@ export interface components {
        */
       comment?: string
     }
-    /** @description Incentive level */
     CurrentIncentive: {
-      level: components['schemas']['IncentiveLevel']
+      /** @description Incentive level. Will never be null. */
+      level?: components['schemas']['IncentiveLevel']
       /**
-       * @description Date time of the incentive
-       * @example 2021-07-05T10:35:17
+       * Format: date-time
+       * @description Date time of the incentive. Will never be null.
+       * @example 2022-11-10T15:47:24
        */
       dateTime: string
       /**
@@ -722,26 +797,24 @@ export interface components {
        */
       nextReviewDate: string
     }
-    /** @description Email addresses */
     EmailAddress: {
       /**
-       * @description The email address
+       * @description The email address. Will never be null.
        * @example john.smith@gmail.com
        */
-      email: string
+      email?: string
     }
-    /** @description All identifiers for the prisoner including those recorded against aliases. Currently supports only PNC, CRO, NINO and DL. */
     Identifier: {
       /**
-       * @description The type of identifier
+       * @description The type of identifier. Will never be null.
        * @example PNC, CRO, DL, NINO
        */
-      type: string
+      type?: string
       /**
-       * @description The identifier value
+       * @description The identifier value. Will never be null.
        * @example 12/394773H
        */
-      value: string
+      value?: string
       /**
        * Format: date
        * @description The date the identifier was issued according to NOMIS
@@ -751,55 +824,98 @@ export interface components {
       /** @description Free text entered into NOMIS when the identifier was recorded. */
       issuedAuthorityText?: string
       /**
-       * @description The date/time the identifier was created in the system
-       * @example 2021-07-05T10:35:17
+       * Format: date-time
+       * @description The date/time the identifier was created in the system. Will never be null.
+       * @example 2020-07-17T12:34:56.833Z
        */
-      createdDateTime: string
+      createdDateTime?: string
     }
-    /** @description Incentive level */
     IncentiveLevel: {
       /**
-       * @description code
+       * @description code. Will never be null.
        * @example STD
        */
       code?: string
       /**
-       * @description description
+       * @description description. Will never be null.
        * @example Standard
        */
-      description: string
+      description?: string
     }
-    /** @description All historical convicted offences */
+    Language: {
+      /**
+       * @description A LOV from domain LANG_TYPE
+       * @enum {string}
+       */
+      type?: 'PRIM' | 'SEC' | 'PREF_SPEAK' | 'PREF_WRITE'
+      /**
+       * @description The actual language code, from domain LANG
+       * @example ENG
+       */
+      code?: string
+      /**
+       * @description The level of reading skill, from domain LANG_SKILLS:
+       *         |Y  Yes
+       *         |A	Average
+       *         |D	Dyslexia
+       *         |G	Good
+       *         |N	Nil
+       *         |P	Poor
+       *         |R	Refused
+       * @enum {string}
+       */
+      readSkill?: 'Y' | 'N' | 'A' | 'D' | 'G' | 'P' | 'R'
+      /**
+       * @description The level of writing skill, see description for readSkill
+       * @enum {string}
+       */
+      writeSkill?: 'Y' | 'N' | 'A' | 'D' | 'G' | 'P' | 'R'
+      /**
+       * @description The level of writing skill, see description for readSkill
+       * @enum {string}
+       */
+      speakSkill?: 'Y' | 'N' | 'A' | 'D' | 'G' | 'P' | 'R'
+      /** @description Whether an interpreter requested */
+      interpreterRequested?: boolean
+    }
     Offence: {
       /**
-       * @description The statue code
+       * @description The statue code. Will never be null.
        * @example TH68
        */
-      statuteCode: string
+      statuteCode?: string
       /**
-       * @description The offence code
+       * @description The offence code. Will never be null.
        * @example TH68010
        */
-      offenceCode: string
+      offenceCode?: string
       /**
-       * @description The offence description
+       * @description The offence description. Will never be null.
        * @example Theft from a shop
        */
-      offenceDescription: string
+      offenceDescription?: string
       /**
        * Format: date
        * @description The date of the offence
        * @example 2024-05-23
        */
       offenceDate?: string
-      /** @description Indicates this offence is for the latest NOMIS booking */
-      latestBooking: boolean
+      /** @description Indicates this offence is for the latest NOMIS booking. Will never be null. */
+      latestBooking?: boolean
+      /**
+       * Format: date
+       * @description Start date of sentence - null if there is no associated sentence
+       * @example 2018-03-10
+       */
+      sentenceStartDate?: string
+      /** @description Primary sentence - true if it is not a consecutive sentence, false if it is a consecutive sentence, null if no sentence found for the charge. */
+      primarySentence?: boolean
     }
     PagePrisoner: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       first?: boolean
       last?: boolean
       /** Format: int32 */
@@ -807,7 +923,7 @@ export interface components {
       content?: components['schemas']['Prisoner'][]
       /** Format: int32 */
       number?: number
-      sort?: components['schemas']['SortObject'][]
+      sort?: components['schemas']['SortObject']
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
@@ -816,7 +932,7 @@ export interface components {
     PageableObject: {
       /** Format: int64 */
       offset?: number
-      sort?: components['schemas']['SortObject'][]
+      sort?: components['schemas']['SortObject']
       /** Format: int32 */
       pageSize?: number
       paged?: boolean
@@ -824,18 +940,50 @@ export interface components {
       pageNumber?: number
       unpaged?: boolean
     }
-    /** @description Telephone numbers. Note that the number will contain only numeric characters [0-9] (including no break between area code and number). Therefore if searching on 'phoneNumbers.number' you should not pass any non-numeric characters. */
+    PersonalCareNeed: {
+      /**
+       * @description Problem Type, from reference data with domain 'HEALTH'
+       * @example MATSTAT
+       */
+      problemType?: string
+      /**
+       * @description Problem Code, from reference data with domain 'HEALTH_PBLM'
+       * @example ACCU9
+       */
+      problemCode?: string
+      /**
+       * @description Problem Status, from reference data with domain 'HEALTH_STS'
+       * @enum {string}
+       */
+      problemStatus?: 'ON' | 'I' | 'EBS'
+      /** @description Problem Description */
+      problemDescription?: string
+      /** @description Comment */
+      commentText?: string
+      /**
+       * Format: date
+       * @description Start Date
+       * @example 2020-06-21
+       */
+      startDate?: string
+      /**
+       * Format: date
+       * @description End Date
+       * @example 2025-05-11
+       */
+      endDate?: string
+    }
     PhoneNumber: {
       /**
-       * @description The type of the phone number
+       * @description The type of the phone number. Will never be null.
        * @example HOME, MOB
        */
-      type: string
+      type?: string
       /**
-       * @description The phone number. Numeric characters only (no whitespace).
+       * @description The phone number. Numeric characters only (no whitespace). Will never be null.
        * @example 01141234567
        */
-      number: string
+      number?: string
     }
     Prisoner: {
       /**
@@ -910,6 +1058,11 @@ export interface components {
        */
       ethnicity: string
       /**
+       * @description Ethnicity code
+       * @example W1
+       */
+      raceCode: string
+      /**
        * @description Youth Offender?
        * @example true
        */
@@ -929,6 +1082,21 @@ export interface components {
        * @example Egyptian
        */
       nationality: string
+      /**
+       * @description Smoker (V=vapes)
+       * @enum {string}
+       */
+      smoker?: 'Y' | 'N' | 'V'
+      /** @description Personal Care Needs */
+      personalCareNeeds?: components['schemas']['PersonalCareNeed'][]
+      /** @description Languages */
+      languages?: components['schemas']['Language'][]
+      /**
+       * Format: int64
+       * @description The prisoner's current facial image can be retrieved by plugging this id into the prison-api endpoint /app/images/{prisonerNumber}/data?imageId={imageId}
+       * @example 2122100
+       */
+      currentFacialImageId?: number
       /**
        * @description Status of the prisoner
        * @example ACTIVE IN
@@ -985,6 +1153,11 @@ export interface components {
        */
       category?: string
       /**
+       * @description Complexity of Need level if female
+       * @example low
+       */
+      complexityOfNeedLevel?: string
+      /**
        * @description Legal Status
        * @example SENTENCED
        * @enum {string}
@@ -1010,6 +1183,12 @@ export interface components {
        * @example Serving Life Imprisonment
        */
       imprisonmentStatusDescription?: string
+      /**
+       * @description The prisoner's convicted status code.
+       * @example Convicted
+       * @enum {string}
+       */
+      convictedStatus?: 'Convicted' | 'Remand'
       /**
        * @description Most serious offence for this sentence
        * @example Robbery
@@ -1105,10 +1284,16 @@ export interface components {
       nonDtoReleaseDateType?: 'ARD' | 'CRD' | 'NPD' | 'PRRD'
       /**
        * Format: date
-       * @description Date prisoner was received into the prison
+       * @description Date prisoner was received into prison at the start of the term
        * @example 2023-05-01
        */
       receptionDate?: string
+      /**
+       * Format: date
+       * @description Date prisoner was transferred into the current or latest prison
+       * @example 2023-05-01
+       */
+      lastAdmissionDate?: string
       /**
        * Format: date
        * @description Parole  Eligibility Date
@@ -1157,7 +1342,7 @@ export interface components {
        */
       locationDescription?: string
       /**
-       * @description Indicates a restricted patient
+       * @description Indicates a restricted patient. Will never be null.
        * @example true
        */
       restrictedPatient: boolean
@@ -1187,6 +1372,7 @@ export interface components {
        * @example Psychiatric Hospital Discharge to Hazelwood House
        */
       dischargeDetails?: string
+      /** @description Incentive level */
       currentIncentive?: components['schemas']['CurrentIncentive']
       /**
        * Format: int32
@@ -1282,7 +1468,7 @@ export interface components {
       scars?: components['schemas']['BodyPartDetail'][]
       /** @description List of parts of the body that have marks. This includes NOMIS physical details of type 'marks' and 'otherMarks'. If we find a comment with either 'tattoo' or 'scar' we also add to the list of tattoos or scars. From REFERENCE_CODES table where DOMAIN = BODY_PART. Allowable values extracted 08/02/2023. */
       marks?: components['schemas']['BodyPartDetail'][]
-      /** @description Addresses */
+      /** @description Addresses. Note that no fixed addresses are only ever returned if they are also the primary address, otherwise they are filtered out. */
       addresses?: components['schemas']['Address'][]
       /** @description Email addresses */
       emailAddresses?: components['schemas']['EmailAddress'][]
@@ -1293,74 +1479,75 @@ export interface components {
       /** @description All historical convicted offences */
       allConvictedOffences?: components['schemas']['Offence'][]
     }
-    /** @description Alerts */
     PrisonerAlert: {
       /**
-       * @description Alert Type
+       * @description Alert Type. Will never be null.
        * @example H
        */
-      alertType: string
+      alertType?: string
       /**
-       * @description Alert Code
+       * @description Alert Code. Will never be null.
        * @example HA
        */
-      alertCode: string
+      alertCode?: string
       /**
-       * @description Active
+       * @description Active. Will never be null.
        * @example true
        */
-      active: boolean
+      active?: boolean
       /**
-       * @description Expired
+       * @description Expired. Will never be null.
        * @example true
        */
-      expired: boolean
+      expired?: boolean
     }
-    /** @description Aliases Names and Details */
     PrisonerAlias: {
       /**
-       * @description Title
+       * @description Title. Will never be null.
        * @example Ms
        */
       title?: string
       /**
-       * @description First Name
+       * @description First Name. Will never be null.
        * @example Robert
        */
-      firstName: string
+      firstName?: string
       /**
-       * @description Middle names
+       * @description Middle names. Will never be null.
        * @example Trevor
        */
       middleNames?: string
       /**
-       * @description Last name
+       * @description Last name. Will never be null.
        * @example Lorsen
        */
-      lastName: string
+      lastName?: string
       /**
        * Format: date
-       * @description Date of birth
+       * @description Date of birth. Will never be null.
        * @example 1975-04-02
        */
-      dateOfBirth: string
+      dateOfBirth?: string
       /**
-       * @description Gender
+       * @description Gender. Will never be null.
        * @example Male
        */
       gender?: string
       /**
-       * @description Ethnicity
+       * @description Ethnicity. Will never be null.
        * @example White : Irish
        */
       ethnicity?: string
+      /**
+       * @description Ethnicity code. Will never be null.
+       * @example W1
+       */
+      raceCode?: string
     }
     SortObject: {
-      direction?: string
-      nullHandling?: string
-      ascending?: boolean
-      property?: string
-      ignoreCase?: boolean
+      empty?: boolean
+      sorted?: boolean
+      unsorted?: boolean
     }
     /** @description Search Criteria for Release Date Search */
     ReleaseDateSearch: {
@@ -1493,7 +1680,6 @@ export interface components {
        */
       bookingIds: number[]
     }
-    /** @description Pagination options. Will default to the first page if omitted. */
     PaginationRequest: {
       /**
        * Format: int32
@@ -1545,18 +1731,25 @@ export interface components {
        */
       prisonIds: string[]
       /**
+       * Format: date
+       * @description Date of birth to filter results by
+       * @example 1970-02-28
+       */
+      dateOfBirth?: string
+      /**
        * @description Include aliases in search
        * @default true
        * @example true
        */
       includeAliases: boolean
+      /** @description Pagination options. Will default to the first page if omitted. */
       pagination: components['schemas']['PaginationRequest']
     }
     PrisonerDetailResponse: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       first?: boolean
       last?: boolean
       /** Format: int32 */
@@ -1564,7 +1757,7 @@ export interface components {
       content?: components['schemas']['Prisoner'][]
       /** Format: int32 */
       number?: number
-      sort?: components['schemas']['SortObject'][]
+      sort?: components['schemas']['SortObject']
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
@@ -1599,7 +1792,6 @@ export interface components {
        */
       moreInfo?: string
     }
-    /** @description List of body parts that have scars */
     BodyPart: {
       /**
        * @description Body part that has the physical mark, searching on the description in the type BODY_PART in the REFERENCE_CODES table. Allowable values extracted 08/02/2023.
@@ -1796,13 +1988,14 @@ export interface components {
        * @example false
        */
       lenient: boolean
+      /** @description Pagination options. Will default to the first page if omitted. */
       pagination: components['schemas']['PaginationRequest']
     }
     PhysicalDetailResponse: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       first?: boolean
       last?: boolean
       /** Format: int32 */
@@ -1810,7 +2003,7 @@ export interface components {
       content?: components['schemas']['Prisoner'][]
       /** Format: int32 */
       number?: number
-      sort?: components['schemas']['SortObject'][]
+      sort?: components['schemas']['SortObject']
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
@@ -1849,8 +2042,8 @@ export interface components {
        */
       nomsNumber?: string
     }
-    /** @description List of prisoners that share the same possibility of being the match */
     PrisonerMatch: {
+      /** @description Details of the matching prisoner */
       prisoner: components['schemas']['Prisoner']
     }
     PrisonerMatches: {
@@ -1904,6 +2097,7 @@ export interface components {
        *     ]
        */
       prisonIds: string[]
+      /** @description Pagination options. Will default to the first page if omitted. */
       pagination: components['schemas']['PaginationRequest']
       /**
        * @description The type of search. When set to DEFAULT (which is the default when not provided) search order is by calculated relevance (AKA score). An ESTABLISHMENT type will order results by name and is designed for using this API for a single quick search field for prisoners within a specific prison
@@ -1912,10 +2106,10 @@ export interface components {
       type: 'DEFAULT' | 'ESTABLISHMENT'
     }
     KeywordResponse: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       first?: boolean
       last?: boolean
       /** Format: int32 */
@@ -1923,7 +2117,7 @@ export interface components {
       content?: components['schemas']['Prisoner'][]
       /** Format: int32 */
       number?: number
-      sort?: components['schemas']['SortObject'][]
+      sort?: components['schemas']['SortObject']
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
@@ -1973,7 +2167,7 @@ export interface components {
     /** @description A request to search for prisoners by attributes */
     AttributeSearchRequest: {
       /**
-       * @description The type of join to use when combining matchers or subQueries. Defaults to AND if not included in the request.
+       * @description The type of join to use when combining the matchers and subQueries
        * @default AND
        * @example AND
        * @enum {string}
@@ -2129,7 +2323,6 @@ export interface components {
        */
       type: string
     })
-    /** @description Matchers that will be applied to this query */
     Matcher: {
       type: string
     }
@@ -2156,7 +2349,7 @@ export interface components {
     /** @description A query to search for prisoners by attributes */
     Query: {
       /**
-       * @description The type of join to use when combining matchers or subQueries. Defaults to AND if not included in the request.
+       * @description The type of join to use when combining the matchers and subQueries
        * @default AND
        * @example AND
        * @enum {string}
@@ -2172,7 +2365,7 @@ export interface components {
         | components['schemas']['StringMatcher']
       )[]
       /** @description A list of sub-queries of type Query that will be combined with the matchers in this query */
-      subQueries?: components['schemas']['Query'][]
+      subQueries?: unknown[]
     }
     /** @description A matcher for a string attribute from the prisoner record */
     StringMatcher: {
@@ -2184,22 +2377,7 @@ export interface components {
        */
       attribute: string
       /**
-       * @description The condition to apply to the attribute value.
-       *
-       *       All String searches are case-insensitive.
-       *
-       *       IS and IS_NOT require an exact match (wildcards ? and * will not work).
-       *
-       *       For IS and CONTAINS some attributes support fuzzy matching e.g. they allow spelling mistakes. Call endpoint `/attribute-search/attributes` to see which attributes support fuzzy matching.
-       *
-       *       CONTAINS without wildcards (? and *) for a non-fuzzy attribute looks for the exact search term anywhere in the attribute value.
-       *
-       *       CONTAINS with wildcards ? (single character) and * (zero to many characters) perform a wildcard match which must match the entire attribute value.
-       *
-       *       STARTSWITH checks only the prefix of the attribute value and does not support fuzzy matching or wildcards.
-       *
-       *       IN checks a list of values for an exact match and does not support fuzzy matching, wildcards or case insensitive searching.
-       *
+       * @description The condition to apply to the attribute
        * @example IS
        * @enum {string}
        */
@@ -2221,6 +2399,44 @@ export interface components {
     }
     ReferenceDataResponse: {
       data: components['schemas']['ReferenceData'][]
+    }
+    /** @description Prisoner location */
+    PrisonerLocation: {
+      /**
+       * @description Prisoner number
+       * @example A1234AA
+       */
+      prisonerNumber: string
+      /**
+       * @description Prison id. Current prison or OUT if outside. Will not be returned if no bookings.
+       * @example MDI
+       */
+      prisonId?: string
+      /**
+       * @description Last prison id. If prisonId is OUT then will contain last prison, otherwise will be the same as prisonId. Will not be returned if no bookings.
+       * @example MDI
+       */
+      lastPrisonId?: string
+      /**
+       * @description First Name
+       * @example Robert
+       */
+      firstName: string
+      /**
+       * @description Last name
+       * @example Larsen
+       */
+      lastName: string
+    }
+    /** @description Prisoner location response */
+    PrisonerLocationResponse: {
+      /**
+       * @description Scroll id. To be kept and used in next request
+       * @example FGluY2x1ZGVfY29udGV4dF91dWlkDnF1ZXJ5VGhlbkZldG...
+       */
+      scrollId?: string
+      /** @description List of prisoner locations */
+      locations?: components['schemas']['PrisonerLocation'][]
     }
     /** @description An attribute that can be searched for in a query */
     Attribute: {
@@ -2252,6 +2468,11 @@ export interface operations {
   findByCriteria: {
     parameters: {
       query?: {
+        /**
+         * @description A list of fields to populate on the Prisoner record returned in the response. An empty list defaults to all fields.
+         * @example [prisonerNumber,firstName,aliases.firstName,currentIncentive.level.code]
+         */
+        responseFields?: string[]
         /** @description Zero-based page index (0..N) */
         page?: number
         /** @description The size of the page to be returned */
@@ -2283,6 +2504,11 @@ export interface operations {
   findByReleaseDateAndPrison: {
     parameters: {
       query?: {
+        /**
+         * @description A list of fields to populate on the Prisoner record returned in the response. An empty list defaults to all fields.
+         * @example [prisonerNumber,firstName,aliases.firstName,currentIncentive.level.code]
+         */
+        responseFields?: string[]
         /** @description Zero-based page index (0..N) */
         page?: number
         /** @description The size of the page to be returned */
@@ -2313,7 +2539,13 @@ export interface operations {
   }
   findByNumbers: {
     parameters: {
-      query?: never
+      query?: {
+        /**
+         * @description A list of fields to populate on the Prisoner record returned in the response. An empty list defaults to all fields.
+         * @example [prisonerNumber,firstName,aliases.firstName,currentIncentive.level.code]
+         */
+        responseFields?: string[]
+      }
       header?: never
       path?: never
       cookie?: never
@@ -2337,7 +2569,13 @@ export interface operations {
   }
   findPossibleMatchesBySearchCriteria: {
     parameters: {
-      query?: never
+      query?: {
+        /**
+         * @description A list of fields to populate on the Prisoner record returned in the response. An empty list defaults to all fields.
+         * @example [prisonerNumber,firstName,aliases.firstName,currentIncentive.level.code]
+         */
+        responseFields?: string[]
+      }
       header?: never
       path?: never
       cookie?: never
@@ -2385,7 +2623,13 @@ export interface operations {
   }
   findByCriteria_2: {
     parameters: {
-      query?: never
+      query?: {
+        /**
+         * @description A list of fields to populate on the Prisoner record returned in the response. An empty list defaults to all fields.
+         * @example [prisonerNumber,firstName,aliases.firstName,currentIncentive.level.code]
+         */
+        responseFields?: string[]
+      }
       header?: never
       path?: never
       cookie?: never
@@ -2409,7 +2653,13 @@ export interface operations {
   }
   findByIds: {
     parameters: {
-      query?: never
+      query?: {
+        /**
+         * @description A list of fields to populate on the Prisoner record returned in the response. An empty list defaults to all fields.
+         * @example [prisonerNumber,firstName,aliases.firstName,currentIncentive.level.code]
+         */
+        responseFields?: string[]
+      }
       header?: never
       path?: never
       cookie?: never
@@ -2433,7 +2683,13 @@ export interface operations {
   }
   prisonerDetailSearch: {
     parameters: {
-      query?: never
+      query?: {
+        /**
+         * @description A list of fields to populate on the Prisoner record returned in the response. An empty list defaults to all fields.
+         * @example [prisonerNumber,firstName,aliases.firstName,currentIncentive.level.code]
+         */
+        responseFields?: string[]
+      }
       header?: never
       path?: never
       cookie?: never
@@ -2484,7 +2740,13 @@ export interface operations {
   }
   prisonerDetailSearch_1: {
     parameters: {
-      query?: never
+      query?: {
+        /**
+         * @description A list of fields to populate on the Prisoner record returned in the response. An empty list defaults to all fields.
+         * @example [prisonerNumber,firstName,aliases.firstName,currentIncentive.level.code]
+         */
+        responseFields?: string[]
+      }
       header?: never
       path?: never
       cookie?: never
@@ -2586,7 +2848,13 @@ export interface operations {
   }
   keywordSearch: {
     parameters: {
-      query?: never
+      query?: {
+        /**
+         * @description A list of fields to populate on the Prisoner record returned in the response. An empty list defaults to all fields.
+         * @example [prisonerNumber,firstName,aliases.firstName,currentIncentive.level.code]
+         */
+        responseFields?: string[]
+      }
       header?: never
       path?: never
       cookie?: never
@@ -2644,6 +2912,11 @@ export interface operations {
         size?: number
         /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
         sort?: string[]
+        /**
+         * @description A list of fields to populate on the Prisoner record returned in the response. An empty list defaults to all fields.
+         * @example [prisonerNumber,firstName,aliases.firstName,currentIncentive.level.code]
+         */
+        responseFields?: string[]
       }
       header?: never
       path?: never
@@ -2675,6 +2948,11 @@ export interface operations {
         size?: number
         /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
         sort?: string[]
+        /**
+         * @description A list of fields to populate on the Prisoner record returned in the response. An empty list defaults to all fields.
+         * @example [prisonerNumber,firstName,aliases.firstName,currentIncentive.level.code]
+         */
+        responseFields?: string[]
       }
       header?: never
       path?: never
@@ -2720,6 +2998,26 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  responseFields: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': string[]
         }
       }
     }
@@ -2845,7 +3143,13 @@ export interface operations {
   }
   findByPrisonNumber: {
     parameters: {
-      query?: never
+      query?: {
+        /**
+         * @description A list of fields to populate on the Prisoner record returned in the response. An empty list defaults to all fields.
+         * @example [prisonerNumber,firstName,aliases.firstName,currentIncentive.level.code]
+         */
+        responseFields?: string[]
+      }
       header?: never
       path: {
         id: string
@@ -2869,6 +3173,11 @@ export interface operations {
     parameters: {
       query?: {
         'include-restricted-patients'?: boolean
+        /**
+         * @description A list of fields to populate on the Prisoner record returned in the response. An empty list defaults to all fields.
+         * @example [prisonerNumber,firstName,aliases.firstName,currentIncentive.level.code]
+         */
+        responseFields?: string[]
         /** @description Zero-based page index (0..N) */
         page?: number
         /** @description The size of the page to be returned */
@@ -2891,6 +3200,48 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['PagePrisoner']
+        }
+      }
+    }
+  }
+  scroll: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        'scroll-id': string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PrisonerLocationResponse']
+        }
+      }
+    }
+  }
+  findAll: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PrisonerLocationResponse']
         }
       }
     }
@@ -2928,6 +3279,11 @@ export interface operations {
          * @example STD
          */
         incentiveLevelCode?: string
+        /**
+         * @description A list of fields to populate on the Prisoner record returned in the response. An empty list defaults to all fields.
+         * @example [prisonerNumber,firstName,aliases.firstName,currentIncentive.level.code]
+         */
+        responseFields?: string[]
         /** @description Zero-based page index (0..N) */
         page?: number
         /** @description The size of the page to be returned */

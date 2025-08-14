@@ -40,6 +40,8 @@ export default class VisitsByDatePage extends Page {
 
   bookedOn = (index: number): PageElement => cy.get(`:nth-child(${index}) > [data-test="booked-on"]`)
 
+  visitStatus = (index: number): PageElement => cy.get(`:nth-child(${index}) > [data-test="visit-status"]`)
+
   noResultsMessage = (): PageElement => cy.get('[data-test="no-visits-message"]')
 
   // another date form

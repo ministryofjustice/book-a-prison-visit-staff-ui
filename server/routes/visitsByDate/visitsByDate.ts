@@ -64,12 +64,14 @@ export default function routes({
 
     // fetch visits if a known session is selected and split into open/closed
     if (sessionSchedule) {
-      const openAndClosedVisits = await visitService.getVisitsBySessionTemplate({
-        username,
-        prisonId,
-        reference: sessionSchedule.sessionTemplateReference,
-        sessionDate: selectedDateString,
-      })
+      const openAndClosedVisits = (
+        await visitService.getVisitsBySessionTemplate({
+          username,
+          prisonId,
+          reference: sessionSchedule.sessionTemplateReference,
+          sessionDate: selectedDateString,
+        })
+      ).filter(visit => ['APPROVED', 'AUTO_APPROVED', 'REQUESTED'].includes(visit.visitSubStatus))
 
       openAndClosedVisits.forEach(visit => {
         visits[visit.visitRestriction].visits.push(visit)
@@ -113,6 +115,7 @@ export default function routes({
 
     return res.render('pages/visitsByDate/visitsByDate', {
       errors: req.flash('errors'),
+      messages: req.flash('messages'),
       formValues: getFlashFormValues(req),
       dateTabs: getDateTabs(selectedDateString, firstTabDateString, 3),
       sessionSchedule,

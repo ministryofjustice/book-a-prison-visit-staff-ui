@@ -4,6 +4,26 @@
  */
 
 export interface paths {
+  '/v2/prisoners/{prisonerId}/contacts/social/approved/restrictions/visit-request/date-ranges': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Get all date ranges of visitor restrictions which would cause a visit to be a request visit
+     * @description Returns a List<DateRangeDto> containing all start/end date pairs of visitor restrictions which cause a visit to be a request visit
+     */
+    post: operations['getDateRangesForVisitorRestrictionsWhichEffectRequestVisits']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v2/prisoners/{prisonerId}/contacts/social': {
     parameters: {
       query?: never
@@ -200,6 +220,30 @@ export interface components {
       errorCode?: number
       userMessage?: string
       developerMessage?: string
+    }
+    /** @description A date range */
+    DateRangeDto: {
+      /**
+       * Format: date
+       * @description The start of the date range
+       */
+      fromDate: string
+      /**
+       * Format: date
+       * @description The end of the date range
+       */
+      toDate: string
+    }
+    /** @description Request body for finding visitor restriction date ranges which would effect request visits */
+    RequestVisitVisitorRestrictionsBodyDto: {
+      /** @description Prisoner Id of prisoner who the visit is for */
+      prisonerId: string
+      /** @description List of all visitors attending the visit */
+      visitorIds: string[]
+      /** @description A list of restriction codes to search for when finding visitor restrictions */
+      supportedVisitorRestrictionsCodesForRequestVisits: string[]
+      /** @description The current visit booking window date range (used to limit restriction search) */
+      currentDateRange: components['schemas']['DateRangeDto']
     }
     /** @description An address */
     AddressDto: {
@@ -424,19 +468,6 @@ export interface components {
       /** @description Has closed restriction */
       value: boolean
     }
-    /** @description A date range */
-    DateRangeDto: {
-      /**
-       * Format: date
-       * @description The start of the date range
-       */
-      fromDate: string
-      /**
-       * Format: date
-       * @description The end of the date range
-       */
-      toDate: string
-    }
   }
   responses: never
   parameters: never
@@ -446,6 +477,66 @@ export interface components {
 }
 export type $defs = Record<string, never>
 export interface operations {
+  getDateRangesForVisitorRestrictionsWhichEffectRequestVisits: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RequestVisitVisitorRestrictionsBodyDto']
+      }
+    }
+    responses: {
+      /** @description Date ranges returned (empty if none cause sessions to be request visits) */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['DateRangeDto'][]
+        }
+      }
+      /** @description Incorrect request to Get date ranges for prisoner visitors */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to Get date ranges for prisoner visitors */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Prisoner or Visitor not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
   getPrisonerSocialContacts: {
     parameters: {
       query?: {

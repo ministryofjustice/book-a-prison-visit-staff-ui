@@ -52,45 +52,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/court/video-link-bookings/{videoLinkBookingId}/comment': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    /** @description Update the comment for a Video Link Booking */
-    put: operations['updateVideoLinkBookingComment']
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/court/video-link-bookings/{videoBookingId}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * A video Link Booking
-     * @description Return a video Link Booking
-     */
-    get: operations['getVideoLinkBooking']
-    /** @description Update a Video Link Booking */
-    put: operations['updateVideoLinkBooking']
-    post?: never
-    /** @description Delete a Video Link Booking */
-    delete: operations['deleteVideoLinkBooking']
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/attendance/{id}': {
     parameters: {
       query?: never
@@ -105,81 +66,6 @@ export interface paths {
      */
     put: operations['putAttendance']
     post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/court/video-link-bookings': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Video Link Bookings
-     * @description Return details of Video Link Bookings in CSV format. Restrict the response to bookings with a main start time within 'days' of start-date.
-     */
-    get: operations['getVideoLinkBookingsByStartDate']
-    put?: never
-    /** @description Create a Video Link Booking */
-    post: operations['createVideoLinkBooking']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/court/video-link-bookings/date/{date}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** @description Return all video link bookings for the specified date and prisons, optionally filtering by court. */
-    post: operations['getVideoLinkBookingsBySearchDetails']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/court/video-link-booking-check': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** @description Check that a potential video link booking, described by the supplied specification, can be made.  If not then return information about some alternatives. */
-    post: operations['findAvailableVideoLinkBookingOptions']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/court/video-link-appointments': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Video link appointments
-     * @description Return video link appointments
-     */
-    post: operations['getVideoLinkAppointments']
     delete?: never
     options?: never
     head?: never
@@ -307,27 +193,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/video-link-rooms/{agencyId}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * getVideoLinkBookingRooms
-     * @deprecated
-     * @description List of all the Video Link Booking rooms in the prison.
-     */
-    get: operations['getVideoLinkBookingRooms']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/queue-admin/get-dlq-messages/{dlqName}': {
     parameters: {
       query?: never
@@ -336,48 +201,6 @@ export interface paths {
       cookie?: never
     }
     get: operations['getDlqMessages']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/locations/{agencyId}/{group}/location-prefix': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * getLocationPrefixFromGroup
-     * @deprecated
-     * @description Get location prefix by group
-     */
-    get: operations['getLocationPrefixFromGroup']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/locations/groups/{agencyId}/{name}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * getLocationGroup
-     * @deprecated
-     * @description List of cell locations by group at agency location.
-     */
-    get: operations['getLocationGroup']
     put?: never
     post?: never
     delete?: never
@@ -398,126 +221,6 @@ export interface paths {
      * @description All scheduled events for offender.  This endpoint filters out cancelled events.
      */
     get: operations['getEvents']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/events/video-link-booking-events': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Video Link Booking Events
-     * @description Return details of Video Link Booking Events (Create, Update, Delete) in CSV format. Restrict the response to events occurring within 'days' of start-date.
-     */
-    get: operations['getVideoLinkBookingEvents']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/court/hearing-type': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Return all court hearing types
-     * @description Get court hearing types
-     */
-    get: operations['getCourtHearingTypes']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/court/courts': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * All courts
-     * @description Return information about all courts.
-     */
-    get: operations['getCourts']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/court/courts/{courtId}/email': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Court email address
-     * @description Return information about email address.
-     */
-    get: operations['getEmailByCourtId']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/court/court-hearing-types': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * All court hearing types
-     * @description Return a list of all court hearing types.
-     */
-    get: operations['getCourtHearingTypes_1']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/court/all-courts': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Return all court locations
-     * @description All court locations
-     */
-    get: operations['getCourtNames']
     put?: never
     post?: never
     delete?: never
@@ -741,48 +444,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/agencies/{agencyId}/locations/whereabouts': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * getWhereabouts
-     * @deprecated
-     * @description Whereabouts details (e.g. whether enabled) for prison.
-     */
-    get: operations['getWhereabouts']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/agencies/{agencyId}/locations/groups': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * getAvailableLocationGroups
-     * @deprecated
-     * @description List of all available Location Groups at agency.
-     */
-    get: operations['getAvailableLocationGroups']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/absence-reasons': {
     parameters: {
       query?: never
@@ -831,21 +492,6 @@ export interface components {
       /** Format: int32 */
       messagesFoundCount: number
     }
-    VideoLinkAppointmentSpecification: {
-      /** Format: int64 */
-      locationId: number
-      /** Format: date-time */
-      startTime: string
-      /** Format: date-time */
-      endTime: string
-    }
-    VideoLinkBookingUpdateSpecification: {
-      courtId: string
-      comment?: string
-      pre?: components['schemas']['VideoLinkAppointmentSpecification']
-      main: components['schemas']['VideoLinkAppointmentSpecification']
-      post?: components['schemas']['VideoLinkAppointmentSpecification']
-    }
     UpdateAttendanceDto: {
       attended: boolean
       paid: boolean
@@ -882,162 +528,6 @@ export interface components {
       userMessage?: string
       developerMessage?: string
       moreInfo?: string
-    }
-    VideoLinkBookingSpecification: {
-      /** Format: int64 */
-      bookingId: number
-      court?: string
-      courtId?: string
-      /** @enum {string} */
-      courtHearingType?:
-        | 'APPEAL'
-        | 'APPLICATION'
-        | 'BACKER_TRIAL'
-        | 'BAIL'
-        | 'CIVIL'
-        | 'COMMITTAL_FOR_SENTENCE'
-        | 'CUSTODY_TIME_LIMIT_APPLICATIONS'
-        | 'IMMIGRATION_DEPORTATION'
-        | 'FAMILY'
-        | 'TRIAL'
-        | 'FURTHER_CASE_MANAGEMENT'
-        | 'FUTURE_TRIAL_REVIEW'
-        | 'GROUND_RULES'
-        | 'MENTION_DEFENDANT_MUST_ATTEND'
-        | 'MENTION_TO_FIX'
-        | 'NEWTON'
-        | 'PLEA'
-        | 'PLEA_TRIAL_PREPARATION'
-        | 'PRE_TRIAL_REVIEW'
-        | 'PROCEEDS_OF_CRIME_APPLICATIONS'
-        | 'REMAND'
-        | 'SECTION_28'
-        | 'SENTENCE'
-        | 'TRIBUNAL'
-        | 'OTHER'
-      madeByTheCourt: boolean
-      comment?: string
-      pre?: components['schemas']['VideoLinkAppointmentSpecification']
-      main: components['schemas']['VideoLinkAppointmentSpecification']
-      post?: components['schemas']['VideoLinkAppointmentSpecification']
-    }
-    /** @description Video link bookings search details parameters */
-    VideoLinkBookingSearchDetails: {
-      courtId: string
-      prisonIds: string[]
-    }
-    LocationTimeslot: {
-      /** Format: int64 */
-      locationId: number
-      /** Format: date-time */
-      startTime: string
-      /** Format: date-time */
-      endTime: string
-    }
-    VideoLinkBookingResponse: {
-      /** Format: int64 */
-      videoLinkBookingId: number
-      /** Format: int64 */
-      bookingId: number
-      agencyId: string
-      court?: string
-      /** @enum {string} */
-      courtHearingType?:
-        | 'APPEAL'
-        | 'APPLICATION'
-        | 'BACKER_TRIAL'
-        | 'BAIL'
-        | 'CIVIL'
-        | 'COMMITTAL_FOR_SENTENCE'
-        | 'CUSTODY_TIME_LIMIT_APPLICATIONS'
-        | 'IMMIGRATION_DEPORTATION'
-        | 'FAMILY'
-        | 'TRIAL'
-        | 'FURTHER_CASE_MANAGEMENT'
-        | 'FUTURE_TRIAL_REVIEW'
-        | 'GROUND_RULES'
-        | 'MENTION_DEFENDANT_MUST_ATTEND'
-        | 'MENTION_TO_FIX'
-        | 'NEWTON'
-        | 'PLEA'
-        | 'PLEA_TRIAL_PREPARATION'
-        | 'PRE_TRIAL_REVIEW'
-        | 'PROCEEDS_OF_CRIME_APPLICATIONS'
-        | 'REMAND'
-        | 'SECTION_28'
-        | 'SENTENCE'
-        | 'TRIBUNAL'
-        | 'OTHER'
-      courtId?: string
-      comment?: string
-      pre?: components['schemas']['LocationTimeslot']
-      main: components['schemas']['LocationTimeslot']
-      post?: components['schemas']['LocationTimeslot']
-    }
-    Interval: {
-      start: components['schemas']['LocalTime']
-      end: components['schemas']['LocalTime']
-    }
-    LocalTime: {
-      /** Format: int32 */
-      hour?: number
-      /** Format: int32 */
-      minute?: number
-      /** Format: int32 */
-      second?: number
-      /** Format: int32 */
-      nano?: number
-    }
-    LocationAndInterval: {
-      /** Format: int64 */
-      locationId: number
-      interval: components['schemas']['Interval']
-    }
-    VideoLinkBookingSearchSpecification: {
-      agencyId: string
-      /** Format: date */
-      date: string
-      preAppointment?: components['schemas']['LocationAndInterval']
-      mainAppointment: components['schemas']['LocationAndInterval']
-      postAppointment?: components['schemas']['LocationAndInterval']
-      /** Format: int64 */
-      vlbIdToExclude?: number
-    }
-    VideoLinkBookingOption: {
-      pre?: components['schemas']['LocationAndInterval']
-      main: components['schemas']['LocationAndInterval']
-      post?: components['schemas']['LocationAndInterval']
-    }
-    VideoLinkBookingOptions: {
-      matched: boolean
-      alternatives: components['schemas']['VideoLinkBookingOption'][]
-    }
-    VideoLinkAppointmentDto: {
-      /** Format: int64 */
-      id: number
-      /** Format: int64 */
-      bookingId: number
-      /** Format: int64 */
-      appointmentId: number
-      /** Format: int64 */
-      videoLinkBookingId: number
-      /** Format: int64 */
-      mainAppointmentId?: number
-      court: string
-      courtId?: string
-      /** @enum {string} */
-      hearingType: 'MAIN' | 'PRE' | 'POST'
-      createdByUsername?: string
-      madeByTheCourt?: boolean
-      /** Format: date-time */
-      startTime?: string
-      /** Format: date-time */
-      endTime?: string
-      /** Format: int64 */
-      locationId?: number
-    }
-    VideoLinkAppointmentsResponse: {
-      appointments?: components['schemas']['VideoLinkAppointmentDto'][]
     }
     CellMoveDetails: {
       /** Format: int64 */
@@ -1222,14 +712,9 @@ export interface components {
       /** Format: int64 */
       locationId: number
     }
-    LocationIdAndDescription: {
-      /** Format: int64 */
-      locationId: number
-      description: string
-    }
     DlqMessage: {
       body: {
-        [key: string]: Record<string, never> | undefined
+        [key: string]: unknown
       }
       messageId: string
     }
@@ -1239,23 +724,6 @@ export interface components {
       /** Format: int32 */
       messagesReturnedCount: number
       messages: components['schemas']['DlqMessage'][]
-    }
-    Location: {
-      /** Format: int64 */
-      locationId: number
-      locationType: string
-      description: string
-      locationUsage?: string
-      agencyId: string
-      /** Format: int64 */
-      parentLocationId?: number
-      /** Format: int32 */
-      currentOccupancy: number
-      locationPrefix: string
-      /** Format: int32 */
-      operationalCapacity: number
-      userDescription?: string
-      internalLocationCode: string
     }
     ScheduledEventDto: {
       /** Format: int64 */
@@ -1288,17 +756,6 @@ export interface components {
       payRate?: number
       locationCode?: string
       createUserId?: string
-    }
-    Court: {
-      id: string
-      name: string
-      email?: string
-    }
-    CourtEmailDto: {
-      email: string
-    }
-    CourtLocationsResponse: {
-      courtLocations?: string[]
     }
     CellMoveReasonDto: {
       /** Format: int64 */
@@ -1464,7 +921,7 @@ export interface components {
       content?: components['schemas']['AttendanceHistoryDto'][]
       /** Format: int32 */
       number?: number
-      sort?: components['schemas']['SortObject'][]
+      sort?: components['schemas']['SortObject']
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
@@ -1473,20 +930,18 @@ export interface components {
     PageableObject: {
       /** Format: int64 */
       offset?: number
-      sort?: components['schemas']['SortObject'][]
+      sort?: components['schemas']['SortObject']
       /** Format: int32 */
       pageSize?: number
+      unpaged?: boolean
       paged?: boolean
       /** Format: int32 */
       pageNumber?: number
-      unpaged?: boolean
     }
     SortObject: {
-      direction?: string
-      nullHandling?: string
-      ascending?: boolean
-      property?: string
-      ignoreCase?: boolean
+      empty?: boolean
+      sorted?: boolean
+      unsorted?: boolean
     }
     AttendanceSummary: {
       /** Format: int32 */
@@ -1607,6 +1062,10 @@ export interface components {
     }
     AppointmentDetailsDto: {
       appointment: components['schemas']['AppointmentDto']
+      /**
+       * @deprecated
+       * @description Not populated
+       */
       videoLinkBooking?: components['schemas']['VideoLinkBookingDto']
       recurring?: components['schemas']['RecurringAppointmentDto']
     }
@@ -1635,20 +1094,36 @@ export interface components {
       /** Format: date-time */
       startTime: string
     }
+    VideoLinkAppointmentDto: {
+      /** Format: int64 */
+      id: number
+      /** Format: int64 */
+      bookingId: number
+      /** Format: int64 */
+      appointmentId: number
+      /** Format: int64 */
+      videoLinkBookingId: number
+      /** Format: int64 */
+      mainAppointmentId?: number
+      court: string
+      courtId?: string
+      /** @enum {string} */
+      hearingType: 'MAIN' | 'PRE' | 'POST'
+      createdByUsername?: string
+      madeByTheCourt?: boolean
+      /** Format: date-time */
+      startTime?: string
+      /** Format: date-time */
+      endTime?: string
+      /** Format: int64 */
+      locationId?: number
+    }
     VideoLinkBookingDto: {
       /** Format: int64 */
       id: number
       main: components['schemas']['VideoLinkAppointmentDto']
       pre?: components['schemas']['VideoLinkAppointmentDto']
       post?: components['schemas']['VideoLinkAppointmentDto']
-    }
-    WhereaboutsConfig: {
-      enabled: boolean
-    }
-    LocationGroup: {
-      name: string
-      key: string
-      children: components['schemas']['LocationGroup'][]
     }
     AbsentReasonDto: {
       /** @enum {string} */
@@ -1782,100 +1257,6 @@ export interface operations {
       }
     }
   }
-  updateVideoLinkBookingComment: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Video link booking id */
-        videoLinkBookingId: number
-      }
-      cookie?: never
-    }
-    requestBody?: {
-      content: {
-        'text/plain': string
-      }
-    }
-    responses: {
-      /** @description No Content */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  getVideoLinkBooking: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Video link booking id */
-        videoBookingId: number
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['VideoLinkBookingResponse']
-        }
-      }
-    }
-  }
-  updateVideoLinkBooking: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Video link booking id */
-        videoBookingId: number
-      }
-      cookie?: never
-    }
-    requestBody?: {
-      content: {
-        'application/json': components['schemas']['VideoLinkBookingUpdateSpecification']
-      }
-    }
-    responses: {
-      /** @description No Content */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  deleteVideoLinkBooking: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Video link booking id */
-        videoBookingId: number
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description No Content */
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
   putAttendance: {
     parameters: {
       query?: never
@@ -1916,131 +1297,6 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  getVideoLinkBookingsByStartDate: {
-    parameters: {
-      query: {
-        /** @description The earliest booking start time for which to return bookings for. */
-        'start-date': string
-        /** @description Return details of bookings occurring within this number of days of start-date */
-        days?: number
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': string
-          'text/csv': string
-        }
-      }
-    }
-  }
-  createVideoLinkBooking: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['VideoLinkBookingSpecification']
-      }
-    }
-    responses: {
-      /** @description Created */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': number
-        }
-      }
-    }
-  }
-  getVideoLinkBookingsBySearchDetails: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Return video link bookings for this date only. ISO-8601 date format */
-        date: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['VideoLinkBookingSearchDetails']
-      }
-    }
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['VideoLinkBookingResponse'][]
-        }
-      }
-    }
-  }
-  findAvailableVideoLinkBookingOptions: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['VideoLinkBookingSearchSpecification']
-      }
-    }
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['VideoLinkBookingOptions']
-        }
-      }
-    }
-  }
-  getVideoLinkAppointments: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': number[]
-      }
-    }
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['VideoLinkAppointmentsResponse']
         }
       }
     }
@@ -2320,29 +1576,6 @@ export interface operations {
       }
     }
   }
-  getVideoLinkBookingRooms: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description The prison */
-        agencyId: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['LocationIdAndDescription'][]
-        }
-      }
-    }
-  }
   getDlqMessages: {
     parameters: {
       query?: {
@@ -2363,104 +1596,6 @@ export interface operations {
         }
         content: {
           '*/*': components['schemas']['GetDlqResult']
-        }
-      }
-    }
-  }
-  getLocationPrefixFromGroup: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description The prison */
-        agencyId: string
-        /**
-         * @description The group name
-         * @example Houseblock 1
-         */
-        group: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Invalid request. */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Requested resource not found. */
-      404: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Unrecoverable error occurred whilst processing request. */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  getLocationGroup: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description The prison */
-        agencyId: string
-        /** @description The group name */
-        name: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['Location'][]
-        }
-      }
-      /** @description Invalid request. */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['Location'][]
-        }
-      }
-      /** @description Requested resource not found. */
-      404: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['Location'][]
-        }
-      }
-      /** @description Unrecoverable error occurred whilst processing request. */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['Location'][]
         }
       }
     }
@@ -2507,186 +1642,6 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['ScheduledEventDto'][]
-        }
-      }
-    }
-  }
-  getVideoLinkBookingEvents: {
-    parameters: {
-      query: {
-        /** @description The earliest date for which to return event details. */
-        'start-date': string
-        /** @description Return details of events occurring within this number of days of start-date */
-        days?: number
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'text/csv': string
-        }
-      }
-    }
-  }
-  getCourtHearingTypes: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': (
-            | 'APPEAL'
-            | 'APPLICATION'
-            | 'BACKER_TRIAL'
-            | 'BAIL'
-            | 'CIVIL'
-            | 'COMMITTAL_FOR_SENTENCE'
-            | 'CUSTODY_TIME_LIMIT_APPLICATIONS'
-            | 'IMMIGRATION_DEPORTATION'
-            | 'FAMILY'
-            | 'TRIAL'
-            | 'FURTHER_CASE_MANAGEMENT'
-            | 'FUTURE_TRIAL_REVIEW'
-            | 'GROUND_RULES'
-            | 'MENTION_DEFENDANT_MUST_ATTEND'
-            | 'MENTION_TO_FIX'
-            | 'NEWTON'
-            | 'PLEA'
-            | 'PLEA_TRIAL_PREPARATION'
-            | 'PRE_TRIAL_REVIEW'
-            | 'PROCEEDS_OF_CRIME_APPLICATIONS'
-            | 'REMAND'
-            | 'SECTION_28'
-            | 'SENTENCE'
-            | 'TRIBUNAL'
-            | 'OTHER'
-          )[]
-        }
-      }
-    }
-  }
-  getCourts: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['Court'][]
-        }
-      }
-    }
-  }
-  getEmailByCourtId: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Court id */
-        courtId: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['CourtEmailDto']
-        }
-      }
-    }
-  }
-  getCourtHearingTypes_1: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': (
-            | 'APPEAL'
-            | 'APPLICATION'
-            | 'BACKER_TRIAL'
-            | 'BAIL'
-            | 'CIVIL'
-            | 'COMMITTAL_FOR_SENTENCE'
-            | 'CUSTODY_TIME_LIMIT_APPLICATIONS'
-            | 'IMMIGRATION_DEPORTATION'
-            | 'FAMILY'
-            | 'TRIAL'
-            | 'FURTHER_CASE_MANAGEMENT'
-            | 'FUTURE_TRIAL_REVIEW'
-            | 'GROUND_RULES'
-            | 'MENTION_DEFENDANT_MUST_ATTEND'
-            | 'MENTION_TO_FIX'
-            | 'NEWTON'
-            | 'PLEA'
-            | 'PLEA_TRIAL_PREPARATION'
-            | 'PRE_TRIAL_REVIEW'
-            | 'PROCEEDS_OF_CRIME_APPLICATIONS'
-            | 'REMAND'
-            | 'SECTION_28'
-            | 'SENTENCE'
-            | 'TRIBUNAL'
-            | 'OTHER'
-          )[]
-        }
-      }
-    }
-  }
-  getCourtNames: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['CourtLocationsResponse']
         }
       }
     }
@@ -2924,6 +1879,8 @@ export interface operations {
         fromDateTime: string
         /** @description Date and Time of the change in format YYYY-MM-DDT:09:45 */
         toDateTime?: string
+        /** @description The agency Id */
+        agencyId?: string
       }
       header?: never
       path?: never
@@ -3077,106 +2034,6 @@ export interface operations {
     requestBody?: never
     responses: {
       /** @description Appointment not found. */
-      404: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Unrecoverable error occurred whilst processing request. */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  getWhereabouts: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description The prison */
-        agencyId: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['WhereaboutsConfig']
-        }
-      }
-      /** @description Invalid request. */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['WhereaboutsConfig']
-        }
-      }
-      /** @description Requested resource not found. */
-      404: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['WhereaboutsConfig']
-        }
-      }
-      /** @description Unrecoverable error occurred whilst processing request. */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['WhereaboutsConfig']
-        }
-      }
-    }
-  }
-  getAvailableLocationGroups: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description The prison */
-        agencyId: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['LocationGroup'][]
-        }
-      }
-      /** @description Invalid request. */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Requested resource not found. */
       404: {
         headers: {
           [name: string]: unknown
