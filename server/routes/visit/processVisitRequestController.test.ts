@@ -53,9 +53,29 @@ describe('Process a visit request (approve / reject)', () => {
     it('should approve visit request, set success message and redirect to visits page when coming from visits page', () => {
       return request(app)
         .post('/visit/ab-cd-ef-gh/request/approve')
-        .send({ fromVisits: 'true' })
+        .send({ redirectTo: 'visits' })
         .expect(302)
         .expect('location', '/visits')
+        .expect(() => {
+          expect(flashProvider).toHaveBeenCalledWith('messages', {
+            variant: 'success',
+            title: 'You approved the request and booked the visit with John Smith',
+            showTitleAsHeading: true,
+            html: 'The main contact has been notified. You can <a href="/visit/ab-cd-ef-gh">view this visit again</a>.',
+          })
+
+          expect(visitRequestsService.approveVisitRequest).toHaveBeenCalledWith('user1', visitDetails.reference)
+          expect(visitRequestsService.rejectVisitRequest).not.toHaveBeenCalled()
+          expect(visitService.getVisitDetailed).not.toHaveBeenCalled()
+        })
+    })
+
+    it('should approve visit request, set success message and redirect to profile page when coming from profile page', () => {
+      return request(app)
+        .post('/visit/ab-cd-ef-gh/request/approve')
+        .send({ redirectTo: 'profile', prisonerId: 'A1234BC' })
+        .expect(302)
+        .expect('location', '/prisoner/A1234BC')
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledWith('messages', {
             variant: 'success',
@@ -101,9 +121,35 @@ describe('Process a visit request (approve / reject)', () => {
 
       return request(app)
         .post('/visit/ab-cd-ef-gh/request/approve')
-        .send({ fromVisits: 'true' })
+        .send({ redirectTo: 'visits' })
         .expect(302)
         .expect('location', '/visits')
+        .expect(() => {
+          expect(flashProvider).toHaveBeenCalledWith('messages', {
+            variant: 'information',
+            title: 'The visit to John Smith has already been approved',
+            showTitleAsHeading: true,
+            html: 'The main contact has been notified. You can <a href="/visit/ab-cd-ef-gh">view this visit again</a>.',
+          })
+
+          expect(visitRequestsService.approveVisitRequest).toHaveBeenCalledWith('user1', visitDetails.reference)
+          expect(visitRequestsService.rejectVisitRequest).not.toHaveBeenCalled()
+          expect(visitService.getVisitDetailed).toHaveBeenCalledWith({
+            username: 'user1',
+            reference: visitDetails.reference,
+          })
+        })
+    })
+
+    it('should handle 400 Bad Request from API, set failure message and redirect to profile page when coming from profile page', () => {
+      visitDetails.visitSubStatus = 'APPROVED'
+      visitRequestsService.approveVisitRequest.mockRejectedValue(new BadRequest())
+
+      return request(app)
+        .post('/visit/ab-cd-ef-gh/request/approve')
+        .send({ redirectTo: 'profile', prisonerId: 'A1234BC' })
+        .expect(302)
+        .expect('location', '/prisoner/A1234BC')
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledWith('messages', {
             variant: 'information',

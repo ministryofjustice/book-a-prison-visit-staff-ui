@@ -3,6 +3,7 @@ import { VisitRequestsService, VisitService } from '../../services'
 import { MoJAlert } from '../../@types/bapv'
 import { convertToTitleCase } from '../../utils/utils'
 import { VisitBookingDetails, VisitRequestResponse } from '../../data/orchestrationApiTypes'
+import { isValidPrisonerNumber } from '../validationChecks'
 
 type RequestAction = 'approve' | 'reject'
 
@@ -16,7 +17,17 @@ export default class ProcessVisitRequestController {
     return async (req, res, next) => {
       const { reference } = req.params
       const { username } = res.locals.user
-      const redirectPath = req.body?.fromVisits === 'true' ? '/visits' : '/requested-visits'
+      let redirectPath = '/requested-visits'
+
+      if (req.body?.redirectTo === 'visits') {
+        redirectPath = '/visits'
+      } else if (req.body?.redirectTo === 'profile') {
+        const prisonerId = req.body?.prisonerId
+
+        if (isValidPrisonerNumber(prisonerId)) {
+          redirectPath = `/prisoner/${prisonerId}`
+        }
+      }
 
       try {
         const visitRequestResponse =

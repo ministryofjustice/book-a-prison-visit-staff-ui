@@ -26,6 +26,7 @@ export default function routes({ auditService, prisonerProfileService }: Service
     })
 
     return res.render('pages/prisoner/profile', {
+      messages: req.flash('messages'),
       errors: req.flash('errors'),
       ...prisonerProfile,
       prisonerName: `${prisonerProfile.prisonerDetails.lastName}, ${prisonerProfile.prisonerDetails.firstName}`,
