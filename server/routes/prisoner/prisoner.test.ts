@@ -30,7 +30,7 @@ jest.mock('../visitorUtils', () => ({
 }))
 
 beforeEach(() => {
-  flashData = { errors: [], formValues: [] }
+  flashData = { errors: [], formValues: [], messages: [] }
   flashProvider.mockImplementation((key: keyof FlashData) => flashData[key])
 
   visitSessionData = {}
@@ -140,6 +140,26 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
             username: 'user1',
             operationId: undefined,
           })
+        })
+    })
+
+    it('should render display alert if returning from approve/reject', () => {
+      flashData.messages = [
+        {
+          variant: 'success',
+          title: 'title',
+          text: '',
+        },
+      ]
+
+      return request(app)
+        .get('/prisoner/A1234BC')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('.moj-alert').length).toBe(1)
+          expect(flashProvider).toHaveBeenCalledWith('messages')
         })
     })
 
@@ -351,7 +371,6 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
           expect($('label[for="vo-override"]').text()).toContain('The prisoner has no available visiting orders')
           expect($('[data-test="book-a-visit"]').length).toBe(1)
           expect(flashProvider).toHaveBeenCalledWith('errors')
-          expect(flashProvider).toHaveBeenCalledTimes(1)
           expect(auditService.viewPrisoner).toHaveBeenCalledTimes(1)
           expect(auditService.viewPrisoner).toHaveBeenCalledWith({
             prisonerId: 'A1234BC',

@@ -20,9 +20,11 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
       {# Messages #}
-      {% for message in messages %}
-        {{ mojAlert(message) }}
-      {% endfor %}
+      {% if messages.length %}
+        {% for message in messages %}
+          {{ mojAlert(message) }}
+        {% endfor %}
+      {% endif %}
 
       {% include "partials/errorSummary.njk" %}
 

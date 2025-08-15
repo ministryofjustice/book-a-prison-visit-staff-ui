@@ -23,7 +23,7 @@ const visitService = createMockVisitService()
 const visitSessionsService = createMockVisitSessionsService()
 
 beforeEach(() => {
-  flashData = { errors: [], formValues: [] }
+  flashData = { errors: [], formValues: [], messages: [] }
   flashProvider.mockImplementation((key: keyof FlashData) => flashData[key])
 
   blockedDatesService.isBlockedDate.mockResolvedValue(false)
@@ -160,18 +160,13 @@ describe('GET /visits - Visits by date page', () => {
     })
 
     it('should render display alert if returning from approve/reject', () => {
-      flashData = {
-        errors: [],
-        formValues: [],
-        messages: [
-          {
-            variant: 'success',
-            title: 'title',
-            text: '',
-          },
-        ],
-      }
-      flashProvider.mockImplementation((key: keyof FlashData) => flashData[key])
+      flashData.messages = [
+        {
+          variant: 'success',
+          title: 'title',
+          text: '',
+        },
+      ]
 
       return request(app)
         .get('/visits')
@@ -180,6 +175,7 @@ describe('GET /visits - Visits by date page', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('.moj-alert').length).toBe(1)
+          expect(flashProvider).toHaveBeenCalledWith('messages')
         })
     })
 
