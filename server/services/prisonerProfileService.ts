@@ -32,7 +32,7 @@ export default class PrisonerProfileService {
       }
       const month = visitsByMonth.get(visitMonth)
 
-      if (visit.visitStatus === 'BOOKED') {
+      if (['APPROVED', 'AUTO_APPROVED', 'REQUESTED'].includes(visit.visitSubStatus)) {
         const isUpcoming = isBefore(now, visitStartTime)
         if (isUpcoming) {
           month.upcomingCount += 1

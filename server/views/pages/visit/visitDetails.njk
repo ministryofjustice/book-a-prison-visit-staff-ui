@@ -6,6 +6,7 @@
 {% from "components/visitors.njk" import visitorDateOfBirth %}
 
 {% set pageHeaderTitle = "Visit request details" if visitDetails.visitSubStatus == "REQUESTED" else "Visit booking details" %}
+{% set fromPrisonerProfile = false %}
 
 {% if fromPage == "visit-search" %}
   {% set backLinkHref = "/search/visit/results?" + fromPageQuery %}
@@ -17,6 +18,7 @@
   {% set backLinkHref = "/review" %}
 {% else %}
   {% set backLinkHref = "/prisoner/" + visitDetails.prisoner.prisonerNumber %}
+  {% set fromPrisonerProfile = true %}
 {% endif %}
 
 {% set mainClasses = "bapv-visit-details" %}
@@ -113,7 +115,11 @@
       <div class="govuk-button-group" data-test="visit-request-actions">
         <form action="/visit/{{ visitDetails.reference }}/request/approve" method="POST" novalidate>
           <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-          {% if fromPage == "visits" %}<input type="hidden" name="fromVisits" value="true" data-test="from-visits-page">{% endif %}
+          {% if fromPage == "visits" %}<input type="hidden" name="redirectTo" value="visits" data-test="redirect-to">{% endif %}
+          {% if fromPrisonerProfile %}
+            <input type="hidden" name="redirectTo" value="profile" data-test="redirect-to">
+            <input type="hidden" name="prisonerId" value="{{ prisonerId }}" data-test="prisoner-id">
+          {% endif %}
           {{ govukButton({
             text: "Approve request",
             classes: "govuk-!-margin-top-5 govuk-button--secondary",
@@ -124,7 +130,11 @@
 
         <form action="/visit/{{ visitDetails.reference }}/request/reject" method="POST" novalidate>
           <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-          {% if fromPage == "visits" %}<input type="hidden" name="fromVisits" value="true" data-test="from-visits-page">{% endif %}
+          {% if fromPage == "visits" %}<input type="hidden" name="redirectTo" value="visits" data-test="redirect-to">{% endif %}
+          {% if fromPrisonerProfile %}
+            <input type="hidden" name="redirectTo" value="profile" data-test="redirect-to">
+            <input type="hidden" name="prisonerId" value="{{ prisonerId }}" data-test="prisoner-id">
+          {% endif %}
           {{ govukButton({
             text: "Reject request",
             classes: "govuk-!-margin-top-5 govuk-!-margin-left-6 govuk-button--secondary",

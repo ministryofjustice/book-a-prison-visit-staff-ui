@@ -154,7 +154,7 @@ describe('Visit details page', () => {
         })
     })
 
-    it('should render hidden fromVisit field for a visit request when coming from visits page', () => {
+    it('should render hidden redirect-to field for a visit request when coming from visits page', () => {
       availableVisitActions = { update: false, cancel: false, clearNotifications: false, processRequest: true }
       visitDetails.visitSubStatus = 'REQUESTED'
 
@@ -164,7 +164,22 @@ describe('Visit details page', () => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('[data-test="from-visits-page"]').val()).toBe('true')
+          expect($('[data-test="redirect-to"]').val()).toBe('visits')
+        })
+    })
+
+    it('should render hidden redirect-to field and prisonerId for a visit request when coming from prisoner profile page', () => {
+      availableVisitActions = { update: false, cancel: false, clearNotifications: false, processRequest: true }
+      visitDetails.visitSubStatus = 'REQUESTED'
+
+      return request(app)
+        .get('/visit/ab-cd-ef-gh?from=prisoner')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('[data-test="redirect-to"]').val()).toBe('profile')
+          expect($('[data-test="prisoner-id"]').val()).toBe('A1234BC')
         })
     })
 
