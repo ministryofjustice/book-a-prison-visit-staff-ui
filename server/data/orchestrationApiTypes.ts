@@ -16,6 +16,7 @@ export type VisitBookingDetails = Omit<VisitBookingDetailsRaw, 'events' | 'notif
   notifications: (Omit<VisitNotificationDto, 'type'> & { type: NotificationType })[]
 }
 export type VisitRestriction = Visit['visitRestriction']
+export type VisitSubStatus = Visit['visitSubStatus']
 export type VisitPreview = components['schemas']['VisitPreviewDto']
 
 export type Visitor = components['schemas']['VisitorDto']

@@ -4,7 +4,7 @@ import { getParsedDateFromQueryString } from '../../utils/utils'
 import { getDateTabs, getSelectedOrDefaultSessionSchedule, getSessionsSideNav } from './visitsUtils'
 import type { Services } from '../../services'
 import { getFlashFormValues } from '../visitorUtils'
-import { VisitPreview, VisitRestriction } from '../../data/orchestrationApiTypes'
+import { Visit, VisitPreview, VisitRestriction } from '../../data/orchestrationApiTypes'
 
 export default function routes({
   auditService,
@@ -64,6 +64,7 @@ export default function routes({
 
     // fetch visits if a known session is selected and split into open/closed
     if (sessionSchedule) {
+      const allowedSubStatuses: Partial<Visit['visitSubStatus']>[] = ['APPROVED', 'AUTO_APPROVED', 'REQUESTED']
       const openAndClosedVisits = (
         await visitService.getVisitsBySessionTemplate({
           username,
@@ -71,7 +72,7 @@ export default function routes({
           reference: sessionSchedule.sessionTemplateReference,
           sessionDate: selectedDateString,
         })
-      ).filter(visit => ['APPROVED', 'AUTO_APPROVED', 'REQUESTED'].includes(visit.visitSubStatus))
+      ).filter(visit => allowedSubStatuses.includes(visit.visitSubStatus))
 
       openAndClosedVisits.forEach(visit => {
         visits[visit.visitRestriction].visits.push(visit)

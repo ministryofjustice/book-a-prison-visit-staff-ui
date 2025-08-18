@@ -1,7 +1,7 @@
 import { format, isBefore } from 'date-fns'
 import { PrisonerProfilePage } from '../@types/bapv'
 import { convertToTitleCase, nextIepAdjustDate, nextPrivIepAdjustDate, prisonerDateTimePretty } from '../utils/utils'
-import { Alert } from '../data/orchestrationApiTypes'
+import { Alert, Visit } from '../data/orchestrationApiTypes'
 import { HmppsAuthClient, OrchestrationApiClient, RestClientBuilder } from '../data'
 
 export default class PrisonerProfileService {
@@ -31,8 +31,9 @@ export default class PrisonerProfileService {
         visitsByMonth.set(visitMonth, { upcomingCount: 0, pastCount: 0, visits: [] })
       }
       const month = visitsByMonth.get(visitMonth)
+      const allowedSubStatuses: Partial<Visit['visitSubStatus']>[] = ['APPROVED', 'AUTO_APPROVED', 'REQUESTED']
 
-      if (['APPROVED', 'AUTO_APPROVED', 'REQUESTED'].includes(visit.visitSubStatus)) {
+      if (allowedSubStatuses.includes(visit.visitSubStatus)) {
         const isUpcoming = isBefore(now, visitStartTime)
         if (isUpcoming) {
           month.upcomingCount += 1

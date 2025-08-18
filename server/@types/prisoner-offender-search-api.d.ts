@@ -2177,10 +2177,11 @@ export interface components {
       queries: components['schemas']['Query'][]
       pagination: components['schemas']['PaginationRequest']
     }
-    /** @description A matcher for a boolean attribute from the Prisoner record */
-    BooleanMatcher: {
-      type: 'BooleanMatcher'
-    } & (Omit<WithRequired<components['schemas']['Matcher'], 'type'>, 'type'> & {
+    /** @description A matcher for a boolean attribute from the Prisoner.
+     *
+     *       The type must be set to Boolean for this matcher.
+     *      */
+    BooleanMatcher: Omit<components['schemas']['Matcher'], 'type'> & {
       /**
        * @description The attribute to match
        * @example recall
@@ -2191,12 +2192,13 @@ export interface components {
        * @example true
        */
       condition: boolean
+    } & {
       /**
-       * @description Must be Boolean
-       * @example Boolean
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
        */
-      type: string
-    })
+      type: 'Boolean'
+    }
     /** @description A matcher for a date attribute from the Prisoner record.
      *
      *       For a between clause use both min value and max value. By default the range is inclusive, but can be adjusted with minInclusive and maxInclusive.
@@ -2206,10 +2208,10 @@ export interface components {
      *       For >= enter only a min value, and for > set min inclusive to false.
      *
      *       For equals enter the same date in both the min value and max value and leave min/max inclusive as true.
+     *
+     *       The type must be set to Date for this matcher.
      *        */
-    DateMatcher: {
-      type: 'DateMatcher'
-    } & (Omit<WithRequired<components['schemas']['Matcher'], 'type'>, 'type'> & {
+    DateMatcher: Omit<components['schemas']['Matcher'], 'type'> & {
       /**
        * @description The attribute to match
        * @example releaseDate
@@ -2237,12 +2239,13 @@ export interface components {
        * @default true
        */
       maxInclusive: boolean
+    } & {
       /**
-       * @description Must be Date
-       * @example Date
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
        */
-      type: string
-    })
+      type: 'Date'
+    }
     /** @description A matcher for a date time attribute from the Prisoner record.
      *
      *       For a between clause use both the min and max values.
@@ -2250,10 +2253,10 @@ export interface components {
      *       For < enter only the max value.
      *
      *       For > enter only the min value.
+     *
+     *       The type must be set to DateTime for this matcher.
      *      */
-    DateTimeMatcher: {
-      type: 'DateTimeMatcher'
-    } & (Omit<WithRequired<components['schemas']['Matcher'], 'type'>, 'type'> & {
+    DateTimeMatcher: Omit<components['schemas']['Matcher'], 'type'> & {
       /**
        * @description The attribute to search on
        * @example currentIncentive.dateTime
@@ -2271,12 +2274,13 @@ export interface components {
        * @example 2024-01-31T21:00:00Z
        */
       maxValue?: string
+    } & {
       /**
-       * @description Must be DateTime
-       * @example DateTime
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
        */
-      type: string
-    })
+      type: 'DateTime'
+    }
     /** @description A matcher for an integer attribute from the Prisoner record.
      *
      *       For a between clause use both min value and max value. By default the range is inclusive, but can be adjusted with minInclusive and maxInclusive.
@@ -2285,11 +2289,11 @@ export interface components {
      *
      *       For >= enter only a min value, and for > set min inclusive to false.
      *
-     *       For equals enter the same integer in both the min value and max value and leave min/max inclusive as true.
+     *       For equals enter the same integer in both the min value and max value and leave min/max inclusive as true..
+     *
+     *       The type must be set to Int for this matcher.
      *        */
-    IntMatcher: {
-      type: 'IntMatcher'
-    } & (Omit<WithRequired<components['schemas']['Matcher'], 'type'>, 'type'> & {
+    IntMatcher: Omit<components['schemas']['Matcher'], 'type'> & {
       /**
        * @description The attribute to match on
        * @example heightCentimetres
@@ -2317,12 +2321,14 @@ export interface components {
        * @default true
        */
       maxInclusive: boolean
+    } & {
       /**
-       * @description Must be Int
-       * @example Int
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
        */
-      type: string
-    })
+      type: 'Int'
+    }
+    /** @description Matchers that will be applied to this query */
     Matcher: {
       type: string
     }
@@ -2331,21 +2337,22 @@ export interface components {
      *         This is required because PNC numbers come in various formats with 2/4 long years and with/without leading zeroes.
      *
      *         This matcher will find the matching PNC regardless of which format is used.
+     *
+     *       The type must be set to PNC for this matcher.
      *        */
-    PncMatcher: {
-      type: 'PncMatcher'
-    } & (Omit<WithRequired<components['schemas']['Matcher'], 'type'>, 'type'> & {
+    PncMatcher: Omit<components['schemas']['Matcher'], 'type'> & {
       /**
        * @description The PNC number match
        * @example 24/123456H
        */
       pncNumber: string
+    } & {
       /**
-       * @description Must be PNC
-       * @example PNC
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
        */
-      type: string
-    })
+      type: 'PNC'
+    }
     /** @description A query to search for prisoners by attributes */
     Query: {
       /**
@@ -2367,10 +2374,11 @@ export interface components {
       /** @description A list of sub-queries of type Query that will be combined with the matchers in this query */
       subQueries?: unknown[]
     }
-    /** @description A matcher for a string attribute from the prisoner record */
-    StringMatcher: {
-      type: 'StringMatcher'
-    } & (Omit<WithRequired<components['schemas']['Matcher'], 'type'>, 'type'> & {
+    /** @description A matcher for a string attribute from the prisoner record.
+     *
+     *       The type must be set to String for this matcher.
+     *      */
+    StringMatcher: Omit<components['schemas']['Matcher'], 'type'> & {
       /**
        * @description The attribute to match on
        * @example aliases.lastName
@@ -2387,12 +2395,13 @@ export interface components {
        * @example Smith
        */
       searchTerm: string
+    } & {
       /**
-       * @description Must be String
-       * @example String
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
        */
-      type: string
-    })
+      type: 'String'
+    }
     ReferenceData: {
       value: string
       label: string
@@ -3375,7 +3384,4 @@ export interface operations {
       }
     }
   }
-}
-type WithRequired<T, K extends keyof T> = T & {
-  [P in K]-?: T[P]
 }
