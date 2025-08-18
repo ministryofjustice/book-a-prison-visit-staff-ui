@@ -20,11 +20,9 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
       {# Messages #}
-      {% if messages.length %}
-        {% for message in messages %}
-          {{ mojAlert(message) }}
-        {% endfor %}
-      {% endif %}
+      {% for message in messages %}
+        {{ mojAlert(message) }}
+      {% endfor %}
 
       {% include "partials/errorSummary.njk" %}
 
@@ -166,28 +164,28 @@
               {
                 html: '<span>' + visit.visitType | capitalize + '<br>(' + visit.visitRestriction | capitalize + ')</span>',
                 attributes: { "data-test": "tab-visits-type" },
-                classes: 'status--' + visitStatus if (visitStatus == 'REJECTED') or (visitStatus == 'CANCELLED') else ''
+                classes: 'status--' + visitStatus if (visitStatus == 'REJECTED') or (visitStatus == 'CANCELLED')
               },
               {
                 text: visit.prisonName,
                 attributes: { "data-test": "tab-visits-location" },
-                classes: 'status--' + visitStatus if (visitStatus == 'REJECTED') or (visitStatus == 'CANCELLED') else ''
+                classes: 'status--' + visitStatus if (visitStatus == 'REJECTED') or (visitStatus == 'CANCELLED')
               },
               {
                 html: visit.startTimestamp | formatDate("EEEE d MMMM yyy") + '<br>' +
                   visit.startTimestamp | formatTime + ' - ' + visit.endTimestamp | formatTime,
                 attributes: { "data-test": "tab-visits-date-and-time" },
-                classes: 'status--' + visitStatus if (visitStatus == 'REJECTED') or (visitStatus == 'CANCELLED') else ''
+                classes: 'status--' + visitStatus if (visitStatus == 'REJECTED') or (visitStatus == 'CANCELLED')
               },
               {
                 html: visitorNames | join('<br>'),
                 attributes: { "data-test": "tab-visits-visitors" },
-                classes: 'status--' + visitStatus if (visitStatus == 'REJECTED') or (visitStatus == 'CANCELLED') else ''
+                classes: 'status--' + visitStatus if (visitStatus == 'REJECTED') or (visitStatus == 'CANCELLED')
               },
               {
-                text: visitStatus | properCase,
+                text: visitStatus | capitalize,
                 attributes: { "data-test": "tab-visits-status" },
-                classes: 'status--' + visitStatus if (visitStatus == 'REJECTED') or (visitStatus == 'CANCELLED') else ''
+                classes: 'status--' + visitStatus if (visitStatus == 'REJECTED') or (visitStatus == 'CANCELLED')
               }
             ]), visitRows) %}
           {% endfor %}
