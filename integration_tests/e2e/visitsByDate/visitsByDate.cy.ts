@@ -41,6 +41,7 @@ context('View visits by date', () => {
       visitReference: 'bc-de-ef-gh',
       visitorCount: 1,
       firstBookedDateTime: '2022-01-01T09:00:00',
+      visitSubStatus: 'REQUESTED',
     }),
   ]
 
@@ -80,16 +81,18 @@ context('View visits by date', () => {
 
     visitsByDatePage.visitSessionHeading().contains('Visits from 1:45pm to 3:45pm')
     visitsByDatePage.visitSectionHeading('open').contains('Open visits')
-    visitsByDatePage.tablesBookedCount('open').contains('2 of 40 tables booked')
+    visitsByDatePage.tablesBookedCount('open').contains('2 of 40 tables reserved')
     visitsByDatePage.visitorsTotalCount('open').contains('3 visitors')
 
     // visits with default sort (last booked first)
     visitsByDatePage.prisonerName(1).contains('Smith, John')
     visitsByDatePage.prisonerNumber(1).contains('A1234BC')
     visitsByDatePage.bookedOn(1).contains('2 January at 2:30pm')
+    visitsByDatePage.visitStatus(1).contains('Booked')
     visitsByDatePage.prisonerName(2).contains('Jones, Fred')
     visitsByDatePage.prisonerNumber(2).contains('B1234CD')
     visitsByDatePage.bookedOn(2).contains('1 January at 9am')
+    visitsByDatePage.visitStatus(2).contains('Requested')
 
     // Click 'Booked on' header to sort and show first booked first
     visitsByDatePage.bookedOnHeader().click()
@@ -98,9 +101,11 @@ context('View visits by date', () => {
     visitsByDatePage.prisonerName(1).contains('Jones, Fred')
     visitsByDatePage.prisonerNumber(1).contains('B1234CD')
     visitsByDatePage.bookedOn(1).contains('1 January at 9am')
+    visitsByDatePage.visitStatus(1).contains('Requested')
     visitsByDatePage.prisonerName(2).contains('Smith, John')
     visitsByDatePage.prisonerNumber(2).contains('A1234BC')
     visitsByDatePage.bookedOn(2).contains('2 January at 2:30pm')
+    visitsByDatePage.visitStatus(2).contains('Booked')
 
     // select last session from side nav
     cy.task('stubGetVisitsBySessionTemplate', {
@@ -113,7 +118,7 @@ context('View visits by date', () => {
 
     visitsByDatePage.visitSessionHeading().contains('Visits from 1pm to 2pm')
     visitsByDatePage.visitSectionHeading('closed').contains('Closed visits')
-    visitsByDatePage.tablesBookedCount('closed').contains('0 of 10 tables booked')
+    visitsByDatePage.tablesBookedCount('closed').contains('0 of 10 tables reserved')
     visitsByDatePage.visitorsTotalCount('closed').should('not.exist')
 
     // select tomorrow
@@ -159,12 +164,13 @@ context('View visits by date', () => {
 
     visitsByDatePage.visitSessionHeading().contains('Visits from 9am to 10am')
     visitsByDatePage.visitSectionHeading('unknown').contains('All visits')
-    visitsByDatePage.tablesBookedCount('unknown').contains('1 table booked')
+    visitsByDatePage.tablesBookedCount('unknown').contains('1 table reserved')
     visitsByDatePage.visitorsTotalCount('unknown').contains('2 visitors')
 
     visitsByDatePage.prisonerName(1).contains('Smith, John')
     visitsByDatePage.prisonerNumber(1).contains('A1234BC')
     visitsByDatePage.bookedOn(1).contains('1 January at 9am')
+    visitsByDatePage.visitStatus(1).contains('Booked')
 
     // select the second 'unknown' visits session
     visitsByDatePage.selectSessionNavItem(1)
@@ -176,15 +182,17 @@ context('View visits by date', () => {
 
     visitsByDatePage.visitSessionHeading().contains('Visits from 1:45pm to 3:45pm')
     visitsByDatePage.visitSectionHeading('unknown').contains('All visits')
-    visitsByDatePage.tablesBookedCount('unknown').contains('2 tables booked')
+    visitsByDatePage.tablesBookedCount('unknown').contains('2 tables reserved')
     visitsByDatePage.visitorsTotalCount('unknown').contains('3 visitors')
 
     visitsByDatePage.prisonerName(1).contains('Smith, John')
     visitsByDatePage.prisonerNumber(1).contains('A1234BC')
     visitsByDatePage.bookedOn(1).contains('2 January at 2:30pm')
+    visitsByDatePage.visitStatus(1).contains('Booked')
     visitsByDatePage.prisonerName(2).contains('Jones, Fred')
     visitsByDatePage.prisonerNumber(2).contains('B1234CD')
     visitsByDatePage.bookedOn(2).contains('1 January at 9am')
+    visitsByDatePage.visitStatus(2).contains('Requested')
   })
 
   it('should show visits by date, and change date using the date picker', () => {

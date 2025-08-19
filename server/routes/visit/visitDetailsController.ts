@@ -68,6 +68,7 @@ export default class VisitDetailsController {
         prisonerLocation,
         visitDetails,
         flaggedVisitorRestrictionIds,
+        prisonerId: prisoner.prisonerNumber,
       })
     }
   }

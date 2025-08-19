@@ -30,7 +30,7 @@ jest.mock('../visitorUtils', () => ({
 }))
 
 beforeEach(() => {
-  flashData = { errors: [], formValues: [] }
+  flashData = { errors: [], formValues: [], messages: [] }
   flashProvider.mockImplementation((key: keyof FlashData) => flashData[key])
 
   visitSessionData = {}
@@ -143,6 +143,26 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
         })
     })
 
+    it('should render display alert if returning from approve/reject', () => {
+      flashData.messages = [
+        {
+          variant: 'success',
+          title: 'title',
+          text: '',
+        },
+      ]
+
+      return request(app)
+        .get('/prisoner/A1234BC')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('.moj-alert').length).toBe(1)
+          expect(flashProvider).toHaveBeenCalledWith('messages')
+        })
+    })
+
     it('should show back link to search results page with querystring', () => {
       return request(app)
         .get('/prisoner/A1234BC?search=A1234BC')
@@ -175,22 +195,30 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
       const upcomingVisit = TestData.visitSummary({
         startTimestamp: '2023-03-02T10:00',
         endTimestamp: '2023-03-02T11:00',
+        visitSubStatus: 'AUTO_APPROVED',
+        visitors,
+      })
+      const approvedVisit = TestData.visitSummary({
+        startTimestamp: '2023-03-02T10:00',
+        endTimestamp: '2023-03-02T11:00',
+        visitSubStatus: 'APPROVED',
         visitors,
       })
       const pastVisit = TestData.visitSummary({
         startTimestamp: '2023-02-03T10:00',
         endTimestamp: '2023-02-03T11:00',
+        visitSubStatus: 'AUTO_APPROVED',
         visitors,
       })
       const cancelledVisit = TestData.visitSummary({
         startTimestamp: '2023-02-03T10:00',
         endTimestamp: '2023-02-03T11:00',
-        visitStatus: 'CANCELLED',
+        visitSubStatus: 'CANCELLED',
         visitors,
       })
 
       prisonerProfile.visitsByMonth = new Map([
-        ['March 2023', { upcomingCount: 1, pastCount: 0, visits: [upcomingVisit] }],
+        ['March 2023', { upcomingCount: 2, pastCount: 0, visits: [upcomingVisit, approvedVisit] }],
         ['February 2023', { upcomingCount: 0, pastCount: 1, visits: [pastVisit, cancelledVisit] }],
         ['January 2023', { upcomingCount: 0, pastCount: 0, visits: [cancelledVisit] }],
       ])
@@ -202,8 +230,8 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('h1').text().trim()).toBe('Smith, John')
-          expect($('.prisoner-profile-visits:nth-child(1) caption').text()).toBe('March 2023 (1 upcoming visit)')
-          expect($('.prisoner-profile-visits:nth-child(1) [data-test="tab-visits-reference"]').length).toBe(1)
+          expect($('.prisoner-profile-visits:nth-child(1) caption').text()).toBe('March 2023 (2 upcoming visits)')
+          expect($('.prisoner-profile-visits:nth-child(1) [data-test="tab-visits-reference"]').length).toBe(2)
           expect($('.prisoner-profile-visits:nth-child(1) [data-test="tab-visits-reference"]').eq(0).text()).toBe(
             upcomingVisit.reference,
           )
@@ -343,7 +371,6 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
           expect($('label[for="vo-override"]').text()).toContain('The prisoner has no available visiting orders')
           expect($('[data-test="book-a-visit"]').length).toBe(1)
           expect(flashProvider).toHaveBeenCalledWith('errors')
-          expect(flashProvider).toHaveBeenCalledTimes(1)
           expect(auditService.viewPrisoner).toHaveBeenCalledTimes(1)
           expect(auditService.viewPrisoner).toHaveBeenCalledWith({
             prisonerId: 'A1234BC',

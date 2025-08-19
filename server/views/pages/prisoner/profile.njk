@@ -5,6 +5,7 @@
 {% from "govuk/components/tabs/macro.njk" import govukTabs %}
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {%- from "moj/components/banner/macro.njk" import mojBanner -%}
+{%- from "moj/components/alert/macro.njk" import mojAlert -%}
 
 {% set pageHeaderTitle = prisonerName %}
 
@@ -18,6 +19,10 @@
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
+      {# Messages #}
+      {% for message in messages %}
+        {{ mojAlert(message) }}
+      {% endfor %}
 
       {% include "partials/errorSummary.njk" %}
 
@@ -138,6 +143,19 @@
               {% set visitorNames = (visitorNames.push((visitor.firstName + ' ' + visitor.lastName) | escape), visitorNames) %}
             {% endfor %}
 
+            {% if (visit.visitSubStatus == "APPROVED") or (visit.visitSubStatus == "AUTO_APPROVED") %}
+              {% set visitStatus = "BOOKED" %}
+            {% endif %}
+            {% if (visit.visitSubStatus == "REQUESTED") %}
+              {% set visitStatus = "REQUESTED" %}
+            {% endif %}
+            {% if (visit.visitSubStatus == "REJECTED") or (visit.visitSubStatus == "AUTO_REJECTED") %}
+              {% set visitStatus = "REJECTED" %}
+            {% endif %}
+            {% if (visit.visitSubStatus == "CANCELLED") or (visit.visitSubStatus == "WITHDRAWN") %}
+              {% set visitStatus = "CANCELLED" %}
+            {% endif %}
+
             {% set visitRows = (visitRows.push([
               {
                 html: '<a class="govuk-link--no-visited-state" href="/visit/' + visit.reference + '">' +  visit.reference + '</a>',
@@ -145,24 +163,29 @@
               },
               {
                 html: '<span>' + visit.visitType | capitalize + '<br>(' + visit.visitRestriction | capitalize + ')</span>',
-                attributes: { "data-test": "tab-visits-type" }
+                attributes: { "data-test": "tab-visits-type" },
+                classes: 'status--' + visitStatus if (visitStatus == 'REJECTED') or (visitStatus == 'CANCELLED')
               },
               {
                 text: visit.prisonName,
-                attributes: { "data-test": "tab-visits-location" }
+                attributes: { "data-test": "tab-visits-location" },
+                classes: 'status--' + visitStatus if (visitStatus == 'REJECTED') or (visitStatus == 'CANCELLED')
               },
               {
                 html: visit.startTimestamp | formatDate("EEEE d MMMM yyy") + '<br>' +
                   visit.startTimestamp | formatTime + ' - ' + visit.endTimestamp | formatTime,
-                attributes: { "data-test": "tab-visits-date-and-time" }
+                attributes: { "data-test": "tab-visits-date-and-time" },
+                classes: 'status--' + visitStatus if (visitStatus == 'REJECTED') or (visitStatus == 'CANCELLED')
               },
               {
                 html: visitorNames | join('<br>'),
-                attributes: { "data-test": "tab-visits-visitors" }
+                attributes: { "data-test": "tab-visits-visitors" },
+                classes: 'status--' + visitStatus if (visitStatus == 'REJECTED') or (visitStatus == 'CANCELLED')
               },
               {
-                text: visit.visitStatus | capitalize,
-                attributes: { "data-test": "tab-visits-status" }
+                text: visitStatus | capitalize,
+                attributes: { "data-test": "tab-visits-status" },
+                classes: 'status--' + visitStatus if (visitStatus == 'REJECTED') or (visitStatus == 'CANCELLED')
               }
             ]), visitRows) %}
           {% endfor %}

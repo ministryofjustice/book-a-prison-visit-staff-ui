@@ -57,7 +57,7 @@ export function registerNunjucks(app?: express.Express): Environment {
 
   njkEnv.addFilter('initialiseName', initialiseName)
 
-  njkEnv.addFilter('formatLastNameFirst', (fullName: string, properCase = true) => {
+  njkEnv.addFilter('formatLastNameFirst', (fullName: string, useProperCase = true) => {
     // this check is for the authError page
     if (!fullName) {
       return null
@@ -65,7 +65,7 @@ export function registerNunjucks(app?: express.Express): Environment {
 
     const array = fullName.split(' ')
 
-    if (properCase) {
+    if (useProperCase) {
       return array.length === 1
         ? properCaseFullName(array[0])
         : `${properCaseFullName(array.at(-1))}, ${properCaseFullName(array[0])}`

@@ -4,7 +4,7 @@ import { getParsedDateFromQueryString } from '../../utils/utils'
 import { getDateTabs, getSelectedOrDefaultSessionSchedule, getSessionsSideNav } from './visitsUtils'
 import type { Services } from '../../services'
 import { getFlashFormValues } from '../visitorUtils'
-import { VisitPreview, VisitRestriction } from '../../data/orchestrationApiTypes'
+import { Visit, VisitPreview, VisitRestriction } from '../../data/orchestrationApiTypes'
 
 export default function routes({
   auditService,
@@ -64,12 +64,15 @@ export default function routes({
 
     // fetch visits if a known session is selected and split into open/closed
     if (sessionSchedule) {
-      const openAndClosedVisits = await visitService.getVisitsBySessionTemplate({
-        username,
-        prisonId,
-        reference: sessionSchedule.sessionTemplateReference,
-        sessionDate: selectedDateString,
-      })
+      const allowedSubStatuses: Partial<Visit['visitSubStatus']>[] = ['APPROVED', 'AUTO_APPROVED', 'REQUESTED']
+      const openAndClosedVisits = (
+        await visitService.getVisitsBySessionTemplate({
+          username,
+          prisonId,
+          reference: sessionSchedule.sessionTemplateReference,
+          sessionDate: selectedDateString,
+        })
+      ).filter(visit => allowedSubStatuses.includes(visit.visitSubStatus))
 
       openAndClosedVisits.forEach(visit => {
         visits[visit.visitRestriction].visits.push(visit)
@@ -113,6 +116,7 @@ export default function routes({
 
     return res.render('pages/visitsByDate/visitsByDate', {
       errors: req.flash('errors'),
+      messages: req.flash('messages'),
       formValues: getFlashFormValues(req),
       dateTabs: getDateTabs(selectedDateString, firstTabDateString, 3),
       sessionSchedule,

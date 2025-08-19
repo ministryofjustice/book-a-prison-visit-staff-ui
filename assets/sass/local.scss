@@ -353,3 +353,8 @@ p.bapv-visit-details__restriction--flagged {
     @include govuk-font-size($size: 19);
   }
 }
+
+.prisoner-profile-visits .status--REJECTED,
+.prisoner-profile-visits .status--CANCELLED {
+  color: $govuk-secondary-text-colour;
+}

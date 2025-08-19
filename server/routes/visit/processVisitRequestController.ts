@@ -3,6 +3,7 @@ import { VisitRequestsService, VisitService } from '../../services'
 import { MoJAlert } from '../../@types/bapv'
 import { convertToTitleCase } from '../../utils/utils'
 import { VisitBookingDetails, VisitRequestResponse } from '../../data/orchestrationApiTypes'
+import { isValidPrisonerNumber } from '../validationChecks'
 
 type RequestAction = 'approve' | 'reject'
 
@@ -16,6 +17,17 @@ export default class ProcessVisitRequestController {
     return async (req, res, next) => {
       const { reference } = req.params
       const { username } = res.locals.user
+      let redirectPath = '/requested-visits'
+
+      if (req.body?.redirectTo === 'visits') {
+        redirectPath = '/visits'
+      } else if (req.body?.redirectTo === 'profile') {
+        const prisonerId = req.body?.prisonerId
+
+        if (isValidPrisonerNumber(prisonerId)) {
+          redirectPath = `/prisoner/${prisonerId}`
+        }
+      }
 
       try {
         const visitRequestResponse =
@@ -25,14 +37,14 @@ export default class ProcessVisitRequestController {
 
         req.flash('messages', this.getSuccessMessage(action, visitRequestResponse))
 
-        return res.redirect('/requested-visits')
+        return res.redirect(redirectPath)
       } catch (error) {
         // HTTP 400 Bad Request means a visit not in REQUESTED state (i.e. already approved or rejected)
         if (error.status === 400) {
           const visitDetails = await this.visitService.getVisitDetailed({ username, reference })
           req.flash('messages', this.getFailureMessage(visitDetails))
 
-          return res.redirect('/requested-visits')
+          return res.redirect(redirectPath)
         }
 
         return next(error)

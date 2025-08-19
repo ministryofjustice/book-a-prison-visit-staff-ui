@@ -23,7 +23,7 @@ const visitService = createMockVisitService()
 const visitSessionsService = createMockVisitSessionsService()
 
 beforeEach(() => {
-  flashData = { errors: [], formValues: [] }
+  flashData = { errors: [], formValues: [], messages: [] }
   flashProvider.mockImplementation((key: keyof FlashData) => flashData[key])
 
   blockedDatesService.isBlockedDate.mockResolvedValue(false)
@@ -113,12 +113,12 @@ describe('GET /visits - Visits by date page', () => {
           expect($('[data-test=visit-session-heading]').text()).toBe('Visits from 1:45pm to 3:45pm')
 
           expect($('[data-test=visit-section-heading-closed]').text().trim()).toBe('Closed visits')
-          expect($('[data-test=visit-tables-booked-closed]').text().trim()).toBe('0 of 5 tables booked')
+          expect($('[data-test=visit-tables-booked-closed]').text().trim()).toBe('0 of 5 tables reserved')
           expect($('[data-test=visit-visitors-total-closed]').length).toBe(0)
           expect($('[data-test=visits-closed]').length).toBe(0)
 
           expect($('[data-test=visit-section-heading-open]').text().trim()).toBe('Open visits')
-          expect($('[data-test=visit-tables-booked-open]').text().trim()).toBe('1 of 20 tables booked')
+          expect($('[data-test=visit-tables-booked-open]').text().trim()).toBe('1 of 20 tables reserved')
           expect($('[data-test=visit-visitors-total-open]').text()).toBe('2 visitors')
 
           expect($('[data-test=visits-open] [data-test="prisoner-name"]').eq(0).text()).toBe('Smith, John')
@@ -159,6 +159,26 @@ describe('GET /visits - Visits by date page', () => {
         })
     })
 
+    it('should render display alert if returning from approve/reject', () => {
+      flashData.messages = [
+        {
+          variant: 'success',
+          title: 'title',
+          text: '',
+        },
+      ]
+
+      return request(app)
+        .get('/visits')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('.moj-alert').length).toBe(1)
+          expect(flashProvider).toHaveBeenCalledWith('messages')
+        })
+    })
+
     it('should render date tabs, side-nav and visits for a specific date and session', () => {
       return request(app)
         .get('/visits?sessionReference=-afe.dcc.0f&selectedDate=2024-02-02&firstTabDate=2024-02-01')
@@ -182,12 +202,12 @@ describe('GET /visits - Visits by date page', () => {
           expect($('[data-test=visit-session-heading]').text()).toBe('Visits from 1:45pm to 3:45pm')
 
           expect($('[data-test=visit-section-heading-closed]').text().trim()).toBe('Closed visits')
-          expect($('[data-test=visit-tables-booked-closed]').text().trim()).toBe('0 of 5 tables booked')
+          expect($('[data-test=visit-tables-booked-closed]').text().trim()).toBe('0 of 5 tables reserved')
           expect($('[data-test=visit-visitors-total-closed]').length).toBe(0)
           expect($('[data-test=visits-closed]').length).toBe(0)
 
           expect($('[data-test=visit-section-heading-open]').text().trim()).toBe('Open visits')
-          expect($('[data-test=visit-tables-booked-open]').text().trim()).toBe('1 of 20 tables booked')
+          expect($('[data-test=visit-tables-booked-open]').text().trim()).toBe('1 of 20 tables reserved')
           expect($('[data-test=visit-visitors-total-open]').text()).toBe('2 visitors')
 
           expect($('[data-test=visits-open] [data-test="prisoner-name"]').eq(0).text()).toBe('Smith, John')
@@ -254,7 +274,7 @@ describe('GET /visits - Visits by date page', () => {
           expect($('[data-test=visit-room-caption]').text()).toBe('Visits hall')
           expect($('[data-test=visit-session-heading]').text()).toBe('Visits from 1:45pm to 3:45pm')
           expect($('[data-test=visit-section-heading-open]').text().trim()).toBe('Open visits')
-          expect($('[data-test=visit-tables-booked-open]').text().trim()).toBe('1 of 20 tables booked')
+          expect($('[data-test=visit-tables-booked-open]').text().trim()).toBe('1 of 20 tables reserved')
           expect($('[data-test=visit-visitors-total-open]').text()).toBe('2 visitors')
 
           expect(blockedDatesService.isBlockedDate).not.toHaveBeenCalled()
@@ -339,7 +359,7 @@ describe('GET /visits - Visits by date page', () => {
           expect($('[data-test=visit-section-heading-open]').length).toBe(0)
 
           expect($('[data-test=visit-section-heading-unknown]').text().trim()).toBe('All visits')
-          expect($('[data-test=visit-tables-booked-unknown]').text().trim()).toBe('1 table booked')
+          expect($('[data-test=visit-tables-booked-unknown]').text().trim()).toBe('1 table reserved')
           expect($('[data-test=visit-visitors-total-unknown]').text()).toBe('2 visitors')
 
           expect($('[data-test=visits-unknown] [data-test="prisoner-name"]').eq(0).text()).toBe('Smith, John')
@@ -399,7 +419,7 @@ describe('GET /visits - Visits by date page', () => {
           expect($('[data-test=visit-section-heading-open]').length).toBe(0)
 
           expect($('[data-test=visit-section-heading-unknown]').text().trim()).toBe('All visits')
-          expect($('[data-test=visit-tables-booked-unknown]').text().trim()).toBe('1 table booked')
+          expect($('[data-test=visit-tables-booked-unknown]').text().trim()).toBe('1 table reserved')
           expect($('[data-test=visit-visitors-total-unknown]').text()).toBe('2 visitors')
 
           expect($('[data-test=visits-unknown] [data-test="prisoner-name"]').eq(0).text()).toBe('Smith, John')
@@ -476,12 +496,12 @@ describe('GET /visits - Visits by date page', () => {
           expect($('[data-test=visit-session-heading]').text()).toBe('Visits from 1:45pm to 3:45pm')
 
           expect($('[data-test=visit-section-heading-closed]').text().trim()).toBe('Closed visits')
-          expect($('[data-test=visit-tables-booked-closed]').text().trim()).toBe('0 of 5 tables booked')
+          expect($('[data-test=visit-tables-booked-closed]').text().trim()).toBe('0 of 5 tables reserved')
           expect($('[data-test=visit-visitors-total-closed]').length).toBe(0)
           expect($('[data-test=visits-closed]').length).toBe(0)
 
           expect($('[data-test=visit-section-heading-open]').text().trim()).toBe('Open visits')
-          expect($('[data-test=visit-tables-booked-open]').text().trim()).toBe('1 of 20 tables booked')
+          expect($('[data-test=visit-tables-booked-open]').text().trim()).toBe('1 of 20 tables reserved')
           expect($('[data-test=visit-visitors-total-open]').text()).toBe('2 visitors')
 
           expect($('[data-test=visits-open] [data-test="prisoner-name"]').eq(0).text()).toBe('Smith, John')

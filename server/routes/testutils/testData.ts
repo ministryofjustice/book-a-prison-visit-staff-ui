@@ -674,6 +674,8 @@ export default class TestData {
     visitTimeSlot = { startTime: '13:45', endTime: '15:45' },
     firstBookedDateTime = '2022-01-01T09:00:00',
     visitRestriction = 'OPEN',
+    visitStatus = 'BOOKED',
+    visitSubStatus = 'APPROVED',
   }: Partial<VisitPreview> = {}): VisitPreview => ({
     prisonerId,
     firstName,
@@ -683,6 +685,8 @@ export default class TestData {
     visitTimeSlot,
     firstBookedDateTime,
     visitRestriction,
+    visitStatus,
+    visitSubStatus,
   })
 
   static visitRequestResponse = ({
@@ -748,6 +752,7 @@ export default class TestData {
     prisonName = 'Hewell (HMP)',
     visitType = 'SOCIAL',
     visitStatus = 'BOOKED',
+    visitSubStatus = 'APPROVED',
     visitRestriction = 'OPEN',
     startTimestamp = '2022-01-14T10:00:00',
     endTimestamp = '2022-01-14T11:00:00',
@@ -766,6 +771,7 @@ export default class TestData {
       prisonName,
       visitType,
       visitStatus,
+      visitSubStatus,
       visitRestriction,
       startTimestamp,
       endTimestamp,

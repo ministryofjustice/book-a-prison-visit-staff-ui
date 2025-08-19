@@ -6,6 +6,7 @@
 {%- from "moj/components/side-navigation/macro.njk" import mojSideNavigation -%}
 {%- from "moj/components/sub-navigation/macro.njk" import mojSubNavigation -%}
 {%- from "moj/components/date-picker/macro.njk" import mojDatePicker -%}
+{%- from "moj/components/alert/macro.njk" import mojAlert -%}
 
 {% set pageHeaderTitle = "View visits by date" %}
 
@@ -23,7 +24,7 @@
     </h3>
 
     <p data-test="visit-tables-booked-{{ type}}">
-      {{ visitsSection.visits | length }}{{ (" of " + capacity) if capacity }} {{ "table" | pluralise(capacity or visitsSection.visits | length)}} booked
+      {{ visitsSection.visits | length }}{{ (" of " + capacity) if capacity }} {{ "table" | pluralise(capacity or visitsSection.visits | length)}} reserved
     </p>
 
     {% if visitsSection.visits | length %}
@@ -33,6 +34,7 @@
 
       {% set visitsRows = [] %}
       {% for visit in visitsSection.visits %}
+        {% set visitStatus = "REQUESTED" if (visit.visitSubStatus == "REQUESTED") else "BOOKED" %}
         {% set visitsRows = (visitsRows.push([
           {
             text: visit.lastName | capitalize + ", " + visit.firstName | capitalize,
@@ -49,6 +51,10 @@
               "data-test": "booked-on",
               "data-sort-value": visit.firstBookedDateTime | formatDate("t")
             }
+          },
+          {
+            text: visitStatus | capitalize,
+            attributes: { "data-test": "visit-status" }
           },
           {
             classes: "govuk-!-text-align-right",
@@ -78,10 +84,16 @@
               }
             },
             {
-              text: "Booked on",
+              text: "Requested on",
               attributes: {
                 "aria-sort": "descending",
                 "data-test": "header-booked-on"
+              }
+            },
+            {
+              text: "Visit status",
+              attributes: {
+                "aria-sort": "none"
               }
             },
             {
@@ -98,6 +110,10 @@
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
+      {# Messages #}
+      {% for message in messages %}
+        {{ mojAlert(message) }}
+      {% endfor %}
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
       {% include "partials/errorSummary.njk" %}
     </div>
