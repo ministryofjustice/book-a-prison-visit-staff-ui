@@ -21,5 +21,7 @@ generic-service:
 
     REDIS_KEY: "bapv-staff-prod"
 
+    FEATURE_VISIT_REQUEST: "true"
+
 generic-prometheus-alerts:
   alertSeverity: visits-alerts
