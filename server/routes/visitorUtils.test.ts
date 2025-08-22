@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import { Session, SessionData } from 'express-session'
 import { FlashFormValues, VisitSlot, VisitSlotList } from '../@types/bapv'
-import { clearSession, getFlashFormValues, getSelectedSlot, getSlotByTimeAndRestriction } from './visitorUtils'
+import { clearSession, getFlashFormValues, getSelectedSlot, getMatchingSlot } from './visitorUtils'
 import TestData from './testutils/testData'
 
 const prisonId = 'HEI'
@@ -126,24 +126,33 @@ describe('getSelectedSlot', () => {
   })
 })
 
-describe('getSlotByTimeAndRestriction', () => {
+describe('getMatchingSlot', () => {
   it('should return a slot given matching start/end timestamp and visit restriction', () => {
-    expect(getSlotByTimeAndRestriction(slotsList, '2022-02-14T12:00:00', '2022-02-14T13:05:00', 'OPEN')).toHaveProperty(
-      'id',
-      '3',
-    )
+    expect(
+      getMatchingSlot(slotsList, '2022-02-14T12:00:00', '2022-02-14T13:05:00', 'OPEN', 'v9d.7ed.7u3'),
+    ).toHaveProperty('id', '3')
   })
 
   it('should return undefined if correct start but incorrect end start time', () => {
-    expect(getSlotByTimeAndRestriction(slotsList, '2022-02-14T12:00:00', '2022-02-14T13:00:00', 'OPEN')).toBe(undefined)
+    expect(getMatchingSlot(slotsList, '2022-02-14T12:00:00', '2022-02-14T13:00:00', 'OPEN', 'v9d.7ed.7u3')).toBe(
+      undefined,
+    )
   })
 
   it('should return undefined if incorrect start but correct end start time', () => {
-    expect(getSlotByTimeAndRestriction(slotsList, '2022-02-14T12:05:00', '2022-02-14T13:05:00', 'OPEN')).toBe(undefined)
+    expect(getMatchingSlot(slotsList, '2022-02-14T12:05:00', '2022-02-14T13:05:00', 'OPEN', 'v9d.7ed.7u3')).toBe(
+      undefined,
+    )
   })
 
   it('should return undefined if correct start/end but wrong restriction', () => {
-    expect(getSlotByTimeAndRestriction(slotsList, '2022-02-14T12:00:00', '2022-02-14T13:05:00', 'CLOSED')).toBe(
+    expect(getMatchingSlot(slotsList, '2022-02-14T12:00:00', '2022-02-14T13:05:00', 'CLOSED', 'abc.def.ghi')).toBe(
+      undefined,
+    )
+  })
+
+  it('should return undefined if correct start, end and restriction, but wrong session template ref', () => {
+    expect(getMatchingSlot(slotsList, '2022-02-14T12:00:00', '2022-02-14T13:05:00', 'OPEN', 'abc.def.ghi')).toBe(
       undefined,
     )
   })

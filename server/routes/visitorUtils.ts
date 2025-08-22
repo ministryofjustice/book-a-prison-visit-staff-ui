@@ -11,11 +11,12 @@ export const getSelectedSlot = (slotsList: VisitSlotList, selectedSlot: string):
     .find(slot => slot.id === selectedSlot)
 }
 
-export const getSlotByTimeAndRestriction = (
+export const getMatchingSlot = (
   slotsList: VisitSlotList,
   startTimestamp: string,
   endTimestamp: string,
   visitRestriction: string,
+  sessionTemplateReference: string,
 ): VisitSlot => {
   return Object.values(slotsList)
     .flat()
@@ -26,7 +27,8 @@ export const getSlotByTimeAndRestriction = (
       slot =>
         slot.startTimestamp === startTimestamp &&
         slot.endTimestamp === endTimestamp &&
-        slot.visitRestriction === visitRestriction,
+        slot.visitRestriction === visitRestriction &&
+        slot.sessionTemplateReference === sessionTemplateReference,
     )
 }
 

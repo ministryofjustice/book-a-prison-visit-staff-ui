@@ -2,7 +2,7 @@ import type { Request, Response } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
 import { BookOrUpdate, MoJAlert, VisitSlot } from '../../@types/bapv'
 import AuditService from '../../services/auditService'
-import { getFlashFormValues, getSelectedSlot, getSlotByTimeAndRestriction } from '../visitorUtils'
+import { getFlashFormValues, getSelectedSlot, getMatchingSlot } from '../visitorUtils'
 import { getUrlPrefix } from './visitJourneyUtils'
 import { VisitService, VisitSessionsService } from '../../services'
 import { isSameVisitSlot } from '../../utils/utils'
@@ -49,11 +49,12 @@ export default class DateAndTime {
 
     // first time here on update journey, visitSlot.id will be ''
     if (isUpdate && visitSessionData.visitSlot?.id === '') {
-      const matchingSlot = getSlotByTimeAndRestriction(
+      const matchingSlot = getMatchingSlot(
         slotsList,
         visitSessionData.visitSlot.startTimestamp,
         visitSessionData.visitSlot.endTimestamp,
         visitSessionData.visitRestriction,
+        visitSessionData.visitSlot.sessionTemplateReference,
       )
 
       if (
@@ -88,11 +89,12 @@ export default class DateAndTime {
     // matching on original time but session's current visit restriction to ensure
     // originally selected time slot is available for re-selection even if restriction changes
     const originalVisitSlot = visitSessionData.originalVisitSlot
-      ? getSlotByTimeAndRestriction(
+      ? getMatchingSlot(
           slotsList,
           visitSessionData.originalVisitSlot.startTimestamp,
           visitSessionData.originalVisitSlot.endTimestamp,
           visitSessionData.visitRestriction,
+          visitSessionData.originalVisitSlot.sessionTemplateReference,
         )
       : undefined
 
