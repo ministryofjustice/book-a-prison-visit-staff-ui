@@ -129,6 +129,15 @@ const getVisitRequestAlert = ({
     }
   }
 
+  if (visitStatus === 'CANCELLED' && visitSubStatus === 'WITHDRAWN') {
+    return {
+      variant: 'information',
+      title: 'Request withdrawn',
+      showTitleAsHeading: true,
+      text: `This visit request was withdrawn by the booker`,
+    }
+  }
+
   return undefined
 }
 
