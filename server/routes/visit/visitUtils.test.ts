@@ -217,6 +217,32 @@ describe('Visit utils', () => {
           },
         ])
       })
+
+      it('should return an alert if visit request is WITHDRAWN', () => {
+        const visitDetails = TestData.visitBookingDetails({
+          visitStatus: 'CANCELLED',
+          visitSubStatus: 'WITHDRAWN',
+          outcomeStatus: 'REQUESTED_VISIT_WITHDRAWN',
+          events: [
+            {
+              type: 'REQUESTED_VISIT_WITHDRAWN',
+              applicationMethodType: 'WEBSITE',
+              actionedByFullName: undefined,
+              userType: 'PUBLIC',
+              createTimestamp: '',
+            },
+          ],
+        })
+
+        expect(getVisitAlerts(visitDetails)).toStrictEqual<MoJAlert[]>([
+          {
+            variant: 'information',
+            title: 'Request withdrawn',
+            showTitleAsHeading: true,
+            text: 'This visit request was withdrawn by the booker',
+          },
+        ])
+      })
     })
 
     describe('Visit request', () => {
