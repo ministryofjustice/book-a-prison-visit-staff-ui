@@ -57,8 +57,6 @@ export default class VisitDetailsController {
 
       const prisonerDpsAlertsUrl = getDpsPrisonerAlertsUrl(visitDetails.prisoner.prisonerNumber)
       const prisonerLocation = getPrisonerLocation(prisoner)
-      console.log(eventsTimeline)
-      console.log(visitDetails.events)
 
       return res.render('pages/visit/visitDetails', {
         availableVisitActions,
