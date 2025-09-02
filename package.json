@@ -137,8 +137,6 @@
     "@types/passport-oauth2": "^1.8.0",
     "@types/superagent": "^8.1.9",
     "@types/supertest": "^6.0.3",
-    "@typescript-eslint/eslint-plugin": "^8.41.0",
-    "@typescript-eslint/parser": "^8.41.0",
     "audit-ci": "^7.1.0",
     "axe-core": "^4.10.3",
     "cheerio": "^1.1.2",
