@@ -33,6 +33,7 @@ import {
   VisitRequestSummary,
   VisitRestriction,
   VisitSession,
+  VisitSessionsAndScheduleDto,
 } from './orchestrationApiTypes'
 import { Prison, VisitSessionData } from '../@types/bapv'
 
@@ -391,6 +392,28 @@ export default class OrchestrationApiClient {
     } catch {
       return null
     }
+  }
+
+  async getVisitSessionsAndSchedule({
+    prisonId,
+    prisonerId,
+    minNumberOfDays,
+    username,
+  }: {
+    prisonId: string
+    prisonerId: string
+    minNumberOfDays: number
+    username: string
+  }): Promise<VisitSessionsAndScheduleDto[]> {
+    return this.restClient.get({
+      path: '/visit-sessions-and-schedule',
+      query: new URLSearchParams({
+        prisonId,
+        prisonerId,
+        min: minNumberOfDays.toString(),
+        username,
+      }).toString(),
+    })
   }
 
   // prisoner-profile-controller
