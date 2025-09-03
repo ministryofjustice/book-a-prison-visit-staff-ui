@@ -1,3 +1,4 @@
+// TODO remove this, types, etc
 import { URLSearchParams } from 'url'
 import RestClient from './restClient'
 import { ScheduledEvent } from './whereaboutsApiTypes'
