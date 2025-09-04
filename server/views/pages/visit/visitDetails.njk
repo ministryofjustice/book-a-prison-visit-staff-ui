@@ -5,7 +5,6 @@
 {%- from "components/expandableComment/macro.njk" import bapvExpandableComment -%}
 {% from "components/visitors.njk" import visitorDateOfBirth %}
 
-{% set pageHeaderTitle = "Visit request details" if visitDetails.visitSubStatus == "REQUESTED" else "Visit booking details" %}
 {% set fromPrisonerProfile = false %}
 
 {% if fromPage == "visit-search" %}
