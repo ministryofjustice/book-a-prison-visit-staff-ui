@@ -20,6 +20,7 @@ import {
   VisitRequestsCountDto,
   VisitRequestSummary,
   VisitSession,
+  VisitSessionsAndScheduleDto,
 } from '../../server/data/orchestrationApiTypes'
 import TestData from '../../server/routes/testutils/testData'
 
@@ -697,6 +698,39 @@ export default {
       },
     })
   },
+
+  stubGetVisitSessionsAndSchedule: ({
+    prisonId = 'HEI',
+    prisonerId,
+    minNumberOfDays = 2,
+    username = 'USER1',
+    visitSessionsAndSchedule = TestData.visitSessionsAndSchedule(),
+  }: {
+    prisonId: string
+    prisonerId: string
+    minNumberOfDays: number
+    username: string
+    visitSessionsAndSchedule: VisitSessionsAndScheduleDto
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPath: `/orchestration/visit-sessions-and-schedule`,
+        queryParameters: {
+          prisonId: { equalTo: prisonId },
+          prisonerId: { equalTo: prisonerId },
+          min: { equalTo: minNumberOfDays.toString() },
+          username: { equalTo: username },
+        },
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: visitSessionsAndSchedule,
+      },
+    })
+  },
+
   stubPrisonerProfile: (profile: PrisonerProfile): SuperAgentRequest => {
     return stubFor({
       request: {
