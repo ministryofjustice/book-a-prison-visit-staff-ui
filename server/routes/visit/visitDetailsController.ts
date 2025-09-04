@@ -8,6 +8,7 @@ import {
   getVisitorRestrictionIdsToFlag,
 } from './visitUtils'
 import visitEventsTimelineBuilder from './visitEventsTimelineBuilder'
+import { VisitBookingDetails } from '../../data/orchestrationApiTypes'
 
 export default class VisitDetailsController {
   public constructor(
@@ -59,6 +60,7 @@ export default class VisitDetailsController {
       const prisonerLocation = getPrisonerLocation(prisoner)
 
       return res.render('pages/visit/visitDetails', {
+        pageHeaderTitle: this.getPageHeaderTitle(visitDetails.visitSubStatus),
         availableVisitActions,
         eventsTimeline,
         fromPage,
@@ -71,5 +73,15 @@ export default class VisitDetailsController {
         prisonerId: prisoner.prisonerNumber,
       })
     }
+  }
+
+  private getPageHeaderTitle(visitSubStatus: VisitBookingDetails['visitSubStatus']): string {
+    const requestTitleSubStatuses: VisitBookingDetails['visitSubStatus'][] = [
+      'REQUESTED',
+      'REJECTED',
+      'AUTO_REJECTED',
+      'WITHDRAWN',
+    ]
+    return requestTitleSubStatuses.includes(visitSubStatus) ? 'Visit request details' : 'Visit booking details'
   }
 }
