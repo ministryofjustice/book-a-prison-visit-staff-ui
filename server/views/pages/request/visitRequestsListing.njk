@@ -59,32 +59,32 @@
 
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
 
-      <p>
-        These requests by online bookers need to be manually checked due to alerts and restrictions.
-      </p>
-
-      <p>
-        They have been automatically checked to make sure:
-      </p>
-      <ul class="govuk-list govuk-list--bullet">
-        <li>visitors are on the prisoner’s approved visitor list</li>
-        <li>the date and time is suitable for the prisoner</li>
-        <li>there are no non-associations for the prisoner</li>
-      </ul>
-
-      <p>
-        The visit time has been reserved for these requests. It will be released if the request is rejected.
-      </p>
-
-      <p>
-        Requests need to be checked at least
-        <span data-test="check-before-days">{{ checkBeforeDays }} {{ "day" | pluralise(checkBeforeDays) }}</span>
-        before the visit date. If not, they will be automatically rejected.
-      </p>
-
-      <hr class="govuk-section-break govuk-section-break--l">
-
       {% if visitRequests | length %}
+
+        <p>
+          These requests by online bookers need to be manually checked due to alerts and restrictions.
+        </p>
+
+        <p>
+          They have been automatically checked to make sure:
+        </p>
+        <ul class="govuk-list govuk-list--bullet">
+          <li>visitors are on the prisoner’s approved visitor list</li>
+          <li>the date and time is suitable for the prisoner</li>
+          <li>there are no non-associations for the prisoner</li>
+        </ul>
+
+        <p>
+          The visit time has been reserved for these requests. It will be released if the request is rejected.
+        </p>
+
+        <p>
+          Requests need to be checked at least
+          <span data-test="check-before-days">{{ checkBeforeDays }} {{ "day" | pluralise(checkBeforeDays) }}</span>
+          before the visit date. If not, they will be automatically rejected.
+        </p>
+
+        <hr class="govuk-section-break govuk-section-break--l">
 
         {{ govukTable({
           attributes: {
