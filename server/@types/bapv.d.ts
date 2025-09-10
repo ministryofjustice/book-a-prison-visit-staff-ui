@@ -182,3 +182,7 @@ export type CancelledVisitInfo = {
   hasEmailAddress: boolean
   hasMobileNumber: boolean
 }
+
+export type GOVUKTag = TextOrHtml & {
+  classes?: string
+}
