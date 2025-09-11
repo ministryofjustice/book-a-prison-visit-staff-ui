@@ -12,7 +12,7 @@ export default function routes({ visitNotificationsService, visitRequestsService
     const prison = req.session.selectedEstablishment
     const { username } = res.locals.user
 
-    const showRequestedVisitsTile = config.features.visitRequest && isPrisonEnabledForPublic(prison)
+    const showRequestedVisitsTile = isPrisonEnabledForPublic(prison)
     const requestCount = showRequestedVisitsTile
       ? (await visitRequestsService.getVisitRequestCount(username, prison.prisonId)).count
       : null
