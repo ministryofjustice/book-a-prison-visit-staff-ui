@@ -3,7 +3,6 @@ import { Router } from 'express'
 import { clearSession } from './visitorUtils'
 import { Services } from '../services'
 import { Prison } from '../@types/bapv'
-import config from '../config'
 
 export default function routes({ visitNotificationsService, visitRequestsService }: Services): Router {
   const router = Router()
