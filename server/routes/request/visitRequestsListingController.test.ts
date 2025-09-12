@@ -4,7 +4,6 @@ import * as cheerio from 'cheerio'
 import { appWithAllRoutes, FlashData, flashProvider } from '../testutils/appSetup'
 import { createMockVisitRequestsService } from '../../services/testutils/mocks'
 import TestData from '../testutils/testData'
-import { setFeature } from '../../data/testutils/mockFeature'
 
 let app: Express
 let flashData: FlashData
@@ -17,18 +16,10 @@ describe('GET /requested-visits - Requested visits listing', () => {
   const visitRequestsService = createMockVisitRequestsService()
 
   beforeEach(() => {
-    setFeature('visitRequest', true)
-
     flashData = {}
     flashProvider.mockImplementation((key: keyof FlashData) => flashData[key])
 
     app = appWithAllRoutes({ services: { visitRequestsService } })
-  })
-
-  it('should return a 404 if FEATURE_VISIT_REQUEST is disabled', () => {
-    setFeature('visitRequest', false)
-    app = appWithAllRoutes({ services: { visitRequestsService } })
-    return request(app).get('/requested-visits').expect(404)
   })
 
   it('should render the requested visits listing page - with requests to review', () => {

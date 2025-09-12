@@ -7,7 +7,6 @@ import * as visitorUtils from './visitorUtils'
 import { createMockVisitNotificationsService, createMockVisitRequestsService } from '../services/testutils/mocks'
 import TestData from './testutils/testData'
 import { Prison } from '../@types/bapv'
-import { setFeature } from '../data/testutils/mockFeature'
 
 let app: Express
 
@@ -25,8 +24,6 @@ describe('GET /', () => {
   let notificationCount = TestData.notificationCount()
 
   beforeEach(() => {
-    setFeature('visitRequest', false)
-
     selectedEstablishment = TestData.prison()
     sessionData = { selectedEstablishment } as SessionData
 
@@ -71,9 +68,7 @@ describe('GET /', () => {
   })
 
   describe('Requested visits tile', () => {
-    // requires feature to be enabled and PUBLIC prison
     beforeEach(() => {
-      setFeature('visitRequest', true)
       selectedEstablishment.clients.push({ userType: 'PUBLIC', active: true })
     })
 
