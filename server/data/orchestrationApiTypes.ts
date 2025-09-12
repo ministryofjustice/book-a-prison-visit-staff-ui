@@ -35,7 +35,7 @@ export type BookingOrchestrationRequestDto = components['schemas']['BookingOrche
 export type SessionCapacity = components['schemas']['SessionCapacityDto']
 export type SessionSchedule = components['schemas']['SessionScheduleDto']
 
-export type VisitSession = components['schemas']['VisitSessionDto']
+export type VisitSession = components['schemas']['VisitSessionDto'] // TODO remove
 
 export type Alert = components['schemas']['AlertDto']
 export type OffenderRestriction = components['schemas']['OffenderRestrictionDto']
@@ -63,6 +63,12 @@ export type VisitNotificationsRaw = components['schemas']['OrchestrationVisitNot
 export type VisitNotifications = Omit<VisitNotificationsRaw, 'notifications'> & {
   notifications: (Omit<VisitNotificationEventRaw, 'type'> & { type: NotificationType })[]
 }
+
+// Visit sessions and scheduled events (calendar)
+export type VisitSessionsAndScheduleDto = components['schemas']['VisitSessionsAndScheduleDto']
+export type SessionsAndScheduleDto = components['schemas']['SessionsAndScheduleDto']
+export type VisitSessionV2Dto = components['schemas']['VisitSessionV2Dto']
+export type PrisonerScheduledEventDto = components['schemas']['PrisonerScheduledEventDto']
 
 export type PrisonDto = components['schemas']['PrisonDto']
 
