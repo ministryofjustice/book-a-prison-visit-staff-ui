@@ -124,7 +124,7 @@
         <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
         {# Days and visit sessions / schedule #}
-        {% for day in sessionsAndSchedule %}
+        {% for day in calendarFullDays %}
           <div class="govuk-form-group bapv-calendar__day-group" data-date="{{ day.date }}">
 
             {% call govukFieldset({

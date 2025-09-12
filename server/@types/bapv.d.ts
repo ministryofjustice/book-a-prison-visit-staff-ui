@@ -103,8 +103,10 @@ export type VisitSessionData = {
     alerts?: Alert[]
     restrictions?: OffenderRestriction[]
   }
-  visitSlot?: VisitSlot
-  originalVisitSlot?: VisitSlot
+  selectedVisitSession?: { date: string; sessionTemplateReference: string } // TODO add to session check middleware
+  originalVisitSession?: { date: string; sessionTemplateReference: string } // TODO add to session check middleware?
+  visitSlot?: VisitSlot // TODO remove (and 'VisitSlot' type definition)
+  originalVisitSlot?: VisitSlot // TODO remove
   visitRestriction?: 'OPEN' | 'CLOSED'
   visitorIds?: number[]
   visitors?: VisitorListItem[]

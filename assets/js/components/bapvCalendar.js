@@ -8,10 +8,10 @@ function handleSelectDate(event) {
   const dateToShow = event.target.parentElement.dataset.date
 
   // remove highlighted day
-  document.querySelector(`.${calendarDaySelectedClass}`).classList.remove(calendarDaySelectedClass)
+  document.querySelector(`.${calendarDaySelectedClass}`)?.classList.remove(calendarDaySelectedClass)
 
   // hide active form group
-  document.querySelector(`.${calendarDayGroupActiveClass}`).classList.remove(calendarDayGroupActiveClass)
+  document.querySelector(`.${calendarDayGroupActiveClass}`)?.classList.remove(calendarDayGroupActiveClass)
 
   // highlight selected day
   document.querySelector(`.${calendarDayClass}[data-date='${dateToShow}']`).classList.add(calendarDaySelectedClass)
