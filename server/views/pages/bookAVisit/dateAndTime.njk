@@ -1,4 +1,5 @@
 {% extends "layout.njk" %}
+{# TODO clean up imports #}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/accordion/macro.njk" import govukAccordion %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
@@ -8,6 +9,7 @@
 {%- from "govuk/components/tag/macro.njk" import govukTag -%}
 {%- from "moj/components/banner/macro.njk" import mojBanner -%}
 {%- from "moj/components/alert/macro.njk" import mojAlert -%}
+{% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
 
 {% set pageHeaderTitle = "Select date and time of visit" %}
 
@@ -64,6 +66,151 @@
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
 
       <p class="bapv-extraspacing bapv-date-time-information"><strong>Prisoner name:</strong> <span data-test="prisoner-name">{{ prisonerName }}</span> <strong>Location:</strong> <span data-test="visit-location">{{ location }}</span> <strong>Visit type:</strong> <span data-test="visit-restriction">{{ visitRestriction | capitalize }}</span></p>
+
+
+      <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">{# TODO remove #}
+
+      {# Calendar #}
+      <nav class="bapv-calendar govuk-!-width-one-half" aria-label="Visit date selection calendar" role="navigation">
+
+        {# Loop over months #}
+        {% for month in calendar %}
+          <h2 class="govuk-heading-m">{{ month.monthLabel }}</h2>
+
+          {# Day name headings on first month only - unless more than 2 months #}
+          {% if loop.first or calendar | length > 2 %}
+            <ul class="govuk-list bapv-calendar__day-headings" aria-hidden="true">
+              <li>Mon</li>
+              <li>Tue</li>
+              <li>Wed</li>
+              <li>Thu</li>
+              <li>Fri</li>
+              <li>Sat</li>
+              <li>Sun</li>
+            </ul>
+          {% endif %}
+
+          {# Days for this month #}
+          <ul class="govuk-list bapv-calendar__month">
+            {% for day in month.days %}
+              <li data-date="{{ day.date }}" class="bapv-calendar__day
+                {#- add column offset class based on ISO day of week (1-7) -#}
+                {%- if loop.first %} bapv-calendar__day--start-col-{{ day.date | formatDate('i') }}{% endif -%}
+                {#- day style override classes -#}
+                {%- if day.colour %} bapv-calendar__day--{{ day.colour }}{% endif -%}
+                {%- if day.selected %} bapv-calendar__day--selected{%- endif -%}
+                {%- if day.outline %} bapv-calendar__day--outline{%- endif %}"
+                {%- if not day.sessionCount %} aria-hidden="true"{% endif -%}
+                >
+
+                {%- if day.sessionCount -%}
+                  <a id="day-link-{{ day.date }}" href="#day-group-{{ day.date }}">
+                    {{- day.date | formatDate("d") -}}
+                    <span class="govuk-visually-hidden">{{ day.date | formatDate("MMMM - eeee") }} - {{ day.sessionCount }} visit {{ "time" | pluralise(day.sessionCount )}}</span>
+                  </a>
+                {% else -%}
+                    <span>{{ day.date | formatDate("d") }}</span>
+                    <span class="govuk-visually-hidden">{{ day.date | formatDate("MMMM - eeee") }} - no visit times</span>
+                {%- endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        {% endfor %}
+      </nav>
+
+      {# Days / visit sessions #}
+      {# TODO fix disable-button-on-submit code #}
+      <form action="{{ urlPrefix }}/select-date-and-time" method="POST" novalidate class="disable-button-on-submit">
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+        {# Days and visit sessions / schedule #}
+        {% for day in calendarFullDays %}
+          <div class="govuk-form-group bapv-calendar__day-group" data-date="{{ day.date }}">
+
+            {% call govukFieldset({
+              attributes: { id: 'day-group-' + day.date },
+              legend: {
+                text: day.date | formatDate("EEEE d MMMM yyyy"),
+                classes: "govuk-fieldset__legend--m"
+              }
+            }) -%}
+
+            {# morning and/or afternoon sections #}
+            {%- for section in day.daySection %}
+              <div class="govuk-grid-row">
+                {# radio inputs #}
+                <div class="govuk-grid-column-one-quarter">
+                  <h3 class="govuk-heading-s">{{ section.label | capitalize }}</h3>
+                    {# build radio items #}
+                    {% set visitSessionItems = [] %}
+                    {%- for visitSession in section.visitSessions %}
+                      {% set radioValue = day.date + "_" + visitSession.sessionTemplateReference %}
+
+                      {% set radioLabelHtml -%}
+                        <span class="govuk-!-font-weight-bold">{{ visitSession.time }}</span>
+                        <br>
+                        {{ visitSession.visitRoom }}
+                        <br>
+                        {% if visitSession.tag %}
+                          {{ govukTag({
+                            text: visitSession.tag.text,
+                            classes: visitSession.tag.classes
+                          }) }}
+                        {% else %}
+                          <span class="bapv-secondary-text">
+                            {{ visitSession.availableTables }} {{ "table" | pluralise(visitSession.availableTables) }} available
+                          </span>
+                        {% endif %}
+                      {%- endset %}
+                      {% set visitSessionItems = (visitSessionItems.push({
+                        value: radioValue,
+                        html: radioLabelHtml,
+                        disabled: visitSession.disabled
+                      }), visitSessionItems) %} {# TODO handle 'checked' to pre-populate #}
+                    {% endfor %}
+
+                    {{- govukRadios({
+                      name: "RADIOS_NAME",
+                      idPrefix: "date-" + day.date,
+                      items: visitSessionItems
+                    }) }} {# TODO handle errorMessage #}
+                  
+                </div>
+                {# prisoner schedule #}
+                {% if section.scheduledEvents | length %}
+                  <div class="govuk-grid-column-three-quarters">
+                    <h3 class="govuk-heading-s{{ " bapv-visibility-hidden" if loop.index > 1 }}">Prisoner schedule</h3>
+                    {% for event in section.scheduledEvents %}
+                      <div class="bapv-calendar__event">
+                        {{ event.time }}
+                        <br>
+                        {{ event.description }}
+                      </div>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+            {% endfor %}
+
+            <p class="govuk-!-display-inline-block">
+              <a class="govuk-visually-hidden-focusable govuk-!-display-block govuk-!-margin-top-5" href="#day-link-{{ day.date }}">
+                Choose a different date above
+              </a>
+            </p>
+
+            {%- endcall %}
+          </div>
+        {% endfor %}
+
+        {{ govukButton({
+          text: "Continue",
+          attributes: { "data-test": "continue-button" },
+          preventDoubleClick: true
+        }) }}
+      </form>
+      <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">{# TODO remove #}
+
+
       {{ govukDetails({
         summaryText: "What time slots are shown?",
         html: "<p>Showing time slots:</p><ul><li>suitable for the prisoner’s location, category and incentive level</li><li>that do not have non-associations for the prisoner</li><li>over the next 28 days</li></ul>"
@@ -188,4 +335,8 @@
 
     </div>
   </div>
+{% endblock %}
+
+{% block pageScripts %}
+<script src="/assets/components/bapvCalendar.js"></script>
 {% endblock %}

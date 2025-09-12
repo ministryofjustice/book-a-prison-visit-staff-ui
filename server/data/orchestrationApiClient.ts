@@ -351,6 +351,7 @@ export default class OrchestrationApiClient {
     })
   }
 
+  // TODO remove, and related wiremock
   async getVisitSessions(
     offenderNo: string,
     prisonId: string,
@@ -405,7 +406,7 @@ export default class OrchestrationApiClient {
     prisonerId: string
     minNumberOfDays: number
     username: string
-  }): Promise<VisitSessionsAndScheduleDto[]> {
+  }): Promise<VisitSessionsAndScheduleDto> {
     return this.restClient.get({
       path: '/visit-sessions-and-schedule',
       query: new URLSearchParams({
