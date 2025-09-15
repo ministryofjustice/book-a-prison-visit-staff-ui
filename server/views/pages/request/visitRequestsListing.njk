@@ -79,9 +79,13 @@
         </p>
 
         <p>
-          Requests need to be checked at least
-          <span data-test="check-before-days">{{ checkBeforeDays }} {{ "day" | pluralise(checkBeforeDays) }}</span>
-          before the visit date. If not, they will be automatically rejected.
+          Requests need to be checked 
+          {% if checkBeforeDays === 0 %}
+            <span data-test="check-before-days">before the visit date.</span>
+          {% else %}
+            <span data-test="check-before-days">at least {{ checkBeforeDays }} {{ "day" | pluralise(checkBeforeDays) }} before the visit date.</span>
+          {% endif %}
+          If not, they will be automatically rejected.
         </p>
 
         <hr class="govuk-section-break govuk-section-break--l">
