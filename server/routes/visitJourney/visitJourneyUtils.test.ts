@@ -62,6 +62,22 @@ describe('validationErrorToMoJAlert', () => {
     expect(url).toBe('check-your-booking/overbooking')
   })
 
+  it('should return an MoJAlert for 422 error APPLICATION_INVALID_VISIT_DATE_BLOCKED', () => {
+    const validationErrors: ApplicationValidationErrorResponse['validationErrors'] = [
+      'APPLICATION_INVALID_VISIT_DATE_BLOCKED',
+    ]
+
+    const { mojAlert, url } = validationErrorsToMoJAlert(prisonerName, visitStartTimestamp, validationErrors)
+
+    expect(mojAlert).toStrictEqual({
+      text: 'Select a new visit time.',
+      showTitleAsHeading: true,
+      title: 'This visit date has been blocked.',
+      variant: 'warning',
+    })
+    expect(url).toBe('select-date-and-time')
+  })
+
   it('should return a single, prioritised MoJAlert for multiple 422 errors', () => {
     const validationErrors: ApplicationValidationErrorResponse['validationErrors'] = [
       'APPLICATION_INVALID_NO_SLOT_CAPACITY',
