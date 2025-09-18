@@ -19,5 +19,5 @@ export default class VisitRequestsListingPage extends Page {
 
   getNoRequestsMessage = (): PageElement => cy.get('[data-test="no-visit-requests"]')
 
-  checkBeforeDays = (): PageElement => cy.get(`[data-test="check-before-days"]`)
+  getBeforeDaysMessage = (): PageElement => cy.get(`[data-test="check-before-days"]`)
 }

@@ -83,7 +83,7 @@
           {% if checkBeforeDays === 0 %}
             <span data-test="check-before-days">before the visit date.</span>
           {% else %}
-            <span data-test="check-before-days">at least {{ checkBeforeDays }} {{ "day" | pluralise(checkBeforeDays) }} before the visit date.</span>
+            <span data-test="check-before-days">at least {{ checkBeforeDays }} full {{ "day" | pluralise(checkBeforeDays) }} before the visit date.</span>
           {% endif %}
           If not, they will be automatically rejected.
         </p>

@@ -34,7 +34,7 @@ describe('GET /requested-visits - Requested visits listing', () => {
         expect($('.govuk-breadcrumbs li').length).toBe(2)
         expect($('.moj-alert').length).toBe(0)
         expect($('h1').text()).toBe('Requested visits')
-        expect($('[data-test=check-before-days]').text()).toBe('at least 2 days before the visit date.')
+        expect($('[data-test=check-before-days]').text()).toBe('at least 2 full days before the visit date.')
 
         expect($('[data-test=visit-requests] tbody tr').length).toBe(1)
 
@@ -64,7 +64,7 @@ describe('GET /requested-visits - Requested visits listing', () => {
         expect($('.govuk-breadcrumbs li').length).toBe(2)
         expect($('.moj-alert').length).toBe(0)
         expect($('h1').text()).toBe('Requested visits')
-        expect($('[data-test=check-before-days]').text()).toBe('at least 2 days before the visit date.')
+        expect($('[data-test=check-before-days]').text()).toBe('at least 2 full days before the visit date.')
 
         expect($('[data-test=visit-requests] tbody tr').length).toBe(1)
 
