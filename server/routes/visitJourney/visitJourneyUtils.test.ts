@@ -73,7 +73,7 @@ describe('validationErrorToMoJAlert', () => {
       text: 'Select a new visit time.',
       showTitleAsHeading: true,
       title: 'This visit date has been blocked.',
-      variant: 'warning',
+      variant: 'error',
     })
     expect(url).toBe('select-date-and-time')
   })

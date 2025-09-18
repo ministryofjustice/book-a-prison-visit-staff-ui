@@ -31,7 +31,7 @@ export const validationErrorsToMoJAlert = (
       mojAlert: {
         title: 'This visit date has been blocked.',
         text: 'Select a new visit time.',
-        variant: 'warning',
+        variant: 'error',
         showTitleAsHeading: true,
       },
       url: `select-date-and-time`,
