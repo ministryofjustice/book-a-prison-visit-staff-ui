@@ -668,6 +668,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/visit-sessions-and-schedule': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Returns all visit sessions and prisoner schedule for a specified prisoner
+     * @description Retrieve all visit sessions and schedule for a specified prisoner
+     */
+    get: operations['getVisitSessionsAndSchedule']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/queue-admin/get-dlq-messages/{dlqName}': {
     parameters: {
       query?: never
@@ -796,6 +816,26 @@ export interface paths {
      * @description Get permitted visitors for a prisoner associated with that booker.
      */
     get: operations['getPermittedVisitorsForPrisoner']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/public/booker/{bookerReference}/audit': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get audit entries for a booker.
+     * @description Get audit entries for a booker.
+     */
+    get: operations['getBookerAudit']
     put?: never
     post?: never
     delete?: never
@@ -1298,6 +1338,8 @@ export interface components {
         | 'APPLICATION_INVALID_VISIT_ALREADY_BOOKED'
         | 'APPLICATION_INVALID_NO_VO_BALANCE'
         | 'APPLICATION_INVALID_NO_SLOT_CAPACITY'
+        | 'APPLICATION_INVALID_VISIT_DATE_BLOCKED'
+        | 'APPLICATION_INVALID_USER_TYPE'
       )[]
     }
     BookingOrchestrationRequestDto: {
@@ -1756,6 +1798,7 @@ export interface components {
         | 'CANCELLED_NON_ASSOCIATION_VISIT_EVENT'
         | 'IGNORED_NON_ASSOCIATION_VISIT_NOTIFICATIONS_EVENT'
         | 'PAIRED_VISIT_CANCELLED_IGNORED_OR_UPDATED_EVENT'
+        | 'COURT_VIDEO_APPOINTMENT_CREATED_OR_UPDATED_EVENT'
       /**
        * @description What was the application method for this event
        * @enum {string}
@@ -2084,7 +2127,12 @@ export interface components {
        * @example VISITOR_RESTRICTION
        * @enum {string}
        */
-      attributeName: 'VISITOR_RESTRICTION' | 'VISITOR_RESTRICTION_ID' | 'VISITOR_ID' | 'PAIRED_VISIT'
+      attributeName:
+        | 'VISITOR_RESTRICTION'
+        | 'VISITOR_RESTRICTION_ID'
+        | 'VISITOR_ID'
+        | 'PAIRED_VISIT'
+        | 'APPOINTMENT_INSTANCE_ID'
       /**
        * @description Value of the attribute associated with the notification event
        * @example BAN
@@ -2234,10 +2282,10 @@ export interface components {
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
       pageSize?: number
-      unpaged?: boolean
       paged?: boolean
       /** Format: int32 */
       pageNumber?: number
+      unpaged?: boolean
     }
     SortObject: {
       empty?: boolean
@@ -2513,6 +2561,97 @@ export interface components {
        * @enum {string}
        */
       sessionRestriction: 'OPEN' | 'CLOSED'
+    }
+    PrisonerScheduledEventDto: {
+      /** @description Type of scheduled event (as a code) */
+      eventType?: string
+      /** @description Description of scheduled event sub type */
+      eventSubTypeDesc?: string
+      /** @description Source-specific description for type or nature of the event */
+      eventSourceDesc?: string
+      /**
+       * Format: HH:mm
+       * @description Date and time at which event starts
+       * @example 13:45
+       */
+      startTime?: string
+      /**
+       * Format: HH:mm
+       * @description Date and time at which event ends
+       * @example 13:45
+       */
+      endTime?: string
+    }
+    SessionsAndScheduleDto: {
+      /**
+       * Format: date
+       * @description Session date
+       * @example 2020-11-01
+       */
+      date: string
+      /** @description Visit sessions */
+      visitSessions: components['schemas']['VisitSessionV2Dto'][]
+      /** @description Visit sessions */
+      scheduledEvents: components['schemas']['PrisonerScheduledEventDto'][]
+    }
+    VisitSessionV2Dto: {
+      /**
+       * @description Session Template Reference
+       * @example v9d.7ed.7u
+       */
+      sessionTemplateReference: string
+      /**
+       * @description Visit Room
+       * @example Visits Main Hall
+       */
+      visitRoom: string
+      /**
+       * Format: int32
+       * @description The number of concurrent visits which may take place within this session
+       * @example 1
+       */
+      openVisitCapacity: number
+      /**
+       * Format: int32
+       * @description The count of open visit bookings already reserved or booked for this session
+       * @example 1
+       */
+      openVisitBookedCount?: number
+      /**
+       * Format: int32
+       * @description The number of closed visits which may take place within this session
+       * @example 1
+       */
+      closedVisitCapacity: number
+      /**
+       * Format: int32
+       * @description The count of closed visit bookings already reserved or booked for this session
+       * @example 1
+       */
+      closedVisitBookedCount?: number
+      /**
+       * Format: HH:mm
+       * @description The start time of the visit session
+       * @example 10:30
+       */
+      startTime: string
+      /**
+       * Format: HH:mm
+       * @description The end time of the visit session
+       * @example 11:30
+       */
+      endTime: string
+      /** @description Session conflicts */
+      sessionConflicts?: ('NON_ASSOCIATION' | 'DOUBLE_BOOKING_OR_RESERVATION')[]
+    }
+    VisitSessionsAndScheduleDto: {
+      /**
+       * @description If scheduled events are available
+       * @example true
+       */
+      scheduledEventsAvailable: boolean
+      /** @description List of visit sessions and prisoner schedules */
+      sessionsAndSchedule: components['schemas']['SessionsAndScheduleDto'][]
     }
     DlqMessage: {
       body: {
@@ -2803,6 +2942,21 @@ export interface components {
        * @example 2029-12-31
        */
       expiryDate?: string
+    }
+    /** @description Combined visits and booker registry audit entries for a public booker. */
+    BookerHistoryAuditDto: {
+      /**
+       * @description Audit Type
+       * @example PRISONER_REGISTERED
+       */
+      auditType: string
+      /** @description Audit summary */
+      text?: string
+      /**
+       * Format: date-time
+       * @description Timestamp of booker audit entry
+       */
+      createdTimestamp: string
     }
     PrisonerProfileDto: {
       /**
@@ -5368,6 +5522,65 @@ export interface operations {
       }
     }
   }
+  getVisitSessionsAndSchedule: {
+    parameters: {
+      query: {
+        /**
+         * @description Query by NOMIS Prison Identifier
+         * @example MDI
+         */
+        prisonId: string
+        /**
+         * @description Filter results by prisoner id
+         * @example A12345DC
+         */
+        prisonerId: string
+        /**
+         * @description Override the default minimum number of days notice from the current date
+         * @example 2
+         */
+        min?: number
+        /**
+         * @description Username for the user making the request. Used to exclude user's pending applications from session capacity count. Optional, ignored if not passed in.
+         * @example user-1
+         */
+        username?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Visit sessions and schedule information returned for a prisoner */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          '*/*': components['schemas']['VisitSessionsAndScheduleDto']
+        }
+      }
+      /** @description Incorrect request to get visit sessions and schedule information for a prisoner  */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
   getDlqMessages: {
     parameters: {
       query?: {
@@ -5700,6 +5913,55 @@ export interface operations {
         }
       }
       /** @description Incorrect permissions to get permitted visitors for a prisoner associated with that booker */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  getBookerAudit: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        bookerReference: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Return all audit entries for booker */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          '*/*': components['schemas']['BookerHistoryAuditDto'][]
+        }
+      }
+      /** @description Incorrect request to get audit entries for a booker */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to get audit entries for a booker */
       403: {
         headers: {
           [name: string]: unknown
