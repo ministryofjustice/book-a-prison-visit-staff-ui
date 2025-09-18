@@ -6,6 +6,7 @@ import VisitDetailsPage from '../../pages/visit/visitDetails'
 
 context('Process a visit Request', () => {
   const prisonStaffAndPublic = TestData.prisonDto({
+    policyNoticeDaysMin: 0,
     clients: [
       { userType: 'STAFF', active: true },
       { userType: 'PUBLIC', active: true },
@@ -36,6 +37,7 @@ context('Process a visit Request', () => {
 
     // Requested visits page
     const visitRequestsListingPage = Page.verifyOnPage(VisitRequestsListingPage)
+    visitRequestsListingPage.getBeforeDaysMessage().contains('before the visit date.')
     visitRequestsListingPage.getVisitDate(1).contains('10/7/2025')
     visitRequestsListingPage.getVisitRequestedDate(1).contains('1/7/2025')
     visitRequestsListingPage.getPrisonerName(1).contains('John Smith')
