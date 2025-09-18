@@ -26,6 +26,18 @@ export const validationErrorsToMoJAlert = (
     }
   }
 
+  if (validationErrors.includes('APPLICATION_INVALID_VISIT_DATE_BLOCKED')) {
+    return {
+      mojAlert: {
+        title: 'This visit date has been blocked.',
+        text: 'Select a new visit time.',
+        variant: 'error',
+        showTitleAsHeading: true,
+      },
+      url: `select-date-and-time`,
+    }
+  }
+
   if (validationErrors.includes('APPLICATION_INVALID_VISIT_ALREADY_BOOKED')) {
     return {
       mojAlert: {
