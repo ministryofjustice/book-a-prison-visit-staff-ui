@@ -24,6 +24,7 @@ import indexRoutes from '../index'
 import visitJourneyRoutes from '../visitJourney'
 import blockVisitDatesRoutes from '../blockVisitDates'
 import establishmentNotSupportedRoutes from '../establishmentNotSupported'
+import maintenancePageRoute from '../maintenancePageRoute'
 import prisonerRoutes from '../prisoner/prisoner'
 import requestRoutes from '../request'
 import reviewRoutes from '../review'
@@ -93,6 +94,8 @@ function appSetup(
   })
   app.use(express.json())
   app.use(express.urlencoded({ extended: true }))
+
+  app.use(maintenancePageRoute())
 
   app.use(populateSelectedEstablishment(services))
 
