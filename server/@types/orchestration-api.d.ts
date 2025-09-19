@@ -824,6 +824,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/public/booker/{bookerReference}/audit': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get audit entries for a booker.
+     * @description Get audit entries for a booker.
+     */
+    get: operations['getBookerAudit']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/prisoner/{prisonId}/{prisonerId}/profile': {
     parameters: {
       query?: never
@@ -1318,6 +1338,8 @@ export interface components {
         | 'APPLICATION_INVALID_VISIT_ALREADY_BOOKED'
         | 'APPLICATION_INVALID_NO_VO_BALANCE'
         | 'APPLICATION_INVALID_NO_SLOT_CAPACITY'
+        | 'APPLICATION_INVALID_VISIT_DATE_BLOCKED'
+        | 'APPLICATION_INVALID_USER_TYPE'
       )[]
     }
     BookingOrchestrationRequestDto: {
@@ -2258,11 +2280,11 @@ export interface components {
       /** Format: int64 */
       offset?: number
       sort?: components['schemas']['SortObject']
+      /** Format: int32 */
+      pageSize?: number
       paged?: boolean
       /** Format: int32 */
       pageNumber?: number
-      /** Format: int32 */
-      pageSize?: number
       unpaged?: boolean
     }
     SortObject: {
@@ -2920,6 +2942,21 @@ export interface components {
        * @example 2029-12-31
        */
       expiryDate?: string
+    }
+    /** @description Combined visits and booker registry audit entries for a public booker. */
+    BookerHistoryAuditDto: {
+      /**
+       * @description Audit Type
+       * @example PRISONER_REGISTERED
+       */
+      auditType: string
+      /** @description Audit summary */
+      text?: string
+      /**
+       * Format: date-time
+       * @description Timestamp of booker audit entry
+       */
+      createdTimestamp: string
     }
     PrisonerProfileDto: {
       /**
@@ -5876,6 +5913,55 @@ export interface operations {
         }
       }
       /** @description Incorrect permissions to get permitted visitors for a prisoner associated with that booker */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  getBookerAudit: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        bookerReference: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Return all audit entries for booker */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          '*/*': components['schemas']['BookerHistoryAuditDto'][]
+        }
+      }
+      /** @description Incorrect request to get audit entries for a booker */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to get audit entries for a booker */
       403: {
         headers: {
           [name: string]: unknown
