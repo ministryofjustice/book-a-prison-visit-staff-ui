@@ -181,7 +181,7 @@ kubectl -n visit-someone-in-prison-frontend-svc-dev set env deployment/book-a-pr
 
 This will update the environment variables and restart the pods. To see the status of pods, use:
 ```
-kubectl -n visit-someone-in-prison-backend-svc-dev get pods
+kubectl -n visit-someone-in-prison-frontend-svc-dev get pods
 ```
 Once these are restarted, the maintenance page will be active.
 
