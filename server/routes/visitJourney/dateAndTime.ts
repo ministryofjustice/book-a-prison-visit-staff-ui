@@ -39,6 +39,15 @@ export default class DateAndTime {
       })
     }
 
+    const { calendar, calendarFullDays } = await this.visitSessionsService.getVisitSessionsAndScheduleCalendar({
+      username: res.locals.user.username,
+      prisonId,
+      prisonerId: visitSessionData.prisoner.offenderNo,
+      minNumberOfDays,
+      visitRestriction: visitSessionData.visitRestriction,
+      selectedVisitSession: visitSessionData.selectedVisitSession,
+    })
+
     const { slotsList, whereaboutsAvailable } = await this.visitSessionsService.getVisitSessions({
       username: res.locals.user.username,
       offenderNo: visitSessionData.prisoner.offenderNo,
@@ -116,6 +125,10 @@ export default class DateAndTime {
       prisonerName: `${visitSessionData.prisoner.firstName} ${visitSessionData.prisoner.lastName}`,
       offenderNo: visitSessionData.prisoner.offenderNo,
       location: visitSessionData.prisoner.location,
+
+      calendar,
+      calendarFullDays,
+
       whereaboutsAvailable,
       slotsList,
       formValues,

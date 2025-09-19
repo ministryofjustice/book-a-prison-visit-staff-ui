@@ -145,6 +145,11 @@ testJourneys.forEach(journey => {
       visitSessionData.originalVisitSlot = journey.isUpdate ? visitSlot1 : undefined
 
       visitSessionsService.getVisitSessions.mockResolvedValue({ slotsList, whereaboutsAvailable: true })
+      visitSessionsService.getVisitSessionsAndScheduleCalendar.mockResolvedValue({
+        calendar: [],
+        calendarFullDays: [],
+        scheduledEventsAvailable: true,
+      }) // FIXME
     })
 
     describe(`GET ${journey.urlPrefix}/select-date-and-time`, () => {
@@ -522,6 +527,11 @@ testJourneys.forEach(journey => {
 describe('Update journey override booking window', () => {
   it('should override booking window min days to 0 if confirmation set in session', () => {
     visitSessionsService.getVisitSessions.mockResolvedValue({ slotsList: {}, whereaboutsAvailable: true })
+    visitSessionsService.getVisitSessionsAndScheduleCalendar.mockResolvedValue({
+      calendar: [],
+      calendarFullDays: [],
+      scheduledEventsAvailable: true,
+    }) // FIXME
 
     visitSessionData.overrideBookingWindow = true
 
@@ -580,6 +590,11 @@ describe('Update journey specific warning messages', () => {
     currentlyAvailableSlots = slotsList['October 2022'][0].slots.morning
 
     visitSessionsService.getVisitSessions.mockResolvedValue({ slotsList, whereaboutsAvailable: true })
+    visitSessionsService.getVisitSessionsAndScheduleCalendar.mockResolvedValue({
+      calendar: [],
+      calendarFullDays: [],
+      scheduledEventsAvailable: true,
+    }) // FIXME
 
     visitSessionData.visitReference = 'ab-cd-ef-gh'
     visitSessionData.visitSlot = currentlyBookedSlot
