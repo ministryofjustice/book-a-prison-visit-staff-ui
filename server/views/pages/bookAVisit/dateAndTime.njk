@@ -136,14 +136,14 @@
             }) -%}
 
             {# morning and/or afternoon sections #}
-            {%- for section in day.daySection %}
+            {%- for sectionLabel, visitSessions in day.visitSessions | groupby("daySection") %}
               <div class="govuk-grid-row">
                 {# radio inputs #}
                 <div class="govuk-grid-column-one-quarter">
-                  <h3 class="govuk-heading-s">{{ section.label | capitalize }}</h3>
+                  <h3 class="govuk-heading-s">{{ sectionLabel | capitalize }}</h3>
                     {# build radio items #}
                     {% set visitSessionItems = [] %}
-                    {%- for visitSession in section.visitSessions %}
+                    {%- for visitSession in visitSessions %}
                       {% set radioValue = day.date + "_" + visitSession.sessionTemplateReference %}
 
                       {% set radioLabelHtml -%}
@@ -170,17 +170,18 @@
                     {% endfor %}
 
                     {{- govukRadios({
-                      name: "RADIOS_NAME",
-                      idPrefix: "date-" + day.date,
+                      name: "visit-date-and-session",
+                      idPrefix: "date-" + day.date + "-" + section.label,
                       items: visitSessionItems
                     }) }} {# TODO handle errorMessage #}
                   
                 </div>
                 {# prisoner schedule #}
-                {% if section.scheduledEvents | length %}
+                {% set scheduledEventsByDaySection = day.scheduledEvents | groupby("daySection") %}
+                {% if scheduledEventsByDaySection[sectionLabel] | length %}
                   <div class="govuk-grid-column-three-quarters">
                     <h3 class="govuk-heading-s{{ " bapv-visibility-hidden" if loop.index > 1 }}">Prisoner schedule</h3>
-                    {% for event in section.scheduledEvents %}
+                    {% for event in scheduledEventsByDaySection[sectionLabel] %}
                       <div class="bapv-calendar__event">
                         {{ event.time }}
                         <br>

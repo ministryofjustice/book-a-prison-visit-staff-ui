@@ -10,6 +10,7 @@ import {
   VisitSession,
   VisitSummary,
 } from '../data/orchestrationApiTypes'
+import { CalendarVisitSession } from '../services/visitSessionsService';
 
 type TextOrHtml = { text: string; html?: never } | { text?: never; html: string }
 
@@ -103,8 +104,10 @@ export type VisitSessionData = {
     alerts?: Alert[]
     restrictions?: OffenderRestriction[]
   }
-  selectedVisitSession?: { date: string; sessionTemplateReference: string } // TODO add to session check middleware
-  originalVisitSession?: { date: string; sessionTemplateReference: string } // TODO add to session check middleware?
+  allVisitSessionIds?: string[] // e.g. ['2025-09-22_session-ref']
+  allVisitSessions?: CalendarVisitSession[]
+  selectedVisitSession?: CalendarVisitSession // TODO add to session check middleware
+  originalVisitSession?: CalendarVisitSession // TODO add to session check middleware?
   visitSlot?: VisitSlot // TODO remove (and 'VisitSlot' type definition)
   originalVisitSlot?: VisitSlot // TODO remove
   visitRestriction?: 'OPEN' | 'CLOSED'

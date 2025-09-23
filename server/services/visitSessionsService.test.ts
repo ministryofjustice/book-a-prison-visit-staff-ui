@@ -10,6 +10,7 @@ import {
 } from '../data/testutils/mocks'
 
 const token = 'some token'
+const username = 'user1'
 
 describe('Visit sessions service', () => {
   const hmppsAuthClient = createMockHmppsAuthClient()
@@ -50,7 +51,7 @@ describe('Visit sessions service', () => {
         prisonCode: 'HEI',
         sessionDate,
         sessionTemplateReference: visitSession.sessionTemplateReference,
-        username: 'user1',
+        username,
       })
 
       expect(orchestrationApiClient.getSingleVisitSession).toHaveBeenCalledWith(
@@ -67,7 +68,7 @@ describe('Visit sessions service', () => {
       orchestrationApiClient.getVisitSessions.mockResolvedValue([])
       whereaboutsApiClient.getEvents.mockResolvedValue([])
       const results = await visitSessionsService.getVisitSessions({
-        username: 'user',
+        username,
         offenderNo: 'A1234BC',
         prisonId,
         visitRestriction: 'OPEN',
@@ -75,7 +76,7 @@ describe('Visit sessions service', () => {
       })
 
       expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
-      expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId, 'user', 2)
+      expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId, 'user1', 2)
       expect(results).toEqual({ slotsList: {}, whereaboutsAvailable: true })
     })
 
@@ -120,7 +121,7 @@ describe('Visit sessions service', () => {
         ]
         whereaboutsApiClient.getEvents.mockResolvedValue(events)
         const results = await visitSessionsService.getVisitSessions({
-          username: 'user',
+          username,
           offenderNo: 'A1234BC',
           prisonId,
           visitRestriction: 'OPEN',
@@ -128,7 +129,7 @@ describe('Visit sessions service', () => {
         })
 
         expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
-        expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId, 'user', 2)
+        expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId, 'user1', 2)
         expect(whereaboutsApiClient.getEvents).toHaveBeenCalledTimes(1)
         expect(results).toEqual(<{ slotsList: VisitSlotList; whereaboutsAvailable: boolean }>{
           slotsList: {
@@ -187,7 +188,7 @@ describe('Visit sessions service', () => {
         ]
         whereaboutsApiClient.getEvents.mockResolvedValue(events)
         const results = await visitSessionsService.getVisitSessions({
-          username: 'user',
+          username,
           offenderNo: 'A1234BC',
           prisonId,
           visitRestriction: 'OPEN',
@@ -195,7 +196,7 @@ describe('Visit sessions service', () => {
         })
 
         expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
-        expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId, 'user', 2)
+        expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId, 'user1', 2)
         expect(whereaboutsApiClient.getEvents).toHaveBeenCalledTimes(1)
         expect(results).toEqual(<{ slotsList: VisitSlotList; whereaboutsAvailable: boolean }>{
           slotsList: {
@@ -232,7 +233,7 @@ describe('Visit sessions service', () => {
       it('with no prisoner events', async () => {
         whereaboutsApiClient.getEvents.mockResolvedValue([])
         const results = await visitSessionsService.getVisitSessions({
-          username: 'user',
+          username,
           offenderNo: 'A1234BC',
           prisonId,
           visitRestriction: 'OPEN',
@@ -240,7 +241,7 @@ describe('Visit sessions service', () => {
         })
 
         expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
-        expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId, 'user', 2)
+        expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId, 'user1', 2)
         expect(whereaboutsApiClient.getEvents).toHaveBeenCalledTimes(1)
         expect(results).toEqual(<{ slotsList: VisitSlotList; whereaboutsAvailable: boolean }>{
           slotsList: {
@@ -294,7 +295,7 @@ describe('Visit sessions service', () => {
       orchestrationApiClient.getVisitSessions.mockResolvedValue(sessions)
       whereaboutsApiClient.getEvents.mockResolvedValue([])
       const results = await visitSessionsService.getVisitSessions({
-        username: 'user',
+        username,
         offenderNo: 'A1234BC',
         prisonId,
         visitRestriction: 'CLOSED',
@@ -302,7 +303,7 @@ describe('Visit sessions service', () => {
       })
 
       expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
-      expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId, 'user', 2)
+      expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId, 'user1', 2)
       expect(results).toEqual(<{ slotsList: VisitSlotList; whereaboutsAvailable: boolean }>{
         slotsList: {
           'February 2022': [
@@ -402,7 +403,7 @@ describe('Visit sessions service', () => {
       orchestrationApiClient.getVisitSessions.mockResolvedValue(sessions)
       whereaboutsApiClient.getEvents.mockResolvedValue([])
       const results = await visitSessionsService.getVisitSessions({
-        username: 'user',
+        username,
         offenderNo: 'A1234BC',
         prisonId,
         visitRestriction: 'OPEN',
@@ -410,7 +411,7 @@ describe('Visit sessions service', () => {
       })
 
       expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
-      expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId, 'user', 2)
+      expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId, 'user1', 2)
       expect(results).toEqual(<{ slotsList: VisitSlotList; whereaboutsAvailable: boolean }>{
         slotsList: {
           'February 2022': [
@@ -545,7 +546,7 @@ describe('Visit sessions service', () => {
       orchestrationApiClient.getVisitSessions.mockResolvedValue(sessions)
       whereaboutsApiClient.getEvents.mockResolvedValue([])
       const results = await visitSessionsService.getVisitSessions({
-        username: 'user',
+        username,
         offenderNo: 'A1234BC',
         prisonId,
         visitRestriction: 'OPEN',
@@ -553,7 +554,7 @@ describe('Visit sessions service', () => {
       })
 
       expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
-      expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId, 'user', 2)
+      expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId, 'user1', 2)
       expect(results).toEqual(<{ slotsList: VisitSlotList; whereaboutsAvailable: boolean }>{
         slotsList: {
           'February 2022': [
@@ -617,7 +618,7 @@ describe('Visit sessions service', () => {
       orchestrationApiClient.getVisitSessions.mockResolvedValue(sessions)
       whereaboutsApiClient.getEvents.mockResolvedValue([])
       const results = await visitSessionsService.getVisitSessions({
-        username: 'user',
+        username,
         offenderNo: 'A1234BC',
         prisonId,
         visitRestriction: 'CLOSED',
@@ -625,7 +626,7 @@ describe('Visit sessions service', () => {
       })
 
       expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledTimes(1)
-      expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId, 'user', 2)
+      expect(orchestrationApiClient.getVisitSessions).toHaveBeenCalledWith('A1234BC', prisonId, 'user1', 2)
       expect(results).toEqual(<{ slotsList: VisitSlotList; whereaboutsAvailable: boolean }>{
         slotsList: {
           'February 2022': [
@@ -666,7 +667,7 @@ describe('Visit sessions service', () => {
 
       orchestrationApiClient.getSessionSchedule.mockResolvedValue(sessionSchedule)
 
-      const results = await visitSessionsService.getSessionSchedule({ username: 'user', prisonId, date })
+      const results = await visitSessionsService.getSessionSchedule({ username, prisonId, date })
 
       expect(orchestrationApiClient.getSessionSchedule).toHaveBeenCalledWith(prisonId, date)
       expect(results).toEqual(sessionSchedule)
@@ -683,7 +684,7 @@ describe('Visit sessions service', () => {
       orchestrationApiClient.getVisitSessionCapacity.mockResolvedValue(sessionCapacity)
 
       const results = await visitSessionsService.getVisitSessionCapacity(
-        'user',
+        'user1',
         prisonId,
         sessionDate,
         sessionStartTime,
@@ -701,6 +702,9 @@ describe('Visit sessions service', () => {
   })
 
   describe('getVisitSessionsAndScheduleCalendar', () => {
+    const prisonerId = 'A1234BC'
+    const minNumberOfDays = 2
+
     it('should return CalendarMonth array from given SessionsAndScheduleDtos', async () => {
       const visitSessionsAndSchedule = TestData.visitSessionsAndSchedule({
         sessionsAndSchedule: [
@@ -736,15 +740,142 @@ describe('Visit sessions service', () => {
       ]
 
       const result = await visitSessionsService.getVisitSessionsAndScheduleCalendar({
-        username: 'user',
+        username,
         prisonId,
-        prisonerId: 'A1234BC',
+        prisonerId,
         minNumberOfDays: 2,
         visitRestriction: 'OPEN',
         selectedVisitSession: undefined,
       })
 
       expect(result.calendar).toStrictEqual(expectedCalendar)
+      expect(orchestrationApiClient.getVisitSessionsAndSchedule).toHaveBeenCalledWith({
+        prisonId,
+        prisonerId,
+        minNumberOfDays,
+        username,
+      })
+    })
+
+    it('should return visit sessions and events with day section (morning / afternoon) added', async () => {
+      const visitSessionsAndSchedule = TestData.visitSessionsAndSchedule({
+        sessionsAndSchedule: [
+          // no sessions; should be ignored
+          TestData.sessionsAndScheduleDto({ date: '2025-08-30', visitSessions: [] }),
+
+          // morning visit slots only
+          TestData.sessionsAndScheduleDto({
+            date: '2025-08-31',
+            visitSessions: [
+              TestData.visitSessionV2({ startTime: '10:00', endTime: '11:00', sessionTemplateReference: 'a' }),
+              TestData.visitSessionV2({ startTime: '11:30', endTime: '12:30', sessionTemplateReference: 'b' }),
+            ],
+            scheduledEvents: [
+              TestData.prisonerScheduledEvent({ startTime: '09:00', endTime: '11:00', eventSourceDesc: 'Education' }),
+            ],
+          }),
+
+          // afternoon visit slots only
+          TestData.sessionsAndScheduleDto({
+            date: '2025-09-01',
+            visitSessions: [
+              TestData.visitSessionV2({ startTime: '13:00', endTime: '14:30', sessionTemplateReference: 'c' }),
+            ],
+            scheduledEvents: [
+              TestData.prisonerScheduledEvent({ startTime: '14:30', endTime: '16:00', eventSourceDesc: 'Education' }),
+            ],
+          }),
+
+          // morning and afternoon visit slots
+          TestData.sessionsAndScheduleDto({
+            date: '2025-09-02',
+            visitSessions: [
+              TestData.visitSessionV2({ startTime: '10:00', endTime: '11:00', sessionTemplateReference: 'd' }),
+              TestData.visitSessionV2({ startTime: '13:00', endTime: '14:30', sessionTemplateReference: 'e' }),
+            ],
+            scheduledEvents: [
+              TestData.prisonerScheduledEvent({ startTime: '09:00', endTime: '11:00', eventSourceDesc: 'Education' }),
+              TestData.prisonerScheduledEvent({ startTime: '14:30', endTime: '16:00', eventSourceDesc: 'Education' }),
+            ],
+          }),
+        ],
+      })
+      orchestrationApiClient.getVisitSessionsAndSchedule.mockResolvedValue(visitSessionsAndSchedule)
+
+      const expectedCalendarFullDays: CalendarFullDay[] = [
+        {
+          date: '2025-08-31',
+          visitSessions: [
+            {
+              date: '2025-08-31',
+              sessionTemplateReference: 'a',
+              daySection: 'morning',
+              time: '10am to 11am',
+              visitRoom: TestData.visitSessionV2().visitRoom,
+              availableTables: 18,
+            },
+            {
+              date: '2025-08-31',
+              sessionTemplateReference: 'b',
+              daySection: 'morning',
+              time: '11:30am to 12:30pm',
+              visitRoom: TestData.visitSessionV2().visitRoom,
+              availableTables: 18,
+            },
+          ],
+          scheduledEvents: [{ daySection: 'morning', time: '9am to 11am', description: 'Activity - Education' }],
+        },
+        {
+          date: '2025-09-01',
+          visitSessions: [
+            {
+              date: '2025-09-01',
+              sessionTemplateReference: 'c',
+              daySection: 'afternoon',
+              time: '1pm to 2:30pm',
+              visitRoom: TestData.visitSessionV2().visitRoom,
+              availableTables: 18,
+            },
+          ],
+          scheduledEvents: [{ daySection: 'afternoon', time: '2:30pm to 4pm', description: 'Activity - Education' }],
+        },
+        {
+          date: '2025-09-02',
+          visitSessions: [
+            {
+              date: '2025-09-02',
+              sessionTemplateReference: 'd',
+              daySection: 'morning',
+              time: '10am to 11am',
+              visitRoom: TestData.visitSessionV2().visitRoom,
+              availableTables: 18,
+            },
+            {
+              date: '2025-09-02',
+              sessionTemplateReference: 'e',
+              daySection: 'afternoon',
+              time: '1pm to 2:30pm',
+              visitRoom: TestData.visitSessionV2().visitRoom,
+              availableTables: 18,
+            },
+          ],
+          scheduledEvents: [
+            { daySection: 'morning', time: '9am to 11am', description: 'Activity - Education' },
+            { daySection: 'afternoon', time: '2:30pm to 4pm', description: 'Activity - Education' },
+          ],
+        },
+      ]
+
+      const result = await visitSessionsService.getVisitSessionsAndScheduleCalendar({
+        username,
+        prisonId,
+        prisonerId,
+        minNumberOfDays: 2,
+        visitRestriction: 'OPEN',
+        selectedVisitSession: undefined,
+      })
+
+      expect(result.calendarFullDays).toStrictEqual(expectedCalendarFullDays)
     })
 
     describe('Selected calendar grid day', () => {
@@ -768,9 +899,9 @@ describe('Visit sessions service', () => {
         ]
 
         const result = await visitSessionsService.getVisitSessionsAndScheduleCalendar({
-          username: 'user',
+          username,
           prisonId,
-          prisonerId: 'A1234BC',
+          prisonerId,
           minNumberOfDays: 2,
           visitRestriction: 'OPEN',
           selectedVisitSession: undefined,
@@ -805,9 +936,9 @@ describe('Visit sessions service', () => {
         ]
 
         const result = await visitSessionsService.getVisitSessionsAndScheduleCalendar({
-          username: 'user',
+          username,
           prisonId,
-          prisonerId: 'A1234BC',
+          prisonerId,
           minNumberOfDays: 2,
           visitRestriction: 'OPEN',
           selectedVisitSession: { date: '2025-08-31', sessionTemplateReference: 'b' },
@@ -836,9 +967,9 @@ describe('Visit sessions service', () => {
         ]
 
         const result = await visitSessionsService.getVisitSessionsAndScheduleCalendar({
-          username: 'user',
+          username,
           prisonId,
-          prisonerId: 'A1234BC',
+          prisonerId,
           minNumberOfDays: 2,
           visitRestriction: 'OPEN',
           selectedVisitSession: { date: '0000-00-00', sessionTemplateReference: 'not found' },
@@ -848,147 +979,56 @@ describe('Visit sessions service', () => {
       })
     })
 
-    it('should return visit sessions and events, split into morning / afternoon', async () => {
-      const visitSessionsAndSchedule = TestData.visitSessionsAndSchedule({
-        sessionsAndSchedule: [
-          // no sessions; should be ignored
-          TestData.sessionsAndScheduleDto({ date: '2025-08-30', visitSessions: [] }),
+    describe('Open / closed capacity', () => {
+      it('should give availability based on open capacity for an OPEN visit restriction', async () => {
+        const visitSessionsAndSchedule = TestData.visitSessionsAndSchedule() // closed count 20; booked 2
+        orchestrationApiClient.getVisitSessionsAndSchedule.mockResolvedValue(visitSessionsAndSchedule)
 
-          // morning visit slots only
-          TestData.sessionsAndScheduleDto({
-            date: '2025-08-31',
-            visitSessions: [
-              TestData.visitSessionV2({ startTime: '10:00', endTime: '11:00', sessionTemplateReference: 'a' }),
-              TestData.visitSessionV2({ startTime: '11:30', endTime: '12:30', sessionTemplateReference: 'b' }),
-            ],
-            scheduledEvents: [
-              TestData.prisonerScheduledEvent({ startTime: '09:00', endTime: '11:00', eventSourceDesc: 'Education' }),
-              // ignored (after cut-off and no afternoon visit sessions)
-              TestData.prisonerScheduledEvent({ startTime: '12:00', endTime: '13:00' }),
-            ],
-          }),
+        const result = await visitSessionsService.getVisitSessionsAndScheduleCalendar({
+          username,
+          prisonId,
+          prisonerId,
+          minNumberOfDays: 2,
+          visitRestriction: 'OPEN',
+          selectedVisitSession: undefined,
+        })
 
-          // afternoon visit slots only
-          TestData.sessionsAndScheduleDto({
-            date: '2025-09-01',
-            visitSessions: [
-              TestData.visitSessionV2({ startTime: '13:00', endTime: '14:30', sessionTemplateReference: 'c' }),
-            ],
-            scheduledEvents: [
-              // ignored (before cut-off and no morning visit sessions)
-              TestData.prisonerScheduledEvent({ startTime: '09:00', endTime: '11:00', eventSourceDesc: 'Education' }),
-              TestData.prisonerScheduledEvent({ startTime: '14:30', endTime: '16:00', eventSourceDesc: 'Education' }),
-            ],
-          }),
-
-          // morning and afternoon visit slots
-          TestData.sessionsAndScheduleDto({
-            date: '2025-09-02',
-            visitSessions: [
-              TestData.visitSessionV2({ startTime: '10:00', endTime: '11:00', sessionTemplateReference: 'd' }),
-              TestData.visitSessionV2({ startTime: '13:00', endTime: '14:30', sessionTemplateReference: 'e' }),
-            ],
-            scheduledEvents: [
-              TestData.prisonerScheduledEvent({ startTime: '09:00', endTime: '11:00', eventSourceDesc: 'Education' }),
-              TestData.prisonerScheduledEvent({ startTime: '14:30', endTime: '16:00', eventSourceDesc: 'Education' }),
-            ],
-          }),
-        ],
-      })
-      orchestrationApiClient.getVisitSessionsAndSchedule.mockResolvedValue(visitSessionsAndSchedule)
-
-      const expectedCalendarFullDays: CalendarFullDay[] = [
-        {
-          date: '2025-08-31',
-          daySection: [
-            {
-              label: 'morning',
-              visitSessions: [
-                {
-                  sessionTemplateReference: 'a',
-                  time: '10am to 11am',
-                  visitRoom: TestData.visitSessionV2().visitRoom,
-                  availableTables: 18,
-                },
-                {
-                  sessionTemplateReference: 'b',
-                  time: '11:30am to 12:30pm',
-                  visitRoom: TestData.visitSessionV2().visitRoom,
-                  availableTables: 18,
-                },
-              ],
-              scheduledEvents: [{ time: '9am to 11am', description: 'Activity - Education' }],
-            },
-          ],
-        },
-        {
-          date: '2025-09-01',
-          daySection: [
-            {
-              label: 'afternoon',
-              visitSessions: [
-                {
-                  sessionTemplateReference: 'c',
-                  time: '1pm to 2:30pm',
-                  visitRoom: TestData.visitSessionV2().visitRoom,
-                  availableTables: 18,
-                },
-              ],
-              scheduledEvents: [{ time: '2:30pm to 4pm', description: 'Activity - Education' }],
-            },
-          ],
-        },
-        {
-          date: '2025-09-02',
-          daySection: [
-            {
-              label: 'morning',
-              visitSessions: [
-                {
-                  sessionTemplateReference: 'd',
-                  time: '10am to 11am',
-                  visitRoom: TestData.visitSessionV2().visitRoom,
-                  availableTables: 18,
-                },
-              ],
-              scheduledEvents: [{ time: '9am to 11am', description: 'Activity - Education' }],
-            },
-            {
-              label: 'afternoon',
-              visitSessions: [
-                {
-                  sessionTemplateReference: 'e',
-                  time: '1pm to 2:30pm',
-                  visitRoom: TestData.visitSessionV2().visitRoom,
-                  availableTables: 18,
-                },
-              ],
-              scheduledEvents: [{ time: '2:30pm to 4pm', description: 'Activity - Education' }],
-            },
-          ],
-        },
-      ]
-
-      const result = await visitSessionsService.getVisitSessionsAndScheduleCalendar({
-        username: 'user',
-        prisonId,
-        prisonerId: 'A1234BC',
-        minNumberOfDays: 2,
-        visitRestriction: 'OPEN',
-        selectedVisitSession: undefined,
+        expect(result.calendarFullDays[0].visitSessions[0].availableTables).toBe(18)
       })
 
-      expect(result.calendarFullDays).toStrictEqual(expectedCalendarFullDays)
+      it('should give availability based on closed capacity for a CLOSED visit restriction', async () => {
+        const visitSessionsAndSchedule = TestData.visitSessionsAndSchedule() // closed count 2; booked 1
+        orchestrationApiClient.getVisitSessionsAndSchedule.mockResolvedValue(visitSessionsAndSchedule)
+
+        const result = await visitSessionsService.getVisitSessionsAndScheduleCalendar({
+          username,
+          prisonId,
+          prisonerId,
+          minNumberOfDays: 2,
+          visitRestriction: 'CLOSED',
+          selectedVisitSession: undefined,
+        })
+
+        expect(result.calendarFullDays[0].visitSessions[0].availableTables).toBe(1)
+      })
     })
 
-    // TODO calendar test - colour
-    // TODO calendar test - selected
-    // TODO calendar test - outline
+    // describe('Prisoner already has a visit', () => {
+    // ACCOUNT FOR FACT THAT WE DON'T KNOW ORIGINAL BOOKING OR SELECTED SESSION??? (ie. reserved vs double-booked)
+    // grid day color if no other sessions - red ? (check)
+    // grid day color if other sessions also full - red ? (check)
+    // grid day color if other have availability - orange ? (check)
 
-    // TODO open / closed counts
+    // grid day color if no other sessions - red ? (check)
 
-    // TODO disabled visit session
-
-    // TODO GOVUK tags
+    // tag on visit session
   })
+  // TODO calendar test - colour
+  // TODO calendar test - selected
+  // TODO calendar test - outline
+
+  // TODO disabled visit session
+
+  // TODO GOVUK tags
+  // })
 })

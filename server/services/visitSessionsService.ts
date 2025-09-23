@@ -26,9 +26,13 @@ export type CalendarMonth = {
   days: CalendarGridDate[]
 }
 
-// Single visit session entry within a morning/afternoon section
-type CalendarVisitSession = {
+type CalendarDaySection = 'morning' | 'afternoon'
+
+// Single visit session entry
+export type CalendarVisitSession = {
+  date: string // yyyy-mm-dd
   sessionTemplateReference: string
+  daySection: CalendarDaySection
   time: string // e.g. "10am to 11am"
   visitRoom: string
   availableTables: number
@@ -36,21 +40,17 @@ type CalendarVisitSession = {
   tag?: GOVUKTag
 }
 
-// Single prisoner event entry within a morning/afternoon section
+// Single prisoner event entry
 type CalendarScheduledEvent = {
+  daySection: CalendarDaySection
   time: string // e.g. "10am to 11am"
   description: string
 }
 
-type CalendarDaySection = {
-  label: 'morning' | 'afternoon'
-  visitSessions: CalendarVisitSession[]
-  scheduledEvents: CalendarScheduledEvent[]
-}
-
 export type CalendarFullDay = {
   date: string // yyyy-mm-dd
-  daySection: CalendarDaySection[]
+  visitSessions: CalendarVisitSession[]
+  scheduledEvents: CalendarScheduledEvent[]
 }
 
 export default class VisitSessionsService {
@@ -325,47 +325,21 @@ export default class VisitSessionsService {
   ): CalendarFullDay[] {
     const daysWithVisitSessions = sessionsAndSchedule.filter(day => day.visitSessions.length > 0)
 
-    const sessionsAndScheduleDays: CalendarFullDay[] = daysWithVisitSessions.map(day => {
-      const currentDaySessionSchedule: CalendarFullDay = {
+    const calendarFullDays: CalendarFullDay[] = daysWithVisitSessions.map(day => {
+      return {
         date: day.date,
-        daySection: [],
+        visitSessions: day.visitSessions.map(visitSession =>
+          this.buildVisitSession(day.date, visitSession, visitRestriction),
+        ),
+        scheduledEvents: day.scheduledEvents.map(event => this.buildScheduledEvent(event)),
       }
-
-      // split visit sessions to morning / afternoon
-      const morningVisitSessions = day.visitSessions.filter(session => this.isBeforeMorningCutOff(session.startTime))
-      const afternoonVisitSessions = day.visitSessions.filter(session => !this.isBeforeMorningCutOff(session.startTime))
-
-      if (morningVisitSessions.length) {
-        const morningEvents = day.scheduledEvents.filter(event => this.isBeforeMorningCutOff(event.startTime))
-
-        currentDaySessionSchedule.daySection.push({
-          label: 'morning',
-          visitSessions: morningVisitSessions.map(visitSession =>
-            this.buildVisitSession(visitSession, visitRestriction),
-          ),
-          scheduledEvents: morningEvents.map(event => this.buildCalendarScheduledEvent(event)),
-        })
-      }
-
-      if (afternoonVisitSessions.length) {
-        const afternoonEvents = day.scheduledEvents.filter(event => !this.isBeforeMorningCutOff(event.startTime))
-
-        currentDaySessionSchedule.daySection.push({
-          label: 'afternoon',
-          visitSessions: afternoonVisitSessions.map(visitSession =>
-            this.buildVisitSession(visitSession, visitRestriction),
-          ),
-          scheduledEvents: afternoonEvents.map(event => this.buildCalendarScheduledEvent(event)),
-        })
-      }
-
-      return currentDaySessionSchedule
     })
 
-    return sessionsAndScheduleDays
+    return calendarFullDays
   }
 
   private buildVisitSession(
+    date: string,
     visitSession: VisitSessionV2Dto,
     visitRestriction: VisitSessionData['visitRestriction'],
   ): CalendarVisitSession {
@@ -375,7 +349,9 @@ export default class VisitSessionsService {
         : visitSession.closedVisitCapacity - visitSession.closedVisitBookedCount
 
     return {
+      date,
       sessionTemplateReference: visitSession.sessionTemplateReference,
+      daySection: this.isBeforeMorningCutOff(visitSession.startTime) ? 'morning' : 'afternoon',
       time: formatStartToEndTime(visitSession.startTime, visitSession.endTime),
       visitRoom: visitSession.visitRoom,
       availableTables,
@@ -384,8 +360,9 @@ export default class VisitSessionsService {
     }
   }
 
-  private buildCalendarScheduledEvent(event: PrisonerScheduledEventDto): CalendarScheduledEvent {
+  private buildScheduledEvent(event: PrisonerScheduledEventDto): CalendarScheduledEvent {
     return {
+      daySection: this.isBeforeMorningCutOff(event.startTime) ? 'morning' : 'afternoon',
       time: formatStartToEndTime(event.startTime, event.endTime),
       description: this.getEventDescription(event),
     }
