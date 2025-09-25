@@ -1,8 +1,57 @@
 import { format, parseISO, isAfter, isBefore, parse } from 'date-fns'
-import { VisitSlot, VisitSlotList, VisitSlotsForDay, VisitSessionData, PrisonerEvent } from '../@types/bapv'
-import { VisitSession, SessionCapacity, SessionSchedule } from '../data/orchestrationApiTypes'
+import { VisitSlot, VisitSlotList, VisitSlotsForDay, VisitSessionData, PrisonerEvent, GOVUKTag } from '../@types/bapv'
+import {
+  VisitSession,
+  SessionCapacity,
+  SessionSchedule,
+  SessionsAndScheduleDto,
+  VisitSessionV2Dto,
+  PrisonerScheduledEventDto,
+} from '../data/orchestrationApiTypes'
 import { ScheduledEvent } from '../data/whereaboutsApiTypes'
 import { HmppsAuthClient, RestClientBuilder, OrchestrationApiClient, WhereaboutsApiClient } from '../data'
+import { formatStartToEndTime } from '../utils/utils'
+
+// Single date on the calendar grid
+type CalendarGridDate = {
+  date: string // e.g. 2025-09-01
+  sessionCount: number
+  colour?: 'orange' | 'red' // defaults to grey (no sessions) or blue (sessions)
+  selected?: boolean // renders with filled circle background
+  outline?: boolean // renders with circular outline
+}
+
+export type CalendarMonth = {
+  monthLabel: string // e.g. 'March'
+  days: CalendarGridDate[]
+}
+
+// Single visit session entry within a morning/afternoon section
+type CalendarVisitSession = {
+  sessionTemplateReference: string
+  time: string // e.g. "10am to 11am"
+  visitRoom: string
+  availableTables: number
+  disabled?: boolean
+  tag?: GOVUKTag
+}
+
+// Single prisoner event entry within a morning/afternoon section
+type CalendarScheduledEvent = {
+  time: string // e.g. "10am to 11am"
+  description: string
+}
+
+type CalendarDaySection = {
+  label: 'morning' | 'afternoon'
+  visitSessions: CalendarVisitSession[]
+  scheduledEvents: CalendarScheduledEvent[]
+}
+
+export type CalendarFullDay = {
+  date: string // yyyy-mm-dd
+  daySection: CalendarDaySection[]
+}
 
 export default class VisitSessionsService {
   private morningCutOff = 12
@@ -159,6 +208,7 @@ export default class VisitSessionsService {
     return { slotsList: availableSessions, whereaboutsAvailable }
   }
 
+  // TODO remove
   async getSessionSchedule({
     username,
     prisonId,
@@ -187,6 +237,167 @@ export default class VisitSessionsService {
     return orchestrationApiClient.getVisitSessionCapacity(prisonId, sessionDate, sessionStartTime, sessionEndTime)
   }
 
+  async getVisitSessionsAndScheduleCalendar({
+    username,
+    prisonId,
+    prisonerId,
+    minNumberOfDays,
+    selectedVisitSession,
+    visitRestriction,
+  }: {
+    username: string
+    prisonId: string
+    prisonerId: string
+    minNumberOfDays: number
+    selectedVisitSession: VisitSessionData['selectedVisitSession'] | undefined
+    visitRestriction: VisitSessionData['visitRestriction']
+  }): Promise<{ calendar: CalendarMonth[]; calendarFullDays: CalendarFullDay[]; scheduledEventsAvailable: boolean }> {
+    const token = await this.hmppsAuthClient.getSystemClientToken(username)
+    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+
+    const { scheduledEventsAvailable, sessionsAndSchedule } = await orchestrationApiClient.getVisitSessionsAndSchedule({
+      prisonId,
+      prisonerId,
+      minNumberOfDays,
+      username,
+    })
+
+    const calendar = this.buildCalendarMonths(sessionsAndSchedule, selectedVisitSession)
+    const calendarFullDays = this.buildCalendarFullDays(sessionsAndSchedule, visitRestriction)
+
+    return {
+      calendar,
+      calendarFullDays,
+      scheduledEventsAvailable,
+    }
+  }
+
+  private buildCalendarMonths(
+    sessionsAndSchedule: SessionsAndScheduleDto[],
+    selectedVisitSession: VisitSessionData['selectedVisitSession' | undefined],
+  ): CalendarMonth[] {
+    let selectedDateFound = false
+    const calendarMonths = sessionsAndSchedule.reduce((months, day) => {
+      const { date, visitSessions } = day
+
+      const monthLabel = format(day.date, 'MMMM') // e.g. 'September'
+      if (months.at(-1)?.monthLabel !== monthLabel) {
+        months.push({ monthLabel, days: [] })
+      }
+
+      const calendarGridDate: CalendarGridDate = {
+        date,
+        sessionCount: visitSessions.length,
+      }
+
+      const matchesSelectedVisitSession =
+        selectedVisitSession?.date === date &&
+        visitSessions.some(
+          session => session.sessionTemplateReference === selectedVisitSession?.sessionTemplateReference,
+        )
+
+      if (matchesSelectedVisitSession) {
+        calendarGridDate.selected = true
+        selectedDateFound = true
+      }
+
+      months.at(-1).days.push(calendarGridDate)
+
+      return months
+    }, [] as CalendarMonth[])
+
+    if (!selectedDateFound) {
+      for (const month of calendarMonths) {
+        const firstDayWithVisitSessions = month.days.find(day => day.sessionCount > 0)
+        if (firstDayWithVisitSessions) {
+          firstDayWithVisitSessions.selected = true
+          break
+        }
+      }
+    }
+
+    return calendarMonths
+  }
+
+  private buildCalendarFullDays(
+    sessionsAndSchedule: SessionsAndScheduleDto[],
+    visitRestriction: VisitSessionData['visitRestriction'],
+  ): CalendarFullDay[] {
+    const daysWithVisitSessions = sessionsAndSchedule.filter(day => day.visitSessions.length > 0)
+
+    const sessionsAndScheduleDays: CalendarFullDay[] = daysWithVisitSessions.map(day => {
+      const currentDaySessionSchedule: CalendarFullDay = {
+        date: day.date,
+        daySection: [],
+      }
+
+      // split visit sessions to morning / afternoon
+      const morningVisitSessions = day.visitSessions.filter(session => this.isBeforeMorningCutOff(session.startTime))
+      const afternoonVisitSessions = day.visitSessions.filter(session => !this.isBeforeMorningCutOff(session.startTime))
+
+      if (morningVisitSessions.length) {
+        const morningEvents = day.scheduledEvents.filter(event => this.isBeforeMorningCutOff(event.startTime))
+
+        currentDaySessionSchedule.daySection.push({
+          label: 'morning',
+          visitSessions: morningVisitSessions.map(visitSession =>
+            this.buildVisitSession(visitSession, visitRestriction),
+          ),
+          scheduledEvents: morningEvents.map(event => this.buildCalendarScheduledEvent(event)),
+        })
+      }
+
+      if (afternoonVisitSessions.length) {
+        const afternoonEvents = day.scheduledEvents.filter(event => !this.isBeforeMorningCutOff(event.startTime))
+
+        currentDaySessionSchedule.daySection.push({
+          label: 'afternoon',
+          visitSessions: afternoonVisitSessions.map(visitSession =>
+            this.buildVisitSession(visitSession, visitRestriction),
+          ),
+          scheduledEvents: afternoonEvents.map(event => this.buildCalendarScheduledEvent(event)),
+        })
+      }
+
+      return currentDaySessionSchedule
+    })
+
+    return sessionsAndScheduleDays
+  }
+
+  private buildVisitSession(
+    visitSession: VisitSessionV2Dto,
+    visitRestriction: VisitSessionData['visitRestriction'],
+  ): CalendarVisitSession {
+    const availableTables =
+      visitRestriction === 'OPEN'
+        ? visitSession.openVisitCapacity - visitSession.openVisitBookedCount
+        : visitSession.closedVisitCapacity - visitSession.closedVisitBookedCount
+
+    return {
+      sessionTemplateReference: visitSession.sessionTemplateReference,
+      time: formatStartToEndTime(visitSession.startTime, visitSession.endTime),
+      visitRoom: visitSession.visitRoom,
+      availableTables,
+      // TODO disabled
+      // TODO tag
+    }
+  }
+
+  private buildCalendarScheduledEvent(event: PrisonerScheduledEventDto): CalendarScheduledEvent {
+    return {
+      time: formatStartToEndTime(event.startTime, event.endTime),
+      description: this.getEventDescription(event),
+    }
+  }
+
+  // is a start time (HH:MM) before morning cut off time
+  private isBeforeMorningCutOff(time: string): boolean {
+    const hours = parseInt(time.substring(0, 2), 10)
+    return hours < this.morningCutOff
+  }
+
+  // TODO remove
   private getPrisonerEvents(events: ScheduledEvent[], start: Date, end: Date): PrisonerEvent[] {
     return events
       .filter(event => {
@@ -203,7 +414,7 @@ export default class VisitSessionsService {
       })
   }
 
-  private getEventDescription(event: ScheduledEvent): string {
+  private getEventDescription(event: ScheduledEvent | PrisonerScheduledEventDto): string {
     if (event.eventType === 'APP') {
       return `Appointment - ${event.eventSubTypeDesc}`
     }

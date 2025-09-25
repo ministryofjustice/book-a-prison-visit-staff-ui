@@ -781,6 +781,30 @@ describe('orchestrationApiClient', () => {
     })
   })
 
+  describe('getVisitSessionsAndSchedule', () => {
+    it('should return array of visit sessions and events for specified prisoner', async () => {
+      const visitSessionsAndScheduleDto = TestData.visitSessionsAndSchedule()
+      const prisonerId = 'A1234BC'
+      const minNumberOfDays = 2
+      const username = 'user1'
+
+      fakeOrchestrationApi
+        .get('/visit-sessions-and-schedule')
+        .query({ prisonId, prisonerId, min: minNumberOfDays, username })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, visitSessionsAndScheduleDto)
+
+      const output = await orchestrationApiClient.getVisitSessionsAndSchedule({
+        prisonId,
+        prisonerId,
+        minNumberOfDays,
+        username,
+      })
+
+      expect(output).toStrictEqual(visitSessionsAndScheduleDto)
+    })
+  })
+
   describe('getPrisonerProfile', () => {
     it('should return prisoner profile page for selected prisoner', async () => {
       const prisonerProfile = TestData.prisonerProfile()
